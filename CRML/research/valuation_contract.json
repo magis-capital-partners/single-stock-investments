@@ -2,18 +2,220 @@
   "schema_version": "2.0",
   "status": "evidence_blocked",
   "ticker": "CRML",
-  "as_of": "2026-07-20",
-  "economic_ownership_map": [],
+  "as_of": "2026-07-18",
+  "economic_ownership_map": [
+    {
+      "component_id": "corporate_cash",
+      "label": "Corporate cash (soft floor)",
+      "category": "financial_asset",
+      "treatment": "additive",
+      "included_in_component_id": null,
+      "ownership_claim": "Corporate cash (soft floor)",
+      "ownership_percentage": 1.0,
+      "quantity": {
+        "value": 1,
+        "unit": "per-share economic claim"
+      },
+      "method": "net_asset_value",
+      "method_version": null,
+      "method_provenance": null,
+      "comparable_ids": [],
+      "range_per_share": {
+        "low": null,
+        "base": null,
+        "high": null
+      },
+      "legacy_range_per_share": {
+        "low": 0.05,
+        "base": 0.07,
+        "high": 0.1
+      },
+      "valuation_status": "legacy_sensitivity",
+      "calculation_proof": null,
+      "evidence_tier": "filing",
+      "evidence_level": "primary_verified",
+      "evidence": "$7.3M cash at June 30, 2025 / 104.9M shares (20-F FY2025)",
+      "scenario_assumptions": null,
+      "probability_and_timing": null,
+      "tax_and_realization_adjustments": "Going-concern burn.",
+      "falsifier": "A directly comparable transaction or asset-specific impairment supports a value below the low-case unit mark after like-for-like adjustments.",
+      "overlap_key": "corporate_cash",
+      "assumption_type": "fact"
+    },
+    {
+      "component_id": "tanbreez_risked_nav",
+      "label": "Tanbreez 42% REE stake (risked)",
+      "category": "real_option",
+      "treatment": "additive",
+      "included_in_component_id": null,
+      "ownership_claim": "Tanbreez 42% REE stake (risked)",
+      "ownership_percentage": 1.0,
+      "quantity": {
+        "value": 1,
+        "unit": "per-share economic claim"
+      },
+      "method": "probability_weighted",
+      "method_version": null,
+      "method_provenance": null,
+      "comparable_ids": [],
+      "range_per_share": {
+        "low": null,
+        "base": null,
+        "high": null
+      },
+      "legacy_range_per_share": {
+        "low": 0.5,
+        "base": 3.0,
+        "high": 8.0
+      },
+      "valuation_status": "legacy_sensitivity",
+      "calculation_proof": null,
+      "evidence_tier": "filing",
+      "evidence_level": "primary_verified",
+      "evidence": "44.87 Mt @ 0.38% TREO; PEA ~$3B pre-tax project NPV heavily risked (20-F)",
+      "scenario_assumptions": null,
+      "probability_and_timing": {
+        "success_probability": null,
+        "remaining_capital_m": null,
+        "timing_basis": "Base ~7 years aligned with Lawrence scenario horizon.",
+        "probability_basis": "Base ~15% Tanbreez development success after DFS and Greenland Stage 2.",
+        "remaining_capital_basis": "Project capex not yet funded; embedded in component ranges."
+      },
+      "tax_and_realization_adjustments": "PEA NPV heavily risked.",
+      "falsifier": "The next decision milestone fails, remaining capital rises materially, or the stated success probability no longer fits observable progress.",
+      "overlap_key": "tanbreez_risked_nav",
+      "assumption_type": "fact"
+    },
+    {
+      "component_id": "wolfsberg_option",
+      "label": "Wolfsberg lithium option",
+      "category": "real_option",
+      "treatment": "additive",
+      "included_in_component_id": null,
+      "ownership_claim": "Wolfsberg lithium option",
+      "ownership_percentage": 1.0,
+      "quantity": {
+        "value": 1,
+        "unit": "per-share economic claim"
+      },
+      "method": "milestone_nav",
+      "method_version": null,
+      "method_provenance": null,
+      "comparable_ids": [],
+      "range_per_share": {
+        "low": null,
+        "base": null,
+        "high": null
+      },
+      "legacy_range_per_share": {
+        "low": 0.0,
+        "base": 0.5,
+        "high": 2.0
+      },
+      "valuation_status": "legacy_sensitivity",
+      "calculation_proof": null,
+      "evidence_tier": "filing",
+      "evidence_level": "primary_verified",
+      "evidence": "BMW $15M restricted advance; M+I 9.7 Mt @ 1.03% Li2O (20-F)",
+      "scenario_assumptions": null,
+      "probability_and_timing": {
+        "success_probability": null,
+        "remaining_capital_m": null,
+        "timing_basis": "Later than Tanbreez base.",
+        "probability_basis": "Secondary option; BMW milestone required.",
+        "remaining_capital_basis": "Wolfsberg capex in option range."
+      },
+      "tax_and_realization_adjustments": "Advance restricted until production.",
+      "falsifier": "The next decision milestone fails, remaining capital rises materially, or the stated success probability no longer fits observable progress.",
+      "overlap_key": "wolfsberg_option",
+      "assumption_type": "fact"
+    },
+    {
+      "component_id": "dilution_reserve",
+      "label": "Dilution and GEM overhang reserve",
+      "category": "liability_or_reserve",
+      "treatment": "additive",
+      "included_in_component_id": null,
+      "ownership_claim": "Dilution and GEM overhang reserve",
+      "ownership_percentage": 1.0,
+      "quantity": {
+        "value": 1,
+        "unit": "per-share economic claim"
+      },
+      "method": "manual",
+      "method_version": null,
+      "method_provenance": null,
+      "comparable_ids": [],
+      "range_per_share": {
+        "low": null,
+        "base": null,
+        "high": null
+      },
+      "legacy_range_per_share": {
+        "low": -1.5,
+        "base": -0.5,
+        "high": -0.2
+      },
+      "valuation_status": "legacy_sensitivity",
+      "calculation_proof": null,
+      "evidence_tier": "filing",
+      "evidence_level": "primary_verified",
+      "evidence": "Stage 2 14.5M shares; GEM arbitration (20-F)",
+      "scenario_assumptions": null,
+      "probability_and_timing": null,
+      "tax_and_realization_adjustments": "Does not double-count unit count.",
+      "falsifier": "The obligation, financing claim, tax, or realization friction is materially larger than the low-case reserve.",
+      "overlap_key": "dilution_reserve",
+      "assumption_type": "fact"
+    }
+  ],
   "component_coverage": {
-    "all_material_components_identified": false,
-    "material_component_count": 0,
-    "additive_component_count": 0,
+    "all_material_components_identified": true,
+    "material_component_count": 4,
+    "additive_component_count": 4,
     "embedded_component_count": 0,
-    "unvalued_component_count": 1,
+    "unvalued_component_count": 4,
     "double_counting_flags": []
   },
   "input_classification": {
-    "facts": [],
+    "facts": [
+      {
+        "component_id": "corporate_cash",
+        "label": "Corporate cash (soft floor)",
+        "kind": "fact",
+        "evidence_tier": "filing",
+        "evidence": "$7.3M cash at June 30, 2025 / 104.9M shares (20-F FY2025)",
+        "method": "net_asset_value",
+        "valuation_status": "legacy_sensitivity"
+      },
+      {
+        "component_id": "tanbreez_risked_nav",
+        "label": "Tanbreez 42% REE stake (risked)",
+        "kind": "fact",
+        "evidence_tier": "filing",
+        "evidence": "44.87 Mt @ 0.38% TREO; PEA ~$3B pre-tax project NPV heavily risked (20-F)",
+        "method": "probability_weighted",
+        "valuation_status": "legacy_sensitivity"
+      },
+      {
+        "component_id": "wolfsberg_option",
+        "label": "Wolfsberg lithium option",
+        "kind": "fact",
+        "evidence_tier": "filing",
+        "evidence": "BMW $15M restricted advance; M+I 9.7 Mt @ 1.03% Li2O (20-F)",
+        "method": "milestone_nav",
+        "valuation_status": "legacy_sensitivity"
+      },
+      {
+        "component_id": "dilution_reserve",
+        "label": "Dilution and GEM overhang reserve",
+        "kind": "fact",
+        "evidence_tier": "filing",
+        "evidence": "Stage 2 14.5M shares; GEM arbitration (20-F)",
+        "method": "manual",
+        "valuation_status": "legacy_sensitivity"
+      }
+    ],
     "estimates": [],
     "judgments": []
   },
@@ -62,11 +264,29 @@
       "stock compensation or acquisitions omitted",
       "terminal value unsupported by a durable mechanism"
     ],
-    "secondary_profiles": [],
+    "secondary_profiles": [
+      {
+        "profile_id": "binary_milestone",
+        "score": 3.0,
+        "reasons": [
+          "component categories=real_option",
+          "existing methods=milestone, probability"
+        ]
+      },
+      {
+        "profile_id": "credit_and_normalized_returns",
+        "score": 2.0,
+        "reasons": [
+          "component categories=financial_asset, liability_or_reserve"
+        ]
+      }
+    ],
     "scorecard": {
       "scarce_asset_optionality": {
-        "score": 0.0,
-        "reasons": []
+        "score": 1.0,
+        "reasons": [
+          "component categories=real_option"
+        ]
       },
       "quality_reinvestment": {
         "score": 16.0,
@@ -80,20 +300,27 @@
         "reasons": []
       },
       "credit_and_normalized_returns": {
-        "score": 0.0,
-        "reasons": []
+        "score": 2.0,
+        "reasons": [
+          "component categories=financial_asset, liability_or_reserve"
+        ]
       },
       "catalyst_asset_value": {
-        "score": 0.0,
-        "reasons": []
+        "score": 1.0,
+        "reasons": [
+          "component categories=financial_asset"
+        ]
       },
       "predictable_cash_flow": {
         "score": 0.0,
         "reasons": []
       },
       "binary_milestone": {
-        "score": 0.0,
-        "reasons": []
+        "score": 3.0,
+        "reasons": [
+          "component categories=real_option",
+          "existing methods=milestone, probability"
+        ]
       }
     },
     "decision_rule": "Power Zones select the fitting economic method and eligible independent reviewers; they never choose the valuation answer or capital decision.",
@@ -105,12 +332,13 @@
     "classification": {
       "archetype": "compounder",
       "moat": "unproven",
-      "dhando": "pending",
+      "dhando": "none",
       "stance": "watch",
-      "cycle": "-",
+      "cycle": "up",
       "moi_bucket": "pending",
-      "payoff_lens": "pending",
-      "investment_sleeve": "-"
+      "payoff_lens": "asset",
+      "investment_sleeve": "ls_algo_underlying",
+      "predictive_attribute": "complexity_discount"
     },
     "specialist_power_zones": [],
     "committee": {
@@ -136,11 +364,11 @@
         }
       ]
     },
-    "input_hash": "eef9721dd6d8cf43376ade3a02386c46262545661f1364bc0d616ced3fc0e5c1",
-    "generated_at": "2026-07-20T09:33:01.085659+00:00"
+    "input_hash": "f2411297db72b24487558ac3b6fa284afc4fe0cc71cbc7f7a2c34d6531a0ec86",
+    "generated_at": "2026-07-20T17:13:54.533999+00:00"
   },
   "market": {
-    "price_per_share": null,
+    "price_per_share": 6.4,
     "fully_diluted_shares": null,
     "market_cap_m": null,
     "enterprise_value_m": null
@@ -156,7 +384,11 @@
       "base": 0,
       "high": 0
     },
-    "legacy_value_per_share": null,
+    "legacy_value_per_share": {
+      "low": -0.95,
+      "base": 3.07,
+      "high": 9.9
+    },
     "probability_weighted_value_per_share": null,
     "expected_distributions_per_share": 0.0,
     "annualized_return_at_price_pct": {
@@ -170,17 +402,54 @@
   },
   "scenario_contract": {
     "rule": "Cases must change cited causal operating, capital, probability, timing, or financing drivers\u2014not only a terminal multiple.",
-    "top_value_drivers": [],
+    "top_value_drivers": [
+      {
+        "component_id": "corporate_cash",
+        "label": "Corporate cash (soft floor)",
+        "valuation_status": "legacy_sensitivity",
+        "base_per_share": null,
+        "legacy_base_per_share": 0.07,
+        "range_width_per_share": null,
+        "scenario_assumptions": null
+      },
+      {
+        "component_id": "tanbreez_risked_nav",
+        "label": "Tanbreez 42% REE stake (risked)",
+        "valuation_status": "legacy_sensitivity",
+        "base_per_share": null,
+        "legacy_base_per_share": 3.0,
+        "range_width_per_share": null,
+        "scenario_assumptions": null
+      },
+      {
+        "component_id": "wolfsberg_option",
+        "label": "Wolfsberg lithium option",
+        "valuation_status": "legacy_sensitivity",
+        "base_per_share": null,
+        "legacy_base_per_share": 0.5,
+        "range_width_per_share": null,
+        "scenario_assumptions": null
+      },
+      {
+        "component_id": "dilution_reserve",
+        "label": "Dilution and GEM overhang reserve",
+        "valuation_status": "legacy_sensitivity",
+        "base_per_share": null,
+        "legacy_base_per_share": -0.5,
+        "range_width_per_share": null,
+        "scenario_assumptions": null
+      }
+    ],
     "reverse_expectations": null
   },
   "calculation_proof_summary": {
-    "component_count": 0,
+    "component_count": 4,
     "priced_component_count": 0,
     "proof_complete_pct": 0.0,
     "status_counts": {
       "bounded_estimate": 0,
       "calculated": 0,
-      "legacy_sensitivity": 0,
+      "legacy_sensitivity": 4,
       "unpriced": 0
     },
     "all_material_components_priced": false,
@@ -196,14 +465,22 @@
     "low_base_high_ordered": true
   },
   "evidence": {
-    "unresolved_count": 1,
+    "unresolved_count": 4,
     "blockers": [
-      "A complete economic ownership map has not been supplied."
+      "corporate_cash: material component is legacy_sensitivity; a valid calculation proof is required",
+      "dilution_reserve: material component is legacy_sensitivity; a valid calculation proof is required",
+      "tanbreez_risked_nav: material component is legacy_sensitivity; a valid calculation proof is required",
+      "wolfsberg_option: material component is legacy_sensitivity; a valid calculation proof is required"
     ],
     "validation_errors": []
   },
   "monitoring": {
-    "falsifiers": [],
+    "falsifiers": [
+      "A directly comparable transaction or asset-specific impairment supports a value below the low-case unit mark after like-for-like adjustments.",
+      "The next decision milestone fails, remaining capital rises materially, or the stated success probability no longer fits observable progress.",
+      "The next decision milestone fails, remaining capital rises materially, or the stated success probability no longer fits observable progress.",
+      "The obligation, financing claim, tax, or realization friction is materially larger than the low-case reserve."
+    ],
     "required_refresh_triggers": [
       "new filing or material operating update",
       "capital-structure change",
@@ -212,13 +489,12 @@
     ]
   },
   "change_control": {
-    "model_hash": "0f663ebf4bc9a77f626ef2ddcb7bc9e42c28e242a894041a199ed6f71d3602cc",
+    "model_hash": "adf21e571dcc1566d2927071a94ecdee4ca662882c26979d1ca9d05cef49cff0",
     "method_versions": [],
     "change_log": [],
     "rule": "A source fact is locked. Every assumption change requires a reason, author, timestamp, and before/after value."
   },
   "decision_rule": "No security is decision-grade until every material claim is valued exactly once by a valid calculation proof and every material evidence blocker is resolved.",
   "authority": "universal_valuation_contract",
-  "model_scaffold_ref": "CRML/research/valuation_model_scaffold.json",
-  "next_action": "Gather the listed primary evidence and compile the first proof-complete component model; never substitute an analyst plug."
+  "legacy_reference_present": true
 }

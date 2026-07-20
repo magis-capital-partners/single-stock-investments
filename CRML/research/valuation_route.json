@@ -43,11 +43,29 @@
     "stock compensation or acquisitions omitted",
     "terminal value unsupported by a durable mechanism"
   ],
-  "secondary_profiles": [],
+  "secondary_profiles": [
+    {
+      "profile_id": "binary_milestone",
+      "score": 3.0,
+      "reasons": [
+        "component categories=real_option",
+        "existing methods=milestone, probability"
+      ]
+    },
+    {
+      "profile_id": "credit_and_normalized_returns",
+      "score": 2.0,
+      "reasons": [
+        "component categories=financial_asset, liability_or_reserve"
+      ]
+    }
+  ],
   "scorecard": {
     "scarce_asset_optionality": {
-      "score": 0.0,
-      "reasons": []
+      "score": 1.0,
+      "reasons": [
+        "component categories=real_option"
+      ]
     },
     "quality_reinvestment": {
       "score": 16.0,
@@ -61,20 +79,27 @@
       "reasons": []
     },
     "credit_and_normalized_returns": {
-      "score": 0.0,
-      "reasons": []
+      "score": 2.0,
+      "reasons": [
+        "component categories=financial_asset, liability_or_reserve"
+      ]
     },
     "catalyst_asset_value": {
-      "score": 0.0,
-      "reasons": []
+      "score": 1.0,
+      "reasons": [
+        "component categories=financial_asset"
+      ]
     },
     "predictable_cash_flow": {
       "score": 0.0,
       "reasons": []
     },
     "binary_milestone": {
-      "score": 0.0,
-      "reasons": []
+      "score": 3.0,
+      "reasons": [
+        "component categories=real_option",
+        "existing methods=milestone, probability"
+      ]
     }
   },
   "decision_rule": "Power Zones select the fitting economic method and eligible independent reviewers; they never choose the valuation answer or capital decision.",
@@ -86,12 +111,13 @@
   "classification": {
     "archetype": "compounder",
     "moat": "unproven",
-    "dhando": "pending",
+    "dhando": "none",
     "stance": "watch",
-    "cycle": "-",
+    "cycle": "up",
     "moi_bucket": "pending",
-    "payoff_lens": "pending",
-    "investment_sleeve": "-"
+    "payoff_lens": "asset",
+    "investment_sleeve": "ls_algo_underlying",
+    "predictive_attribute": "complexity_discount"
   },
   "specialist_power_zones": [],
   "committee": {
@@ -117,6 +143,6 @@
       }
     ]
   },
-  "input_hash": "eef9721dd6d8cf43376ade3a02386c46262545661f1364bc0d616ced3fc0e5c1",
-  "generated_at": "2026-07-20T09:33:01.085659+00:00"
+  "input_hash": "f2411297db72b24487558ac3b6fa284afc4fe0cc71cbc7f7a2c34d6531a0ec86",
+  "generated_at": "2026-07-20T17:13:54.533999+00:00"
 }

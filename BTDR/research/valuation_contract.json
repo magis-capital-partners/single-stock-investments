@@ -2,7 +2,7 @@
   "schema_version": "2.0",
   "status": "evidence_blocked",
   "ticker": "BTDR",
-  "as_of": "2026-07-19",
+  "as_of": "2026-07-20",
   "economic_ownership_map": [],
   "component_coverage": {
     "all_material_components_identified": false,
@@ -98,7 +98,7 @@
     },
     "decision_rule": "Power Zones select the fitting economic method and eligible independent reviewers; they never choose the valuation answer or capital decision.",
     "ticker": "BTDR",
-    "as_of": "2026-07-19",
+    "as_of": "2026-07-20",
     "route_source": "canonical_power_zone_router",
     "config_path": "_system/frameworks/power_zones.json",
     "config_updated": "2026-07-14",
@@ -110,7 +110,7 @@
       "cycle": "-",
       "moi_bucket": "pending",
       "payoff_lens": "pending",
-      "investment_sleeve": "-"
+      "investment_sleeve": "ls_algo_underlying"
     },
     "specialist_power_zones": [],
     "committee": {
@@ -136,8 +136,8 @@
         }
       ]
     },
-    "input_hash": "818981b5114cc94a85422e5d99e52685f09fd15a6d82054979bc682e3ef8fbe1",
-    "generated_at": "2026-07-19T20:25:24.927138+00:00"
+    "input_hash": "786c097e18c99905ddd914ff4d92dd57ecf538480eb479c0ce7ab8b85c3cab8e",
+    "generated_at": "2026-07-20T17:13:54.233231+00:00"
   },
   "market": {
     "price_per_share": null,
@@ -196,9 +196,10 @@
     "low_base_high_ordered": true
   },
   "evidence": {
-    "unresolved_count": 1,
+    "unresolved_count": 2,
     "blockers": [
-      "A complete economic ownership map has not been supplied."
+      "A complete economic ownership map has not been supplied.",
+      "Market price per share is missing or non-positive; cannot mark decision_grade or compute entry prices."
     ],
     "validation_errors": []
   },
@@ -212,7 +213,7 @@
     ]
   },
   "change_control": {
-    "model_hash": "8929d13abf02a7450278094e89d6969bfab8d6c2cecff5878f4ffb03c387cdaa",
+    "model_hash": "262ee1f1309b7c0a6bbe88b7a07eb858a6e7099aa7f59d5f25aefe4cd3dfcf8c",
     "method_versions": [],
     "change_log": [],
     "rule": "A source fact is locked. Every assumption change requires a reason, author, timestamp, and before/after value."

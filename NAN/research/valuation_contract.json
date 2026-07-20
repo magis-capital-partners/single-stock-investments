@@ -2,7 +2,7 @@
   "schema_version": "2.0",
   "status": "evidence_blocked",
   "ticker": "NAN",
-  "as_of": "2026-07-19",
+  "as_of": "2026-07-20",
   "economic_ownership_map": [],
   "component_coverage": {
     "all_material_components_identified": false,
@@ -19,53 +19,63 @@
   },
   "method_route": {
     "schema_version": "2.0",
-    "status": "default_needs_review",
-    "profile_id": "quality_reinvestment",
-    "label": "High-return compounder",
-    "score": 0.0,
+    "status": "routed",
+    "profile_id": "scarce_asset_optionality",
+    "label": "Scarce assets, royalties, and optionality",
+    "score": 6.0,
     "reasons": [
-      "No decisive classification was supplied; owner-earnings is the conservative operating default."
+      "archetype=holding_co"
     ],
     "primary_methods": [
-      "owner_earnings_reinvestment_dcf"
+      "component_owner_cash_and_unit_nav"
     ],
     "corroborating_methods": [
-      "reverse_dcf",
-      "incremental_roic_runway"
+      "comparable_transactions",
+      "replacement_cost_or_reverse_nav"
     ],
     "primary_personas": [
-      "buffett_weschler",
-      "hohn"
-    ],
-    "cross_check_personas": [
-      "munger",
-      "marathon_capital_cycle"
-    ],
-    "silent_personas": [
-      "greenblatt",
       "hk",
-      "klarman_asset_value",
-      "marks_credit_cycle",
-      "pabrai",
       "stahl"
     ],
+    "cross_check_personas": [
+      "klarman_asset_value",
+      "marks_credit_cycle"
+    ],
+    "silent_personas": [
+      "buffett_weschler",
+      "greenblatt",
+      "hohn",
+      "marathon_capital_cycle",
+      "munger",
+      "pabrai"
+    ],
     "required_evidence": [
-      "normalized owner earnings",
-      "incremental return on capital",
-      "reinvestment runway",
-      "diluted share count",
-      "competitive-advantage mechanism"
+      "legal economic claim",
+      "non-overlapping physical inventory",
+      "unit economics",
+      "realization timing",
+      "remaining owner capital"
     ],
     "failure_modes": [
-      "growth projected without its capital cost",
-      "stock compensation or acquisitions omitted",
-      "terminal value unsupported by a durable mechanism"
+      "gross asset value mistaken for shareholder value",
+      "operating cash flow and NAV counted twice",
+      "remote options treated as contracted cash"
     ],
-    "secondary_profiles": [],
+    "secondary_profiles": [
+      {
+        "profile_id": "catalyst_asset_value",
+        "score": 6.0,
+        "reasons": [
+          "archetype=holding_co"
+        ]
+      }
+    ],
     "scorecard": {
       "scarce_asset_optionality": {
-        "score": 0.0,
-        "reasons": []
+        "score": 6.0,
+        "reasons": [
+          "archetype=holding_co"
+        ]
       },
       "quality_reinvestment": {
         "score": 0.0,
@@ -80,8 +90,10 @@
         "reasons": []
       },
       "catalyst_asset_value": {
-        "score": 0.0,
-        "reasons": []
+        "score": 6.0,
+        "reasons": [
+          "archetype=holding_co"
+        ]
       },
       "predictable_cash_flow": {
         "score": 0.0,
@@ -94,19 +106,21 @@
     },
     "decision_rule": "Power Zones select the fitting economic method and eligible independent reviewers; they never choose the valuation answer or capital decision.",
     "ticker": "NAN",
-    "as_of": "2026-07-18",
+    "as_of": "2026-07-20",
     "route_source": "canonical_power_zone_router",
     "config_path": "_system/frameworks/power_zones.json",
     "config_updated": "2026-07-14",
     "classification": {
-      "archetype": "unknown",
-      "moat": "unproven",
+      "archetype": "holding_co",
+      "moat": "n/a",
       "dhando": "pending",
       "stance": "watch",
       "cycle": "-",
       "moi_bucket": "pending",
-      "payoff_lens": "pending",
-      "investment_sleeve": "-"
+      "payoff_lens": "asset",
+      "investment_sleeve": "fund_nav_discounts",
+      "fund_edge": "classic",
+      "instrument_type": "closed_end_fund"
     },
     "specialist_power_zones": [],
     "committee": {
@@ -115,25 +129,25 @@
       "committee_seatable": true,
       "candidates": [
         {
-          "persona": "buffett_weschler",
-          "independence_group": "quality_reinvestment"
+          "persona": "hk",
+          "independence_group": "scarce_assets"
         },
         {
-          "persona": "hohn",
-          "independence_group": "competitive_advantage"
+          "persona": "stahl",
+          "independence_group": "scarce_assets"
         },
         {
-          "persona": "munger",
-          "independence_group": "quality_reinvestment"
+          "persona": "klarman_asset_value",
+          "independence_group": "asset_realization"
         },
         {
-          "persona": "marathon_capital_cycle",
-          "independence_group": "capital_cycle"
+          "persona": "marks_credit_cycle",
+          "independence_group": "credit_cycle"
         }
       ]
     },
-    "input_hash": "403eca3d2ea88764a65c64d2221da4f0eccddc4b5301f3fd144580bcec061cce",
-    "generated_at": "2026-07-18T13:01:45.805919+00:00"
+    "input_hash": "8ba7bc6f65669e976aa70827047bb3decfc2374dbd4f0d40250db1ad313d5f72",
+    "generated_at": "2026-07-20T17:13:55.816215+00:00"
   },
   "market": {
     "price_per_share": null,
@@ -192,9 +206,10 @@
     "low_base_high_ordered": true
   },
   "evidence": {
-    "unresolved_count": 1,
+    "unresolved_count": 2,
     "blockers": [
-      "A complete economic ownership map has not been supplied."
+      "A complete economic ownership map has not been supplied.",
+      "Market price per share is missing or non-positive; cannot mark decision_grade or compute entry prices."
     ],
     "validation_errors": []
   },
@@ -208,13 +223,12 @@
     ]
   },
   "change_control": {
-    "model_hash": "d9a842dd1645beca8adf6c2540a3e6f41a95ceef07f2c5ba13762d2e9575f7d5",
+    "model_hash": "f195f282c1db778f2d92273e67c14735c49b2065253379ca3cdf6a6d79fa1809",
     "method_versions": [],
     "change_log": [],
     "rule": "A source fact is locked. Every assumption change requires a reason, author, timestamp, and before/after value."
   },
   "decision_rule": "No security is decision-grade until every material claim is valued exactly once by a valid calculation proof and every material evidence blocker is resolved.",
   "authority": "universal_valuation_contract",
-  "model_scaffold_ref": "NAN/research/valuation_model_scaffold.json",
-  "next_action": "Gather the listed primary evidence and compile the first proof-complete component model; never substitute an analyst plug."
+  "legacy_reference_present": false
 }
