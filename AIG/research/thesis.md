@@ -1,29 +1,29 @@
 # AIG — Investment Thesis
 
-**Last updated:** 2026-07-10
+**Last updated:** 2026-07-21
 
 ## Classification
 
 | Field | Value |
 |-------|-------|
-| **Archetype** (Stahl) | unknown |
-| **Moat** (Munger) | unproven |
-| **Dhando** (Pabrai) | pending |
+| **Archetype** (Stahl) | compounder |
+| **Moat** (Munger) | stable |
+| **Dhando** (Pabrai) | partial |
 | **Stance** | watch |
-| **Cycle** | - |
-| **MOI bucket** (legacy) | pending |
-| **Payoff lens** | pending |
+| **Cycle** | mid |
+| **Payoff lens** | operating |
+| **Implied 7yr IRR (base)** | 11.5% |
 
 ## One-line thesis
 
-American International Group — thesis pending Marvin deep dive.
+Post-Corebridge AIG compounds adjusted book through General Insurance underwriting, float spread, and repurchases; at ~$80 the base case implies ~11.5% per year with partial dhando from catastrophe and casualty tail risk.
 
 ## Key questions
 
-- [ ] Read latest annual report
-- [ ] Read latest quarterly report
-- [ ] Apply `_system/frameworks/mental_models.md` Tier 1 lenses
+- [x] Read latest annual report (FY2025 10-K)
+- [x] Build economic ownership map and calculation proofs
+- [ ] Human review of Global Personal wildfire and Fortitude runoff bands
 
 ## [HUMAN REVIEW]
 
-- Onboarded 2026-07-10; awaiting deep dive.
+- Contract backfill 2026-07-21; decision_grade valuation contract; depth 19/24.
