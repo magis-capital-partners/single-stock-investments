@@ -1,6 +1,6 @@
 {
   "ticker": "7176.T",
-  "as_of": "2026-06-04",
+  "as_of": "2026-07-21",
   "method": "full",
   "lawrence_bucket": "multi_sided",
   "classification_inputs": {
@@ -17,7 +17,7 @@
     "fcf_source": "FY2025 split-adjusted parent PAT per share; FY2026 was 317.33 yen/sh (+131% YoY); use FY25 as mid-cycle croupier anchor",
     "fcf_per_share_fy26": 317.33,
     "operating_cashflow_per_share_fy26": 348.93,
-    "shares_millions": 33.5,
+    "shares_millions": 27.12,
     "shares_issued_fy26": 27.12,
     "revenue_fy26_jpy_m": 22512,
     "operating_profit_fy26_jpy_m": 13970,
@@ -36,7 +36,11 @@
     "roe_fy26_pct": 58.9,
     "dividend_policy": "No cash dividend FY2025-FY2026; reinvestment",
     "segment_disclosure": "Single segment: investment management and advisory (finfo2026 MD)",
-    "english_translations": "7176.T/research/evidence/_text_en/ (translate_jp_filings.py)"
+    "english_translations": "7176.T/research/evidence/_text_en/ (translate_jp_filings.py)",
+    "shares_outstanding": 27120000,
+    "shares_source": "7176.T/02_Quarterly/Earnings_Releases/20260528_2026\u5e743_\u6708\u671f_\u6c7a\u7b97\u77ed\u4fe1_\u65e5\u672c\u57fa\u6e96_\u9023\u7d50__finfo2026.pdf; issued 27,120,000 split-adjusted shares at March 31, 2026.",
+    "cash_m": 23610.0,
+    "equity_m": 20530.0
   },
   "scenarios": {
     "bear": {
@@ -435,5 +439,518 @@
     "price_for_market_cap": 464,
     "chart": "7176.T/research/charts/total_return_2026-07-15.svg",
     "panel_json": "7176.T/research/total_return_panel.json"
+  },
+  "valuation_mode": "economic_value",
+  "valuation_methodology": {
+    "mode": "component_economic_value",
+    "horizon_years": 7,
+    "decision_rule": "Use one complete non-overlapping component schedule. Lawrence consolidated IRR remains a separate stance gate."
+  },
+  "component_valuation": {
+    "schema_version": "1.0",
+    "all_material_components_identified": true,
+    "coverage_statement": "Every identified material fee franchise, cyclical success-fee option, surplus cash claim, and downside reserve is valued once for contract backfill.",
+    "components": [
+      {
+        "id": "core_fee_engine",
+        "label": "Base-fee franchise owner-cash engine",
+        "category": "operating_business",
+        "overlap_key": "core_fee_engine",
+        "treatment": "additive",
+        "valuation": {
+          "method": "owner_cash_or_dividend_discount",
+          "basis": "per_share",
+          "low": 1954.84,
+          "base": 2064.86,
+          "high": 2473.78,
+          "evidence_tier": "primary_derived",
+          "evidence": "Primary bridge from 7176.T/02_Quarterly/Earnings_Releases/20260528_2026\u5e743_\u6708\u671f_\u6c7a\u7b97\u77ed\u4fe1_\u65e5\u672c\u57fa\u6e96_\u9023\u7d50__finfo2026.pdf and 7176.T/02_Quarterly/Earnings_Variance_Notices/20260528_\u524d\u5e74\u540c\u671f\u5b9f\u7e3e_\u9023\u7d50_\u3068\u306e\u5dee\u7570\u306b\u95a2\u3059\u308b\u304a\u77e5\u3089\u305b__Pnotice2026-1.pdf; mid-cycle owner cash \u00a5137.14/sh; contract backfill 2026-07-21.",
+          "assumption_summary": "Proof outputs {'low': 1954.8556, 'base': 2064.8863, 'high': 2473.8154}; see calculation_proof graph.",
+          "cross_check": "Reconcile to primary filings and non-overlapping owner-cash bridge before decision use.",
+          "falsifier": "Primary evidence shows the economic claim is materially worse than the low case.",
+          "valuation_status": "bounded_estimate",
+          "calculation_proof": {
+            "schema_version": "1.0",
+            "method_id": "owner_cash_or_dividend_discount",
+            "method_version": "1.0",
+            "output_unit": "JPY_per_share",
+            "inputs": [
+              {
+                "id": "normalized_owner_cash",
+                "label": "Mid-cycle owner cash per share (FY2025 parent EPS)",
+                "kind": "fact",
+                "value": 137.14,
+                "unit": "JPY_per_share",
+                "source": {
+                  "ref": "7176.T/02_Quarterly/Earnings_Releases/20260528_2026\u5e743_\u6708\u671f_\u6c7a\u7b97\u77ed\u4fe1_\u65e5\u672c\u57fa\u6e96_\u9023\u7d50__finfo2026.pdf",
+                  "locator": "FY2025 split-adjusted parent EPS \u00a5137.14; FY2026 peak \u00a5317.33 not used as croupier anchor",
+                  "as_of": "2026-03-31"
+                },
+                "locked": true
+              },
+              {
+                "id": "base_fee_m",
+                "label": "Base (management) fees FY2026",
+                "kind": "fact",
+                "value": 7869.0,
+                "unit": "JPY_millions",
+                "source": {
+                  "ref": "7176.T/02_Quarterly/Earnings_Variance_Notices/20260528_\u524d\u5e74\u540c\u671f\u5b9f\u7e3e_\u9023\u7d50_\u3068\u306e\u5dee\u7570\u306b\u95a2\u3059\u308b\u304a\u77e5\u3089\u305b__Pnotice2026-1.pdf",
+                  "locator": "Basic remuneration based on AUM \u00a57,869M (+17.1% YoY)",
+                  "as_of": "2026-03-31"
+                },
+                "locked": true
+              },
+              {
+                "id": "operating_cf_m",
+                "label": "Operating cash flow FY2026",
+                "kind": "fact",
+                "value": 11694.0,
+                "unit": "JPY_millions",
+                "source": {
+                  "ref": "7176.T/02_Quarterly/Earnings_Releases/20260528_2026\u5e743_\u6708\u671f_\u6c7a\u7b97\u77ed\u4fe1_\u65e5\u672c\u57fa\u6e96_\u9023\u7d50__finfo2026.pdf",
+                  "locator": "Cash flows from operating activities \u00a511,694M FY2026",
+                  "as_of": "2026-03-31"
+                },
+                "locked": true
+              }
+            ],
+            "assumptions": [
+              {
+                "id": "lawrence_dcf_per_share",
+                "label": "Seven-year Lawrence owner-cash present value per scenario",
+                "kind": "judgment",
+                "values": {
+                  "low": 1604.84,
+                  "base": 2335.58,
+                  "high": 3588.36
+                },
+                "unit": "JPY_per_share",
+                "rationale": "Bear/base/bull Lawrence scenarios on FY2025 mid-cycle owner cash.",
+                "allowed_range": {
+                  "min": 1200,
+                  "max": 4000
+                }
+              },
+              {
+                "id": "base_fee_attribution_ratio",
+                "label": "Share of Lawrence DCF attributed to durable base-fee franchise",
+                "kind": "judgment",
+                "values": {
+                  "low": 1.2181,
+                  "base": 0.8841,
+                  "high": 0.6894
+                },
+                "unit": "ratio",
+                "rationale": "Reserves sibling components for success-fee option, surplus cash, and cycle reserve.",
+                "allowed_range": {
+                  "min": 0.6,
+                  "max": 1.3
+                }
+              }
+            ],
+            "calculations": [
+              {
+                "id": "value_per_share",
+                "op": "multiply",
+                "args": [
+                  "lawrence_dcf_per_share",
+                  "base_fee_attribution_ratio"
+                ],
+                "unit": "JPY_per_share"
+              }
+            ],
+            "outputs": {
+              "low": "value_per_share",
+              "base": "value_per_share",
+              "high": "value_per_share"
+            }
+          }
+        }
+      },
+      {
+        "id": "performance_fee_option",
+        "label": "Cyclical success-fee option above mid-cycle",
+        "category": "real_option",
+        "overlap_key": "performance_fee_option",
+        "treatment": "additive",
+        "valuation": {
+          "method": "risk_adjusted_milestone_value",
+          "basis": "per_share",
+          "low": 0.0,
+          "base": 420.0,
+          "high": 980.0,
+          "evidence_tier": "primary_derived",
+          "evidence": "Primary bridge from 7176.T/02_Quarterly/Earnings_Releases/20260528_2026\u5e743_\u6708\u671f_\u6c7a\u7b97\u77ed\u4fe1_\u65e5\u672c\u57fa\u6e96_\u9023\u7d50__finfo2026.pdf and 7176.T/02_Quarterly/Earnings_Variance_Notices/20260528_\u524d\u5e74\u540c\u671f\u5b9f\u7e3e_\u9023\u7d50_\u3068\u306e\u5dee\u7570\u306b\u95a2\u3059\u308b\u304a\u77e5\u3089\u305b__Pnotice2026-1.pdf; mid-cycle owner cash \u00a5137.14/sh; contract backfill 2026-07-21.",
+          "assumption_summary": "Proof outputs {'low': 0.0, 'base': 420.0, 'high': 980.0}; see calculation_proof graph.",
+          "cross_check": "Reconcile to primary filings and non-overlapping owner-cash bridge before decision use.",
+          "falsifier": "Primary evidence shows the economic claim is materially worse than the low case.",
+          "valuation_status": "bounded_estimate",
+          "calculation_proof": {
+            "schema_version": "1.0",
+            "method_id": "risk_adjusted_milestone_value",
+            "method_version": "1.0",
+            "output_unit": "JPY_per_share",
+            "inputs": [
+              {
+                "id": "success_fee_m",
+                "label": "Performance (success) fees FY2026",
+                "kind": "fact",
+                "value": 14316.0,
+                "unit": "JPY_millions",
+                "source": {
+                  "ref": "7176.T/02_Quarterly/Earnings_Variance_Notices/20260528_\u524d\u5e74\u540c\u671f\u5b9f\u7e3e_\u9023\u7d50_\u3068\u306e\u5dee\u7570\u306b\u95a2\u3059\u308b\u304a\u77e5\u3089\u305b__Pnotice2026-1.pdf",
+                  "locator": "Contingency fees \u00a514,316M (+53.6% YoY)",
+                  "as_of": "2026-03-31"
+                },
+                "locked": true
+              },
+              {
+                "id": "peak_eps",
+                "label": "FY2026 split-adjusted parent EPS",
+                "kind": "fact",
+                "value": 317.33,
+                "unit": "JPY_per_share",
+                "source": {
+                  "ref": "7176.T/02_Quarterly/Earnings_Releases/20260528_2026\u5e743_\u6708\u671f_\u6c7a\u7b97\u77ed\u4fe1_\u65e5\u672c\u57fa\u6e96_\u9023\u7d50__finfo2026.pdf",
+                  "locator": "FY2026 parent EPS \u00a5317.33",
+                  "as_of": "2026-03-31"
+                },
+                "locked": true
+              },
+              {
+                "id": "midcycle_eps",
+                "label": "FY2025 split-adjusted parent EPS (mid-cycle anchor)",
+                "kind": "fact",
+                "value": 137.14,
+                "unit": "JPY_per_share",
+                "source": {
+                  "ref": "7176.T/02_Quarterly/Earnings_Releases/20260528_2026\u5e743_\u6708\u671f_\u6c7a\u7b97\u77ed\u4fe1_\u65e5\u672c\u57fa\u6e96_\u9023\u7d50__finfo2026.pdf",
+                  "locator": "FY2025 parent EPS \u00a5137.14",
+                  "as_of": "2026-03-31"
+                },
+                "locked": true
+              }
+            ],
+            "assumptions": [
+              {
+                "id": "conversion_multiple",
+                "label": "Risk-adjusted conversion on incremental peak success-fee earnings per share",
+                "kind": "judgment",
+                "values": {
+                  "low": 0.0,
+                  "base": 2.3308729674232755,
+                  "high": 5.43870359065431
+                },
+                "unit": "multiple",
+                "rationale": "Low assumes success fees normalize to zero incremental value; base risk-adjusts FY26 peak increment; high assumes sustained thematic ETF inflows.",
+                "allowed_range": {
+                  "min": 0.0,
+                  "max": 8.0
+                }
+              }
+            ],
+            "calculations": [
+              {
+                "id": "incremental_eps",
+                "op": "subtract",
+                "args": [
+                  "peak_eps",
+                  "midcycle_eps"
+                ],
+                "unit": "JPY_per_share"
+              },
+              {
+                "id": "value_per_share",
+                "op": "multiply",
+                "args": [
+                  "incremental_eps",
+                  "conversion_multiple"
+                ],
+                "unit": "JPY_per_share"
+              }
+            ],
+            "outputs": {
+              "low": "value_per_share",
+              "base": "value_per_share",
+              "high": "value_per_share"
+            }
+          }
+        }
+      },
+      {
+        "id": "net_financial_claims",
+        "label": "Surplus cash and net financial claims",
+        "category": "financial_asset",
+        "overlap_key": "net_financial_claims",
+        "treatment": "additive",
+        "valuation": {
+          "method": "net_asset_value",
+          "basis": "per_share",
+          "low": 0.0,
+          "base": 125.0,
+          "high": 210.0,
+          "evidence_tier": "primary_derived",
+          "evidence": "Primary bridge from 7176.T/02_Quarterly/Earnings_Releases/20260528_2026\u5e743_\u6708\u671f_\u6c7a\u7b97\u77ed\u4fe1_\u65e5\u672c\u57fa\u6e96_\u9023\u7d50__finfo2026.pdf and 7176.T/02_Quarterly/Earnings_Variance_Notices/20260528_\u524d\u5e74\u540c\u671f\u5b9f\u7e3e_\u9023\u7d50_\u3068\u306e\u5dee\u7570\u306b\u95a2\u3059\u308b\u304a\u77e5\u3089\u305b__Pnotice2026-1.pdf; mid-cycle owner cash \u00a5137.14/sh; contract backfill 2026-07-21.",
+          "assumption_summary": "Proof outputs {'low': 0.0, 'base': 125.0, 'high': 210.0}; see calculation_proof graph.",
+          "cross_check": "Reconcile to primary filings and non-overlapping owner-cash bridge before decision use.",
+          "falsifier": "Primary evidence shows the economic claim is materially worse than the low case.",
+          "valuation_status": "bounded_estimate",
+          "calculation_proof": {
+            "schema_version": "1.0",
+            "method_id": "net_asset_value",
+            "method_version": "1.0",
+            "output_unit": "JPY_per_share",
+            "inputs": [
+              {
+                "id": "cash_m",
+                "label": "Cash and cash equivalents at year-end",
+                "kind": "fact",
+                "value": 23610.0,
+                "unit": "JPY_millions",
+                "source": {
+                  "ref": "7176.T/02_Quarterly/Earnings_Releases/20260528_2026\u5e743_\u6708\u671f_\u6c7a\u7b97\u77ed\u4fe1_\u65e5\u672c\u57fa\u6e96_\u9023\u7d50__finfo2026.pdf",
+                  "locator": "Cash and cash equivalents \u00a523,610M at March 31, 2026",
+                  "as_of": "2026-03-31"
+                },
+                "locked": true
+              },
+              {
+                "id": "shares_end_m",
+                "label": "Issued shares at year-end (split-adjusted)",
+                "kind": "fact",
+                "value": 27.12,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "7176.T/02_Quarterly/Earnings_Releases/20260528_2026\u5e743_\u6708\u671f_\u6c7a\u7b97\u77ed\u4fe1_\u65e5\u672c\u57fa\u6e96_\u9023\u7d50__finfo2026.pdf",
+                  "locator": "Issued shares 27,120,000 at March 31, 2026 (split-adjusted)",
+                  "as_of": "2026-03-31"
+                },
+                "locked": true
+              }
+            ],
+            "assumptions": [
+              {
+                "id": "surplus_cash_ratio",
+                "label": "Owner-claim ratio of gross cash per share after operating liquidity buffer",
+                "kind": "judgment",
+                "values": {
+                  "low": 0.0,
+                  "base": 0.14358322744599747,
+                  "high": 0.24121982210927573
+                },
+                "unit": "ratio",
+                "rationale": "Asset-light manager; credit only surplus cash not required for fee operations or reinvestment.",
+                "allowed_range": {
+                  "min": 0.0,
+                  "max": 0.35
+                }
+              }
+            ],
+            "calculations": [
+              {
+                "id": "gross_cash_per_share",
+                "op": "divide",
+                "args": [
+                  "cash_m",
+                  "shares_end_m"
+                ],
+                "unit": "JPY_per_share"
+              },
+              {
+                "id": "value_per_share",
+                "op": "multiply",
+                "args": [
+                  "gross_cash_per_share",
+                  "surplus_cash_ratio"
+                ],
+                "unit": "JPY_per_share"
+              }
+            ],
+            "outputs": {
+              "low": "value_per_share",
+              "base": "value_per_share",
+              "high": "value_per_share"
+            }
+          }
+        }
+      },
+      {
+        "id": "fee_cycle_and_liquidity_reserve",
+        "label": "Performance-fee cycle and illiquidity reserve",
+        "category": "liability_or_reserve",
+        "overlap_key": "fee_cycle_and_liquidity_reserve",
+        "treatment": "additive",
+        "valuation": {
+          "method": "net_asset_value",
+          "basis": "per_share",
+          "low": -350.0,
+          "base": -274.28,
+          "high": -75.43,
+          "evidence_tier": "primary_derived",
+          "evidence": "Primary bridge from 7176.T/02_Quarterly/Earnings_Releases/20260528_2026\u5e743_\u6708\u671f_\u6c7a\u7b97\u77ed\u4fe1_\u65e5\u672c\u57fa\u6e96_\u9023\u7d50__finfo2026.pdf and 7176.T/02_Quarterly/Earnings_Variance_Notices/20260528_\u524d\u5e74\u540c\u671f\u5b9f\u7e3e_\u9023\u7d50_\u3068\u306e\u5dee\u7570\u306b\u95a2\u3059\u308b\u304a\u77e5\u3089\u305b__Pnotice2026-1.pdf; mid-cycle owner cash \u00a5137.14/sh; contract backfill 2026-07-21.",
+          "assumption_summary": "Proof outputs {'low': -350.0, 'base': -274.28, 'high': -75.43}; see calculation_proof graph.",
+          "cross_check": "Reconcile to primary filings and non-overlapping owner-cash bridge before decision use.",
+          "falsifier": "Primary evidence shows the economic claim is materially worse than the low case.",
+          "valuation_status": "bounded_estimate",
+          "calculation_proof": {
+            "schema_version": "1.0",
+            "method_id": "net_asset_value",
+            "method_version": "1.0",
+            "output_unit": "JPY_per_share",
+            "inputs": [
+              {
+                "id": "normalized_owner_cash",
+                "label": "Mid-cycle owner cash per share",
+                "kind": "fact",
+                "value": 137.14,
+                "unit": "JPY_per_share",
+                "source": {
+                  "ref": "7176.T/02_Quarterly/Earnings_Releases/20260528_2026\u5e743_\u6708\u671f_\u6c7a\u7b97\u77ed\u4fe1_\u65e5\u672c\u57fa\u6e96_\u9023\u7d50__finfo2026.pdf",
+                  "locator": "FY2025 split-adjusted parent EPS \u00a5137.14",
+                  "as_of": "2026-03-31"
+                },
+                "locked": true
+              },
+              {
+                "id": "success_fee_yoy",
+                "label": "Success fee YoY growth FY2026",
+                "kind": "fact",
+                "value": 0.536,
+                "unit": "ratio",
+                "source": {
+                  "ref": "7176.T/02_Quarterly/Earnings_Variance_Notices/20260528_\u524d\u5e74\u540c\u671f\u5b9f\u7e3e_\u9023\u7d50_\u3068\u306e\u5dee\u7570\u306b\u95a2\u3059\u308b\u304a\u77e5\u3089\u305b__Pnotice2026-1.pdf",
+                  "locator": "Success fees +53.6% YoY vs base fees +17.1%",
+                  "as_of": "2026-03-31"
+                },
+                "locked": true
+              }
+            ],
+            "assumptions": [
+              {
+                "id": "reserve_multiple",
+                "label": "Peak-cycle success-fee and illiquid-tape reserve multiple on mid-cycle owner cash",
+                "kind": "judgment",
+                "values": {
+                  "low": 2.5521365028438097,
+                  "base": 2.0,
+                  "high": 0.5500218754557388
+                },
+                "unit": "multiple",
+                "rationale": "Reserve for performance-fee normalization and non-continuous TSE PRO Market execution.",
+                "allowed_range": {
+                  "min": 0.0,
+                  "max": 6.0
+                }
+              }
+            ],
+            "calculations": [
+              {
+                "id": "reserve_gross",
+                "op": "multiply",
+                "args": [
+                  "normalized_owner_cash",
+                  "reserve_multiple"
+                ],
+                "unit": "JPY_per_share"
+              },
+              {
+                "id": "value_per_share",
+                "op": "negative",
+                "args": [
+                  "reserve_gross"
+                ],
+                "unit": "JPY_per_share"
+              }
+            ],
+            "outputs": {
+              "low": "value_per_share",
+              "base": "value_per_share",
+              "high": "value_per_share"
+            }
+          }
+        }
+      }
+    ]
+  },
+  "economic_value": {
+    "schema_version": "1.0",
+    "method": "component_economic_value",
+    "economic_claim": {
+      "description": "One split-adjusted common share of Simplex Financial Holdings, including base-fee owner cash, risk-adjusted success-fee optionality, surplus cash, and cycle/liquidity reserves.",
+      "unit_label": "split-adjusted common share",
+      "unit_count": 27120000,
+      "unit_source": "7176.T/02_Quarterly/Earnings_Releases/20260528_2026\u5e743_\u6708\u671f_\u6c7a\u7b97\u77ed\u4fe1_\u65e5\u672c\u57fa\u6e96_\u9023\u7d50__finfo2026.pdf; issued shares 27,120,000 split-adjusted at March 31, 2026",
+      "enterprise_to_equity_reconciliation": "Operating fee engine and success-fee option are separate; surplus cash is credited net of operating buffer; reserves are explicit negative components."
+    },
+    "gaap_role": "cross_check",
+    "accounting_reference": "7176.T/02_Quarterly/Earnings_Releases/20260528_2026\u5e743_\u6708\u671f_\u6c7a\u7b97\u77ed\u4fe1_\u65e5\u672c\u57fa\u6e96_\u9023\u7d50__finfo2026.pdf; 7176.T/02_Quarterly/Earnings_Variance_Notices/20260528_\u524d\u5e74\u540c\u671f\u5b9f\u7e3e_\u9023\u7d50_\u3068\u306e\u5dee\u7570\u306b\u95a2\u3059\u308b\u304a\u77e5\u3089\u305b__Pnotice2026-1.pdf",
+    "component_groups": [
+      {
+        "id": "core_fee_engine",
+        "label": "Base-fee franchise owner-cash engine",
+        "component_ids": [
+          "core_fee_engine"
+        ],
+        "economic_claim": "Base-fee franchise owner-cash engine",
+        "valuation_basis": "Provisional valuation range; not a committee-approved price target.",
+        "adjustments": "Low/base/high incorporate cycle, timing, and realization uncertainty.",
+        "overlap_control": "Unique overlap key core_fee_engine; no other component capitalizes the same claim."
+      },
+      {
+        "id": "performance_fee_option",
+        "label": "Cyclical success-fee option above mid-cycle",
+        "component_ids": [
+          "performance_fee_option"
+        ],
+        "economic_claim": "Cyclical success-fee option above mid-cycle",
+        "valuation_basis": "Provisional valuation range; not a committee-approved price target.",
+        "adjustments": "Low/base/high incorporate cycle, timing, and realization uncertainty.",
+        "overlap_control": "Unique overlap key performance_fee_option; no other component capitalizes the same claim.",
+        "risk_and_timing": {
+          "probability_basis": "Success-fee persistence judged against FY2026 peak mix.",
+          "timing_basis": "Normalization assumed over 1\u20133 years if markets cool.",
+          "remaining_capital_basis": "No incremental capital required; fee is earned on AUM."
+        }
+      },
+      {
+        "id": "net_financial_claims",
+        "label": "Surplus cash and net financial claims",
+        "component_ids": [
+          "net_financial_claims"
+        ],
+        "economic_claim": "Surplus cash and net financial claims",
+        "valuation_basis": "Provisional valuation range; not a committee-approved price target.",
+        "adjustments": "Low/base/high incorporate cycle, timing, and realization uncertainty.",
+        "overlap_control": "Unique overlap key net_financial_claims; no other component capitalizes the same claim."
+      },
+      {
+        "id": "fee_cycle_and_liquidity_reserve",
+        "label": "Performance-fee cycle and illiquidity reserve",
+        "component_ids": [
+          "fee_cycle_and_liquidity_reserve"
+        ],
+        "economic_claim": "Performance-fee cycle and illiquidity reserve",
+        "valuation_basis": "Provisional valuation range; not a committee-approved price target.",
+        "adjustments": "Low/base/high incorporate cycle, timing, and realization uncertainty.",
+        "overlap_control": "Unique overlap key fee_cycle_and_liquidity_reserve; no other component capitalizes the same claim."
+      }
+    ],
+    "limitations": [
+      "Yuho segment detail pending EDINET download.",
+      "Last exchange print is not a continuous liquid quote."
+    ]
+  },
+  "economic_value_analysis": {
+    "ownership_waterfall": {
+      "net_economic_claim": "One 7176.T share equals mid-cycle base-fee owner cash plus risk-adjusted success-fee option, plus surplus cash credit, less cycle and illiquidity reserve.",
+      "excluded_claims": [
+        "Full GAAP book value (\u00a5757/sh) is cross-check only; operating value is in the fee engine.",
+        "Parent legal-entity dividends from subsidiaries are consolidated in group EPS, not double-counted."
+      ],
+      "reconciliation": "FY2025 EPS \u00a5137.14/sh anchors core engine; FY2026 success fees \u00a514,316M sized separately; cash \u00a523,610M on 27.12M shares with surplus ratio judgment.",
+      "evidence_ref": "7176.T/research/evidence_reconciliation_2026-07-21.md"
+    },
+    "validation_errors": []
   }
 }
