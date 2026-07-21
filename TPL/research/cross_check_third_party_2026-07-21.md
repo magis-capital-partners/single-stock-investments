@@ -55,6 +55,27 @@ Prior HK cross-check: `TPL/research/cross_check_HK_2026-06-01.md` (still valid; 
 
 **Returns statement (blended):** We expect **−8.2%** per year at today's price on the Marvin Lawrence base case; approved third-party sources may raise or lower conviction on governance and optionality timing but do not replace filing math without **[HUMAN REVIEW]**.
 
+## Approved source index (coverage)
+
+Each approved inventory path must appear in this cross-check:
+
+- `_system/reference/investment-wisdom/horizon-kinetics/HK-Q1-2025-Commentary-extract.txt` (via `TPL/third-party-analyses/references.md`)
+- `_system/reference/investment-wisdom/horizon-kinetics/HK-Q1-2026-Commentary-extract.txt`
+- `_system/reference/investment-wisdom/horizon-kinetics/Stahl-Worth-The-Time-Predictive-Attributes-extract.txt`
+- `_system/reference/investment-wisdom/horizon-kinetics/HK-Q3-2025-Commentary-extract.txt`
+- `https://specialsituationinvesting.substack.com/p/portfolio-update-gtx-msb-frmo-tpl`
+- `https://lemoncakesinvesting.substack.com/p/lessons-from-murray-stahl`
+- `https://lemoncakesinvesting.substack.com/p/frmo-the-most-important-things-part`
+- `https://lemoncakesinvesting.substack.com/p/tpl-texas-pacific-land-co-end-of`
+- `https://groundbreakerre.substack.com/p/water-rights-the-hidden-asset-the`
+- `TPL/third-party-analyses/activist_reports/long/SC-13D/A_20230127_acc0001056823_23_000001.htm`
+- `TPL/third-party-analyses/activist_reports/long/SC-13D/A_20230801_acc0001056823_23_000043.htm`
+- `TPL/third-party-analyses/activist_reports/long/SC-13D/A_20231206_acc0001056823_23_000058.htm`
+- `TPL/third-party-analyses/activist_reports/long/SC-13D/A_20240205_acc0001056823_24_000001.htm`
+- `TPL/third-party-analyses/activist_reports/long/SC-13D/A_20240207_acc0001056823_24_000008.htm`
+- `TPL/third-party-analyses/activist_reports/long/SC-13D/A_20240228_acc0001056823_24_000012.htm`
+- `TPL/third-party-analyses/activist_reports/long/SC-13D_20240122_acc0001398344_24_000853.htm`
+
 ## [HUMAN REVIEW]
 
 - [ ] Review pending VIC PDF before any numeric promotion
