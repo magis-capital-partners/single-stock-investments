@@ -1,9 +1,6 @@
 # GYRO — Investment Thesis
 
-**Last updated:** 2026-07-17
-**Deep dive:** `GYRO/research/deep_dive_2026-07-17.md`
-**Valuation:** `GYRO/research/valuation.json`
-**Adversarial:** pass · `GYRO/research/adversarial_2026-07-17.md`
+**Last updated:** auto-sync
 
 ## Classification
 
@@ -14,10 +11,15 @@
 | **Dhando** (Pabrai) | partial |
 | **Stance** | hold |
 | **Cycle** | - |
-| **Implied 7yr IRR** (Lawrence) | 33.4% per year (base); horizon is 2.46 years to the 2028 target, not literally 7 |
-| **IRR method** | yield_curve |
-| **MOI bucket** (legacy) | asset / special situation |
+| **Implied 7yr IRR** (base) | 33.4 |
+| **IRR method** | scarce_asset_optionality |
+| **Lawrence bucket** | other |
 | **Payoff lens** | asset |
+| **MOI bucket** | asset / special situation |
+
+**Deep dive:** `GYRO/research/deep_dive_2026-07-21.md` (auto-sync)
+**Valuation:** `GYRO/research/valuation.json`
+**Adversarial:** pass · `GYRO/research/adversarial_2026-07-21.md`
 
 ## One-line thesis
 
