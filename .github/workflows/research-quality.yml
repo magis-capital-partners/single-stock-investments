@@ -144,15 +144,34 @@ jobs:
             _system/scripts/ci_sparse_checkout_paths.py
           sparse-checkout-cone-mode: false
           fetch-depth: 1
-      - name: Checkout workspace (shallow PR diff)
+      - name: Checkout workspace (PR head + base tip)
         run: |
+          # Depth only needs enough history for overlay/insider valuation.json
+          # comparisons against base tip. Ticker scope comes from the GitHub PR
+          # file list below — never from a shallow two-dot git fallback.
           bash _system/scripts/ci_checkout_workspace.sh history "pull/${{ github.event.pull_request.number }}/head" 2
           git fetch --depth=1 origin "+refs/heads/${{ github.base_ref }}:refs/remotes/origin/${{ github.base_ref }}"
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
+      - name: Export PR changed files
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh api --paginate \
+            "repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}/files" \
+            --jq '.[].filename' > "$RUNNER_TEMP/pr-files.txt"
+          echo "PR files: $(wc -l < "$RUNNER_TEMP/pr-files.txt")"
+      - name: Use base-branch research linter
+        run: |
+          # PR heads often predate the scoping fix; the workflow merge commit
+          # already has the new args, so pull the matching script from base.
+          git checkout "origin/${{ github.base_ref }}" -- _system/scripts/lint_pr_research.py
       - name: Lint changed ticker research
-        run: python _system/scripts/lint_pr_research.py --base origin/${{ github.base_ref }}
+        run: |
+          python _system/scripts/lint_pr_research.py \
+            --base origin/${{ github.base_ref }} \
+            --name-only-file "$RUNNER_TEMP/pr-files.txt"
 
   dashboard-integrity:
     needs: changes
