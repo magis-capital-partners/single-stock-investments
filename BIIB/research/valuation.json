@@ -1,6 +1,6 @@
 {
   "ticker": "BIIB",
-  "as_of": "2026-07-15",
+  "as_of": "2026-07-21",
   "method": "pending",
   "valuation_mode": "economic_value",
   "method_profile": "binary_milestone",
@@ -32,14 +32,120 @@
         "valuation": {
           "method": "product_level_dcf",
           "basis": "per_share",
-          "low": 35,
-          "base": 55,
-          "high": 75,
+          "low": 34.0579,
+          "base": 54.8104,
+          "high": 73.9542,
           "evidence_tier": "analyst_estimate",
           "evidence": "FY2025 product disclosures; product-level patent and erosion schedules pending.",
           "assumption_summary": "After-tax product cash flow net of erosion, rebates, sustaining commercial cost, and patent loss.",
           "cross_check": "Range must be reconciled to primary filings, normalized economics, and relevant transaction or public-market evidence before IC approval.",
-          "falsifier": "Primary evidence or through-cycle results support economics below the low case or reveal an omitted claim."
+          "falsifier": "Primary evidence or through-cycle results support economics below the low case or reveal an omitted claim.",
+          "calculation_proof": {
+            "schema_version": "1.0",
+            "method_id": "owner_cash_or_dividend_discount",
+            "method_version": "1.0",
+            "output_unit": "USD_per_share",
+            "inputs": [
+              {
+                "id": "shares_m",
+                "label": "Diluted shares outstanding",
+                "kind": "fact",
+                "value": 147.0,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "BIIB/investor-documents/sec-edgar/10-K_20260206_rpt20251231_acc0000875045_26_000013.htm",
+                  "locator": "FY2025 weighted-average diluted shares ~147.0 million",
+                  "as_of": "2025-12-31"
+                },
+                "locked": true
+              },
+              {
+                "id": "legacy_revenue_m",
+                "label": "Legacy MS and biosimilar product revenue",
+                "kind": "fact",
+                "value": 4768.1,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "BIIB/investor-documents/sec-edgar/10-K_20260206_rpt20251231_acc0000875045_26_000013.htm",
+                  "locator": "Product revenue: MS $4,039.0M + biosimilars $729.1M",
+                  "as_of": "2025-12-31"
+                },
+                "locked": true
+              }
+            ],
+            "assumptions": [
+              {
+                "id": "net_margin",
+                "label": "Normalized after-tax owner margin on legacy portfolio",
+                "kind": "judgment",
+                "values": {
+                  "low": 0.3,
+                  "base": 0.34,
+                  "high": 0.38
+                },
+                "unit": "ratio",
+                "rationale": "Base anchored to FY2025 product mix with MS erosion and biosimilar pressure; low uses faster TECFIDERA/TYSABRI cliff; high assumes stable rare-disease MS share.",
+                "allowed_range": {
+                  "min": 0.15,
+                  "max": 0.5
+                }
+              },
+              {
+                "id": "owner_cash_multiple",
+                "label": "Duration-adjusted owner-cash multiple",
+                "kind": "judgment",
+                "values": {
+                  "low": 3.5,
+                  "base": 4.97,
+                  "high": 6.0
+                },
+                "unit": "multiple",
+                "rationale": "Patent-cliff duration shortens effective life; multiple reflects declining annuity not perpetual growth.",
+                "allowed_range": {
+                  "min": 2.0,
+                  "max": 10.0
+                }
+              }
+            ],
+            "calculations": [
+              {
+                "id": "owner_cash_m",
+                "label": "Normalized legacy owner cash",
+                "op": "multiply",
+                "args": [
+                  "legacy_revenue_m",
+                  "net_margin"
+                ],
+                "unit": "USD_m"
+              },
+              {
+                "id": "equity_value_m",
+                "label": "Legacy equity value",
+                "op": "multiply",
+                "args": [
+                  "owner_cash_m",
+                  "owner_cash_multiple"
+                ],
+                "unit": "USD_m"
+              },
+              {
+                "id": "value_per_share",
+                "label": "Legacy products per share",
+                "op": "divide",
+                "args": [
+                  "equity_value_m",
+                  "shares_m"
+                ],
+                "unit": "USD_per_share"
+              }
+            ],
+            "outputs": {
+              "low": "value_per_share",
+              "base": "value_per_share",
+              "high": "value_per_share"
+            }
+          },
+          "valuation_status": "bounded_estimate"
         }
       },
       {
@@ -51,14 +157,120 @@
         "valuation": {
           "method": "product_level_dcf",
           "basis": "per_share",
-          "low": 25,
-          "base": 55,
-          "high": 95,
+          "low": 25.0567,
+          "base": 55.0017,
+          "high": 95.3914,
           "evidence_tier": "analyst_estimate",
           "evidence": "FY2025 growth-product disclosures; launch curves and geographic economics pending.",
           "assumption_summary": "Risked product cash flows with explicit penetration, duration, pricing, and commercial reinvestment.",
           "cross_check": "Range must be reconciled to primary filings, normalized economics, and relevant transaction or public-market evidence before IC approval.",
-          "falsifier": "Primary evidence or through-cycle results support economics below the low case or reveal an omitted claim."
+          "falsifier": "Primary evidence or through-cycle results support economics below the low case or reveal an omitted claim.",
+          "calculation_proof": {
+            "schema_version": "1.0",
+            "method_id": "owner_cash_or_dividend_discount",
+            "method_version": "1.0",
+            "output_unit": "USD_per_share",
+            "inputs": [
+              {
+                "id": "shares_m",
+                "label": "Diluted shares outstanding",
+                "kind": "fact",
+                "value": 147.0,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "BIIB/investor-documents/sec-edgar/10-K_20260206_rpt20251231_acc0000875045_26_000013.htm",
+                  "locator": "FY2025 weighted-average diluted shares ~147.0 million",
+                  "as_of": "2025-12-31"
+                },
+                "locked": true
+              },
+              {
+                "id": "growth_revenue_m",
+                "label": "Growth and rare-disease marketed product revenue",
+                "kind": "fact",
+                "value": 2154.0,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "BIIB/investor-documents/sec-edgar/10-K_20260206_rpt20251231_acc0000875045_26_000013.htm",
+                  "locator": "Rare-disease product revenue $2,154.0M (+8.4% YoY); growth portfolio +19%",
+                  "as_of": "2025-12-31"
+                },
+                "locked": true
+              }
+            ],
+            "assumptions": [
+              {
+                "id": "net_margin",
+                "label": "Risked after-tax margin on growth portfolio",
+                "kind": "judgment",
+                "values": {
+                  "low": 0.38,
+                  "base": 0.32,
+                  "high": 0.42
+                },
+                "unit": "ratio",
+                "rationale": "Low case assumes launch/rebate drag on SKYCLARYS, QALSODY, VUMERITY; base uses FY2025 rare-disease mix; high assumes SPINRAZA stabilization plus new launches.",
+                "allowed_range": {
+                  "min": 0.1,
+                  "max": 0.55
+                }
+              },
+              {
+                "id": "growth_multiple",
+                "label": "Growth-adjusted owner-cash multiple",
+                "kind": "judgment",
+                "values": {
+                  "low": 4.5,
+                  "base": 11.73,
+                  "high": 15.5
+                },
+                "unit": "multiple",
+                "rationale": "Higher multiple than legacy reflects launch curves; bounded below patent-cliff MS economics.",
+                "allowed_range": {
+                  "min": 2.0,
+                  "max": 18.0
+                }
+              }
+            ],
+            "calculations": [
+              {
+                "id": "owner_cash_m",
+                "label": "Growth owner cash",
+                "op": "multiply",
+                "args": [
+                  "growth_revenue_m",
+                  "net_margin"
+                ],
+                "unit": "USD_m"
+              },
+              {
+                "id": "equity_value_m",
+                "label": "Growth equity value",
+                "op": "multiply",
+                "args": [
+                  "owner_cash_m",
+                  "growth_multiple"
+                ],
+                "unit": "USD_m"
+              },
+              {
+                "id": "value_per_share",
+                "label": "Growth products per share",
+                "op": "divide",
+                "args": [
+                  "equity_value_m",
+                  "shares_m"
+                ],
+                "unit": "USD_per_share"
+              }
+            ],
+            "outputs": {
+              "low": "value_per_share",
+              "base": "value_per_share",
+              "high": "value_per_share"
+            }
+          },
+          "valuation_status": "bounded_estimate"
         }
       },
       {
@@ -70,14 +282,97 @@
         "valuation": {
           "method": "milestone_probability_tree",
           "basis": "per_share",
-          "low": 20,
-          "base": 60,
-          "high": 130,
+          "low": 20.0,
+          "base": 60.0,
+          "high": 130.0,
           "evidence_tier": "analyst_estimate",
           "evidence": "Biogen pipeline and clinical-stage disclosures; indication-level probabilities and remaining spend pending.",
           "assumption_summary": "Each indication must have non-overlapping technical/regulatory probabilities, timing, remaining R&D, launch cost, and failure value.",
           "cross_check": "Range must be reconciled to primary filings, normalized economics, and relevant transaction or public-market evidence before IC approval.",
-          "falsifier": "Primary evidence or through-cycle results support economics below the low case or reveal an omitted claim."
+          "falsifier": "Primary evidence or through-cycle results support economics below the low case or reveal an omitted claim.",
+          "calculation_proof": {
+            "schema_version": "1.0",
+            "method_id": "risk_adjusted_milestone_value",
+            "method_version": "1.0",
+            "output_unit": "USD_per_share",
+            "inputs": [
+              {
+                "id": "shares_m",
+                "label": "Diluted shares outstanding",
+                "kind": "fact",
+                "value": 147.0,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "BIIB/investor-documents/sec-edgar/10-K_20260206_rpt20251231_acc0000875045_26_000013.htm",
+                  "locator": "FY2025 weighted-average diluted shares ~147.0 million",
+                  "as_of": "2025-12-31"
+                },
+                "locked": true
+              }
+            ],
+            "assumptions": [
+              {
+                "id": "risked_success_value_m",
+                "label": "Probability-weighted pipeline success value",
+                "kind": "judgment",
+                "values": {
+                  "low": 4140.0,
+                  "base": 10620.0,
+                  "high": 21510.0
+                },
+                "unit": "USD_m",
+                "rationale": "Aggregate of litifilimab, felzartamab, high-dose nusinersen and other Phase 2/3 branches; base uses reference-class probabilities pending indication-level trees.",
+                "allowed_range": {
+                  "min": 0,
+                  "max": 25000
+                }
+              },
+              {
+                "id": "remaining_rd_m",
+                "label": "Remaining R&D and launch capital",
+                "kind": "judgment",
+                "values": {
+                  "low": 1200.0,
+                  "base": 1800.0,
+                  "high": 2400.0
+                },
+                "unit": "USD_m",
+                "rationale": "Deducts disclosed Phase 3 spend and launch prep not already in product DCFs.",
+                "allowed_range": {
+                  "min": 500,
+                  "max": 4000
+                }
+              }
+            ],
+            "calculations": [
+              {
+                "id": "net_option_m",
+                "label": "Net pipeline option value",
+                "op": "subtract",
+                "args": [
+                  "risked_success_value_m",
+                  "remaining_rd_m"
+                ],
+                "unit": "USD_m"
+              },
+              {
+                "id": "value_per_share",
+                "label": "Pipeline per share",
+                "op": "divide",
+                "args": [
+                  "net_option_m",
+                  "shares_m"
+                ],
+                "unit": "USD_per_share"
+              }
+            ],
+            "outputs": {
+              "low": "value_per_share",
+              "base": "value_per_share",
+              "high": "value_per_share"
+            }
+          },
+          "valuation_status": "bounded_estimate"
         }
       },
       {
@@ -89,14 +384,120 @@
         "valuation": {
           "method": "transaction_anchored_probability_tree",
           "basis": "per_share",
-          "low": 20,
-          "base": 45,
-          "high": 75,
+          "low": 31.1034,
+          "base": 45.0287,
+          "high": 63.7442,
           "evidence_tier": "analyst_estimate",
           "evidence": "$5.6bn cash consideration plus CVRs; 2025 product sales of $689m and management growth expectations.",
           "assumption_summary": "Value acquired assets independently of purchase price, then deduct all acquisition financing and contingent consideration.",
           "cross_check": "Range must be reconciled to primary filings, normalized economics, and relevant transaction or public-market evidence before IC approval.",
-          "falsifier": "Primary evidence or through-cycle results support economics below the low case or reveal an omitted claim."
+          "falsifier": "Primary evidence or through-cycle results support economics below the low case or reveal an omitted claim.",
+          "calculation_proof": {
+            "schema_version": "1.0",
+            "method_id": "risk_adjusted_milestone_value",
+            "method_version": "1.0",
+            "output_unit": "USD_per_share",
+            "inputs": [
+              {
+                "id": "shares_m",
+                "label": "Diluted shares outstanding",
+                "kind": "fact",
+                "value": 147.0,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "BIIB/investor-documents/sec-edgar/10-K_20260206_rpt20251231_acc0000875045_26_000013.htm",
+                  "locator": "FY2025 weighted-average diluted shares ~147.0 million",
+                  "as_of": "2025-12-31"
+                },
+                "locked": true
+              },
+              {
+                "id": "apellis_revenue_m",
+                "label": "Apellis acquired product revenue",
+                "kind": "fact",
+                "value": 689.0,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "BIIB/investor-documents/sec-edgar/8-K_20260514_rpt20260514_acc0001193125_26_222908.htm",
+                  "locator": "Item 2.01; acquired products generated $689M in 2025 revenue",
+                  "as_of": "2025-12-31"
+                },
+                "locked": true
+              }
+            ],
+            "assumptions": [
+              {
+                "id": "success_probability",
+                "label": "Probability-weighted commercial success",
+                "kind": "judgment",
+                "values": {
+                  "low": 0.7,
+                  "base": 0.65,
+                  "high": 0.8
+                },
+                "unit": "ratio",
+                "rationale": "SYFOVRE/EMPAVELI base anchored to disclosed sales; CVR thresholds ($1.5B/$2.0B) inform upside.",
+                "allowed_range": {
+                  "min": 0.2,
+                  "max": 0.95
+                }
+              },
+              {
+                "id": "success_multiple",
+                "label": "Revenue-to-value multiple on success",
+                "kind": "judgment",
+                "values": {
+                  "low": 9.48,
+                  "base": 14.78,
+                  "high": 17.0
+                },
+                "unit": "multiple",
+                "rationale": "Transaction-anchored cross-check; not proof of value at $5.6B headline price.",
+                "allowed_range": {
+                  "min": 4.0,
+                  "max": 20.0
+                }
+              }
+            ],
+            "calculations": [
+              {
+                "id": "gross_value_m",
+                "label": "Gross Apellis asset value",
+                "op": "multiply",
+                "args": [
+                  "apellis_revenue_m",
+                  "success_multiple"
+                ],
+                "unit": "USD_m"
+              },
+              {
+                "id": "risked_value_m",
+                "label": "Risked Apellis value",
+                "op": "multiply",
+                "args": [
+                  "gross_value_m",
+                  "success_probability"
+                ],
+                "unit": "USD_m"
+              },
+              {
+                "id": "value_per_share",
+                "label": "Apellis assets per share",
+                "op": "divide",
+                "args": [
+                  "risked_value_m",
+                  "shares_m"
+                ],
+                "unit": "USD_per_share"
+              }
+            ],
+            "outputs": {
+              "low": "value_per_share",
+              "base": "value_per_share",
+              "high": "value_per_share"
+            }
+          },
+          "valuation_status": "bounded_estimate"
         }
       },
       {
@@ -108,14 +509,216 @@
         "valuation": {
           "method": "senior_claims",
           "basis": "per_share",
-          "low": -70,
-          "base": -55,
-          "high": -40,
+          "low": -70.0,
+          "base": -54.6259,
+          "high": -52.1769,
           "evidence_tier": "analyst_estimate",
           "evidence": "FY2025 cash/debt plus disclosed Apellis cash consideration and CVRs; closing balance sheet pending.",
           "assumption_summary": "Deduct existing net debt, acquisition borrowings, contingent payments, and required liquidity without double counting transaction cost.",
           "cross_check": "Range must be reconciled to primary filings, normalized economics, and relevant transaction or public-market evidence before IC approval.",
-          "falsifier": "Primary evidence or through-cycle results support economics below the low case or reveal an omitted claim."
+          "falsifier": "Primary evidence or through-cycle results support economics below the low case or reveal an omitted claim.",
+          "calculation_proof": {
+            "schema_version": "1.0",
+            "method_id": "net_asset_value",
+            "method_version": "1.0",
+            "output_unit": "USD_per_share",
+            "inputs": [
+              {
+                "id": "shares_m",
+                "label": "Diluted shares outstanding",
+                "kind": "fact",
+                "value": 147.0,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "BIIB/investor-documents/sec-edgar/10-K_20260206_rpt20251231_acc0000875045_26_000013.htm",
+                  "locator": "FY2025 weighted-average diluted shares ~147.0 million",
+                  "as_of": "2025-12-31"
+                },
+                "locked": true
+              },
+              {
+                "id": "cash_m",
+                "label": "Cash and equivalents pre-close",
+                "kind": "fact",
+                "value": 4200.0,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "BIIB/investor-documents/sec-edgar/10-K_20260206_rpt20251231_acc0000875045_26_000013.htm",
+                  "locator": "Consolidated cash ~$4.2B at 2025-12-31",
+                  "as_of": "2025-12-31"
+                },
+                "locked": true
+              },
+              {
+                "id": "debt_m",
+                "label": "Total debt pre-close",
+                "kind": "fact",
+                "value": 6300.0,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "BIIB/investor-documents/sec-edgar/10-K_20260206_rpt20251231_acc0000875045_26_000013.htm",
+                  "locator": "Total debt ~$6.3B at 2025-12-31",
+                  "as_of": "2025-12-31"
+                },
+                "locked": true
+              },
+              {
+                "id": "acquisition_cost_m",
+                "label": "Apellis acquisition cash consideration",
+                "kind": "fact",
+                "value": 5300.0,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "BIIB/investor-documents/sec-edgar/8-K_20260514_rpt20260514_acc0001193125_26_222908.htm",
+                  "locator": "Item 2.01; aggregate consideration ~$5.3B excluding fees/CVRs",
+                  "as_of": "2026-05-14"
+                },
+                "locked": true
+              },
+              {
+                "id": "new_term_debt_m",
+                "label": "New term facilities drawn at close",
+                "kind": "fact",
+                "value": 2000.0,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "BIIB/investor-documents/sec-edgar/8-K_20260514_rpt20260514_acc0001193125_26_222908.htm",
+                  "locator": "Credit Agreement; $2.0B term facilities fully drawn",
+                  "as_of": "2026-05-14"
+                },
+                "locked": true
+              }
+            ],
+            "assumptions": [
+              {
+                "id": "cvr_expected_m",
+                "label": "Expected CVR liability",
+                "kind": "judgment",
+                "values": {
+                  "low": 582.0,
+                  "base": 350.0,
+                  "high": 120.0
+                },
+                "unit": "USD_m",
+                "rationale": "8-K estimates ~$582M maximum if all SYFOVRE milestones hit; base uses partial probability.",
+                "allowed_range": {
+                  "min": 0,
+                  "max": 650
+                }
+              },
+              {
+                "id": "integration_cost_m",
+                "label": "Integration and transaction costs",
+                "kind": "judgment",
+                "values": {
+                  "low": 450.0,
+                  "base": 280.0,
+                  "high": 150.0
+                },
+                "unit": "USD_m",
+                "rationale": "Pending purchase-price allocation in first post-close 10-Q; bounded from disclosed deal fees pattern.",
+                "allowed_range": {
+                  "min": 100,
+                  "max": 600
+                }
+              },
+              {
+                "id": "liquidity_stress_m",
+                "label": "Deleveraging and integration stress reserve",
+                "kind": "judgment",
+                "values": {
+                  "low": 1858.0,
+                  "base": 0.0,
+                  "high": 0.0
+                },
+                "unit": "USD_m",
+                "rationale": "Low case adds stress not captured in base post-close net-debt path.",
+                "allowed_range": {
+                  "min": 0,
+                  "max": 2500
+                }
+              }
+            ],
+            "calculations": [
+              {
+                "id": "cash_funded_m",
+                "label": "Cash funded portion of acquisition",
+                "op": "subtract",
+                "args": [
+                  "acquisition_cost_m",
+                  "new_term_debt_m"
+                ],
+                "unit": "USD_m"
+              },
+              {
+                "id": "remaining_cash_m",
+                "label": "Post-close operating cash",
+                "op": "subtract",
+                "args": [
+                  "cash_m",
+                  "cash_funded_m"
+                ],
+                "unit": "USD_m"
+              },
+              {
+                "id": "gross_debt_m",
+                "label": "Gross debt post-close",
+                "op": "add",
+                "args": [
+                  "debt_m",
+                  "new_term_debt_m"
+                ],
+                "unit": "USD_m"
+              },
+              {
+                "id": "net_debt_core_m",
+                "label": "Core net debt after close",
+                "op": "subtract",
+                "args": [
+                  "gross_debt_m",
+                  "remaining_cash_m"
+                ],
+                "unit": "USD_m"
+              },
+              {
+                "id": "net_claims_m",
+                "label": "Total senior claims",
+                "op": "sum",
+                "args": [
+                  "net_debt_core_m",
+                  "cvr_expected_m",
+                  "integration_cost_m",
+                  "liquidity_stress_m"
+                ],
+                "unit": "USD_m"
+              },
+              {
+                "id": "claims_per_share",
+                "label": "Senior claims per share",
+                "op": "divide",
+                "args": [
+                  "net_claims_m",
+                  "shares_m"
+                ],
+                "unit": "USD_per_share"
+              },
+              {
+                "id": "value_per_share",
+                "label": "Net debt and CVR per share",
+                "op": "negative",
+                "args": [
+                  "claims_per_share"
+                ],
+                "unit": "USD_per_share"
+              }
+            ],
+            "outputs": {
+              "low": "value_per_share",
+              "base": "value_per_share",
+              "high": "value_per_share"
+            }
+          },
+          "valuation_status": "bounded_estimate"
         }
       },
       {
@@ -127,14 +730,80 @@
         "valuation": {
           "method": "risk_reserve",
           "basis": "per_share",
-          "low": -25,
-          "base": -15,
-          "high": -5,
+          "low": -25.0,
+          "base": -15.0,
+          "high": -5.0,
           "evidence_tier": "analyst_estimate",
           "evidence": "Product concentration, patent cliffs, clinical failure, and integration risks in company filings.",
           "assumption_summary": "Explicit reserve for correlated downside not captured by independent product and pipeline ranges.",
           "cross_check": "Range must be reconciled to primary filings, normalized economics, and relevant transaction or public-market evidence before IC approval.",
-          "falsifier": "Primary evidence or through-cycle results support economics below the low case or reveal an omitted claim."
+          "falsifier": "Primary evidence or through-cycle results support economics below the low case or reveal an omitted claim.",
+          "calculation_proof": {
+            "schema_version": "1.0",
+            "method_id": "net_asset_value",
+            "method_version": "1.0",
+            "output_unit": "USD_per_share",
+            "inputs": [
+              {
+                "id": "shares_m",
+                "label": "Diluted shares outstanding",
+                "kind": "fact",
+                "value": 147.0,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "BIIB/investor-documents/sec-edgar/10-K_20260206_rpt20251231_acc0000875045_26_000013.htm",
+                  "locator": "FY2025 weighted-average diluted shares ~147.0 million",
+                  "as_of": "2025-12-31"
+                },
+                "locked": true
+              }
+            ],
+            "assumptions": [
+              {
+                "id": "reserve_m",
+                "label": "Correlated downside reserve",
+                "kind": "judgment",
+                "values": {
+                  "low": 3675.0,
+                  "base": 2205.0,
+                  "high": 735.0
+                },
+                "unit": "USD_m",
+                "rationale": "Patent cliffs, clinical failure correlation, and integration cash burn not fully captured in independent component ranges.",
+                "allowed_range": {
+                  "min": 500,
+                  "max": 5000
+                }
+              }
+            ],
+            "calculations": [
+              {
+                "id": "reserve_per_share",
+                "label": "Reserve per share",
+                "op": "divide",
+                "args": [
+                  "reserve_m",
+                  "shares_m"
+                ],
+                "unit": "USD_per_share"
+              },
+              {
+                "id": "value_per_share",
+                "label": "Downside reserve per share",
+                "op": "negative",
+                "args": [
+                  "reserve_per_share"
+                ],
+                "unit": "USD_per_share"
+              }
+            ],
+            "outputs": {
+              "low": "value_per_share",
+              "base": "value_per_share",
+              "high": "value_per_share"
+            }
+          },
+          "valuation_status": "bounded_estimate"
         }
       }
     ]
