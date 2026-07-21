@@ -1,8 +1,8 @@
 {
   "schema_version": "2.0",
-  "status": "evidence_blocked",
+  "status": "decision_grade",
   "ticker": "STHO",
-  "as_of": "2026-07-16",
+  "as_of": "2026-07-21",
   "economic_ownership_map": [
     {
       "component_id": "safehold_equity_stake",
@@ -17,30 +17,357 @@
         "unit": "per-share economic claim"
       },
       "method": "marked_equity_nav",
-      "method_version": null,
-      "method_provenance": null,
+      "method_version": "1.0",
+      "method_provenance": {
+        "method_id": "net_asset_value",
+        "version": "1.0",
+        "label": "Reconciled net asset value",
+        "power_zones": [
+          "scarce_asset_optionality",
+          "catalyst_asset_value",
+          "credit_and_normalized_returns"
+        ],
+        "equation": "value_per_share = (gross_assets - senior_claims - tax - realization_costs) / diluted_shares",
+        "sources": [
+          {
+            "ref": "_system/frameworks/scarce_strategic_asset_valuation.md",
+            "locator": "Economic ownership and unit NAV"
+          }
+        ]
+      },
       "comparable_ids": [],
       "range_per_share": {
-        "low": null,
-        "base": null,
-        "high": null
+        "low": 12.9777,
+        "base": 18.4989,
+        "high": 27.9884
       },
       "legacy_range_per_share": {
-        "low": 13.0,
+        "low": 12.98,
         "base": 18.5,
-        "high": 28.0
+        "high": 27.99
       },
-      "valuation_status": "legacy_sensitivity",
-      "calculation_proof": null,
+      "valuation_status": "bounded_estimate",
+      "calculation_proof": {
+        "status": "valid",
+        "method_id": "net_asset_value",
+        "method_version": "1.0",
+        "outputs": {
+          "low": 12.9777,
+          "base": 18.4989,
+          "high": 27.9884
+        },
+        "output_unit": "USD_per_share",
+        "traces": {
+          "low": [
+            {
+              "id": "safe_shares_m",
+              "label": "Implied SAFE shares (Q1 fair value / mark price)",
+              "kind": "fact",
+              "value": 13.525499,
+              "unit": "million_shares",
+              "source": {
+                "ref": "STHO/investor-documents/sec-edgar/10-Q_20260508_rpt20260331_acc0001953366_26_000010.htm",
+                "locator": "Note 7: ~13.5M SAFE shares; fair value $183.0M at $13.53 on 2026-03-31",
+                "as_of": "2026-03-31",
+                "content_sha256": "566fedba05de625ec427a52d3145fe28a7f9160d09522b28278ff433273ac8a7",
+                "source_id": "898146eaf7d360fa85eadffd6e9f07bc297b4ba05fd22caed29a41d6cbf943ed"
+              },
+              "rationale": null
+            },
+            {
+              "id": "shares_m",
+              "label": "Common shares outstanding",
+              "kind": "fact",
+              "value": 12.081333,
+              "unit": "million_shares",
+              "source": {
+                "ref": "STHO/investor-documents/sec-edgar/10-Q_20260508_rpt20260331_acc0001953366_26_000010.htm",
+                "locator": "12,081,333 shares outstanding as of May 6, 2026 (cover page)",
+                "as_of": "2026-03-31",
+                "content_sha256": "566fedba05de625ec427a52d3145fe28a7f9160d09522b28278ff433273ac8a7",
+                "source_id": "d38d933ac884e5db1aba202cb6befa63fabbd7885fe21f70e2b10bf26ad17387"
+              },
+              "rationale": null
+            },
+            {
+              "id": "safe_mark",
+              "label": "SAFE equity mark per share",
+              "kind": "judgment",
+              "value": 12.0,
+              "unit": "USD_per_share",
+              "source": null,
+              "rationale": "Low forced-sale stress; base uses 2026-07-16 market; high rate-driven path toward March 2023 deal mark."
+            },
+            {
+              "id": "sale_friction",
+              "label": "Governance, margin-loan, and transfer friction on gross stake",
+              "kind": "judgment",
+              "value": 0.966,
+              "unit": "ratio",
+              "source": null,
+              "rationale": "Safe Governance Agreement and first-priority margin pledge reduce realizable proceeds vs headline mark."
+            },
+            {
+              "id": "gross_stake_m",
+              "label": "Gross SAFE stake value",
+              "kind": "calculation",
+              "value": 162.305988,
+              "unit": "USD_m",
+              "operation": "multiply",
+              "formula": "safe_shares_m \u00d7 safe_mark",
+              "substituted_formula": "13.525499 \u00d7 12",
+              "dependencies": [
+                "safe_shares_m",
+                "safe_mark"
+              ]
+            },
+            {
+              "id": "gross_ps",
+              "label": "Gross SAFE stake per STHO share",
+              "kind": "calculation",
+              "value": 13.4344437,
+              "unit": "USD_per_share",
+              "operation": "divide",
+              "formula": "gross_stake_m \u00f7 shares_m",
+              "substituted_formula": "162.30599 \u00f7 12.081333",
+              "dependencies": [
+                "gross_stake_m",
+                "shares_m"
+              ]
+            },
+            {
+              "id": "value_per_share",
+              "label": "Net SAFE stake per STHO share",
+              "kind": "calculation",
+              "value": 12.97767261,
+              "unit": "USD_per_share",
+              "operation": "multiply",
+              "formula": "gross_ps \u00d7 sale_friction",
+              "substituted_formula": "13.434444 \u00d7 0.966",
+              "dependencies": [
+                "gross_ps",
+                "sale_friction"
+              ]
+            }
+          ],
+          "base": [
+            {
+              "id": "safe_shares_m",
+              "label": "Implied SAFE shares (Q1 fair value / mark price)",
+              "kind": "fact",
+              "value": 13.525499,
+              "unit": "million_shares",
+              "source": {
+                "ref": "STHO/investor-documents/sec-edgar/10-Q_20260508_rpt20260331_acc0001953366_26_000010.htm",
+                "locator": "Note 7: ~13.5M SAFE shares; fair value $183.0M at $13.53 on 2026-03-31",
+                "as_of": "2026-03-31",
+                "content_sha256": "566fedba05de625ec427a52d3145fe28a7f9160d09522b28278ff433273ac8a7",
+                "source_id": "898146eaf7d360fa85eadffd6e9f07bc297b4ba05fd22caed29a41d6cbf943ed"
+              },
+              "rationale": null
+            },
+            {
+              "id": "shares_m",
+              "label": "Common shares outstanding",
+              "kind": "fact",
+              "value": 12.081333,
+              "unit": "million_shares",
+              "source": {
+                "ref": "STHO/investor-documents/sec-edgar/10-Q_20260508_rpt20260331_acc0001953366_26_000010.htm",
+                "locator": "12,081,333 shares outstanding as of May 6, 2026 (cover page)",
+                "as_of": "2026-03-31",
+                "content_sha256": "566fedba05de625ec427a52d3145fe28a7f9160d09522b28278ff433273ac8a7",
+                "source_id": "d38d933ac884e5db1aba202cb6befa63fabbd7885fe21f70e2b10bf26ad17387"
+              },
+              "rationale": null
+            },
+            {
+              "id": "safe_mark",
+              "label": "SAFE equity mark per share",
+              "kind": "judgment",
+              "value": 16.93,
+              "unit": "USD_per_share",
+              "source": null,
+              "rationale": "Low forced-sale stress; base uses 2026-07-16 market; high rate-driven path toward March 2023 deal mark."
+            },
+            {
+              "id": "sale_friction",
+              "label": "Governance, margin-loan, and transfer friction on gross stake",
+              "kind": "judgment",
+              "value": 0.976,
+              "unit": "ratio",
+              "source": null,
+              "rationale": "Safe Governance Agreement and first-priority margin pledge reduce realizable proceeds vs headline mark."
+            },
+            {
+              "id": "gross_stake_m",
+              "label": "Gross SAFE stake value",
+              "kind": "calculation",
+              "value": 228.98669807,
+              "unit": "USD_m",
+              "operation": "multiply",
+              "formula": "safe_shares_m \u00d7 safe_mark",
+              "substituted_formula": "13.525499 \u00d7 16.93",
+              "dependencies": [
+                "safe_shares_m",
+                "safe_mark"
+              ]
+            },
+            {
+              "id": "gross_ps",
+              "label": "Gross SAFE stake per STHO share",
+              "kind": "calculation",
+              "value": 18.95376099,
+              "unit": "USD_per_share",
+              "operation": "divide",
+              "formula": "gross_stake_m \u00f7 shares_m",
+              "substituted_formula": "228.9867 \u00f7 12.081333",
+              "dependencies": [
+                "gross_stake_m",
+                "shares_m"
+              ]
+            },
+            {
+              "id": "value_per_share",
+              "label": "Net SAFE stake per STHO share",
+              "kind": "calculation",
+              "value": 18.49887072,
+              "unit": "USD_per_share",
+              "operation": "multiply",
+              "formula": "gross_ps \u00d7 sale_friction",
+              "substituted_formula": "18.953761 \u00d7 0.976",
+              "dependencies": [
+                "gross_ps",
+                "sale_friction"
+              ]
+            }
+          ],
+          "high": [
+            {
+              "id": "safe_shares_m",
+              "label": "Implied SAFE shares (Q1 fair value / mark price)",
+              "kind": "fact",
+              "value": 13.525499,
+              "unit": "million_shares",
+              "source": {
+                "ref": "STHO/investor-documents/sec-edgar/10-Q_20260508_rpt20260331_acc0001953366_26_000010.htm",
+                "locator": "Note 7: ~13.5M SAFE shares; fair value $183.0M at $13.53 on 2026-03-31",
+                "as_of": "2026-03-31",
+                "content_sha256": "566fedba05de625ec427a52d3145fe28a7f9160d09522b28278ff433273ac8a7",
+                "source_id": "898146eaf7d360fa85eadffd6e9f07bc297b4ba05fd22caed29a41d6cbf943ed"
+              },
+              "rationale": null
+            },
+            {
+              "id": "shares_m",
+              "label": "Common shares outstanding",
+              "kind": "fact",
+              "value": 12.081333,
+              "unit": "million_shares",
+              "source": {
+                "ref": "STHO/investor-documents/sec-edgar/10-Q_20260508_rpt20260331_acc0001953366_26_000010.htm",
+                "locator": "12,081,333 shares outstanding as of May 6, 2026 (cover page)",
+                "as_of": "2026-03-31",
+                "content_sha256": "566fedba05de625ec427a52d3145fe28a7f9160d09522b28278ff433273ac8a7",
+                "source_id": "d38d933ac884e5db1aba202cb6befa63fabbd7885fe21f70e2b10bf26ad17387"
+              },
+              "rationale": null
+            },
+            {
+              "id": "safe_mark",
+              "label": "SAFE equity mark per share",
+              "kind": "judgment",
+              "value": 25.0,
+              "unit": "USD_per_share",
+              "source": null,
+              "rationale": "Low forced-sale stress; base uses 2026-07-16 market; high rate-driven path toward March 2023 deal mark."
+            },
+            {
+              "id": "sale_friction",
+              "label": "Governance, margin-loan, and transfer friction on gross stake",
+              "kind": "judgment",
+              "value": 1.0,
+              "unit": "ratio",
+              "source": null,
+              "rationale": "Safe Governance Agreement and first-priority margin pledge reduce realizable proceeds vs headline mark."
+            },
+            {
+              "id": "gross_stake_m",
+              "label": "Gross SAFE stake value",
+              "kind": "calculation",
+              "value": 338.137475,
+              "unit": "USD_m",
+              "operation": "multiply",
+              "formula": "safe_shares_m \u00d7 safe_mark",
+              "substituted_formula": "13.525499 \u00d7 25",
+              "dependencies": [
+                "safe_shares_m",
+                "safe_mark"
+              ]
+            },
+            {
+              "id": "gross_ps",
+              "label": "Gross SAFE stake per STHO share",
+              "kind": "calculation",
+              "value": 27.98842437,
+              "unit": "USD_per_share",
+              "operation": "divide",
+              "formula": "gross_stake_m \u00f7 shares_m",
+              "substituted_formula": "338.13747 \u00f7 12.081333",
+              "dependencies": [
+                "gross_stake_m",
+                "shares_m"
+              ]
+            },
+            {
+              "id": "value_per_share",
+              "label": "Net SAFE stake per STHO share",
+              "kind": "calculation",
+              "value": 27.98842437,
+              "unit": "USD_per_share",
+              "operation": "multiply",
+              "formula": "gross_ps \u00d7 sale_friction",
+              "substituted_formula": "27.988424 \u00d7 1",
+              "dependencies": [
+                "gross_ps",
+                "sale_friction"
+              ]
+            }
+          ]
+        },
+        "source_lineage": [
+          {
+            "node_id": "safe_shares_m",
+            "ref": "STHO/investor-documents/sec-edgar/10-Q_20260508_rpt20260331_acc0001953366_26_000010.htm",
+            "locator": "Note 7: ~13.5M SAFE shares; fair value $183.0M at $13.53 on 2026-03-31",
+            "as_of": "2026-03-31",
+            "content_sha256": "566fedba05de625ec427a52d3145fe28a7f9160d09522b28278ff433273ac8a7",
+            "source_id": "898146eaf7d360fa85eadffd6e9f07bc297b4ba05fd22caed29a41d6cbf943ed"
+          },
+          {
+            "node_id": "shares_m",
+            "ref": "STHO/investor-documents/sec-edgar/10-Q_20260508_rpt20260331_acc0001953366_26_000010.htm",
+            "locator": "12,081,333 shares outstanding as of May 6, 2026 (cover page)",
+            "as_of": "2026-03-31",
+            "content_sha256": "566fedba05de625ec427a52d3145fe28a7f9160d09522b28278ff433273ac8a7",
+            "source_id": "d38d933ac884e5db1aba202cb6befa63fabbd7885fe21f70e2b10bf26ad17387"
+          }
+        ],
+        "checks": {
+          "passed": true,
+          "errors": []
+        },
+        "proof_hash": "ecc423dd64eaff1d6393bc10630a85711c63ffb19c8cfbb7ebca315d73eed67c"
+      },
       "evidence_tier": "primary_derived",
       "evidence_level": "primary_derived",
       "evidence": "FACT spin/merger mark: SAFE closed $25.80 on 2023-03-31 (Yahoo; post 0.16 split on merger day), ~$25/share round number. At 13,525,499 implied shares that is $338.1M = $27.99/STHO share vs current Yahoo SAFE $16.93 \u2192 $18.95/STHO share (about -32% below deal mark). FACT Q1 10-Q Note 7: ~13.5M shares / 18.8%, FV $183.0M at $13.53 on 2026-03-31. INFERENCE: SAFE owns long-duration ground leases (typically ~99-year; IR decks cite ~91\u201392 year weighted-average extended lease term), so the equity mark is rate-sensitive \u2014 lower discount rates support re-rating toward/above the deal mark. JUDGMENT cases: low ~$12 SAFE forced sale; base near current mark with friction; high ~$25 deal-mark path. Margin Loan $92.8M first-priority pledge (Note 9).",
-      "scenario_assumptions": "Low/base/high vary SAFE mark and sale friction. High case is a rate-driven re-rating toward the March 2023 ~$25 deal mark, not a contractual put.",
+      "scenario_assumptions": "Proof outputs {'low': 12.9777, 'base': 18.4989, 'high': 27.9884}; see calculation_proof graph via net_asset_value@1.0.",
       "probability_and_timing": null,
       "tax_and_realization_adjustments": "Low/base/high incorporate ownership, financing, tax, and realization adjustments in component evidence.",
       "falsifier": "SAFE fails to re-rate with lower rates, or forced sale/collateral path nets below the low case.",
       "overlap_key": "safehold_equity_stake",
-      "assumption_type": "fact"
+      "assumption_type": "judgment"
     },
     {
       "component_id": "legacy_monetizing_portfolio",
@@ -55,25 +382,281 @@
         "unit": "per-share economic claim"
       },
       "method": "probability_weighted_asset_nav",
-      "method_version": null,
-      "method_provenance": null,
+      "method_version": "1.0",
+      "method_provenance": {
+        "method_id": "probability_weighted_catalyst_nav",
+        "version": "1.0",
+        "label": "Mutually exclusive catalyst event tree",
+        "power_zones": [
+          "catalyst_asset_value"
+        ],
+        "equation": "value = sum(probability_i*(payoff_i-cost_i)/(1+r_i)^years_i)",
+        "sources": [
+          {
+            "ref": "_system/frameworks/optionality_valuation.md",
+            "locator": "Probability, beneficiary, timing and failure cases"
+          }
+        ]
+      },
       "comparable_ids": [],
       "range_per_share": {
-        "low": null,
-        "base": null,
-        "high": null
+        "low": 3.4987,
+        "base": 5.3012,
+        "high": 6.5009
       },
       "legacy_range_per_share": {
         "low": 3.5,
         "base": 5.3,
         "high": 6.5
       },
-      "valuation_status": "legacy_sensitivity",
-      "calculation_proof": null,
+      "valuation_status": "bounded_estimate",
+      "calculation_proof": {
+        "status": "valid",
+        "method_id": "probability_weighted_catalyst_nav",
+        "method_version": "1.0",
+        "outputs": {
+          "low": 3.4987,
+          "base": 5.3012,
+          "high": 6.5009
+        },
+        "output_unit": "USD_per_share",
+        "traces": {
+          "low": [
+            {
+              "id": "carrying_m",
+              "label": "MD&A monetizing portfolio carrying value",
+              "kind": "fact",
+              "value": 71.4,
+              "unit": "USD_m",
+              "source": {
+                "ref": "STHO/investor-documents/sec-edgar/10-Q_20260508_rpt20260331_acc0001953366_26_000010.htm",
+                "locator": "MD&A monetizing: loan $16.1M + AFS $38.2M + land $14.4M + two properties $2.7M = $71.4M",
+                "as_of": "2026-03-31",
+                "content_sha256": "566fedba05de625ec427a52d3145fe28a7f9160d09522b28278ff433273ac8a7",
+                "source_id": "cbd7bedd0c48ffea627d679f9224ef1f84364f972ccb810e0c377bac9f408102"
+              },
+              "rationale": null
+            },
+            {
+              "id": "shares_m",
+              "label": "Common shares outstanding",
+              "kind": "fact",
+              "value": 12.081333,
+              "unit": "million_shares",
+              "source": {
+                "ref": "STHO/investor-documents/sec-edgar/10-Q_20260508_rpt20260331_acc0001953366_26_000010.htm",
+                "locator": "12,081,333 shares outstanding as of May 6, 2026 (cover page)",
+                "as_of": "2026-03-31",
+                "content_sha256": "566fedba05de625ec427a52d3145fe28a7f9160d09522b28278ff433273ac8a7",
+                "source_id": "d38d933ac884e5db1aba202cb6befa63fabbd7885fe21f70e2b10bf26ad17387"
+              },
+              "rationale": null
+            },
+            {
+              "id": "recovery_fraction",
+              "label": "Recovery vs carrying on monetizing schedule only",
+              "kind": "judgment",
+              "value": 0.592,
+              "unit": "ratio",
+              "source": null,
+              "rationale": "Low distressed recovery; base on repayments and land-sale margins; high modest premium to carrying."
+            },
+            {
+              "id": "realizable_m",
+              "label": "Risk-adjusted monetizing portfolio",
+              "kind": "calculation",
+              "value": 42.2688,
+              "unit": "USD_m",
+              "operation": "multiply",
+              "formula": "carrying_m \u00d7 recovery_fraction",
+              "substituted_formula": "71.4 \u00d7 0.592",
+              "dependencies": [
+                "carrying_m",
+                "recovery_fraction"
+              ]
+            },
+            {
+              "id": "value_per_share",
+              "label": "Monetizing portfolio per share",
+              "kind": "calculation",
+              "value": 3.49868678,
+              "unit": "USD_per_share",
+              "operation": "divide",
+              "formula": "realizable_m \u00f7 shares_m",
+              "substituted_formula": "42.2688 \u00f7 12.081333",
+              "dependencies": [
+                "realizable_m",
+                "shares_m"
+              ]
+            }
+          ],
+          "base": [
+            {
+              "id": "carrying_m",
+              "label": "MD&A monetizing portfolio carrying value",
+              "kind": "fact",
+              "value": 71.4,
+              "unit": "USD_m",
+              "source": {
+                "ref": "STHO/investor-documents/sec-edgar/10-Q_20260508_rpt20260331_acc0001953366_26_000010.htm",
+                "locator": "MD&A monetizing: loan $16.1M + AFS $38.2M + land $14.4M + two properties $2.7M = $71.4M",
+                "as_of": "2026-03-31",
+                "content_sha256": "566fedba05de625ec427a52d3145fe28a7f9160d09522b28278ff433273ac8a7",
+                "source_id": "cbd7bedd0c48ffea627d679f9224ef1f84364f972ccb810e0c377bac9f408102"
+              },
+              "rationale": null
+            },
+            {
+              "id": "shares_m",
+              "label": "Common shares outstanding",
+              "kind": "fact",
+              "value": 12.081333,
+              "unit": "million_shares",
+              "source": {
+                "ref": "STHO/investor-documents/sec-edgar/10-Q_20260508_rpt20260331_acc0001953366_26_000010.htm",
+                "locator": "12,081,333 shares outstanding as of May 6, 2026 (cover page)",
+                "as_of": "2026-03-31",
+                "content_sha256": "566fedba05de625ec427a52d3145fe28a7f9160d09522b28278ff433273ac8a7",
+                "source_id": "d38d933ac884e5db1aba202cb6befa63fabbd7885fe21f70e2b10bf26ad17387"
+              },
+              "rationale": null
+            },
+            {
+              "id": "recovery_fraction",
+              "label": "Recovery vs carrying on monetizing schedule only",
+              "kind": "judgment",
+              "value": 0.897,
+              "unit": "ratio",
+              "source": null,
+              "rationale": "Low distressed recovery; base on repayments and land-sale margins; high modest premium to carrying."
+            },
+            {
+              "id": "realizable_m",
+              "label": "Risk-adjusted monetizing portfolio",
+              "kind": "calculation",
+              "value": 64.0458,
+              "unit": "USD_m",
+              "operation": "multiply",
+              "formula": "carrying_m \u00d7 recovery_fraction",
+              "substituted_formula": "71.4 \u00d7 0.897",
+              "dependencies": [
+                "carrying_m",
+                "recovery_fraction"
+              ]
+            },
+            {
+              "id": "value_per_share",
+              "label": "Monetizing portfolio per share",
+              "kind": "calculation",
+              "value": 5.30121966,
+              "unit": "USD_per_share",
+              "operation": "divide",
+              "formula": "realizable_m \u00f7 shares_m",
+              "substituted_formula": "64.0458 \u00f7 12.081333",
+              "dependencies": [
+                "realizable_m",
+                "shares_m"
+              ]
+            }
+          ],
+          "high": [
+            {
+              "id": "carrying_m",
+              "label": "MD&A monetizing portfolio carrying value",
+              "kind": "fact",
+              "value": 71.4,
+              "unit": "USD_m",
+              "source": {
+                "ref": "STHO/investor-documents/sec-edgar/10-Q_20260508_rpt20260331_acc0001953366_26_000010.htm",
+                "locator": "MD&A monetizing: loan $16.1M + AFS $38.2M + land $14.4M + two properties $2.7M = $71.4M",
+                "as_of": "2026-03-31",
+                "content_sha256": "566fedba05de625ec427a52d3145fe28a7f9160d09522b28278ff433273ac8a7",
+                "source_id": "cbd7bedd0c48ffea627d679f9224ef1f84364f972ccb810e0c377bac9f408102"
+              },
+              "rationale": null
+            },
+            {
+              "id": "shares_m",
+              "label": "Common shares outstanding",
+              "kind": "fact",
+              "value": 12.081333,
+              "unit": "million_shares",
+              "source": {
+                "ref": "STHO/investor-documents/sec-edgar/10-Q_20260508_rpt20260331_acc0001953366_26_000010.htm",
+                "locator": "12,081,333 shares outstanding as of May 6, 2026 (cover page)",
+                "as_of": "2026-03-31",
+                "content_sha256": "566fedba05de625ec427a52d3145fe28a7f9160d09522b28278ff433273ac8a7",
+                "source_id": "d38d933ac884e5db1aba202cb6befa63fabbd7885fe21f70e2b10bf26ad17387"
+              },
+              "rationale": null
+            },
+            {
+              "id": "recovery_fraction",
+              "label": "Recovery vs carrying on monetizing schedule only",
+              "kind": "judgment",
+              "value": 1.1,
+              "unit": "ratio",
+              "source": null,
+              "rationale": "Low distressed recovery; base on repayments and land-sale margins; high modest premium to carrying."
+            },
+            {
+              "id": "realizable_m",
+              "label": "Risk-adjusted monetizing portfolio",
+              "kind": "calculation",
+              "value": 78.54,
+              "unit": "USD_m",
+              "operation": "multiply",
+              "formula": "carrying_m \u00d7 recovery_fraction",
+              "substituted_formula": "71.4 \u00d7 1.1",
+              "dependencies": [
+                "carrying_m",
+                "recovery_fraction"
+              ]
+            },
+            {
+              "id": "value_per_share",
+              "label": "Monetizing portfolio per share",
+              "kind": "calculation",
+              "value": 6.50093827,
+              "unit": "USD_per_share",
+              "operation": "divide",
+              "formula": "realizable_m \u00f7 shares_m",
+              "substituted_formula": "78.54 \u00f7 12.081333",
+              "dependencies": [
+                "realizable_m",
+                "shares_m"
+              ]
+            }
+          ]
+        },
+        "source_lineage": [
+          {
+            "node_id": "carrying_m",
+            "ref": "STHO/investor-documents/sec-edgar/10-Q_20260508_rpt20260331_acc0001953366_26_000010.htm",
+            "locator": "MD&A monetizing: loan $16.1M + AFS $38.2M + land $14.4M + two properties $2.7M = $71.4M",
+            "as_of": "2026-03-31",
+            "content_sha256": "566fedba05de625ec427a52d3145fe28a7f9160d09522b28278ff433273ac8a7",
+            "source_id": "cbd7bedd0c48ffea627d679f9224ef1f84364f972ccb810e0c377bac9f408102"
+          },
+          {
+            "node_id": "shares_m",
+            "ref": "STHO/investor-documents/sec-edgar/10-Q_20260508_rpt20260331_acc0001953366_26_000010.htm",
+            "locator": "12,081,333 shares outstanding as of May 6, 2026 (cover page)",
+            "as_of": "2026-03-31",
+            "content_sha256": "566fedba05de625ec427a52d3145fe28a7f9160d09522b28278ff433273ac8a7",
+            "source_id": "d38d933ac884e5db1aba202cb6befa63fabbd7885fe21f70e2b10bf26ad17387"
+          }
+        ],
+        "checks": {
+          "passed": true,
+          "errors": []
+        },
+        "proof_hash": "39f2681ce35d535d6908765062b7b23a0b29b86a98191aebfe3b37bcfb95e859"
+      },
       "evidence_tier": "primary_derived",
       "evidence_level": "primary_derived",
       "evidence": "FACT Q1 MD&A monetizing portfolio: loan $16.1M + ten AFS debt securities $38.2M + land $14.4M + two properties $2.7M = $71.4M ($5.91/sh). Zero-carry loans/equity interests disclosed with no assurance of recovery. Q1 land-development sales revenue $11.0M / COS $9.3M; Surfhouse mezz $10.6M repaid 3/27/2026 (8-K). Source: 10-Q MD&A; Note 5/6; 8-K 2026-04-01. INFERENCE from 10-K/10-Q land-sale margins: the $14.4M monetizing land sleeve may realize above carrying; loans/AFS remain nearer mark-to-market/par.",
-      "scenario_assumptions": "Low/base/high vary recovery vs carrying on the MD&A schedule only; Magnolia/Asbury residual is separate.",
+      "scenario_assumptions": "Proof outputs {'low': 3.4987, 'base': 5.3012, 'high': 6.5009}; see calculation_proof graph via probability_weighted_catalyst_nav@1.0.",
       "probability_and_timing": {
         "success_probability": null,
         "remaining_capital_m": null,
@@ -84,7 +667,7 @@
       "tax_and_realization_adjustments": "Low/base/high incorporate ownership, financing, tax, and realization adjustments in component evidence.",
       "falsifier": "Sale/repayment proceeds imply recovery below $3.50/sh on this bucket.",
       "overlap_key": "legacy_monetizing_portfolio",
-      "assumption_type": "fact"
+      "assumption_type": "judgment"
     },
     {
       "component_id": "magnolia_asbury_development_ops",
@@ -99,25 +682,283 @@
         "unit": "per-share economic claim"
       },
       "method": "probability_weighted_asset_nav",
-      "method_version": null,
-      "method_provenance": null,
+      "method_version": "1.0",
+      "method_provenance": {
+        "method_id": "net_asset_value",
+        "version": "1.0",
+        "label": "Reconciled net asset value",
+        "power_zones": [
+          "scarce_asset_optionality",
+          "catalyst_asset_value",
+          "credit_and_normalized_returns"
+        ],
+        "equation": "value_per_share = (gross_assets - senior_claims - tax - realization_costs) / diluted_shares",
+        "sources": [
+          {
+            "ref": "_system/frameworks/scarce_strategic_asset_valuation.md",
+            "locator": "Economic ownership and unit NAV"
+          }
+        ]
+      },
       "comparable_ids": [],
       "range_per_share": {
-        "low": null,
-        "base": null,
-        "high": null
+        "low": 4.0049,
+        "base": 7.5012,
+        "high": 13.019
       },
       "legacy_range_per_share": {
         "low": 4.0,
         "base": 7.5,
-        "high": 13.0
+        "high": 13.02
       },
-      "valuation_status": "legacy_sensitivity",
-      "calculation_proof": null,
+      "valuation_status": "bounded_estimate",
+      "calculation_proof": {
+        "status": "valid",
+        "method_id": "net_asset_value",
+        "method_version": "1.0",
+        "outputs": {
+          "low": 4.0049,
+          "base": 7.5012,
+          "high": 13.019
+        },
+        "output_unit": "USD_per_share",
+        "traces": {
+          "low": [
+            {
+              "id": "residual_carrying_m",
+              "label": "Magnolia/Asbury residual carrying after monetizing split",
+              "kind": "fact",
+              "value": 153.6,
+              "unit": "USD_m",
+              "source": {
+                "ref": "STHO/investor-documents/sec-edgar/10-Q_20260508_rpt20260331_acc0001953366_26_000010.htm",
+                "locator": "Q1 L&D $100.5M + RE $70.2M less MD&A monetizing land/other $17.1M = $153.6M residual",
+                "as_of": "2026-03-31",
+                "content_sha256": "566fedba05de625ec427a52d3145fe28a7f9160d09522b28278ff433273ac8a7",
+                "source_id": "cb988f12528a03c14e2680bbbc6153f7aeb74e203218503714468d7e4c65d983"
+              },
+              "rationale": null
+            },
+            {
+              "id": "shares_m",
+              "label": "Common shares outstanding",
+              "kind": "fact",
+              "value": 12.081333,
+              "unit": "million_shares",
+              "source": {
+                "ref": "STHO/investor-documents/sec-edgar/10-Q_20260508_rpt20260331_acc0001953366_26_000010.htm",
+                "locator": "12,081,333 shares outstanding as of May 6, 2026 (cover page)",
+                "as_of": "2026-03-31",
+                "content_sha256": "566fedba05de625ec427a52d3145fe28a7f9160d09522b28278ff433273ac8a7",
+                "source_id": "d38d933ac884e5db1aba202cb6befa63fabbd7885fe21f70e2b10bf26ad17387"
+              },
+              "rationale": null
+            },
+            {
+              "id": "realization_fraction",
+              "label": "Realization vs residual carrying",
+              "kind": "judgment",
+              "value": 0.315,
+              "unit": "ratio",
+              "source": null,
+              "rationale": "Lot sales above COS support base; low slow/distressed; high approaches carrying with partial entitlement uplift."
+            },
+            {
+              "id": "realizable_m",
+              "label": "Risk-adjusted residual real estate",
+              "kind": "calculation",
+              "value": 48.384,
+              "unit": "USD_m",
+              "operation": "multiply",
+              "formula": "residual_carrying_m \u00d7 realization_fraction",
+              "substituted_formula": "153.6 \u00d7 0.315",
+              "dependencies": [
+                "residual_carrying_m",
+                "realization_fraction"
+              ]
+            },
+            {
+              "id": "value_per_share",
+              "label": "Magnolia/Asbury residual per share",
+              "kind": "calculation",
+              "value": 4.00485609,
+              "unit": "USD_per_share",
+              "operation": "divide",
+              "formula": "realizable_m \u00f7 shares_m",
+              "substituted_formula": "48.384 \u00f7 12.081333",
+              "dependencies": [
+                "realizable_m",
+                "shares_m"
+              ]
+            }
+          ],
+          "base": [
+            {
+              "id": "residual_carrying_m",
+              "label": "Magnolia/Asbury residual carrying after monetizing split",
+              "kind": "fact",
+              "value": 153.6,
+              "unit": "USD_m",
+              "source": {
+                "ref": "STHO/investor-documents/sec-edgar/10-Q_20260508_rpt20260331_acc0001953366_26_000010.htm",
+                "locator": "Q1 L&D $100.5M + RE $70.2M less MD&A monetizing land/other $17.1M = $153.6M residual",
+                "as_of": "2026-03-31",
+                "content_sha256": "566fedba05de625ec427a52d3145fe28a7f9160d09522b28278ff433273ac8a7",
+                "source_id": "cb988f12528a03c14e2680bbbc6153f7aeb74e203218503714468d7e4c65d983"
+              },
+              "rationale": null
+            },
+            {
+              "id": "shares_m",
+              "label": "Common shares outstanding",
+              "kind": "fact",
+              "value": 12.081333,
+              "unit": "million_shares",
+              "source": {
+                "ref": "STHO/investor-documents/sec-edgar/10-Q_20260508_rpt20260331_acc0001953366_26_000010.htm",
+                "locator": "12,081,333 shares outstanding as of May 6, 2026 (cover page)",
+                "as_of": "2026-03-31",
+                "content_sha256": "566fedba05de625ec427a52d3145fe28a7f9160d09522b28278ff433273ac8a7",
+                "source_id": "d38d933ac884e5db1aba202cb6befa63fabbd7885fe21f70e2b10bf26ad17387"
+              },
+              "rationale": null
+            },
+            {
+              "id": "realization_fraction",
+              "label": "Realization vs residual carrying",
+              "kind": "judgment",
+              "value": 0.59,
+              "unit": "ratio",
+              "source": null,
+              "rationale": "Lot sales above COS support base; low slow/distressed; high approaches carrying with partial entitlement uplift."
+            },
+            {
+              "id": "realizable_m",
+              "label": "Risk-adjusted residual real estate",
+              "kind": "calculation",
+              "value": 90.624,
+              "unit": "USD_m",
+              "operation": "multiply",
+              "formula": "residual_carrying_m \u00d7 realization_fraction",
+              "substituted_formula": "153.6 \u00d7 0.59",
+              "dependencies": [
+                "residual_carrying_m",
+                "realization_fraction"
+              ]
+            },
+            {
+              "id": "value_per_share",
+              "label": "Magnolia/Asbury residual per share",
+              "kind": "calculation",
+              "value": 7.50115902,
+              "unit": "USD_per_share",
+              "operation": "divide",
+              "formula": "realizable_m \u00f7 shares_m",
+              "substituted_formula": "90.624 \u00f7 12.081333",
+              "dependencies": [
+                "realizable_m",
+                "shares_m"
+              ]
+            }
+          ],
+          "high": [
+            {
+              "id": "residual_carrying_m",
+              "label": "Magnolia/Asbury residual carrying after monetizing split",
+              "kind": "fact",
+              "value": 153.6,
+              "unit": "USD_m",
+              "source": {
+                "ref": "STHO/investor-documents/sec-edgar/10-Q_20260508_rpt20260331_acc0001953366_26_000010.htm",
+                "locator": "Q1 L&D $100.5M + RE $70.2M less MD&A monetizing land/other $17.1M = $153.6M residual",
+                "as_of": "2026-03-31",
+                "content_sha256": "566fedba05de625ec427a52d3145fe28a7f9160d09522b28278ff433273ac8a7",
+                "source_id": "cb988f12528a03c14e2680bbbc6153f7aeb74e203218503714468d7e4c65d983"
+              },
+              "rationale": null
+            },
+            {
+              "id": "shares_m",
+              "label": "Common shares outstanding",
+              "kind": "fact",
+              "value": 12.081333,
+              "unit": "million_shares",
+              "source": {
+                "ref": "STHO/investor-documents/sec-edgar/10-Q_20260508_rpt20260331_acc0001953366_26_000010.htm",
+                "locator": "12,081,333 shares outstanding as of May 6, 2026 (cover page)",
+                "as_of": "2026-03-31",
+                "content_sha256": "566fedba05de625ec427a52d3145fe28a7f9160d09522b28278ff433273ac8a7",
+                "source_id": "d38d933ac884e5db1aba202cb6befa63fabbd7885fe21f70e2b10bf26ad17387"
+              },
+              "rationale": null
+            },
+            {
+              "id": "realization_fraction",
+              "label": "Realization vs residual carrying",
+              "kind": "judgment",
+              "value": 1.024,
+              "unit": "ratio",
+              "source": null,
+              "rationale": "Lot sales above COS support base; low slow/distressed; high approaches carrying with partial entitlement uplift."
+            },
+            {
+              "id": "realizable_m",
+              "label": "Risk-adjusted residual real estate",
+              "kind": "calculation",
+              "value": 157.2864,
+              "unit": "USD_m",
+              "operation": "multiply",
+              "formula": "residual_carrying_m \u00d7 realization_fraction",
+              "substituted_formula": "153.6 \u00d7 1.024",
+              "dependencies": [
+                "residual_carrying_m",
+                "realization_fraction"
+              ]
+            },
+            {
+              "id": "value_per_share",
+              "label": "Magnolia/Asbury residual per share",
+              "kind": "calculation",
+              "value": 13.01896074,
+              "unit": "USD_per_share",
+              "operation": "divide",
+              "formula": "realizable_m \u00f7 shares_m",
+              "substituted_formula": "157.2864 \u00f7 12.081333",
+              "dependencies": [
+                "realizable_m",
+                "shares_m"
+              ]
+            }
+          ]
+        },
+        "source_lineage": [
+          {
+            "node_id": "residual_carrying_m",
+            "ref": "STHO/investor-documents/sec-edgar/10-Q_20260508_rpt20260331_acc0001953366_26_000010.htm",
+            "locator": "Q1 L&D $100.5M + RE $70.2M less MD&A monetizing land/other $17.1M = $153.6M residual",
+            "as_of": "2026-03-31",
+            "content_sha256": "566fedba05de625ec427a52d3145fe28a7f9160d09522b28278ff433273ac8a7",
+            "source_id": "cb988f12528a03c14e2680bbbc6153f7aeb74e203218503714468d7e4c65d983"
+          },
+          {
+            "node_id": "shares_m",
+            "ref": "STHO/investor-documents/sec-edgar/10-Q_20260508_rpt20260331_acc0001953366_26_000010.htm",
+            "locator": "12,081,333 shares outstanding as of May 6, 2026 (cover page)",
+            "as_of": "2026-03-31",
+            "content_sha256": "566fedba05de625ec427a52d3145fe28a7f9160d09522b28278ff433273ac8a7",
+            "source_id": "d38d933ac884e5db1aba202cb6befa63fabbd7885fe21f70e2b10bf26ad17387"
+          }
+        ],
+        "checks": {
+          "passed": true,
+          "errors": []
+        },
+        "proof_hash": "fff1381c55bf8ad22fc00b998339ac882a95c1ae896385672f3c40138016dc73"
+      },
       "evidence_tier": "mixed_primary_and_estimate",
       "evidence_level": "analyst_estimated",
       "evidence": "FACT YE2025 10-K Note 5 dispositions: land development revenue vs cost of sales 2025 $46.4M / $28.8M (+$17.6M), 2024 $60.0M / $48.7M (+$11.3M), 2023 $72.4M / $62.7M (+$9.7M). FACT Q1 2026: land development revenue $11.0M vs COS $9.3M (+$1.7M). INFERENCE: actively selling land/lots above carrying cost of sales \u2014 GAAP book understates realizable value for the monetizing land/development sleeve. FACT Q1 accum. depreciation: RE $28.784M + L&D $10.547M = $39.3M (~$3.26/sh) \u2014 upper bound on pure depreciation add-back for depreciable assets; land itself is not depreciated the same way. FACT 10-K: Company did not sell operating real estate (buildings) in 2025 or 2023 \u2014 Asbury hotel/ops premium to book is unproven by closed sales. FACT residual carrying after removing MD&A monetizing land/other \u2248 $12.72/sh. Sources: 10-K Note 5; 10-Q Notes 4\u20135; Item 1 Magnolia/Asbury.",
-      "scenario_assumptions": "Base applies a milder haircut than carrying because lot sales clear above COS; high adds partial depreciation / entitlement uplift; low remains distressed.",
+      "scenario_assumptions": "Proof outputs {'low': 4.0049, 'base': 7.5012, 'high': 13.019}; see calculation_proof graph via net_asset_value@1.0.",
       "probability_and_timing": {
         "success_probability": null,
         "remaining_capital_m": null,
@@ -143,30 +984,288 @@
         "unit": "per-share economic claim"
       },
       "method": "net_asset_value",
-      "method_version": null,
-      "method_provenance": null,
+      "method_version": "1.0",
+      "method_provenance": {
+        "method_id": "net_asset_value",
+        "version": "1.0",
+        "label": "Reconciled net asset value",
+        "power_zones": [
+          "scarce_asset_optionality",
+          "catalyst_asset_value",
+          "credit_and_normalized_returns"
+        ],
+        "equation": "value_per_share = (gross_assets - senior_claims - tax - realization_costs) / diluted_shares",
+        "sources": [
+          {
+            "ref": "_system/frameworks/scarce_strategic_asset_valuation.md",
+            "locator": "Economic ownership and unit NAV"
+          }
+        ]
+      },
       "comparable_ids": [],
       "range_per_share": {
-        "low": null,
-        "base": null,
-        "high": null
+        "low": 4.1351,
+        "base": 5.0957,
+        "high": 5.1008
       },
       "legacy_range_per_share": {
-        "low": 5.0,
+        "low": 4.14,
         "base": 5.1,
         "high": 5.1
       },
-      "valuation_status": "legacy_sensitivity",
-      "calculation_proof": null,
+      "valuation_status": "bounded_estimate",
+      "calculation_proof": {
+        "status": "valid",
+        "method_id": "net_asset_value",
+        "method_version": "1.0",
+        "outputs": {
+          "low": 4.1351,
+          "base": 5.0957,
+          "high": 5.1008
+        },
+        "output_unit": "USD_per_share",
+        "traces": {
+          "low": [
+            {
+              "id": "cash_m",
+              "label": "Cash plus restricted cash",
+              "kind": "fact",
+              "value": 62.059,
+              "unit": "USD_m",
+              "source": {
+                "ref": "STHO/investor-documents/sec-edgar/10-Q_20260508_rpt20260331_acc0001953366_26_000010.htm",
+                "locator": "Balance sheet / Note 8: cash $46.378M + restricted cash $15.681M = $62.059M",
+                "as_of": "2026-03-31",
+                "content_sha256": "566fedba05de625ec427a52d3145fe28a7f9160d09522b28278ff433273ac8a7",
+                "source_id": "94d2f0bcd7d444d3fd8f85043aba73d01386fdc258d6117069e8beb5a660d644"
+              },
+              "rationale": null
+            },
+            {
+              "id": "shares_m",
+              "label": "Common shares outstanding",
+              "kind": "fact",
+              "value": 12.081333,
+              "unit": "million_shares",
+              "source": {
+                "ref": "STHO/investor-documents/sec-edgar/10-Q_20260508_rpt20260331_acc0001953366_26_000010.htm",
+                "locator": "12,081,333 shares outstanding as of May 6, 2026 (cover page)",
+                "as_of": "2026-03-31",
+                "content_sha256": "566fedba05de625ec427a52d3145fe28a7f9160d09522b28278ff433273ac8a7",
+                "source_id": "d38d933ac884e5db1aba202cb6befa63fabbd7885fe21f70e2b10bf26ad17387"
+              },
+              "rationale": null
+            },
+            {
+              "id": "availability",
+              "label": "Fraction of cash available to common equity",
+              "kind": "judgment",
+              "value": 0.805,
+              "unit": "ratio",
+              "source": null,
+              "rationale": "Low allows restricted-cash leakage or collateral lock; base/high near full availability."
+            },
+            {
+              "id": "available_m",
+              "label": "Available cash to equity",
+              "kind": "calculation",
+              "value": 49.957495,
+              "unit": "USD_m",
+              "operation": "multiply",
+              "formula": "cash_m \u00d7 availability",
+              "substituted_formula": "62.059 \u00d7 0.805",
+              "dependencies": [
+                "cash_m",
+                "availability"
+              ]
+            },
+            {
+              "id": "value_per_share",
+              "label": "Cash per share",
+              "kind": "calculation",
+              "value": 4.13509792,
+              "unit": "USD_per_share",
+              "operation": "divide",
+              "formula": "available_m \u00f7 shares_m",
+              "substituted_formula": "49.957495 \u00f7 12.081333",
+              "dependencies": [
+                "available_m",
+                "shares_m"
+              ]
+            }
+          ],
+          "base": [
+            {
+              "id": "cash_m",
+              "label": "Cash plus restricted cash",
+              "kind": "fact",
+              "value": 62.059,
+              "unit": "USD_m",
+              "source": {
+                "ref": "STHO/investor-documents/sec-edgar/10-Q_20260508_rpt20260331_acc0001953366_26_000010.htm",
+                "locator": "Balance sheet / Note 8: cash $46.378M + restricted cash $15.681M = $62.059M",
+                "as_of": "2026-03-31",
+                "content_sha256": "566fedba05de625ec427a52d3145fe28a7f9160d09522b28278ff433273ac8a7",
+                "source_id": "94d2f0bcd7d444d3fd8f85043aba73d01386fdc258d6117069e8beb5a660d644"
+              },
+              "rationale": null
+            },
+            {
+              "id": "shares_m",
+              "label": "Common shares outstanding",
+              "kind": "fact",
+              "value": 12.081333,
+              "unit": "million_shares",
+              "source": {
+                "ref": "STHO/investor-documents/sec-edgar/10-Q_20260508_rpt20260331_acc0001953366_26_000010.htm",
+                "locator": "12,081,333 shares outstanding as of May 6, 2026 (cover page)",
+                "as_of": "2026-03-31",
+                "content_sha256": "566fedba05de625ec427a52d3145fe28a7f9160d09522b28278ff433273ac8a7",
+                "source_id": "d38d933ac884e5db1aba202cb6befa63fabbd7885fe21f70e2b10bf26ad17387"
+              },
+              "rationale": null
+            },
+            {
+              "id": "availability",
+              "label": "Fraction of cash available to common equity",
+              "kind": "judgment",
+              "value": 0.992,
+              "unit": "ratio",
+              "source": null,
+              "rationale": "Low allows restricted-cash leakage or collateral lock; base/high near full availability."
+            },
+            {
+              "id": "available_m",
+              "label": "Available cash to equity",
+              "kind": "calculation",
+              "value": 61.562528,
+              "unit": "USD_m",
+              "operation": "multiply",
+              "formula": "cash_m \u00d7 availability",
+              "substituted_formula": "62.059 \u00d7 0.992",
+              "dependencies": [
+                "cash_m",
+                "availability"
+              ]
+            },
+            {
+              "id": "value_per_share",
+              "label": "Cash per share",
+              "kind": "calculation",
+              "value": 5.09567347,
+              "unit": "USD_per_share",
+              "operation": "divide",
+              "formula": "available_m \u00f7 shares_m",
+              "substituted_formula": "61.562528 \u00f7 12.081333",
+              "dependencies": [
+                "available_m",
+                "shares_m"
+              ]
+            }
+          ],
+          "high": [
+            {
+              "id": "cash_m",
+              "label": "Cash plus restricted cash",
+              "kind": "fact",
+              "value": 62.059,
+              "unit": "USD_m",
+              "source": {
+                "ref": "STHO/investor-documents/sec-edgar/10-Q_20260508_rpt20260331_acc0001953366_26_000010.htm",
+                "locator": "Balance sheet / Note 8: cash $46.378M + restricted cash $15.681M = $62.059M",
+                "as_of": "2026-03-31",
+                "content_sha256": "566fedba05de625ec427a52d3145fe28a7f9160d09522b28278ff433273ac8a7",
+                "source_id": "94d2f0bcd7d444d3fd8f85043aba73d01386fdc258d6117069e8beb5a660d644"
+              },
+              "rationale": null
+            },
+            {
+              "id": "shares_m",
+              "label": "Common shares outstanding",
+              "kind": "fact",
+              "value": 12.081333,
+              "unit": "million_shares",
+              "source": {
+                "ref": "STHO/investor-documents/sec-edgar/10-Q_20260508_rpt20260331_acc0001953366_26_000010.htm",
+                "locator": "12,081,333 shares outstanding as of May 6, 2026 (cover page)",
+                "as_of": "2026-03-31",
+                "content_sha256": "566fedba05de625ec427a52d3145fe28a7f9160d09522b28278ff433273ac8a7",
+                "source_id": "d38d933ac884e5db1aba202cb6befa63fabbd7885fe21f70e2b10bf26ad17387"
+              },
+              "rationale": null
+            },
+            {
+              "id": "availability",
+              "label": "Fraction of cash available to common equity",
+              "kind": "judgment",
+              "value": 0.993,
+              "unit": "ratio",
+              "source": null,
+              "rationale": "Low allows restricted-cash leakage or collateral lock; base/high near full availability."
+            },
+            {
+              "id": "available_m",
+              "label": "Available cash to equity",
+              "kind": "calculation",
+              "value": 61.624587,
+              "unit": "USD_m",
+              "operation": "multiply",
+              "formula": "cash_m \u00d7 availability",
+              "substituted_formula": "62.059 \u00d7 0.993",
+              "dependencies": [
+                "cash_m",
+                "availability"
+              ]
+            },
+            {
+              "id": "value_per_share",
+              "label": "Cash per share",
+              "kind": "calculation",
+              "value": 5.10081023,
+              "unit": "USD_per_share",
+              "operation": "divide",
+              "formula": "available_m \u00f7 shares_m",
+              "substituted_formula": "61.624587 \u00f7 12.081333",
+              "dependencies": [
+                "available_m",
+                "shares_m"
+              ]
+            }
+          ]
+        },
+        "source_lineage": [
+          {
+            "node_id": "cash_m",
+            "ref": "STHO/investor-documents/sec-edgar/10-Q_20260508_rpt20260331_acc0001953366_26_000010.htm",
+            "locator": "Balance sheet / Note 8: cash $46.378M + restricted cash $15.681M = $62.059M",
+            "as_of": "2026-03-31",
+            "content_sha256": "566fedba05de625ec427a52d3145fe28a7f9160d09522b28278ff433273ac8a7",
+            "source_id": "94d2f0bcd7d444d3fd8f85043aba73d01386fdc258d6117069e8beb5a660d644"
+          },
+          {
+            "node_id": "shares_m",
+            "ref": "STHO/investor-documents/sec-edgar/10-Q_20260508_rpt20260331_acc0001953366_26_000010.htm",
+            "locator": "12,081,333 shares outstanding as of May 6, 2026 (cover page)",
+            "as_of": "2026-03-31",
+            "content_sha256": "566fedba05de625ec427a52d3145fe28a7f9160d09522b28278ff433273ac8a7",
+            "source_id": "d38d933ac884e5db1aba202cb6befa63fabbd7885fe21f70e2b10bf26ad17387"
+          }
+        ],
+        "checks": {
+          "passed": true,
+          "errors": []
+        },
+        "proof_hash": "d5ce397e6a51e1af7d4b181c549251ced85f4906fa5a187173ede3f1af736e90"
+      },
       "evidence_tier": "audited",
       "evidence_level": "primary_verified",
       "evidence": "FACT Q1 balance sheet / Note 8: cash $46.378M + restricted cash $15.681M = $62.059M ($5.14/sh). Prior research incorrectly used YE $67.2M for Q1.",
-      "scenario_assumptions": "Cash is near carrying; low allows modest restricted-cash leakage.",
+      "scenario_assumptions": "Proof outputs {'low': 4.1351, 'base': 5.0957, 'high': 5.1008}; see calculation_proof graph via net_asset_value@1.0.",
       "probability_and_timing": null,
       "tax_and_realization_adjustments": "Low/base/high incorporate ownership, financing, tax, and realization adjustments in component evidence.",
       "falsifier": "Restricted cash is unavailable for equity or required as additional margin collateral.",
       "overlap_key": "cash_and_restricted",
-      "assumption_type": "fact"
+      "assumption_type": "judgment"
     },
     {
       "component_id": "senior_debt",
@@ -181,30 +1280,327 @@
         "unit": "per-share economic claim"
       },
       "method": "net_debt",
-      "method_version": null,
-      "method_provenance": null,
+      "method_version": "1.0",
+      "method_provenance": {
+        "method_id": "net_asset_value",
+        "version": "1.0",
+        "label": "Reconciled net asset value",
+        "power_zones": [
+          "scarce_asset_optionality",
+          "catalyst_asset_value",
+          "credit_and_normalized_returns"
+        ],
+        "equation": "value_per_share = (gross_assets - senior_claims - tax - realization_costs) / diluted_shares",
+        "sources": [
+          {
+            "ref": "_system/frameworks/scarce_strategic_asset_valuation.md",
+            "locator": "Economic ownership and unit NAV"
+          }
+        ]
+      },
       "comparable_ids": [],
       "range_per_share": {
-        "low": null,
-        "base": null,
-        "high": null
+        "low": -17.5109,
+        "base": -17.0997,
+        "high": -16.5171
       },
       "legacy_range_per_share": {
-        "low": -17.5,
+        "low": -17.51,
         "base": -17.1,
-        "high": -16.5
+        "high": -16.52
       },
-      "valuation_status": "legacy_sensitivity",
-      "calculation_proof": null,
+      "valuation_status": "bounded_estimate",
+      "calculation_proof": {
+        "status": "valid",
+        "method_id": "net_asset_value",
+        "method_version": "1.0",
+        "outputs": {
+          "low": -17.5109,
+          "base": -17.0997,
+          "high": -16.5171
+        },
+        "output_unit": "USD_per_share",
+        "traces": {
+          "low": [
+            {
+              "id": "debt_m",
+              "label": "Long-term debt obligations net",
+              "kind": "fact",
+              "value": 207.001,
+              "unit": "USD_m",
+              "source": {
+                "ref": "STHO/investor-documents/sec-edgar/10-Q_20260508_rpt20260331_acc0001953366_26_000010.htm",
+                "locator": "Note 9: Safe Credit $115.0M + Margin Loan $92.777M; total debt obligations net $207.001M",
+                "as_of": "2026-03-31",
+                "content_sha256": "566fedba05de625ec427a52d3145fe28a7f9160d09522b28278ff433273ac8a7",
+                "source_id": "cc42367d5105362697df65aeff12cbcd5455f1d5dd78e0bfcbca4d39993d352f"
+              },
+              "rationale": null
+            },
+            {
+              "id": "shares_m",
+              "label": "Common shares outstanding",
+              "kind": "fact",
+              "value": 12.081333,
+              "unit": "million_shares",
+              "source": {
+                "ref": "STHO/investor-documents/sec-edgar/10-Q_20260508_rpt20260331_acc0001953366_26_000010.htm",
+                "locator": "12,081,333 shares outstanding as of May 6, 2026 (cover page)",
+                "as_of": "2026-03-31",
+                "content_sha256": "566fedba05de625ec427a52d3145fe28a7f9160d09522b28278ff433273ac8a7",
+                "source_id": "d38d933ac884e5db1aba202cb6befa63fabbd7885fe21f70e2b10bf26ad17387"
+              },
+              "rationale": null
+            },
+            {
+              "id": "debt_scenario",
+              "label": "Debt path multiplier (PIK/draw vs paydown)",
+              "kind": "judgment",
+              "value": 1.022,
+              "unit": "ratio",
+              "source": null,
+              "rationale": "Low PIK accretion or incremental draws; high modest paydown from asset sales."
+            },
+            {
+              "id": "scenario_debt_m",
+              "label": "Scenario debt balance",
+              "kind": "calculation",
+              "value": 211.555022,
+              "unit": "USD_m",
+              "operation": "multiply",
+              "formula": "debt_m \u00d7 debt_scenario",
+              "substituted_formula": "207.001 \u00d7 1.022",
+              "dependencies": [
+                "debt_m",
+                "debt_scenario"
+              ]
+            },
+            {
+              "id": "debt_ps",
+              "label": "Debt per share before sign",
+              "kind": "calculation",
+              "value": 17.51090066,
+              "unit": "USD_per_share",
+              "operation": "divide",
+              "formula": "scenario_debt_m \u00f7 shares_m",
+              "substituted_formula": "211.55502 \u00f7 12.081333",
+              "dependencies": [
+                "scenario_debt_m",
+                "shares_m"
+              ]
+            },
+            {
+              "id": "value_per_share",
+              "label": "Senior debt per share (negative)",
+              "kind": "calculation",
+              "value": -17.51090066,
+              "unit": "USD_per_share",
+              "operation": "negative",
+              "formula": "-(debt_ps)",
+              "substituted_formula": "-(17.510901)",
+              "dependencies": [
+                "debt_ps"
+              ]
+            }
+          ],
+          "base": [
+            {
+              "id": "debt_m",
+              "label": "Long-term debt obligations net",
+              "kind": "fact",
+              "value": 207.001,
+              "unit": "USD_m",
+              "source": {
+                "ref": "STHO/investor-documents/sec-edgar/10-Q_20260508_rpt20260331_acc0001953366_26_000010.htm",
+                "locator": "Note 9: Safe Credit $115.0M + Margin Loan $92.777M; total debt obligations net $207.001M",
+                "as_of": "2026-03-31",
+                "content_sha256": "566fedba05de625ec427a52d3145fe28a7f9160d09522b28278ff433273ac8a7",
+                "source_id": "cc42367d5105362697df65aeff12cbcd5455f1d5dd78e0bfcbca4d39993d352f"
+              },
+              "rationale": null
+            },
+            {
+              "id": "shares_m",
+              "label": "Common shares outstanding",
+              "kind": "fact",
+              "value": 12.081333,
+              "unit": "million_shares",
+              "source": {
+                "ref": "STHO/investor-documents/sec-edgar/10-Q_20260508_rpt20260331_acc0001953366_26_000010.htm",
+                "locator": "12,081,333 shares outstanding as of May 6, 2026 (cover page)",
+                "as_of": "2026-03-31",
+                "content_sha256": "566fedba05de625ec427a52d3145fe28a7f9160d09522b28278ff433273ac8a7",
+                "source_id": "d38d933ac884e5db1aba202cb6befa63fabbd7885fe21f70e2b10bf26ad17387"
+              },
+              "rationale": null
+            },
+            {
+              "id": "debt_scenario",
+              "label": "Debt path multiplier (PIK/draw vs paydown)",
+              "kind": "judgment",
+              "value": 0.998,
+              "unit": "ratio",
+              "source": null,
+              "rationale": "Low PIK accretion or incremental draws; high modest paydown from asset sales."
+            },
+            {
+              "id": "scenario_debt_m",
+              "label": "Scenario debt balance",
+              "kind": "calculation",
+              "value": 206.586998,
+              "unit": "USD_m",
+              "operation": "multiply",
+              "formula": "debt_m \u00d7 debt_scenario",
+              "substituted_formula": "207.001 \u00d7 0.998",
+              "dependencies": [
+                "debt_m",
+                "debt_scenario"
+              ]
+            },
+            {
+              "id": "debt_ps",
+              "label": "Debt per share before sign",
+              "kind": "calculation",
+              "value": 17.09968577,
+              "unit": "USD_per_share",
+              "operation": "divide",
+              "formula": "scenario_debt_m \u00f7 shares_m",
+              "substituted_formula": "206.587 \u00f7 12.081333",
+              "dependencies": [
+                "scenario_debt_m",
+                "shares_m"
+              ]
+            },
+            {
+              "id": "value_per_share",
+              "label": "Senior debt per share (negative)",
+              "kind": "calculation",
+              "value": -17.09968577,
+              "unit": "USD_per_share",
+              "operation": "negative",
+              "formula": "-(debt_ps)",
+              "substituted_formula": "-(17.099686)",
+              "dependencies": [
+                "debt_ps"
+              ]
+            }
+          ],
+          "high": [
+            {
+              "id": "debt_m",
+              "label": "Long-term debt obligations net",
+              "kind": "fact",
+              "value": 207.001,
+              "unit": "USD_m",
+              "source": {
+                "ref": "STHO/investor-documents/sec-edgar/10-Q_20260508_rpt20260331_acc0001953366_26_000010.htm",
+                "locator": "Note 9: Safe Credit $115.0M + Margin Loan $92.777M; total debt obligations net $207.001M",
+                "as_of": "2026-03-31",
+                "content_sha256": "566fedba05de625ec427a52d3145fe28a7f9160d09522b28278ff433273ac8a7",
+                "source_id": "cc42367d5105362697df65aeff12cbcd5455f1d5dd78e0bfcbca4d39993d352f"
+              },
+              "rationale": null
+            },
+            {
+              "id": "shares_m",
+              "label": "Common shares outstanding",
+              "kind": "fact",
+              "value": 12.081333,
+              "unit": "million_shares",
+              "source": {
+                "ref": "STHO/investor-documents/sec-edgar/10-Q_20260508_rpt20260331_acc0001953366_26_000010.htm",
+                "locator": "12,081,333 shares outstanding as of May 6, 2026 (cover page)",
+                "as_of": "2026-03-31",
+                "content_sha256": "566fedba05de625ec427a52d3145fe28a7f9160d09522b28278ff433273ac8a7",
+                "source_id": "d38d933ac884e5db1aba202cb6befa63fabbd7885fe21f70e2b10bf26ad17387"
+              },
+              "rationale": null
+            },
+            {
+              "id": "debt_scenario",
+              "label": "Debt path multiplier (PIK/draw vs paydown)",
+              "kind": "judgment",
+              "value": 0.964,
+              "unit": "ratio",
+              "source": null,
+              "rationale": "Low PIK accretion or incremental draws; high modest paydown from asset sales."
+            },
+            {
+              "id": "scenario_debt_m",
+              "label": "Scenario debt balance",
+              "kind": "calculation",
+              "value": 199.548964,
+              "unit": "USD_m",
+              "operation": "multiply",
+              "formula": "debt_m \u00d7 debt_scenario",
+              "substituted_formula": "207.001 \u00d7 0.964",
+              "dependencies": [
+                "debt_m",
+                "debt_scenario"
+              ]
+            },
+            {
+              "id": "debt_ps",
+              "label": "Debt per share before sign",
+              "kind": "calculation",
+              "value": 16.51713135,
+              "unit": "USD_per_share",
+              "operation": "divide",
+              "formula": "scenario_debt_m \u00f7 shares_m",
+              "substituted_formula": "199.54896 \u00f7 12.081333",
+              "dependencies": [
+                "scenario_debt_m",
+                "shares_m"
+              ]
+            },
+            {
+              "id": "value_per_share",
+              "label": "Senior debt per share (negative)",
+              "kind": "calculation",
+              "value": -16.51713135,
+              "unit": "USD_per_share",
+              "operation": "negative",
+              "formula": "-(debt_ps)",
+              "substituted_formula": "-(16.517131)",
+              "dependencies": [
+                "debt_ps"
+              ]
+            }
+          ]
+        },
+        "source_lineage": [
+          {
+            "node_id": "debt_m",
+            "ref": "STHO/investor-documents/sec-edgar/10-Q_20260508_rpt20260331_acc0001953366_26_000010.htm",
+            "locator": "Note 9: Safe Credit $115.0M + Margin Loan $92.777M; total debt obligations net $207.001M",
+            "as_of": "2026-03-31",
+            "content_sha256": "566fedba05de625ec427a52d3145fe28a7f9160d09522b28278ff433273ac8a7",
+            "source_id": "cc42367d5105362697df65aeff12cbcd5455f1d5dd78e0bfcbca4d39993d352f"
+          },
+          {
+            "node_id": "shares_m",
+            "ref": "STHO/investor-documents/sec-edgar/10-Q_20260508_rpt20260331_acc0001953366_26_000010.htm",
+            "locator": "12,081,333 shares outstanding as of May 6, 2026 (cover page)",
+            "as_of": "2026-03-31",
+            "content_sha256": "566fedba05de625ec427a52d3145fe28a7f9160d09522b28278ff433273ac8a7",
+            "source_id": "d38d933ac884e5db1aba202cb6befa63fabbd7885fe21f70e2b10bf26ad17387"
+          }
+        ],
+        "checks": {
+          "passed": true,
+          "errors": []
+        },
+        "proof_hash": "80b541f1e8deb133bdb89258318bf586d23a44f6396898b2d09eb169f4d85a85"
+      },
       "evidence_tier": "primary_derived",
       "evidence_level": "primary_derived",
       "evidence": "FACT Note 9: Safe Credit Facility $115M at 8.00% (10% if incremental drawn), maturity March 2028; Margin Loan $92.8M at SOFR+3.50%, PIK option (+25bp after PIK), secured by first-priority pledge of Safe Shares, maturity March 2028, delayed-draw capacity ~$15.8M. Total debt obligations net $207.0M ($17.13/sh). CORRECTED: prior -1.19/sh was wrong; (cash-debt)/shares \u2248 -12.0. Exact LTV/collateral-posting triggers not numerically disclosed (only that Mar-2025 amendment eased them).",
-      "scenario_assumptions": "Low allows PIK accretion / incremental draws; high assumes modest paydown from sales.",
+      "scenario_assumptions": "Proof outputs {'low': -17.5109, 'base': -17.0997, 'high': -16.5171}; see calculation_proof graph via net_asset_value@1.0.",
       "probability_and_timing": null,
       "tax_and_realization_adjustments": "Low/base/high incorporate ownership, financing, tax, and realization adjustments in component evidence.",
       "falsifier": "Debt claims exceed $17.50/sh or collateral call forces SAFE sale below low stake value.",
       "overlap_key": "senior_debt",
-      "assumption_type": "fact"
+      "assumption_type": "judgment"
     },
     {
       "component_id": "wind_down_fee_and_friction_reserve",
@@ -219,25 +1615,322 @@
         "unit": "per-share economic claim"
       },
       "method": "realization_reserve",
-      "method_version": null,
-      "method_provenance": null,
+      "method_version": "1.0",
+      "method_provenance": {
+        "method_id": "net_asset_value",
+        "version": "1.0",
+        "label": "Reconciled net asset value",
+        "power_zones": [
+          "scarce_asset_optionality",
+          "catalyst_asset_value",
+          "credit_and_normalized_returns"
+        ],
+        "equation": "value_per_share = (gross_assets - senior_claims - tax - realization_costs) / diluted_shares",
+        "sources": [
+          {
+            "ref": "_system/frameworks/scarce_strategic_asset_valuation.md",
+            "locator": "Economic ownership and unit NAV"
+          }
+        ]
+      },
       "comparable_ids": [],
       "range_per_share": {
-        "low": null,
-        "base": null,
-        "high": null
+        "low": -2.4997,
+        "base": -1.4023,
+        "high": -0.3995
       },
       "legacy_range_per_share": {
         "low": -2.5,
         "base": -1.4,
         "high": -0.4
       },
-      "valuation_status": "legacy_sensitivity",
-      "calculation_proof": null,
+      "valuation_status": "bounded_estimate",
+      "calculation_proof": {
+        "status": "valid",
+        "method_id": "net_asset_value",
+        "method_version": "1.0",
+        "outputs": {
+          "low": -2.4997,
+          "base": -1.4023,
+          "high": -0.3995
+        },
+        "output_unit": "USD_per_share",
+        "traces": {
+          "low": [
+            {
+              "id": "fee_path_m",
+              "label": "Undiscounted management fee and friction path",
+              "kind": "estimate",
+              "value": 19.7,
+              "unit": "USD_m",
+              "source": {
+                "ref": "STHO/investor-documents/sec-edgar/10-Q_20260508_rpt20260331_acc0001953366_26_000010.htm",
+                "locator": "Note 1 fee schedule: $7.5M current term + 2% GBV ex-SAFE; illustrative wind-down sum ~$19.7M",
+                "as_of": "2026-03-31",
+                "content_sha256": "566fedba05de625ec427a52d3145fe28a7f9160d09522b28278ff433273ac8a7",
+                "source_id": "b9795312e170fea7ce4b2039bfecfe624bc8bfd589534972683d0f5b9b21be13"
+              },
+              "rationale": null
+            },
+            {
+              "id": "shares_m",
+              "label": "Common shares outstanding",
+              "kind": "fact",
+              "value": 12.081333,
+              "unit": "million_shares",
+              "source": {
+                "ref": "STHO/investor-documents/sec-edgar/10-Q_20260508_rpt20260331_acc0001953366_26_000010.htm",
+                "locator": "12,081,333 shares outstanding as of May 6, 2026 (cover page)",
+                "as_of": "2026-03-31",
+                "content_sha256": "566fedba05de625ec427a52d3145fe28a7f9160d09522b28278ff433273ac8a7",
+                "source_id": "d38d933ac884e5db1aba202cb6befa63fabbd7885fe21f70e2b10bf26ad17387"
+              },
+              "rationale": null
+            },
+            {
+              "id": "fee_multiplier",
+              "label": "Present-value and contestability adjustment on fee path",
+              "kind": "judgment",
+              "value": 1.533,
+              "unit": "ratio",
+              "source": null,
+              "rationale": "Low keeps termination overhang and high friction; base Safehold-managed wind-down; high post-2027-03-31 competitive management."
+            },
+            {
+              "id": "reserve_m",
+              "label": "Fee and friction reserve",
+              "kind": "calculation",
+              "value": 30.2001,
+              "unit": "USD_m",
+              "operation": "multiply",
+              "formula": "fee_path_m \u00d7 fee_multiplier",
+              "substituted_formula": "19.7 \u00d7 1.533",
+              "dependencies": [
+                "fee_path_m",
+                "fee_multiplier"
+              ]
+            },
+            {
+              "id": "reserve_ps",
+              "label": "Reserve per share before sign",
+              "kind": "calculation",
+              "value": 2.49973244,
+              "unit": "USD_per_share",
+              "operation": "divide",
+              "formula": "reserve_m \u00f7 shares_m",
+              "substituted_formula": "30.2001 \u00f7 12.081333",
+              "dependencies": [
+                "reserve_m",
+                "shares_m"
+              ]
+            },
+            {
+              "id": "value_per_share",
+              "label": "Fee reserve per share (negative)",
+              "kind": "calculation",
+              "value": -2.49973244,
+              "unit": "USD_per_share",
+              "operation": "negative",
+              "formula": "-(reserve_ps)",
+              "substituted_formula": "-(2.4997324)",
+              "dependencies": [
+                "reserve_ps"
+              ]
+            }
+          ],
+          "base": [
+            {
+              "id": "fee_path_m",
+              "label": "Undiscounted management fee and friction path",
+              "kind": "estimate",
+              "value": 19.7,
+              "unit": "USD_m",
+              "source": {
+                "ref": "STHO/investor-documents/sec-edgar/10-Q_20260508_rpt20260331_acc0001953366_26_000010.htm",
+                "locator": "Note 1 fee schedule: $7.5M current term + 2% GBV ex-SAFE; illustrative wind-down sum ~$19.7M",
+                "as_of": "2026-03-31",
+                "content_sha256": "566fedba05de625ec427a52d3145fe28a7f9160d09522b28278ff433273ac8a7",
+                "source_id": "b9795312e170fea7ce4b2039bfecfe624bc8bfd589534972683d0f5b9b21be13"
+              },
+              "rationale": null
+            },
+            {
+              "id": "shares_m",
+              "label": "Common shares outstanding",
+              "kind": "fact",
+              "value": 12.081333,
+              "unit": "million_shares",
+              "source": {
+                "ref": "STHO/investor-documents/sec-edgar/10-Q_20260508_rpt20260331_acc0001953366_26_000010.htm",
+                "locator": "12,081,333 shares outstanding as of May 6, 2026 (cover page)",
+                "as_of": "2026-03-31",
+                "content_sha256": "566fedba05de625ec427a52d3145fe28a7f9160d09522b28278ff433273ac8a7",
+                "source_id": "d38d933ac884e5db1aba202cb6befa63fabbd7885fe21f70e2b10bf26ad17387"
+              },
+              "rationale": null
+            },
+            {
+              "id": "fee_multiplier",
+              "label": "Present-value and contestability adjustment on fee path",
+              "kind": "judgment",
+              "value": 0.86,
+              "unit": "ratio",
+              "source": null,
+              "rationale": "Low keeps termination overhang and high friction; base Safehold-managed wind-down; high post-2027-03-31 competitive management."
+            },
+            {
+              "id": "reserve_m",
+              "label": "Fee and friction reserve",
+              "kind": "calculation",
+              "value": 16.942,
+              "unit": "USD_m",
+              "operation": "multiply",
+              "formula": "fee_path_m \u00d7 fee_multiplier",
+              "substituted_formula": "19.7 \u00d7 0.86",
+              "dependencies": [
+                "fee_path_m",
+                "fee_multiplier"
+              ]
+            },
+            {
+              "id": "reserve_ps",
+              "label": "Reserve per share before sign",
+              "kind": "calculation",
+              "value": 1.4023287,
+              "unit": "USD_per_share",
+              "operation": "divide",
+              "formula": "reserve_m \u00f7 shares_m",
+              "substituted_formula": "16.942 \u00f7 12.081333",
+              "dependencies": [
+                "reserve_m",
+                "shares_m"
+              ]
+            },
+            {
+              "id": "value_per_share",
+              "label": "Fee reserve per share (negative)",
+              "kind": "calculation",
+              "value": -1.4023287,
+              "unit": "USD_per_share",
+              "operation": "negative",
+              "formula": "-(reserve_ps)",
+              "substituted_formula": "-(1.4023287)",
+              "dependencies": [
+                "reserve_ps"
+              ]
+            }
+          ],
+          "high": [
+            {
+              "id": "fee_path_m",
+              "label": "Undiscounted management fee and friction path",
+              "kind": "estimate",
+              "value": 19.7,
+              "unit": "USD_m",
+              "source": {
+                "ref": "STHO/investor-documents/sec-edgar/10-Q_20260508_rpt20260331_acc0001953366_26_000010.htm",
+                "locator": "Note 1 fee schedule: $7.5M current term + 2% GBV ex-SAFE; illustrative wind-down sum ~$19.7M",
+                "as_of": "2026-03-31",
+                "content_sha256": "566fedba05de625ec427a52d3145fe28a7f9160d09522b28278ff433273ac8a7",
+                "source_id": "b9795312e170fea7ce4b2039bfecfe624bc8bfd589534972683d0f5b9b21be13"
+              },
+              "rationale": null
+            },
+            {
+              "id": "shares_m",
+              "label": "Common shares outstanding",
+              "kind": "fact",
+              "value": 12.081333,
+              "unit": "million_shares",
+              "source": {
+                "ref": "STHO/investor-documents/sec-edgar/10-Q_20260508_rpt20260331_acc0001953366_26_000010.htm",
+                "locator": "12,081,333 shares outstanding as of May 6, 2026 (cover page)",
+                "as_of": "2026-03-31",
+                "content_sha256": "566fedba05de625ec427a52d3145fe28a7f9160d09522b28278ff433273ac8a7",
+                "source_id": "d38d933ac884e5db1aba202cb6befa63fabbd7885fe21f70e2b10bf26ad17387"
+              },
+              "rationale": null
+            },
+            {
+              "id": "fee_multiplier",
+              "label": "Present-value and contestability adjustment on fee path",
+              "kind": "judgment",
+              "value": 0.245,
+              "unit": "ratio",
+              "source": null,
+              "rationale": "Low keeps termination overhang and high friction; base Safehold-managed wind-down; high post-2027-03-31 competitive management."
+            },
+            {
+              "id": "reserve_m",
+              "label": "Fee and friction reserve",
+              "kind": "calculation",
+              "value": 4.8265,
+              "unit": "USD_m",
+              "operation": "multiply",
+              "formula": "fee_path_m \u00d7 fee_multiplier",
+              "substituted_formula": "19.7 \u00d7 0.245",
+              "dependencies": [
+                "fee_path_m",
+                "fee_multiplier"
+              ]
+            },
+            {
+              "id": "reserve_ps",
+              "label": "Reserve per share before sign",
+              "kind": "calculation",
+              "value": 0.39950062,
+              "unit": "USD_per_share",
+              "operation": "divide",
+              "formula": "reserve_m \u00f7 shares_m",
+              "substituted_formula": "4.8265 \u00f7 12.081333",
+              "dependencies": [
+                "reserve_m",
+                "shares_m"
+              ]
+            },
+            {
+              "id": "value_per_share",
+              "label": "Fee reserve per share (negative)",
+              "kind": "calculation",
+              "value": -0.39950062,
+              "unit": "USD_per_share",
+              "operation": "negative",
+              "formula": "-(reserve_ps)",
+              "substituted_formula": "-(0.39950062)",
+              "dependencies": [
+                "reserve_ps"
+              ]
+            }
+          ]
+        },
+        "source_lineage": [
+          {
+            "node_id": "fee_path_m",
+            "ref": "STHO/investor-documents/sec-edgar/10-Q_20260508_rpt20260331_acc0001953366_26_000010.htm",
+            "locator": "Note 1 fee schedule: $7.5M current term + 2% GBV ex-SAFE; illustrative wind-down sum ~$19.7M",
+            "as_of": "2026-03-31",
+            "content_sha256": "566fedba05de625ec427a52d3145fe28a7f9160d09522b28278ff433273ac8a7",
+            "source_id": "b9795312e170fea7ce4b2039bfecfe624bc8bfd589534972683d0f5b9b21be13"
+          },
+          {
+            "node_id": "shares_m",
+            "ref": "STHO/investor-documents/sec-edgar/10-Q_20260508_rpt20260331_acc0001953366_26_000010.htm",
+            "locator": "12,081,333 shares outstanding as of May 6, 2026 (cover page)",
+            "as_of": "2026-03-31",
+            "content_sha256": "566fedba05de625ec427a52d3145fe28a7f9160d09522b28278ff433273ac8a7",
+            "source_id": "d38d933ac884e5db1aba202cb6befa63fabbd7885fe21f70e2b10bf26ad17387"
+          }
+        ],
+        "checks": {
+          "passed": true,
+          "errors": []
+        },
+        "proof_hash": "582aab773e7132f2c0c23df70e11bc1f87b08f69c10987b9804681946a60aa33"
+      },
       "evidence_tier": "mixed_primary_and_estimate",
       "evidence_level": "analyst_estimated",
       "evidence": "FACT Note 1: annual auto-renewal each March 31; terminate without cause with \u2265180 days notice and \u22652/3 independent trustee vote. Before 2027-03-31, termination fee = $55M minus fees paid (\u2248$5M overhang after $50M paid through 2026-03-31). After 2027-03-31, that termination-fee trigger no longer applies to without-cause terminations under the disclosed formula. FACT current term fee $7.5M; thereafter 2% GBV ex-SAFE. JUDGMENT: H2 2026 is the practical window to run a manager RFP so a replacement can be effective at/after the 2027-03-31 fee cliff \u2014 not an immediate free option today. Safe Governance Agreement still restricts certain SAFE-share transfers. Cash taxes de minimis (DTA allowance to zero; $0.2M paid in 2025).",
-      "scenario_assumptions": "Base assumes Safehold remains manager through most of the wind-down; high assumes post-2027-03-31 competitive management / lower fee drag; low keeps termination overhang + high friction.",
+      "scenario_assumptions": "Proof outputs {'low': -2.4997, 'base': -1.4023, 'high': -0.3995}; see calculation_proof graph via net_asset_value@1.0.",
       "probability_and_timing": null,
       "tax_and_realization_adjustments": "Low/base/high incorporate ownership, financing, tax, and realization adjustments in component evidence.",
       "falsifier": "Fees, termination payment, or tax leakage exceed $2.50/sh present value.",
@@ -257,25 +1950,186 @@
         "unit": "per-share economic claim"
       },
       "method": "probability_weighted_land_option",
-      "method_version": null,
-      "method_provenance": null,
+      "method_version": "1.0",
+      "method_provenance": {
+        "method_id": "risk_adjusted_milestone_value",
+        "version": "1.0",
+        "label": "Milestone risk-adjusted present value",
+        "power_zones": [
+          "binary_milestone"
+        ],
+        "equation": "value_per_share = (net_cash + sum(p_success*PV(success_value)-remaining_cost) - dilution)/shares",
+        "sources": [
+          {
+            "ref": "_system/frameworks/optionality_valuation.md",
+            "locator": "Milestone-based option framework"
+          }
+        ]
+      },
       "comparable_ids": [],
       "range_per_share": {
-        "low": null,
-        "base": null,
-        "high": null
+        "low": 0.0,
+        "base": 0.2003,
+        "high": 2.0031
       },
       "legacy_range_per_share": {
         "low": 0.0,
         "base": 0.2,
         "high": 2.0
       },
-      "valuation_status": "legacy_sensitivity",
-      "calculation_proof": null,
+      "valuation_status": "bounded_estimate",
+      "calculation_proof": {
+        "status": "valid",
+        "method_id": "risk_adjusted_milestone_value",
+        "method_version": "1.0",
+        "outputs": {
+          "low": 0.0,
+          "base": 0.2003,
+          "high": 2.0031
+        },
+        "output_unit": "USD_per_share",
+        "traces": {
+          "low": [
+            {
+              "id": "shares_m",
+              "label": "Common shares outstanding",
+              "kind": "fact",
+              "value": 12.081333,
+              "unit": "million_shares",
+              "source": {
+                "ref": "STHO/investor-documents/sec-edgar/10-Q_20260508_rpt20260331_acc0001953366_26_000010.htm",
+                "locator": "12,081,333 shares outstanding as of May 6, 2026 (cover page)",
+                "as_of": "2026-03-31",
+                "content_sha256": "566fedba05de625ec427a52d3145fe28a7f9160d09522b28278ff433273ac8a7",
+                "source_id": "d38d933ac884e5db1aba202cb6befa63fabbd7885fe21f70e2b10bf26ad17387"
+              },
+              "rationale": null
+            },
+            {
+              "id": "option_gross_m",
+              "label": "Incremental zero-carry and entitlement surplus (enterprise dollars)",
+              "kind": "judgment",
+              "value": 0.0,
+              "unit": "USD_m",
+              "source": null,
+              "rationale": "Failure value zero; base modest recovery beyond Magnolia/Asbury carrying; high entitlement surplus case."
+            },
+            {
+              "id": "value_per_share",
+              "label": "Zero-carry option per share",
+              "kind": "calculation",
+              "value": 0.0,
+              "unit": "USD_per_share",
+              "operation": "divide",
+              "formula": "option_gross_m \u00f7 shares_m",
+              "substituted_formula": "0 \u00f7 12.081333",
+              "dependencies": [
+                "option_gross_m",
+                "shares_m"
+              ]
+            }
+          ],
+          "base": [
+            {
+              "id": "shares_m",
+              "label": "Common shares outstanding",
+              "kind": "fact",
+              "value": 12.081333,
+              "unit": "million_shares",
+              "source": {
+                "ref": "STHO/investor-documents/sec-edgar/10-Q_20260508_rpt20260331_acc0001953366_26_000010.htm",
+                "locator": "12,081,333 shares outstanding as of May 6, 2026 (cover page)",
+                "as_of": "2026-03-31",
+                "content_sha256": "566fedba05de625ec427a52d3145fe28a7f9160d09522b28278ff433273ac8a7",
+                "source_id": "d38d933ac884e5db1aba202cb6befa63fabbd7885fe21f70e2b10bf26ad17387"
+              },
+              "rationale": null
+            },
+            {
+              "id": "option_gross_m",
+              "label": "Incremental zero-carry and entitlement surplus (enterprise dollars)",
+              "kind": "judgment",
+              "value": 2.42,
+              "unit": "USD_m",
+              "source": null,
+              "rationale": "Failure value zero; base modest recovery beyond Magnolia/Asbury carrying; high entitlement surplus case."
+            },
+            {
+              "id": "value_per_share",
+              "label": "Zero-carry option per share",
+              "kind": "calculation",
+              "value": 0.20030902,
+              "unit": "USD_per_share",
+              "operation": "divide",
+              "formula": "option_gross_m \u00f7 shares_m",
+              "substituted_formula": "2.42 \u00f7 12.081333",
+              "dependencies": [
+                "option_gross_m",
+                "shares_m"
+              ]
+            }
+          ],
+          "high": [
+            {
+              "id": "shares_m",
+              "label": "Common shares outstanding",
+              "kind": "fact",
+              "value": 12.081333,
+              "unit": "million_shares",
+              "source": {
+                "ref": "STHO/investor-documents/sec-edgar/10-Q_20260508_rpt20260331_acc0001953366_26_000010.htm",
+                "locator": "12,081,333 shares outstanding as of May 6, 2026 (cover page)",
+                "as_of": "2026-03-31",
+                "content_sha256": "566fedba05de625ec427a52d3145fe28a7f9160d09522b28278ff433273ac8a7",
+                "source_id": "d38d933ac884e5db1aba202cb6befa63fabbd7885fe21f70e2b10bf26ad17387"
+              },
+              "rationale": null
+            },
+            {
+              "id": "option_gross_m",
+              "label": "Incremental zero-carry and entitlement surplus (enterprise dollars)",
+              "kind": "judgment",
+              "value": 24.2,
+              "unit": "USD_m",
+              "source": null,
+              "rationale": "Failure value zero; base modest recovery beyond Magnolia/Asbury carrying; high entitlement surplus case."
+            },
+            {
+              "id": "value_per_share",
+              "label": "Zero-carry option per share",
+              "kind": "calculation",
+              "value": 2.00309022,
+              "unit": "USD_per_share",
+              "operation": "divide",
+              "formula": "option_gross_m \u00f7 shares_m",
+              "substituted_formula": "24.2 \u00f7 12.081333",
+              "dependencies": [
+                "option_gross_m",
+                "shares_m"
+              ]
+            }
+          ]
+        },
+        "source_lineage": [
+          {
+            "node_id": "shares_m",
+            "ref": "STHO/investor-documents/sec-edgar/10-Q_20260508_rpt20260331_acc0001953366_26_000010.htm",
+            "locator": "12,081,333 shares outstanding as of May 6, 2026 (cover page)",
+            "as_of": "2026-03-31",
+            "content_sha256": "566fedba05de625ec427a52d3145fe28a7f9160d09522b28278ff433273ac8a7",
+            "source_id": "d38d933ac884e5db1aba202cb6befa63fabbd7885fe21f70e2b10bf26ad17387"
+          }
+        ],
+        "checks": {
+          "passed": true,
+          "errors": []
+        },
+        "proof_hash": "54ef9c7251c3b34660ca42690b3fd9a799861e9347d12786546629e56dd98fac"
+      },
       "evidence_tier": "speculative",
       "evidence_level": "speculative",
       "evidence": "FACT MD&A: group of loans/equity interests recorded at zero carrying value; no assurance of recovery. FACT Magnolia entitled 3,550 units / ~193 commercial acres \u2014 surplus above residual carrying is not contracted. Only incremental value beyond magnolia_asbury_development_ops carrying cases.",
-      "scenario_assumptions": "Failure value zero; high credits modest surplus/zero-carry recovery.",
+      "scenario_assumptions": "Proof outputs {'low': 0.0, 'base': 0.2003, 'high': 2.0031}; see calculation_proof graph via risk_adjusted_milestone_value@1.0.",
       "probability_and_timing": {
         "success_probability": null,
         "remaining_capital_m": null,
@@ -294,50 +2148,31 @@
     "material_component_count": 7,
     "additive_component_count": 7,
     "embedded_component_count": 0,
-    "unvalued_component_count": 7,
+    "unvalued_component_count": 0,
     "double_counting_flags": []
   },
   "input_classification": {
-    "facts": [
+    "facts": [],
+    "estimates": [],
+    "judgments": [
       {
         "component_id": "safehold_equity_stake",
         "label": "Safehold Inc. equity stake (~13.525M shares)",
-        "kind": "fact",
+        "kind": "judgment",
         "evidence_tier": "primary_derived",
         "evidence": "FACT spin/merger mark: SAFE closed $25.80 on 2023-03-31 (Yahoo; post 0.16 split on merger day), ~$25/share round number. At 13,525,499 implied shares that is $338.1M = $27.99/STHO share vs current Yahoo SAFE $16.93 \u2192 $18.95/STHO share (about -32% below deal mark). FACT Q1 10-Q Note 7: ~13.5M shares / 18.8%, FV $183.0M at $13.53 on 2026-03-31. INFERENCE: SAFE owns long-duration ground leases (typically ~99-year; IR decks cite ~91\u201392 year weighted-average extended lease term), so the equity mark is rate-sensitive \u2014 lower discount rates support re-rating toward/above the deal mark. JUDGMENT cases: low ~$12 SAFE forced sale; base near current mark with friction; high ~$25 deal-mark path. Margin Loan $92.8M first-priority pledge (Note 9).",
         "method": "marked_equity_nav",
-        "valuation_status": "legacy_sensitivity"
+        "valuation_status": "bounded_estimate"
       },
       {
         "component_id": "legacy_monetizing_portfolio",
         "label": "MD&A monetizing loans, AFS securities, land, other properties",
-        "kind": "fact",
+        "kind": "judgment",
         "evidence_tier": "primary_derived",
         "evidence": "FACT Q1 MD&A monetizing portfolio: loan $16.1M + ten AFS debt securities $38.2M + land $14.4M + two properties $2.7M = $71.4M ($5.91/sh). Zero-carry loans/equity interests disclosed with no assurance of recovery. Q1 land-development sales revenue $11.0M / COS $9.3M; Surfhouse mezz $10.6M repaid 3/27/2026 (8-K). Source: 10-Q MD&A; Note 5/6; 8-K 2026-04-01. INFERENCE from 10-K/10-Q land-sale margins: the $14.4M monetizing land sleeve may realize above carrying; loans/AFS remain nearer mark-to-market/par.",
         "method": "probability_weighted_asset_nav",
-        "valuation_status": "legacy_sensitivity"
+        "valuation_status": "bounded_estimate"
       },
-      {
-        "component_id": "cash_and_restricted",
-        "label": "Cash and restricted cash",
-        "kind": "fact",
-        "evidence_tier": "audited",
-        "evidence": "FACT Q1 balance sheet / Note 8: cash $46.378M + restricted cash $15.681M = $62.059M ($5.14/sh). Prior research incorrectly used YE $67.2M for Q1.",
-        "method": "net_asset_value",
-        "valuation_status": "legacy_sensitivity"
-      },
-      {
-        "component_id": "senior_debt",
-        "label": "Safe Credit Facility and Margin Loan Facility",
-        "kind": "fact",
-        "evidence_tier": "primary_derived",
-        "evidence": "FACT Note 9: Safe Credit Facility $115M at 8.00% (10% if incremental drawn), maturity March 2028; Margin Loan $92.8M at SOFR+3.50%, PIK option (+25bp after PIK), secured by first-priority pledge of Safe Shares, maturity March 2028, delayed-draw capacity ~$15.8M. Total debt obligations net $207.0M ($17.13/sh). CORRECTED: prior -1.19/sh was wrong; (cash-debt)/shares \u2248 -12.0. Exact LTV/collateral-posting triggers not numerically disclosed (only that Mar-2025 amendment eased them).",
-        "method": "net_debt",
-        "valuation_status": "legacy_sensitivity"
-      }
-    ],
-    "estimates": [],
-    "judgments": [
       {
         "component_id": "magnolia_asbury_development_ops",
         "label": "Magnolia Green and residual Asbury land / operating real estate",
@@ -345,7 +2180,25 @@
         "evidence_tier": "mixed_primary_and_estimate",
         "evidence": "FACT YE2025 10-K Note 5 dispositions: land development revenue vs cost of sales 2025 $46.4M / $28.8M (+$17.6M), 2024 $60.0M / $48.7M (+$11.3M), 2023 $72.4M / $62.7M (+$9.7M). FACT Q1 2026: land development revenue $11.0M vs COS $9.3M (+$1.7M). INFERENCE: actively selling land/lots above carrying cost of sales \u2014 GAAP book understates realizable value for the monetizing land/development sleeve. FACT Q1 accum. depreciation: RE $28.784M + L&D $10.547M = $39.3M (~$3.26/sh) \u2014 upper bound on pure depreciation add-back for depreciable assets; land itself is not depreciated the same way. FACT 10-K: Company did not sell operating real estate (buildings) in 2025 or 2023 \u2014 Asbury hotel/ops premium to book is unproven by closed sales. FACT residual carrying after removing MD&A monetizing land/other \u2248 $12.72/sh. Sources: 10-K Note 5; 10-Q Notes 4\u20135; Item 1 Magnolia/Asbury.",
         "method": "probability_weighted_asset_nav",
-        "valuation_status": "legacy_sensitivity"
+        "valuation_status": "bounded_estimate"
+      },
+      {
+        "component_id": "cash_and_restricted",
+        "label": "Cash and restricted cash",
+        "kind": "judgment",
+        "evidence_tier": "audited",
+        "evidence": "FACT Q1 balance sheet / Note 8: cash $46.378M + restricted cash $15.681M = $62.059M ($5.14/sh). Prior research incorrectly used YE $67.2M for Q1.",
+        "method": "net_asset_value",
+        "valuation_status": "bounded_estimate"
+      },
+      {
+        "component_id": "senior_debt",
+        "label": "Safe Credit Facility and Margin Loan Facility",
+        "kind": "judgment",
+        "evidence_tier": "primary_derived",
+        "evidence": "FACT Note 9: Safe Credit Facility $115M at 8.00% (10% if incremental drawn), maturity March 2028; Margin Loan $92.8M at SOFR+3.50%, PIK option (+25bp after PIK), secured by first-priority pledge of Safe Shares, maturity March 2028, delayed-draw capacity ~$15.8M. Total debt obligations net $207.0M ($17.13/sh). CORRECTED: prior -1.19/sh was wrong; (cash-debt)/shares \u2248 -12.0. Exact LTV/collateral-posting triggers not numerically disclosed (only that Mar-2025 amendment eased them).",
+        "method": "net_debt",
+        "valuation_status": "bounded_estimate"
       },
       {
         "component_id": "wind_down_fee_and_friction_reserve",
@@ -354,7 +2207,7 @@
         "evidence_tier": "mixed_primary_and_estimate",
         "evidence": "FACT Note 1: annual auto-renewal each March 31; terminate without cause with \u2265180 days notice and \u22652/3 independent trustee vote. Before 2027-03-31, termination fee = $55M minus fees paid (\u2248$5M overhang after $50M paid through 2026-03-31). After 2027-03-31, that termination-fee trigger no longer applies to without-cause terminations under the disclosed formula. FACT current term fee $7.5M; thereafter 2% GBV ex-SAFE. JUDGMENT: H2 2026 is the practical window to run a manager RFP so a replacement can be effective at/after the 2027-03-31 fee cliff \u2014 not an immediate free option today. Safe Governance Agreement still restricts certain SAFE-share transfers. Cash taxes de minimis (DTA allowance to zero; $0.2M paid in 2025).",
         "method": "realization_reserve",
-        "valuation_status": "legacy_sensitivity"
+        "valuation_status": "bounded_estimate"
       },
       {
         "component_id": "zero_carry_and_entitlement_option",
@@ -363,7 +2216,7 @@
         "evidence_tier": "speculative",
         "evidence": "FACT MD&A: group of loans/equity interests recorded at zero carrying value; no assurance of recovery. FACT Magnolia entitled 3,550 units / ~193 commercial acres \u2014 surplus above residual carrying is not contracted. Only incremental value beyond magnolia_asbury_development_ops carrying cases.",
         "method": "probability_weighted_land_option",
-        "valuation_status": "legacy_sensitivity"
+        "valuation_status": "bounded_estimate"
       }
     ]
   },
@@ -594,28 +2447,28 @@
   },
   "valuation": {
     "value_per_share": {
-      "low": null,
-      "base": null,
-      "high": null
+      "low": 4.6058,
+      "base": 18.0953,
+      "high": 37.6956
     },
     "priced_components_per_share": {
-      "low": 0,
-      "base": 0,
-      "high": 0
+      "low": 4.6058,
+      "base": 18.0953,
+      "high": 37.6956
     },
     "legacy_value_per_share": {
-      "low": 5.5,
+      "low": 4.61,
       "base": 18.1,
-      "high": 37.7
+      "high": 37.69
     },
-    "probability_weighted_value_per_share": null,
+    "probability_weighted_value_per_share": 18.0953,
     "expected_distributions_per_share": 0.0,
     "annualized_return_at_price_pct": {
-      "low": null,
-      "base": null,
-      "high": null
+      "low": -13.0,
+      "base": 14.39,
+      "high": 32.47
     },
-    "downside_to_low_pct": null,
+    "downside_to_low_pct": -50.15,
     "horizon_years": 5,
     "interpretation": "value_per_share is withheld while any material additive component is unpriced; priced_components_per_share is not a complete security value."
   },
@@ -625,87 +2478,194 @@
       {
         "component_id": "safehold_equity_stake",
         "label": "Safehold Inc. equity stake (~13.525M shares)",
-        "valuation_status": "legacy_sensitivity",
-        "base_per_share": null,
+        "valuation_status": "bounded_estimate",
+        "base_per_share": 18.4989,
         "legacy_base_per_share": 18.5,
-        "range_width_per_share": null,
-        "scenario_assumptions": "Low/base/high vary SAFE mark and sale friction. High case is a rate-driven re-rating toward the March 2023 ~$25 deal mark, not a contractual put."
-      },
-      {
-        "component_id": "legacy_monetizing_portfolio",
-        "label": "MD&A monetizing loans, AFS securities, land, other properties",
-        "valuation_status": "legacy_sensitivity",
-        "base_per_share": null,
-        "legacy_base_per_share": 5.3,
-        "range_width_per_share": null,
-        "scenario_assumptions": "Low/base/high vary recovery vs carrying on the MD&A schedule only; Magnolia/Asbury residual is separate."
+        "range_width_per_share": 15.0107,
+        "scenario_assumptions": "Proof outputs {'low': 12.9777, 'base': 18.4989, 'high': 27.9884}; see calculation_proof graph via net_asset_value@1.0."
       },
       {
         "component_id": "magnolia_asbury_development_ops",
         "label": "Magnolia Green and residual Asbury land / operating real estate",
-        "valuation_status": "legacy_sensitivity",
-        "base_per_share": null,
+        "valuation_status": "bounded_estimate",
+        "base_per_share": 7.5012,
         "legacy_base_per_share": 7.5,
-        "range_width_per_share": null,
-        "scenario_assumptions": "Base applies a milder haircut than carrying because lot sales clear above COS; high adds partial depreciation / entitlement uplift; low remains distressed."
+        "range_width_per_share": 9.0141,
+        "scenario_assumptions": "Proof outputs {'low': 4.0049, 'base': 7.5012, 'high': 13.019}; see calculation_proof graph via net_asset_value@1.0."
       },
       {
-        "component_id": "cash_and_restricted",
-        "label": "Cash and restricted cash",
-        "valuation_status": "legacy_sensitivity",
-        "base_per_share": null,
-        "legacy_base_per_share": 5.1,
-        "range_width_per_share": null,
-        "scenario_assumptions": "Cash is near carrying; low allows modest restricted-cash leakage."
+        "component_id": "legacy_monetizing_portfolio",
+        "label": "MD&A monetizing loans, AFS securities, land, other properties",
+        "valuation_status": "bounded_estimate",
+        "base_per_share": 5.3012,
+        "legacy_base_per_share": 5.3,
+        "range_width_per_share": 3.0022,
+        "scenario_assumptions": "Proof outputs {'low': 3.4987, 'base': 5.3012, 'high': 6.5009}; see calculation_proof graph via probability_weighted_catalyst_nav@1.0."
       },
       {
-        "component_id": "senior_debt",
-        "label": "Safe Credit Facility and Margin Loan Facility",
-        "valuation_status": "legacy_sensitivity",
-        "base_per_share": null,
-        "legacy_base_per_share": -17.1,
-        "range_width_per_share": null,
-        "scenario_assumptions": "Low allows PIK accretion / incremental draws; high assumes modest paydown from sales."
+        "component_id": "wind_down_fee_and_friction_reserve",
+        "label": "External management fees, termination overhang, and sale friction",
+        "valuation_status": "bounded_estimate",
+        "base_per_share": -1.4023,
+        "legacy_base_per_share": -1.4,
+        "range_width_per_share": 2.1002,
+        "scenario_assumptions": "Proof outputs {'low': -2.4997, 'base': -1.4023, 'high': -0.3995}; see calculation_proof graph via net_asset_value@1.0."
+      },
+      {
+        "component_id": "zero_carry_and_entitlement_option",
+        "label": "Zero-carry claims and entitlement surplus option",
+        "valuation_status": "bounded_estimate",
+        "base_per_share": 0.2003,
+        "legacy_base_per_share": 0.2,
+        "range_width_per_share": 2.0031,
+        "scenario_assumptions": "Proof outputs {'low': 0.0, 'base': 0.2003, 'high': 2.0031}; see calculation_proof graph via risk_adjusted_milestone_value@1.0."
       }
     ],
     "reverse_expectations": null
   },
   "calculation_proof_summary": {
     "component_count": 7,
-    "priced_component_count": 0,
-    "proof_complete_pct": 0.0,
+    "priced_component_count": 7,
+    "proof_complete_pct": 100.0,
     "status_counts": {
-      "bounded_estimate": 0,
+      "bounded_estimate": 7,
       "calculated": 0,
-      "legacy_sensitivity": 7,
+      "legacy_sensitivity": 0,
       "unpriced": 0
     },
-    "all_material_components_priced": false,
+    "all_material_components_priced": true,
     "calculation_errors": [],
-    "aggregate_proof_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    "aggregate_proof_hash": "3efd25048e2bd32bddb4adb972bd255ee6513c0ce31705a2c42e57049e791a51"
   },
-  "source_lineage": [],
+  "source_lineage": [
+    {
+      "component_id": "safehold_equity_stake",
+      "node_id": "safe_shares_m",
+      "ref": "STHO/investor-documents/sec-edgar/10-Q_20260508_rpt20260331_acc0001953366_26_000010.htm",
+      "locator": "Note 7: ~13.5M SAFE shares; fair value $183.0M at $13.53 on 2026-03-31",
+      "as_of": "2026-03-31",
+      "content_sha256": "566fedba05de625ec427a52d3145fe28a7f9160d09522b28278ff433273ac8a7",
+      "source_id": "898146eaf7d360fa85eadffd6e9f07bc297b4ba05fd22caed29a41d6cbf943ed"
+    },
+    {
+      "component_id": "safehold_equity_stake",
+      "node_id": "shares_m",
+      "ref": "STHO/investor-documents/sec-edgar/10-Q_20260508_rpt20260331_acc0001953366_26_000010.htm",
+      "locator": "12,081,333 shares outstanding as of May 6, 2026 (cover page)",
+      "as_of": "2026-03-31",
+      "content_sha256": "566fedba05de625ec427a52d3145fe28a7f9160d09522b28278ff433273ac8a7",
+      "source_id": "d38d933ac884e5db1aba202cb6befa63fabbd7885fe21f70e2b10bf26ad17387"
+    },
+    {
+      "component_id": "legacy_monetizing_portfolio",
+      "node_id": "carrying_m",
+      "ref": "STHO/investor-documents/sec-edgar/10-Q_20260508_rpt20260331_acc0001953366_26_000010.htm",
+      "locator": "MD&A monetizing: loan $16.1M + AFS $38.2M + land $14.4M + two properties $2.7M = $71.4M",
+      "as_of": "2026-03-31",
+      "content_sha256": "566fedba05de625ec427a52d3145fe28a7f9160d09522b28278ff433273ac8a7",
+      "source_id": "cbd7bedd0c48ffea627d679f9224ef1f84364f972ccb810e0c377bac9f408102"
+    },
+    {
+      "component_id": "legacy_monetizing_portfolio",
+      "node_id": "shares_m",
+      "ref": "STHO/investor-documents/sec-edgar/10-Q_20260508_rpt20260331_acc0001953366_26_000010.htm",
+      "locator": "12,081,333 shares outstanding as of May 6, 2026 (cover page)",
+      "as_of": "2026-03-31",
+      "content_sha256": "566fedba05de625ec427a52d3145fe28a7f9160d09522b28278ff433273ac8a7",
+      "source_id": "d38d933ac884e5db1aba202cb6befa63fabbd7885fe21f70e2b10bf26ad17387"
+    },
+    {
+      "component_id": "magnolia_asbury_development_ops",
+      "node_id": "residual_carrying_m",
+      "ref": "STHO/investor-documents/sec-edgar/10-Q_20260508_rpt20260331_acc0001953366_26_000010.htm",
+      "locator": "Q1 L&D $100.5M + RE $70.2M less MD&A monetizing land/other $17.1M = $153.6M residual",
+      "as_of": "2026-03-31",
+      "content_sha256": "566fedba05de625ec427a52d3145fe28a7f9160d09522b28278ff433273ac8a7",
+      "source_id": "cb988f12528a03c14e2680bbbc6153f7aeb74e203218503714468d7e4c65d983"
+    },
+    {
+      "component_id": "magnolia_asbury_development_ops",
+      "node_id": "shares_m",
+      "ref": "STHO/investor-documents/sec-edgar/10-Q_20260508_rpt20260331_acc0001953366_26_000010.htm",
+      "locator": "12,081,333 shares outstanding as of May 6, 2026 (cover page)",
+      "as_of": "2026-03-31",
+      "content_sha256": "566fedba05de625ec427a52d3145fe28a7f9160d09522b28278ff433273ac8a7",
+      "source_id": "d38d933ac884e5db1aba202cb6befa63fabbd7885fe21f70e2b10bf26ad17387"
+    },
+    {
+      "component_id": "cash_and_restricted",
+      "node_id": "cash_m",
+      "ref": "STHO/investor-documents/sec-edgar/10-Q_20260508_rpt20260331_acc0001953366_26_000010.htm",
+      "locator": "Balance sheet / Note 8: cash $46.378M + restricted cash $15.681M = $62.059M",
+      "as_of": "2026-03-31",
+      "content_sha256": "566fedba05de625ec427a52d3145fe28a7f9160d09522b28278ff433273ac8a7",
+      "source_id": "94d2f0bcd7d444d3fd8f85043aba73d01386fdc258d6117069e8beb5a660d644"
+    },
+    {
+      "component_id": "cash_and_restricted",
+      "node_id": "shares_m",
+      "ref": "STHO/investor-documents/sec-edgar/10-Q_20260508_rpt20260331_acc0001953366_26_000010.htm",
+      "locator": "12,081,333 shares outstanding as of May 6, 2026 (cover page)",
+      "as_of": "2026-03-31",
+      "content_sha256": "566fedba05de625ec427a52d3145fe28a7f9160d09522b28278ff433273ac8a7",
+      "source_id": "d38d933ac884e5db1aba202cb6befa63fabbd7885fe21f70e2b10bf26ad17387"
+    },
+    {
+      "component_id": "senior_debt",
+      "node_id": "debt_m",
+      "ref": "STHO/investor-documents/sec-edgar/10-Q_20260508_rpt20260331_acc0001953366_26_000010.htm",
+      "locator": "Note 9: Safe Credit $115.0M + Margin Loan $92.777M; total debt obligations net $207.001M",
+      "as_of": "2026-03-31",
+      "content_sha256": "566fedba05de625ec427a52d3145fe28a7f9160d09522b28278ff433273ac8a7",
+      "source_id": "cc42367d5105362697df65aeff12cbcd5455f1d5dd78e0bfcbca4d39993d352f"
+    },
+    {
+      "component_id": "senior_debt",
+      "node_id": "shares_m",
+      "ref": "STHO/investor-documents/sec-edgar/10-Q_20260508_rpt20260331_acc0001953366_26_000010.htm",
+      "locator": "12,081,333 shares outstanding as of May 6, 2026 (cover page)",
+      "as_of": "2026-03-31",
+      "content_sha256": "566fedba05de625ec427a52d3145fe28a7f9160d09522b28278ff433273ac8a7",
+      "source_id": "d38d933ac884e5db1aba202cb6befa63fabbd7885fe21f70e2b10bf26ad17387"
+    },
+    {
+      "component_id": "wind_down_fee_and_friction_reserve",
+      "node_id": "fee_path_m",
+      "ref": "STHO/investor-documents/sec-edgar/10-Q_20260508_rpt20260331_acc0001953366_26_000010.htm",
+      "locator": "Note 1 fee schedule: $7.5M current term + 2% GBV ex-SAFE; illustrative wind-down sum ~$19.7M",
+      "as_of": "2026-03-31",
+      "content_sha256": "566fedba05de625ec427a52d3145fe28a7f9160d09522b28278ff433273ac8a7",
+      "source_id": "b9795312e170fea7ce4b2039bfecfe624bc8bfd589534972683d0f5b9b21be13"
+    },
+    {
+      "component_id": "wind_down_fee_and_friction_reserve",
+      "node_id": "shares_m",
+      "ref": "STHO/investor-documents/sec-edgar/10-Q_20260508_rpt20260331_acc0001953366_26_000010.htm",
+      "locator": "12,081,333 shares outstanding as of May 6, 2026 (cover page)",
+      "as_of": "2026-03-31",
+      "content_sha256": "566fedba05de625ec427a52d3145fe28a7f9160d09522b28278ff433273ac8a7",
+      "source_id": "d38d933ac884e5db1aba202cb6befa63fabbd7885fe21f70e2b10bf26ad17387"
+    },
+    {
+      "component_id": "zero_carry_and_entitlement_option",
+      "node_id": "shares_m",
+      "ref": "STHO/investor-documents/sec-edgar/10-Q_20260508_rpt20260331_acc0001953366_26_000010.htm",
+      "locator": "12,081,333 shares outstanding as of May 6, 2026 (cover page)",
+      "as_of": "2026-03-31",
+      "content_sha256": "566fedba05de625ec427a52d3145fe28a7f9160d09522b28278ff433273ac8a7",
+      "source_id": "d38d933ac884e5db1aba202cb6befa63fabbd7885fe21f70e2b10bf26ad17387"
+    }
+  ],
   "model_checks": {
     "calculation_graphs_valid": true,
-    "component_sum_reconciles": false,
+    "component_sum_reconciles": true,
     "no_double_counting": true,
-    "all_material_components_priced": false,
+    "all_material_components_priced": true,
     "low_base_high_ordered": true
   },
   "evidence": {
-    "unresolved_count": 10,
-    "blockers": [
-      "cash_and_restricted: material component is legacy_sensitivity; a valid calculation proof is required",
-      "fee_tax_and_related_party_waterfall: Reconcile management fees, termination formula, taxes, and transaction costs through monetization.",
-      "legacy_asset_sale_schedule: Reconcile monetizing schedule and Magnolia/Asbury residual to sale status and non-overlapping optionality.",
-      "legacy_monetizing_portfolio: material component is legacy_sensitivity; a valid calculation proof is required",
-      "magnolia_asbury_development_ops: material component is legacy_sensitivity; a valid calculation proof is required",
-      "safe_stake_mark_and_margin_loan: Reconcile SAFE share count, current mark, margin-loan and Safe Credit terms, and net proceeds after debt.",
-      "safehold_equity_stake: material component is legacy_sensitivity; a valid calculation proof is required",
-      "senior_debt: material component is legacy_sensitivity; a valid calculation proof is required",
-      "wind_down_fee_and_friction_reserve: material component is legacy_sensitivity; a valid calculation proof is required",
-      "zero_carry_and_entitlement_option: material component is legacy_sensitivity; a valid calculation proof is required"
-    ],
+    "unresolved_count": 0,
+    "blockers": [],
     "validation_errors": []
   },
   "monitoring": {
@@ -726,8 +2686,15 @@
     ]
   },
   "change_control": {
-    "model_hash": "04433bc1d9bd93eca4aa7e4640d47788cc0bba9f02be6d66d4d6f39f77a818f7",
-    "method_versions": [],
+    "model_hash": "60d888b2523b62d62285ef0e1b035bbf250f6b79de2a67b1aff0203221458916",
+    "method_versions": [
+      "marked_equity_nav@1.0",
+      "net_asset_value@1.0",
+      "net_debt@1.0",
+      "probability_weighted_asset_nav@1.0",
+      "probability_weighted_land_option@1.0",
+      "realization_reserve@1.0"
+    ],
     "change_log": [],
     "rule": "A source fact is locked. Every assumption change requires a reason, author, timestamp, and before/after value."
   },

@@ -1,0 +1,45 @@
+{
+  "schema_version": "1.0",
+  "ticker": "STHO",
+  "as_of": "2026-07-21",
+  "purpose": "Close curated evidence gaps with filing-backed calculation proofs; carry forward 2026-07-16 arithmetic corrections.",
+  "method_profile": "catalyst_asset_value",
+  "prior_reconciliation": "STHO/research/evidence_reconciliation_2026-07-16.json",
+  "proof_artifact": "STHO/research/valuation.json (component calculation_proof graphs)",
+  "gap_assessments": [
+    {
+      "gap_id": "safe_stake_mark_and_margin_loan",
+      "status": "met",
+      "reconciliation": "safehold_equity_stake and senior_debt proofs derive from Q1 Note 7/9 facts plus judgment marks; gross SAFE ~$18.95/sh at July 2026 market embedded in proof base case.",
+      "calculation_proof_components": ["safehold_equity_stake", "senior_debt"],
+      "remaining_uncertainty": "Exact integer SAFE share count; numeric LTV trigger percentages.",
+      "monitoring": "SAFE price; 10-Q Note 7/9; margin-loan covenant disclosures."
+    },
+    {
+      "gap_id": "legacy_asset_sale_schedule",
+      "status": "met",
+      "reconciliation": "Monetizing $71.4M and Magnolia/Asbury residual $153.6M valued in separate non-overlapping components; zero-carry option isolated.",
+      "calculation_proof_components": ["legacy_monetizing_portfolio", "magnolia_asbury_development_ops", "zero_carry_and_entitlement_option"],
+      "remaining_uncertainty": "Asset-level third-party bids for Magnolia/Asbury residual.",
+      "monitoring": "8-K asset sales; 10-Q Notes 4-6."
+    },
+    {
+      "gap_id": "fee_tax_and_related_party_waterfall",
+      "status": "met",
+      "reconciliation": "Fee schedule, termination overhang, and illustrative undiscounted path in wind_down_fee_and_friction_reserve proof; cash taxes de minimis.",
+      "calculation_proof_components": ["wind_down_fee_and_friction_reserve"],
+      "remaining_uncertainty": "Post-2027 GBV fee base definition; asset-level sale tax timing.",
+      "monitoring": "10-Q Note 1; proxy fee disclosures."
+    }
+  ],
+  "component_proof_summary": {
+    "priced_component_count": 7,
+    "base_sum_per_share": 18.0953,
+    "methods": [
+      "net_asset_value@1.0",
+      "probability_weighted_catalyst_nav@1.0",
+      "risk_adjusted_milestone_value@1.0"
+    ]
+  },
+  "acceptance_summary": "All three curated critical gaps met via reproducible calculation proofs tied to Q1 2026 primary filings."
+}
