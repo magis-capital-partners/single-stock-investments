@@ -11,17 +11,17 @@
 | **Dhando** (Pabrai) | partial |
 | **Stance** | watch |
 | **Cycle** | up |
-| **Implied 7yr IRR** (base) | 6.3% (base) |
-| **IRR method** | yield_curve |
+| **Implied 7yr IRR** (base) | — |
+| **IRR method** | scarce_asset_optionality |
 | **Lawrence bucket** | other |
 | **Payoff lens** | levered |
 | **MOI bucket** | pending |
 
-**Deep dive:** `BMNR/research/deep_dive_2026-07-17.md` (auto-sync)
+**Deep dive:** `BMNR/research/deep_dive_2026-07-21.md` (auto-sync)
 
 **One line:** Ethereum treasury vehicle trading below May 2026 ETH fair value per share; watch until mechanical IRR and dilution path confirm mid-teens return.
 
-**Status:** watch (pending mechanical refresh 2026-07-17)
+**Status:** watch (mechanical refresh 2026-07-21; valuation_contract decision_grade)
 
-See `research/deep_dive_2026-07-17.md` and `research/valuation.json`.
+See `research/deep_dive_2026-07-21.md` and `research/valuation.json`.
 

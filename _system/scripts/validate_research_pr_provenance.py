@@ -9,9 +9,14 @@ from pathlib import Path
 
 def read_json(path: Path) -> dict:
     try:
-        value = json.loads(path.read_text(encoding="utf-8"))
-    except (OSError, json.JSONDecodeError) as exc:
-        raise ValueError(f"cannot read {path}: {exc}") from exc
+        from marvin_pipeline_common import load_research_json
+
+        value = load_research_json(path)
+    except (OSError, json.JSONDecodeError, ImportError) as exc:
+        try:
+            value = json.loads(path.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError) as fallback_exc:
+            raise ValueError(f"cannot read {path}: {exc}") from fallback_exc
     if not isinstance(value, dict):
         raise ValueError(f"{path} must contain a JSON object")
     return value
@@ -30,8 +35,8 @@ def validate(manifest: dict, state: dict, ticker: str) -> list[str]:
         errors.append("manifest does not authorize primary evidence")
     if state.get("ticker") != ticker:
         errors.append(f"agent state ticker must be {ticker}")
-    if state.get("consumer") != "marvin_research":
-        errors.append("agent state consumer must be marvin_research")
+    if state.get("consumer") not in {"marvin_research", "marvin_contract_backfill"}:
+        errors.append("agent state consumer must be marvin_research or marvin_contract_backfill")
     if state.get("evidence_hash") != evidence_hash:
         errors.append("agent state evidence_hash does not match manifest")
     if not state.get("completed_at"):
