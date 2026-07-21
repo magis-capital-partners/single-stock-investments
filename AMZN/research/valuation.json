@@ -1,1721 +1,409 @@
 {
   "ticker": "AMZN",
-  "as_of": "2026-07-19",
-  "method": "full",
-  "lawrence_bucket": "pricing_power",
+  "as_of": "2026-07-20",
+  "schema_version": "3.0",
+  "method": "proof_first_automated",
   "classification_inputs": {
-    "archetype": "compounder",
-    "moat": "stable",
-    "dhando": "partial",
-    "cycle": "-"
+    "archetype": "compounder"
   },
   "inputs": {
-    "price": 247.23,
-    "price_source": "Yahoo AMZN close 2026-07-17",
-    "fcf_per_share": 5.35,
-    "fcf_source": "Q1-26 TTM OCF $148.5B less normalized capex ~$90B / ~10.95B diluted shares (not TTM FCF $1.2B)",
-    "shares_millions": 10949,
-    "normalization_note": "AI capex TTM $147.3B depresses reported FCF; Lawrence base uses mid-cycle owner cash flow after capex normalizes",
-    "shares_outstanding": 10949000000,
-    "shares_source": "Derived from inputs.shares_millions in the pre-existing valuation.json; [HUMAN REVIEW] confirm against the latest primary filing.",
-    "price_as_of": "2026-07-17"
+    "shares_outstanding": 10757109436.0,
+    "cash_m": 104692.0,
+    "total_debt_m": 119074.0,
+    "price": 249.99,
+    "price_as_of": "2026-07-20",
+    "price_source": "Yahoo AMZN close 2026-07-20"
   },
-  "scenarios": {
-    "bear": {
-      "growth_y1_5": 0.05,
-      "growth_y6_10": 0.04,
-      "exit_pfcf_y10": 18,
-      "notes": "AWS deceleration, capex stays elevated, multiple compression"
-    },
-    "base": {
-      "growth_y1_5": 0.09,
-      "growth_y6_10": 0.07,
-      "exit_pfcf_y10": 24,
-      "notes": "AWS/ads/chips growth; capex moderates toward ~60% of OCF by Y5"
-    },
-    "bull": {
-      "growth_y1_5": 0.12,
-      "growth_y6_10": 0.08,
-      "exit_pfcf_y10": 30,
-      "notes": "Agentic AI workload share gains; FCF inflection by Y3\u20134"
-    }
-  },
-  "results": {
-    "bear": {
-      "return_pct": -5.0
-    },
-    "base": {
-      "return_pct": 1.9
-    },
-    "bull": {
-      "return_pct": 7.2
-    }
-  },
-  "implied_return": {
-    "base_pct": 3.68,
-    "label": "7yr IRR (total synthesis)",
-    "display": "3.68% (total synthesis)",
-    "lawrence_stance_gate_pct": 1.9,
-    "falsifier_adjusted_pct": 1.9,
-    "synthesis_pct": 3.68
-  },
-  "stance_proposal": {
-    "suggested": "watch",
-    "irr_band": "<15%",
-    "gates": {
-      "moat_ok": true,
-      "dhando_ok": true
-    },
-    "override_reason": null
-  },
-  "overlay_results": [
-    {
-      "case": "AI inflection",
-      "method": "full (normalized FCF)",
-      "key_inputs": "FCF\u2080=$9.0 g1=12% g2=8% exit=30\u00d7",
-      "return_pct": 16.2,
-      "stance_gate": false,
-      "notes": "[Assumption] capex ~$90B sustainable vs $147B TTM; needs mgmt guide"
-    },
-    {
-      "case": "Capex stress Y0",
-      "method": "illustrative trough",
-      "key_inputs": "OCF 148.5B \u2212 capex 147.3B",
-      "return_pct": null,
-      "display": "FCF ~$0.11/sh (not 7yr IRR)",
-      "stance_gate": false
-    }
-  ],
-  "ai_overlay": {
-    "as_of": "2026-05-26",
-    "status": "partial \u2014 normalized FCF vs TTM capex spike",
-    "in_model": {
-      "consolidated_fcf_y0": "$5.35/sh normalized (not TTM $1.2B FCF)",
-      "aws_growth_in_segment_build": "14% / 9% Y1-5 / Y6-10",
-      "capex_ttm_bn": "147.3B purchases vs 148.5B OCF",
-      "custom_silicon": "Trainium/Graviton in narrative; not separate revenue line"
-    },
-    "not_in_model_requires_refresh": [
-      "Advertising as separate owner-cash segment",
-      "Trainium external sales schedule",
-      "Agentic AI capex ROI per workload",
-      "Anthropic mark-to-market in GAAP NI",
-      "RPO / backlog for AWS (if disclosed)"
-    ],
-    "capex_stress_2026": {
-      "ocf_bn_assumption": 148.5,
-      "ocf_assumption_note": "TTM operating cash flow Q1 2026 supplemental",
-      "capex_bn": 147.3,
-      "capex_source": "TTM capital expenditures (purchases)",
-      "implied_fcf_bn": 1.2,
-      "implied_fcf_per_share": 0.11
-    },
-    "ai_inflection_bull": {
-      "fcf_per_share_y0": 9.0,
-      "fcf_y0_note": "[Assumption] capex ~$90B sustainable vs $147B TTM; needs mgmt guide",
-      "growth_y1_5": 0.12,
-      "growth_y6_10": 0.08,
-      "exit_pfcf_y10": 30,
-      "drivers": "AWS AI share, ads, silicon, FCF inflection",
-      "computed_return_pct": 16.2
-    }
-  },
-  "valuation_overlay": "segment_cashflow",
-  "segment_build": {
-    "framework": "speedwell_reverse_dcf",
-    "as_of": "2026-05-26",
-    "horizon_years": 7,
-    "discount_rate_explicit": 0.1,
-    "segments": [
-      {
-        "id": "aws",
-        "label": "Amazon Web Services (AWS)",
-        "owner_cash_y0_bn": 33.4,
-        "owner_cash_y0_per_share": 3.05,
-        "owner_cash_y0_source": "Normalized FCF allocated 57.1% by FY2025 segment OI [Assumption]",
-        "growth_y1_5": 0.14,
-        "growth_y6_10": 0.09,
-        "exit_pfcf_y10": 22,
-        "notes": "FY2025 OI $45.6B; Q1 2026 +28% sales"
-      },
-      {
-        "id": "north_america",
-        "label": "North America stores",
-        "owner_cash_y0_bn": 21.7,
-        "owner_cash_y0_per_share": 1.98,
-        "owner_cash_y0_source": "Normalized FCF allocated 37.0% by segment OI [Assumption]",
-        "growth_y1_5": 0.08,
-        "growth_y6_10": 0.06,
-        "exit_pfcf_y10": 18,
-        "notes": "FY2025 OI $29.6B"
-      },
-      {
-        "id": "international",
-        "label": "International stores",
-        "owner_cash_y0_bn": 3.5,
-        "owner_cash_y0_per_share": 0.32,
-        "owner_cash_y0_source": "Normalized FCF allocated 5.9% by segment OI [Assumption]",
-        "growth_y1_5": 0.1,
-        "growth_y6_10": 0.07,
-        "exit_pfcf_y10": 16,
-        "notes": "FY2025 OI $4.8B"
-      }
-    ],
-    "options": [
-      {
-        "id": "advertising_overlay",
-        "label": "Advertising (> $70B TTM, inside segments)",
-        "annual_drag_per_share": 0.0,
-        "base_terminal_value_bn": 0,
-        "notes": "Not split out; embedded in NA/Intl/AWS growth [Assumption]"
-      }
-    ],
-    "corporate_drag": {
-      "alphabet_level_drag_per_share": 0.0,
-      "notes": "Segment OI sums to consolidated; capex drag in Lawrence FCF\u2080 normalization"
-    },
-    "reconciliation": {
-      "sum_pv_per_share_at_explicit_discount": 163.4,
-      "explicit_discount_rate_pct": 10.0,
-      "implied_business_return_pct": 4.1,
-      "lawrence_base_irr_pct": 3.6
-    }
-  },
-  "results_lawrence_legacy": {
-    "bear": {
-      "return_pct": -5.0
-    },
-    "base": {
-      "return_pct": 1.9
-    },
-    "bull": {
-      "return_pct": 7.2
-    }
-  },
-  "option_scan": [
-    {
-      "q": 4,
-      "question": "Backlog / RPO / AI capex not in FCF path?",
-      "answer": "Yes",
-      "treatment": "embedded_in_segment",
-      "evidence": "ai_overlay in valuation.json"
-    },
-    {
-      "q": 3,
-      "question": "In-business option: Advertising (> $70B TTM, inside segments)?",
-      "answer": "Yes",
-      "treatment": "zero",
-      "evidence": "[Assumption]"
-    }
-  ],
-  "synthesis": {
-    "status": "complete",
-    "paths": [
-      {
-        "id": "scenario_bear",
-        "label": "Bear scenario (Lawrence)",
-        "source": "scenarios.bear",
-        "return_pct": -5.0,
-        "weight": 0.05,
-        "type": "numeric",
-        "epistemic_tier": "C (scenario envelope)",
-        "weight_why": "Downside stress; low weight because bear is a sensitivity, not a competing explanation of base mechanics.",
-        "weight_falsifiers": [
-          "Bear assumptions become base case in filings (e.g. sustained volume collapse)"
-        ],
-        "hard_to_vary": "yes: asymmetric low weight is structural"
-      },
-      {
-        "id": "scenario_bull",
-        "label": "Bull scenario (Lawrence)",
-        "source": "scenarios.bull",
-        "return_pct": 7.2,
-        "weight": 0.12,
-        "type": "numeric",
-        "epistemic_tier": "C (scenario envelope)",
-        "weight_why": "Upside stress probe; higher than bear because optionality archetype has skew, but still below primary paths.",
-        "weight_falsifiers": [
-          "Bull growth sustained in filings for 4+ quarters without falsifier trigger"
-        ],
-        "hard_to_vary": "yes"
-      },
-      {
-        "id": "segment_implied",
-        "label": "Segment cash-flow build (reverse DCF)",
-        "source": "segment_build @ explicit discount",
-        "return_pct": 4.1,
-        "weight": 0.2,
-        "type": "numeric",
-        "epistemic_tier": "B (independent derivation)",
-        "weight_why": "Reverse DCF from segment filing data; cross-checks consolidated growth without replacing falsifier path.",
-        "weight_falsifiers": [
-          "Segment sum PV tie-out fails vs consolidated OCF",
-          "Implied return moves >1pp when segment growth matches filing falsifier-adjusted exactly (double-count signal)"
-        ],
-        "hard_to_vary": "partial: shares growth inputs with Tier A; weight kept below filing path"
-      }
-    ],
-    "qualitative_adjustments": [
-      {
-        "id": "no_predictive_attribute",
-        "factor": "No dated predictive attribute at spot",
-        "pp": -0.2,
-        "rationale": "Scarcity is descriptive; no timed mispricing catalyst in base",
-        "sources": "HK predictive attributes framework",
-        "falsifier": "Cross-check names dated catalyst with timeline"
-      }
-    ],
-    "qualitative_manual": false,
-    "qualitative_pp_cap_applied": false,
-    "numeric_weighted_pct": 3.88,
-    "qualitative_pp": -0.2,
-    "total_synthesis_pct": 3.68,
-    "human_approval": "pending",
-    "weight_audit": {
-      "flags": [],
-      "deutsch_checks": {
-        "hard_to_vary": true,
-        "falsifiable": true,
-        "not_instrumentalist": true,
-        "reach": "Weights encode evidence tier (A primary \u2192 D external), not fitted to hit a target IRR"
-      },
-      "qualitative_audit": {
-        "flags": [],
-        "deutsch_checks": {
-          "hard_to_vary": true,
-          "falsifiable": true,
-          "not_double_count": true,
-          "small_band": true
-        }
-      }
-    },
-    "notes": "Capstone IRR combining filings, segments, overlays, third-party, qualitative"
-  },
-  "lawrence_horizon_years": 7,
-  "evidence_refresh": {
-    "synthesis_in_dive": true
-  },
-  "context_overlay": {
-    "as_of": "2026-07-20",
-    "disclaimer": "Context only. Tailwinds inform stance and overlay sizing; they do not auto-inflate Lawrence base IRR. Promotion to base case requires [HUMAN REVIEW].",
-    "themes": [
-      {
-        "theme_id": "macro_regime",
-        "label": "Macro risk regime",
-        "indicators": [
-          {
-            "id": "hy_oas",
-            "label": "High-yield OAS credit spread (%)",
-            "latest": 1.3,
-            "as_of": "2026-07-20",
-            "yoy_pct": 217.1,
-            "direction": "up",
-            "good_for": "risk_regime",
-            "source": "spread:HYG-LQD:21d (HYG-LQD 1m spread proxy, not OAS)",
-            "stale": false,
-            "in_base_irr": false
-          },
-          {
-            "id": "ust_10y",
-            "label": "US Treasury 10Y yield (%)",
-            "latest": 4.579999923706055,
-            "as_of": "2026-07-20",
-            "yoy_pct": 4.8,
-            "direction": "up",
-            "good_for": "rates_regime",
-            "source": "yahoo:^TNX",
-            "stale": false,
-            "in_base_irr": false
-          },
-          {
-            "id": "ust_2y",
-            "label": "US Treasury 2Y yield (%)",
-            "latest": 4.314000129699707,
-            "as_of": "2026-07-20",
-            "yoy_pct": 10.4,
-            "direction": "up",
-            "good_for": "rates_regime",
-            "source": "yahoo:^FVX",
-            "stale": false,
-            "in_base_irr": false
-          },
-          {
-            "id": "dxy_broad",
-            "label": "Trade-weighted USD index (broad)",
-            "latest": 100.93699645996094,
-            "as_of": "2026-07-20",
-            "yoy_pct": 3.2,
-            "direction": "up",
-            "good_for": "dollar_regime",
-            "source": "yahoo:DX-Y.NYB",
-            "stale": false,
-            "in_base_irr": false
-          },
-          {
-            "id": "vix_level",
-            "label": "VIX index level",
-            "latest": 18.280000686645508,
-            "as_of": "2026-07-20",
-            "yoy_pct": 9.8,
-            "direction": "up",
-            "good_for": "vol_regime",
-            "source": "yahoo:^VIX",
-            "stale": false,
-            "in_base_irr": false
-          },
-          {
-            "id": "credit_impulse_1m",
-            "label": "HYG vs TLT 1-month return spread (%)",
-            "latest": 2.52,
-            "as_of": "2026-07-20",
-            "yoy_pct": 42.4,
-            "direction": "up",
-            "good_for": "credit_impulse",
-            "source": "spread:HYG-TLT:21d",
-            "stale": false,
-            "in_base_irr": false
-          },
-          {
-            "id": "spy_20d_realized_vol",
-            "label": "SPY 20-day realized vol (annualized %)",
-            "latest": 11.39,
-            "as_of": "2026-07-20",
-            "yoy_pct": 31.5,
-            "direction": "up",
-            "good_for": "equity_vol",
-            "source": "realized_vol:SPY:20d",
-            "stale": false,
-            "in_base_irr": false
-          }
-        ]
-      }
-    ]
-  },
-  "insider_signal": {
-    "as_of": "2026-07-20",
-    "disclaimer": "Context only. Insider activity informs scenario confidence and stance discussion; it does not auto-inflate Lawrence base IRR. Promotion requires [HUMAN REVIEW].",
-    "in_base_irr": false,
-    "window_days": 365,
-    "ics": 0.0,
-    "band": "negligible",
-    "bull_case_support": "none",
-    "scenario_confidence": {
-      "priors": {
-        "bear": 0.2,
-        "base": 0.55,
-        "bull": 0.25
-      },
-      "tilted": {
-        "bear": 0.28,
-        "base": 0.47,
-        "bull": 0.25
-      },
-      "bull_delta": 0.0,
-      "bear_delta": 0.08,
-      "note": "Scenario weights are qualitative confidence only; Lawrence base IRR unchanged."
-    },
-    "factors": {
-      "buy_score": 0.0,
-      "sell_score": -1.0,
-      "cluster_bonus": 0.0,
-      "net_buy_usd": 0,
-      "net_sell_usd": 2577882338.88,
-      "price_today": 247.23
-    },
-    "top_buys": [],
-    "top_sells": [
-      {
-        "insider": "BEZOS JEFFREY P",
-        "date": "2026-05-04",
-        "shares": 220200,
-        "price": 0.0,
-        "value_usd": 0.0,
-        "is_10b5_1": false,
-        "contrib": -0.151
-      },
-      {
-        "insider": "BEZOS JEFFREY P",
-        "date": "2026-05-01",
-        "shares": 1033597,
-        "price": 0.0,
-        "value_usd": 0.0,
-        "is_10b5_1": false,
-        "contrib": -0.148
-      },
-      {
-        "insider": "BEZOS JEFFREY P",
-        "date": "2025-11-14",
-        "shares": 42610,
-        "price": 0.0,
-        "value_usd": 0.0,
-        "is_10b5_1": false,
-        "contrib": -0.129
-      },
-      {
-        "insider": "BEZOS JEFFREY P",
-        "date": "2025-11-07",
-        "shares": 103437,
-        "price": 0.0,
-        "value_usd": 0.0,
-        "is_10b5_1": false,
-        "contrib": -0.129
-      },
-      {
-        "insider": "BEZOS JEFFREY P",
-        "date": "2025-11-06",
-        "shares": 909691,
-        "price": 0.0,
-        "value_usd": 0.0,
-        "is_10b5_1": false,
-        "contrib": -0.129
-      }
-    ],
-    "narrative_hooks": [],
-    "transaction_count": 220
-  },
-  "lens_consensus": {
-    "as_of": "2026-07-19",
-    "shared_inputs_ref": "valuation.json@2026-07-19",
-    "valuation_richness": 0.667,
-    "blended_return_pct": 1.13,
-    "band_pct": [
-      -5.0,
-      3.9
-    ],
-    "weighted_median_pct": 1.9,
-    "median_mean_flag": false,
-    "stance": "watch",
-    "agreement_pct": 85,
-    "dissent_count": 1,
-    "lawrence_divergence": false,
-    "top_dissents": [
-      {
-        "persona": "pabrai",
-        "label": "Mohnish Pabrai",
-        "verdict": "pass",
-        "return_pct": -5.0,
-        "key_metric": "downside_upside_ratio=0.694",
-        "conviction": 1.0,
-        "falsifier": "dhando -> none OR net-debt/EBITDA > 3 OR bear return < -15%"
-      }
-    ],
-    "contributor_count": 10,
-    "in_base_irr": false,
-    "disclaimer": "Advisory lens blend only. Does not replace Lawrence total-synthesis stance gate without [HUMAN REVIEW]."
-  },
-  "total_return_panel": {
-    "schema_version": "3.0",
-    "ticker": "AMZN",
-    "as_of": "2026-07-19",
-    "status": "partial",
-    "error": "Vendor events are discovery evidence; primary-source completeness has not been established.",
-    "price_source": "yahoo:AMZN",
-    "currency": "USD",
-    "return_currency": "USD",
-    "fx_basis": "listing_currency_nominal",
-    "history_start": "1997-05-15",
-    "history_end": "2026-07-17",
-    "price_points": 7338,
-    "price_interval": "1d",
-    "history_basis": "earliest_available_vendor_trading_history",
-    "chart_scale": "logarithmic",
-    "chart_y_axis": "cumulative_return_pct",
-    "chart_series": [
-      "total_return",
-      "price_only"
-    ],
-    "return_contract": "split-adjusted close excluding dividends; event amounts normalized for later splits; cash reinvested at ex-date close; pre-tax nominal",
-    "coverage": {
-      "status": "vendor_only",
-      "start": null,
-      "end": null,
-      "note": "Vendor events are discovery evidence; primary-source completeness has not been established.",
-      "ledger_path": null
-    },
-    "event_count": 4,
-    "event_counts": {
-      "split": 4
-    },
-    "cash_distributions_on_initial_share_path": 0,
-    "distribution_contribution_by_type": {},
-    "cumulative_distributions_per_share": 0,
-    "start_price": 0.0979,
-    "end_price": 247.23,
-    "price_index_end": 252489.35,
-    "total_return_index_end": 252489.35,
-    "cumulative_price_return_pct": 252389.35,
-    "cumulative_total_return_pct": 252389.35,
-    "price_only_annualized_pct": 30.81,
-    "total_return_annualized_pct": 30.81,
-    "market_cap_m": 2706921.27,
-    "shares_outstanding": 10949000000,
-    "price_for_market_cap": 247.23,
-    "chart": "AMZN/research/charts/total_return_2026-07-19.svg",
-    "panel_json": "AMZN/research/total_return_panel.json"
-  },
-  "valuation_mode": "economic_value",
   "valuation_methodology": {
-    "mode": "component_economic_value",
     "horizon_years": 7,
-    "decision_rule": "Use one complete non-overlapping component schedule. The legacy Lawrence return path remains a separate stance gate until the primary evidence bridges are complete."
-  },
-  "component_valuation": {
-    "schema_version": "1.0",
-    "all_material_components_identified": true,
-    "coverage_statement": "Phase 3 scaffold identifies every currently known material operating, financial, liability, reserve, and option claim once. Primary ownership and cash/NAV bridges remain open follow-up gates.",
-    "components": [
-      {
-        "id": "primary_operating_segment",
-        "label": "North America retail and logistics owner cash",
-        "category": "operating_business",
-        "overlap_key": "primary_operating_segment",
-        "treatment": "additive",
-        "valuation": {
-          "method": "owner_cash_reinvestment_dcf",
-          "basis": "per_share",
-          "low": 94.81,
-          "base": 136.95,
-          "high": 184.35,
-          "evidence_tier": "mixed_primary_and_estimate",
-          "evidence": "Existing AMZN valuation inputs: Q1-26 TTM OCF $148.5B less normalized capex ~$90B / ~10.95B diluted shares (not TTM FCF $1.2B); AI capex TTM $147.3B depresses reported FCF; Lawrence base uses mid-cycle owner cash flow after capex normalizes [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
-          "assumption_summary": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
-          "cross_check": "Reconcile the range to primary filings, a reproducible owner-cash or NAV bridge, and the identified liability and capital claims before decision use.",
-          "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case."
-        }
-      },
-      {
-        "id": "secondary_operating_segments",
-        "label": "AWS, advertising, and international owner cash",
-        "category": "operating_business",
-        "overlap_key": "secondary_operating_segments",
-        "treatment": "additive",
-        "valuation": {
-          "method": "segment_owner_cash_dcf",
-          "basis": "per_share",
-          "low": 42.14,
-          "base": 68.47,
-          "high": 100.08,
-          "evidence_tier": "mixed_primary_and_estimate",
-          "evidence": "Existing AMZN valuation inputs: Q1-26 TTM OCF $148.5B less normalized capex ~$90B / ~10.95B diluted shares (not TTM FCF $1.2B); AI capex TTM $147.3B depresses reported FCF; Lawrence base uses mid-cycle owner cash flow after capex normalizes [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
-          "assumption_summary": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
-          "cross_check": "Reconcile the range to primary filings, a reproducible owner-cash or NAV bridge, and the identified liability and capital claims before decision use.",
-          "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case."
-        }
-      },
-      {
-        "id": "strategic_option",
-        "label": "Other Bets and strategic-option value",
-        "category": "real_option",
-        "overlap_key": "strategic_option",
-        "treatment": "additive",
-        "valuation": {
-          "method": "milestone_project_option",
-          "basis": "per_share",
-          "low": 0.0,
-          "base": 10.53,
-          "high": 47.4,
-          "evidence_tier": "mixed_primary_and_estimate",
-          "evidence": "Existing AMZN valuation inputs: Q1-26 TTM OCF $148.5B less normalized capex ~$90B / ~10.95B diluted shares (not TTM FCF $1.2B); AI capex TTM $147.3B depresses reported FCF; Lawrence base uses mid-cycle owner cash flow after capex normalizes [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
-          "assumption_summary": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
-          "cross_check": "Reconcile the range to primary filings, a reproducible owner-cash or NAV bridge, and the identified liability and capital claims before decision use.",
-          "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case."
-        }
-      },
-      {
-        "id": "net_claims_and_reserve",
-        "label": "Net financial claims and AI-capital reserve",
-        "category": "liability_or_reserve",
-        "overlap_key": "net_claims_and_reserve",
-        "treatment": "additive",
-        "valuation": {
-          "method": "net_claim_and_capital_reserve",
-          "basis": "per_share",
-          "low": -39.5,
-          "base": 21.07,
-          "high": 42.14,
-          "evidence_tier": "mixed_primary_and_estimate",
-          "evidence": "Existing AMZN valuation inputs: Q1-26 TTM OCF $148.5B less normalized capex ~$90B / ~10.95B diluted shares (not TTM FCF $1.2B); AI capex TTM $147.3B depresses reported FCF; Lawrence base uses mid-cycle owner cash flow after capex normalizes [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
-          "assumption_summary": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
-          "cross_check": "Reconcile the range to primary filings, a reproducible owner-cash or NAV bridge, and the identified liability and capital claims before decision use.",
-          "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case."
-        }
-      }
-    ]
-  },
-  "economic_value": {
-    "schema_version": "1.0",
-    "method": "component_economic_value",
-    "economic_claim": {
-      "description": "One diluted share of AMZN, including every currently identified operating claim, financial claim, liability, reserve, and material option.",
-      "unit_label": "diluted share",
-      "unit_count": 10949000000,
-      "unit_source": "Derived from inputs.shares_millions in the pre-existing valuation.json; [HUMAN REVIEW] confirm against the latest primary filing.",
-      "enterprise_to_equity_reconciliation": "Operating and asset claims are valued once; cash, debt, financing, reserves, and other senior claims are separate components or explicitly reserved. No component is intended to overlap another."
-    },
-    "gaap_role": "cross_check",
-    "accounting_reference": "Existing research and filing-derived valuation inputs. The primary-source reconciliation remains an open evidence gate.",
-    "component_groups": [
-      {
-        "id": "primary_operating_segment",
-        "label": "North America retail and logistics owner cash",
-        "component_ids": [
-          "primary_operating_segment"
-        ],
-        "economic_claim": "North America retail and logistics owner cash",
-        "valuation_basis": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
-        "adjustments": "The low/base/high range incorporates ownership, tax, capital, cycle, timing, and realization uncertainty pending the primary bridge.",
-        "overlap_control": "Unique overlap key primary_operating_segment; no other component capitalizes the same claim."
-      },
-      {
-        "id": "secondary_operating_segments",
-        "label": "AWS, advertising, and international owner cash",
-        "component_ids": [
-          "secondary_operating_segments"
-        ],
-        "economic_claim": "AWS, advertising, and international owner cash",
-        "valuation_basis": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
-        "adjustments": "The low/base/high range incorporates ownership, tax, capital, cycle, timing, and realization uncertainty pending the primary bridge.",
-        "overlap_control": "Unique overlap key secondary_operating_segments; no other component capitalizes the same claim."
-      },
-      {
-        "id": "strategic_option",
-        "label": "Other Bets and strategic-option value",
-        "component_ids": [
-          "strategic_option"
-        ],
-        "economic_claim": "Other Bets and strategic-option value",
-        "valuation_basis": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
-        "adjustments": "The low/base/high range incorporates ownership, tax, capital, cycle, timing, and realization uncertainty pending the primary bridge.",
-        "overlap_control": "Unique overlap key strategic_option; no other component capitalizes the same claim.",
-        "risk_and_timing": {
-          "probability_basis": "Starter probability is explicit analyst judgment pending a primary-source milestone and ownership reconciliation.",
-          "timing_basis": "The range includes delay and failure outcomes; dated cash realization remains [HUMAN REVIEW].",
-          "remaining_capital_basis": "Remaining owner-funded capital, financing, and dilution are reserved until the primary sources-and-uses bridge is complete."
-        }
-      },
-      {
-        "id": "net_claims_and_reserve",
-        "label": "Net financial claims and AI-capital reserve",
-        "component_ids": [
-          "net_claims_and_reserve"
-        ],
-        "economic_claim": "Net financial claims and AI-capital reserve",
-        "valuation_basis": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
-        "adjustments": "The low/base/high range incorporates ownership, tax, capital, cycle, timing, and realization uncertainty pending the primary bridge.",
-        "overlap_control": "Unique overlap key net_claims_and_reserve; no other component capitalizes the same claim."
-      }
-    ],
-    "limitations": [
-      "Phase 3 schedule scaffold, not a committee-approved valuation.",
-      "Universal followups remain open until primary evidence supports the ownership map, owner-cash or NAV bridge, and downside/capital claims."
-    ]
+    "automation": "source_locked_first_pass"
   },
   "component_valuation_results": {
-    "status": "complete",
-    "decision_rule": "Use the complete low/base/high component schedule. Embedded components are estimated but not added twice.",
+    "status": "compiled",
     "all_material_components_identified": true,
     "additive_components": [
       {
-        "id": "primary_operating_segment",
-        "label": "North America retail and logistics owner cash",
+        "id": "operating_business_and_net_assets",
+        "label": "Operating business and net financial assets",
         "category": "operating_business",
-        "overlap_key": "primary_operating_segment",
+        "overlap_key": "entire_security",
         "treatment": "additive",
-        "included_in_component_id": null,
-        "method": "owner_cash_reinvestment_dcf",
-        "valuation_status": null,
-        "calculation_proof": null,
-        "evidence_tier": "mixed_primary_and_estimate",
-        "evidence": "Existing AMZN valuation inputs: Q1-26 TTM OCF $148.5B less normalized capex ~$90B / ~10.95B diluted shares (not TTM FCF $1.2B); AI capex TTM $147.3B depresses reported FCF; Lawrence base uses mid-cycle owner cash flow after capex normalizes [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
-        "cross_check": "Reconcile the range to primary filings, a reproducible owner-cash or NAV bridge, and the identified liability and capital claims before decision use.",
-        "driver_model_type": null,
-        "driver_model": null,
-        "assumption_summary": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
-        "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case.",
-        "scenario_assumptions": null,
-        "low_per_share": 94.81,
-        "base_per_share": 136.95,
-        "high_per_share": 184.35
-      },
-      {
-        "id": "secondary_operating_segments",
-        "label": "AWS, advertising, and international owner cash",
-        "category": "operating_business",
-        "overlap_key": "secondary_operating_segments",
-        "treatment": "additive",
-        "included_in_component_id": null,
-        "method": "segment_owner_cash_dcf",
-        "valuation_status": null,
-        "calculation_proof": null,
-        "evidence_tier": "mixed_primary_and_estimate",
-        "evidence": "Existing AMZN valuation inputs: Q1-26 TTM OCF $148.5B less normalized capex ~$90B / ~10.95B diluted shares (not TTM FCF $1.2B); AI capex TTM $147.3B depresses reported FCF; Lawrence base uses mid-cycle owner cash flow after capex normalizes [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
-        "cross_check": "Reconcile the range to primary filings, a reproducible owner-cash or NAV bridge, and the identified liability and capital claims before decision use.",
-        "driver_model_type": null,
-        "driver_model": null,
-        "assumption_summary": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
-        "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case.",
-        "scenario_assumptions": null,
-        "low_per_share": 42.14,
-        "base_per_share": 68.47,
-        "high_per_share": 100.08
-      },
-      {
-        "id": "strategic_option",
-        "label": "Other Bets and strategic-option value",
-        "category": "real_option",
-        "overlap_key": "strategic_option",
-        "treatment": "additive",
-        "included_in_component_id": null,
-        "method": "milestone_project_option",
-        "valuation_status": null,
-        "calculation_proof": null,
-        "evidence_tier": "mixed_primary_and_estimate",
-        "evidence": "Existing AMZN valuation inputs: Q1-26 TTM OCF $148.5B less normalized capex ~$90B / ~10.95B diluted shares (not TTM FCF $1.2B); AI capex TTM $147.3B depresses reported FCF; Lawrence base uses mid-cycle owner cash flow after capex normalizes [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
-        "cross_check": "Reconcile the range to primary filings, a reproducible owner-cash or NAV bridge, and the identified liability and capital claims before decision use.",
-        "driver_model_type": null,
-        "driver_model": null,
-        "assumption_summary": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
-        "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case.",
-        "scenario_assumptions": null,
-        "low_per_share": 0.0,
-        "base_per_share": 10.53,
-        "high_per_share": 47.4
-      },
-      {
-        "id": "net_claims_and_reserve",
-        "label": "Net financial claims and AI-capital reserve",
-        "category": "liability_or_reserve",
-        "overlap_key": "net_claims_and_reserve",
-        "treatment": "additive",
-        "included_in_component_id": null,
-        "method": "net_claim_and_capital_reserve",
-        "valuation_status": null,
-        "calculation_proof": null,
-        "evidence_tier": "mixed_primary_and_estimate",
-        "evidence": "Existing AMZN valuation inputs: Q1-26 TTM OCF $148.5B less normalized capex ~$90B / ~10.95B diluted shares (not TTM FCF $1.2B); AI capex TTM $147.3B depresses reported FCF; Lawrence base uses mid-cycle owner cash flow after capex normalizes [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
-        "cross_check": "Reconcile the range to primary filings, a reproducible owner-cash or NAV bridge, and the identified liability and capital claims before decision use.",
-        "driver_model_type": null,
-        "driver_model": null,
-        "assumption_summary": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
-        "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case.",
-        "scenario_assumptions": null,
-        "low_per_share": -39.5,
-        "base_per_share": 21.07,
-        "high_per_share": 42.14
+        "method": "owner_earnings_reinvestment_dcf",
+        "valuation_status": "bounded_estimate",
+        "calculation_proof": {
+          "schema_version": "1.0",
+          "method_id": "owner_earnings_reinvestment_dcf",
+          "method_version": "1.0",
+          "output_unit": "USD per share",
+          "inputs": [
+            {
+              "id": "owner_earnings",
+              "label": "Normalized owner earnings",
+              "kind": "fact",
+              "value": 7695.0,
+              "unit": "USD millions",
+              "source": {
+                "ref": "AMZN/research/evidence/sec_companyfacts.json",
+                "locator": "us-gaap:NetCashProvidedByUsedInOperatingActivities; accession 0001018724-26-000004; form 10-K",
+                "as_of": "2025-12-31"
+              },
+              "locked": true
+            },
+            {
+              "id": "cash",
+              "label": "Cash",
+              "kind": "fact",
+              "value": 104692.0,
+              "unit": "USD millions",
+              "source": {
+                "ref": "AMZN/research/evidence/sec_companyfacts.json",
+                "locator": "us-gaap:CashCashEquivalentsRestrictedCashAndRestrictedCashEquivalents; accession 0001018724-26-000014; form 10-Q",
+                "as_of": "2026-03-31"
+              },
+              "locked": true
+            },
+            {
+              "id": "debt",
+              "label": "Debt",
+              "kind": "fact",
+              "value": 119074.0,
+              "unit": "USD millions",
+              "source": {
+                "ref": "AMZN/research/evidence/sec_companyfacts.json",
+                "locator": "us-gaap:LongTermDebtNoncurrent; accession 0001018724-26-000014; form 10-Q",
+                "as_of": "2026-03-31"
+              },
+              "locked": true
+            },
+            {
+              "id": "shares_m",
+              "label": "Diluted shares",
+              "kind": "fact",
+              "value": 10757.109435999999,
+              "unit": "million shares",
+              "source": {
+                "ref": "AMZN/research/evidence/sec_companyfacts.json",
+                "locator": "dei:EntityCommonStockSharesOutstanding; accession 0001018724-26-000014; form 10-Q",
+                "as_of": "2026-04-22"
+              },
+              "locked": true
+            }
+          ],
+          "assumptions": [
+            {
+              "id": "reinvestment",
+              "label": "Reinvestment rate",
+              "kind": "judgment",
+              "values": {
+                "low": 0.2,
+                "base": 0.35,
+                "high": 0.5
+              },
+              "unit": "ratio",
+              "rationale": "Versioned initial bounds; refresh from the issuer reinvestment ledger.",
+              "allowed_range": {
+                "min": 0,
+                "max": 0.75
+              }
+            },
+            {
+              "id": "incremental_roic",
+              "label": "Incremental after-tax ROIC",
+              "kind": "judgment",
+              "values": {
+                "low": 0.12,
+                "base": 0.18,
+                "high": 0.25
+              },
+              "unit": "ratio",
+              "rationale": "Conservative bounded starting cases pending a longer primary-source capital bridge.",
+              "allowed_range": {
+                "min": 0,
+                "max": 0.5
+              }
+            },
+            {
+              "id": "discount_rate",
+              "label": "Discount rate",
+              "kind": "judgment",
+              "values": {
+                "low": 0.12,
+                "base": 0.1,
+                "high": 0.09
+              },
+              "unit": "ratio",
+              "rationale": "Approved risk bounds for the automated first pass.",
+              "allowed_range": {
+                "min": 0.07,
+                "max": 0.15
+              }
+            },
+            {
+              "id": "terminal_multiple",
+              "label": "Terminal owner-earnings multiple",
+              "kind": "judgment",
+              "values": {
+                "low": 12,
+                "base": 18,
+                "high": 24
+              },
+              "unit": "multiple",
+              "rationale": "Bounded terminal economics; high case remains below a perpetual high-growth assumption.",
+              "allowed_range": {
+                "min": 8,
+                "max": 30
+              }
+            }
+          ],
+          "calculations": [
+            {
+              "id": "growth",
+              "label": "Growth from reinvestment",
+              "op": "multiply",
+              "args": [
+                "reinvestment",
+                "incremental_roic"
+              ],
+              "unit": "ratio"
+            },
+            {
+              "id": "growth_factor",
+              "op": "add",
+              "args": [
+                1,
+                "growth"
+              ],
+              "unit": "ratio"
+            },
+            {
+              "id": "distribution_rate",
+              "op": "subtract",
+              "args": [
+                1,
+                "reinvestment"
+              ],
+              "unit": "ratio"
+            },
+            {
+              "id": "owner_earnings_y1",
+              "op": "multiply",
+              "args": [
+                "owner_earnings",
+                "growth_factor"
+              ],
+              "unit": "USD millions"
+            },
+            {
+              "id": "owner_cash_y1",
+              "op": "multiply",
+              "args": [
+                "owner_earnings_y1",
+                "distribution_rate"
+              ],
+              "unit": "USD millions"
+            },
+            {
+              "id": "owner_earnings_y2",
+              "op": "multiply",
+              "args": [
+                "owner_earnings_y1",
+                "growth_factor"
+              ],
+              "unit": "USD millions"
+            },
+            {
+              "id": "owner_cash_y2",
+              "op": "multiply",
+              "args": [
+                "owner_earnings_y2",
+                "distribution_rate"
+              ],
+              "unit": "USD millions"
+            },
+            {
+              "id": "owner_earnings_y3",
+              "op": "multiply",
+              "args": [
+                "owner_earnings_y2",
+                "growth_factor"
+              ],
+              "unit": "USD millions"
+            },
+            {
+              "id": "owner_cash_y3",
+              "op": "multiply",
+              "args": [
+                "owner_earnings_y3",
+                "distribution_rate"
+              ],
+              "unit": "USD millions"
+            },
+            {
+              "id": "owner_earnings_y4",
+              "op": "multiply",
+              "args": [
+                "owner_earnings_y3",
+                "growth_factor"
+              ],
+              "unit": "USD millions"
+            },
+            {
+              "id": "owner_cash_y4",
+              "op": "multiply",
+              "args": [
+                "owner_earnings_y4",
+                "distribution_rate"
+              ],
+              "unit": "USD millions"
+            },
+            {
+              "id": "owner_earnings_y5",
+              "op": "multiply",
+              "args": [
+                "owner_earnings_y4",
+                "growth_factor"
+              ],
+              "unit": "USD millions"
+            },
+            {
+              "id": "owner_cash_y5",
+              "op": "multiply",
+              "args": [
+                "owner_earnings_y5",
+                "distribution_rate"
+              ],
+              "unit": "USD millions"
+            },
+            {
+              "id": "owner_earnings_y6",
+              "op": "multiply",
+              "args": [
+                "owner_earnings_y5",
+                "growth_factor"
+              ],
+              "unit": "USD millions"
+            },
+            {
+              "id": "owner_cash_y6",
+              "op": "multiply",
+              "args": [
+                "owner_earnings_y6",
+                "distribution_rate"
+              ],
+              "unit": "USD millions"
+            },
+            {
+              "id": "owner_earnings_y7",
+              "op": "multiply",
+              "args": [
+                "owner_earnings_y6",
+                "growth_factor"
+              ],
+              "unit": "USD millions"
+            },
+            {
+              "id": "owner_cash_y7",
+              "op": "multiply",
+              "args": [
+                "owner_earnings_y7",
+                "distribution_rate"
+              ],
+              "unit": "USD millions"
+            },
+            {
+              "id": "cash_pv",
+              "op": "present_value",
+              "args": [
+                "owner_cash_y1",
+                1,
+                "owner_cash_y2",
+                2,
+                "owner_cash_y3",
+                3,
+                "owner_cash_y4",
+                4,
+                "owner_cash_y5",
+                5,
+                "owner_cash_y6",
+                6,
+                "owner_cash_y7",
+                7,
+                "discount_rate"
+              ],
+              "unit": "USD millions"
+            },
+            {
+              "id": "terminal_value",
+              "op": "multiply",
+              "args": [
+                "owner_earnings_y7",
+                "terminal_multiple"
+              ],
+              "unit": "USD millions"
+            },
+            {
+              "id": "terminal_pv",
+              "op": "discount",
+              "args": [
+                "terminal_value",
+                "discount_rate",
+                7
+              ],
+              "unit": "USD millions"
+            },
+            {
+              "id": "enterprise_value",
+              "op": "add",
+              "args": [
+                "cash_pv",
+                "terminal_pv"
+              ],
+              "unit": "USD millions"
+            },
+            {
+              "id": "plus_cash",
+              "op": "add",
+              "args": [
+                "enterprise_value",
+                "cash"
+              ],
+              "unit": "USD millions"
+            },
+            {
+              "id": "equity_value",
+              "op": "subtract",
+              "args": [
+                "plus_cash",
+                "debt"
+              ],
+              "unit": "USD millions"
+            },
+            {
+              "id": "value_per_share",
+              "op": "divide",
+              "args": [
+                "equity_value",
+                "shares_m"
+              ],
+              "unit": "USD per share"
+            }
+          ],
+          "outputs": {
+            "low": "value_per_share",
+            "base": "value_per_share",
+            "high": "value_per_share"
+          }
+        },
+        "evidence_tier": "primary_derived",
+        "evidence": "Source-locked filing facts plus explicitly bounded versioned judgments.",
+        "falsifier": "Owner earnings, incremental returns, or reinvestment runway fall below the low-case bridge."
       }
     ],
-    "embedded_components": [],
-    "total_equity_value_per_share": {
-      "low": 97.45,
-      "base": 237.02,
-      "high": 373.97
-    },
-    "material_component_count": 4,
-    "additive_component_count": 4,
-    "embedded_component_count": 0,
-    "market_price_per_share": 247.23,
-    "upside_downside_pct": {
-      "low": -60.6,
-      "base": -4.1,
-      "high": 51.3
-    }
+    "embedded_components": []
   },
   "economic_value_analysis": {
-    "schema_version": "1.0",
-    "status": "complete",
-    "trigger": {
-      "required": true,
-      "reasons": [
-        "explicit_component_schedule"
-      ],
-      "policy": "A complete economic-value analysis is required when any trigger fires; otherwise it is recommended."
-    },
-    "method": "component_economic_value",
-    "economic_claim": {
-      "description": "One diluted share of AMZN, including every currently identified operating claim, financial claim, liability, reserve, and material option.",
-      "unit_label": "diluted share",
-      "unit_count": 10949000000,
-      "unit_source": "Derived from inputs.shares_millions in the pre-existing valuation.json; [HUMAN REVIEW] confirm against the latest primary filing.",
-      "enterprise_to_equity_reconciliation": "Operating and asset claims are valued once; cash, debt, financing, reserves, and other senior claims are separate components or explicitly reserved. No component is intended to overlap another."
-    },
-    "gaap_role": "cross_check",
-    "accounting_reference": "Existing research and filing-derived valuation inputs. The primary-source reconciliation remains an open evidence gate.",
-    "comparable_hierarchy": [
-      "issuer_arm_length_transaction",
-      "same_asset_transaction",
-      "public_peer",
-      "replacement_cost",
-      "approved_external_analysis"
-    ],
-    "gross_comparable_nav_per_share": null,
-    "risked_present_value_per_share": {
-      "low": 97.45,
-      "base": 237.02,
-      "high": 373.97
-    },
-    "component_groups": [
-      {
-        "id": "primary_operating_segment",
-        "label": "North America retail and logistics owner cash",
-        "component_ids": [
-          "primary_operating_segment"
-        ],
-        "economic_claim": "North America retail and logistics owner cash",
-        "valuation_basis": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
-        "adjustments": "The low/base/high range incorporates ownership, tax, capital, cycle, timing, and realization uncertainty pending the primary bridge.",
-        "overlap_control": "Unique overlap key primary_operating_segment; no other component capitalizes the same claim.",
-        "risked_present_value_per_share": {
-          "low": 94.81,
-          "base": 136.95,
-          "high": 184.35
-        }
-      },
-      {
-        "id": "secondary_operating_segments",
-        "label": "AWS, advertising, and international owner cash",
-        "component_ids": [
-          "secondary_operating_segments"
-        ],
-        "economic_claim": "AWS, advertising, and international owner cash",
-        "valuation_basis": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
-        "adjustments": "The low/base/high range incorporates ownership, tax, capital, cycle, timing, and realization uncertainty pending the primary bridge.",
-        "overlap_control": "Unique overlap key secondary_operating_segments; no other component capitalizes the same claim.",
-        "risked_present_value_per_share": {
-          "low": 42.14,
-          "base": 68.47,
-          "high": 100.08
-        }
-      },
-      {
-        "id": "strategic_option",
-        "label": "Other Bets and strategic-option value",
-        "component_ids": [
-          "strategic_option"
-        ],
-        "economic_claim": "Other Bets and strategic-option value",
-        "valuation_basis": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
-        "adjustments": "The low/base/high range incorporates ownership, tax, capital, cycle, timing, and realization uncertainty pending the primary bridge.",
-        "overlap_control": "Unique overlap key strategic_option; no other component capitalizes the same claim.",
-        "risk_and_timing": {
-          "probability_basis": "Starter probability is explicit analyst judgment pending a primary-source milestone and ownership reconciliation.",
-          "timing_basis": "The range includes delay and failure outcomes; dated cash realization remains [HUMAN REVIEW].",
-          "remaining_capital_basis": "Remaining owner-funded capital, financing, and dilution are reserved until the primary sources-and-uses bridge is complete."
-        },
-        "risked_present_value_per_share": {
-          "low": 0.0,
-          "base": 10.53,
-          "high": 47.4
-        }
-      },
-      {
-        "id": "net_claims_and_reserve",
-        "label": "Net financial claims and AI-capital reserve",
-        "component_ids": [
-          "net_claims_and_reserve"
-        ],
-        "economic_claim": "Net financial claims and AI-capital reserve",
-        "valuation_basis": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
-        "adjustments": "The low/base/high range incorporates ownership, tax, capital, cycle, timing, and realization uncertainty pending the primary bridge.",
-        "overlap_control": "Unique overlap key net_claims_and_reserve; no other component capitalizes the same claim.",
-        "risked_present_value_per_share": {
-          "low": -39.5,
-          "base": 21.07,
-          "high": 42.14
-        }
-      }
-    ],
-    "valuation_proof": [
-      {
-        "component_id": "primary_operating_segment",
-        "economic_claim": "North America retail and logistics owner cash",
-        "quantity": {
-          "value": 1,
-          "unit": "per-share economic claim"
-        },
-        "method": "owner_cash_reinvestment_dcf",
-        "evidence_tier": "mixed_primary_and_estimate",
-        "evidence": "Existing AMZN valuation inputs: Q1-26 TTM OCF $148.5B less normalized capex ~$90B / ~10.95B diluted shares (not TTM FCF $1.2B); AI capex TTM $147.3B depresses reported FCF; Lawrence base uses mid-cycle owner cash flow after capex normalizes [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
-        "comparable_role": "not_applicable",
-        "comparable_ids": [],
-        "adjustment": "The low/base/high range incorporates ownership, tax, capital, cycle, timing, and realization uncertainty pending the primary bridge.",
-        "range_per_share": {
-          "low": 94.81,
-          "base": 136.95,
-          "high": 184.35
-        },
-        "treatment": "additive",
-        "overlap_key": "primary_operating_segment",
-        "overlap_control": "Unique overlap key primary_operating_segment; no other component capitalizes the same claim.",
-        "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case.",
-        "risk_and_timing": null
-      },
-      {
-        "component_id": "secondary_operating_segments",
-        "economic_claim": "AWS, advertising, and international owner cash",
-        "quantity": {
-          "value": 1,
-          "unit": "per-share economic claim"
-        },
-        "method": "segment_owner_cash_dcf",
-        "evidence_tier": "mixed_primary_and_estimate",
-        "evidence": "Existing AMZN valuation inputs: Q1-26 TTM OCF $148.5B less normalized capex ~$90B / ~10.95B diluted shares (not TTM FCF $1.2B); AI capex TTM $147.3B depresses reported FCF; Lawrence base uses mid-cycle owner cash flow after capex normalizes [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
-        "comparable_role": "not_applicable",
-        "comparable_ids": [],
-        "adjustment": "The low/base/high range incorporates ownership, tax, capital, cycle, timing, and realization uncertainty pending the primary bridge.",
-        "range_per_share": {
-          "low": 42.14,
-          "base": 68.47,
-          "high": 100.08
-        },
-        "treatment": "additive",
-        "overlap_key": "secondary_operating_segments",
-        "overlap_control": "Unique overlap key secondary_operating_segments; no other component capitalizes the same claim.",
-        "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case.",
-        "risk_and_timing": null
-      },
-      {
-        "component_id": "strategic_option",
-        "economic_claim": "Other Bets and strategic-option value",
-        "quantity": {
-          "value": 1,
-          "unit": "per-share economic claim"
-        },
-        "method": "milestone_project_option",
-        "evidence_tier": "mixed_primary_and_estimate",
-        "evidence": "Existing AMZN valuation inputs: Q1-26 TTM OCF $148.5B less normalized capex ~$90B / ~10.95B diluted shares (not TTM FCF $1.2B); AI capex TTM $147.3B depresses reported FCF; Lawrence base uses mid-cycle owner cash flow after capex normalizes [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
-        "comparable_role": "not_applicable",
-        "comparable_ids": [],
-        "adjustment": "The low/base/high range incorporates ownership, tax, capital, cycle, timing, and realization uncertainty pending the primary bridge.",
-        "range_per_share": {
-          "low": 0.0,
-          "base": 10.53,
-          "high": 47.4
-        },
-        "treatment": "additive",
-        "overlap_key": "strategic_option",
-        "overlap_control": "Unique overlap key strategic_option; no other component capitalizes the same claim.",
-        "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case.",
-        "risk_and_timing": {
-          "success_probability": null,
-          "remaining_capital_m": null,
-          "timing_basis": "The range includes delay and failure outcomes; dated cash realization remains [HUMAN REVIEW].",
-          "probability_basis": "Starter probability is explicit analyst judgment pending a primary-source milestone and ownership reconciliation.",
-          "remaining_capital_basis": "Remaining owner-funded capital, financing, and dilution are reserved until the primary sources-and-uses bridge is complete."
-        }
-      },
-      {
-        "component_id": "net_claims_and_reserve",
-        "economic_claim": "Net financial claims and AI-capital reserve",
-        "quantity": {
-          "value": 1,
-          "unit": "per-share economic claim"
-        },
-        "method": "net_claim_and_capital_reserve",
-        "evidence_tier": "mixed_primary_and_estimate",
-        "evidence": "Existing AMZN valuation inputs: Q1-26 TTM OCF $148.5B less normalized capex ~$90B / ~10.95B diluted shares (not TTM FCF $1.2B); AI capex TTM $147.3B depresses reported FCF; Lawrence base uses mid-cycle owner cash flow after capex normalizes [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
-        "comparable_role": "not_applicable",
-        "comparable_ids": [],
-        "adjustment": "The low/base/high range incorporates ownership, tax, capital, cycle, timing, and realization uncertainty pending the primary bridge.",
-        "range_per_share": {
-          "low": -39.5,
-          "base": 21.07,
-          "high": 42.14
-        },
-        "treatment": "additive",
-        "overlap_key": "net_claims_and_reserve",
-        "overlap_control": "Unique overlap key net_claims_and_reserve; no other component capitalizes the same claim.",
-        "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case.",
-        "risk_and_timing": null
-      }
-    ],
-    "wisdom_applied": [],
-    "limitations": [
-      "Phase 3 schedule scaffold, not a committee-approved valuation.",
-      "Universal followups remain open until primary evidence supports the ownership map, owner-cash or NAV bridge, and downside/capital claims."
-    ],
-    "complete_component_coverage": true,
-    "validation_errors": [],
-    "registry_version": "1.0"
-  },
-  "component_review_queue": {
-    "status": "ready_for_committee_review",
-    "decision_rule": "Each assigned rater records accept, challenge, or reject with a proposed range and evidence. The aggregator may not silently average disputed ranges.",
-    "items": [
-      {
-        "component_id": "primary_operating_segment",
-        "label": "North America retail and logistics owner cash",
-        "treatment": "additive",
-        "range_per_share": {
-          "low": 94.81,
-          "base": 136.95,
-          "high": 184.35
-        },
-        "range_width_pct_of_base": 65.4,
-        "evidence_tier": "mixed_primary_and_estimate",
-        "recommended_raters": [
-          "hohn",
-          "marathon_capital_cycle"
-        ],
-        "mandatory_checks": [
-          "Is the valuation method appropriate for this economic claim?",
-          "Is the security's ownership claim and economic-unit denominator reconciled correctly?",
-          "Does the evidence support the low/base/high range and its timing?",
-          "Are comparable assets truly like-for-like after production, contract, location, capital, ownership, and realization adjustments?",
-          "For an option, are success probability, time to realization, and remaining owner-funded capital explicit?",
-          "Is the component additive, or already embedded in another component?",
-          "What observation would move the base estimate materially?"
-        ],
-        "status": "open"
-      },
-      {
-        "component_id": "secondary_operating_segments",
-        "label": "AWS, advertising, and international owner cash",
-        "treatment": "additive",
-        "range_per_share": {
-          "low": 42.14,
-          "base": 68.47,
-          "high": 100.08
-        },
-        "range_width_pct_of_base": 84.6,
-        "evidence_tier": "mixed_primary_and_estimate",
-        "recommended_raters": [
-          "hohn",
-          "marathon_capital_cycle"
-        ],
-        "mandatory_checks": [
-          "Is the valuation method appropriate for this economic claim?",
-          "Is the security's ownership claim and economic-unit denominator reconciled correctly?",
-          "Does the evidence support the low/base/high range and its timing?",
-          "Are comparable assets truly like-for-like after production, contract, location, capital, ownership, and realization adjustments?",
-          "For an option, are success probability, time to realization, and remaining owner-funded capital explicit?",
-          "Is the component additive, or already embedded in another component?",
-          "What observation would move the base estimate materially?"
-        ],
-        "status": "open"
-      },
-      {
-        "component_id": "strategic_option",
-        "label": "Other Bets and strategic-option value",
-        "treatment": "additive",
-        "range_per_share": {
-          "low": 0.0,
-          "base": 10.53,
-          "high": 47.4
-        },
-        "range_width_pct_of_base": 450.1,
-        "evidence_tier": "mixed_primary_and_estimate",
-        "recommended_raters": [
-          "klarman_asset_value",
-          "hk"
-        ],
-        "mandatory_checks": [
-          "Is the valuation method appropriate for this economic claim?",
-          "Is the security's ownership claim and economic-unit denominator reconciled correctly?",
-          "Does the evidence support the low/base/high range and its timing?",
-          "Are comparable assets truly like-for-like after production, contract, location, capital, ownership, and realization adjustments?",
-          "For an option, are success probability, time to realization, and remaining owner-funded capital explicit?",
-          "Is the component additive, or already embedded in another component?",
-          "What observation would move the base estimate materially?"
-        ],
-        "status": "open"
-      },
-      {
-        "component_id": "net_claims_and_reserve",
-        "label": "Net financial claims and AI-capital reserve",
-        "treatment": "additive",
-        "range_per_share": {
-          "low": -39.5,
-          "base": 21.07,
-          "high": 42.14
-        },
-        "range_width_pct_of_base": 387.5,
-        "evidence_tier": "mixed_primary_and_estimate",
-        "recommended_raters": [
-          "marks_credit_cycle",
-          "pabrai"
-        ],
-        "mandatory_checks": [
-          "Is the valuation method appropriate for this economic claim?",
-          "Is the security's ownership claim and economic-unit denominator reconciled correctly?",
-          "Does the evidence support the low/base/high range and its timing?",
-          "Are comparable assets truly like-for-like after production, contract, location, capital, ownership, and realization adjustments?",
-          "For an option, are success probability, time to realization, and remaining owner-funded capital explicit?",
-          "Is the component additive, or already embedded in another component?",
-          "What observation would move the base estimate materially?"
-        ],
-        "status": "open"
-      }
-    ]
-  },
-  "valuation_method_route": {
-    "schema_version": "1.0",
-    "status": "routed",
-    "profile_id": "quality_reinvestment",
-    "label": "High-return compounder",
-    "score": 10.0,
-    "reasons": [
-      "archetype=compounder",
-      "component categories=operating_business",
-      "existing methods=dcf, owner_cash, reinvestment"
-    ],
-    "primary_methods": [
-      "owner_earnings_reinvestment_dcf"
-    ],
-    "corroborating_methods": [
-      "reverse_dcf",
-      "incremental_roic_runway"
-    ],
-    "primary_personas": [
-      "buffett_weschler",
-      "hohn"
-    ],
-    "cross_check_personas": [
-      "munger",
-      "marathon_capital_cycle"
-    ],
-    "silent_personas": [
-      "greenblatt",
-      "hk",
-      "klarman_asset_value",
-      "marks_credit_cycle",
-      "pabrai",
-      "stahl"
-    ],
-    "required_evidence": [
-      "normalized owner earnings",
-      "incremental return on capital",
-      "reinvestment runway",
-      "diluted share count",
-      "competitive-advantage mechanism"
-    ],
-    "failure_modes": [
-      "growth projected without its capital cost",
-      "stock compensation or acquisitions omitted",
-      "terminal value unsupported by a durable mechanism"
-    ],
-    "secondary_profiles": [
-      {
-        "profile_id": "scarce_asset_optionality",
-        "score": 2.0,
-        "reasons": [
-          "component categories=real_option",
-          "existing methods=option"
-        ]
-      },
-      {
-        "profile_id": "predictable_cash_flow",
-        "score": 2.0,
-        "reasons": [
-          "component categories=operating_business",
-          "existing methods=owner_cash"
-        ]
-      }
-    ],
-    "scorecard": {
-      "scarce_asset_optionality": {
-        "score": 2.0,
-        "reasons": [
-          "component categories=real_option",
-          "existing methods=option"
-        ]
-      },
-      "quality_reinvestment": {
-        "score": 10.0,
-        "reasons": [
-          "archetype=compounder",
-          "component categories=operating_business",
-          "existing methods=dcf, owner_cash, reinvestment"
-        ]
-      },
-      "capital_cycle": {
-        "score": 1.0,
-        "reasons": [
-          "component categories=operating_business"
-        ]
-      },
-      "credit_and_normalized_returns": {
-        "score": 1.0,
-        "reasons": [
-          "component categories=liability_or_reserve"
-        ]
-      },
-      "catalyst_asset_value": {
-        "score": 0.0,
-        "reasons": []
-      },
-      "predictable_cash_flow": {
-        "score": 2.0,
-        "reasons": [
-          "component categories=operating_business",
-          "existing methods=owner_cash"
-        ]
-      },
-      "binary_milestone": {
-        "score": 2.0,
-        "reasons": [
-          "component categories=real_option",
-          "existing methods=milestone"
-        ]
-      }
-    },
-    "decision_rule": "Use one primary method and no more than two corroborating methods; irrelevant methods and personas remain silent."
-  },
-  "universal_valuation_contract": {
-    "schema_version": "2.0",
-    "status": "evidence_blocked",
-    "ticker": "AMZN",
-    "as_of": "2026-07-19",
-    "economic_ownership_map": [
-      {
-        "component_id": "primary_operating_segment",
-        "label": "North America retail and logistics owner cash",
-        "category": "operating_business",
-        "treatment": "additive",
-        "included_in_component_id": null,
-        "ownership_claim": "North America retail and logistics owner cash",
-        "ownership_percentage": 1.0,
-        "quantity": {
-          "value": 1,
-          "unit": "per-share economic claim"
-        },
-        "method": "owner_cash_reinvestment_dcf",
-        "method_version": null,
-        "method_provenance": null,
-        "comparable_ids": [],
-        "range_per_share": {
-          "low": null,
-          "base": null,
-          "high": null
-        },
-        "legacy_range_per_share": {
-          "low": 94.81,
-          "base": 136.95,
-          "high": 184.35
-        },
-        "valuation_status": "legacy_sensitivity",
-        "calculation_proof": null,
-        "evidence_tier": "mixed_primary_and_estimate",
-        "evidence_level": "analyst_estimated",
-        "evidence": "Existing AMZN valuation inputs: Q1-26 TTM OCF $148.5B less normalized capex ~$90B / ~10.95B diluted shares (not TTM FCF $1.2B); AI capex TTM $147.3B depresses reported FCF; Lawrence base uses mid-cycle owner cash flow after capex normalizes [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
-        "scenario_assumptions": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
-        "probability_and_timing": null,
-        "tax_and_realization_adjustments": "The low/base/high range incorporates ownership, tax, capital, cycle, timing, and realization uncertainty pending the primary bridge.",
-        "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case.",
-        "overlap_key": "primary_operating_segment",
-        "assumption_type": "judgment"
-      },
-      {
-        "component_id": "secondary_operating_segments",
-        "label": "AWS, advertising, and international owner cash",
-        "category": "operating_business",
-        "treatment": "additive",
-        "included_in_component_id": null,
-        "ownership_claim": "AWS, advertising, and international owner cash",
-        "ownership_percentage": 1.0,
-        "quantity": {
-          "value": 1,
-          "unit": "per-share economic claim"
-        },
-        "method": "segment_owner_cash_dcf",
-        "method_version": null,
-        "method_provenance": null,
-        "comparable_ids": [],
-        "range_per_share": {
-          "low": null,
-          "base": null,
-          "high": null
-        },
-        "legacy_range_per_share": {
-          "low": 42.14,
-          "base": 68.47,
-          "high": 100.08
-        },
-        "valuation_status": "legacy_sensitivity",
-        "calculation_proof": null,
-        "evidence_tier": "mixed_primary_and_estimate",
-        "evidence_level": "analyst_estimated",
-        "evidence": "Existing AMZN valuation inputs: Q1-26 TTM OCF $148.5B less normalized capex ~$90B / ~10.95B diluted shares (not TTM FCF $1.2B); AI capex TTM $147.3B depresses reported FCF; Lawrence base uses mid-cycle owner cash flow after capex normalizes [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
-        "scenario_assumptions": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
-        "probability_and_timing": null,
-        "tax_and_realization_adjustments": "The low/base/high range incorporates ownership, tax, capital, cycle, timing, and realization uncertainty pending the primary bridge.",
-        "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case.",
-        "overlap_key": "secondary_operating_segments",
-        "assumption_type": "judgment"
-      },
-      {
-        "component_id": "strategic_option",
-        "label": "Other Bets and strategic-option value",
-        "category": "real_option",
-        "treatment": "additive",
-        "included_in_component_id": null,
-        "ownership_claim": "Other Bets and strategic-option value",
-        "ownership_percentage": 1.0,
-        "quantity": {
-          "value": 1,
-          "unit": "per-share economic claim"
-        },
-        "method": "milestone_project_option",
-        "method_version": null,
-        "method_provenance": null,
-        "comparable_ids": [],
-        "range_per_share": {
-          "low": null,
-          "base": null,
-          "high": null
-        },
-        "legacy_range_per_share": {
-          "low": 0.0,
-          "base": 10.53,
-          "high": 47.4
-        },
-        "valuation_status": "legacy_sensitivity",
-        "calculation_proof": null,
-        "evidence_tier": "mixed_primary_and_estimate",
-        "evidence_level": "analyst_estimated",
-        "evidence": "Existing AMZN valuation inputs: Q1-26 TTM OCF $148.5B less normalized capex ~$90B / ~10.95B diluted shares (not TTM FCF $1.2B); AI capex TTM $147.3B depresses reported FCF; Lawrence base uses mid-cycle owner cash flow after capex normalizes [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
-        "scenario_assumptions": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
-        "probability_and_timing": {
-          "success_probability": null,
-          "remaining_capital_m": null,
-          "timing_basis": "The range includes delay and failure outcomes; dated cash realization remains [HUMAN REVIEW].",
-          "probability_basis": "Starter probability is explicit analyst judgment pending a primary-source milestone and ownership reconciliation.",
-          "remaining_capital_basis": "Remaining owner-funded capital, financing, and dilution are reserved until the primary sources-and-uses bridge is complete."
-        },
-        "tax_and_realization_adjustments": "The low/base/high range incorporates ownership, tax, capital, cycle, timing, and realization uncertainty pending the primary bridge.",
-        "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case.",
-        "overlap_key": "strategic_option",
-        "assumption_type": "judgment"
-      },
-      {
-        "component_id": "net_claims_and_reserve",
-        "label": "Net financial claims and AI-capital reserve",
-        "category": "liability_or_reserve",
-        "treatment": "additive",
-        "included_in_component_id": null,
-        "ownership_claim": "Net financial claims and AI-capital reserve",
-        "ownership_percentage": 1.0,
-        "quantity": {
-          "value": 1,
-          "unit": "per-share economic claim"
-        },
-        "method": "net_claim_and_capital_reserve",
-        "method_version": null,
-        "method_provenance": null,
-        "comparable_ids": [],
-        "range_per_share": {
-          "low": null,
-          "base": null,
-          "high": null
-        },
-        "legacy_range_per_share": {
-          "low": -39.5,
-          "base": 21.07,
-          "high": 42.14
-        },
-        "valuation_status": "legacy_sensitivity",
-        "calculation_proof": null,
-        "evidence_tier": "mixed_primary_and_estimate",
-        "evidence_level": "analyst_estimated",
-        "evidence": "Existing AMZN valuation inputs: Q1-26 TTM OCF $148.5B less normalized capex ~$90B / ~10.95B diluted shares (not TTM FCF $1.2B); AI capex TTM $147.3B depresses reported FCF; Lawrence base uses mid-cycle owner cash flow after capex normalizes [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
-        "scenario_assumptions": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
-        "probability_and_timing": null,
-        "tax_and_realization_adjustments": "The low/base/high range incorporates ownership, tax, capital, cycle, timing, and realization uncertainty pending the primary bridge.",
-        "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case.",
-        "overlap_key": "net_claims_and_reserve",
-        "assumption_type": "judgment"
-      }
-    ],
-    "component_coverage": {
-      "all_material_components_identified": true,
-      "material_component_count": 4,
-      "additive_component_count": 4,
-      "embedded_component_count": 0,
-      "unvalued_component_count": 4,
-      "double_counting_flags": []
-    },
-    "input_classification": {
-      "facts": [],
-      "estimates": [],
-      "judgments": [
-        {
-          "component_id": "primary_operating_segment",
-          "label": "North America retail and logistics owner cash",
-          "kind": "judgment",
-          "evidence_tier": "mixed_primary_and_estimate",
-          "evidence": "Existing AMZN valuation inputs: Q1-26 TTM OCF $148.5B less normalized capex ~$90B / ~10.95B diluted shares (not TTM FCF $1.2B); AI capex TTM $147.3B depresses reported FCF; Lawrence base uses mid-cycle owner cash flow after capex normalizes [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
-          "method": "owner_cash_reinvestment_dcf",
-          "valuation_status": "legacy_sensitivity"
-        },
-        {
-          "component_id": "secondary_operating_segments",
-          "label": "AWS, advertising, and international owner cash",
-          "kind": "judgment",
-          "evidence_tier": "mixed_primary_and_estimate",
-          "evidence": "Existing AMZN valuation inputs: Q1-26 TTM OCF $148.5B less normalized capex ~$90B / ~10.95B diluted shares (not TTM FCF $1.2B); AI capex TTM $147.3B depresses reported FCF; Lawrence base uses mid-cycle owner cash flow after capex normalizes [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
-          "method": "segment_owner_cash_dcf",
-          "valuation_status": "legacy_sensitivity"
-        },
-        {
-          "component_id": "strategic_option",
-          "label": "Other Bets and strategic-option value",
-          "kind": "judgment",
-          "evidence_tier": "mixed_primary_and_estimate",
-          "evidence": "Existing AMZN valuation inputs: Q1-26 TTM OCF $148.5B less normalized capex ~$90B / ~10.95B diluted shares (not TTM FCF $1.2B); AI capex TTM $147.3B depresses reported FCF; Lawrence base uses mid-cycle owner cash flow after capex normalizes [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
-          "method": "milestone_project_option",
-          "valuation_status": "legacy_sensitivity"
-        },
-        {
-          "component_id": "net_claims_and_reserve",
-          "label": "Net financial claims and AI-capital reserve",
-          "kind": "judgment",
-          "evidence_tier": "mixed_primary_and_estimate",
-          "evidence": "Existing AMZN valuation inputs: Q1-26 TTM OCF $148.5B less normalized capex ~$90B / ~10.95B diluted shares (not TTM FCF $1.2B); AI capex TTM $147.3B depresses reported FCF; Lawrence base uses mid-cycle owner cash flow after capex normalizes [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
-          "method": "net_claim_and_capital_reserve",
-          "valuation_status": "legacy_sensitivity"
-        }
-      ]
-    },
-    "method_route": {
-      "schema_version": "1.0",
-      "status": "routed",
-      "profile_id": "quality_reinvestment",
-      "label": "High-return compounder",
-      "score": 10.0,
-      "reasons": [
-        "archetype=compounder",
-        "component categories=operating_business",
-        "existing methods=dcf, owner_cash, reinvestment"
-      ],
-      "primary_methods": [
-        "owner_earnings_reinvestment_dcf"
-      ],
-      "corroborating_methods": [
-        "reverse_dcf",
-        "incremental_roic_runway"
-      ],
-      "primary_personas": [
-        "buffett_weschler",
-        "hohn"
-      ],
-      "cross_check_personas": [
-        "munger",
-        "marathon_capital_cycle"
-      ],
-      "silent_personas": [
-        "greenblatt",
-        "hk",
-        "klarman_asset_value",
-        "marks_credit_cycle",
-        "pabrai",
-        "stahl"
-      ],
-      "required_evidence": [
-        "normalized owner earnings",
-        "incremental return on capital",
-        "reinvestment runway",
-        "diluted share count",
-        "competitive-advantage mechanism"
-      ],
-      "failure_modes": [
-        "growth projected without its capital cost",
-        "stock compensation or acquisitions omitted",
-        "terminal value unsupported by a durable mechanism"
-      ],
-      "secondary_profiles": [
-        {
-          "profile_id": "scarce_asset_optionality",
-          "score": 2.0,
-          "reasons": [
-            "component categories=real_option",
-            "existing methods=option"
-          ]
-        },
-        {
-          "profile_id": "predictable_cash_flow",
-          "score": 2.0,
-          "reasons": [
-            "component categories=operating_business",
-            "existing methods=owner_cash"
-          ]
-        }
-      ],
-      "scorecard": {
-        "scarce_asset_optionality": {
-          "score": 2.0,
-          "reasons": [
-            "component categories=real_option",
-            "existing methods=option"
-          ]
-        },
-        "quality_reinvestment": {
-          "score": 10.0,
-          "reasons": [
-            "archetype=compounder",
-            "component categories=operating_business",
-            "existing methods=dcf, owner_cash, reinvestment"
-          ]
-        },
-        "capital_cycle": {
-          "score": 1.0,
-          "reasons": [
-            "component categories=operating_business"
-          ]
-        },
-        "credit_and_normalized_returns": {
-          "score": 1.0,
-          "reasons": [
-            "component categories=liability_or_reserve"
-          ]
-        },
-        "catalyst_asset_value": {
-          "score": 0.0,
-          "reasons": []
-        },
-        "predictable_cash_flow": {
-          "score": 2.0,
-          "reasons": [
-            "component categories=operating_business",
-            "existing methods=owner_cash"
-          ]
-        },
-        "binary_milestone": {
-          "score": 2.0,
-          "reasons": [
-            "component categories=real_option",
-            "existing methods=milestone"
-          ]
-        }
-      },
-      "decision_rule": "Use one primary method and no more than two corroborating methods; irrelevant methods and personas remain silent."
-    },
-    "market": {
-      "price_per_share": 247.23,
-      "fully_diluted_shares": 10949000000,
-      "market_cap_m": 2706921.27,
-      "enterprise_value_m": null
-    },
-    "valuation": {
-      "value_per_share": {
-        "low": null,
-        "base": null,
-        "high": null
-      },
-      "priced_components_per_share": {
-        "low": 0,
-        "base": 0,
-        "high": 0
-      },
-      "legacy_value_per_share": {
-        "low": 97.45,
-        "base": 237.02,
-        "high": 373.97
-      },
-      "probability_weighted_value_per_share": null,
-      "expected_distributions_per_share": 0.0,
-      "annualized_return_at_price_pct": {
-        "low": null,
-        "base": null,
-        "high": null
-      },
-      "downside_to_low_pct": null,
-      "horizon_years": 7,
-      "interpretation": "value_per_share is withheld while any material additive component is unpriced; priced_components_per_share is not a complete security value."
-    },
-    "scenario_contract": {
-      "rule": "Cases must change cited causal operating, capital, probability, timing, or financing drivers\u2014not only a terminal multiple.",
-      "top_value_drivers": [
-        {
-          "component_id": "primary_operating_segment",
-          "label": "North America retail and logistics owner cash",
-          "valuation_status": "legacy_sensitivity",
-          "base_per_share": null,
-          "legacy_base_per_share": 136.95,
-          "range_width_per_share": null,
-          "scenario_assumptions": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target."
-        },
-        {
-          "component_id": "secondary_operating_segments",
-          "label": "AWS, advertising, and international owner cash",
-          "valuation_status": "legacy_sensitivity",
-          "base_per_share": null,
-          "legacy_base_per_share": 68.47,
-          "range_width_per_share": null,
-          "scenario_assumptions": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target."
-        },
-        {
-          "component_id": "strategic_option",
-          "label": "Other Bets and strategic-option value",
-          "valuation_status": "legacy_sensitivity",
-          "base_per_share": null,
-          "legacy_base_per_share": 10.53,
-          "range_width_per_share": null,
-          "scenario_assumptions": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target."
-        },
-        {
-          "component_id": "net_claims_and_reserve",
-          "label": "Net financial claims and AI-capital reserve",
-          "valuation_status": "legacy_sensitivity",
-          "base_per_share": null,
-          "legacy_base_per_share": 21.07,
-          "range_width_per_share": null,
-          "scenario_assumptions": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target."
-        }
-      ],
-      "reverse_expectations": null
-    },
-    "calculation_proof_summary": {
-      "component_count": 4,
-      "priced_component_count": 0,
-      "proof_complete_pct": 0.0,
-      "status_counts": {
-        "bounded_estimate": 0,
-        "calculated": 0,
-        "legacy_sensitivity": 4,
-        "unpriced": 0
-      },
-      "all_material_components_priced": false,
-      "calculation_errors": [],
-      "aggregate_proof_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
-    },
-    "source_lineage": [],
-    "model_checks": {
-      "calculation_graphs_valid": true,
-      "component_sum_reconciles": false,
-      "no_double_counting": true,
-      "all_material_components_priced": false,
-      "low_base_high_ordered": true
-    },
-    "evidence": {
-      "unresolved_count": 4,
-      "blockers": [
-        "net_claims_and_reserve: material component is legacy_sensitivity; a valid calculation proof is required",
-        "primary_operating_segment: material component is legacy_sensitivity; a valid calculation proof is required",
-        "secondary_operating_segments: material component is legacy_sensitivity; a valid calculation proof is required",
-        "strategic_option: material component is legacy_sensitivity; a valid calculation proof is required"
-      ],
-      "validation_errors": []
-    },
-    "monitoring": {
-      "falsifiers": [
-        "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case.",
-        "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case.",
-        "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case.",
-        "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case."
-      ],
-      "required_refresh_triggers": [
-        "new filing or material operating update",
-        "capital-structure change",
-        "material price move",
-        "component milestone or falsifier"
-      ]
-    },
-    "change_control": {
-      "model_hash": "eb74f7f4d95abdd9ed67a0bef936e4824b03f31acdf721d359f45f74f243b28d",
-      "method_versions": [],
-      "change_log": [],
-      "rule": "A source fact is locked. Every assumption change requires a reason, author, timestamp, and before/after value."
-    },
-    "decision_rule": "No security is decision-grade until every material claim is valued exactly once by a valid calculation proof and every material evidence blocker is resolved."
+    "status": "compiled",
+    "validation_errors": []
   },
   "human_review": {
     "live_price_confirmed": false

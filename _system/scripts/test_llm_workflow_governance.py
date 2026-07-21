@@ -130,6 +130,8 @@ class WorkflowGovernanceTests(unittest.TestCase):
     def test_policy_encodes_expected_call_budgets(self):
         policy = json.loads((ROOT / "_system" / "config" / "llm_usage_policy.json").read_text(encoding="utf-8"))
         self.assertEqual(policy["consumers"]["marvin_research"]["daily_repo_limit"], 4)
+        self.assertIn("contract_backfill", policy["consumers"]["marvin_research"]["allowed_reasons"])
+        self.assertEqual(policy["consumers"]["marvin_contract_backfill"]["daily_repo_limit"], 50)
         self.assertEqual(policy["consumers"]["investment_committee"]["baseline_calls_per_ticker"], 5)
         self.assertEqual(policy["consumers"]["investment_committee"]["maximum_calls_per_ticker"], 9)
         self.assertEqual(policy["consumers"]["ci_autofix"]["minimum_repeat_count"], 2)

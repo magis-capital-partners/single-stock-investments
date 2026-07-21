@@ -78,6 +78,9 @@ def registry_row(ticker: str) -> dict | None:
 def yahoo_symbol_for(ticker: str, market: str, exchange: str) -> str:
     t = ticker.upper()
     m = (market or "US").upper()
+    # Yahoo uses hyphen for share classes (BRK.B → BRK-B, BF.B → BF-B).
+    if re.fullmatch(r"[A-Z]+\.[A-Z]", t):
+        return t.replace(".", "-")
     if m == "JP" and t.endswith(".T"):
         return t.replace(".T", ".T")
     if m == "SE" and t.endswith(".ST"):
@@ -116,13 +119,34 @@ def fetch_price(ticker: str) -> tuple[float | None, str | None, str]:
     return None, None, f"fetch failed (stooq={sym}, yahoo={ysym}, err={err})"
 
 
-def merge_ticker(ticker: str, *, force: bool = False) -> bool:
+def ensure_valuation_stub(ticker: str) -> dict:
+    """Create a minimal valuation.json so market price can land before modeling."""
+    t = ticker.upper()
+    research = ROOT / t / "research"
+    research.mkdir(parents=True, exist_ok=True)
+    stub = {
+        "ticker": t,
+        "as_of": TODAY,
+        "method": "price_stub",
+        "inputs": {},
+        "notes": "Price stub created by fetch_equity_prices.py --create-stub; replace with a real model before decision-grade.",
+    }
+    path = research / "valuation.json"
+    path.write_text(json.dumps(stub, indent=2) + "\n", encoding="utf-8")
+    return stub
+
+
+def merge_ticker(ticker: str, *, force: bool = False, create_stub: bool = False) -> bool:
     t = ticker.upper()
     vpath = ROOT / t / "research" / "valuation.json"
     if not vpath.exists():
-        print(f"SKIP {t}: no valuation.json")
-        return False
-    val = json.loads(vpath.read_text(encoding="utf-8"))
+        if not create_stub:
+            print(f"SKIP {t}: no valuation.json")
+            return False
+        val = ensure_valuation_stub(t)
+        print(f"STUB {t}: created minimal valuation.json")
+    else:
+        val = json.loads(vpath.read_text(encoding="utf-8"))
     inputs = val.setdefault("inputs", {})
     ps = str(inputs.get("price_source") or "")
     if not force and ps and not PLACEHOLDER_RE.search(ps):
@@ -154,26 +178,70 @@ def merge_ticker(ticker: str, *, force: bool = False) -> bool:
     return True
 
 
+def registry_tickers() -> list[str]:
+    holdings = load_registry().get("holdings") or {}
+    return sorted(str(t).upper() for t in holdings)
+
+
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("tickers", nargs="*", help="Ticker(s); omit with --all")
-    ap.add_argument("--all", action="store_true", help="All registry holdings with valuation.json")
+    ap.add_argument("--all", action="store_true", help="All registry holdings (or folders with valuation.json)")
     ap.add_argument("--merge", action="store_true", help="Write into valuation.json (default)")
     ap.add_argument("--force", action="store_true", help="Overwrite even when price_source is not placeholder")
+    ap.add_argument(
+        "--create-stub",
+        action="store_true",
+        help="Create a minimal valuation.json when missing so price can clear the contract blocker",
+    )
+    ap.add_argument(
+        "--missing-price-only",
+        action="store_true",
+        help="Only process tickers whose contract or valuation lacks a positive price",
+    )
     args = ap.parse_args()
     tickers: list[str] = []
     if args.all:
-        for td in sorted(ROOT.iterdir()):
-            if td.is_dir() and (td / "research" / "valuation.json").exists():
-                if not td.name.startswith("_") and not td.name.startswith("."):
-                    tickers.append(td.name.upper())
+        if args.create_stub:
+            tickers = registry_tickers()
+        else:
+            for td in sorted(ROOT.iterdir()):
+                if td.is_dir() and (td / "research" / "valuation.json").exists():
+                    if not td.name.startswith("_") and not td.name.startswith("."):
+                        tickers.append(td.name.upper())
     else:
         tickers = [t.upper() for t in args.tickers]
     if not tickers:
         ap.error("provide tickers or --all")
+    if args.missing_price_only:
+        filtered = []
+        for t in tickers:
+            val = {}
+            vpath = ROOT / t / "research" / "valuation.json"
+            if vpath.exists():
+                try:
+                    val = json.loads(vpath.read_text(encoding="utf-8"))
+                except json.JSONDecodeError:
+                    val = {}
+            price = (val.get("inputs") or {}).get("price")
+            cpath = ROOT / t / "research" / "valuation_contract.json"
+            cprice = None
+            if cpath.exists():
+                try:
+                    cprice = (json.loads(cpath.read_text(encoding="utf-8")).get("market") or {}).get("price_per_share")
+                except json.JSONDecodeError:
+                    cprice = None
+            try:
+                has_price = (price is not None and float(price) > 0) or (cprice is not None and float(cprice) > 0)
+            except (TypeError, ValueError):
+                has_price = False
+            if not has_price:
+                filtered.append(t)
+        tickers = filtered
+        print(f"missing-price-only: {len(tickers)} tickers")
     ok = True
     for t in tickers:
-        if not merge_ticker(t, force=args.force):
+        if not merge_ticker(t, force=args.force, create_stub=args.create_stub):
             ok = False
     return 0 if ok else 1
 

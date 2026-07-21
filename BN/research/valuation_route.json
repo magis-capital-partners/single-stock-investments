@@ -1,78 +1,79 @@
 {
   "schema_version": "2.0",
   "status": "routed",
-  "profile_id": "scarce_asset_optionality",
-  "label": "Scarce assets, royalties, and optionality",
-  "score": 10.0,
+  "profile_id": "quality_reinvestment",
+  "label": "High-return compounder",
+  "score": 20.0,
   "reasons": [
+    "archetype=compounder",
+    "component categories=operating_business",
+    "existing methods=dcf, owner_cash, reinvestment",
     "explicit reviewed profile"
   ],
   "primary_methods": [
-    "component_owner_cash_and_unit_nav"
+    "owner_earnings_reinvestment_dcf"
   ],
   "corroborating_methods": [
-    "comparable_transactions",
-    "replacement_cost_or_reverse_nav"
+    "reverse_dcf",
+    "incremental_roic_runway"
   ],
   "primary_personas": [
-    "hk",
-    "stahl"
+    "buffett_weschler",
+    "hohn"
   ],
   "cross_check_personas": [
-    "klarman_asset_value",
-    "marks_credit_cycle"
+    "munger",
+    "marathon_capital_cycle"
   ],
   "silent_personas": [
-    "buffett_weschler",
     "greenblatt",
-    "hohn",
-    "marathon_capital_cycle",
-    "munger",
-    "pabrai"
+    "hk",
+    "klarman_asset_value",
+    "marks_credit_cycle",
+    "pabrai",
+    "stahl"
   ],
   "required_evidence": [
-    "legal economic claim",
-    "non-overlapping physical inventory",
-    "unit economics",
-    "realization timing",
-    "remaining owner capital"
+    "normalized owner earnings",
+    "incremental return on capital",
+    "reinvestment runway",
+    "diluted share count",
+    "competitive-advantage mechanism"
   ],
   "failure_modes": [
-    "gross asset value mistaken for shareholder value",
-    "operating cash flow and NAV counted twice",
-    "remote options treated as contracted cash"
+    "growth projected without its capital cost",
+    "stock compensation or acquisitions omitted",
+    "terminal value unsupported by a durable mechanism"
   ],
   "secondary_profiles": [
-    {
-      "profile_id": "quality_reinvestment",
-      "score": 10.0,
-      "reasons": [
-        "archetype=platform",
-        "component categories=operating_business",
-        "existing methods=dcf, owner_cash, reinvestment"
-      ]
-    },
     {
       "profile_id": "credit_and_normalized_returns",
       "score": 2.0,
       "reasons": [
         "component categories=financial_asset, liability_or_reserve"
       ]
+    },
+    {
+      "profile_id": "predictable_cash_flow",
+      "score": 2.0,
+      "reasons": [
+        "component categories=operating_business",
+        "existing methods=owner_cash"
+      ]
     }
   ],
   "scorecard": {
     "scarce_asset_optionality": {
-      "score": 10.0,
-      "reasons": [
-        "explicit reviewed profile"
-      ]
+      "score": 0.0,
+      "reasons": []
     },
     "quality_reinvestment": {
-      "score": 10.0,
+      "score": 20.0,
       "reasons": [
-        "archetype=platform",
+        "archetype=compounder",
         "component categories=operating_business",
-        "existing methods=dcf, owner_cash, reinvestment"
+        "existing methods=dcf, owner_cash, reinvestment",
+        "explicit reviewed profile"
       ]
     },
     "capital_cycle": {
@@ -112,7 +113,7 @@
   "config_path": "_system/frameworks/power_zones.json",
   "config_updated": "2026-07-14",
   "classification": {
-    "archetype": "platform",
+    "archetype": "compounder",
     "moat": "stable",
     "dhando": "partial",
     "stance": "hold",
@@ -125,16 +126,34 @@
       "label": "Buffett / Weschler",
       "independence_group": "quality_reinvestment",
       "in_power_zone": true,
-      "fit": 0.667,
-      "matched": 2,
+      "fit": 1.0,
+      "matched": 3,
       "known_fields": 3,
       "matched_fields": [
+        "archetype",
         "moat",
         "investment_sleeve"
       ],
       "excluded_by": null,
       "match_rate": null,
-      "score": 57
+      "score": 85
+    },
+    {
+      "persona": "lawrence",
+      "label": "Bryan Lawrence",
+      "independence_group": "quality_reinvestment",
+      "in_power_zone": true,
+      "fit": 1.0,
+      "matched": 3,
+      "known_fields": 3,
+      "matched_fields": [
+        "archetype",
+        "moat",
+        "dhando"
+      ],
+      "excluded_by": null,
+      "match_rate": null,
+      "score": 85
     },
     {
       "persona": "hohn",
@@ -147,22 +166,6 @@
       "matched_fields": [
         "archetype",
         "moat"
-      ],
-      "excluded_by": null,
-      "match_rate": null,
-      "score": 57
-    },
-    {
-      "persona": "lawrence",
-      "label": "Bryan Lawrence",
-      "independence_group": "quality_reinvestment",
-      "in_power_zone": true,
-      "fit": 0.667,
-      "matched": 2,
-      "known_fields": 3,
-      "matched_fields": [
-        "moat",
-        "dhando"
       ],
       "excluded_by": null,
       "match_rate": null,
@@ -187,24 +190,24 @@
   ],
   "committee": {
     "candidate_count": 5,
-    "independence_group_count": 4,
+    "independence_group_count": 3,
     "committee_seatable": true,
     "candidates": [
       {
-        "persona": "hk",
-        "independence_group": "scarce_assets"
+        "persona": "buffett_weschler",
+        "independence_group": "quality_reinvestment"
       },
       {
-        "persona": "stahl",
-        "independence_group": "scarce_assets"
+        "persona": "hohn",
+        "independence_group": "competitive_advantage"
       },
       {
-        "persona": "klarman_asset_value",
-        "independence_group": "asset_realization"
+        "persona": "munger",
+        "independence_group": "quality_reinvestment"
       },
       {
-        "persona": "marks_credit_cycle",
-        "independence_group": "credit_cycle"
+        "persona": "marathon_capital_cycle",
+        "independence_group": "capital_cycle"
       },
       {
         "persona": "lawrence",
@@ -212,6 +215,6 @@
       }
     ]
   },
-  "input_hash": "a0847a3f8e46f3b1a73967f60c44c381f8c5f4a7d81a8fd1fca8c8dddb2ce61f",
-  "generated_at": "2026-07-20T17:13:54.191493+00:00"
+  "input_hash": "21dbde1572fca77e401dfb3b9229e537073fde87c00da8fe00a13df756fcd0e0",
+  "generated_at": "2026-07-20T23:42:01.593800+00:00"
 }

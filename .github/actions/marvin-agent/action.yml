@@ -22,6 +22,10 @@ inputs:
     description: Explicit manual override of duplicate/cooldown gates
     required: false
     default: "false"
+  consumer:
+    description: LLM usage policy consumer (marvin_research or marvin_contract_backfill)
+    required: false
+    default: "marvin_research"
 
 runs:
   using: composite
@@ -30,7 +34,7 @@ runs:
       id: llm_gate
       uses: ./.github/actions/llm-gate
       with:
-        consumer: marvin_research
+        consumer: ${{ inputs.consumer }}
         subject: ${{ inputs.ticker }}
         reason: ${{ inputs.pick_reason }}
         evidence_hash: ${{ inputs.evidence_hash }}
@@ -81,7 +85,7 @@ runs:
       shell: bash
       run: |
         python _system/scripts/llm_call_gate.py model \
-          --consumer marvin_research --reason "${{ inputs.pick_reason }}"
+          --consumer "${{ inputs.consumer }}" --reason "${{ inputs.pick_reason }}"
 
     - name: Run Marvin deep dive
       id: agent
@@ -106,7 +110,7 @@ runs:
         STATUS: ${{ steps.agent.outcome == 'success' && 'completed' || 'failed' }}
       run: |
         python _system/scripts/llm_call_gate.py record \
-          --consumer marvin_research --subject "${{ inputs.ticker }}" \
+          --consumer "${{ inputs.consumer }}" --subject "${{ inputs.ticker }}" \
           --reason "${{ inputs.pick_reason }}" --evidence-hash "${{ inputs.evidence_hash }}" \
           --ledger "${{ steps.llm_gate.outputs.ledger }}" --status "$STATUS"
 

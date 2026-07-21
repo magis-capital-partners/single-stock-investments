@@ -1,0 +1,92 @@
+{
+  "schema_version": "1.0",
+  "ticker": "AMZN",
+  "as_of": "2026-07-20",
+  "facts": [
+    {
+      "field_id": "operating_cash_flow_m",
+      "value": 139514.0,
+      "unit": "USD millions",
+      "locked": true,
+      "confidence": "high",
+      "source": {
+        "ref": "AMZN/research/evidence/sec_companyfacts.json",
+        "locator": "us-gaap:NetCashProvidedByUsedInOperatingActivities; accession 0001018724-26-000004; form 10-K",
+        "as_of": "2025-12-31",
+        "content_sha256": "c991e221b9e1956e53c1e7c05f6a6683f926e43b23e2c800f626e997a268cc93"
+      }
+    },
+    {
+      "field_id": "capital_expenditures_m",
+      "value": 131819.0,
+      "unit": "USD millions",
+      "locked": true,
+      "confidence": "high",
+      "source": {
+        "ref": "AMZN/research/evidence/sec_companyfacts.json",
+        "locator": "us-gaap:PaymentsToAcquireProductiveAssets; accession 0001018724-26-000004; form 10-K",
+        "as_of": "2025-12-31",
+        "content_sha256": "c991e221b9e1956e53c1e7c05f6a6683f926e43b23e2c800f626e997a268cc93"
+      }
+    },
+    {
+      "field_id": "shares_outstanding",
+      "value": 10757109436.0,
+      "unit": "shares",
+      "locked": true,
+      "confidence": "high",
+      "source": {
+        "ref": "AMZN/research/evidence/sec_companyfacts.json",
+        "locator": "dei:EntityCommonStockSharesOutstanding; accession 0001018724-26-000014; form 10-Q",
+        "as_of": "2026-04-22",
+        "content_sha256": "c991e221b9e1956e53c1e7c05f6a6683f926e43b23e2c800f626e997a268cc93"
+      }
+    },
+    {
+      "field_id": "cash_m",
+      "value": 104692.0,
+      "unit": "USD millions",
+      "locked": true,
+      "confidence": "high",
+      "source": {
+        "ref": "AMZN/research/evidence/sec_companyfacts.json",
+        "locator": "us-gaap:CashCashEquivalentsRestrictedCashAndRestrictedCashEquivalents; accession 0001018724-26-000014; form 10-Q",
+        "as_of": "2026-03-31",
+        "content_sha256": "c991e221b9e1956e53c1e7c05f6a6683f926e43b23e2c800f626e997a268cc93"
+      }
+    },
+    {
+      "field_id": "debt_m",
+      "value": 119074.0,
+      "unit": "USD millions",
+      "locked": true,
+      "confidence": "high",
+      "source": {
+        "ref": "AMZN/research/evidence/sec_companyfacts.json",
+        "locator": "us-gaap:LongTermDebtNoncurrent; accession 0001018724-26-000014; form 10-Q",
+        "as_of": "2026-03-31",
+        "content_sha256": "c991e221b9e1956e53c1e7c05f6a6683f926e43b23e2c800f626e997a268cc93"
+      }
+    },
+    {
+      "field_id": "normalized_owner_earnings_m",
+      "value": 7695.0,
+      "unit": "USD millions",
+      "source": {
+        "ref": "AMZN/research/evidence/sec_companyfacts.json",
+        "locator": "us-gaap:NetCashProvidedByUsedInOperatingActivities; accession 0001018724-26-000004; form 10-K",
+        "as_of": "2025-12-31",
+        "content_sha256": "c991e221b9e1956e53c1e7c05f6a6683f926e43b23e2c800f626e997a268cc93"
+      },
+      "derived_from": [
+        "operating_cash_flow_m",
+        "capital_expenditures_m"
+      ],
+      "formula": "operating_cash_flow_m - abs(capital_expenditures_m)",
+      "confidence": "medium",
+      "locked": true
+    }
+  ],
+  "source_count": 1,
+  "generated_at": "2026-07-20T23:41:02.323889Z"
+}

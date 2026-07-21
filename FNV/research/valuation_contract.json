@@ -216,83 +216,82 @@
   "method_route": {
     "schema_version": "2.0",
     "status": "routed",
-    "profile_id": "scarce_asset_optionality",
-    "label": "Scarce assets, royalties, and optionality",
-    "score": 22.0,
+    "profile_id": "quality_reinvestment",
+    "label": "High-return compounder",
+    "score": 17.0,
     "reasons": [
-      "archetype=optionality",
-      "component categories=real_option",
-      "existing methods=option, royalty, unit_nav",
-      "investment_sleeve=real_assets_lt",
+      "archetype=compounder",
+      "component categories=operating_business",
       "explicit reviewed profile"
     ],
     "primary_methods": [
-      "component_owner_cash_and_unit_nav"
+      "owner_earnings_reinvestment_dcf"
     ],
     "corroborating_methods": [
-      "comparable_transactions",
-      "replacement_cost_or_reverse_nav"
+      "reverse_dcf",
+      "incremental_roic_runway"
     ],
     "primary_personas": [
-      "hk",
-      "stahl"
+      "buffett_weschler",
+      "hohn"
     ],
     "cross_check_personas": [
-      "klarman_asset_value",
-      "marks_credit_cycle"
+      "munger",
+      "marathon_capital_cycle"
     ],
     "silent_personas": [
-      "buffett_weschler",
       "greenblatt",
-      "hohn",
-      "marathon_capital_cycle",
-      "munger",
-      "pabrai"
+      "hk",
+      "klarman_asset_value",
+      "marks_credit_cycle",
+      "pabrai",
+      "stahl"
     ],
     "required_evidence": [
-      "legal economic claim",
-      "non-overlapping physical inventory",
-      "unit economics",
-      "realization timing",
-      "remaining owner capital"
+      "normalized owner earnings",
+      "incremental return on capital",
+      "reinvestment runway",
+      "diluted share count",
+      "competitive-advantage mechanism"
     ],
     "failure_modes": [
-      "gross asset value mistaken for shareholder value",
-      "operating cash flow and NAV counted twice",
-      "remote options treated as contracted cash"
+      "growth projected without its capital cost",
+      "stock compensation or acquisitions omitted",
+      "terminal value unsupported by a durable mechanism"
     ],
     "secondary_profiles": [
+      {
+        "profile_id": "scarce_asset_optionality",
+        "score": 6.0,
+        "reasons": [
+          "component categories=real_option",
+          "existing methods=option, royalty, unit_nav",
+          "investment_sleeve=real_assets_lt"
+        ]
+      },
       {
         "profile_id": "credit_and_normalized_returns",
         "score": 2.0,
         "reasons": [
           "component categories=financial_asset, liability_or_reserve"
         ]
-      },
-      {
-        "profile_id": "binary_milestone",
-        "score": 2.0,
-        "reasons": [
-          "component categories=real_option",
-          "existing methods=milestone"
-        ]
       }
     ],
     "scorecard": {
       "scarce_asset_optionality": {
-        "score": 22.0,
+        "score": 6.0,
         "reasons": [
-          "archetype=optionality",
           "component categories=real_option",
           "existing methods=option, royalty, unit_nav",
-          "investment_sleeve=real_assets_lt",
-          "explicit reviewed profile"
+          "investment_sleeve=real_assets_lt"
         ]
       },
       "quality_reinvestment": {
-        "score": 1.0,
+        "score": 17.0,
         "reasons": [
-          "component categories=operating_business"
+          "archetype=compounder",
+          "component categories=operating_business",
+          "explicit reviewed profile"
         ]
       },
       "capital_cycle": {
@@ -334,7 +333,7 @@
     "config_path": "_system/frameworks/power_zones.json",
     "config_updated": "2026-07-14",
     "classification": {
-      "archetype": "optionality",
+      "archetype": "compounder",
       "moat": "stable",
       "dhando": "partial",
       "stance": "watch",
@@ -346,97 +345,49 @@
     },
     "specialist_power_zones": [
       {
-        "persona": "hk",
-        "label": "Horizon Kinetics",
-        "independence_group": "scarce_assets",
-        "in_power_zone": true,
-        "fit": 1.0,
-        "matched": 2,
-        "known_fields": 2,
-        "matched_fields": [
-          "archetype",
-          "investment_sleeve"
-        ],
-        "excluded_by": null,
-        "match_rate": null,
-        "score": 85
-      },
-      {
-        "persona": "stahl",
-        "label": "Murray Stahl",
-        "independence_group": "scarce_assets",
-        "in_power_zone": true,
-        "fit": 1.0,
-        "matched": 2,
-        "known_fields": 2,
-        "matched_fields": [
-          "archetype",
-          "investment_sleeve"
-        ],
-        "excluded_by": null,
-        "match_rate": null,
-        "score": 85
-      },
-      {
-        "persona": "pabrai",
-        "label": "Mohnish Pabrai",
-        "independence_group": "asymmetry_downside",
-        "in_power_zone": true,
-        "fit": 0.75,
-        "matched": 3,
-        "known_fields": 4,
-        "matched_fields": [
-          "dhando",
-          "archetype",
-          "investment_sleeve"
-        ],
-        "excluded_by": null,
-        "match_rate": null,
-        "score": 64
-      },
-      {
-        "persona": "greenblatt",
-        "label": "Joel Greenblatt",
-        "independence_group": "special_situations",
-        "in_power_zone": true,
-        "fit": 0.667,
-        "matched": 2,
-        "known_fields": 3,
-        "matched_fields": [
-          "archetype",
-          "dhando"
-        ],
-        "excluded_by": null,
-        "match_rate": null,
-        "score": 57
-      },
-      {
-        "persona": "klarman_asset_value",
-        "label": "Klarman / Baupost",
-        "independence_group": "asset_realization",
-        "in_power_zone": true,
-        "fit": 0.667,
-        "matched": 2,
-        "known_fields": 3,
-        "matched_fields": [
-          "archetype",
-          "dhando"
-        ],
-        "excluded_by": null,
-        "match_rate": null,
-        "score": 57
-      },
-      {
         "persona": "lawrence",
         "label": "Bryan Lawrence",
+        "independence_group": "quality_reinvestment",
+        "in_power_zone": true,
+        "fit": 1.0,
+        "matched": 3,
+        "known_fields": 3,
+        "matched_fields": [
+          "archetype",
+          "moat",
+          "dhando"
+        ],
+        "excluded_by": null,
+        "match_rate": null,
+        "score": 85
+      },
+      {
+        "persona": "buffett_weschler",
+        "label": "Buffett / Weschler",
         "independence_group": "quality_reinvestment",
         "in_power_zone": true,
         "fit": 0.667,
         "matched": 2,
         "known_fields": 3,
         "matched_fields": [
-          "moat",
-          "dhando"
+          "archetype",
+          "moat"
+        ],
+        "excluded_by": null,
+        "match_rate": null,
+        "score": 57
+      },
+      {
+        "persona": "hohn",
+        "label": "Chris Hohn",
+        "independence_group": "competitive_advantage",
+        "in_power_zone": true,
+        "fit": 0.667,
+        "matched": 2,
+        "known_fields": 3,
+        "matched_fields": [
+          "archetype",
+          "moat"
         ],
         "excluded_by": null,
         "match_rate": null,
@@ -475,55 +426,67 @@
         "score": 57
       },
       {
-        "persona": "moi",
-        "label": "MOI / Mihaljevic",
-        "independence_group": "special_situations",
+        "persona": "munger",
+        "label": "Charlie Munger",
+        "independence_group": "quality_reinvestment",
         "in_power_zone": true,
         "fit": 0.667,
         "matched": 2,
         "known_fields": 3,
         "matched_fields": [
           "archetype",
-          "dhando"
+          "moat"
         ],
         "excluded_by": null,
         "match_rate": null,
         "score": 57
+      },
+      {
+        "persona": "pabrai",
+        "label": "Mohnish Pabrai",
+        "independence_group": "asymmetry_downside",
+        "in_power_zone": true,
+        "fit": 0.5,
+        "matched": 2,
+        "known_fields": 4,
+        "matched_fields": [
+          "dhando",
+          "investment_sleeve"
+        ],
+        "excluded_by": null,
+        "match_rate": null,
+        "score": 42
       }
     ],
     "committee": {
-      "candidate_count": 6,
-      "independence_group_count": 5,
+      "candidate_count": 5,
+      "independence_group_count": 3,
       "committee_seatable": true,
       "candidates": [
         {
-          "persona": "hk",
-          "independence_group": "scarce_assets"
+          "persona": "buffett_weschler",
+          "independence_group": "quality_reinvestment"
         },
         {
-          "persona": "stahl",
-          "independence_group": "scarce_assets"
+          "persona": "hohn",
+          "independence_group": "competitive_advantage"
         },
         {
-          "persona": "klarman_asset_value",
-          "independence_group": "asset_realization"
+          "persona": "munger",
+          "independence_group": "quality_reinvestment"
         },
         {
-          "persona": "marks_credit_cycle",
-          "independence_group": "credit_cycle"
+          "persona": "marathon_capital_cycle",
+          "independence_group": "capital_cycle"
         },
         {
           "persona": "lawrence",
           "independence_group": "quality_reinvestment"
-        },
-        {
-          "persona": "moi",
-          "independence_group": "special_situations"
         }
       ]
     },
-    "input_hash": "99c9ac77a8af03383afcc9e54fd3a364f50b691d950034d3195978f3f181bed3",
-    "generated_at": "2026-07-20T17:13:55.040322+00:00"
+    "input_hash": "63e037ae3749543978445633ea1daeb4016af96be18d7c0874aff10b565d5421",
+    "generated_at": "2026-07-20T23:51:20.823894+00:00"
   },
   "market": {
     "price_per_share": 229.28,
@@ -650,7 +613,7 @@
     ]
   },
   "change_control": {
-    "model_hash": "f8610bd531993ccfd0c26da2c9f8a0b83de41b4b05411c4b9f7791f2d8bf179f",
+    "model_hash": "a01a2f6e4dc9d2f71458fc97a8631da42d96bc958a4c423227e0a07139b9cee2",
     "method_versions": [],
     "change_log": [],
     "rule": "A source fact is locked. Every assumption change requires a reason, author, timestamp, and before/after value."
