@@ -22,7 +22,7 @@ Marvin floor **8.03%** per year (compounder; stance **watch**) from primary fili
 
 | Topic | Marvin (filings) | External | Source |
 |-------|------------------|----------|--------|
-| Base return anchor | **8.03%** per year | Qualitative support only | `AFL/research/deep_dive_2026-07-10.md` |
+| Base return anchor | **7.93%** per year | Qualitative support only | `AFL/research/deep_dive_2026-07-21.md` |
 | Archetype / stance | **compounder** · **watch** | See indexed sources | `valuation.json` |
 | Normalization | FY2025 GAAP net income fell to $3.65B (EPS $6.82) from $5.44B on investment mark | Cross-check vs posts | Marvin |
 
@@ -57,6 +57,6 @@ Marvin floor **8.03%** per year (compounder; stance **watch**) from primary fili
 
 ## Primary sources cited
 
-1. `AFL/research/deep_dive_2026-07-10.md`
+1. `AFL/research/deep_dive_2026-07-21.md`
 2. `AFL/research/valuation.json`
 3. `AFL/third-party-analyses/source_inventory_2026-07-10.md`
