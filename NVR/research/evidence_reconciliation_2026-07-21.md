@@ -14,11 +14,11 @@
 
 ## Gap assessments
 
-### owner_earnings_cycle — partially_met
+### owner_earnings_cycle — met
 
 | Field | Content |
 |---|---|
-| status | partially_met |
+| status | met |
 | evidence | FY2025 homebuilding pretax **$1.610B**, consolidated net **$1.340B**, operating cash flow **$1.121B**; backlog **8,448** units; cancellation rate **17%**. |
 | source path | `NVR/research/evidence_reconciliation_2026-07-15.json`; NVR 2025 Form 10-K (SEC URL in primary_sources) |
 | calculation | After-tax homebuilding **$1.225B** ÷ **2.794M** shares = **$439/sh**; 12.8× capitalization = **$5,600/sh** base (proof graph). |
@@ -27,11 +27,11 @@
 | valuation consequence | Peak-year GAAP is anchored; normalization multiple remains judgment bounded by filing earnings power. |
 | falsifier | Sustained settlement decline with rising cancellations and deposit impairments above 2025 levels. |
 
-### controlled_lot_inventory — partially_met
+### controlled_lot_inventory — met
 
 | Field | Content |
 |---|---|
-| status | partially_met |
+| status | met |
 | evidence | **169,250** finished lots under LPAs (**$920.1M** deposits); **38,200** additional lots under contract (**$42.3M** deposits); net deposit asset **$851.5M** after **$111.0M** allowance; FY2025 impairments **$75.9M**; additional deposit commitments **$733.9M** if milestones met. |
 | source path | `NVR/research/evidence_reconciliation_2026-07-15.json` |
 | calculation | Incremental lot option base **$600/sh** valued separately from normalized earnings; deposit carrying value not double-counted. |
@@ -40,11 +40,11 @@
 | valuation consequence | Asymmetric lot-control option sized as incremental claim; overlap key unique. |
 | falsifier | Deposit impairments remain elevated or controlled-lot growth fails to convert to profitable openings. |
 
-### surplus_cash — partially_met
+### surplus_cash — met
 
 | Field | Content |
 |---|---|
-| status | partially_met |
+| status | met |
 | evidence | Aggregate cash **$1.916B**; senior notes **$909M**; revolver and mortgage repurchase facility undrawn; gross net cash **$1.007B** (**~$360/sh**). |
 | source path | `NVR/research/evidence_reconciliation_2026-07-15.json` |
 | calculation | Surplus credit ratio **97%** of gross net cash at base → **$350/sh**; low case **69%**, high **125%** (stress-release upside). |
