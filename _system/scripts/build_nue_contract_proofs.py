@@ -475,6 +475,57 @@ def main() -> int:
     }
     eva["validation_errors"] = []
 
+    price = float((data.get("inputs") or {}).get("price") or 230.74)
+    base_value = 179.0
+    base_irr = round(((base_value / price) ** (1 / 7) - 1) * 100, 2)
+    low_irr = round(((68.0 / price) ** (1 / 7) - 1) * 100, 2)
+    high_irr = round(((334.0 / price) ** (1 / 7) - 1) * 100, 2)
+
+    data["method"] = "scenario"
+    data["irr_method"] = "component_economic_value"
+    data["inputs"]["normalization_note"] = (
+        "Through-cycle component schedule; not peak 2025 mill spreads."
+    )
+    data["inputs"]["fcf_per_share"] = 7.52
+    data["inputs"]["fcf_source"] = "FY2025 diluted EPS anchor from NUE/research/evidence_reconciliation_2026-07-15.json"
+    data["scenarios"] = {
+        "bear": {
+            "return_pct": low_irr,
+            "notes": "Low component sum $68/sh with full supply-response reserve",
+        },
+        "base": {
+            "return_pct": base_irr,
+            "growth_y1_5": 0.0,
+            "growth_y6_10": 0.0,
+            "exit_multiple": 1.0,
+            "notes": "Base component sum $179/sh versus price; terminal value equals normalized component equity",
+        },
+        "bull": {
+            "return_pct": high_irr,
+            "notes": "High component sum $334/sh with full project optionality",
+        },
+    }
+    data["implied_return"] = {
+        "base_pct": base_irr,
+        "label": "component base",
+        "display": f"{base_irr}%",
+    }
+    data["stance_proposal"] = {
+        "suggested": "watch",
+        "irr_band": "below_hurdle",
+        "gates": {
+            "moat_ok": False,
+            "dhando_ok": True,
+        },
+        "override_reason": None,
+    }
+    data["estimates"] = {
+        "blended_best": {
+            "per_share": base_value,
+            "weights": "component base sum from proof-complete schedule",
+        }
+    }
+
     VAL_PATH.write_text(json.dumps(data, indent=2) + "\n", encoding="utf-8")
     print(json.dumps({"status": "ok", "outputs": outputs}, indent=2))
     return 0

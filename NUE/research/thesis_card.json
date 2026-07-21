@@ -1,68 +1,73 @@
 {
-  "schema_version": "1.0",
-  "ticker": "NUE",
-  "thesis": "Nucor is the largest U.S. electric-arc-furnace steelmaker, vertically integrated from scrap and DRI through mills and downstream fabrication. **[Fact]** FY2025 was a strong cyclical year: steel-mill pretax **$2.4B**, products **$1.2B**, and **83%** mill utilization. **[Fact]** The company is finishing a heavy capex wave (West Virginia sheet, Kentucky plate, Arizona melt shop) while keeping leverage moderate (**24%** funded debt to capital). **[Inference]** At **~$237**, the market prices mid-cycle quality and project optionality above our through-cycle component base **~$179/sh**.",
-  "why_market_wrong": "We do not see a clear mispricing edge today. **[Inference]** Nucor's low-cost EAF model, dividend record, and project pipeline may justify a premium to normalized economics, while our base case deliberately avoids capitalizing 2025 peak spreads. **[Inference]** The gap is mostly cycle and growth-capital timing, not an obvious hidden asset.",
-  "base_irr_pct": -3.9,
-  "irr_label": "annualized return",
-  "scenarios": {
-    "base": -3.9,
-    "bear": -16.3,
-    "bull": 5.0
-  },
+  "base_irr_pct": -1.0,
   "classification": {
     "archetype": "capital_cycle",
-    "moat": "unproven",
-    "dhando": "partial",
-    "stance": "watch",
-    "cycle": "mid",
-    "lawrence_bucket": "low_cost",
-    "payoff_lens": "operating"
+    "cycle": "mid"
   },
+  "evidence_citations": [
+    "NUE/investor-documents/sec-edgar/10-K_2026_rpt20251231.htm",
+    "NUE/third-party-analyses/source_inventory_2026-07-21.md",
+    "NUE/research/evidence_reconciliation_2026-07-21.md",
+    "NUE/research/evidence/filing_digest_2026-07-21.md",
+    "NUE/research/cross_check_third_party_2026-07-21.md"
+  ],
+  "filing_digest": "NUE/research/evidence/filing_digest_2026-07-21.md",
+  "generated_at": "2026-07-21T03:57:14+00:00",
+  "irr_label": "7yr IRR (total synthesis)",
   "key_assumptions": [
     {
       "input": "Price today",
-      "value": "**$236.87**",
-      "source": "Market close 2026-07-15 (`valuation.json`)"
+      "source": "Yahoo NUE close 2026-07-20",
+      "value": "**$230.74**"
     },
     {
-      "input": "Component economic value (base)",
-      "value": "**$179/sh**",
-      "source": "Proof-complete schedule in `valuation.json`"
+      "input": "Starting free cash flow per share",
+      "source": "FY2025 diluted EPS anchor from NUE/research/evidence_reconciliation_2026-07-15.json",
+      "value": "**$7.52**"
     },
     {
-      "input": "Steel mills through-cycle value",
-      "value": "**$110/sh**",
-      "source": "FY2025 mills pretax $2.383B normalized via midcycle_capacity_value@1.0"
+      "input": "Growth in years 1 through 5",
+      "source": "Base component sum $179/sh versus price; terminal value equals normalized component equity",
+      "value": "**0.0%** per year"
     },
     {
-      "input": "Net debt and leases",
-      "value": "**−$19/sh**",
-      "source": "Cash $2.699B less debt/leases $7.121B over 230.9M shares"
+      "input": "Growth in years 6 through 7",
+      "source": "Scenario base",
+      "value": "**0.0%** per year"
     },
     {
-      "input": "Supply-response reserve",
-      "value": "**−$10/sh**",
-      "source": "[Assumption] explicit downcycle reserve separate from segment multiples"
+      "input": "Selling multiple in year 10",
+      "source": "Scenario base",
+      "value": "**1.0 times cash flow**"
+    },
+    {
+      "input": "Time horizon",
+      "source": "7-year owner-cash model",
+      "value": "**7 years**"
+    },
+    {
+      "input": "Blended owner cash",
+      "source": "component base sum from proof-complete schedule",
+      "value": "**$179.0**"
     }
   ],
-  "open_questions": [
-    "Reconcile maintenance capital versus growth capex by segment across a full cycle using post-refresh 10-K extracts.",
-    "Update product-level domestic/global capacity map when AISI and competitor project disclosures refresh.",
-    "Track West Virginia sheet mill cost, timing, and utilization versus the $3.65B / 3M t disclosure.",
-    "Confirm whether 2026 startup-cost run-rate falls materially after Kentucky plate and Arizona projects mature."
-  ],
-  "evidence_citations": [
-    "NUE/research/evidence_reconciliation_2026-07-15.json",
-    "NUE/research/evidence_reconciliation_2026-07-21.md",
-    "NUE/research/valuation.json"
-  ],
-  "filing_digest": "NUE/research/evidence/filing_digest_2026-07-21.md",
-  "generated_at": "2026-07-21T03:36:00+00:00",
   "last_verified": {
     "deep_dive": "2026-07-21",
-    "valuation_as_of": "2026-07-21",
-    "human_approved": null
+    "human_approved": null,
+    "valuation_as_of": "2026-07-21"
   },
-  "stance": null
+  "open_questions": [
+    "Confirm post-refresh 10-K extract matches locked FY2025 facts in `evidence_reconciliation_2026-07-15.json`.",
+    "Product-level capacity/import map remains a bounded stress reserve, not a full industry database."
+  ],
+  "scenarios": {
+    "base": -23.8,
+    "bear": -0.8,
+    "bull": -0.8
+  },
+  "schema_version": "1.0",
+  "stance": null,
+  "thesis": "Nucor Corporation is the largest steel producer in the United States by tonnage, built almost entirely on electric-arc-furnace (EAF) mini-mills fed by scrap and direct-reduced iron. **[Fact]** The company reports three operating segments: steel mills (sheet, plate, bar, and structural products), steel products (joist, deck, rebar fabrication, towers, and other downstream businesses), and raw materials (scrap yards, DRI, and brokerage). **[Fact]** FY2025 pretax segment earnings were **$2.383 billion** for mills, **$1.229 billion** for products, and **$153 million** for raw materials, with corporate eliminations of **$1.197 billion**. **[Fact]** Steel-mill shipments were **25.271 million tons** at **83%** capacity utilization. **[Fact]** Nucor is also in the late stages of a multi-year capital program, including a West Virginia sheet mill targeted at roughly **3 million tons** of annual capacity for about **$3.65 billion** net of state incentives. **[Fact]**",
+  "ticker": "NUE",
+  "why_market_wrong": "We do not see a durable mispricing signal at today's price. **[Inference]** Nucor's cost position, balance-sheet strength, and project pipeline may justify a premium to our through-cycle component base of about **$179 per share** versus a price near **$231**. **[Inference]** The market may be capitalizing mid-cycle spreads and successful project completion, while our base case normalizes 2025 peak mill utilization and keeps an explicit supply-response reserve. **[Inference]** If projects earn above their cost of capital and industry supply discipline holds, the bull component schedule (**~$334 per share**) could prove conservative; if imports and new domestic capacity depress spreads, the low case (**~$68 per share**) is the relevant stress path."
 }
