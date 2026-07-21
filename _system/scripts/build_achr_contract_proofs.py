@@ -409,6 +409,67 @@ def build_valuation_scaffold() -> dict:
                 ),
             ],
         },
+        "economic_value": {
+            "schema_version": "1.0",
+            "method": "component_economic_value",
+            "gaap_role": "cross_check",
+            "accounting_reference": (
+                "FY2025 10-K and Q1 2026 10-Q; GAAP net loss reflects pre-revenue R&D burn and is not owner cash."
+            ),
+            "economic_claim": {
+                "description": (
+                    "One diluted ACHR common share, including net liquid assets, risk-adjusted Midnight "
+                    "certification and partner milestone value, less dilution and burn reserve."
+                ),
+                "unit_label": "diluted share",
+                "unit_count": int(round(SHARES_M * 1_000_000)),
+                "unit_source": (
+                    f"Q1 2026 weighted-average diluted shares 766,850,002 ({FILING_10Q})"
+                ),
+                "enterprise_to_equity_reconciliation": (
+                    "Pre-revenue developer with no operating enterprise cash flow; net liquid assets, "
+                    "certification option, and burn reserve are separate additive components with unique overlap keys."
+                ),
+            },
+            "component_groups": [
+                {
+                    "id": "net_liquid_claims",
+                    "label": "Net cash, short-term investments, and debt claims",
+                    "component_ids": ["net_liquid_claims"],
+                    "economic_claim": "Net cash, short-term investments, and debt claims",
+                    "valuation_basis": "Filing-locked cash, investments, debt, and warrant liabilities divided by diluted shares.",
+                    "adjustments": "Low/high stress debt and mark haircuts on liquid assets.",
+                    "overlap_control": "Unique overlap key net_liquid_claims.",
+                },
+                {
+                    "id": "midnight_certification_option",
+                    "label": "Midnight FAA certification and partner milestone value",
+                    "component_ids": ["midnight_certification_option"],
+                    "economic_claim": "Midnight FAA certification and partner milestone value",
+                    "valuation_basis": "Risk-adjusted milestone value from United, Stellantis, and USAF conditional paths.",
+                    "adjustments": "Probability, timing, and remaining certification capital are inside the range.",
+                    "overlap_control": "Unique overlap key midnight_certification_option.",
+                    "risk_and_timing": {
+                        "probability_basis": (
+                            "Base assumes partial certification and limited partner conversion; bear assumes failure (0)."
+                        ),
+                        "timing_basis": "Seven-year Lawrence horizon aligned with scenario yield-curve stance gate.",
+                        "remaining_capital_basis": (
+                            "FY2025 R&D $493.9M and operating loss $729.3M continue until commercial revenue scales."
+                        ),
+                    },
+                },
+                {
+                    "id": "dilution_and_burn_reserve",
+                    "label": "Future dilution and pre-revenue burn reserve",
+                    "component_ids": ["dilution_and_burn_reserve"],
+                    "economic_claim": "Future dilution and pre-revenue burn reserve",
+                    "valuation_basis": "Negative reserve for ATM/S-3 issuance and continued pre-revenue burn.",
+                    "adjustments": "Separate from net liquid claim; does not double-count cash already marked.",
+                    "overlap_control": "Unique overlap key dilution_and_burn_reserve.",
+                },
+            ],
+        },
         "economic_value_analysis": {
             "ownership_waterfall": {
                 "net_economic_claim": (
@@ -427,6 +488,7 @@ def build_valuation_scaffold() -> dict:
             },
             "validation_errors": [],
         },
+        "valuation_mode": "economic_value",
     }
 
 
