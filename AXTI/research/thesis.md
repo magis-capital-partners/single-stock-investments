@@ -17,7 +17,7 @@
 | **Payoff lens** | operating |
 | **MOI bucket** | pending |
 
-**Deep dive:** `AXTI/research/deep_dive_2026-07-20.md` (auto-sync)
+**Deep dive:** `AXTI/research/deep_dive_2026-07-21.md` (auto-sync)
 
 ## One-line thesis
 
