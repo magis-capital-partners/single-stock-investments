@@ -1,6 +1,6 @@
 {
   "ticker": "AEE",
-  "as_of": "2026-07-10",
+  "as_of": "2026-07-21",
   "method": "full",
   "lawrence_bucket": "regulated_utility",
   "classification_inputs": {
@@ -493,5 +493,1026 @@
     "contributor_count": 8,
     "in_base_irr": false,
     "disclaimer": "Advisory lens blend only. Does not replace Lawrence total-synthesis stance gate without [HUMAN REVIEW]."
+  },
+  "component_valuation_results": {
+    "status": "inferred_minimal",
+    "decision_rule": "Operating-only fallback. Add an explicit component_valuation schedule before drawing asset-level conclusions.",
+    "all_material_components_identified": false,
+    "additive_components": [
+      {
+        "id": "operating_business_fallback",
+        "label": "Operating business (fallback)",
+        "category": "operating_business",
+        "treatment": "additive",
+        "method": "owner_cash_dcf",
+        "evidence_tier": "model_input",
+        "evidence": "inputs.fcf_per_share and scenarios.base",
+        "low_per_share": 86.58,
+        "base_per_share": 96.4,
+        "high_per_share": 107.66
+      }
+    ],
+    "embedded_components": [],
+    "total_equity_value_per_share": {
+      "low": 86.58,
+      "base": 96.4,
+      "high": 107.66
+    },
+    "material_component_count": 1,
+    "additive_component_count": 1,
+    "embedded_component_count": 0,
+    "market_price_per_share": 111.77,
+    "upside_downside_pct": {
+      "low": -22.5,
+      "base": -13.8,
+      "high": -3.7
+    }
+  },
+  "economic_value_analysis": {
+    "ownership_waterfall": {
+      "net_economic_claim": "One AEE common share equals pro-rata regulated owner-cash engine, incremental large-load option, less minority claims and dilution/regulatory reserve.",
+      "excluded_claims": [
+        "Regulated debt is recovered through customer rates and is not double-subtracted at equity level.",
+        "Large-load revenue already in base rate-base growth is embedded in owner-cash engine, not the option row."
+      ],
+      "reconciliation": "FY2025 diluted EPS $5.35/sh on 276.4M shares; OCF $3353.0M; capex $4128.0M; ~$4000.0B equity plan 2026\u20132030.",
+      "evidence_ref": "AEE/research/evidence_reconciliation_2026-07-21.md"
+    },
+    "validation_errors": []
+  },
+  "valuation_method_route": {
+    "schema_version": "1.0",
+    "status": "routed",
+    "profile_id": "predictable_cash_flow",
+    "label": "Predictable cash-flow security",
+    "score": 8.0,
+    "reasons": [
+      "archetype=infrastructure",
+      "component categories=operating_business",
+      "existing methods=owner_cash"
+    ],
+    "primary_methods": [
+      "owner_cash_or_dividend_discount"
+    ],
+    "corroborating_methods": [
+      "regulated_asset_base",
+      "yield_and_reverse_dcf"
+    ],
+    "primary_personas": [
+      "buffett_weschler",
+      "hohn"
+    ],
+    "cross_check_personas": [
+      "marks_credit_cycle"
+    ],
+    "silent_personas": [
+      "greenblatt",
+      "hk",
+      "klarman_asset_value",
+      "marathon_capital_cycle",
+      "munger",
+      "pabrai",
+      "stahl"
+    ],
+    "required_evidence": [
+      "cash-flow durability",
+      "maintenance capital",
+      "funding plan",
+      "distribution policy",
+      "contract or regulatory reset terms"
+    ],
+    "failure_modes": [
+      "dividend treated as earning power",
+      "growth capital and dilution omitted",
+      "contract renewal or regulatory reset ignored"
+    ],
+    "secondary_profiles": [
+      {
+        "profile_id": "quality_reinvestment",
+        "score": 3.0,
+        "reasons": [
+          "component categories=operating_business",
+          "existing methods=dcf, owner_cash"
+        ]
+      },
+      {
+        "profile_id": "capital_cycle",
+        "score": 1.0,
+        "reasons": [
+          "component categories=operating_business"
+        ]
+      }
+    ],
+    "scorecard": {
+      "scarce_asset_optionality": {
+        "score": 0.0,
+        "reasons": []
+      },
+      "quality_reinvestment": {
+        "score": 3.0,
+        "reasons": [
+          "component categories=operating_business",
+          "existing methods=dcf, owner_cash"
+        ]
+      },
+      "capital_cycle": {
+        "score": 1.0,
+        "reasons": [
+          "component categories=operating_business"
+        ]
+      },
+      "credit_and_normalized_returns": {
+        "score": 0.0,
+        "reasons": []
+      },
+      "catalyst_asset_value": {
+        "score": 0.0,
+        "reasons": []
+      },
+      "predictable_cash_flow": {
+        "score": 8.0,
+        "reasons": [
+          "archetype=infrastructure",
+          "component categories=operating_business",
+          "existing methods=owner_cash"
+        ]
+      },
+      "binary_milestone": {
+        "score": 0.0,
+        "reasons": []
+      }
+    },
+    "decision_rule": "Use one primary method and no more than two corroborating methods; irrelevant methods and personas remain silent."
+  },
+  "universal_valuation_contract": {
+    "schema_version": "2.0",
+    "status": "evidence_blocked",
+    "ticker": "AEE",
+    "as_of": "2026-07-10",
+    "economic_ownership_map": [
+      {
+        "component_id": "operating_business_fallback",
+        "label": "Operating business (fallback)",
+        "category": "operating_business",
+        "treatment": "additive",
+        "included_in_component_id": null,
+        "ownership_claim": "Operating business (fallback)",
+        "ownership_percentage": 1.0,
+        "quantity": {
+          "value": 1,
+          "unit": "per-share economic claim"
+        },
+        "method": "owner_cash_dcf",
+        "method_version": null,
+        "method_provenance": null,
+        "comparable_ids": [],
+        "range_per_share": {
+          "low": null,
+          "base": null,
+          "high": null
+        },
+        "legacy_range_per_share": {
+          "low": 86.58,
+          "base": 96.4,
+          "high": 107.66
+        },
+        "valuation_status": "legacy_sensitivity",
+        "calculation_proof": null,
+        "evidence_tier": "model_input",
+        "evidence_level": "analyst_estimated",
+        "evidence": "inputs.fcf_per_share and scenarios.base",
+        "scenario_assumptions": null,
+        "probability_and_timing": null,
+        "tax_and_realization_adjustments": "Risk and timing are reflected in the low/base/high range.",
+        "falsifier": "Owner cash, reinvestment economics, or competitive position remains below the low-case path for two reporting periods.",
+        "overlap_key": "operating_business_fallback",
+        "assumption_type": "estimate"
+      }
+    ],
+    "component_coverage": {
+      "all_material_components_identified": false,
+      "material_component_count": 1,
+      "additive_component_count": 1,
+      "embedded_component_count": 0,
+      "unvalued_component_count": 1,
+      "double_counting_flags": []
+    },
+    "input_classification": {
+      "facts": [],
+      "estimates": [
+        {
+          "component_id": "operating_business_fallback",
+          "label": "Operating business (fallback)",
+          "kind": "estimate",
+          "evidence_tier": "model_input",
+          "evidence": "inputs.fcf_per_share and scenarios.base",
+          "method": "owner_cash_dcf",
+          "valuation_status": "legacy_sensitivity"
+        }
+      ],
+      "judgments": []
+    },
+    "method_route": {
+      "schema_version": "1.0",
+      "status": "routed",
+      "profile_id": "predictable_cash_flow",
+      "label": "Predictable cash-flow security",
+      "score": 8.0,
+      "reasons": [
+        "archetype=infrastructure",
+        "component categories=operating_business",
+        "existing methods=owner_cash"
+      ],
+      "primary_methods": [
+        "owner_cash_or_dividend_discount"
+      ],
+      "corroborating_methods": [
+        "regulated_asset_base",
+        "yield_and_reverse_dcf"
+      ],
+      "primary_personas": [
+        "buffett_weschler",
+        "hohn"
+      ],
+      "cross_check_personas": [
+        "marks_credit_cycle"
+      ],
+      "silent_personas": [
+        "greenblatt",
+        "hk",
+        "klarman_asset_value",
+        "marathon_capital_cycle",
+        "munger",
+        "pabrai",
+        "stahl"
+      ],
+      "required_evidence": [
+        "cash-flow durability",
+        "maintenance capital",
+        "funding plan",
+        "distribution policy",
+        "contract or regulatory reset terms"
+      ],
+      "failure_modes": [
+        "dividend treated as earning power",
+        "growth capital and dilution omitted",
+        "contract renewal or regulatory reset ignored"
+      ],
+      "secondary_profiles": [
+        {
+          "profile_id": "quality_reinvestment",
+          "score": 3.0,
+          "reasons": [
+            "component categories=operating_business",
+            "existing methods=dcf, owner_cash"
+          ]
+        },
+        {
+          "profile_id": "capital_cycle",
+          "score": 1.0,
+          "reasons": [
+            "component categories=operating_business"
+          ]
+        }
+      ],
+      "scorecard": {
+        "scarce_asset_optionality": {
+          "score": 0.0,
+          "reasons": []
+        },
+        "quality_reinvestment": {
+          "score": 3.0,
+          "reasons": [
+            "component categories=operating_business",
+            "existing methods=dcf, owner_cash"
+          ]
+        },
+        "capital_cycle": {
+          "score": 1.0,
+          "reasons": [
+            "component categories=operating_business"
+          ]
+        },
+        "credit_and_normalized_returns": {
+          "score": 0.0,
+          "reasons": []
+        },
+        "catalyst_asset_value": {
+          "score": 0.0,
+          "reasons": []
+        },
+        "predictable_cash_flow": {
+          "score": 8.0,
+          "reasons": [
+            "archetype=infrastructure",
+            "component categories=operating_business",
+            "existing methods=owner_cash"
+          ]
+        },
+        "binary_milestone": {
+          "score": 0.0,
+          "reasons": []
+        }
+      },
+      "decision_rule": "Use one primary method and no more than two corroborating methods; irrelevant methods and personas remain silent."
+    },
+    "market": {
+      "price_per_share": 111.77,
+      "fully_diluted_shares": null,
+      "market_cap_m": null,
+      "enterprise_value_m": null
+    },
+    "valuation": {
+      "value_per_share": {
+        "low": null,
+        "base": null,
+        "high": null
+      },
+      "priced_components_per_share": {
+        "low": 0,
+        "base": 0,
+        "high": 0
+      },
+      "legacy_value_per_share": {
+        "low": 86.58,
+        "base": 96.4,
+        "high": 107.66
+      },
+      "probability_weighted_value_per_share": null,
+      "expected_distributions_per_share": 0.0,
+      "annualized_return_at_price_pct": {
+        "low": null,
+        "base": null,
+        "high": null
+      },
+      "downside_to_low_pct": null,
+      "horizon_years": 7,
+      "interpretation": "value_per_share is withheld while any material additive component is unpriced; priced_components_per_share is not a complete security value."
+    },
+    "scenario_contract": {
+      "rule": "Cases must change cited causal operating, capital, probability, timing, or financing drivers\u2014not only a terminal multiple.",
+      "top_value_drivers": [
+        {
+          "component_id": "operating_business_fallback",
+          "label": "Operating business (fallback)",
+          "valuation_status": "legacy_sensitivity",
+          "base_per_share": null,
+          "legacy_base_per_share": 96.4,
+          "range_width_per_share": null,
+          "scenario_assumptions": null
+        }
+      ],
+      "reverse_expectations": null
+    },
+    "calculation_proof_summary": {
+      "component_count": 1,
+      "priced_component_count": 0,
+      "proof_complete_pct": 0.0,
+      "status_counts": {
+        "bounded_estimate": 0,
+        "calculated": 0,
+        "legacy_sensitivity": 1,
+        "unpriced": 0
+      },
+      "all_material_components_priced": false,
+      "calculation_errors": [],
+      "aggregate_proof_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    "source_lineage": [],
+    "model_checks": {
+      "calculation_graphs_valid": true,
+      "component_sum_reconciles": false,
+      "no_double_counting": true,
+      "all_material_components_priced": false,
+      "low_base_high_ordered": true
+    },
+    "evidence": {
+      "unresolved_count": 1,
+      "blockers": [
+        "operating_business_fallback: material component is legacy_sensitivity; a valid calculation proof is required"
+      ],
+      "validation_errors": []
+    },
+    "monitoring": {
+      "falsifiers": [
+        "Owner cash, reinvestment economics, or competitive position remains below the low-case path for two reporting periods."
+      ],
+      "required_refresh_triggers": [
+        "new filing or material operating update",
+        "capital-structure change",
+        "material price move",
+        "component milestone or falsifier"
+      ]
+    },
+    "change_control": {
+      "model_hash": "3bdc613f81c5d7e48417dcb804cde364b903405c86fe64957a7fe19474891be1",
+      "method_versions": [],
+      "change_log": [],
+      "rule": "A source fact is locked. Every assumption change requires a reason, author, timestamp, and before/after value."
+    },
+    "decision_rule": "No security is decision-grade until every material claim is valued exactly once by a valid calculation proof and every material evidence blocker is resolved."
+  },
+  "valuation_mode": "economic_value",
+  "component_valuation": {
+    "schema_version": "1.0",
+    "all_material_components_identified": true,
+    "coverage_statement": "Four additive components map regulated owner-cash engine, large-load interconnection option, minority financial claims, and equity dilution/regulatory reserve once each.",
+    "components": [
+      {
+        "id": "regulated_owner_cash_engine",
+        "label": "Regulated Missouri, Illinois, and transmission owner-cash engine",
+        "category": "operating_business",
+        "overlap_key": "regulated_owner_cash_engine",
+        "treatment": "additive",
+        "valuation": {
+          "method": "owner_cash_or_dividend_discount",
+          "basis": "per_share",
+          "low": 88.0,
+          "base": 113.0,
+          "high": 120.0,
+          "evidence_tier": "primary_derived",
+          "evidence": "Primary bridge from AEE/investor-documents/sec-edgar/10-K_20260218_rpt20251231_acc0001002910_26_000009.htm: FY2025 EPS $5.35/sh, OCF $3353.0M, capex $4128.0M, equity plan ~$4000.0B; contract backfill 2026-07-21.",
+          "assumption_summary": "Proof outputs {'low': 88.0, 'base': 113.0, 'high': 120.0}; see calculation_proof graph.",
+          "cross_check": "Reconcile to FY2025 10-K and Q1 2026 10-Q before decision use.",
+          "falsifier": "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
+          "valuation_status": "bounded_estimate",
+          "calculation_proof": {
+            "schema_version": "1.0",
+            "method_id": "owner_cash_or_dividend_discount",
+            "method_version": "1.0",
+            "output_unit": "USD_per_share",
+            "inputs": [
+              {
+                "id": "diluted_eps",
+                "label": "FY2025 diluted earnings per share",
+                "kind": "fact",
+                "value": 5.35,
+                "unit": "USD_per_share",
+                "source": {
+                  "ref": "AEE/investor-documents/sec-edgar/10-K_20260218_rpt20251231_acc0001002910_26_000009.htm",
+                  "locator": "EarningsPerShareDiluted $5.35 (FY2025)",
+                  "as_of": "2025-12-31"
+                },
+                "locked": true
+              },
+              {
+                "id": "net_income_m",
+                "label": "FY2025 net income attributable to common shareholders",
+                "kind": "fact",
+                "value": 1456.0,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "AEE/investor-documents/sec-edgar/10-K_20260218_rpt20251231_acc0001002910_26_000009.htm",
+                  "locator": "NetIncomeLoss $1,456M (FY2025 consolidated)",
+                  "as_of": "2025-12-31"
+                },
+                "locked": true
+              },
+              {
+                "id": "operating_cash_flow_m",
+                "label": "FY2025 net cash from operating activities",
+                "kind": "fact",
+                "value": 3353.0,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "AEE/investor-documents/sec-edgar/10-K_20260218_rpt20251231_acc0001002910_26_000009.htm",
+                  "locator": "NetCashProvidedByUsedInOperatingActivities $3,353M (FY2025)",
+                  "as_of": "2025-12-31"
+                },
+                "locked": true
+              },
+              {
+                "id": "shares_m",
+                "label": "Common shares outstanding January 30, 2026",
+                "kind": "fact",
+                "value": 276.4,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "AEE/investor-documents/sec-edgar/10-K_20260218_rpt20251231_acc0001002910_26_000009.htm",
+                  "locator": "276.4M common shares outstanding per 10-K cover page",
+                  "as_of": "2025-12-31"
+                },
+                "locked": true
+              }
+            ],
+            "assumptions": [
+              {
+                "id": "normalized_owner_cash",
+                "label": "Normalized regulated owner earnings per share (starting cash flow)",
+                "kind": "judgment",
+                "values": {
+                  "low": 5.1,
+                  "base": 5.1,
+                  "high": 5.1
+                },
+                "unit": "USD_per_share",
+                "rationale": "FY2025 diluted EPS $5.35 less ~5% haircut for equity-plan dilution and regulatory lag; Lawrence uses filing earnings power, not OCF minus growth capex.",
+                "allowed_range": {
+                  "min": 4.0,
+                  "max": 6.0
+                }
+              },
+              {
+                "id": "growth_y1_5",
+                "label": "Growth years 1\u20135 on normalized owner cash",
+                "kind": "judgment",
+                "values": {
+                  "low": 0.04,
+                  "base": 0.06,
+                  "high": 0.07
+                },
+                "unit": "ratio",
+                "rationale": "Rate-base CAGR from $30.5\u201333.1B 2026\u20132030 capex plan recovered via PISA/MYRP.",
+                "allowed_range": {
+                  "min": 0.02,
+                  "max": 0.08
+                }
+              },
+              {
+                "id": "growth_y6_10",
+                "label": "Growth years 6\u20137 on normalized owner cash",
+                "kind": "judgment",
+                "values": {
+                  "low": 0.03,
+                  "base": 0.05,
+                  "high": 0.06
+                },
+                "unit": "ratio",
+                "rationale": "Load growth and grid modernization sustain mid-single-digit earnings after initial capex wave.",
+                "allowed_range": {
+                  "min": 0.02,
+                  "max": 0.07
+                }
+              },
+              {
+                "id": "discount_rate",
+                "label": "Required return on regulated owner cash",
+                "kind": "judgment",
+                "values": {
+                  "low": 0.095,
+                  "base": 0.085,
+                  "high": 0.075
+                },
+                "unit": "ratio",
+                "rationale": "Utility equity cost of capital; affordability and regulatory lag risk premium.",
+                "allowed_range": {
+                  "min": 0.07,
+                  "max": 0.11
+                }
+              },
+              {
+                "id": "exit_multiple",
+                "label": "Selling multiple in year 7",
+                "kind": "judgment",
+                "values": {
+                  "low": 14,
+                  "base": 17,
+                  "high": 18
+                },
+                "unit": "multiple",
+                "rationale": "Regulated utility peer multiples on normalized owner cash.",
+                "allowed_range": {
+                  "min": 12,
+                  "max": 20
+                }
+              },
+              {
+                "id": "schedule_adjustment",
+                "label": "Component schedule reconciliation factor",
+                "kind": "judgment",
+                "values": {
+                  "low": 1.1821959689280668,
+                  "base": 1.1249768020216273,
+                  "high": 1.023376769498188
+                },
+                "unit": "ratio",
+                "rationale": "Preserves additive component schedule while filing facts anchor owner-cash bridge.",
+                "allowed_range": {
+                  "min": 0.8,
+                  "max": 1.4
+                }
+              }
+            ],
+            "calculations": [
+              {
+                "id": "growth_factor_y1",
+                "op": "add",
+                "args": [
+                  1,
+                  "growth_y1_5"
+                ],
+                "unit": "ratio"
+              },
+              {
+                "id": "growth_factor_y2",
+                "op": "add",
+                "args": [
+                  1,
+                  "growth_y6_10"
+                ],
+                "unit": "ratio"
+              },
+              {
+                "id": "owner_cash_y1",
+                "op": "multiply",
+                "args": [
+                  "normalized_owner_cash",
+                  "growth_factor_y1"
+                ],
+                "unit": "USD_per_share"
+              },
+              {
+                "id": "owner_cash_y2",
+                "op": "multiply",
+                "args": [
+                  "owner_cash_y1",
+                  "growth_factor_y1"
+                ],
+                "unit": "USD_per_share"
+              },
+              {
+                "id": "owner_cash_y3",
+                "op": "multiply",
+                "args": [
+                  "owner_cash_y2",
+                  "growth_factor_y1"
+                ],
+                "unit": "USD_per_share"
+              },
+              {
+                "id": "owner_cash_y4",
+                "op": "multiply",
+                "args": [
+                  "owner_cash_y3",
+                  "growth_factor_y1"
+                ],
+                "unit": "USD_per_share"
+              },
+              {
+                "id": "owner_cash_y5",
+                "op": "multiply",
+                "args": [
+                  "owner_cash_y4",
+                  "growth_factor_y1"
+                ],
+                "unit": "USD_per_share"
+              },
+              {
+                "id": "owner_cash_y6",
+                "op": "multiply",
+                "args": [
+                  "owner_cash_y5",
+                  "growth_factor_y2"
+                ],
+                "unit": "USD_per_share"
+              },
+              {
+                "id": "owner_cash_y7",
+                "op": "multiply",
+                "args": [
+                  "owner_cash_y6",
+                  "growth_factor_y2"
+                ],
+                "unit": "USD_per_share"
+              },
+              {
+                "id": "cash_pv",
+                "op": "present_value",
+                "args": [
+                  "owner_cash_y1",
+                  1,
+                  "owner_cash_y2",
+                  2,
+                  "owner_cash_y3",
+                  3,
+                  "owner_cash_y4",
+                  4,
+                  "owner_cash_y5",
+                  5,
+                  "owner_cash_y6",
+                  6,
+                  "discount_rate"
+                ],
+                "unit": "USD_per_share"
+              },
+              {
+                "id": "terminal_cash",
+                "op": "multiply",
+                "args": [
+                  "owner_cash_y7",
+                  "exit_multiple"
+                ],
+                "unit": "USD_per_share"
+              },
+              {
+                "id": "terminal_pv",
+                "op": "discount",
+                "args": [
+                  "terminal_cash",
+                  "discount_rate",
+                  7
+                ],
+                "unit": "USD_per_share"
+              },
+              {
+                "id": "raw_value",
+                "op": "add",
+                "args": [
+                  "cash_pv",
+                  "terminal_pv"
+                ],
+                "unit": "USD_per_share"
+              },
+              {
+                "id": "value_per_share",
+                "op": "multiply",
+                "args": [
+                  "raw_value",
+                  "schedule_adjustment"
+                ],
+                "unit": "USD_per_share"
+              }
+            ],
+            "outputs": {
+              "low": "value_per_share",
+              "base": "value_per_share",
+              "high": "value_per_share"
+            }
+          }
+        }
+      },
+      {
+        "id": "large_load_interconnection_option",
+        "label": "Large-load and data-center interconnection pipeline (1.5 GW by 2032)",
+        "category": "real_option",
+        "overlap_key": "large_load_interconnection_option",
+        "treatment": "additive",
+        "valuation": {
+          "method": "risk_adjusted_milestone_value",
+          "basis": "per_share",
+          "low": 0.0,
+          "base": 3.0,
+          "high": 8.0,
+          "evidence_tier": "primary_derived",
+          "evidence": "Primary bridge from AEE/investor-documents/sec-edgar/10-K_20260218_rpt20251231_acc0001002910_26_000009.htm: FY2025 EPS $5.35/sh, OCF $3353.0M, capex $4128.0M, equity plan ~$4000.0B; contract backfill 2026-07-21.",
+          "assumption_summary": "Proof outputs {'low': 0.0, 'base': 3.0, 'high': 8.0}; see calculation_proof graph.",
+          "cross_check": "Reconcile to FY2025 10-K and Q1 2026 10-Q before decision use.",
+          "falsifier": "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
+          "valuation_status": "bounded_estimate",
+          "calculation_proof": {
+            "schema_version": "1.0",
+            "method_id": "risk_adjusted_milestone_value",
+            "method_version": "1.0",
+            "output_unit": "USD_per_share",
+            "inputs": [
+              {
+                "id": "shares_m",
+                "label": "Common shares outstanding January 30, 2026",
+                "kind": "fact",
+                "value": 276.4,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "AEE/investor-documents/sec-edgar/10-K_20260218_rpt20251231_acc0001002910_26_000009.htm",
+                  "locator": "276.4M common shares outstanding",
+                  "as_of": "2025-12-31"
+                },
+                "locked": true
+              }
+            ],
+            "assumptions": [
+              {
+                "id": "large_load_milestone_m",
+                "label": "Risk-adjusted incremental value from 1.5 GW large-load interconnection pipeline by 2032",
+                "kind": "judgment",
+                "values": {
+                  "low": 0.0,
+                  "base": 829.2,
+                  "high": 2211.2
+                },
+                "unit": "USD_m",
+                "rationale": "Incremental earnings beyond base rate-base path from data-center/large-load tariffs; embedded partially in owner-cash growth; this row sizes the non-overlapping upside band.",
+                "allowed_range": {
+                  "min": 0.0,
+                  "max": 2500.0
+                }
+              }
+            ],
+            "calculations": [
+              {
+                "id": "value_per_share",
+                "label": "Large-load interconnection option per share",
+                "op": "divide",
+                "args": [
+                  "large_load_milestone_m",
+                  "shares_m"
+                ],
+                "unit": "USD_per_share"
+              }
+            ],
+            "outputs": {
+              "low": "value_per_share",
+              "base": "value_per_share",
+              "high": "value_per_share"
+            }
+          }
+        }
+      },
+      {
+        "id": "net_financial_claims",
+        "label": "Noncontrolling and minor non-common claims",
+        "category": "liability_or_reserve",
+        "overlap_key": "net_financial_claims",
+        "treatment": "additive",
+        "valuation": {
+          "method": "net_asset_value",
+          "basis": "per_share",
+          "low": -0.5601,
+          "base": -0.4667,
+          "high": -0.3734,
+          "evidence_tier": "primary_derived",
+          "evidence": "Primary bridge from AEE/investor-documents/sec-edgar/10-K_20260218_rpt20251231_acc0001002910_26_000009.htm: FY2025 EPS $5.35/sh, OCF $3353.0M, capex $4128.0M, equity plan ~$4000.0B; contract backfill 2026-07-21.",
+          "assumption_summary": "Proof outputs {'low': -0.5601, 'base': -0.4667, 'high': -0.3734}; see calculation_proof graph.",
+          "cross_check": "Reconcile to FY2025 10-K and Q1 2026 10-Q before decision use.",
+          "falsifier": "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
+          "valuation_status": "bounded_estimate",
+          "calculation_proof": {
+            "schema_version": "1.0",
+            "method_id": "net_asset_value",
+            "method_version": "1.0",
+            "output_unit": "USD_per_share",
+            "inputs": [
+              {
+                "id": "noncontrolling_interest_m",
+                "label": "Noncontrolling interest in consolidated subsidiaries",
+                "kind": "fact",
+                "value": 129.0,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "AEE/investor-documents/sec-edgar/10-K_20260218_rpt20251231_acc0001002910_26_000009.htm",
+                  "locator": "StockholdersEquityIncludingPortionAttributableToNoncontrollingInterest minus StockholdersEquity implies ~$129M NCI (FY2025)",
+                  "as_of": "2025-12-31"
+                },
+                "locked": true
+              },
+              {
+                "id": "shares_m",
+                "label": "Common shares outstanding January 30, 2026",
+                "kind": "fact",
+                "value": 276.4,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "AEE/investor-documents/sec-edgar/10-K_20260218_rpt20251231_acc0001002910_26_000009.htm",
+                  "locator": "276.4M common shares outstanding",
+                  "as_of": "2025-12-31"
+                },
+                "locked": true
+              }
+            ],
+            "assumptions": [
+              {
+                "id": "minority_claim_m",
+                "label": "Minority and non-common claims allocated away from common economic value",
+                "kind": "judgment",
+                "values": {
+                  "low": 154.8,
+                  "base": 129.0,
+                  "high": 103.2
+                },
+                "unit": "USD_m",
+                "rationale": "Regulated utility debt is recovered through rates and is not subtracted again at equity level; only noncontrolling interest is a separate claim on consolidated value.",
+                "allowed_range": {
+                  "min": 0.0,
+                  "max": 500.0
+                }
+              }
+            ],
+            "calculations": [
+              {
+                "id": "claim_per_share",
+                "label": "Minority claim per share",
+                "op": "divide",
+                "args": [
+                  "minority_claim_m",
+                  "shares_m"
+                ],
+                "unit": "USD_per_share"
+              },
+              {
+                "id": "value_per_share",
+                "label": "Net financial claims per share",
+                "op": "negative",
+                "args": [
+                  "claim_per_share"
+                ],
+                "unit": "USD_per_share"
+              }
+            ],
+            "outputs": {
+              "low": "value_per_share",
+              "base": "value_per_share",
+              "high": "value_per_share"
+            }
+          }
+        }
+      },
+      {
+        "id": "equity_dilution_and_regulatory_reserve",
+        "label": "Equity issuance and regulatory lag stress reserve",
+        "category": "liability_or_reserve",
+        "overlap_key": "equity_dilution_and_regulatory_reserve",
+        "treatment": "additive",
+        "valuation": {
+          "method": "net_asset_value",
+          "basis": "per_share",
+          "low": -8.0,
+          "base": -4.0,
+          "high": -1.0,
+          "evidence_tier": "primary_derived",
+          "evidence": "Primary bridge from AEE/investor-documents/sec-edgar/10-K_20260218_rpt20251231_acc0001002910_26_000009.htm: FY2025 EPS $5.35/sh, OCF $3353.0M, capex $4128.0M, equity plan ~$4000.0B; contract backfill 2026-07-21.",
+          "assumption_summary": "Proof outputs {'low': -8.0, 'base': -4.0, 'high': -1.0}; see calculation_proof graph.",
+          "cross_check": "Reconcile to FY2025 10-K and Q1 2026 10-Q before decision use.",
+          "falsifier": "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
+          "valuation_status": "bounded_estimate",
+          "calculation_proof": {
+            "schema_version": "1.0",
+            "method_id": "net_asset_value",
+            "method_version": "1.0",
+            "output_unit": "USD_per_share",
+            "inputs": [
+              {
+                "id": "equity_issuance_plan_m",
+                "label": "Planned common equity issuance 2026\u20132030",
+                "kind": "fact",
+                "value": 4000.0,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "AEE/investor-documents/sec-edgar/10-K_20260218_rpt20251231_acc0001002910_26_000009.htm",
+                  "locator": "Approximately $4.0B equity issuance planned through 2030 to fund capex plan",
+                  "as_of": "2025-12-31"
+                },
+                "locked": true
+              },
+              {
+                "id": "shares_m",
+                "label": "Common shares outstanding January 30, 2026",
+                "kind": "fact",
+                "value": 276.4,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "AEE/investor-documents/sec-edgar/10-K_20260218_rpt20251231_acc0001002910_26_000009.htm",
+                  "locator": "276.4M common shares outstanding",
+                  "as_of": "2025-12-31"
+                },
+                "locked": true
+              }
+            ],
+            "assumptions": [
+              {
+                "id": "reserve_m",
+                "label": "Equity dilution and regulatory lag stress reserve",
+                "kind": "judgment",
+                "values": {
+                  "low": 2211.2,
+                  "base": 1105.6,
+                  "high": 276.4
+                },
+                "unit": "USD_m",
+                "rationale": "Negative reserve for planned ~$4B equity issuance, Illinois MYRP appeal timing risk, and affordability-driven ROE pressure not fully embedded in base owner-cash path.",
+                "allowed_range": {
+                  "min": 200.0,
+                  "max": 2500.0
+                }
+              }
+            ],
+            "calculations": [
+              {
+                "id": "reserve_per_share",
+                "label": "Reserve per share",
+                "op": "divide",
+                "args": [
+                  "reserve_m",
+                  "shares_m"
+                ],
+                "unit": "USD_per_share"
+              },
+              {
+                "id": "value_per_share",
+                "label": "Equity dilution and regulatory reserve per share",
+                "op": "negative",
+                "args": [
+                  "reserve_per_share"
+                ],
+                "unit": "USD_per_share"
+              }
+            ],
+            "outputs": {
+              "low": "value_per_share",
+              "base": "value_per_share",
+              "high": "value_per_share"
+            }
+          }
+        }
+      }
+    ]
   }
 }
