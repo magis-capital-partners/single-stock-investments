@@ -13,10 +13,10 @@
   "inputs": {
     "price": 7.0,
     "price_source": "Yahoo FRMO close 2026-07-20",
-    "book_per_share": 8.55,
+    "book_per_share": 7.3,
     "normalization_note": "Optionality overlay: SOTP + catalyst stack. Price below FRMO-attributable book.",
     "book_per_share_filed": 8.56,
-    "book_per_share_current": 8.55,
+    "book_per_share_current": 7.3,
     "shares_outstanding": 44022781,
     "shares_source": "FRMO/research/valuation.json pre-existing base SOTP shares, sourced to 2026-02-28_Quarterly_Report.pdf. [HUMAN REVIEW] confirm latest diluted count.",
     "price_as_of": "2026-07-20"
@@ -25,15 +25,15 @@
     "framework": "holdco_sotp",
     "floor_pass": true,
     "floor_metric": "book_per_share",
-    "floor_value": 8.55,
+    "floor_value": 7.3,
     "primary_metric": "lawrence_base",
     "primary_label": "annualized return",
     "primary_return_pct": 21.9,
     "incumbent_sleeve": true,
     "notes": "Trades ~22% below book ($8.55); same SOTP payoffs as prior refresh. HK/MIAX/CMSG catalysts unchanged.",
     "floor_value_filed": 8.56,
-    "floor_value_current": 8.55,
-    "discount_to_current_book_pct": 18.1
+    "floor_value_current": 7.3,
+    "discount_to_current_book_pct": 8.2
   },
   "scenarios": {
     "bear": {
@@ -371,15 +371,15 @@
   },
   "overlay_results": [],
   "book_estimate": {
-    "as_of": "2026-07-21",
+    "as_of": "2026-06-02",
     "filing_period_end": "2026-02-28",
     "filing_source": "investor-documents/ir-frmo/2026-02-28_Quarterly_Report.pdf",
     "filed_book_per_share": 8.56,
-    "current_book_per_share": 8.55,
-    "delta_per_share": -0.0,
-    "delta_pct_of_filed_book": -0.06,
-    "discount_to_filed_book_pct": 18.2,
-    "discount_to_current_estimate_pct": 18.1,
+    "current_book_per_share": 7.3,
+    "delta_per_share": -1.25,
+    "delta_pct_of_filed_book": -14.66,
+    "discount_to_filed_book_pct": 21.7,
+    "discount_to_current_estimate_pct": 8.2,
     "config_path": "FRMO/research/book_estimate_config.json",
     "output_path": "FRMO/research/book_estimate.json"
   },
@@ -504,10 +504,10 @@
     "notes": "Capstone IRR combining filings, segments, overlays, third-party, qualitative"
   },
   "evidence_refresh": {
-    "synthesis_in_dive": false
+    "synthesis_in_dive": true
   },
   "context_overlay": {
-    "as_of": "2026-07-21",
+    "as_of": "2026-07-20",
     "disclaimer": "Context only. Tailwinds inform stance and overlay sizing; they do not auto-inflate Lawrence base IRR. Promotion to base case requires [HUMAN REVIEW].",
     "themes": [
       {
@@ -517,9 +517,9 @@
           {
             "id": "hy_oas",
             "label": "High-yield OAS credit spread (%)",
-            "latest": 1.43,
+            "latest": 1.3,
             "as_of": "2026-07-20",
-            "yoy_pct": 248.8,
+            "yoy_pct": 217.1,
             "direction": "up",
             "good_for": "risk_regime",
             "source": "spread:HYG-LQD:21d (HYG-LQD 1m spread proxy, not OAS)",
@@ -529,9 +529,9 @@
           {
             "id": "ust_10y",
             "label": "US Treasury 10Y yield (%)",
-            "latest": 4.5980000495910645,
+            "latest": 4.579999923706055,
             "as_of": "2026-07-20",
-            "yoy_pct": 5.2,
+            "yoy_pct": 4.8,
             "direction": "up",
             "good_for": "rates_regime",
             "source": "yahoo:^TNX",
@@ -541,9 +541,9 @@
           {
             "id": "ust_2y",
             "label": "US Treasury 2Y yield (%)",
-            "latest": 4.328000068664551,
+            "latest": 4.314000129699707,
             "as_of": "2026-07-20",
-            "yoy_pct": 10.7,
+            "yoy_pct": 10.4,
             "direction": "up",
             "good_for": "rates_regime",
             "source": "yahoo:^FVX",
@@ -553,8 +553,8 @@
           {
             "id": "dxy_broad",
             "label": "Trade-weighted USD index (broad)",
-            "latest": 100.98600006103516,
-            "as_of": "2026-07-21",
+            "latest": 100.93699645996094,
+            "as_of": "2026-07-20",
             "yoy_pct": 3.2,
             "direction": "up",
             "good_for": "dollar_regime",
@@ -565,9 +565,9 @@
           {
             "id": "vix_level",
             "label": "VIX index level",
-            "latest": 18.649999618530273,
+            "latest": 18.280000686645508,
             "as_of": "2026-07-20",
-            "yoy_pct": 12.0,
+            "yoy_pct": 9.8,
             "direction": "up",
             "good_for": "vol_regime",
             "source": "yahoo:^VIX",
@@ -577,9 +577,9 @@
           {
             "id": "credit_impulse_1m",
             "label": "HYG vs TLT 1-month return spread (%)",
-            "latest": 2.76,
+            "latest": 2.52,
             "as_of": "2026-07-20",
-            "yoy_pct": 55.9,
+            "yoy_pct": 42.4,
             "direction": "up",
             "good_for": "credit_impulse",
             "source": "spread:HYG-TLT:21d",
@@ -589,9 +589,9 @@
           {
             "id": "spy_20d_realized_vol",
             "label": "SPY 20-day realized vol (annualized %)",
-            "latest": 11.37,
+            "latest": 11.39,
             "as_of": "2026-07-20",
-            "yoy_pct": 31.3,
+            "yoy_pct": 31.5,
             "direction": "up",
             "good_for": "equity_vol",
             "source": "realized_vol:SPY:20d",
@@ -603,32 +603,50 @@
     ]
   },
   "lens_consensus": {
-    "as_of": "2026-07-21",
-    "shared_inputs_ref": "valuation.json@2026-07-21",
+    "as_of": "2026-05-26",
+    "shared_inputs_ref": "valuation.json@2026-05-26",
     "valuation_richness": 0.0,
-    "blended_return_pct": 20.24,
+    "blended_return_pct": 19.78,
     "band_pct": [
       7.2,
       26.01
     ],
     "weighted_median_pct": 21.9,
     "median_mean_flag": false,
-    "stance": "accumulate",
-    "agreement_pct": 86,
-    "dissent_count": 1,
-    "lawrence_divergence": false,
+    "stance": "hold",
+    "agreement_pct": 0,
+    "dissent_count": 8,
+    "lawrence_divergence": true,
     "top_dissents": [
       {
-        "persona": "pabrai",
-        "label": "Mohnish Pabrai",
-        "verdict": "watch",
-        "return_pct": 7.2,
-        "key_metric": "downside_upside_ratio=0.239",
-        "conviction": 0.39,
-        "falsifier": "dhando -> none OR net-debt/EBITDA > 3 OR bear return < -15%"
+        "persona": "stahl",
+        "label": "Murray Stahl",
+        "verdict": "accumulate",
+        "return_pct": 21.9,
+        "key_metric": "archetype=holding_co",
+        "conviction": 0.595,
+        "falsifier": "No asset intensity / pricing power (moat eroding + non-croupier)"
+      },
+      {
+        "persona": "hk",
+        "label": "Horizon Kinetics",
+        "verdict": "accumulate",
+        "return_pct": 23.9,
+        "key_metric": "payoff_lens=pending",
+        "conviction": 0.595,
+        "falsifier": "No dated contractual payoff or royalty/trust structure"
+      },
+      {
+        "persona": "lawrence",
+        "label": "Lawrence (house IRR)",
+        "verdict": "accumulate",
+        "return_pct": 26.01,
+        "key_metric": "synthesis_pct=26.01",
+        "conviction": 0.551,
+        "falsifier": "Synthesis incomplete or irr_method pending"
       }
     ],
-    "contributor_count": 11,
+    "contributor_count": 8,
     "in_base_irr": false,
     "disclaimer": "Advisory lens blend only. Does not replace Lawrence total-synthesis stance gate without [HUMAN REVIEW]."
   },
@@ -885,31 +903,7 @@
               "high": "value_per_share"
             }
           },
-          "valuation_status": "bounded_estimate",
-          "driver_model": {
-            "type": "milestone_project_option",
-            "timing_basis": "5-year catalyst window (MIAX lockup release, Winland control, CMSG/HKHC re-rate)",
-            "scenarios": {
-              "low": {
-                "success_value_m": 57.831,
-                "success_probability": 0.411,
-                "remaining_cost_m": 0.0,
-                "ownership_pct": 1.0
-              },
-              "base": {
-                "success_value_m": 57.831,
-                "success_probability": 0.716,
-                "remaining_cost_m": 0.0,
-                "ownership_pct": 1.0
-              },
-              "high": {
-                "success_value_m": 70.88,
-                "success_probability": 1.0,
-                "remaining_cost_m": 0.0,
-                "ownership_pct": 1.0
-              }
-            }
-          }
+          "valuation_status": "bounded_estimate"
         }
       },
       {
@@ -1145,12 +1139,7 @@
         "economic_claim": "Management-company and exchange interests",
         "valuation_basis": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
         "adjustments": "The low/base/high range incorporates ownership, tax, capital, cycle, timing, and realization uncertainty pending the primary bridge.",
-        "overlap_control": "Unique overlap key reinvestment_or_assets; no other component capitalizes the same claim.",
-        "risk_and_timing": {
-          "timing_basis": "5-year catalyst window aligned with Lawrence SOTP horizon",
-          "probability_basis": "Base 71.6% probability weights MIAX lockup release, Winland control, and HKHC re-rate",
-          "remaining_capital_basis": "Affiliate stakes already funded at FRMO parent; no incremental owner capital required for mark re-rate"
-        }
+        "overlap_control": "Unique overlap key reinvestment_or_assets; no other component capitalizes the same claim."
       },
       {
         "id": "net_financial_claims",
@@ -1376,53 +1365,11 @@
         "evidence_tier": "mixed_primary_and_estimate",
         "evidence": "Filing-backed proof from FRMO/investor-documents/ir-frmo/2026-02-28_Quarterly_Report.pdf; overlap_key=reinvestment_or_assets. Legacy Lawrence SOTP path remains separate stance gate.",
         "cross_check": "Non-overlapping component schedule reconciles to Q3 FY2026 quarterly report.",
-        "driver_model_type": "milestone_project_option",
-        "driver_model": {
-          "type": "milestone_project_option",
-          "timing_basis": "5-year catalyst window (MIAX lockup release, Winland control, CMSG/HKHC re-rate)",
-          "scenarios": {
-            "low": {
-              "success_value_m": 57.831,
-              "success_probability": 0.411,
-              "remaining_cost_m": 0.0,
-              "ownership_pct": 1.0
-            },
-            "base": {
-              "success_value_m": 57.831,
-              "success_probability": 0.716,
-              "remaining_cost_m": 0.0,
-              "ownership_pct": 1.0
-            },
-            "high": {
-              "success_value_m": 70.88,
-              "success_probability": 1.0,
-              "remaining_cost_m": 0.0,
-              "ownership_pct": 1.0
-            }
-          }
-        },
+        "driver_model_type": null,
+        "driver_model": null,
         "assumption_summary": "Proof outputs {'low': 0.5399, 'base': 0.9406, 'high': 1.6105}; see calculation_proof graph.",
         "falsifier": "Primary filing revises Investment A, affiliate marks, or share count >10% without matching proof update.",
-        "scenario_assumptions": {
-          "low": {
-            "success_value_m": 57.831,
-            "success_probability": 0.411,
-            "remaining_cost_m": 0.0,
-            "ownership_pct": 1.0
-          },
-          "base": {
-            "success_value_m": 57.831,
-            "success_probability": 0.716,
-            "remaining_cost_m": 0.0,
-            "ownership_pct": 1.0
-          },
-          "high": {
-            "success_value_m": 70.88,
-            "success_probability": 1.0,
-            "remaining_cost_m": 0.0,
-            "ownership_pct": 1.0
-          }
-        },
+        "scenario_assumptions": null,
         "low_per_share": 0.54,
         "base_per_share": 0.94,
         "high_per_share": 1.61
@@ -1646,7 +1593,7 @@
   },
   "economic_value_analysis": {
     "schema_version": "1.0",
-    "status": "complete",
+    "status": "evidence_blocked",
     "trigger": {
       "required": true,
       "reasons": [
@@ -1704,11 +1651,6 @@
         "valuation_basis": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
         "adjustments": "The low/base/high range incorporates ownership, tax, capital, cycle, timing, and realization uncertainty pending the primary bridge.",
         "overlap_control": "Unique overlap key reinvestment_or_assets; no other component capitalizes the same claim.",
-        "risk_and_timing": {
-          "timing_basis": "5-year catalyst window aligned with Lawrence SOTP horizon",
-          "probability_basis": "Base 71.6% probability weights MIAX lockup release, Winland control, and HKHC re-rate",
-          "remaining_capital_basis": "Affiliate stakes already funded at FRMO parent; no incremental owner capital required for mark re-rate"
-        },
         "risked_present_value_per_share": {
           "low": 0.54,
           "base": 0.94,
@@ -1777,8 +1719,8 @@
         "component_id": "reinvestment_or_assets",
         "economic_claim": "Management-company and exchange interests",
         "quantity": {
-          "value": 57.831,
-          "unit": "base success value, millions"
+          "value": 1,
+          "unit": "per-share economic claim"
         },
         "method": "probability_weighted_catalyst_nav",
         "evidence_tier": "mixed_primary_and_estimate",
@@ -1796,11 +1738,11 @@
         "overlap_control": "Unique overlap key reinvestment_or_assets; no other component capitalizes the same claim.",
         "falsifier": "Primary filing revises Investment A, affiliate marks, or share count >10% without matching proof update.",
         "risk_and_timing": {
-          "success_probability": 0.716,
-          "remaining_capital_m": 0.0,
-          "timing_basis": "5-year catalyst window aligned with Lawrence SOTP horizon",
-          "probability_basis": "Base 71.6% probability weights MIAX lockup release, Winland control, and HKHC re-rate",
-          "remaining_capital_basis": "Affiliate stakes already funded at FRMO parent; no incremental owner capital required for mark re-rate"
+          "success_probability": null,
+          "remaining_capital_m": null,
+          "timing_basis": null,
+          "probability_basis": null,
+          "remaining_capital_basis": null
         }
       },
       {
@@ -1858,7 +1800,9 @@
       "Universal followups remain open until primary evidence supports the ownership map, owner-cash or NAV bridge, and downside/capital claims."
     ],
     "complete_component_coverage": true,
-    "validation_errors": [],
+    "validation_errors": [
+      "option component reinvestment_or_assets requires probability, timing, and remaining-capital treatment"
+    ],
     "registry_version": "1.0"
   },
   "component_review_queue": {
@@ -2083,7 +2027,7 @@
   },
   "universal_valuation_contract": {
     "schema_version": "2.0",
-    "status": "decision_grade",
+    "status": "evidence_blocked",
     "ticker": "FRMO",
     "as_of": "2026-07-21",
     "economic_ownership_map": [
@@ -2392,8 +2336,8 @@
         "ownership_claim": "Management-company and exchange interests",
         "ownership_percentage": 1.0,
         "quantity": {
-          "value": 57.831,
-          "unit": "base success value, millions"
+          "value": 1,
+          "unit": "per-share economic claim"
         },
         "method": "probability_weighted_catalyst_nav",
         "method_version": "1.0",
@@ -2670,32 +2614,13 @@
         "evidence_tier": "mixed_primary_and_estimate",
         "evidence_level": "analyst_estimated",
         "evidence": "Filing-backed proof from FRMO/investor-documents/ir-frmo/2026-02-28_Quarterly_Report.pdf; overlap_key=reinvestment_or_assets. Legacy Lawrence SOTP path remains separate stance gate.",
-        "scenario_assumptions": {
-          "low": {
-            "success_value_m": 57.831,
-            "success_probability": 0.411,
-            "remaining_cost_m": 0.0,
-            "ownership_pct": 1.0
-          },
-          "base": {
-            "success_value_m": 57.831,
-            "success_probability": 0.716,
-            "remaining_cost_m": 0.0,
-            "ownership_pct": 1.0
-          },
-          "high": {
-            "success_value_m": 70.88,
-            "success_probability": 1.0,
-            "remaining_cost_m": 0.0,
-            "ownership_pct": 1.0
-          }
-        },
+        "scenario_assumptions": "Proof outputs {'low': 0.5399, 'base': 0.9406, 'high': 1.6105}; see calculation_proof graph.",
         "probability_and_timing": {
-          "success_probability": 0.716,
-          "remaining_capital_m": 0.0,
-          "timing_basis": "5-year catalyst window aligned with Lawrence SOTP horizon",
-          "probability_basis": "Base 71.6% probability weights MIAX lockup release, Winland control, and HKHC re-rate",
-          "remaining_capital_basis": "Affiliate stakes already funded at FRMO parent; no incremental owner capital required for mark re-rate"
+          "success_probability": null,
+          "remaining_capital_m": null,
+          "timing_basis": null,
+          "probability_basis": null,
+          "remaining_capital_basis": null
         },
         "tax_and_realization_adjustments": "The low/base/high range incorporates ownership, tax, capital, cycle, timing, and realization uncertainty pending the primary bridge.",
         "falsifier": "Primary filing revises Investment A, affiliate marks, or share count >10% without matching proof update.",
@@ -3516,26 +3441,7 @@
           "base_per_share": 0.9406,
           "legacy_base_per_share": 0.94,
           "range_width_per_share": 1.0706,
-          "scenario_assumptions": {
-            "low": {
-              "success_value_m": 57.831,
-              "success_probability": 0.411,
-              "remaining_cost_m": 0.0,
-              "ownership_pct": 1.0
-            },
-            "base": {
-              "success_value_m": 57.831,
-              "success_probability": 0.716,
-              "remaining_cost_m": 0.0,
-              "ownership_pct": 1.0
-            },
-            "high": {
-              "success_value_m": 70.88,
-              "success_probability": 1.0,
-              "remaining_cost_m": 0.0,
-              "ownership_pct": 1.0
-            }
-          }
+          "scenario_assumptions": "Proof outputs {'low': 0.5399, 'base': 0.9406, 'high': 1.6105}; see calculation_proof graph."
         },
         {
           "component_id": "net_financial_claims",
@@ -3645,9 +3551,13 @@
       "low_base_high_ordered": true
     },
     "evidence": {
-      "unresolved_count": 0,
-      "blockers": [],
-      "validation_errors": []
+      "unresolved_count": 1,
+      "blockers": [
+        "option component reinvestment_or_assets requires probability, timing, and remaining-capital treatment"
+      ],
+      "validation_errors": [
+        "option component reinvestment_or_assets requires probability, timing, and remaining-capital treatment"
+      ]
     },
     "monitoring": {
       "falsifiers": [
@@ -3664,7 +3574,7 @@
       ]
     },
     "change_control": {
-      "model_hash": "91cb2f34880b120d1f119613c648bf5139beafbb7bd6fd88780642090fccec05",
+      "model_hash": "4f03a9a0c40e864eab4fc954a3f8d939a912a3957e6a911d7d471314fe8afab5",
       "method_versions": [
         "net_asset_value@1.0",
         "probability_weighted_catalyst_nav@1.0"
