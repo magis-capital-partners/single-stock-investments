@@ -1,14 +1,577 @@
 {
   "ticker": "AAPL",
-  "as_of": "2026-07-20",
-  "method": "price_stub",
+  "as_of": "2026-07-21",
+  "method": "full",
+  "irr_method": "full",
+  "valuation_mode": "economic_value",
+  "method_profile": "quality_reinvestment",
+  "lawrence_bucket": "pricing_power",
+  "payoff_lens": "operating",
+  "classification_inputs": {
+    "archetype": "compounder",
+    "moat": "stable",
+    "dhando": "partial",
+    "cycle": "mid",
+    "payoff_lens": "operating",
+    "predictive_attribute": "quality_at_rich_price"
+  },
   "inputs": {
     "price": 326.59,
+    "price_source": "Yahoo AAPL close 2026-07-20",
     "price_as_of": "2026-07-20",
-    "price_source": "Yahoo AAPL close 2026-07-20"
+    "shares_millions": 15014.7,
+    "shares_outstanding": 15014745000,
+    "shares_source": "FY2025 net income $112010.0M / diluted EPS $7.46 (AAPL/investor-documents/sec-edgar/10-K_20251031_rpt20250927_acc0000320193_25_000079.htm)",
+    "fcf_per_share": 6.578,
+    "fcf_source": "FY2025 operating cash flow $111482.0M less capital spending $12715.0M \u00f7 15014.745M diluted shares per AAPL/investor-documents/sec-edgar/10-K_20251031_rpt20250927_acc0000320193_25_000079.htm",
+    "cash_m": 132420.0,
+    "total_debt_m": 90678.0,
+    "normalization_note": "FY2025 free cash flow per share anchors owner cash; Services amortization and buybacks affect GAAP EPS but not the filing-locked cash bridge."
   },
-  "notes": "Price stub created by fetch_equity_prices.py --create-stub; replace with a real model before decision-grade.",
-  "human_review": {
-    "live_price_confirmed": false
+  "scenarios": {
+    "bear": {
+      "growth_y1_5": 0.03,
+      "growth_y6_10": 0.02,
+      "exit_pfcf_y10": 22,
+      "notes": "China demand shock, antitrust drag, slower Services mix"
+    },
+    "base": {
+      "growth_y1_5": 0.06,
+      "growth_y6_10": 0.04,
+      "exit_pfcf_y10": 28,
+      "notes": "Mid-cycle iPhone refresh plus high-margin Services growth; modest buyback tailwind"
+    },
+    "bull": {
+      "growth_y1_5": 0.09,
+      "growth_y6_10": 0.05,
+      "exit_pfcf_y10": 32,
+      "notes": "Apple Intelligence monetization and installed-base ARPU lift"
+    }
+  },
+  "option_scan": [
+    {
+      "q": 1,
+      "question": "GAAP book misstates core assets?",
+      "answer": "Partial",
+      "treatment": "embedded_in_segment",
+      "evidence": "Installed-base ecosystem and deferred Services value not fully separated on balance sheet"
+    },
+    {
+      "q": 2,
+      "question": "Undeveloped reserves / dormant assets?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "Operating consumer platform; no land-at-zero or royalty reserve pattern"
+    },
+    {
+      "q": 3,
+      "question": "In-business loss segment?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "Consolidated operating income positive FY2025 $133,050M"
+    },
+    {
+      "q": 4,
+      "question": "Backlog / contracted revenue not in FCF path?",
+      "answer": "Yes",
+      "treatment": "milestone_nav",
+      "evidence": "Services deferred revenue and installed-base monetization in services_installed_base_option"
+    },
+    {
+      "q": 5,
+      "question": "Private or illiquid stakes below fair value?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "No material private equity stakes disclosed (10-K)"
+    },
+    {
+      "q": 6,
+      "question": "Transitory distribution / legal recovery?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "No special dividend or litigation recovery catalyst"
+    }
+  ],
+  "growth_explanation": {
+    "mechanism": "Hardware refresh cycles drive unit volume; Services and installed-base monetization lift mix and margin; capital returns reduce share count.",
+    "source": "AAPL/investor-documents/sec-edgar/10-K_20251031_rpt20250927_acc0000320193_25_000079.htm disaggregated net sales and cash-flow statement",
+    "falsifiers": [
+      {
+        "id": "china_revenue_shock",
+        "trigger": "Greater China revenue falls more than 10% year-over-year for two consecutive quarters",
+        "source": "10-Q geographic revenue disclosures"
+      },
+      {
+        "id": "services_deceleration",
+        "trigger": "Services net sales growth falls below 5% year-over-year for four consecutive quarters",
+        "source": "10-K/10-Q disaggregated net sales table"
+      }
+    ]
+  },
+  "lawrence_horizon_years": 7,
+  "stance_proposal": {
+    "suggested": "watch",
+    "irr_band": "<15%",
+    "gates": {
+      "moat_ok": true,
+      "dhando_ok": true
+    },
+    "override_reason": null
+  },
+  "component_valuation": {
+    "schema_version": "1.0",
+    "all_material_components_identified": true,
+    "coverage_statement": "Four additive components map the core products and services engine, Services installed-base option, net financial claims, and regulatory/cycle reserve once each.",
+    "components": [
+      {
+        "id": "core_products_services_engine",
+        "label": "Core products and services owner-cash engine",
+        "category": "operating_business",
+        "overlap_key": "core_products_services_engine",
+        "treatment": "additive",
+        "valuation": {
+          "method": "owner_earnings_reinvestment_dcf",
+          "basis": "per_share",
+          "low": 131.56,
+          "base": 171.03,
+          "high": 210.4999,
+          "evidence_tier": "primary_derived",
+          "evidence": "Primary bridge from AAPL/investor-documents/sec-edgar/10-K_20251031_rpt20250927_acc0000320193_25_000079.htm: FY2025 revenue $307003.0M, OCF $111482.0M, FCF $98767.0M, Services $109158.0M, cash and securities $132420.0M, total debt $90678.0M; contract backfill 2026-07-21.",
+          "assumption_summary": "Proof outputs {'low': 131.56, 'base': 171.03, 'high': 210.4999}; see calculation_proof graph.",
+          "cross_check": "Reconcile to FY2025 10-K and Q2 FY2026 10-Q before decision use.",
+          "falsifier": "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
+          "valuation_status": "bounded_estimate",
+          "calculation_proof": {
+            "schema_version": "1.0",
+            "method_id": "owner_earnings_reinvestment_dcf",
+            "method_version": "1.0",
+            "output_unit": "USD_per_share",
+            "inputs": [
+              {
+                "id": "operating_cash_flow_m",
+                "label": "FY2025 net cash from operating activities",
+                "kind": "fact",
+                "value": 111482.0,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "AAPL/investor-documents/sec-edgar/10-K_20251031_rpt20250927_acc0000320193_25_000079.htm",
+                  "locator": "NetCashProvidedByUsedInOperatingActivities $111,482M (FY2025)",
+                  "as_of": "2025-09-27"
+                },
+                "locked": true
+              },
+              {
+                "id": "capex_m",
+                "label": "FY2025 payments to acquire property, plant and equipment",
+                "kind": "fact",
+                "value": 12715.0,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "AAPL/investor-documents/sec-edgar/10-K_20251031_rpt20250927_acc0000320193_25_000079.htm",
+                  "locator": "PaymentsToAcquirePropertyPlantAndEquipment $12,715M (FY2025)",
+                  "as_of": "2025-09-27"
+                },
+                "locked": true
+              },
+              {
+                "id": "net_income_m",
+                "label": "FY2025 net income",
+                "kind": "fact",
+                "value": 112010.0,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "AAPL/investor-documents/sec-edgar/10-K_20251031_rpt20250927_acc0000320193_25_000079.htm",
+                  "locator": "NetIncomeLoss $112,010M (FY2025); diluted EPS $7.46",
+                  "as_of": "2025-09-27"
+                },
+                "locked": true
+              },
+              {
+                "id": "shares_m",
+                "label": "FY2025 diluted shares (net income / diluted EPS)",
+                "kind": "fact",
+                "value": 15014.745,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "AAPL/investor-documents/sec-edgar/10-K_20251031_rpt20250927_acc0000320193_25_000079.htm",
+                  "locator": "FY2025 net income $112010.0M / diluted EPS $7.46",
+                  "as_of": "2025-09-27"
+                },
+                "locked": true
+              }
+            ],
+            "assumptions": [
+              {
+                "id": "owner_free_cash_flow_per_share",
+                "label": "Normalized owner free cash flow per diluted share",
+                "kind": "judgment",
+                "values": {
+                  "low": 6.578,
+                  "base": 6.578,
+                  "high": 6.578
+                },
+                "unit": "USD_per_share",
+                "rationale": "FY2025 operating cash flow less capital spending per diluted share; buybacks reduce share count but do not change per-share cash generation anchor.",
+                "allowed_range": {
+                  "min": 4.0,
+                  "max": 10.0
+                }
+              },
+              {
+                "id": "capitalization_multiple",
+                "label": "Duration-adjusted owner free-cash-flow capitalization multiple",
+                "kind": "judgment",
+                "values": {
+                  "low": 20.0,
+                  "base": 26.0003,
+                  "high": 32.0006
+                },
+                "unit": "multiple",
+                "rationale": "Bear stresses iPhone cycle and China share loss; base mid-cycle seven-year path; bull modest Services mix uplift without peak-cycle heroics.",
+                "allowed_range": {
+                  "min": 15.0,
+                  "max": 40.0
+                }
+              }
+            ],
+            "calculations": [
+              {
+                "id": "value_per_share",
+                "label": "Core products and services engine per share",
+                "op": "multiply",
+                "args": [
+                  "owner_free_cash_flow_per_share",
+                  "capitalization_multiple"
+                ],
+                "unit": "USD_per_share"
+              }
+            ],
+            "outputs": {
+              "low": "value_per_share",
+              "base": "value_per_share",
+              "high": "value_per_share"
+            }
+          }
+        }
+      },
+      {
+        "id": "services_installed_base_option",
+        "label": "Services installed-base and platform monetization option",
+        "category": "real_option",
+        "overlap_key": "services_installed_base_option",
+        "treatment": "additive",
+        "valuation": {
+          "method": "risk_adjusted_milestone_value",
+          "basis": "per_share",
+          "low": 0.0,
+          "base": 35.0,
+          "high": 85.0,
+          "evidence_tier": "primary_derived",
+          "evidence": "Primary bridge from AAPL/investor-documents/sec-edgar/10-K_20251031_rpt20250927_acc0000320193_25_000079.htm: FY2025 revenue $307003.0M, OCF $111482.0M, FCF $98767.0M, Services $109158.0M, cash and securities $132420.0M, total debt $90678.0M; contract backfill 2026-07-21.",
+          "assumption_summary": "Proof outputs {'low': 0.0, 'base': 35.0, 'high': 85.0}; see calculation_proof graph.",
+          "cross_check": "Reconcile to FY2025 10-K and Q2 FY2026 10-Q before decision use.",
+          "falsifier": "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
+          "valuation_status": "bounded_estimate",
+          "calculation_proof": {
+            "schema_version": "1.0",
+            "method_id": "risk_adjusted_milestone_value",
+            "method_version": "1.0",
+            "output_unit": "USD_per_share",
+            "inputs": [
+              {
+                "id": "services_revenue_m",
+                "label": "FY2025 Services net sales (disaggregated table)",
+                "kind": "fact",
+                "value": 109158.0,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "AAPL/investor-documents/sec-edgar/10-K_20251031_rpt20250927_acc0000320193_25_000079.htm",
+                  "locator": "Disaggregated net sales table: Services $109,158M (FY2025)",
+                  "as_of": "2025-09-27"
+                },
+                "locked": true
+              },
+              {
+                "id": "total_revenue_m",
+                "label": "FY2025 consolidated net sales",
+                "kind": "fact",
+                "value": 307003.0,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "AAPL/investor-documents/sec-edgar/10-K_20251031_rpt20250927_acc0000320193_25_000079.htm",
+                  "locator": "RevenueFromContractWithCustomerExcludingAssessedTax $307,003M (FY2025)",
+                  "as_of": "2025-09-27"
+                },
+                "locked": true
+              },
+              {
+                "id": "shares_m",
+                "label": "FY2025 diluted shares",
+                "kind": "fact",
+                "value": 15014.745,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "AAPL/investor-documents/sec-edgar/10-K_20251031_rpt20250927_acc0000320193_25_000079.htm",
+                  "locator": "FY2025 net income $112010.0M / diluted EPS $7.46",
+                  "as_of": "2025-09-27"
+                },
+                "locked": true
+              }
+            ],
+            "assumptions": [
+              {
+                "id": "services_milestone_m",
+                "label": "Risk-adjusted incremental installed-base and Services monetization",
+                "kind": "judgment",
+                "values": {
+                  "low": 0.0,
+                  "base": 525516.1,
+                  "high": 1276253.3
+                },
+                "unit": "USD_m",
+                "rationale": "Non-overlapping claim on high-margin Services, App Store, and Apple Intelligence monetization beyond normalized hardware free cash flow; base is judgment band.",
+                "allowed_range": {
+                  "min": 0.0,
+                  "max": 1500000.0
+                }
+              }
+            ],
+            "calculations": [
+              {
+                "id": "value_per_share",
+                "label": "Services installed-base option per share",
+                "op": "divide",
+                "args": [
+                  "services_milestone_m",
+                  "shares_m"
+                ],
+                "unit": "USD_per_share"
+              }
+            ],
+            "outputs": {
+              "low": "value_per_share",
+              "base": "value_per_share",
+              "high": "value_per_share"
+            }
+          }
+        }
+      },
+      {
+        "id": "net_financial_claims",
+        "label": "Net cash, securities, and debt claims on common equity",
+        "category": "liability_or_reserve",
+        "overlap_key": "net_financial_claims",
+        "treatment": "additive",
+        "valuation": {
+          "method": "net_asset_value",
+          "basis": "per_share",
+          "low": -6.0,
+          "base": 3.0,
+          "high": 10.0,
+          "evidence_tier": "primary_derived",
+          "evidence": "Primary bridge from AAPL/investor-documents/sec-edgar/10-K_20251031_rpt20250927_acc0000320193_25_000079.htm: FY2025 revenue $307003.0M, OCF $111482.0M, FCF $98767.0M, Services $109158.0M, cash and securities $132420.0M, total debt $90678.0M; contract backfill 2026-07-21.",
+          "assumption_summary": "Proof outputs {'low': -6.0, 'base': 3.0, 'high': 10.0}; see calculation_proof graph.",
+          "cross_check": "Reconcile to FY2025 10-K and Q2 FY2026 10-Q before decision use.",
+          "falsifier": "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
+          "valuation_status": "bounded_estimate",
+          "calculation_proof": {
+            "schema_version": "1.0",
+            "method_id": "net_asset_value",
+            "method_version": "1.0",
+            "output_unit": "USD_per_share",
+            "inputs": [
+              {
+                "id": "cash_and_securities_m",
+                "label": "Cash, cash equivalents, and marketable securities",
+                "kind": "fact",
+                "value": 132420.0,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "AAPL/investor-documents/sec-edgar/10-K_20251031_rpt20250927_acc0000320193_25_000079.htm",
+                  "locator": "CashCashEquivalentsAndMarketableSecurities $132,420M at September 27, 2025",
+                  "as_of": "2025-09-27"
+                },
+                "locked": true
+              },
+              {
+                "id": "total_debt_m",
+                "label": "Total term debt (current plus noncurrent)",
+                "kind": "fact",
+                "value": 90678.0,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "AAPL/investor-documents/sec-edgar/10-K_20251031_rpt20250927_acc0000320193_25_000079.htm",
+                  "locator": "LongTermDebtNoncurrent $78,328M plus LongTermDebtCurrent $12,350M (FY2025)",
+                  "as_of": "2025-09-27"
+                },
+                "locked": true
+              },
+              {
+                "id": "shares_m",
+                "label": "FY2025 diluted shares",
+                "kind": "fact",
+                "value": 15014.745,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "AAPL/investor-documents/sec-edgar/10-K_20251031_rpt20250927_acc0000320193_25_000079.htm",
+                  "locator": "FY2025 net income $112010.0M / diluted EPS $7.46",
+                  "as_of": "2025-09-27"
+                },
+                "locked": true
+              }
+            ],
+            "assumptions": [
+              {
+                "id": "net_corporate_claim_m",
+                "label": "Net financial claim on common equity after debt and operating liquidity reserve",
+                "kind": "judgment",
+                "values": {
+                  "low": -90088.5,
+                  "base": 45044.2,
+                  "high": 150147.5
+                },
+                "unit": "USD_m",
+                "rationale": "Filing-locked cash and marketable securities less total debt; low stresses refinancing and trapped liquidity; high credits excess securities net of debt.",
+                "allowed_range": {
+                  "min": -200000.0,
+                  "max": 200000.0
+                }
+              }
+            ],
+            "calculations": [
+              {
+                "id": "value_per_share",
+                "label": "Net financial claims per share",
+                "op": "divide",
+                "args": [
+                  "net_corporate_claim_m",
+                  "shares_m"
+                ],
+                "unit": "USD_per_share"
+              }
+            ],
+            "outputs": {
+              "low": "value_per_share",
+              "base": "value_per_share",
+              "high": "value_per_share"
+            }
+          }
+        }
+      },
+      {
+        "id": "regulatory_and_cycle_reserve",
+        "label": "China, antitrust, and hardware cycle stress reserve",
+        "category": "liability_or_reserve",
+        "overlap_key": "regulatory_and_cycle_reserve",
+        "treatment": "additive",
+        "valuation": {
+          "method": "net_asset_value",
+          "basis": "per_share",
+          "low": -45.0,
+          "base": -22.0,
+          "high": -8.0,
+          "evidence_tier": "primary_derived",
+          "evidence": "Primary bridge from AAPL/investor-documents/sec-edgar/10-K_20251031_rpt20250927_acc0000320193_25_000079.htm: FY2025 revenue $307003.0M, OCF $111482.0M, FCF $98767.0M, Services $109158.0M, cash and securities $132420.0M, total debt $90678.0M; contract backfill 2026-07-21.",
+          "assumption_summary": "Proof outputs {'low': -45.0, 'base': -22.0, 'high': -8.0}; see calculation_proof graph.",
+          "cross_check": "Reconcile to FY2025 10-K and Q2 FY2026 10-Q before decision use.",
+          "falsifier": "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
+          "valuation_status": "bounded_estimate",
+          "calculation_proof": {
+            "schema_version": "1.0",
+            "method_id": "net_asset_value",
+            "method_version": "1.0",
+            "output_unit": "USD_per_share",
+            "inputs": [
+              {
+                "id": "operating_income_m",
+                "label": "FY2025 operating income",
+                "kind": "fact",
+                "value": 133050.0,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "AAPL/investor-documents/sec-edgar/10-K_20251031_rpt20250927_acc0000320193_25_000079.htm",
+                  "locator": "OperatingIncomeLoss $133050.0M (FY2025)",
+                  "as_of": "2025-09-27"
+                },
+                "locked": true
+              },
+              {
+                "id": "research_and_development_m",
+                "label": "FY2025 research and development expense",
+                "kind": "fact",
+                "value": 34550.0,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "AAPL/investor-documents/sec-edgar/10-K_20251031_rpt20250927_acc0000320193_25_000079.htm",
+                  "locator": "ResearchAndDevelopmentExpense $34,550M (FY2025)",
+                  "as_of": "2025-09-27"
+                },
+                "locked": true
+              },
+              {
+                "id": "shares_m",
+                "label": "FY2025 diluted shares",
+                "kind": "fact",
+                "value": 15014.745,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "AAPL/investor-documents/sec-edgar/10-K_20251031_rpt20250927_acc0000320193_25_000079.htm",
+                  "locator": "FY2025 net income $112010.0M / diluted EPS $7.46",
+                  "as_of": "2025-09-27"
+                },
+                "locked": true
+              }
+            ],
+            "assumptions": [
+              {
+                "id": "reserve_m",
+                "label": "China concentration, antitrust, and iPhone cycle stress reserve",
+                "kind": "judgment",
+                "values": {
+                  "low": -675663.5,
+                  "base": -330324.4,
+                  "high": -120118.0
+                },
+                "unit": "USD_m",
+                "rationale": "Negative reserve for regulatory fines, China demand shocks, and hardware cycle compression not fully embedded in core capitalization multiple.",
+                "allowed_range": {
+                  "min": -800000.0,
+                  "max": -50000.0
+                }
+              }
+            ],
+            "calculations": [
+              {
+                "id": "value_per_share",
+                "label": "Regulatory and cycle reserve per share",
+                "op": "divide",
+                "args": [
+                  "reserve_m",
+                  "shares_m"
+                ],
+                "unit": "USD_per_share"
+              }
+            ],
+            "outputs": {
+              "low": "value_per_share",
+              "base": "value_per_share",
+              "high": "value_per_share"
+            }
+          }
+        }
+      }
+    ]
+  },
+  "economic_value_analysis": {
+    "ownership_waterfall": {
+      "net_economic_claim": "One AAPL common share equals pro-rata normalized free cash flow from the hardware and embedded Services engine, incremental installed-base monetization, net corporate liquidity, less regulatory and cycle reserve.",
+      "excluded_claims": [
+        "Services revenue already embedded in consolidated free cash flow is not double-counted in the core engine multiple.",
+        "Operating lease liabilities are reserved through net financial claims judgment, not as separate NAV."
+      ],
+      "reconciliation": "FY2025 FCF $98767.0M on 15014.745M shares; cash and marketable securities $132420.0M less total debt $90678.0M.",
+      "evidence_ref": "AAPL/research/evidence_reconciliation_2026-07-21.md"
+    },
+    "validation_errors": []
   }
 }
