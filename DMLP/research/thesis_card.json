@@ -1,57 +1,74 @@
 {
-  "schema_version": "1.0",
-  "ticker": "DMLP",
-  "generated_at": "2026-07-21T02:30:00+00:00",
-  "thesis": "Dorchester Minerals is a passive U.S. royalty and mineral MLP that distributes essentially all available cash quarterly. FY2025 declared distributions were $2.775346 per unit on 48.26 million units; proof-first component math sums to about $19.24 per unit of economic value versus a price near $27.",
-  "why_market_wrong": "Yield buyers may treat Dorchester as a static bond proxy and underweight 2024-2025 unit-funded mineral acquisitions and undeveloped acreage optionality. GAAP net income ($1.16/unit) understates cash distributions by design.",
   "base_irr_pct": 13.8,
-  "irr_label": "7yr IRR (total synthesis)",
-  "stance": "watch",
   "classification": {
     "archetype": "infrastructure",
-    "moat": "narrow",
-    "dhando": "partial",
     "cycle": "mid",
-    "payoff_lens": "operating"
+    "dhando": "partial",
+    "lawrence_bucket": "other",
+    "moat": "narrow",
+    "payoff_lens": "operating",
+    "predictive_attribute": "distribution_yield_vs_commodity"
   },
-  "key_assumptions": [
-    {
-      "input": "Starting owner cash (distributions per unit)",
-      "value": "$2.78",
-      "source": "FY2025 declared distributions $2.775346/unit (10-K_20260224)"
-    },
-    {
-      "input": "Producing stream capitalization",
-      "value": "4.2–8.1× distribution run-rate",
-      "source": "owner_cash_or_dividend_discount proof in valuation.json"
-    },
-    {
-      "input": "Component economic value (base)",
-      "value": "$19.24/unit",
-      "source": "Four additive proofs in valuation.json"
-    }
-  ],
-  "open_questions": [
-    "Confirm live price and trailing distribution run-rate after Q1 2026 10-Q.",
-    "GP conflict and acquisition pacing vs dilution [HUMAN REVIEW].",
-    "Promote VIC PDF or activist context before weighting in base IRR.",
-    "Stance and sizing require human_decision.json."
-  ],
   "evidence_citations": [
     "DMLP/investor-documents/sec-edgar/10-K_20260224_rpt20251231_acc0001437749_26_005376.htm",
-    "DMLP/investor-documents/sec-edgar/10-Q_20260506_rpt20260331_acc0001437749_26_015255.htm",
-    "DMLP/research/evidence/filing_digest_2026-07-20.md",
-    "DMLP/research/evidence_reconciliation_2026-07-21.md"
+    "investor-documents/sec-edgar/10-K_20260224_rpt20251231_acc0001437749_26_005376.htm",
+    "investor-documents/sec-edgar/10-Q_20260506_rpt20260331_acc0001437749_26_015255.htm",
+    "investor-documents/sec-edgar/DEF_14A_20260402_rpt20260513_acc0001437749_26_011129.htm",
+    "DMLP/research/deep_dive_2026-06-03.md"
   ],
-  "filing_digest": "DMLP/research/evidence/filing_digest_2026-07-20.md",
+  "filing_digest": "DMLP/research/evidence/filing_digest_2026-07-21.md",
+  "generated_at": "2026-07-21T02:34:21+00:00",
+  "irr_label": "7yr IRR (total synthesis)",
+  "key_assumptions": [
+    {
+      "input": "Price today",
+      "source": "Yahoo DMLP close 2026-07-20",
+      "value": "**$27.29**"
+    },
+    {
+      "input": "Starting free cash flow per share",
+      "source": "FY2025 declared distributions $2.775346/unit (cash basis owner yield; 10-K_20260224)",
+      "value": "**$2.78**"
+    },
+    {
+      "input": "Growth in years 1 through 5",
+      "source": "Mid-cycle distributions; 2024-2025 unit-funded royalty acquisitions add low single-digit growth",
+      "value": "**2.0%** per year"
+    },
+    {
+      "input": "Growth in years 6 through 7",
+      "source": "Scenario base",
+      "value": "**1.0%** per year"
+    },
+    {
+      "input": "Selling multiple in year 10",
+      "source": "Scenario base",
+      "value": "**12 times cash flow**"
+    },
+    {
+      "input": "Time horizon",
+      "source": "7-year owner-cash model",
+      "value": "**7 years**"
+    }
+  ],
   "last_verified": {
     "deep_dive": "2026-07-21",
-    "valuation_as_of": "2026-07-21",
-    "human_approved": null
+    "human_approved": null,
+    "valuation_as_of": "2026-07-21"
   },
+  "open_questions": [
+    "Confirm live price and trailing distribution run-rate after Q1 2026 10-Q.",
+    "GP conflict and acquisition pacing vs dilution.",
+    "Promote VIC PDF before any third-party numeric blend."
+  ],
   "scenarios": {
-    "bear_return_pct": 9.7,
-    "base_return_pct": 13.8,
-    "bull_return_pct": 19.2
-  }
+    "base": 14.4,
+    "bear": 9.9,
+    "bull": 19.3
+  },
+  "schema_version": "1.0",
+  "stance": null,
+  "thesis": "Dorchester Minerals, L.P. is a Dallas-based master limited partnership that owns net royalty and mineral interests across U.S. oil and gas basins and distributes essentially all available cash to common unitholders each quarter. **[Fact]** The partnership has no operating employees; revenue is royalty and net profits interest cash from properties operated by third parties. **[Fact]** As of December 31, 2025, **48,255,450** common units were outstanding (`DMLP/investor-documents/sec-edgar/10-K_20260224_rpt20251231_acc0001437749_26_005376.htm`). **[Fact]** FY2025 operating revenues were **$152.8 million**, net income **$57.4 million** (**$1.16** per unit), and declared distributions **$2.775346** per unit (same 10-K). **[Fact]** The partnership agreement requires quarterly distributions equal to **100%** of available cash after reserves (same 10-K, Business section).",
+  "ticker": "DMLP",
+  "why_market_wrong": "Yield-oriented investors may treat Dorchester as a static bond proxy and miss accretive growth from unit-funded mineral acquisitions in 2024-2025. **[Inference]** GAAP net income understates cash distributions because of timing between production and cash receipts. **[Inference]** Screeners focused on earnings yield rather than distribution yield may mis-rank the name versus simpler royalty trusts. **[Inference]** Proof-first component math at base case sums to about **$19.24** per unit of economic value versus a price near **$27**, suggesting the market embeds acreage optionality and mid-cycle commodity assumptions not yet reproduced in filing-locked owner-cash paths."
 }
