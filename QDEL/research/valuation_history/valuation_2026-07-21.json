@@ -306,7 +306,7 @@
     "synthesis_in_dive": true
   },
   "context_overlay": {
-    "as_of": "2026-07-21",
+    "as_of": "2026-07-20",
     "disclaimer": "Context only. Tailwinds inform stance and overlay sizing; they do not auto-inflate Lawrence base IRR. Promotion to base case requires [HUMAN REVIEW].",
     "themes": [
       {
@@ -316,9 +316,9 @@
           {
             "id": "hy_oas",
             "label": "High-yield OAS credit spread (%)",
-            "latest": 1.43,
+            "latest": 1.3,
             "as_of": "2026-07-20",
-            "yoy_pct": 248.8,
+            "yoy_pct": 217.1,
             "direction": "up",
             "good_for": "risk_regime",
             "source": "spread:HYG-LQD:21d (HYG-LQD 1m spread proxy, not OAS)",
@@ -328,9 +328,9 @@
           {
             "id": "ust_10y",
             "label": "US Treasury 10Y yield (%)",
-            "latest": 4.5980000495910645,
+            "latest": 4.579999923706055,
             "as_of": "2026-07-20",
-            "yoy_pct": 5.2,
+            "yoy_pct": 4.8,
             "direction": "up",
             "good_for": "rates_regime",
             "source": "yahoo:^TNX",
@@ -340,9 +340,9 @@
           {
             "id": "ust_2y",
             "label": "US Treasury 2Y yield (%)",
-            "latest": 4.328000068664551,
+            "latest": 4.314000129699707,
             "as_of": "2026-07-20",
-            "yoy_pct": 10.7,
+            "yoy_pct": 10.4,
             "direction": "up",
             "good_for": "rates_regime",
             "source": "yahoo:^FVX",
@@ -352,8 +352,8 @@
           {
             "id": "dxy_broad",
             "label": "Trade-weighted USD index (broad)",
-            "latest": 100.96900177001953,
-            "as_of": "2026-07-21",
+            "latest": 100.93699645996094,
+            "as_of": "2026-07-20",
             "yoy_pct": 3.2,
             "direction": "up",
             "good_for": "dollar_regime",
@@ -364,9 +364,9 @@
           {
             "id": "vix_level",
             "label": "VIX index level",
-            "latest": 18.649999618530273,
+            "latest": 18.280000686645508,
             "as_of": "2026-07-20",
-            "yoy_pct": 12.0,
+            "yoy_pct": 9.8,
             "direction": "up",
             "good_for": "vol_regime",
             "source": "yahoo:^VIX",
@@ -376,9 +376,9 @@
           {
             "id": "credit_impulse_1m",
             "label": "HYG vs TLT 1-month return spread (%)",
-            "latest": 2.76,
+            "latest": 2.52,
             "as_of": "2026-07-20",
-            "yoy_pct": 55.9,
+            "yoy_pct": 42.4,
             "direction": "up",
             "good_for": "credit_impulse",
             "source": "spread:HYG-TLT:21d",
@@ -388,9 +388,9 @@
           {
             "id": "spy_20d_realized_vol",
             "label": "SPY 20-day realized vol (annualized %)",
-            "latest": 11.37,
+            "latest": 11.39,
             "as_of": "2026-07-20",
-            "yoy_pct": 31.3,
+            "yoy_pct": 31.5,
             "direction": "up",
             "good_for": "equity_vol",
             "source": "realized_vol:SPY:20d",
@@ -402,50 +402,41 @@
     ]
   },
   "lens_consensus": {
-    "as_of": "2026-07-21",
-    "shared_inputs_ref": "valuation.json@2026-07-21",
+    "as_of": "2026-06-29",
+    "shared_inputs_ref": "valuation.json@2026-06-29",
     "valuation_richness": 0.0,
-    "blended_return_pct": 13.54,
+    "blended_return_pct": 15.81,
     "band_pct": [
-      7.6,
-      18.05
+      7.5,
+      22.34
     ],
-    "weighted_median_pct": 14.47,
-    "median_mean_flag": false,
-    "stance": "pass",
-    "agreement_pct": 42,
-    "dissent_count": 6,
-    "lawrence_divergence": true,
+    "weighted_median_pct": 19.0,
+    "median_mean_flag": true,
+    "stance": "watch",
+    "agreement_pct": 67,
+    "dissent_count": 2,
+    "lawrence_divergence": false,
     "top_dissents": [
       {
-        "persona": "marathon_capital_cycle",
-        "label": "Marathon / Capital Returns",
-        "verdict": "watch",
-        "return_pct": 15.4,
-        "key_metric": "incremental_roic=None",
-        "conviction": 0.17,
-        "falsifier": "Supply response, reinvestment requirements, or incremental returns cannot be measured."
+        "persona": "pabrai",
+        "label": "Mohnish Pabrai",
+        "verdict": "pass",
+        "return_pct": 7.5,
+        "key_metric": "downside_upside_ratio=0.341",
+        "conviction": 0.375,
+        "falsifier": "dhando -> none OR net-debt/EBITDA > 3 OR bear return < -15%"
       },
       {
-        "persona": "marks_credit_cycle",
-        "label": "Howard Marks / Oaktree",
-        "verdict": "watch",
-        "return_pct": 15.4,
-        "key_metric": "net_debt_ebitda=None",
-        "conviction": 0.17,
-        "falsifier": "Debt maturities, refinancing exposure, liquidity, or downside recovery cannot be reconciled."
-      },
-      {
-        "persona": "lawrence",
-        "label": "Lawrence (house IRR)",
-        "verdict": "watch",
-        "return_pct": 18.05,
-        "key_metric": "synthesis_pct=18.05",
-        "conviction": 0.153,
-        "falsifier": "Synthesis incomplete or irr_method pending"
+        "persona": "munger",
+        "label": "Charlie Munger",
+        "verdict": "pass",
+        "return_pct": 7.5,
+        "key_metric": "moat=unproven",
+        "conviction": 0.225,
+        "falsifier": "Moat eroding/unproven or irr_method pending"
       }
     ],
-    "contributor_count": 9,
+    "contributor_count": 7,
     "in_base_irr": false,
     "disclaimer": "Advisory lens blend only. Does not replace Lawrence total-synthesis stance gate without [HUMAN REVIEW]."
   },
@@ -5420,7 +5411,7 @@
     "decision_rule": "No security is decision-grade until every material claim is valued exactly once by a valid calculation proof and every material evidence blocker is resolved."
   },
   "insider_signal": {
-    "as_of": "2026-07-21",
+    "as_of": "2026-07-20",
     "disclaimer": "Context only. Insider activity informs scenario confidence and stance discussion; it does not auto-inflate Lawrence base IRR. Promotion requires [HUMAN REVIEW].",
     "in_base_irr": false,
     "window_days": 365,
@@ -5541,7 +5532,7 @@
         "price": 18.18,
         "value_usd": 38105.28,
         "is_10b5_1": false,
-        "contrib": -0.063
+        "contrib": -0.064
       }
     ],
     "narrative_hooks": [],
