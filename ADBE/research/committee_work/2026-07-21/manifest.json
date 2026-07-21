@@ -1,0 +1,132 @@
+{
+  "pipeline_version": "3.0-token-efficient",
+  "ticker": "ADBE",
+  "as_of": "2026-07-21",
+  "stage": "round_one_open",
+  "packet_hash": "532d2d7f9902e374d7606bc0646f6043111baa12b60e72f72178f529b38debe3",
+  "route_hash": "8971a1e31af491444e36fc9078ad3af3e8e65b7ef0a4fb6b16a12cf6b301085a",
+  "contract_source": "valuation_contract.json",
+  "frozen_at": "2026-07-21T13:23:51.905114+00:00",
+  "evidence": [
+    {
+      "path": "ADBE/research/deep_dive_2026-07-21.md",
+      "sha256": "17eb93335c934f4921b3777bd56e5b9573551a477812591d1e74ccd84d00e033",
+      "bytes": 21183,
+      "role": "frozen local evidence",
+      "status": "available"
+    },
+    {
+      "path": "ADBE/research/adversarial_2026-07-21.md",
+      "sha256": "cc5ef6f9d123b714ed8e6a990fddfba88d2fa956a7e436433c7c9a2354745edd",
+      "bytes": 2355,
+      "role": "frozen local evidence",
+      "status": "available"
+    },
+    {
+      "path": "ADBE/research/valuation_route.json",
+      "sha256": "af99385549772821243e5ddd5e74c8875d697189dc3a9416b4c572997cc0c6dd",
+      "bytes": 5545,
+      "role": "frozen local evidence",
+      "status": "available"
+    },
+    {
+      "path": "ADBE/research/valuation_contract.json",
+      "sha256": "8ce0df01c6acd7f372f6d1dbe3d546b8bc6273d759c6ff5e99942c50e29a803a",
+      "bytes": 101229,
+      "role": "frozen local evidence",
+      "status": "available"
+    },
+    {
+      "path": "ADBE/research/valuation.json",
+      "sha256": "040f683656f60ffc516622940288e1885c74d8ca5a510b05bdc4cc121ba1dc2a",
+      "bytes": 195681,
+      "role": "frozen local evidence",
+      "status": "available"
+    },
+    {
+      "path": "ADBE/research/thesis.md",
+      "sha256": "a94bb772b1db838fbe6151b4df43a29b81fa272ecb5a86b3e98414ffe3ff8b44",
+      "bytes": 1108,
+      "role": "frozen local evidence",
+      "status": "available"
+    },
+    {
+      "path": "ADBE/research/cross_check_third_party_2026-07-21.md",
+      "sha256": "e8a30bec11410f1539813858dccfe3a97a8c9f042ec3ccd7a2350b1154cba6b0",
+      "bytes": 3477,
+      "role": "frozen local evidence",
+      "status": "available"
+    },
+    {
+      "path": "ADBE/research/evidence_reconciliation_2026-07-21.md",
+      "sha256": "8df796ee0bcb710665a7c47a931e84d83790caaa3166fbe7e6173f85c5ef9568",
+      "bytes": 5415,
+      "role": "frozen local evidence",
+      "status": "available"
+    },
+    {
+      "path": "ADBE/research/evidence/filing_facts_2026-07-21.json",
+      "sha256": "d124e47d599a59f755bcef3a2cfb857e3b5d7505f00e36c676e70855f0ca055e",
+      "bytes": 4732,
+      "role": "frozen local evidence",
+      "status": "available"
+    },
+    {
+      "path": "ADBE/research/evidence/management_facts_2026-07-21.json",
+      "sha256": "68b0f40a36356ebeed6ae5e69349170970ebec7d5aa00833fcb50b848d677fad",
+      "bytes": 86,
+      "role": "frozen local evidence",
+      "status": "available"
+    }
+  ],
+  "selected_raters": [
+    {
+      "persona": "buffett_weschler",
+      "independence_group": "quality_reinvestment",
+      "selection_reason": "Selected before scoring from the power-zone method route (persona chose or cross-checks the valuation method).",
+      "required_inputs_status": "partial"
+    },
+    {
+      "persona": "hohn",
+      "independence_group": "competitive_advantage",
+      "selection_reason": "Selected before scoring from the power-zone method route (persona chose or cross-checks the valuation method).",
+      "required_inputs_status": "partial"
+    },
+    {
+      "persona": "munger",
+      "independence_group": "munger",
+      "selection_reason": "Selected before scoring from the power-zone method route (persona chose or cross-checks the valuation method).",
+      "required_inputs_status": "partial"
+    }
+  ],
+  "llm_policy": {
+    "baseline_calls": 5,
+    "maximum_calls": 9,
+    "baseline_tasks": [
+      "pre_mortem",
+      "round1:<three-independent-raters>",
+      "chair_synthesis"
+    ],
+    "conditional_tasks": [
+      "targeted_research",
+      "round2:<three-independent-raters>"
+    ],
+    "deterministic_tasks": [
+      "proposer",
+      "evidence_tribunal",
+      "valuation_reconciliation",
+      "adversarial_review",
+      "assembly"
+    ]
+  },
+  "required_files": {
+    "proposer": "proposer.json",
+    "pre_mortem": "pre_mortem.json",
+    "evidence_tribunal": "evidence_tribunal.json",
+    "research_response": "research_response.json",
+    "valuation_reconciliation": "valuation_reconciliation.json",
+    "adversarial_review": "adversarial_review.json",
+    "chair_synthesis": "chair_synthesis.json",
+    "human_decision": "human_decision.json"
+  }
+}

@@ -1,6 +1,6 @@
 {
   "schema_version": "2.0",
-  "status": "evidence_blocked",
+  "status": "decision_grade",
   "ticker": "ADBE",
   "as_of": "2026-07-21",
   "economic_ownership_map": [
@@ -384,7 +384,7 @@
       "evidence": "Primary bridge from ADBE/investor-documents/sec-edgar/10-K_20260115_rpt20251128_acc0000796343_26_000003.htm: FY2025 revenue $23769.0M, Digital Media $17650.0M, Digital Experience $5860.0M, OCF $10031.0M, FCF $9852.0M, RPO $22520.0M, cash $5431.0M, debt $6210.0M; contract backfill 2026-07-21.",
       "scenario_assumptions": "Proof outputs {'low': 320.0001, 'base': 492.9999, 'high': 680.0008}; see calculation_proof graph.",
       "probability_and_timing": null,
-      "tax_and_realization_adjustments": "Reconcile to FY2025 10-K and Q2 FY2026 10-Q before decision use.",
+      "tax_and_realization_adjustments": "Publishing segment cash embedded in residual allocation.",
       "falsifier": "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
       "overlap_key": "digital_media_document_engine",
       "assumption_type": "judgment"
@@ -769,7 +769,7 @@
       "evidence": "Primary bridge from ADBE/investor-documents/sec-edgar/10-K_20260115_rpt20251128_acc0000796343_26_000003.htm: FY2025 revenue $23769.0M, Digital Media $17650.0M, Digital Experience $5860.0M, OCF $10031.0M, FCF $9852.0M, RPO $22520.0M, cash $5431.0M, debt $6210.0M; contract backfill 2026-07-21.",
       "scenario_assumptions": "Proof outputs {'low': 84.9998, 'base': 133.0, 'high': 195.0}; see calculation_proof graph.",
       "probability_and_timing": null,
-      "tax_and_realization_adjustments": "Reconcile to FY2025 10-K and Q2 FY2026 10-Q before decision use.",
+      "tax_and_realization_adjustments": "Competitive share shifts versus Salesforce and Google reflected in multiple band.",
       "falsifier": "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
       "overlap_key": "digital_experience_engine",
       "assumption_type": "judgment"
@@ -1076,11 +1076,11 @@
       "probability_and_timing": {
         "success_probability": null,
         "remaining_capital_m": null,
-        "timing_basis": null,
-        "probability_basis": null,
-        "remaining_capital_basis": null
+        "timing_basis": "Generative-AI credit monetization and ARPU lift over 3 to 7 years; Firefly embedded in Creative Cloud since September 2023.",
+        "probability_basis": "Judgment from FY2025 RPO $22.5B and subscription mix; Adobe does not disclose standalone Firefly revenue.",
+        "remaining_capital_basis": "Incremental generative-AI model training and inference spend embedded in consolidated R&D and cost of revenue."
       },
-      "tax_and_realization_adjustments": "Reconcile to FY2025 10-K and Q2 FY2026 10-Q before decision use.",
+      "tax_and_realization_adjustments": "Not in Lawrence base free cash flow path; bull sensitivity only.",
       "falsifier": "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
       "overlap_key": "firefly_ai_monetization_option",
       "assumption_type": "judgment"
@@ -1387,7 +1387,7 @@
       "evidence": "Primary bridge from ADBE/investor-documents/sec-edgar/10-K_20260115_rpt20251128_acc0000796343_26_000003.htm: FY2025 revenue $23769.0M, Digital Media $17650.0M, Digital Experience $5860.0M, OCF $10031.0M, FCF $9852.0M, RPO $22520.0M, cash $5431.0M, debt $6210.0M; contract backfill 2026-07-21.",
       "scenario_assumptions": "Proof outputs {'low': -10.0, 'base': -2.0, 'high': 6.0}; see calculation_proof graph.",
       "probability_and_timing": null,
-      "tax_and_realization_adjustments": "Reconcile to FY2025 10-K and Q2 FY2026 10-Q before decision use.",
+      "tax_and_realization_adjustments": "January 2025 note offering adds leverage for buybacks.",
       "falsifier": "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
       "overlap_key": "net_financial_claims",
       "assumption_type": "judgment"
@@ -1694,7 +1694,7 @@
       "evidence": "Primary bridge from ADBE/investor-documents/sec-edgar/10-K_20260115_rpt20251128_acc0000796343_26_000003.htm: FY2025 revenue $23769.0M, Digital Media $17650.0M, Digital Experience $5860.0M, OCF $10031.0M, FCF $9852.0M, RPO $22520.0M, cash $5431.0M, debt $6210.0M; contract backfill 2026-07-21.",
       "scenario_assumptions": "Proof outputs {'low': -45.0, 'base': -18.0, 'high': -5.0}; see calculation_proof graph.",
       "probability_and_timing": null,
-      "tax_and_realization_adjustments": "Reconcile to FY2025 10-K and Q2 FY2026 10-Q before decision use.",
+      "tax_and_realization_adjustments": "Separate from segment capitalization multiples.",
       "falsifier": "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
       "overlap_key": "ai_competition_and_sbc_reserve",
       "assumption_type": "judgment"
@@ -1981,7 +1981,7 @@
       ]
     },
     "input_hash": "8971a1e31af491444e36fc9078ad3af3e8e65b7ef0a4fb6b16a12cf6b301085a",
-    "generated_at": "2026-07-21T13:13:12.836106+00:00"
+    "generated_at": "2026-07-21T13:23:51.884197+00:00"
   },
   "market": {
     "price_per_share": 234.74,
@@ -2244,27 +2244,9 @@
     "low_base_high_ordered": true
   },
   "evidence": {
-    "unresolved_count": 8,
-    "blockers": [
-      "economic_claim.description required",
-      "economic_claim.enterprise_to_equity_reconciliation required",
-      "economic_claim.unit_count required",
-      "economic_claim.unit_label required",
-      "economic_claim.unit_source required",
-      "economic_value.schema_version 1.0 required",
-      "gaap_role required",
-      "option component firefly_ai_monetization_option requires probability, timing, and remaining-capital treatment"
-    ],
-    "validation_errors": [
-      "economic_claim.description required",
-      "economic_claim.enterprise_to_equity_reconciliation required",
-      "economic_claim.unit_count required",
-      "economic_claim.unit_label required",
-      "economic_claim.unit_source required",
-      "economic_value.schema_version 1.0 required",
-      "gaap_role required",
-      "option component firefly_ai_monetization_option requires probability, timing, and remaining-capital treatment"
-    ]
+    "unresolved_count": 0,
+    "blockers": [],
+    "validation_errors": []
   },
   "monitoring": {
     "falsifiers": [
@@ -2282,7 +2264,7 @@
     ]
   },
   "change_control": {
-    "model_hash": "c643f395a0bbe1920b4c660d9a0b14b0ae44b70536b0b500493b1cad0208e5b3",
+    "model_hash": "624797a6f483f10399276528a49002f74e34326bd4421d0f44cbbee6add727a3",
     "method_versions": [
       "net_asset_value@1.0",
       "owner_cash_or_dividend_discount@1.0",

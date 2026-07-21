@@ -54,9 +54,6 @@ re_pass: false
 | Classification IRR | 32.04% | 32.04% | Yes |
 | Valuation bridge base | 32.04% | 32.04% | Yes |
 
-**Lint notes:**
-- ADBE/research: adversarial date adversarial_2026-07-10.md != dive 2026-07-21
-
 ---
 
 ## Disclosure scan
