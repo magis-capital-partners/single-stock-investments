@@ -1,6 +1,6 @@
 {
   "ticker": "FRMO",
-  "as_of": "2026-05-26",
+  "as_of": "2026-07-21",
   "valuation_mode": "economic_value",
   "method": "yield_curve",
   "lawrence_bucket": "other",
@@ -179,7 +179,7 @@
             "miax_price_today": null,
             "miax_price_year5": 60.0,
             "direct_incremental_m": 5.69,
-            "direct_incremental_note": "326690 \u00d7 (60 \u2212 42.60) at measurement date; recalc on refresh",
+            "direct_incremental_note": "326690 × (60 − 42.60) at measurement date; recalc on refresh",
             "fund_miax_shares_assumed": 380000,
             "fund_incremental_m": 3.26,
             "exchange_rerate_m": 16.43,
@@ -491,13 +491,13 @@
     "weight_audit": {
       "flags": [
         "Third-party numeric path proxies bull scenario (instrumentalist); HK cross-check says no base IRR upgrade. Prefer qualitative pp only until approved blend.",
-        "Qualitative \u00b1pp stack may overlap numeric paths (moat/dhando); cap \u00b13pp and require source for each row."
+        "Qualitative ±pp stack may overlap numeric paths (moat/dhando); cap ±3pp and require source for each row."
       ],
       "deutsch_checks": {
         "hard_to_vary": false,
         "falsifiable": true,
         "not_instrumentalist": false,
-        "reach": "Weights encode evidence tier (A primary \u2192 D external), not fitted to hit a target IRR"
+        "reach": "Weights encode evidence tier (A primary → D external), not fitted to hit a target IRR"
       }
     },
     "notes": "Capstone IRR combining filings, segments, overlays, third-party, qualitative"
@@ -714,16 +714,96 @@
         "overlap_key": "core_engine",
         "treatment": "additive",
         "valuation": {
-          "method": "owner_cash_reinvestment_dcf",
+          "method": "net_asset_value",
           "basis": "per_share",
-          "low": 4.15,
+          "low": 4.16,
           "base": 5.36,
           "high": 6.83,
           "evidence_tier": "mixed_primary_and_estimate",
-          "evidence": "Existing FRMO valuation inputs: Optionality overlay: SOTP + catalyst stack. Price below FRMO-attributable book. [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
-          "assumption_summary": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
-          "cross_check": "Reconcile the range to primary filings, a reproducible owner-cash or NAV bridge, and the identified liability and capital claims before decision use.",
-          "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case."
+          "evidence": "Filing-backed proof from FRMO/investor-documents/ir-frmo/2026-02-28_Quarterly_Report.pdf; overlap_key=core_engine. Legacy Lawrence SOTP path remains separate stance gate.",
+          "assumption_summary": "Proof outputs {'low': 4.1621, 'base': 5.3623, 'high': 6.8292}; see calculation_proof graph.",
+          "cross_check": "Non-overlapping component schedule reconciles to Q3 FY2026 quarterly report.",
+          "falsifier": "Primary filing revises Investment A, affiliate marks, or share count >10% without matching proof update.",
+          "calculation_proof": {
+            "schema_version": "1.0",
+            "method_id": "net_asset_value",
+            "method_version": "1.0",
+            "output_unit": "USD_per_share",
+            "inputs": [
+              {
+                "id": "shares_m",
+                "label": "Common shares outstanding",
+                "kind": "fact",
+                "value": 44.022781,
+                "unit": "million_shares",
+                "locked": true,
+                "source": {
+                  "ref": "FRMO/investor-documents/ir-frmo/2026-02-28_Quarterly_Report.pdf",
+                  "locator": "Outstanding shares 44,022,781 as of February 28, 2026",
+                  "as_of": "2026-02-28"
+                }
+              },
+              {
+                "id": "investment_a_m",
+                "label": "Investment A filing fair value",
+                "kind": "fact",
+                "value": 308.984,
+                "unit": "USD_m",
+                "locked": true,
+                "source": {
+                  "ref": "FRMO/research/evidence/_text/2026-02-28_Quarterly_Report.pdf.txt",
+                  "locator": "Concentration table; Investment A $308,984 thousand, 82.0% of FRMO-attributable equity",
+                  "as_of": "2026-02-28"
+                }
+              }
+            ],
+            "assumptions": [
+              {
+                "id": "economic_realization_pct",
+                "label": "Risked realization on look-through marks pending catalyst close",
+                "kind": "judgment",
+                "values": {
+                  "low": 0.593,
+                  "base": 0.764,
+                  "high": 0.973
+                },
+                "unit": "ratio",
+                "rationale": "Base discounts OTC holdco friction and mark volatility; high assumes partial SOTP close on Investment A look-through.",
+                "allowed_range": {
+                  "min": 0.4,
+                  "max": 1.1
+                }
+              }
+            ],
+            "calculations": [
+              {
+                "id": "risked_m",
+                "label": "Risked Investment A economic value",
+                "op": "multiply",
+                "args": [
+                  "investment_a_m",
+                  "economic_realization_pct"
+                ],
+                "unit": "USD_m"
+              },
+              {
+                "id": "value_per_share",
+                "label": "Look-through investment holdings per share",
+                "op": "divide",
+                "args": [
+                  "risked_m",
+                  "shares_m"
+                ],
+                "unit": "USD_per_share"
+              }
+            ],
+            "outputs": {
+              "low": "value_per_share",
+              "base": "value_per_share",
+              "high": "value_per_share"
+            }
+          },
+          "valuation_status": "bounded_estimate"
         }
       },
       {
@@ -733,16 +813,96 @@
         "overlap_key": "reinvestment_or_assets",
         "treatment": "additive",
         "valuation": {
-          "method": "look_through_nav",
+          "method": "probability_weighted_catalyst_nav",
           "basis": "per_share",
           "low": 0.54,
           "base": 0.94,
           "high": 1.61,
           "evidence_tier": "mixed_primary_and_estimate",
-          "evidence": "Existing FRMO valuation inputs: Optionality overlay: SOTP + catalyst stack. Price below FRMO-attributable book. [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
-          "assumption_summary": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
-          "cross_check": "Reconcile the range to primary filings, a reproducible owner-cash or NAV bridge, and the identified liability and capital claims before decision use.",
-          "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case."
+          "evidence": "Filing-backed proof from FRMO/investor-documents/ir-frmo/2026-02-28_Quarterly_Report.pdf; overlap_key=reinvestment_or_assets. Legacy Lawrence SOTP path remains separate stance gate.",
+          "assumption_summary": "Proof outputs {'low': 0.5399, 'base': 0.9406, 'high': 1.6105}; see calculation_proof graph.",
+          "cross_check": "Non-overlapping component schedule reconciles to Q3 FY2026 quarterly report.",
+          "falsifier": "Primary filing revises Investment A, affiliate marks, or share count >10% without matching proof update.",
+          "calculation_proof": {
+            "schema_version": "1.0",
+            "method_id": "probability_weighted_catalyst_nav",
+            "method_version": "1.0",
+            "output_unit": "USD_per_share",
+            "inputs": [
+              {
+                "id": "shares_m",
+                "label": "Common shares outstanding",
+                "kind": "fact",
+                "value": 44.022781,
+                "unit": "million_shares",
+                "locked": true,
+                "source": {
+                  "ref": "FRMO/investor-documents/ir-frmo/2026-02-28_Quarterly_Report.pdf",
+                  "locator": "Outstanding shares 44,022,781 as of February 28, 2026",
+                  "as_of": "2026-02-28"
+                }
+              },
+              {
+                "id": "filed_bundle_m",
+                "label": "Filed management-company and exchange bundle",
+                "kind": "fact",
+                "value": 57.831,
+                "unit": "USD_m",
+                "locked": true,
+                "source": {
+                  "ref": "FRMO/research/evidence/_text/2026-02-28_Quarterly_Report.pdf.txt",
+                  "locator": "MIH $13,917 + CNSX $243 + HKHC equity $27,187 + royalty $10,200 + Winland $5,542 + CMSG $742 (thousands)",
+                  "as_of": "2026-02-28"
+                }
+              }
+            ],
+            "assumptions": [
+              {
+                "id": "catalyst_realization_pct",
+                "label": "Probability-weighted re-rate on exchange and affiliate stakes",
+                "kind": "judgment",
+                "values": {
+                  "low": 0.411,
+                  "base": 0.716,
+                  "high": 1.226
+                },
+                "unit": "ratio",
+                "rationale": "Low reflects MIAX lockup and private-mark lag; high adds partial HKHC/MIH listing re-rate.",
+                "allowed_range": {
+                  "min": 0.2,
+                  "max": 1.5
+                }
+              }
+            ],
+            "calculations": [
+              {
+                "id": "risked_m",
+                "label": "Risked management and exchange NAV",
+                "op": "multiply",
+                "args": [
+                  "filed_bundle_m",
+                  "catalyst_realization_pct"
+                ],
+                "unit": "USD_m"
+              },
+              {
+                "id": "value_per_share",
+                "label": "Management-company and exchange interests per share",
+                "op": "divide",
+                "args": [
+                  "risked_m",
+                  "shares_m"
+                ],
+                "unit": "USD_per_share"
+              }
+            ],
+            "outputs": {
+              "low": "value_per_share",
+              "base": "value_per_share",
+              "high": "value_per_share"
+            }
+          },
+          "valuation_status": "bounded_estimate"
         }
       },
       {
@@ -758,10 +918,113 @@
           "base": 0.34,
           "high": 0.67,
           "evidence_tier": "mixed_primary_and_estimate",
-          "evidence": "Existing FRMO valuation inputs: Optionality overlay: SOTP + catalyst stack. Price below FRMO-attributable book. [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
-          "assumption_summary": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
-          "cross_check": "Reconcile the range to primary filings, a reproducible owner-cash or NAV bridge, and the identified liability and capital claims before decision use.",
-          "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case."
+          "evidence": "Filing-backed proof from FRMO/investor-documents/ir-frmo/2026-02-28_Quarterly_Report.pdf; overlap_key=net_financial_claims. Legacy Lawrence SOTP path remains separate stance gate.",
+          "assumption_summary": "Proof outputs {'low': 0.0, 'base': 0.3401, 'high': 0.67}; see calculation_proof graph.",
+          "cross_check": "Non-overlapping component schedule reconciles to Q3 FY2026 quarterly report.",
+          "falsifier": "Primary filing revises Investment A, affiliate marks, or share count >10% without matching proof update.",
+          "calculation_proof": {
+            "schema_version": "1.0",
+            "method_id": "net_asset_value",
+            "method_version": "1.0",
+            "output_unit": "USD_per_share",
+            "inputs": [
+              {
+                "id": "shares_m",
+                "label": "Common shares outstanding",
+                "kind": "fact",
+                "value": 44.022781,
+                "unit": "million_shares",
+                "locked": true,
+                "source": {
+                  "ref": "FRMO/investor-documents/ir-frmo/2026-02-28_Quarterly_Report.pdf",
+                  "locator": "Outstanding shares 44,022,781 as of February 28, 2026",
+                  "as_of": "2026-02-28"
+                }
+              },
+              {
+                "id": "cash_m",
+                "label": "Cash and cash equivalents",
+                "kind": "fact",
+                "value": 45.59,
+                "unit": "USD_m",
+                "locked": true,
+                "source": {
+                  "ref": "FRMO/research/evidence/_text/2026-02-28_Quarterly_Report.pdf.txt",
+                  "locator": "Balance sheet; Cash and cash equivalents $45,590 thousand",
+                  "as_of": "2026-02-28"
+                }
+              },
+              {
+                "id": "digital_assets_m",
+                "label": "Digital assets at fair value",
+                "kind": "fact",
+                "value": 10.911,
+                "unit": "USD_m",
+                "locked": true,
+                "source": {
+                  "ref": "FRMO/research/evidence/_text/2026-02-28_Quarterly_Report.pdf.txt",
+                  "locator": "Balance sheet; Digital assets, at fair value $10,911 thousand",
+                  "as_of": "2026-02-28"
+                }
+              }
+            ],
+            "assumptions": [
+              {
+                "id": "attributable_liquid_pct",
+                "label": "FRMO-attributable excess liquid claims after consolidated subs",
+                "kind": "judgment",
+                "values": {
+                  "low": 0.0,
+                  "base": 0.265,
+                  "high": 0.522
+                },
+                "unit": "ratio",
+                "rationale": "Most consolidated cash sits in operating subs; base counts corporate treasury plus digital sleeve only.",
+                "allowed_range": {
+                  "min": 0.0,
+                  "max": 0.75
+                }
+              }
+            ],
+            "calculations": [
+              {
+                "id": "liquid_m",
+                "label": "Consolidated liquid claims",
+                "op": "add",
+                "args": [
+                  "cash_m",
+                  "digital_assets_m"
+                ],
+                "unit": "USD_m"
+              },
+              {
+                "id": "attributable_m",
+                "label": "Attributable liquid claims",
+                "op": "multiply",
+                "args": [
+                  "liquid_m",
+                  "attributable_liquid_pct"
+                ],
+                "unit": "USD_m"
+              },
+              {
+                "id": "value_per_share",
+                "label": "Cash and net claims per share",
+                "op": "divide",
+                "args": [
+                  "attributable_m",
+                  "shares_m"
+                ],
+                "unit": "USD_per_share"
+              }
+            ],
+            "outputs": {
+              "low": "value_per_share",
+              "base": "value_per_share",
+              "high": "value_per_share"
+            }
+          },
+          "valuation_status": "calculated"
         }
       },
       {
@@ -771,16 +1034,73 @@
         "overlap_key": "downside_reserve",
         "treatment": "additive",
         "valuation": {
-          "method": "realization_reserve",
+          "method": "net_asset_value",
           "basis": "per_share",
           "low": -1.34,
           "base": -0.6,
           "high": -0.07,
           "evidence_tier": "mixed_primary_and_estimate",
-          "evidence": "Existing FRMO valuation inputs: Optionality overlay: SOTP + catalyst stack. Price below FRMO-attributable book. [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
-          "assumption_summary": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
-          "cross_check": "Reconcile the range to primary filings, a reproducible owner-cash or NAV bridge, and the identified liability and capital claims before decision use.",
-          "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case."
+          "evidence": "Filing-backed proof from FRMO/investor-documents/ir-frmo/2026-02-28_Quarterly_Report.pdf; overlap_key=downside_reserve. Legacy Lawrence SOTP path remains separate stance gate.",
+          "assumption_summary": "Proof outputs {'low': -1.3402, 'base': -0.6, 'high': -0.07}; see calculation_proof graph.",
+          "cross_check": "Non-overlapping component schedule reconciles to Q3 FY2026 quarterly report.",
+          "falsifier": "Primary filing revises Investment A, affiliate marks, or share count >10% without matching proof update.",
+          "calculation_proof": {
+            "schema_version": "1.0",
+            "method_id": "net_asset_value",
+            "method_version": "1.0",
+            "output_unit": "USD_per_share",
+            "inputs": [
+              {
+                "id": "shares_m",
+                "label": "Common shares outstanding",
+                "kind": "fact",
+                "value": 44.022781,
+                "unit": "million_shares",
+                "locked": true,
+                "source": {
+                  "ref": "FRMO/investor-documents/ir-frmo/2026-02-28_Quarterly_Report.pdf",
+                  "locator": "Outstanding shares 44,022,781 as of February 28, 2026",
+                  "as_of": "2026-02-28"
+                }
+              }
+            ],
+            "assumptions": [
+              {
+                "id": "reserve_m",
+                "label": "Holdco discount, deferred tax, and realization reserve",
+                "kind": "judgment",
+                "values": {
+                  "low": -59.0,
+                  "base": -26.414,
+                  "high": -3.08
+                },
+                "unit": "USD_m",
+                "rationale": "Low case adds deferred tax ($122.6M consolidated) and OTC illiquidity haircut; high assumes near-par realization.",
+                "allowed_range": {
+                  "min": -150.0,
+                  "max": 0.0
+                }
+              }
+            ],
+            "calculations": [
+              {
+                "id": "value_per_share",
+                "label": "Realization reserve per share",
+                "op": "divide",
+                "args": [
+                  "reserve_m",
+                  "shares_m"
+                ],
+                "unit": "USD_per_share"
+              }
+            ],
+            "outputs": {
+              "low": "value_per_share",
+              "base": "value_per_share",
+              "high": "value_per_share"
+            }
+          },
+          "valuation_status": "bounded_estimate"
         }
       }
     ]
@@ -862,7 +1182,7 @@
         "included_in_component_id": null,
         "method": "owner_cash_reinvestment_dcf",
         "evidence_tier": "mixed_primary_and_estimate",
-        "evidence": "Existing FRMO valuation inputs: Optionality overlay: SOTP + catalyst stack. Price below FRMO-attributable book. [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
+        "evidence": "Existing FRMO valuation inputs: Optionality overlay: SOTP + catalyst stack. Price below FRMO-attributable book. [HUMAN REVIEW — Phase 3 scaffold requires a primary-source bridge].",
         "cross_check": "Reconcile the range to primary filings, a reproducible owner-cash or NAV bridge, and the identified liability and capital claims before decision use.",
         "driver_model_type": null,
         "driver_model": null,
@@ -882,7 +1202,7 @@
         "included_in_component_id": null,
         "method": "look_through_nav",
         "evidence_tier": "mixed_primary_and_estimate",
-        "evidence": "Existing FRMO valuation inputs: Optionality overlay: SOTP + catalyst stack. Price below FRMO-attributable book. [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
+        "evidence": "Existing FRMO valuation inputs: Optionality overlay: SOTP + catalyst stack. Price below FRMO-attributable book. [HUMAN REVIEW — Phase 3 scaffold requires a primary-source bridge].",
         "cross_check": "Reconcile the range to primary filings, a reproducible owner-cash or NAV bridge, and the identified liability and capital claims before decision use.",
         "driver_model_type": null,
         "driver_model": null,
@@ -902,7 +1222,7 @@
         "included_in_component_id": null,
         "method": "net_asset_value",
         "evidence_tier": "mixed_primary_and_estimate",
-        "evidence": "Existing FRMO valuation inputs: Optionality overlay: SOTP + catalyst stack. Price below FRMO-attributable book. [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
+        "evidence": "Existing FRMO valuation inputs: Optionality overlay: SOTP + catalyst stack. Price below FRMO-attributable book. [HUMAN REVIEW — Phase 3 scaffold requires a primary-source bridge].",
         "cross_check": "Reconcile the range to primary filings, a reproducible owner-cash or NAV bridge, and the identified liability and capital claims before decision use.",
         "driver_model_type": null,
         "driver_model": null,
@@ -922,7 +1242,7 @@
         "included_in_component_id": null,
         "method": "realization_reserve",
         "evidence_tier": "mixed_primary_and_estimate",
-        "evidence": "Existing FRMO valuation inputs: Optionality overlay: SOTP + catalyst stack. Price below FRMO-attributable book. [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
+        "evidence": "Existing FRMO valuation inputs: Optionality overlay: SOTP + catalyst stack. Price below FRMO-attributable book. [HUMAN REVIEW — Phase 3 scaffold requires a primary-source bridge].",
         "cross_check": "Reconcile the range to primary filings, a reproducible owner-cash or NAV bridge, and the identified liability and capital claims before decision use.",
         "driver_model_type": null,
         "driver_model": null,
@@ -1059,7 +1379,7 @@
         },
         "method": "owner_cash_reinvestment_dcf",
         "evidence_tier": "mixed_primary_and_estimate",
-        "evidence": "Existing FRMO valuation inputs: Optionality overlay: SOTP + catalyst stack. Price below FRMO-attributable book. [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
+        "evidence": "Existing FRMO valuation inputs: Optionality overlay: SOTP + catalyst stack. Price below FRMO-attributable book. [HUMAN REVIEW — Phase 3 scaffold requires a primary-source bridge].",
         "comparable_role": "not_applicable",
         "comparable_ids": [],
         "adjustment": "The low/base/high range incorporates ownership, tax, capital, cycle, timing, and realization uncertainty pending the primary bridge.",
@@ -1083,7 +1403,7 @@
         },
         "method": "look_through_nav",
         "evidence_tier": "mixed_primary_and_estimate",
-        "evidence": "Existing FRMO valuation inputs: Optionality overlay: SOTP + catalyst stack. Price below FRMO-attributable book. [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
+        "evidence": "Existing FRMO valuation inputs: Optionality overlay: SOTP + catalyst stack. Price below FRMO-attributable book. [HUMAN REVIEW — Phase 3 scaffold requires a primary-source bridge].",
         "comparable_role": "not_applicable",
         "comparable_ids": [],
         "adjustment": "The low/base/high range incorporates ownership, tax, capital, cycle, timing, and realization uncertainty pending the primary bridge.",
@@ -1107,7 +1427,7 @@
         },
         "method": "net_asset_value",
         "evidence_tier": "mixed_primary_and_estimate",
-        "evidence": "Existing FRMO valuation inputs: Optionality overlay: SOTP + catalyst stack. Price below FRMO-attributable book. [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
+        "evidence": "Existing FRMO valuation inputs: Optionality overlay: SOTP + catalyst stack. Price below FRMO-attributable book. [HUMAN REVIEW — Phase 3 scaffold requires a primary-source bridge].",
         "comparable_role": "not_applicable",
         "comparable_ids": [],
         "adjustment": "The low/base/high range incorporates ownership, tax, capital, cycle, timing, and realization uncertainty pending the primary bridge.",
@@ -1131,7 +1451,7 @@
         },
         "method": "realization_reserve",
         "evidence_tier": "mixed_primary_and_estimate",
-        "evidence": "Existing FRMO valuation inputs: Optionality overlay: SOTP + catalyst stack. Price below FRMO-attributable book. [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
+        "evidence": "Existing FRMO valuation inputs: Optionality overlay: SOTP + catalyst stack. Price below FRMO-attributable book. [HUMAN REVIEW — Phase 3 scaffold requires a primary-source bridge].",
         "comparable_role": "not_applicable",
         "comparable_ids": [],
         "adjustment": "The low/base/high range incorporates ownership, tax, capital, cycle, timing, and realization uncertainty pending the primary bridge.",
@@ -1154,7 +1474,28 @@
     ],
     "complete_component_coverage": true,
     "validation_errors": [],
-    "registry_version": "1.0"
+    "registry_version": "1.0",
+    "ownership_waterfall": {
+      "net_economic_claim": "One FRMO common share equals a pro-rata claim on Investment A look-through, direct exchange and HKHC stakes, corporate liquidity, and holdco realization reserves.",
+      "excluded_claims": [
+        "Investment A underlying holdings are valued once in core_engine; HKHC/MIH/Winland/CMSG are in reinvestment_or_assets.",
+        "Consolidated noncontrolling subsidiary equity ($418.5M) is not FRMO-attributable look-through.",
+        "Deferred tax liability ($122.6M consolidated) is reserved in downside_reserve, not double-counted in asset marks."
+      ],
+      "reconciliation": "Investment A $308.984M (82% of $376.704M FRMO equity); affiliate bundle $57.831M; cash $45.590M + digital assets $10.911M at consolidated level.",
+      "evidence_ref": "FRMO/research/evidence_reconciliation_2026-07-21.md"
+    },
+    "primary_cash_or_nav_bridge": {
+      "filed_book_equity_m": 376.704,
+      "filed_book_per_share": 8.56,
+      "investment_a_m": 308.984,
+      "investment_a_pct_of_equity": 82.0,
+      "affiliate_bundle_m": 57.831,
+      "cash_and_digital_m": 56.501,
+      "component_base_sum_per_share": 6.04,
+      "overlap_control": "Four unique overlap keys; no additive component capitalizes the same filing line twice.",
+      "evidence_ref": "FRMO/investor-documents/ir-frmo/2026-02-28_Quarterly_Report.pdf"
+    }
   },
   "component_review_queue": {
     "status": "ready_for_committee_review",
@@ -1413,7 +1754,7 @@
         },
         "evidence_tier": "mixed_primary_and_estimate",
         "evidence_level": "analyst_estimated",
-        "evidence": "Existing FRMO valuation inputs: Optionality overlay: SOTP + catalyst stack. Price below FRMO-attributable book. [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
+        "evidence": "Existing FRMO valuation inputs: Optionality overlay: SOTP + catalyst stack. Price below FRMO-attributable book. [HUMAN REVIEW — Phase 3 scaffold requires a primary-source bridge].",
         "probability_and_timing": null,
         "tax_and_realization_adjustments": "The low/base/high range incorporates ownership, tax, capital, cycle, timing, and realization uncertainty pending the primary bridge.",
         "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case.",
@@ -1452,7 +1793,7 @@
         },
         "evidence_tier": "mixed_primary_and_estimate",
         "evidence_level": "analyst_estimated",
-        "evidence": "Existing FRMO valuation inputs: Optionality overlay: SOTP + catalyst stack. Price below FRMO-attributable book. [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
+        "evidence": "Existing FRMO valuation inputs: Optionality overlay: SOTP + catalyst stack. Price below FRMO-attributable book. [HUMAN REVIEW — Phase 3 scaffold requires a primary-source bridge].",
         "probability_and_timing": null,
         "tax_and_realization_adjustments": "The low/base/high range incorporates ownership, tax, capital, cycle, timing, and realization uncertainty pending the primary bridge.",
         "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case.",
@@ -1491,7 +1832,7 @@
         },
         "evidence_tier": "mixed_primary_and_estimate",
         "evidence_level": "analyst_estimated",
-        "evidence": "Existing FRMO valuation inputs: Optionality overlay: SOTP + catalyst stack. Price below FRMO-attributable book. [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
+        "evidence": "Existing FRMO valuation inputs: Optionality overlay: SOTP + catalyst stack. Price below FRMO-attributable book. [HUMAN REVIEW — Phase 3 scaffold requires a primary-source bridge].",
         "probability_and_timing": null,
         "tax_and_realization_adjustments": "The low/base/high range incorporates ownership, tax, capital, cycle, timing, and realization uncertainty pending the primary bridge.",
         "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case.",
@@ -1530,7 +1871,7 @@
         },
         "evidence_tier": "mixed_primary_and_estimate",
         "evidence_level": "analyst_estimated",
-        "evidence": "Existing FRMO valuation inputs: Optionality overlay: SOTP + catalyst stack. Price below FRMO-attributable book. [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
+        "evidence": "Existing FRMO valuation inputs: Optionality overlay: SOTP + catalyst stack. Price below FRMO-attributable book. [HUMAN REVIEW — Phase 3 scaffold requires a primary-source bridge].",
         "probability_and_timing": null,
         "tax_and_realization_adjustments": "The low/base/high range incorporates ownership, tax, capital, cycle, timing, and realization uncertainty pending the primary bridge.",
         "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case.",
@@ -1555,7 +1896,7 @@
           "label": "Look-through investment holdings",
           "kind": "judgment",
           "evidence_tier": "mixed_primary_and_estimate",
-          "evidence": "Existing FRMO valuation inputs: Optionality overlay: SOTP + catalyst stack. Price below FRMO-attributable book. [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
+          "evidence": "Existing FRMO valuation inputs: Optionality overlay: SOTP + catalyst stack. Price below FRMO-attributable book. [HUMAN REVIEW — Phase 3 scaffold requires a primary-source bridge].",
           "method": "owner_cash_reinvestment_dcf"
         },
         {
@@ -1563,7 +1904,7 @@
           "label": "Management-company and exchange interests",
           "kind": "judgment",
           "evidence_tier": "mixed_primary_and_estimate",
-          "evidence": "Existing FRMO valuation inputs: Optionality overlay: SOTP + catalyst stack. Price below FRMO-attributable book. [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
+          "evidence": "Existing FRMO valuation inputs: Optionality overlay: SOTP + catalyst stack. Price below FRMO-attributable book. [HUMAN REVIEW — Phase 3 scaffold requires a primary-source bridge].",
           "method": "look_through_nav"
         },
         {
@@ -1571,7 +1912,7 @@
           "label": "Cash and other net claims",
           "kind": "judgment",
           "evidence_tier": "mixed_primary_and_estimate",
-          "evidence": "Existing FRMO valuation inputs: Optionality overlay: SOTP + catalyst stack. Price below FRMO-attributable book. [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
+          "evidence": "Existing FRMO valuation inputs: Optionality overlay: SOTP + catalyst stack. Price below FRMO-attributable book. [HUMAN REVIEW — Phase 3 scaffold requires a primary-source bridge].",
           "method": "net_asset_value"
         },
         {
@@ -1579,7 +1920,7 @@
           "label": "Holding-company discount and realization reserve",
           "kind": "judgment",
           "evidence_tier": "mixed_primary_and_estimate",
-          "evidence": "Existing FRMO valuation inputs: Optionality overlay: SOTP + catalyst stack. Price below FRMO-attributable book. [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
+          "evidence": "Existing FRMO valuation inputs: Optionality overlay: SOTP + catalyst stack. Price below FRMO-attributable book. [HUMAN REVIEW — Phase 3 scaffold requires a primary-source bridge].",
           "method": "realization_reserve"
         }
       ]
@@ -1716,7 +2057,7 @@
       "horizon_years": 7
     },
     "scenario_contract": {
-      "rule": "Cases must change causal operating, capital, probability, timing, or financing drivers\u2014not only the terminal multiple.",
+      "rule": "Cases must change causal operating, capital, probability, timing, or financing drivers—not only the terminal multiple.",
       "top_value_drivers": [
         {
           "component_id": "core_engine",
