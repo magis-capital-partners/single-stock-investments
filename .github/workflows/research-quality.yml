@@ -162,11 +162,28 @@ jobs:
             "repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}/files" \
             --jq '.[].filename' > "$RUNNER_TEMP/pr-files.txt"
           echo "PR files: $(wc -l < "$RUNNER_TEMP/pr-files.txt")"
-      - name: Use base-branch research linter
+      - name: Overlay lint scripts from base branch
         run: |
-          # PR heads often predate the scoping fix; the workflow merge commit
-          # already has the new args, so pull the matching script from base.
-          git checkout "origin/${{ github.base_ref }}" -- _system/scripts/lint_pr_research.py
+          # Stale PR heads must not break CI when main evolves the lint CLI/API.
+          # Pull the full lint dependency set from the base tip, not only the entrypoint.
+          set -euo pipefail
+          BASE_REF="origin/${{ github.base_ref }}"
+          for f in \
+            lint_pr_research.py \
+            lint_deep_dive.py \
+            lint_adversarial.py \
+            lint_context_overlay.py \
+            lint_insider_signal.py \
+            check_evidence_completeness.py \
+            marvin_pipeline_common.py \
+            filing_facts.py \
+            refresh_optionality_valuation.py
+          do
+            if git cat-file -e "${BASE_REF}:_system/scripts/${f}" 2>/dev/null; then
+              git checkout "${BASE_REF}" -- "_system/scripts/${f}"
+              echo "overlay _system/scripts/${f} from ${BASE_REF}"
+            fi
+          done
       - name: Lint changed ticker research
         run: |
           python _system/scripts/lint_pr_research.py \
