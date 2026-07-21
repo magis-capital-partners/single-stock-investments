@@ -559,6 +559,83 @@ def build_valuation_scaffold() -> dict:
     }
 
 
+def economic_value_block() -> dict:
+    return {
+        "schema_version": "1.0",
+        "method": "component_economic_value",
+        "economic_claim": {
+            "description": (
+                "One diluted share of ACN, including consulting and managed-services owner cash, "
+                "Gen AI reinvention upside, net financial claims, and IT-cycle/AI disruption reserve."
+            ),
+            "unit_label": "diluted share",
+            "unit_count": int(round(SHARES_M * 1_000_000)),
+            "unit_source": (
+                f"FY2025 net income ${NI_M}M / diluted EPS ${EPS_DILUTED} "
+                f"({FILING_10K})."
+            ),
+            "enterprise_to_equity_reconciliation": (
+                "Consolidated services engine valued through owner-cash discount on FY2025 FCF per share; "
+                "Gen AI option, net liquidity, and disruption reserve are separate overlap keys."
+            ),
+        },
+        "gaap_role": "cross_check",
+        "accounting_reference": (
+            f"FY2025 10-K: stockholders' equity ~$31.2B; economic value in normalized owner cash "
+            f"(${FCF_PS}/sh), not GAAP book alone."
+        ),
+        "component_groups": [
+            {
+                "id": "services_owner_cash_engine",
+                "label": "Consulting and managed-services owner-cash engine",
+                "component_ids": ["services_owner_cash_engine"],
+                "economic_claim": "Global consulting and managed-services normalized free cash flow",
+                "valuation_basis": "Owner-cash discount on FY2025 FCF per diluted share.",
+                "adjustments": "Business optimization charges already in OCF; managed-services mix shift supports base growth.",
+                "overlap_control": "Unique overlap key services_owner_cash_engine.",
+            },
+            {
+                "id": "gen_ai_reinvention_option",
+                "label": "Generative AI reinvention and managed-services upside option",
+                "component_ids": ["gen_ai_reinvention_option"],
+                "economic_claim": "Incremental enterprise Gen AI reinvention monetization beyond normalized FCF",
+                "valuation_basis": "Risk-adjusted milestone value on reinvention bookings upside.",
+                "adjustments": "Not in Lawrence base FCF path; Q2 FY2026 bookings stabilization supports base band.",
+                "overlap_control": "Unique overlap key gen_ai_reinvention_option.",
+                "risk_and_timing": {
+                    "probability_basis": "Base ~45% that Gen AI reinvention sustains mid-single-digit bookings growth; low case zero.",
+                    "timing_basis": "Enterprise reinvention programs convert over 3–5 years per FY2025 10-K disclosures.",
+                    "remaining_capital_basis": (
+                        "$3B Gen AI investment since 2023; ~$1B remaining run-rate in proof judgment band."
+                    ),
+                },
+            },
+            {
+                "id": "net_financial_claims",
+                "label": "Net cash and debt claims on common equity",
+                "component_ids": ["net_financial_claims"],
+                "economic_claim": "Net corporate liquidity after long-term debt and operating minimum",
+                "valuation_basis": "Net asset value on filing-locked cash less debt.",
+                "adjustments": "Operating cash minimum judgment; no double-count with core engine.",
+                "overlap_control": "Unique overlap key net_financial_claims.",
+            },
+            {
+                "id": "it_cycle_and_ai_disruption_reserve",
+                "label": "IT spending cycle and AI labor-substitution stress reserve",
+                "component_ids": ["it_cycle_and_ai_disruption_reserve"],
+                "economic_claim": "Consulting commoditization and margin compression stress",
+                "valuation_basis": "Bounded negative reserve; not full enterprise value haircut.",
+                "adjustments": "Partial dhando: AI could compress FCF faster than low-growth scenario.",
+                "overlap_control": "Unique overlap key it_cycle_and_ai_disruption_reserve.",
+            },
+        ],
+        "limitations": [
+            "Segment-level FCF not separately disclosed; consolidated engine with option overlay.",
+            "Gen AI reinvention probability and remaining investment are judgment bands.",
+        ],
+    }
+
+
 def main() -> int:
     proofs = {
         "services_owner_cash_engine": services_engine_proof(),
@@ -600,9 +677,21 @@ def main() -> int:
         comp["valuation"]["assumption_summary"] = (
             f"Proof outputs {outputs[cid]}; see calculation_proof graph."
         )
+        if cid == "gen_ai_reinvention_option":
+            comp["driver_model"] = {
+                "timing_basis": "Enterprise reinvention programs convert over 3–5 years.",
+                "scenarios": {
+                    "base": {
+                        "success_probability": 0.45,
+                        "remaining_cost_m": 1000.0,
+                    }
+                },
+            }
         for case in ("low", "base", "high"):
             comp["valuation"][case] = outputs[cid][case]
 
+    data["economic_value"] = economic_value_block()
+    data["valuation_mode"] = "economic_value"
     path.write_text(json.dumps(data, indent=2) + "\n", encoding="utf-8")
     base_sum = sum(outputs[c]["base"] for c in outputs)
     print(json.dumps({"status": "ok", "outputs": outputs, "base_sum_per_share": round(base_sum, 2)}, indent=2))
