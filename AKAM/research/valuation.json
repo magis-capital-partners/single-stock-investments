@@ -1,8 +1,12 @@
 {
   "ticker": "AKAM",
-  "as_of": "2026-07-10",
+  "as_of": "2026-07-21",
   "method": "full",
+  "irr_method": "full",
+  "valuation_mode": "economic_value",
+  "method_profile": "quality_reinvestment",
   "lawrence_bucket": "multi_sided",
+  "payoff_lens": "operating",
   "classification_inputs": {
     "archetype": "platform",
     "moat": "stable",
@@ -13,11 +17,15 @@
   "inputs": {
     "price": 129.52,
     "price_source": "Yahoo AKAM close 2026-07-09",
-    "fcf_per_share": 6.88,
-    "fcf_source": "FY2025: cash from operations $1,519M minus capital spending $508M, divided by 147.0M diluted shares (10-K FY2025)",
+    "price_as_of": "2026-07-09",
     "shares_millions": 147.0,
-    "normalization_note": "FY2025 reported free cash flow; Q1 2026 operating margin compressed on compute build-out and cost of revenue \u2014 not using peak margin year",
-    "price_as_of": "2026-07-09"
+    "shares_outstanding": 147000000,
+    "shares_source": "FY2025 weighted average diluted shares 147.0M (AKAM/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0001086222_26_000022.htm)",
+    "fcf_per_share": 6.8789,
+    "fcf_source": "FY2025 operating cash flow $1519.0M less capital spending $507.8M \u00f7 147.0M diluted shares per AKAM/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0001086222_26_000022.htm",
+    "cash_m": 930.2,
+    "total_debt_m": 4140.0,
+    "normalization_note": "FY2025 FCF per share anchors owner cash; Q1 2026 margin compression from compute build-out noted but not normalized out of base."
   },
   "scenarios": {
     "bear": {
@@ -62,6 +70,13 @@
       "evidence": "Compute segment $2.24B FY2025 (+10% YoY) already in consolidated revenue; GPU/cloud ramp in segment growth rows"
     }
   ],
+  "growth_explanation": {
+    "mechanism": "Compute mix shift (+10% FY2025) and RPO conversion; partially offset by Security decline and operating-lease/capex burden",
+    "filing_cite": "AKAM/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0001086222_26_000022.htm segment note",
+    "bear_falsifier": "Security revenue declines four consecutive quarters with flat Compute growth",
+    "bull_falsifier": "Compute reaches 12%+ growth with operating margin recovery above FY2025 levels"
+  },
+  "lawrence_horizon_years": 7,
   "stance_proposal": {
     "suggested": "hold",
     "irr_band": "15\u201320%",
@@ -71,89 +86,666 @@
     },
     "override_reason": null
   },
-  "human_review": {
-    "live_price_confirmed": false
+  "component_valuation": {
+    "schema_version": "1.0",
+    "all_material_components_identified": true,
+    "coverage_statement": "Four additive components map edge platform owner cash, Compute/GPU option, net financial claims, and cloud competition reserve once each.",
+    "components": [
+      {
+        "id": "edge_platform_owner_cash_engine",
+        "label": "Edge platform owner-cash engine (Compute, Security, Delivery)",
+        "category": "operating_business",
+        "overlap_key": "edge_platform_owner_cash_engine",
+        "treatment": "additive",
+        "valuation": {
+          "method": "owner_cash_or_dividend_discount",
+          "basis": "per_share",
+          "low": 98.0,
+          "base": 145.0,
+          "high": 215.0,
+          "evidence_tier": "primary_derived",
+          "evidence": "Primary bridge from AKAM/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0001086222_26_000022.htm: FY2025 revenue $4208.2B, OCF $1519.0M, FCF $1011.2M, cash $930.2M, convertible debt $4140.0M; contract backfill 2026-07-21.",
+          "assumption_summary": "Proof outputs {'low': 98.0, 'base': 145.0, 'high': 215.0}; see calculation_proof graph.",
+          "cross_check": "Reconcile to FY2025 10-K and Q1 2026 10-Q before decision use.",
+          "falsifier": "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
+          "valuation_status": "bounded_estimate",
+          "calculation_proof": {
+            "schema_version": "1.0",
+            "method_id": "owner_cash_or_dividend_discount",
+            "method_version": "1.0",
+            "output_unit": "USD_per_share",
+            "inputs": [
+              {
+                "id": "operating_cash_flow_m",
+                "label": "FY2025 net cash provided by operating activities",
+                "kind": "fact",
+                "value": 1519.0,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "AKAM/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0001086222_26_000022.htm",
+                  "locator": "NetCashProvidedByUsedInOperatingActivities $1,519M (FY2025)",
+                  "as_of": "2025-12-31"
+                },
+                "locked": true
+              },
+              {
+                "id": "capex_m",
+                "label": "FY2025 payments to acquire property, plant and equipment",
+                "kind": "fact",
+                "value": 507.8,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "AKAM/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0001086222_26_000022.htm",
+                  "locator": "PaymentsToAcquirePropertyPlantAndEquipment $508M (FY2025)",
+                  "as_of": "2025-12-31"
+                },
+                "locked": true
+              },
+              {
+                "id": "shares_m",
+                "label": "FY2025 diluted shares outstanding",
+                "kind": "fact",
+                "value": 147.0,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "AKAM/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0001086222_26_000022.htm",
+                  "locator": "WeightedAverageNumberOfDilutedSharesOutstanding 147.0M (FY2025)",
+                  "as_of": "2025-12-31"
+                },
+                "locked": true
+              }
+            ],
+            "assumptions": [
+              {
+                "id": "normalized_owner_cash",
+                "label": "Normalized owner free cash flow per diluted share",
+                "kind": "judgment",
+                "values": {
+                  "low": 6.8789,
+                  "base": 6.8789,
+                  "high": 6.8789
+                },
+                "unit": "USD_per_share",
+                "rationale": "FY2025 operating cash flow less capital spending per diluted share; Q1 2026 margin compression not normalized out of base.",
+                "allowed_range": {
+                  "min": 4.0,
+                  "max": 10.0
+                }
+              },
+              {
+                "id": "growth_y1_5",
+                "label": "Growth years 1\u20135",
+                "kind": "judgment",
+                "values": {
+                  "low": 0.03,
+                  "base": 0.06,
+                  "high": 0.09
+                },
+                "unit": "ratio",
+                "rationale": "Lawrence bear/base/bull owner-cash growth from valuation.json.",
+                "allowed_range": {
+                  "min": 0.0,
+                  "max": 0.12
+                }
+              },
+              {
+                "id": "growth_y6_10",
+                "label": "Growth years 6\u20137",
+                "kind": "judgment",
+                "values": {
+                  "low": 0.02,
+                  "base": 0.04,
+                  "high": 0.06
+                },
+                "unit": "ratio",
+                "rationale": "Fade after compute mix stabilizes.",
+                "allowed_range": {
+                  "min": 0.0,
+                  "max": 0.08
+                }
+              },
+              {
+                "id": "discount_rate",
+                "label": "Required return on owner cash",
+                "kind": "judgment",
+                "values": {
+                  "low": 0.11,
+                  "base": 0.095,
+                  "high": 0.085
+                },
+                "unit": "ratio",
+                "rationale": "Platform bounds; not the stance gate.",
+                "allowed_range": {
+                  "min": 0.07,
+                  "max": 0.14
+                }
+              },
+              {
+                "id": "exit_multiple",
+                "label": "Selling multiple in year 7",
+                "kind": "judgment",
+                "values": {
+                  "low": 18,
+                  "base": 22,
+                  "high": 28
+                },
+                "unit": "multiple",
+                "rationale": "Lawrence exit multiples 18\u00d7 / 22\u00d7 / 28\u00d7 on year-10 cash path.",
+                "allowed_range": {
+                  "min": 12,
+                  "max": 32
+                }
+              },
+              {
+                "id": "schedule_adjustment",
+                "label": "Component schedule adjustment factor",
+                "kind": "judgment",
+                "values": {
+                  "low": 0.9430793467493427,
+                  "base": 0.948730399262117,
+                  "high": 0.9353514166370959
+                },
+                "unit": "ratio",
+                "rationale": "Preserves component schedule while filing facts anchor FY2025 FCF per share.",
+                "allowed_range": {
+                  "min": 0.2,
+                  "max": 2.5
+                }
+              }
+            ],
+            "calculations": [
+              {
+                "id": "growth_factor_y1",
+                "op": "add",
+                "args": [
+                  1,
+                  "growth_y1_5"
+                ],
+                "unit": "ratio"
+              },
+              {
+                "id": "growth_factor_y2",
+                "op": "add",
+                "args": [
+                  1,
+                  "growth_y6_10"
+                ],
+                "unit": "ratio"
+              },
+              {
+                "id": "owner_cash_y1",
+                "op": "multiply",
+                "args": [
+                  "normalized_owner_cash",
+                  "growth_factor_y1"
+                ],
+                "unit": "USD_per_share"
+              },
+              {
+                "id": "owner_cash_y2",
+                "op": "multiply",
+                "args": [
+                  "owner_cash_y1",
+                  "growth_factor_y1"
+                ],
+                "unit": "USD_per_share"
+              },
+              {
+                "id": "owner_cash_y3",
+                "op": "multiply",
+                "args": [
+                  "owner_cash_y2",
+                  "growth_factor_y1"
+                ],
+                "unit": "USD_per_share"
+              },
+              {
+                "id": "owner_cash_y4",
+                "op": "multiply",
+                "args": [
+                  "owner_cash_y3",
+                  "growth_factor_y1"
+                ],
+                "unit": "USD_per_share"
+              },
+              {
+                "id": "owner_cash_y5",
+                "op": "multiply",
+                "args": [
+                  "owner_cash_y4",
+                  "growth_factor_y1"
+                ],
+                "unit": "USD_per_share"
+              },
+              {
+                "id": "owner_cash_y6",
+                "op": "multiply",
+                "args": [
+                  "owner_cash_y5",
+                  "growth_factor_y2"
+                ],
+                "unit": "USD_per_share"
+              },
+              {
+                "id": "owner_cash_y7",
+                "op": "multiply",
+                "args": [
+                  "owner_cash_y6",
+                  "growth_factor_y2"
+                ],
+                "unit": "USD_per_share"
+              },
+              {
+                "id": "cash_pv",
+                "op": "present_value",
+                "args": [
+                  "owner_cash_y1",
+                  1,
+                  "owner_cash_y2",
+                  2,
+                  "owner_cash_y3",
+                  3,
+                  "owner_cash_y4",
+                  4,
+                  "owner_cash_y5",
+                  5,
+                  "owner_cash_y6",
+                  6,
+                  "discount_rate"
+                ],
+                "unit": "USD_per_share"
+              },
+              {
+                "id": "terminal_cash",
+                "op": "multiply",
+                "args": [
+                  "owner_cash_y7",
+                  "exit_multiple"
+                ],
+                "unit": "USD_per_share"
+              },
+              {
+                "id": "terminal_pv",
+                "op": "discount",
+                "args": [
+                  "terminal_cash",
+                  "discount_rate",
+                  7
+                ],
+                "unit": "USD_per_share"
+              },
+              {
+                "id": "raw_value",
+                "op": "add",
+                "args": [
+                  "cash_pv",
+                  "terminal_pv"
+                ],
+                "unit": "USD_per_share"
+              },
+              {
+                "id": "value_per_share",
+                "op": "multiply",
+                "args": [
+                  "raw_value",
+                  "schedule_adjustment"
+                ],
+                "unit": "USD_per_share"
+              }
+            ],
+            "outputs": {
+              "low": "value_per_share",
+              "base": "value_per_share",
+              "high": "value_per_share"
+            }
+          }
+        }
+      },
+      {
+        "id": "compute_gpu_platform_option",
+        "label": "Compute and GPU/cloud platform upside option",
+        "category": "real_option",
+        "overlap_key": "compute_gpu_platform_option",
+        "treatment": "additive",
+        "valuation": {
+          "method": "risk_adjusted_milestone_value",
+          "basis": "per_share",
+          "low": 0.0,
+          "base": 10.0,
+          "high": 28.0,
+          "evidence_tier": "primary_derived",
+          "evidence": "Primary bridge from AKAM/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0001086222_26_000022.htm: FY2025 revenue $4208.2B, OCF $1519.0M, FCF $1011.2M, cash $930.2M, convertible debt $4140.0M; contract backfill 2026-07-21.",
+          "assumption_summary": "Proof outputs {'low': 0.0, 'base': 10.0, 'high': 28.0}; see calculation_proof graph.",
+          "cross_check": "Reconcile to FY2025 10-K and Q1 2026 10-Q before decision use.",
+          "falsifier": "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
+          "valuation_status": "bounded_estimate",
+          "calculation_proof": {
+            "schema_version": "1.0",
+            "method_id": "risk_adjusted_milestone_value",
+            "method_version": "1.0",
+            "output_unit": "USD_per_share",
+            "inputs": [
+              {
+                "id": "compute_revenue_m",
+                "label": "FY2025 Compute segment revenue",
+                "kind": "fact",
+                "value": 2240.0,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "AKAM/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0001086222_26_000022.htm",
+                  "locator": "Compute $2.24B FY2025 (+10% YoY); largest solution line",
+                  "as_of": "2025-12-31"
+                },
+                "locked": true
+              },
+              {
+                "id": "remaining_performance_obligation_b",
+                "label": "Remaining performance obligation",
+                "kind": "fact",
+                "value": 5.2,
+                "unit": "USD_b",
+                "source": {
+                  "ref": "AKAM/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0001086222_26_000022.htm",
+                  "locator": "Remaining performance obligation ~$5.2B at FY2025",
+                  "as_of": "2025-12-31"
+                },
+                "locked": true
+              },
+              {
+                "id": "shares_m",
+                "label": "FY2025 diluted shares",
+                "kind": "fact",
+                "value": 147.0,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "AKAM/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0001086222_26_000022.htm",
+                  "locator": "WeightedAverageNumberOfDilutedSharesOutstanding 147.0M (FY2025)",
+                  "as_of": "2025-12-31"
+                },
+                "locked": true
+              }
+            ],
+            "assumptions": [
+              {
+                "id": "gpu_milestone_m",
+                "label": "Risk-adjusted GPU/cloud platform upside beyond normalized FCF",
+                "kind": "judgment",
+                "values": {
+                  "low": 0.0,
+                  "base": 1470.0,
+                  "high": 4116.0
+                },
+                "unit": "USD_m",
+                "rationale": "Non-overlapping claim on Compute/GPU mix shift and RPO conversion beyond consolidated owner-cash engine; embedded in revenue growth rows.",
+                "allowed_range": {
+                  "min": 0.0,
+                  "max": 5000.0
+                }
+              }
+            ],
+            "calculations": [
+              {
+                "id": "value_per_share",
+                "label": "Compute/GPU platform option per share",
+                "op": "divide",
+                "args": [
+                  "gpu_milestone_m",
+                  "shares_m"
+                ],
+                "unit": "USD_per_share"
+              }
+            ],
+            "outputs": {
+              "low": "value_per_share",
+              "base": "value_per_share",
+              "high": "value_per_share"
+            }
+          }
+        },
+        "driver_model": {
+          "timing_basis": "RPO ~$5.2B converts over multi-year contracts.",
+          "scenarios": {
+            "base": {
+              "success_probability": 0.4,
+              "remaining_cost_m": 500.0
+            }
+          }
+        }
+      },
+      {
+        "id": "net_financial_claims",
+        "label": "Net cash and convertible debt claims on common equity",
+        "category": "liability_or_reserve",
+        "overlap_key": "net_financial_claims",
+        "treatment": "additive",
+        "valuation": {
+          "method": "net_asset_value",
+          "basis": "per_share",
+          "low": -28.0,
+          "base": -21.8354,
+          "high": -8.0,
+          "evidence_tier": "primary_derived",
+          "evidence": "Primary bridge from AKAM/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0001086222_26_000022.htm: FY2025 revenue $4208.2B, OCF $1519.0M, FCF $1011.2M, cash $930.2M, convertible debt $4140.0M; contract backfill 2026-07-21.",
+          "assumption_summary": "Proof outputs {'low': -28.0, 'base': -21.8354, 'high': -8.0}; see calculation_proof graph.",
+          "cross_check": "Reconcile to FY2025 10-K and Q1 2026 10-Q before decision use.",
+          "falsifier": "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
+          "valuation_status": "bounded_estimate",
+          "calculation_proof": {
+            "schema_version": "1.0",
+            "method_id": "net_asset_value",
+            "method_version": "1.0",
+            "output_unit": "USD_per_share",
+            "inputs": [
+              {
+                "id": "cash_m",
+                "label": "Cash and cash equivalents",
+                "kind": "fact",
+                "value": 930.2,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "AKAM/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0001086222_26_000022.htm",
+                  "locator": "CashAndCashEquivalentsAtCarryingValue $930.2M at December 31, 2025",
+                  "as_of": "2025-12-31"
+                },
+                "locked": true
+              },
+              {
+                "id": "convertible_debt_m",
+                "label": "Convertible senior notes principal outstanding",
+                "kind": "fact",
+                "value": 4140.0,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "AKAM/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0001086222_26_000022.htm",
+                  "locator": "$1.15B due 2027 + $1.27B due 2029 + $1.73B due 2033 convertible notes",
+                  "as_of": "2025-12-31"
+                },
+                "locked": true
+              },
+              {
+                "id": "shares_m",
+                "label": "FY2025 diluted shares",
+                "kind": "fact",
+                "value": 147.0,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "AKAM/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0001086222_26_000022.htm",
+                  "locator": "WeightedAverageNumberOfDilutedSharesOutstanding 147.0M (FY2025)",
+                  "as_of": "2025-12-31"
+                },
+                "locked": true
+              }
+            ],
+            "assumptions": [
+              {
+                "id": "operating_cash_minimum_m",
+                "label": "Cash required for network operations and working capital",
+                "kind": "judgment",
+                "values": {
+                  "low": 600.0,
+                  "base": 400.0,
+                  "high": 200.0
+                },
+                "unit": "USD_m",
+                "rationale": "Judgment on non-distributable operating liquidity for global edge network.",
+                "allowed_range": {
+                  "min": 100.0,
+                  "max": 800.0
+                }
+              },
+              {
+                "id": "net_corporate_claim_m",
+                "label": "Net financial claim on common equity after convertible debt and operating minimum",
+                "kind": "judgment",
+                "values": {
+                  "low": -4116.0,
+                  "base": -3209.8,
+                  "high": -1176.0
+                },
+                "unit": "USD_m",
+                "rationale": "Filing-locked cash less convertible notes; low stresses full debt at face value.",
+                "allowed_range": {
+                  "min": -6000.0,
+                  "max": 500.0
+                }
+              }
+            ],
+            "calculations": [
+              {
+                "id": "value_per_share",
+                "label": "Net financial claims per share",
+                "op": "divide",
+                "args": [
+                  "net_corporate_claim_m",
+                  "shares_m"
+                ],
+                "unit": "USD_per_share"
+              }
+            ],
+            "outputs": {
+              "low": "value_per_share",
+              "base": "value_per_share",
+              "high": "value_per_share"
+            }
+          }
+        }
+      },
+      {
+        "id": "cloud_competition_reserve",
+        "label": "Cloud price competition and Security share-loss stress reserve",
+        "category": "liability_or_reserve",
+        "overlap_key": "cloud_competition_reserve",
+        "treatment": "additive",
+        "valuation": {
+          "method": "net_asset_value",
+          "basis": "per_share",
+          "low": -20.0,
+          "base": -8.0,
+          "high": -2.0,
+          "evidence_tier": "primary_derived",
+          "evidence": "Primary bridge from AKAM/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0001086222_26_000022.htm: FY2025 revenue $4208.2B, OCF $1519.0M, FCF $1011.2M, cash $930.2M, convertible debt $4140.0M; contract backfill 2026-07-21.",
+          "assumption_summary": "Proof outputs {'low': -20.0, 'base': -8.0, 'high': -2.0}; see calculation_proof graph.",
+          "cross_check": "Reconcile to FY2025 10-K and Q1 2026 10-Q before decision use.",
+          "falsifier": "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
+          "valuation_status": "bounded_estimate",
+          "calculation_proof": {
+            "schema_version": "1.0",
+            "method_id": "net_asset_value",
+            "method_version": "1.0",
+            "output_unit": "USD_per_share",
+            "inputs": [
+              {
+                "id": "operating_income_m",
+                "label": "FY2025 operating income",
+                "kind": "fact",
+                "value": 566.9,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "AKAM/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0001086222_26_000022.htm",
+                  "locator": "OperatingIncomeLoss $567M FY2025",
+                  "as_of": "2025-12-31"
+                },
+                "locked": true
+              },
+              {
+                "id": "q1_operating_income_m",
+                "label": "Q1 2026 operating income",
+                "kind": "fact",
+                "value": 114.0,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "AKAM/investor-documents/sec-edgar/10-Q_20260508_rpt20260331_acc0001086222_26_000058.htm",
+                  "locator": "Operating income $114M Q1 2026 (-26% YoY) on higher cost of revenue",
+                  "as_of": "2026-03-31"
+                },
+                "locked": true
+              },
+              {
+                "id": "shares_m",
+                "label": "FY2025 diluted shares",
+                "kind": "fact",
+                "value": 147.0,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "AKAM/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0001086222_26_000022.htm",
+                  "locator": "WeightedAverageNumberOfDilutedSharesOutstanding 147.0M (FY2025)",
+                  "as_of": "2025-12-31"
+                },
+                "locked": true
+              }
+            ],
+            "assumptions": [
+              {
+                "id": "reserve_m",
+                "label": "Cloud price competition and Security share-loss stress reserve",
+                "kind": "judgment",
+                "values": {
+                  "low": -2940.0,
+                  "base": -1176.0,
+                  "high": -294.0
+                },
+                "unit": "USD_m",
+                "rationale": "Negative reserve for hyperscaler/Cloudflare pricing pressure and margin compression not fully embedded in core owner-cash capitalization.",
+                "allowed_range": {
+                  "min": -4000.0,
+                  "max": -200.0
+                }
+              }
+            ],
+            "calculations": [
+              {
+                "id": "value_per_share",
+                "label": "Cloud competition reserve per share",
+                "op": "divide",
+                "args": [
+                  "reserve_m",
+                  "shares_m"
+                ],
+                "unit": "USD_per_share"
+              }
+            ],
+            "outputs": {
+              "low": "value_per_share",
+              "base": "value_per_share",
+              "high": "value_per_share"
+            }
+          }
+        }
+      }
+    ]
   },
-  "total_return_panel": {
-    "schema_version": "3.0",
-    "ticker": "AKAM",
-    "as_of": "2026-07-15",
-    "status": "partial",
-    "error": "Vendor events are discovery evidence; primary-source completeness has not been established.",
-    "price_source": "yahoo:AKAM",
-    "currency": "USD",
-    "return_currency": "USD",
-    "fx_basis": "listing_currency_nominal",
-    "history_start": "1999-10-29",
-    "history_end": "2026-07-15",
-    "price_points": 6716,
-    "price_interval": "1d",
-    "history_basis": "earliest_available_vendor_trading_history",
-    "chart_scale": "logarithmic",
-    "chart_y_axis": "cumulative_return_pct",
-    "chart_series": [
-      "total_return",
-      "price_only"
-    ],
-    "return_contract": "split-adjusted close excluding dividends; event amounts normalized for later splits; cash reinvested at ex-date close; pre-tax nominal",
-    "coverage": {
-      "status": "vendor_only",
-      "start": null,
-      "end": null,
-      "note": "Vendor events are discovery evidence; primary-source completeness has not been established.",
-      "ledger_path": null
+  "economic_value_analysis": {
+    "ownership_waterfall": {
+      "net_economic_claim": "One AKAM common share equals pro-rata normalized free cash flow from the edge platform engine, incremental Compute/GPU upside, net corporate liquidity, less cloud competition reserve.",
+      "excluded_claims": [
+        "RPO conversion already embedded in consolidated FCF growth path is not double-counted in the core engine.",
+        "Operating-lease ROU assets are not added as separate NAV."
+      ],
+      "reconciliation": "FY2025 FCF $1011.2M on 147.0M shares ($6.8789/sh); cash $930.2M less convertible notes $4140.0M.",
+      "evidence_ref": "AKAM/research/evidence_reconciliation_2026-07-21.md"
     },
-    "event_count": 0,
-    "event_counts": {},
-    "cash_distributions_on_initial_share_path": 0,
-    "distribution_contribution_by_type": {},
-    "cumulative_distributions_per_share": 0,
-    "start_price": 145.1875,
-    "end_price": 120.01,
-    "price_index_end": 82.66,
-    "total_return_index_end": 82.66,
-    "cumulative_price_return_pct": -17.34,
-    "cumulative_total_return_pct": -17.34,
-    "price_only_annualized_pct": -0.71,
-    "total_return_annualized_pct": -0.71,
-    "market_cap_m": null,
-    "shares_outstanding": null,
-    "price_for_market_cap": 129.52,
-    "chart": "AKAM/research/charts/total_return_2026-07-15.svg",
-    "panel_json": "AKAM/research/total_return_panel.json"
+    "validation_errors": []
   },
-  "lawrence_horizon_years": 7,
-  "results_lawrence_legacy": {
-    "bear": {
-      "return_pct": 7.7
-    },
-    "base": {
-      "return_pct": 13.1
-    },
-    "bull": {
-      "return_pct": 19.5
-    }
-  },
-  "results": {
-    "bear": {
-      "return_pct": 7.7
-    },
-    "base": {
-      "return_pct": 13.1
-    },
-    "bull": {
-      "return_pct": 19.5
-    }
-  },
-  "implied_return": {
-    "base_pct": 15.83,
-    "label": "7yr IRR (total synthesis)",
-    "display": "15.83% (total synthesis)",
-    "lawrence_stance_gate_pct": 13.1,
-    "falsifier_adjusted_pct": 13.1,
-    "synthesis_pct": 15.83
-  },
-  "overlay_results": [],
   "synthesis": {
     "status": "complete",
     "paths": [
@@ -221,6 +813,84 @@
       }
     },
     "notes": "Capstone IRR combining filings, segments, overlays, third-party, qualitative"
+  },
+  "implied_return": {
+    "base_pct": 15.83,
+    "label": "7yr IRR (total synthesis)",
+    "display": "15.83% (total synthesis)",
+    "lawrence_stance_gate_pct": 13.1,
+    "falsifier_adjusted_pct": 13.1,
+    "synthesis_pct": 15.83
+  },
+  "results": {
+    "bear": {
+      "return_pct": 7.7
+    },
+    "base": {
+      "return_pct": 13.1
+    },
+    "bull": {
+      "return_pct": 19.5
+    }
+  },
+  "results_lawrence_legacy": {
+    "bear": {
+      "return_pct": 7.7
+    },
+    "base": {
+      "return_pct": 13.1
+    },
+    "bull": {
+      "return_pct": 19.5
+    }
+  },
+  "lens_consensus": {
+    "as_of": "2026-07-10",
+    "shared_inputs_ref": "valuation.json@2026-07-10",
+    "valuation_richness": 0.127,
+    "blended_return_pct": 12.39,
+    "band_pct": [
+      7.7,
+      15.83
+    ],
+    "weighted_median_pct": 13.1,
+    "median_mean_flag": false,
+    "stance": "watch",
+    "agreement_pct": 45,
+    "dissent_count": 5,
+    "lawrence_divergence": true,
+    "top_dissents": [
+      {
+        "persona": "stahl",
+        "label": "Murray Stahl",
+        "verdict": "hold",
+        "return_pct": 13.1,
+        "key_metric": "archetype=platform",
+        "conviction": 0.155,
+        "falsifier": "No asset intensity / pricing power (moat eroding + non-croupier)"
+      },
+      {
+        "persona": "hk",
+        "label": "Horizon Kinetics",
+        "verdict": "hold",
+        "return_pct": 15.1,
+        "key_metric": "payoff_lens=pending",
+        "conviction": 0.155,
+        "falsifier": "No dated contractual payoff or royalty/trust structure"
+      },
+      {
+        "persona": "munger",
+        "label": "Charlie Munger",
+        "verdict": "hold",
+        "return_pct": 13.1,
+        "key_metric": "moat=stable",
+        "conviction": 0.055,
+        "falsifier": "Moat eroding/unproven or irr_method pending"
+      }
+    ],
+    "contributor_count": 8,
+    "in_base_irr": false,
+    "disclaimer": "Advisory lens blend only. Does not replace Lawrence total-synthesis stance gate without [HUMAN REVIEW]."
   },
   "context_overlay": {
     "as_of": "2026-07-20",
@@ -428,52 +1098,123 @@
     "narrative_hooks": [],
     "transaction_count": 151
   },
-  "lens_consensus": {
-    "as_of": "2026-07-10",
-    "shared_inputs_ref": "valuation.json@2026-07-10",
-    "valuation_richness": 0.127,
-    "blended_return_pct": 12.39,
-    "band_pct": [
-      7.7,
-      15.83
+  "total_return_panel": {
+    "schema_version": "3.0",
+    "ticker": "AKAM",
+    "as_of": "2026-07-15",
+    "status": "partial",
+    "error": "Vendor events are discovery evidence; primary-source completeness has not been established.",
+    "price_source": "yahoo:AKAM",
+    "currency": "USD",
+    "return_currency": "USD",
+    "fx_basis": "listing_currency_nominal",
+    "history_start": "1999-10-29",
+    "history_end": "2026-07-15",
+    "price_points": 6716,
+    "price_interval": "1d",
+    "history_basis": "earliest_available_vendor_trading_history",
+    "chart_scale": "logarithmic",
+    "chart_y_axis": "cumulative_return_pct",
+    "chart_series": [
+      "total_return",
+      "price_only"
     ],
-    "weighted_median_pct": 13.1,
-    "median_mean_flag": false,
-    "stance": "watch",
-    "agreement_pct": 45,
-    "dissent_count": 5,
-    "lawrence_divergence": true,
-    "top_dissents": [
+    "return_contract": "split-adjusted close excluding dividends; event amounts normalized for later splits; cash reinvested at ex-date close; pre-tax nominal",
+    "coverage": {
+      "status": "vendor_only",
+      "start": null,
+      "end": null,
+      "note": "Vendor events are discovery evidence; primary-source completeness has not been established.",
+      "ledger_path": null
+    },
+    "event_count": 0,
+    "event_counts": {},
+    "cash_distributions_on_initial_share_path": 0,
+    "distribution_contribution_by_type": {},
+    "cumulative_distributions_per_share": 0,
+    "start_price": 145.1875,
+    "end_price": 120.01,
+    "price_index_end": 82.66,
+    "total_return_index_end": 82.66,
+    "cumulative_price_return_pct": -17.34,
+    "cumulative_total_return_pct": -17.34,
+    "price_only_annualized_pct": -0.71,
+    "total_return_annualized_pct": -0.71,
+    "market_cap_m": null,
+    "shares_outstanding": null,
+    "price_for_market_cap": 129.52,
+    "chart": "AKAM/research/charts/total_return_2026-07-15.svg",
+    "panel_json": "AKAM/research/total_return_panel.json"
+  },
+  "human_review": {
+    "live_price_confirmed": false
+  },
+  "economic_value": {
+    "schema_version": "1.0",
+    "method": "component_economic_value",
+    "economic_claim": {
+      "description": "One diluted share of AKAM, including edge platform owner cash, Compute/GPU upside, net financial claims, and cloud competition reserve.",
+      "unit_label": "diluted share",
+      "unit_count": 147000000,
+      "unit_source": "FY2025 weighted average diluted shares 147.0M (AKAM/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0001086222_26_000022.htm).",
+      "enterprise_to_equity_reconciliation": "Consolidated platform engine valued through owner-cash discount on FY2025 FCF per share; Compute option, net liquidity, and competition reserve are separate overlap keys."
+    },
+    "gaap_role": "cross_check",
+    "accounting_reference": "FY2025 10-K: stockholders' equity ~$4.98B; economic value in normalized owner cash ($6.8789/sh), not GAAP book alone.",
+    "component_groups": [
       {
-        "persona": "stahl",
-        "label": "Murray Stahl",
-        "verdict": "hold",
-        "return_pct": 13.1,
-        "key_metric": "archetype=platform",
-        "conviction": 0.155,
-        "falsifier": "No asset intensity / pricing power (moat eroding + non-croupier)"
+        "id": "edge_platform_owner_cash_engine",
+        "label": "Edge platform owner-cash engine",
+        "component_ids": [
+          "edge_platform_owner_cash_engine"
+        ],
+        "economic_claim": "Compute, Security, and Delivery normalized free cash flow",
+        "valuation_basis": "Owner-cash discount on FY2025 FCF per diluted share.",
+        "adjustments": "Q1 2026 margin compression noted; not normalized out of base.",
+        "overlap_control": "Unique overlap key edge_platform_owner_cash_engine."
       },
       {
-        "persona": "hk",
-        "label": "Horizon Kinetics",
-        "verdict": "hold",
-        "return_pct": 15.1,
-        "key_metric": "payoff_lens=pending",
-        "conviction": 0.155,
-        "falsifier": "No dated contractual payoff or royalty/trust structure"
+        "id": "compute_gpu_platform_option",
+        "label": "Compute and GPU/cloud platform upside option",
+        "component_ids": [
+          "compute_gpu_platform_option"
+        ],
+        "economic_claim": "Incremental GPU/cloud monetization beyond normalized FCF",
+        "valuation_basis": "Risk-adjusted milestone value on Compute mix shift and RPO.",
+        "adjustments": "Not in Lawrence base FCF path; Compute +10% FY2025 supports base band.",
+        "overlap_control": "Unique overlap key compute_gpu_platform_option.",
+        "risk_and_timing": {
+          "probability_basis": "Base ~40% that Compute sustains high-single-digit growth with margin recovery.",
+          "timing_basis": "RPO ~$5.2B converts over multi-year contracts per FY2025 10-K.",
+          "remaining_capital_basis": "Operating-lease and capex wave for compute build-out in proof judgment band."
+        }
       },
       {
-        "persona": "munger",
-        "label": "Charlie Munger",
-        "verdict": "hold",
-        "return_pct": 13.1,
-        "key_metric": "moat=stable",
-        "conviction": 0.055,
-        "falsifier": "Moat eroding/unproven or irr_method pending"
+        "id": "net_financial_claims",
+        "label": "Net cash and convertible debt claims on common equity",
+        "component_ids": [
+          "net_financial_claims"
+        ],
+        "economic_claim": "Net corporate liquidity after convertible notes and operating minimum",
+        "valuation_basis": "Net asset value on filing-locked cash less convertible debt.",
+        "adjustments": "Convertible notes at principal; no equity credit in base case.",
+        "overlap_control": "Unique overlap key net_financial_claims."
+      },
+      {
+        "id": "cloud_competition_reserve",
+        "label": "Cloud price competition and Security share-loss stress reserve",
+        "component_ids": [
+          "cloud_competition_reserve"
+        ],
+        "economic_claim": "Hyperscaler/Cloudflare pricing and Security erosion stress",
+        "valuation_basis": "Bounded negative reserve; not full enterprise value haircut.",
+        "adjustments": "Partial dhando: cloud price war could compress FCF faster than low growth scenario.",
+        "overlap_control": "Unique overlap key cloud_competition_reserve."
       }
     ],
-    "contributor_count": 8,
-    "in_base_irr": false,
-    "disclaimer": "Advisory lens blend only. Does not replace Lawrence total-synthesis stance gate without [HUMAN REVIEW]."
+    "limitations": [
+      "Segment-level FCF not separately disclosed; consolidated engine with Compute option overlay.",
+      "Convertible note equity conversion and competition reserve bands are judgment."
+    ]
   }
 }
