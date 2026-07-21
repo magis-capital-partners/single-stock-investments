@@ -9,10 +9,10 @@
 | **Archetype** (Stahl) | platform |
 | **Moat** (Munger) | stable |
 | **Dhando** (Pabrai) | partial |
-| **Stance** | watch |
+| **Stance** | hold |
 | **Cycle** | - |
-| **Implied 7yr IRR** (base) | 12.71% (total synthesis) |
-| **IRR method** | full |
+| **Implied 7yr IRR** (base) | -1.79% (contract base) |
+| **IRR method** | quality_reinvestment |
 | **Lawrence bucket** | multi_sided |
 | **Payoff lens** | pending |
 | **MOI bucket** | pending |
@@ -43,4 +43,4 @@ Global alternative-asset compounder earning durable fee streams on $614B fee-bea
 - Confirm DE yield vs 5-year range before sizing.
 - Model BN+BNT merger impact.
 
-**Deep dive:** `BN/research/deep_dive_2026-06-04.md` (auto-sync)
+**Deep dive:** `BN/research/deep_dive_2026-07-21.md` (auto-sync)
