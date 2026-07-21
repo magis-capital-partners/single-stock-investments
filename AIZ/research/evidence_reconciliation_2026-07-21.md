@@ -12,7 +12,7 @@
 | Downside capital claims | **met** — net debt ~$7.30/sh filing-locked; catastrophe reserve component |
 | Double-counting | **met** — non-overlapping overlap keys; unearned premiums not subtracted twice |
 
-**Contract status after agent pass:** pending mechanical refresh (`marvin_cloud_refresh.py` 2026-07-21).
+**Contract status after agent pass:** **decision_grade** after `marvin_cloud_refresh.py` 2026-07-21; Lawrence synthesis **8.07%** per year.
 
 ---
 
