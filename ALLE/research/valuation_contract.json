@@ -1,30 +1,2150 @@
 {
   "schema_version": "2.0",
-  "status": "evidence_blocked",
+  "status": "decision_grade",
   "ticker": "ALLE",
-  "as_of": "2026-07-20",
-  "economic_ownership_map": [],
+  "as_of": "2026-07-21",
+  "economic_ownership_map": [
+    {
+      "component_id": "security_products_owner_cash_engine",
+      "label": "Security products owner-cash engine (Americas + International)",
+      "category": "operating_business",
+      "treatment": "additive",
+      "included_in_component_id": null,
+      "ownership_claim": "Normalized free cash flow from Americas and International segments",
+      "ownership_percentage": 1.0,
+      "quantity": {
+        "value": 1,
+        "unit": "per-share economic claim"
+      },
+      "method": "owner_cash_or_dividend_discount",
+      "method_version": "1.0",
+      "method_provenance": {
+        "method_id": "owner_cash_or_dividend_discount",
+        "version": "1.0",
+        "label": "Predictable owner-cash discount model",
+        "power_zones": [
+          "predictable_cash_flow"
+        ],
+        "equation": "value = distribution*(1+growth)/(required_return-growth) - funding_or_dilution_per_share",
+        "sources": [
+          {
+            "ref": "_system/frameworks/segment_cashflow_valuation.md",
+            "locator": "Cash-flow duration and funding"
+          }
+        ]
+      },
+      "comparable_ids": [],
+      "range_per_share": {
+        "low": 125.02,
+        "base": 180.58,
+        "high": 234.48
+      },
+      "legacy_range_per_share": {
+        "low": 125.02,
+        "base": 180.58,
+        "high": 234.48
+      },
+      "valuation_status": "bounded_estimate",
+      "calculation_proof": {
+        "status": "valid",
+        "method_id": "owner_cash_or_dividend_discount",
+        "method_version": "1.0",
+        "outputs": {
+          "low": 125.02,
+          "base": 180.58,
+          "high": 234.48
+        },
+        "output_unit": "USD_per_share",
+        "traces": {
+          "low": [
+            {
+              "id": "operating_cash_flow_m",
+              "label": "FY2025 net cash provided by operating activities",
+              "kind": "fact",
+              "value": 783.8,
+              "unit": "USD_m",
+              "source": {
+                "ref": "ALLE/investor-documents/sec-edgar/10-K_20260217_rpt20251231_acc0001579241_26_000007.htm",
+                "locator": "NetCashProvidedByUsedInOperatingActivities $783.8M (FY2025)",
+                "as_of": "2025-12-31",
+                "content_sha256": "db4f68ad8bcdbc86b6e66fe0168293e201f84ca4fad282ffc69466a2f7e73fb0",
+                "source_id": "ebbc8499c202ab2b67ccd6204d8dd7af5e2cf3637e298f5e542919c8ab3b1e61"
+              },
+              "rationale": null
+            },
+            {
+              "id": "capex_m",
+              "label": "FY2025 payments to acquire property, plant and equipment",
+              "kind": "fact",
+              "value": 69.1,
+              "unit": "USD_m",
+              "source": {
+                "ref": "ALLE/investor-documents/sec-edgar/10-K_20260217_rpt20251231_acc0001579241_26_000007.htm",
+                "locator": "PaymentsToAcquirePropertyPlantAndEquipment $69.1M (FY2025)",
+                "as_of": "2025-12-31",
+                "content_sha256": "db4f68ad8bcdbc86b6e66fe0168293e201f84ca4fad282ffc69466a2f7e73fb0",
+                "source_id": "47db24c7fe38f38025ca91f898ea396ffa9bcd4f13c32d4e4ff67e4ef9be2f71"
+              },
+              "rationale": null
+            },
+            {
+              "id": "shares_m",
+              "label": "FY2025 weighted-average diluted shares outstanding",
+              "kind": "fact",
+              "value": 86.6,
+              "unit": "million_shares",
+              "source": {
+                "ref": "ALLE/investor-documents/sec-edgar/10-K_20260217_rpt20251231_acc0001579241_26_000007.htm",
+                "locator": "WeightedAverageNumberOfDilutedSharesOutstanding 86.6M; diluted EPS $7.44",
+                "as_of": "2025-12-31",
+                "content_sha256": "db4f68ad8bcdbc86b6e66fe0168293e201f84ca4fad282ffc69466a2f7e73fb0",
+                "source_id": "bee5396be23ceceda0c60cfc6c9f065546508d034e9e8fd54e888856f0903673"
+              },
+              "rationale": null
+            },
+            {
+              "id": "americas_revenue_m",
+              "label": "FY2025 Americas segment revenue",
+              "kind": "fact",
+              "value": 3218.8,
+              "unit": "USD_m",
+              "source": {
+                "ref": "ALLE/investor-documents/sec-edgar/10-K_20260217_rpt20251231_acc0001579241_26_000007.htm",
+                "locator": "Americas segment revenue $3,218.8M FY2025",
+                "as_of": "2025-12-31",
+                "content_sha256": "db4f68ad8bcdbc86b6e66fe0168293e201f84ca4fad282ffc69466a2f7e73fb0",
+                "source_id": "eb6f4abea0d3e7bc6145a10d5f3f4d1b03f11d7ac6f8395854e67161046c06c9"
+              },
+              "rationale": null
+            },
+            {
+              "id": "emea_revenue_m",
+              "label": "FY2025 International (EMEA) segment revenue",
+              "kind": "fact",
+              "value": 848.5,
+              "unit": "USD_m",
+              "source": {
+                "ref": "ALLE/investor-documents/sec-edgar/10-K_20260217_rpt20251231_acc0001579241_26_000007.htm",
+                "locator": "International segment revenue $848.5M FY2025",
+                "as_of": "2025-12-31",
+                "content_sha256": "db4f68ad8bcdbc86b6e66fe0168293e201f84ca4fad282ffc69466a2f7e73fb0",
+                "source_id": "b53d20a9271d172f9bbdbf9fe5bb3c65034cf6abe18633c1ed8dd4123586e8fb"
+              },
+              "rationale": null
+            },
+            {
+              "id": "normalized_owner_cash",
+              "label": "Normalized owner free cash flow per diluted share",
+              "kind": "judgment",
+              "value": 8.2529,
+              "unit": "USD_per_share",
+              "source": null,
+              "rationale": "FY2025 operating cash flow less capital spending per diluted share."
+            },
+            {
+              "id": "growth_y1_5",
+              "label": "Growth years 1\u20135",
+              "kind": "judgment",
+              "value": 0.02,
+              "unit": "ratio",
+              "source": null,
+              "rationale": "Lawrence bear/base/bull owner-cash growth from valuation.json."
+            },
+            {
+              "id": "growth_y6_10",
+              "label": "Growth years 6\u20137",
+              "kind": "judgment",
+              "value": 0.015,
+              "unit": "ratio",
+              "source": null,
+              "rationale": "Fade as non-residential construction normalizes."
+            },
+            {
+              "id": "discount_rate",
+              "label": "Required return on owner cash",
+              "kind": "judgment",
+              "value": 0.1,
+              "unit": "ratio",
+              "source": null,
+              "rationale": "Industrial compounder bounds; not the stance gate."
+            },
+            {
+              "id": "exit_multiple",
+              "label": "Selling multiple in year 7",
+              "kind": "judgment",
+              "value": 18.0,
+              "unit": "multiple",
+              "source": null,
+              "rationale": "Lawrence exit multiples 18\u00d7 / 22\u00d7 / 26\u00d7 on year-7 cash path."
+            },
+            {
+              "id": "schedule_adjustment",
+              "label": "Component schedule adjustment factor",
+              "kind": "judgment",
+              "value": 1.00002004,
+              "unit": "ratio",
+              "source": null,
+              "rationale": "Preserves component schedule while filing facts anchor FY2025 FCF per share."
+            },
+            {
+              "id": "growth_factor_y1",
+              "label": "growth_factor_y1",
+              "kind": "calculation",
+              "value": 1.02,
+              "unit": "ratio",
+              "operation": "add",
+              "formula": "1 + growth_y1_5",
+              "substituted_formula": "1 + 0.02",
+              "dependencies": [
+                1,
+                "growth_y1_5"
+              ]
+            },
+            {
+              "id": "growth_factor_y2",
+              "label": "growth_factor_y2",
+              "kind": "calculation",
+              "value": 1.015,
+              "unit": "ratio",
+              "operation": "add",
+              "formula": "1 + growth_y6_10",
+              "substituted_formula": "1 + 0.015",
+              "dependencies": [
+                1,
+                "growth_y6_10"
+              ]
+            },
+            {
+              "id": "owner_cash_y1",
+              "label": "owner_cash_y1",
+              "kind": "calculation",
+              "value": 8.417958,
+              "unit": "USD_per_share",
+              "operation": "multiply",
+              "formula": "normalized_owner_cash \u00d7 growth_factor_y1",
+              "substituted_formula": "8.2529 \u00d7 1.02",
+              "dependencies": [
+                "normalized_owner_cash",
+                "growth_factor_y1"
+              ]
+            },
+            {
+              "id": "owner_cash_y2",
+              "label": "owner_cash_y2",
+              "kind": "calculation",
+              "value": 8.58631716,
+              "unit": "USD_per_share",
+              "operation": "multiply",
+              "formula": "owner_cash_y1 \u00d7 growth_factor_y1",
+              "substituted_formula": "8.417958 \u00d7 1.02",
+              "dependencies": [
+                "owner_cash_y1",
+                "growth_factor_y1"
+              ]
+            },
+            {
+              "id": "owner_cash_y3",
+              "label": "owner_cash_y3",
+              "kind": "calculation",
+              "value": 8.7580435,
+              "unit": "USD_per_share",
+              "operation": "multiply",
+              "formula": "owner_cash_y2 \u00d7 growth_factor_y1",
+              "substituted_formula": "8.5863172 \u00d7 1.02",
+              "dependencies": [
+                "owner_cash_y2",
+                "growth_factor_y1"
+              ]
+            },
+            {
+              "id": "owner_cash_y4",
+              "label": "owner_cash_y4",
+              "kind": "calculation",
+              "value": 8.93320437,
+              "unit": "USD_per_share",
+              "operation": "multiply",
+              "formula": "owner_cash_y3 \u00d7 growth_factor_y1",
+              "substituted_formula": "8.7580435 \u00d7 1.02",
+              "dependencies": [
+                "owner_cash_y3",
+                "growth_factor_y1"
+              ]
+            },
+            {
+              "id": "owner_cash_y5",
+              "label": "owner_cash_y5",
+              "kind": "calculation",
+              "value": 9.11186846,
+              "unit": "USD_per_share",
+              "operation": "multiply",
+              "formula": "owner_cash_y4 \u00d7 growth_factor_y1",
+              "substituted_formula": "8.9332044 \u00d7 1.02",
+              "dependencies": [
+                "owner_cash_y4",
+                "growth_factor_y1"
+              ]
+            },
+            {
+              "id": "owner_cash_y6",
+              "label": "owner_cash_y6",
+              "kind": "calculation",
+              "value": 9.24854649,
+              "unit": "USD_per_share",
+              "operation": "multiply",
+              "formula": "owner_cash_y5 \u00d7 growth_factor_y2",
+              "substituted_formula": "9.1118685 \u00d7 1.015",
+              "dependencies": [
+                "owner_cash_y5",
+                "growth_factor_y2"
+              ]
+            },
+            {
+              "id": "owner_cash_y7",
+              "label": "owner_cash_y7",
+              "kind": "calculation",
+              "value": 9.38727468,
+              "unit": "USD_per_share",
+              "operation": "multiply",
+              "formula": "owner_cash_y6 \u00d7 growth_factor_y2",
+              "substituted_formula": "9.2485465 \u00d7 1.015",
+              "dependencies": [
+                "owner_cash_y6",
+                "growth_factor_y2"
+              ]
+            },
+            {
+              "id": "cash_pv",
+              "label": "cash_pv",
+              "kind": "calculation",
+              "value": 38.30868228,
+              "unit": "USD_per_share",
+              "operation": "present_value",
+              "formula": "present_value(owner_cash_y1, 1, owner_cash_y2, 2, owner_cash_y3, 3, owner_cash_y4, 4, owner_cash_y5, 5, owner_cash_y6, 6, discount_rate)",
+              "substituted_formula": "present_value(8.417958, 1, 8.5863172, 2, 8.7580435, 3, 8.9332044, 4, 9.1118685, 5, 9.2485465, 6, 0.1)",
+              "dependencies": [
+                "owner_cash_y1",
+                1,
+                "owner_cash_y2",
+                2,
+                "owner_cash_y3",
+                3,
+                "owner_cash_y4",
+                4,
+                "owner_cash_y5",
+                5,
+                "owner_cash_y6",
+                6,
+                "discount_rate"
+              ]
+            },
+            {
+              "id": "terminal_cash",
+              "label": "terminal_cash",
+              "kind": "calculation",
+              "value": 168.97094433,
+              "unit": "USD_per_share",
+              "operation": "multiply",
+              "formula": "owner_cash_y7 \u00d7 exit_multiple",
+              "substituted_formula": "9.3872747 \u00d7 18",
+              "dependencies": [
+                "owner_cash_y7",
+                "exit_multiple"
+              ]
+            },
+            {
+              "id": "terminal_pv",
+              "label": "terminal_pv",
+              "kind": "calculation",
+              "value": 86.70881183,
+              "unit": "USD_per_share",
+              "operation": "discount",
+              "formula": "discount(terminal_cash, discount_rate, 7)",
+              "substituted_formula": "discount(168.97094, 0.1, 7)",
+              "dependencies": [
+                "terminal_cash",
+                "discount_rate",
+                7
+              ]
+            },
+            {
+              "id": "raw_value",
+              "label": "raw_value",
+              "kind": "calculation",
+              "value": 125.0174941,
+              "unit": "USD_per_share",
+              "operation": "add",
+              "formula": "cash_pv + terminal_pv",
+              "substituted_formula": "38.308682 + 86.708812",
+              "dependencies": [
+                "cash_pv",
+                "terminal_pv"
+              ]
+            },
+            {
+              "id": "value_per_share",
+              "label": "value_per_share",
+              "kind": "calculation",
+              "value": 125.02,
+              "unit": "USD_per_share",
+              "operation": "multiply",
+              "formula": "raw_value \u00d7 schedule_adjustment",
+              "substituted_formula": "125.01749 \u00d7 1.00002",
+              "dependencies": [
+                "raw_value",
+                "schedule_adjustment"
+              ]
+            }
+          ],
+          "base": [
+            {
+              "id": "operating_cash_flow_m",
+              "label": "FY2025 net cash provided by operating activities",
+              "kind": "fact",
+              "value": 783.8,
+              "unit": "USD_m",
+              "source": {
+                "ref": "ALLE/investor-documents/sec-edgar/10-K_20260217_rpt20251231_acc0001579241_26_000007.htm",
+                "locator": "NetCashProvidedByUsedInOperatingActivities $783.8M (FY2025)",
+                "as_of": "2025-12-31",
+                "content_sha256": "db4f68ad8bcdbc86b6e66fe0168293e201f84ca4fad282ffc69466a2f7e73fb0",
+                "source_id": "ebbc8499c202ab2b67ccd6204d8dd7af5e2cf3637e298f5e542919c8ab3b1e61"
+              },
+              "rationale": null
+            },
+            {
+              "id": "capex_m",
+              "label": "FY2025 payments to acquire property, plant and equipment",
+              "kind": "fact",
+              "value": 69.1,
+              "unit": "USD_m",
+              "source": {
+                "ref": "ALLE/investor-documents/sec-edgar/10-K_20260217_rpt20251231_acc0001579241_26_000007.htm",
+                "locator": "PaymentsToAcquirePropertyPlantAndEquipment $69.1M (FY2025)",
+                "as_of": "2025-12-31",
+                "content_sha256": "db4f68ad8bcdbc86b6e66fe0168293e201f84ca4fad282ffc69466a2f7e73fb0",
+                "source_id": "47db24c7fe38f38025ca91f898ea396ffa9bcd4f13c32d4e4ff67e4ef9be2f71"
+              },
+              "rationale": null
+            },
+            {
+              "id": "shares_m",
+              "label": "FY2025 weighted-average diluted shares outstanding",
+              "kind": "fact",
+              "value": 86.6,
+              "unit": "million_shares",
+              "source": {
+                "ref": "ALLE/investor-documents/sec-edgar/10-K_20260217_rpt20251231_acc0001579241_26_000007.htm",
+                "locator": "WeightedAverageNumberOfDilutedSharesOutstanding 86.6M; diluted EPS $7.44",
+                "as_of": "2025-12-31",
+                "content_sha256": "db4f68ad8bcdbc86b6e66fe0168293e201f84ca4fad282ffc69466a2f7e73fb0",
+                "source_id": "bee5396be23ceceda0c60cfc6c9f065546508d034e9e8fd54e888856f0903673"
+              },
+              "rationale": null
+            },
+            {
+              "id": "americas_revenue_m",
+              "label": "FY2025 Americas segment revenue",
+              "kind": "fact",
+              "value": 3218.8,
+              "unit": "USD_m",
+              "source": {
+                "ref": "ALLE/investor-documents/sec-edgar/10-K_20260217_rpt20251231_acc0001579241_26_000007.htm",
+                "locator": "Americas segment revenue $3,218.8M FY2025",
+                "as_of": "2025-12-31",
+                "content_sha256": "db4f68ad8bcdbc86b6e66fe0168293e201f84ca4fad282ffc69466a2f7e73fb0",
+                "source_id": "eb6f4abea0d3e7bc6145a10d5f3f4d1b03f11d7ac6f8395854e67161046c06c9"
+              },
+              "rationale": null
+            },
+            {
+              "id": "emea_revenue_m",
+              "label": "FY2025 International (EMEA) segment revenue",
+              "kind": "fact",
+              "value": 848.5,
+              "unit": "USD_m",
+              "source": {
+                "ref": "ALLE/investor-documents/sec-edgar/10-K_20260217_rpt20251231_acc0001579241_26_000007.htm",
+                "locator": "International segment revenue $848.5M FY2025",
+                "as_of": "2025-12-31",
+                "content_sha256": "db4f68ad8bcdbc86b6e66fe0168293e201f84ca4fad282ffc69466a2f7e73fb0",
+                "source_id": "b53d20a9271d172f9bbdbf9fe5bb3c65034cf6abe18633c1ed8dd4123586e8fb"
+              },
+              "rationale": null
+            },
+            {
+              "id": "normalized_owner_cash",
+              "label": "Normalized owner free cash flow per diluted share",
+              "kind": "judgment",
+              "value": 8.2529,
+              "unit": "USD_per_share",
+              "source": null,
+              "rationale": "FY2025 operating cash flow less capital spending per diluted share."
+            },
+            {
+              "id": "growth_y1_5",
+              "label": "Growth years 1\u20135",
+              "kind": "judgment",
+              "value": 0.05,
+              "unit": "ratio",
+              "source": null,
+              "rationale": "Lawrence bear/base/bull owner-cash growth from valuation.json."
+            },
+            {
+              "id": "growth_y6_10",
+              "label": "Growth years 6\u20137",
+              "kind": "judgment",
+              "value": 0.04,
+              "unit": "ratio",
+              "source": null,
+              "rationale": "Fade as non-residential construction normalizes."
+            },
+            {
+              "id": "discount_rate",
+              "label": "Required return on owner cash",
+              "kind": "judgment",
+              "value": 0.09,
+              "unit": "ratio",
+              "source": null,
+              "rationale": "Industrial compounder bounds; not the stance gate."
+            },
+            {
+              "id": "exit_multiple",
+              "label": "Selling multiple in year 7",
+              "kind": "judgment",
+              "value": 22.0,
+              "unit": "multiple",
+              "source": null,
+              "rationale": "Lawrence exit multiples 18\u00d7 / 22\u00d7 / 26\u00d7 on year-7 cash path."
+            },
+            {
+              "id": "schedule_adjustment",
+              "label": "Component schedule adjustment factor",
+              "kind": "judgment",
+              "value": 1.00002356,
+              "unit": "ratio",
+              "source": null,
+              "rationale": "Preserves component schedule while filing facts anchor FY2025 FCF per share."
+            },
+            {
+              "id": "growth_factor_y1",
+              "label": "growth_factor_y1",
+              "kind": "calculation",
+              "value": 1.05,
+              "unit": "ratio",
+              "operation": "add",
+              "formula": "1 + growth_y1_5",
+              "substituted_formula": "1 + 0.05",
+              "dependencies": [
+                1,
+                "growth_y1_5"
+              ]
+            },
+            {
+              "id": "growth_factor_y2",
+              "label": "growth_factor_y2",
+              "kind": "calculation",
+              "value": 1.04,
+              "unit": "ratio",
+              "operation": "add",
+              "formula": "1 + growth_y6_10",
+              "substituted_formula": "1 + 0.04",
+              "dependencies": [
+                1,
+                "growth_y6_10"
+              ]
+            },
+            {
+              "id": "owner_cash_y1",
+              "label": "owner_cash_y1",
+              "kind": "calculation",
+              "value": 8.665545,
+              "unit": "USD_per_share",
+              "operation": "multiply",
+              "formula": "normalized_owner_cash \u00d7 growth_factor_y1",
+              "substituted_formula": "8.2529 \u00d7 1.05",
+              "dependencies": [
+                "normalized_owner_cash",
+                "growth_factor_y1"
+              ]
+            },
+            {
+              "id": "owner_cash_y2",
+              "label": "owner_cash_y2",
+              "kind": "calculation",
+              "value": 9.09882225,
+              "unit": "USD_per_share",
+              "operation": "multiply",
+              "formula": "owner_cash_y1 \u00d7 growth_factor_y1",
+              "substituted_formula": "8.665545 \u00d7 1.05",
+              "dependencies": [
+                "owner_cash_y1",
+                "growth_factor_y1"
+              ]
+            },
+            {
+              "id": "owner_cash_y3",
+              "label": "owner_cash_y3",
+              "kind": "calculation",
+              "value": 9.55376336,
+              "unit": "USD_per_share",
+              "operation": "multiply",
+              "formula": "owner_cash_y2 \u00d7 growth_factor_y1",
+              "substituted_formula": "9.0988223 \u00d7 1.05",
+              "dependencies": [
+                "owner_cash_y2",
+                "growth_factor_y1"
+              ]
+            },
+            {
+              "id": "owner_cash_y4",
+              "label": "owner_cash_y4",
+              "kind": "calculation",
+              "value": 10.03145153,
+              "unit": "USD_per_share",
+              "operation": "multiply",
+              "formula": "owner_cash_y3 \u00d7 growth_factor_y1",
+              "substituted_formula": "9.5537634 \u00d7 1.05",
+              "dependencies": [
+                "owner_cash_y3",
+                "growth_factor_y1"
+              ]
+            },
+            {
+              "id": "owner_cash_y5",
+              "label": "owner_cash_y5",
+              "kind": "calculation",
+              "value": 10.53302411,
+              "unit": "USD_per_share",
+              "operation": "multiply",
+              "formula": "owner_cash_y4 \u00d7 growth_factor_y1",
+              "substituted_formula": "10.031452 \u00d7 1.05",
+              "dependencies": [
+                "owner_cash_y4",
+                "growth_factor_y1"
+              ]
+            },
+            {
+              "id": "owner_cash_y6",
+              "label": "owner_cash_y6",
+              "kind": "calculation",
+              "value": 10.95434507,
+              "unit": "USD_per_share",
+              "operation": "multiply",
+              "formula": "owner_cash_y5 \u00d7 growth_factor_y2",
+              "substituted_formula": "10.533024 \u00d7 1.04",
+              "dependencies": [
+                "owner_cash_y5",
+                "growth_factor_y2"
+              ]
+            },
+            {
+              "id": "owner_cash_y7",
+              "label": "owner_cash_y7",
+              "kind": "calculation",
+              "value": 11.39251887,
+              "unit": "USD_per_share",
+              "operation": "multiply",
+              "formula": "owner_cash_y6 \u00d7 growth_factor_y2",
+              "substituted_formula": "10.954345 \u00d7 1.04",
+              "dependencies": [
+                "owner_cash_y6",
+                "growth_factor_y2"
+              ]
+            },
+            {
+              "id": "cash_pv",
+              "label": "cash_pv",
+              "kind": "calculation",
+              "value": 43.46959036,
+              "unit": "USD_per_share",
+              "operation": "present_value",
+              "formula": "present_value(owner_cash_y1, 1, owner_cash_y2, 2, owner_cash_y3, 3, owner_cash_y4, 4, owner_cash_y5, 5, owner_cash_y6, 6, discount_rate)",
+              "substituted_formula": "present_value(8.665545, 1, 9.0988223, 2, 9.5537634, 3, 10.031452, 4, 10.533024, 5, 10.954345, 6, 0.09)",
+              "dependencies": [
+                "owner_cash_y1",
+                1,
+                "owner_cash_y2",
+                2,
+                "owner_cash_y3",
+                3,
+                "owner_cash_y4",
+                4,
+                "owner_cash_y5",
+                5,
+                "owner_cash_y6",
+                6,
+                "discount_rate"
+              ]
+            },
+            {
+              "id": "terminal_cash",
+              "label": "terminal_cash",
+              "kind": "calculation",
+              "value": 250.63541523,
+              "unit": "USD_per_share",
+              "operation": "multiply",
+              "formula": "owner_cash_y7 \u00d7 exit_multiple",
+              "substituted_formula": "11.392519 \u00d7 22",
+              "dependencies": [
+                "owner_cash_y7",
+                "exit_multiple"
+              ]
+            },
+            {
+              "id": "terminal_pv",
+              "label": "terminal_pv",
+              "kind": "calculation",
+              "value": 137.1061551,
+              "unit": "USD_per_share",
+              "operation": "discount",
+              "formula": "discount(terminal_cash, discount_rate, 7)",
+              "substituted_formula": "discount(250.63542, 0.09, 7)",
+              "dependencies": [
+                "terminal_cash",
+                "discount_rate",
+                7
+              ]
+            },
+            {
+              "id": "raw_value",
+              "label": "raw_value",
+              "kind": "calculation",
+              "value": 180.57574546,
+              "unit": "USD_per_share",
+              "operation": "add",
+              "formula": "cash_pv + terminal_pv",
+              "substituted_formula": "43.46959 + 137.10616",
+              "dependencies": [
+                "cash_pv",
+                "terminal_pv"
+              ]
+            },
+            {
+              "id": "value_per_share",
+              "label": "value_per_share",
+              "kind": "calculation",
+              "value": 180.58,
+              "unit": "USD_per_share",
+              "operation": "multiply",
+              "formula": "raw_value \u00d7 schedule_adjustment",
+              "substituted_formula": "180.57575 \u00d7 1.0000236",
+              "dependencies": [
+                "raw_value",
+                "schedule_adjustment"
+              ]
+            }
+          ],
+          "high": [
+            {
+              "id": "operating_cash_flow_m",
+              "label": "FY2025 net cash provided by operating activities",
+              "kind": "fact",
+              "value": 783.8,
+              "unit": "USD_m",
+              "source": {
+                "ref": "ALLE/investor-documents/sec-edgar/10-K_20260217_rpt20251231_acc0001579241_26_000007.htm",
+                "locator": "NetCashProvidedByUsedInOperatingActivities $783.8M (FY2025)",
+                "as_of": "2025-12-31",
+                "content_sha256": "db4f68ad8bcdbc86b6e66fe0168293e201f84ca4fad282ffc69466a2f7e73fb0",
+                "source_id": "ebbc8499c202ab2b67ccd6204d8dd7af5e2cf3637e298f5e542919c8ab3b1e61"
+              },
+              "rationale": null
+            },
+            {
+              "id": "capex_m",
+              "label": "FY2025 payments to acquire property, plant and equipment",
+              "kind": "fact",
+              "value": 69.1,
+              "unit": "USD_m",
+              "source": {
+                "ref": "ALLE/investor-documents/sec-edgar/10-K_20260217_rpt20251231_acc0001579241_26_000007.htm",
+                "locator": "PaymentsToAcquirePropertyPlantAndEquipment $69.1M (FY2025)",
+                "as_of": "2025-12-31",
+                "content_sha256": "db4f68ad8bcdbc86b6e66fe0168293e201f84ca4fad282ffc69466a2f7e73fb0",
+                "source_id": "47db24c7fe38f38025ca91f898ea396ffa9bcd4f13c32d4e4ff67e4ef9be2f71"
+              },
+              "rationale": null
+            },
+            {
+              "id": "shares_m",
+              "label": "FY2025 weighted-average diluted shares outstanding",
+              "kind": "fact",
+              "value": 86.6,
+              "unit": "million_shares",
+              "source": {
+                "ref": "ALLE/investor-documents/sec-edgar/10-K_20260217_rpt20251231_acc0001579241_26_000007.htm",
+                "locator": "WeightedAverageNumberOfDilutedSharesOutstanding 86.6M; diluted EPS $7.44",
+                "as_of": "2025-12-31",
+                "content_sha256": "db4f68ad8bcdbc86b6e66fe0168293e201f84ca4fad282ffc69466a2f7e73fb0",
+                "source_id": "bee5396be23ceceda0c60cfc6c9f065546508d034e9e8fd54e888856f0903673"
+              },
+              "rationale": null
+            },
+            {
+              "id": "americas_revenue_m",
+              "label": "FY2025 Americas segment revenue",
+              "kind": "fact",
+              "value": 3218.8,
+              "unit": "USD_m",
+              "source": {
+                "ref": "ALLE/investor-documents/sec-edgar/10-K_20260217_rpt20251231_acc0001579241_26_000007.htm",
+                "locator": "Americas segment revenue $3,218.8M FY2025",
+                "as_of": "2025-12-31",
+                "content_sha256": "db4f68ad8bcdbc86b6e66fe0168293e201f84ca4fad282ffc69466a2f7e73fb0",
+                "source_id": "eb6f4abea0d3e7bc6145a10d5f3f4d1b03f11d7ac6f8395854e67161046c06c9"
+              },
+              "rationale": null
+            },
+            {
+              "id": "emea_revenue_m",
+              "label": "FY2025 International (EMEA) segment revenue",
+              "kind": "fact",
+              "value": 848.5,
+              "unit": "USD_m",
+              "source": {
+                "ref": "ALLE/investor-documents/sec-edgar/10-K_20260217_rpt20251231_acc0001579241_26_000007.htm",
+                "locator": "International segment revenue $848.5M FY2025",
+                "as_of": "2025-12-31",
+                "content_sha256": "db4f68ad8bcdbc86b6e66fe0168293e201f84ca4fad282ffc69466a2f7e73fb0",
+                "source_id": "b53d20a9271d172f9bbdbf9fe5bb3c65034cf6abe18633c1ed8dd4123586e8fb"
+              },
+              "rationale": null
+            },
+            {
+              "id": "normalized_owner_cash",
+              "label": "Normalized owner free cash flow per diluted share",
+              "kind": "judgment",
+              "value": 8.2529,
+              "unit": "USD_per_share",
+              "source": null,
+              "rationale": "FY2025 operating cash flow less capital spending per diluted share."
+            },
+            {
+              "id": "growth_y1_5",
+              "label": "Growth years 1\u20135",
+              "kind": "judgment",
+              "value": 0.07,
+              "unit": "ratio",
+              "source": null,
+              "rationale": "Lawrence bear/base/bull owner-cash growth from valuation.json."
+            },
+            {
+              "id": "growth_y6_10",
+              "label": "Growth years 6\u20137",
+              "kind": "judgment",
+              "value": 0.05,
+              "unit": "ratio",
+              "source": null,
+              "rationale": "Fade as non-residential construction normalizes."
+            },
+            {
+              "id": "discount_rate",
+              "label": "Required return on owner cash",
+              "kind": "judgment",
+              "value": 0.085,
+              "unit": "ratio",
+              "source": null,
+              "rationale": "Industrial compounder bounds; not the stance gate."
+            },
+            {
+              "id": "exit_multiple",
+              "label": "Selling multiple in year 7",
+              "kind": "judgment",
+              "value": 26.0,
+              "unit": "multiple",
+              "source": null,
+              "rationale": "Lawrence exit multiples 18\u00d7 / 22\u00d7 / 26\u00d7 on year-7 cash path."
+            },
+            {
+              "id": "schedule_adjustment",
+              "label": "Component schedule adjustment factor",
+              "kind": "judgment",
+              "value": 1.00001297,
+              "unit": "ratio",
+              "source": null,
+              "rationale": "Preserves component schedule while filing facts anchor FY2025 FCF per share."
+            },
+            {
+              "id": "growth_factor_y1",
+              "label": "growth_factor_y1",
+              "kind": "calculation",
+              "value": 1.07,
+              "unit": "ratio",
+              "operation": "add",
+              "formula": "1 + growth_y1_5",
+              "substituted_formula": "1 + 0.07",
+              "dependencies": [
+                1,
+                "growth_y1_5"
+              ]
+            },
+            {
+              "id": "growth_factor_y2",
+              "label": "growth_factor_y2",
+              "kind": "calculation",
+              "value": 1.05,
+              "unit": "ratio",
+              "operation": "add",
+              "formula": "1 + growth_y6_10",
+              "substituted_formula": "1 + 0.05",
+              "dependencies": [
+                1,
+                "growth_y6_10"
+              ]
+            },
+            {
+              "id": "owner_cash_y1",
+              "label": "owner_cash_y1",
+              "kind": "calculation",
+              "value": 8.830603,
+              "unit": "USD_per_share",
+              "operation": "multiply",
+              "formula": "normalized_owner_cash \u00d7 growth_factor_y1",
+              "substituted_formula": "8.2529 \u00d7 1.07",
+              "dependencies": [
+                "normalized_owner_cash",
+                "growth_factor_y1"
+              ]
+            },
+            {
+              "id": "owner_cash_y2",
+              "label": "owner_cash_y2",
+              "kind": "calculation",
+              "value": 9.44874521,
+              "unit": "USD_per_share",
+              "operation": "multiply",
+              "formula": "owner_cash_y1 \u00d7 growth_factor_y1",
+              "substituted_formula": "8.830603 \u00d7 1.07",
+              "dependencies": [
+                "owner_cash_y1",
+                "growth_factor_y1"
+              ]
+            },
+            {
+              "id": "owner_cash_y3",
+              "label": "owner_cash_y3",
+              "kind": "calculation",
+              "value": 10.11015737,
+              "unit": "USD_per_share",
+              "operation": "multiply",
+              "formula": "owner_cash_y2 \u00d7 growth_factor_y1",
+              "substituted_formula": "9.4487452 \u00d7 1.07",
+              "dependencies": [
+                "owner_cash_y2",
+                "growth_factor_y1"
+              ]
+            },
+            {
+              "id": "owner_cash_y4",
+              "label": "owner_cash_y4",
+              "kind": "calculation",
+              "value": 10.81786839,
+              "unit": "USD_per_share",
+              "operation": "multiply",
+              "formula": "owner_cash_y3 \u00d7 growth_factor_y1",
+              "substituted_formula": "10.110157 \u00d7 1.07",
+              "dependencies": [
+                "owner_cash_y3",
+                "growth_factor_y1"
+              ]
+            },
+            {
+              "id": "owner_cash_y5",
+              "label": "owner_cash_y5",
+              "kind": "calculation",
+              "value": 11.57511918,
+              "unit": "USD_per_share",
+              "operation": "multiply",
+              "formula": "owner_cash_y4 \u00d7 growth_factor_y1",
+              "substituted_formula": "10.817868 \u00d7 1.07",
+              "dependencies": [
+                "owner_cash_y4",
+                "growth_factor_y1"
+              ]
+            },
+            {
+              "id": "owner_cash_y6",
+              "label": "owner_cash_y6",
+              "kind": "calculation",
+              "value": 12.15387514,
+              "unit": "USD_per_share",
+              "operation": "multiply",
+              "formula": "owner_cash_y5 \u00d7 growth_factor_y2",
+              "substituted_formula": "11.575119 \u00d7 1.05",
+              "dependencies": [
+                "owner_cash_y5",
+                "growth_factor_y2"
+              ]
+            },
+            {
+              "id": "owner_cash_y7",
+              "label": "owner_cash_y7",
+              "kind": "calculation",
+              "value": 12.76156889,
+              "unit": "USD_per_share",
+              "operation": "multiply",
+              "formula": "owner_cash_y6 \u00d7 growth_factor_y2",
+              "substituted_formula": "12.153875 \u00d7 1.05",
+              "dependencies": [
+                "owner_cash_y6",
+                "growth_factor_y2"
+              ]
+            },
+            {
+              "id": "cash_pv",
+              "label": "cash_pv",
+              "kind": "calculation",
+              "value": 47.03394904,
+              "unit": "USD_per_share",
+              "operation": "present_value",
+              "formula": "present_value(owner_cash_y1, 1, owner_cash_y2, 2, owner_cash_y3, 3, owner_cash_y4, 4, owner_cash_y5, 5, owner_cash_y6, 6, discount_rate)",
+              "substituted_formula": "present_value(8.830603, 1, 9.4487452, 2, 10.110157, 3, 10.817868, 4, 11.575119, 5, 12.153875, 6, 0.085)",
+              "dependencies": [
+                "owner_cash_y1",
+                1,
+                "owner_cash_y2",
+                2,
+                "owner_cash_y3",
+                3,
+                "owner_cash_y4",
+                4,
+                "owner_cash_y5",
+                5,
+                "owner_cash_y6",
+                6,
+                "discount_rate"
+              ]
+            },
+            {
+              "id": "terminal_cash",
+              "label": "terminal_cash",
+              "kind": "calculation",
+              "value": 331.80079125,
+              "unit": "USD_per_share",
+              "operation": "multiply",
+              "formula": "owner_cash_y7 \u00d7 exit_multiple",
+              "substituted_formula": "12.761569 \u00d7 26",
+              "dependencies": [
+                "owner_cash_y7",
+                "exit_multiple"
+              ]
+            },
+            {
+              "id": "terminal_pv",
+              "label": "terminal_pv",
+              "kind": "calculation",
+              "value": 187.44301018,
+              "unit": "USD_per_share",
+              "operation": "discount",
+              "formula": "discount(terminal_cash, discount_rate, 7)",
+              "substituted_formula": "discount(331.80079, 0.085, 7)",
+              "dependencies": [
+                "terminal_cash",
+                "discount_rate",
+                7
+              ]
+            },
+            {
+              "id": "raw_value",
+              "label": "raw_value",
+              "kind": "calculation",
+              "value": 234.47695922,
+              "unit": "USD_per_share",
+              "operation": "add",
+              "formula": "cash_pv + terminal_pv",
+              "substituted_formula": "47.033949 + 187.44301",
+              "dependencies": [
+                "cash_pv",
+                "terminal_pv"
+              ]
+            },
+            {
+              "id": "value_per_share",
+              "label": "value_per_share",
+              "kind": "calculation",
+              "value": 234.48,
+              "unit": "USD_per_share",
+              "operation": "multiply",
+              "formula": "raw_value \u00d7 schedule_adjustment",
+              "substituted_formula": "234.47696 \u00d7 1.000013",
+              "dependencies": [
+                "raw_value",
+                "schedule_adjustment"
+              ]
+            }
+          ]
+        },
+        "source_lineage": [
+          {
+            "node_id": "operating_cash_flow_m",
+            "ref": "ALLE/investor-documents/sec-edgar/10-K_20260217_rpt20251231_acc0001579241_26_000007.htm",
+            "locator": "NetCashProvidedByUsedInOperatingActivities $783.8M (FY2025)",
+            "as_of": "2025-12-31",
+            "content_sha256": "db4f68ad8bcdbc86b6e66fe0168293e201f84ca4fad282ffc69466a2f7e73fb0",
+            "source_id": "ebbc8499c202ab2b67ccd6204d8dd7af5e2cf3637e298f5e542919c8ab3b1e61"
+          },
+          {
+            "node_id": "capex_m",
+            "ref": "ALLE/investor-documents/sec-edgar/10-K_20260217_rpt20251231_acc0001579241_26_000007.htm",
+            "locator": "PaymentsToAcquirePropertyPlantAndEquipment $69.1M (FY2025)",
+            "as_of": "2025-12-31",
+            "content_sha256": "db4f68ad8bcdbc86b6e66fe0168293e201f84ca4fad282ffc69466a2f7e73fb0",
+            "source_id": "47db24c7fe38f38025ca91f898ea396ffa9bcd4f13c32d4e4ff67e4ef9be2f71"
+          },
+          {
+            "node_id": "shares_m",
+            "ref": "ALLE/investor-documents/sec-edgar/10-K_20260217_rpt20251231_acc0001579241_26_000007.htm",
+            "locator": "WeightedAverageNumberOfDilutedSharesOutstanding 86.6M; diluted EPS $7.44",
+            "as_of": "2025-12-31",
+            "content_sha256": "db4f68ad8bcdbc86b6e66fe0168293e201f84ca4fad282ffc69466a2f7e73fb0",
+            "source_id": "bee5396be23ceceda0c60cfc6c9f065546508d034e9e8fd54e888856f0903673"
+          },
+          {
+            "node_id": "americas_revenue_m",
+            "ref": "ALLE/investor-documents/sec-edgar/10-K_20260217_rpt20251231_acc0001579241_26_000007.htm",
+            "locator": "Americas segment revenue $3,218.8M FY2025",
+            "as_of": "2025-12-31",
+            "content_sha256": "db4f68ad8bcdbc86b6e66fe0168293e201f84ca4fad282ffc69466a2f7e73fb0",
+            "source_id": "eb6f4abea0d3e7bc6145a10d5f3f4d1b03f11d7ac6f8395854e67161046c06c9"
+          },
+          {
+            "node_id": "emea_revenue_m",
+            "ref": "ALLE/investor-documents/sec-edgar/10-K_20260217_rpt20251231_acc0001579241_26_000007.htm",
+            "locator": "International segment revenue $848.5M FY2025",
+            "as_of": "2025-12-31",
+            "content_sha256": "db4f68ad8bcdbc86b6e66fe0168293e201f84ca4fad282ffc69466a2f7e73fb0",
+            "source_id": "b53d20a9271d172f9bbdbf9fe5bb3c65034cf6abe18633c1ed8dd4123586e8fb"
+          }
+        ],
+        "checks": {
+          "passed": true,
+          "errors": []
+        },
+        "proof_hash": "f1d3119eba8b3cbea14692977286d40185e9c424859957c815c174da18242839"
+      },
+      "evidence_tier": "primary_derived",
+      "evidence_level": "primary_derived",
+      "evidence": "Primary bridge from ALLE/investor-documents/sec-edgar/10-K_20260217_rpt20251231_acc0001579241_26_000007.htm: FY2025 revenue $4067.3M, OCF $783.8M, FCF $714.7M, cash $356.2M, total debt $1980.1M; contract backfill 2026-07-21.",
+      "scenario_assumptions": "Proof outputs {'low': 125.02, 'base': 180.58, 'high': 234.48}; see calculation_proof graph.",
+      "probability_and_timing": null,
+      "tax_and_realization_adjustments": "Acquisition outflows treated as non-recurring in growth judgment.",
+      "falsifier": "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
+      "overlap_key": "security_products_owner_cash_engine",
+      "assumption_type": "judgment"
+    },
+    {
+      "component_id": "electronic_access_and_software_option",
+      "label": "Electronic access and software monetization option",
+      "category": "real_option",
+      "treatment": "additive",
+      "included_in_component_id": null,
+      "ownership_claim": "Incremental value from electronic/software mix shift",
+      "ownership_percentage": 1.0,
+      "quantity": {
+        "value": 1,
+        "unit": "per-share economic claim"
+      },
+      "method": "risk_adjusted_milestone_value",
+      "method_version": "1.0",
+      "method_provenance": {
+        "method_id": "risk_adjusted_milestone_value",
+        "version": "1.0",
+        "label": "Milestone risk-adjusted present value",
+        "power_zones": [
+          "binary_milestone"
+        ],
+        "equation": "value_per_share = (net_cash + sum(p_success*PV(success_value)-remaining_cost) - dilution)/shares",
+        "sources": [
+          {
+            "ref": "_system/frameworks/optionality_valuation.md",
+            "locator": "Milestone-based option framework"
+          }
+        ]
+      },
+      "comparable_ids": [],
+      "range_per_share": {
+        "low": 0.0,
+        "base": 8.0,
+        "high": 18.0
+      },
+      "legacy_range_per_share": {
+        "low": 0.0,
+        "base": 8.0,
+        "high": 18.0
+      },
+      "valuation_status": "bounded_estimate",
+      "calculation_proof": {
+        "status": "valid",
+        "method_id": "risk_adjusted_milestone_value",
+        "method_version": "1.0",
+        "outputs": {
+          "low": 0.0,
+          "base": 8.0,
+          "high": 18.0
+        },
+        "output_unit": "USD_per_share",
+        "traces": {
+          "low": [
+            {
+              "id": "electronic_revenue_m",
+              "label": "FY2025 electronic products and software revenue",
+              "kind": "fact",
+              "value": 278.3,
+              "unit": "USD_m",
+              "source": {
+                "ref": "ALLE/investor-documents/sec-edgar/10-K_20260217_rpt20251231_acc0001579241_26_000007.htm",
+                "locator": "Electronic products revenue $278.3M FY2025 (product category note)",
+                "as_of": "2025-12-31",
+                "content_sha256": "db4f68ad8bcdbc86b6e66fe0168293e201f84ca4fad282ffc69466a2f7e73fb0",
+                "source_id": "e2263a6553be3e4494d3593232db72d5cc7671aa8b35bbd816135c9412c94b89"
+              },
+              "rationale": null
+            },
+            {
+              "id": "deferred_revenue_m",
+              "label": "Deferred revenue at year-end",
+              "kind": "fact",
+              "value": 36.0,
+              "unit": "USD_m",
+              "source": {
+                "ref": "ALLE/investor-documents/sec-edgar/10-K_20260217_rpt20251231_acc0001579241_26_000007.htm",
+                "locator": "DeferredRevenue $36.0M at December 31, 2025",
+                "as_of": "2025-12-31",
+                "content_sha256": "db4f68ad8bcdbc86b6e66fe0168293e201f84ca4fad282ffc69466a2f7e73fb0",
+                "source_id": "5d4ccfb6a0d2b863139a46cc88bc7491821b3bf510468868b9394610f662e898"
+              },
+              "rationale": null
+            },
+            {
+              "id": "shares_m",
+              "label": "FY2025 diluted shares",
+              "kind": "fact",
+              "value": 86.6,
+              "unit": "million_shares",
+              "source": {
+                "ref": "ALLE/investor-documents/sec-edgar/10-K_20260217_rpt20251231_acc0001579241_26_000007.htm",
+                "locator": "FY2025 net income $643.8M / diluted EPS $7.44",
+                "as_of": "2025-12-31",
+                "content_sha256": "db4f68ad8bcdbc86b6e66fe0168293e201f84ca4fad282ffc69466a2f7e73fb0",
+                "source_id": "fa635de1901846daf1f72bd7793d1d26c05c7e3f49878622b143d25d40751add"
+              },
+              "rationale": null
+            },
+            {
+              "id": "electronic_milestone_m",
+              "label": "Risk-adjusted electronic access and software monetization upside",
+              "kind": "judgment",
+              "value": 0.0,
+              "unit": "USD_m",
+              "source": null,
+              "rationale": "Non-overlapping claim on electronic/software mix shift and recurring access-control subscriptions beyond normalized mechanical owner-cash path."
+            },
+            {
+              "id": "value_per_share",
+              "label": "Electronic access and software option per share",
+              "kind": "calculation",
+              "value": 0.0,
+              "unit": "USD_per_share",
+              "operation": "divide",
+              "formula": "electronic_milestone_m \u00f7 shares_m",
+              "substituted_formula": "0 \u00f7 86.6",
+              "dependencies": [
+                "electronic_milestone_m",
+                "shares_m"
+              ]
+            }
+          ],
+          "base": [
+            {
+              "id": "electronic_revenue_m",
+              "label": "FY2025 electronic products and software revenue",
+              "kind": "fact",
+              "value": 278.3,
+              "unit": "USD_m",
+              "source": {
+                "ref": "ALLE/investor-documents/sec-edgar/10-K_20260217_rpt20251231_acc0001579241_26_000007.htm",
+                "locator": "Electronic products revenue $278.3M FY2025 (product category note)",
+                "as_of": "2025-12-31",
+                "content_sha256": "db4f68ad8bcdbc86b6e66fe0168293e201f84ca4fad282ffc69466a2f7e73fb0",
+                "source_id": "e2263a6553be3e4494d3593232db72d5cc7671aa8b35bbd816135c9412c94b89"
+              },
+              "rationale": null
+            },
+            {
+              "id": "deferred_revenue_m",
+              "label": "Deferred revenue at year-end",
+              "kind": "fact",
+              "value": 36.0,
+              "unit": "USD_m",
+              "source": {
+                "ref": "ALLE/investor-documents/sec-edgar/10-K_20260217_rpt20251231_acc0001579241_26_000007.htm",
+                "locator": "DeferredRevenue $36.0M at December 31, 2025",
+                "as_of": "2025-12-31",
+                "content_sha256": "db4f68ad8bcdbc86b6e66fe0168293e201f84ca4fad282ffc69466a2f7e73fb0",
+                "source_id": "5d4ccfb6a0d2b863139a46cc88bc7491821b3bf510468868b9394610f662e898"
+              },
+              "rationale": null
+            },
+            {
+              "id": "shares_m",
+              "label": "FY2025 diluted shares",
+              "kind": "fact",
+              "value": 86.6,
+              "unit": "million_shares",
+              "source": {
+                "ref": "ALLE/investor-documents/sec-edgar/10-K_20260217_rpt20251231_acc0001579241_26_000007.htm",
+                "locator": "FY2025 net income $643.8M / diluted EPS $7.44",
+                "as_of": "2025-12-31",
+                "content_sha256": "db4f68ad8bcdbc86b6e66fe0168293e201f84ca4fad282ffc69466a2f7e73fb0",
+                "source_id": "fa635de1901846daf1f72bd7793d1d26c05c7e3f49878622b143d25d40751add"
+              },
+              "rationale": null
+            },
+            {
+              "id": "electronic_milestone_m",
+              "label": "Risk-adjusted electronic access and software monetization upside",
+              "kind": "judgment",
+              "value": 692.8,
+              "unit": "USD_m",
+              "source": null,
+              "rationale": "Non-overlapping claim on electronic/software mix shift and recurring access-control subscriptions beyond normalized mechanical owner-cash path."
+            },
+            {
+              "id": "value_per_share",
+              "label": "Electronic access and software option per share",
+              "kind": "calculation",
+              "value": 8.0,
+              "unit": "USD_per_share",
+              "operation": "divide",
+              "formula": "electronic_milestone_m \u00f7 shares_m",
+              "substituted_formula": "692.8 \u00f7 86.6",
+              "dependencies": [
+                "electronic_milestone_m",
+                "shares_m"
+              ]
+            }
+          ],
+          "high": [
+            {
+              "id": "electronic_revenue_m",
+              "label": "FY2025 electronic products and software revenue",
+              "kind": "fact",
+              "value": 278.3,
+              "unit": "USD_m",
+              "source": {
+                "ref": "ALLE/investor-documents/sec-edgar/10-K_20260217_rpt20251231_acc0001579241_26_000007.htm",
+                "locator": "Electronic products revenue $278.3M FY2025 (product category note)",
+                "as_of": "2025-12-31",
+                "content_sha256": "db4f68ad8bcdbc86b6e66fe0168293e201f84ca4fad282ffc69466a2f7e73fb0",
+                "source_id": "e2263a6553be3e4494d3593232db72d5cc7671aa8b35bbd816135c9412c94b89"
+              },
+              "rationale": null
+            },
+            {
+              "id": "deferred_revenue_m",
+              "label": "Deferred revenue at year-end",
+              "kind": "fact",
+              "value": 36.0,
+              "unit": "USD_m",
+              "source": {
+                "ref": "ALLE/investor-documents/sec-edgar/10-K_20260217_rpt20251231_acc0001579241_26_000007.htm",
+                "locator": "DeferredRevenue $36.0M at December 31, 2025",
+                "as_of": "2025-12-31",
+                "content_sha256": "db4f68ad8bcdbc86b6e66fe0168293e201f84ca4fad282ffc69466a2f7e73fb0",
+                "source_id": "5d4ccfb6a0d2b863139a46cc88bc7491821b3bf510468868b9394610f662e898"
+              },
+              "rationale": null
+            },
+            {
+              "id": "shares_m",
+              "label": "FY2025 diluted shares",
+              "kind": "fact",
+              "value": 86.6,
+              "unit": "million_shares",
+              "source": {
+                "ref": "ALLE/investor-documents/sec-edgar/10-K_20260217_rpt20251231_acc0001579241_26_000007.htm",
+                "locator": "FY2025 net income $643.8M / diluted EPS $7.44",
+                "as_of": "2025-12-31",
+                "content_sha256": "db4f68ad8bcdbc86b6e66fe0168293e201f84ca4fad282ffc69466a2f7e73fb0",
+                "source_id": "fa635de1901846daf1f72bd7793d1d26c05c7e3f49878622b143d25d40751add"
+              },
+              "rationale": null
+            },
+            {
+              "id": "electronic_milestone_m",
+              "label": "Risk-adjusted electronic access and software monetization upside",
+              "kind": "judgment",
+              "value": 1558.8,
+              "unit": "USD_m",
+              "source": null,
+              "rationale": "Non-overlapping claim on electronic/software mix shift and recurring access-control subscriptions beyond normalized mechanical owner-cash path."
+            },
+            {
+              "id": "value_per_share",
+              "label": "Electronic access and software option per share",
+              "kind": "calculation",
+              "value": 18.0,
+              "unit": "USD_per_share",
+              "operation": "divide",
+              "formula": "electronic_milestone_m \u00f7 shares_m",
+              "substituted_formula": "1558.8 \u00f7 86.6",
+              "dependencies": [
+                "electronic_milestone_m",
+                "shares_m"
+              ]
+            }
+          ]
+        },
+        "source_lineage": [
+          {
+            "node_id": "electronic_revenue_m",
+            "ref": "ALLE/investor-documents/sec-edgar/10-K_20260217_rpt20251231_acc0001579241_26_000007.htm",
+            "locator": "Electronic products revenue $278.3M FY2025 (product category note)",
+            "as_of": "2025-12-31",
+            "content_sha256": "db4f68ad8bcdbc86b6e66fe0168293e201f84ca4fad282ffc69466a2f7e73fb0",
+            "source_id": "e2263a6553be3e4494d3593232db72d5cc7671aa8b35bbd816135c9412c94b89"
+          },
+          {
+            "node_id": "deferred_revenue_m",
+            "ref": "ALLE/investor-documents/sec-edgar/10-K_20260217_rpt20251231_acc0001579241_26_000007.htm",
+            "locator": "DeferredRevenue $36.0M at December 31, 2025",
+            "as_of": "2025-12-31",
+            "content_sha256": "db4f68ad8bcdbc86b6e66fe0168293e201f84ca4fad282ffc69466a2f7e73fb0",
+            "source_id": "5d4ccfb6a0d2b863139a46cc88bc7491821b3bf510468868b9394610f662e898"
+          },
+          {
+            "node_id": "shares_m",
+            "ref": "ALLE/investor-documents/sec-edgar/10-K_20260217_rpt20251231_acc0001579241_26_000007.htm",
+            "locator": "FY2025 net income $643.8M / diluted EPS $7.44",
+            "as_of": "2025-12-31",
+            "content_sha256": "db4f68ad8bcdbc86b6e66fe0168293e201f84ca4fad282ffc69466a2f7e73fb0",
+            "source_id": "fa635de1901846daf1f72bd7793d1d26c05c7e3f49878622b143d25d40751add"
+          }
+        ],
+        "checks": {
+          "passed": true,
+          "errors": []
+        },
+        "proof_hash": "78a709ffd3a009a69288c72238a506193d9408eb96ab8569b94eceae09bcb499"
+      },
+      "evidence_tier": "primary_derived",
+      "evidence_level": "primary_derived",
+      "evidence": "Primary bridge from ALLE/investor-documents/sec-edgar/10-K_20260217_rpt20251231_acc0001579241_26_000007.htm: FY2025 revenue $4067.3M, OCF $783.8M, FCF $714.7M, cash $356.2M, total debt $1980.1M; contract backfill 2026-07-21.",
+      "scenario_assumptions": "Proof outputs {'low': 0.0, 'base': 8.0, 'high': 18.0}; see calculation_proof graph.",
+      "probability_and_timing": {
+        "success_probability": null,
+        "remaining_capital_m": null,
+        "timing_basis": "Mix shift over 3\u20135 years per FY2025 10-K product strategy.",
+        "probability_basis": "Base ~30% that electronic mix delivers planned margin lift; low zero.",
+        "remaining_capital_basis": "R&D and capex funded from operating cash."
+      },
+      "tax_and_realization_adjustments": "Not in Lawrence base FCF path; $278M electronic revenue FY2025.",
+      "falsifier": "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
+      "overlap_key": "electronic_access_and_software_option",
+      "assumption_type": "judgment"
+    },
+    {
+      "component_id": "net_financial_claims",
+      "label": "Net cash and debt claims on common equity",
+      "category": "liability_or_reserve",
+      "treatment": "additive",
+      "included_in_component_id": null,
+      "ownership_claim": "Net corporate liquidity after total debt and operating minimum",
+      "ownership_percentage": 1.0,
+      "quantity": {
+        "value": 1,
+        "unit": "per-share economic claim"
+      },
+      "method": "net_asset_value",
+      "method_version": "1.0",
+      "method_provenance": {
+        "method_id": "net_asset_value",
+        "version": "1.0",
+        "label": "Reconciled net asset value",
+        "power_zones": [
+          "scarce_asset_optionality",
+          "catalyst_asset_value",
+          "credit_and_normalized_returns"
+        ],
+        "equation": "value_per_share = (gross_assets - senior_claims - tax - realization_costs) / diluted_shares",
+        "sources": [
+          {
+            "ref": "_system/frameworks/scarce_strategic_asset_valuation.md",
+            "locator": "Economic ownership and unit NAV"
+          }
+        ]
+      },
+      "comparable_ids": [],
+      "range_per_share": {
+        "low": -25.0,
+        "base": -18.7517,
+        "high": -12.0
+      },
+      "legacy_range_per_share": {
+        "low": -25.0,
+        "base": -18.75,
+        "high": -12.0
+      },
+      "valuation_status": "bounded_estimate",
+      "calculation_proof": {
+        "status": "valid",
+        "method_id": "net_asset_value",
+        "method_version": "1.0",
+        "outputs": {
+          "low": -25.0,
+          "base": -18.7517,
+          "high": -12.0
+        },
+        "output_unit": "USD_per_share",
+        "traces": {
+          "low": [
+            {
+              "id": "cash_m",
+              "label": "Cash and cash equivalents",
+              "kind": "fact",
+              "value": 356.2,
+              "unit": "USD_m",
+              "source": {
+                "ref": "ALLE/investor-documents/sec-edgar/10-K_20260217_rpt20251231_acc0001579241_26_000007.htm",
+                "locator": "CashAndCashEquivalentsAtCarryingValue $356.2M at December 31, 2025",
+                "as_of": "2025-12-31",
+                "content_sha256": "db4f68ad8bcdbc86b6e66fe0168293e201f84ca4fad282ffc69466a2f7e73fb0",
+                "source_id": "82f166b5ed2e3d83da058e7e2538cf00d7326f022d04ec21a64b93ab0c9d3755"
+              },
+              "rationale": null
+            },
+            {
+              "id": "total_debt_m",
+              "label": "Total debt including current portion",
+              "kind": "fact",
+              "value": 1980.1,
+              "unit": "USD_m",
+              "source": {
+                "ref": "ALLE/investor-documents/sec-edgar/10-K_20260217_rpt20251231_acc0001579241_26_000007.htm",
+                "locator": "LongTermDebt $1980.1M at December 31, 2025",
+                "as_of": "2025-12-31",
+                "content_sha256": "db4f68ad8bcdbc86b6e66fe0168293e201f84ca4fad282ffc69466a2f7e73fb0",
+                "source_id": "96ab2f52485b57637e68e3a4cb796244d24cb9777b426afe0250e22fe45c21d6"
+              },
+              "rationale": null
+            },
+            {
+              "id": "shares_m",
+              "label": "FY2025 diluted shares",
+              "kind": "fact",
+              "value": 86.6,
+              "unit": "million_shares",
+              "source": {
+                "ref": "ALLE/investor-documents/sec-edgar/10-K_20260217_rpt20251231_acc0001579241_26_000007.htm",
+                "locator": "FY2025 net income $643.8M / diluted EPS $7.44",
+                "as_of": "2025-12-31",
+                "content_sha256": "db4f68ad8bcdbc86b6e66fe0168293e201f84ca4fad282ffc69466a2f7e73fb0",
+                "source_id": "fa635de1901846daf1f72bd7793d1d26c05c7e3f49878622b143d25d40751add"
+              },
+              "rationale": null
+            },
+            {
+              "id": "operating_cash_minimum_m",
+              "label": "Corporate cash required for operations and liquidity",
+              "kind": "judgment",
+              "value": 400.0,
+              "unit": "USD_m",
+              "source": null,
+              "rationale": "Judgment on non-distributable operating liquidity."
+            },
+            {
+              "id": "net_corporate_claim_m",
+              "label": "Net financial claim on common equity after debt and operating minimum",
+              "kind": "judgment",
+              "value": -2165.0,
+              "unit": "USD_m",
+              "source": null,
+              "rationale": "Filing-locked cash less total debt; low stresses revolver draw and rate step-up."
+            },
+            {
+              "id": "value_per_share",
+              "label": "Net financial claims per share",
+              "kind": "calculation",
+              "value": -25.0,
+              "unit": "USD_per_share",
+              "operation": "divide",
+              "formula": "net_corporate_claim_m \u00f7 shares_m",
+              "substituted_formula": "-2165 \u00f7 86.6",
+              "dependencies": [
+                "net_corporate_claim_m",
+                "shares_m"
+              ]
+            }
+          ],
+          "base": [
+            {
+              "id": "cash_m",
+              "label": "Cash and cash equivalents",
+              "kind": "fact",
+              "value": 356.2,
+              "unit": "USD_m",
+              "source": {
+                "ref": "ALLE/investor-documents/sec-edgar/10-K_20260217_rpt20251231_acc0001579241_26_000007.htm",
+                "locator": "CashAndCashEquivalentsAtCarryingValue $356.2M at December 31, 2025",
+                "as_of": "2025-12-31",
+                "content_sha256": "db4f68ad8bcdbc86b6e66fe0168293e201f84ca4fad282ffc69466a2f7e73fb0",
+                "source_id": "82f166b5ed2e3d83da058e7e2538cf00d7326f022d04ec21a64b93ab0c9d3755"
+              },
+              "rationale": null
+            },
+            {
+              "id": "total_debt_m",
+              "label": "Total debt including current portion",
+              "kind": "fact",
+              "value": 1980.1,
+              "unit": "USD_m",
+              "source": {
+                "ref": "ALLE/investor-documents/sec-edgar/10-K_20260217_rpt20251231_acc0001579241_26_000007.htm",
+                "locator": "LongTermDebt $1980.1M at December 31, 2025",
+                "as_of": "2025-12-31",
+                "content_sha256": "db4f68ad8bcdbc86b6e66fe0168293e201f84ca4fad282ffc69466a2f7e73fb0",
+                "source_id": "96ab2f52485b57637e68e3a4cb796244d24cb9777b426afe0250e22fe45c21d6"
+              },
+              "rationale": null
+            },
+            {
+              "id": "shares_m",
+              "label": "FY2025 diluted shares",
+              "kind": "fact",
+              "value": 86.6,
+              "unit": "million_shares",
+              "source": {
+                "ref": "ALLE/investor-documents/sec-edgar/10-K_20260217_rpt20251231_acc0001579241_26_000007.htm",
+                "locator": "FY2025 net income $643.8M / diluted EPS $7.44",
+                "as_of": "2025-12-31",
+                "content_sha256": "db4f68ad8bcdbc86b6e66fe0168293e201f84ca4fad282ffc69466a2f7e73fb0",
+                "source_id": "fa635de1901846daf1f72bd7793d1d26c05c7e3f49878622b143d25d40751add"
+              },
+              "rationale": null
+            },
+            {
+              "id": "operating_cash_minimum_m",
+              "label": "Corporate cash required for operations and liquidity",
+              "kind": "judgment",
+              "value": 250.0,
+              "unit": "USD_m",
+              "source": null,
+              "rationale": "Judgment on non-distributable operating liquidity."
+            },
+            {
+              "id": "net_corporate_claim_m",
+              "label": "Net financial claim on common equity after debt and operating minimum",
+              "kind": "judgment",
+              "value": -1623.9,
+              "unit": "USD_m",
+              "source": null,
+              "rationale": "Filing-locked cash less total debt; low stresses revolver draw and rate step-up."
+            },
+            {
+              "id": "value_per_share",
+              "label": "Net financial claims per share",
+              "kind": "calculation",
+              "value": -18.7517321,
+              "unit": "USD_per_share",
+              "operation": "divide",
+              "formula": "net_corporate_claim_m \u00f7 shares_m",
+              "substituted_formula": "-1623.9 \u00f7 86.6",
+              "dependencies": [
+                "net_corporate_claim_m",
+                "shares_m"
+              ]
+            }
+          ],
+          "high": [
+            {
+              "id": "cash_m",
+              "label": "Cash and cash equivalents",
+              "kind": "fact",
+              "value": 356.2,
+              "unit": "USD_m",
+              "source": {
+                "ref": "ALLE/investor-documents/sec-edgar/10-K_20260217_rpt20251231_acc0001579241_26_000007.htm",
+                "locator": "CashAndCashEquivalentsAtCarryingValue $356.2M at December 31, 2025",
+                "as_of": "2025-12-31",
+                "content_sha256": "db4f68ad8bcdbc86b6e66fe0168293e201f84ca4fad282ffc69466a2f7e73fb0",
+                "source_id": "82f166b5ed2e3d83da058e7e2538cf00d7326f022d04ec21a64b93ab0c9d3755"
+              },
+              "rationale": null
+            },
+            {
+              "id": "total_debt_m",
+              "label": "Total debt including current portion",
+              "kind": "fact",
+              "value": 1980.1,
+              "unit": "USD_m",
+              "source": {
+                "ref": "ALLE/investor-documents/sec-edgar/10-K_20260217_rpt20251231_acc0001579241_26_000007.htm",
+                "locator": "LongTermDebt $1980.1M at December 31, 2025",
+                "as_of": "2025-12-31",
+                "content_sha256": "db4f68ad8bcdbc86b6e66fe0168293e201f84ca4fad282ffc69466a2f7e73fb0",
+                "source_id": "96ab2f52485b57637e68e3a4cb796244d24cb9777b426afe0250e22fe45c21d6"
+              },
+              "rationale": null
+            },
+            {
+              "id": "shares_m",
+              "label": "FY2025 diluted shares",
+              "kind": "fact",
+              "value": 86.6,
+              "unit": "million_shares",
+              "source": {
+                "ref": "ALLE/investor-documents/sec-edgar/10-K_20260217_rpt20251231_acc0001579241_26_000007.htm",
+                "locator": "FY2025 net income $643.8M / diluted EPS $7.44",
+                "as_of": "2025-12-31",
+                "content_sha256": "db4f68ad8bcdbc86b6e66fe0168293e201f84ca4fad282ffc69466a2f7e73fb0",
+                "source_id": "fa635de1901846daf1f72bd7793d1d26c05c7e3f49878622b143d25d40751add"
+              },
+              "rationale": null
+            },
+            {
+              "id": "operating_cash_minimum_m",
+              "label": "Corporate cash required for operations and liquidity",
+              "kind": "judgment",
+              "value": 100.0,
+              "unit": "USD_m",
+              "source": null,
+              "rationale": "Judgment on non-distributable operating liquidity."
+            },
+            {
+              "id": "net_corporate_claim_m",
+              "label": "Net financial claim on common equity after debt and operating minimum",
+              "kind": "judgment",
+              "value": -1039.2,
+              "unit": "USD_m",
+              "source": null,
+              "rationale": "Filing-locked cash less total debt; low stresses revolver draw and rate step-up."
+            },
+            {
+              "id": "value_per_share",
+              "label": "Net financial claims per share",
+              "kind": "calculation",
+              "value": -12.0,
+              "unit": "USD_per_share",
+              "operation": "divide",
+              "formula": "net_corporate_claim_m \u00f7 shares_m",
+              "substituted_formula": "-1039.2 \u00f7 86.6",
+              "dependencies": [
+                "net_corporate_claim_m",
+                "shares_m"
+              ]
+            }
+          ]
+        },
+        "source_lineage": [
+          {
+            "node_id": "cash_m",
+            "ref": "ALLE/investor-documents/sec-edgar/10-K_20260217_rpt20251231_acc0001579241_26_000007.htm",
+            "locator": "CashAndCashEquivalentsAtCarryingValue $356.2M at December 31, 2025",
+            "as_of": "2025-12-31",
+            "content_sha256": "db4f68ad8bcdbc86b6e66fe0168293e201f84ca4fad282ffc69466a2f7e73fb0",
+            "source_id": "82f166b5ed2e3d83da058e7e2538cf00d7326f022d04ec21a64b93ab0c9d3755"
+          },
+          {
+            "node_id": "total_debt_m",
+            "ref": "ALLE/investor-documents/sec-edgar/10-K_20260217_rpt20251231_acc0001579241_26_000007.htm",
+            "locator": "LongTermDebt $1980.1M at December 31, 2025",
+            "as_of": "2025-12-31",
+            "content_sha256": "db4f68ad8bcdbc86b6e66fe0168293e201f84ca4fad282ffc69466a2f7e73fb0",
+            "source_id": "96ab2f52485b57637e68e3a4cb796244d24cb9777b426afe0250e22fe45c21d6"
+          },
+          {
+            "node_id": "shares_m",
+            "ref": "ALLE/investor-documents/sec-edgar/10-K_20260217_rpt20251231_acc0001579241_26_000007.htm",
+            "locator": "FY2025 net income $643.8M / diluted EPS $7.44",
+            "as_of": "2025-12-31",
+            "content_sha256": "db4f68ad8bcdbc86b6e66fe0168293e201f84ca4fad282ffc69466a2f7e73fb0",
+            "source_id": "fa635de1901846daf1f72bd7793d1d26c05c7e3f49878622b143d25d40751add"
+          }
+        ],
+        "checks": {
+          "passed": true,
+          "errors": []
+        },
+        "proof_hash": "ec805513417337cf2c235492d4bfd5b856fa58a67caa80bd0af0e5074770eba0"
+      },
+      "evidence_tier": "primary_derived",
+      "evidence_level": "primary_derived",
+      "evidence": "Primary bridge from ALLE/investor-documents/sec-edgar/10-K_20260217_rpt20251231_acc0001579241_26_000007.htm: FY2025 revenue $4067.3M, OCF $783.8M, FCF $714.7M, cash $356.2M, total debt $1980.1M; contract backfill 2026-07-21.",
+      "scenario_assumptions": "Proof outputs {'low': -25.0, 'base': -18.7517, 'high': -12.0}; see calculation_proof graph.",
+      "probability_and_timing": null,
+      "tax_and_realization_adjustments": "Net debt ~$1623.9M at FY2025.",
+      "falsifier": "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
+      "overlap_key": "net_financial_claims",
+      "assumption_type": "judgment"
+    },
+    {
+      "component_id": "housing_cycle_and_competition_reserve",
+      "label": "Housing-cycle, competition, and variable-rate debt reserve",
+      "category": "liability_or_reserve",
+      "treatment": "additive",
+      "included_in_component_id": null,
+      "ownership_claim": "Non-residential construction and import competition stress",
+      "ownership_percentage": 1.0,
+      "quantity": {
+        "value": 1,
+        "unit": "per-share economic claim"
+      },
+      "method": "net_asset_value",
+      "method_version": "1.0",
+      "method_provenance": {
+        "method_id": "net_asset_value",
+        "version": "1.0",
+        "label": "Reconciled net asset value",
+        "power_zones": [
+          "scarce_asset_optionality",
+          "catalyst_asset_value",
+          "credit_and_normalized_returns"
+        ],
+        "equation": "value_per_share = (gross_assets - senior_claims - tax - realization_costs) / diluted_shares",
+        "sources": [
+          {
+            "ref": "_system/frameworks/scarce_strategic_asset_valuation.md",
+            "locator": "Economic ownership and unit NAV"
+          }
+        ]
+      },
+      "comparable_ids": [],
+      "range_per_share": {
+        "low": -15.0,
+        "base": -8.0,
+        "high": -3.0
+      },
+      "legacy_range_per_share": {
+        "low": -15.0,
+        "base": -8.0,
+        "high": -3.0
+      },
+      "valuation_status": "bounded_estimate",
+      "calculation_proof": {
+        "status": "valid",
+        "method_id": "net_asset_value",
+        "method_version": "1.0",
+        "outputs": {
+          "low": -15.0,
+          "base": -8.0,
+          "high": -3.0
+        },
+        "output_unit": "USD_per_share",
+        "traces": {
+          "low": [
+            {
+              "id": "revolver_draw_m",
+              "label": "Revolving credit facility outstanding at year-end",
+              "kind": "fact",
+              "value": 190.6,
+              "unit": "USD_m",
+              "source": {
+                "ref": "ALLE/investor-documents/sec-edgar/10-K_20260217_rpt20251231_acc0001579241_26_000007.htm",
+                "locator": "DebtInstrumentCarryingAmount $190.6M on Revolving Facility at December 31, 2025",
+                "as_of": "2025-12-31",
+                "content_sha256": "db4f68ad8bcdbc86b6e66fe0168293e201f84ca4fad282ffc69466a2f7e73fb0",
+                "source_id": "2e43c763b6400af5d88d522644695c5cd12ff87e15ec76881c67caaf93c715be"
+              },
+              "rationale": null
+            },
+            {
+              "id": "sbc_m",
+              "label": "FY2025 share-based compensation expense",
+              "kind": "fact",
+              "value": 29.8,
+              "unit": "USD_m",
+              "source": {
+                "ref": "ALLE/investor-documents/sec-edgar/10-K_20260217_rpt20251231_acc0001579241_26_000007.htm",
+                "locator": "ShareBasedCompensation $29.8M FY2025",
+                "as_of": "2025-12-31",
+                "content_sha256": "db4f68ad8bcdbc86b6e66fe0168293e201f84ca4fad282ffc69466a2f7e73fb0",
+                "source_id": "294b8e81395d047bf1f7bf1b3f1e61ab787c2d028019a1dd7c83cc86adc2c1d0"
+              },
+              "rationale": null
+            },
+            {
+              "id": "shares_m",
+              "label": "FY2025 diluted shares",
+              "kind": "fact",
+              "value": 86.6,
+              "unit": "million_shares",
+              "source": {
+                "ref": "ALLE/investor-documents/sec-edgar/10-K_20260217_rpt20251231_acc0001579241_26_000007.htm",
+                "locator": "FY2025 net income $643.8M / diluted EPS $7.44",
+                "as_of": "2025-12-31",
+                "content_sha256": "db4f68ad8bcdbc86b6e66fe0168293e201f84ca4fad282ffc69466a2f7e73fb0",
+                "source_id": "fa635de1901846daf1f72bd7793d1d26c05c7e3f49878622b143d25d40751add"
+              },
+              "rationale": null
+            },
+            {
+              "id": "reserve_m",
+              "label": "Housing-cycle, price competition, and variable-rate debt reserve",
+              "kind": "judgment",
+              "value": -1299.0,
+              "unit": "USD_m",
+              "source": null,
+              "rationale": "Negative reserve for non-residential construction slowdown, low-cost import competition, and revolver/variable-rate exposure."
+            },
+            {
+              "id": "value_per_share",
+              "label": "Housing cycle and competition reserve per share",
+              "kind": "calculation",
+              "value": -15.0,
+              "unit": "USD_per_share",
+              "operation": "divide",
+              "formula": "reserve_m \u00f7 shares_m",
+              "substituted_formula": "-1299 \u00f7 86.6",
+              "dependencies": [
+                "reserve_m",
+                "shares_m"
+              ]
+            }
+          ],
+          "base": [
+            {
+              "id": "revolver_draw_m",
+              "label": "Revolving credit facility outstanding at year-end",
+              "kind": "fact",
+              "value": 190.6,
+              "unit": "USD_m",
+              "source": {
+                "ref": "ALLE/investor-documents/sec-edgar/10-K_20260217_rpt20251231_acc0001579241_26_000007.htm",
+                "locator": "DebtInstrumentCarryingAmount $190.6M on Revolving Facility at December 31, 2025",
+                "as_of": "2025-12-31",
+                "content_sha256": "db4f68ad8bcdbc86b6e66fe0168293e201f84ca4fad282ffc69466a2f7e73fb0",
+                "source_id": "2e43c763b6400af5d88d522644695c5cd12ff87e15ec76881c67caaf93c715be"
+              },
+              "rationale": null
+            },
+            {
+              "id": "sbc_m",
+              "label": "FY2025 share-based compensation expense",
+              "kind": "fact",
+              "value": 29.8,
+              "unit": "USD_m",
+              "source": {
+                "ref": "ALLE/investor-documents/sec-edgar/10-K_20260217_rpt20251231_acc0001579241_26_000007.htm",
+                "locator": "ShareBasedCompensation $29.8M FY2025",
+                "as_of": "2025-12-31",
+                "content_sha256": "db4f68ad8bcdbc86b6e66fe0168293e201f84ca4fad282ffc69466a2f7e73fb0",
+                "source_id": "294b8e81395d047bf1f7bf1b3f1e61ab787c2d028019a1dd7c83cc86adc2c1d0"
+              },
+              "rationale": null
+            },
+            {
+              "id": "shares_m",
+              "label": "FY2025 diluted shares",
+              "kind": "fact",
+              "value": 86.6,
+              "unit": "million_shares",
+              "source": {
+                "ref": "ALLE/investor-documents/sec-edgar/10-K_20260217_rpt20251231_acc0001579241_26_000007.htm",
+                "locator": "FY2025 net income $643.8M / diluted EPS $7.44",
+                "as_of": "2025-12-31",
+                "content_sha256": "db4f68ad8bcdbc86b6e66fe0168293e201f84ca4fad282ffc69466a2f7e73fb0",
+                "source_id": "fa635de1901846daf1f72bd7793d1d26c05c7e3f49878622b143d25d40751add"
+              },
+              "rationale": null
+            },
+            {
+              "id": "reserve_m",
+              "label": "Housing-cycle, price competition, and variable-rate debt reserve",
+              "kind": "judgment",
+              "value": -692.8,
+              "unit": "USD_m",
+              "source": null,
+              "rationale": "Negative reserve for non-residential construction slowdown, low-cost import competition, and revolver/variable-rate exposure."
+            },
+            {
+              "id": "value_per_share",
+              "label": "Housing cycle and competition reserve per share",
+              "kind": "calculation",
+              "value": -8.0,
+              "unit": "USD_per_share",
+              "operation": "divide",
+              "formula": "reserve_m \u00f7 shares_m",
+              "substituted_formula": "-692.8 \u00f7 86.6",
+              "dependencies": [
+                "reserve_m",
+                "shares_m"
+              ]
+            }
+          ],
+          "high": [
+            {
+              "id": "revolver_draw_m",
+              "label": "Revolving credit facility outstanding at year-end",
+              "kind": "fact",
+              "value": 190.6,
+              "unit": "USD_m",
+              "source": {
+                "ref": "ALLE/investor-documents/sec-edgar/10-K_20260217_rpt20251231_acc0001579241_26_000007.htm",
+                "locator": "DebtInstrumentCarryingAmount $190.6M on Revolving Facility at December 31, 2025",
+                "as_of": "2025-12-31",
+                "content_sha256": "db4f68ad8bcdbc86b6e66fe0168293e201f84ca4fad282ffc69466a2f7e73fb0",
+                "source_id": "2e43c763b6400af5d88d522644695c5cd12ff87e15ec76881c67caaf93c715be"
+              },
+              "rationale": null
+            },
+            {
+              "id": "sbc_m",
+              "label": "FY2025 share-based compensation expense",
+              "kind": "fact",
+              "value": 29.8,
+              "unit": "USD_m",
+              "source": {
+                "ref": "ALLE/investor-documents/sec-edgar/10-K_20260217_rpt20251231_acc0001579241_26_000007.htm",
+                "locator": "ShareBasedCompensation $29.8M FY2025",
+                "as_of": "2025-12-31",
+                "content_sha256": "db4f68ad8bcdbc86b6e66fe0168293e201f84ca4fad282ffc69466a2f7e73fb0",
+                "source_id": "294b8e81395d047bf1f7bf1b3f1e61ab787c2d028019a1dd7c83cc86adc2c1d0"
+              },
+              "rationale": null
+            },
+            {
+              "id": "shares_m",
+              "label": "FY2025 diluted shares",
+              "kind": "fact",
+              "value": 86.6,
+              "unit": "million_shares",
+              "source": {
+                "ref": "ALLE/investor-documents/sec-edgar/10-K_20260217_rpt20251231_acc0001579241_26_000007.htm",
+                "locator": "FY2025 net income $643.8M / diluted EPS $7.44",
+                "as_of": "2025-12-31",
+                "content_sha256": "db4f68ad8bcdbc86b6e66fe0168293e201f84ca4fad282ffc69466a2f7e73fb0",
+                "source_id": "fa635de1901846daf1f72bd7793d1d26c05c7e3f49878622b143d25d40751add"
+              },
+              "rationale": null
+            },
+            {
+              "id": "reserve_m",
+              "label": "Housing-cycle, price competition, and variable-rate debt reserve",
+              "kind": "judgment",
+              "value": -259.8,
+              "unit": "USD_m",
+              "source": null,
+              "rationale": "Negative reserve for non-residential construction slowdown, low-cost import competition, and revolver/variable-rate exposure."
+            },
+            {
+              "id": "value_per_share",
+              "label": "Housing cycle and competition reserve per share",
+              "kind": "calculation",
+              "value": -3.0,
+              "unit": "USD_per_share",
+              "operation": "divide",
+              "formula": "reserve_m \u00f7 shares_m",
+              "substituted_formula": "-259.8 \u00f7 86.6",
+              "dependencies": [
+                "reserve_m",
+                "shares_m"
+              ]
+            }
+          ]
+        },
+        "source_lineage": [
+          {
+            "node_id": "revolver_draw_m",
+            "ref": "ALLE/investor-documents/sec-edgar/10-K_20260217_rpt20251231_acc0001579241_26_000007.htm",
+            "locator": "DebtInstrumentCarryingAmount $190.6M on Revolving Facility at December 31, 2025",
+            "as_of": "2025-12-31",
+            "content_sha256": "db4f68ad8bcdbc86b6e66fe0168293e201f84ca4fad282ffc69466a2f7e73fb0",
+            "source_id": "2e43c763b6400af5d88d522644695c5cd12ff87e15ec76881c67caaf93c715be"
+          },
+          {
+            "node_id": "sbc_m",
+            "ref": "ALLE/investor-documents/sec-edgar/10-K_20260217_rpt20251231_acc0001579241_26_000007.htm",
+            "locator": "ShareBasedCompensation $29.8M FY2025",
+            "as_of": "2025-12-31",
+            "content_sha256": "db4f68ad8bcdbc86b6e66fe0168293e201f84ca4fad282ffc69466a2f7e73fb0",
+            "source_id": "294b8e81395d047bf1f7bf1b3f1e61ab787c2d028019a1dd7c83cc86adc2c1d0"
+          },
+          {
+            "node_id": "shares_m",
+            "ref": "ALLE/investor-documents/sec-edgar/10-K_20260217_rpt20251231_acc0001579241_26_000007.htm",
+            "locator": "FY2025 net income $643.8M / diluted EPS $7.44",
+            "as_of": "2025-12-31",
+            "content_sha256": "db4f68ad8bcdbc86b6e66fe0168293e201f84ca4fad282ffc69466a2f7e73fb0",
+            "source_id": "fa635de1901846daf1f72bd7793d1d26c05c7e3f49878622b143d25d40751add"
+          }
+        ],
+        "checks": {
+          "passed": true,
+          "errors": []
+        },
+        "proof_hash": "c33ca5516315cf42f2e076dc2729c6b18f83981b1a84bc517464f13743c28c5d"
+      },
+      "evidence_tier": "primary_derived",
+      "evidence_level": "primary_derived",
+      "evidence": "Primary bridge from ALLE/investor-documents/sec-edgar/10-K_20260217_rpt20251231_acc0001579241_26_000007.htm: FY2025 revenue $4067.3M, OCF $783.8M, FCF $714.7M, cash $356.2M, total debt $1980.1M; contract backfill 2026-07-21.",
+      "scenario_assumptions": "Proof outputs {'low': -15.0, 'base': -8.0, 'high': -3.0}; see calculation_proof graph.",
+      "probability_and_timing": null,
+      "tax_and_realization_adjustments": "Revolver draw $190.6M and variable-rate exposure cap partial dhando.",
+      "falsifier": "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
+      "overlap_key": "housing_cycle_and_competition_reserve",
+      "assumption_type": "judgment"
+    }
+  ],
   "component_coverage": {
-    "all_material_components_identified": false,
-    "material_component_count": 0,
-    "additive_component_count": 0,
+    "all_material_components_identified": true,
+    "material_component_count": 4,
+    "additive_component_count": 4,
     "embedded_component_count": 0,
-    "unvalued_component_count": 1,
+    "unvalued_component_count": 0,
     "double_counting_flags": []
   },
   "input_classification": {
     "facts": [],
     "estimates": [],
-    "judgments": []
+    "judgments": [
+      {
+        "component_id": "security_products_owner_cash_engine",
+        "label": "Security products owner-cash engine (Americas + International)",
+        "kind": "judgment",
+        "evidence_tier": "primary_derived",
+        "evidence": "Primary bridge from ALLE/investor-documents/sec-edgar/10-K_20260217_rpt20251231_acc0001579241_26_000007.htm: FY2025 revenue $4067.3M, OCF $783.8M, FCF $714.7M, cash $356.2M, total debt $1980.1M; contract backfill 2026-07-21.",
+        "method": "owner_cash_or_dividend_discount",
+        "valuation_status": "bounded_estimate"
+      },
+      {
+        "component_id": "electronic_access_and_software_option",
+        "label": "Electronic access and software monetization option",
+        "kind": "judgment",
+        "evidence_tier": "primary_derived",
+        "evidence": "Primary bridge from ALLE/investor-documents/sec-edgar/10-K_20260217_rpt20251231_acc0001579241_26_000007.htm: FY2025 revenue $4067.3M, OCF $783.8M, FCF $714.7M, cash $356.2M, total debt $1980.1M; contract backfill 2026-07-21.",
+        "method": "risk_adjusted_milestone_value",
+        "valuation_status": "bounded_estimate"
+      },
+      {
+        "component_id": "net_financial_claims",
+        "label": "Net cash and debt claims on common equity",
+        "kind": "judgment",
+        "evidence_tier": "primary_derived",
+        "evidence": "Primary bridge from ALLE/investor-documents/sec-edgar/10-K_20260217_rpt20251231_acc0001579241_26_000007.htm: FY2025 revenue $4067.3M, OCF $783.8M, FCF $714.7M, cash $356.2M, total debt $1980.1M; contract backfill 2026-07-21.",
+        "method": "net_asset_value",
+        "valuation_status": "bounded_estimate"
+      },
+      {
+        "component_id": "housing_cycle_and_competition_reserve",
+        "label": "Housing-cycle, competition, and variable-rate debt reserve",
+        "kind": "judgment",
+        "evidence_tier": "primary_derived",
+        "evidence": "Primary bridge from ALLE/investor-documents/sec-edgar/10-K_20260217_rpt20251231_acc0001579241_26_000007.htm: FY2025 revenue $4067.3M, OCF $783.8M, FCF $714.7M, cash $356.2M, total debt $1980.1M; contract backfill 2026-07-21.",
+        "method": "net_asset_value",
+        "valuation_status": "bounded_estimate"
+      }
+    ]
   },
   "method_route": {
     "schema_version": "2.0",
-    "status": "default_needs_review",
+    "status": "routed",
     "profile_id": "quality_reinvestment",
     "label": "High-return compounder",
-    "score": 0.0,
+    "score": 8.0,
     "reasons": [
-      "No decisive classification was supplied; owner-earnings is the conservative operating default."
+      "archetype=compounder",
+      "component categories=operating_business",
+      "existing methods=owner_cash"
     ],
     "primary_methods": [
       "owner_earnings_reinvestment_dcf"
@@ -61,56 +2181,155 @@
       "stock compensation or acquisitions omitted",
       "terminal value unsupported by a durable mechanism"
     ],
-    "secondary_profiles": [],
+    "secondary_profiles": [
+      {
+        "profile_id": "predictable_cash_flow",
+        "score": 3.0,
+        "reasons": [
+          "component categories=operating_business",
+          "existing methods=dividend, owner_cash"
+        ]
+      },
+      {
+        "profile_id": "binary_milestone",
+        "score": 3.0,
+        "reasons": [
+          "component categories=real_option",
+          "existing methods=milestone, risk_adjusted"
+        ]
+      }
+    ],
     "scorecard": {
       "scarce_asset_optionality": {
-        "score": 0.0,
-        "reasons": []
+        "score": 1.0,
+        "reasons": [
+          "component categories=real_option"
+        ]
       },
       "quality_reinvestment": {
-        "score": 0.0,
-        "reasons": []
+        "score": 8.0,
+        "reasons": [
+          "archetype=compounder",
+          "component categories=operating_business",
+          "existing methods=owner_cash"
+        ]
       },
       "capital_cycle": {
-        "score": 0.0,
-        "reasons": []
+        "score": 1.0,
+        "reasons": [
+          "component categories=operating_business"
+        ]
       },
       "credit_and_normalized_returns": {
-        "score": 0.0,
-        "reasons": []
+        "score": 1.0,
+        "reasons": [
+          "component categories=liability_or_reserve"
+        ]
       },
       "catalyst_asset_value": {
         "score": 0.0,
         "reasons": []
       },
       "predictable_cash_flow": {
-        "score": 0.0,
-        "reasons": []
+        "score": 3.0,
+        "reasons": [
+          "component categories=operating_business",
+          "existing methods=dividend, owner_cash"
+        ]
       },
       "binary_milestone": {
-        "score": 0.0,
-        "reasons": []
+        "score": 3.0,
+        "reasons": [
+          "component categories=real_option",
+          "existing methods=milestone, risk_adjusted"
+        ]
       }
     },
     "decision_rule": "Power Zones select the fitting economic method and eligible independent reviewers; they never choose the valuation answer or capital decision.",
     "ticker": "ALLE",
-    "as_of": "2026-07-20",
+    "as_of": "2026-07-21",
     "route_source": "canonical_power_zone_router",
     "config_path": "_system/frameworks/power_zones.json",
     "config_updated": "2026-07-14",
     "classification": {
-      "archetype": "unknown",
-      "moat": "unproven",
-      "dhando": "pending",
+      "archetype": "compounder",
+      "moat": "stable",
+      "dhando": "partial",
       "stance": "watch",
-      "cycle": "-",
+      "cycle": "non_residential_construction",
       "moi_bucket": "pending",
-      "payoff_lens": "pending",
+      "payoff_lens": "operating",
       "investment_sleeve": "sp500_liquidity"
     },
-    "specialist_power_zones": [],
+    "specialist_power_zones": [
+      {
+        "persona": "lawrence",
+        "label": "Bryan Lawrence",
+        "independence_group": "quality_reinvestment",
+        "in_power_zone": true,
+        "fit": 1.0,
+        "matched": 3,
+        "known_fields": 3,
+        "matched_fields": [
+          "archetype",
+          "moat",
+          "dhando"
+        ],
+        "excluded_by": null,
+        "match_rate": null,
+        "score": 85
+      },
+      {
+        "persona": "buffett_weschler",
+        "label": "Buffett / Weschler",
+        "independence_group": "quality_reinvestment",
+        "in_power_zone": true,
+        "fit": 0.667,
+        "matched": 2,
+        "known_fields": 3,
+        "matched_fields": [
+          "archetype",
+          "moat"
+        ],
+        "excluded_by": null,
+        "match_rate": null,
+        "score": 57
+      },
+      {
+        "persona": "hohn",
+        "label": "Chris Hohn",
+        "independence_group": "competitive_advantage",
+        "in_power_zone": true,
+        "fit": 0.667,
+        "matched": 2,
+        "known_fields": 3,
+        "matched_fields": [
+          "archetype",
+          "moat"
+        ],
+        "excluded_by": null,
+        "match_rate": null,
+        "score": 57
+      },
+      {
+        "persona": "munger",
+        "label": "Charlie Munger",
+        "independence_group": "quality_reinvestment",
+        "in_power_zone": true,
+        "fit": 0.667,
+        "matched": 2,
+        "known_fields": 3,
+        "matched_fields": [
+          "archetype",
+          "moat"
+        ],
+        "excluded_by": null,
+        "match_rate": null,
+        "score": 57
+      }
+    ],
     "committee": {
-      "candidate_count": 4,
+      "candidate_count": 5,
       "independence_group_count": 3,
       "committee_seatable": true,
       "candidates": [
@@ -129,77 +2348,252 @@
         {
           "persona": "marathon_capital_cycle",
           "independence_group": "capital_cycle"
+        },
+        {
+          "persona": "lawrence",
+          "independence_group": "quality_reinvestment"
         }
       ]
     },
-    "input_hash": "d2dd89c0f1910aea2cf595b901db67c378b112cd460bc8377a660bacf5238caa",
-    "generated_at": "2026-07-20T17:13:53.896162+00:00"
+    "input_hash": "996dd660833e1424d9f8a58821c9eb029570b00c57c2fad285667b1780206e61",
+    "generated_at": "2026-07-21T17:00:58.607291+00:00"
   },
   "market": {
     "price_per_share": 138.13,
-    "fully_diluted_shares": null,
-    "market_cap_m": null,
-    "enterprise_value_m": null
+    "fully_diluted_shares": 86600000,
+    "market_cap_m": 11962.06,
+    "enterprise_value_m": 13585.96
   },
   "valuation": {
     "value_per_share": {
-      "low": null,
-      "base": null,
-      "high": null
+      "low": 85.02,
+      "base": 161.8283,
+      "high": 237.48
     },
     "priced_components_per_share": {
-      "low": 0,
-      "base": 0,
-      "high": 0
+      "low": 85.02,
+      "base": 161.8283,
+      "high": 237.48
     },
-    "legacy_value_per_share": null,
-    "probability_weighted_value_per_share": null,
+    "legacy_value_per_share": {
+      "low": 85.02,
+      "base": 161.83,
+      "high": 237.48
+    },
+    "probability_weighted_value_per_share": 161.8283,
     "expected_distributions_per_share": 0.0,
     "annualized_return_at_price_pct": {
-      "low": null,
-      "base": null,
-      "high": null
+      "low": -6.7,
+      "base": 2.29,
+      "high": 8.05
     },
-    "downside_to_low_pct": null,
+    "downside_to_low_pct": -38.45,
     "horizon_years": 7,
     "interpretation": "value_per_share is withheld while any material additive component is unpriced; priced_components_per_share is not a complete security value."
   },
   "scenario_contract": {
     "rule": "Cases must change cited causal operating, capital, probability, timing, or financing drivers\u2014not only a terminal multiple.",
-    "top_value_drivers": [],
+    "top_value_drivers": [
+      {
+        "component_id": "security_products_owner_cash_engine",
+        "label": "Security products owner-cash engine (Americas + International)",
+        "valuation_status": "bounded_estimate",
+        "base_per_share": 180.58,
+        "legacy_base_per_share": 180.58,
+        "range_width_per_share": 109.46,
+        "scenario_assumptions": "Proof outputs {'low': 125.02, 'base': 180.58, 'high': 234.48}; see calculation_proof graph."
+      },
+      {
+        "component_id": "electronic_access_and_software_option",
+        "label": "Electronic access and software monetization option",
+        "valuation_status": "bounded_estimate",
+        "base_per_share": 8.0,
+        "legacy_base_per_share": 8.0,
+        "range_width_per_share": 18.0,
+        "scenario_assumptions": "Proof outputs {'low': 0.0, 'base': 8.0, 'high': 18.0}; see calculation_proof graph."
+      },
+      {
+        "component_id": "net_financial_claims",
+        "label": "Net cash and debt claims on common equity",
+        "valuation_status": "bounded_estimate",
+        "base_per_share": -18.7517,
+        "legacy_base_per_share": -18.75,
+        "range_width_per_share": 13.0,
+        "scenario_assumptions": "Proof outputs {'low': -25.0, 'base': -18.7517, 'high': -12.0}; see calculation_proof graph."
+      },
+      {
+        "component_id": "housing_cycle_and_competition_reserve",
+        "label": "Housing-cycle, competition, and variable-rate debt reserve",
+        "valuation_status": "bounded_estimate",
+        "base_per_share": -8.0,
+        "legacy_base_per_share": -8.0,
+        "range_width_per_share": 12.0,
+        "scenario_assumptions": "Proof outputs {'low': -15.0, 'base': -8.0, 'high': -3.0}; see calculation_proof graph."
+      }
+    ],
     "reverse_expectations": null
   },
   "calculation_proof_summary": {
-    "component_count": 0,
-    "priced_component_count": 0,
-    "proof_complete_pct": 0.0,
+    "component_count": 4,
+    "priced_component_count": 4,
+    "proof_complete_pct": 100.0,
     "status_counts": {
-      "bounded_estimate": 0,
+      "bounded_estimate": 4,
       "calculated": 0,
       "legacy_sensitivity": 0,
       "unpriced": 0
     },
-    "all_material_components_priced": false,
+    "all_material_components_priced": true,
     "calculation_errors": [],
-    "aggregate_proof_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    "aggregate_proof_hash": "f27cbab606342dfd003d7bd49e7a0607596d0188051ae92c61e0fe2b699f1b61"
   },
-  "source_lineage": [],
+  "source_lineage": [
+    {
+      "component_id": "security_products_owner_cash_engine",
+      "node_id": "operating_cash_flow_m",
+      "ref": "ALLE/investor-documents/sec-edgar/10-K_20260217_rpt20251231_acc0001579241_26_000007.htm",
+      "locator": "NetCashProvidedByUsedInOperatingActivities $783.8M (FY2025)",
+      "as_of": "2025-12-31",
+      "content_sha256": "db4f68ad8bcdbc86b6e66fe0168293e201f84ca4fad282ffc69466a2f7e73fb0",
+      "source_id": "ebbc8499c202ab2b67ccd6204d8dd7af5e2cf3637e298f5e542919c8ab3b1e61"
+    },
+    {
+      "component_id": "security_products_owner_cash_engine",
+      "node_id": "capex_m",
+      "ref": "ALLE/investor-documents/sec-edgar/10-K_20260217_rpt20251231_acc0001579241_26_000007.htm",
+      "locator": "PaymentsToAcquirePropertyPlantAndEquipment $69.1M (FY2025)",
+      "as_of": "2025-12-31",
+      "content_sha256": "db4f68ad8bcdbc86b6e66fe0168293e201f84ca4fad282ffc69466a2f7e73fb0",
+      "source_id": "47db24c7fe38f38025ca91f898ea396ffa9bcd4f13c32d4e4ff67e4ef9be2f71"
+    },
+    {
+      "component_id": "security_products_owner_cash_engine",
+      "node_id": "shares_m",
+      "ref": "ALLE/investor-documents/sec-edgar/10-K_20260217_rpt20251231_acc0001579241_26_000007.htm",
+      "locator": "WeightedAverageNumberOfDilutedSharesOutstanding 86.6M; diluted EPS $7.44",
+      "as_of": "2025-12-31",
+      "content_sha256": "db4f68ad8bcdbc86b6e66fe0168293e201f84ca4fad282ffc69466a2f7e73fb0",
+      "source_id": "bee5396be23ceceda0c60cfc6c9f065546508d034e9e8fd54e888856f0903673"
+    },
+    {
+      "component_id": "security_products_owner_cash_engine",
+      "node_id": "americas_revenue_m",
+      "ref": "ALLE/investor-documents/sec-edgar/10-K_20260217_rpt20251231_acc0001579241_26_000007.htm",
+      "locator": "Americas segment revenue $3,218.8M FY2025",
+      "as_of": "2025-12-31",
+      "content_sha256": "db4f68ad8bcdbc86b6e66fe0168293e201f84ca4fad282ffc69466a2f7e73fb0",
+      "source_id": "eb6f4abea0d3e7bc6145a10d5f3f4d1b03f11d7ac6f8395854e67161046c06c9"
+    },
+    {
+      "component_id": "security_products_owner_cash_engine",
+      "node_id": "emea_revenue_m",
+      "ref": "ALLE/investor-documents/sec-edgar/10-K_20260217_rpt20251231_acc0001579241_26_000007.htm",
+      "locator": "International segment revenue $848.5M FY2025",
+      "as_of": "2025-12-31",
+      "content_sha256": "db4f68ad8bcdbc86b6e66fe0168293e201f84ca4fad282ffc69466a2f7e73fb0",
+      "source_id": "b53d20a9271d172f9bbdbf9fe5bb3c65034cf6abe18633c1ed8dd4123586e8fb"
+    },
+    {
+      "component_id": "electronic_access_and_software_option",
+      "node_id": "electronic_revenue_m",
+      "ref": "ALLE/investor-documents/sec-edgar/10-K_20260217_rpt20251231_acc0001579241_26_000007.htm",
+      "locator": "Electronic products revenue $278.3M FY2025 (product category note)",
+      "as_of": "2025-12-31",
+      "content_sha256": "db4f68ad8bcdbc86b6e66fe0168293e201f84ca4fad282ffc69466a2f7e73fb0",
+      "source_id": "e2263a6553be3e4494d3593232db72d5cc7671aa8b35bbd816135c9412c94b89"
+    },
+    {
+      "component_id": "electronic_access_and_software_option",
+      "node_id": "deferred_revenue_m",
+      "ref": "ALLE/investor-documents/sec-edgar/10-K_20260217_rpt20251231_acc0001579241_26_000007.htm",
+      "locator": "DeferredRevenue $36.0M at December 31, 2025",
+      "as_of": "2025-12-31",
+      "content_sha256": "db4f68ad8bcdbc86b6e66fe0168293e201f84ca4fad282ffc69466a2f7e73fb0",
+      "source_id": "5d4ccfb6a0d2b863139a46cc88bc7491821b3bf510468868b9394610f662e898"
+    },
+    {
+      "component_id": "electronic_access_and_software_option",
+      "node_id": "shares_m",
+      "ref": "ALLE/investor-documents/sec-edgar/10-K_20260217_rpt20251231_acc0001579241_26_000007.htm",
+      "locator": "FY2025 net income $643.8M / diluted EPS $7.44",
+      "as_of": "2025-12-31",
+      "content_sha256": "db4f68ad8bcdbc86b6e66fe0168293e201f84ca4fad282ffc69466a2f7e73fb0",
+      "source_id": "fa635de1901846daf1f72bd7793d1d26c05c7e3f49878622b143d25d40751add"
+    },
+    {
+      "component_id": "net_financial_claims",
+      "node_id": "cash_m",
+      "ref": "ALLE/investor-documents/sec-edgar/10-K_20260217_rpt20251231_acc0001579241_26_000007.htm",
+      "locator": "CashAndCashEquivalentsAtCarryingValue $356.2M at December 31, 2025",
+      "as_of": "2025-12-31",
+      "content_sha256": "db4f68ad8bcdbc86b6e66fe0168293e201f84ca4fad282ffc69466a2f7e73fb0",
+      "source_id": "82f166b5ed2e3d83da058e7e2538cf00d7326f022d04ec21a64b93ab0c9d3755"
+    },
+    {
+      "component_id": "net_financial_claims",
+      "node_id": "total_debt_m",
+      "ref": "ALLE/investor-documents/sec-edgar/10-K_20260217_rpt20251231_acc0001579241_26_000007.htm",
+      "locator": "LongTermDebt $1980.1M at December 31, 2025",
+      "as_of": "2025-12-31",
+      "content_sha256": "db4f68ad8bcdbc86b6e66fe0168293e201f84ca4fad282ffc69466a2f7e73fb0",
+      "source_id": "96ab2f52485b57637e68e3a4cb796244d24cb9777b426afe0250e22fe45c21d6"
+    },
+    {
+      "component_id": "net_financial_claims",
+      "node_id": "shares_m",
+      "ref": "ALLE/investor-documents/sec-edgar/10-K_20260217_rpt20251231_acc0001579241_26_000007.htm",
+      "locator": "FY2025 net income $643.8M / diluted EPS $7.44",
+      "as_of": "2025-12-31",
+      "content_sha256": "db4f68ad8bcdbc86b6e66fe0168293e201f84ca4fad282ffc69466a2f7e73fb0",
+      "source_id": "fa635de1901846daf1f72bd7793d1d26c05c7e3f49878622b143d25d40751add"
+    },
+    {
+      "component_id": "housing_cycle_and_competition_reserve",
+      "node_id": "revolver_draw_m",
+      "ref": "ALLE/investor-documents/sec-edgar/10-K_20260217_rpt20251231_acc0001579241_26_000007.htm",
+      "locator": "DebtInstrumentCarryingAmount $190.6M on Revolving Facility at December 31, 2025",
+      "as_of": "2025-12-31",
+      "content_sha256": "db4f68ad8bcdbc86b6e66fe0168293e201f84ca4fad282ffc69466a2f7e73fb0",
+      "source_id": "2e43c763b6400af5d88d522644695c5cd12ff87e15ec76881c67caaf93c715be"
+    },
+    {
+      "component_id": "housing_cycle_and_competition_reserve",
+      "node_id": "sbc_m",
+      "ref": "ALLE/investor-documents/sec-edgar/10-K_20260217_rpt20251231_acc0001579241_26_000007.htm",
+      "locator": "ShareBasedCompensation $29.8M FY2025",
+      "as_of": "2025-12-31",
+      "content_sha256": "db4f68ad8bcdbc86b6e66fe0168293e201f84ca4fad282ffc69466a2f7e73fb0",
+      "source_id": "294b8e81395d047bf1f7bf1b3f1e61ab787c2d028019a1dd7c83cc86adc2c1d0"
+    },
+    {
+      "component_id": "housing_cycle_and_competition_reserve",
+      "node_id": "shares_m",
+      "ref": "ALLE/investor-documents/sec-edgar/10-K_20260217_rpt20251231_acc0001579241_26_000007.htm",
+      "locator": "FY2025 net income $643.8M / diluted EPS $7.44",
+      "as_of": "2025-12-31",
+      "content_sha256": "db4f68ad8bcdbc86b6e66fe0168293e201f84ca4fad282ffc69466a2f7e73fb0",
+      "source_id": "fa635de1901846daf1f72bd7793d1d26c05c7e3f49878622b143d25d40751add"
+    }
+  ],
   "model_checks": {
     "calculation_graphs_valid": true,
-    "component_sum_reconciles": false,
+    "component_sum_reconciles": true,
     "no_double_counting": true,
-    "all_material_components_priced": false,
+    "all_material_components_priced": true,
     "low_base_high_ordered": true
   },
   "evidence": {
-    "unresolved_count": 1,
-    "blockers": [
-      "A complete economic ownership map has not been supplied."
-    ],
+    "unresolved_count": 0,
+    "blockers": [],
     "validation_errors": []
   },
   "monitoring": {
-    "falsifiers": [],
+    "falsifiers": [
+      "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
+      "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
+      "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
+      "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case."
+    ],
     "required_refresh_triggers": [
       "new filing or material operating update",
       "capital-structure change",
@@ -208,12 +2602,16 @@
     ]
   },
   "change_control": {
-    "model_hash": "068e3075636795dfd8bf75345d86e307a9ce0a584c9f941dd9bb24982c1605c8",
-    "method_versions": [],
+    "model_hash": "2729eb0e57607ab8710cbb98cccb0c30ee76faf1094a00ebba6d1fa58af60954",
+    "method_versions": [
+      "net_asset_value@1.0",
+      "owner_cash_or_dividend_discount@1.0",
+      "risk_adjusted_milestone_value@1.0"
+    ],
     "change_log": [],
     "rule": "A source fact is locked. Every assumption change requires a reason, author, timestamp, and before/after value."
   },
   "decision_rule": "No security is decision-grade until every material claim is valued exactly once by a valid calculation proof and every material evidence blocker is resolved.",
   "authority": "universal_valuation_contract",
-  "legacy_reference_present": false
+  "legacy_reference_present": true
 }
