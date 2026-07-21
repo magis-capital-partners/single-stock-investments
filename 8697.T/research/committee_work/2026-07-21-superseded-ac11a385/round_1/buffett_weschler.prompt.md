@@ -1,11 +1,11 @@
-# 8697.T - isolated committee round 2
+# 8697.T - isolated committee round 1
 
-You are the **hohn** method, independence group **competitive_advantage**.
+You are the **buffett_weschler** method, independence group **quality_reinvestment**.
 
-Evidence packet: `602431bde98f2b98db32228f673a9aed545aede5898afe72b25e551e79b2c652`
+Evidence packet: `ac11a385a505106afe41e665a97b4f8d7db9796f1e2a568c1071ef62880b272c`
 
 - `8697.T/research/deep_dive_2026-07-21.md`
-- `8697.T/research/adversarial_2026-07-21.md`
+- `8697.T/research/adversarial_2026-06-04.md`
 - `8697.T/research/valuation_route.json`
 - `8697.T/research/valuation_contract.json`
 - `8697.T/research/valuation.json`
