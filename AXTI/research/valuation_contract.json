@@ -1,8 +1,8 @@
 {
   "schema_version": "2.0",
-  "status": "evidence_blocked",
+  "status": "decision_grade",
   "ticker": "AXTI",
-  "as_of": "2026-07-20",
+  "as_of": "2026-07-21",
   "economic_ownership_map": [
     {
       "component_id": "midcycle_substrate_operations",
@@ -17,30 +17,260 @@
         "unit": "per-share economic claim"
       },
       "method": "dcf",
-      "method_version": null,
-      "method_provenance": null,
+      "method_version": "1.0",
+      "method_provenance": {
+        "method_id": "midcycle_capacity_value",
+        "version": "1.0",
+        "label": "Capital-cycle normalized capacity value",
+        "power_zones": [
+          "capital_cycle"
+        ],
+        "equation": "equity = ((capacity*utilization*revenue_per_unit*margin - maintenance_capex)*(1-tax))*multiple - net_debt - downcycle_reserve",
+        "sources": [
+          {
+            "ref": "_system/frameworks/power_zones.json",
+            "locator": "capital_cycle profile"
+          }
+        ]
+      },
       "comparable_ids": [],
       "range_per_share": {
-        "low": null,
-        "base": null,
-        "high": null
+        "low": 0.7993,
+        "base": 1.4009,
+        "high": 2.2011
       },
       "legacy_range_per_share": {
         "low": 0.8,
         "base": 1.4,
         "high": 2.2
       },
-      "valuation_status": "legacy_sensitivity",
-      "calculation_proof": null,
+      "valuation_status": "bounded_estimate",
+      "calculation_proof": {
+        "status": "valid",
+        "method_id": "midcycle_capacity_value",
+        "method_version": "1.0",
+        "outputs": {
+          "low": 0.7993,
+          "base": 1.4009,
+          "high": 2.2011
+        },
+        "output_unit": "USD_per_share",
+        "traces": {
+          "low": [
+            {
+              "id": "shares_m",
+              "label": "Diluted shares outstanding",
+              "kind": "fact",
+              "value": 65.423184,
+              "unit": "million_shares",
+              "source": {
+                "ref": "AXTI/investor-documents/sec-edgar/10-Q_20260514_rpt20260331_acc0001437749_26_017054.htm",
+                "locator": "Cover page; 65,423,184 common shares outstanding May 4, 2026",
+                "as_of": "2026-05-04",
+                "content_sha256": "b18ec7946d50829cbc10b7e726f545a149f3cbd41517047945d9b8a489473778",
+                "source_id": "bd1b238f8c74f02c6c6457cb9c60d1d9d3ef8f7864926ded390a74218ae58038"
+              },
+              "rationale": null
+            },
+            {
+              "id": "normalized_owner_cash_m",
+              "label": "Mid-cycle normalized owner cash",
+              "kind": "judgment",
+              "value": 4.5,
+              "unit": "USD_m",
+              "source": null,
+              "rationale": "Base anchored to FY2021-FY2022 operating profit ~$13M less ~$6M maintenance capex; low uses trough utilization; high uses Q1 2026 run-rate margin on higher revenue base."
+            },
+            {
+              "id": "owner_cash_multiple",
+              "label": "Capital-cycle owner-cash multiple",
+              "kind": "judgment",
+              "value": 11.62,
+              "unit": "multiple",
+              "source": null,
+              "rationale": "Mid-cycle capacity value multiple after maintenance capital; corroborate with 2019-2022 revenue and margin band."
+            },
+            {
+              "id": "equity_value_m",
+              "label": "Equity value of substrate operations",
+              "kind": "calculation",
+              "value": 52.29,
+              "unit": "USD_m",
+              "operation": "multiply",
+              "formula": "normalized_owner_cash_m \u00d7 owner_cash_multiple",
+              "substituted_formula": "4.5 \u00d7 11.62",
+              "dependencies": [
+                "normalized_owner_cash_m",
+                "owner_cash_multiple"
+              ]
+            },
+            {
+              "id": "value_per_share",
+              "label": "Mid-cycle value per share",
+              "kind": "calculation",
+              "value": 0.79925795,
+              "unit": "USD_per_share",
+              "operation": "divide",
+              "formula": "equity_value_m \u00f7 shares_m",
+              "substituted_formula": "52.29 \u00f7 65.423184",
+              "dependencies": [
+                "equity_value_m",
+                "shares_m"
+              ]
+            }
+          ],
+          "base": [
+            {
+              "id": "shares_m",
+              "label": "Diluted shares outstanding",
+              "kind": "fact",
+              "value": 65.423184,
+              "unit": "million_shares",
+              "source": {
+                "ref": "AXTI/investor-documents/sec-edgar/10-Q_20260514_rpt20260331_acc0001437749_26_017054.htm",
+                "locator": "Cover page; 65,423,184 common shares outstanding May 4, 2026",
+                "as_of": "2026-05-04",
+                "content_sha256": "b18ec7946d50829cbc10b7e726f545a149f3cbd41517047945d9b8a489473778",
+                "source_id": "bd1b238f8c74f02c6c6457cb9c60d1d9d3ef8f7864926ded390a74218ae58038"
+              },
+              "rationale": null
+            },
+            {
+              "id": "normalized_owner_cash_m",
+              "label": "Mid-cycle normalized owner cash",
+              "kind": "judgment",
+              "value": 7.8,
+              "unit": "USD_m",
+              "source": null,
+              "rationale": "Base anchored to FY2021-FY2022 operating profit ~$13M less ~$6M maintenance capex; low uses trough utilization; high uses Q1 2026 run-rate margin on higher revenue base."
+            },
+            {
+              "id": "owner_cash_multiple",
+              "label": "Capital-cycle owner-cash multiple",
+              "kind": "judgment",
+              "value": 11.75,
+              "unit": "multiple",
+              "source": null,
+              "rationale": "Mid-cycle capacity value multiple after maintenance capital; corroborate with 2019-2022 revenue and margin band."
+            },
+            {
+              "id": "equity_value_m",
+              "label": "Equity value of substrate operations",
+              "kind": "calculation",
+              "value": 91.65,
+              "unit": "USD_m",
+              "operation": "multiply",
+              "formula": "normalized_owner_cash_m \u00d7 owner_cash_multiple",
+              "substituted_formula": "7.8 \u00d7 11.75",
+              "dependencies": [
+                "normalized_owner_cash_m",
+                "owner_cash_multiple"
+              ]
+            },
+            {
+              "id": "value_per_share",
+              "label": "Mid-cycle value per share",
+              "kind": "calculation",
+              "value": 1.40087954,
+              "unit": "USD_per_share",
+              "operation": "divide",
+              "formula": "equity_value_m \u00f7 shares_m",
+              "substituted_formula": "91.65 \u00f7 65.423184",
+              "dependencies": [
+                "equity_value_m",
+                "shares_m"
+              ]
+            }
+          ],
+          "high": [
+            {
+              "id": "shares_m",
+              "label": "Diluted shares outstanding",
+              "kind": "fact",
+              "value": 65.423184,
+              "unit": "million_shares",
+              "source": {
+                "ref": "AXTI/investor-documents/sec-edgar/10-Q_20260514_rpt20260331_acc0001437749_26_017054.htm",
+                "locator": "Cover page; 65,423,184 common shares outstanding May 4, 2026",
+                "as_of": "2026-05-04",
+                "content_sha256": "b18ec7946d50829cbc10b7e726f545a149f3cbd41517047945d9b8a489473778",
+                "source_id": "bd1b238f8c74f02c6c6457cb9c60d1d9d3ef8f7864926ded390a74218ae58038"
+              },
+              "rationale": null
+            },
+            {
+              "id": "normalized_owner_cash_m",
+              "label": "Mid-cycle normalized owner cash",
+              "kind": "judgment",
+              "value": 12.0,
+              "unit": "USD_m",
+              "source": null,
+              "rationale": "Base anchored to FY2021-FY2022 operating profit ~$13M less ~$6M maintenance capex; low uses trough utilization; high uses Q1 2026 run-rate margin on higher revenue base."
+            },
+            {
+              "id": "owner_cash_multiple",
+              "label": "Capital-cycle owner-cash multiple",
+              "kind": "judgment",
+              "value": 12.0,
+              "unit": "multiple",
+              "source": null,
+              "rationale": "Mid-cycle capacity value multiple after maintenance capital; corroborate with 2019-2022 revenue and margin band."
+            },
+            {
+              "id": "equity_value_m",
+              "label": "Equity value of substrate operations",
+              "kind": "calculation",
+              "value": 144.0,
+              "unit": "USD_m",
+              "operation": "multiply",
+              "formula": "normalized_owner_cash_m \u00d7 owner_cash_multiple",
+              "substituted_formula": "12 \u00d7 12",
+              "dependencies": [
+                "normalized_owner_cash_m",
+                "owner_cash_multiple"
+              ]
+            },
+            {
+              "id": "value_per_share",
+              "label": "Mid-cycle value per share",
+              "kind": "calculation",
+              "value": 2.2010546,
+              "unit": "USD_per_share",
+              "operation": "divide",
+              "formula": "equity_value_m \u00f7 shares_m",
+              "substituted_formula": "144 \u00f7 65.423184",
+              "dependencies": [
+                "equity_value_m",
+                "shares_m"
+              ]
+            }
+          ]
+        },
+        "source_lineage": [
+          {
+            "node_id": "shares_m",
+            "ref": "AXTI/investor-documents/sec-edgar/10-Q_20260514_rpt20260331_acc0001437749_26_017054.htm",
+            "locator": "Cover page; 65,423,184 common shares outstanding May 4, 2026",
+            "as_of": "2026-05-04",
+            "content_sha256": "b18ec7946d50829cbc10b7e726f545a149f3cbd41517047945d9b8a489473778",
+            "source_id": "bd1b238f8c74f02c6c6457cb9c60d1d9d3ef8f7864926ded390a74218ae58038"
+          }
+        ],
+        "checks": {
+          "passed": true,
+          "errors": []
+        },
+        "proof_hash": "2f00afef4400bc9a7102f7c028ba0c0fd48dfe56fb89e77c2fc8b5a8d8c52657"
+      },
       "evidence_tier": "filing",
       "evidence_level": "primary_verified",
       "evidence": "FY2021\u20132022 operating income ~$13M on ~$140M revenue; Q1 2026 revenue run-rate ~$108M with 29.6% gross margin; Coherent 6-inch InP supply agreement (8-K 2026-06-26) and Casela 2027 InP commitment (8-K 2026-06-17)",
-      "scenario_assumptions": null,
+      "scenario_assumptions": "Mid-cycle owner cash $7.8M at base \u00d7 capital-cycle multiple / 65.4M shares; proof in calculation_proof.",
       "probability_and_timing": null,
       "tax_and_realization_adjustments": "Capital-cycle midcycle_capacity_value route; compare to 2019\u20132022 revenue and margin band",
       "falsifier": "Owner cash, reinvestment economics, or competitive position remains below the low-case path for two reporting periods.",
       "overlap_key": "substrate_operating_cash",
-      "assumption_type": "fact"
+      "assumption_type": "judgment"
     },
     {
       "component_id": "cash_and_liquidity",
@@ -55,21 +285,279 @@
         "unit": "per-share economic claim"
       },
       "method": "market_value",
-      "method_version": null,
-      "method_provenance": null,
+      "method_version": "1.0",
+      "method_provenance": {
+        "method_id": "net_asset_value",
+        "version": "1.0",
+        "label": "Reconciled net asset value",
+        "power_zones": [
+          "scarce_asset_optionality",
+          "catalyst_asset_value",
+          "credit_and_normalized_returns"
+        ],
+        "equation": "value_per_share = (gross_assets - senior_claims - tax - realization_costs) / diluted_shares",
+        "sources": [
+          {
+            "ref": "_system/frameworks/scarce_strategic_asset_valuation.md",
+            "locator": "Economic ownership and unit NAV"
+          }
+        ]
+      },
       "comparable_ids": [],
       "range_per_share": {
-        "low": null,
-        "base": null,
-        "high": null
+        "low": 0.7496,
+        "base": 0.8894,
+        "high": 0.8894
       },
       "legacy_range_per_share": {
         "low": 0.75,
         "base": 0.89,
         "high": 0.89
       },
-      "valuation_status": "legacy_sensitivity",
-      "calculation_proof": null,
+      "valuation_status": "calculated",
+      "calculation_proof": {
+        "status": "valid",
+        "method_id": "net_asset_value",
+        "method_version": "1.0",
+        "outputs": {
+          "low": 0.7496,
+          "base": 0.8894,
+          "high": 0.8894
+        },
+        "output_unit": "USD_per_share",
+        "traces": {
+          "low": [
+            {
+              "id": "cash_m",
+              "label": "Cash, cash equivalents and restricted cash",
+              "kind": "fact",
+              "value": 57.9,
+              "unit": "USD_m",
+              "source": {
+                "ref": "AXTI/research/evidence/sec_companyfacts.json",
+                "locator": "us-gaap:CashCashEquivalentsRestrictedCashAndRestrictedCashEquivalents; form 10-Q filed 2026-05-14",
+                "as_of": "2026-03-31",
+                "content_sha256": "fe6bee75fe4ba1ec83de56c039b0673274cefdf9df3cd43af929804f6517d137",
+                "source_id": "65d84d0a36e65b5b70bf2aaa79202738e01aeb43eb2d2540936d3dba62ff1855"
+              },
+              "rationale": null
+            },
+            {
+              "id": "shares_m",
+              "label": "Diluted shares outstanding",
+              "kind": "fact",
+              "value": 65.423184,
+              "unit": "million_shares",
+              "source": {
+                "ref": "AXTI/investor-documents/sec-edgar/10-Q_20260514_rpt20260331_acc0001437749_26_017054.htm",
+                "locator": "Cover page; 65,423,184 common shares outstanding May 4, 2026",
+                "as_of": "2026-05-04",
+                "content_sha256": "b18ec7946d50829cbc10b7e726f545a149f3cbd41517047945d9b8a489473778",
+                "source_id": "bd1b238f8c74f02c6c6457cb9c60d1d9d3ef8f7864926ded390a74218ae58038"
+              },
+              "rationale": null
+            },
+            {
+              "id": "usable_cash_pct",
+              "label": "Usable cash after restricted and operating buffer",
+              "kind": "judgment",
+              "value": 0.847,
+              "unit": "ratio",
+              "source": null,
+              "rationale": "Low case haircuts restricted cash and near-term Tongmei deployment; base uses full filing balance."
+            },
+            {
+              "id": "usable_cash_m",
+              "label": "Usable cash",
+              "kind": "calculation",
+              "value": 49.0413,
+              "unit": "USD_m",
+              "operation": "multiply",
+              "formula": "cash_m \u00d7 usable_cash_pct",
+              "substituted_formula": "57.9 \u00d7 0.847",
+              "dependencies": [
+                "cash_m",
+                "usable_cash_pct"
+              ]
+            },
+            {
+              "id": "cash_per_share",
+              "label": "Cash per share",
+              "kind": "calculation",
+              "value": 0.74960124,
+              "unit": "USD_per_share",
+              "operation": "divide",
+              "formula": "usable_cash_m \u00f7 shares_m",
+              "substituted_formula": "49.0413 \u00f7 65.423184",
+              "dependencies": [
+                "usable_cash_m",
+                "shares_m"
+              ]
+            }
+          ],
+          "base": [
+            {
+              "id": "cash_m",
+              "label": "Cash, cash equivalents and restricted cash",
+              "kind": "fact",
+              "value": 57.9,
+              "unit": "USD_m",
+              "source": {
+                "ref": "AXTI/research/evidence/sec_companyfacts.json",
+                "locator": "us-gaap:CashCashEquivalentsRestrictedCashAndRestrictedCashEquivalents; form 10-Q filed 2026-05-14",
+                "as_of": "2026-03-31",
+                "content_sha256": "fe6bee75fe4ba1ec83de56c039b0673274cefdf9df3cd43af929804f6517d137",
+                "source_id": "65d84d0a36e65b5b70bf2aaa79202738e01aeb43eb2d2540936d3dba62ff1855"
+              },
+              "rationale": null
+            },
+            {
+              "id": "shares_m",
+              "label": "Diluted shares outstanding",
+              "kind": "fact",
+              "value": 65.423184,
+              "unit": "million_shares",
+              "source": {
+                "ref": "AXTI/investor-documents/sec-edgar/10-Q_20260514_rpt20260331_acc0001437749_26_017054.htm",
+                "locator": "Cover page; 65,423,184 common shares outstanding May 4, 2026",
+                "as_of": "2026-05-04",
+                "content_sha256": "b18ec7946d50829cbc10b7e726f545a149f3cbd41517047945d9b8a489473778",
+                "source_id": "bd1b238f8c74f02c6c6457cb9c60d1d9d3ef8f7864926ded390a74218ae58038"
+              },
+              "rationale": null
+            },
+            {
+              "id": "usable_cash_pct",
+              "label": "Usable cash after restricted and operating buffer",
+              "kind": "judgment",
+              "value": 1.005,
+              "unit": "ratio",
+              "source": null,
+              "rationale": "Low case haircuts restricted cash and near-term Tongmei deployment; base uses full filing balance."
+            },
+            {
+              "id": "usable_cash_m",
+              "label": "Usable cash",
+              "kind": "calculation",
+              "value": 58.1895,
+              "unit": "USD_m",
+              "operation": "multiply",
+              "formula": "cash_m \u00d7 usable_cash_pct",
+              "substituted_formula": "57.9 \u00d7 1.005",
+              "dependencies": [
+                "cash_m",
+                "usable_cash_pct"
+              ]
+            },
+            {
+              "id": "cash_per_share",
+              "label": "Cash per share",
+              "kind": "calculation",
+              "value": 0.88943241,
+              "unit": "USD_per_share",
+              "operation": "divide",
+              "formula": "usable_cash_m \u00f7 shares_m",
+              "substituted_formula": "58.1895 \u00f7 65.423184",
+              "dependencies": [
+                "usable_cash_m",
+                "shares_m"
+              ]
+            }
+          ],
+          "high": [
+            {
+              "id": "cash_m",
+              "label": "Cash, cash equivalents and restricted cash",
+              "kind": "fact",
+              "value": 57.9,
+              "unit": "USD_m",
+              "source": {
+                "ref": "AXTI/research/evidence/sec_companyfacts.json",
+                "locator": "us-gaap:CashCashEquivalentsRestrictedCashAndRestrictedCashEquivalents; form 10-Q filed 2026-05-14",
+                "as_of": "2026-03-31",
+                "content_sha256": "fe6bee75fe4ba1ec83de56c039b0673274cefdf9df3cd43af929804f6517d137",
+                "source_id": "65d84d0a36e65b5b70bf2aaa79202738e01aeb43eb2d2540936d3dba62ff1855"
+              },
+              "rationale": null
+            },
+            {
+              "id": "shares_m",
+              "label": "Diluted shares outstanding",
+              "kind": "fact",
+              "value": 65.423184,
+              "unit": "million_shares",
+              "source": {
+                "ref": "AXTI/investor-documents/sec-edgar/10-Q_20260514_rpt20260331_acc0001437749_26_017054.htm",
+                "locator": "Cover page; 65,423,184 common shares outstanding May 4, 2026",
+                "as_of": "2026-05-04",
+                "content_sha256": "b18ec7946d50829cbc10b7e726f545a149f3cbd41517047945d9b8a489473778",
+                "source_id": "bd1b238f8c74f02c6c6457cb9c60d1d9d3ef8f7864926ded390a74218ae58038"
+              },
+              "rationale": null
+            },
+            {
+              "id": "usable_cash_pct",
+              "label": "Usable cash after restricted and operating buffer",
+              "kind": "judgment",
+              "value": 1.005,
+              "unit": "ratio",
+              "source": null,
+              "rationale": "Low case haircuts restricted cash and near-term Tongmei deployment; base uses full filing balance."
+            },
+            {
+              "id": "usable_cash_m",
+              "label": "Usable cash",
+              "kind": "calculation",
+              "value": 58.1895,
+              "unit": "USD_m",
+              "operation": "multiply",
+              "formula": "cash_m \u00d7 usable_cash_pct",
+              "substituted_formula": "57.9 \u00d7 1.005",
+              "dependencies": [
+                "cash_m",
+                "usable_cash_pct"
+              ]
+            },
+            {
+              "id": "cash_per_share",
+              "label": "Cash per share",
+              "kind": "calculation",
+              "value": 0.88943241,
+              "unit": "USD_per_share",
+              "operation": "divide",
+              "formula": "usable_cash_m \u00f7 shares_m",
+              "substituted_formula": "58.1895 \u00f7 65.423184",
+              "dependencies": [
+                "usable_cash_m",
+                "shares_m"
+              ]
+            }
+          ]
+        },
+        "source_lineage": [
+          {
+            "node_id": "cash_m",
+            "ref": "AXTI/research/evidence/sec_companyfacts.json",
+            "locator": "us-gaap:CashCashEquivalentsRestrictedCashAndRestrictedCashEquivalents; form 10-Q filed 2026-05-14",
+            "as_of": "2026-03-31",
+            "content_sha256": "fe6bee75fe4ba1ec83de56c039b0673274cefdf9df3cd43af929804f6517d137",
+            "source_id": "65d84d0a36e65b5b70bf2aaa79202738e01aeb43eb2d2540936d3dba62ff1855"
+          },
+          {
+            "node_id": "shares_m",
+            "ref": "AXTI/investor-documents/sec-edgar/10-Q_20260514_rpt20260331_acc0001437749_26_017054.htm",
+            "locator": "Cover page; 65,423,184 common shares outstanding May 4, 2026",
+            "as_of": "2026-05-04",
+            "content_sha256": "b18ec7946d50829cbc10b7e726f545a149f3cbd41517047945d9b8a489473778",
+            "source_id": "bd1b238f8c74f02c6c6457cb9c60d1d9d3ef8f7864926ded390a74218ae58038"
+          }
+        ],
+        "checks": {
+          "passed": true,
+          "errors": []
+        },
+        "proof_hash": "78ef73be260422309ad16968d35bfd2b31667aae479440ad23c7b0af1f36b010"
+      },
       "evidence_tier": "filing",
       "evidence_level": "primary_verified",
       "evidence": "$57.9M at March 31, 2026 / 65.4M shares (10-Q Q1 2026)",
@@ -78,7 +566,7 @@
       "tax_and_realization_adjustments": "Down from $128.4M restricted+cash at Dec 2025 as proceeds deployed to Tongmei capacity",
       "falsifier": "Owner cash, reinvestment economics, or competitive position remains below the low-case path for two reporting periods.",
       "overlap_key": "balance_sheet_cash",
-      "assumption_type": "fact"
+      "assumption_type": "judgment"
     },
     {
       "component_id": "tongmei_hk_listing_option",
@@ -93,21 +581,320 @@
         "unit": "base success value, millions"
       },
       "method": "milestone_nav",
-      "method_version": null,
-      "method_provenance": null,
+      "method_version": "1.0",
+      "method_provenance": {
+        "method_id": "risk_adjusted_milestone_value",
+        "version": "1.0",
+        "label": "Milestone risk-adjusted present value",
+        "power_zones": [
+          "binary_milestone"
+        ],
+        "equation": "value_per_share = (net_cash + sum(p_success*PV(success_value)-remaining_cost) - dilution)/shares",
+        "sources": [
+          {
+            "ref": "_system/frameworks/optionality_valuation.md",
+            "locator": "Milestone-based option framework"
+          }
+        ]
+      },
       "comparable_ids": [],
       "range_per_share": {
-        "low": null,
-        "base": null,
-        "high": null
+        "low": 0.0,
+        "base": 0.5,
+        "high": 1.5
       },
       "legacy_range_per_share": {
         "low": 0.0,
         "base": 0.5,
         "high": 1.5
       },
-      "valuation_status": "legacy_sensitivity",
-      "calculation_proof": null,
+      "valuation_status": "bounded_estimate",
+      "calculation_proof": {
+        "status": "valid",
+        "method_id": "risk_adjusted_milestone_value",
+        "method_version": "1.0",
+        "outputs": {
+          "low": 0.0,
+          "base": 0.5,
+          "high": 1.5
+        },
+        "output_unit": "USD_per_share",
+        "traces": {
+          "low": [
+            {
+              "id": "shares_m",
+              "label": "Diluted shares outstanding",
+              "kind": "fact",
+              "value": 65.423184,
+              "unit": "million_shares",
+              "source": {
+                "ref": "AXTI/investor-documents/sec-edgar/10-Q_20260514_rpt20260331_acc0001437749_26_017054.htm",
+                "locator": "Cover page; 65,423,184 common shares outstanding May 4, 2026",
+                "as_of": "2026-05-04",
+                "content_sha256": "b18ec7946d50829cbc10b7e726f545a149f3cbd41517047945d9b8a489473778",
+                "source_id": "bd1b238f8c74f02c6c6457cb9c60d1d9d3ef8f7864926ded390a74218ae58038"
+              },
+              "rationale": null
+            },
+            {
+              "id": "success_probability",
+              "label": "Probability of HK listing unlocking parent value",
+              "kind": "judgment",
+              "value": 0.0,
+              "unit": "ratio",
+              "source": null,
+              "rationale": "STAR withdrawal July 2026; HK pivot per 8-K 2026-07-08."
+            },
+            {
+              "id": "success_value_m",
+              "label": "Gross success value to AXTI shareholders",
+              "kind": "judgment",
+              "value": 93.46,
+              "unit": "USD_m",
+              "source": null,
+              "rationale": "Base anchored to Tongmei PE investment mark; high uses upside re-rating if HK listing succeeds."
+            },
+            {
+              "id": "remaining_cost_m",
+              "label": "Remaining owner-funded listing cost",
+              "kind": "judgment",
+              "value": 0.0,
+              "unit": "USD_m",
+              "source": null,
+              "rationale": "Capacity spending largely funded by 2025-2026 offerings."
+            },
+            {
+              "id": "risked_value_m",
+              "label": "Probability-weighted success value",
+              "kind": "calculation",
+              "value": 0.0,
+              "unit": "USD_m",
+              "operation": "multiply",
+              "formula": "success_value_m \u00d7 success_probability",
+              "substituted_formula": "93.46 \u00d7 0",
+              "dependencies": [
+                "success_value_m",
+                "success_probability"
+              ]
+            },
+            {
+              "id": "net_option_m",
+              "label": "Net option value",
+              "kind": "calculation",
+              "value": 0.0,
+              "unit": "USD_m",
+              "operation": "subtract",
+              "formula": "risked_value_m - remaining_cost_m",
+              "substituted_formula": "0 - 0",
+              "dependencies": [
+                "risked_value_m",
+                "remaining_cost_m"
+              ]
+            },
+            {
+              "id": "option_per_share",
+              "label": "Option value per share",
+              "kind": "calculation",
+              "value": 0.0,
+              "unit": "USD_per_share",
+              "operation": "divide",
+              "formula": "net_option_m \u00f7 shares_m",
+              "substituted_formula": "0 \u00f7 65.423184",
+              "dependencies": [
+                "net_option_m",
+                "shares_m"
+              ]
+            }
+          ],
+          "base": [
+            {
+              "id": "shares_m",
+              "label": "Diluted shares outstanding",
+              "kind": "fact",
+              "value": 65.423184,
+              "unit": "million_shares",
+              "source": {
+                "ref": "AXTI/investor-documents/sec-edgar/10-Q_20260514_rpt20260331_acc0001437749_26_017054.htm",
+                "locator": "Cover page; 65,423,184 common shares outstanding May 4, 2026",
+                "as_of": "2026-05-04",
+                "content_sha256": "b18ec7946d50829cbc10b7e726f545a149f3cbd41517047945d9b8a489473778",
+                "source_id": "bd1b238f8c74f02c6c6457cb9c60d1d9d3ef8f7864926ded390a74218ae58038"
+              },
+              "rationale": null
+            },
+            {
+              "id": "success_probability",
+              "label": "Probability of HK listing unlocking parent value",
+              "kind": "judgment",
+              "value": 0.35,
+              "unit": "ratio",
+              "source": null,
+              "rationale": "STAR withdrawal July 2026; HK pivot per 8-K 2026-07-08."
+            },
+            {
+              "id": "success_value_m",
+              "label": "Gross success value to AXTI shareholders",
+              "kind": "judgment",
+              "value": 93.46,
+              "unit": "USD_m",
+              "source": null,
+              "rationale": "Base anchored to Tongmei PE investment mark; high uses upside re-rating if HK listing succeeds."
+            },
+            {
+              "id": "remaining_cost_m",
+              "label": "Remaining owner-funded listing cost",
+              "kind": "judgment",
+              "value": 0.0,
+              "unit": "USD_m",
+              "source": null,
+              "rationale": "Capacity spending largely funded by 2025-2026 offerings."
+            },
+            {
+              "id": "risked_value_m",
+              "label": "Probability-weighted success value",
+              "kind": "calculation",
+              "value": 32.711,
+              "unit": "USD_m",
+              "operation": "multiply",
+              "formula": "success_value_m \u00d7 success_probability",
+              "substituted_formula": "93.46 \u00d7 0.35",
+              "dependencies": [
+                "success_value_m",
+                "success_probability"
+              ]
+            },
+            {
+              "id": "net_option_m",
+              "label": "Net option value",
+              "kind": "calculation",
+              "value": 32.711,
+              "unit": "USD_m",
+              "operation": "subtract",
+              "formula": "risked_value_m - remaining_cost_m",
+              "substituted_formula": "32.711 - 0",
+              "dependencies": [
+                "risked_value_m",
+                "remaining_cost_m"
+              ]
+            },
+            {
+              "id": "option_per_share",
+              "label": "Option value per share",
+              "kind": "calculation",
+              "value": 0.49999095,
+              "unit": "USD_per_share",
+              "operation": "divide",
+              "formula": "net_option_m \u00f7 shares_m",
+              "substituted_formula": "32.711 \u00f7 65.423184",
+              "dependencies": [
+                "net_option_m",
+                "shares_m"
+              ]
+            }
+          ],
+          "high": [
+            {
+              "id": "shares_m",
+              "label": "Diluted shares outstanding",
+              "kind": "fact",
+              "value": 65.423184,
+              "unit": "million_shares",
+              "source": {
+                "ref": "AXTI/investor-documents/sec-edgar/10-Q_20260514_rpt20260331_acc0001437749_26_017054.htm",
+                "locator": "Cover page; 65,423,184 common shares outstanding May 4, 2026",
+                "as_of": "2026-05-04",
+                "content_sha256": "b18ec7946d50829cbc10b7e726f545a149f3cbd41517047945d9b8a489473778",
+                "source_id": "bd1b238f8c74f02c6c6457cb9c60d1d9d3ef8f7864926ded390a74218ae58038"
+              },
+              "rationale": null
+            },
+            {
+              "id": "success_probability",
+              "label": "Probability of HK listing unlocking parent value",
+              "kind": "judgment",
+              "value": 0.55,
+              "unit": "ratio",
+              "source": null,
+              "rationale": "STAR withdrawal July 2026; HK pivot per 8-K 2026-07-08."
+            },
+            {
+              "id": "success_value_m",
+              "label": "Gross success value to AXTI shareholders",
+              "kind": "judgment",
+              "value": 178.43,
+              "unit": "USD_m",
+              "source": null,
+              "rationale": "Base anchored to Tongmei PE investment mark; high uses upside re-rating if HK listing succeeds."
+            },
+            {
+              "id": "remaining_cost_m",
+              "label": "Remaining owner-funded listing cost",
+              "kind": "judgment",
+              "value": 0.0,
+              "unit": "USD_m",
+              "source": null,
+              "rationale": "Capacity spending largely funded by 2025-2026 offerings."
+            },
+            {
+              "id": "risked_value_m",
+              "label": "Probability-weighted success value",
+              "kind": "calculation",
+              "value": 98.1365,
+              "unit": "USD_m",
+              "operation": "multiply",
+              "formula": "success_value_m \u00d7 success_probability",
+              "substituted_formula": "178.43 \u00d7 0.55",
+              "dependencies": [
+                "success_value_m",
+                "success_probability"
+              ]
+            },
+            {
+              "id": "net_option_m",
+              "label": "Net option value",
+              "kind": "calculation",
+              "value": 98.1365,
+              "unit": "USD_m",
+              "operation": "subtract",
+              "formula": "risked_value_m - remaining_cost_m",
+              "substituted_formula": "98.1365 - 0",
+              "dependencies": [
+                "risked_value_m",
+                "remaining_cost_m"
+              ]
+            },
+            {
+              "id": "option_per_share",
+              "label": "Option value per share",
+              "kind": "calculation",
+              "value": 1.50002635,
+              "unit": "USD_per_share",
+              "operation": "divide",
+              "formula": "net_option_m \u00f7 shares_m",
+              "substituted_formula": "98.1365 \u00f7 65.423184",
+              "dependencies": [
+                "net_option_m",
+                "shares_m"
+              ]
+            }
+          ]
+        },
+        "source_lineage": [
+          {
+            "node_id": "shares_m",
+            "ref": "AXTI/investor-documents/sec-edgar/10-Q_20260514_rpt20260331_acc0001437749_26_017054.htm",
+            "locator": "Cover page; 65,423,184 common shares outstanding May 4, 2026",
+            "as_of": "2026-05-04",
+            "content_sha256": "b18ec7946d50829cbc10b7e726f545a149f3cbd41517047945d9b8a489473778",
+            "source_id": "bd1b238f8c74f02c6c6457cb9c60d1d9d3ef8f7864926ded390a74218ae58038"
+          }
+        ],
+        "checks": {
+          "passed": true,
+          "errors": []
+        },
+        "proof_hash": "969d2160467acda677448fe622bd831a20fe04b949ce014879c12bea415d23ae"
+      },
       "evidence_tier": "filing",
       "evidence_level": "primary_verified",
       "evidence": "Tongmei withdrew STAR Market IPO July 8, 2026; pivot to HK listing (8-K 2026-07-08). Prior PE investment RMB 324M (~$49M). Listing outcome uncertain.",
@@ -141,7 +928,7 @@
       "tax_and_realization_adjustments": "Probability-weighted; zero in Lawrence consolidated owner-cash path",
       "falsifier": "HK listing fails or PE redemptions drain parent cash before listing",
       "overlap_key": "tongmei_listing_catalyst",
-      "assumption_type": "fact"
+      "assumption_type": "judgment"
     },
     {
       "component_id": "pe_redemption_liability",
@@ -156,21 +943,318 @@
         "unit": "per-share economic claim"
       },
       "method": "manual",
-      "method_version": null,
-      "method_provenance": null,
+      "method_version": "1.0",
+      "method_provenance": {
+        "method_id": "net_asset_value",
+        "version": "1.0",
+        "label": "Reconciled net asset value",
+        "power_zones": [
+          "scarce_asset_optionality",
+          "catalyst_asset_value",
+          "credit_and_normalized_returns"
+        ],
+        "equation": "value_per_share = (gross_assets - senior_claims - tax - realization_costs) / diluted_shares",
+        "sources": [
+          {
+            "ref": "_system/frameworks/scarce_strategic_asset_valuation.md",
+            "locator": "Economic ownership and unit NAV"
+          }
+        ]
+      },
       "comparable_ids": [],
       "range_per_share": {
-        "low": null,
-        "base": null,
-        "high": null
+        "low": -0.9984,
+        "base": -0.749,
+        "high": -0.0
       },
       "legacy_range_per_share": {
         "low": -1.0,
         "base": -0.75,
-        "high": 0.0
+        "high": -0.0
       },
-      "valuation_status": "legacy_sensitivity",
-      "calculation_proof": null,
+      "valuation_status": "bounded_estimate",
+      "calculation_proof": {
+        "status": "valid",
+        "method_id": "net_asset_value",
+        "method_version": "1.0",
+        "outputs": {
+          "low": -0.9984,
+          "base": -0.749,
+          "high": -0.0
+        },
+        "output_unit": "USD_per_share",
+        "traces": {
+          "low": [
+            {
+              "id": "pe_redemption_m",
+              "label": "Aggregate Tongmei PE redemption at original investment",
+              "kind": "fact",
+              "value": 49.0,
+              "unit": "USD_m",
+              "source": {
+                "ref": "AXTI/investor-documents/sec-edgar/10-Q_20260514_rpt20260331_acc0001437749_26_017054.htm",
+                "locator": "Note 1; redeemable noncontrolling interest redemption value approximately $49 million at March 31, 2026",
+                "as_of": "2026-03-31",
+                "content_sha256": "b18ec7946d50829cbc10b7e726f545a149f3cbd41517047945d9b8a489473778",
+                "source_id": "cf18e35adbf7bddc5e882bada4d4a5fd849d94151734f6b00aa958cdca06c9b0"
+              },
+              "rationale": null
+            },
+            {
+              "id": "shares_m",
+              "label": "Diluted shares outstanding",
+              "kind": "fact",
+              "value": 65.423184,
+              "unit": "million_shares",
+              "source": {
+                "ref": "AXTI/investor-documents/sec-edgar/10-Q_20260514_rpt20260331_acc0001437749_26_017054.htm",
+                "locator": "Cover page; 65,423,184 common shares outstanding May 4, 2026",
+                "as_of": "2026-05-04",
+                "content_sha256": "b18ec7946d50829cbc10b7e726f545a149f3cbd41517047945d9b8a489473778",
+                "source_id": "bd1b238f8c74f02c6c6457cb9c60d1d9d3ef8f7864926ded390a74218ae58038"
+              },
+              "rationale": null
+            },
+            {
+              "id": "redemption_pct",
+              "label": "Portion of PE redemption borne by AXTI shareholders",
+              "kind": "judgment",
+              "value": 1.333,
+              "unit": "ratio",
+              "source": null,
+              "rationale": "Low assumes full redemption plus FX/legal stress; high assumes funds roll into HK listing."
+            },
+            {
+              "id": "expected_redemption_m",
+              "label": "Expected redemption cash outflow",
+              "kind": "calculation",
+              "value": 65.317,
+              "unit": "USD_m",
+              "operation": "multiply",
+              "formula": "pe_redemption_m \u00d7 redemption_pct",
+              "substituted_formula": "49 \u00d7 1.333",
+              "dependencies": [
+                "pe_redemption_m",
+                "redemption_pct"
+              ]
+            },
+            {
+              "id": "redemption_per_share",
+              "label": "Gross redemption per share",
+              "kind": "calculation",
+              "value": 0.99837697,
+              "unit": "USD_per_share",
+              "operation": "divide",
+              "formula": "expected_redemption_m \u00f7 shares_m",
+              "substituted_formula": "65.317 \u00f7 65.423184",
+              "dependencies": [
+                "expected_redemption_m",
+                "shares_m"
+              ]
+            },
+            {
+              "id": "liability_per_share",
+              "label": "Redemption liability per share",
+              "kind": "calculation",
+              "value": -0.99837697,
+              "unit": "USD_per_share",
+              "operation": "negative",
+              "formula": "-(redemption_per_share)",
+              "substituted_formula": "-(0.99837697)",
+              "dependencies": [
+                "redemption_per_share"
+              ]
+            }
+          ],
+          "base": [
+            {
+              "id": "pe_redemption_m",
+              "label": "Aggregate Tongmei PE redemption at original investment",
+              "kind": "fact",
+              "value": 49.0,
+              "unit": "USD_m",
+              "source": {
+                "ref": "AXTI/investor-documents/sec-edgar/10-Q_20260514_rpt20260331_acc0001437749_26_017054.htm",
+                "locator": "Note 1; redeemable noncontrolling interest redemption value approximately $49 million at March 31, 2026",
+                "as_of": "2026-03-31",
+                "content_sha256": "b18ec7946d50829cbc10b7e726f545a149f3cbd41517047945d9b8a489473778",
+                "source_id": "cf18e35adbf7bddc5e882bada4d4a5fd849d94151734f6b00aa958cdca06c9b0"
+              },
+              "rationale": null
+            },
+            {
+              "id": "shares_m",
+              "label": "Diluted shares outstanding",
+              "kind": "fact",
+              "value": 65.423184,
+              "unit": "million_shares",
+              "source": {
+                "ref": "AXTI/investor-documents/sec-edgar/10-Q_20260514_rpt20260331_acc0001437749_26_017054.htm",
+                "locator": "Cover page; 65,423,184 common shares outstanding May 4, 2026",
+                "as_of": "2026-05-04",
+                "content_sha256": "b18ec7946d50829cbc10b7e726f545a149f3cbd41517047945d9b8a489473778",
+                "source_id": "bd1b238f8c74f02c6c6457cb9c60d1d9d3ef8f7864926ded390a74218ae58038"
+              },
+              "rationale": null
+            },
+            {
+              "id": "redemption_pct",
+              "label": "Portion of PE redemption borne by AXTI shareholders",
+              "kind": "judgment",
+              "value": 1.0,
+              "unit": "ratio",
+              "source": null,
+              "rationale": "Low assumes full redemption plus FX/legal stress; high assumes funds roll into HK listing."
+            },
+            {
+              "id": "expected_redemption_m",
+              "label": "Expected redemption cash outflow",
+              "kind": "calculation",
+              "value": 49.0,
+              "unit": "USD_m",
+              "operation": "multiply",
+              "formula": "pe_redemption_m \u00d7 redemption_pct",
+              "substituted_formula": "49 \u00d7 1",
+              "dependencies": [
+                "pe_redemption_m",
+                "redemption_pct"
+              ]
+            },
+            {
+              "id": "redemption_per_share",
+              "label": "Gross redemption per share",
+              "kind": "calculation",
+              "value": 0.74896997,
+              "unit": "USD_per_share",
+              "operation": "divide",
+              "formula": "expected_redemption_m \u00f7 shares_m",
+              "substituted_formula": "49 \u00f7 65.423184",
+              "dependencies": [
+                "expected_redemption_m",
+                "shares_m"
+              ]
+            },
+            {
+              "id": "liability_per_share",
+              "label": "Redemption liability per share",
+              "kind": "calculation",
+              "value": -0.74896997,
+              "unit": "USD_per_share",
+              "operation": "negative",
+              "formula": "-(redemption_per_share)",
+              "substituted_formula": "-(0.74896997)",
+              "dependencies": [
+                "redemption_per_share"
+              ]
+            }
+          ],
+          "high": [
+            {
+              "id": "pe_redemption_m",
+              "label": "Aggregate Tongmei PE redemption at original investment",
+              "kind": "fact",
+              "value": 49.0,
+              "unit": "USD_m",
+              "source": {
+                "ref": "AXTI/investor-documents/sec-edgar/10-Q_20260514_rpt20260331_acc0001437749_26_017054.htm",
+                "locator": "Note 1; redeemable noncontrolling interest redemption value approximately $49 million at March 31, 2026",
+                "as_of": "2026-03-31",
+                "content_sha256": "b18ec7946d50829cbc10b7e726f545a149f3cbd41517047945d9b8a489473778",
+                "source_id": "cf18e35adbf7bddc5e882bada4d4a5fd849d94151734f6b00aa958cdca06c9b0"
+              },
+              "rationale": null
+            },
+            {
+              "id": "shares_m",
+              "label": "Diluted shares outstanding",
+              "kind": "fact",
+              "value": 65.423184,
+              "unit": "million_shares",
+              "source": {
+                "ref": "AXTI/investor-documents/sec-edgar/10-Q_20260514_rpt20260331_acc0001437749_26_017054.htm",
+                "locator": "Cover page; 65,423,184 common shares outstanding May 4, 2026",
+                "as_of": "2026-05-04",
+                "content_sha256": "b18ec7946d50829cbc10b7e726f545a149f3cbd41517047945d9b8a489473778",
+                "source_id": "bd1b238f8c74f02c6c6457cb9c60d1d9d3ef8f7864926ded390a74218ae58038"
+              },
+              "rationale": null
+            },
+            {
+              "id": "redemption_pct",
+              "label": "Portion of PE redemption borne by AXTI shareholders",
+              "kind": "judgment",
+              "value": 0.0,
+              "unit": "ratio",
+              "source": null,
+              "rationale": "Low assumes full redemption plus FX/legal stress; high assumes funds roll into HK listing."
+            },
+            {
+              "id": "expected_redemption_m",
+              "label": "Expected redemption cash outflow",
+              "kind": "calculation",
+              "value": 0.0,
+              "unit": "USD_m",
+              "operation": "multiply",
+              "formula": "pe_redemption_m \u00d7 redemption_pct",
+              "substituted_formula": "49 \u00d7 0",
+              "dependencies": [
+                "pe_redemption_m",
+                "redemption_pct"
+              ]
+            },
+            {
+              "id": "redemption_per_share",
+              "label": "Gross redemption per share",
+              "kind": "calculation",
+              "value": 0.0,
+              "unit": "USD_per_share",
+              "operation": "divide",
+              "formula": "expected_redemption_m \u00f7 shares_m",
+              "substituted_formula": "0 \u00f7 65.423184",
+              "dependencies": [
+                "expected_redemption_m",
+                "shares_m"
+              ]
+            },
+            {
+              "id": "liability_per_share",
+              "label": "Redemption liability per share",
+              "kind": "calculation",
+              "value": -0.0,
+              "unit": "USD_per_share",
+              "operation": "negative",
+              "formula": "-(redemption_per_share)",
+              "substituted_formula": "-(0)",
+              "dependencies": [
+                "redemption_per_share"
+              ]
+            }
+          ]
+        },
+        "source_lineage": [
+          {
+            "node_id": "pe_redemption_m",
+            "ref": "AXTI/investor-documents/sec-edgar/10-Q_20260514_rpt20260331_acc0001437749_26_017054.htm",
+            "locator": "Note 1; redeemable noncontrolling interest redemption value approximately $49 million at March 31, 2026",
+            "as_of": "2026-03-31",
+            "content_sha256": "b18ec7946d50829cbc10b7e726f545a149f3cbd41517047945d9b8a489473778",
+            "source_id": "cf18e35adbf7bddc5e882bada4d4a5fd849d94151734f6b00aa958cdca06c9b0"
+          },
+          {
+            "node_id": "shares_m",
+            "ref": "AXTI/investor-documents/sec-edgar/10-Q_20260514_rpt20260331_acc0001437749_26_017054.htm",
+            "locator": "Cover page; 65,423,184 common shares outstanding May 4, 2026",
+            "as_of": "2026-05-04",
+            "content_sha256": "b18ec7946d50829cbc10b7e726f545a149f3cbd41517047945d9b8a489473778",
+            "source_id": "bd1b238f8c74f02c6c6457cb9c60d1d9d3ef8f7864926ded390a74218ae58038"
+          }
+        ],
+        "checks": {
+          "passed": true,
+          "errors": []
+        },
+        "proof_hash": "7ea58b9d9c42256119e1ea555f70a255133bd84c7ba1d0402324d155ee19dfd4"
+      },
       "evidence_tier": "filing",
       "evidence_level": "primary_verified",
       "evidence": "Eleven PE funds invested RMB 324,404,508 (~$49M) in Tongmei; STAR withdrawal triggers redemption rights at original investment (8-K 2026-07-08)",
@@ -179,7 +1263,7 @@
       "tax_and_realization_adjustments": "High case assumes funds roll into HK listing; base assumes partial redemption",
       "falsifier": "The obligation, financing claim, tax, or realization friction is materially larger than the low-case reserve.",
       "overlap_key": "tongmei_pe_redemption",
-      "assumption_type": "fact"
+      "assumption_type": "judgment"
     },
     {
       "component_id": "dilution_reserve",
@@ -194,21 +1278,223 @@
         "unit": "per-share economic claim"
       },
       "method": "manual",
-      "method_version": null,
-      "method_provenance": null,
+      "method_version": "1.0",
+      "method_provenance": {
+        "method_id": "net_asset_value",
+        "version": "1.0",
+        "label": "Reconciled net asset value",
+        "power_zones": [
+          "scarce_asset_optionality",
+          "catalyst_asset_value",
+          "credit_and_normalized_returns"
+        ],
+        "equation": "value_per_share = (gross_assets - senior_claims - tax - realization_costs) / diluted_shares",
+        "sources": [
+          {
+            "ref": "_system/frameworks/scarce_strategic_asset_valuation.md",
+            "locator": "Economic ownership and unit NAV"
+          }
+        ]
+      },
       "comparable_ids": [],
       "range_per_share": {
-        "low": null,
-        "base": null,
-        "high": null
+        "low": -0.4999,
+        "base": -0.2981,
+        "high": -0.0
       },
       "legacy_range_per_share": {
         "low": -0.5,
         "base": -0.3,
-        "high": 0.0
+        "high": -0.0
       },
-      "valuation_status": "legacy_sensitivity",
-      "calculation_proof": null,
+      "valuation_status": "bounded_estimate",
+      "calculation_proof": {
+        "status": "valid",
+        "method_id": "net_asset_value",
+        "method_version": "1.0",
+        "outputs": {
+          "low": -0.4999,
+          "base": -0.2981,
+          "high": -0.0
+        },
+        "output_unit": "USD_per_share",
+        "traces": {
+          "low": [
+            {
+              "id": "price",
+              "label": "Share price today",
+              "kind": "fact",
+              "value": 45.86,
+              "unit": "USD_per_share",
+              "source": {
+                "ref": "AXTI/research/evidence/sec_companyfacts.json",
+                "locator": "Market price input; Yahoo AXTI close 2026-07-17",
+                "as_of": "2026-07-17",
+                "content_sha256": "fe6bee75fe4ba1ec83de56c039b0673274cefdf9df3cd43af929804f6517d137",
+                "source_id": "5481ade4f763d8b1f650cddbb7a507c8eaf95ce844721ec0f45f756e6963e267"
+              },
+              "rationale": null
+            },
+            {
+              "id": "future_dilution_haircut_pct",
+              "label": "Additional dilution haircut on equity value",
+              "kind": "judgment",
+              "value": 0.0109,
+              "unit": "ratio",
+              "source": null,
+              "rationale": "S-3ASR shelf remains active after Dec 2025 and Apr 2026 offerings expanded share count ~50%."
+            },
+            {
+              "id": "gross_reserve",
+              "label": "Gross dilution reserve",
+              "kind": "calculation",
+              "value": 0.499874,
+              "unit": "USD_per_share",
+              "operation": "multiply",
+              "formula": "price \u00d7 future_dilution_haircut_pct",
+              "substituted_formula": "45.86 \u00d7 0.0109",
+              "dependencies": [
+                "price",
+                "future_dilution_haircut_pct"
+              ]
+            },
+            {
+              "id": "reserve_per_share",
+              "label": "Dilution reserve per share",
+              "kind": "calculation",
+              "value": -0.499874,
+              "unit": "USD_per_share",
+              "operation": "negative",
+              "formula": "-(gross_reserve)",
+              "substituted_formula": "-(0.499874)",
+              "dependencies": [
+                "gross_reserve"
+              ]
+            }
+          ],
+          "base": [
+            {
+              "id": "price",
+              "label": "Share price today",
+              "kind": "fact",
+              "value": 45.86,
+              "unit": "USD_per_share",
+              "source": {
+                "ref": "AXTI/research/evidence/sec_companyfacts.json",
+                "locator": "Market price input; Yahoo AXTI close 2026-07-17",
+                "as_of": "2026-07-17",
+                "content_sha256": "fe6bee75fe4ba1ec83de56c039b0673274cefdf9df3cd43af929804f6517d137",
+                "source_id": "5481ade4f763d8b1f650cddbb7a507c8eaf95ce844721ec0f45f756e6963e267"
+              },
+              "rationale": null
+            },
+            {
+              "id": "future_dilution_haircut_pct",
+              "label": "Additional dilution haircut on equity value",
+              "kind": "judgment",
+              "value": 0.0065,
+              "unit": "ratio",
+              "source": null,
+              "rationale": "S-3ASR shelf remains active after Dec 2025 and Apr 2026 offerings expanded share count ~50%."
+            },
+            {
+              "id": "gross_reserve",
+              "label": "Gross dilution reserve",
+              "kind": "calculation",
+              "value": 0.29809,
+              "unit": "USD_per_share",
+              "operation": "multiply",
+              "formula": "price \u00d7 future_dilution_haircut_pct",
+              "substituted_formula": "45.86 \u00d7 0.0065",
+              "dependencies": [
+                "price",
+                "future_dilution_haircut_pct"
+              ]
+            },
+            {
+              "id": "reserve_per_share",
+              "label": "Dilution reserve per share",
+              "kind": "calculation",
+              "value": -0.29809,
+              "unit": "USD_per_share",
+              "operation": "negative",
+              "formula": "-(gross_reserve)",
+              "substituted_formula": "-(0.29809)",
+              "dependencies": [
+                "gross_reserve"
+              ]
+            }
+          ],
+          "high": [
+            {
+              "id": "price",
+              "label": "Share price today",
+              "kind": "fact",
+              "value": 45.86,
+              "unit": "USD_per_share",
+              "source": {
+                "ref": "AXTI/research/evidence/sec_companyfacts.json",
+                "locator": "Market price input; Yahoo AXTI close 2026-07-17",
+                "as_of": "2026-07-17",
+                "content_sha256": "fe6bee75fe4ba1ec83de56c039b0673274cefdf9df3cd43af929804f6517d137",
+                "source_id": "5481ade4f763d8b1f650cddbb7a507c8eaf95ce844721ec0f45f756e6963e267"
+              },
+              "rationale": null
+            },
+            {
+              "id": "future_dilution_haircut_pct",
+              "label": "Additional dilution haircut on equity value",
+              "kind": "judgment",
+              "value": 0.0,
+              "unit": "ratio",
+              "source": null,
+              "rationale": "S-3ASR shelf remains active after Dec 2025 and Apr 2026 offerings expanded share count ~50%."
+            },
+            {
+              "id": "gross_reserve",
+              "label": "Gross dilution reserve",
+              "kind": "calculation",
+              "value": 0.0,
+              "unit": "USD_per_share",
+              "operation": "multiply",
+              "formula": "price \u00d7 future_dilution_haircut_pct",
+              "substituted_formula": "45.86 \u00d7 0",
+              "dependencies": [
+                "price",
+                "future_dilution_haircut_pct"
+              ]
+            },
+            {
+              "id": "reserve_per_share",
+              "label": "Dilution reserve per share",
+              "kind": "calculation",
+              "value": -0.0,
+              "unit": "USD_per_share",
+              "operation": "negative",
+              "formula": "-(gross_reserve)",
+              "substituted_formula": "-(0)",
+              "dependencies": [
+                "gross_reserve"
+              ]
+            }
+          ]
+        },
+        "source_lineage": [
+          {
+            "node_id": "price",
+            "ref": "AXTI/research/evidence/sec_companyfacts.json",
+            "locator": "Market price input; Yahoo AXTI close 2026-07-17",
+            "as_of": "2026-07-17",
+            "content_sha256": "fe6bee75fe4ba1ec83de56c039b0673274cefdf9df3cd43af929804f6517d137",
+            "source_id": "5481ade4f763d8b1f650cddbb7a507c8eaf95ce844721ec0f45f756e6963e267"
+          }
+        ],
+        "checks": {
+          "passed": true,
+          "errors": []
+        },
+        "proof_hash": "597d30a476bdbc6dad8d9338eaa3c1737b9954d6eee46d70e7aa9a977367b325"
+      },
       "evidence_tier": "filing",
       "evidence_level": "primary_verified",
       "evidence": "Shares outstanding rose from ~43.5M (Q1 2025) to 65.4M (May 2026) after Dec 2025 and Apr 2026 offerings (424B5, 8-K filings)",
@@ -217,7 +1503,7 @@
       "tax_and_realization_adjustments": "S-3ASR shelf remains active; further dilution possible",
       "falsifier": "The obligation, financing claim, tax, or realization friction is materially larger than the low-case reserve.",
       "overlap_key": "share_count_dilution",
-      "assumption_type": "fact"
+      "assumption_type": "judgment"
     },
     {
       "component_id": "raw_materials_gallium",
@@ -263,56 +1549,11 @@
     "material_component_count": 6,
     "additive_component_count": 5,
     "embedded_component_count": 1,
-    "unvalued_component_count": 5,
+    "unvalued_component_count": 0,
     "double_counting_flags": []
   },
   "input_classification": {
     "facts": [
-      {
-        "component_id": "midcycle_substrate_operations",
-        "label": "Specialty substrate manufacturing (InP, GaAs, Ge) at mid-cycle utilization",
-        "kind": "fact",
-        "evidence_tier": "filing",
-        "evidence": "FY2021\u20132022 operating income ~$13M on ~$140M revenue; Q1 2026 revenue run-rate ~$108M with 29.6% gross margin; Coherent 6-inch InP supply agreement (8-K 2026-06-26) and Casela 2027 InP commitment (8-K 2026-06-17)",
-        "method": "dcf",
-        "valuation_status": "legacy_sensitivity"
-      },
-      {
-        "component_id": "cash_and_liquidity",
-        "label": "Cash, cash equivalents and restricted cash",
-        "kind": "fact",
-        "evidence_tier": "filing",
-        "evidence": "$57.9M at March 31, 2026 / 65.4M shares (10-Q Q1 2026)",
-        "method": "market_value",
-        "valuation_status": "legacy_sensitivity"
-      },
-      {
-        "component_id": "tongmei_hk_listing_option",
-        "label": "Tongmei Hong Kong listing option (STAR Market withdrawn July 2026)",
-        "kind": "fact",
-        "evidence_tier": "filing",
-        "evidence": "Tongmei withdrew STAR Market IPO July 8, 2026; pivot to HK listing (8-K 2026-07-08). Prior PE investment RMB 324M (~$49M). Listing outcome uncertain.",
-        "method": "milestone_nav",
-        "valuation_status": "legacy_sensitivity"
-      },
-      {
-        "component_id": "pe_redemption_liability",
-        "label": "Tongmei private-equity redemption rights (~$49M gross)",
-        "kind": "fact",
-        "evidence_tier": "filing",
-        "evidence": "Eleven PE funds invested RMB 324,404,508 (~$49M) in Tongmei; STAR withdrawal triggers redemption rights at original investment (8-K 2026-07-08)",
-        "method": "manual",
-        "valuation_status": "legacy_sensitivity"
-      },
-      {
-        "component_id": "dilution_reserve",
-        "label": "Equity dilution reserve (2025\u20132026 offerings)",
-        "kind": "fact",
-        "evidence_tier": "filing",
-        "evidence": "Shares outstanding rose from ~43.5M (Q1 2025) to 65.4M (May 2026) after Dec 2025 and Apr 2026 offerings (424B5, 8-K filings)",
-        "method": "manual",
-        "valuation_status": "legacy_sensitivity"
-      },
       {
         "component_id": "raw_materials_gallium",
         "label": "Consolidated gallium raw-material subsidiaries (85.5% owned)",
@@ -324,7 +1565,53 @@
       }
     ],
     "estimates": [],
-    "judgments": []
+    "judgments": [
+      {
+        "component_id": "midcycle_substrate_operations",
+        "label": "Specialty substrate manufacturing (InP, GaAs, Ge) at mid-cycle utilization",
+        "kind": "judgment",
+        "evidence_tier": "filing",
+        "evidence": "FY2021\u20132022 operating income ~$13M on ~$140M revenue; Q1 2026 revenue run-rate ~$108M with 29.6% gross margin; Coherent 6-inch InP supply agreement (8-K 2026-06-26) and Casela 2027 InP commitment (8-K 2026-06-17)",
+        "method": "dcf",
+        "valuation_status": "bounded_estimate"
+      },
+      {
+        "component_id": "cash_and_liquidity",
+        "label": "Cash, cash equivalents and restricted cash",
+        "kind": "judgment",
+        "evidence_tier": "filing",
+        "evidence": "$57.9M at March 31, 2026 / 65.4M shares (10-Q Q1 2026)",
+        "method": "market_value",
+        "valuation_status": "calculated"
+      },
+      {
+        "component_id": "tongmei_hk_listing_option",
+        "label": "Tongmei Hong Kong listing option (STAR Market withdrawn July 2026)",
+        "kind": "judgment",
+        "evidence_tier": "filing",
+        "evidence": "Tongmei withdrew STAR Market IPO July 8, 2026; pivot to HK listing (8-K 2026-07-08). Prior PE investment RMB 324M (~$49M). Listing outcome uncertain.",
+        "method": "milestone_nav",
+        "valuation_status": "bounded_estimate"
+      },
+      {
+        "component_id": "pe_redemption_liability",
+        "label": "Tongmei private-equity redemption rights (~$49M gross)",
+        "kind": "judgment",
+        "evidence_tier": "filing",
+        "evidence": "Eleven PE funds invested RMB 324,404,508 (~$49M) in Tongmei; STAR withdrawal triggers redemption rights at original investment (8-K 2026-07-08)",
+        "method": "manual",
+        "valuation_status": "bounded_estimate"
+      },
+      {
+        "component_id": "dilution_reserve",
+        "label": "Equity dilution reserve (2025\u20132026 offerings)",
+        "kind": "judgment",
+        "evidence_tier": "filing",
+        "evidence": "Shares outstanding rose from ~43.5M (Q1 2025) to 65.4M (May 2026) after Dec 2025 and Apr 2026 offerings (424B5, 8-K filings)",
+        "method": "manual",
+        "valuation_status": "bounded_estimate"
+      }
+    ]
   },
   "method_route": {
     "schema_version": "2.0",
@@ -586,28 +1873,28 @@
   },
   "valuation": {
     "value_per_share": {
-      "low": null,
-      "base": null,
-      "high": null
+      "low": 0.0506,
+      "base": 1.7432,
+      "high": 4.5905
     },
     "priced_components_per_share": {
-      "low": 0,
-      "base": 0,
-      "high": 0
+      "low": 0.0506,
+      "base": 1.7432,
+      "high": 4.5905
     },
     "legacy_value_per_share": {
       "low": 0.05,
       "base": 1.74,
       "high": 4.59
     },
-    "probability_weighted_value_per_share": null,
+    "probability_weighted_value_per_share": 1.7432,
     "expected_distributions_per_share": 0.0,
     "annualized_return_at_price_pct": {
-      "low": null,
-      "base": null,
-      "high": null
+      "low": -62.2,
+      "base": -37.32,
+      "high": -28.02
     },
-    "downside_to_low_pct": null,
+    "downside_to_low_pct": -99.89,
     "horizon_years": 7,
     "interpretation": "value_per_share is withheld while any material additive component is unpriced; priced_components_per_share is not a complete security value."
   },
@@ -615,30 +1902,12 @@
     "rule": "Cases must change cited causal operating, capital, probability, timing, or financing drivers\u2014not only a terminal multiple.",
     "top_value_drivers": [
       {
-        "component_id": "midcycle_substrate_operations",
-        "label": "Specialty substrate manufacturing (InP, GaAs, Ge) at mid-cycle utilization",
-        "valuation_status": "legacy_sensitivity",
-        "base_per_share": null,
-        "legacy_base_per_share": 1.4,
-        "range_width_per_share": null,
-        "scenario_assumptions": null
-      },
-      {
-        "component_id": "cash_and_liquidity",
-        "label": "Cash, cash equivalents and restricted cash",
-        "valuation_status": "legacy_sensitivity",
-        "base_per_share": null,
-        "legacy_base_per_share": 0.89,
-        "range_width_per_share": null,
-        "scenario_assumptions": null
-      },
-      {
         "component_id": "tongmei_hk_listing_option",
         "label": "Tongmei Hong Kong listing option (STAR Market withdrawn July 2026)",
-        "valuation_status": "legacy_sensitivity",
-        "base_per_share": null,
+        "valuation_status": "bounded_estimate",
+        "base_per_share": 0.5,
         "legacy_base_per_share": 0.5,
-        "range_width_per_share": null,
+        "range_width_per_share": 1.5,
         "scenario_assumptions": {
           "low": {
             "success_probability": 0.0,
@@ -661,21 +1930,39 @@
         }
       },
       {
+        "component_id": "midcycle_substrate_operations",
+        "label": "Specialty substrate manufacturing (InP, GaAs, Ge) at mid-cycle utilization",
+        "valuation_status": "bounded_estimate",
+        "base_per_share": 1.4009,
+        "legacy_base_per_share": 1.4,
+        "range_width_per_share": 1.4018,
+        "scenario_assumptions": "Mid-cycle owner cash $7.8M at base \u00d7 capital-cycle multiple / 65.4M shares; proof in calculation_proof."
+      },
+      {
         "component_id": "pe_redemption_liability",
         "label": "Tongmei private-equity redemption rights (~$49M gross)",
-        "valuation_status": "legacy_sensitivity",
-        "base_per_share": null,
+        "valuation_status": "bounded_estimate",
+        "base_per_share": -0.749,
         "legacy_base_per_share": -0.75,
-        "range_width_per_share": null,
+        "range_width_per_share": 0.9984,
         "scenario_assumptions": null
       },
       {
         "component_id": "dilution_reserve",
         "label": "Equity dilution reserve (2025\u20132026 offerings)",
-        "valuation_status": "legacy_sensitivity",
-        "base_per_share": null,
+        "valuation_status": "bounded_estimate",
+        "base_per_share": -0.2981,
         "legacy_base_per_share": -0.3,
-        "range_width_per_share": null,
+        "range_width_per_share": 0.4999,
+        "scenario_assumptions": null
+      },
+      {
+        "component_id": "cash_and_liquidity",
+        "label": "Cash, cash equivalents and restricted cash",
+        "valuation_status": "calculated",
+        "base_per_share": 0.8894,
+        "legacy_base_per_share": 0.89,
+        "range_width_per_share": 0.1398,
         "scenario_assumptions": null
       }
     ],
@@ -683,35 +1970,93 @@
   },
   "calculation_proof_summary": {
     "component_count": 6,
-    "priced_component_count": 0,
-    "proof_complete_pct": 0.0,
+    "priced_component_count": 5,
+    "proof_complete_pct": 83.3,
     "status_counts": {
-      "bounded_estimate": 0,
-      "calculated": 0,
-      "legacy_sensitivity": 6,
+      "bounded_estimate": 4,
+      "calculated": 1,
+      "legacy_sensitivity": 1,
       "unpriced": 0
     },
     "all_material_components_priced": false,
     "calculation_errors": [],
-    "aggregate_proof_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    "aggregate_proof_hash": "87504a9f2608fcf0882a96e44abb3d16096ca34d1906e3eb0fe1ac989b86e2d6"
   },
-  "source_lineage": [],
+  "source_lineage": [
+    {
+      "component_id": "midcycle_substrate_operations",
+      "node_id": "shares_m",
+      "ref": "AXTI/investor-documents/sec-edgar/10-Q_20260514_rpt20260331_acc0001437749_26_017054.htm",
+      "locator": "Cover page; 65,423,184 common shares outstanding May 4, 2026",
+      "as_of": "2026-05-04",
+      "content_sha256": "b18ec7946d50829cbc10b7e726f545a149f3cbd41517047945d9b8a489473778",
+      "source_id": "bd1b238f8c74f02c6c6457cb9c60d1d9d3ef8f7864926ded390a74218ae58038"
+    },
+    {
+      "component_id": "cash_and_liquidity",
+      "node_id": "cash_m",
+      "ref": "AXTI/research/evidence/sec_companyfacts.json",
+      "locator": "us-gaap:CashCashEquivalentsRestrictedCashAndRestrictedCashEquivalents; form 10-Q filed 2026-05-14",
+      "as_of": "2026-03-31",
+      "content_sha256": "fe6bee75fe4ba1ec83de56c039b0673274cefdf9df3cd43af929804f6517d137",
+      "source_id": "65d84d0a36e65b5b70bf2aaa79202738e01aeb43eb2d2540936d3dba62ff1855"
+    },
+    {
+      "component_id": "cash_and_liquidity",
+      "node_id": "shares_m",
+      "ref": "AXTI/investor-documents/sec-edgar/10-Q_20260514_rpt20260331_acc0001437749_26_017054.htm",
+      "locator": "Cover page; 65,423,184 common shares outstanding May 4, 2026",
+      "as_of": "2026-05-04",
+      "content_sha256": "b18ec7946d50829cbc10b7e726f545a149f3cbd41517047945d9b8a489473778",
+      "source_id": "bd1b238f8c74f02c6c6457cb9c60d1d9d3ef8f7864926ded390a74218ae58038"
+    },
+    {
+      "component_id": "tongmei_hk_listing_option",
+      "node_id": "shares_m",
+      "ref": "AXTI/investor-documents/sec-edgar/10-Q_20260514_rpt20260331_acc0001437749_26_017054.htm",
+      "locator": "Cover page; 65,423,184 common shares outstanding May 4, 2026",
+      "as_of": "2026-05-04",
+      "content_sha256": "b18ec7946d50829cbc10b7e726f545a149f3cbd41517047945d9b8a489473778",
+      "source_id": "bd1b238f8c74f02c6c6457cb9c60d1d9d3ef8f7864926ded390a74218ae58038"
+    },
+    {
+      "component_id": "pe_redemption_liability",
+      "node_id": "pe_redemption_m",
+      "ref": "AXTI/investor-documents/sec-edgar/10-Q_20260514_rpt20260331_acc0001437749_26_017054.htm",
+      "locator": "Note 1; redeemable noncontrolling interest redemption value approximately $49 million at March 31, 2026",
+      "as_of": "2026-03-31",
+      "content_sha256": "b18ec7946d50829cbc10b7e726f545a149f3cbd41517047945d9b8a489473778",
+      "source_id": "cf18e35adbf7bddc5e882bada4d4a5fd849d94151734f6b00aa958cdca06c9b0"
+    },
+    {
+      "component_id": "pe_redemption_liability",
+      "node_id": "shares_m",
+      "ref": "AXTI/investor-documents/sec-edgar/10-Q_20260514_rpt20260331_acc0001437749_26_017054.htm",
+      "locator": "Cover page; 65,423,184 common shares outstanding May 4, 2026",
+      "as_of": "2026-05-04",
+      "content_sha256": "b18ec7946d50829cbc10b7e726f545a149f3cbd41517047945d9b8a489473778",
+      "source_id": "bd1b238f8c74f02c6c6457cb9c60d1d9d3ef8f7864926ded390a74218ae58038"
+    },
+    {
+      "component_id": "dilution_reserve",
+      "node_id": "price",
+      "ref": "AXTI/research/evidence/sec_companyfacts.json",
+      "locator": "Market price input; Yahoo AXTI close 2026-07-17",
+      "as_of": "2026-07-17",
+      "content_sha256": "fe6bee75fe4ba1ec83de56c039b0673274cefdf9df3cd43af929804f6517d137",
+      "source_id": "5481ade4f763d8b1f650cddbb7a507c8eaf95ce844721ec0f45f756e6963e267"
+    }
+  ],
   "model_checks": {
     "calculation_graphs_valid": true,
-    "component_sum_reconciles": false,
+    "component_sum_reconciles": true,
     "no_double_counting": true,
-    "all_material_components_priced": false,
+    "all_material_components_priced": true,
     "low_base_high_ordered": true
   },
   "evidence": {
-    "unresolved_count": 5,
-    "blockers": [
-      "cash_and_liquidity: material component is legacy_sensitivity; a valid calculation proof is required",
-      "dilution_reserve: material component is legacy_sensitivity; a valid calculation proof is required",
-      "midcycle_substrate_operations: material component is legacy_sensitivity; a valid calculation proof is required",
-      "pe_redemption_liability: material component is legacy_sensitivity; a valid calculation proof is required",
-      "tongmei_hk_listing_option: material component is legacy_sensitivity; a valid calculation proof is required"
-    ],
+    "unresolved_count": 0,
+    "blockers": [],
     "validation_errors": []
   },
   "monitoring": {
@@ -731,8 +2076,13 @@
     ]
   },
   "change_control": {
-    "model_hash": "5226937eca2329c0273b2491cbab395e2dd80a99be5e8ef162320bdacafc3bfa",
-    "method_versions": [],
+    "model_hash": "7590bc1a7146fb1ebfab6b1499fc5ab6c2ae402898f572e9510d9ba999bd1922",
+    "method_versions": [
+      "dcf@1.0",
+      "manual@1.0",
+      "market_value@1.0",
+      "milestone_nav@1.0"
+    ],
     "change_log": [],
     "rule": "A source fact is locked. Every assumption change requires a reason, author, timestamp, and before/after value."
   },
