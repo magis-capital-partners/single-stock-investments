@@ -3,7 +3,7 @@
   "as_of": "2026-07-21",
   "method": "yield_curve",
   "irr_method": "scenario",
-  "valuation_mode": "economic_value",
+  "valuation_mode": "optionality",
   "lawrence_bucket": "other",
   "payoff_lens": "asset",
   "classification_inputs": {
@@ -156,7 +156,9 @@
     "irr_band": "<15%",
     "gates": {
       "moat_ok": false,
-      "dhando_ok": true
+      "dhando_ok": true,
+      "floor_pass": false,
+      "valuation_mode": "optionality"
     },
     "override_reason": "Filing-locked net liquid assets ~$2.21/sh cap downside partially, but pre-revenue burn, dilution from 624M to 767M shares, and certification binary keep moat unproven."
   },
@@ -525,79 +527,21 @@
       }
     ]
   },
-  "economic_value": {
-    "schema_version": "1.0",
-    "method": "component_economic_value",
-    "gaap_role": "cross_check",
-    "accounting_reference": "FY2025 10-K and Q1 2026 10-Q; GAAP net loss reflects pre-revenue R&D burn and is not owner cash.",
-    "economic_claim": {
-      "description": "One diluted ACHR common share, including net liquid assets, risk-adjusted Midnight certification and partner milestone value, less dilution and burn reserve.",
-      "unit_label": "diluted share",
-      "unit_count": 766850000,
-      "unit_source": "Q1 2026 weighted-average diluted shares 766,850,002 (ACHR/investor-documents/sec-edgar/10-Q_20260511_rpt20260331_acc0001824502_26_000038.htm)",
-      "enterprise_to_equity_reconciliation": "Pre-revenue developer with no operating enterprise cash flow; net liquid assets, certification option, and burn reserve are separate additive components with unique overlap keys."
-    },
-    "component_groups": [
-      {
-        "id": "net_liquid_claims",
-        "label": "Net cash, short-term investments, and debt claims",
-        "component_ids": [
-          "net_liquid_claims"
-        ],
-        "economic_claim": "Net cash, short-term investments, and debt claims",
-        "valuation_basis": "Filing-locked cash, investments, debt, and warrant liabilities divided by diluted shares.",
-        "adjustments": "Low/high stress debt and mark haircuts on liquid assets.",
-        "overlap_control": "Unique overlap key net_liquid_claims."
-      },
-      {
-        "id": "midnight_certification_option",
-        "label": "Midnight FAA certification and partner milestone value",
-        "component_ids": [
-          "midnight_certification_option"
-        ],
-        "economic_claim": "Midnight FAA certification and partner milestone value",
-        "valuation_basis": "Risk-adjusted milestone value from United, Stellantis, and USAF conditional paths.",
-        "adjustments": "Probability, timing, and remaining certification capital are inside the range.",
-        "overlap_control": "Unique overlap key midnight_certification_option.",
-        "risk_and_timing": {
-          "probability_basis": "Base assumes partial certification and limited partner conversion; bear assumes failure (0).",
-          "timing_basis": "Seven-year Lawrence horizon aligned with scenario yield-curve stance gate.",
-          "remaining_capital_basis": "FY2025 R&D $493.9M and operating loss $729.3M continue until commercial revenue scales."
-        }
-      },
-      {
-        "id": "dilution_and_burn_reserve",
-        "label": "Future dilution and pre-revenue burn reserve",
-        "component_ids": [
-          "dilution_and_burn_reserve"
-        ],
-        "economic_claim": "Future dilution and pre-revenue burn reserve",
-        "valuation_basis": "Negative reserve for ATM/S-3 issuance and continued pre-revenue burn.",
-        "adjustments": "Separate from net liquid claim; does not double-count cash already marked.",
-        "overlap_control": "Unique overlap key dilution_and_burn_reserve."
-      }
-    ]
-  },
   "economic_value_analysis": {
     "schema_version": "1.0",
-    "status": "complete",
+    "status": "evidence_blocked",
     "trigger": {
       "required": true,
       "reasons": [
-        "explicit_component_schedule"
+        "explicit_component_schedule",
+        "optionality_or_nav_overlay"
       ],
       "policy": "A complete economic-value analysis is required when any trigger fires; otherwise it is recommended."
     },
-    "method": "component_economic_value",
-    "economic_claim": {
-      "description": "One diluted ACHR common share, including net liquid assets, risk-adjusted Midnight certification and partner milestone value, less dilution and burn reserve.",
-      "unit_label": "diluted share",
-      "unit_count": 766850000,
-      "unit_source": "Q1 2026 weighted-average diluted shares 766,850,002 (ACHR/investor-documents/sec-edgar/10-Q_20260511_rpt20260331_acc0001824502_26_000038.htm)",
-      "enterprise_to_equity_reconciliation": "Pre-revenue developer with no operating enterprise cash flow; net liquid assets, certification option, and burn reserve are separate additive components with unique overlap keys."
-    },
-    "gaap_role": "cross_check",
-    "accounting_reference": "FY2025 10-K and Q1 2026 10-Q; GAAP net loss reflects pre-revenue R&D burn and is not owner cash.",
+    "method": "economic_claim_to_risked_present_value",
+    "economic_claim": {},
+    "gaap_role": null,
+    "accounting_reference": null,
     "comparable_hierarchy": [
       "issuer_arm_length_transaction",
       "same_asset_transaction",
@@ -619,8 +563,8 @@
           "net_liquid_claims"
         ],
         "economic_claim": "Net cash, short-term investments, and debt claims",
-        "valuation_basis": "Filing-locked cash, investments, debt, and warrant liabilities divided by diluted shares.",
-        "adjustments": "Low/high stress debt and mark haircuts on liquid assets.",
+        "valuation_basis": "Proof outputs {'low': 2.0799, 'base': 2.2115, 'high': 2.3301}; see calculation_proof graph.",
+        "adjustments": "Reconcile to FY2025 10-K and Q1 2026 10-Q before decision use.",
         "overlap_control": "Unique overlap key net_liquid_claims.",
         "risked_present_value_per_share": {
           "low": 2.08,
@@ -635,14 +579,9 @@
           "midnight_certification_option"
         ],
         "economic_claim": "Midnight FAA certification and partner milestone value",
-        "valuation_basis": "Risk-adjusted milestone value from United, Stellantis, and USAF conditional paths.",
-        "adjustments": "Probability, timing, and remaining certification capital are inside the range.",
+        "valuation_basis": "Proof outputs {'low': 0.0, 'base': 3.5, 'high': 10.0}; see calculation_proof graph.",
+        "adjustments": "Reconcile to FY2025 10-K and Q1 2026 10-Q before decision use.",
         "overlap_control": "Unique overlap key midnight_certification_option.",
-        "risk_and_timing": {
-          "probability_basis": "Base assumes partial certification and limited partner conversion; bear assumes failure (0).",
-          "timing_basis": "Seven-year Lawrence horizon aligned with scenario yield-curve stance gate.",
-          "remaining_capital_basis": "FY2025 R&D $493.9M and operating loss $729.3M continue until commercial revenue scales."
-        },
         "risked_present_value_per_share": {
           "low": 0.0,
           "base": 3.5,
@@ -656,8 +595,8 @@
           "dilution_and_burn_reserve"
         ],
         "economic_claim": "Future dilution and pre-revenue burn reserve",
-        "valuation_basis": "Negative reserve for ATM/S-3 issuance and continued pre-revenue burn.",
-        "adjustments": "Separate from net liquid claim; does not double-count cash already marked.",
+        "valuation_basis": "Proof outputs {'low': -3.0001, 'base': -1.5, 'high': -0.5}; see calculation_proof graph.",
+        "adjustments": "Reconcile to FY2025 10-K and Q1 2026 10-Q before decision use.",
         "overlap_control": "Unique overlap key dilution_and_burn_reserve.",
         "risked_present_value_per_share": {
           "low": -3.0,
@@ -679,7 +618,7 @@
         "evidence": "Primary bridge from ACHR/investor-documents/sec-edgar/10-Q_20260511_rpt20260331_acc0001824502_26_000038.htm: cash $951.1M, short-term investments $824.8M, debt $80.2M; FY2025 net loss $618.2M per ACHR/investor-documents/sec-edgar/10-K_20260302_rpt20251231_acc0001824502_26_000019.htm; contract backfill 2026-07-21.",
         "comparable_role": "not_applicable",
         "comparable_ids": [],
-        "adjustment": "Low/high stress debt and mark haircuts on liquid assets.",
+        "adjustment": "Reconcile to FY2025 10-K and Q1 2026 10-Q before decision use.",
         "range_per_share": {
           "low": 2.08,
           "base": 2.21,
@@ -703,7 +642,7 @@
         "evidence": "Primary bridge from ACHR/investor-documents/sec-edgar/10-Q_20260511_rpt20260331_acc0001824502_26_000038.htm: cash $951.1M, short-term investments $824.8M, debt $80.2M; FY2025 net loss $618.2M per ACHR/investor-documents/sec-edgar/10-K_20260302_rpt20251231_acc0001824502_26_000019.htm; contract backfill 2026-07-21.",
         "comparable_role": "not_applicable",
         "comparable_ids": [],
-        "adjustment": "Probability, timing, and remaining certification capital are inside the range.",
+        "adjustment": "Reconcile to FY2025 10-K and Q1 2026 10-Q before decision use.",
         "range_per_share": {
           "low": 0.0,
           "base": 3.5,
@@ -716,9 +655,9 @@
         "risk_and_timing": {
           "success_probability": null,
           "remaining_capital_m": null,
-          "timing_basis": "Seven-year Lawrence horizon aligned with scenario yield-curve stance gate.",
-          "probability_basis": "Base assumes partial certification and limited partner conversion; bear assumes failure (0).",
-          "remaining_capital_basis": "FY2025 R&D $493.9M and operating loss $729.3M continue until commercial revenue scales."
+          "timing_basis": null,
+          "probability_basis": null,
+          "remaining_capital_basis": null
         }
       },
       {
@@ -733,7 +672,7 @@
         "evidence": "Primary bridge from ACHR/investor-documents/sec-edgar/10-Q_20260511_rpt20260331_acc0001824502_26_000038.htm: cash $951.1M, short-term investments $824.8M, debt $80.2M; FY2025 net loss $618.2M per ACHR/investor-documents/sec-edgar/10-K_20260302_rpt20251231_acc0001824502_26_000019.htm; contract backfill 2026-07-21.",
         "comparable_role": "not_applicable",
         "comparable_ids": [],
-        "adjustment": "Separate from net liquid claim; does not double-count cash already marked.",
+        "adjustment": "Reconcile to FY2025 10-K and Q1 2026 10-Q before decision use.",
         "range_per_share": {
           "low": -3.0,
           "base": -1.5,
@@ -749,7 +688,16 @@
     "wisdom_applied": [],
     "limitations": [],
     "complete_component_coverage": true,
-    "validation_errors": [],
+    "validation_errors": [
+      "economic_claim.description required",
+      "economic_claim.enterprise_to_equity_reconciliation required",
+      "economic_claim.unit_count required",
+      "economic_claim.unit_label required",
+      "economic_claim.unit_source required",
+      "economic_value.schema_version 1.0 required",
+      "gaap_role required",
+      "option component midnight_certification_option requires probability, timing, and remaining-capital treatment"
+    ],
     "registry_version": "1.0"
   },
   "catalyst_paths": [
@@ -1413,7 +1361,7 @@
   },
   "universal_valuation_contract": {
     "schema_version": "2.0",
-    "status": "decision_grade",
+    "status": "evidence_blocked",
     "ticker": "ACHR",
     "as_of": "2026-07-21",
     "economic_ownership_map": [
@@ -1878,7 +1826,7 @@
         "evidence": "Primary bridge from ACHR/investor-documents/sec-edgar/10-Q_20260511_rpt20260331_acc0001824502_26_000038.htm: cash $951.1M, short-term investments $824.8M, debt $80.2M; FY2025 net loss $618.2M per ACHR/investor-documents/sec-edgar/10-K_20260302_rpt20251231_acc0001824502_26_000019.htm; contract backfill 2026-07-21.",
         "scenario_assumptions": "Proof outputs {'low': 2.0799, 'base': 2.2115, 'high': 2.3301}; see calculation_proof graph.",
         "probability_and_timing": null,
-        "tax_and_realization_adjustments": "Low/high stress debt and mark haircuts on liquid assets.",
+        "tax_and_realization_adjustments": "Reconcile to FY2025 10-K and Q1 2026 10-Q before decision use.",
         "falsifier": "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
         "overlap_key": "net_liquid_claims",
         "assumption_type": "judgment"
@@ -2238,11 +2186,11 @@
         "probability_and_timing": {
           "success_probability": null,
           "remaining_capital_m": null,
-          "timing_basis": "Seven-year Lawrence horizon aligned with scenario yield-curve stance gate.",
-          "probability_basis": "Base assumes partial certification and limited partner conversion; bear assumes failure (0).",
-          "remaining_capital_basis": "FY2025 R&D $493.9M and operating loss $729.3M continue until commercial revenue scales."
+          "timing_basis": null,
+          "probability_basis": null,
+          "remaining_capital_basis": null
         },
-        "tax_and_realization_adjustments": "Probability, timing, and remaining certification capital are inside the range.",
+        "tax_and_realization_adjustments": "Reconcile to FY2025 10-K and Q1 2026 10-Q before decision use.",
         "falsifier": "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
         "overlap_key": "midnight_certification_option",
         "assumption_type": "judgment"
@@ -2549,7 +2497,7 @@
         "evidence": "Primary bridge from ACHR/investor-documents/sec-edgar/10-Q_20260511_rpt20260331_acc0001824502_26_000038.htm: cash $951.1M, short-term investments $824.8M, debt $80.2M; FY2025 net loss $618.2M per ACHR/investor-documents/sec-edgar/10-K_20260302_rpt20251231_acc0001824502_26_000019.htm; contract backfill 2026-07-21.",
         "scenario_assumptions": "Proof outputs {'low': -3.0001, 'base': -1.5, 'high': -0.5}; see calculation_proof graph.",
         "probability_and_timing": null,
-        "tax_and_realization_adjustments": "Separate from net liquid claim; does not double-count cash already marked.",
+        "tax_and_realization_adjustments": "Reconcile to FY2025 10-K and Q1 2026 10-Q before decision use.",
         "falsifier": "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
         "overlap_key": "dilution_and_burn_reserve",
         "assumption_type": "judgment"
@@ -2907,9 +2855,27 @@
       "low_base_high_ordered": true
     },
     "evidence": {
-      "unresolved_count": 0,
-      "blockers": [],
-      "validation_errors": []
+      "unresolved_count": 8,
+      "blockers": [
+        "economic_claim.description required",
+        "economic_claim.enterprise_to_equity_reconciliation required",
+        "economic_claim.unit_count required",
+        "economic_claim.unit_label required",
+        "economic_claim.unit_source required",
+        "economic_value.schema_version 1.0 required",
+        "gaap_role required",
+        "option component midnight_certification_option requires probability, timing, and remaining-capital treatment"
+      ],
+      "validation_errors": [
+        "economic_claim.description required",
+        "economic_claim.enterprise_to_equity_reconciliation required",
+        "economic_claim.unit_count required",
+        "economic_claim.unit_label required",
+        "economic_claim.unit_source required",
+        "economic_value.schema_version 1.0 required",
+        "gaap_role required",
+        "option component midnight_certification_option requires probability, timing, and remaining-capital treatment"
+      ]
     },
     "monitoring": {
       "falsifiers": [
@@ -2925,7 +2891,7 @@
       ]
     },
     "change_control": {
-      "model_hash": "1237e8fceb11385103bb7489000ce9aba23135696a3b8831543eb3ad757d1dff",
+      "model_hash": "8979ea0fce0ab64ace465da02aa59dc7a996c76c11a02563116215ece8110a46",
       "method_versions": [
         "net_asset_value@1.0",
         "risk_adjusted_milestone_value@1.0"
@@ -2934,203 +2900,5 @@
       "rule": "A source fact is locked. Every assumption change requires a reason, author, timestamp, and before/after value."
     },
     "decision_rule": "No security is decision-grade until every material claim is valued exactly once by a valid calculation proof and every material evidence blocker is resolved."
-  },
-  "context_overlay": {
-    "as_of": "2026-07-21",
-    "disclaimer": "Context only. Tailwinds inform stance and overlay sizing; they do not auto-inflate Lawrence base IRR. Promotion to base case requires [HUMAN REVIEW].",
-    "themes": [
-      {
-        "theme_id": "macro_regime",
-        "label": "Macro risk regime",
-        "indicators": [
-          {
-            "id": "hy_oas",
-            "label": "High-yield OAS credit spread (%)",
-            "latest": 1.43,
-            "as_of": "2026-07-20",
-            "yoy_pct": 248.8,
-            "direction": "up",
-            "good_for": "risk_regime",
-            "source": "spread:HYG-LQD:21d (HYG-LQD 1m spread proxy, not OAS)",
-            "stale": false,
-            "in_base_irr": false
-          },
-          {
-            "id": "ust_10y",
-            "label": "US Treasury 10Y yield (%)",
-            "latest": 4.599999904632568,
-            "as_of": "2026-07-21",
-            "yoy_pct": 5.2,
-            "direction": "up",
-            "good_for": "rates_regime",
-            "source": "yahoo:^TNX",
-            "stale": false,
-            "in_base_irr": false
-          },
-          {
-            "id": "ust_2y",
-            "label": "US Treasury 2Y yield (%)",
-            "latest": 4.324999809265137,
-            "as_of": "2026-07-21",
-            "yoy_pct": 10.7,
-            "direction": "up",
-            "good_for": "rates_regime",
-            "source": "yahoo:^FVX",
-            "stale": false,
-            "in_base_irr": false
-          },
-          {
-            "id": "dxy_broad",
-            "label": "Trade-weighted USD index (broad)",
-            "latest": 101.02100372314453,
-            "as_of": "2026-07-21",
-            "yoy_pct": 3.2,
-            "direction": "up",
-            "good_for": "dollar_regime",
-            "source": "yahoo:DX-Y.NYB",
-            "stale": false,
-            "in_base_irr": false
-          },
-          {
-            "id": "vix_level",
-            "label": "VIX index level",
-            "latest": 17.850000381469727,
-            "as_of": "2026-07-21",
-            "yoy_pct": 7.2,
-            "direction": "up",
-            "good_for": "vol_regime",
-            "source": "yahoo:^VIX",
-            "stale": false,
-            "in_base_irr": false
-          },
-          {
-            "id": "credit_impulse_1m",
-            "label": "HYG vs TLT 1-month return spread (%)",
-            "latest": 2.76,
-            "as_of": "2026-07-20",
-            "yoy_pct": 55.9,
-            "direction": "up",
-            "good_for": "credit_impulse",
-            "source": "spread:HYG-TLT:21d",
-            "stale": false,
-            "in_base_irr": false
-          },
-          {
-            "id": "spy_20d_realized_vol",
-            "label": "SPY 20-day realized vol (annualized %)",
-            "latest": 11.37,
-            "as_of": "2026-07-20",
-            "yoy_pct": 31.3,
-            "direction": "up",
-            "good_for": "equity_vol",
-            "source": "realized_vol:SPY:20d",
-            "stale": false,
-            "in_base_irr": false
-          }
-        ]
-      }
-    ]
-  },
-  "insider_signal": {
-    "as_of": "2026-07-21",
-    "disclaimer": "Context only. Insider activity informs scenario confidence and stance discussion; it does not auto-inflate Lawrence base IRR. Promotion requires [HUMAN REVIEW].",
-    "in_base_irr": false,
-    "window_days": 365,
-    "ics": 0.0,
-    "band": "negligible",
-    "bull_case_support": "none",
-    "scenario_confidence": {
-      "priors": {
-        "bear": 0.2,
-        "base": 0.55,
-        "bull": 0.25
-      },
-      "tilted": {
-        "bear": 0.28,
-        "base": 0.47,
-        "bull": 0.25
-      },
-      "bull_delta": 0.0,
-      "bear_delta": 0.08,
-      "note": "Scenario weights are qualitative confidence only; Lawrence base IRR unchanged."
-    },
-    "factors": {
-      "buy_score": 0.0,
-      "sell_score": -1.0,
-      "cluster_bonus": 0.0,
-      "net_buy_usd": 0,
-      "net_sell_usd": 7894353.73,
-      "price_today": 5.31
-    },
-    "top_buys": [],
-    "top_sells": [
-      {
-        "insider": "Lentell Eric",
-        "date": "2026-06-11",
-        "shares": 3754,
-        "price": 4.9984,
-        "value_usd": 18763.99,
-        "is_10b5_1": false,
-        "contrib": -0.143
-      },
-      {
-        "insider": "Gupta Priya",
-        "date": "2026-05-18",
-        "shares": 9860,
-        "price": 5.9527,
-        "value_usd": 58693.62,
-        "is_10b5_1": false,
-        "contrib": -0.125
-      },
-      {
-        "insider": "Rungta Harsh",
-        "date": "2026-05-18",
-        "shares": 12414,
-        "price": 5.9527,
-        "value_usd": 73896.82,
-        "is_10b5_1": false,
-        "contrib": -0.117
-      },
-      {
-        "insider": "Muniz Thomas Paul",
-        "date": "2026-05-18",
-        "shares": 91839,
-        "price": 5.9527,
-        "value_usd": 546690.02,
-        "is_10b5_1": false,
-        "contrib": -0.117
-      },
-      {
-        "insider": "Lentell Eric",
-        "date": "2026-05-18",
-        "shares": 48169,
-        "price": 5.9527,
-        "value_usd": 286735.61,
-        "is_10b5_1": false,
-        "contrib": -0.117
-      }
-    ],
-    "narrative_hooks": [],
-    "transaction_count": 100
-  },
-  "lens_consensus": {
-    "as_of": "2026-07-21",
-    "shared_inputs_ref": "valuation.json@2026-07-21",
-    "valuation_richness": 1.0,
-    "blended_return_pct": -6.18,
-    "band_pct": [
-      -22.3,
-      -2.8
-    ],
-    "weighted_median_pct": -3.3,
-    "median_mean_flag": false,
-    "stance": "pass",
-    "agreement_pct": 100,
-    "dissent_count": 0,
-    "lawrence_divergence": false,
-    "top_dissents": [],
-    "contributor_count": 10,
-    "in_base_irr": false,
-    "disclaimer": "Advisory lens blend only. Does not replace Lawrence total-synthesis stance gate without [HUMAN REVIEW]."
   }
 }
