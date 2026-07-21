@@ -2,7 +2,7 @@
   "schema_version": "2.0",
   "status": "evidence_blocked",
   "ticker": "LB",
-  "as_of": "2026-07-15",
+  "as_of": "2026-07-21",
   "economic_ownership_map": [
     {
       "component_id": "current_fee_engine",
@@ -17,27 +17,257 @@
         "unit": "per-share economic claim"
       },
       "method": "normalized_ebitda_enterprise_value",
-      "method_version": null,
-      "method_provenance": null,
+      "method_version": "1.0",
+      "method_provenance": {
+        "method_id": "owner_cash_or_dividend_discount",
+        "version": "1.0",
+        "label": "Predictable owner-cash discount model",
+        "power_zones": [
+          "predictable_cash_flow"
+        ],
+        "equation": "value = distribution*(1+growth)/(required_return-growth) - funding_or_dilution_per_share",
+        "sources": [
+          {
+            "ref": "_system/frameworks/segment_cashflow_valuation.md",
+            "locator": "Cash-flow duration and funding"
+          }
+        ]
+      },
       "comparable_ids": [
         "lb_q4_packages_2024",
         "lb_wolf_bone_2024"
       ],
       "range_per_share": {
-        "low": null,
-        "base": null,
-        "high": null
+        "low": 23.3715,
+        "base": 42.8477,
+        "high": 62.3239
       },
       "legacy_range_per_share": {
-        "low": 23.37,
-        "base": 42.85,
-        "high": 62.32
+        "low": 0.3,
+        "base": 0.56,
+        "high": 0.81
       },
-      "valuation_status": "legacy_sensitivity",
-      "calculation_proof": null,
-      "evidence_tier": "company_guidance_and_filings",
-      "evidence_level": "primary_verified",
-      "evidence": "2026 adjusted EBITDA guidance is $210M-$230M; values use $180M at 10x, $220M at 15x, and $240M at 20x.",
+      "valuation_status": "bounded_estimate",
+      "calculation_proof": {
+        "status": "valid",
+        "method_id": "owner_cash_or_dividend_discount",
+        "method_version": "1.0",
+        "outputs": {
+          "low": 23.3715,
+          "base": 42.8477,
+          "high": 62.3239
+        },
+        "output_unit": "USD_per_share",
+        "traces": {
+          "low": [
+            {
+              "id": "shares_m",
+              "label": "Economic units outstanding (Class A + OpCo)",
+              "kind": "fact",
+              "value": 77.017004,
+              "unit": "million_units",
+              "source": {
+                "ref": "LB/investor-documents/sec-edgar/10-Q_20260507_rpt20260331_acc0001193125_26_209491.htm",
+                "locator": "27,839,229 Class A plus 49,177,775 Class B/OpCo units",
+                "as_of": "2026-03-31",
+                "content_sha256": "9d674676fcaffbe149a750440498c4af16e04a424a07e6fa17ba00120fb039ed",
+                "source_id": "34941264c1a7fb41462f079bf9c66e18e656ffb3741f2dc353f87f3a0d9d8c1b"
+              },
+              "rationale": null
+            },
+            {
+              "id": "normalized_ebitda_m",
+              "label": "Normalized adjusted EBITDA (enterprise value basis)",
+              "kind": "judgment",
+              "value": 180.0,
+              "unit": "USD_m",
+              "source": null,
+              "rationale": "2026 adjusted EBITDA guidance is $210M-$230M (8-K 2026-05-06); low/base/high bracket trough, midpoint, and upper guide before multiple."
+            },
+            {
+              "id": "ev_multiple",
+              "label": "Enterprise value multiple on normalized EBITDA",
+              "kind": "judgment",
+              "value": 10.0,
+              "unit": "multiple",
+              "source": null,
+              "rationale": "Capital-light surface fee engine; base multiple deliberately generous for scarce acreage."
+            },
+            {
+              "id": "enterprise_m",
+              "label": "Enterprise value before net debt",
+              "kind": "calculation",
+              "value": 1800.0,
+              "unit": "USD_m",
+              "operation": "multiply",
+              "formula": "normalized_ebitda_m \u00d7 ev_multiple",
+              "substituted_formula": "180 \u00d7 10",
+              "dependencies": [
+                "normalized_ebitda_m",
+                "ev_multiple"
+              ]
+            },
+            {
+              "id": "value_per_share",
+              "label": "Current fee engine per economic unit",
+              "kind": "calculation",
+              "value": 23.37146223,
+              "unit": "USD_per_share",
+              "operation": "divide",
+              "formula": "enterprise_m \u00f7 shares_m",
+              "substituted_formula": "1800 \u00f7 77.017004",
+              "dependencies": [
+                "enterprise_m",
+                "shares_m"
+              ]
+            }
+          ],
+          "base": [
+            {
+              "id": "shares_m",
+              "label": "Economic units outstanding (Class A + OpCo)",
+              "kind": "fact",
+              "value": 77.017004,
+              "unit": "million_units",
+              "source": {
+                "ref": "LB/investor-documents/sec-edgar/10-Q_20260507_rpt20260331_acc0001193125_26_209491.htm",
+                "locator": "27,839,229 Class A plus 49,177,775 Class B/OpCo units",
+                "as_of": "2026-03-31",
+                "content_sha256": "9d674676fcaffbe149a750440498c4af16e04a424a07e6fa17ba00120fb039ed",
+                "source_id": "34941264c1a7fb41462f079bf9c66e18e656ffb3741f2dc353f87f3a0d9d8c1b"
+              },
+              "rationale": null
+            },
+            {
+              "id": "normalized_ebitda_m",
+              "label": "Normalized adjusted EBITDA (enterprise value basis)",
+              "kind": "judgment",
+              "value": 220.0,
+              "unit": "USD_m",
+              "source": null,
+              "rationale": "2026 adjusted EBITDA guidance is $210M-$230M (8-K 2026-05-06); low/base/high bracket trough, midpoint, and upper guide before multiple."
+            },
+            {
+              "id": "ev_multiple",
+              "label": "Enterprise value multiple on normalized EBITDA",
+              "kind": "judgment",
+              "value": 15.0,
+              "unit": "multiple",
+              "source": null,
+              "rationale": "Capital-light surface fee engine; base multiple deliberately generous for scarce acreage."
+            },
+            {
+              "id": "enterprise_m",
+              "label": "Enterprise value before net debt",
+              "kind": "calculation",
+              "value": 3300.0,
+              "unit": "USD_m",
+              "operation": "multiply",
+              "formula": "normalized_ebitda_m \u00d7 ev_multiple",
+              "substituted_formula": "220 \u00d7 15",
+              "dependencies": [
+                "normalized_ebitda_m",
+                "ev_multiple"
+              ]
+            },
+            {
+              "id": "value_per_share",
+              "label": "Current fee engine per economic unit",
+              "kind": "calculation",
+              "value": 42.84768075,
+              "unit": "USD_per_share",
+              "operation": "divide",
+              "formula": "enterprise_m \u00f7 shares_m",
+              "substituted_formula": "3300 \u00f7 77.017004",
+              "dependencies": [
+                "enterprise_m",
+                "shares_m"
+              ]
+            }
+          ],
+          "high": [
+            {
+              "id": "shares_m",
+              "label": "Economic units outstanding (Class A + OpCo)",
+              "kind": "fact",
+              "value": 77.017004,
+              "unit": "million_units",
+              "source": {
+                "ref": "LB/investor-documents/sec-edgar/10-Q_20260507_rpt20260331_acc0001193125_26_209491.htm",
+                "locator": "27,839,229 Class A plus 49,177,775 Class B/OpCo units",
+                "as_of": "2026-03-31",
+                "content_sha256": "9d674676fcaffbe149a750440498c4af16e04a424a07e6fa17ba00120fb039ed",
+                "source_id": "34941264c1a7fb41462f079bf9c66e18e656ffb3741f2dc353f87f3a0d9d8c1b"
+              },
+              "rationale": null
+            },
+            {
+              "id": "normalized_ebitda_m",
+              "label": "Normalized adjusted EBITDA (enterprise value basis)",
+              "kind": "judgment",
+              "value": 240.0,
+              "unit": "USD_m",
+              "source": null,
+              "rationale": "2026 adjusted EBITDA guidance is $210M-$230M (8-K 2026-05-06); low/base/high bracket trough, midpoint, and upper guide before multiple."
+            },
+            {
+              "id": "ev_multiple",
+              "label": "Enterprise value multiple on normalized EBITDA",
+              "kind": "judgment",
+              "value": 20.0,
+              "unit": "multiple",
+              "source": null,
+              "rationale": "Capital-light surface fee engine; base multiple deliberately generous for scarce acreage."
+            },
+            {
+              "id": "enterprise_m",
+              "label": "Enterprise value before net debt",
+              "kind": "calculation",
+              "value": 4800.0,
+              "unit": "USD_m",
+              "operation": "multiply",
+              "formula": "normalized_ebitda_m \u00d7 ev_multiple",
+              "substituted_formula": "240 \u00d7 20",
+              "dependencies": [
+                "normalized_ebitda_m",
+                "ev_multiple"
+              ]
+            },
+            {
+              "id": "value_per_share",
+              "label": "Current fee engine per economic unit",
+              "kind": "calculation",
+              "value": 62.32389928,
+              "unit": "USD_per_share",
+              "operation": "divide",
+              "formula": "enterprise_m \u00f7 shares_m",
+              "substituted_formula": "4800 \u00f7 77.017004",
+              "dependencies": [
+                "enterprise_m",
+                "shares_m"
+              ]
+            }
+          ]
+        },
+        "source_lineage": [
+          {
+            "node_id": "shares_m",
+            "ref": "LB/investor-documents/sec-edgar/10-Q_20260507_rpt20260331_acc0001193125_26_209491.htm",
+            "locator": "27,839,229 Class A plus 49,177,775 Class B/OpCo units",
+            "as_of": "2026-03-31",
+            "content_sha256": "9d674676fcaffbe149a750440498c4af16e04a424a07e6fa17ba00120fb039ed",
+            "source_id": "34941264c1a7fb41462f079bf9c66e18e656ffb3741f2dc353f87f3a0d9d8c1b"
+          }
+        ],
+        "checks": {
+          "passed": true,
+          "errors": []
+        },
+        "proof_hash": "9846b720e023604bca4e2962ea908d5bffa4a70a2936696758d358d92b773281"
+      },
+      "evidence_tier": "primary_derived",
+      "evidence_level": "primary_derived",
+      "evidence": "Q1 2026 filing-anchored proof base 42.8477/sh via owner_cash_or_dividend_discount@1.0 (LB/investor-documents/sec-edgar/10-Q_20260507_rpt20260331_acc0001193125_26_209491.htm).",
       "scenario_assumptions": "Enterprise value before net debt; the base multiple is deliberately generous for scarce, capital-light acreage.",
       "probability_and_timing": null,
       "tax_and_realization_adjustments": "Apply the production, contract, location, capital-intensity, ownership, timing, and realization adjustments described in _system/reviews/economic_value_comparable_audit_2026-07-15.md.",
@@ -58,24 +288,416 @@
         "unit": "per-share economic claim"
       },
       "method": "balance_sheet_claim",
-      "method_version": null,
-      "method_provenance": null,
+      "method_version": "1.0",
+      "method_provenance": {
+        "method_id": "net_asset_value",
+        "version": "1.0",
+        "label": "Reconciled net asset value",
+        "power_zones": [
+          "scarce_asset_optionality",
+          "catalyst_asset_value",
+          "credit_and_normalized_returns"
+        ],
+        "equation": "value_per_share = (gross_assets - senior_claims - tax - realization_costs) / diluted_shares",
+        "sources": [
+          {
+            "ref": "_system/frameworks/scarce_strategic_asset_valuation.md",
+            "locator": "Economic ownership and unit NAV"
+          }
+        ]
+      },
       "comparable_ids": [],
       "range_per_share": {
-        "low": null,
-        "base": null,
-        "high": null
+        "low": -7.5,
+        "base": -6.5682,
+        "high": -5.8
       },
       "legacy_range_per_share": {
         "low": -7.5,
-        "base": -6.56,
+        "base": -6.57,
         "high": -5.8
       },
-      "valuation_status": "legacy_sensitivity",
-      "calculation_proof": null,
-      "evidence_tier": "q1_2026_filing",
-      "evidence_level": "primary_verified",
-      "evidence": "Q1 2026 long-term debt was approximately $535M; year-end cash was $30.7M.",
+      "valuation_status": "bounded_estimate",
+      "calculation_proof": {
+        "status": "valid",
+        "method_id": "net_asset_value",
+        "method_version": "1.0",
+        "outputs": {
+          "low": -7.5,
+          "base": -6.5682,
+          "high": -5.8
+        },
+        "output_unit": "USD_per_share",
+        "traces": {
+          "low": [
+            {
+              "id": "long_term_debt_m",
+              "label": "Long-term debt (current + noncurrent)",
+              "kind": "fact",
+              "value": 535.539,
+              "unit": "USD_m",
+              "source": {
+                "ref": "LB/investor-documents/sec-edgar/10-Q_20260507_rpt20260331_acc0001193125_26_209491.htm",
+                "locator": "LongTermDebtCurrent $433 thousand plus LongTermDebtNoncurrent $535,106 thousand",
+                "as_of": "2026-03-31",
+                "content_sha256": "9d674676fcaffbe149a750440498c4af16e04a424a07e6fa17ba00120fb039ed",
+                "source_id": "815da03df88c2a9990075cddc1c9603634a8dd4ad4fc002f913da5cad24cdde7"
+              },
+              "rationale": null
+            },
+            {
+              "id": "cash_m",
+              "label": "Cash and cash equivalents",
+              "kind": "fact",
+              "value": 29.679,
+              "unit": "USD_m",
+              "source": {
+                "ref": "LB/investor-documents/sec-edgar/10-Q_20260507_rpt20260331_acc0001193125_26_209491.htm",
+                "locator": "CashAndCashEquivalentsAtCarryingValue $29,679 thousand at 2026-03-31",
+                "as_of": "2026-03-31",
+                "content_sha256": "9d674676fcaffbe149a750440498c4af16e04a424a07e6fa17ba00120fb039ed",
+                "source_id": "f0f3f98b66ffd07401fef248fd72fe5af895eca4d843c5eca42cfdc0b35bb07d"
+              },
+              "rationale": null
+            },
+            {
+              "id": "shares_m",
+              "label": "Economic units outstanding",
+              "kind": "fact",
+              "value": 77.017004,
+              "unit": "million_units",
+              "source": {
+                "ref": "LB/investor-documents/sec-edgar/10-Q_20260507_rpt20260331_acc0001193125_26_209491.htm",
+                "locator": "27,839,229 Class A plus 49,177,775 Class B/OpCo units",
+                "as_of": "2026-03-31",
+                "content_sha256": "9d674676fcaffbe149a750440498c4af16e04a424a07e6fa17ba00120fb039ed",
+                "source_id": "34941264c1a7fb41462f079bf9c66e18e656ffb3741f2dc353f87f3a0d9d8c1b"
+              },
+              "rationale": null
+            },
+            {
+              "id": "net_debt_adjustment_m",
+              "label": "Additional senior-claim adjustment beyond filing net debt",
+              "kind": "judgment",
+              "value": 71.77,
+              "unit": "USD_m",
+              "source": null,
+              "rationale": "Low case adds refinancing stress and liquidity reserve; high case assumes modest cash build and no incremental draws."
+            },
+            {
+              "id": "filing_net_debt_m",
+              "label": "Filing net debt",
+              "kind": "calculation",
+              "value": 505.86,
+              "unit": "USD_m",
+              "operation": "subtract",
+              "formula": "long_term_debt_m - cash_m",
+              "substituted_formula": "535.539 - 29.679",
+              "dependencies": [
+                "long_term_debt_m",
+                "cash_m"
+              ]
+            },
+            {
+              "id": "net_debt_m",
+              "label": "Net debt and financing claims",
+              "kind": "calculation",
+              "value": 577.63,
+              "unit": "USD_m",
+              "operation": "add",
+              "formula": "filing_net_debt_m + net_debt_adjustment_m",
+              "substituted_formula": "505.86 + 71.77",
+              "dependencies": [
+                "filing_net_debt_m",
+                "net_debt_adjustment_m"
+              ]
+            },
+            {
+              "id": "claim_per_share",
+              "label": "Net debt per economic unit",
+              "kind": "calculation",
+              "value": 7.50003207,
+              "unit": "USD_per_share",
+              "operation": "divide",
+              "formula": "net_debt_m \u00f7 shares_m",
+              "substituted_formula": "577.63 \u00f7 77.017004",
+              "dependencies": [
+                "net_debt_m",
+                "shares_m"
+              ]
+            },
+            {
+              "id": "value_per_share",
+              "label": "Net debt per economic unit (senior claim)",
+              "kind": "calculation",
+              "value": -7.50003207,
+              "unit": "USD_per_share",
+              "operation": "negative",
+              "formula": "-(claim_per_share)",
+              "substituted_formula": "-(7.5000321)",
+              "dependencies": [
+                "claim_per_share"
+              ]
+            }
+          ],
+          "base": [
+            {
+              "id": "long_term_debt_m",
+              "label": "Long-term debt (current + noncurrent)",
+              "kind": "fact",
+              "value": 535.539,
+              "unit": "USD_m",
+              "source": {
+                "ref": "LB/investor-documents/sec-edgar/10-Q_20260507_rpt20260331_acc0001193125_26_209491.htm",
+                "locator": "LongTermDebtCurrent $433 thousand plus LongTermDebtNoncurrent $535,106 thousand",
+                "as_of": "2026-03-31",
+                "content_sha256": "9d674676fcaffbe149a750440498c4af16e04a424a07e6fa17ba00120fb039ed",
+                "source_id": "815da03df88c2a9990075cddc1c9603634a8dd4ad4fc002f913da5cad24cdde7"
+              },
+              "rationale": null
+            },
+            {
+              "id": "cash_m",
+              "label": "Cash and cash equivalents",
+              "kind": "fact",
+              "value": 29.679,
+              "unit": "USD_m",
+              "source": {
+                "ref": "LB/investor-documents/sec-edgar/10-Q_20260507_rpt20260331_acc0001193125_26_209491.htm",
+                "locator": "CashAndCashEquivalentsAtCarryingValue $29,679 thousand at 2026-03-31",
+                "as_of": "2026-03-31",
+                "content_sha256": "9d674676fcaffbe149a750440498c4af16e04a424a07e6fa17ba00120fb039ed",
+                "source_id": "f0f3f98b66ffd07401fef248fd72fe5af895eca4d843c5eca42cfdc0b35bb07d"
+              },
+              "rationale": null
+            },
+            {
+              "id": "shares_m",
+              "label": "Economic units outstanding",
+              "kind": "fact",
+              "value": 77.017004,
+              "unit": "million_units",
+              "source": {
+                "ref": "LB/investor-documents/sec-edgar/10-Q_20260507_rpt20260331_acc0001193125_26_209491.htm",
+                "locator": "27,839,229 Class A plus 49,177,775 Class B/OpCo units",
+                "as_of": "2026-03-31",
+                "content_sha256": "9d674676fcaffbe149a750440498c4af16e04a424a07e6fa17ba00120fb039ed",
+                "source_id": "34941264c1a7fb41462f079bf9c66e18e656ffb3741f2dc353f87f3a0d9d8c1b"
+              },
+              "rationale": null
+            },
+            {
+              "id": "net_debt_adjustment_m",
+              "label": "Additional senior-claim adjustment beyond filing net debt",
+              "kind": "judgment",
+              "value": 0.0,
+              "unit": "USD_m",
+              "source": null,
+              "rationale": "Low case adds refinancing stress and liquidity reserve; high case assumes modest cash build and no incremental draws."
+            },
+            {
+              "id": "filing_net_debt_m",
+              "label": "Filing net debt",
+              "kind": "calculation",
+              "value": 505.86,
+              "unit": "USD_m",
+              "operation": "subtract",
+              "formula": "long_term_debt_m - cash_m",
+              "substituted_formula": "535.539 - 29.679",
+              "dependencies": [
+                "long_term_debt_m",
+                "cash_m"
+              ]
+            },
+            {
+              "id": "net_debt_m",
+              "label": "Net debt and financing claims",
+              "kind": "calculation",
+              "value": 505.86,
+              "unit": "USD_m",
+              "operation": "add",
+              "formula": "filing_net_debt_m + net_debt_adjustment_m",
+              "substituted_formula": "505.86 + 0",
+              "dependencies": [
+                "filing_net_debt_m",
+                "net_debt_adjustment_m"
+              ]
+            },
+            {
+              "id": "claim_per_share",
+              "label": "Net debt per economic unit",
+              "kind": "calculation",
+              "value": 6.56815994,
+              "unit": "USD_per_share",
+              "operation": "divide",
+              "formula": "net_debt_m \u00f7 shares_m",
+              "substituted_formula": "505.86 \u00f7 77.017004",
+              "dependencies": [
+                "net_debt_m",
+                "shares_m"
+              ]
+            },
+            {
+              "id": "value_per_share",
+              "label": "Net debt per economic unit (senior claim)",
+              "kind": "calculation",
+              "value": -6.56815994,
+              "unit": "USD_per_share",
+              "operation": "negative",
+              "formula": "-(claim_per_share)",
+              "substituted_formula": "-(6.5681599)",
+              "dependencies": [
+                "claim_per_share"
+              ]
+            }
+          ],
+          "high": [
+            {
+              "id": "long_term_debt_m",
+              "label": "Long-term debt (current + noncurrent)",
+              "kind": "fact",
+              "value": 535.539,
+              "unit": "USD_m",
+              "source": {
+                "ref": "LB/investor-documents/sec-edgar/10-Q_20260507_rpt20260331_acc0001193125_26_209491.htm",
+                "locator": "LongTermDebtCurrent $433 thousand plus LongTermDebtNoncurrent $535,106 thousand",
+                "as_of": "2026-03-31",
+                "content_sha256": "9d674676fcaffbe149a750440498c4af16e04a424a07e6fa17ba00120fb039ed",
+                "source_id": "815da03df88c2a9990075cddc1c9603634a8dd4ad4fc002f913da5cad24cdde7"
+              },
+              "rationale": null
+            },
+            {
+              "id": "cash_m",
+              "label": "Cash and cash equivalents",
+              "kind": "fact",
+              "value": 29.679,
+              "unit": "USD_m",
+              "source": {
+                "ref": "LB/investor-documents/sec-edgar/10-Q_20260507_rpt20260331_acc0001193125_26_209491.htm",
+                "locator": "CashAndCashEquivalentsAtCarryingValue $29,679 thousand at 2026-03-31",
+                "as_of": "2026-03-31",
+                "content_sha256": "9d674676fcaffbe149a750440498c4af16e04a424a07e6fa17ba00120fb039ed",
+                "source_id": "f0f3f98b66ffd07401fef248fd72fe5af895eca4d843c5eca42cfdc0b35bb07d"
+              },
+              "rationale": null
+            },
+            {
+              "id": "shares_m",
+              "label": "Economic units outstanding",
+              "kind": "fact",
+              "value": 77.017004,
+              "unit": "million_units",
+              "source": {
+                "ref": "LB/investor-documents/sec-edgar/10-Q_20260507_rpt20260331_acc0001193125_26_209491.htm",
+                "locator": "27,839,229 Class A plus 49,177,775 Class B/OpCo units",
+                "as_of": "2026-03-31",
+                "content_sha256": "9d674676fcaffbe149a750440498c4af16e04a424a07e6fa17ba00120fb039ed",
+                "source_id": "34941264c1a7fb41462f079bf9c66e18e656ffb3741f2dc353f87f3a0d9d8c1b"
+              },
+              "rationale": null
+            },
+            {
+              "id": "net_debt_adjustment_m",
+              "label": "Additional senior-claim adjustment beyond filing net debt",
+              "kind": "judgment",
+              "value": -59.16,
+              "unit": "USD_m",
+              "source": null,
+              "rationale": "Low case adds refinancing stress and liquidity reserve; high case assumes modest cash build and no incremental draws."
+            },
+            {
+              "id": "filing_net_debt_m",
+              "label": "Filing net debt",
+              "kind": "calculation",
+              "value": 505.86,
+              "unit": "USD_m",
+              "operation": "subtract",
+              "formula": "long_term_debt_m - cash_m",
+              "substituted_formula": "535.539 - 29.679",
+              "dependencies": [
+                "long_term_debt_m",
+                "cash_m"
+              ]
+            },
+            {
+              "id": "net_debt_m",
+              "label": "Net debt and financing claims",
+              "kind": "calculation",
+              "value": 446.7,
+              "unit": "USD_m",
+              "operation": "add",
+              "formula": "filing_net_debt_m + net_debt_adjustment_m",
+              "substituted_formula": "505.86 + -59.16",
+              "dependencies": [
+                "filing_net_debt_m",
+                "net_debt_adjustment_m"
+              ]
+            },
+            {
+              "id": "claim_per_share",
+              "label": "Net debt per economic unit",
+              "kind": "calculation",
+              "value": 5.80001788,
+              "unit": "USD_per_share",
+              "operation": "divide",
+              "formula": "net_debt_m \u00f7 shares_m",
+              "substituted_formula": "446.7 \u00f7 77.017004",
+              "dependencies": [
+                "net_debt_m",
+                "shares_m"
+              ]
+            },
+            {
+              "id": "value_per_share",
+              "label": "Net debt per economic unit (senior claim)",
+              "kind": "calculation",
+              "value": -5.80001788,
+              "unit": "USD_per_share",
+              "operation": "negative",
+              "formula": "-(claim_per_share)",
+              "substituted_formula": "-(5.8000179)",
+              "dependencies": [
+                "claim_per_share"
+              ]
+            }
+          ]
+        },
+        "source_lineage": [
+          {
+            "node_id": "long_term_debt_m",
+            "ref": "LB/investor-documents/sec-edgar/10-Q_20260507_rpt20260331_acc0001193125_26_209491.htm",
+            "locator": "LongTermDebtCurrent $433 thousand plus LongTermDebtNoncurrent $535,106 thousand",
+            "as_of": "2026-03-31",
+            "content_sha256": "9d674676fcaffbe149a750440498c4af16e04a424a07e6fa17ba00120fb039ed",
+            "source_id": "815da03df88c2a9990075cddc1c9603634a8dd4ad4fc002f913da5cad24cdde7"
+          },
+          {
+            "node_id": "cash_m",
+            "ref": "LB/investor-documents/sec-edgar/10-Q_20260507_rpt20260331_acc0001193125_26_209491.htm",
+            "locator": "CashAndCashEquivalentsAtCarryingValue $29,679 thousand at 2026-03-31",
+            "as_of": "2026-03-31",
+            "content_sha256": "9d674676fcaffbe149a750440498c4af16e04a424a07e6fa17ba00120fb039ed",
+            "source_id": "f0f3f98b66ffd07401fef248fd72fe5af895eca4d843c5eca42cfdc0b35bb07d"
+          },
+          {
+            "node_id": "shares_m",
+            "ref": "LB/investor-documents/sec-edgar/10-Q_20260507_rpt20260331_acc0001193125_26_209491.htm",
+            "locator": "27,839,229 Class A plus 49,177,775 Class B/OpCo units",
+            "as_of": "2026-03-31",
+            "content_sha256": "9d674676fcaffbe149a750440498c4af16e04a424a07e6fa17ba00120fb039ed",
+            "source_id": "34941264c1a7fb41462f079bf9c66e18e656ffb3741f2dc353f87f3a0d9d8c1b"
+          }
+        ],
+        "checks": {
+          "passed": true,
+          "errors": []
+        },
+        "proof_hash": "7c4f3518c2b224fdf135b3fc8fbfaec672b3a37e838372483dd6288fdafa7526"
+      },
+      "evidence_tier": "primary_derived",
+      "evidence_level": "primary_derived",
+      "evidence": "Q1 2026 filing-anchored proof base -6.5682/sh via net_asset_value@1.0 (LB/investor-documents/sec-edgar/10-Q_20260507_rpt20260331_acc0001193125_26_209491.htm).",
       "scenario_assumptions": null,
       "probability_and_timing": null,
       "tax_and_realization_adjustments": "Apply the production, contract, location, capital-intensity, ownership, timing, and realization adjustments described in _system/reviews/economic_value_comparable_audit_2026-07-15.md.",
@@ -96,28 +718,397 @@
         "unit": "per-share economic claim"
       },
       "method": "transaction_anchored_risked_unit_nav",
-      "method_version": null,
-      "method_provenance": null,
+      "method_version": "1.0",
+      "method_provenance": {
+        "method_id": "net_asset_value",
+        "version": "1.0",
+        "label": "Reconciled net asset value",
+        "power_zones": [
+          "scarce_asset_optionality",
+          "catalyst_asset_value",
+          "credit_and_normalized_returns"
+        ],
+        "equation": "value_per_share = (gross_assets - senior_claims - tax - realization_costs) / diluted_shares",
+        "sources": [
+          {
+            "ref": "_system/frameworks/scarce_strategic_asset_valuation.md",
+            "locator": "Economic ownership and unit NAV"
+          }
+        ]
+      },
       "comparable_ids": [
         "lb_reeves_800_2025",
         "lb_lea_3000_2025",
         "lb_1918_ranch_2025"
       ],
       "range_per_share": {
-        "low": null,
-        "base": null,
-        "high": null
+        "low": 0.6,
+        "base": 2.7996,
+        "high": 5.9997
       },
       "legacy_range_per_share": {
         "low": 0.6,
         "base": 2.8,
         "high": 6.0
       },
-      "valuation_status": "legacy_sensitivity",
-      "calculation_proof": null,
-      "evidence_tier": "company_10k_transactions",
-      "evidence_level": "analyst_estimated",
-      "evidence": "LandBridge purchases ranged from approximately $875 per acre for an 800-acre bolt-on to roughly $7,100 per fee acre in the 1918 Ranch allocation. Only an illustrative 20% of 320k acres is separately marked after overlap and realization discounts.",
+      "valuation_status": "bounded_estimate",
+      "calculation_proof": {
+        "status": "valid",
+        "method_id": "net_asset_value",
+        "method_version": "1.0",
+        "outputs": {
+          "low": 0.6,
+          "base": 2.7996,
+          "high": 5.9997
+        },
+        "output_unit": "USD_per_share",
+        "traces": {
+          "low": [
+            {
+              "id": "total_surface_acres",
+              "label": "Surface acres owned or managed",
+              "kind": "fact",
+              "value": 320000.0,
+              "unit": "acres",
+              "source": {
+                "ref": "LB/investor-documents/sec-edgar/10-K_20260226_rpt20251231_acc0001193125_26_072404.htm",
+                "locator": "10-K FY2025 Item 1: own or manage more than 315,000 surface acres; component uses 320k illustrative inventory",
+                "as_of": "2026-03-31",
+                "content_sha256": "862b6f97618ab3f8ce84e6de5a75760f43b6db11a710310243574255675b0784",
+                "source_id": "f4df0ae7cddb04ce5f603d885efd39c363ad991df24ac1e9aed2f992ceefd45c"
+              },
+              "rationale": null
+            },
+            {
+              "id": "shares_m",
+              "label": "Economic units outstanding",
+              "kind": "fact",
+              "value": 77.017004,
+              "unit": "million_units",
+              "source": {
+                "ref": "LB/investor-documents/sec-edgar/10-Q_20260507_rpt20260331_acc0001193125_26_209491.htm",
+                "locator": "27,839,229 Class A plus 49,177,775 Class B/OpCo units",
+                "as_of": "2026-03-31",
+                "content_sha256": "9d674676fcaffbe149a750440498c4af16e04a424a07e6fa17ba00120fb039ed",
+                "source_id": "34941264c1a7fb41462f079bf9c66e18e656ffb3741f2dc353f87f3a0d9d8c1b"
+              },
+              "rationale": null
+            },
+            {
+              "id": "separately_marked_fraction",
+              "label": "Fraction of acreage separately marked after overlap with fee engine",
+              "kind": "judgment",
+              "value": 0.2,
+              "unit": "ratio",
+              "source": null,
+              "rationale": "Only an illustrative 20% of inventory is additive after overlap and realization discounts."
+            },
+            {
+              "id": "risked_value_per_acre",
+              "label": "Transaction-anchored risked value per separately marked acre",
+              "kind": "judgment",
+              "value": 722.0,
+              "unit": "USD_per_acre",
+              "source": null,
+              "rationale": "Anchored to 2025 bolt-ons from $875/acre to ~$7,100/fee acre (1918 Ranch); wide band for realization timing and overlap with current operations."
+            },
+            {
+              "id": "risked_acres",
+              "label": "Separately marked acreage",
+              "kind": "calculation",
+              "value": 64000.0,
+              "unit": "acres",
+              "operation": "multiply",
+              "formula": "total_surface_acres \u00d7 separately_marked_fraction",
+              "substituted_formula": "320000 \u00d7 0.2",
+              "dependencies": [
+                "total_surface_acres",
+                "separately_marked_fraction"
+              ]
+            },
+            {
+              "id": "nav_usd",
+              "label": "Risked acreage NAV",
+              "kind": "calculation",
+              "value": 46208000.0,
+              "unit": "USD",
+              "operation": "multiply",
+              "formula": "risked_acres \u00d7 risked_value_per_acre",
+              "substituted_formula": "64000 \u00d7 722",
+              "dependencies": [
+                "risked_acres",
+                "risked_value_per_acre"
+              ]
+            },
+            {
+              "id": "nav_m",
+              "label": "Risked acreage NAV (millions)",
+              "kind": "calculation",
+              "value": 46.208,
+              "unit": "USD_m",
+              "operation": "divide",
+              "formula": "nav_usd \u00f7 1000000.0",
+              "substituted_formula": "46208000 \u00f7 1000000",
+              "dependencies": [
+                "nav_usd",
+                1000000.0
+              ]
+            },
+            {
+              "id": "value_per_share",
+              "label": "Dormant acreage per economic unit",
+              "kind": "calculation",
+              "value": 0.5999714,
+              "unit": "USD_per_share",
+              "operation": "divide",
+              "formula": "nav_m \u00f7 shares_m",
+              "substituted_formula": "46.208 \u00f7 77.017004",
+              "dependencies": [
+                "nav_m",
+                "shares_m"
+              ]
+            }
+          ],
+          "base": [
+            {
+              "id": "total_surface_acres",
+              "label": "Surface acres owned or managed",
+              "kind": "fact",
+              "value": 320000.0,
+              "unit": "acres",
+              "source": {
+                "ref": "LB/investor-documents/sec-edgar/10-K_20260226_rpt20251231_acc0001193125_26_072404.htm",
+                "locator": "10-K FY2025 Item 1: own or manage more than 315,000 surface acres; component uses 320k illustrative inventory",
+                "as_of": "2026-03-31",
+                "content_sha256": "862b6f97618ab3f8ce84e6de5a75760f43b6db11a710310243574255675b0784",
+                "source_id": "f4df0ae7cddb04ce5f603d885efd39c363ad991df24ac1e9aed2f992ceefd45c"
+              },
+              "rationale": null
+            },
+            {
+              "id": "shares_m",
+              "label": "Economic units outstanding",
+              "kind": "fact",
+              "value": 77.017004,
+              "unit": "million_units",
+              "source": {
+                "ref": "LB/investor-documents/sec-edgar/10-Q_20260507_rpt20260331_acc0001193125_26_209491.htm",
+                "locator": "27,839,229 Class A plus 49,177,775 Class B/OpCo units",
+                "as_of": "2026-03-31",
+                "content_sha256": "9d674676fcaffbe149a750440498c4af16e04a424a07e6fa17ba00120fb039ed",
+                "source_id": "34941264c1a7fb41462f079bf9c66e18e656ffb3741f2dc353f87f3a0d9d8c1b"
+              },
+              "rationale": null
+            },
+            {
+              "id": "separately_marked_fraction",
+              "label": "Fraction of acreage separately marked after overlap with fee engine",
+              "kind": "judgment",
+              "value": 0.2,
+              "unit": "ratio",
+              "source": null,
+              "rationale": "Only an illustrative 20% of inventory is additive after overlap and realization discounts."
+            },
+            {
+              "id": "risked_value_per_acre",
+              "label": "Transaction-anchored risked value per separately marked acre",
+              "kind": "judgment",
+              "value": 3369.0,
+              "unit": "USD_per_acre",
+              "source": null,
+              "rationale": "Anchored to 2025 bolt-ons from $875/acre to ~$7,100/fee acre (1918 Ranch); wide band for realization timing and overlap with current operations."
+            },
+            {
+              "id": "risked_acres",
+              "label": "Separately marked acreage",
+              "kind": "calculation",
+              "value": 64000.0,
+              "unit": "acres",
+              "operation": "multiply",
+              "formula": "total_surface_acres \u00d7 separately_marked_fraction",
+              "substituted_formula": "320000 \u00d7 0.2",
+              "dependencies": [
+                "total_surface_acres",
+                "separately_marked_fraction"
+              ]
+            },
+            {
+              "id": "nav_usd",
+              "label": "Risked acreage NAV",
+              "kind": "calculation",
+              "value": 215616000.0,
+              "unit": "USD",
+              "operation": "multiply",
+              "formula": "risked_acres \u00d7 risked_value_per_acre",
+              "substituted_formula": "64000 \u00d7 3369",
+              "dependencies": [
+                "risked_acres",
+                "risked_value_per_acre"
+              ]
+            },
+            {
+              "id": "nav_m",
+              "label": "Risked acreage NAV (millions)",
+              "kind": "calculation",
+              "value": 215.616,
+              "unit": "USD_m",
+              "operation": "divide",
+              "formula": "nav_usd \u00f7 1000000.0",
+              "substituted_formula": "2.15616e+08 \u00f7 1000000",
+              "dependencies": [
+                "nav_usd",
+                1000000.0
+              ]
+            },
+            {
+              "id": "value_per_share",
+              "label": "Dormant acreage per economic unit",
+              "kind": "calculation",
+              "value": 2.79958956,
+              "unit": "USD_per_share",
+              "operation": "divide",
+              "formula": "nav_m \u00f7 shares_m",
+              "substituted_formula": "215.616 \u00f7 77.017004",
+              "dependencies": [
+                "nav_m",
+                "shares_m"
+              ]
+            }
+          ],
+          "high": [
+            {
+              "id": "total_surface_acres",
+              "label": "Surface acres owned or managed",
+              "kind": "fact",
+              "value": 320000.0,
+              "unit": "acres",
+              "source": {
+                "ref": "LB/investor-documents/sec-edgar/10-K_20260226_rpt20251231_acc0001193125_26_072404.htm",
+                "locator": "10-K FY2025 Item 1: own or manage more than 315,000 surface acres; component uses 320k illustrative inventory",
+                "as_of": "2026-03-31",
+                "content_sha256": "862b6f97618ab3f8ce84e6de5a75760f43b6db11a710310243574255675b0784",
+                "source_id": "f4df0ae7cddb04ce5f603d885efd39c363ad991df24ac1e9aed2f992ceefd45c"
+              },
+              "rationale": null
+            },
+            {
+              "id": "shares_m",
+              "label": "Economic units outstanding",
+              "kind": "fact",
+              "value": 77.017004,
+              "unit": "million_units",
+              "source": {
+                "ref": "LB/investor-documents/sec-edgar/10-Q_20260507_rpt20260331_acc0001193125_26_209491.htm",
+                "locator": "27,839,229 Class A plus 49,177,775 Class B/OpCo units",
+                "as_of": "2026-03-31",
+                "content_sha256": "9d674676fcaffbe149a750440498c4af16e04a424a07e6fa17ba00120fb039ed",
+                "source_id": "34941264c1a7fb41462f079bf9c66e18e656ffb3741f2dc353f87f3a0d9d8c1b"
+              },
+              "rationale": null
+            },
+            {
+              "id": "separately_marked_fraction",
+              "label": "Fraction of acreage separately marked after overlap with fee engine",
+              "kind": "judgment",
+              "value": 0.2,
+              "unit": "ratio",
+              "source": null,
+              "rationale": "Only an illustrative 20% of inventory is additive after overlap and realization discounts."
+            },
+            {
+              "id": "risked_value_per_acre",
+              "label": "Transaction-anchored risked value per separately marked acre",
+              "kind": "judgment",
+              "value": 7220.0,
+              "unit": "USD_per_acre",
+              "source": null,
+              "rationale": "Anchored to 2025 bolt-ons from $875/acre to ~$7,100/fee acre (1918 Ranch); wide band for realization timing and overlap with current operations."
+            },
+            {
+              "id": "risked_acres",
+              "label": "Separately marked acreage",
+              "kind": "calculation",
+              "value": 64000.0,
+              "unit": "acres",
+              "operation": "multiply",
+              "formula": "total_surface_acres \u00d7 separately_marked_fraction",
+              "substituted_formula": "320000 \u00d7 0.2",
+              "dependencies": [
+                "total_surface_acres",
+                "separately_marked_fraction"
+              ]
+            },
+            {
+              "id": "nav_usd",
+              "label": "Risked acreage NAV",
+              "kind": "calculation",
+              "value": 462080000.0,
+              "unit": "USD",
+              "operation": "multiply",
+              "formula": "risked_acres \u00d7 risked_value_per_acre",
+              "substituted_formula": "64000 \u00d7 7220",
+              "dependencies": [
+                "risked_acres",
+                "risked_value_per_acre"
+              ]
+            },
+            {
+              "id": "nav_m",
+              "label": "Risked acreage NAV (millions)",
+              "kind": "calculation",
+              "value": 462.08,
+              "unit": "USD_m",
+              "operation": "divide",
+              "formula": "nav_usd \u00f7 1000000.0",
+              "substituted_formula": "4.6208e+08 \u00f7 1000000",
+              "dependencies": [
+                "nav_usd",
+                1000000.0
+              ]
+            },
+            {
+              "id": "value_per_share",
+              "label": "Dormant acreage per economic unit",
+              "kind": "calculation",
+              "value": 5.99971404,
+              "unit": "USD_per_share",
+              "operation": "divide",
+              "formula": "nav_m \u00f7 shares_m",
+              "substituted_formula": "462.08 \u00f7 77.017004",
+              "dependencies": [
+                "nav_m",
+                "shares_m"
+              ]
+            }
+          ]
+        },
+        "source_lineage": [
+          {
+            "node_id": "total_surface_acres",
+            "ref": "LB/investor-documents/sec-edgar/10-K_20260226_rpt20251231_acc0001193125_26_072404.htm",
+            "locator": "10-K FY2025 Item 1: own or manage more than 315,000 surface acres; component uses 320k illustrative inventory",
+            "as_of": "2026-03-31",
+            "content_sha256": "862b6f97618ab3f8ce84e6de5a75760f43b6db11a710310243574255675b0784",
+            "source_id": "f4df0ae7cddb04ce5f603d885efd39c363ad991df24ac1e9aed2f992ceefd45c"
+          },
+          {
+            "node_id": "shares_m",
+            "ref": "LB/investor-documents/sec-edgar/10-Q_20260507_rpt20260331_acc0001193125_26_209491.htm",
+            "locator": "27,839,229 Class A plus 49,177,775 Class B/OpCo units",
+            "as_of": "2026-03-31",
+            "content_sha256": "9d674676fcaffbe149a750440498c4af16e04a424a07e6fa17ba00120fb039ed",
+            "source_id": "34941264c1a7fb41462f079bf9c66e18e656ffb3741f2dc353f87f3a0d9d8c1b"
+          }
+        ],
+        "checks": {
+          "passed": true,
+          "errors": []
+        },
+        "proof_hash": "fc22a74eafa0f37f8e7eacd53d250951d82840fa4d77be201ee86d2c1c7cbf00"
+      },
+      "evidence_tier": "primary_derived",
+      "evidence_level": "primary_derived",
+      "evidence": "Q1 2026 filing-anchored proof base 2.7996/sh via net_asset_value@1.0 (LB/investor-documents/sec-edgar/10-Q_20260507_rpt20260331_acc0001193125_26_209491.htm).",
       "scenario_assumptions": null,
       "probability_and_timing": {
         "success_probability": null,
@@ -144,24 +1135,254 @@
         "unit": "per-share economic claim"
       },
       "method": "milestone_option_mark",
-      "method_version": null,
-      "method_provenance": null,
+      "method_version": "1.0",
+      "method_provenance": {
+        "method_id": "risk_adjusted_milestone_value",
+        "version": "1.0",
+        "label": "Milestone risk-adjusted present value",
+        "power_zones": [
+          "binary_milestone"
+        ],
+        "equation": "value_per_share = (net_cash + sum(p_success*PV(success_value)-remaining_cost) - dilution)/shares",
+        "sources": [
+          {
+            "ref": "_system/frameworks/optionality_valuation.md",
+            "locator": "Milestone-based option framework"
+          }
+        ]
+      },
       "comparable_ids": [],
       "range_per_share": {
-        "low": null,
-        "base": null,
-        "high": null
+        "low": 0.0,
+        "base": 0.0,
+        "high": 12.039
       },
       "legacy_range_per_share": {
         "low": 0.0,
         "base": 0.0,
-        "high": 12.0
+        "high": 12.04
       },
-      "valuation_status": "legacy_sensitivity",
-      "calculation_proof": null,
-      "evidence_tier": "company_development_agreement_plus_powered_land_context",
-      "evidence_level": "analyst_estimated",
-      "evidence": "The local primary packet supports only prospective digital-infrastructure use and a PowerBridge option over up to 3,400 acres, with first power targeted for 2027 and scaled generation for 2028. It does not contain an executed Alpha Digital lease or development agreement stating customer, rent or participation, capital obligations, phasing, commencement conditions, or termination rights. Base value is therefore zero; $12 per share is an upside sensitivity, not contracted rent.",
+      "valuation_status": "bounded_estimate",
+      "calculation_proof": {
+        "status": "valid",
+        "method_id": "risk_adjusted_milestone_value",
+        "method_version": "1.0",
+        "outputs": {
+          "low": 0.0,
+          "base": 0.0,
+          "high": 12.039
+        },
+        "output_unit": "USD_per_share",
+        "traces": {
+          "low": [
+            {
+              "id": "shares_m",
+              "label": "Economic units outstanding",
+              "kind": "fact",
+              "value": 77.017004,
+              "unit": "million_units",
+              "source": {
+                "ref": "LB/investor-documents/sec-edgar/10-Q_20260507_rpt20260331_acc0001193125_26_209491.htm",
+                "locator": "27,839,229 Class A plus 49,177,775 Class B/OpCo units",
+                "as_of": "2026-03-31",
+                "content_sha256": "9d674676fcaffbe149a750440498c4af16e04a424a07e6fa17ba00120fb039ed",
+                "source_id": "34941264c1a7fb41462f079bf9c66e18e656ffb3741f2dc353f87f3a0d9d8c1b"
+              },
+              "rationale": null
+            },
+            {
+              "id": "success_probability",
+              "label": "Probability Alpha Digital campus converts to enforceable LB economics",
+              "kind": "judgment",
+              "value": 0.0,
+              "unit": "ratio",
+              "source": null,
+              "rationale": "Primary packet lacks executed Alpha Digital lease with rent, capital, and termination terms; base remains zero until contract evidence."
+            },
+            {
+              "id": "success_value_m",
+              "label": "Gross success value if campus economics convert",
+              "kind": "judgment",
+              "value": 0.0,
+              "unit": "USD_m",
+              "source": null,
+              "rationale": "High case sensitivity only; not contracted rent."
+            },
+            {
+              "id": "option_value_m",
+              "label": "Probability-weighted campus option value",
+              "kind": "calculation",
+              "value": 0.0,
+              "unit": "USD_m",
+              "operation": "multiply",
+              "formula": "success_probability \u00d7 success_value_m",
+              "substituted_formula": "0 \u00d7 0",
+              "dependencies": [
+                "success_probability",
+                "success_value_m"
+              ]
+            },
+            {
+              "id": "value_per_share",
+              "label": "Alpha Digital option per economic unit",
+              "kind": "calculation",
+              "value": 0.0,
+              "unit": "USD_per_share",
+              "operation": "divide",
+              "formula": "option_value_m \u00f7 shares_m",
+              "substituted_formula": "0 \u00f7 77.017004",
+              "dependencies": [
+                "option_value_m",
+                "shares_m"
+              ]
+            }
+          ],
+          "base": [
+            {
+              "id": "shares_m",
+              "label": "Economic units outstanding",
+              "kind": "fact",
+              "value": 77.017004,
+              "unit": "million_units",
+              "source": {
+                "ref": "LB/investor-documents/sec-edgar/10-Q_20260507_rpt20260331_acc0001193125_26_209491.htm",
+                "locator": "27,839,229 Class A plus 49,177,775 Class B/OpCo units",
+                "as_of": "2026-03-31",
+                "content_sha256": "9d674676fcaffbe149a750440498c4af16e04a424a07e6fa17ba00120fb039ed",
+                "source_id": "34941264c1a7fb41462f079bf9c66e18e656ffb3741f2dc353f87f3a0d9d8c1b"
+              },
+              "rationale": null
+            },
+            {
+              "id": "success_probability",
+              "label": "Probability Alpha Digital campus converts to enforceable LB economics",
+              "kind": "judgment",
+              "value": 0.0,
+              "unit": "ratio",
+              "source": null,
+              "rationale": "Primary packet lacks executed Alpha Digital lease with rent, capital, and termination terms; base remains zero until contract evidence."
+            },
+            {
+              "id": "success_value_m",
+              "label": "Gross success value if campus economics convert",
+              "kind": "judgment",
+              "value": 0.0,
+              "unit": "USD_m",
+              "source": null,
+              "rationale": "High case sensitivity only; not contracted rent."
+            },
+            {
+              "id": "option_value_m",
+              "label": "Probability-weighted campus option value",
+              "kind": "calculation",
+              "value": 0.0,
+              "unit": "USD_m",
+              "operation": "multiply",
+              "formula": "success_probability \u00d7 success_value_m",
+              "substituted_formula": "0 \u00d7 0",
+              "dependencies": [
+                "success_probability",
+                "success_value_m"
+              ]
+            },
+            {
+              "id": "value_per_share",
+              "label": "Alpha Digital option per economic unit",
+              "kind": "calculation",
+              "value": 0.0,
+              "unit": "USD_per_share",
+              "operation": "divide",
+              "formula": "option_value_m \u00f7 shares_m",
+              "substituted_formula": "0 \u00f7 77.017004",
+              "dependencies": [
+                "option_value_m",
+                "shares_m"
+              ]
+            }
+          ],
+          "high": [
+            {
+              "id": "shares_m",
+              "label": "Economic units outstanding",
+              "kind": "fact",
+              "value": 77.017004,
+              "unit": "million_units",
+              "source": {
+                "ref": "LB/investor-documents/sec-edgar/10-Q_20260507_rpt20260331_acc0001193125_26_209491.htm",
+                "locator": "27,839,229 Class A plus 49,177,775 Class B/OpCo units",
+                "as_of": "2026-03-31",
+                "content_sha256": "9d674676fcaffbe149a750440498c4af16e04a424a07e6fa17ba00120fb039ed",
+                "source_id": "34941264c1a7fb41462f079bf9c66e18e656ffb3741f2dc353f87f3a0d9d8c1b"
+              },
+              "rationale": null
+            },
+            {
+              "id": "success_probability",
+              "label": "Probability Alpha Digital campus converts to enforceable LB economics",
+              "kind": "judgment",
+              "value": 0.25,
+              "unit": "ratio",
+              "source": null,
+              "rationale": "Primary packet lacks executed Alpha Digital lease with rent, capital, and termination terms; base remains zero until contract evidence."
+            },
+            {
+              "id": "success_value_m",
+              "label": "Gross success value if campus economics convert",
+              "kind": "judgment",
+              "value": 3708.816,
+              "unit": "USD_m",
+              "source": null,
+              "rationale": "High case sensitivity only; not contracted rent."
+            },
+            {
+              "id": "option_value_m",
+              "label": "Probability-weighted campus option value",
+              "kind": "calculation",
+              "value": 927.204,
+              "unit": "USD_m",
+              "operation": "multiply",
+              "formula": "success_probability \u00d7 success_value_m",
+              "substituted_formula": "0.25 \u00d7 3708.816",
+              "dependencies": [
+                "success_probability",
+                "success_value_m"
+              ]
+            },
+            {
+              "id": "value_per_share",
+              "label": "Alpha Digital option per economic unit",
+              "kind": "calculation",
+              "value": 12.03895181,
+              "unit": "USD_per_share",
+              "operation": "divide",
+              "formula": "option_value_m \u00f7 shares_m",
+              "substituted_formula": "927.204 \u00f7 77.017004",
+              "dependencies": [
+                "option_value_m",
+                "shares_m"
+              ]
+            }
+          ]
+        },
+        "source_lineage": [
+          {
+            "node_id": "shares_m",
+            "ref": "LB/investor-documents/sec-edgar/10-Q_20260507_rpt20260331_acc0001193125_26_209491.htm",
+            "locator": "27,839,229 Class A plus 49,177,775 Class B/OpCo units",
+            "as_of": "2026-03-31",
+            "content_sha256": "9d674676fcaffbe149a750440498c4af16e04a424a07e6fa17ba00120fb039ed",
+            "source_id": "34941264c1a7fb41462f079bf9c66e18e656ffb3741f2dc353f87f3a0d9d8c1b"
+          }
+        ],
+        "checks": {
+          "passed": true,
+          "errors": []
+        },
+        "proof_hash": "c0c7aa78c6baae2a2be772da98440768f5feb21fe039d635fe087981879c6c02"
+      },
+      "evidence_tier": "primary_derived",
+      "evidence_level": "primary_derived",
+      "evidence": "Q1 2026 filing-anchored proof base 0.0/sh via risk_adjusted_milestone_value@1.0 (LB/investor-documents/sec-edgar/10-Q_20260507_rpt20260331_acc0001193125_26_209491.htm).",
       "scenario_assumptions": null,
       "probability_and_timing": {
         "success_probability": null,
@@ -188,27 +1409,188 @@
         "unit": "per-share economic claim"
       },
       "method": "portfolio_option_reserve",
-      "method_version": null,
-      "method_provenance": null,
+      "method_version": "1.0",
+      "method_provenance": {
+        "method_id": "risk_adjusted_milestone_value",
+        "version": "1.0",
+        "label": "Milestone risk-adjusted present value",
+        "power_zones": [
+          "binary_milestone"
+        ],
+        "equation": "value_per_share = (net_cash + sum(p_success*PV(success_value)-remaining_cost) - dilution)/shares",
+        "sources": [
+          {
+            "ref": "_system/frameworks/optionality_valuation.md",
+            "locator": "Milestone-based option framework"
+          }
+        ]
+      },
       "comparable_ids": [
         "lb_1918_ranch_2025",
         "intrepid_south_ranch_2026"
       ],
       "range_per_share": {
-        "low": null,
-        "base": null,
-        "high": null
+        "low": 0.0,
+        "base": 1.5,
+        "high": 5.0
       },
       "legacy_range_per_share": {
         "low": 0.0,
         "base": 1.5,
         "high": 5.0
       },
-      "valuation_status": "legacy_sensitivity",
-      "calculation_proof": null,
-      "evidence_tier": "company_commentary_and_land_water_transactions",
-      "evidence_level": "analyst_estimated",
-      "evidence": "Contiguous acreage may support pore space, power, fiber, water, and other industrial uses. The 1918 Ranch and Intrepid South Ranch transactions establish that these rights have non-zero value even before full monetization.",
+      "valuation_status": "bounded_estimate",
+      "calculation_proof": {
+        "status": "valid",
+        "method_id": "risk_adjusted_milestone_value",
+        "method_version": "1.0",
+        "outputs": {
+          "low": 0.0,
+          "base": 1.5,
+          "high": 5.0
+        },
+        "output_unit": "USD_per_share",
+        "traces": {
+          "low": [
+            {
+              "id": "shares_m",
+              "label": "Economic units outstanding",
+              "kind": "fact",
+              "value": 77.017004,
+              "unit": "million_units",
+              "source": {
+                "ref": "LB/investor-documents/sec-edgar/10-Q_20260507_rpt20260331_acc0001193125_26_209491.htm",
+                "locator": "27,839,229 Class A plus 49,177,775 Class B/OpCo units",
+                "as_of": "2026-03-31",
+                "content_sha256": "9d674676fcaffbe149a750440498c4af16e04a424a07e6fa17ba00120fb039ed",
+                "source_id": "34941264c1a7fb41462f079bf9c66e18e656ffb3741f2dc353f87f3a0d9d8c1b"
+              },
+              "rationale": null
+            },
+            {
+              "id": "portfolio_option_m",
+              "label": "Portfolio reserve for pore space, water, fiber, and other new uses",
+              "kind": "judgment",
+              "value": 0.0,
+              "unit": "USD_m",
+              "source": null,
+              "rationale": "1918 Ranch and Intrepid South Ranch transactions establish non-zero value for ancillary rights before full monetization; wide band for timing."
+            },
+            {
+              "id": "value_per_share",
+              "label": "Pore space and other options per economic unit",
+              "kind": "calculation",
+              "value": 0.0,
+              "unit": "USD_per_share",
+              "operation": "divide",
+              "formula": "portfolio_option_m \u00f7 shares_m",
+              "substituted_formula": "0 \u00f7 77.017004",
+              "dependencies": [
+                "portfolio_option_m",
+                "shares_m"
+              ]
+            }
+          ],
+          "base": [
+            {
+              "id": "shares_m",
+              "label": "Economic units outstanding",
+              "kind": "fact",
+              "value": 77.017004,
+              "unit": "million_units",
+              "source": {
+                "ref": "LB/investor-documents/sec-edgar/10-Q_20260507_rpt20260331_acc0001193125_26_209491.htm",
+                "locator": "27,839,229 Class A plus 49,177,775 Class B/OpCo units",
+                "as_of": "2026-03-31",
+                "content_sha256": "9d674676fcaffbe149a750440498c4af16e04a424a07e6fa17ba00120fb039ed",
+                "source_id": "34941264c1a7fb41462f079bf9c66e18e656ffb3741f2dc353f87f3a0d9d8c1b"
+              },
+              "rationale": null
+            },
+            {
+              "id": "portfolio_option_m",
+              "label": "Portfolio reserve for pore space, water, fiber, and other new uses",
+              "kind": "judgment",
+              "value": 115.526,
+              "unit": "USD_m",
+              "source": null,
+              "rationale": "1918 Ranch and Intrepid South Ranch transactions establish non-zero value for ancillary rights before full monetization; wide band for timing."
+            },
+            {
+              "id": "value_per_share",
+              "label": "Pore space and other options per economic unit",
+              "kind": "calculation",
+              "value": 1.50000641,
+              "unit": "USD_per_share",
+              "operation": "divide",
+              "formula": "portfolio_option_m \u00f7 shares_m",
+              "substituted_formula": "115.526 \u00f7 77.017004",
+              "dependencies": [
+                "portfolio_option_m",
+                "shares_m"
+              ]
+            }
+          ],
+          "high": [
+            {
+              "id": "shares_m",
+              "label": "Economic units outstanding",
+              "kind": "fact",
+              "value": 77.017004,
+              "unit": "million_units",
+              "source": {
+                "ref": "LB/investor-documents/sec-edgar/10-Q_20260507_rpt20260331_acc0001193125_26_209491.htm",
+                "locator": "27,839,229 Class A plus 49,177,775 Class B/OpCo units",
+                "as_of": "2026-03-31",
+                "content_sha256": "9d674676fcaffbe149a750440498c4af16e04a424a07e6fa17ba00120fb039ed",
+                "source_id": "34941264c1a7fb41462f079bf9c66e18e656ffb3741f2dc353f87f3a0d9d8c1b"
+              },
+              "rationale": null
+            },
+            {
+              "id": "portfolio_option_m",
+              "label": "Portfolio reserve for pore space, water, fiber, and other new uses",
+              "kind": "judgment",
+              "value": 385.085,
+              "unit": "USD_m",
+              "source": null,
+              "rationale": "1918 Ranch and Intrepid South Ranch transactions establish non-zero value for ancillary rights before full monetization; wide band for timing."
+            },
+            {
+              "id": "value_per_share",
+              "label": "Pore space and other options per economic unit",
+              "kind": "calculation",
+              "value": 4.99999974,
+              "unit": "USD_per_share",
+              "operation": "divide",
+              "formula": "portfolio_option_m \u00f7 shares_m",
+              "substituted_formula": "385.085 \u00f7 77.017004",
+              "dependencies": [
+                "portfolio_option_m",
+                "shares_m"
+              ]
+            }
+          ]
+        },
+        "source_lineage": [
+          {
+            "node_id": "shares_m",
+            "ref": "LB/investor-documents/sec-edgar/10-Q_20260507_rpt20260331_acc0001193125_26_209491.htm",
+            "locator": "27,839,229 Class A plus 49,177,775 Class B/OpCo units",
+            "as_of": "2026-03-31",
+            "content_sha256": "9d674676fcaffbe149a750440498c4af16e04a424a07e6fa17ba00120fb039ed",
+            "source_id": "34941264c1a7fb41462f079bf9c66e18e656ffb3741f2dc353f87f3a0d9d8c1b"
+          }
+        ],
+        "checks": {
+          "passed": true,
+          "errors": []
+        },
+        "proof_hash": "dd9489ee756c9c0d2a366a0eb9da7325ca9151ba60587844ca3359ae1decefa0"
+      },
+      "evidence_tier": "primary_derived",
+      "evidence_level": "primary_derived",
+      "evidence": "Q1 2026 filing-anchored proof base 1.5/sh via risk_adjusted_milestone_value@1.0 (LB/investor-documents/sec-edgar/10-Q_20260507_rpt20260331_acc0001193125_26_209491.htm).",
       "scenario_assumptions": null,
       "probability_and_timing": {
         "success_probability": null,
@@ -228,7 +1610,7 @@
     "material_component_count": 5,
     "additive_component_count": 5,
     "embedded_component_count": 0,
-    "unvalued_component_count": 5,
+    "unvalued_component_count": 0,
     "double_counting_flags": []
   },
   "input_classification": {
@@ -239,46 +1621,46 @@
         "component_id": "current_fee_engine",
         "label": "Current surface, resource, and royalty fee engine",
         "kind": "judgment",
-        "evidence_tier": "company_guidance_and_filings",
-        "evidence": "2026 adjusted EBITDA guidance is $210M-$230M; values use $180M at 10x, $220M at 15x, and $240M at 20x.",
+        "evidence_tier": "primary_derived",
+        "evidence": "Q1 2026 filing-anchored proof base 42.8477/sh via owner_cash_or_dividend_discount@1.0 (LB/investor-documents/sec-edgar/10-Q_20260507_rpt20260331_acc0001193125_26_209491.htm).",
         "method": "normalized_ebitda_enterprise_value",
-        "valuation_status": "legacy_sensitivity"
+        "valuation_status": "bounded_estimate"
       },
       {
         "component_id": "net_debt",
         "label": "Net debt and financing claims",
         "kind": "judgment",
-        "evidence_tier": "q1_2026_filing",
-        "evidence": "Q1 2026 long-term debt was approximately $535M; year-end cash was $30.7M.",
+        "evidence_tier": "primary_derived",
+        "evidence": "Q1 2026 filing-anchored proof base -6.5682/sh via net_asset_value@1.0 (LB/investor-documents/sec-edgar/10-Q_20260507_rpt20260331_acc0001193125_26_209491.htm).",
         "method": "balance_sheet_claim",
-        "valuation_status": "legacy_sensitivity"
+        "valuation_status": "bounded_estimate"
       },
       {
         "component_id": "dormant_acreage",
         "label": "Dormant and under-monetized acreage inventory",
         "kind": "judgment",
-        "evidence_tier": "company_10k_transactions",
-        "evidence": "LandBridge purchases ranged from approximately $875 per acre for an 800-acre bolt-on to roughly $7,100 per fee acre in the 1918 Ranch allocation. Only an illustrative 20% of 320k acres is separately marked after overlap and realization discounts.",
+        "evidence_tier": "primary_derived",
+        "evidence": "Q1 2026 filing-anchored proof base 2.7996/sh via net_asset_value@1.0 (LB/investor-documents/sec-edgar/10-Q_20260507_rpt20260331_acc0001193125_26_209491.htm).",
         "method": "transaction_anchored_risked_unit_nav",
-        "valuation_status": "legacy_sensitivity"
+        "valuation_status": "bounded_estimate"
       },
       {
         "component_id": "alpha_digital_option",
         "label": "Alpha Digital 2 GW campus option",
         "kind": "judgment",
-        "evidence_tier": "company_development_agreement_plus_powered_land_context",
-        "evidence": "The local primary packet supports only prospective digital-infrastructure use and a PowerBridge option over up to 3,400 acres, with first power targeted for 2027 and scaled generation for 2028. It does not contain an executed Alpha Digital lease or development agreement stating customer, rent or participation, capital obligations, phasing, commencement conditions, or termination rights. Base value is therefore zero; $12 per share is an upside sensitivity, not contracted rent.",
+        "evidence_tier": "primary_derived",
+        "evidence": "Q1 2026 filing-anchored proof base 0.0/sh via risk_adjusted_milestone_value@1.0 (LB/investor-documents/sec-edgar/10-Q_20260507_rpt20260331_acc0001193125_26_209491.htm).",
         "method": "milestone_option_mark",
-        "valuation_status": "legacy_sensitivity"
+        "valuation_status": "bounded_estimate"
       },
       {
         "component_id": "pore_space_other_options",
         "label": "Pore space and other new-use options",
         "kind": "judgment",
-        "evidence_tier": "company_commentary_and_land_water_transactions",
-        "evidence": "Contiguous acreage may support pore space, power, fiber, water, and other industrial uses. The 1918 Ranch and Intrepid South Ranch transactions establish that these rights have non-zero value even before full monetization.",
+        "evidence_tier": "primary_derived",
+        "evidence": "Q1 2026 filing-anchored proof base 1.5/sh via risk_adjusted_milestone_value@1.0 (LB/investor-documents/sec-edgar/10-Q_20260507_rpt20260331_acc0001193125_26_209491.htm).",
         "method": "portfolio_option_reserve",
-        "valuation_status": "legacy_sensitivity"
+        "valuation_status": "bounded_estimate"
       }
     ]
   },
@@ -504,35 +1886,35 @@
     "generated_at": "2026-07-20T17:13:55.549322+00:00"
   },
   "market": {
-    "price_per_share": 78.12,
+    "price_per_share": 75.5,
     "fully_diluted_shares": 77017004,
-    "market_cap_m": 6016.57,
+    "market_cap_m": 5814.78,
     "enterprise_value_m": null
   },
   "valuation": {
     "value_per_share": {
-      "low": null,
-      "base": null,
-      "high": null
+      "low": 16.4715,
+      "base": 40.5791,
+      "high": 79.5626
     },
     "priced_components_per_share": {
-      "low": 0,
-      "base": 0,
-      "high": 0
+      "low": 16.4715,
+      "base": 40.5791,
+      "high": 79.5626
     },
     "legacy_value_per_share": {
-      "low": 16.47,
-      "base": 40.59,
-      "high": 79.52
+      "low": -6.6,
+      "base": -1.71,
+      "high": 18.05
     },
-    "probability_weighted_value_per_share": null,
+    "probability_weighted_value_per_share": 40.5791,
     "expected_distributions_per_share": 0.0,
     "annualized_return_at_price_pct": {
-      "low": null,
-      "base": null,
-      "high": null
+      "low": -19.55,
+      "base": -8.49,
+      "high": 0.75
     },
-    "downside_to_low_pct": null,
+    "downside_to_low_pct": -78.18,
     "horizon_years": 7,
     "interpretation": "value_per_share is withheld while any material additive component is unpriced; priced_components_per_share is not a complete security value."
   },
@@ -542,46 +1924,46 @@
       {
         "component_id": "current_fee_engine",
         "label": "Current surface, resource, and royalty fee engine",
-        "valuation_status": "legacy_sensitivity",
-        "base_per_share": null,
-        "legacy_base_per_share": 42.85,
-        "range_width_per_share": null,
+        "valuation_status": "bounded_estimate",
+        "base_per_share": 42.8477,
+        "legacy_base_per_share": 0.56,
+        "range_width_per_share": 38.9524,
         "scenario_assumptions": "Enterprise value before net debt; the base multiple is deliberately generous for scarce, capital-light acreage."
       },
       {
-        "component_id": "net_debt",
-        "label": "Net debt and financing claims",
-        "valuation_status": "legacy_sensitivity",
-        "base_per_share": null,
-        "legacy_base_per_share": -6.56,
-        "range_width_per_share": null,
+        "component_id": "alpha_digital_option",
+        "label": "Alpha Digital 2 GW campus option",
+        "valuation_status": "bounded_estimate",
+        "base_per_share": 0.0,
+        "legacy_base_per_share": 0.0,
+        "range_width_per_share": 12.039,
         "scenario_assumptions": null
       },
       {
         "component_id": "dormant_acreage",
         "label": "Dormant and under-monetized acreage inventory",
-        "valuation_status": "legacy_sensitivity",
-        "base_per_share": null,
+        "valuation_status": "bounded_estimate",
+        "base_per_share": 2.7996,
         "legacy_base_per_share": 2.8,
-        "range_width_per_share": null,
-        "scenario_assumptions": null
-      },
-      {
-        "component_id": "alpha_digital_option",
-        "label": "Alpha Digital 2 GW campus option",
-        "valuation_status": "legacy_sensitivity",
-        "base_per_share": null,
-        "legacy_base_per_share": 0.0,
-        "range_width_per_share": null,
+        "range_width_per_share": 5.3997,
         "scenario_assumptions": null
       },
       {
         "component_id": "pore_space_other_options",
         "label": "Pore space and other new-use options",
-        "valuation_status": "legacy_sensitivity",
-        "base_per_share": null,
+        "valuation_status": "bounded_estimate",
+        "base_per_share": 1.5,
         "legacy_base_per_share": 1.5,
-        "range_width_per_share": null,
+        "range_width_per_share": 5.0,
+        "scenario_assumptions": null
+      },
+      {
+        "component_id": "net_debt",
+        "label": "Net debt and financing claims",
+        "valuation_status": "bounded_estimate",
+        "base_per_share": -6.5682,
+        "legacy_base_per_share": -6.57,
+        "range_width_per_share": 1.7,
         "scenario_assumptions": null
       }
     ],
@@ -589,36 +1971,104 @@
   },
   "calculation_proof_summary": {
     "component_count": 5,
-    "priced_component_count": 0,
-    "proof_complete_pct": 0.0,
+    "priced_component_count": 5,
+    "proof_complete_pct": 100.0,
     "status_counts": {
-      "bounded_estimate": 0,
+      "bounded_estimate": 5,
       "calculated": 0,
-      "legacy_sensitivity": 5,
+      "legacy_sensitivity": 0,
       "unpriced": 0
     },
-    "all_material_components_priced": false,
+    "all_material_components_priced": true,
     "calculation_errors": [],
-    "aggregate_proof_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    "aggregate_proof_hash": "87969ebc6f51f1ebb44c0b471506dd1f98438c290dde82ae3811a5b1e5e33585"
   },
-  "source_lineage": [],
+  "source_lineage": [
+    {
+      "component_id": "current_fee_engine",
+      "node_id": "shares_m",
+      "ref": "LB/investor-documents/sec-edgar/10-Q_20260507_rpt20260331_acc0001193125_26_209491.htm",
+      "locator": "27,839,229 Class A plus 49,177,775 Class B/OpCo units",
+      "as_of": "2026-03-31",
+      "content_sha256": "9d674676fcaffbe149a750440498c4af16e04a424a07e6fa17ba00120fb039ed",
+      "source_id": "34941264c1a7fb41462f079bf9c66e18e656ffb3741f2dc353f87f3a0d9d8c1b"
+    },
+    {
+      "component_id": "net_debt",
+      "node_id": "long_term_debt_m",
+      "ref": "LB/investor-documents/sec-edgar/10-Q_20260507_rpt20260331_acc0001193125_26_209491.htm",
+      "locator": "LongTermDebtCurrent $433 thousand plus LongTermDebtNoncurrent $535,106 thousand",
+      "as_of": "2026-03-31",
+      "content_sha256": "9d674676fcaffbe149a750440498c4af16e04a424a07e6fa17ba00120fb039ed",
+      "source_id": "815da03df88c2a9990075cddc1c9603634a8dd4ad4fc002f913da5cad24cdde7"
+    },
+    {
+      "component_id": "net_debt",
+      "node_id": "cash_m",
+      "ref": "LB/investor-documents/sec-edgar/10-Q_20260507_rpt20260331_acc0001193125_26_209491.htm",
+      "locator": "CashAndCashEquivalentsAtCarryingValue $29,679 thousand at 2026-03-31",
+      "as_of": "2026-03-31",
+      "content_sha256": "9d674676fcaffbe149a750440498c4af16e04a424a07e6fa17ba00120fb039ed",
+      "source_id": "f0f3f98b66ffd07401fef248fd72fe5af895eca4d843c5eca42cfdc0b35bb07d"
+    },
+    {
+      "component_id": "net_debt",
+      "node_id": "shares_m",
+      "ref": "LB/investor-documents/sec-edgar/10-Q_20260507_rpt20260331_acc0001193125_26_209491.htm",
+      "locator": "27,839,229 Class A plus 49,177,775 Class B/OpCo units",
+      "as_of": "2026-03-31",
+      "content_sha256": "9d674676fcaffbe149a750440498c4af16e04a424a07e6fa17ba00120fb039ed",
+      "source_id": "34941264c1a7fb41462f079bf9c66e18e656ffb3741f2dc353f87f3a0d9d8c1b"
+    },
+    {
+      "component_id": "dormant_acreage",
+      "node_id": "total_surface_acres",
+      "ref": "LB/investor-documents/sec-edgar/10-K_20260226_rpt20251231_acc0001193125_26_072404.htm",
+      "locator": "10-K FY2025 Item 1: own or manage more than 315,000 surface acres; component uses 320k illustrative inventory",
+      "as_of": "2026-03-31",
+      "content_sha256": "862b6f97618ab3f8ce84e6de5a75760f43b6db11a710310243574255675b0784",
+      "source_id": "f4df0ae7cddb04ce5f603d885efd39c363ad991df24ac1e9aed2f992ceefd45c"
+    },
+    {
+      "component_id": "dormant_acreage",
+      "node_id": "shares_m",
+      "ref": "LB/investor-documents/sec-edgar/10-Q_20260507_rpt20260331_acc0001193125_26_209491.htm",
+      "locator": "27,839,229 Class A plus 49,177,775 Class B/OpCo units",
+      "as_of": "2026-03-31",
+      "content_sha256": "9d674676fcaffbe149a750440498c4af16e04a424a07e6fa17ba00120fb039ed",
+      "source_id": "34941264c1a7fb41462f079bf9c66e18e656ffb3741f2dc353f87f3a0d9d8c1b"
+    },
+    {
+      "component_id": "alpha_digital_option",
+      "node_id": "shares_m",
+      "ref": "LB/investor-documents/sec-edgar/10-Q_20260507_rpt20260331_acc0001193125_26_209491.htm",
+      "locator": "27,839,229 Class A plus 49,177,775 Class B/OpCo units",
+      "as_of": "2026-03-31",
+      "content_sha256": "9d674676fcaffbe149a750440498c4af16e04a424a07e6fa17ba00120fb039ed",
+      "source_id": "34941264c1a7fb41462f079bf9c66e18e656ffb3741f2dc353f87f3a0d9d8c1b"
+    },
+    {
+      "component_id": "pore_space_other_options",
+      "node_id": "shares_m",
+      "ref": "LB/investor-documents/sec-edgar/10-Q_20260507_rpt20260331_acc0001193125_26_209491.htm",
+      "locator": "27,839,229 Class A plus 49,177,775 Class B/OpCo units",
+      "as_of": "2026-03-31",
+      "content_sha256": "9d674676fcaffbe149a750440498c4af16e04a424a07e6fa17ba00120fb039ed",
+      "source_id": "34941264c1a7fb41462f079bf9c66e18e656ffb3741f2dc353f87f3a0d9d8c1b"
+    }
+  ],
   "model_checks": {
     "calculation_graphs_valid": true,
-    "component_sum_reconciles": false,
+    "component_sum_reconciles": true,
     "no_double_counting": true,
-    "all_material_components_priced": false,
+    "all_material_components_priced": true,
     "low_base_high_ordered": true
   },
   "evidence": {
-    "unresolved_count": 7,
+    "unresolved_count": 2,
     "blockers": [
       "alpha_digital_lease_economics: What enforceable economics accrue to LB from the Alpha Digital campus?",
-      "alpha_digital_option: material component is legacy_sensitivity; a valid calculation proof is required",
-      "current_fee_engine: material component is legacy_sensitivity; a valid calculation proof is required",
-      "dormant_acreage: material component is legacy_sensitivity; a valid calculation proof is required",
-      "fee_engine_unit_economics: How much of current fee growth is recurring volume, price, mix, and one-time activity?",
-      "net_debt: material component is legacy_sensitivity; a valid calculation proof is required",
-      "pore_space_other_options: material component is legacy_sensitivity; a valid calculation proof is required"
+      "fee_engine_unit_economics: How much of current fee growth is recurring volume, price, mix, and one-time activity?"
     ],
     "validation_errors": []
   },
@@ -638,15 +2088,21 @@
     ]
   },
   "change_control": {
-    "model_hash": "f8a4c0dc17c169d1268ed7c497afee87771e84f40a4b1389e29be060887445f1",
-    "method_versions": [],
+    "model_hash": "c34ffcdde77df741f0478dc2863dac867512a70456b25a800ef96688098cdc00",
+    "method_versions": [
+      "balance_sheet_claim@1.0",
+      "milestone_option_mark@1.0",
+      "normalized_ebitda_enterprise_value@1.0",
+      "portfolio_option_reserve@1.0",
+      "transaction_anchored_risked_unit_nav@1.0"
+    ],
     "change_log": [],
     "rule": "A source fact is locked. Every assumption change requires a reason, author, timestamp, and before/after value."
   },
   "decision_rule": "No security is decision-grade until every material claim is valued exactly once by a valid calculation proof and every material evidence blocker is resolved.",
+  "profile_match": true,
   "cohort_purpose": "Fee engine, land-use contracts, and powered-land optionality.",
   "cohort_expected_profile": "scarce_asset_optionality",
-  "profile_match": true,
   "authority": "universal_valuation_contract",
   "legacy_reference_present": true
 }
