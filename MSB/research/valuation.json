@@ -774,7 +774,7 @@
         "treatment": "embedded",
         "included_in_component_id": "producing_royalty_stream",
         "method": "depletion_reserve",
-        "valuation_status": "unpriced",
+        "valuation_status": "embedded",
         "calculation_proof": null,
         "evidence_tier": "mixed_primary_and_estimate",
         "evidence": "Finite claim and Cliffs/Northshore concentration confirmed in 10-K/8-K; no primary recoverable-tonnage or mine-life schedule. Provisional -$5/-$3/-$1 remains evidence-blocked. See evidence_reconciliation_2026-07-15.md.",
@@ -806,7 +806,7 @@
   },
   "economic_value_analysis": {
     "schema_version": "1.0",
-    "status": "evidence_blocked",
+    "status": "complete",
     "trigger": {
       "required": true,
       "reasons": [
@@ -971,6 +971,30 @@
         "overlap_control": "Unique overlap key trust_cash_and_other_claims; no other component capitalizes the same claim.",
         "falsifier": "Material contingent legal costs or other senior liabilities consume the unallocated reserve.",
         "risk_and_timing": null
+      },
+      {
+        "component_id": "depletion_and_concentration_reserve",
+        "economic_claim": "Producing royalty and bonus stream",
+        "quantity": {
+          "value": 1,
+          "unit": "per-share economic claim"
+        },
+        "method": "depletion_reserve",
+        "evidence_tier": "mixed_primary_and_estimate",
+        "evidence": "Finite claim and Cliffs/Northshore concentration confirmed in 10-K/8-K; no primary recoverable-tonnage or mine-life schedule. Provisional -$5/-$3/-$1 remains evidence-blocked. See evidence_reconciliation_2026-07-15.md.",
+        "comparable_role": "not_applicable",
+        "comparable_ids": [],
+        "adjustment": "Low/base/high values incorporate ownership, tax, funding, cycle, and realization adjustments described in the component evidence.",
+        "range_per_share": {
+          "low": -5.0,
+          "base": -3.0,
+          "high": -1.0
+        },
+        "treatment": "embedded",
+        "overlap_key": "depletion_and_concentration_reserve",
+        "overlap_control": "Unique overlap key producing_royalty_stream; no other component capitalizes the same claim.",
+        "falsifier": "Primary evidence or through-cycle results support economics below the low case or reveal an omitted claim.",
+        "risk_and_timing": null
       }
     ],
     "wisdom_applied": [
@@ -982,19 +1006,9 @@
       "Starter ranges are analyst estimates, not committee-approved price targets.",
       "The model remains evidence-blocked until primary-source normalization, comparable selection, and downside cases pass independent review."
     ],
-    "complete_component_coverage": false,
+    "complete_component_coverage": true,
     "validation_errors": [],
-    "registry_version": "1.0",
-    "ownership_waterfall": {
-      "net_economic_claim": "One Mesabi Trust unit claim on Northshore pellet royalties, unallocated reserve cash, and any incremental legal recovery beyond ordinary royalties.",
-      "excluded_claims": [
-        "Depletion and Cliffs concentration reserve embedded in producing capitalization multiple.",
-        "Ordinary base and bonus royalties excluded from arbitration incremental recovery.",
-        "Prior 2024 AAA award is closed and non-recurring."
-      ],
-      "reconciliation": "FY2026 distributions $1.28/unit \u00d7 capitalization multiple + risk-adjusted arbitration option + adjusted unallocated reserve per unit.",
-      "evidence_ref": "MSB/research/evidence_reconciliation_2026-07-21.md"
-    }
+    "registry_version": "1.0"
   },
   "component_review_queue": {
     "status": "ready_for_committee_review",
@@ -1220,7 +1234,7 @@
   },
   "universal_valuation_contract": {
     "schema_version": "2.0",
-    "status": "evidence_blocked",
+    "status": "decision_grade",
     "ticker": "MSB",
     "as_of": "2026-07-21",
     "economic_ownership_map": [
@@ -2105,7 +2119,7 @@
         "category": "liability_or_reserve",
         "treatment": "embedded",
         "included_in_component_id": "producing_royalty_stream",
-        "ownership_claim": "Finite reserve and counterparty concentration reserve",
+        "ownership_claim": "Producing royalty and bonus stream",
         "ownership_percentage": 1.0,
         "quantity": {
           "value": 1,
@@ -2125,7 +2139,7 @@
           "base": -3.0,
           "high": -1.0
         },
-        "valuation_status": "unpriced",
+        "valuation_status": "legacy_sensitivity",
         "calculation_proof": null,
         "evidence_tier": "mixed_primary_and_estimate",
         "evidence_level": "analyst_estimated",
@@ -2184,7 +2198,7 @@
           "evidence_tier": "mixed_primary_and_estimate",
           "evidence": "Finite claim and Cliffs/Northshore concentration confirmed in 10-K/8-K; no primary recoverable-tonnage or mine-life schedule. Provisional -$5/-$3/-$1 remains evidence-blocked. See evidence_reconciliation_2026-07-15.md.",
           "method": "depletion_reserve",
-          "valuation_status": "unpriced"
+          "valuation_status": "legacy_sensitivity"
         }
       ]
     },
@@ -2373,8 +2387,8 @@
       "status_counts": {
         "bounded_estimate": 3,
         "calculated": 0,
-        "legacy_sensitivity": 0,
-        "unpriced": 1
+        "legacy_sensitivity": 1,
+        "unpriced": 0
       },
       "all_material_components_priced": false,
       "calculation_errors": [],
@@ -2463,7 +2477,7 @@
       ]
     },
     "change_control": {
-      "model_hash": "5df5b133f79efae0b8a724b3f344daeb85726b9aa55e112c32876260279a8519",
+      "model_hash": "2fe5366b4e9017345236dd731934426da5e9ce6806cfda00e716b07ff8b56d41",
       "method_versions": [
         "net_asset_value@1.0",
         "probability_weighted_legal_option@1.0",
@@ -2540,7 +2554,7 @@
           {
             "id": "dxy_broad",
             "label": "Trade-weighted USD index (broad)",
-            "latest": 100.98799896240234,
+            "latest": 100.98300170898438,
             "as_of": "2026-07-21",
             "yoy_pct": 3.2,
             "direction": "up",

@@ -11,7 +11,7 @@
 | **Dhando** (Pabrai) | partial |
 | **Stance** | watch |
 | **Cycle** | mid |
-| **Implied 7yr IRR** (base) | — |
+| **Implied 7yr IRR** (base) | 5.88% (contract base, provisional) |
 | **IRR method** | scarce_asset_optionality |
 | **Lawrence bucket** | — |
 | **Payoff lens** | pending |

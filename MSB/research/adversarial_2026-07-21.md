@@ -47,12 +47,9 @@ re_pass: false
 
 | Check | Expected (valuation.json) | Found in dive | OK? |
 |-------|---------------------------|---------------|-----|
-| Returns statement | n/a | None% | — |
-| Classification IRR | n/a | None% | — |
-| Valuation bridge base | n/a | None% | — |
-
-**Lint notes:**
-- MSB/research: adversarial date adversarial_2026-05-29.md != dive 2026-07-21
+| Returns statement | n/a | 5.9% | — |
+| Classification IRR | n/a | 5.88% | — |
+| Valuation bridge base | n/a | 5.9% | — |
 
 ---
 

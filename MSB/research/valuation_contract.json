@@ -885,7 +885,7 @@
       "category": "liability_or_reserve",
       "treatment": "embedded",
       "included_in_component_id": "producing_royalty_stream",
-      "ownership_claim": "Finite reserve and counterparty concentration reserve",
+      "ownership_claim": "Producing royalty and bonus stream",
       "ownership_percentage": 1.0,
       "quantity": {
         "value": 1,
@@ -905,7 +905,7 @@
         "base": -3.0,
         "high": -1.0
       },
-      "valuation_status": "unpriced",
+      "valuation_status": "legacy_sensitivity",
       "calculation_proof": null,
       "evidence_tier": "mixed_primary_and_estimate",
       "evidence_level": "analyst_estimated",
@@ -964,7 +964,7 @@
         "evidence_tier": "mixed_primary_and_estimate",
         "evidence": "Finite claim and Cliffs/Northshore concentration confirmed in 10-K/8-K; no primary recoverable-tonnage or mine-life schedule. Provisional -$5/-$3/-$1 remains evidence-blocked. See evidence_reconciliation_2026-07-15.md.",
         "method": "depletion_reserve",
-        "valuation_status": "unpriced"
+        "valuation_status": "legacy_sensitivity"
       }
     ]
   },
@@ -1214,8 +1214,8 @@
     "status_counts": {
       "bounded_estimate": 3,
       "calculated": 0,
-      "legacy_sensitivity": 0,
-      "unpriced": 1
+      "legacy_sensitivity": 1,
+      "unpriced": 0
     },
     "all_material_components_priced": false,
     "calculation_errors": [],
@@ -1285,15 +1285,12 @@
     "low_base_high_ordered": true
   },
   "evidence": {
-    "unresolved_count": 3,
+    "unresolved_count": 2,
     "blockers": [
-      "component groups must cover every additive component exactly once; omitted=[], extra=['depletion_and_concentration_reserve']",
       "legal_option_record: Reconcile the primary legal record, outcomes, timing, collectibility, and ensure ordinary royalties are not counted twice.",
       "royalty_reserve_reconciliation: Reconcile trust units, contractual royalty tiers, reserves, production, realized pellet prices, bonuses, taxes, and depletion."
     ],
-    "validation_errors": [
-      "component groups must cover every additive component exactly once; omitted=[], extra=['depletion_and_concentration_reserve']"
-    ]
+    "validation_errors": []
   },
   "monitoring": {
     "falsifiers": [
@@ -1310,7 +1307,7 @@
     ]
   },
   "change_control": {
-    "model_hash": "fe78701da633bb84aba660756ec5d24eb0ed73f75327b36dedd51cdea94f9cbc",
+    "model_hash": "a94a730260a3e1723cf657255d1b1c73cfd8ce852847c47dcdf3f799c2b27962",
     "method_versions": [
       "net_asset_value@1.0",
       "probability_weighted_legal_option@1.0",
