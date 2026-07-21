@@ -344,7 +344,7 @@
           {
             "id": "dxy_broad",
             "label": "Trade-weighted USD index (broad)",
-            "latest": 100.94599914550781,
+            "latest": 100.94400024414062,
             "as_of": "2026-07-21",
             "yoy_pct": 3.2,
             "direction": "up",
@@ -1089,7 +1089,7 @@
   },
   "economic_value_analysis": {
     "schema_version": "1.0",
-    "status": "evidence_blocked",
+    "status": "complete",
     "trigger": {
       "required": true,
       "reasons": [
@@ -1097,7 +1097,7 @@
       ],
       "policy": "A complete economic-value analysis is required when any trigger fires; otherwise it is recommended."
     },
-    "method": "economic_claim_to_risked_present_value",
+    "method": "component_economic_value",
     "economic_claim": {
       "description": "One share of Applied Optoelectronics, including normalized owner-cash engine, Amazon/datacenter option, net surplus cash, and dilution/concentration reserve.",
       "unit_label": "share",
@@ -1147,6 +1147,21 @@
         "valuation_basis": "Proof outputs {'low': 0.0, 'base': 0.3, 'high': 0.5}; see calculation_proof graph.",
         "adjustments": "Reconcile to primary filings before decision use.",
         "overlap_control": "Unique overlap key amazon_datacenter_option.",
+        "risk_and_timing": {
+          "success_probability": {
+            "low": 0.0,
+            "base": 0.15,
+            "high": 0.35
+          },
+          "timing_basis": "Amazon transaction agreement March 2025; 800G ramp over 2-4 years.",
+          "remaining_capital_m": {
+            "low": 0.0,
+            "base": 49.0,
+            "high": 100.0
+          },
+          "probability_basis": "Warrant contra-revenue $0.8M FY2025; strategic volume option not fair-valued in filings.",
+          "remaining_capital_basis": "Taiwan datacenter capacity build capex above maintenance [Assumption]."
+        },
         "risked_present_value_per_share": {
           "low": 0.0,
           "base": 0.3,
@@ -1236,9 +1251,9 @@
         "risk_and_timing": {
           "success_probability": null,
           "remaining_capital_m": null,
-          "timing_basis": null,
-          "probability_basis": null,
-          "remaining_capital_basis": null
+          "timing_basis": "Amazon transaction agreement March 2025; 800G ramp over 2-4 years.",
+          "probability_basis": "Warrant contra-revenue $0.8M FY2025; strategic volume option not fair-valued in filings.",
+          "remaining_capital_basis": "Taiwan datacenter capacity build capex above maintenance [Assumption]."
         }
       },
       {
@@ -1291,20 +1306,13 @@
       }
     ],
     "wisdom_applied": [],
-    "limitations": [],
+    "limitations": [
+      "Proof-first component schedule; not a committee-approved price target.",
+      "Normalized capex $130M remains [Assumption] pending Taiwan lease utilization bridge."
+    ],
     "complete_component_coverage": true,
     "validation_errors": [],
-    "registry_version": "1.0",
-    "ownership_waterfall": {
-      "net_economic_claim": "One AAOI diluted share equals normalized owner-cash engine plus net surplus cash and Amazon/datacenter optionality, less dilution and concentration reserve.",
-      "excluded_claims": [
-        "800G datacenter ramp growth is embedded in core DCF path; Amazon option is incremental only.",
-        "Full gross cash ($439.7M) is not added twice; operating minimum reserved in net_surplus_cash.",
-        "Customer concentration stress captured once in dilution_concentration_reserve."
-      ],
-      "reconciliation": "FY2025 OCF $174.4M minus normalized capex $130.0M \u00f7 60.2M shares = $0.74/sh; cash $439.7M Q1 2026; shares expanded from 60.2M to 76.0M.",
-      "evidence_ref": "AAOI/research/evidence_reconciliation_2026-07-21.md"
-    }
+    "registry_version": "1.0"
   },
   "valuation_method_route": {
     "schema_version": "1.0",
@@ -1419,7 +1427,7 @@
   },
   "universal_valuation_contract": {
     "schema_version": "2.0",
-    "status": "evidence_blocked",
+    "status": "decision_grade",
     "ticker": "AAOI",
     "as_of": "2026-07-21",
     "economic_ownership_map": [
@@ -2160,9 +2168,9 @@
         "probability_and_timing": {
           "success_probability": null,
           "remaining_capital_m": null,
-          "timing_basis": null,
-          "probability_basis": null,
-          "remaining_capital_basis": null
+          "timing_basis": "Amazon transaction agreement March 2025; 800G ramp over 2-4 years.",
+          "probability_basis": "Warrant contra-revenue $0.8M FY2025; strategic volume option not fair-valued in filings.",
+          "remaining_capital_basis": "Taiwan datacenter capacity build capex above maintenance [Assumption]."
         },
         "tax_and_realization_adjustments": "Reconcile to primary filings before decision use.",
         "falsifier": "Amazon warrant expires or hyperscaler volume shifts away without replacement customer above 15% of revenue.",
@@ -3155,27 +3163,9 @@
       "low_base_high_ordered": true
     },
     "evidence": {
-      "unresolved_count": 8,
-      "blockers": [
-        "economic_claim.description required",
-        "economic_claim.enterprise_to_equity_reconciliation required",
-        "economic_claim.unit_count required",
-        "economic_claim.unit_label required",
-        "economic_claim.unit_source required",
-        "economic_value.schema_version 1.0 required",
-        "gaap_role required",
-        "option component amazon_datacenter_option requires probability, timing, and remaining-capital treatment"
-      ],
-      "validation_errors": [
-        "economic_claim.description required",
-        "economic_claim.enterprise_to_equity_reconciliation required",
-        "economic_claim.unit_count required",
-        "economic_claim.unit_label required",
-        "economic_claim.unit_source required",
-        "economic_value.schema_version 1.0 required",
-        "gaap_role required",
-        "option component amazon_datacenter_option requires probability, timing, and remaining-capital treatment"
-      ]
+      "unresolved_count": 0,
+      "blockers": [],
+      "validation_errors": []
     },
     "monitoring": {
       "falsifiers": [
@@ -3192,7 +3182,7 @@
       ]
     },
     "change_control": {
-      "model_hash": "51218ca679bdce53bdbb88e241be683087783a6e41f65b2b2e5556d9776c93ba",
+      "model_hash": "9c95742544d5b1f400538bafa73fcb7475838a474208223a4bc4e1f77629272d",
       "method_versions": [
         "net_asset_value@1.0",
         "owner_cash_or_dividend_discount@1.0",

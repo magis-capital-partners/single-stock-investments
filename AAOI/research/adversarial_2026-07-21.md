@@ -56,7 +56,6 @@ re_pass: false
 
 **Lint notes:**
 - AAOI/research/deep_dive_2026-07-21.md: executive_summary_first_pct 83.0% vs valuation.json base -13.44% (tol 0.25pp)
-- AAOI/research: adversarial date adversarial_2026-07-17.md != dive 2026-07-21
 
 ---
 
