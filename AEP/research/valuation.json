@@ -1,14 +1,801 @@
 {
   "ticker": "AEP",
-  "as_of": "2026-07-20",
-  "method": "price_stub",
+  "as_of": "2026-07-21",
+  "method": "full",
+  "irr_method": "full",
+  "valuation_mode": "economic_value",
+  "method_profile": "predictable_cash_flow",
+  "lawrence_bucket": "regulated_utility",
+  "payoff_lens": "operating",
+  "classification_inputs": {
+    "archetype": "infrastructure",
+    "moat": "narrow",
+    "dhando": "partial",
+    "cycle": "mid",
+    "payoff_lens": "operating"
+  },
   "inputs": {
     "price": 131.05,
+    "price_source": "Yahoo AEP close 2026-07-20",
     "price_as_of": "2026-07-20",
-    "price_source": "Yahoo AEP close 2026-07-20"
+    "shares_millions": 537.468,
+    "shares_outstanding": 537468000,
+    "shares_source": "FY2025 weighted average diluted shares 537.468M (AEP/investor-documents/sec-edgar/10-K_20260212_rpt20251231_acc0000004904_26_000013.htm)",
+    "fcf_per_share": 6.4,
+    "fcf_source": "FY2025 diluted EPS $6.66 less ~4% normalization haircut = $6.4/sh; regulated utility uses earnings power not OCF $6.9B less investing $11.9B",
+    "cash_m": 197.0,
+    "total_debt_m": 47707.0,
+    "normalization_note": "Regulated utility: Lawrence uses normalized owner earnings per share, not raw OCF minus capex. Heavy 2026-2030 capex ($72B plan) is recovered through rate base with regulatory lag."
   },
-  "notes": "Price stub created by fetch_equity_prices.py --create-stub; replace with a real model before decision-grade.",
-  "human_review": {
-    "live_price_confirmed": false
+  "scenarios": {
+    "bear": {
+      "growth_y1_5": 0.03,
+      "growth_y6_10": 0.02,
+      "exit_pfcf_y10": 14,
+      "notes": "Regulatory lag, affordability caps, equity dilution at top of $5.6B plan"
+    },
+    "base": {
+      "growth_y1_5": 0.05,
+      "growth_y6_10": 0.04,
+      "exit_pfcf_y10": 17,
+      "notes": "Rate-base CAGR from $72B capital plan; dividend payout ~56% on normalized earnings"
+    },
+    "bull": {
+      "growth_y1_5": 0.06,
+      "growth_y6_10": 0.05,
+      "exit_pfcf_y10": 18,
+      "notes": "Faster data-center load growth, constructive transmission ROEs, minimal dilution"
+    }
+  },
+  "option_scan": [
+    {
+      "q": 1,
+      "question": "GAAP book misstates core assets?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "Regulated rate base on balance sheet; no land-at-cost pattern"
+    },
+    {
+      "q": 4,
+      "question": "Backlog / contracted revenue not in FCF path?",
+      "answer": "Partial yes",
+      "treatment": "embedded_in_segment",
+      "evidence": "$72B capital plan and data-center load pipeline flow through rate-base growth"
+    },
+    {
+      "q": 7,
+      "question": "Embedded product option in revenue?",
+      "answer": "Yes \u2014 data-center and large-load interconnections",
+      "treatment": "milestone_nav",
+      "evidence": "10-K large-load category includes data centers; separate data_center_load_option component"
+    }
+  ],
+  "growth_explanation": {
+    "mechanism": "Allowed return on $72B 2026-2030 capital plan (transmission, distribution, generation) recovered through state trackers and FERC formula rates; data-center load adds incremental rate-base growth",
+    "filing_cite": "AEP/investor-documents/sec-edgar/10-K_20260212_rpt20251231_acc0000004904_26_000013.htm MD&A Liquidity and Capital Resources",
+    "bear_falsifier": "Operating EPS growth falls below 3% for four consecutive quarters with rising equity issuance",
+    "bull_falsifier": "Large-load interconnections exceed management plan with constructive ROE orders in key states"
+  },
+  "lawrence_horizon_years": 7,
+  "stance_proposal": {
+    "suggested": "watch",
+    "irr_band": "<15%",
+    "gates": {
+      "moat_ok": true,
+      "dhando_ok": true
+    },
+    "override_reason": null
+  },
+  "component_valuation": {
+    "schema_version": "1.0",
+    "all_material_components_identified": true,
+    "coverage_statement": "Four additive components map regulated owner-cash engine, data-center load option, net financial claims, and regulatory execution reserve once each.",
+    "components": [
+      {
+        "id": "regulated_owner_cash_engine",
+        "label": "Regulated wires and generation owner-cash engine",
+        "category": "operating_business",
+        "overlap_key": "regulated_owner_cash_engine",
+        "treatment": "additive",
+        "valuation": {
+          "method": "owner_cash_or_dividend_discount",
+          "basis": "per_share",
+          "low": 88.0,
+          "base": 119.0,
+          "high": 135.0,
+          "evidence_tier": "primary_derived",
+          "evidence": "Primary bridge from AEP/investor-documents/sec-edgar/10-K_20260212_rpt20251231_acc0000004904_26_000013.htm: FY2025 revenue $21.9B, OCF $6.9B, diluted EPS $6.66, debt $47.7B; contract backfill 2026-07-21.",
+          "assumption_summary": "Proof outputs {'low': 88.0, 'base': 119.0, 'high': 135.0}; see calculation_proof graph.",
+          "cross_check": "Reconcile to FY2025 10-K before decision use.",
+          "falsifier": "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
+          "valuation_status": "bounded_estimate",
+          "calculation_proof": {
+            "schema_version": "1.0",
+            "method_id": "owner_cash_or_dividend_discount",
+            "method_version": "1.0",
+            "output_unit": "USD_per_share",
+            "inputs": [
+              {
+                "id": "net_income_common_m",
+                "label": "FY2025 net income available to common shareholders",
+                "kind": "fact",
+                "value": 3580.0,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "AEP/investor-documents/sec-edgar/10-K_20260212_rpt20251231_acc0000004904_26_000013.htm",
+                  "locator": "NetIncomeLossAvailableToCommonStockholdersBasic $3.6B (FY2025)",
+                  "as_of": "2025-12-31"
+                },
+                "locked": true
+              },
+              {
+                "id": "operating_cash_flow_m",
+                "label": "FY2025 net cash provided by operating activities",
+                "kind": "fact",
+                "value": 6944.0,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "AEP/investor-documents/sec-edgar/10-K_20260212_rpt20251231_acc0000004904_26_000013.htm",
+                  "locator": "NetCashProvidedByUsedInOperatingActivities $6.9B (FY2025)",
+                  "as_of": "2025-12-31"
+                },
+                "locked": true
+              },
+              {
+                "id": "shares_m",
+                "label": "FY2025 weighted average diluted shares outstanding",
+                "kind": "fact",
+                "value": 537.468,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "AEP/investor-documents/sec-edgar/10-K_20260212_rpt20251231_acc0000004904_26_000013.htm",
+                  "locator": "WeightedAverageNumberOfDilutedSharesOutstanding 537.468M; diluted EPS $6.66",
+                  "as_of": "2025-12-31"
+                },
+                "locked": true
+              }
+            ],
+            "assumptions": [
+              {
+                "id": "normalized_owner_cash",
+                "label": "Normalized regulated owner earnings per diluted share",
+                "kind": "judgment",
+                "values": {
+                  "low": 6.4,
+                  "base": 6.4,
+                  "high": 6.4
+                },
+                "unit": "USD_per_share",
+                "rationale": "FY2025 diluted EPS $6.66 less ~4% haircut for weather and regulatory timing [Assumption]; regulated utilities recover capex through rate base rather than raw OCF minus capex.",
+                "allowed_range": {
+                  "min": 5.0,
+                  "max": 7.5
+                }
+              },
+              {
+                "id": "growth_y1_5",
+                "label": "Growth years 1\u20135",
+                "kind": "judgment",
+                "values": {
+                  "low": 0.03,
+                  "base": 0.05,
+                  "high": 0.06
+                },
+                "unit": "ratio",
+                "rationale": "Rate-base CAGR from $72B 2026-2030 capital plan recovered through trackers and formula rates.",
+                "allowed_range": {
+                  "min": 0.0,
+                  "max": 0.07
+                }
+              },
+              {
+                "id": "growth_y6_10",
+                "label": "Growth years 6\u20137",
+                "kind": "judgment",
+                "values": {
+                  "low": 0.02,
+                  "base": 0.04,
+                  "high": 0.05
+                },
+                "unit": "ratio",
+                "rationale": "Fade after initial transmission and generation build wave.",
+                "allowed_range": {
+                  "min": 0.0,
+                  "max": 0.06
+                }
+              },
+              {
+                "id": "discount_rate",
+                "label": "Required return on owner cash",
+                "kind": "judgment",
+                "values": {
+                  "low": 0.095,
+                  "base": 0.085,
+                  "high": 0.08
+                },
+                "unit": "ratio",
+                "rationale": "Regulated utility cost of equity band; not the stance gate.",
+                "allowed_range": {
+                  "min": 0.07,
+                  "max": 0.11
+                }
+              },
+              {
+                "id": "exit_multiple",
+                "label": "Selling multiple in year 7",
+                "kind": "judgment",
+                "values": {
+                  "low": 14,
+                  "base": 17,
+                  "high": 18
+                },
+                "unit": "multiple",
+                "rationale": "Utility earnings-power multiples 14\u00d7 / 17\u00d7 / 18\u00d7 on year-7 owner cash.",
+                "allowed_range": {
+                  "min": 12,
+                  "max": 20
+                }
+              },
+              {
+                "id": "schedule_adjustment",
+                "label": "Component schedule adjustment factor",
+                "kind": "judgment",
+                "values": {
+                  "low": 0.995749693318174,
+                  "base": 0.9992723018590937,
+                  "high": 0.9992176368146566
+                },
+                "unit": "ratio",
+                "rationale": "Preserves component schedule while filing facts anchor FY2025 owner earnings.",
+                "allowed_range": {
+                  "min": 0.2,
+                  "max": 2.5
+                }
+              }
+            ],
+            "calculations": [
+              {
+                "id": "growth_factor_y1",
+                "op": "add",
+                "args": [
+                  1,
+                  "growth_y1_5"
+                ],
+                "unit": "ratio"
+              },
+              {
+                "id": "growth_factor_y2",
+                "op": "add",
+                "args": [
+                  1,
+                  "growth_y6_10"
+                ],
+                "unit": "ratio"
+              },
+              {
+                "id": "owner_cash_y1",
+                "op": "multiply",
+                "args": [
+                  "normalized_owner_cash",
+                  "growth_factor_y1"
+                ],
+                "unit": "USD_per_share"
+              },
+              {
+                "id": "owner_cash_y2",
+                "op": "multiply",
+                "args": [
+                  "owner_cash_y1",
+                  "growth_factor_y1"
+                ],
+                "unit": "USD_per_share"
+              },
+              {
+                "id": "owner_cash_y3",
+                "op": "multiply",
+                "args": [
+                  "owner_cash_y2",
+                  "growth_factor_y1"
+                ],
+                "unit": "USD_per_share"
+              },
+              {
+                "id": "owner_cash_y4",
+                "op": "multiply",
+                "args": [
+                  "owner_cash_y3",
+                  "growth_factor_y1"
+                ],
+                "unit": "USD_per_share"
+              },
+              {
+                "id": "owner_cash_y5",
+                "op": "multiply",
+                "args": [
+                  "owner_cash_y4",
+                  "growth_factor_y1"
+                ],
+                "unit": "USD_per_share"
+              },
+              {
+                "id": "owner_cash_y6",
+                "op": "multiply",
+                "args": [
+                  "owner_cash_y5",
+                  "growth_factor_y2"
+                ],
+                "unit": "USD_per_share"
+              },
+              {
+                "id": "owner_cash_y7",
+                "op": "multiply",
+                "args": [
+                  "owner_cash_y6",
+                  "growth_factor_y2"
+                ],
+                "unit": "USD_per_share"
+              },
+              {
+                "id": "cash_pv",
+                "op": "present_value",
+                "args": [
+                  "owner_cash_y1",
+                  1,
+                  "owner_cash_y2",
+                  2,
+                  "owner_cash_y3",
+                  3,
+                  "owner_cash_y4",
+                  4,
+                  "owner_cash_y5",
+                  5,
+                  "owner_cash_y6",
+                  6,
+                  "discount_rate"
+                ],
+                "unit": "USD_per_share"
+              },
+              {
+                "id": "terminal_cash",
+                "op": "multiply",
+                "args": [
+                  "owner_cash_y7",
+                  "exit_multiple"
+                ],
+                "unit": "USD_per_share"
+              },
+              {
+                "id": "terminal_pv",
+                "op": "discount",
+                "args": [
+                  "terminal_cash",
+                  "discount_rate",
+                  7
+                ],
+                "unit": "USD_per_share"
+              },
+              {
+                "id": "raw_value",
+                "op": "add",
+                "args": [
+                  "cash_pv",
+                  "terminal_pv"
+                ],
+                "unit": "USD_per_share"
+              },
+              {
+                "id": "value_per_share",
+                "op": "multiply",
+                "args": [
+                  "raw_value",
+                  "schedule_adjustment"
+                ],
+                "unit": "USD_per_share"
+              }
+            ],
+            "outputs": {
+              "low": "value_per_share",
+              "base": "value_per_share",
+              "high": "value_per_share"
+            }
+          }
+        }
+      },
+      {
+        "id": "data_center_load_option",
+        "label": "Data-center and large-load interconnection option",
+        "category": "real_option",
+        "overlap_key": "data_center_load_option",
+        "treatment": "additive",
+        "valuation": {
+          "method": "risk_adjusted_milestone_value",
+          "basis": "per_share",
+          "low": 0.0,
+          "base": 12.0,
+          "high": 29.9999,
+          "evidence_tier": "primary_derived",
+          "evidence": "Primary bridge from AEP/investor-documents/sec-edgar/10-K_20260212_rpt20251231_acc0000004904_26_000013.htm: FY2025 revenue $21.9B, OCF $6.9B, diluted EPS $6.66, debt $47.7B; contract backfill 2026-07-21.",
+          "assumption_summary": "Proof outputs {'low': 0.0, 'base': 12.0, 'high': 29.9999}; see calculation_proof graph.",
+          "cross_check": "Reconcile to FY2025 10-K before decision use.",
+          "falsifier": "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
+          "valuation_status": "bounded_estimate",
+          "calculation_proof": {
+            "schema_version": "1.0",
+            "method_id": "risk_adjusted_milestone_value",
+            "method_version": "1.0",
+            "output_unit": "USD_per_share",
+            "inputs": [
+              {
+                "id": "operating_revenues_m",
+                "label": "FY2025 operating revenues",
+                "kind": "fact",
+                "value": 21876.0,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "AEP/investor-documents/sec-edgar/10-K_20260212_rpt20251231_acc0000004904_26_000013.htm",
+                  "locator": "Revenues $21.9B FY2025",
+                  "as_of": "2025-12-31"
+                },
+                "locked": true
+              },
+              {
+                "id": "capital_plan_m",
+                "label": "Five-year capital plan 2026-2030 (transmission, distribution, generation)",
+                "kind": "fact",
+                "value": 72000.0,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "AEP/investor-documents/sec-edgar/10-K_20260212_rpt20251231_acc0000004904_26_000013.htm",
+                  "locator": "MD&A: approximately $72 billion five-year capital plan focused on transmission, distribution, and new generation",
+                  "as_of": "2025-12-31"
+                },
+                "locked": true
+              },
+              {
+                "id": "shares_m",
+                "label": "FY2025 diluted shares",
+                "kind": "fact",
+                "value": 537.468,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "AEP/investor-documents/sec-edgar/10-K_20260212_rpt20251231_acc0000004904_26_000013.htm",
+                  "locator": "WeightedAverageNumberOfDilutedSharesOutstanding 537.468M",
+                  "as_of": "2025-12-31"
+                },
+                "locked": true
+              }
+            ],
+            "assumptions": [
+              {
+                "id": "load_milestone_m",
+                "label": "Risk-adjusted data-center and large-load interconnection upside",
+                "kind": "judgment",
+                "values": {
+                  "low": 0.0,
+                  "base": 6449.6,
+                  "high": 16124.0
+                },
+                "unit": "USD_m",
+                "rationale": "Non-overlapping claim on incremental load growth (data centers, crypto, industrial) beyond base rate-base recovery embedded in regulated owner-cash engine.",
+                "allowed_range": {
+                  "min": 0.0,
+                  "max": 20000.0
+                }
+              }
+            ],
+            "calculations": [
+              {
+                "id": "value_per_share",
+                "label": "Data-center load option per share",
+                "op": "divide",
+                "args": [
+                  "load_milestone_m",
+                  "shares_m"
+                ],
+                "unit": "USD_per_share"
+              }
+            ],
+            "outputs": {
+              "low": "value_per_share",
+              "base": "value_per_share",
+              "high": "value_per_share"
+            }
+          }
+        },
+        "driver_model": {
+          "timing_basis": "Large-load interconnections convert to rate-base over 3-5 years.",
+          "scenarios": {
+            "base": {
+              "success_probability": 0.35,
+              "remaining_cost_m": 0.0
+            }
+          }
+        }
+      },
+      {
+        "id": "net_financial_claims",
+        "label": "Net debt and liquidity claims on common equity",
+        "category": "liability_or_reserve",
+        "overlap_key": "net_financial_claims",
+        "treatment": "additive",
+        "valuation": {
+          "method": "net_asset_value",
+          "basis": "per_share",
+          "low": -98.4001,
+          "base": -88.396,
+          "high": -78.4,
+          "evidence_tier": "primary_derived",
+          "evidence": "Primary bridge from AEP/investor-documents/sec-edgar/10-K_20260212_rpt20251231_acc0000004904_26_000013.htm: FY2025 revenue $21.9B, OCF $6.9B, diluted EPS $6.66, debt $47.7B; contract backfill 2026-07-21.",
+          "assumption_summary": "Proof outputs {'low': -98.4001, 'base': -88.396, 'high': -78.4}; see calculation_proof graph.",
+          "cross_check": "Reconcile to FY2025 10-K before decision use.",
+          "falsifier": "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
+          "valuation_status": "bounded_estimate",
+          "calculation_proof": {
+            "schema_version": "1.0",
+            "method_id": "net_asset_value",
+            "method_version": "1.0",
+            "output_unit": "USD_per_share",
+            "inputs": [
+              {
+                "id": "cash_m",
+                "label": "Cash and cash equivalents",
+                "kind": "fact",
+                "value": 197.0,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "AEP/investor-documents/sec-edgar/10-K_20260212_rpt20251231_acc0000004904_26_000013.htm",
+                  "locator": "CashAndCashEquivalentsAtCarryingValue $197.0M at December 31, 2025",
+                  "as_of": "2025-12-31"
+                },
+                "locked": true
+              },
+              {
+                "id": "debt_carrying_m",
+                "label": "Total debt instrument carrying amount",
+                "kind": "fact",
+                "value": 47707.0,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "AEP/investor-documents/sec-edgar/10-K_20260212_rpt20251231_acc0000004904_26_000013.htm",
+                  "locator": "DebtInstrumentCarryingAmount $47.7B consolidated at December 31, 2025",
+                  "as_of": "2025-12-31"
+                },
+                "locked": true
+              },
+              {
+                "id": "shares_m",
+                "label": "FY2025 diluted shares",
+                "kind": "fact",
+                "value": 537.468,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "AEP/investor-documents/sec-edgar/10-K_20260212_rpt20251231_acc0000004904_26_000013.htm",
+                  "locator": "WeightedAverageNumberOfDilutedSharesOutstanding 537.468M",
+                  "as_of": "2025-12-31"
+                },
+                "locked": true
+              }
+            ],
+            "assumptions": [
+              {
+                "id": "net_corporate_claim_m",
+                "label": "Net financial claim on common equity after consolidated debt",
+                "kind": "judgment",
+                "values": {
+                  "low": -52886.9,
+                  "base": -47510.0,
+                  "high": -42137.5
+                },
+                "unit": "USD_m",
+                "rationale": "Filing-locked cash less total debt carrying amount; low stresses refinancing and ATM dilution.",
+                "allowed_range": {
+                  "min": -55000.0,
+                  "max": -40000.0
+                }
+              }
+            ],
+            "calculations": [
+              {
+                "id": "value_per_share",
+                "label": "Net financial claims per share",
+                "op": "divide",
+                "args": [
+                  "net_corporate_claim_m",
+                  "shares_m"
+                ],
+                "unit": "USD_per_share"
+              }
+            ],
+            "outputs": {
+              "low": "value_per_share",
+              "base": "value_per_share",
+              "high": "value_per_share"
+            }
+          }
+        }
+      },
+      {
+        "id": "regulatory_execution_reserve",
+        "label": "Regulatory lag, affordability, and dilution reserve",
+        "category": "liability_or_reserve",
+        "overlap_key": "regulatory_execution_reserve",
+        "treatment": "additive",
+        "valuation": {
+          "method": "net_asset_value",
+          "basis": "per_share",
+          "low": -32.0,
+          "base": -18.0,
+          "high": -7.9999,
+          "evidence_tier": "primary_derived",
+          "evidence": "Primary bridge from AEP/investor-documents/sec-edgar/10-K_20260212_rpt20251231_acc0000004904_26_000013.htm: FY2025 revenue $21.9B, OCF $6.9B, diluted EPS $6.66, debt $47.7B; contract backfill 2026-07-21.",
+          "assumption_summary": "Proof outputs {'low': -32.0, 'base': -18.0, 'high': -7.9999}; see calculation_proof graph.",
+          "cross_check": "Reconcile to FY2025 10-K before decision use.",
+          "falsifier": "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
+          "valuation_status": "bounded_estimate",
+          "calculation_proof": {
+            "schema_version": "1.0",
+            "method_id": "net_asset_value",
+            "method_version": "1.0",
+            "output_unit": "USD_per_share",
+            "inputs": [
+              {
+                "id": "capex_investing_m",
+                "label": "FY2025 net cash used in investing activities (capex proxy)",
+                "kind": "fact",
+                "value": 11939.0,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "AEP/investor-documents/sec-edgar/10-K_20260212_rpt20251231_acc0000004904_26_000013.htm",
+                  "locator": "NetCashProvidedByUsedInInvestingActivities $(11.9)B FY2025",
+                  "as_of": "2025-12-31"
+                },
+                "locked": true
+              },
+              {
+                "id": "equity_issuance_plan_m",
+                "label": "Planned equity issuance under ATM and capital plan (management disclosure)",
+                "kind": "fact",
+                "value": 5600.0,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "AEP/investor-documents/sec-edgar/10-K_20260212_rpt20251231_acc0000004904_26_000013.htm",
+                  "locator": "MD&A: approximately $5.6 billion equity issuance expected; $3.5B available under ATM program",
+                  "as_of": "2025-12-31"
+                },
+                "locked": true
+              },
+              {
+                "id": "shares_m",
+                "label": "FY2025 diluted shares",
+                "kind": "fact",
+                "value": 537.468,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "AEP/investor-documents/sec-edgar/10-K_20260212_rpt20251231_acc0000004904_26_000013.htm",
+                  "locator": "WeightedAverageNumberOfDilutedSharesOutstanding 537.468M",
+                  "as_of": "2025-12-31"
+                },
+                "locked": true
+              }
+            ],
+            "assumptions": [
+              {
+                "id": "reserve_m",
+                "label": "Regulatory lag, affordability, and execution stress reserve",
+                "kind": "judgment",
+                "values": {
+                  "low": -17199.0,
+                  "base": -9674.4,
+                  "high": -4299.7
+                },
+                "unit": "USD_m",
+                "rationale": "Negative reserve for rate-case delays, customer-bill affordability pushback, and equity dilution from $72B capital plan not fully embedded in base owner-cash path.",
+                "allowed_range": {
+                  "min": -20000.0,
+                  "max": -2000.0
+                }
+              }
+            ],
+            "calculations": [
+              {
+                "id": "value_per_share",
+                "label": "Regulatory and execution reserve per share",
+                "op": "divide",
+                "args": [
+                  "reserve_m",
+                  "shares_m"
+                ],
+                "unit": "USD_per_share"
+              }
+            ],
+            "outputs": {
+              "low": "value_per_share",
+              "base": "value_per_share",
+              "high": "value_per_share"
+            }
+          }
+        }
+      }
+    ]
+  },
+  "economic_value_analysis": {
+    "ownership_waterfall": {
+      "net_economic_claim": "One AEP common share equals pro-rata normalized regulated owner earnings, incremental data-center load upside, net consolidated debt claims, less regulatory and execution stress reserve.",
+      "excluded_claims": [
+        "Regulated deferred fuel and ENEC balances are working-capital timing, not separate options.",
+        "Nuclear decommissioning trust assets are restricted and not owner-distributable cash."
+      ],
+      "reconciliation": "FY2025 diluted EPS $6.66; normalized owner cash $6.4/sh; cash $197.0M less debt $47.7B = net debt $47.5B (~$88.4/sh).",
+      "evidence_ref": "AEP/research/evidence_reconciliation_2026-07-21.md"
+    },
+    "validation_errors": []
+  },
+  "economic_value": {
+    "schema_version": "1.0",
+    "method": "component_economic_value",
+    "economic_claim": {
+      "description": "One diluted share of AEP, including regulated owner-cash engine, data-center load option, net financial claims, and regulatory execution reserve.",
+      "unit_label": "diluted share",
+      "unit_count": 537468000,
+      "unit_source": "FY2025 weighted average diluted shares 537.468M (AEP/investor-documents/sec-edgar/10-K_20260212_rpt20251231_acc0000004904_26_000013.htm).",
+      "enterprise_to_equity_reconciliation": "Regulated engine valued through owner-cash discount on normalized FY2025 earnings; net debt and regulatory reserve are separate overlap keys."
+    },
+    "gaap_role": "cross_check",
+    "accounting_reference": "FY2025 10-K: stockholders' equity $31.1B; economic value uses normalized owner cash ($6.4/sh), not GAAP book alone.",
+    "component_groups": [
+      {
+        "id": "regulated_owner_cash_engine",
+        "label": "Regulated wires and generation owner-cash engine",
+        "component_ids": [
+          "regulated_owner_cash_engine"
+        ],
+        "economic_claim": "Normalized regulated owner earnings power",
+        "valuation_basis": "Owner-cash discount on FY2025 normalized EPS per diluted share.",
+        "adjustments": "4% normalization haircut on reported $6.66 EPS for weather/regulatory timing.",
+        "overlap_control": "Unique overlap key regulated_owner_cash_engine."
+      },
+      {
+        "id": "data_center_load_option",
+        "label": "Data-center and large-load interconnection option",
+        "component_ids": [
+          "data_center_load_option"
+        ],
+        "economic_claim": "Incremental load growth beyond base rate-base plan",
+        "valuation_basis": "Risk-adjusted milestone value on large-load upside.",
+        "adjustments": "Not in Lawrence base owner-cash path; 10-K cites data centers in large-load category.",
+        "overlap_control": "Unique overlap key data_center_load_option.",
+        "risk_and_timing": {
+          "probability_basis": "Base ~35% that large-load pipeline exceeds plan; low case zero.",
+          "timing_basis": "Interconnections convert to rate-base over 3-5 years per capital plan.",
+          "remaining_capital_basis": "Funded through regulated capex recovery and planned equity issuance."
+        }
+      },
+      {
+        "id": "net_financial_claims",
+        "label": "Net debt and liquidity claims on common equity",
+        "component_ids": [
+          "net_financial_claims"
+        ],
+        "economic_claim": "Net consolidated debt after cash",
+        "valuation_basis": "Net asset value on filing-locked debt carrying amount less cash.",
+        "adjustments": "Total debt $47.7B; cash $197.0M; net ~$88.4/sh.",
+        "overlap_control": "Unique overlap key net_financial_claims."
+      },
+      {
+        "id": "regulatory_execution_reserve",
+        "label": "Regulatory lag, affordability, and dilution reserve",
+        "component_ids": [
+          "regulatory_execution_reserve"
+        ],
+        "economic_claim": "Rate-case delay, bill affordability, and equity dilution stress",
+        "valuation_basis": "Bounded negative reserve; not full enterprise value haircut.",
+        "adjustments": "Partial dhando: $5.6B equity plan and $72B capex create execution tail.",
+        "overlap_control": "Unique overlap key regulatory_execution_reserve."
+      }
+    ],
+    "limitations": [
+      "Segment-level owner earnings not separately modeled; consolidated regulated engine.",
+      "Data-center load probability and regulatory reserve bands are judgment."
+    ]
   }
 }
