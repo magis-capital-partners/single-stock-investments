@@ -85,6 +85,16 @@ class WorkflowGovernanceTests(unittest.TestCase):
         self.assertIn("if: steps.meta.outputs.eligible == 'true'", workflow)
         self.assertNotIn("Stop after promoting draft", workflow)
 
+    def test_agent_pr_merge_accepts_committee_work_artifacts(self):
+        workflow = (ROOT / ".github" / "workflows" / "marvin-pr-automerge.yml").read_text(encoding="utf-8")
+        self.assertIn("validate_committee_pr_artifacts.py", workflow)
+        self.assertIn("validate_research_pr_provenance.py", workflow)
+        self.assertIn("committee_work", workflow)
+        self.assertNotIn(
+            "Cursor research PR must include research_agent_manifest.json.",
+            workflow,
+        )
+
     def test_power_zone_writer_uses_shared_lock_and_retry_push(self):
         workflow = (ROOT / ".github" / "workflows" / "power-zone-universe.yml").read_text(encoding="utf-8")
         self.assertIn("group: data-commit-main", workflow)
