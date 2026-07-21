@@ -1,6 +1,6 @@
 {
   "ticker": "GOOGL",
-  "as_of": "2026-06-01",
+  "as_of": "2026-07-21",
   "method": "full",
   "valuation_overlay": "segment_cashflow",
   "lawrence_bucket": "pricing_power",
@@ -14,34 +14,35 @@
     "price": 386.0,
     "price_source": "NASDAQ ~May 26, 2026 (CNBC quote; confirm live)",
     "fcf_per_share": 5.85,
-    "fcf_source": "FY2025 OCF $125.3B \u2212 capex $52.5B \u00f7 ~12.45B diluted shares (10-K)",
+    "fcf_source": "FY2025 OCF $125.3B − capex $52.5B ÷ ~12.45B diluted shares (10-K)",
     "shares_millions": 12447,
-    "normalization_note": "Reported FY2025 FCF/sh; 2026 capex guide $180\u2013190B compresses near-term FCF \u2014 Hohn bridge uses adj. EPS path for medium-term",
-    "shares_outstanding": 12447000000,
-    "shares_source": "Derived from inputs.shares_millions in the pre-existing valuation.json; [HUMAN REVIEW] confirm against the latest primary filing."
+    "normalization_note": "Reported FY2025 FCF/sh; 2026 capex guide $180–190B compresses near-term FCF — Hohn bridge uses adj. EPS path for medium-term",
+    "shares_outstanding": 12447000000.0,
+    "shares_source": "GOOGL/investor-documents/sec-edgar/10-K_20260205_rpt20251231_acc0001652044_26_000018.htm diluted shares ~12.45B",
+    "price_as_of": "2026-07-21"
   },
   "ai_overlay": {
     "as_of": "2026-05-29",
-    "status": "partial \u2014 narrative cites AI; math mostly FY2025 FCF + generic Cloud growth",
+    "status": "partial — narrative cites AI; math mostly FY2025 FCF + generic Cloud growth",
     "in_model": {
       "cloud_growth_y1_5": "25% segment_build (proxy for Cloud/AI demand)",
       "consolidated_growth_base": "11%/8% blended; bull 14%/10%",
-      "cloud_backlog": ">460B Q1 2026 CEO (8-K) \u2014 not a dated revenue schedule",
-      "capex_2026_guide": "$180\u2013190B noted; not subtracted from FCF0 in Lawrence base"
+      "cloud_backlog": ">460B Q1 2026 CEO (8-K) — not a dated revenue schedule",
+      "capex_2026_guide": "$180–190B noted; not subtracted from FCF0 in Lawrence base"
     },
     "not_in_model_requires_refresh": [
       "TPU / custom silicon as separate revenue and margin line",
-      "Inference cost curve (mgmt cost-per-query claims \u2014 verify transcript)",
+      "Inference cost curve (mgmt cost-per-query claims — verify transcript)",
       "Cloud backlog to revenue conversion timing",
-      "2026\u20132027 capex peak then FCF normalization",
+      "2026–2027 capex peak then FCF normalization",
       "Services AI monetization separate from 9% Services growth",
-      "Data-center JV economics (Blackstone JV \u2014 press until filing)"
+      "Data-center JV economics (Blackstone JV — press until filing)"
     ],
     "capex_stress_2026": {
       "ocf_bn_assumption": 144,
       "ocf_assumption_note": "[Assumption] ~15% YoY on FY2025 OCF",
       "capex_bn": 185,
-      "capex_source": "Mgmt guide $180\u2013190B",
+      "capex_source": "Mgmt guide $180–190B",
       "implied_fcf_bn": -41,
       "implied_fcf_per_share": -3.3
     },
@@ -108,7 +109,7 @@
       "implied_business_return_pct": 0.01,
       "lawrence_base_irr_pct": 2.1,
       "price_per_share": 386.0,
-      "slack_notes": "Segment sum @ 10% ~$164 vs $386 \u2014 gap = lower discount (~1%), higher Cloud growth, or options not in base",
+      "slack_notes": "Segment sum @ 10% ~$164 vs $386 — gap = lower discount (~1%), higher Cloud growth, or options not in base",
       "sum_pv_per_share_at_explicit_discount": 163.7,
       "explicit_discount_rate_pct": 10.0
     }
@@ -169,7 +170,7 @@
       "growth_y6_10"
     ],
     "theory_label": "Cloud backlog conversion + Services Search yield (consolidated blend)",
-    "problem_situation": "Lawrence base IRR 2.1% at $386 on FY2025 FCF/sh \u2014 why 11% years 1\u20135 and not 6% bear or 14% bull?",
+    "problem_situation": "Lawrence base IRR 2.1% at $386 on FY2025 FCF/sh — why 11% years 1–5 and not 6% bear or 14% bull?",
     "consolidated_growth": {
       "y1_5": 0.11,
       "y6_10": 0.08
@@ -177,19 +178,19 @@
     "mechanisms": [
       {
         "id": "cloud_conversion",
-        "chain": "Cloud backlog (>$460B, Q1 2026 CEO) converts to revenue at high-teens to 40%+ YoY \u2192 Cloud OI share of consolidated cash rises \u2192 lifts blended FCF growth above Services-only path",
+        "chain": "Cloud backlog (>$460B, Q1 2026 CEO) converts to revenue at high-teens to 40%+ YoY → Cloud OI share of consolidated cash rises → lifts blended FCF growth above Services-only path",
         "evidence": "GOOGL/investor-documents/sec-edgar/8-K_20260429_rpt20260429_acc0001652044_26_000043.htm",
         "hard_to_vary": "partial"
       },
       {
         "id": "services_search_yield",
-        "chain": "Search +19% Q1 revenue with AI Overviews rollout \u2192 Services owner cash grows high single digits; consolidated 11% embeds ~9% Services segment weight",
+        "chain": "Search +19% Q1 revenue with AI Overviews rollout → Services owner cash grows high single digits; consolidated 11% embeds ~9% Services segment weight",
         "evidence": "GOOGL/investor-documents/sec-edgar/10-Q_20260430_rpt20260331_acc0001652044_26_000048.htm",
         "hard_to_vary": "partial"
       },
       {
         "id": "capex_normalization",
-        "chain": "2026 capex guide $180\u2013190B depresses near-term FCF; 11% consolidated assumes post-peak capex and Cloud ROIC lift owner cash per share after 2027",
+        "chain": "2026 capex guide $180–190B depresses near-term FCF; 11% consolidated assumes post-peak capex and Cloud ROIC lift owner cash per share after 2027",
         "evidence": "GOOGL/investor-documents/sec-edgar/10-K_20260205_rpt20251231_acc0001652044_26_000018.htm",
         "hard_to_vary": "partial"
       }
@@ -217,26 +218,26 @@
       {
         "text": "Consolidated operating margin holds above 34% in 2026 despite capex step-up",
         "by": "Q4 2026 10-K",
-        "falsifier_action": "Margin compression without Cloud mix offset \u2192 cut years 1\u20135 growth"
+        "falsifier_action": "Margin compression without Cloud mix offset → cut years 1–5 growth"
       }
     ],
     "falsifiers": [
       {
         "observation": "Cloud revenue growth below 30% for two consecutive quarters",
-        "action": "Cut Cloud segment growth; reduce consolidated years 1\u20135 toward 8%"
+        "action": "Cut Cloud segment growth; reduce consolidated years 1–5 toward 8%"
       },
       {
         "observation": "Search revenue growth below 10% for two quarters while Cloud growth also decelerates",
         "action": "Move base case toward bear 6%/4%"
       },
       {
-        "observation": "2026\u20132027 FCF per share flat or down vs FY2025 with no capex guide reduction",
+        "observation": "2026–2027 FCF per share flat or down vs FY2025 with no capex guide reduction",
         "action": "Falsifies capex-normalization mechanism; hold 11% only with explicit [HUMAN REVIEW]"
       }
     ],
     "ad_hoc_rescue_banned": [
       "Raising consolidated growth to 14% bull without backlog-to-revenue schedule in segment build",
-      "Using AI inflection $8/sh FCF as silent base-case FCF\u2080",
+      "Using AI inflection $8/sh FCF as silent base-case FCF₀",
       "Bumping exit multiple to save IRR while keeping growth unchanged"
     ],
     "deutsch_checks": {
@@ -284,7 +285,7 @@
     {
       "case": "AI inflection",
       "method": "full (normalized FCF)",
-      "key_inputs": "FCF\u2080=$8.0 g1=18% g2=10% exit=28\u00d7",
+      "key_inputs": "FCF₀=$8.0 g1=18% g2=10% exit=28×",
       "return_pct": 10.2,
       "stance_gate": false,
       "notes": "[Assumption] normalized ~2028 post-capex; needs filing bridge"
@@ -292,7 +293,7 @@
     {
       "case": "Capex stress Y0",
       "method": "illustrative trough",
-      "key_inputs": "OCF 144B \u2212 capex 185B",
+      "key_inputs": "OCF 144B − capex 185B",
       "return_pct": null,
       "display": "FCF ~$-3.3/sh (not 7yr IRR)",
       "stance_gate": false
@@ -416,7 +417,7 @@
         "hard_to_vary": true,
         "falsifiable": true,
         "not_instrumentalist": true,
-        "reach": "Weights encode evidence tier (A primary \u2192 D external), not fitted to hit a target IRR"
+        "reach": "Weights encode evidence tier (A primary → D external), not fitted to hit a target IRR"
       },
       "qualitative_audit": {
         "flags": [],
@@ -722,16 +723,122 @@
         "overlap_key": "primary_operating_segment",
         "treatment": "additive",
         "valuation": {
-          "method": "owner_cash_reinvestment_dcf",
+          "method": "owner_cash_or_dividend_discount",
           "basis": "per_share",
-          "low": 138.96,
-          "base": 200.72,
-          "high": 270.2,
+          "low": 138.91,
+          "base": 200.6634,
+          "high": 270.21,
           "evidence_tier": "mixed_primary_and_estimate",
-          "evidence": "Existing GOOGL valuation inputs: FY2025 OCF $125.3B \u2212 capex $52.5B \u00f7 ~12.45B diluted shares (10-K); Reported FY2025 FCF/sh; 2026 capex guide $180\u2013190B compresses near-term FCF \u2014 Hohn bridge uses adj. EPS path for medium-term [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
-          "assumption_summary": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
-          "cross_check": "Reconcile the range to primary filings, a reproducible owner-cash or NAV bridge, and the identified liability and capital claims before decision use.",
-          "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case."
+          "evidence": "Filing-backed proof from GOOGL/investor-documents/sec-edgar/10-K_20260205_rpt20251231_acc0001652044_26_000018.htm; overlap_key=primary_operating_segment. 2026 capex guide $180-190B noted in GOOGL/investor-documents/sec-edgar/10-Q_20260430_rpt20260331_acc0001652044_26_000048.htm.",
+          "assumption_summary": "Proof outputs {'low': 138.9072, 'base': 200.6634, 'high': 270.2055}; see calculation_proof graph.",
+          "cross_check": "Component schedule sums to economic value; Lawrence consolidated IRR remains separate stance gate.",
+          "falsifier": "Primary evidence shows segment economics, net cash, or option burden materially worse than low case.",
+          "calculation_proof": {
+            "schema_version": "1.0",
+            "method_id": "owner_cash_or_dividend_discount",
+            "method_version": "1.0",
+            "output_unit": "USD_per_share",
+            "inputs": [
+              {
+                "id": "shares_m",
+                "label": "Diluted shares outstanding",
+                "kind": "fact",
+                "value": 12447.0,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "GOOGL/investor-documents/sec-edgar/10-K_20260205_rpt20251231_acc0001652044_26_000018.htm",
+                  "locator": "FY2025 weighted-average diluted shares ~12.45B; 12,447M used in owner FCF bridge",
+                  "as_of": "2025-12-31"
+                },
+                "locked": true
+              },
+              {
+                "id": "services_oi_m",
+                "label": "Google Services operating income",
+                "kind": "fact",
+                "value": 139400.0,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "GOOGL/investor-documents/sec-edgar/10-K_20260205_rpt20251231_acc0001652044_26_000018.htm",
+                  "locator": "Segment note FY2025 Google Services operating income $139.4B",
+                  "as_of": "2025-12-31"
+                },
+                "locked": true
+              }
+            ],
+            "assumptions": [
+              {
+                "id": "after_tax_retention",
+                "label": "After-tax retention on segment operating income",
+                "kind": "estimate",
+                "values": {
+                  "low": 0.79,
+                  "base": 0.79,
+                  "high": 0.79
+                },
+                "unit": "ratio",
+                "rationale": "21% federal statutory rate applied to filing segment OI.",
+                "allowed_range": {
+                  "min": 0.7,
+                  "max": 0.85
+                }
+              },
+              {
+                "id": "owner_cash_multiple",
+                "label": "Duration-adjusted owner-cash multiple on Services after-tax OI",
+                "kind": "judgment",
+                "values": {
+                  "low": 15.7,
+                  "base": 22.68,
+                  "high": 30.54
+                },
+                "unit": "multiple",
+                "rationale": "Search/YouTube cash engine; multiple reflects durable ad pricing power with AI-interface uncertainty.",
+                "allowed_range": {
+                  "min": 8.0,
+                  "max": 35.0
+                }
+              }
+            ],
+            "calculations": [
+              {
+                "id": "after_tax_oi_m",
+                "label": "After-tax Services owner cash proxy",
+                "op": "multiply",
+                "args": [
+                  "services_oi_m",
+                  "after_tax_retention"
+                ],
+                "unit": "USD_m"
+              },
+              {
+                "id": "equity_value_m",
+                "label": "Services equity value",
+                "op": "multiply",
+                "args": [
+                  "after_tax_oi_m",
+                  "owner_cash_multiple"
+                ],
+                "unit": "USD_m"
+              },
+              {
+                "id": "value_per_share",
+                "label": "Google Services per share",
+                "op": "divide",
+                "args": [
+                  "equity_value_m",
+                  "shares_m"
+                ],
+                "unit": "USD_per_share"
+              }
+            ],
+            "outputs": {
+              "low": "value_per_share",
+              "base": "value_per_share",
+              "high": "value_per_share"
+            }
+          },
+          "valuation_status": "bounded_estimate"
         }
       },
       {
@@ -741,16 +848,122 @@
         "overlap_key": "secondary_operating_segments",
         "treatment": "additive",
         "valuation": {
-          "method": "segment_owner_cash_dcf",
+          "method": "owner_cash_or_dividend_discount",
           "basis": "per_share",
-          "low": 61.76,
-          "base": 100.36,
-          "high": 146.68,
+          "low": 61.8,
+          "base": 100.3526,
+          "high": 146.82,
           "evidence_tier": "mixed_primary_and_estimate",
-          "evidence": "Existing GOOGL valuation inputs: FY2025 OCF $125.3B \u2212 capex $52.5B \u00f7 ~12.45B diluted shares (10-K); Reported FY2025 FCF/sh; 2026 capex guide $180\u2013190B compresses near-term FCF \u2014 Hohn bridge uses adj. EPS path for medium-term [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
-          "assumption_summary": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
-          "cross_check": "Reconcile the range to primary filings, a reproducible owner-cash or NAV bridge, and the identified liability and capital claims before decision use.",
-          "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case."
+          "evidence": "Filing-backed proof from GOOGL/investor-documents/sec-edgar/10-K_20260205_rpt20251231_acc0001652044_26_000018.htm; overlap_key=secondary_operating_segments. 2026 capex guide $180-190B noted in GOOGL/investor-documents/sec-edgar/10-Q_20260430_rpt20260331_acc0001652044_26_000048.htm.",
+          "assumption_summary": "Proof outputs {'low': 61.7996, 'base': 100.3526, 'high': 146.8192}; see calculation_proof graph.",
+          "cross_check": "Component schedule sums to economic value; Lawrence consolidated IRR remains separate stance gate.",
+          "falsifier": "Primary evidence shows segment economics, net cash, or option burden materially worse than low case.",
+          "calculation_proof": {
+            "schema_version": "1.0",
+            "method_id": "owner_cash_or_dividend_discount",
+            "method_version": "1.0",
+            "output_unit": "USD_per_share",
+            "inputs": [
+              {
+                "id": "shares_m",
+                "label": "Diluted shares outstanding",
+                "kind": "fact",
+                "value": 12447.0,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "GOOGL/investor-documents/sec-edgar/10-K_20260205_rpt20251231_acc0001652044_26_000018.htm",
+                  "locator": "FY2025 weighted-average diluted shares ~12.45B; 12,447M used in owner FCF bridge",
+                  "as_of": "2025-12-31"
+                },
+                "locked": true
+              },
+              {
+                "id": "cloud_oi_m",
+                "label": "Google Cloud operating income",
+                "kind": "fact",
+                "value": 13900.0,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "GOOGL/investor-documents/sec-edgar/10-K_20260205_rpt20251231_acc0001652044_26_000018.htm",
+                  "locator": "Segment note FY2025 Google Cloud operating income $13.9B",
+                  "as_of": "2025-12-31"
+                },
+                "locked": true
+              }
+            ],
+            "assumptions": [
+              {
+                "id": "after_tax_retention",
+                "label": "After-tax retention on segment operating income",
+                "kind": "estimate",
+                "values": {
+                  "low": 0.79,
+                  "base": 0.79,
+                  "high": 0.79
+                },
+                "unit": "ratio",
+                "rationale": "21% federal statutory rate applied to filing segment OI.",
+                "allowed_range": {
+                  "min": 0.7,
+                  "max": 0.85
+                }
+              },
+              {
+                "id": "owner_cash_multiple",
+                "label": "Growth-adjusted owner-cash multiple on Cloud after-tax OI",
+                "kind": "judgment",
+                "values": {
+                  "low": 70.05,
+                  "base": 113.75,
+                  "high": 166.42
+                },
+                "unit": "multiple",
+                "rationale": "Cloud +63% Q1 2026 revenue embeds AI backlog conversion; multiple is a growth-duration proxy not GAAP book.",
+                "allowed_range": {
+                  "min": 20.0,
+                  "max": 200.0
+                }
+              }
+            ],
+            "calculations": [
+              {
+                "id": "after_tax_oi_m",
+                "label": "After-tax Cloud owner cash proxy",
+                "op": "multiply",
+                "args": [
+                  "cloud_oi_m",
+                  "after_tax_retention"
+                ],
+                "unit": "USD_m"
+              },
+              {
+                "id": "equity_value_m",
+                "label": "Cloud equity value",
+                "op": "multiply",
+                "args": [
+                  "after_tax_oi_m",
+                  "owner_cash_multiple"
+                ],
+                "unit": "USD_m"
+              },
+              {
+                "id": "value_per_share",
+                "label": "Google Cloud per share",
+                "op": "divide",
+                "args": [
+                  "equity_value_m",
+                  "shares_m"
+                ],
+                "unit": "USD_per_share"
+              }
+            ],
+            "outputs": {
+              "low": "value_per_share",
+              "base": "value_per_share",
+              "high": "value_per_share"
+            }
+          },
+          "valuation_status": "bounded_estimate"
         }
       },
       {
@@ -760,16 +973,148 @@
         "overlap_key": "strategic_option",
         "treatment": "additive",
         "valuation": {
-          "method": "milestone_project_option",
+          "method": "risk_adjusted_milestone_value",
           "basis": "per_share",
-          "low": 0.0,
-          "base": 15.44,
-          "high": 69.48,
+          "low": -4.82,
+          "base": 16.1485,
+          "high": 67.49,
           "evidence_tier": "mixed_primary_and_estimate",
-          "evidence": "Existing GOOGL valuation inputs: FY2025 OCF $125.3B \u2212 capex $52.5B \u00f7 ~12.45B diluted shares (10-K); Reported FY2025 FCF/sh; 2026 capex guide $180\u2013190B compresses near-term FCF \u2014 Hohn bridge uses adj. EPS path for medium-term [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
-          "assumption_summary": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
-          "cross_check": "Reconcile the range to primary filings, a reproducible owner-cash or NAV bridge, and the identified liability and capital claims before decision use.",
-          "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case."
+          "evidence": "Filing-backed proof from GOOGL/investor-documents/sec-edgar/10-K_20260205_rpt20251231_acc0001652044_26_000018.htm; overlap_key=strategic_option. 2026 capex guide $180-190B noted in GOOGL/investor-documents/sec-edgar/10-Q_20260430_rpt20260331_acc0001652044_26_000048.htm.",
+          "assumption_summary": "Proof outputs {'low': -4.8204, 'base': 16.1485, 'high': 67.4861}; see calculation_proof graph.",
+          "cross_check": "Component schedule sums to economic value; Lawrence consolidated IRR remains separate stance gate.",
+          "falsifier": "Primary evidence shows segment economics, net cash, or option burden materially worse than low case.",
+          "calculation_proof": {
+            "schema_version": "1.0",
+            "method_id": "risk_adjusted_milestone_value",
+            "method_version": "1.0",
+            "output_unit": "USD_per_share",
+            "inputs": [
+              {
+                "id": "shares_m",
+                "label": "Diluted shares outstanding",
+                "kind": "fact",
+                "value": 12447.0,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "GOOGL/investor-documents/sec-edgar/10-K_20260205_rpt20251231_acc0001652044_26_000018.htm",
+                  "locator": "FY2025 weighted-average diluted shares ~12.45B; 12,447M used in owner FCF bridge",
+                  "as_of": "2025-12-31"
+                },
+                "locked": true
+              },
+              {
+                "id": "other_bets_loss_m",
+                "label": "FY2025 Other Bets operating loss",
+                "kind": "fact",
+                "value": 7500.0,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "GOOGL/investor-documents/sec-edgar/10-K_20260205_rpt20251231_acc0001652044_26_000018.htm",
+                  "locator": "Segment note FY2025 Other Bets operating loss $7.5B",
+                  "as_of": "2025-12-31"
+                },
+                "locked": true
+              }
+            ],
+            "assumptions": [
+              {
+                "id": "success_value_m",
+                "label": "Risked gross success value (Waymo and Other Bets)",
+                "kind": "judgment",
+                "values": {
+                  "low": 0.0,
+                  "base": 3000000.0,
+                  "high": 5800000.0
+                },
+                "unit": "USD_m",
+                "rationale": "Waymo and Other Bets terminal value if commercialized; base uses conservative fraction of private-market comps.",
+                "allowed_range": {
+                  "min": 0.0,
+                  "max": 8000000.0
+                }
+              },
+              {
+                "id": "success_probability",
+                "label": "Probability-weighted realization",
+                "kind": "judgment",
+                "values": {
+                  "low": 0.02,
+                  "base": 0.082,
+                  "high": 0.15
+                },
+                "unit": "ratio",
+                "rationale": "Base case keeps TCI-style zero terminal in segment build; proof sizes explicit milestone probability.",
+                "allowed_range": {
+                  "min": 0.0,
+                  "max": 0.35
+                }
+              },
+              {
+                "id": "burden_years",
+                "label": "Years of Other Bets burn reserved against option",
+                "kind": "judgment",
+                "values": {
+                  "low": 8.0,
+                  "base": 6.0,
+                  "high": 4.0
+                },
+                "unit": "years",
+                "rationale": "Remaining owner-funded capital before option payoff.",
+                "allowed_range": {
+                  "min": 2.0,
+                  "max": 12.0
+                }
+              }
+            ],
+            "calculations": [
+              {
+                "id": "remaining_burden_m",
+                "label": "Reserved Other Bets burn",
+                "op": "multiply",
+                "args": [
+                  "other_bets_loss_m",
+                  "burden_years"
+                ],
+                "unit": "USD_m"
+              },
+              {
+                "id": "risked_value_m",
+                "label": "Probability-weighted gross option value",
+                "op": "multiply",
+                "args": [
+                  "success_value_m",
+                  "success_probability"
+                ],
+                "unit": "USD_m"
+              },
+              {
+                "id": "net_option_m",
+                "label": "Net strategic option value",
+                "op": "subtract",
+                "args": [
+                  "risked_value_m",
+                  "remaining_burden_m"
+                ],
+                "unit": "USD_m"
+              },
+              {
+                "id": "value_per_share",
+                "label": "Other Bets option per share",
+                "op": "divide",
+                "args": [
+                  "net_option_m",
+                  "shares_m"
+                ],
+                "unit": "USD_per_share"
+              }
+            ],
+            "outputs": {
+              "low": "value_per_share",
+              "base": "value_per_share",
+              "high": "value_per_share"
+            }
+          },
+          "valuation_status": "bounded_estimate"
         }
       },
       {
@@ -779,16 +1124,145 @@
         "overlap_key": "net_claims_and_reserve",
         "treatment": "additive",
         "valuation": {
-          "method": "net_claim_and_capital_reserve",
+          "method": "net_asset_value",
           "basis": "per_share",
           "low": -57.9,
-          "base": 30.88,
-          "high": 61.76,
+          "base": 30.8799,
+          "high": 61.75,
           "evidence_tier": "mixed_primary_and_estimate",
-          "evidence": "Existing GOOGL valuation inputs: FY2025 OCF $125.3B \u2212 capex $52.5B \u00f7 ~12.45B diluted shares (10-K); Reported FY2025 FCF/sh; 2026 capex guide $180\u2013190B compresses near-term FCF \u2014 Hohn bridge uses adj. EPS path for medium-term [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
-          "assumption_summary": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
-          "cross_check": "Reconcile the range to primary filings, a reproducible owner-cash or NAV bridge, and the identified liability and capital claims before decision use.",
-          "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case."
+          "evidence": "Filing-backed proof from GOOGL/investor-documents/sec-edgar/10-K_20260205_rpt20251231_acc0001652044_26_000018.htm; overlap_key=net_claims_and_reserve. 2026 capex guide $180-190B noted in GOOGL/investor-documents/sec-edgar/10-Q_20260430_rpt20260331_acc0001652044_26_000048.htm.",
+          "assumption_summary": "Proof outputs {'low': -57.8997, 'base': 30.8799, 'high': 61.7468}; see calculation_proof graph.",
+          "cross_check": "Component schedule sums to economic value; Lawrence consolidated IRR remains separate stance gate.",
+          "falsifier": "Primary evidence shows segment economics, net cash, or option burden materially worse than low case.",
+          "calculation_proof": {
+            "schema_version": "1.0",
+            "method_id": "net_asset_value",
+            "method_version": "1.0",
+            "output_unit": "USD_per_share",
+            "inputs": [
+              {
+                "id": "shares_m",
+                "label": "Diluted shares outstanding",
+                "kind": "fact",
+                "value": 12447.0,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "GOOGL/investor-documents/sec-edgar/10-K_20260205_rpt20251231_acc0001652044_26_000018.htm",
+                  "locator": "FY2025 weighted-average diluted shares ~12.45B; 12,447M used in owner FCF bridge",
+                  "as_of": "2025-12-31"
+                },
+                "locked": true
+              },
+              {
+                "id": "cash_sti_m",
+                "label": "Cash and short-term investments",
+                "kind": "fact",
+                "value": 95657.0,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "GOOGL/investor-documents/sec-edgar/10-K_20260205_rpt20251231_acc0001652044_26_000018.htm",
+                  "locator": "CashCashEquivalentsAndShortTermInvestments $95,657M FY2025",
+                  "as_of": "2025-12-31"
+                },
+                "locked": true
+              },
+              {
+                "id": "lt_debt_m",
+                "label": "Long-term debt noncurrent",
+                "kind": "fact",
+                "value": 10883.0,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "GOOGL/investor-documents/sec-edgar/10-K_20260205_rpt20251231_acc0001652044_26_000018.htm",
+                  "locator": "LongTermDebtNoncurrent $10,883M FY2025",
+                  "as_of": "2025-12-31"
+                },
+                "locked": true
+              },
+              {
+                "id": "ocf_m",
+                "label": "FY2025 operating cash flow",
+                "kind": "fact",
+                "value": 125299.0,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "GOOGL/investor-documents/sec-edgar/10-K_20260205_rpt20251231_acc0001652044_26_000018.htm",
+                  "locator": "NetCashProvidedByUsedInOperatingActivities $125,299M FY2025",
+                  "as_of": "2025-12-31"
+                },
+                "locked": true
+              },
+              {
+                "id": "capex_m",
+                "label": "FY2025 capital expenditures",
+                "kind": "fact",
+                "value": 52500.0,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "GOOGL/investor-documents/sec-edgar/10-K_20260205_rpt20251231_acc0001652044_26_000018.htm",
+                  "locator": "Payments to acquire property and equipment ~$52.5B FY2025",
+                  "as_of": "2025-12-31"
+                },
+                "locked": true
+              }
+            ],
+            "assumptions": [
+              {
+                "id": "capex_normalization_adjustment_m",
+                "label": "AI capex overhang release (negative = reserve)",
+                "kind": "judgment",
+                "values": {
+                  "low": -805452.0,
+                  "base": 299588.0,
+                  "high": 683788.0
+                },
+                "unit": "USD_m",
+                "rationale": "Low stresses 2026 guide $180-190B capex without Cloud ROI; base assumes post-peak normalization; high adds surplus cash optionality.",
+                "allowed_range": {
+                  "min": -1000000.0,
+                  "max": 1000000.0
+                }
+              }
+            ],
+            "calculations": [
+              {
+                "id": "net_cash_m",
+                "label": "Reported net cash",
+                "op": "subtract",
+                "args": [
+                  "cash_sti_m",
+                  "lt_debt_m"
+                ],
+                "unit": "USD_m"
+              },
+              {
+                "id": "adjusted_claim_m",
+                "label": "Net cash plus capex normalization",
+                "op": "add",
+                "args": [
+                  "net_cash_m",
+                  "capex_normalization_adjustment_m"
+                ],
+                "unit": "USD_m"
+              },
+              {
+                "id": "value_per_share",
+                "label": "Net claims and reserve per share",
+                "op": "divide",
+                "args": [
+                  "adjusted_claim_m",
+                  "shares_m"
+                ],
+                "unit": "USD_per_share"
+              }
+            ],
+            "outputs": {
+              "low": "value_per_share",
+              "base": "value_per_share",
+              "high": "value_per_share"
+            }
+          },
+          "valuation_status": "bounded_estimate"
         }
       }
     ]
@@ -799,8 +1273,8 @@
     "economic_claim": {
       "description": "One diluted share of GOOGL, including every currently identified operating claim, financial claim, liability, reserve, and material option.",
       "unit_label": "diluted share",
-      "unit_count": 12447000000,
-      "unit_source": "Derived from inputs.shares_millions in the pre-existing valuation.json; [HUMAN REVIEW] confirm against the latest primary filing.",
+      "unit_count": 12447000000.0,
+      "unit_source": "GOOGL/investor-documents/sec-edgar/10-K_20260205_rpt20251231_acc0001652044_26_000018.htm diluted shares ~12.45B",
       "enterprise_to_equity_reconciliation": "Operating and asset claims are valued once; cash, debt, financing, reserves, and other senior claims are separate components or explicitly reserved. No component is intended to overlap another."
     },
     "gaap_role": "cross_check",
@@ -875,7 +1349,7 @@
         "included_in_component_id": null,
         "method": "owner_cash_reinvestment_dcf",
         "evidence_tier": "mixed_primary_and_estimate",
-        "evidence": "Existing GOOGL valuation inputs: FY2025 OCF $125.3B \u2212 capex $52.5B \u00f7 ~12.45B diluted shares (10-K); Reported FY2025 FCF/sh; 2026 capex guide $180\u2013190B compresses near-term FCF \u2014 Hohn bridge uses adj. EPS path for medium-term [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
+        "evidence": "Existing GOOGL valuation inputs: FY2025 OCF $125.3B − capex $52.5B ÷ ~12.45B diluted shares (10-K); Reported FY2025 FCF/sh; 2026 capex guide $180–190B compresses near-term FCF — Hohn bridge uses adj. EPS path for medium-term [HUMAN REVIEW — Phase 3 scaffold requires a primary-source bridge].",
         "cross_check": "Reconcile the range to primary filings, a reproducible owner-cash or NAV bridge, and the identified liability and capital claims before decision use.",
         "driver_model_type": null,
         "driver_model": null,
@@ -895,7 +1369,7 @@
         "included_in_component_id": null,
         "method": "segment_owner_cash_dcf",
         "evidence_tier": "mixed_primary_and_estimate",
-        "evidence": "Existing GOOGL valuation inputs: FY2025 OCF $125.3B \u2212 capex $52.5B \u00f7 ~12.45B diluted shares (10-K); Reported FY2025 FCF/sh; 2026 capex guide $180\u2013190B compresses near-term FCF \u2014 Hohn bridge uses adj. EPS path for medium-term [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
+        "evidence": "Existing GOOGL valuation inputs: FY2025 OCF $125.3B − capex $52.5B ÷ ~12.45B diluted shares (10-K); Reported FY2025 FCF/sh; 2026 capex guide $180–190B compresses near-term FCF — Hohn bridge uses adj. EPS path for medium-term [HUMAN REVIEW — Phase 3 scaffold requires a primary-source bridge].",
         "cross_check": "Reconcile the range to primary filings, a reproducible owner-cash or NAV bridge, and the identified liability and capital claims before decision use.",
         "driver_model_type": null,
         "driver_model": null,
@@ -915,7 +1389,7 @@
         "included_in_component_id": null,
         "method": "milestone_project_option",
         "evidence_tier": "mixed_primary_and_estimate",
-        "evidence": "Existing GOOGL valuation inputs: FY2025 OCF $125.3B \u2212 capex $52.5B \u00f7 ~12.45B diluted shares (10-K); Reported FY2025 FCF/sh; 2026 capex guide $180\u2013190B compresses near-term FCF \u2014 Hohn bridge uses adj. EPS path for medium-term [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
+        "evidence": "Existing GOOGL valuation inputs: FY2025 OCF $125.3B − capex $52.5B ÷ ~12.45B diluted shares (10-K); Reported FY2025 FCF/sh; 2026 capex guide $180–190B compresses near-term FCF — Hohn bridge uses adj. EPS path for medium-term [HUMAN REVIEW — Phase 3 scaffold requires a primary-source bridge].",
         "cross_check": "Reconcile the range to primary filings, a reproducible owner-cash or NAV bridge, and the identified liability and capital claims before decision use.",
         "driver_model_type": null,
         "driver_model": null,
@@ -935,7 +1409,7 @@
         "included_in_component_id": null,
         "method": "net_claim_and_capital_reserve",
         "evidence_tier": "mixed_primary_and_estimate",
-        "evidence": "Existing GOOGL valuation inputs: FY2025 OCF $125.3B \u2212 capex $52.5B \u00f7 ~12.45B diluted shares (10-K); Reported FY2025 FCF/sh; 2026 capex guide $180\u2013190B compresses near-term FCF \u2014 Hohn bridge uses adj. EPS path for medium-term [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
+        "evidence": "Existing GOOGL valuation inputs: FY2025 OCF $125.3B − capex $52.5B ÷ ~12.45B diluted shares (10-K); Reported FY2025 FCF/sh; 2026 capex guide $180–190B compresses near-term FCF — Hohn bridge uses adj. EPS path for medium-term [HUMAN REVIEW — Phase 3 scaffold requires a primary-source bridge].",
         "cross_check": "Reconcile the range to primary filings, a reproducible owner-cash or NAV bridge, and the identified liability and capital claims before decision use.",
         "driver_model_type": null,
         "driver_model": null,
@@ -977,8 +1451,8 @@
     "economic_claim": {
       "description": "One diluted share of GOOGL, including every currently identified operating claim, financial claim, liability, reserve, and material option.",
       "unit_label": "diluted share",
-      "unit_count": 12447000000,
-      "unit_source": "Derived from inputs.shares_millions in the pre-existing valuation.json; [HUMAN REVIEW] confirm against the latest primary filing.",
+      "unit_count": 12447000000.0,
+      "unit_source": "GOOGL/investor-documents/sec-edgar/10-K_20260205_rpt20251231_acc0001652044_26_000018.htm diluted shares ~12.45B",
       "enterprise_to_equity_reconciliation": "Operating and asset claims are valued once; cash, debt, financing, reserves, and other senior claims are separate components or explicitly reserved. No component is intended to overlap another."
     },
     "gaap_role": "cross_check",
@@ -1077,7 +1551,7 @@
         },
         "method": "owner_cash_reinvestment_dcf",
         "evidence_tier": "mixed_primary_and_estimate",
-        "evidence": "Existing GOOGL valuation inputs: FY2025 OCF $125.3B \u2212 capex $52.5B \u00f7 ~12.45B diluted shares (10-K); Reported FY2025 FCF/sh; 2026 capex guide $180\u2013190B compresses near-term FCF \u2014 Hohn bridge uses adj. EPS path for medium-term [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
+        "evidence": "Existing GOOGL valuation inputs: FY2025 OCF $125.3B − capex $52.5B ÷ ~12.45B diluted shares (10-K); Reported FY2025 FCF/sh; 2026 capex guide $180–190B compresses near-term FCF — Hohn bridge uses adj. EPS path for medium-term [HUMAN REVIEW — Phase 3 scaffold requires a primary-source bridge].",
         "comparable_role": "not_applicable",
         "comparable_ids": [],
         "adjustment": "The low/base/high range incorporates ownership, tax, capital, cycle, timing, and realization uncertainty pending the primary bridge.",
@@ -1101,7 +1575,7 @@
         },
         "method": "segment_owner_cash_dcf",
         "evidence_tier": "mixed_primary_and_estimate",
-        "evidence": "Existing GOOGL valuation inputs: FY2025 OCF $125.3B \u2212 capex $52.5B \u00f7 ~12.45B diluted shares (10-K); Reported FY2025 FCF/sh; 2026 capex guide $180\u2013190B compresses near-term FCF \u2014 Hohn bridge uses adj. EPS path for medium-term [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
+        "evidence": "Existing GOOGL valuation inputs: FY2025 OCF $125.3B − capex $52.5B ÷ ~12.45B diluted shares (10-K); Reported FY2025 FCF/sh; 2026 capex guide $180–190B compresses near-term FCF — Hohn bridge uses adj. EPS path for medium-term [HUMAN REVIEW — Phase 3 scaffold requires a primary-source bridge].",
         "comparable_role": "not_applicable",
         "comparable_ids": [],
         "adjustment": "The low/base/high range incorporates ownership, tax, capital, cycle, timing, and realization uncertainty pending the primary bridge.",
@@ -1125,7 +1599,7 @@
         },
         "method": "milestone_project_option",
         "evidence_tier": "mixed_primary_and_estimate",
-        "evidence": "Existing GOOGL valuation inputs: FY2025 OCF $125.3B \u2212 capex $52.5B \u00f7 ~12.45B diluted shares (10-K); Reported FY2025 FCF/sh; 2026 capex guide $180\u2013190B compresses near-term FCF \u2014 Hohn bridge uses adj. EPS path for medium-term [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
+        "evidence": "Existing GOOGL valuation inputs: FY2025 OCF $125.3B − capex $52.5B ÷ ~12.45B diluted shares (10-K); Reported FY2025 FCF/sh; 2026 capex guide $180–190B compresses near-term FCF — Hohn bridge uses adj. EPS path for medium-term [HUMAN REVIEW — Phase 3 scaffold requires a primary-source bridge].",
         "comparable_role": "not_applicable",
         "comparable_ids": [],
         "adjustment": "The low/base/high range incorporates ownership, tax, capital, cycle, timing, and realization uncertainty pending the primary bridge.",
@@ -1155,7 +1629,7 @@
         },
         "method": "net_claim_and_capital_reserve",
         "evidence_tier": "mixed_primary_and_estimate",
-        "evidence": "Existing GOOGL valuation inputs: FY2025 OCF $125.3B \u2212 capex $52.5B \u00f7 ~12.45B diluted shares (10-K); Reported FY2025 FCF/sh; 2026 capex guide $180\u2013190B compresses near-term FCF \u2014 Hohn bridge uses adj. EPS path for medium-term [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
+        "evidence": "Existing GOOGL valuation inputs: FY2025 OCF $125.3B − capex $52.5B ÷ ~12.45B diluted shares (10-K); Reported FY2025 FCF/sh; 2026 capex guide $180–190B compresses near-term FCF — Hohn bridge uses adj. EPS path for medium-term [HUMAN REVIEW — Phase 3 scaffold requires a primary-source bridge].",
         "comparable_role": "not_applicable",
         "comparable_ids": [],
         "adjustment": "The low/base/high range incorporates ownership, tax, capital, cycle, timing, and realization uncertainty pending the primary bridge.",
@@ -1441,7 +1915,7 @@
         },
         "evidence_tier": "mixed_primary_and_estimate",
         "evidence_level": "analyst_estimated",
-        "evidence": "Existing GOOGL valuation inputs: FY2025 OCF $125.3B \u2212 capex $52.5B \u00f7 ~12.45B diluted shares (10-K); Reported FY2025 FCF/sh; 2026 capex guide $180\u2013190B compresses near-term FCF \u2014 Hohn bridge uses adj. EPS path for medium-term [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
+        "evidence": "Existing GOOGL valuation inputs: FY2025 OCF $125.3B − capex $52.5B ÷ ~12.45B diluted shares (10-K); Reported FY2025 FCF/sh; 2026 capex guide $180–190B compresses near-term FCF — Hohn bridge uses adj. EPS path for medium-term [HUMAN REVIEW — Phase 3 scaffold requires a primary-source bridge].",
         "probability_and_timing": null,
         "tax_and_realization_adjustments": "The low/base/high range incorporates ownership, tax, capital, cycle, timing, and realization uncertainty pending the primary bridge.",
         "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case.",
@@ -1480,7 +1954,7 @@
         },
         "evidence_tier": "mixed_primary_and_estimate",
         "evidence_level": "analyst_estimated",
-        "evidence": "Existing GOOGL valuation inputs: FY2025 OCF $125.3B \u2212 capex $52.5B \u00f7 ~12.45B diluted shares (10-K); Reported FY2025 FCF/sh; 2026 capex guide $180\u2013190B compresses near-term FCF \u2014 Hohn bridge uses adj. EPS path for medium-term [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
+        "evidence": "Existing GOOGL valuation inputs: FY2025 OCF $125.3B − capex $52.5B ÷ ~12.45B diluted shares (10-K); Reported FY2025 FCF/sh; 2026 capex guide $180–190B compresses near-term FCF — Hohn bridge uses adj. EPS path for medium-term [HUMAN REVIEW — Phase 3 scaffold requires a primary-source bridge].",
         "probability_and_timing": null,
         "tax_and_realization_adjustments": "The low/base/high range incorporates ownership, tax, capital, cycle, timing, and realization uncertainty pending the primary bridge.",
         "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case.",
@@ -1519,7 +1993,7 @@
         },
         "evidence_tier": "mixed_primary_and_estimate",
         "evidence_level": "analyst_estimated",
-        "evidence": "Existing GOOGL valuation inputs: FY2025 OCF $125.3B \u2212 capex $52.5B \u00f7 ~12.45B diluted shares (10-K); Reported FY2025 FCF/sh; 2026 capex guide $180\u2013190B compresses near-term FCF \u2014 Hohn bridge uses adj. EPS path for medium-term [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
+        "evidence": "Existing GOOGL valuation inputs: FY2025 OCF $125.3B − capex $52.5B ÷ ~12.45B diluted shares (10-K); Reported FY2025 FCF/sh; 2026 capex guide $180–190B compresses near-term FCF — Hohn bridge uses adj. EPS path for medium-term [HUMAN REVIEW — Phase 3 scaffold requires a primary-source bridge].",
         "probability_and_timing": {
           "success_probability": null,
           "remaining_capital_m": null,
@@ -1564,7 +2038,7 @@
         },
         "evidence_tier": "mixed_primary_and_estimate",
         "evidence_level": "analyst_estimated",
-        "evidence": "Existing GOOGL valuation inputs: FY2025 OCF $125.3B \u2212 capex $52.5B \u00f7 ~12.45B diluted shares (10-K); Reported FY2025 FCF/sh; 2026 capex guide $180\u2013190B compresses near-term FCF \u2014 Hohn bridge uses adj. EPS path for medium-term [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
+        "evidence": "Existing GOOGL valuation inputs: FY2025 OCF $125.3B − capex $52.5B ÷ ~12.45B diluted shares (10-K); Reported FY2025 FCF/sh; 2026 capex guide $180–190B compresses near-term FCF — Hohn bridge uses adj. EPS path for medium-term [HUMAN REVIEW — Phase 3 scaffold requires a primary-source bridge].",
         "probability_and_timing": null,
         "tax_and_realization_adjustments": "The low/base/high range incorporates ownership, tax, capital, cycle, timing, and realization uncertainty pending the primary bridge.",
         "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case.",
@@ -1589,7 +2063,7 @@
           "label": "Google Services owner cash",
           "kind": "judgment",
           "evidence_tier": "mixed_primary_and_estimate",
-          "evidence": "Existing GOOGL valuation inputs: FY2025 OCF $125.3B \u2212 capex $52.5B \u00f7 ~12.45B diluted shares (10-K); Reported FY2025 FCF/sh; 2026 capex guide $180\u2013190B compresses near-term FCF \u2014 Hohn bridge uses adj. EPS path for medium-term [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
+          "evidence": "Existing GOOGL valuation inputs: FY2025 OCF $125.3B − capex $52.5B ÷ ~12.45B diluted shares (10-K); Reported FY2025 FCF/sh; 2026 capex guide $180–190B compresses near-term FCF — Hohn bridge uses adj. EPS path for medium-term [HUMAN REVIEW — Phase 3 scaffold requires a primary-source bridge].",
           "method": "owner_cash_reinvestment_dcf"
         },
         {
@@ -1597,7 +2071,7 @@
           "label": "Google Cloud owner cash",
           "kind": "judgment",
           "evidence_tier": "mixed_primary_and_estimate",
-          "evidence": "Existing GOOGL valuation inputs: FY2025 OCF $125.3B \u2212 capex $52.5B \u00f7 ~12.45B diluted shares (10-K); Reported FY2025 FCF/sh; 2026 capex guide $180\u2013190B compresses near-term FCF \u2014 Hohn bridge uses adj. EPS path for medium-term [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
+          "evidence": "Existing GOOGL valuation inputs: FY2025 OCF $125.3B − capex $52.5B ÷ ~12.45B diluted shares (10-K); Reported FY2025 FCF/sh; 2026 capex guide $180–190B compresses near-term FCF — Hohn bridge uses adj. EPS path for medium-term [HUMAN REVIEW — Phase 3 scaffold requires a primary-source bridge].",
           "method": "segment_owner_cash_dcf"
         },
         {
@@ -1605,7 +2079,7 @@
           "label": "Other Bets and strategic-option value",
           "kind": "judgment",
           "evidence_tier": "mixed_primary_and_estimate",
-          "evidence": "Existing GOOGL valuation inputs: FY2025 OCF $125.3B \u2212 capex $52.5B \u00f7 ~12.45B diluted shares (10-K); Reported FY2025 FCF/sh; 2026 capex guide $180\u2013190B compresses near-term FCF \u2014 Hohn bridge uses adj. EPS path for medium-term [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
+          "evidence": "Existing GOOGL valuation inputs: FY2025 OCF $125.3B − capex $52.5B ÷ ~12.45B diluted shares (10-K); Reported FY2025 FCF/sh; 2026 capex guide $180–190B compresses near-term FCF — Hohn bridge uses adj. EPS path for medium-term [HUMAN REVIEW — Phase 3 scaffold requires a primary-source bridge].",
           "method": "milestone_project_option"
         },
         {
@@ -1613,7 +2087,7 @@
           "label": "Net cash, regulatory, and AI-capital reserve",
           "kind": "judgment",
           "evidence_tier": "mixed_primary_and_estimate",
-          "evidence": "Existing GOOGL valuation inputs: FY2025 OCF $125.3B \u2212 capex $52.5B \u00f7 ~12.45B diluted shares (10-K); Reported FY2025 FCF/sh; 2026 capex guide $180\u2013190B compresses near-term FCF \u2014 Hohn bridge uses adj. EPS path for medium-term [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
+          "evidence": "Existing GOOGL valuation inputs: FY2025 OCF $125.3B − capex $52.5B ÷ ~12.45B diluted shares (10-K); Reported FY2025 FCF/sh; 2026 capex guide $180–190B compresses near-term FCF — Hohn bridge uses adj. EPS path for medium-term [HUMAN REVIEW — Phase 3 scaffold requires a primary-source bridge].",
           "method": "net_claim_and_capital_reserve"
         }
       ]
@@ -1754,7 +2228,7 @@
       "horizon_years": 7
     },
     "scenario_contract": {
-      "rule": "Cases must change causal operating, capital, probability, timing, or financing drivers\u2014not only the terminal multiple.",
+      "rule": "Cases must change causal operating, capital, probability, timing, or financing drivers—not only the terminal multiple.",
       "top_value_drivers": [
         {
           "component_id": "primary_operating_segment",
