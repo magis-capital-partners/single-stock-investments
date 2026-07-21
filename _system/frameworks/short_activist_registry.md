@@ -2,6 +2,8 @@
 
 **Machine-readable registry:** `_system/frameworks/activist_firm_registry.json` (long + short firms).
 
+**Long / press campaigns:** see `_system/frameworks/activist_press_ingest.md` (`site_index` + `press_wire` lanes; seeds in `_system/data/activist_press_seeds.json`).
+
 **Purpose:** Milly (adversarial reviewer) scans these publishers for reports on **portfolio tickers**. Not every name has coverage on every holding.
 
 **Use:** Cross-reference only. A short report is **evidence to reconcile**, not a veto. Goal = **truth**, not bearishness for its own sake.
