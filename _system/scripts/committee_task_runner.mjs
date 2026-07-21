@@ -40,13 +40,15 @@ Isolation and delivery rules:
 
 try {
   const repoSpec = startingRef ? { url: `https://github.com/${repo}`, startingRef } : { url: `https://github.com/${repo}` };
-  // Cloud catalog ids are bare (e.g. claude-sonnet-5); thinking/effort are params.
+  // Cloud catalog requires a full id+params variant (GET /v1/models).
+  // Default Sonnet 5 variant: thinking=true, context=1m, effort=high.
   const model =
     modelId === "claude-sonnet-5"
       ? {
           id: modelId,
           params: [
             { id: "thinking", value: "true" },
+            { id: "context", value: "1m" },
             { id: "effort", value: "high" },
           ],
         }
