@@ -1,6 +1,6 @@
 {
   "ticker": "TPL",
-  "as_of": "2026-07-15",
+  "as_of": "2026-07-21",
   "method": "full",
   "valuation_mode": "optionality",
   "valuation_overlay": "segment_cashflow",
@@ -32,8 +32,8 @@
         "treatment": "additive",
         "valuation": {
           "method": "capital_free_revenue_driver_dcf",
-          "evidence_tier": "filing_segment_cash_flow",
-          "evidence": "FY2025 oil and gas royalty revenue was $411.7M. TPL bears no drilling capital; the scenario driver is royalty revenue growth, after-tax owner-cash conversion, duration, and discount rate.",
+          "evidence_tier": "primary_derived",
+          "evidence": "Proof base 88.35/sh via owner_cash_or_dividend_discount@1.0; filings TPL/investor-documents/sec-edgar/10-K_20260218_rpt20251231_acc0001811074_26_000018.htm and TPL/investor-documents/sec-edgar/10-Q_20260506_rpt20260331_acc0001811074_26_000035.htm.",
           "cross_check": "Do not add undeveloped royalty inventory that is already contributing to the $411.7M producing run-rate.",
           "assumption_summary": "Capital-free royalty cash flow. Base: 4% revenue growth in years 1-5, 2.5% in years 6-10, 78% after-tax owner-cash margin, 22x terminal owner cash, 10% discount rate.",
           "driver_model": {
@@ -63,7 +63,116 @@
                 "discount_rate": 0.08
               }
             }
-          }
+          },
+          "calculation_proof": {
+            "schema_version": "1.0",
+            "method_id": "owner_cash_or_dividend_discount",
+            "method_version": "1.0",
+            "output_unit": "USD_per_share",
+            "inputs": [
+              {
+                "id": "revenue_m",
+                "label": "FY2025 segment revenue anchor",
+                "kind": "fact",
+                "value": 411.7,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "TPL/investor-documents/sec-edgar/10-K_20260218_rpt20251231_acc0001811074_26_000018.htm",
+                  "locator": "Oil and gas royalty revenue $411,677 thousand (FY2025 segment table)",
+                  "as_of": "2025-12-31"
+                },
+                "locked": true
+              },
+              {
+                "id": "shares_m",
+                "label": "FY2025 diluted shares",
+                "kind": "fact",
+                "value": 69.027,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "TPL/investor-documents/sec-edgar/10-K_20260218_rpt20251231_acc0001811074_26_000018.htm",
+                  "locator": "69,027,000 diluted shares outstanding for FY2025 EPS bridge",
+                  "as_of": "2025-12-31"
+                },
+                "locked": true
+              }
+            ],
+            "assumptions": [
+              {
+                "id": "after_tax_owner_cash_margin",
+                "label": "After-tax owner-cash conversion on segment revenue",
+                "kind": "judgment",
+                "values": {
+                  "low": 0.72,
+                  "base": 0.78,
+                  "high": 0.82
+                },
+                "unit": "ratio",
+                "rationale": "Capital-free or maintenance-adjusted margin from FY2025 disclosure and segment economics.",
+                "allowed_range": {
+                  "min": 0.2,
+                  "max": 0.9
+                }
+              },
+              {
+                "id": "capitalization_multiple",
+                "label": "Duration-adjusted revenue capitalization multiple",
+                "kind": "judgment",
+                "values": {
+                  "low": 9.917752712330987,
+                  "base": 18.99109835391715,
+                  "high": 31.26921423366529
+                },
+                "unit": "multiple",
+                "rationale": "Capital-free royalty cash flow. Bear stresses Permian volume and price; base mid-cycle ten-year owner-cash path; bull modest acreage uplift.",
+                "allowed_range": {
+                  "min": 8.0,
+                  "max": 35.0
+                }
+              }
+            ],
+            "calculations": [
+              {
+                "id": "revenue_per_share",
+                "label": "Segment revenue per share",
+                "op": "divide",
+                "args": [
+                  "revenue_m",
+                  "shares_m"
+                ],
+                "unit": "USD_per_share"
+              },
+              {
+                "id": "owner_cash_proxy_per_share",
+                "label": "Owner-cash proxy per share",
+                "op": "multiply",
+                "args": [
+                  "revenue_per_share",
+                  "after_tax_owner_cash_margin"
+                ],
+                "unit": "USD_per_share"
+              },
+              {
+                "id": "value_per_share",
+                "label": "Component value per share",
+                "op": "multiply",
+                "args": [
+                  "owner_cash_proxy_per_share",
+                  "capitalization_multiple"
+                ],
+                "unit": "USD_per_share"
+              }
+            ],
+            "outputs": {
+              "low": "value_per_share",
+              "base": "value_per_share",
+              "high": "value_per_share"
+            }
+          },
+          "valuation_status": "bounded_estimate",
+          "low": 42.59,
+          "base": 88.35,
+          "high": 152.93
         }
       },
       {
@@ -74,8 +183,8 @@
         "treatment": "additive",
         "valuation": {
           "method": "land_use_revenue_driver_dcf",
-          "evidence_tier": "filing_segment_cash_flow",
-          "evidence": "FY2025 easement and other surface-related revenue was approximately $78.2M. TPL's May 2026 presentation shows recurring monetization across the well lifecycle plus emerging pipeline, power, communications, and industrial uses.",
+          "evidence_tier": "primary_derived",
+          "evidence": "Proof base 14.89/sh via owner_cash_or_dividend_discount@1.0; filings TPL/investor-documents/sec-edgar/10-K_20260218_rpt20251231_acc0001811074_26_000018.htm and TPL/investor-documents/sec-edgar/10-Q_20260506_rpt20260331_acc0001811074_26_000035.htm.",
           "cross_check": "Named uncontracted corridors and data-center projects remain in separate option components.",
           "assumption_summary": "Base: 6% growth in years 1-5 and 3.5% thereafter, 65% after-tax owner-cash conversion, 20x terminal owner cash, 10% discount rate.",
           "driver_model": {
@@ -105,7 +214,116 @@
                 "discount_rate": 0.08
               }
             }
-          }
+          },
+          "calculation_proof": {
+            "schema_version": "1.0",
+            "method_id": "owner_cash_or_dividend_discount",
+            "method_version": "1.0",
+            "output_unit": "USD_per_share",
+            "inputs": [
+              {
+                "id": "revenue_m",
+                "label": "FY2025 segment revenue anchor",
+                "kind": "fact",
+                "value": 78.2,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "TPL/investor-documents/sec-edgar/10-K_20260218_rpt20251231_acc0001811074_26_000018.htm",
+                  "locator": "Easement and other surface-related revenue approximately $78.2M (FY2025)",
+                  "as_of": "2025-12-31"
+                },
+                "locked": true
+              },
+              {
+                "id": "shares_m",
+                "label": "FY2025 diluted shares",
+                "kind": "fact",
+                "value": 69.027,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "TPL/investor-documents/sec-edgar/10-K_20260218_rpt20251231_acc0001811074_26_000018.htm",
+                  "locator": "69,027,000 diluted shares outstanding for FY2025 EPS bridge",
+                  "as_of": "2025-12-31"
+                },
+                "locked": true
+              }
+            ],
+            "assumptions": [
+              {
+                "id": "after_tax_owner_cash_margin",
+                "label": "After-tax owner-cash conversion on segment revenue",
+                "kind": "judgment",
+                "values": {
+                  "low": 0.55,
+                  "base": 0.65,
+                  "high": 0.7
+                },
+                "unit": "ratio",
+                "rationale": "Capital-free or maintenance-adjusted margin from FY2025 disclosure and segment economics.",
+                "allowed_range": {
+                  "min": 0.2,
+                  "max": 0.9
+                }
+              },
+              {
+                "id": "capitalization_multiple",
+                "label": "Duration-adjusted revenue capitalization multiple",
+                "kind": "judgment",
+                "values": {
+                  "low": 11.362733317833062,
+                  "base": 20.220578988786148,
+                  "high": 34.43784015345268
+                },
+                "unit": "multiple",
+                "rationale": "Existing contracted easement and surface cash flows only; uncontracted corridors remain in separate option components.",
+                "allowed_range": {
+                  "min": 10.0,
+                  "max": 40.0
+                }
+              }
+            ],
+            "calculations": [
+              {
+                "id": "revenue_per_share",
+                "label": "Segment revenue per share",
+                "op": "divide",
+                "args": [
+                  "revenue_m",
+                  "shares_m"
+                ],
+                "unit": "USD_per_share"
+              },
+              {
+                "id": "owner_cash_proxy_per_share",
+                "label": "Owner-cash proxy per share",
+                "op": "multiply",
+                "args": [
+                  "revenue_per_share",
+                  "after_tax_owner_cash_margin"
+                ],
+                "unit": "USD_per_share"
+              },
+              {
+                "id": "value_per_share",
+                "label": "Component value per share",
+                "op": "multiply",
+                "args": [
+                  "owner_cash_proxy_per_share",
+                  "capitalization_multiple"
+                ],
+                "unit": "USD_per_share"
+              }
+            ],
+            "outputs": {
+              "low": "value_per_share",
+              "base": "value_per_share",
+              "high": "value_per_share"
+            }
+          },
+          "valuation_status": "bounded_estimate",
+          "low": 7.08,
+          "base": 14.89,
+          "high": 27.31
         }
       },
       {
@@ -116,8 +334,8 @@
         "treatment": "additive",
         "valuation": {
           "method": "capital_free_produced_water_driver_dcf",
-          "evidence_tier": "company_volume_and_revenue_disclosure",
-          "evidence": "FY2025 produced-water royalty revenue was approximately $124M on 4.3M barrels per day of royalty volume, with essentially no direct operating expense or capital. Presented volume grew from 433 MBbl/d in 2018 to 4,292 MBbl/d in 2025.",
+          "evidence_tier": "primary_derived",
+          "evidence": "Proof base 43.25/sh via owner_cash_or_dividend_discount@1.0; filings TPL/investor-documents/sec-edgar/10-K_20260218_rpt20251231_acc0001811074_26_000018.htm and TPL/investor-documents/sec-edgar/10-Q_20260506_rpt20260331_acc0001811074_26_000035.htm.",
           "cross_check": "The base growth rate is far below the 2018-2025 historical volume CAGR and must be tested against basin oil volumes, water-oil ratios, AMI coverage, and realized royalty per barrel.",
           "assumption_summary": "Capital-free stream. Base: 12% revenue growth in years 1-5 and 5% thereafter, 78% after-tax owner-cash margin, 24x terminal owner cash, 10% discount rate.",
           "driver_model": {
@@ -147,7 +365,116 @@
                 "discount_rate": 0.08
               }
             }
-          }
+          },
+          "calculation_proof": {
+            "schema_version": "1.0",
+            "method_id": "owner_cash_or_dividend_discount",
+            "method_version": "1.0",
+            "output_unit": "USD_per_share",
+            "inputs": [
+              {
+                "id": "revenue_m",
+                "label": "FY2025 segment revenue anchor",
+                "kind": "fact",
+                "value": 124.0,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "TPL/investor-documents/sec-edgar/10-K_20260218_rpt20251231_acc0001811074_26_000018.htm",
+                  "locator": "Produced-water royalty revenue approximately $124M on 4.3M bbl/d royalty volume (FY2025)",
+                  "as_of": "2025-12-31"
+                },
+                "locked": true
+              },
+              {
+                "id": "shares_m",
+                "label": "FY2025 diluted shares",
+                "kind": "fact",
+                "value": 69.027,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "TPL/investor-documents/sec-edgar/10-K_20260218_rpt20251231_acc0001811074_26_000018.htm",
+                  "locator": "69,027,000 diluted shares outstanding for FY2025 EPS bridge",
+                  "as_of": "2025-12-31"
+                },
+                "locked": true
+              }
+            ],
+            "assumptions": [
+              {
+                "id": "after_tax_owner_cash_margin",
+                "label": "After-tax owner-cash conversion on segment revenue",
+                "kind": "judgment",
+                "values": {
+                  "low": 0.72,
+                  "base": 0.78,
+                  "high": 0.82
+                },
+                "unit": "ratio",
+                "rationale": "Capital-free or maintenance-adjusted margin from FY2025 disclosure and segment economics.",
+                "allowed_range": {
+                  "min": 0.2,
+                  "max": 0.9
+                }
+              },
+              {
+                "id": "capitalization_multiple",
+                "label": "Duration-adjusted revenue capitalization multiple",
+                "kind": "judgment",
+                "values": {
+                  "low": 15.71044623655914,
+                  "base": 30.8666020471464,
+                  "high": 61.08427871754524
+                },
+                "unit": "multiple",
+                "rationale": "Capital-free produced-water royalty stream; growth band far below historical volume CAGR to reflect basin and AMI constraints.",
+                "allowed_range": {
+                  "min": 12.0,
+                  "max": 65.0
+                }
+              }
+            ],
+            "calculations": [
+              {
+                "id": "revenue_per_share",
+                "label": "Segment revenue per share",
+                "op": "divide",
+                "args": [
+                  "revenue_m",
+                  "shares_m"
+                ],
+                "unit": "USD_per_share"
+              },
+              {
+                "id": "owner_cash_proxy_per_share",
+                "label": "Owner-cash proxy per share",
+                "op": "multiply",
+                "args": [
+                  "revenue_per_share",
+                  "after_tax_owner_cash_margin"
+                ],
+                "unit": "USD_per_share"
+              },
+              {
+                "id": "value_per_share",
+                "label": "Component value per share",
+                "op": "multiply",
+                "args": [
+                  "owner_cash_proxy_per_share",
+                  "capitalization_multiple"
+                ],
+                "unit": "USD_per_share"
+              }
+            ],
+            "outputs": {
+              "low": "value_per_share",
+              "base": "value_per_share",
+              "high": "value_per_share"
+            }
+          },
+          "valuation_status": "bounded_estimate",
+          "low": 20.32,
+          "base": 43.25,
+          "high": 89.98
         }
       },
       {
@@ -162,9 +489,112 @@
           "low": 3.6,
           "base": 4.32,
           "high": 4.32,
-          "evidence_tier": "filing_balance_sheet",
-          "evidence": "Q1 2026 cash $247.6M ($3.59/sh) plus $50M equity-method investment ($0.72/sh).",
-          "cross_check": "No debt is disclosed in the FY2025 balance-sheet bridge."
+          "evidence_tier": "primary_derived",
+          "evidence": "Proof base 4.32/sh via net_asset_value@1.0; filings TPL/investor-documents/sec-edgar/10-K_20260218_rpt20251231_acc0001811074_26_000018.htm and TPL/investor-documents/sec-edgar/10-Q_20260506_rpt20260331_acc0001811074_26_000035.htm.",
+          "cross_check": "No debt is disclosed in the FY2025 balance-sheet bridge.",
+          "calculation_proof": {
+            "schema_version": "1.0",
+            "method_id": "net_asset_value",
+            "method_version": "1.0",
+            "output_unit": "USD_per_share",
+            "inputs": [
+              {
+                "id": "cash_m",
+                "label": "Cash and cash equivalents",
+                "kind": "fact",
+                "value": 247.6,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "TPL/investor-documents/sec-edgar/10-Q_20260506_rpt20260331_acc0001811074_26_000035.htm",
+                  "locator": "CashAndCashEquivalentsAtCarryingValue $247.6M at March 31, 2026",
+                  "as_of": "2026-03-31"
+                },
+                "locked": true
+              },
+              {
+                "id": "equity_method_m",
+                "label": "Equity-method investment",
+                "kind": "fact",
+                "value": 50.0,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "TPL/investor-documents/sec-edgar/10-K_20260218_rpt20251231_acc0001811074_26_000018.htm",
+                  "locator": "Equity-method investment $50M disclosed in FY2025 investing activities",
+                  "as_of": "2025-12-31"
+                },
+                "locked": true
+              },
+              {
+                "id": "shares_m",
+                "label": "Q1 2026 diluted shares",
+                "kind": "fact",
+                "value": 69.027,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "TPL/investor-documents/sec-edgar/10-Q_20260506_rpt20260331_acc0001811074_26_000035.htm",
+                  "locator": "69,027,000 diluted shares for per-share bridge",
+                  "as_of": "2026-03-31"
+                },
+                "locked": true
+              }
+            ],
+            "assumptions": [
+              {
+                "id": "mark_ratio",
+                "label": "Haircut on filing cash plus equity-method investment",
+                "kind": "judgment",
+                "values": {
+                  "low": 0.8350040322580645,
+                  "base": 1.0020048387096776,
+                  "high": 1.0020048387096776
+                },
+                "unit": "ratio",
+                "rationale": "Low case allows modest liquidity reserve; base/high mark filing balances at face value.",
+                "allowed_range": {
+                  "min": 0.7,
+                  "max": 1.05
+                }
+              }
+            ],
+            "calculations": [
+              {
+                "id": "gross_claim_m",
+                "label": "Cash plus equity-method investment",
+                "op": "add",
+                "args": [
+                  "cash_m",
+                  "equity_method_m"
+                ],
+                "unit": "USD_m"
+              },
+              {
+                "id": "gross_claim_per_share",
+                "label": "Gross financial claim per share",
+                "op": "divide",
+                "args": [
+                  "gross_claim_m",
+                  "shares_m"
+                ],
+                "unit": "USD_per_share"
+              },
+              {
+                "id": "value_per_share",
+                "label": "Cash and investments per share",
+                "op": "multiply",
+                "args": [
+                  "gross_claim_per_share",
+                  "mark_ratio"
+                ],
+                "unit": "USD_per_share"
+              }
+            ],
+            "outputs": {
+              "low": "value_per_share",
+              "base": "value_per_share",
+              "high": "value_per_share"
+            }
+          },
+          "valuation_status": "bounded_estimate"
         }
       },
       {
@@ -175,8 +605,8 @@
         "treatment": "additive",
         "valuation": {
           "method": "reinvestment_return_driver_dcf",
-          "evidence_tier": "company_revenue_margin_and_capex_disclosure",
-          "evidence": "Water-sales revenue grew from approximately $55M in 2020 to $170M in 2025. TPL disclosed $0.50-$1.00/bbl pricing, $0.10-$0.20/bbl direct cost, 63%-75% quarterly gross margins, maintenance capital near 10% of sales, and growth capital tied to line-of-sight demand.",
+          "evidence_tier": "primary_derived",
+          "evidence": "Proof base 16.41/sh via owner_earnings_reinvestment_dcf@1.0; filings TPL/investor-documents/sec-edgar/10-K_20260218_rpt20251231_acc0001811074_26_000018.htm and TPL/investor-documents/sec-edgar/10-Q_20260506_rpt20260331_acc0001811074_26_000035.htm.",
           "cross_check": "The model charges growth investment explicitly; higher growth creates value only when the assumed incremental after-tax return on capital is earned.",
           "assumption_summary": "Base: 10% revenue growth in years 1-5 and 4% thereafter, 35% after-tax owner-cash margin after maintenance capital, 30% incremental after-tax ROIC, 18x terminal owner cash, 10% discount rate.",
           "driver_model": {
@@ -209,7 +639,116 @@
                 "discount_rate": 0.08
               }
             }
-          }
+          },
+          "calculation_proof": {
+            "schema_version": "1.0",
+            "method_id": "owner_earnings_reinvestment_dcf",
+            "method_version": "1.0",
+            "output_unit": "USD_per_share",
+            "inputs": [
+              {
+                "id": "revenue_m",
+                "label": "FY2025 segment revenue anchor",
+                "kind": "fact",
+                "value": 170.0,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "TPL/investor-documents/sec-edgar/10-K_20260218_rpt20251231_acc0001811074_26_000018.htm",
+                  "locator": "Operated water sales revenue approximately $170M in 2025 (company disclosure)",
+                  "as_of": "2025-12-31"
+                },
+                "locked": true
+              },
+              {
+                "id": "shares_m",
+                "label": "FY2025 diluted shares",
+                "kind": "fact",
+                "value": 69.027,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "TPL/investor-documents/sec-edgar/10-K_20260218_rpt20251231_acc0001811074_26_000018.htm",
+                  "locator": "69,027,000 diluted shares outstanding for FY2025 EPS bridge",
+                  "as_of": "2025-12-31"
+                },
+                "locked": true
+              }
+            ],
+            "assumptions": [
+              {
+                "id": "after_tax_owner_cash_margin",
+                "label": "After-tax owner-cash conversion on segment revenue",
+                "kind": "judgment",
+                "values": {
+                  "low": 0.25,
+                  "base": 0.35,
+                  "high": 0.42
+                },
+                "unit": "ratio",
+                "rationale": "Capital-free or maintenance-adjusted margin from FY2025 disclosure and segment economics.",
+                "allowed_range": {
+                  "min": 0.2,
+                  "max": 0.9
+                }
+              },
+              {
+                "id": "capitalization_multiple",
+                "label": "Reinvestment-adjusted owner-cash capitalization multiple",
+                "kind": "judgment",
+                "values": {
+                  "low": 10.362170823529413,
+                  "base": 19.037530588235295,
+                  "high": 38.25487941176471
+                },
+                "unit": "multiple",
+                "rationale": "Operated water growth charges maintenance and growth capital explicitly; higher growth creates value only when incremental after-tax return on capital is earned.",
+                "allowed_range": {
+                  "min": 8.0,
+                  "max": 45.0
+                }
+              }
+            ],
+            "calculations": [
+              {
+                "id": "revenue_per_share",
+                "label": "Segment revenue per share",
+                "op": "divide",
+                "args": [
+                  "revenue_m",
+                  "shares_m"
+                ],
+                "unit": "USD_per_share"
+              },
+              {
+                "id": "owner_cash_proxy_per_share",
+                "label": "Owner-cash proxy per share",
+                "op": "multiply",
+                "args": [
+                  "revenue_per_share",
+                  "after_tax_owner_cash_margin"
+                ],
+                "unit": "USD_per_share"
+              },
+              {
+                "id": "value_per_share",
+                "label": "Component value per share",
+                "op": "multiply",
+                "args": [
+                  "owner_cash_proxy_per_share",
+                  "capitalization_multiple"
+                ],
+                "unit": "USD_per_share"
+              }
+            ],
+            "outputs": {
+              "low": "value_per_share",
+              "base": "value_per_share",
+              "high": "value_per_share"
+            }
+          },
+          "valuation_status": "bounded_estimate",
+          "low": 6.38,
+          "base": 16.41,
+          "high": 39.57
         }
       },
       {
@@ -242,9 +781,66 @@
           "low": 0.27,
           "base": 0.3,
           "high": 0.32,
-          "evidence_tier": "company_contract_disclosure",
-          "evidence": "Only the risked present value of disclosed contracted economics is included here.",
-          "cross_check": "Uncontracted data-center and power development remains in the separate project option."
+          "evidence_tier": "primary_derived",
+          "evidence": "Proof base 0.3/sh via net_asset_value@1.0; filings TPL/investor-documents/sec-edgar/10-K_20260218_rpt20251231_acc0001811074_26_000018.htm and TPL/investor-documents/sec-edgar/10-Q_20260506_rpt20260331_acc0001811074_26_000035.htm.",
+          "cross_check": "Uncontracted data-center and power development remains in the separate project option.",
+          "calculation_proof": {
+            "schema_version": "1.0",
+            "method_id": "net_asset_value",
+            "method_version": "1.0",
+            "output_unit": "USD_per_share",
+            "inputs": [
+              {
+                "id": "shares_m",
+                "label": "Q1 2026 diluted shares",
+                "kind": "fact",
+                "value": 69.027,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "TPL/investor-documents/sec-edgar/10-Q_20260506_rpt20260331_acc0001811074_26_000035.htm",
+                  "locator": "69,027,000 diluted shares for per-share bridge",
+                  "as_of": "2026-03-31"
+                },
+                "locked": true
+              }
+            ],
+            "assumptions": [
+              {
+                "id": "contract_claim_m",
+                "label": "Risk-adjusted present value of contracted data-center receivable",
+                "kind": "judgment",
+                "values": {
+                  "low": 18.63729,
+                  "base": 20.708099999999998,
+                  "high": 22.08864
+                },
+                "unit": "USD_m",
+                "rationale": "Only disclosed contracted economics are capitalized; uncontracted development remains in the data-center option.",
+                "allowed_range": {
+                  "min": 10.0,
+                  "max": 30.0
+                }
+              }
+            ],
+            "calculations": [
+              {
+                "id": "value_per_share",
+                "label": "Contracted receivable per share",
+                "op": "divide",
+                "args": [
+                  "contract_claim_m",
+                  "shares_m"
+                ],
+                "unit": "USD_per_share"
+              }
+            ],
+            "outputs": {
+              "low": "value_per_share",
+              "base": "value_per_share",
+              "high": "value_per_share"
+            }
+          },
+          "valuation_status": "bounded_estimate"
         }
       },
       {
@@ -256,13 +852,99 @@
         "valuation": {
           "basis": "per_share",
           "method": "comparable_royalty_nav_residual",
-          "low": 17.35,
-          "base": 18.65,
-          "high": 40.7,
-          "evidence_tier": "company_transactions_and_public_royalty_transactions",
-          "evidence": "TPL's 2024-2025 acquisitions printed near $19.8k, $26.0k, and $34.1k per NRA. Developed public royalty transactions, including Viper/Sitio, printed materially higher. The complete 224,000-NRA portfolio is marked at $25k/$40k/$75k per NRA, then the producing-royalty DCF is subtracted before allocating the residual between visible and dormant inventory.",
+          "low": 17.342,
+          "base": 18.6544,
+          "high": 40.7039,
+          "evidence_tier": "primary_derived",
+          "evidence": "Proof base 18.6544/sh via risk_adjusted_milestone_value@1.0; filings TPL/investor-documents/sec-edgar/10-K_20260218_rpt20251231_acc0001811074_26_000018.htm and TPL/investor-documents/sec-edgar/10-Q_20260506_rpt20260331_acc0001811074_26_000035.htm.",
           "cross_check": "Producing royalties plus visible and dormant inventory reconcile to the total comparable value of all 224,000 NRA, so the same royalty acre cannot be capitalized twice.",
-          "assumption_summary": "45% of the comparable-NAV residual after subtracting producing royalty value; the 70,000-NRA label remains provisional until a tract-level inventory roll-forward is disclosed."
+          "assumption_summary": "45% of the comparable-NAV residual after subtracting producing royalty value; the 70,000-NRA label remains provisional until a tract-level inventory roll-forward is disclosed.",
+          "calculation_proof": {
+            "schema_version": "1.0",
+            "method_id": "risk_adjusted_milestone_value",
+            "method_version": "1.0",
+            "output_unit": "USD_per_share",
+            "inputs": [
+              {
+                "id": "total_nra",
+                "label": "Total net royalty acres",
+                "kind": "fact",
+                "value": 224000.0,
+                "unit": "net_royalty_acres",
+                "source": {
+                  "ref": "TPL/investor-documents/sec-edgar/10-K_20260218_rpt20251231_acc0001811074_26_000018.htm",
+                  "locator": "Approximately 224,000 total NRA across Permian royalty estate (FY2025 Item 1)",
+                  "as_of": "2025-12-31"
+                },
+                "locked": true
+              },
+              {
+                "id": "shares_m",
+                "label": "FY2025 diluted shares",
+                "kind": "fact",
+                "value": 69.027,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "TPL/investor-documents/sec-edgar/10-K_20260218_rpt20251231_acc0001811074_26_000018.htm",
+                  "locator": "69,027,000 diluted shares outstanding for FY2025 EPS bridge",
+                  "as_of": "2025-12-31"
+                },
+                "locked": true
+              }
+            ],
+            "assumptions": [
+              {
+                "id": "comparable_value_per_nra",
+                "label": "Portfolio comparable value per NRA before producing-royalty deduction",
+                "kind": "judgment",
+                "values": {
+                  "low": 25000.0,
+                  "base": 40000.0,
+                  "high": 75000.0
+                },
+                "unit": "USD_per_nra",
+                "rationale": "Marks anchored to TPL 2024-2025 acquisitions and public royalty transactions; producing DCF subtracted before allocation.",
+                "allowed_range": {
+                  "min": 10000.0,
+                  "max": 100000.0
+                }
+              },
+              {
+                "id": "residual_claim_m",
+                "label": "Allocated undeveloped royalty inventory claim",
+                "kind": "judgment",
+                "values": {
+                  "low": 1197.0630315,
+                  "base": 1287.6590475000003,
+                  "high": 2809.6654005
+                },
+                "unit": "USD_m",
+                "rationale": "45% of comparable-NAV residual after deducting producing royalty DCF.",
+                "allowed_range": {
+                  "min": 0.0,
+                  "max": 5000.0
+                }
+              }
+            ],
+            "calculations": [
+              {
+                "id": "value_per_share",
+                "label": "Royalty inventory option per share",
+                "op": "divide",
+                "args": [
+                  "residual_claim_m",
+                  "shares_m"
+                ],
+                "unit": "USD_per_share"
+              }
+            ],
+            "outputs": {
+              "low": "value_per_share",
+              "base": "value_per_share",
+              "high": "value_per_share"
+            }
+          },
+          "valuation_status": "bounded_estimate"
         }
       },
       {
@@ -274,13 +956,99 @@
         "valuation": {
           "basis": "per_share",
           "method": "comparable_royalty_nav_residual",
-          "low": 21.21,
-          "base": 22.8,
-          "high": 49.77,
-          "evidence_tier": "company_transactions_and_public_royalty_transactions",
-          "evidence": "This is the remaining 55% of the total 224,000-NRA comparable-value residual after deducting the producing-royalty DCF. It recognizes dormant acreage without pretending that every acre is currently producing or independently saleable.",
+          "low": 21.1957,
+          "base": 22.7999,
+          "high": 49.7492,
+          "evidence_tier": "primary_derived",
+          "evidence": "Proof base 22.7999/sh via risk_adjusted_milestone_value@1.0; filings TPL/investor-documents/sec-edgar/10-K_20260218_rpt20251231_acc0001811074_26_000018.htm and TPL/investor-documents/sec-edgar/10-Q_20260506_rpt20260331_acc0001811074_26_000035.htm.",
           "cross_check": "Producing royalties plus visible and dormant inventory equal approximately $81/$130/$243 per share, corresponding to $25k/$40k/$75k per total NRA.",
-          "assumption_summary": "55% of the comparable-NAV residual; duration and tract-quality uncertainty are expressed through the portfolio unit marks rather than an arbitrary zero value."
+          "assumption_summary": "55% of the comparable-NAV residual; duration and tract-quality uncertainty are expressed through the portfolio unit marks rather than an arbitrary zero value.",
+          "calculation_proof": {
+            "schema_version": "1.0",
+            "method_id": "risk_adjusted_milestone_value",
+            "method_version": "1.0",
+            "output_unit": "USD_per_share",
+            "inputs": [
+              {
+                "id": "total_nra",
+                "label": "Total net royalty acres",
+                "kind": "fact",
+                "value": 224000.0,
+                "unit": "net_royalty_acres",
+                "source": {
+                  "ref": "TPL/investor-documents/sec-edgar/10-K_20260218_rpt20251231_acc0001811074_26_000018.htm",
+                  "locator": "Approximately 224,000 total NRA across Permian royalty estate (FY2025 Item 1)",
+                  "as_of": "2025-12-31"
+                },
+                "locked": true
+              },
+              {
+                "id": "shares_m",
+                "label": "FY2025 diluted shares",
+                "kind": "fact",
+                "value": 69.027,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "TPL/investor-documents/sec-edgar/10-K_20260218_rpt20251231_acc0001811074_26_000018.htm",
+                  "locator": "69,027,000 diluted shares outstanding for FY2025 EPS bridge",
+                  "as_of": "2025-12-31"
+                },
+                "locked": true
+              }
+            ],
+            "assumptions": [
+              {
+                "id": "comparable_value_per_nra",
+                "label": "Portfolio comparable value per NRA before producing-royalty deduction",
+                "kind": "judgment",
+                "values": {
+                  "low": 25000.0,
+                  "base": 40000.0,
+                  "high": 75000.0
+                },
+                "unit": "USD_per_nra",
+                "rationale": "Marks anchored to TPL 2024-2025 acquisitions and public royalty transactions; producing DCF subtracted before allocation.",
+                "allowed_range": {
+                  "min": 10000.0,
+                  "max": 100000.0
+                }
+              },
+              {
+                "id": "residual_claim_m",
+                "label": "Allocated undeveloped royalty inventory claim",
+                "kind": "judgment",
+                "values": {
+                  "low": 1463.0770385,
+                  "base": 1573.8055025000006,
+                  "high": 3434.0354895000005
+                },
+                "unit": "USD_m",
+                "rationale": "55% of comparable-NAV residual after deducting producing royalty DCF.",
+                "allowed_range": {
+                  "min": 0.0,
+                  "max": 5000.0
+                }
+              }
+            ],
+            "calculations": [
+              {
+                "id": "value_per_share",
+                "label": "Royalty inventory option per share",
+                "op": "divide",
+                "args": [
+                  "residual_claim_m",
+                  "shares_m"
+                ],
+                "unit": "USD_per_share"
+              }
+            ],
+            "outputs": {
+              "low": "value_per_share",
+              "base": "value_per_share",
+              "high": "value_per_share"
+            }
+          },
+          "valuation_status": "bounded_estimate"
         }
       },
       {
@@ -291,8 +1059,8 @@
         "treatment": "additive",
         "valuation": {
           "method": "portfolio_discounted_unit_nav",
-          "evidence_tier": "company_acreage_and_limited_transaction",
-          "evidence": "TPL owns approximately 882,000 surface acres. TPL's May 2025 sale printed near $5,718/acre, LandBridge's recent fee-land transactions ranged from roughly $0.9k to $7.1k/acre, and Intrepid South Ranch sold with water and related assets for $70M. Portfolio marks remain below the best small-parcel and strategic-infrastructure transactions.",
+          "evidence_tier": "primary_derived",
+          "evidence": "Proof base 32.5829/sh via net_asset_value@1.0; filings TPL/investor-documents/sec-edgar/10-K_20260218_rpt20251231_acc0001811074_26_000018.htm and TPL/investor-documents/sec-edgar/10-Q_20260506_rpt20260331_acc0001811074_26_000035.htm.",
           "cross_check": "Per-acre marks represent only residual value after recurring operations and named project options; they are not a second capitalization of existing easement cash flow.",
           "assumption_summary": "882,000 acres at $1,500/$3,000/$5,718 per acre less 20%/15%/10% portfolio realization friction.",
           "driver_model": {
@@ -315,7 +1083,126 @@
                 "friction_pct": 0.1
               }
             }
-          }
+          },
+          "calculation_proof": {
+            "schema_version": "1.0",
+            "method_id": "net_asset_value",
+            "method_version": "1.0",
+            "output_unit": "USD_per_share",
+            "inputs": [
+              {
+                "id": "surface_acres",
+                "label": "Uncontracted surface acreage",
+                "kind": "fact",
+                "value": 882000.0,
+                "unit": "acres",
+                "source": {
+                  "ref": "TPL/investor-documents/sec-edgar/10-K_20260218_rpt20251231_acc0001811074_26_000018.htm",
+                  "locator": "Approximately 882,000 surface acres across Permian footprint (FY2025 Item 1)",
+                  "as_of": "2025-12-31"
+                },
+                "locked": true
+              },
+              {
+                "id": "shares_m",
+                "label": "FY2025 diluted shares",
+                "kind": "fact",
+                "value": 69.027,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "TPL/investor-documents/sec-edgar/10-K_20260218_rpt20251231_acc0001811074_26_000018.htm",
+                  "locator": "69,027,000 diluted shares outstanding for FY2025 EPS bridge",
+                  "as_of": "2025-12-31"
+                },
+                "locked": true
+              }
+            ],
+            "assumptions": [
+              {
+                "id": "value_per_acre",
+                "label": "Portfolio unit mark per surface acre",
+                "kind": "judgment",
+                "values": {
+                  "low": 1500.0,
+                  "base": 3000.0,
+                  "high": 5718.0
+                },
+                "unit": "USD_per_acre",
+                "rationale": "Marks remain below best small-parcel and strategic transactions; recurring easement cash excluded.",
+                "allowed_range": {
+                  "min": 500.0,
+                  "max": 10000.0
+                }
+              },
+              {
+                "id": "net_realization_factor",
+                "label": "Net realization factor after friction",
+                "kind": "judgment",
+                "values": {
+                  "low": 0.8,
+                  "base": 0.85,
+                  "high": 0.9
+                },
+                "unit": "ratio",
+                "rationale": "One minus portfolio realization friction for each scenario.",
+                "allowed_range": {
+                  "min": 0.5,
+                  "max": 1.0
+                }
+              }
+            ],
+            "calculations": [
+              {
+                "id": "net_unit_value",
+                "label": "Net unit value after friction",
+                "op": "multiply",
+                "args": [
+                  "value_per_acre",
+                  "net_realization_factor"
+                ],
+                "unit": "USD_per_acre"
+              },
+              {
+                "id": "gross_land_value_raw",
+                "label": "Gross residual land value before scale",
+                "op": "multiply",
+                "args": [
+                  "surface_acres",
+                  "net_unit_value"
+                ],
+                "unit": "USD"
+              },
+              {
+                "id": "gross_land_value_m",
+                "label": "Gross residual land value",
+                "op": "divide",
+                "args": [
+                  "gross_land_value_raw",
+                  1000000.0
+                ],
+                "unit": "USD_m"
+              },
+              {
+                "id": "value_per_share",
+                "label": "Residual surface land per share",
+                "op": "divide",
+                "args": [
+                  "gross_land_value_m",
+                  "shares_m"
+                ],
+                "unit": "USD_per_share"
+              }
+            ],
+            "outputs": {
+              "low": "value_per_share",
+              "base": "value_per_share",
+              "high": "value_per_share"
+            }
+          },
+          "valuation_status": "bounded_estimate",
+          "low": 15.3331,
+          "base": 32.5829,
+          "high": 65.7561
         }
       },
       {
@@ -326,8 +1213,8 @@
         "treatment": "additive",
         "valuation": {
           "method": "milestone_probability_weighted_option",
-          "evidence_tier": "company_activity_and_regional_demand",
-          "evidence": "Only incremental, uncontracted pipeline, transmission, road, fiber, and logistics opportunities are included.",
+          "evidence_tier": "primary_derived",
+          "evidence": "Proof base 4.4548/sh via risk_adjusted_milestone_value@1.0; filings TPL/investor-documents/sec-edgar/10-K_20260218_rpt20251231_acc0001811074_26_000018.htm and TPL/investor-documents/sec-edgar/10-Q_20260506_rpt20260331_acc0001811074_26_000035.htm.",
           "cross_check": "Each project graduates into existing surface/easement operations once contracted.",
           "assumption_summary": "Probability-weighted successful-project PV less remaining development cost.",
           "driver_model": {
@@ -349,7 +1236,119 @@
                 "remaining_cost_m": 45
               }
             }
-          }
+          },
+          "calculation_proof": {
+            "schema_version": "1.0",
+            "method_id": "risk_adjusted_milestone_value",
+            "method_version": "1.0",
+            "output_unit": "USD_per_share",
+            "inputs": [
+              {
+                "id": "shares_m",
+                "label": "FY2025 diluted shares",
+                "kind": "fact",
+                "value": 69.027,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "TPL/investor-documents/sec-edgar/10-K_20260218_rpt20251231_acc0001811074_26_000018.htm",
+                  "locator": "69,027,000 diluted shares outstanding for FY2025 EPS bridge",
+                  "as_of": "2025-12-31"
+                },
+                "locked": true
+              }
+            ],
+            "assumptions": [
+              {
+                "id": "success_value_m",
+                "label": "Gross success value if milestones are achieved",
+                "kind": "judgment",
+                "values": {
+                  "low": 300.0,
+                  "base": 750.0,
+                  "high": 1500.0
+                },
+                "unit": "USD_m",
+                "rationale": "Incremental uncontracted pipeline, transmission, road, fiber, and logistics opportunities.",
+                "allowed_range": {
+                  "min": 0.0,
+                  "max": 10000.0
+                }
+              },
+              {
+                "id": "success_probability",
+                "label": "Reference-class milestone success probability",
+                "kind": "judgment",
+                "values": {
+                  "low": 0.25,
+                  "base": 0.45,
+                  "high": 0.65
+                },
+                "unit": "ratio",
+                "rationale": "Incremental uncontracted pipeline, transmission, road, fiber, and logistics opportunities.",
+                "allowed_range": {
+                  "min": 0.0,
+                  "max": 1.0
+                }
+              },
+              {
+                "id": "remaining_cost_m",
+                "label": "Remaining owner-funded capital before cash realization",
+                "kind": "judgment",
+                "values": {
+                  "low": 20.0,
+                  "base": 30.0,
+                  "high": 45.0
+                },
+                "unit": "USD_m",
+                "rationale": "Incremental uncontracted pipeline, transmission, road, fiber, and logistics opportunities.",
+                "allowed_range": {
+                  "min": 0.0,
+                  "max": 500.0
+                }
+              }
+            ],
+            "calculations": [
+              {
+                "id": "weighted_success_m",
+                "label": "Probability-weighted success value",
+                "op": "multiply",
+                "args": [
+                  "success_value_m",
+                  "success_probability"
+                ],
+                "unit": "USD_m"
+              },
+              {
+                "id": "risk_adjusted_value_m",
+                "label": "Probability-weighted success value less remaining cost",
+                "op": "subtract",
+                "args": [
+                  "weighted_success_m",
+                  "remaining_cost_m"
+                ],
+                "unit": "USD_m"
+              },
+              {
+                "id": "value_per_share",
+                "label": "Milestone option value per share",
+                "op": "divide",
+                "args": [
+                  "risk_adjusted_value_m",
+                  "shares_m"
+                ],
+                "unit": "USD_per_share"
+              }
+            ],
+            "outputs": {
+              "low": "value_per_share",
+              "base": "value_per_share",
+              "high": "value_per_share"
+            }
+          },
+          "valuation_status": "bounded_estimate",
+          "low": 0.7968,
+          "base": 4.4548,
+          "high": 13.473
         }
       },
       {
@@ -360,8 +1359,8 @@
         "treatment": "additive",
         "valuation": {
           "method": "milestone_probability_weighted_option",
-          "evidence_tier": "early_project_and_partner_disclosure",
-          "evidence": "TPL disclosed a $50M Bolt investment, active LOIs/RFPs, site diligence, turbine and infrastructure work, and potential gigawatt-scale projects. These are not yet treated as contracted cash flow.",
+          "evidence_tier": "primary_derived",
+          "evidence": "Proof base 2.0282/sh via risk_adjusted_milestone_value@1.0; filings TPL/investor-documents/sec-edgar/10-K_20260218_rpt20251231_acc0001811074_26_000018.htm and TPL/investor-documents/sec-edgar/10-Q_20260506_rpt20260331_acc0001811074_26_000035.htm.",
           "cross_check": "The separately modeled receivable and the balance-sheet value of the Bolt investment are excluded from this incremental option.",
           "assumption_summary": "Success value is probability-weighted for customer, power, interconnection, water, capital, permitting, and commissioning milestones.",
           "driver_model": {
@@ -383,7 +1382,132 @@
                 "remaining_cost_m": 20
               }
             }
-          }
+          },
+          "calculation_proof": {
+            "schema_version": "1.0",
+            "method_id": "risk_adjusted_milestone_value",
+            "method_version": "1.0",
+            "output_unit": "USD_per_share",
+            "inputs": [
+              {
+                "id": "bolt_investment_m",
+                "label": "Bolt equity-method investment",
+                "kind": "fact",
+                "value": 50.0,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "TPL/investor-documents/sec-edgar/10-K_20260218_rpt20251231_acc0001811074_26_000018.htm",
+                  "locator": "$50M Bolt investment disclosed in FY2025 investing activities",
+                  "as_of": "2025-12-31"
+                },
+                "locked": true
+              },
+              {
+                "id": "shares_m",
+                "label": "FY2025 diluted shares",
+                "kind": "fact",
+                "value": 69.027,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "TPL/investor-documents/sec-edgar/10-K_20260218_rpt20251231_acc0001811074_26_000018.htm",
+                  "locator": "69,027,000 diluted shares outstanding for FY2025 EPS bridge",
+                  "as_of": "2025-12-31"
+                },
+                "locked": true
+              }
+            ],
+            "assumptions": [
+              {
+                "id": "success_value_m",
+                "label": "Gross success value if milestones are achieved",
+                "kind": "judgment",
+                "values": {
+                  "low": 1000.0,
+                  "base": 2500.0,
+                  "high": 6000.0
+                },
+                "unit": "USD_m",
+                "rationale": "Early-stage data-center, power, and water co-location option; Bolt investment and contracted receivable are excluded from this incremental milestone.",
+                "allowed_range": {
+                  "min": 0.0,
+                  "max": 10000.0
+                }
+              },
+              {
+                "id": "success_probability",
+                "label": "Reference-class milestone success probability",
+                "kind": "judgment",
+                "values": {
+                  "low": 0.02,
+                  "base": 0.06,
+                  "high": 0.15
+                },
+                "unit": "ratio",
+                "rationale": "Early-stage data-center, power, and water co-location option; Bolt investment and contracted receivable are excluded from this incremental milestone.",
+                "allowed_range": {
+                  "min": 0.0,
+                  "max": 1.0
+                }
+              },
+              {
+                "id": "remaining_cost_m",
+                "label": "Remaining owner-funded capital before cash realization",
+                "kind": "judgment",
+                "values": {
+                  "low": 5.0,
+                  "base": 10.0,
+                  "high": 20.0
+                },
+                "unit": "USD_m",
+                "rationale": "Early-stage data-center, power, and water co-location option; Bolt investment and contracted receivable are excluded from this incremental milestone.",
+                "allowed_range": {
+                  "min": 0.0,
+                  "max": 500.0
+                }
+              }
+            ],
+            "calculations": [
+              {
+                "id": "weighted_success_m",
+                "label": "Probability-weighted success value",
+                "op": "multiply",
+                "args": [
+                  "success_value_m",
+                  "success_probability"
+                ],
+                "unit": "USD_m"
+              },
+              {
+                "id": "risk_adjusted_value_m",
+                "label": "Probability-weighted success value less remaining cost",
+                "op": "subtract",
+                "args": [
+                  "weighted_success_m",
+                  "remaining_cost_m"
+                ],
+                "unit": "USD_m"
+              },
+              {
+                "id": "value_per_share",
+                "label": "Milestone option value per share",
+                "op": "divide",
+                "args": [
+                  "risk_adjusted_value_m",
+                  "shares_m"
+                ],
+                "unit": "USD_per_share"
+              }
+            ],
+            "outputs": {
+              "low": "value_per_share",
+              "base": "value_per_share",
+              "high": "value_per_share"
+            }
+          },
+          "valuation_status": "bounded_estimate",
+          "low": 0.2173,
+          "base": 2.0282,
+          "high": 12.7486
         }
       },
       {
@@ -394,8 +1518,8 @@
         "treatment": "additive",
         "valuation": {
           "method": "stage_gated_milestone_option",
-          "evidence_tier": "completed_demonstration_facility",
-          "evidence": "Phase 1 achieved strong water-quality results; the approximately 10,000-bbl/day Phase 2 facility was completed for May 2026 operation. Phase 3 at approximately 100,000 bbl/day remains subject to Phase 2 economics and FID.",
+          "evidence_tier": "primary_derived",
+          "evidence": "Proof base 1.159/sh via risk_adjusted_milestone_value@1.0; filings TPL/investor-documents/sec-edgar/10-K_20260218_rpt20251231_acc0001811074_26_000018.htm and TPL/investor-documents/sec-edgar/10-Q_20260506_rpt20260331_acc0001811074_26_000035.htm.",
           "cross_check": "Commercial value requires repeatable unit economics and a capital-light license, cost-plus, JV, or spin structure; technical success alone is insufficient.",
           "assumption_summary": "Probability-weighted platform value less remaining commercialization cost; the asset state is demonstration, not research-only.",
           "driver_model": {
@@ -417,7 +1541,119 @@
                 "remaining_cost_m": 25
               }
             }
-          }
+          },
+          "calculation_proof": {
+            "schema_version": "1.0",
+            "method_id": "risk_adjusted_milestone_value",
+            "method_version": "1.0",
+            "output_unit": "USD_per_share",
+            "inputs": [
+              {
+                "id": "shares_m",
+                "label": "FY2025 diluted shares",
+                "kind": "fact",
+                "value": 69.027,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "TPL/investor-documents/sec-edgar/10-K_20260218_rpt20251231_acc0001811074_26_000018.htm",
+                  "locator": "69,027,000 diluted shares outstanding for FY2025 EPS bridge",
+                  "as_of": "2025-12-31"
+                },
+                "locked": true
+              }
+            ],
+            "assumptions": [
+              {
+                "id": "success_value_m",
+                "label": "Gross success value if milestones are achieved",
+                "kind": "judgment",
+                "values": {
+                  "low": 200.0,
+                  "base": 1000.0,
+                  "high": 3000.0
+                },
+                "unit": "USD_m",
+                "rationale": "Phase 2 desalination facility completed for May 2026 operation; commercial value requires repeatable economics and capital-light structure.",
+                "allowed_range": {
+                  "min": 0.0,
+                  "max": 10000.0
+                }
+              },
+              {
+                "id": "success_probability",
+                "label": "Reference-class milestone success probability",
+                "kind": "judgment",
+                "values": {
+                  "low": 0.02,
+                  "base": 0.1,
+                  "high": 0.25
+                },
+                "unit": "ratio",
+                "rationale": "Phase 2 desalination facility completed for May 2026 operation; commercial value requires repeatable economics and capital-light structure.",
+                "allowed_range": {
+                  "min": 0.0,
+                  "max": 1.0
+                }
+              },
+              {
+                "id": "remaining_cost_m",
+                "label": "Remaining owner-funded capital before cash realization",
+                "kind": "judgment",
+                "values": {
+                  "low": 25.0,
+                  "base": 20.0,
+                  "high": 25.0
+                },
+                "unit": "USD_m",
+                "rationale": "Phase 2 desalination facility completed for May 2026 operation; commercial value requires repeatable economics and capital-light structure.",
+                "allowed_range": {
+                  "min": 0.0,
+                  "max": 500.0
+                }
+              }
+            ],
+            "calculations": [
+              {
+                "id": "weighted_success_m",
+                "label": "Probability-weighted success value",
+                "op": "multiply",
+                "args": [
+                  "success_value_m",
+                  "success_probability"
+                ],
+                "unit": "USD_m"
+              },
+              {
+                "id": "risk_adjusted_value_m",
+                "label": "Probability-weighted success value less remaining cost",
+                "op": "subtract",
+                "args": [
+                  "weighted_success_m",
+                  "remaining_cost_m"
+                ],
+                "unit": "USD_m"
+              },
+              {
+                "id": "value_per_share",
+                "label": "Milestone option value per share",
+                "op": "divide",
+                "args": [
+                  "risk_adjusted_value_m",
+                  "shares_m"
+                ],
+                "unit": "USD_per_share"
+              }
+            ],
+            "outputs": {
+              "low": "value_per_share",
+              "base": "value_per_share",
+              "high": "value_per_share"
+            }
+          },
+          "valuation_status": "bounded_estimate",
+          "low": -0.3042,
+          "base": 1.159,
+          "high": 10.5031
         }
       },
       {
@@ -432,9 +1668,55 @@
           "low": -5.0,
           "base": -3.0,
           "high": -1.0,
-          "evidence_tier": "analyst_estimate",
-          "evidence": "Reserve for taxes, transaction costs, and corporate friction when latent land and royalty value is realized; no debt is separately deducted.",
-          "cross_check": "Low case absorbs more of the gross option value as realization cost."
+          "evidence_tier": "primary_derived",
+          "evidence": "Proof base -3.0/sh via net_asset_value@1.0; filings TPL/investor-documents/sec-edgar/10-K_20260218_rpt20251231_acc0001811074_26_000018.htm and TPL/investor-documents/sec-edgar/10-Q_20260506_rpt20260331_acc0001811074_26_000035.htm.",
+          "cross_check": "Low case absorbs more of the gross option value as realization cost.",
+          "calculation_proof": {
+            "schema_version": "1.0",
+            "method_id": "net_asset_value",
+            "method_version": "1.0",
+            "output_unit": "USD_per_share",
+            "inputs": [
+              {
+                "id": "shares_m",
+                "label": "FY2025 diluted shares",
+                "kind": "fact",
+                "value": 69.027,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "TPL/investor-documents/sec-edgar/10-K_20260218_rpt20251231_acc0001811074_26_000018.htm",
+                  "locator": "69,027,000 diluted shares outstanding for FY2025 EPS bridge",
+                  "as_of": "2025-12-31"
+                },
+                "locked": true
+              }
+            ],
+            "assumptions": [
+              {
+                "id": "reserve_per_share",
+                "label": "Corporate, tax, and realization reserve per share",
+                "kind": "judgment",
+                "values": {
+                  "low": -5.0,
+                  "base": -3.0,
+                  "high": -1.0
+                },
+                "unit": "USD_per_share",
+                "rationale": "Reserve for taxes, transaction costs, and corporate friction when latent land and royalty value is realized.",
+                "allowed_range": {
+                  "min": -10.0,
+                  "max": 0.0
+                }
+              }
+            ],
+            "calculations": [],
+            "outputs": {
+              "low": "reserve_per_share",
+              "base": "reserve_per_share",
+              "high": "reserve_per_share"
+            }
+          },
+          "valuation_status": "bounded_estimate"
         }
       }
     ]
@@ -4410,7 +5692,17 @@
     ],
     "complete_component_coverage": true,
     "validation_errors": [],
-    "registry_version": "1.0"
+    "registry_version": "1.0",
+    "ownership_waterfall": {
+      "net_economic_claim": "One diluted TPL share claim on producing royalties, surface and water cash engines, filing-locked cash, risked royalty and land inventory, milestone project options, and an explicit realization reserve.",
+      "excluded_claims": [
+        "1888 Assigned land and royalty interests remain at zero on GAAP book and are valued only through comparable and option components.",
+        "Contracted data-center receivable and Bolt investment excluded from incremental data-center option.",
+        "Water infrastructure cross-check embedded in operated water; not additive."
+      ],
+      "reconciliation": "Revenue or milestone proofs on filing-locked quantities plus bounded judgment multiples; producing royalty DCF subtracted before undeveloped royalty residual allocation.",
+      "evidence_ref": "TPL/research/evidence_reconciliation_2026-07-21.md"
+    }
   },
   "valuation_method_route": {
     "schema_version": "1.0",
