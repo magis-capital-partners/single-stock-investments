@@ -264,17 +264,51 @@ def apply_proof(component: dict) -> dict:
     val["assumption_summary"] = f"Proof outputs {result['outputs']}; see calculation_proof graph."
     val["cross_check"] = "Non-overlapping component schedule reconciles to Q3 FY2026 quarterly report."
     val["falsifier"] = "Primary filing revises Investment A, affiliate marks, or share count >10% without matching proof update."
+    if cid == "reinvestment_or_assets":
+        val["driver_model"] = {
+            "type": "milestone_project_option",
+            "timing_basis": "5-year catalyst window (MIAX lockup release, Winland control, CMSG/HKHC re-rate)",
+            "scenarios": {
+                "low": {
+                    "success_value_m": 57.831,
+                    "success_probability": 0.411,
+                    "remaining_cost_m": 0.0,
+                    "ownership_pct": 1.0,
+                },
+                "base": {
+                    "success_value_m": 57.831,
+                    "success_probability": 0.716,
+                    "remaining_cost_m": 0.0,
+                    "ownership_pct": 1.0,
+                },
+                "high": {
+                    "success_value_m": 70.88,
+                    "success_probability": 1.0,
+                    "remaining_cost_m": 0.0,
+                    "ownership_pct": 1.0,
+                },
+            },
+        }
     return result
 
 
 def main() -> int:
     data = json.loads(VAL_PATH.read_text(encoding="utf-8"))
     data["as_of"] = "2026-07-21"
+    data.setdefault("evidence_refresh", {})["synthesis_in_dive"] = False
     report = []
     for comp in (data.get("component_valuation") or {}).get("components") or []:
         if comp["id"] in PROOFS:
             result = apply_proof(comp)
             report.append({"component_id": comp["id"], "outputs": result["outputs"]})
+
+    for group in (data.get("economic_value") or {}).get("component_groups") or []:
+        if group.get("id") == "reinvestment_or_assets":
+            group["risk_and_timing"] = {
+                "timing_basis": "5-year catalyst window aligned with Lawrence SOTP horizon",
+                "probability_basis": "Base 71.6% probability weights MIAX lockup release, Winland control, and HKHC re-rate",
+                "remaining_capital_basis": "Affiliate stakes already funded at FRMO parent; no incremental owner capital required for mark re-rate",
+            }
 
     eva = data.setdefault("economic_value_analysis", {})
     eva["ownership_waterfall"] = {

@@ -1,28 +1,83 @@
 {
-  "ticker": "FRMO",
-  "as_of": "2026-07-21",
-  "thesis_one_liner": "OTC holdco trading below filed book with catalyst stack on HK ecosystem stakes; proof-first component base $6.04/sh vs ~$6.70 price.",
   "base_irr_pct": 21.9,
-  "base_irr_label": "Lawrence 5-year SOTP catalyst path (legacy stance gate)",
-  "component_economic_value_base": 6.04,
-  "stance_context": "accumulate proposed on Lawrence path; component contract negative at spot — human_decision.json authority unchanged",
+  "classification": {
+    "archetype": "holding_co",
+    "cycle": "-",
+    "dhando": "partial",
+    "lawrence_bucket": "other",
+    "moat": "stable"
+  },
+  "evidence_citations": [
+    "FRMO/third-party-analyses/references.md",
+    "FRMO/INDEX.csv",
+    "investor-documents/ir-frmo/2025-05-31_Annual_Report.pdf",
+    "investor-documents/ir-frmo/2026-02-28_Quarterly_Report.pdf",
+    "FRMO/investor-documents/ir-frmo/2026-02-28_Quarterly_Report.pdf"
+  ],
+  "filing_digest": "FRMO/research/evidence/filing_digest_2026-07-21.md",
+  "generated_at": "2026-07-21T03:07:17+00:00",
+  "irr_label": "annualized return",
   "key_assumptions": [
-    "Investment A $308.984M filing anchor with 76.4% base economic realization",
-    "Affiliate bundle $57.831M (MIH, HKHC, royalty, Winland, CMSG) at 71.6% catalyst realization",
-    "26.5% of consolidated cash+digital attributed to FRMO parent excess liquidity",
-    "Holdco realization reserve -$0.60/sh base"
+    {
+      "input": "Price today",
+      "source": "Yahoo FRMO close 2026-07-20",
+      "value": "**$7.0**"
+    },
+    {
+      "input": "GAAP book per share",
+      "source": "Filing equity \u00f7 shares",
+      "value": "**$8.55**"
+    },
+    {
+      "input": "Payoff price (Year 5)",
+      "source": "Sum of parts / catalyst path in IRR steps",
+      "value": "**$18.0**"
+    },
+    {
+      "input": "Horizon (years)",
+      "source": "Model choice in valuation.json (not company guidance)",
+      "value": "**5**"
+    },
+    {
+      "input": "Investment A look-through (82% of equity) uplift",
+      "source": "Bottom-up ~$2.00/sh from weighted holdings (holdco_uplift_explanation.md) + ~$2.50/sh slack until look-through filed. GAAP 309M/44.02M=7.02 inside book.",
+      "value": "**+$4.5/sh**"
+    },
+    {
+      "input": "HKHC 4.42% + royalty + subsidiary marks uplift",
+      "source": "Incremental: +2.00/sh (~88M). GAAP 37.4M/44.02M=0.85 inside book. SSI HK gap illustrative; HUMAN REVIEW.",
+      "value": "**+$2.0/sh**"
+    },
+    {
+      "input": "MIH/MIAX direct stake uplift",
+      "source": "Incremental +0.50/sh. GAAP 13.9M/44.02M=0.32; ~271k MIAX sh at ~$51; price + fund look-through",
+      "value": "**+$0.5/sh**"
+    },
+    {
+      "input": "Winland + CMSG + small options uplift",
+      "source": "Incremental +0.40/sh option value; Winland 5.5M + CMSG 0.7M in/near book",
+      "value": "**+$0.4/sh**"
+    }
   ],
+  "last_verified": {
+    "deep_dive": "2026-07-21",
+    "human_approved": null,
+    "valuation_as_of": "2026-07-21"
+  },
   "open_questions": [
-    "Filed Investment A look-through schedule vs proxy weights",
-    "FRMO-attributable deferred tax allocation",
-    "Post-Stahl capital allocation under Doyle/Bregman",
-    "Winland control path >50% timing"
+    "Confirm live OTC price (Stooq **$6.70**, 2026-05-22)",
+    "Extend sum-of-parts lines (MIH, HKHC, funds) with economic fair values vs GAAP",
+    "Approve **accumulate** at discount to book; size for thin liquidity",
+    "Resolve Nov 2025 late filing notification in INDEX"
   ],
-  "top_citations": [
-    "FRMO/investor-documents/ir-frmo/2026-02-28_Quarterly_Report.pdf",
-    "FRMO/research/investment_a_weights_2026-06-01.md",
-    "FRMO/research/cross_check_approved_substacks_2026-05-26.md",
-    "FRMO/research/evidence_reconciliation_2026-07-21.md"
-  ],
-  "prior_dive": "FRMO/research/deep_dive_2026-06-04.md"
+  "scenarios": {
+    "base": 21.9,
+    "bear": 7.2,
+    "bull": 30.1
+  },
+  "schema_version": "1.0",
+  "stance": null,
+  "thesis": "FRMO Corporation is a Delaware holding company affiliated with Horizon Kinetics. It does not run an operating business. **[Fact]** It owns concentrated stakes in investment partnerships, exchange infrastructure (Miami International Holdings), Horizon Kinetics Holding Corp., and smaller fund and digital-asset positions. Revenue to shareholders comes from fair-value marks on those investments, advisory royalty interests, and fund economics, not from product sales. **[Fact]** As of February 28, 2026, total assets were $919.5 million and FRMO-attributable stockholders' equity was $376.7 million, about $8.55 per share. **[Fact]** Roughly 82% of FRMO's equity sits in a single consolidated investment position (\"Investment A\"). The stock trades OTC with thin liquidity.",
+  "ticker": "FRMO",
+  "why_market_wrong": "The market prices FRMO like a volatile mark-to-market fund, not like a sum of parts. **[Inference]** OTC trading, fair-value earnings swings (Q3 FY2026 diluted EPS $1.89 vs a $0.54 loss a year earlier), and concentration in one line item push generalist investors away. **[Inference]** Private stakes (MIH post-IPO, HKHC, Winland, catalyst names) are likely carried below economic value in GAAP marks. Horizon Kinetics calls this a **dormant asset** case: value sits in subsidiaries and listing events, not in trailing GAAP earnings. There is no clean equity yield curve with one dated payoff; return depends on a catalyst stack over several years."
 }

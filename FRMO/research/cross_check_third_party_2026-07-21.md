@@ -8,7 +8,24 @@
 
 ---
 
-## Inventory coverage
+## Approved sources cited
+
+Registry: `FRMO/third-party-analyses/references.md`
+
+| Source | URL | Use in this cross-check |
+|--------|-----|-------------------------|
+| SSI flywheel | https://specialsituationinvesting.substack.com/p/frmo-corp-a-frictionless-flywheel | Permanent capital; step-wise flywheel; Winland/CMSG catalysts |
+| SSI portfolio update | https://specialsituationinvesting.substack.com/p/portfolio-update-gtx-msb-frmo-tpl | FRMO meeting; Permian water / TPL tailwinds |
+| LCI Stahl lessons | https://lemoncakesinvesting.substack.com/p/lessons-from-murray-stahl | FRMO/HK concentration; active share |
+| LCI crypto commentary | https://lemoncakesinvesting.substack.com/p/frmo-frmo-corp-commentary-on-frmos | WELX/CMSG modular stack |
+| LCI commodities Pt 1 | https://lemoncakesinvesting.substack.com/p/frmo-the-most-important-things-part | TPL weight; MIAX/Winland options |
+| LCI Bitcoin Pt 3.1 | https://lemoncakesinvesting.substack.com/p/frmo-the-most-important-things-part-f3c | Seigniorage; CMSG naming |
+| LCI portfolio review 2023 | https://lemoncakesinvesting.substack.com/p/portfolio-review-2023-annual | Permanent capital sleeve |
+| LCI TPL governance | https://lemoncakesinvesting.substack.com/p/tpl-texas-pacific-land-co-end-of | Post-Stahl governance context |
+
+Prior synthesis: `FRMO/research/cross_check_approved_substacks_2026-05-26.md`
+
+---
 
 | Source tier | Count | Role |
 |-------------|-------|------|
