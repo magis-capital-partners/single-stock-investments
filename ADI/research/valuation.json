@@ -1,14 +1,577 @@
 {
   "ticker": "ADI",
-  "as_of": "2026-07-20",
-  "method": "price_stub",
+  "as_of": "2026-07-21",
+  "method": "full",
+  "irr_method": "full",
+  "valuation_mode": "economic_value",
+  "method_profile": "quality_reinvestment",
+  "lawrence_bucket": "pricing_power",
+  "payoff_lens": "operating",
+  "classification_inputs": {
+    "archetype": "compounder",
+    "moat": "stable",
+    "dhando": "partial",
+    "cycle": "mid",
+    "payoff_lens": "operating",
+    "predictive_attribute": "analog_moat_at_rich_price"
+  },
   "inputs": {
     "price": 372.46,
+    "price_source": "Yahoo ADI close 2026-07-20",
     "price_as_of": "2026-07-20",
-    "price_source": "Yahoo ADI close 2026-07-20"
+    "shares_millions": 496.709,
+    "shares_outstanding": 496709000,
+    "shares_source": "FY2025 net income $2267.3M / diluted EPS $4.56 (ADI/investor-documents/sec-edgar/10-K_20251125_rpt20251101_acc0000006281_25_000153.htm)",
+    "fcf_per_share": 8.6139,
+    "fcf_source": "FY2025 operating cash flow $4812.2M less capital spending $533.6M \u00f7 496.709M diluted shares per ADI/investor-documents/sec-edgar/10-K_20251125_rpt20251101_acc0000006281_25_000153.htm",
+    "cash_m": 2499.4,
+    "total_debt_m": 8599.9,
+    "normalization_note": "FY2025 free cash flow per share anchors owner cash after FY2024 trough recovery; Maxim integration amortization affects GAAP EPS but not the filing-locked cash bridge."
   },
-  "notes": "Price stub created by fetch_equity_prices.py --create-stub; replace with a real model before decision-grade.",
-  "human_review": {
-    "live_price_confirmed": false
+  "scenarios": {
+    "bear": {
+      "growth_y1_5": 0.02,
+      "growth_y6_10": 0.01,
+      "exit_pfcf_y10": 20,
+      "notes": "Industrial inventory correction and communications softness"
+    },
+    "base": {
+      "growth_y1_5": 0.05,
+      "growth_y6_10": 0.03,
+      "exit_pfcf_y10": 26,
+      "notes": "Mid-cycle analog recovery with industrial and automotive mix"
+    },
+    "bull": {
+      "growth_y1_5": 0.08,
+      "growth_y6_10": 0.04,
+      "exit_pfcf_y10": 32,
+      "notes": "AI data-center power and connectivity mix uplift"
+    }
+  },
+  "option_scan": [
+    {
+      "q": 1,
+      "question": "GAAP book misstates core assets?",
+      "answer": "Partial",
+      "treatment": "embedded_in_segment",
+      "evidence": "Intangible assets from Maxim acquisition; analog design IP not separately marked"
+    },
+    {
+      "q": 2,
+      "question": "Undeveloped reserves / dormant assets?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "Operating semiconductor franchise; no land-at-zero pattern"
+    },
+    {
+      "q": 3,
+      "question": "In-business loss segment?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "Consolidated operating income positive FY2025 $2,932.5M"
+    },
+    {
+      "q": 4,
+      "question": "Backlog / contracted revenue not in FCF path?",
+      "answer": "Yes",
+      "treatment": "milestone_nav",
+      "evidence": "AI/data-center power and connectivity design wins in ai_data_center_edge_option"
+    },
+    {
+      "q": 5,
+      "question": "Private or illiquid stakes below fair value?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "No material private equity stakes disclosed (10-K)"
+    },
+    {
+      "q": 6,
+      "question": "Transitory distribution / legal recovery?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "No special dividend or litigation recovery catalyst"
+    }
+  ],
+  "growth_explanation": {
+    "mechanism": "Industrial and automotive end markets drive volume recovery; analog content per system rises with electrification and automation; capital returns reduce share count.",
+    "source": "ADI/investor-documents/sec-edgar/10-K_20251125_rpt20251101_acc0000006281_25_000153.htm disaggregated revenue and cash-flow statement",
+    "falsifiers": [
+      {
+        "id": "industrial_revenue_shock",
+        "trigger": "Industrial end-market revenue falls more than 15% year-over-year for two consecutive quarters",
+        "source": "10-Q end-market revenue disclosures"
+      },
+      {
+        "id": "fcf_compression",
+        "trigger": "Trailing four-quarter free cash flow per share falls below $6.50 for four quarters",
+        "source": "10-K/10-Q cash-flow statements"
+      }
+    ]
+  },
+  "lawrence_horizon_years": 7,
+  "stance_proposal": {
+    "suggested": "watch",
+    "irr_band": "<15%",
+    "gates": {
+      "moat_ok": true,
+      "dhando_ok": true
+    },
+    "override_reason": null
+  },
+  "component_valuation": {
+    "schema_version": "1.0",
+    "all_material_components_identified": true,
+    "coverage_statement": "Four additive components map the analog semiconductor owner-cash engine, AI/data-center edge option, net financial claims, and cycle/integration reserve once each.",
+    "components": [
+      {
+        "id": "analog_semiconductor_engine",
+        "label": "Analog semiconductor owner-cash engine",
+        "category": "operating_business",
+        "overlap_key": "analog_semiconductor_engine",
+        "treatment": "additive",
+        "valuation": {
+          "method": "owner_earnings_reinvestment_dcf",
+          "basis": "per_share",
+          "low": 172.2797,
+          "base": 223.9597,
+          "high": 275.6396,
+          "evidence_tier": "primary_derived",
+          "evidence": "Primary bridge from ADI/investor-documents/sec-edgar/10-K_20251125_rpt20251101_acc0000006281_25_000153.htm: FY2025 revenue $11019.7M, OCF $4812.2M, FCF $4278.6M, Industrial end market $4,929.4M, cash $2499.4M, total debt $8599.9M; contract backfill 2026-07-21.",
+          "assumption_summary": "Proof outputs {'low': 172.2797, 'base': 223.9597, 'high': 275.6396}; see calculation_proof graph.",
+          "cross_check": "Reconcile to FY2025 10-K and Q2 FY2026 10-Q before decision use.",
+          "falsifier": "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
+          "valuation_status": "bounded_estimate",
+          "calculation_proof": {
+            "schema_version": "1.0",
+            "method_id": "owner_earnings_reinvestment_dcf",
+            "method_version": "1.0",
+            "output_unit": "USD_per_share",
+            "inputs": [
+              {
+                "id": "operating_cash_flow_m",
+                "label": "FY2025 net cash from operating activities",
+                "kind": "fact",
+                "value": 4812.2,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "ADI/investor-documents/sec-edgar/10-K_20251125_rpt20251101_acc0000006281_25_000153.htm",
+                  "locator": "NetCashProvidedByUsedInOperatingActivities $4,812.2M (FY2025)",
+                  "as_of": "2025-11-01"
+                },
+                "locked": true
+              },
+              {
+                "id": "capex_m",
+                "label": "FY2025 payments to acquire property, plant and equipment",
+                "kind": "fact",
+                "value": 533.6,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "ADI/investor-documents/sec-edgar/10-K_20251125_rpt20251101_acc0000006281_25_000153.htm",
+                  "locator": "PaymentsToAcquirePropertyPlantAndEquipment $533.6M (FY2025)",
+                  "as_of": "2025-11-01"
+                },
+                "locked": true
+              },
+              {
+                "id": "net_income_m",
+                "label": "FY2025 net income",
+                "kind": "fact",
+                "value": 2267.3,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "ADI/investor-documents/sec-edgar/10-K_20251125_rpt20251101_acc0000006281_25_000153.htm",
+                  "locator": "NetIncomeLoss $2,267.3M (FY2025); diluted EPS $4.56",
+                  "as_of": "2025-11-01"
+                },
+                "locked": true
+              },
+              {
+                "id": "shares_m",
+                "label": "FY2025 diluted shares (net income / diluted EPS)",
+                "kind": "fact",
+                "value": 496.709,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "ADI/investor-documents/sec-edgar/10-K_20251125_rpt20251101_acc0000006281_25_000153.htm",
+                  "locator": "FY2025 net income $2267.3M / diluted EPS $4.56",
+                  "as_of": "2025-11-01"
+                },
+                "locked": true
+              }
+            ],
+            "assumptions": [
+              {
+                "id": "owner_free_cash_flow_per_share",
+                "label": "Normalized owner free cash flow per diluted share",
+                "kind": "judgment",
+                "values": {
+                  "low": 8.6139,
+                  "base": 8.6139,
+                  "high": 8.6139
+                },
+                "unit": "USD_per_share",
+                "rationale": "FY2025 operating cash flow less capital spending per diluted share; buybacks reduce share count but do not change per-share cash generation anchor.",
+                "allowed_range": {
+                  "min": 5.0,
+                  "max": 12.0
+                }
+              },
+              {
+                "id": "capitalization_multiple",
+                "label": "Duration-adjusted owner free-cash-flow capitalization multiple",
+                "kind": "judgment",
+                "values": {
+                  "low": 20.0002,
+                  "base": 25.9998,
+                  "high": 31.9994
+                },
+                "unit": "multiple",
+                "rationale": "Bear stresses industrial inventory correction and communications softness; base mid-cycle seven-year path after FY2024 trough; bull modest AI/data-center mix uplift.",
+                "allowed_range": {
+                  "min": 15.0,
+                  "max": 40.0
+                }
+              }
+            ],
+            "calculations": [
+              {
+                "id": "value_per_share",
+                "label": "Analog semiconductor owner-cash engine per share",
+                "op": "multiply",
+                "args": [
+                  "owner_free_cash_flow_per_share",
+                  "capitalization_multiple"
+                ],
+                "unit": "USD_per_share"
+              }
+            ],
+            "outputs": {
+              "low": "value_per_share",
+              "base": "value_per_share",
+              "high": "value_per_share"
+            }
+          }
+        }
+      },
+      {
+        "id": "ai_data_center_edge_option",
+        "label": "AI and data-center power and connectivity option",
+        "category": "real_option",
+        "overlap_key": "ai_data_center_edge_option",
+        "treatment": "additive",
+        "valuation": {
+          "method": "risk_adjusted_milestone_value",
+          "basis": "per_share",
+          "low": 0.0,
+          "base": 18.0001,
+          "high": 45.0,
+          "evidence_tier": "primary_derived",
+          "evidence": "Primary bridge from ADI/investor-documents/sec-edgar/10-K_20251125_rpt20251101_acc0000006281_25_000153.htm: FY2025 revenue $11019.7M, OCF $4812.2M, FCF $4278.6M, Industrial end market $4,929.4M, cash $2499.4M, total debt $8599.9M; contract backfill 2026-07-21.",
+          "assumption_summary": "Proof outputs {'low': 0.0, 'base': 18.0001, 'high': 45.0}; see calculation_proof graph.",
+          "cross_check": "Reconcile to FY2025 10-K and Q2 FY2026 10-Q before decision use.",
+          "falsifier": "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
+          "valuation_status": "bounded_estimate",
+          "calculation_proof": {
+            "schema_version": "1.0",
+            "method_id": "risk_adjusted_milestone_value",
+            "method_version": "1.0",
+            "output_unit": "USD_per_share",
+            "inputs": [
+              {
+                "id": "industrial_revenue_m",
+                "label": "FY2025 Industrial end-market revenue",
+                "kind": "fact",
+                "value": 4929.4,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "ADI/investor-documents/sec-edgar/10-K_20251125_rpt20251101_acc0000006281_25_000153.htm",
+                  "locator": "Disaggregated revenue: Industrial $4,929.4M (45% of FY2025 revenue)",
+                  "as_of": "2025-11-01"
+                },
+                "locked": true
+              },
+              {
+                "id": "total_revenue_m",
+                "label": "FY2025 consolidated revenue",
+                "kind": "fact",
+                "value": 11019.7,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "ADI/investor-documents/sec-edgar/10-K_20251125_rpt20251101_acc0000006281_25_000153.htm",
+                  "locator": "RevenueFromContractWithCustomerExcludingAssessedTax $11,019.7M (FY2025)",
+                  "as_of": "2025-11-01"
+                },
+                "locked": true
+              },
+              {
+                "id": "shares_m",
+                "label": "FY2025 diluted shares",
+                "kind": "fact",
+                "value": 496.709,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "ADI/investor-documents/sec-edgar/10-K_20251125_rpt20251101_acc0000006281_25_000153.htm",
+                  "locator": "FY2025 net income $2267.3M / diluted EPS $4.56",
+                  "as_of": "2025-11-01"
+                },
+                "locked": true
+              }
+            ],
+            "assumptions": [
+              {
+                "id": "ai_milestone_m",
+                "label": "Risk-adjusted AI, data-center power, and connectivity monetization",
+                "kind": "judgment",
+                "values": {
+                  "low": 0.0,
+                  "base": 8940.8,
+                  "high": 22351.9
+                },
+                "unit": "USD_m",
+                "rationale": "Non-overlapping claim on hyperscale power delivery, thermal management, and high-speed connectivity beyond normalized free cash flow; base is judgment band.",
+                "allowed_range": {
+                  "min": 0.0,
+                  "max": 25000.0
+                }
+              }
+            ],
+            "calculations": [
+              {
+                "id": "value_per_share",
+                "label": "AI and data-center edge option per share",
+                "op": "divide",
+                "args": [
+                  "ai_milestone_m",
+                  "shares_m"
+                ],
+                "unit": "USD_per_share"
+              }
+            ],
+            "outputs": {
+              "low": "value_per_share",
+              "base": "value_per_share",
+              "high": "value_per_share"
+            }
+          }
+        }
+      },
+      {
+        "id": "net_financial_claims",
+        "label": "Net cash and debt claims on common equity",
+        "category": "liability_or_reserve",
+        "overlap_key": "net_financial_claims",
+        "treatment": "additive",
+        "valuation": {
+          "method": "net_asset_value",
+          "basis": "per_share",
+          "low": -15.9999,
+          "base": -12.0,
+          "high": -8.0001,
+          "evidence_tier": "primary_derived",
+          "evidence": "Primary bridge from ADI/investor-documents/sec-edgar/10-K_20251125_rpt20251101_acc0000006281_25_000153.htm: FY2025 revenue $11019.7M, OCF $4812.2M, FCF $4278.6M, Industrial end market $4,929.4M, cash $2499.4M, total debt $8599.9M; contract backfill 2026-07-21.",
+          "assumption_summary": "Proof outputs {'low': -15.9999, 'base': -12.0, 'high': -8.0001}; see calculation_proof graph.",
+          "cross_check": "Reconcile to FY2025 10-K and Q2 FY2026 10-Q before decision use.",
+          "falsifier": "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
+          "valuation_status": "bounded_estimate",
+          "calculation_proof": {
+            "schema_version": "1.0",
+            "method_id": "net_asset_value",
+            "method_version": "1.0",
+            "output_unit": "USD_per_share",
+            "inputs": [
+              {
+                "id": "cash_m",
+                "label": "Cash and cash equivalents at November 1, 2025",
+                "kind": "fact",
+                "value": 2499.4,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "ADI/investor-documents/sec-edgar/10-K_20251125_rpt20251101_acc0000006281_25_000153.htm",
+                  "locator": "CashAndCashEquivalentsAtCarryingValue $2,499.4M at November 1, 2025",
+                  "as_of": "2025-11-01"
+                },
+                "locked": true
+              },
+              {
+                "id": "total_debt_m",
+                "label": "Total debt (long-term, current portion, and short-term borrowings)",
+                "kind": "fact",
+                "value": 8599.9,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "ADI/investor-documents/sec-edgar/10-K_20251125_rpt20251101_acc0000006281_25_000153.htm",
+                  "locator": "LongTermDebtNoncurrent $8,145.1M plus current debt and short-term borrowings $454.8M",
+                  "as_of": "2025-11-01"
+                },
+                "locked": true
+              },
+              {
+                "id": "shares_m",
+                "label": "FY2025 diluted shares",
+                "kind": "fact",
+                "value": 496.709,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "ADI/investor-documents/sec-edgar/10-K_20251125_rpt20251101_acc0000006281_25_000153.htm",
+                  "locator": "FY2025 net income $2267.3M / diluted EPS $4.56",
+                  "as_of": "2025-11-01"
+                },
+                "locked": true
+              }
+            ],
+            "assumptions": [
+              {
+                "id": "net_corporate_claim_m",
+                "label": "Net financial claim on common equity after debt and operating liquidity reserve",
+                "kind": "judgment",
+                "values": {
+                  "low": -7947.3,
+                  "base": -5960.5,
+                  "high": -3973.7
+                },
+                "unit": "USD_m",
+                "rationale": "Filing-locked cash less total debt; low stresses refinancing and trapped liquidity; high credits modest excess liquidity net of debt after Maxim acquisition leverage.",
+                "allowed_range": {
+                  "min": -15000.0,
+                  "max": 5000.0
+                }
+              }
+            ],
+            "calculations": [
+              {
+                "id": "value_per_share",
+                "label": "Net financial claims per share",
+                "op": "divide",
+                "args": [
+                  "net_corporate_claim_m",
+                  "shares_m"
+                ],
+                "unit": "USD_per_share"
+              }
+            ],
+            "outputs": {
+              "low": "value_per_share",
+              "base": "value_per_share",
+              "high": "value_per_share"
+            }
+          }
+        }
+      },
+      {
+        "id": "cycle_integration_reserve",
+        "label": "Semiconductor cycle and integration stress reserve",
+        "category": "liability_or_reserve",
+        "overlap_key": "cycle_integration_reserve",
+        "treatment": "additive",
+        "valuation": {
+          "method": "net_asset_value",
+          "basis": "per_share",
+          "low": -35.0,
+          "base": -20.0,
+          "high": -10.0,
+          "evidence_tier": "primary_derived",
+          "evidence": "Primary bridge from ADI/investor-documents/sec-edgar/10-K_20251125_rpt20251101_acc0000006281_25_000153.htm: FY2025 revenue $11019.7M, OCF $4812.2M, FCF $4278.6M, Industrial end market $4,929.4M, cash $2499.4M, total debt $8599.9M; contract backfill 2026-07-21.",
+          "assumption_summary": "Proof outputs {'low': -35.0, 'base': -20.0, 'high': -10.0}; see calculation_proof graph.",
+          "cross_check": "Reconcile to FY2025 10-K and Q2 FY2026 10-Q before decision use.",
+          "falsifier": "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
+          "valuation_status": "bounded_estimate",
+          "calculation_proof": {
+            "schema_version": "1.0",
+            "method_id": "net_asset_value",
+            "method_version": "1.0",
+            "output_unit": "USD_per_share",
+            "inputs": [
+              {
+                "id": "operating_income_m",
+                "label": "FY2025 operating income",
+                "kind": "fact",
+                "value": 2932.5,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "ADI/investor-documents/sec-edgar/10-K_20251125_rpt20251101_acc0000006281_25_000153.htm",
+                  "locator": "OperatingIncomeLoss $2932.5M (FY2025)",
+                  "as_of": "2025-11-01"
+                },
+                "locked": true
+              },
+              {
+                "id": "research_and_development_m",
+                "label": "FY2025 research and development expense",
+                "kind": "fact",
+                "value": 1766.0,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "ADI/investor-documents/sec-edgar/10-K_20251125_rpt20251101_acc0000006281_25_000153.htm",
+                  "locator": "ResearchAndDevelopmentExpense $1,766.0M (FY2025)",
+                  "as_of": "2025-11-01"
+                },
+                "locked": true
+              },
+              {
+                "id": "shares_m",
+                "label": "FY2025 diluted shares",
+                "kind": "fact",
+                "value": 496.709,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "ADI/investor-documents/sec-edgar/10-K_20251125_rpt20251101_acc0000006281_25_000153.htm",
+                  "locator": "FY2025 net income $2267.3M / diluted EPS $4.56",
+                  "as_of": "2025-11-01"
+                },
+                "locked": true
+              }
+            ],
+            "assumptions": [
+              {
+                "id": "reserve_m",
+                "label": "Semiconductor cycle, inventory, and integration amortization stress reserve",
+                "kind": "judgment",
+                "values": {
+                  "low": -17384.8,
+                  "base": -9934.2,
+                  "high": -4967.1
+                },
+                "unit": "USD_m",
+                "rationale": "Negative reserve for industrial inventory corrections, communications softness, and Maxim integration amortization not fully embedded in core capitalization multiple.",
+                "allowed_range": {
+                  "min": -20000.0,
+                  "max": -3000.0
+                }
+              }
+            ],
+            "calculations": [
+              {
+                "id": "value_per_share",
+                "label": "Cycle and integration reserve per share",
+                "op": "divide",
+                "args": [
+                  "reserve_m",
+                  "shares_m"
+                ],
+                "unit": "USD_per_share"
+              }
+            ],
+            "outputs": {
+              "low": "value_per_share",
+              "base": "value_per_share",
+              "high": "value_per_share"
+            }
+          }
+        }
+      }
+    ]
+  },
+  "economic_value_analysis": {
+    "ownership_waterfall": {
+      "net_economic_claim": "One ADI common share equals pro-rata normalized free cash flow from the analog semiconductor engine, incremental AI/data-center monetization, net corporate liquidity, less cycle and integration reserve.",
+      "excluded_claims": [
+        "Industrial and automotive revenue already embedded in consolidated free cash flow is not double-counted in the core engine multiple.",
+        "Maxim acquisition intangibles amortization is reserved through cycle_integration_reserve, not as separate NAV."
+      ],
+      "reconciliation": "FY2025 FCF $4278.6M on 496.709M shares; cash $2499.4M less total debt $8599.9M.",
+      "evidence_ref": "ADI/research/evidence_reconciliation_2026-07-21.md"
+    },
+    "validation_errors": []
   }
 }
