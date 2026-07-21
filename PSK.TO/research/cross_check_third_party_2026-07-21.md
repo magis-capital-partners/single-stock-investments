@@ -2,7 +2,7 @@
 
 **Date:** 2026-07-21  
 **Agent:** Marvin (contract backfill refresh)  
-**Marvin dive:** `PSK.TO/research/deep_dive_2026-06-03.md` (prior; mechanical sync pending)  
+**Marvin dive:** `PSK.TO/research/deep_dive_2026-07-21.md`  
 **Source inventory:** `PSK.TO/third-party-analyses/source_inventory_2026-06-03.md` (if present)  
 **Framework:** `_system/frameworks/third_party_cross_reference.md`, `external_view_blend.md`
 

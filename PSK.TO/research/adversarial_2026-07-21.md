@@ -11,11 +11,11 @@ re_pass: false
 
 # PSK.TO — Adversarial review
 
-**Date:** 2026-06-03  
+**Date:** 2026-07-21  
 **Agent:** Milly (batch pass)  
-**Dive reviewed:** `PSK.TO/research/deep_dive_2026-06-03.md`  
+**Dive reviewed:** `PSK.TO/research/deep_dive_2026-07-21.md`  
 **Valuation reviewed:** `PSK.TO/research/valuation.json`  
-**Filings used:** `PSK.TO/research/evidence/filing_facts_2026-06-03.json`
+**Filings used:** `PSK.TO/research/evidence/filing_facts_2026-07-21.json`
 
 **Goal:** Truth-seeking QA. Not bearish for its own sake.
 
@@ -53,7 +53,8 @@ re_pass: false
 | Valuation bridge base | 6.06% | 6.06% | Yes |
 
 **Lint notes:**
-- PSK.TO/research/deep_dive_2026-06-03.md: executive_summary_first_pct 5.2% vs valuation.json base 6.06% (tol 0.25pp)
+- PSK.TO/research/deep_dive_2026-07-21.md: executive_summary_first_pct 5.2% vs valuation.json base 6.06% (tol 0.25pp)
+- PSK.TO/research: adversarial date adversarial_2026-06-03.md != dive 2026-07-21
 
 ---
 
