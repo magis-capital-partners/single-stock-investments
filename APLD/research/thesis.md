@@ -11,8 +11,8 @@
 | **Dhando** (Pabrai) | none |
 | **Stance** | watch |
 | **Cycle** | - |
-| **Implied 7yr IRR** (base) | 12.09% (total synthesis) |
-| **IRR method** | scenario |
+| **Implied 7yr IRR** (base) | — |
+| **IRR method** | quality_reinvestment |
 | **Lawrence bucket** | other |
 | **Payoff lens** | pending |
 | **MOI bucket** | pending |
@@ -43,4 +43,4 @@ AI data centre developer with accelerating revenue ($126.6M FQ3, +139% YoY) and 
 - Build SPV-level debt/lease model before sizing.
 - Treat third-party research PDF in `research/reports/` as non-primary.
 
-**Deep dive:** `APLD/research/deep_dive_2026-06-04.md` (auto-sync)
+**Deep dive:** `APLD/research/deep_dive_2026-07-21.md` (auto-sync)

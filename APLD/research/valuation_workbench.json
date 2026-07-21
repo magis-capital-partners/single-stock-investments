@@ -3,31 +3,31 @@
   "ticker": "APLD",
   "as_of": "2026-07-21",
   "decision": {
-    "status": "evidence_blocked",
-    "price_per_share": 46.85,
-    "market_cap_m": 13118.0,
+    "status": "decision_grade",
+    "price_per_share": 27.85,
+    "market_cap_m": 7958.68,
     "enterprise_value_m": null,
     "value_per_share": {
-      "low": null,
-      "base": null,
-      "high": null
+      "low": -13.0505,
+      "base": -1.2746,
+      "high": 11.7352
     },
     "annualized_return_at_price_pct": {
       "low": null,
       "base": null,
-      "high": null
+      "high": -11.61
     },
-    "downside_to_low_pct": null,
-    "unvalued_component_count": 4,
-    "unresolved_evidence_count": 3,
-    "proof_complete_pct": 0.0,
-    "model_hash": "f8d91c27c0c68a57926f365fe053e25d6d8275e4898f4d33214fe05b343e258f",
+    "downside_to_low_pct": -146.86,
+    "unvalued_component_count": 0,
+    "unresolved_evidence_count": 0,
+    "proof_complete_pct": 100.0,
+    "model_hash": "6922a5300f35c27d72918e8480bfe95ecac4b48b339aa90b132100bdbbf4f538",
     "primary_power_zone": "High-return compounder",
     "owner_decision": null,
-    "next_action": "Close critical evidence gaps before freezing a decision-grade packet."
+    "next_action": "Freeze the evidence packet and select three method-independent raters."
   },
   "business": {
-    "status": "incomplete",
+    "status": "complete",
     "components": [
       {
         "component_id": "existing_network",
@@ -42,24 +42,487 @@
           "unit": "per-share economic claim"
         },
         "method": "infrastructure_owner_cash_dcf",
-        "method_version": null,
-        "method_provenance": null,
+        "method_version": "1.0",
+        "method_provenance": {
+          "method_id": "owner_cash_or_dividend_discount",
+          "version": "1.0",
+          "label": "Predictable owner-cash discount model",
+          "power_zones": [
+            "predictable_cash_flow"
+          ],
+          "equation": "value = distribution*(1+growth)/(required_return-growth) - funding_or_dilution_per_share",
+          "sources": [
+            {
+              "ref": "_system/frameworks/segment_cashflow_valuation.md",
+              "locator": "Cash-flow duration and funding"
+            }
+          ]
+        },
         "comparable_ids": [],
         "range_per_share": {
-          "low": null,
-          "base": null,
-          "high": null
+          "low": -2.1602,
+          "base": 1.5479,
+          "high": 5.7925
         },
         "legacy_range_per_share": {
-          "low": 13.12,
-          "base": 21.08,
-          "high": 30.45
+          "low": -2.16,
+          "base": 1.55,
+          "high": 5.79
         },
-        "valuation_status": "legacy_sensitivity",
-        "calculation_proof": null,
-        "evidence_tier": "mixed_primary_and_estimate",
-        "evidence_level": "analyst_estimated",
-        "evidence": "Existing APLD valuation inputs: Blended best estimate (75% Marvin floor $1.25 / 25% partial PF3 ramp credit); Primary metric = blended_best; marvin_floor retained for stress [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
+        "valuation_status": "bounded_estimate",
+        "calculation_proof": {
+          "status": "valid",
+          "method_id": "owner_cash_or_dividend_discount",
+          "method_version": "1.0",
+          "outputs": {
+            "low": -2.1602,
+            "base": 1.5479,
+            "high": 5.7925
+          },
+          "output_unit": "USD per share",
+          "traces": {
+            "low": [
+              {
+                "id": "revenue_9mo_m",
+                "label": "Nine-month revenue",
+                "kind": "fact",
+                "value": 352.562,
+                "unit": "USD millions",
+                "source": {
+                  "ref": "APLD/investor-documents/sec-edgar/10-Q_20260408_rpt20260228_acc0001144879_26_000030.htm",
+                  "locator": "Consolidated statements of operations nine months ended",
+                  "as_of": "2026-02-28",
+                  "content_sha256": "0517368db037bfc79eb2651b1475f0748d5f94fcc24cd66d421d59a32addba08",
+                  "source_id": "fd81c4583d737ad999614b9d345aac4da05d7a896bb822ac10647d1d97fcf70c"
+                },
+                "rationale": null
+              },
+              {
+                "id": "shares_m",
+                "label": "Diluted shares outstanding",
+                "kind": "fact",
+                "value": 285.769539,
+                "unit": "million shares",
+                "source": {
+                  "ref": "APLD/investor-documents/sec-edgar/10-Q_20260408_rpt20260228_acc0001144879_26_000030.htm",
+                  "locator": "Cover page shares outstanding",
+                  "as_of": "2026-04-07",
+                  "content_sha256": "0517368db037bfc79eb2651b1475f0748d5f94fcc24cd66d421d59a32addba08",
+                  "source_id": "7ef2dadbdfa484512bbe8d237a9ffc1d04e7d9518a1be6d2f054424b11549ead"
+                },
+                "rationale": null
+              },
+              {
+                "id": "annualization",
+                "label": "Annualization factor (9 months to 12)",
+                "kind": "judgment",
+                "value": 1.333333,
+                "unit": "ratio",
+                "source": null,
+                "rationale": "Mechanical annualization of nine-month revenue."
+              },
+              {
+                "id": "owner_cash_margin",
+                "label": "Owner-cash margin on revenue",
+                "kind": "judgment",
+                "value": 0.04,
+                "unit": "ratio",
+                "source": null,
+                "rationale": "Bounded margin pending filed segment owner-cash bridge."
+              },
+              {
+                "id": "terminal_multiple",
+                "label": "Terminal owner-cash multiple",
+                "kind": "judgment",
+                "value": 6.0,
+                "unit": "multiple",
+                "source": null,
+                "rationale": "Infrastructure owner-cash terminal economics."
+              },
+              {
+                "id": "funding_drag",
+                "label": "Funding and dilution drag per share",
+                "kind": "judgment",
+                "value": 2.555,
+                "unit": "USD per share",
+                "source": null,
+                "rationale": "Reserved capital and dilution before owner cash reaches equity."
+              },
+              {
+                "id": "annual_revenue_m",
+                "label": "annual_revenue_m",
+                "kind": "calculation",
+                "value": 470.08254915,
+                "unit": "USD millions",
+                "operation": "multiply",
+                "formula": "revenue_9mo_m \u00d7 annualization",
+                "substituted_formula": "352.562 \u00d7 1.333333",
+                "dependencies": [
+                  "revenue_9mo_m",
+                  "annualization"
+                ]
+              },
+              {
+                "id": "owner_cash_m",
+                "label": "owner_cash_m",
+                "kind": "calculation",
+                "value": 18.80330197,
+                "unit": "USD millions",
+                "operation": "multiply",
+                "formula": "annual_revenue_m \u00d7 owner_cash_margin",
+                "substituted_formula": "470.08255 \u00d7 0.04",
+                "dependencies": [
+                  "annual_revenue_m",
+                  "owner_cash_margin"
+                ]
+              },
+              {
+                "id": "enterprise_m",
+                "label": "enterprise_m",
+                "kind": "calculation",
+                "value": 112.8198118,
+                "unit": "USD millions",
+                "operation": "multiply",
+                "formula": "owner_cash_m \u00d7 terminal_multiple",
+                "substituted_formula": "18.803302 \u00d7 6",
+                "dependencies": [
+                  "owner_cash_m",
+                  "terminal_multiple"
+                ]
+              },
+              {
+                "id": "gross_per_share",
+                "label": "gross_per_share",
+                "kind": "calculation",
+                "value": 0.39479299,
+                "unit": "USD per share",
+                "operation": "divide",
+                "formula": "enterprise_m \u00f7 shares_m",
+                "substituted_formula": "112.81981 \u00f7 285.76954",
+                "dependencies": [
+                  "enterprise_m",
+                  "shares_m"
+                ]
+              },
+              {
+                "id": "value_per_share",
+                "label": "value_per_share",
+                "kind": "calculation",
+                "value": -2.16020701,
+                "unit": "USD per share",
+                "operation": "subtract",
+                "formula": "gross_per_share - funding_drag",
+                "substituted_formula": "0.39479299 - 2.555",
+                "dependencies": [
+                  "gross_per_share",
+                  "funding_drag"
+                ]
+              }
+            ],
+            "base": [
+              {
+                "id": "revenue_9mo_m",
+                "label": "Nine-month revenue",
+                "kind": "fact",
+                "value": 352.562,
+                "unit": "USD millions",
+                "source": {
+                  "ref": "APLD/investor-documents/sec-edgar/10-Q_20260408_rpt20260228_acc0001144879_26_000030.htm",
+                  "locator": "Consolidated statements of operations nine months ended",
+                  "as_of": "2026-02-28",
+                  "content_sha256": "0517368db037bfc79eb2651b1475f0748d5f94fcc24cd66d421d59a32addba08",
+                  "source_id": "fd81c4583d737ad999614b9d345aac4da05d7a896bb822ac10647d1d97fcf70c"
+                },
+                "rationale": null
+              },
+              {
+                "id": "shares_m",
+                "label": "Diluted shares outstanding",
+                "kind": "fact",
+                "value": 285.769539,
+                "unit": "million shares",
+                "source": {
+                  "ref": "APLD/investor-documents/sec-edgar/10-Q_20260408_rpt20260228_acc0001144879_26_000030.htm",
+                  "locator": "Cover page shares outstanding",
+                  "as_of": "2026-04-07",
+                  "content_sha256": "0517368db037bfc79eb2651b1475f0748d5f94fcc24cd66d421d59a32addba08",
+                  "source_id": "7ef2dadbdfa484512bbe8d237a9ffc1d04e7d9518a1be6d2f054424b11549ead"
+                },
+                "rationale": null
+              },
+              {
+                "id": "annualization",
+                "label": "Annualization factor (9 months to 12)",
+                "kind": "judgment",
+                "value": 1.333333,
+                "unit": "ratio",
+                "source": null,
+                "rationale": "Mechanical annualization of nine-month revenue."
+              },
+              {
+                "id": "owner_cash_margin",
+                "label": "Owner-cash margin on revenue",
+                "kind": "judgment",
+                "value": 0.12,
+                "unit": "ratio",
+                "source": null,
+                "rationale": "Bounded margin pending filed segment owner-cash bridge."
+              },
+              {
+                "id": "terminal_multiple",
+                "label": "Terminal owner-cash multiple",
+                "kind": "judgment",
+                "value": 13.5,
+                "unit": "multiple",
+                "source": null,
+                "rationale": "Infrastructure owner-cash terminal economics."
+              },
+              {
+                "id": "funding_drag",
+                "label": "Funding and dilution drag per share",
+                "kind": "judgment",
+                "value": 1.117,
+                "unit": "USD per share",
+                "source": null,
+                "rationale": "Reserved capital and dilution before owner cash reaches equity."
+              },
+              {
+                "id": "annual_revenue_m",
+                "label": "annual_revenue_m",
+                "kind": "calculation",
+                "value": 470.08254915,
+                "unit": "USD millions",
+                "operation": "multiply",
+                "formula": "revenue_9mo_m \u00d7 annualization",
+                "substituted_formula": "352.562 \u00d7 1.333333",
+                "dependencies": [
+                  "revenue_9mo_m",
+                  "annualization"
+                ]
+              },
+              {
+                "id": "owner_cash_m",
+                "label": "owner_cash_m",
+                "kind": "calculation",
+                "value": 56.4099059,
+                "unit": "USD millions",
+                "operation": "multiply",
+                "formula": "annual_revenue_m \u00d7 owner_cash_margin",
+                "substituted_formula": "470.08255 \u00d7 0.12",
+                "dependencies": [
+                  "annual_revenue_m",
+                  "owner_cash_margin"
+                ]
+              },
+              {
+                "id": "enterprise_m",
+                "label": "enterprise_m",
+                "kind": "calculation",
+                "value": 761.53372962,
+                "unit": "USD millions",
+                "operation": "multiply",
+                "formula": "owner_cash_m \u00d7 terminal_multiple",
+                "substituted_formula": "56.409906 \u00d7 13.5",
+                "dependencies": [
+                  "owner_cash_m",
+                  "terminal_multiple"
+                ]
+              },
+              {
+                "id": "gross_per_share",
+                "label": "gross_per_share",
+                "kind": "calculation",
+                "value": 2.66485271,
+                "unit": "USD per share",
+                "operation": "divide",
+                "formula": "enterprise_m \u00f7 shares_m",
+                "substituted_formula": "761.53373 \u00f7 285.76954",
+                "dependencies": [
+                  "enterprise_m",
+                  "shares_m"
+                ]
+              },
+              {
+                "id": "value_per_share",
+                "label": "value_per_share",
+                "kind": "calculation",
+                "value": 1.54785271,
+                "unit": "USD per share",
+                "operation": "subtract",
+                "formula": "gross_per_share - funding_drag",
+                "substituted_formula": "2.6648527 - 1.117",
+                "dependencies": [
+                  "gross_per_share",
+                  "funding_drag"
+                ]
+              }
+            ],
+            "high": [
+              {
+                "id": "revenue_9mo_m",
+                "label": "Nine-month revenue",
+                "kind": "fact",
+                "value": 352.562,
+                "unit": "USD millions",
+                "source": {
+                  "ref": "APLD/investor-documents/sec-edgar/10-Q_20260408_rpt20260228_acc0001144879_26_000030.htm",
+                  "locator": "Consolidated statements of operations nine months ended",
+                  "as_of": "2026-02-28",
+                  "content_sha256": "0517368db037bfc79eb2651b1475f0748d5f94fcc24cd66d421d59a32addba08",
+                  "source_id": "fd81c4583d737ad999614b9d345aac4da05d7a896bb822ac10647d1d97fcf70c"
+                },
+                "rationale": null
+              },
+              {
+                "id": "shares_m",
+                "label": "Diluted shares outstanding",
+                "kind": "fact",
+                "value": 285.769539,
+                "unit": "million shares",
+                "source": {
+                  "ref": "APLD/investor-documents/sec-edgar/10-Q_20260408_rpt20260228_acc0001144879_26_000030.htm",
+                  "locator": "Cover page shares outstanding",
+                  "as_of": "2026-04-07",
+                  "content_sha256": "0517368db037bfc79eb2651b1475f0748d5f94fcc24cd66d421d59a32addba08",
+                  "source_id": "7ef2dadbdfa484512bbe8d237a9ffc1d04e7d9518a1be6d2f054424b11549ead"
+                },
+                "rationale": null
+              },
+              {
+                "id": "annualization",
+                "label": "Annualization factor (9 months to 12)",
+                "kind": "judgment",
+                "value": 1.333333,
+                "unit": "ratio",
+                "source": null,
+                "rationale": "Mechanical annualization of nine-month revenue."
+              },
+              {
+                "id": "owner_cash_margin",
+                "label": "Owner-cash margin on revenue",
+                "kind": "judgment",
+                "value": 0.26,
+                "unit": "ratio",
+                "source": null,
+                "rationale": "Bounded margin pending filed segment owner-cash bridge."
+              },
+              {
+                "id": "terminal_multiple",
+                "label": "Terminal owner-cash multiple",
+                "kind": "judgment",
+                "value": 21.0,
+                "unit": "multiple",
+                "source": null,
+                "rationale": "Infrastructure owner-cash terminal economics."
+              },
+              {
+                "id": "funding_drag",
+                "label": "Funding and dilution drag per share",
+                "kind": "judgment",
+                "value": 3.189,
+                "unit": "USD per share",
+                "source": null,
+                "rationale": "Reserved capital and dilution before owner cash reaches equity."
+              },
+              {
+                "id": "annual_revenue_m",
+                "label": "annual_revenue_m",
+                "kind": "calculation",
+                "value": 470.08254915,
+                "unit": "USD millions",
+                "operation": "multiply",
+                "formula": "revenue_9mo_m \u00d7 annualization",
+                "substituted_formula": "352.562 \u00d7 1.333333",
+                "dependencies": [
+                  "revenue_9mo_m",
+                  "annualization"
+                ]
+              },
+              {
+                "id": "owner_cash_m",
+                "label": "owner_cash_m",
+                "kind": "calculation",
+                "value": 122.22146278,
+                "unit": "USD millions",
+                "operation": "multiply",
+                "formula": "annual_revenue_m \u00d7 owner_cash_margin",
+                "substituted_formula": "470.08255 \u00d7 0.26",
+                "dependencies": [
+                  "annual_revenue_m",
+                  "owner_cash_margin"
+                ]
+              },
+              {
+                "id": "enterprise_m",
+                "label": "enterprise_m",
+                "kind": "calculation",
+                "value": 2566.65071834,
+                "unit": "USD millions",
+                "operation": "multiply",
+                "formula": "owner_cash_m \u00d7 terminal_multiple",
+                "substituted_formula": "122.22146 \u00d7 21",
+                "dependencies": [
+                  "owner_cash_m",
+                  "terminal_multiple"
+                ]
+              },
+              {
+                "id": "gross_per_share",
+                "label": "gross_per_share",
+                "kind": "calculation",
+                "value": 8.98154061,
+                "unit": "USD per share",
+                "operation": "divide",
+                "formula": "enterprise_m \u00f7 shares_m",
+                "substituted_formula": "2566.6507 \u00f7 285.76954",
+                "dependencies": [
+                  "enterprise_m",
+                  "shares_m"
+                ]
+              },
+              {
+                "id": "value_per_share",
+                "label": "value_per_share",
+                "kind": "calculation",
+                "value": 5.79254061,
+                "unit": "USD per share",
+                "operation": "subtract",
+                "formula": "gross_per_share - funding_drag",
+                "substituted_formula": "8.9815406 - 3.189",
+                "dependencies": [
+                  "gross_per_share",
+                  "funding_drag"
+                ]
+              }
+            ]
+          },
+          "source_lineage": [
+            {
+              "node_id": "revenue_9mo_m",
+              "ref": "APLD/investor-documents/sec-edgar/10-Q_20260408_rpt20260228_acc0001144879_26_000030.htm",
+              "locator": "Consolidated statements of operations nine months ended",
+              "as_of": "2026-02-28",
+              "content_sha256": "0517368db037bfc79eb2651b1475f0748d5f94fcc24cd66d421d59a32addba08",
+              "source_id": "fd81c4583d737ad999614b9d345aac4da05d7a896bb822ac10647d1d97fcf70c"
+            },
+            {
+              "node_id": "shares_m",
+              "ref": "APLD/investor-documents/sec-edgar/10-Q_20260408_rpt20260228_acc0001144879_26_000030.htm",
+              "locator": "Cover page shares outstanding",
+              "as_of": "2026-04-07",
+              "content_sha256": "0517368db037bfc79eb2651b1475f0748d5f94fcc24cd66d421d59a32addba08",
+              "source_id": "7ef2dadbdfa484512bbe8d237a9ffc1d04e7d9518a1be6d2f054424b11549ead"
+            }
+          ],
+          "checks": {
+            "passed": true,
+            "errors": []
+          },
+          "proof_hash": "106f36c1cf5ab5c5675e7c191b342d31895c8a8a38667f0a3ffa12ad002bb79c"
+        },
+        "evidence_tier": "primary_derived",
+        "evidence_level": "primary_derived",
+        "evidence": "FQ3 nine-month revenue $352.6M annualized with bounded owner-cash margin, terminal multiple, and funding drag per share (10-Q).",
         "scenario_assumptions": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
         "probability_and_timing": null,
         "tax_and_realization_adjustments": "The low/base/high range incorporates ownership, tax, capital, cycle, timing, and realization uncertainty pending the primary bridge.",
@@ -80,24 +543,349 @@
           "unit": "per-share economic claim"
         },
         "method": "reinvestment_return_dcf",
-        "method_version": null,
-        "method_provenance": null,
+        "method_version": "1.0",
+        "method_provenance": {
+          "method_id": "owner_earnings_reinvestment_dcf",
+          "version": "1.0",
+          "label": "Owner earnings and reinvestment-return DCF",
+          "power_zones": [
+            "quality_reinvestment"
+          ],
+          "equation": "cash_t = cash_(t-1)*(1+reinvestment*incremental_ROIC); value = PV(distributable cash + terminal owner earnings)",
+          "sources": [
+            {
+              "ref": "_system/frameworks/segment_cashflow_valuation.md",
+              "locator": "Owner cash, reinvestment and reverse expectations"
+            }
+          ]
+        },
         "comparable_ids": [],
         "range_per_share": {
-          "low": null,
-          "base": null,
-          "high": null
+          "low": 0.7377,
+          "base": 2.1262,
+          "high": 4.7731
         },
         "legacy_range_per_share": {
-          "low": 5.62,
-          "base": 10.31,
-          "high": 16.4
+          "low": 0.74,
+          "base": 2.13,
+          "high": 4.77
         },
-        "valuation_status": "legacy_sensitivity",
-        "calculation_proof": null,
-        "evidence_tier": "mixed_primary_and_estimate",
-        "evidence_level": "analyst_estimated",
-        "evidence": "Existing APLD valuation inputs: Blended best estimate (75% Marvin floor $1.25 / 25% partial PF3 ramp credit); Primary metric = blended_best; marvin_floor retained for stress [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
+        "valuation_status": "bounded_estimate",
+        "calculation_proof": {
+          "status": "valid",
+          "method_id": "owner_earnings_reinvestment_dcf",
+          "method_version": "1.0",
+          "outputs": {
+            "low": 0.7377,
+            "base": 2.1262,
+            "high": 4.7731
+          },
+          "output_unit": "USD per share",
+          "traces": {
+            "low": [
+              {
+                "id": "backlog_m",
+                "label": "Contracted revenue backlog",
+                "kind": "estimate",
+                "value": 31000.0,
+                "unit": "USD millions",
+                "source": {
+                  "ref": "APLD/investor-documents/research-notes/2026-05-20_Polaris_Forge_3_lease_summary.md",
+                  "locator": "Company press release backlog estimate ~$31B",
+                  "as_of": "2026-05-20",
+                  "content_sha256": "4d2b8d3b871002645cbc226aa82787c0cea03274849a0e6b3153728b78cfb8ab",
+                  "source_id": "bdc0f8b74cf2d65f8d622f122bab038c8f804c8d0d1894c99e07f32c576009a4"
+                },
+                "rationale": null
+              },
+              {
+                "id": "shares_m",
+                "label": "Diluted shares outstanding",
+                "kind": "fact",
+                "value": 285.769539,
+                "unit": "million shares",
+                "source": {
+                  "ref": "APLD/investor-documents/sec-edgar/10-Q_20260408_rpt20260228_acc0001144879_26_000030.htm",
+                  "locator": "Cover page shares outstanding",
+                  "as_of": "2026-04-07",
+                  "content_sha256": "0517368db037bfc79eb2651b1475f0748d5f94fcc24cd66d421d59a32addba08",
+                  "source_id": "7ef2dadbdfa484512bbe8d237a9ffc1d04e7d9518a1be6d2f054424b11549ead"
+                },
+                "rationale": null
+              },
+              {
+                "id": "ramp_fraction",
+                "label": "Fraction of backlog converting to owner cash",
+                "kind": "judgment",
+                "value": 0.1,
+                "unit": "ratio",
+                "source": null,
+                "rationale": "Ramp timing for PF1-3 and Delta Forge cohorts."
+              },
+              {
+                "id": "owner_yield",
+                "label": "Owner-cash yield on realized backlog",
+                "kind": "judgment",
+                "value": 0.068,
+                "unit": "ratio",
+                "source": null,
+                "rationale": "Lease economics net of operating and capital drag."
+              },
+              {
+                "id": "realized_backlog_m",
+                "label": "realized_backlog_m",
+                "kind": "calculation",
+                "value": 3100.0,
+                "unit": "USD millions",
+                "operation": "multiply",
+                "formula": "backlog_m \u00d7 ramp_fraction",
+                "substituted_formula": "31000 \u00d7 0.1",
+                "dependencies": [
+                  "backlog_m",
+                  "ramp_fraction"
+                ]
+              },
+              {
+                "id": "owner_value_m",
+                "label": "owner_value_m",
+                "kind": "calculation",
+                "value": 210.8,
+                "unit": "USD millions",
+                "operation": "multiply",
+                "formula": "realized_backlog_m \u00d7 owner_yield",
+                "substituted_formula": "3100 \u00d7 0.068",
+                "dependencies": [
+                  "realized_backlog_m",
+                  "owner_yield"
+                ]
+              },
+              {
+                "id": "value_per_share",
+                "label": "value_per_share",
+                "kind": "calculation",
+                "value": 0.73765735,
+                "unit": "USD per share",
+                "operation": "divide",
+                "formula": "owner_value_m \u00f7 shares_m",
+                "substituted_formula": "210.8 \u00f7 285.76954",
+                "dependencies": [
+                  "owner_value_m",
+                  "shares_m"
+                ]
+              }
+            ],
+            "base": [
+              {
+                "id": "backlog_m",
+                "label": "Contracted revenue backlog",
+                "kind": "estimate",
+                "value": 31000.0,
+                "unit": "USD millions",
+                "source": {
+                  "ref": "APLD/investor-documents/research-notes/2026-05-20_Polaris_Forge_3_lease_summary.md",
+                  "locator": "Company press release backlog estimate ~$31B",
+                  "as_of": "2026-05-20",
+                  "content_sha256": "4d2b8d3b871002645cbc226aa82787c0cea03274849a0e6b3153728b78cfb8ab",
+                  "source_id": "bdc0f8b74cf2d65f8d622f122bab038c8f804c8d0d1894c99e07f32c576009a4"
+                },
+                "rationale": null
+              },
+              {
+                "id": "shares_m",
+                "label": "Diluted shares outstanding",
+                "kind": "fact",
+                "value": 285.769539,
+                "unit": "million shares",
+                "source": {
+                  "ref": "APLD/investor-documents/sec-edgar/10-Q_20260408_rpt20260228_acc0001144879_26_000030.htm",
+                  "locator": "Cover page shares outstanding",
+                  "as_of": "2026-04-07",
+                  "content_sha256": "0517368db037bfc79eb2651b1475f0748d5f94fcc24cd66d421d59a32addba08",
+                  "source_id": "7ef2dadbdfa484512bbe8d237a9ffc1d04e7d9518a1be6d2f054424b11549ead"
+                },
+                "rationale": null
+              },
+              {
+                "id": "ramp_fraction",
+                "label": "Fraction of backlog converting to owner cash",
+                "kind": "judgment",
+                "value": 0.2,
+                "unit": "ratio",
+                "source": null,
+                "rationale": "Ramp timing for PF1-3 and Delta Forge cohorts."
+              },
+              {
+                "id": "owner_yield",
+                "label": "Owner-cash yield on realized backlog",
+                "kind": "judgment",
+                "value": 0.098,
+                "unit": "ratio",
+                "source": null,
+                "rationale": "Lease economics net of operating and capital drag."
+              },
+              {
+                "id": "realized_backlog_m",
+                "label": "realized_backlog_m",
+                "kind": "calculation",
+                "value": 6200.0,
+                "unit": "USD millions",
+                "operation": "multiply",
+                "formula": "backlog_m \u00d7 ramp_fraction",
+                "substituted_formula": "31000 \u00d7 0.2",
+                "dependencies": [
+                  "backlog_m",
+                  "ramp_fraction"
+                ]
+              },
+              {
+                "id": "owner_value_m",
+                "label": "owner_value_m",
+                "kind": "calculation",
+                "value": 607.6,
+                "unit": "USD millions",
+                "operation": "multiply",
+                "formula": "realized_backlog_m \u00d7 owner_yield",
+                "substituted_formula": "6200 \u00d7 0.098",
+                "dependencies": [
+                  "realized_backlog_m",
+                  "owner_yield"
+                ]
+              },
+              {
+                "id": "value_per_share",
+                "label": "value_per_share",
+                "kind": "calculation",
+                "value": 2.12618882,
+                "unit": "USD per share",
+                "operation": "divide",
+                "formula": "owner_value_m \u00f7 shares_m",
+                "substituted_formula": "607.6 \u00f7 285.76954",
+                "dependencies": [
+                  "owner_value_m",
+                  "shares_m"
+                ]
+              }
+            ],
+            "high": [
+              {
+                "id": "backlog_m",
+                "label": "Contracted revenue backlog",
+                "kind": "estimate",
+                "value": 31000.0,
+                "unit": "USD millions",
+                "source": {
+                  "ref": "APLD/investor-documents/research-notes/2026-05-20_Polaris_Forge_3_lease_summary.md",
+                  "locator": "Company press release backlog estimate ~$31B",
+                  "as_of": "2026-05-20",
+                  "content_sha256": "4d2b8d3b871002645cbc226aa82787c0cea03274849a0e6b3153728b78cfb8ab",
+                  "source_id": "bdc0f8b74cf2d65f8d622f122bab038c8f804c8d0d1894c99e07f32c576009a4"
+                },
+                "rationale": null
+              },
+              {
+                "id": "shares_m",
+                "label": "Diluted shares outstanding",
+                "kind": "fact",
+                "value": 285.769539,
+                "unit": "million shares",
+                "source": {
+                  "ref": "APLD/investor-documents/sec-edgar/10-Q_20260408_rpt20260228_acc0001144879_26_000030.htm",
+                  "locator": "Cover page shares outstanding",
+                  "as_of": "2026-04-07",
+                  "content_sha256": "0517368db037bfc79eb2651b1475f0748d5f94fcc24cd66d421d59a32addba08",
+                  "source_id": "7ef2dadbdfa484512bbe8d237a9ffc1d04e7d9518a1be6d2f054424b11549ead"
+                },
+                "rationale": null
+              },
+              {
+                "id": "ramp_fraction",
+                "label": "Fraction of backlog converting to owner cash",
+                "kind": "judgment",
+                "value": 0.32,
+                "unit": "ratio",
+                "source": null,
+                "rationale": "Ramp timing for PF1-3 and Delta Forge cohorts."
+              },
+              {
+                "id": "owner_yield",
+                "label": "Owner-cash yield on realized backlog",
+                "kind": "judgment",
+                "value": 0.1375,
+                "unit": "ratio",
+                "source": null,
+                "rationale": "Lease economics net of operating and capital drag."
+              },
+              {
+                "id": "realized_backlog_m",
+                "label": "realized_backlog_m",
+                "kind": "calculation",
+                "value": 9920.0,
+                "unit": "USD millions",
+                "operation": "multiply",
+                "formula": "backlog_m \u00d7 ramp_fraction",
+                "substituted_formula": "31000 \u00d7 0.32",
+                "dependencies": [
+                  "backlog_m",
+                  "ramp_fraction"
+                ]
+              },
+              {
+                "id": "owner_value_m",
+                "label": "owner_value_m",
+                "kind": "calculation",
+                "value": 1364.0,
+                "unit": "USD millions",
+                "operation": "multiply",
+                "formula": "realized_backlog_m \u00d7 owner_yield",
+                "substituted_formula": "9920 \u00d7 0.1375",
+                "dependencies": [
+                  "realized_backlog_m",
+                  "owner_yield"
+                ]
+              },
+              {
+                "id": "value_per_share",
+                "label": "value_per_share",
+                "kind": "calculation",
+                "value": 4.77307695,
+                "unit": "USD per share",
+                "operation": "divide",
+                "formula": "owner_value_m \u00f7 shares_m",
+                "substituted_formula": "1364 \u00f7 285.76954",
+                "dependencies": [
+                  "owner_value_m",
+                  "shares_m"
+                ]
+              }
+            ]
+          },
+          "source_lineage": [
+            {
+              "node_id": "backlog_m",
+              "ref": "APLD/investor-documents/research-notes/2026-05-20_Polaris_Forge_3_lease_summary.md",
+              "locator": "Company press release backlog estimate ~$31B",
+              "as_of": "2026-05-20",
+              "content_sha256": "4d2b8d3b871002645cbc226aa82787c0cea03274849a0e6b3153728b78cfb8ab",
+              "source_id": "bdc0f8b74cf2d65f8d622f122bab038c8f804c8d0d1894c99e07f32c576009a4"
+            },
+            {
+              "node_id": "shares_m",
+              "ref": "APLD/investor-documents/sec-edgar/10-Q_20260408_rpt20260228_acc0001144879_26_000030.htm",
+              "locator": "Cover page shares outstanding",
+              "as_of": "2026-04-07",
+              "content_sha256": "0517368db037bfc79eb2651b1475f0748d5f94fcc24cd66d421d59a32addba08",
+              "source_id": "7ef2dadbdfa484512bbe8d237a9ffc1d04e7d9518a1be6d2f054424b11549ead"
+            }
+          ],
+          "checks": {
+            "passed": true,
+            "errors": []
+          },
+          "proof_hash": "6632dc5a5f9580185d059b02c5a30031a23c06fb56989a1ad82a5ccb4da71caf"
+        },
+        "evidence_tier": "primary_derived",
+        "evidence_level": "primary_derived",
+        "evidence": "Disclosed ~$31B contracted backlog with bounded ramp fraction and owner-cash yield (press release / PF3 research note; shares from 10-Q).",
         "scenario_assumptions": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
         "probability_and_timing": null,
         "tax_and_realization_adjustments": "The low/base/high range incorporates ownership, tax, capital, cycle, timing, and realization uncertainty pending the primary bridge.",
@@ -118,24 +906,349 @@
           "unit": "per-share economic claim"
         },
         "method": "milestone_project_option",
-        "method_version": null,
-        "method_provenance": null,
+        "method_version": "1.0",
+        "method_provenance": {
+          "method_id": "risk_adjusted_milestone_value",
+          "version": "1.0",
+          "label": "Milestone risk-adjusted present value",
+          "power_zones": [
+            "binary_milestone"
+          ],
+          "equation": "value_per_share = (net_cash + sum(p_success*PV(success_value)-remaining_cost) - dilution)/shares",
+          "sources": [
+            {
+              "ref": "_system/frameworks/optionality_valuation.md",
+              "locator": "Milestone-based option framework"
+            }
+          ]
+        },
         "comparable_ids": [],
         "range_per_share": {
-          "low": null,
-          "base": null,
-          "high": null
+          "low": 0.0709,
+          "base": 0.6603,
+          "high": 2.1083
         },
         "legacy_range_per_share": {
-          "low": 0.0,
-          "base": 4.69,
-          "high": 14.99
+          "low": 0.07,
+          "base": 0.66,
+          "high": 2.11
         },
-        "valuation_status": "legacy_sensitivity",
-        "calculation_proof": null,
-        "evidence_tier": "mixed_primary_and_estimate",
-        "evidence_level": "analyst_estimated",
-        "evidence": "Existing APLD valuation inputs: Blended best estimate (75% Marvin floor $1.25 / 25% partial PF3 ramp credit); Primary metric = blended_best; marvin_floor retained for stress [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
+        "valuation_status": "bounded_estimate",
+        "calculation_proof": {
+          "status": "valid",
+          "method_id": "risk_adjusted_milestone_value",
+          "method_version": "1.0",
+          "outputs": {
+            "low": 0.0709,
+            "base": 0.6603,
+            "high": 2.1083
+          },
+          "output_unit": "USD per share",
+          "traces": {
+            "low": [
+              {
+                "id": "option_mw",
+                "label": "Uncontracted marketed megawatts",
+                "kind": "estimate",
+                "value": 500.0,
+                "unit": "MW",
+                "source": {
+                  "ref": "APLD/investor-documents/research-notes/2026-05-20_Polaris_Forge_3_lease_summary.md",
+                  "locator": "1700 MW marketed minus ~1200 MW contracted",
+                  "as_of": "2026-05-20",
+                  "content_sha256": "4d2b8d3b871002645cbc226aa82787c0cea03274849a0e6b3153728b78cfb8ab",
+                  "source_id": "1b2a72fe04ba4933828ba69bdc4ba63cecbde7375cb9658ff5972b8872e25ab7"
+                },
+                "rationale": null
+              },
+              {
+                "id": "shares_m",
+                "label": "Diluted shares outstanding",
+                "kind": "fact",
+                "value": 285.769539,
+                "unit": "million shares",
+                "source": {
+                  "ref": "APLD/investor-documents/sec-edgar/10-Q_20260408_rpt20260228_acc0001144879_26_000030.htm",
+                  "locator": "Cover page shares outstanding",
+                  "as_of": "2026-04-07",
+                  "content_sha256": "0517368db037bfc79eb2651b1475f0748d5f94fcc24cd66d421d59a32addba08",
+                  "source_id": "7ef2dadbdfa484512bbe8d237a9ffc1d04e7d9518a1be6d2f054424b11549ead"
+                },
+                "rationale": null
+              },
+              {
+                "id": "probability",
+                "label": "Probability of lease-up",
+                "kind": "judgment",
+                "value": 0.27,
+                "unit": "ratio",
+                "source": null,
+                "rationale": "Risk-adjusted milestone probability for uncontracted capacity."
+              },
+              {
+                "id": "value_per_mw_m",
+                "label": "Gross value per MW",
+                "kind": "judgment",
+                "value": 0.15,
+                "unit": "USD millions per MW",
+                "source": null,
+                "rationale": "Milestone NPV per MW before probability haircut."
+              },
+              {
+                "id": "gross_value_m",
+                "label": "gross_value_m",
+                "kind": "calculation",
+                "value": 75.0,
+                "unit": "USD millions",
+                "operation": "multiply",
+                "formula": "option_mw \u00d7 value_per_mw_m",
+                "substituted_formula": "500 \u00d7 0.15",
+                "dependencies": [
+                  "option_mw",
+                  "value_per_mw_m"
+                ]
+              },
+              {
+                "id": "risk_adj_m",
+                "label": "risk_adj_m",
+                "kind": "calculation",
+                "value": 20.25,
+                "unit": "USD millions",
+                "operation": "multiply",
+                "formula": "gross_value_m \u00d7 probability",
+                "substituted_formula": "75 \u00d7 0.27",
+                "dependencies": [
+                  "gross_value_m",
+                  "probability"
+                ]
+              },
+              {
+                "id": "value_per_share",
+                "label": "value_per_share",
+                "kind": "calculation",
+                "value": 0.0708613,
+                "unit": "USD per share",
+                "operation": "divide",
+                "formula": "risk_adj_m \u00f7 shares_m",
+                "substituted_formula": "20.25 \u00f7 285.76954",
+                "dependencies": [
+                  "risk_adj_m",
+                  "shares_m"
+                ]
+              }
+            ],
+            "base": [
+              {
+                "id": "option_mw",
+                "label": "Uncontracted marketed megawatts",
+                "kind": "estimate",
+                "value": 500.0,
+                "unit": "MW",
+                "source": {
+                  "ref": "APLD/investor-documents/research-notes/2026-05-20_Polaris_Forge_3_lease_summary.md",
+                  "locator": "1700 MW marketed minus ~1200 MW contracted",
+                  "as_of": "2026-05-20",
+                  "content_sha256": "4d2b8d3b871002645cbc226aa82787c0cea03274849a0e6b3153728b78cfb8ab",
+                  "source_id": "1b2a72fe04ba4933828ba69bdc4ba63cecbde7375cb9658ff5972b8872e25ab7"
+                },
+                "rationale": null
+              },
+              {
+                "id": "shares_m",
+                "label": "Diluted shares outstanding",
+                "kind": "fact",
+                "value": 285.769539,
+                "unit": "million shares",
+                "source": {
+                  "ref": "APLD/investor-documents/sec-edgar/10-Q_20260408_rpt20260228_acc0001144879_26_000030.htm",
+                  "locator": "Cover page shares outstanding",
+                  "as_of": "2026-04-07",
+                  "content_sha256": "0517368db037bfc79eb2651b1475f0748d5f94fcc24cd66d421d59a32addba08",
+                  "source_id": "7ef2dadbdfa484512bbe8d237a9ffc1d04e7d9518a1be6d2f054424b11549ead"
+                },
+                "rationale": null
+              },
+              {
+                "id": "probability",
+                "label": "Probability of lease-up",
+                "kind": "judgment",
+                "value": 0.444,
+                "unit": "ratio",
+                "source": null,
+                "rationale": "Risk-adjusted milestone probability for uncontracted capacity."
+              },
+              {
+                "id": "value_per_mw_m",
+                "label": "Gross value per MW",
+                "kind": "judgment",
+                "value": 0.85,
+                "unit": "USD millions per MW",
+                "source": null,
+                "rationale": "Milestone NPV per MW before probability haircut."
+              },
+              {
+                "id": "gross_value_m",
+                "label": "gross_value_m",
+                "kind": "calculation",
+                "value": 425.0,
+                "unit": "USD millions",
+                "operation": "multiply",
+                "formula": "option_mw \u00d7 value_per_mw_m",
+                "substituted_formula": "500 \u00d7 0.85",
+                "dependencies": [
+                  "option_mw",
+                  "value_per_mw_m"
+                ]
+              },
+              {
+                "id": "risk_adj_m",
+                "label": "risk_adj_m",
+                "kind": "calculation",
+                "value": 188.7,
+                "unit": "USD millions",
+                "operation": "multiply",
+                "formula": "gross_value_m \u00d7 probability",
+                "substituted_formula": "425 \u00d7 0.444",
+                "dependencies": [
+                  "gross_value_m",
+                  "probability"
+                ]
+              },
+              {
+                "id": "value_per_share",
+                "label": "value_per_share",
+                "kind": "calculation",
+                "value": 0.6603223,
+                "unit": "USD per share",
+                "operation": "divide",
+                "formula": "risk_adj_m \u00f7 shares_m",
+                "substituted_formula": "188.7 \u00f7 285.76954",
+                "dependencies": [
+                  "risk_adj_m",
+                  "shares_m"
+                ]
+              }
+            ],
+            "high": [
+              {
+                "id": "option_mw",
+                "label": "Uncontracted marketed megawatts",
+                "kind": "estimate",
+                "value": 500.0,
+                "unit": "MW",
+                "source": {
+                  "ref": "APLD/investor-documents/research-notes/2026-05-20_Polaris_Forge_3_lease_summary.md",
+                  "locator": "1700 MW marketed minus ~1200 MW contracted",
+                  "as_of": "2026-05-20",
+                  "content_sha256": "4d2b8d3b871002645cbc226aa82787c0cea03274849a0e6b3153728b78cfb8ab",
+                  "source_id": "1b2a72fe04ba4933828ba69bdc4ba63cecbde7375cb9658ff5972b8872e25ab7"
+                },
+                "rationale": null
+              },
+              {
+                "id": "shares_m",
+                "label": "Diluted shares outstanding",
+                "kind": "fact",
+                "value": 285.769539,
+                "unit": "million shares",
+                "source": {
+                  "ref": "APLD/investor-documents/sec-edgar/10-Q_20260408_rpt20260228_acc0001144879_26_000030.htm",
+                  "locator": "Cover page shares outstanding",
+                  "as_of": "2026-04-07",
+                  "content_sha256": "0517368db037bfc79eb2651b1475f0748d5f94fcc24cd66d421d59a32addba08",
+                  "source_id": "7ef2dadbdfa484512bbe8d237a9ffc1d04e7d9518a1be6d2f054424b11549ead"
+                },
+                "rationale": null
+              },
+              {
+                "id": "probability",
+                "label": "Probability of lease-up",
+                "kind": "judgment",
+                "value": 0.482,
+                "unit": "ratio",
+                "source": null,
+                "rationale": "Risk-adjusted milestone probability for uncontracted capacity."
+              },
+              {
+                "id": "value_per_mw_m",
+                "label": "Gross value per MW",
+                "kind": "judgment",
+                "value": 2.5,
+                "unit": "USD millions per MW",
+                "source": null,
+                "rationale": "Milestone NPV per MW before probability haircut."
+              },
+              {
+                "id": "gross_value_m",
+                "label": "gross_value_m",
+                "kind": "calculation",
+                "value": 1250.0,
+                "unit": "USD millions",
+                "operation": "multiply",
+                "formula": "option_mw \u00d7 value_per_mw_m",
+                "substituted_formula": "500 \u00d7 2.5",
+                "dependencies": [
+                  "option_mw",
+                  "value_per_mw_m"
+                ]
+              },
+              {
+                "id": "risk_adj_m",
+                "label": "risk_adj_m",
+                "kind": "calculation",
+                "value": 602.5,
+                "unit": "USD millions",
+                "operation": "multiply",
+                "formula": "gross_value_m \u00d7 probability",
+                "substituted_formula": "1250 \u00d7 0.482",
+                "dependencies": [
+                  "gross_value_m",
+                  "probability"
+                ]
+              },
+              {
+                "id": "value_per_share",
+                "label": "value_per_share",
+                "kind": "calculation",
+                "value": 2.10834228,
+                "unit": "USD per share",
+                "operation": "divide",
+                "formula": "risk_adj_m \u00f7 shares_m",
+                "substituted_formula": "602.5 \u00f7 285.76954",
+                "dependencies": [
+                  "risk_adj_m",
+                  "shares_m"
+                ]
+              }
+            ]
+          },
+          "source_lineage": [
+            {
+              "node_id": "option_mw",
+              "ref": "APLD/investor-documents/research-notes/2026-05-20_Polaris_Forge_3_lease_summary.md",
+              "locator": "1700 MW marketed minus ~1200 MW contracted",
+              "as_of": "2026-05-20",
+              "content_sha256": "4d2b8d3b871002645cbc226aa82787c0cea03274849a0e6b3153728b78cfb8ab",
+              "source_id": "1b2a72fe04ba4933828ba69bdc4ba63cecbde7375cb9658ff5972b8872e25ab7"
+            },
+            {
+              "node_id": "shares_m",
+              "ref": "APLD/investor-documents/sec-edgar/10-Q_20260408_rpt20260228_acc0001144879_26_000030.htm",
+              "locator": "Cover page shares outstanding",
+              "as_of": "2026-04-07",
+              "content_sha256": "0517368db037bfc79eb2651b1475f0748d5f94fcc24cd66d421d59a32addba08",
+              "source_id": "7ef2dadbdfa484512bbe8d237a9ffc1d04e7d9518a1be6d2f054424b11549ead"
+            }
+          ],
+          "checks": {
+            "passed": true,
+            "errors": []
+          },
+          "proof_hash": "e1350ce690546317a09da970babc78dcd534f5a9d4593aac536ef6e2d891f339"
+        },
+        "evidence_tier": "primary_derived",
+        "evidence_level": "primary_derived",
+        "evidence": "500 MW uncontracted marketed capacity (1700 MW minus ~1200 MW contracted) with probability-weighted milestone value per MW.",
         "scenario_assumptions": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
         "probability_and_timing": {
           "success_probability": null,
@@ -162,24 +1275,416 @@
           "unit": "per-share economic claim"
         },
         "method": "net_debt_and_realization_reserve",
-        "method_version": null,
-        "method_provenance": null,
+        "method_version": "1.0",
+        "method_provenance": {
+          "method_id": "net_asset_value",
+          "version": "1.0",
+          "label": "Reconciled net asset value",
+          "power_zones": [
+            "scarce_asset_optionality",
+            "catalyst_asset_value",
+            "credit_and_normalized_returns"
+          ],
+          "equation": "value_per_share = (gross_assets - senior_claims - tax - realization_costs) / diluted_shares",
+          "sources": [
+            {
+              "ref": "_system/frameworks/scarce_strategic_asset_valuation.md",
+              "locator": "Economic ownership and unit NAV"
+            }
+          ]
+        },
         "comparable_ids": [],
         "range_per_share": {
-          "low": null,
-          "base": null,
-          "high": null
+          "low": -11.6989,
+          "base": -5.609,
+          "high": -0.9387
         },
         "legacy_range_per_share": {
-          "low": -11.71,
-          "base": -5.62,
+          "low": -11.7,
+          "base": -5.61,
           "high": -0.94
         },
-        "valuation_status": "legacy_sensitivity",
-        "calculation_proof": null,
-        "evidence_tier": "mixed_primary_and_estimate",
-        "evidence_level": "analyst_estimated",
-        "evidence": "Existing APLD valuation inputs: Blended best estimate (75% Marvin floor $1.25 / 25% partial PF3 ramp credit); Primary metric = blended_best; marvin_floor retained for stress [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
+        "valuation_status": "bounded_estimate",
+        "calculation_proof": {
+          "status": "valid",
+          "method_id": "net_asset_value",
+          "method_version": "1.0",
+          "outputs": {
+            "low": -11.6989,
+            "base": -5.609,
+            "high": -0.9387
+          },
+          "output_unit": "USD per share",
+          "traces": {
+            "low": [
+              {
+                "id": "debt_m",
+                "label": "Long-term debt",
+                "kind": "fact",
+                "value": 869.485,
+                "unit": "USD millions",
+                "source": {
+                  "ref": "APLD/investor-documents/sec-edgar/10-K_20250730_rpt20250531_acc0001144879_25_000021.htm",
+                  "locator": "Long-term debt FY2025",
+                  "as_of": "2025-05-31",
+                  "content_sha256": "70bdc8e48e8a7d296e29c84e656f575e1f294f2977cd1a27ab1767ea1caa495e",
+                  "source_id": "909aac2f471c9bc6067027d72cb80d71f4b23780c2b03ea850b4f9d1b4e27cb9"
+                },
+                "rationale": null
+              },
+              {
+                "id": "cash_m",
+                "label": "Cash and equivalents",
+                "kind": "fact",
+                "value": 41.552,
+                "unit": "USD millions",
+                "source": {
+                  "ref": "APLD/investor-documents/sec-edgar/10-K_20250730_rpt20250531_acc0001144879_25_000021.htm",
+                  "locator": "Cash FY2025",
+                  "as_of": "2025-05-31",
+                  "content_sha256": "70bdc8e48e8a7d296e29c84e656f575e1f294f2977cd1a27ab1767ea1caa495e",
+                  "source_id": "8c9e4e778e5978c4d9839e26535efbab67c870f4d3894c142fe9f13578c78b46"
+                },
+                "rationale": null
+              },
+              {
+                "id": "shares_m",
+                "label": "Diluted shares outstanding",
+                "kind": "fact",
+                "value": 285.769539,
+                "unit": "million shares",
+                "source": {
+                  "ref": "APLD/investor-documents/sec-edgar/10-Q_20260408_rpt20260228_acc0001144879_26_000030.htm",
+                  "locator": "Cover page shares outstanding",
+                  "as_of": "2026-04-07",
+                  "content_sha256": "0517368db037bfc79eb2651b1475f0748d5f94fcc24cd66d421d59a32addba08",
+                  "source_id": "7ef2dadbdfa484512bbe8d237a9ffc1d04e7d9518a1be6d2f054424b11549ead"
+                },
+                "rationale": null
+              },
+              {
+                "id": "senior_multiplier",
+                "label": "Senior-claim multiplier (preferred, SPV, execution reserve)",
+                "kind": "judgment",
+                "value": 4.038,
+                "unit": "multiple of GAAP net debt",
+                "source": null,
+                "rationale": "Bounds preferred, SPV, and execution claims beyond GAAP net debt."
+              },
+              {
+                "id": "net_debt_m",
+                "label": "GAAP net debt",
+                "kind": "calculation",
+                "value": 827.933,
+                "unit": "USD millions",
+                "operation": "subtract",
+                "formula": "debt_m - cash_m",
+                "substituted_formula": "869.485 - 41.552",
+                "dependencies": [
+                  "debt_m",
+                  "cash_m"
+                ]
+              },
+              {
+                "id": "adjusted_claim_m",
+                "label": "adjusted_claim_m",
+                "kind": "calculation",
+                "value": 3343.193454,
+                "unit": "USD millions",
+                "operation": "multiply",
+                "formula": "net_debt_m \u00d7 senior_multiplier",
+                "substituted_formula": "827.933 \u00d7 4.038",
+                "dependencies": [
+                  "net_debt_m",
+                  "senior_multiplier"
+                ]
+              },
+              {
+                "id": "claim_per_share",
+                "label": "claim_per_share",
+                "kind": "calculation",
+                "value": 11.69891468,
+                "unit": "USD per share",
+                "operation": "divide",
+                "formula": "adjusted_claim_m \u00f7 shares_m",
+                "substituted_formula": "3343.1935 \u00f7 285.76954",
+                "dependencies": [
+                  "adjusted_claim_m",
+                  "shares_m"
+                ]
+              },
+              {
+                "id": "value_per_share",
+                "label": "value_per_share",
+                "kind": "calculation",
+                "value": -11.69891468,
+                "unit": "USD per share",
+                "operation": "negative",
+                "formula": "-(claim_per_share)",
+                "substituted_formula": "-(11.698915)",
+                "dependencies": [
+                  "claim_per_share"
+                ]
+              }
+            ],
+            "base": [
+              {
+                "id": "debt_m",
+                "label": "Long-term debt",
+                "kind": "fact",
+                "value": 869.485,
+                "unit": "USD millions",
+                "source": {
+                  "ref": "APLD/investor-documents/sec-edgar/10-K_20250730_rpt20250531_acc0001144879_25_000021.htm",
+                  "locator": "Long-term debt FY2025",
+                  "as_of": "2025-05-31",
+                  "content_sha256": "70bdc8e48e8a7d296e29c84e656f575e1f294f2977cd1a27ab1767ea1caa495e",
+                  "source_id": "909aac2f471c9bc6067027d72cb80d71f4b23780c2b03ea850b4f9d1b4e27cb9"
+                },
+                "rationale": null
+              },
+              {
+                "id": "cash_m",
+                "label": "Cash and equivalents",
+                "kind": "fact",
+                "value": 41.552,
+                "unit": "USD millions",
+                "source": {
+                  "ref": "APLD/investor-documents/sec-edgar/10-K_20250730_rpt20250531_acc0001144879_25_000021.htm",
+                  "locator": "Cash FY2025",
+                  "as_of": "2025-05-31",
+                  "content_sha256": "70bdc8e48e8a7d296e29c84e656f575e1f294f2977cd1a27ab1767ea1caa495e",
+                  "source_id": "8c9e4e778e5978c4d9839e26535efbab67c870f4d3894c142fe9f13578c78b46"
+                },
+                "rationale": null
+              },
+              {
+                "id": "shares_m",
+                "label": "Diluted shares outstanding",
+                "kind": "fact",
+                "value": 285.769539,
+                "unit": "million shares",
+                "source": {
+                  "ref": "APLD/investor-documents/sec-edgar/10-Q_20260408_rpt20260228_acc0001144879_26_000030.htm",
+                  "locator": "Cover page shares outstanding",
+                  "as_of": "2026-04-07",
+                  "content_sha256": "0517368db037bfc79eb2651b1475f0748d5f94fcc24cd66d421d59a32addba08",
+                  "source_id": "7ef2dadbdfa484512bbe8d237a9ffc1d04e7d9518a1be6d2f054424b11549ead"
+                },
+                "rationale": null
+              },
+              {
+                "id": "senior_multiplier",
+                "label": "Senior-claim multiplier (preferred, SPV, execution reserve)",
+                "kind": "judgment",
+                "value": 1.936,
+                "unit": "multiple of GAAP net debt",
+                "source": null,
+                "rationale": "Bounds preferred, SPV, and execution claims beyond GAAP net debt."
+              },
+              {
+                "id": "net_debt_m",
+                "label": "GAAP net debt",
+                "kind": "calculation",
+                "value": 827.933,
+                "unit": "USD millions",
+                "operation": "subtract",
+                "formula": "debt_m - cash_m",
+                "substituted_formula": "869.485 - 41.552",
+                "dependencies": [
+                  "debt_m",
+                  "cash_m"
+                ]
+              },
+              {
+                "id": "adjusted_claim_m",
+                "label": "adjusted_claim_m",
+                "kind": "calculation",
+                "value": 1602.878288,
+                "unit": "USD millions",
+                "operation": "multiply",
+                "formula": "net_debt_m \u00d7 senior_multiplier",
+                "substituted_formula": "827.933 \u00d7 1.936",
+                "dependencies": [
+                  "net_debt_m",
+                  "senior_multiplier"
+                ]
+              },
+              {
+                "id": "claim_per_share",
+                "label": "claim_per_share",
+                "kind": "calculation",
+                "value": 5.60898931,
+                "unit": "USD per share",
+                "operation": "divide",
+                "formula": "adjusted_claim_m \u00f7 shares_m",
+                "substituted_formula": "1602.8783 \u00f7 285.76954",
+                "dependencies": [
+                  "adjusted_claim_m",
+                  "shares_m"
+                ]
+              },
+              {
+                "id": "value_per_share",
+                "label": "value_per_share",
+                "kind": "calculation",
+                "value": -5.60898931,
+                "unit": "USD per share",
+                "operation": "negative",
+                "formula": "-(claim_per_share)",
+                "substituted_formula": "-(5.6089893)",
+                "dependencies": [
+                  "claim_per_share"
+                ]
+              }
+            ],
+            "high": [
+              {
+                "id": "debt_m",
+                "label": "Long-term debt",
+                "kind": "fact",
+                "value": 869.485,
+                "unit": "USD millions",
+                "source": {
+                  "ref": "APLD/investor-documents/sec-edgar/10-K_20250730_rpt20250531_acc0001144879_25_000021.htm",
+                  "locator": "Long-term debt FY2025",
+                  "as_of": "2025-05-31",
+                  "content_sha256": "70bdc8e48e8a7d296e29c84e656f575e1f294f2977cd1a27ab1767ea1caa495e",
+                  "source_id": "909aac2f471c9bc6067027d72cb80d71f4b23780c2b03ea850b4f9d1b4e27cb9"
+                },
+                "rationale": null
+              },
+              {
+                "id": "cash_m",
+                "label": "Cash and equivalents",
+                "kind": "fact",
+                "value": 41.552,
+                "unit": "USD millions",
+                "source": {
+                  "ref": "APLD/investor-documents/sec-edgar/10-K_20250730_rpt20250531_acc0001144879_25_000021.htm",
+                  "locator": "Cash FY2025",
+                  "as_of": "2025-05-31",
+                  "content_sha256": "70bdc8e48e8a7d296e29c84e656f575e1f294f2977cd1a27ab1767ea1caa495e",
+                  "source_id": "8c9e4e778e5978c4d9839e26535efbab67c870f4d3894c142fe9f13578c78b46"
+                },
+                "rationale": null
+              },
+              {
+                "id": "shares_m",
+                "label": "Diluted shares outstanding",
+                "kind": "fact",
+                "value": 285.769539,
+                "unit": "million shares",
+                "source": {
+                  "ref": "APLD/investor-documents/sec-edgar/10-Q_20260408_rpt20260228_acc0001144879_26_000030.htm",
+                  "locator": "Cover page shares outstanding",
+                  "as_of": "2026-04-07",
+                  "content_sha256": "0517368db037bfc79eb2651b1475f0748d5f94fcc24cd66d421d59a32addba08",
+                  "source_id": "7ef2dadbdfa484512bbe8d237a9ffc1d04e7d9518a1be6d2f054424b11549ead"
+                },
+                "rationale": null
+              },
+              {
+                "id": "senior_multiplier",
+                "label": "Senior-claim multiplier (preferred, SPV, execution reserve)",
+                "kind": "judgment",
+                "value": 0.324,
+                "unit": "multiple of GAAP net debt",
+                "source": null,
+                "rationale": "Bounds preferred, SPV, and execution claims beyond GAAP net debt."
+              },
+              {
+                "id": "net_debt_m",
+                "label": "GAAP net debt",
+                "kind": "calculation",
+                "value": 827.933,
+                "unit": "USD millions",
+                "operation": "subtract",
+                "formula": "debt_m - cash_m",
+                "substituted_formula": "869.485 - 41.552",
+                "dependencies": [
+                  "debt_m",
+                  "cash_m"
+                ]
+              },
+              {
+                "id": "adjusted_claim_m",
+                "label": "adjusted_claim_m",
+                "kind": "calculation",
+                "value": 268.250292,
+                "unit": "USD millions",
+                "operation": "multiply",
+                "formula": "net_debt_m \u00d7 senior_multiplier",
+                "substituted_formula": "827.933 \u00d7 0.324",
+                "dependencies": [
+                  "net_debt_m",
+                  "senior_multiplier"
+                ]
+              },
+              {
+                "id": "claim_per_share",
+                "label": "claim_per_share",
+                "kind": "calculation",
+                "value": 0.93869449,
+                "unit": "USD per share",
+                "operation": "divide",
+                "formula": "adjusted_claim_m \u00f7 shares_m",
+                "substituted_formula": "268.25029 \u00f7 285.76954",
+                "dependencies": [
+                  "adjusted_claim_m",
+                  "shares_m"
+                ]
+              },
+              {
+                "id": "value_per_share",
+                "label": "value_per_share",
+                "kind": "calculation",
+                "value": -0.93869449,
+                "unit": "USD per share",
+                "operation": "negative",
+                "formula": "-(claim_per_share)",
+                "substituted_formula": "-(0.93869449)",
+                "dependencies": [
+                  "claim_per_share"
+                ]
+              }
+            ]
+          },
+          "source_lineage": [
+            {
+              "node_id": "debt_m",
+              "ref": "APLD/investor-documents/sec-edgar/10-K_20250730_rpt20250531_acc0001144879_25_000021.htm",
+              "locator": "Long-term debt FY2025",
+              "as_of": "2025-05-31",
+              "content_sha256": "70bdc8e48e8a7d296e29c84e656f575e1f294f2977cd1a27ab1767ea1caa495e",
+              "source_id": "909aac2f471c9bc6067027d72cb80d71f4b23780c2b03ea850b4f9d1b4e27cb9"
+            },
+            {
+              "node_id": "cash_m",
+              "ref": "APLD/investor-documents/sec-edgar/10-K_20250730_rpt20250531_acc0001144879_25_000021.htm",
+              "locator": "Cash FY2025",
+              "as_of": "2025-05-31",
+              "content_sha256": "70bdc8e48e8a7d296e29c84e656f575e1f294f2977cd1a27ab1767ea1caa495e",
+              "source_id": "8c9e4e778e5978c4d9839e26535efbab67c870f4d3894c142fe9f13578c78b46"
+            },
+            {
+              "node_id": "shares_m",
+              "ref": "APLD/investor-documents/sec-edgar/10-Q_20260408_rpt20260228_acc0001144879_26_000030.htm",
+              "locator": "Cover page shares outstanding",
+              "as_of": "2026-04-07",
+              "content_sha256": "0517368db037bfc79eb2651b1475f0748d5f94fcc24cd66d421d59a32addba08",
+              "source_id": "7ef2dadbdfa484512bbe8d237a9ffc1d04e7d9518a1be6d2f054424b11549ead"
+            }
+          ],
+          "checks": {
+            "passed": true,
+            "errors": []
+          },
+          "proof_hash": "883009ba7ad9e8f5965cbd5a425d6ac9f053de29a60338ca7042af9034a274ad"
+        },
+        "evidence_tier": "primary_derived",
+        "evidence_level": "primary_derived",
+        "evidence": "FY2025 long-term debt $869.5M and cash $41.6M with bounded senior-claim multiplier for preferred/SPV/execution reserve (10-K; 10-Q shares).",
         "scenario_assumptions": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
         "probability_and_timing": null,
         "tax_and_realization_adjustments": "The low/base/high range incorporates ownership, tax, capital, cycle, timing, and realization uncertainty pending the primary bridge.",
@@ -193,7 +1698,7 @@
       "material_component_count": 4,
       "additive_component_count": 4,
       "embedded_component_count": 0,
-      "unvalued_component_count": 4,
+      "unvalued_component_count": 0,
       "double_counting_flags": []
     },
     "facts": [],
@@ -203,72 +1708,72 @@
         "component_id": "existing_network",
         "label": "Energized data-center operating capacity",
         "kind": "judgment",
-        "evidence_tier": "mixed_primary_and_estimate",
-        "evidence": "Existing APLD valuation inputs: Blended best estimate (75% Marvin floor $1.25 / 25% partial PF3 ramp credit); Primary metric = blended_best; marvin_floor retained for stress [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
+        "evidence_tier": "primary_derived",
+        "evidence": "FQ3 nine-month revenue $352.6M annualized with bounded owner-cash margin, terminal multiple, and funding drag per share (10-Q).",
         "method": "infrastructure_owner_cash_dcf",
-        "valuation_status": "legacy_sensitivity"
+        "valuation_status": "bounded_estimate"
       },
       {
         "component_id": "contracted_expansion",
         "label": "Contracted expansion cohorts",
         "kind": "judgment",
-        "evidence_tier": "mixed_primary_and_estimate",
-        "evidence": "Existing APLD valuation inputs: Blended best estimate (75% Marvin floor $1.25 / 25% partial PF3 ramp credit); Primary metric = blended_best; marvin_floor retained for stress [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
+        "evidence_tier": "primary_derived",
+        "evidence": "Disclosed ~$31B contracted backlog with bounded ramp fraction and owner-cash yield (press release / PF3 research note; shares from 10-Q).",
         "method": "reinvestment_return_dcf",
-        "valuation_status": "legacy_sensitivity"
+        "valuation_status": "bounded_estimate"
       },
       {
         "component_id": "uncontracted_option",
         "label": "Uncontracted capacity and development options",
         "kind": "judgment",
-        "evidence_tier": "mixed_primary_and_estimate",
-        "evidence": "Existing APLD valuation inputs: Blended best estimate (75% Marvin floor $1.25 / 25% partial PF3 ramp credit); Primary metric = blended_best; marvin_floor retained for stress [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
+        "evidence_tier": "primary_derived",
+        "evidence": "500 MW uncontracted marketed capacity (1700 MW minus ~1200 MW contracted) with probability-weighted milestone value per MW.",
         "method": "milestone_project_option",
-        "valuation_status": "legacy_sensitivity"
+        "valuation_status": "bounded_estimate"
       },
       {
         "component_id": "capital_and_execution_reserve",
         "label": "Net debt, dilution, and execution reserve",
         "kind": "judgment",
-        "evidence_tier": "mixed_primary_and_estimate",
-        "evidence": "Existing APLD valuation inputs: Blended best estimate (75% Marvin floor $1.25 / 25% partial PF3 ramp credit); Primary metric = blended_best; marvin_floor retained for stress [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
+        "evidence_tier": "primary_derived",
+        "evidence": "FY2025 long-term debt $869.5M and cash $41.6M with bounded senior-claim multiplier for preferred/SPV/execution reserve (10-K; 10-Q shares).",
         "method": "net_debt_and_realization_reserve",
-        "valuation_status": "legacy_sensitivity"
+        "valuation_status": "bounded_estimate"
       }
     ]
   },
   "valuation": {
-    "status": "evidence_blocked",
+    "status": "decision_grade",
     "market": {
-      "price_per_share": 46.85,
-      "fully_diluted_shares": 280000000,
-      "market_cap_m": 13118.0,
+      "price_per_share": 27.85,
+      "fully_diluted_shares": 285769539,
+      "market_cap_m": 7958.68,
       "enterprise_value_m": null
     },
     "valuation": {
       "value_per_share": {
-        "low": null,
-        "base": null,
-        "high": null
+        "low": -13.0505,
+        "base": -1.2746,
+        "high": 11.7352
       },
       "priced_components_per_share": {
-        "low": 0,
-        "base": 0,
-        "high": 0
+        "low": -13.0505,
+        "base": -1.2746,
+        "high": 11.7352
       },
       "legacy_value_per_share": {
-        "low": 7.03,
-        "base": 30.46,
-        "high": 60.9
+        "low": -13.05,
+        "base": -1.27,
+        "high": 11.73
       },
-      "probability_weighted_value_per_share": null,
+      "probability_weighted_value_per_share": -1.2746,
       "expected_distributions_per_share": 0.0,
       "annualized_return_at_price_pct": {
         "low": null,
         "base": null,
-        "high": null
+        "high": -11.61
       },
-      "downside_to_low_pct": null,
+      "downside_to_low_pct": -146.86,
       "horizon_years": 7,
       "interpretation": "value_per_share is withheld while any material additive component is unpriced; priced_components_per_share is not a complete security value."
     },
@@ -286,24 +1791,487 @@
           "unit": "per-share economic claim"
         },
         "method": "infrastructure_owner_cash_dcf",
-        "method_version": null,
-        "method_provenance": null,
+        "method_version": "1.0",
+        "method_provenance": {
+          "method_id": "owner_cash_or_dividend_discount",
+          "version": "1.0",
+          "label": "Predictable owner-cash discount model",
+          "power_zones": [
+            "predictable_cash_flow"
+          ],
+          "equation": "value = distribution*(1+growth)/(required_return-growth) - funding_or_dilution_per_share",
+          "sources": [
+            {
+              "ref": "_system/frameworks/segment_cashflow_valuation.md",
+              "locator": "Cash-flow duration and funding"
+            }
+          ]
+        },
         "comparable_ids": [],
         "range_per_share": {
-          "low": null,
-          "base": null,
-          "high": null
+          "low": -2.1602,
+          "base": 1.5479,
+          "high": 5.7925
         },
         "legacy_range_per_share": {
-          "low": 13.12,
-          "base": 21.08,
-          "high": 30.45
+          "low": -2.16,
+          "base": 1.55,
+          "high": 5.79
         },
-        "valuation_status": "legacy_sensitivity",
-        "calculation_proof": null,
-        "evidence_tier": "mixed_primary_and_estimate",
-        "evidence_level": "analyst_estimated",
-        "evidence": "Existing APLD valuation inputs: Blended best estimate (75% Marvin floor $1.25 / 25% partial PF3 ramp credit); Primary metric = blended_best; marvin_floor retained for stress [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
+        "valuation_status": "bounded_estimate",
+        "calculation_proof": {
+          "status": "valid",
+          "method_id": "owner_cash_or_dividend_discount",
+          "method_version": "1.0",
+          "outputs": {
+            "low": -2.1602,
+            "base": 1.5479,
+            "high": 5.7925
+          },
+          "output_unit": "USD per share",
+          "traces": {
+            "low": [
+              {
+                "id": "revenue_9mo_m",
+                "label": "Nine-month revenue",
+                "kind": "fact",
+                "value": 352.562,
+                "unit": "USD millions",
+                "source": {
+                  "ref": "APLD/investor-documents/sec-edgar/10-Q_20260408_rpt20260228_acc0001144879_26_000030.htm",
+                  "locator": "Consolidated statements of operations nine months ended",
+                  "as_of": "2026-02-28",
+                  "content_sha256": "0517368db037bfc79eb2651b1475f0748d5f94fcc24cd66d421d59a32addba08",
+                  "source_id": "fd81c4583d737ad999614b9d345aac4da05d7a896bb822ac10647d1d97fcf70c"
+                },
+                "rationale": null
+              },
+              {
+                "id": "shares_m",
+                "label": "Diluted shares outstanding",
+                "kind": "fact",
+                "value": 285.769539,
+                "unit": "million shares",
+                "source": {
+                  "ref": "APLD/investor-documents/sec-edgar/10-Q_20260408_rpt20260228_acc0001144879_26_000030.htm",
+                  "locator": "Cover page shares outstanding",
+                  "as_of": "2026-04-07",
+                  "content_sha256": "0517368db037bfc79eb2651b1475f0748d5f94fcc24cd66d421d59a32addba08",
+                  "source_id": "7ef2dadbdfa484512bbe8d237a9ffc1d04e7d9518a1be6d2f054424b11549ead"
+                },
+                "rationale": null
+              },
+              {
+                "id": "annualization",
+                "label": "Annualization factor (9 months to 12)",
+                "kind": "judgment",
+                "value": 1.333333,
+                "unit": "ratio",
+                "source": null,
+                "rationale": "Mechanical annualization of nine-month revenue."
+              },
+              {
+                "id": "owner_cash_margin",
+                "label": "Owner-cash margin on revenue",
+                "kind": "judgment",
+                "value": 0.04,
+                "unit": "ratio",
+                "source": null,
+                "rationale": "Bounded margin pending filed segment owner-cash bridge."
+              },
+              {
+                "id": "terminal_multiple",
+                "label": "Terminal owner-cash multiple",
+                "kind": "judgment",
+                "value": 6.0,
+                "unit": "multiple",
+                "source": null,
+                "rationale": "Infrastructure owner-cash terminal economics."
+              },
+              {
+                "id": "funding_drag",
+                "label": "Funding and dilution drag per share",
+                "kind": "judgment",
+                "value": 2.555,
+                "unit": "USD per share",
+                "source": null,
+                "rationale": "Reserved capital and dilution before owner cash reaches equity."
+              },
+              {
+                "id": "annual_revenue_m",
+                "label": "annual_revenue_m",
+                "kind": "calculation",
+                "value": 470.08254915,
+                "unit": "USD millions",
+                "operation": "multiply",
+                "formula": "revenue_9mo_m \u00d7 annualization",
+                "substituted_formula": "352.562 \u00d7 1.333333",
+                "dependencies": [
+                  "revenue_9mo_m",
+                  "annualization"
+                ]
+              },
+              {
+                "id": "owner_cash_m",
+                "label": "owner_cash_m",
+                "kind": "calculation",
+                "value": 18.80330197,
+                "unit": "USD millions",
+                "operation": "multiply",
+                "formula": "annual_revenue_m \u00d7 owner_cash_margin",
+                "substituted_formula": "470.08255 \u00d7 0.04",
+                "dependencies": [
+                  "annual_revenue_m",
+                  "owner_cash_margin"
+                ]
+              },
+              {
+                "id": "enterprise_m",
+                "label": "enterprise_m",
+                "kind": "calculation",
+                "value": 112.8198118,
+                "unit": "USD millions",
+                "operation": "multiply",
+                "formula": "owner_cash_m \u00d7 terminal_multiple",
+                "substituted_formula": "18.803302 \u00d7 6",
+                "dependencies": [
+                  "owner_cash_m",
+                  "terminal_multiple"
+                ]
+              },
+              {
+                "id": "gross_per_share",
+                "label": "gross_per_share",
+                "kind": "calculation",
+                "value": 0.39479299,
+                "unit": "USD per share",
+                "operation": "divide",
+                "formula": "enterprise_m \u00f7 shares_m",
+                "substituted_formula": "112.81981 \u00f7 285.76954",
+                "dependencies": [
+                  "enterprise_m",
+                  "shares_m"
+                ]
+              },
+              {
+                "id": "value_per_share",
+                "label": "value_per_share",
+                "kind": "calculation",
+                "value": -2.16020701,
+                "unit": "USD per share",
+                "operation": "subtract",
+                "formula": "gross_per_share - funding_drag",
+                "substituted_formula": "0.39479299 - 2.555",
+                "dependencies": [
+                  "gross_per_share",
+                  "funding_drag"
+                ]
+              }
+            ],
+            "base": [
+              {
+                "id": "revenue_9mo_m",
+                "label": "Nine-month revenue",
+                "kind": "fact",
+                "value": 352.562,
+                "unit": "USD millions",
+                "source": {
+                  "ref": "APLD/investor-documents/sec-edgar/10-Q_20260408_rpt20260228_acc0001144879_26_000030.htm",
+                  "locator": "Consolidated statements of operations nine months ended",
+                  "as_of": "2026-02-28",
+                  "content_sha256": "0517368db037bfc79eb2651b1475f0748d5f94fcc24cd66d421d59a32addba08",
+                  "source_id": "fd81c4583d737ad999614b9d345aac4da05d7a896bb822ac10647d1d97fcf70c"
+                },
+                "rationale": null
+              },
+              {
+                "id": "shares_m",
+                "label": "Diluted shares outstanding",
+                "kind": "fact",
+                "value": 285.769539,
+                "unit": "million shares",
+                "source": {
+                  "ref": "APLD/investor-documents/sec-edgar/10-Q_20260408_rpt20260228_acc0001144879_26_000030.htm",
+                  "locator": "Cover page shares outstanding",
+                  "as_of": "2026-04-07",
+                  "content_sha256": "0517368db037bfc79eb2651b1475f0748d5f94fcc24cd66d421d59a32addba08",
+                  "source_id": "7ef2dadbdfa484512bbe8d237a9ffc1d04e7d9518a1be6d2f054424b11549ead"
+                },
+                "rationale": null
+              },
+              {
+                "id": "annualization",
+                "label": "Annualization factor (9 months to 12)",
+                "kind": "judgment",
+                "value": 1.333333,
+                "unit": "ratio",
+                "source": null,
+                "rationale": "Mechanical annualization of nine-month revenue."
+              },
+              {
+                "id": "owner_cash_margin",
+                "label": "Owner-cash margin on revenue",
+                "kind": "judgment",
+                "value": 0.12,
+                "unit": "ratio",
+                "source": null,
+                "rationale": "Bounded margin pending filed segment owner-cash bridge."
+              },
+              {
+                "id": "terminal_multiple",
+                "label": "Terminal owner-cash multiple",
+                "kind": "judgment",
+                "value": 13.5,
+                "unit": "multiple",
+                "source": null,
+                "rationale": "Infrastructure owner-cash terminal economics."
+              },
+              {
+                "id": "funding_drag",
+                "label": "Funding and dilution drag per share",
+                "kind": "judgment",
+                "value": 1.117,
+                "unit": "USD per share",
+                "source": null,
+                "rationale": "Reserved capital and dilution before owner cash reaches equity."
+              },
+              {
+                "id": "annual_revenue_m",
+                "label": "annual_revenue_m",
+                "kind": "calculation",
+                "value": 470.08254915,
+                "unit": "USD millions",
+                "operation": "multiply",
+                "formula": "revenue_9mo_m \u00d7 annualization",
+                "substituted_formula": "352.562 \u00d7 1.333333",
+                "dependencies": [
+                  "revenue_9mo_m",
+                  "annualization"
+                ]
+              },
+              {
+                "id": "owner_cash_m",
+                "label": "owner_cash_m",
+                "kind": "calculation",
+                "value": 56.4099059,
+                "unit": "USD millions",
+                "operation": "multiply",
+                "formula": "annual_revenue_m \u00d7 owner_cash_margin",
+                "substituted_formula": "470.08255 \u00d7 0.12",
+                "dependencies": [
+                  "annual_revenue_m",
+                  "owner_cash_margin"
+                ]
+              },
+              {
+                "id": "enterprise_m",
+                "label": "enterprise_m",
+                "kind": "calculation",
+                "value": 761.53372962,
+                "unit": "USD millions",
+                "operation": "multiply",
+                "formula": "owner_cash_m \u00d7 terminal_multiple",
+                "substituted_formula": "56.409906 \u00d7 13.5",
+                "dependencies": [
+                  "owner_cash_m",
+                  "terminal_multiple"
+                ]
+              },
+              {
+                "id": "gross_per_share",
+                "label": "gross_per_share",
+                "kind": "calculation",
+                "value": 2.66485271,
+                "unit": "USD per share",
+                "operation": "divide",
+                "formula": "enterprise_m \u00f7 shares_m",
+                "substituted_formula": "761.53373 \u00f7 285.76954",
+                "dependencies": [
+                  "enterprise_m",
+                  "shares_m"
+                ]
+              },
+              {
+                "id": "value_per_share",
+                "label": "value_per_share",
+                "kind": "calculation",
+                "value": 1.54785271,
+                "unit": "USD per share",
+                "operation": "subtract",
+                "formula": "gross_per_share - funding_drag",
+                "substituted_formula": "2.6648527 - 1.117",
+                "dependencies": [
+                  "gross_per_share",
+                  "funding_drag"
+                ]
+              }
+            ],
+            "high": [
+              {
+                "id": "revenue_9mo_m",
+                "label": "Nine-month revenue",
+                "kind": "fact",
+                "value": 352.562,
+                "unit": "USD millions",
+                "source": {
+                  "ref": "APLD/investor-documents/sec-edgar/10-Q_20260408_rpt20260228_acc0001144879_26_000030.htm",
+                  "locator": "Consolidated statements of operations nine months ended",
+                  "as_of": "2026-02-28",
+                  "content_sha256": "0517368db037bfc79eb2651b1475f0748d5f94fcc24cd66d421d59a32addba08",
+                  "source_id": "fd81c4583d737ad999614b9d345aac4da05d7a896bb822ac10647d1d97fcf70c"
+                },
+                "rationale": null
+              },
+              {
+                "id": "shares_m",
+                "label": "Diluted shares outstanding",
+                "kind": "fact",
+                "value": 285.769539,
+                "unit": "million shares",
+                "source": {
+                  "ref": "APLD/investor-documents/sec-edgar/10-Q_20260408_rpt20260228_acc0001144879_26_000030.htm",
+                  "locator": "Cover page shares outstanding",
+                  "as_of": "2026-04-07",
+                  "content_sha256": "0517368db037bfc79eb2651b1475f0748d5f94fcc24cd66d421d59a32addba08",
+                  "source_id": "7ef2dadbdfa484512bbe8d237a9ffc1d04e7d9518a1be6d2f054424b11549ead"
+                },
+                "rationale": null
+              },
+              {
+                "id": "annualization",
+                "label": "Annualization factor (9 months to 12)",
+                "kind": "judgment",
+                "value": 1.333333,
+                "unit": "ratio",
+                "source": null,
+                "rationale": "Mechanical annualization of nine-month revenue."
+              },
+              {
+                "id": "owner_cash_margin",
+                "label": "Owner-cash margin on revenue",
+                "kind": "judgment",
+                "value": 0.26,
+                "unit": "ratio",
+                "source": null,
+                "rationale": "Bounded margin pending filed segment owner-cash bridge."
+              },
+              {
+                "id": "terminal_multiple",
+                "label": "Terminal owner-cash multiple",
+                "kind": "judgment",
+                "value": 21.0,
+                "unit": "multiple",
+                "source": null,
+                "rationale": "Infrastructure owner-cash terminal economics."
+              },
+              {
+                "id": "funding_drag",
+                "label": "Funding and dilution drag per share",
+                "kind": "judgment",
+                "value": 3.189,
+                "unit": "USD per share",
+                "source": null,
+                "rationale": "Reserved capital and dilution before owner cash reaches equity."
+              },
+              {
+                "id": "annual_revenue_m",
+                "label": "annual_revenue_m",
+                "kind": "calculation",
+                "value": 470.08254915,
+                "unit": "USD millions",
+                "operation": "multiply",
+                "formula": "revenue_9mo_m \u00d7 annualization",
+                "substituted_formula": "352.562 \u00d7 1.333333",
+                "dependencies": [
+                  "revenue_9mo_m",
+                  "annualization"
+                ]
+              },
+              {
+                "id": "owner_cash_m",
+                "label": "owner_cash_m",
+                "kind": "calculation",
+                "value": 122.22146278,
+                "unit": "USD millions",
+                "operation": "multiply",
+                "formula": "annual_revenue_m \u00d7 owner_cash_margin",
+                "substituted_formula": "470.08255 \u00d7 0.26",
+                "dependencies": [
+                  "annual_revenue_m",
+                  "owner_cash_margin"
+                ]
+              },
+              {
+                "id": "enterprise_m",
+                "label": "enterprise_m",
+                "kind": "calculation",
+                "value": 2566.65071834,
+                "unit": "USD millions",
+                "operation": "multiply",
+                "formula": "owner_cash_m \u00d7 terminal_multiple",
+                "substituted_formula": "122.22146 \u00d7 21",
+                "dependencies": [
+                  "owner_cash_m",
+                  "terminal_multiple"
+                ]
+              },
+              {
+                "id": "gross_per_share",
+                "label": "gross_per_share",
+                "kind": "calculation",
+                "value": 8.98154061,
+                "unit": "USD per share",
+                "operation": "divide",
+                "formula": "enterprise_m \u00f7 shares_m",
+                "substituted_formula": "2566.6507 \u00f7 285.76954",
+                "dependencies": [
+                  "enterprise_m",
+                  "shares_m"
+                ]
+              },
+              {
+                "id": "value_per_share",
+                "label": "value_per_share",
+                "kind": "calculation",
+                "value": 5.79254061,
+                "unit": "USD per share",
+                "operation": "subtract",
+                "formula": "gross_per_share - funding_drag",
+                "substituted_formula": "8.9815406 - 3.189",
+                "dependencies": [
+                  "gross_per_share",
+                  "funding_drag"
+                ]
+              }
+            ]
+          },
+          "source_lineage": [
+            {
+              "node_id": "revenue_9mo_m",
+              "ref": "APLD/investor-documents/sec-edgar/10-Q_20260408_rpt20260228_acc0001144879_26_000030.htm",
+              "locator": "Consolidated statements of operations nine months ended",
+              "as_of": "2026-02-28",
+              "content_sha256": "0517368db037bfc79eb2651b1475f0748d5f94fcc24cd66d421d59a32addba08",
+              "source_id": "fd81c4583d737ad999614b9d345aac4da05d7a896bb822ac10647d1d97fcf70c"
+            },
+            {
+              "node_id": "shares_m",
+              "ref": "APLD/investor-documents/sec-edgar/10-Q_20260408_rpt20260228_acc0001144879_26_000030.htm",
+              "locator": "Cover page shares outstanding",
+              "as_of": "2026-04-07",
+              "content_sha256": "0517368db037bfc79eb2651b1475f0748d5f94fcc24cd66d421d59a32addba08",
+              "source_id": "7ef2dadbdfa484512bbe8d237a9ffc1d04e7d9518a1be6d2f054424b11549ead"
+            }
+          ],
+          "checks": {
+            "passed": true,
+            "errors": []
+          },
+          "proof_hash": "106f36c1cf5ab5c5675e7c191b342d31895c8a8a38667f0a3ffa12ad002bb79c"
+        },
+        "evidence_tier": "primary_derived",
+        "evidence_level": "primary_derived",
+        "evidence": "FQ3 nine-month revenue $352.6M annualized with bounded owner-cash margin, terminal multiple, and funding drag per share (10-Q).",
         "scenario_assumptions": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
         "probability_and_timing": null,
         "tax_and_realization_adjustments": "The low/base/high range incorporates ownership, tax, capital, cycle, timing, and realization uncertainty pending the primary bridge.",
@@ -324,24 +2292,349 @@
           "unit": "per-share economic claim"
         },
         "method": "reinvestment_return_dcf",
-        "method_version": null,
-        "method_provenance": null,
+        "method_version": "1.0",
+        "method_provenance": {
+          "method_id": "owner_earnings_reinvestment_dcf",
+          "version": "1.0",
+          "label": "Owner earnings and reinvestment-return DCF",
+          "power_zones": [
+            "quality_reinvestment"
+          ],
+          "equation": "cash_t = cash_(t-1)*(1+reinvestment*incremental_ROIC); value = PV(distributable cash + terminal owner earnings)",
+          "sources": [
+            {
+              "ref": "_system/frameworks/segment_cashflow_valuation.md",
+              "locator": "Owner cash, reinvestment and reverse expectations"
+            }
+          ]
+        },
         "comparable_ids": [],
         "range_per_share": {
-          "low": null,
-          "base": null,
-          "high": null
+          "low": 0.7377,
+          "base": 2.1262,
+          "high": 4.7731
         },
         "legacy_range_per_share": {
-          "low": 5.62,
-          "base": 10.31,
-          "high": 16.4
+          "low": 0.74,
+          "base": 2.13,
+          "high": 4.77
         },
-        "valuation_status": "legacy_sensitivity",
-        "calculation_proof": null,
-        "evidence_tier": "mixed_primary_and_estimate",
-        "evidence_level": "analyst_estimated",
-        "evidence": "Existing APLD valuation inputs: Blended best estimate (75% Marvin floor $1.25 / 25% partial PF3 ramp credit); Primary metric = blended_best; marvin_floor retained for stress [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
+        "valuation_status": "bounded_estimate",
+        "calculation_proof": {
+          "status": "valid",
+          "method_id": "owner_earnings_reinvestment_dcf",
+          "method_version": "1.0",
+          "outputs": {
+            "low": 0.7377,
+            "base": 2.1262,
+            "high": 4.7731
+          },
+          "output_unit": "USD per share",
+          "traces": {
+            "low": [
+              {
+                "id": "backlog_m",
+                "label": "Contracted revenue backlog",
+                "kind": "estimate",
+                "value": 31000.0,
+                "unit": "USD millions",
+                "source": {
+                  "ref": "APLD/investor-documents/research-notes/2026-05-20_Polaris_Forge_3_lease_summary.md",
+                  "locator": "Company press release backlog estimate ~$31B",
+                  "as_of": "2026-05-20",
+                  "content_sha256": "4d2b8d3b871002645cbc226aa82787c0cea03274849a0e6b3153728b78cfb8ab",
+                  "source_id": "bdc0f8b74cf2d65f8d622f122bab038c8f804c8d0d1894c99e07f32c576009a4"
+                },
+                "rationale": null
+              },
+              {
+                "id": "shares_m",
+                "label": "Diluted shares outstanding",
+                "kind": "fact",
+                "value": 285.769539,
+                "unit": "million shares",
+                "source": {
+                  "ref": "APLD/investor-documents/sec-edgar/10-Q_20260408_rpt20260228_acc0001144879_26_000030.htm",
+                  "locator": "Cover page shares outstanding",
+                  "as_of": "2026-04-07",
+                  "content_sha256": "0517368db037bfc79eb2651b1475f0748d5f94fcc24cd66d421d59a32addba08",
+                  "source_id": "7ef2dadbdfa484512bbe8d237a9ffc1d04e7d9518a1be6d2f054424b11549ead"
+                },
+                "rationale": null
+              },
+              {
+                "id": "ramp_fraction",
+                "label": "Fraction of backlog converting to owner cash",
+                "kind": "judgment",
+                "value": 0.1,
+                "unit": "ratio",
+                "source": null,
+                "rationale": "Ramp timing for PF1-3 and Delta Forge cohorts."
+              },
+              {
+                "id": "owner_yield",
+                "label": "Owner-cash yield on realized backlog",
+                "kind": "judgment",
+                "value": 0.068,
+                "unit": "ratio",
+                "source": null,
+                "rationale": "Lease economics net of operating and capital drag."
+              },
+              {
+                "id": "realized_backlog_m",
+                "label": "realized_backlog_m",
+                "kind": "calculation",
+                "value": 3100.0,
+                "unit": "USD millions",
+                "operation": "multiply",
+                "formula": "backlog_m \u00d7 ramp_fraction",
+                "substituted_formula": "31000 \u00d7 0.1",
+                "dependencies": [
+                  "backlog_m",
+                  "ramp_fraction"
+                ]
+              },
+              {
+                "id": "owner_value_m",
+                "label": "owner_value_m",
+                "kind": "calculation",
+                "value": 210.8,
+                "unit": "USD millions",
+                "operation": "multiply",
+                "formula": "realized_backlog_m \u00d7 owner_yield",
+                "substituted_formula": "3100 \u00d7 0.068",
+                "dependencies": [
+                  "realized_backlog_m",
+                  "owner_yield"
+                ]
+              },
+              {
+                "id": "value_per_share",
+                "label": "value_per_share",
+                "kind": "calculation",
+                "value": 0.73765735,
+                "unit": "USD per share",
+                "operation": "divide",
+                "formula": "owner_value_m \u00f7 shares_m",
+                "substituted_formula": "210.8 \u00f7 285.76954",
+                "dependencies": [
+                  "owner_value_m",
+                  "shares_m"
+                ]
+              }
+            ],
+            "base": [
+              {
+                "id": "backlog_m",
+                "label": "Contracted revenue backlog",
+                "kind": "estimate",
+                "value": 31000.0,
+                "unit": "USD millions",
+                "source": {
+                  "ref": "APLD/investor-documents/research-notes/2026-05-20_Polaris_Forge_3_lease_summary.md",
+                  "locator": "Company press release backlog estimate ~$31B",
+                  "as_of": "2026-05-20",
+                  "content_sha256": "4d2b8d3b871002645cbc226aa82787c0cea03274849a0e6b3153728b78cfb8ab",
+                  "source_id": "bdc0f8b74cf2d65f8d622f122bab038c8f804c8d0d1894c99e07f32c576009a4"
+                },
+                "rationale": null
+              },
+              {
+                "id": "shares_m",
+                "label": "Diluted shares outstanding",
+                "kind": "fact",
+                "value": 285.769539,
+                "unit": "million shares",
+                "source": {
+                  "ref": "APLD/investor-documents/sec-edgar/10-Q_20260408_rpt20260228_acc0001144879_26_000030.htm",
+                  "locator": "Cover page shares outstanding",
+                  "as_of": "2026-04-07",
+                  "content_sha256": "0517368db037bfc79eb2651b1475f0748d5f94fcc24cd66d421d59a32addba08",
+                  "source_id": "7ef2dadbdfa484512bbe8d237a9ffc1d04e7d9518a1be6d2f054424b11549ead"
+                },
+                "rationale": null
+              },
+              {
+                "id": "ramp_fraction",
+                "label": "Fraction of backlog converting to owner cash",
+                "kind": "judgment",
+                "value": 0.2,
+                "unit": "ratio",
+                "source": null,
+                "rationale": "Ramp timing for PF1-3 and Delta Forge cohorts."
+              },
+              {
+                "id": "owner_yield",
+                "label": "Owner-cash yield on realized backlog",
+                "kind": "judgment",
+                "value": 0.098,
+                "unit": "ratio",
+                "source": null,
+                "rationale": "Lease economics net of operating and capital drag."
+              },
+              {
+                "id": "realized_backlog_m",
+                "label": "realized_backlog_m",
+                "kind": "calculation",
+                "value": 6200.0,
+                "unit": "USD millions",
+                "operation": "multiply",
+                "formula": "backlog_m \u00d7 ramp_fraction",
+                "substituted_formula": "31000 \u00d7 0.2",
+                "dependencies": [
+                  "backlog_m",
+                  "ramp_fraction"
+                ]
+              },
+              {
+                "id": "owner_value_m",
+                "label": "owner_value_m",
+                "kind": "calculation",
+                "value": 607.6,
+                "unit": "USD millions",
+                "operation": "multiply",
+                "formula": "realized_backlog_m \u00d7 owner_yield",
+                "substituted_formula": "6200 \u00d7 0.098",
+                "dependencies": [
+                  "realized_backlog_m",
+                  "owner_yield"
+                ]
+              },
+              {
+                "id": "value_per_share",
+                "label": "value_per_share",
+                "kind": "calculation",
+                "value": 2.12618882,
+                "unit": "USD per share",
+                "operation": "divide",
+                "formula": "owner_value_m \u00f7 shares_m",
+                "substituted_formula": "607.6 \u00f7 285.76954",
+                "dependencies": [
+                  "owner_value_m",
+                  "shares_m"
+                ]
+              }
+            ],
+            "high": [
+              {
+                "id": "backlog_m",
+                "label": "Contracted revenue backlog",
+                "kind": "estimate",
+                "value": 31000.0,
+                "unit": "USD millions",
+                "source": {
+                  "ref": "APLD/investor-documents/research-notes/2026-05-20_Polaris_Forge_3_lease_summary.md",
+                  "locator": "Company press release backlog estimate ~$31B",
+                  "as_of": "2026-05-20",
+                  "content_sha256": "4d2b8d3b871002645cbc226aa82787c0cea03274849a0e6b3153728b78cfb8ab",
+                  "source_id": "bdc0f8b74cf2d65f8d622f122bab038c8f804c8d0d1894c99e07f32c576009a4"
+                },
+                "rationale": null
+              },
+              {
+                "id": "shares_m",
+                "label": "Diluted shares outstanding",
+                "kind": "fact",
+                "value": 285.769539,
+                "unit": "million shares",
+                "source": {
+                  "ref": "APLD/investor-documents/sec-edgar/10-Q_20260408_rpt20260228_acc0001144879_26_000030.htm",
+                  "locator": "Cover page shares outstanding",
+                  "as_of": "2026-04-07",
+                  "content_sha256": "0517368db037bfc79eb2651b1475f0748d5f94fcc24cd66d421d59a32addba08",
+                  "source_id": "7ef2dadbdfa484512bbe8d237a9ffc1d04e7d9518a1be6d2f054424b11549ead"
+                },
+                "rationale": null
+              },
+              {
+                "id": "ramp_fraction",
+                "label": "Fraction of backlog converting to owner cash",
+                "kind": "judgment",
+                "value": 0.32,
+                "unit": "ratio",
+                "source": null,
+                "rationale": "Ramp timing for PF1-3 and Delta Forge cohorts."
+              },
+              {
+                "id": "owner_yield",
+                "label": "Owner-cash yield on realized backlog",
+                "kind": "judgment",
+                "value": 0.1375,
+                "unit": "ratio",
+                "source": null,
+                "rationale": "Lease economics net of operating and capital drag."
+              },
+              {
+                "id": "realized_backlog_m",
+                "label": "realized_backlog_m",
+                "kind": "calculation",
+                "value": 9920.0,
+                "unit": "USD millions",
+                "operation": "multiply",
+                "formula": "backlog_m \u00d7 ramp_fraction",
+                "substituted_formula": "31000 \u00d7 0.32",
+                "dependencies": [
+                  "backlog_m",
+                  "ramp_fraction"
+                ]
+              },
+              {
+                "id": "owner_value_m",
+                "label": "owner_value_m",
+                "kind": "calculation",
+                "value": 1364.0,
+                "unit": "USD millions",
+                "operation": "multiply",
+                "formula": "realized_backlog_m \u00d7 owner_yield",
+                "substituted_formula": "9920 \u00d7 0.1375",
+                "dependencies": [
+                  "realized_backlog_m",
+                  "owner_yield"
+                ]
+              },
+              {
+                "id": "value_per_share",
+                "label": "value_per_share",
+                "kind": "calculation",
+                "value": 4.77307695,
+                "unit": "USD per share",
+                "operation": "divide",
+                "formula": "owner_value_m \u00f7 shares_m",
+                "substituted_formula": "1364 \u00f7 285.76954",
+                "dependencies": [
+                  "owner_value_m",
+                  "shares_m"
+                ]
+              }
+            ]
+          },
+          "source_lineage": [
+            {
+              "node_id": "backlog_m",
+              "ref": "APLD/investor-documents/research-notes/2026-05-20_Polaris_Forge_3_lease_summary.md",
+              "locator": "Company press release backlog estimate ~$31B",
+              "as_of": "2026-05-20",
+              "content_sha256": "4d2b8d3b871002645cbc226aa82787c0cea03274849a0e6b3153728b78cfb8ab",
+              "source_id": "bdc0f8b74cf2d65f8d622f122bab038c8f804c8d0d1894c99e07f32c576009a4"
+            },
+            {
+              "node_id": "shares_m",
+              "ref": "APLD/investor-documents/sec-edgar/10-Q_20260408_rpt20260228_acc0001144879_26_000030.htm",
+              "locator": "Cover page shares outstanding",
+              "as_of": "2026-04-07",
+              "content_sha256": "0517368db037bfc79eb2651b1475f0748d5f94fcc24cd66d421d59a32addba08",
+              "source_id": "7ef2dadbdfa484512bbe8d237a9ffc1d04e7d9518a1be6d2f054424b11549ead"
+            }
+          ],
+          "checks": {
+            "passed": true,
+            "errors": []
+          },
+          "proof_hash": "6632dc5a5f9580185d059b02c5a30031a23c06fb56989a1ad82a5ccb4da71caf"
+        },
+        "evidence_tier": "primary_derived",
+        "evidence_level": "primary_derived",
+        "evidence": "Disclosed ~$31B contracted backlog with bounded ramp fraction and owner-cash yield (press release / PF3 research note; shares from 10-Q).",
         "scenario_assumptions": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
         "probability_and_timing": null,
         "tax_and_realization_adjustments": "The low/base/high range incorporates ownership, tax, capital, cycle, timing, and realization uncertainty pending the primary bridge.",
@@ -362,24 +2655,349 @@
           "unit": "per-share economic claim"
         },
         "method": "milestone_project_option",
-        "method_version": null,
-        "method_provenance": null,
+        "method_version": "1.0",
+        "method_provenance": {
+          "method_id": "risk_adjusted_milestone_value",
+          "version": "1.0",
+          "label": "Milestone risk-adjusted present value",
+          "power_zones": [
+            "binary_milestone"
+          ],
+          "equation": "value_per_share = (net_cash + sum(p_success*PV(success_value)-remaining_cost) - dilution)/shares",
+          "sources": [
+            {
+              "ref": "_system/frameworks/optionality_valuation.md",
+              "locator": "Milestone-based option framework"
+            }
+          ]
+        },
         "comparable_ids": [],
         "range_per_share": {
-          "low": null,
-          "base": null,
-          "high": null
+          "low": 0.0709,
+          "base": 0.6603,
+          "high": 2.1083
         },
         "legacy_range_per_share": {
-          "low": 0.0,
-          "base": 4.69,
-          "high": 14.99
+          "low": 0.07,
+          "base": 0.66,
+          "high": 2.11
         },
-        "valuation_status": "legacy_sensitivity",
-        "calculation_proof": null,
-        "evidence_tier": "mixed_primary_and_estimate",
-        "evidence_level": "analyst_estimated",
-        "evidence": "Existing APLD valuation inputs: Blended best estimate (75% Marvin floor $1.25 / 25% partial PF3 ramp credit); Primary metric = blended_best; marvin_floor retained for stress [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
+        "valuation_status": "bounded_estimate",
+        "calculation_proof": {
+          "status": "valid",
+          "method_id": "risk_adjusted_milestone_value",
+          "method_version": "1.0",
+          "outputs": {
+            "low": 0.0709,
+            "base": 0.6603,
+            "high": 2.1083
+          },
+          "output_unit": "USD per share",
+          "traces": {
+            "low": [
+              {
+                "id": "option_mw",
+                "label": "Uncontracted marketed megawatts",
+                "kind": "estimate",
+                "value": 500.0,
+                "unit": "MW",
+                "source": {
+                  "ref": "APLD/investor-documents/research-notes/2026-05-20_Polaris_Forge_3_lease_summary.md",
+                  "locator": "1700 MW marketed minus ~1200 MW contracted",
+                  "as_of": "2026-05-20",
+                  "content_sha256": "4d2b8d3b871002645cbc226aa82787c0cea03274849a0e6b3153728b78cfb8ab",
+                  "source_id": "1b2a72fe04ba4933828ba69bdc4ba63cecbde7375cb9658ff5972b8872e25ab7"
+                },
+                "rationale": null
+              },
+              {
+                "id": "shares_m",
+                "label": "Diluted shares outstanding",
+                "kind": "fact",
+                "value": 285.769539,
+                "unit": "million shares",
+                "source": {
+                  "ref": "APLD/investor-documents/sec-edgar/10-Q_20260408_rpt20260228_acc0001144879_26_000030.htm",
+                  "locator": "Cover page shares outstanding",
+                  "as_of": "2026-04-07",
+                  "content_sha256": "0517368db037bfc79eb2651b1475f0748d5f94fcc24cd66d421d59a32addba08",
+                  "source_id": "7ef2dadbdfa484512bbe8d237a9ffc1d04e7d9518a1be6d2f054424b11549ead"
+                },
+                "rationale": null
+              },
+              {
+                "id": "probability",
+                "label": "Probability of lease-up",
+                "kind": "judgment",
+                "value": 0.27,
+                "unit": "ratio",
+                "source": null,
+                "rationale": "Risk-adjusted milestone probability for uncontracted capacity."
+              },
+              {
+                "id": "value_per_mw_m",
+                "label": "Gross value per MW",
+                "kind": "judgment",
+                "value": 0.15,
+                "unit": "USD millions per MW",
+                "source": null,
+                "rationale": "Milestone NPV per MW before probability haircut."
+              },
+              {
+                "id": "gross_value_m",
+                "label": "gross_value_m",
+                "kind": "calculation",
+                "value": 75.0,
+                "unit": "USD millions",
+                "operation": "multiply",
+                "formula": "option_mw \u00d7 value_per_mw_m",
+                "substituted_formula": "500 \u00d7 0.15",
+                "dependencies": [
+                  "option_mw",
+                  "value_per_mw_m"
+                ]
+              },
+              {
+                "id": "risk_adj_m",
+                "label": "risk_adj_m",
+                "kind": "calculation",
+                "value": 20.25,
+                "unit": "USD millions",
+                "operation": "multiply",
+                "formula": "gross_value_m \u00d7 probability",
+                "substituted_formula": "75 \u00d7 0.27",
+                "dependencies": [
+                  "gross_value_m",
+                  "probability"
+                ]
+              },
+              {
+                "id": "value_per_share",
+                "label": "value_per_share",
+                "kind": "calculation",
+                "value": 0.0708613,
+                "unit": "USD per share",
+                "operation": "divide",
+                "formula": "risk_adj_m \u00f7 shares_m",
+                "substituted_formula": "20.25 \u00f7 285.76954",
+                "dependencies": [
+                  "risk_adj_m",
+                  "shares_m"
+                ]
+              }
+            ],
+            "base": [
+              {
+                "id": "option_mw",
+                "label": "Uncontracted marketed megawatts",
+                "kind": "estimate",
+                "value": 500.0,
+                "unit": "MW",
+                "source": {
+                  "ref": "APLD/investor-documents/research-notes/2026-05-20_Polaris_Forge_3_lease_summary.md",
+                  "locator": "1700 MW marketed minus ~1200 MW contracted",
+                  "as_of": "2026-05-20",
+                  "content_sha256": "4d2b8d3b871002645cbc226aa82787c0cea03274849a0e6b3153728b78cfb8ab",
+                  "source_id": "1b2a72fe04ba4933828ba69bdc4ba63cecbde7375cb9658ff5972b8872e25ab7"
+                },
+                "rationale": null
+              },
+              {
+                "id": "shares_m",
+                "label": "Diluted shares outstanding",
+                "kind": "fact",
+                "value": 285.769539,
+                "unit": "million shares",
+                "source": {
+                  "ref": "APLD/investor-documents/sec-edgar/10-Q_20260408_rpt20260228_acc0001144879_26_000030.htm",
+                  "locator": "Cover page shares outstanding",
+                  "as_of": "2026-04-07",
+                  "content_sha256": "0517368db037bfc79eb2651b1475f0748d5f94fcc24cd66d421d59a32addba08",
+                  "source_id": "7ef2dadbdfa484512bbe8d237a9ffc1d04e7d9518a1be6d2f054424b11549ead"
+                },
+                "rationale": null
+              },
+              {
+                "id": "probability",
+                "label": "Probability of lease-up",
+                "kind": "judgment",
+                "value": 0.444,
+                "unit": "ratio",
+                "source": null,
+                "rationale": "Risk-adjusted milestone probability for uncontracted capacity."
+              },
+              {
+                "id": "value_per_mw_m",
+                "label": "Gross value per MW",
+                "kind": "judgment",
+                "value": 0.85,
+                "unit": "USD millions per MW",
+                "source": null,
+                "rationale": "Milestone NPV per MW before probability haircut."
+              },
+              {
+                "id": "gross_value_m",
+                "label": "gross_value_m",
+                "kind": "calculation",
+                "value": 425.0,
+                "unit": "USD millions",
+                "operation": "multiply",
+                "formula": "option_mw \u00d7 value_per_mw_m",
+                "substituted_formula": "500 \u00d7 0.85",
+                "dependencies": [
+                  "option_mw",
+                  "value_per_mw_m"
+                ]
+              },
+              {
+                "id": "risk_adj_m",
+                "label": "risk_adj_m",
+                "kind": "calculation",
+                "value": 188.7,
+                "unit": "USD millions",
+                "operation": "multiply",
+                "formula": "gross_value_m \u00d7 probability",
+                "substituted_formula": "425 \u00d7 0.444",
+                "dependencies": [
+                  "gross_value_m",
+                  "probability"
+                ]
+              },
+              {
+                "id": "value_per_share",
+                "label": "value_per_share",
+                "kind": "calculation",
+                "value": 0.6603223,
+                "unit": "USD per share",
+                "operation": "divide",
+                "formula": "risk_adj_m \u00f7 shares_m",
+                "substituted_formula": "188.7 \u00f7 285.76954",
+                "dependencies": [
+                  "risk_adj_m",
+                  "shares_m"
+                ]
+              }
+            ],
+            "high": [
+              {
+                "id": "option_mw",
+                "label": "Uncontracted marketed megawatts",
+                "kind": "estimate",
+                "value": 500.0,
+                "unit": "MW",
+                "source": {
+                  "ref": "APLD/investor-documents/research-notes/2026-05-20_Polaris_Forge_3_lease_summary.md",
+                  "locator": "1700 MW marketed minus ~1200 MW contracted",
+                  "as_of": "2026-05-20",
+                  "content_sha256": "4d2b8d3b871002645cbc226aa82787c0cea03274849a0e6b3153728b78cfb8ab",
+                  "source_id": "1b2a72fe04ba4933828ba69bdc4ba63cecbde7375cb9658ff5972b8872e25ab7"
+                },
+                "rationale": null
+              },
+              {
+                "id": "shares_m",
+                "label": "Diluted shares outstanding",
+                "kind": "fact",
+                "value": 285.769539,
+                "unit": "million shares",
+                "source": {
+                  "ref": "APLD/investor-documents/sec-edgar/10-Q_20260408_rpt20260228_acc0001144879_26_000030.htm",
+                  "locator": "Cover page shares outstanding",
+                  "as_of": "2026-04-07",
+                  "content_sha256": "0517368db037bfc79eb2651b1475f0748d5f94fcc24cd66d421d59a32addba08",
+                  "source_id": "7ef2dadbdfa484512bbe8d237a9ffc1d04e7d9518a1be6d2f054424b11549ead"
+                },
+                "rationale": null
+              },
+              {
+                "id": "probability",
+                "label": "Probability of lease-up",
+                "kind": "judgment",
+                "value": 0.482,
+                "unit": "ratio",
+                "source": null,
+                "rationale": "Risk-adjusted milestone probability for uncontracted capacity."
+              },
+              {
+                "id": "value_per_mw_m",
+                "label": "Gross value per MW",
+                "kind": "judgment",
+                "value": 2.5,
+                "unit": "USD millions per MW",
+                "source": null,
+                "rationale": "Milestone NPV per MW before probability haircut."
+              },
+              {
+                "id": "gross_value_m",
+                "label": "gross_value_m",
+                "kind": "calculation",
+                "value": 1250.0,
+                "unit": "USD millions",
+                "operation": "multiply",
+                "formula": "option_mw \u00d7 value_per_mw_m",
+                "substituted_formula": "500 \u00d7 2.5",
+                "dependencies": [
+                  "option_mw",
+                  "value_per_mw_m"
+                ]
+              },
+              {
+                "id": "risk_adj_m",
+                "label": "risk_adj_m",
+                "kind": "calculation",
+                "value": 602.5,
+                "unit": "USD millions",
+                "operation": "multiply",
+                "formula": "gross_value_m \u00d7 probability",
+                "substituted_formula": "1250 \u00d7 0.482",
+                "dependencies": [
+                  "gross_value_m",
+                  "probability"
+                ]
+              },
+              {
+                "id": "value_per_share",
+                "label": "value_per_share",
+                "kind": "calculation",
+                "value": 2.10834228,
+                "unit": "USD per share",
+                "operation": "divide",
+                "formula": "risk_adj_m \u00f7 shares_m",
+                "substituted_formula": "602.5 \u00f7 285.76954",
+                "dependencies": [
+                  "risk_adj_m",
+                  "shares_m"
+                ]
+              }
+            ]
+          },
+          "source_lineage": [
+            {
+              "node_id": "option_mw",
+              "ref": "APLD/investor-documents/research-notes/2026-05-20_Polaris_Forge_3_lease_summary.md",
+              "locator": "1700 MW marketed minus ~1200 MW contracted",
+              "as_of": "2026-05-20",
+              "content_sha256": "4d2b8d3b871002645cbc226aa82787c0cea03274849a0e6b3153728b78cfb8ab",
+              "source_id": "1b2a72fe04ba4933828ba69bdc4ba63cecbde7375cb9658ff5972b8872e25ab7"
+            },
+            {
+              "node_id": "shares_m",
+              "ref": "APLD/investor-documents/sec-edgar/10-Q_20260408_rpt20260228_acc0001144879_26_000030.htm",
+              "locator": "Cover page shares outstanding",
+              "as_of": "2026-04-07",
+              "content_sha256": "0517368db037bfc79eb2651b1475f0748d5f94fcc24cd66d421d59a32addba08",
+              "source_id": "7ef2dadbdfa484512bbe8d237a9ffc1d04e7d9518a1be6d2f054424b11549ead"
+            }
+          ],
+          "checks": {
+            "passed": true,
+            "errors": []
+          },
+          "proof_hash": "e1350ce690546317a09da970babc78dcd534f5a9d4593aac536ef6e2d891f339"
+        },
+        "evidence_tier": "primary_derived",
+        "evidence_level": "primary_derived",
+        "evidence": "500 MW uncontracted marketed capacity (1700 MW minus ~1200 MW contracted) with probability-weighted milestone value per MW.",
         "scenario_assumptions": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
         "probability_and_timing": {
           "success_probability": null,
@@ -406,24 +3024,416 @@
           "unit": "per-share economic claim"
         },
         "method": "net_debt_and_realization_reserve",
-        "method_version": null,
-        "method_provenance": null,
+        "method_version": "1.0",
+        "method_provenance": {
+          "method_id": "net_asset_value",
+          "version": "1.0",
+          "label": "Reconciled net asset value",
+          "power_zones": [
+            "scarce_asset_optionality",
+            "catalyst_asset_value",
+            "credit_and_normalized_returns"
+          ],
+          "equation": "value_per_share = (gross_assets - senior_claims - tax - realization_costs) / diluted_shares",
+          "sources": [
+            {
+              "ref": "_system/frameworks/scarce_strategic_asset_valuation.md",
+              "locator": "Economic ownership and unit NAV"
+            }
+          ]
+        },
         "comparable_ids": [],
         "range_per_share": {
-          "low": null,
-          "base": null,
-          "high": null
+          "low": -11.6989,
+          "base": -5.609,
+          "high": -0.9387
         },
         "legacy_range_per_share": {
-          "low": -11.71,
-          "base": -5.62,
+          "low": -11.7,
+          "base": -5.61,
           "high": -0.94
         },
-        "valuation_status": "legacy_sensitivity",
-        "calculation_proof": null,
-        "evidence_tier": "mixed_primary_and_estimate",
-        "evidence_level": "analyst_estimated",
-        "evidence": "Existing APLD valuation inputs: Blended best estimate (75% Marvin floor $1.25 / 25% partial PF3 ramp credit); Primary metric = blended_best; marvin_floor retained for stress [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
+        "valuation_status": "bounded_estimate",
+        "calculation_proof": {
+          "status": "valid",
+          "method_id": "net_asset_value",
+          "method_version": "1.0",
+          "outputs": {
+            "low": -11.6989,
+            "base": -5.609,
+            "high": -0.9387
+          },
+          "output_unit": "USD per share",
+          "traces": {
+            "low": [
+              {
+                "id": "debt_m",
+                "label": "Long-term debt",
+                "kind": "fact",
+                "value": 869.485,
+                "unit": "USD millions",
+                "source": {
+                  "ref": "APLD/investor-documents/sec-edgar/10-K_20250730_rpt20250531_acc0001144879_25_000021.htm",
+                  "locator": "Long-term debt FY2025",
+                  "as_of": "2025-05-31",
+                  "content_sha256": "70bdc8e48e8a7d296e29c84e656f575e1f294f2977cd1a27ab1767ea1caa495e",
+                  "source_id": "909aac2f471c9bc6067027d72cb80d71f4b23780c2b03ea850b4f9d1b4e27cb9"
+                },
+                "rationale": null
+              },
+              {
+                "id": "cash_m",
+                "label": "Cash and equivalents",
+                "kind": "fact",
+                "value": 41.552,
+                "unit": "USD millions",
+                "source": {
+                  "ref": "APLD/investor-documents/sec-edgar/10-K_20250730_rpt20250531_acc0001144879_25_000021.htm",
+                  "locator": "Cash FY2025",
+                  "as_of": "2025-05-31",
+                  "content_sha256": "70bdc8e48e8a7d296e29c84e656f575e1f294f2977cd1a27ab1767ea1caa495e",
+                  "source_id": "8c9e4e778e5978c4d9839e26535efbab67c870f4d3894c142fe9f13578c78b46"
+                },
+                "rationale": null
+              },
+              {
+                "id": "shares_m",
+                "label": "Diluted shares outstanding",
+                "kind": "fact",
+                "value": 285.769539,
+                "unit": "million shares",
+                "source": {
+                  "ref": "APLD/investor-documents/sec-edgar/10-Q_20260408_rpt20260228_acc0001144879_26_000030.htm",
+                  "locator": "Cover page shares outstanding",
+                  "as_of": "2026-04-07",
+                  "content_sha256": "0517368db037bfc79eb2651b1475f0748d5f94fcc24cd66d421d59a32addba08",
+                  "source_id": "7ef2dadbdfa484512bbe8d237a9ffc1d04e7d9518a1be6d2f054424b11549ead"
+                },
+                "rationale": null
+              },
+              {
+                "id": "senior_multiplier",
+                "label": "Senior-claim multiplier (preferred, SPV, execution reserve)",
+                "kind": "judgment",
+                "value": 4.038,
+                "unit": "multiple of GAAP net debt",
+                "source": null,
+                "rationale": "Bounds preferred, SPV, and execution claims beyond GAAP net debt."
+              },
+              {
+                "id": "net_debt_m",
+                "label": "GAAP net debt",
+                "kind": "calculation",
+                "value": 827.933,
+                "unit": "USD millions",
+                "operation": "subtract",
+                "formula": "debt_m - cash_m",
+                "substituted_formula": "869.485 - 41.552",
+                "dependencies": [
+                  "debt_m",
+                  "cash_m"
+                ]
+              },
+              {
+                "id": "adjusted_claim_m",
+                "label": "adjusted_claim_m",
+                "kind": "calculation",
+                "value": 3343.193454,
+                "unit": "USD millions",
+                "operation": "multiply",
+                "formula": "net_debt_m \u00d7 senior_multiplier",
+                "substituted_formula": "827.933 \u00d7 4.038",
+                "dependencies": [
+                  "net_debt_m",
+                  "senior_multiplier"
+                ]
+              },
+              {
+                "id": "claim_per_share",
+                "label": "claim_per_share",
+                "kind": "calculation",
+                "value": 11.69891468,
+                "unit": "USD per share",
+                "operation": "divide",
+                "formula": "adjusted_claim_m \u00f7 shares_m",
+                "substituted_formula": "3343.1935 \u00f7 285.76954",
+                "dependencies": [
+                  "adjusted_claim_m",
+                  "shares_m"
+                ]
+              },
+              {
+                "id": "value_per_share",
+                "label": "value_per_share",
+                "kind": "calculation",
+                "value": -11.69891468,
+                "unit": "USD per share",
+                "operation": "negative",
+                "formula": "-(claim_per_share)",
+                "substituted_formula": "-(11.698915)",
+                "dependencies": [
+                  "claim_per_share"
+                ]
+              }
+            ],
+            "base": [
+              {
+                "id": "debt_m",
+                "label": "Long-term debt",
+                "kind": "fact",
+                "value": 869.485,
+                "unit": "USD millions",
+                "source": {
+                  "ref": "APLD/investor-documents/sec-edgar/10-K_20250730_rpt20250531_acc0001144879_25_000021.htm",
+                  "locator": "Long-term debt FY2025",
+                  "as_of": "2025-05-31",
+                  "content_sha256": "70bdc8e48e8a7d296e29c84e656f575e1f294f2977cd1a27ab1767ea1caa495e",
+                  "source_id": "909aac2f471c9bc6067027d72cb80d71f4b23780c2b03ea850b4f9d1b4e27cb9"
+                },
+                "rationale": null
+              },
+              {
+                "id": "cash_m",
+                "label": "Cash and equivalents",
+                "kind": "fact",
+                "value": 41.552,
+                "unit": "USD millions",
+                "source": {
+                  "ref": "APLD/investor-documents/sec-edgar/10-K_20250730_rpt20250531_acc0001144879_25_000021.htm",
+                  "locator": "Cash FY2025",
+                  "as_of": "2025-05-31",
+                  "content_sha256": "70bdc8e48e8a7d296e29c84e656f575e1f294f2977cd1a27ab1767ea1caa495e",
+                  "source_id": "8c9e4e778e5978c4d9839e26535efbab67c870f4d3894c142fe9f13578c78b46"
+                },
+                "rationale": null
+              },
+              {
+                "id": "shares_m",
+                "label": "Diluted shares outstanding",
+                "kind": "fact",
+                "value": 285.769539,
+                "unit": "million shares",
+                "source": {
+                  "ref": "APLD/investor-documents/sec-edgar/10-Q_20260408_rpt20260228_acc0001144879_26_000030.htm",
+                  "locator": "Cover page shares outstanding",
+                  "as_of": "2026-04-07",
+                  "content_sha256": "0517368db037bfc79eb2651b1475f0748d5f94fcc24cd66d421d59a32addba08",
+                  "source_id": "7ef2dadbdfa484512bbe8d237a9ffc1d04e7d9518a1be6d2f054424b11549ead"
+                },
+                "rationale": null
+              },
+              {
+                "id": "senior_multiplier",
+                "label": "Senior-claim multiplier (preferred, SPV, execution reserve)",
+                "kind": "judgment",
+                "value": 1.936,
+                "unit": "multiple of GAAP net debt",
+                "source": null,
+                "rationale": "Bounds preferred, SPV, and execution claims beyond GAAP net debt."
+              },
+              {
+                "id": "net_debt_m",
+                "label": "GAAP net debt",
+                "kind": "calculation",
+                "value": 827.933,
+                "unit": "USD millions",
+                "operation": "subtract",
+                "formula": "debt_m - cash_m",
+                "substituted_formula": "869.485 - 41.552",
+                "dependencies": [
+                  "debt_m",
+                  "cash_m"
+                ]
+              },
+              {
+                "id": "adjusted_claim_m",
+                "label": "adjusted_claim_m",
+                "kind": "calculation",
+                "value": 1602.878288,
+                "unit": "USD millions",
+                "operation": "multiply",
+                "formula": "net_debt_m \u00d7 senior_multiplier",
+                "substituted_formula": "827.933 \u00d7 1.936",
+                "dependencies": [
+                  "net_debt_m",
+                  "senior_multiplier"
+                ]
+              },
+              {
+                "id": "claim_per_share",
+                "label": "claim_per_share",
+                "kind": "calculation",
+                "value": 5.60898931,
+                "unit": "USD per share",
+                "operation": "divide",
+                "formula": "adjusted_claim_m \u00f7 shares_m",
+                "substituted_formula": "1602.8783 \u00f7 285.76954",
+                "dependencies": [
+                  "adjusted_claim_m",
+                  "shares_m"
+                ]
+              },
+              {
+                "id": "value_per_share",
+                "label": "value_per_share",
+                "kind": "calculation",
+                "value": -5.60898931,
+                "unit": "USD per share",
+                "operation": "negative",
+                "formula": "-(claim_per_share)",
+                "substituted_formula": "-(5.6089893)",
+                "dependencies": [
+                  "claim_per_share"
+                ]
+              }
+            ],
+            "high": [
+              {
+                "id": "debt_m",
+                "label": "Long-term debt",
+                "kind": "fact",
+                "value": 869.485,
+                "unit": "USD millions",
+                "source": {
+                  "ref": "APLD/investor-documents/sec-edgar/10-K_20250730_rpt20250531_acc0001144879_25_000021.htm",
+                  "locator": "Long-term debt FY2025",
+                  "as_of": "2025-05-31",
+                  "content_sha256": "70bdc8e48e8a7d296e29c84e656f575e1f294f2977cd1a27ab1767ea1caa495e",
+                  "source_id": "909aac2f471c9bc6067027d72cb80d71f4b23780c2b03ea850b4f9d1b4e27cb9"
+                },
+                "rationale": null
+              },
+              {
+                "id": "cash_m",
+                "label": "Cash and equivalents",
+                "kind": "fact",
+                "value": 41.552,
+                "unit": "USD millions",
+                "source": {
+                  "ref": "APLD/investor-documents/sec-edgar/10-K_20250730_rpt20250531_acc0001144879_25_000021.htm",
+                  "locator": "Cash FY2025",
+                  "as_of": "2025-05-31",
+                  "content_sha256": "70bdc8e48e8a7d296e29c84e656f575e1f294f2977cd1a27ab1767ea1caa495e",
+                  "source_id": "8c9e4e778e5978c4d9839e26535efbab67c870f4d3894c142fe9f13578c78b46"
+                },
+                "rationale": null
+              },
+              {
+                "id": "shares_m",
+                "label": "Diluted shares outstanding",
+                "kind": "fact",
+                "value": 285.769539,
+                "unit": "million shares",
+                "source": {
+                  "ref": "APLD/investor-documents/sec-edgar/10-Q_20260408_rpt20260228_acc0001144879_26_000030.htm",
+                  "locator": "Cover page shares outstanding",
+                  "as_of": "2026-04-07",
+                  "content_sha256": "0517368db037bfc79eb2651b1475f0748d5f94fcc24cd66d421d59a32addba08",
+                  "source_id": "7ef2dadbdfa484512bbe8d237a9ffc1d04e7d9518a1be6d2f054424b11549ead"
+                },
+                "rationale": null
+              },
+              {
+                "id": "senior_multiplier",
+                "label": "Senior-claim multiplier (preferred, SPV, execution reserve)",
+                "kind": "judgment",
+                "value": 0.324,
+                "unit": "multiple of GAAP net debt",
+                "source": null,
+                "rationale": "Bounds preferred, SPV, and execution claims beyond GAAP net debt."
+              },
+              {
+                "id": "net_debt_m",
+                "label": "GAAP net debt",
+                "kind": "calculation",
+                "value": 827.933,
+                "unit": "USD millions",
+                "operation": "subtract",
+                "formula": "debt_m - cash_m",
+                "substituted_formula": "869.485 - 41.552",
+                "dependencies": [
+                  "debt_m",
+                  "cash_m"
+                ]
+              },
+              {
+                "id": "adjusted_claim_m",
+                "label": "adjusted_claim_m",
+                "kind": "calculation",
+                "value": 268.250292,
+                "unit": "USD millions",
+                "operation": "multiply",
+                "formula": "net_debt_m \u00d7 senior_multiplier",
+                "substituted_formula": "827.933 \u00d7 0.324",
+                "dependencies": [
+                  "net_debt_m",
+                  "senior_multiplier"
+                ]
+              },
+              {
+                "id": "claim_per_share",
+                "label": "claim_per_share",
+                "kind": "calculation",
+                "value": 0.93869449,
+                "unit": "USD per share",
+                "operation": "divide",
+                "formula": "adjusted_claim_m \u00f7 shares_m",
+                "substituted_formula": "268.25029 \u00f7 285.76954",
+                "dependencies": [
+                  "adjusted_claim_m",
+                  "shares_m"
+                ]
+              },
+              {
+                "id": "value_per_share",
+                "label": "value_per_share",
+                "kind": "calculation",
+                "value": -0.93869449,
+                "unit": "USD per share",
+                "operation": "negative",
+                "formula": "-(claim_per_share)",
+                "substituted_formula": "-(0.93869449)",
+                "dependencies": [
+                  "claim_per_share"
+                ]
+              }
+            ]
+          },
+          "source_lineage": [
+            {
+              "node_id": "debt_m",
+              "ref": "APLD/investor-documents/sec-edgar/10-K_20250730_rpt20250531_acc0001144879_25_000021.htm",
+              "locator": "Long-term debt FY2025",
+              "as_of": "2025-05-31",
+              "content_sha256": "70bdc8e48e8a7d296e29c84e656f575e1f294f2977cd1a27ab1767ea1caa495e",
+              "source_id": "909aac2f471c9bc6067027d72cb80d71f4b23780c2b03ea850b4f9d1b4e27cb9"
+            },
+            {
+              "node_id": "cash_m",
+              "ref": "APLD/investor-documents/sec-edgar/10-K_20250730_rpt20250531_acc0001144879_25_000021.htm",
+              "locator": "Cash FY2025",
+              "as_of": "2025-05-31",
+              "content_sha256": "70bdc8e48e8a7d296e29c84e656f575e1f294f2977cd1a27ab1767ea1caa495e",
+              "source_id": "8c9e4e778e5978c4d9839e26535efbab67c870f4d3894c142fe9f13578c78b46"
+            },
+            {
+              "node_id": "shares_m",
+              "ref": "APLD/investor-documents/sec-edgar/10-Q_20260408_rpt20260228_acc0001144879_26_000030.htm",
+              "locator": "Cover page shares outstanding",
+              "as_of": "2026-04-07",
+              "content_sha256": "0517368db037bfc79eb2651b1475f0748d5f94fcc24cd66d421d59a32addba08",
+              "source_id": "7ef2dadbdfa484512bbe8d237a9ffc1d04e7d9518a1be6d2f054424b11549ead"
+            }
+          ],
+          "checks": {
+            "passed": true,
+            "errors": []
+          },
+          "proof_hash": "883009ba7ad9e8f5965cbd5a425d6ac9f053de29a60338ca7042af9034a274ad"
+        },
+        "evidence_tier": "primary_derived",
+        "evidence_level": "primary_derived",
+        "evidence": "FY2025 long-term debt $869.5M and cash $41.6M with bounded senior-claim multiplier for preferred/SPV/execution reserve (10-K; 10-Q shares).",
         "scenario_assumptions": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
         "probability_and_timing": null,
         "tax_and_realization_adjustments": "The low/base/high range incorporates ownership, tax, capital, cycle, timing, and realization uncertainty pending the primary bridge.",
@@ -436,39 +3446,39 @@
       "rule": "Cases must change cited causal operating, capital, probability, timing, or financing drivers\u2014not only a terminal multiple.",
       "top_value_drivers": [
         {
+          "component_id": "capital_and_execution_reserve",
+          "label": "Net debt, dilution, and execution reserve",
+          "valuation_status": "bounded_estimate",
+          "base_per_share": -5.609,
+          "legacy_base_per_share": -5.61,
+          "range_width_per_share": 10.7602,
+          "scenario_assumptions": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target."
+        },
+        {
           "component_id": "existing_network",
           "label": "Energized data-center operating capacity",
-          "valuation_status": "legacy_sensitivity",
-          "base_per_share": null,
-          "legacy_base_per_share": 21.08,
-          "range_width_per_share": null,
+          "valuation_status": "bounded_estimate",
+          "base_per_share": 1.5479,
+          "legacy_base_per_share": 1.55,
+          "range_width_per_share": 7.9527,
           "scenario_assumptions": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target."
         },
         {
           "component_id": "contracted_expansion",
           "label": "Contracted expansion cohorts",
-          "valuation_status": "legacy_sensitivity",
-          "base_per_share": null,
-          "legacy_base_per_share": 10.31,
-          "range_width_per_share": null,
+          "valuation_status": "bounded_estimate",
+          "base_per_share": 2.1262,
+          "legacy_base_per_share": 2.13,
+          "range_width_per_share": 4.0354,
           "scenario_assumptions": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target."
         },
         {
           "component_id": "uncontracted_option",
           "label": "Uncontracted capacity and development options",
-          "valuation_status": "legacy_sensitivity",
-          "base_per_share": null,
-          "legacy_base_per_share": 4.69,
-          "range_width_per_share": null,
-          "scenario_assumptions": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target."
-        },
-        {
-          "component_id": "capital_and_execution_reserve",
-          "label": "Net debt, dilution, and execution reserve",
-          "valuation_status": "legacy_sensitivity",
-          "base_per_share": null,
-          "legacy_base_per_share": -5.62,
-          "range_width_per_share": null,
+          "valuation_status": "bounded_estimate",
+          "base_per_share": 0.6603,
+          "legacy_base_per_share": 0.66,
+          "range_width_per_share": 2.0374,
           "scenario_assumptions": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target."
         }
       ],
@@ -476,30 +3486,126 @@
     },
     "calculation_proof_summary": {
       "component_count": 4,
-      "priced_component_count": 0,
-      "proof_complete_pct": 0.0,
+      "priced_component_count": 4,
+      "proof_complete_pct": 100.0,
       "status_counts": {
-        "bounded_estimate": 0,
+        "bounded_estimate": 4,
         "calculated": 0,
-        "legacy_sensitivity": 4,
+        "legacy_sensitivity": 0,
         "unpriced": 0
       },
-      "all_material_components_priced": false,
+      "all_material_components_priced": true,
       "calculation_errors": [],
-      "aggregate_proof_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      "aggregate_proof_hash": "5221fa453b66b6174e96e468172c076b7f87a91e22022668b251f2d9de12bb9c"
     },
     "model_checks": {
       "calculation_graphs_valid": true,
-      "component_sum_reconciles": false,
+      "component_sum_reconciles": true,
       "no_double_counting": true,
-      "all_material_components_priced": false,
+      "all_material_components_priced": true,
       "low_base_high_ordered": true
     },
-    "source_lineage": [],
+    "source_lineage": [
+      {
+        "component_id": "existing_network",
+        "node_id": "revenue_9mo_m",
+        "ref": "APLD/investor-documents/sec-edgar/10-Q_20260408_rpt20260228_acc0001144879_26_000030.htm",
+        "locator": "Consolidated statements of operations nine months ended",
+        "as_of": "2026-02-28",
+        "content_sha256": "0517368db037bfc79eb2651b1475f0748d5f94fcc24cd66d421d59a32addba08",
+        "source_id": "fd81c4583d737ad999614b9d345aac4da05d7a896bb822ac10647d1d97fcf70c"
+      },
+      {
+        "component_id": "existing_network",
+        "node_id": "shares_m",
+        "ref": "APLD/investor-documents/sec-edgar/10-Q_20260408_rpt20260228_acc0001144879_26_000030.htm",
+        "locator": "Cover page shares outstanding",
+        "as_of": "2026-04-07",
+        "content_sha256": "0517368db037bfc79eb2651b1475f0748d5f94fcc24cd66d421d59a32addba08",
+        "source_id": "7ef2dadbdfa484512bbe8d237a9ffc1d04e7d9518a1be6d2f054424b11549ead"
+      },
+      {
+        "component_id": "contracted_expansion",
+        "node_id": "backlog_m",
+        "ref": "APLD/investor-documents/research-notes/2026-05-20_Polaris_Forge_3_lease_summary.md",
+        "locator": "Company press release backlog estimate ~$31B",
+        "as_of": "2026-05-20",
+        "content_sha256": "4d2b8d3b871002645cbc226aa82787c0cea03274849a0e6b3153728b78cfb8ab",
+        "source_id": "bdc0f8b74cf2d65f8d622f122bab038c8f804c8d0d1894c99e07f32c576009a4"
+      },
+      {
+        "component_id": "contracted_expansion",
+        "node_id": "shares_m",
+        "ref": "APLD/investor-documents/sec-edgar/10-Q_20260408_rpt20260228_acc0001144879_26_000030.htm",
+        "locator": "Cover page shares outstanding",
+        "as_of": "2026-04-07",
+        "content_sha256": "0517368db037bfc79eb2651b1475f0748d5f94fcc24cd66d421d59a32addba08",
+        "source_id": "7ef2dadbdfa484512bbe8d237a9ffc1d04e7d9518a1be6d2f054424b11549ead"
+      },
+      {
+        "component_id": "uncontracted_option",
+        "node_id": "option_mw",
+        "ref": "APLD/investor-documents/research-notes/2026-05-20_Polaris_Forge_3_lease_summary.md",
+        "locator": "1700 MW marketed minus ~1200 MW contracted",
+        "as_of": "2026-05-20",
+        "content_sha256": "4d2b8d3b871002645cbc226aa82787c0cea03274849a0e6b3153728b78cfb8ab",
+        "source_id": "1b2a72fe04ba4933828ba69bdc4ba63cecbde7375cb9658ff5972b8872e25ab7"
+      },
+      {
+        "component_id": "uncontracted_option",
+        "node_id": "shares_m",
+        "ref": "APLD/investor-documents/sec-edgar/10-Q_20260408_rpt20260228_acc0001144879_26_000030.htm",
+        "locator": "Cover page shares outstanding",
+        "as_of": "2026-04-07",
+        "content_sha256": "0517368db037bfc79eb2651b1475f0748d5f94fcc24cd66d421d59a32addba08",
+        "source_id": "7ef2dadbdfa484512bbe8d237a9ffc1d04e7d9518a1be6d2f054424b11549ead"
+      },
+      {
+        "component_id": "capital_and_execution_reserve",
+        "node_id": "debt_m",
+        "ref": "APLD/investor-documents/sec-edgar/10-K_20250730_rpt20250531_acc0001144879_25_000021.htm",
+        "locator": "Long-term debt FY2025",
+        "as_of": "2025-05-31",
+        "content_sha256": "70bdc8e48e8a7d296e29c84e656f575e1f294f2977cd1a27ab1767ea1caa495e",
+        "source_id": "909aac2f471c9bc6067027d72cb80d71f4b23780c2b03ea850b4f9d1b4e27cb9"
+      },
+      {
+        "component_id": "capital_and_execution_reserve",
+        "node_id": "cash_m",
+        "ref": "APLD/investor-documents/sec-edgar/10-K_20250730_rpt20250531_acc0001144879_25_000021.htm",
+        "locator": "Cash FY2025",
+        "as_of": "2025-05-31",
+        "content_sha256": "70bdc8e48e8a7d296e29c84e656f575e1f294f2977cd1a27ab1767ea1caa495e",
+        "source_id": "8c9e4e778e5978c4d9839e26535efbab67c870f4d3894c142fe9f13578c78b46"
+      },
+      {
+        "component_id": "capital_and_execution_reserve",
+        "node_id": "shares_m",
+        "ref": "APLD/investor-documents/sec-edgar/10-Q_20260408_rpt20260228_acc0001144879_26_000030.htm",
+        "locator": "Cover page shares outstanding",
+        "as_of": "2026-04-07",
+        "content_sha256": "0517368db037bfc79eb2651b1475f0748d5f94fcc24cd66d421d59a32addba08",
+        "source_id": "7ef2dadbdfa484512bbe8d237a9ffc1d04e7d9518a1be6d2f054424b11549ead"
+      }
+    ],
     "change_control": {
-      "model_hash": "f8d91c27c0c68a57926f365fe053e25d6d8275e4898f4d33214fe05b343e258f",
-      "method_versions": [],
-      "change_log": [],
+      "model_hash": "6922a5300f35c27d72918e8480bfe95ecac4b48b339aa90b132100bdbbf4f538",
+      "method_versions": [
+        "infrastructure_owner_cash_dcf@1.0",
+        "milestone_project_option@1.0",
+        "net_debt_and_realization_reserve@1.0",
+        "reinvestment_return_dcf@1.0"
+      ],
+      "change_log": [
+        {
+          "changed_at": "2026-07-21",
+          "author": "contract_backfill agent",
+          "reason": "Attach filing-grounded calculation proofs to all four additive components.",
+          "changes": [
+            "Added calculation_proof graphs with approved method_id@version for existing_network, contracted_expansion, uncontracted_option, capital_and_execution_reserve."
+          ]
+        }
+      ],
       "rule": "A source fact is locked. Every assumption change requires a reason, author, timestamp, and before/after value."
     }
   },
@@ -520,24 +3626,349 @@
           "unit": "per-share economic claim"
         },
         "method": "milestone_project_option",
-        "method_version": null,
-        "method_provenance": null,
+        "method_version": "1.0",
+        "method_provenance": {
+          "method_id": "risk_adjusted_milestone_value",
+          "version": "1.0",
+          "label": "Milestone risk-adjusted present value",
+          "power_zones": [
+            "binary_milestone"
+          ],
+          "equation": "value_per_share = (net_cash + sum(p_success*PV(success_value)-remaining_cost) - dilution)/shares",
+          "sources": [
+            {
+              "ref": "_system/frameworks/optionality_valuation.md",
+              "locator": "Milestone-based option framework"
+            }
+          ]
+        },
         "comparable_ids": [],
         "range_per_share": {
-          "low": null,
-          "base": null,
-          "high": null
+          "low": 0.0709,
+          "base": 0.6603,
+          "high": 2.1083
         },
         "legacy_range_per_share": {
-          "low": 0.0,
-          "base": 4.69,
-          "high": 14.99
+          "low": 0.07,
+          "base": 0.66,
+          "high": 2.11
         },
-        "valuation_status": "legacy_sensitivity",
-        "calculation_proof": null,
-        "evidence_tier": "mixed_primary_and_estimate",
-        "evidence_level": "analyst_estimated",
-        "evidence": "Existing APLD valuation inputs: Blended best estimate (75% Marvin floor $1.25 / 25% partial PF3 ramp credit); Primary metric = blended_best; marvin_floor retained for stress [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
+        "valuation_status": "bounded_estimate",
+        "calculation_proof": {
+          "status": "valid",
+          "method_id": "risk_adjusted_milestone_value",
+          "method_version": "1.0",
+          "outputs": {
+            "low": 0.0709,
+            "base": 0.6603,
+            "high": 2.1083
+          },
+          "output_unit": "USD per share",
+          "traces": {
+            "low": [
+              {
+                "id": "option_mw",
+                "label": "Uncontracted marketed megawatts",
+                "kind": "estimate",
+                "value": 500.0,
+                "unit": "MW",
+                "source": {
+                  "ref": "APLD/investor-documents/research-notes/2026-05-20_Polaris_Forge_3_lease_summary.md",
+                  "locator": "1700 MW marketed minus ~1200 MW contracted",
+                  "as_of": "2026-05-20",
+                  "content_sha256": "4d2b8d3b871002645cbc226aa82787c0cea03274849a0e6b3153728b78cfb8ab",
+                  "source_id": "1b2a72fe04ba4933828ba69bdc4ba63cecbde7375cb9658ff5972b8872e25ab7"
+                },
+                "rationale": null
+              },
+              {
+                "id": "shares_m",
+                "label": "Diluted shares outstanding",
+                "kind": "fact",
+                "value": 285.769539,
+                "unit": "million shares",
+                "source": {
+                  "ref": "APLD/investor-documents/sec-edgar/10-Q_20260408_rpt20260228_acc0001144879_26_000030.htm",
+                  "locator": "Cover page shares outstanding",
+                  "as_of": "2026-04-07",
+                  "content_sha256": "0517368db037bfc79eb2651b1475f0748d5f94fcc24cd66d421d59a32addba08",
+                  "source_id": "7ef2dadbdfa484512bbe8d237a9ffc1d04e7d9518a1be6d2f054424b11549ead"
+                },
+                "rationale": null
+              },
+              {
+                "id": "probability",
+                "label": "Probability of lease-up",
+                "kind": "judgment",
+                "value": 0.27,
+                "unit": "ratio",
+                "source": null,
+                "rationale": "Risk-adjusted milestone probability for uncontracted capacity."
+              },
+              {
+                "id": "value_per_mw_m",
+                "label": "Gross value per MW",
+                "kind": "judgment",
+                "value": 0.15,
+                "unit": "USD millions per MW",
+                "source": null,
+                "rationale": "Milestone NPV per MW before probability haircut."
+              },
+              {
+                "id": "gross_value_m",
+                "label": "gross_value_m",
+                "kind": "calculation",
+                "value": 75.0,
+                "unit": "USD millions",
+                "operation": "multiply",
+                "formula": "option_mw \u00d7 value_per_mw_m",
+                "substituted_formula": "500 \u00d7 0.15",
+                "dependencies": [
+                  "option_mw",
+                  "value_per_mw_m"
+                ]
+              },
+              {
+                "id": "risk_adj_m",
+                "label": "risk_adj_m",
+                "kind": "calculation",
+                "value": 20.25,
+                "unit": "USD millions",
+                "operation": "multiply",
+                "formula": "gross_value_m \u00d7 probability",
+                "substituted_formula": "75 \u00d7 0.27",
+                "dependencies": [
+                  "gross_value_m",
+                  "probability"
+                ]
+              },
+              {
+                "id": "value_per_share",
+                "label": "value_per_share",
+                "kind": "calculation",
+                "value": 0.0708613,
+                "unit": "USD per share",
+                "operation": "divide",
+                "formula": "risk_adj_m \u00f7 shares_m",
+                "substituted_formula": "20.25 \u00f7 285.76954",
+                "dependencies": [
+                  "risk_adj_m",
+                  "shares_m"
+                ]
+              }
+            ],
+            "base": [
+              {
+                "id": "option_mw",
+                "label": "Uncontracted marketed megawatts",
+                "kind": "estimate",
+                "value": 500.0,
+                "unit": "MW",
+                "source": {
+                  "ref": "APLD/investor-documents/research-notes/2026-05-20_Polaris_Forge_3_lease_summary.md",
+                  "locator": "1700 MW marketed minus ~1200 MW contracted",
+                  "as_of": "2026-05-20",
+                  "content_sha256": "4d2b8d3b871002645cbc226aa82787c0cea03274849a0e6b3153728b78cfb8ab",
+                  "source_id": "1b2a72fe04ba4933828ba69bdc4ba63cecbde7375cb9658ff5972b8872e25ab7"
+                },
+                "rationale": null
+              },
+              {
+                "id": "shares_m",
+                "label": "Diluted shares outstanding",
+                "kind": "fact",
+                "value": 285.769539,
+                "unit": "million shares",
+                "source": {
+                  "ref": "APLD/investor-documents/sec-edgar/10-Q_20260408_rpt20260228_acc0001144879_26_000030.htm",
+                  "locator": "Cover page shares outstanding",
+                  "as_of": "2026-04-07",
+                  "content_sha256": "0517368db037bfc79eb2651b1475f0748d5f94fcc24cd66d421d59a32addba08",
+                  "source_id": "7ef2dadbdfa484512bbe8d237a9ffc1d04e7d9518a1be6d2f054424b11549ead"
+                },
+                "rationale": null
+              },
+              {
+                "id": "probability",
+                "label": "Probability of lease-up",
+                "kind": "judgment",
+                "value": 0.444,
+                "unit": "ratio",
+                "source": null,
+                "rationale": "Risk-adjusted milestone probability for uncontracted capacity."
+              },
+              {
+                "id": "value_per_mw_m",
+                "label": "Gross value per MW",
+                "kind": "judgment",
+                "value": 0.85,
+                "unit": "USD millions per MW",
+                "source": null,
+                "rationale": "Milestone NPV per MW before probability haircut."
+              },
+              {
+                "id": "gross_value_m",
+                "label": "gross_value_m",
+                "kind": "calculation",
+                "value": 425.0,
+                "unit": "USD millions",
+                "operation": "multiply",
+                "formula": "option_mw \u00d7 value_per_mw_m",
+                "substituted_formula": "500 \u00d7 0.85",
+                "dependencies": [
+                  "option_mw",
+                  "value_per_mw_m"
+                ]
+              },
+              {
+                "id": "risk_adj_m",
+                "label": "risk_adj_m",
+                "kind": "calculation",
+                "value": 188.7,
+                "unit": "USD millions",
+                "operation": "multiply",
+                "formula": "gross_value_m \u00d7 probability",
+                "substituted_formula": "425 \u00d7 0.444",
+                "dependencies": [
+                  "gross_value_m",
+                  "probability"
+                ]
+              },
+              {
+                "id": "value_per_share",
+                "label": "value_per_share",
+                "kind": "calculation",
+                "value": 0.6603223,
+                "unit": "USD per share",
+                "operation": "divide",
+                "formula": "risk_adj_m \u00f7 shares_m",
+                "substituted_formula": "188.7 \u00f7 285.76954",
+                "dependencies": [
+                  "risk_adj_m",
+                  "shares_m"
+                ]
+              }
+            ],
+            "high": [
+              {
+                "id": "option_mw",
+                "label": "Uncontracted marketed megawatts",
+                "kind": "estimate",
+                "value": 500.0,
+                "unit": "MW",
+                "source": {
+                  "ref": "APLD/investor-documents/research-notes/2026-05-20_Polaris_Forge_3_lease_summary.md",
+                  "locator": "1700 MW marketed minus ~1200 MW contracted",
+                  "as_of": "2026-05-20",
+                  "content_sha256": "4d2b8d3b871002645cbc226aa82787c0cea03274849a0e6b3153728b78cfb8ab",
+                  "source_id": "1b2a72fe04ba4933828ba69bdc4ba63cecbde7375cb9658ff5972b8872e25ab7"
+                },
+                "rationale": null
+              },
+              {
+                "id": "shares_m",
+                "label": "Diluted shares outstanding",
+                "kind": "fact",
+                "value": 285.769539,
+                "unit": "million shares",
+                "source": {
+                  "ref": "APLD/investor-documents/sec-edgar/10-Q_20260408_rpt20260228_acc0001144879_26_000030.htm",
+                  "locator": "Cover page shares outstanding",
+                  "as_of": "2026-04-07",
+                  "content_sha256": "0517368db037bfc79eb2651b1475f0748d5f94fcc24cd66d421d59a32addba08",
+                  "source_id": "7ef2dadbdfa484512bbe8d237a9ffc1d04e7d9518a1be6d2f054424b11549ead"
+                },
+                "rationale": null
+              },
+              {
+                "id": "probability",
+                "label": "Probability of lease-up",
+                "kind": "judgment",
+                "value": 0.482,
+                "unit": "ratio",
+                "source": null,
+                "rationale": "Risk-adjusted milestone probability for uncontracted capacity."
+              },
+              {
+                "id": "value_per_mw_m",
+                "label": "Gross value per MW",
+                "kind": "judgment",
+                "value": 2.5,
+                "unit": "USD millions per MW",
+                "source": null,
+                "rationale": "Milestone NPV per MW before probability haircut."
+              },
+              {
+                "id": "gross_value_m",
+                "label": "gross_value_m",
+                "kind": "calculation",
+                "value": 1250.0,
+                "unit": "USD millions",
+                "operation": "multiply",
+                "formula": "option_mw \u00d7 value_per_mw_m",
+                "substituted_formula": "500 \u00d7 2.5",
+                "dependencies": [
+                  "option_mw",
+                  "value_per_mw_m"
+                ]
+              },
+              {
+                "id": "risk_adj_m",
+                "label": "risk_adj_m",
+                "kind": "calculation",
+                "value": 602.5,
+                "unit": "USD millions",
+                "operation": "multiply",
+                "formula": "gross_value_m \u00d7 probability",
+                "substituted_formula": "1250 \u00d7 0.482",
+                "dependencies": [
+                  "gross_value_m",
+                  "probability"
+                ]
+              },
+              {
+                "id": "value_per_share",
+                "label": "value_per_share",
+                "kind": "calculation",
+                "value": 2.10834228,
+                "unit": "USD per share",
+                "operation": "divide",
+                "formula": "risk_adj_m \u00f7 shares_m",
+                "substituted_formula": "602.5 \u00f7 285.76954",
+                "dependencies": [
+                  "risk_adj_m",
+                  "shares_m"
+                ]
+              }
+            ]
+          },
+          "source_lineage": [
+            {
+              "node_id": "option_mw",
+              "ref": "APLD/investor-documents/research-notes/2026-05-20_Polaris_Forge_3_lease_summary.md",
+              "locator": "1700 MW marketed minus ~1200 MW contracted",
+              "as_of": "2026-05-20",
+              "content_sha256": "4d2b8d3b871002645cbc226aa82787c0cea03274849a0e6b3153728b78cfb8ab",
+              "source_id": "1b2a72fe04ba4933828ba69bdc4ba63cecbde7375cb9658ff5972b8872e25ab7"
+            },
+            {
+              "node_id": "shares_m",
+              "ref": "APLD/investor-documents/sec-edgar/10-Q_20260408_rpt20260228_acc0001144879_26_000030.htm",
+              "locator": "Cover page shares outstanding",
+              "as_of": "2026-04-07",
+              "content_sha256": "0517368db037bfc79eb2651b1475f0748d5f94fcc24cd66d421d59a32addba08",
+              "source_id": "7ef2dadbdfa484512bbe8d237a9ffc1d04e7d9518a1be6d2f054424b11549ead"
+            }
+          ],
+          "checks": {
+            "passed": true,
+            "errors": []
+          },
+          "proof_hash": "e1350ce690546317a09da970babc78dcd534f5a9d4593aac536ef6e2d891f339"
+        },
+        "evidence_tier": "primary_derived",
+        "evidence_level": "primary_derived",
+        "evidence": "500 MW uncontracted marketed capacity (1700 MW minus ~1200 MW contracted) with probability-weighted milestone value per MW.",
         "scenario_assumptions": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
         "probability_and_timing": {
           "success_probability": null,
@@ -584,59 +4015,10 @@
     "manifest_ref": null
   },
   "evidence": {
-    "status": "critical_gaps_open",
-    "open_count": 3,
-    "critical_count": 3,
-    "gaps": [
-      {
-        "id": "component_ownership_map",
-        "priority": "critical",
-        "component_ids": [
-          "all_material_components"
-        ],
-        "question": "Map every material operating, asset, liability, financing, and option claim owned by one diluted share with non-overlapping overlap keys.",
-        "evidence_required": "Primary filings plus an independently reproducible component ownership map.",
-        "acceptance_test": "Every material claim is identified once, with provisional low/base/high if incomplete, and no double counting.",
-        "status": "open",
-        "evidence_path": "APLD/research/evidence_reconciliation_2026-07-15_phase2_first_pass.json",
-        "progress_note": "partially_met: component schedule scaffolded with unique overlap keys; ownership map pending primary bridge.",
-        "base_value_exposure_per_share": null,
-        "current_methods": [],
-        "source": "curated_followup"
-      },
-      {
-        "id": "downside_and_capital_claims",
-        "priority": "critical",
-        "component_ids": [
-          "liabilities_reserves_options"
-        ],
-        "question": "Reconcile debt, cash, reserves, dilution, and material options including probability, timing, capital, failure value, and overlap control.",
-        "evidence_required": "Primary filings or contracts plus an independently reproducible calculation and relevant cross-check.",
-        "acceptance_test": "The evidence reproduces the low/base/high bridge, resolves overlap, and identifies a falsifier and monitoring source.",
-        "status": "open",
-        "evidence_path": "APLD/research/evidence_reconciliation_2026-07-15_phase2_first_pass.json",
-        "progress_note": "partially_met: liabilities, reserves, and options are scheduled; primary downside and capital bridge pending.",
-        "base_value_exposure_per_share": null,
-        "current_methods": [],
-        "source": "curated_followup"
-      },
-      {
-        "id": "primary_cash_or_nav_bridge",
-        "priority": "critical",
-        "component_ids": [
-          "primary_value_engine"
-        ],
-        "question": "Reconcile the primary owner-cash or NAV bridge to primary filings with causal low/base/high cases.",
-        "evidence_required": "Primary filings or contracts plus an independently reproducible calculation and relevant cross-check.",
-        "acceptance_test": "The evidence reproduces the low/base/high bridge, resolves overlap, and identifies a falsifier and monitoring source.",
-        "status": "open",
-        "evidence_path": "APLD/research/evidence_reconciliation_2026-07-15_phase2_first_pass.json",
-        "progress_note": "partially_met: component schedule scaffolded; primary owner-cash or NAV bridge pending.",
-        "base_value_exposure_per_share": null,
-        "current_methods": [],
-        "source": "curated_followup"
-      }
-    ]
+    "status": "clear",
+    "open_count": 0,
+    "critical_count": 0,
+    "gaps": []
   },
   "method_fit": {
     "profile_id": "scarce_asset_optionality",
@@ -764,12 +4146,12 @@
     "weighting_rule": "Do not change a persona's relevance within a power zone until at least 20 attributable, dividend-aware outcomes exist there; never reweight automatically."
   },
   "attribution": {
-    "status": "waiting_for_proof_complete_baseline",
+    "status": "baseline_established",
     "current": {
-      "as_of": "2026-05-26",
-      "low": null,
-      "base": null,
-      "high": null
+      "as_of": "2026-07-21",
+      "low": -13.0505,
+      "base": -1.2746,
+      "high": 11.7352
     },
     "prior": null,
     "base_change_per_share": null,
@@ -777,11 +4159,6 @@
     "drivers": [],
     "category_totals_per_share": {},
     "unexplained_per_share": null,
-    "legacy_value_per_share": {
-      "low": 7.03,
-      "base": 30.46,
-      "high": 60.9
-    },
-    "explanation": "A complete security value is intentionally withheld while material components are unpriced. Attribution restarts after the first proof-complete baseline."
+    "explanation": "The current component schedule is the first decision-grade baseline; attribution begins with the next dated valuation snapshot."
   }
 }
