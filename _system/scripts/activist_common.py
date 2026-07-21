@@ -24,6 +24,12 @@ ACTIVIST_FORMS = frozenset(
     }
 )
 
+# Publisher / wire rows share the same body-verification + false-positive gates.
+PUBLISHER_SOURCES = frozenset({"publisher_site", "local", "press_wire"})
+OPEN_LETTER_CLASSES = frozenset(
+    {"open_letter", "campaign_presentation", "press_campaign", "publisher_report"}
+)
+
 
 def now_iso() -> str:
     return datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
@@ -56,6 +62,28 @@ def active_firms(*, side: str | None = None) -> list[dict]:
     out = [f for f in firms if f.get("active", True)]
     if side:
         out = [f for f in out if f.get("side") in (side, "both")]
+    return out
+
+
+def firm_ingest_methods(firm: dict | None) -> list[str]:
+    """Return normalized ingest methods; supports legacy ingest_method string."""
+    if not firm:
+        return []
+    methods = firm.get("ingest_methods")
+    if isinstance(methods, list) and methods:
+        return [str(m).strip() for m in methods if str(m).strip()]
+    legacy = firm.get("ingest_method")
+    if legacy:
+        return [str(legacy).strip()]
+    return []
+
+
+def firm_has_ingest(firm: dict | None, method: str) -> bool:
+    return method in firm_ingest_methods(firm)
+
+
+def firms_for_ingest(method: str, *, side: str | None = None) -> list[dict]:
+    out = [f for f in active_firms(side=side) if firm_has_ingest(f, method)]
     return out
 
 
@@ -265,7 +293,7 @@ def resolve_report_file(report: dict) -> tuple[str | None, bool, bool]:
 
 
 def publisher_match_blob(report: dict) -> str:
-    """Text used to match publisher/local reports to a ticker (excludes repo paths).
+    """Text used to match publisher/local/wire reports to a ticker (excludes repo paths).
 
     Including local_file makes every ``{TICKER}/third-party-analyses/...`` path
     match its folder ticker regardless of document content.
@@ -273,6 +301,7 @@ def publisher_match_blob(report: dict) -> str:
     parts = [
         report.get("title") or "",
         report.get("source_url") or "",
+        report.get("document_url") or "",
         report.get("firm_name") or "",
     ]
     return " ".join(p for p in parts if p)
@@ -359,7 +388,7 @@ def prune_ghost_index_entries(ticker: str, *, dry_run: bool = False) -> int:
         if not exists and not source_url:
             removed += 1
             continue
-        if report.get("source") in ("local", "publisher_site") and url:
+        if report.get("source") in PUBLISHER_SOURCES and url:
             if url_target_mismatch(url, title, meta) and not exists:
                 removed += 1
                 continue
@@ -417,6 +446,18 @@ def match_report_to_ticker(text: str, meta: dict, *, min_confidence: float = 0.0
     # sufficient without explicit market notation.
     if company and len(company) >= 6 and company in hay:
         return True, 0.98, "company_name"
+
+    # Lead brand token from the company name (e.g. "costar" from "CoStar Group").
+    # Treated as company evidence (not a weak alias) so open letters titled
+    # "…Letter to CoStar Board" survive publisher_match_allowed.
+    if company:
+        for token in re.split(r"[\s,./]+", company):
+            token_l = token.strip().lower()
+            if len(token_l) < 6 or token_l in GENERIC_COMPANY_TOKENS:
+                continue
+            if re.search(rf"\b{re.escape(token_l)}\b", hay, re.I):
+                return True, 0.95, "company_brand"
+            break
 
     explicit_patterns = (
         rf"\${re.escape(ticker)}\b",
