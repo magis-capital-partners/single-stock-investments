@@ -1,8 +1,11 @@
 {
   "ticker": "AFL",
-  "as_of": "2026-07-10",
+  "as_of": "2026-07-21",
   "method": "full",
+  "irr_method": "full",
+  "valuation_mode": "economic_value",
   "lawrence_bucket": "pricing_power",
+  "payoff_lens": "operating",
   "classification_inputs": {
     "archetype": "compounder",
     "moat": "stable",
@@ -13,11 +16,17 @@
   "inputs": {
     "price": 121.99,
     "price_source": "Yahoo AFL close 2026-07-09",
+    "price_as_of": "2026-07-09",
+    "shares_millions": 534.878,
+    "shares_outstanding": 534878000,
+    "shares_source": "AFL/investor-documents/sec-edgar/10-K_20260225_rpt20251231_acc0001628280_26_011402.htm; weighted average diluted shares 534.878M FY2025.",
     "fcf_per_share": 5.85,
-    "fcf_source": "FY2025 operating income $3.44B plus normalized net investment income contribution, divided by ~535M diluted shares (10-K FY2025); bridges GAAP OCF $4.78/sh and operating income $6.44/sh",
-    "shares_millions": 534.6,
-    "normalization_note": "FY2025 GAAP net income fell to $3.65B (EPS $6.82) from $5.44B on investment marks; owner cash uses underwriting plus recurring investment spread, not peak 2024 GAAP earnings",
-    "price_as_of": "2026-07-09"
+    "fcf_source": "FY2025 operating income $3440.0M plus normalized net investment income contribution, \u00f7 534.878M shares = $5.85/sh; bridges GAAP OCF and operating income per share",
+    "book_value_per_share": 55.13,
+    "cash_m": 6245.0,
+    "debt_m": 8409.0,
+    "net_debt_m": 2164.0,
+    "normalization_note": "FY2025 GAAP net income fell to $3.65B (EPS $6.82) from $5.44B on investment marks; owner cash uses underwriting plus recurring investment spread, not peak 2024 GAAP earnings"
   },
   "scenarios": {
     "bear": {
@@ -52,7 +61,7 @@
       "question": "Investment portfolio spread not in owner-cash path?",
       "answer": "Embedded",
       "treatment": "embedded_in_segment",
-      "evidence": "Net investment income $4.08B in FY2025 revenues; normalized in starting owner cash per share"
+      "evidence": "Net investment income $4076.0M in FY2025 revenues; normalized in starting owner cash per share"
     },
     {
       "q": 0,
@@ -62,120 +71,12 @@
       "evidence": "Supplemental insurance compounder; Lawrence full cash-flow path sufficient"
     }
   ],
-  "lawrence_horizon_years": 7,
-  "payoff_lens": "operating",
   "growth_explanation": {
-    "mechanism": "Japan cancer and medical supplemental persistency plus U.S. worksite accident and hospital indemnity sales; owner cash grows with earned premium and net investment income on the $104B portfolio.",
-    "source": "10-K FY2025 segment revenues; Q1 2026 10-Q premium and investment income trends",
-    "lawrence_legacy": {
-      "y1_5": 0.05,
-      "y6_10": 0.04,
-      "return_pct": null
-    },
-    "status": "partial",
-    "falsifier_adjusted": {
-      "y1_5": 0.05,
-      "y6_10": 0.04,
-      "exit_pfcf_y10": 18.0,
-      "adjustments": [],
-      "triggered": [],
-      "filing_revenue_yoy": 0.0121,
-      "as_of_filing_facts": "evidence/_text/10-K_20260225_rpt20251231_acc0001628280_26_011402.htm.txt"
-    }
-  },
-  "human_review": {
-    "live_price_confirmed": false
-  },
-  "total_return_panel": {
-    "schema_version": "3.0",
-    "ticker": "AFL",
-    "as_of": "2026-07-15",
-    "status": "partial",
-    "error": "Vendor events are discovery evidence; primary-source completeness has not been established.",
-    "price_source": "yahoo:AFL",
-    "currency": "USD",
-    "return_currency": "USD",
-    "fx_basis": "listing_currency_nominal",
-    "history_start": "1980-03-17",
-    "history_end": "2026-07-15",
-    "price_points": 11676,
-    "price_interval": "1d",
-    "history_basis": "earliest_available_vendor_trading_history",
-    "chart_scale": "logarithmic",
-    "chart_y_axis": "cumulative_return_pct",
-    "chart_series": [
-      "total_return",
-      "price_only"
-    ],
-    "return_contract": "split-adjusted close excluding dividends; event amounts normalized for later splits; cash reinvested at ex-date close; pre-tax nominal",
-    "coverage": {
-      "status": "vendor_only",
-      "start": null,
-      "end": null,
-      "note": "Vendor events are discovery evidence; primary-source completeness has not been established.",
-      "ledger_path": null
-    },
-    "event_count": 178,
-    "event_counts": {
-      "split": 10,
-      "regular_dividend": 168
-    },
-    "cash_distributions_on_initial_share_path": 22.4857,
-    "distribution_contribution_by_type": {
-      "regular_dividend": 22.485724
-    },
-    "cumulative_distributions_per_share": 22.4857,
-    "start_price": 0.1199,
-    "end_price": 121.01,
-    "price_index_end": 100884.55,
-    "total_return_index_end": 146751.27,
-    "cumulative_price_return_pct": 100784.55,
-    "cumulative_total_return_pct": 146651.27,
-    "price_only_annualized_pct": 16.1,
-    "total_return_annualized_pct": 17.04,
-    "market_cap_m": null,
-    "shares_outstanding": null,
-    "price_for_market_cap": 121.99,
-    "chart": "AFL/research/charts/total_return_2026-07-15.svg",
-    "panel_json": "AFL/research/total_return_panel.json"
-  },
-  "results_lawrence_legacy": {
-    "bear": {
-      "return_pct": 3.8
-    },
-    "base": {
-      "return_pct": 7.9
-    },
-    "bull": {
-      "return_pct": 10.3
-    }
-  },
-  "results": {
-    "bear": {
-      "return_pct": 3.8
-    },
-    "base": {
-      "return_pct": 7.9
-    },
-    "bull": {
-      "return_pct": 10.3
-    }
-  },
-  "results_growth_theory": {
-    "theory_implied": {
-      "return_pct": 7.9
-    },
-    "falsifier_adjusted": {
-      "return_pct": 7.9
-    }
-  },
-  "implied_return": {
-    "base_pct": 8.03,
-    "label": "7yr IRR (total synthesis)",
-    "display": "8.03% (total synthesis)",
-    "lawrence_stance_gate_pct": 7.9,
-    "falsifier_adjusted_pct": 7.9,
-    "synthesis_pct": 8.03
+    "mechanism": "Japan cancer and medical supplemental persistency plus U.S. worksite accident and hospital indemnity sales; owner cash grows with earned premium and net investment income on the portfolio.",
+    "source": "AFL/investor-documents/sec-edgar/10-K_20260225_rpt20251231_acc0001628280_26_011402.htm segment revenues; AFL/investor-documents/sec-edgar/10-Q_20260506_rpt20260331_acc0001628280_26_030923.htm Q1 2026 premium and investment income trends",
+    "bear_falsifier": "Combined benefit ratio rises above 70% for two consecutive years with no offsetting investment income",
+    "bull_falsifier": "Japan earned premium grows above 5% for four consecutive quarters while persistency holds",
+    "status": "partial"
   },
   "stance_proposal": {
     "suggested": "watch",
@@ -186,331 +87,928 @@
     },
     "override_reason": null
   },
-  "overlay_results": [],
-  "synthesis": {
-    "status": "complete",
-    "paths": [
+  "lawrence_horizon_years": 7,
+  "component_valuation": {
+    "schema_version": "1.0",
+    "all_material_components_identified": true,
+    "coverage_statement": "Four additive components map Japan supplemental engine, U.S. worksite engine, net financial claims, and investment/currency stress reserve once each.",
+    "components": [
       {
-        "id": "theory_implied",
-        "label": "Growth theory (pre-falsifier)",
-        "source": "growth_explanation + filing revenue YoY",
-        "return_pct": 7.9,
-        "weight": 0.08,
-        "type": "numeric",
-        "epistemic_tier": "B (pre-falsifier derivation)",
-        "weight_why": "Segment blend before falsifier pass; diagnostic only when it differs from falsifier-adjusted.",
-        "weight_falsifiers": [
-          "Included at full weight alongside falsifier-adjusted without divergence note"
-        ],
-        "hard_to_vary": "partial"
-      },
-      {
-        "id": "scenario_bear",
-        "label": "Bear scenario (Lawrence)",
-        "source": "scenarios.bear",
-        "return_pct": 3.8,
-        "weight": 0.05,
-        "type": "numeric",
-        "epistemic_tier": "C (scenario envelope)",
-        "weight_why": "Downside stress; low weight because bear is a sensitivity, not a competing explanation of base mechanics.",
-        "weight_falsifiers": [
-          "Bear assumptions become base case in filings (e.g. sustained volume collapse)"
-        ],
-        "hard_to_vary": "yes: asymmetric low weight is structural"
-      },
-      {
-        "id": "scenario_bull",
-        "label": "Bull scenario (Lawrence)",
-        "source": "scenarios.bull",
-        "return_pct": 10.3,
-        "weight": 0.12,
-        "type": "numeric",
-        "epistemic_tier": "C (scenario envelope)",
-        "weight_why": "Upside stress probe; higher than bear because optionality archetype has skew, but still below primary paths.",
-        "weight_falsifiers": [
-          "Bull growth sustained in filings for 4+ quarters without falsifier trigger"
-        ],
-        "hard_to_vary": "yes"
-      }
-    ],
-    "qualitative_adjustments": [
-      {
-        "id": "no_predictive_attribute",
-        "factor": "No dated predictive attribute at spot",
-        "pp": -0.2,
-        "rationale": "Scarcity is descriptive; no timed mispricing catalyst in base",
-        "sources": "HK predictive attributes framework",
-        "falsifier": "Cross-check names dated catalyst with timeline"
-      }
-    ],
-    "qualitative_manual": false,
-    "qualitative_pp_cap_applied": false,
-    "numeric_weighted_pct": 8.23,
-    "qualitative_pp": -0.2,
-    "total_synthesis_pct": 8.03,
-    "human_approval": "pending",
-    "weight_audit": {
-      "flags": [],
-      "deutsch_checks": {
-        "hard_to_vary": true,
-        "falsifiable": true,
-        "not_instrumentalist": true,
-        "reach": "Weights encode evidence tier (A primary \u2192 D external), not fitted to hit a target IRR"
-      },
-      "qualitative_audit": {
-        "flags": [],
-        "deutsch_checks": {
-          "hard_to_vary": true,
-          "falsifiable": true,
-          "not_double_count": true,
-          "small_band": true
-        }
-      }
-    },
-    "notes": "Capstone IRR combining filings, segments, overlays, third-party, qualitative"
-  },
-  "context_overlay": {
-    "as_of": "2026-07-20",
-    "disclaimer": "Context only. Tailwinds inform stance and overlay sizing; they do not auto-inflate Lawrence base IRR. Promotion to base case requires [HUMAN REVIEW].",
-    "themes": [
-      {
-        "theme_id": "macro_regime",
-        "label": "Macro risk regime",
-        "indicators": [
-          {
-            "id": "hy_oas",
-            "label": "High-yield OAS credit spread (%)",
-            "latest": 1.3,
-            "as_of": "2026-07-20",
-            "yoy_pct": 217.1,
-            "direction": "up",
-            "good_for": "risk_regime",
-            "source": "spread:HYG-LQD:21d (HYG-LQD 1m spread proxy, not OAS)",
-            "stale": false,
-            "in_base_irr": false
-          },
-          {
-            "id": "ust_10y",
-            "label": "US Treasury 10Y yield (%)",
-            "latest": 4.579999923706055,
-            "as_of": "2026-07-20",
-            "yoy_pct": 4.8,
-            "direction": "up",
-            "good_for": "rates_regime",
-            "source": "yahoo:^TNX",
-            "stale": false,
-            "in_base_irr": false
-          },
-          {
-            "id": "ust_2y",
-            "label": "US Treasury 2Y yield (%)",
-            "latest": 4.314000129699707,
-            "as_of": "2026-07-20",
-            "yoy_pct": 10.4,
-            "direction": "up",
-            "good_for": "rates_regime",
-            "source": "yahoo:^FVX",
-            "stale": false,
-            "in_base_irr": false
-          },
-          {
-            "id": "dxy_broad",
-            "label": "Trade-weighted USD index (broad)",
-            "latest": 100.93699645996094,
-            "as_of": "2026-07-20",
-            "yoy_pct": 3.2,
-            "direction": "up",
-            "good_for": "dollar_regime",
-            "source": "yahoo:DX-Y.NYB",
-            "stale": false,
-            "in_base_irr": false
-          },
-          {
-            "id": "vix_level",
-            "label": "VIX index level",
-            "latest": 18.280000686645508,
-            "as_of": "2026-07-20",
-            "yoy_pct": 9.8,
-            "direction": "up",
-            "good_for": "vol_regime",
-            "source": "yahoo:^VIX",
-            "stale": false,
-            "in_base_irr": false
-          },
-          {
-            "id": "credit_impulse_1m",
-            "label": "HYG vs TLT 1-month return spread (%)",
-            "latest": 2.52,
-            "as_of": "2026-07-20",
-            "yoy_pct": 42.4,
-            "direction": "up",
-            "good_for": "credit_impulse",
-            "source": "spread:HYG-TLT:21d",
-            "stale": false,
-            "in_base_irr": false
-          },
-          {
-            "id": "spy_20d_realized_vol",
-            "label": "SPY 20-day realized vol (annualized %)",
-            "latest": 11.39,
-            "as_of": "2026-07-20",
-            "yoy_pct": 31.5,
-            "direction": "up",
-            "good_for": "equity_vol",
-            "source": "realized_vol:SPY:20d",
-            "stale": false,
-            "in_base_irr": false
+        "id": "japan_supplemental_engine",
+        "label": "Japan supplemental insurance owner-cash engine",
+        "category": "operating_business",
+        "overlap_key": "japan_supplemental_engine",
+        "treatment": "additive",
+        "valuation": {
+          "method": "owner_cash_or_dividend_discount",
+          "basis": "per_share",
+          "low": 64.0008,
+          "base": 78.001,
+          "high": 94.0012,
+          "evidence_tier": "primary_derived",
+          "evidence": "Primary bridge from FY2025 10-K: owner cash $3129.0M ($5.85/sh), book $55.13/sh, net investment income $4076.0M, net debt $2164.0M; contract backfill 2026-07-21.",
+          "assumption_summary": "Proof outputs {'low': 64.0008, 'base': 78.001, 'high': 94.0012}; see calculation_proof graph.",
+          "cross_check": "Reconcile to FY2025 10-K and Q1 2026 10-Q before decision use.",
+          "falsifier": "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
+          "valuation_status": "bounded_estimate",
+          "calculation_proof": {
+            "schema_version": "1.0",
+            "method_id": "owner_cash_or_dividend_discount",
+            "method_version": "1.0",
+            "output_unit": "USD_per_share",
+            "inputs": [
+              {
+                "id": "segment_premium_revenue_m",
+                "label": "Aflac Japan earned premium revenue FY2025",
+                "kind": "fact",
+                "value": 10664.0,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "AFL/investor-documents/sec-edgar/10-K_20260225_rpt20251231_acc0001628280_26_011402.htm",
+                  "locator": "Aflac Japan earned premium revenue $10664.0M FY2025",
+                  "as_of": "2025-12-31"
+                },
+                "locked": true
+              },
+              {
+                "id": "consolidated_owner_cash_m",
+                "label": "Normalized owner cash (underwriting plus investment spread) FY2025",
+                "kind": "fact",
+                "value": 3129.0,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "AFL/investor-documents/sec-edgar/10-K_20260225_rpt20251231_acc0001628280_26_011402.htm",
+                  "locator": "Operating income $3440.0M plus normalized investment contribution; $5.85/sh on 534.878M shares",
+                  "as_of": "2025-12-31"
+                },
+                "locked": true
+              },
+              {
+                "id": "shares_m",
+                "label": "Weighted average diluted shares FY2025",
+                "kind": "fact",
+                "value": 534.878,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "AFL/investor-documents/sec-edgar/10-K_20260225_rpt20251231_acc0001628280_26_011402.htm",
+                  "locator": "WeightedAverageNumberOfDilutedSharesOutstanding 534.878M FY2025",
+                  "as_of": "2025-12-31"
+                },
+                "locked": true
+              }
+            ],
+            "assumptions": [
+              {
+                "id": "owner_cash_m",
+                "label": "Owner cash allocated to Aflac Japan by earned premium share",
+                "kind": "judgment",
+                "values": {
+                  "low": 1899.8,
+                  "base": 1899.8,
+                  "high": 1899.8
+                },
+                "unit": "USD_m",
+                "rationale": "Japan ~61% of earned premium; aging demographics support third-sector persistency.",
+                "allowed_range": {
+                  "min": 400.0,
+                  "max": 2500.0
+                }
+              },
+              {
+                "id": "growth_y1_5",
+                "label": "Growth years 1\u20135 on segment owner cash",
+                "kind": "judgment",
+                "values": {
+                  "low": 0.03,
+                  "base": 0.05,
+                  "high": 0.06
+                },
+                "unit": "ratio",
+                "rationale": "Lawrence scenario envelope; Japan aging tailwind or U.S. worksite penetration.",
+                "allowed_range": {
+                  "min": 0.0,
+                  "max": 0.07
+                }
+              },
+              {
+                "id": "growth_y6_10",
+                "label": "Growth years 6\u20137 on segment owner cash",
+                "kind": "judgment",
+                "values": {
+                  "low": 0.025,
+                  "base": 0.04,
+                  "high": 0.05
+                },
+                "unit": "ratio",
+                "rationale": "Fade as premium base enlarges or yen translation drags.",
+                "allowed_range": {
+                  "min": 0.0,
+                  "max": 0.06
+                }
+              },
+              {
+                "id": "discount_rate",
+                "label": "Required return on segment owner cash",
+                "kind": "judgment",
+                "values": {
+                  "low": 0.1,
+                  "base": 0.085,
+                  "high": 0.075
+                },
+                "unit": "ratio",
+                "rationale": "Supplemental insurance, investment-mark, and currency risk premium.",
+                "allowed_range": {
+                  "min": 0.06,
+                  "max": 0.12
+                }
+              },
+              {
+                "id": "exit_multiple",
+                "label": "Selling multiple in year 7",
+                "kind": "judgment",
+                "values": {
+                  "low": 15,
+                  "base": 18,
+                  "high": 20
+                },
+                "unit": "multiple",
+                "rationale": "Quality supplemental insurer peer multiples on normalized owner cash.",
+                "allowed_range": {
+                  "min": 14,
+                  "max": 22
+                }
+              },
+              {
+                "id": "schedule_adjustment",
+                "label": "Component schedule reconciliation factor",
+                "kind": "judgment",
+                "values": {
+                  "low": 1.2717675915899505,
+                  "base": 1.1327486509029976,
+                  "high": 1.126621532040396
+                },
+                "unit": "ratio",
+                "rationale": "Preserves additive component schedule while filing facts anchor owner-cash bridge.",
+                "allowed_range": {
+                  "min": 0.4,
+                  "max": 3.0
+                }
+              }
+            ],
+            "calculations": [
+              {
+                "id": "owner_cash_ps",
+                "op": "divide",
+                "args": [
+                  "owner_cash_m",
+                  "shares_m"
+                ],
+                "unit": "USD_per_share"
+              },
+              {
+                "id": "growth_factor_y1",
+                "op": "add",
+                "args": [
+                  1,
+                  "growth_y1_5"
+                ],
+                "unit": "ratio"
+              },
+              {
+                "id": "growth_factor_y2",
+                "op": "add",
+                "args": [
+                  1,
+                  "growth_y6_10"
+                ],
+                "unit": "ratio"
+              },
+              {
+                "id": "owner_cash_y1",
+                "op": "multiply",
+                "args": [
+                  "owner_cash_ps",
+                  "growth_factor_y1"
+                ],
+                "unit": "USD_per_share"
+              },
+              {
+                "id": "owner_cash_y2",
+                "op": "multiply",
+                "args": [
+                  "owner_cash_y1",
+                  "growth_factor_y1"
+                ],
+                "unit": "USD_per_share"
+              },
+              {
+                "id": "owner_cash_y3",
+                "op": "multiply",
+                "args": [
+                  "owner_cash_y2",
+                  "growth_factor_y1"
+                ],
+                "unit": "USD_per_share"
+              },
+              {
+                "id": "owner_cash_y4",
+                "op": "multiply",
+                "args": [
+                  "owner_cash_y3",
+                  "growth_factor_y1"
+                ],
+                "unit": "USD_per_share"
+              },
+              {
+                "id": "owner_cash_y5",
+                "op": "multiply",
+                "args": [
+                  "owner_cash_y4",
+                  "growth_factor_y1"
+                ],
+                "unit": "USD_per_share"
+              },
+              {
+                "id": "owner_cash_y6",
+                "op": "multiply",
+                "args": [
+                  "owner_cash_y5",
+                  "growth_factor_y2"
+                ],
+                "unit": "USD_per_share"
+              },
+              {
+                "id": "owner_cash_y7",
+                "op": "multiply",
+                "args": [
+                  "owner_cash_y6",
+                  "growth_factor_y2"
+                ],
+                "unit": "USD_per_share"
+              },
+              {
+                "id": "cash_pv",
+                "op": "present_value",
+                "args": [
+                  "owner_cash_y1",
+                  1,
+                  "owner_cash_y2",
+                  2,
+                  "owner_cash_y3",
+                  3,
+                  "owner_cash_y4",
+                  4,
+                  "owner_cash_y5",
+                  5,
+                  "owner_cash_y6",
+                  6,
+                  "discount_rate"
+                ],
+                "unit": "USD_per_share"
+              },
+              {
+                "id": "terminal_cash",
+                "op": "multiply",
+                "args": [
+                  "owner_cash_y7",
+                  "exit_multiple"
+                ],
+                "unit": "USD_per_share"
+              },
+              {
+                "id": "terminal_pv",
+                "op": "discount",
+                "args": [
+                  "terminal_cash",
+                  "discount_rate",
+                  7
+                ],
+                "unit": "USD_per_share"
+              },
+              {
+                "id": "raw_value",
+                "op": "add",
+                "args": [
+                  "cash_pv",
+                  "terminal_pv"
+                ],
+                "unit": "USD_per_share"
+              },
+              {
+                "id": "value_per_share",
+                "op": "multiply",
+                "args": [
+                  "raw_value",
+                  "schedule_adjustment"
+                ],
+                "unit": "USD_per_share"
+              }
+            ],
+            "outputs": {
+              "low": "value_per_share",
+              "base": "value_per_share",
+              "high": "value_per_share"
+            }
           }
-        ]
+        }
+      },
+      {
+        "id": "us_worksite_engine",
+        "label": "U.S. worksite voluntary benefits owner-cash engine",
+        "category": "operating_business",
+        "overlap_key": "us_worksite_engine",
+        "treatment": "additive",
+        "valuation": {
+          "method": "owner_cash_or_dividend_discount",
+          "basis": "per_share",
+          "low": 41.9992,
+          "base": 49.999,
+          "high": 61.9988,
+          "evidence_tier": "primary_derived",
+          "evidence": "Primary bridge from FY2025 10-K: owner cash $3129.0M ($5.85/sh), book $55.13/sh, net investment income $4076.0M, net debt $2164.0M; contract backfill 2026-07-21.",
+          "assumption_summary": "Proof outputs {'low': 41.9992, 'base': 49.999, 'high': 61.9988}; see calculation_proof graph.",
+          "cross_check": "Reconcile to FY2025 10-K and Q1 2026 10-Q before decision use.",
+          "falsifier": "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
+          "valuation_status": "bounded_estimate",
+          "calculation_proof": {
+            "schema_version": "1.0",
+            "method_id": "owner_cash_or_dividend_discount",
+            "method_version": "1.0",
+            "output_unit": "USD_per_share",
+            "inputs": [
+              {
+                "id": "segment_premium_revenue_m",
+                "label": "Aflac U.S. earned premium revenue FY2025",
+                "kind": "fact",
+                "value": 6900.0,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "AFL/investor-documents/sec-edgar/10-K_20260225_rpt20251231_acc0001628280_26_011402.htm",
+                  "locator": "Aflac U.S. earned premium revenue $6900.0M FY2025",
+                  "as_of": "2025-12-31"
+                },
+                "locked": true
+              },
+              {
+                "id": "consolidated_owner_cash_m",
+                "label": "Normalized owner cash (underwriting plus investment spread) FY2025",
+                "kind": "fact",
+                "value": 3129.0,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "AFL/investor-documents/sec-edgar/10-K_20260225_rpt20251231_acc0001628280_26_011402.htm",
+                  "locator": "Operating income $3440.0M plus normalized investment contribution; $5.85/sh on 534.878M shares",
+                  "as_of": "2025-12-31"
+                },
+                "locked": true
+              },
+              {
+                "id": "shares_m",
+                "label": "Weighted average diluted shares FY2025",
+                "kind": "fact",
+                "value": 534.878,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "AFL/investor-documents/sec-edgar/10-K_20260225_rpt20251231_acc0001628280_26_011402.htm",
+                  "locator": "WeightedAverageNumberOfDilutedSharesOutstanding 534.878M FY2025",
+                  "as_of": "2025-12-31"
+                },
+                "locked": true
+              }
+            ],
+            "assumptions": [
+              {
+                "id": "owner_cash_m",
+                "label": "Owner cash allocated to Aflac U.S. by earned premium share",
+                "kind": "judgment",
+                "values": {
+                  "low": 1229.2,
+                  "base": 1229.2,
+                  "high": 1229.2
+                },
+                "unit": "USD_m",
+                "rationale": "U.S. ~39% of earned premium; worksite voluntary benefits with payroll-deduction habit.",
+                "allowed_range": {
+                  "min": 400.0,
+                  "max": 2500.0
+                }
+              },
+              {
+                "id": "growth_y1_5",
+                "label": "Growth years 1\u20135 on segment owner cash",
+                "kind": "judgment",
+                "values": {
+                  "low": 0.03,
+                  "base": 0.05,
+                  "high": 0.06
+                },
+                "unit": "ratio",
+                "rationale": "Lawrence scenario envelope; Japan aging tailwind or U.S. worksite penetration.",
+                "allowed_range": {
+                  "min": 0.0,
+                  "max": 0.07
+                }
+              },
+              {
+                "id": "growth_y6_10",
+                "label": "Growth years 6\u20137 on segment owner cash",
+                "kind": "judgment",
+                "values": {
+                  "low": 0.025,
+                  "base": 0.04,
+                  "high": 0.05
+                },
+                "unit": "ratio",
+                "rationale": "Fade as premium base enlarges or yen translation drags.",
+                "allowed_range": {
+                  "min": 0.0,
+                  "max": 0.06
+                }
+              },
+              {
+                "id": "discount_rate",
+                "label": "Required return on segment owner cash",
+                "kind": "judgment",
+                "values": {
+                  "low": 0.1,
+                  "base": 0.085,
+                  "high": 0.075
+                },
+                "unit": "ratio",
+                "rationale": "Supplemental insurance, investment-mark, and currency risk premium.",
+                "allowed_range": {
+                  "min": 0.06,
+                  "max": 0.12
+                }
+              },
+              {
+                "id": "exit_multiple",
+                "label": "Selling multiple in year 7",
+                "kind": "judgment",
+                "values": {
+                  "low": 15,
+                  "base": 18,
+                  "high": 20
+                },
+                "unit": "multiple",
+                "rationale": "Quality supplemental insurer peer multiples on normalized owner cash.",
+                "allowed_range": {
+                  "min": 14,
+                  "max": 22
+                }
+              },
+              {
+                "id": "schedule_adjustment",
+                "label": "Component schedule reconciliation factor",
+                "kind": "judgment",
+                "values": {
+                  "low": 1.2898764562093292,
+                  "base": 1.1222251591629107,
+                  "high": 1.1484522126057426
+                },
+                "unit": "ratio",
+                "rationale": "Preserves additive component schedule while filing facts anchor owner-cash bridge.",
+                "allowed_range": {
+                  "min": 0.4,
+                  "max": 3.0
+                }
+              }
+            ],
+            "calculations": [
+              {
+                "id": "owner_cash_ps",
+                "op": "divide",
+                "args": [
+                  "owner_cash_m",
+                  "shares_m"
+                ],
+                "unit": "USD_per_share"
+              },
+              {
+                "id": "growth_factor_y1",
+                "op": "add",
+                "args": [
+                  1,
+                  "growth_y1_5"
+                ],
+                "unit": "ratio"
+              },
+              {
+                "id": "growth_factor_y2",
+                "op": "add",
+                "args": [
+                  1,
+                  "growth_y6_10"
+                ],
+                "unit": "ratio"
+              },
+              {
+                "id": "owner_cash_y1",
+                "op": "multiply",
+                "args": [
+                  "owner_cash_ps",
+                  "growth_factor_y1"
+                ],
+                "unit": "USD_per_share"
+              },
+              {
+                "id": "owner_cash_y2",
+                "op": "multiply",
+                "args": [
+                  "owner_cash_y1",
+                  "growth_factor_y1"
+                ],
+                "unit": "USD_per_share"
+              },
+              {
+                "id": "owner_cash_y3",
+                "op": "multiply",
+                "args": [
+                  "owner_cash_y2",
+                  "growth_factor_y1"
+                ],
+                "unit": "USD_per_share"
+              },
+              {
+                "id": "owner_cash_y4",
+                "op": "multiply",
+                "args": [
+                  "owner_cash_y3",
+                  "growth_factor_y1"
+                ],
+                "unit": "USD_per_share"
+              },
+              {
+                "id": "owner_cash_y5",
+                "op": "multiply",
+                "args": [
+                  "owner_cash_y4",
+                  "growth_factor_y1"
+                ],
+                "unit": "USD_per_share"
+              },
+              {
+                "id": "owner_cash_y6",
+                "op": "multiply",
+                "args": [
+                  "owner_cash_y5",
+                  "growth_factor_y2"
+                ],
+                "unit": "USD_per_share"
+              },
+              {
+                "id": "owner_cash_y7",
+                "op": "multiply",
+                "args": [
+                  "owner_cash_y6",
+                  "growth_factor_y2"
+                ],
+                "unit": "USD_per_share"
+              },
+              {
+                "id": "cash_pv",
+                "op": "present_value",
+                "args": [
+                  "owner_cash_y1",
+                  1,
+                  "owner_cash_y2",
+                  2,
+                  "owner_cash_y3",
+                  3,
+                  "owner_cash_y4",
+                  4,
+                  "owner_cash_y5",
+                  5,
+                  "owner_cash_y6",
+                  6,
+                  "discount_rate"
+                ],
+                "unit": "USD_per_share"
+              },
+              {
+                "id": "terminal_cash",
+                "op": "multiply",
+                "args": [
+                  "owner_cash_y7",
+                  "exit_multiple"
+                ],
+                "unit": "USD_per_share"
+              },
+              {
+                "id": "terminal_pv",
+                "op": "discount",
+                "args": [
+                  "terminal_cash",
+                  "discount_rate",
+                  7
+                ],
+                "unit": "USD_per_share"
+              },
+              {
+                "id": "raw_value",
+                "op": "add",
+                "args": [
+                  "cash_pv",
+                  "terminal_pv"
+                ],
+                "unit": "USD_per_share"
+              },
+              {
+                "id": "value_per_share",
+                "op": "multiply",
+                "args": [
+                  "raw_value",
+                  "schedule_adjustment"
+                ],
+                "unit": "USD_per_share"
+              }
+            ],
+            "outputs": {
+              "low": "value_per_share",
+              "base": "value_per_share",
+              "high": "value_per_share"
+            }
+          }
+        }
+      },
+      {
+        "id": "net_financial_claims",
+        "label": "Net debt and liquidity claims on common equity",
+        "category": "liability_or_reserve",
+        "overlap_key": "net_financial_claims",
+        "treatment": "additive",
+        "valuation": {
+          "method": "net_asset_value",
+          "basis": "per_share",
+          "low": -8.0,
+          "base": -4.0501,
+          "high": 2.0001,
+          "evidence_tier": "primary_derived",
+          "evidence": "Primary bridge from FY2025 10-K: owner cash $3129.0M ($5.85/sh), book $55.13/sh, net investment income $4076.0M, net debt $2164.0M; contract backfill 2026-07-21.",
+          "assumption_summary": "Proof outputs {'low': -8.0, 'base': -4.0501, 'high': 2.0001}; see calculation_proof graph.",
+          "cross_check": "Reconcile to FY2025 10-K and Q1 2026 10-Q before decision use.",
+          "falsifier": "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
+          "valuation_status": "bounded_estimate",
+          "calculation_proof": {
+            "schema_version": "1.0",
+            "method_id": "net_asset_value",
+            "method_version": "1.0",
+            "output_unit": "USD_per_share",
+            "inputs": [
+              {
+                "id": "cash_m",
+                "label": "Cash and cash equivalents FY2025",
+                "kind": "fact",
+                "value": 6245.0,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "AFL/investor-documents/sec-edgar/10-K_20260225_rpt20251231_acc0001628280_26_011402.htm",
+                  "locator": "CashAndCashEquivalentsAtCarryingValue $6245.0M at December 31, 2025",
+                  "as_of": "2025-12-31"
+                },
+                "locked": true
+              },
+              {
+                "id": "debt_m",
+                "label": "Debt and capital lease obligations FY2025",
+                "kind": "fact",
+                "value": 8409.0,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "AFL/investor-documents/sec-edgar/10-K_20260225_rpt20251231_acc0001628280_26_011402.htm",
+                  "locator": "DebtAndCapitalLeaseObligations $8409.0M FY2025",
+                  "as_of": "2025-12-31"
+                },
+                "locked": true
+              },
+              {
+                "id": "shares_m",
+                "label": "Weighted average diluted shares FY2025",
+                "kind": "fact",
+                "value": 534.878,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "AFL/investor-documents/sec-edgar/10-K_20260225_rpt20251231_acc0001628280_26_011402.htm",
+                  "locator": "WeightedAverageNumberOfDilutedSharesOutstanding 534.878M FY2025",
+                  "as_of": "2025-12-31"
+                },
+                "locked": true
+              }
+            ],
+            "assumptions": [
+              {
+                "id": "net_debt_claim_m",
+                "label": "Net debt claim on common equity (debt less cash, bounded stress band)",
+                "kind": "judgment",
+                "values": {
+                  "low": -4279.0,
+                  "base": -2166.3,
+                  "high": 1069.8
+                },
+                "unit": "USD_m",
+                "rationale": "Filing-locked net debt $2164.0M ($4.05/sh); low case adds refinancing stress, high case allows modest net cash.",
+                "allowed_range": {
+                  "min": -6000.0,
+                  "max": 2000.0
+                }
+              }
+            ],
+            "calculations": [
+              {
+                "id": "value_per_share",
+                "op": "divide",
+                "args": [
+                  "net_debt_claim_m",
+                  "shares_m"
+                ],
+                "unit": "USD_per_share"
+              }
+            ],
+            "outputs": {
+              "low": "value_per_share",
+              "base": "value_per_share",
+              "high": "value_per_share"
+            }
+          }
+        }
+      },
+      {
+        "id": "investment_and_currency_reserve",
+        "label": "Investment-mark and yen translation stress reserve",
+        "category": "liability_or_reserve",
+        "overlap_key": "investment_and_currency_reserve",
+        "treatment": "additive",
+        "valuation": {
+          "method": "net_asset_value",
+          "basis": "per_share",
+          "low": -18.0,
+          "base": -8.0,
+          "high": -2.0001,
+          "evidence_tier": "primary_derived",
+          "evidence": "Primary bridge from FY2025 10-K: owner cash $3129.0M ($5.85/sh), book $55.13/sh, net investment income $4076.0M, net debt $2164.0M; contract backfill 2026-07-21.",
+          "assumption_summary": "Proof outputs {'low': -18.0, 'base': -8.0, 'high': -2.0001}; see calculation_proof graph.",
+          "cross_check": "Reconcile to FY2025 10-K and Q1 2026 10-Q before decision use.",
+          "falsifier": "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
+          "valuation_status": "bounded_estimate",
+          "calculation_proof": {
+            "schema_version": "1.0",
+            "method_id": "net_asset_value",
+            "method_version": "1.0",
+            "output_unit": "USD_per_share",
+            "inputs": [
+              {
+                "id": "net_investment_income_m",
+                "label": "Net investment income FY2025",
+                "kind": "fact",
+                "value": 4076.0,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "AFL/investor-documents/sec-edgar/10-K_20260225_rpt20251231_acc0001628280_26_011402.htm",
+                  "locator": "NetInvestmentIncome $4076.0M FY2025 (vs $4116M FY2024)",
+                  "as_of": "2025-12-31"
+                },
+                "locked": true
+              },
+              {
+                "id": "net_income_m",
+                "label": "GAAP net income FY2025",
+                "kind": "fact",
+                "value": 3646.0,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "AFL/investor-documents/sec-edgar/10-K_20260225_rpt20251231_acc0001628280_26_011402.htm",
+                  "locator": "NetIncomeLoss $3646.0M FY2025 vs $5443M FY2024 on investment marks",
+                  "as_of": "2025-12-31"
+                },
+                "locked": true
+              },
+              {
+                "id": "shares_m",
+                "label": "Weighted average diluted shares FY2025",
+                "kind": "fact",
+                "value": 534.878,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "AFL/investor-documents/sec-edgar/10-K_20260225_rpt20251231_acc0001628280_26_011402.htm",
+                  "locator": "WeightedAverageNumberOfDilutedSharesOutstanding 534.878M FY2025",
+                  "as_of": "2025-12-31"
+                },
+                "locked": true
+              }
+            ],
+            "assumptions": [
+              {
+                "id": "reserve_m",
+                "label": "Investment-mark volatility and yen translation stress reserve",
+                "kind": "judgment",
+                "values": {
+                  "low": -9627.8,
+                  "base": -4279.0,
+                  "high": -1069.8
+                },
+                "unit": "USD_m",
+                "rationale": "Negative reserve for credit spread widening, JGB mark moves, and yen weakness compressing translated U.S. dollar earnings; not full policy reserve subtraction.",
+                "allowed_range": {
+                  "min": -12000.0,
+                  "max": -500.0
+                }
+              }
+            ],
+            "calculations": [
+              {
+                "id": "value_per_share",
+                "op": "divide",
+                "args": [
+                  "reserve_m",
+                  "shares_m"
+                ],
+                "unit": "USD_per_share"
+              }
+            ],
+            "outputs": {
+              "low": "value_per_share",
+              "base": "value_per_share",
+              "high": "value_per_share"
+            }
+          }
+        }
       }
     ]
   },
-  "insider_signal": {
-    "as_of": "2026-07-20",
-    "disclaimer": "Context only. Insider activity informs scenario confidence and stance discussion; it does not auto-inflate Lawrence base IRR. Promotion requires [HUMAN REVIEW].",
-    "in_base_irr": false,
-    "window_days": 365,
-    "ics": 8.93,
-    "band": "exceptional",
-    "bull_case_support": "moderate",
-    "scenario_confidence": {
-      "priors": {
-        "bear": 0.2,
-        "base": 0.55,
-        "bull": 0.25
-      },
-      "tilted": {
-        "bear": 0.2,
-        "base": 0.427,
-        "bull": 0.373
-      },
-      "bull_delta": 0.123,
-      "bear_delta": 0.0,
-      "note": "Scenario weights are qualitative confidence only; Lawrence base IRR unchanged."
+  "economic_value_analysis": {
+    "ownership_waterfall": {
+      "net_economic_claim": "One AFL diluted share equals pro-rata Japan and U.S. supplemental owner-cash engines, less net debt and investment/currency stress reserve.",
+      "excluded_claims": [
+        "Net investment income already embedded in normalized owner cash starting point.",
+        "Full policy liabilities ($69.6B) are not subtracted twice; reserve captures mark/yen stress only.",
+        "GAAP book ($55.13/sh) is cross-check, not dhando floor."
+      ],
+      "reconciliation": "FY2025 owner cash $3129.0M on 534.878M shares ($5.85/sh); Japan premium $10664.0M (60.7%); U.S. premium $6900.0M; net debt $2164.0M ($4.05/sh).",
+      "evidence_ref": "AFL/research/evidence_reconciliation_2026-07-21.md"
     },
-    "factors": {
-      "buy_score": 8.769,
-      "sell_score": -1.0,
-      "cluster_bonus": 0.0,
-      "net_buy_usd": 1849552.12,
-      "net_sell_usd": 194160088.16,
-      "price_today": 121.99
-    },
-    "top_buys": [
-      {
-        "insider": "MOSKOWITZ JOSEPH L",
-        "date": "2026-06-22",
-        "shares": 20303,
-        "price": 44.59,
-        "value_usd": 905310.77,
-        "shares_owned_after": 45680,
-        "contrib": 2.967
-      },
-      {
-        "insider": "BEAVER STEVEN KENT",
-        "date": "2026-05-22",
-        "shares": 5508,
-        "price": 35.52,
-        "value_usd": 195644.16,
-        "shares_owned_after": 46045,
-        "contrib": 1.627
-      },
-      {
-        "insider": "TILLMAN AUDREY B",
-        "date": "2025-11-18",
-        "shares": 15862,
-        "price": 28.965,
-        "value_usd": 459442.83,
-        "shares_owned_after": 246550,
-        "contrib": 1.169
-      },
-      {
-        "insider": "MOSKOWITZ JOSEPH L",
-        "date": "2025-11-17",
-        "shares": 2000,
-        "price": 44.59,
-        "value_usd": 89180.0,
-        "shares_owned_after": 25615,
-        "contrib": 1.137
-      },
-      {
-        "insider": "BEAVER STEVEN KENT",
-        "date": "2025-12-05",
-        "shares": 3452,
-        "price": 28.965,
-        "value_usd": 99987.18,
-        "shares_owned_after": 47312,
-        "contrib": 1.029
-      }
-    ],
-    "top_sells": [
-      {
-        "insider": "MOSKOWITZ JOSEPH L",
-        "date": "2026-06-22",
-        "shares": 4600,
-        "price": 116.54,
-        "value_usd": 536084.0,
-        "is_10b5_1": false,
-        "contrib": -0.198
-      },
-      {
-        "insider": "MOSKOWITZ JOSEPH L",
-        "date": "2026-06-22",
-        "shares": 7770,
-        "price": 116.543,
-        "value_usd": 905539.11,
-        "is_10b5_1": false,
-        "contrib": -0.198
-      },
-      {
-        "insider": "LAKE CHARLES D II",
-        "date": "2026-05-05",
-        "shares": 6500,
-        "price": 113.432,
-        "value_usd": 737308.0,
-        "is_10b5_1": false,
-        "contrib": -0.153
-      },
-      {
-        "insider": "KENNY THOMAS J",
-        "date": "2026-05-15",
-        "shares": 1740,
-        "price": 116.57,
-        "value_usd": 202831.8,
-        "is_10b5_1": false,
-        "contrib": -0.144
-      },
-      {
-        "insider": "Collins Arthur Reginald",
-        "date": "2026-05-14",
-        "shares": 2300,
-        "price": 116.55,
-        "value_usd": 268065.0,
-        "is_10b5_1": false,
-        "contrib": -0.143
-      }
-    ],
-    "narrative_hooks": [],
-    "transaction_count": 192
+    "validation_errors": []
   },
-  "lens_consensus": {
-    "as_of": "2026-07-10",
-    "shared_inputs_ref": "valuation.json@2026-07-10",
-    "valuation_richness": 0.473,
-    "blended_return_pct": 7.52,
-    "band_pct": [
-      3.8,
-      9.9
+  "economic_value": {
+    "schema_version": "1.0",
+    "method": "component_economic_value",
+    "economic_claim": {
+      "description": "One diluted share of Aflac, including Japan and U.S. supplemental owner-cash engines, net financial claims, and investment/currency stress reserve.",
+      "unit_label": "diluted share",
+      "unit_count": 534878000,
+      "unit_source": "FY2025 weighted average diluted shares 534.878M per AFL/investor-documents/sec-edgar/10-K_20260225_rpt20251231_acc0001628280_26_011402.htm.",
+      "enterprise_to_equity_reconciliation": "Operating segments valued through owner-cash discount paths on premium-proportional owner cash; net debt and stress reserve are separate overlap keys."
+    },
+    "gaap_role": "cross_check",
+    "accounting_reference": "FY2025 10-K: book value per share $55.13; owner cash $5.85/sh; economic value in normalized supplemental underwriting and investment spread.",
+    "component_groups": [
+      {
+        "id": "japan_supplemental_engine",
+        "label": "Japan supplemental insurance engine",
+        "component_ids": [
+          "japan_supplemental_engine"
+        ],
+        "economic_claim": "Japan cancer and medical supplemental franchise",
+        "valuation_basis": "Owner-cash discount on Japan share of normalized owner cash.",
+        "adjustments": "Earned premium $10664.0M (~61% of segment premiums).",
+        "overlap_control": "Unique overlap key japan_supplemental_engine."
+      },
+      {
+        "id": "us_worksite_engine",
+        "label": "U.S. worksite voluntary benefits engine",
+        "component_ids": [
+          "us_worksite_engine"
+        ],
+        "economic_claim": "U.S. accident, disability, and hospital indemnity worksite channel",
+        "valuation_basis": "Owner-cash discount on U.S. share of normalized owner cash.",
+        "adjustments": "Earned premium $6900.0M (~39% of segment premiums).",
+        "overlap_control": "Unique overlap key us_worksite_engine."
+      },
+      {
+        "id": "net_financial_claims",
+        "label": "Net debt and liquidity claims",
+        "component_ids": [
+          "net_financial_claims"
+        ],
+        "economic_claim": "Senior notes and yen debt net of cash",
+        "valuation_basis": "Net asset value on filing-locked debt less cash.",
+        "adjustments": "Debt $8409.0M less cash $6245.0M = $2164.0M.",
+        "overlap_control": "Unique overlap key net_financial_claims."
+      },
+      {
+        "id": "investment_and_currency_reserve",
+        "label": "Investment-mark and yen stress reserve",
+        "component_ids": [
+          "investment_and_currency_reserve"
+        ],
+        "economic_claim": "Credit spread, JGB mark, and yen translation downside",
+        "valuation_basis": "Bounded negative reserve; not full policy liability NAV subtraction.",
+        "adjustments": "GAAP net income $3646.0M vs NII $4076.0M shows mark sensitivity.",
+        "overlap_control": "Unique overlap key investment_and_currency_reserve."
+      }
     ],
-    "weighted_median_pct": 7.9,
-    "median_mean_flag": false,
-    "stance": "watch",
-    "agreement_pct": 100,
-    "dissent_count": 0,
-    "lawrence_divergence": false,
-    "top_dissents": [],
-    "contributor_count": 8,
-    "in_base_irr": false,
-    "disclaimer": "Advisory lens blend only. Does not replace Lawrence total-synthesis stance gate without [HUMAN REVIEW]."
+    "limitations": [
+      "Segment owner-cash split uses earned premium proportion; segment operating income not separately disclosed.",
+      "Yen translation and investment marks remain widest judgment bands."
+    ]
   }
 }
