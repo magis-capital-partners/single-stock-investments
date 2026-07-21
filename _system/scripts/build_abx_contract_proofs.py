@@ -474,6 +474,97 @@ def ensure_component_scaffold(data: dict) -> None:
             ),
         ],
     }
+    data["economic_value"] = {
+        "schema_version": "1.0",
+        "method": "component_economic_value",
+        "economic_claim": {
+            "description": (
+                "One diluted share of ABX, including every identified Life Solutions operating claim, "
+                "asset-management fee franchise, Abacus Intel technology option, net financial claims, "
+                "and longevity/funding reserve."
+            ),
+            "unit_label": "diluted share",
+            "unit_count": int(round(SHARES_M * 1_000_000)),
+            "unit_source": (
+                f"FY2025 diluted weighted-average shares {SHARES_M}M "
+                f"({FILING_10K})"
+            ),
+            "enterprise_to_equity_reconciliation": (
+                "Operating and option claims are valued once; cash, debt, financing, reserves, "
+                "and other senior claims are separate components with non-overlapping overlap keys."
+            ),
+        },
+        "gaap_role": "cross_check",
+        "accounting_reference": (
+            "FY2025 10-K and Q1 2026 10-Q filing-derived inputs. "
+            "Adjusted EBITDA is narrative context only; Lawrence base uses GAAP owner cash."
+        ),
+        "component_groups": [
+            {
+                "id": "life_solutions_engine",
+                "label": "Life Solutions origination, servicing, and policy spread engine",
+                "component_ids": ["life_solutions_engine"],
+                "economic_claim": "Life Solutions origination, servicing, and policy spread engine",
+                "valuation_basis": "FY2025 operating income per share × reinvestment capitalization multiple.",
+                "adjustments": "Policy portfolio fair-value marks embedded in earnings path, not separate NAV.",
+                "overlap_control": "Unique overlap key life_solutions_engine.",
+            },
+            {
+                "id": "asset_management_franchise",
+                "label": "Asset Management fee franchise (FCF Advisors and managed accounts)",
+                "component_ids": ["asset_management_franchise"],
+                "economic_claim": "Asset Management fee franchise (FCF Advisors and managed accounts)",
+                "valuation_basis": "25% of segment revenue converted to owner-cash proxy × fee multiple.",
+                "adjustments": "Segment margin pending full disclosure; FCF Advisors acquired December 2024.",
+                "overlap_control": "Unique overlap key asset_management_franchise.",
+            },
+            {
+                "id": "technology_platform_option",
+                "label": "Abacus Intel mortality-verification platform option",
+                "component_ids": ["technology_platform_option"],
+                "economic_claim": "Abacus Intel mortality-verification platform option",
+                "valuation_basis": "Risk-adjusted milestone value on early Technology Services revenue.",
+                "adjustments": "Low case zero; base/high bound API monetization beyond Life Solutions servicing.",
+                "overlap_control": "Unique overlap key technology_platform_option.",
+                "risk_and_timing": {
+                    "probability_basis": (
+                        "Base case assumes 15–25% probability of scaled third-party API adoption "
+                        "within seven years given $0.7M FY2025 Technology Services revenue."
+                    ),
+                    "timing_basis": (
+                        "Seven-year horizon aligned with Lawrence model; commercial traction "
+                        "expected years 3–5 if Abacus Intel gains institutional verification clients."
+                    ),
+                    "remaining_capital_basis": (
+                        "Incremental R&D and sales capital for Abacus Intel embedded in consolidated "
+                        "operating spend; no separate owner-funded capex line disclosed."
+                    ),
+                },
+            },
+            {
+                "id": "net_financial_claims",
+                "label": "Net cash and recourse debt claims on common equity",
+                "component_ids": ["net_financial_claims"],
+                "economic_claim": "Net cash and recourse debt claims on common equity",
+                "valuation_basis": "Q1 2026 cash less reported debt per diluted share.",
+                "adjustments": "High case credits partial non-recourse securitization carve-out.",
+                "overlap_control": "Unique overlap key net_financial_claims.",
+            },
+            {
+                "id": "longevity_and_funding_reserve",
+                "label": "Longevity, mortality-assumption, and funding-spread stress reserve",
+                "component_ids": ["longevity_and_funding_reserve"],
+                "economic_claim": "Longevity, mortality-assumption, and funding-spread stress reserve",
+                "valuation_basis": "Negative reserve scaled to GAAP FCF per share and funding-risk band.",
+                "adjustments": "Separate from operating multiple; captures longevity and ABXL spread stress.",
+                "overlap_control": "Unique overlap key longevity_and_funding_reserve.",
+            },
+        ],
+        "limitations": [
+            "Proof-complete component schedule; committee-approved valuation pending human review.",
+            "Asset Management segment margin and securitization non-recourse treatment remain widest bands.",
+        ],
+    }
     data["economic_value_analysis"] = {
         "ownership_waterfall": {
             "net_economic_claim": (
