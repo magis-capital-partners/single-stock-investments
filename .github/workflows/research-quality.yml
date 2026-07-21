@@ -162,6 +162,11 @@ jobs:
             "repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}/files" \
             --jq '.[].filename' > "$RUNNER_TEMP/pr-files.txt"
           echo "PR files: $(wc -l < "$RUNNER_TEMP/pr-files.txt")"
+      - name: Use base-branch research linter
+        run: |
+          # PR heads often predate the scoping fix; the workflow merge commit
+          # already has the new args, so pull the matching script from base.
+          git checkout "origin/${{ github.base_ref }}" -- _system/scripts/lint_pr_research.py
       - name: Lint changed ticker research
         run: |
           python _system/scripts/lint_pr_research.py \
