@@ -401,6 +401,80 @@ def _component(cid: str, label: str, category: str, overlap_key: str) -> dict:
 def attach_components(data: dict) -> dict:
     data["as_of"] = AS_OF
     data["valuation_mode"] = "economic_value"
+    shares_outstanding = int(round(SHARES_M * 1_000_000))
+    unit_source = (
+        f"276.4M common shares outstanding January 30, 2026 ({FILING_10K})"
+    )
+    economic_claim = {
+        "description": (
+            "One common share of Ameren, including regulated Missouri/Illinois/transmission owner cash, "
+            "incremental large-load interconnection upside, minority claims, and dilution/regulatory reserve."
+        ),
+        "unit_label": "common share",
+        "unit_count": shares_outstanding,
+        "unit_source": unit_source,
+        "enterprise_to_equity_reconciliation": (
+            "Regulated owner-cash engine valued on normalized EPS power; utility debt recovered through rates "
+            "and not double-subtracted; large-load option, minority claim, and reserve are separate overlap keys."
+        ),
+    }
+    data["economic_value"] = {
+        "schema_version": "1.0",
+        "method": "component_economic_value",
+        "economic_claim": economic_claim,
+        "gaap_role": "cross_check",
+        "accounting_reference": (
+            f"FY2025 10-K: stockholders' equity ${EQUITY_M/1000:.1f}B; economic value in normalized owner cash "
+            f"(${OWNER_CASH_PS}/sh), not GAAP book alone."
+        ),
+        "component_groups": [
+            {
+                "id": "regulated_owner_cash_engine",
+                "label": "Regulated Missouri, Illinois, and transmission owner-cash engine",
+                "component_ids": ["regulated_owner_cash_engine"],
+                "economic_claim": "Normalized regulated earnings power across Missouri, Illinois, and FERC transmission",
+                "valuation_basis": "Owner-cash discount on FY2025 normalized EPS path.",
+                "adjustments": "Heavy growth capex recovered via PISA/MYRP; not subtracted from owner-cash start.",
+                "overlap_control": "Unique overlap key regulated_owner_cash_engine.",
+            },
+            {
+                "id": "large_load_interconnection_option",
+                "label": "Large-load and data-center interconnection pipeline (1.5 GW by 2032)",
+                "component_ids": ["large_load_interconnection_option"],
+                "economic_claim": "Incremental large-load/data-center earnings beyond base rate-base path",
+                "valuation_basis": "Risk-adjusted milestone value on interconnection pipeline.",
+                "adjustments": "Base rate-base growth embedded in owner-cash engine; option row is non-overlapping upside.",
+                "overlap_control": "Unique overlap key large_load_interconnection_option.",
+                "risk_and_timing": {
+                    "probability_basis": "Base ~50% that 1.5 GW large-load target converts to earned ROE by 2032; low case zero.",
+                    "timing_basis": "Interconnections ramp 2027–2032 per FY2025 10-K large-load disclosures.",
+                    "remaining_capital_basis": "Incremental grid capex largely in $30.5–33.1B plan; option band covers timing/approval risk only.",
+                },
+            },
+            {
+                "id": "net_financial_claims",
+                "label": "Noncontrolling and minor non-common claims",
+                "component_ids": ["net_financial_claims"],
+                "economic_claim": "Noncontrolling interest allocated away from common shareholders",
+                "valuation_basis": "Net asset value on filing-locked NCI.",
+                "adjustments": "Regulated debt not subtracted at equity level.",
+                "overlap_control": "Unique overlap key net_financial_claims.",
+            },
+            {
+                "id": "equity_dilution_and_regulatory_reserve",
+                "label": "Equity issuance and regulatory lag stress reserve",
+                "component_ids": ["equity_dilution_and_regulatory_reserve"],
+                "economic_claim": "Equity dilution and regulatory lag stress on per-share growth",
+                "valuation_basis": "Bounded negative reserve; not full enterprise haircut.",
+                "adjustments": "~$4B equity plan and Illinois MYRP appeal timing.",
+                "overlap_control": "Unique overlap key equity_dilution_and_regulatory_reserve.",
+            },
+        ],
+        "limitations": [
+            "Segment-level owner cash not separately modeled; consolidated regulated engine.",
+            "Large-load probability and equity issuance timing remain widest judgment bands.",
+        ],
+    }
     data["component_valuation"] = {
         "schema_version": "1.0",
         "all_material_components_identified": True,
@@ -485,7 +559,7 @@ def main() -> int:
     data = attach_components(data)
     evidence = (
         f"Primary bridge from {FILING_10K}: FY2025 EPS ${EPS_DILUTED}/sh, OCF ${OCF_M}M, "
-        f"capex ${CAPEX_M}M, equity plan ~${EQUITY_PLAN_M}B; contract backfill {AS_OF}."
+        f"capex ${CAPEX_M}M, equity plan ~${EQUITY_PLAN_M}M; contract backfill {AS_OF}."
     )
     for comp in data["component_valuation"]["components"]:
         cid = comp["id"]
@@ -500,6 +574,18 @@ def main() -> int:
         )
         for case in ("low", "base", "high"):
             comp["valuation"][case] = outputs[cid][case]
+        if cid == "large_load_interconnection_option":
+            comp["driver_model"] = {
+                "timing_basis": "Interconnections ramp 2027–2032 per FY2025 10-K large-load disclosures.",
+                "scenarios": {
+                    "base": {
+                        "success_probability": 0.5,
+                        "realization_probability": 0.5,
+                        "remaining_cost_m": 0.0,
+                        "years": 6,
+                    }
+                },
+            }
 
     path.write_text(json.dumps(data, indent=2) + "\n", encoding="utf-8")
     base_sum = sum(outputs[c]["base"] for c in outputs)
