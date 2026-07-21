@@ -1,14 +1,830 @@
 {
   "ticker": "ALGN",
-  "as_of": "2026-07-20",
-  "method": "price_stub",
+  "as_of": "2026-07-21",
+  "method": "full",
+  "irr_method": "full",
+  "valuation_mode": "economic_value",
+  "method_profile": "quality_reinvestment",
+  "lawrence_bucket": "pricing_power",
+  "payoff_lens": "operating",
+  "classification_inputs": {
+    "archetype": "compounder",
+    "moat": "stable",
+    "dhando": "partial",
+    "cycle": "mid",
+    "payoff_lens": "operating"
+  },
   "inputs": {
     "price": 175.05,
+    "price_source": "Yahoo ALGN close 2026-07-20",
     "price_as_of": "2026-07-20",
-    "price_source": "Yahoo ALGN close 2026-07-20"
+    "shares_millions": 76.568,
+    "shares_outstanding": 76568000,
+    "shares_source": "FY2025 weighted average diluted shares 76.568M (ALGN/investor-documents/sec-edgar/10-K_20260227_rpt20251231_acc0001097149_26_000014.htm)",
+    "fcf_per_share": 7.942,
+    "fcf_source": "FY2025 operating cash flow $785.8M less capital spending $177.7M \u00f7 76.568M diluted shares per ALGN/investor-documents/sec-edgar/10-K_20260227_rpt20251231_acc0001097149_26_000014.htm",
+    "cash_m": 1043.9,
+    "total_debt_m": 0.0,
+    "normalization_note": "FY2025 FCF per share anchors owner cash; Clear Aligner ~84% of revenue; scanner ecosystem valued separately as option."
   },
-  "notes": "Price stub created by fetch_equity_prices.py --create-stub; replace with a real model before decision-grade.",
-  "human_review": {
-    "live_price_confirmed": false
+  "scenarios": {
+    "bear": {
+      "growth_y1_5": 0.02,
+      "growth_y6_10": 0.01,
+      "exit_pfcf_y10": 20,
+      "notes": "ASP compression and DTC competition; teen-case volume stagnation"
+    },
+    "base": {
+      "growth_y1_5": 0.04,
+      "growth_y6_10": 0.03,
+      "exit_pfcf_y10": 24,
+      "notes": "Clear Aligner retention + international mix; Systems growth mid-single-digit"
+    },
+    "bull": {
+      "growth_y1_5": 0.06,
+      "growth_y6_10": 0.04,
+      "exit_pfcf_y10": 28,
+      "notes": "Teen-case volume recovery + iTero scanner adoption acceleration"
+    }
+  },
+  "option_scan": [
+    {
+      "q": 1,
+      "question": "GAAP book misstates core assets?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "Asset-light medical device; goodwill $492M on balance sheet (10-K FY2025)"
+    },
+    {
+      "q": 4,
+      "question": "Backlog / contracted revenue not in FCF path?",
+      "answer": "Partial yes",
+      "treatment": "embedded_in_segment",
+      "evidence": "Deferred revenue $1.43B; RPO $1.44B recognized over ~1 year"
+    },
+    {
+      "q": 7,
+      "question": "Embedded product option in revenue?",
+      "answer": "Yes \u2014 iTero scanner and digital platform",
+      "treatment": "milestone_nav",
+      "evidence": "Systems and Services revenue $789.6M FY2025; separate scanner_platform_option component"
+    }
+  ],
+  "growth_explanation": {
+    "mechanism": "Clear Aligner case volume growth from teen and adult orthodontic adoption; international expansion; partially offset by ASP pressure and DTC competition",
+    "filing_cite": "ALGN/investor-documents/sec-edgar/10-K_20260227_rpt20251231_acc0001097149_26_000014.htm Item 7",
+    "bear_falsifier": "Consolidated revenue growth falls below 2% for four consecutive quarters",
+    "bull_falsifier": "Clear Aligner segment revenue re-accelerates above 8% with stable gross margin"
+  },
+  "lawrence_horizon_years": 7,
+  "stance_proposal": {
+    "suggested": "watch",
+    "irr_band": "0-5%",
+    "gates": {
+      "moat_ok": true,
+      "dhando_ok": true
+    },
+    "override_reason": null
+  },
+  "component_valuation": {
+    "schema_version": "1.0",
+    "all_material_components_identified": true,
+    "coverage_statement": "Four additive components map Clear Aligner owner cash, scanner platform option, net financial claims, and competition/ASP reserve once each.",
+    "components": [
+      {
+        "id": "clear_aligner_owner_cash_engine",
+        "label": "Clear Aligner owner-cash engine",
+        "category": "operating_business",
+        "overlap_key": "clear_aligner_owner_cash_engine",
+        "treatment": "additive",
+        "valuation": {
+          "method": "owner_cash_or_dividend_discount",
+          "basis": "per_share",
+          "low": 115.0,
+          "base": 160.0,
+          "high": 205.0,
+          "evidence_tier": "primary_derived",
+          "evidence": "Primary bridge from ALGN/investor-documents/sec-edgar/10-K_20260227_rpt20251231_acc0001097149_26_000014.htm: FY2025 revenue $3862.3M, OCF $785.8M, FCF $608.1M, cash $1043.9M, no debt; contract backfill 2026-07-21.",
+          "assumption_summary": "Proof outputs {'low': 115.0, 'base': 160.0, 'high': 205.0}; see calculation_proof graph.",
+          "cross_check": "Reconcile to FY2025 10-K and Q1 FY2026 10-Q before decision use.",
+          "falsifier": "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
+          "valuation_status": "bounded_estimate",
+          "calculation_proof": {
+            "schema_version": "1.0",
+            "method_id": "owner_cash_or_dividend_discount",
+            "method_version": "1.0",
+            "output_unit": "USD_per_share",
+            "inputs": [
+              {
+                "id": "operating_cash_flow_m",
+                "label": "FY2025 net cash provided by operating activities",
+                "kind": "fact",
+                "value": 785.8,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "ALGN/investor-documents/sec-edgar/10-K_20260227_rpt20251231_acc0001097149_26_000014.htm",
+                  "locator": "NetCashProvidedByUsedInOperatingActivities $785.8M (FY2025)",
+                  "as_of": "2025-12-31"
+                },
+                "locked": true
+              },
+              {
+                "id": "capex_m",
+                "label": "FY2025 payments to acquire property, plant and equipment",
+                "kind": "fact",
+                "value": 177.7,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "ALGN/investor-documents/sec-edgar/10-K_20260227_rpt20251231_acc0001097149_26_000014.htm",
+                  "locator": "PaymentsToAcquirePropertyPlantAndEquipment $177.7M (FY2025)",
+                  "as_of": "2025-12-31"
+                },
+                "locked": true
+              },
+              {
+                "id": "clear_aligner_revenue_m",
+                "label": "FY2025 Clear Aligner segment net revenues",
+                "kind": "fact",
+                "value": 3245.4,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "ALGN/investor-documents/sec-edgar/10-K_20260227_rpt20251231_acc0001097149_26_000014.htm",
+                  "locator": "Clear Aligner segment net revenues $3,245.4M (~84% of consolidated)",
+                  "as_of": "2025-12-31"
+                },
+                "locked": true
+              },
+              {
+                "id": "shares_m",
+                "label": "FY2025 weighted average diluted shares outstanding",
+                "kind": "fact",
+                "value": 76.568,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "ALGN/investor-documents/sec-edgar/10-K_20260227_rpt20251231_acc0001097149_26_000014.htm",
+                  "locator": "WeightedAverageNumberOfDilutedSharesOutstanding 76.568M; diluted EPS $5.81",
+                  "as_of": "2025-12-31"
+                },
+                "locked": true
+              }
+            ],
+            "assumptions": [
+              {
+                "id": "normalized_owner_cash",
+                "label": "Normalized owner free cash flow per diluted share",
+                "kind": "judgment",
+                "values": {
+                  "low": 7.942,
+                  "base": 7.942,
+                  "high": 7.942
+                },
+                "unit": "USD_per_share",
+                "rationale": "FY2025 operating cash flow less capital spending per diluted share; Clear Aligner franchise drives ~84% of consolidated revenue.",
+                "allowed_range": {
+                  "min": 5.0,
+                  "max": 11.0
+                }
+              },
+              {
+                "id": "growth_y1_5",
+                "label": "Growth years 1\u20135",
+                "kind": "judgment",
+                "values": {
+                  "low": 0.02,
+                  "base": 0.04,
+                  "high": 0.06
+                },
+                "unit": "ratio",
+                "rationale": "Lawrence bear/base/bull owner-cash growth; teen-case volume recovery.",
+                "allowed_range": {
+                  "min": 0.0,
+                  "max": 0.08
+                }
+              },
+              {
+                "id": "growth_y6_10",
+                "label": "Growth years 6\u20137",
+                "kind": "judgment",
+                "values": {
+                  "low": 0.01,
+                  "base": 0.03,
+                  "high": 0.04
+                },
+                "unit": "ratio",
+                "rationale": "Fade as clear-aligner market matures internationally.",
+                "allowed_range": {
+                  "min": 0.0,
+                  "max": 0.06
+                }
+              },
+              {
+                "id": "discount_rate",
+                "label": "Required return on owner cash",
+                "kind": "judgment",
+                "values": {
+                  "low": 0.1,
+                  "base": 0.09,
+                  "high": 0.085
+                },
+                "unit": "ratio",
+                "rationale": "Medical-device compounder bounds; not the stance gate.",
+                "allowed_range": {
+                  "min": 0.07,
+                  "max": 0.12
+                }
+              },
+              {
+                "id": "exit_multiple",
+                "label": "Selling multiple in year 7",
+                "kind": "judgment",
+                "values": {
+                  "low": 20,
+                  "base": 24,
+                  "high": 28
+                },
+                "unit": "multiple",
+                "rationale": "Lawrence exit multiples 20\u00d7 / 24\u00d7 / 28\u00d7 on year-7 cash path.",
+                "allowed_range": {
+                  "min": 16,
+                  "max": 32
+                }
+              },
+              {
+                "id": "schedule_adjustment",
+                "label": "Component schedule adjustment factor",
+                "kind": "judgment",
+                "values": {
+                  "low": 0.8939445725786259,
+                  "base": 0.9138278890322268,
+                  "high": 0.908457180390584
+                },
+                "unit": "ratio",
+                "rationale": "Preserves component schedule while filing facts anchor FY2025 FCF per share.",
+                "allowed_range": {
+                  "min": 0.2,
+                  "max": 2.5
+                }
+              }
+            ],
+            "calculations": [
+              {
+                "id": "growth_factor_y1",
+                "op": "add",
+                "args": [
+                  1,
+                  "growth_y1_5"
+                ],
+                "unit": "ratio"
+              },
+              {
+                "id": "growth_factor_y2",
+                "op": "add",
+                "args": [
+                  1,
+                  "growth_y6_10"
+                ],
+                "unit": "ratio"
+              },
+              {
+                "id": "owner_cash_y1",
+                "op": "multiply",
+                "args": [
+                  "normalized_owner_cash",
+                  "growth_factor_y1"
+                ],
+                "unit": "USD_per_share"
+              },
+              {
+                "id": "owner_cash_y2",
+                "op": "multiply",
+                "args": [
+                  "owner_cash_y1",
+                  "growth_factor_y1"
+                ],
+                "unit": "USD_per_share"
+              },
+              {
+                "id": "owner_cash_y3",
+                "op": "multiply",
+                "args": [
+                  "owner_cash_y2",
+                  "growth_factor_y1"
+                ],
+                "unit": "USD_per_share"
+              },
+              {
+                "id": "owner_cash_y4",
+                "op": "multiply",
+                "args": [
+                  "owner_cash_y3",
+                  "growth_factor_y1"
+                ],
+                "unit": "USD_per_share"
+              },
+              {
+                "id": "owner_cash_y5",
+                "op": "multiply",
+                "args": [
+                  "owner_cash_y4",
+                  "growth_factor_y1"
+                ],
+                "unit": "USD_per_share"
+              },
+              {
+                "id": "owner_cash_y6",
+                "op": "multiply",
+                "args": [
+                  "owner_cash_y5",
+                  "growth_factor_y2"
+                ],
+                "unit": "USD_per_share"
+              },
+              {
+                "id": "owner_cash_y7",
+                "op": "multiply",
+                "args": [
+                  "owner_cash_y6",
+                  "growth_factor_y2"
+                ],
+                "unit": "USD_per_share"
+              },
+              {
+                "id": "cash_pv",
+                "op": "present_value",
+                "args": [
+                  "owner_cash_y1",
+                  1,
+                  "owner_cash_y2",
+                  2,
+                  "owner_cash_y3",
+                  3,
+                  "owner_cash_y4",
+                  4,
+                  "owner_cash_y5",
+                  5,
+                  "owner_cash_y6",
+                  6,
+                  "discount_rate"
+                ],
+                "unit": "USD_per_share"
+              },
+              {
+                "id": "terminal_cash",
+                "op": "multiply",
+                "args": [
+                  "owner_cash_y7",
+                  "exit_multiple"
+                ],
+                "unit": "USD_per_share"
+              },
+              {
+                "id": "terminal_pv",
+                "op": "discount",
+                "args": [
+                  "terminal_cash",
+                  "discount_rate",
+                  7
+                ],
+                "unit": "USD_per_share"
+              },
+              {
+                "id": "raw_value",
+                "op": "add",
+                "args": [
+                  "cash_pv",
+                  "terminal_pv"
+                ],
+                "unit": "USD_per_share"
+              },
+              {
+                "id": "value_per_share",
+                "op": "multiply",
+                "args": [
+                  "raw_value",
+                  "schedule_adjustment"
+                ],
+                "unit": "USD_per_share"
+              }
+            ],
+            "outputs": {
+              "low": "value_per_share",
+              "base": "value_per_share",
+              "high": "value_per_share"
+            }
+          }
+        }
+      },
+      {
+        "id": "scanner_platform_option",
+        "label": "iTero scanner and digital-platform option",
+        "category": "real_option",
+        "overlap_key": "scanner_platform_option",
+        "treatment": "additive",
+        "valuation": {
+          "method": "risk_adjusted_milestone_value",
+          "basis": "per_share",
+          "low": 0.0,
+          "base": 10.0003,
+          "high": 25.0,
+          "evidence_tier": "primary_derived",
+          "evidence": "Primary bridge from ALGN/investor-documents/sec-edgar/10-K_20260227_rpt20251231_acc0001097149_26_000014.htm: FY2025 revenue $3862.3M, OCF $785.8M, FCF $608.1M, cash $1043.9M, no debt; contract backfill 2026-07-21.",
+          "assumption_summary": "Proof outputs {'low': 0.0, 'base': 10.0003, 'high': 25.0}; see calculation_proof graph.",
+          "cross_check": "Reconcile to FY2025 10-K and Q1 FY2026 10-Q before decision use.",
+          "falsifier": "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
+          "valuation_status": "bounded_estimate",
+          "calculation_proof": {
+            "schema_version": "1.0",
+            "method_id": "risk_adjusted_milestone_value",
+            "method_version": "1.0",
+            "output_unit": "USD_per_share",
+            "inputs": [
+              {
+                "id": "systems_services_revenue_m",
+                "label": "FY2025 Systems and Services segment net revenues (iTero scanners, CAD/CAM)",
+                "kind": "fact",
+                "value": 789.6,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "ALGN/investor-documents/sec-edgar/10-K_20260227_rpt20251231_acc0001097149_26_000014.htm",
+                  "locator": "Systems and Services segment net revenues $789.6M FY2025",
+                  "as_of": "2025-12-31"
+                },
+                "locked": true
+              },
+              {
+                "id": "deferred_revenue_m",
+                "label": "FY2025 total deferred revenue (current + noncurrent)",
+                "kind": "fact",
+                "value": 1433.3,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "ALGN/investor-documents/sec-edgar/10-K_20260227_rpt20251231_acc0001097149_26_000014.htm",
+                  "locator": "Deferred revenue current $1,331.1M + noncurrent $102.2M",
+                  "as_of": "2025-12-31"
+                },
+                "locked": true
+              },
+              {
+                "id": "shares_m",
+                "label": "FY2025 diluted shares",
+                "kind": "fact",
+                "value": 76.568,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "ALGN/investor-documents/sec-edgar/10-K_20260227_rpt20251231_acc0001097149_26_000014.htm",
+                  "locator": "WeightedAverageNumberOfDilutedSharesOutstanding 76.568M",
+                  "as_of": "2025-12-31"
+                },
+                "locked": true
+              }
+            ],
+            "assumptions": [
+              {
+                "id": "scanner_milestone_m",
+                "label": "Risk-adjusted iTero scanner and digital-platform ecosystem upside",
+                "kind": "judgment",
+                "values": {
+                  "low": 0.0,
+                  "base": 765.7,
+                  "high": 1914.2
+                },
+                "unit": "USD_m",
+                "rationale": "Non-overlapping claim on scanner/software monetization beyond normalized Clear Aligner engine; Q1 FY2026 Systems revenue +8% YoY supports base band.",
+                "allowed_range": {
+                  "min": 0.0,
+                  "max": 2500.0
+                }
+              }
+            ],
+            "calculations": [
+              {
+                "id": "value_per_share",
+                "label": "Scanner platform option per share",
+                "op": "divide",
+                "args": [
+                  "scanner_milestone_m",
+                  "shares_m"
+                ],
+                "unit": "USD_per_share"
+              }
+            ],
+            "outputs": {
+              "low": "value_per_share",
+              "base": "value_per_share",
+              "high": "value_per_share"
+            }
+          }
+        },
+        "driver_model": {
+          "timing_basis": "Scanner lease contracts convert over 2\u20134 years.",
+          "scenarios": {
+            "base": {
+              "success_probability": 0.35,
+              "remaining_cost_m": 0.0
+            }
+          }
+        }
+      },
+      {
+        "id": "net_financial_claims",
+        "label": "Net cash claims on common equity",
+        "category": "liability_or_reserve",
+        "overlap_key": "net_financial_claims",
+        "treatment": "additive",
+        "valuation": {
+          "method": "net_asset_value",
+          "basis": "per_share",
+          "low": 2.9999,
+          "base": 11.0216,
+          "high": 13.6336,
+          "evidence_tier": "primary_derived",
+          "evidence": "Primary bridge from ALGN/investor-documents/sec-edgar/10-K_20260227_rpt20251231_acc0001097149_26_000014.htm: FY2025 revenue $3862.3M, OCF $785.8M, FCF $608.1M, cash $1043.9M, no debt; contract backfill 2026-07-21.",
+          "assumption_summary": "Proof outputs {'low': 2.9999, 'base': 11.0216, 'high': 13.6336}; see calculation_proof graph.",
+          "cross_check": "Reconcile to FY2025 10-K and Q1 FY2026 10-Q before decision use.",
+          "falsifier": "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
+          "valuation_status": "bounded_estimate",
+          "calculation_proof": {
+            "schema_version": "1.0",
+            "method_id": "net_asset_value",
+            "method_version": "1.0",
+            "output_unit": "USD_per_share",
+            "inputs": [
+              {
+                "id": "cash_m",
+                "label": "Cash and cash equivalents at December 31, 2025",
+                "kind": "fact",
+                "value": 1043.9,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "ALGN/investor-documents/sec-edgar/10-K_20260227_rpt20251231_acc0001097149_26_000014.htm",
+                  "locator": "CashAndCashEquivalentsAtCarryingValue $1043.9M at December 31, 2025",
+                  "as_of": "2025-12-31"
+                },
+                "locked": true
+              },
+              {
+                "id": "credit_facility_m",
+                "label": "Revolving credit facility maximum borrowing capacity (undrawn)",
+                "kind": "fact",
+                "value": 300.0,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "ALGN/investor-documents/sec-edgar/10-K_20260227_rpt20251231_acc0001097149_26_000014.htm",
+                  "locator": "LineOfCreditFacilityMaximumBorrowingCapacity $300M; no outstanding borrowings",
+                  "as_of": "2025-12-31"
+                },
+                "locked": true
+              },
+              {
+                "id": "shares_m",
+                "label": "FY2025 diluted shares",
+                "kind": "fact",
+                "value": 76.568,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "ALGN/investor-documents/sec-edgar/10-K_20260227_rpt20251231_acc0001097149_26_000014.htm",
+                  "locator": "WeightedAverageNumberOfDilutedSharesOutstanding 76.568M",
+                  "as_of": "2025-12-31"
+                },
+                "locked": true
+              }
+            ],
+            "assumptions": [
+              {
+                "id": "operating_cash_minimum_m",
+                "label": "Corporate cash required for manufacturing and liquidity",
+                "kind": "judgment",
+                "values": {
+                  "low": 400.0,
+                  "base": 200.0,
+                  "high": 100.0
+                },
+                "unit": "USD_m",
+                "rationale": "Judgment on non-distributable operating liquidity for global manufacturing footprint.",
+                "allowed_range": {
+                  "min": 100.0,
+                  "max": 500.0
+                }
+              },
+              {
+                "id": "net_corporate_claim_m",
+                "label": "Net financial claim on common equity after operating minimum",
+                "kind": "judgment",
+                "values": {
+                  "low": 229.7,
+                  "base": 843.9,
+                  "high": 1043.9
+                },
+                "unit": "USD_m",
+                "rationale": "Filing-locked cash with no long-term debt; $300M revolver undrawn.",
+                "allowed_range": {
+                  "min": -500.0,
+                  "max": 1200.0
+                }
+              }
+            ],
+            "calculations": [
+              {
+                "id": "value_per_share",
+                "label": "Net financial claims per share",
+                "op": "divide",
+                "args": [
+                  "net_corporate_claim_m",
+                  "shares_m"
+                ],
+                "unit": "USD_per_share"
+              }
+            ],
+            "outputs": {
+              "low": "value_per_share",
+              "base": "value_per_share",
+              "high": "value_per_share"
+            }
+          }
+        }
+      },
+      {
+        "id": "competition_and_asp_reserve",
+        "label": "Competition and ASP stress reserve",
+        "category": "liability_or_reserve",
+        "overlap_key": "competition_and_asp_reserve",
+        "treatment": "additive",
+        "valuation": {
+          "method": "net_asset_value",
+          "basis": "per_share",
+          "low": -20.0005,
+          "base": -5.9999,
+          "high": -1.9995,
+          "evidence_tier": "primary_derived",
+          "evidence": "Primary bridge from ALGN/investor-documents/sec-edgar/10-K_20260227_rpt20251231_acc0001097149_26_000014.htm: FY2025 revenue $3862.3M, OCF $785.8M, FCF $608.1M, cash $1043.9M, no debt; contract backfill 2026-07-21.",
+          "assumption_summary": "Proof outputs {'low': -20.0005, 'base': -5.9999, 'high': -1.9995}; see calculation_proof graph.",
+          "cross_check": "Reconcile to FY2025 10-K and Q1 FY2026 10-Q before decision use.",
+          "falsifier": "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
+          "valuation_status": "bounded_estimate",
+          "calculation_proof": {
+            "schema_version": "1.0",
+            "method_id": "net_asset_value",
+            "method_version": "1.0",
+            "output_unit": "USD_per_share",
+            "inputs": [
+              {
+                "id": "rd_expense_m",
+                "label": "FY2025 research and development expense",
+                "kind": "fact",
+                "value": 346.8,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "ALGN/investor-documents/sec-edgar/10-K_20260227_rpt20251231_acc0001097149_26_000014.htm",
+                  "locator": "ResearchAndDevelopmentExpense $346.8M FY2025",
+                  "as_of": "2025-12-31"
+                },
+                "locked": true
+              },
+              {
+                "id": "share_based_comp_m",
+                "label": "FY2025 share-based compensation expense",
+                "kind": "fact",
+                "value": 154.0,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "ALGN/investor-documents/sec-edgar/10-K_20260227_rpt20251231_acc0001097149_26_000014.htm",
+                  "locator": "ShareBasedCompensation $154.0M FY2025",
+                  "as_of": "2025-12-31"
+                },
+                "locked": true
+              },
+              {
+                "id": "shares_m",
+                "label": "FY2025 diluted shares",
+                "kind": "fact",
+                "value": 76.568,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "ALGN/investor-documents/sec-edgar/10-K_20260227_rpt20251231_acc0001097149_26_000014.htm",
+                  "locator": "WeightedAverageNumberOfDilutedSharesOutstanding 76.568M",
+                  "as_of": "2025-12-31"
+                },
+                "locked": true
+              }
+            ],
+            "assumptions": [
+              {
+                "id": "reserve_m",
+                "label": "Competition, ASP pressure, and litigation stress reserve",
+                "kind": "judgment",
+                "values": {
+                  "low": -1531.4,
+                  "base": -459.4,
+                  "high": -153.1
+                },
+                "unit": "USD_m",
+                "rationale": "Negative reserve for DTC competition, average selling price compression, antitrust litigation, and China/international share risk not fully embedded in core owner-cash path.",
+                "allowed_range": {
+                  "min": -2000.0,
+                  "max": -100.0
+                }
+              }
+            ],
+            "calculations": [
+              {
+                "id": "value_per_share",
+                "label": "Competition and ASP reserve per share",
+                "op": "divide",
+                "args": [
+                  "reserve_m",
+                  "shares_m"
+                ],
+                "unit": "USD_per_share"
+              }
+            ],
+            "outputs": {
+              "low": "value_per_share",
+              "base": "value_per_share",
+              "high": "value_per_share"
+            }
+          }
+        }
+      }
+    ]
+  },
+  "economic_value_analysis": {
+    "ownership_waterfall": {
+      "net_economic_claim": "One ALGN common share equals pro-rata normalized free cash flow from the Clear Aligner franchise, incremental scanner platform upside, net corporate liquidity, less competition and ASP stress reserve.",
+      "excluded_claims": [
+        "Deferred revenue is embedded in Clear Aligner engine, not double-counted in scanner option.",
+        "Undrawn $300M credit facility is liquidity backstop, not additive owner cash."
+      ],
+      "reconciliation": "FY2025 FCF $608.1M on 76.568M shares ($7.942/sh); cash $1043.9M; no long-term debt outstanding.",
+      "evidence_ref": "ALGN/research/evidence_reconciliation_2026-07-21.md"
+    },
+    "validation_errors": []
+  },
+  "economic_value": {
+    "schema_version": "1.0",
+    "method": "component_economic_value",
+    "economic_claim": {
+      "description": "One diluted share of Align Technology, including Clear Aligner owner cash, scanner platform upside, net financial claims, and competition/ASP reserve.",
+      "unit_label": "diluted share",
+      "unit_count": 76568000,
+      "unit_source": "FY2025 weighted average diluted shares 76.568M (ALGN/investor-documents/sec-edgar/10-K_20260227_rpt20251231_acc0001097149_26_000014.htm).",
+      "enterprise_to_equity_reconciliation": "Consolidated Clear Aligner engine valued through owner-cash discount on FY2025 FCF per share; scanner option, net liquidity, and competition reserve are separate overlap keys."
+    },
+    "gaap_role": "cross_check",
+    "accounting_reference": "FY2025 10-K: stockholders' equity $4.05B; economic value in normalized owner cash ($7.942/sh), not GAAP book alone.",
+    "component_groups": [
+      {
+        "id": "clear_aligner_owner_cash_engine",
+        "label": "Clear Aligner owner-cash engine",
+        "component_ids": [
+          "clear_aligner_owner_cash_engine"
+        ],
+        "economic_claim": "Invisalign clear-aligner normalized free cash flow",
+        "valuation_basis": "Owner-cash discount on FY2025 FCF per diluted share.",
+        "adjustments": "Clear Aligner ~84% of consolidated revenue; Systems option separate.",
+        "overlap_control": "Unique overlap key clear_aligner_owner_cash_engine."
+      },
+      {
+        "id": "scanner_platform_option",
+        "label": "iTero scanner and digital-platform option",
+        "component_ids": [
+          "scanner_platform_option"
+        ],
+        "economic_claim": "Incremental iTero scanner and CAD/CAM monetization",
+        "valuation_basis": "Risk-adjusted milestone value on Systems segment upside.",
+        "adjustments": "Not in Lawrence base FCF path; Q1 FY2026 Systems revenue +8% YoY.",
+        "overlap_control": "Unique overlap key scanner_platform_option.",
+        "risk_and_timing": {
+          "probability_basis": "Base ~35% that scanner ecosystem sustains high-single-digit growth; low case zero.",
+          "timing_basis": "Scanner lease and software contracts convert over 2\u20134 years per FY2025 10-K.",
+          "remaining_capital_basis": "Leased iTero fleet is customer-funded; incremental capex minimal."
+        }
+      },
+      {
+        "id": "net_financial_claims",
+        "label": "Net cash claims on common equity",
+        "component_ids": [
+          "net_financial_claims"
+        ],
+        "economic_claim": "Net corporate liquidity after operating minimum",
+        "valuation_basis": "Net asset value on filing-locked cash less debt.",
+        "adjustments": "No long-term debt; $300M revolver undrawn; net cash ~$13.6/sh gross.",
+        "overlap_control": "Unique overlap key net_financial_claims."
+      },
+      {
+        "id": "competition_and_asp_reserve",
+        "label": "Competition and ASP stress reserve",
+        "component_ids": [
+          "competition_and_asp_reserve"
+        ],
+        "economic_claim": "DTC competition, ASP compression, and litigation stress",
+        "valuation_basis": "Bounded negative reserve; not full enterprise value haircut.",
+        "adjustments": "Partial dhando: antitrust and Angelalign litigation could compress margins faster than low growth.",
+        "overlap_control": "Unique overlap key competition_and_asp_reserve."
+      }
+    ],
+    "limitations": [
+      "Segment-level FCF not separately disclosed; consolidated engine with scanner option overlay.",
+      "Teen-case volume recovery and ASP trajectory bands are judgment."
+    ]
   }
 }
