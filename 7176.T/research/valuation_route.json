@@ -1,93 +1,119 @@
 {
   "schema_version": "2.0",
   "status": "routed",
-  "profile_id": "scarce_asset_optionality",
-  "label": "Scarce assets, royalties, and optionality",
-  "score": 6.0,
+  "profile_id": "quality_reinvestment",
+  "label": "High-return compounder",
+  "score": 8.0,
   "reasons": [
-    "archetype=croupier"
+    "archetype=croupier",
+    "component categories=operating_business",
+    "existing methods=owner_cash"
   ],
   "primary_methods": [
-    "component_owner_cash_and_unit_nav"
+    "owner_earnings_reinvestment_dcf"
   ],
   "corroborating_methods": [
-    "comparable_transactions",
-    "replacement_cost_or_reverse_nav"
+    "reverse_dcf",
+    "incremental_roic_runway"
   ],
   "primary_personas": [
-    "hk",
-    "stahl"
+    "buffett_weschler",
+    "hohn"
   ],
   "cross_check_personas": [
-    "klarman_asset_value",
-    "marks_credit_cycle"
+    "munger",
+    "marathon_capital_cycle"
   ],
   "silent_personas": [
-    "buffett_weschler",
     "greenblatt",
-    "hohn",
-    "marathon_capital_cycle",
-    "munger",
-    "pabrai"
+    "hk",
+    "klarman_asset_value",
+    "marks_credit_cycle",
+    "pabrai",
+    "stahl"
   ],
   "required_evidence": [
-    "legal economic claim",
-    "non-overlapping physical inventory",
-    "unit economics",
-    "realization timing",
-    "remaining owner capital"
+    "normalized owner earnings",
+    "incremental return on capital",
+    "reinvestment runway",
+    "diluted share count",
+    "competitive-advantage mechanism"
   ],
   "failure_modes": [
-    "gross asset value mistaken for shareholder value",
-    "operating cash flow and NAV counted twice",
-    "remote options treated as contracted cash"
+    "growth projected without its capital cost",
+    "stock compensation or acquisitions omitted",
+    "terminal value unsupported by a durable mechanism"
   ],
   "secondary_profiles": [
     {
-      "profile_id": "quality_reinvestment",
-      "score": 6.0,
+      "profile_id": "scarce_asset_optionality",
+      "score": 7.0,
       "reasons": [
-        "archetype=croupier"
+        "archetype=croupier",
+        "component categories=real_option"
+      ]
+    },
+    {
+      "profile_id": "predictable_cash_flow",
+      "score": 3.0,
+      "reasons": [
+        "component categories=operating_business",
+        "existing methods=dividend, owner_cash"
       ]
     }
   ],
   "scorecard": {
     "scarce_asset_optionality": {
-      "score": 6.0,
+      "score": 7.0,
       "reasons": [
-        "archetype=croupier"
+        "archetype=croupier",
+        "component categories=real_option"
       ]
     },
     "quality_reinvestment": {
-      "score": 6.0,
+      "score": 8.0,
       "reasons": [
-        "archetype=croupier"
+        "archetype=croupier",
+        "component categories=operating_business",
+        "existing methods=owner_cash"
       ]
     },
     "capital_cycle": {
-      "score": 0.0,
-      "reasons": []
+      "score": 1.0,
+      "reasons": [
+        "component categories=operating_business"
+      ]
     },
     "credit_and_normalized_returns": {
-      "score": 0.0,
-      "reasons": []
+      "score": 2.0,
+      "reasons": [
+        "component categories=financial_asset, liability_or_reserve"
+      ]
     },
     "catalyst_asset_value": {
-      "score": 0.0,
-      "reasons": []
+      "score": 1.0,
+      "reasons": [
+        "component categories=financial_asset"
+      ]
     },
     "predictable_cash_flow": {
-      "score": 0.0,
-      "reasons": []
+      "score": 3.0,
+      "reasons": [
+        "component categories=operating_business",
+        "existing methods=dividend, owner_cash"
+      ]
     },
     "binary_milestone": {
-      "score": 0.0,
-      "reasons": []
+      "score": 3.0,
+      "reasons": [
+        "component categories=real_option",
+        "existing methods=milestone, risk_adjusted"
+      ]
     }
   },
   "decision_rule": "Power Zones select the fitting economic method and eligible independent reviewers; they never choose the valuation answer or capital decision.",
   "ticker": "7176.T",
-  "as_of": "2026-07-20",
+  "as_of": "2026-07-21",
   "route_source": "canonical_power_zone_router",
   "config_path": "_system/frameworks/power_zones.json",
   "config_updated": "2026-07-14",
@@ -137,24 +163,24 @@
   ],
   "committee": {
     "candidate_count": 5,
-    "independence_group_count": 4,
+    "independence_group_count": 3,
     "committee_seatable": true,
     "candidates": [
       {
-        "persona": "hk",
-        "independence_group": "scarce_assets"
+        "persona": "buffett_weschler",
+        "independence_group": "quality_reinvestment"
       },
       {
-        "persona": "stahl",
-        "independence_group": "scarce_assets"
+        "persona": "hohn",
+        "independence_group": "competitive_advantage"
       },
       {
-        "persona": "klarman_asset_value",
-        "independence_group": "asset_realization"
+        "persona": "munger",
+        "independence_group": "quality_reinvestment"
       },
       {
-        "persona": "marks_credit_cycle",
-        "independence_group": "credit_cycle"
+        "persona": "marathon_capital_cycle",
+        "independence_group": "capital_cycle"
       },
       {
         "persona": "lawrence",
@@ -162,6 +188,6 @@
       }
     ]
   },
-  "input_hash": "e6943f54428d37e5a855ce0954df876540c97fa96e10c1cba112b55e78dd7a2c",
-  "generated_at": "2026-07-20T17:13:53.730894+00:00"
+  "input_hash": "6a035941f88d7b4fb9bfecc6af44c01324401841e0161cb309b5f402b5a3367c",
+  "generated_at": "2026-07-21T05:10:07.459928+00:00"
 }

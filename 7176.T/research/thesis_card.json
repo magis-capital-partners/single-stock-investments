@@ -1,60 +1,79 @@
 {
-  "schema_version": "1.0",
-  "ticker": "7176.T",
-  "thesis": "Simplex Financial Holdings is a Japan asset manager and ETF sponsor (TOKYO PRO Market) earning base and success fees on **¥1.34 trillion** AUM. **[Fact]** FY2026 revenue **¥22.5B** and parent EPS **¥317.33/sh** (split-adjusted) were driven by success fees (+53.6% YoY). **[Inference]** Mid-cycle owner cash **¥137.14/sh** (FY2025) is the croupier anchor; the last exchange print **¥464** (100 shares, Jan 2026) is not a continuous liquid market.",
-  "base_irr_pct": 53.33,
-  "irr_label": "7yr IRR (total synthesis)",
-  "scenarios": {
-    "bear": 43.0,
-    "base": 50.3,
-    "bull": 58.7
-  },
+  "base_irr_pct": 38.04,
   "classification": {
     "archetype": "croupier",
-    "moat": "partial",
-    "dhando": "partial",
     "cycle": "mid",
+    "dhando": "partial",
     "lawrence_bucket": "multi_sided",
-    "stance": "watch"
+    "moat": "partial",
+    "payoff_lens": "operating"
   },
+  "evidence_citations": [
+    "7176.T/third-party-analyses/source_inventory_2026-06-04.md",
+    "7176.T/02_Quarterly/Earnings_Releases/20260528_2026\u5e743_\u6708\u671f_\u6c7a\u7b97\u77ed\u4fe1_\u65e5\u672c\u57fa\u6e96_\u9023\u7d50__finfo2026.pdf",
+    "7176.T/INDEX.csv",
+    "7176.T/research/deep_dive_2026-06-04.md",
+    "7176.T/research/evidence/filing_digest_2026-06-04.md"
+  ],
+  "filing_digest": "7176.T/research/evidence/filing_digest_2026-07-21.md",
+  "generated_at": "2026-07-21T05:09:06+00:00",
+  "irr_label": "7yr IRR (total synthesis)",
   "key_assumptions": [
     {
       "input": "Price today",
-      "value": "¥464",
-      "source": "Stooq/Yahoo last print 2026-01-07 (100 shares); illiquid"
+      "source": "Yahoo 7176.T close 2026-07-17",
+      "value": "**$757.0**"
     },
     {
-      "input": "Starting owner cash per share",
-      "value": "¥137.14",
-      "source": "FY2025 split-adjusted parent EPS (finfo2026); not FY2026 peak"
+      "input": "Starting free cash flow per share",
+      "source": "FY2025 split-adjusted parent PAT per share; FY2026 was 317.33 yen/sh (+131% YoY); use FY25 as mid-cycle croupier anchor",
+      "value": "**$137.14**"
     },
     {
-      "input": "Component schedule base",
-      "value": "¥2,336/sh",
-      "source": "Four additive proof components summing to Lawrence DCF base"
+      "input": "Cycle adjustment (starting cash)",
+      "source": "Croupier mid-cycle: Lawrence gate uses FY2025 owner cash, not FY2026 peak success-fee earnings. Price is last thin print, not VWAP.",
+      "value": "**mid**"
     },
     {
-      "input": "Success fees FY2026",
-      "value": "¥14,316M",
-      "source": "Pnotice2026-1 (+53.6% YoY vs base fees +17.1%)"
+      "input": "Growth in years 1 through 5",
+      "source": "Base fees track AUM (+2.9% AUM, +17% base fees FY26); mid-cycle owner cash FY25",
+      "value": "**5.0%** per year"
+    },
+    {
+      "input": "Growth in years 6 through 7",
+      "source": "Scenario base",
+      "value": "**3.5%** per year"
+    },
+    {
+      "input": "Selling multiple in year 10",
+      "source": "Scenario base",
+      "value": "**16 times cash flow**"
+    },
+    {
+      "input": "Time horizon",
+      "source": "7-year owner-cash model",
+      "value": "**7 years**"
     }
   ],
-  "open_questions": [
-    "Confirm live TSE PRO Market quote and depth before sizing.",
-    "Download yuho via EDINET E31267 for segment and non-recurring detail.",
-    "Reconcile operating cash flow **¥11,694M** vs net income for owner-cash normalization."
-  ],
-  "evidence_citations": [
-    "7176.T/02_Quarterly/Earnings_Releases/20260528_2026年3_月期_決算短信_日本基準_連結__finfo2026.pdf",
-    "7176.T/02_Quarterly/Earnings_Variance_Notices/20260528_前年同期実績_連結_との差異に関するお知らせ__Pnotice2026-1.pdf",
-    "7176.T/research/evidence/filing_digest_2026-06-04.md",
-    "7176.T/research/evidence_reconciliation_2026-07-21.md"
-  ],
-  "filing_digest": "7176.T/research/evidence/filing_digest_2026-06-04.md",
-  "generated_at": "2026-07-21T00:00:00Z",
   "last_verified": {
-    "valuation_as_of": "2026-07-21",
     "deep_dive": "2026-07-21",
-    "human_approved": null
-  }
+    "human_approved": null,
+    "valuation_as_of": "2026-07-21"
+  },
+  "open_questions": [
+    "Confirm **live TSE price** and depth; do not use Stooq/Yahoo alone.",
+    "Download **yuho** via EDINET E31267 when API key is available; verify segments and non-recurring items.",
+    "Reconcile **operating cash flow** vs net income for owner-cash normalization.",
+    "Old dive error:** ~\u00a523/sh on ~300M shares was pre-split / wrong share count; corrected to split-adjusted filing EPS."
+  ],
+  "scenarios": {
+    "base": 35.2,
+    "bear": 28.2,
+    "bull": 43.2
+  },
+  "schema_version": "1.0",
+  "stance": null,
+  "thesis": "Simplex Financial Holdings Co., Ltd. (7176.T) is a Tokyo-based independent asset manager and ETF sponsor on TSE Prime. **[Fact]** It runs three lines: institutional fund management, listed ETF creation and management (Nikkei, TOPIX, leveraged, inverse, thematic, and Japan-first active ETFs), and an open-innovation layer that connects investors and banks. **[Fact]** The group traces to Simplex Asset Management (founded 1999). **[Fact]** FY2026 (year ended March 2026) consolidated revenue was **\u00a522.5 billion**, parent net income **\u00a510.6 billion**, and split-adjusted basic earnings per share **\u00a5317.33** (`7176.T/02_Quarterly/Earnings_Releases/20260528_2026\u5e743_\u6708\u671f_\u6c7a\u7b97\u77ed\u4fe1_\u65e5\u672c\u57fa\u6e96_\u9023\u7d50__finfo2026.pdf`). IR materials: http://www.simplexasset.com/sfh/ (holding company site frames this feed).",
+  "ticker": "7176.T",
+  "why_market_wrong": "The market may treat 7176.T as an illiquid micro-float while underpricing a **croupier-like** fee stack on Japan ETF and institutional flows. **[Inference]** At the last exchange print (**\u00a5464**, 100 shares, January 2026), mechanical math on **mid-cycle** owner cash looks very cheap versus FY2025 earnings power. **[Inference]** That print is not a continuous liquid market: there is no reliable daily tape, so charts and portfolio backtests understate both risk and the uncertainty of \"market price.\" There is **no dated predictive attribute** in our base case."
 }
