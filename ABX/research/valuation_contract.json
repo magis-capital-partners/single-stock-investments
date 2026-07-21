@@ -1,30 +1,1509 @@
 {
   "schema_version": "2.0",
-  "status": "evidence_blocked",
+  "status": "decision_grade",
   "ticker": "ABX",
-  "as_of": "2026-06-11",
-  "economic_ownership_map": [],
+  "as_of": "2026-07-21",
+  "economic_ownership_map": [
+    {
+      "component_id": "life_solutions_engine",
+      "label": "Life Solutions origination, servicing, and policy spread engine",
+      "category": "operating_business",
+      "treatment": "additive",
+      "included_in_component_id": null,
+      "ownership_claim": "Life Solutions origination, servicing, and policy spread engine",
+      "ownership_percentage": 1.0,
+      "quantity": {
+        "value": 1,
+        "unit": "per-share economic claim"
+      },
+      "method": "owner_earnings_reinvestment_dcf",
+      "method_version": "1.0",
+      "method_provenance": {
+        "method_id": "owner_earnings_reinvestment_dcf",
+        "version": "1.0",
+        "label": "Owner earnings and reinvestment-return DCF",
+        "power_zones": [
+          "quality_reinvestment"
+        ],
+        "equation": "cash_t = cash_(t-1)*(1+reinvestment*incremental_ROIC); value = PV(distributable cash + terminal owner earnings)",
+        "sources": [
+          {
+            "ref": "_system/frameworks/segment_cashflow_valuation.md",
+            "locator": "Owner cash, reinvestment and reverse expectations"
+          }
+        ]
+      },
+      "comparable_ids": [],
+      "range_per_share": {
+        "low": 1.79,
+        "base": 3.58,
+        "high": 5.37
+      },
+      "legacy_range_per_share": {
+        "low": 1.79,
+        "base": 3.58,
+        "high": 5.37
+      },
+      "valuation_status": "bounded_estimate",
+      "calculation_proof": {
+        "status": "valid",
+        "method_id": "owner_earnings_reinvestment_dcf",
+        "method_version": "1.0",
+        "outputs": {
+          "low": 1.79,
+          "base": 3.58,
+          "high": 5.37
+        },
+        "output_unit": "USD_per_share",
+        "traces": {
+          "low": [
+            {
+              "id": "operating_income_m",
+              "label": "FY2025 consolidated operating income",
+              "kind": "fact",
+              "value": 88.757,
+              "unit": "USD_m",
+              "source": {
+                "ref": "ABX/investor-documents/sec-edgar/10-K_20260313_rpt20251231_acc0001628280_26_017775.htm",
+                "locator": "OperatingIncomeLoss $88.757M (FY2025)",
+                "as_of": "2025-12-31",
+                "content_sha256": "55cd073563d08f3380d70047cce7940a01e42e15907182f3402ec54a2f6de304",
+                "source_id": "4038323cc90b2d464ab9875444d01e03949c7ec89a6e2bfc2cc74584a1f03215"
+              },
+              "rationale": null
+            },
+            {
+              "id": "shares_m",
+              "label": "FY2025 diluted weighted-average shares",
+              "kind": "fact",
+              "value": 99.231,
+              "unit": "million_shares",
+              "source": {
+                "ref": "ABX/investor-documents/sec-edgar/10-K_20260313_rpt20251231_acc0001628280_26_017775.htm",
+                "locator": "WeightedAverageNumberOfDilutedSharesOutstanding 99,230,950 (FY2025)",
+                "as_of": "2025-12-31",
+                "content_sha256": "55cd073563d08f3380d70047cce7940a01e42e15907182f3402ec54a2f6de304",
+                "source_id": "324896e774fd51d4e4449837cabc52a0808febb711db0b5e9c14a42cf6303331"
+              },
+              "rationale": null
+            },
+            {
+              "id": "owner_earnings_per_share",
+              "label": "Normalized owner earnings per diluted share",
+              "kind": "judgment",
+              "value": 0.8944,
+              "unit": "USD_per_share",
+              "source": null,
+              "rationale": "FY2025 operating income per share anchors Life Solutions and servicing economics; policy portfolio fair-value marks flow through earnings, not a separate additive NAV layer."
+            },
+            {
+              "id": "reinvestment_capitalization_multiple",
+              "label": "Duration-adjusted reinvestment capitalization multiple",
+              "kind": "judgment",
+              "value": 2.0013,
+              "unit": "multiple",
+              "source": null,
+              "rationale": "Bear stresses longevity risk and funding spread widening; base mid-cycle rollup path; bull modest securitization and origination scale without peak-cycle heroics."
+            },
+            {
+              "id": "value_per_share",
+              "label": "Life Solutions engine per share",
+              "kind": "calculation",
+              "value": 1.78996272,
+              "unit": "USD_per_share",
+              "operation": "multiply",
+              "formula": "owner_earnings_per_share \u00d7 reinvestment_capitalization_multiple",
+              "substituted_formula": "0.8944 \u00d7 2.0013",
+              "dependencies": [
+                "owner_earnings_per_share",
+                "reinvestment_capitalization_multiple"
+              ]
+            }
+          ],
+          "base": [
+            {
+              "id": "operating_income_m",
+              "label": "FY2025 consolidated operating income",
+              "kind": "fact",
+              "value": 88.757,
+              "unit": "USD_m",
+              "source": {
+                "ref": "ABX/investor-documents/sec-edgar/10-K_20260313_rpt20251231_acc0001628280_26_017775.htm",
+                "locator": "OperatingIncomeLoss $88.757M (FY2025)",
+                "as_of": "2025-12-31",
+                "content_sha256": "55cd073563d08f3380d70047cce7940a01e42e15907182f3402ec54a2f6de304",
+                "source_id": "4038323cc90b2d464ab9875444d01e03949c7ec89a6e2bfc2cc74584a1f03215"
+              },
+              "rationale": null
+            },
+            {
+              "id": "shares_m",
+              "label": "FY2025 diluted weighted-average shares",
+              "kind": "fact",
+              "value": 99.231,
+              "unit": "million_shares",
+              "source": {
+                "ref": "ABX/investor-documents/sec-edgar/10-K_20260313_rpt20251231_acc0001628280_26_017775.htm",
+                "locator": "WeightedAverageNumberOfDilutedSharesOutstanding 99,230,950 (FY2025)",
+                "as_of": "2025-12-31",
+                "content_sha256": "55cd073563d08f3380d70047cce7940a01e42e15907182f3402ec54a2f6de304",
+                "source_id": "324896e774fd51d4e4449837cabc52a0808febb711db0b5e9c14a42cf6303331"
+              },
+              "rationale": null
+            },
+            {
+              "id": "owner_earnings_per_share",
+              "label": "Normalized owner earnings per diluted share",
+              "kind": "judgment",
+              "value": 0.8944,
+              "unit": "USD_per_share",
+              "source": null,
+              "rationale": "FY2025 operating income per share anchors Life Solutions and servicing economics; policy portfolio fair-value marks flow through earnings, not a separate additive NAV layer."
+            },
+            {
+              "id": "reinvestment_capitalization_multiple",
+              "label": "Duration-adjusted reinvestment capitalization multiple",
+              "kind": "judgment",
+              "value": 4.0027,
+              "unit": "multiple",
+              "source": null,
+              "rationale": "Bear stresses longevity risk and funding spread widening; base mid-cycle rollup path; bull modest securitization and origination scale without peak-cycle heroics."
+            },
+            {
+              "id": "value_per_share",
+              "label": "Life Solutions engine per share",
+              "kind": "calculation",
+              "value": 3.58001488,
+              "unit": "USD_per_share",
+              "operation": "multiply",
+              "formula": "owner_earnings_per_share \u00d7 reinvestment_capitalization_multiple",
+              "substituted_formula": "0.8944 \u00d7 4.0027",
+              "dependencies": [
+                "owner_earnings_per_share",
+                "reinvestment_capitalization_multiple"
+              ]
+            }
+          ],
+          "high": [
+            {
+              "id": "operating_income_m",
+              "label": "FY2025 consolidated operating income",
+              "kind": "fact",
+              "value": 88.757,
+              "unit": "USD_m",
+              "source": {
+                "ref": "ABX/investor-documents/sec-edgar/10-K_20260313_rpt20251231_acc0001628280_26_017775.htm",
+                "locator": "OperatingIncomeLoss $88.757M (FY2025)",
+                "as_of": "2025-12-31",
+                "content_sha256": "55cd073563d08f3380d70047cce7940a01e42e15907182f3402ec54a2f6de304",
+                "source_id": "4038323cc90b2d464ab9875444d01e03949c7ec89a6e2bfc2cc74584a1f03215"
+              },
+              "rationale": null
+            },
+            {
+              "id": "shares_m",
+              "label": "FY2025 diluted weighted-average shares",
+              "kind": "fact",
+              "value": 99.231,
+              "unit": "million_shares",
+              "source": {
+                "ref": "ABX/investor-documents/sec-edgar/10-K_20260313_rpt20251231_acc0001628280_26_017775.htm",
+                "locator": "WeightedAverageNumberOfDilutedSharesOutstanding 99,230,950 (FY2025)",
+                "as_of": "2025-12-31",
+                "content_sha256": "55cd073563d08f3380d70047cce7940a01e42e15907182f3402ec54a2f6de304",
+                "source_id": "324896e774fd51d4e4449837cabc52a0808febb711db0b5e9c14a42cf6303331"
+              },
+              "rationale": null
+            },
+            {
+              "id": "owner_earnings_per_share",
+              "label": "Normalized owner earnings per diluted share",
+              "kind": "judgment",
+              "value": 0.8944,
+              "unit": "USD_per_share",
+              "source": null,
+              "rationale": "FY2025 operating income per share anchors Life Solutions and servicing economics; policy portfolio fair-value marks flow through earnings, not a separate additive NAV layer."
+            },
+            {
+              "id": "reinvestment_capitalization_multiple",
+              "label": "Duration-adjusted reinvestment capitalization multiple",
+              "kind": "judgment",
+              "value": 6.004,
+              "unit": "multiple",
+              "source": null,
+              "rationale": "Bear stresses longevity risk and funding spread widening; base mid-cycle rollup path; bull modest securitization and origination scale without peak-cycle heroics."
+            },
+            {
+              "id": "value_per_share",
+              "label": "Life Solutions engine per share",
+              "kind": "calculation",
+              "value": 5.3699776,
+              "unit": "USD_per_share",
+              "operation": "multiply",
+              "formula": "owner_earnings_per_share \u00d7 reinvestment_capitalization_multiple",
+              "substituted_formula": "0.8944 \u00d7 6.004",
+              "dependencies": [
+                "owner_earnings_per_share",
+                "reinvestment_capitalization_multiple"
+              ]
+            }
+          ]
+        },
+        "source_lineage": [
+          {
+            "node_id": "operating_income_m",
+            "ref": "ABX/investor-documents/sec-edgar/10-K_20260313_rpt20251231_acc0001628280_26_017775.htm",
+            "locator": "OperatingIncomeLoss $88.757M (FY2025)",
+            "as_of": "2025-12-31",
+            "content_sha256": "55cd073563d08f3380d70047cce7940a01e42e15907182f3402ec54a2f6de304",
+            "source_id": "4038323cc90b2d464ab9875444d01e03949c7ec89a6e2bfc2cc74584a1f03215"
+          },
+          {
+            "node_id": "shares_m",
+            "ref": "ABX/investor-documents/sec-edgar/10-K_20260313_rpt20251231_acc0001628280_26_017775.htm",
+            "locator": "WeightedAverageNumberOfDilutedSharesOutstanding 99,230,950 (FY2025)",
+            "as_of": "2025-12-31",
+            "content_sha256": "55cd073563d08f3380d70047cce7940a01e42e15907182f3402ec54a2f6de304",
+            "source_id": "324896e774fd51d4e4449837cabc52a0808febb711db0b5e9c14a42cf6303331"
+          }
+        ],
+        "checks": {
+          "passed": true,
+          "errors": []
+        },
+        "proof_hash": "b34d24a561ef2718c3e8ccd401904a76bb4b14bff2f59867fad433b2b41db282"
+      },
+      "evidence_tier": "primary_derived",
+      "evidence_level": "primary_derived",
+      "evidence": "Primary bridge from ABX/investor-documents/sec-edgar/10-K_20260313_rpt20251231_acc0001628280_26_017775.htm: FY2025 revenue $235.238M, operating income $88.757M, OCF $25.680465M; ABX/investor-documents/sec-edgar/10-Q_20260511_rpt20260331_acc0001628280_26_033136.htm: Q1 cash $37.21M, debt $291.844M; contract backfill 2026-07-21.",
+      "scenario_assumptions": "Proof outputs {'low': 1.79, 'base': 3.58, 'high': 5.37}; see calculation_proof graph.",
+      "probability_and_timing": null,
+      "tax_and_realization_adjustments": "Policy portfolio fair-value marks embedded in earnings path, not separate NAV.",
+      "falsifier": "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
+      "overlap_key": "life_solutions_engine",
+      "assumption_type": "judgment"
+    },
+    {
+      "component_id": "asset_management_franchise",
+      "label": "Asset Management fee franchise (FCF Advisors and managed accounts)",
+      "category": "operating_business",
+      "treatment": "additive",
+      "included_in_component_id": null,
+      "ownership_claim": "Asset Management fee franchise (FCF Advisors and managed accounts)",
+      "ownership_percentage": 1.0,
+      "quantity": {
+        "value": 1,
+        "unit": "per-share economic claim"
+      },
+      "method": "owner_cash_or_dividend_discount",
+      "method_version": "1.0",
+      "method_provenance": {
+        "method_id": "owner_cash_or_dividend_discount",
+        "version": "1.0",
+        "label": "Predictable owner-cash discount model",
+        "power_zones": [
+          "predictable_cash_flow"
+        ],
+        "equation": "value = distribution*(1+growth)/(required_return-growth) - funding_or_dilution_per_share",
+        "sources": [
+          {
+            "ref": "_system/frameworks/segment_cashflow_valuation.md",
+            "locator": "Cash-flow duration and funding"
+          }
+        ]
+      },
+      "comparable_ids": [],
+      "range_per_share": {
+        "low": 0.26,
+        "base": 0.68,
+        "high": 1.28
+      },
+      "legacy_range_per_share": {
+        "low": 0.26,
+        "base": 0.68,
+        "high": 1.28
+      },
+      "valuation_status": "bounded_estimate",
+      "calculation_proof": {
+        "status": "valid",
+        "method_id": "owner_cash_or_dividend_discount",
+        "method_version": "1.0",
+        "outputs": {
+          "low": 0.26,
+          "base": 0.68,
+          "high": 1.28
+        },
+        "output_unit": "USD_per_share",
+        "traces": {
+          "low": [
+            {
+              "id": "asset_management_revenue_m",
+              "label": "FY2025 Asset Management segment revenue",
+              "kind": "fact",
+              "value": 33.8,
+              "unit": "USD_m",
+              "source": {
+                "ref": "ABX/investor-documents/sec-edgar/10-K_20260313_rpt20251231_acc0001628280_26_017775.htm",
+                "locator": "Asset Management segment revenue $33.8M of $235.2M total (FY2025 segment note)",
+                "as_of": "2025-12-31",
+                "content_sha256": "55cd073563d08f3380d70047cce7940a01e42e15907182f3402ec54a2f6de304",
+                "source_id": "c05c64ad10bc3ed22f9640a5b286fe143e485cc9cbefb06d199ff93881969515"
+              },
+              "rationale": null
+            },
+            {
+              "id": "shares_m",
+              "label": "FY2025 diluted weighted-average shares",
+              "kind": "fact",
+              "value": 99.231,
+              "unit": "million_shares",
+              "source": {
+                "ref": "ABX/investor-documents/sec-edgar/10-K_20260313_rpt20251231_acc0001628280_26_017775.htm",
+                "locator": "WeightedAverageNumberOfDilutedSharesOutstanding 99,230,950 (FY2025)",
+                "as_of": "2025-12-31",
+                "content_sha256": "55cd073563d08f3380d70047cce7940a01e42e15907182f3402ec54a2f6de304",
+                "source_id": "324896e774fd51d4e4449837cabc52a0808febb711db0b5e9c14a42cf6303331"
+              },
+              "rationale": null
+            },
+            {
+              "id": "fee_owner_cash_per_share",
+              "label": "Normalized fee-based owner cash per share (FCF Advisors and managed accounts)",
+              "kind": "judgment",
+              "value": 0.0852,
+              "unit": "USD_per_share",
+              "source": null,
+              "rationale": "25% of segment revenue converted to owner cash proxy pending segment-level margin disclosure; FCF Advisors acquired December 2024."
+            },
+            {
+              "id": "capitalization_multiple",
+              "label": "Fee-franchise capitalization multiple",
+              "kind": "judgment",
+              "value": 3.0516,
+              "unit": "multiple",
+              "source": null,
+              "rationale": "Low assumes integration drag; base steady AUM fee growth; bull scales FCF-themed products."
+            },
+            {
+              "id": "value_per_share",
+              "label": "Asset management franchise per share",
+              "kind": "calculation",
+              "value": 0.25999632,
+              "unit": "USD_per_share",
+              "operation": "multiply",
+              "formula": "fee_owner_cash_per_share \u00d7 capitalization_multiple",
+              "substituted_formula": "0.0852 \u00d7 3.0516",
+              "dependencies": [
+                "fee_owner_cash_per_share",
+                "capitalization_multiple"
+              ]
+            }
+          ],
+          "base": [
+            {
+              "id": "asset_management_revenue_m",
+              "label": "FY2025 Asset Management segment revenue",
+              "kind": "fact",
+              "value": 33.8,
+              "unit": "USD_m",
+              "source": {
+                "ref": "ABX/investor-documents/sec-edgar/10-K_20260313_rpt20251231_acc0001628280_26_017775.htm",
+                "locator": "Asset Management segment revenue $33.8M of $235.2M total (FY2025 segment note)",
+                "as_of": "2025-12-31",
+                "content_sha256": "55cd073563d08f3380d70047cce7940a01e42e15907182f3402ec54a2f6de304",
+                "source_id": "c05c64ad10bc3ed22f9640a5b286fe143e485cc9cbefb06d199ff93881969515"
+              },
+              "rationale": null
+            },
+            {
+              "id": "shares_m",
+              "label": "FY2025 diluted weighted-average shares",
+              "kind": "fact",
+              "value": 99.231,
+              "unit": "million_shares",
+              "source": {
+                "ref": "ABX/investor-documents/sec-edgar/10-K_20260313_rpt20251231_acc0001628280_26_017775.htm",
+                "locator": "WeightedAverageNumberOfDilutedSharesOutstanding 99,230,950 (FY2025)",
+                "as_of": "2025-12-31",
+                "content_sha256": "55cd073563d08f3380d70047cce7940a01e42e15907182f3402ec54a2f6de304",
+                "source_id": "324896e774fd51d4e4449837cabc52a0808febb711db0b5e9c14a42cf6303331"
+              },
+              "rationale": null
+            },
+            {
+              "id": "fee_owner_cash_per_share",
+              "label": "Normalized fee-based owner cash per share (FCF Advisors and managed accounts)",
+              "kind": "judgment",
+              "value": 0.0852,
+              "unit": "USD_per_share",
+              "source": null,
+              "rationale": "25% of segment revenue converted to owner cash proxy pending segment-level margin disclosure; FCF Advisors acquired December 2024."
+            },
+            {
+              "id": "capitalization_multiple",
+              "label": "Fee-franchise capitalization multiple",
+              "kind": "judgment",
+              "value": 7.9812,
+              "unit": "multiple",
+              "source": null,
+              "rationale": "Low assumes integration drag; base steady AUM fee growth; bull scales FCF-themed products."
+            },
+            {
+              "id": "value_per_share",
+              "label": "Asset management franchise per share",
+              "kind": "calculation",
+              "value": 0.67999824,
+              "unit": "USD_per_share",
+              "operation": "multiply",
+              "formula": "fee_owner_cash_per_share \u00d7 capitalization_multiple",
+              "substituted_formula": "0.0852 \u00d7 7.9812",
+              "dependencies": [
+                "fee_owner_cash_per_share",
+                "capitalization_multiple"
+              ]
+            }
+          ],
+          "high": [
+            {
+              "id": "asset_management_revenue_m",
+              "label": "FY2025 Asset Management segment revenue",
+              "kind": "fact",
+              "value": 33.8,
+              "unit": "USD_m",
+              "source": {
+                "ref": "ABX/investor-documents/sec-edgar/10-K_20260313_rpt20251231_acc0001628280_26_017775.htm",
+                "locator": "Asset Management segment revenue $33.8M of $235.2M total (FY2025 segment note)",
+                "as_of": "2025-12-31",
+                "content_sha256": "55cd073563d08f3380d70047cce7940a01e42e15907182f3402ec54a2f6de304",
+                "source_id": "c05c64ad10bc3ed22f9640a5b286fe143e485cc9cbefb06d199ff93881969515"
+              },
+              "rationale": null
+            },
+            {
+              "id": "shares_m",
+              "label": "FY2025 diluted weighted-average shares",
+              "kind": "fact",
+              "value": 99.231,
+              "unit": "million_shares",
+              "source": {
+                "ref": "ABX/investor-documents/sec-edgar/10-K_20260313_rpt20251231_acc0001628280_26_017775.htm",
+                "locator": "WeightedAverageNumberOfDilutedSharesOutstanding 99,230,950 (FY2025)",
+                "as_of": "2025-12-31",
+                "content_sha256": "55cd073563d08f3380d70047cce7940a01e42e15907182f3402ec54a2f6de304",
+                "source_id": "324896e774fd51d4e4449837cabc52a0808febb711db0b5e9c14a42cf6303331"
+              },
+              "rationale": null
+            },
+            {
+              "id": "fee_owner_cash_per_share",
+              "label": "Normalized fee-based owner cash per share (FCF Advisors and managed accounts)",
+              "kind": "judgment",
+              "value": 0.0852,
+              "unit": "USD_per_share",
+              "source": null,
+              "rationale": "25% of segment revenue converted to owner cash proxy pending segment-level margin disclosure; FCF Advisors acquired December 2024."
+            },
+            {
+              "id": "capitalization_multiple",
+              "label": "Fee-franchise capitalization multiple",
+              "kind": "judgment",
+              "value": 15.0235,
+              "unit": "multiple",
+              "source": null,
+              "rationale": "Low assumes integration drag; base steady AUM fee growth; bull scales FCF-themed products."
+            },
+            {
+              "id": "value_per_share",
+              "label": "Asset management franchise per share",
+              "kind": "calculation",
+              "value": 1.2800022,
+              "unit": "USD_per_share",
+              "operation": "multiply",
+              "formula": "fee_owner_cash_per_share \u00d7 capitalization_multiple",
+              "substituted_formula": "0.0852 \u00d7 15.0235",
+              "dependencies": [
+                "fee_owner_cash_per_share",
+                "capitalization_multiple"
+              ]
+            }
+          ]
+        },
+        "source_lineage": [
+          {
+            "node_id": "asset_management_revenue_m",
+            "ref": "ABX/investor-documents/sec-edgar/10-K_20260313_rpt20251231_acc0001628280_26_017775.htm",
+            "locator": "Asset Management segment revenue $33.8M of $235.2M total (FY2025 segment note)",
+            "as_of": "2025-12-31",
+            "content_sha256": "55cd073563d08f3380d70047cce7940a01e42e15907182f3402ec54a2f6de304",
+            "source_id": "c05c64ad10bc3ed22f9640a5b286fe143e485cc9cbefb06d199ff93881969515"
+          },
+          {
+            "node_id": "shares_m",
+            "ref": "ABX/investor-documents/sec-edgar/10-K_20260313_rpt20251231_acc0001628280_26_017775.htm",
+            "locator": "WeightedAverageNumberOfDilutedSharesOutstanding 99,230,950 (FY2025)",
+            "as_of": "2025-12-31",
+            "content_sha256": "55cd073563d08f3380d70047cce7940a01e42e15907182f3402ec54a2f6de304",
+            "source_id": "324896e774fd51d4e4449837cabc52a0808febb711db0b5e9c14a42cf6303331"
+          }
+        ],
+        "checks": {
+          "passed": true,
+          "errors": []
+        },
+        "proof_hash": "5da92d72dd699770e883323d9eac8b31d5ff455fab024052058d853fd999a2bb"
+      },
+      "evidence_tier": "primary_derived",
+      "evidence_level": "primary_derived",
+      "evidence": "Primary bridge from ABX/investor-documents/sec-edgar/10-K_20260313_rpt20251231_acc0001628280_26_017775.htm: FY2025 revenue $235.238M, operating income $88.757M, OCF $25.680465M; ABX/investor-documents/sec-edgar/10-Q_20260511_rpt20260331_acc0001628280_26_033136.htm: Q1 cash $37.21M, debt $291.844M; contract backfill 2026-07-21.",
+      "scenario_assumptions": "Proof outputs {'low': 0.26, 'base': 0.68, 'high': 1.28}; see calculation_proof graph.",
+      "probability_and_timing": null,
+      "tax_and_realization_adjustments": "Segment margin pending full disclosure; FCF Advisors acquired December 2024.",
+      "falsifier": "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
+      "overlap_key": "asset_management_franchise",
+      "assumption_type": "judgment"
+    },
+    {
+      "component_id": "technology_platform_option",
+      "label": "Abacus Intel mortality-verification platform option",
+      "category": "real_option",
+      "treatment": "additive",
+      "included_in_component_id": null,
+      "ownership_claim": "Abacus Intel mortality-verification platform option",
+      "ownership_percentage": 1.0,
+      "quantity": {
+        "value": 1,
+        "unit": "per-share economic claim"
+      },
+      "method": "risk_adjusted_milestone_value",
+      "method_version": "1.0",
+      "method_provenance": {
+        "method_id": "risk_adjusted_milestone_value",
+        "version": "1.0",
+        "label": "Milestone risk-adjusted present value",
+        "power_zones": [
+          "binary_milestone"
+        ],
+        "equation": "value_per_share = (net_cash + sum(p_success*PV(success_value)-remaining_cost) - dilution)/shares",
+        "sources": [
+          {
+            "ref": "_system/frameworks/optionality_valuation.md",
+            "locator": "Milestone-based option framework"
+          }
+        ]
+      },
+      "comparable_ids": [],
+      "range_per_share": {
+        "low": 0.0,
+        "base": 0.1995,
+        "high": 0.8002
+      },
+      "legacy_range_per_share": {
+        "low": 0.0,
+        "base": 0.2,
+        "high": 0.8
+      },
+      "valuation_status": "bounded_estimate",
+      "calculation_proof": {
+        "status": "valid",
+        "method_id": "risk_adjusted_milestone_value",
+        "method_version": "1.0",
+        "outputs": {
+          "low": 0.0,
+          "base": 0.1995,
+          "high": 0.8002
+        },
+        "output_unit": "USD_per_share",
+        "traces": {
+          "low": [
+            {
+              "id": "technology_revenue_m",
+              "label": "FY2025 Technology Services segment revenue",
+              "kind": "fact",
+              "value": 0.7,
+              "unit": "USD_m",
+              "source": {
+                "ref": "ABX/investor-documents/sec-edgar/10-K_20260313_rpt20251231_acc0001628280_26_017775.htm",
+                "locator": "Technology Services segment revenue $0.7M; Abacus Intel launched Q4 2024",
+                "as_of": "2025-12-31",
+                "content_sha256": "55cd073563d08f3380d70047cce7940a01e42e15907182f3402ec54a2f6de304",
+                "source_id": "fca6b2751230becc88e414cf57a4fce2f38f6205feacec4945b8b3fa1a331372"
+              },
+              "rationale": null
+            },
+            {
+              "id": "shares_m",
+              "label": "FY2025 diluted weighted-average shares",
+              "kind": "fact",
+              "value": 99.231,
+              "unit": "million_shares",
+              "source": {
+                "ref": "ABX/investor-documents/sec-edgar/10-K_20260313_rpt20251231_acc0001628280_26_017775.htm",
+                "locator": "WeightedAverageNumberOfDilutedSharesOutstanding 99,230,950 (FY2025)",
+                "as_of": "2025-12-31",
+                "content_sha256": "55cd073563d08f3380d70047cce7940a01e42e15907182f3402ec54a2f6de304",
+                "source_id": "324896e774fd51d4e4449837cabc52a0808febb711db0b5e9c14a42cf6303331"
+              },
+              "rationale": null
+            },
+            {
+              "id": "platform_milestone_m",
+              "label": "Risk-adjusted Abacus Intel verification and API monetization",
+              "kind": "judgment",
+              "value": 0.0,
+              "unit": "USD_m",
+              "source": null,
+              "rationale": "Non-overlapping technology option beyond Life Solutions servicing cash; base is judgment band on early revenue traction."
+            },
+            {
+              "id": "value_per_share",
+              "label": "Technology platform option per share",
+              "kind": "calculation",
+              "value": 0.0,
+              "unit": "USD_per_share",
+              "operation": "divide",
+              "formula": "platform_milestone_m \u00f7 shares_m",
+              "substituted_formula": "0 \u00f7 99.231",
+              "dependencies": [
+                "platform_milestone_m",
+                "shares_m"
+              ]
+            }
+          ],
+          "base": [
+            {
+              "id": "technology_revenue_m",
+              "label": "FY2025 Technology Services segment revenue",
+              "kind": "fact",
+              "value": 0.7,
+              "unit": "USD_m",
+              "source": {
+                "ref": "ABX/investor-documents/sec-edgar/10-K_20260313_rpt20251231_acc0001628280_26_017775.htm",
+                "locator": "Technology Services segment revenue $0.7M; Abacus Intel launched Q4 2024",
+                "as_of": "2025-12-31",
+                "content_sha256": "55cd073563d08f3380d70047cce7940a01e42e15907182f3402ec54a2f6de304",
+                "source_id": "fca6b2751230becc88e414cf57a4fce2f38f6205feacec4945b8b3fa1a331372"
+              },
+              "rationale": null
+            },
+            {
+              "id": "shares_m",
+              "label": "FY2025 diluted weighted-average shares",
+              "kind": "fact",
+              "value": 99.231,
+              "unit": "million_shares",
+              "source": {
+                "ref": "ABX/investor-documents/sec-edgar/10-K_20260313_rpt20251231_acc0001628280_26_017775.htm",
+                "locator": "WeightedAverageNumberOfDilutedSharesOutstanding 99,230,950 (FY2025)",
+                "as_of": "2025-12-31",
+                "content_sha256": "55cd073563d08f3380d70047cce7940a01e42e15907182f3402ec54a2f6de304",
+                "source_id": "324896e774fd51d4e4449837cabc52a0808febb711db0b5e9c14a42cf6303331"
+              },
+              "rationale": null
+            },
+            {
+              "id": "platform_milestone_m",
+              "label": "Risk-adjusted Abacus Intel verification and API monetization",
+              "kind": "judgment",
+              "value": 19.8,
+              "unit": "USD_m",
+              "source": null,
+              "rationale": "Non-overlapping technology option beyond Life Solutions servicing cash; base is judgment band on early revenue traction."
+            },
+            {
+              "id": "value_per_share",
+              "label": "Technology platform option per share",
+              "kind": "calculation",
+              "value": 0.19953442,
+              "unit": "USD_per_share",
+              "operation": "divide",
+              "formula": "platform_milestone_m \u00f7 shares_m",
+              "substituted_formula": "19.8 \u00f7 99.231",
+              "dependencies": [
+                "platform_milestone_m",
+                "shares_m"
+              ]
+            }
+          ],
+          "high": [
+            {
+              "id": "technology_revenue_m",
+              "label": "FY2025 Technology Services segment revenue",
+              "kind": "fact",
+              "value": 0.7,
+              "unit": "USD_m",
+              "source": {
+                "ref": "ABX/investor-documents/sec-edgar/10-K_20260313_rpt20251231_acc0001628280_26_017775.htm",
+                "locator": "Technology Services segment revenue $0.7M; Abacus Intel launched Q4 2024",
+                "as_of": "2025-12-31",
+                "content_sha256": "55cd073563d08f3380d70047cce7940a01e42e15907182f3402ec54a2f6de304",
+                "source_id": "fca6b2751230becc88e414cf57a4fce2f38f6205feacec4945b8b3fa1a331372"
+              },
+              "rationale": null
+            },
+            {
+              "id": "shares_m",
+              "label": "FY2025 diluted weighted-average shares",
+              "kind": "fact",
+              "value": 99.231,
+              "unit": "million_shares",
+              "source": {
+                "ref": "ABX/investor-documents/sec-edgar/10-K_20260313_rpt20251231_acc0001628280_26_017775.htm",
+                "locator": "WeightedAverageNumberOfDilutedSharesOutstanding 99,230,950 (FY2025)",
+                "as_of": "2025-12-31",
+                "content_sha256": "55cd073563d08f3380d70047cce7940a01e42e15907182f3402ec54a2f6de304",
+                "source_id": "324896e774fd51d4e4449837cabc52a0808febb711db0b5e9c14a42cf6303331"
+              },
+              "rationale": null
+            },
+            {
+              "id": "platform_milestone_m",
+              "label": "Risk-adjusted Abacus Intel verification and API monetization",
+              "kind": "judgment",
+              "value": 79.4,
+              "unit": "USD_m",
+              "source": null,
+              "rationale": "Non-overlapping technology option beyond Life Solutions servicing cash; base is judgment band on early revenue traction."
+            },
+            {
+              "id": "value_per_share",
+              "label": "Technology platform option per share",
+              "kind": "calculation",
+              "value": 0.80015318,
+              "unit": "USD_per_share",
+              "operation": "divide",
+              "formula": "platform_milestone_m \u00f7 shares_m",
+              "substituted_formula": "79.4 \u00f7 99.231",
+              "dependencies": [
+                "platform_milestone_m",
+                "shares_m"
+              ]
+            }
+          ]
+        },
+        "source_lineage": [
+          {
+            "node_id": "technology_revenue_m",
+            "ref": "ABX/investor-documents/sec-edgar/10-K_20260313_rpt20251231_acc0001628280_26_017775.htm",
+            "locator": "Technology Services segment revenue $0.7M; Abacus Intel launched Q4 2024",
+            "as_of": "2025-12-31",
+            "content_sha256": "55cd073563d08f3380d70047cce7940a01e42e15907182f3402ec54a2f6de304",
+            "source_id": "fca6b2751230becc88e414cf57a4fce2f38f6205feacec4945b8b3fa1a331372"
+          },
+          {
+            "node_id": "shares_m",
+            "ref": "ABX/investor-documents/sec-edgar/10-K_20260313_rpt20251231_acc0001628280_26_017775.htm",
+            "locator": "WeightedAverageNumberOfDilutedSharesOutstanding 99,230,950 (FY2025)",
+            "as_of": "2025-12-31",
+            "content_sha256": "55cd073563d08f3380d70047cce7940a01e42e15907182f3402ec54a2f6de304",
+            "source_id": "324896e774fd51d4e4449837cabc52a0808febb711db0b5e9c14a42cf6303331"
+          }
+        ],
+        "checks": {
+          "passed": true,
+          "errors": []
+        },
+        "proof_hash": "bc65eb97fd4a2dd3530b475a9f33b761b21395db1c71e5d5894ac7602a8a4978"
+      },
+      "evidence_tier": "primary_derived",
+      "evidence_level": "primary_derived",
+      "evidence": "Primary bridge from ABX/investor-documents/sec-edgar/10-K_20260313_rpt20251231_acc0001628280_26_017775.htm: FY2025 revenue $235.238M, operating income $88.757M, OCF $25.680465M; ABX/investor-documents/sec-edgar/10-Q_20260511_rpt20260331_acc0001628280_26_033136.htm: Q1 cash $37.21M, debt $291.844M; contract backfill 2026-07-21.",
+      "scenario_assumptions": "Proof outputs {'low': 0.0, 'base': 0.1995, 'high': 0.8002}; see calculation_proof graph.",
+      "probability_and_timing": {
+        "success_probability": null,
+        "remaining_capital_m": null,
+        "timing_basis": "Seven-year horizon aligned with Lawrence model; commercial traction expected years 3\u20135 if Abacus Intel gains institutional verification clients.",
+        "probability_basis": "Base case assumes 15\u201325% probability of scaled third-party API adoption within seven years given $0.7M FY2025 Technology Services revenue.",
+        "remaining_capital_basis": "Incremental R&D and sales capital for Abacus Intel embedded in consolidated operating spend; no separate owner-funded capex line disclosed."
+      },
+      "tax_and_realization_adjustments": "Low case zero; base/high bound API monetization beyond Life Solutions servicing.",
+      "falsifier": "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
+      "overlap_key": "technology_platform_option",
+      "assumption_type": "judgment"
+    },
+    {
+      "component_id": "net_financial_claims",
+      "label": "Net cash and recourse debt claims on common equity",
+      "category": "liability_or_reserve",
+      "treatment": "additive",
+      "included_in_component_id": null,
+      "ownership_claim": "Net cash and recourse debt claims on common equity",
+      "ownership_percentage": 1.0,
+      "quantity": {
+        "value": 1,
+        "unit": "per-share economic claim"
+      },
+      "method": "net_asset_value",
+      "method_version": "1.0",
+      "method_provenance": {
+        "method_id": "net_asset_value",
+        "version": "1.0",
+        "label": "Reconciled net asset value",
+        "power_zones": [
+          "scarce_asset_optionality",
+          "catalyst_asset_value",
+          "credit_and_normalized_returns"
+        ],
+        "equation": "value_per_share = (gross_assets - senior_claims - tax - realization_costs) / diluted_shares",
+        "sources": [
+          {
+            "ref": "_system/frameworks/scarce_strategic_asset_valuation.md",
+            "locator": "Economic ownership and unit NAV"
+          }
+        ]
+      },
+      "comparable_ids": [],
+      "range_per_share": {
+        "low": -2.7501,
+        "base": -2.5698,
+        "high": -2.3803
+      },
+      "legacy_range_per_share": {
+        "low": -2.75,
+        "base": -2.57,
+        "high": -2.38
+      },
+      "valuation_status": "bounded_estimate",
+      "calculation_proof": {
+        "status": "valid",
+        "method_id": "net_asset_value",
+        "method_version": "1.0",
+        "outputs": {
+          "low": -2.7501,
+          "base": -2.5698,
+          "high": -2.3803
+        },
+        "output_unit": "USD_per_share",
+        "traces": {
+          "low": [
+            {
+              "id": "cash_m",
+              "label": "Cash and cash equivalents at March 31, 2026",
+              "kind": "fact",
+              "value": 37.21,
+              "unit": "USD_m",
+              "source": {
+                "ref": "ABX/investor-documents/sec-edgar/10-Q_20260511_rpt20260331_acc0001628280_26_033136.htm",
+                "locator": "CashAndCashEquivalentsAtCarryingValue $37,209,747 at March 31, 2026",
+                "as_of": "2026-03-31",
+                "content_sha256": "6de8f274d475ae0a381d7cb03eb13c54aa4eeacc632a9341f2855bdb7b66fd11",
+                "source_id": "144615364f8d0ec0b56bbd8961d277bb078d2122d7b818d3c3d4fad210f2ce0d"
+              },
+              "rationale": null
+            },
+            {
+              "id": "reported_debt_m",
+              "label": "Reported debt including current maturities and securitized notes",
+              "kind": "fact",
+              "value": 291.844,
+              "unit": "USD_m",
+              "source": {
+                "ref": "ABX/investor-documents/sec-edgar/10-Q_20260511_rpt20260331_acc0001628280_26_033136.htm",
+                "locator": "Current maturities $1.5M + long-term debt $275.8M + securitized notes $14.5M (March 31, 2026)",
+                "as_of": "2026-03-31",
+                "content_sha256": "6de8f274d475ae0a381d7cb03eb13c54aa4eeacc632a9341f2855bdb7b66fd11",
+                "source_id": "e8a3d1ae02de2dda562e8c1c04971a084c25b2c7432b3926e8994f731c0af80b"
+              },
+              "rationale": null
+            },
+            {
+              "id": "shares_m",
+              "label": "FY2025 diluted weighted-average shares",
+              "kind": "fact",
+              "value": 99.231,
+              "unit": "million_shares",
+              "source": {
+                "ref": "ABX/investor-documents/sec-edgar/10-K_20260313_rpt20251231_acc0001628280_26_017775.htm",
+                "locator": "WeightedAverageNumberOfDilutedSharesOutstanding 99,230,950 (FY2025)",
+                "as_of": "2025-12-31",
+                "content_sha256": "55cd073563d08f3380d70047cce7940a01e42e15907182f3402ec54a2f6de304",
+                "source_id": "324896e774fd51d4e4449837cabc52a0808febb711db0b5e9c14a42cf6303331"
+              },
+              "rationale": null
+            },
+            {
+              "id": "net_corporate_claim_m",
+              "label": "Net financial claim on common equity after recourse debt",
+              "kind": "judgment",
+              "value": -272.9,
+              "unit": "USD_m",
+              "source": null,
+              "rationale": "Filing-locked cash less reported debt; low stresses warehouse and ABXL spread widening; high credits non-recourse securitization carve-outs not modeled as full equity reduction."
+            },
+            {
+              "id": "value_per_share",
+              "label": "Net financial claims per share",
+              "kind": "calculation",
+              "value": -2.75014864,
+              "unit": "USD_per_share",
+              "operation": "divide",
+              "formula": "net_corporate_claim_m \u00f7 shares_m",
+              "substituted_formula": "-272.9 \u00f7 99.231",
+              "dependencies": [
+                "net_corporate_claim_m",
+                "shares_m"
+              ]
+            }
+          ],
+          "base": [
+            {
+              "id": "cash_m",
+              "label": "Cash and cash equivalents at March 31, 2026",
+              "kind": "fact",
+              "value": 37.21,
+              "unit": "USD_m",
+              "source": {
+                "ref": "ABX/investor-documents/sec-edgar/10-Q_20260511_rpt20260331_acc0001628280_26_033136.htm",
+                "locator": "CashAndCashEquivalentsAtCarryingValue $37,209,747 at March 31, 2026",
+                "as_of": "2026-03-31",
+                "content_sha256": "6de8f274d475ae0a381d7cb03eb13c54aa4eeacc632a9341f2855bdb7b66fd11",
+                "source_id": "144615364f8d0ec0b56bbd8961d277bb078d2122d7b818d3c3d4fad210f2ce0d"
+              },
+              "rationale": null
+            },
+            {
+              "id": "reported_debt_m",
+              "label": "Reported debt including current maturities and securitized notes",
+              "kind": "fact",
+              "value": 291.844,
+              "unit": "USD_m",
+              "source": {
+                "ref": "ABX/investor-documents/sec-edgar/10-Q_20260511_rpt20260331_acc0001628280_26_033136.htm",
+                "locator": "Current maturities $1.5M + long-term debt $275.8M + securitized notes $14.5M (March 31, 2026)",
+                "as_of": "2026-03-31",
+                "content_sha256": "6de8f274d475ae0a381d7cb03eb13c54aa4eeacc632a9341f2855bdb7b66fd11",
+                "source_id": "e8a3d1ae02de2dda562e8c1c04971a084c25b2c7432b3926e8994f731c0af80b"
+              },
+              "rationale": null
+            },
+            {
+              "id": "shares_m",
+              "label": "FY2025 diluted weighted-average shares",
+              "kind": "fact",
+              "value": 99.231,
+              "unit": "million_shares",
+              "source": {
+                "ref": "ABX/investor-documents/sec-edgar/10-K_20260313_rpt20251231_acc0001628280_26_017775.htm",
+                "locator": "WeightedAverageNumberOfDilutedSharesOutstanding 99,230,950 (FY2025)",
+                "as_of": "2025-12-31",
+                "content_sha256": "55cd073563d08f3380d70047cce7940a01e42e15907182f3402ec54a2f6de304",
+                "source_id": "324896e774fd51d4e4449837cabc52a0808febb711db0b5e9c14a42cf6303331"
+              },
+              "rationale": null
+            },
+            {
+              "id": "net_corporate_claim_m",
+              "label": "Net financial claim on common equity after recourse debt",
+              "kind": "judgment",
+              "value": -255.0,
+              "unit": "USD_m",
+              "source": null,
+              "rationale": "Filing-locked cash less reported debt; low stresses warehouse and ABXL spread widening; high credits non-recourse securitization carve-outs not modeled as full equity reduction."
+            },
+            {
+              "id": "value_per_share",
+              "label": "Net financial claims per share",
+              "kind": "calculation",
+              "value": -2.56976147,
+              "unit": "USD_per_share",
+              "operation": "divide",
+              "formula": "net_corporate_claim_m \u00f7 shares_m",
+              "substituted_formula": "-255 \u00f7 99.231",
+              "dependencies": [
+                "net_corporate_claim_m",
+                "shares_m"
+              ]
+            }
+          ],
+          "high": [
+            {
+              "id": "cash_m",
+              "label": "Cash and cash equivalents at March 31, 2026",
+              "kind": "fact",
+              "value": 37.21,
+              "unit": "USD_m",
+              "source": {
+                "ref": "ABX/investor-documents/sec-edgar/10-Q_20260511_rpt20260331_acc0001628280_26_033136.htm",
+                "locator": "CashAndCashEquivalentsAtCarryingValue $37,209,747 at March 31, 2026",
+                "as_of": "2026-03-31",
+                "content_sha256": "6de8f274d475ae0a381d7cb03eb13c54aa4eeacc632a9341f2855bdb7b66fd11",
+                "source_id": "144615364f8d0ec0b56bbd8961d277bb078d2122d7b818d3c3d4fad210f2ce0d"
+              },
+              "rationale": null
+            },
+            {
+              "id": "reported_debt_m",
+              "label": "Reported debt including current maturities and securitized notes",
+              "kind": "fact",
+              "value": 291.844,
+              "unit": "USD_m",
+              "source": {
+                "ref": "ABX/investor-documents/sec-edgar/10-Q_20260511_rpt20260331_acc0001628280_26_033136.htm",
+                "locator": "Current maturities $1.5M + long-term debt $275.8M + securitized notes $14.5M (March 31, 2026)",
+                "as_of": "2026-03-31",
+                "content_sha256": "6de8f274d475ae0a381d7cb03eb13c54aa4eeacc632a9341f2855bdb7b66fd11",
+                "source_id": "e8a3d1ae02de2dda562e8c1c04971a084c25b2c7432b3926e8994f731c0af80b"
+              },
+              "rationale": null
+            },
+            {
+              "id": "shares_m",
+              "label": "FY2025 diluted weighted-average shares",
+              "kind": "fact",
+              "value": 99.231,
+              "unit": "million_shares",
+              "source": {
+                "ref": "ABX/investor-documents/sec-edgar/10-K_20260313_rpt20251231_acc0001628280_26_017775.htm",
+                "locator": "WeightedAverageNumberOfDilutedSharesOutstanding 99,230,950 (FY2025)",
+                "as_of": "2025-12-31",
+                "content_sha256": "55cd073563d08f3380d70047cce7940a01e42e15907182f3402ec54a2f6de304",
+                "source_id": "324896e774fd51d4e4449837cabc52a0808febb711db0b5e9c14a42cf6303331"
+              },
+              "rationale": null
+            },
+            {
+              "id": "net_corporate_claim_m",
+              "label": "Net financial claim on common equity after recourse debt",
+              "kind": "judgment",
+              "value": -236.2,
+              "unit": "USD_m",
+              "source": null,
+              "rationale": "Filing-locked cash less reported debt; low stresses warehouse and ABXL spread widening; high credits non-recourse securitization carve-outs not modeled as full equity reduction."
+            },
+            {
+              "id": "value_per_share",
+              "label": "Net financial claims per share",
+              "kind": "calculation",
+              "value": -2.38030454,
+              "unit": "USD_per_share",
+              "operation": "divide",
+              "formula": "net_corporate_claim_m \u00f7 shares_m",
+              "substituted_formula": "-236.2 \u00f7 99.231",
+              "dependencies": [
+                "net_corporate_claim_m",
+                "shares_m"
+              ]
+            }
+          ]
+        },
+        "source_lineage": [
+          {
+            "node_id": "cash_m",
+            "ref": "ABX/investor-documents/sec-edgar/10-Q_20260511_rpt20260331_acc0001628280_26_033136.htm",
+            "locator": "CashAndCashEquivalentsAtCarryingValue $37,209,747 at March 31, 2026",
+            "as_of": "2026-03-31",
+            "content_sha256": "6de8f274d475ae0a381d7cb03eb13c54aa4eeacc632a9341f2855bdb7b66fd11",
+            "source_id": "144615364f8d0ec0b56bbd8961d277bb078d2122d7b818d3c3d4fad210f2ce0d"
+          },
+          {
+            "node_id": "reported_debt_m",
+            "ref": "ABX/investor-documents/sec-edgar/10-Q_20260511_rpt20260331_acc0001628280_26_033136.htm",
+            "locator": "Current maturities $1.5M + long-term debt $275.8M + securitized notes $14.5M (March 31, 2026)",
+            "as_of": "2026-03-31",
+            "content_sha256": "6de8f274d475ae0a381d7cb03eb13c54aa4eeacc632a9341f2855bdb7b66fd11",
+            "source_id": "e8a3d1ae02de2dda562e8c1c04971a084c25b2c7432b3926e8994f731c0af80b"
+          },
+          {
+            "node_id": "shares_m",
+            "ref": "ABX/investor-documents/sec-edgar/10-K_20260313_rpt20251231_acc0001628280_26_017775.htm",
+            "locator": "WeightedAverageNumberOfDilutedSharesOutstanding 99,230,950 (FY2025)",
+            "as_of": "2025-12-31",
+            "content_sha256": "55cd073563d08f3380d70047cce7940a01e42e15907182f3402ec54a2f6de304",
+            "source_id": "324896e774fd51d4e4449837cabc52a0808febb711db0b5e9c14a42cf6303331"
+          }
+        ],
+        "checks": {
+          "passed": true,
+          "errors": []
+        },
+        "proof_hash": "000c05eea07ac1aa937739b7c4dfb3f13c11cbbbb29b8c3bc40de465add4b382"
+      },
+      "evidence_tier": "primary_derived",
+      "evidence_level": "primary_derived",
+      "evidence": "Primary bridge from ABX/investor-documents/sec-edgar/10-K_20260313_rpt20251231_acc0001628280_26_017775.htm: FY2025 revenue $235.238M, operating income $88.757M, OCF $25.680465M; ABX/investor-documents/sec-edgar/10-Q_20260511_rpt20260331_acc0001628280_26_033136.htm: Q1 cash $37.21M, debt $291.844M; contract backfill 2026-07-21.",
+      "scenario_assumptions": "Proof outputs {'low': -2.7501, 'base': -2.5698, 'high': -2.3803}; see calculation_proof graph.",
+      "probability_and_timing": null,
+      "tax_and_realization_adjustments": "High case credits partial non-recourse securitization carve-out.",
+      "falsifier": "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
+      "overlap_key": "net_financial_claims",
+      "assumption_type": "judgment"
+    },
+    {
+      "component_id": "longevity_and_funding_reserve",
+      "label": "Longevity, mortality-assumption, and funding-spread stress reserve",
+      "category": "liability_or_reserve",
+      "treatment": "additive",
+      "included_in_component_id": null,
+      "ownership_claim": "Longevity, mortality-assumption, and funding-spread stress reserve",
+      "ownership_percentage": 1.0,
+      "quantity": {
+        "value": 1,
+        "unit": "per-share economic claim"
+      },
+      "method": "net_asset_value",
+      "method_version": "1.0",
+      "method_provenance": {
+        "method_id": "net_asset_value",
+        "version": "1.0",
+        "label": "Reconciled net asset value",
+        "power_zones": [
+          "scarce_asset_optionality",
+          "catalyst_asset_value",
+          "credit_and_normalized_returns"
+        ],
+        "equation": "value_per_share = (gross_assets - senior_claims - tax - realization_costs) / diluted_shares",
+        "sources": [
+          {
+            "ref": "_system/frameworks/scarce_strategic_asset_valuation.md",
+            "locator": "Economic ownership and unit NAV"
+          }
+        ]
+      },
+      "comparable_ids": [],
+      "range_per_share": {
+        "low": -1.2496,
+        "base": -0.5996,
+        "high": -0.1502
+      },
+      "legacy_range_per_share": {
+        "low": -1.25,
+        "base": -0.6,
+        "high": -0.15
+      },
+      "valuation_status": "bounded_estimate",
+      "calculation_proof": {
+        "status": "valid",
+        "method_id": "net_asset_value",
+        "method_version": "1.0",
+        "outputs": {
+          "low": -1.2496,
+          "base": -0.5996,
+          "high": -0.1502
+        },
+        "output_unit": "USD_per_share",
+        "traces": {
+          "low": [
+            {
+              "id": "owner_cash_per_share",
+              "label": "FY2025 GAAP free cash flow per share",
+              "kind": "fact",
+              "value": 0.2494,
+              "unit": "USD_per_share",
+              "source": {
+                "ref": "ABX/investor-documents/sec-edgar/10-K_20260313_rpt20251231_acc0001628280_26_017775.htm",
+                "locator": "FY2025 OCF $25.680465M less capex $0.93M on 99.231M diluted shares",
+                "as_of": "2025-12-31",
+                "content_sha256": "55cd073563d08f3380d70047cce7940a01e42e15907182f3402ec54a2f6de304",
+                "source_id": "604181242049896dd38a457112b6a18551e9a4288832c9443abb679531a829fe"
+              },
+              "rationale": null
+            },
+            {
+              "id": "adjusted_ebitda_m",
+              "label": "FY2025 adjusted EBITDA",
+              "kind": "fact",
+              "value": 132.554,
+              "unit": "USD_m",
+              "source": {
+                "ref": "ABX/investor-documents/sec-edgar/10-K_20260313_rpt20251231_acc0001628280_26_017775.htm",
+                "locator": "Adjusted EBITDA $132.554M (FY2025 non-GAAP reconciliation)",
+                "as_of": "2025-12-31",
+                "content_sha256": "55cd073563d08f3380d70047cce7940a01e42e15907182f3402ec54a2f6de304",
+                "source_id": "9dba34b2bc87637b5f67f3f4cb8504bbf7048ec0c9766bd4f3108cc98832ed04"
+              },
+              "rationale": null
+            },
+            {
+              "id": "shares_m",
+              "label": "FY2025 diluted weighted-average shares",
+              "kind": "fact",
+              "value": 99.231,
+              "unit": "million_shares",
+              "source": {
+                "ref": "ABX/investor-documents/sec-edgar/10-K_20260313_rpt20251231_acc0001628280_26_017775.htm",
+                "locator": "WeightedAverageNumberOfDilutedSharesOutstanding 99,230,950 (FY2025)",
+                "as_of": "2025-12-31",
+                "content_sha256": "55cd073563d08f3380d70047cce7940a01e42e15907182f3402ec54a2f6de304",
+                "source_id": "324896e774fd51d4e4449837cabc52a0808febb711db0b5e9c14a42cf6303331"
+              },
+              "rationale": null
+            },
+            {
+              "id": "reserve_m",
+              "label": "Longevity, mortality-assumption, and funding-spread stress reserve",
+              "kind": "judgment",
+              "value": -124.0,
+              "unit": "USD_m",
+              "source": null,
+              "rationale": "Negative reserve for insured longevity improvements, credit spread widening on ABXL notes, and integration execution risk not fully embedded in operating multiple."
+            },
+            {
+              "id": "value_per_share",
+              "label": "Longevity and funding reserve per share",
+              "kind": "calculation",
+              "value": -1.2496095,
+              "unit": "USD_per_share",
+              "operation": "divide",
+              "formula": "reserve_m \u00f7 shares_m",
+              "substituted_formula": "-124 \u00f7 99.231",
+              "dependencies": [
+                "reserve_m",
+                "shares_m"
+              ]
+            }
+          ],
+          "base": [
+            {
+              "id": "owner_cash_per_share",
+              "label": "FY2025 GAAP free cash flow per share",
+              "kind": "fact",
+              "value": 0.2494,
+              "unit": "USD_per_share",
+              "source": {
+                "ref": "ABX/investor-documents/sec-edgar/10-K_20260313_rpt20251231_acc0001628280_26_017775.htm",
+                "locator": "FY2025 OCF $25.680465M less capex $0.93M on 99.231M diluted shares",
+                "as_of": "2025-12-31",
+                "content_sha256": "55cd073563d08f3380d70047cce7940a01e42e15907182f3402ec54a2f6de304",
+                "source_id": "604181242049896dd38a457112b6a18551e9a4288832c9443abb679531a829fe"
+              },
+              "rationale": null
+            },
+            {
+              "id": "adjusted_ebitda_m",
+              "label": "FY2025 adjusted EBITDA",
+              "kind": "fact",
+              "value": 132.554,
+              "unit": "USD_m",
+              "source": {
+                "ref": "ABX/investor-documents/sec-edgar/10-K_20260313_rpt20251231_acc0001628280_26_017775.htm",
+                "locator": "Adjusted EBITDA $132.554M (FY2025 non-GAAP reconciliation)",
+                "as_of": "2025-12-31",
+                "content_sha256": "55cd073563d08f3380d70047cce7940a01e42e15907182f3402ec54a2f6de304",
+                "source_id": "9dba34b2bc87637b5f67f3f4cb8504bbf7048ec0c9766bd4f3108cc98832ed04"
+              },
+              "rationale": null
+            },
+            {
+              "id": "shares_m",
+              "label": "FY2025 diluted weighted-average shares",
+              "kind": "fact",
+              "value": 99.231,
+              "unit": "million_shares",
+              "source": {
+                "ref": "ABX/investor-documents/sec-edgar/10-K_20260313_rpt20251231_acc0001628280_26_017775.htm",
+                "locator": "WeightedAverageNumberOfDilutedSharesOutstanding 99,230,950 (FY2025)",
+                "as_of": "2025-12-31",
+                "content_sha256": "55cd073563d08f3380d70047cce7940a01e42e15907182f3402ec54a2f6de304",
+                "source_id": "324896e774fd51d4e4449837cabc52a0808febb711db0b5e9c14a42cf6303331"
+              },
+              "rationale": null
+            },
+            {
+              "id": "reserve_m",
+              "label": "Longevity, mortality-assumption, and funding-spread stress reserve",
+              "kind": "judgment",
+              "value": -59.5,
+              "unit": "USD_m",
+              "source": null,
+              "rationale": "Negative reserve for insured longevity improvements, credit spread widening on ABXL notes, and integration execution risk not fully embedded in operating multiple."
+            },
+            {
+              "id": "value_per_share",
+              "label": "Longevity and funding reserve per share",
+              "kind": "calculation",
+              "value": -0.59961101,
+              "unit": "USD_per_share",
+              "operation": "divide",
+              "formula": "reserve_m \u00f7 shares_m",
+              "substituted_formula": "-59.5 \u00f7 99.231",
+              "dependencies": [
+                "reserve_m",
+                "shares_m"
+              ]
+            }
+          ],
+          "high": [
+            {
+              "id": "owner_cash_per_share",
+              "label": "FY2025 GAAP free cash flow per share",
+              "kind": "fact",
+              "value": 0.2494,
+              "unit": "USD_per_share",
+              "source": {
+                "ref": "ABX/investor-documents/sec-edgar/10-K_20260313_rpt20251231_acc0001628280_26_017775.htm",
+                "locator": "FY2025 OCF $25.680465M less capex $0.93M on 99.231M diluted shares",
+                "as_of": "2025-12-31",
+                "content_sha256": "55cd073563d08f3380d70047cce7940a01e42e15907182f3402ec54a2f6de304",
+                "source_id": "604181242049896dd38a457112b6a18551e9a4288832c9443abb679531a829fe"
+              },
+              "rationale": null
+            },
+            {
+              "id": "adjusted_ebitda_m",
+              "label": "FY2025 adjusted EBITDA",
+              "kind": "fact",
+              "value": 132.554,
+              "unit": "USD_m",
+              "source": {
+                "ref": "ABX/investor-documents/sec-edgar/10-K_20260313_rpt20251231_acc0001628280_26_017775.htm",
+                "locator": "Adjusted EBITDA $132.554M (FY2025 non-GAAP reconciliation)",
+                "as_of": "2025-12-31",
+                "content_sha256": "55cd073563d08f3380d70047cce7940a01e42e15907182f3402ec54a2f6de304",
+                "source_id": "9dba34b2bc87637b5f67f3f4cb8504bbf7048ec0c9766bd4f3108cc98832ed04"
+              },
+              "rationale": null
+            },
+            {
+              "id": "shares_m",
+              "label": "FY2025 diluted weighted-average shares",
+              "kind": "fact",
+              "value": 99.231,
+              "unit": "million_shares",
+              "source": {
+                "ref": "ABX/investor-documents/sec-edgar/10-K_20260313_rpt20251231_acc0001628280_26_017775.htm",
+                "locator": "WeightedAverageNumberOfDilutedSharesOutstanding 99,230,950 (FY2025)",
+                "as_of": "2025-12-31",
+                "content_sha256": "55cd073563d08f3380d70047cce7940a01e42e15907182f3402ec54a2f6de304",
+                "source_id": "324896e774fd51d4e4449837cabc52a0808febb711db0b5e9c14a42cf6303331"
+              },
+              "rationale": null
+            },
+            {
+              "id": "reserve_m",
+              "label": "Longevity, mortality-assumption, and funding-spread stress reserve",
+              "kind": "judgment",
+              "value": -14.9,
+              "unit": "USD_m",
+              "source": null,
+              "rationale": "Negative reserve for insured longevity improvements, credit spread widening on ABXL notes, and integration execution risk not fully embedded in operating multiple."
+            },
+            {
+              "id": "value_per_share",
+              "label": "Longevity and funding reserve per share",
+              "kind": "calculation",
+              "value": -0.15015469,
+              "unit": "USD_per_share",
+              "operation": "divide",
+              "formula": "reserve_m \u00f7 shares_m",
+              "substituted_formula": "-14.9 \u00f7 99.231",
+              "dependencies": [
+                "reserve_m",
+                "shares_m"
+              ]
+            }
+          ]
+        },
+        "source_lineage": [
+          {
+            "node_id": "owner_cash_per_share",
+            "ref": "ABX/investor-documents/sec-edgar/10-K_20260313_rpt20251231_acc0001628280_26_017775.htm",
+            "locator": "FY2025 OCF $25.680465M less capex $0.93M on 99.231M diluted shares",
+            "as_of": "2025-12-31",
+            "content_sha256": "55cd073563d08f3380d70047cce7940a01e42e15907182f3402ec54a2f6de304",
+            "source_id": "604181242049896dd38a457112b6a18551e9a4288832c9443abb679531a829fe"
+          },
+          {
+            "node_id": "adjusted_ebitda_m",
+            "ref": "ABX/investor-documents/sec-edgar/10-K_20260313_rpt20251231_acc0001628280_26_017775.htm",
+            "locator": "Adjusted EBITDA $132.554M (FY2025 non-GAAP reconciliation)",
+            "as_of": "2025-12-31",
+            "content_sha256": "55cd073563d08f3380d70047cce7940a01e42e15907182f3402ec54a2f6de304",
+            "source_id": "9dba34b2bc87637b5f67f3f4cb8504bbf7048ec0c9766bd4f3108cc98832ed04"
+          },
+          {
+            "node_id": "shares_m",
+            "ref": "ABX/investor-documents/sec-edgar/10-K_20260313_rpt20251231_acc0001628280_26_017775.htm",
+            "locator": "WeightedAverageNumberOfDilutedSharesOutstanding 99,230,950 (FY2025)",
+            "as_of": "2025-12-31",
+            "content_sha256": "55cd073563d08f3380d70047cce7940a01e42e15907182f3402ec54a2f6de304",
+            "source_id": "324896e774fd51d4e4449837cabc52a0808febb711db0b5e9c14a42cf6303331"
+          }
+        ],
+        "checks": {
+          "passed": true,
+          "errors": []
+        },
+        "proof_hash": "ef1159c98d10cb9fda10d5699f623602a8cd1c0bd593674aaad202e0756d6ac4"
+      },
+      "evidence_tier": "primary_derived",
+      "evidence_level": "primary_derived",
+      "evidence": "Primary bridge from ABX/investor-documents/sec-edgar/10-K_20260313_rpt20251231_acc0001628280_26_017775.htm: FY2025 revenue $235.238M, operating income $88.757M, OCF $25.680465M; ABX/investor-documents/sec-edgar/10-Q_20260511_rpt20260331_acc0001628280_26_033136.htm: Q1 cash $37.21M, debt $291.844M; contract backfill 2026-07-21.",
+      "scenario_assumptions": "Proof outputs {'low': -1.2496, 'base': -0.5996, 'high': -0.1502}; see calculation_proof graph.",
+      "probability_and_timing": null,
+      "tax_and_realization_adjustments": "Separate from operating multiple; captures longevity and ABXL spread stress.",
+      "falsifier": "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
+      "overlap_key": "longevity_and_funding_reserve",
+      "assumption_type": "judgment"
+    }
+  ],
   "component_coverage": {
-    "all_material_components_identified": false,
-    "material_component_count": 0,
-    "additive_component_count": 0,
+    "all_material_components_identified": true,
+    "material_component_count": 5,
+    "additive_component_count": 5,
     "embedded_component_count": 0,
-    "unvalued_component_count": 1,
+    "unvalued_component_count": 0,
     "double_counting_flags": []
   },
   "input_classification": {
     "facts": [],
     "estimates": [],
-    "judgments": []
+    "judgments": [
+      {
+        "component_id": "life_solutions_engine",
+        "label": "Life Solutions origination, servicing, and policy spread engine",
+        "kind": "judgment",
+        "evidence_tier": "primary_derived",
+        "evidence": "Primary bridge from ABX/investor-documents/sec-edgar/10-K_20260313_rpt20251231_acc0001628280_26_017775.htm: FY2025 revenue $235.238M, operating income $88.757M, OCF $25.680465M; ABX/investor-documents/sec-edgar/10-Q_20260511_rpt20260331_acc0001628280_26_033136.htm: Q1 cash $37.21M, debt $291.844M; contract backfill 2026-07-21.",
+        "method": "owner_earnings_reinvestment_dcf",
+        "valuation_status": "bounded_estimate"
+      },
+      {
+        "component_id": "asset_management_franchise",
+        "label": "Asset Management fee franchise (FCF Advisors and managed accounts)",
+        "kind": "judgment",
+        "evidence_tier": "primary_derived",
+        "evidence": "Primary bridge from ABX/investor-documents/sec-edgar/10-K_20260313_rpt20251231_acc0001628280_26_017775.htm: FY2025 revenue $235.238M, operating income $88.757M, OCF $25.680465M; ABX/investor-documents/sec-edgar/10-Q_20260511_rpt20260331_acc0001628280_26_033136.htm: Q1 cash $37.21M, debt $291.844M; contract backfill 2026-07-21.",
+        "method": "owner_cash_or_dividend_discount",
+        "valuation_status": "bounded_estimate"
+      },
+      {
+        "component_id": "technology_platform_option",
+        "label": "Abacus Intel mortality-verification platform option",
+        "kind": "judgment",
+        "evidence_tier": "primary_derived",
+        "evidence": "Primary bridge from ABX/investor-documents/sec-edgar/10-K_20260313_rpt20251231_acc0001628280_26_017775.htm: FY2025 revenue $235.238M, operating income $88.757M, OCF $25.680465M; ABX/investor-documents/sec-edgar/10-Q_20260511_rpt20260331_acc0001628280_26_033136.htm: Q1 cash $37.21M, debt $291.844M; contract backfill 2026-07-21.",
+        "method": "risk_adjusted_milestone_value",
+        "valuation_status": "bounded_estimate"
+      },
+      {
+        "component_id": "net_financial_claims",
+        "label": "Net cash and recourse debt claims on common equity",
+        "kind": "judgment",
+        "evidence_tier": "primary_derived",
+        "evidence": "Primary bridge from ABX/investor-documents/sec-edgar/10-K_20260313_rpt20251231_acc0001628280_26_017775.htm: FY2025 revenue $235.238M, operating income $88.757M, OCF $25.680465M; ABX/investor-documents/sec-edgar/10-Q_20260511_rpt20260331_acc0001628280_26_033136.htm: Q1 cash $37.21M, debt $291.844M; contract backfill 2026-07-21.",
+        "method": "net_asset_value",
+        "valuation_status": "bounded_estimate"
+      },
+      {
+        "component_id": "longevity_and_funding_reserve",
+        "label": "Longevity, mortality-assumption, and funding-spread stress reserve",
+        "kind": "judgment",
+        "evidence_tier": "primary_derived",
+        "evidence": "Primary bridge from ABX/investor-documents/sec-edgar/10-K_20260313_rpt20251231_acc0001628280_26_017775.htm: FY2025 revenue $235.238M, operating income $88.757M, OCF $25.680465M; ABX/investor-documents/sec-edgar/10-Q_20260511_rpt20260331_acc0001628280_26_033136.htm: Q1 cash $37.21M, debt $291.844M; contract backfill 2026-07-21.",
+        "method": "net_asset_value",
+        "valuation_status": "bounded_estimate"
+      }
+    ]
   },
   "method_route": {
     "schema_version": "2.0",
     "status": "routed",
     "profile_id": "quality_reinvestment",
     "label": "High-return compounder",
-    "score": 6.0,
+    "score": 10.0,
     "reasons": [
-      "archetype=platform"
+      "archetype=platform",
+      "component categories=operating_business",
+      "existing methods=dcf, owner_cash, reinvestment"
     ],
     "primary_methods": [
       "owner_earnings_reinvestment_dcf"
@@ -61,42 +1540,73 @@
       "stock compensation or acquisitions omitted",
       "terminal value unsupported by a durable mechanism"
     ],
-    "secondary_profiles": [],
+    "secondary_profiles": [
+      {
+        "profile_id": "predictable_cash_flow",
+        "score": 3.0,
+        "reasons": [
+          "component categories=operating_business",
+          "existing methods=dividend, owner_cash"
+        ]
+      },
+      {
+        "profile_id": "binary_milestone",
+        "score": 3.0,
+        "reasons": [
+          "component categories=real_option",
+          "existing methods=milestone, risk_adjusted"
+        ]
+      }
+    ],
     "scorecard": {
       "scarce_asset_optionality": {
-        "score": 0.0,
-        "reasons": []
+        "score": 1.0,
+        "reasons": [
+          "component categories=real_option"
+        ]
       },
       "quality_reinvestment": {
-        "score": 6.0,
+        "score": 10.0,
         "reasons": [
-          "archetype=platform"
+          "archetype=platform",
+          "component categories=operating_business",
+          "existing methods=dcf, owner_cash, reinvestment"
         ]
       },
       "capital_cycle": {
-        "score": 0.0,
-        "reasons": []
+        "score": 1.0,
+        "reasons": [
+          "component categories=operating_business"
+        ]
       },
       "credit_and_normalized_returns": {
-        "score": 0.0,
-        "reasons": []
+        "score": 1.0,
+        "reasons": [
+          "component categories=liability_or_reserve"
+        ]
       },
       "catalyst_asset_value": {
         "score": 0.0,
         "reasons": []
       },
       "predictable_cash_flow": {
-        "score": 0.0,
-        "reasons": []
+        "score": 3.0,
+        "reasons": [
+          "component categories=operating_business",
+          "existing methods=dividend, owner_cash"
+        ]
       },
       "binary_milestone": {
-        "score": 0.0,
-        "reasons": []
+        "score": 3.0,
+        "reasons": [
+          "component categories=real_option",
+          "existing methods=milestone, risk_adjusted"
+        ]
       }
     },
     "decision_rule": "Power Zones select the fitting economic method and eligible independent reviewers; they never choose the valuation answer or capital decision.",
     "ticker": "ABX",
-    "as_of": "2026-07-20",
+    "as_of": "2026-07-21",
     "route_source": "canonical_power_zone_router",
     "config_path": "_system/frameworks/power_zones.json",
     "config_updated": "2026-07-14",
@@ -152,74 +1662,237 @@
         }
       ]
     },
-    "input_hash": "e9e12d4596995c271bc543394792d07a1ac2f1cf88d3a168d171090fd2c8e5c2",
-    "generated_at": "2026-07-20T17:13:53.774582+00:00"
+    "input_hash": "fbd81964b2fedb0be0068ad21c492ebf9a82f7d3ae42959111c24090a803e67c",
+    "generated_at": "2026-07-21T12:31:08.612865+00:00"
   },
   "market": {
-    "price_per_share": 9.25,
+    "price_per_share": 10.26,
     "fully_diluted_shares": null,
     "market_cap_m": null,
     "enterprise_value_m": null
   },
   "valuation": {
     "value_per_share": {
-      "low": null,
-      "base": null,
-      "high": null
+      "low": -1.9497,
+      "base": 1.2901,
+      "high": 4.9197
     },
     "priced_components_per_share": {
-      "low": 0,
-      "base": 0,
-      "high": 0
+      "low": -1.9497,
+      "base": 1.2901,
+      "high": 4.9197
     },
-    "legacy_value_per_share": null,
-    "probability_weighted_value_per_share": null,
+    "legacy_value_per_share": {
+      "low": -1.95,
+      "base": 1.29,
+      "high": 4.92
+    },
+    "probability_weighted_value_per_share": 1.2901,
     "expected_distributions_per_share": 0.0,
     "annualized_return_at_price_pct": {
       "low": null,
-      "base": null,
-      "high": null
+      "base": -25.64,
+      "high": -9.97
     },
-    "downside_to_low_pct": null,
+    "downside_to_low_pct": -119.0,
     "horizon_years": 7,
     "interpretation": "value_per_share is withheld while any material additive component is unpriced; priced_components_per_share is not a complete security value."
   },
   "scenario_contract": {
     "rule": "Cases must change cited causal operating, capital, probability, timing, or financing drivers\u2014not only a terminal multiple.",
-    "top_value_drivers": [],
+    "top_value_drivers": [
+      {
+        "component_id": "life_solutions_engine",
+        "label": "Life Solutions origination, servicing, and policy spread engine",
+        "valuation_status": "bounded_estimate",
+        "base_per_share": 3.58,
+        "legacy_base_per_share": 3.58,
+        "range_width_per_share": 3.58,
+        "scenario_assumptions": "Proof outputs {'low': 1.79, 'base': 3.58, 'high': 5.37}; see calculation_proof graph."
+      },
+      {
+        "component_id": "longevity_and_funding_reserve",
+        "label": "Longevity, mortality-assumption, and funding-spread stress reserve",
+        "valuation_status": "bounded_estimate",
+        "base_per_share": -0.5996,
+        "legacy_base_per_share": -0.6,
+        "range_width_per_share": 1.0994,
+        "scenario_assumptions": "Proof outputs {'low': -1.2496, 'base': -0.5996, 'high': -0.1502}; see calculation_proof graph."
+      },
+      {
+        "component_id": "asset_management_franchise",
+        "label": "Asset Management fee franchise (FCF Advisors and managed accounts)",
+        "valuation_status": "bounded_estimate",
+        "base_per_share": 0.68,
+        "legacy_base_per_share": 0.68,
+        "range_width_per_share": 1.02,
+        "scenario_assumptions": "Proof outputs {'low': 0.26, 'base': 0.68, 'high': 1.28}; see calculation_proof graph."
+      },
+      {
+        "component_id": "technology_platform_option",
+        "label": "Abacus Intel mortality-verification platform option",
+        "valuation_status": "bounded_estimate",
+        "base_per_share": 0.1995,
+        "legacy_base_per_share": 0.2,
+        "range_width_per_share": 0.8002,
+        "scenario_assumptions": "Proof outputs {'low': 0.0, 'base': 0.1995, 'high': 0.8002}; see calculation_proof graph."
+      },
+      {
+        "component_id": "net_financial_claims",
+        "label": "Net cash and recourse debt claims on common equity",
+        "valuation_status": "bounded_estimate",
+        "base_per_share": -2.5698,
+        "legacy_base_per_share": -2.57,
+        "range_width_per_share": 0.3698,
+        "scenario_assumptions": "Proof outputs {'low': -2.7501, 'base': -2.5698, 'high': -2.3803}; see calculation_proof graph."
+      }
+    ],
     "reverse_expectations": null
   },
   "calculation_proof_summary": {
-    "component_count": 0,
-    "priced_component_count": 0,
-    "proof_complete_pct": 0.0,
+    "component_count": 5,
+    "priced_component_count": 5,
+    "proof_complete_pct": 100.0,
     "status_counts": {
-      "bounded_estimate": 0,
+      "bounded_estimate": 5,
       "calculated": 0,
       "legacy_sensitivity": 0,
       "unpriced": 0
     },
-    "all_material_components_priced": false,
+    "all_material_components_priced": true,
     "calculation_errors": [],
-    "aggregate_proof_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    "aggregate_proof_hash": "950b904c1727fafd621fb4e2a3c290ca443ac66465eca412282a282991f50381"
   },
-  "source_lineage": [],
+  "source_lineage": [
+    {
+      "component_id": "life_solutions_engine",
+      "node_id": "operating_income_m",
+      "ref": "ABX/investor-documents/sec-edgar/10-K_20260313_rpt20251231_acc0001628280_26_017775.htm",
+      "locator": "OperatingIncomeLoss $88.757M (FY2025)",
+      "as_of": "2025-12-31",
+      "content_sha256": "55cd073563d08f3380d70047cce7940a01e42e15907182f3402ec54a2f6de304",
+      "source_id": "4038323cc90b2d464ab9875444d01e03949c7ec89a6e2bfc2cc74584a1f03215"
+    },
+    {
+      "component_id": "life_solutions_engine",
+      "node_id": "shares_m",
+      "ref": "ABX/investor-documents/sec-edgar/10-K_20260313_rpt20251231_acc0001628280_26_017775.htm",
+      "locator": "WeightedAverageNumberOfDilutedSharesOutstanding 99,230,950 (FY2025)",
+      "as_of": "2025-12-31",
+      "content_sha256": "55cd073563d08f3380d70047cce7940a01e42e15907182f3402ec54a2f6de304",
+      "source_id": "324896e774fd51d4e4449837cabc52a0808febb711db0b5e9c14a42cf6303331"
+    },
+    {
+      "component_id": "asset_management_franchise",
+      "node_id": "asset_management_revenue_m",
+      "ref": "ABX/investor-documents/sec-edgar/10-K_20260313_rpt20251231_acc0001628280_26_017775.htm",
+      "locator": "Asset Management segment revenue $33.8M of $235.2M total (FY2025 segment note)",
+      "as_of": "2025-12-31",
+      "content_sha256": "55cd073563d08f3380d70047cce7940a01e42e15907182f3402ec54a2f6de304",
+      "source_id": "c05c64ad10bc3ed22f9640a5b286fe143e485cc9cbefb06d199ff93881969515"
+    },
+    {
+      "component_id": "asset_management_franchise",
+      "node_id": "shares_m",
+      "ref": "ABX/investor-documents/sec-edgar/10-K_20260313_rpt20251231_acc0001628280_26_017775.htm",
+      "locator": "WeightedAverageNumberOfDilutedSharesOutstanding 99,230,950 (FY2025)",
+      "as_of": "2025-12-31",
+      "content_sha256": "55cd073563d08f3380d70047cce7940a01e42e15907182f3402ec54a2f6de304",
+      "source_id": "324896e774fd51d4e4449837cabc52a0808febb711db0b5e9c14a42cf6303331"
+    },
+    {
+      "component_id": "technology_platform_option",
+      "node_id": "technology_revenue_m",
+      "ref": "ABX/investor-documents/sec-edgar/10-K_20260313_rpt20251231_acc0001628280_26_017775.htm",
+      "locator": "Technology Services segment revenue $0.7M; Abacus Intel launched Q4 2024",
+      "as_of": "2025-12-31",
+      "content_sha256": "55cd073563d08f3380d70047cce7940a01e42e15907182f3402ec54a2f6de304",
+      "source_id": "fca6b2751230becc88e414cf57a4fce2f38f6205feacec4945b8b3fa1a331372"
+    },
+    {
+      "component_id": "technology_platform_option",
+      "node_id": "shares_m",
+      "ref": "ABX/investor-documents/sec-edgar/10-K_20260313_rpt20251231_acc0001628280_26_017775.htm",
+      "locator": "WeightedAverageNumberOfDilutedSharesOutstanding 99,230,950 (FY2025)",
+      "as_of": "2025-12-31",
+      "content_sha256": "55cd073563d08f3380d70047cce7940a01e42e15907182f3402ec54a2f6de304",
+      "source_id": "324896e774fd51d4e4449837cabc52a0808febb711db0b5e9c14a42cf6303331"
+    },
+    {
+      "component_id": "net_financial_claims",
+      "node_id": "cash_m",
+      "ref": "ABX/investor-documents/sec-edgar/10-Q_20260511_rpt20260331_acc0001628280_26_033136.htm",
+      "locator": "CashAndCashEquivalentsAtCarryingValue $37,209,747 at March 31, 2026",
+      "as_of": "2026-03-31",
+      "content_sha256": "6de8f274d475ae0a381d7cb03eb13c54aa4eeacc632a9341f2855bdb7b66fd11",
+      "source_id": "144615364f8d0ec0b56bbd8961d277bb078d2122d7b818d3c3d4fad210f2ce0d"
+    },
+    {
+      "component_id": "net_financial_claims",
+      "node_id": "reported_debt_m",
+      "ref": "ABX/investor-documents/sec-edgar/10-Q_20260511_rpt20260331_acc0001628280_26_033136.htm",
+      "locator": "Current maturities $1.5M + long-term debt $275.8M + securitized notes $14.5M (March 31, 2026)",
+      "as_of": "2026-03-31",
+      "content_sha256": "6de8f274d475ae0a381d7cb03eb13c54aa4eeacc632a9341f2855bdb7b66fd11",
+      "source_id": "e8a3d1ae02de2dda562e8c1c04971a084c25b2c7432b3926e8994f731c0af80b"
+    },
+    {
+      "component_id": "net_financial_claims",
+      "node_id": "shares_m",
+      "ref": "ABX/investor-documents/sec-edgar/10-K_20260313_rpt20251231_acc0001628280_26_017775.htm",
+      "locator": "WeightedAverageNumberOfDilutedSharesOutstanding 99,230,950 (FY2025)",
+      "as_of": "2025-12-31",
+      "content_sha256": "55cd073563d08f3380d70047cce7940a01e42e15907182f3402ec54a2f6de304",
+      "source_id": "324896e774fd51d4e4449837cabc52a0808febb711db0b5e9c14a42cf6303331"
+    },
+    {
+      "component_id": "longevity_and_funding_reserve",
+      "node_id": "owner_cash_per_share",
+      "ref": "ABX/investor-documents/sec-edgar/10-K_20260313_rpt20251231_acc0001628280_26_017775.htm",
+      "locator": "FY2025 OCF $25.680465M less capex $0.93M on 99.231M diluted shares",
+      "as_of": "2025-12-31",
+      "content_sha256": "55cd073563d08f3380d70047cce7940a01e42e15907182f3402ec54a2f6de304",
+      "source_id": "604181242049896dd38a457112b6a18551e9a4288832c9443abb679531a829fe"
+    },
+    {
+      "component_id": "longevity_and_funding_reserve",
+      "node_id": "adjusted_ebitda_m",
+      "ref": "ABX/investor-documents/sec-edgar/10-K_20260313_rpt20251231_acc0001628280_26_017775.htm",
+      "locator": "Adjusted EBITDA $132.554M (FY2025 non-GAAP reconciliation)",
+      "as_of": "2025-12-31",
+      "content_sha256": "55cd073563d08f3380d70047cce7940a01e42e15907182f3402ec54a2f6de304",
+      "source_id": "9dba34b2bc87637b5f67f3f4cb8504bbf7048ec0c9766bd4f3108cc98832ed04"
+    },
+    {
+      "component_id": "longevity_and_funding_reserve",
+      "node_id": "shares_m",
+      "ref": "ABX/investor-documents/sec-edgar/10-K_20260313_rpt20251231_acc0001628280_26_017775.htm",
+      "locator": "WeightedAverageNumberOfDilutedSharesOutstanding 99,230,950 (FY2025)",
+      "as_of": "2025-12-31",
+      "content_sha256": "55cd073563d08f3380d70047cce7940a01e42e15907182f3402ec54a2f6de304",
+      "source_id": "324896e774fd51d4e4449837cabc52a0808febb711db0b5e9c14a42cf6303331"
+    }
+  ],
   "model_checks": {
     "calculation_graphs_valid": true,
-    "component_sum_reconciles": false,
+    "component_sum_reconciles": true,
     "no_double_counting": true,
-    "all_material_components_priced": false,
+    "all_material_components_priced": true,
     "low_base_high_ordered": true
   },
   "evidence": {
-    "unresolved_count": 1,
-    "blockers": [
-      "A complete economic ownership map has not been supplied."
-    ],
+    "unresolved_count": 0,
+    "blockers": [],
     "validation_errors": []
   },
   "monitoring": {
-    "falsifiers": [],
+    "falsifiers": [
+      "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
+      "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
+      "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
+      "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
+      "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case."
+    ],
     "required_refresh_triggers": [
       "new filing or material operating update",
       "capital-structure change",
@@ -228,8 +1901,13 @@
     ]
   },
   "change_control": {
-    "model_hash": "32ac0f0b0ff16b2ca23494e46ba544e7e554fb627245514c8268df5fcaca55ed",
-    "method_versions": [],
+    "model_hash": "9dd04745db4b24884fc89ce0af3da16389e4544f3e1389a2be66c48ea55dc3ca",
+    "method_versions": [
+      "net_asset_value@1.0",
+      "owner_cash_or_dividend_discount@1.0",
+      "owner_earnings_reinvestment_dcf@1.0",
+      "risk_adjusted_milestone_value@1.0"
+    ],
     "change_log": [],
     "rule": "A source fact is locked. Every assumption change requires a reason, author, timestamp, and before/after value."
   },
