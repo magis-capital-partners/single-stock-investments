@@ -1,14 +1,566 @@
 {
   "ticker": "AFRM",
-  "as_of": "2026-07-20",
-  "method": "price_stub",
+  "as_of": "2026-07-21",
+  "method": "full",
+  "irr_method": "full",
+  "lawrence_bucket": "multi_sided",
+  "valuation_mode": "operating",
+  "payoff_lens": "operating",
+  "classification_inputs": {
+    "archetype": "platform",
+    "moat": "narrow",
+    "dhando": "partial",
+    "cycle": "mid",
+    "payoff_lens": "operating",
+    "predictive_attribute": "growth_premium"
+  },
   "inputs": {
     "price": 75.32,
+    "price_source": "Yahoo AFRM close 2026-07-20",
     "price_as_of": "2026-07-20",
-    "price_source": "Yahoo AFRM close 2026-07-20"
+    "shares_millions": 348.6,
+    "shares_outstanding": 348556556,
+    "shares_source": "Q3 FY2026 YTD diluted shares 348,556,556 (AFRM/investor-documents/sec-edgar/10-Q_20260507_rpt20260331_acc0001628280_26_032294.htm)",
+    "fcf_per_share": 2.33,
+    "fcf_source": "FY2025 operating cash flow $793.909M \u00f7 341.023566M shares; total revenue $3224.412M and provision for credit losses $616.683M (AFRM/investor-documents/sec-edgar/10-K_20250828_rpt20250630_acc0001820953_25_000080.htm)",
+    "cash_m": 1723.413,
+    "corporate_debt_m": 1128.617,
+    "securitization_debt_m": 7745.3,
+    "revenue_fy2025_m": 3224.412,
+    "merchant_rev_fy2025_m": 1113.966,
+    "normalization_note": "Affirm consolidates merchant network fees and interest income on loans; Lawrence base uses FY2025 operating cash flow per share, not GAAP net income alone. Securitization funding debt is reserved separately from corporate liquidity."
   },
-  "notes": "Price stub created by fetch_equity_prices.py --create-stub; replace with a real model before decision-grade.",
-  "human_review": {
-    "live_price_confirmed": false
+  "scenarios": {
+    "bear": {
+      "growth_y1_5": -0.02,
+      "growth_y6_10": 0.0,
+      "exit_pfcf_y10": 10,
+      "notes": "Credit recession, higher funding spreads, merchant take-rate pressure"
+    },
+    "base": {
+      "growth_y1_5": 0.1,
+      "growth_y6_10": 0.06,
+      "exit_pfcf_y10": 16,
+      "notes": "Continued GMV growth with stable credit losses; OCF normalized off FY2025"
+    },
+    "bull": {
+      "growth_y1_5": 0.18,
+      "growth_y6_10": 0.1,
+      "exit_pfcf_y10": 22,
+      "notes": "Affirm Card and wallet scale; funding cost advantage persists"
+    }
+  },
+  "option_scan": [
+    {
+      "q": 1,
+      "question": "GAAP book misstates core assets?",
+      "answer": "Partial",
+      "treatment": "embedded_in_segment",
+      "evidence": "Loan receivables marked at amortized cost; merchant relationships not capitalized"
+    },
+    {
+      "q": 2,
+      "question": "Undeveloped reserves / dormant assets?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "Operating BNPL platform; no land or royalty pattern"
+    },
+    {
+      "q": 3,
+      "question": "In-business loss segment?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "FY2025 operating income $1.20B and net income $985M (10-K)"
+    },
+    {
+      "q": 4,
+      "question": "Backlog / contracted revenue not in FCF path?",
+      "answer": "Yes",
+      "treatment": "milestone_nav",
+      "evidence": "Affirm Card and wallet expansion modeled in wallet_and_card_option component"
+    },
+    {
+      "q": 5,
+      "question": "Private or illiquid stakes below fair value?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "No material private equity stakes (10-K)"
+    },
+    {
+      "q": 6,
+      "question": "Transitory distribution / legal recovery?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "No special dividend or litigation recovery catalyst"
+    }
+  ],
+  "growth_explanation": {
+    "mechanism": "Gross merchandise volume drives merchant network revenue and loan originations; interest income scales with receivables while funding costs and credit losses determine owner cash conversion.",
+    "source": "AFRM/investor-documents/sec-edgar/10-K_20250828_rpt20250630_acc0001820953_25_000080.htm revenue $3.22B and OCF $794M",
+    "falsifiers": [
+      {
+        "id": "credit_loss_spike",
+        "trigger": "Provision for credit losses exceeds 25% of total revenue for two consecutive quarters",
+        "source": "10-Q credit quality disclosures"
+      },
+      {
+        "id": "funding_stress",
+        "trigger": "Weighted-average funding cost rises more than 200 bps YoY while GMV growth slows below 5%",
+        "source": "10-K funding and liquidity note"
+      }
+    ]
+  },
+  "lawrence_horizon_years": 7,
+  "stance_proposal": {
+    "suggested": "watch",
+    "irr_band": "<15%",
+    "gates": {
+      "moat_ok": true,
+      "dhando_ok": true
+    },
+    "override_reason": null
+  },
+  "component_valuation": {
+    "schema_version": "1.0",
+    "all_material_components_identified": true,
+    "coverage_statement": "Four additive components map platform owner cash, wallet/card option, net corporate liquidity, and credit/funding stress reserve once each.",
+    "components": [
+      {
+        "id": "platform_owner_cash_engine",
+        "label": "BNPL platform owner cash (merchant network and interest economics)",
+        "category": "operating_business",
+        "overlap_key": "platform_owner_cash_engine",
+        "treatment": "additive",
+        "valuation": {
+          "method": "owner_cash_or_dividend_discount",
+          "basis": "per_share",
+          "low": 13.9701,
+          "base": 20.9499,
+          "high": 30.26,
+          "evidence_tier": "primary_derived",
+          "evidence": "Primary bridge from AFRM/investor-documents/sec-edgar/10-K_20250828_rpt20250630_acc0001820953_25_000080.htm: FY2025 revenue $3224.412M, OCF $793.909M, provision $616.683M; AFRM/investor-documents/sec-edgar/10-Q_20260507_rpt20260331_acc0001628280_26_032294.htm: cash $1723.413M, corporate debt $1128.617M; contract backfill 2026-07-21.",
+          "assumption_summary": "Proof outputs {'low': 13.9701, 'base': 20.9499, 'high': 30.26}; see calculation_proof graph.",
+          "cross_check": "Reconcile to FY2025 10-K and Q3 FY2026 10-Q before decision use.",
+          "falsifier": "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
+          "valuation_status": "bounded_estimate",
+          "calculation_proof": {
+            "schema_version": "1.0",
+            "method_id": "owner_cash_or_dividend_discount",
+            "method_version": "1.0",
+            "output_unit": "USD_per_share",
+            "inputs": [
+              {
+                "id": "operating_cash_flow_m",
+                "label": "FY2025 net cash from operating activities",
+                "kind": "fact",
+                "value": 793.909,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "AFRM/investor-documents/sec-edgar/10-K_20250828_rpt20250630_acc0001820953_25_000080.htm",
+                  "locator": "NetCashProvidedByUsedInOperatingActivities $793.909M for year ended June 30, 2025",
+                  "as_of": "2025-06-30"
+                },
+                "locked": true
+              },
+              {
+                "id": "operating_income_m",
+                "label": "FY2025 operating income",
+                "kind": "fact",
+                "value": 1200.862,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "AFRM/investor-documents/sec-edgar/10-K_20250828_rpt20250630_acc0001820953_25_000080.htm",
+                  "locator": "OperatingIncomeLoss $1,200.862M for year ended June 30, 2025",
+                  "as_of": "2025-06-30"
+                },
+                "locked": true
+              },
+              {
+                "id": "shares_fy_m",
+                "label": "FY2025 weighted-average diluted shares",
+                "kind": "fact",
+                "value": 341.023566,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "AFRM/investor-documents/sec-edgar/10-K_20250828_rpt20250630_acc0001820953_25_000080.htm",
+                  "locator": "WeightedAverageNumberOfDilutedSharesOutstanding 341,023,566 (FY2025)",
+                  "as_of": "2025-06-30"
+                },
+                "locked": true
+              }
+            ],
+            "assumptions": [
+              {
+                "id": "owner_cash_per_share",
+                "label": "Normalized owner cash per diluted share (OCF proxy)",
+                "kind": "judgment",
+                "values": {
+                  "low": 2.328,
+                  "base": 2.328,
+                  "high": 2.328
+                },
+                "unit": "USD_per_share",
+                "rationale": "FY2025 operating cash flow per share anchors platform economics; interest income and merchant fees flow through consolidated OCF after loan-loss and funding cash effects.",
+                "allowed_range": {
+                  "min": 0.0,
+                  "max": 8.0
+                }
+              },
+              {
+                "id": "capitalization_multiple",
+                "label": "Duration-adjusted owner-cash capitalization multiple",
+                "kind": "judgment",
+                "values": {
+                  "low": 6.0009,
+                  "base": 8.9991,
+                  "high": 12.9983
+                },
+                "unit": "multiple",
+                "rationale": "Bear stresses credit losses and funding spreads; base mid-cycle seven-year path; bull modest share gains without peak-cycle heroics.",
+                "allowed_range": {
+                  "min": 4.0,
+                  "max": 18.0
+                }
+              }
+            ],
+            "calculations": [
+              {
+                "id": "value_per_share",
+                "label": "Platform owner-cash engine per share",
+                "op": "multiply",
+                "args": [
+                  "owner_cash_per_share",
+                  "capitalization_multiple"
+                ],
+                "unit": "USD_per_share"
+              }
+            ],
+            "outputs": {
+              "low": "value_per_share",
+              "base": "value_per_share",
+              "high": "value_per_share"
+            }
+          }
+        }
+      },
+      {
+        "id": "wallet_and_card_option",
+        "label": "Affirm Card, debit, and consumer wallet expansion",
+        "category": "real_option",
+        "overlap_key": "wallet_and_card_option",
+        "treatment": "additive",
+        "valuation": {
+          "method": "risk_adjusted_milestone_value",
+          "basis": "per_share",
+          "low": 0.0,
+          "base": 8.0001,
+          "high": 21.9999,
+          "evidence_tier": "primary_derived",
+          "evidence": "Primary bridge from AFRM/investor-documents/sec-edgar/10-K_20250828_rpt20250630_acc0001820953_25_000080.htm: FY2025 revenue $3224.412M, OCF $793.909M, provision $616.683M; AFRM/investor-documents/sec-edgar/10-Q_20260507_rpt20260331_acc0001628280_26_032294.htm: cash $1723.413M, corporate debt $1128.617M; contract backfill 2026-07-21.",
+          "assumption_summary": "Proof outputs {'low': 0.0, 'base': 8.0001, 'high': 21.9999}; see calculation_proof graph.",
+          "cross_check": "Reconcile to FY2025 10-K and Q3 FY2026 10-Q before decision use.",
+          "falsifier": "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
+          "valuation_status": "bounded_estimate",
+          "calculation_proof": {
+            "schema_version": "1.0",
+            "method_id": "risk_adjusted_milestone_value",
+            "method_version": "1.0",
+            "output_unit": "USD_per_share",
+            "inputs": [
+              {
+                "id": "merchant_network_rev_m",
+                "label": "FY2025 merchant network and platform revenue",
+                "kind": "fact",
+                "value": 1113.966,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "AFRM/investor-documents/sec-edgar/10-K_20250828_rpt20250630_acc0001820953_25_000080.htm",
+                  "locator": "RevenueFromContractWithCustomerExcludingAssessedTax $1,113.966M (FY2025 consolidated)",
+                  "as_of": "2025-06-30"
+                },
+                "locked": true
+              },
+              {
+                "id": "shares_m",
+                "label": "Q3 FY2026 YTD weighted-average diluted shares",
+                "kind": "fact",
+                "value": 348.556556,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "AFRM/investor-documents/sec-edgar/10-Q_20260507_rpt20260331_acc0001628280_26_032294.htm",
+                  "locator": "WeightedAverageNumberOfDilutedSharesOutstanding 348,556,556 (nine months ended March 31, 2026)",
+                  "as_of": "2026-03-31"
+                },
+                "locked": true
+              }
+            ],
+            "assumptions": [
+              {
+                "id": "wallet_milestone_m",
+                "label": "Risk-adjusted Affirm Card, debit, and wallet expansion value",
+                "kind": "judgment",
+                "values": {
+                  "low": 0.0,
+                  "base": 2788.5,
+                  "high": 7668.2
+                },
+                "unit": "USD_m",
+                "rationale": "Non-overlapping claim on deeper consumer wallet, Affirm Card, and repeat-transaction economics not fully captured in normalized OCF multiple; base is bounded judgment pending standalone segment disclosure.",
+                "allowed_range": {
+                  "min": 0.0,
+                  "max": 12000.0
+                }
+              }
+            ],
+            "calculations": [
+              {
+                "id": "value_per_share",
+                "label": "Wallet and card option per share",
+                "op": "divide",
+                "args": [
+                  "wallet_milestone_m",
+                  "shares_m"
+                ],
+                "unit": "USD_per_share"
+              }
+            ],
+            "outputs": {
+              "low": "value_per_share",
+              "base": "value_per_share",
+              "high": "value_per_share"
+            }
+          }
+        }
+      },
+      {
+        "id": "net_corporate_liquidity",
+        "label": "Net parent cash less corporate and revolving debt",
+        "category": "liability_or_reserve",
+        "overlap_key": "net_corporate_liquidity",
+        "treatment": "additive",
+        "valuation": {
+          "method": "net_asset_value",
+          "basis": "per_share",
+          "low": 1.2974,
+          "base": 1.7065,
+          "high": 2.1156,
+          "evidence_tier": "primary_derived",
+          "evidence": "Primary bridge from AFRM/investor-documents/sec-edgar/10-K_20250828_rpt20250630_acc0001820953_25_000080.htm: FY2025 revenue $3224.412M, OCF $793.909M, provision $616.683M; AFRM/investor-documents/sec-edgar/10-Q_20260507_rpt20260331_acc0001628280_26_032294.htm: cash $1723.413M, corporate debt $1128.617M; contract backfill 2026-07-21.",
+          "assumption_summary": "Proof outputs {'low': 1.2974, 'base': 1.7065, 'high': 2.1156}; see calculation_proof graph.",
+          "cross_check": "Reconcile to FY2025 10-K and Q3 FY2026 10-Q before decision use.",
+          "falsifier": "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
+          "valuation_status": "bounded_estimate",
+          "calculation_proof": {
+            "schema_version": "1.0",
+            "method_id": "net_asset_value",
+            "method_version": "1.0",
+            "output_unit": "USD_per_share",
+            "inputs": [
+              {
+                "id": "cash_m",
+                "label": "Cash and cash equivalents (Q3 FY2026)",
+                "kind": "fact",
+                "value": 1723.413,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "AFRM/investor-documents/sec-edgar/10-Q_20260507_rpt20260331_acc0001628280_26_032294.htm",
+                  "locator": "CashAndCashEquivalentsAtCarryingValue $1,723.413M at March 31, 2026",
+                  "as_of": "2026-03-31"
+                },
+                "locked": true
+              },
+              {
+                "id": "corporate_debt_m",
+                "label": "Corporate and revolving long-term debt (ex-securitization trusts)",
+                "kind": "fact",
+                "value": 1128.617,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "AFRM/investor-documents/sec-edgar/10-Q_20260507_rpt20260331_acc0001628280_26_032294.htm",
+                  "locator": "LongTermDebt corporate/revolving component ~$1,128.617M at March 31, 2026 (10-Q debt note; excludes ~$7.7B securitization trust notes)",
+                  "as_of": "2026-03-31"
+                },
+                "locked": true
+              },
+              {
+                "id": "securitization_debt_m",
+                "label": "Securitization trust funding debt (non-corporate claim)",
+                "kind": "fact",
+                "value": 7745.3,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "AFRM/investor-documents/sec-edgar/10-Q_20260507_rpt20260331_acc0001628280_26_032294.htm",
+                  "locator": "Total LongTermDebt $8,873.911M less corporate component; matched to loan receivables funding",
+                  "as_of": "2026-03-31"
+                },
+                "locked": true
+              },
+              {
+                "id": "shares_m",
+                "label": "Q3 FY2026 YTD diluted shares",
+                "kind": "fact",
+                "value": 348.556556,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "AFRM/investor-documents/sec-edgar/10-Q_20260507_rpt20260331_acc0001628280_26_032294.htm",
+                  "locator": "WeightedAverageNumberOfDilutedSharesOutstanding 348,556,556",
+                  "as_of": "2026-03-31"
+                },
+                "locked": true
+              }
+            ],
+            "assumptions": [
+              {
+                "id": "net_corporate_claim_m",
+                "label": "Net corporate liquidity after cash and non-securitization debt",
+                "kind": "judgment",
+                "values": {
+                  "low": 452.2,
+                  "base": 594.8,
+                  "high": 737.4
+                },
+                "unit": "USD_m",
+                "rationale": "Parent cash less corporate/revolving debt; securitization notes are matched to loan receivables and excluded from this overlap key.",
+                "allowed_range": {
+                  "min": -2000.0,
+                  "max": 3000.0
+                }
+              }
+            ],
+            "calculations": [
+              {
+                "id": "value_per_share",
+                "label": "Net corporate liquidity per share",
+                "op": "divide",
+                "args": [
+                  "net_corporate_claim_m",
+                  "shares_m"
+                ],
+                "unit": "USD_per_share"
+              }
+            ],
+            "outputs": {
+              "low": "value_per_share",
+              "base": "value_per_share",
+              "high": "value_per_share"
+            }
+          }
+        }
+      },
+      {
+        "id": "credit_funding_stress_reserve",
+        "label": "Credit cycle and securitization funding stress reserve",
+        "category": "liability_or_reserve",
+        "overlap_key": "credit_funding_stress_reserve",
+        "treatment": "additive",
+        "valuation": {
+          "method": "net_asset_value",
+          "basis": "per_share",
+          "low": -21.9999,
+          "base": -12.0001,
+          "high": -5.0,
+          "evidence_tier": "primary_derived",
+          "evidence": "Primary bridge from AFRM/investor-documents/sec-edgar/10-K_20250828_rpt20250630_acc0001820953_25_000080.htm: FY2025 revenue $3224.412M, OCF $793.909M, provision $616.683M; AFRM/investor-documents/sec-edgar/10-Q_20260507_rpt20260331_acc0001628280_26_032294.htm: cash $1723.413M, corporate debt $1128.617M; contract backfill 2026-07-21.",
+          "assumption_summary": "Proof outputs {'low': -21.9999, 'base': -12.0001, 'high': -5.0}; see calculation_proof graph.",
+          "cross_check": "Reconcile to FY2025 10-K and Q3 FY2026 10-Q before decision use.",
+          "falsifier": "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
+          "valuation_status": "bounded_estimate",
+          "calculation_proof": {
+            "schema_version": "1.0",
+            "method_id": "net_asset_value",
+            "method_version": "1.0",
+            "output_unit": "USD_per_share",
+            "inputs": [
+              {
+                "id": "provision_loan_loss_m",
+                "label": "FY2025 provision for credit losses",
+                "kind": "fact",
+                "value": 616.683,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "AFRM/investor-documents/sec-edgar/10-K_20250828_rpt20250630_acc0001820953_25_000080.htm",
+                  "locator": "ProvisionForLoanLossesExpensed $616.683M for year ended June 30, 2025",
+                  "as_of": "2025-06-30"
+                },
+                "locked": true
+              },
+              {
+                "id": "total_debt_m",
+                "label": "Total long-term debt including securitization (Q3 FY2026)",
+                "kind": "fact",
+                "value": 8873.911,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "AFRM/investor-documents/sec-edgar/10-Q_20260507_rpt20260331_acc0001628280_26_032294.htm",
+                  "locator": "LongTermDebt $8,873.911M at March 31, 2026",
+                  "as_of": "2026-03-31"
+                },
+                "locked": true
+              },
+              {
+                "id": "shares_m",
+                "label": "Q3 FY2026 YTD diluted shares",
+                "kind": "fact",
+                "value": 348.556556,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "AFRM/investor-documents/sec-edgar/10-Q_20260507_rpt20260331_acc0001628280_26_032294.htm",
+                  "locator": "WeightedAverageNumberOfDilutedSharesOutstanding 348,556,556",
+                  "as_of": "2026-03-31"
+                },
+                "locked": true
+              }
+            ],
+            "assumptions": [
+              {
+                "id": "reserve_m",
+                "label": "Credit cycle, funding spread, and securitization stress reserve",
+                "kind": "judgment",
+                "values": {
+                  "low": -7668.2,
+                  "base": -4182.7,
+                  "high": -1742.8
+                },
+                "unit": "USD_m",
+                "rationale": "Negative reserve for recession-driven credit losses, higher funding costs, and securitization refinancing risk not fully embedded in the owner-cash multiple.",
+                "allowed_range": {
+                  "min": -12000.0,
+                  "max": 0.0
+                }
+              }
+            ],
+            "calculations": [
+              {
+                "id": "value_per_share",
+                "label": "Credit and funding stress reserve per share",
+                "op": "divide",
+                "args": [
+                  "reserve_m",
+                  "shares_m"
+                ],
+                "unit": "USD_per_share"
+              }
+            ],
+            "outputs": {
+              "low": "value_per_share",
+              "base": "value_per_share",
+              "high": "value_per_share"
+            }
+          }
+        }
+      }
+    ]
+  },
+  "economic_value_analysis": {
+    "ownership_waterfall": {
+      "net_economic_claim": "One AFRM common share equals pro-rata normalized platform owner cash, incremental wallet/card option value, net corporate liquidity, less credit/funding reserve.",
+      "excluded_claims": [
+        "Interest income and merchant fees already flow through the owner-cash engine; securitization trust debt is matched to loan receivables and excluded from net corporate liquidity.",
+        "Loan receivables are not double-counted as NAV separate from owner-cash capitalization."
+      ],
+      "reconciliation": "FY2025 OCF $793.909M on 341.023566M shares; Q3 FY2026 cash $1723.413M less corporate debt $1128.617M; provision $616.683M.",
+      "evidence_ref": "AFRM/research/evidence_reconciliation_2026-07-21.md"
+    },
+    "validation_errors": []
   }
 }
