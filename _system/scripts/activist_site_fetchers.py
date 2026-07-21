@@ -89,23 +89,116 @@ def parse_html_links(base_url: str, html: str) -> list[dict]:
 
 def likely_report(url: str, title: str, domain: str) -> bool:
     lower = f"{url} {title}".lower()
-    if any(x in lower for x in ("privacy", "contact", "about", "subscribe", "login", "cart", "twitter.com", "linkedin.com")):
+    if any(
+        x in lower
+        for x in (
+            "privacy",
+            "contact",
+            "about",
+            "subscribe",
+            "login",
+            "cart",
+            "twitter.com",
+            "linkedin.com",
+            "careers",
+            "cookie",
+        )
+    ):
         return False
     if url.lower().endswith(".pdf"):
         return True
     host = urlparse(url).netloc.lower()
-    if domain not in host and not host.endswith(domain):
+    if domain and domain not in host and not host.endswith(domain):
         return False
     path = urlparse(url).path.strip("/")
-    if not path or path in {"feed", "comments", "feed", "wp-json"}:
+    if not path or path in {"feed", "comments", "wp-json"}:
         return False
-    if any(x in lower for x in ("report", "research", "short", "investigation", "analysis", "letter")):
+    if any(
+        x in lower
+        for x in (
+            "report",
+            "research",
+            "short",
+            "investigation",
+            "analysis",
+            "letter",
+            "open-letter",
+            "open letter",
+            "presentation",
+            "nomination",
+            "proxy",
+            "white-paper",
+            "white paper",
+            "board",
+            "shareholder",
+        )
+    ):
         return True
     if re.search(r"/20\d{2}/", url):
         return True
-    if path.count("/") <= 1 and len(path) >= 4 and path not in {"research", "reports", "blog", "news"}:
+    if path.count("/") <= 1 and len(path) >= 4 and path not in {"research", "reports", "blog", "news", "media", "newsroom"}:
         return True
     return False
+
+
+def fetch_long_newsroom(firm: dict) -> list[dict]:
+    """Crawl configured newsroom paths / RSS for long activist firms."""
+    domains = [d for d in (firm.get("domains") or []) if d]
+    if not domains:
+        return []
+    paths = firm.get("newsroom_paths") or ["/news/", "/media/", "/"]
+    rss_urls = list(firm.get("rss_urls") or [])
+    out: list[dict] = []
+    seen: set[str] = set()
+
+    for rss in rss_urls:
+        try:
+            items = parse_rss(fetch_text(rss), rss)
+            for item in items:
+                if item["url"] in seen:
+                    continue
+                domain = urlparse(item["url"]).netloc.lower()
+                if any(likely_report(item["url"], item["title"], d) for d in domains) or any(
+                    d in domain for d in domains
+                ):
+                    if likely_report(item["url"], item["title"], domains[0]):
+                        seen.add(item["url"])
+                        out.append(item)
+        except Exception as exc:
+            append_scan_log({"firm_id": firm.get("id"), "status": "rss_fail", "url": rss, "error": str(exc)})
+
+    for domain in domains:
+        for feed_path in ("/feed/", "/feed/rss/", "/?feed=rss2"):
+            try:
+                base = f"https://{domain}"
+                items = parse_rss(fetch_text(base + feed_path), base)
+                for item in items:
+                    if item["url"] in seen:
+                        continue
+                    if likely_report(item["url"], item["title"], domain):
+                        seen.add(item["url"])
+                        out.append(item)
+                if out:
+                    break
+            except Exception:
+                continue
+        for path in paths:
+            try:
+                page = f"https://{domain}{path}"
+                links = parse_html_links(page, fetch_text(page))
+                for item in links:
+                    if item["url"] in seen:
+                        continue
+                    if likely_report(item["url"], item["title"], domain):
+                        seen.add(item["url"])
+                        out.append(item)
+            except Exception as exc:
+                append_scan_log(
+                    {"firm_id": firm.get("id"), "status": "newsroom_fail", "url": f"https://{domain}{path}", "error": str(exc)}
+                )
+        if out:
+            break
+    return out
 
 
 def fetch_hindenburg(_firm: dict) -> list[dict]:
@@ -182,12 +275,18 @@ FIRM_FETCHERS = {
     "kerrisdale": fetch_kerrisdale,
     "spruce_point": fetch_spruce_point,
     "j_capital": fetch_wordpress_rss,
+    "long_newsroom": fetch_long_newsroom,
 }
 
 
 def fetch_firm_reports(firm: dict) -> list[dict]:
     parser = firm.get("site_parser") or firm.get("id")
-    fn = FIRM_FETCHERS.get(parser) or fetch_wordpress_rss
+    if parser in FIRM_FETCHERS:
+        fn = FIRM_FETCHERS[parser]
+    elif firm.get("side") in ("long", "both") or firm.get("newsroom_paths") or firm.get("rss_urls"):
+        fn = fetch_long_newsroom
+    else:
+        fn = fetch_wordpress_rss
     try:
         return fn(firm)
     except Exception as exc:

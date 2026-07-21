@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /** Run exactly one isolated Investment Committee task via Cursor Cloud Agent. */
 import { readFileSync } from "node:fs";
-import { Agent, CursorAgentError } from "@cursor/sdk";
+import { Agent, Cursor, CursorAgentError } from "@cursor/sdk";
 
 const apiKey = process.env.CURSOR_API_KEY?.trim();
 const repo = process.env.GITHUB_REPOSITORY?.trim();
@@ -40,9 +40,22 @@ Isolation and delivery rules:
 
 try {
   const repoSpec = startingRef ? { url: `https://github.com/${repo}`, startingRef } : { url: `https://github.com/${repo}` };
+  // Cloud catalog requires a full id+params variant (GET /v1/models).
+  // Default Sonnet 5 variant: thinking=true, context=1m, effort=high.
+  const model =
+    modelId === "claude-sonnet-5"
+      ? {
+          id: modelId,
+          params: [
+            { id: "thinking", value: "true" },
+            { id: "context", value: "1m" },
+            { id: "effort", value: "high" },
+          ],
+        }
+      : { id: modelId };
   const result = await Agent.prompt(prompt, {
     apiKey,
-    model: { id: modelId },
+    model,
     cloud: { repos: [repoSpec], autoCreatePR: true, skipReviewerRequest: true },
   });
   console.log("Status:", result.status);
@@ -52,6 +65,17 @@ try {
 } catch (err) {
   if (err instanceof CursorAgentError) {
     console.error("Startup failed:", err.message, "retryable=", err.isRetryable);
+    if (/not available or invalid/i.test(err.message || "")) {
+      try {
+        const models = await Cursor.models.list({ apiKey });
+        const ids = (Array.isArray(models) ? models : models?.items || [])
+          .map((row) => row?.model?.id || row?.id || row)
+          .filter(Boolean);
+        console.error("Available Cursor model ids:", ids.join(", ") || JSON.stringify(models));
+      } catch (listErr) {
+        console.error("Could not list Cursor models:", listErr?.message || listErr);
+      }
+    }
     process.exit(1);
   }
   throw err;
