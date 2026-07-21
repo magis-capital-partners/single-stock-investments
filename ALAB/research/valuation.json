@@ -1,14 +1,647 @@
 {
   "ticker": "ALAB",
-  "as_of": "2026-07-20",
-  "method": "price_stub",
+  "as_of": "2026-07-21",
+  "method": "full",
+  "irr_method": "full",
+  "lawrence_bucket": "pricing_power",
+  "payoff_lens": "operating",
+  "classification_inputs": {
+    "archetype": "compounder",
+    "moat": "narrow",
+    "dhando": "partial",
+    "cycle": "up",
+    "payoff_lens": "operating",
+    "predictive_attribute": "ai_connectivity_bottleneck"
+  },
   "inputs": {
     "price": 309.09,
+    "price_source": "Yahoo ALAB close 2026-07-20",
     "price_as_of": "2026-07-20",
-    "price_source": "Yahoo ALAB close 2026-07-20"
+    "shares_millions": 179.6,
+    "shares_outstanding": 179551000,
+    "shares_source": "FY2025 diluted net income $219.134M / diluted EPS $1.22 (ALAB/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0001736297_26_000010.htm)",
+    "fcf_per_share": 0.81,
+    "fcf_source": "Two-year average operating income proxy $144.745M \u00f7 179.551M shares; FY2025 OCF $319.306M per ALAB/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0001736297_26_000010.htm",
+    "cash_m": 167.611,
+    "marketable_securities_m": 1021.205,
+    "lease_liability_m": 30.974,
+    "normalization_note": "FY2025 revenue grew 115% YoY; Lawrence base uses two-year average operating income, not peak net income inflated by valuation-allowance release."
   },
-  "notes": "Price stub created by fetch_equity_prices.py --create-stub; replace with a real model before decision-grade.",
-  "human_review": {
-    "live_price_confirmed": false
+  "scenarios": {
+    "bear": {
+      "growth_y1_5": 0.0,
+      "growth_y6_10": -0.02,
+      "exit_pfcf_y10": 6,
+      "notes": "Hyperscaler slowdown, customer concentration bite, multiple compression"
+    },
+    "base": {
+      "growth_y1_5": 0.08,
+      "growth_y6_10": 0.04,
+      "exit_pfcf_y10": 10,
+      "notes": "AI connectivity share gains; normalized owner cash; exit 10\u00d7 owner cash"
+    },
+    "bull": {
+      "growth_y1_5": 0.14,
+      "growth_y6_10": 0.06,
+      "exit_pfcf_y10": 14,
+      "notes": "Design wins scale across PCIe Gen6/CXL and switch platforms"
+    }
+  },
+  "option_scan": [
+    {
+      "q": 1,
+      "question": "GAAP book misstates core assets?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "Semiconductor inventory and IP at cost; no land-at-zero pattern (10-K)"
+    },
+    {
+      "q": 2,
+      "question": "Undeveloped reserves / dormant assets?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "Fabless connectivity vendor; no royalty reserve pattern"
+    },
+    {
+      "q": 3,
+      "question": "In-business loss segment?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "Single reportable segment profitable at operating line FY2025"
+    },
+    {
+      "q": 4,
+      "question": "Backlog / contracted revenue not in FCF path?",
+      "answer": "Partial",
+      "treatment": "milestone_nav",
+      "evidence": "Design-win pipeline and product roadmap modeled in design_win_scale_option"
+    },
+    {
+      "q": 5,
+      "question": "Private or illiquid stakes below fair value?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "No material equity-method stakes in FY2025 10-K"
+    },
+    {
+      "q": 6,
+      "question": "Transitory distribution / legal recovery?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "No litigation recovery or special dividend catalyst"
+    }
+  ],
+  "growth_explanation": {
+    "mechanism": "Revenue scales with AI data-center buildouts requiring high-speed PCIe, CXL, and Ethernet connectivity retimers and switches; design wins convert to unit shipments.",
+    "source": "ALAB/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0001736297_26_000010.htm revenue $852.525M (+115% YoY from $396.29M)",
+    "falsifiers": [
+      {
+        "id": "concentration_loss",
+        "trigger": "Customer A revenue share falls below 20% without replacement hyperscaler wins",
+        "source": "10-K customer concentration note"
+      },
+      {
+        "id": "margin_compress",
+        "trigger": "Gross margin falls below 70% for four consecutive quarters",
+        "source": "10-Q income statement"
+      }
+    ]
+  },
+  "lawrence_horizon_years": 7,
+  "stance_proposal": {
+    "suggested": "watch",
+    "irr_band": "<15%",
+    "gates": {
+      "moat_ok": true,
+      "dhando_ok": true
+    },
+    "override_reason": null
+  },
+  "component_valuation": {
+    "schema_version": "1.0",
+    "all_material_components_identified": true,
+    "coverage_statement": "Four additive components map AI connectivity owner cash, design-win scale option, net financial claims, and customer concentration reserve once each.",
+    "components": [
+      {
+        "id": "ai_connectivity_semiconductor_engine",
+        "label": "AI connectivity semiconductor operations (retimers, DSP, switches)",
+        "category": "operating_business",
+        "overlap_key": "ai_connectivity_semiconductor_engine",
+        "treatment": "additive",
+        "valuation": {
+          "method": "owner_cash_or_dividend_discount",
+          "basis": "per_share",
+          "low": 4.84,
+          "base": 8.06,
+          "high": 11.29,
+          "evidence_tier": "primary_derived",
+          "evidence": "Primary bridge from ALAB/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0001736297_26_000010.htm: FY2025 revenue $852.525M, operating income $173.423M, cash $167.611M, AFS $1021.205M, lease $30.974M; contract backfill 2026-07-21.",
+          "assumption_summary": "Proof outputs {'low': 4.84, 'base': 8.06, 'high': 11.29}; see calculation_proof graph.",
+          "cross_check": "Reconcile to FY2025 10-K and Q1 2026 10-Q before decision use.",
+          "falsifier": "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
+          "valuation_status": "bounded_estimate",
+          "calculation_proof": {
+            "schema_version": "1.0",
+            "method_id": "owner_cash_or_dividend_discount",
+            "method_version": "1.0",
+            "output_unit": "USD_per_share",
+            "inputs": [
+              {
+                "id": "operating_income_m",
+                "label": "FY2025 operating income",
+                "kind": "fact",
+                "value": 173.423,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "ALAB/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0001736297_26_000010.htm",
+                  "locator": "OperatingIncomeLoss $173.423M (FY2025, up from $116.066M prior year)",
+                  "as_of": "2025-12-31"
+                },
+                "locked": true
+              },
+              {
+                "id": "midcycle_operating_income_m",
+                "label": "Two-year average operating income (FY2024\u2013FY2025)",
+                "kind": "fact",
+                "value": 144.745,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "ALAB/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0001736297_26_000010.htm",
+                  "locator": "OperatingIncomeLoss $173.423M (2025) and $116.066M (2024); midpoint normalization",
+                  "as_of": "2025-12-31"
+                },
+                "locked": true
+              },
+              {
+                "id": "shares_m",
+                "label": "FY2025 diluted shares",
+                "kind": "fact",
+                "value": 179.551,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "ALAB/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0001736297_26_000010.htm",
+                  "locator": "FY2025 diluted net income $219.134M / diluted EPS $1.22",
+                  "as_of": "2025-12-31"
+                },
+                "locked": true
+              }
+            ],
+            "assumptions": [
+              {
+                "id": "owner_cash_per_share",
+                "label": "Normalized owner cash per diluted share (two-year average operating income proxy)",
+                "kind": "judgment",
+                "values": {
+                  "low": 0.8061,
+                  "base": 0.8061,
+                  "high": 0.8061
+                },
+                "unit": "USD_per_share",
+                "rationale": "Two-year average operating income per share anchors AI connectivity semiconductor economics; FY2025 net income includes valuation-allowance release not repeated in base.",
+                "allowed_range": {
+                  "min": 0.0,
+                  "max": 3.0
+                }
+              },
+              {
+                "id": "capitalization_multiple",
+                "label": "Duration-adjusted owner-cash capitalization multiple",
+                "kind": "judgment",
+                "values": {
+                  "low": 6.0042,
+                  "base": 9.9988,
+                  "high": 14.0057
+                },
+                "unit": "multiple",
+                "rationale": "Bear stresses hyperscaler concentration and semi cycle; base ten-year path on normalized owner cash; bull modest share gains without peak-cycle heroics.",
+                "allowed_range": {
+                  "min": 4.0,
+                  "max": 18.0
+                }
+              }
+            ],
+            "calculations": [
+              {
+                "id": "value_per_share",
+                "label": "AI connectivity semiconductor engine per share",
+                "op": "multiply",
+                "args": [
+                  "owner_cash_per_share",
+                  "capitalization_multiple"
+                ],
+                "unit": "USD_per_share"
+              }
+            ],
+            "outputs": {
+              "low": "value_per_share",
+              "base": "value_per_share",
+              "high": "value_per_share"
+            }
+          }
+        }
+      },
+      {
+        "id": "design_win_scale_option",
+        "label": "Design-win and product-scale option (PCIe/CXL/switch roadmap)",
+        "category": "real_option",
+        "overlap_key": "design_win_scale_option",
+        "treatment": "additive",
+        "valuation": {
+          "method": "risk_adjusted_milestone_value",
+          "basis": "per_share",
+          "low": 0.0,
+          "base": 11.9999,
+          "high": 35.0001,
+          "evidence_tier": "primary_derived",
+          "evidence": "Primary bridge from ALAB/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0001736297_26_000010.htm: FY2025 revenue $852.525M, operating income $173.423M, cash $167.611M, AFS $1021.205M, lease $30.974M; contract backfill 2026-07-21.",
+          "assumption_summary": "Proof outputs {'low': 0.0, 'base': 11.9999, 'high': 35.0001}; see calculation_proof graph.",
+          "cross_check": "Reconcile to FY2025 10-K and Q1 2026 10-Q before decision use.",
+          "falsifier": "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
+          "valuation_status": "bounded_estimate",
+          "calculation_proof": {
+            "schema_version": "1.0",
+            "method_id": "risk_adjusted_milestone_value",
+            "method_version": "1.0",
+            "output_unit": "USD_per_share",
+            "inputs": [
+              {
+                "id": "total_revenue_m",
+                "label": "FY2025 total revenue",
+                "kind": "fact",
+                "value": 852.525,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "ALAB/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0001736297_26_000010.htm",
+                  "locator": "RevenueFromContractWithCustomerExcludingAssessedTax $852.525M (FY2025, +115% YoY)",
+                  "as_of": "2025-12-31"
+                },
+                "locked": true
+              },
+              {
+                "id": "prior_revenue_m",
+                "label": "FY2024 total revenue",
+                "kind": "fact",
+                "value": 396.29,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "ALAB/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0001736297_26_000010.htm",
+                  "locator": "RevenueFromContractWithCustomerExcludingAssessedTax $396.29M (FY2024)",
+                  "as_of": "2025-12-31"
+                },
+                "locked": true
+              },
+              {
+                "id": "shares_m",
+                "label": "FY2025 diluted shares",
+                "kind": "fact",
+                "value": 179.551,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "ALAB/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0001736297_26_000010.htm",
+                  "locator": "FY2025 diluted net income $219.134M / diluted EPS $1.22",
+                  "as_of": "2025-12-31"
+                },
+                "locked": true
+              }
+            ],
+            "assumptions": [
+              {
+                "id": "design_win_milestone_m",
+                "label": "Risk-adjusted AI infrastructure design-win and product-scale economics",
+                "kind": "judgment",
+                "values": {
+                  "low": 0.0,
+                  "base": 2154.6,
+                  "high": 6284.3
+                },
+                "unit": "USD_m",
+                "rationale": "Non-overlapping claim on PCIe/CXL/Ethernet retimer and switch roadmap adoption not fully captured in normalized owner-cash multiple; base is judgment band.",
+                "allowed_range": {
+                  "min": 0.0,
+                  "max": 7000.0
+                }
+              }
+            ],
+            "calculations": [
+              {
+                "id": "value_per_share",
+                "label": "Design-win scale option per share",
+                "op": "divide",
+                "args": [
+                  "design_win_milestone_m",
+                  "shares_m"
+                ],
+                "unit": "USD_per_share"
+              }
+            ],
+            "outputs": {
+              "low": "value_per_share",
+              "base": "value_per_share",
+              "high": "value_per_share"
+            }
+          }
+        }
+      },
+      {
+        "id": "net_financial_claims",
+        "label": "Net cash, marketable securities, and lease claims on common equity",
+        "category": "liability_or_reserve",
+        "overlap_key": "net_financial_claims",
+        "treatment": "additive",
+        "valuation": {
+          "method": "net_asset_value",
+          "basis": "per_share",
+          "low": 5.7226,
+          "base": 6.4483,
+          "high": 6.626,
+          "evidence_tier": "primary_derived",
+          "evidence": "Primary bridge from ALAB/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0001736297_26_000010.htm: FY2025 revenue $852.525M, operating income $173.423M, cash $167.611M, AFS $1021.205M, lease $30.974M; contract backfill 2026-07-21.",
+          "assumption_summary": "Proof outputs {'low': 5.7226, 'base': 6.4483, 'high': 6.626}; see calculation_proof graph.",
+          "cross_check": "Reconcile to FY2025 10-K and Q1 2026 10-Q before decision use.",
+          "falsifier": "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
+          "valuation_status": "bounded_estimate",
+          "calculation_proof": {
+            "schema_version": "1.0",
+            "method_id": "net_asset_value",
+            "method_version": "1.0",
+            "output_unit": "USD_per_share",
+            "inputs": [
+              {
+                "id": "cash_m",
+                "label": "Cash and cash equivalents (FY2025)",
+                "kind": "fact",
+                "value": 167.611,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "ALAB/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0001736297_26_000010.htm",
+                  "locator": "CashAndCashEquivalentsAtCarryingValue $167.611M at December 31, 2025",
+                  "as_of": "2025-12-31"
+                },
+                "locked": true
+              },
+              {
+                "id": "marketable_securities_m",
+                "label": "Current available-for-sale debt securities",
+                "kind": "fact",
+                "value": 1021.205,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "ALAB/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0001736297_26_000010.htm",
+                  "locator": "AvailableForSaleSecuritiesDebtSecuritiesCurrent $1021.205M at December 31, 2025",
+                  "as_of": "2025-12-31"
+                },
+                "locked": true
+              },
+              {
+                "id": "lease_liability_m",
+                "label": "Operating lease liabilities",
+                "kind": "fact",
+                "value": 30.974,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "ALAB/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0001736297_26_000010.htm",
+                  "locator": "OperatingLeaseLiability $30.974M at December 31, 2025",
+                  "as_of": "2025-12-31"
+                },
+                "locked": true
+              },
+              {
+                "id": "shares_m",
+                "label": "FY2025 diluted shares",
+                "kind": "fact",
+                "value": 179.551,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "ALAB/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0001736297_26_000010.htm",
+                  "locator": "FY2025 diluted net income $219.134M / diluted EPS $1.22",
+                  "as_of": "2025-12-31"
+                },
+                "locked": true
+              }
+            ],
+            "assumptions": [
+              {
+                "id": "net_corporate_claim_m",
+                "label": "Net financial claim after cash, marketable securities, and lease liabilities",
+                "kind": "judgment",
+                "values": {
+                  "low": 1027.5,
+                  "base": 1157.8,
+                  "high": 1189.7
+                },
+                "unit": "USD_m",
+                "rationale": "Filing-locked cash plus current AFS debt securities less operating lease liabilities; no traditional bank debt outstanding.",
+                "allowed_range": {
+                  "min": 800.0,
+                  "max": 1300.0
+                }
+              }
+            ],
+            "calculations": [
+              {
+                "id": "value_per_share",
+                "label": "Net financial claims per share",
+                "op": "divide",
+                "args": [
+                  "net_corporate_claim_m",
+                  "shares_m"
+                ],
+                "unit": "USD_per_share"
+              }
+            ],
+            "outputs": {
+              "low": "value_per_share",
+              "base": "value_per_share",
+              "high": "value_per_share"
+            }
+          }
+        }
+      },
+      {
+        "id": "customer_concentration_reserve",
+        "label": "Hyperscaler customer concentration and cycle reserve",
+        "category": "liability_or_reserve",
+        "overlap_key": "customer_concentration_reserve",
+        "treatment": "additive",
+        "valuation": {
+          "method": "net_asset_value",
+          "basis": "per_share",
+          "low": -17.9999,
+          "base": -8.0,
+          "high": -2.0,
+          "evidence_tier": "primary_derived",
+          "evidence": "Primary bridge from ALAB/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0001736297_26_000010.htm: FY2025 revenue $852.525M, operating income $173.423M, cash $167.611M, AFS $1021.205M, lease $30.974M; contract backfill 2026-07-21.",
+          "assumption_summary": "Proof outputs {'low': -17.9999, 'base': -8.0, 'high': -2.0}; see calculation_proof graph.",
+          "cross_check": "Reconcile to FY2025 10-K and Q1 2026 10-Q before decision use.",
+          "falsifier": "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
+          "valuation_status": "bounded_estimate",
+          "calculation_proof": {
+            "schema_version": "1.0",
+            "method_id": "net_asset_value",
+            "method_version": "1.0",
+            "output_unit": "USD_per_share",
+            "inputs": [
+              {
+                "id": "customer_a_concentration_pct",
+                "label": "Customer A revenue concentration (FY2025)",
+                "kind": "fact",
+                "value": 0.37,
+                "unit": "ratio",
+                "source": {
+                  "ref": "ALAB/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0001736297_26_000010.htm",
+                  "locator": "ConcentrationRiskPercentage1 37% for Customer A revenue FY2025",
+                  "as_of": "2025-12-31"
+                },
+                "locked": true
+              },
+              {
+                "id": "top_customer_ar_concentration_pct",
+                "label": "Top customer accounts receivable concentration",
+                "kind": "fact",
+                "value": 0.73,
+                "unit": "ratio",
+                "source": {
+                  "ref": "ALAB/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0001736297_26_000010.htm",
+                  "locator": "ConcentrationRiskPercentage1 73% accounts receivable from top customer FY2025",
+                  "as_of": "2025-12-31"
+                },
+                "locked": true
+              },
+              {
+                "id": "shares_m",
+                "label": "FY2025 diluted shares",
+                "kind": "fact",
+                "value": 179.551,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "ALAB/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0001736297_26_000010.htm",
+                  "locator": "FY2025 diluted net income $219.134M / diluted EPS $1.22",
+                  "as_of": "2025-12-31"
+                },
+                "locked": true
+              }
+            ],
+            "assumptions": [
+              {
+                "id": "reserve_m",
+                "label": "Hyperscaler customer concentration and semi-cycle stress reserve",
+                "kind": "judgment",
+                "values": {
+                  "low": -3231.9,
+                  "base": -1436.4,
+                  "high": -359.1
+                },
+                "unit": "USD_m",
+                "rationale": "Negative reserve for Customer A ~37% revenue share, top-customer AR concentration 73%, and Amazon warrant overhang not fully embedded in owner-cash multiple.",
+                "allowed_range": {
+                  "min": -4000.0,
+                  "max": -300.0
+                }
+              }
+            ],
+            "calculations": [
+              {
+                "id": "value_per_share",
+                "label": "Customer concentration reserve per share",
+                "op": "divide",
+                "args": [
+                  "reserve_m",
+                  "shares_m"
+                ],
+                "unit": "USD_per_share"
+              }
+            ],
+            "outputs": {
+              "low": "value_per_share",
+              "base": "value_per_share",
+              "high": "value_per_share"
+            }
+          }
+        }
+      }
+    ]
+  },
+  "economic_value_analysis": {
+    "ownership_waterfall": {
+      "net_economic_claim": "One ALAB common share equals pro-rata normalized connectivity owner cash, incremental design-win economics, net financial position, less concentration reserve.",
+      "excluded_claims": [
+        "Marketable securities already counted in net financial claims, not duplicated in engine multiple.",
+        "Amazon customer warrant economics reserved through concentration component."
+      ],
+      "reconciliation": "FY2025 two-year average operating income $144.745M on 179.551M shares; cash $167.611M plus AFS $1021.205M less lease $30.974M.",
+      "evidence_ref": "ALAB/research/evidence_reconciliation_2026-07-21.md"
+    },
+    "validation_errors": []
+  },
+  "economic_value": {
+    "schema_version": "1.0",
+    "method": "component_economic_value",
+    "economic_claim": {
+      "description": "One diluted share of Astera Labs, including connectivity owner cash, design-win option, net financial claims, and concentration reserve.",
+      "unit_label": "diluted share",
+      "unit_count": 179551000,
+      "unit_source": "FY2025 diluted net income $219.134M / diluted EPS $1.22 (ALAB/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0001736297_26_000010.htm)",
+      "enterprise_to_equity_reconciliation": "Operating and option claims valued once; cash, securities, and reserves are separate components with unique overlap keys."
+    },
+    "gaap_role": "cross_check",
+    "accounting_reference": "FY2025 10-K and Q1 2026 10-Q extracts; reconciliation 2026-07-21.",
+    "component_groups": [
+      {
+        "id": "ai_connectivity_semiconductor_engine",
+        "label": "AI connectivity semiconductor operations",
+        "component_ids": [
+          "ai_connectivity_semiconductor_engine"
+        ],
+        "economic_claim": "AI connectivity semiconductor operations",
+        "valuation_basis": "Two-year average operating income capitalization proof.",
+        "adjustments": "Concentration stress in reserve component.",
+        "overlap_control": "Unique overlap key ai_connectivity_semiconductor_engine."
+      },
+      {
+        "id": "design_win_scale_option",
+        "label": "Design-win and product-scale option",
+        "component_ids": [
+          "design_win_scale_option"
+        ],
+        "economic_claim": "Design-win and product-scale option",
+        "valuation_basis": "Risk-adjusted milestone on AI infrastructure adoption.",
+        "adjustments": "Low case zero; base does not assume full roadmap NPV.",
+        "overlap_control": "Unique overlap key design_win_scale_option.",
+        "risk_and_timing": {
+          "success_probability": 0.55,
+          "timing_years": 3,
+          "remaining_capital_m": 0.0,
+          "probability_basis": "FY2025 revenue +115% YoY; base assumes partial roadmap conversion over three years without heroics.",
+          "timing_basis": "Design wins ship as hyperscaler platforms ramp; [Assumption] 3-year base.",
+          "remaining_capital_basis": "R&D embedded in normalized owner cash; no separate remaining-capital claim."
+        }
+      },
+      {
+        "id": "net_financial_claims",
+        "label": "Net cash, marketable securities, and lease claims",
+        "component_ids": [
+          "net_financial_claims"
+        ],
+        "economic_claim": "Net cash, marketable securities, and lease claims",
+        "valuation_basis": "Filing-locked cash plus AFS less lease liabilities.",
+        "adjustments": "Low/high stress marks on securities portfolio.",
+        "overlap_control": "Unique overlap key net_financial_claims."
+      },
+      {
+        "id": "customer_concentration_reserve",
+        "label": "Hyperscaler customer concentration reserve",
+        "component_ids": [
+          "customer_concentration_reserve"
+        ],
+        "economic_claim": "Hyperscaler customer concentration reserve",
+        "valuation_basis": "Negative reserve for Customer A 37% revenue and 73% AR concentration.",
+        "adjustments": "Separate from core capitalization multiple.",
+        "overlap_control": "Unique overlap key customer_concentration_reserve."
+      }
+    ],
+    "limitations": [
+      "Contract backfill scaffold; not a committee-approved valuation.",
+      "Design-win milestone band remains widest judgment range pending segment disclosure."
+    ]
   }
 }
