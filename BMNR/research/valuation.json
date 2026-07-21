@@ -1,6 +1,6 @@
 {
   "ticker": "BMNR",
-  "as_of": "2026-07-17",
+  "as_of": "2026-07-21",
   "valuation_mode": "optionality",
   "valuation_overlay": "segment_cashflow",
   "method": "yield_curve",
@@ -72,9 +72,89 @@
           "high": 22.0,
           "evidence_tier": "filing",
           "evidence": "$10.856B ETH fair value divided by 579,652,432 shares at May 31, 2026 (10-Q Q3 FY2026 digital asset table). Low case applies ~40% ETH mark haircut from May marks.",
-          "assumption_summary": "Look-through ETH per diluted common share before trajectory and operating overlays.",
+          "assumption_summary": "Look-through ETH per diluted common share before trajectory and operating overlays. Proof in calculation_proof.",
           "cross_check": "Reconcile to GAAP CryptoAssetFairValue and share count on each filing refresh.",
-          "falsifier": "ETH fair value per share falls below the low case after sustained spot decline and further dilution."
+          "falsifier": "ETH fair value per share falls below the low case after sustained spot decline and further dilution.",
+          "calculation_proof": {
+            "schema_version": "1.0",
+            "method_id": "net_asset_value",
+            "method_version": "1.0",
+            "output_unit": "USD_per_share",
+            "inputs": [
+              {
+                "id": "eth_fv_m",
+                "label": "ETH fair value",
+                "kind": "fact",
+                "value": 10855.537,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "BMNR/investor-documents/sec-edgar/10-Q_20260714_rpt20260531_acc0001628280_26_048157.htm",
+                  "locator": "CryptoAssetFairValue EthereumMember; $10,855,537 thousand at May 31, 2026",
+                  "as_of": "2026-05-31"
+                },
+                "locked": true
+              },
+              {
+                "id": "shares_m",
+                "label": "Common shares outstanding",
+                "kind": "fact",
+                "value": 579.652432,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "BMNR/investor-documents/sec-edgar/10-Q_20260714_rpt20260531_acc0001628280_26_048157.htm",
+                  "locator": "Cover page; 579,652,432 common shares outstanding May 31, 2026",
+                  "as_of": "2026-05-31"
+                },
+                "locked": true
+              }
+            ],
+            "assumptions": [
+              {
+                "id": "eth_mark_multiplier",
+                "label": "ETH fair value adjustment from May 2026 marks",
+                "kind": "judgment",
+                "values": {
+                  "low": 0.5597,
+                  "base": 1.0,
+                  "high": 1.1726
+                },
+                "unit": "multiplier",
+                "rationale": "Low applies ~40% ETH mark haircut from May marks; base uses filing fair value; high modest premium.",
+                "allowed_range": {
+                  "min": 0.4,
+                  "max": 1.3
+                }
+              }
+            ],
+            "calculations": [
+              {
+                "id": "adjusted_eth_m",
+                "label": "Adjusted ETH fair value",
+                "op": "multiply",
+                "args": [
+                  "eth_fv_m",
+                  "eth_mark_multiplier"
+                ],
+                "unit": "USD_m"
+              },
+              {
+                "id": "value_per_share",
+                "label": "ETH look-through per share",
+                "op": "divide",
+                "args": [
+                  "adjusted_eth_m",
+                  "shares_m"
+                ],
+                "unit": "USD_per_share"
+              }
+            ],
+            "outputs": {
+              "low": "value_per_share",
+              "base": "value_per_share",
+              "high": "value_per_share"
+            }
+          },
+          "valuation_status": "calculated"
         }
       },
       {
@@ -91,9 +171,118 @@
           "high": 18.0,
           "evidence_tier": "mixed_primary_and_estimate",
           "evidence": "Base aligns with scenarios.base.sotp_build eth_growth_net_dilution (+$4.5/sh): 8% ETH CAGR for 7 years offset by 10% cumulative ATM dilution [Assumption]. Bear embeds dilution exceeding token appreciation.",
-          "assumption_summary": "Incremental per-share value from ETH beta net of issuance, not double-counted with static look-through.",
+          "assumption_summary": "Incremental per-share value from ETH beta net of issuance, not double-counted with static look-through. Proof in calculation_proof.",
           "cross_check": "Range must reconcile to filing ETH purchases, share issuance, and live spot before IC approval.",
-          "falsifier": "ATM issuance dilutes ETH per share faster than token price rises for two consecutive quarters."
+          "falsifier": "ATM issuance dilutes ETH per share faster than token price rises for two consecutive quarters.",
+          "calculation_proof": {
+            "schema_version": "1.0",
+            "method_id": "risk_adjusted_milestone_value",
+            "method_version": "1.0",
+            "output_unit": "USD_per_share",
+            "inputs": [
+              {
+                "id": "shares_m",
+                "label": "Common shares outstanding",
+                "kind": "fact",
+                "value": 579.652432,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "BMNR/investor-documents/sec-edgar/10-Q_20260714_rpt20260531_acc0001628280_26_048157.htm",
+                  "locator": "Cover page; 579,652,432 common shares outstanding May 31, 2026",
+                  "as_of": "2026-05-31"
+                },
+                "locked": true
+              }
+            ],
+            "assumptions": [
+              {
+                "id": "success_probability",
+                "label": "Probability ETH trajectory net of dilution delivers incremental value",
+                "kind": "judgment",
+                "values": {
+                  "low": 1.0,
+                  "base": 1.0,
+                  "high": 1.0
+                },
+                "unit": "ratio",
+                "rationale": "Probability embedded in incremental value range; base aligns with 8% ETH CAGR net 10% dilution over seven years.",
+                "allowed_range": {
+                  "min": 0.0,
+                  "max": 1.0
+                }
+              },
+              {
+                "id": "incremental_value_m",
+                "label": "Seven-year incremental ETH value net of ATM dilution",
+                "kind": "judgment",
+                "values": {
+                  "low": -869.5,
+                  "base": 2608.4,
+                  "high": 10433.7
+                },
+                "unit": "USD_m",
+                "rationale": "Incremental to static May look-through; bear dilution dominates, bull ETH re-rating with limited issuance.",
+                "allowed_range": {
+                  "min": -2000.0,
+                  "max": 15000.0
+                }
+              },
+              {
+                "id": "remaining_cost_m",
+                "label": "Remaining owner-funded deployment cost",
+                "kind": "judgment",
+                "values": {
+                  "low": 0.0,
+                  "base": 0.0,
+                  "high": 0.0
+                },
+                "unit": "USD_m",
+                "rationale": "Further ATM cost captured inside dilution assumptions.",
+                "allowed_range": {
+                  "min": 0.0,
+                  "max": 500.0
+                }
+              }
+            ],
+            "calculations": [
+              {
+                "id": "risked_value_m",
+                "label": "Risk-adjusted incremental value",
+                "op": "multiply",
+                "args": [
+                  "incremental_value_m",
+                  "success_probability"
+                ],
+                "unit": "USD_m"
+              },
+              {
+                "id": "net_option_m",
+                "label": "Net incremental value",
+                "op": "subtract",
+                "args": [
+                  "risked_value_m",
+                  "remaining_cost_m"
+                ],
+                "unit": "USD_m"
+              },
+              {
+                "id": "value_per_share",
+                "label": "Incremental ETH trajectory per share",
+                "op": "divide",
+                "args": [
+                  "net_option_m",
+                  "shares_m"
+                ],
+                "unit": "USD_per_share"
+              }
+            ],
+            "outputs": {
+              "low": "value_per_share",
+              "base": "value_per_share",
+              "high": "value_per_share"
+            }
+          },
+          "valuation_status": "bounded_estimate"
         }
       },
       {
@@ -110,9 +299,141 @@
           "high": 1.5,
           "evidence_tier": "mixed_primary_and_estimate",
           "evidence": "Nine-month FY2026 staking and validation revenue $56.924M on 579.7M shares; modest margin capitalized at 10 times [Assumption] in base payoff build.",
-          "assumption_summary": "Small operating annuity from staking yield; legacy mining immaterial.",
+          "assumption_summary": "Small operating annuity from staking yield; legacy mining immaterial. Proof in calculation_proof.",
           "cross_check": "Reconcile to revenue segment table and corporate burn before promoting to base IRR.",
-          "falsifier": "Staking yield falls below corporate G&A drag for two reporting periods."
+          "falsifier": "Staking yield falls below corporate G&A drag for two reporting periods.",
+          "calculation_proof": {
+            "schema_version": "1.0",
+            "method_id": "owner_cash_or_dividend_discount",
+            "method_version": "1.0",
+            "output_unit": "USD_per_share",
+            "inputs": [
+              {
+                "id": "staking_revenue_9mo_m",
+                "label": "Nine-month staking and validation revenue",
+                "kind": "fact",
+                "value": 56.924,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "BMNR/investor-documents/sec-edgar/10-Q_20260714_rpt20260531_acc0001628280_26_048157.htm",
+                  "locator": "Segment revenue; staking and validation $56,924 thousand nine months ended May 31, 2026",
+                  "as_of": "2026-05-31"
+                },
+                "locked": true
+              },
+              {
+                "id": "shares_m",
+                "label": "Common shares outstanding",
+                "kind": "fact",
+                "value": 579.652432,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "BMNR/investor-documents/sec-edgar/10-Q_20260714_rpt20260531_acc0001628280_26_048157.htm",
+                  "locator": "Cover page; 579,652,432 common shares outstanding May 31, 2026",
+                  "as_of": "2026-05-31"
+                },
+                "locked": true
+              }
+            ],
+            "assumptions": [
+              {
+                "id": "annualization_factor",
+                "label": "Nine-month to annual revenue factor",
+                "kind": "estimate",
+                "values": {
+                  "low": 1.32,
+                  "base": 1.3333,
+                  "high": 1.38
+                },
+                "unit": "ratio",
+                "rationale": "Annualize nine-month staking revenue.",
+                "allowed_range": {
+                  "min": 1.0,
+                  "max": 1.5
+                }
+              },
+              {
+                "id": "net_margin_pct",
+                "label": "Staking revenue to owner cash conversion",
+                "kind": "judgment",
+                "values": {
+                  "low": 0.42,
+                  "base": 0.57,
+                  "high": 0.68
+                },
+                "unit": "ratio",
+                "rationale": "Direct-cost margin on staking yield; corporate G&A excluded from this annuity.",
+                "allowed_range": {
+                  "min": 0.2,
+                  "max": 0.75
+                }
+              },
+              {
+                "id": "capitalization_multiple",
+                "label": "Owner-cash capitalization multiple",
+                "kind": "judgment",
+                "values": {
+                  "low": 9.5,
+                  "base": 10.0,
+                  "high": 16.5
+                },
+                "unit": "multiple",
+                "rationale": "Small operating annuity capitalized at modest multiple.",
+                "allowed_range": {
+                  "min": 5.0,
+                  "max": 17.0
+                }
+              }
+            ],
+            "calculations": [
+              {
+                "id": "annual_revenue_m",
+                "label": "Annualized staking revenue",
+                "op": "multiply",
+                "args": [
+                  "staking_revenue_9mo_m",
+                  "annualization_factor"
+                ],
+                "unit": "USD_m"
+              },
+              {
+                "id": "annual_owner_cash_m",
+                "label": "Annual staking owner cash",
+                "op": "multiply",
+                "args": [
+                  "annual_revenue_m",
+                  "net_margin_pct"
+                ],
+                "unit": "USD_m"
+              },
+              {
+                "id": "capitalized_m",
+                "label": "Capitalized staking value",
+                "op": "multiply",
+                "args": [
+                  "annual_owner_cash_m",
+                  "capitalization_multiple"
+                ],
+                "unit": "USD_m"
+              },
+              {
+                "id": "value_per_share",
+                "label": "Staking annuity per share",
+                "op": "divide",
+                "args": [
+                  "capitalized_m",
+                  "shares_m"
+                ],
+                "unit": "USD_per_share"
+              }
+            ],
+            "outputs": {
+              "low": "value_per_share",
+              "base": "value_per_share",
+              "high": "value_per_share"
+            }
+          },
+          "valuation_status": "bounded_estimate"
         }
       },
       {
@@ -129,9 +450,138 @@
           "high": 0.0,
           "evidence_tier": "filing",
           "evidence": "Warrant liability $2.1M and deferred tax liability $92.3M at May 31, 2026 (10-Q Q3 FY2026); BMNP preferred stock claims not fully modeled [HUMAN REVIEW].",
-          "assumption_summary": "Reserve for senior claims and tax on unrealized crypto gains; base zero pending preferred waterfall.",
+          "assumption_summary": "Reserve for senior claims and tax on unrealized crypto gains; base zero pending preferred waterfall. Proof in calculation_proof.",
           "cross_check": "Update when preferred conversion terms and ATM pace clarify dilution stack.",
-          "falsifier": "Preferred or warrant conversion materially reduces common look-through below the low case."
+          "falsifier": "Preferred or warrant conversion materially reduces common look-through below the low case.",
+          "calculation_proof": {
+            "schema_version": "1.0",
+            "method_id": "net_asset_value",
+            "method_version": "1.0",
+            "output_unit": "USD_per_share",
+            "inputs": [
+              {
+                "id": "warrant_liability_m",
+                "label": "Warrant liability",
+                "kind": "fact",
+                "value": 2.1,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "BMNR/investor-documents/sec-edgar/10-Q_20260714_rpt20260531_acc0001628280_26_048157.htm",
+                  "locator": "Warrant liability $2,100 thousand at May 31, 2026",
+                  "as_of": "2026-05-31"
+                },
+                "locked": true
+              },
+              {
+                "id": "deferred_tax_m",
+                "label": "Deferred tax liability",
+                "kind": "fact",
+                "value": 92.3,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "BMNR/investor-documents/sec-edgar/10-Q_20260714_rpt20260531_acc0001628280_26_048157.htm",
+                  "locator": "Deferred tax liability $92,300 thousand at May 31, 2026",
+                  "as_of": "2026-05-31"
+                },
+                "locked": true
+              },
+              {
+                "id": "shares_m",
+                "label": "Common shares outstanding",
+                "kind": "fact",
+                "value": 579.652432,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "BMNR/investor-documents/sec-edgar/10-Q_20260714_rpt20260531_acc0001628280_26_048157.htm",
+                  "locator": "Cover page; 579,652,432 common shares outstanding May 31, 2026",
+                  "as_of": "2026-05-31"
+                },
+                "locked": true
+              }
+            ],
+            "assumptions": [
+              {
+                "id": "preferred_claim_m",
+                "label": "BMNP preferred stock look-through claim",
+                "kind": "judgment",
+                "values": {
+                  "low": 485.0,
+                  "base": 485.0,
+                  "high": 485.0
+                },
+                "unit": "USD_m",
+                "rationale": "Preferred waterfall not fully modeled [HUMAN REVIEW]; reserve application varies by case.",
+                "allowed_range": {
+                  "min": 0.0,
+                  "max": 2000.0
+                }
+              },
+              {
+                "id": "reserve_application_pct",
+                "label": "Fraction of filing senior claims applied to common look-through",
+                "kind": "judgment",
+                "values": {
+                  "low": 1.0,
+                  "base": 0.0,
+                  "high": 0.0
+                },
+                "unit": "ratio",
+                "rationale": "Base zero pending preferred waterfall clarity; low applies warrants, deferred tax, and preferred stress.",
+                "allowed_range": {
+                  "min": 0.0,
+                  "max": 1.0
+                }
+              }
+            ],
+            "calculations": [
+              {
+                "id": "gross_claims_m",
+                "label": "Gross senior claims before application",
+                "op": "sum",
+                "args": [
+                  "warrant_liability_m",
+                  "deferred_tax_m",
+                  "preferred_claim_m"
+                ],
+                "unit": "USD_m"
+              },
+              {
+                "id": "applied_claims_m",
+                "label": "Applied senior claims",
+                "op": "multiply",
+                "args": [
+                  "gross_claims_m",
+                  "reserve_application_pct"
+                ],
+                "unit": "USD_m"
+              },
+              {
+                "id": "reserve_per_share",
+                "label": "Senior claim drag per share",
+                "op": "divide",
+                "args": [
+                  "applied_claims_m",
+                  "shares_m"
+                ],
+                "unit": "USD_per_share"
+              },
+              {
+                "id": "value_per_share",
+                "label": "Reserve (negative additive)",
+                "op": "negative",
+                "args": [
+                  "reserve_per_share"
+                ],
+                "unit": "USD_per_share"
+              }
+            ],
+            "outputs": {
+              "low": "value_per_share",
+              "base": "value_per_share",
+              "high": "value_per_share"
+            }
+          },
+          "valuation_status": "bounded_estimate"
         }
       }
     ]
