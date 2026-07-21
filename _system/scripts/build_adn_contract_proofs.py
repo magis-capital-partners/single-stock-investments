@@ -535,7 +535,76 @@ def build_valuation_scaffold() -> dict:
                 "unit_label": "common share",
                 "unit_count": int(round(SHARES_M * 1_000_000)),
                 "unit_source": f"18,619,712 common shares outstanding as at May 6, 2026 ({FILING_Q1})",
+                "enterprise_to_equity_reconciliation": (
+                    "Harvest owner cash, owned timberland IFRS NAV, carbon/real-estate options, net liquidity and debt, "
+                    "and payout reserve are separate overlap keys; Crown fee stream stays in producing operations only."
+                ),
             },
+            "gaap_role": "cross_check",
+            "accounting_reference": (
+                f"FY2025 annual report: book value ${BOOK_PER_SHARE}/sh; timberlands at historical cost less depletion; "
+                "economic value uses owner cash and component NAV, not GAAP book alone."
+            ),
+            "component_groups": [
+                {
+                    "id": "producing_timber_operations",
+                    "label": "Harvest, Crown management, and timber services owner cash",
+                    "component_ids": ["producing_timber_operations"],
+                    "economic_claim": "Consolidated harvest and Crown management fee stream",
+                    "valuation_basis": "Owner-cash discount on FY2025 Free Cash Flow per share.",
+                    "adjustments": "Excludes lumpy 2024 carbon credit sales from base owner-cash rate.",
+                    "overlap_control": "Unique overlap key producing_timber_operations.",
+                },
+                {
+                    "id": "carbon_and_real_estate_option",
+                    "label": "Voluntary carbon credits and real-estate milestone options",
+                    "component_ids": ["carbon_and_real_estate_option"],
+                    "economic_claim": "Episodic carbon credit issuance and real-estate fee upside",
+                    "valuation_basis": "Risk-adjusted milestone value using 2024 carbon sale as reference only.",
+                    "adjustments": "Base assigns zero until next verified issuance; real-estate fees remain small.",
+                    "overlap_control": "Unique overlap key carbon_and_real_estate_option; not in Lawrence FCF growth path.",
+                    "risk_and_timing": {
+                        "probability_basis": (
+                            "Base zero probability until next verified Katahdin voluntary credit issuance; "
+                            "high case uses one repeat of the 2024 CAD 24.6M sale precedent."
+                        ),
+                        "timing_basis": (
+                            "No disclosed carbon issuance schedule in FY2025 filings; real-estate HBU reviews are episodic."
+                        ),
+                        "remaining_capital_basis": (
+                            "Project monitoring and verification costs are embedded in operating segments; "
+                            "no incremental owner-funded capital reserved in base case."
+                        ),
+                    },
+                },
+                {
+                    "id": "owned_timberland_nav",
+                    "label": "Owned freehold timberland and infrastructure at IFRS cost plus partial fair-value uplift",
+                    "component_ids": ["owned_timberland_nav"],
+                    "economic_claim": "1.075M owned freehold acres at IFRS cost with partial fair-value uplift",
+                    "valuation_basis": "Fraction of shareholders equity attributable to owned land not in producing capitalization.",
+                    "adjustments": "Timberlands carried at historical cost; uplift band is bounded judgment.",
+                    "overlap_control": "Unique overlap key owned_timberland_nav.",
+                },
+                {
+                    "id": "net_financial_claims",
+                    "label": "Net liquidity, debt, and corporate balance-sheet claims",
+                    "component_ids": ["net_financial_claims"],
+                    "economic_claim": "Net liquidity and attributed long-term debt senior to equity",
+                    "valuation_basis": "Filing net liquidity CAD 17.4M with bounded debt attribution.",
+                    "adjustments": "Low case stresses full debt seniority; high adds revolver headroom.",
+                    "overlap_control": "Unique overlap key net_financial_claims.",
+                },
+                {
+                    "id": "payout_and_cycle_reserve",
+                    "label": "Dividend coverage, Maine execution, and lumber-cycle reserve",
+                    "component_ids": ["payout_and_cycle_reserve"],
+                    "economic_claim": "Dividend-FCF gap and Maine/lumber-cycle stress reserve",
+                    "valuation_basis": "Negative reserve scaling with CAD 1.16 dividend minus CAD 0.37 FCF gap.",
+                    "adjustments": "Macer 100% DRIP mitigates cash drain but not economic dilution risk.",
+                    "overlap_control": "Unique overlap key payout_and_cycle_reserve.",
+                },
+            ],
         },
         "economic_value_analysis": {
             "ownership_waterfall": {
