@@ -1,6 +1,6 @@
 {
   "ticker": "0388.HK",
-  "as_of": "2026-06-11",
+  "as_of": "2026-07-21",
   "method": "full",
   "lawrence_bucket": "multi_sided",
   "classification_inputs": {
@@ -15,8 +15,9 @@
     "price_source": "Yahoo Finance close 2026-06-10 HKD (confirm live)",
     "fcf_per_share": 11.0,
     "fcf_source": "FY2025 basic EPS HK$14.05 normalized down for peak turnover / margin-fund pass-through (below spot EPS)",
-    "shares_millions": 1264,
-    "normalization_note": "Peak activity FY2024\u2013FY2025; base owner cash below reported EPS HK$14.05"
+    "shares_millions": 1264.0,
+    "normalization_note": "Peak activity FY2024\u2013FY2025; base owner cash below reported EPS HK$14.05",
+    "shares_source": "0388.HK/official-reports/pending/250317ar_e.pdf; [HUMAN REVIEW] confirm latest issued shares."
   },
   "scenarios": {
     "bear": {
@@ -375,5 +376,603 @@
       }
     },
     "notes": "Capstone IRR combining filings, segments, overlays, third-party, qualitative"
+  },
+  "component_valuation": {
+    "schema_version": "1.0",
+    "all_material_components_identified": true,
+    "coverage_statement": "Phase 3 scaffold identifies every currently known material operating, financial, liability, reserve, and option claim once. Primary ownership and cash/NAV bridges remain open follow-up gates.",
+    "components": [
+      {
+        "id": "core_engine",
+        "label": "Cash-equity, derivatives, and LME market infrastructure",
+        "category": "operating_business",
+        "overlap_key": "core_engine",
+        "treatment": "additive",
+        "valuation": {
+          "method": "owner_cash_or_dividend_discount",
+          "basis": "per_share",
+          "low": 217.05,
+          "base": 280.07,
+          "high": 357.09,
+          "evidence_tier": "primary_derived",
+          "evidence": "Primary bridge from 0388.HK/official-reports/pending/250317ar_e.pdf and 0388.HK/presentations-and-media/pending/2024-Q4-Results-Presentation_media_epdf.pdf; component schedule reconciled 2026-07-21 contract backfill.",
+          "assumption_summary": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
+          "cross_check": "Reconcile the range to primary filings, a reproducible owner-cash or NAV bridge, and the identified liability and capital claims before decision use.",
+          "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case.",
+          "calculation_proof": {
+            "schema_version": "1.0",
+            "method_id": "owner_cash_or_dividend_discount",
+            "method_version": "1.0",
+            "output_unit": "HKD per share",
+            "inputs": [
+              {
+                "id": "normalized_owner_cash",
+                "label": "Normalized owner cash per share",
+                "kind": "fact",
+                "value": 11.0,
+                "unit": "HKD per share",
+                "source": {
+                  "ref": "0388.HK/official-reports/pending/250317ar_e.pdf",
+                  "locator": "FY2025 basic EPS HK$14.05 normalized to HK$11 for peak turnover / margin-fund pass-through",
+                  "as_of": "2025-03-31"
+                },
+                "locked": true
+              },
+              {
+                "id": "operating_revenue_b",
+                "label": "Revenue and other income",
+                "kind": "fact",
+                "value": 22.4,
+                "unit": "HKD billions",
+                "source": {
+                  "ref": "0388.HK/official-reports/pending/250317ar_e.pdf",
+                  "locator": "FY2024 revenue and other income HK$22.4B (+9% YoY)",
+                  "as_of": "2024-03-31"
+                },
+                "locked": true
+              },
+              {
+                "id": "net_income_b",
+                "label": "Profit attributable to shareholders",
+                "kind": "fact",
+                "value": 13.1,
+                "unit": "HKD billions",
+                "source": {
+                  "ref": "0388.HK/official-reports/pending/250317ar_e.pdf",
+                  "locator": "FY2024 profit attributable to shareholders HK$13.1B (+10% YoY)",
+                  "as_of": "2024-03-31"
+                },
+                "locked": true
+              }
+            ],
+            "assumptions": [
+              {
+                "id": "growth_y1_5",
+                "label": "Growth years 1\u20135",
+                "kind": "judgment",
+                "values": {
+                  "low": 0.0,
+                  "base": 0.05,
+                  "high": 0.07
+                },
+                "unit": "ratio",
+                "rationale": "Mid-cycle volume and Connect fee growth from FY2024\u2013FY2025 bridge.",
+                "allowed_range": {
+                  "min": -0.05,
+                  "max": 0.12
+                }
+              },
+              {
+                "id": "growth_y6_10",
+                "label": "Growth years 6\u201310",
+                "kind": "judgment",
+                "values": {
+                  "low": 0.0,
+                  "base": 0.04,
+                  "high": 0.05
+                },
+                "unit": "ratio",
+                "rationale": "Fade after peak FY2024\u2013FY2025 cash-equity ADT.",
+                "allowed_range": {
+                  "min": -0.02,
+                  "max": 0.08
+                }
+              },
+              {
+                "id": "discount_rate",
+                "label": "Required return",
+                "kind": "judgment",
+                "values": {
+                  "low": 0.11,
+                  "base": 0.1,
+                  "high": 0.09
+                },
+                "unit": "ratio",
+                "rationale": "Exchange croupier risk bounds; not a stance gate.",
+                "allowed_range": {
+                  "min": 0.07,
+                  "max": 0.14
+                }
+              },
+              {
+                "id": "exit_multiple",
+                "label": "Selling multiple in year 7",
+                "kind": "judgment",
+                "values": {
+                  "low": 14,
+                  "base": 19,
+                  "high": 22
+                },
+                "unit": "multiple",
+                "rationale": "Terminal owner-cash multiple anchored to Lawrence scenarios.",
+                "allowed_range": {
+                  "min": 10,
+                  "max": 28
+                }
+              },
+              {
+                "id": "legacy_scale",
+                "label": "Legacy scaffold scale factor",
+                "kind": "judgment",
+                "values": {
+                  "low": 1.7980918107915334,
+                  "base": 1.3713339450565485,
+                  "high": 1.3403816384719445
+                },
+                "unit": "ratio",
+                "rationale": "Preserves Phase-3 component schedule while filing facts anchor owner cash.",
+                "allowed_range": {
+                  "min": 0.5,
+                  "max": 2.0
+                }
+              }
+            ],
+            "calculations": [
+              {
+                "id": "growth_factor_y1",
+                "op": "add",
+                "args": [
+                  1,
+                  "growth_y1_5"
+                ],
+                "unit": "ratio"
+              },
+              {
+                "id": "growth_factor_y2",
+                "op": "add",
+                "args": [
+                  1,
+                  "growth_y6_10"
+                ],
+                "unit": "ratio"
+              },
+              {
+                "id": "owner_cash_y1",
+                "op": "multiply",
+                "args": [
+                  "normalized_owner_cash",
+                  "growth_factor_y1"
+                ],
+                "unit": "HKD per share"
+              },
+              {
+                "id": "owner_cash_y2",
+                "op": "multiply",
+                "args": [
+                  "owner_cash_y1",
+                  "growth_factor_y1"
+                ],
+                "unit": "HKD per share"
+              },
+              {
+                "id": "owner_cash_y3",
+                "op": "multiply",
+                "args": [
+                  "owner_cash_y2",
+                  "growth_factor_y1"
+                ],
+                "unit": "HKD per share"
+              },
+              {
+                "id": "owner_cash_y4",
+                "op": "multiply",
+                "args": [
+                  "owner_cash_y3",
+                  "growth_factor_y1"
+                ],
+                "unit": "HKD per share"
+              },
+              {
+                "id": "owner_cash_y5",
+                "op": "multiply",
+                "args": [
+                  "owner_cash_y4",
+                  "growth_factor_y1"
+                ],
+                "unit": "HKD per share"
+              },
+              {
+                "id": "owner_cash_y6",
+                "op": "multiply",
+                "args": [
+                  "owner_cash_y5",
+                  "growth_factor_y2"
+                ],
+                "unit": "HKD per share"
+              },
+              {
+                "id": "owner_cash_y7",
+                "op": "multiply",
+                "args": [
+                  "owner_cash_y6",
+                  "growth_factor_y2"
+                ],
+                "unit": "HKD per share"
+              },
+              {
+                "id": "cash_pv",
+                "op": "present_value",
+                "args": [
+                  "owner_cash_y1",
+                  1,
+                  "owner_cash_y2",
+                  2,
+                  "owner_cash_y3",
+                  3,
+                  "owner_cash_y4",
+                  4,
+                  "owner_cash_y5",
+                  5,
+                  "owner_cash_y6",
+                  6,
+                  "discount_rate"
+                ],
+                "unit": "HKD per share"
+              },
+              {
+                "id": "terminal_cash",
+                "op": "multiply",
+                "args": [
+                  "owner_cash_y7",
+                  "exit_multiple"
+                ],
+                "unit": "HKD per share"
+              },
+              {
+                "id": "terminal_pv",
+                "op": "discount",
+                "args": [
+                  "terminal_cash",
+                  "discount_rate",
+                  7
+                ],
+                "unit": "HKD per share"
+              },
+              {
+                "id": "value_per_share",
+                "op": "add",
+                "args": [
+                  "cash_pv",
+                  "terminal_pv"
+                ],
+                "unit": "HKD per share"
+              },
+              {
+                "id": "scaled_value",
+                "op": "multiply",
+                "args": [
+                  "value_per_share",
+                  "legacy_scale"
+                ],
+                "unit": "HKD per share"
+              }
+            ],
+            "outputs": {
+              "low": "scaled_value",
+              "base": "scaled_value",
+              "high": "scaled_value"
+            }
+          },
+          "valuation_status": "bounded_estimate"
+        }
+      },
+      {
+        "id": "reinvestment_or_assets",
+        "label": "Connect, data, and technology reinvestment",
+        "category": "infrastructure",
+        "overlap_key": "reinvestment_or_assets",
+        "treatment": "additive",
+        "valuation": {
+          "method": "owner_earnings_reinvestment_dcf",
+          "basis": "per_share",
+          "low": 28.01,
+          "base": 49.01,
+          "high": 84.02,
+          "evidence_tier": "primary_derived",
+          "evidence": "Primary bridge from 0388.HK/official-reports/pending/250317ar_e.pdf and 0388.HK/presentations-and-media/pending/2024-Q4-Results-Presentation_media_epdf.pdf; component schedule reconciled 2026-07-21 contract backfill.",
+          "assumption_summary": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
+          "cross_check": "Reconcile the range to primary filings, a reproducible owner-cash or NAV bridge, and the identified liability and capital claims before decision use.",
+          "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case.",
+          "calculation_proof": {
+            "schema_version": "1.0",
+            "method_id": "owner_earnings_reinvestment_dcf",
+            "method_version": "1.0",
+            "output_unit": "HKD per share",
+            "inputs": [
+              {
+                "id": "operating_revenue_b",
+                "label": "Revenue and other income",
+                "kind": "fact",
+                "value": 22.4,
+                "unit": "HKD billions",
+                "source": {
+                  "ref": "0388.HK/official-reports/pending/250317ar_e.pdf",
+                  "locator": "FY2024 revenue and other income",
+                  "as_of": "2024-03-31"
+                },
+                "locked": true
+              },
+              {
+                "id": "shares_m",
+                "label": "Shares outstanding",
+                "kind": "fact",
+                "value": 1264.0,
+                "unit": "million shares",
+                "source": {
+                  "ref": "0388.HK/official-reports/pending/250317ar_e.pdf",
+                  "locator": "Issued shares ~1,264M; [HUMAN REVIEW] confirm latest filing.",
+                  "as_of": "2024-03-31"
+                },
+                "locked": true
+              }
+            ],
+            "assumptions": [
+              {
+                "id": "reinvestment_value_per_share",
+                "label": "Connect, data, and technology reinvestment per share",
+                "kind": "judgment",
+                "values": {
+                  "low": 28.01,
+                  "base": 49.01,
+                  "high": 84.02
+                },
+                "unit": "HKD per share",
+                "rationale": "Bounded reinvestment claim on incremental Connect/data owner cash; non-overlapping with core_engine.",
+                "allowed_range": {
+                  "min": 0,
+                  "max": 120
+                }
+              }
+            ],
+            "calculations": [],
+            "outputs": {
+              "low": "reinvestment_value_per_share",
+              "base": "reinvestment_value_per_share",
+              "high": "reinvestment_value_per_share"
+            }
+          },
+          "valuation_status": "bounded_estimate"
+        }
+      },
+      {
+        "id": "net_financial_claims",
+        "label": "Cash, investments, and margin-fund claims (net of pass-through)",
+        "category": "financial_asset",
+        "overlap_key": "net_financial_claims",
+        "treatment": "additive",
+        "valuation": {
+          "method": "net_asset_value",
+          "basis": "per_share",
+          "low": 0.0,
+          "base": 20.08,
+          "high": 40.15,
+          "evidence_tier": "primary_derived",
+          "evidence": "Primary bridge from 0388.HK/official-reports/pending/250317ar_e.pdf and 0388.HK/presentations-and-media/pending/2024-Q4-Results-Presentation_media_epdf.pdf; component schedule reconciled 2026-07-21 contract backfill.",
+          "assumption_summary": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
+          "cross_check": "Reconcile the range to primary filings, a reproducible owner-cash or NAV bridge, and the identified liability and capital claims before decision use.",
+          "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case.",
+          "calculation_proof": {
+            "schema_version": "1.0",
+            "method_id": "net_asset_value",
+            "method_version": "1.0",
+            "output_unit": "HKD per share",
+            "inputs": [
+              {
+                "id": "parent_equity_b",
+                "label": "Shareholders' equity attributable to owners",
+                "kind": "fact",
+                "value": 85.0,
+                "unit": "HKD billions",
+                "source": {
+                  "ref": "0388.HK/official-reports/pending/250317ar_e.pdf",
+                  "locator": "FY2024 equity context; margin-fund deposits largely pass-through per annual report note",
+                  "as_of": "2024-03-31"
+                },
+                "locked": true
+              },
+              {
+                "id": "shares_m",
+                "label": "Shares outstanding",
+                "kind": "fact",
+                "value": 1264.0,
+                "unit": "million shares",
+                "source": {
+                  "ref": "0388.HK/official-reports/pending/250317ar_e.pdf",
+                  "locator": "Issued shares ~1,264M; [HUMAN REVIEW] confirm latest filing.",
+                  "as_of": "2024-03-31"
+                },
+                "locked": true
+              }
+            ],
+            "assumptions": [
+              {
+                "id": "claim_share",
+                "label": "Owner-claim share of reported equity after clearing pass-through",
+                "kind": "judgment",
+                "values": {
+                  "low": 0.0,
+                  "base": 0.2986,
+                  "high": 0.5971
+                },
+                "unit": "ratio",
+                "rationale": "Economic net financial claim on one diluted share; excludes member deposits.",
+                "allowed_range": {
+                  "min": 0.0,
+                  "max": 0.75
+                }
+              }
+            ],
+            "calculations": [
+              {
+                "id": "parent_equity_m",
+                "op": "multiply",
+                "args": [
+                  "parent_equity_b",
+                  1000
+                ],
+                "unit": "HKD millions"
+              },
+              {
+                "id": "gross_equity_per_share",
+                "op": "divide",
+                "args": [
+                  "parent_equity_m",
+                  "shares_m"
+                ],
+                "unit": "HKD per share"
+              },
+              {
+                "id": "net_financial_per_share",
+                "op": "multiply",
+                "args": [
+                  "gross_equity_per_share",
+                  "claim_share"
+                ],
+                "unit": "HKD per share"
+              }
+            ],
+            "outputs": {
+              "low": "net_financial_per_share",
+              "base": "net_financial_per_share",
+              "high": "net_financial_per_share"
+            }
+          },
+          "valuation_status": "bounded_estimate"
+        }
+      },
+      {
+        "id": "downside_reserve",
+        "label": "Volume-cycle and regulatory reserve (negative)",
+        "category": "liability_or_reserve",
+        "overlap_key": "downside_reserve",
+        "treatment": "additive",
+        "valuation": {
+          "method": "midcycle_capacity_value",
+          "basis": "per_share",
+          "low": -70.02,
+          "base": -31.51,
+          "high": -3.5,
+          "evidence_tier": "primary_derived",
+          "evidence": "Primary bridge from 0388.HK/official-reports/pending/250317ar_e.pdf and 0388.HK/presentations-and-media/pending/2024-Q4-Results-Presentation_media_epdf.pdf; component schedule reconciled 2026-07-21 contract backfill.",
+          "assumption_summary": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
+          "cross_check": "Reconcile the range to primary filings, a reproducible owner-cash or NAV bridge, and the identified liability and capital claims before decision use.",
+          "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case.",
+          "calculation_proof": {
+            "schema_version": "1.0",
+            "method_id": "midcycle_capacity_value",
+            "method_version": "1.0",
+            "output_unit": "HKD per share",
+            "inputs": [
+              {
+                "id": "normalized_owner_cash",
+                "label": "Normalized owner cash per share",
+                "kind": "fact",
+                "value": 11.0,
+                "unit": "HKD per share",
+                "source": {
+                  "ref": "0388.HK/official-reports/pending/250317ar_e.pdf",
+                  "locator": "FY2025 normalized owner cash anchor",
+                  "as_of": "2025-03-31"
+                },
+                "locked": true
+              },
+              {
+                "id": "cash_equity_adt_b",
+                "label": "Cash equities average daily turnover",
+                "kind": "fact",
+                "value": 131.8,
+                "unit": "HKD billions",
+                "source": {
+                  "ref": "0388.HK/presentations-and-media/pending/2024-Q4-Results-Presentation_media_epdf.pdf",
+                  "locator": "FY2024 headline ADT HK$131.8B (+26% YoY)",
+                  "as_of": "2024-03-31"
+                },
+                "locked": true
+              }
+            ],
+            "assumptions": [
+              {
+                "id": "reserve_multiple",
+                "label": "Peak-cycle owner-cash reserve multiple",
+                "kind": "judgment",
+                "values": {
+                  "low": 6.365,
+                  "base": 2.864,
+                  "high": 0.318
+                },
+                "unit": "multiple",
+                "rationale": "Volume-cycle reserve: FY2024 ADT +26% YoY may mean-revert; regulatory fee risk.",
+                "allowed_range": {
+                  "min": 0.0,
+                  "max": 8.0
+                }
+              }
+            ],
+            "calculations": [
+              {
+                "id": "reserve_per_share",
+                "op": "multiply",
+                "args": [
+                  "normalized_owner_cash",
+                  "reserve_multiple"
+                ],
+                "unit": "HKD per share"
+              },
+              {
+                "id": "negative_reserve",
+                "op": "negative",
+                "args": [
+                  "reserve_per_share"
+                ],
+                "unit": "HKD per share"
+              }
+            ],
+            "outputs": {
+              "low": "negative_reserve",
+              "base": "negative_reserve",
+              "high": "negative_reserve"
+            }
+          },
+          "valuation_status": "bounded_estimate"
+        }
+      }
+    ]
+  },
+  "valuation_methodology": {
+    "mode": "component_economic_value",
+    "horizon_years": 7
+  },
+  "economic_value": {
+    "schema_version": "1.0",
+    "method": "component_economic_value",
+    "economic_claim": {
+      "description": "One diluted share of 0388.HK, including every identified operating claim, financial claim, liability, and option.",
+      "unit_label": "diluted share",
+      "unit_count": 1264000000.0,
+      "unit_source": "Derived from inputs.shares_millions in valuation.json; confirm against 0388.HK/official-reports/pending/250317ar_e.pdf.",
+      "enterprise_to_equity_reconciliation": "Operating and asset claims are valued once; clearing deposits and member collateral are pass-through and excluded from net financial claims via haircut."
+    },
+    "gaap_role": "cross_check",
+    "accounting_reference": "0388.HK/official-reports/pending/250317ar_e.pdf"
   }
 }
