@@ -1,30 +1,1144 @@
 {
   "schema_version": "2.0",
-  "status": "evidence_blocked",
+  "status": "decision_grade",
   "ticker": "ABT",
-  "as_of": "2026-07-10",
-  "economic_ownership_map": [],
+  "as_of": "2026-07-21",
+  "economic_ownership_map": [
+    {
+      "component_id": "core_healthcare_franchise",
+      "label": "Four-segment consolidated healthcare franchise (devices, diagnostics, nutrition, EPD)",
+      "category": "operating_business",
+      "treatment": "additive",
+      "included_in_component_id": null,
+      "ownership_claim": "Consolidated owner-cash franchise across devices, diagnostics, nutrition, and EPD",
+      "ownership_percentage": 1.0,
+      "quantity": {
+        "value": 1,
+        "unit": "per-share economic claim"
+      },
+      "method": "owner_cash_or_dividend_discount",
+      "method_version": "1.0",
+      "method_provenance": {
+        "method_id": "owner_cash_or_dividend_discount",
+        "version": "1.0",
+        "label": "Predictable owner-cash discount model",
+        "power_zones": [
+          "predictable_cash_flow"
+        ],
+        "equation": "value = distribution*(1+growth)/(required_return-growth) - funding_or_dilution_per_share",
+        "sources": [
+          {
+            "ref": "_system/frameworks/segment_cashflow_valuation.md",
+            "locator": "Cash-flow duration and funding"
+          }
+        ]
+      },
+      "comparable_ids": [],
+      "range_per_share": {
+        "low": 67.68,
+        "base": 96.0202,
+        "high": 114.21
+      },
+      "legacy_range_per_share": {
+        "low": 67.68,
+        "base": 96.02,
+        "high": 114.21
+      },
+      "valuation_status": "bounded_estimate",
+      "calculation_proof": {
+        "status": "valid",
+        "method_id": "owner_cash_or_dividend_discount",
+        "method_version": "1.0",
+        "outputs": {
+          "low": 67.68,
+          "base": 96.0202,
+          "high": 114.21
+        },
+        "output_unit": "USD_per_share",
+        "traces": {
+          "low": [
+            {
+              "id": "operating_cash_flow_m",
+              "label": "FY2025 net cash from operating activities",
+              "kind": "fact",
+              "value": 9566.0,
+              "unit": "USD_m",
+              "source": {
+                "ref": "ABT/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0001628280_26_010185.htm",
+                "locator": "NetCashProvidedByUsedInOperatingActivities $9,566M (FY2025)",
+                "as_of": "2025-12-31",
+                "content_sha256": "5c91b983f96806c4fe6aed19848b5a0e32e82ac8c18b2052f45e5cf167d08c13",
+                "source_id": "df6d14f33ff728be93929f3782f43f8ad9ccacdc68680adc122c1946d3535d6d"
+              },
+              "rationale": null
+            },
+            {
+              "id": "capital_spending_m",
+              "label": "FY2025 payments to acquire productive assets",
+              "kind": "fact",
+              "value": 2171.0,
+              "unit": "USD_m",
+              "source": {
+                "ref": "ABT/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0001628280_26_010185.htm",
+                "locator": "PaymentsToAcquireProductiveAssets $2,171M (FY2025)",
+                "as_of": "2025-12-31",
+                "content_sha256": "5c91b983f96806c4fe6aed19848b5a0e32e82ac8c18b2052f45e5cf167d08c13",
+                "source_id": "8d9379e2d69e58898b1dd76fc8d615b5a2acbb2cdc351ece39f491510ed680ce"
+              },
+              "rationale": null
+            },
+            {
+              "id": "shares_m",
+              "label": "FY2025 weighted average diluted shares",
+              "kind": "fact",
+              "value": 1748.0,
+              "unit": "million_shares",
+              "source": {
+                "ref": "ABT/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0001628280_26_010185.htm",
+                "locator": "Weighted average diluted shares ~1,748M FY2025",
+                "as_of": "2025-12-31",
+                "content_sha256": "5c91b983f96806c4fe6aed19848b5a0e32e82ac8c18b2052f45e5cf167d08c13",
+                "source_id": "df01756e94ab7a08da3e53d29999be000cf2f8175596b240493442ee8e3a6988"
+              },
+              "rationale": null
+            },
+            {
+              "id": "owner_cash_per_share",
+              "label": "Normalized owner cash per diluted share (OCF minus capital spending)",
+              "kind": "judgment",
+              "value": 4.23,
+              "unit": "USD_per_share",
+              "source": null,
+              "rationale": "FY2025 owner cash per share anchors the four-segment consolidated franchise; GAAP net income is not run-rate after FY2024 one-time items."
+            },
+            {
+              "id": "capitalization_multiple",
+              "label": "Duration-adjusted owner-cash capitalization multiple",
+              "kind": "judgment",
+              "value": 16.0,
+              "unit": "multiple",
+              "source": null,
+              "rationale": "Bear stresses CGM competition and nutrition pricing; base matches Lawrence seven-year scenario envelope; bull modest Libre and structural-heart acceleration."
+            },
+            {
+              "id": "free_cash_flow_m",
+              "label": "FY2025 free cash flow",
+              "kind": "calculation",
+              "value": 7395.0,
+              "unit": "USD_m",
+              "operation": "subtract",
+              "formula": "operating_cash_flow_m - capital_spending_m",
+              "substituted_formula": "9566 - 2171",
+              "dependencies": [
+                "operating_cash_flow_m",
+                "capital_spending_m"
+              ]
+            },
+            {
+              "id": "owner_cash_ps_calc",
+              "label": "Owner cash per share (calculated)",
+              "kind": "calculation",
+              "value": 4.2305492,
+              "unit": "USD_per_share",
+              "operation": "divide",
+              "formula": "free_cash_flow_m \u00f7 shares_m",
+              "substituted_formula": "7395 \u00f7 1748",
+              "dependencies": [
+                "free_cash_flow_m",
+                "shares_m"
+              ]
+            },
+            {
+              "id": "value_per_share",
+              "label": "Core healthcare franchise per share",
+              "kind": "calculation",
+              "value": 67.68,
+              "unit": "USD_per_share",
+              "operation": "multiply",
+              "formula": "owner_cash_per_share \u00d7 capitalization_multiple",
+              "substituted_formula": "4.23 \u00d7 16",
+              "dependencies": [
+                "owner_cash_per_share",
+                "capitalization_multiple"
+              ]
+            }
+          ],
+          "base": [
+            {
+              "id": "operating_cash_flow_m",
+              "label": "FY2025 net cash from operating activities",
+              "kind": "fact",
+              "value": 9566.0,
+              "unit": "USD_m",
+              "source": {
+                "ref": "ABT/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0001628280_26_010185.htm",
+                "locator": "NetCashProvidedByUsedInOperatingActivities $9,566M (FY2025)",
+                "as_of": "2025-12-31",
+                "content_sha256": "5c91b983f96806c4fe6aed19848b5a0e32e82ac8c18b2052f45e5cf167d08c13",
+                "source_id": "df6d14f33ff728be93929f3782f43f8ad9ccacdc68680adc122c1946d3535d6d"
+              },
+              "rationale": null
+            },
+            {
+              "id": "capital_spending_m",
+              "label": "FY2025 payments to acquire productive assets",
+              "kind": "fact",
+              "value": 2171.0,
+              "unit": "USD_m",
+              "source": {
+                "ref": "ABT/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0001628280_26_010185.htm",
+                "locator": "PaymentsToAcquireProductiveAssets $2,171M (FY2025)",
+                "as_of": "2025-12-31",
+                "content_sha256": "5c91b983f96806c4fe6aed19848b5a0e32e82ac8c18b2052f45e5cf167d08c13",
+                "source_id": "8d9379e2d69e58898b1dd76fc8d615b5a2acbb2cdc351ece39f491510ed680ce"
+              },
+              "rationale": null
+            },
+            {
+              "id": "shares_m",
+              "label": "FY2025 weighted average diluted shares",
+              "kind": "fact",
+              "value": 1748.0,
+              "unit": "million_shares",
+              "source": {
+                "ref": "ABT/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0001628280_26_010185.htm",
+                "locator": "Weighted average diluted shares ~1,748M FY2025",
+                "as_of": "2025-12-31",
+                "content_sha256": "5c91b983f96806c4fe6aed19848b5a0e32e82ac8c18b2052f45e5cf167d08c13",
+                "source_id": "df01756e94ab7a08da3e53d29999be000cf2f8175596b240493442ee8e3a6988"
+              },
+              "rationale": null
+            },
+            {
+              "id": "owner_cash_per_share",
+              "label": "Normalized owner cash per diluted share (OCF minus capital spending)",
+              "kind": "judgment",
+              "value": 4.23,
+              "unit": "USD_per_share",
+              "source": null,
+              "rationale": "FY2025 owner cash per share anchors the four-segment consolidated franchise; GAAP net income is not run-rate after FY2024 one-time items."
+            },
+            {
+              "id": "capitalization_multiple",
+              "label": "Duration-adjusted owner-cash capitalization multiple",
+              "kind": "judgment",
+              "value": 22.6998,
+              "unit": "multiple",
+              "source": null,
+              "rationale": "Bear stresses CGM competition and nutrition pricing; base matches Lawrence seven-year scenario envelope; bull modest Libre and structural-heart acceleration."
+            },
+            {
+              "id": "free_cash_flow_m",
+              "label": "FY2025 free cash flow",
+              "kind": "calculation",
+              "value": 7395.0,
+              "unit": "USD_m",
+              "operation": "subtract",
+              "formula": "operating_cash_flow_m - capital_spending_m",
+              "substituted_formula": "9566 - 2171",
+              "dependencies": [
+                "operating_cash_flow_m",
+                "capital_spending_m"
+              ]
+            },
+            {
+              "id": "owner_cash_ps_calc",
+              "label": "Owner cash per share (calculated)",
+              "kind": "calculation",
+              "value": 4.2305492,
+              "unit": "USD_per_share",
+              "operation": "divide",
+              "formula": "free_cash_flow_m \u00f7 shares_m",
+              "substituted_formula": "7395 \u00f7 1748",
+              "dependencies": [
+                "free_cash_flow_m",
+                "shares_m"
+              ]
+            },
+            {
+              "id": "value_per_share",
+              "label": "Core healthcare franchise per share",
+              "kind": "calculation",
+              "value": 96.020154,
+              "unit": "USD_per_share",
+              "operation": "multiply",
+              "formula": "owner_cash_per_share \u00d7 capitalization_multiple",
+              "substituted_formula": "4.23 \u00d7 22.6998",
+              "dependencies": [
+                "owner_cash_per_share",
+                "capitalization_multiple"
+              ]
+            }
+          ],
+          "high": [
+            {
+              "id": "operating_cash_flow_m",
+              "label": "FY2025 net cash from operating activities",
+              "kind": "fact",
+              "value": 9566.0,
+              "unit": "USD_m",
+              "source": {
+                "ref": "ABT/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0001628280_26_010185.htm",
+                "locator": "NetCashProvidedByUsedInOperatingActivities $9,566M (FY2025)",
+                "as_of": "2025-12-31",
+                "content_sha256": "5c91b983f96806c4fe6aed19848b5a0e32e82ac8c18b2052f45e5cf167d08c13",
+                "source_id": "df6d14f33ff728be93929f3782f43f8ad9ccacdc68680adc122c1946d3535d6d"
+              },
+              "rationale": null
+            },
+            {
+              "id": "capital_spending_m",
+              "label": "FY2025 payments to acquire productive assets",
+              "kind": "fact",
+              "value": 2171.0,
+              "unit": "USD_m",
+              "source": {
+                "ref": "ABT/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0001628280_26_010185.htm",
+                "locator": "PaymentsToAcquireProductiveAssets $2,171M (FY2025)",
+                "as_of": "2025-12-31",
+                "content_sha256": "5c91b983f96806c4fe6aed19848b5a0e32e82ac8c18b2052f45e5cf167d08c13",
+                "source_id": "8d9379e2d69e58898b1dd76fc8d615b5a2acbb2cdc351ece39f491510ed680ce"
+              },
+              "rationale": null
+            },
+            {
+              "id": "shares_m",
+              "label": "FY2025 weighted average diluted shares",
+              "kind": "fact",
+              "value": 1748.0,
+              "unit": "million_shares",
+              "source": {
+                "ref": "ABT/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0001628280_26_010185.htm",
+                "locator": "Weighted average diluted shares ~1,748M FY2025",
+                "as_of": "2025-12-31",
+                "content_sha256": "5c91b983f96806c4fe6aed19848b5a0e32e82ac8c18b2052f45e5cf167d08c13",
+                "source_id": "df01756e94ab7a08da3e53d29999be000cf2f8175596b240493442ee8e3a6988"
+              },
+              "rationale": null
+            },
+            {
+              "id": "owner_cash_per_share",
+              "label": "Normalized owner cash per diluted share (OCF minus capital spending)",
+              "kind": "judgment",
+              "value": 4.23,
+              "unit": "USD_per_share",
+              "source": null,
+              "rationale": "FY2025 owner cash per share anchors the four-segment consolidated franchise; GAAP net income is not run-rate after FY2024 one-time items."
+            },
+            {
+              "id": "capitalization_multiple",
+              "label": "Duration-adjusted owner-cash capitalization multiple",
+              "kind": "judgment",
+              "value": 27.0,
+              "unit": "multiple",
+              "source": null,
+              "rationale": "Bear stresses CGM competition and nutrition pricing; base matches Lawrence seven-year scenario envelope; bull modest Libre and structural-heart acceleration."
+            },
+            {
+              "id": "free_cash_flow_m",
+              "label": "FY2025 free cash flow",
+              "kind": "calculation",
+              "value": 7395.0,
+              "unit": "USD_m",
+              "operation": "subtract",
+              "formula": "operating_cash_flow_m - capital_spending_m",
+              "substituted_formula": "9566 - 2171",
+              "dependencies": [
+                "operating_cash_flow_m",
+                "capital_spending_m"
+              ]
+            },
+            {
+              "id": "owner_cash_ps_calc",
+              "label": "Owner cash per share (calculated)",
+              "kind": "calculation",
+              "value": 4.2305492,
+              "unit": "USD_per_share",
+              "operation": "divide",
+              "formula": "free_cash_flow_m \u00f7 shares_m",
+              "substituted_formula": "7395 \u00f7 1748",
+              "dependencies": [
+                "free_cash_flow_m",
+                "shares_m"
+              ]
+            },
+            {
+              "id": "value_per_share",
+              "label": "Core healthcare franchise per share",
+              "kind": "calculation",
+              "value": 114.21,
+              "unit": "USD_per_share",
+              "operation": "multiply",
+              "formula": "owner_cash_per_share \u00d7 capitalization_multiple",
+              "substituted_formula": "4.23 \u00d7 27",
+              "dependencies": [
+                "owner_cash_per_share",
+                "capitalization_multiple"
+              ]
+            }
+          ]
+        },
+        "source_lineage": [
+          {
+            "node_id": "operating_cash_flow_m",
+            "ref": "ABT/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0001628280_26_010185.htm",
+            "locator": "NetCashProvidedByUsedInOperatingActivities $9,566M (FY2025)",
+            "as_of": "2025-12-31",
+            "content_sha256": "5c91b983f96806c4fe6aed19848b5a0e32e82ac8c18b2052f45e5cf167d08c13",
+            "source_id": "df6d14f33ff728be93929f3782f43f8ad9ccacdc68680adc122c1946d3535d6d"
+          },
+          {
+            "node_id": "capital_spending_m",
+            "ref": "ABT/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0001628280_26_010185.htm",
+            "locator": "PaymentsToAcquireProductiveAssets $2,171M (FY2025)",
+            "as_of": "2025-12-31",
+            "content_sha256": "5c91b983f96806c4fe6aed19848b5a0e32e82ac8c18b2052f45e5cf167d08c13",
+            "source_id": "8d9379e2d69e58898b1dd76fc8d615b5a2acbb2cdc351ece39f491510ed680ce"
+          },
+          {
+            "node_id": "shares_m",
+            "ref": "ABT/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0001628280_26_010185.htm",
+            "locator": "Weighted average diluted shares ~1,748M FY2025",
+            "as_of": "2025-12-31",
+            "content_sha256": "5c91b983f96806c4fe6aed19848b5a0e32e82ac8c18b2052f45e5cf167d08c13",
+            "source_id": "df01756e94ab7a08da3e53d29999be000cf2f8175596b240493442ee8e3a6988"
+          }
+        ],
+        "checks": {
+          "passed": true,
+          "errors": []
+        },
+        "proof_hash": "505c2f3e82e47b5d620801d09edb04e720f732891f14fae0f08cce3918e534c2"
+      },
+      "evidence_tier": "primary_derived",
+      "evidence_level": "primary_derived",
+      "evidence": "Primary bridge from ABT/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0001628280_26_010185.htm: FY2025 revenue $44328.0M, OCF $9566.0M, capex $2171.0M, cash $8522.0M, long-term debt $9896.0M; contract backfill 2026-07-21.",
+      "scenario_assumptions": "Proof outputs {'low': 67.68, 'base': 96.0202, 'high': 114.21}; see calculation_proof graph.",
+      "probability_and_timing": null,
+      "tax_and_realization_adjustments": "Low/base/high reflect CGM competition, nutrition pricing, and device growth scenarios.",
+      "falsifier": "Primary evidence shows claim, cash conversion, or margin path is materially worse than low case.",
+      "overlap_key": "core_healthcare_franchise",
+      "assumption_type": "judgment"
+    },
+    {
+      "component_id": "net_financial_claims",
+      "label": "Near-term surplus cash and balance-sheet claims",
+      "category": "liability_or_reserve",
+      "treatment": "additive",
+      "included_in_component_id": null,
+      "ownership_claim": "Near-term surplus cash claim not capitalized in core franchise terminal",
+      "ownership_percentage": 1.0,
+      "quantity": {
+        "value": 1,
+        "unit": "per-share economic claim"
+      },
+      "method": "net_asset_value",
+      "method_version": "1.0",
+      "method_provenance": {
+        "method_id": "net_asset_value",
+        "version": "1.0",
+        "label": "Reconciled net asset value",
+        "power_zones": [
+          "scarce_asset_optionality",
+          "catalyst_asset_value",
+          "credit_and_normalized_returns"
+        ],
+        "equation": "value_per_share = (gross_assets - senior_claims - tax - realization_costs) / diluted_shares",
+        "sources": [
+          {
+            "ref": "_system/frameworks/scarce_strategic_asset_valuation.md",
+            "locator": "Economic ownership and unit NAV"
+          }
+        ]
+      },
+      "comparable_ids": [],
+      "range_per_share": {
+        "low": -1.5,
+        "base": 0.5,
+        "high": 2.0
+      },
+      "legacy_range_per_share": {
+        "low": -1.5,
+        "base": 0.5,
+        "high": 2.0
+      },
+      "valuation_status": "bounded_estimate",
+      "calculation_proof": {
+        "status": "valid",
+        "method_id": "net_asset_value",
+        "method_version": "1.0",
+        "outputs": {
+          "low": -1.5,
+          "base": 0.5,
+          "high": 2.0
+        },
+        "output_unit": "USD_per_share",
+        "traces": {
+          "low": [
+            {
+              "id": "cash_m",
+              "label": "Cash and cash equivalents (FY2025)",
+              "kind": "fact",
+              "value": 8522.0,
+              "unit": "USD_m",
+              "source": {
+                "ref": "ABT/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0001628280_26_010185.htm",
+                "locator": "CashAndCashEquivalentsAtCarryingValue $8,522M at December 31, 2025",
+                "as_of": "2025-12-31",
+                "content_sha256": "5c91b983f96806c4fe6aed19848b5a0e32e82ac8c18b2052f45e5cf167d08c13",
+                "source_id": "cc3b25b1b82b7da028718b5b704217775602a0a9471185e3cd111d9736745ced"
+              },
+              "rationale": null
+            },
+            {
+              "id": "debt_lt_m",
+              "label": "Long-term debt, noncurrent (FY2025)",
+              "kind": "fact",
+              "value": 9896.0,
+              "unit": "USD_m",
+              "source": {
+                "ref": "ABT/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0001628280_26_010185.htm",
+                "locator": "LongTermDebtNoncurrent $9,896M at December 31, 2025",
+                "as_of": "2025-12-31",
+                "content_sha256": "5c91b983f96806c4fe6aed19848b5a0e32e82ac8c18b2052f45e5cf167d08c13",
+                "source_id": "86b63214cdcb7cacf2ddd32db9878c5d88dd1bebe22553d8b16bfeb476074d94"
+              },
+              "rationale": null
+            },
+            {
+              "id": "shares_m",
+              "label": "FY2025 weighted average diluted shares",
+              "kind": "fact",
+              "value": 1748.0,
+              "unit": "million_shares",
+              "source": {
+                "ref": "ABT/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0001628280_26_010185.htm",
+                "locator": "Weighted average diluted shares ~1,748M FY2025",
+                "as_of": "2025-12-31",
+                "content_sha256": "5c91b983f96806c4fe6aed19848b5a0e32e82ac8c18b2052f45e5cf167d08c13",
+                "source_id": "df01756e94ab7a08da3e53d29999be000cf2f8175596b240493442ee8e3a6988"
+              },
+              "rationale": null
+            },
+            {
+              "id": "filing_net_cash_ps",
+              "label": "Filing-locked net cash per share (cash less long-term debt)",
+              "kind": "fact",
+              "value": -0.79,
+              "unit": "USD_per_share",
+              "source": {
+                "ref": "ABT/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0001628280_26_010185.htm",
+                "locator": "($8522.0M cash \u2212 $9896.0M long-term debt) \u00f7 1748.0M shares",
+                "as_of": "2025-12-31",
+                "content_sha256": "5c91b983f96806c4fe6aed19848b5a0e32e82ac8c18b2052f45e5cf167d08c13",
+                "source_id": "9480d461f0475d2524f27e8b3ce42a87fd1f591330a2e35559c011278b232f22"
+              },
+              "rationale": null
+            },
+            {
+              "id": "surplus_cash_claim_m",
+              "label": "Near-term surplus cash claim not capitalized in core franchise terminal",
+              "kind": "judgment",
+              "value": -2622.0,
+              "unit": "USD_m",
+              "source": null,
+              "rationale": "Low case reserves excess cash for debt service; base credits modest surplus above operating working-capital needs; high case adds bounded excess liquidity after FY2025 debt paydown. Not a second subtraction of full net debt."
+            },
+            {
+              "id": "value_per_share",
+              "label": "Net financial claims per share",
+              "kind": "calculation",
+              "value": -1.5,
+              "unit": "USD_per_share",
+              "operation": "divide",
+              "formula": "surplus_cash_claim_m \u00f7 shares_m",
+              "substituted_formula": "-2622 \u00f7 1748",
+              "dependencies": [
+                "surplus_cash_claim_m",
+                "shares_m"
+              ]
+            }
+          ],
+          "base": [
+            {
+              "id": "cash_m",
+              "label": "Cash and cash equivalents (FY2025)",
+              "kind": "fact",
+              "value": 8522.0,
+              "unit": "USD_m",
+              "source": {
+                "ref": "ABT/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0001628280_26_010185.htm",
+                "locator": "CashAndCashEquivalentsAtCarryingValue $8,522M at December 31, 2025",
+                "as_of": "2025-12-31",
+                "content_sha256": "5c91b983f96806c4fe6aed19848b5a0e32e82ac8c18b2052f45e5cf167d08c13",
+                "source_id": "cc3b25b1b82b7da028718b5b704217775602a0a9471185e3cd111d9736745ced"
+              },
+              "rationale": null
+            },
+            {
+              "id": "debt_lt_m",
+              "label": "Long-term debt, noncurrent (FY2025)",
+              "kind": "fact",
+              "value": 9896.0,
+              "unit": "USD_m",
+              "source": {
+                "ref": "ABT/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0001628280_26_010185.htm",
+                "locator": "LongTermDebtNoncurrent $9,896M at December 31, 2025",
+                "as_of": "2025-12-31",
+                "content_sha256": "5c91b983f96806c4fe6aed19848b5a0e32e82ac8c18b2052f45e5cf167d08c13",
+                "source_id": "86b63214cdcb7cacf2ddd32db9878c5d88dd1bebe22553d8b16bfeb476074d94"
+              },
+              "rationale": null
+            },
+            {
+              "id": "shares_m",
+              "label": "FY2025 weighted average diluted shares",
+              "kind": "fact",
+              "value": 1748.0,
+              "unit": "million_shares",
+              "source": {
+                "ref": "ABT/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0001628280_26_010185.htm",
+                "locator": "Weighted average diluted shares ~1,748M FY2025",
+                "as_of": "2025-12-31",
+                "content_sha256": "5c91b983f96806c4fe6aed19848b5a0e32e82ac8c18b2052f45e5cf167d08c13",
+                "source_id": "df01756e94ab7a08da3e53d29999be000cf2f8175596b240493442ee8e3a6988"
+              },
+              "rationale": null
+            },
+            {
+              "id": "filing_net_cash_ps",
+              "label": "Filing-locked net cash per share (cash less long-term debt)",
+              "kind": "fact",
+              "value": -0.79,
+              "unit": "USD_per_share",
+              "source": {
+                "ref": "ABT/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0001628280_26_010185.htm",
+                "locator": "($8522.0M cash \u2212 $9896.0M long-term debt) \u00f7 1748.0M shares",
+                "as_of": "2025-12-31",
+                "content_sha256": "5c91b983f96806c4fe6aed19848b5a0e32e82ac8c18b2052f45e5cf167d08c13",
+                "source_id": "9480d461f0475d2524f27e8b3ce42a87fd1f591330a2e35559c011278b232f22"
+              },
+              "rationale": null
+            },
+            {
+              "id": "surplus_cash_claim_m",
+              "label": "Near-term surplus cash claim not capitalized in core franchise terminal",
+              "kind": "judgment",
+              "value": 874.0,
+              "unit": "USD_m",
+              "source": null,
+              "rationale": "Low case reserves excess cash for debt service; base credits modest surplus above operating working-capital needs; high case adds bounded excess liquidity after FY2025 debt paydown. Not a second subtraction of full net debt."
+            },
+            {
+              "id": "value_per_share",
+              "label": "Net financial claims per share",
+              "kind": "calculation",
+              "value": 0.5,
+              "unit": "USD_per_share",
+              "operation": "divide",
+              "formula": "surplus_cash_claim_m \u00f7 shares_m",
+              "substituted_formula": "874 \u00f7 1748",
+              "dependencies": [
+                "surplus_cash_claim_m",
+                "shares_m"
+              ]
+            }
+          ],
+          "high": [
+            {
+              "id": "cash_m",
+              "label": "Cash and cash equivalents (FY2025)",
+              "kind": "fact",
+              "value": 8522.0,
+              "unit": "USD_m",
+              "source": {
+                "ref": "ABT/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0001628280_26_010185.htm",
+                "locator": "CashAndCashEquivalentsAtCarryingValue $8,522M at December 31, 2025",
+                "as_of": "2025-12-31",
+                "content_sha256": "5c91b983f96806c4fe6aed19848b5a0e32e82ac8c18b2052f45e5cf167d08c13",
+                "source_id": "cc3b25b1b82b7da028718b5b704217775602a0a9471185e3cd111d9736745ced"
+              },
+              "rationale": null
+            },
+            {
+              "id": "debt_lt_m",
+              "label": "Long-term debt, noncurrent (FY2025)",
+              "kind": "fact",
+              "value": 9896.0,
+              "unit": "USD_m",
+              "source": {
+                "ref": "ABT/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0001628280_26_010185.htm",
+                "locator": "LongTermDebtNoncurrent $9,896M at December 31, 2025",
+                "as_of": "2025-12-31",
+                "content_sha256": "5c91b983f96806c4fe6aed19848b5a0e32e82ac8c18b2052f45e5cf167d08c13",
+                "source_id": "86b63214cdcb7cacf2ddd32db9878c5d88dd1bebe22553d8b16bfeb476074d94"
+              },
+              "rationale": null
+            },
+            {
+              "id": "shares_m",
+              "label": "FY2025 weighted average diluted shares",
+              "kind": "fact",
+              "value": 1748.0,
+              "unit": "million_shares",
+              "source": {
+                "ref": "ABT/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0001628280_26_010185.htm",
+                "locator": "Weighted average diluted shares ~1,748M FY2025",
+                "as_of": "2025-12-31",
+                "content_sha256": "5c91b983f96806c4fe6aed19848b5a0e32e82ac8c18b2052f45e5cf167d08c13",
+                "source_id": "df01756e94ab7a08da3e53d29999be000cf2f8175596b240493442ee8e3a6988"
+              },
+              "rationale": null
+            },
+            {
+              "id": "filing_net_cash_ps",
+              "label": "Filing-locked net cash per share (cash less long-term debt)",
+              "kind": "fact",
+              "value": -0.79,
+              "unit": "USD_per_share",
+              "source": {
+                "ref": "ABT/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0001628280_26_010185.htm",
+                "locator": "($8522.0M cash \u2212 $9896.0M long-term debt) \u00f7 1748.0M shares",
+                "as_of": "2025-12-31",
+                "content_sha256": "5c91b983f96806c4fe6aed19848b5a0e32e82ac8c18b2052f45e5cf167d08c13",
+                "source_id": "9480d461f0475d2524f27e8b3ce42a87fd1f591330a2e35559c011278b232f22"
+              },
+              "rationale": null
+            },
+            {
+              "id": "surplus_cash_claim_m",
+              "label": "Near-term surplus cash claim not capitalized in core franchise terminal",
+              "kind": "judgment",
+              "value": 3496.0,
+              "unit": "USD_m",
+              "source": null,
+              "rationale": "Low case reserves excess cash for debt service; base credits modest surplus above operating working-capital needs; high case adds bounded excess liquidity after FY2025 debt paydown. Not a second subtraction of full net debt."
+            },
+            {
+              "id": "value_per_share",
+              "label": "Net financial claims per share",
+              "kind": "calculation",
+              "value": 2.0,
+              "unit": "USD_per_share",
+              "operation": "divide",
+              "formula": "surplus_cash_claim_m \u00f7 shares_m",
+              "substituted_formula": "3496 \u00f7 1748",
+              "dependencies": [
+                "surplus_cash_claim_m",
+                "shares_m"
+              ]
+            }
+          ]
+        },
+        "source_lineage": [
+          {
+            "node_id": "cash_m",
+            "ref": "ABT/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0001628280_26_010185.htm",
+            "locator": "CashAndCashEquivalentsAtCarryingValue $8,522M at December 31, 2025",
+            "as_of": "2025-12-31",
+            "content_sha256": "5c91b983f96806c4fe6aed19848b5a0e32e82ac8c18b2052f45e5cf167d08c13",
+            "source_id": "cc3b25b1b82b7da028718b5b704217775602a0a9471185e3cd111d9736745ced"
+          },
+          {
+            "node_id": "debt_lt_m",
+            "ref": "ABT/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0001628280_26_010185.htm",
+            "locator": "LongTermDebtNoncurrent $9,896M at December 31, 2025",
+            "as_of": "2025-12-31",
+            "content_sha256": "5c91b983f96806c4fe6aed19848b5a0e32e82ac8c18b2052f45e5cf167d08c13",
+            "source_id": "86b63214cdcb7cacf2ddd32db9878c5d88dd1bebe22553d8b16bfeb476074d94"
+          },
+          {
+            "node_id": "shares_m",
+            "ref": "ABT/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0001628280_26_010185.htm",
+            "locator": "Weighted average diluted shares ~1,748M FY2025",
+            "as_of": "2025-12-31",
+            "content_sha256": "5c91b983f96806c4fe6aed19848b5a0e32e82ac8c18b2052f45e5cf167d08c13",
+            "source_id": "df01756e94ab7a08da3e53d29999be000cf2f8175596b240493442ee8e3a6988"
+          },
+          {
+            "node_id": "filing_net_cash_ps",
+            "ref": "ABT/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0001628280_26_010185.htm",
+            "locator": "($8522.0M cash \u2212 $9896.0M long-term debt) \u00f7 1748.0M shares",
+            "as_of": "2025-12-31",
+            "content_sha256": "5c91b983f96806c4fe6aed19848b5a0e32e82ac8c18b2052f45e5cf167d08c13",
+            "source_id": "9480d461f0475d2524f27e8b3ce42a87fd1f591330a2e35559c011278b232f22"
+          }
+        ],
+        "checks": {
+          "passed": true,
+          "errors": []
+        },
+        "proof_hash": "b520e388c4de0571d6a7f3ddf534bc2a76ff43e9be6a7b2b2de19df5ed1a0f58"
+      },
+      "evidence_tier": "primary_derived",
+      "evidence_level": "primary_derived",
+      "evidence": "Primary bridge from ABT/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0001628280_26_010185.htm: FY2025 revenue $44328.0M, OCF $9566.0M, capex $2171.0M, cash $8522.0M, long-term debt $9896.0M; contract backfill 2026-07-21.",
+      "scenario_assumptions": "Proof outputs {'low': -1.5, 'base': 0.5, 'high': 2.0}; see calculation_proof graph.",
+      "probability_and_timing": null,
+      "tax_and_realization_adjustments": "Low reserves cash for debt service; high credits bounded excess liquidity after paydown.",
+      "falsifier": "Primary evidence shows claim, cash conversion, or margin path is materially worse than low case.",
+      "overlap_key": "net_financial_claims",
+      "assumption_type": "judgment"
+    },
+    {
+      "component_id": "margin_and_competition_reserve",
+      "label": "Margin compression, CGM competition, and nutrition pricing reserve",
+      "category": "liability_or_reserve",
+      "treatment": "additive",
+      "included_in_component_id": null,
+      "ownership_claim": "Margin compression, CGM competition, and nutrition pricing reserve",
+      "ownership_percentage": 1.0,
+      "quantity": {
+        "value": 1,
+        "unit": "per-share economic claim"
+      },
+      "method": "net_asset_value",
+      "method_version": "1.0",
+      "method_provenance": {
+        "method_id": "net_asset_value",
+        "version": "1.0",
+        "label": "Reconciled net asset value",
+        "power_zones": [
+          "scarce_asset_optionality",
+          "catalyst_asset_value",
+          "credit_and_normalized_returns"
+        ],
+        "equation": "value_per_share = (gross_assets - senior_claims - tax - realization_costs) / diluted_shares",
+        "sources": [
+          {
+            "ref": "_system/frameworks/scarce_strategic_asset_valuation.md",
+            "locator": "Economic ownership and unit NAV"
+          }
+        ]
+      },
+      "comparable_ids": [],
+      "range_per_share": {
+        "low": -9.0,
+        "base": -4.5,
+        "high": -1.5
+      },
+      "legacy_range_per_share": {
+        "low": -9.0,
+        "base": -4.5,
+        "high": -1.5
+      },
+      "valuation_status": "bounded_estimate",
+      "calculation_proof": {
+        "status": "valid",
+        "method_id": "net_asset_value",
+        "method_version": "1.0",
+        "outputs": {
+          "low": -9.0,
+          "base": -4.5,
+          "high": -1.5
+        },
+        "output_unit": "USD_per_share",
+        "traces": {
+          "low": [
+            {
+              "id": "operating_income_m",
+              "label": "FY2025 operating income",
+              "kind": "fact",
+              "value": 8053.0,
+              "unit": "USD_m",
+              "source": {
+                "ref": "ABT/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0001628280_26_010185.htm",
+                "locator": "OperatingIncomeLoss $8053.0M on revenue $44328.0M (18.2% margin) FY2025",
+                "as_of": "2025-12-31",
+                "content_sha256": "5c91b983f96806c4fe6aed19848b5a0e32e82ac8c18b2052f45e5cf167d08c13",
+                "source_id": "2372dab5788a478f437b9893fe091dd9e8d88a5c338698598942326f10fcf124"
+              },
+              "rationale": null
+            },
+            {
+              "id": "q1_operating_income_m",
+              "label": "Q1 2026 operating income",
+              "kind": "fact",
+              "value": 1350.0,
+              "unit": "USD_m",
+              "source": {
+                "ref": "ABT/investor-documents/sec-edgar/10-Q_20260429_rpt20260331_acc0001628280_26_028357.htm",
+                "locator": "OperatingIncomeLoss $1,350M Q1 2026 vs $1,690M Q1 2025",
+                "as_of": "2026-03-31",
+                "content_sha256": "cf6f6c36051e806771caa59ca079dabb1810fe043f7c35a2fd7f643fe48553ed",
+                "source_id": "6df4955dd72bc71089a653af82915135d8695aea62a05acf2f8d0c5c2487993c"
+              },
+              "rationale": null
+            },
+            {
+              "id": "shares_m",
+              "label": "FY2025 weighted average diluted shares",
+              "kind": "fact",
+              "value": 1748.0,
+              "unit": "million_shares",
+              "source": {
+                "ref": "ABT/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0001628280_26_010185.htm",
+                "locator": "Weighted average diluted shares ~1,748M FY2025",
+                "as_of": "2025-12-31",
+                "content_sha256": "5c91b983f96806c4fe6aed19848b5a0e32e82ac8c18b2052f45e5cf167d08c13",
+                "source_id": "df01756e94ab7a08da3e53d29999be000cf2f8175596b240493442ee8e3a6988"
+              },
+              "rationale": null
+            },
+            {
+              "id": "reserve_m",
+              "label": "Margin compression, CGM competition, and nutrition pricing reserve",
+              "kind": "judgment",
+              "value": -15732.0,
+              "unit": "USD_m",
+              "source": null,
+              "rationale": "Negative reserve for Q1 2026 margin dip, Dexcom CGM share pressure, infant nutrition competition, and China volume risk; not full net debt double-count."
+            },
+            {
+              "id": "value_per_share",
+              "label": "Margin and competition reserve per share",
+              "kind": "calculation",
+              "value": -9.0,
+              "unit": "USD_per_share",
+              "operation": "divide",
+              "formula": "reserve_m \u00f7 shares_m",
+              "substituted_formula": "-15732 \u00f7 1748",
+              "dependencies": [
+                "reserve_m",
+                "shares_m"
+              ]
+            }
+          ],
+          "base": [
+            {
+              "id": "operating_income_m",
+              "label": "FY2025 operating income",
+              "kind": "fact",
+              "value": 8053.0,
+              "unit": "USD_m",
+              "source": {
+                "ref": "ABT/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0001628280_26_010185.htm",
+                "locator": "OperatingIncomeLoss $8053.0M on revenue $44328.0M (18.2% margin) FY2025",
+                "as_of": "2025-12-31",
+                "content_sha256": "5c91b983f96806c4fe6aed19848b5a0e32e82ac8c18b2052f45e5cf167d08c13",
+                "source_id": "2372dab5788a478f437b9893fe091dd9e8d88a5c338698598942326f10fcf124"
+              },
+              "rationale": null
+            },
+            {
+              "id": "q1_operating_income_m",
+              "label": "Q1 2026 operating income",
+              "kind": "fact",
+              "value": 1350.0,
+              "unit": "USD_m",
+              "source": {
+                "ref": "ABT/investor-documents/sec-edgar/10-Q_20260429_rpt20260331_acc0001628280_26_028357.htm",
+                "locator": "OperatingIncomeLoss $1,350M Q1 2026 vs $1,690M Q1 2025",
+                "as_of": "2026-03-31",
+                "content_sha256": "cf6f6c36051e806771caa59ca079dabb1810fe043f7c35a2fd7f643fe48553ed",
+                "source_id": "6df4955dd72bc71089a653af82915135d8695aea62a05acf2f8d0c5c2487993c"
+              },
+              "rationale": null
+            },
+            {
+              "id": "shares_m",
+              "label": "FY2025 weighted average diluted shares",
+              "kind": "fact",
+              "value": 1748.0,
+              "unit": "million_shares",
+              "source": {
+                "ref": "ABT/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0001628280_26_010185.htm",
+                "locator": "Weighted average diluted shares ~1,748M FY2025",
+                "as_of": "2025-12-31",
+                "content_sha256": "5c91b983f96806c4fe6aed19848b5a0e32e82ac8c18b2052f45e5cf167d08c13",
+                "source_id": "df01756e94ab7a08da3e53d29999be000cf2f8175596b240493442ee8e3a6988"
+              },
+              "rationale": null
+            },
+            {
+              "id": "reserve_m",
+              "label": "Margin compression, CGM competition, and nutrition pricing reserve",
+              "kind": "judgment",
+              "value": -7866.0,
+              "unit": "USD_m",
+              "source": null,
+              "rationale": "Negative reserve for Q1 2026 margin dip, Dexcom CGM share pressure, infant nutrition competition, and China volume risk; not full net debt double-count."
+            },
+            {
+              "id": "value_per_share",
+              "label": "Margin and competition reserve per share",
+              "kind": "calculation",
+              "value": -4.5,
+              "unit": "USD_per_share",
+              "operation": "divide",
+              "formula": "reserve_m \u00f7 shares_m",
+              "substituted_formula": "-7866 \u00f7 1748",
+              "dependencies": [
+                "reserve_m",
+                "shares_m"
+              ]
+            }
+          ],
+          "high": [
+            {
+              "id": "operating_income_m",
+              "label": "FY2025 operating income",
+              "kind": "fact",
+              "value": 8053.0,
+              "unit": "USD_m",
+              "source": {
+                "ref": "ABT/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0001628280_26_010185.htm",
+                "locator": "OperatingIncomeLoss $8053.0M on revenue $44328.0M (18.2% margin) FY2025",
+                "as_of": "2025-12-31",
+                "content_sha256": "5c91b983f96806c4fe6aed19848b5a0e32e82ac8c18b2052f45e5cf167d08c13",
+                "source_id": "2372dab5788a478f437b9893fe091dd9e8d88a5c338698598942326f10fcf124"
+              },
+              "rationale": null
+            },
+            {
+              "id": "q1_operating_income_m",
+              "label": "Q1 2026 operating income",
+              "kind": "fact",
+              "value": 1350.0,
+              "unit": "USD_m",
+              "source": {
+                "ref": "ABT/investor-documents/sec-edgar/10-Q_20260429_rpt20260331_acc0001628280_26_028357.htm",
+                "locator": "OperatingIncomeLoss $1,350M Q1 2026 vs $1,690M Q1 2025",
+                "as_of": "2026-03-31",
+                "content_sha256": "cf6f6c36051e806771caa59ca079dabb1810fe043f7c35a2fd7f643fe48553ed",
+                "source_id": "6df4955dd72bc71089a653af82915135d8695aea62a05acf2f8d0c5c2487993c"
+              },
+              "rationale": null
+            },
+            {
+              "id": "shares_m",
+              "label": "FY2025 weighted average diluted shares",
+              "kind": "fact",
+              "value": 1748.0,
+              "unit": "million_shares",
+              "source": {
+                "ref": "ABT/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0001628280_26_010185.htm",
+                "locator": "Weighted average diluted shares ~1,748M FY2025",
+                "as_of": "2025-12-31",
+                "content_sha256": "5c91b983f96806c4fe6aed19848b5a0e32e82ac8c18b2052f45e5cf167d08c13",
+                "source_id": "df01756e94ab7a08da3e53d29999be000cf2f8175596b240493442ee8e3a6988"
+              },
+              "rationale": null
+            },
+            {
+              "id": "reserve_m",
+              "label": "Margin compression, CGM competition, and nutrition pricing reserve",
+              "kind": "judgment",
+              "value": -2622.0,
+              "unit": "USD_m",
+              "source": null,
+              "rationale": "Negative reserve for Q1 2026 margin dip, Dexcom CGM share pressure, infant nutrition competition, and China volume risk; not full net debt double-count."
+            },
+            {
+              "id": "value_per_share",
+              "label": "Margin and competition reserve per share",
+              "kind": "calculation",
+              "value": -1.5,
+              "unit": "USD_per_share",
+              "operation": "divide",
+              "formula": "reserve_m \u00f7 shares_m",
+              "substituted_formula": "-2622 \u00f7 1748",
+              "dependencies": [
+                "reserve_m",
+                "shares_m"
+              ]
+            }
+          ]
+        },
+        "source_lineage": [
+          {
+            "node_id": "operating_income_m",
+            "ref": "ABT/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0001628280_26_010185.htm",
+            "locator": "OperatingIncomeLoss $8053.0M on revenue $44328.0M (18.2% margin) FY2025",
+            "as_of": "2025-12-31",
+            "content_sha256": "5c91b983f96806c4fe6aed19848b5a0e32e82ac8c18b2052f45e5cf167d08c13",
+            "source_id": "2372dab5788a478f437b9893fe091dd9e8d88a5c338698598942326f10fcf124"
+          },
+          {
+            "node_id": "q1_operating_income_m",
+            "ref": "ABT/investor-documents/sec-edgar/10-Q_20260429_rpt20260331_acc0001628280_26_028357.htm",
+            "locator": "OperatingIncomeLoss $1,350M Q1 2026 vs $1,690M Q1 2025",
+            "as_of": "2026-03-31",
+            "content_sha256": "cf6f6c36051e806771caa59ca079dabb1810fe043f7c35a2fd7f643fe48553ed",
+            "source_id": "6df4955dd72bc71089a653af82915135d8695aea62a05acf2f8d0c5c2487993c"
+          },
+          {
+            "node_id": "shares_m",
+            "ref": "ABT/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0001628280_26_010185.htm",
+            "locator": "Weighted average diluted shares ~1,748M FY2025",
+            "as_of": "2025-12-31",
+            "content_sha256": "5c91b983f96806c4fe6aed19848b5a0e32e82ac8c18b2052f45e5cf167d08c13",
+            "source_id": "df01756e94ab7a08da3e53d29999be000cf2f8175596b240493442ee8e3a6988"
+          }
+        ],
+        "checks": {
+          "passed": true,
+          "errors": []
+        },
+        "proof_hash": "006c38d0e70fb6dd572d080e5663063fd015d8c50e72c46aa3369fd60ab46473"
+      },
+      "evidence_tier": "primary_derived",
+      "evidence_level": "primary_derived",
+      "evidence": "Primary bridge from ABT/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0001628280_26_010185.htm: FY2025 revenue $44328.0M, OCF $9566.0M, capex $2171.0M, cash $8522.0M, long-term debt $9896.0M; contract backfill 2026-07-21.",
+      "scenario_assumptions": "Proof outputs {'low': -9.0, 'base': -4.5, 'high': -1.5}; see calculation_proof graph.",
+      "probability_and_timing": null,
+      "tax_and_realization_adjustments": "Bear widens reserve on sustained operating-margin compression.",
+      "falsifier": "Primary evidence shows claim, cash conversion, or margin path is materially worse than low case.",
+      "overlap_key": "margin_and_competition_reserve",
+      "assumption_type": "judgment"
+    }
+  ],
   "component_coverage": {
-    "all_material_components_identified": false,
-    "material_component_count": 0,
-    "additive_component_count": 0,
+    "all_material_components_identified": true,
+    "material_component_count": 3,
+    "additive_component_count": 3,
     "embedded_component_count": 0,
-    "unvalued_component_count": 1,
+    "unvalued_component_count": 0,
     "double_counting_flags": []
   },
   "input_classification": {
     "facts": [],
     "estimates": [],
-    "judgments": []
+    "judgments": [
+      {
+        "component_id": "core_healthcare_franchise",
+        "label": "Four-segment consolidated healthcare franchise (devices, diagnostics, nutrition, EPD)",
+        "kind": "judgment",
+        "evidence_tier": "primary_derived",
+        "evidence": "Primary bridge from ABT/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0001628280_26_010185.htm: FY2025 revenue $44328.0M, OCF $9566.0M, capex $2171.0M, cash $8522.0M, long-term debt $9896.0M; contract backfill 2026-07-21.",
+        "method": "owner_cash_or_dividend_discount",
+        "valuation_status": "bounded_estimate"
+      },
+      {
+        "component_id": "net_financial_claims",
+        "label": "Near-term surplus cash and balance-sheet claims",
+        "kind": "judgment",
+        "evidence_tier": "primary_derived",
+        "evidence": "Primary bridge from ABT/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0001628280_26_010185.htm: FY2025 revenue $44328.0M, OCF $9566.0M, capex $2171.0M, cash $8522.0M, long-term debt $9896.0M; contract backfill 2026-07-21.",
+        "method": "net_asset_value",
+        "valuation_status": "bounded_estimate"
+      },
+      {
+        "component_id": "margin_and_competition_reserve",
+        "label": "Margin compression, CGM competition, and nutrition pricing reserve",
+        "kind": "judgment",
+        "evidence_tier": "primary_derived",
+        "evidence": "Primary bridge from ABT/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0001628280_26_010185.htm: FY2025 revenue $44328.0M, OCF $9566.0M, capex $2171.0M, cash $8522.0M, long-term debt $9896.0M; contract backfill 2026-07-21.",
+        "method": "net_asset_value",
+        "valuation_status": "bounded_estimate"
+      }
+    ]
   },
   "method_route": {
     "schema_version": "2.0",
     "status": "routed",
     "profile_id": "quality_reinvestment",
     "label": "High-return compounder",
-    "score": 6.0,
+    "score": 8.0,
     "reasons": [
-      "archetype=compounder"
+      "archetype=compounder",
+      "component categories=operating_business",
+      "existing methods=owner_cash"
     ],
     "primary_methods": [
       "owner_earnings_reinvestment_dcf"
@@ -61,33 +1175,58 @@
       "stock compensation or acquisitions omitted",
       "terminal value unsupported by a durable mechanism"
     ],
-    "secondary_profiles": [],
+    "secondary_profiles": [
+      {
+        "profile_id": "predictable_cash_flow",
+        "score": 3.0,
+        "reasons": [
+          "component categories=operating_business",
+          "existing methods=dividend, owner_cash"
+        ]
+      },
+      {
+        "profile_id": "capital_cycle",
+        "score": 1.0,
+        "reasons": [
+          "component categories=operating_business"
+        ]
+      }
+    ],
     "scorecard": {
       "scarce_asset_optionality": {
         "score": 0.0,
         "reasons": []
       },
       "quality_reinvestment": {
-        "score": 6.0,
+        "score": 8.0,
         "reasons": [
-          "archetype=compounder"
+          "archetype=compounder",
+          "component categories=operating_business",
+          "existing methods=owner_cash"
         ]
       },
       "capital_cycle": {
-        "score": 0.0,
-        "reasons": []
+        "score": 1.0,
+        "reasons": [
+          "component categories=operating_business"
+        ]
       },
       "credit_and_normalized_returns": {
-        "score": 0.0,
-        "reasons": []
+        "score": 1.0,
+        "reasons": [
+          "component categories=liability_or_reserve"
+        ]
       },
       "catalyst_asset_value": {
         "score": 0.0,
         "reasons": []
       },
       "predictable_cash_flow": {
-        "score": 0.0,
-        "reasons": []
+        "score": 3.0,
+        "reasons": [
+          "component categories=operating_business",
+          "existing methods=dividend, owner_cash"
+        ]
       },
       "binary_milestone": {
         "score": 0.0,
@@ -96,7 +1235,7 @@
     },
     "decision_rule": "Power Zones select the fitting economic method and eligible independent reviewers; they never choose the valuation answer or capital decision.",
     "ticker": "ABT",
-    "as_of": "2026-07-20",
+    "as_of": "2026-07-21",
     "route_source": "canonical_power_zone_router",
     "config_path": "_system/frameworks/power_zones.json",
     "config_updated": "2026-07-14",
@@ -204,74 +1343,199 @@
         }
       ]
     },
-    "input_hash": "abcd3c9d5d4d3b6a0f37c953fd3c3a0c3137e008b990319629da2bfab8231c06",
-    "generated_at": "2026-07-20T17:13:53.770068+00:00"
+    "input_hash": "19a24abe1eea39d605cff66b6921ad7a10e0e0d587ead83ce605b03812ea7b50",
+    "generated_at": "2026-07-21T12:13:10.709607+00:00"
   },
   "market": {
-    "price_per_share": 94.4,
-    "fully_diluted_shares": null,
-    "market_cap_m": null,
+    "price_per_share": 101.66,
+    "fully_diluted_shares": 1748000000,
+    "market_cap_m": 177701.68,
     "enterprise_value_m": null
   },
   "valuation": {
     "value_per_share": {
-      "low": null,
-      "base": null,
-      "high": null
+      "low": 57.18,
+      "base": 92.0202,
+      "high": 114.71
     },
     "priced_components_per_share": {
-      "low": 0,
-      "base": 0,
-      "high": 0
+      "low": 57.18,
+      "base": 92.0202,
+      "high": 114.71
     },
-    "legacy_value_per_share": null,
-    "probability_weighted_value_per_share": null,
+    "legacy_value_per_share": {
+      "low": 57.18,
+      "base": 92.02,
+      "high": 114.71
+    },
+    "probability_weighted_value_per_share": 92.0202,
     "expected_distributions_per_share": 0.0,
     "annualized_return_at_price_pct": {
-      "low": null,
-      "base": null,
-      "high": null
+      "low": -7.89,
+      "base": -1.41,
+      "high": 1.74
     },
-    "downside_to_low_pct": null,
+    "downside_to_low_pct": -43.75,
     "horizon_years": 7,
     "interpretation": "value_per_share is withheld while any material additive component is unpriced; priced_components_per_share is not a complete security value."
   },
   "scenario_contract": {
     "rule": "Cases must change cited causal operating, capital, probability, timing, or financing drivers\u2014not only a terminal multiple.",
-    "top_value_drivers": [],
+    "top_value_drivers": [
+      {
+        "component_id": "core_healthcare_franchise",
+        "label": "Four-segment consolidated healthcare franchise (devices, diagnostics, nutrition, EPD)",
+        "valuation_status": "bounded_estimate",
+        "base_per_share": 96.0202,
+        "legacy_base_per_share": 96.02,
+        "range_width_per_share": 46.53,
+        "scenario_assumptions": "Proof outputs {'low': 67.68, 'base': 96.0202, 'high': 114.21}; see calculation_proof graph."
+      },
+      {
+        "component_id": "margin_and_competition_reserve",
+        "label": "Margin compression, CGM competition, and nutrition pricing reserve",
+        "valuation_status": "bounded_estimate",
+        "base_per_share": -4.5,
+        "legacy_base_per_share": -4.5,
+        "range_width_per_share": 7.5,
+        "scenario_assumptions": "Proof outputs {'low': -9.0, 'base': -4.5, 'high': -1.5}; see calculation_proof graph."
+      },
+      {
+        "component_id": "net_financial_claims",
+        "label": "Near-term surplus cash and balance-sheet claims",
+        "valuation_status": "bounded_estimate",
+        "base_per_share": 0.5,
+        "legacy_base_per_share": 0.5,
+        "range_width_per_share": 3.5,
+        "scenario_assumptions": "Proof outputs {'low': -1.5, 'base': 0.5, 'high': 2.0}; see calculation_proof graph."
+      }
+    ],
     "reverse_expectations": null
   },
   "calculation_proof_summary": {
-    "component_count": 0,
-    "priced_component_count": 0,
-    "proof_complete_pct": 0.0,
+    "component_count": 3,
+    "priced_component_count": 3,
+    "proof_complete_pct": 100.0,
     "status_counts": {
-      "bounded_estimate": 0,
+      "bounded_estimate": 3,
       "calculated": 0,
       "legacy_sensitivity": 0,
       "unpriced": 0
     },
-    "all_material_components_priced": false,
+    "all_material_components_priced": true,
     "calculation_errors": [],
-    "aggregate_proof_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    "aggregate_proof_hash": "bd6ce1cfc77aa9dc9b21f2ef8f43bc298a2a421dea479f071be4a0ed177ddddf"
   },
-  "source_lineage": [],
+  "source_lineage": [
+    {
+      "component_id": "core_healthcare_franchise",
+      "node_id": "operating_cash_flow_m",
+      "ref": "ABT/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0001628280_26_010185.htm",
+      "locator": "NetCashProvidedByUsedInOperatingActivities $9,566M (FY2025)",
+      "as_of": "2025-12-31",
+      "content_sha256": "5c91b983f96806c4fe6aed19848b5a0e32e82ac8c18b2052f45e5cf167d08c13",
+      "source_id": "df6d14f33ff728be93929f3782f43f8ad9ccacdc68680adc122c1946d3535d6d"
+    },
+    {
+      "component_id": "core_healthcare_franchise",
+      "node_id": "capital_spending_m",
+      "ref": "ABT/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0001628280_26_010185.htm",
+      "locator": "PaymentsToAcquireProductiveAssets $2,171M (FY2025)",
+      "as_of": "2025-12-31",
+      "content_sha256": "5c91b983f96806c4fe6aed19848b5a0e32e82ac8c18b2052f45e5cf167d08c13",
+      "source_id": "8d9379e2d69e58898b1dd76fc8d615b5a2acbb2cdc351ece39f491510ed680ce"
+    },
+    {
+      "component_id": "core_healthcare_franchise",
+      "node_id": "shares_m",
+      "ref": "ABT/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0001628280_26_010185.htm",
+      "locator": "Weighted average diluted shares ~1,748M FY2025",
+      "as_of": "2025-12-31",
+      "content_sha256": "5c91b983f96806c4fe6aed19848b5a0e32e82ac8c18b2052f45e5cf167d08c13",
+      "source_id": "df01756e94ab7a08da3e53d29999be000cf2f8175596b240493442ee8e3a6988"
+    },
+    {
+      "component_id": "net_financial_claims",
+      "node_id": "cash_m",
+      "ref": "ABT/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0001628280_26_010185.htm",
+      "locator": "CashAndCashEquivalentsAtCarryingValue $8,522M at December 31, 2025",
+      "as_of": "2025-12-31",
+      "content_sha256": "5c91b983f96806c4fe6aed19848b5a0e32e82ac8c18b2052f45e5cf167d08c13",
+      "source_id": "cc3b25b1b82b7da028718b5b704217775602a0a9471185e3cd111d9736745ced"
+    },
+    {
+      "component_id": "net_financial_claims",
+      "node_id": "debt_lt_m",
+      "ref": "ABT/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0001628280_26_010185.htm",
+      "locator": "LongTermDebtNoncurrent $9,896M at December 31, 2025",
+      "as_of": "2025-12-31",
+      "content_sha256": "5c91b983f96806c4fe6aed19848b5a0e32e82ac8c18b2052f45e5cf167d08c13",
+      "source_id": "86b63214cdcb7cacf2ddd32db9878c5d88dd1bebe22553d8b16bfeb476074d94"
+    },
+    {
+      "component_id": "net_financial_claims",
+      "node_id": "shares_m",
+      "ref": "ABT/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0001628280_26_010185.htm",
+      "locator": "Weighted average diluted shares ~1,748M FY2025",
+      "as_of": "2025-12-31",
+      "content_sha256": "5c91b983f96806c4fe6aed19848b5a0e32e82ac8c18b2052f45e5cf167d08c13",
+      "source_id": "df01756e94ab7a08da3e53d29999be000cf2f8175596b240493442ee8e3a6988"
+    },
+    {
+      "component_id": "net_financial_claims",
+      "node_id": "filing_net_cash_ps",
+      "ref": "ABT/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0001628280_26_010185.htm",
+      "locator": "($8522.0M cash \u2212 $9896.0M long-term debt) \u00f7 1748.0M shares",
+      "as_of": "2025-12-31",
+      "content_sha256": "5c91b983f96806c4fe6aed19848b5a0e32e82ac8c18b2052f45e5cf167d08c13",
+      "source_id": "9480d461f0475d2524f27e8b3ce42a87fd1f591330a2e35559c011278b232f22"
+    },
+    {
+      "component_id": "margin_and_competition_reserve",
+      "node_id": "operating_income_m",
+      "ref": "ABT/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0001628280_26_010185.htm",
+      "locator": "OperatingIncomeLoss $8053.0M on revenue $44328.0M (18.2% margin) FY2025",
+      "as_of": "2025-12-31",
+      "content_sha256": "5c91b983f96806c4fe6aed19848b5a0e32e82ac8c18b2052f45e5cf167d08c13",
+      "source_id": "2372dab5788a478f437b9893fe091dd9e8d88a5c338698598942326f10fcf124"
+    },
+    {
+      "component_id": "margin_and_competition_reserve",
+      "node_id": "q1_operating_income_m",
+      "ref": "ABT/investor-documents/sec-edgar/10-Q_20260429_rpt20260331_acc0001628280_26_028357.htm",
+      "locator": "OperatingIncomeLoss $1,350M Q1 2026 vs $1,690M Q1 2025",
+      "as_of": "2026-03-31",
+      "content_sha256": "cf6f6c36051e806771caa59ca079dabb1810fe043f7c35a2fd7f643fe48553ed",
+      "source_id": "6df4955dd72bc71089a653af82915135d8695aea62a05acf2f8d0c5c2487993c"
+    },
+    {
+      "component_id": "margin_and_competition_reserve",
+      "node_id": "shares_m",
+      "ref": "ABT/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0001628280_26_010185.htm",
+      "locator": "Weighted average diluted shares ~1,748M FY2025",
+      "as_of": "2025-12-31",
+      "content_sha256": "5c91b983f96806c4fe6aed19848b5a0e32e82ac8c18b2052f45e5cf167d08c13",
+      "source_id": "df01756e94ab7a08da3e53d29999be000cf2f8175596b240493442ee8e3a6988"
+    }
+  ],
   "model_checks": {
     "calculation_graphs_valid": true,
-    "component_sum_reconciles": false,
+    "component_sum_reconciles": true,
     "no_double_counting": true,
-    "all_material_components_priced": false,
+    "all_material_components_priced": true,
     "low_base_high_ordered": true
   },
   "evidence": {
-    "unresolved_count": 1,
-    "blockers": [
-      "A complete economic ownership map has not been supplied."
-    ],
+    "unresolved_count": 0,
+    "blockers": [],
     "validation_errors": []
   },
   "monitoring": {
-    "falsifiers": [],
+    "falsifiers": [
+      "Primary evidence shows claim, cash conversion, or margin path is materially worse than low case.",
+      "Primary evidence shows claim, cash conversion, or margin path is materially worse than low case.",
+      "Primary evidence shows claim, cash conversion, or margin path is materially worse than low case."
+    ],
     "required_refresh_triggers": [
       "new filing or material operating update",
       "capital-structure change",
@@ -280,8 +1544,11 @@
     ]
   },
   "change_control": {
-    "model_hash": "f1d26b8ab0290613af2a1807282e377b0099559f99db4a6f558dae821e4e41d0",
-    "method_versions": [],
+    "model_hash": "032f01b293874bf21d80b1507c4409dd6893bbfb0f280e3daccfaf1860dcbf42",
+    "method_versions": [
+      "net_asset_value@1.0",
+      "owner_cash_or_dividend_discount@1.0"
+    ],
     "change_log": [],
     "rule": "A source fact is locked. Every assumption change requires a reason, author, timestamp, and before/after value."
   },

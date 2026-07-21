@@ -326,8 +326,77 @@ def _component(cid: str, label: str, category: str, overlap_key: str) -> dict:
     }
 
 
+def attach_economic_value(data: dict) -> None:
+    data["economic_value"] = {
+        "schema_version": "1.0",
+        "method": "component_economic_value",
+        "economic_claim": {
+            "description": (
+                "One diluted share of ABT, including every currently identified operating claim, "
+                "financial claim, and margin/competition reserve."
+            ),
+            "unit_label": "diluted share",
+            "unit_count": int(round(SHARES_M * 1_000_000)),
+            "unit_source": (
+                f"{FILING_10K}; weighted average diluted shares ~{SHARES_M}M FY2025."
+            ),
+            "enterprise_to_equity_reconciliation": (
+                "Operating franchise valued in core_healthcare_franchise; surplus cash and balance-sheet "
+                "claims in net_financial_claims; margin and competition stress in margin_and_competition_reserve. "
+                "No component overlaps another."
+            ),
+        },
+        "gaap_role": "cross_check",
+        "accounting_reference": (
+            "FY2025 10-K owner-cash bridge (OCF minus capital spending); GAAP net income not run-rate "
+            "after FY2024 one-time items."
+        ),
+        "component_groups": [
+            {
+                "id": "core_healthcare_franchise",
+                "label": "Four-segment consolidated healthcare franchise",
+                "component_ids": ["core_healthcare_franchise"],
+                "economic_claim": "Consolidated owner-cash franchise across devices, diagnostics, nutrition, and EPD",
+                "valuation_basis": "Filing-backed owner-cash capitalization multiple on FY2025 free cash flow per share.",
+                "adjustments": "Low/base/high reflect CGM competition, nutrition pricing, and device growth scenarios.",
+                "overlap_control": "Unique overlap key core_healthcare_franchise; device pipeline embedded, not duplicated.",
+            },
+            {
+                "id": "net_financial_claims",
+                "label": "Near-term surplus cash and balance-sheet claims",
+                "component_ids": ["net_financial_claims"],
+                "economic_claim": "Near-term surplus cash claim not capitalized in core franchise terminal",
+                "valuation_basis": "Judgment band anchored to filing cash $8,522M and long-term debt $9,896M.",
+                "adjustments": "Low reserves cash for debt service; high credits bounded excess liquidity after paydown.",
+                "overlap_control": "Unique overlap key net_financial_claims; not full net debt double-count.",
+            },
+            {
+                "id": "margin_and_competition_reserve",
+                "label": "Margin compression and competition reserve",
+                "component_ids": ["margin_and_competition_reserve"],
+                "economic_claim": "Margin compression, CGM competition, and nutrition pricing reserve",
+                "valuation_basis": "Negative reserve scaled to Q1 2026 margin dip and competitive watch items.",
+                "adjustments": "Bear widens reserve on sustained operating-margin compression.",
+                "overlap_control": "Unique overlap key margin_and_competition_reserve.",
+            },
+        ],
+        "limitations": [
+            "Proof-first component schedule; committee pricing gate separate from Lawrence stance IRR.",
+            "Segment-level owner-cash allocation remains consolidated pending segment footnote refresh.",
+        ],
+    }
+
+
 def attach_component_valuation(data: dict) -> None:
     data["valuation_mode"] = "economic_value"
+    data["valuation_methodology"] = {
+        "mode": "component_economic_value",
+        "horizon_years": 7,
+        "decision_rule": (
+            "Use one complete non-overlapping component schedule. The legacy Lawrence return path "
+            "remains a separate stance gate until the primary evidence bridges are complete."
+        ),
+    }
     data["component_valuation"] = {
         "schema_version": "1.0",
         "all_material_components_identified": True,
@@ -357,6 +426,7 @@ def attach_component_valuation(data: dict) -> None:
             ),
         ],
     }
+    attach_economic_value(data)
     data["economic_value_analysis"] = {
         "ownership_waterfall": {
             "net_economic_claim": (
@@ -405,6 +475,18 @@ def main() -> int:
     data = json.loads(path.read_text(encoding="utf-8"))
     if not data.get("component_valuation"):
         attach_component_valuation(data)
+    else:
+        data["valuation_mode"] = "economic_value"
+        data.setdefault("valuation_methodology", {
+            "mode": "component_economic_value",
+            "horizon_years": 7,
+            "decision_rule": (
+                "Use one complete non-overlapping component schedule. The legacy Lawrence return path "
+                "remains a separate stance gate until the primary evidence bridges are complete."
+            ),
+        })
+        if not data.get("economic_value"):
+            attach_economic_value(data)
 
     evidence = (
         f"Primary bridge from {FILING_10K}: FY2025 revenue ${REV_M}M, OCF ${OCF_M}M, "
