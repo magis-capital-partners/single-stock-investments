@@ -51,6 +51,13 @@ METHOD_MAP = {
     "regulatory_and_execution_reserve": "net_asset_value",
 }
 
+LEGACY_LABELS = {
+    "core_marketplace_platform": "Core marketplace owner-cash engine (nights and GBV)",
+    "experiences_services_option": "Experiences and services attach option",
+    "net_financial_claims": "Net cash and debt claims on common equity",
+    "regulatory_and_execution_reserve": "Regulatory, tax, and execution reserve",
+}
+
 
 def _src(ref: str, locator: str, as_of: str) -> dict:
     return {"ref": ref, "locator": locator, "as_of": as_of}
@@ -476,6 +483,80 @@ def attach_components(data: dict, proofs: dict, outputs: dict) -> None:
             "Use one complete non-overlapping component schedule. "
             "The legacy Lawrence return path remains a separate stance gate."
         ),
+    }
+    data["economic_value"] = {
+        "schema_version": "1.0",
+        "method": "component_economic_value",
+        "economic_claim": {
+            "description": (
+                "One diluted share of ABNB, including the core marketplace owner-cash engine, "
+                "experiences/services option, net financial claims, and regulatory reserve."
+            ),
+            "unit_label": "diluted share",
+            "unit_count": int(round(SHARES_M * 1_000_000)),
+            "unit_source": (
+                f"FY2025 weighted average diluted shares {SHARES_M}M "
+                f"({FILING_10K}); FCF ${FCF_M}M on {SHARES_M}M shares = ${FCF0}/sh."
+            ),
+            "enterprise_to_equity_reconciliation": (
+                "Operating marketplace cash is valued in core_marketplace_platform; "
+                "net cash and debt are separate in net_financial_claims; "
+                "experiences attach is non-overlapping milestone option; "
+                "regulatory reserve is a negative claim. No component overlaps another."
+            ),
+        },
+        "gaap_role": "cross_check",
+        "accounting_reference": (
+            f"FY2025 10-K: revenue ${REV_M}M, FCF ${FCF_M}M, cash ${CASH_M}M, "
+            f"long-term debt ${DEBT_M}M, SBC $1.59B."
+        ),
+        "component_groups": [
+            {
+                "id": "core_marketplace_platform",
+                "label": LEGACY_LABELS["core_marketplace_platform"],
+                "component_ids": ["core_marketplace_platform"],
+                "economic_claim": LEGACY_LABELS["core_marketplace_platform"],
+                "valuation_basis": f"Proof outputs {outputs['core_marketplace_platform']}; see calculation_proof graph.",
+                "adjustments": "Reconcile to FY2025 10-K and Q1 2026 10-Q before decision use.",
+                "overlap_control": "Unique overlap key core_marketplace_platform; no other component capitalizes the same claim.",
+            },
+            {
+                "id": "experiences_services_option",
+                "label": LEGACY_LABELS["experiences_services_option"],
+                "component_ids": ["experiences_services_option"],
+                "economic_claim": LEGACY_LABELS["experiences_services_option"],
+                "valuation_basis": f"Proof outputs {outputs['experiences_services_option']}; see calculation_proof graph.",
+                "adjustments": "Reconcile to FY2025 10-K and Q1 2026 10-Q before decision use.",
+                "overlap_control": "Unique overlap key experiences_services_option; seats in KPI embedded in core engine.",
+                "risk_and_timing": {
+                    "probability_basis": "Low case $0/sh; base $4/sh; high $12/sh on incremental attach beyond nights path.",
+                    "timing_basis": "Milestone value over 3–7 years as experiences/services mix expands.",
+                    "remaining_capital_basis": "Marketing and product spend for attach largely in core owner-cash path; option net of embedded spend.",
+                },
+            },
+            {
+                "id": "net_financial_claims",
+                "label": LEGACY_LABELS["net_financial_claims"],
+                "component_ids": ["net_financial_claims"],
+                "economic_claim": LEGACY_LABELS["net_financial_claims"],
+                "valuation_basis": f"Proof outputs {outputs['net_financial_claims']}; see calculation_proof graph.",
+                "adjustments": "Reconcile to FY2025 10-K and Q1 2026 10-Q before decision use.",
+                "overlap_control": "Unique overlap key net_financial_claims; no other component capitalizes the same claim.",
+            },
+            {
+                "id": "regulatory_and_execution_reserve",
+                "label": LEGACY_LABELS["regulatory_and_execution_reserve"],
+                "component_ids": ["regulatory_and_execution_reserve"],
+                "economic_claim": LEGACY_LABELS["regulatory_and_execution_reserve"],
+                "valuation_basis": f"Proof outputs {outputs['regulatory_and_execution_reserve']}; see calculation_proof graph.",
+                "adjustments": "Reconcile to FY2025 10-K and Q1 2026 10-Q before decision use.",
+                "overlap_control": "Unique overlap key regulatory_and_execution_reserve; no other component capitalizes the same claim.",
+            },
+        ],
+        "limitations": [
+            "Component ranges are filing-anchored bounded estimates, not committee-approved price targets.",
+            "Experiences/services option remains judgment-heavy pending standalone segment disclosure.",
+        ],
     }
     data["as_of"] = AS_OF
     inputs = data.setdefault("inputs", {})
