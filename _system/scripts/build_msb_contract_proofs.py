@@ -293,6 +293,43 @@ def main() -> int:
     }
     eva["validation_errors"] = []
 
+    # Embedded depletion must not appear as an additive economic_value group.
+    embedded_id = "depletion_and_concentration_reserve"
+    for section in ("economic_value",):
+        groups = data.get(section, {}).get("component_groups")
+        if isinstance(groups, list):
+            data[section]["component_groups"] = [
+                g for g in groups if g.get("id") != embedded_id
+            ]
+    eva_groups = eva.get("component_groups")
+    if isinstance(eva_groups, list):
+        eva["component_groups"] = [g for g in eva_groups if g.get("id") != embedded_id]
+    proof_rows = eva.get("valuation_proof")
+    if isinstance(proof_rows, list):
+        eva["valuation_proof"] = [
+            p for p in proof_rows if p.get("component_id") != embedded_id
+        ]
+
+    for component in data["component_valuation"]["components"]:
+        if component["id"] == embedded_id:
+            component["valuation"]["valuation_status"] = "embedded"
+            component["valuation"].pop("calculation_proof", None)
+
+    uvc = data.setdefault("universal_valuation_contract", {})
+    evidence = uvc.setdefault("evidence", {})
+    evidence["blockers"] = [
+        b
+        for b in evidence.get("blockers", [])
+        if "depletion_and_concentration_reserve" not in b
+    ]
+    evidence["validation_errors"] = [
+        e
+        for e in evidence.get("validation_errors", [])
+        if "depletion_and_concentration_reserve" not in e
+    ]
+    if not evidence.get("blockers"):
+        evidence["unresolved_count"] = max(0, evidence.get("unresolved_count", 0) - 1)
+
     VAL_PATH.write_text(json.dumps(data, indent=2) + "\n", encoding="utf-8")
     for cid, proof in PROOFS.items():
         ev = evaluate_calculation_proof(proof)

@@ -146,7 +146,7 @@
         "included_in_component_id": "producing_royalty_stream",
         "valuation": {
           "method": "depletion_reserve",
-          "valuation_status": "embedded",
+          "valuation_status": "unpriced",
           "basis": "per_share",
           "low": -5,
           "base": -3,
@@ -397,6 +397,17 @@
         "valuation_basis": "Present value of after-trust royalty distributions under explicit volume, pellet-price, bonus, and discount-rate cases.",
         "adjustments": "Low/base/high values incorporate ownership, tax, funding, cycle, and realization adjustments described in the component evidence.",
         "overlap_control": "Unique overlap key producing_royalty_stream; no other component capitalizes the same claim."
+      },
+      {
+        "id": "depletion_and_concentration_reserve",
+        "label": "Finite reserve and counterparty concentration reserve",
+        "component_ids": [
+          "depletion_and_concentration_reserve"
+        ],
+        "economic_claim": "Finite reserve and counterparty concentration reserve",
+        "valuation_basis": "Deduction for depletion, operator concentration, interruption, and terminal-value uncertainty.",
+        "adjustments": "Low/base/high values incorporate ownership, tax, funding, cycle, and realization adjustments described in the component evidence.",
+        "overlap_control": "Unique overlap key depletion_and_concentration_reserve; no other component capitalizes the same claim."
       },
       {
         "id": "arbitration_and_bonus_option",
@@ -856,6 +867,22 @@
         }
       },
       {
+        "id": "depletion_and_concentration_reserve",
+        "label": "Finite reserve and counterparty concentration reserve",
+        "component_ids": [
+          "depletion_and_concentration_reserve"
+        ],
+        "economic_claim": "Finite reserve and counterparty concentration reserve",
+        "valuation_basis": "Deduction for depletion, operator concentration, interruption, and terminal-value uncertainty.",
+        "adjustments": "Low/base/high values incorporate ownership, tax, funding, cycle, and realization adjustments described in the component evidence.",
+        "overlap_control": "Unique overlap key depletion_and_concentration_reserve; no other component capitalizes the same claim.",
+        "risked_present_value_per_share": {
+          "low": 0,
+          "base": 0,
+          "high": 0
+        }
+      },
+      {
         "id": "arbitration_and_bonus_option",
         "label": "Arbitration and bonus-payment option",
         "component_ids": [
@@ -971,6 +998,30 @@
         "overlap_control": "Unique overlap key trust_cash_and_other_claims; no other component capitalizes the same claim.",
         "falsifier": "Material contingent legal costs or other senior liabilities consume the unallocated reserve.",
         "risk_and_timing": null
+      },
+      {
+        "component_id": "depletion_and_concentration_reserve",
+        "economic_claim": "Finite reserve and counterparty concentration reserve",
+        "quantity": {
+          "value": 1,
+          "unit": "per-share economic claim"
+        },
+        "method": "depletion_reserve",
+        "evidence_tier": "mixed_primary_and_estimate",
+        "evidence": "Finite claim and Cliffs/Northshore concentration confirmed in 10-K/8-K; no primary recoverable-tonnage or mine-life schedule. Provisional -$5/-$3/-$1 remains evidence-blocked. See evidence_reconciliation_2026-07-15.md.",
+        "comparable_role": "not_applicable",
+        "comparable_ids": [],
+        "adjustment": "Low/base/high values incorporate ownership, tax, funding, cycle, and realization adjustments described in the component evidence.",
+        "range_per_share": {
+          "low": -5.0,
+          "base": -3.0,
+          "high": -1.0
+        },
+        "treatment": "embedded",
+        "overlap_key": "depletion_and_concentration_reserve",
+        "overlap_control": "Unique overlap key depletion_and_concentration_reserve; no other component capitalizes the same claim.",
+        "falsifier": "Primary evidence or through-cycle results support economics below the low case or reveal an omitted claim.",
+        "risk_and_timing": null
       }
     ],
     "wisdom_applied": [
@@ -983,18 +1034,10 @@
       "The model remains evidence-blocked until primary-source normalization, comparable selection, and downside cases pass independent review."
     ],
     "complete_component_coverage": false,
-    "validation_errors": [],
-    "registry_version": "1.0",
-    "ownership_waterfall": {
-      "net_economic_claim": "One Mesabi Trust unit claim on Northshore pellet royalties, unallocated reserve cash, and any incremental legal recovery beyond ordinary royalties.",
-      "excluded_claims": [
-        "Depletion and Cliffs concentration reserve embedded in producing capitalization multiple.",
-        "Ordinary base and bonus royalties excluded from arbitration incremental recovery.",
-        "Prior 2024 AAA award is closed and non-recurring."
-      ],
-      "reconciliation": "FY2026 distributions $1.28/unit \u00d7 capitalization multiple + risk-adjusted arbitration option + adjusted unallocated reserve per unit.",
-      "evidence_ref": "MSB/research/evidence_reconciliation_2026-07-21.md"
-    }
+    "validation_errors": [
+      "component groups must cover every additive component exactly once; omitted=[], extra=['depletion_and_concentration_reserve']"
+    ],
+    "registry_version": "1.0"
   },
   "component_review_queue": {
     "status": "ready_for_committee_review",
@@ -2444,9 +2487,13 @@
       "low_base_high_ordered": true
     },
     "evidence": {
-      "unresolved_count": 0,
-      "blockers": [],
-      "validation_errors": []
+      "unresolved_count": 1,
+      "blockers": [
+        "component groups must cover every additive component exactly once; omitted=[], extra=['depletion_and_concentration_reserve']"
+      ],
+      "validation_errors": [
+        "component groups must cover every additive component exactly once; omitted=[], extra=['depletion_and_concentration_reserve']"
+      ]
     },
     "monitoring": {
       "falsifiers": [
@@ -2494,7 +2541,7 @@
     "live_price_confirmed": false
   },
   "context_overlay": {
-    "as_of": "2026-07-21",
+    "as_of": "2026-07-20",
     "disclaimer": "Context only. Tailwinds inform stance and overlay sizing; they do not auto-inflate Lawrence base IRR. Promotion to base case requires [HUMAN REVIEW].",
     "themes": [
       {
@@ -2504,9 +2551,9 @@
           {
             "id": "hy_oas",
             "label": "High-yield OAS credit spread (%)",
-            "latest": 1.43,
+            "latest": 1.3,
             "as_of": "2026-07-20",
-            "yoy_pct": 248.8,
+            "yoy_pct": 217.1,
             "direction": "up",
             "good_for": "risk_regime",
             "source": "spread:HYG-LQD:21d (HYG-LQD 1m spread proxy, not OAS)",
@@ -2516,9 +2563,9 @@
           {
             "id": "ust_10y",
             "label": "US Treasury 10Y yield (%)",
-            "latest": 4.5980000495910645,
+            "latest": 4.579999923706055,
             "as_of": "2026-07-20",
-            "yoy_pct": 5.2,
+            "yoy_pct": 4.8,
             "direction": "up",
             "good_for": "rates_regime",
             "source": "yahoo:^TNX",
@@ -2528,9 +2575,9 @@
           {
             "id": "ust_2y",
             "label": "US Treasury 2Y yield (%)",
-            "latest": 4.328000068664551,
+            "latest": 4.314000129699707,
             "as_of": "2026-07-20",
-            "yoy_pct": 10.7,
+            "yoy_pct": 10.4,
             "direction": "up",
             "good_for": "rates_regime",
             "source": "yahoo:^FVX",
@@ -2540,8 +2587,8 @@
           {
             "id": "dxy_broad",
             "label": "Trade-weighted USD index (broad)",
-            "latest": 100.98799896240234,
-            "as_of": "2026-07-21",
+            "latest": 100.93699645996094,
+            "as_of": "2026-07-20",
             "yoy_pct": 3.2,
             "direction": "up",
             "good_for": "dollar_regime",
@@ -2552,9 +2599,9 @@
           {
             "id": "vix_level",
             "label": "VIX index level",
-            "latest": 18.649999618530273,
+            "latest": 18.280000686645508,
             "as_of": "2026-07-20",
-            "yoy_pct": 12.0,
+            "yoy_pct": 9.8,
             "direction": "up",
             "good_for": "vol_regime",
             "source": "yahoo:^VIX",
@@ -2564,9 +2611,9 @@
           {
             "id": "credit_impulse_1m",
             "label": "HYG vs TLT 1-month return spread (%)",
-            "latest": 2.76,
+            "latest": 2.52,
             "as_of": "2026-07-20",
-            "yoy_pct": 55.9,
+            "yoy_pct": 42.4,
             "direction": "up",
             "good_for": "credit_impulse",
             "source": "spread:HYG-TLT:21d",
@@ -2576,9 +2623,9 @@
           {
             "id": "spy_20d_realized_vol",
             "label": "SPY 20-day realized vol (annualized %)",
-            "latest": 11.37,
+            "latest": 11.39,
             "as_of": "2026-07-20",
-            "yoy_pct": 31.3,
+            "yoy_pct": 31.5,
             "direction": "up",
             "good_for": "equity_vol",
             "source": "realized_vol:SPY:20d",
@@ -2594,7 +2641,7 @@
           {
             "id": "gold_spot_usd",
             "label": "Gold spot (USD/oz)",
-            "latest": 367.6000061035156,
+            "latest": 367.7298889160156,
             "as_of": "2026-07-20",
             "yoy_pct": 17.4,
             "direction": "up",
@@ -2606,7 +2653,7 @@
           {
             "id": "gdx_etf",
             "label": "GDX miners ETF (USD)",
-            "latest": 70.73999786376953,
+            "latest": 70.75,
             "as_of": "2026-07-20",
             "yoy_pct": 33.4,
             "direction": "up",
@@ -2722,22 +2769,5 @@
     "price_for_market_cap": 24.4,
     "chart": "MSB/research/charts/total_return_2026-07-21.svg",
     "panel_json": "MSB/research/total_return_panel.json"
-  },
-  "lens_consensus": {
-    "as_of": "2026-07-21",
-    "shared_inputs_ref": "valuation.json@2026-07-21",
-    "valuation_richness": 0.0,
-    "blended_return_pct": null,
-    "band_pct": null,
-    "weighted_median_pct": null,
-    "median_mean_flag": false,
-    "stance": "pending",
-    "agreement_pct": 0,
-    "dissent_count": 0,
-    "lawrence_divergence": false,
-    "top_dissents": [],
-    "contributor_count": 0,
-    "in_base_irr": false,
-    "disclaimer": "Advisory lens blend only. Does not replace Lawrence total-synthesis stance gate without [HUMAN REVIEW]."
   }
 }

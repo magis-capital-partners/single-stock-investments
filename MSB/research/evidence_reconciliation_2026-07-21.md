@@ -1,6 +1,6 @@
 # MSB valuation evidence reconciliation — 2026-07-21
 
-**Scope:** Close `authorized_evidence.json` contract backfill blockers by attaching valid `calculation_proof` graphs to every additive component. Authorized evidence packet per `research_agent_manifest.json` (2026-07-21).
+**Scope:** Close `authorized_evidence.json` blockers by attaching valid `calculation_proof` graphs to every additive component. Authorized evidence packet per `research_agent_manifest.json` (2026-07-21).
 
 ## Blockers closed
 

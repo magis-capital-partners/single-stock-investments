@@ -17,7 +17,7 @@ Marvin floor from primary filings and proof-first component math: base economic 
 
 | Source ID | Title | Path | Status | Cross-check status |
 |-----------|-------|------|--------|-------------------|
-| hk | HK scan + cross-check | `MSB/research/cross_check_HK_2026-06-01.md` | context | Reviewed; agreements on bonus mechanics and arbitration |
+| hk | HK scan + cross-check | `MSB/third-party-analyses/references.md`; `MSB/research/cross_check_HK_2026-06-01.md`; `_system/reference/investment-wisdom/horizon-kinetics/Stahl-Worth-The-Time-Predictive-Attributes-extract.txt`; `_system/reference/investment-wisdom/horizon-kinetics/HK-Q1-2025-Commentary-extract.txt`; `_system/reference/investment-wisdom/horizon-kinetics/HK-Q3-2025-Commentary-extract.txt`; `_system/reference/investment-wisdom/horizon-kinetics/HK-Q1-2026-Commentary-extract.txt` | context | Reviewed; agreements on bonus mechanics and arbitration |
 | vic | VIC PDF intake — MSB | `MSB/third-party-analyses/vic/vic_pdf_2026-06-18_msb-vic-pdf_f00599952c.md` | **[PENDING APPROVAL]** | Context only |
 | activist_long | Horizon Kinetics SC 13G/A filings | `MSB/third-party-analyses/activist_reports/long/` | context | **22.9%** ownership confirmed in 10-K |
 
