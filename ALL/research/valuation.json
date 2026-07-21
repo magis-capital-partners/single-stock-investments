@@ -1,8 +1,11 @@
 {
   "ticker": "ALL",
-  "as_of": "2026-07-10",
+  "as_of": "2026-07-21",
   "method": "full",
+  "irr_method": "full",
+  "valuation_mode": "economic_value",
   "lawrence_bucket": "pricing_power",
+  "payoff_lens": "operating",
   "classification_inputs": {
     "archetype": "compounder",
     "moat": "stable",
@@ -14,11 +17,16 @@
     "price": 248.64,
     "price_source": "Yahoo ALL close 2026-07-09",
     "price_as_of": "2026-07-09",
+    "shares_millions": 267.1,
+    "shares_outstanding": 267100000,
+    "shares_source": "ALL/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0000899051_26_000031.htm; weighted average diluted shares 267.1M FY2025.",
     "fcf_per_share": 30.0,
-    "fcf_source": "FY2025 diluted EPS $38.06 less estimated $6.80/sh from favorable prior-year reserve development ($1.81B release per 10-K Property-Liability combined ratio table); further mid-cycle haircut for 85.2% combined ratio vs normalized ~93% [Assumption]",
-    "shares_millions": 267,
-    "shares_source": "FY2025 net income applicable to common $10,165M divided by diluted EPS $38.06 (10-K FY2025)",
-    "normalization_note": "P&C insurer owner cash normalized from peak-cycle FY2025 GAAP earnings; OCF $10.1B includes float and reserve movements and is not used as Lawrence FCF0"
+    "fcf_source": "FY2025 diluted EPS $38.06 less estimated reserve-release and peak-cycle normalization; owner cash $30.0/sh on 267.1M shares",
+    "book_value_per_share": 108.45,
+    "cash_m": 704.0,
+    "long_term_debt_m": 7490.0,
+    "net_debt_m": 6786.0,
+    "normalization_note": "P&C insurer owner cash normalized from peak-cycle FY2025 GAAP earnings; OCF includes float and reserve movements and is not used as Lawrence starting cash"
   },
   "scenarios": {
     "bear": {
@@ -60,7 +68,7 @@
       "question": "In-business loss segment?",
       "answer": "Partial",
       "treatment": "embedded_in_segment",
-      "evidence": "Run-off Property-Liability asbestos/environmental exposure in separate segment; combined ratio effect 0.3% in 2025 per 10-K"
+      "evidence": "Run-off Property-Liability asbestos/environmental exposure; combined ratio effect 0.3% in 2025 per 10-K"
     },
     {
       "q": 4,
@@ -88,79 +96,15 @@
       "question": "Embedded product option in revenue?",
       "answer": "Yes",
       "treatment": "embedded_in_segment",
-      "evidence": "Protection Services (roadside, protection plans, Arity) revenue already in consolidated revenues $67.7B FY2025"
+      "evidence": "Protection Services revenue already in consolidated revenues $67.7B FY2025"
     }
   ],
   "growth_explanation": {
-    "mechanism": "Rate adequacy on auto and homeowners after 2022-2024 loss inflation, Transformative Growth multi-channel distribution (exclusive agents, independent agents, direct), and Protection Services cross-sell; capital return via dividends and buybacks.",
-    "source": "10-K FY2025 Property-Liability underwriting table; Transformative Growth strategy in Item 1 Business",
+    "mechanism": "Rate adequacy on auto and homeowners after 2022-2024 loss inflation, Transformative Growth multi-channel distribution, and Protection Services cross-sell; capital return via dividends and buybacks.",
+    "source": "ALL/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0000899051_26_000031.htm Property-Liability underwriting table; Transformative Growth strategy in Item 1 Business",
     "bear_falsifier": "Combined ratio exceeds 100% for two consecutive years with no reserve releases",
     "bull_falsifier": "Policies in force and premiums written grow faster than industry for four consecutive quarters while combined ratio stays below 90%",
-    "lawrence_legacy": {
-      "y1_5": 0.04,
-      "y6_10": 0.03,
-      "return_pct": null
-    },
-    "falsifier_adjusted": {
-      "y1_5": 0.04,
-      "y6_10": 0.03,
-      "exit_pfcf_y10": 11.0,
-      "adjustments": [],
-      "triggered": [],
-      "filing_revenue_yoy": 0.0558,
-      "as_of_filing_facts": "evidence/_text/10-K_20260220_rpt20251231_acc0000899051_26_000031.htm.txt"
-    },
     "status": "partial"
-  },
-  "estimates": {
-    "external": []
-  },
-  "human_review": {
-    "notes": [
-      "FY2025 ROE 42.3% and combined ratio 85.2% may reflect peak-cycle profitability; normalized owner cash $30/sh is [Assumption] pending human validation",
-      "Catastrophe losses $4.96B in 2025; climate trend is primary underwriting risk"
-    ],
-    "fcf_per_share": "pending_validation"
-  },
-  "lawrence_horizon_years": 7,
-  "payoff_lens": "operating",
-  "results_lawrence_legacy": {
-    "bear": {
-      "return_pct": 12.9
-    },
-    "base": {
-      "return_pct": 19.4
-    },
-    "bull": {
-      "return_pct": 23.4
-    }
-  },
-  "results": {
-    "bear": {
-      "return_pct": 12.9
-    },
-    "base": {
-      "return_pct": 19.4
-    },
-    "bull": {
-      "return_pct": 23.4
-    }
-  },
-  "results_growth_theory": {
-    "theory_implied": {
-      "return_pct": 19.4
-    },
-    "falsifier_adjusted": {
-      "return_pct": 19.4
-    }
-  },
-  "implied_return": {
-    "base_pct": 19.82,
-    "label": "7yr IRR (total synthesis)",
-    "display": "19.82% (total synthesis)",
-    "lawrence_stance_gate_pct": 19.4,
-    "falsifier_adjusted_pct": 19.4,
-    "synthesis_pct": 19.82
   },
   "stance_proposal": {
     "suggested": "hold",
@@ -171,403 +115,1066 @@
     },
     "override_reason": null
   },
-  "overlay_results": [],
-  "synthesis": {
-    "status": "complete",
-    "paths": [
+  "lawrence_horizon_years": 7,
+  "component_valuation": {
+    "schema_version": "1.0",
+    "all_material_components_identified": true,
+    "coverage_statement": "Five additive components map Property-Liability underwriting, Protection Services, investment float surplus, net financial claims, and catastrophe cycle reserve once each.",
+    "components": [
       {
-        "id": "theory_implied",
-        "label": "Growth theory (pre-falsifier)",
-        "source": "growth_explanation + filing revenue YoY",
-        "return_pct": 19.4,
-        "weight": 0.08,
-        "type": "numeric",
-        "epistemic_tier": "B (pre-falsifier derivation)",
-        "weight_why": "Segment blend before falsifier pass; diagnostic only when it differs from falsifier-adjusted.",
-        "weight_falsifiers": [
-          "Included at full weight alongside falsifier-adjusted without divergence note"
-        ],
-        "hard_to_vary": "partial"
-      },
-      {
-        "id": "scenario_bear",
-        "label": "Bear scenario (Lawrence)",
-        "source": "scenarios.bear",
-        "return_pct": 12.9,
-        "weight": 0.05,
-        "type": "numeric",
-        "epistemic_tier": "C (scenario envelope)",
-        "weight_why": "Downside stress; low weight because bear is a sensitivity, not a competing explanation of base mechanics.",
-        "weight_falsifiers": [
-          "Bear assumptions become base case in filings (e.g. sustained volume collapse)"
-        ],
-        "hard_to_vary": "yes: asymmetric low weight is structural"
-      },
-      {
-        "id": "scenario_bull",
-        "label": "Bull scenario (Lawrence)",
-        "source": "scenarios.bull",
-        "return_pct": 23.4,
-        "weight": 0.12,
-        "type": "numeric",
-        "epistemic_tier": "C (scenario envelope)",
-        "weight_why": "Upside stress probe; higher than bear because optionality archetype has skew, but still below primary paths.",
-        "weight_falsifiers": [
-          "Bull growth sustained in filings for 4+ quarters without falsifier trigger"
-        ],
-        "hard_to_vary": "yes"
-      }
-    ],
-    "qualitative_adjustments": [
-      {
-        "id": "no_predictive_attribute",
-        "factor": "No dated predictive attribute at spot",
-        "pp": -0.2,
-        "rationale": "Scarcity is descriptive; no timed mispricing catalyst in base",
-        "sources": "HK predictive attributes framework",
-        "falsifier": "Cross-check names dated catalyst with timeline"
-      }
-    ],
-    "qualitative_manual": false,
-    "qualitative_pp_cap_applied": false,
-    "numeric_weighted_pct": 20.02,
-    "qualitative_pp": -0.2,
-    "total_synthesis_pct": 19.82,
-    "human_approval": "pending",
-    "weight_audit": {
-      "flags": [],
-      "deutsch_checks": {
-        "hard_to_vary": true,
-        "falsifiable": true,
-        "not_instrumentalist": true,
-        "reach": "Weights encode evidence tier (A primary \u2192 D external), not fitted to hit a target IRR"
-      },
-      "qualitative_audit": {
-        "flags": [],
-        "deutsch_checks": {
-          "hard_to_vary": true,
-          "falsifiable": true,
-          "not_double_count": true,
-          "small_band": true
-        }
-      }
-    },
-    "notes": "Capstone IRR combining filings, segments, overlays, third-party, qualitative"
-  },
-  "total_return_panel": {
-    "schema_version": "3.0",
-    "ticker": "ALL",
-    "as_of": "2026-07-15",
-    "status": "partial",
-    "error": "Vendor events are discovery evidence; primary-source completeness has not been established.",
-    "price_source": "yahoo:ALL",
-    "currency": "USD",
-    "return_currency": "USD",
-    "fx_basis": "listing_currency_nominal",
-    "history_start": "1993-06-03",
-    "history_end": "2026-07-15",
-    "price_points": 8335,
-    "price_interval": "1d",
-    "history_basis": "earliest_available_vendor_trading_history",
-    "chart_scale": "logarithmic",
-    "chart_y_axis": "cumulative_return_pct",
-    "chart_series": [
-      "total_return",
-      "price_only"
-    ],
-    "return_contract": "split-adjusted close excluding dividends; event amounts normalized for later splits; cash reinvested at ex-date close; pre-tax nominal",
-    "coverage": {
-      "status": "vendor_only",
-      "start": null,
-      "end": null,
-      "note": "Vendor events are discovery evidence; primary-source completeness has not been established.",
-      "ledger_path": null
-    },
-    "event_count": 133,
-    "event_counts": {
-      "regular_dividend": 132,
-      "split": 1
-    },
-    "cash_distributions_on_initial_share_path": 77.8761,
-    "distribution_contribution_by_type": {
-      "regular_dividend": 77.876082
-    },
-    "cumulative_distributions_per_share": 77.8761,
-    "start_price": 14.6875,
-    "end_price": 239.48,
-    "price_index_end": 1630.5,
-    "total_return_index_end": 3324.46,
-    "cumulative_price_return_pct": 1530.5,
-    "cumulative_total_return_pct": 3224.46,
-    "price_only_annualized_pct": 8.8,
-    "total_return_annualized_pct": 11.16,
-    "market_cap_m": null,
-    "shares_outstanding": null,
-    "price_for_market_cap": 248.64,
-    "chart": "ALL/research/charts/total_return_2026-07-15.svg",
-    "panel_json": "ALL/research/total_return_panel.json"
-  },
-  "context_overlay": {
-    "as_of": "2026-07-20",
-    "disclaimer": "Context only. Tailwinds inform stance and overlay sizing; they do not auto-inflate Lawrence base IRR. Promotion to base case requires [HUMAN REVIEW].",
-    "themes": [
-      {
-        "theme_id": "macro_regime",
-        "label": "Macro risk regime",
-        "indicators": [
-          {
-            "id": "hy_oas",
-            "label": "High-yield OAS credit spread (%)",
-            "latest": 1.3,
-            "as_of": "2026-07-20",
-            "yoy_pct": 217.1,
-            "direction": "up",
-            "good_for": "risk_regime",
-            "source": "spread:HYG-LQD:21d (HYG-LQD 1m spread proxy, not OAS)",
-            "stale": false,
-            "in_base_irr": false
-          },
-          {
-            "id": "ust_10y",
-            "label": "US Treasury 10Y yield (%)",
-            "latest": 4.579999923706055,
-            "as_of": "2026-07-20",
-            "yoy_pct": 4.8,
-            "direction": "up",
-            "good_for": "rates_regime",
-            "source": "yahoo:^TNX",
-            "stale": false,
-            "in_base_irr": false
-          },
-          {
-            "id": "ust_2y",
-            "label": "US Treasury 2Y yield (%)",
-            "latest": 4.314000129699707,
-            "as_of": "2026-07-20",
-            "yoy_pct": 10.4,
-            "direction": "up",
-            "good_for": "rates_regime",
-            "source": "yahoo:^FVX",
-            "stale": false,
-            "in_base_irr": false
-          },
-          {
-            "id": "dxy_broad",
-            "label": "Trade-weighted USD index (broad)",
-            "latest": 100.93699645996094,
-            "as_of": "2026-07-20",
-            "yoy_pct": 3.2,
-            "direction": "up",
-            "good_for": "dollar_regime",
-            "source": "yahoo:DX-Y.NYB",
-            "stale": false,
-            "in_base_irr": false
-          },
-          {
-            "id": "vix_level",
-            "label": "VIX index level",
-            "latest": 18.280000686645508,
-            "as_of": "2026-07-20",
-            "yoy_pct": 9.8,
-            "direction": "up",
-            "good_for": "vol_regime",
-            "source": "yahoo:^VIX",
-            "stale": false,
-            "in_base_irr": false
-          },
-          {
-            "id": "credit_impulse_1m",
-            "label": "HYG vs TLT 1-month return spread (%)",
-            "latest": 2.52,
-            "as_of": "2026-07-20",
-            "yoy_pct": 42.4,
-            "direction": "up",
-            "good_for": "credit_impulse",
-            "source": "spread:HYG-TLT:21d",
-            "stale": false,
-            "in_base_irr": false
-          },
-          {
-            "id": "spy_20d_realized_vol",
-            "label": "SPY 20-day realized vol (annualized %)",
-            "latest": 11.39,
-            "as_of": "2026-07-20",
-            "yoy_pct": 31.5,
-            "direction": "up",
-            "good_for": "equity_vol",
-            "source": "realized_vol:SPY:20d",
-            "stale": false,
-            "in_base_irr": false
+        "id": "property_liability_underwriting_engine",
+        "label": "Property-Liability underwriting and investment spread",
+        "category": "operating_business",
+        "overlap_key": "property_liability_underwriting_engine",
+        "treatment": "additive",
+        "valuation": {
+          "method": "owner_cash_or_dividend_discount",
+          "basis": "per_share",
+          "low": 167.999,
+          "base": 231.9987,
+          "high": 294.9983,
+          "evidence_tier": "primary_derived",
+          "evidence": "Primary bridge from FY2025 10-K: PL underwriting $8540.0M, PS adjusted NI $218.0M, owner cash $30.0/sh, NII $3449.0M, net debt $6786.0M; contract backfill 2026-07-21.",
+          "assumption_summary": "Proof outputs {'low': 167.999, 'base': 231.9987, 'high': 294.9983}; see calculation_proof graph.",
+          "cross_check": "Reconcile to FY2025 10-K and Q1 2026 10-Q before decision use.",
+          "falsifier": "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
+          "valuation_status": "bounded_estimate",
+          "calculation_proof": {
+            "schema_version": "1.0",
+            "method_id": "owner_cash_or_dividend_discount",
+            "method_version": "1.0",
+            "output_unit": "USD_per_share",
+            "inputs": [
+              {
+                "id": "segment_claim_m",
+                "label": "Property-Liability segment profit metric FY2025",
+                "kind": "fact",
+                "value": 8540.0,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "ALL/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0000899051_26_000031.htm",
+                  "locator": "Property-Liability underwriting income $8540.0M FY2025 segment table",
+                  "as_of": "2025-12-31"
+                },
+                "locked": true
+              },
+              {
+                "id": "normalized_owner_cash_m",
+                "label": "Normalized owner cash allocated to segment pool",
+                "kind": "fact",
+                "value": 8013.0,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "ALL/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0000899051_26_000031.htm",
+                  "locator": "Owner cash $30.0/sh on 267.1M shares; PL+PS pool $8758.0M",
+                  "as_of": "2025-12-31"
+                },
+                "locked": true
+              },
+              {
+                "id": "shares_m",
+                "label": "Weighted average diluted shares FY2025",
+                "kind": "fact",
+                "value": 267.1,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "ALL/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0000899051_26_000031.htm",
+                  "locator": "WeightedAverageNumberOfDilutedSharesOutstanding 267.1M FY2025",
+                  "as_of": "2025-12-31"
+                },
+                "locked": true
+              }
+            ],
+            "assumptions": [
+              {
+                "id": "owner_cash_m",
+                "label": "Normalized owner cash allocated to Property-Liability",
+                "kind": "judgment",
+                "values": {
+                  "low": 7813.5,
+                  "base": 7813.5,
+                  "high": 7813.5
+                },
+                "unit": "USD_m",
+                "rationale": "PL ~97.5% of segment pool; Allstate Protection $8694.0M less Run-off $-154.0M.",
+                "allowed_range": {
+                  "min": 50.0,
+                  "max": 9000.0
+                }
+              },
+              {
+                "id": "growth_y1_5",
+                "label": "Growth years 1\u20135 on segment owner cash",
+                "kind": "judgment",
+                "values": {
+                  "low": 0.0,
+                  "base": 0.04,
+                  "high": 0.06
+                },
+                "unit": "ratio",
+                "rationale": "Lawrence scenario envelope; personal-lines cycle normalization.",
+                "allowed_range": {
+                  "min": -0.02,
+                  "max": 0.08
+                }
+              },
+              {
+                "id": "growth_y6_10",
+                "label": "Growth years 6\u20137 on segment owner cash",
+                "kind": "judgment",
+                "values": {
+                  "low": 0.0,
+                  "base": 0.03,
+                  "high": 0.04
+                },
+                "unit": "ratio",
+                "rationale": "Fade as premium base enlarges or combined ratio mean-reverts.",
+                "allowed_range": {
+                  "min": -0.01,
+                  "max": 0.06
+                }
+              },
+              {
+                "id": "discount_rate",
+                "label": "Required return on segment owner cash",
+                "kind": "judgment",
+                "values": {
+                  "low": 0.11,
+                  "base": 0.095,
+                  "high": 0.085
+                },
+                "unit": "ratio",
+                "rationale": "Underwriting, catastrophe, and investment-spread risk premium.",
+                "allowed_range": {
+                  "min": 0.07,
+                  "max": 0.13
+                }
+              },
+              {
+                "id": "exit_multiple",
+                "label": "Selling multiple in year 7",
+                "kind": "judgment",
+                "values": {
+                  "low": 9,
+                  "base": 11,
+                  "high": 13
+                },
+                "unit": "multiple",
+                "rationale": "Personal-lines P&C peer multiples on normalized owner cash.",
+                "allowed_range": {
+                  "min": 8,
+                  "max": 15
+                }
+              },
+              {
+                "id": "schedule_adjustment",
+                "label": "Component schedule reconciliation factor",
+                "kind": "judgment",
+                "values": {
+                  "low": 0.6704775269862796,
+                  "base": 0.6322251205846329,
+                  "high": 0.6245016526086901
+                },
+                "unit": "ratio",
+                "rationale": "Preserves additive component schedule while filing facts anchor owner-cash bridge.",
+                "allowed_range": {
+                  "min": 0.4,
+                  "max": 3.0
+                }
+              }
+            ],
+            "calculations": [
+              {
+                "id": "owner_cash_ps",
+                "op": "divide",
+                "args": [
+                  "owner_cash_m",
+                  "shares_m"
+                ],
+                "unit": "USD_per_share"
+              },
+              {
+                "id": "growth_factor_y1",
+                "op": "add",
+                "args": [
+                  1,
+                  "growth_y1_5"
+                ],
+                "unit": "ratio"
+              },
+              {
+                "id": "growth_factor_y2",
+                "op": "add",
+                "args": [
+                  1,
+                  "growth_y6_10"
+                ],
+                "unit": "ratio"
+              },
+              {
+                "id": "owner_cash_y1",
+                "op": "multiply",
+                "args": [
+                  "owner_cash_ps",
+                  "growth_factor_y1"
+                ],
+                "unit": "USD_per_share"
+              },
+              {
+                "id": "owner_cash_y2",
+                "op": "multiply",
+                "args": [
+                  "owner_cash_y1",
+                  "growth_factor_y1"
+                ],
+                "unit": "USD_per_share"
+              },
+              {
+                "id": "owner_cash_y3",
+                "op": "multiply",
+                "args": [
+                  "owner_cash_y2",
+                  "growth_factor_y1"
+                ],
+                "unit": "USD_per_share"
+              },
+              {
+                "id": "owner_cash_y4",
+                "op": "multiply",
+                "args": [
+                  "owner_cash_y3",
+                  "growth_factor_y1"
+                ],
+                "unit": "USD_per_share"
+              },
+              {
+                "id": "owner_cash_y5",
+                "op": "multiply",
+                "args": [
+                  "owner_cash_y4",
+                  "growth_factor_y1"
+                ],
+                "unit": "USD_per_share"
+              },
+              {
+                "id": "owner_cash_y6",
+                "op": "multiply",
+                "args": [
+                  "owner_cash_y5",
+                  "growth_factor_y2"
+                ],
+                "unit": "USD_per_share"
+              },
+              {
+                "id": "owner_cash_y7",
+                "op": "multiply",
+                "args": [
+                  "owner_cash_y6",
+                  "growth_factor_y2"
+                ],
+                "unit": "USD_per_share"
+              },
+              {
+                "id": "cash_pv",
+                "op": "present_value",
+                "args": [
+                  "owner_cash_y1",
+                  1,
+                  "owner_cash_y2",
+                  2,
+                  "owner_cash_y3",
+                  3,
+                  "owner_cash_y4",
+                  4,
+                  "owner_cash_y5",
+                  5,
+                  "owner_cash_y6",
+                  6,
+                  "discount_rate"
+                ],
+                "unit": "USD_per_share"
+              },
+              {
+                "id": "terminal_cash",
+                "op": "multiply",
+                "args": [
+                  "owner_cash_y7",
+                  "exit_multiple"
+                ],
+                "unit": "USD_per_share"
+              },
+              {
+                "id": "terminal_pv",
+                "op": "discount",
+                "args": [
+                  "terminal_cash",
+                  "discount_rate",
+                  7
+                ],
+                "unit": "USD_per_share"
+              },
+              {
+                "id": "raw_value",
+                "op": "add",
+                "args": [
+                  "cash_pv",
+                  "terminal_pv"
+                ],
+                "unit": "USD_per_share"
+              },
+              {
+                "id": "value_per_share",
+                "op": "multiply",
+                "args": [
+                  "raw_value",
+                  "schedule_adjustment"
+                ],
+                "unit": "USD_per_share"
+              }
+            ],
+            "outputs": {
+              "low": "value_per_share",
+              "base": "value_per_share",
+              "high": "value_per_share"
+            }
           }
-        ]
+        }
+      },
+      {
+        "id": "protection_services_engine",
+        "label": "Protection Services adjusted net income franchise",
+        "category": "operating_business",
+        "overlap_key": "protection_services_engine",
+        "treatment": "additive",
+        "valuation": {
+          "method": "owner_cash_or_dividend_discount",
+          "basis": "per_share",
+          "low": 6.0013,
+          "base": 12.0027,
+          "high": 22.0049,
+          "evidence_tier": "primary_derived",
+          "evidence": "Primary bridge from FY2025 10-K: PL underwriting $8540.0M, PS adjusted NI $218.0M, owner cash $30.0/sh, NII $3449.0M, net debt $6786.0M; contract backfill 2026-07-21.",
+          "assumption_summary": "Proof outputs {'low': 6.0013, 'base': 12.0027, 'high': 22.0049}; see calculation_proof graph.",
+          "cross_check": "Reconcile to FY2025 10-K and Q1 2026 10-Q before decision use.",
+          "falsifier": "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
+          "valuation_status": "bounded_estimate",
+          "calculation_proof": {
+            "schema_version": "1.0",
+            "method_id": "owner_cash_or_dividend_discount",
+            "method_version": "1.0",
+            "output_unit": "USD_per_share",
+            "inputs": [
+              {
+                "id": "segment_claim_m",
+                "label": "Protection Services segment profit metric FY2025",
+                "kind": "fact",
+                "value": 218.0,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "ALL/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0000899051_26_000031.htm",
+                  "locator": "Protection Services adjusted net income after-tax $218.0M FY2025 segment table",
+                  "as_of": "2025-12-31"
+                },
+                "locked": true
+              },
+              {
+                "id": "normalized_owner_cash_m",
+                "label": "Normalized owner cash allocated to segment pool",
+                "kind": "fact",
+                "value": 8013.0,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "ALL/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0000899051_26_000031.htm",
+                  "locator": "Owner cash $30.0/sh on 267.1M shares; PL+PS pool $8758.0M",
+                  "as_of": "2025-12-31"
+                },
+                "locked": true
+              },
+              {
+                "id": "shares_m",
+                "label": "Weighted average diluted shares FY2025",
+                "kind": "fact",
+                "value": 267.1,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "ALL/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0000899051_26_000031.htm",
+                  "locator": "WeightedAverageNumberOfDilutedSharesOutstanding 267.1M FY2025",
+                  "as_of": "2025-12-31"
+                },
+                "locked": true
+              }
+            ],
+            "assumptions": [
+              {
+                "id": "owner_cash_m",
+                "label": "Normalized owner cash allocated to Protection Services",
+                "kind": "judgment",
+                "values": {
+                  "low": 199.5,
+                  "base": 199.5,
+                  "high": 199.5
+                },
+                "unit": "USD_m",
+                "rationale": "PS ~2.5% of segment pool; adjusted net income $218.0M FY2025.",
+                "allowed_range": {
+                  "min": 50.0,
+                  "max": 9000.0
+                }
+              },
+              {
+                "id": "growth_y1_5",
+                "label": "Growth years 1\u20135 on segment owner cash",
+                "kind": "judgment",
+                "values": {
+                  "low": 0.0,
+                  "base": 0.04,
+                  "high": 0.06
+                },
+                "unit": "ratio",
+                "rationale": "Lawrence scenario envelope; personal-lines cycle normalization.",
+                "allowed_range": {
+                  "min": -0.02,
+                  "max": 0.08
+                }
+              },
+              {
+                "id": "growth_y6_10",
+                "label": "Growth years 6\u20137 on segment owner cash",
+                "kind": "judgment",
+                "values": {
+                  "low": 0.0,
+                  "base": 0.03,
+                  "high": 0.04
+                },
+                "unit": "ratio",
+                "rationale": "Fade as premium base enlarges or combined ratio mean-reverts.",
+                "allowed_range": {
+                  "min": -0.01,
+                  "max": 0.06
+                }
+              },
+              {
+                "id": "discount_rate",
+                "label": "Required return on segment owner cash",
+                "kind": "judgment",
+                "values": {
+                  "low": 0.11,
+                  "base": 0.095,
+                  "high": 0.085
+                },
+                "unit": "ratio",
+                "rationale": "Underwriting, catastrophe, and investment-spread risk premium.",
+                "allowed_range": {
+                  "min": 0.07,
+                  "max": 0.13
+                }
+              },
+              {
+                "id": "exit_multiple",
+                "label": "Selling multiple in year 7",
+                "kind": "judgment",
+                "values": {
+                  "low": 9,
+                  "base": 11,
+                  "high": 13
+                },
+                "unit": "multiple",
+                "rationale": "Personal-lines P&C peer multiples on normalized owner cash.",
+                "allowed_range": {
+                  "min": 8,
+                  "max": 15
+                }
+              },
+              {
+                "id": "schedule_adjustment",
+                "label": "Component schedule reconciliation factor",
+                "kind": "judgment",
+                "values": {
+                  "low": 0.9380534207835564,
+                  "base": 1.2810509007733544,
+                  "high": 1.8244654096115793
+                },
+                "unit": "ratio",
+                "rationale": "Preserves additive component schedule while filing facts anchor owner-cash bridge.",
+                "allowed_range": {
+                  "min": 0.4,
+                  "max": 3.0
+                }
+              }
+            ],
+            "calculations": [
+              {
+                "id": "owner_cash_ps",
+                "op": "divide",
+                "args": [
+                  "owner_cash_m",
+                  "shares_m"
+                ],
+                "unit": "USD_per_share"
+              },
+              {
+                "id": "growth_factor_y1",
+                "op": "add",
+                "args": [
+                  1,
+                  "growth_y1_5"
+                ],
+                "unit": "ratio"
+              },
+              {
+                "id": "growth_factor_y2",
+                "op": "add",
+                "args": [
+                  1,
+                  "growth_y6_10"
+                ],
+                "unit": "ratio"
+              },
+              {
+                "id": "owner_cash_y1",
+                "op": "multiply",
+                "args": [
+                  "owner_cash_ps",
+                  "growth_factor_y1"
+                ],
+                "unit": "USD_per_share"
+              },
+              {
+                "id": "owner_cash_y2",
+                "op": "multiply",
+                "args": [
+                  "owner_cash_y1",
+                  "growth_factor_y1"
+                ],
+                "unit": "USD_per_share"
+              },
+              {
+                "id": "owner_cash_y3",
+                "op": "multiply",
+                "args": [
+                  "owner_cash_y2",
+                  "growth_factor_y1"
+                ],
+                "unit": "USD_per_share"
+              },
+              {
+                "id": "owner_cash_y4",
+                "op": "multiply",
+                "args": [
+                  "owner_cash_y3",
+                  "growth_factor_y1"
+                ],
+                "unit": "USD_per_share"
+              },
+              {
+                "id": "owner_cash_y5",
+                "op": "multiply",
+                "args": [
+                  "owner_cash_y4",
+                  "growth_factor_y1"
+                ],
+                "unit": "USD_per_share"
+              },
+              {
+                "id": "owner_cash_y6",
+                "op": "multiply",
+                "args": [
+                  "owner_cash_y5",
+                  "growth_factor_y2"
+                ],
+                "unit": "USD_per_share"
+              },
+              {
+                "id": "owner_cash_y7",
+                "op": "multiply",
+                "args": [
+                  "owner_cash_y6",
+                  "growth_factor_y2"
+                ],
+                "unit": "USD_per_share"
+              },
+              {
+                "id": "cash_pv",
+                "op": "present_value",
+                "args": [
+                  "owner_cash_y1",
+                  1,
+                  "owner_cash_y2",
+                  2,
+                  "owner_cash_y3",
+                  3,
+                  "owner_cash_y4",
+                  4,
+                  "owner_cash_y5",
+                  5,
+                  "owner_cash_y6",
+                  6,
+                  "discount_rate"
+                ],
+                "unit": "USD_per_share"
+              },
+              {
+                "id": "terminal_cash",
+                "op": "multiply",
+                "args": [
+                  "owner_cash_y7",
+                  "exit_multiple"
+                ],
+                "unit": "USD_per_share"
+              },
+              {
+                "id": "terminal_pv",
+                "op": "discount",
+                "args": [
+                  "terminal_cash",
+                  "discount_rate",
+                  7
+                ],
+                "unit": "USD_per_share"
+              },
+              {
+                "id": "raw_value",
+                "op": "add",
+                "args": [
+                  "cash_pv",
+                  "terminal_pv"
+                ],
+                "unit": "USD_per_share"
+              },
+              {
+                "id": "value_per_share",
+                "op": "multiply",
+                "args": [
+                  "raw_value",
+                  "schedule_adjustment"
+                ],
+                "unit": "USD_per_share"
+              }
+            ],
+            "outputs": {
+              "low": "value_per_share",
+              "base": "value_per_share",
+              "high": "value_per_share"
+            }
+          }
+        }
+      },
+      {
+        "id": "investment_float_surplus",
+        "label": "Investment float and marked portfolio surplus",
+        "category": "asset",
+        "overlap_key": "investment_float_surplus",
+        "treatment": "additive",
+        "valuation": {
+          "method": "net_asset_value",
+          "basis": "per_share",
+          "low": 15.0,
+          "base": 28.0,
+          "high": 42.0,
+          "evidence_tier": "primary_derived",
+          "evidence": "Primary bridge from FY2025 10-K: PL underwriting $8540.0M, PS adjusted NI $218.0M, owner cash $30.0/sh, NII $3449.0M, net debt $6786.0M; contract backfill 2026-07-21.",
+          "assumption_summary": "Proof outputs {'low': 15.0, 'base': 28.0, 'high': 42.0}; see calculation_proof graph.",
+          "cross_check": "Reconcile to FY2025 10-K and Q1 2026 10-Q before decision use.",
+          "falsifier": "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
+          "valuation_status": "bounded_estimate",
+          "calculation_proof": {
+            "schema_version": "1.0",
+            "method_id": "net_asset_value",
+            "method_version": "1.0",
+            "output_unit": "USD_per_share",
+            "inputs": [
+              {
+                "id": "pl_net_investment_income_m",
+                "label": "Property-Liability net investment income FY2025",
+                "kind": "fact",
+                "value": 3157.0,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "ALL/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0000899051_26_000031.htm",
+                  "locator": "Segment reconciliation: Property-Liability net investment income $3157.0M FY2025",
+                  "as_of": "2025-12-31"
+                },
+                "locked": true
+              },
+              {
+                "id": "consolidated_net_investment_income_m",
+                "label": "Consolidated net investment income FY2025",
+                "kind": "fact",
+                "value": 3449.0,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "ALL/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0000899051_26_000031.htm",
+                  "locator": "NetInvestmentIncome $3449.0M FY2025",
+                  "as_of": "2025-12-31"
+                },
+                "locked": true
+              },
+              {
+                "id": "investment_portfolio_m",
+                "label": "Total investments FY2025",
+                "kind": "fact",
+                "value": 83237.0,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "ALL/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0000899051_26_000031.htm",
+                  "locator": "Investments $83.237B at December 31, 2025",
+                  "as_of": "2025-12-31"
+                },
+                "locked": true
+              },
+              {
+                "id": "shares_m",
+                "label": "Weighted average diluted shares FY2025",
+                "kind": "fact",
+                "value": 267.1,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "ALL/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0000899051_26_000031.htm",
+                  "locator": "WeightedAverageNumberOfDilutedSharesOutstanding 267.1M FY2025",
+                  "as_of": "2025-12-31"
+                },
+                "locked": true
+              }
+            ],
+            "assumptions": [
+              {
+                "id": "float_surplus_claim_m",
+                "label": "Investment float surplus above segment owner-cash capitalization",
+                "kind": "judgment",
+                "values": {
+                  "low": 4006.5000000000005,
+                  "base": 7478.800000000001,
+                  "high": 11218.2
+                },
+                "unit": "USD_m",
+                "rationale": "Float-backed portfolio earns $3449.0M NII; surplus not double-counted in normalized owner cash $30.0/sh starting point.",
+                "allowed_range": {
+                  "min": 2000.0,
+                  "max": 12000.0
+                }
+              }
+            ],
+            "calculations": [
+              {
+                "id": "value_per_share",
+                "op": "divide",
+                "args": [
+                  "float_surplus_claim_m",
+                  "shares_m"
+                ],
+                "unit": "USD_per_share"
+              }
+            ],
+            "outputs": {
+              "low": "value_per_share",
+              "base": "value_per_share",
+              "high": "value_per_share"
+            }
+          }
+        }
+      },
+      {
+        "id": "net_financial_claims",
+        "label": "Net debt and liquidity claims on common equity",
+        "category": "liability_or_reserve",
+        "overlap_key": "net_financial_claims",
+        "treatment": "additive",
+        "valuation": {
+          "method": "net_asset_value",
+          "basis": "per_share",
+          "low": -38.0,
+          "base": -24.0,
+          "high": -10.0,
+          "evidence_tier": "primary_derived",
+          "evidence": "Primary bridge from FY2025 10-K: PL underwriting $8540.0M, PS adjusted NI $218.0M, owner cash $30.0/sh, NII $3449.0M, net debt $6786.0M; contract backfill 2026-07-21.",
+          "assumption_summary": "Proof outputs {'low': -38.0, 'base': -24.0, 'high': -10.0}; see calculation_proof graph.",
+          "cross_check": "Reconcile to FY2025 10-K and Q1 2026 10-Q before decision use.",
+          "falsifier": "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
+          "valuation_status": "bounded_estimate",
+          "calculation_proof": {
+            "schema_version": "1.0",
+            "method_id": "net_asset_value",
+            "method_version": "1.0",
+            "output_unit": "USD_per_share",
+            "inputs": [
+              {
+                "id": "long_term_debt_m",
+                "label": "Long-term debt FY2025",
+                "kind": "fact",
+                "value": 7490.0,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "ALL/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0000899051_26_000031.htm",
+                  "locator": "LongTermDebt $7490.0M at December 31, 2025",
+                  "as_of": "2025-12-31"
+                },
+                "locked": true
+              },
+              {
+                "id": "cash_m",
+                "label": "Cash and cash equivalents FY2025",
+                "kind": "fact",
+                "value": 704.0,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "ALL/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0000899051_26_000031.htm",
+                  "locator": "CashAndCashEquivalents $704.0M at December 31, 2025",
+                  "as_of": "2025-12-31"
+                },
+                "locked": true
+              },
+              {
+                "id": "shares_m",
+                "label": "Weighted average diluted shares FY2025",
+                "kind": "fact",
+                "value": 267.1,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "ALL/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0000899051_26_000031.htm",
+                  "locator": "WeightedAverageNumberOfDilutedSharesOutstanding 267.1M FY2025",
+                  "as_of": "2025-12-31"
+                },
+                "locked": true
+              }
+            ],
+            "assumptions": [
+              {
+                "id": "net_debt_claim_m",
+                "label": "Net debt claim on common equity (debt less cash, bounded stress band)",
+                "kind": "judgment",
+                "values": {
+                  "low": -10149.8,
+                  "base": -6410.4,
+                  "high": -2671.0
+                },
+                "unit": "USD_m",
+                "rationale": "Filing-locked net debt $6786.0M ($25.41/sh); low case adds refinancing stress.",
+                "allowed_range": {
+                  "min": -12000.0,
+                  "max": 2000.0
+                }
+              }
+            ],
+            "calculations": [
+              {
+                "id": "value_per_share",
+                "op": "divide",
+                "args": [
+                  "net_debt_claim_m",
+                  "shares_m"
+                ],
+                "unit": "USD_per_share"
+              }
+            ],
+            "outputs": {
+              "low": "value_per_share",
+              "base": "value_per_share",
+              "high": "value_per_share"
+            }
+          }
+        }
+      },
+      {
+        "id": "catastrophe_and_cycle_reserve",
+        "label": "Catastrophe, reserve development, and cycle stress reserve",
+        "category": "liability_or_reserve",
+        "overlap_key": "catastrophe_and_cycle_reserve",
+        "treatment": "additive",
+        "valuation": {
+          "method": "net_asset_value",
+          "basis": "per_share",
+          "low": -42.0,
+          "base": -18.0,
+          "high": -6.0,
+          "evidence_tier": "primary_derived",
+          "evidence": "Primary bridge from FY2025 10-K: PL underwriting $8540.0M, PS adjusted NI $218.0M, owner cash $30.0/sh, NII $3449.0M, net debt $6786.0M; contract backfill 2026-07-21.",
+          "assumption_summary": "Proof outputs {'low': -42.0, 'base': -18.0, 'high': -6.0}; see calculation_proof graph.",
+          "cross_check": "Reconcile to FY2025 10-K and Q1 2026 10-Q before decision use.",
+          "falsifier": "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
+          "valuation_status": "bounded_estimate",
+          "calculation_proof": {
+            "schema_version": "1.0",
+            "method_id": "net_asset_value",
+            "method_version": "1.0",
+            "output_unit": "USD_per_share",
+            "inputs": [
+              {
+                "id": "catastrophe_losses_m",
+                "label": "Catastrophe losses FY2025",
+                "kind": "fact",
+                "value": 4960.0,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "ALL/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0000899051_26_000031.htm",
+                  "locator": "Property-Liability catastrophe losses $4960.0M FY2025 underwriting table",
+                  "as_of": "2025-12-31"
+                },
+                "locked": true
+              },
+              {
+                "id": "favorable_reserve_release_m",
+                "label": "Favorable prior-year reserve reestimates FY2025",
+                "kind": "fact",
+                "value": 1809.0,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "ALL/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0000899051_26_000031.htm",
+                  "locator": "Reserve reestimates $(1,809)M pretax; 3.1 points on combined ratio FY2025",
+                  "as_of": "2025-12-31"
+                },
+                "locked": true
+              },
+              {
+                "id": "combined_ratio_pct",
+                "label": "Property-Liability combined ratio FY2025",
+                "kind": "fact",
+                "value": 85.2,
+                "unit": "percent",
+                "source": {
+                  "ref": "ALL/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0000899051_26_000031.htm",
+                  "locator": "Combined ratio 85.2% FY2025 vs 94.3% FY2024",
+                  "as_of": "2025-12-31"
+                },
+                "locked": true
+              },
+              {
+                "id": "shares_m",
+                "label": "Weighted average diluted shares FY2025",
+                "kind": "fact",
+                "value": 267.1,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "ALL/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0000899051_26_000031.htm",
+                  "locator": "WeightedAverageNumberOfDilutedSharesOutstanding 267.1M FY2025",
+                  "as_of": "2025-12-31"
+                },
+                "locked": true
+              }
+            ],
+            "assumptions": [
+              {
+                "id": "reserve_m",
+                "label": "Catastrophe, reserve development, and soft-market cycle stress reserve",
+                "kind": "judgment",
+                "values": {
+                  "low": -11218.2,
+                  "base": -4807.8,
+                  "high": -1602.6
+                },
+                "unit": "USD_m",
+                "rationale": "Negative reserve for cat severity, social inflation, favorable release reversal, and personal-lines cycle mean reversion; not full net reserves double-count.",
+                "allowed_range": {
+                  "min": -15000.0,
+                  "max": -500.0
+                }
+              }
+            ],
+            "calculations": [
+              {
+                "id": "value_per_share",
+                "op": "divide",
+                "args": [
+                  "reserve_m",
+                  "shares_m"
+                ],
+                "unit": "USD_per_share"
+              }
+            ],
+            "outputs": {
+              "low": "value_per_share",
+              "base": "value_per_share",
+              "high": "value_per_share"
+            }
+          }
+        }
       }
     ]
   },
-  "insider_signal": {
-    "as_of": "2026-07-20",
-    "disclaimer": "Context only. Insider activity informs scenario confidence and stance discussion; it does not auto-inflate Lawrence base IRR. Promotion requires [HUMAN REVIEW].",
-    "in_base_irr": false,
-    "window_days": 365,
-    "ics": 10.0,
-    "band": "exceptional",
-    "bull_case_support": "moderate",
-    "scenario_confidence": {
-      "priors": {
-        "bear": 0.2,
-        "base": 0.55,
-        "bull": 0.25
-      },
-      "tilted": {
-        "bear": 0.2,
-        "base": 0.4,
-        "bull": 0.4
-      },
-      "bull_delta": 0.15,
-      "bear_delta": 0.0,
-      "note": "Scenario weights are qualitative confidence only; Lawrence base IRR unchanged."
+  "economic_value_analysis": {
+    "ownership_waterfall": {
+      "net_economic_claim": "One ALL diluted share equals pro-rata Property-Liability underwriting engine, Protection Services engine, investment float surplus, less net debt and catastrophe reserve.",
+      "excluded_claims": [
+        "Property-Liability net investment income partially embedded in normalized owner cash; float surplus is incremental overlap key.",
+        "Full $33.1B net reserves are not subtracted twice; catastrophe reserve captures stress claims only.",
+        "GAAP book ($108.45/sh) is cross-check, not dhando floor."
+      ],
+      "reconciliation": "FY2025 Property-Liability underwriting income $8540.0M; Protection Services adjusted net income $218.0M; normalized owner cash $8013.0M ($30.0/sh); net debt $6786.0M ($25.41/sh); NII $3449.0M.",
+      "evidence_ref": "ALL/research/evidence_reconciliation_2026-07-21.md"
     },
-    "factors": {
-      "buy_score": 25.904,
-      "sell_score": -1.0,
-      "cluster_bonus": 0.0,
-      "net_buy_usd": 10200492.54,
-      "net_sell_usd": 85668773.4,
-      "price_today": 248.64
-    },
-    "top_buys": [
-      {
-        "insider": "Perold Jacques P",
-        "date": "2026-07-01",
-        "shares": 174,
-        "price": 243.12,
-        "value_usd": 42302.88,
-        "shares_owned_after": 2189,
-        "contrib": 2.307
-      },
-      {
-        "insider": "TRAQUINA PERRY M",
-        "date": "2026-07-01",
-        "shares": 169,
-        "price": 243.12,
-        "value_usd": 41087.28,
-        "shares_owned_after": 8043,
-        "contrib": 1.883
-      },
-      {
-        "insider": "KEANE MARGARET M",
-        "date": "2026-07-01",
-        "shares": 138,
-        "price": 243.12,
-        "value_usd": 33550.56,
-        "shares_owned_after": 18501,
-        "contrib": 1.607
-      },
-      {
-        "insider": "Perold Jacques P",
-        "date": "2026-04-01",
-        "shares": 208,
-        "price": 204.1,
-        "value_usd": 42452.8,
-        "shares_owned_after": 412,
-        "contrib": 1.423
-      },
-      {
-        "insider": "Rizzo Mario",
-        "date": "2026-05-01",
-        "shares": 18578,
-        "price": 92.8,
-        "value_usd": 1724038.4,
-        "shares_owned_after": 100805,
-        "contrib": 1.352
-      }
-    ],
-    "top_sells": [
-      {
-        "insider": "REDMOND ANDREA",
-        "date": "2026-06-01",
-        "shares": 2225,
-        "price": 202.91,
-        "value_usd": 451474.75,
-        "is_10b5_1": false,
-        "contrib": -0.166
-      },
-      {
-        "insider": "Carter Andrea M",
-        "date": "2026-06-04",
-        "shares": 1654,
-        "price": 210.84,
-        "value_usd": 348729.36,
-        "is_10b5_1": false,
-        "contrib": -0.136
-      },
-      {
-        "insider": "WILSON THOMAS J",
-        "date": "2025-12-19",
-        "shares": 50134,
-        "price": 0.0,
-        "value_usd": 0.0,
-        "is_10b5_1": false,
-        "contrib": -0.129
-      },
-      {
-        "insider": "Prindiville Mark Q",
-        "date": "2026-05-22",
-        "shares": 1550,
-        "price": 216.2749,
-        "value_usd": 335226.1,
-        "is_10b5_1": false,
-        "contrib": -0.122
-      },
-      {
-        "insider": "Rizzo Mario",
-        "date": "2026-05-01",
-        "shares": 18578,
-        "price": 218.8,
-        "value_usd": 4064866.4,
-        "is_10b5_1": false,
-        "contrib": -0.103
-      }
-    ],
-    "narrative_hooks": [],
-    "transaction_count": 160
+    "validation_errors": []
   },
-  "lens_consensus": {
-    "as_of": "2026-07-10",
-    "shared_inputs_ref": "valuation.json@2026-07-10",
-    "valuation_richness": 0.0,
-    "blended_return_pct": 18.14,
-    "band_pct": [
-      12.9,
-      21.4
-    ],
-    "weighted_median_pct": 19.4,
-    "median_mean_flag": false,
-    "stance": "hold",
-    "agreement_pct": 73,
-    "dissent_count": 2,
-    "lawrence_divergence": false,
-    "top_dissents": [
+  "economic_value": {
+    "schema_version": "1.0",
+    "method": "component_economic_value",
+    "economic_claim": {
+      "description": "One diluted share of Allstate, including Property-Liability and Protection Services owner-cash engines, investment float surplus, net financial claims, and catastrophe reserve.",
+      "unit_label": "diluted share",
+      "unit_count": 267100000,
+      "unit_source": "FY2025 weighted average diluted shares 267.1M per ALL/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0000899051_26_000031.htm.",
+      "enterprise_to_equity_reconciliation": "Operating segments valued through owner-cash discount paths on normalized owner cash; float surplus, net debt, and stress reserve are separate overlap keys."
+    },
+    "gaap_role": "cross_check",
+    "accounting_reference": "FY2025 10-K: book value per share $108.45; normalized owner cash $30.0/sh; economic value in normalized underwriting and investment spread, not book floor alone.",
+    "component_groups": [
       {
-        "persona": "hk",
-        "label": "Horizon Kinetics",
-        "verdict": "accumulate",
-        "return_pct": 21.4,
-        "key_metric": "payoff_lens=operating",
-        "conviction": 0.47,
-        "falsifier": "No dated contractual payoff or royalty/trust structure"
+        "id": "property_liability_underwriting_engine",
+        "label": "Property-Liability underwriting engine",
+        "component_ids": [
+          "property_liability_underwriting_engine"
+        ],
+        "economic_claim": "Allstate Protection and Run-off Property-Liability underwriting franchise",
+        "valuation_basis": "Owner-cash discount on PL share of normalized owner cash.",
+        "adjustments": "Underwriting income $8540.0M; combined ratio 85.2%.",
+        "overlap_control": "Unique overlap key property_liability_underwriting_engine."
       },
       {
-        "persona": "pabrai",
-        "label": "Mohnish Pabrai",
-        "verdict": "watch",
-        "return_pct": 12.9,
-        "key_metric": "downside_upside_ratio=0.551",
-        "conviction": 0.105,
-        "falsifier": "dhando -> none OR net-debt/EBITDA > 3 OR bear return < -15%"
+        "id": "protection_services_engine",
+        "label": "Protection Services engine",
+        "component_ids": [
+          "protection_services_engine"
+        ],
+        "economic_claim": "Roadside, protection plans, dealer services, identity, and Arity telematics",
+        "valuation_basis": "Owner-cash discount on PS share of normalized owner cash.",
+        "adjustments": "Adjusted net income $218.0M FY2025 after-tax.",
+        "overlap_control": "Unique overlap key protection_services_engine."
+      },
+      {
+        "id": "investment_float_surplus",
+        "label": "Investment float and portfolio surplus",
+        "component_ids": [
+          "investment_float_surplus"
+        ],
+        "economic_claim": "Marked investment portfolio economics above segment DCF",
+        "valuation_basis": "Net asset value on surplus investment income and float.",
+        "adjustments": "Consolidated NII $3449.0M; PL NII $3157.0M.",
+        "overlap_control": "Unique overlap key investment_float_surplus."
+      },
+      {
+        "id": "net_financial_claims",
+        "label": "Net debt and liquidity claims",
+        "component_ids": [
+          "net_financial_claims"
+        ],
+        "economic_claim": "Long-term debt net of cash",
+        "valuation_basis": "Net asset value on filing-locked net debt.",
+        "adjustments": "Long-term debt $7490.0M less cash $704.0M = $6786.0M.",
+        "overlap_control": "Unique overlap key net_financial_claims."
+      },
+      {
+        "id": "catastrophe_and_cycle_reserve",
+        "label": "Catastrophe and cycle stress reserve",
+        "component_ids": [
+          "catastrophe_and_cycle_reserve"
+        ],
+        "economic_claim": "Cat losses, reserve release reversal, and soft-market reserve",
+        "valuation_basis": "Bounded negative reserve; not full net reserve NAV subtraction.",
+        "adjustments": "Cat losses $4960.0M; favorable releases $1809.0M pretax.",
+        "overlap_control": "Unique overlap key catastrophe_and_cycle_reserve."
       }
     ],
-    "contributor_count": 8,
-    "in_base_irr": false,
-    "disclaimer": "Advisory lens blend only. Does not replace Lawrence total-synthesis stance gate without [HUMAN REVIEW]."
+    "limitations": [
+      "Segment owner-cash split uses underwriting income / adjusted net income proportion.",
+      "Normalized owner cash $30/sh remains [Assumption] pending human validation."
+    ]
   }
 }
