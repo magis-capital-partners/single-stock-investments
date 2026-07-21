@@ -1,14 +1,3136 @@
 {
   "ticker": "ACHR",
-  "as_of": "2026-07-20",
-  "method": "price_stub",
+  "as_of": "2026-07-21",
+  "method": "yield_curve",
+  "irr_method": "scenario",
+  "valuation_mode": "economic_value",
+  "lawrence_bucket": "other",
+  "payoff_lens": "asset",
+  "classification_inputs": {
+    "archetype": "optionality",
+    "moat": "unproven",
+    "dhando": "partial",
+    "cycle": "up",
+    "payoff_lens": "asset",
+    "predictive_attribute": "narrative_premium"
+  },
   "inputs": {
     "price": 5.31,
+    "price_source": "Yahoo ACHR close 2026-07-20",
     "price_as_of": "2026-07-20",
-    "price_source": "Yahoo ACHR close 2026-07-20"
+    "shares_millions": 766.85,
+    "shares_outstanding": 766850000,
+    "shares_source": "Q1 2026 weighted-average diluted shares 766,850,002 (ACHR/investor-documents/sec-edgar/10-Q_20260511_rpt20260331_acc0001824502_26_000038.htm)",
+    "fcf_per_share": -0.81,
+    "fcf_source": "FY2025 net loss $618.2M on revenue $0.3M; R&D $493.9M and operating loss $729.3M (ACHR/investor-documents/sec-edgar/10-K_20260302_rpt20251231_acc0001824502_26_000019.htm)",
+    "cash_m": 951.1,
+    "st_investments_m": 824.8,
+    "net_liquid_m": 1695.9,
+    "debt_m": 80.2,
+    "revenue_fy2025_m": 0.3,
+    "revenue_q1_2026_m": 1.6,
+    "normalization_note": "Pre-revenue eVTOL developer; Lawrence owner-cash is deeply negative. Interest income on cash stack partially offsets operating burn but is not durable owner cash."
   },
-  "notes": "Price stub created by fetch_equity_prices.py --create-stub; replace with a real model before decision-grade.",
-  "human_review": {
-    "live_price_confirmed": false
+  "scenarios": {
+    "bear": {
+      "price": 5.31,
+      "payoff": 1.5,
+      "years": 5,
+      "probability": 0.35,
+      "notes": "Certification delay or failure; continued dilution; payoff near impaired liquid asset value"
+    },
+    "base": {
+      "price": 5.31,
+      "payoff": 4.2,
+      "years": 7,
+      "probability": 0.45,
+      "notes": "Partial Midnight certification and limited commercial ramp; component sum base case",
+      "sotp_build": {
+        "lines": [
+          {
+            "id": "book",
+            "label": "GAAP book / price anchor",
+            "gaap_per_share": 5.31,
+            "uplift_per_share": 0.0,
+            "math": "Anchor $5.31/sh"
+          },
+          {
+            "id": "catalyst",
+            "label": "Catalyst / recovery path",
+            "gaap_per_share": 0.0,
+            "uplift_per_share": 0.01,
+            "math": "[Assumption] \u2014 see scenario notes in valuation.json"
+          },
+          {
+            "id": "tie_out",
+            "label": "Tie-out to payoff",
+            "gaap_per_share": 0.0,
+            "uplift_per_share": -1.12,
+            "math": "Running sum + -1.12 = $4.2 payoff"
+          }
+        ],
+        "year5_economic_nav_per_share": 4.2,
+        "years": 7,
+        "notes": "Partial Midnight certification and limited commercial ramp; component sum base case"
+      }
+    },
+    "bull": {
+      "price": 5.31,
+      "payoff": 14.0,
+      "years": 7,
+      "probability": 0.2,
+      "notes": "FAA type certification on schedule; United/Stellantis conditional orders convert; defense revenue scales"
+    }
+  },
+  "option_scan": [
+    {
+      "q": 1,
+      "question": "GAAP book misstates core assets?",
+      "answer": "Partial",
+      "treatment": "nav_floor",
+      "evidence": "Midnight aircraft and manufacturing lines capitalized; economic value depends on certification success (10-K Item 1)"
+    },
+    {
+      "q": 2,
+      "question": "Undeveloped reserves / dormant assets?",
+      "answer": "Yes",
+      "treatment": "probability_weighted",
+      "evidence": "Midnight eVTOL in certification; Georgia high-volume facility under scale-up (10-K Item 1 Business)"
+    },
+    {
+      "q": 3,
+      "question": "In-business loss segment?",
+      "answer": "Yes",
+      "treatment": "embedded_in_segment",
+      "evidence": "FY2025 operating loss $729.3M on revenue $0.3M; Q1 2026 operating loss $254.6M (10-K, 10-Q)"
+    },
+    {
+      "q": 4,
+      "question": "Backlog / contracted revenue not in FCF path?",
+      "answer": "Yes",
+      "treatment": "milestone_nav",
+      "evidence": "United conditional purchase up to $1.0B aircraft plus $500M option; USAF contracts (10-K Note 12)"
+    },
+    {
+      "q": 5,
+      "question": "Private or illiquid stakes below fair value?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "Public NYSE issuer; no material private equity stakes at cost below fair value (10-K)"
+    },
+    {
+      "q": 6,
+      "question": "Transitory distribution / legal recovery?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "No litigation recovery or special dividend catalyst"
+    }
+  ],
+  "optionality_gate": {
+    "primary_metric": "lawrence_base",
+    "floor_metric": "net_liquid_per_share",
+    "floor_value": 2.2115,
+    "notes": "Pre-profit eVTOL; filing-locked net liquid ~$2.21/sh offers partial dhando floor; certification option drives upside",
+    "primary_label": "annualized return",
+    "primary_return_pct": -3.3
+  },
+  "growth_explanation": {
+    "mechanism": "Commercial air-taxi revenue begins only after FAA type certification of Midnight; United, Stellantis, and U.S. Air Force partnerships provide conditional demand paths.",
+    "source": "ACHR/investor-documents/sec-edgar/10-K_20260302_rpt20251231_acc0001824502_26_000019.htm Item 1; ACHR/investor-documents/sec-edgar/10-Q_20260511_rpt20260331_acc0001824502_26_000038.htm revenue $1.6M Q1 2026",
+    "falsifiers": [
+      {
+        "id": "certification_slip",
+        "trigger": "FAA type certification delayed more than 18 months versus current public guidance without offsetting partner relief",
+        "source": "10-K Risk Factors; 8-K updates"
+      },
+      {
+        "id": "liquidity_stress",
+        "trigger": "Combined cash and short-term investments fall below $800M while net loss run rate stays above $500M annually",
+        "source": "10-Q balance sheet and statements of operations"
+      }
+    ]
+  },
+  "lawrence_horizon_years": 7,
+  "stance_proposal": {
+    "suggested": "watch",
+    "irr_band": "<15%",
+    "gates": {
+      "moat_ok": false,
+      "dhando_ok": true
+    },
+    "override_reason": "Filing-locked net liquid assets ~$2.21/sh cap downside partially, but pre-revenue burn, dilution from 624M to 767M shares, and certification binary keep moat unproven."
+  },
+  "component_valuation": {
+    "schema_version": "1.0",
+    "all_material_components_identified": true,
+    "coverage_statement": "Three additive components map net liquid claims, Midnight certification/partner option, and dilution/burn reserve once each.",
+    "components": [
+      {
+        "id": "net_liquid_claims",
+        "label": "Net cash, short-term investments, and debt claims",
+        "category": "financial_asset",
+        "overlap_key": "net_liquid_claims",
+        "treatment": "additive",
+        "valuation": {
+          "method": "net_asset_value",
+          "basis": "per_share",
+          "low": 2.0799,
+          "base": 2.2115,
+          "high": 2.3301,
+          "evidence_tier": "primary_derived",
+          "evidence": "Primary bridge from ACHR/investor-documents/sec-edgar/10-Q_20260511_rpt20260331_acc0001824502_26_000038.htm: cash $951.1M, short-term investments $824.8M, debt $80.2M; FY2025 net loss $618.2M per ACHR/investor-documents/sec-edgar/10-K_20260302_rpt20251231_acc0001824502_26_000019.htm; contract backfill 2026-07-21.",
+          "assumption_summary": "Proof outputs {'low': 2.0799, 'base': 2.2115, 'high': 2.3301}; see calculation_proof graph.",
+          "cross_check": "Reconcile to FY2025 10-K and Q1 2026 10-Q before decision use.",
+          "falsifier": "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
+          "valuation_status": "bounded_estimate",
+          "calculation_proof": {
+            "schema_version": "1.0",
+            "method_id": "net_asset_value",
+            "method_version": "1.0",
+            "output_unit": "USD_per_share",
+            "inputs": [
+              {
+                "id": "cash_m",
+                "label": "Cash and cash equivalents (Q1 2026)",
+                "kind": "fact",
+                "value": 951.1,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "ACHR/investor-documents/sec-edgar/10-Q_20260511_rpt20260331_acc0001824502_26_000038.htm",
+                  "locator": "Cash and cash equivalents $951.1M at March 31, 2026",
+                  "as_of": "2026-03-31"
+                },
+                "locked": true
+              },
+              {
+                "id": "st_investments_m",
+                "label": "Short-term investments (Q1 2026)",
+                "kind": "fact",
+                "value": 824.8,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "ACHR/investor-documents/sec-edgar/10-Q_20260511_rpt20260331_acc0001824502_26_000038.htm",
+                  "locator": "Short-term investments $824.8M at March 31, 2026",
+                  "as_of": "2026-03-31"
+                },
+                "locked": true
+              },
+              {
+                "id": "restricted_cash_m",
+                "label": "Restricted cash (Q1 2026)",
+                "kind": "fact",
+                "value": 7.3,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "ACHR/investor-documents/sec-edgar/10-Q_20260511_rpt20260331_acc0001824502_26_000038.htm",
+                  "locator": "Restricted cash $7.3M at March 31, 2026",
+                  "as_of": "2026-03-31"
+                },
+                "locked": true
+              },
+              {
+                "id": "debt_m",
+                "label": "Long-term debt current and noncurrent",
+                "kind": "fact",
+                "value": 80.2,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "ACHR/investor-documents/sec-edgar/10-Q_20260511_rpt20260331_acc0001824502_26_000038.htm",
+                  "locator": "Long-term debt current $1.4M + noncurrent $78.8M at March 31, 2026",
+                  "as_of": "2026-03-31"
+                },
+                "locked": true
+              },
+              {
+                "id": "warrant_liab_m",
+                "label": "Warrant liabilities noncurrent",
+                "kind": "fact",
+                "value": 7.1,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "ACHR/investor-documents/sec-edgar/10-Q_20260511_rpt20260331_acc0001824502_26_000038.htm",
+                  "locator": "Warrant liabilities noncurrent $7.1M at March 31, 2026",
+                  "as_of": "2026-03-31"
+                },
+                "locked": true
+              },
+              {
+                "id": "shares_m",
+                "label": "Q1 2026 weighted-average diluted shares",
+                "kind": "fact",
+                "value": 766.85,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "ACHR/investor-documents/sec-edgar/10-Q_20260511_rpt20260331_acc0001824502_26_000038.htm",
+                  "locator": "Weighted-average shares outstanding, basic and diluted 766,850,002",
+                  "as_of": "2026-03-31"
+                },
+                "locked": true
+              }
+            ],
+            "assumptions": [
+              {
+                "id": "net_liquid_claim_m",
+                "label": "Net liquid claim after debt and warrant liabilities",
+                "kind": "judgment",
+                "values": {
+                  "low": 1595.0,
+                  "base": 1695.9,
+                  "high": 1786.8
+                },
+                "unit": "USD_m",
+                "rationale": "Filing-locked cash, restricted cash, and short-term investments less debt and warrant liabilities; low/high stress debt +10% and mark haircuts on liquid assets.",
+                "allowed_range": {
+                  "min": 0.0,
+                  "max": 2500.0
+                }
+              }
+            ],
+            "calculations": [
+              {
+                "id": "value_per_share",
+                "label": "Net liquid claims per share",
+                "op": "divide",
+                "args": [
+                  "net_liquid_claim_m",
+                  "shares_m"
+                ],
+                "unit": "USD_per_share"
+              }
+            ],
+            "outputs": {
+              "low": "value_per_share",
+              "base": "value_per_share",
+              "high": "value_per_share"
+            }
+          }
+        }
+      },
+      {
+        "id": "midnight_certification_option",
+        "label": "Midnight FAA certification and partner milestone value",
+        "category": "real_option",
+        "overlap_key": "midnight_certification_option",
+        "treatment": "additive",
+        "valuation": {
+          "method": "risk_adjusted_milestone_value",
+          "basis": "per_share",
+          "low": 0.0,
+          "base": 3.5,
+          "high": 10.0,
+          "evidence_tier": "primary_derived",
+          "evidence": "Primary bridge from ACHR/investor-documents/sec-edgar/10-Q_20260511_rpt20260331_acc0001824502_26_000038.htm: cash $951.1M, short-term investments $824.8M, debt $80.2M; FY2025 net loss $618.2M per ACHR/investor-documents/sec-edgar/10-K_20260302_rpt20251231_acc0001824502_26_000019.htm; contract backfill 2026-07-21.",
+          "assumption_summary": "Proof outputs {'low': 0.0, 'base': 3.5, 'high': 10.0}; see calculation_proof graph.",
+          "cross_check": "Reconcile to FY2025 10-K and Q1 2026 10-Q before decision use.",
+          "falsifier": "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
+          "valuation_status": "bounded_estimate",
+          "calculation_proof": {
+            "schema_version": "1.0",
+            "method_id": "risk_adjusted_milestone_value",
+            "method_version": "1.0",
+            "output_unit": "USD_per_share",
+            "inputs": [
+              {
+                "id": "net_loss_fy_m",
+                "label": "FY2025 net loss",
+                "kind": "fact",
+                "value": 618.2,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "ACHR/investor-documents/sec-edgar/10-K_20260302_rpt20251231_acc0001824502_26_000019.htm",
+                  "locator": "Net loss $618.2 million for year ended December 31, 2025",
+                  "as_of": "2025-12-31"
+                },
+                "locked": true
+              },
+              {
+                "id": "rd_fy_m",
+                "label": "FY2025 research and development expense",
+                "kind": "fact",
+                "value": 493.9,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "ACHR/investor-documents/sec-edgar/10-K_20260302_rpt20251231_acc0001824502_26_000019.htm",
+                  "locator": "Research and development $493.9M (FY2025 consolidated statements of operations)",
+                  "as_of": "2025-12-31"
+                },
+                "locked": true
+              },
+              {
+                "id": "revenue_fy_m",
+                "label": "FY2025 revenue",
+                "kind": "fact",
+                "value": 0.3,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "ACHR/investor-documents/sec-edgar/10-K_20260302_rpt20251231_acc0001824502_26_000019.htm",
+                  "locator": "Revenue $0.3M (FY2025)",
+                  "as_of": "2025-12-31"
+                },
+                "locked": true
+              },
+              {
+                "id": "shares_m",
+                "label": "Q1 2026 diluted shares",
+                "kind": "fact",
+                "value": 766.85,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "ACHR/investor-documents/sec-edgar/10-Q_20260511_rpt20260331_acc0001824502_26_000038.htm",
+                  "locator": "Weighted-average shares outstanding, basic and diluted 766,850,002",
+                  "as_of": "2026-03-31"
+                },
+                "locked": true
+              }
+            ],
+            "assumptions": [
+              {
+                "id": "risked_milestone_m",
+                "label": "Risk-adjusted Midnight certification and partner milestone value",
+                "kind": "judgment",
+                "values": {
+                  "low": 0.0,
+                  "base": 2684.0,
+                  "high": 7668.5
+                },
+                "unit": "USD_m",
+                "rationale": "Conditional United purchase agreement up to $1.0B aircraft plus $500M option, Stellantis partnership, and U.S. Air Force contracts are milestones not in Lawrence owner-cash base; base uses bounded probability-weighted commercialization value pending FAA type certification.",
+                "allowed_range": {
+                  "min": 0.0,
+                  "max": 12000.0
+                }
+              }
+            ],
+            "calculations": [
+              {
+                "id": "value_per_share",
+                "label": "Midnight certification option per share",
+                "op": "divide",
+                "args": [
+                  "risked_milestone_m",
+                  "shares_m"
+                ],
+                "unit": "USD_per_share"
+              }
+            ],
+            "outputs": {
+              "low": "value_per_share",
+              "base": "value_per_share",
+              "high": "value_per_share"
+            }
+          }
+        }
+      },
+      {
+        "id": "dilution_and_burn_reserve",
+        "label": "Future dilution and pre-revenue burn reserve",
+        "category": "liability_or_reserve",
+        "overlap_key": "dilution_and_burn_reserve",
+        "treatment": "additive",
+        "valuation": {
+          "method": "net_asset_value",
+          "basis": "per_share",
+          "low": -3.0001,
+          "base": -1.5,
+          "high": -0.5,
+          "evidence_tier": "primary_derived",
+          "evidence": "Primary bridge from ACHR/investor-documents/sec-edgar/10-Q_20260511_rpt20260331_acc0001824502_26_000038.htm: cash $951.1M, short-term investments $824.8M, debt $80.2M; FY2025 net loss $618.2M per ACHR/investor-documents/sec-edgar/10-K_20260302_rpt20251231_acc0001824502_26_000019.htm; contract backfill 2026-07-21.",
+          "assumption_summary": "Proof outputs {'low': -3.0001, 'base': -1.5, 'high': -0.5}; see calculation_proof graph.",
+          "cross_check": "Reconcile to FY2025 10-K and Q1 2026 10-Q before decision use.",
+          "falsifier": "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
+          "valuation_status": "bounded_estimate",
+          "calculation_proof": {
+            "schema_version": "1.0",
+            "method_id": "net_asset_value",
+            "method_version": "1.0",
+            "output_unit": "USD_per_share",
+            "inputs": [
+              {
+                "id": "accum_deficit_m",
+                "label": "Accumulated deficit since inception",
+                "kind": "fact",
+                "value": 2303.8,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "ACHR/investor-documents/sec-edgar/10-K_20260302_rpt20251231_acc0001824502_26_000019.htm",
+                  "locator": "Retained earnings (accumulated deficit) $(2,303.8)M at December 31, 2025",
+                  "as_of": "2025-12-31"
+                },
+                "locked": true
+              },
+              {
+                "id": "op_loss_fy_m",
+                "label": "FY2025 loss from operations",
+                "kind": "fact",
+                "value": 729.3,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "ACHR/investor-documents/sec-edgar/10-K_20260302_rpt20251231_acc0001824502_26_000019.htm",
+                  "locator": "Loss from operations $(729.3)M (FY2025)",
+                  "as_of": "2025-12-31"
+                },
+                "locked": true
+              },
+              {
+                "id": "shares_m",
+                "label": "Q1 2026 diluted shares",
+                "kind": "fact",
+                "value": 766.85,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "ACHR/investor-documents/sec-edgar/10-Q_20260511_rpt20260331_acc0001824502_26_000038.htm",
+                  "locator": "Weighted-average shares outstanding, basic and diluted 766,850,002",
+                  "as_of": "2026-03-31"
+                },
+                "locked": true
+              }
+            ],
+            "assumptions": [
+              {
+                "id": "reserve_m",
+                "label": "Future dilution, ATM issuance, and burn reserve",
+                "kind": "judgment",
+                "values": {
+                  "low": -2300.6,
+                  "base": -1150.3,
+                  "high": -383.4
+                },
+                "unit": "USD_m",
+                "rationale": "Negative reserve for continued pre-revenue operating losses, S-3/424B5 equity issuance capacity, and share count growth from 624M FY2025 to 767M Q1 2026 diluted shares.",
+                "allowed_range": {
+                  "min": -4000.0,
+                  "max": 0.0
+                }
+              }
+            ],
+            "calculations": [
+              {
+                "id": "value_per_share",
+                "label": "Dilution and burn reserve per share",
+                "op": "divide",
+                "args": [
+                  "reserve_m",
+                  "shares_m"
+                ],
+                "unit": "USD_per_share"
+              }
+            ],
+            "outputs": {
+              "low": "value_per_share",
+              "base": "value_per_share",
+              "high": "value_per_share"
+            }
+          }
+        }
+      }
+    ]
+  },
+  "economic_value": {
+    "schema_version": "1.0",
+    "method": "component_economic_value",
+    "gaap_role": "cross_check",
+    "accounting_reference": "FY2025 10-K and Q1 2026 10-Q; GAAP net loss reflects pre-revenue R&D burn and is not owner cash.",
+    "economic_claim": {
+      "description": "One diluted ACHR common share, including net liquid assets, risk-adjusted Midnight certification and partner milestone value, less dilution and burn reserve.",
+      "unit_label": "diluted share",
+      "unit_count": 766850000,
+      "unit_source": "Q1 2026 weighted-average diluted shares 766,850,002 (ACHR/investor-documents/sec-edgar/10-Q_20260511_rpt20260331_acc0001824502_26_000038.htm)",
+      "enterprise_to_equity_reconciliation": "Pre-revenue developer with no operating enterprise cash flow; net liquid assets, certification option, and burn reserve are separate additive components with unique overlap keys."
+    },
+    "component_groups": [
+      {
+        "id": "net_liquid_claims",
+        "label": "Net cash, short-term investments, and debt claims",
+        "component_ids": [
+          "net_liquid_claims"
+        ],
+        "economic_claim": "Net cash, short-term investments, and debt claims",
+        "valuation_basis": "Filing-locked cash, investments, debt, and warrant liabilities divided by diluted shares.",
+        "adjustments": "Low/high stress debt and mark haircuts on liquid assets.",
+        "overlap_control": "Unique overlap key net_liquid_claims."
+      },
+      {
+        "id": "midnight_certification_option",
+        "label": "Midnight FAA certification and partner milestone value",
+        "component_ids": [
+          "midnight_certification_option"
+        ],
+        "economic_claim": "Midnight FAA certification and partner milestone value",
+        "valuation_basis": "Risk-adjusted milestone value from United, Stellantis, and USAF conditional paths.",
+        "adjustments": "Probability, timing, and remaining certification capital are inside the range.",
+        "overlap_control": "Unique overlap key midnight_certification_option.",
+        "risk_and_timing": {
+          "probability_basis": "Base assumes partial certification and limited partner conversion; bear assumes failure (0).",
+          "timing_basis": "Seven-year Lawrence horizon aligned with scenario yield-curve stance gate.",
+          "remaining_capital_basis": "FY2025 R&D $493.9M and operating loss $729.3M continue until commercial revenue scales."
+        }
+      },
+      {
+        "id": "dilution_and_burn_reserve",
+        "label": "Future dilution and pre-revenue burn reserve",
+        "component_ids": [
+          "dilution_and_burn_reserve"
+        ],
+        "economic_claim": "Future dilution and pre-revenue burn reserve",
+        "valuation_basis": "Negative reserve for ATM/S-3 issuance and continued pre-revenue burn.",
+        "adjustments": "Separate from net liquid claim; does not double-count cash already marked.",
+        "overlap_control": "Unique overlap key dilution_and_burn_reserve."
+      }
+    ]
+  },
+  "economic_value_analysis": {
+    "schema_version": "1.0",
+    "status": "complete",
+    "trigger": {
+      "required": true,
+      "reasons": [
+        "explicit_component_schedule"
+      ],
+      "policy": "A complete economic-value analysis is required when any trigger fires; otherwise it is recommended."
+    },
+    "method": "component_economic_value",
+    "economic_claim": {
+      "description": "One diluted ACHR common share, including net liquid assets, risk-adjusted Midnight certification and partner milestone value, less dilution and burn reserve.",
+      "unit_label": "diluted share",
+      "unit_count": 766850000,
+      "unit_source": "Q1 2026 weighted-average diluted shares 766,850,002 (ACHR/investor-documents/sec-edgar/10-Q_20260511_rpt20260331_acc0001824502_26_000038.htm)",
+      "enterprise_to_equity_reconciliation": "Pre-revenue developer with no operating enterprise cash flow; net liquid assets, certification option, and burn reserve are separate additive components with unique overlap keys."
+    },
+    "gaap_role": "cross_check",
+    "accounting_reference": "FY2025 10-K and Q1 2026 10-Q; GAAP net loss reflects pre-revenue R&D burn and is not owner cash.",
+    "comparable_hierarchy": [
+      "issuer_arm_length_transaction",
+      "same_asset_transaction",
+      "public_peer",
+      "replacement_cost",
+      "approved_external_analysis"
+    ],
+    "gross_comparable_nav_per_share": null,
+    "risked_present_value_per_share": {
+      "low": -0.92,
+      "base": 4.21,
+      "high": 11.83
+    },
+    "component_groups": [
+      {
+        "id": "net_liquid_claims",
+        "label": "Net cash, short-term investments, and debt claims",
+        "component_ids": [
+          "net_liquid_claims"
+        ],
+        "economic_claim": "Net cash, short-term investments, and debt claims",
+        "valuation_basis": "Filing-locked cash, investments, debt, and warrant liabilities divided by diluted shares.",
+        "adjustments": "Low/high stress debt and mark haircuts on liquid assets.",
+        "overlap_control": "Unique overlap key net_liquid_claims.",
+        "risked_present_value_per_share": {
+          "low": 2.08,
+          "base": 2.21,
+          "high": 2.33
+        }
+      },
+      {
+        "id": "midnight_certification_option",
+        "label": "Midnight FAA certification and partner milestone value",
+        "component_ids": [
+          "midnight_certification_option"
+        ],
+        "economic_claim": "Midnight FAA certification and partner milestone value",
+        "valuation_basis": "Risk-adjusted milestone value from United, Stellantis, and USAF conditional paths.",
+        "adjustments": "Probability, timing, and remaining certification capital are inside the range.",
+        "overlap_control": "Unique overlap key midnight_certification_option.",
+        "risk_and_timing": {
+          "probability_basis": "Base assumes partial certification and limited partner conversion; bear assumes failure (0).",
+          "timing_basis": "Seven-year Lawrence horizon aligned with scenario yield-curve stance gate.",
+          "remaining_capital_basis": "FY2025 R&D $493.9M and operating loss $729.3M continue until commercial revenue scales."
+        },
+        "risked_present_value_per_share": {
+          "low": 0.0,
+          "base": 3.5,
+          "high": 10.0
+        }
+      },
+      {
+        "id": "dilution_and_burn_reserve",
+        "label": "Future dilution and pre-revenue burn reserve",
+        "component_ids": [
+          "dilution_and_burn_reserve"
+        ],
+        "economic_claim": "Future dilution and pre-revenue burn reserve",
+        "valuation_basis": "Negative reserve for ATM/S-3 issuance and continued pre-revenue burn.",
+        "adjustments": "Separate from net liquid claim; does not double-count cash already marked.",
+        "overlap_control": "Unique overlap key dilution_and_burn_reserve.",
+        "risked_present_value_per_share": {
+          "low": -3.0,
+          "base": -1.5,
+          "high": -0.5
+        }
+      }
+    ],
+    "valuation_proof": [
+      {
+        "component_id": "net_liquid_claims",
+        "economic_claim": "Net cash, short-term investments, and debt claims",
+        "quantity": {
+          "value": 1,
+          "unit": "per-share economic claim"
+        },
+        "method": "net_asset_value",
+        "evidence_tier": "primary_derived",
+        "evidence": "Primary bridge from ACHR/investor-documents/sec-edgar/10-Q_20260511_rpt20260331_acc0001824502_26_000038.htm: cash $951.1M, short-term investments $824.8M, debt $80.2M; FY2025 net loss $618.2M per ACHR/investor-documents/sec-edgar/10-K_20260302_rpt20251231_acc0001824502_26_000019.htm; contract backfill 2026-07-21.",
+        "comparable_role": "not_applicable",
+        "comparable_ids": [],
+        "adjustment": "Low/high stress debt and mark haircuts on liquid assets.",
+        "range_per_share": {
+          "low": 2.08,
+          "base": 2.21,
+          "high": 2.33
+        },
+        "treatment": "additive",
+        "overlap_key": "net_liquid_claims",
+        "overlap_control": "Unique overlap key net_liquid_claims.",
+        "falsifier": "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
+        "risk_and_timing": null
+      },
+      {
+        "component_id": "midnight_certification_option",
+        "economic_claim": "Midnight FAA certification and partner milestone value",
+        "quantity": {
+          "value": 1,
+          "unit": "per-share economic claim"
+        },
+        "method": "risk_adjusted_milestone_value",
+        "evidence_tier": "primary_derived",
+        "evidence": "Primary bridge from ACHR/investor-documents/sec-edgar/10-Q_20260511_rpt20260331_acc0001824502_26_000038.htm: cash $951.1M, short-term investments $824.8M, debt $80.2M; FY2025 net loss $618.2M per ACHR/investor-documents/sec-edgar/10-K_20260302_rpt20251231_acc0001824502_26_000019.htm; contract backfill 2026-07-21.",
+        "comparable_role": "not_applicable",
+        "comparable_ids": [],
+        "adjustment": "Probability, timing, and remaining certification capital are inside the range.",
+        "range_per_share": {
+          "low": 0.0,
+          "base": 3.5,
+          "high": 10.0
+        },
+        "treatment": "additive",
+        "overlap_key": "midnight_certification_option",
+        "overlap_control": "Unique overlap key midnight_certification_option.",
+        "falsifier": "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
+        "risk_and_timing": {
+          "success_probability": null,
+          "remaining_capital_m": null,
+          "timing_basis": "Seven-year Lawrence horizon aligned with scenario yield-curve stance gate.",
+          "probability_basis": "Base assumes partial certification and limited partner conversion; bear assumes failure (0).",
+          "remaining_capital_basis": "FY2025 R&D $493.9M and operating loss $729.3M continue until commercial revenue scales."
+        }
+      },
+      {
+        "component_id": "dilution_and_burn_reserve",
+        "economic_claim": "Future dilution and pre-revenue burn reserve",
+        "quantity": {
+          "value": 1,
+          "unit": "per-share economic claim"
+        },
+        "method": "net_asset_value",
+        "evidence_tier": "primary_derived",
+        "evidence": "Primary bridge from ACHR/investor-documents/sec-edgar/10-Q_20260511_rpt20260331_acc0001824502_26_000038.htm: cash $951.1M, short-term investments $824.8M, debt $80.2M; FY2025 net loss $618.2M per ACHR/investor-documents/sec-edgar/10-K_20260302_rpt20251231_acc0001824502_26_000019.htm; contract backfill 2026-07-21.",
+        "comparable_role": "not_applicable",
+        "comparable_ids": [],
+        "adjustment": "Separate from net liquid claim; does not double-count cash already marked.",
+        "range_per_share": {
+          "low": -3.0,
+          "base": -1.5,
+          "high": -0.5
+        },
+        "treatment": "additive",
+        "overlap_key": "dilution_and_burn_reserve",
+        "overlap_control": "Unique overlap key dilution_and_burn_reserve.",
+        "falsifier": "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
+        "risk_and_timing": null
+      }
+    ],
+    "wisdom_applied": [],
+    "limitations": [],
+    "complete_component_coverage": true,
+    "validation_errors": [],
+    "registry_version": "1.0"
+  },
+  "catalyst_paths": [
+    {
+      "event": "Base catalyst path",
+      "timing": "7 years",
+      "impact": "Partial Midnight certification and limited commercial ramp; component sum base case"
+    },
+    {
+      "event": "Failure mode",
+      "timing": "bear scenario",
+      "impact": "Certification delay or failure; continued dilution; payoff near impaired liquid asset value"
+    }
+  ],
+  "total_return_panel": {
+    "schema_version": "3.0",
+    "ticker": "ACHR",
+    "as_of": "2026-07-21",
+    "status": "partial",
+    "error": "Vendor events are discovery evidence; primary-source completeness has not been established.",
+    "price_source": "yahoo:ACHR",
+    "currency": "USD",
+    "return_currency": "USD",
+    "fx_basis": "listing_currency_nominal",
+    "history_start": "2020-12-18",
+    "history_end": "2026-07-20",
+    "price_points": 1400,
+    "price_interval": "1d",
+    "history_basis": "earliest_available_vendor_trading_history",
+    "chart_scale": "logarithmic",
+    "chart_y_axis": "cumulative_return_pct",
+    "chart_series": [
+      "total_return",
+      "price_only"
+    ],
+    "return_contract": "split-adjusted close excluding dividends; event amounts normalized for later splits; cash reinvested at ex-date close; pre-tax nominal",
+    "coverage": {
+      "status": "vendor_only",
+      "start": null,
+      "end": null,
+      "note": "Vendor events are discovery evidence; primary-source completeness has not been established.",
+      "ledger_path": null
+    },
+    "event_count": 0,
+    "event_counts": {},
+    "cash_distributions_on_initial_share_path": 0,
+    "distribution_contribution_by_type": {},
+    "cumulative_distributions_per_share": 0,
+    "start_price": 9.97,
+    "end_price": 5.31,
+    "price_index_end": 53.26,
+    "total_return_index_end": 53.26,
+    "cumulative_price_return_pct": -46.74,
+    "cumulative_total_return_pct": -46.74,
+    "price_only_annualized_pct": -10.67,
+    "total_return_annualized_pct": -10.67,
+    "market_cap_m": 4071.97,
+    "shares_outstanding": 766850000,
+    "price_for_market_cap": 5.31,
+    "chart": "ACHR/research/charts/total_return_2026-07-21.svg",
+    "panel_json": "ACHR/research/total_return_panel.json"
+  },
+  "results_lawrence_legacy": {
+    "bear": {
+      "return_pct": -22.3
+    },
+    "base": {
+      "return_pct": -3.3
+    },
+    "bull": {
+      "return_pct": 14.9
+    }
+  },
+  "results": {
+    "bear": {
+      "return_pct": -22.3
+    },
+    "base": {
+      "return_pct": -3.3
+    },
+    "bull": {
+      "return_pct": 14.9
+    }
+  },
+  "implied_return": {
+    "base_pct": -3.3,
+    "label": "annualized return",
+    "display": "-3.3% (base)"
+  },
+  "overlay_results": [],
+  "component_valuation_results": {
+    "status": "complete",
+    "decision_rule": "Use the complete low/base/high component schedule. Embedded components are estimated but not added twice.",
+    "all_material_components_identified": true,
+    "additive_components": [
+      {
+        "id": "net_liquid_claims",
+        "label": "Net cash, short-term investments, and debt claims",
+        "category": "financial_asset",
+        "overlap_key": "net_liquid_claims",
+        "treatment": "additive",
+        "included_in_component_id": null,
+        "method": "net_asset_value",
+        "valuation_status": "bounded_estimate",
+        "calculation_proof": {
+          "schema_version": "1.0",
+          "method_id": "net_asset_value",
+          "method_version": "1.0",
+          "output_unit": "USD_per_share",
+          "inputs": [
+            {
+              "id": "cash_m",
+              "label": "Cash and cash equivalents (Q1 2026)",
+              "kind": "fact",
+              "value": 951.1,
+              "unit": "USD_m",
+              "source": {
+                "ref": "ACHR/investor-documents/sec-edgar/10-Q_20260511_rpt20260331_acc0001824502_26_000038.htm",
+                "locator": "Cash and cash equivalents $951.1M at March 31, 2026",
+                "as_of": "2026-03-31"
+              },
+              "locked": true
+            },
+            {
+              "id": "st_investments_m",
+              "label": "Short-term investments (Q1 2026)",
+              "kind": "fact",
+              "value": 824.8,
+              "unit": "USD_m",
+              "source": {
+                "ref": "ACHR/investor-documents/sec-edgar/10-Q_20260511_rpt20260331_acc0001824502_26_000038.htm",
+                "locator": "Short-term investments $824.8M at March 31, 2026",
+                "as_of": "2026-03-31"
+              },
+              "locked": true
+            },
+            {
+              "id": "restricted_cash_m",
+              "label": "Restricted cash (Q1 2026)",
+              "kind": "fact",
+              "value": 7.3,
+              "unit": "USD_m",
+              "source": {
+                "ref": "ACHR/investor-documents/sec-edgar/10-Q_20260511_rpt20260331_acc0001824502_26_000038.htm",
+                "locator": "Restricted cash $7.3M at March 31, 2026",
+                "as_of": "2026-03-31"
+              },
+              "locked": true
+            },
+            {
+              "id": "debt_m",
+              "label": "Long-term debt current and noncurrent",
+              "kind": "fact",
+              "value": 80.2,
+              "unit": "USD_m",
+              "source": {
+                "ref": "ACHR/investor-documents/sec-edgar/10-Q_20260511_rpt20260331_acc0001824502_26_000038.htm",
+                "locator": "Long-term debt current $1.4M + noncurrent $78.8M at March 31, 2026",
+                "as_of": "2026-03-31"
+              },
+              "locked": true
+            },
+            {
+              "id": "warrant_liab_m",
+              "label": "Warrant liabilities noncurrent",
+              "kind": "fact",
+              "value": 7.1,
+              "unit": "USD_m",
+              "source": {
+                "ref": "ACHR/investor-documents/sec-edgar/10-Q_20260511_rpt20260331_acc0001824502_26_000038.htm",
+                "locator": "Warrant liabilities noncurrent $7.1M at March 31, 2026",
+                "as_of": "2026-03-31"
+              },
+              "locked": true
+            },
+            {
+              "id": "shares_m",
+              "label": "Q1 2026 weighted-average diluted shares",
+              "kind": "fact",
+              "value": 766.85,
+              "unit": "million_shares",
+              "source": {
+                "ref": "ACHR/investor-documents/sec-edgar/10-Q_20260511_rpt20260331_acc0001824502_26_000038.htm",
+                "locator": "Weighted-average shares outstanding, basic and diluted 766,850,002",
+                "as_of": "2026-03-31"
+              },
+              "locked": true
+            }
+          ],
+          "assumptions": [
+            {
+              "id": "net_liquid_claim_m",
+              "label": "Net liquid claim after debt and warrant liabilities",
+              "kind": "judgment",
+              "values": {
+                "low": 1595.0,
+                "base": 1695.9,
+                "high": 1786.8
+              },
+              "unit": "USD_m",
+              "rationale": "Filing-locked cash, restricted cash, and short-term investments less debt and warrant liabilities; low/high stress debt +10% and mark haircuts on liquid assets.",
+              "allowed_range": {
+                "min": 0.0,
+                "max": 2500.0
+              }
+            }
+          ],
+          "calculations": [
+            {
+              "id": "value_per_share",
+              "label": "Net liquid claims per share",
+              "op": "divide",
+              "args": [
+                "net_liquid_claim_m",
+                "shares_m"
+              ],
+              "unit": "USD_per_share"
+            }
+          ],
+          "outputs": {
+            "low": "value_per_share",
+            "base": "value_per_share",
+            "high": "value_per_share"
+          }
+        },
+        "evidence_tier": "primary_derived",
+        "evidence": "Primary bridge from ACHR/investor-documents/sec-edgar/10-Q_20260511_rpt20260331_acc0001824502_26_000038.htm: cash $951.1M, short-term investments $824.8M, debt $80.2M; FY2025 net loss $618.2M per ACHR/investor-documents/sec-edgar/10-K_20260302_rpt20251231_acc0001824502_26_000019.htm; contract backfill 2026-07-21.",
+        "cross_check": "Reconcile to FY2025 10-K and Q1 2026 10-Q before decision use.",
+        "driver_model_type": null,
+        "driver_model": null,
+        "assumption_summary": "Proof outputs {'low': 2.0799, 'base': 2.2115, 'high': 2.3301}; see calculation_proof graph.",
+        "falsifier": "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
+        "scenario_assumptions": null,
+        "low_per_share": 2.08,
+        "base_per_share": 2.21,
+        "high_per_share": 2.33
+      },
+      {
+        "id": "midnight_certification_option",
+        "label": "Midnight FAA certification and partner milestone value",
+        "category": "real_option",
+        "overlap_key": "midnight_certification_option",
+        "treatment": "additive",
+        "included_in_component_id": null,
+        "method": "risk_adjusted_milestone_value",
+        "valuation_status": "bounded_estimate",
+        "calculation_proof": {
+          "schema_version": "1.0",
+          "method_id": "risk_adjusted_milestone_value",
+          "method_version": "1.0",
+          "output_unit": "USD_per_share",
+          "inputs": [
+            {
+              "id": "net_loss_fy_m",
+              "label": "FY2025 net loss",
+              "kind": "fact",
+              "value": 618.2,
+              "unit": "USD_m",
+              "source": {
+                "ref": "ACHR/investor-documents/sec-edgar/10-K_20260302_rpt20251231_acc0001824502_26_000019.htm",
+                "locator": "Net loss $618.2 million for year ended December 31, 2025",
+                "as_of": "2025-12-31"
+              },
+              "locked": true
+            },
+            {
+              "id": "rd_fy_m",
+              "label": "FY2025 research and development expense",
+              "kind": "fact",
+              "value": 493.9,
+              "unit": "USD_m",
+              "source": {
+                "ref": "ACHR/investor-documents/sec-edgar/10-K_20260302_rpt20251231_acc0001824502_26_000019.htm",
+                "locator": "Research and development $493.9M (FY2025 consolidated statements of operations)",
+                "as_of": "2025-12-31"
+              },
+              "locked": true
+            },
+            {
+              "id": "revenue_fy_m",
+              "label": "FY2025 revenue",
+              "kind": "fact",
+              "value": 0.3,
+              "unit": "USD_m",
+              "source": {
+                "ref": "ACHR/investor-documents/sec-edgar/10-K_20260302_rpt20251231_acc0001824502_26_000019.htm",
+                "locator": "Revenue $0.3M (FY2025)",
+                "as_of": "2025-12-31"
+              },
+              "locked": true
+            },
+            {
+              "id": "shares_m",
+              "label": "Q1 2026 diluted shares",
+              "kind": "fact",
+              "value": 766.85,
+              "unit": "million_shares",
+              "source": {
+                "ref": "ACHR/investor-documents/sec-edgar/10-Q_20260511_rpt20260331_acc0001824502_26_000038.htm",
+                "locator": "Weighted-average shares outstanding, basic and diluted 766,850,002",
+                "as_of": "2026-03-31"
+              },
+              "locked": true
+            }
+          ],
+          "assumptions": [
+            {
+              "id": "risked_milestone_m",
+              "label": "Risk-adjusted Midnight certification and partner milestone value",
+              "kind": "judgment",
+              "values": {
+                "low": 0.0,
+                "base": 2684.0,
+                "high": 7668.5
+              },
+              "unit": "USD_m",
+              "rationale": "Conditional United purchase agreement up to $1.0B aircraft plus $500M option, Stellantis partnership, and U.S. Air Force contracts are milestones not in Lawrence owner-cash base; base uses bounded probability-weighted commercialization value pending FAA type certification.",
+              "allowed_range": {
+                "min": 0.0,
+                "max": 12000.0
+              }
+            }
+          ],
+          "calculations": [
+            {
+              "id": "value_per_share",
+              "label": "Midnight certification option per share",
+              "op": "divide",
+              "args": [
+                "risked_milestone_m",
+                "shares_m"
+              ],
+              "unit": "USD_per_share"
+            }
+          ],
+          "outputs": {
+            "low": "value_per_share",
+            "base": "value_per_share",
+            "high": "value_per_share"
+          }
+        },
+        "evidence_tier": "primary_derived",
+        "evidence": "Primary bridge from ACHR/investor-documents/sec-edgar/10-Q_20260511_rpt20260331_acc0001824502_26_000038.htm: cash $951.1M, short-term investments $824.8M, debt $80.2M; FY2025 net loss $618.2M per ACHR/investor-documents/sec-edgar/10-K_20260302_rpt20251231_acc0001824502_26_000019.htm; contract backfill 2026-07-21.",
+        "cross_check": "Reconcile to FY2025 10-K and Q1 2026 10-Q before decision use.",
+        "driver_model_type": null,
+        "driver_model": null,
+        "assumption_summary": "Proof outputs {'low': 0.0, 'base': 3.5, 'high': 10.0}; see calculation_proof graph.",
+        "falsifier": "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
+        "scenario_assumptions": null,
+        "low_per_share": 0.0,
+        "base_per_share": 3.5,
+        "high_per_share": 10.0
+      },
+      {
+        "id": "dilution_and_burn_reserve",
+        "label": "Future dilution and pre-revenue burn reserve",
+        "category": "liability_or_reserve",
+        "overlap_key": "dilution_and_burn_reserve",
+        "treatment": "additive",
+        "included_in_component_id": null,
+        "method": "net_asset_value",
+        "valuation_status": "bounded_estimate",
+        "calculation_proof": {
+          "schema_version": "1.0",
+          "method_id": "net_asset_value",
+          "method_version": "1.0",
+          "output_unit": "USD_per_share",
+          "inputs": [
+            {
+              "id": "accum_deficit_m",
+              "label": "Accumulated deficit since inception",
+              "kind": "fact",
+              "value": 2303.8,
+              "unit": "USD_m",
+              "source": {
+                "ref": "ACHR/investor-documents/sec-edgar/10-K_20260302_rpt20251231_acc0001824502_26_000019.htm",
+                "locator": "Retained earnings (accumulated deficit) $(2,303.8)M at December 31, 2025",
+                "as_of": "2025-12-31"
+              },
+              "locked": true
+            },
+            {
+              "id": "op_loss_fy_m",
+              "label": "FY2025 loss from operations",
+              "kind": "fact",
+              "value": 729.3,
+              "unit": "USD_m",
+              "source": {
+                "ref": "ACHR/investor-documents/sec-edgar/10-K_20260302_rpt20251231_acc0001824502_26_000019.htm",
+                "locator": "Loss from operations $(729.3)M (FY2025)",
+                "as_of": "2025-12-31"
+              },
+              "locked": true
+            },
+            {
+              "id": "shares_m",
+              "label": "Q1 2026 diluted shares",
+              "kind": "fact",
+              "value": 766.85,
+              "unit": "million_shares",
+              "source": {
+                "ref": "ACHR/investor-documents/sec-edgar/10-Q_20260511_rpt20260331_acc0001824502_26_000038.htm",
+                "locator": "Weighted-average shares outstanding, basic and diluted 766,850,002",
+                "as_of": "2026-03-31"
+              },
+              "locked": true
+            }
+          ],
+          "assumptions": [
+            {
+              "id": "reserve_m",
+              "label": "Future dilution, ATM issuance, and burn reserve",
+              "kind": "judgment",
+              "values": {
+                "low": -2300.6,
+                "base": -1150.3,
+                "high": -383.4
+              },
+              "unit": "USD_m",
+              "rationale": "Negative reserve for continued pre-revenue operating losses, S-3/424B5 equity issuance capacity, and share count growth from 624M FY2025 to 767M Q1 2026 diluted shares.",
+              "allowed_range": {
+                "min": -4000.0,
+                "max": 0.0
+              }
+            }
+          ],
+          "calculations": [
+            {
+              "id": "value_per_share",
+              "label": "Dilution and burn reserve per share",
+              "op": "divide",
+              "args": [
+                "reserve_m",
+                "shares_m"
+              ],
+              "unit": "USD_per_share"
+            }
+          ],
+          "outputs": {
+            "low": "value_per_share",
+            "base": "value_per_share",
+            "high": "value_per_share"
+          }
+        },
+        "evidence_tier": "primary_derived",
+        "evidence": "Primary bridge from ACHR/investor-documents/sec-edgar/10-Q_20260511_rpt20260331_acc0001824502_26_000038.htm: cash $951.1M, short-term investments $824.8M, debt $80.2M; FY2025 net loss $618.2M per ACHR/investor-documents/sec-edgar/10-K_20260302_rpt20251231_acc0001824502_26_000019.htm; contract backfill 2026-07-21.",
+        "cross_check": "Reconcile to FY2025 10-K and Q1 2026 10-Q before decision use.",
+        "driver_model_type": null,
+        "driver_model": null,
+        "assumption_summary": "Proof outputs {'low': -3.0001, 'base': -1.5, 'high': -0.5}; see calculation_proof graph.",
+        "falsifier": "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
+        "scenario_assumptions": null,
+        "low_per_share": -3.0,
+        "base_per_share": -1.5,
+        "high_per_share": -0.5
+      }
+    ],
+    "embedded_components": [],
+    "total_equity_value_per_share": {
+      "low": -0.92,
+      "base": 4.21,
+      "high": 11.83
+    },
+    "material_component_count": 3,
+    "additive_component_count": 3,
+    "embedded_component_count": 0,
+    "market_price_per_share": 5.31,
+    "upside_downside_pct": {
+      "low": -117.3,
+      "base": -20.7,
+      "high": 122.8
+    }
+  },
+  "component_review_queue": {
+    "status": "ready_for_committee_review",
+    "decision_rule": "Each assigned rater records accept, challenge, or reject with a proposed range and evidence. The aggregator may not silently average disputed ranges.",
+    "items": [
+      {
+        "component_id": "net_liquid_claims",
+        "label": "Net cash, short-term investments, and debt claims",
+        "treatment": "additive",
+        "range_per_share": {
+          "low": 2.08,
+          "base": 2.21,
+          "high": 2.33
+        },
+        "range_width_pct_of_base": 11.3,
+        "evidence_tier": "primary_derived",
+        "recommended_raters": [
+          "greenblatt",
+          "marks_credit_cycle"
+        ],
+        "mandatory_checks": [
+          "Is the valuation method appropriate for this economic claim?",
+          "Is the security's ownership claim and economic-unit denominator reconciled correctly?",
+          "Does the evidence support the low/base/high range and its timing?",
+          "Are comparable assets truly like-for-like after production, contract, location, capital, ownership, and realization adjustments?",
+          "For an option, are success probability, time to realization, and remaining owner-funded capital explicit?",
+          "Is the component additive, or already embedded in another component?",
+          "What observation would move the base estimate materially?"
+        ],
+        "status": "open"
+      },
+      {
+        "component_id": "midnight_certification_option",
+        "label": "Midnight FAA certification and partner milestone value",
+        "treatment": "additive",
+        "range_per_share": {
+          "low": 0.0,
+          "base": 3.5,
+          "high": 10.0
+        },
+        "range_width_pct_of_base": 285.7,
+        "evidence_tier": "primary_derived",
+        "recommended_raters": [
+          "klarman_asset_value",
+          "hk"
+        ],
+        "mandatory_checks": [
+          "Is the valuation method appropriate for this economic claim?",
+          "Is the security's ownership claim and economic-unit denominator reconciled correctly?",
+          "Does the evidence support the low/base/high range and its timing?",
+          "Are comparable assets truly like-for-like after production, contract, location, capital, ownership, and realization adjustments?",
+          "For an option, are success probability, time to realization, and remaining owner-funded capital explicit?",
+          "Is the component additive, or already embedded in another component?",
+          "What observation would move the base estimate materially?"
+        ],
+        "status": "open"
+      },
+      {
+        "component_id": "dilution_and_burn_reserve",
+        "label": "Future dilution and pre-revenue burn reserve",
+        "treatment": "additive",
+        "range_per_share": {
+          "low": -3.0,
+          "base": -1.5,
+          "high": -0.5
+        },
+        "range_width_pct_of_base": 166.7,
+        "evidence_tier": "primary_derived",
+        "recommended_raters": [
+          "marks_credit_cycle",
+          "pabrai"
+        ],
+        "mandatory_checks": [
+          "Is the valuation method appropriate for this economic claim?",
+          "Is the security's ownership claim and economic-unit denominator reconciled correctly?",
+          "Does the evidence support the low/base/high range and its timing?",
+          "Are comparable assets truly like-for-like after production, contract, location, capital, ownership, and realization adjustments?",
+          "For an option, are success probability, time to realization, and remaining owner-funded capital explicit?",
+          "Is the component additive, or already embedded in another component?",
+          "What observation would move the base estimate materially?"
+        ],
+        "status": "open"
+      }
+    ]
+  },
+  "valuation_method_route": {
+    "schema_version": "1.0",
+    "status": "routed",
+    "profile_id": "scarce_asset_optionality",
+    "label": "Scarce assets, royalties, and optionality",
+    "score": 7.0,
+    "reasons": [
+      "archetype=optionality",
+      "component categories=real_option"
+    ],
+    "primary_methods": [
+      "component_owner_cash_and_unit_nav"
+    ],
+    "corroborating_methods": [
+      "comparable_transactions",
+      "replacement_cost_or_reverse_nav"
+    ],
+    "primary_personas": [
+      "hk",
+      "stahl"
+    ],
+    "cross_check_personas": [
+      "klarman_asset_value",
+      "marks_credit_cycle"
+    ],
+    "silent_personas": [
+      "buffett_weschler",
+      "greenblatt",
+      "hohn",
+      "marathon_capital_cycle",
+      "munger",
+      "pabrai"
+    ],
+    "required_evidence": [
+      "legal economic claim",
+      "non-overlapping physical inventory",
+      "unit economics",
+      "realization timing",
+      "remaining owner capital"
+    ],
+    "failure_modes": [
+      "gross asset value mistaken for shareholder value",
+      "operating cash flow and NAV counted twice",
+      "remote options treated as contracted cash"
+    ],
+    "secondary_profiles": [
+      {
+        "profile_id": "binary_milestone",
+        "score": 3.0,
+        "reasons": [
+          "component categories=real_option",
+          "existing methods=milestone, risk_adjusted"
+        ]
+      },
+      {
+        "profile_id": "credit_and_normalized_returns",
+        "score": 2.0,
+        "reasons": [
+          "component categories=financial_asset, liability_or_reserve"
+        ]
+      }
+    ],
+    "scorecard": {
+      "scarce_asset_optionality": {
+        "score": 7.0,
+        "reasons": [
+          "archetype=optionality",
+          "component categories=real_option"
+        ]
+      },
+      "quality_reinvestment": {
+        "score": 0.0,
+        "reasons": []
+      },
+      "capital_cycle": {
+        "score": 0.0,
+        "reasons": []
+      },
+      "credit_and_normalized_returns": {
+        "score": 2.0,
+        "reasons": [
+          "component categories=financial_asset, liability_or_reserve"
+        ]
+      },
+      "catalyst_asset_value": {
+        "score": 1.0,
+        "reasons": [
+          "component categories=financial_asset"
+        ]
+      },
+      "predictable_cash_flow": {
+        "score": 0.0,
+        "reasons": []
+      },
+      "binary_milestone": {
+        "score": 3.0,
+        "reasons": [
+          "component categories=real_option",
+          "existing methods=milestone, risk_adjusted"
+        ]
+      }
+    },
+    "decision_rule": "Use one primary method and no more than two corroborating methods; irrelevant methods and personas remain silent."
+  },
+  "universal_valuation_contract": {
+    "schema_version": "2.0",
+    "status": "decision_grade",
+    "ticker": "ACHR",
+    "as_of": "2026-07-21",
+    "economic_ownership_map": [
+      {
+        "component_id": "net_liquid_claims",
+        "label": "Net cash, short-term investments, and debt claims",
+        "category": "financial_asset",
+        "treatment": "additive",
+        "included_in_component_id": null,
+        "ownership_claim": "Net cash, short-term investments, and debt claims",
+        "ownership_percentage": 1.0,
+        "quantity": {
+          "value": 1,
+          "unit": "per-share economic claim"
+        },
+        "method": "net_asset_value",
+        "method_version": "1.0",
+        "method_provenance": {
+          "method_id": "net_asset_value",
+          "version": "1.0",
+          "label": "Reconciled net asset value",
+          "power_zones": [
+            "scarce_asset_optionality",
+            "catalyst_asset_value",
+            "credit_and_normalized_returns"
+          ],
+          "equation": "value_per_share = (gross_assets - senior_claims - tax - realization_costs) / diluted_shares",
+          "sources": [
+            {
+              "ref": "_system/frameworks/scarce_strategic_asset_valuation.md",
+              "locator": "Economic ownership and unit NAV"
+            }
+          ]
+        },
+        "comparable_ids": [],
+        "range_per_share": {
+          "low": 2.0799,
+          "base": 2.2115,
+          "high": 2.3301
+        },
+        "legacy_range_per_share": {
+          "low": 2.08,
+          "base": 2.21,
+          "high": 2.33
+        },
+        "valuation_status": "bounded_estimate",
+        "calculation_proof": {
+          "status": "valid",
+          "method_id": "net_asset_value",
+          "method_version": "1.0",
+          "outputs": {
+            "low": 2.0799,
+            "base": 2.2115,
+            "high": 2.3301
+          },
+          "output_unit": "USD_per_share",
+          "traces": {
+            "low": [
+              {
+                "id": "cash_m",
+                "label": "Cash and cash equivalents (Q1 2026)",
+                "kind": "fact",
+                "value": 951.1,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "ACHR/investor-documents/sec-edgar/10-Q_20260511_rpt20260331_acc0001824502_26_000038.htm",
+                  "locator": "Cash and cash equivalents $951.1M at March 31, 2026",
+                  "as_of": "2026-03-31",
+                  "content_sha256": "6c5b3f7aebfd0125301ec1dd7e570b9467a5e3b0c542f24e62929278347520b2",
+                  "source_id": "1702287d93ea1162cf5a81d74d19b40861769e7c5d930a9eb591eeff97dc3604"
+                },
+                "rationale": null
+              },
+              {
+                "id": "st_investments_m",
+                "label": "Short-term investments (Q1 2026)",
+                "kind": "fact",
+                "value": 824.8,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "ACHR/investor-documents/sec-edgar/10-Q_20260511_rpt20260331_acc0001824502_26_000038.htm",
+                  "locator": "Short-term investments $824.8M at March 31, 2026",
+                  "as_of": "2026-03-31",
+                  "content_sha256": "6c5b3f7aebfd0125301ec1dd7e570b9467a5e3b0c542f24e62929278347520b2",
+                  "source_id": "9e40c2150d15a23a51faa1909983875c8b9fa84d8978d9288a486a766b53e7b8"
+                },
+                "rationale": null
+              },
+              {
+                "id": "restricted_cash_m",
+                "label": "Restricted cash (Q1 2026)",
+                "kind": "fact",
+                "value": 7.3,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "ACHR/investor-documents/sec-edgar/10-Q_20260511_rpt20260331_acc0001824502_26_000038.htm",
+                  "locator": "Restricted cash $7.3M at March 31, 2026",
+                  "as_of": "2026-03-31",
+                  "content_sha256": "6c5b3f7aebfd0125301ec1dd7e570b9467a5e3b0c542f24e62929278347520b2",
+                  "source_id": "0bdcedefb8c21c940b5bf54996a76cb9d400437bacfbfae01158d9cf1c21eaa2"
+                },
+                "rationale": null
+              },
+              {
+                "id": "debt_m",
+                "label": "Long-term debt current and noncurrent",
+                "kind": "fact",
+                "value": 80.2,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "ACHR/investor-documents/sec-edgar/10-Q_20260511_rpt20260331_acc0001824502_26_000038.htm",
+                  "locator": "Long-term debt current $1.4M + noncurrent $78.8M at March 31, 2026",
+                  "as_of": "2026-03-31",
+                  "content_sha256": "6c5b3f7aebfd0125301ec1dd7e570b9467a5e3b0c542f24e62929278347520b2",
+                  "source_id": "6fa1deead3e61be3bccadb5ae62965cabe8ac469f5156cbd65c4157d275be58a"
+                },
+                "rationale": null
+              },
+              {
+                "id": "warrant_liab_m",
+                "label": "Warrant liabilities noncurrent",
+                "kind": "fact",
+                "value": 7.1,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "ACHR/investor-documents/sec-edgar/10-Q_20260511_rpt20260331_acc0001824502_26_000038.htm",
+                  "locator": "Warrant liabilities noncurrent $7.1M at March 31, 2026",
+                  "as_of": "2026-03-31",
+                  "content_sha256": "6c5b3f7aebfd0125301ec1dd7e570b9467a5e3b0c542f24e62929278347520b2",
+                  "source_id": "3130a4ff271c187bc9ec33ffdff6ead59712ddbee0ab6ff8539c4d6599201497"
+                },
+                "rationale": null
+              },
+              {
+                "id": "shares_m",
+                "label": "Q1 2026 weighted-average diluted shares",
+                "kind": "fact",
+                "value": 766.85,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "ACHR/investor-documents/sec-edgar/10-Q_20260511_rpt20260331_acc0001824502_26_000038.htm",
+                  "locator": "Weighted-average shares outstanding, basic and diluted 766,850,002",
+                  "as_of": "2026-03-31",
+                  "content_sha256": "6c5b3f7aebfd0125301ec1dd7e570b9467a5e3b0c542f24e62929278347520b2",
+                  "source_id": "3e75549b41984a14e46fab72095a3b231b6a2ed573f90472a34c16342c11f4bc"
+                },
+                "rationale": null
+              },
+              {
+                "id": "net_liquid_claim_m",
+                "label": "Net liquid claim after debt and warrant liabilities",
+                "kind": "judgment",
+                "value": 1595.0,
+                "unit": "USD_m",
+                "source": null,
+                "rationale": "Filing-locked cash, restricted cash, and short-term investments less debt and warrant liabilities; low/high stress debt +10% and mark haircuts on liquid assets."
+              },
+              {
+                "id": "value_per_share",
+                "label": "Net liquid claims per share",
+                "kind": "calculation",
+                "value": 2.07993741,
+                "unit": "USD_per_share",
+                "operation": "divide",
+                "formula": "net_liquid_claim_m \u00f7 shares_m",
+                "substituted_formula": "1595 \u00f7 766.85",
+                "dependencies": [
+                  "net_liquid_claim_m",
+                  "shares_m"
+                ]
+              }
+            ],
+            "base": [
+              {
+                "id": "cash_m",
+                "label": "Cash and cash equivalents (Q1 2026)",
+                "kind": "fact",
+                "value": 951.1,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "ACHR/investor-documents/sec-edgar/10-Q_20260511_rpt20260331_acc0001824502_26_000038.htm",
+                  "locator": "Cash and cash equivalents $951.1M at March 31, 2026",
+                  "as_of": "2026-03-31",
+                  "content_sha256": "6c5b3f7aebfd0125301ec1dd7e570b9467a5e3b0c542f24e62929278347520b2",
+                  "source_id": "1702287d93ea1162cf5a81d74d19b40861769e7c5d930a9eb591eeff97dc3604"
+                },
+                "rationale": null
+              },
+              {
+                "id": "st_investments_m",
+                "label": "Short-term investments (Q1 2026)",
+                "kind": "fact",
+                "value": 824.8,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "ACHR/investor-documents/sec-edgar/10-Q_20260511_rpt20260331_acc0001824502_26_000038.htm",
+                  "locator": "Short-term investments $824.8M at March 31, 2026",
+                  "as_of": "2026-03-31",
+                  "content_sha256": "6c5b3f7aebfd0125301ec1dd7e570b9467a5e3b0c542f24e62929278347520b2",
+                  "source_id": "9e40c2150d15a23a51faa1909983875c8b9fa84d8978d9288a486a766b53e7b8"
+                },
+                "rationale": null
+              },
+              {
+                "id": "restricted_cash_m",
+                "label": "Restricted cash (Q1 2026)",
+                "kind": "fact",
+                "value": 7.3,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "ACHR/investor-documents/sec-edgar/10-Q_20260511_rpt20260331_acc0001824502_26_000038.htm",
+                  "locator": "Restricted cash $7.3M at March 31, 2026",
+                  "as_of": "2026-03-31",
+                  "content_sha256": "6c5b3f7aebfd0125301ec1dd7e570b9467a5e3b0c542f24e62929278347520b2",
+                  "source_id": "0bdcedefb8c21c940b5bf54996a76cb9d400437bacfbfae01158d9cf1c21eaa2"
+                },
+                "rationale": null
+              },
+              {
+                "id": "debt_m",
+                "label": "Long-term debt current and noncurrent",
+                "kind": "fact",
+                "value": 80.2,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "ACHR/investor-documents/sec-edgar/10-Q_20260511_rpt20260331_acc0001824502_26_000038.htm",
+                  "locator": "Long-term debt current $1.4M + noncurrent $78.8M at March 31, 2026",
+                  "as_of": "2026-03-31",
+                  "content_sha256": "6c5b3f7aebfd0125301ec1dd7e570b9467a5e3b0c542f24e62929278347520b2",
+                  "source_id": "6fa1deead3e61be3bccadb5ae62965cabe8ac469f5156cbd65c4157d275be58a"
+                },
+                "rationale": null
+              },
+              {
+                "id": "warrant_liab_m",
+                "label": "Warrant liabilities noncurrent",
+                "kind": "fact",
+                "value": 7.1,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "ACHR/investor-documents/sec-edgar/10-Q_20260511_rpt20260331_acc0001824502_26_000038.htm",
+                  "locator": "Warrant liabilities noncurrent $7.1M at March 31, 2026",
+                  "as_of": "2026-03-31",
+                  "content_sha256": "6c5b3f7aebfd0125301ec1dd7e570b9467a5e3b0c542f24e62929278347520b2",
+                  "source_id": "3130a4ff271c187bc9ec33ffdff6ead59712ddbee0ab6ff8539c4d6599201497"
+                },
+                "rationale": null
+              },
+              {
+                "id": "shares_m",
+                "label": "Q1 2026 weighted-average diluted shares",
+                "kind": "fact",
+                "value": 766.85,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "ACHR/investor-documents/sec-edgar/10-Q_20260511_rpt20260331_acc0001824502_26_000038.htm",
+                  "locator": "Weighted-average shares outstanding, basic and diluted 766,850,002",
+                  "as_of": "2026-03-31",
+                  "content_sha256": "6c5b3f7aebfd0125301ec1dd7e570b9467a5e3b0c542f24e62929278347520b2",
+                  "source_id": "3e75549b41984a14e46fab72095a3b231b6a2ed573f90472a34c16342c11f4bc"
+                },
+                "rationale": null
+              },
+              {
+                "id": "net_liquid_claim_m",
+                "label": "Net liquid claim after debt and warrant liabilities",
+                "kind": "judgment",
+                "value": 1695.9,
+                "unit": "USD_m",
+                "source": null,
+                "rationale": "Filing-locked cash, restricted cash, and short-term investments less debt and warrant liabilities; low/high stress debt +10% and mark haircuts on liquid assets."
+              },
+              {
+                "id": "value_per_share",
+                "label": "Net liquid claims per share",
+                "kind": "calculation",
+                "value": 2.21151464,
+                "unit": "USD_per_share",
+                "operation": "divide",
+                "formula": "net_liquid_claim_m \u00f7 shares_m",
+                "substituted_formula": "1695.9 \u00f7 766.85",
+                "dependencies": [
+                  "net_liquid_claim_m",
+                  "shares_m"
+                ]
+              }
+            ],
+            "high": [
+              {
+                "id": "cash_m",
+                "label": "Cash and cash equivalents (Q1 2026)",
+                "kind": "fact",
+                "value": 951.1,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "ACHR/investor-documents/sec-edgar/10-Q_20260511_rpt20260331_acc0001824502_26_000038.htm",
+                  "locator": "Cash and cash equivalents $951.1M at March 31, 2026",
+                  "as_of": "2026-03-31",
+                  "content_sha256": "6c5b3f7aebfd0125301ec1dd7e570b9467a5e3b0c542f24e62929278347520b2",
+                  "source_id": "1702287d93ea1162cf5a81d74d19b40861769e7c5d930a9eb591eeff97dc3604"
+                },
+                "rationale": null
+              },
+              {
+                "id": "st_investments_m",
+                "label": "Short-term investments (Q1 2026)",
+                "kind": "fact",
+                "value": 824.8,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "ACHR/investor-documents/sec-edgar/10-Q_20260511_rpt20260331_acc0001824502_26_000038.htm",
+                  "locator": "Short-term investments $824.8M at March 31, 2026",
+                  "as_of": "2026-03-31",
+                  "content_sha256": "6c5b3f7aebfd0125301ec1dd7e570b9467a5e3b0c542f24e62929278347520b2",
+                  "source_id": "9e40c2150d15a23a51faa1909983875c8b9fa84d8978d9288a486a766b53e7b8"
+                },
+                "rationale": null
+              },
+              {
+                "id": "restricted_cash_m",
+                "label": "Restricted cash (Q1 2026)",
+                "kind": "fact",
+                "value": 7.3,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "ACHR/investor-documents/sec-edgar/10-Q_20260511_rpt20260331_acc0001824502_26_000038.htm",
+                  "locator": "Restricted cash $7.3M at March 31, 2026",
+                  "as_of": "2026-03-31",
+                  "content_sha256": "6c5b3f7aebfd0125301ec1dd7e570b9467a5e3b0c542f24e62929278347520b2",
+                  "source_id": "0bdcedefb8c21c940b5bf54996a76cb9d400437bacfbfae01158d9cf1c21eaa2"
+                },
+                "rationale": null
+              },
+              {
+                "id": "debt_m",
+                "label": "Long-term debt current and noncurrent",
+                "kind": "fact",
+                "value": 80.2,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "ACHR/investor-documents/sec-edgar/10-Q_20260511_rpt20260331_acc0001824502_26_000038.htm",
+                  "locator": "Long-term debt current $1.4M + noncurrent $78.8M at March 31, 2026",
+                  "as_of": "2026-03-31",
+                  "content_sha256": "6c5b3f7aebfd0125301ec1dd7e570b9467a5e3b0c542f24e62929278347520b2",
+                  "source_id": "6fa1deead3e61be3bccadb5ae62965cabe8ac469f5156cbd65c4157d275be58a"
+                },
+                "rationale": null
+              },
+              {
+                "id": "warrant_liab_m",
+                "label": "Warrant liabilities noncurrent",
+                "kind": "fact",
+                "value": 7.1,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "ACHR/investor-documents/sec-edgar/10-Q_20260511_rpt20260331_acc0001824502_26_000038.htm",
+                  "locator": "Warrant liabilities noncurrent $7.1M at March 31, 2026",
+                  "as_of": "2026-03-31",
+                  "content_sha256": "6c5b3f7aebfd0125301ec1dd7e570b9467a5e3b0c542f24e62929278347520b2",
+                  "source_id": "3130a4ff271c187bc9ec33ffdff6ead59712ddbee0ab6ff8539c4d6599201497"
+                },
+                "rationale": null
+              },
+              {
+                "id": "shares_m",
+                "label": "Q1 2026 weighted-average diluted shares",
+                "kind": "fact",
+                "value": 766.85,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "ACHR/investor-documents/sec-edgar/10-Q_20260511_rpt20260331_acc0001824502_26_000038.htm",
+                  "locator": "Weighted-average shares outstanding, basic and diluted 766,850,002",
+                  "as_of": "2026-03-31",
+                  "content_sha256": "6c5b3f7aebfd0125301ec1dd7e570b9467a5e3b0c542f24e62929278347520b2",
+                  "source_id": "3e75549b41984a14e46fab72095a3b231b6a2ed573f90472a34c16342c11f4bc"
+                },
+                "rationale": null
+              },
+              {
+                "id": "net_liquid_claim_m",
+                "label": "Net liquid claim after debt and warrant liabilities",
+                "kind": "judgment",
+                "value": 1786.8,
+                "unit": "USD_m",
+                "source": null,
+                "rationale": "Filing-locked cash, restricted cash, and short-term investments less debt and warrant liabilities; low/high stress debt +10% and mark haircuts on liquid assets."
+              },
+              {
+                "id": "value_per_share",
+                "label": "Net liquid claims per share",
+                "kind": "calculation",
+                "value": 2.33005151,
+                "unit": "USD_per_share",
+                "operation": "divide",
+                "formula": "net_liquid_claim_m \u00f7 shares_m",
+                "substituted_formula": "1786.8 \u00f7 766.85",
+                "dependencies": [
+                  "net_liquid_claim_m",
+                  "shares_m"
+                ]
+              }
+            ]
+          },
+          "source_lineage": [
+            {
+              "node_id": "cash_m",
+              "ref": "ACHR/investor-documents/sec-edgar/10-Q_20260511_rpt20260331_acc0001824502_26_000038.htm",
+              "locator": "Cash and cash equivalents $951.1M at March 31, 2026",
+              "as_of": "2026-03-31",
+              "content_sha256": "6c5b3f7aebfd0125301ec1dd7e570b9467a5e3b0c542f24e62929278347520b2",
+              "source_id": "1702287d93ea1162cf5a81d74d19b40861769e7c5d930a9eb591eeff97dc3604"
+            },
+            {
+              "node_id": "st_investments_m",
+              "ref": "ACHR/investor-documents/sec-edgar/10-Q_20260511_rpt20260331_acc0001824502_26_000038.htm",
+              "locator": "Short-term investments $824.8M at March 31, 2026",
+              "as_of": "2026-03-31",
+              "content_sha256": "6c5b3f7aebfd0125301ec1dd7e570b9467a5e3b0c542f24e62929278347520b2",
+              "source_id": "9e40c2150d15a23a51faa1909983875c8b9fa84d8978d9288a486a766b53e7b8"
+            },
+            {
+              "node_id": "restricted_cash_m",
+              "ref": "ACHR/investor-documents/sec-edgar/10-Q_20260511_rpt20260331_acc0001824502_26_000038.htm",
+              "locator": "Restricted cash $7.3M at March 31, 2026",
+              "as_of": "2026-03-31",
+              "content_sha256": "6c5b3f7aebfd0125301ec1dd7e570b9467a5e3b0c542f24e62929278347520b2",
+              "source_id": "0bdcedefb8c21c940b5bf54996a76cb9d400437bacfbfae01158d9cf1c21eaa2"
+            },
+            {
+              "node_id": "debt_m",
+              "ref": "ACHR/investor-documents/sec-edgar/10-Q_20260511_rpt20260331_acc0001824502_26_000038.htm",
+              "locator": "Long-term debt current $1.4M + noncurrent $78.8M at March 31, 2026",
+              "as_of": "2026-03-31",
+              "content_sha256": "6c5b3f7aebfd0125301ec1dd7e570b9467a5e3b0c542f24e62929278347520b2",
+              "source_id": "6fa1deead3e61be3bccadb5ae62965cabe8ac469f5156cbd65c4157d275be58a"
+            },
+            {
+              "node_id": "warrant_liab_m",
+              "ref": "ACHR/investor-documents/sec-edgar/10-Q_20260511_rpt20260331_acc0001824502_26_000038.htm",
+              "locator": "Warrant liabilities noncurrent $7.1M at March 31, 2026",
+              "as_of": "2026-03-31",
+              "content_sha256": "6c5b3f7aebfd0125301ec1dd7e570b9467a5e3b0c542f24e62929278347520b2",
+              "source_id": "3130a4ff271c187bc9ec33ffdff6ead59712ddbee0ab6ff8539c4d6599201497"
+            },
+            {
+              "node_id": "shares_m",
+              "ref": "ACHR/investor-documents/sec-edgar/10-Q_20260511_rpt20260331_acc0001824502_26_000038.htm",
+              "locator": "Weighted-average shares outstanding, basic and diluted 766,850,002",
+              "as_of": "2026-03-31",
+              "content_sha256": "6c5b3f7aebfd0125301ec1dd7e570b9467a5e3b0c542f24e62929278347520b2",
+              "source_id": "3e75549b41984a14e46fab72095a3b231b6a2ed573f90472a34c16342c11f4bc"
+            }
+          ],
+          "checks": {
+            "passed": true,
+            "errors": []
+          },
+          "proof_hash": "7cacc1af80be4490b0c5fbf62f01786f1fa810b4bb805e84416737b28a680aa2"
+        },
+        "evidence_tier": "primary_derived",
+        "evidence_level": "primary_derived",
+        "evidence": "Primary bridge from ACHR/investor-documents/sec-edgar/10-Q_20260511_rpt20260331_acc0001824502_26_000038.htm: cash $951.1M, short-term investments $824.8M, debt $80.2M; FY2025 net loss $618.2M per ACHR/investor-documents/sec-edgar/10-K_20260302_rpt20251231_acc0001824502_26_000019.htm; contract backfill 2026-07-21.",
+        "scenario_assumptions": "Proof outputs {'low': 2.0799, 'base': 2.2115, 'high': 2.3301}; see calculation_proof graph.",
+        "probability_and_timing": null,
+        "tax_and_realization_adjustments": "Low/high stress debt and mark haircuts on liquid assets.",
+        "falsifier": "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
+        "overlap_key": "net_liquid_claims",
+        "assumption_type": "judgment"
+      },
+      {
+        "component_id": "midnight_certification_option",
+        "label": "Midnight FAA certification and partner milestone value",
+        "category": "real_option",
+        "treatment": "additive",
+        "included_in_component_id": null,
+        "ownership_claim": "Midnight FAA certification and partner milestone value",
+        "ownership_percentage": 1.0,
+        "quantity": {
+          "value": 1,
+          "unit": "per-share economic claim"
+        },
+        "method": "risk_adjusted_milestone_value",
+        "method_version": "1.0",
+        "method_provenance": {
+          "method_id": "risk_adjusted_milestone_value",
+          "version": "1.0",
+          "label": "Milestone risk-adjusted present value",
+          "power_zones": [
+            "binary_milestone"
+          ],
+          "equation": "value_per_share = (net_cash + sum(p_success*PV(success_value)-remaining_cost) - dilution)/shares",
+          "sources": [
+            {
+              "ref": "_system/frameworks/optionality_valuation.md",
+              "locator": "Milestone-based option framework"
+            }
+          ]
+        },
+        "comparable_ids": [],
+        "range_per_share": {
+          "low": 0.0,
+          "base": 3.5,
+          "high": 10.0
+        },
+        "legacy_range_per_share": {
+          "low": 0.0,
+          "base": 3.5,
+          "high": 10.0
+        },
+        "valuation_status": "bounded_estimate",
+        "calculation_proof": {
+          "status": "valid",
+          "method_id": "risk_adjusted_milestone_value",
+          "method_version": "1.0",
+          "outputs": {
+            "low": 0.0,
+            "base": 3.5,
+            "high": 10.0
+          },
+          "output_unit": "USD_per_share",
+          "traces": {
+            "low": [
+              {
+                "id": "net_loss_fy_m",
+                "label": "FY2025 net loss",
+                "kind": "fact",
+                "value": 618.2,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "ACHR/investor-documents/sec-edgar/10-K_20260302_rpt20251231_acc0001824502_26_000019.htm",
+                  "locator": "Net loss $618.2 million for year ended December 31, 2025",
+                  "as_of": "2025-12-31",
+                  "content_sha256": "29331fb27a7e99e301bf2e17ab1836b36d3ab653c8baeaccac8ca83e945fe8d9",
+                  "source_id": "35ff28cc5095a6ca82d622e0cdbe7470c3b6e61117c9a567a4ac88bf62508df0"
+                },
+                "rationale": null
+              },
+              {
+                "id": "rd_fy_m",
+                "label": "FY2025 research and development expense",
+                "kind": "fact",
+                "value": 493.9,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "ACHR/investor-documents/sec-edgar/10-K_20260302_rpt20251231_acc0001824502_26_000019.htm",
+                  "locator": "Research and development $493.9M (FY2025 consolidated statements of operations)",
+                  "as_of": "2025-12-31",
+                  "content_sha256": "29331fb27a7e99e301bf2e17ab1836b36d3ab653c8baeaccac8ca83e945fe8d9",
+                  "source_id": "3307dd4fa008aab7440e3bb31a9d908fc406996513e2ed3a57af455ab1ce3c2c"
+                },
+                "rationale": null
+              },
+              {
+                "id": "revenue_fy_m",
+                "label": "FY2025 revenue",
+                "kind": "fact",
+                "value": 0.3,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "ACHR/investor-documents/sec-edgar/10-K_20260302_rpt20251231_acc0001824502_26_000019.htm",
+                  "locator": "Revenue $0.3M (FY2025)",
+                  "as_of": "2025-12-31",
+                  "content_sha256": "29331fb27a7e99e301bf2e17ab1836b36d3ab653c8baeaccac8ca83e945fe8d9",
+                  "source_id": "8df5d15c318208dd455daf07d9c454d11f090c205200f81fe9a41b2d05d43f0a"
+                },
+                "rationale": null
+              },
+              {
+                "id": "shares_m",
+                "label": "Q1 2026 diluted shares",
+                "kind": "fact",
+                "value": 766.85,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "ACHR/investor-documents/sec-edgar/10-Q_20260511_rpt20260331_acc0001824502_26_000038.htm",
+                  "locator": "Weighted-average shares outstanding, basic and diluted 766,850,002",
+                  "as_of": "2026-03-31",
+                  "content_sha256": "6c5b3f7aebfd0125301ec1dd7e570b9467a5e3b0c542f24e62929278347520b2",
+                  "source_id": "3e75549b41984a14e46fab72095a3b231b6a2ed573f90472a34c16342c11f4bc"
+                },
+                "rationale": null
+              },
+              {
+                "id": "risked_milestone_m",
+                "label": "Risk-adjusted Midnight certification and partner milestone value",
+                "kind": "judgment",
+                "value": 0.0,
+                "unit": "USD_m",
+                "source": null,
+                "rationale": "Conditional United purchase agreement up to $1.0B aircraft plus $500M option, Stellantis partnership, and U.S. Air Force contracts are milestones not in Lawrence owner-cash base; base uses bounded probability-weighted commercialization value pending FAA type certification."
+              },
+              {
+                "id": "value_per_share",
+                "label": "Midnight certification option per share",
+                "kind": "calculation",
+                "value": 0.0,
+                "unit": "USD_per_share",
+                "operation": "divide",
+                "formula": "risked_milestone_m \u00f7 shares_m",
+                "substituted_formula": "0 \u00f7 766.85",
+                "dependencies": [
+                  "risked_milestone_m",
+                  "shares_m"
+                ]
+              }
+            ],
+            "base": [
+              {
+                "id": "net_loss_fy_m",
+                "label": "FY2025 net loss",
+                "kind": "fact",
+                "value": 618.2,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "ACHR/investor-documents/sec-edgar/10-K_20260302_rpt20251231_acc0001824502_26_000019.htm",
+                  "locator": "Net loss $618.2 million for year ended December 31, 2025",
+                  "as_of": "2025-12-31",
+                  "content_sha256": "29331fb27a7e99e301bf2e17ab1836b36d3ab653c8baeaccac8ca83e945fe8d9",
+                  "source_id": "35ff28cc5095a6ca82d622e0cdbe7470c3b6e61117c9a567a4ac88bf62508df0"
+                },
+                "rationale": null
+              },
+              {
+                "id": "rd_fy_m",
+                "label": "FY2025 research and development expense",
+                "kind": "fact",
+                "value": 493.9,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "ACHR/investor-documents/sec-edgar/10-K_20260302_rpt20251231_acc0001824502_26_000019.htm",
+                  "locator": "Research and development $493.9M (FY2025 consolidated statements of operations)",
+                  "as_of": "2025-12-31",
+                  "content_sha256": "29331fb27a7e99e301bf2e17ab1836b36d3ab653c8baeaccac8ca83e945fe8d9",
+                  "source_id": "3307dd4fa008aab7440e3bb31a9d908fc406996513e2ed3a57af455ab1ce3c2c"
+                },
+                "rationale": null
+              },
+              {
+                "id": "revenue_fy_m",
+                "label": "FY2025 revenue",
+                "kind": "fact",
+                "value": 0.3,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "ACHR/investor-documents/sec-edgar/10-K_20260302_rpt20251231_acc0001824502_26_000019.htm",
+                  "locator": "Revenue $0.3M (FY2025)",
+                  "as_of": "2025-12-31",
+                  "content_sha256": "29331fb27a7e99e301bf2e17ab1836b36d3ab653c8baeaccac8ca83e945fe8d9",
+                  "source_id": "8df5d15c318208dd455daf07d9c454d11f090c205200f81fe9a41b2d05d43f0a"
+                },
+                "rationale": null
+              },
+              {
+                "id": "shares_m",
+                "label": "Q1 2026 diluted shares",
+                "kind": "fact",
+                "value": 766.85,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "ACHR/investor-documents/sec-edgar/10-Q_20260511_rpt20260331_acc0001824502_26_000038.htm",
+                  "locator": "Weighted-average shares outstanding, basic and diluted 766,850,002",
+                  "as_of": "2026-03-31",
+                  "content_sha256": "6c5b3f7aebfd0125301ec1dd7e570b9467a5e3b0c542f24e62929278347520b2",
+                  "source_id": "3e75549b41984a14e46fab72095a3b231b6a2ed573f90472a34c16342c11f4bc"
+                },
+                "rationale": null
+              },
+              {
+                "id": "risked_milestone_m",
+                "label": "Risk-adjusted Midnight certification and partner milestone value",
+                "kind": "judgment",
+                "value": 2684.0,
+                "unit": "USD_m",
+                "source": null,
+                "rationale": "Conditional United purchase agreement up to $1.0B aircraft plus $500M option, Stellantis partnership, and U.S. Air Force contracts are milestones not in Lawrence owner-cash base; base uses bounded probability-weighted commercialization value pending FAA type certification."
+              },
+              {
+                "id": "value_per_share",
+                "label": "Midnight certification option per share",
+                "kind": "calculation",
+                "value": 3.5000326,
+                "unit": "USD_per_share",
+                "operation": "divide",
+                "formula": "risked_milestone_m \u00f7 shares_m",
+                "substituted_formula": "2684 \u00f7 766.85",
+                "dependencies": [
+                  "risked_milestone_m",
+                  "shares_m"
+                ]
+              }
+            ],
+            "high": [
+              {
+                "id": "net_loss_fy_m",
+                "label": "FY2025 net loss",
+                "kind": "fact",
+                "value": 618.2,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "ACHR/investor-documents/sec-edgar/10-K_20260302_rpt20251231_acc0001824502_26_000019.htm",
+                  "locator": "Net loss $618.2 million for year ended December 31, 2025",
+                  "as_of": "2025-12-31",
+                  "content_sha256": "29331fb27a7e99e301bf2e17ab1836b36d3ab653c8baeaccac8ca83e945fe8d9",
+                  "source_id": "35ff28cc5095a6ca82d622e0cdbe7470c3b6e61117c9a567a4ac88bf62508df0"
+                },
+                "rationale": null
+              },
+              {
+                "id": "rd_fy_m",
+                "label": "FY2025 research and development expense",
+                "kind": "fact",
+                "value": 493.9,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "ACHR/investor-documents/sec-edgar/10-K_20260302_rpt20251231_acc0001824502_26_000019.htm",
+                  "locator": "Research and development $493.9M (FY2025 consolidated statements of operations)",
+                  "as_of": "2025-12-31",
+                  "content_sha256": "29331fb27a7e99e301bf2e17ab1836b36d3ab653c8baeaccac8ca83e945fe8d9",
+                  "source_id": "3307dd4fa008aab7440e3bb31a9d908fc406996513e2ed3a57af455ab1ce3c2c"
+                },
+                "rationale": null
+              },
+              {
+                "id": "revenue_fy_m",
+                "label": "FY2025 revenue",
+                "kind": "fact",
+                "value": 0.3,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "ACHR/investor-documents/sec-edgar/10-K_20260302_rpt20251231_acc0001824502_26_000019.htm",
+                  "locator": "Revenue $0.3M (FY2025)",
+                  "as_of": "2025-12-31",
+                  "content_sha256": "29331fb27a7e99e301bf2e17ab1836b36d3ab653c8baeaccac8ca83e945fe8d9",
+                  "source_id": "8df5d15c318208dd455daf07d9c454d11f090c205200f81fe9a41b2d05d43f0a"
+                },
+                "rationale": null
+              },
+              {
+                "id": "shares_m",
+                "label": "Q1 2026 diluted shares",
+                "kind": "fact",
+                "value": 766.85,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "ACHR/investor-documents/sec-edgar/10-Q_20260511_rpt20260331_acc0001824502_26_000038.htm",
+                  "locator": "Weighted-average shares outstanding, basic and diluted 766,850,002",
+                  "as_of": "2026-03-31",
+                  "content_sha256": "6c5b3f7aebfd0125301ec1dd7e570b9467a5e3b0c542f24e62929278347520b2",
+                  "source_id": "3e75549b41984a14e46fab72095a3b231b6a2ed573f90472a34c16342c11f4bc"
+                },
+                "rationale": null
+              },
+              {
+                "id": "risked_milestone_m",
+                "label": "Risk-adjusted Midnight certification and partner milestone value",
+                "kind": "judgment",
+                "value": 7668.5,
+                "unit": "USD_m",
+                "source": null,
+                "rationale": "Conditional United purchase agreement up to $1.0B aircraft plus $500M option, Stellantis partnership, and U.S. Air Force contracts are milestones not in Lawrence owner-cash base; base uses bounded probability-weighted commercialization value pending FAA type certification."
+              },
+              {
+                "id": "value_per_share",
+                "label": "Midnight certification option per share",
+                "kind": "calculation",
+                "value": 10.0,
+                "unit": "USD_per_share",
+                "operation": "divide",
+                "formula": "risked_milestone_m \u00f7 shares_m",
+                "substituted_formula": "7668.5 \u00f7 766.85",
+                "dependencies": [
+                  "risked_milestone_m",
+                  "shares_m"
+                ]
+              }
+            ]
+          },
+          "source_lineage": [
+            {
+              "node_id": "net_loss_fy_m",
+              "ref": "ACHR/investor-documents/sec-edgar/10-K_20260302_rpt20251231_acc0001824502_26_000019.htm",
+              "locator": "Net loss $618.2 million for year ended December 31, 2025",
+              "as_of": "2025-12-31",
+              "content_sha256": "29331fb27a7e99e301bf2e17ab1836b36d3ab653c8baeaccac8ca83e945fe8d9",
+              "source_id": "35ff28cc5095a6ca82d622e0cdbe7470c3b6e61117c9a567a4ac88bf62508df0"
+            },
+            {
+              "node_id": "rd_fy_m",
+              "ref": "ACHR/investor-documents/sec-edgar/10-K_20260302_rpt20251231_acc0001824502_26_000019.htm",
+              "locator": "Research and development $493.9M (FY2025 consolidated statements of operations)",
+              "as_of": "2025-12-31",
+              "content_sha256": "29331fb27a7e99e301bf2e17ab1836b36d3ab653c8baeaccac8ca83e945fe8d9",
+              "source_id": "3307dd4fa008aab7440e3bb31a9d908fc406996513e2ed3a57af455ab1ce3c2c"
+            },
+            {
+              "node_id": "revenue_fy_m",
+              "ref": "ACHR/investor-documents/sec-edgar/10-K_20260302_rpt20251231_acc0001824502_26_000019.htm",
+              "locator": "Revenue $0.3M (FY2025)",
+              "as_of": "2025-12-31",
+              "content_sha256": "29331fb27a7e99e301bf2e17ab1836b36d3ab653c8baeaccac8ca83e945fe8d9",
+              "source_id": "8df5d15c318208dd455daf07d9c454d11f090c205200f81fe9a41b2d05d43f0a"
+            },
+            {
+              "node_id": "shares_m",
+              "ref": "ACHR/investor-documents/sec-edgar/10-Q_20260511_rpt20260331_acc0001824502_26_000038.htm",
+              "locator": "Weighted-average shares outstanding, basic and diluted 766,850,002",
+              "as_of": "2026-03-31",
+              "content_sha256": "6c5b3f7aebfd0125301ec1dd7e570b9467a5e3b0c542f24e62929278347520b2",
+              "source_id": "3e75549b41984a14e46fab72095a3b231b6a2ed573f90472a34c16342c11f4bc"
+            }
+          ],
+          "checks": {
+            "passed": true,
+            "errors": []
+          },
+          "proof_hash": "4fc04d935fba76f7099bef87fae83cebea5540fa1b14e73e0fb2192768be7103"
+        },
+        "evidence_tier": "primary_derived",
+        "evidence_level": "primary_derived",
+        "evidence": "Primary bridge from ACHR/investor-documents/sec-edgar/10-Q_20260511_rpt20260331_acc0001824502_26_000038.htm: cash $951.1M, short-term investments $824.8M, debt $80.2M; FY2025 net loss $618.2M per ACHR/investor-documents/sec-edgar/10-K_20260302_rpt20251231_acc0001824502_26_000019.htm; contract backfill 2026-07-21.",
+        "scenario_assumptions": "Proof outputs {'low': 0.0, 'base': 3.5, 'high': 10.0}; see calculation_proof graph.",
+        "probability_and_timing": {
+          "success_probability": null,
+          "remaining_capital_m": null,
+          "timing_basis": "Seven-year Lawrence horizon aligned with scenario yield-curve stance gate.",
+          "probability_basis": "Base assumes partial certification and limited partner conversion; bear assumes failure (0).",
+          "remaining_capital_basis": "FY2025 R&D $493.9M and operating loss $729.3M continue until commercial revenue scales."
+        },
+        "tax_and_realization_adjustments": "Probability, timing, and remaining certification capital are inside the range.",
+        "falsifier": "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
+        "overlap_key": "midnight_certification_option",
+        "assumption_type": "judgment"
+      },
+      {
+        "component_id": "dilution_and_burn_reserve",
+        "label": "Future dilution and pre-revenue burn reserve",
+        "category": "liability_or_reserve",
+        "treatment": "additive",
+        "included_in_component_id": null,
+        "ownership_claim": "Future dilution and pre-revenue burn reserve",
+        "ownership_percentage": 1.0,
+        "quantity": {
+          "value": 1,
+          "unit": "per-share economic claim"
+        },
+        "method": "net_asset_value",
+        "method_version": "1.0",
+        "method_provenance": {
+          "method_id": "net_asset_value",
+          "version": "1.0",
+          "label": "Reconciled net asset value",
+          "power_zones": [
+            "scarce_asset_optionality",
+            "catalyst_asset_value",
+            "credit_and_normalized_returns"
+          ],
+          "equation": "value_per_share = (gross_assets - senior_claims - tax - realization_costs) / diluted_shares",
+          "sources": [
+            {
+              "ref": "_system/frameworks/scarce_strategic_asset_valuation.md",
+              "locator": "Economic ownership and unit NAV"
+            }
+          ]
+        },
+        "comparable_ids": [],
+        "range_per_share": {
+          "low": -3.0001,
+          "base": -1.5,
+          "high": -0.5
+        },
+        "legacy_range_per_share": {
+          "low": -3.0,
+          "base": -1.5,
+          "high": -0.5
+        },
+        "valuation_status": "bounded_estimate",
+        "calculation_proof": {
+          "status": "valid",
+          "method_id": "net_asset_value",
+          "method_version": "1.0",
+          "outputs": {
+            "low": -3.0001,
+            "base": -1.5,
+            "high": -0.5
+          },
+          "output_unit": "USD_per_share",
+          "traces": {
+            "low": [
+              {
+                "id": "accum_deficit_m",
+                "label": "Accumulated deficit since inception",
+                "kind": "fact",
+                "value": 2303.8,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "ACHR/investor-documents/sec-edgar/10-K_20260302_rpt20251231_acc0001824502_26_000019.htm",
+                  "locator": "Retained earnings (accumulated deficit) $(2,303.8)M at December 31, 2025",
+                  "as_of": "2025-12-31",
+                  "content_sha256": "29331fb27a7e99e301bf2e17ab1836b36d3ab653c8baeaccac8ca83e945fe8d9",
+                  "source_id": "de386196ee4a74357cb4b55e7df7ec6490e7c10aa846540e4f3180b5c9be5d86"
+                },
+                "rationale": null
+              },
+              {
+                "id": "op_loss_fy_m",
+                "label": "FY2025 loss from operations",
+                "kind": "fact",
+                "value": 729.3,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "ACHR/investor-documents/sec-edgar/10-K_20260302_rpt20251231_acc0001824502_26_000019.htm",
+                  "locator": "Loss from operations $(729.3)M (FY2025)",
+                  "as_of": "2025-12-31",
+                  "content_sha256": "29331fb27a7e99e301bf2e17ab1836b36d3ab653c8baeaccac8ca83e945fe8d9",
+                  "source_id": "fbefa5bede2371d7a28143ca858af035faa07013cb04b998af2f14e6af1c11f0"
+                },
+                "rationale": null
+              },
+              {
+                "id": "shares_m",
+                "label": "Q1 2026 diluted shares",
+                "kind": "fact",
+                "value": 766.85,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "ACHR/investor-documents/sec-edgar/10-Q_20260511_rpt20260331_acc0001824502_26_000038.htm",
+                  "locator": "Weighted-average shares outstanding, basic and diluted 766,850,002",
+                  "as_of": "2026-03-31",
+                  "content_sha256": "6c5b3f7aebfd0125301ec1dd7e570b9467a5e3b0c542f24e62929278347520b2",
+                  "source_id": "3e75549b41984a14e46fab72095a3b231b6a2ed573f90472a34c16342c11f4bc"
+                },
+                "rationale": null
+              },
+              {
+                "id": "reserve_m",
+                "label": "Future dilution, ATM issuance, and burn reserve",
+                "kind": "judgment",
+                "value": -2300.6,
+                "unit": "USD_m",
+                "source": null,
+                "rationale": "Negative reserve for continued pre-revenue operating losses, S-3/424B5 equity issuance capacity, and share count growth from 624M FY2025 to 767M Q1 2026 diluted shares."
+              },
+              {
+                "id": "value_per_share",
+                "label": "Dilution and burn reserve per share",
+                "kind": "calculation",
+                "value": -3.0000652,
+                "unit": "USD_per_share",
+                "operation": "divide",
+                "formula": "reserve_m \u00f7 shares_m",
+                "substituted_formula": "-2300.6 \u00f7 766.85",
+                "dependencies": [
+                  "reserve_m",
+                  "shares_m"
+                ]
+              }
+            ],
+            "base": [
+              {
+                "id": "accum_deficit_m",
+                "label": "Accumulated deficit since inception",
+                "kind": "fact",
+                "value": 2303.8,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "ACHR/investor-documents/sec-edgar/10-K_20260302_rpt20251231_acc0001824502_26_000019.htm",
+                  "locator": "Retained earnings (accumulated deficit) $(2,303.8)M at December 31, 2025",
+                  "as_of": "2025-12-31",
+                  "content_sha256": "29331fb27a7e99e301bf2e17ab1836b36d3ab653c8baeaccac8ca83e945fe8d9",
+                  "source_id": "de386196ee4a74357cb4b55e7df7ec6490e7c10aa846540e4f3180b5c9be5d86"
+                },
+                "rationale": null
+              },
+              {
+                "id": "op_loss_fy_m",
+                "label": "FY2025 loss from operations",
+                "kind": "fact",
+                "value": 729.3,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "ACHR/investor-documents/sec-edgar/10-K_20260302_rpt20251231_acc0001824502_26_000019.htm",
+                  "locator": "Loss from operations $(729.3)M (FY2025)",
+                  "as_of": "2025-12-31",
+                  "content_sha256": "29331fb27a7e99e301bf2e17ab1836b36d3ab653c8baeaccac8ca83e945fe8d9",
+                  "source_id": "fbefa5bede2371d7a28143ca858af035faa07013cb04b998af2f14e6af1c11f0"
+                },
+                "rationale": null
+              },
+              {
+                "id": "shares_m",
+                "label": "Q1 2026 diluted shares",
+                "kind": "fact",
+                "value": 766.85,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "ACHR/investor-documents/sec-edgar/10-Q_20260511_rpt20260331_acc0001824502_26_000038.htm",
+                  "locator": "Weighted-average shares outstanding, basic and diluted 766,850,002",
+                  "as_of": "2026-03-31",
+                  "content_sha256": "6c5b3f7aebfd0125301ec1dd7e570b9467a5e3b0c542f24e62929278347520b2",
+                  "source_id": "3e75549b41984a14e46fab72095a3b231b6a2ed573f90472a34c16342c11f4bc"
+                },
+                "rationale": null
+              },
+              {
+                "id": "reserve_m",
+                "label": "Future dilution, ATM issuance, and burn reserve",
+                "kind": "judgment",
+                "value": -1150.3,
+                "unit": "USD_m",
+                "source": null,
+                "rationale": "Negative reserve for continued pre-revenue operating losses, S-3/424B5 equity issuance capacity, and share count growth from 624M FY2025 to 767M Q1 2026 diluted shares."
+              },
+              {
+                "id": "value_per_share",
+                "label": "Dilution and burn reserve per share",
+                "kind": "calculation",
+                "value": -1.5000326,
+                "unit": "USD_per_share",
+                "operation": "divide",
+                "formula": "reserve_m \u00f7 shares_m",
+                "substituted_formula": "-1150.3 \u00f7 766.85",
+                "dependencies": [
+                  "reserve_m",
+                  "shares_m"
+                ]
+              }
+            ],
+            "high": [
+              {
+                "id": "accum_deficit_m",
+                "label": "Accumulated deficit since inception",
+                "kind": "fact",
+                "value": 2303.8,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "ACHR/investor-documents/sec-edgar/10-K_20260302_rpt20251231_acc0001824502_26_000019.htm",
+                  "locator": "Retained earnings (accumulated deficit) $(2,303.8)M at December 31, 2025",
+                  "as_of": "2025-12-31",
+                  "content_sha256": "29331fb27a7e99e301bf2e17ab1836b36d3ab653c8baeaccac8ca83e945fe8d9",
+                  "source_id": "de386196ee4a74357cb4b55e7df7ec6490e7c10aa846540e4f3180b5c9be5d86"
+                },
+                "rationale": null
+              },
+              {
+                "id": "op_loss_fy_m",
+                "label": "FY2025 loss from operations",
+                "kind": "fact",
+                "value": 729.3,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "ACHR/investor-documents/sec-edgar/10-K_20260302_rpt20251231_acc0001824502_26_000019.htm",
+                  "locator": "Loss from operations $(729.3)M (FY2025)",
+                  "as_of": "2025-12-31",
+                  "content_sha256": "29331fb27a7e99e301bf2e17ab1836b36d3ab653c8baeaccac8ca83e945fe8d9",
+                  "source_id": "fbefa5bede2371d7a28143ca858af035faa07013cb04b998af2f14e6af1c11f0"
+                },
+                "rationale": null
+              },
+              {
+                "id": "shares_m",
+                "label": "Q1 2026 diluted shares",
+                "kind": "fact",
+                "value": 766.85,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "ACHR/investor-documents/sec-edgar/10-Q_20260511_rpt20260331_acc0001824502_26_000038.htm",
+                  "locator": "Weighted-average shares outstanding, basic and diluted 766,850,002",
+                  "as_of": "2026-03-31",
+                  "content_sha256": "6c5b3f7aebfd0125301ec1dd7e570b9467a5e3b0c542f24e62929278347520b2",
+                  "source_id": "3e75549b41984a14e46fab72095a3b231b6a2ed573f90472a34c16342c11f4bc"
+                },
+                "rationale": null
+              },
+              {
+                "id": "reserve_m",
+                "label": "Future dilution, ATM issuance, and burn reserve",
+                "kind": "judgment",
+                "value": -383.4,
+                "unit": "USD_m",
+                "source": null,
+                "rationale": "Negative reserve for continued pre-revenue operating losses, S-3/424B5 equity issuance capacity, and share count growth from 624M FY2025 to 767M Q1 2026 diluted shares."
+              },
+              {
+                "id": "value_per_share",
+                "label": "Dilution and burn reserve per share",
+                "kind": "calculation",
+                "value": -0.4999674,
+                "unit": "USD_per_share",
+                "operation": "divide",
+                "formula": "reserve_m \u00f7 shares_m",
+                "substituted_formula": "-383.4 \u00f7 766.85",
+                "dependencies": [
+                  "reserve_m",
+                  "shares_m"
+                ]
+              }
+            ]
+          },
+          "source_lineage": [
+            {
+              "node_id": "accum_deficit_m",
+              "ref": "ACHR/investor-documents/sec-edgar/10-K_20260302_rpt20251231_acc0001824502_26_000019.htm",
+              "locator": "Retained earnings (accumulated deficit) $(2,303.8)M at December 31, 2025",
+              "as_of": "2025-12-31",
+              "content_sha256": "29331fb27a7e99e301bf2e17ab1836b36d3ab653c8baeaccac8ca83e945fe8d9",
+              "source_id": "de386196ee4a74357cb4b55e7df7ec6490e7c10aa846540e4f3180b5c9be5d86"
+            },
+            {
+              "node_id": "op_loss_fy_m",
+              "ref": "ACHR/investor-documents/sec-edgar/10-K_20260302_rpt20251231_acc0001824502_26_000019.htm",
+              "locator": "Loss from operations $(729.3)M (FY2025)",
+              "as_of": "2025-12-31",
+              "content_sha256": "29331fb27a7e99e301bf2e17ab1836b36d3ab653c8baeaccac8ca83e945fe8d9",
+              "source_id": "fbefa5bede2371d7a28143ca858af035faa07013cb04b998af2f14e6af1c11f0"
+            },
+            {
+              "node_id": "shares_m",
+              "ref": "ACHR/investor-documents/sec-edgar/10-Q_20260511_rpt20260331_acc0001824502_26_000038.htm",
+              "locator": "Weighted-average shares outstanding, basic and diluted 766,850,002",
+              "as_of": "2026-03-31",
+              "content_sha256": "6c5b3f7aebfd0125301ec1dd7e570b9467a5e3b0c542f24e62929278347520b2",
+              "source_id": "3e75549b41984a14e46fab72095a3b231b6a2ed573f90472a34c16342c11f4bc"
+            }
+          ],
+          "checks": {
+            "passed": true,
+            "errors": []
+          },
+          "proof_hash": "22f2b5099c431c7079285dda74354956dfd6071a5c7fa1d082a7e4793acea33d"
+        },
+        "evidence_tier": "primary_derived",
+        "evidence_level": "primary_derived",
+        "evidence": "Primary bridge from ACHR/investor-documents/sec-edgar/10-Q_20260511_rpt20260331_acc0001824502_26_000038.htm: cash $951.1M, short-term investments $824.8M, debt $80.2M; FY2025 net loss $618.2M per ACHR/investor-documents/sec-edgar/10-K_20260302_rpt20251231_acc0001824502_26_000019.htm; contract backfill 2026-07-21.",
+        "scenario_assumptions": "Proof outputs {'low': -3.0001, 'base': -1.5, 'high': -0.5}; see calculation_proof graph.",
+        "probability_and_timing": null,
+        "tax_and_realization_adjustments": "Separate from net liquid claim; does not double-count cash already marked.",
+        "falsifier": "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
+        "overlap_key": "dilution_and_burn_reserve",
+        "assumption_type": "judgment"
+      }
+    ],
+    "component_coverage": {
+      "all_material_components_identified": true,
+      "material_component_count": 3,
+      "additive_component_count": 3,
+      "embedded_component_count": 0,
+      "unvalued_component_count": 0,
+      "double_counting_flags": []
+    },
+    "input_classification": {
+      "facts": [],
+      "estimates": [],
+      "judgments": [
+        {
+          "component_id": "net_liquid_claims",
+          "label": "Net cash, short-term investments, and debt claims",
+          "kind": "judgment",
+          "evidence_tier": "primary_derived",
+          "evidence": "Primary bridge from ACHR/investor-documents/sec-edgar/10-Q_20260511_rpt20260331_acc0001824502_26_000038.htm: cash $951.1M, short-term investments $824.8M, debt $80.2M; FY2025 net loss $618.2M per ACHR/investor-documents/sec-edgar/10-K_20260302_rpt20251231_acc0001824502_26_000019.htm; contract backfill 2026-07-21.",
+          "method": "net_asset_value",
+          "valuation_status": "bounded_estimate"
+        },
+        {
+          "component_id": "midnight_certification_option",
+          "label": "Midnight FAA certification and partner milestone value",
+          "kind": "judgment",
+          "evidence_tier": "primary_derived",
+          "evidence": "Primary bridge from ACHR/investor-documents/sec-edgar/10-Q_20260511_rpt20260331_acc0001824502_26_000038.htm: cash $951.1M, short-term investments $824.8M, debt $80.2M; FY2025 net loss $618.2M per ACHR/investor-documents/sec-edgar/10-K_20260302_rpt20251231_acc0001824502_26_000019.htm; contract backfill 2026-07-21.",
+          "method": "risk_adjusted_milestone_value",
+          "valuation_status": "bounded_estimate"
+        },
+        {
+          "component_id": "dilution_and_burn_reserve",
+          "label": "Future dilution and pre-revenue burn reserve",
+          "kind": "judgment",
+          "evidence_tier": "primary_derived",
+          "evidence": "Primary bridge from ACHR/investor-documents/sec-edgar/10-Q_20260511_rpt20260331_acc0001824502_26_000038.htm: cash $951.1M, short-term investments $824.8M, debt $80.2M; FY2025 net loss $618.2M per ACHR/investor-documents/sec-edgar/10-K_20260302_rpt20251231_acc0001824502_26_000019.htm; contract backfill 2026-07-21.",
+          "method": "net_asset_value",
+          "valuation_status": "bounded_estimate"
+        }
+      ]
+    },
+    "method_route": {
+      "schema_version": "1.0",
+      "status": "routed",
+      "profile_id": "scarce_asset_optionality",
+      "label": "Scarce assets, royalties, and optionality",
+      "score": 7.0,
+      "reasons": [
+        "archetype=optionality",
+        "component categories=real_option"
+      ],
+      "primary_methods": [
+        "component_owner_cash_and_unit_nav"
+      ],
+      "corroborating_methods": [
+        "comparable_transactions",
+        "replacement_cost_or_reverse_nav"
+      ],
+      "primary_personas": [
+        "hk",
+        "stahl"
+      ],
+      "cross_check_personas": [
+        "klarman_asset_value",
+        "marks_credit_cycle"
+      ],
+      "silent_personas": [
+        "buffett_weschler",
+        "greenblatt",
+        "hohn",
+        "marathon_capital_cycle",
+        "munger",
+        "pabrai"
+      ],
+      "required_evidence": [
+        "legal economic claim",
+        "non-overlapping physical inventory",
+        "unit economics",
+        "realization timing",
+        "remaining owner capital"
+      ],
+      "failure_modes": [
+        "gross asset value mistaken for shareholder value",
+        "operating cash flow and NAV counted twice",
+        "remote options treated as contracted cash"
+      ],
+      "secondary_profiles": [
+        {
+          "profile_id": "binary_milestone",
+          "score": 3.0,
+          "reasons": [
+            "component categories=real_option",
+            "existing methods=milestone, risk_adjusted"
+          ]
+        },
+        {
+          "profile_id": "credit_and_normalized_returns",
+          "score": 2.0,
+          "reasons": [
+            "component categories=financial_asset, liability_or_reserve"
+          ]
+        }
+      ],
+      "scorecard": {
+        "scarce_asset_optionality": {
+          "score": 7.0,
+          "reasons": [
+            "archetype=optionality",
+            "component categories=real_option"
+          ]
+        },
+        "quality_reinvestment": {
+          "score": 0.0,
+          "reasons": []
+        },
+        "capital_cycle": {
+          "score": 0.0,
+          "reasons": []
+        },
+        "credit_and_normalized_returns": {
+          "score": 2.0,
+          "reasons": [
+            "component categories=financial_asset, liability_or_reserve"
+          ]
+        },
+        "catalyst_asset_value": {
+          "score": 1.0,
+          "reasons": [
+            "component categories=financial_asset"
+          ]
+        },
+        "predictable_cash_flow": {
+          "score": 0.0,
+          "reasons": []
+        },
+        "binary_milestone": {
+          "score": 3.0,
+          "reasons": [
+            "component categories=real_option",
+            "existing methods=milestone, risk_adjusted"
+          ]
+        }
+      },
+      "decision_rule": "Use one primary method and no more than two corroborating methods; irrelevant methods and personas remain silent."
+    },
+    "market": {
+      "price_per_share": 5.31,
+      "fully_diluted_shares": 766850000,
+      "market_cap_m": 4071.97,
+      "enterprise_value_m": 3201.07
+    },
+    "valuation": {
+      "value_per_share": {
+        "low": -0.9202,
+        "base": 4.2115,
+        "high": 11.8301
+      },
+      "priced_components_per_share": {
+        "low": -0.9202,
+        "base": 4.2115,
+        "high": 11.8301
+      },
+      "legacy_value_per_share": {
+        "low": -0.92,
+        "base": 4.21,
+        "high": 11.83
+      },
+      "probability_weighted_value_per_share": 4.2115,
+      "expected_distributions_per_share": 0.0,
+      "annualized_return_at_price_pct": {
+        "low": null,
+        "base": -3.26,
+        "high": 12.12
+      },
+      "downside_to_low_pct": -117.33,
+      "horizon_years": 7,
+      "interpretation": "value_per_share is withheld while any material additive component is unpriced; priced_components_per_share is not a complete security value."
+    },
+    "scenario_contract": {
+      "rule": "Cases must change cited causal operating, capital, probability, timing, or financing drivers\u2014not only a terminal multiple.",
+      "top_value_drivers": [
+        {
+          "component_id": "midnight_certification_option",
+          "label": "Midnight FAA certification and partner milestone value",
+          "valuation_status": "bounded_estimate",
+          "base_per_share": 3.5,
+          "legacy_base_per_share": 3.5,
+          "range_width_per_share": 10.0,
+          "scenario_assumptions": "Proof outputs {'low': 0.0, 'base': 3.5, 'high': 10.0}; see calculation_proof graph."
+        },
+        {
+          "component_id": "dilution_and_burn_reserve",
+          "label": "Future dilution and pre-revenue burn reserve",
+          "valuation_status": "bounded_estimate",
+          "base_per_share": -1.5,
+          "legacy_base_per_share": -1.5,
+          "range_width_per_share": 2.5001,
+          "scenario_assumptions": "Proof outputs {'low': -3.0001, 'base': -1.5, 'high': -0.5}; see calculation_proof graph."
+        },
+        {
+          "component_id": "net_liquid_claims",
+          "label": "Net cash, short-term investments, and debt claims",
+          "valuation_status": "bounded_estimate",
+          "base_per_share": 2.2115,
+          "legacy_base_per_share": 2.21,
+          "range_width_per_share": 0.2502,
+          "scenario_assumptions": "Proof outputs {'low': 2.0799, 'base': 2.2115, 'high': 2.3301}; see calculation_proof graph."
+        }
+      ],
+      "reverse_expectations": null
+    },
+    "calculation_proof_summary": {
+      "component_count": 3,
+      "priced_component_count": 3,
+      "proof_complete_pct": 100.0,
+      "status_counts": {
+        "bounded_estimate": 3,
+        "calculated": 0,
+        "legacy_sensitivity": 0,
+        "unpriced": 0
+      },
+      "all_material_components_priced": true,
+      "calculation_errors": [],
+      "aggregate_proof_hash": "d06ed71112d7fc18c4ed5bd114f8fbdd16ba83b5bc54e57c479a625990c8b2c3"
+    },
+    "source_lineage": [
+      {
+        "component_id": "net_liquid_claims",
+        "node_id": "cash_m",
+        "ref": "ACHR/investor-documents/sec-edgar/10-Q_20260511_rpt20260331_acc0001824502_26_000038.htm",
+        "locator": "Cash and cash equivalents $951.1M at March 31, 2026",
+        "as_of": "2026-03-31",
+        "content_sha256": "6c5b3f7aebfd0125301ec1dd7e570b9467a5e3b0c542f24e62929278347520b2",
+        "source_id": "1702287d93ea1162cf5a81d74d19b40861769e7c5d930a9eb591eeff97dc3604"
+      },
+      {
+        "component_id": "net_liquid_claims",
+        "node_id": "st_investments_m",
+        "ref": "ACHR/investor-documents/sec-edgar/10-Q_20260511_rpt20260331_acc0001824502_26_000038.htm",
+        "locator": "Short-term investments $824.8M at March 31, 2026",
+        "as_of": "2026-03-31",
+        "content_sha256": "6c5b3f7aebfd0125301ec1dd7e570b9467a5e3b0c542f24e62929278347520b2",
+        "source_id": "9e40c2150d15a23a51faa1909983875c8b9fa84d8978d9288a486a766b53e7b8"
+      },
+      {
+        "component_id": "net_liquid_claims",
+        "node_id": "restricted_cash_m",
+        "ref": "ACHR/investor-documents/sec-edgar/10-Q_20260511_rpt20260331_acc0001824502_26_000038.htm",
+        "locator": "Restricted cash $7.3M at March 31, 2026",
+        "as_of": "2026-03-31",
+        "content_sha256": "6c5b3f7aebfd0125301ec1dd7e570b9467a5e3b0c542f24e62929278347520b2",
+        "source_id": "0bdcedefb8c21c940b5bf54996a76cb9d400437bacfbfae01158d9cf1c21eaa2"
+      },
+      {
+        "component_id": "net_liquid_claims",
+        "node_id": "debt_m",
+        "ref": "ACHR/investor-documents/sec-edgar/10-Q_20260511_rpt20260331_acc0001824502_26_000038.htm",
+        "locator": "Long-term debt current $1.4M + noncurrent $78.8M at March 31, 2026",
+        "as_of": "2026-03-31",
+        "content_sha256": "6c5b3f7aebfd0125301ec1dd7e570b9467a5e3b0c542f24e62929278347520b2",
+        "source_id": "6fa1deead3e61be3bccadb5ae62965cabe8ac469f5156cbd65c4157d275be58a"
+      },
+      {
+        "component_id": "net_liquid_claims",
+        "node_id": "warrant_liab_m",
+        "ref": "ACHR/investor-documents/sec-edgar/10-Q_20260511_rpt20260331_acc0001824502_26_000038.htm",
+        "locator": "Warrant liabilities noncurrent $7.1M at March 31, 2026",
+        "as_of": "2026-03-31",
+        "content_sha256": "6c5b3f7aebfd0125301ec1dd7e570b9467a5e3b0c542f24e62929278347520b2",
+        "source_id": "3130a4ff271c187bc9ec33ffdff6ead59712ddbee0ab6ff8539c4d6599201497"
+      },
+      {
+        "component_id": "net_liquid_claims",
+        "node_id": "shares_m",
+        "ref": "ACHR/investor-documents/sec-edgar/10-Q_20260511_rpt20260331_acc0001824502_26_000038.htm",
+        "locator": "Weighted-average shares outstanding, basic and diluted 766,850,002",
+        "as_of": "2026-03-31",
+        "content_sha256": "6c5b3f7aebfd0125301ec1dd7e570b9467a5e3b0c542f24e62929278347520b2",
+        "source_id": "3e75549b41984a14e46fab72095a3b231b6a2ed573f90472a34c16342c11f4bc"
+      },
+      {
+        "component_id": "midnight_certification_option",
+        "node_id": "net_loss_fy_m",
+        "ref": "ACHR/investor-documents/sec-edgar/10-K_20260302_rpt20251231_acc0001824502_26_000019.htm",
+        "locator": "Net loss $618.2 million for year ended December 31, 2025",
+        "as_of": "2025-12-31",
+        "content_sha256": "29331fb27a7e99e301bf2e17ab1836b36d3ab653c8baeaccac8ca83e945fe8d9",
+        "source_id": "35ff28cc5095a6ca82d622e0cdbe7470c3b6e61117c9a567a4ac88bf62508df0"
+      },
+      {
+        "component_id": "midnight_certification_option",
+        "node_id": "rd_fy_m",
+        "ref": "ACHR/investor-documents/sec-edgar/10-K_20260302_rpt20251231_acc0001824502_26_000019.htm",
+        "locator": "Research and development $493.9M (FY2025 consolidated statements of operations)",
+        "as_of": "2025-12-31",
+        "content_sha256": "29331fb27a7e99e301bf2e17ab1836b36d3ab653c8baeaccac8ca83e945fe8d9",
+        "source_id": "3307dd4fa008aab7440e3bb31a9d908fc406996513e2ed3a57af455ab1ce3c2c"
+      },
+      {
+        "component_id": "midnight_certification_option",
+        "node_id": "revenue_fy_m",
+        "ref": "ACHR/investor-documents/sec-edgar/10-K_20260302_rpt20251231_acc0001824502_26_000019.htm",
+        "locator": "Revenue $0.3M (FY2025)",
+        "as_of": "2025-12-31",
+        "content_sha256": "29331fb27a7e99e301bf2e17ab1836b36d3ab653c8baeaccac8ca83e945fe8d9",
+        "source_id": "8df5d15c318208dd455daf07d9c454d11f090c205200f81fe9a41b2d05d43f0a"
+      },
+      {
+        "component_id": "midnight_certification_option",
+        "node_id": "shares_m",
+        "ref": "ACHR/investor-documents/sec-edgar/10-Q_20260511_rpt20260331_acc0001824502_26_000038.htm",
+        "locator": "Weighted-average shares outstanding, basic and diluted 766,850,002",
+        "as_of": "2026-03-31",
+        "content_sha256": "6c5b3f7aebfd0125301ec1dd7e570b9467a5e3b0c542f24e62929278347520b2",
+        "source_id": "3e75549b41984a14e46fab72095a3b231b6a2ed573f90472a34c16342c11f4bc"
+      },
+      {
+        "component_id": "dilution_and_burn_reserve",
+        "node_id": "accum_deficit_m",
+        "ref": "ACHR/investor-documents/sec-edgar/10-K_20260302_rpt20251231_acc0001824502_26_000019.htm",
+        "locator": "Retained earnings (accumulated deficit) $(2,303.8)M at December 31, 2025",
+        "as_of": "2025-12-31",
+        "content_sha256": "29331fb27a7e99e301bf2e17ab1836b36d3ab653c8baeaccac8ca83e945fe8d9",
+        "source_id": "de386196ee4a74357cb4b55e7df7ec6490e7c10aa846540e4f3180b5c9be5d86"
+      },
+      {
+        "component_id": "dilution_and_burn_reserve",
+        "node_id": "op_loss_fy_m",
+        "ref": "ACHR/investor-documents/sec-edgar/10-K_20260302_rpt20251231_acc0001824502_26_000019.htm",
+        "locator": "Loss from operations $(729.3)M (FY2025)",
+        "as_of": "2025-12-31",
+        "content_sha256": "29331fb27a7e99e301bf2e17ab1836b36d3ab653c8baeaccac8ca83e945fe8d9",
+        "source_id": "fbefa5bede2371d7a28143ca858af035faa07013cb04b998af2f14e6af1c11f0"
+      },
+      {
+        "component_id": "dilution_and_burn_reserve",
+        "node_id": "shares_m",
+        "ref": "ACHR/investor-documents/sec-edgar/10-Q_20260511_rpt20260331_acc0001824502_26_000038.htm",
+        "locator": "Weighted-average shares outstanding, basic and diluted 766,850,002",
+        "as_of": "2026-03-31",
+        "content_sha256": "6c5b3f7aebfd0125301ec1dd7e570b9467a5e3b0c542f24e62929278347520b2",
+        "source_id": "3e75549b41984a14e46fab72095a3b231b6a2ed573f90472a34c16342c11f4bc"
+      }
+    ],
+    "model_checks": {
+      "calculation_graphs_valid": true,
+      "component_sum_reconciles": true,
+      "no_double_counting": true,
+      "all_material_components_priced": true,
+      "low_base_high_ordered": true
+    },
+    "evidence": {
+      "unresolved_count": 0,
+      "blockers": [],
+      "validation_errors": []
+    },
+    "monitoring": {
+      "falsifiers": [
+        "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
+        "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
+        "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case."
+      ],
+      "required_refresh_triggers": [
+        "new filing or material operating update",
+        "capital-structure change",
+        "material price move",
+        "component milestone or falsifier"
+      ]
+    },
+    "change_control": {
+      "model_hash": "1237e8fceb11385103bb7489000ce9aba23135696a3b8831543eb3ad757d1dff",
+      "method_versions": [
+        "net_asset_value@1.0",
+        "risk_adjusted_milestone_value@1.0"
+      ],
+      "change_log": [],
+      "rule": "A source fact is locked. Every assumption change requires a reason, author, timestamp, and before/after value."
+    },
+    "decision_rule": "No security is decision-grade until every material claim is valued exactly once by a valid calculation proof and every material evidence blocker is resolved."
+  },
+  "context_overlay": {
+    "as_of": "2026-07-21",
+    "disclaimer": "Context only. Tailwinds inform stance and overlay sizing; they do not auto-inflate Lawrence base IRR. Promotion to base case requires [HUMAN REVIEW].",
+    "themes": [
+      {
+        "theme_id": "macro_regime",
+        "label": "Macro risk regime",
+        "indicators": [
+          {
+            "id": "hy_oas",
+            "label": "High-yield OAS credit spread (%)",
+            "latest": 1.43,
+            "as_of": "2026-07-20",
+            "yoy_pct": 248.8,
+            "direction": "up",
+            "good_for": "risk_regime",
+            "source": "spread:HYG-LQD:21d (HYG-LQD 1m spread proxy, not OAS)",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "ust_10y",
+            "label": "US Treasury 10Y yield (%)",
+            "latest": 4.599999904632568,
+            "as_of": "2026-07-21",
+            "yoy_pct": 5.2,
+            "direction": "up",
+            "good_for": "rates_regime",
+            "source": "yahoo:^TNX",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "ust_2y",
+            "label": "US Treasury 2Y yield (%)",
+            "latest": 4.324999809265137,
+            "as_of": "2026-07-21",
+            "yoy_pct": 10.7,
+            "direction": "up",
+            "good_for": "rates_regime",
+            "source": "yahoo:^FVX",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "dxy_broad",
+            "label": "Trade-weighted USD index (broad)",
+            "latest": 101.02100372314453,
+            "as_of": "2026-07-21",
+            "yoy_pct": 3.2,
+            "direction": "up",
+            "good_for": "dollar_regime",
+            "source": "yahoo:DX-Y.NYB",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "vix_level",
+            "label": "VIX index level",
+            "latest": 17.850000381469727,
+            "as_of": "2026-07-21",
+            "yoy_pct": 7.2,
+            "direction": "up",
+            "good_for": "vol_regime",
+            "source": "yahoo:^VIX",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "credit_impulse_1m",
+            "label": "HYG vs TLT 1-month return spread (%)",
+            "latest": 2.76,
+            "as_of": "2026-07-20",
+            "yoy_pct": 55.9,
+            "direction": "up",
+            "good_for": "credit_impulse",
+            "source": "spread:HYG-TLT:21d",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "spy_20d_realized_vol",
+            "label": "SPY 20-day realized vol (annualized %)",
+            "latest": 11.37,
+            "as_of": "2026-07-20",
+            "yoy_pct": 31.3,
+            "direction": "up",
+            "good_for": "equity_vol",
+            "source": "realized_vol:SPY:20d",
+            "stale": false,
+            "in_base_irr": false
+          }
+        ]
+      }
+    ]
+  },
+  "insider_signal": {
+    "as_of": "2026-07-21",
+    "disclaimer": "Context only. Insider activity informs scenario confidence and stance discussion; it does not auto-inflate Lawrence base IRR. Promotion requires [HUMAN REVIEW].",
+    "in_base_irr": false,
+    "window_days": 365,
+    "ics": 0.0,
+    "band": "negligible",
+    "bull_case_support": "none",
+    "scenario_confidence": {
+      "priors": {
+        "bear": 0.2,
+        "base": 0.55,
+        "bull": 0.25
+      },
+      "tilted": {
+        "bear": 0.28,
+        "base": 0.47,
+        "bull": 0.25
+      },
+      "bull_delta": 0.0,
+      "bear_delta": 0.08,
+      "note": "Scenario weights are qualitative confidence only; Lawrence base IRR unchanged."
+    },
+    "factors": {
+      "buy_score": 0.0,
+      "sell_score": -1.0,
+      "cluster_bonus": 0.0,
+      "net_buy_usd": 0,
+      "net_sell_usd": 7894353.73,
+      "price_today": 5.31
+    },
+    "top_buys": [],
+    "top_sells": [
+      {
+        "insider": "Lentell Eric",
+        "date": "2026-06-11",
+        "shares": 3754,
+        "price": 4.9984,
+        "value_usd": 18763.99,
+        "is_10b5_1": false,
+        "contrib": -0.143
+      },
+      {
+        "insider": "Gupta Priya",
+        "date": "2026-05-18",
+        "shares": 9860,
+        "price": 5.9527,
+        "value_usd": 58693.62,
+        "is_10b5_1": false,
+        "contrib": -0.125
+      },
+      {
+        "insider": "Rungta Harsh",
+        "date": "2026-05-18",
+        "shares": 12414,
+        "price": 5.9527,
+        "value_usd": 73896.82,
+        "is_10b5_1": false,
+        "contrib": -0.117
+      },
+      {
+        "insider": "Muniz Thomas Paul",
+        "date": "2026-05-18",
+        "shares": 91839,
+        "price": 5.9527,
+        "value_usd": 546690.02,
+        "is_10b5_1": false,
+        "contrib": -0.117
+      },
+      {
+        "insider": "Lentell Eric",
+        "date": "2026-05-18",
+        "shares": 48169,
+        "price": 5.9527,
+        "value_usd": 286735.61,
+        "is_10b5_1": false,
+        "contrib": -0.117
+      }
+    ],
+    "narrative_hooks": [],
+    "transaction_count": 100
+  },
+  "lens_consensus": {
+    "as_of": "2026-07-21",
+    "shared_inputs_ref": "valuation.json@2026-07-21",
+    "valuation_richness": 1.0,
+    "blended_return_pct": -6.18,
+    "band_pct": [
+      -22.3,
+      -2.8
+    ],
+    "weighted_median_pct": -3.3,
+    "median_mean_flag": false,
+    "stance": "pass",
+    "agreement_pct": 100,
+    "dissent_count": 0,
+    "lawrence_divergence": false,
+    "top_dissents": [],
+    "contributor_count": 10,
+    "in_base_irr": false,
+    "disclaimer": "Advisory lens blend only. Does not replace Lawrence total-synthesis stance gate without [HUMAN REVIEW]."
   }
 }

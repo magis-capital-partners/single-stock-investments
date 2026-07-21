@@ -124,3 +124,6 @@ jobs:
             exit 0
           fi
           bash _system/scripts/ci_push_main.sh "chore(queue): refill contract_backfill wave for overnight drain"
+          # GITHUB_TOKEN pushes do not chain other workflows; kick Research Queue explicitly.
+          gh api --method POST "repos/${{ github.repository }}/dispatches" \
+            -f event_type=research-queue-run

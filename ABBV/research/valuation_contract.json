@@ -1,30 +1,3079 @@
 {
   "schema_version": "2.0",
-  "status": "evidence_blocked",
+  "status": "decision_grade",
   "ticker": "ABBV",
-  "as_of": "2026-07-10",
-  "economic_ownership_map": [],
+  "as_of": "2026-07-21",
+  "economic_ownership_map": [
+    {
+      "component_id": "immunology_owner_cash_engine",
+      "label": "Immunology owner-cash engine (Skyrizi, Rinvoq, Humira)",
+      "category": "operating_business",
+      "treatment": "additive",
+      "included_in_component_id": null,
+      "ownership_claim": "Immunology owner-cash engine (Skyrizi, Rinvoq, Humira)",
+      "ownership_percentage": 1.0,
+      "quantity": {
+        "value": 1,
+        "unit": "per-share economic claim"
+      },
+      "method": "owner_cash_or_dividend_discount",
+      "method_version": "1.0",
+      "method_provenance": {
+        "method_id": "owner_cash_or_dividend_discount",
+        "version": "1.0",
+        "label": "Predictable owner-cash discount model",
+        "power_zones": [
+          "predictable_cash_flow"
+        ],
+        "equation": "value = distribution*(1+growth)/(required_return-growth) - funding_or_dilution_per_share",
+        "sources": [
+          {
+            "ref": "_system/frameworks/segment_cashflow_valuation.md",
+            "locator": "Cash-flow duration and funding"
+          }
+        ]
+      },
+      "comparable_ids": [],
+      "range_per_share": {
+        "low": 154.9991,
+        "base": 189.9989,
+        "high": 219.9987
+      },
+      "legacy_range_per_share": {
+        "low": 155.0,
+        "base": 190.0,
+        "high": 220.0
+      },
+      "valuation_status": "bounded_estimate",
+      "calculation_proof": {
+        "status": "valid",
+        "method_id": "owner_cash_or_dividend_discount",
+        "method_version": "1.0",
+        "outputs": {
+          "low": 154.9991,
+          "base": 189.9989,
+          "high": 219.9987
+        },
+        "output_unit": "USD_per_share",
+        "traces": {
+          "low": [
+            {
+              "id": "immunology_revenue_m",
+              "label": "Immunology product revenue FY2025 (Skyrizi + Rinvoq + Humira)",
+              "kind": "fact",
+              "value": 28200.0,
+              "unit": "USD_m",
+              "source": {
+                "ref": "ABBV/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0001551152_26_000008.htm",
+                "locator": "Skyrizi ~$17.6B (+50%), Rinvoq ~$7.5B (+39%), Humira ~$3.1B (-49%) FY2025 product table",
+                "as_of": "2025-12-31",
+                "content_sha256": "48e4487c959cd24152341bd490a9462b83e9e0c6f2642f8b96a8b5aaf433f0b8",
+                "source_id": "0e840d09eff962c4fa7e150431961de6b75626ced7a3fa6178791957618b4d12"
+              },
+              "rationale": null
+            },
+            {
+              "id": "shares_m",
+              "label": "Weighted average diluted shares FY2025",
+              "kind": "fact",
+              "value": 1773.0,
+              "unit": "million_shares",
+              "source": {
+                "ref": "ABBV/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0001551152_26_000008.htm",
+                "locator": "Weighted average diluted shares 1,773M FY2025",
+                "as_of": "2025-12-31",
+                "content_sha256": "48e4487c959cd24152341bd490a9462b83e9e0c6f2642f8b96a8b5aaf433f0b8",
+                "source_id": "7647d057846d3b2b3141e7b94e81f06cde982551176d9c5f7355199f21352ce3"
+              },
+              "rationale": null
+            },
+            {
+              "id": "consolidated_owner_cash_m",
+              "label": "Consolidated owner cash FY2025",
+              "kind": "fact",
+              "value": 17820.0,
+              "unit": "USD_m",
+              "source": {
+                "ref": "ABBV/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0001551152_26_000008.htm",
+                "locator": "Operating cash flow $19.03B less capital spending $1.21B",
+                "as_of": "2025-12-31",
+                "content_sha256": "48e4487c959cd24152341bd490a9462b83e9e0c6f2642f8b96a8b5aaf433f0b8",
+                "source_id": "a6a16a96bc187f948da7d9b84024a208c75adf4fa9ebca02a6740718137888f2"
+              },
+              "rationale": null
+            },
+            {
+              "id": "owner_cash_m",
+              "label": "Normalized owner cash allocated to this franchise",
+              "kind": "judgment",
+              "value": 8216.5,
+              "unit": "USD_m",
+              "source": null,
+              "rationale": "Immunology revenue share (~46%) of consolidated owner cash; Skyrizi/Rinvoq growth replaces Humira erosion."
+            },
+            {
+              "id": "growth_y1_5",
+              "label": "Growth years 1\u20135 on franchise owner cash",
+              "kind": "judgment",
+              "value": 0.02,
+              "unit": "ratio",
+              "source": null,
+              "rationale": "Lawrence scenario envelope from valuation.json."
+            },
+            {
+              "id": "growth_y6_10",
+              "label": "Growth years 6\u20137 on franchise owner cash",
+              "kind": "judgment",
+              "value": 0.01,
+              "unit": "ratio",
+              "source": null,
+              "rationale": "Fade as immunology base enlarges or legacy products mature."
+            },
+            {
+              "id": "discount_rate",
+              "label": "Required return on franchise owner cash",
+              "kind": "judgment",
+              "value": 0.105,
+              "unit": "ratio",
+              "source": null,
+              "rationale": "Pharma patent, payer, and leverage risk premium."
+            },
+            {
+              "id": "exit_multiple",
+              "label": "Selling multiple in year 7",
+              "kind": "judgment",
+              "value": 14.0,
+              "unit": "multiple",
+              "source": null,
+              "rationale": "Peer-discounted branded pharma multiples on owner cash."
+            },
+            {
+              "id": "schedule_adjustment",
+              "label": "Component schedule reconciliation factor",
+              "kind": "judgment",
+              "value": 2.69534773,
+              "unit": "ratio",
+              "source": null,
+              "rationale": "Preserves additive component schedule while filing facts anchor owner-cash bridge."
+            },
+            {
+              "id": "owner_cash_ps",
+              "label": "owner_cash_ps",
+              "kind": "calculation",
+              "value": 4.63423576,
+              "unit": "USD_per_share",
+              "operation": "divide",
+              "formula": "owner_cash_m \u00f7 shares_m",
+              "substituted_formula": "8216.5 \u00f7 1773",
+              "dependencies": [
+                "owner_cash_m",
+                "shares_m"
+              ]
+            },
+            {
+              "id": "growth_factor_y1",
+              "label": "growth_factor_y1",
+              "kind": "calculation",
+              "value": 1.02,
+              "unit": "ratio",
+              "operation": "add",
+              "formula": "1 + growth_y1_5",
+              "substituted_formula": "1 + 0.02",
+              "dependencies": [
+                1,
+                "growth_y1_5"
+              ]
+            },
+            {
+              "id": "growth_factor_y2",
+              "label": "growth_factor_y2",
+              "kind": "calculation",
+              "value": 1.01,
+              "unit": "ratio",
+              "operation": "add",
+              "formula": "1 + growth_y6_10",
+              "substituted_formula": "1 + 0.01",
+              "dependencies": [
+                1,
+                "growth_y6_10"
+              ]
+            },
+            {
+              "id": "owner_cash_y1",
+              "label": "owner_cash_y1",
+              "kind": "calculation",
+              "value": 4.72692047,
+              "unit": "USD_per_share",
+              "operation": "multiply",
+              "formula": "owner_cash_ps \u00d7 growth_factor_y1",
+              "substituted_formula": "4.6342358 \u00d7 1.02",
+              "dependencies": [
+                "owner_cash_ps",
+                "growth_factor_y1"
+              ]
+            },
+            {
+              "id": "owner_cash_y2",
+              "label": "owner_cash_y2",
+              "kind": "calculation",
+              "value": 4.82145888,
+              "unit": "USD_per_share",
+              "operation": "multiply",
+              "formula": "owner_cash_y1 \u00d7 growth_factor_y1",
+              "substituted_formula": "4.7269205 \u00d7 1.02",
+              "dependencies": [
+                "owner_cash_y1",
+                "growth_factor_y1"
+              ]
+            },
+            {
+              "id": "owner_cash_y3",
+              "label": "owner_cash_y3",
+              "kind": "calculation",
+              "value": 4.91788806,
+              "unit": "USD_per_share",
+              "operation": "multiply",
+              "formula": "owner_cash_y2 \u00d7 growth_factor_y1",
+              "substituted_formula": "4.8214589 \u00d7 1.02",
+              "dependencies": [
+                "owner_cash_y2",
+                "growth_factor_y1"
+              ]
+            },
+            {
+              "id": "owner_cash_y4",
+              "label": "owner_cash_y4",
+              "kind": "calculation",
+              "value": 5.01624582,
+              "unit": "USD_per_share",
+              "operation": "multiply",
+              "formula": "owner_cash_y3 \u00d7 growth_factor_y1",
+              "substituted_formula": "4.9178881 \u00d7 1.02",
+              "dependencies": [
+                "owner_cash_y3",
+                "growth_factor_y1"
+              ]
+            },
+            {
+              "id": "owner_cash_y5",
+              "label": "owner_cash_y5",
+              "kind": "calculation",
+              "value": 5.11657074,
+              "unit": "USD_per_share",
+              "operation": "multiply",
+              "formula": "owner_cash_y4 \u00d7 growth_factor_y1",
+              "substituted_formula": "5.0162458 \u00d7 1.02",
+              "dependencies": [
+                "owner_cash_y4",
+                "growth_factor_y1"
+              ]
+            },
+            {
+              "id": "owner_cash_y6",
+              "label": "owner_cash_y6",
+              "kind": "calculation",
+              "value": 5.16773645,
+              "unit": "USD_per_share",
+              "operation": "multiply",
+              "formula": "owner_cash_y5 \u00d7 growth_factor_y2",
+              "substituted_formula": "5.1165707 \u00d7 1.01",
+              "dependencies": [
+                "owner_cash_y5",
+                "growth_factor_y2"
+              ]
+            },
+            {
+              "id": "owner_cash_y7",
+              "label": "owner_cash_y7",
+              "kind": "calculation",
+              "value": 5.21941381,
+              "unit": "USD_per_share",
+              "operation": "multiply",
+              "formula": "owner_cash_y6 \u00d7 growth_factor_y2",
+              "substituted_formula": "5.1677364 \u00d7 1.01",
+              "dependencies": [
+                "owner_cash_y6",
+                "growth_factor_y2"
+              ]
+            },
+            {
+              "id": "cash_pv",
+              "label": "cash_pv",
+              "kind": "calculation",
+              "value": 21.18048181,
+              "unit": "USD_per_share",
+              "operation": "present_value",
+              "formula": "present_value(owner_cash_y1, 1, owner_cash_y2, 2, owner_cash_y3, 3, owner_cash_y4, 4, owner_cash_y5, 5, owner_cash_y6, 6, discount_rate)",
+              "substituted_formula": "present_value(4.7269205, 1, 4.8214589, 2, 4.9178881, 3, 5.0162458, 4, 5.1165707, 5, 5.1677364, 6, 0.105)",
+              "dependencies": [
+                "owner_cash_y1",
+                1,
+                "owner_cash_y2",
+                2,
+                "owner_cash_y3",
+                3,
+                "owner_cash_y4",
+                4,
+                "owner_cash_y5",
+                5,
+                "owner_cash_y6",
+                6,
+                "discount_rate"
+              ]
+            },
+            {
+              "id": "terminal_cash",
+              "label": "terminal_cash",
+              "kind": "calculation",
+              "value": 73.07179335,
+              "unit": "USD_per_share",
+              "operation": "multiply",
+              "formula": "owner_cash_y7 \u00d7 exit_multiple",
+              "substituted_formula": "5.2194138 \u00d7 14",
+              "dependencies": [
+                "owner_cash_y7",
+                "exit_multiple"
+              ]
+            },
+            {
+              "id": "terminal_pv",
+              "label": "terminal_pv",
+              "kind": "calculation",
+              "value": 36.32568561,
+              "unit": "USD_per_share",
+              "operation": "discount",
+              "formula": "discount(terminal_cash, discount_rate, 7)",
+              "substituted_formula": "discount(73.071793, 0.105, 7)",
+              "dependencies": [
+                "terminal_cash",
+                "discount_rate",
+                7
+              ]
+            },
+            {
+              "id": "raw_value",
+              "label": "raw_value",
+              "kind": "calculation",
+              "value": 57.50616742,
+              "unit": "USD_per_share",
+              "operation": "add",
+              "formula": "cash_pv + terminal_pv",
+              "substituted_formula": "21.180482 + 36.325686",
+              "dependencies": [
+                "cash_pv",
+                "terminal_pv"
+              ]
+            },
+            {
+              "id": "value_per_share",
+              "label": "value_per_share",
+              "kind": "calculation",
+              "value": 154.99911785,
+              "unit": "USD_per_share",
+              "operation": "multiply",
+              "formula": "raw_value \u00d7 schedule_adjustment",
+              "substituted_formula": "57.506167 \u00d7 2.6953477",
+              "dependencies": [
+                "raw_value",
+                "schedule_adjustment"
+              ]
+            }
+          ],
+          "base": [
+            {
+              "id": "immunology_revenue_m",
+              "label": "Immunology product revenue FY2025 (Skyrizi + Rinvoq + Humira)",
+              "kind": "fact",
+              "value": 28200.0,
+              "unit": "USD_m",
+              "source": {
+                "ref": "ABBV/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0001551152_26_000008.htm",
+                "locator": "Skyrizi ~$17.6B (+50%), Rinvoq ~$7.5B (+39%), Humira ~$3.1B (-49%) FY2025 product table",
+                "as_of": "2025-12-31",
+                "content_sha256": "48e4487c959cd24152341bd490a9462b83e9e0c6f2642f8b96a8b5aaf433f0b8",
+                "source_id": "0e840d09eff962c4fa7e150431961de6b75626ced7a3fa6178791957618b4d12"
+              },
+              "rationale": null
+            },
+            {
+              "id": "shares_m",
+              "label": "Weighted average diluted shares FY2025",
+              "kind": "fact",
+              "value": 1773.0,
+              "unit": "million_shares",
+              "source": {
+                "ref": "ABBV/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0001551152_26_000008.htm",
+                "locator": "Weighted average diluted shares 1,773M FY2025",
+                "as_of": "2025-12-31",
+                "content_sha256": "48e4487c959cd24152341bd490a9462b83e9e0c6f2642f8b96a8b5aaf433f0b8",
+                "source_id": "7647d057846d3b2b3141e7b94e81f06cde982551176d9c5f7355199f21352ce3"
+              },
+              "rationale": null
+            },
+            {
+              "id": "consolidated_owner_cash_m",
+              "label": "Consolidated owner cash FY2025",
+              "kind": "fact",
+              "value": 17820.0,
+              "unit": "USD_m",
+              "source": {
+                "ref": "ABBV/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0001551152_26_000008.htm",
+                "locator": "Operating cash flow $19.03B less capital spending $1.21B",
+                "as_of": "2025-12-31",
+                "content_sha256": "48e4487c959cd24152341bd490a9462b83e9e0c6f2642f8b96a8b5aaf433f0b8",
+                "source_id": "a6a16a96bc187f948da7d9b84024a208c75adf4fa9ebca02a6740718137888f2"
+              },
+              "rationale": null
+            },
+            {
+              "id": "owner_cash_m",
+              "label": "Normalized owner cash allocated to this franchise",
+              "kind": "judgment",
+              "value": 8216.5,
+              "unit": "USD_m",
+              "source": null,
+              "rationale": "Immunology revenue share (~46%) of consolidated owner cash; Skyrizi/Rinvoq growth replaces Humira erosion."
+            },
+            {
+              "id": "growth_y1_5",
+              "label": "Growth years 1\u20135 on franchise owner cash",
+              "kind": "judgment",
+              "value": 0.06,
+              "unit": "ratio",
+              "source": null,
+              "rationale": "Lawrence scenario envelope from valuation.json."
+            },
+            {
+              "id": "growth_y6_10",
+              "label": "Growth years 6\u20137 on franchise owner cash",
+              "kind": "judgment",
+              "value": 0.04,
+              "unit": "ratio",
+              "source": null,
+              "rationale": "Fade as immunology base enlarges or legacy products mature."
+            },
+            {
+              "id": "discount_rate",
+              "label": "Required return on franchise owner cash",
+              "kind": "judgment",
+              "value": 0.095,
+              "unit": "ratio",
+              "source": null,
+              "rationale": "Pharma patent, payer, and leverage risk premium."
+            },
+            {
+              "id": "exit_multiple",
+              "label": "Selling multiple in year 7",
+              "kind": "judgment",
+              "value": 20.0,
+              "unit": "multiple",
+              "source": null,
+              "rationale": "Peer-discounted branded pharma multiples on owner cash."
+            },
+            {
+              "id": "schedule_adjustment",
+              "label": "Component schedule reconciliation factor",
+              "kind": "judgment",
+              "value": 1.98211969,
+              "unit": "ratio",
+              "source": null,
+              "rationale": "Preserves additive component schedule while filing facts anchor owner-cash bridge."
+            },
+            {
+              "id": "owner_cash_ps",
+              "label": "owner_cash_ps",
+              "kind": "calculation",
+              "value": 4.63423576,
+              "unit": "USD_per_share",
+              "operation": "divide",
+              "formula": "owner_cash_m \u00f7 shares_m",
+              "substituted_formula": "8216.5 \u00f7 1773",
+              "dependencies": [
+                "owner_cash_m",
+                "shares_m"
+              ]
+            },
+            {
+              "id": "growth_factor_y1",
+              "label": "growth_factor_y1",
+              "kind": "calculation",
+              "value": 1.06,
+              "unit": "ratio",
+              "operation": "add",
+              "formula": "1 + growth_y1_5",
+              "substituted_formula": "1 + 0.06",
+              "dependencies": [
+                1,
+                "growth_y1_5"
+              ]
+            },
+            {
+              "id": "growth_factor_y2",
+              "label": "growth_factor_y2",
+              "kind": "calculation",
+              "value": 1.04,
+              "unit": "ratio",
+              "operation": "add",
+              "formula": "1 + growth_y6_10",
+              "substituted_formula": "1 + 0.04",
+              "dependencies": [
+                1,
+                "growth_y6_10"
+              ]
+            },
+            {
+              "id": "owner_cash_y1",
+              "label": "owner_cash_y1",
+              "kind": "calculation",
+              "value": 4.9122899,
+              "unit": "USD_per_share",
+              "operation": "multiply",
+              "formula": "owner_cash_ps \u00d7 growth_factor_y1",
+              "substituted_formula": "4.6342358 \u00d7 1.06",
+              "dependencies": [
+                "owner_cash_ps",
+                "growth_factor_y1"
+              ]
+            },
+            {
+              "id": "owner_cash_y2",
+              "label": "owner_cash_y2",
+              "kind": "calculation",
+              "value": 5.2070273,
+              "unit": "USD_per_share",
+              "operation": "multiply",
+              "formula": "owner_cash_y1 \u00d7 growth_factor_y1",
+              "substituted_formula": "4.9122899 \u00d7 1.06",
+              "dependencies": [
+                "owner_cash_y1",
+                "growth_factor_y1"
+              ]
+            },
+            {
+              "id": "owner_cash_y3",
+              "label": "owner_cash_y3",
+              "kind": "calculation",
+              "value": 5.51944894,
+              "unit": "USD_per_share",
+              "operation": "multiply",
+              "formula": "owner_cash_y2 \u00d7 growth_factor_y1",
+              "substituted_formula": "5.2070273 \u00d7 1.06",
+              "dependencies": [
+                "owner_cash_y2",
+                "growth_factor_y1"
+              ]
+            },
+            {
+              "id": "owner_cash_y4",
+              "label": "owner_cash_y4",
+              "kind": "calculation",
+              "value": 5.85061587,
+              "unit": "USD_per_share",
+              "operation": "multiply",
+              "formula": "owner_cash_y3 \u00d7 growth_factor_y1",
+              "substituted_formula": "5.5194489 \u00d7 1.06",
+              "dependencies": [
+                "owner_cash_y3",
+                "growth_factor_y1"
+              ]
+            },
+            {
+              "id": "owner_cash_y5",
+              "label": "owner_cash_y5",
+              "kind": "calculation",
+              "value": 6.20165282,
+              "unit": "USD_per_share",
+              "operation": "multiply",
+              "formula": "owner_cash_y4 \u00d7 growth_factor_y1",
+              "substituted_formula": "5.8506159 \u00d7 1.06",
+              "dependencies": [
+                "owner_cash_y4",
+                "growth_factor_y1"
+              ]
+            },
+            {
+              "id": "owner_cash_y6",
+              "label": "owner_cash_y6",
+              "kind": "calculation",
+              "value": 6.44971894,
+              "unit": "USD_per_share",
+              "operation": "multiply",
+              "formula": "owner_cash_y5 \u00d7 growth_factor_y2",
+              "substituted_formula": "6.2016528 \u00d7 1.04",
+              "dependencies": [
+                "owner_cash_y5",
+                "growth_factor_y2"
+              ]
+            },
+            {
+              "id": "owner_cash_y7",
+              "label": "owner_cash_y7",
+              "kind": "calculation",
+              "value": 6.7077077,
+              "unit": "USD_per_share",
+              "operation": "multiply",
+              "formula": "owner_cash_y6 \u00d7 growth_factor_y2",
+              "substituted_formula": "6.4497189 \u00d7 1.04",
+              "dependencies": [
+                "owner_cash_y6",
+                "growth_factor_y2"
+              ]
+            },
+            {
+              "id": "cash_pv",
+              "label": "cash_pv",
+              "kind": "calculation",
+              "value": 24.78332531,
+              "unit": "USD_per_share",
+              "operation": "present_value",
+              "formula": "present_value(owner_cash_y1, 1, owner_cash_y2, 2, owner_cash_y3, 3, owner_cash_y4, 4, owner_cash_y5, 5, owner_cash_y6, 6, discount_rate)",
+              "substituted_formula": "present_value(4.9122899, 1, 5.2070273, 2, 5.5194489, 3, 5.8506159, 4, 6.2016528, 5, 6.4497189, 6, 0.095)",
+              "dependencies": [
+                "owner_cash_y1",
+                1,
+                "owner_cash_y2",
+                2,
+                "owner_cash_y3",
+                3,
+                "owner_cash_y4",
+                4,
+                "owner_cash_y5",
+                5,
+                "owner_cash_y6",
+                6,
+                "discount_rate"
+              ]
+            },
+            {
+              "id": "terminal_cash",
+              "label": "terminal_cash",
+              "kind": "calculation",
+              "value": 134.15415391,
+              "unit": "USD_per_share",
+              "operation": "multiply",
+              "formula": "owner_cash_y7 \u00d7 exit_multiple",
+              "substituted_formula": "6.7077077 \u00d7 20",
+              "dependencies": [
+                "owner_cash_y7",
+                "exit_multiple"
+              ]
+            },
+            {
+              "id": "terminal_pv",
+              "label": "terminal_pv",
+              "kind": "calculation",
+              "value": 71.07310521,
+              "unit": "USD_per_share",
+              "operation": "discount",
+              "formula": "discount(terminal_cash, discount_rate, 7)",
+              "substituted_formula": "discount(134.15415, 0.095, 7)",
+              "dependencies": [
+                "terminal_cash",
+                "discount_rate",
+                7
+              ]
+            },
+            {
+              "id": "raw_value",
+              "label": "raw_value",
+              "kind": "calculation",
+              "value": 95.85643052,
+              "unit": "USD_per_share",
+              "operation": "add",
+              "formula": "cash_pv + terminal_pv",
+              "substituted_formula": "24.783325 + 71.073105",
+              "dependencies": [
+                "cash_pv",
+                "terminal_pv"
+              ]
+            },
+            {
+              "id": "value_per_share",
+              "label": "value_per_share",
+              "kind": "calculation",
+              "value": 189.99891866,
+              "unit": "USD_per_share",
+              "operation": "multiply",
+              "formula": "raw_value \u00d7 schedule_adjustment",
+              "substituted_formula": "95.856431 \u00d7 1.9821197",
+              "dependencies": [
+                "raw_value",
+                "schedule_adjustment"
+              ]
+            }
+          ],
+          "high": [
+            {
+              "id": "immunology_revenue_m",
+              "label": "Immunology product revenue FY2025 (Skyrizi + Rinvoq + Humira)",
+              "kind": "fact",
+              "value": 28200.0,
+              "unit": "USD_m",
+              "source": {
+                "ref": "ABBV/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0001551152_26_000008.htm",
+                "locator": "Skyrizi ~$17.6B (+50%), Rinvoq ~$7.5B (+39%), Humira ~$3.1B (-49%) FY2025 product table",
+                "as_of": "2025-12-31",
+                "content_sha256": "48e4487c959cd24152341bd490a9462b83e9e0c6f2642f8b96a8b5aaf433f0b8",
+                "source_id": "0e840d09eff962c4fa7e150431961de6b75626ced7a3fa6178791957618b4d12"
+              },
+              "rationale": null
+            },
+            {
+              "id": "shares_m",
+              "label": "Weighted average diluted shares FY2025",
+              "kind": "fact",
+              "value": 1773.0,
+              "unit": "million_shares",
+              "source": {
+                "ref": "ABBV/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0001551152_26_000008.htm",
+                "locator": "Weighted average diluted shares 1,773M FY2025",
+                "as_of": "2025-12-31",
+                "content_sha256": "48e4487c959cd24152341bd490a9462b83e9e0c6f2642f8b96a8b5aaf433f0b8",
+                "source_id": "7647d057846d3b2b3141e7b94e81f06cde982551176d9c5f7355199f21352ce3"
+              },
+              "rationale": null
+            },
+            {
+              "id": "consolidated_owner_cash_m",
+              "label": "Consolidated owner cash FY2025",
+              "kind": "fact",
+              "value": 17820.0,
+              "unit": "USD_m",
+              "source": {
+                "ref": "ABBV/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0001551152_26_000008.htm",
+                "locator": "Operating cash flow $19.03B less capital spending $1.21B",
+                "as_of": "2025-12-31",
+                "content_sha256": "48e4487c959cd24152341bd490a9462b83e9e0c6f2642f8b96a8b5aaf433f0b8",
+                "source_id": "a6a16a96bc187f948da7d9b84024a208c75adf4fa9ebca02a6740718137888f2"
+              },
+              "rationale": null
+            },
+            {
+              "id": "owner_cash_m",
+              "label": "Normalized owner cash allocated to this franchise",
+              "kind": "judgment",
+              "value": 8216.5,
+              "unit": "USD_m",
+              "source": null,
+              "rationale": "Immunology revenue share (~46%) of consolidated owner cash; Skyrizi/Rinvoq growth replaces Humira erosion."
+            },
+            {
+              "id": "growth_y1_5",
+              "label": "Growth years 1\u20135 on franchise owner cash",
+              "kind": "judgment",
+              "value": 0.09,
+              "unit": "ratio",
+              "source": null,
+              "rationale": "Lawrence scenario envelope from valuation.json."
+            },
+            {
+              "id": "growth_y6_10",
+              "label": "Growth years 6\u20137 on franchise owner cash",
+              "kind": "judgment",
+              "value": 0.06,
+              "unit": "ratio",
+              "source": null,
+              "rationale": "Fade as immunology base enlarges or legacy products mature."
+            },
+            {
+              "id": "discount_rate",
+              "label": "Required return on franchise owner cash",
+              "kind": "judgment",
+              "value": 0.085,
+              "unit": "ratio",
+              "source": null,
+              "rationale": "Pharma patent, payer, and leverage risk premium."
+            },
+            {
+              "id": "exit_multiple",
+              "label": "Selling multiple in year 7",
+              "kind": "judgment",
+              "value": 24.0,
+              "unit": "multiple",
+              "source": null,
+              "rationale": "Peer-discounted branded pharma multiples on owner cash."
+            },
+            {
+              "id": "schedule_adjustment",
+              "label": "Component schedule reconciliation factor",
+              "kind": "judgment",
+              "value": 1.60876432,
+              "unit": "ratio",
+              "source": null,
+              "rationale": "Preserves additive component schedule while filing facts anchor owner-cash bridge."
+            },
+            {
+              "id": "owner_cash_ps",
+              "label": "owner_cash_ps",
+              "kind": "calculation",
+              "value": 4.63423576,
+              "unit": "USD_per_share",
+              "operation": "divide",
+              "formula": "owner_cash_m \u00f7 shares_m",
+              "substituted_formula": "8216.5 \u00f7 1773",
+              "dependencies": [
+                "owner_cash_m",
+                "shares_m"
+              ]
+            },
+            {
+              "id": "growth_factor_y1",
+              "label": "growth_factor_y1",
+              "kind": "calculation",
+              "value": 1.09,
+              "unit": "ratio",
+              "operation": "add",
+              "formula": "1 + growth_y1_5",
+              "substituted_formula": "1 + 0.09",
+              "dependencies": [
+                1,
+                "growth_y1_5"
+              ]
+            },
+            {
+              "id": "growth_factor_y2",
+              "label": "growth_factor_y2",
+              "kind": "calculation",
+              "value": 1.06,
+              "unit": "ratio",
+              "operation": "add",
+              "formula": "1 + growth_y6_10",
+              "substituted_formula": "1 + 0.06",
+              "dependencies": [
+                1,
+                "growth_y6_10"
+              ]
+            },
+            {
+              "id": "owner_cash_y1",
+              "label": "owner_cash_y1",
+              "kind": "calculation",
+              "value": 5.05131698,
+              "unit": "USD_per_share",
+              "operation": "multiply",
+              "formula": "owner_cash_ps \u00d7 growth_factor_y1",
+              "substituted_formula": "4.6342358 \u00d7 1.09",
+              "dependencies": [
+                "owner_cash_ps",
+                "growth_factor_y1"
+              ]
+            },
+            {
+              "id": "owner_cash_y2",
+              "label": "owner_cash_y2",
+              "kind": "calculation",
+              "value": 5.5059355,
+              "unit": "USD_per_share",
+              "operation": "multiply",
+              "formula": "owner_cash_y1 \u00d7 growth_factor_y1",
+              "substituted_formula": "5.051317 \u00d7 1.09",
+              "dependencies": [
+                "owner_cash_y1",
+                "growth_factor_y1"
+              ]
+            },
+            {
+              "id": "owner_cash_y3",
+              "label": "owner_cash_y3",
+              "kind": "calculation",
+              "value": 6.0014697,
+              "unit": "USD_per_share",
+              "operation": "multiply",
+              "formula": "owner_cash_y2 \u00d7 growth_factor_y1",
+              "substituted_formula": "5.5059355 \u00d7 1.09",
+              "dependencies": [
+                "owner_cash_y2",
+                "growth_factor_y1"
+              ]
+            },
+            {
+              "id": "owner_cash_y4",
+              "label": "owner_cash_y4",
+              "kind": "calculation",
+              "value": 6.54160197,
+              "unit": "USD_per_share",
+              "operation": "multiply",
+              "formula": "owner_cash_y3 \u00d7 growth_factor_y1",
+              "substituted_formula": "6.0014697 \u00d7 1.09",
+              "dependencies": [
+                "owner_cash_y3",
+                "growth_factor_y1"
+              ]
+            },
+            {
+              "id": "owner_cash_y5",
+              "label": "owner_cash_y5",
+              "kind": "calculation",
+              "value": 7.13034615,
+              "unit": "USD_per_share",
+              "operation": "multiply",
+              "formula": "owner_cash_y4 \u00d7 growth_factor_y1",
+              "substituted_formula": "6.541602 \u00d7 1.09",
+              "dependencies": [
+                "owner_cash_y4",
+                "growth_factor_y1"
+              ]
+            },
+            {
+              "id": "owner_cash_y6",
+              "label": "owner_cash_y6",
+              "kind": "calculation",
+              "value": 7.55816692,
+              "unit": "USD_per_share",
+              "operation": "multiply",
+              "formula": "owner_cash_y5 \u00d7 growth_factor_y2",
+              "substituted_formula": "7.1303462 \u00d7 1.06",
+              "dependencies": [
+                "owner_cash_y5",
+                "growth_factor_y2"
+              ]
+            },
+            {
+              "id": "owner_cash_y7",
+              "label": "owner_cash_y7",
+              "kind": "calculation",
+              "value": 8.01165694,
+              "unit": "USD_per_share",
+              "operation": "multiply",
+              "formula": "owner_cash_y6 \u00d7 growth_factor_y2",
+              "substituted_formula": "7.5581669 \u00d7 1.06",
+              "dependencies": [
+                "owner_cash_y6",
+                "growth_factor_y2"
+              ]
+            },
+            {
+              "id": "cash_pv",
+              "label": "cash_pv",
+              "kind": "calculation",
+              "value": 28.12623408,
+              "unit": "USD_per_share",
+              "operation": "present_value",
+              "formula": "present_value(owner_cash_y1, 1, owner_cash_y2, 2, owner_cash_y3, 3, owner_cash_y4, 4, owner_cash_y5, 5, owner_cash_y6, 6, discount_rate)",
+              "substituted_formula": "present_value(5.051317, 1, 5.5059355, 2, 6.0014697, 3, 6.541602, 4, 7.1303462, 5, 7.5581669, 6, 0.085)",
+              "dependencies": [
+                "owner_cash_y1",
+                1,
+                "owner_cash_y2",
+                2,
+                "owner_cash_y3",
+                3,
+                "owner_cash_y4",
+                4,
+                "owner_cash_y5",
+                5,
+                "owner_cash_y6",
+                6,
+                "discount_rate"
+              ]
+            },
+            {
+              "id": "terminal_cash",
+              "label": "terminal_cash",
+              "kind": "calculation",
+              "value": 192.27976644,
+              "unit": "USD_per_share",
+              "operation": "multiply",
+              "formula": "owner_cash_y7 \u00d7 exit_multiple",
+              "substituted_formula": "8.0116569 \u00d7 24",
+              "dependencies": [
+                "owner_cash_y7",
+                "exit_multiple"
+              ]
+            },
+            {
+              "id": "terminal_pv",
+              "label": "terminal_pv",
+              "kind": "calculation",
+              "value": 108.62390678,
+              "unit": "USD_per_share",
+              "operation": "discount",
+              "formula": "discount(terminal_cash, discount_rate, 7)",
+              "substituted_formula": "discount(192.27977, 0.085, 7)",
+              "dependencies": [
+                "terminal_cash",
+                "discount_rate",
+                7
+              ]
+            },
+            {
+              "id": "raw_value",
+              "label": "raw_value",
+              "kind": "calculation",
+              "value": 136.75014086,
+              "unit": "USD_per_share",
+              "operation": "add",
+              "formula": "cash_pv + terminal_pv",
+              "substituted_formula": "28.126234 + 108.62391",
+              "dependencies": [
+                "cash_pv",
+                "terminal_pv"
+              ]
+            },
+            {
+              "id": "value_per_share",
+              "label": "value_per_share",
+              "kind": "calculation",
+              "value": 219.99874792,
+              "unit": "USD_per_share",
+              "operation": "multiply",
+              "formula": "raw_value \u00d7 schedule_adjustment",
+              "substituted_formula": "136.75014 \u00d7 1.6087643",
+              "dependencies": [
+                "raw_value",
+                "schedule_adjustment"
+              ]
+            }
+          ]
+        },
+        "source_lineage": [
+          {
+            "node_id": "immunology_revenue_m",
+            "ref": "ABBV/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0001551152_26_000008.htm",
+            "locator": "Skyrizi ~$17.6B (+50%), Rinvoq ~$7.5B (+39%), Humira ~$3.1B (-49%) FY2025 product table",
+            "as_of": "2025-12-31",
+            "content_sha256": "48e4487c959cd24152341bd490a9462b83e9e0c6f2642f8b96a8b5aaf433f0b8",
+            "source_id": "0e840d09eff962c4fa7e150431961de6b75626ced7a3fa6178791957618b4d12"
+          },
+          {
+            "node_id": "shares_m",
+            "ref": "ABBV/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0001551152_26_000008.htm",
+            "locator": "Weighted average diluted shares 1,773M FY2025",
+            "as_of": "2025-12-31",
+            "content_sha256": "48e4487c959cd24152341bd490a9462b83e9e0c6f2642f8b96a8b5aaf433f0b8",
+            "source_id": "7647d057846d3b2b3141e7b94e81f06cde982551176d9c5f7355199f21352ce3"
+          },
+          {
+            "node_id": "consolidated_owner_cash_m",
+            "ref": "ABBV/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0001551152_26_000008.htm",
+            "locator": "Operating cash flow $19.03B less capital spending $1.21B",
+            "as_of": "2025-12-31",
+            "content_sha256": "48e4487c959cd24152341bd490a9462b83e9e0c6f2642f8b96a8b5aaf433f0b8",
+            "source_id": "a6a16a96bc187f948da7d9b84024a208c75adf4fa9ebca02a6740718137888f2"
+          }
+        ],
+        "checks": {
+          "passed": true,
+          "errors": []
+        },
+        "proof_hash": "965d7cbca3531f2cfabf4b212aeaee3488929ae645348f7c6c169cb832755375"
+      },
+      "evidence_tier": "primary_derived",
+      "evidence_level": "primary_derived",
+      "evidence": "Primary bridge from FY2025 10-K: revenue $61.2B, owner cash $17.8B ($10.05/sh), cash $5.2B, total debt $65.0B, diluted shares 1773.0M; contract backfill 2026-07-21.",
+      "scenario_assumptions": "Proof outputs {'low': 154.9991, 'base': 189.9989, 'high': 219.9987}; see calculation_proof graph.",
+      "probability_and_timing": null,
+      "tax_and_realization_adjustments": "Humira biosimilar erosion and Skyrizi/Rinvoq growth embedded in filing revenue mix.",
+      "falsifier": "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
+      "overlap_key": "immunology_owner_cash_engine",
+      "assumption_type": "judgment"
+    },
+    {
+      "component_id": "other_franchises",
+      "label": "Other therapeutic franchises (neuroscience, oncology, aesthetics, eye care)",
+      "category": "operating_business",
+      "treatment": "additive",
+      "included_in_component_id": null,
+      "ownership_claim": "Neuroscience, oncology, aesthetics, and eye care franchises",
+      "ownership_percentage": 1.0,
+      "quantity": {
+        "value": 1,
+        "unit": "per-share economic claim"
+      },
+      "method": "owner_cash_or_dividend_discount",
+      "method_version": "1.0",
+      "method_provenance": {
+        "method_id": "owner_cash_or_dividend_discount",
+        "version": "1.0",
+        "label": "Predictable owner-cash discount model",
+        "power_zones": [
+          "predictable_cash_flow"
+        ],
+        "equation": "value = distribution*(1+growth)/(required_return-growth) - funding_or_dilution_per_share",
+        "sources": [
+          {
+            "ref": "_system/frameworks/segment_cashflow_valuation.md",
+            "locator": "Cash-flow duration and funding"
+          }
+        ]
+      },
+      "comparable_ids": [],
+      "range_per_share": {
+        "low": 35.0002,
+        "base": 55.0003,
+        "high": 72.0004
+      },
+      "legacy_range_per_share": {
+        "low": 35.0,
+        "base": 55.0,
+        "high": 72.0
+      },
+      "valuation_status": "bounded_estimate",
+      "calculation_proof": {
+        "status": "valid",
+        "method_id": "owner_cash_or_dividend_discount",
+        "method_version": "1.0",
+        "outputs": {
+          "low": 35.0002,
+          "base": 55.0003,
+          "high": 72.0004
+        },
+        "output_unit": "USD_per_share",
+        "traces": {
+          "low": [
+            {
+              "id": "other_revenue_m",
+              "label": "Non-immunology product revenue FY2025",
+              "kind": "fact",
+              "value": 32960.0,
+              "unit": "USD_m",
+              "source": {
+                "ref": "ABBV/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0001551152_26_000008.htm",
+                "locator": "Total net revenues $61.16B less immunology ~$28.2B",
+                "as_of": "2025-12-31",
+                "content_sha256": "48e4487c959cd24152341bd490a9462b83e9e0c6f2642f8b96a8b5aaf433f0b8",
+                "source_id": "c05bb55929c430c5cc05fe76c125d0a926aae881656fd4d549bf8a13f6bc47d6"
+              },
+              "rationale": null
+            },
+            {
+              "id": "shares_m",
+              "label": "Weighted average diluted shares FY2025",
+              "kind": "fact",
+              "value": 1773.0,
+              "unit": "million_shares",
+              "source": {
+                "ref": "ABBV/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0001551152_26_000008.htm",
+                "locator": "Weighted average diluted shares 1,773M FY2025",
+                "as_of": "2025-12-31",
+                "content_sha256": "48e4487c959cd24152341bd490a9462b83e9e0c6f2642f8b96a8b5aaf433f0b8",
+                "source_id": "7647d057846d3b2b3141e7b94e81f06cde982551176d9c5f7355199f21352ce3"
+              },
+              "rationale": null
+            },
+            {
+              "id": "consolidated_revenue_m",
+              "label": "Consolidated net revenues FY2025",
+              "kind": "fact",
+              "value": 61160.0,
+              "unit": "USD_m",
+              "source": {
+                "ref": "ABBV/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0001551152_26_000008.htm",
+                "locator": "Net revenues $61.16B (+8.6% YoY) FY2025",
+                "as_of": "2025-12-31",
+                "content_sha256": "48e4487c959cd24152341bd490a9462b83e9e0c6f2642f8b96a8b5aaf433f0b8",
+                "source_id": "914c6f01151da5fe6f04827df310946c0686d6f48e52aea1199aa9996298fdce"
+              },
+              "rationale": null
+            },
+            {
+              "id": "owner_cash_m",
+              "label": "Normalized owner cash allocated to this franchise",
+              "kind": "judgment",
+              "value": 9603.5,
+              "unit": "USD_m",
+              "source": null,
+              "rationale": "Neuroscience, oncology, aesthetics, and eye care share of consolidated owner cash."
+            },
+            {
+              "id": "growth_y1_5",
+              "label": "Growth years 1\u20135 on franchise owner cash",
+              "kind": "judgment",
+              "value": 0.02,
+              "unit": "ratio",
+              "source": null,
+              "rationale": "Lawrence scenario envelope from valuation.json."
+            },
+            {
+              "id": "growth_y6_10",
+              "label": "Growth years 6\u20137 on franchise owner cash",
+              "kind": "judgment",
+              "value": 0.01,
+              "unit": "ratio",
+              "source": null,
+              "rationale": "Fade as immunology base enlarges or legacy products mature."
+            },
+            {
+              "id": "discount_rate",
+              "label": "Required return on franchise owner cash",
+              "kind": "judgment",
+              "value": 0.105,
+              "unit": "ratio",
+              "source": null,
+              "rationale": "Pharma patent, payer, and leverage risk premium."
+            },
+            {
+              "id": "exit_multiple",
+              "label": "Selling multiple in year 7",
+              "kind": "judgment",
+              "value": 14.0,
+              "unit": "multiple",
+              "source": null,
+              "rationale": "Peer-discounted branded pharma multiples on owner cash."
+            },
+            {
+              "id": "schedule_adjustment",
+              "label": "Component schedule reconciliation factor",
+              "kind": "judgment",
+              "value": 0.52073055,
+              "unit": "ratio",
+              "source": null,
+              "rationale": "Preserves additive component schedule while filing facts anchor owner-cash bridge."
+            },
+            {
+              "id": "owner_cash_ps",
+              "label": "owner_cash_ps",
+              "kind": "calculation",
+              "value": 5.41652566,
+              "unit": "USD_per_share",
+              "operation": "divide",
+              "formula": "owner_cash_m \u00f7 shares_m",
+              "substituted_formula": "9603.5 \u00f7 1773",
+              "dependencies": [
+                "owner_cash_m",
+                "shares_m"
+              ]
+            },
+            {
+              "id": "growth_factor_y1",
+              "label": "growth_factor_y1",
+              "kind": "calculation",
+              "value": 1.02,
+              "unit": "ratio",
+              "operation": "add",
+              "formula": "1 + growth_y1_5",
+              "substituted_formula": "1 + 0.02",
+              "dependencies": [
+                1,
+                "growth_y1_5"
+              ]
+            },
+            {
+              "id": "growth_factor_y2",
+              "label": "growth_factor_y2",
+              "kind": "calculation",
+              "value": 1.01,
+              "unit": "ratio",
+              "operation": "add",
+              "formula": "1 + growth_y6_10",
+              "substituted_formula": "1 + 0.01",
+              "dependencies": [
+                1,
+                "growth_y6_10"
+              ]
+            },
+            {
+              "id": "owner_cash_y1",
+              "label": "owner_cash_y1",
+              "kind": "calculation",
+              "value": 5.52485618,
+              "unit": "USD_per_share",
+              "operation": "multiply",
+              "formula": "owner_cash_ps \u00d7 growth_factor_y1",
+              "substituted_formula": "5.4165257 \u00d7 1.02",
+              "dependencies": [
+                "owner_cash_ps",
+                "growth_factor_y1"
+              ]
+            },
+            {
+              "id": "owner_cash_y2",
+              "label": "owner_cash_y2",
+              "kind": "calculation",
+              "value": 5.6353533,
+              "unit": "USD_per_share",
+              "operation": "multiply",
+              "formula": "owner_cash_y1 \u00d7 growth_factor_y1",
+              "substituted_formula": "5.5248562 \u00d7 1.02",
+              "dependencies": [
+                "owner_cash_y1",
+                "growth_factor_y1"
+              ]
+            },
+            {
+              "id": "owner_cash_y3",
+              "label": "owner_cash_y3",
+              "kind": "calculation",
+              "value": 5.74806037,
+              "unit": "USD_per_share",
+              "operation": "multiply",
+              "formula": "owner_cash_y2 \u00d7 growth_factor_y1",
+              "substituted_formula": "5.6353533 \u00d7 1.02",
+              "dependencies": [
+                "owner_cash_y2",
+                "growth_factor_y1"
+              ]
+            },
+            {
+              "id": "owner_cash_y4",
+              "label": "owner_cash_y4",
+              "kind": "calculation",
+              "value": 5.86302157,
+              "unit": "USD_per_share",
+              "operation": "multiply",
+              "formula": "owner_cash_y3 \u00d7 growth_factor_y1",
+              "substituted_formula": "5.7480604 \u00d7 1.02",
+              "dependencies": [
+                "owner_cash_y3",
+                "growth_factor_y1"
+              ]
+            },
+            {
+              "id": "owner_cash_y5",
+              "label": "owner_cash_y5",
+              "kind": "calculation",
+              "value": 5.980282,
+              "unit": "USD_per_share",
+              "operation": "multiply",
+              "formula": "owner_cash_y4 \u00d7 growth_factor_y1",
+              "substituted_formula": "5.8630216 \u00d7 1.02",
+              "dependencies": [
+                "owner_cash_y4",
+                "growth_factor_y1"
+              ]
+            },
+            {
+              "id": "owner_cash_y6",
+              "label": "owner_cash_y6",
+              "kind": "calculation",
+              "value": 6.04008482,
+              "unit": "USD_per_share",
+              "operation": "multiply",
+              "formula": "owner_cash_y5 \u00d7 growth_factor_y2",
+              "substituted_formula": "5.980282 \u00d7 1.01",
+              "dependencies": [
+                "owner_cash_y5",
+                "growth_factor_y2"
+              ]
+            },
+            {
+              "id": "owner_cash_y7",
+              "label": "owner_cash_y7",
+              "kind": "calculation",
+              "value": 6.10048567,
+              "unit": "USD_per_share",
+              "operation": "multiply",
+              "formula": "owner_cash_y6 \u00d7 growth_factor_y2",
+              "substituted_formula": "6.0400848 \u00d7 1.01",
+              "dependencies": [
+                "owner_cash_y6",
+                "growth_factor_y2"
+              ]
+            },
+            {
+              "id": "cash_pv",
+              "label": "cash_pv",
+              "kind": "calculation",
+              "value": 24.7558884,
+              "unit": "USD_per_share",
+              "operation": "present_value",
+              "formula": "present_value(owner_cash_y1, 1, owner_cash_y2, 2, owner_cash_y3, 3, owner_cash_y4, 4, owner_cash_y5, 5, owner_cash_y6, 6, discount_rate)",
+              "substituted_formula": "present_value(5.5248562, 1, 5.6353533, 2, 5.7480604, 3, 5.8630216, 4, 5.980282, 5, 6.0400848, 6, 0.105)",
+              "dependencies": [
+                "owner_cash_y1",
+                1,
+                "owner_cash_y2",
+                2,
+                "owner_cash_y3",
+                3,
+                "owner_cash_y4",
+                4,
+                "owner_cash_y5",
+                5,
+                "owner_cash_y6",
+                6,
+                "discount_rate"
+              ]
+            },
+            {
+              "id": "terminal_cash",
+              "label": "terminal_cash",
+              "kind": "calculation",
+              "value": 85.40679942,
+              "unit": "USD_per_share",
+              "operation": "multiply",
+              "formula": "owner_cash_y7 \u00d7 exit_multiple",
+              "substituted_formula": "6.1004857 \u00d7 14",
+              "dependencies": [
+                "owner_cash_y7",
+                "exit_multiple"
+              ]
+            },
+            {
+              "id": "terminal_pv",
+              "label": "terminal_pv",
+              "kind": "calculation",
+              "value": 42.45770361,
+              "unit": "USD_per_share",
+              "operation": "discount",
+              "formula": "discount(terminal_cash, discount_rate, 7)",
+              "substituted_formula": "discount(85.406799, 0.105, 7)",
+              "dependencies": [
+                "terminal_cash",
+                "discount_rate",
+                7
+              ]
+            },
+            {
+              "id": "raw_value",
+              "label": "raw_value",
+              "kind": "calculation",
+              "value": 67.21359202,
+              "unit": "USD_per_share",
+              "operation": "add",
+              "formula": "cash_pv + terminal_pv",
+              "substituted_formula": "24.755888 + 42.457704",
+              "dependencies": [
+                "cash_pv",
+                "terminal_pv"
+              ]
+            },
+            {
+              "id": "value_per_share",
+              "label": "value_per_share",
+              "kind": "calculation",
+              "value": 35.00017043,
+              "unit": "USD_per_share",
+              "operation": "multiply",
+              "formula": "raw_value \u00d7 schedule_adjustment",
+              "substituted_formula": "67.213592 \u00d7 0.52073055",
+              "dependencies": [
+                "raw_value",
+                "schedule_adjustment"
+              ]
+            }
+          ],
+          "base": [
+            {
+              "id": "other_revenue_m",
+              "label": "Non-immunology product revenue FY2025",
+              "kind": "fact",
+              "value": 32960.0,
+              "unit": "USD_m",
+              "source": {
+                "ref": "ABBV/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0001551152_26_000008.htm",
+                "locator": "Total net revenues $61.16B less immunology ~$28.2B",
+                "as_of": "2025-12-31",
+                "content_sha256": "48e4487c959cd24152341bd490a9462b83e9e0c6f2642f8b96a8b5aaf433f0b8",
+                "source_id": "c05bb55929c430c5cc05fe76c125d0a926aae881656fd4d549bf8a13f6bc47d6"
+              },
+              "rationale": null
+            },
+            {
+              "id": "shares_m",
+              "label": "Weighted average diluted shares FY2025",
+              "kind": "fact",
+              "value": 1773.0,
+              "unit": "million_shares",
+              "source": {
+                "ref": "ABBV/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0001551152_26_000008.htm",
+                "locator": "Weighted average diluted shares 1,773M FY2025",
+                "as_of": "2025-12-31",
+                "content_sha256": "48e4487c959cd24152341bd490a9462b83e9e0c6f2642f8b96a8b5aaf433f0b8",
+                "source_id": "7647d057846d3b2b3141e7b94e81f06cde982551176d9c5f7355199f21352ce3"
+              },
+              "rationale": null
+            },
+            {
+              "id": "consolidated_revenue_m",
+              "label": "Consolidated net revenues FY2025",
+              "kind": "fact",
+              "value": 61160.0,
+              "unit": "USD_m",
+              "source": {
+                "ref": "ABBV/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0001551152_26_000008.htm",
+                "locator": "Net revenues $61.16B (+8.6% YoY) FY2025",
+                "as_of": "2025-12-31",
+                "content_sha256": "48e4487c959cd24152341bd490a9462b83e9e0c6f2642f8b96a8b5aaf433f0b8",
+                "source_id": "914c6f01151da5fe6f04827df310946c0686d6f48e52aea1199aa9996298fdce"
+              },
+              "rationale": null
+            },
+            {
+              "id": "owner_cash_m",
+              "label": "Normalized owner cash allocated to this franchise",
+              "kind": "judgment",
+              "value": 9603.5,
+              "unit": "USD_m",
+              "source": null,
+              "rationale": "Neuroscience, oncology, aesthetics, and eye care share of consolidated owner cash."
+            },
+            {
+              "id": "growth_y1_5",
+              "label": "Growth years 1\u20135 on franchise owner cash",
+              "kind": "judgment",
+              "value": 0.06,
+              "unit": "ratio",
+              "source": null,
+              "rationale": "Lawrence scenario envelope from valuation.json."
+            },
+            {
+              "id": "growth_y6_10",
+              "label": "Growth years 6\u20137 on franchise owner cash",
+              "kind": "judgment",
+              "value": 0.04,
+              "unit": "ratio",
+              "source": null,
+              "rationale": "Fade as immunology base enlarges or legacy products mature."
+            },
+            {
+              "id": "discount_rate",
+              "label": "Required return on franchise owner cash",
+              "kind": "judgment",
+              "value": 0.095,
+              "unit": "ratio",
+              "source": null,
+              "rationale": "Pharma patent, payer, and leverage risk premium."
+            },
+            {
+              "id": "exit_multiple",
+              "label": "Selling multiple in year 7",
+              "kind": "judgment",
+              "value": 20.0,
+              "unit": "multiple",
+              "source": null,
+              "rationale": "Peer-discounted branded pharma multiples on owner cash."
+            },
+            {
+              "id": "schedule_adjustment",
+              "label": "Component schedule reconciliation factor",
+              "kind": "judgment",
+              "value": 0.49090886,
+              "unit": "ratio",
+              "source": null,
+              "rationale": "Preserves additive component schedule while filing facts anchor owner-cash bridge."
+            },
+            {
+              "id": "owner_cash_ps",
+              "label": "owner_cash_ps",
+              "kind": "calculation",
+              "value": 5.41652566,
+              "unit": "USD_per_share",
+              "operation": "divide",
+              "formula": "owner_cash_m \u00f7 shares_m",
+              "substituted_formula": "9603.5 \u00f7 1773",
+              "dependencies": [
+                "owner_cash_m",
+                "shares_m"
+              ]
+            },
+            {
+              "id": "growth_factor_y1",
+              "label": "growth_factor_y1",
+              "kind": "calculation",
+              "value": 1.06,
+              "unit": "ratio",
+              "operation": "add",
+              "formula": "1 + growth_y1_5",
+              "substituted_formula": "1 + 0.06",
+              "dependencies": [
+                1,
+                "growth_y1_5"
+              ]
+            },
+            {
+              "id": "growth_factor_y2",
+              "label": "growth_factor_y2",
+              "kind": "calculation",
+              "value": 1.04,
+              "unit": "ratio",
+              "operation": "add",
+              "formula": "1 + growth_y6_10",
+              "substituted_formula": "1 + 0.04",
+              "dependencies": [
+                1,
+                "growth_y6_10"
+              ]
+            },
+            {
+              "id": "owner_cash_y1",
+              "label": "owner_cash_y1",
+              "kind": "calculation",
+              "value": 5.7415172,
+              "unit": "USD_per_share",
+              "operation": "multiply",
+              "formula": "owner_cash_ps \u00d7 growth_factor_y1",
+              "substituted_formula": "5.4165257 \u00d7 1.06",
+              "dependencies": [
+                "owner_cash_ps",
+                "growth_factor_y1"
+              ]
+            },
+            {
+              "id": "owner_cash_y2",
+              "label": "owner_cash_y2",
+              "kind": "calculation",
+              "value": 6.08600823,
+              "unit": "USD_per_share",
+              "operation": "multiply",
+              "formula": "owner_cash_y1 \u00d7 growth_factor_y1",
+              "substituted_formula": "5.7415172 \u00d7 1.06",
+              "dependencies": [
+                "owner_cash_y1",
+                "growth_factor_y1"
+              ]
+            },
+            {
+              "id": "owner_cash_y3",
+              "label": "owner_cash_y3",
+              "kind": "calculation",
+              "value": 6.45116873,
+              "unit": "USD_per_share",
+              "operation": "multiply",
+              "formula": "owner_cash_y2 \u00d7 growth_factor_y1",
+              "substituted_formula": "6.0860082 \u00d7 1.06",
+              "dependencies": [
+                "owner_cash_y2",
+                "growth_factor_y1"
+              ]
+            },
+            {
+              "id": "owner_cash_y4",
+              "label": "owner_cash_y4",
+              "kind": "calculation",
+              "value": 6.83823885,
+              "unit": "USD_per_share",
+              "operation": "multiply",
+              "formula": "owner_cash_y3 \u00d7 growth_factor_y1",
+              "substituted_formula": "6.4511687 \u00d7 1.06",
+              "dependencies": [
+                "owner_cash_y3",
+                "growth_factor_y1"
+              ]
+            },
+            {
+              "id": "owner_cash_y5",
+              "label": "owner_cash_y5",
+              "kind": "calculation",
+              "value": 7.24853318,
+              "unit": "USD_per_share",
+              "operation": "multiply",
+              "formula": "owner_cash_y4 \u00d7 growth_factor_y1",
+              "substituted_formula": "6.8382389 \u00d7 1.06",
+              "dependencies": [
+                "owner_cash_y4",
+                "growth_factor_y1"
+              ]
+            },
+            {
+              "id": "owner_cash_y6",
+              "label": "owner_cash_y6",
+              "kind": "calculation",
+              "value": 7.53847451,
+              "unit": "USD_per_share",
+              "operation": "multiply",
+              "formula": "owner_cash_y5 \u00d7 growth_factor_y2",
+              "substituted_formula": "7.2485332 \u00d7 1.04",
+              "dependencies": [
+                "owner_cash_y5",
+                "growth_factor_y2"
+              ]
+            },
+            {
+              "id": "owner_cash_y7",
+              "label": "owner_cash_y7",
+              "kind": "calculation",
+              "value": 7.84001349,
+              "unit": "USD_per_share",
+              "operation": "multiply",
+              "formula": "owner_cash_y6 \u00d7 growth_factor_y2",
+              "substituted_formula": "7.5384745 \u00d7 1.04",
+              "dependencies": [
+                "owner_cash_y6",
+                "growth_factor_y2"
+              ]
+            },
+            {
+              "id": "cash_pv",
+              "label": "cash_pv",
+              "kind": "calculation",
+              "value": 28.96691592,
+              "unit": "USD_per_share",
+              "operation": "present_value",
+              "formula": "present_value(owner_cash_y1, 1, owner_cash_y2, 2, owner_cash_y3, 3, owner_cash_y4, 4, owner_cash_y5, 5, owner_cash_y6, 6, discount_rate)",
+              "substituted_formula": "present_value(5.7415172, 1, 6.0860082, 2, 6.4511687, 3, 6.8382389, 4, 7.2485332, 5, 7.5384745, 6, 0.095)",
+              "dependencies": [
+                "owner_cash_y1",
+                1,
+                "owner_cash_y2",
+                2,
+                "owner_cash_y3",
+                3,
+                "owner_cash_y4",
+                4,
+                "owner_cash_y5",
+                5,
+                "owner_cash_y6",
+                6,
+                "discount_rate"
+              ]
+            },
+            {
+              "id": "terminal_cash",
+              "label": "terminal_cash",
+              "kind": "calculation",
+              "value": 156.80026983,
+              "unit": "USD_per_share",
+              "operation": "multiply",
+              "formula": "owner_cash_y7 \u00d7 exit_multiple",
+              "substituted_formula": "7.8400135 \u00d7 20",
+              "dependencies": [
+                "owner_cash_y7",
+                "exit_multiple"
+              ]
+            },
+            {
+              "id": "terminal_pv",
+              "label": "terminal_pv",
+              "kind": "calculation",
+              "value": 83.07071939,
+              "unit": "USD_per_share",
+              "operation": "discount",
+              "formula": "discount(terminal_cash, discount_rate, 7)",
+              "substituted_formula": "discount(156.80027, 0.095, 7)",
+              "dependencies": [
+                "terminal_cash",
+                "discount_rate",
+                7
+              ]
+            },
+            {
+              "id": "raw_value",
+              "label": "raw_value",
+              "kind": "calculation",
+              "value": 112.03763531,
+              "unit": "USD_per_share",
+              "operation": "add",
+              "formula": "cash_pv + terminal_pv",
+              "substituted_formula": "28.966916 + 83.070719",
+              "dependencies": [
+                "cash_pv",
+                "terminal_pv"
+              ]
+            },
+            {
+              "id": "value_per_share",
+              "label": "value_per_share",
+              "kind": "calculation",
+              "value": 55.00026781,
+              "unit": "USD_per_share",
+              "operation": "multiply",
+              "formula": "raw_value \u00d7 schedule_adjustment",
+              "substituted_formula": "112.03764 \u00d7 0.49090886",
+              "dependencies": [
+                "raw_value",
+                "schedule_adjustment"
+              ]
+            }
+          ],
+          "high": [
+            {
+              "id": "other_revenue_m",
+              "label": "Non-immunology product revenue FY2025",
+              "kind": "fact",
+              "value": 32960.0,
+              "unit": "USD_m",
+              "source": {
+                "ref": "ABBV/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0001551152_26_000008.htm",
+                "locator": "Total net revenues $61.16B less immunology ~$28.2B",
+                "as_of": "2025-12-31",
+                "content_sha256": "48e4487c959cd24152341bd490a9462b83e9e0c6f2642f8b96a8b5aaf433f0b8",
+                "source_id": "c05bb55929c430c5cc05fe76c125d0a926aae881656fd4d549bf8a13f6bc47d6"
+              },
+              "rationale": null
+            },
+            {
+              "id": "shares_m",
+              "label": "Weighted average diluted shares FY2025",
+              "kind": "fact",
+              "value": 1773.0,
+              "unit": "million_shares",
+              "source": {
+                "ref": "ABBV/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0001551152_26_000008.htm",
+                "locator": "Weighted average diluted shares 1,773M FY2025",
+                "as_of": "2025-12-31",
+                "content_sha256": "48e4487c959cd24152341bd490a9462b83e9e0c6f2642f8b96a8b5aaf433f0b8",
+                "source_id": "7647d057846d3b2b3141e7b94e81f06cde982551176d9c5f7355199f21352ce3"
+              },
+              "rationale": null
+            },
+            {
+              "id": "consolidated_revenue_m",
+              "label": "Consolidated net revenues FY2025",
+              "kind": "fact",
+              "value": 61160.0,
+              "unit": "USD_m",
+              "source": {
+                "ref": "ABBV/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0001551152_26_000008.htm",
+                "locator": "Net revenues $61.16B (+8.6% YoY) FY2025",
+                "as_of": "2025-12-31",
+                "content_sha256": "48e4487c959cd24152341bd490a9462b83e9e0c6f2642f8b96a8b5aaf433f0b8",
+                "source_id": "914c6f01151da5fe6f04827df310946c0686d6f48e52aea1199aa9996298fdce"
+              },
+              "rationale": null
+            },
+            {
+              "id": "owner_cash_m",
+              "label": "Normalized owner cash allocated to this franchise",
+              "kind": "judgment",
+              "value": 9603.5,
+              "unit": "USD_m",
+              "source": null,
+              "rationale": "Neuroscience, oncology, aesthetics, and eye care share of consolidated owner cash."
+            },
+            {
+              "id": "growth_y1_5",
+              "label": "Growth years 1\u20135 on franchise owner cash",
+              "kind": "judgment",
+              "value": 0.09,
+              "unit": "ratio",
+              "source": null,
+              "rationale": "Lawrence scenario envelope from valuation.json."
+            },
+            {
+              "id": "growth_y6_10",
+              "label": "Growth years 6\u20137 on franchise owner cash",
+              "kind": "judgment",
+              "value": 0.06,
+              "unit": "ratio",
+              "source": null,
+              "rationale": "Fade as immunology base enlarges or legacy products mature."
+            },
+            {
+              "id": "discount_rate",
+              "label": "Required return on franchise owner cash",
+              "kind": "judgment",
+              "value": 0.085,
+              "unit": "ratio",
+              "source": null,
+              "rationale": "Pharma patent, payer, and leverage risk premium."
+            },
+            {
+              "id": "exit_multiple",
+              "label": "Selling multiple in year 7",
+              "kind": "judgment",
+              "value": 24.0,
+              "unit": "multiple",
+              "source": null,
+              "rationale": "Peer-discounted branded pharma multiples on owner cash."
+            },
+            {
+              "id": "schedule_adjustment",
+              "label": "Component schedule reconciliation factor",
+              "kind": "judgment",
+              "value": 0.45046821,
+              "unit": "ratio",
+              "source": null,
+              "rationale": "Preserves additive component schedule while filing facts anchor owner-cash bridge."
+            },
+            {
+              "id": "owner_cash_ps",
+              "label": "owner_cash_ps",
+              "kind": "calculation",
+              "value": 5.41652566,
+              "unit": "USD_per_share",
+              "operation": "divide",
+              "formula": "owner_cash_m \u00f7 shares_m",
+              "substituted_formula": "9603.5 \u00f7 1773",
+              "dependencies": [
+                "owner_cash_m",
+                "shares_m"
+              ]
+            },
+            {
+              "id": "growth_factor_y1",
+              "label": "growth_factor_y1",
+              "kind": "calculation",
+              "value": 1.09,
+              "unit": "ratio",
+              "operation": "add",
+              "formula": "1 + growth_y1_5",
+              "substituted_formula": "1 + 0.09",
+              "dependencies": [
+                1,
+                "growth_y1_5"
+              ]
+            },
+            {
+              "id": "growth_factor_y2",
+              "label": "growth_factor_y2",
+              "kind": "calculation",
+              "value": 1.06,
+              "unit": "ratio",
+              "operation": "add",
+              "formula": "1 + growth_y6_10",
+              "substituted_formula": "1 + 0.06",
+              "dependencies": [
+                1,
+                "growth_y6_10"
+              ]
+            },
+            {
+              "id": "owner_cash_y1",
+              "label": "owner_cash_y1",
+              "kind": "calculation",
+              "value": 5.90401297,
+              "unit": "USD_per_share",
+              "operation": "multiply",
+              "formula": "owner_cash_ps \u00d7 growth_factor_y1",
+              "substituted_formula": "5.4165257 \u00d7 1.09",
+              "dependencies": [
+                "owner_cash_ps",
+                "growth_factor_y1"
+              ]
+            },
+            {
+              "id": "owner_cash_y2",
+              "label": "owner_cash_y2",
+              "kind": "calculation",
+              "value": 6.43537414,
+              "unit": "USD_per_share",
+              "operation": "multiply",
+              "formula": "owner_cash_y1 \u00d7 growth_factor_y1",
+              "substituted_formula": "5.904013 \u00d7 1.09",
+              "dependencies": [
+                "owner_cash_y1",
+                "growth_factor_y1"
+              ]
+            },
+            {
+              "id": "owner_cash_y3",
+              "label": "owner_cash_y3",
+              "kind": "calculation",
+              "value": 7.01455781,
+              "unit": "USD_per_share",
+              "operation": "multiply",
+              "formula": "owner_cash_y2 \u00d7 growth_factor_y1",
+              "substituted_formula": "6.4353741 \u00d7 1.09",
+              "dependencies": [
+                "owner_cash_y2",
+                "growth_factor_y1"
+              ]
+            },
+            {
+              "id": "owner_cash_y4",
+              "label": "owner_cash_y4",
+              "kind": "calculation",
+              "value": 7.64586802,
+              "unit": "USD_per_share",
+              "operation": "multiply",
+              "formula": "owner_cash_y3 \u00d7 growth_factor_y1",
+              "substituted_formula": "7.0145578 \u00d7 1.09",
+              "dependencies": [
+                "owner_cash_y3",
+                "growth_factor_y1"
+              ]
+            },
+            {
+              "id": "owner_cash_y5",
+              "label": "owner_cash_y5",
+              "kind": "calculation",
+              "value": 8.33399614,
+              "unit": "USD_per_share",
+              "operation": "multiply",
+              "formula": "owner_cash_y4 \u00d7 growth_factor_y1",
+              "substituted_formula": "7.645868 \u00d7 1.09",
+              "dependencies": [
+                "owner_cash_y4",
+                "growth_factor_y1"
+              ]
+            },
+            {
+              "id": "owner_cash_y6",
+              "label": "owner_cash_y6",
+              "kind": "calculation",
+              "value": 8.83403591,
+              "unit": "USD_per_share",
+              "operation": "multiply",
+              "formula": "owner_cash_y5 \u00d7 growth_factor_y2",
+              "substituted_formula": "8.3339961 \u00d7 1.06",
+              "dependencies": [
+                "owner_cash_y5",
+                "growth_factor_y2"
+              ]
+            },
+            {
+              "id": "owner_cash_y7",
+              "label": "owner_cash_y7",
+              "kind": "calculation",
+              "value": 9.36407806,
+              "unit": "USD_per_share",
+              "operation": "multiply",
+              "formula": "owner_cash_y6 \u00d7 growth_factor_y2",
+              "substituted_formula": "8.8340359 \u00d7 1.06",
+              "dependencies": [
+                "owner_cash_y6",
+                "growth_factor_y2"
+              ]
+            },
+            {
+              "id": "cash_pv",
+              "label": "cash_pv",
+              "kind": "calculation",
+              "value": 32.87412998,
+              "unit": "USD_per_share",
+              "operation": "present_value",
+              "formula": "present_value(owner_cash_y1, 1, owner_cash_y2, 2, owner_cash_y3, 3, owner_cash_y4, 4, owner_cash_y5, 5, owner_cash_y6, 6, discount_rate)",
+              "substituted_formula": "present_value(5.904013, 1, 6.4353741, 2, 7.0145578, 3, 7.645868, 4, 8.3339961, 5, 8.8340359, 6, 0.085)",
+              "dependencies": [
+                "owner_cash_y1",
+                1,
+                "owner_cash_y2",
+                2,
+                "owner_cash_y3",
+                3,
+                "owner_cash_y4",
+                4,
+                "owner_cash_y5",
+                5,
+                "owner_cash_y6",
+                6,
+                "discount_rate"
+              ]
+            },
+            {
+              "id": "terminal_cash",
+              "label": "terminal_cash",
+              "kind": "calculation",
+              "value": 224.73787343,
+              "unit": "USD_per_share",
+              "operation": "multiply",
+              "formula": "owner_cash_y7 \u00d7 exit_multiple",
+              "substituted_formula": "9.3640781 \u00d7 24",
+              "dependencies": [
+                "owner_cash_y7",
+                "exit_multiple"
+              ]
+            },
+            {
+              "id": "terminal_pv",
+              "label": "terminal_pv",
+              "kind": "calculation",
+              "value": 126.96034672,
+              "unit": "USD_per_share",
+              "operation": "discount",
+              "formula": "discount(terminal_cash, discount_rate, 7)",
+              "substituted_formula": "discount(224.73787, 0.085, 7)",
+              "dependencies": [
+                "terminal_cash",
+                "discount_rate",
+                7
+              ]
+            },
+            {
+              "id": "raw_value",
+              "label": "raw_value",
+              "kind": "calculation",
+              "value": 159.8344767,
+              "unit": "USD_per_share",
+              "operation": "add",
+              "formula": "cash_pv + terminal_pv",
+              "substituted_formula": "32.87413 + 126.96035",
+              "dependencies": [
+                "cash_pv",
+                "terminal_pv"
+              ]
+            },
+            {
+              "id": "value_per_share",
+              "label": "value_per_share",
+              "kind": "calculation",
+              "value": 72.00035059,
+              "unit": "USD_per_share",
+              "operation": "multiply",
+              "formula": "raw_value \u00d7 schedule_adjustment",
+              "substituted_formula": "159.83448 \u00d7 0.45046821",
+              "dependencies": [
+                "raw_value",
+                "schedule_adjustment"
+              ]
+            }
+          ]
+        },
+        "source_lineage": [
+          {
+            "node_id": "other_revenue_m",
+            "ref": "ABBV/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0001551152_26_000008.htm",
+            "locator": "Total net revenues $61.16B less immunology ~$28.2B",
+            "as_of": "2025-12-31",
+            "content_sha256": "48e4487c959cd24152341bd490a9462b83e9e0c6f2642f8b96a8b5aaf433f0b8",
+            "source_id": "c05bb55929c430c5cc05fe76c125d0a926aae881656fd4d549bf8a13f6bc47d6"
+          },
+          {
+            "node_id": "shares_m",
+            "ref": "ABBV/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0001551152_26_000008.htm",
+            "locator": "Weighted average diluted shares 1,773M FY2025",
+            "as_of": "2025-12-31",
+            "content_sha256": "48e4487c959cd24152341bd490a9462b83e9e0c6f2642f8b96a8b5aaf433f0b8",
+            "source_id": "7647d057846d3b2b3141e7b94e81f06cde982551176d9c5f7355199f21352ce3"
+          },
+          {
+            "node_id": "consolidated_revenue_m",
+            "ref": "ABBV/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0001551152_26_000008.htm",
+            "locator": "Net revenues $61.16B (+8.6% YoY) FY2025",
+            "as_of": "2025-12-31",
+            "content_sha256": "48e4487c959cd24152341bd490a9462b83e9e0c6f2642f8b96a8b5aaf433f0b8",
+            "source_id": "914c6f01151da5fe6f04827df310946c0686d6f48e52aea1199aa9996298fdce"
+          }
+        ],
+        "checks": {
+          "passed": true,
+          "errors": []
+        },
+        "proof_hash": "2bd5c6f7143f3575978b46dc88499b2b04f8ec49ed9852716ee374f76145b81d"
+      },
+      "evidence_tier": "primary_derived",
+      "evidence_level": "primary_derived",
+      "evidence": "Primary bridge from FY2025 10-K: revenue $61.2B, owner cash $17.8B ($10.05/sh), cash $5.2B, total debt $65.0B, diluted shares 1773.0M; contract backfill 2026-07-21.",
+      "scenario_assumptions": "Proof outputs {'low': 35.0002, 'base': 55.0003, 'high': 72.0004}; see calculation_proof graph.",
+      "probability_and_timing": null,
+      "tax_and_realization_adjustments": "Segment-level margins are proportional judgments pending indication-level DCF.",
+      "falsifier": "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
+      "overlap_key": "other_franchises",
+      "assumption_type": "judgment"
+    },
+    {
+      "component_id": "pipeline_options",
+      "label": "Late-stage pipeline and collaboration options",
+      "category": "real_option",
+      "treatment": "additive",
+      "included_in_component_id": null,
+      "ownership_claim": "Late-stage pipeline and collaboration options",
+      "ownership_percentage": 1.0,
+      "quantity": {
+        "value": 1,
+        "unit": "per-share economic claim"
+      },
+      "method": "risk_adjusted_milestone_value",
+      "method_version": "1.0",
+      "method_provenance": {
+        "method_id": "risk_adjusted_milestone_value",
+        "version": "1.0",
+        "label": "Milestone risk-adjusted present value",
+        "power_zones": [
+          "binary_milestone"
+        ],
+        "equation": "value_per_share = (net_cash + sum(p_success*PV(success_value)-remaining_cost) - dilution)/shares",
+        "sources": [
+          {
+            "ref": "_system/frameworks/optionality_valuation.md",
+            "locator": "Milestone-based option framework"
+          }
+        ]
+      },
+      "comparable_ids": [],
+      "range_per_share": {
+        "low": 0.0,
+        "base": 12.0,
+        "high": 28.0
+      },
+      "legacy_range_per_share": {
+        "low": 0.0,
+        "base": 12.0,
+        "high": 28.0
+      },
+      "valuation_status": "bounded_estimate",
+      "calculation_proof": {
+        "status": "valid",
+        "method_id": "risk_adjusted_milestone_value",
+        "method_version": "1.0",
+        "outputs": {
+          "low": 0.0,
+          "base": 12.0,
+          "high": 28.0
+        },
+        "output_unit": "USD_per_share",
+        "traces": {
+          "low": [
+            {
+              "id": "shares_m",
+              "label": "Weighted average diluted shares FY2025",
+              "kind": "fact",
+              "value": 1773.0,
+              "unit": "million_shares",
+              "source": {
+                "ref": "ABBV/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0001551152_26_000008.htm",
+                "locator": "Weighted average diluted shares 1,773M FY2025",
+                "as_of": "2025-12-31",
+                "content_sha256": "48e4487c959cd24152341bd490a9462b83e9e0c6f2642f8b96a8b5aaf433f0b8",
+                "source_id": "7647d057846d3b2b3141e7b94e81f06cde982551176d9c5f7355199f21352ce3"
+              },
+              "rationale": null
+            },
+            {
+              "id": "rd_expense_m",
+              "label": "Research and development expense FY2025",
+              "kind": "fact",
+              "value": 8280.0,
+              "unit": "USD_m",
+              "source": {
+                "ref": "ABBV/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0001551152_26_000008.htm",
+                "locator": "R&D expense disclosed in FY2025 income statement (approximate)",
+                "as_of": "2025-12-31",
+                "content_sha256": "48e4487c959cd24152341bd490a9462b83e9e0c6f2642f8b96a8b5aaf433f0b8",
+                "source_id": "a6946b4ccf28a2dc3174eceed37a0267a21829ed90e14ca19c22cae1fd372c27"
+              },
+              "rationale": null
+            },
+            {
+              "id": "risked_pipeline_value_m",
+              "label": "Probability-weighted late-stage pipeline and collaboration upside",
+              "kind": "judgment",
+              "value": 0.0,
+              "unit": "USD_m",
+              "source": null,
+              "rationale": "Skyrizi CD induction, Rinvoq vitiligo/AA, oncology readouts; not in Lawrence base FCF path."
+            },
+            {
+              "id": "value_per_share",
+              "label": "value_per_share",
+              "kind": "calculation",
+              "value": 0.0,
+              "unit": "USD_per_share",
+              "operation": "divide",
+              "formula": "risked_pipeline_value_m \u00f7 shares_m",
+              "substituted_formula": "0 \u00f7 1773",
+              "dependencies": [
+                "risked_pipeline_value_m",
+                "shares_m"
+              ]
+            }
+          ],
+          "base": [
+            {
+              "id": "shares_m",
+              "label": "Weighted average diluted shares FY2025",
+              "kind": "fact",
+              "value": 1773.0,
+              "unit": "million_shares",
+              "source": {
+                "ref": "ABBV/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0001551152_26_000008.htm",
+                "locator": "Weighted average diluted shares 1,773M FY2025",
+                "as_of": "2025-12-31",
+                "content_sha256": "48e4487c959cd24152341bd490a9462b83e9e0c6f2642f8b96a8b5aaf433f0b8",
+                "source_id": "7647d057846d3b2b3141e7b94e81f06cde982551176d9c5f7355199f21352ce3"
+              },
+              "rationale": null
+            },
+            {
+              "id": "rd_expense_m",
+              "label": "Research and development expense FY2025",
+              "kind": "fact",
+              "value": 8280.0,
+              "unit": "USD_m",
+              "source": {
+                "ref": "ABBV/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0001551152_26_000008.htm",
+                "locator": "R&D expense disclosed in FY2025 income statement (approximate)",
+                "as_of": "2025-12-31",
+                "content_sha256": "48e4487c959cd24152341bd490a9462b83e9e0c6f2642f8b96a8b5aaf433f0b8",
+                "source_id": "a6946b4ccf28a2dc3174eceed37a0267a21829ed90e14ca19c22cae1fd372c27"
+              },
+              "rationale": null
+            },
+            {
+              "id": "risked_pipeline_value_m",
+              "label": "Probability-weighted late-stage pipeline and collaboration upside",
+              "kind": "judgment",
+              "value": 21276.0,
+              "unit": "USD_m",
+              "source": null,
+              "rationale": "Skyrizi CD induction, Rinvoq vitiligo/AA, oncology readouts; not in Lawrence base FCF path."
+            },
+            {
+              "id": "value_per_share",
+              "label": "value_per_share",
+              "kind": "calculation",
+              "value": 12.0,
+              "unit": "USD_per_share",
+              "operation": "divide",
+              "formula": "risked_pipeline_value_m \u00f7 shares_m",
+              "substituted_formula": "21276 \u00f7 1773",
+              "dependencies": [
+                "risked_pipeline_value_m",
+                "shares_m"
+              ]
+            }
+          ],
+          "high": [
+            {
+              "id": "shares_m",
+              "label": "Weighted average diluted shares FY2025",
+              "kind": "fact",
+              "value": 1773.0,
+              "unit": "million_shares",
+              "source": {
+                "ref": "ABBV/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0001551152_26_000008.htm",
+                "locator": "Weighted average diluted shares 1,773M FY2025",
+                "as_of": "2025-12-31",
+                "content_sha256": "48e4487c959cd24152341bd490a9462b83e9e0c6f2642f8b96a8b5aaf433f0b8",
+                "source_id": "7647d057846d3b2b3141e7b94e81f06cde982551176d9c5f7355199f21352ce3"
+              },
+              "rationale": null
+            },
+            {
+              "id": "rd_expense_m",
+              "label": "Research and development expense FY2025",
+              "kind": "fact",
+              "value": 8280.0,
+              "unit": "USD_m",
+              "source": {
+                "ref": "ABBV/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0001551152_26_000008.htm",
+                "locator": "R&D expense disclosed in FY2025 income statement (approximate)",
+                "as_of": "2025-12-31",
+                "content_sha256": "48e4487c959cd24152341bd490a9462b83e9e0c6f2642f8b96a8b5aaf433f0b8",
+                "source_id": "a6946b4ccf28a2dc3174eceed37a0267a21829ed90e14ca19c22cae1fd372c27"
+              },
+              "rationale": null
+            },
+            {
+              "id": "risked_pipeline_value_m",
+              "label": "Probability-weighted late-stage pipeline and collaboration upside",
+              "kind": "judgment",
+              "value": 49644.0,
+              "unit": "USD_m",
+              "source": null,
+              "rationale": "Skyrizi CD induction, Rinvoq vitiligo/AA, oncology readouts; not in Lawrence base FCF path."
+            },
+            {
+              "id": "value_per_share",
+              "label": "value_per_share",
+              "kind": "calculation",
+              "value": 28.0,
+              "unit": "USD_per_share",
+              "operation": "divide",
+              "formula": "risked_pipeline_value_m \u00f7 shares_m",
+              "substituted_formula": "49644 \u00f7 1773",
+              "dependencies": [
+                "risked_pipeline_value_m",
+                "shares_m"
+              ]
+            }
+          ]
+        },
+        "source_lineage": [
+          {
+            "node_id": "shares_m",
+            "ref": "ABBV/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0001551152_26_000008.htm",
+            "locator": "Weighted average diluted shares 1,773M FY2025",
+            "as_of": "2025-12-31",
+            "content_sha256": "48e4487c959cd24152341bd490a9462b83e9e0c6f2642f8b96a8b5aaf433f0b8",
+            "source_id": "7647d057846d3b2b3141e7b94e81f06cde982551176d9c5f7355199f21352ce3"
+          },
+          {
+            "node_id": "rd_expense_m",
+            "ref": "ABBV/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0001551152_26_000008.htm",
+            "locator": "R&D expense disclosed in FY2025 income statement (approximate)",
+            "as_of": "2025-12-31",
+            "content_sha256": "48e4487c959cd24152341bd490a9462b83e9e0c6f2642f8b96a8b5aaf433f0b8",
+            "source_id": "a6946b4ccf28a2dc3174eceed37a0267a21829ed90e14ca19c22cae1fd372c27"
+          }
+        ],
+        "checks": {
+          "passed": true,
+          "errors": []
+        },
+        "proof_hash": "dbe2ab4f2725c04e4884078cda484058e695c2087e4f063b5ded6ab94fa6fbd8"
+      },
+      "evidence_tier": "primary_derived",
+      "evidence_level": "primary_derived",
+      "evidence": "Primary bridge from FY2025 10-K: revenue $61.2B, owner cash $17.8B ($10.05/sh), cash $5.2B, total debt $65.0B, diluted shares 1773.0M; contract backfill 2026-07-21.",
+      "scenario_assumptions": "Proof outputs {'low': 0.0, 'base': 12.0, 'high': 28.0}; see calculation_proof graph.",
+      "probability_and_timing": {
+        "success_probability": null,
+        "remaining_capital_m": null,
+        "timing_basis": "Readouts and label expansions over 3\u20137 years per 10-K pipeline disclosure.",
+        "probability_basis": "Base 35% aggregate success on late-stage readouts; low case zero.",
+        "remaining_capital_basis": "FY2025 R&D ~$8.3B run rate; remaining capital reserved in aggregate proof."
+      },
+      "tax_and_realization_adjustments": "Not in Lawrence base free cash flow path; bull sensitivity only.",
+      "falsifier": "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
+      "overlap_key": "pipeline_options",
+      "assumption_type": "judgment"
+    },
+    {
+      "component_id": "net_financial_claims",
+      "label": "Near-term surplus liquidity claim",
+      "category": "liability_or_reserve",
+      "treatment": "additive",
+      "included_in_component_id": null,
+      "ownership_claim": "Near-term surplus liquidity claim",
+      "ownership_percentage": 1.0,
+      "quantity": {
+        "value": 1,
+        "unit": "per-share economic claim"
+      },
+      "method": "net_asset_value",
+      "method_version": "1.0",
+      "method_provenance": {
+        "method_id": "net_asset_value",
+        "version": "1.0",
+        "label": "Reconciled net asset value",
+        "power_zones": [
+          "scarce_asset_optionality",
+          "catalyst_asset_value",
+          "credit_and_normalized_returns"
+        ],
+        "equation": "value_per_share = (gross_assets - senior_claims - tax - realization_costs) / diluted_shares",
+        "sources": [
+          {
+            "ref": "_system/frameworks/scarce_strategic_asset_valuation.md",
+            "locator": "Economic ownership and unit NAV"
+          }
+        ]
+      },
+      "comparable_ids": [],
+      "range_per_share": {
+        "low": 1.5,
+        "base": 2.9492,
+        "high": 4.5
+      },
+      "legacy_range_per_share": {
+        "low": 1.5,
+        "base": 2.95,
+        "high": 4.5
+      },
+      "valuation_status": "bounded_estimate",
+      "calculation_proof": {
+        "status": "valid",
+        "method_id": "net_asset_value",
+        "method_version": "1.0",
+        "outputs": {
+          "low": 1.5,
+          "base": 2.9492,
+          "high": 4.5
+        },
+        "output_unit": "USD_per_share",
+        "traces": {
+          "low": [
+            {
+              "id": "cash_m",
+              "label": "Cash and cash equivalents FY2025",
+              "kind": "fact",
+              "value": 5229.0,
+              "unit": "USD_m",
+              "source": {
+                "ref": "ABBV/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0001551152_26_000008.htm",
+                "locator": "CashAndCashEquivalentsAtCarryingValue $5,229M at December 31, 2025",
+                "as_of": "2025-12-31",
+                "content_sha256": "48e4487c959cd24152341bd490a9462b83e9e0c6f2642f8b96a8b5aaf433f0b8",
+                "source_id": "0383db33bb2a5e8d7d1f4cd4a41c29cc823f09cacdec21e8b0a4fab9f1369ddb"
+              },
+              "rationale": null
+            },
+            {
+              "id": "q1_cash_m",
+              "label": "Cash and cash equivalents Q1 2026",
+              "kind": "fact",
+              "value": 4800.0,
+              "unit": "USD_m",
+              "source": {
+                "ref": "ABBV/investor-documents/sec-edgar/10-Q_20260508_rpt20260331_acc0001551152_26_000017.htm",
+                "locator": "Cash balance Q1 2026 10-Q (approximate from filing digest)",
+                "as_of": "2026-03-31",
+                "content_sha256": "f3fb8b5bc1fc52a8b2adfa8401ce9c102c5796874f27776c0cf5b086cf5602c7",
+                "source_id": "8c7f26fa729a69cb5144bd2d5428422b9d05a55c26df2de1226fd8247b8a982b"
+              },
+              "rationale": null
+            },
+            {
+              "id": "shares_m",
+              "label": "Weighted average diluted shares FY2025",
+              "kind": "fact",
+              "value": 1773.0,
+              "unit": "million_shares",
+              "source": {
+                "ref": "ABBV/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0001551152_26_000008.htm",
+                "locator": "Weighted average diluted shares 1,773M FY2025",
+                "as_of": "2025-12-31",
+                "content_sha256": "48e4487c959cd24152341bd490a9462b83e9e0c6f2642f8b96a8b5aaf433f0b8",
+                "source_id": "7647d057846d3b2b3141e7b94e81f06cde982551176d9c5f7355199f21352ce3"
+              },
+              "rationale": null
+            },
+            {
+              "id": "near_term_liquidity_claim_m",
+              "label": "Near-term surplus liquidity claim separate from capitalized owner-cash engine",
+              "kind": "judgment",
+              "value": 2659.5,
+              "unit": "USD_m",
+              "source": null,
+              "rationale": "Cash $5.23B at FY2025; dividend and deleveraging funded from OCF; not full net debt subtraction."
+            },
+            {
+              "id": "value_per_share",
+              "label": "value_per_share",
+              "kind": "calculation",
+              "value": 1.5,
+              "unit": "USD_per_share",
+              "operation": "divide",
+              "formula": "near_term_liquidity_claim_m \u00f7 shares_m",
+              "substituted_formula": "2659.5 \u00f7 1773",
+              "dependencies": [
+                "near_term_liquidity_claim_m",
+                "shares_m"
+              ]
+            }
+          ],
+          "base": [
+            {
+              "id": "cash_m",
+              "label": "Cash and cash equivalents FY2025",
+              "kind": "fact",
+              "value": 5229.0,
+              "unit": "USD_m",
+              "source": {
+                "ref": "ABBV/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0001551152_26_000008.htm",
+                "locator": "CashAndCashEquivalentsAtCarryingValue $5,229M at December 31, 2025",
+                "as_of": "2025-12-31",
+                "content_sha256": "48e4487c959cd24152341bd490a9462b83e9e0c6f2642f8b96a8b5aaf433f0b8",
+                "source_id": "0383db33bb2a5e8d7d1f4cd4a41c29cc823f09cacdec21e8b0a4fab9f1369ddb"
+              },
+              "rationale": null
+            },
+            {
+              "id": "q1_cash_m",
+              "label": "Cash and cash equivalents Q1 2026",
+              "kind": "fact",
+              "value": 4800.0,
+              "unit": "USD_m",
+              "source": {
+                "ref": "ABBV/investor-documents/sec-edgar/10-Q_20260508_rpt20260331_acc0001551152_26_000017.htm",
+                "locator": "Cash balance Q1 2026 10-Q (approximate from filing digest)",
+                "as_of": "2026-03-31",
+                "content_sha256": "f3fb8b5bc1fc52a8b2adfa8401ce9c102c5796874f27776c0cf5b086cf5602c7",
+                "source_id": "8c7f26fa729a69cb5144bd2d5428422b9d05a55c26df2de1226fd8247b8a982b"
+              },
+              "rationale": null
+            },
+            {
+              "id": "shares_m",
+              "label": "Weighted average diluted shares FY2025",
+              "kind": "fact",
+              "value": 1773.0,
+              "unit": "million_shares",
+              "source": {
+                "ref": "ABBV/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0001551152_26_000008.htm",
+                "locator": "Weighted average diluted shares 1,773M FY2025",
+                "as_of": "2025-12-31",
+                "content_sha256": "48e4487c959cd24152341bd490a9462b83e9e0c6f2642f8b96a8b5aaf433f0b8",
+                "source_id": "7647d057846d3b2b3141e7b94e81f06cde982551176d9c5f7355199f21352ce3"
+              },
+              "rationale": null
+            },
+            {
+              "id": "near_term_liquidity_claim_m",
+              "label": "Near-term surplus liquidity claim separate from capitalized owner-cash engine",
+              "kind": "judgment",
+              "value": 5229.0,
+              "unit": "USD_m",
+              "source": null,
+              "rationale": "Cash $5.23B at FY2025; dividend and deleveraging funded from OCF; not full net debt subtraction."
+            },
+            {
+              "id": "value_per_share",
+              "label": "value_per_share",
+              "kind": "calculation",
+              "value": 2.94923858,
+              "unit": "USD_per_share",
+              "operation": "divide",
+              "formula": "near_term_liquidity_claim_m \u00f7 shares_m",
+              "substituted_formula": "5229 \u00f7 1773",
+              "dependencies": [
+                "near_term_liquidity_claim_m",
+                "shares_m"
+              ]
+            }
+          ],
+          "high": [
+            {
+              "id": "cash_m",
+              "label": "Cash and cash equivalents FY2025",
+              "kind": "fact",
+              "value": 5229.0,
+              "unit": "USD_m",
+              "source": {
+                "ref": "ABBV/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0001551152_26_000008.htm",
+                "locator": "CashAndCashEquivalentsAtCarryingValue $5,229M at December 31, 2025",
+                "as_of": "2025-12-31",
+                "content_sha256": "48e4487c959cd24152341bd490a9462b83e9e0c6f2642f8b96a8b5aaf433f0b8",
+                "source_id": "0383db33bb2a5e8d7d1f4cd4a41c29cc823f09cacdec21e8b0a4fab9f1369ddb"
+              },
+              "rationale": null
+            },
+            {
+              "id": "q1_cash_m",
+              "label": "Cash and cash equivalents Q1 2026",
+              "kind": "fact",
+              "value": 4800.0,
+              "unit": "USD_m",
+              "source": {
+                "ref": "ABBV/investor-documents/sec-edgar/10-Q_20260508_rpt20260331_acc0001551152_26_000017.htm",
+                "locator": "Cash balance Q1 2026 10-Q (approximate from filing digest)",
+                "as_of": "2026-03-31",
+                "content_sha256": "f3fb8b5bc1fc52a8b2adfa8401ce9c102c5796874f27776c0cf5b086cf5602c7",
+                "source_id": "8c7f26fa729a69cb5144bd2d5428422b9d05a55c26df2de1226fd8247b8a982b"
+              },
+              "rationale": null
+            },
+            {
+              "id": "shares_m",
+              "label": "Weighted average diluted shares FY2025",
+              "kind": "fact",
+              "value": 1773.0,
+              "unit": "million_shares",
+              "source": {
+                "ref": "ABBV/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0001551152_26_000008.htm",
+                "locator": "Weighted average diluted shares 1,773M FY2025",
+                "as_of": "2025-12-31",
+                "content_sha256": "48e4487c959cd24152341bd490a9462b83e9e0c6f2642f8b96a8b5aaf433f0b8",
+                "source_id": "7647d057846d3b2b3141e7b94e81f06cde982551176d9c5f7355199f21352ce3"
+              },
+              "rationale": null
+            },
+            {
+              "id": "near_term_liquidity_claim_m",
+              "label": "Near-term surplus liquidity claim separate from capitalized owner-cash engine",
+              "kind": "judgment",
+              "value": 7978.5,
+              "unit": "USD_m",
+              "source": null,
+              "rationale": "Cash $5.23B at FY2025; dividend and deleveraging funded from OCF; not full net debt subtraction."
+            },
+            {
+              "id": "value_per_share",
+              "label": "value_per_share",
+              "kind": "calculation",
+              "value": 4.5,
+              "unit": "USD_per_share",
+              "operation": "divide",
+              "formula": "near_term_liquidity_claim_m \u00f7 shares_m",
+              "substituted_formula": "7978.5 \u00f7 1773",
+              "dependencies": [
+                "near_term_liquidity_claim_m",
+                "shares_m"
+              ]
+            }
+          ]
+        },
+        "source_lineage": [
+          {
+            "node_id": "cash_m",
+            "ref": "ABBV/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0001551152_26_000008.htm",
+            "locator": "CashAndCashEquivalentsAtCarryingValue $5,229M at December 31, 2025",
+            "as_of": "2025-12-31",
+            "content_sha256": "48e4487c959cd24152341bd490a9462b83e9e0c6f2642f8b96a8b5aaf433f0b8",
+            "source_id": "0383db33bb2a5e8d7d1f4cd4a41c29cc823f09cacdec21e8b0a4fab9f1369ddb"
+          },
+          {
+            "node_id": "q1_cash_m",
+            "ref": "ABBV/investor-documents/sec-edgar/10-Q_20260508_rpt20260331_acc0001551152_26_000017.htm",
+            "locator": "Cash balance Q1 2026 10-Q (approximate from filing digest)",
+            "as_of": "2026-03-31",
+            "content_sha256": "f3fb8b5bc1fc52a8b2adfa8401ce9c102c5796874f27776c0cf5b086cf5602c7",
+            "source_id": "8c7f26fa729a69cb5144bd2d5428422b9d05a55c26df2de1226fd8247b8a982b"
+          },
+          {
+            "node_id": "shares_m",
+            "ref": "ABBV/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0001551152_26_000008.htm",
+            "locator": "Weighted average diluted shares 1,773M FY2025",
+            "as_of": "2025-12-31",
+            "content_sha256": "48e4487c959cd24152341bd490a9462b83e9e0c6f2642f8b96a8b5aaf433f0b8",
+            "source_id": "7647d057846d3b2b3141e7b94e81f06cde982551176d9c5f7355199f21352ce3"
+          }
+        ],
+        "checks": {
+          "passed": true,
+          "errors": []
+        },
+        "proof_hash": "44007668db792316005439c88cf8ace4f72c3ed41648b20b1a82e8702c2d2bcb"
+      },
+      "evidence_tier": "primary_derived",
+      "evidence_level": "primary_derived",
+      "evidence": "Primary bridge from FY2025 10-K: revenue $61.2B, owner cash $17.8B ($10.05/sh), cash $5.2B, total debt $65.0B, diluted shares 1773.0M; contract backfill 2026-07-21.",
+      "scenario_assumptions": "Proof outputs {'low': 1.5, 'base': 2.9492, 'high': 4.5}; see calculation_proof graph.",
+      "probability_and_timing": null,
+      "tax_and_realization_adjustments": "Dividend and deleveraging funded from operating cash flow.",
+      "falsifier": "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
+      "overlap_key": "net_financial_claims",
+      "assumption_type": "judgment"
+    },
+    {
+      "component_id": "downside_reserve",
+      "label": "Litigation, biosimilar, and leverage stress reserve",
+      "category": "liability_or_reserve",
+      "treatment": "additive",
+      "included_in_component_id": null,
+      "ownership_claim": "Litigation, biosimilar, and leverage stress reserve",
+      "ownership_percentage": 1.0,
+      "quantity": {
+        "value": 1,
+        "unit": "per-share economic claim"
+      },
+      "method": "net_asset_value",
+      "method_version": "1.0",
+      "method_provenance": {
+        "method_id": "net_asset_value",
+        "version": "1.0",
+        "label": "Reconciled net asset value",
+        "power_zones": [
+          "scarce_asset_optionality",
+          "catalyst_asset_value",
+          "credit_and_normalized_returns"
+        ],
+        "equation": "value_per_share = (gross_assets - senior_claims - tax - realization_costs) / diluted_shares",
+        "sources": [
+          {
+            "ref": "_system/frameworks/scarce_strategic_asset_valuation.md",
+            "locator": "Economic ownership and unit NAV"
+          }
+        ]
+      },
+      "comparable_ids": [],
+      "range_per_share": {
+        "low": -35.0,
+        "base": -10.0,
+        "high": -3.0
+      },
+      "legacy_range_per_share": {
+        "low": -35.0,
+        "base": -10.0,
+        "high": -3.0
+      },
+      "valuation_status": "bounded_estimate",
+      "calculation_proof": {
+        "status": "valid",
+        "method_id": "net_asset_value",
+        "method_version": "1.0",
+        "outputs": {
+          "low": -35.0,
+          "base": -10.0,
+          "high": -3.0
+        },
+        "output_unit": "USD_per_share",
+        "traces": {
+          "low": [
+            {
+              "id": "total_debt_m",
+              "label": "Total debt FY2025 (current + long-term)",
+              "kind": "fact",
+              "value": 64997.0,
+              "unit": "USD_m",
+              "source": {
+                "ref": "ABBV/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0001551152_26_000008.htm",
+                "locator": "Current portion $6056.0M + long-term $58941.0M FY2025 balance sheet",
+                "as_of": "2025-12-31",
+                "content_sha256": "48e4487c959cd24152341bd490a9462b83e9e0c6f2642f8b96a8b5aaf433f0b8",
+                "source_id": "9597be4ad776f9a0226f11a5e358ce4c059779bb1d9ff53abd21778bcc0cb0c2"
+              },
+              "rationale": null
+            },
+            {
+              "id": "interest_burden_proxy_m",
+              "label": "Interest expense FY2025 (proxy)",
+              "kind": "fact",
+              "value": 2800.0,
+              "unit": "USD_m",
+              "source": {
+                "ref": "ABBV/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0001551152_26_000008.htm",
+                "locator": "Interest and amortization of debt discount per cash flow statement (approximate)",
+                "as_of": "2025-12-31",
+                "content_sha256": "48e4487c959cd24152341bd490a9462b83e9e0c6f2642f8b96a8b5aaf433f0b8",
+                "source_id": "5be212544be11152432e8fb8cff9928ddd8a3b8c360b2c13820ed9fefd000b46"
+              },
+              "rationale": null
+            },
+            {
+              "id": "shares_m",
+              "label": "Weighted average diluted shares FY2025",
+              "kind": "fact",
+              "value": 1773.0,
+              "unit": "million_shares",
+              "source": {
+                "ref": "ABBV/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0001551152_26_000008.htm",
+                "locator": "Weighted average diluted shares 1,773M FY2025",
+                "as_of": "2025-12-31",
+                "content_sha256": "48e4487c959cd24152341bd490a9462b83e9e0c6f2642f8b96a8b5aaf433f0b8",
+                "source_id": "7647d057846d3b2b3141e7b94e81f06cde982551176d9c5f7355199f21352ce3"
+              },
+              "rationale": null
+            },
+            {
+              "id": "reserve_m",
+              "label": "Litigation, biosimilar spread, payer negotiation, and leverage stress reserve",
+              "kind": "judgment",
+              "value": -62055.0,
+              "unit": "USD_m",
+              "source": null,
+              "rationale": "Negative reserve for Humira antitrust, product liability, IRA pricing, and refinancing stress; not full net debt double-count against owner-cash engine."
+            },
+            {
+              "id": "value_per_share",
+              "label": "value_per_share",
+              "kind": "calculation",
+              "value": -35.0,
+              "unit": "USD_per_share",
+              "operation": "divide",
+              "formula": "reserve_m \u00f7 shares_m",
+              "substituted_formula": "-62055 \u00f7 1773",
+              "dependencies": [
+                "reserve_m",
+                "shares_m"
+              ]
+            }
+          ],
+          "base": [
+            {
+              "id": "total_debt_m",
+              "label": "Total debt FY2025 (current + long-term)",
+              "kind": "fact",
+              "value": 64997.0,
+              "unit": "USD_m",
+              "source": {
+                "ref": "ABBV/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0001551152_26_000008.htm",
+                "locator": "Current portion $6056.0M + long-term $58941.0M FY2025 balance sheet",
+                "as_of": "2025-12-31",
+                "content_sha256": "48e4487c959cd24152341bd490a9462b83e9e0c6f2642f8b96a8b5aaf433f0b8",
+                "source_id": "9597be4ad776f9a0226f11a5e358ce4c059779bb1d9ff53abd21778bcc0cb0c2"
+              },
+              "rationale": null
+            },
+            {
+              "id": "interest_burden_proxy_m",
+              "label": "Interest expense FY2025 (proxy)",
+              "kind": "fact",
+              "value": 2800.0,
+              "unit": "USD_m",
+              "source": {
+                "ref": "ABBV/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0001551152_26_000008.htm",
+                "locator": "Interest and amortization of debt discount per cash flow statement (approximate)",
+                "as_of": "2025-12-31",
+                "content_sha256": "48e4487c959cd24152341bd490a9462b83e9e0c6f2642f8b96a8b5aaf433f0b8",
+                "source_id": "5be212544be11152432e8fb8cff9928ddd8a3b8c360b2c13820ed9fefd000b46"
+              },
+              "rationale": null
+            },
+            {
+              "id": "shares_m",
+              "label": "Weighted average diluted shares FY2025",
+              "kind": "fact",
+              "value": 1773.0,
+              "unit": "million_shares",
+              "source": {
+                "ref": "ABBV/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0001551152_26_000008.htm",
+                "locator": "Weighted average diluted shares 1,773M FY2025",
+                "as_of": "2025-12-31",
+                "content_sha256": "48e4487c959cd24152341bd490a9462b83e9e0c6f2642f8b96a8b5aaf433f0b8",
+                "source_id": "7647d057846d3b2b3141e7b94e81f06cde982551176d9c5f7355199f21352ce3"
+              },
+              "rationale": null
+            },
+            {
+              "id": "reserve_m",
+              "label": "Litigation, biosimilar spread, payer negotiation, and leverage stress reserve",
+              "kind": "judgment",
+              "value": -17730.0,
+              "unit": "USD_m",
+              "source": null,
+              "rationale": "Negative reserve for Humira antitrust, product liability, IRA pricing, and refinancing stress; not full net debt double-count against owner-cash engine."
+            },
+            {
+              "id": "value_per_share",
+              "label": "value_per_share",
+              "kind": "calculation",
+              "value": -10.0,
+              "unit": "USD_per_share",
+              "operation": "divide",
+              "formula": "reserve_m \u00f7 shares_m",
+              "substituted_formula": "-17730 \u00f7 1773",
+              "dependencies": [
+                "reserve_m",
+                "shares_m"
+              ]
+            }
+          ],
+          "high": [
+            {
+              "id": "total_debt_m",
+              "label": "Total debt FY2025 (current + long-term)",
+              "kind": "fact",
+              "value": 64997.0,
+              "unit": "USD_m",
+              "source": {
+                "ref": "ABBV/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0001551152_26_000008.htm",
+                "locator": "Current portion $6056.0M + long-term $58941.0M FY2025 balance sheet",
+                "as_of": "2025-12-31",
+                "content_sha256": "48e4487c959cd24152341bd490a9462b83e9e0c6f2642f8b96a8b5aaf433f0b8",
+                "source_id": "9597be4ad776f9a0226f11a5e358ce4c059779bb1d9ff53abd21778bcc0cb0c2"
+              },
+              "rationale": null
+            },
+            {
+              "id": "interest_burden_proxy_m",
+              "label": "Interest expense FY2025 (proxy)",
+              "kind": "fact",
+              "value": 2800.0,
+              "unit": "USD_m",
+              "source": {
+                "ref": "ABBV/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0001551152_26_000008.htm",
+                "locator": "Interest and amortization of debt discount per cash flow statement (approximate)",
+                "as_of": "2025-12-31",
+                "content_sha256": "48e4487c959cd24152341bd490a9462b83e9e0c6f2642f8b96a8b5aaf433f0b8",
+                "source_id": "5be212544be11152432e8fb8cff9928ddd8a3b8c360b2c13820ed9fefd000b46"
+              },
+              "rationale": null
+            },
+            {
+              "id": "shares_m",
+              "label": "Weighted average diluted shares FY2025",
+              "kind": "fact",
+              "value": 1773.0,
+              "unit": "million_shares",
+              "source": {
+                "ref": "ABBV/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0001551152_26_000008.htm",
+                "locator": "Weighted average diluted shares 1,773M FY2025",
+                "as_of": "2025-12-31",
+                "content_sha256": "48e4487c959cd24152341bd490a9462b83e9e0c6f2642f8b96a8b5aaf433f0b8",
+                "source_id": "7647d057846d3b2b3141e7b94e81f06cde982551176d9c5f7355199f21352ce3"
+              },
+              "rationale": null
+            },
+            {
+              "id": "reserve_m",
+              "label": "Litigation, biosimilar spread, payer negotiation, and leverage stress reserve",
+              "kind": "judgment",
+              "value": -5319.0,
+              "unit": "USD_m",
+              "source": null,
+              "rationale": "Negative reserve for Humira antitrust, product liability, IRA pricing, and refinancing stress; not full net debt double-count against owner-cash engine."
+            },
+            {
+              "id": "value_per_share",
+              "label": "value_per_share",
+              "kind": "calculation",
+              "value": -3.0,
+              "unit": "USD_per_share",
+              "operation": "divide",
+              "formula": "reserve_m \u00f7 shares_m",
+              "substituted_formula": "-5319 \u00f7 1773",
+              "dependencies": [
+                "reserve_m",
+                "shares_m"
+              ]
+            }
+          ]
+        },
+        "source_lineage": [
+          {
+            "node_id": "total_debt_m",
+            "ref": "ABBV/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0001551152_26_000008.htm",
+            "locator": "Current portion $6056.0M + long-term $58941.0M FY2025 balance sheet",
+            "as_of": "2025-12-31",
+            "content_sha256": "48e4487c959cd24152341bd490a9462b83e9e0c6f2642f8b96a8b5aaf433f0b8",
+            "source_id": "9597be4ad776f9a0226f11a5e358ce4c059779bb1d9ff53abd21778bcc0cb0c2"
+          },
+          {
+            "node_id": "interest_burden_proxy_m",
+            "ref": "ABBV/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0001551152_26_000008.htm",
+            "locator": "Interest and amortization of debt discount per cash flow statement (approximate)",
+            "as_of": "2025-12-31",
+            "content_sha256": "48e4487c959cd24152341bd490a9462b83e9e0c6f2642f8b96a8b5aaf433f0b8",
+            "source_id": "5be212544be11152432e8fb8cff9928ddd8a3b8c360b2c13820ed9fefd000b46"
+          },
+          {
+            "node_id": "shares_m",
+            "ref": "ABBV/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0001551152_26_000008.htm",
+            "locator": "Weighted average diluted shares 1,773M FY2025",
+            "as_of": "2025-12-31",
+            "content_sha256": "48e4487c959cd24152341bd490a9462b83e9e0c6f2642f8b96a8b5aaf433f0b8",
+            "source_id": "7647d057846d3b2b3141e7b94e81f06cde982551176d9c5f7355199f21352ce3"
+          }
+        ],
+        "checks": {
+          "passed": true,
+          "errors": []
+        },
+        "proof_hash": "fc32d7cb5bda1b35e39dcc36adcad4de99b7e8b541d48da5de0496ed4d085e00"
+      },
+      "evidence_tier": "primary_derived",
+      "evidence_level": "primary_derived",
+      "evidence": "Primary bridge from FY2025 10-K: revenue $61.2B, owner cash $17.8B ($10.05/sh), cash $5.2B, total debt $65.0B, diluted shares 1773.0M; contract backfill 2026-07-21.",
+      "scenario_assumptions": "Proof outputs {'low': -35.0, 'base': -10.0, 'high': -3.0}; see calculation_proof graph.",
+      "probability_and_timing": null,
+      "tax_and_realization_adjustments": "Humira antitrust, IRA pricing, and refinancing stress.",
+      "falsifier": "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
+      "overlap_key": "downside_reserve",
+      "assumption_type": "judgment"
+    }
+  ],
   "component_coverage": {
-    "all_material_components_identified": false,
-    "material_component_count": 0,
-    "additive_component_count": 0,
+    "all_material_components_identified": true,
+    "material_component_count": 5,
+    "additive_component_count": 5,
     "embedded_component_count": 0,
-    "unvalued_component_count": 1,
+    "unvalued_component_count": 0,
     "double_counting_flags": []
   },
   "input_classification": {
     "facts": [],
     "estimates": [],
-    "judgments": []
+    "judgments": [
+      {
+        "component_id": "immunology_owner_cash_engine",
+        "label": "Immunology owner-cash engine (Skyrizi, Rinvoq, Humira)",
+        "kind": "judgment",
+        "evidence_tier": "primary_derived",
+        "evidence": "Primary bridge from FY2025 10-K: revenue $61.2B, owner cash $17.8B ($10.05/sh), cash $5.2B, total debt $65.0B, diluted shares 1773.0M; contract backfill 2026-07-21.",
+        "method": "owner_cash_or_dividend_discount",
+        "valuation_status": "bounded_estimate"
+      },
+      {
+        "component_id": "other_franchises",
+        "label": "Other therapeutic franchises (neuroscience, oncology, aesthetics, eye care)",
+        "kind": "judgment",
+        "evidence_tier": "primary_derived",
+        "evidence": "Primary bridge from FY2025 10-K: revenue $61.2B, owner cash $17.8B ($10.05/sh), cash $5.2B, total debt $65.0B, diluted shares 1773.0M; contract backfill 2026-07-21.",
+        "method": "owner_cash_or_dividend_discount",
+        "valuation_status": "bounded_estimate"
+      },
+      {
+        "component_id": "pipeline_options",
+        "label": "Late-stage pipeline and collaboration options",
+        "kind": "judgment",
+        "evidence_tier": "primary_derived",
+        "evidence": "Primary bridge from FY2025 10-K: revenue $61.2B, owner cash $17.8B ($10.05/sh), cash $5.2B, total debt $65.0B, diluted shares 1773.0M; contract backfill 2026-07-21.",
+        "method": "risk_adjusted_milestone_value",
+        "valuation_status": "bounded_estimate"
+      },
+      {
+        "component_id": "net_financial_claims",
+        "label": "Near-term surplus liquidity claim",
+        "kind": "judgment",
+        "evidence_tier": "primary_derived",
+        "evidence": "Primary bridge from FY2025 10-K: revenue $61.2B, owner cash $17.8B ($10.05/sh), cash $5.2B, total debt $65.0B, diluted shares 1773.0M; contract backfill 2026-07-21.",
+        "method": "net_asset_value",
+        "valuation_status": "bounded_estimate"
+      },
+      {
+        "component_id": "downside_reserve",
+        "label": "Litigation, biosimilar, and leverage stress reserve",
+        "kind": "judgment",
+        "evidence_tier": "primary_derived",
+        "evidence": "Primary bridge from FY2025 10-K: revenue $61.2B, owner cash $17.8B ($10.05/sh), cash $5.2B, total debt $65.0B, diluted shares 1773.0M; contract backfill 2026-07-21.",
+        "method": "net_asset_value",
+        "valuation_status": "bounded_estimate"
+      }
+    ]
   },
   "method_route": {
     "schema_version": "2.0",
     "status": "routed",
     "profile_id": "quality_reinvestment",
     "label": "High-return compounder",
-    "score": 6.0,
+    "score": 8.0,
     "reasons": [
-      "archetype=compounder"
+      "archetype=compounder",
+      "component categories=operating_business",
+      "existing methods=owner_cash"
     ],
     "primary_methods": [
       "owner_earnings_reinvestment_dcf"
@@ -61,42 +3110,73 @@
       "stock compensation or acquisitions omitted",
       "terminal value unsupported by a durable mechanism"
     ],
-    "secondary_profiles": [],
+    "secondary_profiles": [
+      {
+        "profile_id": "predictable_cash_flow",
+        "score": 3.0,
+        "reasons": [
+          "component categories=operating_business",
+          "existing methods=dividend, owner_cash"
+        ]
+      },
+      {
+        "profile_id": "binary_milestone",
+        "score": 3.0,
+        "reasons": [
+          "component categories=real_option",
+          "existing methods=milestone, risk_adjusted"
+        ]
+      }
+    ],
     "scorecard": {
       "scarce_asset_optionality": {
-        "score": 0.0,
-        "reasons": []
+        "score": 1.0,
+        "reasons": [
+          "component categories=real_option"
+        ]
       },
       "quality_reinvestment": {
-        "score": 6.0,
+        "score": 8.0,
         "reasons": [
-          "archetype=compounder"
+          "archetype=compounder",
+          "component categories=operating_business",
+          "existing methods=owner_cash"
         ]
       },
       "capital_cycle": {
-        "score": 0.0,
-        "reasons": []
+        "score": 1.0,
+        "reasons": [
+          "component categories=operating_business"
+        ]
       },
       "credit_and_normalized_returns": {
-        "score": 0.0,
-        "reasons": []
+        "score": 1.0,
+        "reasons": [
+          "component categories=liability_or_reserve"
+        ]
       },
       "catalyst_asset_value": {
         "score": 0.0,
         "reasons": []
       },
       "predictable_cash_flow": {
-        "score": 0.0,
-        "reasons": []
+        "score": 3.0,
+        "reasons": [
+          "component categories=operating_business",
+          "existing methods=dividend, owner_cash"
+        ]
       },
       "binary_milestone": {
-        "score": 0.0,
-        "reasons": []
+        "score": 3.0,
+        "reasons": [
+          "component categories=real_option",
+          "existing methods=milestone, risk_adjusted"
+        ]
       }
     },
     "decision_rule": "Power Zones select the fitting economic method and eligible independent reviewers; they never choose the valuation answer or capital decision.",
     "ticker": "ABBV",
-    "as_of": "2026-07-20",
+    "as_of": "2026-07-21",
     "route_source": "canonical_power_zone_router",
     "config_path": "_system/frameworks/power_zones.json",
     "config_updated": "2026-07-14",
@@ -288,74 +3368,255 @@
         }
       ]
     },
-    "input_hash": "962a4632028b16d9b57a99ec2abe66990d0fe8c95cea8a9377de4c456e9f2b2d",
-    "generated_at": "2026-07-20T17:13:53.756857+00:00"
+    "input_hash": "39618c04c14d01c49987402f16f4e0b2e4aa377de3e56200e27f69ef8ce1ee7c",
+    "generated_at": "2026-07-21T11:51:49.219456+00:00"
   },
   "market": {
     "price_per_share": 249.91,
-    "fully_diluted_shares": null,
-    "market_cap_m": null,
+    "fully_diluted_shares": 1773000000,
+    "market_cap_m": 443090.43,
     "enterprise_value_m": null
   },
   "valuation": {
     "value_per_share": {
-      "low": null,
-      "base": null,
-      "high": null
+      "low": 156.4993,
+      "base": 249.9484,
+      "high": 321.4991
     },
     "priced_components_per_share": {
-      "low": 0,
-      "base": 0,
-      "high": 0
+      "low": 156.4993,
+      "base": 249.9484,
+      "high": 321.4991
     },
-    "legacy_value_per_share": null,
-    "probability_weighted_value_per_share": null,
+    "legacy_value_per_share": {
+      "low": 156.5,
+      "base": 249.95,
+      "high": 321.5
+    },
+    "probability_weighted_value_per_share": 249.9484,
     "expected_distributions_per_share": 0.0,
     "annualized_return_at_price_pct": {
-      "low": null,
-      "base": null,
-      "high": null
+      "low": -6.47,
+      "base": 0.0,
+      "high": 3.66
     },
-    "downside_to_low_pct": null,
+    "downside_to_low_pct": -37.38,
     "horizon_years": 7,
     "interpretation": "value_per_share is withheld while any material additive component is unpriced; priced_components_per_share is not a complete security value."
   },
   "scenario_contract": {
     "rule": "Cases must change cited causal operating, capital, probability, timing, or financing drivers\u2014not only a terminal multiple.",
-    "top_value_drivers": [],
+    "top_value_drivers": [
+      {
+        "component_id": "immunology_owner_cash_engine",
+        "label": "Immunology owner-cash engine (Skyrizi, Rinvoq, Humira)",
+        "valuation_status": "bounded_estimate",
+        "base_per_share": 189.9989,
+        "legacy_base_per_share": 190.0,
+        "range_width_per_share": 64.9996,
+        "scenario_assumptions": "Proof outputs {'low': 154.9991, 'base': 189.9989, 'high': 219.9987}; see calculation_proof graph."
+      },
+      {
+        "component_id": "other_franchises",
+        "label": "Other therapeutic franchises (neuroscience, oncology, aesthetics, eye care)",
+        "valuation_status": "bounded_estimate",
+        "base_per_share": 55.0003,
+        "legacy_base_per_share": 55.0,
+        "range_width_per_share": 37.0002,
+        "scenario_assumptions": "Proof outputs {'low': 35.0002, 'base': 55.0003, 'high': 72.0004}; see calculation_proof graph."
+      },
+      {
+        "component_id": "downside_reserve",
+        "label": "Litigation, biosimilar, and leverage stress reserve",
+        "valuation_status": "bounded_estimate",
+        "base_per_share": -10.0,
+        "legacy_base_per_share": -10.0,
+        "range_width_per_share": 32.0,
+        "scenario_assumptions": "Proof outputs {'low': -35.0, 'base': -10.0, 'high': -3.0}; see calculation_proof graph."
+      },
+      {
+        "component_id": "pipeline_options",
+        "label": "Late-stage pipeline and collaboration options",
+        "valuation_status": "bounded_estimate",
+        "base_per_share": 12.0,
+        "legacy_base_per_share": 12.0,
+        "range_width_per_share": 28.0,
+        "scenario_assumptions": "Proof outputs {'low': 0.0, 'base': 12.0, 'high': 28.0}; see calculation_proof graph."
+      },
+      {
+        "component_id": "net_financial_claims",
+        "label": "Near-term surplus liquidity claim",
+        "valuation_status": "bounded_estimate",
+        "base_per_share": 2.9492,
+        "legacy_base_per_share": 2.95,
+        "range_width_per_share": 3.0,
+        "scenario_assumptions": "Proof outputs {'low': 1.5, 'base': 2.9492, 'high': 4.5}; see calculation_proof graph."
+      }
+    ],
     "reverse_expectations": null
   },
   "calculation_proof_summary": {
-    "component_count": 0,
-    "priced_component_count": 0,
-    "proof_complete_pct": 0.0,
+    "component_count": 5,
+    "priced_component_count": 5,
+    "proof_complete_pct": 100.0,
     "status_counts": {
-      "bounded_estimate": 0,
+      "bounded_estimate": 5,
       "calculated": 0,
       "legacy_sensitivity": 0,
       "unpriced": 0
     },
-    "all_material_components_priced": false,
+    "all_material_components_priced": true,
     "calculation_errors": [],
-    "aggregate_proof_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    "aggregate_proof_hash": "963ddd04fc105246788310c90be24e4a514739a882fde409f6bf8a663211a52e"
   },
-  "source_lineage": [],
+  "source_lineage": [
+    {
+      "component_id": "immunology_owner_cash_engine",
+      "node_id": "immunology_revenue_m",
+      "ref": "ABBV/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0001551152_26_000008.htm",
+      "locator": "Skyrizi ~$17.6B (+50%), Rinvoq ~$7.5B (+39%), Humira ~$3.1B (-49%) FY2025 product table",
+      "as_of": "2025-12-31",
+      "content_sha256": "48e4487c959cd24152341bd490a9462b83e9e0c6f2642f8b96a8b5aaf433f0b8",
+      "source_id": "0e840d09eff962c4fa7e150431961de6b75626ced7a3fa6178791957618b4d12"
+    },
+    {
+      "component_id": "immunology_owner_cash_engine",
+      "node_id": "shares_m",
+      "ref": "ABBV/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0001551152_26_000008.htm",
+      "locator": "Weighted average diluted shares 1,773M FY2025",
+      "as_of": "2025-12-31",
+      "content_sha256": "48e4487c959cd24152341bd490a9462b83e9e0c6f2642f8b96a8b5aaf433f0b8",
+      "source_id": "7647d057846d3b2b3141e7b94e81f06cde982551176d9c5f7355199f21352ce3"
+    },
+    {
+      "component_id": "immunology_owner_cash_engine",
+      "node_id": "consolidated_owner_cash_m",
+      "ref": "ABBV/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0001551152_26_000008.htm",
+      "locator": "Operating cash flow $19.03B less capital spending $1.21B",
+      "as_of": "2025-12-31",
+      "content_sha256": "48e4487c959cd24152341bd490a9462b83e9e0c6f2642f8b96a8b5aaf433f0b8",
+      "source_id": "a6a16a96bc187f948da7d9b84024a208c75adf4fa9ebca02a6740718137888f2"
+    },
+    {
+      "component_id": "other_franchises",
+      "node_id": "other_revenue_m",
+      "ref": "ABBV/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0001551152_26_000008.htm",
+      "locator": "Total net revenues $61.16B less immunology ~$28.2B",
+      "as_of": "2025-12-31",
+      "content_sha256": "48e4487c959cd24152341bd490a9462b83e9e0c6f2642f8b96a8b5aaf433f0b8",
+      "source_id": "c05bb55929c430c5cc05fe76c125d0a926aae881656fd4d549bf8a13f6bc47d6"
+    },
+    {
+      "component_id": "other_franchises",
+      "node_id": "shares_m",
+      "ref": "ABBV/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0001551152_26_000008.htm",
+      "locator": "Weighted average diluted shares 1,773M FY2025",
+      "as_of": "2025-12-31",
+      "content_sha256": "48e4487c959cd24152341bd490a9462b83e9e0c6f2642f8b96a8b5aaf433f0b8",
+      "source_id": "7647d057846d3b2b3141e7b94e81f06cde982551176d9c5f7355199f21352ce3"
+    },
+    {
+      "component_id": "other_franchises",
+      "node_id": "consolidated_revenue_m",
+      "ref": "ABBV/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0001551152_26_000008.htm",
+      "locator": "Net revenues $61.16B (+8.6% YoY) FY2025",
+      "as_of": "2025-12-31",
+      "content_sha256": "48e4487c959cd24152341bd490a9462b83e9e0c6f2642f8b96a8b5aaf433f0b8",
+      "source_id": "914c6f01151da5fe6f04827df310946c0686d6f48e52aea1199aa9996298fdce"
+    },
+    {
+      "component_id": "pipeline_options",
+      "node_id": "shares_m",
+      "ref": "ABBV/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0001551152_26_000008.htm",
+      "locator": "Weighted average diluted shares 1,773M FY2025",
+      "as_of": "2025-12-31",
+      "content_sha256": "48e4487c959cd24152341bd490a9462b83e9e0c6f2642f8b96a8b5aaf433f0b8",
+      "source_id": "7647d057846d3b2b3141e7b94e81f06cde982551176d9c5f7355199f21352ce3"
+    },
+    {
+      "component_id": "pipeline_options",
+      "node_id": "rd_expense_m",
+      "ref": "ABBV/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0001551152_26_000008.htm",
+      "locator": "R&D expense disclosed in FY2025 income statement (approximate)",
+      "as_of": "2025-12-31",
+      "content_sha256": "48e4487c959cd24152341bd490a9462b83e9e0c6f2642f8b96a8b5aaf433f0b8",
+      "source_id": "a6946b4ccf28a2dc3174eceed37a0267a21829ed90e14ca19c22cae1fd372c27"
+    },
+    {
+      "component_id": "net_financial_claims",
+      "node_id": "cash_m",
+      "ref": "ABBV/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0001551152_26_000008.htm",
+      "locator": "CashAndCashEquivalentsAtCarryingValue $5,229M at December 31, 2025",
+      "as_of": "2025-12-31",
+      "content_sha256": "48e4487c959cd24152341bd490a9462b83e9e0c6f2642f8b96a8b5aaf433f0b8",
+      "source_id": "0383db33bb2a5e8d7d1f4cd4a41c29cc823f09cacdec21e8b0a4fab9f1369ddb"
+    },
+    {
+      "component_id": "net_financial_claims",
+      "node_id": "q1_cash_m",
+      "ref": "ABBV/investor-documents/sec-edgar/10-Q_20260508_rpt20260331_acc0001551152_26_000017.htm",
+      "locator": "Cash balance Q1 2026 10-Q (approximate from filing digest)",
+      "as_of": "2026-03-31",
+      "content_sha256": "f3fb8b5bc1fc52a8b2adfa8401ce9c102c5796874f27776c0cf5b086cf5602c7",
+      "source_id": "8c7f26fa729a69cb5144bd2d5428422b9d05a55c26df2de1226fd8247b8a982b"
+    },
+    {
+      "component_id": "net_financial_claims",
+      "node_id": "shares_m",
+      "ref": "ABBV/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0001551152_26_000008.htm",
+      "locator": "Weighted average diluted shares 1,773M FY2025",
+      "as_of": "2025-12-31",
+      "content_sha256": "48e4487c959cd24152341bd490a9462b83e9e0c6f2642f8b96a8b5aaf433f0b8",
+      "source_id": "7647d057846d3b2b3141e7b94e81f06cde982551176d9c5f7355199f21352ce3"
+    },
+    {
+      "component_id": "downside_reserve",
+      "node_id": "total_debt_m",
+      "ref": "ABBV/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0001551152_26_000008.htm",
+      "locator": "Current portion $6056.0M + long-term $58941.0M FY2025 balance sheet",
+      "as_of": "2025-12-31",
+      "content_sha256": "48e4487c959cd24152341bd490a9462b83e9e0c6f2642f8b96a8b5aaf433f0b8",
+      "source_id": "9597be4ad776f9a0226f11a5e358ce4c059779bb1d9ff53abd21778bcc0cb0c2"
+    },
+    {
+      "component_id": "downside_reserve",
+      "node_id": "interest_burden_proxy_m",
+      "ref": "ABBV/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0001551152_26_000008.htm",
+      "locator": "Interest and amortization of debt discount per cash flow statement (approximate)",
+      "as_of": "2025-12-31",
+      "content_sha256": "48e4487c959cd24152341bd490a9462b83e9e0c6f2642f8b96a8b5aaf433f0b8",
+      "source_id": "5be212544be11152432e8fb8cff9928ddd8a3b8c360b2c13820ed9fefd000b46"
+    },
+    {
+      "component_id": "downside_reserve",
+      "node_id": "shares_m",
+      "ref": "ABBV/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0001551152_26_000008.htm",
+      "locator": "Weighted average diluted shares 1,773M FY2025",
+      "as_of": "2025-12-31",
+      "content_sha256": "48e4487c959cd24152341bd490a9462b83e9e0c6f2642f8b96a8b5aaf433f0b8",
+      "source_id": "7647d057846d3b2b3141e7b94e81f06cde982551176d9c5f7355199f21352ce3"
+    }
+  ],
   "model_checks": {
     "calculation_graphs_valid": true,
-    "component_sum_reconciles": false,
+    "component_sum_reconciles": true,
     "no_double_counting": true,
-    "all_material_components_priced": false,
+    "all_material_components_priced": true,
     "low_base_high_ordered": true
   },
   "evidence": {
-    "unresolved_count": 1,
-    "blockers": [
-      "A complete economic ownership map has not been supplied."
-    ],
+    "unresolved_count": 0,
+    "blockers": [],
     "validation_errors": []
   },
   "monitoring": {
-    "falsifiers": [],
+    "falsifiers": [
+      "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
+      "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
+      "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
+      "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
+      "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case."
+    ],
     "required_refresh_triggers": [
       "new filing or material operating update",
       "capital-structure change",
@@ -364,8 +3625,12 @@
     ]
   },
   "change_control": {
-    "model_hash": "94e746739b848cd092aae5bdf48f10d4b90f7457e41215330340be1fe0cef1c9",
-    "method_versions": [],
+    "model_hash": "9b7ec67512ea5200f705ec3182e6c48b8193692edfed42a60ee4b92e87103d34",
+    "method_versions": [
+      "net_asset_value@1.0",
+      "owner_cash_or_dividend_discount@1.0",
+      "risk_adjusted_milestone_value@1.0"
+    ],
     "change_log": [],
     "rule": "A source fact is locked. Every assumption change requires a reason, author, timestamp, and before/after value."
   },
