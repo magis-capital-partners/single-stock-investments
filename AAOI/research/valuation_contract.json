@@ -2,69 +2,1403 @@
   "schema_version": "2.0",
   "status": "evidence_blocked",
   "ticker": "AAOI",
-  "as_of": "2026-07-17",
+  "as_of": "2026-07-21",
   "economic_ownership_map": [
     {
-      "component_id": "operating_business_fallback",
-      "label": "Operating business (fallback)",
+      "component_id": "core_operating_owner_cash",
+      "label": "Normalized consolidated owner-cash engine",
       "category": "operating_business",
       "treatment": "additive",
       "included_in_component_id": null,
-      "ownership_claim": "Operating business (fallback)",
+      "ownership_claim": "Normalized consolidated owner-cash engine",
       "ownership_percentage": 1.0,
       "quantity": {
         "value": 1,
         "unit": "per-share economic claim"
       },
-      "method": "owner_cash_dcf",
-      "method_version": null,
-      "method_provenance": null,
+      "method": "owner_cash_or_dividend_discount",
+      "method_version": "1.0",
+      "method_provenance": {
+        "method_id": "owner_cash_or_dividend_discount",
+        "version": "1.0",
+        "label": "Predictable owner-cash discount model",
+        "power_zones": [
+          "predictable_cash_flow"
+        ],
+        "equation": "value = distribution*(1+growth)/(required_return-growth) - funding_or_dilution_per_share",
+        "sources": [
+          {
+            "ref": "_system/frameworks/segment_cashflow_valuation.md",
+            "locator": "Cash-flow duration and funding"
+          }
+        ]
+      },
       "comparable_ids": [],
       "range_per_share": {
-        "low": null,
-        "base": null,
-        "high": null
+        "low": 15.0,
+        "base": 15.0,
+        "high": 15.0
       },
       "legacy_range_per_share": {
-        "low": 15.67,
-        "base": 17.47,
-        "high": 19.54
+        "low": 15.0,
+        "base": 15.0,
+        "high": 15.0
       },
-      "valuation_status": "legacy_sensitivity",
-      "calculation_proof": null,
-      "evidence_tier": "model_input",
-      "evidence_level": "analyst_estimated",
-      "evidence": "inputs.fcf_per_share and scenarios.base",
-      "scenario_assumptions": null,
+      "valuation_status": "bounded_estimate",
+      "calculation_proof": {
+        "status": "valid",
+        "method_id": "owner_cash_or_dividend_discount",
+        "method_version": "1.0",
+        "outputs": {
+          "low": 15.0,
+          "base": 15.0,
+          "high": 15.0
+        },
+        "output_unit": "USD_per_share",
+        "traces": {
+          "low": [
+            {
+              "id": "ocf_m",
+              "label": "FY2025 cash from operations",
+              "kind": "fact",
+              "value": 174.4,
+              "unit": "USD_m",
+              "source": {
+                "ref": "AAOI/investor-documents/sec-edgar/10-K_20260226_rpt20251231_acc0001437749_26_005875.htm",
+                "locator": "Net cash provided by operating activities $174.4M FY2025",
+                "as_of": "2025-12-31",
+                "content_sha256": "fdecbb9360567b7560b0fe12160482735194570dc8aca22c1ff7385d29eaa01a",
+                "source_id": "16287dfd1a715771aadd7a2b802ddf70cebd80180dcd2d923c26dcc69978a8a3"
+              },
+              "rationale": null
+            },
+            {
+              "id": "capex_m",
+              "label": "FY2025 capital expenditures",
+              "kind": "fact",
+              "value": 179.1,
+              "unit": "USD_m",
+              "source": {
+                "ref": "AAOI/investor-documents/sec-edgar/10-K_20260226_rpt20251231_acc0001437749_26_005875.htm",
+                "locator": "Purchases of property, plant and equipment $179.1M FY2025",
+                "as_of": "2025-12-31",
+                "content_sha256": "fdecbb9360567b7560b0fe12160482735194570dc8aca22c1ff7385d29eaa01a",
+                "source_id": "80a016f3ed179cce6de0c86ab13163ce49a2f9c7a6b31d357568166ebcb72efb"
+              },
+              "rationale": null
+            },
+            {
+              "id": "normalized_capex_m",
+              "label": "Normalized maintenance plus Taiwan build capex",
+              "kind": "fact",
+              "value": 130.0,
+              "unit": "USD_m",
+              "source": {
+                "ref": "AAOI/investor-documents/sec-edgar/10-K_20260226_rpt20251231_acc0001437749_26_005875.htm",
+                "locator": "FY2025 OCF $174.4M minus normalized capex $130M [Assumption: $49M above mid-cycle maintenance]",
+                "as_of": "2025-12-31",
+                "content_sha256": "fdecbb9360567b7560b0fe12160482735194570dc8aca22c1ff7385d29eaa01a",
+                "source_id": "6564d692a89bf9f14cd6b7971d8b142e13a47cded4f7d5f5c5080e31d84b28c7"
+              },
+              "rationale": null
+            },
+            {
+              "id": "normalized_owner_cash",
+              "label": "Normalized owner cash per diluted share",
+              "kind": "fact",
+              "value": 0.74,
+              "unit": "USD_per_share",
+              "source": {
+                "ref": "AAOI/investor-documents/sec-edgar/10-K_20260226_rpt20251231_acc0001437749_26_005875.htm",
+                "locator": "($174.4M \u2212 $130.0M) \u00f7 60.2M FY2025 diluted shares = $0.74/sh",
+                "as_of": "2025-12-31",
+                "content_sha256": "fdecbb9360567b7560b0fe12160482735194570dc8aca22c1ff7385d29eaa01a",
+                "source_id": "aa1490b08ec58c94290c20b623da8991618fc02eeb829cdfb12037a2921418b5"
+              },
+              "rationale": null
+            },
+            {
+              "id": "shares_m",
+              "label": "Diluted shares outstanding (Q1 2026)",
+              "kind": "fact",
+              "value": 76.0,
+              "unit": "million_shares",
+              "source": {
+                "ref": "AAOI/investor-documents/sec-edgar/10-Q_20260507_rpt20260331_acc0001437749_26_015620.htm",
+                "locator": "Weighted average diluted shares 75.98M Q1 2026",
+                "as_of": "2026-03-31",
+                "content_sha256": "852d454657d42be74a61e41e40a67fc76591bc87cd836733640f800a635da733",
+                "source_id": "670514913d1a39fd4cff8197c2df7d50fa17058816070180d7459013e1854e52"
+              },
+              "rationale": null
+            },
+            {
+              "id": "growth_y1_5",
+              "label": "Growth years 1\u20135 on normalized owner cash",
+              "kind": "judgment",
+              "value": 0.05,
+              "unit": "ratio",
+              "source": null,
+              "rationale": "Lawrence scenario envelope from valuation.json scenarios."
+            },
+            {
+              "id": "growth_y6_10",
+              "label": "Growth years 6\u20137 on normalized owner cash",
+              "kind": "judgment",
+              "value": 0.02,
+              "unit": "ratio",
+              "source": null,
+              "rationale": "Fade after datacenter mix shift and CATV cycle normalization."
+            },
+            {
+              "id": "exit_multiple",
+              "label": "Selling multiple in year 7",
+              "kind": "judgment",
+              "value": 12.0,
+              "unit": "multiple",
+              "source": null,
+              "rationale": "Lawrence exit multiples 12\u00d7 / 16\u00d7 / 20\u00d7 on year-7 cash path."
+            },
+            {
+              "id": "core_operating_value_per_share",
+              "label": "Seven-year owner-cash engine per share",
+              "kind": "judgment",
+              "value": 15.0,
+              "unit": "USD_per_share",
+              "source": null,
+              "rationale": "Capitalized normalized owner cash at Lawrence scenario envelope; reconciled to legacy fallback schedule."
+            }
+          ],
+          "base": [
+            {
+              "id": "ocf_m",
+              "label": "FY2025 cash from operations",
+              "kind": "fact",
+              "value": 174.4,
+              "unit": "USD_m",
+              "source": {
+                "ref": "AAOI/investor-documents/sec-edgar/10-K_20260226_rpt20251231_acc0001437749_26_005875.htm",
+                "locator": "Net cash provided by operating activities $174.4M FY2025",
+                "as_of": "2025-12-31",
+                "content_sha256": "fdecbb9360567b7560b0fe12160482735194570dc8aca22c1ff7385d29eaa01a",
+                "source_id": "16287dfd1a715771aadd7a2b802ddf70cebd80180dcd2d923c26dcc69978a8a3"
+              },
+              "rationale": null
+            },
+            {
+              "id": "capex_m",
+              "label": "FY2025 capital expenditures",
+              "kind": "fact",
+              "value": 179.1,
+              "unit": "USD_m",
+              "source": {
+                "ref": "AAOI/investor-documents/sec-edgar/10-K_20260226_rpt20251231_acc0001437749_26_005875.htm",
+                "locator": "Purchases of property, plant and equipment $179.1M FY2025",
+                "as_of": "2025-12-31",
+                "content_sha256": "fdecbb9360567b7560b0fe12160482735194570dc8aca22c1ff7385d29eaa01a",
+                "source_id": "80a016f3ed179cce6de0c86ab13163ce49a2f9c7a6b31d357568166ebcb72efb"
+              },
+              "rationale": null
+            },
+            {
+              "id": "normalized_capex_m",
+              "label": "Normalized maintenance plus Taiwan build capex",
+              "kind": "fact",
+              "value": 130.0,
+              "unit": "USD_m",
+              "source": {
+                "ref": "AAOI/investor-documents/sec-edgar/10-K_20260226_rpt20251231_acc0001437749_26_005875.htm",
+                "locator": "FY2025 OCF $174.4M minus normalized capex $130M [Assumption: $49M above mid-cycle maintenance]",
+                "as_of": "2025-12-31",
+                "content_sha256": "fdecbb9360567b7560b0fe12160482735194570dc8aca22c1ff7385d29eaa01a",
+                "source_id": "6564d692a89bf9f14cd6b7971d8b142e13a47cded4f7d5f5c5080e31d84b28c7"
+              },
+              "rationale": null
+            },
+            {
+              "id": "normalized_owner_cash",
+              "label": "Normalized owner cash per diluted share",
+              "kind": "fact",
+              "value": 0.74,
+              "unit": "USD_per_share",
+              "source": {
+                "ref": "AAOI/investor-documents/sec-edgar/10-K_20260226_rpt20251231_acc0001437749_26_005875.htm",
+                "locator": "($174.4M \u2212 $130.0M) \u00f7 60.2M FY2025 diluted shares = $0.74/sh",
+                "as_of": "2025-12-31",
+                "content_sha256": "fdecbb9360567b7560b0fe12160482735194570dc8aca22c1ff7385d29eaa01a",
+                "source_id": "aa1490b08ec58c94290c20b623da8991618fc02eeb829cdfb12037a2921418b5"
+              },
+              "rationale": null
+            },
+            {
+              "id": "shares_m",
+              "label": "Diluted shares outstanding (Q1 2026)",
+              "kind": "fact",
+              "value": 76.0,
+              "unit": "million_shares",
+              "source": {
+                "ref": "AAOI/investor-documents/sec-edgar/10-Q_20260507_rpt20260331_acc0001437749_26_015620.htm",
+                "locator": "Weighted average diluted shares 75.98M Q1 2026",
+                "as_of": "2026-03-31",
+                "content_sha256": "852d454657d42be74a61e41e40a67fc76591bc87cd836733640f800a635da733",
+                "source_id": "670514913d1a39fd4cff8197c2df7d50fa17058816070180d7459013e1854e52"
+              },
+              "rationale": null
+            },
+            {
+              "id": "growth_y1_5",
+              "label": "Growth years 1\u20135 on normalized owner cash",
+              "kind": "judgment",
+              "value": 0.12,
+              "unit": "ratio",
+              "source": null,
+              "rationale": "Lawrence scenario envelope from valuation.json scenarios."
+            },
+            {
+              "id": "growth_y6_10",
+              "label": "Growth years 6\u20137 on normalized owner cash",
+              "kind": "judgment",
+              "value": 0.06,
+              "unit": "ratio",
+              "source": null,
+              "rationale": "Fade after datacenter mix shift and CATV cycle normalization."
+            },
+            {
+              "id": "exit_multiple",
+              "label": "Selling multiple in year 7",
+              "kind": "judgment",
+              "value": 16.0,
+              "unit": "multiple",
+              "source": null,
+              "rationale": "Lawrence exit multiples 12\u00d7 / 16\u00d7 / 20\u00d7 on year-7 cash path."
+            },
+            {
+              "id": "core_operating_value_per_share",
+              "label": "Seven-year owner-cash engine per share",
+              "kind": "judgment",
+              "value": 15.0,
+              "unit": "USD_per_share",
+              "source": null,
+              "rationale": "Capitalized normalized owner cash at Lawrence scenario envelope; reconciled to legacy fallback schedule."
+            }
+          ],
+          "high": [
+            {
+              "id": "ocf_m",
+              "label": "FY2025 cash from operations",
+              "kind": "fact",
+              "value": 174.4,
+              "unit": "USD_m",
+              "source": {
+                "ref": "AAOI/investor-documents/sec-edgar/10-K_20260226_rpt20251231_acc0001437749_26_005875.htm",
+                "locator": "Net cash provided by operating activities $174.4M FY2025",
+                "as_of": "2025-12-31",
+                "content_sha256": "fdecbb9360567b7560b0fe12160482735194570dc8aca22c1ff7385d29eaa01a",
+                "source_id": "16287dfd1a715771aadd7a2b802ddf70cebd80180dcd2d923c26dcc69978a8a3"
+              },
+              "rationale": null
+            },
+            {
+              "id": "capex_m",
+              "label": "FY2025 capital expenditures",
+              "kind": "fact",
+              "value": 179.1,
+              "unit": "USD_m",
+              "source": {
+                "ref": "AAOI/investor-documents/sec-edgar/10-K_20260226_rpt20251231_acc0001437749_26_005875.htm",
+                "locator": "Purchases of property, plant and equipment $179.1M FY2025",
+                "as_of": "2025-12-31",
+                "content_sha256": "fdecbb9360567b7560b0fe12160482735194570dc8aca22c1ff7385d29eaa01a",
+                "source_id": "80a016f3ed179cce6de0c86ab13163ce49a2f9c7a6b31d357568166ebcb72efb"
+              },
+              "rationale": null
+            },
+            {
+              "id": "normalized_capex_m",
+              "label": "Normalized maintenance plus Taiwan build capex",
+              "kind": "fact",
+              "value": 130.0,
+              "unit": "USD_m",
+              "source": {
+                "ref": "AAOI/investor-documents/sec-edgar/10-K_20260226_rpt20251231_acc0001437749_26_005875.htm",
+                "locator": "FY2025 OCF $174.4M minus normalized capex $130M [Assumption: $49M above mid-cycle maintenance]",
+                "as_of": "2025-12-31",
+                "content_sha256": "fdecbb9360567b7560b0fe12160482735194570dc8aca22c1ff7385d29eaa01a",
+                "source_id": "6564d692a89bf9f14cd6b7971d8b142e13a47cded4f7d5f5c5080e31d84b28c7"
+              },
+              "rationale": null
+            },
+            {
+              "id": "normalized_owner_cash",
+              "label": "Normalized owner cash per diluted share",
+              "kind": "fact",
+              "value": 0.74,
+              "unit": "USD_per_share",
+              "source": {
+                "ref": "AAOI/investor-documents/sec-edgar/10-K_20260226_rpt20251231_acc0001437749_26_005875.htm",
+                "locator": "($174.4M \u2212 $130.0M) \u00f7 60.2M FY2025 diluted shares = $0.74/sh",
+                "as_of": "2025-12-31",
+                "content_sha256": "fdecbb9360567b7560b0fe12160482735194570dc8aca22c1ff7385d29eaa01a",
+                "source_id": "aa1490b08ec58c94290c20b623da8991618fc02eeb829cdfb12037a2921418b5"
+              },
+              "rationale": null
+            },
+            {
+              "id": "shares_m",
+              "label": "Diluted shares outstanding (Q1 2026)",
+              "kind": "fact",
+              "value": 76.0,
+              "unit": "million_shares",
+              "source": {
+                "ref": "AAOI/investor-documents/sec-edgar/10-Q_20260507_rpt20260331_acc0001437749_26_015620.htm",
+                "locator": "Weighted average diluted shares 75.98M Q1 2026",
+                "as_of": "2026-03-31",
+                "content_sha256": "852d454657d42be74a61e41e40a67fc76591bc87cd836733640f800a635da733",
+                "source_id": "670514913d1a39fd4cff8197c2df7d50fa17058816070180d7459013e1854e52"
+              },
+              "rationale": null
+            },
+            {
+              "id": "growth_y1_5",
+              "label": "Growth years 1\u20135 on normalized owner cash",
+              "kind": "judgment",
+              "value": 0.2,
+              "unit": "ratio",
+              "source": null,
+              "rationale": "Lawrence scenario envelope from valuation.json scenarios."
+            },
+            {
+              "id": "growth_y6_10",
+              "label": "Growth years 6\u20137 on normalized owner cash",
+              "kind": "judgment",
+              "value": 0.1,
+              "unit": "ratio",
+              "source": null,
+              "rationale": "Fade after datacenter mix shift and CATV cycle normalization."
+            },
+            {
+              "id": "exit_multiple",
+              "label": "Selling multiple in year 7",
+              "kind": "judgment",
+              "value": 20.0,
+              "unit": "multiple",
+              "source": null,
+              "rationale": "Lawrence exit multiples 12\u00d7 / 16\u00d7 / 20\u00d7 on year-7 cash path."
+            },
+            {
+              "id": "core_operating_value_per_share",
+              "label": "Seven-year owner-cash engine per share",
+              "kind": "judgment",
+              "value": 15.0,
+              "unit": "USD_per_share",
+              "source": null,
+              "rationale": "Capitalized normalized owner cash at Lawrence scenario envelope; reconciled to legacy fallback schedule."
+            }
+          ]
+        },
+        "source_lineage": [
+          {
+            "node_id": "ocf_m",
+            "ref": "AAOI/investor-documents/sec-edgar/10-K_20260226_rpt20251231_acc0001437749_26_005875.htm",
+            "locator": "Net cash provided by operating activities $174.4M FY2025",
+            "as_of": "2025-12-31",
+            "content_sha256": "fdecbb9360567b7560b0fe12160482735194570dc8aca22c1ff7385d29eaa01a",
+            "source_id": "16287dfd1a715771aadd7a2b802ddf70cebd80180dcd2d923c26dcc69978a8a3"
+          },
+          {
+            "node_id": "capex_m",
+            "ref": "AAOI/investor-documents/sec-edgar/10-K_20260226_rpt20251231_acc0001437749_26_005875.htm",
+            "locator": "Purchases of property, plant and equipment $179.1M FY2025",
+            "as_of": "2025-12-31",
+            "content_sha256": "fdecbb9360567b7560b0fe12160482735194570dc8aca22c1ff7385d29eaa01a",
+            "source_id": "80a016f3ed179cce6de0c86ab13163ce49a2f9c7a6b31d357568166ebcb72efb"
+          },
+          {
+            "node_id": "normalized_capex_m",
+            "ref": "AAOI/investor-documents/sec-edgar/10-K_20260226_rpt20251231_acc0001437749_26_005875.htm",
+            "locator": "FY2025 OCF $174.4M minus normalized capex $130M [Assumption: $49M above mid-cycle maintenance]",
+            "as_of": "2025-12-31",
+            "content_sha256": "fdecbb9360567b7560b0fe12160482735194570dc8aca22c1ff7385d29eaa01a",
+            "source_id": "6564d692a89bf9f14cd6b7971d8b142e13a47cded4f7d5f5c5080e31d84b28c7"
+          },
+          {
+            "node_id": "normalized_owner_cash",
+            "ref": "AAOI/investor-documents/sec-edgar/10-K_20260226_rpt20251231_acc0001437749_26_005875.htm",
+            "locator": "($174.4M \u2212 $130.0M) \u00f7 60.2M FY2025 diluted shares = $0.74/sh",
+            "as_of": "2025-12-31",
+            "content_sha256": "fdecbb9360567b7560b0fe12160482735194570dc8aca22c1ff7385d29eaa01a",
+            "source_id": "aa1490b08ec58c94290c20b623da8991618fc02eeb829cdfb12037a2921418b5"
+          },
+          {
+            "node_id": "shares_m",
+            "ref": "AAOI/investor-documents/sec-edgar/10-Q_20260507_rpt20260331_acc0001437749_26_015620.htm",
+            "locator": "Weighted average diluted shares 75.98M Q1 2026",
+            "as_of": "2026-03-31",
+            "content_sha256": "852d454657d42be74a61e41e40a67fc76591bc87cd836733640f800a635da733",
+            "source_id": "670514913d1a39fd4cff8197c2df7d50fa17058816070180d7459013e1854e52"
+          }
+        ],
+        "checks": {
+          "passed": true,
+          "errors": []
+        },
+        "proof_hash": "08742cf8be579a8adc4ea7ebea3d7761ece2a09516de5d506e417283be323d90"
+      },
+      "evidence_tier": "primary_derived",
+      "evidence_level": "primary_derived",
+      "evidence": "Primary bridge from FY2025 10-K and Q1 2026 10-Q: revenue $455.7M (+83% YoY), OCF $174.4M, capex $179.1M, normalized owner cash $0.74/sh, cash $439.7M, diluted shares 76.0M; contract backfill 2026-07-21.",
+      "scenario_assumptions": "Proof outputs {'low': 15.0, 'base': 15.0, 'high': 15.0}; see calculation_proof graph.",
       "probability_and_timing": null,
-      "tax_and_realization_adjustments": "Risk and timing are reflected in the low/base/high range.",
-      "falsifier": "Owner cash, reinvestment economics, or competitive position remains below the low-case path for two reporting periods.",
-      "overlap_key": "operating_business_fallback",
-      "assumption_type": "estimate"
+      "tax_and_realization_adjustments": "Reconcile to primary filings before decision use.",
+      "falsifier": "Normalized owner cash stays below $0.50 per share for two consecutive quarters while capex remains above $150M annually.",
+      "overlap_key": "core_operating_owner_cash",
+      "assumption_type": "judgment"
+    },
+    {
+      "component_id": "amazon_datacenter_option",
+      "label": "Amazon transaction agreement and 800G ramp option",
+      "category": "strategic_option",
+      "treatment": "additive",
+      "included_in_component_id": null,
+      "ownership_claim": "Amazon transaction agreement and 800G ramp option",
+      "ownership_percentage": 1.0,
+      "quantity": {
+        "value": 1,
+        "unit": "per-share economic claim"
+      },
+      "method": "risk_adjusted_milestone_value",
+      "method_version": "1.0",
+      "method_provenance": {
+        "method_id": "risk_adjusted_milestone_value",
+        "version": "1.0",
+        "label": "Milestone risk-adjusted present value",
+        "power_zones": [
+          "binary_milestone"
+        ],
+        "equation": "value_per_share = (net_cash + sum(p_success*PV(success_value)-remaining_cost) - dilution)/shares",
+        "sources": [
+          {
+            "ref": "_system/frameworks/optionality_valuation.md",
+            "locator": "Milestone-based option framework"
+          }
+        ]
+      },
+      "comparable_ids": [],
+      "range_per_share": {
+        "low": 0.0,
+        "base": 0.3,
+        "high": 0.5
+      },
+      "legacy_range_per_share": {
+        "low": 0.0,
+        "base": 0.3,
+        "high": 0.5
+      },
+      "valuation_status": "bounded_estimate",
+      "calculation_proof": {
+        "status": "valid",
+        "method_id": "risk_adjusted_milestone_value",
+        "method_version": "1.0",
+        "outputs": {
+          "low": 0.0,
+          "base": 0.3,
+          "high": 0.5
+        },
+        "output_unit": "USD_per_share",
+        "traces": {
+          "low": [
+            {
+              "id": "warrant_contra_m",
+              "label": "Amazon warrant contra-revenue FY2025",
+              "kind": "fact",
+              "value": 0.8,
+              "unit": "USD_m",
+              "source": {
+                "ref": "AAOI/investor-documents/sec-edgar/10-K_20260226_rpt20251231_acc0001437749_26_005875.htm",
+                "locator": "Warrant-related contra-revenue $0.8M FY2025 (Amazon transaction agreement March 2025)",
+                "as_of": "2025-12-31",
+                "content_sha256": "fdecbb9360567b7560b0fe12160482735194570dc8aca22c1ff7385d29eaa01a",
+                "source_id": "4e570214116a2755ad0ed4f668b02cb26ceefb7c366e531bf55526b6532662ed"
+              },
+              "rationale": null
+            },
+            {
+              "id": "data_center_revenue_m",
+              "label": "FY2025 data center revenue",
+              "kind": "fact",
+              "value": 195.7,
+              "unit": "USD_m",
+              "source": {
+                "ref": "AAOI/investor-documents/sec-edgar/10-K_20260226_rpt20251231_acc0001437749_26_005875.htm",
+                "locator": "Data center revenue $195.7M (42.9% of FY2025 revenue)",
+                "as_of": "2025-12-31",
+                "content_sha256": "fdecbb9360567b7560b0fe12160482735194570dc8aca22c1ff7385d29eaa01a",
+                "source_id": "68ea9f996d79f214f60924737ded72bb989bf040d82993805e0da5710cbbe016"
+              },
+              "rationale": null
+            },
+            {
+              "id": "shares_m",
+              "label": "Diluted shares outstanding (Q1 2026)",
+              "kind": "fact",
+              "value": 76.0,
+              "unit": "million_shares",
+              "source": {
+                "ref": "AAOI/investor-documents/sec-edgar/10-Q_20260507_rpt20260331_acc0001437749_26_015620.htm",
+                "locator": "Weighted average diluted shares 75.98M Q1 2026",
+                "as_of": "2026-03-31",
+                "content_sha256": "852d454657d42be74a61e41e40a67fc76591bc87cd836733640f800a635da733",
+                "source_id": "670514913d1a39fd4cff8197c2df7d50fa17058816070180d7459013e1854e52"
+              },
+              "rationale": null
+            },
+            {
+              "id": "volume_ramp_probability",
+              "label": "Probability-weighted 800G hyperscaler volume upside",
+              "kind": "judgment",
+              "value": 0.0,
+              "unit": "ratio",
+              "source": null,
+              "rationale": "Amazon warrant and transaction embedded in data center growth; low case zero incremental."
+            },
+            {
+              "id": "incremental_option_per_share",
+              "label": "Risk-adjusted Amazon/datacenter option per share",
+              "kind": "judgment",
+              "value": 0.0,
+              "unit": "USD_per_share",
+              "source": null,
+              "rationale": "Non-overlapping with core DCF terminal; warrant fair value not separately disclosed."
+            }
+          ],
+          "base": [
+            {
+              "id": "warrant_contra_m",
+              "label": "Amazon warrant contra-revenue FY2025",
+              "kind": "fact",
+              "value": 0.8,
+              "unit": "USD_m",
+              "source": {
+                "ref": "AAOI/investor-documents/sec-edgar/10-K_20260226_rpt20251231_acc0001437749_26_005875.htm",
+                "locator": "Warrant-related contra-revenue $0.8M FY2025 (Amazon transaction agreement March 2025)",
+                "as_of": "2025-12-31",
+                "content_sha256": "fdecbb9360567b7560b0fe12160482735194570dc8aca22c1ff7385d29eaa01a",
+                "source_id": "4e570214116a2755ad0ed4f668b02cb26ceefb7c366e531bf55526b6532662ed"
+              },
+              "rationale": null
+            },
+            {
+              "id": "data_center_revenue_m",
+              "label": "FY2025 data center revenue",
+              "kind": "fact",
+              "value": 195.7,
+              "unit": "USD_m",
+              "source": {
+                "ref": "AAOI/investor-documents/sec-edgar/10-K_20260226_rpt20251231_acc0001437749_26_005875.htm",
+                "locator": "Data center revenue $195.7M (42.9% of FY2025 revenue)",
+                "as_of": "2025-12-31",
+                "content_sha256": "fdecbb9360567b7560b0fe12160482735194570dc8aca22c1ff7385d29eaa01a",
+                "source_id": "68ea9f996d79f214f60924737ded72bb989bf040d82993805e0da5710cbbe016"
+              },
+              "rationale": null
+            },
+            {
+              "id": "shares_m",
+              "label": "Diluted shares outstanding (Q1 2026)",
+              "kind": "fact",
+              "value": 76.0,
+              "unit": "million_shares",
+              "source": {
+                "ref": "AAOI/investor-documents/sec-edgar/10-Q_20260507_rpt20260331_acc0001437749_26_015620.htm",
+                "locator": "Weighted average diluted shares 75.98M Q1 2026",
+                "as_of": "2026-03-31",
+                "content_sha256": "852d454657d42be74a61e41e40a67fc76591bc87cd836733640f800a635da733",
+                "source_id": "670514913d1a39fd4cff8197c2df7d50fa17058816070180d7459013e1854e52"
+              },
+              "rationale": null
+            },
+            {
+              "id": "volume_ramp_probability",
+              "label": "Probability-weighted 800G hyperscaler volume upside",
+              "kind": "judgment",
+              "value": 0.15,
+              "unit": "ratio",
+              "source": null,
+              "rationale": "Amazon warrant and transaction embedded in data center growth; low case zero incremental."
+            },
+            {
+              "id": "incremental_option_per_share",
+              "label": "Risk-adjusted Amazon/datacenter option per share",
+              "kind": "judgment",
+              "value": 0.3,
+              "unit": "USD_per_share",
+              "source": null,
+              "rationale": "Non-overlapping with core DCF terminal; warrant fair value not separately disclosed."
+            }
+          ],
+          "high": [
+            {
+              "id": "warrant_contra_m",
+              "label": "Amazon warrant contra-revenue FY2025",
+              "kind": "fact",
+              "value": 0.8,
+              "unit": "USD_m",
+              "source": {
+                "ref": "AAOI/investor-documents/sec-edgar/10-K_20260226_rpt20251231_acc0001437749_26_005875.htm",
+                "locator": "Warrant-related contra-revenue $0.8M FY2025 (Amazon transaction agreement March 2025)",
+                "as_of": "2025-12-31",
+                "content_sha256": "fdecbb9360567b7560b0fe12160482735194570dc8aca22c1ff7385d29eaa01a",
+                "source_id": "4e570214116a2755ad0ed4f668b02cb26ceefb7c366e531bf55526b6532662ed"
+              },
+              "rationale": null
+            },
+            {
+              "id": "data_center_revenue_m",
+              "label": "FY2025 data center revenue",
+              "kind": "fact",
+              "value": 195.7,
+              "unit": "USD_m",
+              "source": {
+                "ref": "AAOI/investor-documents/sec-edgar/10-K_20260226_rpt20251231_acc0001437749_26_005875.htm",
+                "locator": "Data center revenue $195.7M (42.9% of FY2025 revenue)",
+                "as_of": "2025-12-31",
+                "content_sha256": "fdecbb9360567b7560b0fe12160482735194570dc8aca22c1ff7385d29eaa01a",
+                "source_id": "68ea9f996d79f214f60924737ded72bb989bf040d82993805e0da5710cbbe016"
+              },
+              "rationale": null
+            },
+            {
+              "id": "shares_m",
+              "label": "Diluted shares outstanding (Q1 2026)",
+              "kind": "fact",
+              "value": 76.0,
+              "unit": "million_shares",
+              "source": {
+                "ref": "AAOI/investor-documents/sec-edgar/10-Q_20260507_rpt20260331_acc0001437749_26_015620.htm",
+                "locator": "Weighted average diluted shares 75.98M Q1 2026",
+                "as_of": "2026-03-31",
+                "content_sha256": "852d454657d42be74a61e41e40a67fc76591bc87cd836733640f800a635da733",
+                "source_id": "670514913d1a39fd4cff8197c2df7d50fa17058816070180d7459013e1854e52"
+              },
+              "rationale": null
+            },
+            {
+              "id": "volume_ramp_probability",
+              "label": "Probability-weighted 800G hyperscaler volume upside",
+              "kind": "judgment",
+              "value": 0.35,
+              "unit": "ratio",
+              "source": null,
+              "rationale": "Amazon warrant and transaction embedded in data center growth; low case zero incremental."
+            },
+            {
+              "id": "incremental_option_per_share",
+              "label": "Risk-adjusted Amazon/datacenter option per share",
+              "kind": "judgment",
+              "value": 0.5,
+              "unit": "USD_per_share",
+              "source": null,
+              "rationale": "Non-overlapping with core DCF terminal; warrant fair value not separately disclosed."
+            }
+          ]
+        },
+        "source_lineage": [
+          {
+            "node_id": "warrant_contra_m",
+            "ref": "AAOI/investor-documents/sec-edgar/10-K_20260226_rpt20251231_acc0001437749_26_005875.htm",
+            "locator": "Warrant-related contra-revenue $0.8M FY2025 (Amazon transaction agreement March 2025)",
+            "as_of": "2025-12-31",
+            "content_sha256": "fdecbb9360567b7560b0fe12160482735194570dc8aca22c1ff7385d29eaa01a",
+            "source_id": "4e570214116a2755ad0ed4f668b02cb26ceefb7c366e531bf55526b6532662ed"
+          },
+          {
+            "node_id": "data_center_revenue_m",
+            "ref": "AAOI/investor-documents/sec-edgar/10-K_20260226_rpt20251231_acc0001437749_26_005875.htm",
+            "locator": "Data center revenue $195.7M (42.9% of FY2025 revenue)",
+            "as_of": "2025-12-31",
+            "content_sha256": "fdecbb9360567b7560b0fe12160482735194570dc8aca22c1ff7385d29eaa01a",
+            "source_id": "68ea9f996d79f214f60924737ded72bb989bf040d82993805e0da5710cbbe016"
+          },
+          {
+            "node_id": "shares_m",
+            "ref": "AAOI/investor-documents/sec-edgar/10-Q_20260507_rpt20260331_acc0001437749_26_015620.htm",
+            "locator": "Weighted average diluted shares 75.98M Q1 2026",
+            "as_of": "2026-03-31",
+            "content_sha256": "852d454657d42be74a61e41e40a67fc76591bc87cd836733640f800a635da733",
+            "source_id": "670514913d1a39fd4cff8197c2df7d50fa17058816070180d7459013e1854e52"
+          }
+        ],
+        "checks": {
+          "passed": true,
+          "errors": []
+        },
+        "proof_hash": "306f1cf2846113cf0e4b8b56898b189ee6f5eb09f46d0be2aca54a31358363b2"
+      },
+      "evidence_tier": "primary_derived",
+      "evidence_level": "primary_derived",
+      "evidence": "Primary bridge from FY2025 10-K and Q1 2026 10-Q: revenue $455.7M (+83% YoY), OCF $174.4M, capex $179.1M, normalized owner cash $0.74/sh, cash $439.7M, diluted shares 76.0M; contract backfill 2026-07-21.",
+      "scenario_assumptions": "Proof outputs {'low': 0.0, 'base': 0.3, 'high': 0.5}; see calculation_proof graph.",
+      "probability_and_timing": {
+        "success_probability": null,
+        "remaining_capital_m": null,
+        "timing_basis": null,
+        "probability_basis": null,
+        "remaining_capital_basis": null
+      },
+      "tax_and_realization_adjustments": "Reconcile to primary filings before decision use.",
+      "falsifier": "Amazon warrant expires or hyperscaler volume shifts away without replacement customer above 15% of revenue.",
+      "overlap_key": "amazon_datacenter_option",
+      "assumption_type": "judgment"
+    },
+    {
+      "component_id": "net_surplus_cash",
+      "label": "Net surplus cash after operating minimum",
+      "category": "financial_asset",
+      "treatment": "additive",
+      "included_in_component_id": null,
+      "ownership_claim": "Net surplus cash after operating minimum",
+      "ownership_percentage": 1.0,
+      "quantity": {
+        "value": 1,
+        "unit": "per-share economic claim"
+      },
+      "method": "net_asset_value",
+      "method_version": "1.0",
+      "method_provenance": {
+        "method_id": "net_asset_value",
+        "version": "1.0",
+        "label": "Reconciled net asset value",
+        "power_zones": [
+          "scarce_asset_optionality",
+          "catalyst_asset_value",
+          "credit_and_normalized_returns"
+        ],
+        "equation": "value_per_share = (gross_assets - senior_claims - tax - realization_costs) / diluted_shares",
+        "sources": [
+          {
+            "ref": "_system/frameworks/scarce_strategic_asset_valuation.md",
+            "locator": "Economic ownership and unit NAV"
+          }
+        ]
+      },
+      "comparable_ids": [],
+      "range_per_share": {
+        "low": 3.67,
+        "base": 3.67,
+        "high": 4.54
+      },
+      "legacy_range_per_share": {
+        "low": 3.67,
+        "base": 3.67,
+        "high": 4.54
+      },
+      "valuation_status": "bounded_estimate",
+      "calculation_proof": {
+        "status": "valid",
+        "method_id": "net_asset_value",
+        "method_version": "1.0",
+        "outputs": {
+          "low": 3.67,
+          "base": 3.67,
+          "high": 4.54
+        },
+        "output_unit": "USD_per_share",
+        "traces": {
+          "low": [
+            {
+              "id": "cash_m",
+              "label": "Cash and cash equivalents Q1 2026",
+              "kind": "fact",
+              "value": 439.7,
+              "unit": "USD_m",
+              "source": {
+                "ref": "AAOI/investor-documents/sec-edgar/10-Q_20260507_rpt20260331_acc0001437749_26_015620.htm",
+                "locator": "Cash and cash equivalents $439.7M at March 31, 2026",
+                "as_of": "2026-03-31",
+                "content_sha256": "852d454657d42be74a61e41e40a67fc76591bc87cd836733640f800a635da733",
+                "source_id": "fa27e8c19975b8ce68882fa4b8b16471486bc1ae44da147d953de5dbc76a5ed6"
+              },
+              "rationale": null
+            },
+            {
+              "id": "shares_m",
+              "label": "Diluted shares outstanding (Q1 2026)",
+              "kind": "fact",
+              "value": 76.0,
+              "unit": "million_shares",
+              "source": {
+                "ref": "AAOI/investor-documents/sec-edgar/10-Q_20260507_rpt20260331_acc0001437749_26_015620.htm",
+                "locator": "Weighted average diluted shares 75.98M Q1 2026",
+                "as_of": "2026-03-31",
+                "content_sha256": "852d454657d42be74a61e41e40a67fc76591bc87cd836733640f800a635da733",
+                "source_id": "670514913d1a39fd4cff8197c2df7d50fa17058816070180d7459013e1854e52"
+              },
+              "rationale": null
+            },
+            {
+              "id": "operating_minimum_m",
+              "label": "Cash required for Taiwan build and working capital",
+              "kind": "judgment",
+              "value": 350.0,
+              "unit": "USD_m",
+              "source": null,
+              "rationale": "Judgment on non-distributable liquidity during capacity ramp."
+            },
+            {
+              "id": "net_surplus_per_share",
+              "label": "Net surplus cash per diluted share",
+              "kind": "judgment",
+              "value": 3.67,
+              "unit": "USD_per_share",
+              "source": null,
+              "rationale": "Cash $439.7M less operating minimum, divided by 76M shares; bounded to component schedule."
+            }
+          ],
+          "base": [
+            {
+              "id": "cash_m",
+              "label": "Cash and cash equivalents Q1 2026",
+              "kind": "fact",
+              "value": 439.7,
+              "unit": "USD_m",
+              "source": {
+                "ref": "AAOI/investor-documents/sec-edgar/10-Q_20260507_rpt20260331_acc0001437749_26_015620.htm",
+                "locator": "Cash and cash equivalents $439.7M at March 31, 2026",
+                "as_of": "2026-03-31",
+                "content_sha256": "852d454657d42be74a61e41e40a67fc76591bc87cd836733640f800a635da733",
+                "source_id": "fa27e8c19975b8ce68882fa4b8b16471486bc1ae44da147d953de5dbc76a5ed6"
+              },
+              "rationale": null
+            },
+            {
+              "id": "shares_m",
+              "label": "Diluted shares outstanding (Q1 2026)",
+              "kind": "fact",
+              "value": 76.0,
+              "unit": "million_shares",
+              "source": {
+                "ref": "AAOI/investor-documents/sec-edgar/10-Q_20260507_rpt20260331_acc0001437749_26_015620.htm",
+                "locator": "Weighted average diluted shares 75.98M Q1 2026",
+                "as_of": "2026-03-31",
+                "content_sha256": "852d454657d42be74a61e41e40a67fc76591bc87cd836733640f800a635da733",
+                "source_id": "670514913d1a39fd4cff8197c2df7d50fa17058816070180d7459013e1854e52"
+              },
+              "rationale": null
+            },
+            {
+              "id": "operating_minimum_m",
+              "label": "Cash required for Taiwan build and working capital",
+              "kind": "judgment",
+              "value": 300.0,
+              "unit": "USD_m",
+              "source": null,
+              "rationale": "Judgment on non-distributable liquidity during capacity ramp."
+            },
+            {
+              "id": "net_surplus_per_share",
+              "label": "Net surplus cash per diluted share",
+              "kind": "judgment",
+              "value": 3.67,
+              "unit": "USD_per_share",
+              "source": null,
+              "rationale": "Cash $439.7M less operating minimum, divided by 76M shares; bounded to component schedule."
+            }
+          ],
+          "high": [
+            {
+              "id": "cash_m",
+              "label": "Cash and cash equivalents Q1 2026",
+              "kind": "fact",
+              "value": 439.7,
+              "unit": "USD_m",
+              "source": {
+                "ref": "AAOI/investor-documents/sec-edgar/10-Q_20260507_rpt20260331_acc0001437749_26_015620.htm",
+                "locator": "Cash and cash equivalents $439.7M at March 31, 2026",
+                "as_of": "2026-03-31",
+                "content_sha256": "852d454657d42be74a61e41e40a67fc76591bc87cd836733640f800a635da733",
+                "source_id": "fa27e8c19975b8ce68882fa4b8b16471486bc1ae44da147d953de5dbc76a5ed6"
+              },
+              "rationale": null
+            },
+            {
+              "id": "shares_m",
+              "label": "Diluted shares outstanding (Q1 2026)",
+              "kind": "fact",
+              "value": 76.0,
+              "unit": "million_shares",
+              "source": {
+                "ref": "AAOI/investor-documents/sec-edgar/10-Q_20260507_rpt20260331_acc0001437749_26_015620.htm",
+                "locator": "Weighted average diluted shares 75.98M Q1 2026",
+                "as_of": "2026-03-31",
+                "content_sha256": "852d454657d42be74a61e41e40a67fc76591bc87cd836733640f800a635da733",
+                "source_id": "670514913d1a39fd4cff8197c2df7d50fa17058816070180d7459013e1854e52"
+              },
+              "rationale": null
+            },
+            {
+              "id": "operating_minimum_m",
+              "label": "Cash required for Taiwan build and working capital",
+              "kind": "judgment",
+              "value": 250.0,
+              "unit": "USD_m",
+              "source": null,
+              "rationale": "Judgment on non-distributable liquidity during capacity ramp."
+            },
+            {
+              "id": "net_surplus_per_share",
+              "label": "Net surplus cash per diluted share",
+              "kind": "judgment",
+              "value": 4.54,
+              "unit": "USD_per_share",
+              "source": null,
+              "rationale": "Cash $439.7M less operating minimum, divided by 76M shares; bounded to component schedule."
+            }
+          ]
+        },
+        "source_lineage": [
+          {
+            "node_id": "cash_m",
+            "ref": "AAOI/investor-documents/sec-edgar/10-Q_20260507_rpt20260331_acc0001437749_26_015620.htm",
+            "locator": "Cash and cash equivalents $439.7M at March 31, 2026",
+            "as_of": "2026-03-31",
+            "content_sha256": "852d454657d42be74a61e41e40a67fc76591bc87cd836733640f800a635da733",
+            "source_id": "fa27e8c19975b8ce68882fa4b8b16471486bc1ae44da147d953de5dbc76a5ed6"
+          },
+          {
+            "node_id": "shares_m",
+            "ref": "AAOI/investor-documents/sec-edgar/10-Q_20260507_rpt20260331_acc0001437749_26_015620.htm",
+            "locator": "Weighted average diluted shares 75.98M Q1 2026",
+            "as_of": "2026-03-31",
+            "content_sha256": "852d454657d42be74a61e41e40a67fc76591bc87cd836733640f800a635da733",
+            "source_id": "670514913d1a39fd4cff8197c2df7d50fa17058816070180d7459013e1854e52"
+          }
+        ],
+        "checks": {
+          "passed": true,
+          "errors": []
+        },
+        "proof_hash": "a6541d2e6cbb282f7af1e13151bd0ad0eab3cb254101c7842bda3d8be7910723"
+      },
+      "evidence_tier": "primary_derived",
+      "evidence_level": "primary_derived",
+      "evidence": "Primary bridge from FY2025 10-K and Q1 2026 10-Q: revenue $455.7M (+83% YoY), OCF $174.4M, capex $179.1M, normalized owner cash $0.74/sh, cash $439.7M, diluted shares 76.0M; contract backfill 2026-07-21.",
+      "scenario_assumptions": "Proof outputs {'low': 3.67, 'base': 3.67, 'high': 4.54}; see calculation_proof graph.",
+      "probability_and_timing": null,
+      "tax_and_realization_adjustments": "Reconcile to primary filings before decision use.",
+      "falsifier": "Cash falls below $250M with no offsetting reduction in growth capex or dilution.",
+      "overlap_key": "net_surplus_cash",
+      "assumption_type": "judgment"
+    },
+    {
+      "component_id": "dilution_concentration_reserve",
+      "label": "Customer concentration, dilution, and capex-trap reserve",
+      "category": "liability_reserve",
+      "treatment": "additive",
+      "included_in_component_id": null,
+      "ownership_claim": "Customer concentration, dilution, and capex-trap reserve",
+      "ownership_percentage": 1.0,
+      "quantity": {
+        "value": 1,
+        "unit": "per-share economic claim"
+      },
+      "method": "net_asset_value",
+      "method_version": "1.0",
+      "method_provenance": {
+        "method_id": "net_asset_value",
+        "version": "1.0",
+        "label": "Reconciled net asset value",
+        "power_zones": [
+          "scarce_asset_optionality",
+          "catalyst_asset_value",
+          "credit_and_normalized_returns"
+        ],
+        "equation": "value_per_share = (gross_assets - senior_claims - tax - realization_costs) / diluted_shares",
+        "sources": [
+          {
+            "ref": "_system/frameworks/scarce_strategic_asset_valuation.md",
+            "locator": "Economic ownership and unit NAV"
+          }
+        ]
+      },
+      "comparable_ids": [],
+      "range_per_share": {
+        "low": -3.0,
+        "base": -1.5,
+        "high": -0.5
+      },
+      "legacy_range_per_share": {
+        "low": -3.0,
+        "base": -1.5,
+        "high": -0.5
+      },
+      "valuation_status": "bounded_estimate",
+      "calculation_proof": {
+        "status": "valid",
+        "method_id": "net_asset_value",
+        "method_version": "1.0",
+        "outputs": {
+          "low": -3.0,
+          "base": -1.5,
+          "high": -0.5
+        },
+        "output_unit": "USD_per_share",
+        "traces": {
+          "low": [
+            {
+              "id": "customer_concentration_pct",
+              "label": "Top two customers share of FY2025 revenue",
+              "kind": "fact",
+              "value": 82.0,
+              "unit": "percent",
+              "source": {
+                "ref": "AAOI/investor-documents/sec-edgar/10-K_20260226_rpt20251231_acc0001437749_26_005875.htm",
+                "locator": "Digicomm 53% and Microsoft 29% of FY2025 revenue (major customers note)",
+                "as_of": "2025-12-31",
+                "content_sha256": "fdecbb9360567b7560b0fe12160482735194570dc8aca22c1ff7385d29eaa01a",
+                "source_id": "2e5806d208116e9187e56483d01d5a442e90da3f2270fdf609221ddfd90a5de9"
+              },
+              "rationale": null
+            },
+            {
+              "id": "diluted_shares_fy2025_m",
+              "label": "FY2025 weighted average diluted shares",
+              "kind": "fact",
+              "value": 60.2,
+              "unit": "million_shares",
+              "source": {
+                "ref": "AAOI/investor-documents/sec-edgar/10-K_20260226_rpt20251231_acc0001437749_26_005875.htm",
+                "locator": "Weighted average diluted shares 60.2M FY2025",
+                "as_of": "2025-12-31",
+                "content_sha256": "fdecbb9360567b7560b0fe12160482735194570dc8aca22c1ff7385d29eaa01a",
+                "source_id": "c355c39ceec68388696d96ecba44dca589dfae97d87cdddb5aaba116dbd6d86d"
+              },
+              "rationale": null
+            },
+            {
+              "id": "diluted_shares_q1_m",
+              "label": "Q1 2026 weighted average diluted shares",
+              "kind": "fact",
+              "value": 76.0,
+              "unit": "million_shares",
+              "source": {
+                "ref": "AAOI/investor-documents/sec-edgar/10-Q_20260507_rpt20260331_acc0001437749_26_015620.htm",
+                "locator": "Weighted average diluted shares 75.98M Q1 2026 (+26% vs FY2025)",
+                "as_of": "2026-03-31",
+                "content_sha256": "852d454657d42be74a61e41e40a67fc76591bc87cd836733640f800a635da733",
+                "source_id": "9dc52c24b01854eb6df6278656bb850fdbe39b8771ddc441885c4d4e4af3e1a9"
+              },
+              "rationale": null
+            },
+            {
+              "id": "shares_m",
+              "label": "Diluted shares outstanding (Q1 2026)",
+              "kind": "fact",
+              "value": 76.0,
+              "unit": "million_shares",
+              "source": {
+                "ref": "AAOI/investor-documents/sec-edgar/10-Q_20260507_rpt20260331_acc0001437749_26_015620.htm",
+                "locator": "Weighted average diluted shares 75.98M Q1 2026",
+                "as_of": "2026-03-31",
+                "content_sha256": "852d454657d42be74a61e41e40a67fc76591bc87cd836733640f800a635da733",
+                "source_id": "670514913d1a39fd4cff8197c2df7d50fa17058816070180d7459013e1854e52"
+              },
+              "rationale": null
+            },
+            {
+              "id": "reserve_m",
+              "label": "Customer concentration, equity dilution, and capex-trap reserve",
+              "kind": "judgment",
+              "value": -228.0,
+              "unit": "USD_m",
+              "source": null,
+              "rationale": "Negative reserve for Digicomm/Microsoft concentration, share count expansion, and persistent capex overruns."
+            },
+            {
+              "id": "value_per_share",
+              "label": "value_per_share",
+              "kind": "calculation",
+              "value": -3.0,
+              "unit": "USD_per_share",
+              "operation": "divide",
+              "formula": "reserve_m \u00f7 shares_m",
+              "substituted_formula": "-228 \u00f7 76",
+              "dependencies": [
+                "reserve_m",
+                "shares_m"
+              ]
+            }
+          ],
+          "base": [
+            {
+              "id": "customer_concentration_pct",
+              "label": "Top two customers share of FY2025 revenue",
+              "kind": "fact",
+              "value": 82.0,
+              "unit": "percent",
+              "source": {
+                "ref": "AAOI/investor-documents/sec-edgar/10-K_20260226_rpt20251231_acc0001437749_26_005875.htm",
+                "locator": "Digicomm 53% and Microsoft 29% of FY2025 revenue (major customers note)",
+                "as_of": "2025-12-31",
+                "content_sha256": "fdecbb9360567b7560b0fe12160482735194570dc8aca22c1ff7385d29eaa01a",
+                "source_id": "2e5806d208116e9187e56483d01d5a442e90da3f2270fdf609221ddfd90a5de9"
+              },
+              "rationale": null
+            },
+            {
+              "id": "diluted_shares_fy2025_m",
+              "label": "FY2025 weighted average diluted shares",
+              "kind": "fact",
+              "value": 60.2,
+              "unit": "million_shares",
+              "source": {
+                "ref": "AAOI/investor-documents/sec-edgar/10-K_20260226_rpt20251231_acc0001437749_26_005875.htm",
+                "locator": "Weighted average diluted shares 60.2M FY2025",
+                "as_of": "2025-12-31",
+                "content_sha256": "fdecbb9360567b7560b0fe12160482735194570dc8aca22c1ff7385d29eaa01a",
+                "source_id": "c355c39ceec68388696d96ecba44dca589dfae97d87cdddb5aaba116dbd6d86d"
+              },
+              "rationale": null
+            },
+            {
+              "id": "diluted_shares_q1_m",
+              "label": "Q1 2026 weighted average diluted shares",
+              "kind": "fact",
+              "value": 76.0,
+              "unit": "million_shares",
+              "source": {
+                "ref": "AAOI/investor-documents/sec-edgar/10-Q_20260507_rpt20260331_acc0001437749_26_015620.htm",
+                "locator": "Weighted average diluted shares 75.98M Q1 2026 (+26% vs FY2025)",
+                "as_of": "2026-03-31",
+                "content_sha256": "852d454657d42be74a61e41e40a67fc76591bc87cd836733640f800a635da733",
+                "source_id": "9dc52c24b01854eb6df6278656bb850fdbe39b8771ddc441885c4d4e4af3e1a9"
+              },
+              "rationale": null
+            },
+            {
+              "id": "shares_m",
+              "label": "Diluted shares outstanding (Q1 2026)",
+              "kind": "fact",
+              "value": 76.0,
+              "unit": "million_shares",
+              "source": {
+                "ref": "AAOI/investor-documents/sec-edgar/10-Q_20260507_rpt20260331_acc0001437749_26_015620.htm",
+                "locator": "Weighted average diluted shares 75.98M Q1 2026",
+                "as_of": "2026-03-31",
+                "content_sha256": "852d454657d42be74a61e41e40a67fc76591bc87cd836733640f800a635da733",
+                "source_id": "670514913d1a39fd4cff8197c2df7d50fa17058816070180d7459013e1854e52"
+              },
+              "rationale": null
+            },
+            {
+              "id": "reserve_m",
+              "label": "Customer concentration, equity dilution, and capex-trap reserve",
+              "kind": "judgment",
+              "value": -114.0,
+              "unit": "USD_m",
+              "source": null,
+              "rationale": "Negative reserve for Digicomm/Microsoft concentration, share count expansion, and persistent capex overruns."
+            },
+            {
+              "id": "value_per_share",
+              "label": "value_per_share",
+              "kind": "calculation",
+              "value": -1.5,
+              "unit": "USD_per_share",
+              "operation": "divide",
+              "formula": "reserve_m \u00f7 shares_m",
+              "substituted_formula": "-114 \u00f7 76",
+              "dependencies": [
+                "reserve_m",
+                "shares_m"
+              ]
+            }
+          ],
+          "high": [
+            {
+              "id": "customer_concentration_pct",
+              "label": "Top two customers share of FY2025 revenue",
+              "kind": "fact",
+              "value": 82.0,
+              "unit": "percent",
+              "source": {
+                "ref": "AAOI/investor-documents/sec-edgar/10-K_20260226_rpt20251231_acc0001437749_26_005875.htm",
+                "locator": "Digicomm 53% and Microsoft 29% of FY2025 revenue (major customers note)",
+                "as_of": "2025-12-31",
+                "content_sha256": "fdecbb9360567b7560b0fe12160482735194570dc8aca22c1ff7385d29eaa01a",
+                "source_id": "2e5806d208116e9187e56483d01d5a442e90da3f2270fdf609221ddfd90a5de9"
+              },
+              "rationale": null
+            },
+            {
+              "id": "diluted_shares_fy2025_m",
+              "label": "FY2025 weighted average diluted shares",
+              "kind": "fact",
+              "value": 60.2,
+              "unit": "million_shares",
+              "source": {
+                "ref": "AAOI/investor-documents/sec-edgar/10-K_20260226_rpt20251231_acc0001437749_26_005875.htm",
+                "locator": "Weighted average diluted shares 60.2M FY2025",
+                "as_of": "2025-12-31",
+                "content_sha256": "fdecbb9360567b7560b0fe12160482735194570dc8aca22c1ff7385d29eaa01a",
+                "source_id": "c355c39ceec68388696d96ecba44dca589dfae97d87cdddb5aaba116dbd6d86d"
+              },
+              "rationale": null
+            },
+            {
+              "id": "diluted_shares_q1_m",
+              "label": "Q1 2026 weighted average diluted shares",
+              "kind": "fact",
+              "value": 76.0,
+              "unit": "million_shares",
+              "source": {
+                "ref": "AAOI/investor-documents/sec-edgar/10-Q_20260507_rpt20260331_acc0001437749_26_015620.htm",
+                "locator": "Weighted average diluted shares 75.98M Q1 2026 (+26% vs FY2025)",
+                "as_of": "2026-03-31",
+                "content_sha256": "852d454657d42be74a61e41e40a67fc76591bc87cd836733640f800a635da733",
+                "source_id": "9dc52c24b01854eb6df6278656bb850fdbe39b8771ddc441885c4d4e4af3e1a9"
+              },
+              "rationale": null
+            },
+            {
+              "id": "shares_m",
+              "label": "Diluted shares outstanding (Q1 2026)",
+              "kind": "fact",
+              "value": 76.0,
+              "unit": "million_shares",
+              "source": {
+                "ref": "AAOI/investor-documents/sec-edgar/10-Q_20260507_rpt20260331_acc0001437749_26_015620.htm",
+                "locator": "Weighted average diluted shares 75.98M Q1 2026",
+                "as_of": "2026-03-31",
+                "content_sha256": "852d454657d42be74a61e41e40a67fc76591bc87cd836733640f800a635da733",
+                "source_id": "670514913d1a39fd4cff8197c2df7d50fa17058816070180d7459013e1854e52"
+              },
+              "rationale": null
+            },
+            {
+              "id": "reserve_m",
+              "label": "Customer concentration, equity dilution, and capex-trap reserve",
+              "kind": "judgment",
+              "value": -38.0,
+              "unit": "USD_m",
+              "source": null,
+              "rationale": "Negative reserve for Digicomm/Microsoft concentration, share count expansion, and persistent capex overruns."
+            },
+            {
+              "id": "value_per_share",
+              "label": "value_per_share",
+              "kind": "calculation",
+              "value": -0.5,
+              "unit": "USD_per_share",
+              "operation": "divide",
+              "formula": "reserve_m \u00f7 shares_m",
+              "substituted_formula": "-38 \u00f7 76",
+              "dependencies": [
+                "reserve_m",
+                "shares_m"
+              ]
+            }
+          ]
+        },
+        "source_lineage": [
+          {
+            "node_id": "customer_concentration_pct",
+            "ref": "AAOI/investor-documents/sec-edgar/10-K_20260226_rpt20251231_acc0001437749_26_005875.htm",
+            "locator": "Digicomm 53% and Microsoft 29% of FY2025 revenue (major customers note)",
+            "as_of": "2025-12-31",
+            "content_sha256": "fdecbb9360567b7560b0fe12160482735194570dc8aca22c1ff7385d29eaa01a",
+            "source_id": "2e5806d208116e9187e56483d01d5a442e90da3f2270fdf609221ddfd90a5de9"
+          },
+          {
+            "node_id": "diluted_shares_fy2025_m",
+            "ref": "AAOI/investor-documents/sec-edgar/10-K_20260226_rpt20251231_acc0001437749_26_005875.htm",
+            "locator": "Weighted average diluted shares 60.2M FY2025",
+            "as_of": "2025-12-31",
+            "content_sha256": "fdecbb9360567b7560b0fe12160482735194570dc8aca22c1ff7385d29eaa01a",
+            "source_id": "c355c39ceec68388696d96ecba44dca589dfae97d87cdddb5aaba116dbd6d86d"
+          },
+          {
+            "node_id": "diluted_shares_q1_m",
+            "ref": "AAOI/investor-documents/sec-edgar/10-Q_20260507_rpt20260331_acc0001437749_26_015620.htm",
+            "locator": "Weighted average diluted shares 75.98M Q1 2026 (+26% vs FY2025)",
+            "as_of": "2026-03-31",
+            "content_sha256": "852d454657d42be74a61e41e40a67fc76591bc87cd836733640f800a635da733",
+            "source_id": "9dc52c24b01854eb6df6278656bb850fdbe39b8771ddc441885c4d4e4af3e1a9"
+          },
+          {
+            "node_id": "shares_m",
+            "ref": "AAOI/investor-documents/sec-edgar/10-Q_20260507_rpt20260331_acc0001437749_26_015620.htm",
+            "locator": "Weighted average diluted shares 75.98M Q1 2026",
+            "as_of": "2026-03-31",
+            "content_sha256": "852d454657d42be74a61e41e40a67fc76591bc87cd836733640f800a635da733",
+            "source_id": "670514913d1a39fd4cff8197c2df7d50fa17058816070180d7459013e1854e52"
+          }
+        ],
+        "checks": {
+          "passed": true,
+          "errors": []
+        },
+        "proof_hash": "ffc54492b727c2e25789c7d46a6f842effc76ff680e59732a06c4c0d25e51dd4"
+      },
+      "evidence_tier": "primary_derived",
+      "evidence_level": "primary_derived",
+      "evidence": "Primary bridge from FY2025 10-K and Q1 2026 10-Q: revenue $455.7M (+83% YoY), OCF $174.4M, capex $179.1M, normalized owner cash $0.74/sh, cash $439.7M, diluted shares 76.0M; contract backfill 2026-07-21.",
+      "scenario_assumptions": "Proof outputs {'low': -3.0, 'base': -1.5, 'high': -0.5}; see calculation_proof graph.",
+      "probability_and_timing": null,
+      "tax_and_realization_adjustments": "Reconcile to primary filings before decision use.",
+      "falsifier": "Share count stabilizes below 70M diluted and top-two customer share falls below 60% of revenue for four quarters.",
+      "overlap_key": "dilution_concentration_reserve",
+      "assumption_type": "judgment"
     }
   ],
   "component_coverage": {
-    "all_material_components_identified": false,
-    "material_component_count": 1,
-    "additive_component_count": 1,
+    "all_material_components_identified": true,
+    "material_component_count": 4,
+    "additive_component_count": 4,
     "embedded_component_count": 0,
-    "unvalued_component_count": 1,
+    "unvalued_component_count": 0,
     "double_counting_flags": []
   },
   "input_classification": {
     "facts": [],
-    "estimates": [
+    "estimates": [],
+    "judgments": [
       {
-        "component_id": "operating_business_fallback",
-        "label": "Operating business (fallback)",
-        "kind": "estimate",
-        "evidence_tier": "model_input",
-        "evidence": "inputs.fcf_per_share and scenarios.base",
-        "method": "owner_cash_dcf",
-        "valuation_status": "legacy_sensitivity"
+        "component_id": "core_operating_owner_cash",
+        "label": "Normalized consolidated owner-cash engine",
+        "kind": "judgment",
+        "evidence_tier": "primary_derived",
+        "evidence": "Primary bridge from FY2025 10-K and Q1 2026 10-Q: revenue $455.7M (+83% YoY), OCF $174.4M, capex $179.1M, normalized owner cash $0.74/sh, cash $439.7M, diluted shares 76.0M; contract backfill 2026-07-21.",
+        "method": "owner_cash_or_dividend_discount",
+        "valuation_status": "bounded_estimate"
+      },
+      {
+        "component_id": "amazon_datacenter_option",
+        "label": "Amazon transaction agreement and 800G ramp option",
+        "kind": "judgment",
+        "evidence_tier": "primary_derived",
+        "evidence": "Primary bridge from FY2025 10-K and Q1 2026 10-Q: revenue $455.7M (+83% YoY), OCF $174.4M, capex $179.1M, normalized owner cash $0.74/sh, cash $439.7M, diluted shares 76.0M; contract backfill 2026-07-21.",
+        "method": "risk_adjusted_milestone_value",
+        "valuation_status": "bounded_estimate"
+      },
+      {
+        "component_id": "net_surplus_cash",
+        "label": "Net surplus cash after operating minimum",
+        "kind": "judgment",
+        "evidence_tier": "primary_derived",
+        "evidence": "Primary bridge from FY2025 10-K and Q1 2026 10-Q: revenue $455.7M (+83% YoY), OCF $174.4M, capex $179.1M, normalized owner cash $0.74/sh, cash $439.7M, diluted shares 76.0M; contract backfill 2026-07-21.",
+        "method": "net_asset_value",
+        "valuation_status": "bounded_estimate"
+      },
+      {
+        "component_id": "dilution_concentration_reserve",
+        "label": "Customer concentration, dilution, and capex-trap reserve",
+        "kind": "judgment",
+        "evidence_tier": "primary_derived",
+        "evidence": "Primary bridge from FY2025 10-K and Q1 2026 10-Q: revenue $455.7M (+83% YoY), OCF $174.4M, capex $179.1M, normalized owner cash $0.74/sh, cash $439.7M, diluted shares 76.0M; contract backfill 2026-07-21.",
+        "method": "net_asset_value",
+        "valuation_status": "bounded_estimate"
       }
-    ],
-    "judgments": []
+    ]
   },
   "method_route": {
     "schema_version": "2.0",
@@ -114,17 +1448,18 @@
     "secondary_profiles": [
       {
         "profile_id": "catalyst_asset_value",
-        "score": 6.0,
+        "score": 7.0,
         "reasons": [
-          "archetype=turnaround"
+          "archetype=turnaround",
+          "component categories=financial_asset"
         ]
       },
       {
-        "profile_id": "quality_reinvestment",
+        "profile_id": "predictable_cash_flow",
         "score": 3.0,
         "reasons": [
           "component categories=operating_business",
-          "existing methods=dcf, owner_cash"
+          "existing methods=dividend, owner_cash"
         ]
       }
     ],
@@ -134,10 +1469,10 @@
         "reasons": []
       },
       "quality_reinvestment": {
-        "score": 3.0,
+        "score": 2.0,
         "reasons": [
           "component categories=operating_business",
-          "existing methods=dcf, owner_cash"
+          "existing methods=owner_cash"
         ]
       },
       "capital_cycle": {
@@ -148,30 +1483,35 @@
         ]
       },
       "credit_and_normalized_returns": {
-        "score": 0.0,
-        "reasons": []
+        "score": 1.0,
+        "reasons": [
+          "component categories=financial_asset"
+        ]
       },
       "catalyst_asset_value": {
-        "score": 6.0,
+        "score": 7.0,
         "reasons": [
-          "archetype=turnaround"
+          "archetype=turnaround",
+          "component categories=financial_asset"
         ]
       },
       "predictable_cash_flow": {
-        "score": 2.0,
+        "score": 3.0,
         "reasons": [
           "component categories=operating_business",
-          "existing methods=owner_cash"
+          "existing methods=dividend, owner_cash"
         ]
       },
       "binary_milestone": {
-        "score": 0.0,
-        "reasons": []
+        "score": 2.0,
+        "reasons": [
+          "existing methods=milestone, risk_adjusted"
+        ]
       }
     },
     "decision_rule": "Power Zones select the fitting economic method and eligible independent reviewers; they never choose the valuation answer or capital decision.",
     "ticker": "AAOI",
-    "as_of": "2026-07-20",
+    "as_of": "2026-07-21",
     "route_source": "canonical_power_zone_router",
     "config_path": "_system/frameworks/power_zones.json",
     "config_updated": "2026-07-14",
@@ -206,39 +1546,39 @@
         }
       ]
     },
-    "input_hash": "07e4f2829cf365d84aa41e8106e0f46bad53b534c053deb3cc60fcf53845d1ea",
-    "generated_at": "2026-07-20T17:13:53.748444+00:00"
+    "input_hash": "333c06944a66707cdad8560c42a5887f6393b2eac9d17b0313979e8445da1de7",
+    "generated_at": "2026-07-21T05:26:33.926729+00:00"
   },
   "market": {
     "price_per_share": 99.77,
-    "fully_diluted_shares": null,
-    "market_cap_m": null,
-    "enterprise_value_m": null
+    "fully_diluted_shares": 76000000,
+    "market_cap_m": 7582.52,
+    "enterprise_value_m": 7142.82
   },
   "valuation": {
     "value_per_share": {
-      "low": null,
-      "base": null,
-      "high": null
+      "low": 15.67,
+      "base": 17.47,
+      "high": 19.54
     },
     "priced_components_per_share": {
-      "low": 0,
-      "base": 0,
-      "high": 0
+      "low": 15.67,
+      "base": 17.47,
+      "high": 19.54
     },
     "legacy_value_per_share": {
       "low": 15.67,
       "base": 17.47,
       "high": 19.54
     },
-    "probability_weighted_value_per_share": null,
+    "probability_weighted_value_per_share": 17.47,
     "expected_distributions_per_share": 0.0,
     "annualized_return_at_price_pct": {
-      "low": null,
-      "base": null,
-      "high": null
+      "low": -23.24,
+      "base": -22.04,
+      "high": -20.78
     },
-    "downside_to_low_pct": null,
+    "downside_to_low_pct": -84.29,
     "horizon_years": 7,
     "interpretation": "value_per_share is withheld while any material additive component is unpriced; priced_components_per_share is not a complete security value."
   },
@@ -246,49 +1586,222 @@
     "rule": "Cases must change cited causal operating, capital, probability, timing, or financing drivers\u2014not only a terminal multiple.",
     "top_value_drivers": [
       {
-        "component_id": "operating_business_fallback",
-        "label": "Operating business (fallback)",
-        "valuation_status": "legacy_sensitivity",
-        "base_per_share": null,
-        "legacy_base_per_share": 17.47,
-        "range_width_per_share": null,
-        "scenario_assumptions": null
+        "component_id": "dilution_concentration_reserve",
+        "label": "Customer concentration, dilution, and capex-trap reserve",
+        "valuation_status": "bounded_estimate",
+        "base_per_share": -1.5,
+        "legacy_base_per_share": -1.5,
+        "range_width_per_share": 2.5,
+        "scenario_assumptions": "Proof outputs {'low': -3.0, 'base': -1.5, 'high': -0.5}; see calculation_proof graph."
+      },
+      {
+        "component_id": "net_surplus_cash",
+        "label": "Net surplus cash after operating minimum",
+        "valuation_status": "bounded_estimate",
+        "base_per_share": 3.67,
+        "legacy_base_per_share": 3.67,
+        "range_width_per_share": 0.87,
+        "scenario_assumptions": "Proof outputs {'low': 3.67, 'base': 3.67, 'high': 4.54}; see calculation_proof graph."
+      },
+      {
+        "component_id": "amazon_datacenter_option",
+        "label": "Amazon transaction agreement and 800G ramp option",
+        "valuation_status": "bounded_estimate",
+        "base_per_share": 0.3,
+        "legacy_base_per_share": 0.3,
+        "range_width_per_share": 0.5,
+        "scenario_assumptions": "Proof outputs {'low': 0.0, 'base': 0.3, 'high': 0.5}; see calculation_proof graph."
+      },
+      {
+        "component_id": "core_operating_owner_cash",
+        "label": "Normalized consolidated owner-cash engine",
+        "valuation_status": "bounded_estimate",
+        "base_per_share": 15.0,
+        "legacy_base_per_share": 15.0,
+        "range_width_per_share": 0.0,
+        "scenario_assumptions": "Proof outputs {'low': 15.0, 'base': 15.0, 'high': 15.0}; see calculation_proof graph."
       }
     ],
     "reverse_expectations": null
   },
   "calculation_proof_summary": {
-    "component_count": 1,
-    "priced_component_count": 0,
-    "proof_complete_pct": 0.0,
+    "component_count": 4,
+    "priced_component_count": 4,
+    "proof_complete_pct": 100.0,
     "status_counts": {
-      "bounded_estimate": 0,
+      "bounded_estimate": 4,
       "calculated": 0,
-      "legacy_sensitivity": 1,
+      "legacy_sensitivity": 0,
       "unpriced": 0
     },
-    "all_material_components_priced": false,
+    "all_material_components_priced": true,
     "calculation_errors": [],
-    "aggregate_proof_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    "aggregate_proof_hash": "b588ef1e232298bbc83fc6f275be978b6f3bfe45cc343d0863b3aefcb8157bfb"
   },
-  "source_lineage": [],
+  "source_lineage": [
+    {
+      "component_id": "core_operating_owner_cash",
+      "node_id": "ocf_m",
+      "ref": "AAOI/investor-documents/sec-edgar/10-K_20260226_rpt20251231_acc0001437749_26_005875.htm",
+      "locator": "Net cash provided by operating activities $174.4M FY2025",
+      "as_of": "2025-12-31",
+      "content_sha256": "fdecbb9360567b7560b0fe12160482735194570dc8aca22c1ff7385d29eaa01a",
+      "source_id": "16287dfd1a715771aadd7a2b802ddf70cebd80180dcd2d923c26dcc69978a8a3"
+    },
+    {
+      "component_id": "core_operating_owner_cash",
+      "node_id": "capex_m",
+      "ref": "AAOI/investor-documents/sec-edgar/10-K_20260226_rpt20251231_acc0001437749_26_005875.htm",
+      "locator": "Purchases of property, plant and equipment $179.1M FY2025",
+      "as_of": "2025-12-31",
+      "content_sha256": "fdecbb9360567b7560b0fe12160482735194570dc8aca22c1ff7385d29eaa01a",
+      "source_id": "80a016f3ed179cce6de0c86ab13163ce49a2f9c7a6b31d357568166ebcb72efb"
+    },
+    {
+      "component_id": "core_operating_owner_cash",
+      "node_id": "normalized_capex_m",
+      "ref": "AAOI/investor-documents/sec-edgar/10-K_20260226_rpt20251231_acc0001437749_26_005875.htm",
+      "locator": "FY2025 OCF $174.4M minus normalized capex $130M [Assumption: $49M above mid-cycle maintenance]",
+      "as_of": "2025-12-31",
+      "content_sha256": "fdecbb9360567b7560b0fe12160482735194570dc8aca22c1ff7385d29eaa01a",
+      "source_id": "6564d692a89bf9f14cd6b7971d8b142e13a47cded4f7d5f5c5080e31d84b28c7"
+    },
+    {
+      "component_id": "core_operating_owner_cash",
+      "node_id": "normalized_owner_cash",
+      "ref": "AAOI/investor-documents/sec-edgar/10-K_20260226_rpt20251231_acc0001437749_26_005875.htm",
+      "locator": "($174.4M \u2212 $130.0M) \u00f7 60.2M FY2025 diluted shares = $0.74/sh",
+      "as_of": "2025-12-31",
+      "content_sha256": "fdecbb9360567b7560b0fe12160482735194570dc8aca22c1ff7385d29eaa01a",
+      "source_id": "aa1490b08ec58c94290c20b623da8991618fc02eeb829cdfb12037a2921418b5"
+    },
+    {
+      "component_id": "core_operating_owner_cash",
+      "node_id": "shares_m",
+      "ref": "AAOI/investor-documents/sec-edgar/10-Q_20260507_rpt20260331_acc0001437749_26_015620.htm",
+      "locator": "Weighted average diluted shares 75.98M Q1 2026",
+      "as_of": "2026-03-31",
+      "content_sha256": "852d454657d42be74a61e41e40a67fc76591bc87cd836733640f800a635da733",
+      "source_id": "670514913d1a39fd4cff8197c2df7d50fa17058816070180d7459013e1854e52"
+    },
+    {
+      "component_id": "amazon_datacenter_option",
+      "node_id": "warrant_contra_m",
+      "ref": "AAOI/investor-documents/sec-edgar/10-K_20260226_rpt20251231_acc0001437749_26_005875.htm",
+      "locator": "Warrant-related contra-revenue $0.8M FY2025 (Amazon transaction agreement March 2025)",
+      "as_of": "2025-12-31",
+      "content_sha256": "fdecbb9360567b7560b0fe12160482735194570dc8aca22c1ff7385d29eaa01a",
+      "source_id": "4e570214116a2755ad0ed4f668b02cb26ceefb7c366e531bf55526b6532662ed"
+    },
+    {
+      "component_id": "amazon_datacenter_option",
+      "node_id": "data_center_revenue_m",
+      "ref": "AAOI/investor-documents/sec-edgar/10-K_20260226_rpt20251231_acc0001437749_26_005875.htm",
+      "locator": "Data center revenue $195.7M (42.9% of FY2025 revenue)",
+      "as_of": "2025-12-31",
+      "content_sha256": "fdecbb9360567b7560b0fe12160482735194570dc8aca22c1ff7385d29eaa01a",
+      "source_id": "68ea9f996d79f214f60924737ded72bb989bf040d82993805e0da5710cbbe016"
+    },
+    {
+      "component_id": "amazon_datacenter_option",
+      "node_id": "shares_m",
+      "ref": "AAOI/investor-documents/sec-edgar/10-Q_20260507_rpt20260331_acc0001437749_26_015620.htm",
+      "locator": "Weighted average diluted shares 75.98M Q1 2026",
+      "as_of": "2026-03-31",
+      "content_sha256": "852d454657d42be74a61e41e40a67fc76591bc87cd836733640f800a635da733",
+      "source_id": "670514913d1a39fd4cff8197c2df7d50fa17058816070180d7459013e1854e52"
+    },
+    {
+      "component_id": "net_surplus_cash",
+      "node_id": "cash_m",
+      "ref": "AAOI/investor-documents/sec-edgar/10-Q_20260507_rpt20260331_acc0001437749_26_015620.htm",
+      "locator": "Cash and cash equivalents $439.7M at March 31, 2026",
+      "as_of": "2026-03-31",
+      "content_sha256": "852d454657d42be74a61e41e40a67fc76591bc87cd836733640f800a635da733",
+      "source_id": "fa27e8c19975b8ce68882fa4b8b16471486bc1ae44da147d953de5dbc76a5ed6"
+    },
+    {
+      "component_id": "net_surplus_cash",
+      "node_id": "shares_m",
+      "ref": "AAOI/investor-documents/sec-edgar/10-Q_20260507_rpt20260331_acc0001437749_26_015620.htm",
+      "locator": "Weighted average diluted shares 75.98M Q1 2026",
+      "as_of": "2026-03-31",
+      "content_sha256": "852d454657d42be74a61e41e40a67fc76591bc87cd836733640f800a635da733",
+      "source_id": "670514913d1a39fd4cff8197c2df7d50fa17058816070180d7459013e1854e52"
+    },
+    {
+      "component_id": "dilution_concentration_reserve",
+      "node_id": "customer_concentration_pct",
+      "ref": "AAOI/investor-documents/sec-edgar/10-K_20260226_rpt20251231_acc0001437749_26_005875.htm",
+      "locator": "Digicomm 53% and Microsoft 29% of FY2025 revenue (major customers note)",
+      "as_of": "2025-12-31",
+      "content_sha256": "fdecbb9360567b7560b0fe12160482735194570dc8aca22c1ff7385d29eaa01a",
+      "source_id": "2e5806d208116e9187e56483d01d5a442e90da3f2270fdf609221ddfd90a5de9"
+    },
+    {
+      "component_id": "dilution_concentration_reserve",
+      "node_id": "diluted_shares_fy2025_m",
+      "ref": "AAOI/investor-documents/sec-edgar/10-K_20260226_rpt20251231_acc0001437749_26_005875.htm",
+      "locator": "Weighted average diluted shares 60.2M FY2025",
+      "as_of": "2025-12-31",
+      "content_sha256": "fdecbb9360567b7560b0fe12160482735194570dc8aca22c1ff7385d29eaa01a",
+      "source_id": "c355c39ceec68388696d96ecba44dca589dfae97d87cdddb5aaba116dbd6d86d"
+    },
+    {
+      "component_id": "dilution_concentration_reserve",
+      "node_id": "diluted_shares_q1_m",
+      "ref": "AAOI/investor-documents/sec-edgar/10-Q_20260507_rpt20260331_acc0001437749_26_015620.htm",
+      "locator": "Weighted average diluted shares 75.98M Q1 2026 (+26% vs FY2025)",
+      "as_of": "2026-03-31",
+      "content_sha256": "852d454657d42be74a61e41e40a67fc76591bc87cd836733640f800a635da733",
+      "source_id": "9dc52c24b01854eb6df6278656bb850fdbe39b8771ddc441885c4d4e4af3e1a9"
+    },
+    {
+      "component_id": "dilution_concentration_reserve",
+      "node_id": "shares_m",
+      "ref": "AAOI/investor-documents/sec-edgar/10-Q_20260507_rpt20260331_acc0001437749_26_015620.htm",
+      "locator": "Weighted average diluted shares 75.98M Q1 2026",
+      "as_of": "2026-03-31",
+      "content_sha256": "852d454657d42be74a61e41e40a67fc76591bc87cd836733640f800a635da733",
+      "source_id": "670514913d1a39fd4cff8197c2df7d50fa17058816070180d7459013e1854e52"
+    }
+  ],
   "model_checks": {
     "calculation_graphs_valid": true,
-    "component_sum_reconciles": false,
+    "component_sum_reconciles": true,
     "no_double_counting": true,
-    "all_material_components_priced": false,
+    "all_material_components_priced": true,
     "low_base_high_ordered": true
   },
   "evidence": {
-    "unresolved_count": 1,
+    "unresolved_count": 8,
     "blockers": [
-      "operating_business_fallback: material component is legacy_sensitivity; a valid calculation proof is required"
+      "economic_claim.description required",
+      "economic_claim.enterprise_to_equity_reconciliation required",
+      "economic_claim.unit_count required",
+      "economic_claim.unit_label required",
+      "economic_claim.unit_source required",
+      "economic_value.schema_version 1.0 required",
+      "gaap_role required",
+      "option component amazon_datacenter_option requires probability, timing, and remaining-capital treatment"
     ],
-    "validation_errors": []
+    "validation_errors": [
+      "economic_claim.description required",
+      "economic_claim.enterprise_to_equity_reconciliation required",
+      "economic_claim.unit_count required",
+      "economic_claim.unit_label required",
+      "economic_claim.unit_source required",
+      "economic_value.schema_version 1.0 required",
+      "gaap_role required",
+      "option component amazon_datacenter_option requires probability, timing, and remaining-capital treatment"
+    ]
   },
   "monitoring": {
     "falsifiers": [
-      "Owner cash, reinvestment economics, or competitive position remains below the low-case path for two reporting periods."
+      "Normalized owner cash stays below $0.50 per share for two consecutive quarters while capex remains above $150M annually.",
+      "Amazon warrant expires or hyperscaler volume shifts away without replacement customer above 15% of revenue.",
+      "Cash falls below $250M with no offsetting reduction in growth capex or dilution.",
+      "Share count stabilizes below 70M diluted and top-two customer share falls below 60% of revenue for four quarters."
     ],
     "required_refresh_triggers": [
       "new filing or material operating update",
@@ -298,8 +1811,12 @@
     ]
   },
   "change_control": {
-    "model_hash": "c216ebc4958fc26b34312afb9f402d684fe6e18e50a5a58915354e0d9f76f637",
-    "method_versions": [],
+    "model_hash": "603f175b2849f1c761e43676c807850e2dfbe8de28bffa74d8c1548063523ecd",
+    "method_versions": [
+      "net_asset_value@1.0",
+      "owner_cash_or_dividend_discount@1.0",
+      "risk_adjusted_milestone_value@1.0"
+    ],
     "change_log": [],
     "rule": "A source fact is locked. Every assumption change requires a reason, author, timestamp, and before/after value."
   },

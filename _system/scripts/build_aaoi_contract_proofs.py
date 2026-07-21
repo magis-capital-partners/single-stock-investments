@@ -372,7 +372,73 @@ def main() -> int:
         ),
         "evidence_ref": "AAOI/research/evidence_reconciliation_2026-07-21.md",
     }
+    eva["economic_claim"] = {
+        "description": (
+            "One share of Applied Optoelectronics, including normalized owner-cash engine, "
+            "Amazon/datacenter option, net surplus cash, and dilution/concentration reserve."
+        ),
+        "unit_label": "share",
+        "unit_count": int(round(SHARES_M * 1_000_000)),
+        "unit_source": f"{Q10}; weighted average diluted shares {SHARES_M}M Q1 2026.",
+        "enterprise_to_equity_reconciliation": (
+            "Operating claims valued in core engine; surplus cash and options additive; "
+            "concentration reserve subtracted once. No overlap between component overlap keys."
+        ),
+    }
+    eva["gaap_role"] = "cross_check"
+    eva["accounting_reference"] = (
+        f"FY2025 10-K and Q1 2026 10-Q; contract backfill {AS_OF}. "
+        "GAAP net income distorted by tax benefits and warrant contra-revenue."
+    )
     eva["validation_errors"] = []
+
+    data["economic_value"] = {
+        "schema_version": "1.0",
+        "method": "component_economic_value",
+        "economic_claim": eva["economic_claim"],
+        "gaap_role": "cross_check",
+        "accounting_reference": eva["accounting_reference"],
+        "component_groups": [
+            {
+                "id": cid,
+                "label": COMPONENT_META[cid]["label"],
+                "component_ids": [cid],
+                "economic_claim": COMPONENT_META[cid]["label"],
+                "valuation_basis": f"Proof outputs {outputs[cid]}; see calculation_proof graph.",
+                "adjustments": "Reconcile to primary filings before decision use.",
+                "overlap_control": f"Unique overlap key {cid}.",
+                **(
+                    {
+                        "risk_and_timing": {
+                            "success_probability": {"low": 0.0, "base": 0.15, "high": 0.35},
+                            "timing_basis": "Amazon transaction agreement March 2025; 800G ramp over 2-4 years.",
+                            "remaining_capital_m": {"low": 0.0, "base": 49.0, "high": 100.0},
+                            "probability_basis": "Warrant contra-revenue $0.8M FY2025; strategic volume option not fair-valued in filings.",
+                            "remaining_capital_basis": "Taiwan datacenter capacity build capex above maintenance [Assumption].",
+                        }
+                    }
+                    if cid == "amazon_datacenter_option"
+                    else {}
+                ),
+            }
+            for cid in proofs
+        ],
+        "limitations": [
+            "Proof-first component schedule; not a committee-approved price target.",
+            "Normalized capex $130M remains [Assumption] pending Taiwan lease utilization bridge.",
+        ],
+    }
+
+    for comp in data["component_valuation"]["components"]:
+        if comp["id"] == "amazon_datacenter_option":
+            comp["probability_and_timing"] = {
+                "success_probability": {"low": 0.0, "base": 0.15, "high": 0.35},
+                "timing_years": {"low": 4, "base": 3, "high": 2},
+                "remaining_capital_m": {"low": 0.0, "base": 49.0, "high": 100.0},
+                "probability_basis": "Amazon warrant March 2025; incremental volume beyond core DCF growth path.",
+                "timing_basis": "Hyperscaler qualification and ramp over 2-4 years per 10-K datacenter mix shift.",
+                "remaining_capital_basis": "Excess capex above $130M normalized maintenance through Taiwan build.",
+            }
 
     path.write_text(json.dumps(data, indent=2) + "\n", encoding="utf-8")
     print(json.dumps({"status": "ok", "outputs": outputs, "total": total}, indent=2))
