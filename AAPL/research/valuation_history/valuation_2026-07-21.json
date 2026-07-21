@@ -579,7 +579,7 @@
   },
   "economic_value_analysis": {
     "schema_version": "1.0",
-    "status": "complete",
+    "status": "evidence_blocked",
     "trigger": {
       "required": true,
       "reasons": [
@@ -587,16 +587,10 @@
       ],
       "policy": "A complete economic-value analysis is required when any trigger fires; otherwise it is recommended."
     },
-    "method": "component_economic_value",
-    "economic_claim": {
-      "description": "One diluted share of AAPL, including core products and services owner cash, Services installed-base option, net financial claims, and regulatory/cycle reserve.",
-      "unit_label": "diluted share",
-      "unit_count": 15014745000,
-      "unit_source": "FY2025 net income $112010.0M / diluted EPS $7.46 (AAPL/investor-documents/sec-edgar/10-K_20251031_rpt20250927_acc0000320193_25_000079.htm)",
-      "enterprise_to_equity_reconciliation": "Core owner free cash flow is valued once; Services option, net financial claims, and regulatory reserve are separate additive components with unique overlap keys."
-    },
-    "gaap_role": "cross_check",
-    "accounting_reference": "FY2025 10-K and Q2 FY2026 10-Q filing extracts; GAAP net income is cross-check only for platform compounder.",
+    "method": "economic_claim_to_risked_present_value",
+    "economic_claim": {},
+    "gaap_role": null,
+    "accounting_reference": null,
     "comparable_hierarchy": [
       "issuer_arm_length_transaction",
       "same_asset_transaction",
@@ -641,13 +635,6 @@
           "low": 0.0,
           "base": 35.0,
           "high": 85.0
-        },
-        "risk_and_timing": {
-          "success_probability": 0.7,
-          "remaining_capital_m": 0.0,
-          "timing_basis": "Installed-base monetization through App Store, iCloud, and Apple Intelligence over 3 to 7 years.",
-          "probability_basis": "Judgment from FY2025 Services net sales $109.2B trajectory; Apple does not disclose standalone Apple Intelligence revenue.",
-          "remaining_capital_basis": "Services scale uses existing platform; incremental R&D embedded in consolidated spend."
         }
       },
       {
@@ -733,9 +720,9 @@
         "risk_and_timing": {
           "success_probability": null,
           "remaining_capital_m": null,
-          "timing_basis": "Installed-base monetization through App Store, iCloud, and Apple Intelligence over 3 to 7 years.",
-          "probability_basis": "Judgment from FY2025 Services net sales $109.2B trajectory; Apple does not disclose standalone Apple Intelligence revenue.",
-          "remaining_capital_basis": "Services scale uses existing platform; incremental R&D embedded in consolidated spend."
+          "timing_basis": null,
+          "probability_basis": null,
+          "remaining_capital_basis": null
         }
       },
       {
@@ -788,12 +775,18 @@
       }
     ],
     "wisdom_applied": [],
-    "limitations": [
-      "Services milestone value is judgment-based; deferred Services revenue partially embedded in consolidated free cash flow.",
-      "Regulatory and China reserve bands remain widest judgment components."
-    ],
+    "limitations": [],
     "complete_component_coverage": true,
-    "validation_errors": [],
+    "validation_errors": [
+      "economic_claim.description required",
+      "economic_claim.enterprise_to_equity_reconciliation required",
+      "economic_claim.unit_count required",
+      "economic_claim.unit_label required",
+      "economic_claim.unit_source required",
+      "economic_value.schema_version 1.0 required",
+      "gaap_role required",
+      "option component services_installed_base_option requires probability, timing, and remaining-capital treatment"
+    ],
     "registry_version": "1.0"
   },
   "total_return_panel": {
@@ -1573,7 +1566,7 @@
   },
   "universal_valuation_contract": {
     "schema_version": "2.0",
-    "status": "decision_grade",
+    "status": "evidence_blocked",
     "ticker": "AAPL",
     "as_of": "2026-07-21",
     "economic_ownership_map": [
@@ -2264,9 +2257,9 @@
         "probability_and_timing": {
           "success_probability": null,
           "remaining_capital_m": null,
-          "timing_basis": "Installed-base monetization through App Store, iCloud, and Apple Intelligence over 3 to 7 years.",
-          "probability_basis": "Judgment from FY2025 Services net sales $109.2B trajectory; Apple does not disclose standalone Apple Intelligence revenue.",
-          "remaining_capital_basis": "Services scale uses existing platform; incremental R&D embedded in consolidated spend."
+          "timing_basis": null,
+          "probability_basis": null,
+          "remaining_capital_basis": null
         },
         "tax_and_realization_adjustments": "Reconcile to FY2025 10-K and Q2 FY2026 10-Q before decision use.",
         "falsifier": "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
@@ -3264,9 +3257,27 @@
       "low_base_high_ordered": true
     },
     "evidence": {
-      "unresolved_count": 0,
-      "blockers": [],
-      "validation_errors": []
+      "unresolved_count": 8,
+      "blockers": [
+        "economic_claim.description required",
+        "economic_claim.enterprise_to_equity_reconciliation required",
+        "economic_claim.unit_count required",
+        "economic_claim.unit_label required",
+        "economic_claim.unit_source required",
+        "economic_value.schema_version 1.0 required",
+        "gaap_role required",
+        "option component services_installed_base_option requires probability, timing, and remaining-capital treatment"
+      ],
+      "validation_errors": [
+        "economic_claim.description required",
+        "economic_claim.enterprise_to_equity_reconciliation required",
+        "economic_claim.unit_count required",
+        "economic_claim.unit_label required",
+        "economic_claim.unit_source required",
+        "economic_value.schema_version 1.0 required",
+        "gaap_role required",
+        "option component services_installed_base_option requires probability, timing, and remaining-capital treatment"
+      ]
     },
     "monitoring": {
       "falsifiers": [
@@ -3283,7 +3294,7 @@
       ]
     },
     "change_control": {
-      "model_hash": "780107b479992ad7c7971f5cb4e3ef7657bb5ce9dc29bfd2931bf2df132e048a",
+      "model_hash": "ce67ce6496a7f76e42c4d6fd159f509874efb38cac7679f06ab863fa1b59ccf5",
       "method_versions": [
         "net_asset_value@1.0",
         "owner_earnings_reinvestment_dcf@1.0",
@@ -3366,303 +3377,5 @@
       }
     },
     "notes": "Capstone IRR combining filings, segments, overlays, third-party, qualitative"
-  },
-  "context_overlay": {
-    "as_of": "2026-07-21",
-    "disclaimer": "Context only. Tailwinds inform stance and overlay sizing; they do not auto-inflate Lawrence base IRR. Promotion to base case requires [HUMAN REVIEW].",
-    "themes": [
-      {
-        "theme_id": "macro_regime",
-        "label": "Macro risk regime",
-        "indicators": [
-          {
-            "id": "hy_oas",
-            "label": "High-yield OAS credit spread (%)",
-            "latest": 1.43,
-            "as_of": "2026-07-20",
-            "yoy_pct": 248.8,
-            "direction": "up",
-            "good_for": "risk_regime",
-            "source": "spread:HYG-LQD:21d (HYG-LQD 1m spread proxy, not OAS)",
-            "stale": false,
-            "in_base_irr": false
-          },
-          {
-            "id": "ust_10y",
-            "label": "US Treasury 10Y yield (%)",
-            "latest": 4.5980000495910645,
-            "as_of": "2026-07-20",
-            "yoy_pct": 5.2,
-            "direction": "up",
-            "good_for": "rates_regime",
-            "source": "yahoo:^TNX",
-            "stale": false,
-            "in_base_irr": false
-          },
-          {
-            "id": "ust_2y",
-            "label": "US Treasury 2Y yield (%)",
-            "latest": 4.328000068664551,
-            "as_of": "2026-07-20",
-            "yoy_pct": 10.7,
-            "direction": "up",
-            "good_for": "rates_regime",
-            "source": "yahoo:^FVX",
-            "stale": false,
-            "in_base_irr": false
-          },
-          {
-            "id": "dxy_broad",
-            "label": "Trade-weighted USD index (broad)",
-            "latest": 100.9540023803711,
-            "as_of": "2026-07-21",
-            "yoy_pct": 3.2,
-            "direction": "up",
-            "good_for": "dollar_regime",
-            "source": "yahoo:DX-Y.NYB",
-            "stale": false,
-            "in_base_irr": false
-          },
-          {
-            "id": "vix_level",
-            "label": "VIX index level",
-            "latest": 17.719999313354492,
-            "as_of": "2026-07-21",
-            "yoy_pct": 6.4,
-            "direction": "up",
-            "good_for": "vol_regime",
-            "source": "yahoo:^VIX",
-            "stale": false,
-            "in_base_irr": false
-          },
-          {
-            "id": "credit_impulse_1m",
-            "label": "HYG vs TLT 1-month return spread (%)",
-            "latest": 2.76,
-            "as_of": "2026-07-20",
-            "yoy_pct": 55.9,
-            "direction": "up",
-            "good_for": "credit_impulse",
-            "source": "spread:HYG-TLT:21d",
-            "stale": false,
-            "in_base_irr": false
-          },
-          {
-            "id": "spy_20d_realized_vol",
-            "label": "SPY 20-day realized vol (annualized %)",
-            "latest": 11.37,
-            "as_of": "2026-07-20",
-            "yoy_pct": 31.3,
-            "direction": "up",
-            "good_for": "equity_vol",
-            "source": "realized_vol:SPY:20d",
-            "stale": false,
-            "in_base_irr": false
-          }
-        ]
-      }
-    ]
-  },
-  "insider_signal": {
-    "as_of": "2026-07-21",
-    "disclaimer": "Context only. Insider activity informs scenario confidence and stance discussion; it does not auto-inflate Lawrence base IRR. Promotion requires [HUMAN REVIEW].",
-    "in_base_irr": false,
-    "window_days": 365,
-    "ics": 0.0,
-    "band": "negligible",
-    "bull_case_support": "none",
-    "scenario_confidence": {
-      "priors": {
-        "bear": 0.2,
-        "base": 0.55,
-        "bull": 0.25
-      },
-      "tilted": {
-        "bear": 0.28,
-        "base": 0.47,
-        "bull": 0.25
-      },
-      "bull_delta": 0.0,
-      "bear_delta": 0.08,
-      "note": "Scenario weights are qualitative confidence only; Lawrence base IRR unchanged."
-    },
-    "factors": {
-      "buy_score": 0.0,
-      "sell_score": -1.0,
-      "cluster_bonus": 0.0,
-      "net_buy_usd": 0,
-      "net_sell_usd": 325148677.71,
-      "price_today": 326.59
-    },
-    "top_buys": [],
-    "top_sells": [
-      {
-        "insider": "Borders Ben",
-        "date": "2026-06-16",
-        "shares": 116,
-        "price": 295.14,
-        "value_usd": 34236.24,
-        "is_10b5_1": false,
-        "contrib": -0.149
-      },
-      {
-        "insider": "Newstead Jennifer",
-        "date": "2026-06-15",
-        "shares": 16238,
-        "price": 296.42,
-        "value_usd": 4813267.96,
-        "is_10b5_1": false,
-        "contrib": -0.148
-      },
-      {
-        "insider": "Borders Ben",
-        "date": "2026-06-15",
-        "shares": 124,
-        "price": 296.42,
-        "value_usd": 36756.08,
-        "is_10b5_1": false,
-        "contrib": -0.148
-      },
-      {
-        "insider": "LEVINSON ARTHUR D",
-        "date": "2026-05-27",
-        "shares": 50000,
-        "price": 311.02,
-        "value_usd": 15551000.0,
-        "is_10b5_1": false,
-        "contrib": -0.126
-      },
-      {
-        "insider": "LEVINSON ARTHUR D",
-        "date": "2026-05-27",
-        "shares": 65000,
-        "price": 0.0,
-        "value_usd": 0.0,
-        "is_10b5_1": false,
-        "contrib": -0.126
-      }
-    ],
-    "narrative_hooks": [],
-    "transaction_count": 71
-  },
-  "lens_consensus": {
-    "as_of": "2026-07-21",
-    "shared_inputs_ref": "valuation.json@2026-07-21",
-    "valuation_richness": 0.749,
-    "blended_return_pct": -0.94,
-    "band_pct": [
-      -5.6,
-      0.77
-    ],
-    "weighted_median_pct": -0.1,
-    "median_mean_flag": false,
-    "stance": "pass",
-    "agreement_pct": 92,
-    "dissent_count": 1,
-    "lawrence_divergence": true,
-    "top_dissents": [
-      {
-        "persona": "lawrence",
-        "label": "Lawrence (house IRR)",
-        "verdict": "watch",
-        "return_pct": 0.77,
-        "key_metric": "synthesis_pct=0.77",
-        "conviction": 0.712,
-        "falsifier": "Synthesis incomplete or irr_method pending"
-      }
-    ],
-    "contributor_count": 9,
-    "in_base_irr": false,
-    "disclaimer": "Advisory lens blend only. Does not replace Lawrence total-synthesis stance gate without [HUMAN REVIEW]."
-  },
-  "economic_value": {
-    "schema_version": "1.0",
-    "method": "component_economic_value",
-    "economic_claim": {
-      "description": "One diluted share of AAPL, including core products and services owner cash, Services installed-base option, net financial claims, and regulatory/cycle reserve.",
-      "unit_label": "diluted share",
-      "unit_count": 15014745000,
-      "unit_source": "FY2025 net income $112010.0M / diluted EPS $7.46 (AAPL/investor-documents/sec-edgar/10-K_20251031_rpt20250927_acc0000320193_25_000079.htm)",
-      "enterprise_to_equity_reconciliation": "Core owner free cash flow is valued once; Services option, net financial claims, and regulatory reserve are separate additive components with unique overlap keys."
-    },
-    "gaap_role": "cross_check",
-    "accounting_reference": "FY2025 10-K and Q2 FY2026 10-Q filing extracts; GAAP net income is cross-check only for platform compounder.",
-    "component_groups": [
-      {
-        "id": "core_products_services_engine",
-        "label": "Core products and services owner-cash engine",
-        "component_ids": [
-          "core_products_services_engine"
-        ],
-        "economic_claim": "Core products and services owner-cash engine",
-        "valuation_basis": "Proof outputs {'low': 131.56, 'base': 171.03, 'high': 210.4999}; see calculation_proof graph.",
-        "adjustments": "Reconcile to FY2025 10-K and Q2 FY2026 10-Q before decision use.",
-        "overlap_control": "Unique overlap key core_products_services_engine.",
-        "risked_present_value_per_share": {
-          "low": 131.56,
-          "base": 171.03,
-          "high": 210.5
-        }
-      },
-      {
-        "id": "services_installed_base_option",
-        "label": "Services installed-base and platform monetization option",
-        "component_ids": [
-          "services_installed_base_option"
-        ],
-        "economic_claim": "Services installed-base and platform monetization option",
-        "valuation_basis": "Proof outputs {'low': 0.0, 'base': 35.0, 'high': 85.0}; see calculation_proof graph.",
-        "adjustments": "Reconcile to FY2025 10-K and Q2 FY2026 10-Q before decision use.",
-        "overlap_control": "Unique overlap key services_installed_base_option.",
-        "risked_present_value_per_share": {
-          "low": 0.0,
-          "base": 35.0,
-          "high": 85.0
-        },
-        "risk_and_timing": {
-          "success_probability": 0.7,
-          "remaining_capital_m": 0.0,
-          "timing_basis": "Installed-base monetization through App Store, iCloud, and Apple Intelligence over 3 to 7 years.",
-          "probability_basis": "Judgment from FY2025 Services net sales $109.2B trajectory; Apple does not disclose standalone Apple Intelligence revenue.",
-          "remaining_capital_basis": "Services scale uses existing platform; incremental R&D embedded in consolidated spend."
-        }
-      },
-      {
-        "id": "net_financial_claims",
-        "label": "Net cash, securities, and debt claims on common equity",
-        "component_ids": [
-          "net_financial_claims"
-        ],
-        "economic_claim": "Net cash, securities, and debt claims on common equity",
-        "valuation_basis": "Proof outputs {'low': -6.0, 'base': 3.0, 'high': 10.0}; see calculation_proof graph.",
-        "adjustments": "Reconcile to FY2025 10-K and Q2 FY2026 10-Q before decision use.",
-        "overlap_control": "Unique overlap key net_financial_claims.",
-        "risked_present_value_per_share": {
-          "low": -6.0,
-          "base": 3.0,
-          "high": 10.0
-        }
-      },
-      {
-        "id": "regulatory_and_cycle_reserve",
-        "label": "China, antitrust, and hardware cycle stress reserve",
-        "component_ids": [
-          "regulatory_and_cycle_reserve"
-        ],
-        "economic_claim": "China, antitrust, and hardware cycle stress reserve",
-        "valuation_basis": "Proof outputs {'low': -45.0, 'base': -22.0, 'high': -8.0}; see calculation_proof graph.",
-        "adjustments": "Reconcile to FY2025 10-K and Q2 FY2026 10-Q before decision use.",
-        "overlap_control": "Unique overlap key regulatory_and_cycle_reserve.",
-        "risked_present_value_per_share": {
-          "low": -45.0,
-          "base": -22.0,
-          "high": -8.0
-        }
-      }
-    ],
-    "limitations": [
-      "Services milestone value is judgment-based; deferred Services revenue partially embedded in consolidated free cash flow.",
-      "Regulatory and China reserve bands remain widest judgment components."
-    ]
   }
 }
