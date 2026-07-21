@@ -11,13 +11,13 @@
 | **Dhando** (Pabrai) | partial |
 | **Stance** | watch |
 | **Cycle** | - |
-| **Implied 7yr IRR** (base) | 14.6% (Lawrence base) |
-| **IRR method** | scenario |
+| **Implied 7yr IRR** (base) | 5.1% (contract base) |
+| **IRR method** | capital_cycle |
 | **Lawrence bucket** | other |
 | **Payoff lens** | levered |
-| **MOI bucket** | pending |
+| **MOI bucket** | levered |
 
-**Deep dive:** `SEVN/research/deep_dive_2026-07-17.md` (auto-sync)
+**Deep dive:** `SEVN/research/deep_dive_2026-07-21.md` (auto-sync)
 
 ## One-line thesis
 
