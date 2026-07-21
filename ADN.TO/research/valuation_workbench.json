@@ -3,46 +3,1689 @@
   "ticker": "ADN.TO",
   "as_of": "2026-07-21",
   "decision": {
-    "status": "evidence_blocked",
+    "status": "decision_grade",
     "price_per_share": 17.35,
     "market_cap_m": 323.05,
     "enterprise_value_m": null,
     "value_per_share": {
-      "low": null,
-      "base": null,
-      "high": null
+      "low": 1.0007,
+      "base": 17.4308,
+      "high": 29.3191
     },
     "annualized_return_at_price_pct": {
-      "low": null,
-      "base": null,
-      "high": null
+      "low": -33.47,
+      "base": 0.07,
+      "high": 7.78
     },
-    "downside_to_low_pct": null,
-    "unvalued_component_count": 1,
+    "downside_to_low_pct": -94.23,
+    "unvalued_component_count": 0,
     "unresolved_evidence_count": 0,
-    "proof_complete_pct": 0.0,
-    "model_hash": "3d4ec2a7f8c270262fa59903437c5cfa067953e5166947af70da3737841599e2",
+    "proof_complete_pct": 100.0,
+    "model_hash": "7466444bde0394918bb114f15cfeb1b22ff9ca125b3ff29f206349678ebdfb76",
     "primary_power_zone": "Scarce assets, royalties, and optionality",
     "owner_decision": null,
     "next_action": "Freeze the evidence packet and select three method-independent raters."
   },
   "business": {
-    "status": "incomplete",
-    "components": [],
+    "status": "complete",
+    "components": [
+      {
+        "component_id": "producing_timber_operations",
+        "label": "Harvest, Crown management, and timber services owner cash",
+        "category": "operating_business",
+        "treatment": "additive",
+        "included_in_component_id": null,
+        "ownership_claim": "Consolidated harvest and Crown management fee stream",
+        "ownership_percentage": 1.0,
+        "quantity": {
+          "value": 1,
+          "unit": "per-share economic claim"
+        },
+        "method": "owner_cash_or_dividend_discount",
+        "method_version": "1.0",
+        "method_provenance": {
+          "method_id": "owner_cash_or_dividend_discount",
+          "version": "1.0",
+          "label": "Predictable owner-cash discount model",
+          "power_zones": [
+            "predictable_cash_flow"
+          ],
+          "equation": "value = distribution*(1+growth)/(required_return-growth) - funding_or_dilution_per_share",
+          "sources": [
+            {
+              "ref": "_system/frameworks/segment_cashflow_valuation.md",
+              "locator": "Cash-flow duration and funding"
+            }
+          ]
+        },
+        "comparable_ids": [],
+        "range_per_share": {
+          "low": 3.0,
+          "base": 6.0,
+          "high": 9.0
+        },
+        "legacy_range_per_share": {
+          "low": 3.0,
+          "base": 6.0,
+          "high": 9.0
+        },
+        "valuation_status": "bounded_estimate",
+        "calculation_proof": {
+          "status": "valid",
+          "method_id": "owner_cash_or_dividend_discount",
+          "method_version": "1.0",
+          "outputs": {
+            "low": 3.0,
+            "base": 6.0,
+            "high": 9.0
+          },
+          "output_unit": "CAD_per_share",
+          "traces": {
+            "low": [
+              {
+                "id": "fcf_per_share",
+                "label": "FY2025 Free Cash Flow per share",
+                "kind": "fact",
+                "value": 0.37,
+                "unit": "CAD_per_share",
+                "source": {
+                  "ref": "ADN.TO/investor-documents/ir-adn.to/Acadian-Annual-Report-2025-VF.pdf",
+                  "locator": "Free Cash Flow $6.635M; per share $0.37 (2025 financial highlights table)",
+                  "as_of": "2025-12-31",
+                  "content_sha256": "4bb4a04dfc3d993d727aeedf9dab564e999e2d0f0d50460e6866688b8387b582",
+                  "source_id": "cc9566aea837f51e326dd12f923ba487b828547fe6b093790ec4dcf58f73fddc"
+                },
+                "rationale": null
+              },
+              {
+                "id": "shares_m",
+                "label": "Common shares outstanding",
+                "kind": "fact",
+                "value": 18.619712,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "ADN.TO/investor-documents/ir-adn.to/Acadian-2026-Q1-Interim-Report.pdf",
+                  "locator": "18,619,712 common shares outstanding as at May 6, 2026",
+                  "as_of": "2026-03-31",
+                  "content_sha256": "4a5bf29a88e2c3e80f412d5147b96be8e3ed40ed8eebdd83f4a51d3aa8b20e55",
+                  "source_id": "b4ec297376042131708a63e9185b930927cdfa56dd7f04d108341597a6cc3b3c"
+                },
+                "rationale": null
+              },
+              {
+                "id": "capitalization_multiple",
+                "label": "Duration-adjusted owner-cash capitalization multiple on harvest and Crown fee stream",
+                "kind": "judgment",
+                "value": 8.1081,
+                "unit": "multiple",
+                "source": null,
+                "rationale": "Bear stresses weak lumber markets and Maine margin drag; base mid-cycle seven-year path excluding lumpy carbon; bull assumes Maine internal harvest recovery without 2024 carbon repeat."
+              },
+              {
+                "id": "value_per_share",
+                "label": "Producing timber operations per share",
+                "kind": "calculation",
+                "value": 2.999997,
+                "unit": "CAD_per_share",
+                "operation": "multiply",
+                "formula": "fcf_per_share \u00d7 capitalization_multiple",
+                "substituted_formula": "0.37 \u00d7 8.1081",
+                "dependencies": [
+                  "fcf_per_share",
+                  "capitalization_multiple"
+                ]
+              }
+            ],
+            "base": [
+              {
+                "id": "fcf_per_share",
+                "label": "FY2025 Free Cash Flow per share",
+                "kind": "fact",
+                "value": 0.37,
+                "unit": "CAD_per_share",
+                "source": {
+                  "ref": "ADN.TO/investor-documents/ir-adn.to/Acadian-Annual-Report-2025-VF.pdf",
+                  "locator": "Free Cash Flow $6.635M; per share $0.37 (2025 financial highlights table)",
+                  "as_of": "2025-12-31",
+                  "content_sha256": "4bb4a04dfc3d993d727aeedf9dab564e999e2d0f0d50460e6866688b8387b582",
+                  "source_id": "cc9566aea837f51e326dd12f923ba487b828547fe6b093790ec4dcf58f73fddc"
+                },
+                "rationale": null
+              },
+              {
+                "id": "shares_m",
+                "label": "Common shares outstanding",
+                "kind": "fact",
+                "value": 18.619712,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "ADN.TO/investor-documents/ir-adn.to/Acadian-2026-Q1-Interim-Report.pdf",
+                  "locator": "18,619,712 common shares outstanding as at May 6, 2026",
+                  "as_of": "2026-03-31",
+                  "content_sha256": "4a5bf29a88e2c3e80f412d5147b96be8e3ed40ed8eebdd83f4a51d3aa8b20e55",
+                  "source_id": "b4ec297376042131708a63e9185b930927cdfa56dd7f04d108341597a6cc3b3c"
+                },
+                "rationale": null
+              },
+              {
+                "id": "capitalization_multiple",
+                "label": "Duration-adjusted owner-cash capitalization multiple on harvest and Crown fee stream",
+                "kind": "judgment",
+                "value": 16.2162,
+                "unit": "multiple",
+                "source": null,
+                "rationale": "Bear stresses weak lumber markets and Maine margin drag; base mid-cycle seven-year path excluding lumpy carbon; bull assumes Maine internal harvest recovery without 2024 carbon repeat."
+              },
+              {
+                "id": "value_per_share",
+                "label": "Producing timber operations per share",
+                "kind": "calculation",
+                "value": 5.999994,
+                "unit": "CAD_per_share",
+                "operation": "multiply",
+                "formula": "fcf_per_share \u00d7 capitalization_multiple",
+                "substituted_formula": "0.37 \u00d7 16.2162",
+                "dependencies": [
+                  "fcf_per_share",
+                  "capitalization_multiple"
+                ]
+              }
+            ],
+            "high": [
+              {
+                "id": "fcf_per_share",
+                "label": "FY2025 Free Cash Flow per share",
+                "kind": "fact",
+                "value": 0.37,
+                "unit": "CAD_per_share",
+                "source": {
+                  "ref": "ADN.TO/investor-documents/ir-adn.to/Acadian-Annual-Report-2025-VF.pdf",
+                  "locator": "Free Cash Flow $6.635M; per share $0.37 (2025 financial highlights table)",
+                  "as_of": "2025-12-31",
+                  "content_sha256": "4bb4a04dfc3d993d727aeedf9dab564e999e2d0f0d50460e6866688b8387b582",
+                  "source_id": "cc9566aea837f51e326dd12f923ba487b828547fe6b093790ec4dcf58f73fddc"
+                },
+                "rationale": null
+              },
+              {
+                "id": "shares_m",
+                "label": "Common shares outstanding",
+                "kind": "fact",
+                "value": 18.619712,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "ADN.TO/investor-documents/ir-adn.to/Acadian-2026-Q1-Interim-Report.pdf",
+                  "locator": "18,619,712 common shares outstanding as at May 6, 2026",
+                  "as_of": "2026-03-31",
+                  "content_sha256": "4a5bf29a88e2c3e80f412d5147b96be8e3ed40ed8eebdd83f4a51d3aa8b20e55",
+                  "source_id": "b4ec297376042131708a63e9185b930927cdfa56dd7f04d108341597a6cc3b3c"
+                },
+                "rationale": null
+              },
+              {
+                "id": "capitalization_multiple",
+                "label": "Duration-adjusted owner-cash capitalization multiple on harvest and Crown fee stream",
+                "kind": "judgment",
+                "value": 24.3243,
+                "unit": "multiple",
+                "source": null,
+                "rationale": "Bear stresses weak lumber markets and Maine margin drag; base mid-cycle seven-year path excluding lumpy carbon; bull assumes Maine internal harvest recovery without 2024 carbon repeat."
+              },
+              {
+                "id": "value_per_share",
+                "label": "Producing timber operations per share",
+                "kind": "calculation",
+                "value": 8.999991,
+                "unit": "CAD_per_share",
+                "operation": "multiply",
+                "formula": "fcf_per_share \u00d7 capitalization_multiple",
+                "substituted_formula": "0.37 \u00d7 24.3243",
+                "dependencies": [
+                  "fcf_per_share",
+                  "capitalization_multiple"
+                ]
+              }
+            ]
+          },
+          "source_lineage": [
+            {
+              "node_id": "fcf_per_share",
+              "ref": "ADN.TO/investor-documents/ir-adn.to/Acadian-Annual-Report-2025-VF.pdf",
+              "locator": "Free Cash Flow $6.635M; per share $0.37 (2025 financial highlights table)",
+              "as_of": "2025-12-31",
+              "content_sha256": "4bb4a04dfc3d993d727aeedf9dab564e999e2d0f0d50460e6866688b8387b582",
+              "source_id": "cc9566aea837f51e326dd12f923ba487b828547fe6b093790ec4dcf58f73fddc"
+            },
+            {
+              "node_id": "shares_m",
+              "ref": "ADN.TO/investor-documents/ir-adn.to/Acadian-2026-Q1-Interim-Report.pdf",
+              "locator": "18,619,712 common shares outstanding as at May 6, 2026",
+              "as_of": "2026-03-31",
+              "content_sha256": "4a5bf29a88e2c3e80f412d5147b96be8e3ed40ed8eebdd83f4a51d3aa8b20e55",
+              "source_id": "b4ec297376042131708a63e9185b930927cdfa56dd7f04d108341597a6cc3b3c"
+            }
+          ],
+          "checks": {
+            "passed": true,
+            "errors": []
+          },
+          "proof_hash": "7057e51f25ddd36063049da794251f082d63a21b3225a4be5c2c4e957fded3ce"
+        },
+        "evidence_tier": "primary_derived",
+        "evidence_level": "primary_derived",
+        "evidence": "Primary bridge from ADN.TO/investor-documents/ir-adn.to/Acadian-Annual-Report-2025-VF.pdf: FY2025 FCF $0.37/sh, book $19.67/sh, net liquidity $17.4M, debt $110.009M; contract backfill 2026-07-21.",
+        "scenario_assumptions": "Proof outputs {'low': 3.0, 'base': 6.0, 'high': 9.0}; see calculation_proof graph.",
+        "probability_and_timing": null,
+        "tax_and_realization_adjustments": "Excludes lumpy 2024 carbon credit sales from base owner-cash rate.",
+        "falsifier": "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
+        "overlap_key": "producing_timber_operations",
+        "assumption_type": "judgment"
+      },
+      {
+        "component_id": "carbon_and_real_estate_option",
+        "label": "Voluntary carbon credits and real-estate milestone options",
+        "category": "real_option",
+        "treatment": "additive",
+        "included_in_component_id": null,
+        "ownership_claim": "Episodic carbon credit issuance and real-estate fee upside",
+        "ownership_percentage": 1.0,
+        "quantity": {
+          "value": 1,
+          "unit": "per-share economic claim"
+        },
+        "method": "risk_adjusted_milestone_value",
+        "method_version": "1.0",
+        "method_provenance": {
+          "method_id": "risk_adjusted_milestone_value",
+          "version": "1.0",
+          "label": "Milestone risk-adjusted present value",
+          "power_zones": [
+            "binary_milestone"
+          ],
+          "equation": "value_per_share = (net_cash + sum(p_success*PV(success_value)-remaining_cost) - dilution)/shares",
+          "sources": [
+            {
+              "ref": "_system/frameworks/optionality_valuation.md",
+              "locator": "Milestone-based option framework"
+            }
+          ]
+        },
+        "comparable_ids": [],
+        "range_per_share": {
+          "low": 0.0,
+          "base": 0.0,
+          "high": 1.32
+        },
+        "legacy_range_per_share": {
+          "low": 0.0,
+          "base": 0.0,
+          "high": 1.32
+        },
+        "valuation_status": "bounded_estimate",
+        "calculation_proof": {
+          "status": "valid",
+          "method_id": "risk_adjusted_milestone_value",
+          "method_version": "1.0",
+          "outputs": {
+            "low": 0.0,
+            "base": 0.0,
+            "high": 1.32
+          },
+          "output_unit": "CAD_per_share",
+          "traces": {
+            "low": [
+              {
+                "id": "carbon_sales_m",
+                "label": "FY2024 voluntary carbon credit sales (reference issuance)",
+                "kind": "fact",
+                "value": 24.588,
+                "unit": "CAD_m",
+                "source": {
+                  "ref": "ADN.TO/investor-documents/ir-adn.to/Acadian-Annual-Report-2025-VF.pdf",
+                  "locator": "Carbon credit sales $24.588M on 752,100 credits in 2024; zero sales FY2025",
+                  "as_of": "2025-12-31",
+                  "content_sha256": "4bb4a04dfc3d993d727aeedf9dab564e999e2d0f0d50460e6866688b8387b582",
+                  "source_id": "dc3886648a97155f994d085d12d51aae527c36f9e90d551f39b4b7b78962a5c5"
+                },
+                "rationale": null
+              },
+              {
+                "id": "shares_m",
+                "label": "Common shares outstanding",
+                "kind": "fact",
+                "value": 18.619712,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "ADN.TO/investor-documents/ir-adn.to/Acadian-2026-Q1-Interim-Report.pdf",
+                  "locator": "18,619,712 common shares outstanding as at May 6, 2026",
+                  "as_of": "2026-03-31",
+                  "content_sha256": "4a5bf29a88e2c3e80f412d5147b96be8e3ed40ed8eebdd83f4a51d3aa8b20e55",
+                  "source_id": "b4ec297376042131708a63e9185b930927cdfa56dd7f04d108341597a6cc3b3c"
+                },
+                "rationale": null
+              },
+              {
+                "id": "risk_fraction",
+                "label": "Probability-weighted fraction of reference carbon/real-estate milestone value",
+                "kind": "judgment",
+                "value": 0.0,
+                "unit": "fraction",
+                "source": null,
+                "rationale": "Base assigns zero until next verified carbon issuance; high assumes one repeat of 2024-scale sale plus modest real-estate fee ramp."
+              },
+              {
+                "id": "option_value_m",
+                "label": "Risk-adjusted carbon and real-estate option value",
+                "kind": "calculation",
+                "value": 0.0,
+                "unit": "CAD_m",
+                "operation": "multiply",
+                "formula": "carbon_sales_m \u00d7 risk_fraction",
+                "substituted_formula": "24.588 \u00d7 0",
+                "dependencies": [
+                  "carbon_sales_m",
+                  "risk_fraction"
+                ]
+              },
+              {
+                "id": "value_per_share",
+                "label": "Carbon and real-estate option per share",
+                "kind": "calculation",
+                "value": 0.0,
+                "unit": "CAD_per_share",
+                "operation": "divide",
+                "formula": "option_value_m \u00f7 shares_m",
+                "substituted_formula": "0 \u00f7 18.619712",
+                "dependencies": [
+                  "option_value_m",
+                  "shares_m"
+                ]
+              }
+            ],
+            "base": [
+              {
+                "id": "carbon_sales_m",
+                "label": "FY2024 voluntary carbon credit sales (reference issuance)",
+                "kind": "fact",
+                "value": 24.588,
+                "unit": "CAD_m",
+                "source": {
+                  "ref": "ADN.TO/investor-documents/ir-adn.to/Acadian-Annual-Report-2025-VF.pdf",
+                  "locator": "Carbon credit sales $24.588M on 752,100 credits in 2024; zero sales FY2025",
+                  "as_of": "2025-12-31",
+                  "content_sha256": "4bb4a04dfc3d993d727aeedf9dab564e999e2d0f0d50460e6866688b8387b582",
+                  "source_id": "dc3886648a97155f994d085d12d51aae527c36f9e90d551f39b4b7b78962a5c5"
+                },
+                "rationale": null
+              },
+              {
+                "id": "shares_m",
+                "label": "Common shares outstanding",
+                "kind": "fact",
+                "value": 18.619712,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "ADN.TO/investor-documents/ir-adn.to/Acadian-2026-Q1-Interim-Report.pdf",
+                  "locator": "18,619,712 common shares outstanding as at May 6, 2026",
+                  "as_of": "2026-03-31",
+                  "content_sha256": "4a5bf29a88e2c3e80f412d5147b96be8e3ed40ed8eebdd83f4a51d3aa8b20e55",
+                  "source_id": "b4ec297376042131708a63e9185b930927cdfa56dd7f04d108341597a6cc3b3c"
+                },
+                "rationale": null
+              },
+              {
+                "id": "risk_fraction",
+                "label": "Probability-weighted fraction of reference carbon/real-estate milestone value",
+                "kind": "judgment",
+                "value": 0.0,
+                "unit": "fraction",
+                "source": null,
+                "rationale": "Base assigns zero until next verified carbon issuance; high assumes one repeat of 2024-scale sale plus modest real-estate fee ramp."
+              },
+              {
+                "id": "option_value_m",
+                "label": "Risk-adjusted carbon and real-estate option value",
+                "kind": "calculation",
+                "value": 0.0,
+                "unit": "CAD_m",
+                "operation": "multiply",
+                "formula": "carbon_sales_m \u00d7 risk_fraction",
+                "substituted_formula": "24.588 \u00d7 0",
+                "dependencies": [
+                  "carbon_sales_m",
+                  "risk_fraction"
+                ]
+              },
+              {
+                "id": "value_per_share",
+                "label": "Carbon and real-estate option per share",
+                "kind": "calculation",
+                "value": 0.0,
+                "unit": "CAD_per_share",
+                "operation": "divide",
+                "formula": "option_value_m \u00f7 shares_m",
+                "substituted_formula": "0 \u00f7 18.619712",
+                "dependencies": [
+                  "option_value_m",
+                  "shares_m"
+                ]
+              }
+            ],
+            "high": [
+              {
+                "id": "carbon_sales_m",
+                "label": "FY2024 voluntary carbon credit sales (reference issuance)",
+                "kind": "fact",
+                "value": 24.588,
+                "unit": "CAD_m",
+                "source": {
+                  "ref": "ADN.TO/investor-documents/ir-adn.to/Acadian-Annual-Report-2025-VF.pdf",
+                  "locator": "Carbon credit sales $24.588M on 752,100 credits in 2024; zero sales FY2025",
+                  "as_of": "2025-12-31",
+                  "content_sha256": "4bb4a04dfc3d993d727aeedf9dab564e999e2d0f0d50460e6866688b8387b582",
+                  "source_id": "dc3886648a97155f994d085d12d51aae527c36f9e90d551f39b4b7b78962a5c5"
+                },
+                "rationale": null
+              },
+              {
+                "id": "shares_m",
+                "label": "Common shares outstanding",
+                "kind": "fact",
+                "value": 18.619712,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "ADN.TO/investor-documents/ir-adn.to/Acadian-2026-Q1-Interim-Report.pdf",
+                  "locator": "18,619,712 common shares outstanding as at May 6, 2026",
+                  "as_of": "2026-03-31",
+                  "content_sha256": "4a5bf29a88e2c3e80f412d5147b96be8e3ed40ed8eebdd83f4a51d3aa8b20e55",
+                  "source_id": "b4ec297376042131708a63e9185b930927cdfa56dd7f04d108341597a6cc3b3c"
+                },
+                "rationale": null
+              },
+              {
+                "id": "risk_fraction",
+                "label": "Probability-weighted fraction of reference carbon/real-estate milestone value",
+                "kind": "judgment",
+                "value": 0.9996,
+                "unit": "fraction",
+                "source": null,
+                "rationale": "Base assigns zero until next verified carbon issuance; high assumes one repeat of 2024-scale sale plus modest real-estate fee ramp."
+              },
+              {
+                "id": "option_value_m",
+                "label": "Risk-adjusted carbon and real-estate option value",
+                "kind": "calculation",
+                "value": 24.5781648,
+                "unit": "CAD_m",
+                "operation": "multiply",
+                "formula": "carbon_sales_m \u00d7 risk_fraction",
+                "substituted_formula": "24.588 \u00d7 0.9996",
+                "dependencies": [
+                  "carbon_sales_m",
+                  "risk_fraction"
+                ]
+              },
+              {
+                "id": "value_per_share",
+                "label": "Carbon and real-estate option per share",
+                "kind": "calculation",
+                "value": 1.32000779,
+                "unit": "CAD_per_share",
+                "operation": "divide",
+                "formula": "option_value_m \u00f7 shares_m",
+                "substituted_formula": "24.578165 \u00f7 18.619712",
+                "dependencies": [
+                  "option_value_m",
+                  "shares_m"
+                ]
+              }
+            ]
+          },
+          "source_lineage": [
+            {
+              "node_id": "carbon_sales_m",
+              "ref": "ADN.TO/investor-documents/ir-adn.to/Acadian-Annual-Report-2025-VF.pdf",
+              "locator": "Carbon credit sales $24.588M on 752,100 credits in 2024; zero sales FY2025",
+              "as_of": "2025-12-31",
+              "content_sha256": "4bb4a04dfc3d993d727aeedf9dab564e999e2d0f0d50460e6866688b8387b582",
+              "source_id": "dc3886648a97155f994d085d12d51aae527c36f9e90d551f39b4b7b78962a5c5"
+            },
+            {
+              "node_id": "shares_m",
+              "ref": "ADN.TO/investor-documents/ir-adn.to/Acadian-2026-Q1-Interim-Report.pdf",
+              "locator": "18,619,712 common shares outstanding as at May 6, 2026",
+              "as_of": "2026-03-31",
+              "content_sha256": "4a5bf29a88e2c3e80f412d5147b96be8e3ed40ed8eebdd83f4a51d3aa8b20e55",
+              "source_id": "b4ec297376042131708a63e9185b930927cdfa56dd7f04d108341597a6cc3b3c"
+            }
+          ],
+          "checks": {
+            "passed": true,
+            "errors": []
+          },
+          "proof_hash": "c3d8f6258130dd8180b64e0e27838a42765e03ee207efc1bea718316972d7919"
+        },
+        "evidence_tier": "primary_derived",
+        "evidence_level": "primary_derived",
+        "evidence": "Primary bridge from ADN.TO/investor-documents/ir-adn.to/Acadian-Annual-Report-2025-VF.pdf: FY2025 FCF $0.37/sh, book $19.67/sh, net liquidity $17.4M, debt $110.009M; contract backfill 2026-07-21.",
+        "scenario_assumptions": "Proof outputs {'low': 0.0, 'base': 0.0, 'high': 1.32}; see calculation_proof graph.",
+        "probability_and_timing": {
+          "success_probability": null,
+          "remaining_capital_m": null,
+          "timing_basis": "No disclosed carbon issuance schedule in FY2025 filings; real-estate HBU reviews are episodic.",
+          "probability_basis": "Base zero probability until next verified Katahdin voluntary credit issuance; high case uses one repeat of the 2024 CAD 24.6M sale precedent.",
+          "remaining_capital_basis": "Project monitoring and verification costs are embedded in operating segments; no incremental owner-funded capital reserved in base case."
+        },
+        "tax_and_realization_adjustments": "Base assigns zero until next verified issuance; real-estate fees remain small.",
+        "falsifier": "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
+        "overlap_key": "carbon_and_real_estate_option",
+        "assumption_type": "judgment"
+      },
+      {
+        "component_id": "owned_timberland_nav",
+        "label": "Owned freehold timberland and infrastructure at IFRS cost plus partial fair-value uplift",
+        "category": "financial_asset",
+        "treatment": "additive",
+        "included_in_component_id": null,
+        "ownership_claim": "1.075M owned freehold acres at IFRS cost with partial fair-value uplift",
+        "ownership_percentage": 1.0,
+        "quantity": {
+          "value": 1,
+          "unit": "per-share economic claim"
+        },
+        "method": "net_asset_value",
+        "method_version": "1.0",
+        "method_provenance": {
+          "method_id": "net_asset_value",
+          "version": "1.0",
+          "label": "Reconciled net asset value",
+          "power_zones": [
+            "scarce_asset_optionality",
+            "catalyst_asset_value",
+            "credit_and_normalized_returns"
+          ],
+          "equation": "value_per_share = (gross_assets - senior_claims - tax - realization_costs) / diluted_shares",
+          "sources": [
+            {
+              "ref": "_system/frameworks/scarce_strategic_asset_valuation.md",
+              "locator": "Economic ownership and unit NAV"
+            }
+          ]
+        },
+        "comparable_ids": [],
+        "range_per_share": {
+          "low": 8.0007,
+          "base": 13.0008,
+          "high": 17.9991
+        },
+        "legacy_range_per_share": {
+          "low": 8.0,
+          "base": 13.0,
+          "high": 18.0
+        },
+        "valuation_status": "bounded_estimate",
+        "calculation_proof": {
+          "status": "valid",
+          "method_id": "net_asset_value",
+          "method_version": "1.0",
+          "outputs": {
+            "low": 8.0007,
+            "base": 13.0008,
+            "high": 17.9991
+          },
+          "output_unit": "CAD_per_share",
+          "traces": {
+            "low": [
+              {
+                "id": "shareholders_equity_m",
+                "label": "Shareholders' equity at IFRS cost",
+                "kind": "fact",
+                "value": 359.744,
+                "unit": "CAD_m",
+                "source": {
+                  "ref": "ADN.TO/investor-documents/ir-adn.to/Acadian-Annual-Report-2025-VF.pdf",
+                  "locator": "Shareholders' equity $359,744 thousand at December 31, 2025; book value $19.67 per share",
+                  "as_of": "2025-12-31",
+                  "content_sha256": "4bb4a04dfc3d993d727aeedf9dab564e999e2d0f0d50460e6866688b8387b582",
+                  "source_id": "4478277683efe19c27be9daabdc2f7f3a2eee2eabc723d52906cbc6eb76d7357"
+                },
+                "rationale": null
+              },
+              {
+                "id": "shares_m",
+                "label": "Common shares outstanding",
+                "kind": "fact",
+                "value": 18.619712,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "ADN.TO/investor-documents/ir-adn.to/Acadian-2026-Q1-Interim-Report.pdf",
+                  "locator": "18,619,712 common shares outstanding as at May 6, 2026",
+                  "as_of": "2026-03-31",
+                  "content_sha256": "4a5bf29a88e2c3e80f412d5147b96be8e3ed40ed8eebdd83f4a51d3aa8b20e55",
+                  "source_id": "b4ec297376042131708a63e9185b930927cdfa56dd7f04d108341597a6cc3b3c"
+                },
+                "rationale": null
+              },
+              {
+                "id": "owned_acres",
+                "label": "Owned freehold timberland acres",
+                "kind": "fact",
+                "value": 1075000.0,
+                "unit": "acres",
+                "source": {
+                  "ref": "ADN.TO/investor-documents/ir-adn.to/Acadian-Annual-Report-2025-VF.pdf",
+                  "locator": "775,000 New Brunswick + 300,000 Maine freehold acres under management",
+                  "as_of": "2025-12-31",
+                  "content_sha256": "4bb4a04dfc3d993d727aeedf9dab564e999e2d0f0d50460e6866688b8387b582",
+                  "source_id": "b86dbfba9f24ef32e3796f1dca81eb57680627ac295f8764455ad51bf32ba467"
+                },
+                "rationale": null
+              },
+              {
+                "id": "land_equity_fraction",
+                "label": "Fraction of IFRS equity representing owned timberland and infrastructure not in producing capitalization",
+                "kind": "judgment",
+                "value": 0.4141,
+                "unit": "fraction",
+                "source": null,
+                "rationale": "Timberlands carried at historical cost less depletion; base credits ~1.075M owned acres at IFRS book plus modest fair-value uplift; high assumes partial third-party per-acre marks on Maine vs NB."
+              },
+              {
+                "id": "land_claim_m",
+                "label": "Owned timberland and infrastructure claim",
+                "kind": "calculation",
+                "value": 148.9699904,
+                "unit": "CAD_m",
+                "operation": "multiply",
+                "formula": "shareholders_equity_m \u00d7 land_equity_fraction",
+                "substituted_formula": "359.744 \u00d7 0.4141",
+                "dependencies": [
+                  "shareholders_equity_m",
+                  "land_equity_fraction"
+                ]
+              },
+              {
+                "id": "value_per_share",
+                "label": "Owned timberland NAV per share",
+                "kind": "calculation",
+                "value": 8.00066029,
+                "unit": "CAD_per_share",
+                "operation": "divide",
+                "formula": "land_claim_m \u00f7 shares_m",
+                "substituted_formula": "148.96999 \u00f7 18.619712",
+                "dependencies": [
+                  "land_claim_m",
+                  "shares_m"
+                ]
+              }
+            ],
+            "base": [
+              {
+                "id": "shareholders_equity_m",
+                "label": "Shareholders' equity at IFRS cost",
+                "kind": "fact",
+                "value": 359.744,
+                "unit": "CAD_m",
+                "source": {
+                  "ref": "ADN.TO/investor-documents/ir-adn.to/Acadian-Annual-Report-2025-VF.pdf",
+                  "locator": "Shareholders' equity $359,744 thousand at December 31, 2025; book value $19.67 per share",
+                  "as_of": "2025-12-31",
+                  "content_sha256": "4bb4a04dfc3d993d727aeedf9dab564e999e2d0f0d50460e6866688b8387b582",
+                  "source_id": "4478277683efe19c27be9daabdc2f7f3a2eee2eabc723d52906cbc6eb76d7357"
+                },
+                "rationale": null
+              },
+              {
+                "id": "shares_m",
+                "label": "Common shares outstanding",
+                "kind": "fact",
+                "value": 18.619712,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "ADN.TO/investor-documents/ir-adn.to/Acadian-2026-Q1-Interim-Report.pdf",
+                  "locator": "18,619,712 common shares outstanding as at May 6, 2026",
+                  "as_of": "2026-03-31",
+                  "content_sha256": "4a5bf29a88e2c3e80f412d5147b96be8e3ed40ed8eebdd83f4a51d3aa8b20e55",
+                  "source_id": "b4ec297376042131708a63e9185b930927cdfa56dd7f04d108341597a6cc3b3c"
+                },
+                "rationale": null
+              },
+              {
+                "id": "owned_acres",
+                "label": "Owned freehold timberland acres",
+                "kind": "fact",
+                "value": 1075000.0,
+                "unit": "acres",
+                "source": {
+                  "ref": "ADN.TO/investor-documents/ir-adn.to/Acadian-Annual-Report-2025-VF.pdf",
+                  "locator": "775,000 New Brunswick + 300,000 Maine freehold acres under management",
+                  "as_of": "2025-12-31",
+                  "content_sha256": "4bb4a04dfc3d993d727aeedf9dab564e999e2d0f0d50460e6866688b8387b582",
+                  "source_id": "b86dbfba9f24ef32e3796f1dca81eb57680627ac295f8764455ad51bf32ba467"
+                },
+                "rationale": null
+              },
+              {
+                "id": "land_equity_fraction",
+                "label": "Fraction of IFRS equity representing owned timberland and infrastructure not in producing capitalization",
+                "kind": "judgment",
+                "value": 0.6729,
+                "unit": "fraction",
+                "source": null,
+                "rationale": "Timberlands carried at historical cost less depletion; base credits ~1.075M owned acres at IFRS book plus modest fair-value uplift; high assumes partial third-party per-acre marks on Maine vs NB."
+              },
+              {
+                "id": "land_claim_m",
+                "label": "Owned timberland and infrastructure claim",
+                "kind": "calculation",
+                "value": 242.0717376,
+                "unit": "CAD_m",
+                "operation": "multiply",
+                "formula": "shareholders_equity_m \u00d7 land_equity_fraction",
+                "substituted_formula": "359.744 \u00d7 0.6729",
+                "dependencies": [
+                  "shareholders_equity_m",
+                  "land_equity_fraction"
+                ]
+              },
+              {
+                "id": "value_per_share",
+                "label": "Owned timberland NAV per share",
+                "kind": "calculation",
+                "value": 13.00083146,
+                "unit": "CAD_per_share",
+                "operation": "divide",
+                "formula": "land_claim_m \u00f7 shares_m",
+                "substituted_formula": "242.07174 \u00f7 18.619712",
+                "dependencies": [
+                  "land_claim_m",
+                  "shares_m"
+                ]
+              }
+            ],
+            "high": [
+              {
+                "id": "shareholders_equity_m",
+                "label": "Shareholders' equity at IFRS cost",
+                "kind": "fact",
+                "value": 359.744,
+                "unit": "CAD_m",
+                "source": {
+                  "ref": "ADN.TO/investor-documents/ir-adn.to/Acadian-Annual-Report-2025-VF.pdf",
+                  "locator": "Shareholders' equity $359,744 thousand at December 31, 2025; book value $19.67 per share",
+                  "as_of": "2025-12-31",
+                  "content_sha256": "4bb4a04dfc3d993d727aeedf9dab564e999e2d0f0d50460e6866688b8387b582",
+                  "source_id": "4478277683efe19c27be9daabdc2f7f3a2eee2eabc723d52906cbc6eb76d7357"
+                },
+                "rationale": null
+              },
+              {
+                "id": "shares_m",
+                "label": "Common shares outstanding",
+                "kind": "fact",
+                "value": 18.619712,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "ADN.TO/investor-documents/ir-adn.to/Acadian-2026-Q1-Interim-Report.pdf",
+                  "locator": "18,619,712 common shares outstanding as at May 6, 2026",
+                  "as_of": "2026-03-31",
+                  "content_sha256": "4a5bf29a88e2c3e80f412d5147b96be8e3ed40ed8eebdd83f4a51d3aa8b20e55",
+                  "source_id": "b4ec297376042131708a63e9185b930927cdfa56dd7f04d108341597a6cc3b3c"
+                },
+                "rationale": null
+              },
+              {
+                "id": "owned_acres",
+                "label": "Owned freehold timberland acres",
+                "kind": "fact",
+                "value": 1075000.0,
+                "unit": "acres",
+                "source": {
+                  "ref": "ADN.TO/investor-documents/ir-adn.to/Acadian-Annual-Report-2025-VF.pdf",
+                  "locator": "775,000 New Brunswick + 300,000 Maine freehold acres under management",
+                  "as_of": "2025-12-31",
+                  "content_sha256": "4bb4a04dfc3d993d727aeedf9dab564e999e2d0f0d50460e6866688b8387b582",
+                  "source_id": "b86dbfba9f24ef32e3796f1dca81eb57680627ac295f8764455ad51bf32ba467"
+                },
+                "rationale": null
+              },
+              {
+                "id": "land_equity_fraction",
+                "label": "Fraction of IFRS equity representing owned timberland and infrastructure not in producing capitalization",
+                "kind": "judgment",
+                "value": 0.9316,
+                "unit": "fraction",
+                "source": null,
+                "rationale": "Timberlands carried at historical cost less depletion; base credits ~1.075M owned acres at IFRS book plus modest fair-value uplift; high assumes partial third-party per-acre marks on Maine vs NB."
+              },
+              {
+                "id": "land_claim_m",
+                "label": "Owned timberland and infrastructure claim",
+                "kind": "calculation",
+                "value": 335.1375104,
+                "unit": "CAD_m",
+                "operation": "multiply",
+                "formula": "shareholders_equity_m \u00d7 land_equity_fraction",
+                "substituted_formula": "359.744 \u00d7 0.9316",
+                "dependencies": [
+                  "shareholders_equity_m",
+                  "land_equity_fraction"
+                ]
+              },
+              {
+                "id": "value_per_share",
+                "label": "Owned timberland NAV per share",
+                "kind": "calculation",
+                "value": 17.99907058,
+                "unit": "CAD_per_share",
+                "operation": "divide",
+                "formula": "land_claim_m \u00f7 shares_m",
+                "substituted_formula": "335.13751 \u00f7 18.619712",
+                "dependencies": [
+                  "land_claim_m",
+                  "shares_m"
+                ]
+              }
+            ]
+          },
+          "source_lineage": [
+            {
+              "node_id": "shareholders_equity_m",
+              "ref": "ADN.TO/investor-documents/ir-adn.to/Acadian-Annual-Report-2025-VF.pdf",
+              "locator": "Shareholders' equity $359,744 thousand at December 31, 2025; book value $19.67 per share",
+              "as_of": "2025-12-31",
+              "content_sha256": "4bb4a04dfc3d993d727aeedf9dab564e999e2d0f0d50460e6866688b8387b582",
+              "source_id": "4478277683efe19c27be9daabdc2f7f3a2eee2eabc723d52906cbc6eb76d7357"
+            },
+            {
+              "node_id": "shares_m",
+              "ref": "ADN.TO/investor-documents/ir-adn.to/Acadian-2026-Q1-Interim-Report.pdf",
+              "locator": "18,619,712 common shares outstanding as at May 6, 2026",
+              "as_of": "2026-03-31",
+              "content_sha256": "4a5bf29a88e2c3e80f412d5147b96be8e3ed40ed8eebdd83f4a51d3aa8b20e55",
+              "source_id": "b4ec297376042131708a63e9185b930927cdfa56dd7f04d108341597a6cc3b3c"
+            },
+            {
+              "node_id": "owned_acres",
+              "ref": "ADN.TO/investor-documents/ir-adn.to/Acadian-Annual-Report-2025-VF.pdf",
+              "locator": "775,000 New Brunswick + 300,000 Maine freehold acres under management",
+              "as_of": "2025-12-31",
+              "content_sha256": "4bb4a04dfc3d993d727aeedf9dab564e999e2d0f0d50460e6866688b8387b582",
+              "source_id": "b86dbfba9f24ef32e3796f1dca81eb57680627ac295f8764455ad51bf32ba467"
+            }
+          ],
+          "checks": {
+            "passed": true,
+            "errors": []
+          },
+          "proof_hash": "4cc5eb0dce5c8ec0a8bf23618819a3fb470e924b32ad8543c9ee14d42775b2eb"
+        },
+        "evidence_tier": "primary_derived",
+        "evidence_level": "primary_derived",
+        "evidence": "Primary bridge from ADN.TO/investor-documents/ir-adn.to/Acadian-Annual-Report-2025-VF.pdf: FY2025 FCF $0.37/sh, book $19.67/sh, net liquidity $17.4M, debt $110.009M; contract backfill 2026-07-21.",
+        "scenario_assumptions": "Proof outputs {'low': 8.0007, 'base': 13.0008, 'high': 17.9991}; see calculation_proof graph.",
+        "probability_and_timing": null,
+        "tax_and_realization_adjustments": "Timberlands carried at historical cost; uplift band is bounded judgment.",
+        "falsifier": "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
+        "overlap_key": "owned_timberland_nav",
+        "assumption_type": "judgment"
+      },
+      {
+        "component_id": "net_financial_claims",
+        "label": "Net liquidity, debt, and corporate balance-sheet claims",
+        "category": "financial_asset",
+        "treatment": "additive",
+        "included_in_component_id": null,
+        "ownership_claim": "Net liquidity and attributed long-term debt senior to equity",
+        "ownership_percentage": 1.0,
+        "quantity": {
+          "value": 1,
+          "unit": "per-share economic claim"
+        },
+        "method": "net_asset_value",
+        "method_version": "1.0",
+        "method_provenance": {
+          "method_id": "net_asset_value",
+          "version": "1.0",
+          "label": "Reconciled net asset value",
+          "power_zones": [
+            "scarce_asset_optionality",
+            "catalyst_asset_value",
+            "credit_and_normalized_returns"
+          ],
+          "equation": "value_per_share = (gross_assets - senior_claims - tax - realization_costs) / diluted_shares",
+          "sources": [
+            {
+              "ref": "_system/frameworks/scarce_strategic_asset_valuation.md",
+              "locator": "Economic ownership and unit NAV"
+            }
+          ]
+        },
+        "comparable_ids": [],
+        "range_per_share": {
+          "low": -5.0,
+          "base": 0.93,
+          "high": 2.0
+        },
+        "legacy_range_per_share": {
+          "low": -5.0,
+          "base": 0.93,
+          "high": 2.0
+        },
+        "valuation_status": "bounded_estimate",
+        "calculation_proof": {
+          "status": "valid",
+          "method_id": "net_asset_value",
+          "method_version": "1.0",
+          "outputs": {
+            "low": -5.0,
+            "base": 0.93,
+            "high": 2.0
+          },
+          "output_unit": "CAD_per_share",
+          "traces": {
+            "low": [
+              {
+                "id": "net_liquidity_m",
+                "label": "Net liquidity at December 31, 2025",
+                "kind": "fact",
+                "value": 17.4,
+                "unit": "CAD_m",
+                "source": {
+                  "ref": "ADN.TO/investor-documents/ir-adn.to/Acadian-Annual-Report-2025-VF.pdf",
+                  "locator": "Net liquidity $17.4M (cash, revolver availability, less minimum cash reserved for debt)",
+                  "as_of": "2025-12-31",
+                  "content_sha256": "4bb4a04dfc3d993d727aeedf9dab564e999e2d0f0d50460e6866688b8387b582",
+                  "source_id": "10193f2b3556bbddde9f5e3a69d74a5965c746f651e6bc22136a0b950bef13b6"
+                },
+                "rationale": null
+              },
+              {
+                "id": "long_term_debt_m",
+                "label": "Total long-term debt",
+                "kind": "fact",
+                "value": 110.009,
+                "unit": "CAD_m",
+                "source": {
+                  "ref": "ADN.TO/investor-documents/ir-adn.to/Acadian-Annual-Report-2025-VF.pdf",
+                  "locator": "Total long-term debt $110,009 thousand at December 31, 2025",
+                  "as_of": "2025-12-31",
+                  "content_sha256": "4bb4a04dfc3d993d727aeedf9dab564e999e2d0f0d50460e6866688b8387b582",
+                  "source_id": "87279d2490ec93f677acf5cb187e65c60066b2f1e84f08f940930dd8652fe55f"
+                },
+                "rationale": null
+              },
+              {
+                "id": "shares_m",
+                "label": "Common shares outstanding",
+                "kind": "fact",
+                "value": 18.619712,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "ADN.TO/investor-documents/ir-adn.to/Acadian-2026-Q1-Interim-Report.pdf",
+                  "locator": "18,619,712 common shares outstanding as at May 6, 2026",
+                  "as_of": "2026-03-31",
+                  "content_sha256": "4a5bf29a88e2c3e80f412d5147b96be8e3ed40ed8eebdd83f4a51d3aa8b20e55",
+                  "source_id": "b4ec297376042131708a63e9185b930927cdfa56dd7f04d108341597a6cc3b3c"
+                },
+                "rationale": null
+              },
+              {
+                "id": "net_corporate_claim_m",
+                "label": "Net corporate financial claim after filing liquidity and attributed debt service burden",
+                "kind": "judgment",
+                "value": -93.099,
+                "unit": "CAD_m",
+                "source": null,
+                "rationale": "Low stresses full long-term debt seniority over equity; base uses filing net liquidity only; high adds bounded working-capital and revolver headroom not capitalized in land component."
+              },
+              {
+                "id": "value_per_share",
+                "label": "Net financial claims per share",
+                "kind": "calculation",
+                "value": -5.00002363,
+                "unit": "CAD_per_share",
+                "operation": "divide",
+                "formula": "net_corporate_claim_m \u00f7 shares_m",
+                "substituted_formula": "-93.099 \u00f7 18.619712",
+                "dependencies": [
+                  "net_corporate_claim_m",
+                  "shares_m"
+                ]
+              }
+            ],
+            "base": [
+              {
+                "id": "net_liquidity_m",
+                "label": "Net liquidity at December 31, 2025",
+                "kind": "fact",
+                "value": 17.4,
+                "unit": "CAD_m",
+                "source": {
+                  "ref": "ADN.TO/investor-documents/ir-adn.to/Acadian-Annual-Report-2025-VF.pdf",
+                  "locator": "Net liquidity $17.4M (cash, revolver availability, less minimum cash reserved for debt)",
+                  "as_of": "2025-12-31",
+                  "content_sha256": "4bb4a04dfc3d993d727aeedf9dab564e999e2d0f0d50460e6866688b8387b582",
+                  "source_id": "10193f2b3556bbddde9f5e3a69d74a5965c746f651e6bc22136a0b950bef13b6"
+                },
+                "rationale": null
+              },
+              {
+                "id": "long_term_debt_m",
+                "label": "Total long-term debt",
+                "kind": "fact",
+                "value": 110.009,
+                "unit": "CAD_m",
+                "source": {
+                  "ref": "ADN.TO/investor-documents/ir-adn.to/Acadian-Annual-Report-2025-VF.pdf",
+                  "locator": "Total long-term debt $110,009 thousand at December 31, 2025",
+                  "as_of": "2025-12-31",
+                  "content_sha256": "4bb4a04dfc3d993d727aeedf9dab564e999e2d0f0d50460e6866688b8387b582",
+                  "source_id": "87279d2490ec93f677acf5cb187e65c60066b2f1e84f08f940930dd8652fe55f"
+                },
+                "rationale": null
+              },
+              {
+                "id": "shares_m",
+                "label": "Common shares outstanding",
+                "kind": "fact",
+                "value": 18.619712,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "ADN.TO/investor-documents/ir-adn.to/Acadian-2026-Q1-Interim-Report.pdf",
+                  "locator": "18,619,712 common shares outstanding as at May 6, 2026",
+                  "as_of": "2026-03-31",
+                  "content_sha256": "4a5bf29a88e2c3e80f412d5147b96be8e3ed40ed8eebdd83f4a51d3aa8b20e55",
+                  "source_id": "b4ec297376042131708a63e9185b930927cdfa56dd7f04d108341597a6cc3b3c"
+                },
+                "rationale": null
+              },
+              {
+                "id": "net_corporate_claim_m",
+                "label": "Net corporate financial claim after filing liquidity and attributed debt service burden",
+                "kind": "judgment",
+                "value": 17.316,
+                "unit": "CAD_m",
+                "source": null,
+                "rationale": "Low stresses full long-term debt seniority over equity; base uses filing net liquidity only; high adds bounded working-capital and revolver headroom not capitalized in land component."
+              },
+              {
+                "id": "value_per_share",
+                "label": "Net financial claims per share",
+                "kind": "calculation",
+                "value": 0.92998216,
+                "unit": "CAD_per_share",
+                "operation": "divide",
+                "formula": "net_corporate_claim_m \u00f7 shares_m",
+                "substituted_formula": "17.316 \u00f7 18.619712",
+                "dependencies": [
+                  "net_corporate_claim_m",
+                  "shares_m"
+                ]
+              }
+            ],
+            "high": [
+              {
+                "id": "net_liquidity_m",
+                "label": "Net liquidity at December 31, 2025",
+                "kind": "fact",
+                "value": 17.4,
+                "unit": "CAD_m",
+                "source": {
+                  "ref": "ADN.TO/investor-documents/ir-adn.to/Acadian-Annual-Report-2025-VF.pdf",
+                  "locator": "Net liquidity $17.4M (cash, revolver availability, less minimum cash reserved for debt)",
+                  "as_of": "2025-12-31",
+                  "content_sha256": "4bb4a04dfc3d993d727aeedf9dab564e999e2d0f0d50460e6866688b8387b582",
+                  "source_id": "10193f2b3556bbddde9f5e3a69d74a5965c746f651e6bc22136a0b950bef13b6"
+                },
+                "rationale": null
+              },
+              {
+                "id": "long_term_debt_m",
+                "label": "Total long-term debt",
+                "kind": "fact",
+                "value": 110.009,
+                "unit": "CAD_m",
+                "source": {
+                  "ref": "ADN.TO/investor-documents/ir-adn.to/Acadian-Annual-Report-2025-VF.pdf",
+                  "locator": "Total long-term debt $110,009 thousand at December 31, 2025",
+                  "as_of": "2025-12-31",
+                  "content_sha256": "4bb4a04dfc3d993d727aeedf9dab564e999e2d0f0d50460e6866688b8387b582",
+                  "source_id": "87279d2490ec93f677acf5cb187e65c60066b2f1e84f08f940930dd8652fe55f"
+                },
+                "rationale": null
+              },
+              {
+                "id": "shares_m",
+                "label": "Common shares outstanding",
+                "kind": "fact",
+                "value": 18.619712,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "ADN.TO/investor-documents/ir-adn.to/Acadian-2026-Q1-Interim-Report.pdf",
+                  "locator": "18,619,712 common shares outstanding as at May 6, 2026",
+                  "as_of": "2026-03-31",
+                  "content_sha256": "4a5bf29a88e2c3e80f412d5147b96be8e3ed40ed8eebdd83f4a51d3aa8b20e55",
+                  "source_id": "b4ec297376042131708a63e9185b930927cdfa56dd7f04d108341597a6cc3b3c"
+                },
+                "rationale": null
+              },
+              {
+                "id": "net_corporate_claim_m",
+                "label": "Net corporate financial claim after filing liquidity and attributed debt service burden",
+                "kind": "judgment",
+                "value": 37.239,
+                "unit": "CAD_m",
+                "source": null,
+                "rationale": "Low stresses full long-term debt seniority over equity; base uses filing net liquidity only; high adds bounded working-capital and revolver headroom not capitalized in land component."
+              },
+              {
+                "id": "value_per_share",
+                "label": "Net financial claims per share",
+                "kind": "calculation",
+                "value": 1.99997723,
+                "unit": "CAD_per_share",
+                "operation": "divide",
+                "formula": "net_corporate_claim_m \u00f7 shares_m",
+                "substituted_formula": "37.239 \u00f7 18.619712",
+                "dependencies": [
+                  "net_corporate_claim_m",
+                  "shares_m"
+                ]
+              }
+            ]
+          },
+          "source_lineage": [
+            {
+              "node_id": "net_liquidity_m",
+              "ref": "ADN.TO/investor-documents/ir-adn.to/Acadian-Annual-Report-2025-VF.pdf",
+              "locator": "Net liquidity $17.4M (cash, revolver availability, less minimum cash reserved for debt)",
+              "as_of": "2025-12-31",
+              "content_sha256": "4bb4a04dfc3d993d727aeedf9dab564e999e2d0f0d50460e6866688b8387b582",
+              "source_id": "10193f2b3556bbddde9f5e3a69d74a5965c746f651e6bc22136a0b950bef13b6"
+            },
+            {
+              "node_id": "long_term_debt_m",
+              "ref": "ADN.TO/investor-documents/ir-adn.to/Acadian-Annual-Report-2025-VF.pdf",
+              "locator": "Total long-term debt $110,009 thousand at December 31, 2025",
+              "as_of": "2025-12-31",
+              "content_sha256": "4bb4a04dfc3d993d727aeedf9dab564e999e2d0f0d50460e6866688b8387b582",
+              "source_id": "87279d2490ec93f677acf5cb187e65c60066b2f1e84f08f940930dd8652fe55f"
+            },
+            {
+              "node_id": "shares_m",
+              "ref": "ADN.TO/investor-documents/ir-adn.to/Acadian-2026-Q1-Interim-Report.pdf",
+              "locator": "18,619,712 common shares outstanding as at May 6, 2026",
+              "as_of": "2026-03-31",
+              "content_sha256": "4a5bf29a88e2c3e80f412d5147b96be8e3ed40ed8eebdd83f4a51d3aa8b20e55",
+              "source_id": "b4ec297376042131708a63e9185b930927cdfa56dd7f04d108341597a6cc3b3c"
+            }
+          ],
+          "checks": {
+            "passed": true,
+            "errors": []
+          },
+          "proof_hash": "2eda76b8285d7a355ab77f2a3a904e7c91ac06b136acfccee8a01f27a805fbd9"
+        },
+        "evidence_tier": "primary_derived",
+        "evidence_level": "primary_derived",
+        "evidence": "Primary bridge from ADN.TO/investor-documents/ir-adn.to/Acadian-Annual-Report-2025-VF.pdf: FY2025 FCF $0.37/sh, book $19.67/sh, net liquidity $17.4M, debt $110.009M; contract backfill 2026-07-21.",
+        "scenario_assumptions": "Proof outputs {'low': -5.0, 'base': 0.93, 'high': 2.0}; see calculation_proof graph.",
+        "probability_and_timing": null,
+        "tax_and_realization_adjustments": "Low case stresses full debt seniority; high adds revolver headroom.",
+        "falsifier": "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
+        "overlap_key": "net_financial_claims",
+        "assumption_type": "judgment"
+      },
+      {
+        "component_id": "payout_and_cycle_reserve",
+        "label": "Dividend coverage, Maine execution, and lumber-cycle reserve",
+        "category": "liability_or_reserve",
+        "treatment": "additive",
+        "included_in_component_id": null,
+        "ownership_claim": "Dividend-FCF gap and Maine/lumber-cycle stress reserve",
+        "ownership_percentage": 1.0,
+        "quantity": {
+          "value": 1,
+          "unit": "per-share economic claim"
+        },
+        "method": "net_asset_value",
+        "method_version": "1.0",
+        "method_provenance": {
+          "method_id": "net_asset_value",
+          "version": "1.0",
+          "label": "Reconciled net asset value",
+          "power_zones": [
+            "scarce_asset_optionality",
+            "catalyst_asset_value",
+            "credit_and_normalized_returns"
+          ],
+          "equation": "value_per_share = (gross_assets - senior_claims - tax - realization_costs) / diluted_shares",
+          "sources": [
+            {
+              "ref": "_system/frameworks/scarce_strategic_asset_valuation.md",
+              "locator": "Economic ownership and unit NAV"
+            }
+          ]
+        },
+        "comparable_ids": [],
+        "range_per_share": {
+          "low": -5.0,
+          "base": -2.5,
+          "high": -1.0
+        },
+        "legacy_range_per_share": {
+          "low": -5.0,
+          "base": -2.5,
+          "high": -1.0
+        },
+        "valuation_status": "bounded_estimate",
+        "calculation_proof": {
+          "status": "valid",
+          "method_id": "net_asset_value",
+          "method_version": "1.0",
+          "outputs": {
+            "low": -5.0,
+            "base": -2.5,
+            "high": -1.0
+          },
+          "output_unit": "CAD_per_share",
+          "traces": {
+            "low": [
+              {
+                "id": "dividend_per_share",
+                "label": "Annual dividend declared per share",
+                "kind": "fact",
+                "value": 1.16,
+                "unit": "CAD_per_share",
+                "source": {
+                  "ref": "ADN.TO/investor-documents/ir-adn.to/Acadian-Annual-Report-2025-VF.pdf",
+                  "locator": "Dividends declared $1.16 per share FY2025",
+                  "as_of": "2025-12-31",
+                  "content_sha256": "4bb4a04dfc3d993d727aeedf9dab564e999e2d0f0d50460e6866688b8387b582",
+                  "source_id": "934215ae4efcd2de3098bd8480c8fe8779acce02c5e0984a6319dce0cea1d0ef"
+                },
+                "rationale": null
+              },
+              {
+                "id": "fcf_per_share",
+                "label": "FY2025 Free Cash Flow per share",
+                "kind": "fact",
+                "value": 0.37,
+                "unit": "CAD_per_share",
+                "source": {
+                  "ref": "ADN.TO/investor-documents/ir-adn.to/Acadian-Annual-Report-2025-VF.pdf",
+                  "locator": "Free Cash Flow per share $0.37 FY2025",
+                  "as_of": "2025-12-31",
+                  "content_sha256": "4bb4a04dfc3d993d727aeedf9dab564e999e2d0f0d50460e6866688b8387b582",
+                  "source_id": "dbb77b3e1225abb2663a0242e8e9275da986a8d965b727812fc6c354db35103b"
+                },
+                "rationale": null
+              },
+              {
+                "id": "shares_m",
+                "label": "Common shares outstanding",
+                "kind": "fact",
+                "value": 18.619712,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "ADN.TO/investor-documents/ir-adn.to/Acadian-2026-Q1-Interim-Report.pdf",
+                  "locator": "18,619,712 common shares outstanding as at May 6, 2026",
+                  "as_of": "2026-03-31",
+                  "content_sha256": "4a5bf29a88e2c3e80f412d5147b96be8e3ed40ed8eebdd83f4a51d3aa8b20e55",
+                  "source_id": "b4ec297376042131708a63e9185b930927cdfa56dd7f04d108341597a6cc3b3c"
+                },
+                "rationale": null
+              },
+              {
+                "id": "coverage_stress_multiple",
+                "label": "Dividend coverage, Maine execution, and lumber-cycle stress reserve multiple on FCF gap",
+                "kind": "judgment",
+                "value": 6.3291,
+                "unit": "multiple",
+                "source": null,
+                "rationale": "Reserve scales with dividend minus Free Cash Flow gap and Maine margin recovery risk; Macer 100% DRIP mitigates cash drain but not economic dilution."
+              },
+              {
+                "id": "gap_per_share",
+                "label": "Annual dividend minus Free Cash Flow per share",
+                "kind": "calculation",
+                "value": 0.79,
+                "unit": "CAD_per_share",
+                "operation": "subtract",
+                "formula": "dividend_per_share - fcf_per_share",
+                "substituted_formula": "1.16 - 0.37",
+                "dependencies": [
+                  "dividend_per_share",
+                  "fcf_per_share"
+                ]
+              },
+              {
+                "id": "reserve_gross",
+                "label": "Gross payout and cycle reserve",
+                "kind": "calculation",
+                "value": 4.999989,
+                "unit": "CAD_per_share",
+                "operation": "multiply",
+                "formula": "gap_per_share \u00d7 coverage_stress_multiple",
+                "substituted_formula": "0.79 \u00d7 6.3291",
+                "dependencies": [
+                  "gap_per_share",
+                  "coverage_stress_multiple"
+                ]
+              },
+              {
+                "id": "value_per_share",
+                "label": "Payout and cycle reserve per share",
+                "kind": "calculation",
+                "value": -4.999989,
+                "unit": "CAD_per_share",
+                "operation": "negative",
+                "formula": "-(reserve_gross)",
+                "substituted_formula": "-(4.999989)",
+                "dependencies": [
+                  "reserve_gross"
+                ]
+              }
+            ],
+            "base": [
+              {
+                "id": "dividend_per_share",
+                "label": "Annual dividend declared per share",
+                "kind": "fact",
+                "value": 1.16,
+                "unit": "CAD_per_share",
+                "source": {
+                  "ref": "ADN.TO/investor-documents/ir-adn.to/Acadian-Annual-Report-2025-VF.pdf",
+                  "locator": "Dividends declared $1.16 per share FY2025",
+                  "as_of": "2025-12-31",
+                  "content_sha256": "4bb4a04dfc3d993d727aeedf9dab564e999e2d0f0d50460e6866688b8387b582",
+                  "source_id": "934215ae4efcd2de3098bd8480c8fe8779acce02c5e0984a6319dce0cea1d0ef"
+                },
+                "rationale": null
+              },
+              {
+                "id": "fcf_per_share",
+                "label": "FY2025 Free Cash Flow per share",
+                "kind": "fact",
+                "value": 0.37,
+                "unit": "CAD_per_share",
+                "source": {
+                  "ref": "ADN.TO/investor-documents/ir-adn.to/Acadian-Annual-Report-2025-VF.pdf",
+                  "locator": "Free Cash Flow per share $0.37 FY2025",
+                  "as_of": "2025-12-31",
+                  "content_sha256": "4bb4a04dfc3d993d727aeedf9dab564e999e2d0f0d50460e6866688b8387b582",
+                  "source_id": "dbb77b3e1225abb2663a0242e8e9275da986a8d965b727812fc6c354db35103b"
+                },
+                "rationale": null
+              },
+              {
+                "id": "shares_m",
+                "label": "Common shares outstanding",
+                "kind": "fact",
+                "value": 18.619712,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "ADN.TO/investor-documents/ir-adn.to/Acadian-2026-Q1-Interim-Report.pdf",
+                  "locator": "18,619,712 common shares outstanding as at May 6, 2026",
+                  "as_of": "2026-03-31",
+                  "content_sha256": "4a5bf29a88e2c3e80f412d5147b96be8e3ed40ed8eebdd83f4a51d3aa8b20e55",
+                  "source_id": "b4ec297376042131708a63e9185b930927cdfa56dd7f04d108341597a6cc3b3c"
+                },
+                "rationale": null
+              },
+              {
+                "id": "coverage_stress_multiple",
+                "label": "Dividend coverage, Maine execution, and lumber-cycle stress reserve multiple on FCF gap",
+                "kind": "judgment",
+                "value": 3.1645,
+                "unit": "multiple",
+                "source": null,
+                "rationale": "Reserve scales with dividend minus Free Cash Flow gap and Maine margin recovery risk; Macer 100% DRIP mitigates cash drain but not economic dilution."
+              },
+              {
+                "id": "gap_per_share",
+                "label": "Annual dividend minus Free Cash Flow per share",
+                "kind": "calculation",
+                "value": 0.79,
+                "unit": "CAD_per_share",
+                "operation": "subtract",
+                "formula": "dividend_per_share - fcf_per_share",
+                "substituted_formula": "1.16 - 0.37",
+                "dependencies": [
+                  "dividend_per_share",
+                  "fcf_per_share"
+                ]
+              },
+              {
+                "id": "reserve_gross",
+                "label": "Gross payout and cycle reserve",
+                "kind": "calculation",
+                "value": 2.499955,
+                "unit": "CAD_per_share",
+                "operation": "multiply",
+                "formula": "gap_per_share \u00d7 coverage_stress_multiple",
+                "substituted_formula": "0.79 \u00d7 3.1645",
+                "dependencies": [
+                  "gap_per_share",
+                  "coverage_stress_multiple"
+                ]
+              },
+              {
+                "id": "value_per_share",
+                "label": "Payout and cycle reserve per share",
+                "kind": "calculation",
+                "value": -2.499955,
+                "unit": "CAD_per_share",
+                "operation": "negative",
+                "formula": "-(reserve_gross)",
+                "substituted_formula": "-(2.499955)",
+                "dependencies": [
+                  "reserve_gross"
+                ]
+              }
+            ],
+            "high": [
+              {
+                "id": "dividend_per_share",
+                "label": "Annual dividend declared per share",
+                "kind": "fact",
+                "value": 1.16,
+                "unit": "CAD_per_share",
+                "source": {
+                  "ref": "ADN.TO/investor-documents/ir-adn.to/Acadian-Annual-Report-2025-VF.pdf",
+                  "locator": "Dividends declared $1.16 per share FY2025",
+                  "as_of": "2025-12-31",
+                  "content_sha256": "4bb4a04dfc3d993d727aeedf9dab564e999e2d0f0d50460e6866688b8387b582",
+                  "source_id": "934215ae4efcd2de3098bd8480c8fe8779acce02c5e0984a6319dce0cea1d0ef"
+                },
+                "rationale": null
+              },
+              {
+                "id": "fcf_per_share",
+                "label": "FY2025 Free Cash Flow per share",
+                "kind": "fact",
+                "value": 0.37,
+                "unit": "CAD_per_share",
+                "source": {
+                  "ref": "ADN.TO/investor-documents/ir-adn.to/Acadian-Annual-Report-2025-VF.pdf",
+                  "locator": "Free Cash Flow per share $0.37 FY2025",
+                  "as_of": "2025-12-31",
+                  "content_sha256": "4bb4a04dfc3d993d727aeedf9dab564e999e2d0f0d50460e6866688b8387b582",
+                  "source_id": "dbb77b3e1225abb2663a0242e8e9275da986a8d965b727812fc6c354db35103b"
+                },
+                "rationale": null
+              },
+              {
+                "id": "shares_m",
+                "label": "Common shares outstanding",
+                "kind": "fact",
+                "value": 18.619712,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "ADN.TO/investor-documents/ir-adn.to/Acadian-2026-Q1-Interim-Report.pdf",
+                  "locator": "18,619,712 common shares outstanding as at May 6, 2026",
+                  "as_of": "2026-03-31",
+                  "content_sha256": "4a5bf29a88e2c3e80f412d5147b96be8e3ed40ed8eebdd83f4a51d3aa8b20e55",
+                  "source_id": "b4ec297376042131708a63e9185b930927cdfa56dd7f04d108341597a6cc3b3c"
+                },
+                "rationale": null
+              },
+              {
+                "id": "coverage_stress_multiple",
+                "label": "Dividend coverage, Maine execution, and lumber-cycle stress reserve multiple on FCF gap",
+                "kind": "judgment",
+                "value": 1.2658,
+                "unit": "multiple",
+                "source": null,
+                "rationale": "Reserve scales with dividend minus Free Cash Flow gap and Maine margin recovery risk; Macer 100% DRIP mitigates cash drain but not economic dilution."
+              },
+              {
+                "id": "gap_per_share",
+                "label": "Annual dividend minus Free Cash Flow per share",
+                "kind": "calculation",
+                "value": 0.79,
+                "unit": "CAD_per_share",
+                "operation": "subtract",
+                "formula": "dividend_per_share - fcf_per_share",
+                "substituted_formula": "1.16 - 0.37",
+                "dependencies": [
+                  "dividend_per_share",
+                  "fcf_per_share"
+                ]
+              },
+              {
+                "id": "reserve_gross",
+                "label": "Gross payout and cycle reserve",
+                "kind": "calculation",
+                "value": 0.999982,
+                "unit": "CAD_per_share",
+                "operation": "multiply",
+                "formula": "gap_per_share \u00d7 coverage_stress_multiple",
+                "substituted_formula": "0.79 \u00d7 1.2658",
+                "dependencies": [
+                  "gap_per_share",
+                  "coverage_stress_multiple"
+                ]
+              },
+              {
+                "id": "value_per_share",
+                "label": "Payout and cycle reserve per share",
+                "kind": "calculation",
+                "value": -0.999982,
+                "unit": "CAD_per_share",
+                "operation": "negative",
+                "formula": "-(reserve_gross)",
+                "substituted_formula": "-(0.999982)",
+                "dependencies": [
+                  "reserve_gross"
+                ]
+              }
+            ]
+          },
+          "source_lineage": [
+            {
+              "node_id": "dividend_per_share",
+              "ref": "ADN.TO/investor-documents/ir-adn.to/Acadian-Annual-Report-2025-VF.pdf",
+              "locator": "Dividends declared $1.16 per share FY2025",
+              "as_of": "2025-12-31",
+              "content_sha256": "4bb4a04dfc3d993d727aeedf9dab564e999e2d0f0d50460e6866688b8387b582",
+              "source_id": "934215ae4efcd2de3098bd8480c8fe8779acce02c5e0984a6319dce0cea1d0ef"
+            },
+            {
+              "node_id": "fcf_per_share",
+              "ref": "ADN.TO/investor-documents/ir-adn.to/Acadian-Annual-Report-2025-VF.pdf",
+              "locator": "Free Cash Flow per share $0.37 FY2025",
+              "as_of": "2025-12-31",
+              "content_sha256": "4bb4a04dfc3d993d727aeedf9dab564e999e2d0f0d50460e6866688b8387b582",
+              "source_id": "dbb77b3e1225abb2663a0242e8e9275da986a8d965b727812fc6c354db35103b"
+            },
+            {
+              "node_id": "shares_m",
+              "ref": "ADN.TO/investor-documents/ir-adn.to/Acadian-2026-Q1-Interim-Report.pdf",
+              "locator": "18,619,712 common shares outstanding as at May 6, 2026",
+              "as_of": "2026-03-31",
+              "content_sha256": "4a5bf29a88e2c3e80f412d5147b96be8e3ed40ed8eebdd83f4a51d3aa8b20e55",
+              "source_id": "b4ec297376042131708a63e9185b930927cdfa56dd7f04d108341597a6cc3b3c"
+            }
+          ],
+          "checks": {
+            "passed": true,
+            "errors": []
+          },
+          "proof_hash": "7147c3d0c46b25be2f00fb79e7aeff314443eacaa9cd5155369188ccb1211e70"
+        },
+        "evidence_tier": "primary_derived",
+        "evidence_level": "primary_derived",
+        "evidence": "Primary bridge from ADN.TO/investor-documents/ir-adn.to/Acadian-Annual-Report-2025-VF.pdf: FY2025 FCF $0.37/sh, book $19.67/sh, net liquidity $17.4M, debt $110.009M; contract backfill 2026-07-21.",
+        "scenario_assumptions": "Proof outputs {'low': -5.0, 'base': -2.5, 'high': -1.0}; see calculation_proof graph.",
+        "probability_and_timing": null,
+        "tax_and_realization_adjustments": "Macer 100% DRIP mitigates cash drain but not economic dilution risk.",
+        "falsifier": "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
+        "overlap_key": "payout_and_cycle_reserve",
+        "assumption_type": "judgment"
+      }
+    ],
     "component_coverage": {
-      "all_material_components_identified": false,
-      "material_component_count": 0,
-      "additive_component_count": 0,
+      "all_material_components_identified": true,
+      "material_component_count": 5,
+      "additive_component_count": 5,
       "embedded_component_count": 0,
-      "unvalued_component_count": 1,
+      "unvalued_component_count": 0,
       "double_counting_flags": []
     },
     "facts": [],
     "estimates": [],
-    "judgments": []
+    "judgments": [
+      {
+        "component_id": "producing_timber_operations",
+        "label": "Harvest, Crown management, and timber services owner cash",
+        "kind": "judgment",
+        "evidence_tier": "primary_derived",
+        "evidence": "Primary bridge from ADN.TO/investor-documents/ir-adn.to/Acadian-Annual-Report-2025-VF.pdf: FY2025 FCF $0.37/sh, book $19.67/sh, net liquidity $17.4M, debt $110.009M; contract backfill 2026-07-21.",
+        "method": "owner_cash_or_dividend_discount",
+        "valuation_status": "bounded_estimate"
+      },
+      {
+        "component_id": "carbon_and_real_estate_option",
+        "label": "Voluntary carbon credits and real-estate milestone options",
+        "kind": "judgment",
+        "evidence_tier": "primary_derived",
+        "evidence": "Primary bridge from ADN.TO/investor-documents/ir-adn.to/Acadian-Annual-Report-2025-VF.pdf: FY2025 FCF $0.37/sh, book $19.67/sh, net liquidity $17.4M, debt $110.009M; contract backfill 2026-07-21.",
+        "method": "risk_adjusted_milestone_value",
+        "valuation_status": "bounded_estimate"
+      },
+      {
+        "component_id": "owned_timberland_nav",
+        "label": "Owned freehold timberland and infrastructure at IFRS cost plus partial fair-value uplift",
+        "kind": "judgment",
+        "evidence_tier": "primary_derived",
+        "evidence": "Primary bridge from ADN.TO/investor-documents/ir-adn.to/Acadian-Annual-Report-2025-VF.pdf: FY2025 FCF $0.37/sh, book $19.67/sh, net liquidity $17.4M, debt $110.009M; contract backfill 2026-07-21.",
+        "method": "net_asset_value",
+        "valuation_status": "bounded_estimate"
+      },
+      {
+        "component_id": "net_financial_claims",
+        "label": "Net liquidity, debt, and corporate balance-sheet claims",
+        "kind": "judgment",
+        "evidence_tier": "primary_derived",
+        "evidence": "Primary bridge from ADN.TO/investor-documents/ir-adn.to/Acadian-Annual-Report-2025-VF.pdf: FY2025 FCF $0.37/sh, book $19.67/sh, net liquidity $17.4M, debt $110.009M; contract backfill 2026-07-21.",
+        "method": "net_asset_value",
+        "valuation_status": "bounded_estimate"
+      },
+      {
+        "component_id": "payout_and_cycle_reserve",
+        "label": "Dividend coverage, Maine execution, and lumber-cycle reserve",
+        "kind": "judgment",
+        "evidence_tier": "primary_derived",
+        "evidence": "Primary bridge from ADN.TO/investor-documents/ir-adn.to/Acadian-Annual-Report-2025-VF.pdf: FY2025 FCF $0.37/sh, book $19.67/sh, net liquidity $17.4M, debt $110.009M; contract backfill 2026-07-21.",
+        "method": "net_asset_value",
+        "valuation_status": "bounded_estimate"
+      }
+    ]
   },
   "valuation": {
-    "status": "evidence_blocked",
+    "status": "decision_grade",
     "market": {
       "price_per_share": 17.35,
       "fully_diluted_shares": 18619712,
@@ -51,66 +1694,2136 @@
     },
     "valuation": {
       "value_per_share": {
-        "low": null,
-        "base": null,
-        "high": null
+        "low": 1.0007,
+        "base": 17.4308,
+        "high": 29.3191
       },
       "priced_components_per_share": {
-        "low": 0,
-        "base": 0,
-        "high": 0
+        "low": 1.0007,
+        "base": 17.4308,
+        "high": 29.3191
       },
-      "legacy_value_per_share": null,
-      "probability_weighted_value_per_share": null,
+      "legacy_value_per_share": {
+        "low": 1.0,
+        "base": 17.43,
+        "high": 29.32
+      },
+      "probability_weighted_value_per_share": 17.4308,
       "expected_distributions_per_share": 0.0,
       "annualized_return_at_price_pct": {
-        "low": null,
-        "base": null,
-        "high": null
+        "low": -33.47,
+        "base": 0.07,
+        "high": 7.78
       },
-      "downside_to_low_pct": null,
+      "downside_to_low_pct": -94.23,
       "horizon_years": 7,
       "interpretation": "value_per_share is withheld while any material additive component is unpriced; priced_components_per_share is not a complete security value."
     },
-    "components": [],
+    "components": [
+      {
+        "component_id": "producing_timber_operations",
+        "label": "Harvest, Crown management, and timber services owner cash",
+        "category": "operating_business",
+        "treatment": "additive",
+        "included_in_component_id": null,
+        "ownership_claim": "Consolidated harvest and Crown management fee stream",
+        "ownership_percentage": 1.0,
+        "quantity": {
+          "value": 1,
+          "unit": "per-share economic claim"
+        },
+        "method": "owner_cash_or_dividend_discount",
+        "method_version": "1.0",
+        "method_provenance": {
+          "method_id": "owner_cash_or_dividend_discount",
+          "version": "1.0",
+          "label": "Predictable owner-cash discount model",
+          "power_zones": [
+            "predictable_cash_flow"
+          ],
+          "equation": "value = distribution*(1+growth)/(required_return-growth) - funding_or_dilution_per_share",
+          "sources": [
+            {
+              "ref": "_system/frameworks/segment_cashflow_valuation.md",
+              "locator": "Cash-flow duration and funding"
+            }
+          ]
+        },
+        "comparable_ids": [],
+        "range_per_share": {
+          "low": 3.0,
+          "base": 6.0,
+          "high": 9.0
+        },
+        "legacy_range_per_share": {
+          "low": 3.0,
+          "base": 6.0,
+          "high": 9.0
+        },
+        "valuation_status": "bounded_estimate",
+        "calculation_proof": {
+          "status": "valid",
+          "method_id": "owner_cash_or_dividend_discount",
+          "method_version": "1.0",
+          "outputs": {
+            "low": 3.0,
+            "base": 6.0,
+            "high": 9.0
+          },
+          "output_unit": "CAD_per_share",
+          "traces": {
+            "low": [
+              {
+                "id": "fcf_per_share",
+                "label": "FY2025 Free Cash Flow per share",
+                "kind": "fact",
+                "value": 0.37,
+                "unit": "CAD_per_share",
+                "source": {
+                  "ref": "ADN.TO/investor-documents/ir-adn.to/Acadian-Annual-Report-2025-VF.pdf",
+                  "locator": "Free Cash Flow $6.635M; per share $0.37 (2025 financial highlights table)",
+                  "as_of": "2025-12-31",
+                  "content_sha256": "4bb4a04dfc3d993d727aeedf9dab564e999e2d0f0d50460e6866688b8387b582",
+                  "source_id": "cc9566aea837f51e326dd12f923ba487b828547fe6b093790ec4dcf58f73fddc"
+                },
+                "rationale": null
+              },
+              {
+                "id": "shares_m",
+                "label": "Common shares outstanding",
+                "kind": "fact",
+                "value": 18.619712,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "ADN.TO/investor-documents/ir-adn.to/Acadian-2026-Q1-Interim-Report.pdf",
+                  "locator": "18,619,712 common shares outstanding as at May 6, 2026",
+                  "as_of": "2026-03-31",
+                  "content_sha256": "4a5bf29a88e2c3e80f412d5147b96be8e3ed40ed8eebdd83f4a51d3aa8b20e55",
+                  "source_id": "b4ec297376042131708a63e9185b930927cdfa56dd7f04d108341597a6cc3b3c"
+                },
+                "rationale": null
+              },
+              {
+                "id": "capitalization_multiple",
+                "label": "Duration-adjusted owner-cash capitalization multiple on harvest and Crown fee stream",
+                "kind": "judgment",
+                "value": 8.1081,
+                "unit": "multiple",
+                "source": null,
+                "rationale": "Bear stresses weak lumber markets and Maine margin drag; base mid-cycle seven-year path excluding lumpy carbon; bull assumes Maine internal harvest recovery without 2024 carbon repeat."
+              },
+              {
+                "id": "value_per_share",
+                "label": "Producing timber operations per share",
+                "kind": "calculation",
+                "value": 2.999997,
+                "unit": "CAD_per_share",
+                "operation": "multiply",
+                "formula": "fcf_per_share \u00d7 capitalization_multiple",
+                "substituted_formula": "0.37 \u00d7 8.1081",
+                "dependencies": [
+                  "fcf_per_share",
+                  "capitalization_multiple"
+                ]
+              }
+            ],
+            "base": [
+              {
+                "id": "fcf_per_share",
+                "label": "FY2025 Free Cash Flow per share",
+                "kind": "fact",
+                "value": 0.37,
+                "unit": "CAD_per_share",
+                "source": {
+                  "ref": "ADN.TO/investor-documents/ir-adn.to/Acadian-Annual-Report-2025-VF.pdf",
+                  "locator": "Free Cash Flow $6.635M; per share $0.37 (2025 financial highlights table)",
+                  "as_of": "2025-12-31",
+                  "content_sha256": "4bb4a04dfc3d993d727aeedf9dab564e999e2d0f0d50460e6866688b8387b582",
+                  "source_id": "cc9566aea837f51e326dd12f923ba487b828547fe6b093790ec4dcf58f73fddc"
+                },
+                "rationale": null
+              },
+              {
+                "id": "shares_m",
+                "label": "Common shares outstanding",
+                "kind": "fact",
+                "value": 18.619712,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "ADN.TO/investor-documents/ir-adn.to/Acadian-2026-Q1-Interim-Report.pdf",
+                  "locator": "18,619,712 common shares outstanding as at May 6, 2026",
+                  "as_of": "2026-03-31",
+                  "content_sha256": "4a5bf29a88e2c3e80f412d5147b96be8e3ed40ed8eebdd83f4a51d3aa8b20e55",
+                  "source_id": "b4ec297376042131708a63e9185b930927cdfa56dd7f04d108341597a6cc3b3c"
+                },
+                "rationale": null
+              },
+              {
+                "id": "capitalization_multiple",
+                "label": "Duration-adjusted owner-cash capitalization multiple on harvest and Crown fee stream",
+                "kind": "judgment",
+                "value": 16.2162,
+                "unit": "multiple",
+                "source": null,
+                "rationale": "Bear stresses weak lumber markets and Maine margin drag; base mid-cycle seven-year path excluding lumpy carbon; bull assumes Maine internal harvest recovery without 2024 carbon repeat."
+              },
+              {
+                "id": "value_per_share",
+                "label": "Producing timber operations per share",
+                "kind": "calculation",
+                "value": 5.999994,
+                "unit": "CAD_per_share",
+                "operation": "multiply",
+                "formula": "fcf_per_share \u00d7 capitalization_multiple",
+                "substituted_formula": "0.37 \u00d7 16.2162",
+                "dependencies": [
+                  "fcf_per_share",
+                  "capitalization_multiple"
+                ]
+              }
+            ],
+            "high": [
+              {
+                "id": "fcf_per_share",
+                "label": "FY2025 Free Cash Flow per share",
+                "kind": "fact",
+                "value": 0.37,
+                "unit": "CAD_per_share",
+                "source": {
+                  "ref": "ADN.TO/investor-documents/ir-adn.to/Acadian-Annual-Report-2025-VF.pdf",
+                  "locator": "Free Cash Flow $6.635M; per share $0.37 (2025 financial highlights table)",
+                  "as_of": "2025-12-31",
+                  "content_sha256": "4bb4a04dfc3d993d727aeedf9dab564e999e2d0f0d50460e6866688b8387b582",
+                  "source_id": "cc9566aea837f51e326dd12f923ba487b828547fe6b093790ec4dcf58f73fddc"
+                },
+                "rationale": null
+              },
+              {
+                "id": "shares_m",
+                "label": "Common shares outstanding",
+                "kind": "fact",
+                "value": 18.619712,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "ADN.TO/investor-documents/ir-adn.to/Acadian-2026-Q1-Interim-Report.pdf",
+                  "locator": "18,619,712 common shares outstanding as at May 6, 2026",
+                  "as_of": "2026-03-31",
+                  "content_sha256": "4a5bf29a88e2c3e80f412d5147b96be8e3ed40ed8eebdd83f4a51d3aa8b20e55",
+                  "source_id": "b4ec297376042131708a63e9185b930927cdfa56dd7f04d108341597a6cc3b3c"
+                },
+                "rationale": null
+              },
+              {
+                "id": "capitalization_multiple",
+                "label": "Duration-adjusted owner-cash capitalization multiple on harvest and Crown fee stream",
+                "kind": "judgment",
+                "value": 24.3243,
+                "unit": "multiple",
+                "source": null,
+                "rationale": "Bear stresses weak lumber markets and Maine margin drag; base mid-cycle seven-year path excluding lumpy carbon; bull assumes Maine internal harvest recovery without 2024 carbon repeat."
+              },
+              {
+                "id": "value_per_share",
+                "label": "Producing timber operations per share",
+                "kind": "calculation",
+                "value": 8.999991,
+                "unit": "CAD_per_share",
+                "operation": "multiply",
+                "formula": "fcf_per_share \u00d7 capitalization_multiple",
+                "substituted_formula": "0.37 \u00d7 24.3243",
+                "dependencies": [
+                  "fcf_per_share",
+                  "capitalization_multiple"
+                ]
+              }
+            ]
+          },
+          "source_lineage": [
+            {
+              "node_id": "fcf_per_share",
+              "ref": "ADN.TO/investor-documents/ir-adn.to/Acadian-Annual-Report-2025-VF.pdf",
+              "locator": "Free Cash Flow $6.635M; per share $0.37 (2025 financial highlights table)",
+              "as_of": "2025-12-31",
+              "content_sha256": "4bb4a04dfc3d993d727aeedf9dab564e999e2d0f0d50460e6866688b8387b582",
+              "source_id": "cc9566aea837f51e326dd12f923ba487b828547fe6b093790ec4dcf58f73fddc"
+            },
+            {
+              "node_id": "shares_m",
+              "ref": "ADN.TO/investor-documents/ir-adn.to/Acadian-2026-Q1-Interim-Report.pdf",
+              "locator": "18,619,712 common shares outstanding as at May 6, 2026",
+              "as_of": "2026-03-31",
+              "content_sha256": "4a5bf29a88e2c3e80f412d5147b96be8e3ed40ed8eebdd83f4a51d3aa8b20e55",
+              "source_id": "b4ec297376042131708a63e9185b930927cdfa56dd7f04d108341597a6cc3b3c"
+            }
+          ],
+          "checks": {
+            "passed": true,
+            "errors": []
+          },
+          "proof_hash": "7057e51f25ddd36063049da794251f082d63a21b3225a4be5c2c4e957fded3ce"
+        },
+        "evidence_tier": "primary_derived",
+        "evidence_level": "primary_derived",
+        "evidence": "Primary bridge from ADN.TO/investor-documents/ir-adn.to/Acadian-Annual-Report-2025-VF.pdf: FY2025 FCF $0.37/sh, book $19.67/sh, net liquidity $17.4M, debt $110.009M; contract backfill 2026-07-21.",
+        "scenario_assumptions": "Proof outputs {'low': 3.0, 'base': 6.0, 'high': 9.0}; see calculation_proof graph.",
+        "probability_and_timing": null,
+        "tax_and_realization_adjustments": "Excludes lumpy 2024 carbon credit sales from base owner-cash rate.",
+        "falsifier": "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
+        "overlap_key": "producing_timber_operations",
+        "assumption_type": "judgment"
+      },
+      {
+        "component_id": "carbon_and_real_estate_option",
+        "label": "Voluntary carbon credits and real-estate milestone options",
+        "category": "real_option",
+        "treatment": "additive",
+        "included_in_component_id": null,
+        "ownership_claim": "Episodic carbon credit issuance and real-estate fee upside",
+        "ownership_percentage": 1.0,
+        "quantity": {
+          "value": 1,
+          "unit": "per-share economic claim"
+        },
+        "method": "risk_adjusted_milestone_value",
+        "method_version": "1.0",
+        "method_provenance": {
+          "method_id": "risk_adjusted_milestone_value",
+          "version": "1.0",
+          "label": "Milestone risk-adjusted present value",
+          "power_zones": [
+            "binary_milestone"
+          ],
+          "equation": "value_per_share = (net_cash + sum(p_success*PV(success_value)-remaining_cost) - dilution)/shares",
+          "sources": [
+            {
+              "ref": "_system/frameworks/optionality_valuation.md",
+              "locator": "Milestone-based option framework"
+            }
+          ]
+        },
+        "comparable_ids": [],
+        "range_per_share": {
+          "low": 0.0,
+          "base": 0.0,
+          "high": 1.32
+        },
+        "legacy_range_per_share": {
+          "low": 0.0,
+          "base": 0.0,
+          "high": 1.32
+        },
+        "valuation_status": "bounded_estimate",
+        "calculation_proof": {
+          "status": "valid",
+          "method_id": "risk_adjusted_milestone_value",
+          "method_version": "1.0",
+          "outputs": {
+            "low": 0.0,
+            "base": 0.0,
+            "high": 1.32
+          },
+          "output_unit": "CAD_per_share",
+          "traces": {
+            "low": [
+              {
+                "id": "carbon_sales_m",
+                "label": "FY2024 voluntary carbon credit sales (reference issuance)",
+                "kind": "fact",
+                "value": 24.588,
+                "unit": "CAD_m",
+                "source": {
+                  "ref": "ADN.TO/investor-documents/ir-adn.to/Acadian-Annual-Report-2025-VF.pdf",
+                  "locator": "Carbon credit sales $24.588M on 752,100 credits in 2024; zero sales FY2025",
+                  "as_of": "2025-12-31",
+                  "content_sha256": "4bb4a04dfc3d993d727aeedf9dab564e999e2d0f0d50460e6866688b8387b582",
+                  "source_id": "dc3886648a97155f994d085d12d51aae527c36f9e90d551f39b4b7b78962a5c5"
+                },
+                "rationale": null
+              },
+              {
+                "id": "shares_m",
+                "label": "Common shares outstanding",
+                "kind": "fact",
+                "value": 18.619712,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "ADN.TO/investor-documents/ir-adn.to/Acadian-2026-Q1-Interim-Report.pdf",
+                  "locator": "18,619,712 common shares outstanding as at May 6, 2026",
+                  "as_of": "2026-03-31",
+                  "content_sha256": "4a5bf29a88e2c3e80f412d5147b96be8e3ed40ed8eebdd83f4a51d3aa8b20e55",
+                  "source_id": "b4ec297376042131708a63e9185b930927cdfa56dd7f04d108341597a6cc3b3c"
+                },
+                "rationale": null
+              },
+              {
+                "id": "risk_fraction",
+                "label": "Probability-weighted fraction of reference carbon/real-estate milestone value",
+                "kind": "judgment",
+                "value": 0.0,
+                "unit": "fraction",
+                "source": null,
+                "rationale": "Base assigns zero until next verified carbon issuance; high assumes one repeat of 2024-scale sale plus modest real-estate fee ramp."
+              },
+              {
+                "id": "option_value_m",
+                "label": "Risk-adjusted carbon and real-estate option value",
+                "kind": "calculation",
+                "value": 0.0,
+                "unit": "CAD_m",
+                "operation": "multiply",
+                "formula": "carbon_sales_m \u00d7 risk_fraction",
+                "substituted_formula": "24.588 \u00d7 0",
+                "dependencies": [
+                  "carbon_sales_m",
+                  "risk_fraction"
+                ]
+              },
+              {
+                "id": "value_per_share",
+                "label": "Carbon and real-estate option per share",
+                "kind": "calculation",
+                "value": 0.0,
+                "unit": "CAD_per_share",
+                "operation": "divide",
+                "formula": "option_value_m \u00f7 shares_m",
+                "substituted_formula": "0 \u00f7 18.619712",
+                "dependencies": [
+                  "option_value_m",
+                  "shares_m"
+                ]
+              }
+            ],
+            "base": [
+              {
+                "id": "carbon_sales_m",
+                "label": "FY2024 voluntary carbon credit sales (reference issuance)",
+                "kind": "fact",
+                "value": 24.588,
+                "unit": "CAD_m",
+                "source": {
+                  "ref": "ADN.TO/investor-documents/ir-adn.to/Acadian-Annual-Report-2025-VF.pdf",
+                  "locator": "Carbon credit sales $24.588M on 752,100 credits in 2024; zero sales FY2025",
+                  "as_of": "2025-12-31",
+                  "content_sha256": "4bb4a04dfc3d993d727aeedf9dab564e999e2d0f0d50460e6866688b8387b582",
+                  "source_id": "dc3886648a97155f994d085d12d51aae527c36f9e90d551f39b4b7b78962a5c5"
+                },
+                "rationale": null
+              },
+              {
+                "id": "shares_m",
+                "label": "Common shares outstanding",
+                "kind": "fact",
+                "value": 18.619712,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "ADN.TO/investor-documents/ir-adn.to/Acadian-2026-Q1-Interim-Report.pdf",
+                  "locator": "18,619,712 common shares outstanding as at May 6, 2026",
+                  "as_of": "2026-03-31",
+                  "content_sha256": "4a5bf29a88e2c3e80f412d5147b96be8e3ed40ed8eebdd83f4a51d3aa8b20e55",
+                  "source_id": "b4ec297376042131708a63e9185b930927cdfa56dd7f04d108341597a6cc3b3c"
+                },
+                "rationale": null
+              },
+              {
+                "id": "risk_fraction",
+                "label": "Probability-weighted fraction of reference carbon/real-estate milestone value",
+                "kind": "judgment",
+                "value": 0.0,
+                "unit": "fraction",
+                "source": null,
+                "rationale": "Base assigns zero until next verified carbon issuance; high assumes one repeat of 2024-scale sale plus modest real-estate fee ramp."
+              },
+              {
+                "id": "option_value_m",
+                "label": "Risk-adjusted carbon and real-estate option value",
+                "kind": "calculation",
+                "value": 0.0,
+                "unit": "CAD_m",
+                "operation": "multiply",
+                "formula": "carbon_sales_m \u00d7 risk_fraction",
+                "substituted_formula": "24.588 \u00d7 0",
+                "dependencies": [
+                  "carbon_sales_m",
+                  "risk_fraction"
+                ]
+              },
+              {
+                "id": "value_per_share",
+                "label": "Carbon and real-estate option per share",
+                "kind": "calculation",
+                "value": 0.0,
+                "unit": "CAD_per_share",
+                "operation": "divide",
+                "formula": "option_value_m \u00f7 shares_m",
+                "substituted_formula": "0 \u00f7 18.619712",
+                "dependencies": [
+                  "option_value_m",
+                  "shares_m"
+                ]
+              }
+            ],
+            "high": [
+              {
+                "id": "carbon_sales_m",
+                "label": "FY2024 voluntary carbon credit sales (reference issuance)",
+                "kind": "fact",
+                "value": 24.588,
+                "unit": "CAD_m",
+                "source": {
+                  "ref": "ADN.TO/investor-documents/ir-adn.to/Acadian-Annual-Report-2025-VF.pdf",
+                  "locator": "Carbon credit sales $24.588M on 752,100 credits in 2024; zero sales FY2025",
+                  "as_of": "2025-12-31",
+                  "content_sha256": "4bb4a04dfc3d993d727aeedf9dab564e999e2d0f0d50460e6866688b8387b582",
+                  "source_id": "dc3886648a97155f994d085d12d51aae527c36f9e90d551f39b4b7b78962a5c5"
+                },
+                "rationale": null
+              },
+              {
+                "id": "shares_m",
+                "label": "Common shares outstanding",
+                "kind": "fact",
+                "value": 18.619712,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "ADN.TO/investor-documents/ir-adn.to/Acadian-2026-Q1-Interim-Report.pdf",
+                  "locator": "18,619,712 common shares outstanding as at May 6, 2026",
+                  "as_of": "2026-03-31",
+                  "content_sha256": "4a5bf29a88e2c3e80f412d5147b96be8e3ed40ed8eebdd83f4a51d3aa8b20e55",
+                  "source_id": "b4ec297376042131708a63e9185b930927cdfa56dd7f04d108341597a6cc3b3c"
+                },
+                "rationale": null
+              },
+              {
+                "id": "risk_fraction",
+                "label": "Probability-weighted fraction of reference carbon/real-estate milestone value",
+                "kind": "judgment",
+                "value": 0.9996,
+                "unit": "fraction",
+                "source": null,
+                "rationale": "Base assigns zero until next verified carbon issuance; high assumes one repeat of 2024-scale sale plus modest real-estate fee ramp."
+              },
+              {
+                "id": "option_value_m",
+                "label": "Risk-adjusted carbon and real-estate option value",
+                "kind": "calculation",
+                "value": 24.5781648,
+                "unit": "CAD_m",
+                "operation": "multiply",
+                "formula": "carbon_sales_m \u00d7 risk_fraction",
+                "substituted_formula": "24.588 \u00d7 0.9996",
+                "dependencies": [
+                  "carbon_sales_m",
+                  "risk_fraction"
+                ]
+              },
+              {
+                "id": "value_per_share",
+                "label": "Carbon and real-estate option per share",
+                "kind": "calculation",
+                "value": 1.32000779,
+                "unit": "CAD_per_share",
+                "operation": "divide",
+                "formula": "option_value_m \u00f7 shares_m",
+                "substituted_formula": "24.578165 \u00f7 18.619712",
+                "dependencies": [
+                  "option_value_m",
+                  "shares_m"
+                ]
+              }
+            ]
+          },
+          "source_lineage": [
+            {
+              "node_id": "carbon_sales_m",
+              "ref": "ADN.TO/investor-documents/ir-adn.to/Acadian-Annual-Report-2025-VF.pdf",
+              "locator": "Carbon credit sales $24.588M on 752,100 credits in 2024; zero sales FY2025",
+              "as_of": "2025-12-31",
+              "content_sha256": "4bb4a04dfc3d993d727aeedf9dab564e999e2d0f0d50460e6866688b8387b582",
+              "source_id": "dc3886648a97155f994d085d12d51aae527c36f9e90d551f39b4b7b78962a5c5"
+            },
+            {
+              "node_id": "shares_m",
+              "ref": "ADN.TO/investor-documents/ir-adn.to/Acadian-2026-Q1-Interim-Report.pdf",
+              "locator": "18,619,712 common shares outstanding as at May 6, 2026",
+              "as_of": "2026-03-31",
+              "content_sha256": "4a5bf29a88e2c3e80f412d5147b96be8e3ed40ed8eebdd83f4a51d3aa8b20e55",
+              "source_id": "b4ec297376042131708a63e9185b930927cdfa56dd7f04d108341597a6cc3b3c"
+            }
+          ],
+          "checks": {
+            "passed": true,
+            "errors": []
+          },
+          "proof_hash": "c3d8f6258130dd8180b64e0e27838a42765e03ee207efc1bea718316972d7919"
+        },
+        "evidence_tier": "primary_derived",
+        "evidence_level": "primary_derived",
+        "evidence": "Primary bridge from ADN.TO/investor-documents/ir-adn.to/Acadian-Annual-Report-2025-VF.pdf: FY2025 FCF $0.37/sh, book $19.67/sh, net liquidity $17.4M, debt $110.009M; contract backfill 2026-07-21.",
+        "scenario_assumptions": "Proof outputs {'low': 0.0, 'base': 0.0, 'high': 1.32}; see calculation_proof graph.",
+        "probability_and_timing": {
+          "success_probability": null,
+          "remaining_capital_m": null,
+          "timing_basis": "No disclosed carbon issuance schedule in FY2025 filings; real-estate HBU reviews are episodic.",
+          "probability_basis": "Base zero probability until next verified Katahdin voluntary credit issuance; high case uses one repeat of the 2024 CAD 24.6M sale precedent.",
+          "remaining_capital_basis": "Project monitoring and verification costs are embedded in operating segments; no incremental owner-funded capital reserved in base case."
+        },
+        "tax_and_realization_adjustments": "Base assigns zero until next verified issuance; real-estate fees remain small.",
+        "falsifier": "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
+        "overlap_key": "carbon_and_real_estate_option",
+        "assumption_type": "judgment"
+      },
+      {
+        "component_id": "owned_timberland_nav",
+        "label": "Owned freehold timberland and infrastructure at IFRS cost plus partial fair-value uplift",
+        "category": "financial_asset",
+        "treatment": "additive",
+        "included_in_component_id": null,
+        "ownership_claim": "1.075M owned freehold acres at IFRS cost with partial fair-value uplift",
+        "ownership_percentage": 1.0,
+        "quantity": {
+          "value": 1,
+          "unit": "per-share economic claim"
+        },
+        "method": "net_asset_value",
+        "method_version": "1.0",
+        "method_provenance": {
+          "method_id": "net_asset_value",
+          "version": "1.0",
+          "label": "Reconciled net asset value",
+          "power_zones": [
+            "scarce_asset_optionality",
+            "catalyst_asset_value",
+            "credit_and_normalized_returns"
+          ],
+          "equation": "value_per_share = (gross_assets - senior_claims - tax - realization_costs) / diluted_shares",
+          "sources": [
+            {
+              "ref": "_system/frameworks/scarce_strategic_asset_valuation.md",
+              "locator": "Economic ownership and unit NAV"
+            }
+          ]
+        },
+        "comparable_ids": [],
+        "range_per_share": {
+          "low": 8.0007,
+          "base": 13.0008,
+          "high": 17.9991
+        },
+        "legacy_range_per_share": {
+          "low": 8.0,
+          "base": 13.0,
+          "high": 18.0
+        },
+        "valuation_status": "bounded_estimate",
+        "calculation_proof": {
+          "status": "valid",
+          "method_id": "net_asset_value",
+          "method_version": "1.0",
+          "outputs": {
+            "low": 8.0007,
+            "base": 13.0008,
+            "high": 17.9991
+          },
+          "output_unit": "CAD_per_share",
+          "traces": {
+            "low": [
+              {
+                "id": "shareholders_equity_m",
+                "label": "Shareholders' equity at IFRS cost",
+                "kind": "fact",
+                "value": 359.744,
+                "unit": "CAD_m",
+                "source": {
+                  "ref": "ADN.TO/investor-documents/ir-adn.to/Acadian-Annual-Report-2025-VF.pdf",
+                  "locator": "Shareholders' equity $359,744 thousand at December 31, 2025; book value $19.67 per share",
+                  "as_of": "2025-12-31",
+                  "content_sha256": "4bb4a04dfc3d993d727aeedf9dab564e999e2d0f0d50460e6866688b8387b582",
+                  "source_id": "4478277683efe19c27be9daabdc2f7f3a2eee2eabc723d52906cbc6eb76d7357"
+                },
+                "rationale": null
+              },
+              {
+                "id": "shares_m",
+                "label": "Common shares outstanding",
+                "kind": "fact",
+                "value": 18.619712,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "ADN.TO/investor-documents/ir-adn.to/Acadian-2026-Q1-Interim-Report.pdf",
+                  "locator": "18,619,712 common shares outstanding as at May 6, 2026",
+                  "as_of": "2026-03-31",
+                  "content_sha256": "4a5bf29a88e2c3e80f412d5147b96be8e3ed40ed8eebdd83f4a51d3aa8b20e55",
+                  "source_id": "b4ec297376042131708a63e9185b930927cdfa56dd7f04d108341597a6cc3b3c"
+                },
+                "rationale": null
+              },
+              {
+                "id": "owned_acres",
+                "label": "Owned freehold timberland acres",
+                "kind": "fact",
+                "value": 1075000.0,
+                "unit": "acres",
+                "source": {
+                  "ref": "ADN.TO/investor-documents/ir-adn.to/Acadian-Annual-Report-2025-VF.pdf",
+                  "locator": "775,000 New Brunswick + 300,000 Maine freehold acres under management",
+                  "as_of": "2025-12-31",
+                  "content_sha256": "4bb4a04dfc3d993d727aeedf9dab564e999e2d0f0d50460e6866688b8387b582",
+                  "source_id": "b86dbfba9f24ef32e3796f1dca81eb57680627ac295f8764455ad51bf32ba467"
+                },
+                "rationale": null
+              },
+              {
+                "id": "land_equity_fraction",
+                "label": "Fraction of IFRS equity representing owned timberland and infrastructure not in producing capitalization",
+                "kind": "judgment",
+                "value": 0.4141,
+                "unit": "fraction",
+                "source": null,
+                "rationale": "Timberlands carried at historical cost less depletion; base credits ~1.075M owned acres at IFRS book plus modest fair-value uplift; high assumes partial third-party per-acre marks on Maine vs NB."
+              },
+              {
+                "id": "land_claim_m",
+                "label": "Owned timberland and infrastructure claim",
+                "kind": "calculation",
+                "value": 148.9699904,
+                "unit": "CAD_m",
+                "operation": "multiply",
+                "formula": "shareholders_equity_m \u00d7 land_equity_fraction",
+                "substituted_formula": "359.744 \u00d7 0.4141",
+                "dependencies": [
+                  "shareholders_equity_m",
+                  "land_equity_fraction"
+                ]
+              },
+              {
+                "id": "value_per_share",
+                "label": "Owned timberland NAV per share",
+                "kind": "calculation",
+                "value": 8.00066029,
+                "unit": "CAD_per_share",
+                "operation": "divide",
+                "formula": "land_claim_m \u00f7 shares_m",
+                "substituted_formula": "148.96999 \u00f7 18.619712",
+                "dependencies": [
+                  "land_claim_m",
+                  "shares_m"
+                ]
+              }
+            ],
+            "base": [
+              {
+                "id": "shareholders_equity_m",
+                "label": "Shareholders' equity at IFRS cost",
+                "kind": "fact",
+                "value": 359.744,
+                "unit": "CAD_m",
+                "source": {
+                  "ref": "ADN.TO/investor-documents/ir-adn.to/Acadian-Annual-Report-2025-VF.pdf",
+                  "locator": "Shareholders' equity $359,744 thousand at December 31, 2025; book value $19.67 per share",
+                  "as_of": "2025-12-31",
+                  "content_sha256": "4bb4a04dfc3d993d727aeedf9dab564e999e2d0f0d50460e6866688b8387b582",
+                  "source_id": "4478277683efe19c27be9daabdc2f7f3a2eee2eabc723d52906cbc6eb76d7357"
+                },
+                "rationale": null
+              },
+              {
+                "id": "shares_m",
+                "label": "Common shares outstanding",
+                "kind": "fact",
+                "value": 18.619712,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "ADN.TO/investor-documents/ir-adn.to/Acadian-2026-Q1-Interim-Report.pdf",
+                  "locator": "18,619,712 common shares outstanding as at May 6, 2026",
+                  "as_of": "2026-03-31",
+                  "content_sha256": "4a5bf29a88e2c3e80f412d5147b96be8e3ed40ed8eebdd83f4a51d3aa8b20e55",
+                  "source_id": "b4ec297376042131708a63e9185b930927cdfa56dd7f04d108341597a6cc3b3c"
+                },
+                "rationale": null
+              },
+              {
+                "id": "owned_acres",
+                "label": "Owned freehold timberland acres",
+                "kind": "fact",
+                "value": 1075000.0,
+                "unit": "acres",
+                "source": {
+                  "ref": "ADN.TO/investor-documents/ir-adn.to/Acadian-Annual-Report-2025-VF.pdf",
+                  "locator": "775,000 New Brunswick + 300,000 Maine freehold acres under management",
+                  "as_of": "2025-12-31",
+                  "content_sha256": "4bb4a04dfc3d993d727aeedf9dab564e999e2d0f0d50460e6866688b8387b582",
+                  "source_id": "b86dbfba9f24ef32e3796f1dca81eb57680627ac295f8764455ad51bf32ba467"
+                },
+                "rationale": null
+              },
+              {
+                "id": "land_equity_fraction",
+                "label": "Fraction of IFRS equity representing owned timberland and infrastructure not in producing capitalization",
+                "kind": "judgment",
+                "value": 0.6729,
+                "unit": "fraction",
+                "source": null,
+                "rationale": "Timberlands carried at historical cost less depletion; base credits ~1.075M owned acres at IFRS book plus modest fair-value uplift; high assumes partial third-party per-acre marks on Maine vs NB."
+              },
+              {
+                "id": "land_claim_m",
+                "label": "Owned timberland and infrastructure claim",
+                "kind": "calculation",
+                "value": 242.0717376,
+                "unit": "CAD_m",
+                "operation": "multiply",
+                "formula": "shareholders_equity_m \u00d7 land_equity_fraction",
+                "substituted_formula": "359.744 \u00d7 0.6729",
+                "dependencies": [
+                  "shareholders_equity_m",
+                  "land_equity_fraction"
+                ]
+              },
+              {
+                "id": "value_per_share",
+                "label": "Owned timberland NAV per share",
+                "kind": "calculation",
+                "value": 13.00083146,
+                "unit": "CAD_per_share",
+                "operation": "divide",
+                "formula": "land_claim_m \u00f7 shares_m",
+                "substituted_formula": "242.07174 \u00f7 18.619712",
+                "dependencies": [
+                  "land_claim_m",
+                  "shares_m"
+                ]
+              }
+            ],
+            "high": [
+              {
+                "id": "shareholders_equity_m",
+                "label": "Shareholders' equity at IFRS cost",
+                "kind": "fact",
+                "value": 359.744,
+                "unit": "CAD_m",
+                "source": {
+                  "ref": "ADN.TO/investor-documents/ir-adn.to/Acadian-Annual-Report-2025-VF.pdf",
+                  "locator": "Shareholders' equity $359,744 thousand at December 31, 2025; book value $19.67 per share",
+                  "as_of": "2025-12-31",
+                  "content_sha256": "4bb4a04dfc3d993d727aeedf9dab564e999e2d0f0d50460e6866688b8387b582",
+                  "source_id": "4478277683efe19c27be9daabdc2f7f3a2eee2eabc723d52906cbc6eb76d7357"
+                },
+                "rationale": null
+              },
+              {
+                "id": "shares_m",
+                "label": "Common shares outstanding",
+                "kind": "fact",
+                "value": 18.619712,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "ADN.TO/investor-documents/ir-adn.to/Acadian-2026-Q1-Interim-Report.pdf",
+                  "locator": "18,619,712 common shares outstanding as at May 6, 2026",
+                  "as_of": "2026-03-31",
+                  "content_sha256": "4a5bf29a88e2c3e80f412d5147b96be8e3ed40ed8eebdd83f4a51d3aa8b20e55",
+                  "source_id": "b4ec297376042131708a63e9185b930927cdfa56dd7f04d108341597a6cc3b3c"
+                },
+                "rationale": null
+              },
+              {
+                "id": "owned_acres",
+                "label": "Owned freehold timberland acres",
+                "kind": "fact",
+                "value": 1075000.0,
+                "unit": "acres",
+                "source": {
+                  "ref": "ADN.TO/investor-documents/ir-adn.to/Acadian-Annual-Report-2025-VF.pdf",
+                  "locator": "775,000 New Brunswick + 300,000 Maine freehold acres under management",
+                  "as_of": "2025-12-31",
+                  "content_sha256": "4bb4a04dfc3d993d727aeedf9dab564e999e2d0f0d50460e6866688b8387b582",
+                  "source_id": "b86dbfba9f24ef32e3796f1dca81eb57680627ac295f8764455ad51bf32ba467"
+                },
+                "rationale": null
+              },
+              {
+                "id": "land_equity_fraction",
+                "label": "Fraction of IFRS equity representing owned timberland and infrastructure not in producing capitalization",
+                "kind": "judgment",
+                "value": 0.9316,
+                "unit": "fraction",
+                "source": null,
+                "rationale": "Timberlands carried at historical cost less depletion; base credits ~1.075M owned acres at IFRS book plus modest fair-value uplift; high assumes partial third-party per-acre marks on Maine vs NB."
+              },
+              {
+                "id": "land_claim_m",
+                "label": "Owned timberland and infrastructure claim",
+                "kind": "calculation",
+                "value": 335.1375104,
+                "unit": "CAD_m",
+                "operation": "multiply",
+                "formula": "shareholders_equity_m \u00d7 land_equity_fraction",
+                "substituted_formula": "359.744 \u00d7 0.9316",
+                "dependencies": [
+                  "shareholders_equity_m",
+                  "land_equity_fraction"
+                ]
+              },
+              {
+                "id": "value_per_share",
+                "label": "Owned timberland NAV per share",
+                "kind": "calculation",
+                "value": 17.99907058,
+                "unit": "CAD_per_share",
+                "operation": "divide",
+                "formula": "land_claim_m \u00f7 shares_m",
+                "substituted_formula": "335.13751 \u00f7 18.619712",
+                "dependencies": [
+                  "land_claim_m",
+                  "shares_m"
+                ]
+              }
+            ]
+          },
+          "source_lineage": [
+            {
+              "node_id": "shareholders_equity_m",
+              "ref": "ADN.TO/investor-documents/ir-adn.to/Acadian-Annual-Report-2025-VF.pdf",
+              "locator": "Shareholders' equity $359,744 thousand at December 31, 2025; book value $19.67 per share",
+              "as_of": "2025-12-31",
+              "content_sha256": "4bb4a04dfc3d993d727aeedf9dab564e999e2d0f0d50460e6866688b8387b582",
+              "source_id": "4478277683efe19c27be9daabdc2f7f3a2eee2eabc723d52906cbc6eb76d7357"
+            },
+            {
+              "node_id": "shares_m",
+              "ref": "ADN.TO/investor-documents/ir-adn.to/Acadian-2026-Q1-Interim-Report.pdf",
+              "locator": "18,619,712 common shares outstanding as at May 6, 2026",
+              "as_of": "2026-03-31",
+              "content_sha256": "4a5bf29a88e2c3e80f412d5147b96be8e3ed40ed8eebdd83f4a51d3aa8b20e55",
+              "source_id": "b4ec297376042131708a63e9185b930927cdfa56dd7f04d108341597a6cc3b3c"
+            },
+            {
+              "node_id": "owned_acres",
+              "ref": "ADN.TO/investor-documents/ir-adn.to/Acadian-Annual-Report-2025-VF.pdf",
+              "locator": "775,000 New Brunswick + 300,000 Maine freehold acres under management",
+              "as_of": "2025-12-31",
+              "content_sha256": "4bb4a04dfc3d993d727aeedf9dab564e999e2d0f0d50460e6866688b8387b582",
+              "source_id": "b86dbfba9f24ef32e3796f1dca81eb57680627ac295f8764455ad51bf32ba467"
+            }
+          ],
+          "checks": {
+            "passed": true,
+            "errors": []
+          },
+          "proof_hash": "4cc5eb0dce5c8ec0a8bf23618819a3fb470e924b32ad8543c9ee14d42775b2eb"
+        },
+        "evidence_tier": "primary_derived",
+        "evidence_level": "primary_derived",
+        "evidence": "Primary bridge from ADN.TO/investor-documents/ir-adn.to/Acadian-Annual-Report-2025-VF.pdf: FY2025 FCF $0.37/sh, book $19.67/sh, net liquidity $17.4M, debt $110.009M; contract backfill 2026-07-21.",
+        "scenario_assumptions": "Proof outputs {'low': 8.0007, 'base': 13.0008, 'high': 17.9991}; see calculation_proof graph.",
+        "probability_and_timing": null,
+        "tax_and_realization_adjustments": "Timberlands carried at historical cost; uplift band is bounded judgment.",
+        "falsifier": "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
+        "overlap_key": "owned_timberland_nav",
+        "assumption_type": "judgment"
+      },
+      {
+        "component_id": "net_financial_claims",
+        "label": "Net liquidity, debt, and corporate balance-sheet claims",
+        "category": "financial_asset",
+        "treatment": "additive",
+        "included_in_component_id": null,
+        "ownership_claim": "Net liquidity and attributed long-term debt senior to equity",
+        "ownership_percentage": 1.0,
+        "quantity": {
+          "value": 1,
+          "unit": "per-share economic claim"
+        },
+        "method": "net_asset_value",
+        "method_version": "1.0",
+        "method_provenance": {
+          "method_id": "net_asset_value",
+          "version": "1.0",
+          "label": "Reconciled net asset value",
+          "power_zones": [
+            "scarce_asset_optionality",
+            "catalyst_asset_value",
+            "credit_and_normalized_returns"
+          ],
+          "equation": "value_per_share = (gross_assets - senior_claims - tax - realization_costs) / diluted_shares",
+          "sources": [
+            {
+              "ref": "_system/frameworks/scarce_strategic_asset_valuation.md",
+              "locator": "Economic ownership and unit NAV"
+            }
+          ]
+        },
+        "comparable_ids": [],
+        "range_per_share": {
+          "low": -5.0,
+          "base": 0.93,
+          "high": 2.0
+        },
+        "legacy_range_per_share": {
+          "low": -5.0,
+          "base": 0.93,
+          "high": 2.0
+        },
+        "valuation_status": "bounded_estimate",
+        "calculation_proof": {
+          "status": "valid",
+          "method_id": "net_asset_value",
+          "method_version": "1.0",
+          "outputs": {
+            "low": -5.0,
+            "base": 0.93,
+            "high": 2.0
+          },
+          "output_unit": "CAD_per_share",
+          "traces": {
+            "low": [
+              {
+                "id": "net_liquidity_m",
+                "label": "Net liquidity at December 31, 2025",
+                "kind": "fact",
+                "value": 17.4,
+                "unit": "CAD_m",
+                "source": {
+                  "ref": "ADN.TO/investor-documents/ir-adn.to/Acadian-Annual-Report-2025-VF.pdf",
+                  "locator": "Net liquidity $17.4M (cash, revolver availability, less minimum cash reserved for debt)",
+                  "as_of": "2025-12-31",
+                  "content_sha256": "4bb4a04dfc3d993d727aeedf9dab564e999e2d0f0d50460e6866688b8387b582",
+                  "source_id": "10193f2b3556bbddde9f5e3a69d74a5965c746f651e6bc22136a0b950bef13b6"
+                },
+                "rationale": null
+              },
+              {
+                "id": "long_term_debt_m",
+                "label": "Total long-term debt",
+                "kind": "fact",
+                "value": 110.009,
+                "unit": "CAD_m",
+                "source": {
+                  "ref": "ADN.TO/investor-documents/ir-adn.to/Acadian-Annual-Report-2025-VF.pdf",
+                  "locator": "Total long-term debt $110,009 thousand at December 31, 2025",
+                  "as_of": "2025-12-31",
+                  "content_sha256": "4bb4a04dfc3d993d727aeedf9dab564e999e2d0f0d50460e6866688b8387b582",
+                  "source_id": "87279d2490ec93f677acf5cb187e65c60066b2f1e84f08f940930dd8652fe55f"
+                },
+                "rationale": null
+              },
+              {
+                "id": "shares_m",
+                "label": "Common shares outstanding",
+                "kind": "fact",
+                "value": 18.619712,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "ADN.TO/investor-documents/ir-adn.to/Acadian-2026-Q1-Interim-Report.pdf",
+                  "locator": "18,619,712 common shares outstanding as at May 6, 2026",
+                  "as_of": "2026-03-31",
+                  "content_sha256": "4a5bf29a88e2c3e80f412d5147b96be8e3ed40ed8eebdd83f4a51d3aa8b20e55",
+                  "source_id": "b4ec297376042131708a63e9185b930927cdfa56dd7f04d108341597a6cc3b3c"
+                },
+                "rationale": null
+              },
+              {
+                "id": "net_corporate_claim_m",
+                "label": "Net corporate financial claim after filing liquidity and attributed debt service burden",
+                "kind": "judgment",
+                "value": -93.099,
+                "unit": "CAD_m",
+                "source": null,
+                "rationale": "Low stresses full long-term debt seniority over equity; base uses filing net liquidity only; high adds bounded working-capital and revolver headroom not capitalized in land component."
+              },
+              {
+                "id": "value_per_share",
+                "label": "Net financial claims per share",
+                "kind": "calculation",
+                "value": -5.00002363,
+                "unit": "CAD_per_share",
+                "operation": "divide",
+                "formula": "net_corporate_claim_m \u00f7 shares_m",
+                "substituted_formula": "-93.099 \u00f7 18.619712",
+                "dependencies": [
+                  "net_corporate_claim_m",
+                  "shares_m"
+                ]
+              }
+            ],
+            "base": [
+              {
+                "id": "net_liquidity_m",
+                "label": "Net liquidity at December 31, 2025",
+                "kind": "fact",
+                "value": 17.4,
+                "unit": "CAD_m",
+                "source": {
+                  "ref": "ADN.TO/investor-documents/ir-adn.to/Acadian-Annual-Report-2025-VF.pdf",
+                  "locator": "Net liquidity $17.4M (cash, revolver availability, less minimum cash reserved for debt)",
+                  "as_of": "2025-12-31",
+                  "content_sha256": "4bb4a04dfc3d993d727aeedf9dab564e999e2d0f0d50460e6866688b8387b582",
+                  "source_id": "10193f2b3556bbddde9f5e3a69d74a5965c746f651e6bc22136a0b950bef13b6"
+                },
+                "rationale": null
+              },
+              {
+                "id": "long_term_debt_m",
+                "label": "Total long-term debt",
+                "kind": "fact",
+                "value": 110.009,
+                "unit": "CAD_m",
+                "source": {
+                  "ref": "ADN.TO/investor-documents/ir-adn.to/Acadian-Annual-Report-2025-VF.pdf",
+                  "locator": "Total long-term debt $110,009 thousand at December 31, 2025",
+                  "as_of": "2025-12-31",
+                  "content_sha256": "4bb4a04dfc3d993d727aeedf9dab564e999e2d0f0d50460e6866688b8387b582",
+                  "source_id": "87279d2490ec93f677acf5cb187e65c60066b2f1e84f08f940930dd8652fe55f"
+                },
+                "rationale": null
+              },
+              {
+                "id": "shares_m",
+                "label": "Common shares outstanding",
+                "kind": "fact",
+                "value": 18.619712,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "ADN.TO/investor-documents/ir-adn.to/Acadian-2026-Q1-Interim-Report.pdf",
+                  "locator": "18,619,712 common shares outstanding as at May 6, 2026",
+                  "as_of": "2026-03-31",
+                  "content_sha256": "4a5bf29a88e2c3e80f412d5147b96be8e3ed40ed8eebdd83f4a51d3aa8b20e55",
+                  "source_id": "b4ec297376042131708a63e9185b930927cdfa56dd7f04d108341597a6cc3b3c"
+                },
+                "rationale": null
+              },
+              {
+                "id": "net_corporate_claim_m",
+                "label": "Net corporate financial claim after filing liquidity and attributed debt service burden",
+                "kind": "judgment",
+                "value": 17.316,
+                "unit": "CAD_m",
+                "source": null,
+                "rationale": "Low stresses full long-term debt seniority over equity; base uses filing net liquidity only; high adds bounded working-capital and revolver headroom not capitalized in land component."
+              },
+              {
+                "id": "value_per_share",
+                "label": "Net financial claims per share",
+                "kind": "calculation",
+                "value": 0.92998216,
+                "unit": "CAD_per_share",
+                "operation": "divide",
+                "formula": "net_corporate_claim_m \u00f7 shares_m",
+                "substituted_formula": "17.316 \u00f7 18.619712",
+                "dependencies": [
+                  "net_corporate_claim_m",
+                  "shares_m"
+                ]
+              }
+            ],
+            "high": [
+              {
+                "id": "net_liquidity_m",
+                "label": "Net liquidity at December 31, 2025",
+                "kind": "fact",
+                "value": 17.4,
+                "unit": "CAD_m",
+                "source": {
+                  "ref": "ADN.TO/investor-documents/ir-adn.to/Acadian-Annual-Report-2025-VF.pdf",
+                  "locator": "Net liquidity $17.4M (cash, revolver availability, less minimum cash reserved for debt)",
+                  "as_of": "2025-12-31",
+                  "content_sha256": "4bb4a04dfc3d993d727aeedf9dab564e999e2d0f0d50460e6866688b8387b582",
+                  "source_id": "10193f2b3556bbddde9f5e3a69d74a5965c746f651e6bc22136a0b950bef13b6"
+                },
+                "rationale": null
+              },
+              {
+                "id": "long_term_debt_m",
+                "label": "Total long-term debt",
+                "kind": "fact",
+                "value": 110.009,
+                "unit": "CAD_m",
+                "source": {
+                  "ref": "ADN.TO/investor-documents/ir-adn.to/Acadian-Annual-Report-2025-VF.pdf",
+                  "locator": "Total long-term debt $110,009 thousand at December 31, 2025",
+                  "as_of": "2025-12-31",
+                  "content_sha256": "4bb4a04dfc3d993d727aeedf9dab564e999e2d0f0d50460e6866688b8387b582",
+                  "source_id": "87279d2490ec93f677acf5cb187e65c60066b2f1e84f08f940930dd8652fe55f"
+                },
+                "rationale": null
+              },
+              {
+                "id": "shares_m",
+                "label": "Common shares outstanding",
+                "kind": "fact",
+                "value": 18.619712,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "ADN.TO/investor-documents/ir-adn.to/Acadian-2026-Q1-Interim-Report.pdf",
+                  "locator": "18,619,712 common shares outstanding as at May 6, 2026",
+                  "as_of": "2026-03-31",
+                  "content_sha256": "4a5bf29a88e2c3e80f412d5147b96be8e3ed40ed8eebdd83f4a51d3aa8b20e55",
+                  "source_id": "b4ec297376042131708a63e9185b930927cdfa56dd7f04d108341597a6cc3b3c"
+                },
+                "rationale": null
+              },
+              {
+                "id": "net_corporate_claim_m",
+                "label": "Net corporate financial claim after filing liquidity and attributed debt service burden",
+                "kind": "judgment",
+                "value": 37.239,
+                "unit": "CAD_m",
+                "source": null,
+                "rationale": "Low stresses full long-term debt seniority over equity; base uses filing net liquidity only; high adds bounded working-capital and revolver headroom not capitalized in land component."
+              },
+              {
+                "id": "value_per_share",
+                "label": "Net financial claims per share",
+                "kind": "calculation",
+                "value": 1.99997723,
+                "unit": "CAD_per_share",
+                "operation": "divide",
+                "formula": "net_corporate_claim_m \u00f7 shares_m",
+                "substituted_formula": "37.239 \u00f7 18.619712",
+                "dependencies": [
+                  "net_corporate_claim_m",
+                  "shares_m"
+                ]
+              }
+            ]
+          },
+          "source_lineage": [
+            {
+              "node_id": "net_liquidity_m",
+              "ref": "ADN.TO/investor-documents/ir-adn.to/Acadian-Annual-Report-2025-VF.pdf",
+              "locator": "Net liquidity $17.4M (cash, revolver availability, less minimum cash reserved for debt)",
+              "as_of": "2025-12-31",
+              "content_sha256": "4bb4a04dfc3d993d727aeedf9dab564e999e2d0f0d50460e6866688b8387b582",
+              "source_id": "10193f2b3556bbddde9f5e3a69d74a5965c746f651e6bc22136a0b950bef13b6"
+            },
+            {
+              "node_id": "long_term_debt_m",
+              "ref": "ADN.TO/investor-documents/ir-adn.to/Acadian-Annual-Report-2025-VF.pdf",
+              "locator": "Total long-term debt $110,009 thousand at December 31, 2025",
+              "as_of": "2025-12-31",
+              "content_sha256": "4bb4a04dfc3d993d727aeedf9dab564e999e2d0f0d50460e6866688b8387b582",
+              "source_id": "87279d2490ec93f677acf5cb187e65c60066b2f1e84f08f940930dd8652fe55f"
+            },
+            {
+              "node_id": "shares_m",
+              "ref": "ADN.TO/investor-documents/ir-adn.to/Acadian-2026-Q1-Interim-Report.pdf",
+              "locator": "18,619,712 common shares outstanding as at May 6, 2026",
+              "as_of": "2026-03-31",
+              "content_sha256": "4a5bf29a88e2c3e80f412d5147b96be8e3ed40ed8eebdd83f4a51d3aa8b20e55",
+              "source_id": "b4ec297376042131708a63e9185b930927cdfa56dd7f04d108341597a6cc3b3c"
+            }
+          ],
+          "checks": {
+            "passed": true,
+            "errors": []
+          },
+          "proof_hash": "2eda76b8285d7a355ab77f2a3a904e7c91ac06b136acfccee8a01f27a805fbd9"
+        },
+        "evidence_tier": "primary_derived",
+        "evidence_level": "primary_derived",
+        "evidence": "Primary bridge from ADN.TO/investor-documents/ir-adn.to/Acadian-Annual-Report-2025-VF.pdf: FY2025 FCF $0.37/sh, book $19.67/sh, net liquidity $17.4M, debt $110.009M; contract backfill 2026-07-21.",
+        "scenario_assumptions": "Proof outputs {'low': -5.0, 'base': 0.93, 'high': 2.0}; see calculation_proof graph.",
+        "probability_and_timing": null,
+        "tax_and_realization_adjustments": "Low case stresses full debt seniority; high adds revolver headroom.",
+        "falsifier": "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
+        "overlap_key": "net_financial_claims",
+        "assumption_type": "judgment"
+      },
+      {
+        "component_id": "payout_and_cycle_reserve",
+        "label": "Dividend coverage, Maine execution, and lumber-cycle reserve",
+        "category": "liability_or_reserve",
+        "treatment": "additive",
+        "included_in_component_id": null,
+        "ownership_claim": "Dividend-FCF gap and Maine/lumber-cycle stress reserve",
+        "ownership_percentage": 1.0,
+        "quantity": {
+          "value": 1,
+          "unit": "per-share economic claim"
+        },
+        "method": "net_asset_value",
+        "method_version": "1.0",
+        "method_provenance": {
+          "method_id": "net_asset_value",
+          "version": "1.0",
+          "label": "Reconciled net asset value",
+          "power_zones": [
+            "scarce_asset_optionality",
+            "catalyst_asset_value",
+            "credit_and_normalized_returns"
+          ],
+          "equation": "value_per_share = (gross_assets - senior_claims - tax - realization_costs) / diluted_shares",
+          "sources": [
+            {
+              "ref": "_system/frameworks/scarce_strategic_asset_valuation.md",
+              "locator": "Economic ownership and unit NAV"
+            }
+          ]
+        },
+        "comparable_ids": [],
+        "range_per_share": {
+          "low": -5.0,
+          "base": -2.5,
+          "high": -1.0
+        },
+        "legacy_range_per_share": {
+          "low": -5.0,
+          "base": -2.5,
+          "high": -1.0
+        },
+        "valuation_status": "bounded_estimate",
+        "calculation_proof": {
+          "status": "valid",
+          "method_id": "net_asset_value",
+          "method_version": "1.0",
+          "outputs": {
+            "low": -5.0,
+            "base": -2.5,
+            "high": -1.0
+          },
+          "output_unit": "CAD_per_share",
+          "traces": {
+            "low": [
+              {
+                "id": "dividend_per_share",
+                "label": "Annual dividend declared per share",
+                "kind": "fact",
+                "value": 1.16,
+                "unit": "CAD_per_share",
+                "source": {
+                  "ref": "ADN.TO/investor-documents/ir-adn.to/Acadian-Annual-Report-2025-VF.pdf",
+                  "locator": "Dividends declared $1.16 per share FY2025",
+                  "as_of": "2025-12-31",
+                  "content_sha256": "4bb4a04dfc3d993d727aeedf9dab564e999e2d0f0d50460e6866688b8387b582",
+                  "source_id": "934215ae4efcd2de3098bd8480c8fe8779acce02c5e0984a6319dce0cea1d0ef"
+                },
+                "rationale": null
+              },
+              {
+                "id": "fcf_per_share",
+                "label": "FY2025 Free Cash Flow per share",
+                "kind": "fact",
+                "value": 0.37,
+                "unit": "CAD_per_share",
+                "source": {
+                  "ref": "ADN.TO/investor-documents/ir-adn.to/Acadian-Annual-Report-2025-VF.pdf",
+                  "locator": "Free Cash Flow per share $0.37 FY2025",
+                  "as_of": "2025-12-31",
+                  "content_sha256": "4bb4a04dfc3d993d727aeedf9dab564e999e2d0f0d50460e6866688b8387b582",
+                  "source_id": "dbb77b3e1225abb2663a0242e8e9275da986a8d965b727812fc6c354db35103b"
+                },
+                "rationale": null
+              },
+              {
+                "id": "shares_m",
+                "label": "Common shares outstanding",
+                "kind": "fact",
+                "value": 18.619712,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "ADN.TO/investor-documents/ir-adn.to/Acadian-2026-Q1-Interim-Report.pdf",
+                  "locator": "18,619,712 common shares outstanding as at May 6, 2026",
+                  "as_of": "2026-03-31",
+                  "content_sha256": "4a5bf29a88e2c3e80f412d5147b96be8e3ed40ed8eebdd83f4a51d3aa8b20e55",
+                  "source_id": "b4ec297376042131708a63e9185b930927cdfa56dd7f04d108341597a6cc3b3c"
+                },
+                "rationale": null
+              },
+              {
+                "id": "coverage_stress_multiple",
+                "label": "Dividend coverage, Maine execution, and lumber-cycle stress reserve multiple on FCF gap",
+                "kind": "judgment",
+                "value": 6.3291,
+                "unit": "multiple",
+                "source": null,
+                "rationale": "Reserve scales with dividend minus Free Cash Flow gap and Maine margin recovery risk; Macer 100% DRIP mitigates cash drain but not economic dilution."
+              },
+              {
+                "id": "gap_per_share",
+                "label": "Annual dividend minus Free Cash Flow per share",
+                "kind": "calculation",
+                "value": 0.79,
+                "unit": "CAD_per_share",
+                "operation": "subtract",
+                "formula": "dividend_per_share - fcf_per_share",
+                "substituted_formula": "1.16 - 0.37",
+                "dependencies": [
+                  "dividend_per_share",
+                  "fcf_per_share"
+                ]
+              },
+              {
+                "id": "reserve_gross",
+                "label": "Gross payout and cycle reserve",
+                "kind": "calculation",
+                "value": 4.999989,
+                "unit": "CAD_per_share",
+                "operation": "multiply",
+                "formula": "gap_per_share \u00d7 coverage_stress_multiple",
+                "substituted_formula": "0.79 \u00d7 6.3291",
+                "dependencies": [
+                  "gap_per_share",
+                  "coverage_stress_multiple"
+                ]
+              },
+              {
+                "id": "value_per_share",
+                "label": "Payout and cycle reserve per share",
+                "kind": "calculation",
+                "value": -4.999989,
+                "unit": "CAD_per_share",
+                "operation": "negative",
+                "formula": "-(reserve_gross)",
+                "substituted_formula": "-(4.999989)",
+                "dependencies": [
+                  "reserve_gross"
+                ]
+              }
+            ],
+            "base": [
+              {
+                "id": "dividend_per_share",
+                "label": "Annual dividend declared per share",
+                "kind": "fact",
+                "value": 1.16,
+                "unit": "CAD_per_share",
+                "source": {
+                  "ref": "ADN.TO/investor-documents/ir-adn.to/Acadian-Annual-Report-2025-VF.pdf",
+                  "locator": "Dividends declared $1.16 per share FY2025",
+                  "as_of": "2025-12-31",
+                  "content_sha256": "4bb4a04dfc3d993d727aeedf9dab564e999e2d0f0d50460e6866688b8387b582",
+                  "source_id": "934215ae4efcd2de3098bd8480c8fe8779acce02c5e0984a6319dce0cea1d0ef"
+                },
+                "rationale": null
+              },
+              {
+                "id": "fcf_per_share",
+                "label": "FY2025 Free Cash Flow per share",
+                "kind": "fact",
+                "value": 0.37,
+                "unit": "CAD_per_share",
+                "source": {
+                  "ref": "ADN.TO/investor-documents/ir-adn.to/Acadian-Annual-Report-2025-VF.pdf",
+                  "locator": "Free Cash Flow per share $0.37 FY2025",
+                  "as_of": "2025-12-31",
+                  "content_sha256": "4bb4a04dfc3d993d727aeedf9dab564e999e2d0f0d50460e6866688b8387b582",
+                  "source_id": "dbb77b3e1225abb2663a0242e8e9275da986a8d965b727812fc6c354db35103b"
+                },
+                "rationale": null
+              },
+              {
+                "id": "shares_m",
+                "label": "Common shares outstanding",
+                "kind": "fact",
+                "value": 18.619712,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "ADN.TO/investor-documents/ir-adn.to/Acadian-2026-Q1-Interim-Report.pdf",
+                  "locator": "18,619,712 common shares outstanding as at May 6, 2026",
+                  "as_of": "2026-03-31",
+                  "content_sha256": "4a5bf29a88e2c3e80f412d5147b96be8e3ed40ed8eebdd83f4a51d3aa8b20e55",
+                  "source_id": "b4ec297376042131708a63e9185b930927cdfa56dd7f04d108341597a6cc3b3c"
+                },
+                "rationale": null
+              },
+              {
+                "id": "coverage_stress_multiple",
+                "label": "Dividend coverage, Maine execution, and lumber-cycle stress reserve multiple on FCF gap",
+                "kind": "judgment",
+                "value": 3.1645,
+                "unit": "multiple",
+                "source": null,
+                "rationale": "Reserve scales with dividend minus Free Cash Flow gap and Maine margin recovery risk; Macer 100% DRIP mitigates cash drain but not economic dilution."
+              },
+              {
+                "id": "gap_per_share",
+                "label": "Annual dividend minus Free Cash Flow per share",
+                "kind": "calculation",
+                "value": 0.79,
+                "unit": "CAD_per_share",
+                "operation": "subtract",
+                "formula": "dividend_per_share - fcf_per_share",
+                "substituted_formula": "1.16 - 0.37",
+                "dependencies": [
+                  "dividend_per_share",
+                  "fcf_per_share"
+                ]
+              },
+              {
+                "id": "reserve_gross",
+                "label": "Gross payout and cycle reserve",
+                "kind": "calculation",
+                "value": 2.499955,
+                "unit": "CAD_per_share",
+                "operation": "multiply",
+                "formula": "gap_per_share \u00d7 coverage_stress_multiple",
+                "substituted_formula": "0.79 \u00d7 3.1645",
+                "dependencies": [
+                  "gap_per_share",
+                  "coverage_stress_multiple"
+                ]
+              },
+              {
+                "id": "value_per_share",
+                "label": "Payout and cycle reserve per share",
+                "kind": "calculation",
+                "value": -2.499955,
+                "unit": "CAD_per_share",
+                "operation": "negative",
+                "formula": "-(reserve_gross)",
+                "substituted_formula": "-(2.499955)",
+                "dependencies": [
+                  "reserve_gross"
+                ]
+              }
+            ],
+            "high": [
+              {
+                "id": "dividend_per_share",
+                "label": "Annual dividend declared per share",
+                "kind": "fact",
+                "value": 1.16,
+                "unit": "CAD_per_share",
+                "source": {
+                  "ref": "ADN.TO/investor-documents/ir-adn.to/Acadian-Annual-Report-2025-VF.pdf",
+                  "locator": "Dividends declared $1.16 per share FY2025",
+                  "as_of": "2025-12-31",
+                  "content_sha256": "4bb4a04dfc3d993d727aeedf9dab564e999e2d0f0d50460e6866688b8387b582",
+                  "source_id": "934215ae4efcd2de3098bd8480c8fe8779acce02c5e0984a6319dce0cea1d0ef"
+                },
+                "rationale": null
+              },
+              {
+                "id": "fcf_per_share",
+                "label": "FY2025 Free Cash Flow per share",
+                "kind": "fact",
+                "value": 0.37,
+                "unit": "CAD_per_share",
+                "source": {
+                  "ref": "ADN.TO/investor-documents/ir-adn.to/Acadian-Annual-Report-2025-VF.pdf",
+                  "locator": "Free Cash Flow per share $0.37 FY2025",
+                  "as_of": "2025-12-31",
+                  "content_sha256": "4bb4a04dfc3d993d727aeedf9dab564e999e2d0f0d50460e6866688b8387b582",
+                  "source_id": "dbb77b3e1225abb2663a0242e8e9275da986a8d965b727812fc6c354db35103b"
+                },
+                "rationale": null
+              },
+              {
+                "id": "shares_m",
+                "label": "Common shares outstanding",
+                "kind": "fact",
+                "value": 18.619712,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "ADN.TO/investor-documents/ir-adn.to/Acadian-2026-Q1-Interim-Report.pdf",
+                  "locator": "18,619,712 common shares outstanding as at May 6, 2026",
+                  "as_of": "2026-03-31",
+                  "content_sha256": "4a5bf29a88e2c3e80f412d5147b96be8e3ed40ed8eebdd83f4a51d3aa8b20e55",
+                  "source_id": "b4ec297376042131708a63e9185b930927cdfa56dd7f04d108341597a6cc3b3c"
+                },
+                "rationale": null
+              },
+              {
+                "id": "coverage_stress_multiple",
+                "label": "Dividend coverage, Maine execution, and lumber-cycle stress reserve multiple on FCF gap",
+                "kind": "judgment",
+                "value": 1.2658,
+                "unit": "multiple",
+                "source": null,
+                "rationale": "Reserve scales with dividend minus Free Cash Flow gap and Maine margin recovery risk; Macer 100% DRIP mitigates cash drain but not economic dilution."
+              },
+              {
+                "id": "gap_per_share",
+                "label": "Annual dividend minus Free Cash Flow per share",
+                "kind": "calculation",
+                "value": 0.79,
+                "unit": "CAD_per_share",
+                "operation": "subtract",
+                "formula": "dividend_per_share - fcf_per_share",
+                "substituted_formula": "1.16 - 0.37",
+                "dependencies": [
+                  "dividend_per_share",
+                  "fcf_per_share"
+                ]
+              },
+              {
+                "id": "reserve_gross",
+                "label": "Gross payout and cycle reserve",
+                "kind": "calculation",
+                "value": 0.999982,
+                "unit": "CAD_per_share",
+                "operation": "multiply",
+                "formula": "gap_per_share \u00d7 coverage_stress_multiple",
+                "substituted_formula": "0.79 \u00d7 1.2658",
+                "dependencies": [
+                  "gap_per_share",
+                  "coverage_stress_multiple"
+                ]
+              },
+              {
+                "id": "value_per_share",
+                "label": "Payout and cycle reserve per share",
+                "kind": "calculation",
+                "value": -0.999982,
+                "unit": "CAD_per_share",
+                "operation": "negative",
+                "formula": "-(reserve_gross)",
+                "substituted_formula": "-(0.999982)",
+                "dependencies": [
+                  "reserve_gross"
+                ]
+              }
+            ]
+          },
+          "source_lineage": [
+            {
+              "node_id": "dividend_per_share",
+              "ref": "ADN.TO/investor-documents/ir-adn.to/Acadian-Annual-Report-2025-VF.pdf",
+              "locator": "Dividends declared $1.16 per share FY2025",
+              "as_of": "2025-12-31",
+              "content_sha256": "4bb4a04dfc3d993d727aeedf9dab564e999e2d0f0d50460e6866688b8387b582",
+              "source_id": "934215ae4efcd2de3098bd8480c8fe8779acce02c5e0984a6319dce0cea1d0ef"
+            },
+            {
+              "node_id": "fcf_per_share",
+              "ref": "ADN.TO/investor-documents/ir-adn.to/Acadian-Annual-Report-2025-VF.pdf",
+              "locator": "Free Cash Flow per share $0.37 FY2025",
+              "as_of": "2025-12-31",
+              "content_sha256": "4bb4a04dfc3d993d727aeedf9dab564e999e2d0f0d50460e6866688b8387b582",
+              "source_id": "dbb77b3e1225abb2663a0242e8e9275da986a8d965b727812fc6c354db35103b"
+            },
+            {
+              "node_id": "shares_m",
+              "ref": "ADN.TO/investor-documents/ir-adn.to/Acadian-2026-Q1-Interim-Report.pdf",
+              "locator": "18,619,712 common shares outstanding as at May 6, 2026",
+              "as_of": "2026-03-31",
+              "content_sha256": "4a5bf29a88e2c3e80f412d5147b96be8e3ed40ed8eebdd83f4a51d3aa8b20e55",
+              "source_id": "b4ec297376042131708a63e9185b930927cdfa56dd7f04d108341597a6cc3b3c"
+            }
+          ],
+          "checks": {
+            "passed": true,
+            "errors": []
+          },
+          "proof_hash": "7147c3d0c46b25be2f00fb79e7aeff314443eacaa9cd5155369188ccb1211e70"
+        },
+        "evidence_tier": "primary_derived",
+        "evidence_level": "primary_derived",
+        "evidence": "Primary bridge from ADN.TO/investor-documents/ir-adn.to/Acadian-Annual-Report-2025-VF.pdf: FY2025 FCF $0.37/sh, book $19.67/sh, net liquidity $17.4M, debt $110.009M; contract backfill 2026-07-21.",
+        "scenario_assumptions": "Proof outputs {'low': -5.0, 'base': -2.5, 'high': -1.0}; see calculation_proof graph.",
+        "probability_and_timing": null,
+        "tax_and_realization_adjustments": "Macer 100% DRIP mitigates cash drain but not economic dilution risk.",
+        "falsifier": "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
+        "overlap_key": "payout_and_cycle_reserve",
+        "assumption_type": "judgment"
+      }
+    ],
     "scenario_contract": {
       "rule": "Cases must change cited causal operating, capital, probability, timing, or financing drivers\u2014not only a terminal multiple.",
-      "top_value_drivers": [],
+      "top_value_drivers": [
+        {
+          "component_id": "owned_timberland_nav",
+          "label": "Owned freehold timberland and infrastructure at IFRS cost plus partial fair-value uplift",
+          "valuation_status": "bounded_estimate",
+          "base_per_share": 13.0008,
+          "legacy_base_per_share": 13.0,
+          "range_width_per_share": 9.9984,
+          "scenario_assumptions": "Proof outputs {'low': 8.0007, 'base': 13.0008, 'high': 17.9991}; see calculation_proof graph."
+        },
+        {
+          "component_id": "net_financial_claims",
+          "label": "Net liquidity, debt, and corporate balance-sheet claims",
+          "valuation_status": "bounded_estimate",
+          "base_per_share": 0.93,
+          "legacy_base_per_share": 0.93,
+          "range_width_per_share": 7.0,
+          "scenario_assumptions": "Proof outputs {'low': -5.0, 'base': 0.93, 'high': 2.0}; see calculation_proof graph."
+        },
+        {
+          "component_id": "producing_timber_operations",
+          "label": "Harvest, Crown management, and timber services owner cash",
+          "valuation_status": "bounded_estimate",
+          "base_per_share": 6.0,
+          "legacy_base_per_share": 6.0,
+          "range_width_per_share": 6.0,
+          "scenario_assumptions": "Proof outputs {'low': 3.0, 'base': 6.0, 'high': 9.0}; see calculation_proof graph."
+        },
+        {
+          "component_id": "payout_and_cycle_reserve",
+          "label": "Dividend coverage, Maine execution, and lumber-cycle reserve",
+          "valuation_status": "bounded_estimate",
+          "base_per_share": -2.5,
+          "legacy_base_per_share": -2.5,
+          "range_width_per_share": 4.0,
+          "scenario_assumptions": "Proof outputs {'low': -5.0, 'base': -2.5, 'high': -1.0}; see calculation_proof graph."
+        },
+        {
+          "component_id": "carbon_and_real_estate_option",
+          "label": "Voluntary carbon credits and real-estate milestone options",
+          "valuation_status": "bounded_estimate",
+          "base_per_share": 0.0,
+          "legacy_base_per_share": 0.0,
+          "range_width_per_share": 1.32,
+          "scenario_assumptions": "Proof outputs {'low': 0.0, 'base': 0.0, 'high': 1.32}; see calculation_proof graph."
+        }
+      ],
       "reverse_expectations": null
     },
     "calculation_proof_summary": {
-      "component_count": 0,
-      "priced_component_count": 0,
-      "proof_complete_pct": 0.0,
+      "component_count": 5,
+      "priced_component_count": 5,
+      "proof_complete_pct": 100.0,
       "status_counts": {
-        "bounded_estimate": 0,
+        "bounded_estimate": 5,
         "calculated": 0,
         "legacy_sensitivity": 0,
         "unpriced": 0
       },
-      "all_material_components_priced": false,
+      "all_material_components_priced": true,
       "calculation_errors": [],
-      "aggregate_proof_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      "aggregate_proof_hash": "d9ba4f6bb82a31274d4f493c4b86e2ed11ac83a31f5e0538ae99735fd7e0af8d"
     },
     "model_checks": {
       "calculation_graphs_valid": true,
-      "component_sum_reconciles": false,
+      "component_sum_reconciles": true,
       "no_double_counting": true,
-      "all_material_components_priced": false,
+      "all_material_components_priced": true,
       "low_base_high_ordered": true
     },
-    "source_lineage": [],
+    "source_lineage": [
+      {
+        "component_id": "producing_timber_operations",
+        "node_id": "fcf_per_share",
+        "ref": "ADN.TO/investor-documents/ir-adn.to/Acadian-Annual-Report-2025-VF.pdf",
+        "locator": "Free Cash Flow $6.635M; per share $0.37 (2025 financial highlights table)",
+        "as_of": "2025-12-31",
+        "content_sha256": "4bb4a04dfc3d993d727aeedf9dab564e999e2d0f0d50460e6866688b8387b582",
+        "source_id": "cc9566aea837f51e326dd12f923ba487b828547fe6b093790ec4dcf58f73fddc"
+      },
+      {
+        "component_id": "producing_timber_operations",
+        "node_id": "shares_m",
+        "ref": "ADN.TO/investor-documents/ir-adn.to/Acadian-2026-Q1-Interim-Report.pdf",
+        "locator": "18,619,712 common shares outstanding as at May 6, 2026",
+        "as_of": "2026-03-31",
+        "content_sha256": "4a5bf29a88e2c3e80f412d5147b96be8e3ed40ed8eebdd83f4a51d3aa8b20e55",
+        "source_id": "b4ec297376042131708a63e9185b930927cdfa56dd7f04d108341597a6cc3b3c"
+      },
+      {
+        "component_id": "carbon_and_real_estate_option",
+        "node_id": "carbon_sales_m",
+        "ref": "ADN.TO/investor-documents/ir-adn.to/Acadian-Annual-Report-2025-VF.pdf",
+        "locator": "Carbon credit sales $24.588M on 752,100 credits in 2024; zero sales FY2025",
+        "as_of": "2025-12-31",
+        "content_sha256": "4bb4a04dfc3d993d727aeedf9dab564e999e2d0f0d50460e6866688b8387b582",
+        "source_id": "dc3886648a97155f994d085d12d51aae527c36f9e90d551f39b4b7b78962a5c5"
+      },
+      {
+        "component_id": "carbon_and_real_estate_option",
+        "node_id": "shares_m",
+        "ref": "ADN.TO/investor-documents/ir-adn.to/Acadian-2026-Q1-Interim-Report.pdf",
+        "locator": "18,619,712 common shares outstanding as at May 6, 2026",
+        "as_of": "2026-03-31",
+        "content_sha256": "4a5bf29a88e2c3e80f412d5147b96be8e3ed40ed8eebdd83f4a51d3aa8b20e55",
+        "source_id": "b4ec297376042131708a63e9185b930927cdfa56dd7f04d108341597a6cc3b3c"
+      },
+      {
+        "component_id": "owned_timberland_nav",
+        "node_id": "shareholders_equity_m",
+        "ref": "ADN.TO/investor-documents/ir-adn.to/Acadian-Annual-Report-2025-VF.pdf",
+        "locator": "Shareholders' equity $359,744 thousand at December 31, 2025; book value $19.67 per share",
+        "as_of": "2025-12-31",
+        "content_sha256": "4bb4a04dfc3d993d727aeedf9dab564e999e2d0f0d50460e6866688b8387b582",
+        "source_id": "4478277683efe19c27be9daabdc2f7f3a2eee2eabc723d52906cbc6eb76d7357"
+      },
+      {
+        "component_id": "owned_timberland_nav",
+        "node_id": "shares_m",
+        "ref": "ADN.TO/investor-documents/ir-adn.to/Acadian-2026-Q1-Interim-Report.pdf",
+        "locator": "18,619,712 common shares outstanding as at May 6, 2026",
+        "as_of": "2026-03-31",
+        "content_sha256": "4a5bf29a88e2c3e80f412d5147b96be8e3ed40ed8eebdd83f4a51d3aa8b20e55",
+        "source_id": "b4ec297376042131708a63e9185b930927cdfa56dd7f04d108341597a6cc3b3c"
+      },
+      {
+        "component_id": "owned_timberland_nav",
+        "node_id": "owned_acres",
+        "ref": "ADN.TO/investor-documents/ir-adn.to/Acadian-Annual-Report-2025-VF.pdf",
+        "locator": "775,000 New Brunswick + 300,000 Maine freehold acres under management",
+        "as_of": "2025-12-31",
+        "content_sha256": "4bb4a04dfc3d993d727aeedf9dab564e999e2d0f0d50460e6866688b8387b582",
+        "source_id": "b86dbfba9f24ef32e3796f1dca81eb57680627ac295f8764455ad51bf32ba467"
+      },
+      {
+        "component_id": "net_financial_claims",
+        "node_id": "net_liquidity_m",
+        "ref": "ADN.TO/investor-documents/ir-adn.to/Acadian-Annual-Report-2025-VF.pdf",
+        "locator": "Net liquidity $17.4M (cash, revolver availability, less minimum cash reserved for debt)",
+        "as_of": "2025-12-31",
+        "content_sha256": "4bb4a04dfc3d993d727aeedf9dab564e999e2d0f0d50460e6866688b8387b582",
+        "source_id": "10193f2b3556bbddde9f5e3a69d74a5965c746f651e6bc22136a0b950bef13b6"
+      },
+      {
+        "component_id": "net_financial_claims",
+        "node_id": "long_term_debt_m",
+        "ref": "ADN.TO/investor-documents/ir-adn.to/Acadian-Annual-Report-2025-VF.pdf",
+        "locator": "Total long-term debt $110,009 thousand at December 31, 2025",
+        "as_of": "2025-12-31",
+        "content_sha256": "4bb4a04dfc3d993d727aeedf9dab564e999e2d0f0d50460e6866688b8387b582",
+        "source_id": "87279d2490ec93f677acf5cb187e65c60066b2f1e84f08f940930dd8652fe55f"
+      },
+      {
+        "component_id": "net_financial_claims",
+        "node_id": "shares_m",
+        "ref": "ADN.TO/investor-documents/ir-adn.to/Acadian-2026-Q1-Interim-Report.pdf",
+        "locator": "18,619,712 common shares outstanding as at May 6, 2026",
+        "as_of": "2026-03-31",
+        "content_sha256": "4a5bf29a88e2c3e80f412d5147b96be8e3ed40ed8eebdd83f4a51d3aa8b20e55",
+        "source_id": "b4ec297376042131708a63e9185b930927cdfa56dd7f04d108341597a6cc3b3c"
+      },
+      {
+        "component_id": "payout_and_cycle_reserve",
+        "node_id": "dividend_per_share",
+        "ref": "ADN.TO/investor-documents/ir-adn.to/Acadian-Annual-Report-2025-VF.pdf",
+        "locator": "Dividends declared $1.16 per share FY2025",
+        "as_of": "2025-12-31",
+        "content_sha256": "4bb4a04dfc3d993d727aeedf9dab564e999e2d0f0d50460e6866688b8387b582",
+        "source_id": "934215ae4efcd2de3098bd8480c8fe8779acce02c5e0984a6319dce0cea1d0ef"
+      },
+      {
+        "component_id": "payout_and_cycle_reserve",
+        "node_id": "fcf_per_share",
+        "ref": "ADN.TO/investor-documents/ir-adn.to/Acadian-Annual-Report-2025-VF.pdf",
+        "locator": "Free Cash Flow per share $0.37 FY2025",
+        "as_of": "2025-12-31",
+        "content_sha256": "4bb4a04dfc3d993d727aeedf9dab564e999e2d0f0d50460e6866688b8387b582",
+        "source_id": "dbb77b3e1225abb2663a0242e8e9275da986a8d965b727812fc6c354db35103b"
+      },
+      {
+        "component_id": "payout_and_cycle_reserve",
+        "node_id": "shares_m",
+        "ref": "ADN.TO/investor-documents/ir-adn.to/Acadian-2026-Q1-Interim-Report.pdf",
+        "locator": "18,619,712 common shares outstanding as at May 6, 2026",
+        "as_of": "2026-03-31",
+        "content_sha256": "4a5bf29a88e2c3e80f412d5147b96be8e3ed40ed8eebdd83f4a51d3aa8b20e55",
+        "source_id": "b4ec297376042131708a63e9185b930927cdfa56dd7f04d108341597a6cc3b3c"
+      }
+    ],
     "change_control": {
-      "model_hash": "3d4ec2a7f8c270262fa59903437c5cfa067953e5166947af70da3737841599e2",
-      "method_versions": [],
+      "model_hash": "7466444bde0394918bb114f15cfeb1b22ff9ca125b3ff29f206349678ebdfb76",
+      "method_versions": [
+        "net_asset_value@1.0",
+        "owner_cash_or_dividend_discount@1.0",
+        "risk_adjusted_milestone_value@1.0"
+      ],
       "change_log": [],
       "rule": "A source fact is locked. Every assumption change requires a reason, author, timestamp, and before/after value."
     }
   },
   "optionality": {
-    "status": "not_material_or_separately_identified",
-    "option_count": 0,
-    "options": [],
+    "status": "present",
+    "option_count": 1,
+    "options": [
+      {
+        "component_id": "carbon_and_real_estate_option",
+        "label": "Voluntary carbon credits and real-estate milestone options",
+        "category": "real_option",
+        "treatment": "additive",
+        "included_in_component_id": null,
+        "ownership_claim": "Episodic carbon credit issuance and real-estate fee upside",
+        "ownership_percentage": 1.0,
+        "quantity": {
+          "value": 1,
+          "unit": "per-share economic claim"
+        },
+        "method": "risk_adjusted_milestone_value",
+        "method_version": "1.0",
+        "method_provenance": {
+          "method_id": "risk_adjusted_milestone_value",
+          "version": "1.0",
+          "label": "Milestone risk-adjusted present value",
+          "power_zones": [
+            "binary_milestone"
+          ],
+          "equation": "value_per_share = (net_cash + sum(p_success*PV(success_value)-remaining_cost) - dilution)/shares",
+          "sources": [
+            {
+              "ref": "_system/frameworks/optionality_valuation.md",
+              "locator": "Milestone-based option framework"
+            }
+          ]
+        },
+        "comparable_ids": [],
+        "range_per_share": {
+          "low": 0.0,
+          "base": 0.0,
+          "high": 1.32
+        },
+        "legacy_range_per_share": {
+          "low": 0.0,
+          "base": 0.0,
+          "high": 1.32
+        },
+        "valuation_status": "bounded_estimate",
+        "calculation_proof": {
+          "status": "valid",
+          "method_id": "risk_adjusted_milestone_value",
+          "method_version": "1.0",
+          "outputs": {
+            "low": 0.0,
+            "base": 0.0,
+            "high": 1.32
+          },
+          "output_unit": "CAD_per_share",
+          "traces": {
+            "low": [
+              {
+                "id": "carbon_sales_m",
+                "label": "FY2024 voluntary carbon credit sales (reference issuance)",
+                "kind": "fact",
+                "value": 24.588,
+                "unit": "CAD_m",
+                "source": {
+                  "ref": "ADN.TO/investor-documents/ir-adn.to/Acadian-Annual-Report-2025-VF.pdf",
+                  "locator": "Carbon credit sales $24.588M on 752,100 credits in 2024; zero sales FY2025",
+                  "as_of": "2025-12-31",
+                  "content_sha256": "4bb4a04dfc3d993d727aeedf9dab564e999e2d0f0d50460e6866688b8387b582",
+                  "source_id": "dc3886648a97155f994d085d12d51aae527c36f9e90d551f39b4b7b78962a5c5"
+                },
+                "rationale": null
+              },
+              {
+                "id": "shares_m",
+                "label": "Common shares outstanding",
+                "kind": "fact",
+                "value": 18.619712,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "ADN.TO/investor-documents/ir-adn.to/Acadian-2026-Q1-Interim-Report.pdf",
+                  "locator": "18,619,712 common shares outstanding as at May 6, 2026",
+                  "as_of": "2026-03-31",
+                  "content_sha256": "4a5bf29a88e2c3e80f412d5147b96be8e3ed40ed8eebdd83f4a51d3aa8b20e55",
+                  "source_id": "b4ec297376042131708a63e9185b930927cdfa56dd7f04d108341597a6cc3b3c"
+                },
+                "rationale": null
+              },
+              {
+                "id": "risk_fraction",
+                "label": "Probability-weighted fraction of reference carbon/real-estate milestone value",
+                "kind": "judgment",
+                "value": 0.0,
+                "unit": "fraction",
+                "source": null,
+                "rationale": "Base assigns zero until next verified carbon issuance; high assumes one repeat of 2024-scale sale plus modest real-estate fee ramp."
+              },
+              {
+                "id": "option_value_m",
+                "label": "Risk-adjusted carbon and real-estate option value",
+                "kind": "calculation",
+                "value": 0.0,
+                "unit": "CAD_m",
+                "operation": "multiply",
+                "formula": "carbon_sales_m \u00d7 risk_fraction",
+                "substituted_formula": "24.588 \u00d7 0",
+                "dependencies": [
+                  "carbon_sales_m",
+                  "risk_fraction"
+                ]
+              },
+              {
+                "id": "value_per_share",
+                "label": "Carbon and real-estate option per share",
+                "kind": "calculation",
+                "value": 0.0,
+                "unit": "CAD_per_share",
+                "operation": "divide",
+                "formula": "option_value_m \u00f7 shares_m",
+                "substituted_formula": "0 \u00f7 18.619712",
+                "dependencies": [
+                  "option_value_m",
+                  "shares_m"
+                ]
+              }
+            ],
+            "base": [
+              {
+                "id": "carbon_sales_m",
+                "label": "FY2024 voluntary carbon credit sales (reference issuance)",
+                "kind": "fact",
+                "value": 24.588,
+                "unit": "CAD_m",
+                "source": {
+                  "ref": "ADN.TO/investor-documents/ir-adn.to/Acadian-Annual-Report-2025-VF.pdf",
+                  "locator": "Carbon credit sales $24.588M on 752,100 credits in 2024; zero sales FY2025",
+                  "as_of": "2025-12-31",
+                  "content_sha256": "4bb4a04dfc3d993d727aeedf9dab564e999e2d0f0d50460e6866688b8387b582",
+                  "source_id": "dc3886648a97155f994d085d12d51aae527c36f9e90d551f39b4b7b78962a5c5"
+                },
+                "rationale": null
+              },
+              {
+                "id": "shares_m",
+                "label": "Common shares outstanding",
+                "kind": "fact",
+                "value": 18.619712,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "ADN.TO/investor-documents/ir-adn.to/Acadian-2026-Q1-Interim-Report.pdf",
+                  "locator": "18,619,712 common shares outstanding as at May 6, 2026",
+                  "as_of": "2026-03-31",
+                  "content_sha256": "4a5bf29a88e2c3e80f412d5147b96be8e3ed40ed8eebdd83f4a51d3aa8b20e55",
+                  "source_id": "b4ec297376042131708a63e9185b930927cdfa56dd7f04d108341597a6cc3b3c"
+                },
+                "rationale": null
+              },
+              {
+                "id": "risk_fraction",
+                "label": "Probability-weighted fraction of reference carbon/real-estate milestone value",
+                "kind": "judgment",
+                "value": 0.0,
+                "unit": "fraction",
+                "source": null,
+                "rationale": "Base assigns zero until next verified carbon issuance; high assumes one repeat of 2024-scale sale plus modest real-estate fee ramp."
+              },
+              {
+                "id": "option_value_m",
+                "label": "Risk-adjusted carbon and real-estate option value",
+                "kind": "calculation",
+                "value": 0.0,
+                "unit": "CAD_m",
+                "operation": "multiply",
+                "formula": "carbon_sales_m \u00d7 risk_fraction",
+                "substituted_formula": "24.588 \u00d7 0",
+                "dependencies": [
+                  "carbon_sales_m",
+                  "risk_fraction"
+                ]
+              },
+              {
+                "id": "value_per_share",
+                "label": "Carbon and real-estate option per share",
+                "kind": "calculation",
+                "value": 0.0,
+                "unit": "CAD_per_share",
+                "operation": "divide",
+                "formula": "option_value_m \u00f7 shares_m",
+                "substituted_formula": "0 \u00f7 18.619712",
+                "dependencies": [
+                  "option_value_m",
+                  "shares_m"
+                ]
+              }
+            ],
+            "high": [
+              {
+                "id": "carbon_sales_m",
+                "label": "FY2024 voluntary carbon credit sales (reference issuance)",
+                "kind": "fact",
+                "value": 24.588,
+                "unit": "CAD_m",
+                "source": {
+                  "ref": "ADN.TO/investor-documents/ir-adn.to/Acadian-Annual-Report-2025-VF.pdf",
+                  "locator": "Carbon credit sales $24.588M on 752,100 credits in 2024; zero sales FY2025",
+                  "as_of": "2025-12-31",
+                  "content_sha256": "4bb4a04dfc3d993d727aeedf9dab564e999e2d0f0d50460e6866688b8387b582",
+                  "source_id": "dc3886648a97155f994d085d12d51aae527c36f9e90d551f39b4b7b78962a5c5"
+                },
+                "rationale": null
+              },
+              {
+                "id": "shares_m",
+                "label": "Common shares outstanding",
+                "kind": "fact",
+                "value": 18.619712,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "ADN.TO/investor-documents/ir-adn.to/Acadian-2026-Q1-Interim-Report.pdf",
+                  "locator": "18,619,712 common shares outstanding as at May 6, 2026",
+                  "as_of": "2026-03-31",
+                  "content_sha256": "4a5bf29a88e2c3e80f412d5147b96be8e3ed40ed8eebdd83f4a51d3aa8b20e55",
+                  "source_id": "b4ec297376042131708a63e9185b930927cdfa56dd7f04d108341597a6cc3b3c"
+                },
+                "rationale": null
+              },
+              {
+                "id": "risk_fraction",
+                "label": "Probability-weighted fraction of reference carbon/real-estate milestone value",
+                "kind": "judgment",
+                "value": 0.9996,
+                "unit": "fraction",
+                "source": null,
+                "rationale": "Base assigns zero until next verified carbon issuance; high assumes one repeat of 2024-scale sale plus modest real-estate fee ramp."
+              },
+              {
+                "id": "option_value_m",
+                "label": "Risk-adjusted carbon and real-estate option value",
+                "kind": "calculation",
+                "value": 24.5781648,
+                "unit": "CAD_m",
+                "operation": "multiply",
+                "formula": "carbon_sales_m \u00d7 risk_fraction",
+                "substituted_formula": "24.588 \u00d7 0.9996",
+                "dependencies": [
+                  "carbon_sales_m",
+                  "risk_fraction"
+                ]
+              },
+              {
+                "id": "value_per_share",
+                "label": "Carbon and real-estate option per share",
+                "kind": "calculation",
+                "value": 1.32000779,
+                "unit": "CAD_per_share",
+                "operation": "divide",
+                "formula": "option_value_m \u00f7 shares_m",
+                "substituted_formula": "24.578165 \u00f7 18.619712",
+                "dependencies": [
+                  "option_value_m",
+                  "shares_m"
+                ]
+              }
+            ]
+          },
+          "source_lineage": [
+            {
+              "node_id": "carbon_sales_m",
+              "ref": "ADN.TO/investor-documents/ir-adn.to/Acadian-Annual-Report-2025-VF.pdf",
+              "locator": "Carbon credit sales $24.588M on 752,100 credits in 2024; zero sales FY2025",
+              "as_of": "2025-12-31",
+              "content_sha256": "4bb4a04dfc3d993d727aeedf9dab564e999e2d0f0d50460e6866688b8387b582",
+              "source_id": "dc3886648a97155f994d085d12d51aae527c36f9e90d551f39b4b7b78962a5c5"
+            },
+            {
+              "node_id": "shares_m",
+              "ref": "ADN.TO/investor-documents/ir-adn.to/Acadian-2026-Q1-Interim-Report.pdf",
+              "locator": "18,619,712 common shares outstanding as at May 6, 2026",
+              "as_of": "2026-03-31",
+              "content_sha256": "4a5bf29a88e2c3e80f412d5147b96be8e3ed40ed8eebdd83f4a51d3aa8b20e55",
+              "source_id": "b4ec297376042131708a63e9185b930927cdfa56dd7f04d108341597a6cc3b3c"
+            }
+          ],
+          "checks": {
+            "passed": true,
+            "errors": []
+          },
+          "proof_hash": "c3d8f6258130dd8180b64e0e27838a42765e03ee207efc1bea718316972d7919"
+        },
+        "evidence_tier": "primary_derived",
+        "evidence_level": "primary_derived",
+        "evidence": "Primary bridge from ADN.TO/investor-documents/ir-adn.to/Acadian-Annual-Report-2025-VF.pdf: FY2025 FCF $0.37/sh, book $19.67/sh, net liquidity $17.4M, debt $110.009M; contract backfill 2026-07-21.",
+        "scenario_assumptions": "Proof outputs {'low': 0.0, 'base': 0.0, 'high': 1.32}; see calculation_proof graph.",
+        "probability_and_timing": {
+          "success_probability": null,
+          "remaining_capital_m": null,
+          "timing_basis": "No disclosed carbon issuance schedule in FY2025 filings; real-estate HBU reviews are episodic.",
+          "probability_basis": "Base zero probability until next verified Katahdin voluntary credit issuance; high case uses one repeat of the 2024 CAD 24.6M sale precedent.",
+          "remaining_capital_basis": "Project monitoring and verification costs are embedded in operating segments; no incremental owner-funded capital reserved in base case."
+        },
+        "tax_and_realization_adjustments": "Base assigns zero until next verified issuance; real-estate fees remain small.",
+        "falsifier": "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
+        "overlap_key": "carbon_and_real_estate_option",
+        "assumption_type": "judgment"
+      }
+    ],
     "rule": "Every option requires a beneficiary, probability, timing, remaining capital, failure case, and non-overlap control; absence of option value must be explicit rather than unvalued."
   },
   "committee": {
@@ -177,6 +3890,7 @@
     ],
     "routing_reasons": [
       "archetype=optionality",
+      "component categories=real_option",
       "investment_sleeve=real_assets_land",
       "explicit reviewed profile"
     ],
@@ -273,12 +3987,12 @@
     "weighting_rule": "Do not change a persona's relevance within a power zone until at least 20 attributable, dividend-aware outcomes exist there; never reweight automatically."
   },
   "attribution": {
-    "status": "waiting_for_proof_complete_baseline",
+    "status": "baseline_established",
     "current": {
-      "as_of": "2026-06-10",
-      "low": null,
-      "base": null,
-      "high": null
+      "as_of": "2026-07-21",
+      "low": 1.0007,
+      "base": 17.4308,
+      "high": 29.3191
     },
     "prior": null,
     "base_change_per_share": null,
@@ -286,7 +4000,6 @@
     "drivers": [],
     "category_totals_per_share": {},
     "unexplained_per_share": null,
-    "legacy_value_per_share": null,
-    "explanation": "A complete security value is intentionally withheld while material components are unpriced. Attribution restarts after the first proof-complete baseline."
+    "explanation": "The current component schedule is the first decision-grade baseline; attribution begins with the next dated valuation snapshot."
   }
 }

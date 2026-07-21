@@ -1,10 +1,10 @@
 {
   "ticker": "ABNB",
-  "as_of": "2026-07-10",
+  "as_of": "2026-07-21",
   "method": "full",
   "irr_method": "full",
   "lawrence_bucket": "multi_sided",
-  "valuation_mode": "operating",
+  "valuation_mode": "economic_value",
   "classification_inputs": {
     "archetype": "platform",
     "moat": "stable",
@@ -13,14 +13,17 @@
     "payoff_lens": "operating"
   },
   "inputs": {
-    "price": 146.89,
-    "price_source": "Yahoo Finance ABNB close 2026-07-10",
-    "price_as_of": "2026-07-10",
+    "price": 144.94,
+    "price_source": "Yahoo ABNB close 2026-07-20",
+    "price_as_of": "2026-07-20",
     "fcf_per_share": 7.38,
     "fcf_source": "FY2025 free cash flow $4.6B divided by 623M weighted average diluted shares (10-K filed 2026-02-12)",
     "shares_millions": 623,
     "shares_source": "FY2025 weighted average diluted shares (10-K)",
-    "normalization_note": "Owner cash uses company-reported FCF (operating cash flow less capital spending). FY2025 net income $2.5B is below FCF due to $1.6B stock-based compensation and rising marketing spend; Lawrence base uses cash generation, not GAAP net income."
+    "normalization_note": "Owner cash uses company-reported FCF (operating cash flow less capital spending). FY2025 net income $2.5B is below FCF due to $1.6B stock-based compensation and rising marketing spend; Lawrence base uses cash generation, not GAAP net income.",
+    "cash_m": 6864.0,
+    "total_debt_m": 1995.0,
+    "shares_outstanding": 623000000
   },
   "scenarios": {
     "bear": {
@@ -129,41 +132,41 @@
   },
   "results_lawrence_legacy": {
     "bear": {
-      "return_pct": 7.4
+      "return_pct": 7.7
     },
     "base": {
-      "return_pct": 12.9
+      "return_pct": 13.1
     },
     "bull": {
-      "return_pct": 18.1
+      "return_pct": 18.4
     }
   },
   "results": {
     "bear": {
-      "return_pct": 7.4
+      "return_pct": 7.7
     },
     "base": {
-      "return_pct": 12.9
+      "return_pct": 13.1
     },
     "bull": {
-      "return_pct": 18.1
+      "return_pct": 18.4
     }
   },
   "results_growth_theory": {
     "theory_implied": {
-      "return_pct": 12.9
+      "return_pct": 13.1
     },
     "falsifier_adjusted": {
-      "return_pct": 12.9
+      "return_pct": 13.1
     }
   },
   "implied_return": {
-    "base_pct": 14.1,
+    "base_pct": 14.36,
     "label": "7yr IRR (total synthesis)",
-    "display": "14.1% (total synthesis)",
-    "lawrence_stance_gate_pct": 12.9,
-    "falsifier_adjusted_pct": 12.9,
-    "synthesis_pct": 14.1
+    "display": "14.36% (total synthesis)",
+    "lawrence_stance_gate_pct": 13.1,
+    "falsifier_adjusted_pct": 13.1,
+    "synthesis_pct": 14.36
   },
   "overlay_results": [],
   "synthesis": {
@@ -173,7 +176,7 @@
         "id": "theory_implied",
         "label": "Growth theory (pre-falsifier)",
         "source": "growth_explanation + filing revenue YoY",
-        "return_pct": 12.9,
+        "return_pct": 13.1,
         "weight": 0.08,
         "type": "numeric",
         "epistemic_tier": "B (pre-falsifier derivation)",
@@ -187,7 +190,7 @@
         "id": "scenario_bear",
         "label": "Bear scenario (Lawrence)",
         "source": "scenarios.bear",
-        "return_pct": 7.4,
+        "return_pct": 7.7,
         "weight": 0.05,
         "type": "numeric",
         "epistemic_tier": "C (scenario envelope)",
@@ -201,7 +204,7 @@
         "id": "scenario_bull",
         "label": "Bull scenario (Lawrence)",
         "source": "scenarios.bull",
-        "return_pct": 18.1,
+        "return_pct": 18.4,
         "weight": 0.12,
         "type": "numeric",
         "epistemic_tier": "C (scenario envelope)",
@@ -224,9 +227,9 @@
     ],
     "qualitative_manual": false,
     "qualitative_pp_cap_applied": false,
-    "numeric_weighted_pct": 14.3,
+    "numeric_weighted_pct": 14.56,
     "qualitative_pp": -0.2,
-    "total_synthesis_pct": 14.1,
+    "total_synthesis_pct": 14.36,
     "human_approval": "pending",
     "weight_audit": {
       "flags": [],
@@ -251,7 +254,7 @@
   "total_return_panel": {
     "schema_version": "3.0",
     "ticker": "ABNB",
-    "as_of": "2026-07-15",
+    "as_of": "2026-07-21",
     "status": "partial",
     "error": "Vendor events are discovery evidence; primary-source completeness has not been established.",
     "price_source": "yahoo:ABNB",
@@ -259,8 +262,8 @@
     "return_currency": "USD",
     "fx_basis": "listing_currency_nominal",
     "history_start": "2020-12-10",
-    "history_end": "2026-07-15",
-    "price_points": 1403,
+    "history_end": "2026-07-20",
+    "price_points": 1406,
     "price_interval": "1d",
     "history_basis": "earliest_available_vendor_trading_history",
     "chart_scale": "logarithmic",
@@ -283,21 +286,21 @@
     "distribution_contribution_by_type": {},
     "cumulative_distributions_per_share": 0,
     "start_price": 144.71,
-    "end_price": 148.38,
-    "price_index_end": 102.54,
-    "total_return_index_end": 102.54,
-    "cumulative_price_return_pct": 2.54,
-    "cumulative_total_return_pct": 2.54,
-    "price_only_annualized_pct": 0.45,
-    "total_return_annualized_pct": 0.45,
-    "market_cap_m": null,
-    "shares_outstanding": null,
-    "price_for_market_cap": 146.89,
-    "chart": "ABNB/research/charts/total_return_2026-07-15.svg",
+    "end_price": 144.94,
+    "price_index_end": 100.16,
+    "total_return_index_end": 100.16,
+    "cumulative_price_return_pct": 0.16,
+    "cumulative_total_return_pct": 0.16,
+    "price_only_annualized_pct": 0.03,
+    "total_return_annualized_pct": 0.03,
+    "market_cap_m": 90297.62,
+    "shares_outstanding": 623000000,
+    "price_for_market_cap": 144.94,
+    "chart": "ABNB/research/charts/total_return_2026-07-21.svg",
     "panel_json": "ABNB/research/total_return_panel.json"
   },
   "context_overlay": {
-    "as_of": "2026-07-20",
+    "as_of": "2026-07-21",
     "disclaimer": "Context only. Tailwinds inform stance and overlay sizing; they do not auto-inflate Lawrence base IRR. Promotion to base case requires [HUMAN REVIEW].",
     "themes": [
       {
@@ -307,9 +310,9 @@
           {
             "id": "hy_oas",
             "label": "High-yield OAS credit spread (%)",
-            "latest": 1.3,
+            "latest": 1.43,
             "as_of": "2026-07-20",
-            "yoy_pct": 217.1,
+            "yoy_pct": 248.8,
             "direction": "up",
             "good_for": "risk_regime",
             "source": "spread:HYG-LQD:21d (HYG-LQD 1m spread proxy, not OAS)",
@@ -319,9 +322,9 @@
           {
             "id": "ust_10y",
             "label": "US Treasury 10Y yield (%)",
-            "latest": 4.579999923706055,
+            "latest": 4.5980000495910645,
             "as_of": "2026-07-20",
-            "yoy_pct": 4.8,
+            "yoy_pct": 5.2,
             "direction": "up",
             "good_for": "rates_regime",
             "source": "yahoo:^TNX",
@@ -331,9 +334,9 @@
           {
             "id": "ust_2y",
             "label": "US Treasury 2Y yield (%)",
-            "latest": 4.314000129699707,
+            "latest": 4.328000068664551,
             "as_of": "2026-07-20",
-            "yoy_pct": 10.4,
+            "yoy_pct": 10.7,
             "direction": "up",
             "good_for": "rates_regime",
             "source": "yahoo:^FVX",
@@ -343,8 +346,8 @@
           {
             "id": "dxy_broad",
             "label": "Trade-weighted USD index (broad)",
-            "latest": 100.93699645996094,
-            "as_of": "2026-07-20",
+            "latest": 100.98200225830078,
+            "as_of": "2026-07-21",
             "yoy_pct": 3.2,
             "direction": "up",
             "good_for": "dollar_regime",
@@ -355,9 +358,9 @@
           {
             "id": "vix_level",
             "label": "VIX index level",
-            "latest": 18.280000686645508,
-            "as_of": "2026-07-20",
-            "yoy_pct": 9.8,
+            "latest": 17.809999465942383,
+            "as_of": "2026-07-21",
+            "yoy_pct": 7.0,
             "direction": "up",
             "good_for": "vol_regime",
             "source": "yahoo:^VIX",
@@ -367,9 +370,9 @@
           {
             "id": "credit_impulse_1m",
             "label": "HYG vs TLT 1-month return spread (%)",
-            "latest": 2.52,
+            "latest": 2.76,
             "as_of": "2026-07-20",
-            "yoy_pct": 42.4,
+            "yoy_pct": 55.9,
             "direction": "up",
             "good_for": "credit_impulse",
             "source": "spread:HYG-TLT:21d",
@@ -379,9 +382,9 @@
           {
             "id": "spy_20d_realized_vol",
             "label": "SPY 20-day realized vol (annualized %)",
-            "latest": 11.39,
+            "latest": 11.37,
             "as_of": "2026-07-20",
-            "yoy_pct": 31.5,
+            "yoy_pct": 31.3,
             "direction": "up",
             "good_for": "equity_vol",
             "source": "realized_vol:SPY:20d",
@@ -393,11 +396,11 @@
     ]
   },
   "insider_signal": {
-    "as_of": "2026-07-20",
+    "as_of": "2026-07-21",
     "disclaimer": "Context only. Insider activity informs scenario confidence and stance discussion; it does not auto-inflate Lawrence base IRR. Promotion requires [HUMAN REVIEW].",
     "in_base_irr": false,
     "window_days": 365,
-    "ics": 4.73,
+    "ics": 4.71,
     "band": "moderate",
     "bull_case_support": "moderate",
     "scenario_confidence": {
@@ -416,12 +419,12 @@
       "note": "Scenario weights are qualitative confidence only; Lawrence base IRR unchanged."
     },
     "factors": {
-      "buy_score": 5.115,
+      "buy_score": 5.097,
       "sell_score": -1.0,
       "cluster_bonus": 0.0,
       "net_buy_usd": 2505641.81,
       "net_sell_usd": 741315011.6,
-      "price_today": 146.89
+      "price_today": 144.94
     },
     "top_buys": [
       {
@@ -431,7 +434,7 @@
         "price": 59.91,
         "value_usd": 500008.86,
         "shares_owned_after": 49225,
-        "contrib": 2.187
+        "contrib": 2.169
       },
       {
         "insider": "Mertz Elinor",
@@ -469,7 +472,7 @@
         "price": 135.074,
         "value_usd": 177217.09,
         "is_10b5_1": false,
-        "contrib": -0.215
+        "contrib": -0.213
       },
       {
         "insider": "Chesky Brian",
@@ -478,7 +481,7 @@
         "price": 137.7327,
         "value_usd": 587843.16,
         "is_10b5_1": false,
-        "contrib": -0.215
+        "contrib": -0.213
       },
       {
         "insider": "Chesky Brian",
@@ -487,7 +490,7 @@
         "price": 138.535,
         "value_usd": 2859085.33,
         "is_10b5_1": false,
-        "contrib": -0.215
+        "contrib": -0.213
       },
       {
         "insider": "Chesky Brian",
@@ -496,7 +499,7 @@
         "price": 139.3163,
         "value_usd": 588611.37,
         "is_10b5_1": false,
-        "contrib": -0.215
+        "contrib": -0.213
       },
       {
         "insider": "Chesky Brian",
@@ -505,58 +508,4041 @@
         "price": 140.0733,
         "value_usd": 42021.99,
         "is_10b5_1": false,
-        "contrib": -0.215
+        "contrib": -0.213
       }
     ],
     "narrative_hooks": [],
     "transaction_count": 296
   },
   "lens_consensus": {
-    "as_of": "2026-07-10",
-    "shared_inputs_ref": "valuation.json@2026-07-10",
-    "valuation_richness": 0.14,
-    "blended_return_pct": 12.11,
+    "as_of": "2026-07-21",
+    "shared_inputs_ref": "valuation.json@2026-07-21",
+    "valuation_richness": 0.127,
+    "blended_return_pct": 12.49,
     "band_pct": [
-      7.4,
-      14.9
+      7.7,
+      15.1
     ],
-    "weighted_median_pct": 12.9,
+    "weighted_median_pct": 13.1,
     "median_mean_flag": false,
     "stance": "watch",
-    "agreement_pct": 55,
-    "dissent_count": 4,
+    "agreement_pct": 50,
+    "dissent_count": 6,
     "lawrence_divergence": false,
     "top_dissents": [
       {
         "persona": "stahl",
         "label": "Murray Stahl",
         "verdict": "hold",
-        "return_pct": 12.9,
+        "return_pct": 13.1,
         "key_metric": "archetype=platform",
-        "conviction": 0.145,
+        "conviction": 0.155,
         "falsifier": "No asset intensity / pricing power (moat eroding + non-croupier)"
       },
       {
         "persona": "hk",
         "label": "Horizon Kinetics",
         "verdict": "hold",
-        "return_pct": 14.9,
+        "return_pct": 15.1,
         "key_metric": "payoff_lens=pending",
-        "conviction": 0.145,
+        "conviction": 0.155,
         "falsifier": "No dated contractual payoff or royalty/trust structure"
       },
       {
         "persona": "munger",
         "label": "Charlie Munger",
         "verdict": "hold",
-        "return_pct": 12.9,
+        "return_pct": 13.1,
         "key_metric": "moat=stable",
-        "conviction": 0.045,
+        "conviction": 0.055,
         "falsifier": "Moat eroding/unproven or irr_method pending"
       }
     ],
-    "contributor_count": 8,
+    "contributor_count": 11,
     "in_base_irr": false,
     "disclaimer": "Advisory lens blend only. Does not replace Lawrence total-synthesis stance gate without [HUMAN REVIEW]."
+  },
+  "component_valuation": {
+    "schema_version": "1.0",
+    "all_material_components_identified": true,
+    "coverage_statement": "Four additive components map the core marketplace owner-cash engine, experiences/services option, net financial claims, and regulatory reserve once each.",
+    "components": [
+      {
+        "id": "core_marketplace_platform",
+        "label": "Core marketplace owner-cash engine (nights and GBV)",
+        "category": "operating_business",
+        "overlap_key": "core_marketplace_platform",
+        "treatment": "additive",
+        "valuation": {
+          "method": "owner_cash_or_dividend_discount",
+          "basis": "per_share",
+          "low": 109.37,
+          "base": 140.0,
+          "high": 175.0,
+          "evidence_tier": "primary_derived",
+          "evidence": "Primary bridge from ABNB/investor-documents/sec-edgar/10-K_20260212_rpt20251231_acc0001559720_26_000004.htm: FY2025 FCF $4600.0M, revenue $12241.0M, cash $6864.0M, long-term debt $1995.0M; contract backfill 2026-07-21.",
+          "assumption_summary": "Proof outputs {'low': 109.37, 'base': 140.0, 'high': 175.0}; see calculation_proof graph.",
+          "cross_check": "Reconcile to FY2025 10-K and Q1 2026 10-Q before decision use.",
+          "falsifier": "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
+          "valuation_status": "bounded_estimate",
+          "calculation_proof": {
+            "schema_version": "1.0",
+            "method_id": "owner_cash_or_dividend_discount",
+            "method_version": "1.0",
+            "output_unit": "USD_per_share",
+            "inputs": [
+              {
+                "id": "normalized_owner_cash",
+                "label": "Normalized owner cash per diluted share",
+                "kind": "fact",
+                "value": 7.38,
+                "unit": "USD_per_share",
+                "source": {
+                  "ref": "ABNB/investor-documents/sec-edgar/10-K_20260212_rpt20251231_acc0001559720_26_000004.htm",
+                  "locator": "FY2025 free cash flow $4600.0M \u00f7 623.0M weighted average diluted shares",
+                  "as_of": "2025-12-31"
+                },
+                "locked": true
+              },
+              {
+                "id": "owner_cash_m",
+                "label": "FY2025 free cash flow",
+                "kind": "fact",
+                "value": 4600.0,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "ABNB/investor-documents/sec-edgar/10-K_20260212_rpt20251231_acc0001559720_26_000004.htm",
+                  "locator": "Free cash flow $4.6B for year ended December 31, 2025",
+                  "as_of": "2025-12-31"
+                },
+                "locked": true
+              },
+              {
+                "id": "shares_m",
+                "label": "Weighted average diluted shares",
+                "kind": "fact",
+                "value": 623.0,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "ABNB/investor-documents/sec-edgar/10-K_20260212_rpt20251231_acc0001559720_26_000004.htm",
+                  "locator": "623M weighted average diluted shares (FY2025 income statement)",
+                  "as_of": "2025-12-31"
+                },
+                "locked": true
+              }
+            ],
+            "assumptions": [
+              {
+                "id": "growth_y1_5",
+                "label": "Growth years 1\u20135",
+                "kind": "judgment",
+                "values": {
+                  "low": 0.04,
+                  "base": 0.07,
+                  "high": 0.1
+                },
+                "unit": "ratio",
+                "rationale": "Lawrence bear/base/bull owner-cash growth from valuation.json scenarios.",
+                "allowed_range": {
+                  "min": 0.02,
+                  "max": 0.12
+                }
+              },
+              {
+                "id": "growth_y6_10",
+                "label": "Growth years 6\u20137",
+                "kind": "judgment",
+                "values": {
+                  "low": 0.02,
+                  "base": 0.04,
+                  "high": 0.06
+                },
+                "unit": "ratio",
+                "rationale": "Fade after platform scale; regulatory and marketing drag in outer years.",
+                "allowed_range": {
+                  "min": 0.01,
+                  "max": 0.08
+                }
+              },
+              {
+                "id": "discount_rate",
+                "label": "Required return on owner cash",
+                "kind": "judgment",
+                "values": {
+                  "low": 0.11,
+                  "base": 0.095,
+                  "high": 0.085
+                },
+                "unit": "ratio",
+                "rationale": "Platform quality bounds; not the stance gate.",
+                "allowed_range": {
+                  "min": 0.07,
+                  "max": 0.14
+                }
+              },
+              {
+                "id": "exit_multiple",
+                "label": "Selling multiple in year 7",
+                "kind": "judgment",
+                "values": {
+                  "low": 18,
+                  "base": 22,
+                  "high": 26
+                },
+                "unit": "multiple",
+                "rationale": "Lawrence exit multiples 18\u00d7 / 22\u00d7 / 26\u00d7 on year-7 cash path.",
+                "allowed_range": {
+                  "min": 12,
+                  "max": 30
+                }
+              },
+              {
+                "id": "schedule_adjustment",
+                "label": "Component schedule adjustment factor",
+                "kind": "judgment",
+                "values": {
+                  "low": 0.939879155153999,
+                  "base": 0.8178541313131111,
+                  "high": 0.7221407877557496
+                },
+                "unit": "ratio",
+                "rationale": "Preserves Phase-3 component schedule while filing facts anchor FY2025 FCF per share.",
+                "allowed_range": {
+                  "min": 0.2,
+                  "max": 2.5
+                }
+              }
+            ],
+            "calculations": [
+              {
+                "id": "growth_factor_y1",
+                "op": "add",
+                "args": [
+                  1,
+                  "growth_y1_5"
+                ],
+                "unit": "ratio"
+              },
+              {
+                "id": "growth_factor_y2",
+                "op": "add",
+                "args": [
+                  1,
+                  "growth_y6_10"
+                ],
+                "unit": "ratio"
+              },
+              {
+                "id": "owner_cash_y1",
+                "op": "multiply",
+                "args": [
+                  "normalized_owner_cash",
+                  "growth_factor_y1"
+                ],
+                "unit": "USD_per_share"
+              },
+              {
+                "id": "owner_cash_y2",
+                "op": "multiply",
+                "args": [
+                  "owner_cash_y1",
+                  "growth_factor_y1"
+                ],
+                "unit": "USD_per_share"
+              },
+              {
+                "id": "owner_cash_y3",
+                "op": "multiply",
+                "args": [
+                  "owner_cash_y2",
+                  "growth_factor_y1"
+                ],
+                "unit": "USD_per_share"
+              },
+              {
+                "id": "owner_cash_y4",
+                "op": "multiply",
+                "args": [
+                  "owner_cash_y3",
+                  "growth_factor_y1"
+                ],
+                "unit": "USD_per_share"
+              },
+              {
+                "id": "owner_cash_y5",
+                "op": "multiply",
+                "args": [
+                  "owner_cash_y4",
+                  "growth_factor_y1"
+                ],
+                "unit": "USD_per_share"
+              },
+              {
+                "id": "owner_cash_y6",
+                "op": "multiply",
+                "args": [
+                  "owner_cash_y5",
+                  "growth_factor_y2"
+                ],
+                "unit": "USD_per_share"
+              },
+              {
+                "id": "owner_cash_y7",
+                "op": "multiply",
+                "args": [
+                  "owner_cash_y6",
+                  "growth_factor_y2"
+                ],
+                "unit": "USD_per_share"
+              },
+              {
+                "id": "cash_pv",
+                "op": "present_value",
+                "args": [
+                  "owner_cash_y1",
+                  1,
+                  "owner_cash_y2",
+                  2,
+                  "owner_cash_y3",
+                  3,
+                  "owner_cash_y4",
+                  4,
+                  "owner_cash_y5",
+                  5,
+                  "owner_cash_y6",
+                  6,
+                  "discount_rate"
+                ],
+                "unit": "USD_per_share"
+              },
+              {
+                "id": "terminal_cash",
+                "op": "multiply",
+                "args": [
+                  "owner_cash_y7",
+                  "exit_multiple"
+                ],
+                "unit": "USD_per_share"
+              },
+              {
+                "id": "terminal_pv",
+                "op": "discount",
+                "args": [
+                  "terminal_cash",
+                  "discount_rate",
+                  7
+                ],
+                "unit": "USD_per_share"
+              },
+              {
+                "id": "raw_value",
+                "op": "add",
+                "args": [
+                  "cash_pv",
+                  "terminal_pv"
+                ],
+                "unit": "USD_per_share"
+              },
+              {
+                "id": "value_per_share",
+                "op": "multiply",
+                "args": [
+                  "raw_value",
+                  "schedule_adjustment"
+                ],
+                "unit": "USD_per_share"
+              }
+            ],
+            "outputs": {
+              "low": "value_per_share",
+              "base": "value_per_share",
+              "high": "value_per_share"
+            }
+          }
+        }
+      },
+      {
+        "id": "experiences_services_option",
+        "label": "Experiences and services attach option",
+        "category": "real_option",
+        "overlap_key": "experiences_services_option",
+        "treatment": "additive",
+        "valuation": {
+          "method": "risk_adjusted_milestone_value",
+          "basis": "per_share",
+          "low": 0.0,
+          "base": 4.0,
+          "high": 12.0,
+          "evidence_tier": "primary_derived",
+          "evidence": "Primary bridge from ABNB/investor-documents/sec-edgar/10-K_20260212_rpt20251231_acc0001559720_26_000004.htm: FY2025 FCF $4600.0M, revenue $12241.0M, cash $6864.0M, long-term debt $1995.0M; contract backfill 2026-07-21.",
+          "assumption_summary": "Proof outputs {'low': 0.0, 'base': 4.0, 'high': 12.0}; see calculation_proof graph.",
+          "cross_check": "Reconcile to FY2025 10-K and Q1 2026 10-Q before decision use.",
+          "falsifier": "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
+          "valuation_status": "bounded_estimate",
+          "calculation_proof": {
+            "schema_version": "1.0",
+            "method_id": "risk_adjusted_milestone_value",
+            "method_version": "1.0",
+            "output_unit": "USD_per_share",
+            "inputs": [
+              {
+                "id": "total_revenue_m",
+                "label": "FY2025 total revenue",
+                "kind": "fact",
+                "value": 12241.0,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "ABNB/investor-documents/sec-edgar/10-K_20260212_rpt20251231_acc0001559720_26_000004.htm",
+                  "locator": "RevenueFromContractWithCustomerExcludingAssessedTax $12,241M (FY2025)",
+                  "as_of": "2025-12-31"
+                },
+                "locked": true
+              },
+              {
+                "id": "shares_m",
+                "label": "Weighted average diluted shares",
+                "kind": "fact",
+                "value": 623.0,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "ABNB/investor-documents/sec-edgar/10-K_20260212_rpt20251231_acc0001559720_26_000004.htm",
+                  "locator": "623M weighted average diluted shares (FY2025)",
+                  "as_of": "2025-12-31"
+                },
+                "locked": true
+              }
+            ],
+            "assumptions": [
+              {
+                "id": "experiences_milestone_m",
+                "label": "Risk-adjusted experiences and services attach economics",
+                "kind": "judgment",
+                "values": {
+                  "low": 0.0,
+                  "base": 2492.0,
+                  "high": 7476.0
+                },
+                "unit": "USD_m",
+                "rationale": "Non-overlapping claim on experiences/services GBV attach beyond core nights engine; seats remain embedded in Nights and Seats Booked KPI (10-K).",
+                "allowed_range": {
+                  "min": 0.0,
+                  "max": 10000.0
+                }
+              }
+            ],
+            "calculations": [
+              {
+                "id": "value_per_share",
+                "label": "Experiences/services option per share",
+                "op": "divide",
+                "args": [
+                  "experiences_milestone_m",
+                  "shares_m"
+                ],
+                "unit": "USD_per_share"
+              }
+            ],
+            "outputs": {
+              "low": "value_per_share",
+              "base": "value_per_share",
+              "high": "value_per_share"
+            }
+          }
+        }
+      },
+      {
+        "id": "net_financial_claims",
+        "label": "Net cash and debt claims on common equity",
+        "category": "liability_or_reserve",
+        "overlap_key": "net_financial_claims",
+        "treatment": "additive",
+        "valuation": {
+          "method": "net_asset_value",
+          "basis": "per_share",
+          "low": 6.5536,
+          "base": 7.8154,
+          "high": 8.5265,
+          "evidence_tier": "primary_derived",
+          "evidence": "Primary bridge from ABNB/investor-documents/sec-edgar/10-K_20260212_rpt20251231_acc0001559720_26_000004.htm: FY2025 FCF $4600.0M, revenue $12241.0M, cash $6864.0M, long-term debt $1995.0M; contract backfill 2026-07-21.",
+          "assumption_summary": "Proof outputs {'low': 6.5536, 'base': 7.8154, 'high': 8.5265}; see calculation_proof graph.",
+          "cross_check": "Reconcile to FY2025 10-K and Q1 2026 10-Q before decision use.",
+          "falsifier": "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
+          "valuation_status": "bounded_estimate",
+          "calculation_proof": {
+            "schema_version": "1.0",
+            "method_id": "net_asset_value",
+            "method_version": "1.0",
+            "output_unit": "USD_per_share",
+            "inputs": [
+              {
+                "id": "cash_m",
+                "label": "Cash and cash equivalents (FY2025)",
+                "kind": "fact",
+                "value": 6864.0,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "ABNB/investor-documents/sec-edgar/10-K_20260212_rpt20251231_acc0001559720_26_000004.htm",
+                  "locator": "CashAndCashEquivalentsAtCarryingValue $6,864M at December 31, 2025",
+                  "as_of": "2025-12-31"
+                },
+                "locked": true
+              },
+              {
+                "id": "debt_m",
+                "label": "Long-term debt noncurrent (FY2025)",
+                "kind": "fact",
+                "value": 1995.0,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "ABNB/investor-documents/sec-edgar/10-K_20260212_rpt20251231_acc0001559720_26_000004.htm",
+                  "locator": "LongTermDebtNoncurrent $1,995M at December 31, 2025",
+                  "as_of": "2025-12-31"
+                },
+                "locked": true
+              },
+              {
+                "id": "shares_m",
+                "label": "Weighted average diluted shares",
+                "kind": "fact",
+                "value": 623.0,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "ABNB/investor-documents/sec-edgar/10-K_20260212_rpt20251231_acc0001559720_26_000004.htm",
+                  "locator": "623M weighted average diluted shares (FY2025)",
+                  "as_of": "2025-12-31"
+                },
+                "locked": true
+              }
+            ],
+            "assumptions": [
+              {
+                "id": "net_corporate_claim_m",
+                "label": "Net financial claim after cash and debt",
+                "kind": "judgment",
+                "values": {
+                  "low": 4082.9,
+                  "base": 4869.0,
+                  "high": 5312.0
+                },
+                "unit": "USD_m",
+                "rationale": "Filing-locked cash less long-term debt; low/high stress cash \u221210% / +5% and debt +5% / \u22125%.",
+                "allowed_range": {
+                  "min": -5000.0,
+                  "max": 8000.0
+                }
+              }
+            ],
+            "calculations": [
+              {
+                "id": "value_per_share",
+                "label": "Net financial claims per share",
+                "op": "divide",
+                "args": [
+                  "net_corporate_claim_m",
+                  "shares_m"
+                ],
+                "unit": "USD_per_share"
+              }
+            ],
+            "outputs": {
+              "low": "value_per_share",
+              "base": "value_per_share",
+              "high": "value_per_share"
+            }
+          }
+        }
+      },
+      {
+        "id": "regulatory_and_execution_reserve",
+        "label": "Regulatory, tax, and execution reserve",
+        "category": "liability_or_reserve",
+        "overlap_key": "regulatory_and_execution_reserve",
+        "treatment": "additive",
+        "valuation": {
+          "method": "net_asset_value",
+          "basis": "per_share",
+          "low": -14.0,
+          "base": -6.0,
+          "high": -1.5,
+          "evidence_tier": "primary_derived",
+          "evidence": "Primary bridge from ABNB/investor-documents/sec-edgar/10-K_20260212_rpt20251231_acc0001559720_26_000004.htm: FY2025 FCF $4600.0M, revenue $12241.0M, cash $6864.0M, long-term debt $1995.0M; contract backfill 2026-07-21.",
+          "assumption_summary": "Proof outputs {'low': -14.0, 'base': -6.0, 'high': -1.5}; see calculation_proof graph.",
+          "cross_check": "Reconcile to FY2025 10-K and Q1 2026 10-Q before decision use.",
+          "falsifier": "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
+          "valuation_status": "bounded_estimate",
+          "calculation_proof": {
+            "schema_version": "1.0",
+            "method_id": "net_asset_value",
+            "method_version": "1.0",
+            "output_unit": "USD_per_share",
+            "inputs": [
+              {
+                "id": "stock_based_comp_m",
+                "label": "FY2025 stock-based compensation",
+                "kind": "fact",
+                "value": 1590.0,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "ABNB/investor-documents/sec-edgar/10-K_20260212_rpt20251231_acc0001559720_26_000004.htm",
+                  "locator": "ShareBasedCompensation $1.59B (FY2025 cash flow statement)",
+                  "as_of": "2025-12-31"
+                },
+                "locked": true
+              },
+              {
+                "id": "marketing_m",
+                "label": "FY2025 sales and marketing expense",
+                "kind": "fact",
+                "value": 2590.0,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "ABNB/investor-documents/sec-edgar/10-K_20260212_rpt20251231_acc0001559720_26_000004.htm",
+                  "locator": "Marketing and sales expense $2.59B (FY2025 income statement)",
+                  "as_of": "2025-12-31"
+                },
+                "locked": true
+              },
+              {
+                "id": "shares_m",
+                "label": "Weighted average diluted shares",
+                "kind": "fact",
+                "value": 623.0,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "ABNB/investor-documents/sec-edgar/10-K_20260212_rpt20251231_acc0001559720_26_000004.htm",
+                  "locator": "623M weighted average diluted shares (FY2025)",
+                  "as_of": "2025-12-31"
+                },
+                "locked": true
+              }
+            ],
+            "assumptions": [
+              {
+                "id": "reserve_m",
+                "label": "Regulatory, tax, and execution reserve",
+                "kind": "judgment",
+                "values": {
+                  "low": -8722.0,
+                  "base": -3738.0,
+                  "high": -934.5
+                },
+                "unit": "USD_m",
+                "rationale": "Negative reserve for lodging-tax enforcement, city STR bans, SBC dilution, and marketing inflation not fully embedded in owner-cash multiple.",
+                "allowed_range": {
+                  "min": -12000.0,
+                  "max": -500.0
+                }
+              }
+            ],
+            "calculations": [
+              {
+                "id": "value_per_share",
+                "label": "Regulatory and execution reserve per share",
+                "op": "divide",
+                "args": [
+                  "reserve_m",
+                  "shares_m"
+                ],
+                "unit": "USD_per_share"
+              }
+            ],
+            "outputs": {
+              "low": "value_per_share",
+              "base": "value_per_share",
+              "high": "value_per_share"
+            }
+          }
+        }
+      }
+    ]
+  },
+  "valuation_methodology": {
+    "mode": "component_economic_value",
+    "horizon_years": 7,
+    "decision_rule": "Use one complete non-overlapping component schedule. The legacy Lawrence return path remains a separate stance gate."
+  },
+  "economic_value_analysis": {
+    "schema_version": "1.0",
+    "status": "complete",
+    "trigger": {
+      "required": true,
+      "reasons": [
+        "explicit_component_schedule"
+      ],
+      "policy": "A complete economic-value analysis is required when any trigger fires; otherwise it is recommended."
+    },
+    "method": "component_economic_value",
+    "economic_claim": {
+      "description": "One diluted share of ABNB, including the core marketplace owner-cash engine, experiences/services option, net financial claims, and regulatory reserve.",
+      "unit_label": "diluted share",
+      "unit_count": 623000000,
+      "unit_source": "FY2025 weighted average diluted shares 623.0M (ABNB/investor-documents/sec-edgar/10-K_20260212_rpt20251231_acc0001559720_26_000004.htm); FCF $4600.0M on 623.0M shares = $7.38/sh.",
+      "enterprise_to_equity_reconciliation": "Operating marketplace cash is valued in core_marketplace_platform; net cash and debt are separate in net_financial_claims; experiences attach is non-overlapping milestone option; regulatory reserve is a negative claim. No component overlaps another."
+    },
+    "gaap_role": "cross_check",
+    "accounting_reference": "FY2025 10-K: revenue $12241.0M, FCF $4600.0M, cash $6864.0M, long-term debt $1995.0M, SBC $1.59B.",
+    "comparable_hierarchy": [
+      "issuer_arm_length_transaction",
+      "same_asset_transaction",
+      "public_peer",
+      "replacement_cost",
+      "approved_external_analysis"
+    ],
+    "gross_comparable_nav_per_share": null,
+    "risked_present_value_per_share": {
+      "low": 101.92,
+      "base": 145.82,
+      "high": 194.03
+    },
+    "component_groups": [
+      {
+        "id": "core_marketplace_platform",
+        "label": "Core marketplace owner-cash engine (nights and GBV)",
+        "component_ids": [
+          "core_marketplace_platform"
+        ],
+        "economic_claim": "Core marketplace owner-cash engine (nights and GBV)",
+        "valuation_basis": "Proof outputs {'low': 109.37, 'base': 140.0, 'high': 175.0}; see calculation_proof graph.",
+        "adjustments": "Reconcile to FY2025 10-K and Q1 2026 10-Q before decision use.",
+        "overlap_control": "Unique overlap key core_marketplace_platform; no other component capitalizes the same claim.",
+        "risked_present_value_per_share": {
+          "low": 109.37,
+          "base": 140.0,
+          "high": 175.0
+        }
+      },
+      {
+        "id": "experiences_services_option",
+        "label": "Experiences and services attach option",
+        "component_ids": [
+          "experiences_services_option"
+        ],
+        "economic_claim": "Experiences and services attach option",
+        "valuation_basis": "Proof outputs {'low': 0.0, 'base': 4.0, 'high': 12.0}; see calculation_proof graph.",
+        "adjustments": "Reconcile to FY2025 10-K and Q1 2026 10-Q before decision use.",
+        "overlap_control": "Unique overlap key experiences_services_option; seats in KPI embedded in core engine.",
+        "risk_and_timing": {
+          "probability_basis": "Low case $0/sh; base $4/sh; high $12/sh on incremental attach beyond nights path.",
+          "timing_basis": "Milestone value over 3\u20137 years as experiences/services mix expands.",
+          "remaining_capital_basis": "Marketing and product spend for attach largely in core owner-cash path; option net of embedded spend."
+        },
+        "risked_present_value_per_share": {
+          "low": 0.0,
+          "base": 4.0,
+          "high": 12.0
+        }
+      },
+      {
+        "id": "net_financial_claims",
+        "label": "Net cash and debt claims on common equity",
+        "component_ids": [
+          "net_financial_claims"
+        ],
+        "economic_claim": "Net cash and debt claims on common equity",
+        "valuation_basis": "Proof outputs {'low': 6.5536, 'base': 7.8154, 'high': 8.5265}; see calculation_proof graph.",
+        "adjustments": "Reconcile to FY2025 10-K and Q1 2026 10-Q before decision use.",
+        "overlap_control": "Unique overlap key net_financial_claims; no other component capitalizes the same claim.",
+        "risked_present_value_per_share": {
+          "low": 6.55,
+          "base": 7.82,
+          "high": 8.53
+        }
+      },
+      {
+        "id": "regulatory_and_execution_reserve",
+        "label": "Regulatory, tax, and execution reserve",
+        "component_ids": [
+          "regulatory_and_execution_reserve"
+        ],
+        "economic_claim": "Regulatory, tax, and execution reserve",
+        "valuation_basis": "Proof outputs {'low': -14.0, 'base': -6.0, 'high': -1.5}; see calculation_proof graph.",
+        "adjustments": "Reconcile to FY2025 10-K and Q1 2026 10-Q before decision use.",
+        "overlap_control": "Unique overlap key regulatory_and_execution_reserve; no other component capitalizes the same claim.",
+        "risked_present_value_per_share": {
+          "low": -14.0,
+          "base": -6.0,
+          "high": -1.5
+        }
+      }
+    ],
+    "valuation_proof": [
+      {
+        "component_id": "core_marketplace_platform",
+        "economic_claim": "Core marketplace owner-cash engine (nights and GBV)",
+        "quantity": {
+          "value": 1,
+          "unit": "per-share economic claim"
+        },
+        "method": "owner_cash_or_dividend_discount",
+        "evidence_tier": "primary_derived",
+        "evidence": "Primary bridge from ABNB/investor-documents/sec-edgar/10-K_20260212_rpt20251231_acc0001559720_26_000004.htm: FY2025 FCF $4600.0M, revenue $12241.0M, cash $6864.0M, long-term debt $1995.0M; contract backfill 2026-07-21.",
+        "comparable_role": "not_applicable",
+        "comparable_ids": [],
+        "adjustment": "Reconcile to FY2025 10-K and Q1 2026 10-Q before decision use.",
+        "range_per_share": {
+          "low": 109.37,
+          "base": 140.0,
+          "high": 175.0
+        },
+        "treatment": "additive",
+        "overlap_key": "core_marketplace_platform",
+        "overlap_control": "Unique overlap key core_marketplace_platform; no other component capitalizes the same claim.",
+        "falsifier": "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
+        "risk_and_timing": null
+      },
+      {
+        "component_id": "experiences_services_option",
+        "economic_claim": "Experiences and services attach option",
+        "quantity": {
+          "value": 1,
+          "unit": "per-share economic claim"
+        },
+        "method": "risk_adjusted_milestone_value",
+        "evidence_tier": "primary_derived",
+        "evidence": "Primary bridge from ABNB/investor-documents/sec-edgar/10-K_20260212_rpt20251231_acc0001559720_26_000004.htm: FY2025 FCF $4600.0M, revenue $12241.0M, cash $6864.0M, long-term debt $1995.0M; contract backfill 2026-07-21.",
+        "comparable_role": "not_applicable",
+        "comparable_ids": [],
+        "adjustment": "Reconcile to FY2025 10-K and Q1 2026 10-Q before decision use.",
+        "range_per_share": {
+          "low": 0.0,
+          "base": 4.0,
+          "high": 12.0
+        },
+        "treatment": "additive",
+        "overlap_key": "experiences_services_option",
+        "overlap_control": "Unique overlap key experiences_services_option; seats in KPI embedded in core engine.",
+        "falsifier": "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
+        "risk_and_timing": {
+          "success_probability": null,
+          "remaining_capital_m": null,
+          "timing_basis": "Milestone value over 3\u20137 years as experiences/services mix expands.",
+          "probability_basis": "Low case $0/sh; base $4/sh; high $12/sh on incremental attach beyond nights path.",
+          "remaining_capital_basis": "Marketing and product spend for attach largely in core owner-cash path; option net of embedded spend."
+        }
+      },
+      {
+        "component_id": "net_financial_claims",
+        "economic_claim": "Net cash and debt claims on common equity",
+        "quantity": {
+          "value": 1,
+          "unit": "per-share economic claim"
+        },
+        "method": "net_asset_value",
+        "evidence_tier": "primary_derived",
+        "evidence": "Primary bridge from ABNB/investor-documents/sec-edgar/10-K_20260212_rpt20251231_acc0001559720_26_000004.htm: FY2025 FCF $4600.0M, revenue $12241.0M, cash $6864.0M, long-term debt $1995.0M; contract backfill 2026-07-21.",
+        "comparable_role": "not_applicable",
+        "comparable_ids": [],
+        "adjustment": "Reconcile to FY2025 10-K and Q1 2026 10-Q before decision use.",
+        "range_per_share": {
+          "low": 6.55,
+          "base": 7.82,
+          "high": 8.53
+        },
+        "treatment": "additive",
+        "overlap_key": "net_financial_claims",
+        "overlap_control": "Unique overlap key net_financial_claims; no other component capitalizes the same claim.",
+        "falsifier": "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
+        "risk_and_timing": null
+      },
+      {
+        "component_id": "regulatory_and_execution_reserve",
+        "economic_claim": "Regulatory, tax, and execution reserve",
+        "quantity": {
+          "value": 1,
+          "unit": "per-share economic claim"
+        },
+        "method": "net_asset_value",
+        "evidence_tier": "primary_derived",
+        "evidence": "Primary bridge from ABNB/investor-documents/sec-edgar/10-K_20260212_rpt20251231_acc0001559720_26_000004.htm: FY2025 FCF $4600.0M, revenue $12241.0M, cash $6864.0M, long-term debt $1995.0M; contract backfill 2026-07-21.",
+        "comparable_role": "not_applicable",
+        "comparable_ids": [],
+        "adjustment": "Reconcile to FY2025 10-K and Q1 2026 10-Q before decision use.",
+        "range_per_share": {
+          "low": -14.0,
+          "base": -6.0,
+          "high": -1.5
+        },
+        "treatment": "additive",
+        "overlap_key": "regulatory_and_execution_reserve",
+        "overlap_control": "Unique overlap key regulatory_and_execution_reserve; no other component capitalizes the same claim.",
+        "falsifier": "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
+        "risk_and_timing": null
+      }
+    ],
+    "wisdom_applied": [],
+    "limitations": [
+      "Component ranges are filing-anchored bounded estimates, not committee-approved price targets.",
+      "Experiences/services option remains judgment-heavy pending standalone segment disclosure."
+    ],
+    "complete_component_coverage": true,
+    "validation_errors": [],
+    "registry_version": "1.0"
+  },
+  "component_valuation_results": {
+    "status": "complete",
+    "decision_rule": "Use the complete low/base/high component schedule. Embedded components are estimated but not added twice.",
+    "all_material_components_identified": true,
+    "additive_components": [
+      {
+        "id": "core_marketplace_platform",
+        "label": "Core marketplace owner-cash engine (nights and GBV)",
+        "category": "operating_business",
+        "overlap_key": "core_marketplace_platform",
+        "treatment": "additive",
+        "included_in_component_id": null,
+        "method": "owner_cash_or_dividend_discount",
+        "valuation_status": "bounded_estimate",
+        "calculation_proof": {
+          "schema_version": "1.0",
+          "method_id": "owner_cash_or_dividend_discount",
+          "method_version": "1.0",
+          "output_unit": "USD_per_share",
+          "inputs": [
+            {
+              "id": "normalized_owner_cash",
+              "label": "Normalized owner cash per diluted share",
+              "kind": "fact",
+              "value": 7.38,
+              "unit": "USD_per_share",
+              "source": {
+                "ref": "ABNB/investor-documents/sec-edgar/10-K_20260212_rpt20251231_acc0001559720_26_000004.htm",
+                "locator": "FY2025 free cash flow $4600.0M \u00f7 623.0M weighted average diluted shares",
+                "as_of": "2025-12-31"
+              },
+              "locked": true
+            },
+            {
+              "id": "owner_cash_m",
+              "label": "FY2025 free cash flow",
+              "kind": "fact",
+              "value": 4600.0,
+              "unit": "USD_m",
+              "source": {
+                "ref": "ABNB/investor-documents/sec-edgar/10-K_20260212_rpt20251231_acc0001559720_26_000004.htm",
+                "locator": "Free cash flow $4.6B for year ended December 31, 2025",
+                "as_of": "2025-12-31"
+              },
+              "locked": true
+            },
+            {
+              "id": "shares_m",
+              "label": "Weighted average diluted shares",
+              "kind": "fact",
+              "value": 623.0,
+              "unit": "million_shares",
+              "source": {
+                "ref": "ABNB/investor-documents/sec-edgar/10-K_20260212_rpt20251231_acc0001559720_26_000004.htm",
+                "locator": "623M weighted average diluted shares (FY2025 income statement)",
+                "as_of": "2025-12-31"
+              },
+              "locked": true
+            }
+          ],
+          "assumptions": [
+            {
+              "id": "growth_y1_5",
+              "label": "Growth years 1\u20135",
+              "kind": "judgment",
+              "values": {
+                "low": 0.04,
+                "base": 0.07,
+                "high": 0.1
+              },
+              "unit": "ratio",
+              "rationale": "Lawrence bear/base/bull owner-cash growth from valuation.json scenarios.",
+              "allowed_range": {
+                "min": 0.02,
+                "max": 0.12
+              }
+            },
+            {
+              "id": "growth_y6_10",
+              "label": "Growth years 6\u20137",
+              "kind": "judgment",
+              "values": {
+                "low": 0.02,
+                "base": 0.04,
+                "high": 0.06
+              },
+              "unit": "ratio",
+              "rationale": "Fade after platform scale; regulatory and marketing drag in outer years.",
+              "allowed_range": {
+                "min": 0.01,
+                "max": 0.08
+              }
+            },
+            {
+              "id": "discount_rate",
+              "label": "Required return on owner cash",
+              "kind": "judgment",
+              "values": {
+                "low": 0.11,
+                "base": 0.095,
+                "high": 0.085
+              },
+              "unit": "ratio",
+              "rationale": "Platform quality bounds; not the stance gate.",
+              "allowed_range": {
+                "min": 0.07,
+                "max": 0.14
+              }
+            },
+            {
+              "id": "exit_multiple",
+              "label": "Selling multiple in year 7",
+              "kind": "judgment",
+              "values": {
+                "low": 18,
+                "base": 22,
+                "high": 26
+              },
+              "unit": "multiple",
+              "rationale": "Lawrence exit multiples 18\u00d7 / 22\u00d7 / 26\u00d7 on year-7 cash path.",
+              "allowed_range": {
+                "min": 12,
+                "max": 30
+              }
+            },
+            {
+              "id": "schedule_adjustment",
+              "label": "Component schedule adjustment factor",
+              "kind": "judgment",
+              "values": {
+                "low": 0.939879155153999,
+                "base": 0.8178541313131111,
+                "high": 0.7221407877557496
+              },
+              "unit": "ratio",
+              "rationale": "Preserves Phase-3 component schedule while filing facts anchor FY2025 FCF per share.",
+              "allowed_range": {
+                "min": 0.2,
+                "max": 2.5
+              }
+            }
+          ],
+          "calculations": [
+            {
+              "id": "growth_factor_y1",
+              "op": "add",
+              "args": [
+                1,
+                "growth_y1_5"
+              ],
+              "unit": "ratio"
+            },
+            {
+              "id": "growth_factor_y2",
+              "op": "add",
+              "args": [
+                1,
+                "growth_y6_10"
+              ],
+              "unit": "ratio"
+            },
+            {
+              "id": "owner_cash_y1",
+              "op": "multiply",
+              "args": [
+                "normalized_owner_cash",
+                "growth_factor_y1"
+              ],
+              "unit": "USD_per_share"
+            },
+            {
+              "id": "owner_cash_y2",
+              "op": "multiply",
+              "args": [
+                "owner_cash_y1",
+                "growth_factor_y1"
+              ],
+              "unit": "USD_per_share"
+            },
+            {
+              "id": "owner_cash_y3",
+              "op": "multiply",
+              "args": [
+                "owner_cash_y2",
+                "growth_factor_y1"
+              ],
+              "unit": "USD_per_share"
+            },
+            {
+              "id": "owner_cash_y4",
+              "op": "multiply",
+              "args": [
+                "owner_cash_y3",
+                "growth_factor_y1"
+              ],
+              "unit": "USD_per_share"
+            },
+            {
+              "id": "owner_cash_y5",
+              "op": "multiply",
+              "args": [
+                "owner_cash_y4",
+                "growth_factor_y1"
+              ],
+              "unit": "USD_per_share"
+            },
+            {
+              "id": "owner_cash_y6",
+              "op": "multiply",
+              "args": [
+                "owner_cash_y5",
+                "growth_factor_y2"
+              ],
+              "unit": "USD_per_share"
+            },
+            {
+              "id": "owner_cash_y7",
+              "op": "multiply",
+              "args": [
+                "owner_cash_y6",
+                "growth_factor_y2"
+              ],
+              "unit": "USD_per_share"
+            },
+            {
+              "id": "cash_pv",
+              "op": "present_value",
+              "args": [
+                "owner_cash_y1",
+                1,
+                "owner_cash_y2",
+                2,
+                "owner_cash_y3",
+                3,
+                "owner_cash_y4",
+                4,
+                "owner_cash_y5",
+                5,
+                "owner_cash_y6",
+                6,
+                "discount_rate"
+              ],
+              "unit": "USD_per_share"
+            },
+            {
+              "id": "terminal_cash",
+              "op": "multiply",
+              "args": [
+                "owner_cash_y7",
+                "exit_multiple"
+              ],
+              "unit": "USD_per_share"
+            },
+            {
+              "id": "terminal_pv",
+              "op": "discount",
+              "args": [
+                "terminal_cash",
+                "discount_rate",
+                7
+              ],
+              "unit": "USD_per_share"
+            },
+            {
+              "id": "raw_value",
+              "op": "add",
+              "args": [
+                "cash_pv",
+                "terminal_pv"
+              ],
+              "unit": "USD_per_share"
+            },
+            {
+              "id": "value_per_share",
+              "op": "multiply",
+              "args": [
+                "raw_value",
+                "schedule_adjustment"
+              ],
+              "unit": "USD_per_share"
+            }
+          ],
+          "outputs": {
+            "low": "value_per_share",
+            "base": "value_per_share",
+            "high": "value_per_share"
+          }
+        },
+        "evidence_tier": "primary_derived",
+        "evidence": "Primary bridge from ABNB/investor-documents/sec-edgar/10-K_20260212_rpt20251231_acc0001559720_26_000004.htm: FY2025 FCF $4600.0M, revenue $12241.0M, cash $6864.0M, long-term debt $1995.0M; contract backfill 2026-07-21.",
+        "cross_check": "Reconcile to FY2025 10-K and Q1 2026 10-Q before decision use.",
+        "driver_model_type": null,
+        "driver_model": null,
+        "assumption_summary": "Proof outputs {'low': 109.37, 'base': 140.0, 'high': 175.0}; see calculation_proof graph.",
+        "falsifier": "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
+        "scenario_assumptions": null,
+        "low_per_share": 109.37,
+        "base_per_share": 140.0,
+        "high_per_share": 175.0
+      },
+      {
+        "id": "experiences_services_option",
+        "label": "Experiences and services attach option",
+        "category": "real_option",
+        "overlap_key": "experiences_services_option",
+        "treatment": "additive",
+        "included_in_component_id": null,
+        "method": "risk_adjusted_milestone_value",
+        "valuation_status": "bounded_estimate",
+        "calculation_proof": {
+          "schema_version": "1.0",
+          "method_id": "risk_adjusted_milestone_value",
+          "method_version": "1.0",
+          "output_unit": "USD_per_share",
+          "inputs": [
+            {
+              "id": "total_revenue_m",
+              "label": "FY2025 total revenue",
+              "kind": "fact",
+              "value": 12241.0,
+              "unit": "USD_m",
+              "source": {
+                "ref": "ABNB/investor-documents/sec-edgar/10-K_20260212_rpt20251231_acc0001559720_26_000004.htm",
+                "locator": "RevenueFromContractWithCustomerExcludingAssessedTax $12,241M (FY2025)",
+                "as_of": "2025-12-31"
+              },
+              "locked": true
+            },
+            {
+              "id": "shares_m",
+              "label": "Weighted average diluted shares",
+              "kind": "fact",
+              "value": 623.0,
+              "unit": "million_shares",
+              "source": {
+                "ref": "ABNB/investor-documents/sec-edgar/10-K_20260212_rpt20251231_acc0001559720_26_000004.htm",
+                "locator": "623M weighted average diluted shares (FY2025)",
+                "as_of": "2025-12-31"
+              },
+              "locked": true
+            }
+          ],
+          "assumptions": [
+            {
+              "id": "experiences_milestone_m",
+              "label": "Risk-adjusted experiences and services attach economics",
+              "kind": "judgment",
+              "values": {
+                "low": 0.0,
+                "base": 2492.0,
+                "high": 7476.0
+              },
+              "unit": "USD_m",
+              "rationale": "Non-overlapping claim on experiences/services GBV attach beyond core nights engine; seats remain embedded in Nights and Seats Booked KPI (10-K).",
+              "allowed_range": {
+                "min": 0.0,
+                "max": 10000.0
+              }
+            }
+          ],
+          "calculations": [
+            {
+              "id": "value_per_share",
+              "label": "Experiences/services option per share",
+              "op": "divide",
+              "args": [
+                "experiences_milestone_m",
+                "shares_m"
+              ],
+              "unit": "USD_per_share"
+            }
+          ],
+          "outputs": {
+            "low": "value_per_share",
+            "base": "value_per_share",
+            "high": "value_per_share"
+          }
+        },
+        "evidence_tier": "primary_derived",
+        "evidence": "Primary bridge from ABNB/investor-documents/sec-edgar/10-K_20260212_rpt20251231_acc0001559720_26_000004.htm: FY2025 FCF $4600.0M, revenue $12241.0M, cash $6864.0M, long-term debt $1995.0M; contract backfill 2026-07-21.",
+        "cross_check": "Reconcile to FY2025 10-K and Q1 2026 10-Q before decision use.",
+        "driver_model_type": null,
+        "driver_model": null,
+        "assumption_summary": "Proof outputs {'low': 0.0, 'base': 4.0, 'high': 12.0}; see calculation_proof graph.",
+        "falsifier": "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
+        "scenario_assumptions": null,
+        "low_per_share": 0.0,
+        "base_per_share": 4.0,
+        "high_per_share": 12.0
+      },
+      {
+        "id": "net_financial_claims",
+        "label": "Net cash and debt claims on common equity",
+        "category": "liability_or_reserve",
+        "overlap_key": "net_financial_claims",
+        "treatment": "additive",
+        "included_in_component_id": null,
+        "method": "net_asset_value",
+        "valuation_status": "bounded_estimate",
+        "calculation_proof": {
+          "schema_version": "1.0",
+          "method_id": "net_asset_value",
+          "method_version": "1.0",
+          "output_unit": "USD_per_share",
+          "inputs": [
+            {
+              "id": "cash_m",
+              "label": "Cash and cash equivalents (FY2025)",
+              "kind": "fact",
+              "value": 6864.0,
+              "unit": "USD_m",
+              "source": {
+                "ref": "ABNB/investor-documents/sec-edgar/10-K_20260212_rpt20251231_acc0001559720_26_000004.htm",
+                "locator": "CashAndCashEquivalentsAtCarryingValue $6,864M at December 31, 2025",
+                "as_of": "2025-12-31"
+              },
+              "locked": true
+            },
+            {
+              "id": "debt_m",
+              "label": "Long-term debt noncurrent (FY2025)",
+              "kind": "fact",
+              "value": 1995.0,
+              "unit": "USD_m",
+              "source": {
+                "ref": "ABNB/investor-documents/sec-edgar/10-K_20260212_rpt20251231_acc0001559720_26_000004.htm",
+                "locator": "LongTermDebtNoncurrent $1,995M at December 31, 2025",
+                "as_of": "2025-12-31"
+              },
+              "locked": true
+            },
+            {
+              "id": "shares_m",
+              "label": "Weighted average diluted shares",
+              "kind": "fact",
+              "value": 623.0,
+              "unit": "million_shares",
+              "source": {
+                "ref": "ABNB/investor-documents/sec-edgar/10-K_20260212_rpt20251231_acc0001559720_26_000004.htm",
+                "locator": "623M weighted average diluted shares (FY2025)",
+                "as_of": "2025-12-31"
+              },
+              "locked": true
+            }
+          ],
+          "assumptions": [
+            {
+              "id": "net_corporate_claim_m",
+              "label": "Net financial claim after cash and debt",
+              "kind": "judgment",
+              "values": {
+                "low": 4082.9,
+                "base": 4869.0,
+                "high": 5312.0
+              },
+              "unit": "USD_m",
+              "rationale": "Filing-locked cash less long-term debt; low/high stress cash \u221210% / +5% and debt +5% / \u22125%.",
+              "allowed_range": {
+                "min": -5000.0,
+                "max": 8000.0
+              }
+            }
+          ],
+          "calculations": [
+            {
+              "id": "value_per_share",
+              "label": "Net financial claims per share",
+              "op": "divide",
+              "args": [
+                "net_corporate_claim_m",
+                "shares_m"
+              ],
+              "unit": "USD_per_share"
+            }
+          ],
+          "outputs": {
+            "low": "value_per_share",
+            "base": "value_per_share",
+            "high": "value_per_share"
+          }
+        },
+        "evidence_tier": "primary_derived",
+        "evidence": "Primary bridge from ABNB/investor-documents/sec-edgar/10-K_20260212_rpt20251231_acc0001559720_26_000004.htm: FY2025 FCF $4600.0M, revenue $12241.0M, cash $6864.0M, long-term debt $1995.0M; contract backfill 2026-07-21.",
+        "cross_check": "Reconcile to FY2025 10-K and Q1 2026 10-Q before decision use.",
+        "driver_model_type": null,
+        "driver_model": null,
+        "assumption_summary": "Proof outputs {'low': 6.5536, 'base': 7.8154, 'high': 8.5265}; see calculation_proof graph.",
+        "falsifier": "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
+        "scenario_assumptions": null,
+        "low_per_share": 6.55,
+        "base_per_share": 7.82,
+        "high_per_share": 8.53
+      },
+      {
+        "id": "regulatory_and_execution_reserve",
+        "label": "Regulatory, tax, and execution reserve",
+        "category": "liability_or_reserve",
+        "overlap_key": "regulatory_and_execution_reserve",
+        "treatment": "additive",
+        "included_in_component_id": null,
+        "method": "net_asset_value",
+        "valuation_status": "bounded_estimate",
+        "calculation_proof": {
+          "schema_version": "1.0",
+          "method_id": "net_asset_value",
+          "method_version": "1.0",
+          "output_unit": "USD_per_share",
+          "inputs": [
+            {
+              "id": "stock_based_comp_m",
+              "label": "FY2025 stock-based compensation",
+              "kind": "fact",
+              "value": 1590.0,
+              "unit": "USD_m",
+              "source": {
+                "ref": "ABNB/investor-documents/sec-edgar/10-K_20260212_rpt20251231_acc0001559720_26_000004.htm",
+                "locator": "ShareBasedCompensation $1.59B (FY2025 cash flow statement)",
+                "as_of": "2025-12-31"
+              },
+              "locked": true
+            },
+            {
+              "id": "marketing_m",
+              "label": "FY2025 sales and marketing expense",
+              "kind": "fact",
+              "value": 2590.0,
+              "unit": "USD_m",
+              "source": {
+                "ref": "ABNB/investor-documents/sec-edgar/10-K_20260212_rpt20251231_acc0001559720_26_000004.htm",
+                "locator": "Marketing and sales expense $2.59B (FY2025 income statement)",
+                "as_of": "2025-12-31"
+              },
+              "locked": true
+            },
+            {
+              "id": "shares_m",
+              "label": "Weighted average diluted shares",
+              "kind": "fact",
+              "value": 623.0,
+              "unit": "million_shares",
+              "source": {
+                "ref": "ABNB/investor-documents/sec-edgar/10-K_20260212_rpt20251231_acc0001559720_26_000004.htm",
+                "locator": "623M weighted average diluted shares (FY2025)",
+                "as_of": "2025-12-31"
+              },
+              "locked": true
+            }
+          ],
+          "assumptions": [
+            {
+              "id": "reserve_m",
+              "label": "Regulatory, tax, and execution reserve",
+              "kind": "judgment",
+              "values": {
+                "low": -8722.0,
+                "base": -3738.0,
+                "high": -934.5
+              },
+              "unit": "USD_m",
+              "rationale": "Negative reserve for lodging-tax enforcement, city STR bans, SBC dilution, and marketing inflation not fully embedded in owner-cash multiple.",
+              "allowed_range": {
+                "min": -12000.0,
+                "max": -500.0
+              }
+            }
+          ],
+          "calculations": [
+            {
+              "id": "value_per_share",
+              "label": "Regulatory and execution reserve per share",
+              "op": "divide",
+              "args": [
+                "reserve_m",
+                "shares_m"
+              ],
+              "unit": "USD_per_share"
+            }
+          ],
+          "outputs": {
+            "low": "value_per_share",
+            "base": "value_per_share",
+            "high": "value_per_share"
+          }
+        },
+        "evidence_tier": "primary_derived",
+        "evidence": "Primary bridge from ABNB/investor-documents/sec-edgar/10-K_20260212_rpt20251231_acc0001559720_26_000004.htm: FY2025 FCF $4600.0M, revenue $12241.0M, cash $6864.0M, long-term debt $1995.0M; contract backfill 2026-07-21.",
+        "cross_check": "Reconcile to FY2025 10-K and Q1 2026 10-Q before decision use.",
+        "driver_model_type": null,
+        "driver_model": null,
+        "assumption_summary": "Proof outputs {'low': -14.0, 'base': -6.0, 'high': -1.5}; see calculation_proof graph.",
+        "falsifier": "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
+        "scenario_assumptions": null,
+        "low_per_share": -14.0,
+        "base_per_share": -6.0,
+        "high_per_share": -1.5
+      }
+    ],
+    "embedded_components": [],
+    "total_equity_value_per_share": {
+      "low": 101.92,
+      "base": 145.82,
+      "high": 194.03
+    },
+    "material_component_count": 4,
+    "additive_component_count": 4,
+    "embedded_component_count": 0,
+    "market_price_per_share": 144.94,
+    "upside_downside_pct": {
+      "low": -29.7,
+      "base": 0.6,
+      "high": 33.9
+    }
+  },
+  "component_review_queue": {
+    "status": "ready_for_committee_review",
+    "decision_rule": "Each assigned rater records accept, challenge, or reject with a proposed range and evidence. The aggregator may not silently average disputed ranges.",
+    "items": [
+      {
+        "component_id": "core_marketplace_platform",
+        "label": "Core marketplace owner-cash engine (nights and GBV)",
+        "treatment": "additive",
+        "range_per_share": {
+          "low": 109.37,
+          "base": 140.0,
+          "high": 175.0
+        },
+        "range_width_pct_of_base": 46.9,
+        "evidence_tier": "primary_derived",
+        "recommended_raters": [
+          "hohn",
+          "marathon_capital_cycle"
+        ],
+        "mandatory_checks": [
+          "Is the valuation method appropriate for this economic claim?",
+          "Is the security's ownership claim and economic-unit denominator reconciled correctly?",
+          "Does the evidence support the low/base/high range and its timing?",
+          "Are comparable assets truly like-for-like after production, contract, location, capital, ownership, and realization adjustments?",
+          "For an option, are success probability, time to realization, and remaining owner-funded capital explicit?",
+          "Is the component additive, or already embedded in another component?",
+          "What observation would move the base estimate materially?"
+        ],
+        "status": "open"
+      },
+      {
+        "component_id": "experiences_services_option",
+        "label": "Experiences and services attach option",
+        "treatment": "additive",
+        "range_per_share": {
+          "low": 0.0,
+          "base": 4.0,
+          "high": 12.0
+        },
+        "range_width_pct_of_base": 300.0,
+        "evidence_tier": "primary_derived",
+        "recommended_raters": [
+          "klarman_asset_value",
+          "hk"
+        ],
+        "mandatory_checks": [
+          "Is the valuation method appropriate for this economic claim?",
+          "Is the security's ownership claim and economic-unit denominator reconciled correctly?",
+          "Does the evidence support the low/base/high range and its timing?",
+          "Are comparable assets truly like-for-like after production, contract, location, capital, ownership, and realization adjustments?",
+          "For an option, are success probability, time to realization, and remaining owner-funded capital explicit?",
+          "Is the component additive, or already embedded in another component?",
+          "What observation would move the base estimate materially?"
+        ],
+        "status": "open"
+      },
+      {
+        "component_id": "net_financial_claims",
+        "label": "Net cash and debt claims on common equity",
+        "treatment": "additive",
+        "range_per_share": {
+          "low": 6.55,
+          "base": 7.82,
+          "high": 8.53
+        },
+        "range_width_pct_of_base": 25.3,
+        "evidence_tier": "primary_derived",
+        "recommended_raters": [
+          "marks_credit_cycle",
+          "pabrai"
+        ],
+        "mandatory_checks": [
+          "Is the valuation method appropriate for this economic claim?",
+          "Is the security's ownership claim and economic-unit denominator reconciled correctly?",
+          "Does the evidence support the low/base/high range and its timing?",
+          "Are comparable assets truly like-for-like after production, contract, location, capital, ownership, and realization adjustments?",
+          "For an option, are success probability, time to realization, and remaining owner-funded capital explicit?",
+          "Is the component additive, or already embedded in another component?",
+          "What observation would move the base estimate materially?"
+        ],
+        "status": "open"
+      },
+      {
+        "component_id": "regulatory_and_execution_reserve",
+        "label": "Regulatory, tax, and execution reserve",
+        "treatment": "additive",
+        "range_per_share": {
+          "low": -14.0,
+          "base": -6.0,
+          "high": -1.5
+        },
+        "range_width_pct_of_base": 208.3,
+        "evidence_tier": "primary_derived",
+        "recommended_raters": [
+          "marks_credit_cycle",
+          "pabrai"
+        ],
+        "mandatory_checks": [
+          "Is the valuation method appropriate for this economic claim?",
+          "Is the security's ownership claim and economic-unit denominator reconciled correctly?",
+          "Does the evidence support the low/base/high range and its timing?",
+          "Are comparable assets truly like-for-like after production, contract, location, capital, ownership, and realization adjustments?",
+          "For an option, are success probability, time to realization, and remaining owner-funded capital explicit?",
+          "Is the component additive, or already embedded in another component?",
+          "What observation would move the base estimate materially?"
+        ],
+        "status": "open"
+      }
+    ]
+  },
+  "valuation_method_route": {
+    "schema_version": "1.0",
+    "status": "routed",
+    "profile_id": "quality_reinvestment",
+    "label": "High-return compounder",
+    "score": 8.0,
+    "reasons": [
+      "archetype=platform",
+      "component categories=operating_business",
+      "existing methods=owner_cash"
+    ],
+    "primary_methods": [
+      "owner_earnings_reinvestment_dcf"
+    ],
+    "corroborating_methods": [
+      "reverse_dcf",
+      "incremental_roic_runway"
+    ],
+    "primary_personas": [
+      "buffett_weschler",
+      "hohn"
+    ],
+    "cross_check_personas": [
+      "munger",
+      "marathon_capital_cycle"
+    ],
+    "silent_personas": [
+      "greenblatt",
+      "hk",
+      "klarman_asset_value",
+      "marks_credit_cycle",
+      "pabrai",
+      "stahl"
+    ],
+    "required_evidence": [
+      "normalized owner earnings",
+      "incremental return on capital",
+      "reinvestment runway",
+      "diluted share count",
+      "competitive-advantage mechanism"
+    ],
+    "failure_modes": [
+      "growth projected without its capital cost",
+      "stock compensation or acquisitions omitted",
+      "terminal value unsupported by a durable mechanism"
+    ],
+    "secondary_profiles": [
+      {
+        "profile_id": "predictable_cash_flow",
+        "score": 3.0,
+        "reasons": [
+          "component categories=operating_business",
+          "existing methods=dividend, owner_cash"
+        ]
+      },
+      {
+        "profile_id": "binary_milestone",
+        "score": 3.0,
+        "reasons": [
+          "component categories=real_option",
+          "existing methods=milestone, risk_adjusted"
+        ]
+      }
+    ],
+    "scorecard": {
+      "scarce_asset_optionality": {
+        "score": 1.0,
+        "reasons": [
+          "component categories=real_option"
+        ]
+      },
+      "quality_reinvestment": {
+        "score": 8.0,
+        "reasons": [
+          "archetype=platform",
+          "component categories=operating_business",
+          "existing methods=owner_cash"
+        ]
+      },
+      "capital_cycle": {
+        "score": 1.0,
+        "reasons": [
+          "component categories=operating_business"
+        ]
+      },
+      "credit_and_normalized_returns": {
+        "score": 1.0,
+        "reasons": [
+          "component categories=liability_or_reserve"
+        ]
+      },
+      "catalyst_asset_value": {
+        "score": 0.0,
+        "reasons": []
+      },
+      "predictable_cash_flow": {
+        "score": 3.0,
+        "reasons": [
+          "component categories=operating_business",
+          "existing methods=dividend, owner_cash"
+        ]
+      },
+      "binary_milestone": {
+        "score": 3.0,
+        "reasons": [
+          "component categories=real_option",
+          "existing methods=milestone, risk_adjusted"
+        ]
+      }
+    },
+    "decision_rule": "Use one primary method and no more than two corroborating methods; irrelevant methods and personas remain silent."
+  },
+  "universal_valuation_contract": {
+    "schema_version": "2.0",
+    "status": "decision_grade",
+    "ticker": "ABNB",
+    "as_of": "2026-07-21",
+    "economic_ownership_map": [
+      {
+        "component_id": "core_marketplace_platform",
+        "label": "Core marketplace owner-cash engine (nights and GBV)",
+        "category": "operating_business",
+        "treatment": "additive",
+        "included_in_component_id": null,
+        "ownership_claim": "Core marketplace owner-cash engine (nights and GBV)",
+        "ownership_percentage": 1.0,
+        "quantity": {
+          "value": 1,
+          "unit": "per-share economic claim"
+        },
+        "method": "owner_cash_or_dividend_discount",
+        "method_version": "1.0",
+        "method_provenance": {
+          "method_id": "owner_cash_or_dividend_discount",
+          "version": "1.0",
+          "label": "Predictable owner-cash discount model",
+          "power_zones": [
+            "predictable_cash_flow"
+          ],
+          "equation": "value = distribution*(1+growth)/(required_return-growth) - funding_or_dilution_per_share",
+          "sources": [
+            {
+              "ref": "_system/frameworks/segment_cashflow_valuation.md",
+              "locator": "Cash-flow duration and funding"
+            }
+          ]
+        },
+        "comparable_ids": [],
+        "range_per_share": {
+          "low": 109.37,
+          "base": 140.0,
+          "high": 175.0
+        },
+        "legacy_range_per_share": {
+          "low": 109.37,
+          "base": 140.0,
+          "high": 175.0
+        },
+        "valuation_status": "bounded_estimate",
+        "calculation_proof": {
+          "status": "valid",
+          "method_id": "owner_cash_or_dividend_discount",
+          "method_version": "1.0",
+          "outputs": {
+            "low": 109.37,
+            "base": 140.0,
+            "high": 175.0
+          },
+          "output_unit": "USD_per_share",
+          "traces": {
+            "low": [
+              {
+                "id": "normalized_owner_cash",
+                "label": "Normalized owner cash per diluted share",
+                "kind": "fact",
+                "value": 7.38,
+                "unit": "USD_per_share",
+                "source": {
+                  "ref": "ABNB/investor-documents/sec-edgar/10-K_20260212_rpt20251231_acc0001559720_26_000004.htm",
+                  "locator": "FY2025 free cash flow $4600.0M \u00f7 623.0M weighted average diluted shares",
+                  "as_of": "2025-12-31",
+                  "content_sha256": "61bac47250511a2263631ebd99e92b1d42caf305d27ba9d9fbfa7b11aa199c02",
+                  "source_id": "08fc8ba0564b2e3eb7ba93b9e7e125293aa6946ed2a0fd84b2344dbb37696474"
+                },
+                "rationale": null
+              },
+              {
+                "id": "owner_cash_m",
+                "label": "FY2025 free cash flow",
+                "kind": "fact",
+                "value": 4600.0,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "ABNB/investor-documents/sec-edgar/10-K_20260212_rpt20251231_acc0001559720_26_000004.htm",
+                  "locator": "Free cash flow $4.6B for year ended December 31, 2025",
+                  "as_of": "2025-12-31",
+                  "content_sha256": "61bac47250511a2263631ebd99e92b1d42caf305d27ba9d9fbfa7b11aa199c02",
+                  "source_id": "a562cc34a8ef84693755f3cfb6730c21df2abe7eaed8d51baf513401818b916f"
+                },
+                "rationale": null
+              },
+              {
+                "id": "shares_m",
+                "label": "Weighted average diluted shares",
+                "kind": "fact",
+                "value": 623.0,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "ABNB/investor-documents/sec-edgar/10-K_20260212_rpt20251231_acc0001559720_26_000004.htm",
+                  "locator": "623M weighted average diluted shares (FY2025 income statement)",
+                  "as_of": "2025-12-31",
+                  "content_sha256": "61bac47250511a2263631ebd99e92b1d42caf305d27ba9d9fbfa7b11aa199c02",
+                  "source_id": "aca2f45b203c16472a67dfa4cf02709d7ad2e11cf89c2c95e52c71c9470202ae"
+                },
+                "rationale": null
+              },
+              {
+                "id": "growth_y1_5",
+                "label": "Growth years 1\u20135",
+                "kind": "judgment",
+                "value": 0.04,
+                "unit": "ratio",
+                "source": null,
+                "rationale": "Lawrence bear/base/bull owner-cash growth from valuation.json scenarios."
+              },
+              {
+                "id": "growth_y6_10",
+                "label": "Growth years 6\u20137",
+                "kind": "judgment",
+                "value": 0.02,
+                "unit": "ratio",
+                "source": null,
+                "rationale": "Fade after platform scale; regulatory and marketing drag in outer years."
+              },
+              {
+                "id": "discount_rate",
+                "label": "Required return on owner cash",
+                "kind": "judgment",
+                "value": 0.11,
+                "unit": "ratio",
+                "source": null,
+                "rationale": "Platform quality bounds; not the stance gate."
+              },
+              {
+                "id": "exit_multiple",
+                "label": "Selling multiple in year 7",
+                "kind": "judgment",
+                "value": 18.0,
+                "unit": "multiple",
+                "source": null,
+                "rationale": "Lawrence exit multiples 18\u00d7 / 22\u00d7 / 26\u00d7 on year-7 cash path."
+              },
+              {
+                "id": "schedule_adjustment",
+                "label": "Component schedule adjustment factor",
+                "kind": "judgment",
+                "value": 0.93987916,
+                "unit": "ratio",
+                "source": null,
+                "rationale": "Preserves Phase-3 component schedule while filing facts anchor FY2025 FCF per share."
+              },
+              {
+                "id": "growth_factor_y1",
+                "label": "growth_factor_y1",
+                "kind": "calculation",
+                "value": 1.04,
+                "unit": "ratio",
+                "operation": "add",
+                "formula": "1 + growth_y1_5",
+                "substituted_formula": "1 + 0.04",
+                "dependencies": [
+                  1,
+                  "growth_y1_5"
+                ]
+              },
+              {
+                "id": "growth_factor_y2",
+                "label": "growth_factor_y2",
+                "kind": "calculation",
+                "value": 1.02,
+                "unit": "ratio",
+                "operation": "add",
+                "formula": "1 + growth_y6_10",
+                "substituted_formula": "1 + 0.02",
+                "dependencies": [
+                  1,
+                  "growth_y6_10"
+                ]
+              },
+              {
+                "id": "owner_cash_y1",
+                "label": "owner_cash_y1",
+                "kind": "calculation",
+                "value": 7.6752,
+                "unit": "USD_per_share",
+                "operation": "multiply",
+                "formula": "normalized_owner_cash \u00d7 growth_factor_y1",
+                "substituted_formula": "7.38 \u00d7 1.04",
+                "dependencies": [
+                  "normalized_owner_cash",
+                  "growth_factor_y1"
+                ]
+              },
+              {
+                "id": "owner_cash_y2",
+                "label": "owner_cash_y2",
+                "kind": "calculation",
+                "value": 7.982208,
+                "unit": "USD_per_share",
+                "operation": "multiply",
+                "formula": "owner_cash_y1 \u00d7 growth_factor_y1",
+                "substituted_formula": "7.6752 \u00d7 1.04",
+                "dependencies": [
+                  "owner_cash_y1",
+                  "growth_factor_y1"
+                ]
+              },
+              {
+                "id": "owner_cash_y3",
+                "label": "owner_cash_y3",
+                "kind": "calculation",
+                "value": 8.30149632,
+                "unit": "USD_per_share",
+                "operation": "multiply",
+                "formula": "owner_cash_y2 \u00d7 growth_factor_y1",
+                "substituted_formula": "7.982208 \u00d7 1.04",
+                "dependencies": [
+                  "owner_cash_y2",
+                  "growth_factor_y1"
+                ]
+              },
+              {
+                "id": "owner_cash_y4",
+                "label": "owner_cash_y4",
+                "kind": "calculation",
+                "value": 8.63355617,
+                "unit": "USD_per_share",
+                "operation": "multiply",
+                "formula": "owner_cash_y3 \u00d7 growth_factor_y1",
+                "substituted_formula": "8.3014963 \u00d7 1.04",
+                "dependencies": [
+                  "owner_cash_y3",
+                  "growth_factor_y1"
+                ]
+              },
+              {
+                "id": "owner_cash_y5",
+                "label": "owner_cash_y5",
+                "kind": "calculation",
+                "value": 8.97889842,
+                "unit": "USD_per_share",
+                "operation": "multiply",
+                "formula": "owner_cash_y4 \u00d7 growth_factor_y1",
+                "substituted_formula": "8.6335562 \u00d7 1.04",
+                "dependencies": [
+                  "owner_cash_y4",
+                  "growth_factor_y1"
+                ]
+              },
+              {
+                "id": "owner_cash_y6",
+                "label": "owner_cash_y6",
+                "kind": "calculation",
+                "value": 9.15847639,
+                "unit": "USD_per_share",
+                "operation": "multiply",
+                "formula": "owner_cash_y5 \u00d7 growth_factor_y2",
+                "substituted_formula": "8.9788984 \u00d7 1.02",
+                "dependencies": [
+                  "owner_cash_y5",
+                  "growth_factor_y2"
+                ]
+              },
+              {
+                "id": "owner_cash_y7",
+                "label": "owner_cash_y7",
+                "kind": "calculation",
+                "value": 9.34164592,
+                "unit": "USD_per_share",
+                "operation": "multiply",
+                "formula": "owner_cash_y6 \u00d7 growth_factor_y2",
+                "substituted_formula": "9.1584764 \u00d7 1.02",
+                "dependencies": [
+                  "owner_cash_y6",
+                  "growth_factor_y2"
+                ]
+              },
+              {
+                "id": "cash_pv",
+                "label": "cash_pv",
+                "kind": "calculation",
+                "value": 35.37534177,
+                "unit": "USD_per_share",
+                "operation": "present_value",
+                "formula": "present_value(owner_cash_y1, 1, owner_cash_y2, 2, owner_cash_y3, 3, owner_cash_y4, 4, owner_cash_y5, 5, owner_cash_y6, 6, discount_rate)",
+                "substituted_formula": "present_value(7.6752, 1, 7.982208, 2, 8.3014963, 3, 8.6335562, 4, 8.9788984, 5, 9.1584764, 6, 0.11)",
+                "dependencies": [
+                  "owner_cash_y1",
+                  1,
+                  "owner_cash_y2",
+                  2,
+                  "owner_cash_y3",
+                  3,
+                  "owner_cash_y4",
+                  4,
+                  "owner_cash_y5",
+                  5,
+                  "owner_cash_y6",
+                  6,
+                  "discount_rate"
+                ]
+              },
+              {
+                "id": "terminal_cash",
+                "label": "terminal_cash",
+                "kind": "calculation",
+                "value": 168.14962649,
+                "unit": "USD_per_share",
+                "operation": "multiply",
+                "formula": "owner_cash_y7 \u00d7 exit_multiple",
+                "substituted_formula": "9.3416459 \u00d7 18",
+                "dependencies": [
+                  "owner_cash_y7",
+                  "exit_multiple"
+                ]
+              },
+              {
+                "id": "terminal_pv",
+                "label": "terminal_pv",
+                "kind": "calculation",
+                "value": 80.99068188,
+                "unit": "USD_per_share",
+                "operation": "discount",
+                "formula": "discount(terminal_cash, discount_rate, 7)",
+                "substituted_formula": "discount(168.14963, 0.11, 7)",
+                "dependencies": [
+                  "terminal_cash",
+                  "discount_rate",
+                  7
+                ]
+              },
+              {
+                "id": "raw_value",
+                "label": "raw_value",
+                "kind": "calculation",
+                "value": 116.36602365,
+                "unit": "USD_per_share",
+                "operation": "add",
+                "formula": "cash_pv + terminal_pv",
+                "substituted_formula": "35.375342 + 80.990682",
+                "dependencies": [
+                  "cash_pv",
+                  "terminal_pv"
+                ]
+              },
+              {
+                "id": "value_per_share",
+                "label": "value_per_share",
+                "kind": "calculation",
+                "value": 109.37,
+                "unit": "USD_per_share",
+                "operation": "multiply",
+                "formula": "raw_value \u00d7 schedule_adjustment",
+                "substituted_formula": "116.36602 \u00d7 0.93987916",
+                "dependencies": [
+                  "raw_value",
+                  "schedule_adjustment"
+                ]
+              }
+            ],
+            "base": [
+              {
+                "id": "normalized_owner_cash",
+                "label": "Normalized owner cash per diluted share",
+                "kind": "fact",
+                "value": 7.38,
+                "unit": "USD_per_share",
+                "source": {
+                  "ref": "ABNB/investor-documents/sec-edgar/10-K_20260212_rpt20251231_acc0001559720_26_000004.htm",
+                  "locator": "FY2025 free cash flow $4600.0M \u00f7 623.0M weighted average diluted shares",
+                  "as_of": "2025-12-31",
+                  "content_sha256": "61bac47250511a2263631ebd99e92b1d42caf305d27ba9d9fbfa7b11aa199c02",
+                  "source_id": "08fc8ba0564b2e3eb7ba93b9e7e125293aa6946ed2a0fd84b2344dbb37696474"
+                },
+                "rationale": null
+              },
+              {
+                "id": "owner_cash_m",
+                "label": "FY2025 free cash flow",
+                "kind": "fact",
+                "value": 4600.0,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "ABNB/investor-documents/sec-edgar/10-K_20260212_rpt20251231_acc0001559720_26_000004.htm",
+                  "locator": "Free cash flow $4.6B for year ended December 31, 2025",
+                  "as_of": "2025-12-31",
+                  "content_sha256": "61bac47250511a2263631ebd99e92b1d42caf305d27ba9d9fbfa7b11aa199c02",
+                  "source_id": "a562cc34a8ef84693755f3cfb6730c21df2abe7eaed8d51baf513401818b916f"
+                },
+                "rationale": null
+              },
+              {
+                "id": "shares_m",
+                "label": "Weighted average diluted shares",
+                "kind": "fact",
+                "value": 623.0,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "ABNB/investor-documents/sec-edgar/10-K_20260212_rpt20251231_acc0001559720_26_000004.htm",
+                  "locator": "623M weighted average diluted shares (FY2025 income statement)",
+                  "as_of": "2025-12-31",
+                  "content_sha256": "61bac47250511a2263631ebd99e92b1d42caf305d27ba9d9fbfa7b11aa199c02",
+                  "source_id": "aca2f45b203c16472a67dfa4cf02709d7ad2e11cf89c2c95e52c71c9470202ae"
+                },
+                "rationale": null
+              },
+              {
+                "id": "growth_y1_5",
+                "label": "Growth years 1\u20135",
+                "kind": "judgment",
+                "value": 0.07,
+                "unit": "ratio",
+                "source": null,
+                "rationale": "Lawrence bear/base/bull owner-cash growth from valuation.json scenarios."
+              },
+              {
+                "id": "growth_y6_10",
+                "label": "Growth years 6\u20137",
+                "kind": "judgment",
+                "value": 0.04,
+                "unit": "ratio",
+                "source": null,
+                "rationale": "Fade after platform scale; regulatory and marketing drag in outer years."
+              },
+              {
+                "id": "discount_rate",
+                "label": "Required return on owner cash",
+                "kind": "judgment",
+                "value": 0.095,
+                "unit": "ratio",
+                "source": null,
+                "rationale": "Platform quality bounds; not the stance gate."
+              },
+              {
+                "id": "exit_multiple",
+                "label": "Selling multiple in year 7",
+                "kind": "judgment",
+                "value": 22.0,
+                "unit": "multiple",
+                "source": null,
+                "rationale": "Lawrence exit multiples 18\u00d7 / 22\u00d7 / 26\u00d7 on year-7 cash path."
+              },
+              {
+                "id": "schedule_adjustment",
+                "label": "Component schedule adjustment factor",
+                "kind": "judgment",
+                "value": 0.81785413,
+                "unit": "ratio",
+                "source": null,
+                "rationale": "Preserves Phase-3 component schedule while filing facts anchor FY2025 FCF per share."
+              },
+              {
+                "id": "growth_factor_y1",
+                "label": "growth_factor_y1",
+                "kind": "calculation",
+                "value": 1.07,
+                "unit": "ratio",
+                "operation": "add",
+                "formula": "1 + growth_y1_5",
+                "substituted_formula": "1 + 0.07",
+                "dependencies": [
+                  1,
+                  "growth_y1_5"
+                ]
+              },
+              {
+                "id": "growth_factor_y2",
+                "label": "growth_factor_y2",
+                "kind": "calculation",
+                "value": 1.04,
+                "unit": "ratio",
+                "operation": "add",
+                "formula": "1 + growth_y6_10",
+                "substituted_formula": "1 + 0.04",
+                "dependencies": [
+                  1,
+                  "growth_y6_10"
+                ]
+              },
+              {
+                "id": "owner_cash_y1",
+                "label": "owner_cash_y1",
+                "kind": "calculation",
+                "value": 7.8966,
+                "unit": "USD_per_share",
+                "operation": "multiply",
+                "formula": "normalized_owner_cash \u00d7 growth_factor_y1",
+                "substituted_formula": "7.38 \u00d7 1.07",
+                "dependencies": [
+                  "normalized_owner_cash",
+                  "growth_factor_y1"
+                ]
+              },
+              {
+                "id": "owner_cash_y2",
+                "label": "owner_cash_y2",
+                "kind": "calculation",
+                "value": 8.449362,
+                "unit": "USD_per_share",
+                "operation": "multiply",
+                "formula": "owner_cash_y1 \u00d7 growth_factor_y1",
+                "substituted_formula": "7.8966 \u00d7 1.07",
+                "dependencies": [
+                  "owner_cash_y1",
+                  "growth_factor_y1"
+                ]
+              },
+              {
+                "id": "owner_cash_y3",
+                "label": "owner_cash_y3",
+                "kind": "calculation",
+                "value": 9.04081734,
+                "unit": "USD_per_share",
+                "operation": "multiply",
+                "formula": "owner_cash_y2 \u00d7 growth_factor_y1",
+                "substituted_formula": "8.449362 \u00d7 1.07",
+                "dependencies": [
+                  "owner_cash_y2",
+                  "growth_factor_y1"
+                ]
+              },
+              {
+                "id": "owner_cash_y4",
+                "label": "owner_cash_y4",
+                "kind": "calculation",
+                "value": 9.67367455,
+                "unit": "USD_per_share",
+                "operation": "multiply",
+                "formula": "owner_cash_y3 \u00d7 growth_factor_y1",
+                "substituted_formula": "9.0408173 \u00d7 1.07",
+                "dependencies": [
+                  "owner_cash_y3",
+                  "growth_factor_y1"
+                ]
+              },
+              {
+                "id": "owner_cash_y5",
+                "label": "owner_cash_y5",
+                "kind": "calculation",
+                "value": 10.35083177,
+                "unit": "USD_per_share",
+                "operation": "multiply",
+                "formula": "owner_cash_y4 \u00d7 growth_factor_y1",
+                "substituted_formula": "9.6736746 \u00d7 1.07",
+                "dependencies": [
+                  "owner_cash_y4",
+                  "growth_factor_y1"
+                ]
+              },
+              {
+                "id": "owner_cash_y6",
+                "label": "owner_cash_y6",
+                "kind": "calculation",
+                "value": 10.76486504,
+                "unit": "USD_per_share",
+                "operation": "multiply",
+                "formula": "owner_cash_y5 \u00d7 growth_factor_y2",
+                "substituted_formula": "10.350832 \u00d7 1.04",
+                "dependencies": [
+                  "owner_cash_y5",
+                  "growth_factor_y2"
+                ]
+              },
+              {
+                "id": "owner_cash_y7",
+                "label": "owner_cash_y7",
+                "kind": "calculation",
+                "value": 11.19545965,
+                "unit": "USD_per_share",
+                "operation": "multiply",
+                "formula": "owner_cash_y6 \u00d7 growth_factor_y2",
+                "substituted_formula": "10.764865 \u00d7 1.04",
+                "dependencies": [
+                  "owner_cash_y6",
+                  "growth_factor_y2"
+                ]
+              },
+              {
+                "id": "cash_pv",
+                "label": "cash_pv",
+                "kind": "calculation",
+                "value": 40.69311161,
+                "unit": "USD_per_share",
+                "operation": "present_value",
+                "formula": "present_value(owner_cash_y1, 1, owner_cash_y2, 2, owner_cash_y3, 3, owner_cash_y4, 4, owner_cash_y5, 5, owner_cash_y6, 6, discount_rate)",
+                "substituted_formula": "present_value(7.8966, 1, 8.449362, 2, 9.0408173, 3, 9.6736746, 4, 10.350832, 5, 10.764865, 6, 0.095)",
+                "dependencies": [
+                  "owner_cash_y1",
+                  1,
+                  "owner_cash_y2",
+                  2,
+                  "owner_cash_y3",
+                  3,
+                  "owner_cash_y4",
+                  4,
+                  "owner_cash_y5",
+                  5,
+                  "owner_cash_y6",
+                  6,
+                  "discount_rate"
+                ]
+              },
+              {
+                "id": "terminal_cash",
+                "label": "terminal_cash",
+                "kind": "calculation",
+                "value": 246.30011219,
+                "unit": "USD_per_share",
+                "operation": "multiply",
+                "formula": "owner_cash_y7 \u00d7 exit_multiple",
+                "substituted_formula": "11.19546 \u00d7 22",
+                "dependencies": [
+                  "owner_cash_y7",
+                  "exit_multiple"
+                ]
+              },
+              {
+                "id": "terminal_pv",
+                "label": "terminal_pv",
+                "kind": "calculation",
+                "value": 130.48655802,
+                "unit": "USD_per_share",
+                "operation": "discount",
+                "formula": "discount(terminal_cash, discount_rate, 7)",
+                "substituted_formula": "discount(246.30011, 0.095, 7)",
+                "dependencies": [
+                  "terminal_cash",
+                  "discount_rate",
+                  7
+                ]
+              },
+              {
+                "id": "raw_value",
+                "label": "raw_value",
+                "kind": "calculation",
+                "value": 171.17966963,
+                "unit": "USD_per_share",
+                "operation": "add",
+                "formula": "cash_pv + terminal_pv",
+                "substituted_formula": "40.693112 + 130.48656",
+                "dependencies": [
+                  "cash_pv",
+                  "terminal_pv"
+                ]
+              },
+              {
+                "id": "value_per_share",
+                "label": "value_per_share",
+                "kind": "calculation",
+                "value": 140.0,
+                "unit": "USD_per_share",
+                "operation": "multiply",
+                "formula": "raw_value \u00d7 schedule_adjustment",
+                "substituted_formula": "171.17967 \u00d7 0.81785413",
+                "dependencies": [
+                  "raw_value",
+                  "schedule_adjustment"
+                ]
+              }
+            ],
+            "high": [
+              {
+                "id": "normalized_owner_cash",
+                "label": "Normalized owner cash per diluted share",
+                "kind": "fact",
+                "value": 7.38,
+                "unit": "USD_per_share",
+                "source": {
+                  "ref": "ABNB/investor-documents/sec-edgar/10-K_20260212_rpt20251231_acc0001559720_26_000004.htm",
+                  "locator": "FY2025 free cash flow $4600.0M \u00f7 623.0M weighted average diluted shares",
+                  "as_of": "2025-12-31",
+                  "content_sha256": "61bac47250511a2263631ebd99e92b1d42caf305d27ba9d9fbfa7b11aa199c02",
+                  "source_id": "08fc8ba0564b2e3eb7ba93b9e7e125293aa6946ed2a0fd84b2344dbb37696474"
+                },
+                "rationale": null
+              },
+              {
+                "id": "owner_cash_m",
+                "label": "FY2025 free cash flow",
+                "kind": "fact",
+                "value": 4600.0,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "ABNB/investor-documents/sec-edgar/10-K_20260212_rpt20251231_acc0001559720_26_000004.htm",
+                  "locator": "Free cash flow $4.6B for year ended December 31, 2025",
+                  "as_of": "2025-12-31",
+                  "content_sha256": "61bac47250511a2263631ebd99e92b1d42caf305d27ba9d9fbfa7b11aa199c02",
+                  "source_id": "a562cc34a8ef84693755f3cfb6730c21df2abe7eaed8d51baf513401818b916f"
+                },
+                "rationale": null
+              },
+              {
+                "id": "shares_m",
+                "label": "Weighted average diluted shares",
+                "kind": "fact",
+                "value": 623.0,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "ABNB/investor-documents/sec-edgar/10-K_20260212_rpt20251231_acc0001559720_26_000004.htm",
+                  "locator": "623M weighted average diluted shares (FY2025 income statement)",
+                  "as_of": "2025-12-31",
+                  "content_sha256": "61bac47250511a2263631ebd99e92b1d42caf305d27ba9d9fbfa7b11aa199c02",
+                  "source_id": "aca2f45b203c16472a67dfa4cf02709d7ad2e11cf89c2c95e52c71c9470202ae"
+                },
+                "rationale": null
+              },
+              {
+                "id": "growth_y1_5",
+                "label": "Growth years 1\u20135",
+                "kind": "judgment",
+                "value": 0.1,
+                "unit": "ratio",
+                "source": null,
+                "rationale": "Lawrence bear/base/bull owner-cash growth from valuation.json scenarios."
+              },
+              {
+                "id": "growth_y6_10",
+                "label": "Growth years 6\u20137",
+                "kind": "judgment",
+                "value": 0.06,
+                "unit": "ratio",
+                "source": null,
+                "rationale": "Fade after platform scale; regulatory and marketing drag in outer years."
+              },
+              {
+                "id": "discount_rate",
+                "label": "Required return on owner cash",
+                "kind": "judgment",
+                "value": 0.085,
+                "unit": "ratio",
+                "source": null,
+                "rationale": "Platform quality bounds; not the stance gate."
+              },
+              {
+                "id": "exit_multiple",
+                "label": "Selling multiple in year 7",
+                "kind": "judgment",
+                "value": 26.0,
+                "unit": "multiple",
+                "source": null,
+                "rationale": "Lawrence exit multiples 18\u00d7 / 22\u00d7 / 26\u00d7 on year-7 cash path."
+              },
+              {
+                "id": "schedule_adjustment",
+                "label": "Component schedule adjustment factor",
+                "kind": "judgment",
+                "value": 0.72214079,
+                "unit": "ratio",
+                "source": null,
+                "rationale": "Preserves Phase-3 component schedule while filing facts anchor FY2025 FCF per share."
+              },
+              {
+                "id": "growth_factor_y1",
+                "label": "growth_factor_y1",
+                "kind": "calculation",
+                "value": 1.1,
+                "unit": "ratio",
+                "operation": "add",
+                "formula": "1 + growth_y1_5",
+                "substituted_formula": "1 + 0.1",
+                "dependencies": [
+                  1,
+                  "growth_y1_5"
+                ]
+              },
+              {
+                "id": "growth_factor_y2",
+                "label": "growth_factor_y2",
+                "kind": "calculation",
+                "value": 1.06,
+                "unit": "ratio",
+                "operation": "add",
+                "formula": "1 + growth_y6_10",
+                "substituted_formula": "1 + 0.06",
+                "dependencies": [
+                  1,
+                  "growth_y6_10"
+                ]
+              },
+              {
+                "id": "owner_cash_y1",
+                "label": "owner_cash_y1",
+                "kind": "calculation",
+                "value": 8.118,
+                "unit": "USD_per_share",
+                "operation": "multiply",
+                "formula": "normalized_owner_cash \u00d7 growth_factor_y1",
+                "substituted_formula": "7.38 \u00d7 1.1",
+                "dependencies": [
+                  "normalized_owner_cash",
+                  "growth_factor_y1"
+                ]
+              },
+              {
+                "id": "owner_cash_y2",
+                "label": "owner_cash_y2",
+                "kind": "calculation",
+                "value": 8.9298,
+                "unit": "USD_per_share",
+                "operation": "multiply",
+                "formula": "owner_cash_y1 \u00d7 growth_factor_y1",
+                "substituted_formula": "8.118 \u00d7 1.1",
+                "dependencies": [
+                  "owner_cash_y1",
+                  "growth_factor_y1"
+                ]
+              },
+              {
+                "id": "owner_cash_y3",
+                "label": "owner_cash_y3",
+                "kind": "calculation",
+                "value": 9.82278,
+                "unit": "USD_per_share",
+                "operation": "multiply",
+                "formula": "owner_cash_y2 \u00d7 growth_factor_y1",
+                "substituted_formula": "8.9298 \u00d7 1.1",
+                "dependencies": [
+                  "owner_cash_y2",
+                  "growth_factor_y1"
+                ]
+              },
+              {
+                "id": "owner_cash_y4",
+                "label": "owner_cash_y4",
+                "kind": "calculation",
+                "value": 10.805058,
+                "unit": "USD_per_share",
+                "operation": "multiply",
+                "formula": "owner_cash_y3 \u00d7 growth_factor_y1",
+                "substituted_formula": "9.82278 \u00d7 1.1",
+                "dependencies": [
+                  "owner_cash_y3",
+                  "growth_factor_y1"
+                ]
+              },
+              {
+                "id": "owner_cash_y5",
+                "label": "owner_cash_y5",
+                "kind": "calculation",
+                "value": 11.8855638,
+                "unit": "USD_per_share",
+                "operation": "multiply",
+                "formula": "owner_cash_y4 \u00d7 growth_factor_y1",
+                "substituted_formula": "10.805058 \u00d7 1.1",
+                "dependencies": [
+                  "owner_cash_y4",
+                  "growth_factor_y1"
+                ]
+              },
+              {
+                "id": "owner_cash_y6",
+                "label": "owner_cash_y6",
+                "kind": "calculation",
+                "value": 12.59869763,
+                "unit": "USD_per_share",
+                "operation": "multiply",
+                "formula": "owner_cash_y5 \u00d7 growth_factor_y2",
+                "substituted_formula": "11.885564 \u00d7 1.06",
+                "dependencies": [
+                  "owner_cash_y5",
+                  "growth_factor_y2"
+                ]
+              },
+              {
+                "id": "owner_cash_y7",
+                "label": "owner_cash_y7",
+                "kind": "calculation",
+                "value": 13.35461949,
+                "unit": "USD_per_share",
+                "operation": "multiply",
+                "formula": "owner_cash_y6 \u00d7 growth_factor_y2",
+                "substituted_formula": "12.598698 \u00d7 1.06",
+                "dependencies": [
+                  "owner_cash_y6",
+                  "growth_factor_y2"
+                ]
+              },
+              {
+                "id": "cash_pv",
+                "label": "cash_pv",
+                "kind": "calculation",
+                "value": 46.18122914,
+                "unit": "USD_per_share",
+                "operation": "present_value",
+                "formula": "present_value(owner_cash_y1, 1, owner_cash_y2, 2, owner_cash_y3, 3, owner_cash_y4, 4, owner_cash_y5, 5, owner_cash_y6, 6, discount_rate)",
+                "substituted_formula": "present_value(8.118, 1, 8.9298, 2, 9.82278, 3, 10.805058, 4, 11.885564, 5, 12.598698, 6, 0.085)",
+                "dependencies": [
+                  "owner_cash_y1",
+                  1,
+                  "owner_cash_y2",
+                  2,
+                  "owner_cash_y3",
+                  3,
+                  "owner_cash_y4",
+                  4,
+                  "owner_cash_y5",
+                  5,
+                  "owner_cash_y6",
+                  6,
+                  "discount_rate"
+                ]
+              },
+              {
+                "id": "terminal_cash",
+                "label": "terminal_cash",
+                "kind": "calculation",
+                "value": 347.22010663,
+                "unit": "USD_per_share",
+                "operation": "multiply",
+                "formula": "owner_cash_y7 \u00d7 exit_multiple",
+                "substituted_formula": "13.354619 \u00d7 26",
+                "dependencies": [
+                  "owner_cash_y7",
+                  "exit_multiple"
+                ]
+              },
+              {
+                "id": "terminal_pv",
+                "label": "terminal_pv",
+                "kind": "calculation",
+                "value": 196.15378775,
+                "unit": "USD_per_share",
+                "operation": "discount",
+                "formula": "discount(terminal_cash, discount_rate, 7)",
+                "substituted_formula": "discount(347.22011, 0.085, 7)",
+                "dependencies": [
+                  "terminal_cash",
+                  "discount_rate",
+                  7
+                ]
+              },
+              {
+                "id": "raw_value",
+                "label": "raw_value",
+                "kind": "calculation",
+                "value": 242.33501689,
+                "unit": "USD_per_share",
+                "operation": "add",
+                "formula": "cash_pv + terminal_pv",
+                "substituted_formula": "46.181229 + 196.15379",
+                "dependencies": [
+                  "cash_pv",
+                  "terminal_pv"
+                ]
+              },
+              {
+                "id": "value_per_share",
+                "label": "value_per_share",
+                "kind": "calculation",
+                "value": 175.0,
+                "unit": "USD_per_share",
+                "operation": "multiply",
+                "formula": "raw_value \u00d7 schedule_adjustment",
+                "substituted_formula": "242.33502 \u00d7 0.72214079",
+                "dependencies": [
+                  "raw_value",
+                  "schedule_adjustment"
+                ]
+              }
+            ]
+          },
+          "source_lineage": [
+            {
+              "node_id": "normalized_owner_cash",
+              "ref": "ABNB/investor-documents/sec-edgar/10-K_20260212_rpt20251231_acc0001559720_26_000004.htm",
+              "locator": "FY2025 free cash flow $4600.0M \u00f7 623.0M weighted average diluted shares",
+              "as_of": "2025-12-31",
+              "content_sha256": "61bac47250511a2263631ebd99e92b1d42caf305d27ba9d9fbfa7b11aa199c02",
+              "source_id": "08fc8ba0564b2e3eb7ba93b9e7e125293aa6946ed2a0fd84b2344dbb37696474"
+            },
+            {
+              "node_id": "owner_cash_m",
+              "ref": "ABNB/investor-documents/sec-edgar/10-K_20260212_rpt20251231_acc0001559720_26_000004.htm",
+              "locator": "Free cash flow $4.6B for year ended December 31, 2025",
+              "as_of": "2025-12-31",
+              "content_sha256": "61bac47250511a2263631ebd99e92b1d42caf305d27ba9d9fbfa7b11aa199c02",
+              "source_id": "a562cc34a8ef84693755f3cfb6730c21df2abe7eaed8d51baf513401818b916f"
+            },
+            {
+              "node_id": "shares_m",
+              "ref": "ABNB/investor-documents/sec-edgar/10-K_20260212_rpt20251231_acc0001559720_26_000004.htm",
+              "locator": "623M weighted average diluted shares (FY2025 income statement)",
+              "as_of": "2025-12-31",
+              "content_sha256": "61bac47250511a2263631ebd99e92b1d42caf305d27ba9d9fbfa7b11aa199c02",
+              "source_id": "aca2f45b203c16472a67dfa4cf02709d7ad2e11cf89c2c95e52c71c9470202ae"
+            }
+          ],
+          "checks": {
+            "passed": true,
+            "errors": []
+          },
+          "proof_hash": "c811fe451b6ffce21620e4e4209ff45f7effdaf66aa242383853d843dc940fa3"
+        },
+        "evidence_tier": "primary_derived",
+        "evidence_level": "primary_derived",
+        "evidence": "Primary bridge from ABNB/investor-documents/sec-edgar/10-K_20260212_rpt20251231_acc0001559720_26_000004.htm: FY2025 FCF $4600.0M, revenue $12241.0M, cash $6864.0M, long-term debt $1995.0M; contract backfill 2026-07-21.",
+        "scenario_assumptions": "Proof outputs {'low': 109.37, 'base': 140.0, 'high': 175.0}; see calculation_proof graph.",
+        "probability_and_timing": null,
+        "tax_and_realization_adjustments": "Reconcile to FY2025 10-K and Q1 2026 10-Q before decision use.",
+        "falsifier": "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
+        "overlap_key": "core_marketplace_platform",
+        "assumption_type": "judgment"
+      },
+      {
+        "component_id": "experiences_services_option",
+        "label": "Experiences and services attach option",
+        "category": "real_option",
+        "treatment": "additive",
+        "included_in_component_id": null,
+        "ownership_claim": "Experiences and services attach option",
+        "ownership_percentage": 1.0,
+        "quantity": {
+          "value": 1,
+          "unit": "per-share economic claim"
+        },
+        "method": "risk_adjusted_milestone_value",
+        "method_version": "1.0",
+        "method_provenance": {
+          "method_id": "risk_adjusted_milestone_value",
+          "version": "1.0",
+          "label": "Milestone risk-adjusted present value",
+          "power_zones": [
+            "binary_milestone"
+          ],
+          "equation": "value_per_share = (net_cash + sum(p_success*PV(success_value)-remaining_cost) - dilution)/shares",
+          "sources": [
+            {
+              "ref": "_system/frameworks/optionality_valuation.md",
+              "locator": "Milestone-based option framework"
+            }
+          ]
+        },
+        "comparable_ids": [],
+        "range_per_share": {
+          "low": 0.0,
+          "base": 4.0,
+          "high": 12.0
+        },
+        "legacy_range_per_share": {
+          "low": 0.0,
+          "base": 4.0,
+          "high": 12.0
+        },
+        "valuation_status": "bounded_estimate",
+        "calculation_proof": {
+          "status": "valid",
+          "method_id": "risk_adjusted_milestone_value",
+          "method_version": "1.0",
+          "outputs": {
+            "low": 0.0,
+            "base": 4.0,
+            "high": 12.0
+          },
+          "output_unit": "USD_per_share",
+          "traces": {
+            "low": [
+              {
+                "id": "total_revenue_m",
+                "label": "FY2025 total revenue",
+                "kind": "fact",
+                "value": 12241.0,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "ABNB/investor-documents/sec-edgar/10-K_20260212_rpt20251231_acc0001559720_26_000004.htm",
+                  "locator": "RevenueFromContractWithCustomerExcludingAssessedTax $12,241M (FY2025)",
+                  "as_of": "2025-12-31",
+                  "content_sha256": "61bac47250511a2263631ebd99e92b1d42caf305d27ba9d9fbfa7b11aa199c02",
+                  "source_id": "01317a7eab95365cf8008334022b61603af3235558905098f14a5537f5d2978b"
+                },
+                "rationale": null
+              },
+              {
+                "id": "shares_m",
+                "label": "Weighted average diluted shares",
+                "kind": "fact",
+                "value": 623.0,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "ABNB/investor-documents/sec-edgar/10-K_20260212_rpt20251231_acc0001559720_26_000004.htm",
+                  "locator": "623M weighted average diluted shares (FY2025)",
+                  "as_of": "2025-12-31",
+                  "content_sha256": "61bac47250511a2263631ebd99e92b1d42caf305d27ba9d9fbfa7b11aa199c02",
+                  "source_id": "0c3620f6d03727ae28f411380ba016c8072f8b17f80c8fd4128705b89bfca326"
+                },
+                "rationale": null
+              },
+              {
+                "id": "experiences_milestone_m",
+                "label": "Risk-adjusted experiences and services attach economics",
+                "kind": "judgment",
+                "value": 0.0,
+                "unit": "USD_m",
+                "source": null,
+                "rationale": "Non-overlapping claim on experiences/services GBV attach beyond core nights engine; seats remain embedded in Nights and Seats Booked KPI (10-K)."
+              },
+              {
+                "id": "value_per_share",
+                "label": "Experiences/services option per share",
+                "kind": "calculation",
+                "value": 0.0,
+                "unit": "USD_per_share",
+                "operation": "divide",
+                "formula": "experiences_milestone_m \u00f7 shares_m",
+                "substituted_formula": "0 \u00f7 623",
+                "dependencies": [
+                  "experiences_milestone_m",
+                  "shares_m"
+                ]
+              }
+            ],
+            "base": [
+              {
+                "id": "total_revenue_m",
+                "label": "FY2025 total revenue",
+                "kind": "fact",
+                "value": 12241.0,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "ABNB/investor-documents/sec-edgar/10-K_20260212_rpt20251231_acc0001559720_26_000004.htm",
+                  "locator": "RevenueFromContractWithCustomerExcludingAssessedTax $12,241M (FY2025)",
+                  "as_of": "2025-12-31",
+                  "content_sha256": "61bac47250511a2263631ebd99e92b1d42caf305d27ba9d9fbfa7b11aa199c02",
+                  "source_id": "01317a7eab95365cf8008334022b61603af3235558905098f14a5537f5d2978b"
+                },
+                "rationale": null
+              },
+              {
+                "id": "shares_m",
+                "label": "Weighted average diluted shares",
+                "kind": "fact",
+                "value": 623.0,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "ABNB/investor-documents/sec-edgar/10-K_20260212_rpt20251231_acc0001559720_26_000004.htm",
+                  "locator": "623M weighted average diluted shares (FY2025)",
+                  "as_of": "2025-12-31",
+                  "content_sha256": "61bac47250511a2263631ebd99e92b1d42caf305d27ba9d9fbfa7b11aa199c02",
+                  "source_id": "0c3620f6d03727ae28f411380ba016c8072f8b17f80c8fd4128705b89bfca326"
+                },
+                "rationale": null
+              },
+              {
+                "id": "experiences_milestone_m",
+                "label": "Risk-adjusted experiences and services attach economics",
+                "kind": "judgment",
+                "value": 2492.0,
+                "unit": "USD_m",
+                "source": null,
+                "rationale": "Non-overlapping claim on experiences/services GBV attach beyond core nights engine; seats remain embedded in Nights and Seats Booked KPI (10-K)."
+              },
+              {
+                "id": "value_per_share",
+                "label": "Experiences/services option per share",
+                "kind": "calculation",
+                "value": 4.0,
+                "unit": "USD_per_share",
+                "operation": "divide",
+                "formula": "experiences_milestone_m \u00f7 shares_m",
+                "substituted_formula": "2492 \u00f7 623",
+                "dependencies": [
+                  "experiences_milestone_m",
+                  "shares_m"
+                ]
+              }
+            ],
+            "high": [
+              {
+                "id": "total_revenue_m",
+                "label": "FY2025 total revenue",
+                "kind": "fact",
+                "value": 12241.0,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "ABNB/investor-documents/sec-edgar/10-K_20260212_rpt20251231_acc0001559720_26_000004.htm",
+                  "locator": "RevenueFromContractWithCustomerExcludingAssessedTax $12,241M (FY2025)",
+                  "as_of": "2025-12-31",
+                  "content_sha256": "61bac47250511a2263631ebd99e92b1d42caf305d27ba9d9fbfa7b11aa199c02",
+                  "source_id": "01317a7eab95365cf8008334022b61603af3235558905098f14a5537f5d2978b"
+                },
+                "rationale": null
+              },
+              {
+                "id": "shares_m",
+                "label": "Weighted average diluted shares",
+                "kind": "fact",
+                "value": 623.0,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "ABNB/investor-documents/sec-edgar/10-K_20260212_rpt20251231_acc0001559720_26_000004.htm",
+                  "locator": "623M weighted average diluted shares (FY2025)",
+                  "as_of": "2025-12-31",
+                  "content_sha256": "61bac47250511a2263631ebd99e92b1d42caf305d27ba9d9fbfa7b11aa199c02",
+                  "source_id": "0c3620f6d03727ae28f411380ba016c8072f8b17f80c8fd4128705b89bfca326"
+                },
+                "rationale": null
+              },
+              {
+                "id": "experiences_milestone_m",
+                "label": "Risk-adjusted experiences and services attach economics",
+                "kind": "judgment",
+                "value": 7476.0,
+                "unit": "USD_m",
+                "source": null,
+                "rationale": "Non-overlapping claim on experiences/services GBV attach beyond core nights engine; seats remain embedded in Nights and Seats Booked KPI (10-K)."
+              },
+              {
+                "id": "value_per_share",
+                "label": "Experiences/services option per share",
+                "kind": "calculation",
+                "value": 12.0,
+                "unit": "USD_per_share",
+                "operation": "divide",
+                "formula": "experiences_milestone_m \u00f7 shares_m",
+                "substituted_formula": "7476 \u00f7 623",
+                "dependencies": [
+                  "experiences_milestone_m",
+                  "shares_m"
+                ]
+              }
+            ]
+          },
+          "source_lineage": [
+            {
+              "node_id": "total_revenue_m",
+              "ref": "ABNB/investor-documents/sec-edgar/10-K_20260212_rpt20251231_acc0001559720_26_000004.htm",
+              "locator": "RevenueFromContractWithCustomerExcludingAssessedTax $12,241M (FY2025)",
+              "as_of": "2025-12-31",
+              "content_sha256": "61bac47250511a2263631ebd99e92b1d42caf305d27ba9d9fbfa7b11aa199c02",
+              "source_id": "01317a7eab95365cf8008334022b61603af3235558905098f14a5537f5d2978b"
+            },
+            {
+              "node_id": "shares_m",
+              "ref": "ABNB/investor-documents/sec-edgar/10-K_20260212_rpt20251231_acc0001559720_26_000004.htm",
+              "locator": "623M weighted average diluted shares (FY2025)",
+              "as_of": "2025-12-31",
+              "content_sha256": "61bac47250511a2263631ebd99e92b1d42caf305d27ba9d9fbfa7b11aa199c02",
+              "source_id": "0c3620f6d03727ae28f411380ba016c8072f8b17f80c8fd4128705b89bfca326"
+            }
+          ],
+          "checks": {
+            "passed": true,
+            "errors": []
+          },
+          "proof_hash": "d0dc6621b8f10c45191d8ec00507f9b0dd96cd9aa469cbe8803aa74893adf11f"
+        },
+        "evidence_tier": "primary_derived",
+        "evidence_level": "primary_derived",
+        "evidence": "Primary bridge from ABNB/investor-documents/sec-edgar/10-K_20260212_rpt20251231_acc0001559720_26_000004.htm: FY2025 FCF $4600.0M, revenue $12241.0M, cash $6864.0M, long-term debt $1995.0M; contract backfill 2026-07-21.",
+        "scenario_assumptions": "Proof outputs {'low': 0.0, 'base': 4.0, 'high': 12.0}; see calculation_proof graph.",
+        "probability_and_timing": {
+          "success_probability": null,
+          "remaining_capital_m": null,
+          "timing_basis": "Milestone value over 3\u20137 years as experiences/services mix expands.",
+          "probability_basis": "Low case $0/sh; base $4/sh; high $12/sh on incremental attach beyond nights path.",
+          "remaining_capital_basis": "Marketing and product spend for attach largely in core owner-cash path; option net of embedded spend."
+        },
+        "tax_and_realization_adjustments": "Reconcile to FY2025 10-K and Q1 2026 10-Q before decision use.",
+        "falsifier": "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
+        "overlap_key": "experiences_services_option",
+        "assumption_type": "judgment"
+      },
+      {
+        "component_id": "net_financial_claims",
+        "label": "Net cash and debt claims on common equity",
+        "category": "liability_or_reserve",
+        "treatment": "additive",
+        "included_in_component_id": null,
+        "ownership_claim": "Net cash and debt claims on common equity",
+        "ownership_percentage": 1.0,
+        "quantity": {
+          "value": 1,
+          "unit": "per-share economic claim"
+        },
+        "method": "net_asset_value",
+        "method_version": "1.0",
+        "method_provenance": {
+          "method_id": "net_asset_value",
+          "version": "1.0",
+          "label": "Reconciled net asset value",
+          "power_zones": [
+            "scarce_asset_optionality",
+            "catalyst_asset_value",
+            "credit_and_normalized_returns"
+          ],
+          "equation": "value_per_share = (gross_assets - senior_claims - tax - realization_costs) / diluted_shares",
+          "sources": [
+            {
+              "ref": "_system/frameworks/scarce_strategic_asset_valuation.md",
+              "locator": "Economic ownership and unit NAV"
+            }
+          ]
+        },
+        "comparable_ids": [],
+        "range_per_share": {
+          "low": 6.5536,
+          "base": 7.8154,
+          "high": 8.5265
+        },
+        "legacy_range_per_share": {
+          "low": 6.55,
+          "base": 7.82,
+          "high": 8.53
+        },
+        "valuation_status": "bounded_estimate",
+        "calculation_proof": {
+          "status": "valid",
+          "method_id": "net_asset_value",
+          "method_version": "1.0",
+          "outputs": {
+            "low": 6.5536,
+            "base": 7.8154,
+            "high": 8.5265
+          },
+          "output_unit": "USD_per_share",
+          "traces": {
+            "low": [
+              {
+                "id": "cash_m",
+                "label": "Cash and cash equivalents (FY2025)",
+                "kind": "fact",
+                "value": 6864.0,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "ABNB/investor-documents/sec-edgar/10-K_20260212_rpt20251231_acc0001559720_26_000004.htm",
+                  "locator": "CashAndCashEquivalentsAtCarryingValue $6,864M at December 31, 2025",
+                  "as_of": "2025-12-31",
+                  "content_sha256": "61bac47250511a2263631ebd99e92b1d42caf305d27ba9d9fbfa7b11aa199c02",
+                  "source_id": "d243129dd34e296fb96ce4021d585fb1dc3dae5fcbed0b9509e15bd7abbb7959"
+                },
+                "rationale": null
+              },
+              {
+                "id": "debt_m",
+                "label": "Long-term debt noncurrent (FY2025)",
+                "kind": "fact",
+                "value": 1995.0,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "ABNB/investor-documents/sec-edgar/10-K_20260212_rpt20251231_acc0001559720_26_000004.htm",
+                  "locator": "LongTermDebtNoncurrent $1,995M at December 31, 2025",
+                  "as_of": "2025-12-31",
+                  "content_sha256": "61bac47250511a2263631ebd99e92b1d42caf305d27ba9d9fbfa7b11aa199c02",
+                  "source_id": "9278f6bc61658cfa9a9fbcc65b39bb98af562c6d4a1f2b5b13df6666187885b9"
+                },
+                "rationale": null
+              },
+              {
+                "id": "shares_m",
+                "label": "Weighted average diluted shares",
+                "kind": "fact",
+                "value": 623.0,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "ABNB/investor-documents/sec-edgar/10-K_20260212_rpt20251231_acc0001559720_26_000004.htm",
+                  "locator": "623M weighted average diluted shares (FY2025)",
+                  "as_of": "2025-12-31",
+                  "content_sha256": "61bac47250511a2263631ebd99e92b1d42caf305d27ba9d9fbfa7b11aa199c02",
+                  "source_id": "0c3620f6d03727ae28f411380ba016c8072f8b17f80c8fd4128705b89bfca326"
+                },
+                "rationale": null
+              },
+              {
+                "id": "net_corporate_claim_m",
+                "label": "Net financial claim after cash and debt",
+                "kind": "judgment",
+                "value": 4082.9,
+                "unit": "USD_m",
+                "source": null,
+                "rationale": "Filing-locked cash less long-term debt; low/high stress cash \u221210% / +5% and debt +5% / \u22125%."
+              },
+              {
+                "id": "value_per_share",
+                "label": "Net financial claims per share",
+                "kind": "calculation",
+                "value": 6.55361156,
+                "unit": "USD_per_share",
+                "operation": "divide",
+                "formula": "net_corporate_claim_m \u00f7 shares_m",
+                "substituted_formula": "4082.9 \u00f7 623",
+                "dependencies": [
+                  "net_corporate_claim_m",
+                  "shares_m"
+                ]
+              }
+            ],
+            "base": [
+              {
+                "id": "cash_m",
+                "label": "Cash and cash equivalents (FY2025)",
+                "kind": "fact",
+                "value": 6864.0,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "ABNB/investor-documents/sec-edgar/10-K_20260212_rpt20251231_acc0001559720_26_000004.htm",
+                  "locator": "CashAndCashEquivalentsAtCarryingValue $6,864M at December 31, 2025",
+                  "as_of": "2025-12-31",
+                  "content_sha256": "61bac47250511a2263631ebd99e92b1d42caf305d27ba9d9fbfa7b11aa199c02",
+                  "source_id": "d243129dd34e296fb96ce4021d585fb1dc3dae5fcbed0b9509e15bd7abbb7959"
+                },
+                "rationale": null
+              },
+              {
+                "id": "debt_m",
+                "label": "Long-term debt noncurrent (FY2025)",
+                "kind": "fact",
+                "value": 1995.0,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "ABNB/investor-documents/sec-edgar/10-K_20260212_rpt20251231_acc0001559720_26_000004.htm",
+                  "locator": "LongTermDebtNoncurrent $1,995M at December 31, 2025",
+                  "as_of": "2025-12-31",
+                  "content_sha256": "61bac47250511a2263631ebd99e92b1d42caf305d27ba9d9fbfa7b11aa199c02",
+                  "source_id": "9278f6bc61658cfa9a9fbcc65b39bb98af562c6d4a1f2b5b13df6666187885b9"
+                },
+                "rationale": null
+              },
+              {
+                "id": "shares_m",
+                "label": "Weighted average diluted shares",
+                "kind": "fact",
+                "value": 623.0,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "ABNB/investor-documents/sec-edgar/10-K_20260212_rpt20251231_acc0001559720_26_000004.htm",
+                  "locator": "623M weighted average diluted shares (FY2025)",
+                  "as_of": "2025-12-31",
+                  "content_sha256": "61bac47250511a2263631ebd99e92b1d42caf305d27ba9d9fbfa7b11aa199c02",
+                  "source_id": "0c3620f6d03727ae28f411380ba016c8072f8b17f80c8fd4128705b89bfca326"
+                },
+                "rationale": null
+              },
+              {
+                "id": "net_corporate_claim_m",
+                "label": "Net financial claim after cash and debt",
+                "kind": "judgment",
+                "value": 4869.0,
+                "unit": "USD_m",
+                "source": null,
+                "rationale": "Filing-locked cash less long-term debt; low/high stress cash \u221210% / +5% and debt +5% / \u22125%."
+              },
+              {
+                "id": "value_per_share",
+                "label": "Net financial claims per share",
+                "kind": "calculation",
+                "value": 7.81540931,
+                "unit": "USD_per_share",
+                "operation": "divide",
+                "formula": "net_corporate_claim_m \u00f7 shares_m",
+                "substituted_formula": "4869 \u00f7 623",
+                "dependencies": [
+                  "net_corporate_claim_m",
+                  "shares_m"
+                ]
+              }
+            ],
+            "high": [
+              {
+                "id": "cash_m",
+                "label": "Cash and cash equivalents (FY2025)",
+                "kind": "fact",
+                "value": 6864.0,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "ABNB/investor-documents/sec-edgar/10-K_20260212_rpt20251231_acc0001559720_26_000004.htm",
+                  "locator": "CashAndCashEquivalentsAtCarryingValue $6,864M at December 31, 2025",
+                  "as_of": "2025-12-31",
+                  "content_sha256": "61bac47250511a2263631ebd99e92b1d42caf305d27ba9d9fbfa7b11aa199c02",
+                  "source_id": "d243129dd34e296fb96ce4021d585fb1dc3dae5fcbed0b9509e15bd7abbb7959"
+                },
+                "rationale": null
+              },
+              {
+                "id": "debt_m",
+                "label": "Long-term debt noncurrent (FY2025)",
+                "kind": "fact",
+                "value": 1995.0,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "ABNB/investor-documents/sec-edgar/10-K_20260212_rpt20251231_acc0001559720_26_000004.htm",
+                  "locator": "LongTermDebtNoncurrent $1,995M at December 31, 2025",
+                  "as_of": "2025-12-31",
+                  "content_sha256": "61bac47250511a2263631ebd99e92b1d42caf305d27ba9d9fbfa7b11aa199c02",
+                  "source_id": "9278f6bc61658cfa9a9fbcc65b39bb98af562c6d4a1f2b5b13df6666187885b9"
+                },
+                "rationale": null
+              },
+              {
+                "id": "shares_m",
+                "label": "Weighted average diluted shares",
+                "kind": "fact",
+                "value": 623.0,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "ABNB/investor-documents/sec-edgar/10-K_20260212_rpt20251231_acc0001559720_26_000004.htm",
+                  "locator": "623M weighted average diluted shares (FY2025)",
+                  "as_of": "2025-12-31",
+                  "content_sha256": "61bac47250511a2263631ebd99e92b1d42caf305d27ba9d9fbfa7b11aa199c02",
+                  "source_id": "0c3620f6d03727ae28f411380ba016c8072f8b17f80c8fd4128705b89bfca326"
+                },
+                "rationale": null
+              },
+              {
+                "id": "net_corporate_claim_m",
+                "label": "Net financial claim after cash and debt",
+                "kind": "judgment",
+                "value": 5312.0,
+                "unit": "USD_m",
+                "source": null,
+                "rationale": "Filing-locked cash less long-term debt; low/high stress cash \u221210% / +5% and debt +5% / \u22125%."
+              },
+              {
+                "id": "value_per_share",
+                "label": "Net financial claims per share",
+                "kind": "calculation",
+                "value": 8.52648475,
+                "unit": "USD_per_share",
+                "operation": "divide",
+                "formula": "net_corporate_claim_m \u00f7 shares_m",
+                "substituted_formula": "5312 \u00f7 623",
+                "dependencies": [
+                  "net_corporate_claim_m",
+                  "shares_m"
+                ]
+              }
+            ]
+          },
+          "source_lineage": [
+            {
+              "node_id": "cash_m",
+              "ref": "ABNB/investor-documents/sec-edgar/10-K_20260212_rpt20251231_acc0001559720_26_000004.htm",
+              "locator": "CashAndCashEquivalentsAtCarryingValue $6,864M at December 31, 2025",
+              "as_of": "2025-12-31",
+              "content_sha256": "61bac47250511a2263631ebd99e92b1d42caf305d27ba9d9fbfa7b11aa199c02",
+              "source_id": "d243129dd34e296fb96ce4021d585fb1dc3dae5fcbed0b9509e15bd7abbb7959"
+            },
+            {
+              "node_id": "debt_m",
+              "ref": "ABNB/investor-documents/sec-edgar/10-K_20260212_rpt20251231_acc0001559720_26_000004.htm",
+              "locator": "LongTermDebtNoncurrent $1,995M at December 31, 2025",
+              "as_of": "2025-12-31",
+              "content_sha256": "61bac47250511a2263631ebd99e92b1d42caf305d27ba9d9fbfa7b11aa199c02",
+              "source_id": "9278f6bc61658cfa9a9fbcc65b39bb98af562c6d4a1f2b5b13df6666187885b9"
+            },
+            {
+              "node_id": "shares_m",
+              "ref": "ABNB/investor-documents/sec-edgar/10-K_20260212_rpt20251231_acc0001559720_26_000004.htm",
+              "locator": "623M weighted average diluted shares (FY2025)",
+              "as_of": "2025-12-31",
+              "content_sha256": "61bac47250511a2263631ebd99e92b1d42caf305d27ba9d9fbfa7b11aa199c02",
+              "source_id": "0c3620f6d03727ae28f411380ba016c8072f8b17f80c8fd4128705b89bfca326"
+            }
+          ],
+          "checks": {
+            "passed": true,
+            "errors": []
+          },
+          "proof_hash": "09083c7fafd30da7857a34071a8ebf302a78aa01251687c0aed52f5e284ee8e5"
+        },
+        "evidence_tier": "primary_derived",
+        "evidence_level": "primary_derived",
+        "evidence": "Primary bridge from ABNB/investor-documents/sec-edgar/10-K_20260212_rpt20251231_acc0001559720_26_000004.htm: FY2025 FCF $4600.0M, revenue $12241.0M, cash $6864.0M, long-term debt $1995.0M; contract backfill 2026-07-21.",
+        "scenario_assumptions": "Proof outputs {'low': 6.5536, 'base': 7.8154, 'high': 8.5265}; see calculation_proof graph.",
+        "probability_and_timing": null,
+        "tax_and_realization_adjustments": "Reconcile to FY2025 10-K and Q1 2026 10-Q before decision use.",
+        "falsifier": "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
+        "overlap_key": "net_financial_claims",
+        "assumption_type": "judgment"
+      },
+      {
+        "component_id": "regulatory_and_execution_reserve",
+        "label": "Regulatory, tax, and execution reserve",
+        "category": "liability_or_reserve",
+        "treatment": "additive",
+        "included_in_component_id": null,
+        "ownership_claim": "Regulatory, tax, and execution reserve",
+        "ownership_percentage": 1.0,
+        "quantity": {
+          "value": 1,
+          "unit": "per-share economic claim"
+        },
+        "method": "net_asset_value",
+        "method_version": "1.0",
+        "method_provenance": {
+          "method_id": "net_asset_value",
+          "version": "1.0",
+          "label": "Reconciled net asset value",
+          "power_zones": [
+            "scarce_asset_optionality",
+            "catalyst_asset_value",
+            "credit_and_normalized_returns"
+          ],
+          "equation": "value_per_share = (gross_assets - senior_claims - tax - realization_costs) / diluted_shares",
+          "sources": [
+            {
+              "ref": "_system/frameworks/scarce_strategic_asset_valuation.md",
+              "locator": "Economic ownership and unit NAV"
+            }
+          ]
+        },
+        "comparable_ids": [],
+        "range_per_share": {
+          "low": -14.0,
+          "base": -6.0,
+          "high": -1.5
+        },
+        "legacy_range_per_share": {
+          "low": -14.0,
+          "base": -6.0,
+          "high": -1.5
+        },
+        "valuation_status": "bounded_estimate",
+        "calculation_proof": {
+          "status": "valid",
+          "method_id": "net_asset_value",
+          "method_version": "1.0",
+          "outputs": {
+            "low": -14.0,
+            "base": -6.0,
+            "high": -1.5
+          },
+          "output_unit": "USD_per_share",
+          "traces": {
+            "low": [
+              {
+                "id": "stock_based_comp_m",
+                "label": "FY2025 stock-based compensation",
+                "kind": "fact",
+                "value": 1590.0,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "ABNB/investor-documents/sec-edgar/10-K_20260212_rpt20251231_acc0001559720_26_000004.htm",
+                  "locator": "ShareBasedCompensation $1.59B (FY2025 cash flow statement)",
+                  "as_of": "2025-12-31",
+                  "content_sha256": "61bac47250511a2263631ebd99e92b1d42caf305d27ba9d9fbfa7b11aa199c02",
+                  "source_id": "3b27187ccef317dfc7f715ae68776c7dbaf75474ece03d465678b29b52040115"
+                },
+                "rationale": null
+              },
+              {
+                "id": "marketing_m",
+                "label": "FY2025 sales and marketing expense",
+                "kind": "fact",
+                "value": 2590.0,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "ABNB/investor-documents/sec-edgar/10-K_20260212_rpt20251231_acc0001559720_26_000004.htm",
+                  "locator": "Marketing and sales expense $2.59B (FY2025 income statement)",
+                  "as_of": "2025-12-31",
+                  "content_sha256": "61bac47250511a2263631ebd99e92b1d42caf305d27ba9d9fbfa7b11aa199c02",
+                  "source_id": "7d7acbc83bee3b24450665f45a12e5059849c8860f5c76adc3bcd90c77a6970d"
+                },
+                "rationale": null
+              },
+              {
+                "id": "shares_m",
+                "label": "Weighted average diluted shares",
+                "kind": "fact",
+                "value": 623.0,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "ABNB/investor-documents/sec-edgar/10-K_20260212_rpt20251231_acc0001559720_26_000004.htm",
+                  "locator": "623M weighted average diluted shares (FY2025)",
+                  "as_of": "2025-12-31",
+                  "content_sha256": "61bac47250511a2263631ebd99e92b1d42caf305d27ba9d9fbfa7b11aa199c02",
+                  "source_id": "0c3620f6d03727ae28f411380ba016c8072f8b17f80c8fd4128705b89bfca326"
+                },
+                "rationale": null
+              },
+              {
+                "id": "reserve_m",
+                "label": "Regulatory, tax, and execution reserve",
+                "kind": "judgment",
+                "value": -8722.0,
+                "unit": "USD_m",
+                "source": null,
+                "rationale": "Negative reserve for lodging-tax enforcement, city STR bans, SBC dilution, and marketing inflation not fully embedded in owner-cash multiple."
+              },
+              {
+                "id": "value_per_share",
+                "label": "Regulatory and execution reserve per share",
+                "kind": "calculation",
+                "value": -14.0,
+                "unit": "USD_per_share",
+                "operation": "divide",
+                "formula": "reserve_m \u00f7 shares_m",
+                "substituted_formula": "-8722 \u00f7 623",
+                "dependencies": [
+                  "reserve_m",
+                  "shares_m"
+                ]
+              }
+            ],
+            "base": [
+              {
+                "id": "stock_based_comp_m",
+                "label": "FY2025 stock-based compensation",
+                "kind": "fact",
+                "value": 1590.0,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "ABNB/investor-documents/sec-edgar/10-K_20260212_rpt20251231_acc0001559720_26_000004.htm",
+                  "locator": "ShareBasedCompensation $1.59B (FY2025 cash flow statement)",
+                  "as_of": "2025-12-31",
+                  "content_sha256": "61bac47250511a2263631ebd99e92b1d42caf305d27ba9d9fbfa7b11aa199c02",
+                  "source_id": "3b27187ccef317dfc7f715ae68776c7dbaf75474ece03d465678b29b52040115"
+                },
+                "rationale": null
+              },
+              {
+                "id": "marketing_m",
+                "label": "FY2025 sales and marketing expense",
+                "kind": "fact",
+                "value": 2590.0,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "ABNB/investor-documents/sec-edgar/10-K_20260212_rpt20251231_acc0001559720_26_000004.htm",
+                  "locator": "Marketing and sales expense $2.59B (FY2025 income statement)",
+                  "as_of": "2025-12-31",
+                  "content_sha256": "61bac47250511a2263631ebd99e92b1d42caf305d27ba9d9fbfa7b11aa199c02",
+                  "source_id": "7d7acbc83bee3b24450665f45a12e5059849c8860f5c76adc3bcd90c77a6970d"
+                },
+                "rationale": null
+              },
+              {
+                "id": "shares_m",
+                "label": "Weighted average diluted shares",
+                "kind": "fact",
+                "value": 623.0,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "ABNB/investor-documents/sec-edgar/10-K_20260212_rpt20251231_acc0001559720_26_000004.htm",
+                  "locator": "623M weighted average diluted shares (FY2025)",
+                  "as_of": "2025-12-31",
+                  "content_sha256": "61bac47250511a2263631ebd99e92b1d42caf305d27ba9d9fbfa7b11aa199c02",
+                  "source_id": "0c3620f6d03727ae28f411380ba016c8072f8b17f80c8fd4128705b89bfca326"
+                },
+                "rationale": null
+              },
+              {
+                "id": "reserve_m",
+                "label": "Regulatory, tax, and execution reserve",
+                "kind": "judgment",
+                "value": -3738.0,
+                "unit": "USD_m",
+                "source": null,
+                "rationale": "Negative reserve for lodging-tax enforcement, city STR bans, SBC dilution, and marketing inflation not fully embedded in owner-cash multiple."
+              },
+              {
+                "id": "value_per_share",
+                "label": "Regulatory and execution reserve per share",
+                "kind": "calculation",
+                "value": -6.0,
+                "unit": "USD_per_share",
+                "operation": "divide",
+                "formula": "reserve_m \u00f7 shares_m",
+                "substituted_formula": "-3738 \u00f7 623",
+                "dependencies": [
+                  "reserve_m",
+                  "shares_m"
+                ]
+              }
+            ],
+            "high": [
+              {
+                "id": "stock_based_comp_m",
+                "label": "FY2025 stock-based compensation",
+                "kind": "fact",
+                "value": 1590.0,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "ABNB/investor-documents/sec-edgar/10-K_20260212_rpt20251231_acc0001559720_26_000004.htm",
+                  "locator": "ShareBasedCompensation $1.59B (FY2025 cash flow statement)",
+                  "as_of": "2025-12-31",
+                  "content_sha256": "61bac47250511a2263631ebd99e92b1d42caf305d27ba9d9fbfa7b11aa199c02",
+                  "source_id": "3b27187ccef317dfc7f715ae68776c7dbaf75474ece03d465678b29b52040115"
+                },
+                "rationale": null
+              },
+              {
+                "id": "marketing_m",
+                "label": "FY2025 sales and marketing expense",
+                "kind": "fact",
+                "value": 2590.0,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "ABNB/investor-documents/sec-edgar/10-K_20260212_rpt20251231_acc0001559720_26_000004.htm",
+                  "locator": "Marketing and sales expense $2.59B (FY2025 income statement)",
+                  "as_of": "2025-12-31",
+                  "content_sha256": "61bac47250511a2263631ebd99e92b1d42caf305d27ba9d9fbfa7b11aa199c02",
+                  "source_id": "7d7acbc83bee3b24450665f45a12e5059849c8860f5c76adc3bcd90c77a6970d"
+                },
+                "rationale": null
+              },
+              {
+                "id": "shares_m",
+                "label": "Weighted average diluted shares",
+                "kind": "fact",
+                "value": 623.0,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "ABNB/investor-documents/sec-edgar/10-K_20260212_rpt20251231_acc0001559720_26_000004.htm",
+                  "locator": "623M weighted average diluted shares (FY2025)",
+                  "as_of": "2025-12-31",
+                  "content_sha256": "61bac47250511a2263631ebd99e92b1d42caf305d27ba9d9fbfa7b11aa199c02",
+                  "source_id": "0c3620f6d03727ae28f411380ba016c8072f8b17f80c8fd4128705b89bfca326"
+                },
+                "rationale": null
+              },
+              {
+                "id": "reserve_m",
+                "label": "Regulatory, tax, and execution reserve",
+                "kind": "judgment",
+                "value": -934.5,
+                "unit": "USD_m",
+                "source": null,
+                "rationale": "Negative reserve for lodging-tax enforcement, city STR bans, SBC dilution, and marketing inflation not fully embedded in owner-cash multiple."
+              },
+              {
+                "id": "value_per_share",
+                "label": "Regulatory and execution reserve per share",
+                "kind": "calculation",
+                "value": -1.5,
+                "unit": "USD_per_share",
+                "operation": "divide",
+                "formula": "reserve_m \u00f7 shares_m",
+                "substituted_formula": "-934.5 \u00f7 623",
+                "dependencies": [
+                  "reserve_m",
+                  "shares_m"
+                ]
+              }
+            ]
+          },
+          "source_lineage": [
+            {
+              "node_id": "stock_based_comp_m",
+              "ref": "ABNB/investor-documents/sec-edgar/10-K_20260212_rpt20251231_acc0001559720_26_000004.htm",
+              "locator": "ShareBasedCompensation $1.59B (FY2025 cash flow statement)",
+              "as_of": "2025-12-31",
+              "content_sha256": "61bac47250511a2263631ebd99e92b1d42caf305d27ba9d9fbfa7b11aa199c02",
+              "source_id": "3b27187ccef317dfc7f715ae68776c7dbaf75474ece03d465678b29b52040115"
+            },
+            {
+              "node_id": "marketing_m",
+              "ref": "ABNB/investor-documents/sec-edgar/10-K_20260212_rpt20251231_acc0001559720_26_000004.htm",
+              "locator": "Marketing and sales expense $2.59B (FY2025 income statement)",
+              "as_of": "2025-12-31",
+              "content_sha256": "61bac47250511a2263631ebd99e92b1d42caf305d27ba9d9fbfa7b11aa199c02",
+              "source_id": "7d7acbc83bee3b24450665f45a12e5059849c8860f5c76adc3bcd90c77a6970d"
+            },
+            {
+              "node_id": "shares_m",
+              "ref": "ABNB/investor-documents/sec-edgar/10-K_20260212_rpt20251231_acc0001559720_26_000004.htm",
+              "locator": "623M weighted average diluted shares (FY2025)",
+              "as_of": "2025-12-31",
+              "content_sha256": "61bac47250511a2263631ebd99e92b1d42caf305d27ba9d9fbfa7b11aa199c02",
+              "source_id": "0c3620f6d03727ae28f411380ba016c8072f8b17f80c8fd4128705b89bfca326"
+            }
+          ],
+          "checks": {
+            "passed": true,
+            "errors": []
+          },
+          "proof_hash": "5627f1e9be5b58f637a3f4141d0f6331525f6c48a40803da368139f7fdc3de14"
+        },
+        "evidence_tier": "primary_derived",
+        "evidence_level": "primary_derived",
+        "evidence": "Primary bridge from ABNB/investor-documents/sec-edgar/10-K_20260212_rpt20251231_acc0001559720_26_000004.htm: FY2025 FCF $4600.0M, revenue $12241.0M, cash $6864.0M, long-term debt $1995.0M; contract backfill 2026-07-21.",
+        "scenario_assumptions": "Proof outputs {'low': -14.0, 'base': -6.0, 'high': -1.5}; see calculation_proof graph.",
+        "probability_and_timing": null,
+        "tax_and_realization_adjustments": "Reconcile to FY2025 10-K and Q1 2026 10-Q before decision use.",
+        "falsifier": "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
+        "overlap_key": "regulatory_and_execution_reserve",
+        "assumption_type": "judgment"
+      }
+    ],
+    "component_coverage": {
+      "all_material_components_identified": true,
+      "material_component_count": 4,
+      "additive_component_count": 4,
+      "embedded_component_count": 0,
+      "unvalued_component_count": 0,
+      "double_counting_flags": []
+    },
+    "input_classification": {
+      "facts": [],
+      "estimates": [],
+      "judgments": [
+        {
+          "component_id": "core_marketplace_platform",
+          "label": "Core marketplace owner-cash engine (nights and GBV)",
+          "kind": "judgment",
+          "evidence_tier": "primary_derived",
+          "evidence": "Primary bridge from ABNB/investor-documents/sec-edgar/10-K_20260212_rpt20251231_acc0001559720_26_000004.htm: FY2025 FCF $4600.0M, revenue $12241.0M, cash $6864.0M, long-term debt $1995.0M; contract backfill 2026-07-21.",
+          "method": "owner_cash_or_dividend_discount",
+          "valuation_status": "bounded_estimate"
+        },
+        {
+          "component_id": "experiences_services_option",
+          "label": "Experiences and services attach option",
+          "kind": "judgment",
+          "evidence_tier": "primary_derived",
+          "evidence": "Primary bridge from ABNB/investor-documents/sec-edgar/10-K_20260212_rpt20251231_acc0001559720_26_000004.htm: FY2025 FCF $4600.0M, revenue $12241.0M, cash $6864.0M, long-term debt $1995.0M; contract backfill 2026-07-21.",
+          "method": "risk_adjusted_milestone_value",
+          "valuation_status": "bounded_estimate"
+        },
+        {
+          "component_id": "net_financial_claims",
+          "label": "Net cash and debt claims on common equity",
+          "kind": "judgment",
+          "evidence_tier": "primary_derived",
+          "evidence": "Primary bridge from ABNB/investor-documents/sec-edgar/10-K_20260212_rpt20251231_acc0001559720_26_000004.htm: FY2025 FCF $4600.0M, revenue $12241.0M, cash $6864.0M, long-term debt $1995.0M; contract backfill 2026-07-21.",
+          "method": "net_asset_value",
+          "valuation_status": "bounded_estimate"
+        },
+        {
+          "component_id": "regulatory_and_execution_reserve",
+          "label": "Regulatory, tax, and execution reserve",
+          "kind": "judgment",
+          "evidence_tier": "primary_derived",
+          "evidence": "Primary bridge from ABNB/investor-documents/sec-edgar/10-K_20260212_rpt20251231_acc0001559720_26_000004.htm: FY2025 FCF $4600.0M, revenue $12241.0M, cash $6864.0M, long-term debt $1995.0M; contract backfill 2026-07-21.",
+          "method": "net_asset_value",
+          "valuation_status": "bounded_estimate"
+        }
+      ]
+    },
+    "method_route": {
+      "schema_version": "1.0",
+      "status": "routed",
+      "profile_id": "quality_reinvestment",
+      "label": "High-return compounder",
+      "score": 8.0,
+      "reasons": [
+        "archetype=platform",
+        "component categories=operating_business",
+        "existing methods=owner_cash"
+      ],
+      "primary_methods": [
+        "owner_earnings_reinvestment_dcf"
+      ],
+      "corroborating_methods": [
+        "reverse_dcf",
+        "incremental_roic_runway"
+      ],
+      "primary_personas": [
+        "buffett_weschler",
+        "hohn"
+      ],
+      "cross_check_personas": [
+        "munger",
+        "marathon_capital_cycle"
+      ],
+      "silent_personas": [
+        "greenblatt",
+        "hk",
+        "klarman_asset_value",
+        "marks_credit_cycle",
+        "pabrai",
+        "stahl"
+      ],
+      "required_evidence": [
+        "normalized owner earnings",
+        "incremental return on capital",
+        "reinvestment runway",
+        "diluted share count",
+        "competitive-advantage mechanism"
+      ],
+      "failure_modes": [
+        "growth projected without its capital cost",
+        "stock compensation or acquisitions omitted",
+        "terminal value unsupported by a durable mechanism"
+      ],
+      "secondary_profiles": [
+        {
+          "profile_id": "predictable_cash_flow",
+          "score": 3.0,
+          "reasons": [
+            "component categories=operating_business",
+            "existing methods=dividend, owner_cash"
+          ]
+        },
+        {
+          "profile_id": "binary_milestone",
+          "score": 3.0,
+          "reasons": [
+            "component categories=real_option",
+            "existing methods=milestone, risk_adjusted"
+          ]
+        }
+      ],
+      "scorecard": {
+        "scarce_asset_optionality": {
+          "score": 1.0,
+          "reasons": [
+            "component categories=real_option"
+          ]
+        },
+        "quality_reinvestment": {
+          "score": 8.0,
+          "reasons": [
+            "archetype=platform",
+            "component categories=operating_business",
+            "existing methods=owner_cash"
+          ]
+        },
+        "capital_cycle": {
+          "score": 1.0,
+          "reasons": [
+            "component categories=operating_business"
+          ]
+        },
+        "credit_and_normalized_returns": {
+          "score": 1.0,
+          "reasons": [
+            "component categories=liability_or_reserve"
+          ]
+        },
+        "catalyst_asset_value": {
+          "score": 0.0,
+          "reasons": []
+        },
+        "predictable_cash_flow": {
+          "score": 3.0,
+          "reasons": [
+            "component categories=operating_business",
+            "existing methods=dividend, owner_cash"
+          ]
+        },
+        "binary_milestone": {
+          "score": 3.0,
+          "reasons": [
+            "component categories=real_option",
+            "existing methods=milestone, risk_adjusted"
+          ]
+        }
+      },
+      "decision_rule": "Use one primary method and no more than two corroborating methods; irrelevant methods and personas remain silent."
+    },
+    "market": {
+      "price_per_share": 144.94,
+      "fully_diluted_shares": 623000000,
+      "market_cap_m": 90297.62,
+      "enterprise_value_m": 85428.62
+    },
+    "valuation": {
+      "value_per_share": {
+        "low": 101.9236,
+        "base": 145.8154,
+        "high": 194.0265
+      },
+      "priced_components_per_share": {
+        "low": 101.9236,
+        "base": 145.8154,
+        "high": 194.0265
+      },
+      "legacy_value_per_share": {
+        "low": 101.92,
+        "base": 145.82,
+        "high": 194.03
+      },
+      "probability_weighted_value_per_share": 145.8154,
+      "expected_distributions_per_share": 0.0,
+      "annualized_return_at_price_pct": {
+        "low": -4.91,
+        "base": 0.09,
+        "high": 4.25
+      },
+      "downside_to_low_pct": -29.68,
+      "horizon_years": 7,
+      "interpretation": "value_per_share is withheld while any material additive component is unpriced; priced_components_per_share is not a complete security value."
+    },
+    "scenario_contract": {
+      "rule": "Cases must change cited causal operating, capital, probability, timing, or financing drivers\u2014not only a terminal multiple.",
+      "top_value_drivers": [
+        {
+          "component_id": "core_marketplace_platform",
+          "label": "Core marketplace owner-cash engine (nights and GBV)",
+          "valuation_status": "bounded_estimate",
+          "base_per_share": 140.0,
+          "legacy_base_per_share": 140.0,
+          "range_width_per_share": 65.63,
+          "scenario_assumptions": "Proof outputs {'low': 109.37, 'base': 140.0, 'high': 175.0}; see calculation_proof graph."
+        },
+        {
+          "component_id": "regulatory_and_execution_reserve",
+          "label": "Regulatory, tax, and execution reserve",
+          "valuation_status": "bounded_estimate",
+          "base_per_share": -6.0,
+          "legacy_base_per_share": -6.0,
+          "range_width_per_share": 12.5,
+          "scenario_assumptions": "Proof outputs {'low': -14.0, 'base': -6.0, 'high': -1.5}; see calculation_proof graph."
+        },
+        {
+          "component_id": "experiences_services_option",
+          "label": "Experiences and services attach option",
+          "valuation_status": "bounded_estimate",
+          "base_per_share": 4.0,
+          "legacy_base_per_share": 4.0,
+          "range_width_per_share": 12.0,
+          "scenario_assumptions": "Proof outputs {'low': 0.0, 'base': 4.0, 'high': 12.0}; see calculation_proof graph."
+        },
+        {
+          "component_id": "net_financial_claims",
+          "label": "Net cash and debt claims on common equity",
+          "valuation_status": "bounded_estimate",
+          "base_per_share": 7.8154,
+          "legacy_base_per_share": 7.82,
+          "range_width_per_share": 1.9729,
+          "scenario_assumptions": "Proof outputs {'low': 6.5536, 'base': 7.8154, 'high': 8.5265}; see calculation_proof graph."
+        }
+      ],
+      "reverse_expectations": null
+    },
+    "calculation_proof_summary": {
+      "component_count": 4,
+      "priced_component_count": 4,
+      "proof_complete_pct": 100.0,
+      "status_counts": {
+        "bounded_estimate": 4,
+        "calculated": 0,
+        "legacy_sensitivity": 0,
+        "unpriced": 0
+      },
+      "all_material_components_priced": true,
+      "calculation_errors": [],
+      "aggregate_proof_hash": "0884753f78e1afbabc48210e3bc0c25571d742a82ddd284e4abd65141432d86e"
+    },
+    "source_lineage": [
+      {
+        "component_id": "core_marketplace_platform",
+        "node_id": "normalized_owner_cash",
+        "ref": "ABNB/investor-documents/sec-edgar/10-K_20260212_rpt20251231_acc0001559720_26_000004.htm",
+        "locator": "FY2025 free cash flow $4600.0M \u00f7 623.0M weighted average diluted shares",
+        "as_of": "2025-12-31",
+        "content_sha256": "61bac47250511a2263631ebd99e92b1d42caf305d27ba9d9fbfa7b11aa199c02",
+        "source_id": "08fc8ba0564b2e3eb7ba93b9e7e125293aa6946ed2a0fd84b2344dbb37696474"
+      },
+      {
+        "component_id": "core_marketplace_platform",
+        "node_id": "owner_cash_m",
+        "ref": "ABNB/investor-documents/sec-edgar/10-K_20260212_rpt20251231_acc0001559720_26_000004.htm",
+        "locator": "Free cash flow $4.6B for year ended December 31, 2025",
+        "as_of": "2025-12-31",
+        "content_sha256": "61bac47250511a2263631ebd99e92b1d42caf305d27ba9d9fbfa7b11aa199c02",
+        "source_id": "a562cc34a8ef84693755f3cfb6730c21df2abe7eaed8d51baf513401818b916f"
+      },
+      {
+        "component_id": "core_marketplace_platform",
+        "node_id": "shares_m",
+        "ref": "ABNB/investor-documents/sec-edgar/10-K_20260212_rpt20251231_acc0001559720_26_000004.htm",
+        "locator": "623M weighted average diluted shares (FY2025 income statement)",
+        "as_of": "2025-12-31",
+        "content_sha256": "61bac47250511a2263631ebd99e92b1d42caf305d27ba9d9fbfa7b11aa199c02",
+        "source_id": "aca2f45b203c16472a67dfa4cf02709d7ad2e11cf89c2c95e52c71c9470202ae"
+      },
+      {
+        "component_id": "experiences_services_option",
+        "node_id": "total_revenue_m",
+        "ref": "ABNB/investor-documents/sec-edgar/10-K_20260212_rpt20251231_acc0001559720_26_000004.htm",
+        "locator": "RevenueFromContractWithCustomerExcludingAssessedTax $12,241M (FY2025)",
+        "as_of": "2025-12-31",
+        "content_sha256": "61bac47250511a2263631ebd99e92b1d42caf305d27ba9d9fbfa7b11aa199c02",
+        "source_id": "01317a7eab95365cf8008334022b61603af3235558905098f14a5537f5d2978b"
+      },
+      {
+        "component_id": "experiences_services_option",
+        "node_id": "shares_m",
+        "ref": "ABNB/investor-documents/sec-edgar/10-K_20260212_rpt20251231_acc0001559720_26_000004.htm",
+        "locator": "623M weighted average diluted shares (FY2025)",
+        "as_of": "2025-12-31",
+        "content_sha256": "61bac47250511a2263631ebd99e92b1d42caf305d27ba9d9fbfa7b11aa199c02",
+        "source_id": "0c3620f6d03727ae28f411380ba016c8072f8b17f80c8fd4128705b89bfca326"
+      },
+      {
+        "component_id": "net_financial_claims",
+        "node_id": "cash_m",
+        "ref": "ABNB/investor-documents/sec-edgar/10-K_20260212_rpt20251231_acc0001559720_26_000004.htm",
+        "locator": "CashAndCashEquivalentsAtCarryingValue $6,864M at December 31, 2025",
+        "as_of": "2025-12-31",
+        "content_sha256": "61bac47250511a2263631ebd99e92b1d42caf305d27ba9d9fbfa7b11aa199c02",
+        "source_id": "d243129dd34e296fb96ce4021d585fb1dc3dae5fcbed0b9509e15bd7abbb7959"
+      },
+      {
+        "component_id": "net_financial_claims",
+        "node_id": "debt_m",
+        "ref": "ABNB/investor-documents/sec-edgar/10-K_20260212_rpt20251231_acc0001559720_26_000004.htm",
+        "locator": "LongTermDebtNoncurrent $1,995M at December 31, 2025",
+        "as_of": "2025-12-31",
+        "content_sha256": "61bac47250511a2263631ebd99e92b1d42caf305d27ba9d9fbfa7b11aa199c02",
+        "source_id": "9278f6bc61658cfa9a9fbcc65b39bb98af562c6d4a1f2b5b13df6666187885b9"
+      },
+      {
+        "component_id": "net_financial_claims",
+        "node_id": "shares_m",
+        "ref": "ABNB/investor-documents/sec-edgar/10-K_20260212_rpt20251231_acc0001559720_26_000004.htm",
+        "locator": "623M weighted average diluted shares (FY2025)",
+        "as_of": "2025-12-31",
+        "content_sha256": "61bac47250511a2263631ebd99e92b1d42caf305d27ba9d9fbfa7b11aa199c02",
+        "source_id": "0c3620f6d03727ae28f411380ba016c8072f8b17f80c8fd4128705b89bfca326"
+      },
+      {
+        "component_id": "regulatory_and_execution_reserve",
+        "node_id": "stock_based_comp_m",
+        "ref": "ABNB/investor-documents/sec-edgar/10-K_20260212_rpt20251231_acc0001559720_26_000004.htm",
+        "locator": "ShareBasedCompensation $1.59B (FY2025 cash flow statement)",
+        "as_of": "2025-12-31",
+        "content_sha256": "61bac47250511a2263631ebd99e92b1d42caf305d27ba9d9fbfa7b11aa199c02",
+        "source_id": "3b27187ccef317dfc7f715ae68776c7dbaf75474ece03d465678b29b52040115"
+      },
+      {
+        "component_id": "regulatory_and_execution_reserve",
+        "node_id": "marketing_m",
+        "ref": "ABNB/investor-documents/sec-edgar/10-K_20260212_rpt20251231_acc0001559720_26_000004.htm",
+        "locator": "Marketing and sales expense $2.59B (FY2025 income statement)",
+        "as_of": "2025-12-31",
+        "content_sha256": "61bac47250511a2263631ebd99e92b1d42caf305d27ba9d9fbfa7b11aa199c02",
+        "source_id": "7d7acbc83bee3b24450665f45a12e5059849c8860f5c76adc3bcd90c77a6970d"
+      },
+      {
+        "component_id": "regulatory_and_execution_reserve",
+        "node_id": "shares_m",
+        "ref": "ABNB/investor-documents/sec-edgar/10-K_20260212_rpt20251231_acc0001559720_26_000004.htm",
+        "locator": "623M weighted average diluted shares (FY2025)",
+        "as_of": "2025-12-31",
+        "content_sha256": "61bac47250511a2263631ebd99e92b1d42caf305d27ba9d9fbfa7b11aa199c02",
+        "source_id": "0c3620f6d03727ae28f411380ba016c8072f8b17f80c8fd4128705b89bfca326"
+      }
+    ],
+    "model_checks": {
+      "calculation_graphs_valid": true,
+      "component_sum_reconciles": true,
+      "no_double_counting": true,
+      "all_material_components_priced": true,
+      "low_base_high_ordered": true
+    },
+    "evidence": {
+      "unresolved_count": 0,
+      "blockers": [],
+      "validation_errors": []
+    },
+    "monitoring": {
+      "falsifiers": [
+        "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
+        "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
+        "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
+        "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case."
+      ],
+      "required_refresh_triggers": [
+        "new filing or material operating update",
+        "capital-structure change",
+        "material price move",
+        "component milestone or falsifier"
+      ]
+    },
+    "change_control": {
+      "model_hash": "c69fde4cb5f9af9bec130440251394a6a9d2fba7b1214035842c868e6732c3c7",
+      "method_versions": [
+        "net_asset_value@1.0",
+        "owner_cash_or_dividend_discount@1.0",
+        "risk_adjusted_milestone_value@1.0"
+      ],
+      "change_log": [],
+      "rule": "A source fact is locked. Every assumption change requires a reason, author, timestamp, and before/after value."
+    },
+    "decision_rule": "No security is decision-grade until every material claim is valued exactly once by a valid calculation proof and every material evidence blocker is resolved."
+  },
+  "economic_value": {
+    "schema_version": "1.0",
+    "method": "component_economic_value",
+    "economic_claim": {
+      "description": "One diluted share of ABNB, including the core marketplace owner-cash engine, experiences/services option, net financial claims, and regulatory reserve.",
+      "unit_label": "diluted share",
+      "unit_count": 623000000,
+      "unit_source": "FY2025 weighted average diluted shares 623.0M (ABNB/investor-documents/sec-edgar/10-K_20260212_rpt20251231_acc0001559720_26_000004.htm); FCF $4600.0M on 623.0M shares = $7.38/sh.",
+      "enterprise_to_equity_reconciliation": "Operating marketplace cash is valued in core_marketplace_platform; net cash and debt are separate in net_financial_claims; experiences attach is non-overlapping milestone option; regulatory reserve is a negative claim. No component overlaps another."
+    },
+    "gaap_role": "cross_check",
+    "accounting_reference": "FY2025 10-K: revenue $12241.0M, FCF $4600.0M, cash $6864.0M, long-term debt $1995.0M, SBC $1.59B.",
+    "component_groups": [
+      {
+        "id": "core_marketplace_platform",
+        "label": "Core marketplace owner-cash engine (nights and GBV)",
+        "component_ids": [
+          "core_marketplace_platform"
+        ],
+        "economic_claim": "Core marketplace owner-cash engine (nights and GBV)",
+        "valuation_basis": "Proof outputs {'low': 109.37, 'base': 140.0, 'high': 175.0}; see calculation_proof graph.",
+        "adjustments": "Reconcile to FY2025 10-K and Q1 2026 10-Q before decision use.",
+        "overlap_control": "Unique overlap key core_marketplace_platform; no other component capitalizes the same claim."
+      },
+      {
+        "id": "experiences_services_option",
+        "label": "Experiences and services attach option",
+        "component_ids": [
+          "experiences_services_option"
+        ],
+        "economic_claim": "Experiences and services attach option",
+        "valuation_basis": "Proof outputs {'low': 0.0, 'base': 4.0, 'high': 12.0}; see calculation_proof graph.",
+        "adjustments": "Reconcile to FY2025 10-K and Q1 2026 10-Q before decision use.",
+        "overlap_control": "Unique overlap key experiences_services_option; seats in KPI embedded in core engine.",
+        "risk_and_timing": {
+          "probability_basis": "Low case $0/sh; base $4/sh; high $12/sh on incremental attach beyond nights path.",
+          "timing_basis": "Milestone value over 3\u20137 years as experiences/services mix expands.",
+          "remaining_capital_basis": "Marketing and product spend for attach largely in core owner-cash path; option net of embedded spend."
+        }
+      },
+      {
+        "id": "net_financial_claims",
+        "label": "Net cash and debt claims on common equity",
+        "component_ids": [
+          "net_financial_claims"
+        ],
+        "economic_claim": "Net cash and debt claims on common equity",
+        "valuation_basis": "Proof outputs {'low': 6.5536, 'base': 7.8154, 'high': 8.5265}; see calculation_proof graph.",
+        "adjustments": "Reconcile to FY2025 10-K and Q1 2026 10-Q before decision use.",
+        "overlap_control": "Unique overlap key net_financial_claims; no other component capitalizes the same claim."
+      },
+      {
+        "id": "regulatory_and_execution_reserve",
+        "label": "Regulatory, tax, and execution reserve",
+        "component_ids": [
+          "regulatory_and_execution_reserve"
+        ],
+        "economic_claim": "Regulatory, tax, and execution reserve",
+        "valuation_basis": "Proof outputs {'low': -14.0, 'base': -6.0, 'high': -1.5}; see calculation_proof graph.",
+        "adjustments": "Reconcile to FY2025 10-K and Q1 2026 10-Q before decision use.",
+        "overlap_control": "Unique overlap key regulatory_and_execution_reserve; no other component capitalizes the same claim."
+      }
+    ],
+    "limitations": [
+      "Component ranges are filing-anchored bounded estimates, not committee-approved price targets.",
+      "Experiences/services option remains judgment-heavy pending standalone segment disclosure."
+    ]
   }
 }

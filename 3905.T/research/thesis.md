@@ -11,8 +11,8 @@
 | **Dhando** (Pabrai) | none |
 | **Stance** | watch |
 | **Cycle** | - |
-| **Implied 7yr IRR** (base) | 4.56% (total synthesis) |
-| **IRR method** | scenario |
+| **Implied 7yr IRR** (base) | — |
+| **IRR method** | quality_reinvestment |
 | **Lawrence bucket** | other |
 | **Payoff lens** | pending |
 | **MOI bucket** | pending |
@@ -43,4 +43,4 @@ DataSection is betting the **Neo Cloud** franchise on **hyperscaler-linked AI da
 - Confirm FY2026 actuals and FY2027 guide when released.
 - Model **Inzai** phased launch and **Australia** GPU delivery **Jun–Aug 2026** per Apr revision.
 
-**Deep dive:** `3905.T/research/deep_dive_2026-06-04.md` (auto-sync)
+**Deep dive:** `3905.T/research/deep_dive_2026-07-21.md` (auto-sync)

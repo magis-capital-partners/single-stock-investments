@@ -144,15 +144,51 @@ jobs:
             _system/scripts/ci_sparse_checkout_paths.py
           sparse-checkout-cone-mode: false
           fetch-depth: 1
-      - name: Checkout workspace (shallow PR diff)
+      - name: Checkout workspace (PR head + base tip)
         run: |
+          # Depth only needs enough history for overlay/insider valuation.json
+          # comparisons against base tip. Ticker scope comes from the GitHub PR
+          # file list below — never from a shallow two-dot git fallback.
           bash _system/scripts/ci_checkout_workspace.sh history "pull/${{ github.event.pull_request.number }}/head" 2
           git fetch --depth=1 origin "+refs/heads/${{ github.base_ref }}:refs/remotes/origin/${{ github.base_ref }}"
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
+      - name: Export PR changed files
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh api --paginate \
+            "repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}/files" \
+            --jq '.[].filename' > "$RUNNER_TEMP/pr-files.txt"
+          echo "PR files: $(wc -l < "$RUNNER_TEMP/pr-files.txt")"
+      - name: Overlay lint scripts from base branch
+        run: |
+          # Stale PR heads must not break CI when main evolves the lint CLI/API.
+          # Pull the full lint dependency set from the base tip, not only the entrypoint.
+          set -euo pipefail
+          BASE_REF="origin/${{ github.base_ref }}"
+          for f in \
+            lint_pr_research.py \
+            lint_deep_dive.py \
+            lint_adversarial.py \
+            lint_context_overlay.py \
+            lint_insider_signal.py \
+            check_evidence_completeness.py \
+            marvin_pipeline_common.py \
+            filing_facts.py \
+            refresh_optionality_valuation.py
+          do
+            if git cat-file -e "${BASE_REF}:_system/scripts/${f}" 2>/dev/null; then
+              git checkout "${BASE_REF}" -- "_system/scripts/${f}"
+              echo "overlay _system/scripts/${f} from ${BASE_REF}"
+            fi
+          done
       - name: Lint changed ticker research
-        run: python _system/scripts/lint_pr_research.py --base origin/${{ github.base_ref }}
+        run: |
+          python _system/scripts/lint_pr_research.py \
+            --base origin/${{ github.base_ref }} \
+            --name-only-file "$RUNNER_TEMP/pr-files.txt"
 
   dashboard-integrity:
     needs: changes

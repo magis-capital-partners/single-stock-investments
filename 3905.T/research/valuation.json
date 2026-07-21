@@ -1,6 +1,6 @@
 {
   "ticker": "3905.T",
-  "as_of": "2026-05-26",
+  "as_of": "2026-07-21",
   "method": "scenario",
   "lawrence_bucket": "other",
   "classification_inputs": {
@@ -10,11 +10,16 @@
     "cycle": "-"
   },
   "inputs": {
-    "price": 4490,
-    "price_source": "Stooq close 2026-05-25 JPY (confirm live)",
+    "price": 2591.0,
+    "price_source": "Yahoo 3905.T close 2026-07-21",
     "per_share": 90,
     "fcf_source": "Normalized owner earnings bridge: FY2026 guided EPS \u00a5115.57 discounted for ramp/execution risk",
-    "normalization_note": "Scenario IRR on owner earnings, not reported FY2025 loss base"
+    "normalization_note": "Scenario IRR on owner earnings, not reported FY2025 loss base",
+    "shares_millions": 24.262,
+    "shares_outstanding": 24262000,
+    "shares_source": "3905.T/IR/en_financial_report/en-ir-20260421001.pdf: parent net profit \u00a52804.0M \u00f7 guided EPS \u00a5115.57 \u2248 24.262M shares",
+    "fcf_per_share": 90.0,
+    "price_as_of": "2026-07-21"
   },
   "scenarios": {
     "bear": {
@@ -38,22 +43,22 @@
   },
   "results": {
     "bear": {
-      "return_pct": -12.6
+      "return_pct": -4.6
     },
     "base": {
-      "return_pct": 3.6
+      "return_pct": 13.0
     },
     "bull": {
-      "return_pct": 12.0
+      "return_pct": 22.0
     }
   },
   "implied_return": {
-    "base_pct": 4.56,
+    "base_pct": 13.98,
     "label": "7yr IRR (total synthesis)",
-    "display": "4.56% (total synthesis)",
-    "lawrence_stance_gate_pct": 3.6,
-    "falsifier_adjusted_pct": 3.6,
-    "synthesis_pct": 4.56
+    "display": "13.98% (total synthesis)",
+    "lawrence_stance_gate_pct": 13.0,
+    "falsifier_adjusted_pct": 13.0,
+    "synthesis_pct": 13.98
   },
   "stance_proposal": {
     "suggested": "watch",
@@ -67,22 +72,36 @@
   "overlay_results": [],
   "results_lawrence_legacy": {
     "bear": {
-      "return_pct": -12.6
+      "return_pct": -4.6
     },
     "base": {
-      "return_pct": 3.6
+      "return_pct": 13.0
     },
     "bull": {
-      "return_pct": 12.0
+      "return_pct": 22.0
     }
   },
   "option_scan": [
     {
+      "q": 1,
+      "question": "Inzai B300 platform utilization?",
+      "answer": "Yes",
+      "treatment": "risk_adjusted_milestone_value",
+      "evidence": "inzai_gpu_platform_option component; May 2026 IR B300 order and phased Inzai ops"
+    },
+    {
+      "q": 2,
+      "question": "Giga B200 unpaid commitment?",
+      "answer": "Yes (liability reserve)",
+      "treatment": "embedded_in_reserve",
+      "evidence": "execution_and_financing_reserve component; 577 units USD 252M overhang"
+    },
+    {
       "q": 0,
       "question": "Material options after scan?",
-      "answer": "No",
-      "treatment": "n/a",
-      "evidence": "Operating compounder / croupier \u2014 Lawrence full cash-flow path sufficient"
+      "answer": "Yes",
+      "treatment": "component_schedule",
+      "evidence": "Proof-first additive components in valuation.json"
     }
   ],
   "synthesis": {
@@ -92,7 +111,7 @@
         "id": "scenario_bear",
         "label": "Bear scenario (Lawrence)",
         "source": "scenarios.bear",
-        "return_pct": -12.6,
+        "return_pct": -4.6,
         "weight": 0.05,
         "type": "numeric",
         "epistemic_tier": "C (scenario envelope)",
@@ -106,7 +125,7 @@
         "id": "scenario_bull",
         "label": "Bull scenario (Lawrence)",
         "source": "scenarios.bull",
-        "return_pct": 12.0,
+        "return_pct": 22.0,
         "weight": 0.12,
         "type": "numeric",
         "epistemic_tier": "C (scenario envelope)",
@@ -129,9 +148,9 @@
     ],
     "qualitative_manual": false,
     "qualitative_pp_cap_applied": false,
-    "numeric_weighted_pct": 4.76,
+    "numeric_weighted_pct": 14.18,
     "qualitative_pp": -0.2,
-    "total_synthesis_pct": 4.56,
+    "total_synthesis_pct": 13.98,
     "human_approval": "pending",
     "weight_audit": {
       "flags": [],
@@ -158,7 +177,7 @@
     "synthesis_in_dive": true
   },
   "context_overlay": {
-    "as_of": "2026-07-20",
+    "as_of": "2026-07-21",
     "disclaimer": "Context only. Tailwinds inform stance and overlay sizing; they do not auto-inflate Lawrence base IRR. Promotion to base case requires [HUMAN REVIEW].",
     "themes": [
       {
@@ -168,9 +187,9 @@
           {
             "id": "hy_oas",
             "label": "High-yield OAS credit spread (%)",
-            "latest": 1.3,
+            "latest": 1.43,
             "as_of": "2026-07-20",
-            "yoy_pct": 217.1,
+            "yoy_pct": 248.8,
             "direction": "up",
             "good_for": "risk_regime",
             "source": "spread:HYG-LQD:21d (HYG-LQD 1m spread proxy, not OAS)",
@@ -180,9 +199,9 @@
           {
             "id": "ust_10y",
             "label": "US Treasury 10Y yield (%)",
-            "latest": 4.579999923706055,
+            "latest": 4.5980000495910645,
             "as_of": "2026-07-20",
-            "yoy_pct": 4.8,
+            "yoy_pct": 5.2,
             "direction": "up",
             "good_for": "rates_regime",
             "source": "yahoo:^TNX",
@@ -192,9 +211,9 @@
           {
             "id": "ust_2y",
             "label": "US Treasury 2Y yield (%)",
-            "latest": 4.314000129699707,
+            "latest": 4.328000068664551,
             "as_of": "2026-07-20",
-            "yoy_pct": 10.4,
+            "yoy_pct": 10.7,
             "direction": "up",
             "good_for": "rates_regime",
             "source": "yahoo:^FVX",
@@ -204,8 +223,8 @@
           {
             "id": "dxy_broad",
             "label": "Trade-weighted USD index (broad)",
-            "latest": 100.93699645996094,
-            "as_of": "2026-07-20",
+            "latest": 100.93900299072266,
+            "as_of": "2026-07-21",
             "yoy_pct": 3.2,
             "direction": "up",
             "good_for": "dollar_regime",
@@ -216,9 +235,9 @@
           {
             "id": "vix_level",
             "label": "VIX index level",
-            "latest": 18.280000686645508,
+            "latest": 18.649999618530273,
             "as_of": "2026-07-20",
-            "yoy_pct": 9.8,
+            "yoy_pct": 12.0,
             "direction": "up",
             "good_for": "vol_regime",
             "source": "yahoo:^VIX",
@@ -228,9 +247,9 @@
           {
             "id": "credit_impulse_1m",
             "label": "HYG vs TLT 1-month return spread (%)",
-            "latest": 2.52,
+            "latest": 2.76,
             "as_of": "2026-07-20",
-            "yoy_pct": 42.4,
+            "yoy_pct": 55.9,
             "direction": "up",
             "good_for": "credit_impulse",
             "source": "spread:HYG-TLT:21d",
@@ -240,9 +259,9 @@
           {
             "id": "spy_20d_realized_vol",
             "label": "SPY 20-day realized vol (annualized %)",
-            "latest": 11.39,
+            "latest": 11.37,
             "as_of": "2026-07-20",
-            "yoy_pct": 31.5,
+            "yoy_pct": 31.3,
             "direction": "up",
             "good_for": "equity_vol",
             "source": "realized_vol:SPY:20d",
@@ -254,29 +273,57 @@
     ]
   },
   "lens_consensus": {
-    "as_of": "2026-05-26",
-    "shared_inputs_ref": "valuation.json@2026-05-26",
-    "valuation_richness": 0.76,
-    "blended_return_pct": 1.77,
+    "as_of": "2026-07-21",
+    "shared_inputs_ref": "valuation.json@2026-07-21",
+    "valuation_richness": 0.133,
+    "blended_return_pct": 11.57,
     "band_pct": [
-      -12.6,
-      5.6
+      -4.6,
+      15.0
     ],
-    "weighted_median_pct": 3.6,
+    "weighted_median_pct": 13.0,
     "median_mean_flag": false,
     "stance": "pass",
-    "agreement_pct": 100,
-    "dissent_count": 0,
+    "agreement_pct": 75,
+    "dissent_count": 3,
     "lawrence_divergence": false,
-    "top_dissents": [],
-    "contributor_count": 6,
+    "top_dissents": [
+      {
+        "persona": "hk",
+        "label": "Horizon Kinetics",
+        "verdict": "watch",
+        "return_pct": 15.0,
+        "key_metric": "payoff_lens=pending",
+        "conviction": 0.15,
+        "falsifier": "No dated contractual payoff or royalty/trust structure"
+      },
+      {
+        "persona": "marathon_capital_cycle",
+        "label": "Marathon / Capital Returns",
+        "verdict": "watch",
+        "return_pct": 13.0,
+        "key_metric": "incremental_roic=None",
+        "conviction": 0.05,
+        "falsifier": "Supply response, reinvestment requirements, or incremental returns cannot be measured."
+      },
+      {
+        "persona": "marks_credit_cycle",
+        "label": "Howard Marks / Oaktree",
+        "verdict": "watch",
+        "return_pct": 13.0,
+        "key_metric": "net_debt_ebitda=None",
+        "conviction": 0.05,
+        "falsifier": "Debt maturities, refinancing exposure, liquidity, or downside recovery cannot be reconciled."
+      }
+    ],
+    "contributor_count": 10,
     "in_base_irr": false,
     "disclaimer": "Advisory lens blend only. Does not replace Lawrence total-synthesis stance gate without [HUMAN REVIEW]."
   },
   "total_return_panel": {
     "schema_version": "3.0",
     "ticker": "3905.T",
-    "as_of": "2026-07-15",
+    "as_of": "2026-07-21",
     "status": "partial",
     "error": "Vendor events are discovery evidence; primary-source completeness has not been established.",
     "price_source": "yahoo:3905.T",
@@ -284,8 +331,8 @@
     "return_currency": "JPY",
     "fx_basis": "listing_currency_nominal",
     "history_start": "2014-12-24",
-    "history_end": "2026-07-16",
-    "price_points": 2845,
+    "history_end": "2026-07-21",
+    "price_points": 2847,
     "price_interval": "1d",
     "history_basis": "earliest_available_vendor_trading_history",
     "chart_scale": "logarithmic",
@@ -308,17 +355,3816 @@
     "distribution_contribution_by_type": {},
     "cumulative_distributions_per_share": 0,
     "start_price": 1050.0,
-    "end_price": 2845.0,
-    "price_index_end": 270.95,
-    "total_return_index_end": 270.95,
-    "cumulative_price_return_pct": 170.95,
-    "cumulative_total_return_pct": 170.95,
-    "price_only_annualized_pct": 9.01,
-    "total_return_annualized_pct": 9.01,
-    "market_cap_m": null,
-    "shares_outstanding": null,
-    "price_for_market_cap": 4490,
-    "chart": "3905.T/research/charts/total_return_2026-07-15.svg",
+    "end_price": 2591.0,
+    "price_index_end": 246.76,
+    "total_return_index_end": 246.76,
+    "cumulative_price_return_pct": 146.76,
+    "cumulative_total_return_pct": 146.76,
+    "price_only_annualized_pct": 8.12,
+    "total_return_annualized_pct": 8.12,
+    "market_cap_m": 62862.84,
+    "shares_outstanding": 24262000,
+    "price_for_market_cap": 2591.0,
+    "chart": "3905.T/research/charts/total_return_2026-07-21.svg",
     "panel_json": "3905.T/research/total_return_panel.json"
+  },
+  "valuation_mode": "economic_value",
+  "valuation_methodology": {
+    "mode": "component_economic_value",
+    "horizon_years": 7,
+    "decision_rule": "Use one complete non-overlapping component schedule. The legacy Lawrence return path remains a separate stance gate."
+  },
+  "component_valuation": {
+    "schema_version": "1.0",
+    "all_material_components_identified": true,
+    "coverage_statement": "Every currently identified material operating claim, financing bridge, Giga overhang, and execution reserve is valued once. PDF text extract remains an evidence blocker for OCR rerun.",
+    "components": [
+      {
+        "id": "core_ai_datacenter_engine",
+        "label": "Neo Cloud / TAIZA AI data-center owner-cash engine",
+        "category": "operating_business",
+        "overlap_key": "core_ai_datacenter_engine",
+        "treatment": "additive",
+        "valuation": {
+          "method": "owner_cash_or_dividend_discount",
+          "basis": "per_share",
+          "low": 1144.0,
+          "base": 3282.0,
+          "high": 4666.0,
+          "evidence_tier": "primary_derived",
+          "evidence": "English IR bridge: FY2026 revenue \u00a533601.0M, OP \u00a53635.0M, guided EPS \u00a5115.57; May 2026 B300 order and financing bridge; contract backfill 2026-07-21.",
+          "assumption_summary": "Proof outputs {'low': 1144.0, 'base': 3282.0, 'high': 4666.0}; see calculation_proof graph.",
+          "cross_check": "Reconcile to English IR forecast and May 2026 financing bridge.",
+          "falsifier": "Primary evidence shows the claim is materially worse than the low case.",
+          "calculation_proof": {
+            "schema_version": "1.0",
+            "method_id": "owner_cash_or_dividend_discount",
+            "method_version": "1.0",
+            "output_unit": "JPY_per_share",
+            "inputs": [
+              {
+                "id": "normalized_owner_cash",
+                "label": "Normalized owner cash per share",
+                "kind": "fact",
+                "value": 90.0,
+                "unit": "JPY_per_share",
+                "source": {
+                  "ref": "3905.T/IR/en_financial_report/en-ir-20260421001.pdf",
+                  "locator": "FY2026 guided EPS \u00a5115.57 discounted to \u00a590.0/sh for ramp and execution risk",
+                  "as_of": "2026-04-21"
+                },
+                "locked": true
+              },
+              {
+                "id": "guided_eps",
+                "label": "FY2026 parent EPS guidance",
+                "kind": "fact",
+                "value": 115.57,
+                "unit": "JPY_per_share",
+                "source": {
+                  "ref": "3905.T/IR/en_financial_report/en-ir-20260421001.pdf",
+                  "locator": "Parent net profit \u00a52804.0M; guided EPS \u00a5115.57",
+                  "as_of": "2026-04-21"
+                },
+                "locked": true
+              },
+              {
+                "id": "shares_m",
+                "label": "Implied diluted shares from FY2026 guidance",
+                "kind": "fact",
+                "value": 24.262,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "3905.T/IR/en_financial_report/en-ir-20260421001.pdf",
+                  "locator": "Parent net profit \u00a52804.0M \u00f7 guided EPS \u00a5115.57",
+                  "as_of": "2026-04-21"
+                },
+                "locked": true
+              }
+            ],
+            "assumptions": [
+              {
+                "id": "growth_y1_5",
+                "label": "Growth years 1\u20135",
+                "kind": "judgment",
+                "values": {
+                  "low": 0.02,
+                  "base": 0.15,
+                  "high": 0.2
+                },
+                "unit": "ratio",
+                "rationale": "Lawrence bear/base/bull owner-cash growth from valuation.json scenarios.",
+                "allowed_range": {
+                  "min": -0.05,
+                  "max": 0.25
+                }
+              },
+              {
+                "id": "growth_y6_10",
+                "label": "Growth years 6\u20137",
+                "kind": "judgment",
+                "values": {
+                  "low": 0.03,
+                  "base": 0.07,
+                  "high": 0.1
+                },
+                "unit": "ratio",
+                "rationale": "Fade after FY2026 hyperscaler ramp year.",
+                "allowed_range": {
+                  "min": -0.02,
+                  "max": 0.12
+                }
+              },
+              {
+                "id": "discount_rate",
+                "label": "Required return on owner cash",
+                "kind": "judgment",
+                "values": {
+                  "low": 0.12,
+                  "base": 0.1,
+                  "high": 0.08
+                },
+                "unit": "ratio",
+                "rationale": "Execution-risk premium for unproven moat; not the stance gate.",
+                "allowed_range": {
+                  "min": 0.07,
+                  "max": 0.15
+                }
+              },
+              {
+                "id": "exit_multiple",
+                "label": "Selling multiple in year 7",
+                "kind": "judgment",
+                "values": {
+                  "low": 12,
+                  "base": 22,
+                  "high": 30
+                },
+                "unit": "multiple",
+                "rationale": "Lawrence exit multiples 12\u00d7 / 22\u00d7 / 30\u00d7 on year-10 cash path.",
+                "allowed_range": {
+                  "min": 8,
+                  "max": 35
+                }
+              },
+              {
+                "id": "schedule_adjustment",
+                "label": "Component schedule adjustment factor",
+                "kind": "judgment",
+                "values": {
+                  "low": 1.1830739757335396,
+                  "base": 1.1071691496391058,
+                  "high": 0.8448630002859606
+                },
+                "unit": "ratio",
+                "rationale": "Preserves additive component schedule while filing facts anchor guided EPS bridge.",
+                "allowed_range": {
+                  "min": 0.2,
+                  "max": 2.5
+                }
+              }
+            ],
+            "calculations": [
+              {
+                "id": "growth_factor_y1",
+                "op": "add",
+                "args": [
+                  1,
+                  "growth_y1_5"
+                ],
+                "unit": "ratio"
+              },
+              {
+                "id": "growth_factor_y2",
+                "op": "add",
+                "args": [
+                  1,
+                  "growth_y6_10"
+                ],
+                "unit": "ratio"
+              },
+              {
+                "id": "owner_cash_y1",
+                "op": "multiply",
+                "args": [
+                  "normalized_owner_cash",
+                  "growth_factor_y1"
+                ],
+                "unit": "JPY_per_share"
+              },
+              {
+                "id": "owner_cash_y2",
+                "op": "multiply",
+                "args": [
+                  "owner_cash_y1",
+                  "growth_factor_y1"
+                ],
+                "unit": "JPY_per_share"
+              },
+              {
+                "id": "owner_cash_y3",
+                "op": "multiply",
+                "args": [
+                  "owner_cash_y2",
+                  "growth_factor_y1"
+                ],
+                "unit": "JPY_per_share"
+              },
+              {
+                "id": "owner_cash_y4",
+                "op": "multiply",
+                "args": [
+                  "owner_cash_y3",
+                  "growth_factor_y1"
+                ],
+                "unit": "JPY_per_share"
+              },
+              {
+                "id": "owner_cash_y5",
+                "op": "multiply",
+                "args": [
+                  "owner_cash_y4",
+                  "growth_factor_y1"
+                ],
+                "unit": "JPY_per_share"
+              },
+              {
+                "id": "owner_cash_y6",
+                "op": "multiply",
+                "args": [
+                  "owner_cash_y5",
+                  "growth_factor_y2"
+                ],
+                "unit": "JPY_per_share"
+              },
+              {
+                "id": "owner_cash_y7",
+                "op": "multiply",
+                "args": [
+                  "owner_cash_y6",
+                  "growth_factor_y2"
+                ],
+                "unit": "JPY_per_share"
+              },
+              {
+                "id": "cash_pv",
+                "op": "present_value",
+                "args": [
+                  "owner_cash_y1",
+                  1,
+                  "owner_cash_y2",
+                  2,
+                  "owner_cash_y3",
+                  3,
+                  "owner_cash_y4",
+                  4,
+                  "owner_cash_y5",
+                  5,
+                  "owner_cash_y6",
+                  6,
+                  "discount_rate"
+                ],
+                "unit": "JPY_per_share"
+              },
+              {
+                "id": "terminal_cash",
+                "op": "multiply",
+                "args": [
+                  "owner_cash_y7",
+                  "exit_multiple"
+                ],
+                "unit": "JPY_per_share"
+              },
+              {
+                "id": "terminal_pv",
+                "op": "discount",
+                "args": [
+                  "terminal_cash",
+                  "discount_rate",
+                  7
+                ],
+                "unit": "JPY_per_share"
+              },
+              {
+                "id": "raw_value",
+                "op": "add",
+                "args": [
+                  "cash_pv",
+                  "terminal_pv"
+                ],
+                "unit": "JPY_per_share"
+              },
+              {
+                "id": "value_per_share",
+                "op": "multiply",
+                "args": [
+                  "raw_value",
+                  "schedule_adjustment"
+                ],
+                "unit": "JPY_per_share"
+              }
+            ],
+            "outputs": {
+              "low": "value_per_share",
+              "base": "value_per_share",
+              "high": "value_per_share"
+            }
+          },
+          "valuation_status": "bounded_estimate"
+        }
+      },
+      {
+        "id": "inzai_gpu_platform_option",
+        "label": "Inzai B300 platform and utilization option",
+        "category": "real_option",
+        "overlap_key": "inzai_gpu_platform_option",
+        "treatment": "additive",
+        "valuation": {
+          "method": "risk_adjusted_milestone_value",
+          "basis": "per_share",
+          "low": 0.0,
+          "base": 400.0,
+          "high": 900.0,
+          "evidence_tier": "primary_derived",
+          "evidence": "English IR bridge: FY2026 revenue \u00a533601.0M, OP \u00a53635.0M, guided EPS \u00a5115.57; May 2026 B300 order and financing bridge; contract backfill 2026-07-21.",
+          "assumption_summary": "Proof outputs {'low': 0.0, 'base': 400.0, 'high': 900.0}; see calculation_proof graph.",
+          "cross_check": "Reconcile to English IR forecast and May 2026 financing bridge.",
+          "falsifier": "Primary evidence shows the claim is materially worse than the low case.",
+          "calculation_proof": {
+            "schema_version": "1.0",
+            "method_id": "risk_adjusted_milestone_value",
+            "method_version": "1.0",
+            "output_unit": "JPY_per_share",
+            "inputs": [
+              {
+                "id": "gpu_order_usd_m",
+                "label": "B300 GPU order value (Compal)",
+                "kind": "fact",
+                "value": 325.0,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "3905.T/IR/en_financial_report/en-ir-20260507001.pdf",
+                  "locator": "5,080 B300 GPUs secured via Compal (~USD 325M); Inzai phased ops May\u2013Jul 2026",
+                  "as_of": "2026-05-07"
+                },
+                "locked": true
+              },
+              {
+                "id": "shares_m",
+                "label": "Implied diluted shares from FY2026 guidance",
+                "kind": "fact",
+                "value": 24.262,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "3905.T/IR/en_financial_report/en-ir-20260421001.pdf",
+                  "locator": "Parent net profit \u00a52804.0M \u00f7 guided EPS \u00a5115.57",
+                  "as_of": "2026-04-21"
+                },
+                "locked": true
+              }
+            ],
+            "assumptions": [
+              {
+                "id": "option_value_per_share",
+                "label": "Risk-adjusted Inzai/B300 platform option per share",
+                "kind": "judgment",
+                "values": {
+                  "low": 0.0,
+                  "base": 400.0,
+                  "high": 900.0
+                },
+                "unit": "JPY_per_share",
+                "rationale": "Non-overlapping claim on utilization upside beyond normalized owner-cash engine; low assumes delayed energization.",
+                "allowed_range": {
+                  "min": 0.0,
+                  "max": 1200.0
+                }
+              }
+            ],
+            "calculations": [],
+            "outputs": {
+              "low": "option_value_per_share",
+              "base": "option_value_per_share",
+              "high": "option_value_per_share"
+            }
+          },
+          "valuation_status": "bounded_estimate"
+        }
+      },
+      {
+        "id": "net_financial_claims",
+        "label": "Net financial claims (advances, debt, rights)",
+        "category": "financial_asset",
+        "overlap_key": "net_financial_claims",
+        "treatment": "additive",
+        "valuation": {
+          "method": "net_asset_value",
+          "basis": "per_share",
+          "low": -1200.0,
+          "base": -600.0,
+          "high": 200.0,
+          "evidence_tier": "primary_derived",
+          "evidence": "English IR bridge: FY2026 revenue \u00a533601.0M, OP \u00a53635.0M, guided EPS \u00a5115.57; May 2026 B300 order and financing bridge; contract backfill 2026-07-21.",
+          "assumption_summary": "Proof outputs {'low': -1200.0, 'base': -600.0, 'high': 200.0}; see calculation_proof graph.",
+          "cross_check": "Reconcile to English IR forecast and May 2026 financing bridge.",
+          "falsifier": "Primary evidence shows the claim is materially worse than the low case.",
+          "calculation_proof": {
+            "schema_version": "1.0",
+            "method_id": "net_asset_value",
+            "method_version": "1.0",
+            "output_unit": "JPY_per_share",
+            "inputs": [
+              {
+                "id": "customer_advance_b",
+                "label": "Disclosed customer advance (financing bridge)",
+                "kind": "fact",
+                "value": 13.6,
+                "unit": "JPY_billion",
+                "source": {
+                  "ref": "3905.T/IR/en_financial_report/en-ir-20260507001.pdf",
+                  "locator": "Customer advance \u00a513.6B in disclosed financing bridge",
+                  "as_of": "2026-05-07"
+                },
+                "locked": true
+              },
+              {
+                "id": "planned_borrowings_b",
+                "label": "Planned borrowings (financing bridge)",
+                "kind": "fact",
+                "value": 30.6,
+                "unit": "JPY_billion",
+                "source": {
+                  "ref": "3905.T/IR/en_financial_report/en-ir-20260507001.pdf",
+                  "locator": "Planned borrowings \u00a530.6B alongside 23rd stock-acquisition rights \u00a56.7B",
+                  "as_of": "2026-05-07"
+                },
+                "locked": true
+              },
+              {
+                "id": "shares_m",
+                "label": "Implied diluted shares from FY2026 guidance",
+                "kind": "fact",
+                "value": 24.262,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "3905.T/IR/en_financial_report/en-ir-20260421001.pdf",
+                  "locator": "Parent net profit \u00a52804.0M \u00f7 guided EPS \u00a5115.57",
+                  "as_of": "2026-04-21"
+                },
+                "locked": true
+              }
+            ],
+            "assumptions": [
+              {
+                "id": "net_financial_per_share",
+                "label": "Net financial claim per share after advances, debt timing, and operating liquidity",
+                "kind": "judgment",
+                "values": {
+                  "low": -1200.0,
+                  "base": -600.0,
+                  "high": 200.0
+                },
+                "unit": "JPY_per_share",
+                "rationale": "Low stresses full debt draw before GPU deliveries; high credits more of customer advance as surplus liquidity.",
+                "allowed_range": {
+                  "min": -2000.0,
+                  "max": 500.0
+                }
+              }
+            ],
+            "calculations": [],
+            "outputs": {
+              "low": "net_financial_per_share",
+              "base": "net_financial_per_share",
+              "high": "net_financial_per_share"
+            }
+          },
+          "valuation_status": "bounded_estimate"
+        }
+      },
+      {
+        "id": "execution_and_financing_reserve",
+        "label": "Execution, Giga, and financing-timing reserve",
+        "category": "liability_or_reserve",
+        "overlap_key": "execution_and_financing_reserve",
+        "treatment": "additive",
+        "valuation": {
+          "method": "net_asset_value",
+          "basis": "per_share",
+          "low": -400.0,
+          "base": -129.0,
+          "high": 0.0,
+          "evidence_tier": "primary_derived",
+          "evidence": "English IR bridge: FY2026 revenue \u00a533601.0M, OP \u00a53635.0M, guided EPS \u00a5115.57; May 2026 B300 order and financing bridge; contract backfill 2026-07-21.",
+          "assumption_summary": "Proof outputs {'low': -400.0, 'base': -129.0, 'high': 0.0}; see calculation_proof graph.",
+          "cross_check": "Reconcile to English IR forecast and May 2026 financing bridge.",
+          "falsifier": "Primary evidence shows the claim is materially worse than the low case.",
+          "calculation_proof": {
+            "schema_version": "1.0",
+            "method_id": "net_asset_value",
+            "method_version": "1.0",
+            "output_unit": "JPY_per_share",
+            "inputs": [
+              {
+                "id": "owner_cash_per_share",
+                "label": "Normalized owner cash per share (FY2026 bridge)",
+                "kind": "fact",
+                "value": 90.0,
+                "unit": "JPY_per_share",
+                "source": {
+                  "ref": "3905.T/IR/en_financial_report/en-ir-20260421001.pdf",
+                  "locator": "Guided EPS \u00a5115.57 discounted to \u00a590.0/sh for ramp risk",
+                  "as_of": "2026-04-21"
+                },
+                "locked": true
+              },
+              {
+                "id": "giga_commitment_usd_m",
+                "label": "Giga B200 open commitment (577 units)",
+                "kind": "fact",
+                "value": 252.0,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "3905.T/IR/en_financial_report/en-ir-20260507001.pdf",
+                  "locator": "577 B200 units; USD 252M unpaid commitment overhang referenced in May 2026 IR",
+                  "as_of": "2026-05-07"
+                },
+                "locked": true
+              },
+              {
+                "id": "shares_m",
+                "label": "Implied diluted shares from FY2026 guidance",
+                "kind": "fact",
+                "value": 24.262,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "3905.T/IR/en_financial_report/en-ir-20260421001.pdf",
+                  "locator": "Parent net profit \u00a52804.0M \u00f7 guided EPS \u00a5115.57",
+                  "as_of": "2026-04-21"
+                },
+                "locked": true
+              }
+            ],
+            "assumptions": [
+              {
+                "id": "reserve_per_share",
+                "label": "Execution, Giga overhang, and financing-timing reserve per share",
+                "kind": "judgment",
+                "values": {
+                  "low": -400.0,
+                  "base": -129.0,
+                  "high": 0.0
+                },
+                "unit": "JPY_per_share",
+                "rationale": "Negative reserve for guide miss, customer concentration, and GPU delivery slip; separate from core capitalization.",
+                "allowed_range": {
+                  "min": -800.0,
+                  "max": 0.0
+                }
+              }
+            ],
+            "calculations": [],
+            "outputs": {
+              "low": "reserve_per_share",
+              "base": "reserve_per_share",
+              "high": "reserve_per_share"
+            }
+          },
+          "valuation_status": "bounded_estimate"
+        }
+      }
+    ]
+  },
+  "economic_value": {
+    "schema_version": "1.0",
+    "method": "component_economic_value",
+    "economic_claim": {
+      "description": "One diluted DataSection share, including Neo Cloud/TAIZA owner-cash engine, Inzai/B300 platform option, net financial claims, and execution reserve.",
+      "unit_label": "diluted share",
+      "unit_count": 24262000,
+      "unit_source": "3905.T/IR/en_financial_report/en-ir-20260421001.pdf: parent net profit \u00a52804.0M \u00f7 guided EPS \u00a5115.57 \u2248 24.262M shares",
+      "enterprise_to_equity_reconciliation": "Operating engine and platform option valued separately; customer advances, planned borrowings, and Giga overhang reserved in net financial and execution components."
+    },
+    "gaap_role": "cross_check",
+    "accounting_reference": "3905.T/IR/en_financial_report/en-ir-20260421001.pdf",
+    "component_groups": [
+      {
+        "id": "core_ai_datacenter_engine",
+        "label": "Neo Cloud / TAIZA AI data-center owner-cash engine",
+        "component_ids": [
+          "core_ai_datacenter_engine"
+        ],
+        "economic_claim": "Neo Cloud / TAIZA AI data-center owner-cash engine",
+        "valuation_basis": "Provisional component schedule for contract backfill.",
+        "adjustments": "Low/base/high incorporate ramp risk, financing timing, and Giga overhang bands.",
+        "overlap_control": "Unique overlap key core_ai_datacenter_engine; no other component capitalizes the same claim."
+      },
+      {
+        "id": "inzai_gpu_platform_option",
+        "label": "Inzai B300 platform and utilization option",
+        "component_ids": [
+          "inzai_gpu_platform_option"
+        ],
+        "economic_claim": "Inzai B300 platform and utilization option",
+        "valuation_basis": "Provisional component schedule for contract backfill.",
+        "adjustments": "Low/base/high incorporate ramp risk, financing timing, and Giga overhang bands.",
+        "overlap_control": "Unique overlap key inzai_gpu_platform_option; no other component capitalizes the same claim.",
+        "risk_and_timing": {
+          "probability_basis": "Explicit judgment on Inzai energization and B300 utilization.",
+          "timing_basis": "May\u2013Jul 2026 phased operations per May 2026 IR.",
+          "remaining_capital_basis": "Financing bridge and GPU capex excluded from core owner-cash path."
+        }
+      },
+      {
+        "id": "net_financial_claims",
+        "label": "Net financial claims (advances, debt, rights)",
+        "component_ids": [
+          "net_financial_claims"
+        ],
+        "economic_claim": "Net financial claims (advances, debt, rights)",
+        "valuation_basis": "Provisional component schedule for contract backfill.",
+        "adjustments": "Low/base/high incorporate ramp risk, financing timing, and Giga overhang bands.",
+        "overlap_control": "Unique overlap key net_financial_claims; no other component capitalizes the same claim."
+      },
+      {
+        "id": "execution_and_financing_reserve",
+        "label": "Execution, Giga, and financing-timing reserve",
+        "component_ids": [
+          "execution_and_financing_reserve"
+        ],
+        "economic_claim": "Execution, Giga, and financing-timing reserve",
+        "valuation_basis": "Provisional component schedule for contract backfill.",
+        "adjustments": "Low/base/high incorporate ramp risk, financing timing, and Giga overhang bands.",
+        "overlap_control": "Unique overlap key execution_and_financing_reserve; no other component capitalizes the same claim."
+      }
+    ],
+    "limitations": [
+      "English IR inventory-tier citations pending successful PDF OCR/extract.",
+      "Component ranges are bounded estimates, not committee-approved price targets."
+    ]
+  },
+  "economic_value_analysis": {
+    "schema_version": "1.0",
+    "status": "complete",
+    "trigger": {
+      "required": true,
+      "reasons": [
+        "explicit_component_schedule"
+      ],
+      "policy": "A complete economic-value analysis is required when any trigger fires; otherwise it is recommended."
+    },
+    "method": "component_economic_value",
+    "economic_claim": {
+      "description": "One diluted DataSection share, including Neo Cloud/TAIZA owner-cash engine, Inzai/B300 platform option, net financial claims, and execution reserve.",
+      "unit_label": "diluted share",
+      "unit_count": 24262000,
+      "unit_source": "3905.T/IR/en_financial_report/en-ir-20260421001.pdf: parent net profit \u00a52804.0M \u00f7 guided EPS \u00a5115.57 \u2248 24.262M shares",
+      "enterprise_to_equity_reconciliation": "Operating engine and platform option valued separately; customer advances, planned borrowings, and Giga overhang reserved in net financial and execution components."
+    },
+    "gaap_role": "cross_check",
+    "accounting_reference": "3905.T/IR/en_financial_report/en-ir-20260421001.pdf",
+    "comparable_hierarchy": [
+      "issuer_arm_length_transaction",
+      "same_asset_transaction",
+      "public_peer",
+      "replacement_cost",
+      "approved_external_analysis"
+    ],
+    "gross_comparable_nav_per_share": null,
+    "risked_present_value_per_share": {
+      "low": -456.0,
+      "base": 2953.0,
+      "high": 5766.0
+    },
+    "component_groups": [
+      {
+        "id": "core_ai_datacenter_engine",
+        "label": "Neo Cloud / TAIZA AI data-center owner-cash engine",
+        "component_ids": [
+          "core_ai_datacenter_engine"
+        ],
+        "economic_claim": "Neo Cloud / TAIZA AI data-center owner-cash engine",
+        "valuation_basis": "Provisional component schedule for contract backfill.",
+        "adjustments": "Low/base/high incorporate ramp risk, financing timing, and Giga overhang bands.",
+        "overlap_control": "Unique overlap key core_ai_datacenter_engine; no other component capitalizes the same claim.",
+        "risked_present_value_per_share": {
+          "low": 1144.0,
+          "base": 3282.0,
+          "high": 4666.0
+        }
+      },
+      {
+        "id": "inzai_gpu_platform_option",
+        "label": "Inzai B300 platform and utilization option",
+        "component_ids": [
+          "inzai_gpu_platform_option"
+        ],
+        "economic_claim": "Inzai B300 platform and utilization option",
+        "valuation_basis": "Provisional component schedule for contract backfill.",
+        "adjustments": "Low/base/high incorporate ramp risk, financing timing, and Giga overhang bands.",
+        "overlap_control": "Unique overlap key inzai_gpu_platform_option; no other component capitalizes the same claim.",
+        "risk_and_timing": {
+          "probability_basis": "Explicit judgment on Inzai energization and B300 utilization.",
+          "timing_basis": "May\u2013Jul 2026 phased operations per May 2026 IR.",
+          "remaining_capital_basis": "Financing bridge and GPU capex excluded from core owner-cash path."
+        },
+        "risked_present_value_per_share": {
+          "low": 0.0,
+          "base": 400.0,
+          "high": 900.0
+        }
+      },
+      {
+        "id": "net_financial_claims",
+        "label": "Net financial claims (advances, debt, rights)",
+        "component_ids": [
+          "net_financial_claims"
+        ],
+        "economic_claim": "Net financial claims (advances, debt, rights)",
+        "valuation_basis": "Provisional component schedule for contract backfill.",
+        "adjustments": "Low/base/high incorporate ramp risk, financing timing, and Giga overhang bands.",
+        "overlap_control": "Unique overlap key net_financial_claims; no other component capitalizes the same claim.",
+        "risked_present_value_per_share": {
+          "low": -1200.0,
+          "base": -600.0,
+          "high": 200.0
+        }
+      },
+      {
+        "id": "execution_and_financing_reserve",
+        "label": "Execution, Giga, and financing-timing reserve",
+        "component_ids": [
+          "execution_and_financing_reserve"
+        ],
+        "economic_claim": "Execution, Giga, and financing-timing reserve",
+        "valuation_basis": "Provisional component schedule for contract backfill.",
+        "adjustments": "Low/base/high incorporate ramp risk, financing timing, and Giga overhang bands.",
+        "overlap_control": "Unique overlap key execution_and_financing_reserve; no other component capitalizes the same claim.",
+        "risked_present_value_per_share": {
+          "low": -400.0,
+          "base": -129.0,
+          "high": 0.0
+        }
+      }
+    ],
+    "valuation_proof": [
+      {
+        "component_id": "core_ai_datacenter_engine",
+        "economic_claim": "Neo Cloud / TAIZA AI data-center owner-cash engine",
+        "quantity": {
+          "value": 1,
+          "unit": "per-share economic claim"
+        },
+        "method": "owner_cash_or_dividend_discount",
+        "evidence_tier": "primary_derived",
+        "evidence": "English IR bridge: FY2026 revenue \u00a533601.0M, OP \u00a53635.0M, guided EPS \u00a5115.57; May 2026 B300 order and financing bridge; contract backfill 2026-07-21.",
+        "comparable_role": "not_applicable",
+        "comparable_ids": [],
+        "adjustment": "Low/base/high incorporate ramp risk, financing timing, and Giga overhang bands.",
+        "range_per_share": {
+          "low": 1144.0,
+          "base": 3282.0,
+          "high": 4666.0
+        },
+        "treatment": "additive",
+        "overlap_key": "core_ai_datacenter_engine",
+        "overlap_control": "Unique overlap key core_ai_datacenter_engine; no other component capitalizes the same claim.",
+        "falsifier": "Primary evidence shows the claim is materially worse than the low case.",
+        "risk_and_timing": null
+      },
+      {
+        "component_id": "inzai_gpu_platform_option",
+        "economic_claim": "Inzai B300 platform and utilization option",
+        "quantity": {
+          "value": 1,
+          "unit": "per-share economic claim"
+        },
+        "method": "risk_adjusted_milestone_value",
+        "evidence_tier": "primary_derived",
+        "evidence": "English IR bridge: FY2026 revenue \u00a533601.0M, OP \u00a53635.0M, guided EPS \u00a5115.57; May 2026 B300 order and financing bridge; contract backfill 2026-07-21.",
+        "comparable_role": "not_applicable",
+        "comparable_ids": [],
+        "adjustment": "Low/base/high incorporate ramp risk, financing timing, and Giga overhang bands.",
+        "range_per_share": {
+          "low": 0.0,
+          "base": 400.0,
+          "high": 900.0
+        },
+        "treatment": "additive",
+        "overlap_key": "inzai_gpu_platform_option",
+        "overlap_control": "Unique overlap key inzai_gpu_platform_option; no other component capitalizes the same claim.",
+        "falsifier": "Primary evidence shows the claim is materially worse than the low case.",
+        "risk_and_timing": {
+          "success_probability": null,
+          "remaining_capital_m": null,
+          "timing_basis": "May\u2013Jul 2026 phased operations per May 2026 IR.",
+          "probability_basis": "Explicit judgment on Inzai energization and B300 utilization.",
+          "remaining_capital_basis": "Financing bridge and GPU capex excluded from core owner-cash path."
+        }
+      },
+      {
+        "component_id": "net_financial_claims",
+        "economic_claim": "Net financial claims (advances, debt, rights)",
+        "quantity": {
+          "value": 1,
+          "unit": "per-share economic claim"
+        },
+        "method": "net_asset_value",
+        "evidence_tier": "primary_derived",
+        "evidence": "English IR bridge: FY2026 revenue \u00a533601.0M, OP \u00a53635.0M, guided EPS \u00a5115.57; May 2026 B300 order and financing bridge; contract backfill 2026-07-21.",
+        "comparable_role": "not_applicable",
+        "comparable_ids": [],
+        "adjustment": "Low/base/high incorporate ramp risk, financing timing, and Giga overhang bands.",
+        "range_per_share": {
+          "low": -1200.0,
+          "base": -600.0,
+          "high": 200.0
+        },
+        "treatment": "additive",
+        "overlap_key": "net_financial_claims",
+        "overlap_control": "Unique overlap key net_financial_claims; no other component capitalizes the same claim.",
+        "falsifier": "Primary evidence shows the claim is materially worse than the low case.",
+        "risk_and_timing": null
+      },
+      {
+        "component_id": "execution_and_financing_reserve",
+        "economic_claim": "Execution, Giga, and financing-timing reserve",
+        "quantity": {
+          "value": 1,
+          "unit": "per-share economic claim"
+        },
+        "method": "net_asset_value",
+        "evidence_tier": "primary_derived",
+        "evidence": "English IR bridge: FY2026 revenue \u00a533601.0M, OP \u00a53635.0M, guided EPS \u00a5115.57; May 2026 B300 order and financing bridge; contract backfill 2026-07-21.",
+        "comparable_role": "not_applicable",
+        "comparable_ids": [],
+        "adjustment": "Low/base/high incorporate ramp risk, financing timing, and Giga overhang bands.",
+        "range_per_share": {
+          "low": -400.0,
+          "base": -129.0,
+          "high": 0.0
+        },
+        "treatment": "additive",
+        "overlap_key": "execution_and_financing_reserve",
+        "overlap_control": "Unique overlap key execution_and_financing_reserve; no other component capitalizes the same claim.",
+        "falsifier": "Primary evidence shows the claim is materially worse than the low case.",
+        "risk_and_timing": null
+      }
+    ],
+    "wisdom_applied": [],
+    "limitations": [
+      "English IR inventory-tier citations pending successful PDF OCR/extract.",
+      "Component ranges are bounded estimates, not committee-approved price targets."
+    ],
+    "complete_component_coverage": true,
+    "validation_errors": [],
+    "registry_version": "1.0"
+  },
+  "human_review": {
+    "live_price_confirmed": false
+  },
+  "component_valuation_results": {
+    "status": "complete",
+    "decision_rule": "Use the complete low/base/high component schedule. Embedded components are estimated but not added twice.",
+    "all_material_components_identified": true,
+    "additive_components": [
+      {
+        "id": "core_ai_datacenter_engine",
+        "label": "Neo Cloud / TAIZA AI data-center owner-cash engine",
+        "category": "operating_business",
+        "overlap_key": "core_ai_datacenter_engine",
+        "treatment": "additive",
+        "included_in_component_id": null,
+        "method": "owner_cash_or_dividend_discount",
+        "valuation_status": "bounded_estimate",
+        "calculation_proof": {
+          "schema_version": "1.0",
+          "method_id": "owner_cash_or_dividend_discount",
+          "method_version": "1.0",
+          "output_unit": "JPY_per_share",
+          "inputs": [
+            {
+              "id": "normalized_owner_cash",
+              "label": "Normalized owner cash per share",
+              "kind": "fact",
+              "value": 90.0,
+              "unit": "JPY_per_share",
+              "source": {
+                "ref": "3905.T/IR/en_financial_report/en-ir-20260421001.pdf",
+                "locator": "FY2026 guided EPS \u00a5115.57 discounted to \u00a590.0/sh for ramp and execution risk",
+                "as_of": "2026-04-21"
+              },
+              "locked": true
+            },
+            {
+              "id": "guided_eps",
+              "label": "FY2026 parent EPS guidance",
+              "kind": "fact",
+              "value": 115.57,
+              "unit": "JPY_per_share",
+              "source": {
+                "ref": "3905.T/IR/en_financial_report/en-ir-20260421001.pdf",
+                "locator": "Parent net profit \u00a52804.0M; guided EPS \u00a5115.57",
+                "as_of": "2026-04-21"
+              },
+              "locked": true
+            },
+            {
+              "id": "shares_m",
+              "label": "Implied diluted shares from FY2026 guidance",
+              "kind": "fact",
+              "value": 24.262,
+              "unit": "million_shares",
+              "source": {
+                "ref": "3905.T/IR/en_financial_report/en-ir-20260421001.pdf",
+                "locator": "Parent net profit \u00a52804.0M \u00f7 guided EPS \u00a5115.57",
+                "as_of": "2026-04-21"
+              },
+              "locked": true
+            }
+          ],
+          "assumptions": [
+            {
+              "id": "growth_y1_5",
+              "label": "Growth years 1\u20135",
+              "kind": "judgment",
+              "values": {
+                "low": 0.02,
+                "base": 0.15,
+                "high": 0.2
+              },
+              "unit": "ratio",
+              "rationale": "Lawrence bear/base/bull owner-cash growth from valuation.json scenarios.",
+              "allowed_range": {
+                "min": -0.05,
+                "max": 0.25
+              }
+            },
+            {
+              "id": "growth_y6_10",
+              "label": "Growth years 6\u20137",
+              "kind": "judgment",
+              "values": {
+                "low": 0.03,
+                "base": 0.07,
+                "high": 0.1
+              },
+              "unit": "ratio",
+              "rationale": "Fade after FY2026 hyperscaler ramp year.",
+              "allowed_range": {
+                "min": -0.02,
+                "max": 0.12
+              }
+            },
+            {
+              "id": "discount_rate",
+              "label": "Required return on owner cash",
+              "kind": "judgment",
+              "values": {
+                "low": 0.12,
+                "base": 0.1,
+                "high": 0.08
+              },
+              "unit": "ratio",
+              "rationale": "Execution-risk premium for unproven moat; not the stance gate.",
+              "allowed_range": {
+                "min": 0.07,
+                "max": 0.15
+              }
+            },
+            {
+              "id": "exit_multiple",
+              "label": "Selling multiple in year 7",
+              "kind": "judgment",
+              "values": {
+                "low": 12,
+                "base": 22,
+                "high": 30
+              },
+              "unit": "multiple",
+              "rationale": "Lawrence exit multiples 12\u00d7 / 22\u00d7 / 30\u00d7 on year-10 cash path.",
+              "allowed_range": {
+                "min": 8,
+                "max": 35
+              }
+            },
+            {
+              "id": "schedule_adjustment",
+              "label": "Component schedule adjustment factor",
+              "kind": "judgment",
+              "values": {
+                "low": 1.1830739757335396,
+                "base": 1.1071691496391058,
+                "high": 0.8448630002859606
+              },
+              "unit": "ratio",
+              "rationale": "Preserves additive component schedule while filing facts anchor guided EPS bridge.",
+              "allowed_range": {
+                "min": 0.2,
+                "max": 2.5
+              }
+            }
+          ],
+          "calculations": [
+            {
+              "id": "growth_factor_y1",
+              "op": "add",
+              "args": [
+                1,
+                "growth_y1_5"
+              ],
+              "unit": "ratio"
+            },
+            {
+              "id": "growth_factor_y2",
+              "op": "add",
+              "args": [
+                1,
+                "growth_y6_10"
+              ],
+              "unit": "ratio"
+            },
+            {
+              "id": "owner_cash_y1",
+              "op": "multiply",
+              "args": [
+                "normalized_owner_cash",
+                "growth_factor_y1"
+              ],
+              "unit": "JPY_per_share"
+            },
+            {
+              "id": "owner_cash_y2",
+              "op": "multiply",
+              "args": [
+                "owner_cash_y1",
+                "growth_factor_y1"
+              ],
+              "unit": "JPY_per_share"
+            },
+            {
+              "id": "owner_cash_y3",
+              "op": "multiply",
+              "args": [
+                "owner_cash_y2",
+                "growth_factor_y1"
+              ],
+              "unit": "JPY_per_share"
+            },
+            {
+              "id": "owner_cash_y4",
+              "op": "multiply",
+              "args": [
+                "owner_cash_y3",
+                "growth_factor_y1"
+              ],
+              "unit": "JPY_per_share"
+            },
+            {
+              "id": "owner_cash_y5",
+              "op": "multiply",
+              "args": [
+                "owner_cash_y4",
+                "growth_factor_y1"
+              ],
+              "unit": "JPY_per_share"
+            },
+            {
+              "id": "owner_cash_y6",
+              "op": "multiply",
+              "args": [
+                "owner_cash_y5",
+                "growth_factor_y2"
+              ],
+              "unit": "JPY_per_share"
+            },
+            {
+              "id": "owner_cash_y7",
+              "op": "multiply",
+              "args": [
+                "owner_cash_y6",
+                "growth_factor_y2"
+              ],
+              "unit": "JPY_per_share"
+            },
+            {
+              "id": "cash_pv",
+              "op": "present_value",
+              "args": [
+                "owner_cash_y1",
+                1,
+                "owner_cash_y2",
+                2,
+                "owner_cash_y3",
+                3,
+                "owner_cash_y4",
+                4,
+                "owner_cash_y5",
+                5,
+                "owner_cash_y6",
+                6,
+                "discount_rate"
+              ],
+              "unit": "JPY_per_share"
+            },
+            {
+              "id": "terminal_cash",
+              "op": "multiply",
+              "args": [
+                "owner_cash_y7",
+                "exit_multiple"
+              ],
+              "unit": "JPY_per_share"
+            },
+            {
+              "id": "terminal_pv",
+              "op": "discount",
+              "args": [
+                "terminal_cash",
+                "discount_rate",
+                7
+              ],
+              "unit": "JPY_per_share"
+            },
+            {
+              "id": "raw_value",
+              "op": "add",
+              "args": [
+                "cash_pv",
+                "terminal_pv"
+              ],
+              "unit": "JPY_per_share"
+            },
+            {
+              "id": "value_per_share",
+              "op": "multiply",
+              "args": [
+                "raw_value",
+                "schedule_adjustment"
+              ],
+              "unit": "JPY_per_share"
+            }
+          ],
+          "outputs": {
+            "low": "value_per_share",
+            "base": "value_per_share",
+            "high": "value_per_share"
+          }
+        },
+        "evidence_tier": "primary_derived",
+        "evidence": "English IR bridge: FY2026 revenue \u00a533601.0M, OP \u00a53635.0M, guided EPS \u00a5115.57; May 2026 B300 order and financing bridge; contract backfill 2026-07-21.",
+        "cross_check": "Reconcile to English IR forecast and May 2026 financing bridge.",
+        "driver_model_type": null,
+        "driver_model": null,
+        "assumption_summary": "Proof outputs {'low': 1144.0, 'base': 3282.0, 'high': 4666.0}; see calculation_proof graph.",
+        "falsifier": "Primary evidence shows the claim is materially worse than the low case.",
+        "scenario_assumptions": null,
+        "low_per_share": 1144.0,
+        "base_per_share": 3282.0,
+        "high_per_share": 4666.0
+      },
+      {
+        "id": "inzai_gpu_platform_option",
+        "label": "Inzai B300 platform and utilization option",
+        "category": "real_option",
+        "overlap_key": "inzai_gpu_platform_option",
+        "treatment": "additive",
+        "included_in_component_id": null,
+        "method": "risk_adjusted_milestone_value",
+        "valuation_status": "bounded_estimate",
+        "calculation_proof": {
+          "schema_version": "1.0",
+          "method_id": "risk_adjusted_milestone_value",
+          "method_version": "1.0",
+          "output_unit": "JPY_per_share",
+          "inputs": [
+            {
+              "id": "gpu_order_usd_m",
+              "label": "B300 GPU order value (Compal)",
+              "kind": "fact",
+              "value": 325.0,
+              "unit": "USD_m",
+              "source": {
+                "ref": "3905.T/IR/en_financial_report/en-ir-20260507001.pdf",
+                "locator": "5,080 B300 GPUs secured via Compal (~USD 325M); Inzai phased ops May\u2013Jul 2026",
+                "as_of": "2026-05-07"
+              },
+              "locked": true
+            },
+            {
+              "id": "shares_m",
+              "label": "Implied diluted shares from FY2026 guidance",
+              "kind": "fact",
+              "value": 24.262,
+              "unit": "million_shares",
+              "source": {
+                "ref": "3905.T/IR/en_financial_report/en-ir-20260421001.pdf",
+                "locator": "Parent net profit \u00a52804.0M \u00f7 guided EPS \u00a5115.57",
+                "as_of": "2026-04-21"
+              },
+              "locked": true
+            }
+          ],
+          "assumptions": [
+            {
+              "id": "option_value_per_share",
+              "label": "Risk-adjusted Inzai/B300 platform option per share",
+              "kind": "judgment",
+              "values": {
+                "low": 0.0,
+                "base": 400.0,
+                "high": 900.0
+              },
+              "unit": "JPY_per_share",
+              "rationale": "Non-overlapping claim on utilization upside beyond normalized owner-cash engine; low assumes delayed energization.",
+              "allowed_range": {
+                "min": 0.0,
+                "max": 1200.0
+              }
+            }
+          ],
+          "calculations": [],
+          "outputs": {
+            "low": "option_value_per_share",
+            "base": "option_value_per_share",
+            "high": "option_value_per_share"
+          }
+        },
+        "evidence_tier": "primary_derived",
+        "evidence": "English IR bridge: FY2026 revenue \u00a533601.0M, OP \u00a53635.0M, guided EPS \u00a5115.57; May 2026 B300 order and financing bridge; contract backfill 2026-07-21.",
+        "cross_check": "Reconcile to English IR forecast and May 2026 financing bridge.",
+        "driver_model_type": null,
+        "driver_model": null,
+        "assumption_summary": "Proof outputs {'low': 0.0, 'base': 400.0, 'high': 900.0}; see calculation_proof graph.",
+        "falsifier": "Primary evidence shows the claim is materially worse than the low case.",
+        "scenario_assumptions": null,
+        "low_per_share": 0.0,
+        "base_per_share": 400.0,
+        "high_per_share": 900.0
+      },
+      {
+        "id": "net_financial_claims",
+        "label": "Net financial claims (advances, debt, rights)",
+        "category": "financial_asset",
+        "overlap_key": "net_financial_claims",
+        "treatment": "additive",
+        "included_in_component_id": null,
+        "method": "net_asset_value",
+        "valuation_status": "bounded_estimate",
+        "calculation_proof": {
+          "schema_version": "1.0",
+          "method_id": "net_asset_value",
+          "method_version": "1.0",
+          "output_unit": "JPY_per_share",
+          "inputs": [
+            {
+              "id": "customer_advance_b",
+              "label": "Disclosed customer advance (financing bridge)",
+              "kind": "fact",
+              "value": 13.6,
+              "unit": "JPY_billion",
+              "source": {
+                "ref": "3905.T/IR/en_financial_report/en-ir-20260507001.pdf",
+                "locator": "Customer advance \u00a513.6B in disclosed financing bridge",
+                "as_of": "2026-05-07"
+              },
+              "locked": true
+            },
+            {
+              "id": "planned_borrowings_b",
+              "label": "Planned borrowings (financing bridge)",
+              "kind": "fact",
+              "value": 30.6,
+              "unit": "JPY_billion",
+              "source": {
+                "ref": "3905.T/IR/en_financial_report/en-ir-20260507001.pdf",
+                "locator": "Planned borrowings \u00a530.6B alongside 23rd stock-acquisition rights \u00a56.7B",
+                "as_of": "2026-05-07"
+              },
+              "locked": true
+            },
+            {
+              "id": "shares_m",
+              "label": "Implied diluted shares from FY2026 guidance",
+              "kind": "fact",
+              "value": 24.262,
+              "unit": "million_shares",
+              "source": {
+                "ref": "3905.T/IR/en_financial_report/en-ir-20260421001.pdf",
+                "locator": "Parent net profit \u00a52804.0M \u00f7 guided EPS \u00a5115.57",
+                "as_of": "2026-04-21"
+              },
+              "locked": true
+            }
+          ],
+          "assumptions": [
+            {
+              "id": "net_financial_per_share",
+              "label": "Net financial claim per share after advances, debt timing, and operating liquidity",
+              "kind": "judgment",
+              "values": {
+                "low": -1200.0,
+                "base": -600.0,
+                "high": 200.0
+              },
+              "unit": "JPY_per_share",
+              "rationale": "Low stresses full debt draw before GPU deliveries; high credits more of customer advance as surplus liquidity.",
+              "allowed_range": {
+                "min": -2000.0,
+                "max": 500.0
+              }
+            }
+          ],
+          "calculations": [],
+          "outputs": {
+            "low": "net_financial_per_share",
+            "base": "net_financial_per_share",
+            "high": "net_financial_per_share"
+          }
+        },
+        "evidence_tier": "primary_derived",
+        "evidence": "English IR bridge: FY2026 revenue \u00a533601.0M, OP \u00a53635.0M, guided EPS \u00a5115.57; May 2026 B300 order and financing bridge; contract backfill 2026-07-21.",
+        "cross_check": "Reconcile to English IR forecast and May 2026 financing bridge.",
+        "driver_model_type": null,
+        "driver_model": null,
+        "assumption_summary": "Proof outputs {'low': -1200.0, 'base': -600.0, 'high': 200.0}; see calculation_proof graph.",
+        "falsifier": "Primary evidence shows the claim is materially worse than the low case.",
+        "scenario_assumptions": null,
+        "low_per_share": -1200.0,
+        "base_per_share": -600.0,
+        "high_per_share": 200.0
+      },
+      {
+        "id": "execution_and_financing_reserve",
+        "label": "Execution, Giga, and financing-timing reserve",
+        "category": "liability_or_reserve",
+        "overlap_key": "execution_and_financing_reserve",
+        "treatment": "additive",
+        "included_in_component_id": null,
+        "method": "net_asset_value",
+        "valuation_status": "bounded_estimate",
+        "calculation_proof": {
+          "schema_version": "1.0",
+          "method_id": "net_asset_value",
+          "method_version": "1.0",
+          "output_unit": "JPY_per_share",
+          "inputs": [
+            {
+              "id": "owner_cash_per_share",
+              "label": "Normalized owner cash per share (FY2026 bridge)",
+              "kind": "fact",
+              "value": 90.0,
+              "unit": "JPY_per_share",
+              "source": {
+                "ref": "3905.T/IR/en_financial_report/en-ir-20260421001.pdf",
+                "locator": "Guided EPS \u00a5115.57 discounted to \u00a590.0/sh for ramp risk",
+                "as_of": "2026-04-21"
+              },
+              "locked": true
+            },
+            {
+              "id": "giga_commitment_usd_m",
+              "label": "Giga B200 open commitment (577 units)",
+              "kind": "fact",
+              "value": 252.0,
+              "unit": "USD_m",
+              "source": {
+                "ref": "3905.T/IR/en_financial_report/en-ir-20260507001.pdf",
+                "locator": "577 B200 units; USD 252M unpaid commitment overhang referenced in May 2026 IR",
+                "as_of": "2026-05-07"
+              },
+              "locked": true
+            },
+            {
+              "id": "shares_m",
+              "label": "Implied diluted shares from FY2026 guidance",
+              "kind": "fact",
+              "value": 24.262,
+              "unit": "million_shares",
+              "source": {
+                "ref": "3905.T/IR/en_financial_report/en-ir-20260421001.pdf",
+                "locator": "Parent net profit \u00a52804.0M \u00f7 guided EPS \u00a5115.57",
+                "as_of": "2026-04-21"
+              },
+              "locked": true
+            }
+          ],
+          "assumptions": [
+            {
+              "id": "reserve_per_share",
+              "label": "Execution, Giga overhang, and financing-timing reserve per share",
+              "kind": "judgment",
+              "values": {
+                "low": -400.0,
+                "base": -129.0,
+                "high": 0.0
+              },
+              "unit": "JPY_per_share",
+              "rationale": "Negative reserve for guide miss, customer concentration, and GPU delivery slip; separate from core capitalization.",
+              "allowed_range": {
+                "min": -800.0,
+                "max": 0.0
+              }
+            }
+          ],
+          "calculations": [],
+          "outputs": {
+            "low": "reserve_per_share",
+            "base": "reserve_per_share",
+            "high": "reserve_per_share"
+          }
+        },
+        "evidence_tier": "primary_derived",
+        "evidence": "English IR bridge: FY2026 revenue \u00a533601.0M, OP \u00a53635.0M, guided EPS \u00a5115.57; May 2026 B300 order and financing bridge; contract backfill 2026-07-21.",
+        "cross_check": "Reconcile to English IR forecast and May 2026 financing bridge.",
+        "driver_model_type": null,
+        "driver_model": null,
+        "assumption_summary": "Proof outputs {'low': -400.0, 'base': -129.0, 'high': 0.0}; see calculation_proof graph.",
+        "falsifier": "Primary evidence shows the claim is materially worse than the low case.",
+        "scenario_assumptions": null,
+        "low_per_share": -400.0,
+        "base_per_share": -129.0,
+        "high_per_share": 0.0
+      }
+    ],
+    "embedded_components": [],
+    "total_equity_value_per_share": {
+      "low": -456.0,
+      "base": 2953.0,
+      "high": 5766.0
+    },
+    "material_component_count": 4,
+    "additive_component_count": 4,
+    "embedded_component_count": 0,
+    "market_price_per_share": 2591.0,
+    "upside_downside_pct": {
+      "low": -117.6,
+      "base": 14.0,
+      "high": 122.5
+    }
+  },
+  "component_review_queue": {
+    "status": "ready_for_committee_review",
+    "decision_rule": "Each assigned rater records accept, challenge, or reject with a proposed range and evidence. The aggregator may not silently average disputed ranges.",
+    "items": [
+      {
+        "component_id": "core_ai_datacenter_engine",
+        "label": "Neo Cloud / TAIZA AI data-center owner-cash engine",
+        "treatment": "additive",
+        "range_per_share": {
+          "low": 1144.0,
+          "base": 3282.0,
+          "high": 4666.0
+        },
+        "range_width_pct_of_base": 107.3,
+        "evidence_tier": "primary_derived",
+        "recommended_raters": [
+          "hohn",
+          "marathon_capital_cycle"
+        ],
+        "mandatory_checks": [
+          "Is the valuation method appropriate for this economic claim?",
+          "Is the security's ownership claim and economic-unit denominator reconciled correctly?",
+          "Does the evidence support the low/base/high range and its timing?",
+          "Are comparable assets truly like-for-like after production, contract, location, capital, ownership, and realization adjustments?",
+          "For an option, are success probability, time to realization, and remaining owner-funded capital explicit?",
+          "Is the component additive, or already embedded in another component?",
+          "What observation would move the base estimate materially?"
+        ],
+        "status": "open"
+      },
+      {
+        "component_id": "inzai_gpu_platform_option",
+        "label": "Inzai B300 platform and utilization option",
+        "treatment": "additive",
+        "range_per_share": {
+          "low": 0.0,
+          "base": 400.0,
+          "high": 900.0
+        },
+        "range_width_pct_of_base": 225.0,
+        "evidence_tier": "primary_derived",
+        "recommended_raters": [
+          "klarman_asset_value",
+          "hk"
+        ],
+        "mandatory_checks": [
+          "Is the valuation method appropriate for this economic claim?",
+          "Is the security's ownership claim and economic-unit denominator reconciled correctly?",
+          "Does the evidence support the low/base/high range and its timing?",
+          "Are comparable assets truly like-for-like after production, contract, location, capital, ownership, and realization adjustments?",
+          "For an option, are success probability, time to realization, and remaining owner-funded capital explicit?",
+          "Is the component additive, or already embedded in another component?",
+          "What observation would move the base estimate materially?"
+        ],
+        "status": "open"
+      },
+      {
+        "component_id": "net_financial_claims",
+        "label": "Net financial claims (advances, debt, rights)",
+        "treatment": "additive",
+        "range_per_share": {
+          "low": -1200.0,
+          "base": -600.0,
+          "high": 200.0
+        },
+        "range_width_pct_of_base": 233.3,
+        "evidence_tier": "primary_derived",
+        "recommended_raters": [
+          "greenblatt",
+          "marks_credit_cycle"
+        ],
+        "mandatory_checks": [
+          "Is the valuation method appropriate for this economic claim?",
+          "Is the security's ownership claim and economic-unit denominator reconciled correctly?",
+          "Does the evidence support the low/base/high range and its timing?",
+          "Are comparable assets truly like-for-like after production, contract, location, capital, ownership, and realization adjustments?",
+          "For an option, are success probability, time to realization, and remaining owner-funded capital explicit?",
+          "Is the component additive, or already embedded in another component?",
+          "What observation would move the base estimate materially?"
+        ],
+        "status": "open"
+      },
+      {
+        "component_id": "execution_and_financing_reserve",
+        "label": "Execution, Giga, and financing-timing reserve",
+        "treatment": "additive",
+        "range_per_share": {
+          "low": -400.0,
+          "base": -129.0,
+          "high": 0.0
+        },
+        "range_width_pct_of_base": 310.1,
+        "evidence_tier": "primary_derived",
+        "recommended_raters": [
+          "marks_credit_cycle",
+          "pabrai"
+        ],
+        "mandatory_checks": [
+          "Is the valuation method appropriate for this economic claim?",
+          "Is the security's ownership claim and economic-unit denominator reconciled correctly?",
+          "Does the evidence support the low/base/high range and its timing?",
+          "Are comparable assets truly like-for-like after production, contract, location, capital, ownership, and realization adjustments?",
+          "For an option, are success probability, time to realization, and remaining owner-funded capital explicit?",
+          "Is the component additive, or already embedded in another component?",
+          "What observation would move the base estimate materially?"
+        ],
+        "status": "open"
+      }
+    ]
+  },
+  "valuation_method_route": {
+    "schema_version": "1.0",
+    "status": "routed",
+    "profile_id": "quality_reinvestment",
+    "label": "High-return compounder",
+    "score": 8.0,
+    "reasons": [
+      "archetype=compounder",
+      "component categories=operating_business",
+      "existing methods=owner_cash"
+    ],
+    "primary_methods": [
+      "owner_earnings_reinvestment_dcf"
+    ],
+    "corroborating_methods": [
+      "reverse_dcf",
+      "incremental_roic_runway"
+    ],
+    "primary_personas": [
+      "buffett_weschler",
+      "hohn"
+    ],
+    "cross_check_personas": [
+      "munger",
+      "marathon_capital_cycle"
+    ],
+    "silent_personas": [
+      "greenblatt",
+      "hk",
+      "klarman_asset_value",
+      "marks_credit_cycle",
+      "pabrai",
+      "stahl"
+    ],
+    "required_evidence": [
+      "normalized owner earnings",
+      "incremental return on capital",
+      "reinvestment runway",
+      "diluted share count",
+      "competitive-advantage mechanism"
+    ],
+    "failure_modes": [
+      "growth projected without its capital cost",
+      "stock compensation or acquisitions omitted",
+      "terminal value unsupported by a durable mechanism"
+    ],
+    "secondary_profiles": [
+      {
+        "profile_id": "predictable_cash_flow",
+        "score": 3.0,
+        "reasons": [
+          "component categories=operating_business",
+          "existing methods=dividend, owner_cash"
+        ]
+      },
+      {
+        "profile_id": "binary_milestone",
+        "score": 3.0,
+        "reasons": [
+          "component categories=real_option",
+          "existing methods=milestone, risk_adjusted"
+        ]
+      }
+    ],
+    "scorecard": {
+      "scarce_asset_optionality": {
+        "score": 1.0,
+        "reasons": [
+          "component categories=real_option"
+        ]
+      },
+      "quality_reinvestment": {
+        "score": 8.0,
+        "reasons": [
+          "archetype=compounder",
+          "component categories=operating_business",
+          "existing methods=owner_cash"
+        ]
+      },
+      "capital_cycle": {
+        "score": 1.0,
+        "reasons": [
+          "component categories=operating_business"
+        ]
+      },
+      "credit_and_normalized_returns": {
+        "score": 2.0,
+        "reasons": [
+          "component categories=financial_asset, liability_or_reserve"
+        ]
+      },
+      "catalyst_asset_value": {
+        "score": 1.0,
+        "reasons": [
+          "component categories=financial_asset"
+        ]
+      },
+      "predictable_cash_flow": {
+        "score": 3.0,
+        "reasons": [
+          "component categories=operating_business",
+          "existing methods=dividend, owner_cash"
+        ]
+      },
+      "binary_milestone": {
+        "score": 3.0,
+        "reasons": [
+          "component categories=real_option",
+          "existing methods=milestone, risk_adjusted"
+        ]
+      }
+    },
+    "decision_rule": "Use one primary method and no more than two corroborating methods; irrelevant methods and personas remain silent."
+  },
+  "universal_valuation_contract": {
+    "schema_version": "2.0",
+    "status": "decision_grade",
+    "ticker": "3905.T",
+    "as_of": "2026-07-21",
+    "economic_ownership_map": [
+      {
+        "component_id": "core_ai_datacenter_engine",
+        "label": "Neo Cloud / TAIZA AI data-center owner-cash engine",
+        "category": "operating_business",
+        "treatment": "additive",
+        "included_in_component_id": null,
+        "ownership_claim": "Neo Cloud / TAIZA AI data-center owner-cash engine",
+        "ownership_percentage": 1.0,
+        "quantity": {
+          "value": 1,
+          "unit": "per-share economic claim"
+        },
+        "method": "owner_cash_or_dividend_discount",
+        "method_version": "1.0",
+        "method_provenance": {
+          "method_id": "owner_cash_or_dividend_discount",
+          "version": "1.0",
+          "label": "Predictable owner-cash discount model",
+          "power_zones": [
+            "predictable_cash_flow"
+          ],
+          "equation": "value = distribution*(1+growth)/(required_return-growth) - funding_or_dilution_per_share",
+          "sources": [
+            {
+              "ref": "_system/frameworks/segment_cashflow_valuation.md",
+              "locator": "Cash-flow duration and funding"
+            }
+          ]
+        },
+        "comparable_ids": [],
+        "range_per_share": {
+          "low": 1144.0,
+          "base": 3282.0,
+          "high": 4666.0
+        },
+        "legacy_range_per_share": {
+          "low": 1144.0,
+          "base": 3282.0,
+          "high": 4666.0
+        },
+        "valuation_status": "bounded_estimate",
+        "calculation_proof": {
+          "status": "valid",
+          "method_id": "owner_cash_or_dividend_discount",
+          "method_version": "1.0",
+          "outputs": {
+            "low": 1144.0,
+            "base": 3282.0,
+            "high": 4666.0
+          },
+          "output_unit": "JPY_per_share",
+          "traces": {
+            "low": [
+              {
+                "id": "normalized_owner_cash",
+                "label": "Normalized owner cash per share",
+                "kind": "fact",
+                "value": 90.0,
+                "unit": "JPY_per_share",
+                "source": {
+                  "ref": "3905.T/IR/en_financial_report/en-ir-20260421001.pdf",
+                  "locator": "FY2026 guided EPS \u00a5115.57 discounted to \u00a590.0/sh for ramp and execution risk",
+                  "as_of": "2026-04-21",
+                  "content_sha256": "fc037a172595242807603ee6b5e28fc0cc54505eae016a92f5943f308afde737",
+                  "source_id": "c506a4c994866e3df60f586b96f633faaecc437abc45b955f855bc7dbe568ce9"
+                },
+                "rationale": null
+              },
+              {
+                "id": "guided_eps",
+                "label": "FY2026 parent EPS guidance",
+                "kind": "fact",
+                "value": 115.57,
+                "unit": "JPY_per_share",
+                "source": {
+                  "ref": "3905.T/IR/en_financial_report/en-ir-20260421001.pdf",
+                  "locator": "Parent net profit \u00a52804.0M; guided EPS \u00a5115.57",
+                  "as_of": "2026-04-21",
+                  "content_sha256": "fc037a172595242807603ee6b5e28fc0cc54505eae016a92f5943f308afde737",
+                  "source_id": "1a0b95691671fbedc621f740515e87d70e99ba37899f4300d12832b41f49a9f6"
+                },
+                "rationale": null
+              },
+              {
+                "id": "shares_m",
+                "label": "Implied diluted shares from FY2026 guidance",
+                "kind": "fact",
+                "value": 24.262,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "3905.T/IR/en_financial_report/en-ir-20260421001.pdf",
+                  "locator": "Parent net profit \u00a52804.0M \u00f7 guided EPS \u00a5115.57",
+                  "as_of": "2026-04-21",
+                  "content_sha256": "fc037a172595242807603ee6b5e28fc0cc54505eae016a92f5943f308afde737",
+                  "source_id": "c9d6621f8e098aea64a639cb3b405c29109ee40c59c6831865b26ba4ff153ec1"
+                },
+                "rationale": null
+              },
+              {
+                "id": "growth_y1_5",
+                "label": "Growth years 1\u20135",
+                "kind": "judgment",
+                "value": 0.02,
+                "unit": "ratio",
+                "source": null,
+                "rationale": "Lawrence bear/base/bull owner-cash growth from valuation.json scenarios."
+              },
+              {
+                "id": "growth_y6_10",
+                "label": "Growth years 6\u20137",
+                "kind": "judgment",
+                "value": 0.03,
+                "unit": "ratio",
+                "source": null,
+                "rationale": "Fade after FY2026 hyperscaler ramp year."
+              },
+              {
+                "id": "discount_rate",
+                "label": "Required return on owner cash",
+                "kind": "judgment",
+                "value": 0.12,
+                "unit": "ratio",
+                "source": null,
+                "rationale": "Execution-risk premium for unproven moat; not the stance gate."
+              },
+              {
+                "id": "exit_multiple",
+                "label": "Selling multiple in year 7",
+                "kind": "judgment",
+                "value": 12.0,
+                "unit": "multiple",
+                "source": null,
+                "rationale": "Lawrence exit multiples 12\u00d7 / 22\u00d7 / 30\u00d7 on year-10 cash path."
+              },
+              {
+                "id": "schedule_adjustment",
+                "label": "Component schedule adjustment factor",
+                "kind": "judgment",
+                "value": 1.18307398,
+                "unit": "ratio",
+                "source": null,
+                "rationale": "Preserves additive component schedule while filing facts anchor guided EPS bridge."
+              },
+              {
+                "id": "growth_factor_y1",
+                "label": "growth_factor_y1",
+                "kind": "calculation",
+                "value": 1.02,
+                "unit": "ratio",
+                "operation": "add",
+                "formula": "1 + growth_y1_5",
+                "substituted_formula": "1 + 0.02",
+                "dependencies": [
+                  1,
+                  "growth_y1_5"
+                ]
+              },
+              {
+                "id": "growth_factor_y2",
+                "label": "growth_factor_y2",
+                "kind": "calculation",
+                "value": 1.03,
+                "unit": "ratio",
+                "operation": "add",
+                "formula": "1 + growth_y6_10",
+                "substituted_formula": "1 + 0.03",
+                "dependencies": [
+                  1,
+                  "growth_y6_10"
+                ]
+              },
+              {
+                "id": "owner_cash_y1",
+                "label": "owner_cash_y1",
+                "kind": "calculation",
+                "value": 91.8,
+                "unit": "JPY_per_share",
+                "operation": "multiply",
+                "formula": "normalized_owner_cash \u00d7 growth_factor_y1",
+                "substituted_formula": "90 \u00d7 1.02",
+                "dependencies": [
+                  "normalized_owner_cash",
+                  "growth_factor_y1"
+                ]
+              },
+              {
+                "id": "owner_cash_y2",
+                "label": "owner_cash_y2",
+                "kind": "calculation",
+                "value": 93.636,
+                "unit": "JPY_per_share",
+                "operation": "multiply",
+                "formula": "owner_cash_y1 \u00d7 growth_factor_y1",
+                "substituted_formula": "91.8 \u00d7 1.02",
+                "dependencies": [
+                  "owner_cash_y1",
+                  "growth_factor_y1"
+                ]
+              },
+              {
+                "id": "owner_cash_y3",
+                "label": "owner_cash_y3",
+                "kind": "calculation",
+                "value": 95.50872,
+                "unit": "JPY_per_share",
+                "operation": "multiply",
+                "formula": "owner_cash_y2 \u00d7 growth_factor_y1",
+                "substituted_formula": "93.636 \u00d7 1.02",
+                "dependencies": [
+                  "owner_cash_y2",
+                  "growth_factor_y1"
+                ]
+              },
+              {
+                "id": "owner_cash_y4",
+                "label": "owner_cash_y4",
+                "kind": "calculation",
+                "value": 97.4188944,
+                "unit": "JPY_per_share",
+                "operation": "multiply",
+                "formula": "owner_cash_y3 \u00d7 growth_factor_y1",
+                "substituted_formula": "95.50872 \u00d7 1.02",
+                "dependencies": [
+                  "owner_cash_y3",
+                  "growth_factor_y1"
+                ]
+              },
+              {
+                "id": "owner_cash_y5",
+                "label": "owner_cash_y5",
+                "kind": "calculation",
+                "value": 99.36727229,
+                "unit": "JPY_per_share",
+                "operation": "multiply",
+                "formula": "owner_cash_y4 \u00d7 growth_factor_y1",
+                "substituted_formula": "97.418894 \u00d7 1.02",
+                "dependencies": [
+                  "owner_cash_y4",
+                  "growth_factor_y1"
+                ]
+              },
+              {
+                "id": "owner_cash_y6",
+                "label": "owner_cash_y6",
+                "kind": "calculation",
+                "value": 102.34829046,
+                "unit": "JPY_per_share",
+                "operation": "multiply",
+                "formula": "owner_cash_y5 \u00d7 growth_factor_y2",
+                "substituted_formula": "99.367272 \u00d7 1.03",
+                "dependencies": [
+                  "owner_cash_y5",
+                  "growth_factor_y2"
+                ]
+              },
+              {
+                "id": "owner_cash_y7",
+                "label": "owner_cash_y7",
+                "kind": "calculation",
+                "value": 105.41873917,
+                "unit": "JPY_per_share",
+                "operation": "multiply",
+                "formula": "owner_cash_y6 \u00d7 growth_factor_y2",
+                "substituted_formula": "102.34829 \u00d7 1.03",
+                "dependencies": [
+                  "owner_cash_y6",
+                  "growth_factor_y2"
+                ]
+              },
+              {
+                "id": "cash_pv",
+                "label": "cash_pv",
+                "kind": "calculation",
+                "value": 394.73950861,
+                "unit": "JPY_per_share",
+                "operation": "present_value",
+                "formula": "present_value(owner_cash_y1, 1, owner_cash_y2, 2, owner_cash_y3, 3, owner_cash_y4, 4, owner_cash_y5, 5, owner_cash_y6, 6, discount_rate)",
+                "substituted_formula": "present_value(91.8, 1, 93.636, 2, 95.50872, 3, 97.418894, 4, 99.367272, 5, 102.34829, 6, 0.12)",
+                "dependencies": [
+                  "owner_cash_y1",
+                  1,
+                  "owner_cash_y2",
+                  2,
+                  "owner_cash_y3",
+                  3,
+                  "owner_cash_y4",
+                  4,
+                  "owner_cash_y5",
+                  5,
+                  "owner_cash_y6",
+                  6,
+                  "discount_rate"
+                ]
+              },
+              {
+                "id": "terminal_cash",
+                "label": "terminal_cash",
+                "kind": "calculation",
+                "value": 1265.02487004,
+                "unit": "JPY_per_share",
+                "operation": "multiply",
+                "formula": "owner_cash_y7 \u00d7 exit_multiple",
+                "substituted_formula": "105.41874 \u00d7 12",
+                "dependencies": [
+                  "owner_cash_y7",
+                  "exit_multiple"
+                ]
+              },
+              {
+                "id": "terminal_pv",
+                "label": "terminal_pv",
+                "kind": "calculation",
+                "value": 572.23300735,
+                "unit": "JPY_per_share",
+                "operation": "discount",
+                "formula": "discount(terminal_cash, discount_rate, 7)",
+                "substituted_formula": "discount(1265.0249, 0.12, 7)",
+                "dependencies": [
+                  "terminal_cash",
+                  "discount_rate",
+                  7
+                ]
+              },
+              {
+                "id": "raw_value",
+                "label": "raw_value",
+                "kind": "calculation",
+                "value": 966.97251596,
+                "unit": "JPY_per_share",
+                "operation": "add",
+                "formula": "cash_pv + terminal_pv",
+                "substituted_formula": "394.73951 + 572.23301",
+                "dependencies": [
+                  "cash_pv",
+                  "terminal_pv"
+                ]
+              },
+              {
+                "id": "value_per_share",
+                "label": "value_per_share",
+                "kind": "calculation",
+                "value": 1144.00001888,
+                "unit": "JPY_per_share",
+                "operation": "multiply",
+                "formula": "raw_value \u00d7 schedule_adjustment",
+                "substituted_formula": "966.97252 \u00d7 1.183074",
+                "dependencies": [
+                  "raw_value",
+                  "schedule_adjustment"
+                ]
+              }
+            ],
+            "base": [
+              {
+                "id": "normalized_owner_cash",
+                "label": "Normalized owner cash per share",
+                "kind": "fact",
+                "value": 90.0,
+                "unit": "JPY_per_share",
+                "source": {
+                  "ref": "3905.T/IR/en_financial_report/en-ir-20260421001.pdf",
+                  "locator": "FY2026 guided EPS \u00a5115.57 discounted to \u00a590.0/sh for ramp and execution risk",
+                  "as_of": "2026-04-21",
+                  "content_sha256": "fc037a172595242807603ee6b5e28fc0cc54505eae016a92f5943f308afde737",
+                  "source_id": "c506a4c994866e3df60f586b96f633faaecc437abc45b955f855bc7dbe568ce9"
+                },
+                "rationale": null
+              },
+              {
+                "id": "guided_eps",
+                "label": "FY2026 parent EPS guidance",
+                "kind": "fact",
+                "value": 115.57,
+                "unit": "JPY_per_share",
+                "source": {
+                  "ref": "3905.T/IR/en_financial_report/en-ir-20260421001.pdf",
+                  "locator": "Parent net profit \u00a52804.0M; guided EPS \u00a5115.57",
+                  "as_of": "2026-04-21",
+                  "content_sha256": "fc037a172595242807603ee6b5e28fc0cc54505eae016a92f5943f308afde737",
+                  "source_id": "1a0b95691671fbedc621f740515e87d70e99ba37899f4300d12832b41f49a9f6"
+                },
+                "rationale": null
+              },
+              {
+                "id": "shares_m",
+                "label": "Implied diluted shares from FY2026 guidance",
+                "kind": "fact",
+                "value": 24.262,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "3905.T/IR/en_financial_report/en-ir-20260421001.pdf",
+                  "locator": "Parent net profit \u00a52804.0M \u00f7 guided EPS \u00a5115.57",
+                  "as_of": "2026-04-21",
+                  "content_sha256": "fc037a172595242807603ee6b5e28fc0cc54505eae016a92f5943f308afde737",
+                  "source_id": "c9d6621f8e098aea64a639cb3b405c29109ee40c59c6831865b26ba4ff153ec1"
+                },
+                "rationale": null
+              },
+              {
+                "id": "growth_y1_5",
+                "label": "Growth years 1\u20135",
+                "kind": "judgment",
+                "value": 0.15,
+                "unit": "ratio",
+                "source": null,
+                "rationale": "Lawrence bear/base/bull owner-cash growth from valuation.json scenarios."
+              },
+              {
+                "id": "growth_y6_10",
+                "label": "Growth years 6\u20137",
+                "kind": "judgment",
+                "value": 0.07,
+                "unit": "ratio",
+                "source": null,
+                "rationale": "Fade after FY2026 hyperscaler ramp year."
+              },
+              {
+                "id": "discount_rate",
+                "label": "Required return on owner cash",
+                "kind": "judgment",
+                "value": 0.1,
+                "unit": "ratio",
+                "source": null,
+                "rationale": "Execution-risk premium for unproven moat; not the stance gate."
+              },
+              {
+                "id": "exit_multiple",
+                "label": "Selling multiple in year 7",
+                "kind": "judgment",
+                "value": 22.0,
+                "unit": "multiple",
+                "source": null,
+                "rationale": "Lawrence exit multiples 12\u00d7 / 22\u00d7 / 30\u00d7 on year-10 cash path."
+              },
+              {
+                "id": "schedule_adjustment",
+                "label": "Component schedule adjustment factor",
+                "kind": "judgment",
+                "value": 1.10716915,
+                "unit": "ratio",
+                "source": null,
+                "rationale": "Preserves additive component schedule while filing facts anchor guided EPS bridge."
+              },
+              {
+                "id": "growth_factor_y1",
+                "label": "growth_factor_y1",
+                "kind": "calculation",
+                "value": 1.15,
+                "unit": "ratio",
+                "operation": "add",
+                "formula": "1 + growth_y1_5",
+                "substituted_formula": "1 + 0.15",
+                "dependencies": [
+                  1,
+                  "growth_y1_5"
+                ]
+              },
+              {
+                "id": "growth_factor_y2",
+                "label": "growth_factor_y2",
+                "kind": "calculation",
+                "value": 1.07,
+                "unit": "ratio",
+                "operation": "add",
+                "formula": "1 + growth_y6_10",
+                "substituted_formula": "1 + 0.07",
+                "dependencies": [
+                  1,
+                  "growth_y6_10"
+                ]
+              },
+              {
+                "id": "owner_cash_y1",
+                "label": "owner_cash_y1",
+                "kind": "calculation",
+                "value": 103.5,
+                "unit": "JPY_per_share",
+                "operation": "multiply",
+                "formula": "normalized_owner_cash \u00d7 growth_factor_y1",
+                "substituted_formula": "90 \u00d7 1.15",
+                "dependencies": [
+                  "normalized_owner_cash",
+                  "growth_factor_y1"
+                ]
+              },
+              {
+                "id": "owner_cash_y2",
+                "label": "owner_cash_y2",
+                "kind": "calculation",
+                "value": 119.025,
+                "unit": "JPY_per_share",
+                "operation": "multiply",
+                "formula": "owner_cash_y1 \u00d7 growth_factor_y1",
+                "substituted_formula": "103.5 \u00d7 1.15",
+                "dependencies": [
+                  "owner_cash_y1",
+                  "growth_factor_y1"
+                ]
+              },
+              {
+                "id": "owner_cash_y3",
+                "label": "owner_cash_y3",
+                "kind": "calculation",
+                "value": 136.87875,
+                "unit": "JPY_per_share",
+                "operation": "multiply",
+                "formula": "owner_cash_y2 \u00d7 growth_factor_y1",
+                "substituted_formula": "119.025 \u00d7 1.15",
+                "dependencies": [
+                  "owner_cash_y2",
+                  "growth_factor_y1"
+                ]
+              },
+              {
+                "id": "owner_cash_y4",
+                "label": "owner_cash_y4",
+                "kind": "calculation",
+                "value": 157.4105625,
+                "unit": "JPY_per_share",
+                "operation": "multiply",
+                "formula": "owner_cash_y3 \u00d7 growth_factor_y1",
+                "substituted_formula": "136.87875 \u00d7 1.15",
+                "dependencies": [
+                  "owner_cash_y3",
+                  "growth_factor_y1"
+                ]
+              },
+              {
+                "id": "owner_cash_y5",
+                "label": "owner_cash_y5",
+                "kind": "calculation",
+                "value": 181.02214687,
+                "unit": "JPY_per_share",
+                "operation": "multiply",
+                "formula": "owner_cash_y4 \u00d7 growth_factor_y1",
+                "substituted_formula": "157.41056 \u00d7 1.15",
+                "dependencies": [
+                  "owner_cash_y4",
+                  "growth_factor_y1"
+                ]
+              },
+              {
+                "id": "owner_cash_y6",
+                "label": "owner_cash_y6",
+                "kind": "calculation",
+                "value": 193.69369716,
+                "unit": "JPY_per_share",
+                "operation": "multiply",
+                "formula": "owner_cash_y5 \u00d7 growth_factor_y2",
+                "substituted_formula": "181.02215 \u00d7 1.07",
+                "dependencies": [
+                  "owner_cash_y5",
+                  "growth_factor_y2"
+                ]
+              },
+              {
+                "id": "owner_cash_y7",
+                "label": "owner_cash_y7",
+                "kind": "calculation",
+                "value": 207.25225596,
+                "unit": "JPY_per_share",
+                "operation": "multiply",
+                "formula": "owner_cash_y6 \u00d7 growth_factor_y2",
+                "substituted_formula": "193.6937 \u00d7 1.07",
+                "dependencies": [
+                  "owner_cash_y6",
+                  "growth_factor_y2"
+                ]
+              },
+              {
+                "id": "cash_pv",
+                "label": "cash_pv",
+                "kind": "calculation",
+                "value": 624.5467941,
+                "unit": "JPY_per_share",
+                "operation": "present_value",
+                "formula": "present_value(owner_cash_y1, 1, owner_cash_y2, 2, owner_cash_y3, 3, owner_cash_y4, 4, owner_cash_y5, 5, owner_cash_y6, 6, discount_rate)",
+                "substituted_formula": "present_value(103.5, 1, 119.025, 2, 136.87875, 3, 157.41056, 4, 181.02215, 5, 193.6937, 6, 0.1)",
+                "dependencies": [
+                  "owner_cash_y1",
+                  1,
+                  "owner_cash_y2",
+                  2,
+                  "owner_cash_y3",
+                  3,
+                  "owner_cash_y4",
+                  4,
+                  "owner_cash_y5",
+                  5,
+                  "owner_cash_y6",
+                  6,
+                  "discount_rate"
+                ]
+              },
+              {
+                "id": "terminal_cash",
+                "label": "terminal_cash",
+                "kind": "calculation",
+                "value": 4559.54963106,
+                "unit": "JPY_per_share",
+                "operation": "multiply",
+                "formula": "owner_cash_y7 \u00d7 exit_multiple",
+                "substituted_formula": "207.25226 \u00d7 22",
+                "dependencies": [
+                  "owner_cash_y7",
+                  "exit_multiple"
+                ]
+              },
+              {
+                "id": "terminal_pv",
+                "label": "terminal_pv",
+                "kind": "calculation",
+                "value": 2339.76990865,
+                "unit": "JPY_per_share",
+                "operation": "discount",
+                "formula": "discount(terminal_cash, discount_rate, 7)",
+                "substituted_formula": "discount(4559.5496, 0.1, 7)",
+                "dependencies": [
+                  "terminal_cash",
+                  "discount_rate",
+                  7
+                ]
+              },
+              {
+                "id": "raw_value",
+                "label": "raw_value",
+                "kind": "calculation",
+                "value": 2964.31670275,
+                "unit": "JPY_per_share",
+                "operation": "add",
+                "formula": "cash_pv + terminal_pv",
+                "substituted_formula": "624.54679 + 2339.7699",
+                "dependencies": [
+                  "cash_pv",
+                  "terminal_pv"
+                ]
+              },
+              {
+                "id": "value_per_share",
+                "label": "value_per_share",
+                "kind": "calculation",
+                "value": 3282.00000304,
+                "unit": "JPY_per_share",
+                "operation": "multiply",
+                "formula": "raw_value \u00d7 schedule_adjustment",
+                "substituted_formula": "2964.3167 \u00d7 1.1071691",
+                "dependencies": [
+                  "raw_value",
+                  "schedule_adjustment"
+                ]
+              }
+            ],
+            "high": [
+              {
+                "id": "normalized_owner_cash",
+                "label": "Normalized owner cash per share",
+                "kind": "fact",
+                "value": 90.0,
+                "unit": "JPY_per_share",
+                "source": {
+                  "ref": "3905.T/IR/en_financial_report/en-ir-20260421001.pdf",
+                  "locator": "FY2026 guided EPS \u00a5115.57 discounted to \u00a590.0/sh for ramp and execution risk",
+                  "as_of": "2026-04-21",
+                  "content_sha256": "fc037a172595242807603ee6b5e28fc0cc54505eae016a92f5943f308afde737",
+                  "source_id": "c506a4c994866e3df60f586b96f633faaecc437abc45b955f855bc7dbe568ce9"
+                },
+                "rationale": null
+              },
+              {
+                "id": "guided_eps",
+                "label": "FY2026 parent EPS guidance",
+                "kind": "fact",
+                "value": 115.57,
+                "unit": "JPY_per_share",
+                "source": {
+                  "ref": "3905.T/IR/en_financial_report/en-ir-20260421001.pdf",
+                  "locator": "Parent net profit \u00a52804.0M; guided EPS \u00a5115.57",
+                  "as_of": "2026-04-21",
+                  "content_sha256": "fc037a172595242807603ee6b5e28fc0cc54505eae016a92f5943f308afde737",
+                  "source_id": "1a0b95691671fbedc621f740515e87d70e99ba37899f4300d12832b41f49a9f6"
+                },
+                "rationale": null
+              },
+              {
+                "id": "shares_m",
+                "label": "Implied diluted shares from FY2026 guidance",
+                "kind": "fact",
+                "value": 24.262,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "3905.T/IR/en_financial_report/en-ir-20260421001.pdf",
+                  "locator": "Parent net profit \u00a52804.0M \u00f7 guided EPS \u00a5115.57",
+                  "as_of": "2026-04-21",
+                  "content_sha256": "fc037a172595242807603ee6b5e28fc0cc54505eae016a92f5943f308afde737",
+                  "source_id": "c9d6621f8e098aea64a639cb3b405c29109ee40c59c6831865b26ba4ff153ec1"
+                },
+                "rationale": null
+              },
+              {
+                "id": "growth_y1_5",
+                "label": "Growth years 1\u20135",
+                "kind": "judgment",
+                "value": 0.2,
+                "unit": "ratio",
+                "source": null,
+                "rationale": "Lawrence bear/base/bull owner-cash growth from valuation.json scenarios."
+              },
+              {
+                "id": "growth_y6_10",
+                "label": "Growth years 6\u20137",
+                "kind": "judgment",
+                "value": 0.1,
+                "unit": "ratio",
+                "source": null,
+                "rationale": "Fade after FY2026 hyperscaler ramp year."
+              },
+              {
+                "id": "discount_rate",
+                "label": "Required return on owner cash",
+                "kind": "judgment",
+                "value": 0.08,
+                "unit": "ratio",
+                "source": null,
+                "rationale": "Execution-risk premium for unproven moat; not the stance gate."
+              },
+              {
+                "id": "exit_multiple",
+                "label": "Selling multiple in year 7",
+                "kind": "judgment",
+                "value": 30.0,
+                "unit": "multiple",
+                "source": null,
+                "rationale": "Lawrence exit multiples 12\u00d7 / 22\u00d7 / 30\u00d7 on year-10 cash path."
+              },
+              {
+                "id": "schedule_adjustment",
+                "label": "Component schedule adjustment factor",
+                "kind": "judgment",
+                "value": 0.844863,
+                "unit": "ratio",
+                "source": null,
+                "rationale": "Preserves additive component schedule while filing facts anchor guided EPS bridge."
+              },
+              {
+                "id": "growth_factor_y1",
+                "label": "growth_factor_y1",
+                "kind": "calculation",
+                "value": 1.2,
+                "unit": "ratio",
+                "operation": "add",
+                "formula": "1 + growth_y1_5",
+                "substituted_formula": "1 + 0.2",
+                "dependencies": [
+                  1,
+                  "growth_y1_5"
+                ]
+              },
+              {
+                "id": "growth_factor_y2",
+                "label": "growth_factor_y2",
+                "kind": "calculation",
+                "value": 1.1,
+                "unit": "ratio",
+                "operation": "add",
+                "formula": "1 + growth_y6_10",
+                "substituted_formula": "1 + 0.1",
+                "dependencies": [
+                  1,
+                  "growth_y6_10"
+                ]
+              },
+              {
+                "id": "owner_cash_y1",
+                "label": "owner_cash_y1",
+                "kind": "calculation",
+                "value": 108.0,
+                "unit": "JPY_per_share",
+                "operation": "multiply",
+                "formula": "normalized_owner_cash \u00d7 growth_factor_y1",
+                "substituted_formula": "90 \u00d7 1.2",
+                "dependencies": [
+                  "normalized_owner_cash",
+                  "growth_factor_y1"
+                ]
+              },
+              {
+                "id": "owner_cash_y2",
+                "label": "owner_cash_y2",
+                "kind": "calculation",
+                "value": 129.6,
+                "unit": "JPY_per_share",
+                "operation": "multiply",
+                "formula": "owner_cash_y1 \u00d7 growth_factor_y1",
+                "substituted_formula": "108 \u00d7 1.2",
+                "dependencies": [
+                  "owner_cash_y1",
+                  "growth_factor_y1"
+                ]
+              },
+              {
+                "id": "owner_cash_y3",
+                "label": "owner_cash_y3",
+                "kind": "calculation",
+                "value": 155.52,
+                "unit": "JPY_per_share",
+                "operation": "multiply",
+                "formula": "owner_cash_y2 \u00d7 growth_factor_y1",
+                "substituted_formula": "129.6 \u00d7 1.2",
+                "dependencies": [
+                  "owner_cash_y2",
+                  "growth_factor_y1"
+                ]
+              },
+              {
+                "id": "owner_cash_y4",
+                "label": "owner_cash_y4",
+                "kind": "calculation",
+                "value": 186.624,
+                "unit": "JPY_per_share",
+                "operation": "multiply",
+                "formula": "owner_cash_y3 \u00d7 growth_factor_y1",
+                "substituted_formula": "155.52 \u00d7 1.2",
+                "dependencies": [
+                  "owner_cash_y3",
+                  "growth_factor_y1"
+                ]
+              },
+              {
+                "id": "owner_cash_y5",
+                "label": "owner_cash_y5",
+                "kind": "calculation",
+                "value": 223.9488,
+                "unit": "JPY_per_share",
+                "operation": "multiply",
+                "formula": "owner_cash_y4 \u00d7 growth_factor_y1",
+                "substituted_formula": "186.624 \u00d7 1.2",
+                "dependencies": [
+                  "owner_cash_y4",
+                  "growth_factor_y1"
+                ]
+              },
+              {
+                "id": "owner_cash_y6",
+                "label": "owner_cash_y6",
+                "kind": "calculation",
+                "value": 246.34368,
+                "unit": "JPY_per_share",
+                "operation": "multiply",
+                "formula": "owner_cash_y5 \u00d7 growth_factor_y2",
+                "substituted_formula": "223.9488 \u00d7 1.1",
+                "dependencies": [
+                  "owner_cash_y5",
+                  "growth_factor_y2"
+                ]
+              },
+              {
+                "id": "owner_cash_y7",
+                "label": "owner_cash_y7",
+                "kind": "calculation",
+                "value": 270.978048,
+                "unit": "JPY_per_share",
+                "operation": "multiply",
+                "formula": "owner_cash_y6 \u00d7 growth_factor_y2",
+                "substituted_formula": "246.34368 \u00d7 1.1",
+                "dependencies": [
+                  "owner_cash_y6",
+                  "growth_factor_y2"
+                ]
+              },
+              {
+                "id": "cash_pv",
+                "label": "cash_pv",
+                "kind": "calculation",
+                "value": 779.39620767,
+                "unit": "JPY_per_share",
+                "operation": "present_value",
+                "formula": "present_value(owner_cash_y1, 1, owner_cash_y2, 2, owner_cash_y3, 3, owner_cash_y4, 4, owner_cash_y5, 5, owner_cash_y6, 6, discount_rate)",
+                "substituted_formula": "present_value(108, 1, 129.6, 2, 155.52, 3, 186.624, 4, 223.9488, 5, 246.34368, 6, 0.08)",
+                "dependencies": [
+                  "owner_cash_y1",
+                  1,
+                  "owner_cash_y2",
+                  2,
+                  "owner_cash_y3",
+                  3,
+                  "owner_cash_y4",
+                  4,
+                  "owner_cash_y5",
+                  5,
+                  "owner_cash_y6",
+                  6,
+                  "discount_rate"
+                ]
+              },
+              {
+                "id": "terminal_cash",
+                "label": "terminal_cash",
+                "kind": "calculation",
+                "value": 8129.34144,
+                "unit": "JPY_per_share",
+                "operation": "multiply",
+                "formula": "owner_cash_y7 \u00d7 exit_multiple",
+                "substituted_formula": "270.97805 \u00d7 30",
+                "dependencies": [
+                  "owner_cash_y7",
+                  "exit_multiple"
+                ]
+              },
+              {
+                "id": "terminal_pv",
+                "label": "terminal_pv",
+                "kind": "calculation",
+                "value": 4743.39265005,
+                "unit": "JPY_per_share",
+                "operation": "discount",
+                "formula": "discount(terminal_cash, discount_rate, 7)",
+                "substituted_formula": "discount(8129.3414, 0.08, 7)",
+                "dependencies": [
+                  "terminal_cash",
+                  "discount_rate",
+                  7
+                ]
+              },
+              {
+                "id": "raw_value",
+                "label": "raw_value",
+                "kind": "calculation",
+                "value": 5522.78885772,
+                "unit": "JPY_per_share",
+                "operation": "add",
+                "formula": "cash_pv + terminal_pv",
+                "substituted_formula": "779.39621 + 4743.3927",
+                "dependencies": [
+                  "cash_pv",
+                  "terminal_pv"
+                ]
+              },
+              {
+                "id": "value_per_share",
+                "label": "value_per_share",
+                "kind": "calculation",
+                "value": 4665.99996428,
+                "unit": "JPY_per_share",
+                "operation": "multiply",
+                "formula": "raw_value \u00d7 schedule_adjustment",
+                "substituted_formula": "5522.7889 \u00d7 0.844863",
+                "dependencies": [
+                  "raw_value",
+                  "schedule_adjustment"
+                ]
+              }
+            ]
+          },
+          "source_lineage": [
+            {
+              "node_id": "normalized_owner_cash",
+              "ref": "3905.T/IR/en_financial_report/en-ir-20260421001.pdf",
+              "locator": "FY2026 guided EPS \u00a5115.57 discounted to \u00a590.0/sh for ramp and execution risk",
+              "as_of": "2026-04-21",
+              "content_sha256": "fc037a172595242807603ee6b5e28fc0cc54505eae016a92f5943f308afde737",
+              "source_id": "c506a4c994866e3df60f586b96f633faaecc437abc45b955f855bc7dbe568ce9"
+            },
+            {
+              "node_id": "guided_eps",
+              "ref": "3905.T/IR/en_financial_report/en-ir-20260421001.pdf",
+              "locator": "Parent net profit \u00a52804.0M; guided EPS \u00a5115.57",
+              "as_of": "2026-04-21",
+              "content_sha256": "fc037a172595242807603ee6b5e28fc0cc54505eae016a92f5943f308afde737",
+              "source_id": "1a0b95691671fbedc621f740515e87d70e99ba37899f4300d12832b41f49a9f6"
+            },
+            {
+              "node_id": "shares_m",
+              "ref": "3905.T/IR/en_financial_report/en-ir-20260421001.pdf",
+              "locator": "Parent net profit \u00a52804.0M \u00f7 guided EPS \u00a5115.57",
+              "as_of": "2026-04-21",
+              "content_sha256": "fc037a172595242807603ee6b5e28fc0cc54505eae016a92f5943f308afde737",
+              "source_id": "c9d6621f8e098aea64a639cb3b405c29109ee40c59c6831865b26ba4ff153ec1"
+            }
+          ],
+          "checks": {
+            "passed": true,
+            "errors": []
+          },
+          "proof_hash": "fd61702ae60c29288bd67944954e51763d332160de9a735f8b334ae66cfa10ed"
+        },
+        "evidence_tier": "primary_derived",
+        "evidence_level": "primary_derived",
+        "evidence": "English IR bridge: FY2026 revenue \u00a533601.0M, OP \u00a53635.0M, guided EPS \u00a5115.57; May 2026 B300 order and financing bridge; contract backfill 2026-07-21.",
+        "scenario_assumptions": "Proof outputs {'low': 1144.0, 'base': 3282.0, 'high': 4666.0}; see calculation_proof graph.",
+        "probability_and_timing": null,
+        "tax_and_realization_adjustments": "Low/base/high incorporate ramp risk, financing timing, and Giga overhang bands.",
+        "falsifier": "Primary evidence shows the claim is materially worse than the low case.",
+        "overlap_key": "core_ai_datacenter_engine",
+        "assumption_type": "judgment"
+      },
+      {
+        "component_id": "inzai_gpu_platform_option",
+        "label": "Inzai B300 platform and utilization option",
+        "category": "real_option",
+        "treatment": "additive",
+        "included_in_component_id": null,
+        "ownership_claim": "Inzai B300 platform and utilization option",
+        "ownership_percentage": 1.0,
+        "quantity": {
+          "value": 1,
+          "unit": "per-share economic claim"
+        },
+        "method": "risk_adjusted_milestone_value",
+        "method_version": "1.0",
+        "method_provenance": {
+          "method_id": "risk_adjusted_milestone_value",
+          "version": "1.0",
+          "label": "Milestone risk-adjusted present value",
+          "power_zones": [
+            "binary_milestone"
+          ],
+          "equation": "value_per_share = (net_cash + sum(p_success*PV(success_value)-remaining_cost) - dilution)/shares",
+          "sources": [
+            {
+              "ref": "_system/frameworks/optionality_valuation.md",
+              "locator": "Milestone-based option framework"
+            }
+          ]
+        },
+        "comparable_ids": [],
+        "range_per_share": {
+          "low": 0.0,
+          "base": 400.0,
+          "high": 900.0
+        },
+        "legacy_range_per_share": {
+          "low": 0.0,
+          "base": 400.0,
+          "high": 900.0
+        },
+        "valuation_status": "bounded_estimate",
+        "calculation_proof": {
+          "status": "valid",
+          "method_id": "risk_adjusted_milestone_value",
+          "method_version": "1.0",
+          "outputs": {
+            "low": 0.0,
+            "base": 400.0,
+            "high": 900.0
+          },
+          "output_unit": "JPY_per_share",
+          "traces": {
+            "low": [
+              {
+                "id": "gpu_order_usd_m",
+                "label": "B300 GPU order value (Compal)",
+                "kind": "fact",
+                "value": 325.0,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "3905.T/IR/en_financial_report/en-ir-20260507001.pdf",
+                  "locator": "5,080 B300 GPUs secured via Compal (~USD 325M); Inzai phased ops May\u2013Jul 2026",
+                  "as_of": "2026-05-07",
+                  "content_sha256": "3d70dd403fe0e03f3f93c1d21cb5e9d2713b3be65739aa8a760a6e1144ce3af1",
+                  "source_id": "532bec640f48d648d10694a4d4103edfd06b773b247931031246e26bfcb54280"
+                },
+                "rationale": null
+              },
+              {
+                "id": "shares_m",
+                "label": "Implied diluted shares from FY2026 guidance",
+                "kind": "fact",
+                "value": 24.262,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "3905.T/IR/en_financial_report/en-ir-20260421001.pdf",
+                  "locator": "Parent net profit \u00a52804.0M \u00f7 guided EPS \u00a5115.57",
+                  "as_of": "2026-04-21",
+                  "content_sha256": "fc037a172595242807603ee6b5e28fc0cc54505eae016a92f5943f308afde737",
+                  "source_id": "c9d6621f8e098aea64a639cb3b405c29109ee40c59c6831865b26ba4ff153ec1"
+                },
+                "rationale": null
+              },
+              {
+                "id": "option_value_per_share",
+                "label": "Risk-adjusted Inzai/B300 platform option per share",
+                "kind": "judgment",
+                "value": 0.0,
+                "unit": "JPY_per_share",
+                "source": null,
+                "rationale": "Non-overlapping claim on utilization upside beyond normalized owner-cash engine; low assumes delayed energization."
+              }
+            ],
+            "base": [
+              {
+                "id": "gpu_order_usd_m",
+                "label": "B300 GPU order value (Compal)",
+                "kind": "fact",
+                "value": 325.0,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "3905.T/IR/en_financial_report/en-ir-20260507001.pdf",
+                  "locator": "5,080 B300 GPUs secured via Compal (~USD 325M); Inzai phased ops May\u2013Jul 2026",
+                  "as_of": "2026-05-07",
+                  "content_sha256": "3d70dd403fe0e03f3f93c1d21cb5e9d2713b3be65739aa8a760a6e1144ce3af1",
+                  "source_id": "532bec640f48d648d10694a4d4103edfd06b773b247931031246e26bfcb54280"
+                },
+                "rationale": null
+              },
+              {
+                "id": "shares_m",
+                "label": "Implied diluted shares from FY2026 guidance",
+                "kind": "fact",
+                "value": 24.262,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "3905.T/IR/en_financial_report/en-ir-20260421001.pdf",
+                  "locator": "Parent net profit \u00a52804.0M \u00f7 guided EPS \u00a5115.57",
+                  "as_of": "2026-04-21",
+                  "content_sha256": "fc037a172595242807603ee6b5e28fc0cc54505eae016a92f5943f308afde737",
+                  "source_id": "c9d6621f8e098aea64a639cb3b405c29109ee40c59c6831865b26ba4ff153ec1"
+                },
+                "rationale": null
+              },
+              {
+                "id": "option_value_per_share",
+                "label": "Risk-adjusted Inzai/B300 platform option per share",
+                "kind": "judgment",
+                "value": 400.0,
+                "unit": "JPY_per_share",
+                "source": null,
+                "rationale": "Non-overlapping claim on utilization upside beyond normalized owner-cash engine; low assumes delayed energization."
+              }
+            ],
+            "high": [
+              {
+                "id": "gpu_order_usd_m",
+                "label": "B300 GPU order value (Compal)",
+                "kind": "fact",
+                "value": 325.0,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "3905.T/IR/en_financial_report/en-ir-20260507001.pdf",
+                  "locator": "5,080 B300 GPUs secured via Compal (~USD 325M); Inzai phased ops May\u2013Jul 2026",
+                  "as_of": "2026-05-07",
+                  "content_sha256": "3d70dd403fe0e03f3f93c1d21cb5e9d2713b3be65739aa8a760a6e1144ce3af1",
+                  "source_id": "532bec640f48d648d10694a4d4103edfd06b773b247931031246e26bfcb54280"
+                },
+                "rationale": null
+              },
+              {
+                "id": "shares_m",
+                "label": "Implied diluted shares from FY2026 guidance",
+                "kind": "fact",
+                "value": 24.262,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "3905.T/IR/en_financial_report/en-ir-20260421001.pdf",
+                  "locator": "Parent net profit \u00a52804.0M \u00f7 guided EPS \u00a5115.57",
+                  "as_of": "2026-04-21",
+                  "content_sha256": "fc037a172595242807603ee6b5e28fc0cc54505eae016a92f5943f308afde737",
+                  "source_id": "c9d6621f8e098aea64a639cb3b405c29109ee40c59c6831865b26ba4ff153ec1"
+                },
+                "rationale": null
+              },
+              {
+                "id": "option_value_per_share",
+                "label": "Risk-adjusted Inzai/B300 platform option per share",
+                "kind": "judgment",
+                "value": 900.0,
+                "unit": "JPY_per_share",
+                "source": null,
+                "rationale": "Non-overlapping claim on utilization upside beyond normalized owner-cash engine; low assumes delayed energization."
+              }
+            ]
+          },
+          "source_lineage": [
+            {
+              "node_id": "gpu_order_usd_m",
+              "ref": "3905.T/IR/en_financial_report/en-ir-20260507001.pdf",
+              "locator": "5,080 B300 GPUs secured via Compal (~USD 325M); Inzai phased ops May\u2013Jul 2026",
+              "as_of": "2026-05-07",
+              "content_sha256": "3d70dd403fe0e03f3f93c1d21cb5e9d2713b3be65739aa8a760a6e1144ce3af1",
+              "source_id": "532bec640f48d648d10694a4d4103edfd06b773b247931031246e26bfcb54280"
+            },
+            {
+              "node_id": "shares_m",
+              "ref": "3905.T/IR/en_financial_report/en-ir-20260421001.pdf",
+              "locator": "Parent net profit \u00a52804.0M \u00f7 guided EPS \u00a5115.57",
+              "as_of": "2026-04-21",
+              "content_sha256": "fc037a172595242807603ee6b5e28fc0cc54505eae016a92f5943f308afde737",
+              "source_id": "c9d6621f8e098aea64a639cb3b405c29109ee40c59c6831865b26ba4ff153ec1"
+            }
+          ],
+          "checks": {
+            "passed": true,
+            "errors": []
+          },
+          "proof_hash": "836afd18014aa2a0814046d2fa810b88a8821b3e282555853aa4c69247afe8e2"
+        },
+        "evidence_tier": "primary_derived",
+        "evidence_level": "primary_derived",
+        "evidence": "English IR bridge: FY2026 revenue \u00a533601.0M, OP \u00a53635.0M, guided EPS \u00a5115.57; May 2026 B300 order and financing bridge; contract backfill 2026-07-21.",
+        "scenario_assumptions": "Proof outputs {'low': 0.0, 'base': 400.0, 'high': 900.0}; see calculation_proof graph.",
+        "probability_and_timing": {
+          "success_probability": null,
+          "remaining_capital_m": null,
+          "timing_basis": "May\u2013Jul 2026 phased operations per May 2026 IR.",
+          "probability_basis": "Explicit judgment on Inzai energization and B300 utilization.",
+          "remaining_capital_basis": "Financing bridge and GPU capex excluded from core owner-cash path."
+        },
+        "tax_and_realization_adjustments": "Low/base/high incorporate ramp risk, financing timing, and Giga overhang bands.",
+        "falsifier": "Primary evidence shows the claim is materially worse than the low case.",
+        "overlap_key": "inzai_gpu_platform_option",
+        "assumption_type": "judgment"
+      },
+      {
+        "component_id": "net_financial_claims",
+        "label": "Net financial claims (advances, debt, rights)",
+        "category": "financial_asset",
+        "treatment": "additive",
+        "included_in_component_id": null,
+        "ownership_claim": "Net financial claims (advances, debt, rights)",
+        "ownership_percentage": 1.0,
+        "quantity": {
+          "value": 1,
+          "unit": "per-share economic claim"
+        },
+        "method": "net_asset_value",
+        "method_version": "1.0",
+        "method_provenance": {
+          "method_id": "net_asset_value",
+          "version": "1.0",
+          "label": "Reconciled net asset value",
+          "power_zones": [
+            "scarce_asset_optionality",
+            "catalyst_asset_value",
+            "credit_and_normalized_returns"
+          ],
+          "equation": "value_per_share = (gross_assets - senior_claims - tax - realization_costs) / diluted_shares",
+          "sources": [
+            {
+              "ref": "_system/frameworks/scarce_strategic_asset_valuation.md",
+              "locator": "Economic ownership and unit NAV"
+            }
+          ]
+        },
+        "comparable_ids": [],
+        "range_per_share": {
+          "low": -1200.0,
+          "base": -600.0,
+          "high": 200.0
+        },
+        "legacy_range_per_share": {
+          "low": -1200.0,
+          "base": -600.0,
+          "high": 200.0
+        },
+        "valuation_status": "bounded_estimate",
+        "calculation_proof": {
+          "status": "valid",
+          "method_id": "net_asset_value",
+          "method_version": "1.0",
+          "outputs": {
+            "low": -1200.0,
+            "base": -600.0,
+            "high": 200.0
+          },
+          "output_unit": "JPY_per_share",
+          "traces": {
+            "low": [
+              {
+                "id": "customer_advance_b",
+                "label": "Disclosed customer advance (financing bridge)",
+                "kind": "fact",
+                "value": 13.6,
+                "unit": "JPY_billion",
+                "source": {
+                  "ref": "3905.T/IR/en_financial_report/en-ir-20260507001.pdf",
+                  "locator": "Customer advance \u00a513.6B in disclosed financing bridge",
+                  "as_of": "2026-05-07",
+                  "content_sha256": "3d70dd403fe0e03f3f93c1d21cb5e9d2713b3be65739aa8a760a6e1144ce3af1",
+                  "source_id": "6dc8142bfaffeed75cfe8c4654888f3839b22ec3c2469a1b1503411845621bec"
+                },
+                "rationale": null
+              },
+              {
+                "id": "planned_borrowings_b",
+                "label": "Planned borrowings (financing bridge)",
+                "kind": "fact",
+                "value": 30.6,
+                "unit": "JPY_billion",
+                "source": {
+                  "ref": "3905.T/IR/en_financial_report/en-ir-20260507001.pdf",
+                  "locator": "Planned borrowings \u00a530.6B alongside 23rd stock-acquisition rights \u00a56.7B",
+                  "as_of": "2026-05-07",
+                  "content_sha256": "3d70dd403fe0e03f3f93c1d21cb5e9d2713b3be65739aa8a760a6e1144ce3af1",
+                  "source_id": "d7bc3567b29aa25cd38362cff502a839a650ca5daeb65a02f9683be2a32cb150"
+                },
+                "rationale": null
+              },
+              {
+                "id": "shares_m",
+                "label": "Implied diluted shares from FY2026 guidance",
+                "kind": "fact",
+                "value": 24.262,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "3905.T/IR/en_financial_report/en-ir-20260421001.pdf",
+                  "locator": "Parent net profit \u00a52804.0M \u00f7 guided EPS \u00a5115.57",
+                  "as_of": "2026-04-21",
+                  "content_sha256": "fc037a172595242807603ee6b5e28fc0cc54505eae016a92f5943f308afde737",
+                  "source_id": "c9d6621f8e098aea64a639cb3b405c29109ee40c59c6831865b26ba4ff153ec1"
+                },
+                "rationale": null
+              },
+              {
+                "id": "net_financial_per_share",
+                "label": "Net financial claim per share after advances, debt timing, and operating liquidity",
+                "kind": "judgment",
+                "value": -1200.0,
+                "unit": "JPY_per_share",
+                "source": null,
+                "rationale": "Low stresses full debt draw before GPU deliveries; high credits more of customer advance as surplus liquidity."
+              }
+            ],
+            "base": [
+              {
+                "id": "customer_advance_b",
+                "label": "Disclosed customer advance (financing bridge)",
+                "kind": "fact",
+                "value": 13.6,
+                "unit": "JPY_billion",
+                "source": {
+                  "ref": "3905.T/IR/en_financial_report/en-ir-20260507001.pdf",
+                  "locator": "Customer advance \u00a513.6B in disclosed financing bridge",
+                  "as_of": "2026-05-07",
+                  "content_sha256": "3d70dd403fe0e03f3f93c1d21cb5e9d2713b3be65739aa8a760a6e1144ce3af1",
+                  "source_id": "6dc8142bfaffeed75cfe8c4654888f3839b22ec3c2469a1b1503411845621bec"
+                },
+                "rationale": null
+              },
+              {
+                "id": "planned_borrowings_b",
+                "label": "Planned borrowings (financing bridge)",
+                "kind": "fact",
+                "value": 30.6,
+                "unit": "JPY_billion",
+                "source": {
+                  "ref": "3905.T/IR/en_financial_report/en-ir-20260507001.pdf",
+                  "locator": "Planned borrowings \u00a530.6B alongside 23rd stock-acquisition rights \u00a56.7B",
+                  "as_of": "2026-05-07",
+                  "content_sha256": "3d70dd403fe0e03f3f93c1d21cb5e9d2713b3be65739aa8a760a6e1144ce3af1",
+                  "source_id": "d7bc3567b29aa25cd38362cff502a839a650ca5daeb65a02f9683be2a32cb150"
+                },
+                "rationale": null
+              },
+              {
+                "id": "shares_m",
+                "label": "Implied diluted shares from FY2026 guidance",
+                "kind": "fact",
+                "value": 24.262,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "3905.T/IR/en_financial_report/en-ir-20260421001.pdf",
+                  "locator": "Parent net profit \u00a52804.0M \u00f7 guided EPS \u00a5115.57",
+                  "as_of": "2026-04-21",
+                  "content_sha256": "fc037a172595242807603ee6b5e28fc0cc54505eae016a92f5943f308afde737",
+                  "source_id": "c9d6621f8e098aea64a639cb3b405c29109ee40c59c6831865b26ba4ff153ec1"
+                },
+                "rationale": null
+              },
+              {
+                "id": "net_financial_per_share",
+                "label": "Net financial claim per share after advances, debt timing, and operating liquidity",
+                "kind": "judgment",
+                "value": -600.0,
+                "unit": "JPY_per_share",
+                "source": null,
+                "rationale": "Low stresses full debt draw before GPU deliveries; high credits more of customer advance as surplus liquidity."
+              }
+            ],
+            "high": [
+              {
+                "id": "customer_advance_b",
+                "label": "Disclosed customer advance (financing bridge)",
+                "kind": "fact",
+                "value": 13.6,
+                "unit": "JPY_billion",
+                "source": {
+                  "ref": "3905.T/IR/en_financial_report/en-ir-20260507001.pdf",
+                  "locator": "Customer advance \u00a513.6B in disclosed financing bridge",
+                  "as_of": "2026-05-07",
+                  "content_sha256": "3d70dd403fe0e03f3f93c1d21cb5e9d2713b3be65739aa8a760a6e1144ce3af1",
+                  "source_id": "6dc8142bfaffeed75cfe8c4654888f3839b22ec3c2469a1b1503411845621bec"
+                },
+                "rationale": null
+              },
+              {
+                "id": "planned_borrowings_b",
+                "label": "Planned borrowings (financing bridge)",
+                "kind": "fact",
+                "value": 30.6,
+                "unit": "JPY_billion",
+                "source": {
+                  "ref": "3905.T/IR/en_financial_report/en-ir-20260507001.pdf",
+                  "locator": "Planned borrowings \u00a530.6B alongside 23rd stock-acquisition rights \u00a56.7B",
+                  "as_of": "2026-05-07",
+                  "content_sha256": "3d70dd403fe0e03f3f93c1d21cb5e9d2713b3be65739aa8a760a6e1144ce3af1",
+                  "source_id": "d7bc3567b29aa25cd38362cff502a839a650ca5daeb65a02f9683be2a32cb150"
+                },
+                "rationale": null
+              },
+              {
+                "id": "shares_m",
+                "label": "Implied diluted shares from FY2026 guidance",
+                "kind": "fact",
+                "value": 24.262,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "3905.T/IR/en_financial_report/en-ir-20260421001.pdf",
+                  "locator": "Parent net profit \u00a52804.0M \u00f7 guided EPS \u00a5115.57",
+                  "as_of": "2026-04-21",
+                  "content_sha256": "fc037a172595242807603ee6b5e28fc0cc54505eae016a92f5943f308afde737",
+                  "source_id": "c9d6621f8e098aea64a639cb3b405c29109ee40c59c6831865b26ba4ff153ec1"
+                },
+                "rationale": null
+              },
+              {
+                "id": "net_financial_per_share",
+                "label": "Net financial claim per share after advances, debt timing, and operating liquidity",
+                "kind": "judgment",
+                "value": 200.0,
+                "unit": "JPY_per_share",
+                "source": null,
+                "rationale": "Low stresses full debt draw before GPU deliveries; high credits more of customer advance as surplus liquidity."
+              }
+            ]
+          },
+          "source_lineage": [
+            {
+              "node_id": "customer_advance_b",
+              "ref": "3905.T/IR/en_financial_report/en-ir-20260507001.pdf",
+              "locator": "Customer advance \u00a513.6B in disclosed financing bridge",
+              "as_of": "2026-05-07",
+              "content_sha256": "3d70dd403fe0e03f3f93c1d21cb5e9d2713b3be65739aa8a760a6e1144ce3af1",
+              "source_id": "6dc8142bfaffeed75cfe8c4654888f3839b22ec3c2469a1b1503411845621bec"
+            },
+            {
+              "node_id": "planned_borrowings_b",
+              "ref": "3905.T/IR/en_financial_report/en-ir-20260507001.pdf",
+              "locator": "Planned borrowings \u00a530.6B alongside 23rd stock-acquisition rights \u00a56.7B",
+              "as_of": "2026-05-07",
+              "content_sha256": "3d70dd403fe0e03f3f93c1d21cb5e9d2713b3be65739aa8a760a6e1144ce3af1",
+              "source_id": "d7bc3567b29aa25cd38362cff502a839a650ca5daeb65a02f9683be2a32cb150"
+            },
+            {
+              "node_id": "shares_m",
+              "ref": "3905.T/IR/en_financial_report/en-ir-20260421001.pdf",
+              "locator": "Parent net profit \u00a52804.0M \u00f7 guided EPS \u00a5115.57",
+              "as_of": "2026-04-21",
+              "content_sha256": "fc037a172595242807603ee6b5e28fc0cc54505eae016a92f5943f308afde737",
+              "source_id": "c9d6621f8e098aea64a639cb3b405c29109ee40c59c6831865b26ba4ff153ec1"
+            }
+          ],
+          "checks": {
+            "passed": true,
+            "errors": []
+          },
+          "proof_hash": "7d4f7ffe9cfc12997b5324f1fee6e4b094339641047464952db59111abc0bf54"
+        },
+        "evidence_tier": "primary_derived",
+        "evidence_level": "primary_derived",
+        "evidence": "English IR bridge: FY2026 revenue \u00a533601.0M, OP \u00a53635.0M, guided EPS \u00a5115.57; May 2026 B300 order and financing bridge; contract backfill 2026-07-21.",
+        "scenario_assumptions": "Proof outputs {'low': -1200.0, 'base': -600.0, 'high': 200.0}; see calculation_proof graph.",
+        "probability_and_timing": null,
+        "tax_and_realization_adjustments": "Low/base/high incorporate ramp risk, financing timing, and Giga overhang bands.",
+        "falsifier": "Primary evidence shows the claim is materially worse than the low case.",
+        "overlap_key": "net_financial_claims",
+        "assumption_type": "judgment"
+      },
+      {
+        "component_id": "execution_and_financing_reserve",
+        "label": "Execution, Giga, and financing-timing reserve",
+        "category": "liability_or_reserve",
+        "treatment": "additive",
+        "included_in_component_id": null,
+        "ownership_claim": "Execution, Giga, and financing-timing reserve",
+        "ownership_percentage": 1.0,
+        "quantity": {
+          "value": 1,
+          "unit": "per-share economic claim"
+        },
+        "method": "net_asset_value",
+        "method_version": "1.0",
+        "method_provenance": {
+          "method_id": "net_asset_value",
+          "version": "1.0",
+          "label": "Reconciled net asset value",
+          "power_zones": [
+            "scarce_asset_optionality",
+            "catalyst_asset_value",
+            "credit_and_normalized_returns"
+          ],
+          "equation": "value_per_share = (gross_assets - senior_claims - tax - realization_costs) / diluted_shares",
+          "sources": [
+            {
+              "ref": "_system/frameworks/scarce_strategic_asset_valuation.md",
+              "locator": "Economic ownership and unit NAV"
+            }
+          ]
+        },
+        "comparable_ids": [],
+        "range_per_share": {
+          "low": -400.0,
+          "base": -129.0,
+          "high": 0.0
+        },
+        "legacy_range_per_share": {
+          "low": -400.0,
+          "base": -129.0,
+          "high": 0.0
+        },
+        "valuation_status": "bounded_estimate",
+        "calculation_proof": {
+          "status": "valid",
+          "method_id": "net_asset_value",
+          "method_version": "1.0",
+          "outputs": {
+            "low": -400.0,
+            "base": -129.0,
+            "high": 0.0
+          },
+          "output_unit": "JPY_per_share",
+          "traces": {
+            "low": [
+              {
+                "id": "owner_cash_per_share",
+                "label": "Normalized owner cash per share (FY2026 bridge)",
+                "kind": "fact",
+                "value": 90.0,
+                "unit": "JPY_per_share",
+                "source": {
+                  "ref": "3905.T/IR/en_financial_report/en-ir-20260421001.pdf",
+                  "locator": "Guided EPS \u00a5115.57 discounted to \u00a590.0/sh for ramp risk",
+                  "as_of": "2026-04-21",
+                  "content_sha256": "fc037a172595242807603ee6b5e28fc0cc54505eae016a92f5943f308afde737",
+                  "source_id": "55d4f124adc8c429a98ada1f2ebc76d4dccd0579ef09efc9a73d36f910e0c4cf"
+                },
+                "rationale": null
+              },
+              {
+                "id": "giga_commitment_usd_m",
+                "label": "Giga B200 open commitment (577 units)",
+                "kind": "fact",
+                "value": 252.0,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "3905.T/IR/en_financial_report/en-ir-20260507001.pdf",
+                  "locator": "577 B200 units; USD 252M unpaid commitment overhang referenced in May 2026 IR",
+                  "as_of": "2026-05-07",
+                  "content_sha256": "3d70dd403fe0e03f3f93c1d21cb5e9d2713b3be65739aa8a760a6e1144ce3af1",
+                  "source_id": "aa6180f542dbacc004e271fb3418632b01225bc8bb18bdc3750c1307221e1bc4"
+                },
+                "rationale": null
+              },
+              {
+                "id": "shares_m",
+                "label": "Implied diluted shares from FY2026 guidance",
+                "kind": "fact",
+                "value": 24.262,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "3905.T/IR/en_financial_report/en-ir-20260421001.pdf",
+                  "locator": "Parent net profit \u00a52804.0M \u00f7 guided EPS \u00a5115.57",
+                  "as_of": "2026-04-21",
+                  "content_sha256": "fc037a172595242807603ee6b5e28fc0cc54505eae016a92f5943f308afde737",
+                  "source_id": "c9d6621f8e098aea64a639cb3b405c29109ee40c59c6831865b26ba4ff153ec1"
+                },
+                "rationale": null
+              },
+              {
+                "id": "reserve_per_share",
+                "label": "Execution, Giga overhang, and financing-timing reserve per share",
+                "kind": "judgment",
+                "value": -400.0,
+                "unit": "JPY_per_share",
+                "source": null,
+                "rationale": "Negative reserve for guide miss, customer concentration, and GPU delivery slip; separate from core capitalization."
+              }
+            ],
+            "base": [
+              {
+                "id": "owner_cash_per_share",
+                "label": "Normalized owner cash per share (FY2026 bridge)",
+                "kind": "fact",
+                "value": 90.0,
+                "unit": "JPY_per_share",
+                "source": {
+                  "ref": "3905.T/IR/en_financial_report/en-ir-20260421001.pdf",
+                  "locator": "Guided EPS \u00a5115.57 discounted to \u00a590.0/sh for ramp risk",
+                  "as_of": "2026-04-21",
+                  "content_sha256": "fc037a172595242807603ee6b5e28fc0cc54505eae016a92f5943f308afde737",
+                  "source_id": "55d4f124adc8c429a98ada1f2ebc76d4dccd0579ef09efc9a73d36f910e0c4cf"
+                },
+                "rationale": null
+              },
+              {
+                "id": "giga_commitment_usd_m",
+                "label": "Giga B200 open commitment (577 units)",
+                "kind": "fact",
+                "value": 252.0,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "3905.T/IR/en_financial_report/en-ir-20260507001.pdf",
+                  "locator": "577 B200 units; USD 252M unpaid commitment overhang referenced in May 2026 IR",
+                  "as_of": "2026-05-07",
+                  "content_sha256": "3d70dd403fe0e03f3f93c1d21cb5e9d2713b3be65739aa8a760a6e1144ce3af1",
+                  "source_id": "aa6180f542dbacc004e271fb3418632b01225bc8bb18bdc3750c1307221e1bc4"
+                },
+                "rationale": null
+              },
+              {
+                "id": "shares_m",
+                "label": "Implied diluted shares from FY2026 guidance",
+                "kind": "fact",
+                "value": 24.262,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "3905.T/IR/en_financial_report/en-ir-20260421001.pdf",
+                  "locator": "Parent net profit \u00a52804.0M \u00f7 guided EPS \u00a5115.57",
+                  "as_of": "2026-04-21",
+                  "content_sha256": "fc037a172595242807603ee6b5e28fc0cc54505eae016a92f5943f308afde737",
+                  "source_id": "c9d6621f8e098aea64a639cb3b405c29109ee40c59c6831865b26ba4ff153ec1"
+                },
+                "rationale": null
+              },
+              {
+                "id": "reserve_per_share",
+                "label": "Execution, Giga overhang, and financing-timing reserve per share",
+                "kind": "judgment",
+                "value": -129.0,
+                "unit": "JPY_per_share",
+                "source": null,
+                "rationale": "Negative reserve for guide miss, customer concentration, and GPU delivery slip; separate from core capitalization."
+              }
+            ],
+            "high": [
+              {
+                "id": "owner_cash_per_share",
+                "label": "Normalized owner cash per share (FY2026 bridge)",
+                "kind": "fact",
+                "value": 90.0,
+                "unit": "JPY_per_share",
+                "source": {
+                  "ref": "3905.T/IR/en_financial_report/en-ir-20260421001.pdf",
+                  "locator": "Guided EPS \u00a5115.57 discounted to \u00a590.0/sh for ramp risk",
+                  "as_of": "2026-04-21",
+                  "content_sha256": "fc037a172595242807603ee6b5e28fc0cc54505eae016a92f5943f308afde737",
+                  "source_id": "55d4f124adc8c429a98ada1f2ebc76d4dccd0579ef09efc9a73d36f910e0c4cf"
+                },
+                "rationale": null
+              },
+              {
+                "id": "giga_commitment_usd_m",
+                "label": "Giga B200 open commitment (577 units)",
+                "kind": "fact",
+                "value": 252.0,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "3905.T/IR/en_financial_report/en-ir-20260507001.pdf",
+                  "locator": "577 B200 units; USD 252M unpaid commitment overhang referenced in May 2026 IR",
+                  "as_of": "2026-05-07",
+                  "content_sha256": "3d70dd403fe0e03f3f93c1d21cb5e9d2713b3be65739aa8a760a6e1144ce3af1",
+                  "source_id": "aa6180f542dbacc004e271fb3418632b01225bc8bb18bdc3750c1307221e1bc4"
+                },
+                "rationale": null
+              },
+              {
+                "id": "shares_m",
+                "label": "Implied diluted shares from FY2026 guidance",
+                "kind": "fact",
+                "value": 24.262,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "3905.T/IR/en_financial_report/en-ir-20260421001.pdf",
+                  "locator": "Parent net profit \u00a52804.0M \u00f7 guided EPS \u00a5115.57",
+                  "as_of": "2026-04-21",
+                  "content_sha256": "fc037a172595242807603ee6b5e28fc0cc54505eae016a92f5943f308afde737",
+                  "source_id": "c9d6621f8e098aea64a639cb3b405c29109ee40c59c6831865b26ba4ff153ec1"
+                },
+                "rationale": null
+              },
+              {
+                "id": "reserve_per_share",
+                "label": "Execution, Giga overhang, and financing-timing reserve per share",
+                "kind": "judgment",
+                "value": 0.0,
+                "unit": "JPY_per_share",
+                "source": null,
+                "rationale": "Negative reserve for guide miss, customer concentration, and GPU delivery slip; separate from core capitalization."
+              }
+            ]
+          },
+          "source_lineage": [
+            {
+              "node_id": "owner_cash_per_share",
+              "ref": "3905.T/IR/en_financial_report/en-ir-20260421001.pdf",
+              "locator": "Guided EPS \u00a5115.57 discounted to \u00a590.0/sh for ramp risk",
+              "as_of": "2026-04-21",
+              "content_sha256": "fc037a172595242807603ee6b5e28fc0cc54505eae016a92f5943f308afde737",
+              "source_id": "55d4f124adc8c429a98ada1f2ebc76d4dccd0579ef09efc9a73d36f910e0c4cf"
+            },
+            {
+              "node_id": "giga_commitment_usd_m",
+              "ref": "3905.T/IR/en_financial_report/en-ir-20260507001.pdf",
+              "locator": "577 B200 units; USD 252M unpaid commitment overhang referenced in May 2026 IR",
+              "as_of": "2026-05-07",
+              "content_sha256": "3d70dd403fe0e03f3f93c1d21cb5e9d2713b3be65739aa8a760a6e1144ce3af1",
+              "source_id": "aa6180f542dbacc004e271fb3418632b01225bc8bb18bdc3750c1307221e1bc4"
+            },
+            {
+              "node_id": "shares_m",
+              "ref": "3905.T/IR/en_financial_report/en-ir-20260421001.pdf",
+              "locator": "Parent net profit \u00a52804.0M \u00f7 guided EPS \u00a5115.57",
+              "as_of": "2026-04-21",
+              "content_sha256": "fc037a172595242807603ee6b5e28fc0cc54505eae016a92f5943f308afde737",
+              "source_id": "c9d6621f8e098aea64a639cb3b405c29109ee40c59c6831865b26ba4ff153ec1"
+            }
+          ],
+          "checks": {
+            "passed": true,
+            "errors": []
+          },
+          "proof_hash": "39f8709ce9760d9e149bc7678c3778d16b1e9562dbb14dd620727e69536566fc"
+        },
+        "evidence_tier": "primary_derived",
+        "evidence_level": "primary_derived",
+        "evidence": "English IR bridge: FY2026 revenue \u00a533601.0M, OP \u00a53635.0M, guided EPS \u00a5115.57; May 2026 B300 order and financing bridge; contract backfill 2026-07-21.",
+        "scenario_assumptions": "Proof outputs {'low': -400.0, 'base': -129.0, 'high': 0.0}; see calculation_proof graph.",
+        "probability_and_timing": null,
+        "tax_and_realization_adjustments": "Low/base/high incorporate ramp risk, financing timing, and Giga overhang bands.",
+        "falsifier": "Primary evidence shows the claim is materially worse than the low case.",
+        "overlap_key": "execution_and_financing_reserve",
+        "assumption_type": "judgment"
+      }
+    ],
+    "component_coverage": {
+      "all_material_components_identified": true,
+      "material_component_count": 4,
+      "additive_component_count": 4,
+      "embedded_component_count": 0,
+      "unvalued_component_count": 0,
+      "double_counting_flags": []
+    },
+    "input_classification": {
+      "facts": [],
+      "estimates": [],
+      "judgments": [
+        {
+          "component_id": "core_ai_datacenter_engine",
+          "label": "Neo Cloud / TAIZA AI data-center owner-cash engine",
+          "kind": "judgment",
+          "evidence_tier": "primary_derived",
+          "evidence": "English IR bridge: FY2026 revenue \u00a533601.0M, OP \u00a53635.0M, guided EPS \u00a5115.57; May 2026 B300 order and financing bridge; contract backfill 2026-07-21.",
+          "method": "owner_cash_or_dividend_discount",
+          "valuation_status": "bounded_estimate"
+        },
+        {
+          "component_id": "inzai_gpu_platform_option",
+          "label": "Inzai B300 platform and utilization option",
+          "kind": "judgment",
+          "evidence_tier": "primary_derived",
+          "evidence": "English IR bridge: FY2026 revenue \u00a533601.0M, OP \u00a53635.0M, guided EPS \u00a5115.57; May 2026 B300 order and financing bridge; contract backfill 2026-07-21.",
+          "method": "risk_adjusted_milestone_value",
+          "valuation_status": "bounded_estimate"
+        },
+        {
+          "component_id": "net_financial_claims",
+          "label": "Net financial claims (advances, debt, rights)",
+          "kind": "judgment",
+          "evidence_tier": "primary_derived",
+          "evidence": "English IR bridge: FY2026 revenue \u00a533601.0M, OP \u00a53635.0M, guided EPS \u00a5115.57; May 2026 B300 order and financing bridge; contract backfill 2026-07-21.",
+          "method": "net_asset_value",
+          "valuation_status": "bounded_estimate"
+        },
+        {
+          "component_id": "execution_and_financing_reserve",
+          "label": "Execution, Giga, and financing-timing reserve",
+          "kind": "judgment",
+          "evidence_tier": "primary_derived",
+          "evidence": "English IR bridge: FY2026 revenue \u00a533601.0M, OP \u00a53635.0M, guided EPS \u00a5115.57; May 2026 B300 order and financing bridge; contract backfill 2026-07-21.",
+          "method": "net_asset_value",
+          "valuation_status": "bounded_estimate"
+        }
+      ]
+    },
+    "method_route": {
+      "schema_version": "1.0",
+      "status": "routed",
+      "profile_id": "quality_reinvestment",
+      "label": "High-return compounder",
+      "score": 8.0,
+      "reasons": [
+        "archetype=compounder",
+        "component categories=operating_business",
+        "existing methods=owner_cash"
+      ],
+      "primary_methods": [
+        "owner_earnings_reinvestment_dcf"
+      ],
+      "corroborating_methods": [
+        "reverse_dcf",
+        "incremental_roic_runway"
+      ],
+      "primary_personas": [
+        "buffett_weschler",
+        "hohn"
+      ],
+      "cross_check_personas": [
+        "munger",
+        "marathon_capital_cycle"
+      ],
+      "silent_personas": [
+        "greenblatt",
+        "hk",
+        "klarman_asset_value",
+        "marks_credit_cycle",
+        "pabrai",
+        "stahl"
+      ],
+      "required_evidence": [
+        "normalized owner earnings",
+        "incremental return on capital",
+        "reinvestment runway",
+        "diluted share count",
+        "competitive-advantage mechanism"
+      ],
+      "failure_modes": [
+        "growth projected without its capital cost",
+        "stock compensation or acquisitions omitted",
+        "terminal value unsupported by a durable mechanism"
+      ],
+      "secondary_profiles": [
+        {
+          "profile_id": "predictable_cash_flow",
+          "score": 3.0,
+          "reasons": [
+            "component categories=operating_business",
+            "existing methods=dividend, owner_cash"
+          ]
+        },
+        {
+          "profile_id": "binary_milestone",
+          "score": 3.0,
+          "reasons": [
+            "component categories=real_option",
+            "existing methods=milestone, risk_adjusted"
+          ]
+        }
+      ],
+      "scorecard": {
+        "scarce_asset_optionality": {
+          "score": 1.0,
+          "reasons": [
+            "component categories=real_option"
+          ]
+        },
+        "quality_reinvestment": {
+          "score": 8.0,
+          "reasons": [
+            "archetype=compounder",
+            "component categories=operating_business",
+            "existing methods=owner_cash"
+          ]
+        },
+        "capital_cycle": {
+          "score": 1.0,
+          "reasons": [
+            "component categories=operating_business"
+          ]
+        },
+        "credit_and_normalized_returns": {
+          "score": 2.0,
+          "reasons": [
+            "component categories=financial_asset, liability_or_reserve"
+          ]
+        },
+        "catalyst_asset_value": {
+          "score": 1.0,
+          "reasons": [
+            "component categories=financial_asset"
+          ]
+        },
+        "predictable_cash_flow": {
+          "score": 3.0,
+          "reasons": [
+            "component categories=operating_business",
+            "existing methods=dividend, owner_cash"
+          ]
+        },
+        "binary_milestone": {
+          "score": 3.0,
+          "reasons": [
+            "component categories=real_option",
+            "existing methods=milestone, risk_adjusted"
+          ]
+        }
+      },
+      "decision_rule": "Use one primary method and no more than two corroborating methods; irrelevant methods and personas remain silent."
+    },
+    "market": {
+      "price_per_share": 2591.0,
+      "fully_diluted_shares": 24262000,
+      "market_cap_m": 62862.84,
+      "enterprise_value_m": null
+    },
+    "valuation": {
+      "value_per_share": {
+        "low": -456.0,
+        "base": 2953.0,
+        "high": 5766.0
+      },
+      "priced_components_per_share": {
+        "low": -456.0,
+        "base": 2953.0,
+        "high": 5766.0
+      },
+      "legacy_value_per_share": {
+        "low": -456.0,
+        "base": 2953.0,
+        "high": 5766.0
+      },
+      "probability_weighted_value_per_share": 2953.0,
+      "expected_distributions_per_share": 0.0,
+      "annualized_return_at_price_pct": {
+        "low": null,
+        "base": 1.89,
+        "high": 12.11
+      },
+      "downside_to_low_pct": -117.6,
+      "horizon_years": 7,
+      "interpretation": "value_per_share is withheld while any material additive component is unpriced; priced_components_per_share is not a complete security value."
+    },
+    "scenario_contract": {
+      "rule": "Cases must change cited causal operating, capital, probability, timing, or financing drivers\u2014not only a terminal multiple.",
+      "top_value_drivers": [
+        {
+          "component_id": "core_ai_datacenter_engine",
+          "label": "Neo Cloud / TAIZA AI data-center owner-cash engine",
+          "valuation_status": "bounded_estimate",
+          "base_per_share": 3282.0,
+          "legacy_base_per_share": 3282.0,
+          "range_width_per_share": 3522.0,
+          "scenario_assumptions": "Proof outputs {'low': 1144.0, 'base': 3282.0, 'high': 4666.0}; see calculation_proof graph."
+        },
+        {
+          "component_id": "net_financial_claims",
+          "label": "Net financial claims (advances, debt, rights)",
+          "valuation_status": "bounded_estimate",
+          "base_per_share": -600.0,
+          "legacy_base_per_share": -600.0,
+          "range_width_per_share": 1400.0,
+          "scenario_assumptions": "Proof outputs {'low': -1200.0, 'base': -600.0, 'high': 200.0}; see calculation_proof graph."
+        },
+        {
+          "component_id": "inzai_gpu_platform_option",
+          "label": "Inzai B300 platform and utilization option",
+          "valuation_status": "bounded_estimate",
+          "base_per_share": 400.0,
+          "legacy_base_per_share": 400.0,
+          "range_width_per_share": 900.0,
+          "scenario_assumptions": "Proof outputs {'low': 0.0, 'base': 400.0, 'high': 900.0}; see calculation_proof graph."
+        },
+        {
+          "component_id": "execution_and_financing_reserve",
+          "label": "Execution, Giga, and financing-timing reserve",
+          "valuation_status": "bounded_estimate",
+          "base_per_share": -129.0,
+          "legacy_base_per_share": -129.0,
+          "range_width_per_share": 400.0,
+          "scenario_assumptions": "Proof outputs {'low': -400.0, 'base': -129.0, 'high': 0.0}; see calculation_proof graph."
+        }
+      ],
+      "reverse_expectations": null
+    },
+    "calculation_proof_summary": {
+      "component_count": 4,
+      "priced_component_count": 4,
+      "proof_complete_pct": 100.0,
+      "status_counts": {
+        "bounded_estimate": 4,
+        "calculated": 0,
+        "legacy_sensitivity": 0,
+        "unpriced": 0
+      },
+      "all_material_components_priced": true,
+      "calculation_errors": [],
+      "aggregate_proof_hash": "1af786902a6d9900897633e334d562ed80553735de5e33287e0d68b5d433ad90"
+    },
+    "source_lineage": [
+      {
+        "component_id": "core_ai_datacenter_engine",
+        "node_id": "normalized_owner_cash",
+        "ref": "3905.T/IR/en_financial_report/en-ir-20260421001.pdf",
+        "locator": "FY2026 guided EPS \u00a5115.57 discounted to \u00a590.0/sh for ramp and execution risk",
+        "as_of": "2026-04-21",
+        "content_sha256": "fc037a172595242807603ee6b5e28fc0cc54505eae016a92f5943f308afde737",
+        "source_id": "c506a4c994866e3df60f586b96f633faaecc437abc45b955f855bc7dbe568ce9"
+      },
+      {
+        "component_id": "core_ai_datacenter_engine",
+        "node_id": "guided_eps",
+        "ref": "3905.T/IR/en_financial_report/en-ir-20260421001.pdf",
+        "locator": "Parent net profit \u00a52804.0M; guided EPS \u00a5115.57",
+        "as_of": "2026-04-21",
+        "content_sha256": "fc037a172595242807603ee6b5e28fc0cc54505eae016a92f5943f308afde737",
+        "source_id": "1a0b95691671fbedc621f740515e87d70e99ba37899f4300d12832b41f49a9f6"
+      },
+      {
+        "component_id": "core_ai_datacenter_engine",
+        "node_id": "shares_m",
+        "ref": "3905.T/IR/en_financial_report/en-ir-20260421001.pdf",
+        "locator": "Parent net profit \u00a52804.0M \u00f7 guided EPS \u00a5115.57",
+        "as_of": "2026-04-21",
+        "content_sha256": "fc037a172595242807603ee6b5e28fc0cc54505eae016a92f5943f308afde737",
+        "source_id": "c9d6621f8e098aea64a639cb3b405c29109ee40c59c6831865b26ba4ff153ec1"
+      },
+      {
+        "component_id": "inzai_gpu_platform_option",
+        "node_id": "gpu_order_usd_m",
+        "ref": "3905.T/IR/en_financial_report/en-ir-20260507001.pdf",
+        "locator": "5,080 B300 GPUs secured via Compal (~USD 325M); Inzai phased ops May\u2013Jul 2026",
+        "as_of": "2026-05-07",
+        "content_sha256": "3d70dd403fe0e03f3f93c1d21cb5e9d2713b3be65739aa8a760a6e1144ce3af1",
+        "source_id": "532bec640f48d648d10694a4d4103edfd06b773b247931031246e26bfcb54280"
+      },
+      {
+        "component_id": "inzai_gpu_platform_option",
+        "node_id": "shares_m",
+        "ref": "3905.T/IR/en_financial_report/en-ir-20260421001.pdf",
+        "locator": "Parent net profit \u00a52804.0M \u00f7 guided EPS \u00a5115.57",
+        "as_of": "2026-04-21",
+        "content_sha256": "fc037a172595242807603ee6b5e28fc0cc54505eae016a92f5943f308afde737",
+        "source_id": "c9d6621f8e098aea64a639cb3b405c29109ee40c59c6831865b26ba4ff153ec1"
+      },
+      {
+        "component_id": "net_financial_claims",
+        "node_id": "customer_advance_b",
+        "ref": "3905.T/IR/en_financial_report/en-ir-20260507001.pdf",
+        "locator": "Customer advance \u00a513.6B in disclosed financing bridge",
+        "as_of": "2026-05-07",
+        "content_sha256": "3d70dd403fe0e03f3f93c1d21cb5e9d2713b3be65739aa8a760a6e1144ce3af1",
+        "source_id": "6dc8142bfaffeed75cfe8c4654888f3839b22ec3c2469a1b1503411845621bec"
+      },
+      {
+        "component_id": "net_financial_claims",
+        "node_id": "planned_borrowings_b",
+        "ref": "3905.T/IR/en_financial_report/en-ir-20260507001.pdf",
+        "locator": "Planned borrowings \u00a530.6B alongside 23rd stock-acquisition rights \u00a56.7B",
+        "as_of": "2026-05-07",
+        "content_sha256": "3d70dd403fe0e03f3f93c1d21cb5e9d2713b3be65739aa8a760a6e1144ce3af1",
+        "source_id": "d7bc3567b29aa25cd38362cff502a839a650ca5daeb65a02f9683be2a32cb150"
+      },
+      {
+        "component_id": "net_financial_claims",
+        "node_id": "shares_m",
+        "ref": "3905.T/IR/en_financial_report/en-ir-20260421001.pdf",
+        "locator": "Parent net profit \u00a52804.0M \u00f7 guided EPS \u00a5115.57",
+        "as_of": "2026-04-21",
+        "content_sha256": "fc037a172595242807603ee6b5e28fc0cc54505eae016a92f5943f308afde737",
+        "source_id": "c9d6621f8e098aea64a639cb3b405c29109ee40c59c6831865b26ba4ff153ec1"
+      },
+      {
+        "component_id": "execution_and_financing_reserve",
+        "node_id": "owner_cash_per_share",
+        "ref": "3905.T/IR/en_financial_report/en-ir-20260421001.pdf",
+        "locator": "Guided EPS \u00a5115.57 discounted to \u00a590.0/sh for ramp risk",
+        "as_of": "2026-04-21",
+        "content_sha256": "fc037a172595242807603ee6b5e28fc0cc54505eae016a92f5943f308afde737",
+        "source_id": "55d4f124adc8c429a98ada1f2ebc76d4dccd0579ef09efc9a73d36f910e0c4cf"
+      },
+      {
+        "component_id": "execution_and_financing_reserve",
+        "node_id": "giga_commitment_usd_m",
+        "ref": "3905.T/IR/en_financial_report/en-ir-20260507001.pdf",
+        "locator": "577 B200 units; USD 252M unpaid commitment overhang referenced in May 2026 IR",
+        "as_of": "2026-05-07",
+        "content_sha256": "3d70dd403fe0e03f3f93c1d21cb5e9d2713b3be65739aa8a760a6e1144ce3af1",
+        "source_id": "aa6180f542dbacc004e271fb3418632b01225bc8bb18bdc3750c1307221e1bc4"
+      },
+      {
+        "component_id": "execution_and_financing_reserve",
+        "node_id": "shares_m",
+        "ref": "3905.T/IR/en_financial_report/en-ir-20260421001.pdf",
+        "locator": "Parent net profit \u00a52804.0M \u00f7 guided EPS \u00a5115.57",
+        "as_of": "2026-04-21",
+        "content_sha256": "fc037a172595242807603ee6b5e28fc0cc54505eae016a92f5943f308afde737",
+        "source_id": "c9d6621f8e098aea64a639cb3b405c29109ee40c59c6831865b26ba4ff153ec1"
+      }
+    ],
+    "model_checks": {
+      "calculation_graphs_valid": true,
+      "component_sum_reconciles": true,
+      "no_double_counting": true,
+      "all_material_components_priced": true,
+      "low_base_high_ordered": true
+    },
+    "evidence": {
+      "unresolved_count": 0,
+      "blockers": [],
+      "validation_errors": []
+    },
+    "monitoring": {
+      "falsifiers": [
+        "Primary evidence shows the claim is materially worse than the low case.",
+        "Primary evidence shows the claim is materially worse than the low case.",
+        "Primary evidence shows the claim is materially worse than the low case.",
+        "Primary evidence shows the claim is materially worse than the low case."
+      ],
+      "required_refresh_triggers": [
+        "new filing or material operating update",
+        "capital-structure change",
+        "material price move",
+        "component milestone or falsifier"
+      ]
+    },
+    "change_control": {
+      "model_hash": "d8d81b0da8071e82dfebfc52228a7b4291c9dd567dc42efbeccae24a834a8974",
+      "method_versions": [
+        "net_asset_value@1.0",
+        "owner_cash_or_dividend_discount@1.0",
+        "risk_adjusted_milestone_value@1.0"
+      ],
+      "change_log": [],
+      "rule": "A source fact is locked. Every assumption change requires a reason, author, timestamp, and before/after value."
+    },
+    "decision_rule": "No security is decision-grade until every material claim is valued exactly once by a valid calculation proof and every material evidence blocker is resolved."
   }
 }
