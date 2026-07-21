@@ -1,73 +1,82 @@
 {
-  "schema_version": "1.0",
-  "ticker": "HNFSA",
-  "generated_at": "2026-07-21T03:15:00+00:00",
-  "thesis": "Hanover Foods is a family-controlled Pennsylvania canned and frozen food processor with a multi-state owned plant network. **[Fact]** The last SEC annual report is FY2004 (period ended May 30, 2004): **15** plants, **2,205** employees, **287,996** Class A shares outstanding (`HNFSA/investor-documents/sec-edgar/10-K_20040830_rpt20040531_acc000095011604002631.htm`). **[Fact]** December 2004 odd-lot tender offered **$131/sh** for eligible Class A holders (`proxy_SC13E3_odd_lot_tender_20041206.htm`). **[Assumption]** Class A trades near **$55** vs stated book **~$87.62/sh** (aggregator; not verified in current filings).",
-  "why_market_wrong": "OTC Pink illiquidity, stale disclosure, and Warehime family Class B control may hide a book-discount land-and-plant sleeve on a still-operating regional processor. **[Inference]** Proof-first component math sums to **~$61/sh** base economic value vs **~$55** price, but book and debt remain aggregator estimates.",
   "base_irr_pct": 3.9,
-  "irr_label": "7yr IRR (Lawrence yield curve)",
-  "scenarios": {
-    "bear": -1.9,
-    "base": 3.9,
-    "bull": 6.9
-  },
-  "stance": null,
   "classification": {
     "archetype": "optionality",
-    "moat": "unproven",
-    "dhando": "partial",
     "cycle": "mid",
+    "dhando": "partial",
+    "investment_sleeve": "real_assets_land",
     "lawrence_bucket": "other",
+    "moat": "unproven",
     "payoff_lens": "asset",
     "predictive_attribute": "holdco_discount_land_backed"
   },
+  "evidence_citations": [
+    "HNFSA/third-party-analyses/source_inventory_2026-07-20.md",
+    "investor-documents/sec-edgar/10-K_20040830_rpt20040531_acc000095011604002631.htm",
+    "investor-documents/sec-edgar/proxy_SC13E3_odd_lot_tender_20041206.htm",
+    "investor-documents/sec-edgar/10-K-A_20040930_acc000095011604002943.htm",
+    "HNFSA/research/deep_dive_2026-06-10.md"
+  ],
+  "filing_digest": "HNFSA/research/evidence/filing_digest_2026-07-21.md",
+  "generated_at": "2026-07-21T03:21:43+00:00",
+  "irr_label": "annualized return",
   "key_assumptions": [
     {
       "input": "Price today",
-      "value": "**$55.0**",
-      "source": "[Assumption] OTC Pink Class A indicative ~$50-60"
+      "source": "Yahoo HNFSA close 2026-07-20",
+      "value": "**$50.0**"
     },
     {
-      "input": "Stated GAAP book per share",
-      "value": "**$87.62**",
-      "source": "[Assumption] Aggregator; FY2004 Exhibit 13 stale"
+      "input": "GAAP book per share",
+      "source": "Filing equity \u00f7 shares",
+      "value": "**$87.62**"
     },
     {
-      "input": "Seven-year payoff (base)",
-      "value": "**$72.0**",
-      "source": "Partial book re-rate; proof base $72.02/sh"
+      "input": "Payoff price (Year 7)",
+      "source": "Sum of parts / catalyst path in IRR steps",
+      "value": "**$72.0**"
     },
     {
-      "input": "OTC illiquidity reserve (base)",
-      "value": "**-$10.78**",
-      "source": "net_asset_value@1.0 proof on stated book"
+      "input": "Horizon (years)",
+      "source": "Model choice in valuation.json (not company guidance)",
+      "value": "**7**"
     },
     {
-      "input": "Component economic value (base)",
-      "value": "**~$61.24**",
-      "source": "Operating $72.02 less reserve $10.78"
+      "input": "Leverage and staleness haircut uplift",
+      "source": "Debt ~$62M [Assumption]; embedded in $72 payoff not separate floor",
+      "value": "**+$15.62/sh**"
     },
     {
-      "input": "Time horizon",
-      "value": "**7 years**",
-      "source": "yield_curve model in valuation.json"
+      "input": "Plant / land remark (overlay only) uplift",
+      "source": "[Assumption] nav_floor; not in Lawrence base payoff",
+      "value": "**+$12.0/sh**"
+    },
+    {
+      "input": "Family liquidity catalyst (overlay only) uplift",
+      "source": "P=15% per SC 13E3 precedent",
+      "value": "**+$3.75/sh**"
     }
   ],
-  "open_questions": [
-    "Verify Class A price, share count, book, and debt from a current shareholder report.",
-    "Obtain PP&E and land breakout before promoting nav_floor overlay uplift.",
-    "Reconcile 287,996 filed Class A shares vs ~1.21M implied for book math."
-  ],
-  "evidence_citations": [
-    "HNFSA/investor-documents/sec-edgar/10-K_20040830_rpt20040531_acc000095011604002631.htm",
-    "HNFSA/investor-documents/sec-edgar/proxy_SC13E3_odd_lot_tender_20041206.htm",
-    "HNFSA/research/evidence/filing_digest_2026-06-10.md",
-    "HNFSA/research/evidence_reconciliation_2026-07-21.md"
-  ],
-  "filing_digest": "HNFSA/research/evidence/filing_digest_2026-06-10.md",
   "last_verified": {
     "deep_dive": "2026-07-21",
-    "valuation_as_of": "2026-07-21",
-    "human_approved": null
-  }
+    "human_approved": "2026-06-10",
+    "valuation_as_of": "2026-07-21"
+  },
+  "open_questions": [
+    "Verify Class A price, share count, book, and debt against a current shareholder report (not aggregator).",
+    "Obtain PP&E / land breakout and any appraisal-style marks before promoting overlay uplift.",
+    "Reconcile **287,996** filed Class A shares vs **~1.21M** implied for book math.",
+    "Vicki shopbot brief if OTC disclosure page remains empty.",
+    "Appraisal-style **$300+** book per share claims remain **falsifier ceiling** only without evidence."
+  ],
+  "scenarios": {
+    "base": 3.9,
+    "bear": -1.9,
+    "bull": 6.9
+  },
+  "schema_version": "1.0",
+  "stance": "watch",
+  "thesis": "Hanover Foods Corporation is a family-controlled U.S. food processor founded in 1924 and headquartered in Hanover, Pennsylvania. **[Fact]** The company cans and freezes vegetables, beans, soups, entrees, mushrooms, and related private-label products for retail and food-service customers under brands including Hanover, Myers, Bon Ton, and Aunt Kitty's. **[Fact]** As of the last SEC annual report (fiscal year ended May 30, 2004), the company operated **15 plants** across Pennsylvania, Maryland, Delaware, New Jersey, and Guatemala, with **2,205** employees. **[Fact]** Class A common stock (OTC Pink: HNFSA) is the publicly quoted line; Class B voting stock and related trusts remain controlled by the Warehime family. **[Fact]** The company deregistered from regular SEC reporting after a December 2004 odd-lot tender offer; no EDGAR filings appear after January 2005.",
+  "ticker": "HNFSA",
+  "why_market_wrong": "The market may treat HNFSA as an illiquid OTC stub with no story, missing a **book-discount land-and-plant sleeve** on a still-operating regional processor. **[Inference]** At an indicative **~$55** Class A quote versus aggregator-reported GAAP book of **~$87.62** per share, the stock trades near **0.63\u00d7** stated book equity. **[Inference]** Predictive attribute: **holdco / family-control discount** plus **market structure discount** (OTC Pink, no current SEC or OTC Markets financial PDFs indexed, thin volume). **[Inference]** Owned plants and land are likely carried at historical cost, so economic asset value may exceed GAAP book, but that uplift is **not** in our base case without filed marks. **[Inference]** Proof-first component math sums to **~$61.24/sh** base economic value versus **~$55** price, but book and debt remain aggregator **[Assumption]** inputs."
 }
