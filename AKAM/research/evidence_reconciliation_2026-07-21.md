@@ -12,7 +12,7 @@
 | Downside capital claims | **met** — cloud competition reserve; $4.14B convertible notes in net claims inputs |
 | Double-counting | **met** — non-overlapping overlap keys; RPO not double-counted in core engine |
 
-**Contract status after agent pass:** pending mechanical close (`marvin_cloud_refresh.py` 2026-07-21).
+**Contract status after agent pass:** decision_grade (`marvin_cloud_refresh.py` 2026-07-21).
 
 ---
 

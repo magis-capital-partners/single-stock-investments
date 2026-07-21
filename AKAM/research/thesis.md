@@ -1,6 +1,6 @@
 # AKAM — Investment Thesis
 
-**Last updated:** 2026-07-10
+**Last updated:** auto-sync
 
 ## Classification
 
@@ -9,15 +9,15 @@
 | **Archetype** (Stahl) | platform |
 | **Moat** (Munger) | stable |
 | **Dhando** (Pabrai) | partial |
-| **Stance** | hold |
+| **Stance** | watch |
 | **Cycle** | mid |
-| **Implied 7yr IRR** (Lawrence) | 15.83% (total synthesis) |
-| **IRR method** | full |
+| **Implied 7yr IRR** (base) | — |
+| **IRR method** | quality_reinvestment |
 | **Lawrence bucket** | multi_sided |
 | **Payoff lens** | operating |
-| **MOI bucket** | — |
+| **MOI bucket** | pending |
 
-**Deep dive:** `AKAM/research/deep_dive_2026-07-10.md`
+**Deep dive:** `AKAM/research/deep_dive_2026-07-21.md` (auto-sync)
 
 ## One-line thesis
 
