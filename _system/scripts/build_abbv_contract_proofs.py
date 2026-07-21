@@ -309,7 +309,7 @@ def downside_reserve_proof() -> dict:
 
 
 def _component(cid: str, label: str, category: str) -> dict:
-    return {
+    comp = {
         "id": cid,
         "label": label,
         "category": category,
@@ -328,6 +328,103 @@ def _component(cid: str, label: str, category: str) -> dict:
             "falsifier": "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
             "valuation_status": "legacy_sensitivity",
         },
+    }
+    if cid == "pipeline_options":
+        comp["valuation"]["driver_model"] = {
+            "type": "milestone_option",
+            "scenarios": {
+                "base": {
+                    "success_probability": 0.35,
+                    "remaining_cost_m": 4200.0,
+                }
+            },
+            "timing_basis": "Late-stage immunology and oncology readouts over 3–7 years; Skyrizi CD induction and Rinvoq label expansions.",
+        }
+    return comp
+
+
+def economic_value_block() -> dict:
+    return {
+        "schema_version": "1.0",
+        "method": "component_economic_value",
+        "economic_claim": {
+            "description": (
+                "One diluted share of ABBV, including immunology owner-cash engine, other therapeutic "
+                "franchises, pipeline options, near-term liquidity, and downside reserve."
+            ),
+            "unit_label": "diluted share",
+            "unit_count": int(round(SHARES_M * 1_000_000)),
+            "unit_source": (
+                f"FY2025 weighted average diluted shares {SHARES_M}M per {K10}; "
+                "inputs.shares_outstanding in valuation.json."
+            ),
+            "enterprise_to_equity_reconciliation": (
+                "Operating franchises are valued through owner-cash discount paths; pipeline options use "
+                "risk-adjusted milestones; liquidity and stress reserves are separate overlap keys. "
+                "Full net debt is not subtracted twice."
+            ),
+        },
+        "gaap_role": "cross_check",
+        "accounting_reference": (
+            "FY2025 10-K: GAAP stockholders equity $3.27B vs $134B assets; economic value in product "
+            "cash flows, not book floor."
+        ),
+        "component_groups": [
+            {
+                "id": "immunology_owner_cash_engine",
+                "label": "Immunology owner-cash engine (Skyrizi, Rinvoq, Humira)",
+                "component_ids": ["immunology_owner_cash_engine"],
+                "economic_claim": "Immunology owner-cash engine (Skyrizi, Rinvoq, Humira)",
+                "valuation_basis": "Owner-cash discount on revenue-proportional immunology share of consolidated owner cash.",
+                "adjustments": "Humira biosimilar erosion and Skyrizi/Rinvoq growth embedded in filing revenue mix.",
+                "overlap_control": "Unique overlap key immunology_owner_cash_engine.",
+            },
+            {
+                "id": "other_franchises",
+                "label": "Other therapeutic franchises",
+                "component_ids": ["other_franchises"],
+                "economic_claim": "Neuroscience, oncology, aesthetics, and eye care franchises",
+                "valuation_basis": "Owner-cash discount on non-immunology revenue share.",
+                "adjustments": "Segment-level margins are proportional judgments pending indication-level DCF.",
+                "overlap_control": "Unique overlap key other_franchises.",
+            },
+            {
+                "id": "pipeline_options",
+                "label": "Late-stage pipeline and collaboration options",
+                "component_ids": ["pipeline_options"],
+                "economic_claim": "Late-stage pipeline and collaboration options",
+                "valuation_basis": "Aggregate risk-adjusted milestone value less remaining R&D burden.",
+                "adjustments": "Not in Lawrence base free cash flow path; bull sensitivity only.",
+                "overlap_control": "Unique overlap key pipeline_options.",
+                "risk_and_timing": {
+                    "probability_basis": "Base 35% aggregate success on late-stage readouts; low case zero.",
+                    "timing_basis": "Readouts and label expansions over 3–7 years per 10-K pipeline disclosure.",
+                    "remaining_capital_basis": "FY2025 R&D ~$8.3B run rate; remaining capital reserved in aggregate proof.",
+                },
+            },
+            {
+                "id": "net_financial_claims",
+                "label": "Near-term surplus liquidity claim",
+                "component_ids": ["net_financial_claims"],
+                "economic_claim": "Near-term surplus liquidity claim",
+                "valuation_basis": "Cash $5.23B at FY2025; separate from capitalized owner-cash engines.",
+                "adjustments": "Dividend and deleveraging funded from operating cash flow.",
+                "overlap_control": "Unique overlap key net_financial_claims.",
+            },
+            {
+                "id": "downside_reserve",
+                "label": "Litigation, biosimilar, and leverage stress reserve",
+                "component_ids": ["downside_reserve"],
+                "economic_claim": "Litigation, biosimilar, and leverage stress reserve",
+                "valuation_basis": "Bounded negative reserve; not full net debt NAV subtraction.",
+                "adjustments": "Humira antitrust, IRA pricing, and refinancing stress.",
+                "overlap_control": "Unique overlap key downside_reserve.",
+            },
+        ],
+        "limitations": [
+            "Franchise splits use revenue-proportional owner-cash allocation pending indication-level builds.",
+            "Pipeline aggregate remains judgment until indication-level event trees are filed.",
+        ],
     }
 
 
@@ -428,6 +525,9 @@ def main() -> int:
         "evidence_ref": f"{TICKER}/research/evidence_reconciliation_{AS_OF}.md",
     }
     eva["validation_errors"] = []
+
+    data["economic_value"] = economic_value_block()
+    data["valuation_mode"] = "economic_value"
 
     path.write_text(json.dumps(data, indent=2) + "\n", encoding="utf-8")
     base_sum = sum(outputs[c]["base"] for c in outputs)
