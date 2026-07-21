@@ -3,7 +3,8 @@
 **Date:** 2026-07-21
 **Agent:** Marvin (contract backfill refresh)
 **Marvin dive:** `TEQ.ST/research/deep_dive_2026-07-21.md`
-**Source inventory:** `TEQ.ST/third-party-analyses/source_inventory_2026-06-01.md`
+**Source inventory:** `TEQ.ST/third-party-analyses/source_inventory_2026-07-21.md`  
+**Approved index:** `TEQ.ST/third-party-analyses/references.md`
 **Framework:** `_system/frameworks/third_party_cross_reference.md`, `external_view_blend.md`
 
 ## Executive summary
@@ -70,4 +71,5 @@ Marvin floor **18.14%** per year (total synthesis; Lawrence base **14.4%**) from
 1. `TEQ.ST/research/deep_dive_2026-07-21.md`
 2. `TEQ.ST/research/valuation.json`
 3. `TEQ.ST/research/evidence_reconciliation_2026-07-21.md`
-4. `TEQ.ST/third-party-analyses/source_inventory_2026-06-01.md`
+4. `TEQ.ST/third-party-analyses/references.md` (curated external index: Redeye, Börsdata, DI, Slow Compounding, MicroCap Expert, Value Bridge, Antheia block trade)
+5. `TEQ.ST/third-party-analyses/source_inventory_2026-07-21.md`

@@ -1,0 +1,139 @@
+{
+  "pipeline_version": "3.0-token-efficient",
+  "ticker": "TEQ.ST",
+  "as_of": "2026-07-21",
+  "stage": "round_one_open",
+  "packet_hash": "e9874ed6199d70a3132f0edb6bf8070cb7d2fc8828a1726750227fedc0026bd2",
+  "route_hash": "f4cfe930a829947d561335cd0b8b628128d4aeebb77982e24cb001bddad3a798",
+  "contract_source": "valuation_contract.json",
+  "frozen_at": "2026-07-21T04:38:27.323391+00:00",
+  "evidence": [
+    {
+      "path": "TEQ.ST/research/deep_dive_2026-07-21.md",
+      "sha256": "fcafe9c7dec4605efe366b6d314593623a24d78f17bfb805ee6b92277467bb16",
+      "bytes": 20619,
+      "role": "frozen local evidence",
+      "status": "available"
+    },
+    {
+      "path": "TEQ.ST/research/adversarial_2026-07-21.md",
+      "sha256": "310220ef392c955f459e6b52bad3940b60d6749570c4c887c24ba0bd1ad85119",
+      "bytes": 2184,
+      "role": "frozen local evidence",
+      "status": "available"
+    },
+    {
+      "path": "TEQ.ST/research/valuation_route.json",
+      "sha256": "52d09959bc6571c5f5a07f675e45b98937217ba60ab54148b25d51bcb1090c14",
+      "bytes": 5487,
+      "role": "frozen local evidence",
+      "status": "available"
+    },
+    {
+      "path": "TEQ.ST/research/valuation_contract.json",
+      "sha256": "0efb632f482a7261bca882caf045208d7d33e04748961eec902e38c690ea704b",
+      "bytes": 90064,
+      "role": "frozen local evidence",
+      "status": "available"
+    },
+    {
+      "path": "TEQ.ST/research/valuation.json",
+      "sha256": "b25e57aba21db05716b60733ff2f2ea2efda98cb38bb7dfe4ac1279d177eb816",
+      "bytes": 168692,
+      "role": "frozen local evidence",
+      "status": "available"
+    },
+    {
+      "path": "TEQ.ST/research/thesis.md",
+      "sha256": "0b5e6cd928e9b66111e99d57ddd51df1d2b67e21f43c07f55ee74de47e18f115",
+      "bytes": 1583,
+      "role": "frozen local evidence",
+      "status": "available"
+    },
+    {
+      "path": "TEQ.ST/research/cross_check_third_party_2026-07-21.md",
+      "sha256": "80662d4186d06408b63f20373a9dd6c6eb1fb4520e21301f9cc8b355ce32a06a",
+      "bytes": 5313,
+      "role": "frozen local evidence",
+      "status": "available"
+    },
+    {
+      "path": "TEQ.ST/research/evidence_reconciliation_2026-07-15_phase2_first_pass.json",
+      "sha256": "aaed0ce88cd75e0cd08770822f697a1d6fc8dede49c1e22fa2713dc3cc0547b1",
+      "bytes": 2615,
+      "role": "frozen local evidence",
+      "status": "available"
+    },
+    {
+      "path": "TEQ.ST/research/evidence_reconciliation_2026-07-21.md",
+      "sha256": "0f7543226cf538d761885ae66bb5cdc1d06421ee66b49878cbd92db8c7797306",
+      "bytes": 4827,
+      "role": "frozen local evidence",
+      "status": "available"
+    },
+    {
+      "path": "TEQ.ST/research/evidence/filing_facts_2026-07-21.json",
+      "sha256": "d5f2cc498cbcb30bbe527726341686b8d848e27004f8b324700e7d8423819306",
+      "bytes": 1754,
+      "role": "frozen local evidence",
+      "status": "available"
+    },
+    {
+      "path": "TEQ.ST/research/evidence/management_facts_2026-07-21.json",
+      "sha256": "52712cefd96a0f0b82c4f90e7fc2a267d89b315581464019c636e1087b347a1f",
+      "bytes": 88,
+      "role": "frozen local evidence",
+      "status": "available"
+    }
+  ],
+  "selected_raters": [
+    {
+      "persona": "buffett_weschler",
+      "independence_group": "quality_reinvestment",
+      "selection_reason": "Selected before scoring from the power-zone method route (persona chose or cross-checks the valuation method).",
+      "required_inputs_status": "partial"
+    },
+    {
+      "persona": "hohn",
+      "independence_group": "competitive_advantage",
+      "selection_reason": "Selected before scoring from the power-zone method route (persona chose or cross-checks the valuation method).",
+      "required_inputs_status": "partial"
+    },
+    {
+      "persona": "munger",
+      "independence_group": "munger",
+      "selection_reason": "Selected before scoring from the power-zone method route (persona chose or cross-checks the valuation method).",
+      "required_inputs_status": "partial"
+    }
+  ],
+  "llm_policy": {
+    "baseline_calls": 5,
+    "maximum_calls": 9,
+    "baseline_tasks": [
+      "pre_mortem",
+      "round1:<three-independent-raters>",
+      "chair_synthesis"
+    ],
+    "conditional_tasks": [
+      "targeted_research",
+      "round2:<three-independent-raters>"
+    ],
+    "deterministic_tasks": [
+      "proposer",
+      "evidence_tribunal",
+      "valuation_reconciliation",
+      "adversarial_review",
+      "assembly"
+    ]
+  },
+  "required_files": {
+    "proposer": "proposer.json",
+    "pre_mortem": "pre_mortem.json",
+    "evidence_tribunal": "evidence_tribunal.json",
+    "research_response": "research_response.json",
+    "valuation_reconciliation": "valuation_reconciliation.json",
+    "adversarial_review": "adversarial_review.json",
+    "chair_synthesis": "chair_synthesis.json",
+    "human_decision": "human_decision.json"
+  }
+}
