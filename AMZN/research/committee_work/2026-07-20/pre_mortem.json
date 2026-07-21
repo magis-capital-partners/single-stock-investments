@@ -1,0 +1,41 @@
+{
+  "status": "complete",
+  "failure_story": "We sized Amazon as a quality compounder on normalized owner cash of $5.35 per share, assuming AI capital spending would fall from roughly $147 billion trailing to a sustainable ~$90 billion run rate while AWS, advertising, and custom silicon compounded. Instead, the hyperscaler AI arms race kept productive-asset purchases near 100% of operating cash flow, trailing free cash flow stayed near $1.2 billion (~$0.11 per share in the capex-stress case), and the market re-rated the equity from embedded-AI optionality to a capital sink. AWS growth and margins softened under Microsoft and Google price competition, the ~$90 billion sustainable capex bridge never materialized in filings, and total return over the hold period landed near the bear envelope (-5% per year) rather than the 3.68% synthesis case—severe underperformance versus the ~15% accumulate hurdle on a mega-cap position held for franchise quality.",
+  "earliest_warning_signals": [
+    "Payoff gate 5 failed at entry: total synthesis 3.68% per year at ~$247 versus the ~15% hurdle, with Lawrence consolidated gate even lower at 1.9% per year on the same normalized owner cash.",
+    "Trailing twelve-month free cash flow was only $1.2 billion while the base case used $5.35 per share normalized owner cash—a ~98% gap between spot FCF and the stance-gate assumption.",
+    "Capital purchases (~$147–151 billion TTM) consumed nearly all operating cash flow ($148.5 billion TTM), leaving implied trough FCF of ~$0.11 per share in the capex-stress row.",
+    "No dated predictive mispricing attribute; the market already priced AI optionality, so there was no inefficiency source supporting above-hurdle return at spot.",
+    "valuation_contract.json and deep dive both flagged evidence_blocked / provisional ranges; per-component low/base/high remained judgment-heavy while registry stance stayed hold as a human override.",
+    "Frozen valuation.json owner_earnings input is $7.695 billion from a single SEC tag, inconsistent with $148.5 billion TTM operating cash flow cited in the owner-cash bridge—period or tag mismatch risk before any sizing.",
+    "Advertising (> $70 billion TTM) and AI backlog/RPO were embedded in segment growth with zero separate owner-cash rows, leaving high-margin engines un-audited in the additive build.",
+    "Q1 2026 net income included roughly $15.6 billion of Anthropic-related non-operating income, distorting quarterly earnings-power signals we did not fully strip in monitoring.",
+    "management_facts_2026-07-19.json has document_count zero; no primary management session on capex ROI was on record.",
+    "filing_facts_2026-07-20.json parsed a 2003 annual report (net income $2,003), not current SEC extracts—freshness QA failure in the frozen packet."
+  ],
+  "forensic_checks": [
+    "Reconcile quarterly PaymentsToAcquireProductiveAssets and operating cash flow from 10-Q supplements against the ~$90 billion sustainable capex assumption; flag any four-quarter stretch where capex stays above $130 billion without matching AWS/ads OI uplift.",
+    "Trace valuation.json calculation_proof owner_earnings ($7,695 million) to the exact SEC locator and period; rebuild TTM owner cash from Mar 2026 10-Q extract ($148.5B OCF minus filing capex) and compare to Lawrence $5.35 per share and contract reinvestment DCF outputs.",
+    "Segment tie-out: sum AWS, North America, and International owner-cash present value ($163.4 per share at 10% discount) versus price ~$250 and consolidated synthesis 3.68% per year; test whether advertising embedded growth double-counts NA/Intl/AWS paths.",
+    "AWS operating income margin and revenue growth versus Azure and Google Cloud disclosures each quarter; model margin compression under AI workload price competition.",
+    "Strip Anthropic and other investment marks from net income each quarter using OtherNonoperatingIncomeExpense and equity-method lines before updating normalized owner earnings.",
+    "Build stock-based compensation and share-count bridge: reconcile diluted shares (~10.95B assumed vs 10.757B in contract) and test whether reinvestment runway omits dilution per valuation_route failure_modes.",
+    "Full debt, lease, and commercial-paper maturity schedule from 10-K/10-Q notes versus net cash component; stress liquidity if capex overshoot persists with FCF near zero.",
+    "Other Bets (Kuiper, Zoox, healthcare) loss drag versus consolidated operating income; probability-weight or zero with explicit rationale per option scan.",
+    "Run Tier-1 short activist registry and targeted forensic web scan; adversarial pass cited batch no_hit on short_scan_2026-05-28.md only with no local short_reports/.",
+    "Verify live price and shares at decision time against Yahoo close $249.99 (2026-07-20) cited in frozen valuation.json; human_review.live_price_confirmed was false."
+  ],
+  "short_source_coverage": "partial",
+  "unresolved_items": [
+    "Sustainable capex ~$90 billion and normalized owner cash $5.35 per share remain [Assumption] / [HUMAN REVIEW], not filing-proven at packet freeze.",
+    "Contract status reads decision_grade in valuation_contract.json while deep dive and evidence reconciliation still describe evidence_blocked provisional ranges—committee-grade pricing not reconciled.",
+    "owner_earnings period mismatch between frozen valuation.json ($7.695B tag) and TTM $148.5B operating cash flow bridge undermines reproducibility of the reinvestment DCF.",
+    "Advertising segment economics (> $70B TTM) lack a standalone owner-cash row; embedded_in_segment treatment may overstate NA/Intl/AWS growth.",
+    "AI workload backlog, RPO, and agentic capex ROI are not modeled; ai_overlay bull path ($9/sh, 16.2%) is sensitivity only.",
+    "No management fieldwork or capex-return guidance on record (management_facts empty).",
+    "filing_facts_2026-07-20.json is stale/wrong-source (2003 annual report), so automated filing QA cannot be trusted without re-extract.",
+    "VIC PDF remains [PENDING APPROVAL]; no approved third-party numeric cross-check in base case.",
+    "Insider conviction score 0.0 with negligible ICS; Bezos net sell ~$4.3B is context only and not stress-tested against capital allocation discipline.",
+    "Full debt/lease maturity and Other Bets option probability/timing remain open per evidence reconciliation gap 3."
+  ]
+}
