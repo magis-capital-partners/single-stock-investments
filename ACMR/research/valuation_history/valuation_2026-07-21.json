@@ -577,7 +577,7 @@
   },
   "economic_value_analysis": {
     "schema_version": "1.0",
-    "status": "complete",
+    "status": "evidence_blocked",
     "trigger": {
       "required": true,
       "reasons": [
@@ -585,16 +585,10 @@
       ],
       "policy": "A complete economic-value analysis is required when any trigger fires; otherwise it is recommended."
     },
-    "method": "component_economic_value",
-    "economic_claim": {
-      "description": "One diluted share of ACMR, including wet clean equipment owner cash, backlog option, net financial claims, and cycle reserve.",
-      "unit_label": "diluted share",
-      "unit_count": 67262000,
-      "unit_source": "FY2025 diluted net income $92.149M / diluted EPS $1.37 (ACMR/investor-documents/sec-edgar/10-K_20260302_rpt20251231_acc0001628280_26_013231.htm)",
-      "enterprise_to_equity_reconciliation": "Operating and option claims are valued once; cash, debt, and reserves are separate components with unique overlap keys."
-    },
-    "gaap_role": "cross_check",
-    "accounting_reference": "FY2025 10-K and Q1 2026 10-Q extracts; reconciliation 2026-07-21.",
+    "method": "economic_claim_to_risked_present_value",
+    "economic_claim": {},
+    "gaap_role": null,
+    "accounting_reference": null,
     "comparable_hierarchy": [
       "issuer_arm_length_transaction",
       "same_asset_transaction",
@@ -616,8 +610,8 @@
           "wet_clean_equipment_engine"
         ],
         "economic_claim": "Wet clean and electroplating equipment operations",
-        "valuation_basis": "Mid-cycle operating income capitalization proof.",
-        "adjustments": "Margin and working-capital stress in cycle reserve.",
+        "valuation_basis": "Proof outputs {'low': 9.68, 'base': 15.4901, 'high': 23.2299}; see calculation_proof graph.",
+        "adjustments": "Reconcile to FY2025 10-K and Q1 2026 10-Q before decision use.",
         "overlap_control": "Unique overlap key wet_clean_equipment_engine.",
         "risked_present_value_per_share": {
           "low": 9.68,
@@ -632,17 +626,9 @@
           "advanced_packaging_backlog_option"
         ],
         "economic_claim": "Advanced packaging and deferred-revenue backlog option",
-        "valuation_basis": "Risk-adjusted milestone on $252M deferred revenue.",
-        "adjustments": "Low case zero; base does not assume full backlog NPV.",
+        "valuation_basis": "Proof outputs {'low': 0.0, 'base': 6.0004, 'high': 17.9998}; see calculation_proof graph.",
+        "adjustments": "Reconcile to FY2025 10-K and Q1 2026 10-Q before decision use.",
         "overlap_control": "Unique overlap key advanced_packaging_backlog_option.",
-        "risk_and_timing": {
-          "success_probability": 0.45,
-          "timing_years": 3,
-          "remaining_capital_m": 0.0,
-          "probability_basis": "Deferred revenue $252M at 12/31/2025; base assumes partial conversion over three years without heroics.",
-          "timing_basis": "Backlog ships as advanced packaging tools install; [Assumption] 3-year base.",
-          "remaining_capital_basis": "Incremental capex for backlog fulfillment embedded in normalized owner cash; no separate remaining-capital claim."
-        },
         "risked_present_value_per_share": {
           "low": 0.0,
           "base": 6.0,
@@ -656,8 +642,8 @@
           "net_financial_claims"
         ],
         "economic_claim": "Net cash and debt claims on common equity",
-        "valuation_basis": "Filing-locked cash less total debt.",
-        "adjustments": "Low/high stress cash and debt bands.",
+        "valuation_basis": "Proof outputs {'low': 6.1342, 'base': 8.0789, 'high': 8.8966}; see calculation_proof graph.",
+        "adjustments": "Reconcile to FY2025 10-K and Q1 2026 10-Q before decision use.",
         "overlap_control": "Unique overlap key net_financial_claims.",
         "risked_present_value_per_share": {
           "low": 6.13,
@@ -672,8 +658,8 @@
           "cycle_and_concentration_reserve"
         ],
         "economic_claim": "Semicap cycle, customer concentration, and working-capital reserve",
-        "valuation_basis": "Negative reserve for OCF trough and geo concentration.",
-        "adjustments": "Separate from core capitalization multiple.",
+        "valuation_basis": "Proof outputs {'low': -14.9996, 'base': -6.9995, 'high': -1.9996}; see calculation_proof graph.",
+        "adjustments": "Reconcile to FY2025 10-K and Q1 2026 10-Q before decision use.",
         "overlap_control": "Unique overlap key cycle_and_concentration_reserve.",
         "risked_present_value_per_share": {
           "low": -15.0,
@@ -695,7 +681,7 @@
         "evidence": "Primary bridge from ACMR/investor-documents/sec-edgar/10-K_20260302_rpt20251231_acc0001628280_26_013231.htm: FY2025 revenue $901.309M, operating income $109.429M, cash $757.373M, total debt $214.012M, deferred revenue $252.486M; contract backfill 2026-07-21.",
         "comparable_role": "not_applicable",
         "comparable_ids": [],
-        "adjustment": "Margin and working-capital stress in cycle reserve.",
+        "adjustment": "Reconcile to FY2025 10-K and Q1 2026 10-Q before decision use.",
         "range_per_share": {
           "low": 9.68,
           "base": 15.49,
@@ -719,7 +705,7 @@
         "evidence": "Primary bridge from ACMR/investor-documents/sec-edgar/10-K_20260302_rpt20251231_acc0001628280_26_013231.htm: FY2025 revenue $901.309M, operating income $109.429M, cash $757.373M, total debt $214.012M, deferred revenue $252.486M; contract backfill 2026-07-21.",
         "comparable_role": "not_applicable",
         "comparable_ids": [],
-        "adjustment": "Low case zero; base does not assume full backlog NPV.",
+        "adjustment": "Reconcile to FY2025 10-K and Q1 2026 10-Q before decision use.",
         "range_per_share": {
           "low": 0.0,
           "base": 6.0,
@@ -732,9 +718,9 @@
         "risk_and_timing": {
           "success_probability": null,
           "remaining_capital_m": null,
-          "timing_basis": "Backlog ships as advanced packaging tools install; [Assumption] 3-year base.",
-          "probability_basis": "Deferred revenue $252M at 12/31/2025; base assumes partial conversion over three years without heroics.",
-          "remaining_capital_basis": "Incremental capex for backlog fulfillment embedded in normalized owner cash; no separate remaining-capital claim."
+          "timing_basis": null,
+          "probability_basis": null,
+          "remaining_capital_basis": null
         }
       },
       {
@@ -749,7 +735,7 @@
         "evidence": "Primary bridge from ACMR/investor-documents/sec-edgar/10-K_20260302_rpt20251231_acc0001628280_26_013231.htm: FY2025 revenue $901.309M, operating income $109.429M, cash $757.373M, total debt $214.012M, deferred revenue $252.486M; contract backfill 2026-07-21.",
         "comparable_role": "not_applicable",
         "comparable_ids": [],
-        "adjustment": "Low/high stress cash and debt bands.",
+        "adjustment": "Reconcile to FY2025 10-K and Q1 2026 10-Q before decision use.",
         "range_per_share": {
           "low": 6.13,
           "base": 8.08,
@@ -773,7 +759,7 @@
         "evidence": "Primary bridge from ACMR/investor-documents/sec-edgar/10-K_20260302_rpt20251231_acc0001628280_26_013231.htm: FY2025 revenue $901.309M, operating income $109.429M, cash $757.373M, total debt $214.012M, deferred revenue $252.486M; contract backfill 2026-07-21.",
         "comparable_role": "not_applicable",
         "comparable_ids": [],
-        "adjustment": "Separate from core capitalization multiple.",
+        "adjustment": "Reconcile to FY2025 10-K and Q1 2026 10-Q before decision use.",
         "range_per_share": {
           "low": -15.0,
           "base": -7.0,
@@ -787,84 +773,19 @@
       }
     ],
     "wisdom_applied": [],
-    "limitations": [
-      "Contract backfill scaffold; not a committee-approved valuation.",
-      "Backlog milestone band remains widest judgment range pending segment disclosure."
-    ],
+    "limitations": [],
     "complete_component_coverage": true,
-    "validation_errors": [],
-    "registry_version": "1.0"
-  },
-  "economic_value": {
-    "schema_version": "1.0",
-    "method": "component_economic_value",
-    "economic_claim": {
-      "description": "One diluted share of ACMR, including wet clean equipment owner cash, backlog option, net financial claims, and cycle reserve.",
-      "unit_label": "diluted share",
-      "unit_count": 67262000,
-      "unit_source": "FY2025 diluted net income $92.149M / diluted EPS $1.37 (ACMR/investor-documents/sec-edgar/10-K_20260302_rpt20251231_acc0001628280_26_013231.htm)",
-      "enterprise_to_equity_reconciliation": "Operating and option claims are valued once; cash, debt, and reserves are separate components with unique overlap keys."
-    },
-    "gaap_role": "cross_check",
-    "accounting_reference": "FY2025 10-K and Q1 2026 10-Q extracts; reconciliation 2026-07-21.",
-    "component_groups": [
-      {
-        "id": "wet_clean_equipment_engine",
-        "label": "Wet clean and electroplating equipment operations",
-        "component_ids": [
-          "wet_clean_equipment_engine"
-        ],
-        "economic_claim": "Wet clean and electroplating equipment operations",
-        "valuation_basis": "Mid-cycle operating income capitalization proof.",
-        "adjustments": "Margin and working-capital stress in cycle reserve.",
-        "overlap_control": "Unique overlap key wet_clean_equipment_engine."
-      },
-      {
-        "id": "advanced_packaging_backlog_option",
-        "label": "Advanced packaging and deferred-revenue backlog option",
-        "component_ids": [
-          "advanced_packaging_backlog_option"
-        ],
-        "economic_claim": "Advanced packaging and deferred-revenue backlog option",
-        "valuation_basis": "Risk-adjusted milestone on $252M deferred revenue.",
-        "adjustments": "Low case zero; base does not assume full backlog NPV.",
-        "overlap_control": "Unique overlap key advanced_packaging_backlog_option.",
-        "risk_and_timing": {
-          "success_probability": 0.45,
-          "timing_years": 3,
-          "remaining_capital_m": 0.0,
-          "probability_basis": "Deferred revenue $252M at 12/31/2025; base assumes partial conversion over three years without heroics.",
-          "timing_basis": "Backlog ships as advanced packaging tools install; [Assumption] 3-year base.",
-          "remaining_capital_basis": "Incremental capex for backlog fulfillment embedded in normalized owner cash; no separate remaining-capital claim."
-        }
-      },
-      {
-        "id": "net_financial_claims",
-        "label": "Net cash and debt claims on common equity",
-        "component_ids": [
-          "net_financial_claims"
-        ],
-        "economic_claim": "Net cash and debt claims on common equity",
-        "valuation_basis": "Filing-locked cash less total debt.",
-        "adjustments": "Low/high stress cash and debt bands.",
-        "overlap_control": "Unique overlap key net_financial_claims."
-      },
-      {
-        "id": "cycle_and_concentration_reserve",
-        "label": "Semicap cycle, customer concentration, and working-capital reserve",
-        "component_ids": [
-          "cycle_and_concentration_reserve"
-        ],
-        "economic_claim": "Semicap cycle, customer concentration, and working-capital reserve",
-        "valuation_basis": "Negative reserve for OCF trough and geo concentration.",
-        "adjustments": "Separate from core capitalization multiple.",
-        "overlap_control": "Unique overlap key cycle_and_concentration_reserve."
-      }
+    "validation_errors": [
+      "economic_claim.description required",
+      "economic_claim.enterprise_to_equity_reconciliation required",
+      "economic_claim.unit_count required",
+      "economic_claim.unit_label required",
+      "economic_claim.unit_source required",
+      "economic_value.schema_version 1.0 required",
+      "gaap_role required",
+      "option component advanced_packaging_backlog_option requires probability, timing, and remaining-capital treatment"
     ],
-    "limitations": [
-      "Contract backfill scaffold; not a committee-approved valuation.",
-      "Backlog milestone band remains widest judgment range pending segment disclosure."
-    ]
+    "registry_version": "1.0"
   },
   "total_return_panel": {
     "schema_version": "3.0",
@@ -1640,7 +1561,7 @@
   },
   "universal_valuation_contract": {
     "schema_version": "2.0",
-    "status": "decision_grade",
+    "status": "evidence_blocked",
     "ticker": "ACMR",
     "as_of": "2026-07-21",
     "economic_ownership_map": [
@@ -1971,7 +1892,7 @@
         "evidence": "Primary bridge from ACMR/investor-documents/sec-edgar/10-K_20260302_rpt20251231_acc0001628280_26_013231.htm: FY2025 revenue $901.309M, operating income $109.429M, cash $757.373M, total debt $214.012M, deferred revenue $252.486M; contract backfill 2026-07-21.",
         "scenario_assumptions": "Proof outputs {'low': 9.68, 'base': 15.4901, 'high': 23.2299}; see calculation_proof graph.",
         "probability_and_timing": null,
-        "tax_and_realization_adjustments": "Margin and working-capital stress in cycle reserve.",
+        "tax_and_realization_adjustments": "Reconcile to FY2025 10-K and Q1 2026 10-Q before decision use.",
         "falsifier": "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
         "overlap_key": "wet_clean_equipment_engine",
         "assumption_type": "judgment"
@@ -2278,11 +2199,11 @@
         "probability_and_timing": {
           "success_probability": null,
           "remaining_capital_m": null,
-          "timing_basis": "Backlog ships as advanced packaging tools install; [Assumption] 3-year base.",
-          "probability_basis": "Deferred revenue $252M at 12/31/2025; base assumes partial conversion over three years without heroics.",
-          "remaining_capital_basis": "Incremental capex for backlog fulfillment embedded in normalized owner cash; no separate remaining-capital claim."
+          "timing_basis": null,
+          "probability_basis": null,
+          "remaining_capital_basis": null
         },
-        "tax_and_realization_adjustments": "Low case zero; base does not assume full backlog NPV.",
+        "tax_and_realization_adjustments": "Reconcile to FY2025 10-K and Q1 2026 10-Q before decision use.",
         "falsifier": "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
         "overlap_key": "advanced_packaging_backlog_option",
         "assumption_type": "judgment"
@@ -2642,7 +2563,7 @@
         "evidence": "Primary bridge from ACMR/investor-documents/sec-edgar/10-K_20260302_rpt20251231_acc0001628280_26_013231.htm: FY2025 revenue $901.309M, operating income $109.429M, cash $757.373M, total debt $214.012M, deferred revenue $252.486M; contract backfill 2026-07-21.",
         "scenario_assumptions": "Proof outputs {'low': 6.1342, 'base': 8.0789, 'high': 8.8966}; see calculation_proof graph.",
         "probability_and_timing": null,
-        "tax_and_realization_adjustments": "Low/high stress cash and debt bands.",
+        "tax_and_realization_adjustments": "Reconcile to FY2025 10-K and Q1 2026 10-Q before decision use.",
         "falsifier": "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
         "overlap_key": "net_financial_claims",
         "assumption_type": "judgment"
@@ -2949,7 +2870,7 @@
         "evidence": "Primary bridge from ACMR/investor-documents/sec-edgar/10-K_20260302_rpt20251231_acc0001628280_26_013231.htm: FY2025 revenue $901.309M, operating income $109.429M, cash $757.373M, total debt $214.012M, deferred revenue $252.486M; contract backfill 2026-07-21.",
         "scenario_assumptions": "Proof outputs {'low': -14.9996, 'base': -6.9995, 'high': -1.9996}; see calculation_proof graph.",
         "probability_and_timing": null,
-        "tax_and_realization_adjustments": "Separate from core capitalization multiple.",
+        "tax_and_realization_adjustments": "Reconcile to FY2025 10-K and Q1 2026 10-Q before decision use.",
         "falsifier": "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
         "overlap_key": "cycle_and_concentration_reserve",
         "assumption_type": "judgment"
@@ -3331,9 +3252,27 @@
       "low_base_high_ordered": true
     },
     "evidence": {
-      "unresolved_count": 0,
-      "blockers": [],
-      "validation_errors": []
+      "unresolved_count": 8,
+      "blockers": [
+        "economic_claim.description required",
+        "economic_claim.enterprise_to_equity_reconciliation required",
+        "economic_claim.unit_count required",
+        "economic_claim.unit_label required",
+        "economic_claim.unit_source required",
+        "economic_value.schema_version 1.0 required",
+        "gaap_role required",
+        "option component advanced_packaging_backlog_option requires probability, timing, and remaining-capital treatment"
+      ],
+      "validation_errors": [
+        "economic_claim.description required",
+        "economic_claim.enterprise_to_equity_reconciliation required",
+        "economic_claim.unit_count required",
+        "economic_claim.unit_label required",
+        "economic_claim.unit_source required",
+        "economic_value.schema_version 1.0 required",
+        "gaap_role required",
+        "option component advanced_packaging_backlog_option requires probability, timing, and remaining-capital treatment"
+      ]
     },
     "monitoring": {
       "falsifiers": [
@@ -3350,7 +3289,7 @@
       ]
     },
     "change_control": {
-      "model_hash": "748fc0712a3a2353e8a9c481e5dceea415bcff5b68861592aa76d83db35711db",
+      "model_hash": "7db14a8eb137c6ec5103622bc2a8d9f2204867904c48e7de8e8574ab7b02521f",
       "method_versions": [
         "net_asset_value@1.0",
         "owner_cash_or_dividend_discount@1.0",
@@ -3433,249 +3372,5 @@
       }
     },
     "notes": "Capstone IRR combining filings, segments, overlays, third-party, qualitative"
-  },
-  "context_overlay": {
-    "as_of": "2026-07-21",
-    "disclaimer": "Context only. Tailwinds inform stance and overlay sizing; they do not auto-inflate Lawrence base IRR. Promotion to base case requires [HUMAN REVIEW].",
-    "themes": [
-      {
-        "theme_id": "macro_regime",
-        "label": "Macro risk regime",
-        "indicators": [
-          {
-            "id": "hy_oas",
-            "label": "High-yield OAS credit spread (%)",
-            "latest": 1.43,
-            "as_of": "2026-07-20",
-            "yoy_pct": 248.8,
-            "direction": "up",
-            "good_for": "risk_regime",
-            "source": "spread:HYG-LQD:21d (HYG-LQD 1m spread proxy, not OAS)",
-            "stale": false,
-            "in_base_irr": false
-          },
-          {
-            "id": "ust_10y",
-            "label": "US Treasury 10Y yield (%)",
-            "latest": 4.605999946594238,
-            "as_of": "2026-07-21",
-            "yoy_pct": 5.4,
-            "direction": "up",
-            "good_for": "rates_regime",
-            "source": "yahoo:^TNX",
-            "stale": false,
-            "in_base_irr": false
-          },
-          {
-            "id": "ust_2y",
-            "label": "US Treasury 2Y yield (%)",
-            "latest": 4.331999778747559,
-            "as_of": "2026-07-21",
-            "yoy_pct": 10.8,
-            "direction": "up",
-            "good_for": "rates_regime",
-            "source": "yahoo:^FVX",
-            "stale": false,
-            "in_base_irr": false
-          },
-          {
-            "id": "dxy_broad",
-            "label": "Trade-weighted USD index (broad)",
-            "latest": 101.02400207519531,
-            "as_of": "2026-07-21",
-            "yoy_pct": 3.2,
-            "direction": "up",
-            "good_for": "dollar_regime",
-            "source": "yahoo:DX-Y.NYB",
-            "stale": false,
-            "in_base_irr": false
-          },
-          {
-            "id": "vix_level",
-            "label": "VIX index level",
-            "latest": 17.920000076293945,
-            "as_of": "2026-07-21",
-            "yoy_pct": 7.6,
-            "direction": "up",
-            "good_for": "vol_regime",
-            "source": "yahoo:^VIX",
-            "stale": false,
-            "in_base_irr": false
-          },
-          {
-            "id": "credit_impulse_1m",
-            "label": "HYG vs TLT 1-month return spread (%)",
-            "latest": 2.76,
-            "as_of": "2026-07-20",
-            "yoy_pct": 55.9,
-            "direction": "up",
-            "good_for": "credit_impulse",
-            "source": "spread:HYG-TLT:21d",
-            "stale": false,
-            "in_base_irr": false
-          },
-          {
-            "id": "spy_20d_realized_vol",
-            "label": "SPY 20-day realized vol (annualized %)",
-            "latest": 11.37,
-            "as_of": "2026-07-20",
-            "yoy_pct": 31.3,
-            "direction": "up",
-            "good_for": "equity_vol",
-            "source": "realized_vol:SPY:20d",
-            "stale": false,
-            "in_base_irr": false
-          }
-        ]
-      }
-    ]
-  },
-  "insider_signal": {
-    "as_of": "2026-07-21",
-    "disclaimer": "Context only. Insider activity informs scenario confidence and stance discussion; it does not auto-inflate Lawrence base IRR. Promotion requires [HUMAN REVIEW].",
-    "in_base_irr": false,
-    "window_days": 365,
-    "ics": 10.0,
-    "band": "exceptional",
-    "bull_case_support": "moderate",
-    "scenario_confidence": {
-      "priors": {
-        "bear": 0.2,
-        "base": 0.55,
-        "bull": 0.25
-      },
-      "tilted": {
-        "bear": 0.2,
-        "base": 0.4,
-        "bull": 0.4
-      },
-      "bull_delta": 0.15,
-      "bear_delta": 0.0,
-      "note": "Scenario weights are qualitative confidence only; Lawrence base IRR unchanged."
-    },
-    "factors": {
-      "buy_score": 32.851,
-      "sell_score": -1.0,
-      "cluster_bonus": 0.0,
-      "net_buy_usd": 4795137.27,
-      "net_sell_usd": 43400101.0,
-      "price_today": 82.52
-    },
-    "top_buys": [
-      {
-        "insider": "Cheav Sotheara",
-        "date": "2026-06-04",
-        "shares": 13351,
-        "price": 13.89,
-        "value_usd": 185445.39,
-        "shares_owned_after": 113353,
-        "contrib": 1.585
-      },
-      {
-        "insider": "McKechnie Mark",
-        "date": "2026-03-12",
-        "shares": 60000,
-        "price": 13.89,
-        "value_usd": 833400.0,
-        "shares_owned_after": 60900,
-        "contrib": 1.377
-      },
-      {
-        "insider": "McKechnie Mark",
-        "date": "2026-03-12",
-        "shares": 38551,
-        "price": 19.49,
-        "value_usd": 751358.99,
-        "shares_owned_after": 39451,
-        "contrib": 1.377
-      },
-      {
-        "insider": "McKechnie Mark",
-        "date": "2025-12-08",
-        "shares": 22500,
-        "price": 25.45,
-        "value_usd": 572625.0,
-        "shares_owned_after": 23400,
-        "contrib": 1.377
-      },
-      {
-        "insider": "Cheav Sotheara",
-        "date": "2026-06-05",
-        "shares": 5399,
-        "price": 13.89,
-        "value_usd": 74992.11,
-        "shares_owned_after": 105401,
-        "contrib": 1.268
-      }
-    ],
-    "top_sells": [
-      {
-        "insider": "Cheav Sotheara",
-        "date": "2026-06-05",
-        "shares": 2384,
-        "price": 81.73,
-        "value_usd": 194844.32,
-        "is_10b5_1": false,
-        "contrib": -0.136
-      },
-      {
-        "insider": "Cheav Sotheara",
-        "date": "2026-06-05",
-        "shares": 968,
-        "price": 82.61,
-        "value_usd": 79966.48,
-        "is_10b5_1": false,
-        "contrib": -0.136
-      },
-      {
-        "insider": "Cheav Sotheara",
-        "date": "2026-06-05",
-        "shares": 400,
-        "price": 84.01,
-        "value_usd": 33604.0,
-        "is_10b5_1": false,
-        "contrib": -0.136
-      },
-      {
-        "insider": "Cheav Sotheara",
-        "date": "2026-06-05",
-        "shares": 1647,
-        "price": 85.41,
-        "value_usd": 140670.27,
-        "is_10b5_1": false,
-        "contrib": -0.136
-      },
-      {
-        "insider": "Wang David H",
-        "date": "2026-06-04",
-        "shares": 2060,
-        "price": 83.86,
-        "value_usd": 172751.6,
-        "is_10b5_1": false,
-        "contrib": -0.135
-      }
-    ],
-    "narrative_hooks": [],
-    "transaction_count": 100
-  },
-  "lens_consensus": {
-    "as_of": "2026-07-21",
-    "shared_inputs_ref": "valuation.json@2026-07-21",
-    "valuation_richness": 0.706,
-    "blended_return_pct": -13.59,
-    "band_pct": [
-      -22.2,
-      -10.03
-    ],
-    "weighted_median_pct": -11.8,
-    "median_mean_flag": false,
-    "stance": "pass",
-    "agreement_pct": 100,
-    "dissent_count": 0,
-    "lawrence_divergence": false,
-    "top_dissents": [],
-    "contributor_count": 8,
-    "in_base_irr": false,
-    "disclaimer": "Advisory lens blend only. Does not replace Lawrence total-synthesis stance gate without [HUMAN REVIEW]."
   }
 }
