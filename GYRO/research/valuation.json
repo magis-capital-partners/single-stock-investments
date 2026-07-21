@@ -1,6 +1,6 @@
 {
   "ticker": "GYRO",
-  "as_of": "2026-07-17",
+  "as_of": "2026-07-21",
   "method": "yield_curve",
   "irr_method": "yield_curve",
   "valuation_mode": "economic_value",
@@ -66,7 +66,35 @@
       "price": 5.8,
       "payoff": 11.79,
       "years": 2.46,
-      "notes": "Management's own liquidation-basis estimate as of 2026-03-31 is realized on schedule by the stated 2028-12-31 target: B2K sale closes at the $28.74M gross value already assumed, both properties otherwise sell at or above the mandated 2014 appraised-value floor, and no material re-estimation of costs occurs. [Fact: filing estimate] + [Assumption: timing holds]"
+      "notes": "Management's own liquidation-basis estimate as of 2026-03-31 is realized on schedule by the stated 2028-12-31 target: B2K sale closes at the $28.74M gross value already assumed, both properties otherwise sell at or above the mandated 2014 appraised-value floor, and no material re-estimation of costs occurs. [Fact: filing estimate] + [Assumption: timing holds]",
+      "sotp_build": {
+        "lines": [
+          {
+            "id": "book",
+            "label": "GAAP book / price anchor",
+            "gaap_per_share": 5.8,
+            "uplift_per_share": 0.0,
+            "math": "Anchor $5.8/sh"
+          },
+          {
+            "id": "operating_path",
+            "label": "Operating / distribution path",
+            "gaap_per_share": 0.0,
+            "uplift_per_share": 3.0,
+            "math": "[Assumption] \u2014 see scenario notes in valuation.json"
+          },
+          {
+            "id": "catalyst",
+            "label": "Catalyst or terminal re-rate",
+            "gaap_per_share": 0.0,
+            "uplift_per_share": 2.99,
+            "math": "[Assumption] \u2014 see scenario notes in valuation.json"
+          }
+        ],
+        "year5_economic_nav_per_share": 11.79,
+        "years": 2.46,
+        "notes": "Management's own liquidation-basis estimate as of 2026-03-31 is realized on schedule by the stated 2028-12-31 target: B2K sale closes at the $28.74M gross value already assumed, both properties otherwise sell at or above the mandated 2014 appraised-value floor, and no material re-estimation of costs occurs. [Fact: filing estimate] + [Assumption: timing holds]"
+      }
     },
     "bull": {
       "price": 5.8,
@@ -377,10 +405,10 @@
     "decision_rule": "Use one primary method and no more than two corroborating methods; irrelevant methods and personas remain silent."
   },
   "universal_valuation_contract": {
-    "schema_version": "1.0",
+    "schema_version": "2.0",
     "status": "decision_grade",
     "ticker": "GYRO",
-    "as_of": "2026-07-17",
+    "as_of": "2026-07-21",
     "economic_ownership_map": [
       {
         "component_id": "real_estate_nrv",
@@ -394,32 +422,194 @@
           "value": 1,
           "unit": "per-share economic claim"
         },
-        "current_operating_contribution": {
-          "starting_revenue_m": null,
-          "base_value_per_share": 24.55
-        },
-        "growth_driver": "ASC 205-30 estimated net realizable value, not historical cost.",
-        "required_reinvestment": {
-          "model_type": null,
-          "base_incremental_after_tax_roic": null,
-          "base_remaining_cost_m": null,
-          "treatment": "explicit in driver model or included in the stated owner-cash conversion and component range"
-        },
         "method": "liquidation_nav",
+        "method_version": "1.0",
+        "method_provenance": {
+          "method_id": "net_asset_value",
+          "version": "1.0",
+          "label": "Reconciled net asset value",
+          "power_zones": [
+            "scarce_asset_optionality",
+            "catalyst_asset_value",
+            "credit_and_normalized_returns"
+          ],
+          "equation": "value_per_share = (gross_assets - senior_claims - tax - realization_costs) / diluted_shares",
+          "sources": [
+            {
+              "ref": "_system/frameworks/scarce_strategic_asset_valuation.md",
+              "locator": "Economic ownership and unit NAV"
+            }
+          ]
+        },
         "comparable_ids": [],
         "range_per_share": {
+          "low": 22.0001,
+          "base": 24.5486,
+          "high": 26.9999
+        },
+        "legacy_range_per_share": {
           "low": 22.0,
           "base": 24.55,
           "high": 27.0
         },
-        "evidence_tier": "audited",
-        "evidence_level": "primary_verified",
-        "evidence": "10-Q Q1 2026: real estate held for sale $53,990,000 / 2,199,308 shares = $24.55. Liquidation-basis already marks to estimated NRV (includes B2K $28.74M gross assumption).",
+        "valuation_status": "bounded_estimate",
+        "calculation_proof": {
+          "status": "valid",
+          "method_id": "net_asset_value",
+          "method_version": "1.0",
+          "outputs": {
+            "low": 22.0001,
+            "base": 24.5486,
+            "high": 26.9999
+          },
+          "output_unit": "USD_per_share",
+          "traces": {
+            "low": [
+              {
+                "id": "shares_m",
+                "label": "Common shares outstanding",
+                "kind": "fact",
+                "value": 2.199308,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "GYRO/investor-documents/sec-edgar/10-Q_20260513_rpt20260331_acc0001437749_26_016537.htm",
+                  "locator": "2,199,308 shares outstanding as of 2026-05-13 cover page",
+                  "as_of": "2026-03-31",
+                  "content_sha256": "90c46e7f1c55420d90cc5f55dd92c97c02694d2fed65f57a6d933e6c4053ffdf",
+                  "source_id": "8fc36d4a471e25e03c3600c8a6a73aa05da50a07e26781a85e2ea6b2ddd992d0"
+                },
+                "rationale": null
+              },
+              {
+                "id": "real_estate_nrv_m",
+                "label": "Real estate held for sale at estimated NRV",
+                "kind": "judgment",
+                "value": 48.385,
+                "unit": "USD_m",
+                "source": null,
+                "rationale": "Base is filing liquidation-basis NRV including the B2K $28.74M gross assumption; low/high bound entitlement or forced-sale re-marks."
+              },
+              {
+                "id": "claim_per_share",
+                "label": "Real estate held for sale at estimated NRV per share",
+                "kind": "calculation",
+                "value": 22.00010185,
+                "unit": "USD_per_share",
+                "operation": "divide",
+                "formula": "real_estate_nrv_m \u00f7 shares_m",
+                "substituted_formula": "48.385 \u00f7 2.199308",
+                "dependencies": [
+                  "real_estate_nrv_m",
+                  "shares_m"
+                ]
+              }
+            ],
+            "base": [
+              {
+                "id": "shares_m",
+                "label": "Common shares outstanding",
+                "kind": "fact",
+                "value": 2.199308,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "GYRO/investor-documents/sec-edgar/10-Q_20260513_rpt20260331_acc0001437749_26_016537.htm",
+                  "locator": "2,199,308 shares outstanding as of 2026-05-13 cover page",
+                  "as_of": "2026-03-31",
+                  "content_sha256": "90c46e7f1c55420d90cc5f55dd92c97c02694d2fed65f57a6d933e6c4053ffdf",
+                  "source_id": "8fc36d4a471e25e03c3600c8a6a73aa05da50a07e26781a85e2ea6b2ddd992d0"
+                },
+                "rationale": null
+              },
+              {
+                "id": "real_estate_nrv_m",
+                "label": "Real estate held for sale at estimated NRV",
+                "kind": "judgment",
+                "value": 53.99,
+                "unit": "USD_m",
+                "source": null,
+                "rationale": "Base is filing liquidation-basis NRV including the B2K $28.74M gross assumption; low/high bound entitlement or forced-sale re-marks."
+              },
+              {
+                "id": "claim_per_share",
+                "label": "Real estate held for sale at estimated NRV per share",
+                "kind": "calculation",
+                "value": 24.54863075,
+                "unit": "USD_per_share",
+                "operation": "divide",
+                "formula": "real_estate_nrv_m \u00f7 shares_m",
+                "substituted_formula": "53.99 \u00f7 2.199308",
+                "dependencies": [
+                  "real_estate_nrv_m",
+                  "shares_m"
+                ]
+              }
+            ],
+            "high": [
+              {
+                "id": "shares_m",
+                "label": "Common shares outstanding",
+                "kind": "fact",
+                "value": 2.199308,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "GYRO/investor-documents/sec-edgar/10-Q_20260513_rpt20260331_acc0001437749_26_016537.htm",
+                  "locator": "2,199,308 shares outstanding as of 2026-05-13 cover page",
+                  "as_of": "2026-03-31",
+                  "content_sha256": "90c46e7f1c55420d90cc5f55dd92c97c02694d2fed65f57a6d933e6c4053ffdf",
+                  "source_id": "8fc36d4a471e25e03c3600c8a6a73aa05da50a07e26781a85e2ea6b2ddd992d0"
+                },
+                "rationale": null
+              },
+              {
+                "id": "real_estate_nrv_m",
+                "label": "Real estate held for sale at estimated NRV",
+                "kind": "judgment",
+                "value": 59.381,
+                "unit": "USD_m",
+                "source": null,
+                "rationale": "Base is filing liquidation-basis NRV including the B2K $28.74M gross assumption; low/high bound entitlement or forced-sale re-marks."
+              },
+              {
+                "id": "claim_per_share",
+                "label": "Real estate held for sale at estimated NRV per share",
+                "kind": "calculation",
+                "value": 26.99985632,
+                "unit": "USD_per_share",
+                "operation": "divide",
+                "formula": "real_estate_nrv_m \u00f7 shares_m",
+                "substituted_formula": "59.381 \u00f7 2.199308",
+                "dependencies": [
+                  "real_estate_nrv_m",
+                  "shares_m"
+                ]
+              }
+            ]
+          },
+          "source_lineage": [
+            {
+              "node_id": "shares_m",
+              "ref": "GYRO/investor-documents/sec-edgar/10-Q_20260513_rpt20260331_acc0001437749_26_016537.htm",
+              "locator": "2,199,308 shares outstanding as of 2026-05-13 cover page",
+              "as_of": "2026-03-31",
+              "content_sha256": "90c46e7f1c55420d90cc5f55dd92c97c02694d2fed65f57a6d933e6c4053ffdf",
+              "source_id": "8fc36d4a471e25e03c3600c8a6a73aa05da50a07e26781a85e2ea6b2ddd992d0"
+            }
+          ],
+          "checks": {
+            "passed": true,
+            "errors": []
+          },
+          "proof_hash": "9cea750888b414264ee5cea2ba874b1022901d869ad9100f4b3a2b09514b7bcf"
+        },
+        "evidence_tier": "primary_derived",
+        "evidence_level": "primary_derived",
+        "evidence": "10-Q Q1 2026 liquidation-basis statement of net assets; proof base 24.5486/sh via net_asset_value@1.0 (GYRO/investor-documents/sec-edgar/10-Q_20260513_rpt20260331_acc0001437749_26_016537.htm).",
+        "scenario_assumptions": "ASC 205-30 estimated net realizable value, not historical cost.",
         "probability_and_timing": null,
         "tax_and_realization_adjustments": "Entitlement and sale timing sit in the range. Embedded option documented in component_valuation with treatment=embedded.",
         "falsifier": "Forced sale or failed entitlement marks real estate NRV below the low case.",
         "overlap_key": "real_estate_nrv",
-        "assumption_type": "fact"
+        "assumption_type": "judgment"
       },
       {
         "component_id": "cash_and_other_assets",
@@ -433,32 +623,194 @@
           "value": 1,
           "unit": "per-share economic claim"
         },
-        "current_operating_contribution": {
-          "starting_revenue_m": null,
-          "base_value_per_share": 1.87
-        },
-        "growth_driver": "Working capital available inside the liquidation plan.",
-        "required_reinvestment": {
-          "model_type": null,
-          "base_incremental_after_tax_roic": null,
-          "base_remaining_cost_m": null,
-          "treatment": "explicit in driver model or included in the stated owner-cash conversion and component range"
-        },
         "method": "net_asset_value",
+        "method_version": "1.0",
+        "method_provenance": {
+          "method_id": "net_asset_value",
+          "version": "1.0",
+          "label": "Reconciled net asset value",
+          "power_zones": [
+            "scarce_asset_optionality",
+            "catalyst_asset_value",
+            "credit_and_normalized_returns"
+          ],
+          "equation": "value_per_share = (gross_assets - senior_claims - tax - realization_costs) / diluted_shares",
+          "sources": [
+            {
+              "ref": "_system/frameworks/scarce_strategic_asset_valuation.md",
+              "locator": "Economic ownership and unit NAV"
+            }
+          ]
+        },
         "comparable_ids": [],
         "range_per_share": {
+          "low": 1.5,
+          "base": 1.872,
+          "high": 2.1998
+        },
+        "legacy_range_per_share": {
           "low": 1.5,
           "base": 1.87,
           "high": 2.2
         },
-        "evidence_tier": "audited",
-        "evidence_level": "primary_verified",
-        "evidence": "Cash ~$3.95M plus other non-RE assets implied by total assets $58.1M less RE $54.0M.",
+        "valuation_status": "bounded_estimate",
+        "calculation_proof": {
+          "status": "valid",
+          "method_id": "net_asset_value",
+          "method_version": "1.0",
+          "outputs": {
+            "low": 1.5,
+            "base": 1.872,
+            "high": 2.1998
+          },
+          "output_unit": "USD_per_share",
+          "traces": {
+            "low": [
+              {
+                "id": "shares_m",
+                "label": "Common shares outstanding",
+                "kind": "fact",
+                "value": 2.199308,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "GYRO/investor-documents/sec-edgar/10-Q_20260513_rpt20260331_acc0001437749_26_016537.htm",
+                  "locator": "2,199,308 shares outstanding as of 2026-05-13 cover page",
+                  "as_of": "2026-03-31",
+                  "content_sha256": "90c46e7f1c55420d90cc5f55dd92c97c02694d2fed65f57a6d933e6c4053ffdf",
+                  "source_id": "8fc36d4a471e25e03c3600c8a6a73aa05da50a07e26781a85e2ea6b2ddd992d0"
+                },
+                "rationale": null
+              },
+              {
+                "id": "non_re_assets_m",
+                "label": "Cash and other non-real-estate assets",
+                "kind": "judgment",
+                "value": 3.299,
+                "unit": "USD_m",
+                "source": null,
+                "rationale": "Base equals total assets $58.107M less real estate held for sale $53.990M; range allows working-capital burn before distributions."
+              },
+              {
+                "id": "claim_per_share",
+                "label": "Cash and other non-real-estate assets per share",
+                "kind": "calculation",
+                "value": 1.50001728,
+                "unit": "USD_per_share",
+                "operation": "divide",
+                "formula": "non_re_assets_m \u00f7 shares_m",
+                "substituted_formula": "3.299 \u00f7 2.199308",
+                "dependencies": [
+                  "non_re_assets_m",
+                  "shares_m"
+                ]
+              }
+            ],
+            "base": [
+              {
+                "id": "shares_m",
+                "label": "Common shares outstanding",
+                "kind": "fact",
+                "value": 2.199308,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "GYRO/investor-documents/sec-edgar/10-Q_20260513_rpt20260331_acc0001437749_26_016537.htm",
+                  "locator": "2,199,308 shares outstanding as of 2026-05-13 cover page",
+                  "as_of": "2026-03-31",
+                  "content_sha256": "90c46e7f1c55420d90cc5f55dd92c97c02694d2fed65f57a6d933e6c4053ffdf",
+                  "source_id": "8fc36d4a471e25e03c3600c8a6a73aa05da50a07e26781a85e2ea6b2ddd992d0"
+                },
+                "rationale": null
+              },
+              {
+                "id": "non_re_assets_m",
+                "label": "Cash and other non-real-estate assets",
+                "kind": "judgment",
+                "value": 4.117,
+                "unit": "USD_m",
+                "source": null,
+                "rationale": "Base equals total assets $58.107M less real estate held for sale $53.990M; range allows working-capital burn before distributions."
+              },
+              {
+                "id": "claim_per_share",
+                "label": "Cash and other non-real-estate assets per share",
+                "kind": "calculation",
+                "value": 1.87195245,
+                "unit": "USD_per_share",
+                "operation": "divide",
+                "formula": "non_re_assets_m \u00f7 shares_m",
+                "substituted_formula": "4.117 \u00f7 2.199308",
+                "dependencies": [
+                  "non_re_assets_m",
+                  "shares_m"
+                ]
+              }
+            ],
+            "high": [
+              {
+                "id": "shares_m",
+                "label": "Common shares outstanding",
+                "kind": "fact",
+                "value": 2.199308,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "GYRO/investor-documents/sec-edgar/10-Q_20260513_rpt20260331_acc0001437749_26_016537.htm",
+                  "locator": "2,199,308 shares outstanding as of 2026-05-13 cover page",
+                  "as_of": "2026-03-31",
+                  "content_sha256": "90c46e7f1c55420d90cc5f55dd92c97c02694d2fed65f57a6d933e6c4053ffdf",
+                  "source_id": "8fc36d4a471e25e03c3600c8a6a73aa05da50a07e26781a85e2ea6b2ddd992d0"
+                },
+                "rationale": null
+              },
+              {
+                "id": "non_re_assets_m",
+                "label": "Cash and other non-real-estate assets",
+                "kind": "judgment",
+                "value": 4.838,
+                "unit": "USD_m",
+                "source": null,
+                "rationale": "Base equals total assets $58.107M less real estate held for sale $53.990M; range allows working-capital burn before distributions."
+              },
+              {
+                "id": "claim_per_share",
+                "label": "Cash and other non-real-estate assets per share",
+                "kind": "calculation",
+                "value": 2.19978284,
+                "unit": "USD_per_share",
+                "operation": "divide",
+                "formula": "non_re_assets_m \u00f7 shares_m",
+                "substituted_formula": "4.838 \u00f7 2.199308",
+                "dependencies": [
+                  "non_re_assets_m",
+                  "shares_m"
+                ]
+              }
+            ]
+          },
+          "source_lineage": [
+            {
+              "node_id": "shares_m",
+              "ref": "GYRO/investor-documents/sec-edgar/10-Q_20260513_rpt20260331_acc0001437749_26_016537.htm",
+              "locator": "2,199,308 shares outstanding as of 2026-05-13 cover page",
+              "as_of": "2026-03-31",
+              "content_sha256": "90c46e7f1c55420d90cc5f55dd92c97c02694d2fed65f57a6d933e6c4053ffdf",
+              "source_id": "8fc36d4a471e25e03c3600c8a6a73aa05da50a07e26781a85e2ea6b2ddd992d0"
+            }
+          ],
+          "checks": {
+            "passed": true,
+            "errors": []
+          },
+          "proof_hash": "5320647e3be78ddfbb8bb94d81b1244ae2fd874767bb48c1abb820d3a63e5ece"
+        },
+        "evidence_tier": "primary_derived",
+        "evidence_level": "primary_derived",
+        "evidence": "10-Q Q1 2026 liquidation-basis statement of net assets; proof base 1.872/sh via net_asset_value@1.0 (GYRO/investor-documents/sec-edgar/10-Q_20260513_rpt20260331_acc0001437749_26_016537.htm).",
+        "scenario_assumptions": "Working capital available inside the liquidation plan.",
         "probability_and_timing": null,
         "tax_and_realization_adjustments": "Burn through 2028 is partly in the cost accrual.",
         "falsifier": "Cash burn through 2028 consumes more than the low-case residual.",
         "overlap_key": "cash_and_other_assets",
-        "assumption_type": "fact"
+        "assumption_type": "judgment"
       },
       {
         "component_id": "loans_payable",
@@ -472,32 +824,233 @@
           "value": 1,
           "unit": "per-share economic claim"
         },
-        "current_operating_contribution": {
-          "starting_revenue_m": null,
-          "base_value_per_share": -4.91
-        },
-        "growth_driver": "Contractual debt senior to equity distributions.",
-        "required_reinvestment": {
-          "model_type": null,
-          "base_incremental_after_tax_roic": null,
-          "base_remaining_cost_m": null,
-          "treatment": "explicit in driver model or included in the stated owner-cash conversion and component range"
-        },
         "method": "book_claim",
+        "method_version": "1.0",
+        "method_provenance": {
+          "method_id": "net_asset_value",
+          "version": "1.0",
+          "label": "Reconciled net asset value",
+          "power_zones": [
+            "scarce_asset_optionality",
+            "catalyst_asset_value",
+            "credit_and_normalized_returns"
+          ],
+          "equation": "value_per_share = (gross_assets - senior_claims - tax - realization_costs) / diluted_shares",
+          "sources": [
+            {
+              "ref": "_system/frameworks/scarce_strategic_asset_valuation.md",
+              "locator": "Economic ownership and unit NAV"
+            }
+          ]
+        },
         "comparable_ids": [],
         "range_per_share": {
+          "low": -5.1998,
+          "base": -4.9062,
+          "high": -4.5001
+        },
+        "legacy_range_per_share": {
           "low": -5.2,
           "base": -4.91,
           "high": -4.5
         },
-        "evidence_tier": "audited",
-        "evidence_level": "primary_verified",
-        "evidence": "Loans payable $10,790,194 / 2,199,308 shares = -$4.91.",
+        "valuation_status": "bounded_estimate",
+        "calculation_proof": {
+          "status": "valid",
+          "method_id": "net_asset_value",
+          "method_version": "1.0",
+          "outputs": {
+            "low": -5.1998,
+            "base": -4.9062,
+            "high": -4.5001
+          },
+          "output_unit": "USD_per_share",
+          "traces": {
+            "low": [
+              {
+                "id": "shares_m",
+                "label": "Common shares outstanding",
+                "kind": "fact",
+                "value": 2.199308,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "GYRO/investor-documents/sec-edgar/10-Q_20260513_rpt20260331_acc0001437749_26_016537.htm",
+                  "locator": "2,199,308 shares outstanding as of 2026-05-13 cover page",
+                  "as_of": "2026-03-31",
+                  "content_sha256": "90c46e7f1c55420d90cc5f55dd92c97c02694d2fed65f57a6d933e6c4053ffdf",
+                  "source_id": "8fc36d4a471e25e03c3600c8a6a73aa05da50a07e26781a85e2ea6b2ddd992d0"
+                },
+                "rationale": null
+              },
+              {
+                "id": "loans_payable_m",
+                "label": "Loans payable",
+                "kind": "judgment",
+                "value": 11.436,
+                "unit": "USD_m",
+                "source": null,
+                "rationale": "Contractual loans payable senior to equity; low case assumes refinancing stress or higher drawn balances."
+              },
+              {
+                "id": "claim_per_share",
+                "label": "Loans payable per share",
+                "kind": "calculation",
+                "value": 5.1998174,
+                "unit": "USD_per_share",
+                "operation": "divide",
+                "formula": "loans_payable_m \u00f7 shares_m",
+                "substituted_formula": "11.436 \u00f7 2.199308",
+                "dependencies": [
+                  "loans_payable_m",
+                  "shares_m"
+                ]
+              },
+              {
+                "id": "value_per_share",
+                "label": "Loans payable per share (senior claim)",
+                "kind": "calculation",
+                "value": -5.1998174,
+                "unit": "USD_per_share",
+                "operation": "negative",
+                "formula": "-(claim_per_share)",
+                "substituted_formula": "-(5.1998174)",
+                "dependencies": [
+                  "claim_per_share"
+                ]
+              }
+            ],
+            "base": [
+              {
+                "id": "shares_m",
+                "label": "Common shares outstanding",
+                "kind": "fact",
+                "value": 2.199308,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "GYRO/investor-documents/sec-edgar/10-Q_20260513_rpt20260331_acc0001437749_26_016537.htm",
+                  "locator": "2,199,308 shares outstanding as of 2026-05-13 cover page",
+                  "as_of": "2026-03-31",
+                  "content_sha256": "90c46e7f1c55420d90cc5f55dd92c97c02694d2fed65f57a6d933e6c4053ffdf",
+                  "source_id": "8fc36d4a471e25e03c3600c8a6a73aa05da50a07e26781a85e2ea6b2ddd992d0"
+                },
+                "rationale": null
+              },
+              {
+                "id": "loans_payable_m",
+                "label": "Loans payable",
+                "kind": "judgment",
+                "value": 10.790194,
+                "unit": "USD_m",
+                "source": null,
+                "rationale": "Contractual loans payable senior to equity; low case assumes refinancing stress or higher drawn balances."
+              },
+              {
+                "id": "claim_per_share",
+                "label": "Loans payable per share",
+                "kind": "calculation",
+                "value": 4.90617685,
+                "unit": "USD_per_share",
+                "operation": "divide",
+                "formula": "loans_payable_m \u00f7 shares_m",
+                "substituted_formula": "10.790194 \u00f7 2.199308",
+                "dependencies": [
+                  "loans_payable_m",
+                  "shares_m"
+                ]
+              },
+              {
+                "id": "value_per_share",
+                "label": "Loans payable per share (senior claim)",
+                "kind": "calculation",
+                "value": -4.90617685,
+                "unit": "USD_per_share",
+                "operation": "negative",
+                "formula": "-(claim_per_share)",
+                "substituted_formula": "-(4.9061769)",
+                "dependencies": [
+                  "claim_per_share"
+                ]
+              }
+            ],
+            "high": [
+              {
+                "id": "shares_m",
+                "label": "Common shares outstanding",
+                "kind": "fact",
+                "value": 2.199308,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "GYRO/investor-documents/sec-edgar/10-Q_20260513_rpt20260331_acc0001437749_26_016537.htm",
+                  "locator": "2,199,308 shares outstanding as of 2026-05-13 cover page",
+                  "as_of": "2026-03-31",
+                  "content_sha256": "90c46e7f1c55420d90cc5f55dd92c97c02694d2fed65f57a6d933e6c4053ffdf",
+                  "source_id": "8fc36d4a471e25e03c3600c8a6a73aa05da50a07e26781a85e2ea6b2ddd992d0"
+                },
+                "rationale": null
+              },
+              {
+                "id": "loans_payable_m",
+                "label": "Loans payable",
+                "kind": "judgment",
+                "value": 9.897,
+                "unit": "USD_m",
+                "source": null,
+                "rationale": "Contractual loans payable senior to equity; low case assumes refinancing stress or higher drawn balances."
+              },
+              {
+                "id": "claim_per_share",
+                "label": "Loans payable per share",
+                "kind": "calculation",
+                "value": 4.50005183,
+                "unit": "USD_per_share",
+                "operation": "divide",
+                "formula": "loans_payable_m \u00f7 shares_m",
+                "substituted_formula": "9.897 \u00f7 2.199308",
+                "dependencies": [
+                  "loans_payable_m",
+                  "shares_m"
+                ]
+              },
+              {
+                "id": "value_per_share",
+                "label": "Loans payable per share (senior claim)",
+                "kind": "calculation",
+                "value": -4.50005183,
+                "unit": "USD_per_share",
+                "operation": "negative",
+                "formula": "-(claim_per_share)",
+                "substituted_formula": "-(4.5000518)",
+                "dependencies": [
+                  "claim_per_share"
+                ]
+              }
+            ]
+          },
+          "source_lineage": [
+            {
+              "node_id": "shares_m",
+              "ref": "GYRO/investor-documents/sec-edgar/10-Q_20260513_rpt20260331_acc0001437749_26_016537.htm",
+              "locator": "2,199,308 shares outstanding as of 2026-05-13 cover page",
+              "as_of": "2026-03-31",
+              "content_sha256": "90c46e7f1c55420d90cc5f55dd92c97c02694d2fed65f57a6d933e6c4053ffdf",
+              "source_id": "8fc36d4a471e25e03c3600c8a6a73aa05da50a07e26781a85e2ea6b2ddd992d0"
+            }
+          ],
+          "checks": {
+            "passed": true,
+            "errors": []
+          },
+          "proof_hash": "66d81458f9d3a45116320ccf8c279351e89c908bf02f0ea47830fc2ec9abec2c"
+        },
+        "evidence_tier": "primary_derived",
+        "evidence_level": "primary_derived",
+        "evidence": "10-Q Q1 2026 liquidation-basis statement of net assets; proof base -4.9062/sh via net_asset_value@1.0 (GYRO/investor-documents/sec-edgar/10-Q_20260513_rpt20260331_acc0001437749_26_016537.htm).",
+        "scenario_assumptions": "Contractual debt senior to equity distributions.",
         "probability_and_timing": null,
         "tax_and_realization_adjustments": "Senior to equity distributions.",
         "falsifier": "Refinancing or default increases the claim above the low case.",
         "overlap_key": "loans_payable",
-        "assumption_type": "fact"
+        "assumption_type": "judgment"
       },
       {
         "component_id": "estimated_liquidation_costs",
@@ -511,32 +1064,233 @@
           "value": 1,
           "unit": "per-share economic claim"
         },
-        "current_operating_contribution": {
-          "starting_revenue_m": null,
-          "base_value_per_share": -7.6
-        },
-        "growth_driver": "Management's disclosed accrual through the 2028 target date.",
-        "required_reinvestment": {
-          "model_type": null,
-          "base_incremental_after_tax_roic": null,
-          "base_remaining_cost_m": null,
-          "treatment": "explicit in driver model or included in the stated owner-cash conversion and component range"
-        },
         "method": "realization_reserve",
+        "method_version": "1.0",
+        "method_provenance": {
+          "method_id": "net_asset_value",
+          "version": "1.0",
+          "label": "Reconciled net asset value",
+          "power_zones": [
+            "scarce_asset_optionality",
+            "catalyst_asset_value",
+            "credit_and_normalized_returns"
+          ],
+          "equation": "value_per_share = (gross_assets - senior_claims - tax - realization_costs) / diluted_shares",
+          "sources": [
+            {
+              "ref": "_system/frameworks/scarce_strategic_asset_valuation.md",
+              "locator": "Economic ownership and unit NAV"
+            }
+          ]
+        },
         "comparable_ids": [],
         "range_per_share": {
+          "low": -9.4998,
+          "base": -7.5978,
+          "high": -6.0001
+        },
+        "legacy_range_per_share": {
           "low": -9.5,
           "base": -7.6,
           "high": -6.0
         },
-        "evidence_tier": "audited",
-        "evidence_level": "primary_verified",
-        "evidence": "Estimated liquidation and operating costs net of receipts $16,709,887 / shares = -$7.60 (includes B2K $4M seller credit already).",
+        "valuation_status": "bounded_estimate",
+        "calculation_proof": {
+          "status": "valid",
+          "method_id": "net_asset_value",
+          "method_version": "1.0",
+          "outputs": {
+            "low": -9.4998,
+            "base": -7.5978,
+            "high": -6.0001
+          },
+          "output_unit": "USD_per_share",
+          "traces": {
+            "low": [
+              {
+                "id": "shares_m",
+                "label": "Common shares outstanding",
+                "kind": "fact",
+                "value": 2.199308,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "GYRO/investor-documents/sec-edgar/10-Q_20260513_rpt20260331_acc0001437749_26_016537.htm",
+                  "locator": "2,199,308 shares outstanding as of 2026-05-13 cover page",
+                  "as_of": "2026-03-31",
+                  "content_sha256": "90c46e7f1c55420d90cc5f55dd92c97c02694d2fed65f57a6d933e6c4053ffdf",
+                  "source_id": "8fc36d4a471e25e03c3600c8a6a73aa05da50a07e26781a85e2ea6b2ddd992d0"
+                },
+                "rationale": null
+              },
+              {
+                "id": "liquidation_costs_m",
+                "label": "Estimated liquidation and operating costs net of receipts",
+                "kind": "judgment",
+                "value": 20.893,
+                "unit": "USD_m",
+                "source": null,
+                "rationale": "Management accrual through the 2028 target date, including B2K seller credit; FY2025 already showed upward re-estimation risk."
+              },
+              {
+                "id": "claim_per_share",
+                "label": "Estimated liquidation and operating costs net of receipts per share",
+                "kind": "calculation",
+                "value": 9.4998063,
+                "unit": "USD_per_share",
+                "operation": "divide",
+                "formula": "liquidation_costs_m \u00f7 shares_m",
+                "substituted_formula": "20.893 \u00f7 2.199308",
+                "dependencies": [
+                  "liquidation_costs_m",
+                  "shares_m"
+                ]
+              },
+              {
+                "id": "value_per_share",
+                "label": "Estimated liquidation and operating costs net of receipts per share (senior claim)",
+                "kind": "calculation",
+                "value": -9.4998063,
+                "unit": "USD_per_share",
+                "operation": "negative",
+                "formula": "-(claim_per_share)",
+                "substituted_formula": "-(9.4998063)",
+                "dependencies": [
+                  "claim_per_share"
+                ]
+              }
+            ],
+            "base": [
+              {
+                "id": "shares_m",
+                "label": "Common shares outstanding",
+                "kind": "fact",
+                "value": 2.199308,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "GYRO/investor-documents/sec-edgar/10-Q_20260513_rpt20260331_acc0001437749_26_016537.htm",
+                  "locator": "2,199,308 shares outstanding as of 2026-05-13 cover page",
+                  "as_of": "2026-03-31",
+                  "content_sha256": "90c46e7f1c55420d90cc5f55dd92c97c02694d2fed65f57a6d933e6c4053ffdf",
+                  "source_id": "8fc36d4a471e25e03c3600c8a6a73aa05da50a07e26781a85e2ea6b2ddd992d0"
+                },
+                "rationale": null
+              },
+              {
+                "id": "liquidation_costs_m",
+                "label": "Estimated liquidation and operating costs net of receipts",
+                "kind": "judgment",
+                "value": 16.709887,
+                "unit": "USD_m",
+                "source": null,
+                "rationale": "Management accrual through the 2028 target date, including B2K seller credit; FY2025 already showed upward re-estimation risk."
+              },
+              {
+                "id": "claim_per_share",
+                "label": "Estimated liquidation and operating costs net of receipts per share",
+                "kind": "calculation",
+                "value": 7.59779303,
+                "unit": "USD_per_share",
+                "operation": "divide",
+                "formula": "liquidation_costs_m \u00f7 shares_m",
+                "substituted_formula": "16.709887 \u00f7 2.199308",
+                "dependencies": [
+                  "liquidation_costs_m",
+                  "shares_m"
+                ]
+              },
+              {
+                "id": "value_per_share",
+                "label": "Estimated liquidation and operating costs net of receipts per share (senior claim)",
+                "kind": "calculation",
+                "value": -7.59779303,
+                "unit": "USD_per_share",
+                "operation": "negative",
+                "formula": "-(claim_per_share)",
+                "substituted_formula": "-(7.597793)",
+                "dependencies": [
+                  "claim_per_share"
+                ]
+              }
+            ],
+            "high": [
+              {
+                "id": "shares_m",
+                "label": "Common shares outstanding",
+                "kind": "fact",
+                "value": 2.199308,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "GYRO/investor-documents/sec-edgar/10-Q_20260513_rpt20260331_acc0001437749_26_016537.htm",
+                  "locator": "2,199,308 shares outstanding as of 2026-05-13 cover page",
+                  "as_of": "2026-03-31",
+                  "content_sha256": "90c46e7f1c55420d90cc5f55dd92c97c02694d2fed65f57a6d933e6c4053ffdf",
+                  "source_id": "8fc36d4a471e25e03c3600c8a6a73aa05da50a07e26781a85e2ea6b2ddd992d0"
+                },
+                "rationale": null
+              },
+              {
+                "id": "liquidation_costs_m",
+                "label": "Estimated liquidation and operating costs net of receipts",
+                "kind": "judgment",
+                "value": 13.196,
+                "unit": "USD_m",
+                "source": null,
+                "rationale": "Management accrual through the 2028 target date, including B2K seller credit; FY2025 already showed upward re-estimation risk."
+              },
+              {
+                "id": "claim_per_share",
+                "label": "Estimated liquidation and operating costs net of receipts per share",
+                "kind": "calculation",
+                "value": 6.00006911,
+                "unit": "USD_per_share",
+                "operation": "divide",
+                "formula": "liquidation_costs_m \u00f7 shares_m",
+                "substituted_formula": "13.196 \u00f7 2.199308",
+                "dependencies": [
+                  "liquidation_costs_m",
+                  "shares_m"
+                ]
+              },
+              {
+                "id": "value_per_share",
+                "label": "Estimated liquidation and operating costs net of receipts per share (senior claim)",
+                "kind": "calculation",
+                "value": -6.00006911,
+                "unit": "USD_per_share",
+                "operation": "negative",
+                "formula": "-(claim_per_share)",
+                "substituted_formula": "-(6.0000691)",
+                "dependencies": [
+                  "claim_per_share"
+                ]
+              }
+            ]
+          },
+          "source_lineage": [
+            {
+              "node_id": "shares_m",
+              "ref": "GYRO/investor-documents/sec-edgar/10-Q_20260513_rpt20260331_acc0001437749_26_016537.htm",
+              "locator": "2,199,308 shares outstanding as of 2026-05-13 cover page",
+              "as_of": "2026-03-31",
+              "content_sha256": "90c46e7f1c55420d90cc5f55dd92c97c02694d2fed65f57a6d933e6c4053ffdf",
+              "source_id": "8fc36d4a471e25e03c3600c8a6a73aa05da50a07e26781a85e2ea6b2ddd992d0"
+            }
+          ],
+          "checks": {
+            "passed": true,
+            "errors": []
+          },
+          "proof_hash": "0e6fcf4cad7722897083dbe18409a620b38655c9991c9e7f2afae6855ad61188"
+        },
+        "evidence_tier": "primary_derived",
+        "evidence_level": "primary_derived",
+        "evidence": "10-Q Q1 2026 liquidation-basis statement of net assets; proof base -7.5978/sh via net_asset_value@1.0 (GYRO/investor-documents/sec-edgar/10-Q_20260513_rpt20260331_acc0001437749_26_016537.htm).",
+        "scenario_assumptions": "Management's disclosed accrual through the 2028 target date.",
         "probability_and_timing": null,
         "tax_and_realization_adjustments": "Includes B2K seller credit.",
         "falsifier": "Further re-estimation (as in FY2025 NAV drop $13.91\u2192$11.76) pushes costs beyond the low case.",
         "overlap_key": "estimated_liquidation_costs",
-        "assumption_type": "fact"
+        "assumption_type": "judgment"
       },
       {
         "component_id": "other_liabilities",
@@ -550,32 +1304,233 @@
           "value": 1,
           "unit": "per-share economic claim"
         },
-        "current_operating_contribution": {
-          "starting_revenue_m": null,
-          "base_value_per_share": -2.12
-        },
-        "growth_driver": "Remaining balance-sheet liabilities senior to equity.",
-        "required_reinvestment": {
-          "model_type": null,
-          "base_incremental_after_tax_roic": null,
-          "base_remaining_cost_m": null,
-          "treatment": "explicit in driver model or included in the stated owner-cash conversion and component range"
-        },
         "method": "book_claim",
+        "method_version": "1.0",
+        "method_provenance": {
+          "method_id": "net_asset_value",
+          "version": "1.0",
+          "label": "Reconciled net asset value",
+          "power_zones": [
+            "scarce_asset_optionality",
+            "catalyst_asset_value",
+            "credit_and_normalized_returns"
+          ],
+          "equation": "value_per_share = (gross_assets - senior_claims - tax - realization_costs) / diluted_shares",
+          "sources": [
+            {
+              "ref": "_system/frameworks/scarce_strategic_asset_valuation.md",
+              "locator": "Economic ownership and unit NAV"
+            }
+          ]
+        },
         "comparable_ids": [],
         "range_per_share": {
+          "low": -2.4999,
+          "base": -2.1293,
+          "high": -1.8001
+        },
+        "legacy_range_per_share": {
           "low": -2.5,
-          "base": -2.12,
+          "base": -2.13,
           "high": -1.8
         },
-        "evidence_tier": "audited",
-        "evidence_level": "primary_verified",
-        "evidence": "Total liabilities $32.18M less loans $10.79M less estimated liquidation costs $16.71M \u2248 $4.68M / shares \u2248 -$2.12.",
+        "valuation_status": "bounded_estimate",
+        "calculation_proof": {
+          "status": "valid",
+          "method_id": "net_asset_value",
+          "method_version": "1.0",
+          "outputs": {
+            "low": -2.4999,
+            "base": -2.1293,
+            "high": -1.8001
+          },
+          "output_unit": "USD_per_share",
+          "traces": {
+            "low": [
+              {
+                "id": "shares_m",
+                "label": "Common shares outstanding",
+                "kind": "fact",
+                "value": 2.199308,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "GYRO/investor-documents/sec-edgar/10-Q_20260513_rpt20260331_acc0001437749_26_016537.htm",
+                  "locator": "2,199,308 shares outstanding as of 2026-05-13 cover page",
+                  "as_of": "2026-03-31",
+                  "content_sha256": "90c46e7f1c55420d90cc5f55dd92c97c02694d2fed65f57a6d933e6c4053ffdf",
+                  "source_id": "8fc36d4a471e25e03c3600c8a6a73aa05da50a07e26781a85e2ea6b2ddd992d0"
+                },
+                "rationale": null
+              },
+              {
+                "id": "other_liabilities_m",
+                "label": "Other balance-sheet liabilities",
+                "kind": "judgment",
+                "value": 5.498,
+                "unit": "USD_m",
+                "source": null,
+                "rationale": "Plug of accounts payable, accrued liabilities, and tenant deposits after loans and estimated liquidation costs; reconciles to $11.79 net assets in liquidation."
+              },
+              {
+                "id": "claim_per_share",
+                "label": "Other balance-sheet liabilities per share",
+                "kind": "calculation",
+                "value": 2.49987723,
+                "unit": "USD_per_share",
+                "operation": "divide",
+                "formula": "other_liabilities_m \u00f7 shares_m",
+                "substituted_formula": "5.498 \u00f7 2.199308",
+                "dependencies": [
+                  "other_liabilities_m",
+                  "shares_m"
+                ]
+              },
+              {
+                "id": "value_per_share",
+                "label": "Other balance-sheet liabilities per share (senior claim)",
+                "kind": "calculation",
+                "value": -2.49987723,
+                "unit": "USD_per_share",
+                "operation": "negative",
+                "formula": "-(claim_per_share)",
+                "substituted_formula": "-(2.4998772)",
+                "dependencies": [
+                  "claim_per_share"
+                ]
+              }
+            ],
+            "base": [
+              {
+                "id": "shares_m",
+                "label": "Common shares outstanding",
+                "kind": "fact",
+                "value": 2.199308,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "GYRO/investor-documents/sec-edgar/10-Q_20260513_rpt20260331_acc0001437749_26_016537.htm",
+                  "locator": "2,199,308 shares outstanding as of 2026-05-13 cover page",
+                  "as_of": "2026-03-31",
+                  "content_sha256": "90c46e7f1c55420d90cc5f55dd92c97c02694d2fed65f57a6d933e6c4053ffdf",
+                  "source_id": "8fc36d4a471e25e03c3600c8a6a73aa05da50a07e26781a85e2ea6b2ddd992d0"
+                },
+                "rationale": null
+              },
+              {
+                "id": "other_liabilities_m",
+                "label": "Other balance-sheet liabilities",
+                "kind": "judgment",
+                "value": 4.683,
+                "unit": "USD_m",
+                "source": null,
+                "rationale": "Plug of accounts payable, accrued liabilities, and tenant deposits after loans and estimated liquidation costs; reconciles to $11.79 net assets in liquidation."
+              },
+              {
+                "id": "claim_per_share",
+                "label": "Other balance-sheet liabilities per share",
+                "kind": "calculation",
+                "value": 2.12930613,
+                "unit": "USD_per_share",
+                "operation": "divide",
+                "formula": "other_liabilities_m \u00f7 shares_m",
+                "substituted_formula": "4.683 \u00f7 2.199308",
+                "dependencies": [
+                  "other_liabilities_m",
+                  "shares_m"
+                ]
+              },
+              {
+                "id": "value_per_share",
+                "label": "Other balance-sheet liabilities per share (senior claim)",
+                "kind": "calculation",
+                "value": -2.12930613,
+                "unit": "USD_per_share",
+                "operation": "negative",
+                "formula": "-(claim_per_share)",
+                "substituted_formula": "-(2.1293061)",
+                "dependencies": [
+                  "claim_per_share"
+                ]
+              }
+            ],
+            "high": [
+              {
+                "id": "shares_m",
+                "label": "Common shares outstanding",
+                "kind": "fact",
+                "value": 2.199308,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "GYRO/investor-documents/sec-edgar/10-Q_20260513_rpt20260331_acc0001437749_26_016537.htm",
+                  "locator": "2,199,308 shares outstanding as of 2026-05-13 cover page",
+                  "as_of": "2026-03-31",
+                  "content_sha256": "90c46e7f1c55420d90cc5f55dd92c97c02694d2fed65f57a6d933e6c4053ffdf",
+                  "source_id": "8fc36d4a471e25e03c3600c8a6a73aa05da50a07e26781a85e2ea6b2ddd992d0"
+                },
+                "rationale": null
+              },
+              {
+                "id": "other_liabilities_m",
+                "label": "Other balance-sheet liabilities",
+                "kind": "judgment",
+                "value": 3.959,
+                "unit": "USD_m",
+                "source": null,
+                "rationale": "Plug of accounts payable, accrued liabilities, and tenant deposits after loans and estimated liquidation costs; reconciles to $11.79 net assets in liquidation."
+              },
+              {
+                "id": "claim_per_share",
+                "label": "Other balance-sheet liabilities per share",
+                "kind": "calculation",
+                "value": 1.80011167,
+                "unit": "USD_per_share",
+                "operation": "divide",
+                "formula": "other_liabilities_m \u00f7 shares_m",
+                "substituted_formula": "3.959 \u00f7 2.199308",
+                "dependencies": [
+                  "other_liabilities_m",
+                  "shares_m"
+                ]
+              },
+              {
+                "id": "value_per_share",
+                "label": "Other balance-sheet liabilities per share (senior claim)",
+                "kind": "calculation",
+                "value": -1.80011167,
+                "unit": "USD_per_share",
+                "operation": "negative",
+                "formula": "-(claim_per_share)",
+                "substituted_formula": "-(1.8001117)",
+                "dependencies": [
+                  "claim_per_share"
+                ]
+              }
+            ]
+          },
+          "source_lineage": [
+            {
+              "node_id": "shares_m",
+              "ref": "GYRO/investor-documents/sec-edgar/10-Q_20260513_rpt20260331_acc0001437749_26_016537.htm",
+              "locator": "2,199,308 shares outstanding as of 2026-05-13 cover page",
+              "as_of": "2026-03-31",
+              "content_sha256": "90c46e7f1c55420d90cc5f55dd92c97c02694d2fed65f57a6d933e6c4053ffdf",
+              "source_id": "8fc36d4a471e25e03c3600c8a6a73aa05da50a07e26781a85e2ea6b2ddd992d0"
+            }
+          ],
+          "checks": {
+            "passed": true,
+            "errors": []
+          },
+          "proof_hash": "2a69163877b28ae32a96835b50d68407eed7e85328b2f58baf5d8b32a12ed989"
+        },
+        "evidence_tier": "primary_derived",
+        "evidence_level": "primary_derived",
+        "evidence": "10-Q Q1 2026 liquidation-basis statement of net assets; proof base -2.1293/sh via net_asset_value@1.0 (GYRO/investor-documents/sec-edgar/10-Q_20260513_rpt20260331_acc0001437749_26_016537.htm).",
+        "scenario_assumptions": "Remaining balance-sheet liabilities senior to equity.",
         "probability_and_timing": null,
         "tax_and_realization_adjustments": "Plug to reconcile to $11.79 net assets.",
         "falsifier": "Unmodeled claims exceed the low case.",
         "overlap_key": "other_liabilities",
-        "assumption_type": "fact"
+        "assumption_type": "judgment"
       },
       {
         "component_id": "b2k_entitlement_option",
@@ -589,27 +1544,26 @@
           "value": 1,
           "unit": "per-share economic claim"
         },
-        "current_operating_contribution": {
-          "starting_revenue_m": null,
-          "base_value_per_share": 0.0
-        },
-        "growth_driver": "Embedded in real_estate_nrv base; additive high only for upside above current NRV.",
-        "required_reinvestment": {
-          "model_type": null,
-          "base_incremental_after_tax_roic": null,
-          "base_remaining_cost_m": null,
-          "treatment": "explicit in driver model or included in the stated owner-cash conversion and component range"
-        },
         "method": "milestone_project_option",
+        "method_version": null,
+        "method_provenance": null,
         "comparable_ids": [],
         "range_per_share": {
+          "low": null,
+          "base": null,
+          "high": null
+        },
+        "legacy_range_per_share": {
           "low": 0.0,
           "base": 0.0,
           "high": 2.0
         },
+        "valuation_status": "legacy_sensitivity",
+        "calculation_proof": null,
         "evidence_tier": "filing",
         "evidence_level": "primary_verified",
         "evidence": "B2K agreement $24.0\u2013$28.74M on ~49 acres; base NRV already uses $28.74M. Embedded so not added twice; high case is premium to current NRV if entitlements exceed the plan.",
+        "scenario_assumptions": "Embedded in real_estate_nrv base; additive high only for upside above current NRV.",
         "probability_and_timing": {
           "success_probability": null,
           "remaining_capital_m": null,
@@ -634,56 +1588,63 @@
     "input_classification": {
       "facts": [
         {
-          "component_id": "real_estate_nrv",
-          "label": "Real estate held for sale at estimated NRV",
-          "kind": "fact",
-          "evidence_tier": "audited",
-          "evidence": "10-Q Q1 2026: real estate held for sale $53,990,000 / 2,199,308 shares = $24.55. Liquidation-basis already marks to estimated NRV (includes B2K $28.74M gross assumption).",
-          "method": "liquidation_nav"
-        },
-        {
-          "component_id": "cash_and_other_assets",
-          "label": "Cash and other assets",
-          "kind": "fact",
-          "evidence_tier": "audited",
-          "evidence": "Cash ~$3.95M plus other non-RE assets implied by total assets $58.1M less RE $54.0M.",
-          "method": "net_asset_value"
-        },
-        {
-          "component_id": "loans_payable",
-          "label": "Loans payable",
-          "kind": "fact",
-          "evidence_tier": "audited",
-          "evidence": "Loans payable $10,790,194 / 2,199,308 shares = -$4.91.",
-          "method": "book_claim"
-        },
-        {
-          "component_id": "estimated_liquidation_costs",
-          "label": "Estimated liquidation and operating costs (net)",
-          "kind": "fact",
-          "evidence_tier": "audited",
-          "evidence": "Estimated liquidation and operating costs net of receipts $16,709,887 / shares = -$7.60 (includes B2K $4M seller credit already).",
-          "method": "realization_reserve"
-        },
-        {
-          "component_id": "other_liabilities",
-          "label": "Other liabilities",
-          "kind": "fact",
-          "evidence_tier": "audited",
-          "evidence": "Total liabilities $32.18M less loans $10.79M less estimated liquidation costs $16.71M \u2248 $4.68M / shares \u2248 -$2.12.",
-          "method": "book_claim"
-        },
-        {
           "component_id": "b2k_entitlement_option",
           "label": "B2K Flowerfield entitlement option (embedded in NRV)",
           "kind": "fact",
           "evidence_tier": "filing",
           "evidence": "B2K agreement $24.0\u2013$28.74M on ~49 acres; base NRV already uses $28.74M. Embedded so not added twice; high case is premium to current NRV if entitlements exceed the plan.",
-          "method": "milestone_project_option"
+          "method": "milestone_project_option",
+          "valuation_status": "legacy_sensitivity"
         }
       ],
       "estimates": [],
-      "judgments": []
+      "judgments": [
+        {
+          "component_id": "real_estate_nrv",
+          "label": "Real estate held for sale at estimated NRV",
+          "kind": "judgment",
+          "evidence_tier": "primary_derived",
+          "evidence": "10-Q Q1 2026 liquidation-basis statement of net assets; proof base 24.5486/sh via net_asset_value@1.0 (GYRO/investor-documents/sec-edgar/10-Q_20260513_rpt20260331_acc0001437749_26_016537.htm).",
+          "method": "liquidation_nav",
+          "valuation_status": "bounded_estimate"
+        },
+        {
+          "component_id": "cash_and_other_assets",
+          "label": "Cash and other assets",
+          "kind": "judgment",
+          "evidence_tier": "primary_derived",
+          "evidence": "10-Q Q1 2026 liquidation-basis statement of net assets; proof base 1.872/sh via net_asset_value@1.0 (GYRO/investor-documents/sec-edgar/10-Q_20260513_rpt20260331_acc0001437749_26_016537.htm).",
+          "method": "net_asset_value",
+          "valuation_status": "bounded_estimate"
+        },
+        {
+          "component_id": "loans_payable",
+          "label": "Loans payable",
+          "kind": "judgment",
+          "evidence_tier": "primary_derived",
+          "evidence": "10-Q Q1 2026 liquidation-basis statement of net assets; proof base -4.9062/sh via net_asset_value@1.0 (GYRO/investor-documents/sec-edgar/10-Q_20260513_rpt20260331_acc0001437749_26_016537.htm).",
+          "method": "book_claim",
+          "valuation_status": "bounded_estimate"
+        },
+        {
+          "component_id": "estimated_liquidation_costs",
+          "label": "Estimated liquidation and operating costs (net)",
+          "kind": "judgment",
+          "evidence_tier": "primary_derived",
+          "evidence": "10-Q Q1 2026 liquidation-basis statement of net assets; proof base -7.5978/sh via net_asset_value@1.0 (GYRO/investor-documents/sec-edgar/10-Q_20260513_rpt20260331_acc0001437749_26_016537.htm).",
+          "method": "realization_reserve",
+          "valuation_status": "bounded_estimate"
+        },
+        {
+          "component_id": "other_liabilities",
+          "label": "Other liabilities",
+          "kind": "judgment",
+          "evidence_tier": "primary_derived",
+          "evidence": "10-Q Q1 2026 liquidation-basis statement of net assets; proof base -2.1293/sh via net_asset_value@1.0 (GYRO/investor-documents/sec-edgar/10-Q_20260513_rpt20260331_acc0001437749_26_016537.htm).",
+          "method": "book_claim",
+          "valuation_status": "bounded_estimate"
+        }
+      ]
     },
     "method_route": {
       "schema_version": "1.0",
@@ -800,60 +1761,149 @@
     },
     "valuation": {
       "value_per_share": {
+        "low": 6.3006,
+        "base": 11.7873,
+        "high": 16.8994
+      },
+      "priced_components_per_share": {
+        "low": 6.3006,
+        "base": 11.7873,
+        "high": 16.8994
+      },
+      "legacy_value_per_share": {
         "low": 6.3,
-        "base": 11.79,
+        "base": 11.78,
         "high": 16.9
       },
-      "probability_weighted_value_per_share": 11.79,
+      "probability_weighted_value_per_share": 11.7873,
       "expected_distributions_per_share": 0.0,
       "annualized_return_at_price_pct": {
-        "low": 2.79,
-        "base": 26.68,
+        "low": 2.8,
+        "base": 26.67,
         "high": 42.83
       },
-      "downside_to_low_pct": 8.62,
-      "horizon_years": 3
+      "downside_to_low_pct": 8.63,
+      "horizon_years": 3,
+      "interpretation": "value_per_share is withheld while any material additive component is unpriced; priced_components_per_share is not a complete security value."
     },
     "scenario_contract": {
-      "rule": "Cases must change causal operating, capital, probability, timing, or financing drivers\u2014not only the terminal multiple.",
+      "rule": "Cases must change cited causal operating, capital, probability, timing, or financing drivers\u2014not only a terminal multiple.",
       "top_value_drivers": [
         {
           "component_id": "real_estate_nrv",
           "label": "Real estate held for sale at estimated NRV",
-          "base_per_share": 24.55,
-          "range_width_per_share": 5.0,
-          "scenario_assumptions": null
+          "valuation_status": "bounded_estimate",
+          "base_per_share": 24.5486,
+          "legacy_base_per_share": 24.55,
+          "range_width_per_share": 4.9998,
+          "scenario_assumptions": "ASC 205-30 estimated net realizable value, not historical cost."
         },
         {
           "component_id": "estimated_liquidation_costs",
           "label": "Estimated liquidation and operating costs (net)",
-          "base_per_share": -7.6,
-          "range_width_per_share": 3.5,
-          "scenario_assumptions": null
+          "valuation_status": "bounded_estimate",
+          "base_per_share": -7.5978,
+          "legacy_base_per_share": -7.6,
+          "range_width_per_share": 3.4997,
+          "scenario_assumptions": "Management's disclosed accrual through the 2028 target date."
         },
         {
           "component_id": "cash_and_other_assets",
           "label": "Cash and other assets",
-          "base_per_share": 1.87,
-          "range_width_per_share": 0.7,
-          "scenario_assumptions": null
-        },
-        {
-          "component_id": "loans_payable",
-          "label": "Loans payable",
-          "base_per_share": -4.91,
-          "range_width_per_share": 0.7,
-          "scenario_assumptions": null
+          "valuation_status": "bounded_estimate",
+          "base_per_share": 1.872,
+          "legacy_base_per_share": 1.87,
+          "range_width_per_share": 0.6998,
+          "scenario_assumptions": "Working capital available inside the liquidation plan."
         },
         {
           "component_id": "other_liabilities",
           "label": "Other liabilities",
-          "base_per_share": -2.12,
-          "range_width_per_share": 0.7,
-          "scenario_assumptions": null
+          "valuation_status": "bounded_estimate",
+          "base_per_share": -2.1293,
+          "legacy_base_per_share": -2.13,
+          "range_width_per_share": 0.6998,
+          "scenario_assumptions": "Remaining balance-sheet liabilities senior to equity."
+        },
+        {
+          "component_id": "loans_payable",
+          "label": "Loans payable",
+          "valuation_status": "bounded_estimate",
+          "base_per_share": -4.9062,
+          "legacy_base_per_share": -4.91,
+          "range_width_per_share": 0.6997,
+          "scenario_assumptions": "Contractual debt senior to equity distributions."
         }
       ],
       "reverse_expectations": null
+    },
+    "calculation_proof_summary": {
+      "component_count": 6,
+      "priced_component_count": 5,
+      "proof_complete_pct": 83.3,
+      "status_counts": {
+        "bounded_estimate": 5,
+        "calculated": 0,
+        "legacy_sensitivity": 1,
+        "unpriced": 0
+      },
+      "all_material_components_priced": false,
+      "calculation_errors": [],
+      "aggregate_proof_hash": "1d243d2081f2a69e7c5e56aa89c27187c4cde64d08ffd7b806fff68da1db2449"
+    },
+    "source_lineage": [
+      {
+        "component_id": "real_estate_nrv",
+        "node_id": "shares_m",
+        "ref": "GYRO/investor-documents/sec-edgar/10-Q_20260513_rpt20260331_acc0001437749_26_016537.htm",
+        "locator": "2,199,308 shares outstanding as of 2026-05-13 cover page",
+        "as_of": "2026-03-31",
+        "content_sha256": "90c46e7f1c55420d90cc5f55dd92c97c02694d2fed65f57a6d933e6c4053ffdf",
+        "source_id": "8fc36d4a471e25e03c3600c8a6a73aa05da50a07e26781a85e2ea6b2ddd992d0"
+      },
+      {
+        "component_id": "cash_and_other_assets",
+        "node_id": "shares_m",
+        "ref": "GYRO/investor-documents/sec-edgar/10-Q_20260513_rpt20260331_acc0001437749_26_016537.htm",
+        "locator": "2,199,308 shares outstanding as of 2026-05-13 cover page",
+        "as_of": "2026-03-31",
+        "content_sha256": "90c46e7f1c55420d90cc5f55dd92c97c02694d2fed65f57a6d933e6c4053ffdf",
+        "source_id": "8fc36d4a471e25e03c3600c8a6a73aa05da50a07e26781a85e2ea6b2ddd992d0"
+      },
+      {
+        "component_id": "loans_payable",
+        "node_id": "shares_m",
+        "ref": "GYRO/investor-documents/sec-edgar/10-Q_20260513_rpt20260331_acc0001437749_26_016537.htm",
+        "locator": "2,199,308 shares outstanding as of 2026-05-13 cover page",
+        "as_of": "2026-03-31",
+        "content_sha256": "90c46e7f1c55420d90cc5f55dd92c97c02694d2fed65f57a6d933e6c4053ffdf",
+        "source_id": "8fc36d4a471e25e03c3600c8a6a73aa05da50a07e26781a85e2ea6b2ddd992d0"
+      },
+      {
+        "component_id": "estimated_liquidation_costs",
+        "node_id": "shares_m",
+        "ref": "GYRO/investor-documents/sec-edgar/10-Q_20260513_rpt20260331_acc0001437749_26_016537.htm",
+        "locator": "2,199,308 shares outstanding as of 2026-05-13 cover page",
+        "as_of": "2026-03-31",
+        "content_sha256": "90c46e7f1c55420d90cc5f55dd92c97c02694d2fed65f57a6d933e6c4053ffdf",
+        "source_id": "8fc36d4a471e25e03c3600c8a6a73aa05da50a07e26781a85e2ea6b2ddd992d0"
+      },
+      {
+        "component_id": "other_liabilities",
+        "node_id": "shares_m",
+        "ref": "GYRO/investor-documents/sec-edgar/10-Q_20260513_rpt20260331_acc0001437749_26_016537.htm",
+        "locator": "2,199,308 shares outstanding as of 2026-05-13 cover page",
+        "as_of": "2026-03-31",
+        "content_sha256": "90c46e7f1c55420d90cc5f55dd92c97c02694d2fed65f57a6d933e6c4053ffdf",
+        "source_id": "8fc36d4a471e25e03c3600c8a6a73aa05da50a07e26781a85e2ea6b2ddd992d0"
+      }
+    ],
+    "model_checks": {
+      "calculation_graphs_valid": true,
+      "component_sum_reconciles": true,
+      "no_double_counting": true,
+      "all_material_components_priced": true,
+      "low_base_high_ordered": true
     },
     "evidence": {
       "unresolved_count": 0,
@@ -876,7 +1926,18 @@
         "component milestone or falsifier"
       ]
     },
-    "decision_rule": "No security is decision-grade until every material economic claim is valued exactly once and every material evidence blocker is resolved."
+    "change_control": {
+      "model_hash": "a17596b707ba2fb244da911987f095907aff0785ab03d36a6131bc6ef2d26b0f",
+      "method_versions": [
+        "book_claim@1.0",
+        "liquidation_nav@1.0",
+        "net_asset_value@1.0",
+        "realization_reserve@1.0"
+      ],
+      "change_log": [],
+      "rule": "A source fact is locked. Every assumption change requires a reason, author, timestamp, and before/after value."
+    },
+    "decision_rule": "No security is decision-grade until every material claim is valued exactly once by a valid calculation proof and every material evidence blocker is resolved."
   },
   "method_profile": "dated_liquidation_nav",
   "valuation_methodology": {
@@ -898,14 +1959,71 @@
         "valuation": {
           "method": "liquidation_nav",
           "basis": "per_share",
-          "low": 22.0,
-          "base": 24.55,
-          "high": 27.0,
-          "evidence_tier": "audited",
-          "evidence": "10-Q Q1 2026: real estate held for sale $53,990,000 / 2,199,308 shares = $24.55. Liquidation-basis already marks to estimated NRV (includes B2K $28.74M gross assumption).",
+          "low": 22.0001,
+          "base": 24.5486,
+          "high": 26.9999,
+          "evidence_tier": "primary_derived",
+          "evidence": "10-Q Q1 2026 liquidation-basis statement of net assets; proof base 24.5486/sh via net_asset_value@1.0 (GYRO/investor-documents/sec-edgar/10-Q_20260513_rpt20260331_acc0001437749_26_016537.htm).",
           "assumption_summary": "ASC 205-30 estimated net realizable value, not historical cost.",
           "cross_check": "Range must reconcile to primary filings and realization path before IC approval.",
-          "falsifier": "Forced sale or failed entitlement marks real estate NRV below the low case."
+          "falsifier": "Forced sale or failed entitlement marks real estate NRV below the low case.",
+          "calculation_proof": {
+            "schema_version": "1.0",
+            "method_id": "net_asset_value",
+            "method_version": "1.0",
+            "output_unit": "USD_per_share",
+            "inputs": [
+              {
+                "id": "shares_m",
+                "label": "Common shares outstanding",
+                "kind": "fact",
+                "value": 2.199308,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "GYRO/investor-documents/sec-edgar/10-Q_20260513_rpt20260331_acc0001437749_26_016537.htm",
+                  "locator": "2,199,308 shares outstanding as of 2026-05-13 cover page",
+                  "as_of": "2026-03-31"
+                },
+                "locked": true
+              }
+            ],
+            "assumptions": [
+              {
+                "id": "real_estate_nrv_m",
+                "label": "Real estate held for sale at estimated NRV",
+                "kind": "judgment",
+                "values": {
+                  "low": 48.385,
+                  "base": 53.99,
+                  "high": 59.381
+                },
+                "unit": "USD_m",
+                "rationale": "Base is filing liquidation-basis NRV including the B2K $28.74M gross assumption; low/high bound entitlement or forced-sale re-marks.",
+                "allowed_range": {
+                  "min": 45.0,
+                  "max": 65.0
+                }
+              }
+            ],
+            "calculations": [
+              {
+                "id": "claim_per_share",
+                "label": "Real estate held for sale at estimated NRV per share",
+                "op": "divide",
+                "args": [
+                  "real_estate_nrv_m",
+                  "shares_m"
+                ],
+                "unit": "USD_per_share"
+              }
+            ],
+            "outputs": {
+              "low": "claim_per_share",
+              "base": "claim_per_share",
+              "high": "claim_per_share"
+            }
+          },
+          "valuation_status": "bounded_estimate"
         }
       },
       {
@@ -918,13 +2036,70 @@
           "method": "net_asset_value",
           "basis": "per_share",
           "low": 1.5,
-          "base": 1.87,
-          "high": 2.2,
-          "evidence_tier": "audited",
-          "evidence": "Cash ~$3.95M plus other non-RE assets implied by total assets $58.1M less RE $54.0M.",
+          "base": 1.872,
+          "high": 2.1998,
+          "evidence_tier": "primary_derived",
+          "evidence": "10-Q Q1 2026 liquidation-basis statement of net assets; proof base 1.872/sh via net_asset_value@1.0 (GYRO/investor-documents/sec-edgar/10-Q_20260513_rpt20260331_acc0001437749_26_016537.htm).",
           "assumption_summary": "Working capital available inside the liquidation plan.",
           "cross_check": "Range must reconcile to primary filings and realization path before IC approval.",
-          "falsifier": "Cash burn through 2028 consumes more than the low-case residual."
+          "falsifier": "Cash burn through 2028 consumes more than the low-case residual.",
+          "calculation_proof": {
+            "schema_version": "1.0",
+            "method_id": "net_asset_value",
+            "method_version": "1.0",
+            "output_unit": "USD_per_share",
+            "inputs": [
+              {
+                "id": "shares_m",
+                "label": "Common shares outstanding",
+                "kind": "fact",
+                "value": 2.199308,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "GYRO/investor-documents/sec-edgar/10-Q_20260513_rpt20260331_acc0001437749_26_016537.htm",
+                  "locator": "2,199,308 shares outstanding as of 2026-05-13 cover page",
+                  "as_of": "2026-03-31"
+                },
+                "locked": true
+              }
+            ],
+            "assumptions": [
+              {
+                "id": "non_re_assets_m",
+                "label": "Cash and other non-real-estate assets",
+                "kind": "judgment",
+                "values": {
+                  "low": 3.299,
+                  "base": 4.117,
+                  "high": 4.838
+                },
+                "unit": "USD_m",
+                "rationale": "Base equals total assets $58.107M less real estate held for sale $53.990M; range allows working-capital burn before distributions.",
+                "allowed_range": {
+                  "min": 3.0,
+                  "max": 5.5
+                }
+              }
+            ],
+            "calculations": [
+              {
+                "id": "claim_per_share",
+                "label": "Cash and other non-real-estate assets per share",
+                "op": "divide",
+                "args": [
+                  "non_re_assets_m",
+                  "shares_m"
+                ],
+                "unit": "USD_per_share"
+              }
+            ],
+            "outputs": {
+              "low": "claim_per_share",
+              "base": "claim_per_share",
+              "high": "claim_per_share"
+            }
+          },
+          "valuation_status": "bounded_estimate"
         }
       },
       {
@@ -936,14 +2111,80 @@
         "valuation": {
           "method": "book_claim",
           "basis": "per_share",
-          "low": -5.2,
-          "base": -4.91,
-          "high": -4.5,
-          "evidence_tier": "audited",
-          "evidence": "Loans payable $10,790,194 / 2,199,308 shares = -$4.91.",
+          "low": -5.1998,
+          "base": -4.9062,
+          "high": -4.5001,
+          "evidence_tier": "primary_derived",
+          "evidence": "10-Q Q1 2026 liquidation-basis statement of net assets; proof base -4.9062/sh via net_asset_value@1.0 (GYRO/investor-documents/sec-edgar/10-Q_20260513_rpt20260331_acc0001437749_26_016537.htm).",
           "assumption_summary": "Contractual debt senior to equity distributions.",
           "cross_check": "Range must reconcile to primary filings and realization path before IC approval.",
-          "falsifier": "Refinancing or default increases the claim above the low case."
+          "falsifier": "Refinancing or default increases the claim above the low case.",
+          "calculation_proof": {
+            "schema_version": "1.0",
+            "method_id": "net_asset_value",
+            "method_version": "1.0",
+            "output_unit": "USD_per_share",
+            "inputs": [
+              {
+                "id": "shares_m",
+                "label": "Common shares outstanding",
+                "kind": "fact",
+                "value": 2.199308,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "GYRO/investor-documents/sec-edgar/10-Q_20260513_rpt20260331_acc0001437749_26_016537.htm",
+                  "locator": "2,199,308 shares outstanding as of 2026-05-13 cover page",
+                  "as_of": "2026-03-31"
+                },
+                "locked": true
+              }
+            ],
+            "assumptions": [
+              {
+                "id": "loans_payable_m",
+                "label": "Loans payable",
+                "kind": "judgment",
+                "values": {
+                  "low": 11.436,
+                  "base": 10.790194,
+                  "high": 9.897
+                },
+                "unit": "USD_m",
+                "rationale": "Contractual loans payable senior to equity; low case assumes refinancing stress or higher drawn balances.",
+                "allowed_range": {
+                  "min": 9.0,
+                  "max": 13.0
+                }
+              }
+            ],
+            "calculations": [
+              {
+                "id": "claim_per_share",
+                "label": "Loans payable per share",
+                "op": "divide",
+                "args": [
+                  "loans_payable_m",
+                  "shares_m"
+                ],
+                "unit": "USD_per_share"
+              },
+              {
+                "id": "value_per_share",
+                "label": "Loans payable per share (senior claim)",
+                "op": "negative",
+                "args": [
+                  "claim_per_share"
+                ],
+                "unit": "USD_per_share"
+              }
+            ],
+            "outputs": {
+              "low": "value_per_share",
+              "base": "value_per_share",
+              "high": "value_per_share"
+            }
+          },
+          "valuation_status": "bounded_estimate"
         }
       },
       {
@@ -955,14 +2196,80 @@
         "valuation": {
           "method": "realization_reserve",
           "basis": "per_share",
-          "low": -9.5,
-          "base": -7.6,
-          "high": -6.0,
-          "evidence_tier": "audited",
-          "evidence": "Estimated liquidation and operating costs net of receipts $16,709,887 / shares = -$7.60 (includes B2K $4M seller credit already).",
+          "low": -9.4998,
+          "base": -7.5978,
+          "high": -6.0001,
+          "evidence_tier": "primary_derived",
+          "evidence": "10-Q Q1 2026 liquidation-basis statement of net assets; proof base -7.5978/sh via net_asset_value@1.0 (GYRO/investor-documents/sec-edgar/10-Q_20260513_rpt20260331_acc0001437749_26_016537.htm).",
           "assumption_summary": "Management's disclosed accrual through the 2028 target date.",
           "cross_check": "Range must reconcile to primary filings and realization path before IC approval.",
-          "falsifier": "Further re-estimation (as in FY2025 NAV drop $13.91\u2192$11.76) pushes costs beyond the low case."
+          "falsifier": "Further re-estimation (as in FY2025 NAV drop $13.91\u2192$11.76) pushes costs beyond the low case.",
+          "calculation_proof": {
+            "schema_version": "1.0",
+            "method_id": "net_asset_value",
+            "method_version": "1.0",
+            "output_unit": "USD_per_share",
+            "inputs": [
+              {
+                "id": "shares_m",
+                "label": "Common shares outstanding",
+                "kind": "fact",
+                "value": 2.199308,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "GYRO/investor-documents/sec-edgar/10-Q_20260513_rpt20260331_acc0001437749_26_016537.htm",
+                  "locator": "2,199,308 shares outstanding as of 2026-05-13 cover page",
+                  "as_of": "2026-03-31"
+                },
+                "locked": true
+              }
+            ],
+            "assumptions": [
+              {
+                "id": "liquidation_costs_m",
+                "label": "Estimated liquidation and operating costs net of receipts",
+                "kind": "judgment",
+                "values": {
+                  "low": 20.893,
+                  "base": 16.709887,
+                  "high": 13.196
+                },
+                "unit": "USD_m",
+                "rationale": "Management accrual through the 2028 target date, including B2K seller credit; FY2025 already showed upward re-estimation risk.",
+                "allowed_range": {
+                  "min": 12.0,
+                  "max": 24.0
+                }
+              }
+            ],
+            "calculations": [
+              {
+                "id": "claim_per_share",
+                "label": "Estimated liquidation and operating costs net of receipts per share",
+                "op": "divide",
+                "args": [
+                  "liquidation_costs_m",
+                  "shares_m"
+                ],
+                "unit": "USD_per_share"
+              },
+              {
+                "id": "value_per_share",
+                "label": "Estimated liquidation and operating costs net of receipts per share (senior claim)",
+                "op": "negative",
+                "args": [
+                  "claim_per_share"
+                ],
+                "unit": "USD_per_share"
+              }
+            ],
+            "outputs": {
+              "low": "value_per_share",
+              "base": "value_per_share",
+              "high": "value_per_share"
+            }
+          },
+          "valuation_status": "bounded_estimate"
         }
       },
       {
@@ -974,14 +2281,80 @@
         "valuation": {
           "method": "book_claim",
           "basis": "per_share",
-          "low": -2.5,
-          "base": -2.12,
-          "high": -1.8,
-          "evidence_tier": "audited",
-          "evidence": "Total liabilities $32.18M less loans $10.79M less estimated liquidation costs $16.71M \u2248 $4.68M / shares \u2248 -$2.12.",
+          "low": -2.4999,
+          "base": -2.1293,
+          "high": -1.8001,
+          "evidence_tier": "primary_derived",
+          "evidence": "10-Q Q1 2026 liquidation-basis statement of net assets; proof base -2.1293/sh via net_asset_value@1.0 (GYRO/investor-documents/sec-edgar/10-Q_20260513_rpt20260331_acc0001437749_26_016537.htm).",
           "assumption_summary": "Remaining balance-sheet liabilities senior to equity.",
           "cross_check": "Range must reconcile to primary filings and realization path before IC approval.",
-          "falsifier": "Unmodeled claims exceed the low case."
+          "falsifier": "Unmodeled claims exceed the low case.",
+          "calculation_proof": {
+            "schema_version": "1.0",
+            "method_id": "net_asset_value",
+            "method_version": "1.0",
+            "output_unit": "USD_per_share",
+            "inputs": [
+              {
+                "id": "shares_m",
+                "label": "Common shares outstanding",
+                "kind": "fact",
+                "value": 2.199308,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "GYRO/investor-documents/sec-edgar/10-Q_20260513_rpt20260331_acc0001437749_26_016537.htm",
+                  "locator": "2,199,308 shares outstanding as of 2026-05-13 cover page",
+                  "as_of": "2026-03-31"
+                },
+                "locked": true
+              }
+            ],
+            "assumptions": [
+              {
+                "id": "other_liabilities_m",
+                "label": "Other balance-sheet liabilities",
+                "kind": "judgment",
+                "values": {
+                  "low": 5.498,
+                  "base": 4.683,
+                  "high": 3.959
+                },
+                "unit": "USD_m",
+                "rationale": "Plug of accounts payable, accrued liabilities, and tenant deposits after loans and estimated liquidation costs; reconciles to $11.79 net assets in liquidation.",
+                "allowed_range": {
+                  "min": 3.5,
+                  "max": 6.0
+                }
+              }
+            ],
+            "calculations": [
+              {
+                "id": "claim_per_share",
+                "label": "Other balance-sheet liabilities per share",
+                "op": "divide",
+                "args": [
+                  "other_liabilities_m",
+                  "shares_m"
+                ],
+                "unit": "USD_per_share"
+              },
+              {
+                "id": "value_per_share",
+                "label": "Other balance-sheet liabilities per share (senior claim)",
+                "op": "negative",
+                "args": [
+                  "claim_per_share"
+                ],
+                "unit": "USD_per_share"
+              }
+            ],
+            "outputs": {
+              "low": "value_per_share",
+              "base": "value_per_share",
+              "high": "value_per_share"
+            }
+          },
+          "valuation_status": "bounded_estimate"
         }
       },
       {
@@ -1102,8 +2475,65 @@
         "treatment": "additive",
         "included_in_component_id": null,
         "method": "liquidation_nav",
-        "evidence_tier": "audited",
-        "evidence": "10-Q Q1 2026: real estate held for sale $53,990,000 / 2,199,308 shares = $24.55. Liquidation-basis already marks to estimated NRV (includes B2K $28.74M gross assumption).",
+        "valuation_status": "bounded_estimate",
+        "calculation_proof": {
+          "schema_version": "1.0",
+          "method_id": "net_asset_value",
+          "method_version": "1.0",
+          "output_unit": "USD_per_share",
+          "inputs": [
+            {
+              "id": "shares_m",
+              "label": "Common shares outstanding",
+              "kind": "fact",
+              "value": 2.199308,
+              "unit": "million_shares",
+              "source": {
+                "ref": "GYRO/investor-documents/sec-edgar/10-Q_20260513_rpt20260331_acc0001437749_26_016537.htm",
+                "locator": "2,199,308 shares outstanding as of 2026-05-13 cover page",
+                "as_of": "2026-03-31"
+              },
+              "locked": true
+            }
+          ],
+          "assumptions": [
+            {
+              "id": "real_estate_nrv_m",
+              "label": "Real estate held for sale at estimated NRV",
+              "kind": "judgment",
+              "values": {
+                "low": 48.385,
+                "base": 53.99,
+                "high": 59.381
+              },
+              "unit": "USD_m",
+              "rationale": "Base is filing liquidation-basis NRV including the B2K $28.74M gross assumption; low/high bound entitlement or forced-sale re-marks.",
+              "allowed_range": {
+                "min": 45.0,
+                "max": 65.0
+              }
+            }
+          ],
+          "calculations": [
+            {
+              "id": "claim_per_share",
+              "label": "Real estate held for sale at estimated NRV per share",
+              "op": "divide",
+              "args": [
+                "real_estate_nrv_m",
+                "shares_m"
+              ],
+              "unit": "USD_per_share"
+            }
+          ],
+          "outputs": {
+            "low": "claim_per_share",
+            "base": "claim_per_share",
+            "high": "claim_per_share"
+          }
+        },
+        "evidence_tier": "primary_derived",
+        "evidence": "10-Q Q1 2026 liquidation-basis statement of net assets; proof base 24.5486/sh via net_asset_value@1.0 (GYRO/investor-documents/sec-edgar/10-Q_20260513_rpt20260331_acc0001437749_26_016537.htm).",
         "cross_check": "Range must reconcile to primary filings and realization path before IC approval.",
         "driver_model_type": null,
         "driver_model": null,
@@ -1122,8 +2552,65 @@
         "treatment": "additive",
         "included_in_component_id": null,
         "method": "net_asset_value",
-        "evidence_tier": "audited",
-        "evidence": "Cash ~$3.95M plus other non-RE assets implied by total assets $58.1M less RE $54.0M.",
+        "valuation_status": "bounded_estimate",
+        "calculation_proof": {
+          "schema_version": "1.0",
+          "method_id": "net_asset_value",
+          "method_version": "1.0",
+          "output_unit": "USD_per_share",
+          "inputs": [
+            {
+              "id": "shares_m",
+              "label": "Common shares outstanding",
+              "kind": "fact",
+              "value": 2.199308,
+              "unit": "million_shares",
+              "source": {
+                "ref": "GYRO/investor-documents/sec-edgar/10-Q_20260513_rpt20260331_acc0001437749_26_016537.htm",
+                "locator": "2,199,308 shares outstanding as of 2026-05-13 cover page",
+                "as_of": "2026-03-31"
+              },
+              "locked": true
+            }
+          ],
+          "assumptions": [
+            {
+              "id": "non_re_assets_m",
+              "label": "Cash and other non-real-estate assets",
+              "kind": "judgment",
+              "values": {
+                "low": 3.299,
+                "base": 4.117,
+                "high": 4.838
+              },
+              "unit": "USD_m",
+              "rationale": "Base equals total assets $58.107M less real estate held for sale $53.990M; range allows working-capital burn before distributions.",
+              "allowed_range": {
+                "min": 3.0,
+                "max": 5.5
+              }
+            }
+          ],
+          "calculations": [
+            {
+              "id": "claim_per_share",
+              "label": "Cash and other non-real-estate assets per share",
+              "op": "divide",
+              "args": [
+                "non_re_assets_m",
+                "shares_m"
+              ],
+              "unit": "USD_per_share"
+            }
+          ],
+          "outputs": {
+            "low": "claim_per_share",
+            "base": "claim_per_share",
+            "high": "claim_per_share"
+          }
+        },
+        "evidence_tier": "primary_derived",
+        "evidence": "10-Q Q1 2026 liquidation-basis statement of net assets; proof base 1.872/sh via net_asset_value@1.0 (GYRO/investor-documents/sec-edgar/10-Q_20260513_rpt20260331_acc0001437749_26_016537.htm).",
         "cross_check": "Range must reconcile to primary filings and realization path before IC approval.",
         "driver_model_type": null,
         "driver_model": null,
@@ -1142,8 +2629,74 @@
         "treatment": "additive",
         "included_in_component_id": null,
         "method": "book_claim",
-        "evidence_tier": "audited",
-        "evidence": "Loans payable $10,790,194 / 2,199,308 shares = -$4.91.",
+        "valuation_status": "bounded_estimate",
+        "calculation_proof": {
+          "schema_version": "1.0",
+          "method_id": "net_asset_value",
+          "method_version": "1.0",
+          "output_unit": "USD_per_share",
+          "inputs": [
+            {
+              "id": "shares_m",
+              "label": "Common shares outstanding",
+              "kind": "fact",
+              "value": 2.199308,
+              "unit": "million_shares",
+              "source": {
+                "ref": "GYRO/investor-documents/sec-edgar/10-Q_20260513_rpt20260331_acc0001437749_26_016537.htm",
+                "locator": "2,199,308 shares outstanding as of 2026-05-13 cover page",
+                "as_of": "2026-03-31"
+              },
+              "locked": true
+            }
+          ],
+          "assumptions": [
+            {
+              "id": "loans_payable_m",
+              "label": "Loans payable",
+              "kind": "judgment",
+              "values": {
+                "low": 11.436,
+                "base": 10.790194,
+                "high": 9.897
+              },
+              "unit": "USD_m",
+              "rationale": "Contractual loans payable senior to equity; low case assumes refinancing stress or higher drawn balances.",
+              "allowed_range": {
+                "min": 9.0,
+                "max": 13.0
+              }
+            }
+          ],
+          "calculations": [
+            {
+              "id": "claim_per_share",
+              "label": "Loans payable per share",
+              "op": "divide",
+              "args": [
+                "loans_payable_m",
+                "shares_m"
+              ],
+              "unit": "USD_per_share"
+            },
+            {
+              "id": "value_per_share",
+              "label": "Loans payable per share (senior claim)",
+              "op": "negative",
+              "args": [
+                "claim_per_share"
+              ],
+              "unit": "USD_per_share"
+            }
+          ],
+          "outputs": {
+            "low": "value_per_share",
+            "base": "value_per_share",
+            "high": "value_per_share"
+          }
+        },
+        "evidence_tier": "primary_derived",
+        "evidence": "10-Q Q1 2026 liquidation-basis statement of net assets; proof base -4.9062/sh via net_asset_value@1.0 (GYRO/investor-documents/sec-edgar/10-Q_20260513_rpt20260331_acc0001437749_26_016537.htm).",
         "cross_check": "Range must reconcile to primary filings and realization path before IC approval.",
         "driver_model_type": null,
         "driver_model": null,
@@ -1162,8 +2715,74 @@
         "treatment": "additive",
         "included_in_component_id": null,
         "method": "realization_reserve",
-        "evidence_tier": "audited",
-        "evidence": "Estimated liquidation and operating costs net of receipts $16,709,887 / shares = -$7.60 (includes B2K $4M seller credit already).",
+        "valuation_status": "bounded_estimate",
+        "calculation_proof": {
+          "schema_version": "1.0",
+          "method_id": "net_asset_value",
+          "method_version": "1.0",
+          "output_unit": "USD_per_share",
+          "inputs": [
+            {
+              "id": "shares_m",
+              "label": "Common shares outstanding",
+              "kind": "fact",
+              "value": 2.199308,
+              "unit": "million_shares",
+              "source": {
+                "ref": "GYRO/investor-documents/sec-edgar/10-Q_20260513_rpt20260331_acc0001437749_26_016537.htm",
+                "locator": "2,199,308 shares outstanding as of 2026-05-13 cover page",
+                "as_of": "2026-03-31"
+              },
+              "locked": true
+            }
+          ],
+          "assumptions": [
+            {
+              "id": "liquidation_costs_m",
+              "label": "Estimated liquidation and operating costs net of receipts",
+              "kind": "judgment",
+              "values": {
+                "low": 20.893,
+                "base": 16.709887,
+                "high": 13.196
+              },
+              "unit": "USD_m",
+              "rationale": "Management accrual through the 2028 target date, including B2K seller credit; FY2025 already showed upward re-estimation risk.",
+              "allowed_range": {
+                "min": 12.0,
+                "max": 24.0
+              }
+            }
+          ],
+          "calculations": [
+            {
+              "id": "claim_per_share",
+              "label": "Estimated liquidation and operating costs net of receipts per share",
+              "op": "divide",
+              "args": [
+                "liquidation_costs_m",
+                "shares_m"
+              ],
+              "unit": "USD_per_share"
+            },
+            {
+              "id": "value_per_share",
+              "label": "Estimated liquidation and operating costs net of receipts per share (senior claim)",
+              "op": "negative",
+              "args": [
+                "claim_per_share"
+              ],
+              "unit": "USD_per_share"
+            }
+          ],
+          "outputs": {
+            "low": "value_per_share",
+            "base": "value_per_share",
+            "high": "value_per_share"
+          }
+        },
+        "evidence_tier": "primary_derived",
+        "evidence": "10-Q Q1 2026 liquidation-basis statement of net assets; proof base -7.5978/sh via net_asset_value@1.0 (GYRO/investor-documents/sec-edgar/10-Q_20260513_rpt20260331_acc0001437749_26_016537.htm).",
         "cross_check": "Range must reconcile to primary filings and realization path before IC approval.",
         "driver_model_type": null,
         "driver_model": null,
@@ -1182,8 +2801,74 @@
         "treatment": "additive",
         "included_in_component_id": null,
         "method": "book_claim",
-        "evidence_tier": "audited",
-        "evidence": "Total liabilities $32.18M less loans $10.79M less estimated liquidation costs $16.71M \u2248 $4.68M / shares \u2248 -$2.12.",
+        "valuation_status": "bounded_estimate",
+        "calculation_proof": {
+          "schema_version": "1.0",
+          "method_id": "net_asset_value",
+          "method_version": "1.0",
+          "output_unit": "USD_per_share",
+          "inputs": [
+            {
+              "id": "shares_m",
+              "label": "Common shares outstanding",
+              "kind": "fact",
+              "value": 2.199308,
+              "unit": "million_shares",
+              "source": {
+                "ref": "GYRO/investor-documents/sec-edgar/10-Q_20260513_rpt20260331_acc0001437749_26_016537.htm",
+                "locator": "2,199,308 shares outstanding as of 2026-05-13 cover page",
+                "as_of": "2026-03-31"
+              },
+              "locked": true
+            }
+          ],
+          "assumptions": [
+            {
+              "id": "other_liabilities_m",
+              "label": "Other balance-sheet liabilities",
+              "kind": "judgment",
+              "values": {
+                "low": 5.498,
+                "base": 4.683,
+                "high": 3.959
+              },
+              "unit": "USD_m",
+              "rationale": "Plug of accounts payable, accrued liabilities, and tenant deposits after loans and estimated liquidation costs; reconciles to $11.79 net assets in liquidation.",
+              "allowed_range": {
+                "min": 3.5,
+                "max": 6.0
+              }
+            }
+          ],
+          "calculations": [
+            {
+              "id": "claim_per_share",
+              "label": "Other balance-sheet liabilities per share",
+              "op": "divide",
+              "args": [
+                "other_liabilities_m",
+                "shares_m"
+              ],
+              "unit": "USD_per_share"
+            },
+            {
+              "id": "value_per_share",
+              "label": "Other balance-sheet liabilities per share (senior claim)",
+              "op": "negative",
+              "args": [
+                "claim_per_share"
+              ],
+              "unit": "USD_per_share"
+            }
+          ],
+          "outputs": {
+            "low": "value_per_share",
+            "base": "value_per_share",
+            "high": "value_per_share"
+          }
+        },
+        "evidence_tier": "primary_derived",
+        "evidence": "10-Q Q1 2026 liquidation-basis statement of net assets; proof base -2.1293/sh via net_asset_value@1.0 (GYRO/investor-documents/sec-edgar/10-Q_20260513_rpt20260331_acc0001437749_26_016537.htm).",
         "cross_check": "Range must reconcile to primary filings and realization path before IC approval.",
         "driver_model_type": null,
         "driver_model": null,
@@ -1191,7 +2876,7 @@
         "falsifier": "Unmodeled claims exceed the low case.",
         "scenario_assumptions": null,
         "low_per_share": -2.5,
-        "base_per_share": -2.12,
+        "base_per_share": -2.13,
         "high_per_share": -1.8
       }
     ],
@@ -1204,6 +2889,8 @@
         "treatment": "embedded",
         "included_in_component_id": "real_estate_nrv",
         "method": "milestone_project_option",
+        "valuation_status": null,
+        "calculation_proof": null,
         "evidence_tier": "filing",
         "evidence": "B2K agreement $24.0\u2013$28.74M on ~49 acres; base NRV already uses $28.74M. Embedded so not added twice; high case is premium to current NRV if entitlements exceed the plan.",
         "cross_check": "Range must reconcile to primary filings and realization path before IC approval.",
@@ -1219,7 +2906,7 @@
     ],
     "total_equity_value_per_share": {
       "low": 6.3,
-      "base": 11.79,
+      "base": 11.78,
       "high": 16.9
     },
     "material_component_count": 6,
@@ -1228,7 +2915,7 @@
     "market_price_per_share": 5.8,
     "upside_downside_pct": {
       "low": 8.6,
-      "base": 103.3,
+      "base": 103.1,
       "high": 191.4
     }
   },
@@ -1263,7 +2950,7 @@
     "gross_comparable_nav_per_share": null,
     "risked_present_value_per_share": {
       "low": 6.3,
-      "base": 11.79,
+      "base": 11.78,
       "high": 16.9
     },
     "component_groups": [
@@ -1348,7 +3035,7 @@
         "overlap_control": "Unique overlap key other_liabilities; no other component capitalizes the same claim.",
         "risked_present_value_per_share": {
           "low": -2.5,
-          "base": -2.12,
+          "base": -2.13,
           "high": -1.8
         }
       }
@@ -1362,8 +3049,8 @@
           "unit": "per-share economic claim"
         },
         "method": "liquidation_nav",
-        "evidence_tier": "audited",
-        "evidence": "10-Q Q1 2026: real estate held for sale $53,990,000 / 2,199,308 shares = $24.55. Liquidation-basis already marks to estimated NRV (includes B2K $28.74M gross assumption).",
+        "evidence_tier": "primary_derived",
+        "evidence": "10-Q Q1 2026 liquidation-basis statement of net assets; proof base 24.5486/sh via net_asset_value@1.0 (GYRO/investor-documents/sec-edgar/10-Q_20260513_rpt20260331_acc0001437749_26_016537.htm).",
         "comparable_role": "not_applicable",
         "comparable_ids": [],
         "adjustment": "Entitlement and sale timing sit in the range. Embedded option documented in component_valuation with treatment=embedded.",
@@ -1386,8 +3073,8 @@
           "unit": "per-share economic claim"
         },
         "method": "net_asset_value",
-        "evidence_tier": "audited",
-        "evidence": "Cash ~$3.95M plus other non-RE assets implied by total assets $58.1M less RE $54.0M.",
+        "evidence_tier": "primary_derived",
+        "evidence": "10-Q Q1 2026 liquidation-basis statement of net assets; proof base 1.872/sh via net_asset_value@1.0 (GYRO/investor-documents/sec-edgar/10-Q_20260513_rpt20260331_acc0001437749_26_016537.htm).",
         "comparable_role": "not_applicable",
         "comparable_ids": [],
         "adjustment": "Burn through 2028 is partly in the cost accrual.",
@@ -1410,8 +3097,8 @@
           "unit": "per-share economic claim"
         },
         "method": "book_claim",
-        "evidence_tier": "audited",
-        "evidence": "Loans payable $10,790,194 / 2,199,308 shares = -$4.91.",
+        "evidence_tier": "primary_derived",
+        "evidence": "10-Q Q1 2026 liquidation-basis statement of net assets; proof base -4.9062/sh via net_asset_value@1.0 (GYRO/investor-documents/sec-edgar/10-Q_20260513_rpt20260331_acc0001437749_26_016537.htm).",
         "comparable_role": "not_applicable",
         "comparable_ids": [],
         "adjustment": "Senior to equity distributions.",
@@ -1434,8 +3121,8 @@
           "unit": "per-share economic claim"
         },
         "method": "realization_reserve",
-        "evidence_tier": "audited",
-        "evidence": "Estimated liquidation and operating costs net of receipts $16,709,887 / shares = -$7.60 (includes B2K $4M seller credit already).",
+        "evidence_tier": "primary_derived",
+        "evidence": "10-Q Q1 2026 liquidation-basis statement of net assets; proof base -7.5978/sh via net_asset_value@1.0 (GYRO/investor-documents/sec-edgar/10-Q_20260513_rpt20260331_acc0001437749_26_016537.htm).",
         "comparable_role": "not_applicable",
         "comparable_ids": [],
         "adjustment": "Includes B2K seller credit.",
@@ -1458,14 +3145,14 @@
           "unit": "per-share economic claim"
         },
         "method": "book_claim",
-        "evidence_tier": "audited",
-        "evidence": "Total liabilities $32.18M less loans $10.79M less estimated liquidation costs $16.71M \u2248 $4.68M / shares \u2248 -$2.12.",
+        "evidence_tier": "primary_derived",
+        "evidence": "10-Q Q1 2026 liquidation-basis statement of net assets; proof base -2.1293/sh via net_asset_value@1.0 (GYRO/investor-documents/sec-edgar/10-Q_20260513_rpt20260331_acc0001437749_26_016537.htm).",
         "comparable_role": "not_applicable",
         "comparable_ids": [],
         "adjustment": "Plug to reconcile to $11.79 net assets.",
         "range_per_share": {
           "low": -2.5,
-          "base": -2.12,
+          "base": -2.13,
           "high": -1.8
         },
         "treatment": "additive",
@@ -1531,7 +3218,7 @@
           "high": 27.0
         },
         "range_width_pct_of_base": 20.4,
-        "evidence_tier": "audited",
+        "evidence_tier": "primary_derived",
         "recommended_raters": [
           "greenblatt",
           "marks_credit_cycle"
@@ -1557,7 +3244,7 @@
           "high": 2.2
         },
         "range_width_pct_of_base": 37.4,
-        "evidence_tier": "audited",
+        "evidence_tier": "primary_derived",
         "recommended_raters": [
           "greenblatt",
           "marks_credit_cycle"
@@ -1583,7 +3270,7 @@
           "high": -4.5
         },
         "range_width_pct_of_base": 14.3,
-        "evidence_tier": "audited",
+        "evidence_tier": "primary_derived",
         "recommended_raters": [
           "marks_credit_cycle",
           "pabrai"
@@ -1609,7 +3296,7 @@
           "high": -6.0
         },
         "range_width_pct_of_base": 46.1,
-        "evidence_tier": "audited",
+        "evidence_tier": "primary_derived",
         "recommended_raters": [
           "marks_credit_cycle",
           "pabrai"
@@ -1631,11 +3318,11 @@
         "treatment": "additive",
         "range_per_share": {
           "low": -2.5,
-          "base": -2.12,
+          "base": -2.13,
           "high": -1.8
         },
-        "range_width_pct_of_base": 33.0,
-        "evidence_tier": "audited",
+        "range_width_pct_of_base": 32.9,
+        "evidence_tier": "primary_derived",
         "recommended_raters": [
           "marks_credit_cycle",
           "pabrai"
@@ -1680,7 +3367,7 @@
     ]
   },
   "context_overlay": {
-    "as_of": "2026-07-20",
+    "as_of": "2026-07-21",
     "disclaimer": "Context only. Tailwinds inform stance and overlay sizing; they do not auto-inflate Lawrence base IRR. Promotion to base case requires [HUMAN REVIEW].",
     "themes": [
       {
@@ -1690,9 +3377,9 @@
           {
             "id": "hy_oas",
             "label": "High-yield OAS credit spread (%)",
-            "latest": 1.3,
+            "latest": 1.43,
             "as_of": "2026-07-20",
-            "yoy_pct": 217.1,
+            "yoy_pct": 248.8,
             "direction": "up",
             "good_for": "risk_regime",
             "source": "spread:HYG-LQD:21d (HYG-LQD 1m spread proxy, not OAS)",
@@ -1702,9 +3389,9 @@
           {
             "id": "ust_10y",
             "label": "US Treasury 10Y yield (%)",
-            "latest": 4.579999923706055,
+            "latest": 4.5980000495910645,
             "as_of": "2026-07-20",
-            "yoy_pct": 4.8,
+            "yoy_pct": 5.2,
             "direction": "up",
             "good_for": "rates_regime",
             "source": "yahoo:^TNX",
@@ -1714,9 +3401,9 @@
           {
             "id": "ust_2y",
             "label": "US Treasury 2Y yield (%)",
-            "latest": 4.314000129699707,
+            "latest": 4.328000068664551,
             "as_of": "2026-07-20",
-            "yoy_pct": 10.4,
+            "yoy_pct": 10.7,
             "direction": "up",
             "good_for": "rates_regime",
             "source": "yahoo:^FVX",
@@ -1726,8 +3413,8 @@
           {
             "id": "dxy_broad",
             "label": "Trade-weighted USD index (broad)",
-            "latest": 100.93699645996094,
-            "as_of": "2026-07-20",
+            "latest": 100.99500274658203,
+            "as_of": "2026-07-21",
             "yoy_pct": 3.2,
             "direction": "up",
             "good_for": "dollar_regime",
@@ -1738,9 +3425,9 @@
           {
             "id": "vix_level",
             "label": "VIX index level",
-            "latest": 18.280000686645508,
+            "latest": 18.649999618530273,
             "as_of": "2026-07-20",
-            "yoy_pct": 9.8,
+            "yoy_pct": 12.0,
             "direction": "up",
             "good_for": "vol_regime",
             "source": "yahoo:^VIX",
@@ -1750,9 +3437,9 @@
           {
             "id": "credit_impulse_1m",
             "label": "HYG vs TLT 1-month return spread (%)",
-            "latest": 2.52,
+            "latest": 2.76,
             "as_of": "2026-07-20",
-            "yoy_pct": 42.4,
+            "yoy_pct": 55.9,
             "direction": "up",
             "good_for": "credit_impulse",
             "source": "spread:HYG-TLT:21d",
@@ -1762,9 +3449,9 @@
           {
             "id": "spy_20d_realized_vol",
             "label": "SPY 20-day realized vol (annualized %)",
-            "latest": 11.39,
+            "latest": 11.37,
             "as_of": "2026-07-20",
-            "yoy_pct": 31.5,
+            "yoy_pct": 31.3,
             "direction": "up",
             "good_for": "equity_vol",
             "source": "realized_vol:SPY:20d",
@@ -1776,7 +3463,7 @@
     ]
   },
   "insider_signal": {
-    "as_of": "2026-07-20",
+    "as_of": "2026-07-21",
     "disclaimer": "Context only. Insider activity informs scenario confidence and stance discussion; it does not auto-inflate Lawrence base IRR. Promotion requires [HUMAN REVIEW].",
     "in_base_irr": false,
     "window_days": 365,
@@ -1838,5 +3525,97 @@
     ],
     "narrative_hooks": [],
     "transaction_count": 3
+  },
+  "total_return_panel": {
+    "schema_version": "3.0",
+    "ticker": "GYRO",
+    "as_of": "2026-07-21",
+    "status": "partial",
+    "error": "Vendor events are discovery evidence; primary-source completeness has not been established.",
+    "price_source": "yahoo:GYRO",
+    "currency": "USD",
+    "return_currency": "USD",
+    "fx_basis": "listing_currency_nominal",
+    "history_start": "1995-08-18",
+    "history_end": "2026-07-20",
+    "price_points": 7779,
+    "price_interval": "1d",
+    "history_basis": "earliest_available_vendor_trading_history",
+    "chart_scale": "logarithmic",
+    "chart_y_axis": "cumulative_return_pct",
+    "chart_series": [
+      "total_return",
+      "price_only"
+    ],
+    "return_contract": "split-adjusted close excluding dividends; event amounts normalized for later splits; cash reinvested at ex-date close; pre-tax nominal",
+    "coverage": {
+      "status": "vendor_only",
+      "start": null,
+      "end": null,
+      "note": "Vendor events are discovery evidence; primary-source completeness has not been established.",
+      "ledger_path": null
+    },
+    "event_count": 9,
+    "event_counts": {
+      "split": 2,
+      "regular_dividend": 7
+    },
+    "cash_distributions_on_initial_share_path": 108108.6416,
+    "distribution_contribution_by_type": {
+      "regular_dividend": 108108.641646
+    },
+    "cumulative_distributions_per_share": 108108.6416,
+    "start_price": 155.303,
+    "end_price": 5.85,
+    "price_index_end": 3.77,
+    "total_return_index_end": 5525.65,
+    "cumulative_price_return_pct": -96.23,
+    "cumulative_total_return_pct": 5425.65,
+    "price_only_annualized_pct": -10.06,
+    "total_return_annualized_pct": 13.85,
+    "market_cap_m": 12.76,
+    "shares_outstanding": 2199308,
+    "price_for_market_cap": 5.8,
+    "chart": "GYRO/research/charts/total_return_2026-07-21.svg",
+    "panel_json": "GYRO/research/total_return_panel.json"
+  },
+  "lens_consensus": {
+    "as_of": "2026-07-21",
+    "shared_inputs_ref": "valuation.json@2026-07-21",
+    "valuation_richness": 0.0,
+    "blended_return_pct": 27.52,
+    "band_pct": [
+      13.5,
+      33.4
+    ],
+    "weighted_median_pct": 33.4,
+    "median_mean_flag": true,
+    "stance": "accumulate",
+    "agreement_pct": 73,
+    "dissent_count": 2,
+    "lawrence_divergence": false,
+    "top_dissents": [
+      {
+        "persona": "pabrai",
+        "label": "Mohnish Pabrai",
+        "verdict": "watch",
+        "return_pct": 13.5,
+        "key_metric": "downside_upside_ratio=0.329",
+        "conviction": 0.075,
+        "falsifier": "dhando -> none OR net-debt/EBITDA > 3 OR bear return < -15%"
+      },
+      {
+        "persona": "munger",
+        "label": "Charlie Munger",
+        "verdict": "hold",
+        "return_pct": 13.5,
+        "key_metric": "moat=n/a",
+        "conviction": 0.075,
+        "falsifier": "Moat eroding/unproven or irr_method pending"
+      }
+    ],
+    "contributor_count": 9,
+    "in_base_irr": false,
+    "disclaimer": "Advisory lens blend only. Does not replace Lawrence total-synthesis stance gate without [HUMAN REVIEW]."
   }
 }
