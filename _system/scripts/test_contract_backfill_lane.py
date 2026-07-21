@@ -87,7 +87,7 @@ class ContractBackfillLaneTests(unittest.TestCase):
             )
         )
         self.assertIn("contract_backfill", policy["consumers"]["marvin_research"]["allowed_reasons"])
-        self.assertEqual(policy["consumers"]["marvin_contract_backfill"]["daily_repo_limit"], 20)
+        self.assertEqual(policy["consumers"]["marvin_contract_backfill"]["daily_repo_limit"], 50)
         model = llm_call_gate.resolve_model(policy, "marvin_contract_backfill", reason="contract_backfill")
         self.assertEqual(model, policy["model_ladder"]["default_model"])
 
