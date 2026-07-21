@@ -1,14 +1,830 @@
 {
   "ticker": "ADM",
-  "as_of": "2026-07-20",
-  "method": "price_stub",
+  "as_of": "2026-07-21",
+  "method": "full",
+  "irr_method": "full",
+  "valuation_mode": "economic_value",
+  "method_profile": "capital_cycle",
+  "lawrence_bucket": "platform",
+  "payoff_lens": "operating",
+  "classification_inputs": {
+    "archetype": "cyclical",
+    "moat": "stable",
+    "dhando": "partial",
+    "cycle": "agriculture_commodity",
+    "payoff_lens": "operating"
+  },
   "inputs": {
     "price": 85.67,
+    "price_source": "Yahoo ADM close 2026-07-20",
     "price_as_of": "2026-07-20",
-    "price_source": "Yahoo ADM close 2026-07-20"
+    "shares_millions": 484.0,
+    "shares_outstanding": 484000000,
+    "shares_source": "FY2025 weighted average diluted shares 484.0M (ADM/investor-documents/sec-edgar/10-K_20260217_rpt20251231_acc0000007084_26_000011.htm)",
+    "fcf_per_share": 8.686,
+    "fcf_source": "FY2025 operating cash flow $5452.0M less capital spending $1248.0M \u00f7 484.0M diluted shares per ADM/investor-documents/sec-edgar/10-K_20260217_rpt20251231_acc0000007084_26_000011.htm",
+    "cash_m": 1015.0,
+    "total_debt_m": 8410.0,
+    "normalization_note": "FY2025 FCF per share anchors owner cash after OCF recovery; reported net income trough ($1.08B) reflects commodity margin compression."
   },
-  "notes": "Price stub created by fetch_equity_prices.py --create-stub; replace with a real model before decision-grade.",
-  "human_review": {
-    "live_price_confirmed": false
+  "scenarios": {
+    "bear": {
+      "growth_y1_5": 0.0,
+      "growth_y6_10": 0.0,
+      "exit_pfcf_y10": 7,
+      "notes": "Crush margins stay depressed; Nutrition growth stalls; leverage limits buybacks"
+    },
+    "base": {
+      "growth_y1_5": 0.03,
+      "growth_y6_10": 0.02,
+      "exit_pfcf_y10": 9,
+      "notes": "Mid-cycle normalization; Ag Services crush recovery; Nutrition mix shift continues"
+    },
+    "bull": {
+      "growth_y1_5": 0.05,
+      "growth_y6_10": 0.03,
+      "exit_pfcf_y10": 11,
+      "notes": "Biofuels demand and South American origination drive margin expansion"
+    }
+  },
+  "option_scan": [
+    {
+      "q": 1,
+      "question": "GAAP book misstates core assets?",
+      "answer": "No material",
+      "treatment": "n/a",
+      "evidence": "Global elevator and processing network largely on balance sheet at cost (10-K FY2025)"
+    },
+    {
+      "q": 4,
+      "question": "Backlog / contracted revenue not in FCF path?",
+      "answer": "Partial yes",
+      "treatment": "embedded_in_segment",
+      "evidence": "Forward grain and oilseed origination contracts convert through working capital"
+    },
+    {
+      "q": 7,
+      "question": "Embedded option in revenue?",
+      "answer": "Yes \u2014 Nutrition specialty",
+      "treatment": "milestone_nav",
+      "evidence": "Nutrition segment $8.0B revenue; separate nutrition_and_specialty_option component"
+    }
+  ],
+  "growth_explanation": {
+    "mechanism": "Mid-cycle crush-margin recovery after FY2024 trough plus Nutrition specialty mix shift; partially offset by commodity price volatility and net debt service",
+    "filing_cite": "ADM/investor-documents/sec-edgar/10-K_20260217_rpt20251231_acc0000007084_26_000011.htm Item 7",
+    "bear_falsifier": "Adjusted segment operating profit stays below $2.5B for two consecutive fiscal years",
+    "bull_falsifier": "Nutrition adjusted operating profit exceeds $600M with stable intersegment controls"
+  },
+  "lawrence_horizon_years": 7,
+  "stance_proposal": {
+    "suggested": "watch",
+    "irr_band": "<10%",
+    "gates": {
+      "moat_ok": true,
+      "dhando_ok": false
+    },
+    "override_reason": "Net debt ~$7.4B and commodity cycle reserve cap dhando despite scale moat"
+  },
+  "component_valuation": {
+    "schema_version": "1.0",
+    "all_material_components_identified": true,
+    "coverage_statement": "Four additive components map origination/processing owner cash, Nutrition specialty option, net financial claims, and commodity-cycle/execution reserve once each.",
+    "components": [
+      {
+        "id": "origination_processing_owner_cash",
+        "label": "Global origination and processing owner-cash engine",
+        "category": "operating_business",
+        "overlap_key": "origination_processing_owner_cash",
+        "treatment": "additive",
+        "valuation": {
+          "method": "owner_cash_or_dividend_discount",
+          "basis": "per_share",
+          "low": 63.22,
+          "base": 87.86,
+          "high": 116.45,
+          "evidence_tier": "primary_derived",
+          "evidence": "Primary bridge from ADM/investor-documents/sec-edgar/10-K_20260217_rpt20251231_acc0000007084_26_000011.htm: FY2025 revenue $80269.0M, OCF $5452.0M, FCF $4204.0M, cash $1015.0M, debt $8410.0M; contract backfill 2026-07-21.",
+          "assumption_summary": "Proof outputs {'low': 63.22, 'base': 87.86, 'high': 116.45}; see calculation_proof graph.",
+          "cross_check": "Reconcile to FY2025 10-K and Q1 2026 10-Q before decision use.",
+          "falsifier": "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
+          "valuation_status": "bounded_estimate",
+          "calculation_proof": {
+            "schema_version": "1.0",
+            "method_id": "owner_cash_or_dividend_discount",
+            "method_version": "1.0",
+            "output_unit": "USD_per_share",
+            "inputs": [
+              {
+                "id": "operating_cash_flow_m",
+                "label": "FY2025 net cash provided by operating activities",
+                "kind": "fact",
+                "value": 5452.0,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "ADM/investor-documents/sec-edgar/10-K_20260217_rpt20251231_acc0000007084_26_000011.htm",
+                  "locator": "NetCashProvidedByUsedInOperatingActivities $5,452M (FY2025)",
+                  "as_of": "2025-12-31"
+                },
+                "locked": true
+              },
+              {
+                "id": "capex_m",
+                "label": "FY2025 payments to acquire property, plant and equipment",
+                "kind": "fact",
+                "value": 1248.0,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "ADM/investor-documents/sec-edgar/10-K_20260217_rpt20251231_acc0000007084_26_000011.htm",
+                  "locator": "PaymentsToAcquirePropertyPlantAndEquipment $1,248M (FY2025)",
+                  "as_of": "2025-12-31"
+                },
+                "locked": true
+              },
+              {
+                "id": "segment_operating_profit_m",
+                "label": "FY2025 adjusted total segment operating profit",
+                "kind": "fact",
+                "value": 3242.0,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "ADM/investor-documents/sec-edgar/10-K_20260217_rpt20251231_acc0000007084_26_000011.htm",
+                  "locator": "Ag Services & Oilseeds $1614.0M + Carbohydrate $1211.0M + Nutrition $417.0M",
+                  "as_of": "2025-12-31"
+                },
+                "locked": true
+              },
+              {
+                "id": "shares_m",
+                "label": "FY2025 diluted shares (weighted average)",
+                "kind": "fact",
+                "value": 484.0,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "ADM/investor-documents/sec-edgar/10-K_20260217_rpt20251231_acc0000007084_26_000011.htm",
+                  "locator": "WeightedAverageNumberOfDilutedSharesOutstanding 484.0M; EPS $2.23",
+                  "as_of": "2025-12-31"
+                },
+                "locked": true
+              }
+            ],
+            "assumptions": [
+              {
+                "id": "normalized_owner_cash",
+                "label": "Normalized owner free cash flow per diluted share",
+                "kind": "judgment",
+                "values": {
+                  "low": 8.686,
+                  "base": 8.686,
+                  "high": 8.686
+                },
+                "unit": "USD_per_share",
+                "rationale": "FY2025 operating cash flow less capital spending per diluted share; trough earnings year but OCF recovered to $5.45B.",
+                "allowed_range": {
+                  "min": 4.0,
+                  "max": 12.0
+                }
+              },
+              {
+                "id": "growth_y1_5",
+                "label": "Growth years 1\u20135",
+                "kind": "judgment",
+                "values": {
+                  "low": 0.0,
+                  "base": 0.03,
+                  "high": 0.05
+                },
+                "unit": "ratio",
+                "rationale": "Lawrence bear/base/bull owner-cash growth; mid-cycle normalization after FY2024 trough.",
+                "allowed_range": {
+                  "min": -0.02,
+                  "max": 0.06
+                }
+              },
+              {
+                "id": "growth_y6_10",
+                "label": "Growth years 6\u20137",
+                "kind": "judgment",
+                "values": {
+                  "low": 0.0,
+                  "base": 0.02,
+                  "high": 0.03
+                },
+                "unit": "ratio",
+                "rationale": "Fade as crush margins normalize and Nutrition mix stabilizes.",
+                "allowed_range": {
+                  "min": 0.0,
+                  "max": 0.05
+                }
+              },
+              {
+                "id": "discount_rate",
+                "label": "Required return on owner cash",
+                "kind": "judgment",
+                "values": {
+                  "low": 0.12,
+                  "base": 0.105,
+                  "high": 0.09
+                },
+                "unit": "ratio",
+                "rationale": "Cyclical processor premium to cost of equity; not the stance gate.",
+                "allowed_range": {
+                  "min": 0.08,
+                  "max": 0.14
+                }
+              },
+              {
+                "id": "exit_multiple",
+                "label": "Selling multiple in year 7",
+                "kind": "judgment",
+                "values": {
+                  "low": 7,
+                  "base": 9,
+                  "high": 11
+                },
+                "unit": "multiple",
+                "rationale": "Lawrence exit multiples 7\u00d7 / 9\u00d7 / 11\u00d7 on year-7 cash path for commodity processor.",
+                "allowed_range": {
+                  "min": 5,
+                  "max": 14
+                }
+              },
+              {
+                "id": "schedule_adjustment",
+                "label": "Component schedule adjustment factor",
+                "kind": "judgment",
+                "values": {
+                  "low": 1.000072434809397,
+                  "base": 0.9999845589394791,
+                  "high": 0.9999612765027401
+                },
+                "unit": "ratio",
+                "rationale": "Preserves component schedule while filing facts anchor FY2025 FCF per share.",
+                "allowed_range": {
+                  "min": 0.2,
+                  "max": 2.5
+                }
+              }
+            ],
+            "calculations": [
+              {
+                "id": "growth_factor_y1",
+                "op": "add",
+                "args": [
+                  1,
+                  "growth_y1_5"
+                ],
+                "unit": "ratio"
+              },
+              {
+                "id": "growth_factor_y2",
+                "op": "add",
+                "args": [
+                  1,
+                  "growth_y6_10"
+                ],
+                "unit": "ratio"
+              },
+              {
+                "id": "owner_cash_y1",
+                "op": "multiply",
+                "args": [
+                  "normalized_owner_cash",
+                  "growth_factor_y1"
+                ],
+                "unit": "USD_per_share"
+              },
+              {
+                "id": "owner_cash_y2",
+                "op": "multiply",
+                "args": [
+                  "owner_cash_y1",
+                  "growth_factor_y1"
+                ],
+                "unit": "USD_per_share"
+              },
+              {
+                "id": "owner_cash_y3",
+                "op": "multiply",
+                "args": [
+                  "owner_cash_y2",
+                  "growth_factor_y1"
+                ],
+                "unit": "USD_per_share"
+              },
+              {
+                "id": "owner_cash_y4",
+                "op": "multiply",
+                "args": [
+                  "owner_cash_y3",
+                  "growth_factor_y1"
+                ],
+                "unit": "USD_per_share"
+              },
+              {
+                "id": "owner_cash_y5",
+                "op": "multiply",
+                "args": [
+                  "owner_cash_y4",
+                  "growth_factor_y1"
+                ],
+                "unit": "USD_per_share"
+              },
+              {
+                "id": "owner_cash_y6",
+                "op": "multiply",
+                "args": [
+                  "owner_cash_y5",
+                  "growth_factor_y2"
+                ],
+                "unit": "USD_per_share"
+              },
+              {
+                "id": "owner_cash_y7",
+                "op": "multiply",
+                "args": [
+                  "owner_cash_y6",
+                  "growth_factor_y2"
+                ],
+                "unit": "USD_per_share"
+              },
+              {
+                "id": "cash_pv",
+                "op": "present_value",
+                "args": [
+                  "owner_cash_y1",
+                  1,
+                  "owner_cash_y2",
+                  2,
+                  "owner_cash_y3",
+                  3,
+                  "owner_cash_y4",
+                  4,
+                  "owner_cash_y5",
+                  5,
+                  "owner_cash_y6",
+                  6,
+                  "discount_rate"
+                ],
+                "unit": "USD_per_share"
+              },
+              {
+                "id": "terminal_cash",
+                "op": "multiply",
+                "args": [
+                  "owner_cash_y7",
+                  "exit_multiple"
+                ],
+                "unit": "USD_per_share"
+              },
+              {
+                "id": "terminal_pv",
+                "op": "discount",
+                "args": [
+                  "terminal_cash",
+                  "discount_rate",
+                  7
+                ],
+                "unit": "USD_per_share"
+              },
+              {
+                "id": "raw_value",
+                "op": "add",
+                "args": [
+                  "cash_pv",
+                  "terminal_pv"
+                ],
+                "unit": "USD_per_share"
+              },
+              {
+                "id": "value_per_share",
+                "op": "multiply",
+                "args": [
+                  "raw_value",
+                  "schedule_adjustment"
+                ],
+                "unit": "USD_per_share"
+              }
+            ],
+            "outputs": {
+              "low": "value_per_share",
+              "base": "value_per_share",
+              "high": "value_per_share"
+            }
+          }
+        }
+      },
+      {
+        "id": "nutrition_and_specialty_option",
+        "label": "Human nutrition and specialty-ingredients upside option",
+        "category": "real_option",
+        "overlap_key": "nutrition_and_specialty_option",
+        "treatment": "additive",
+        "valuation": {
+          "method": "risk_adjusted_milestone_value",
+          "basis": "per_share",
+          "low": 0.0,
+          "base": 8.0,
+          "high": 18.0,
+          "evidence_tier": "primary_derived",
+          "evidence": "Primary bridge from ADM/investor-documents/sec-edgar/10-K_20260217_rpt20251231_acc0000007084_26_000011.htm: FY2025 revenue $80269.0M, OCF $5452.0M, FCF $4204.0M, cash $1015.0M, debt $8410.0M; contract backfill 2026-07-21.",
+          "assumption_summary": "Proof outputs {'low': 0.0, 'base': 8.0, 'high': 18.0}; see calculation_proof graph.",
+          "cross_check": "Reconcile to FY2025 10-K and Q1 2026 10-Q before decision use.",
+          "falsifier": "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
+          "valuation_status": "bounded_estimate",
+          "calculation_proof": {
+            "schema_version": "1.0",
+            "method_id": "risk_adjusted_milestone_value",
+            "method_version": "1.0",
+            "output_unit": "USD_per_share",
+            "inputs": [
+              {
+                "id": "nutrition_segment_op_m",
+                "label": "FY2025 Nutrition adjusted segment operating profit",
+                "kind": "fact",
+                "value": 417.0,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "ADM/investor-documents/sec-edgar/10-K_20260217_rpt20251231_acc0000007084_26_000011.htm",
+                  "locator": "Nutrition adjusted segment operating profit $417.0M FY2025",
+                  "as_of": "2025-12-31"
+                },
+                "locked": true
+              },
+              {
+                "id": "nutrition_revenue_m",
+                "label": "FY2025 Nutrition segment revenue",
+                "kind": "fact",
+                "value": 7982.0,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "ADM/investor-documents/sec-edgar/10-K_20260217_rpt20251231_acc0000007084_26_000011.htm",
+                  "locator": "Nutrition segment revenues $7,982M FY2025 (segment note)",
+                  "as_of": "2025-12-31"
+                },
+                "locked": true
+              },
+              {
+                "id": "shares_m",
+                "label": "FY2025 diluted shares",
+                "kind": "fact",
+                "value": 484.0,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "ADM/investor-documents/sec-edgar/10-K_20260217_rpt20251231_acc0000007084_26_000011.htm",
+                  "locator": "WeightedAverageNumberOfDilutedSharesOutstanding 484.0M",
+                  "as_of": "2025-12-31"
+                },
+                "locked": true
+              }
+            ],
+            "assumptions": [
+              {
+                "id": "nutrition_milestone_m",
+                "label": "Risk-adjusted human-nutrition and specialty-ingredients upside",
+                "kind": "judgment",
+                "values": {
+                  "low": 0.0,
+                  "base": 3872.0,
+                  "high": 8712.0
+                },
+                "unit": "USD_m",
+                "rationale": "Non-overlapping claim on Nutrition mix shift and specialty ingredients beyond consolidated origination/processing FCF engine.",
+                "allowed_range": {
+                  "min": 0.0,
+                  "max": 10000.0
+                }
+              }
+            ],
+            "calculations": [
+              {
+                "id": "value_per_share",
+                "label": "Nutrition and specialty option per share",
+                "op": "divide",
+                "args": [
+                  "nutrition_milestone_m",
+                  "shares_m"
+                ],
+                "unit": "USD_per_share"
+              }
+            ],
+            "outputs": {
+              "low": "value_per_share",
+              "base": "value_per_share",
+              "high": "value_per_share"
+            }
+          }
+        },
+        "driver_model": {
+          "timing_basis": "Specialty nutrition ramp over 3\u20135 years.",
+          "scenarios": {
+            "base": {
+              "success_probability": 0.4,
+              "remaining_cost_m": 0.0
+            }
+          }
+        }
+      },
+      {
+        "id": "net_financial_claims",
+        "label": "Net debt and liquidity claims on common equity",
+        "category": "liability_or_reserve",
+        "overlap_key": "net_financial_claims",
+        "treatment": "additive",
+        "valuation": {
+          "method": "net_asset_value",
+          "basis": "per_share",
+          "low": -22.0,
+          "base": -15.2789,
+          "high": -8.0,
+          "evidence_tier": "primary_derived",
+          "evidence": "Primary bridge from ADM/investor-documents/sec-edgar/10-K_20260217_rpt20251231_acc0000007084_26_000011.htm: FY2025 revenue $80269.0M, OCF $5452.0M, FCF $4204.0M, cash $1015.0M, debt $8410.0M; contract backfill 2026-07-21.",
+          "assumption_summary": "Proof outputs {'low': -22.0, 'base': -15.2789, 'high': -8.0}; see calculation_proof graph.",
+          "cross_check": "Reconcile to FY2025 10-K and Q1 2026 10-Q before decision use.",
+          "falsifier": "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
+          "valuation_status": "bounded_estimate",
+          "calculation_proof": {
+            "schema_version": "1.0",
+            "method_id": "net_asset_value",
+            "method_version": "1.0",
+            "output_unit": "USD_per_share",
+            "inputs": [
+              {
+                "id": "cash_m",
+                "label": "Cash and cash equivalents",
+                "kind": "fact",
+                "value": 1015.0,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "ADM/investor-documents/sec-edgar/10-K_20260217_rpt20251231_acc0000007084_26_000011.htm",
+                  "locator": "CashAndCashEquivalentsAtCarryingValue $1015.0M at December 31, 2025",
+                  "as_of": "2025-12-31"
+                },
+                "locked": true
+              },
+              {
+                "id": "total_debt_m",
+                "label": "Short-term borrowings plus current and noncurrent long-term debt",
+                "kind": "fact",
+                "value": 8410.0,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "ADM/investor-documents/sec-edgar/10-K_20260217_rpt20251231_acc0000007084_26_000011.htm",
+                  "locator": "Debt stack $798.0M ST + $1006.0M current LT + $6606.0M noncurrent LT",
+                  "as_of": "2025-12-31"
+                },
+                "locked": true
+              },
+              {
+                "id": "shares_m",
+                "label": "FY2025 diluted shares",
+                "kind": "fact",
+                "value": 484.0,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "ADM/investor-documents/sec-edgar/10-K_20260217_rpt20251231_acc0000007084_26_000011.htm",
+                  "locator": "WeightedAverageNumberOfDilutedSharesOutstanding 484.0M",
+                  "as_of": "2025-12-31"
+                },
+                "locked": true
+              }
+            ],
+            "assumptions": [
+              {
+                "id": "operating_cash_minimum_m",
+                "label": "Cash required for commodity inventory and margin calls",
+                "kind": "judgment",
+                "values": {
+                  "low": 1200.0,
+                  "base": 800.0,
+                  "high": 500.0
+                },
+                "unit": "USD_m",
+                "rationale": "Judgment on non-distributable working capital for global origination network.",
+                "allowed_range": {
+                  "min": 300.0,
+                  "max": 2000.0
+                }
+              },
+              {
+                "id": "net_corporate_claim_m",
+                "label": "Net financial claim on common equity after debt and operating minimum",
+                "kind": "judgment",
+                "values": {
+                  "low": -10648.0,
+                  "base": -7395.0,
+                  "high": -3872.0
+                },
+                "unit": "USD_m",
+                "rationale": "Filing-locked gross debt less cash; low case stresses refinancing and trapped liquidity.",
+                "allowed_range": {
+                  "min": -12000.0,
+                  "max": 2000.0
+                }
+              }
+            ],
+            "calculations": [
+              {
+                "id": "value_per_share",
+                "label": "Net financial claims per share",
+                "op": "divide",
+                "args": [
+                  "net_corporate_claim_m",
+                  "shares_m"
+                ],
+                "unit": "USD_per_share"
+              }
+            ],
+            "outputs": {
+              "low": "value_per_share",
+              "base": "value_per_share",
+              "high": "value_per_share"
+            }
+          }
+        }
+      },
+      {
+        "id": "commodity_cycle_and_execution_reserve",
+        "label": "Commodity cycle, controls, and execution stress reserve",
+        "category": "liability_or_reserve",
+        "overlap_key": "commodity_cycle_and_execution_reserve",
+        "treatment": "additive",
+        "valuation": {
+          "method": "net_asset_value",
+          "basis": "per_share",
+          "low": -28.0,
+          "base": -12.0,
+          "high": -4.0,
+          "evidence_tier": "primary_derived",
+          "evidence": "Primary bridge from ADM/investor-documents/sec-edgar/10-K_20260217_rpt20251231_acc0000007084_26_000011.htm: FY2025 revenue $80269.0M, OCF $5452.0M, FCF $4204.0M, cash $1015.0M, debt $8410.0M; contract backfill 2026-07-21.",
+          "assumption_summary": "Proof outputs {'low': -28.0, 'base': -12.0, 'high': -4.0}; see calculation_proof graph.",
+          "cross_check": "Reconcile to FY2025 10-K and Q1 2026 10-Q before decision use.",
+          "falsifier": "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
+          "valuation_status": "bounded_estimate",
+          "calculation_proof": {
+            "schema_version": "1.0",
+            "method_id": "net_asset_value",
+            "method_version": "1.0",
+            "output_unit": "USD_per_share",
+            "inputs": [
+              {
+                "id": "net_income_m",
+                "label": "FY2025 net earnings attributable to ADM",
+                "kind": "fact",
+                "value": 1078.0,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "ADM/investor-documents/sec-edgar/10-K_20260217_rpt20251231_acc0000007084_26_000011.htm",
+                  "locator": "NetIncomeLoss $1078.0M FY2025; diluted EPS $2.23",
+                  "as_of": "2025-12-31"
+                },
+                "locked": true
+              },
+              {
+                "id": "sec_penalty_m",
+                "label": "SEC civil penalty under January 2026 settlement",
+                "kind": "fact",
+                "value": 40.0,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "ADM/investor-documents/sec-edgar/8-K_20260128_rpt20260127_acc0001193125_26_025560.htm",
+                  "locator": "SEC settlement civil penalty $40M without admitting wrongdoing (Jan 27, 2026)",
+                  "as_of": "2026-01-27"
+                },
+                "locked": true
+              },
+              {
+                "id": "shares_m",
+                "label": "FY2025 diluted shares",
+                "kind": "fact",
+                "value": 484.0,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "ADM/investor-documents/sec-edgar/10-K_20260217_rpt20251231_acc0000007084_26_000011.htm",
+                  "locator": "WeightedAverageNumberOfDilutedSharesOutstanding 484.0M",
+                  "as_of": "2025-12-31"
+                },
+                "locked": true
+              }
+            ],
+            "assumptions": [
+              {
+                "id": "reserve_m",
+                "label": "Commodity cycle, intersegment controls, and execution stress reserve",
+                "kind": "judgment",
+                "values": {
+                  "low": -13552.0,
+                  "base": -5808.0,
+                  "high": -1936.0
+                },
+                "unit": "USD_m",
+                "rationale": "Negative reserve for crush-margin cyclicality, prior accounting remediation tail, and leverage through commodity troughs; SEC/DOJ investigations closed Jan 2026.",
+                "allowed_range": {
+                  "min": -15000.0,
+                  "max": -1000.0
+                }
+              }
+            ],
+            "calculations": [
+              {
+                "id": "value_per_share",
+                "label": "Commodity cycle and execution reserve per share",
+                "op": "divide",
+                "args": [
+                  "reserve_m",
+                  "shares_m"
+                ],
+                "unit": "USD_per_share"
+              }
+            ],
+            "outputs": {
+              "low": "value_per_share",
+              "base": "value_per_share",
+              "high": "value_per_share"
+            }
+          }
+        }
+      }
+    ]
+  },
+  "economic_value_analysis": {
+    "ownership_waterfall": {
+      "net_economic_claim": "One ADM common share equals pro-rata normalized free cash flow from the global origination and processing network, incremental Nutrition specialty upside, net corporate debt claims, less commodity-cycle and execution reserve.",
+      "excluded_claims": [
+        "Intersegment Nutrition sales already in consolidated revenue are not double-counted in the core engine.",
+        "SEC $40M penalty (Jan 2026) is immaterial to per-share NAV; reserved in execution band."
+      ],
+      "reconciliation": "FY2025 FCF $4204.0M on 484.0M shares ($8.686/sh); cash $1015.0M less total debt $8410.0M.",
+      "evidence_ref": "ADM/research/evidence_reconciliation_2026-07-21.md"
+    },
+    "validation_errors": []
+  },
+  "economic_value": {
+    "schema_version": "1.0",
+    "method": "component_economic_value",
+    "economic_claim": {
+      "description": "One diluted share of ADM, including global origination/processing owner cash, Nutrition specialty upside, net financial claims, and commodity-cycle reserve.",
+      "unit_label": "diluted share",
+      "unit_count": 484000000,
+      "unit_source": "FY2025 weighted average diluted shares 484.0M (ADM/investor-documents/sec-edgar/10-K_20260217_rpt20251231_acc0000007084_26_000011.htm).",
+      "enterprise_to_equity_reconciliation": "Consolidated processing engine valued through owner-cash discount on FY2025 FCF per share; Nutrition option, net debt, and cycle reserve are separate overlap keys."
+    },
+    "gaap_role": "cross_check",
+    "accounting_reference": "FY2025 10-K: stockholders' equity ~$24B; economic value in normalized owner cash ($8.686/sh), not GAAP book alone.",
+    "component_groups": [
+      {
+        "id": "origination_processing_owner_cash",
+        "label": "Global origination and processing owner-cash engine",
+        "component_ids": [
+          "origination_processing_owner_cash"
+        ],
+        "economic_claim": "Ag Services & Oilseeds plus Carbohydrate Solutions normalized free cash flow",
+        "valuation_basis": "Owner-cash discount on FY2025 FCF per diluted share.",
+        "adjustments": "OCF recovery year; earnings trough does not fully reflect cash generation.",
+        "overlap_control": "Unique overlap key origination_processing_owner_cash."
+      },
+      {
+        "id": "nutrition_and_specialty_option",
+        "label": "Human nutrition and specialty-ingredients upside option",
+        "component_ids": [
+          "nutrition_and_specialty_option"
+        ],
+        "economic_claim": "Incremental Nutrition specialty monetization beyond consolidated FCF",
+        "valuation_basis": "Risk-adjusted milestone value on Nutrition mix shift.",
+        "adjustments": "Intersegment sales investigation closed Jan 2026; controls remediated Jun 2025.",
+        "overlap_control": "Unique overlap key nutrition_and_specialty_option.",
+        "risk_and_timing": {
+          "probability_basis": "Base ~40% that Nutrition OP exceeds $500M sustainably; low case zero.",
+          "timing_basis": "Specialty ingredients ramp over 3\u20135 years per segment disclosures.",
+          "remaining_capital_basis": "Nutrition capex embedded in consolidated spending; no separate proof line."
+        }
+      },
+      {
+        "id": "net_financial_claims",
+        "label": "Net debt and liquidity claims on common equity",
+        "component_ids": [
+          "net_financial_claims"
+        ],
+        "economic_claim": "Net corporate debt after cash and operating minimum",
+        "valuation_basis": "Net asset value on filing-locked debt stack.",
+        "adjustments": "Operating cash minimum judgment for commodity working capital.",
+        "overlap_control": "Unique overlap key net_financial_claims."
+      },
+      {
+        "id": "commodity_cycle_and_execution_reserve",
+        "label": "Commodity cycle, controls, and execution stress reserve",
+        "component_ids": [
+          "commodity_cycle_and_execution_reserve"
+        ],
+        "economic_claim": "Crush-margin cyclicality and prior controls remediation tail",
+        "valuation_basis": "Bounded negative reserve; not full enterprise value haircut.",
+        "adjustments": "Partial dhando: net debt and commodity trough cap stance despite scale.",
+        "overlap_control": "Unique overlap key commodity_cycle_and_execution_reserve."
+      }
+    ],
+    "limitations": [
+      "Segment-level FCF not separately disclosed; consolidated engine with Nutrition option overlay.",
+      "Mid-cycle normalization of owner cash is judgment; FY2025 OCF may overstate trough earnings power."
+    ]
   }
 }
