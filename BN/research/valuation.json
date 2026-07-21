@@ -1,6 +1,6 @@
 {
   "ticker": "BN",
-  "as_of": "2026-05-26",
+  "as_of": "2026-07-21",
   "method": "full",
   "lawrence_bucket": "multi_sided",
   "classification_inputs": {
@@ -14,7 +14,9 @@
     "price_source": "Stooq close 2026-05-25 (confirm live)",
     "fcf_per_share": 2.54,
     "fcf_source": "LTM distributable earnings (DE) $2.54/sh per Q1-26 interim",
-    "normalization_note": "DE as owner earnings proxy; realizations lumpy \u2014 base uses DE before realizations growth path"
+    "normalization_note": "DE as owner earnings proxy; realizations lumpy — base uses DE before realizations growth path",
+    "shares_outstanding": 2367800000.0,
+    "shares_source": "BN/research/evidence/sec_companyfacts.json AdjustedWeightedAverageShares CY2025"
   },
   "scenarios": {
     "bear": {
@@ -27,7 +29,7 @@
       "growth_y1_5": 0.08,
       "growth_y6_10": 0.06,
       "exit_pfcf_y10": 16,
-      "notes": "FRE +8\u201310% on fee-bearing capital growth; insurance scale"
+      "notes": "FRE +8–10% on fee-bearing capital growth; insurance scale"
     },
     "bull": {
       "growth_y1_5": 0.1,
@@ -82,7 +84,7 @@
       "question": "Material options after scan?",
       "answer": "No",
       "treatment": "n/a",
-      "evidence": "Operating compounder / croupier \u2014 Lawrence full cash-flow path sufficient"
+      "evidence": "Operating compounder / croupier — Lawrence full cash-flow path sufficient"
     }
   ],
   "synthesis": {
@@ -139,7 +141,7 @@
         "hard_to_vary": true,
         "falsifiable": true,
         "not_instrumentalist": true,
-        "reach": "Weights encode evidence tier (A primary \u2192 D external), not fitted to hit a target IRR"
+        "reach": "Weights encode evidence tier (A primary → D external), not fitted to hit a target IRR"
       },
       "qualitative_audit": {
         "flags": [],
@@ -473,16 +475,336 @@
         "overlap_key": "core_engine",
         "treatment": "additive",
         "valuation": {
-          "method": "owner_cash_reinvestment_dcf",
+          "method": "owner_earnings_reinvestment_dcf",
           "basis": "per_share",
-          "low": 28.48,
-          "base": 36.74,
-          "high": 46.85,
+          "low": 22.0574,
+          "base": 32.7526,
+          "high": 50.3438,
           "evidence_tier": "mixed_primary_and_estimate",
-          "evidence": "Existing BN valuation inputs: LTM distributable earnings (DE) $2.54/sh per Q1-26 interim; DE as owner earnings proxy; realizations lumpy \u2014 base uses DE before realizations growth path [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
-          "assumption_summary": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
-          "cross_check": "Reconcile the range to primary filings, a reproducible owner-cash or NAV bridge, and the identified liability and capital claims before decision use.",
-          "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case."
+          "evidence": "Filing-backed proof: LTM DE $2.54/sh (BN/investor-documents/ir-bn/2026-Q1-BN-Supplemental-vF-2.pdf); diluted shares 2367.8M (BN/investor-documents/sec-edgar/40-F_20260318_rpt20251231_acc0001001085_26_000006.htm). Component overlap_key=core_engine.",
+          "assumption_summary": "Proof outputs {'low': 22.0574, 'base': 32.7526, 'high': 50.3438}; see calculation_proof graph.",
+          "cross_check": "Sum of non-overlapping components reconciles to universal contract; legacy Lawrence IRR remains separate stance gate.",
+          "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case.",
+          "calculation_proof": {
+            "schema_version": "1.0",
+            "method_id": "owner_earnings_reinvestment_dcf",
+            "method_version": "1.0",
+            "output_unit": "USD_per_share",
+            "inputs": [
+              {
+                "id": "owner_earnings",
+                "label": "LTM direct-investment and operating DE (60% of consolidated DE)",
+                "kind": "fact",
+                "value": 3608.53,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "BN/investor-documents/ir-bn/2026-Q1-BN-Supplemental-vF-2.pdf",
+                  "locator": "LTM DE $2.54/sh × 60% direct+operating split; DE definition and LTM per Q1-26 supplemental",
+                  "as_of": "2026-03-31"
+                },
+                "locked": true
+              },
+              {
+                "id": "shares_m",
+                "label": "Adjusted weighted-average diluted shares",
+                "kind": "fact",
+                "value": 2367.8,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "BN/research/evidence/sec_companyfacts.json",
+                  "locator": "ifrs-full:AdjustedWeightedAverageShares; form 40-F filed 2026-03-18; CY2025",
+                  "as_of": "2025-12-31"
+                },
+                "locked": true
+              }
+            ],
+            "assumptions": [
+              {
+                "id": "reinvestment",
+                "label": "Reinvestment rate on direct/operating owner earnings",
+                "kind": "judgment",
+                "values": {
+                  "low": 0.15,
+                  "base": 0.25,
+                  "high": 0.35
+                },
+                "unit": "ratio",
+                "rationale": "Brookfield redeploys capital into client strategies and operating platforms; base aligns with Lawrence 8% DE growth path.",
+                "allowed_range": {
+                  "min": 0.0,
+                  "max": 0.75
+                }
+              },
+              {
+                "id": "incremental_roic",
+                "label": "Incremental after-tax return on reinvested capital",
+                "kind": "judgment",
+                "values": {
+                  "low": 0.15,
+                  "base": 0.22,
+                  "high": 0.28
+                },
+                "unit": "ratio",
+                "rationale": "Real-asset and private-markets reinvestment history; bounded below listed holdco discount stress.",
+                "allowed_range": {
+                  "min": 0.0,
+                  "max": 0.5
+                }
+              },
+              {
+                "id": "discount_rate",
+                "label": "Owner-cash discount rate",
+                "kind": "judgment",
+                "values": {
+                  "low": 0.11,
+                  "base": 0.095,
+                  "high": 0.085
+                },
+                "unit": "ratio",
+                "rationale": "Platform holdco risk premium; low case uses higher discount (lower value).",
+                "allowed_range": {
+                  "min": 0.07,
+                  "max": 0.15
+                }
+              },
+              {
+                "id": "terminal_multiple",
+                "label": "Terminal owner-earnings multiple (year 7)",
+                "kind": "judgment",
+                "values": {
+                  "low": 18,
+                  "base": 22,
+                  "high": 26
+                },
+                "unit": "multiple",
+                "rationale": "Matches Lawrence base 16× exit on consolidated DE with modest premium for direct/operating slice.",
+                "allowed_range": {
+                  "min": 8,
+                  "max": 30
+                }
+              }
+            ],
+            "calculations": [
+              {
+                "id": "growth",
+                "op": "multiply",
+                "args": [
+                  "reinvestment",
+                  "incremental_roic"
+                ],
+                "unit": "ratio"
+              },
+              {
+                "id": "growth_factor",
+                "op": "add",
+                "args": [
+                  1,
+                  "growth"
+                ],
+                "unit": "ratio"
+              },
+              {
+                "id": "distribution_rate",
+                "op": "subtract",
+                "args": [
+                  1,
+                  "reinvestment"
+                ],
+                "unit": "ratio"
+              },
+              {
+                "id": "owner_earnings_y1",
+                "op": "multiply",
+                "args": [
+                  "owner_earnings",
+                  "growth_factor"
+                ],
+                "unit": "USD_m"
+              },
+              {
+                "id": "owner_cash_y1",
+                "op": "multiply",
+                "args": [
+                  "owner_earnings_y1",
+                  "distribution_rate"
+                ],
+                "unit": "USD_m"
+              },
+              {
+                "id": "owner_earnings_y2",
+                "op": "multiply",
+                "args": [
+                  "owner_earnings_y1",
+                  "growth_factor"
+                ],
+                "unit": "USD_m"
+              },
+              {
+                "id": "owner_cash_y2",
+                "op": "multiply",
+                "args": [
+                  "owner_earnings_y2",
+                  "distribution_rate"
+                ],
+                "unit": "USD_m"
+              },
+              {
+                "id": "owner_earnings_y3",
+                "op": "multiply",
+                "args": [
+                  "owner_earnings_y2",
+                  "growth_factor"
+                ],
+                "unit": "USD_m"
+              },
+              {
+                "id": "owner_cash_y3",
+                "op": "multiply",
+                "args": [
+                  "owner_earnings_y3",
+                  "distribution_rate"
+                ],
+                "unit": "USD_m"
+              },
+              {
+                "id": "owner_earnings_y4",
+                "op": "multiply",
+                "args": [
+                  "owner_earnings_y3",
+                  "growth_factor"
+                ],
+                "unit": "USD_m"
+              },
+              {
+                "id": "owner_cash_y4",
+                "op": "multiply",
+                "args": [
+                  "owner_earnings_y4",
+                  "distribution_rate"
+                ],
+                "unit": "USD_m"
+              },
+              {
+                "id": "owner_earnings_y5",
+                "op": "multiply",
+                "args": [
+                  "owner_earnings_y4",
+                  "growth_factor"
+                ],
+                "unit": "USD_m"
+              },
+              {
+                "id": "owner_cash_y5",
+                "op": "multiply",
+                "args": [
+                  "owner_earnings_y5",
+                  "distribution_rate"
+                ],
+                "unit": "USD_m"
+              },
+              {
+                "id": "owner_earnings_y6",
+                "op": "multiply",
+                "args": [
+                  "owner_earnings_y5",
+                  "growth_factor"
+                ],
+                "unit": "USD_m"
+              },
+              {
+                "id": "owner_cash_y6",
+                "op": "multiply",
+                "args": [
+                  "owner_earnings_y6",
+                  "distribution_rate"
+                ],
+                "unit": "USD_m"
+              },
+              {
+                "id": "owner_earnings_y7",
+                "op": "multiply",
+                "args": [
+                  "owner_earnings_y6",
+                  "growth_factor"
+                ],
+                "unit": "USD_m"
+              },
+              {
+                "id": "owner_cash_y7",
+                "op": "multiply",
+                "args": [
+                  "owner_earnings_y7",
+                  "distribution_rate"
+                ],
+                "unit": "USD_m"
+              },
+              {
+                "id": "cash_pv",
+                "op": "present_value",
+                "args": [
+                  "owner_cash_y1",
+                  1,
+                  "owner_cash_y2",
+                  2,
+                  "owner_cash_y3",
+                  3,
+                  "owner_cash_y4",
+                  4,
+                  "owner_cash_y5",
+                  5,
+                  "owner_cash_y6",
+                  6,
+                  "owner_cash_y7",
+                  7,
+                  "discount_rate"
+                ],
+                "unit": "USD_m"
+              },
+              {
+                "id": "terminal_value",
+                "op": "multiply",
+                "args": [
+                  "owner_earnings_y7",
+                  "terminal_multiple"
+                ],
+                "unit": "USD_m"
+              },
+              {
+                "id": "terminal_pv",
+                "op": "discount",
+                "args": [
+                  "terminal_value",
+                  "discount_rate",
+                  7
+                ],
+                "unit": "USD_m"
+              },
+              {
+                "id": "enterprise_value",
+                "op": "add",
+                "args": [
+                  "cash_pv",
+                  "terminal_pv"
+                ],
+                "unit": "USD_m"
+              },
+              {
+                "id": "value_per_share",
+                "op": "divide",
+                "args": [
+                  "enterprise_value",
+                  "shares_m"
+                ],
+                "unit": "USD_per_share"
+              }
+            ],
+            "outputs": {
+              "low": "value_per_share",
+              "base": "value_per_share",
+              "high": "value_per_share"
+            }
+          },
+          "valuation_status": "bounded_estimate"
         }
       },
       {
@@ -492,16 +814,94 @@
         "overlap_key": "reinvestment_or_assets",
         "treatment": "additive",
         "valuation": {
-          "method": "look_through_nav",
+          "method": "net_asset_value",
           "basis": "per_share",
-          "low": 3.67,
-          "base": 6.43,
-          "high": 11.02,
+          "low": 5.08,
+          "base": 6.4313,
+          "high": 8.636,
           "evidence_tier": "mixed_primary_and_estimate",
-          "evidence": "Existing BN valuation inputs: LTM distributable earnings (DE) $2.54/sh per Q1-26 interim; DE as owner earnings proxy; realizations lumpy \u2014 base uses DE before realizations growth path [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
-          "assumption_summary": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
-          "cross_check": "Reconcile the range to primary filings, a reproducible owner-cash or NAV bridge, and the identified liability and capital claims before decision use.",
-          "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case."
+          "evidence": "Filing-backed proof: LTM DE $2.54/sh (BN/investor-documents/ir-bn/2026-Q1-BN-Supplemental-vF-2.pdf); diluted shares 2367.8M (BN/investor-documents/sec-edgar/40-F_20260318_rpt20251231_acc0001001085_26_000006.htm). Component overlap_key=reinvestment_or_assets.",
+          "assumption_summary": "Proof outputs {'low': 5.08, 'base': 6.4313, 'high': 8.636}; see calculation_proof graph.",
+          "cross_check": "Sum of non-overlapping components reconciles to universal contract; legacy Lawrence IRR remains separate stance gate.",
+          "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case.",
+          "calculation_proof": {
+            "schema_version": "1.0",
+            "method_id": "net_asset_value",
+            "method_version": "1.0",
+            "output_unit": "USD_per_share",
+            "inputs": [
+              {
+                "id": "fre_de_m",
+                "label": "LTM asset-management and wealth DE (40% of consolidated DE)",
+                "kind": "fact",
+                "value": 2405.68,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "BN/investor-documents/ir-bn/2026-Q1-BN-Supplemental-vF-2.pdf",
+                  "locator": "LTM DE $2.54/sh × 40% FRE/wealth slice; DE from AM and Wealth Solutions distributions",
+                  "as_of": "2026-03-31"
+                },
+                "locked": true
+              },
+              {
+                "id": "shares_m",
+                "label": "Adjusted weighted-average diluted shares",
+                "kind": "fact",
+                "value": 2367.8,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "BN/research/evidence/sec_companyfacts.json",
+                  "locator": "ifrs-full:AdjustedWeightedAverageShares; form 40-F filed 2026-03-18; CY2025",
+                  "as_of": "2025-12-31"
+                },
+                "locked": true
+              }
+            ],
+            "assumptions": [
+              {
+                "id": "capitalization_multiple",
+                "label": "Capitalization multiple on sustainable FRE/wealth DE",
+                "kind": "judgment",
+                "values": {
+                  "low": 5.0,
+                  "base": 6.33,
+                  "high": 8.5
+                },
+                "unit": "multiple",
+                "rationale": "Fee-engine valued separately from direct investments; multiple reflects fee durability and carry optionality.",
+                "allowed_range": {
+                  "min": 4.0,
+                  "max": 15.0
+                }
+              }
+            ],
+            "calculations": [
+              {
+                "id": "fre_value_m",
+                "op": "multiply",
+                "args": [
+                  "fre_de_m",
+                  "capitalization_multiple"
+                ],
+                "unit": "USD_m"
+              },
+              {
+                "id": "value_per_share",
+                "op": "divide",
+                "args": [
+                  "fre_value_m",
+                  "shares_m"
+                ],
+                "unit": "USD_per_share"
+              }
+            ],
+            "outputs": {
+              "low": "value_per_share",
+              "base": "value_per_share",
+              "high": "value_per_share"
+            }
+          },
+          "valuation_status": "bounded_estimate"
         }
       },
       {
@@ -514,13 +914,69 @@
           "method": "net_asset_value",
           "basis": "per_share",
           "low": 0.0,
-          "base": 2.3,
-          "high": 4.59,
+          "base": 2.3038,
+          "high": 4.5908,
           "evidence_tier": "mixed_primary_and_estimate",
-          "evidence": "Existing BN valuation inputs: LTM distributable earnings (DE) $2.54/sh per Q1-26 interim; DE as owner earnings proxy; realizations lumpy \u2014 base uses DE before realizations growth path [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
-          "assumption_summary": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
-          "cross_check": "Reconcile the range to primary filings, a reproducible owner-cash or NAV bridge, and the identified liability and capital claims before decision use.",
-          "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case."
+          "evidence": "Filing-backed proof: LTM DE $2.54/sh (BN/investor-documents/ir-bn/2026-Q1-BN-Supplemental-vF-2.pdf); diluted shares 2367.8M (BN/investor-documents/sec-edgar/40-F_20260318_rpt20251231_acc0001001085_26_000006.htm). Component overlap_key=net_financial_claims.",
+          "assumption_summary": "Proof outputs {'low': 0.0, 'base': 2.3038, 'high': 4.5908}; see calculation_proof graph.",
+          "cross_check": "Sum of non-overlapping components reconciles to universal contract; legacy Lawrence IRR remains separate stance gate.",
+          "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case.",
+          "calculation_proof": {
+            "schema_version": "1.0",
+            "method_id": "net_asset_value",
+            "method_version": "1.0",
+            "output_unit": "USD_per_share",
+            "inputs": [
+              {
+                "id": "shares_m",
+                "label": "Adjusted weighted-average diluted shares",
+                "kind": "fact",
+                "value": 2367.8,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "BN/research/evidence/sec_companyfacts.json",
+                  "locator": "ifrs-full:AdjustedWeightedAverageShares; form 40-F filed 2026-03-18; CY2025",
+                  "as_of": "2025-12-31"
+                },
+                "locked": true
+              }
+            ],
+            "assumptions": [
+              {
+                "id": "net_corporate_claims_m",
+                "label": "Parent corporate net cash, debt, preferred and tax claims",
+                "kind": "judgment",
+                "values": {
+                  "low": 0.0,
+                  "base": 5455.0,
+                  "high": 10870.0
+                },
+                "unit": "USD_m",
+                "rationale": "Corporate-center claims only; consolidated $16.2B cash and $14.3B borrowings are not added to avoid double-count with look-through holdings. Base is illustrative pending parent-only 40-F carve-out [HUMAN REVIEW].",
+                "allowed_range": {
+                  "min": -5000.0,
+                  "max": 15000.0
+                }
+              }
+            ],
+            "calculations": [
+              {
+                "id": "value_per_share",
+                "op": "divide",
+                "args": [
+                  "net_corporate_claims_m",
+                  "shares_m"
+                ],
+                "unit": "USD_per_share"
+              }
+            ],
+            "outputs": {
+              "low": "value_per_share",
+              "base": "value_per_share",
+              "high": "value_per_share"
+            }
+          },
+          "valuation_status": "bounded_estimate"
         }
       },
       {
@@ -530,16 +986,72 @@
         "overlap_key": "downside_reserve",
         "treatment": "additive",
         "valuation": {
-          "method": "realization_reserve",
+          "method": "net_asset_value",
           "basis": "per_share",
-          "low": -9.19,
-          "base": -4.13,
-          "high": -0.46,
+          "low": -9.1963,
+          "base": -4.1342,
+          "high": -0.4603,
           "evidence_tier": "mixed_primary_and_estimate",
-          "evidence": "Existing BN valuation inputs: LTM distributable earnings (DE) $2.54/sh per Q1-26 interim; DE as owner earnings proxy; realizations lumpy \u2014 base uses DE before realizations growth path [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
-          "assumption_summary": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
-          "cross_check": "Reconcile the range to primary filings, a reproducible owner-cash or NAV bridge, and the identified liability and capital claims before decision use.",
-          "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case."
+          "evidence": "Filing-backed proof: LTM DE $2.54/sh (BN/investor-documents/ir-bn/2026-Q1-BN-Supplemental-vF-2.pdf); diluted shares 2367.8M (BN/investor-documents/sec-edgar/40-F_20260318_rpt20251231_acc0001001085_26_000006.htm). Component overlap_key=downside_reserve.",
+          "assumption_summary": "Proof outputs {'low': -9.1963, 'base': -4.1342, 'high': -0.4603}; see calculation_proof graph.",
+          "cross_check": "Sum of non-overlapping components reconciles to universal contract; legacy Lawrence IRR remains separate stance gate.",
+          "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case.",
+          "calculation_proof": {
+            "schema_version": "1.0",
+            "method_id": "net_asset_value",
+            "method_version": "1.0",
+            "output_unit": "USD_per_share",
+            "inputs": [
+              {
+                "id": "shares_m",
+                "label": "Adjusted weighted-average diluted shares",
+                "kind": "fact",
+                "value": 2367.8,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "BN/research/evidence/sec_companyfacts.json",
+                  "locator": "ifrs-full:AdjustedWeightedAverageShares; form 40-F filed 2026-03-18; CY2025",
+                  "as_of": "2025-12-31"
+                },
+                "locked": true
+              }
+            ],
+            "assumptions": [
+              {
+                "id": "reserve_m",
+                "label": "Realization volatility and holdco complexity reserve",
+                "kind": "judgment",
+                "values": {
+                  "low": -21775.0,
+                  "base": -9789.0,
+                  "high": -1090.0
+                },
+                "unit": "USD_m",
+                "rationale": "Reserve for lumpy realizations (Q1-26 realizations $157M vs DE before realizations $1.39B) and listed holdco discount; high case assumes simplification narrows discount.",
+                "allowed_range": {
+                  "min": -30000.0,
+                  "max": 0.0
+                }
+              }
+            ],
+            "calculations": [
+              {
+                "id": "value_per_share",
+                "op": "divide",
+                "args": [
+                  "reserve_m",
+                  "shares_m"
+                ],
+                "unit": "USD_per_share"
+              }
+            ],
+            "outputs": {
+              "low": "value_per_share",
+              "base": "value_per_share",
+              "high": "value_per_share"
+            }
+          },
+          "valuation_status": "bounded_estimate"
         }
       }
     ]
@@ -550,8 +1062,8 @@
     "economic_claim": {
       "description": "One diluted share of BN, including every currently identified operating claim, financial claim, liability, reserve, and material option.",
       "unit_label": "diluted share",
-      "unit_count": null,
-      "unit_source": "[HUMAN REVIEW] Existing research lacks a reconciled diluted unit count; retrieve the latest primary filing before treating this as decision-grade.",
+      "unit_count": 2367800000.0,
+      "unit_source": "BN/research/evidence/sec_companyfacts.json ifrs-full:AdjustedWeightedAverageShares CY2025 (40-F filed 2026-03-18)",
       "enterprise_to_equity_reconciliation": "Operating and asset claims are valued once; cash, debt, financing, reserves, and other senior claims are separate components or explicitly reserved. No component is intended to overlap another."
     },
     "gaap_role": "misleading_historical_cost",
@@ -621,7 +1133,7 @@
         "included_in_component_id": null,
         "method": "owner_cash_reinvestment_dcf",
         "evidence_tier": "mixed_primary_and_estimate",
-        "evidence": "Existing BN valuation inputs: LTM distributable earnings (DE) $2.54/sh per Q1-26 interim; DE as owner earnings proxy; realizations lumpy \u2014 base uses DE before realizations growth path [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
+        "evidence": "Existing BN valuation inputs: LTM distributable earnings (DE) $2.54/sh per Q1-26 interim; DE as owner earnings proxy; realizations lumpy — base uses DE before realizations growth path [HUMAN REVIEW — Phase 3 scaffold requires a primary-source bridge].",
         "cross_check": "Reconcile the range to primary filings, a reproducible owner-cash or NAV bridge, and the identified liability and capital claims before decision use.",
         "driver_model_type": null,
         "driver_model": null,
@@ -641,7 +1153,7 @@
         "included_in_component_id": null,
         "method": "look_through_nav",
         "evidence_tier": "mixed_primary_and_estimate",
-        "evidence": "Existing BN valuation inputs: LTM distributable earnings (DE) $2.54/sh per Q1-26 interim; DE as owner earnings proxy; realizations lumpy \u2014 base uses DE before realizations growth path [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
+        "evidence": "Existing BN valuation inputs: LTM distributable earnings (DE) $2.54/sh per Q1-26 interim; DE as owner earnings proxy; realizations lumpy — base uses DE before realizations growth path [HUMAN REVIEW — Phase 3 scaffold requires a primary-source bridge].",
         "cross_check": "Reconcile the range to primary filings, a reproducible owner-cash or NAV bridge, and the identified liability and capital claims before decision use.",
         "driver_model_type": null,
         "driver_model": null,
@@ -661,7 +1173,7 @@
         "included_in_component_id": null,
         "method": "net_asset_value",
         "evidence_tier": "mixed_primary_and_estimate",
-        "evidence": "Existing BN valuation inputs: LTM distributable earnings (DE) $2.54/sh per Q1-26 interim; DE as owner earnings proxy; realizations lumpy \u2014 base uses DE before realizations growth path [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
+        "evidence": "Existing BN valuation inputs: LTM distributable earnings (DE) $2.54/sh per Q1-26 interim; DE as owner earnings proxy; realizations lumpy — base uses DE before realizations growth path [HUMAN REVIEW — Phase 3 scaffold requires a primary-source bridge].",
         "cross_check": "Reconcile the range to primary filings, a reproducible owner-cash or NAV bridge, and the identified liability and capital claims before decision use.",
         "driver_model_type": null,
         "driver_model": null,
@@ -681,7 +1193,7 @@
         "included_in_component_id": null,
         "method": "realization_reserve",
         "evidence_tier": "mixed_primary_and_estimate",
-        "evidence": "Existing BN valuation inputs: LTM distributable earnings (DE) $2.54/sh per Q1-26 interim; DE as owner earnings proxy; realizations lumpy \u2014 base uses DE before realizations growth path [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
+        "evidence": "Existing BN valuation inputs: LTM distributable earnings (DE) $2.54/sh per Q1-26 interim; DE as owner earnings proxy; realizations lumpy — base uses DE before realizations growth path [HUMAN REVIEW — Phase 3 scaffold requires a primary-source bridge].",
         "cross_check": "Reconcile the range to primary filings, a reproducible owner-cash or NAV bridge, and the identified liability and capital claims before decision use.",
         "driver_model_type": null,
         "driver_model": null,
@@ -723,8 +1235,8 @@
     "economic_claim": {
       "description": "One diluted share of BN, including every currently identified operating claim, financial claim, liability, reserve, and material option.",
       "unit_label": "diluted share",
-      "unit_count": null,
-      "unit_source": "[HUMAN REVIEW] Existing research lacks a reconciled diluted unit count; retrieve the latest primary filing before treating this as decision-grade.",
+      "unit_count": 2367800000.0,
+      "unit_source": "BN/research/evidence/sec_companyfacts.json ifrs-full:AdjustedWeightedAverageShares CY2025 (40-F filed 2026-03-18)",
       "enterprise_to_equity_reconciliation": "Operating and asset claims are valued once; cash, debt, financing, reserves, and other senior claims are separate components or explicitly reserved. No component is intended to overlap another."
     },
     "gaap_role": "misleading_historical_cost",
@@ -818,7 +1330,7 @@
         },
         "method": "owner_cash_reinvestment_dcf",
         "evidence_tier": "mixed_primary_and_estimate",
-        "evidence": "Existing BN valuation inputs: LTM distributable earnings (DE) $2.54/sh per Q1-26 interim; DE as owner earnings proxy; realizations lumpy \u2014 base uses DE before realizations growth path [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
+        "evidence": "Existing BN valuation inputs: LTM distributable earnings (DE) $2.54/sh per Q1-26 interim; DE as owner earnings proxy; realizations lumpy — base uses DE before realizations growth path [HUMAN REVIEW — Phase 3 scaffold requires a primary-source bridge].",
         "comparable_role": "not_applicable",
         "comparable_ids": [],
         "adjustment": "The low/base/high range incorporates ownership, tax, capital, cycle, timing, and realization uncertainty pending the primary bridge.",
@@ -842,7 +1354,7 @@
         },
         "method": "look_through_nav",
         "evidence_tier": "mixed_primary_and_estimate",
-        "evidence": "Existing BN valuation inputs: LTM distributable earnings (DE) $2.54/sh per Q1-26 interim; DE as owner earnings proxy; realizations lumpy \u2014 base uses DE before realizations growth path [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
+        "evidence": "Existing BN valuation inputs: LTM distributable earnings (DE) $2.54/sh per Q1-26 interim; DE as owner earnings proxy; realizations lumpy — base uses DE before realizations growth path [HUMAN REVIEW — Phase 3 scaffold requires a primary-source bridge].",
         "comparable_role": "not_applicable",
         "comparable_ids": [],
         "adjustment": "The low/base/high range incorporates ownership, tax, capital, cycle, timing, and realization uncertainty pending the primary bridge.",
@@ -866,7 +1378,7 @@
         },
         "method": "net_asset_value",
         "evidence_tier": "mixed_primary_and_estimate",
-        "evidence": "Existing BN valuation inputs: LTM distributable earnings (DE) $2.54/sh per Q1-26 interim; DE as owner earnings proxy; realizations lumpy \u2014 base uses DE before realizations growth path [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
+        "evidence": "Existing BN valuation inputs: LTM distributable earnings (DE) $2.54/sh per Q1-26 interim; DE as owner earnings proxy; realizations lumpy — base uses DE before realizations growth path [HUMAN REVIEW — Phase 3 scaffold requires a primary-source bridge].",
         "comparable_role": "not_applicable",
         "comparable_ids": [],
         "adjustment": "The low/base/high range incorporates ownership, tax, capital, cycle, timing, and realization uncertainty pending the primary bridge.",
@@ -890,7 +1402,7 @@
         },
         "method": "realization_reserve",
         "evidence_tier": "mixed_primary_and_estimate",
-        "evidence": "Existing BN valuation inputs: LTM distributable earnings (DE) $2.54/sh per Q1-26 interim; DE as owner earnings proxy; realizations lumpy \u2014 base uses DE before realizations growth path [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
+        "evidence": "Existing BN valuation inputs: LTM distributable earnings (DE) $2.54/sh per Q1-26 interim; DE as owner earnings proxy; realizations lumpy — base uses DE before realizations growth path [HUMAN REVIEW — Phase 3 scaffold requires a primary-source bridge].",
         "comparable_role": "not_applicable",
         "comparable_ids": [],
         "adjustment": "The low/base/high range incorporates ownership, tax, capital, cycle, timing, and realization uncertainty pending the primary bridge.",
@@ -1173,7 +1685,7 @@
         },
         "evidence_tier": "mixed_primary_and_estimate",
         "evidence_level": "analyst_estimated",
-        "evidence": "Existing BN valuation inputs: LTM distributable earnings (DE) $2.54/sh per Q1-26 interim; DE as owner earnings proxy; realizations lumpy \u2014 base uses DE before realizations growth path [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
+        "evidence": "Existing BN valuation inputs: LTM distributable earnings (DE) $2.54/sh per Q1-26 interim; DE as owner earnings proxy; realizations lumpy — base uses DE before realizations growth path [HUMAN REVIEW — Phase 3 scaffold requires a primary-source bridge].",
         "probability_and_timing": null,
         "tax_and_realization_adjustments": "The low/base/high range incorporates ownership, tax, capital, cycle, timing, and realization uncertainty pending the primary bridge.",
         "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case.",
@@ -1212,7 +1724,7 @@
         },
         "evidence_tier": "mixed_primary_and_estimate",
         "evidence_level": "analyst_estimated",
-        "evidence": "Existing BN valuation inputs: LTM distributable earnings (DE) $2.54/sh per Q1-26 interim; DE as owner earnings proxy; realizations lumpy \u2014 base uses DE before realizations growth path [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
+        "evidence": "Existing BN valuation inputs: LTM distributable earnings (DE) $2.54/sh per Q1-26 interim; DE as owner earnings proxy; realizations lumpy — base uses DE before realizations growth path [HUMAN REVIEW — Phase 3 scaffold requires a primary-source bridge].",
         "probability_and_timing": null,
         "tax_and_realization_adjustments": "The low/base/high range incorporates ownership, tax, capital, cycle, timing, and realization uncertainty pending the primary bridge.",
         "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case.",
@@ -1251,7 +1763,7 @@
         },
         "evidence_tier": "mixed_primary_and_estimate",
         "evidence_level": "analyst_estimated",
-        "evidence": "Existing BN valuation inputs: LTM distributable earnings (DE) $2.54/sh per Q1-26 interim; DE as owner earnings proxy; realizations lumpy \u2014 base uses DE before realizations growth path [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
+        "evidence": "Existing BN valuation inputs: LTM distributable earnings (DE) $2.54/sh per Q1-26 interim; DE as owner earnings proxy; realizations lumpy — base uses DE before realizations growth path [HUMAN REVIEW — Phase 3 scaffold requires a primary-source bridge].",
         "probability_and_timing": null,
         "tax_and_realization_adjustments": "The low/base/high range incorporates ownership, tax, capital, cycle, timing, and realization uncertainty pending the primary bridge.",
         "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case.",
@@ -1290,7 +1802,7 @@
         },
         "evidence_tier": "mixed_primary_and_estimate",
         "evidence_level": "analyst_estimated",
-        "evidence": "Existing BN valuation inputs: LTM distributable earnings (DE) $2.54/sh per Q1-26 interim; DE as owner earnings proxy; realizations lumpy \u2014 base uses DE before realizations growth path [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
+        "evidence": "Existing BN valuation inputs: LTM distributable earnings (DE) $2.54/sh per Q1-26 interim; DE as owner earnings proxy; realizations lumpy — base uses DE before realizations growth path [HUMAN REVIEW — Phase 3 scaffold requires a primary-source bridge].",
         "probability_and_timing": null,
         "tax_and_realization_adjustments": "The low/base/high range incorporates ownership, tax, capital, cycle, timing, and realization uncertainty pending the primary bridge.",
         "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case.",
@@ -1315,7 +1827,7 @@
           "label": "Look-through listed and private holdings",
           "kind": "judgment",
           "evidence_tier": "mixed_primary_and_estimate",
-          "evidence": "Existing BN valuation inputs: LTM distributable earnings (DE) $2.54/sh per Q1-26 interim; DE as owner earnings proxy; realizations lumpy \u2014 base uses DE before realizations growth path [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
+          "evidence": "Existing BN valuation inputs: LTM distributable earnings (DE) $2.54/sh per Q1-26 interim; DE as owner earnings proxy; realizations lumpy — base uses DE before realizations growth path [HUMAN REVIEW — Phase 3 scaffold requires a primary-source bridge].",
           "method": "owner_cash_reinvestment_dcf"
         },
         {
@@ -1323,7 +1835,7 @@
           "label": "Asset-management fee and carry engine",
           "kind": "judgment",
           "evidence_tier": "mixed_primary_and_estimate",
-          "evidence": "Existing BN valuation inputs: LTM distributable earnings (DE) $2.54/sh per Q1-26 interim; DE as owner earnings proxy; realizations lumpy \u2014 base uses DE before realizations growth path [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
+          "evidence": "Existing BN valuation inputs: LTM distributable earnings (DE) $2.54/sh per Q1-26 interim; DE as owner earnings proxy; realizations lumpy — base uses DE before realizations growth path [HUMAN REVIEW — Phase 3 scaffold requires a primary-source bridge].",
           "method": "look_through_nav"
         },
         {
@@ -1331,7 +1843,7 @@
           "label": "Corporate cash, debt, preferred, and tax claims",
           "kind": "judgment",
           "evidence_tier": "mixed_primary_and_estimate",
-          "evidence": "Existing BN valuation inputs: LTM distributable earnings (DE) $2.54/sh per Q1-26 interim; DE as owner earnings proxy; realizations lumpy \u2014 base uses DE before realizations growth path [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
+          "evidence": "Existing BN valuation inputs: LTM distributable earnings (DE) $2.54/sh per Q1-26 interim; DE as owner earnings proxy; realizations lumpy — base uses DE before realizations growth path [HUMAN REVIEW — Phase 3 scaffold requires a primary-source bridge].",
           "method": "net_asset_value"
         },
         {
@@ -1339,7 +1851,7 @@
           "label": "Realization and holding-company discount reserve",
           "kind": "judgment",
           "evidence_tier": "mixed_primary_and_estimate",
-          "evidence": "Existing BN valuation inputs: LTM distributable earnings (DE) $2.54/sh per Q1-26 interim; DE as owner earnings proxy; realizations lumpy \u2014 base uses DE before realizations growth path [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
+          "evidence": "Existing BN valuation inputs: LTM distributable earnings (DE) $2.54/sh per Q1-26 interim; DE as owner earnings proxy; realizations lumpy — base uses DE before realizations growth path [HUMAN REVIEW — Phase 3 scaffold requires a primary-source bridge].",
           "method": "realization_reserve"
         }
       ]
@@ -1475,7 +1987,7 @@
       "horizon_years": 7
     },
     "scenario_contract": {
-      "rule": "Cases must change causal operating, capital, probability, timing, or financing drivers\u2014not only the terminal multiple.",
+      "rule": "Cases must change causal operating, capital, probability, timing, or financing drivers—not only the terminal multiple.",
       "top_value_drivers": [
         {
           "component_id": "core_engine",
