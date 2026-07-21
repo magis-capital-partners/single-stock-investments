@@ -1,6 +1,6 @@
 # HGBL — Investment Thesis
 
-**Last updated:** 2026-07-16
+**Last updated:** auto-sync
 
 ## Classification
 
@@ -11,7 +11,13 @@
 | **Dhando** (Pabrai) | partial |
 | **Stance** | watch |
 | **Cycle** | mid |
+| **Implied 7yr IRR** (base) | 8.68% (contract base, provisional) |
+| **IRR method** | quality_reinvestment |
+| **Lawrence bucket** | other |
 | **Payoff lens** | earnings |
+| **MOI bucket** | pending |
+
+**Deep dive:** `HGBL/research/deep_dive_2026-07-21.md` (auto-sync)
 
 ## One-line thesis
 
