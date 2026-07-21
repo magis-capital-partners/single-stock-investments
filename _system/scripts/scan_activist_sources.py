@@ -32,6 +32,7 @@ from extract_activist_text import extract_ticker_activist_text
 from milly_activist_reconcile import reconcile_ticker
 from activist_triage import triage_portfolio
 from activist_short_md import collect_short_markdown_reports
+from press_activist_digest import scan_press_wires
 from sec_activist_scan import scan_portfolio_sec
 from site_activist_scan import scan_publisher_sites
 from third_party_inventory import write_inventory
@@ -130,10 +131,19 @@ def main() -> int:
     parser.add_argument("--dry-run", action="store_true")
     parser.add_argument("--sec-only", action="store_true")
     parser.add_argument("--site-only", action="store_true")
+    parser.add_argument("--wire-only", action="store_true", help="Only run press/letter digest ingest")
     parser.add_argument("--skip-feed", action="store_true")
+    parser.add_argument("--skip-wire", action="store_true", help="Skip press/letter digest lane")
+    parser.add_argument("--skip-site", action="store_true", help="Skip publisher site scrape")
     parser.add_argument("--include-passive", action="store_true", help="Index passive SC 13G filings")
     parser.add_argument("--reindex-local", action="store_true", help="Re-parse local SEC files without re-download")
     parser.add_argument("--reconcile", action="store_true", help="Run Milly activist mechanical reconcile after scan")
+    parser.add_argument(
+        "--backfill-days",
+        type=int,
+        default=None,
+        help="Limit press-wire seeds to this many trailing days (default: all seeds)",
+    )
     parser.add_argument(
         "--fetch-sec",
         action="store_true",
@@ -143,8 +153,11 @@ def main() -> int:
 
     tickers = [t.upper() for t in args.ticker] if args.ticker else portfolio_tickers()
     all_hits: list[dict] = []
+    run_sec = not args.site_only and not args.wire_only
+    run_site = not args.sec_only and not args.wire_only and not args.skip_site
+    run_wire = not args.sec_only and not args.site_only and not args.skip_wire
 
-    if not args.site_only:
+    if run_sec:
         sec = scan_portfolio_sec(
             tickers,
             dry_run=args.dry_run,
@@ -153,9 +166,18 @@ def main() -> int:
         )
         all_hits.extend(sec.get("hits") or [])
 
-    if not args.sec_only:
+    if run_site:
         site = scan_publisher_sites(tickers, dry_run=args.dry_run)
         all_hits.extend(site.get("hits") or [])
+
+    if run_wire:
+        wire = scan_press_wires(
+            tickers,
+            dry_run=args.dry_run,
+            backfill_days=args.backfill_days,
+            scan_date=args.date,
+        )
+        all_hits.extend(wire.get("hits") or [])
 
     for ticker in tickers:
         local = collect_local_reports(ticker)
