@@ -1,7 +1,8 @@
 name: Auto - Agent PR Merge
 
-# Squash-merge Cursor cloud-agent deep dive PRs after research-quality CI passes.
-# Resolves shared-file conflicts with main before merge when needed.
+# Squash-merge Cursor cloud-agent PRs (Marvin research or Investment Committee
+# task artifacts) after research-quality CI passes. Resolves shared-file
+# conflicts with main before merge when needed.
 
 on:
   pull_request:
@@ -82,7 +83,7 @@ jobs:
         with:
           python-version: "3.12"
 
-      - name: Verify immutable research provenance
+      - name: Verify immutable agent provenance
         if: steps.meta.outputs.eligible == 'true'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -90,18 +91,28 @@ jobs:
           REPO: ${{ github.repository }}
           HEAD_REF: ${{ steps.meta.outputs.head_ref }}
         run: |
-          mapfile -t TICKERS < <(gh api --paginate "repos/$REPO/pulls/$PR/files" --jq '.[].filename' | sed -nE 's|^([^/]+)/research/research_agent_manifest\.json$|\1|p' | sort -u)
-          if [ "${#TICKERS[@]}" -eq 0 ]; then
-            echo "::error::Cursor research PR must include research_agent_manifest.json."
+          mapfile -t FILES < <(gh api --paginate "repos/$REPO/pulls/$PR/files" --jq '.[].filename')
+          mapfile -t RESEARCH_TICKERS < <(printf '%s\n' "${FILES[@]}" | sed -nE 's|^([^/]+)/research/research_agent_manifest\.json$|\1|p' | sort -u)
+          mapfile -t COMMITTEE_FILES < <(printf '%s\n' "${FILES[@]}" | grep -E '^[^/]+/research/committee_work/' || true)
+
+          if [ "${#RESEARCH_TICKERS[@]}" -gt 0 ]; then
+            for TICKER in "${RESEARCH_TICKERS[@]}"; do
+              MANIFEST="$(mktemp)"
+              STATE="$(mktemp)"
+              gh api "repos/$REPO/contents/$TICKER/research/research_agent_manifest.json?ref=$HEAD_REF" --jq .content | base64 --decode > "$MANIFEST"
+              gh api "repos/$REPO/contents/$TICKER/research/agent_run_state.json?ref=$HEAD_REF" --jq .content | base64 --decode > "$STATE"
+              python _system/scripts/validate_research_pr_provenance.py --ticker "$TICKER" --manifest "$MANIFEST" --state "$STATE"
+            done
+            exit 0
+          fi
+
+          if [ "${#COMMITTEE_FILES[@]}" -eq 0 ]; then
+            echo "::error::Cursor agent PR must include research_agent_manifest.json or committee_work artifacts."
             exit 1
           fi
-          for TICKER in "${TICKERS[@]}"; do
-            MANIFEST="$(mktemp)"
-            STATE="$(mktemp)"
-            gh api "repos/$REPO/contents/$TICKER/research/research_agent_manifest.json?ref=$HEAD_REF" --jq .content | base64 --decode > "$MANIFEST"
-            gh api "repos/$REPO/contents/$TICKER/research/agent_run_state.json?ref=$HEAD_REF" --jq .content | base64 --decode > "$STATE"
-            python _system/scripts/validate_research_pr_provenance.py --ticker "$TICKER" --manifest "$MANIFEST" --state "$STATE"
-          done
+
+          # Workspace is the PR merge commit: main packet + this task's artifact.
+          printf '%s\n' "${COMMITTEE_FILES[@]}" | python _system/scripts/validate_committee_pr_artifacts.py
 
       - name: Resolve merge conflicts with main
         if: steps.meta.outputs.eligible == 'true'

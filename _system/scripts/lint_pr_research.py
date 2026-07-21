@@ -106,10 +106,12 @@ def valuation_insider_only_diff(ticker: str, base: str) -> bool:
 
 
 def research_diff_kind(ticker: str, paths: list[str], base: str) -> str:
-    """Per ticker: mechanical_only | narrative | mixed."""
+    """Per ticker: mechanical_only | committee_only | narrative | mixed."""
     tk_paths = [p for p in paths if p.startswith(f"{ticker}/research/")]
     if not tk_paths:
         return "narrative"
+    if all("/research/committee_work/" in p for p in tk_paths):
+        return "committee_only"
     non_mechanical = []
     for p in tk_paths:
         if p.endswith("/research/valuation.json"):
@@ -152,6 +154,9 @@ def main() -> int:
             continue
         kind = research_diff_kind(ticker, paths, args.base)
         print(f"\n=== lint {ticker} ({kind}) ===")
+        if kind == "committee_only":
+            print(f"SKIP {ticker}: committee_work-only diff")
+            continue
         if kind == "mechanical_only":
             val_path = ROOT / ticker / "research" / "valuation.json"
             val: dict = {}
