@@ -55,8 +55,7 @@ re_pass: false
 | Valuation bridge base | 7.6% | 7.6% | Yes |
 
 **Lint notes:**
-- ABBV/research/deep_dive_2026-07-21.md: executive_summary_first_pct 15.0% vs valuation.json base 7.6% (tol 0.25pp)
-- ABBV/research: adversarial date adversarial_2026-07-10.md != dive 2026-07-21
+- ABBV/research/deep_dive_2026-07-21.md: executive_summary_first_pct 12.4% vs valuation.json base 7.6% (tol 0.25pp)
 
 ---
 

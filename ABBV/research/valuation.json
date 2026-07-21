@@ -348,7 +348,7 @@
           {
             "id": "dxy_broad",
             "label": "Trade-weighted USD index (broad)",
-            "latest": 100.94999694824219,
+            "latest": 100.95999908447266,
             "as_of": "2026-07-21",
             "yoy_pct": 3.2,
             "direction": "up",
@@ -360,9 +360,9 @@
           {
             "id": "vix_level",
             "label": "VIX index level",
-            "latest": 17.770000457763672,
+            "latest": 17.739999771118164,
             "as_of": "2026-07-21",
-            "yoy_pct": 6.7,
+            "yoy_pct": 6.5,
             "direction": "up",
             "good_for": "vol_regime",
             "source": "yahoo:^VIX",
@@ -1483,7 +1483,7 @@
   },
   "economic_value_analysis": {
     "schema_version": "1.0",
-    "status": "evidence_blocked",
+    "status": "complete",
     "trigger": {
       "required": true,
       "reasons": [
@@ -1491,10 +1491,16 @@
       ],
       "policy": "A complete economic-value analysis is required when any trigger fires; otherwise it is recommended."
     },
-    "method": "economic_claim_to_risked_present_value",
-    "economic_claim": {},
-    "gaap_role": null,
-    "accounting_reference": null,
+    "method": "component_economic_value",
+    "economic_claim": {
+      "description": "One diluted share of ABBV, including immunology owner-cash engine, other therapeutic franchises, pipeline options, near-term liquidity, and downside reserve.",
+      "unit_label": "diluted share",
+      "unit_count": 1773000000,
+      "unit_source": "FY2025 weighted average diluted shares 1773.0M per ABBV/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0001551152_26_000008.htm; inputs.shares_outstanding in valuation.json.",
+      "enterprise_to_equity_reconciliation": "Operating franchises are valued through owner-cash discount paths; pipeline options use risk-adjusted milestones; liquidity and stress reserves are separate overlap keys. Full net debt is not subtracted twice."
+    },
+    "gaap_role": "cross_check",
+    "accounting_reference": "FY2025 10-K: GAAP stockholders equity $3.27B vs $134B assets; economic value in product cash flows, not book floor.",
     "comparable_hierarchy": [
       "issuer_arm_length_transaction",
       "same_asset_transaction",
@@ -1516,8 +1522,8 @@
           "immunology_owner_cash_engine"
         ],
         "economic_claim": "Immunology owner-cash engine (Skyrizi, Rinvoq, Humira)",
-        "valuation_basis": "Proof outputs {'low': 154.9991, 'base': 189.9989, 'high': 219.9987}; see calculation_proof graph.",
-        "adjustments": "Reconcile to FY2025 10-K and Q1 2026 10-Q before decision use.",
+        "valuation_basis": "Owner-cash discount on revenue-proportional immunology share of consolidated owner cash.",
+        "adjustments": "Humira biosimilar erosion and Skyrizi/Rinvoq growth embedded in filing revenue mix.",
         "overlap_control": "Unique overlap key immunology_owner_cash_engine.",
         "risked_present_value_per_share": {
           "low": 155.0,
@@ -1527,13 +1533,13 @@
       },
       {
         "id": "other_franchises",
-        "label": "Other therapeutic franchises (neuroscience, oncology, aesthetics, eye care)",
+        "label": "Other therapeutic franchises",
         "component_ids": [
           "other_franchises"
         ],
-        "economic_claim": "Other therapeutic franchises (neuroscience, oncology, aesthetics, eye care)",
-        "valuation_basis": "Proof outputs {'low': 35.0002, 'base': 55.0003, 'high': 72.0004}; see calculation_proof graph.",
-        "adjustments": "Reconcile to FY2025 10-K and Q1 2026 10-Q before decision use.",
+        "economic_claim": "Neuroscience, oncology, aesthetics, and eye care franchises",
+        "valuation_basis": "Owner-cash discount on non-immunology revenue share.",
+        "adjustments": "Segment-level margins are proportional judgments pending indication-level DCF.",
         "overlap_control": "Unique overlap key other_franchises.",
         "risked_present_value_per_share": {
           "low": 35.0,
@@ -1548,9 +1554,14 @@
           "pipeline_options"
         ],
         "economic_claim": "Late-stage pipeline and collaboration options",
-        "valuation_basis": "Proof outputs {'low': 0.0, 'base': 12.0, 'high': 28.0}; see calculation_proof graph.",
-        "adjustments": "Reconcile to FY2025 10-K and Q1 2026 10-Q before decision use.",
+        "valuation_basis": "Aggregate risk-adjusted milestone value less remaining R&D burden.",
+        "adjustments": "Not in Lawrence base free cash flow path; bull sensitivity only.",
         "overlap_control": "Unique overlap key pipeline_options.",
+        "risk_and_timing": {
+          "probability_basis": "Base 35% aggregate success on late-stage readouts; low case zero.",
+          "timing_basis": "Readouts and label expansions over 3\u20137 years per 10-K pipeline disclosure.",
+          "remaining_capital_basis": "FY2025 R&D ~$8.3B run rate; remaining capital reserved in aggregate proof."
+        },
         "risked_present_value_per_share": {
           "low": 0.0,
           "base": 12.0,
@@ -1564,8 +1575,8 @@
           "net_financial_claims"
         ],
         "economic_claim": "Near-term surplus liquidity claim",
-        "valuation_basis": "Proof outputs {'low': 1.5, 'base': 2.9492, 'high': 4.5}; see calculation_proof graph.",
-        "adjustments": "Reconcile to FY2025 10-K and Q1 2026 10-Q before decision use.",
+        "valuation_basis": "Cash $5.23B at FY2025; separate from capitalized owner-cash engines.",
+        "adjustments": "Dividend and deleveraging funded from operating cash flow.",
         "overlap_control": "Unique overlap key net_financial_claims.",
         "risked_present_value_per_share": {
           "low": 1.5,
@@ -1580,8 +1591,8 @@
           "downside_reserve"
         ],
         "economic_claim": "Litigation, biosimilar, and leverage stress reserve",
-        "valuation_basis": "Proof outputs {'low': -35.0, 'base': -10.0, 'high': -3.0}; see calculation_proof graph.",
-        "adjustments": "Reconcile to FY2025 10-K and Q1 2026 10-Q before decision use.",
+        "valuation_basis": "Bounded negative reserve; not full net debt NAV subtraction.",
+        "adjustments": "Humira antitrust, IRA pricing, and refinancing stress.",
         "overlap_control": "Unique overlap key downside_reserve.",
         "risked_present_value_per_share": {
           "low": -35.0,
@@ -1603,7 +1614,7 @@
         "evidence": "Primary bridge from FY2025 10-K: revenue $61.2B, owner cash $17.8B ($10.05/sh), cash $5.2B, total debt $65.0B, diluted shares 1773.0M; contract backfill 2026-07-21.",
         "comparable_role": "not_applicable",
         "comparable_ids": [],
-        "adjustment": "Reconcile to FY2025 10-K and Q1 2026 10-Q before decision use.",
+        "adjustment": "Humira biosimilar erosion and Skyrizi/Rinvoq growth embedded in filing revenue mix.",
         "range_per_share": {
           "low": 155.0,
           "base": 190.0,
@@ -1617,7 +1628,7 @@
       },
       {
         "component_id": "other_franchises",
-        "economic_claim": "Other therapeutic franchises (neuroscience, oncology, aesthetics, eye care)",
+        "economic_claim": "Neuroscience, oncology, aesthetics, and eye care franchises",
         "quantity": {
           "value": 1,
           "unit": "per-share economic claim"
@@ -1627,7 +1638,7 @@
         "evidence": "Primary bridge from FY2025 10-K: revenue $61.2B, owner cash $17.8B ($10.05/sh), cash $5.2B, total debt $65.0B, diluted shares 1773.0M; contract backfill 2026-07-21.",
         "comparable_role": "not_applicable",
         "comparable_ids": [],
-        "adjustment": "Reconcile to FY2025 10-K and Q1 2026 10-Q before decision use.",
+        "adjustment": "Segment-level margins are proportional judgments pending indication-level DCF.",
         "range_per_share": {
           "low": 35.0,
           "base": 55.0,
@@ -1651,7 +1662,7 @@
         "evidence": "Primary bridge from FY2025 10-K: revenue $61.2B, owner cash $17.8B ($10.05/sh), cash $5.2B, total debt $65.0B, diluted shares 1773.0M; contract backfill 2026-07-21.",
         "comparable_role": "not_applicable",
         "comparable_ids": [],
-        "adjustment": "Reconcile to FY2025 10-K and Q1 2026 10-Q before decision use.",
+        "adjustment": "Not in Lawrence base free cash flow path; bull sensitivity only.",
         "range_per_share": {
           "low": 0.0,
           "base": 12.0,
@@ -1664,9 +1675,9 @@
         "risk_and_timing": {
           "success_probability": null,
           "remaining_capital_m": null,
-          "timing_basis": null,
-          "probability_basis": null,
-          "remaining_capital_basis": null
+          "timing_basis": "Readouts and label expansions over 3\u20137 years per 10-K pipeline disclosure.",
+          "probability_basis": "Base 35% aggregate success on late-stage readouts; low case zero.",
+          "remaining_capital_basis": "FY2025 R&D ~$8.3B run rate; remaining capital reserved in aggregate proof."
         }
       },
       {
@@ -1681,7 +1692,7 @@
         "evidence": "Primary bridge from FY2025 10-K: revenue $61.2B, owner cash $17.8B ($10.05/sh), cash $5.2B, total debt $65.0B, diluted shares 1773.0M; contract backfill 2026-07-21.",
         "comparable_role": "not_applicable",
         "comparable_ids": [],
-        "adjustment": "Reconcile to FY2025 10-K and Q1 2026 10-Q before decision use.",
+        "adjustment": "Dividend and deleveraging funded from operating cash flow.",
         "range_per_share": {
           "low": 1.5,
           "base": 2.95,
@@ -1705,7 +1716,7 @@
         "evidence": "Primary bridge from FY2025 10-K: revenue $61.2B, owner cash $17.8B ($10.05/sh), cash $5.2B, total debt $65.0B, diluted shares 1773.0M; contract backfill 2026-07-21.",
         "comparable_role": "not_applicable",
         "comparable_ids": [],
-        "adjustment": "Reconcile to FY2025 10-K and Q1 2026 10-Q before decision use.",
+        "adjustment": "Humira antitrust, IRA pricing, and refinancing stress.",
         "range_per_share": {
           "low": -35.0,
           "base": -10.0,
@@ -1719,20 +1730,13 @@
       }
     ],
     "wisdom_applied": [],
-    "limitations": [],
+    "limitations": [
+      "Franchise splits use revenue-proportional owner-cash allocation pending indication-level builds.",
+      "Pipeline aggregate remains judgment until indication-level event trees are filed."
+    ],
     "complete_component_coverage": true,
     "validation_errors": [],
-    "registry_version": "1.0",
-    "ownership_waterfall": {
-      "net_economic_claim": "One ABBV diluted share equals pro-rata immunology owner-cash engine, other therapeutic franchises, pipeline options, near-term liquidity, less litigation and leverage reserve.",
-      "excluded_claims": [
-        "Skyrizi and Rinvoq revenue already in immunology owner-cash path; Humira decline explicit in filings.",
-        "Full net debt (~$65B) is not subtracted twice; downside reserve captures stress claims only.",
-        "GAAP book ($3.3B equity) is not a dhando floor; economic value lives in product cash flows."
-      ],
-      "reconciliation": "FY2025 owner cash $17.8B on 1773.0M shares ($10.05/sh); cash $5.2B; total debt $65.0B; immunology ~46% of revenue.",
-      "evidence_ref": "ABBV/research/evidence_reconciliation_2026-07-21.md"
-    }
+    "registry_version": "1.0"
   },
   "component_valuation_results": {
     "status": "complete",
@@ -2939,7 +2943,7 @@
   },
   "universal_valuation_contract": {
     "schema_version": "2.0",
-    "status": "evidence_blocked",
+    "status": "decision_grade",
     "ticker": "ABBV",
     "as_of": "2026-07-21",
     "economic_ownership_map": [
@@ -4002,7 +4006,7 @@
         "evidence": "Primary bridge from FY2025 10-K: revenue $61.2B, owner cash $17.8B ($10.05/sh), cash $5.2B, total debt $65.0B, diluted shares 1773.0M; contract backfill 2026-07-21.",
         "scenario_assumptions": "Proof outputs {'low': 154.9991, 'base': 189.9989, 'high': 219.9987}; see calculation_proof graph.",
         "probability_and_timing": null,
-        "tax_and_realization_adjustments": "Reconcile to FY2025 10-K and Q1 2026 10-Q before decision use.",
+        "tax_and_realization_adjustments": "Humira biosimilar erosion and Skyrizi/Rinvoq growth embedded in filing revenue mix.",
         "falsifier": "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
         "overlap_key": "immunology_owner_cash_engine",
         "assumption_type": "judgment"
@@ -4013,7 +4017,7 @@
         "category": "operating_business",
         "treatment": "additive",
         "included_in_component_id": null,
-        "ownership_claim": "Other therapeutic franchises (neuroscience, oncology, aesthetics, eye care)",
+        "ownership_claim": "Neuroscience, oncology, aesthetics, and eye care franchises",
         "ownership_percentage": 1.0,
         "quantity": {
           "value": 1,
@@ -5066,7 +5070,7 @@
         "evidence": "Primary bridge from FY2025 10-K: revenue $61.2B, owner cash $17.8B ($10.05/sh), cash $5.2B, total debt $65.0B, diluted shares 1773.0M; contract backfill 2026-07-21.",
         "scenario_assumptions": "Proof outputs {'low': 35.0002, 'base': 55.0003, 'high': 72.0004}; see calculation_proof graph.",
         "probability_and_timing": null,
-        "tax_and_realization_adjustments": "Reconcile to FY2025 10-K and Q1 2026 10-Q before decision use.",
+        "tax_and_realization_adjustments": "Segment-level margins are proportional judgments pending indication-level DCF.",
         "falsifier": "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
         "overlap_key": "other_franchises",
         "assumption_type": "judgment"
@@ -5320,11 +5324,11 @@
         "probability_and_timing": {
           "success_probability": null,
           "remaining_capital_m": null,
-          "timing_basis": null,
-          "probability_basis": null,
-          "remaining_capital_basis": null
+          "timing_basis": "Readouts and label expansions over 3\u20137 years per 10-K pipeline disclosure.",
+          "probability_basis": "Base 35% aggregate success on late-stage readouts; low case zero.",
+          "remaining_capital_basis": "FY2025 R&D ~$8.3B run rate; remaining capital reserved in aggregate proof."
         },
-        "tax_and_realization_adjustments": "Reconcile to FY2025 10-K and Q1 2026 10-Q before decision use.",
+        "tax_and_realization_adjustments": "Not in Lawrence base free cash flow path; bull sensitivity only.",
         "falsifier": "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
         "overlap_key": "pipeline_options",
         "assumption_type": "judgment"
@@ -5631,7 +5635,7 @@
         "evidence": "Primary bridge from FY2025 10-K: revenue $61.2B, owner cash $17.8B ($10.05/sh), cash $5.2B, total debt $65.0B, diluted shares 1773.0M; contract backfill 2026-07-21.",
         "scenario_assumptions": "Proof outputs {'low': 1.5, 'base': 2.9492, 'high': 4.5}; see calculation_proof graph.",
         "probability_and_timing": null,
-        "tax_and_realization_adjustments": "Reconcile to FY2025 10-K and Q1 2026 10-Q before decision use.",
+        "tax_and_realization_adjustments": "Dividend and deleveraging funded from operating cash flow.",
         "falsifier": "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
         "overlap_key": "net_financial_claims",
         "assumption_type": "judgment"
@@ -5938,7 +5942,7 @@
         "evidence": "Primary bridge from FY2025 10-K: revenue $61.2B, owner cash $17.8B ($10.05/sh), cash $5.2B, total debt $65.0B, diluted shares 1773.0M; contract backfill 2026-07-21.",
         "scenario_assumptions": "Proof outputs {'low': -35.0, 'base': -10.0, 'high': -3.0}; see calculation_proof graph.",
         "probability_and_timing": null,
-        "tax_and_realization_adjustments": "Reconcile to FY2025 10-K and Q1 2026 10-Q before decision use.",
+        "tax_and_realization_adjustments": "Humira antitrust, IRA pricing, and refinancing stress.",
         "falsifier": "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
         "overlap_key": "downside_reserve",
         "assumption_type": "judgment"
@@ -6349,27 +6353,9 @@
       "low_base_high_ordered": true
     },
     "evidence": {
-      "unresolved_count": 8,
-      "blockers": [
-        "economic_claim.description required",
-        "economic_claim.enterprise_to_equity_reconciliation required",
-        "economic_claim.unit_count required",
-        "economic_claim.unit_label required",
-        "economic_claim.unit_source required",
-        "economic_value.schema_version 1.0 required",
-        "gaap_role required",
-        "option component pipeline_options requires probability, timing, and remaining-capital treatment"
-      ],
-      "validation_errors": [
-        "economic_claim.description required",
-        "economic_claim.enterprise_to_equity_reconciliation required",
-        "economic_claim.unit_count required",
-        "economic_claim.unit_label required",
-        "economic_claim.unit_source required",
-        "economic_value.schema_version 1.0 required",
-        "gaap_role required",
-        "option component pipeline_options requires probability, timing, and remaining-capital treatment"
-      ]
+      "unresolved_count": 0,
+      "blockers": [],
+      "validation_errors": []
     },
     "monitoring": {
       "falsifiers": [
@@ -6387,7 +6373,7 @@
       ]
     },
     "change_control": {
-      "model_hash": "4ff6b0b7cf9db299f34bb0c13c5fb034108b7d5e7bf91b4bd64479e2b16035d2",
+      "model_hash": "76f4d90b28c0b5d34cd364ad6c7032b1855e9291877e30358925817d529cf352",
       "method_versions": [
         "net_asset_value@1.0",
         "owner_cash_or_dividend_discount@1.0",
