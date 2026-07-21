@@ -561,62 +561,6 @@
               "base": "value_per_share",
               "high": "value_per_share"
             }
-          },
-          "risk_and_timing": {
-            "success_probability": 0.55,
-            "remaining_capital_m": 0.0,
-            "timing_basis": "Typical 12-24 month implant system delivery from backlog disclosure (10-K); base realization ~2 years",
-            "probability_basis": "Backlog conversion history and FY2025 deferred revenue recognition pace (10-K backlog note)",
-            "remaining_capital_basis": "Incremental capex for backlog conversion already in normalized owner-cash path"
-          },
-          "driver_model": {
-            "type": "milestone_project_option",
-            "timing_basis": "Typical 12-24 month implant system delivery from backlog disclosure (10-K); base realization ~2 years",
-            "scenarios": {
-              "low": {
-                "success_probability": 0.0,
-                "success_value_m": 697.0,
-                "remaining_cost_m": 0.0,
-                "ownership_pct": 1.0
-              },
-              "base": {
-                "success_probability": 0.55,
-                "success_value_m": 697.0,
-                "remaining_cost_m": 0.0,
-                "ownership_pct": 1.0
-              },
-              "high": {
-                "success_probability": 0.75,
-                "success_value_m": 1520.0,
-                "remaining_cost_m": 0.0,
-                "ownership_pct": 1.0
-              }
-            }
-          }
-        },
-        "driver_model_type": "milestone_project_option",
-        "driver_model": {
-          "type": "milestone_project_option",
-          "timing_basis": "Typical 12-24 month implant system delivery from backlog disclosure (10-K); base realization ~2 years",
-          "scenarios": {
-            "low": {
-              "success_probability": 0.0,
-              "success_value_m": 697.0,
-              "remaining_cost_m": 0.0,
-              "ownership_pct": 1.0
-            },
-            "base": {
-              "success_probability": 0.55,
-              "success_value_m": 697.0,
-              "remaining_cost_m": 0.0,
-              "ownership_pct": 1.0
-            },
-            "high": {
-              "success_probability": 0.75,
-              "success_value_m": 1520.0,
-              "remaining_cost_m": 0.0,
-              "ownership_pct": 1.0
-            }
           }
         }
       },
@@ -815,7 +759,7 @@
   },
   "economic_value_analysis": {
     "schema_version": "1.0",
-    "status": "complete",
+    "status": "evidence_blocked",
     "trigger": {
       "required": true,
       "reasons": [
@@ -823,16 +767,10 @@
       ],
       "policy": "A complete economic-value analysis is required when any trigger fires; otherwise it is recommended."
     },
-    "method": "component_economic_value",
-    "economic_claim": {
-      "description": "One diluted share of Axcelis Technologies, including mid-cycle ion implant operations, systems backlog conversion option, net cash claims, and cycle reserve.",
-      "unit_label": "diluted share",
-      "unit_count": 31668000,
-      "unit_source": "31.668M weighted average diluted shares FY2025 (10-K)",
-      "enterprise_to_equity_reconciliation": "Debt-free balance sheet; operating value and backlog option are additive; cycle reserve is a liability component; services cash flow embedded in core engine."
-    },
-    "gaap_role": "cross_check",
-    "accounting_reference": "FY2025 10-K and Q1 2026 10-Q; mid-cycle owner cash normalized across FY2023-FY2025.",
+    "method": "economic_claim_to_risked_present_value",
+    "economic_claim": {},
+    "gaap_role": null,
+    "accounting_reference": null,
     "comparable_hierarchy": [
       "issuer_arm_length_transaction",
       "same_asset_transaction",
@@ -843,8 +781,8 @@
     "gross_comparable_nav_per_share": null,
     "risked_present_value_per_share": {
       "low": -9.35,
-      "base": 56.51,
-      "high": 133.67
+      "base": 66.4,
+      "high": 145.67
     },
     "component_groups": [
       {
@@ -875,8 +813,8 @@
         "overlap_control": "Unique overlap key systems_backlog_conversion_option.",
         "risked_present_value_per_share": {
           "low": 0.0,
-          "base": 12.11,
-          "high": 36.0
+          "base": 22.0,
+          "high": 48.0
         }
       },
       {
@@ -941,8 +879,8 @@
         "component_id": "systems_backlog_conversion_option",
         "economic_claim": "Systems backlog and deferred revenue conversion option",
         "quantity": {
-          "value": 697.0,
-          "unit": "base success value, millions"
+          "value": 1,
+          "unit": "per-share economic claim"
         },
         "method": "risk_adjusted_milestone_value",
         "evidence_tier": "primary_derived",
@@ -952,17 +890,17 @@
         "adjustment": "Reconcile to FY2025 10-K and Q1 2026 10-Q before decision use.",
         "range_per_share": {
           "low": 0.0,
-          "base": 12.11,
-          "high": 36.0
+          "base": 22.0,
+          "high": 48.0
         },
         "treatment": "additive",
         "overlap_key": "systems_backlog_conversion_option",
         "overlap_control": "Unique overlap key systems_backlog_conversion_option.",
         "falsifier": "Primary evidence shows claim, cash conversion, or cycle path is materially worse than low case.",
         "risk_and_timing": {
-          "success_probability": 0.55,
-          "remaining_capital_m": 0.0,
-          "timing_basis": "Typical 12-24 month implant system delivery from backlog disclosure (10-K); base realization ~2 years",
+          "success_probability": null,
+          "remaining_capital_m": null,
+          "timing_basis": null,
           "probability_basis": null,
           "remaining_capital_basis": null
         }
@@ -1019,7 +957,16 @@
     "wisdom_applied": [],
     "limitations": [],
     "complete_component_coverage": true,
-    "validation_errors": [],
+    "validation_errors": [
+      "economic_claim.description required",
+      "economic_claim.enterprise_to_equity_reconciliation required",
+      "economic_claim.unit_count required",
+      "economic_claim.unit_label required",
+      "economic_claim.unit_source required",
+      "economic_value.schema_version 1.0 required",
+      "gaap_role required",
+      "option component systems_backlog_conversion_option requires probability, timing, and remaining-capital treatment"
+    ],
     "registry_version": "1.0"
   },
   "results_lawrence_legacy": {
@@ -1484,56 +1431,14 @@
         "evidence_tier": "primary_derived",
         "evidence": "Primary bridge from ACLS/investor-documents/sec-edgar/10-K_20260226_rpt20251231_acc0001104659_26_020461.htm: FY2025 revenue $839.0M, OCF $118.3M, FCF $107.0M, cash $145.5M, systems backlog $457.0M; contract backfill 2026-07-21.",
         "cross_check": "Reconcile to FY2025 10-K and Q1 2026 10-Q before decision use.",
-        "driver_model_type": "milestone_project_option",
-        "driver_model": {
-          "type": "milestone_project_option",
-          "timing_basis": "Typical 12-24 month implant system delivery from backlog disclosure (10-K); base realization ~2 years",
-          "scenarios": {
-            "low": {
-              "success_probability": 0.0,
-              "success_value_m": 697.0,
-              "remaining_cost_m": 0.0,
-              "ownership_pct": 1.0
-            },
-            "base": {
-              "success_probability": 0.55,
-              "success_value_m": 697.0,
-              "remaining_cost_m": 0.0,
-              "ownership_pct": 1.0
-            },
-            "high": {
-              "success_probability": 0.75,
-              "success_value_m": 1520.0,
-              "remaining_cost_m": 0.0,
-              "ownership_pct": 1.0
-            }
-          }
-        },
+        "driver_model_type": null,
+        "driver_model": null,
         "assumption_summary": "Proof outputs {'low': 0.0, 'base': 22.0001, 'high': 48.0011}; see calculation_proof graph.",
         "falsifier": "Primary evidence shows claim, cash conversion, or cycle path is materially worse than low case.",
-        "scenario_assumptions": {
-          "low": {
-            "success_probability": 0.0,
-            "success_value_m": 697.0,
-            "remaining_cost_m": 0.0,
-            "ownership_pct": 1.0
-          },
-          "base": {
-            "success_probability": 0.55,
-            "success_value_m": 697.0,
-            "remaining_cost_m": 0.0,
-            "ownership_pct": 1.0
-          },
-          "high": {
-            "success_probability": 0.75,
-            "success_value_m": 1520.0,
-            "remaining_cost_m": 0.0,
-            "ownership_pct": 1.0
-          }
-        },
+        "scenario_assumptions": null,
         "low_per_share": 0.0,
-        "base_per_share": 12.11,
-        "high_per_share": 36.0
+        "base_per_share": 22.0,
+        "high_per_share": 48.0
       },
       {
         "id": "net_financial_claims",
@@ -1732,8 +1637,8 @@
     "embedded_components": [],
     "total_equity_value_per_share": {
       "low": -9.35,
-      "base": 56.51,
-      "high": 133.67
+      "base": 66.4,
+      "high": 145.67
     },
     "material_component_count": 4,
     "additive_component_count": 4,
@@ -1741,8 +1646,8 @@
     "market_price_per_share": 131.7,
     "upside_downside_pct": {
       "low": -107.1,
-      "base": -57.1,
-      "high": 1.5
+      "base": -49.6,
+      "high": 10.6
     }
   },
   "component_review_queue": {
@@ -1781,10 +1686,10 @@
         "treatment": "additive",
         "range_per_share": {
           "low": 0.0,
-          "base": 12.11,
-          "high": 36.0
+          "base": 22.0,
+          "high": 48.0
         },
-        "range_width_pct_of_base": 297.3,
+        "range_width_pct_of_base": 218.2,
         "evidence_tier": "primary_derived",
         "recommended_raters": [
           "klarman_asset_value",
@@ -1968,7 +1873,7 @@
   },
   "universal_valuation_contract": {
     "schema_version": "2.0",
-    "status": "decision_grade",
+    "status": "evidence_blocked",
     "ticker": "ACLS",
     "as_of": "2026-07-21",
     "economic_ownership_map": [
@@ -3056,8 +2961,8 @@
         "ownership_claim": "Systems backlog and deferred revenue conversion option",
         "ownership_percentage": 1.0,
         "quantity": {
-          "value": 697.0,
-          "unit": "base success value, millions"
+          "value": 1,
+          "unit": "per-share economic claim"
         },
         "method": "risk_adjusted_milestone_value",
         "method_version": "1.0",
@@ -3084,8 +2989,8 @@
         },
         "legacy_range_per_share": {
           "low": 0.0,
-          "base": 12.11,
-          "high": 36.0
+          "base": 22.0,
+          "high": 48.0
         },
         "valuation_status": "bounded_estimate",
         "calculation_proof": {
@@ -3345,30 +3250,11 @@
         "evidence_tier": "primary_derived",
         "evidence_level": "primary_derived",
         "evidence": "Primary bridge from ACLS/investor-documents/sec-edgar/10-K_20260226_rpt20251231_acc0001104659_26_020461.htm: FY2025 revenue $839.0M, OCF $118.3M, FCF $107.0M, cash $145.5M, systems backlog $457.0M; contract backfill 2026-07-21.",
-        "scenario_assumptions": {
-          "low": {
-            "success_probability": 0.0,
-            "success_value_m": 697.0,
-            "remaining_cost_m": 0.0,
-            "ownership_pct": 1.0
-          },
-          "base": {
-            "success_probability": 0.55,
-            "success_value_m": 697.0,
-            "remaining_cost_m": 0.0,
-            "ownership_pct": 1.0
-          },
-          "high": {
-            "success_probability": 0.75,
-            "success_value_m": 1520.0,
-            "remaining_cost_m": 0.0,
-            "ownership_pct": 1.0
-          }
-        },
+        "scenario_assumptions": "Proof outputs {'low': 0.0, 'base': 22.0001, 'high': 48.0011}; see calculation_proof graph.",
         "probability_and_timing": {
-          "success_probability": 0.55,
-          "remaining_capital_m": 0.0,
-          "timing_basis": "Typical 12-24 month implant system delivery from backlog disclosure (10-K); base realization ~2 years",
+          "success_probability": null,
+          "remaining_capital_m": null,
+          "timing_basis": null,
           "probability_basis": null,
           "remaining_capital_basis": null
         },
@@ -4119,8 +4005,8 @@
       },
       "legacy_value_per_share": {
         "low": -9.35,
-        "base": 56.51,
-        "high": 133.67
+        "base": 66.4,
+        "high": 145.67
       },
       "probability_weighted_value_per_share": 66.3997,
       "expected_distributions_per_share": 0.0,
@@ -4150,28 +4036,9 @@
           "label": "Systems backlog and deferred revenue conversion option",
           "valuation_status": "bounded_estimate",
           "base_per_share": 22.0001,
-          "legacy_base_per_share": 12.11,
+          "legacy_base_per_share": 22.0,
           "range_width_per_share": 48.0011,
-          "scenario_assumptions": {
-            "low": {
-              "success_probability": 0.0,
-              "success_value_m": 697.0,
-              "remaining_cost_m": 0.0,
-              "ownership_pct": 1.0
-            },
-            "base": {
-              "success_probability": 0.55,
-              "success_value_m": 697.0,
-              "remaining_cost_m": 0.0,
-              "ownership_pct": 1.0
-            },
-            "high": {
-              "success_probability": 0.75,
-              "success_value_m": 1520.0,
-              "remaining_cost_m": 0.0,
-              "ownership_pct": 1.0
-            }
-          }
+          "scenario_assumptions": "Proof outputs {'low': 0.0, 'base': 22.0001, 'high': 48.0011}; see calculation_proof graph."
         },
         {
           "component_id": "cycle_and_concentration_reserve",
@@ -4326,9 +4193,27 @@
       "low_base_high_ordered": true
     },
     "evidence": {
-      "unresolved_count": 0,
-      "blockers": [],
-      "validation_errors": []
+      "unresolved_count": 8,
+      "blockers": [
+        "economic_claim.description required",
+        "economic_claim.enterprise_to_equity_reconciliation required",
+        "economic_claim.unit_count required",
+        "economic_claim.unit_label required",
+        "economic_claim.unit_source required",
+        "economic_value.schema_version 1.0 required",
+        "gaap_role required",
+        "option component systems_backlog_conversion_option requires probability, timing, and remaining-capital treatment"
+      ],
+      "validation_errors": [
+        "economic_claim.description required",
+        "economic_claim.enterprise_to_equity_reconciliation required",
+        "economic_claim.unit_count required",
+        "economic_claim.unit_label required",
+        "economic_claim.unit_source required",
+        "economic_value.schema_version 1.0 required",
+        "gaap_role required",
+        "option component systems_backlog_conversion_option requires probability, timing, and remaining-capital treatment"
+      ]
     },
     "monitoring": {
       "falsifiers": [
@@ -4345,7 +4230,7 @@
       ]
     },
     "change_control": {
-      "model_hash": "2200df2faa003bf09520bf173dc781143cf29c35c52fda9b6e1e21f6608e5a5e",
+      "model_hash": "2d23de652cd494c504b46ba1d55cf8016b9e6fc170b2444dac01b88f53920c7c",
       "method_versions": [
         "net_asset_value@1.0",
         "owner_cash_or_dividend_discount@1.0",
@@ -4428,266 +4313,5 @@
       }
     },
     "notes": "Capstone IRR combining filings, segments, overlays, third-party, qualitative"
-  },
-  "total_return_panel": {
-    "schema_version": "3.0",
-    "ticker": "ACLS",
-    "as_of": "2026-07-21",
-    "status": "partial",
-    "error": "Vendor events are discovery evidence; primary-source completeness has not been established.",
-    "price_source": "yahoo:ACLS",
-    "currency": "USD",
-    "return_currency": "USD",
-    "fx_basis": "listing_currency_nominal",
-    "history_start": "2000-07-11",
-    "history_end": "2026-07-20",
-    "price_points": 6544,
-    "price_interval": "1d",
-    "history_basis": "earliest_available_vendor_trading_history",
-    "chart_scale": "logarithmic",
-    "chart_y_axis": "cumulative_return_pct",
-    "chart_series": [
-      "total_return",
-      "price_only"
-    ],
-    "return_contract": "split-adjusted close excluding dividends; event amounts normalized for later splits; cash reinvested at ex-date close; pre-tax nominal",
-    "coverage": {
-      "status": "vendor_only",
-      "start": null,
-      "end": null,
-      "note": "Vendor events are discovery evidence; primary-source completeness has not been established.",
-      "ledger_path": null
-    },
-    "event_count": 1,
-    "event_counts": {
-      "split": 1
-    },
-    "cash_distributions_on_initial_share_path": 0,
-    "distribution_contribution_by_type": {},
-    "cumulative_distributions_per_share": 0,
-    "start_price": 95.75,
-    "end_price": 131.7,
-    "price_index_end": 137.55,
-    "total_return_index_end": 137.55,
-    "cumulative_price_return_pct": 37.55,
-    "cumulative_total_return_pct": 37.55,
-    "price_only_annualized_pct": 1.23,
-    "total_return_annualized_pct": 1.23,
-    "market_cap_m": 4170.68,
-    "shares_outstanding": 31668000,
-    "price_for_market_cap": 131.7,
-    "chart": "ACLS/research/charts/total_return_2026-07-21.svg",
-    "panel_json": "ACLS/research/total_return_panel.json"
-  },
-  "context_overlay": {
-    "as_of": "2026-07-21",
-    "disclaimer": "Context only. Tailwinds inform stance and overlay sizing; they do not auto-inflate Lawrence base IRR. Promotion to base case requires [HUMAN REVIEW].",
-    "themes": [
-      {
-        "theme_id": "macro_regime",
-        "label": "Macro risk regime",
-        "indicators": [
-          {
-            "id": "hy_oas",
-            "label": "High-yield OAS credit spread (%)",
-            "latest": 1.43,
-            "as_of": "2026-07-20",
-            "yoy_pct": 248.8,
-            "direction": "up",
-            "good_for": "risk_regime",
-            "source": "spread:HYG-LQD:21d (HYG-LQD 1m spread proxy, not OAS)",
-            "stale": false,
-            "in_base_irr": false
-          },
-          {
-            "id": "ust_10y",
-            "label": "US Treasury 10Y yield (%)",
-            "latest": 4.605999946594238,
-            "as_of": "2026-07-21",
-            "yoy_pct": 5.4,
-            "direction": "up",
-            "good_for": "rates_regime",
-            "source": "yahoo:^TNX",
-            "stale": false,
-            "in_base_irr": false
-          },
-          {
-            "id": "ust_2y",
-            "label": "US Treasury 2Y yield (%)",
-            "latest": 4.335999965667725,
-            "as_of": "2026-07-21",
-            "yoy_pct": 11.0,
-            "direction": "up",
-            "good_for": "rates_regime",
-            "source": "yahoo:^FVX",
-            "stale": false,
-            "in_base_irr": false
-          },
-          {
-            "id": "dxy_broad",
-            "label": "Trade-weighted USD index (broad)",
-            "latest": 101.01300048828125,
-            "as_of": "2026-07-21",
-            "yoy_pct": 3.2,
-            "direction": "up",
-            "good_for": "dollar_regime",
-            "source": "yahoo:DX-Y.NYB",
-            "stale": false,
-            "in_base_irr": false
-          },
-          {
-            "id": "vix_level",
-            "label": "VIX index level",
-            "latest": 17.790000915527344,
-            "as_of": "2026-07-21",
-            "yoy_pct": 6.8,
-            "direction": "up",
-            "good_for": "vol_regime",
-            "source": "yahoo:^VIX",
-            "stale": false,
-            "in_base_irr": false
-          },
-          {
-            "id": "credit_impulse_1m",
-            "label": "HYG vs TLT 1-month return spread (%)",
-            "latest": 2.76,
-            "as_of": "2026-07-20",
-            "yoy_pct": 55.9,
-            "direction": "up",
-            "good_for": "credit_impulse",
-            "source": "spread:HYG-TLT:21d",
-            "stale": false,
-            "in_base_irr": false
-          },
-          {
-            "id": "spy_20d_realized_vol",
-            "label": "SPY 20-day realized vol (annualized %)",
-            "latest": 11.37,
-            "as_of": "2026-07-20",
-            "yoy_pct": 31.3,
-            "direction": "up",
-            "good_for": "equity_vol",
-            "source": "realized_vol:SPY:20d",
-            "stale": false,
-            "in_base_irr": false
-          }
-        ]
-      }
-    ]
-  },
-  "insider_signal": {
-    "as_of": "2026-07-21",
-    "disclaimer": "Context only. Insider activity informs scenario confidence and stance discussion; it does not auto-inflate Lawrence base IRR. Promotion requires [HUMAN REVIEW].",
-    "in_base_irr": false,
-    "window_days": 365,
-    "ics": 0.0,
-    "band": "negligible",
-    "bull_case_support": "none",
-    "scenario_confidence": {
-      "priors": {
-        "bear": 0.2,
-        "base": 0.55,
-        "bull": 0.25
-      },
-      "tilted": {
-        "bear": 0.28,
-        "base": 0.47,
-        "bull": 0.25
-      },
-      "bull_delta": 0.0,
-      "bear_delta": 0.08,
-      "note": "Scenario weights are qualitative confidence only; Lawrence base IRR unchanged."
-    },
-    "factors": {
-      "buy_score": 0.0,
-      "sell_score": -1.0,
-      "cluster_bonus": 0.0,
-      "net_buy_usd": 0,
-      "net_sell_usd": 9927382.93,
-      "price_today": 131.7
-    },
-    "top_buys": [],
-    "top_sells": [
-      {
-        "insider": "Ryzhik David",
-        "date": "2026-07-15",
-        "shares": 127,
-        "price": 145.01,
-        "value_usd": 18416.27,
-        "is_10b5_1": false,
-        "contrib": -0.214
-      },
-      {
-        "insider": "Ryzhik David",
-        "date": "2026-07-15",
-        "shares": 94,
-        "price": 145.01,
-        "value_usd": 13630.94,
-        "is_10b5_1": false,
-        "contrib": -0.214
-      },
-      {
-        "insider": "Ryzhik David",
-        "date": "2026-06-16",
-        "shares": 76,
-        "price": 176.845,
-        "value_usd": 13440.22,
-        "is_10b5_1": false,
-        "contrib": -0.168
-      },
-      {
-        "insider": "Blumenstock Gerald M",
-        "date": "2026-06-15",
-        "shares": 506,
-        "price": 191.6,
-        "value_usd": 96949.6,
-        "is_10b5_1": false,
-        "contrib": -0.148
-      },
-      {
-        "insider": "Sayiner Necip",
-        "date": "2026-06-03",
-        "shares": 1586,
-        "price": 157.4422,
-        "value_usd": 249703.33,
-        "is_10b5_1": false,
-        "contrib": -0.134
-      }
-    ],
-    "narrative_hooks": [],
-    "transaction_count": 86
-  },
-  "lens_consensus": {
-    "as_of": "2026-07-21",
-    "shared_inputs_ref": "valuation.json@2026-07-21",
-    "valuation_richness": 0.679,
-    "blended_return_pct": -5.98,
-    "band_pct": [
-      -12.5,
-      -3.78
-    ],
-    "weighted_median_pct": -4.9,
-    "median_mean_flag": false,
-    "stance": "pass",
-    "agreement_pct": 100,
-    "dissent_count": 0,
-    "lawrence_divergence": false,
-    "top_dissents": [],
-    "contributor_count": 9,
-    "in_base_irr": false,
-    "disclaimer": "Advisory lens blend only. Does not replace Lawrence total-synthesis stance gate without [HUMAN REVIEW]."
-  },
-  "economic_value": {
-    "schema_version": "1.0",
-    "method": "component_economic_value",
-    "economic_claim": {
-      "description": "One diluted share of Axcelis Technologies, including mid-cycle ion implant operations, systems backlog conversion option, net cash claims, and cycle reserve.",
-      "unit_label": "diluted share",
-      "unit_count": 31668000,
-      "unit_source": "31.668M weighted average diluted shares FY2025 (10-K)",
-      "enterprise_to_equity_reconciliation": "Debt-free balance sheet; operating value and backlog option are additive; cycle reserve is a liability component; services cash flow embedded in core engine."
-    },
-    "gaap_role": "cross_check",
-    "accounting_reference": "FY2025 10-K and Q1 2026 10-Q; mid-cycle owner cash normalized across FY2023-FY2025."
   }
 }
