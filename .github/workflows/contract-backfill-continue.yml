@@ -38,7 +38,8 @@ jobs:
             echo "refill=false" >> "$GITHUB_OUTPUT"
             exit 0
           fi
-          OPEN_CURSOR=$(gh pr list --state open --limit 100 --json headRefName --jq '
+          # Gate runs before checkout — gh must get an explicit --repo (no local .git).
+          OPEN_CURSOR=$(gh pr list --repo "${{ github.repository }}" --state open --limit 100 --json headRefName --jq '
             [.[] | select(.headRefName|startswith("cursor/"))] | length
           ')
           if [ "${OPEN_CURSOR}" -ge "${MAX_OPEN_CURSOR_PRS}" ]; then
@@ -84,7 +85,7 @@ jobs:
           print(",".join(data.get("tickers") or []))
           PY
           )
-          mapfile -t OPEN < <(gh pr list --state open --limit 100 --json headRefName,title --jq '
+          mapfile -t OPEN < <(gh pr list --repo "${{ github.repository }}" --state open --limit 100 --json headRefName,title --jq '
             .[]
             | select(.headRefName|startswith("cursor/"))
             | (.title|capture("^(?<t>[A-Z0-9._-]+)").t // empty)

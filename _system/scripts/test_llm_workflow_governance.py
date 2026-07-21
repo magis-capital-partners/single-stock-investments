@@ -124,6 +124,8 @@ class WorkflowGovernanceTests(unittest.TestCase):
         )
         self.assertIn("--wave-size 5", continue_wf)
         self.assertIn("MAX_OPEN_CURSOR_PRS", continue_wf)
+        # Pre-checkout gate must not rely on a local git remote.
+        self.assertIn('gh pr list --repo "${{ github.repository }}"', continue_wf)
         self.assertIn('echo "max_parallel=1"', queue_wf)
         self.assertIn("cursor_pr_backlog_", dispatch)
 
