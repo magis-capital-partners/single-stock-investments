@@ -216,56 +216,56 @@
   "method_route": {
     "schema_version": "2.0",
     "status": "routed",
-    "profile_id": "scarce_asset_optionality",
-    "label": "Scarce assets, royalties, and optionality",
+    "profile_id": "quality_reinvestment",
+    "label": "High-return compounder",
     "score": 19.0,
     "reasons": [
-      "archetype=optionality",
-      "component categories=infrastructure, real_option",
-      "existing methods=option",
+      "archetype=compounder",
+      "existing methods=dcf, owner_cash, reinvestment",
       "explicit reviewed profile"
     ],
     "primary_methods": [
-      "component_owner_cash_and_unit_nav"
+      "owner_earnings_reinvestment_dcf"
     ],
     "corroborating_methods": [
-      "comparable_transactions",
-      "replacement_cost_or_reverse_nav"
+      "reverse_dcf",
+      "incremental_roic_runway"
     ],
     "primary_personas": [
-      "hk",
-      "stahl"
+      "buffett_weschler",
+      "hohn"
     ],
     "cross_check_personas": [
-      "klarman_asset_value",
-      "marks_credit_cycle"
+      "munger",
+      "marathon_capital_cycle"
     ],
     "silent_personas": [
-      "buffett_weschler",
       "greenblatt",
-      "hohn",
-      "marathon_capital_cycle",
-      "munger",
-      "pabrai"
+      "hk",
+      "klarman_asset_value",
+      "marks_credit_cycle",
+      "pabrai",
+      "stahl"
     ],
     "required_evidence": [
-      "legal economic claim",
-      "non-overlapping physical inventory",
-      "unit economics",
-      "realization timing",
-      "remaining owner capital"
+      "normalized owner earnings",
+      "incremental return on capital",
+      "reinvestment runway",
+      "diluted share count",
+      "competitive-advantage mechanism"
     ],
     "failure_modes": [
-      "gross asset value mistaken for shareholder value",
-      "operating cash flow and NAV counted twice",
-      "remote options treated as contracted cash"
+      "growth projected without its capital cost",
+      "stock compensation or acquisitions omitted",
+      "terminal value unsupported by a durable mechanism"
     ],
     "secondary_profiles": [
       {
-        "profile_id": "quality_reinvestment",
+        "profile_id": "scarce_asset_optionality",
         "score": 3.0,
         "reasons": [
-          "existing methods=dcf, owner_cash, reinvestment"
+          "component categories=infrastructure, real_option",
+          "existing methods=option"
         ]
       },
       {
@@ -279,18 +279,18 @@
     ],
     "scorecard": {
       "scarce_asset_optionality": {
-        "score": 19.0,
+        "score": 3.0,
         "reasons": [
-          "archetype=optionality",
           "component categories=infrastructure, real_option",
-          "existing methods=option",
-          "explicit reviewed profile"
+          "existing methods=option"
         ]
       },
       "quality_reinvestment": {
-        "score": 3.0,
+        "score": 19.0,
         "reasons": [
-          "existing methods=dcf, owner_cash, reinvestment"
+          "archetype=compounder",
+          "existing methods=dcf, owner_cash, reinvestment",
+          "explicit reviewed profile"
         ]
       },
       "capital_cycle": {
@@ -331,7 +331,7 @@
     "config_path": "_system/frameworks/power_zones.json",
     "config_updated": "2026-07-14",
     "classification": {
-      "archetype": "optionality",
+      "archetype": "compounder",
       "moat": "unproven",
       "dhando": "none",
       "stance": "watch",
@@ -345,25 +345,25 @@
       "committee_seatable": true,
       "candidates": [
         {
-          "persona": "hk",
-          "independence_group": "scarce_assets"
+          "persona": "buffett_weschler",
+          "independence_group": "quality_reinvestment"
         },
         {
-          "persona": "stahl",
-          "independence_group": "scarce_assets"
+          "persona": "hohn",
+          "independence_group": "competitive_advantage"
         },
         {
-          "persona": "klarman_asset_value",
-          "independence_group": "asset_realization"
+          "persona": "munger",
+          "independence_group": "quality_reinvestment"
         },
         {
-          "persona": "marks_credit_cycle",
-          "independence_group": "credit_cycle"
+          "persona": "marathon_capital_cycle",
+          "independence_group": "capital_cycle"
         }
       ]
     },
-    "input_hash": "36ed83411907cd9a8a52e3d00f5ba6887491d0ec671eec99baf12e7d8bd219ec",
-    "generated_at": "2026-07-20T17:13:53.974419+00:00"
+    "input_hash": "138c2d52ecae4ac21a11fae00364a92c341ed658d398b9b443d7b7a3c85b852a",
+    "generated_at": "2026-07-20T23:41:39.404933+00:00"
   },
   "market": {
     "price_per_share": 46.85,
@@ -490,7 +490,7 @@
     ]
   },
   "change_control": {
-    "model_hash": "a163674a11fa8aeb1dca8f0f289434af4527ac6a0af83e00b19028d5d470a9bd",
+    "model_hash": "f8d91c27c0c68a57926f365fe053e25d6d8275e4898f4d33214fe05b343e258f",
     "method_versions": [],
     "change_log": [],
     "rule": "A source fact is locked. Every assumption change requires a reason, author, timestamp, and before/after value."

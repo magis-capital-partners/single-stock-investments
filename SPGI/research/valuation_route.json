@@ -3,11 +3,11 @@
   "status": "routed",
   "profile_id": "quality_reinvestment",
   "label": "High-return compounder",
-  "score": 20.0,
+  "score": 19.0,
   "reasons": [
-    "archetype=croupier",
+    "archetype=compounder",
     "component categories=operating_business",
-    "existing methods=dcf, owner_cash, reinvestment",
+    "existing methods=dcf, reinvestment",
     "explicit reviewed profile"
   ],
   "primary_methods": [
@@ -47,33 +47,31 @@
   ],
   "secondary_profiles": [
     {
-      "profile_id": "scarce_asset_optionality",
-      "score": 6.0,
+      "profile_id": "capital_cycle",
+      "score": 1.0,
       "reasons": [
-        "archetype=croupier"
+        "component categories=operating_business"
       ]
     },
     {
-      "profile_id": "credit_and_normalized_returns",
-      "score": 2.0,
+      "profile_id": "predictable_cash_flow",
+      "score": 1.0,
       "reasons": [
-        "component categories=financial_asset, liability_or_reserve"
+        "component categories=operating_business"
       ]
     }
   ],
   "scorecard": {
     "scarce_asset_optionality": {
-      "score": 6.0,
-      "reasons": [
-        "archetype=croupier"
-      ]
+      "score": 0.0,
+      "reasons": []
     },
     "quality_reinvestment": {
-      "score": 20.0,
+      "score": 19.0,
       "reasons": [
-        "archetype=croupier",
+        "archetype=compounder",
         "component categories=operating_business",
-        "existing methods=dcf, owner_cash, reinvestment",
+        "existing methods=dcf, reinvestment",
         "explicit reviewed profile"
       ]
     },
@@ -84,22 +82,17 @@
       ]
     },
     "credit_and_normalized_returns": {
-      "score": 2.0,
-      "reasons": [
-        "component categories=financial_asset, liability_or_reserve"
-      ]
+      "score": 0.0,
+      "reasons": []
     },
     "catalyst_asset_value": {
-      "score": 1.0,
-      "reasons": [
-        "component categories=financial_asset"
-      ]
+      "score": 0.0,
+      "reasons": []
     },
     "predictable_cash_flow": {
-      "score": 2.0,
+      "score": 1.0,
       "reasons": [
-        "component categories=operating_business",
-        "existing methods=owner_cash"
+        "component categories=operating_business"
       ]
     },
     "binary_milestone": {
@@ -114,7 +107,7 @@
   "config_path": "_system/frameworks/power_zones.json",
   "config_updated": "2026-07-14",
   "classification": {
-    "archetype": "croupier",
+    "archetype": "compounder",
     "moat": "stable",
     "dhando": "partial",
     "stance": "hold",
@@ -123,15 +116,16 @@
   },
   "specialist_power_zones": [
     {
-      "persona": "hk",
-      "label": "Horizon Kinetics",
-      "independence_group": "scarce_assets",
+      "persona": "buffett_weschler",
+      "label": "Buffett / Weschler",
+      "independence_group": "quality_reinvestment",
       "in_power_zone": true,
       "fit": 1.0,
-      "matched": 2,
-      "known_fields": 2,
+      "matched": 3,
+      "known_fields": 3,
       "matched_fields": [
         "archetype",
+        "moat",
         "investment_sleeve"
       ],
       "excluded_by": null,
@@ -173,52 +167,21 @@
       "score": 85
     },
     {
-      "persona": "stahl",
-      "label": "Murray Stahl",
-      "independence_group": "scarce_assets",
+      "persona": "munger",
+      "label": "Charlie Munger",
+      "independence_group": "quality_reinvestment",
       "in_power_zone": true,
       "fit": 1.0,
-      "matched": 2,
-      "known_fields": 2,
+      "matched": 3,
+      "known_fields": 3,
       "matched_fields": [
         "archetype",
+        "moat",
         "investment_sleeve"
       ],
       "excluded_by": null,
       "match_rate": null,
       "score": 85
-    },
-    {
-      "persona": "buffett_weschler",
-      "label": "Buffett / Weschler",
-      "independence_group": "quality_reinvestment",
-      "in_power_zone": true,
-      "fit": 0.667,
-      "matched": 2,
-      "known_fields": 3,
-      "matched_fields": [
-        "moat",
-        "investment_sleeve"
-      ],
-      "excluded_by": null,
-      "match_rate": null,
-      "score": 57
-    },
-    {
-      "persona": "munger",
-      "label": "Charlie Munger",
-      "independence_group": "quality_reinvestment",
-      "in_power_zone": true,
-      "fit": 0.667,
-      "matched": 2,
-      "known_fields": 3,
-      "matched_fields": [
-        "moat",
-        "investment_sleeve"
-      ],
-      "excluded_by": null,
-      "match_rate": null,
-      "score": 57
     }
   ],
   "committee": {
@@ -248,6 +211,6 @@
       }
     ]
   },
-  "input_hash": "a7b27a3aa0dfee0948f2f58e615c91bd4620e0a17273ce71d54eb7d89cf35508",
-  "generated_at": "2026-07-20T17:13:56.331935+00:00"
+  "input_hash": "933af9e3486a4ba5508936d61f4a8adf49c4fbfe5300b81973067557f1d99432",
+  "generated_at": "2026-07-21T00:04:01.636888+00:00"
 }

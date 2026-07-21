@@ -60,6 +60,8 @@ Read:
 
 If **new_documents** or **new_valuation_news**: focus on what changed for owner cash and valuation; do not re-litigate unchanged facts.
 
+If **contract_backfill**: read `research/authorized_evidence.json` and close its listed blockers. Prefer attaching valid `calculation_proof` graphs (approved `method_id@version`) to every additive component over rewriting the narrative. Keep overlap keys non-overlapping; reconcile owner-cash/NAV and downside capital claims to primary filings. Skip a full deep-dive rewrite unless the ownership map itself is wrong.
+
 ## Phase 2 — Narrative + valuation inputs (you write)
 
 1. Update `{{TICKER}}/research/valuation.json` research inputs from filings. Treat legacy stance/IRR fields as migration references; never create a human decision. Map every material economic claim exactly once for the universal contract.

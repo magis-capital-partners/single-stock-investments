@@ -1,0 +1,79 @@
+{
+  "schema_version": "1.0",
+  "ticker": "DMLP",
+  "as_of": "2026-07-20",
+  "facts": [
+    {
+      "field_id": "operating_cash_flow_m",
+      "value": 132.48499999999999,
+      "unit": "USD millions",
+      "locked": true,
+      "confidence": "high",
+      "source": {
+        "ref": "DMLP/research/evidence/sec_companyfacts.json",
+        "locator": "us-gaap:NetCashProvidedByUsedInOperatingActivities; accession 0001437749-26-005376; form 10-K",
+        "as_of": "2025-12-31",
+        "content_sha256": "be71b6d317edd26aec9dfbba4e0692f94c3e817f4928f550551fa4086b8103b1"
+      }
+    },
+    {
+      "field_id": "capital_expenditures_m",
+      "value": 0.006,
+      "unit": "USD millions",
+      "locked": true,
+      "confidence": "high",
+      "source": {
+        "ref": "DMLP/research/evidence/sec_companyfacts.json",
+        "locator": "us-gaap:PaymentsToAcquireProductiveAssets; accession 0001437749-14-002522; form 10-K",
+        "as_of": "2011-12-31",
+        "content_sha256": "be71b6d317edd26aec9dfbba4e0692f94c3e817f4928f550551fa4086b8103b1"
+      }
+    },
+    {
+      "field_id": "shares_outstanding",
+      "value": 48255450.0,
+      "unit": "shares",
+      "locked": true,
+      "confidence": "high",
+      "source": {
+        "ref": "DMLP/research/evidence/sec_companyfacts.json",
+        "locator": "dei:EntityCommonStockSharesOutstanding; accession 0001437749-26-015255; form 10-Q",
+        "as_of": "2026-05-06",
+        "content_sha256": "be71b6d317edd26aec9dfbba4e0692f94c3e817f4928f550551fa4086b8103b1"
+      }
+    },
+    {
+      "field_id": "cash_m",
+      "value": 28.157,
+      "unit": "USD millions",
+      "locked": true,
+      "confidence": "high",
+      "source": {
+        "ref": "DMLP/research/evidence/sec_companyfacts.json",
+        "locator": "us-gaap:CashAndCashEquivalentsAtCarryingValue; accession 0001437749-26-015255; form 10-Q",
+        "as_of": "2026-03-31",
+        "content_sha256": "be71b6d317edd26aec9dfbba4e0692f94c3e817f4928f550551fa4086b8103b1"
+      }
+    },
+    {
+      "field_id": "normalized_owner_earnings_m",
+      "value": 132.47899999999998,
+      "unit": "USD millions",
+      "source": {
+        "ref": "DMLP/research/evidence/sec_companyfacts.json",
+        "locator": "us-gaap:NetCashProvidedByUsedInOperatingActivities; accession 0001437749-26-005376; form 10-K",
+        "as_of": "2025-12-31",
+        "content_sha256": "be71b6d317edd26aec9dfbba4e0692f94c3e817f4928f550551fa4086b8103b1"
+      },
+      "derived_from": [
+        "operating_cash_flow_m",
+        "capital_expenditures_m"
+      ],
+      "formula": "operating_cash_flow_m - abs(capital_expenditures_m)",
+      "confidence": "medium",
+      "locked": true
+    }
+  ],
+  "source_count": 1,
+  "generated_at": "2026-07-20T23:50:51.584798Z"
+}

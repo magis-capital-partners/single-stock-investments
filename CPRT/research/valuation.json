@@ -1,1595 +1,411 @@
 {
   "ticker": "CPRT",
-  "as_of": "2026-05-26",
-  "method": "full",
-  "lawrence_bucket": "pricing_power",
+  "as_of": "2026-07-20",
+  "schema_version": "3.0",
+  "method": "proof_first_automated",
   "classification_inputs": {
-    "archetype": "compounder",
-    "moat": "stable",
-    "dhando": "full",
-    "cycle": "-"
+    "archetype": "compounder"
   },
   "inputs": {
-    "price": 33.07,
-    "price_source": "NASDAQ close ~May 26, 2026 (Yahoo Finance)",
-    "fcf_per_share": 1.25,
-    "fcf_source": "FY2025 OCF $1.80B \u2212 capex $0.57B \u00f7 ~978M diluted shares (10-K FY2025)",
-    "shares_millions": 977.6,
-    "normalization_note": "FY2025 FCF/sh as mid-cycle base; Q3 FY2026 U.S. service fees soft but international + ASP offset \u2014 not using peak pandemic volumes",
-    "shares_outstanding": 977600000,
-    "shares_source": "Derived from inputs.shares_millions in the pre-existing valuation.json; [HUMAN REVIEW] confirm against the latest primary filing."
+    "shares_outstanding": 925811482.0,
+    "cash_m": 3354.142,
+    "total_debt_m": 11.006,
+    "price": 27.49,
+    "price_as_of": "2026-07-20",
+    "price_source": "Yahoo CPRT close 2026-07-20"
   },
-  "scenarios": {
-    "bear": {
-      "growth_y1_5": 0.02,
-      "growth_y6_10": 0.02,
-      "exit_pfcf_y10": 18,
-      "notes": "Prolonged U.S. assignment stagnation, fee pressure, multiple stays depressed"
-    },
-    "base": {
-      "growth_y1_5": 0.07,
-      "growth_y6_10": 0.05,
-      "exit_pfcf_y10": 24,
-      "notes": "International mix + modest U.S. recovery; re-rate toward historical quality multiple from trough"
-    },
-    "bull": {
-      "growth_y1_5": 0.1,
-      "growth_y6_10": 0.07,
-      "exit_pfcf_y10": 30,
-      "notes": "Volume re-acceleration + buybacks; premium oligopoly multiple restored"
-    }
-  },
-  "results": {
-    "bear": {
-      "return_pct": 1.1
-    },
-    "base": {
-      "return_pct": 9.2
-    },
-    "bull": {
-      "return_pct": 15.1
-    }
-  },
-  "implied_return": {
-    "base_pct": 10.78,
-    "label": "7yr IRR (total synthesis)",
-    "display": "10.78% (total synthesis)",
-    "lawrence_stance_gate_pct": 9.2,
-    "falsifier_adjusted_pct": 9.2,
-    "synthesis_pct": 10.78
-  },
-  "stance_proposal": {
-    "suggested": "watch",
-    "irr_band": "<15%",
-    "gates": {
-      "moat_ok": true,
-      "dhando_ok": true
-    },
-    "override_reason": null
-  },
-  "overlay_results": [],
-  "results_lawrence_legacy": {
-    "bear": {
-      "return_pct": 1.1
-    },
-    "base": {
-      "return_pct": 9.2
-    },
-    "bull": {
-      "return_pct": 15.1
-    }
-  },
-  "option_scan": [
-    {
-      "q": 1,
-      "question": "GAAP book misstates land at historical cost?",
-      "answer": "Partial yes",
-      "treatment": "nav_overlay",
-      "evidence": "FY2025 10-K land $2,395M at cost; comp roll-up base ~$6,917M on ~17,100 owned acres. See CPRT/research/land_valuation/fair_land_summary.json"
-    },
-    {
-      "q": 0,
-      "question": "Material operating options beyond land mark?",
-      "answer": "No",
-      "treatment": "n/a",
-      "evidence": "Primary path remains Lawrence FCF compounder; land overlay is parallel cross-check only"
-    }
-  ],
-  "synthesis": {
-    "status": "complete",
-    "paths": [
-      {
-        "id": "scenario_bear",
-        "label": "Bear scenario (Lawrence)",
-        "source": "scenarios.bear",
-        "return_pct": 1.1,
-        "weight": 0.05,
-        "type": "numeric",
-        "epistemic_tier": "C (scenario envelope)",
-        "weight_why": "Downside stress; low weight because bear is a sensitivity, not a competing explanation of base mechanics.",
-        "weight_falsifiers": [
-          "Bear assumptions become base case in filings (e.g. sustained volume collapse)"
-        ],
-        "hard_to_vary": "yes: asymmetric low weight is structural"
-      },
-      {
-        "id": "scenario_bull",
-        "label": "Bull scenario (Lawrence)",
-        "source": "scenarios.bull",
-        "return_pct": 15.1,
-        "weight": 0.12,
-        "type": "numeric",
-        "epistemic_tier": "C (scenario envelope)",
-        "weight_why": "Upside stress probe; higher than bear because optionality archetype has skew, but still below primary paths.",
-        "weight_falsifiers": [
-          "Bull growth sustained in filings for 4+ quarters without falsifier trigger"
-        ],
-        "hard_to_vary": "yes"
-      }
-    ],
-    "qualitative_adjustments": [
-      {
-        "id": "no_predictive_attribute",
-        "factor": "No dated predictive attribute at spot",
-        "pp": -0.2,
-        "rationale": "Scarcity is descriptive; no timed mispricing catalyst in base",
-        "sources": "HK predictive attributes framework",
-        "falsifier": "Cross-check names dated catalyst with timeline"
-      }
-    ],
-    "qualitative_manual": false,
-    "qualitative_pp_cap_applied": false,
-    "numeric_weighted_pct": 10.98,
-    "qualitative_pp": -0.2,
-    "total_synthesis_pct": 10.78,
-    "human_approval": "pending",
-    "weight_audit": {
-      "flags": [],
-      "deutsch_checks": {
-        "hard_to_vary": true,
-        "falsifiable": true,
-        "not_instrumentalist": true,
-        "reach": "Weights encode evidence tier (A primary \u2192 D external), not fitted to hit a target IRR"
-      },
-      "qualitative_audit": {
-        "flags": [],
-        "deutsch_checks": {
-          "hard_to_vary": true,
-          "falsifiable": true,
-          "not_double_count": true,
-          "small_band": true
-        }
-      }
-    },
-    "notes": "Capstone IRR combining filings, segments, overlays, third-party, qualitative"
-  },
-  "lawrence_horizon_years": 7,
-  "evidence_refresh": {
-    "synthesis_in_dive": true
-  },
-  "context_overlay": {
-    "as_of": "2026-07-20",
-    "disclaimer": "Context only. Tailwinds inform stance and overlay sizing; they do not auto-inflate Lawrence base IRR. Promotion to base case requires [HUMAN REVIEW].",
-    "themes": [
-      {
-        "theme_id": "macro_regime",
-        "label": "Macro risk regime",
-        "indicators": [
-          {
-            "id": "hy_oas",
-            "label": "High-yield OAS credit spread (%)",
-            "latest": 1.3,
-            "as_of": "2026-07-20",
-            "yoy_pct": 217.1,
-            "direction": "up",
-            "good_for": "risk_regime",
-            "source": "spread:HYG-LQD:21d (HYG-LQD 1m spread proxy, not OAS)",
-            "stale": false,
-            "in_base_irr": false
-          },
-          {
-            "id": "ust_10y",
-            "label": "US Treasury 10Y yield (%)",
-            "latest": 4.579999923706055,
-            "as_of": "2026-07-20",
-            "yoy_pct": 4.8,
-            "direction": "up",
-            "good_for": "rates_regime",
-            "source": "yahoo:^TNX",
-            "stale": false,
-            "in_base_irr": false
-          },
-          {
-            "id": "ust_2y",
-            "label": "US Treasury 2Y yield (%)",
-            "latest": 4.314000129699707,
-            "as_of": "2026-07-20",
-            "yoy_pct": 10.4,
-            "direction": "up",
-            "good_for": "rates_regime",
-            "source": "yahoo:^FVX",
-            "stale": false,
-            "in_base_irr": false
-          },
-          {
-            "id": "dxy_broad",
-            "label": "Trade-weighted USD index (broad)",
-            "latest": 100.93699645996094,
-            "as_of": "2026-07-20",
-            "yoy_pct": 3.2,
-            "direction": "up",
-            "good_for": "dollar_regime",
-            "source": "yahoo:DX-Y.NYB",
-            "stale": false,
-            "in_base_irr": false
-          },
-          {
-            "id": "vix_level",
-            "label": "VIX index level",
-            "latest": 18.280000686645508,
-            "as_of": "2026-07-20",
-            "yoy_pct": 9.8,
-            "direction": "up",
-            "good_for": "vol_regime",
-            "source": "yahoo:^VIX",
-            "stale": false,
-            "in_base_irr": false
-          },
-          {
-            "id": "credit_impulse_1m",
-            "label": "HYG vs TLT 1-month return spread (%)",
-            "latest": 2.52,
-            "as_of": "2026-07-20",
-            "yoy_pct": 42.4,
-            "direction": "up",
-            "good_for": "credit_impulse",
-            "source": "spread:HYG-TLT:21d",
-            "stale": false,
-            "in_base_irr": false
-          },
-          {
-            "id": "spy_20d_realized_vol",
-            "label": "SPY 20-day realized vol (annualized %)",
-            "latest": 11.39,
-            "as_of": "2026-07-20",
-            "yoy_pct": 31.5,
-            "direction": "up",
-            "good_for": "equity_vol",
-            "source": "realized_vol:SPY:20d",
-            "stale": false,
-            "in_base_irr": false
-          }
-        ]
-      }
-    ]
-  },
-  "insider_signal": {
-    "as_of": "2026-07-20",
-    "disclaimer": "Context only. Insider activity informs scenario confidence and stance discussion; it does not auto-inflate Lawrence base IRR. Promotion requires [HUMAN REVIEW].",
-    "in_base_irr": false,
-    "window_days": 365,
-    "ics": 10.0,
-    "band": "exceptional",
-    "bull_case_support": "moderate",
-    "scenario_confidence": {
-      "priors": {
-        "bear": 0.2,
-        "base": 0.55,
-        "bull": 0.25
-      },
-      "tilted": {
-        "bear": 0.2,
-        "base": 0.4,
-        "bull": 0.4
-      },
-      "bull_delta": 0.15,
-      "bear_delta": 0.0,
-      "note": "Scenario weights are qualitative confidence only; Lawrence base IRR unchanged."
-    },
-    "factors": {
-      "buy_score": 17.281,
-      "sell_score": -1.0,
-      "cluster_bonus": 0.0,
-      "net_buy_usd": 4752019.58,
-      "net_sell_usd": 17753198.91,
-      "price_today": 33.07
-    },
-    "top_buys": [
-      {
-        "insider": "Liaw Jeffrey",
-        "date": "2026-01-15",
-        "shares": 43166,
-        "price": 8.7,
-        "value_usd": 375544.2,
-        "shares_owned_after": 79021,
-        "contrib": 1.893
-      },
-      {
-        "insider": "Liaw Jeffrey",
-        "date": "2025-10-15",
-        "shares": 43166,
-        "price": 8.7,
-        "value_usd": 375544.2,
-        "shares_owned_after": 55615,
-        "contrib": 1.893
-      },
-      {
-        "insider": "Liaw Jeffrey",
-        "date": "2026-04-15",
-        "shares": 43166,
-        "price": 8.7,
-        "value_usd": 375544.2,
-        "shares_owned_after": 103659,
-        "contrib": 1.834
-      },
-      {
-        "insider": "Liaw Jeffrey",
-        "date": "2025-10-15",
-        "shares": 4523,
-        "price": 6.78,
-        "value_usd": 30665.94,
-        "shares_owned_after": 12449,
-        "contrib": 1.419
-      },
-      {
-        "insider": "Liaw Jeffrey",
-        "date": "2026-01-15",
-        "shares": 4523,
-        "price": 6.78,
-        "value_usd": 30665.94,
-        "shares_owned_after": 35855,
-        "contrib": 1.177
-      }
-    ],
-    "top_sells": [
-      {
-        "insider": "ADAIR A JAYSON",
-        "date": "2026-01-20",
-        "shares": 7761,
-        "price": 0.0,
-        "value_usd": 0.0,
-        "is_10b5_1": false,
-        "contrib": -0.129
-      },
-      {
-        "insider": "ADAIR A JAYSON",
-        "date": "2026-01-20",
-        "shares": 21200,
-        "price": 0.0,
-        "value_usd": 0.0,
-        "is_10b5_1": false,
-        "contrib": -0.129
-      },
-      {
-        "insider": "ADAIR A JAYSON",
-        "date": "2026-01-20",
-        "shares": 21200,
-        "price": 0.0,
-        "value_usd": 0.0,
-        "is_10b5_1": false,
-        "contrib": -0.129
-      },
-      {
-        "insider": "Liaw Jeffrey",
-        "date": "2026-04-15",
-        "shares": 23870,
-        "price": 33.18,
-        "value_usd": 792006.6,
-        "is_10b5_1": false,
-        "contrib": -0.124
-      },
-      {
-        "insider": "Liaw Jeffrey",
-        "date": "2026-04-15",
-        "shares": 2343,
-        "price": 33.17,
-        "value_usd": 77717.31,
-        "is_10b5_1": false,
-        "contrib": -0.124
-      }
-    ],
-    "narrative_hooks": [],
-    "transaction_count": 28
-  },
-  "lens_consensus": {
-    "as_of": "2026-05-26",
-    "shared_inputs_ref": "valuation.json@2026-05-26",
-    "valuation_richness": 0.221,
-    "blended_return_pct": 8.2,
-    "band_pct": [
-      1.1,
-      11.2
-    ],
-    "weighted_median_pct": 9.2,
-    "median_mean_flag": false,
-    "stance": "watch",
-    "agreement_pct": 100,
-    "dissent_count": 0,
-    "lawrence_divergence": false,
-    "top_dissents": [],
-    "contributor_count": 8,
-    "in_base_irr": false,
-    "disclaimer": "Advisory lens blend only. Does not replace Lawrence total-synthesis stance gate without [HUMAN REVIEW]."
-  },
-  "nav_overlay": {
-    "as_of": "2026-06-30",
-    "status": "partial",
-    "gaap_vs_fair_value": {
-      "land_gaap_m": 2394.553,
-      "land_fair_base_m": 6917.189,
-      "land_fair_low_m": 3944.01,
-      "land_fair_high_m": 10375.786,
-      "owned_acres_base": 17100,
-      "owned_pct_disclosed": 0.9,
-      "implied_per_acre_base_usd": 404514,
-      "policy_source": "10-K FY2025: land at historical cost; ESG letter: owns >90% of operating acreage",
-      "source": "investor-documents/sec-edgar/10-K_20250926_rpt20250731_acc0001628280_25_042946.htm"
-    },
-    "in_model": {
-      "lawrence_irr_on_operating_cash": true,
-      "gaap_book_in_dhando": false,
-      "fair_land_in_base_irr": false
-    },
-    "not_in_model_requires_refresh": [
-      "Assessor ownership and acres for 231/281 registry yards",
-      "International yard land comps (UK, DE, BR, ES, FI gap rows)",
-      "Buildings and improvements fair mark separate from dirt",
-      "Leased yards (e.g. Vallejo #1) at $0 Copart land \u2014 lease economics in ROU stream"
-    ],
-    "segments_or_options": [
-      {
-        "id": "owned_yard_land",
-        "label": "Owned salvage-yard land (comp-based)",
-        "option_treatment": "nav_floor",
-        "nav_per_share_full": 14.02,
-        "overlay_value_per_share": 4.62,
-        "evidence": "book_estimate.json land_comp_fair_value delta; pilot 7/20 yards marked",
-        "not_in_lawrence_base": true
-      }
-    ],
-    "pilot_coverage": {
-      "yards_marked": 7,
-      "yards_pilot_total": 20,
-      "pilot_fair_land_sum_m": 116.938,
-      "registry_rows": 231,
-      "filing_facilities": 281
-    },
-    "human_review": true
-  },
-  "total_return_panel": {
-    "schema_version": "3.0",
-    "ticker": "CPRT",
-    "as_of": "2026-07-15",
-    "status": "partial",
-    "error": "Vendor events are discovery evidence; primary-source completeness has not been established.",
-    "price_source": "yahoo:CPRT",
-    "currency": "USD",
-    "return_currency": "USD",
-    "fx_basis": "listing_currency_nominal",
-    "history_start": "1994-03-17",
-    "history_end": "2026-07-15",
-    "price_points": 8135,
-    "price_interval": "1d",
-    "history_basis": "earliest_available_vendor_trading_history",
-    "chart_scale": "logarithmic",
-    "chart_y_axis": "cumulative_return_pct",
-    "chart_series": [
-      "total_return",
-      "price_only"
-    ],
-    "return_contract": "split-adjusted close excluding dividends; event amounts normalized for later splits; cash reinvested at ex-date close; pre-tax nominal",
-    "coverage": {
-      "status": "vendor_only",
-      "start": null,
-      "end": null,
-      "note": "Vendor events are discovery evidence; primary-source completeness has not been established.",
-      "ledger_path": null
-    },
-    "event_count": 7,
-    "event_counts": {
-      "split": 7
-    },
-    "cash_distributions_on_initial_share_path": 0,
-    "distribution_contribution_by_type": {},
-    "cumulative_distributions_per_share": 0,
-    "start_price": 0.1523,
-    "end_price": 27.28,
-    "price_index_end": 17906.84,
-    "total_return_index_end": 17906.84,
-    "cumulative_price_return_pct": 17806.84,
-    "cumulative_total_return_pct": 17806.84,
-    "price_only_annualized_pct": 17.41,
-    "total_return_annualized_pct": 17.41,
-    "market_cap_m": null,
-    "shares_outstanding": null,
-    "price_for_market_cap": 33.07,
-    "chart": "CPRT/research/charts/total_return_2026-07-15.svg",
-    "panel_json": "CPRT/research/total_return_panel.json"
-  },
-  "book_estimate": {
-    "as_of": "2026-06-30",
-    "filing_period_end": "2025-07-31",
-    "filing_source": "investor-documents/sec-edgar/10-K_20250926_rpt20250731_acc0001628280_25_042946.htm",
-    "filed_book_per_share": 9.4,
-    "current_book_per_share": 14.02,
-    "delta_per_share": 4.63,
-    "delta_pct_of_filed_book": 49.23,
-    "discount_to_filed_book_pct": -251.9,
-    "discount_to_current_estimate_pct": -135.8,
-    "config_path": "CPRT/research/book_estimate_config.json",
-    "output_path": "CPRT/research/book_estimate.json"
-  },
-  "valuation_mode": "economic_value",
   "valuation_methodology": {
-    "mode": "component_economic_value",
     "horizon_years": 7,
-    "decision_rule": "Use one complete non-overlapping component schedule. The legacy Lawrence return path remains a separate stance gate until the primary evidence bridges are complete."
-  },
-  "component_valuation": {
-    "schema_version": "1.0",
-    "all_material_components_identified": true,
-    "coverage_statement": "Phase 3 scaffold identifies every currently known material operating, financial, liability, reserve, and option claim once. Primary ownership and cash/NAV bridges remain open follow-up gates.",
-    "components": [
-      {
-        "id": "core_engine",
-        "label": "Auction-network owner-cash engine",
-        "category": "operating_business",
-        "overlap_key": "core_engine",
-        "treatment": "additive",
-        "valuation": {
-          "method": "owner_cash_reinvestment_dcf",
-          "basis": "per_share",
-          "low": 20.5,
-          "base": 26.46,
-          "high": 33.73,
-          "evidence_tier": "mixed_primary_and_estimate",
-          "evidence": "Existing CPRT valuation inputs: FY2025 OCF $1.80B \u2212 capex $0.57B \u00f7 ~978M diluted shares (10-K FY2025); FY2025 FCF/sh as mid-cycle base; Q3 FY2026 U.S. service fees soft but international + ASP offset \u2014 not using peak pandemic volumes [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
-          "assumption_summary": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
-          "cross_check": "Reconcile the range to primary filings, a reproducible owner-cash or NAV bridge, and the identified liability and capital claims before decision use.",
-          "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case."
-        }
-      },
-      {
-        "id": "reinvestment_or_assets",
-        "label": "International growth and reinvestment runway",
-        "category": "operating_business",
-        "overlap_key": "reinvestment_or_assets",
-        "treatment": "additive",
-        "valuation": {
-          "method": "reinvestment_return_dcf",
-          "basis": "per_share",
-          "low": 2.65,
-          "base": 4.63,
-          "high": 7.94,
-          "evidence_tier": "mixed_primary_and_estimate",
-          "evidence": "Existing CPRT valuation inputs: FY2025 OCF $1.80B \u2212 capex $0.57B \u00f7 ~978M diluted shares (10-K FY2025); FY2025 FCF/sh as mid-cycle base; Q3 FY2026 U.S. service fees soft but international + ASP offset \u2014 not using peak pandemic volumes [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
-          "assumption_summary": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
-          "cross_check": "Reconcile the range to primary filings, a reproducible owner-cash or NAV bridge, and the identified liability and capital claims before decision use.",
-          "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case."
-        }
-      },
-      {
-        "id": "net_financial_claims",
-        "label": "Net cash and investments",
-        "category": "financial_asset",
-        "overlap_key": "net_financial_claims",
-        "treatment": "additive",
-        "valuation": {
-          "method": "net_asset_value",
-          "basis": "per_share",
-          "low": 0.0,
-          "base": 1.65,
-          "high": 3.31,
-          "evidence_tier": "mixed_primary_and_estimate",
-          "evidence": "Existing CPRT valuation inputs: FY2025 OCF $1.80B \u2212 capex $0.57B \u00f7 ~978M diluted shares (10-K FY2025); FY2025 FCF/sh as mid-cycle base; Q3 FY2026 U.S. service fees soft but international + ASP offset \u2014 not using peak pandemic volumes [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
-          "assumption_summary": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
-          "cross_check": "Reconcile the range to primary filings, a reproducible owner-cash or NAV bridge, and the identified liability and capital claims before decision use.",
-          "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case."
-        }
-      },
-      {
-        "id": "downside_reserve",
-        "label": "Insurance, land, and execution reserve",
-        "category": "liability_or_reserve",
-        "overlap_key": "downside_reserve",
-        "treatment": "additive",
-        "valuation": {
-          "method": "realization_reserve",
-          "basis": "per_share",
-          "low": -6.61,
-          "base": -2.98,
-          "high": -0.33,
-          "evidence_tier": "mixed_primary_and_estimate",
-          "evidence": "Existing CPRT valuation inputs: FY2025 OCF $1.80B \u2212 capex $0.57B \u00f7 ~978M diluted shares (10-K FY2025); FY2025 FCF/sh as mid-cycle base; Q3 FY2026 U.S. service fees soft but international + ASP offset \u2014 not using peak pandemic volumes [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
-          "assumption_summary": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
-          "cross_check": "Reconcile the range to primary filings, a reproducible owner-cash or NAV bridge, and the identified liability and capital claims before decision use.",
-          "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case."
-        }
-      }
-    ]
-  },
-  "economic_value": {
-    "schema_version": "1.0",
-    "method": "component_economic_value",
-    "economic_claim": {
-      "description": "One diluted share of CPRT, including every currently identified operating claim, financial claim, liability, reserve, and material option.",
-      "unit_label": "diluted share",
-      "unit_count": 977600000,
-      "unit_source": "Derived from inputs.shares_millions in the pre-existing valuation.json; [HUMAN REVIEW] confirm against the latest primary filing.",
-      "enterprise_to_equity_reconciliation": "Operating and asset claims are valued once; cash, debt, financing, reserves, and other senior claims are separate components or explicitly reserved. No component is intended to overlap another."
-    },
-    "gaap_role": "cross_check",
-    "accounting_reference": "Existing research and filing-derived valuation inputs. The primary-source reconciliation remains an open evidence gate.",
-    "component_groups": [
-      {
-        "id": "core_engine",
-        "label": "Auction-network owner-cash engine",
-        "component_ids": [
-          "core_engine"
-        ],
-        "economic_claim": "Auction-network owner-cash engine",
-        "valuation_basis": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
-        "adjustments": "The low/base/high range incorporates ownership, tax, capital, cycle, timing, and realization uncertainty pending the primary bridge.",
-        "overlap_control": "Unique overlap key core_engine; no other component capitalizes the same claim."
-      },
-      {
-        "id": "reinvestment_or_assets",
-        "label": "International growth and reinvestment runway",
-        "component_ids": [
-          "reinvestment_or_assets"
-        ],
-        "economic_claim": "International growth and reinvestment runway",
-        "valuation_basis": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
-        "adjustments": "The low/base/high range incorporates ownership, tax, capital, cycle, timing, and realization uncertainty pending the primary bridge.",
-        "overlap_control": "Unique overlap key reinvestment_or_assets; no other component capitalizes the same claim."
-      },
-      {
-        "id": "net_financial_claims",
-        "label": "Net cash and investments",
-        "component_ids": [
-          "net_financial_claims"
-        ],
-        "economic_claim": "Net cash and investments",
-        "valuation_basis": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
-        "adjustments": "The low/base/high range incorporates ownership, tax, capital, cycle, timing, and realization uncertainty pending the primary bridge.",
-        "overlap_control": "Unique overlap key net_financial_claims; no other component capitalizes the same claim."
-      },
-      {
-        "id": "downside_reserve",
-        "label": "Insurance, land, and execution reserve",
-        "component_ids": [
-          "downside_reserve"
-        ],
-        "economic_claim": "Insurance, land, and execution reserve",
-        "valuation_basis": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
-        "adjustments": "The low/base/high range incorporates ownership, tax, capital, cycle, timing, and realization uncertainty pending the primary bridge.",
-        "overlap_control": "Unique overlap key downside_reserve; no other component capitalizes the same claim."
-      }
-    ],
-    "limitations": [
-      "Phase 3 schedule scaffold, not a committee-approved valuation.",
-      "Universal followups remain open until primary evidence supports the ownership map, owner-cash or NAV bridge, and downside/capital claims."
-    ]
+    "automation": "source_locked_first_pass"
   },
   "component_valuation_results": {
-    "status": "complete",
-    "decision_rule": "Use the complete low/base/high component schedule. Embedded components are estimated but not added twice.",
+    "status": "compiled",
     "all_material_components_identified": true,
     "additive_components": [
       {
-        "id": "core_engine",
-        "label": "Auction-network owner-cash engine",
+        "id": "operating_business_and_net_assets",
+        "label": "Operating business and net financial assets",
         "category": "operating_business",
-        "overlap_key": "core_engine",
+        "overlap_key": "entire_security",
         "treatment": "additive",
-        "included_in_component_id": null,
-        "method": "owner_cash_reinvestment_dcf",
-        "evidence_tier": "mixed_primary_and_estimate",
-        "evidence": "Existing CPRT valuation inputs: FY2025 OCF $1.80B \u2212 capex $0.57B \u00f7 ~978M diluted shares (10-K FY2025); FY2025 FCF/sh as mid-cycle base; Q3 FY2026 U.S. service fees soft but international + ASP offset \u2014 not using peak pandemic volumes [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
-        "cross_check": "Reconcile the range to primary filings, a reproducible owner-cash or NAV bridge, and the identified liability and capital claims before decision use.",
-        "driver_model_type": null,
-        "driver_model": null,
-        "assumption_summary": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
-        "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case.",
-        "scenario_assumptions": null,
-        "low_per_share": 20.5,
-        "base_per_share": 26.46,
-        "high_per_share": 33.73
-      },
-      {
-        "id": "reinvestment_or_assets",
-        "label": "International growth and reinvestment runway",
-        "category": "operating_business",
-        "overlap_key": "reinvestment_or_assets",
-        "treatment": "additive",
-        "included_in_component_id": null,
-        "method": "reinvestment_return_dcf",
-        "evidence_tier": "mixed_primary_and_estimate",
-        "evidence": "Existing CPRT valuation inputs: FY2025 OCF $1.80B \u2212 capex $0.57B \u00f7 ~978M diluted shares (10-K FY2025); FY2025 FCF/sh as mid-cycle base; Q3 FY2026 U.S. service fees soft but international + ASP offset \u2014 not using peak pandemic volumes [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
-        "cross_check": "Reconcile the range to primary filings, a reproducible owner-cash or NAV bridge, and the identified liability and capital claims before decision use.",
-        "driver_model_type": null,
-        "driver_model": null,
-        "assumption_summary": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
-        "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case.",
-        "scenario_assumptions": null,
-        "low_per_share": 2.65,
-        "base_per_share": 4.63,
-        "high_per_share": 7.94
-      },
-      {
-        "id": "net_financial_claims",
-        "label": "Net cash and investments",
-        "category": "financial_asset",
-        "overlap_key": "net_financial_claims",
-        "treatment": "additive",
-        "included_in_component_id": null,
-        "method": "net_asset_value",
-        "evidence_tier": "mixed_primary_and_estimate",
-        "evidence": "Existing CPRT valuation inputs: FY2025 OCF $1.80B \u2212 capex $0.57B \u00f7 ~978M diluted shares (10-K FY2025); FY2025 FCF/sh as mid-cycle base; Q3 FY2026 U.S. service fees soft but international + ASP offset \u2014 not using peak pandemic volumes [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
-        "cross_check": "Reconcile the range to primary filings, a reproducible owner-cash or NAV bridge, and the identified liability and capital claims before decision use.",
-        "driver_model_type": null,
-        "driver_model": null,
-        "assumption_summary": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
-        "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case.",
-        "scenario_assumptions": null,
-        "low_per_share": 0.0,
-        "base_per_share": 1.65,
-        "high_per_share": 3.31
-      },
-      {
-        "id": "downside_reserve",
-        "label": "Insurance, land, and execution reserve",
-        "category": "liability_or_reserve",
-        "overlap_key": "downside_reserve",
-        "treatment": "additive",
-        "included_in_component_id": null,
-        "method": "realization_reserve",
-        "evidence_tier": "mixed_primary_and_estimate",
-        "evidence": "Existing CPRT valuation inputs: FY2025 OCF $1.80B \u2212 capex $0.57B \u00f7 ~978M diluted shares (10-K FY2025); FY2025 FCF/sh as mid-cycle base; Q3 FY2026 U.S. service fees soft but international + ASP offset \u2014 not using peak pandemic volumes [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
-        "cross_check": "Reconcile the range to primary filings, a reproducible owner-cash or NAV bridge, and the identified liability and capital claims before decision use.",
-        "driver_model_type": null,
-        "driver_model": null,
-        "assumption_summary": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
-        "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case.",
-        "scenario_assumptions": null,
-        "low_per_share": -6.61,
-        "base_per_share": -2.98,
-        "high_per_share": -0.33
+        "method": "owner_earnings_reinvestment_dcf",
+        "valuation_status": "bounded_estimate",
+        "calculation_proof": {
+          "schema_version": "1.0",
+          "method_id": "owner_earnings_reinvestment_dcf",
+          "method_version": "1.0",
+          "output_unit": "USD per share",
+          "inputs": [
+            {
+              "id": "owner_earnings",
+              "label": "Normalized owner earnings",
+              "kind": "fact",
+              "value": 1230.76,
+              "unit": "USD millions",
+              "source": {
+                "ref": "CPRT/research/evidence/sec_companyfacts.json",
+                "locator": "us-gaap:NetCashProvidedByUsedInOperatingActivities; accession 0001628280-25-042946; form 10-K",
+                "as_of": "2025-07-31"
+              },
+              "locked": true
+            },
+            {
+              "id": "cash",
+              "label": "Cash",
+              "kind": "fact",
+              "value": 3354.142,
+              "unit": "USD millions",
+              "source": {
+                "ref": "CPRT/research/evidence/sec_companyfacts.json",
+                "locator": "us-gaap:CashCashEquivalentsRestrictedCashAndRestrictedCashEquivalents; accession 0001193125-26-245578; form 10-Q",
+                "as_of": "2026-04-30"
+              },
+              "locked": true
+            },
+            {
+              "id": "debt",
+              "label": "Debt",
+              "kind": "fact",
+              "value": 11.006,
+              "unit": "USD millions",
+              "source": {
+                "ref": "CPRT/research/evidence/sec_companyfacts.json",
+                "locator": "us-gaap:LongTermDebt; accession 0000900075-23-000034; form 10-K",
+                "as_of": "2023-07-31"
+              },
+              "locked": true
+            },
+            {
+              "id": "shares_m",
+              "label": "Diluted shares",
+              "kind": "fact",
+              "value": 925.811482,
+              "unit": "million shares",
+              "source": {
+                "ref": "CPRT/research/evidence/sec_companyfacts.json",
+                "locator": "dei:EntityCommonStockSharesOutstanding; accession 0001193125-26-245578; form 10-Q",
+                "as_of": "2026-05-27"
+              },
+              "locked": true
+            }
+          ],
+          "assumptions": [
+            {
+              "id": "reinvestment",
+              "label": "Reinvestment rate",
+              "kind": "judgment",
+              "values": {
+                "low": 0.2,
+                "base": 0.35,
+                "high": 0.5
+              },
+              "unit": "ratio",
+              "rationale": "Versioned initial bounds; refresh from the issuer reinvestment ledger.",
+              "allowed_range": {
+                "min": 0,
+                "max": 0.75
+              }
+            },
+            {
+              "id": "incremental_roic",
+              "label": "Incremental after-tax ROIC",
+              "kind": "judgment",
+              "values": {
+                "low": 0.12,
+                "base": 0.18,
+                "high": 0.25
+              },
+              "unit": "ratio",
+              "rationale": "Conservative bounded starting cases pending a longer primary-source capital bridge.",
+              "allowed_range": {
+                "min": 0,
+                "max": 0.5
+              }
+            },
+            {
+              "id": "discount_rate",
+              "label": "Discount rate",
+              "kind": "judgment",
+              "values": {
+                "low": 0.12,
+                "base": 0.1,
+                "high": 0.09
+              },
+              "unit": "ratio",
+              "rationale": "Approved risk bounds for the automated first pass.",
+              "allowed_range": {
+                "min": 0.07,
+                "max": 0.15
+              }
+            },
+            {
+              "id": "terminal_multiple",
+              "label": "Terminal owner-earnings multiple",
+              "kind": "judgment",
+              "values": {
+                "low": 12,
+                "base": 18,
+                "high": 24
+              },
+              "unit": "multiple",
+              "rationale": "Bounded terminal economics; high case remains below a perpetual high-growth assumption.",
+              "allowed_range": {
+                "min": 8,
+                "max": 30
+              }
+            }
+          ],
+          "calculations": [
+            {
+              "id": "growth",
+              "label": "Growth from reinvestment",
+              "op": "multiply",
+              "args": [
+                "reinvestment",
+                "incremental_roic"
+              ],
+              "unit": "ratio"
+            },
+            {
+              "id": "growth_factor",
+              "op": "add",
+              "args": [
+                1,
+                "growth"
+              ],
+              "unit": "ratio"
+            },
+            {
+              "id": "distribution_rate",
+              "op": "subtract",
+              "args": [
+                1,
+                "reinvestment"
+              ],
+              "unit": "ratio"
+            },
+            {
+              "id": "owner_earnings_y1",
+              "op": "multiply",
+              "args": [
+                "owner_earnings",
+                "growth_factor"
+              ],
+              "unit": "USD millions"
+            },
+            {
+              "id": "owner_cash_y1",
+              "op": "multiply",
+              "args": [
+                "owner_earnings_y1",
+                "distribution_rate"
+              ],
+              "unit": "USD millions"
+            },
+            {
+              "id": "owner_earnings_y2",
+              "op": "multiply",
+              "args": [
+                "owner_earnings_y1",
+                "growth_factor"
+              ],
+              "unit": "USD millions"
+            },
+            {
+              "id": "owner_cash_y2",
+              "op": "multiply",
+              "args": [
+                "owner_earnings_y2",
+                "distribution_rate"
+              ],
+              "unit": "USD millions"
+            },
+            {
+              "id": "owner_earnings_y3",
+              "op": "multiply",
+              "args": [
+                "owner_earnings_y2",
+                "growth_factor"
+              ],
+              "unit": "USD millions"
+            },
+            {
+              "id": "owner_cash_y3",
+              "op": "multiply",
+              "args": [
+                "owner_earnings_y3",
+                "distribution_rate"
+              ],
+              "unit": "USD millions"
+            },
+            {
+              "id": "owner_earnings_y4",
+              "op": "multiply",
+              "args": [
+                "owner_earnings_y3",
+                "growth_factor"
+              ],
+              "unit": "USD millions"
+            },
+            {
+              "id": "owner_cash_y4",
+              "op": "multiply",
+              "args": [
+                "owner_earnings_y4",
+                "distribution_rate"
+              ],
+              "unit": "USD millions"
+            },
+            {
+              "id": "owner_earnings_y5",
+              "op": "multiply",
+              "args": [
+                "owner_earnings_y4",
+                "growth_factor"
+              ],
+              "unit": "USD millions"
+            },
+            {
+              "id": "owner_cash_y5",
+              "op": "multiply",
+              "args": [
+                "owner_earnings_y5",
+                "distribution_rate"
+              ],
+              "unit": "USD millions"
+            },
+            {
+              "id": "owner_earnings_y6",
+              "op": "multiply",
+              "args": [
+                "owner_earnings_y5",
+                "growth_factor"
+              ],
+              "unit": "USD millions"
+            },
+            {
+              "id": "owner_cash_y6",
+              "op": "multiply",
+              "args": [
+                "owner_earnings_y6",
+                "distribution_rate"
+              ],
+              "unit": "USD millions"
+            },
+            {
+              "id": "owner_earnings_y7",
+              "op": "multiply",
+              "args": [
+                "owner_earnings_y6",
+                "growth_factor"
+              ],
+              "unit": "USD millions"
+            },
+            {
+              "id": "owner_cash_y7",
+              "op": "multiply",
+              "args": [
+                "owner_earnings_y7",
+                "distribution_rate"
+              ],
+              "unit": "USD millions"
+            },
+            {
+              "id": "cash_pv",
+              "op": "present_value",
+              "args": [
+                "owner_cash_y1",
+                1,
+                "owner_cash_y2",
+                2,
+                "owner_cash_y3",
+                3,
+                "owner_cash_y4",
+                4,
+                "owner_cash_y5",
+                5,
+                "owner_cash_y6",
+                6,
+                "owner_cash_y7",
+                7,
+                "discount_rate"
+              ],
+              "unit": "USD millions"
+            },
+            {
+              "id": "terminal_value",
+              "op": "multiply",
+              "args": [
+                "owner_earnings_y7",
+                "terminal_multiple"
+              ],
+              "unit": "USD millions"
+            },
+            {
+              "id": "terminal_pv",
+              "op": "discount",
+              "args": [
+                "terminal_value",
+                "discount_rate",
+                7
+              ],
+              "unit": "USD millions"
+            },
+            {
+              "id": "enterprise_value",
+              "op": "add",
+              "args": [
+                "cash_pv",
+                "terminal_pv"
+              ],
+              "unit": "USD millions"
+            },
+            {
+              "id": "plus_cash",
+              "op": "add",
+              "args": [
+                "enterprise_value",
+                "cash"
+              ],
+              "unit": "USD millions"
+            },
+            {
+              "id": "equity_value",
+              "op": "subtract",
+              "args": [
+                "plus_cash",
+                "debt"
+              ],
+              "unit": "USD millions"
+            },
+            {
+              "id": "value_per_share",
+              "op": "divide",
+              "args": [
+                "equity_value",
+                "shares_m"
+              ],
+              "unit": "USD per share"
+            }
+          ],
+          "outputs": {
+            "low": "value_per_share",
+            "base": "value_per_share",
+            "high": "value_per_share"
+          }
+        },
+        "evidence_tier": "primary_derived",
+        "evidence": "Source-locked filing facts plus explicitly bounded versioned judgments.",
+        "falsifier": "Owner earnings, incremental returns, or reinvestment runway fall below the low-case bridge."
       }
     ],
-    "embedded_components": [],
-    "total_equity_value_per_share": {
-      "low": 16.54,
-      "base": 29.76,
-      "high": 44.65
-    },
-    "material_component_count": 4,
-    "additive_component_count": 4,
-    "embedded_component_count": 0,
-    "market_price_per_share": 33.07,
-    "upside_downside_pct": {
-      "low": -50.0,
-      "base": -10.0,
-      "high": 35.0
-    }
+    "embedded_components": []
   },
   "economic_value_analysis": {
-    "schema_version": "1.0",
-    "status": "complete",
-    "trigger": {
-      "required": true,
-      "reasons": [
-        "explicit_component_schedule",
-        "optionality_or_nav_overlay"
-      ],
-      "policy": "A complete economic-value analysis is required when any trigger fires; otherwise it is recommended."
-    },
-    "method": "component_economic_value",
-    "economic_claim": {
-      "description": "One diluted share of CPRT, including every currently identified operating claim, financial claim, liability, reserve, and material option.",
-      "unit_label": "diluted share",
-      "unit_count": 977600000,
-      "unit_source": "Derived from inputs.shares_millions in the pre-existing valuation.json; [HUMAN REVIEW] confirm against the latest primary filing.",
-      "enterprise_to_equity_reconciliation": "Operating and asset claims are valued once; cash, debt, financing, reserves, and other senior claims are separate components or explicitly reserved. No component is intended to overlap another."
-    },
-    "gaap_role": "cross_check",
-    "accounting_reference": "Existing research and filing-derived valuation inputs. The primary-source reconciliation remains an open evidence gate.",
-    "comparable_hierarchy": [
-      "issuer_arm_length_transaction",
-      "same_asset_transaction",
-      "public_peer",
-      "replacement_cost",
-      "approved_external_analysis"
-    ],
-    "gross_comparable_nav_per_share": null,
-    "risked_present_value_per_share": {
-      "low": 16.54,
-      "base": 29.76,
-      "high": 44.65
-    },
-    "component_groups": [
-      {
-        "id": "core_engine",
-        "label": "Auction-network owner-cash engine",
-        "component_ids": [
-          "core_engine"
-        ],
-        "economic_claim": "Auction-network owner-cash engine",
-        "valuation_basis": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
-        "adjustments": "The low/base/high range incorporates ownership, tax, capital, cycle, timing, and realization uncertainty pending the primary bridge.",
-        "overlap_control": "Unique overlap key core_engine; no other component capitalizes the same claim.",
-        "risked_present_value_per_share": {
-          "low": 20.5,
-          "base": 26.46,
-          "high": 33.73
-        }
-      },
-      {
-        "id": "reinvestment_or_assets",
-        "label": "International growth and reinvestment runway",
-        "component_ids": [
-          "reinvestment_or_assets"
-        ],
-        "economic_claim": "International growth and reinvestment runway",
-        "valuation_basis": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
-        "adjustments": "The low/base/high range incorporates ownership, tax, capital, cycle, timing, and realization uncertainty pending the primary bridge.",
-        "overlap_control": "Unique overlap key reinvestment_or_assets; no other component capitalizes the same claim.",
-        "risked_present_value_per_share": {
-          "low": 2.65,
-          "base": 4.63,
-          "high": 7.94
-        }
-      },
-      {
-        "id": "net_financial_claims",
-        "label": "Net cash and investments",
-        "component_ids": [
-          "net_financial_claims"
-        ],
-        "economic_claim": "Net cash and investments",
-        "valuation_basis": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
-        "adjustments": "The low/base/high range incorporates ownership, tax, capital, cycle, timing, and realization uncertainty pending the primary bridge.",
-        "overlap_control": "Unique overlap key net_financial_claims; no other component capitalizes the same claim.",
-        "risked_present_value_per_share": {
-          "low": 0.0,
-          "base": 1.65,
-          "high": 3.31
-        }
-      },
-      {
-        "id": "downside_reserve",
-        "label": "Insurance, land, and execution reserve",
-        "component_ids": [
-          "downside_reserve"
-        ],
-        "economic_claim": "Insurance, land, and execution reserve",
-        "valuation_basis": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
-        "adjustments": "The low/base/high range incorporates ownership, tax, capital, cycle, timing, and realization uncertainty pending the primary bridge.",
-        "overlap_control": "Unique overlap key downside_reserve; no other component capitalizes the same claim.",
-        "risked_present_value_per_share": {
-          "low": -6.61,
-          "base": -2.98,
-          "high": -0.33
-        }
-      }
-    ],
-    "valuation_proof": [
-      {
-        "component_id": "core_engine",
-        "economic_claim": "Auction-network owner-cash engine",
-        "quantity": {
-          "value": 1,
-          "unit": "per-share economic claim"
-        },
-        "method": "owner_cash_reinvestment_dcf",
-        "evidence_tier": "mixed_primary_and_estimate",
-        "evidence": "Existing CPRT valuation inputs: FY2025 OCF $1.80B \u2212 capex $0.57B \u00f7 ~978M diluted shares (10-K FY2025); FY2025 FCF/sh as mid-cycle base; Q3 FY2026 U.S. service fees soft but international + ASP offset \u2014 not using peak pandemic volumes [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
-        "comparable_role": "not_applicable",
-        "comparable_ids": [],
-        "adjustment": "The low/base/high range incorporates ownership, tax, capital, cycle, timing, and realization uncertainty pending the primary bridge.",
-        "range_per_share": {
-          "low": 20.5,
-          "base": 26.46,
-          "high": 33.73
-        },
-        "treatment": "additive",
-        "overlap_key": "core_engine",
-        "overlap_control": "Unique overlap key core_engine; no other component capitalizes the same claim.",
-        "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case.",
-        "risk_and_timing": null
-      },
-      {
-        "component_id": "reinvestment_or_assets",
-        "economic_claim": "International growth and reinvestment runway",
-        "quantity": {
-          "value": 1,
-          "unit": "per-share economic claim"
-        },
-        "method": "reinvestment_return_dcf",
-        "evidence_tier": "mixed_primary_and_estimate",
-        "evidence": "Existing CPRT valuation inputs: FY2025 OCF $1.80B \u2212 capex $0.57B \u00f7 ~978M diluted shares (10-K FY2025); FY2025 FCF/sh as mid-cycle base; Q3 FY2026 U.S. service fees soft but international + ASP offset \u2014 not using peak pandemic volumes [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
-        "comparable_role": "not_applicable",
-        "comparable_ids": [],
-        "adjustment": "The low/base/high range incorporates ownership, tax, capital, cycle, timing, and realization uncertainty pending the primary bridge.",
-        "range_per_share": {
-          "low": 2.65,
-          "base": 4.63,
-          "high": 7.94
-        },
-        "treatment": "additive",
-        "overlap_key": "reinvestment_or_assets",
-        "overlap_control": "Unique overlap key reinvestment_or_assets; no other component capitalizes the same claim.",
-        "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case.",
-        "risk_and_timing": null
-      },
-      {
-        "component_id": "net_financial_claims",
-        "economic_claim": "Net cash and investments",
-        "quantity": {
-          "value": 1,
-          "unit": "per-share economic claim"
-        },
-        "method": "net_asset_value",
-        "evidence_tier": "mixed_primary_and_estimate",
-        "evidence": "Existing CPRT valuation inputs: FY2025 OCF $1.80B \u2212 capex $0.57B \u00f7 ~978M diluted shares (10-K FY2025); FY2025 FCF/sh as mid-cycle base; Q3 FY2026 U.S. service fees soft but international + ASP offset \u2014 not using peak pandemic volumes [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
-        "comparable_role": "not_applicable",
-        "comparable_ids": [],
-        "adjustment": "The low/base/high range incorporates ownership, tax, capital, cycle, timing, and realization uncertainty pending the primary bridge.",
-        "range_per_share": {
-          "low": 0.0,
-          "base": 1.65,
-          "high": 3.31
-        },
-        "treatment": "additive",
-        "overlap_key": "net_financial_claims",
-        "overlap_control": "Unique overlap key net_financial_claims; no other component capitalizes the same claim.",
-        "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case.",
-        "risk_and_timing": null
-      },
-      {
-        "component_id": "downside_reserve",
-        "economic_claim": "Insurance, land, and execution reserve",
-        "quantity": {
-          "value": 1,
-          "unit": "per-share economic claim"
-        },
-        "method": "realization_reserve",
-        "evidence_tier": "mixed_primary_and_estimate",
-        "evidence": "Existing CPRT valuation inputs: FY2025 OCF $1.80B \u2212 capex $0.57B \u00f7 ~978M diluted shares (10-K FY2025); FY2025 FCF/sh as mid-cycle base; Q3 FY2026 U.S. service fees soft but international + ASP offset \u2014 not using peak pandemic volumes [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
-        "comparable_role": "not_applicable",
-        "comparable_ids": [],
-        "adjustment": "The low/base/high range incorporates ownership, tax, capital, cycle, timing, and realization uncertainty pending the primary bridge.",
-        "range_per_share": {
-          "low": -6.61,
-          "base": -2.98,
-          "high": -0.33
-        },
-        "treatment": "additive",
-        "overlap_key": "downside_reserve",
-        "overlap_control": "Unique overlap key downside_reserve; no other component capitalizes the same claim.",
-        "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case.",
-        "risk_and_timing": null
-      }
-    ],
-    "wisdom_applied": [],
-    "limitations": [
-      "Phase 3 schedule scaffold, not a committee-approved valuation.",
-      "Universal followups remain open until primary evidence supports the ownership map, owner-cash or NAV bridge, and downside/capital claims."
-    ],
-    "complete_component_coverage": true,
-    "validation_errors": [],
-    "registry_version": "1.0"
+    "status": "compiled",
+    "validation_errors": []
   },
-  "component_review_queue": {
-    "status": "ready_for_committee_review",
-    "decision_rule": "Each assigned rater records accept, challenge, or reject with a proposed range and evidence. The aggregator may not silently average disputed ranges.",
-    "items": [
-      {
-        "component_id": "core_engine",
-        "label": "Auction-network owner-cash engine",
-        "treatment": "additive",
-        "range_per_share": {
-          "low": 20.5,
-          "base": 26.46,
-          "high": 33.73
-        },
-        "range_width_pct_of_base": 50.0,
-        "evidence_tier": "mixed_primary_and_estimate",
-        "recommended_raters": [
-          "hohn",
-          "marathon_capital_cycle"
-        ],
-        "mandatory_checks": [
-          "Is the valuation method appropriate for this economic claim?",
-          "Is the security's ownership claim and economic-unit denominator reconciled correctly?",
-          "Does the evidence support the low/base/high range and its timing?",
-          "Are comparable assets truly like-for-like after production, contract, location, capital, ownership, and realization adjustments?",
-          "For an option, are success probability, time to realization, and remaining owner-funded capital explicit?",
-          "Is the component additive, or already embedded in another component?",
-          "What observation would move the base estimate materially?"
-        ],
-        "status": "open"
-      },
-      {
-        "component_id": "reinvestment_or_assets",
-        "label": "International growth and reinvestment runway",
-        "treatment": "additive",
-        "range_per_share": {
-          "low": 2.65,
-          "base": 4.63,
-          "high": 7.94
-        },
-        "range_width_pct_of_base": 114.3,
-        "evidence_tier": "mixed_primary_and_estimate",
-        "recommended_raters": [
-          "hohn",
-          "marathon_capital_cycle"
-        ],
-        "mandatory_checks": [
-          "Is the valuation method appropriate for this economic claim?",
-          "Is the security's ownership claim and economic-unit denominator reconciled correctly?",
-          "Does the evidence support the low/base/high range and its timing?",
-          "Are comparable assets truly like-for-like after production, contract, location, capital, ownership, and realization adjustments?",
-          "For an option, are success probability, time to realization, and remaining owner-funded capital explicit?",
-          "Is the component additive, or already embedded in another component?",
-          "What observation would move the base estimate materially?"
-        ],
-        "status": "open"
-      },
-      {
-        "component_id": "net_financial_claims",
-        "label": "Net cash and investments",
-        "treatment": "additive",
-        "range_per_share": {
-          "low": 0.0,
-          "base": 1.65,
-          "high": 3.31
-        },
-        "range_width_pct_of_base": 200.6,
-        "evidence_tier": "mixed_primary_and_estimate",
-        "recommended_raters": [
-          "greenblatt",
-          "marks_credit_cycle"
-        ],
-        "mandatory_checks": [
-          "Is the valuation method appropriate for this economic claim?",
-          "Is the security's ownership claim and economic-unit denominator reconciled correctly?",
-          "Does the evidence support the low/base/high range and its timing?",
-          "Are comparable assets truly like-for-like after production, contract, location, capital, ownership, and realization adjustments?",
-          "For an option, are success probability, time to realization, and remaining owner-funded capital explicit?",
-          "Is the component additive, or already embedded in another component?",
-          "What observation would move the base estimate materially?"
-        ],
-        "status": "open"
-      },
-      {
-        "component_id": "downside_reserve",
-        "label": "Insurance, land, and execution reserve",
-        "treatment": "additive",
-        "range_per_share": {
-          "low": -6.61,
-          "base": -2.98,
-          "high": -0.33
-        },
-        "range_width_pct_of_base": 210.7,
-        "evidence_tier": "mixed_primary_and_estimate",
-        "recommended_raters": [
-          "marks_credit_cycle",
-          "pabrai"
-        ],
-        "mandatory_checks": [
-          "Is the valuation method appropriate for this economic claim?",
-          "Is the security's ownership claim and economic-unit denominator reconciled correctly?",
-          "Does the evidence support the low/base/high range and its timing?",
-          "Are comparable assets truly like-for-like after production, contract, location, capital, ownership, and realization adjustments?",
-          "For an option, are success probability, time to realization, and remaining owner-funded capital explicit?",
-          "Is the component additive, or already embedded in another component?",
-          "What observation would move the base estimate materially?"
-        ],
-        "status": "open"
-      }
-    ]
-  },
-  "valuation_method_route": {
-    "schema_version": "1.0",
-    "status": "routed",
-    "profile_id": "quality_reinvestment",
-    "label": "High-return compounder",
-    "score": 10.0,
-    "reasons": [
-      "archetype=compounder",
-      "component categories=operating_business",
-      "existing methods=dcf, owner_cash, reinvestment"
-    ],
-    "primary_methods": [
-      "owner_earnings_reinvestment_dcf"
-    ],
-    "corroborating_methods": [
-      "reverse_dcf",
-      "incremental_roic_runway"
-    ],
-    "primary_personas": [
-      "buffett_weschler",
-      "hohn"
-    ],
-    "cross_check_personas": [
-      "munger",
-      "marathon_capital_cycle"
-    ],
-    "silent_personas": [
-      "greenblatt",
-      "hk",
-      "klarman_asset_value",
-      "marks_credit_cycle",
-      "pabrai",
-      "stahl"
-    ],
-    "required_evidence": [
-      "normalized owner earnings",
-      "incremental return on capital",
-      "reinvestment runway",
-      "diluted share count",
-      "competitive-advantage mechanism"
-    ],
-    "failure_modes": [
-      "growth projected without its capital cost",
-      "stock compensation or acquisitions omitted",
-      "terminal value unsupported by a durable mechanism"
-    ],
-    "secondary_profiles": [
-      {
-        "profile_id": "credit_and_normalized_returns",
-        "score": 2.0,
-        "reasons": [
-          "component categories=financial_asset, liability_or_reserve"
-        ]
-      },
-      {
-        "profile_id": "predictable_cash_flow",
-        "score": 2.0,
-        "reasons": [
-          "component categories=operating_business",
-          "existing methods=owner_cash"
-        ]
-      }
-    ],
-    "scorecard": {
-      "scarce_asset_optionality": {
-        "score": 0.0,
-        "reasons": []
-      },
-      "quality_reinvestment": {
-        "score": 10.0,
-        "reasons": [
-          "archetype=compounder",
-          "component categories=operating_business",
-          "existing methods=dcf, owner_cash, reinvestment"
-        ]
-      },
-      "capital_cycle": {
-        "score": 1.0,
-        "reasons": [
-          "component categories=operating_business"
-        ]
-      },
-      "credit_and_normalized_returns": {
-        "score": 2.0,
-        "reasons": [
-          "component categories=financial_asset, liability_or_reserve"
-        ]
-      },
-      "catalyst_asset_value": {
-        "score": 1.0,
-        "reasons": [
-          "component categories=financial_asset"
-        ]
-      },
-      "predictable_cash_flow": {
-        "score": 2.0,
-        "reasons": [
-          "component categories=operating_business",
-          "existing methods=owner_cash"
-        ]
-      },
-      "binary_milestone": {
-        "score": 0.0,
-        "reasons": []
-      }
-    },
-    "decision_rule": "Use one primary method and no more than two corroborating methods; irrelevant methods and personas remain silent."
-  },
-  "universal_valuation_contract": {
-    "schema_version": "1.0",
-    "status": "decision_grade",
-    "ticker": "CPRT",
-    "as_of": "2026-05-26",
-    "economic_ownership_map": [
-      {
-        "component_id": "core_engine",
-        "label": "Auction-network owner-cash engine",
-        "category": "operating_business",
-        "treatment": "additive",
-        "included_in_component_id": null,
-        "ownership_claim": "Auction-network owner-cash engine",
-        "ownership_percentage": 1.0,
-        "quantity": {
-          "value": 1,
-          "unit": "per-share economic claim"
-        },
-        "current_operating_contribution": {
-          "starting_revenue_m": null,
-          "base_value_per_share": 26.46
-        },
-        "growth_driver": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
-        "required_reinvestment": {
-          "model_type": null,
-          "base_incremental_after_tax_roic": null,
-          "base_remaining_cost_m": null,
-          "treatment": "explicit in driver model or included in the stated owner-cash conversion and component range"
-        },
-        "method": "owner_cash_reinvestment_dcf",
-        "comparable_ids": [],
-        "range_per_share": {
-          "low": 20.5,
-          "base": 26.46,
-          "high": 33.73
-        },
-        "evidence_tier": "mixed_primary_and_estimate",
-        "evidence_level": "analyst_estimated",
-        "evidence": "Existing CPRT valuation inputs: FY2025 OCF $1.80B \u2212 capex $0.57B \u00f7 ~978M diluted shares (10-K FY2025); FY2025 FCF/sh as mid-cycle base; Q3 FY2026 U.S. service fees soft but international + ASP offset \u2014 not using peak pandemic volumes [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
-        "probability_and_timing": null,
-        "tax_and_realization_adjustments": "The low/base/high range incorporates ownership, tax, capital, cycle, timing, and realization uncertainty pending the primary bridge.",
-        "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case.",
-        "overlap_key": "core_engine",
-        "assumption_type": "judgment"
-      },
-      {
-        "component_id": "reinvestment_or_assets",
-        "label": "International growth and reinvestment runway",
-        "category": "operating_business",
-        "treatment": "additive",
-        "included_in_component_id": null,
-        "ownership_claim": "International growth and reinvestment runway",
-        "ownership_percentage": 1.0,
-        "quantity": {
-          "value": 1,
-          "unit": "per-share economic claim"
-        },
-        "current_operating_contribution": {
-          "starting_revenue_m": null,
-          "base_value_per_share": 4.63
-        },
-        "growth_driver": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
-        "required_reinvestment": {
-          "model_type": null,
-          "base_incremental_after_tax_roic": null,
-          "base_remaining_cost_m": null,
-          "treatment": "explicit in driver model or included in the stated owner-cash conversion and component range"
-        },
-        "method": "reinvestment_return_dcf",
-        "comparable_ids": [],
-        "range_per_share": {
-          "low": 2.65,
-          "base": 4.63,
-          "high": 7.94
-        },
-        "evidence_tier": "mixed_primary_and_estimate",
-        "evidence_level": "analyst_estimated",
-        "evidence": "Existing CPRT valuation inputs: FY2025 OCF $1.80B \u2212 capex $0.57B \u00f7 ~978M diluted shares (10-K FY2025); FY2025 FCF/sh as mid-cycle base; Q3 FY2026 U.S. service fees soft but international + ASP offset \u2014 not using peak pandemic volumes [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
-        "probability_and_timing": null,
-        "tax_and_realization_adjustments": "The low/base/high range incorporates ownership, tax, capital, cycle, timing, and realization uncertainty pending the primary bridge.",
-        "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case.",
-        "overlap_key": "reinvestment_or_assets",
-        "assumption_type": "judgment"
-      },
-      {
-        "component_id": "net_financial_claims",
-        "label": "Net cash and investments",
-        "category": "financial_asset",
-        "treatment": "additive",
-        "included_in_component_id": null,
-        "ownership_claim": "Net cash and investments",
-        "ownership_percentage": 1.0,
-        "quantity": {
-          "value": 1,
-          "unit": "per-share economic claim"
-        },
-        "current_operating_contribution": {
-          "starting_revenue_m": null,
-          "base_value_per_share": 1.65
-        },
-        "growth_driver": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
-        "required_reinvestment": {
-          "model_type": null,
-          "base_incremental_after_tax_roic": null,
-          "base_remaining_cost_m": null,
-          "treatment": "explicit in driver model or included in the stated owner-cash conversion and component range"
-        },
-        "method": "net_asset_value",
-        "comparable_ids": [],
-        "range_per_share": {
-          "low": 0.0,
-          "base": 1.65,
-          "high": 3.31
-        },
-        "evidence_tier": "mixed_primary_and_estimate",
-        "evidence_level": "analyst_estimated",
-        "evidence": "Existing CPRT valuation inputs: FY2025 OCF $1.80B \u2212 capex $0.57B \u00f7 ~978M diluted shares (10-K FY2025); FY2025 FCF/sh as mid-cycle base; Q3 FY2026 U.S. service fees soft but international + ASP offset \u2014 not using peak pandemic volumes [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
-        "probability_and_timing": null,
-        "tax_and_realization_adjustments": "The low/base/high range incorporates ownership, tax, capital, cycle, timing, and realization uncertainty pending the primary bridge.",
-        "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case.",
-        "overlap_key": "net_financial_claims",
-        "assumption_type": "judgment"
-      },
-      {
-        "component_id": "downside_reserve",
-        "label": "Insurance, land, and execution reserve",
-        "category": "liability_or_reserve",
-        "treatment": "additive",
-        "included_in_component_id": null,
-        "ownership_claim": "Insurance, land, and execution reserve",
-        "ownership_percentage": 1.0,
-        "quantity": {
-          "value": 1,
-          "unit": "per-share economic claim"
-        },
-        "current_operating_contribution": {
-          "starting_revenue_m": null,
-          "base_value_per_share": -2.98
-        },
-        "growth_driver": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
-        "required_reinvestment": {
-          "model_type": null,
-          "base_incremental_after_tax_roic": null,
-          "base_remaining_cost_m": null,
-          "treatment": "explicit in driver model or included in the stated owner-cash conversion and component range"
-        },
-        "method": "realization_reserve",
-        "comparable_ids": [],
-        "range_per_share": {
-          "low": -6.61,
-          "base": -2.98,
-          "high": -0.33
-        },
-        "evidence_tier": "mixed_primary_and_estimate",
-        "evidence_level": "analyst_estimated",
-        "evidence": "Existing CPRT valuation inputs: FY2025 OCF $1.80B \u2212 capex $0.57B \u00f7 ~978M diluted shares (10-K FY2025); FY2025 FCF/sh as mid-cycle base; Q3 FY2026 U.S. service fees soft but international + ASP offset \u2014 not using peak pandemic volumes [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
-        "probability_and_timing": null,
-        "tax_and_realization_adjustments": "The low/base/high range incorporates ownership, tax, capital, cycle, timing, and realization uncertainty pending the primary bridge.",
-        "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case.",
-        "overlap_key": "downside_reserve",
-        "assumption_type": "judgment"
-      }
-    ],
-    "component_coverage": {
-      "all_material_components_identified": true,
-      "material_component_count": 4,
-      "additive_component_count": 4,
-      "embedded_component_count": 0,
-      "unvalued_component_count": 0,
-      "double_counting_flags": []
-    },
-    "input_classification": {
-      "facts": [],
-      "estimates": [],
-      "judgments": [
-        {
-          "component_id": "core_engine",
-          "label": "Auction-network owner-cash engine",
-          "kind": "judgment",
-          "evidence_tier": "mixed_primary_and_estimate",
-          "evidence": "Existing CPRT valuation inputs: FY2025 OCF $1.80B \u2212 capex $0.57B \u00f7 ~978M diluted shares (10-K FY2025); FY2025 FCF/sh as mid-cycle base; Q3 FY2026 U.S. service fees soft but international + ASP offset \u2014 not using peak pandemic volumes [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
-          "method": "owner_cash_reinvestment_dcf"
-        },
-        {
-          "component_id": "reinvestment_or_assets",
-          "label": "International growth and reinvestment runway",
-          "kind": "judgment",
-          "evidence_tier": "mixed_primary_and_estimate",
-          "evidence": "Existing CPRT valuation inputs: FY2025 OCF $1.80B \u2212 capex $0.57B \u00f7 ~978M diluted shares (10-K FY2025); FY2025 FCF/sh as mid-cycle base; Q3 FY2026 U.S. service fees soft but international + ASP offset \u2014 not using peak pandemic volumes [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
-          "method": "reinvestment_return_dcf"
-        },
-        {
-          "component_id": "net_financial_claims",
-          "label": "Net cash and investments",
-          "kind": "judgment",
-          "evidence_tier": "mixed_primary_and_estimate",
-          "evidence": "Existing CPRT valuation inputs: FY2025 OCF $1.80B \u2212 capex $0.57B \u00f7 ~978M diluted shares (10-K FY2025); FY2025 FCF/sh as mid-cycle base; Q3 FY2026 U.S. service fees soft but international + ASP offset \u2014 not using peak pandemic volumes [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
-          "method": "net_asset_value"
-        },
-        {
-          "component_id": "downside_reserve",
-          "label": "Insurance, land, and execution reserve",
-          "kind": "judgment",
-          "evidence_tier": "mixed_primary_and_estimate",
-          "evidence": "Existing CPRT valuation inputs: FY2025 OCF $1.80B \u2212 capex $0.57B \u00f7 ~978M diluted shares (10-K FY2025); FY2025 FCF/sh as mid-cycle base; Q3 FY2026 U.S. service fees soft but international + ASP offset \u2014 not using peak pandemic volumes [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
-          "method": "realization_reserve"
-        }
-      ]
-    },
-    "method_route": {
-      "schema_version": "1.0",
-      "status": "routed",
-      "profile_id": "quality_reinvestment",
-      "label": "High-return compounder",
-      "score": 10.0,
-      "reasons": [
-        "archetype=compounder",
-        "component categories=operating_business",
-        "existing methods=dcf, owner_cash, reinvestment"
-      ],
-      "primary_methods": [
-        "owner_earnings_reinvestment_dcf"
-      ],
-      "corroborating_methods": [
-        "reverse_dcf",
-        "incremental_roic_runway"
-      ],
-      "primary_personas": [
-        "buffett_weschler",
-        "hohn"
-      ],
-      "cross_check_personas": [
-        "munger",
-        "marathon_capital_cycle"
-      ],
-      "silent_personas": [
-        "greenblatt",
-        "hk",
-        "klarman_asset_value",
-        "marks_credit_cycle",
-        "pabrai",
-        "stahl"
-      ],
-      "required_evidence": [
-        "normalized owner earnings",
-        "incremental return on capital",
-        "reinvestment runway",
-        "diluted share count",
-        "competitive-advantage mechanism"
-      ],
-      "failure_modes": [
-        "growth projected without its capital cost",
-        "stock compensation or acquisitions omitted",
-        "terminal value unsupported by a durable mechanism"
-      ],
-      "secondary_profiles": [
-        {
-          "profile_id": "credit_and_normalized_returns",
-          "score": 2.0,
-          "reasons": [
-            "component categories=financial_asset, liability_or_reserve"
-          ]
-        },
-        {
-          "profile_id": "predictable_cash_flow",
-          "score": 2.0,
-          "reasons": [
-            "component categories=operating_business",
-            "existing methods=owner_cash"
-          ]
-        }
-      ],
-      "scorecard": {
-        "scarce_asset_optionality": {
-          "score": 0.0,
-          "reasons": []
-        },
-        "quality_reinvestment": {
-          "score": 10.0,
-          "reasons": [
-            "archetype=compounder",
-            "component categories=operating_business",
-            "existing methods=dcf, owner_cash, reinvestment"
-          ]
-        },
-        "capital_cycle": {
-          "score": 1.0,
-          "reasons": [
-            "component categories=operating_business"
-          ]
-        },
-        "credit_and_normalized_returns": {
-          "score": 2.0,
-          "reasons": [
-            "component categories=financial_asset, liability_or_reserve"
-          ]
-        },
-        "catalyst_asset_value": {
-          "score": 1.0,
-          "reasons": [
-            "component categories=financial_asset"
-          ]
-        },
-        "predictable_cash_flow": {
-          "score": 2.0,
-          "reasons": [
-            "component categories=operating_business",
-            "existing methods=owner_cash"
-          ]
-        },
-        "binary_milestone": {
-          "score": 0.0,
-          "reasons": []
-        }
-      },
-      "decision_rule": "Use one primary method and no more than two corroborating methods; irrelevant methods and personas remain silent."
-    },
-    "market": {
-      "price_per_share": 33.07,
-      "fully_diluted_shares": 977600000,
-      "market_cap_m": 32329.23,
-      "enterprise_value_m": null
-    },
-    "valuation": {
-      "value_per_share": {
-        "low": 16.54,
-        "base": 29.76,
-        "high": 44.65
-      },
-      "probability_weighted_value_per_share": 29.76,
-      "expected_distributions_per_share": 0.0,
-      "annualized_return_at_price_pct": {
-        "low": -9.42,
-        "base": -1.5,
-        "high": 4.38
-      },
-      "downside_to_low_pct": -49.98,
-      "horizon_years": 7
-    },
-    "scenario_contract": {
-      "rule": "Cases must change causal operating, capital, probability, timing, or financing drivers\u2014not only the terminal multiple.",
-      "top_value_drivers": [
-        {
-          "component_id": "core_engine",
-          "label": "Auction-network owner-cash engine",
-          "base_per_share": 26.46,
-          "range_width_per_share": 13.23,
-          "scenario_assumptions": null
-        },
-        {
-          "component_id": "downside_reserve",
-          "label": "Insurance, land, and execution reserve",
-          "base_per_share": -2.98,
-          "range_width_per_share": 6.28,
-          "scenario_assumptions": null
-        },
-        {
-          "component_id": "reinvestment_or_assets",
-          "label": "International growth and reinvestment runway",
-          "base_per_share": 4.63,
-          "range_width_per_share": 5.29,
-          "scenario_assumptions": null
-        },
-        {
-          "component_id": "net_financial_claims",
-          "label": "Net cash and investments",
-          "base_per_share": 1.65,
-          "range_width_per_share": 3.31,
-          "scenario_assumptions": null
-        }
-      ],
-      "reverse_expectations": null
-    },
-    "evidence": {
-      "unresolved_count": 0,
-      "blockers": [],
-      "validation_errors": []
-    },
-    "monitoring": {
-      "falsifiers": [
-        "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case.",
-        "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case.",
-        "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case.",
-        "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case."
-      ],
-      "required_refresh_triggers": [
-        "new filing or material operating update",
-        "capital-structure change",
-        "material price move",
-        "component milestone or falsifier"
-      ]
-    },
-    "decision_rule": "No security is decision-grade until every material economic claim is valued exactly once and every material evidence blocker is resolved."
+  "human_review": {
+    "live_price_confirmed": false
   }
 }

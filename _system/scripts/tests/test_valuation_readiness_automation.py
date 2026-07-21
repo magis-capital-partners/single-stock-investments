@@ -45,8 +45,10 @@ class ValuationAutomationTests(unittest.TestCase):
         self.assertEqual(result["status"], "valid", result["checks"]["errors"])
         self.assertLessEqual(result["outputs"]["low"], result["outputs"]["base"])
         self.assertLessEqual(result["outputs"]["base"], result["outputs"]["high"])
+        # Market price is required for decision_grade (live mark from fetch_equity_prices).
+        valuation.setdefault("inputs", {})["price"] = 50.0
         contract = build_universal_valuation_contract(valuation, "quality_reinvestment")
-        self.assertEqual(contract["status"], "decision_grade")
+        self.assertEqual(contract["status"], "decision_grade", contract.get("evidence", {}).get("blockers"))
         self.assertEqual(strict_contract_errors(valuation), [])
 
     def test_negative_owner_earnings_cannot_clear_model_gate(self):

@@ -36,7 +36,7 @@ New tickers            → LS-algo Universe Intake (registry-driven onboarding)
 |---|---|---|
 | Data Pipeline | six separate schedules | Intake, activist, downloads, Drive, news |
 | Auto - Daily Research | successful Data Pipeline download job | Admit one material evidence change |
-| Auto - Research Queue | queue file change | Serial queued research |
+| Auto - Research Queue | deep-dive or contract-backfill queue push | Serial onboard queue, or ≤3 parallel contract_backfill jobs |
 | Research Agent Dispatcher | reusable only | Evidence manifest, token gate, research PR |
 | Power Zone Universe | successful downloads; Monday fallback; authenticated API event | Canonical valuation route, contract, workbench, pricing, committee initialization (sole owner of the valuation pipeline) |
 | LS-algo Universe Intake | daily 02:45; successful downloads; dispatch | LS-algo screener onboard, evidence recovery, registry derivatives |

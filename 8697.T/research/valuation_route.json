@@ -1,80 +1,79 @@
 {
   "schema_version": "2.0",
   "status": "routed",
-  "profile_id": "predictable_cash_flow",
-  "label": "Predictable cash-flow security",
-  "score": 12.0,
+  "profile_id": "quality_reinvestment",
+  "label": "High-return compounder",
+  "score": 20.0,
   "reasons": [
+    "archetype=compounder",
     "component categories=operating_business",
-    "existing methods=owner_cash",
+    "existing methods=dcf, owner_cash, reinvestment",
     "explicit reviewed profile"
   ],
   "primary_methods": [
-    "owner_cash_or_dividend_discount"
+    "owner_earnings_reinvestment_dcf"
   ],
   "corroborating_methods": [
-    "regulated_asset_base",
-    "yield_and_reverse_dcf"
+    "reverse_dcf",
+    "incremental_roic_runway"
   ],
   "primary_personas": [
     "buffett_weschler",
     "hohn"
   ],
   "cross_check_personas": [
-    "marks_credit_cycle"
+    "munger",
+    "marathon_capital_cycle"
   ],
   "silent_personas": [
     "greenblatt",
     "hk",
     "klarman_asset_value",
-    "marathon_capital_cycle",
-    "munger",
+    "marks_credit_cycle",
     "pabrai",
     "stahl"
   ],
   "required_evidence": [
-    "cash-flow durability",
-    "maintenance capital",
-    "funding plan",
-    "distribution policy",
-    "contract or regulatory reset terms"
+    "normalized owner earnings",
+    "incremental return on capital",
+    "reinvestment runway",
+    "diluted share count",
+    "competitive-advantage mechanism"
   ],
   "failure_modes": [
-    "dividend treated as earning power",
-    "growth capital and dilution omitted",
-    "contract renewal or regulatory reset ignored"
+    "growth projected without its capital cost",
+    "stock compensation or acquisitions omitted",
+    "terminal value unsupported by a durable mechanism"
   ],
   "secondary_profiles": [
     {
-      "profile_id": "quality_reinvestment",
-      "score": 10.0,
+      "profile_id": "credit_and_normalized_returns",
+      "score": 2.0,
       "reasons": [
-        "archetype=croupier",
-        "component categories=operating_business",
-        "existing methods=dcf, owner_cash, reinvestment"
+        "component categories=financial_asset, liability_or_reserve"
       ]
     },
     {
-      "profile_id": "scarce_asset_optionality",
-      "score": 6.0,
+      "profile_id": "predictable_cash_flow",
+      "score": 2.0,
       "reasons": [
-        "archetype=croupier"
+        "component categories=operating_business",
+        "existing methods=owner_cash"
       ]
     }
   ],
   "scorecard": {
     "scarce_asset_optionality": {
-      "score": 6.0,
-      "reasons": [
-        "archetype=croupier"
-      ]
+      "score": 0.0,
+      "reasons": []
     },
     "quality_reinvestment": {
-      "score": 10.0,
+      "score": 20.0,
       "reasons": [
-        "archetype=croupier",
+        "archetype=compounder",
         "component categories=operating_business",
-        "existing methods=dcf, owner_cash, reinvestment"
+        "existing methods=dcf, owner_cash, reinvestment",
+        "explicit reviewed profile"
       ]
     },
     "capital_cycle": {
@@ -96,11 +95,10 @@
       ]
     },
     "predictable_cash_flow": {
-      "score": 12.0,
+      "score": 2.0,
       "reasons": [
         "component categories=operating_business",
-        "existing methods=owner_cash",
-        "explicit reviewed profile"
+        "existing methods=owner_cash"
       ]
     },
     "binary_milestone": {
@@ -115,7 +113,7 @@
   "config_path": "_system/frameworks/power_zones.json",
   "config_updated": "2026-07-14",
   "classification": {
-    "archetype": "croupier",
+    "archetype": "compounder",
     "moat": "stable",
     "dhando": "partial",
     "stance": "hold",
@@ -124,15 +122,16 @@
   },
   "specialist_power_zones": [
     {
-      "persona": "hk",
-      "label": "Horizon Kinetics",
-      "independence_group": "scarce_assets",
+      "persona": "buffett_weschler",
+      "label": "Buffett / Weschler",
+      "independence_group": "quality_reinvestment",
       "in_power_zone": true,
       "fit": 1.0,
-      "matched": 2,
-      "known_fields": 2,
+      "matched": 3,
+      "known_fields": 3,
       "matched_fields": [
         "archetype",
+        "moat",
         "investment_sleeve"
       ],
       "excluded_by": null,
@@ -174,36 +173,21 @@
       "score": 85
     },
     {
-      "persona": "stahl",
-      "label": "Murray Stahl",
-      "independence_group": "scarce_assets",
-      "in_power_zone": true,
-      "fit": 1.0,
-      "matched": 2,
-      "known_fields": 2,
-      "matched_fields": [
-        "archetype",
-        "investment_sleeve"
-      ],
-      "excluded_by": null,
-      "match_rate": null,
-      "score": 85
-    },
-    {
-      "persona": "buffett_weschler",
-      "label": "Buffett / Weschler",
+      "persona": "munger",
+      "label": "Charlie Munger",
       "independence_group": "quality_reinvestment",
       "in_power_zone": true,
-      "fit": 0.667,
-      "matched": 2,
+      "fit": 1.0,
+      "matched": 3,
       "known_fields": 3,
       "matched_fields": [
+        "archetype",
         "moat",
         "investment_sleeve"
       ],
       "excluded_by": null,
       "match_rate": null,
-      "score": 57
+      "score": 85
     },
     {
       "persona": "marks_credit_cycle",
@@ -220,26 +204,10 @@
       "excluded_by": null,
       "match_rate": null,
       "score": 57
-    },
-    {
-      "persona": "munger",
-      "label": "Charlie Munger",
-      "independence_group": "quality_reinvestment",
-      "in_power_zone": true,
-      "fit": 0.667,
-      "matched": 2,
-      "known_fields": 3,
-      "matched_fields": [
-        "moat",
-        "investment_sleeve"
-      ],
-      "excluded_by": null,
-      "match_rate": null,
-      "score": 57
     }
   ],
   "committee": {
-    "candidate_count": 4,
+    "candidate_count": 5,
     "independence_group_count": 3,
     "committee_seatable": true,
     "candidates": [
@@ -252,8 +220,12 @@
         "independence_group": "competitive_advantage"
       },
       {
-        "persona": "marks_credit_cycle",
-        "independence_group": "credit_cycle"
+        "persona": "munger",
+        "independence_group": "quality_reinvestment"
+      },
+      {
+        "persona": "marathon_capital_cycle",
+        "independence_group": "capital_cycle"
       },
       {
         "persona": "lawrence",
@@ -261,6 +233,6 @@
       }
     ]
   },
-  "input_hash": "2e564d169c805553a3c2ca804b35533426ca5be169fb8956e7aabfd8e8f0bef5",
-  "generated_at": "2026-07-20T17:13:53.735451+00:00"
+  "input_hash": "57c9d9ddac6c13c02e04ec7f948755300eb30230993b0bf3f133f6afb12ca475",
+  "generated_at": "2026-07-20T23:39:00.331976+00:00"
 }

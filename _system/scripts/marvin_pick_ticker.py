@@ -3,10 +3,12 @@
 
 Priority (registry holdings only):
   1. Explicit ticker with ready, unprocessed evidence
-  2. Recently onboarded holding with no deep dive yet (`onboard_pending`)
-  3. Any holding with no deep dive yet (`no_deep_dive`)
-  4. Holdings with primary documents newer than the latest deep dive
-  5. Holdings with refresh-eligible valuation news newer than the latest deep dive
+  2. Evidence recovery queue (`evidence_gap_ready`)
+  3. Recently onboarded holding with no deep dive yet (`onboard_pending`)
+  4. Any holding with no deep dive yet (`no_deep_dive`)
+  5. Contract backfill for evidence_blocked valuations (`contract_backfill`)
+  6. Holdings with primary documents newer than the latest deep dive
+  7. Holdings with refresh-eligible valuation news newer than the latest deep dive
 """
 from __future__ import annotations
 
@@ -271,6 +273,44 @@ def evidence_recovery_candidates() -> list[str]:
     ]
 
 
+def contract_backfill_candidates() -> list[str]:
+    """Evidence-blocked holdings, almost-there (mapped) first, then the rest."""
+    queue_path = ROOT / "_system" / "data" / "contract_backfill_queue.json"
+    queue = {}
+    if queue_path.is_file():
+        try:
+            queue = json.loads(queue_path.read_text(encoding="utf-8"))
+        except json.JSONDecodeError:
+            queue = {}
+    almost = [str(t).upper() for t in (queue.get("almost_there") or [])]
+    wave = [str(t).upper() for t in (queue.get("tickers") or [])]
+    ordered: list[str] = []
+    for ticker in almost + wave:
+        if ticker not in ordered:
+            ordered.append(ticker)
+    if ordered:
+        return ordered
+    # Fallback when the queue file is absent: scan contracts directly.
+    found_almost: list[str] = []
+    found_other: list[str] = []
+    for ticker in holdings_tickers():
+        path = ROOT / ticker / "research" / "valuation_contract.json"
+        if not path.is_file():
+            continue
+        try:
+            contract = json.loads(path.read_text(encoding="utf-8"))
+        except json.JSONDecodeError:
+            continue
+        if contract.get("status") != "evidence_blocked":
+            continue
+        cc = contract.get("component_coverage") or {}
+        if cc.get("all_material_components_identified") and int(cc.get("additive_component_count") or 0) > 0:
+            found_almost.append(ticker)
+        else:
+            found_other.append(ticker)
+    return found_almost + found_other
+
+
 def pick_ticker(
     explicit: str | None = None,
     *,
@@ -322,6 +362,13 @@ def pick_ticker(
     if no_dive:
         t = sorted(no_dive)[0]
         return research_candidate(t, "no_deep_dive", force=force) or {"ticker": None, "skip": True, "reason": "evidence_not_ready"}
+
+    # Almost-there mapped contracts outrank ordinary refresh work so the new
+    # universal valuation can burn down without waiting on news triggers.
+    for ticker in contract_backfill_candidates():
+        candidate = research_candidate(ticker, "contract_backfill", force=force)
+        if candidate:
+            return candidate
 
     if stale:
         stale.sort(key=lambda x: (-x[0].timestamp(), x[2]))

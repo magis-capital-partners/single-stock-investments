@@ -1,11 +1,12 @@
 name: Auto - Research Queue
 
-# Evidence queue only. This workflow never calls Cursor itself.
+# Evidence / contract-backfill queues only. This workflow never calls Cursor itself.
 on:
   push:
     branches: [main]
     paths:
       - _system/data/deep_dive_dispatch_queue.json
+      - _system/data/contract_backfill_queue.json
 
 permissions:
   contents: read
@@ -16,34 +17,46 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     outputs:
-      tickers: ${{ steps.matrix.outputs.tickers }}
+      jobs: ${{ steps.matrix.outputs.jobs }}
       max_parallel: ${{ steps.matrix.outputs.max_parallel }}
     steps:
       - uses: actions/checkout@v4
         with:
           sparse-checkout: |
             _system/scripts/build_deep_dive_dispatch_matrix.py
+            _system/scripts/marvin_pick_ticker.py
+            _system/scripts/portfolio_registry.py
+            _system/scripts/portfolio_news_common.py
+            _system/scripts/build_research_agent_manifest.py
+            _system/portfolio/registry.json
             _system/data/deep_dive_dispatch_queue.json
+            _system/data/contract_backfill_queue.json
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
       - id: matrix
         run: |
-          TICKERS=$(python _system/scripts/build_deep_dive_dispatch_matrix.py --use-queue)
-          echo "tickers=$TICKERS" >> "$GITHUB_OUTPUT"
-          echo "max_parallel=1" >> "$GITHUB_OUTPUT"
+          JOBS=$(python _system/scripts/build_deep_dive_dispatch_matrix.py --use-queue)
+          echo "jobs=$JOBS" >> "$GITHUB_OUTPUT"
+          # Backfill may run a few in parallel; onboard stays serial.
+          if echo "$JOBS" | grep -q contract_backfill; then
+            echo "max_parallel=3" >> "$GITHUB_OUTPUT"
+          else
+            echo "max_parallel=1" >> "$GITHUB_OUTPUT"
+          fi
 
   batch:
     needs: batch-prepare
-    if: needs.batch-prepare.outputs.tickers != '[]'
+    if: needs.batch-prepare.outputs.jobs != '[]'
     strategy:
       fail-fast: false
-      max-parallel: 1
+      max-parallel: ${{ fromJson(needs.batch-prepare.outputs.max_parallel) }}
       matrix:
-        ticker: ${{ fromJson(needs.batch-prepare.outputs.tickers) }}
+        include: ${{ fromJson(needs.batch-prepare.outputs.jobs) }}
     uses: ./.github/workflows/research-agent-dispatch.yml
     with:
       ticker: ${{ matrix.ticker }}
-      reason: batch_onboard_pending
+      reason: ${{ matrix.reason }}
+      consumer: ${{ matrix.consumer }}
       force: false
     secrets: inherit

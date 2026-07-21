@@ -15,6 +15,11 @@ on:
         type: boolean
         required: false
         default: false
+      consumer:
+        type: string
+        required: false
+        default: "marvin_research"
+        description: LLM usage policy consumer id
     secrets:
       CURSOR_API_KEY:
         required: false
@@ -151,6 +156,7 @@ jobs:
           evidence_manifest: ${{ needs.select.outputs.ticker }}/research/research_agent_manifest.json
           evidence_manifest_json: ${{ needs.select.outputs.manifest_json }}
           force: ${{ inputs.force }}
+          consumer: ${{ inputs.consumer || 'marvin_research' }}
 
   caught-up:
     needs: select

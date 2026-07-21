@@ -109,7 +109,8 @@ def _latest_companyfact(payload: dict, namespace: str, tags: list[str], annual: 
                 candidates.append((str(row.get("end")), str(row.get("filed") or ""), tag, unit, row))
     if not candidates:
         return None
-    _end, _filed, tag, unit, row = max(candidates)
+    # Sort only on comparable keys; the raw row dict is not orderable.
+    _end, _filed, tag, unit, row = max(candidates, key=lambda item: (item[0], item[1], item[2], item[3]))
     return tag, {**row, "unit": unit}
 
 
@@ -313,11 +314,19 @@ def run_ticker(ticker: str, as_of: str, collect: bool, full_rerun: bool) -> dict
     state["stages"]["collection"] = {"status": "complete" if not any(r["returncode"] for r in collection_results) else "partial", "at": now(), "results": collection_results}
     ledger = build_fact_ledger(ticker, as_of)
     write_json(research / "valuation_fact_ledger.json", ledger)
+    prior_valuation = read_json(research / "valuation.json")
+    prior_inputs = prior_valuation.get("inputs") if isinstance(prior_valuation.get("inputs"), dict) else {}
     model = compile_owner_earnings(ticker, as_of, identity, ledger)
     if model:
+        # Preserve live market marks fetched into inputs.price.
+        merged_inputs = dict(prior_inputs)
+        merged_inputs.update(model.get("inputs") or {})
+        for key in ("price", "price_as_of", "price_source"):
+            if prior_inputs.get(key) not in (None, ""):
+                merged_inputs[key] = prior_inputs[key]
+        model["inputs"] = merged_inputs
         write_json(research / "valuation.json", model)
     else:
-        prior_valuation = read_json(research / "valuation.json")
         if prior_valuation.get("method") == "proof_first_automated":
             (research / "valuation.json").unlink(missing_ok=True)
     plan = evidence_plan(ticker, identity, ledger, as_of, model_ready=bool(model))
