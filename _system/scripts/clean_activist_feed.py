@@ -30,7 +30,7 @@ from build_activist_feed import WEAK_MATCH_TICKER_THRESHOLD  # noqa: E402
 
 def is_publisher_false_positive(row: dict, meta_cache: dict[str, dict]) -> bool:
     """True when a publisher/local row clearly targets a different company."""
-    if row.get("source") not in ("publisher_site", "local"):
+    if row.get("source") not in ("publisher_site", "local", "press_wire"):
         return False
     ticker = (row.get("ticker") or "").upper()
     if not ticker:

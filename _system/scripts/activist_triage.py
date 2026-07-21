@@ -241,6 +241,17 @@ def triage_report(
         if registry_firm and tier <= tier_max_signal and publisher_verified:
             promote_rules.append("publisher_short_t1_verified")
 
+    if report.get("source") in {"publisher_site", "press_wire", "local"} and side == "long":
+        filing = report.get("filing_class") or ""
+        publisher_verified = report.get("target_verified") is True and report.get("body_verified") is not False
+        if (
+            registry_firm
+            and tier <= tier_max_signal
+            and publisher_verified
+            and filing in {"open_letter", "campaign_presentation", "press_campaign", "publisher_report"}
+        ):
+            promote_rules.append("publisher_long_letter_verified")
+
     if campaign >= campaign_min:
         promote_rules.append("active_campaign")
 
@@ -287,7 +298,12 @@ def triage_report(
     elif promote_rules:
         if any(
             r in promote_rules
-            for r in ("registry_proxy_campaign", "stake_large_registry", "publisher_short_t1_verified")
+            for r in (
+                "registry_proxy_campaign",
+                "stake_large_registry",
+                "publisher_short_t1_verified",
+                "publisher_long_letter_verified",
+            )
         ):
             verdict = "auto_signal"
         else:

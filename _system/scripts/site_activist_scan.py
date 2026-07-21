@@ -7,9 +7,10 @@ from pathlib import Path
 from urllib.parse import urlparse
 
 from activist_common import (
-    active_firms,
+    firms_for_ingest,
     canonical_report_path,
     classify_publisher_page,
+    firm_has_ingest,
     load_ticker_index,
     now_iso,
     publisher_match_allowed,
@@ -69,11 +70,14 @@ def _guess_date(link: dict) -> tuple[str | None, str, str | None]:
 
 
 def scan_firm_site(firm: dict, tickers: list[str], *, dry_run: bool = False) -> list[dict]:
-    if firm.get("ingest_method") != "site_index":
+    if not firm_has_ingest(firm, "site_index"):
         return []
     links = fetch_firm_reports(firm)
     hits: list[dict] = []
     firm_id = firm.get("id") or "unknown"
+    # Long activist letters go under long/; short forensic reports under short/.
+    # "both" firms (e.g. Kerrisdale) default to short for site pages unless
+    # the title clearly looks like a long/open-letter campaign.
     side = "short" if firm.get("side") in ("short", "both") else "long"
     downloaded: dict[str, Path] = {}
 
@@ -101,6 +105,18 @@ def scan_firm_site(firm: dict, tickers: list[str], *, dry_run: bool = False) -> 
         if not dry_run and not canonical_ref:
             continue
 
+        title_l = (link.get("title") or "").lower()
+        link_side = side
+        if firm.get("side") == "both" and any(
+            tok in title_l for tok in ("letter to", "open letter", "board of directors", "nominat")
+        ):
+            link_side = "long"
+        filing_class = "publisher_report"
+        if any(tok in title_l for tok in ("open letter", "letter to the board", "letter to board")):
+            filing_class = "open_letter"
+        elif "presentation" in title_l and any(tok in title_l for tok in ("board", "shareholder", "investor")):
+            filing_class = "campaign_presentation"
+
         for ticker in tickers:
             meta = ticker_meta(ticker)
             blob = f"{link['title']} {link['url']}"
@@ -110,7 +126,7 @@ def scan_firm_site(firm: dict, tickers: list[str], *, dry_run: bool = False) -> 
             entry = {
                 "firm_id": firm_id,
                 "firm_name": firm.get("name") or firm_id,
-                "side": side,
+                "side": link_side,
                 "report_date": report_date,
                 "date_precision": date_precision,
                 "date_source": date_source or "publisher",
@@ -120,7 +136,7 @@ def scan_firm_site(firm: dict, tickers: list[str], *, dry_run: bool = False) -> 
                 "canonical_file": canonical_ref,
                 "local_pdf": canonical_ref if ext == ".pdf" else None,
                 "local_file": canonical_ref,
-                "filing_class": "publisher_report",
+                "filing_class": filing_class,
                 "include_in_feed": True,
                 "status": "new",
                 "tier": "context",
@@ -138,8 +154,8 @@ def scan_firm_site(firm: dict, tickers: list[str], *, dry_run: bool = False) -> 
 
 def scan_publisher_sites(tickers: list[str] | None = None, *, dry_run: bool = False) -> dict:
     tickers = tickers or []
-    firms = [f for f in active_firms(side="short") if f.get("ingest_method") == "site_index"]
-    firms.extend(f for f in active_firms(side="both") if f.get("ingest_method") == "site_index")
+    # Long + short + both firms that opt into site_index (Wave A long newsrooms included).
+    firms = firms_for_ingest("site_index")
     all_hits: list[dict] = []
     for firm in firms:
         hits = scan_firm_site(firm, tickers, dry_run=dry_run)
