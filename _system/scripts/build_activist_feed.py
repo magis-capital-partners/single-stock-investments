@@ -12,6 +12,7 @@ from pathlib import Path
 
 from activist_common import (
     PORTFOLIO_REGISTRY,
+    PUBLISHER_SOURCES,
     firm_name,
     load_global_scan,
     load_json,
@@ -64,8 +65,8 @@ def feed_eligible(report: dict) -> bool:
 
 
 def publisher_target_verdict(report: dict, *, ticker: str) -> tuple[bool, float, str]:
-    """Require both report-page and document-body evidence for publisher rows."""
-    if report.get("source") not in {"publisher_site", "local"}:
+    """Require both report-page and document-body evidence for publisher/wire rows."""
+    if report.get("source") not in PUBLISHER_SOURCES:
         return True, 1.0, "authoritative_source" if report.get("source") == "sec_edgar" else "curated_local"
     meta = ticker_meta(ticker)
     url = report.get("source_url") or report.get("local_file") or ""
@@ -92,6 +93,8 @@ def report_kind(row: dict) -> str:
         return "proxy_campaign"
     if row.get("filing_class") in {"activist_13d", "activist_13g", "registry_13g"}:
         return "ownership_filing"
+    if row.get("filing_class") in {"open_letter", "campaign_presentation", "press_campaign"}:
+        return "activist_report"
     return "activist_report"
 
 
@@ -104,12 +107,12 @@ def stable_report_id(row: dict) -> str:
 
 
 def dedupe_canonical_reports(rows: list[dict]) -> tuple[list[dict], int, int]:
-    """Deduplicate exact URLs and quarantine cross-ticker publisher conflicts."""
+    """Deduplicate exact URLs and quarantine cross-ticker publisher/wire conflicts."""
     groups: dict[str, list[dict]] = {}
     passthrough: list[dict] = []
     for row in rows:
-        url = row.get("source_url")
-        if row.get("source") != "publisher_site" or not url:
+        url = row.get("document_url") or row.get("source_url")
+        if row.get("source") not in {"publisher_site", "press_wire"} or not url:
             passthrough.append(row)
             continue
         groups.setdefault(url.rstrip("/"), []).append(row)
@@ -448,6 +451,8 @@ def build_feed(*, prune_indexes: bool = True, link_check: bool | None = None) ->
                 "title": report.get("title"),
                 "source": report.get("source"),
                 "source_url": report.get("source_url"),
+                "document_url": report.get("document_url"),
+                "wire": report.get("wire"),
                 "local_file": file_ref or report.get("local_file"),
                 "local_pdf": report.get("local_pdf") if local_is_pdf else None,
                 "canonical_file": report.get("canonical_file") or file_ref,

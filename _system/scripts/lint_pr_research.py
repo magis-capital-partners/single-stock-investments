@@ -4,6 +4,7 @@
 Usage:
   python _system/scripts/lint_pr_research.py
   python _system/scripts/lint_pr_research.py --base origin/main
+  python _system/scripts/lint_pr_research.py --base origin/main --name-only-file /tmp/pr-files.txt
 """
 from __future__ import annotations
 
@@ -27,32 +28,72 @@ sys.path.insert(0, str(SCRIPTS))
 from marvin_pipeline_common import has_evidence_refresh_config  # noqa: E402
 
 
+def _normalize_paths(lines: list[str]) -> list[str]:
+    return [line.strip().replace("\\", "/") for line in lines if line.strip()]
+
+
+def read_name_only_file(path: Path) -> list[str]:
+    return _normalize_paths(path.read_text(encoding="utf-8").splitlines())
+
+
 def git_diff_names(base: str) -> list[str]:
+    """Return paths changed on this branch vs merge-base with ``base``.
+
+    Never fall back to a two-dot compare against the tip of ``base``: on shallow
+    CI clones that incorrectly includes main-only commits (e.g. authorize waves)
+    and poisons unrelated PRs with foreign tickers.
+    """
     r = subprocess.run(
-        ["git", "diff", "--name-only", f"{base}...HEAD"],
+        ["git", "diff", "--name-only", "--diff-filter=ACMR", f"{base}...HEAD"],
         cwd=ROOT,
         capture_output=True,
         text=True,
     )
-    if r.returncode != 0:
-        r = subprocess.run(
-            ["git", "diff", "--name-only", base],
-            cwd=ROOT,
-            capture_output=True,
-            text=True,
+    if r.returncode == 0:
+        return _normalize_paths((r.stdout or "").splitlines())
+
+    mb = subprocess.run(
+        ["git", "merge-base", base, "HEAD"],
+        cwd=ROOT,
+        capture_output=True,
+        text=True,
+    )
+    if mb.returncode != 0 or not (mb.stdout or "").strip():
+        print(
+            "ERROR: cannot compute merge-base for PR lint; "
+            "deepen git history or pass --name-only-file from the GitHub PR file list.",
+            file=sys.stderr,
         )
-    return [line.strip().replace("\\", "/") for line in (r.stdout or "").splitlines() if line.strip()]
+        raise SystemExit(2)
+    merge_base = mb.stdout.strip()
+    r2 = subprocess.run(
+        ["git", "diff", "--name-only", "--diff-filter=ACMR", f"{merge_base}...HEAD"],
+        cwd=ROOT,
+        capture_output=True,
+        text=True,
+    )
+    if r2.returncode != 0:
+        print(
+            f"ERROR: git diff failed for {merge_base}...HEAD: {(r2.stderr or r2.stdout or '').strip()}",
+            file=sys.stderr,
+        )
+        raise SystemExit(2)
+    return _normalize_paths((r2.stdout or "").splitlines())
 
 
-def tickers_from_diff(base: str) -> list[str]:
+def tickers_from_paths(paths: list[str]) -> list[str]:
     tickers: set[str] = set()
-    for line in git_diff_names(base):
+    for line in paths:
         if "/research/" not in line:
             continue
         m = TICKER_RE.match(line)
         if m and not m.group(1).startswith(("_", ".")):
             tickers.add(m.group(1))
     return sorted(tickers)
+
+
+def tickers_from_diff(base: str) -> list[str]:
+    return tickers_from_paths(git_diff_names(base))
 
 
 def valuation_overlay_only_diff(ticker: str, base: str) -> bool:
@@ -105,24 +146,31 @@ def valuation_insider_only_diff(ticker: str, base: str) -> bool:
     return old.get("insider_signal") != new.get("insider_signal")
 
 
+def _is_committee_side_path(path: str) -> bool:
+    return "/research/committee_work/" in path or path.endswith("/research/valuation_workbench.json")
+
+
+def _is_mechanical_path(path: str, ticker: str, base: str) -> bool:
+    if path.endswith("/research/valuation.json"):
+        return valuation_overlay_only_diff(ticker, base) or valuation_insider_only_diff(ticker, base)
+    if path.endswith("/research/authorized_evidence.json"):
+        # Queue authorize packets / contract_backfill stubs — not narrative research.
+        return True
+    if MECHANICAL_EVIDENCE.match(path) or MECHANICAL_INSIDER.match(path) or MECHANICAL_MI.match(path):
+        return True
+    if "/research/evidence/filing_facts_" in path and path.endswith(".json"):
+        return True
+    return False
+
+
 def research_diff_kind(ticker: str, paths: list[str], base: str) -> str:
     """Per ticker: mechanical_only | committee_only | narrative | mixed."""
     tk_paths = [p for p in paths if p.startswith(f"{ticker}/research/")]
     if not tk_paths:
         return "narrative"
-    if all("/research/committee_work/" in p for p in tk_paths):
+    if all(_is_committee_side_path(p) for p in tk_paths):
         return "committee_only"
-    non_mechanical = []
-    for p in tk_paths:
-        if p.endswith("/research/valuation.json"):
-            if not (valuation_overlay_only_diff(ticker, base) or valuation_insider_only_diff(ticker, base)):
-                non_mechanical.append(p)
-            continue
-        if MECHANICAL_EVIDENCE.match(p) or MECHANICAL_INSIDER.match(p) or MECHANICAL_MI.match(p):
-            continue
-        if "/research/evidence/filing_facts_" in p and p.endswith(".json"):
-            continue
-        non_mechanical.append(p)
+    non_mechanical = [p for p in tk_paths if not _is_mechanical_path(p, ticker, base)]
     if not non_mechanical:
         return "mechanical_only"
     val_only = all(p.endswith("/research/valuation.json") for p in non_mechanical)
@@ -136,10 +184,19 @@ def research_diff_kind(ticker: str, paths: list[str], base: str) -> str:
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--base", default="origin/main", help="Git base ref for diff")
+    parser.add_argument(
+        "--name-only-file",
+        default="",
+        help="Optional file of changed paths (one per line). Prefer the GitHub PR file list in CI.",
+    )
     args = parser.parse_args()
 
-    paths = git_diff_names(args.base)
-    tickers = tickers_from_diff(args.base)
+    if args.name_only_file:
+        paths = read_name_only_file(Path(args.name_only_file))
+        print(f"Using --name-only-file ({len(paths)} path(s))")
+    else:
+        paths = git_diff_names(args.base)
+    tickers = tickers_from_paths(paths)
     if not tickers:
         print("SKIP: no ticker research paths in diff")
         return 0

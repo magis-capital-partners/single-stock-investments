@@ -6,6 +6,7 @@ import argparse
 from pathlib import Path
 
 from activist_common import (
+    PUBLISHER_SOURCES,
     load_ticker_index,
     portfolio_tickers,
     publisher_match_allowed,
@@ -35,14 +36,22 @@ def should_keep(report: dict, meta: dict) -> tuple[bool, str]:
     url = report.get("source_url") or report.get("local_file") or ""
     title = report.get("title") or ""
 
-    if source in {"publisher_site", "local"} and url_target_mismatch(url, title, meta):
+    if source in PUBLISHER_SOURCES and url_target_mismatch(url, title, meta):
         return False, "url_slug_mismatch"
 
-    if source in {"publisher_site", "local"}:
+    if source in PUBLISHER_SOURCES:
+        # Curated press seeds that already passed body verification should not be
+        # dropped solely because the public URL slug is wire boilerplate.
+        if (
+            source == "press_wire"
+            and report.get("body_verified") is True
+            and report.get("target_verified") is True
+        ):
+            return True, "press_wire_body_verified"
         matched, confidence, reason = publisher_match_allowed(url, title, blob, meta)
         if not matched:
             return False, f"weak_match:{reason}:{confidence:.2f}"
-        if source == "publisher_site" and report.get("body_verified") is not True:
+        if source in {"publisher_site", "press_wire"} and report.get("body_verified") is not True:
             return False, "body_unverified"
         body_reason = report.get("body_match_reason") or ""
         if body_reason.startswith("alias:"):
