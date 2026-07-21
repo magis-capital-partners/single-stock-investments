@@ -30,8 +30,8 @@ def validate(manifest: dict, state: dict, ticker: str) -> list[str]:
         errors.append("manifest does not authorize primary evidence")
     if state.get("ticker") != ticker:
         errors.append(f"agent state ticker must be {ticker}")
-    if state.get("consumer") != "marvin_research":
-        errors.append("agent state consumer must be marvin_research")
+    if state.get("consumer") not in {"marvin_research", "marvin_contract_backfill"}:
+        errors.append("agent state consumer must be marvin_research or marvin_contract_backfill")
     if state.get("evidence_hash") != evidence_hash:
         errors.append("agent state evidence_hash does not match manifest")
     if not state.get("completed_at"):
