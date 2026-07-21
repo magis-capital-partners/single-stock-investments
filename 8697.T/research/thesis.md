@@ -9,15 +9,15 @@
 | **Archetype** (Stahl) | croupier |
 | **Moat** (Munger) | stable |
 | **Dhando** (Pabrai) | partial |
-| **Stance** | watch |
+| **Stance** | hold |
 | **Cycle** | peak |
-| **Implied 7yr IRR** (base) | 3.19% (total synthesis) |
-| **IRR method** | full |
+| **Implied 7yr IRR** (base) | -2.76% (contract base) |
+| **IRR method** | quality_reinvestment |
 | **Lawrence bucket** | multi_sided |
 | **Payoff lens** | pending |
 | **MOI bucket** | pending |
 
-**Deep dive:** `8697.T/research/deep_dive_2026-06-04.md` (auto-sync)
+**Deep dive:** `8697.T/research/deep_dive_2026-07-21.md` (auto-sync)
 
 ## One-line thesis
 

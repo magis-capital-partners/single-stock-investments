@@ -53,8 +53,7 @@ re_pass: false
 | Valuation bridge base | 6.06% | 6.06% | Yes |
 
 **Lint notes:**
-- PSK.TO/research: dive header cites adversarial but file missing
-- PSK.TO/research/deep_dive_2026-06-03.md: executive_summary_first_pct 5.8% vs valuation.json base 6.06% (tol 0.25pp)
+- PSK.TO/research/deep_dive_2026-06-03.md: executive_summary_first_pct 5.2% vs valuation.json base 6.06% (tol 0.25pp)
 
 ---
 

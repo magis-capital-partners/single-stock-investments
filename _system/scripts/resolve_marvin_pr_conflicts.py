@@ -129,9 +129,14 @@ def resolve(pr_number: str, ticker: str | None = None) -> None:
 
     run(["git", "config", "user.name", "github-actions[bot]"])
     run(["git", "config", "user.email", "41898282+github-actions[bot]@users.noreply.github.com"])
-    run(["git", "fetch", "origin", head_ref, "main"])
+    # Fetch the PR head explicitly; sparse/local clones often lack origin/<branch> refs.
+    run(["git", "fetch", "origin", "main", head_ref])
+    run(["git", "fetch", "origin", f"+{head_ref}:refs/remotes/origin/{head_ref}"], check=False)
 
     branch_ref = f"origin/{head_ref}"
+    tip = run(["git", "rev-parse", "--verify", branch_ref], check=False)
+    if tip.returncode != 0:
+        branch_ref = "FETCH_HEAD"
     daily_path = latest_daily_log()
     daily_rel = str(daily_path.relative_to(ROOT)).replace("\\", "/") if daily_path else None
     daily_section = None

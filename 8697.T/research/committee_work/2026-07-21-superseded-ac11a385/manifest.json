@@ -1,0 +1,140 @@
+{
+  "pipeline_version": "3.0-token-efficient",
+  "ticker": "8697.T",
+  "as_of": "2026-07-21",
+  "stage": "superseded",
+  "packet_hash": "ac11a385a505106afe41e665a97b4f8d7db9796f1e2a568c1071ef62880b272c",
+  "route_hash": "57c9d9ddac6c13c02e04ec7f948755300eb30230993b0bf3f133f6afb12ca475",
+  "contract_source": "valuation_contract.json",
+  "frozen_at": "2026-07-21T01:38:06.555969+00:00",
+  "evidence": [
+    {
+      "path": "8697.T/research/deep_dive_2026-07-21.md",
+      "sha256": "80cab438688352d412ef887160e02937c686e4ddc4637b9eeb09e3ccbae5437b",
+      "bytes": 20342,
+      "role": "frozen local evidence",
+      "status": "available"
+    },
+    {
+      "path": "8697.T/research/adversarial_2026-06-04.md",
+      "sha256": "f974c1eeace846c2263c13ba1d1fe639902027da3a8fa81df46d5b86a5414aa9",
+      "bytes": 2385,
+      "role": "frozen local evidence",
+      "status": "available"
+    },
+    {
+      "path": "8697.T/research/valuation_route.json",
+      "sha256": "85b49ec3b79265d0a9276ca1391aa72fd35a76749e221d90084effea637cb2be",
+      "bytes": 5855,
+      "role": "frozen local evidence",
+      "status": "available"
+    },
+    {
+      "path": "8697.T/research/valuation_contract.json",
+      "sha256": "4a5bd367f4a229784069962c733d78a5cd427a8a700f65033a36a3dfd33b10cc",
+      "bytes": 94140,
+      "role": "frozen local evidence",
+      "status": "available"
+    },
+    {
+      "path": "8697.T/research/valuation.json",
+      "sha256": "bc68d793d7ed110f61b38bcb5df23b01724935a6d4ec14d9268f0152a2d1dbf1",
+      "bytes": 175972,
+      "role": "frozen local evidence",
+      "status": "available"
+    },
+    {
+      "path": "8697.T/research/thesis.md",
+      "sha256": "97b37f1f59e73eece28f36a908d6e7733269d2ddcfc530ff2317921caa6a16a4",
+      "bytes": 1935,
+      "role": "frozen local evidence",
+      "status": "available"
+    },
+    {
+      "path": "8697.T/research/cross_check_third_party_2026-07-21.md",
+      "sha256": "732216092067e283ce30522c272b32c590116a2c45df2ead709a1ea97b0124c1",
+      "bytes": 1941,
+      "role": "frozen local evidence",
+      "status": "available"
+    },
+    {
+      "path": "8697.T/research/evidence_reconciliation_2026-07-15_phase2_first_pass.json",
+      "sha256": "5fc9443600df69d4185451572bb25ffd68db62c97706d3a4af055bc18f2df507",
+      "bytes": 2652,
+      "role": "frozen local evidence",
+      "status": "available"
+    },
+    {
+      "path": "8697.T/research/evidence_reconciliation_2026-07-21.md",
+      "sha256": "0dfc9addd2a3ef2f153e2e0e6f712deaa3a991a195ee5e28533316b0256cf8e8",
+      "bytes": 3947,
+      "role": "frozen local evidence",
+      "status": "available"
+    },
+    {
+      "path": "8697.T/research/evidence/filing_facts_2026-07-21.json",
+      "sha256": "7d74dd452d428d5c3658e91491a1e42ec138f6e8e57832d4ae0aafe7965b2f5e",
+      "bytes": 316,
+      "role": "frozen local evidence",
+      "status": "available"
+    },
+    {
+      "path": "8697.T/research/evidence/management_facts_2026-07-21.json",
+      "sha256": "fee7685e9e0f96932c955614b15521c78bd22104d0cf39911229221ada6d8604",
+      "bytes": 89,
+      "role": "frozen local evidence",
+      "status": "available"
+    }
+  ],
+  "selected_raters": [
+    {
+      "persona": "buffett_weschler",
+      "independence_group": "quality_reinvestment",
+      "selection_reason": "Selected before scoring from the power-zone method route (persona chose or cross-checks the valuation method).",
+      "required_inputs_status": "partial"
+    },
+    {
+      "persona": "hohn",
+      "independence_group": "competitive_advantage",
+      "selection_reason": "Selected before scoring from the power-zone method route (persona chose or cross-checks the valuation method).",
+      "required_inputs_status": "partial"
+    },
+    {
+      "persona": "munger",
+      "independence_group": "munger",
+      "selection_reason": "Selected before scoring from the power-zone method route (persona chose or cross-checks the valuation method).",
+      "required_inputs_status": "partial"
+    }
+  ],
+  "llm_policy": {
+    "baseline_calls": 5,
+    "maximum_calls": 9,
+    "baseline_tasks": [
+      "pre_mortem",
+      "round1:<three-independent-raters>",
+      "chair_synthesis"
+    ],
+    "conditional_tasks": [
+      "targeted_research",
+      "round2:<three-independent-raters>"
+    ],
+    "deterministic_tasks": [
+      "proposer",
+      "evidence_tribunal",
+      "valuation_reconciliation",
+      "adversarial_review",
+      "assembly"
+    ]
+  },
+  "required_files": {
+    "proposer": "proposer.json",
+    "pre_mortem": "pre_mortem.json",
+    "evidence_tribunal": "evidence_tribunal.json",
+    "research_response": "research_response.json",
+    "valuation_reconciliation": "valuation_reconciliation.json",
+    "adversarial_review": "adversarial_review.json",
+    "chair_synthesis": "chair_synthesis.json",
+    "human_decision": "human_decision.json"
+  },
+  "superseded_reason": "frozen_evidence_changed"
+}

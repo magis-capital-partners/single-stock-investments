@@ -8,6 +8,15 @@
 | 2026-08-04 | QDEL | earnings | context | 35 | rule_conflict, activist_cross_link, scheduled_context, neutral_low_impact | Upcoming earnings |
 | 2026-07-29 | APLD | earnings | context | 35 | rule_conflict, activist_cross_link, scheduled_context, neutral_low_impact | Upcoming earnings |
 | 2026-07-28 | FRMI | earnings | context | 35 | rule_conflict, activist_cross_link, scheduled_context, neutral_low_impact | Upcoming earnings |
+| 2026-07-21 | QDEL | third_party | context | 25 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | `mcintyre` |
+| 2026-07-21 | QDEL | third_party | context | 25 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | The Carlyle Group — SC 13D/A |
+| 2026-07-21 | APLD | third_party | context | 25 | rule_conflict, activist_cross_link, neutral_low_impact | Applied Digital / Marvin shop summary (PF3 PR) |
+| 2026-07-21 | APLD | third_party | context | 25 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | Research note (run-the-table bull case) |
+| 2026-07-21 | APLD | third_party | context | 25 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | Oasis Management (SC 13D/A) |
+| 2026-07-21 | APLD | third_party | context | 25 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | Wolfpack Research short cache (Jul 2023) |
+| 2026-07-21 | QDEL | third_party | context | 25 | rule_conflict, activist_cross_link, neutral_low_impact | McIntyre Partnerships |
+| 2026-07-21 | APLD | third_party | context | 15 | rule_conflict, activist_cross_link, neutral_low_impact | VIC PDF intake - APLD - APLD VIC PDF |
+| 2026-07-21 | QDEL | third_party | context | 15 | rule_conflict, activist_cross_link, neutral_low_impact | VIC PDF intake - QDEL - QDEL VIC PDF |
 | 2026-07-20 | LLY | third_party | context | 25 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | Bulldog Investors — SC 13D/A |
 | 2026-07-20 | LLY | third_party | context | 25 | rule_conflict, activist_cross_link, neutral_low_impact | SC 13D/A · LLY · 2022-12-01 |
 | 2026-07-20 | IONQ | third_party | context | 25 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | Citron (+7) — SC 13D/A |
@@ -39,22 +48,13 @@
 | 2026-07-20 | CHTR | third_party | context | 25 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | Soroban Capital — SC 13D/A |
 | 2026-07-20 | MRSH | third_party | context | 25 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | Elliott Management — SC 13G/A |
 | 2026-07-20 | APD | third_party | context | 25 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | MANTLE RIDGE LP — DFAN14A (proxy solicitation) |
-| 2026-07-20 | QDEL | third_party | context | 25 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | `mcintyre` |
-| 2026-07-20 | QDEL | third_party | context | 25 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | The Carlyle Group — SC 13D/A |
-| 2026-07-20 | APLD | third_party | context | 25 | rule_conflict, activist_cross_link, neutral_low_impact | Applied Digital / Marvin shop summary (PF3 PR) |
-| 2026-07-20 | APLD | third_party | context | 25 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | Research note (run-the-table bull case) |
-| 2026-07-20 | APLD | third_party | context | 25 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | Oasis Management (SC 13D/A) |
-| 2026-07-20 | APLD | third_party | context | 25 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | Wolfpack Research short cache (Jul 2023) |
 | 2026-07-20 | BKR | third_party | context | 25 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | Semper Augustus Investments Group |
-| 2026-07-20 | QDEL | third_party | context | 25 | rule_conflict, activist_cross_link, neutral_low_impact | McIntyre Partnerships |
 | 2026-07-20 | BMY | third_party | context | 25 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | I.R.S. IDENTIFICATION NOS. OF ABOVE PERSONS (... — SC 13D/A |
-| 2026-07-20 | APLD | third_party | context | 15 | rule_conflict, activist_cross_link, neutral_low_impact | VIC PDF intake - APLD - APLD VIC PDF |
 | 2026-07-20 | INTU | third_party | context | 15 | rule_conflict, activist_cross_link, neutral_low_impact | INTU - 163568 |
 | 2026-07-20 | TRC | third_party | context | 15 | rule_conflict, activist_cross_link, neutral_low_impact | VIC PDF intake - TRC - TRC VIC PDF |
 | 2026-07-20 | FRMI | third_party | context | 15 | rule_conflict, activist_cross_link, neutral_low_impact | VIC PDF intake - FRMI - FRMI.pdf |
 | 2026-07-20 | FRMI | third_party | context | 15 | rule_conflict, activist_cross_link, neutral_low_impact | VIC PDF intake - FRMI - FRMI VIC PDF |
 | 2026-07-20 | MRSH | third_party | context | 15 | rule_conflict, activist_cross_link, neutral_low_impact | VIC PDF intake - MRSH - MRSH VIC PDF |
-| 2026-07-20 | QDEL | third_party | context | 15 | rule_conflict, activist_cross_link, neutral_low_impact | VIC PDF intake - QDEL - QDEL VIC PDF |
 | 2026-07-19 | APLD | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | CoreWeave vs. Applied Digital: Evaluating Disparities in Rev |
 | 2026-07-18 | APD | kpi_trend | context | 66 | rule_conflict, activist_cross_link, routine_governance_watch | Leadership / governance on watch |
 | 2026-07-18 | MRSH | kpi_trend | context | 66 | rule_conflict, activist_cross_link, routine_governance_watch | Leadership / governance on watch |

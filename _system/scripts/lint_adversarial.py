@@ -245,8 +245,15 @@ def lint_ticker(
         if m_ret:
             ret_line = m_ret.group(0).lower()
         blended_returns = "blended" in ret_line or "synthesis" in ret_line
+        class_row = ""
+        class_m = CLASS_IRR.search(text)
+        if class_m:
+            class_row = class_m.group(1).lower()
+        contract_base_classification = "contract base" in class_row
         for label, pct in found.items():
             if pct is None:
+                continue
+            if label == "classification" and contract_base_classification:
                 continue
             if abs(pct - expected) > TOLERANCE:
                 if label == "executive_summary_first_pct":

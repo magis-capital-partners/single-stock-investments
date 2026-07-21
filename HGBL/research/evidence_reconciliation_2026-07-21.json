@@ -1,0 +1,55 @@
+{
+  "schema_version": "1.0",
+  "ticker": "HGBL",
+  "as_of": "2026-07-21",
+  "purpose": "Contract backfill: close curated evidence gaps with filing-grounded proofs.",
+  "method_profile": "quality_reinvestment",
+  "primary_sources": [
+    {
+      "title": "Q1 2026 Form 10-Q",
+      "path": "HGBL/investor-documents/sec-edgar/10-Q_20260507_rpt20260331_acc0001193125_26_211813.htm",
+      "period": "2026-03-31"
+    },
+    {
+      "title": "FY2025 Form 10-K",
+      "path": "HGBL/investor-documents/sec-edgar/10-K_20260312_rpt20251231_acc0001193125_26_104062.htm",
+      "period": "2025-12-31"
+    }
+  ],
+  "resolved_facts": [
+    "Price $1.26; 34,734,754 shares; book equity ~$67.8M ($1.95/sh).",
+    "FY2025 segment op. income after corporate $5.481M; after 25% tax proxy $4.11M.",
+    "Q1 2026 notes receivable $8.551M; EMI $19.442M; debt and leases $5.537M.",
+    "DebtX acquired January 1, 2026 for ~$8.5M; Q1 Commercial Loans loss $0.606M; goodwill $5.3M.",
+    "Proof-first component sum base $1.91/sh."
+  ],
+  "gap_assessments": [
+    {
+      "gap_id": "fee_earnings_power_and_multiple",
+      "status": "met",
+      "reconciliation": "FY2025 segment table reproduced; after-tax fee earnings capitalized at 8x/10x/12x with calculation_proof owner_earnings_reinvestment_dcf@1.0.",
+      "falsifier": "Through-cycle after-tax fee earnings fall below low-case capitalization.",
+      "monitoring_source": "Quarterly segment note; 10-K/10-Q."
+    },
+    {
+      "gap_id": "emi_and_notes_realization",
+      "status": "met",
+      "reconciliation": "Notes and EMI carrying values locked from Q1 2026; recovery ratios 61%-98% on notes and 54%-100% on EMI with credit concentration cited.",
+      "falsifier": "Impairment or realization below low-case haircuts.",
+      "monitoring_source": "10-Q notes receivable and EMI footnotes."
+    },
+    {
+      "gap_id": "debtx_earn_in",
+      "status": "met",
+      "reconciliation": "Incremental option only ($0-$0.25/sh); $8.5M purchase and goodwill excluded from fee/tangible components; Q1 loss documented.",
+      "falsifier": "Continued losses with goodwill impairment.",
+      "monitoring_source": "10-Q DebtX acquisition note; Commercial Loans segment."
+    }
+  ],
+  "acceptance_summary": {
+    "fee_earnings_power_and_multiple": "met",
+    "emi_and_notes_realization": "met",
+    "debtx_earn_in": "met"
+  },
+  "committee_conclusion": "All curated acceptance tests met; calculation proofs attached; contract eligible for decision_grade pending human committee review."
+}
