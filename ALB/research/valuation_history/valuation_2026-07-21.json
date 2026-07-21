@@ -116,7 +116,7 @@
       "exit_pfcf_y10": 9.0,
       "adjustments": [],
       "triggered": [],
-      "filing_revenue_yoy": -0.0437,
+      "filing_revenue_yoy": null,
       "as_of_filing_facts": "evidence/_text/10-K-A_20260331_rpt20251231_acc0000915913_26_000060.htm.txt"
     },
     "status": "partial"
@@ -339,15 +339,6 @@
               "low": "value_per_share",
               "base": "value_per_share",
               "high": "value_per_share"
-            }
-          }
-        },
-        "driver_model": {
-          "scenarios": {
-            "base": {
-              "success_probability": 0.55,
-              "remaining_cost_m": 250.0,
-              "timing_basis": "Conversion ramp and contract volume recovery over 3 to 7 years; base case assumes partial ramp through FY2030."
             }
           }
         }
@@ -573,7 +564,7 @@
   },
   "economic_value_analysis": {
     "schema_version": "1.0",
-    "status": "complete",
+    "status": "evidence_blocked",
     "trigger": {
       "required": true,
       "reasons": [
@@ -581,16 +572,10 @@
       ],
       "policy": "A complete economic-value analysis is required when any trigger fires; otherwise it is recommended."
     },
-    "method": "component_economic_value",
-    "economic_claim": {
-      "description": "One diluted share of ALB, including mid-cycle lithium and specialty operations, conversion capacity option, net financial claims, and lithium cycle/capex reserve.",
-      "unit_label": "diluted share",
-      "unit_count": 118607000,
-      "unit_source": "Q1 2026 weighted average diluted shares 118.607M (ALB/investor-documents/sec-edgar/10-Q_20260506_rpt20260331_acc0000915913_26_000072.htm)",
-      "enterprise_to_equity_reconciliation": "Operating owner cash is valued once; cash, debt, conversion option, and cycle reserve are separate additive components with unique overlap keys."
-    },
-    "gaap_role": "cross_check",
-    "accounting_reference": "FY2025 10-K and Q1 2026 10-Q filing extracts; GAAP net loss is cross-check only for cyclical lithium producer.",
+    "method": "economic_claim_to_risked_present_value",
+    "economic_claim": {},
+    "gaap_role": null,
+    "accounting_reference": null,
     "comparable_hierarchy": [
       "issuer_arm_length_transaction",
       "same_asset_transaction",
@@ -612,7 +597,7 @@
           "midcycle_lithium_and_specialty_operations"
         ],
         "economic_claim": "Mid-cycle lithium, bromine, and specialty chemicals operations",
-        "valuation_basis": "Proof outputs from calculation_proof graph; contract backfill 2026-07-21.",
+        "valuation_basis": "Proof outputs {'low': 18.5302, 'base': 32.4297, 'high': 50.9599}; see calculation_proof graph.",
         "adjustments": "Reconcile to FY2025 10-K and Q1 2026 10-Q before decision use.",
         "overlap_control": "Unique overlap key midcycle_lithium_and_specialty_operations.",
         "risked_present_value_per_share": {
@@ -628,20 +613,13 @@
           "conversion_capacity_and_contract_option"
         ],
         "economic_claim": "Conversion capacity ramp and long-term contract volume option",
-        "valuation_basis": "Proof outputs from calculation_proof graph; contract backfill 2026-07-21.",
+        "valuation_basis": "Proof outputs {'low': 0.0, 'base': 15.0, 'high': 40.0002}; see calculation_proof graph.",
         "adjustments": "Reconcile to FY2025 10-K and Q1 2026 10-Q before decision use.",
         "overlap_control": "Unique overlap key conversion_capacity_and_contract_option.",
         "risked_present_value_per_share": {
           "low": 0.0,
           "base": 15.0,
           "high": 40.0
-        },
-        "risk_and_timing": {
-          "success_probability": 0.55,
-          "remaining_capital_m": 250.0,
-          "timing_basis": "Conversion ramp and contract volume recovery over 3 to 7 years; base case assumes partial ramp through FY2030.",
-          "probability_basis": "Judgment from disclosed conversion projects and industry lithium demand recovery; Albemarle does not mark option value separately in SEC filings.",
-          "remaining_capital_basis": "FY2025 capex $590M with management guidance to reduce spend; base reserves $250M incremental owner capital for delayed ramp."
         }
       },
       {
@@ -651,7 +629,7 @@
           "net_financial_claims"
         ],
         "economic_claim": "Net cash and debt claims on common equity",
-        "valuation_basis": "Proof outputs from calculation_proof graph; contract backfill 2026-07-21.",
+        "valuation_basis": "Proof outputs {'low': -9.3249, 'base': -6.6775, 'high': -4.0301}; see calculation_proof graph.",
         "adjustments": "Reconcile to FY2025 10-K and Q1 2026 10-Q before decision use.",
         "overlap_control": "Unique overlap key net_financial_claims.",
         "risked_present_value_per_share": {
@@ -667,7 +645,7 @@
           "lithium_cycle_and_capex_reserve"
         ],
         "economic_claim": "Lithium price, conversion timing, and capex execution reserve",
-        "valuation_basis": "Proof outputs from calculation_proof graph; contract backfill 2026-07-21.",
+        "valuation_basis": "Proof outputs {'low': -40.0002, 'base': -22.0004, 'high': -10.0003}; see calculation_proof graph.",
         "adjustments": "Reconcile to FY2025 10-K and Q1 2026 10-Q before decision use.",
         "overlap_control": "Unique overlap key lithium_cycle_and_capex_reserve.",
         "risked_present_value_per_share": {
@@ -727,9 +705,9 @@
         "risk_and_timing": {
           "success_probability": null,
           "remaining_capital_m": null,
-          "timing_basis": "Conversion ramp and contract volume recovery over 3 to 7 years; base case assumes partial ramp through FY2030.",
-          "probability_basis": "Judgment from disclosed conversion projects and industry lithium demand recovery; Albemarle does not mark option value separately in SEC filings.",
-          "remaining_capital_basis": "FY2025 capex $590M with management guidance to reduce spend; base reserves $250M incremental owner capital for delayed ramp."
+          "timing_basis": null,
+          "probability_basis": null,
+          "remaining_capital_basis": null
         }
       },
       {
@@ -782,12 +760,18 @@
       }
     ],
     "wisdom_applied": [],
-    "limitations": [
-      "Conversion ramp timing is judgment-based pending project-level disclosure.",
-      "Cyclical lithium equity; component sum can lag market recovery pricing."
-    ],
+    "limitations": [],
     "complete_component_coverage": true,
-    "validation_errors": [],
+    "validation_errors": [
+      "economic_claim.description required",
+      "economic_claim.enterprise_to_equity_reconciliation required",
+      "economic_claim.unit_count required",
+      "economic_claim.unit_label required",
+      "economic_claim.unit_source required",
+      "economic_value.schema_version 1.0 required",
+      "gaap_role required",
+      "option component conversion_capacity_and_contract_option requires probability, timing, and remaining-capital treatment"
+    ],
     "registry_version": "1.0"
   },
   "total_return_panel": {
@@ -830,12 +814,12 @@
     },
     "cumulative_distributions_per_share": 31.916,
     "start_price": 7.25,
-    "end_price": 118.59,
-    "price_index_end": 1635.72,
-    "total_return_index_end": 2467.23,
-    "cumulative_price_return_pct": 1535.72,
-    "cumulative_total_return_pct": 2367.23,
-    "price_only_annualized_pct": 9.01,
+    "end_price": 118.53,
+    "price_index_end": 1634.9,
+    "total_return_index_end": 2465.98,
+    "cumulative_price_return_pct": 1534.9,
+    "cumulative_total_return_pct": 2365.98,
+    "price_only_annualized_pct": 9.0,
     "total_return_annualized_pct": 10.4,
     "market_cap_m": 14019.35,
     "shares_outstanding": 118607000,
@@ -1554,7 +1538,7 @@
   },
   "universal_valuation_contract": {
     "schema_version": "2.0",
-    "status": "decision_grade",
+    "status": "evidence_blocked",
     "ticker": "ALB",
     "as_of": "2026-07-21",
     "economic_ownership_map": [
@@ -2139,9 +2123,9 @@
         "probability_and_timing": {
           "success_probability": null,
           "remaining_capital_m": null,
-          "timing_basis": "Conversion ramp and contract volume recovery over 3 to 7 years; base case assumes partial ramp through FY2030.",
-          "probability_basis": "Judgment from disclosed conversion projects and industry lithium demand recovery; Albemarle does not mark option value separately in SEC filings.",
-          "remaining_capital_basis": "FY2025 capex $590M with management guidance to reduce spend; base reserves $250M incremental owner capital for delayed ramp."
+          "timing_basis": null,
+          "probability_basis": null,
+          "remaining_capital_basis": null
         },
         "tax_and_realization_adjustments": "Reconcile to FY2025 10-K and Q1 2026 10-Q before decision use.",
         "falsifier": "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
@@ -3183,9 +3167,27 @@
       "low_base_high_ordered": true
     },
     "evidence": {
-      "unresolved_count": 0,
-      "blockers": [],
-      "validation_errors": []
+      "unresolved_count": 8,
+      "blockers": [
+        "economic_claim.description required",
+        "economic_claim.enterprise_to_equity_reconciliation required",
+        "economic_claim.unit_count required",
+        "economic_claim.unit_label required",
+        "economic_claim.unit_source required",
+        "economic_value.schema_version 1.0 required",
+        "gaap_role required",
+        "option component conversion_capacity_and_contract_option requires probability, timing, and remaining-capital treatment"
+      ],
+      "validation_errors": [
+        "economic_claim.description required",
+        "economic_claim.enterprise_to_equity_reconciliation required",
+        "economic_claim.unit_count required",
+        "economic_claim.unit_label required",
+        "economic_claim.unit_source required",
+        "economic_value.schema_version 1.0 required",
+        "gaap_role required",
+        "option component conversion_capacity_and_contract_option requires probability, timing, and remaining-capital treatment"
+      ]
     },
     "monitoring": {
       "falsifiers": [
@@ -3202,7 +3204,7 @@
       ]
     },
     "change_control": {
-      "model_hash": "76d8008e582032f6019f299635fd1b093e29bffc4ad127285fc46c0a80a92569",
+      "model_hash": "2205f6dfaf36d51a76d50acb40542641488359477f03c497b595c599a27220e0",
       "method_versions": [
         "net_asset_value@1.0",
         "owner_cash_or_dividend_discount@1.0",
@@ -3285,359 +3287,5 @@
       }
     },
     "notes": "Capstone IRR combining filings, segments, overlays, third-party, qualitative"
-  },
-  "context_overlay": {
-    "as_of": "2026-07-21",
-    "disclaimer": "Context only. Tailwinds inform stance and overlay sizing; they do not auto-inflate Lawrence base IRR. Promotion to base case requires [HUMAN REVIEW].",
-    "themes": [
-      {
-        "theme_id": "macro_regime",
-        "label": "Macro risk regime",
-        "indicators": [
-          {
-            "id": "hy_oas",
-            "label": "High-yield OAS credit spread (%)",
-            "latest": 1.55,
-            "as_of": "2026-07-21",
-            "yoy_pct": 278.0,
-            "direction": "up",
-            "good_for": "risk_regime",
-            "source": "spread:HYG-LQD:21d (HYG-LQD 1m spread proxy, not OAS)",
-            "stale": false,
-            "in_base_irr": false
-          },
-          {
-            "id": "ust_10y",
-            "label": "US Treasury 10Y yield (%)",
-            "latest": 4.625999927520752,
-            "as_of": "2026-07-21",
-            "yoy_pct": 5.8,
-            "direction": "up",
-            "good_for": "rates_regime",
-            "source": "yahoo:^TNX",
-            "stale": false,
-            "in_base_irr": false
-          },
-          {
-            "id": "ust_2y",
-            "label": "US Treasury 2Y yield (%)",
-            "latest": 4.363999843597412,
-            "as_of": "2026-07-21",
-            "yoy_pct": 11.7,
-            "direction": "up",
-            "good_for": "rates_regime",
-            "source": "yahoo:^FVX",
-            "stale": false,
-            "in_base_irr": false
-          },
-          {
-            "id": "dxy_broad",
-            "label": "Trade-weighted USD index (broad)",
-            "latest": 101.1259994506836,
-            "as_of": "2026-07-21",
-            "yoy_pct": 3.3,
-            "direction": "up",
-            "good_for": "dollar_regime",
-            "source": "yahoo:DX-Y.NYB",
-            "stale": false,
-            "in_base_irr": false
-          },
-          {
-            "id": "vix_level",
-            "label": "VIX index level",
-            "latest": 17.219999313354492,
-            "as_of": "2026-07-21",
-            "yoy_pct": 3.4,
-            "direction": "up",
-            "good_for": "vol_regime",
-            "source": "yahoo:^VIX",
-            "stale": false,
-            "in_base_irr": false
-          },
-          {
-            "id": "credit_impulse_1m",
-            "label": "HYG vs TLT 1-month return spread (%)",
-            "latest": 3.09,
-            "as_of": "2026-07-21",
-            "yoy_pct": 74.6,
-            "direction": "up",
-            "good_for": "credit_impulse",
-            "source": "spread:HYG-TLT:21d",
-            "stale": false,
-            "in_base_irr": false
-          },
-          {
-            "id": "spy_20d_realized_vol",
-            "label": "SPY 20-day realized vol (annualized %)",
-            "latest": 11.66,
-            "as_of": "2026-07-21",
-            "yoy_pct": 34.6,
-            "direction": "up",
-            "good_for": "equity_vol",
-            "source": "realized_vol:SPY:20d",
-            "stale": false,
-            "in_base_irr": false
-          }
-        ]
-      }
-    ]
-  },
-  "insider_signal": {
-    "as_of": "2026-07-21",
-    "disclaimer": "Context only. Insider activity informs scenario confidence and stance discussion; it does not auto-inflate Lawrence base IRR. Promotion requires [HUMAN REVIEW].",
-    "in_base_irr": false,
-    "window_days": 365,
-    "ics": 10.0,
-    "band": "exceptional",
-    "bull_case_support": "moderate",
-    "scenario_confidence": {
-      "priors": {
-        "bear": 0.2,
-        "base": 0.55,
-        "bull": 0.25
-      },
-      "tilted": {
-        "bear": 0.2,
-        "base": 0.4,
-        "bull": 0.4
-      },
-      "bull_delta": 0.15,
-      "bear_delta": 0.0,
-      "note": "Scenario weights are qualitative confidence only; Lawrence base IRR unchanged."
-    },
-    "factors": {
-      "buy_score": 13.016,
-      "sell_score": -1.0,
-      "cluster_bonus": 0.0,
-      "net_buy_usd": 2642491.6,
-      "net_sell_usd": 18156111.7,
-      "price_today": 118.2
-    },
-    "top_buys": [
-      {
-        "insider": "Masters J Kent",
-        "date": "2026-02-26",
-        "shares": 9032,
-        "price": 184.93,
-        "value_usd": 1670287.76,
-        "shares_owned_after": 127885,
-        "contrib": 2.222
-      },
-      {
-        "insider": "LaBauve Donald J. Jr.",
-        "date": "2026-02-27",
-        "shares": 1266,
-        "price": 178.67,
-        "value_usd": 226196.22,
-        "shares_owned_after": 10132,
-        "contrib": 1.801
-      },
-      {
-        "insider": "Anderson Melissa H.",
-        "date": "2026-02-26",
-        "shares": 1129,
-        "price": 184.93,
-        "value_usd": 208785.97,
-        "shares_owned_after": 10003,
-        "contrib": 1.76
-      },
-      {
-        "insider": "Norris Eric",
-        "date": "2026-02-26",
-        "shares": 1806,
-        "price": 184.93,
-        "value_usd": 333983.58,
-        "shares_owned_after": 49738,
-        "contrib": 1.609
-      },
-      {
-        "insider": "Gagarinas Autumn M.",
-        "date": "2026-02-26",
-        "shares": 194,
-        "price": 184.93,
-        "value_usd": 35876.42,
-        "shares_owned_after": 3682,
-        "contrib": 1.255
-      }
-    ],
-    "top_sells": [
-      {
-        "insider": "Cramer Ralf Hans",
-        "date": "2026-07-01",
-        "shares": 929,
-        "price": 136.08,
-        "value_usd": 126418.32,
-        "is_10b5_1": false,
-        "contrib": -0.212
-      },
-      {
-        "insider": "Cramer Ralf Hans",
-        "date": "2026-07-01",
-        "shares": 13,
-        "price": 136.08,
-        "value_usd": 1769.04,
-        "is_10b5_1": false,
-        "contrib": -0.212
-      },
-      {
-        "insider": "Masters J Kent",
-        "date": "2026-05-15",
-        "shares": 3826,
-        "price": 183.12,
-        "value_usd": 700617.12,
-        "is_10b5_1": false,
-        "contrib": -0.164
-      },
-      {
-        "insider": "Masters J Kent",
-        "date": "2026-05-15",
-        "shares": 11867,
-        "price": 183.87,
-        "value_usd": 2181985.29,
-        "is_10b5_1": false,
-        "contrib": -0.164
-      },
-      {
-        "insider": "Masters J Kent",
-        "date": "2026-05-15",
-        "shares": 700,
-        "price": 184.52,
-        "value_usd": 129164.0,
-        "is_10b5_1": false,
-        "contrib": -0.164
-      }
-    ],
-    "narrative_hooks": [],
-    "transaction_count": 71
-  },
-  "lens_consensus": {
-    "as_of": "2026-07-21",
-    "shared_inputs_ref": "valuation.json@2026-07-21",
-    "valuation_richness": 0.253,
-    "blended_return_pct": 8.77,
-    "band_pct": [
-      -1.2,
-      13.15
-    ],
-    "weighted_median_pct": 11.2,
-    "median_mean_flag": false,
-    "stance": "watch",
-    "agreement_pct": 77,
-    "dissent_count": 2,
-    "lawrence_divergence": false,
-    "top_dissents": [
-      {
-        "persona": "pabrai",
-        "label": "Mohnish Pabrai",
-        "verdict": "pass",
-        "return_pct": -1.2,
-        "key_metric": "downside_upside_ratio=0.06",
-        "conviction": 0.81,
-        "falsifier": "dhando -> none OR net-debt/EBITDA > 3 OR bear return < -15%"
-      },
-      {
-        "persona": "munger",
-        "label": "Charlie Munger",
-        "verdict": "pass",
-        "return_pct": -1.2,
-        "key_metric": "moat=narrow",
-        "conviction": 0.66,
-        "falsifier": "Moat eroding/unproven or irr_method pending"
-      }
-    ],
-    "contributor_count": 10,
-    "in_base_irr": false,
-    "disclaimer": "Advisory lens blend only. Does not replace Lawrence total-synthesis stance gate without [HUMAN REVIEW]."
-  },
-  "economic_value": {
-    "schema_version": "1.0",
-    "method": "component_economic_value",
-    "economic_claim": {
-      "description": "One diluted share of ALB, including mid-cycle lithium and specialty operations, conversion capacity option, net financial claims, and lithium cycle/capex reserve.",
-      "unit_label": "diluted share",
-      "unit_count": 118607000,
-      "unit_source": "Q1 2026 weighted average diluted shares 118.607M (ALB/investor-documents/sec-edgar/10-Q_20260506_rpt20260331_acc0000915913_26_000072.htm)",
-      "enterprise_to_equity_reconciliation": "Operating owner cash is valued once; cash, debt, conversion option, and cycle reserve are separate additive components with unique overlap keys."
-    },
-    "gaap_role": "cross_check",
-    "accounting_reference": "FY2025 10-K and Q1 2026 10-Q filing extracts; GAAP net loss is cross-check only for cyclical lithium producer.",
-    "component_groups": [
-      {
-        "id": "midcycle_lithium_and_specialty_operations",
-        "label": "Mid-cycle lithium, bromine, and specialty chemicals operations",
-        "component_ids": [
-          "midcycle_lithium_and_specialty_operations"
-        ],
-        "economic_claim": "Mid-cycle lithium, bromine, and specialty chemicals operations",
-        "valuation_basis": "Proof outputs from calculation_proof graph; contract backfill 2026-07-21.",
-        "adjustments": "Reconcile to FY2025 10-K and Q1 2026 10-Q before decision use.",
-        "overlap_control": "Unique overlap key midcycle_lithium_and_specialty_operations.",
-        "risked_present_value_per_share": {
-          "low": 18.53,
-          "base": 32.43,
-          "high": 50.96
-        }
-      },
-      {
-        "id": "conversion_capacity_and_contract_option",
-        "label": "Conversion capacity ramp and long-term contract volume option",
-        "component_ids": [
-          "conversion_capacity_and_contract_option"
-        ],
-        "economic_claim": "Conversion capacity ramp and long-term contract volume option",
-        "valuation_basis": "Proof outputs from calculation_proof graph; contract backfill 2026-07-21.",
-        "adjustments": "Reconcile to FY2025 10-K and Q1 2026 10-Q before decision use.",
-        "overlap_control": "Unique overlap key conversion_capacity_and_contract_option.",
-        "risked_present_value_per_share": {
-          "low": 0.0,
-          "base": 15.0,
-          "high": 40.0
-        },
-        "risk_and_timing": {
-          "success_probability": 0.55,
-          "remaining_capital_m": 250.0,
-          "timing_basis": "Conversion ramp and contract volume recovery over 3 to 7 years; base case assumes partial ramp through FY2030.",
-          "probability_basis": "Judgment from disclosed conversion projects and industry lithium demand recovery; Albemarle does not mark option value separately in SEC filings.",
-          "remaining_capital_basis": "FY2025 capex $590M with management guidance to reduce spend; base reserves $250M incremental owner capital for delayed ramp."
-        }
-      },
-      {
-        "id": "net_financial_claims",
-        "label": "Net cash and debt claims on common equity",
-        "component_ids": [
-          "net_financial_claims"
-        ],
-        "economic_claim": "Net cash and debt claims on common equity",
-        "valuation_basis": "Proof outputs from calculation_proof graph; contract backfill 2026-07-21.",
-        "adjustments": "Reconcile to FY2025 10-K and Q1 2026 10-Q before decision use.",
-        "overlap_control": "Unique overlap key net_financial_claims.",
-        "risked_present_value_per_share": {
-          "low": -9.32,
-          "base": -6.68,
-          "high": -4.03
-        }
-      },
-      {
-        "id": "lithium_cycle_and_capex_reserve",
-        "label": "Lithium price, conversion timing, and capex execution reserve",
-        "component_ids": [
-          "lithium_cycle_and_capex_reserve"
-        ],
-        "economic_claim": "Lithium price, conversion timing, and capex execution reserve",
-        "valuation_basis": "Proof outputs from calculation_proof graph; contract backfill 2026-07-21.",
-        "adjustments": "Reconcile to FY2025 10-K and Q1 2026 10-Q before decision use.",
-        "overlap_control": "Unique overlap key lithium_cycle_and_capex_reserve.",
-        "risked_present_value_per_share": {
-          "low": -40.0,
-          "base": -22.0,
-          "high": -10.0
-        }
-      }
-    ],
-    "limitations": [
-      "Conversion ramp timing is judgment-based pending project-level disclosure.",
-      "Cyclical lithium equity; component sum can lag market recovery pricing."
-    ]
-  },
-  "valuation_mode": "economic_value"
+  }
 }

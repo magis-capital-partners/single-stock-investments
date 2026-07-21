@@ -550,6 +550,86 @@ def build_valuation_scaffold() -> dict:
             },
             "validation_errors": [],
         },
+        "economic_value": {
+            "schema_version": "1.0",
+            "method": "component_economic_value",
+            "economic_claim": {
+                "description": (
+                    "One diluted share of ALB, including mid-cycle lithium and specialty operations, "
+                    "conversion capacity option, net financial claims, and lithium cycle/capex reserve."
+                ),
+                "unit_label": "diluted share",
+                "unit_count": int(round(SHARES_M * 1_000_000)),
+                "unit_source": f"Q1 2026 weighted average diluted shares {SHARES_M}M ({FILING_10Q})",
+                "enterprise_to_equity_reconciliation": (
+                    "Operating owner cash is valued once; cash, debt, conversion option, and cycle reserve "
+                    "are separate additive components with unique overlap keys."
+                ),
+            },
+            "gaap_role": "cross_check",
+            "accounting_reference": (
+                "FY2025 10-K and Q1 2026 10-Q filing extracts; GAAP net loss is cross-check only "
+                "for cyclical lithium producer."
+            ),
+            "component_groups": [
+                {
+                    "id": "midcycle_lithium_and_specialty_operations",
+                    "label": "Mid-cycle lithium, bromine, and specialty chemicals operations",
+                    "component_ids": ["midcycle_lithium_and_specialty_operations"],
+                    "economic_claim": "Mid-cycle lithium, bromine, and specialty chemicals operations",
+                    "valuation_basis": "Proof from owner_cash_or_dividend_discount@1.0",
+                    "adjustments": "Reconcile to FY2025 10-K and Q1 2026 10-Q before decision use.",
+                    "overlap_control": "Unique overlap key midcycle_lithium_and_specialty_operations.",
+                },
+                {
+                    "id": "conversion_capacity_and_contract_option",
+                    "label": "Conversion capacity ramp and long-term contract volume option",
+                    "component_ids": ["conversion_capacity_and_contract_option"],
+                    "economic_claim": "Conversion capacity ramp and long-term contract volume option",
+                    "valuation_basis": "Proof from risk_adjusted_milestone_value@1.0",
+                    "adjustments": "Reconcile to FY2025 10-K and Q1 2026 10-Q before decision use.",
+                    "overlap_control": "Unique overlap key conversion_capacity_and_contract_option.",
+                    "risk_and_timing": {
+                        "success_probability": 0.55,
+                        "remaining_capital_m": 250.0,
+                        "timing_basis": (
+                            "Conversion ramp and contract volume recovery over 3 to 7 years; "
+                            "base case assumes partial ramp through FY2030."
+                        ),
+                        "probability_basis": (
+                            "Judgment from disclosed conversion projects and industry lithium demand recovery."
+                        ),
+                        "remaining_capital_basis": (
+                            "FY2025 capex $590M with management guidance to reduce spend; "
+                            "base reserves $250M incremental owner capital for delayed ramp."
+                        ),
+                    },
+                },
+                {
+                    "id": "net_financial_claims",
+                    "label": "Net cash and debt claims on common equity",
+                    "component_ids": ["net_financial_claims"],
+                    "economic_claim": "Net cash and debt claims on common equity",
+                    "valuation_basis": "Proof from net_asset_value@1.0",
+                    "adjustments": "Reconcile to FY2025 10-K and Q1 2026 10-Q before decision use.",
+                    "overlap_control": "Unique overlap key net_financial_claims.",
+                },
+                {
+                    "id": "lithium_cycle_and_capex_reserve",
+                    "label": "Lithium price, conversion timing, and capex execution reserve",
+                    "component_ids": ["lithium_cycle_and_capex_reserve"],
+                    "economic_claim": "Lithium price, conversion timing, and capex execution reserve",
+                    "valuation_basis": "Proof from net_asset_value@1.0",
+                    "adjustments": "Reconcile to FY2025 10-K and Q1 2026 10-Q before decision use.",
+                    "overlap_control": "Unique overlap key lithium_cycle_and_capex_reserve.",
+                },
+            ],
+            "limitations": [
+                "Conversion ramp timing is judgment-based pending project-level disclosure.",
+                "Cyclical lithium equity; component sum can lag market recovery pricing.",
+            ],
+        },
+        "valuation_mode": "economic_value",
     }
 
 
