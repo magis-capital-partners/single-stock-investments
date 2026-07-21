@@ -1,6 +1,6 @@
 {
   "ticker": "DMLP",
-  "as_of": "2026-06-08",
+  "as_of": "2026-07-21",
   "method": "full",
   "lawrence_bucket": "other",
   "classification_inputs": {
@@ -22,7 +22,7 @@
     "normalization_note": "Distributions exceed accrual net income ($1.16/unit FY2025) by design; Lawrence uses declared cash distributions not GAAP EPS.",
     "price_as_of": "2026-06-05",
     "shares_outstanding": 48255000,
-    "shares_source": "Derived from inputs.units_outstanding_m in the pre-existing valuation.json; [HUMAN REVIEW] confirm against the latest primary filing."
+    "shares_source": "48,255,450 common units outstanding at December 31, 2025 (DMLP/investor-documents/sec-edgar/10-K_20260224_rpt20251231_acc0001437749_26_005376.htm)"
   },
   "scenarios": {
     "bear": {
@@ -518,14 +518,84 @@
         "valuation": {
           "method": "royalty_distribution_curve",
           "basis": "per_share",
-          "low": 11.54,
-          "base": 17.04,
+          "low": 11.5399,
+          "base": 17.0401,
           "high": 22.53,
-          "evidence_tier": "mixed_primary_and_estimate",
-          "evidence": "Existing DMLP valuation inputs: FY2025 declared distributions $2.775346/unit (cash basis owner yield; 10-K_20260224); FY2025 total assets $309.554M / 48.255M units (approx.; GAAP not fair-value floor); Distributions exceed accrual net income ($1.16/unit FY2025) by design; Lawrence uses declared cash distributions not GAAP EPS. [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
+          "evidence_tier": "primary_derived",
+          "evidence": "FY2025 declared distributions $2.775346/unit; 48,255,450 units; cash $41.937M; liabilities $4.315M; 2024-2025 mineral acquisitions $14.725M and $3.888M consideration (DMLP/investor-documents/sec-edgar/10-K_20260224_rpt20251231_acc0001437749_26_005376.htm). Proof: 17.0401/sh base via owner_cash_or_dividend_discount@1.0.",
           "assumption_summary": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
           "cross_check": "Reconcile the range to primary filings, a reproducible owner-cash or NAV bridge, and the identified liability and capital claims before decision use.",
-          "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case."
+          "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case.",
+          "calculation_proof": {
+            "schema_version": "1.0",
+            "method_id": "owner_cash_or_dividend_discount",
+            "method_version": "1.0",
+            "output_unit": "USD_per_share",
+            "inputs": [
+              {
+                "id": "distribution_per_unit",
+                "label": "FY2025 declared distributions per unit",
+                "kind": "fact",
+                "value": 2.775346,
+                "unit": "USD_per_unit",
+                "source": {
+                  "ref": "DMLP/investor-documents/sec-edgar/10-K_20260224_rpt20251231_acc0001437749_26_005376.htm",
+                  "locator": "FY2025 declared distributions $2.775346 per common unit",
+                  "as_of": "2025-12-31"
+                },
+                "locked": true
+              },
+              {
+                "id": "units_m",
+                "label": "Common units outstanding",
+                "kind": "fact",
+                "value": 48.25545,
+                "unit": "million_units",
+                "source": {
+                  "ref": "DMLP/investor-documents/sec-edgar/10-K_20260224_rpt20251231_acc0001437749_26_005376.htm",
+                  "locator": "48,255,450 common units outstanding at December 31, 2025",
+                  "as_of": "2025-12-31"
+                },
+                "locked": true
+              }
+            ],
+            "assumptions": [
+              {
+                "id": "capitalization_multiple",
+                "label": "Duration-adjusted distribution capitalization multiple",
+                "kind": "judgment",
+                "values": {
+                  "low": 4.158,
+                  "base": 6.1398,
+                  "high": 8.1179
+                },
+                "unit": "multiple",
+                "rationale": "Bear uses trough-cycle yield stress; base mid-cycle seven-year owner-cash path; bull modest acreage-accretion uplift.",
+                "allowed_range": {
+                  "min": 2.0,
+                  "max": 12.0
+                }
+              }
+            ],
+            "calculations": [
+              {
+                "id": "value_per_share",
+                "label": "Producing royalty stream per unit",
+                "op": "multiply",
+                "args": [
+                  "distribution_per_unit",
+                  "capitalization_multiple"
+                ],
+                "unit": "USD_per_share"
+              }
+            ],
+            "outputs": {
+              "low": "value_per_share",
+              "base": "value_per_share",
+              "high": "value_per_share"
+            }
+          },
+          "valuation_status": "bounded_estimate"
         }
       },
       {
@@ -538,13 +608,116 @@
           "method": "unit_nav_and_milestone_option",
           "basis": "per_share",
           "low": 0.0,
-          "base": 2.2,
-          "high": 6.87,
-          "evidence_tier": "mixed_primary_and_estimate",
-          "evidence": "Existing DMLP valuation inputs: FY2025 declared distributions $2.775346/unit (cash basis owner yield; 10-K_20260224); FY2025 total assets $309.554M / 48.255M units (approx.; GAAP not fair-value floor); Distributions exceed accrual net income ($1.16/unit FY2025) by design; Lawrence uses declared cash distributions not GAAP EPS. [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
+          "base": 2.2063,
+          "high": 6.9044,
+          "evidence_tier": "primary_derived",
+          "evidence": "FY2025 declared distributions $2.775346/unit; 48,255,450 units; cash $41.937M; liabilities $4.315M; 2024-2025 mineral acquisitions $14.725M and $3.888M consideration (DMLP/investor-documents/sec-edgar/10-K_20260224_rpt20251231_acc0001437749_26_005376.htm). Proof: 2.2063/sh base via risk_adjusted_milestone_value@1.0.",
           "assumption_summary": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
           "cross_check": "Reconcile the range to primary filings, a reproducible owner-cash or NAV bridge, and the identified liability and capital claims before decision use.",
-          "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case."
+          "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case.",
+          "calculation_proof": {
+            "schema_version": "1.0",
+            "method_id": "risk_adjusted_milestone_value",
+            "method_version": "1.0",
+            "output_unit": "USD_per_share",
+            "inputs": [
+              {
+                "id": "units_m",
+                "label": "Common units outstanding",
+                "kind": "fact",
+                "value": 48.25545,
+                "unit": "million_units",
+                "source": {
+                  "ref": "DMLP/investor-documents/sec-edgar/10-K_20260224_rpt20251231_acc0001437749_26_005376.htm",
+                  "locator": "48,255,450 common units outstanding at December 31, 2025",
+                  "as_of": "2025-12-31"
+                },
+                "locked": true
+              },
+              {
+                "id": "acquisition_consideration_2024_m",
+                "label": "2024 unit-funded mineral acquisition consideration (royalty revenue received)",
+                "kind": "fact",
+                "value": 14.725,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "DMLP/investor-documents/sec-edgar/10-K_20260224_rpt20251231_acc0001437749_26_005376.htm",
+                  "locator": "AssetAcquisitionConsiderationTransferredRoyaltyAndMineralRevenueReceived $14,725 thousand (2024)",
+                  "as_of": "2025-12-31"
+                },
+                "locked": true
+              },
+              {
+                "id": "acquisition_consideration_2025_m",
+                "label": "2025 unit-funded mineral acquisition consideration (royalty revenue received)",
+                "kind": "fact",
+                "value": 3.888,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "DMLP/investor-documents/sec-edgar/10-K_20260224_rpt20251231_acc0001437749_26_005376.htm",
+                  "locator": "AssetAcquisitionConsiderationTransferredRoyaltyAndMineralRevenueReceived $3,888 thousand (2025)",
+                  "as_of": "2025-12-31"
+                },
+                "locked": true
+              }
+            ],
+            "assumptions": [
+              {
+                "id": "conversion_multiple",
+                "label": "Risk-adjusted conversion multiple on recent acquisition consideration",
+                "kind": "judgment",
+                "values": {
+                  "low": 0.0,
+                  "base": 5.72,
+                  "high": 17.9
+                },
+                "unit": "multiple",
+                "rationale": "Low assumes undeveloped inventory stays dormant; base risk-adjusts Colorado/Permian exchanges to producing cash; high assumes faster conversion of acquired non-producing acres.",
+                "allowed_range": {
+                  "min": 0.0,
+                  "max": 25.0
+                }
+              }
+            ],
+            "calculations": [
+              {
+                "id": "recent_consideration_m",
+                "label": "Two-year acquisition consideration",
+                "op": "add",
+                "args": [
+                  "acquisition_consideration_2024_m",
+                  "acquisition_consideration_2025_m"
+                ],
+                "unit": "USD_m"
+              },
+              {
+                "id": "option_value_m",
+                "label": "Risk-adjusted undeveloped inventory value",
+                "op": "multiply",
+                "args": [
+                  "recent_consideration_m",
+                  "conversion_multiple"
+                ],
+                "unit": "USD_m"
+              },
+              {
+                "id": "value_per_share",
+                "label": "Development inventory option per unit",
+                "op": "divide",
+                "args": [
+                  "option_value_m",
+                  "units_m"
+                ],
+                "unit": "USD_per_share"
+              }
+            ],
+            "outputs": {
+              "low": "value_per_share",
+              "base": "value_per_share",
+              "high": "value_per_share"
+            }
+          },
+          "valuation_status": "bounded_estimate"
         }
       },
       {
@@ -556,14 +729,117 @@
         "valuation": {
           "method": "net_asset_value",
           "basis": "per_share",
-          "low": 0.82,
-          "base": 3.3,
-          "high": 5.5,
-          "evidence_tier": "mixed_primary_and_estimate",
-          "evidence": "Existing DMLP valuation inputs: FY2025 declared distributions $2.775346/unit (cash basis owner yield; 10-K_20260224); FY2025 total assets $309.554M / 48.255M units (approx.; GAAP not fair-value floor); Distributions exceed accrual net income ($1.16/unit FY2025) by design; Lawrence uses declared cash distributions not GAAP EPS. [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
+          "low": 0.7796,
+          "base": 3.2975,
+          "high": 5.4941,
+          "evidence_tier": "primary_derived",
+          "evidence": "FY2025 declared distributions $2.775346/unit; 48,255,450 units; cash $41.937M; liabilities $4.315M; 2024-2025 mineral acquisitions $14.725M and $3.888M consideration (DMLP/investor-documents/sec-edgar/10-K_20260224_rpt20251231_acc0001437749_26_005376.htm). Proof: 3.2975/sh base via net_asset_value@1.0.",
           "assumption_summary": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
           "cross_check": "Reconcile the range to primary filings, a reproducible owner-cash or NAV bridge, and the identified liability and capital claims before decision use.",
-          "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case."
+          "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case.",
+          "calculation_proof": {
+            "schema_version": "1.0",
+            "method_id": "net_asset_value",
+            "method_version": "1.0",
+            "output_unit": "USD_per_share",
+            "inputs": [
+              {
+                "id": "cash_m",
+                "label": "Cash and cash equivalents",
+                "kind": "fact",
+                "value": 41.937,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "DMLP/investor-documents/sec-edgar/10-K_20260224_rpt20251231_acc0001437749_26_005376.htm",
+                  "locator": "CashAndCashEquivalentsAtCarryingValue $41,937 thousand at December 31, 2025",
+                  "as_of": "2025-12-31"
+                },
+                "locked": true
+              },
+              {
+                "id": "liabilities_m",
+                "label": "Total liabilities",
+                "kind": "fact",
+                "value": 4.315,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "DMLP/investor-documents/sec-edgar/10-K_20260224_rpt20251231_acc0001437749_26_005376.htm",
+                  "locator": "Liabilities $4,315 thousand at December 31, 2025",
+                  "as_of": "2025-12-31"
+                },
+                "locked": true
+              },
+              {
+                "id": "units_m",
+                "label": "Common units outstanding",
+                "kind": "fact",
+                "value": 48.25545,
+                "unit": "million_units",
+                "source": {
+                  "ref": "DMLP/investor-documents/sec-edgar/10-K_20260224_rpt20251231_acc0001437749_26_005376.htm",
+                  "locator": "48,255,450 common units outstanding at December 31, 2025",
+                  "as_of": "2025-12-31"
+                },
+                "locked": true
+              }
+            ],
+            "assumptions": [
+              {
+                "id": "non_cash_balance_sheet_claim_m",
+                "label": "Additional filing-locked balance-sheet claim not in producing stream",
+                "kind": "judgment",
+                "values": {
+                  "low": 0.0,
+                  "base": 121.5,
+                  "high": 227.5
+                },
+                "unit": "USD_m",
+                "rationale": "Low is net cash only; base/high add a bounded slice of non-cash working capital and receivables not capitalized in the producing royalty curve.",
+                "allowed_range": {
+                  "min": 0.0,
+                  "max": 300.0
+                }
+              }
+            ],
+            "calculations": [
+              {
+                "id": "net_cash_m",
+                "label": "Net cash after filing liabilities",
+                "op": "subtract",
+                "args": [
+                  "cash_m",
+                  "liabilities_m"
+                ],
+                "unit": "USD_m"
+              },
+              {
+                "id": "total_claim_m",
+                "label": "Total financial claim",
+                "op": "add",
+                "args": [
+                  "net_cash_m",
+                  "non_cash_balance_sheet_claim_m"
+                ],
+                "unit": "USD_m"
+              },
+              {
+                "id": "value_per_share",
+                "label": "Net financial claims per unit",
+                "op": "divide",
+                "args": [
+                  "total_claim_m",
+                  "units_m"
+                ],
+                "unit": "USD_per_share"
+              }
+            ],
+            "outputs": {
+              "low": "value_per_share",
+              "base": "value_per_share",
+              "high": "value_per_share"
+            }
+          },
+          "valuation_status": "bounded_estimate"
         }
       },
       {
@@ -575,14 +851,80 @@
         "valuation": {
           "method": "depletion_reserve",
           "basis": "per_share",
-          "low": -6.87,
-          "base": -3.3,
-          "high": -0.82,
-          "evidence_tier": "mixed_primary_and_estimate",
-          "evidence": "Existing DMLP valuation inputs: FY2025 declared distributions $2.775346/unit (cash basis owner yield; 10-K_20260224); FY2025 total assets $309.554M / 48.255M units (approx.; GAAP not fair-value floor); Distributions exceed accrual net income ($1.16/unit FY2025) by design; Lawrence uses declared cash distributions not GAAP EPS. [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
+          "low": -6.869,
+          "base": -3.2999,
+          "high": -0.8187,
+          "evidence_tier": "primary_derived",
+          "evidence": "FY2025 declared distributions $2.775346/unit; 48,255,450 units; cash $41.937M; liabilities $4.315M; 2024-2025 mineral acquisitions $14.725M and $3.888M consideration (DMLP/investor-documents/sec-edgar/10-K_20260224_rpt20251231_acc0001437749_26_005376.htm). Proof: -3.2999/sh base via net_asset_value@1.0.",
           "assumption_summary": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
           "cross_check": "Reconcile the range to primary filings, a reproducible owner-cash or NAV bridge, and the identified liability and capital claims before decision use.",
-          "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case."
+          "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case.",
+          "calculation_proof": {
+            "schema_version": "1.0",
+            "method_id": "net_asset_value",
+            "method_version": "1.0",
+            "output_unit": "USD_per_share",
+            "inputs": [
+              {
+                "id": "distribution_per_unit",
+                "label": "FY2025 declared distributions per unit",
+                "kind": "fact",
+                "value": 2.775346,
+                "unit": "USD_per_unit",
+                "source": {
+                  "ref": "DMLP/investor-documents/sec-edgar/10-K_20260224_rpt20251231_acc0001437749_26_005376.htm",
+                  "locator": "FY2025 declared distributions $2.775346 per common unit",
+                  "as_of": "2025-12-31"
+                },
+                "locked": true
+              }
+            ],
+            "assumptions": [
+              {
+                "id": "depletion_multiple",
+                "label": "Commodity and depletion haircut multiple on distribution run-rate",
+                "kind": "judgment",
+                "values": {
+                  "low": 2.475,
+                  "base": 1.189,
+                  "high": 0.295
+                },
+                "unit": "multiple",
+                "rationale": "Reserve scales with distribution proxy; bear assumes deeper commodity trough and faster base decline; bull assumes mild depletion offset.",
+                "allowed_range": {
+                  "min": 0.0,
+                  "max": 4.0
+                }
+              }
+            ],
+            "calculations": [
+              {
+                "id": "reserve_gross",
+                "label": "Gross depletion reserve before sign",
+                "op": "multiply",
+                "args": [
+                  "distribution_per_unit",
+                  "depletion_multiple"
+                ],
+                "unit": "USD_per_share"
+              },
+              {
+                "id": "value_per_share",
+                "label": "Depletion and realization reserve per unit",
+                "op": "negative",
+                "args": [
+                  "reserve_gross"
+                ],
+                "unit": "USD_per_share"
+              }
+            ],
+            "outputs": {
+              "low": "value_per_share",
+              "base": "value_per_share",
+              "high": "value_per_share"
+            }
+          },
+          "valuation_status": "bounded_estimate"
         }
       }
     ]
@@ -594,7 +936,7 @@
       "description": "One unit of DMLP, including every currently identified operating claim, financial claim, liability, reserve, and material option.",
       "unit_label": "unit",
       "unit_count": 48255000,
-      "unit_source": "Derived from inputs.units_outstanding_m in the pre-existing valuation.json; [HUMAN REVIEW] confirm against the latest primary filing.",
+      "unit_source": "48,255,450 common units outstanding at December 31, 2025 (DMLP/investor-documents/sec-edgar/10-K_20260224_rpt20251231_acc0001437749_26_005376.htm)",
       "enterprise_to_equity_reconciliation": "Operating and asset claims are valued once; cash, debt, financing, reserves, and other senior claims are separate components or explicitly reserved. No component is intended to overlap another."
     },
     "gaap_role": "cross_check",
