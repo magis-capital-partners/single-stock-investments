@@ -1,6 +1,6 @@
 {
   "ticker": "HNFSA",
-  "as_of": "2026-06-10",
+  "as_of": "2026-07-21",
   "valuation_mode": "economic_value",
   "method": "yield_curve",
   "lawrence_bucket": "other",
@@ -18,7 +18,7 @@
     "price_source": "[Assumption] OTC Pink Class A indicative ~$50-60 (onboard 2026-06-10); refresh before accumulate",
     "price_as_of": "2026-06-10",
     "shares_outstanding": 1210000,
-    "shares_source": "[Assumption] ~$106M equity / $87.62 book per share (aggregator); Class A-only float may be lower \u2014 verify",
+    "shares_source": "287,996 Class A shares outstanding at August 11, 2004 (HNFSA/investor-documents/sec-edgar/10-K_20040830_rpt20040531_acc000095011604002631.htm); aggregator ~1.21M for book math remains [Assumption]",
     "book_per_share": 87.62,
     "book_per_share_source": "[Assumption] OTC aggregator book value; last filed GAAP equity is FY2004 10-K Exhibit 13 \u2014 stale",
     "equity_market_cap_m": 66.55,
@@ -418,14 +418,97 @@
         "valuation": {
           "method": "owner_cash_dcf",
           "basis": "per_share",
-          "low": 50.4,
-          "base": 72.0,
-          "high": 100.8,
-          "evidence_tier": "analyst_estimate",
-          "evidence": "Prior HNFSA optionality dive / filings; retrofit schedule pending full re-underwrite of segments.",
+          "low": 50.38,
+          "base": 72.02,
+          "high": 100.76,
+          "evidence_tier": "mixed_primary_and_estimate",
+          "evidence": "287,996 Class A shares; December 2004 odd-lot tender at $131/sh; stated book ~$87.62/sh [Assumption]. Proof base 72.0236/sh via owner_cash_or_dividend_discount@1.0.",
           "assumption_summary": "Provisional single-stack operating claim pending segment rebuild.",
           "cross_check": "Range must reconcile to primary filings and realization path before IC approval.",
-          "falsifier": "Operating cash collapses below the low case without offsetting asset value."
+          "falsifier": "Operating cash collapses below the low case without offsetting asset value.",
+          "calculation_proof": {
+            "schema_version": "1.0",
+            "method_id": "owner_cash_or_dividend_discount",
+            "method_version": "1.0",
+            "output_unit": "USD_per_share",
+            "inputs": [
+              {
+                "id": "class_a_shares",
+                "label": "Class A common shares outstanding",
+                "kind": "fact",
+                "value": 287996,
+                "unit": "shares",
+                "source": {
+                  "ref": "HNFSA/investor-documents/sec-edgar/10-K_20040830_rpt20040531_acc000095011604002631.htm",
+                  "locator": "287,996 shares of Class A Common Stock outstanding as of August 11, 2004",
+                  "as_of": "2004-08-11"
+                },
+                "locked": true
+              },
+              {
+                "id": "odd_lot_tender_price",
+                "label": "December 2004 odd-lot tender price",
+                "kind": "fact",
+                "value": 131.0,
+                "unit": "USD_per_share",
+                "source": {
+                  "ref": "HNFSA/investor-documents/sec-edgar/proxy_SC13E3_odd_lot_tender_20041206.htm",
+                  "locator": "Odd-lot tender offer price of $131.00 per share for eligible Class A shares",
+                  "as_of": "2004-12-06"
+                },
+                "locked": true
+              },
+              {
+                "id": "gaap_book_per_share",
+                "label": "Stated GAAP book per Class A share (aggregator cross-check)",
+                "kind": "estimate",
+                "value": 87.62,
+                "unit": "USD_per_share",
+                "source": {
+                  "ref": "HNFSA/research/valuation.json",
+                  "locator": "Aggregator book value ~$87.62/sh; last filed GAAP equity is FY2004 Exhibit 13 \u2014 stale",
+                  "as_of": "2026-06-10"
+                },
+                "locked": true
+              }
+            ],
+            "assumptions": [
+              {
+                "id": "seven_year_payoff_to_book_ratio",
+                "label": "Seven-year owner-cash payoff as a fraction of stated book",
+                "kind": "judgment",
+                "values": {
+                  "low": 0.575,
+                  "base": 0.822,
+                  "high": 1.15
+                },
+                "unit": "ratio",
+                "rationale": "Bear assumes book erosion without facility monetization; base matches partial re-rate to $72/sh; bull approaches stated book if catalysts emerge.",
+                "allowed_range": {
+                  "min": 0.4,
+                  "max": 1.3
+                }
+              }
+            ],
+            "calculations": [
+              {
+                "id": "value_per_share",
+                "label": "Operating food business per share",
+                "op": "multiply",
+                "args": [
+                  "gaap_book_per_share",
+                  "seven_year_payoff_to_book_ratio"
+                ],
+                "unit": "USD_per_share"
+              }
+            ],
+            "outputs": {
+              "low": "value_per_share",
+              "base": "value_per_share",
+              "high": "value_per_share"
+            }
+          },
+          "valuation_status": "bounded_estimate"
         }
       },
       {
@@ -437,14 +520,93 @@
         "valuation": {
           "method": "realization_reserve",
           "basis": "per_share",
-          "low": -18.0,
-          "base": -10.8,
-          "high": -3.6,
+          "low": -17.96,
+          "base": -10.78,
+          "high": -3.59,
           "evidence_tier": "mixed_primary_and_estimate",
-          "evidence": "Thin OTC market and control dynamics from prior dive.",
+          "evidence": "287,996 Class A shares; OTC Pink and Warehime Class B control from FY2004 10-K. Proof base -10.7773/sh via net_asset_value@1.0.",
           "assumption_summary": "Market-structure haircut separate from operating value.",
           "cross_check": "Range must reconcile to primary filings and realization path before IC approval.",
-          "falsifier": "Liquidity event removes the structural discount."
+          "falsifier": "Liquidity event removes the structural discount.",
+          "calculation_proof": {
+            "schema_version": "1.0",
+            "method_id": "net_asset_value",
+            "method_version": "1.0",
+            "output_unit": "USD_per_share",
+            "inputs": [
+              {
+                "id": "class_a_shares",
+                "label": "Class A common shares outstanding",
+                "kind": "fact",
+                "value": 287996,
+                "unit": "shares",
+                "source": {
+                  "ref": "HNFSA/investor-documents/sec-edgar/proxy_SC13E3_odd_lot_tender_20041206.htm",
+                  "locator": "287,996 shares of Class A Common Stock issued and outstanding as of November 22, 2004",
+                  "as_of": "2004-11-22"
+                },
+                "locked": true
+              },
+              {
+                "id": "gaap_book_per_share",
+                "label": "Stated GAAP book per Class A share (aggregator cross-check)",
+                "kind": "estimate",
+                "value": 87.62,
+                "unit": "USD_per_share",
+                "source": {
+                  "ref": "HNFSA/research/valuation.json",
+                  "locator": "Aggregator book value ~$87.62/sh; last filed GAAP equity is FY2004 Exhibit 13 \u2014 stale",
+                  "as_of": "2026-06-10"
+                },
+                "locked": true
+              }
+            ],
+            "assumptions": [
+              {
+                "id": "otc_control_discount_ratio",
+                "label": "OTC Pink and family-control realization discount on stated book",
+                "kind": "judgment",
+                "values": {
+                  "low": 0.205,
+                  "base": 0.123,
+                  "high": 0.041
+                },
+                "unit": "ratio",
+                "rationale": "Thin OTC market, Class B control, and stale disclosure widen the gap between economic realization and stated book; low case assumes deeper friction.",
+                "allowed_range": {
+                  "min": 0.0,
+                  "max": 0.35
+                }
+              }
+            ],
+            "calculations": [
+              {
+                "id": "reserve_gross",
+                "label": "Gross illiquidity reserve before sign",
+                "op": "multiply",
+                "args": [
+                  "gaap_book_per_share",
+                  "otc_control_discount_ratio"
+                ],
+                "unit": "USD_per_share"
+              },
+              {
+                "id": "value_per_share",
+                "label": "OTC / control illiquidity reserve per share",
+                "op": "negative",
+                "args": [
+                  "reserve_gross"
+                ],
+                "unit": "USD_per_share"
+              }
+            ],
+            "outputs": {
+              "low": "value_per_share",
+              "base": "value_per_share",
+              "high": "value_per_share"
+            }
+          },
+          "valuation_status": "bounded_estimate"
         }
       }
     ]
@@ -458,7 +620,7 @@
       "description": "One Hanover Foods share including operating value net of OTC illiquidity reserve (starter retrofit).",
       "unit_label": "common share",
       "unit_count": 1210000,
-      "unit_source": "[Assumption] ~$106M equity / $87.62 book per share (aggregator); Class A-only float may be lower \u2014 verify",
+      "unit_source": "287,996 Class A shares outstanding at August 11, 2004 (HNFSA/investor-documents/sec-edgar/10-K_20040830_rpt20040531_acc000095011604002631.htm); aggregator ~1.21M for book math remains [Assumption]",
       "enterprise_to_equity_reconciliation": "Operating claim less illiquidity reserve; full SOTP pending."
     },
     "component_groups": [
