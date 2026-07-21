@@ -291,7 +291,7 @@ def _component(cid: str, label: str, category: str, overlap_key: str) -> dict:
         "treatment": "additive",
         "valuation": {
             "method": METHOD_MAP[cid],
-            "basis": "per_cvr",
+            "basis": "per_share",
             "low": LEGACY[cid]["low"],
             "base": LEGACY[cid]["base"],
             "high": LEGACY[cid]["high"],
@@ -326,6 +326,11 @@ def build_valuation_scaffold(base_sum: float) -> dict:
         },
         "inputs": {
             "price": ref_price,
+            "book_per_share": ref_price,
+            "book_per_share_caveat": (
+                "Reference fair value equals probability-weighted milestone sum; "
+                "not GAAP issuer book (non-tradeable CVR claim)"
+            ),
             "price_source": (
                 "Reference price equals base-case probability-weighted milestone component sum; "
                 "non-tradeable CVR has no reliable OTC quote (0.000 on broker screens Jul 2026) [Assumption for yield curve]"
@@ -357,6 +362,47 @@ def build_valuation_scaffold(base_sum: float) -> dict:
                 "payoff": ref_price,
                 "years": 3.5,
                 "notes": "Component-weighted expected milestone stack realized on base probabilities by 2029.",
+                "sotp_build": {
+                    "shares": 1,
+                    "book_per_share": 0.0,
+                    "lines": [
+                        {
+                            "id": "book",
+                            "label": "Contractual claim anchor",
+                            "gaap_per_share": 0.0,
+                            "uplift_per_share": 0.0,
+                            "math": "Zero if all milestones miss; upside from dated cash triggers only",
+                        },
+                        {
+                            "id": "net_sales_milestone",
+                            "label": "Net sales milestone (probability-weighted)",
+                            "uplift_per_share": LEGACY["net_sales_milestone"]["base"],
+                            "math": "CVR Agreement EX-10.1; P=40% full $17.50, P=15% delayed $8.75",
+                        },
+                        {
+                            "id": "fda_stemi_milestone",
+                            "label": "FDA STEMI milestone (probability-weighted)",
+                            "uplift_per_share": LEGACY["fda_stemi_milestone"]["base"],
+                            "math": "CVR Agreement; P=35% for $7.50 by Jan 1, 2028",
+                        },
+                        {
+                            "id": "clinical_recommendation_milestone",
+                            "label": "Clinical recommendation milestone (probability-weighted)",
+                            "uplift_per_share": LEGACY["clinical_recommendation_milestone"]["base"],
+                            "math": "CVR Agreement; P=45% for $10.00 by Dec 31, 2029",
+                        },
+                        {
+                            "id": "timing_execution_reserve",
+                            "label": "Timing and execution reserve",
+                            "uplift_per_share": LEGACY["timing_execution_reserve"]["base"],
+                            "math": "Tax withholding, illiquidity, net-sales definition risk [Assumption]",
+                        },
+                    ],
+                    "year5_economic_nav_per_share": ref_price,
+                    "sum_check": f"component lines sum to {ref_price}",
+                    "years": 3.5,
+                    "notes": "Milestone stack from Dec 2022 CVR Agreement; probabilities in calculation_proof graphs",
+                },
             },
             "bull": {
                 "price": ref_price,
@@ -495,6 +541,90 @@ def build_valuation_scaffold(base_sum: float) -> dict:
                 "evidence_ref": f"{TICKER}/research/evidence_reconciliation_{AS_OF}.md",
             },
             "validation_errors": [],
+        },
+        "economic_value": {
+            "schema_version": "1.0",
+            "method": "component_economic_value",
+            "economic_claim": {
+                "description": (
+                    "One ABMD.CVR, including every currently identified milestone payment claim "
+                    "and execution reserve."
+                ),
+                "unit_label": "CVR",
+                "unit_count": 1,
+                "unit_source": (
+                    "One CVR per pre-merger Abiomed share tendered; ~25.76M shares accepted Dec 2022 "
+                    f"({JNJ_CLOSE})"
+                ),
+                "enterprise_to_equity_reconciliation": (
+                    "Each milestone is valued once via probability-weighted present value; "
+                    "timing reserve is separate. No component overlaps another."
+                ),
+            },
+            "gaap_role": "reference_only",
+            "accounting_reference": "Non-tradeable contractual cash claim; no GAAP issuer financials in workspace.",
+            "component_groups": [
+                {
+                    "id": "net_sales_milestone",
+                    "label": "Net sales milestone ($3.7B threshold)",
+                    "component_ids": ["net_sales_milestone"],
+                    "economic_claim": "Net sales milestone ($3.7B threshold)",
+                    "valuation_basis": "CVR Agreement milestone payment schedule.",
+                    "adjustments": "Probability-weighted full ($17.50) and delayed ($8.75) paths.",
+                    "overlap_control": "Unique overlap key net_sales_milestone.",
+                    "risk_and_timing": {
+                        "probability_basis": "Base P=40% full period; P=15% delayed; FY2022 revenue $1.032B vs $3.7B threshold.",
+                        "timing_basis": "2028 Measurement Period through 2028-29 Measurement Period per CVR Agreement.",
+                        "remaining_capital_basis": "No holder capital call; zero remaining capital on CVR claim.",
+                    },
+                },
+                {
+                    "id": "fda_stemi_milestone",
+                    "label": "FDA STEMI-without-shock approval milestone",
+                    "component_ids": ["fda_stemi_milestone"],
+                    "economic_claim": "FDA STEMI-without-shock approval milestone",
+                    "valuation_basis": "CVR Agreement $7.50 payment by Jan 1, 2028.",
+                    "adjustments": "Base P=35% regulatory success.",
+                    "overlap_control": "Unique overlap key fda_stemi_milestone.",
+                    "risk_and_timing": {
+                        "probability_basis": "STEMI DTU regulatory path under JNJ; binary by fixed deadline.",
+                        "timing_basis": "Payment within five business days of Milestone Notice; deadline Jan 1, 2028.",
+                        "remaining_capital_basis": "No holder capital required.",
+                    },
+                },
+                {
+                    "id": "clinical_recommendation_milestone",
+                    "label": "Class I clinical recommendation milestone",
+                    "component_ids": ["clinical_recommendation_milestone"],
+                    "economic_claim": "Class I clinical recommendation milestone",
+                    "valuation_basis": "CVR Agreement $10.00 payment by Dec 31, 2029.",
+                    "adjustments": "Base P=45% for any of three guideline paths.",
+                    "overlap_control": "Unique overlap key clinical_recommendation_milestone.",
+                    "risk_and_timing": {
+                        "probability_basis": "Three mutually exclusive ACC/AHA Class I paths; earliest triggers payment.",
+                        "timing_basis": "Clinical Recommendation Milestone Period ends Dec 31, 2029.",
+                        "remaining_capital_basis": "No holder capital required.",
+                    },
+                },
+                {
+                    "id": "timing_execution_reserve",
+                    "label": "Tax, timing, definition, and illiquidity reserve",
+                    "component_ids": ["timing_execution_reserve"],
+                    "economic_claim": "Tax, timing, definition, and illiquidity reserve",
+                    "valuation_basis": "Execution friction on milestone realization.",
+                    "adjustments": "Negative reserve separate from milestone zeros.",
+                    "overlap_control": "Unique overlap key timing_execution_reserve.",
+                    "risk_and_timing": {
+                        "probability_basis": "Reserve scales with illiquidity and JNJ measurement discretion; not a success probability.",
+                        "timing_basis": "Applied at each milestone payment; withholding per CVR Agreement section 2.4(c).",
+                        "remaining_capital_basis": "No additional holder capital; reserve is a valuation haircut only.",
+                    },
+                },
+            ],
+            "limitations": [
+                "Probability judgments pending JNJ Net Sales Statements and milestone notices.",
+                "Reference price is model fair value; OTC quote unavailable.",
+            ],
         },
     }
 

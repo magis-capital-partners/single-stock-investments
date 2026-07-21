@@ -1,0 +1,83 @@
+{
+  "base_irr_pct": 0.0,
+  "classification": {
+    "archetype": "optionality",
+    "cycle": "-",
+    "dhando": "partial",
+    "lawrence_bucket": "other",
+    "moat": "n/a",
+    "payoff_lens": "event",
+    "predictive_attribute": "complexity_discount"
+  },
+  "evidence_citations": [
+    "ABMD.CVR/third-party-analyses/source_inventory_2026-07-21.md",
+    "ABMD.CVR/research/evidence_reconciliation_2026-07-21.md",
+    "ABMD.CVR/research/adversarial_2026-07-21.md",
+    "ABMD.CVR/research/cross_check_third_party_2026-07-21.md"
+  ],
+  "filing_digest": "ABMD.CVR/research/evidence/filing_digest_2026-07-21.md",
+  "generated_at": "2026-07-21T12:13:44+00:00",
+  "irr_label": "annualized return",
+  "key_assumptions": [
+    {
+      "input": "Price today",
+      "source": "Reference price equals base-case probability-weighted milestone component sum; non-tradeable CVR has no reliable OTC quote (0.000 on broker screens Jul 2026) [Assumption for yield curve]",
+      "value": "**$13.44**"
+    },
+    {
+      "input": "GAAP book per share",
+      "source": "Filing equity \u00f7 shares",
+      "value": "**$13.44**"
+    },
+    {
+      "input": "Payoff price (Year 3.5)",
+      "source": "Sum of parts / catalyst path in IRR steps",
+      "value": "**$13.44**"
+    },
+    {
+      "input": "Horizon (years)",
+      "source": "Model choice in valuation.json (not company guidance)",
+      "value": "**3.5**"
+    },
+    {
+      "input": "Net sales milestone (probability-weighted) uplift",
+      "source": "CVR Agreement EX-10.1; P=40% full $17.50, P=15% delayed $8.75",
+      "value": "**+$8.31/sh**"
+    },
+    {
+      "input": "FDA STEMI milestone (probability-weighted) uplift",
+      "source": "CVR Agreement; P=35% for $7.50 by Jan 1, 2028",
+      "value": "**+$2.63/sh**"
+    },
+    {
+      "input": "Clinical recommendation milestone (probability-weighted) uplift",
+      "source": "CVR Agreement; P=45% for $10.00 by Dec 31, 2029",
+      "value": "**+$4.5/sh**"
+    },
+    {
+      "input": "Timing and execution reserve uplift",
+      "source": "Tax withholding, illiquidity, net-sales definition risk [Assumption]",
+      "value": "**+$-2.0/sh**"
+    }
+  ],
+  "last_verified": {
+    "deep_dive": "2026-07-21",
+    "human_approved": null,
+    "valuation_as_of": "2026-07-21"
+  },
+  "open_questions": [
+    "Substitute verified holder entry price for reference-price yield curve",
+    "Download CVR Agreement and future Milestone Notices to local `investor-documents/`",
+    "Promote any third-party CVR specialist source before numeric blend"
+  ],
+  "scenarios": {
+    "base": 0.0,
+    "bear": -37.9,
+    "bull": 33.5
+  },
+  "schema_version": "1.0",
+  "stance": null,
+  "thesis": "ABMD.CVR is not an operating company. It is the **contingent value right** issued to former Abiomed shareholders when Johnson & Johnson completed its acquisition on **December 22, 2022**. **[Fact]** Each CVR is a non-tradeable contractual claim to receive up to **$35.00** in cash if three defined commercial and clinical milestones are achieved under the CVR Agreement. **[Fact]** Holders received one CVR for each Abiomed share tendered at **$380.00** upfront cash. **[Fact]** Approximately **25.76 million** shares were tendered (~57% of then-outstanding Abiomed stock). **[Fact]** Abiomed now operates as a standalone business within JNJ MedTech; the CVR is a tail cash option on Impella net sales and regulatory/clinical success, not equity in JNJ.",
+  "ticker": "ABMD.CVR",
+  "why_market_wrong": "The CVR is **non-tradeable** and largely invisible to screens: broker quotes show **0.000** with no volume, so holders who still own the claim may undervalue live milestone optionality or over-discount JNJ measurement discretion. **[Inference]** Predictive attribute: **complexity discount** on a dated, multi-trigger cash stack. **[Inference]** Pre-acquisition Abiomed revenue was **$1.032 billion** (FY2022); the net-sales milestone requires **$3.7 billion** in a defined JNJ fiscal window, so the market may treat the **$17.50** leg as unreachable while underweighting partial **$8.75** delayed payment or clinical legs. **[Inference]** Conversely, holders may anchor on the **$35** headline and ignore simultaneous probability and timing discounting. Proof-first component math sums to about **$13.44/CVR** base economic value at explicit milestone probabilities."
+}

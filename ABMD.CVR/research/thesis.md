@@ -1,18 +1,23 @@
 # ABMD.CVR — Investment Thesis
 
-**Last updated:** 2026-07-02
+**Last updated:** auto-sync
 
 ## Classification
 
 | Field | Value |
 |-------|-------|
-| **Archetype** (Stahl) | unknown |
-| **Moat** (Munger) | unproven |
-| **Dhando** (Pabrai) | pending |
+| **Archetype** (Stahl) | optionality |
+| **Moat** (Munger) | n/a |
+| **Dhando** (Pabrai) | partial |
 | **Stance** | watch |
 | **Cycle** | - |
-| **MOI bucket** (legacy) | pending |
-| **Payoff lens** | pending |
+| **Implied 7yr IRR** (base) | -0.0% (contract base, provisional) |
+| **IRR method** | scarce_asset_optionality |
+| **Lawrence bucket** | other |
+| **Payoff lens** | event |
+| **MOI bucket** | pending |
+
+**Deep dive:** `ABMD.CVR/research/deep_dive_2026-07-21.md` (auto-sync)
 
 ## One-line thesis
 
