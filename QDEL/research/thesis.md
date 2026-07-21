@@ -9,15 +9,15 @@
 | **Archetype** (Stahl) | turnaround |
 | **Moat** (Munger) | unproven |
 | **Dhando** (Pabrai) | partial |
-| **Stance** | watch |
+| **Stance** | hold |
 | **Cycle** | - |
-| **Implied 7yr IRR** (base) | 15.4% (Lawrence base) |
-| **IRR method** | full |
+| **Implied 7yr IRR** (base) | -6.4% (contract base, provisional) |
+| **IRR method** | quality_reinvestment |
 | **Lawrence bucket** | pricing_power |
 | **Payoff lens** | event |
 | **MOI bucket** | pending |
 
-**Deep dive:** `QDEL/research/deep_dive_2026-06-29.md` (auto-sync)
+**Deep dive:** `QDEL/research/deep_dive_2026-07-21.md` (auto-sync)
 
 ## One-line thesis
 
