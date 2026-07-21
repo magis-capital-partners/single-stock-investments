@@ -1,7 +1,510 @@
 {
   "ticker": "ABMD.CVR",
-  "as_of": "2026-07-20",
-  "method": "price_stub",
-  "inputs": {},
-  "notes": "Price stub created by fetch_equity_prices.py --create-stub; replace with a real model before decision-grade."
+  "as_of": "2026-07-21",
+  "method": "yield_curve",
+  "irr_method": "yield_curve",
+  "method_profile": "binary_milestone",
+  "valuation_mode": "economic_value",
+  "lawrence_bucket": "other",
+  "payoff_lens": "event",
+  "classification_inputs": {
+    "archetype": "optionality",
+    "moat": "n/a",
+    "dhando": "partial",
+    "cycle": "-",
+    "payoff_lens": "event",
+    "predictive_attribute": "complexity_discount"
+  },
+  "inputs": {
+    "price": 13.44,
+    "price_source": "Reference price equals base-case probability-weighted milestone component sum; non-tradeable CVR has no reliable OTC quote (0.000 on broker screens Jul 2026) [Assumption for yield curve]",
+    "price_as_of": "2026-07-21",
+    "shares_outstanding": 1,
+    "shares_source": "One CVR per pre-merger Abiomed share tendered; ~25.76M shares accepted Dec 2022 (https://www.jnj.com/media-center/press-releases/johnson-johnson-completes-acquisition-of-abiomed)",
+    "max_milestone_payment_per_cvr": 35.0,
+    "max_milestone_source": "CVR Agreement and Offer to Purchase (https://www.sec.gov/Archives/edgar/data/200406/000119312522285216/d411777dex99a1a.htm)",
+    "abiomed_fy2022_revenue_b": 1.032,
+    "abiomed_fy2022_revenue_source": "https://www.sec.gov/Archives/edgar/data/815094/000095017022006432/abmd-ex99_1.htm",
+    "normalization_note": "Security is a non-tradeable contingent cash claim, not an operating business. Lawrence yield-curve base uses probability-weighted milestone stack from the Dec 2022 CVR Agreement."
+  },
+  "scenarios": {
+    "bear": {
+      "price": 13.44,
+      "payoff": 2.0,
+      "years": 4.0,
+      "notes": "All three milestones miss or only minimal delayed net-sales payment; long wait, high discount."
+    },
+    "base": {
+      "price": 13.44,
+      "payoff": 13.44,
+      "years": 3.5,
+      "notes": "Component-weighted expected milestone stack realized on base probabilities by 2029."
+    },
+    "bull": {
+      "price": 13.44,
+      "payoff": 32.0,
+      "years": 3.0,
+      "notes": "Near-maximum $35 stack less modest reserve; FDA and Class I paths succeed on schedule."
+    }
+  },
+  "option_scan": [
+    {
+      "q": 1,
+      "question": "GAAP book misstates core assets?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "Pure contractual cash claim; no balance sheet"
+    },
+    {
+      "q": 2,
+      "question": "Undeveloped reserves / acreage / dormant royalty?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "No physical asset base"
+    },
+    {
+      "q": 3,
+      "question": "In-business loss segment?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "Not an operating company"
+    },
+    {
+      "q": 4,
+      "question": "Backlog / contracted revenue not in FCF path?",
+      "answer": "Yes",
+      "treatment": "yield_curve",
+      "evidence": "Contractual milestone payments up to $35/CVR per CVR Agreement"
+    },
+    {
+      "q": 5,
+      "question": "Private or illiquid stakes below fair value?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "Cash claim only"
+    },
+    {
+      "q": 6,
+      "question": "Transitory distribution / legal recovery?",
+      "answer": "Yes",
+      "treatment": "yield_curve",
+      "evidence": "Dated milestone cash payments from JNJ upon achievement"
+    },
+    {
+      "q": 7,
+      "question": "Embedded product option already in revenue?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "Claim is separate from JNJ MedTech equity"
+    }
+  ],
+  "optionality_gate": {
+    "framework": "milestone_yield_curve",
+    "floor_pass": true,
+    "floor_metric": "contractual_milestone_stack",
+    "floor_value": 0.0,
+    "ceiling_value": 35.0,
+    "primary_metric": "lawrence_base",
+    "primary_label": "annualized return",
+    "notes": "Downside bounded at zero contractual payment per milestone; upside capped at $35/CVR. Illiquidity and JNJ measurement discretion remain real risks."
+  },
+  "growth_explanation": {
+    "mechanism": "Return driver is dated milestone realization under the Dec 2022 CVR Agreement, not operating cash-flow growth.",
+    "bear_trigger": "2028 Non-Achievement Notice for net sales and FDA miss by Jan 1, 2028.",
+    "bull_trigger": "Full $17.50 net-sales payment plus FDA and Class I milestones before deadlines.",
+    "status": "complete"
+  },
+  "lawrence_horizon_years": 7,
+  "stance_proposal": {
+    "suggested": "watch",
+    "irr_band": "<15%",
+    "gates": {
+      "moat_ok": true,
+      "dhando_ok": true
+    },
+    "override_reason": null
+  },
+  "component_valuation": {
+    "schema_version": "1.0",
+    "all_material_components_identified": true,
+    "coverage_statement": "Four additive components map net-sales, FDA, clinical-recommendation milestones and a timing/execution reserve once each.",
+    "components": [
+      {
+        "id": "net_sales_milestone",
+        "label": "Net sales milestone ($3.7B threshold)",
+        "category": "real_option",
+        "overlap_key": "net_sales_milestone",
+        "treatment": "additive",
+        "valuation": {
+          "method": "risk_adjusted_milestone_value",
+          "basis": "per_cvr",
+          "low": 0.0,
+          "base": 8.3125,
+          "high": 17.5,
+          "evidence_tier": "primary_derived",
+          "evidence": "CVR Agreement 2022-12-22: up to $35/CVR in three milestones; Abiomed FY2022 revenue $1.032B baseline (https://www.sec.gov/Archives/edgar/data/815094/000095017022006432/abmd-ex99_1.htm). Proof base 8.3125/CVR via risk_adjusted_milestone_value@1.0.",
+          "assumption_summary": "Proof outputs {'low': 0.0, 'base': 8.3125, 'high': 17.5}; probability and timing judgments explicit in graph.",
+          "cross_check": "Reconcile to CVR Agreement milestone definitions before decision use.",
+          "falsifier": "JNJ certifies milestone non-achievement or Net Sales Statement shows threshold unreachable.",
+          "valuation_status": "bounded_estimate",
+          "calculation_proof": {
+            "schema_version": "1.0",
+            "method_id": "risk_adjusted_milestone_value",
+            "method_version": "1.0",
+            "output_unit": "USD_per_cvr",
+            "inputs": [
+              {
+                "id": "full_milestone_payment",
+                "label": "Net sales milestone payment if achieved in 2028 measurement period",
+                "kind": "fact",
+                "value": 17.5,
+                "unit": "USD_per_cvr",
+                "source": {
+                  "ref": "https://www.sec.gov/Archives/edgar/data/200406/000119312522311072/d428734dex101.htm",
+                  "locator": "Milestone Payment (a)(i): $17.50 per CVR if Net Sales Milestone achieved during 2028 Measurement Period",
+                  "as_of": "2022-12-22"
+                },
+                "locked": true
+              },
+              {
+                "id": "reduced_milestone_payment",
+                "label": "Net sales milestone payment if achieved in 2028-29 measurement period only",
+                "kind": "fact",
+                "value": 8.75,
+                "unit": "USD_per_cvr",
+                "source": {
+                  "ref": "https://www.sec.gov/Archives/edgar/data/200406/000119312522311072/d428734dex101.htm",
+                  "locator": "Milestone Payment (a)(ii): $8.75 per CVR if achieved during 2028-29 Measurement Period after missing 2028 period",
+                  "as_of": "2022-12-22"
+                },
+                "locked": true
+              },
+              {
+                "id": "net_sales_threshold_b",
+                "label": "Worldwide net sales threshold for net sales milestone",
+                "kind": "fact",
+                "value": 3.7,
+                "unit": "USD_billion",
+                "source": {
+                  "ref": "https://www.sec.gov/Archives/edgar/data/200406/000119312522311072/d428734dex101.htm",
+                  "locator": "Net Sales Milestone: aggregate worldwide Net Sales exceeds $3,700,000,000",
+                  "as_of": "2022-12-22"
+                },
+                "locked": true
+              },
+              {
+                "id": "abiomed_fy2022_revenue_b",
+                "label": "Abiomed FY2022 worldwide revenue (pre-acquisition baseline)",
+                "kind": "fact",
+                "value": 1.032,
+                "unit": "USD_billion",
+                "source": {
+                  "ref": "https://www.sec.gov/Archives/edgar/data/815094/000095017022006432/abmd-ex99_1.htm",
+                  "locator": "Full year revenue totaled $1.032 billion for fiscal year ended March 31, 2022",
+                  "as_of": "2022-03-31"
+                },
+                "locked": true
+              }
+            ],
+            "assumptions": [
+              {
+                "id": "full_period_success_probability",
+                "label": "Probability of exceeding $3.7B net sales in the 2028 measurement period",
+                "kind": "judgment",
+                "values": {
+                  "low": 0.0,
+                  "base": 0.4,
+                  "high": 1.0
+                },
+                "unit": "probability",
+                "rationale": "FY2022 revenue $1.0B; milestone requires ~3.6\u00d7 run-rate by JNJ FY2028 Q1 window. JNJ MedTech distribution and Impella penetration partially offset but threshold remains ambitious.",
+                "allowed_range": {
+                  "min": 0.0,
+                  "max": 1.0
+                }
+              },
+              {
+                "id": "delayed_period_success_probability",
+                "label": "Probability of reduced $8.75 payment in 2028-29 measurement period",
+                "kind": "judgment",
+                "values": {
+                  "low": 0.0,
+                  "base": 0.15,
+                  "high": 0.0
+                },
+                "unit": "probability",
+                "rationale": "Captures delayed four-quarter achievement at half rate if primary window missed.",
+                "allowed_range": {
+                  "min": 0.0,
+                  "max": 0.5
+                }
+              }
+            ],
+            "calculations": [
+              {
+                "id": "full_expected",
+                "label": "Expected value from full-period milestone",
+                "op": "multiply",
+                "args": [
+                  "full_milestone_payment",
+                  "full_period_success_probability"
+                ],
+                "unit": "USD_per_cvr"
+              },
+              {
+                "id": "delayed_expected",
+                "label": "Expected value from delayed milestone",
+                "op": "multiply",
+                "args": [
+                  "reduced_milestone_payment",
+                  "delayed_period_success_probability"
+                ],
+                "unit": "USD_per_cvr"
+              },
+              {
+                "id": "value_per_share",
+                "label": "Net sales milestone expected value per CVR",
+                "op": "add",
+                "args": [
+                  "full_expected",
+                  "delayed_expected"
+                ],
+                "unit": "USD_per_cvr"
+              }
+            ],
+            "outputs": {
+              "low": "value_per_share",
+              "base": "value_per_share",
+              "high": "value_per_share"
+            }
+          }
+        }
+      },
+      {
+        "id": "fda_stemi_milestone",
+        "label": "FDA STEMI-without-shock approval milestone",
+        "category": "real_option",
+        "overlap_key": "fda_stemi_milestone",
+        "treatment": "additive",
+        "valuation": {
+          "method": "risk_adjusted_milestone_value",
+          "basis": "per_cvr",
+          "low": 0.0,
+          "base": 2.625,
+          "high": 7.5,
+          "evidence_tier": "primary_derived",
+          "evidence": "CVR Agreement 2022-12-22: up to $35/CVR in three milestones; Abiomed FY2022 revenue $1.032B baseline (https://www.sec.gov/Archives/edgar/data/815094/000095017022006432/abmd-ex99_1.htm). Proof base 2.625/CVR via risk_adjusted_milestone_value@1.0.",
+          "assumption_summary": "Proof outputs {'low': 0.0, 'base': 2.625, 'high': 7.5}; probability and timing judgments explicit in graph.",
+          "cross_check": "Reconcile to CVR Agreement milestone definitions before decision use.",
+          "falsifier": "JNJ certifies milestone non-achievement or Net Sales Statement shows threshold unreachable.",
+          "valuation_status": "bounded_estimate",
+          "calculation_proof": {
+            "schema_version": "1.0",
+            "method_id": "risk_adjusted_milestone_value",
+            "method_version": "1.0",
+            "output_unit": "USD_per_cvr",
+            "inputs": [
+              {
+                "id": "milestone_payment",
+                "label": "FDA approval milestone payment",
+                "kind": "fact",
+                "value": 7.5,
+                "unit": "USD_per_cvr",
+                "source": {
+                  "ref": "https://www.sec.gov/Archives/edgar/data/200406/000119312522311072/d428734dex101.htm",
+                  "locator": "Milestone Payment (b): $7.50 per CVR for FDA Approval Milestone",
+                  "as_of": "2022-12-22"
+                },
+                "locked": true
+              }
+            ],
+            "assumptions": [
+              {
+                "id": "success_probability",
+                "label": "Probability of FDA PMA approval for Impella in STEMI without cardiogenic shock by Jan 1, 2028",
+                "kind": "judgment",
+                "values": {
+                  "low": 0.0,
+                  "base": 0.35,
+                  "high": 1.0
+                },
+                "unit": "probability",
+                "rationale": "STEMI DTU trial and regulatory path remain active under JNJ; binary regulatory risk by fixed deadline.",
+                "allowed_range": {
+                  "min": 0.0,
+                  "max": 1.0
+                }
+              }
+            ],
+            "calculations": [
+              {
+                "id": "value_per_share",
+                "label": "Risk-adjusted FDA milestone value per CVR",
+                "op": "multiply",
+                "args": [
+                  "milestone_payment",
+                  "success_probability"
+                ],
+                "unit": "USD_per_cvr"
+              }
+            ],
+            "outputs": {
+              "low": "value_per_share",
+              "base": "value_per_share",
+              "high": "value_per_share"
+            }
+          }
+        }
+      },
+      {
+        "id": "clinical_recommendation_milestone",
+        "label": "Class I clinical recommendation milestone",
+        "category": "real_option",
+        "overlap_key": "clinical_recommendation_milestone",
+        "treatment": "additive",
+        "valuation": {
+          "method": "risk_adjusted_milestone_value",
+          "basis": "per_cvr",
+          "low": 0.0,
+          "base": 4.5,
+          "high": 10.0,
+          "evidence_tier": "primary_derived",
+          "evidence": "CVR Agreement 2022-12-22: up to $35/CVR in three milestones; Abiomed FY2022 revenue $1.032B baseline (https://www.sec.gov/Archives/edgar/data/815094/000095017022006432/abmd-ex99_1.htm). Proof base 4.5/CVR via risk_adjusted_milestone_value@1.0.",
+          "assumption_summary": "Proof outputs {'low': 0.0, 'base': 4.5, 'high': 10.0}; probability and timing judgments explicit in graph.",
+          "cross_check": "Reconcile to CVR Agreement milestone definitions before decision use.",
+          "falsifier": "JNJ certifies milestone non-achievement or Net Sales Statement shows threshold unreachable.",
+          "valuation_status": "bounded_estimate",
+          "calculation_proof": {
+            "schema_version": "1.0",
+            "method_id": "risk_adjusted_milestone_value",
+            "method_version": "1.0",
+            "output_unit": "USD_per_cvr",
+            "inputs": [
+              {
+                "id": "milestone_payment",
+                "label": "Clinical recommendation milestone payment",
+                "kind": "fact",
+                "value": 10.0,
+                "unit": "USD_per_cvr",
+                "source": {
+                  "ref": "https://www.sec.gov/Archives/edgar/data/200406/000119312522311072/d428734dex101.htm",
+                  "locator": "Milestone Payment (c): $10.00 per CVR for Clinical Recommendation Milestone",
+                  "as_of": "2022-12-22"
+                },
+                "locked": true
+              }
+            ],
+            "assumptions": [
+              {
+                "id": "success_probability",
+                "label": "Probability at least one Class I ACC/AHA guideline recommendation path succeeds by Dec 31, 2029",
+                "kind": "judgment",
+                "values": {
+                  "low": 0.0,
+                  "base": 0.45,
+                  "high": 1.0
+                },
+                "unit": "probability",
+                "rationale": "Three mutually exclusive clinical paths (STEMI, HRPCI, cardiogenic shock); earliest success triggers full payment.",
+                "allowed_range": {
+                  "min": 0.0,
+                  "max": 1.0
+                }
+              }
+            ],
+            "calculations": [
+              {
+                "id": "value_per_share",
+                "label": "Risk-adjusted clinical recommendation value per CVR",
+                "op": "multiply",
+                "args": [
+                  "milestone_payment",
+                  "success_probability"
+                ],
+                "unit": "USD_per_cvr"
+              }
+            ],
+            "outputs": {
+              "low": "value_per_share",
+              "base": "value_per_share",
+              "high": "value_per_share"
+            }
+          }
+        }
+      },
+      {
+        "id": "timing_execution_reserve",
+        "label": "Tax, timing, definition, and illiquidity reserve",
+        "category": "liability_or_reserve",
+        "overlap_key": "timing_execution_reserve",
+        "treatment": "additive",
+        "valuation": {
+          "method": "net_asset_value",
+          "basis": "per_cvr",
+          "low": -4.0,
+          "base": -2.0,
+          "high": -0.5,
+          "evidence_tier": "primary_derived",
+          "evidence": "CVR Agreement 2022-12-22: up to $35/CVR in three milestones; Abiomed FY2022 revenue $1.032B baseline (https://www.sec.gov/Archives/edgar/data/815094/000095017022006432/abmd-ex99_1.htm). Proof base -2.0/CVR via net_asset_value@1.0.",
+          "assumption_summary": "Proof outputs {'low': -4.0, 'base': -2.0, 'high': -0.5}; probability and timing judgments explicit in graph.",
+          "cross_check": "Reconcile to CVR Agreement milestone definitions before decision use.",
+          "falsifier": "JNJ certifies milestone non-achievement or Net Sales Statement shows threshold unreachable.",
+          "valuation_status": "bounded_estimate",
+          "calculation_proof": {
+            "schema_version": "1.0",
+            "method_id": "net_asset_value",
+            "method_version": "1.0",
+            "output_unit": "USD_per_cvr",
+            "inputs": [],
+            "assumptions": [
+              {
+                "id": "reserve_per_cvr",
+                "label": "Reserve for tax withholding, payment delay, net-sales definition risk, and non-tradeable illiquidity",
+                "kind": "judgment",
+                "values": {
+                  "low": 4.0,
+                  "base": 2.0,
+                  "high": 0.5
+                },
+                "unit": "USD_per_cvr",
+                "rationale": "CVR Agreement permits withholding and measurement disputes; OTC quote unavailable at 0.000.",
+                "allowed_range": {
+                  "min": 0.0,
+                  "max": 6.0
+                }
+              }
+            ],
+            "calculations": [
+              {
+                "id": "value_per_share",
+                "label": "Timing and execution reserve per CVR",
+                "op": "negative",
+                "args": [
+                  "reserve_per_cvr"
+                ],
+                "unit": "USD_per_cvr"
+              }
+            ],
+            "outputs": {
+              "low": "value_per_share",
+              "base": "value_per_share",
+              "high": "value_per_share"
+            }
+          }
+        }
+      }
+    ]
+  },
+  "economic_value_analysis": {
+    "ownership_waterfall": {
+      "net_economic_claim": "One ABMD.CVR equals the contractual right to up to $35 in milestone cash from Johnson & Johnson under the Dec 2022 CVR Agreement.",
+      "excluded_claims": [
+        "Upfront $380/share cash consideration from the merger is excluded; only CVR tail remains.",
+        "JNJ common stock or MedTech segment value is not part of this claim."
+      ],
+      "reconciliation": "Maximum stack $35/CVR = $17.50 net sales + $7.50 FDA + $10.00 clinical recommendation.",
+      "evidence_ref": "ABMD.CVR/research/evidence_reconciliation_2026-07-21.md"
+    },
+    "validation_errors": []
+  }
 }
