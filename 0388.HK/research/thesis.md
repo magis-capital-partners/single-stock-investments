@@ -12,12 +12,12 @@
 | **Stance** | watch |
 | **Cycle** | peak |
 | **Implied 7yr IRR** (base) | -0.15% (total synthesis) |
-| **IRR method** | full |
+| **IRR method** | scarce_asset_optionality |
 | **Lawrence bucket** | multi_sided |
 | **Payoff lens** | operating |
 | **MOI bucket** | pending |
 
-**Deep dive:** `0388.HK/research/deep_dive_2026-06-11.md` (auto-sync)
+**Deep dive:** `0388.HK/research/deep_dive_2026-07-21.md` (auto-sync)
 
 ## One-line thesis
 
