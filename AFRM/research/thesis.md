@@ -1,18 +1,23 @@
 # AFRM — Investment Thesis
 
-**Last updated:** 2026-07-18
+**Last updated:** auto-sync
 
 ## Classification
 
 | Field | Value |
 |-------|-------|
-| **Archetype** (Stahl) | unknown |
-| **Moat** (Munger) | unproven |
-| **Dhando** (Pabrai) | pending |
+| **Archetype** (Stahl) | platform |
+| **Moat** (Munger) | narrow |
+| **Dhando** (Pabrai) | partial |
 | **Stance** | watch |
-| **Cycle** | - |
-| **MOI bucket** (legacy) | pending |
-| **Payoff lens** | pending |
+| **Cycle** | mid |
+| **Implied 7yr IRR** (base) | -18.07% (contract base, provisional) |
+| **IRR method** | quality_reinvestment |
+| **Lawrence bucket** | multi_sided |
+| **Payoff lens** | operating |
+| **MOI bucket** | pending |
+
+**Deep dive:** `AFRM/research/deep_dive_2026-07-21.md` (auto-sync)
 
 ## One-line thesis
 
