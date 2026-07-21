@@ -12,7 +12,7 @@
 | Downside capital claims | **met** — IT-cycle/AI disruption reserve; long-term debt $5.03B in net claims inputs |
 | Double-counting | **met** — non-overlapping overlap keys; managed-services backlog not double-counted |
 
-**Contract status after agent pass:** pending mechanical close (`marvin_cloud_refresh.py`).
+**Contract status after agent pass:** decision_grade (`marvin_cloud_refresh.py` 2026-07-21).
 
 ---
 
@@ -26,7 +26,7 @@
 | **Calculation** | FY2025 revenue $69.7B; consulting ~50% / managed services ~50%; OCF $11.47B less capex $0.60B = FCF $10.87B |
 | **Remaining uncertainty** | Segment-level FCF not separately disclosed; consolidated FCF engine with option overlay for Gen AI upside |
 | **Affected components** | All four |
-| **Valuation consequence** | Base component sum **~$302/sh** vs price **~$139** |
+| **Valuation consequence** | Base component sum **~$302/sh** vs price **~$145** |
 | **Falsifier** | 10-K restates segment economics or shows material intersegment eliminations breaking consolidated FCF bridge |
 
 ---
