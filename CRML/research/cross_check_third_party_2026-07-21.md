@@ -37,13 +37,13 @@ No approved third-party sources are indexed for CRML as of this scan. Marvin sta
 | Lens | Owner cash / value | Return / horizon | Stance hint |
 |------|-------------------|------------------|-------------|
 | Marvin (component proof) | $3.07/sh base | -9.96% annualized @ $6.40, 7yr | watch |
-| Marvin (Lawrence scenario) | $4.00/sh payoff | -6.53% annualized @ $6.40, 7yr | watch |
+| Marvin (Lawrence scenario) | $4.00/sh payoff | -7.34% annualized @ $6.40, 7yr | watch |
 | External (combined) | — | — | — |
-| **Blended best estimate** | **$4.00/sh payoff path** | **-6.53% / 7yr** | **watch** |
+| **Blended best estimate** | **$3.07/sh component base** | **-7.34% / 7yr** | **watch** |
 
 **Weights:** 100% Marvin filings; no approved third party in base.
 
-**Returns statement (blended):** At **$6.40**, Marvin expects about **-6.53%** per year over seven years on a risked asset payoff of **$4.00** per share; component proof schedule cross-checks at **$3.07** per share base economic value.
+**Returns statement (blended):** At **$6.40**, Marvin expects about **-7.34%** per year over seven years; component proof schedule cross-checks at **$3.07** per share base economic value.
 
 ## [HUMAN REVIEW]
 

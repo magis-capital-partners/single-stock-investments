@@ -54,10 +54,10 @@
     },
     "base": {
       "price": 6.4,
-      "payoff": 4.0,
+      "payoff": 3.07,
       "years": 7,
       "probability": 0.45,
-      "notes": "Partial risked value on 42% Tanbreez stake after DFS, financing, and dilution; Wolfsberg/BMW path delayed; heavy haircut vs company PEA NPV",
+      "notes": "Component-proof base economic value ($3.07/sh) from filing-grounded proofs; Tanbreez risked NAV, Wolfsberg milestone, cash, less dilution reserve",
       "sotp_build": {
         "shares": 1,
         "book_per_share": 0.0,
@@ -94,12 +94,12 @@
             "id": "residual",
             "label": "Residual to Lawrence base payoff",
             "gaap_per_share": 0.0,
-            "uplift_per_share": 4.0,
-            "math": "Tie to $4.0 path"
+            "uplift_per_share": 3.07,
+            "math": "Tie to $3.07 path"
           }
         ],
-        "year5_economic_nav_per_share": 4.0,
-        "sum_check": "lines sum to 4.0",
+        "year5_economic_nav_per_share": 3.07,
+        "sum_check": "lines sum to 3.07",
         "years": 7,
         "notes": "Lawrence base with partial production option"
       }
@@ -114,7 +114,7 @@
   },
   "nav_overlay": {
     "status": "complete",
-    "as_of": "2026-07-18",
+    "as_of": "2026-07-21",
     "gaap_vs_fair_value": {
       "note": "Mineral rights and exploration assets on balance sheet ($171.7M total assets) are not marked to PEA NPV; PEA is pre-tax project-level and highly uncertain"
     },
@@ -157,7 +157,7 @@
     "floor_metric": "nav_per_share",
     "floor_value": 0.0,
     "primary_metric": "lawrence_base",
-    "primary_return_pct": -6.5,
+    "primary_return_pct": -10.0,
     "primary_label": "annualized return",
     "notes": "Economic floor ~$0.0/sh (not GAAP book); spot copper $4.0/unit; option yield ~0.0%",
     "overlay_nav_per_share": 0.0,
@@ -225,9 +225,12 @@
     }
   ],
   "implied_return": {
-    "base_pct": -6.5,
-    "label": "annualized return",
-    "display": "-6.5% (base)"
+    "base_pct": -7.34,
+    "label": "7yr IRR (total synthesis)",
+    "display": "-7.34% (total synthesis)",
+    "lawrence_stance_gate_pct": -9.96,
+    "falsifier_adjusted_pct": -9.96,
+    "synthesis_pct": -7.34
   },
   "stance": {
     "proposal": "watch",
@@ -278,11 +281,11 @@
     }
   ],
   "market_inputs": {},
-  "market_inputs_as_of": "2026-07-20",
+  "market_inputs_as_of": "2026-07-21",
   "total_return_panel": {
     "schema_version": "3.0",
     "ticker": "CRML",
-    "as_of": "2026-07-18",
+    "as_of": "2026-07-21",
     "status": "partial",
     "error": "Vendor events are discovery evidence; primary-source completeness has not been established.",
     "price_source": "yahoo:CRML",
@@ -290,8 +293,8 @@
     "return_currency": "USD",
     "fx_basis": "listing_currency_nominal",
     "history_start": "2022-02-07",
-    "history_end": "2026-07-17",
-    "price_points": 1114,
+    "history_end": "2026-07-20",
+    "price_points": 1115,
     "price_interval": "1d",
     "history_basis": "earliest_available_vendor_trading_history",
     "chart_scale": "logarithmic",
@@ -314,17 +317,17 @@
     "distribution_contribution_by_type": {},
     "cumulative_distributions_per_share": 0,
     "start_price": 9.938,
-    "end_price": 6.4,
-    "price_index_end": 64.4,
-    "total_return_index_end": 64.4,
-    "cumulative_price_return_pct": -35.6,
-    "cumulative_total_return_pct": -35.6,
-    "price_only_annualized_pct": -9.44,
-    "total_return_annualized_pct": -9.44,
+    "end_price": 6.21,
+    "price_index_end": 62.49,
+    "total_return_index_end": 62.49,
+    "cumulative_price_return_pct": -37.51,
+    "cumulative_total_return_pct": -37.51,
+    "price_only_annualized_pct": -10.04,
+    "total_return_annualized_pct": -10.04,
     "market_cap_m": null,
     "shares_outstanding": null,
     "price_for_market_cap": 6.4,
-    "chart": "CRML/research/charts/total_return_2026-07-18.svg",
+    "chart": "CRML/research/charts/total_return_2026-07-21.svg",
     "panel_json": "CRML/research/total_return_panel.json"
   },
   "results_lawrence_legacy": {
@@ -332,7 +335,7 @@
       "return_pct": -25.2
     },
     "base": {
-      "return_pct": -6.5
+      "return_pct": -10.0
     },
     "bull": {
       "return_pct": 2.4
@@ -340,13 +343,13 @@
   },
   "results": {
     "bear": {
-      "return_pct": -25.2
+      "return_pct": -18.72
     },
     "base": {
-      "return_pct": -6.5
+      "return_pct": -9.96
     },
     "bull": {
-      "return_pct": 2.4
+      "return_pct": 2.39
     }
   },
   "overlay_results": [],
@@ -2291,8 +2294,8 @@
                   "ref": "CRML/research/valuation.json",
                   "locator": "inputs.price; Yahoo CRML close 2026-07-18",
                   "as_of": "2026-07-18",
-                  "content_sha256": "e4cd0f3e5c8a092fb84be00de03aeabf9ae8550f3b58258a9978a8ad703786ce",
-                  "source_id": "46ce67eb327f44b4801874631e45de8f8fe310307ec6b2733051d439f10ea88a"
+                  "content_sha256": "6a267395ffa1490a1ddae659c0336818eff41f907da7d98a80c28a394984336f",
+                  "source_id": "8e54a13a908b3da47372a11851cf892c661b00a4c133e4454409fceee4497e83"
                 },
                 "rationale": null
               },
@@ -2374,8 +2377,8 @@
                   "ref": "CRML/research/valuation.json",
                   "locator": "inputs.price; Yahoo CRML close 2026-07-18",
                   "as_of": "2026-07-18",
-                  "content_sha256": "e4cd0f3e5c8a092fb84be00de03aeabf9ae8550f3b58258a9978a8ad703786ce",
-                  "source_id": "46ce67eb327f44b4801874631e45de8f8fe310307ec6b2733051d439f10ea88a"
+                  "content_sha256": "6a267395ffa1490a1ddae659c0336818eff41f907da7d98a80c28a394984336f",
+                  "source_id": "8e54a13a908b3da47372a11851cf892c661b00a4c133e4454409fceee4497e83"
                 },
                 "rationale": null
               },
@@ -2457,8 +2460,8 @@
                   "ref": "CRML/research/valuation.json",
                   "locator": "inputs.price; Yahoo CRML close 2026-07-18",
                   "as_of": "2026-07-18",
-                  "content_sha256": "e4cd0f3e5c8a092fb84be00de03aeabf9ae8550f3b58258a9978a8ad703786ce",
-                  "source_id": "46ce67eb327f44b4801874631e45de8f8fe310307ec6b2733051d439f10ea88a"
+                  "content_sha256": "6a267395ffa1490a1ddae659c0336818eff41f907da7d98a80c28a394984336f",
+                  "source_id": "8e54a13a908b3da47372a11851cf892c661b00a4c133e4454409fceee4497e83"
                 },
                 "rationale": null
               },
@@ -2536,8 +2539,8 @@
               "ref": "CRML/research/valuation.json",
               "locator": "inputs.price; Yahoo CRML close 2026-07-18",
               "as_of": "2026-07-18",
-              "content_sha256": "e4cd0f3e5c8a092fb84be00de03aeabf9ae8550f3b58258a9978a8ad703786ce",
-              "source_id": "46ce67eb327f44b4801874631e45de8f8fe310307ec6b2733051d439f10ea88a"
+              "content_sha256": "6a267395ffa1490a1ddae659c0336818eff41f907da7d98a80c28a394984336f",
+              "source_id": "8e54a13a908b3da47372a11851cf892c661b00a4c133e4454409fceee4497e83"
             },
             {
               "node_id": "stage2_shares_m",
@@ -2560,7 +2563,7 @@
             "passed": true,
             "errors": []
           },
-          "proof_hash": "723cfa5a59fba9d013efb5c6d2c2f4d0af377125362c48a7120a7bc3393db8fd"
+          "proof_hash": "b52a06d3d9d20c1f2c4854b39a30e40b6568405cc539189a8d64512306ad6d39"
         },
         "evidence_tier": "filing",
         "evidence_level": "primary_verified",
@@ -2814,7 +2817,7 @@
       },
       "all_material_components_priced": true,
       "calculation_errors": [],
-      "aggregate_proof_hash": "6013d35cf43358e5a8ebdc1a9294a12ad1c1292fbc037dfb37f968be8ef2a86d"
+      "aggregate_proof_hash": "aa34aa7afbe4c6be4769c9e68ae54fa5f0e90727ebd7c85c6dd9ab58f0b91cc4"
     },
     "source_lineage": [
       {
@@ -2868,8 +2871,8 @@
         "ref": "CRML/research/valuation.json",
         "locator": "inputs.price; Yahoo CRML close 2026-07-18",
         "as_of": "2026-07-18",
-        "content_sha256": "e4cd0f3e5c8a092fb84be00de03aeabf9ae8550f3b58258a9978a8ad703786ce",
-        "source_id": "46ce67eb327f44b4801874631e45de8f8fe310307ec6b2733051d439f10ea88a"
+        "content_sha256": "6a267395ffa1490a1ddae659c0336818eff41f907da7d98a80c28a394984336f",
+        "source_id": "8e54a13a908b3da47372a11851cf892c661b00a4c133e4454409fceee4497e83"
       },
       {
         "component_id": "dilution_reserve",
@@ -2917,7 +2920,7 @@
       ]
     },
     "change_control": {
-      "model_hash": "132cc321e3fdb2308356c79f6ea2d6a310315ec7c457677abe6a2ad29128377e",
+      "model_hash": "f422ff1fd7d5eadf93c11a8b4ad9e68e9e2018f9bd01e1dee810945d95ea8b39",
       "method_versions": [
         "manual@1.0",
         "milestone_nav@1.0",
@@ -2930,7 +2933,7 @@
     "decision_rule": "No security is decision-grade until every material claim is valued exactly once by a valid calculation proof and every material evidence blocker is resolved."
   },
   "insider_signal": {
-    "as_of": "2026-07-20",
+    "as_of": "2026-07-21",
     "disclaimer": "Context only. Insider activity informs scenario confidence and stance discussion; it does not auto-inflate Lawrence base IRR. Promotion requires [HUMAN REVIEW].",
     "in_base_irr": false,
     "window_days": 365,
@@ -3022,7 +3025,7 @@
         "id": "scenario_bull",
         "label": "Bull scenario (Lawrence envelope)",
         "source": "scenarios.bull",
-        "return_pct": 11.8,
+        "return_pct": 2.4,
         "weight": 0.05,
         "type": "numeric",
         "epistemic_tier": "C (scenario envelope)",
@@ -3036,9 +3039,9 @@
     "qualitative_adjustments": [],
     "qualitative_manual": false,
     "qualitative_pp_cap_applied": false,
-    "numeric_weighted_pct": -6.53,
+    "numeric_weighted_pct": -7.34,
     "qualitative_pp": 0,
-    "total_synthesis_pct": -6.53,
+    "total_synthesis_pct": -7.34,
     "human_approval": "pending",
     "weight_audit": {
       "flags": [],
@@ -3061,15 +3064,15 @@
     "notes": "Capstone IRR combining filings, segments, overlays, third-party, qualitative"
   },
   "lens_consensus": {
-    "as_of": "2026-07-18",
-    "shared_inputs_ref": "valuation.json@2026-07-18",
+    "as_of": "2026-07-21",
+    "shared_inputs_ref": "valuation.json@2026-07-21",
     "valuation_richness": 1.0,
-    "blended_return_pct": -8.25,
+    "blended_return_pct": -10.46,
     "band_pct": [
       -18.72,
-      -6.49
+      -7.34
     ],
-    "weighted_median_pct": -6.49,
+    "weighted_median_pct": -9.96,
     "median_mean_flag": false,
     "stance": "pass",
     "agreement_pct": 100,
@@ -3743,7 +3746,7 @@
     ]
   },
   "context_overlay": {
-    "as_of": "2026-07-20",
+    "as_of": "2026-07-21",
     "disclaimer": "Context only. Tailwinds inform stance and overlay sizing; they do not auto-inflate Lawrence base IRR. Promotion to base case requires [HUMAN REVIEW].",
     "themes": [
       {
@@ -3753,9 +3756,9 @@
           {
             "id": "hy_oas",
             "label": "High-yield OAS credit spread (%)",
-            "latest": 1.3,
+            "latest": 1.43,
             "as_of": "2026-07-20",
-            "yoy_pct": 217.1,
+            "yoy_pct": 248.8,
             "direction": "up",
             "good_for": "risk_regime",
             "source": "spread:HYG-LQD:21d (HYG-LQD 1m spread proxy, not OAS)",
@@ -3765,9 +3768,9 @@
           {
             "id": "ust_10y",
             "label": "US Treasury 10Y yield (%)",
-            "latest": 4.579999923706055,
+            "latest": 4.5980000495910645,
             "as_of": "2026-07-20",
-            "yoy_pct": 4.8,
+            "yoy_pct": 5.2,
             "direction": "up",
             "good_for": "rates_regime",
             "source": "yahoo:^TNX",
@@ -3777,9 +3780,9 @@
           {
             "id": "ust_2y",
             "label": "US Treasury 2Y yield (%)",
-            "latest": 4.314000129699707,
+            "latest": 4.328000068664551,
             "as_of": "2026-07-20",
-            "yoy_pct": 10.4,
+            "yoy_pct": 10.7,
             "direction": "up",
             "good_for": "rates_regime",
             "source": "yahoo:^FVX",
@@ -3789,8 +3792,8 @@
           {
             "id": "dxy_broad",
             "label": "Trade-weighted USD index (broad)",
-            "latest": 100.93699645996094,
-            "as_of": "2026-07-20",
+            "latest": 100.96399688720703,
+            "as_of": "2026-07-21",
             "yoy_pct": 3.2,
             "direction": "up",
             "good_for": "dollar_regime",
@@ -3801,9 +3804,9 @@
           {
             "id": "vix_level",
             "label": "VIX index level",
-            "latest": 18.280000686645508,
+            "latest": 18.649999618530273,
             "as_of": "2026-07-20",
-            "yoy_pct": 9.8,
+            "yoy_pct": 12.0,
             "direction": "up",
             "good_for": "vol_regime",
             "source": "yahoo:^VIX",
@@ -3813,9 +3816,9 @@
           {
             "id": "credit_impulse_1m",
             "label": "HYG vs TLT 1-month return spread (%)",
-            "latest": 2.52,
+            "latest": 2.76,
             "as_of": "2026-07-20",
-            "yoy_pct": 42.4,
+            "yoy_pct": 55.9,
             "direction": "up",
             "good_for": "credit_impulse",
             "source": "spread:HYG-TLT:21d",
@@ -3825,9 +3828,9 @@
           {
             "id": "spy_20d_realized_vol",
             "label": "SPY 20-day realized vol (annualized %)",
-            "latest": 11.39,
+            "latest": 11.37,
             "as_of": "2026-07-20",
-            "yoy_pct": 31.5,
+            "yoy_pct": 31.3,
             "direction": "up",
             "good_for": "equity_vol",
             "source": "realized_vol:SPY:20d",

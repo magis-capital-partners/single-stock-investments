@@ -1,28 +1,66 @@
 {
-  "ticker": "CRML",
-  "as_of": "2026-07-21",
-  "thesis_one_liner": "Pre-production Western REE/lithium option on Tanbreez (42% Greenland) and Wolfsberg (Austria); value is risked asset payoff, not operating cash.",
-  "base_irr_pct": -6.53,
-  "base_payoff_per_share": 4.0,
-  "price": 6.4,
-  "stance_proposal": "watch",
-  "component_economic_value_base": 3.07,
+  "base_irr_pct": -7.34,
+  "classification": {
+    "archetype": "optionality",
+    "cycle": "up",
+    "dhando": "none",
+    "lawrence_bucket": "other",
+    "moat": "unproven",
+    "payoff_lens": "asset",
+    "predictive_attribute": "complexity_discount"
+  },
+  "evidence_citations": [
+    "CRML/third-party-analyses/source_inventory_2026-07-18.md",
+    "CRML/INDEX.csv",
+    "investor-documents/sec-edgar/20-F_20251006_rpt20250630_acc0001213900_25_096254.htm",
+    "investor-documents/sec-edgar/20-F_20241030_rpt20240630_acc0001213900_24_092156.htm",
+    "investor-documents/sec-edgar/20-F_20240304_rpt20240227_acc0001213900_24_019605.htm"
+  ],
+  "filing_digest": "CRML/research/evidence/filing_digest_2026-07-21.md",
+  "generated_at": "2026-07-21T02:28:35+00:00",
+  "irr_label": "7yr IRR (total synthesis)",
   "key_assumptions": [
-    "104.9M ordinary shares at June 30, 2025; $7.3M cash with going-concern warning",
-    "Tanbreez 44.87 Mt @ 0.38% TREO; PEA ~$3B pre-tax project NPV heavily risked to ~$3/sh base component",
-    "Wolfsberg BMW $15M restricted advance; milestone option ~$0.50/sh base",
-    "Dilution reserve -$0.50/sh base for Stage 2 (14.5M shares) and GEM overhang",
-    "Seven-year Lawrence scenario payoff $4.00/sh vs $6.40 price"
+    {
+      "input": "Price today",
+      "source": "Yahoo CRML via ownership_common fetch 2026-07-18",
+      "value": "**$6.4**"
+    },
+    {
+      "input": "Payoff price (Year 7)",
+      "source": "Sum of parts / catalyst path in IRR steps",
+      "value": "**$3.07**"
+    },
+    {
+      "input": "Horizon (years)",
+      "source": "Model choice in valuation.json (not company guidance)",
+      "value": "**7**"
+    },
+    {
+      "input": "Residual to Lawrence base payoff uplift",
+      "source": "Tie to $3.07 path",
+      "value": "**+$3.07/sh**"
+    }
   ],
+  "last_verified": {
+    "deep_dive": "2026-07-21",
+    "human_approved": null,
+    "valuation_as_of": "2026-07-21"
+  },
   "open_questions": [
-    "GEM arbitration outcome and cash/share settlement",
-    "Tanbreez DFS and Greenland Stage 2 approval to 92.5%",
-    "Fully diluted share count after PIPE, warrants, and Stage 2 issuance",
-    "Whether BMW $15M advance enters risked floor when restrictions ease"
+    "Confirm fully diluted share count after PIPE, Stage 2 (**14.5M** shares), and warrant exercises post June 30, 2025",
+    "GEM arbitration outcome and cash/share settlement timing",
+    "Tanbreez DFS publication and Greenland Stage 2 approval status",
+    "Whether BMW **$15M** advance should enter risked floor when restrictions ease",
+    "Component proof judgments (Tanbreez success probability and gross success value) vs next filing milestones"
   ],
-  "top_citations": [
-    "CRML/investor-documents/sec-edgar/20-F_20251006_rpt20250630_acc0001213900_25_096254.htm",
-    "CRML/research/evidence/filing_facts_2026-07-18.json",
-    "CRML/research/evidence_reconciliation_2026-07-21.md"
-  ]
+  "scenarios": {
+    "base": -9.96,
+    "bear": -18.72,
+    "bull": 2.39
+  },
+  "schema_version": "1.0",
+  "stance": null,
+  "thesis": "Critical Metals Corp. is a Nasdaq-listed mining exploration and development company focused on critical minerals for electrification and Western supply-chain security. **[Fact]** Its flagship asset is the Tanbreez rare earth project in southern Greenland, where the company holds a **42%** equity interest in Tanbreez Mining Greenland A/S with a contracted path to **92.5%** subject to Greenland government approval. **[Fact]** The company also owns the Wolfsberg lithium project in Austria (BMW offtake and **$15 million** advance payment) and minority stakes in Weinebene and Eastern Alps lithium projects. **[Fact]** FY2025 net loss was **$51.9 million** on **104.9 million** ordinary shares; cash was **$7.3 million** at June 30, 2025 with a going-concern warning. **[Fact]** The company has declared mineral resources but has not declared reserves or begun production.",
+  "ticker": "CRML",
+  "why_market_wrong": "**Predictive attribute:** complexity discount (Greenland jurisdiction, pre-reserve resource, related-party Tanbreez history, and headline PEA net present value versus thin cash floor)."
 }
