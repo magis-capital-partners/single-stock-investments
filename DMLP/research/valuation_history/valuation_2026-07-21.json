@@ -1,0 +1,3539 @@
+{
+  "ticker": "DMLP",
+  "as_of": "2026-07-21",
+  "method": "full",
+  "lawrence_bucket": "other",
+  "classification_inputs": {
+    "archetype": "infrastructure",
+    "moat": "narrow",
+    "dhando": "partial",
+    "cycle": "mid",
+    "payoff_lens": "operating",
+    "predictive_attribute": "distribution_yield_vs_commodity"
+  },
+  "inputs": {
+    "price": 27.29,
+    "price_source": "Yahoo DMLP close 2026-07-20",
+    "fcf_per_share": 2.78,
+    "fcf_source": "FY2025 declared distributions $2.775346/unit (cash basis owner yield; 10-K_20260224)",
+    "units_outstanding_m": 48.255,
+    "book_per_share": 6.42,
+    "book_source": "FY2025 total assets $309.554M / 48.255M units (approx.; GAAP not fair-value floor)",
+    "normalization_note": "Distributions exceed accrual net income ($1.16/unit FY2025) by design; Lawrence uses declared cash distributions not GAAP EPS.",
+    "price_as_of": "2026-07-20",
+    "shares_outstanding": 48255000,
+    "shares_source": "48,255,450 common units outstanding at December 31, 2025 (DMLP/investor-documents/sec-edgar/10-K_20260224_rpt20251231_acc0001437749_26_005376.htm)"
+  },
+  "scenarios": {
+    "bear": {
+      "growth_y1_5": 0.0,
+      "growth_y6_10": -0.02,
+      "exit_pfcf_y10": 10,
+      "notes": "Oil/gas price trough; distribution flat to down; depletion without offsetting acquisitions"
+    },
+    "base": {
+      "growth_y1_5": 0.02,
+      "growth_y6_10": 0.01,
+      "exit_pfcf_y10": 12,
+      "notes": "Mid-cycle distributions; 2024-2025 unit-funded royalty acquisitions add low single-digit growth"
+    },
+    "bull": {
+      "growth_y1_5": 0.05,
+      "growth_y6_10": 0.03,
+      "exit_pfcf_y10": 14,
+      "notes": "Commodity up-cycle + continued accretive mineral deals via Form S-4 units"
+    }
+  },
+  "stance_proposal": {
+    "suggested": "watch",
+    "irr_band": "<15%",
+    "gates": {
+      "moat_ok": true,
+      "dhando_ok": true
+    },
+    "override_reason": null
+  },
+  "option_scan": [
+    {
+      "q": 1,
+      "question": "GAAP book misstates core assets?",
+      "answer": "Partial",
+      "treatment": "embedded_in_segment",
+      "evidence": "Royalty/mineral interests carried on balance sheet; fair value tied to commodity cash flows not separate NAV mark (10-K)"
+    },
+    {
+      "q": 2,
+      "question": "Undeveloped reserves / acreage / dormant royalty?",
+      "answer": "Yes",
+      "treatment": "embedded_in_segment",
+      "evidence": "2024-2025 acquisitions include non-producing acres (e.g. ~14,225 net mineral acres Sep 2024 exchange); production conversion in growth path [Assumption]"
+    },
+    {
+      "q": 5,
+      "question": "Private or illiquid stakes below fair value?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "Public MLP; no holdco sleeve"
+    },
+    {
+      "q": 7,
+      "question": "Embedded product option already in revenue?",
+      "answer": "Yes",
+      "treatment": "embedded_in_segment",
+      "evidence": "Producing royalty cash flows in operating revenues; acquisitions funded with units"
+    }
+  ],
+  "growth_explanation": {
+    "mechanism": "Base growth assumes modest distribution increases from 2024-2025 royalty exchanges (Colorado, Permian) offsetting base decline on legacy properties.",
+    "bear_trigger": "Sustained sub-$60 WTI equivalent realized prices cut distributions below $2.50/unit for four quarters.",
+    "bull_trigger": "Distribution run-rate above $3.20/unit sustained with continued accretive unit-for-mineral deals.",
+    "lawrence_legacy": {
+      "y1_5": 0.02,
+      "y6_10": 0.01,
+      "return_pct": null
+    },
+    "falsifier_adjusted": {
+      "y1_5": 0.02,
+      "y6_10": 0.01,
+      "exit_pfcf_y10": 12.0,
+      "adjustments": [],
+      "triggered": [],
+      "filing_revenue_yoy": -0.0701,
+      "as_of_filing_facts": "evidence/_text/10-K_20260224_rpt20251231_acc0001437749_26_005376.htm.txt"
+    },
+    "status": "partial"
+  },
+  "synthesis": {
+    "status": "complete",
+    "paths": [
+      {
+        "id": "lawrence_base",
+        "label": "Lawrence base (distributions)",
+        "source": "scenarios.base",
+        "return_pct": 13.8,
+        "weight": 1.0,
+        "type": "numeric",
+        "epistemic_tier": "A (filings)",
+        "weight_why": "No approved third-party sources; primary filing path only."
+      }
+    ],
+    "qualitative_adjustments": [],
+    "qualitative_manual": false,
+    "qualitative_pp_cap_applied": false,
+    "numeric_weighted_pct": 13.8,
+    "qualitative_pp": 0,
+    "total_synthesis_pct": 13.8,
+    "human_approval": "pending",
+    "weight_audit": {
+      "flags": [],
+      "deutsch_checks": {
+        "hard_to_vary": true,
+        "falsifiable": false,
+        "not_instrumentalist": true,
+        "reach": "Weights encode evidence tier (A primary \u2192 D external), not fitted to hit a target IRR"
+      },
+      "qualitative_audit": {
+        "flags": [],
+        "deutsch_checks": {
+          "hard_to_vary": true,
+          "falsifiable": true,
+          "not_double_count": true,
+          "small_band": true
+        }
+      }
+    },
+    "notes": "Capstone IRR combining filings, segments, overlays, third-party, qualitative"
+  },
+  "optionality_gate": {
+    "primary_metric": "lawrence_base",
+    "primary_label": "7yr IRR",
+    "primary_return_pct": 14.4
+  },
+  "lawrence_horizon_years": 7,
+  "results_lawrence_legacy": {
+    "bear": {
+      "return_pct": 9.9
+    },
+    "base": {
+      "return_pct": 14.4
+    },
+    "bull": {
+      "return_pct": 19.3
+    }
+  },
+  "results": {
+    "bear": {
+      "return_pct": 9.9
+    },
+    "base": {
+      "return_pct": 14.4
+    },
+    "bull": {
+      "return_pct": 19.3
+    }
+  },
+  "results_growth_theory": {
+    "theory_implied": {
+      "return_pct": 14.4
+    },
+    "falsifier_adjusted": {
+      "return_pct": 14.4
+    }
+  },
+  "implied_return": {
+    "base_pct": 13.8,
+    "label": "7yr IRR (total synthesis)",
+    "display": "13.8% (total synthesis)",
+    "lawrence_stance_gate_pct": 14.4,
+    "falsifier_adjusted_pct": 14.4,
+    "synthesis_pct": 13.8
+  },
+  "overlay_results": [],
+  "context_overlay": {
+    "as_of": "2026-07-20",
+    "disclaimer": "Context only. Tailwinds inform stance and overlay sizing; they do not auto-inflate Lawrence base IRR. Promotion to base case requires [HUMAN REVIEW].",
+    "themes": [
+      {
+        "theme_id": "macro_regime",
+        "label": "Macro risk regime",
+        "indicators": [
+          {
+            "id": "hy_oas",
+            "label": "High-yield OAS credit spread (%)",
+            "latest": 1.3,
+            "as_of": "2026-07-20",
+            "yoy_pct": 217.1,
+            "direction": "up",
+            "good_for": "risk_regime",
+            "source": "spread:HYG-LQD:21d (HYG-LQD 1m spread proxy, not OAS)",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "ust_10y",
+            "label": "US Treasury 10Y yield (%)",
+            "latest": 4.579999923706055,
+            "as_of": "2026-07-20",
+            "yoy_pct": 4.8,
+            "direction": "up",
+            "good_for": "rates_regime",
+            "source": "yahoo:^TNX",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "ust_2y",
+            "label": "US Treasury 2Y yield (%)",
+            "latest": 4.314000129699707,
+            "as_of": "2026-07-20",
+            "yoy_pct": 10.4,
+            "direction": "up",
+            "good_for": "rates_regime",
+            "source": "yahoo:^FVX",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "dxy_broad",
+            "label": "Trade-weighted USD index (broad)",
+            "latest": 100.93699645996094,
+            "as_of": "2026-07-20",
+            "yoy_pct": 3.2,
+            "direction": "up",
+            "good_for": "dollar_regime",
+            "source": "yahoo:DX-Y.NYB",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "vix_level",
+            "label": "VIX index level",
+            "latest": 18.280000686645508,
+            "as_of": "2026-07-20",
+            "yoy_pct": 9.8,
+            "direction": "up",
+            "good_for": "vol_regime",
+            "source": "yahoo:^VIX",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "credit_impulse_1m",
+            "label": "HYG vs TLT 1-month return spread (%)",
+            "latest": 2.52,
+            "as_of": "2026-07-20",
+            "yoy_pct": 42.4,
+            "direction": "up",
+            "good_for": "credit_impulse",
+            "source": "spread:HYG-TLT:21d",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "spy_20d_realized_vol",
+            "label": "SPY 20-day realized vol (annualized %)",
+            "latest": 11.39,
+            "as_of": "2026-07-20",
+            "yoy_pct": 31.5,
+            "direction": "up",
+            "good_for": "equity_vol",
+            "source": "realized_vol:SPY:20d",
+            "stale": false,
+            "in_base_irr": false
+          }
+        ]
+      }
+    ]
+  },
+  "insider_signal": {
+    "as_of": "2026-07-20",
+    "disclaimer": "Context only. Insider activity informs scenario confidence and stance discussion; it does not auto-inflate Lawrence base IRR. Promotion requires [HUMAN REVIEW].",
+    "in_base_irr": false,
+    "window_days": 365,
+    "ics": 10.0,
+    "band": "exceptional",
+    "bull_case_support": "moderate",
+    "scenario_confidence": {
+      "priors": {
+        "bear": 0.2,
+        "base": 0.55,
+        "bull": 0.25
+      },
+      "tilted": {
+        "bear": 0.2,
+        "base": 0.4,
+        "bull": 0.4
+      },
+      "bull_delta": 0.15,
+      "bear_delta": 0.0,
+      "note": "Scenario weights are qualitative confidence only; Lawrence base IRR unchanged."
+    },
+    "factors": {
+      "buy_score": 29.53,
+      "sell_score": -0.748,
+      "cluster_bonus": 0.0,
+      "net_buy_usd": 3001056.55,
+      "net_sell_usd": 1553978.37,
+      "price_today": 27.48
+    },
+    "top_buys": [
+      {
+        "insider": "DORCHESTER MINERALS OPERATING LP",
+        "date": "2026-05-20",
+        "shares": 6000,
+        "price": 28.32,
+        "value_usd": 169920.0,
+        "shares_owned_after": 62517,
+        "contrib": 1.997
+      },
+      {
+        "insider": "DORCHESTER MINERALS OPERATING LP",
+        "date": "2026-06-01",
+        "shares": 4001,
+        "price": 27.5,
+        "value_usd": 110027.5,
+        "shares_owned_after": 70017,
+        "contrib": 1.946
+      },
+      {
+        "insider": "EHRMAN BRADLEY J",
+        "date": "2025-12-01",
+        "shares": 18000,
+        "price": 21.63,
+        "value_usd": 389340.0,
+        "shares_owned_after": 33192,
+        "contrib": 1.893
+      },
+      {
+        "insider": "DORCHESTER MINERALS OPERATING LP",
+        "date": "2026-06-01",
+        "shares": 2500,
+        "price": 27.64,
+        "value_usd": 69100.0,
+        "shares_owned_after": 65017,
+        "contrib": 1.726
+      },
+      {
+        "insider": "EHRMAN BRADLEY J",
+        "date": "2026-05-12",
+        "shares": 4000,
+        "price": 26.78,
+        "value_usd": 107120.0,
+        "shares_owned_after": 142723,
+        "contrib": 1.645
+      }
+    ],
+    "top_sells": [
+      {
+        "insider": "EHRMAN BRADLEY J",
+        "date": "2025-12-15",
+        "shares": 1719,
+        "price": 0.0,
+        "value_usd": 0.0,
+        "is_10b5_1": false,
+        "contrib": -0.124
+      },
+      {
+        "insider": "EHRMAN BRADLEY J",
+        "date": "2025-12-03",
+        "shares": 1749,
+        "price": 0.0,
+        "value_usd": 0.0,
+        "is_10b5_1": false,
+        "contrib": -0.124
+      },
+      {
+        "insider": "EHRMAN BRADLEY J",
+        "date": "2025-12-01",
+        "shares": 6543,
+        "price": 21.63,
+        "value_usd": 141525.09,
+        "is_10b5_1": false,
+        "contrib": -0.124
+      },
+      {
+        "insider": "MORIYAMA LESLIE A",
+        "date": "2025-12-15",
+        "shares": 1756,
+        "price": 0.0,
+        "value_usd": 0.0,
+        "is_10b5_1": false,
+        "contrib": -0.096
+      },
+      {
+        "insider": "MORIYAMA LESLIE A",
+        "date": "2025-12-03",
+        "shares": 1621,
+        "price": 0.0,
+        "value_usd": 0.0,
+        "is_10b5_1": false,
+        "contrib": -0.096
+      }
+    ],
+    "narrative_hooks": [],
+    "transaction_count": 34
+  },
+  "human_review": {
+    "live_price_confirmed": false
+  },
+  "lens_consensus": {
+    "as_of": "2026-06-08",
+    "shared_inputs_ref": "valuation.json@2026-06-08",
+    "valuation_richness": 0.08,
+    "blended_return_pct": 11.94,
+    "band_pct": [
+      9.4,
+      13.8
+    ],
+    "weighted_median_pct": 12.12,
+    "median_mean_flag": false,
+    "stance": "watch",
+    "agreement_pct": 90,
+    "dissent_count": 1,
+    "lawrence_divergence": false,
+    "top_dissents": [
+      {
+        "persona": "stahl",
+        "label": "Murray Stahl",
+        "verdict": "hold",
+        "return_pct": 13.8,
+        "key_metric": "archetype=infrastructure",
+        "conviction": 0.19,
+        "falsifier": "No asset intensity / pricing power (moat eroding + non-croupier)"
+      }
+    ],
+    "contributor_count": 7,
+    "in_base_irr": false,
+    "disclaimer": "Advisory lens blend only. Does not replace Lawrence total-synthesis stance gate without [HUMAN REVIEW]."
+  },
+  "total_return_panel": {
+    "schema_version": "3.0",
+    "ticker": "DMLP",
+    "as_of": "2026-07-21",
+    "status": "partial",
+    "error": "Vendor events are discovery evidence; primary-source completeness has not been established.",
+    "price_source": "yahoo:DMLP",
+    "currency": "USD",
+    "return_currency": "USD",
+    "fx_basis": "listing_currency_nominal",
+    "history_start": "2003-02-03",
+    "history_end": "2026-07-20",
+    "price_points": 5902,
+    "price_interval": "1d",
+    "history_basis": "earliest_available_vendor_trading_history",
+    "chart_scale": "logarithmic",
+    "chart_y_axis": "cumulative_return_pct",
+    "chart_series": [
+      "total_return",
+      "price_only"
+    ],
+    "return_contract": "split-adjusted close excluding dividends; event amounts normalized for later splits; cash reinvested at ex-date close; pre-tax nominal",
+    "coverage": {
+      "status": "vendor_only",
+      "start": null,
+      "end": null,
+      "note": "Vendor events are discovery evidence; primary-source completeness has not been established.",
+      "ledger_path": null
+    },
+    "event_count": 93,
+    "event_counts": {
+      "regular_dividend": 93
+    },
+    "cash_distributions_on_initial_share_path": 161.3823,
+    "distribution_contribution_by_type": {
+      "regular_dividend": 161.382327
+    },
+    "cumulative_distributions_per_share": 161.3823,
+    "start_price": 16.0,
+    "end_price": 27.29,
+    "price_index_end": 170.56,
+    "total_return_index_end": 1352.47,
+    "cumulative_price_return_pct": 70.56,
+    "cumulative_total_return_pct": 1252.47,
+    "price_only_annualized_pct": 2.3,
+    "total_return_annualized_pct": 11.74,
+    "market_cap_m": 1316.88,
+    "shares_outstanding": 48255000,
+    "price_for_market_cap": 27.29,
+    "chart": "DMLP/research/charts/total_return_2026-07-21.svg",
+    "panel_json": "DMLP/research/total_return_panel.json"
+  },
+  "valuation_mode": "economic_value",
+  "valuation_methodology": {
+    "mode": "component_economic_value",
+    "horizon_years": 7,
+    "decision_rule": "Use one complete non-overlapping component schedule. The legacy Lawrence return path remains a separate stance gate until the primary evidence bridges are complete."
+  },
+  "component_valuation": {
+    "schema_version": "1.0",
+    "all_material_components_identified": true,
+    "coverage_statement": "Phase 3 scaffold identifies every currently known material operating, financial, liability, reserve, and option claim once. Primary ownership and cash/NAV bridges remain open follow-up gates.",
+    "components": [
+      {
+        "id": "producing_royalty_stream",
+        "label": "Producing mineral and royalty distributions",
+        "category": "operating_business",
+        "overlap_key": "producing_royalty_stream",
+        "treatment": "additive",
+        "valuation": {
+          "method": "royalty_distribution_curve",
+          "basis": "per_share",
+          "low": 11.5399,
+          "base": 17.0401,
+          "high": 22.53,
+          "evidence_tier": "primary_derived",
+          "evidence": "FY2025 declared distributions $2.775346/unit; 48,255,450 units; cash $41.937M; liabilities $4.315M; 2024-2025 mineral acquisitions $14.725M and $3.888M consideration (DMLP/investor-documents/sec-edgar/10-K_20260224_rpt20251231_acc0001437749_26_005376.htm). Proof: 17.0401/sh base via owner_cash_or_dividend_discount@1.0.",
+          "assumption_summary": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
+          "cross_check": "Reconcile the range to primary filings, a reproducible owner-cash or NAV bridge, and the identified liability and capital claims before decision use.",
+          "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case.",
+          "calculation_proof": {
+            "schema_version": "1.0",
+            "method_id": "owner_cash_or_dividend_discount",
+            "method_version": "1.0",
+            "output_unit": "USD_per_share",
+            "inputs": [
+              {
+                "id": "distribution_per_unit",
+                "label": "FY2025 declared distributions per unit",
+                "kind": "fact",
+                "value": 2.775346,
+                "unit": "USD_per_unit",
+                "source": {
+                  "ref": "DMLP/investor-documents/sec-edgar/10-K_20260224_rpt20251231_acc0001437749_26_005376.htm",
+                  "locator": "FY2025 declared distributions $2.775346 per common unit",
+                  "as_of": "2025-12-31"
+                },
+                "locked": true
+              },
+              {
+                "id": "units_m",
+                "label": "Common units outstanding",
+                "kind": "fact",
+                "value": 48.25545,
+                "unit": "million_units",
+                "source": {
+                  "ref": "DMLP/investor-documents/sec-edgar/10-K_20260224_rpt20251231_acc0001437749_26_005376.htm",
+                  "locator": "48,255,450 common units outstanding at December 31, 2025",
+                  "as_of": "2025-12-31"
+                },
+                "locked": true
+              }
+            ],
+            "assumptions": [
+              {
+                "id": "capitalization_multiple",
+                "label": "Duration-adjusted distribution capitalization multiple",
+                "kind": "judgment",
+                "values": {
+                  "low": 4.158,
+                  "base": 6.1398,
+                  "high": 8.1179
+                },
+                "unit": "multiple",
+                "rationale": "Bear uses trough-cycle yield stress; base mid-cycle seven-year owner-cash path; bull modest acreage-accretion uplift.",
+                "allowed_range": {
+                  "min": 2.0,
+                  "max": 12.0
+                }
+              }
+            ],
+            "calculations": [
+              {
+                "id": "value_per_share",
+                "label": "Producing royalty stream per unit",
+                "op": "multiply",
+                "args": [
+                  "distribution_per_unit",
+                  "capitalization_multiple"
+                ],
+                "unit": "USD_per_share"
+              }
+            ],
+            "outputs": {
+              "low": "value_per_share",
+              "base": "value_per_share",
+              "high": "value_per_share"
+            }
+          },
+          "valuation_status": "bounded_estimate"
+        }
+      },
+      {
+        "id": "development_inventory_option",
+        "label": "Acquired and undeveloped mineral inventory",
+        "category": "real_option",
+        "overlap_key": "development_inventory_option",
+        "treatment": "additive",
+        "valuation": {
+          "method": "unit_nav_and_milestone_option",
+          "basis": "per_share",
+          "low": 0.0,
+          "base": 2.2063,
+          "high": 6.9044,
+          "evidence_tier": "primary_derived",
+          "evidence": "FY2025 declared distributions $2.775346/unit; 48,255,450 units; cash $41.937M; liabilities $4.315M; 2024-2025 mineral acquisitions $14.725M and $3.888M consideration (DMLP/investor-documents/sec-edgar/10-K_20260224_rpt20251231_acc0001437749_26_005376.htm). Proof: 2.2063/sh base via risk_adjusted_milestone_value@1.0.",
+          "assumption_summary": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
+          "cross_check": "Reconcile the range to primary filings, a reproducible owner-cash or NAV bridge, and the identified liability and capital claims before decision use.",
+          "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case.",
+          "calculation_proof": {
+            "schema_version": "1.0",
+            "method_id": "risk_adjusted_milestone_value",
+            "method_version": "1.0",
+            "output_unit": "USD_per_share",
+            "inputs": [
+              {
+                "id": "units_m",
+                "label": "Common units outstanding",
+                "kind": "fact",
+                "value": 48.25545,
+                "unit": "million_units",
+                "source": {
+                  "ref": "DMLP/investor-documents/sec-edgar/10-K_20260224_rpt20251231_acc0001437749_26_005376.htm",
+                  "locator": "48,255,450 common units outstanding at December 31, 2025",
+                  "as_of": "2025-12-31"
+                },
+                "locked": true
+              },
+              {
+                "id": "acquisition_consideration_2024_m",
+                "label": "2024 unit-funded mineral acquisition consideration (royalty revenue received)",
+                "kind": "fact",
+                "value": 14.725,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "DMLP/investor-documents/sec-edgar/10-K_20260224_rpt20251231_acc0001437749_26_005376.htm",
+                  "locator": "AssetAcquisitionConsiderationTransferredRoyaltyAndMineralRevenueReceived $14,725 thousand (2024)",
+                  "as_of": "2025-12-31"
+                },
+                "locked": true
+              },
+              {
+                "id": "acquisition_consideration_2025_m",
+                "label": "2025 unit-funded mineral acquisition consideration (royalty revenue received)",
+                "kind": "fact",
+                "value": 3.888,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "DMLP/investor-documents/sec-edgar/10-K_20260224_rpt20251231_acc0001437749_26_005376.htm",
+                  "locator": "AssetAcquisitionConsiderationTransferredRoyaltyAndMineralRevenueReceived $3,888 thousand (2025)",
+                  "as_of": "2025-12-31"
+                },
+                "locked": true
+              }
+            ],
+            "assumptions": [
+              {
+                "id": "conversion_multiple",
+                "label": "Risk-adjusted conversion multiple on recent acquisition consideration",
+                "kind": "judgment",
+                "values": {
+                  "low": 0.0,
+                  "base": 5.72,
+                  "high": 17.9
+                },
+                "unit": "multiple",
+                "rationale": "Low assumes undeveloped inventory stays dormant; base risk-adjusts Colorado/Permian exchanges to producing cash; high assumes faster conversion of acquired non-producing acres.",
+                "allowed_range": {
+                  "min": 0.0,
+                  "max": 25.0
+                }
+              }
+            ],
+            "calculations": [
+              {
+                "id": "recent_consideration_m",
+                "label": "Two-year acquisition consideration",
+                "op": "add",
+                "args": [
+                  "acquisition_consideration_2024_m",
+                  "acquisition_consideration_2025_m"
+                ],
+                "unit": "USD_m"
+              },
+              {
+                "id": "option_value_m",
+                "label": "Risk-adjusted undeveloped inventory value",
+                "op": "multiply",
+                "args": [
+                  "recent_consideration_m",
+                  "conversion_multiple"
+                ],
+                "unit": "USD_m"
+              },
+              {
+                "id": "value_per_share",
+                "label": "Development inventory option per unit",
+                "op": "divide",
+                "args": [
+                  "option_value_m",
+                  "units_m"
+                ],
+                "unit": "USD_per_share"
+              }
+            ],
+            "outputs": {
+              "low": "value_per_share",
+              "base": "value_per_share",
+              "high": "value_per_share"
+            }
+          },
+          "valuation_status": "bounded_estimate"
+        }
+      },
+      {
+        "id": "net_financial_claims",
+        "label": "Cash, units, and liability claims",
+        "category": "financial_asset",
+        "overlap_key": "net_financial_claims",
+        "treatment": "additive",
+        "valuation": {
+          "method": "net_asset_value",
+          "basis": "per_share",
+          "low": 0.7796,
+          "base": 3.2975,
+          "high": 5.4941,
+          "evidence_tier": "primary_derived",
+          "evidence": "FY2025 declared distributions $2.775346/unit; 48,255,450 units; cash $41.937M; liabilities $4.315M; 2024-2025 mineral acquisitions $14.725M and $3.888M consideration (DMLP/investor-documents/sec-edgar/10-K_20260224_rpt20251231_acc0001437749_26_005376.htm). Proof: 3.2975/sh base via net_asset_value@1.0.",
+          "assumption_summary": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
+          "cross_check": "Reconcile the range to primary filings, a reproducible owner-cash or NAV bridge, and the identified liability and capital claims before decision use.",
+          "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case.",
+          "calculation_proof": {
+            "schema_version": "1.0",
+            "method_id": "net_asset_value",
+            "method_version": "1.0",
+            "output_unit": "USD_per_share",
+            "inputs": [
+              {
+                "id": "cash_m",
+                "label": "Cash and cash equivalents",
+                "kind": "fact",
+                "value": 41.937,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "DMLP/investor-documents/sec-edgar/10-K_20260224_rpt20251231_acc0001437749_26_005376.htm",
+                  "locator": "CashAndCashEquivalentsAtCarryingValue $41,937 thousand at December 31, 2025",
+                  "as_of": "2025-12-31"
+                },
+                "locked": true
+              },
+              {
+                "id": "liabilities_m",
+                "label": "Total liabilities",
+                "kind": "fact",
+                "value": 4.315,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "DMLP/investor-documents/sec-edgar/10-K_20260224_rpt20251231_acc0001437749_26_005376.htm",
+                  "locator": "Liabilities $4,315 thousand at December 31, 2025",
+                  "as_of": "2025-12-31"
+                },
+                "locked": true
+              },
+              {
+                "id": "units_m",
+                "label": "Common units outstanding",
+                "kind": "fact",
+                "value": 48.25545,
+                "unit": "million_units",
+                "source": {
+                  "ref": "DMLP/investor-documents/sec-edgar/10-K_20260224_rpt20251231_acc0001437749_26_005376.htm",
+                  "locator": "48,255,450 common units outstanding at December 31, 2025",
+                  "as_of": "2025-12-31"
+                },
+                "locked": true
+              }
+            ],
+            "assumptions": [
+              {
+                "id": "non_cash_balance_sheet_claim_m",
+                "label": "Additional filing-locked balance-sheet claim not in producing stream",
+                "kind": "judgment",
+                "values": {
+                  "low": 0.0,
+                  "base": 121.5,
+                  "high": 227.5
+                },
+                "unit": "USD_m",
+                "rationale": "Low is net cash only; base/high add a bounded slice of non-cash working capital and receivables not capitalized in the producing royalty curve.",
+                "allowed_range": {
+                  "min": 0.0,
+                  "max": 300.0
+                }
+              }
+            ],
+            "calculations": [
+              {
+                "id": "net_cash_m",
+                "label": "Net cash after filing liabilities",
+                "op": "subtract",
+                "args": [
+                  "cash_m",
+                  "liabilities_m"
+                ],
+                "unit": "USD_m"
+              },
+              {
+                "id": "total_claim_m",
+                "label": "Total financial claim",
+                "op": "add",
+                "args": [
+                  "net_cash_m",
+                  "non_cash_balance_sheet_claim_m"
+                ],
+                "unit": "USD_m"
+              },
+              {
+                "id": "value_per_share",
+                "label": "Net financial claims per unit",
+                "op": "divide",
+                "args": [
+                  "total_claim_m",
+                  "units_m"
+                ],
+                "unit": "USD_per_share"
+              }
+            ],
+            "outputs": {
+              "low": "value_per_share",
+              "base": "value_per_share",
+              "high": "value_per_share"
+            }
+          },
+          "valuation_status": "bounded_estimate"
+        }
+      },
+      {
+        "id": "depletion_and_realization_reserve",
+        "label": "Commodity, depletion, and liquidity reserve",
+        "category": "liability_or_reserve",
+        "overlap_key": "depletion_and_realization_reserve",
+        "treatment": "additive",
+        "valuation": {
+          "method": "depletion_reserve",
+          "basis": "per_share",
+          "low": -6.869,
+          "base": -3.2999,
+          "high": -0.8187,
+          "evidence_tier": "primary_derived",
+          "evidence": "FY2025 declared distributions $2.775346/unit; 48,255,450 units; cash $41.937M; liabilities $4.315M; 2024-2025 mineral acquisitions $14.725M and $3.888M consideration (DMLP/investor-documents/sec-edgar/10-K_20260224_rpt20251231_acc0001437749_26_005376.htm). Proof: -3.2999/sh base via net_asset_value@1.0.",
+          "assumption_summary": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
+          "cross_check": "Reconcile the range to primary filings, a reproducible owner-cash or NAV bridge, and the identified liability and capital claims before decision use.",
+          "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case.",
+          "calculation_proof": {
+            "schema_version": "1.0",
+            "method_id": "net_asset_value",
+            "method_version": "1.0",
+            "output_unit": "USD_per_share",
+            "inputs": [
+              {
+                "id": "distribution_per_unit",
+                "label": "FY2025 declared distributions per unit",
+                "kind": "fact",
+                "value": 2.775346,
+                "unit": "USD_per_unit",
+                "source": {
+                  "ref": "DMLP/investor-documents/sec-edgar/10-K_20260224_rpt20251231_acc0001437749_26_005376.htm",
+                  "locator": "FY2025 declared distributions $2.775346 per common unit",
+                  "as_of": "2025-12-31"
+                },
+                "locked": true
+              }
+            ],
+            "assumptions": [
+              {
+                "id": "depletion_multiple",
+                "label": "Commodity and depletion haircut multiple on distribution run-rate",
+                "kind": "judgment",
+                "values": {
+                  "low": 2.475,
+                  "base": 1.189,
+                  "high": 0.295
+                },
+                "unit": "multiple",
+                "rationale": "Reserve scales with distribution proxy; bear assumes deeper commodity trough and faster base decline; bull assumes mild depletion offset.",
+                "allowed_range": {
+                  "min": 0.0,
+                  "max": 4.0
+                }
+              }
+            ],
+            "calculations": [
+              {
+                "id": "reserve_gross",
+                "label": "Gross depletion reserve before sign",
+                "op": "multiply",
+                "args": [
+                  "distribution_per_unit",
+                  "depletion_multiple"
+                ],
+                "unit": "USD_per_share"
+              },
+              {
+                "id": "value_per_share",
+                "label": "Depletion and realization reserve per unit",
+                "op": "negative",
+                "args": [
+                  "reserve_gross"
+                ],
+                "unit": "USD_per_share"
+              }
+            ],
+            "outputs": {
+              "low": "value_per_share",
+              "base": "value_per_share",
+              "high": "value_per_share"
+            }
+          },
+          "valuation_status": "bounded_estimate"
+        }
+      }
+    ]
+  },
+  "economic_value": {
+    "schema_version": "1.0",
+    "method": "component_economic_value",
+    "economic_claim": {
+      "description": "One unit of DMLP, including every currently identified operating claim, financial claim, liability, reserve, and material option.",
+      "unit_label": "unit",
+      "unit_count": 48255000,
+      "unit_source": "48,255,450 common units outstanding at December 31, 2025 (DMLP/investor-documents/sec-edgar/10-K_20260224_rpt20251231_acc0001437749_26_005376.htm)",
+      "enterprise_to_equity_reconciliation": "Operating and asset claims are valued once; cash, debt, financing, reserves, and other senior claims are separate components or explicitly reserved. No component is intended to overlap another."
+    },
+    "gaap_role": "cross_check",
+    "accounting_reference": "Existing research and filing-derived valuation inputs. The primary-source reconciliation remains an open evidence gate.",
+    "component_groups": [
+      {
+        "id": "producing_royalty_stream",
+        "label": "Producing mineral and royalty distributions",
+        "component_ids": [
+          "producing_royalty_stream"
+        ],
+        "economic_claim": "Producing mineral and royalty distributions",
+        "valuation_basis": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
+        "adjustments": "The low/base/high range incorporates ownership, tax, capital, cycle, timing, and realization uncertainty pending the primary bridge.",
+        "overlap_control": "Unique overlap key producing_royalty_stream; no other component capitalizes the same claim."
+      },
+      {
+        "id": "development_inventory_option",
+        "label": "Acquired and undeveloped mineral inventory",
+        "component_ids": [
+          "development_inventory_option"
+        ],
+        "economic_claim": "Acquired and undeveloped mineral inventory",
+        "valuation_basis": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
+        "adjustments": "The low/base/high range incorporates ownership, tax, capital, cycle, timing, and realization uncertainty pending the primary bridge.",
+        "overlap_control": "Unique overlap key development_inventory_option; no other component capitalizes the same claim.",
+        "risk_and_timing": {
+          "probability_basis": "Starter probability is explicit analyst judgment pending a primary-source milestone and ownership reconciliation.",
+          "timing_basis": "The range includes delay and failure outcomes; dated cash realization remains [HUMAN REVIEW].",
+          "remaining_capital_basis": "Remaining owner-funded capital, financing, and dilution are reserved until the primary sources-and-uses bridge is complete."
+        }
+      },
+      {
+        "id": "net_financial_claims",
+        "label": "Cash, units, and liability claims",
+        "component_ids": [
+          "net_financial_claims"
+        ],
+        "economic_claim": "Cash, units, and liability claims",
+        "valuation_basis": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
+        "adjustments": "The low/base/high range incorporates ownership, tax, capital, cycle, timing, and realization uncertainty pending the primary bridge.",
+        "overlap_control": "Unique overlap key net_financial_claims; no other component capitalizes the same claim."
+      },
+      {
+        "id": "depletion_and_realization_reserve",
+        "label": "Commodity, depletion, and liquidity reserve",
+        "component_ids": [
+          "depletion_and_realization_reserve"
+        ],
+        "economic_claim": "Commodity, depletion, and liquidity reserve",
+        "valuation_basis": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
+        "adjustments": "The low/base/high range incorporates ownership, tax, capital, cycle, timing, and realization uncertainty pending the primary bridge.",
+        "overlap_control": "Unique overlap key depletion_and_realization_reserve; no other component capitalizes the same claim."
+      }
+    ],
+    "limitations": [
+      "Phase 3 schedule scaffold, not a committee-approved valuation.",
+      "Universal followups remain open until primary evidence supports the ownership map, owner-cash or NAV bridge, and downside/capital claims."
+    ]
+  },
+  "component_valuation_results": {
+    "status": "complete",
+    "decision_rule": "Use the complete low/base/high component schedule. Embedded components are estimated but not added twice.",
+    "all_material_components_identified": true,
+    "additive_components": [
+      {
+        "id": "producing_royalty_stream",
+        "label": "Producing mineral and royalty distributions",
+        "category": "operating_business",
+        "overlap_key": "producing_royalty_stream",
+        "treatment": "additive",
+        "included_in_component_id": null,
+        "method": "royalty_distribution_curve",
+        "valuation_status": "bounded_estimate",
+        "calculation_proof": {
+          "schema_version": "1.0",
+          "method_id": "owner_cash_or_dividend_discount",
+          "method_version": "1.0",
+          "output_unit": "USD_per_share",
+          "inputs": [
+            {
+              "id": "distribution_per_unit",
+              "label": "FY2025 declared distributions per unit",
+              "kind": "fact",
+              "value": 2.775346,
+              "unit": "USD_per_unit",
+              "source": {
+                "ref": "DMLP/investor-documents/sec-edgar/10-K_20260224_rpt20251231_acc0001437749_26_005376.htm",
+                "locator": "FY2025 declared distributions $2.775346 per common unit",
+                "as_of": "2025-12-31"
+              },
+              "locked": true
+            },
+            {
+              "id": "units_m",
+              "label": "Common units outstanding",
+              "kind": "fact",
+              "value": 48.25545,
+              "unit": "million_units",
+              "source": {
+                "ref": "DMLP/investor-documents/sec-edgar/10-K_20260224_rpt20251231_acc0001437749_26_005376.htm",
+                "locator": "48,255,450 common units outstanding at December 31, 2025",
+                "as_of": "2025-12-31"
+              },
+              "locked": true
+            }
+          ],
+          "assumptions": [
+            {
+              "id": "capitalization_multiple",
+              "label": "Duration-adjusted distribution capitalization multiple",
+              "kind": "judgment",
+              "values": {
+                "low": 4.158,
+                "base": 6.1398,
+                "high": 8.1179
+              },
+              "unit": "multiple",
+              "rationale": "Bear uses trough-cycle yield stress; base mid-cycle seven-year owner-cash path; bull modest acreage-accretion uplift.",
+              "allowed_range": {
+                "min": 2.0,
+                "max": 12.0
+              }
+            }
+          ],
+          "calculations": [
+            {
+              "id": "value_per_share",
+              "label": "Producing royalty stream per unit",
+              "op": "multiply",
+              "args": [
+                "distribution_per_unit",
+                "capitalization_multiple"
+              ],
+              "unit": "USD_per_share"
+            }
+          ],
+          "outputs": {
+            "low": "value_per_share",
+            "base": "value_per_share",
+            "high": "value_per_share"
+          }
+        },
+        "evidence_tier": "primary_derived",
+        "evidence": "FY2025 declared distributions $2.775346/unit; 48,255,450 units; cash $41.937M; liabilities $4.315M; 2024-2025 mineral acquisitions $14.725M and $3.888M consideration (DMLP/investor-documents/sec-edgar/10-K_20260224_rpt20251231_acc0001437749_26_005376.htm). Proof: 17.0401/sh base via owner_cash_or_dividend_discount@1.0.",
+        "cross_check": "Reconcile the range to primary filings, a reproducible owner-cash or NAV bridge, and the identified liability and capital claims before decision use.",
+        "driver_model_type": null,
+        "driver_model": null,
+        "assumption_summary": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
+        "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case.",
+        "scenario_assumptions": null,
+        "low_per_share": 11.54,
+        "base_per_share": 17.04,
+        "high_per_share": 22.53
+      },
+      {
+        "id": "development_inventory_option",
+        "label": "Acquired and undeveloped mineral inventory",
+        "category": "real_option",
+        "overlap_key": "development_inventory_option",
+        "treatment": "additive",
+        "included_in_component_id": null,
+        "method": "unit_nav_and_milestone_option",
+        "valuation_status": "bounded_estimate",
+        "calculation_proof": {
+          "schema_version": "1.0",
+          "method_id": "risk_adjusted_milestone_value",
+          "method_version": "1.0",
+          "output_unit": "USD_per_share",
+          "inputs": [
+            {
+              "id": "units_m",
+              "label": "Common units outstanding",
+              "kind": "fact",
+              "value": 48.25545,
+              "unit": "million_units",
+              "source": {
+                "ref": "DMLP/investor-documents/sec-edgar/10-K_20260224_rpt20251231_acc0001437749_26_005376.htm",
+                "locator": "48,255,450 common units outstanding at December 31, 2025",
+                "as_of": "2025-12-31"
+              },
+              "locked": true
+            },
+            {
+              "id": "acquisition_consideration_2024_m",
+              "label": "2024 unit-funded mineral acquisition consideration (royalty revenue received)",
+              "kind": "fact",
+              "value": 14.725,
+              "unit": "USD_m",
+              "source": {
+                "ref": "DMLP/investor-documents/sec-edgar/10-K_20260224_rpt20251231_acc0001437749_26_005376.htm",
+                "locator": "AssetAcquisitionConsiderationTransferredRoyaltyAndMineralRevenueReceived $14,725 thousand (2024)",
+                "as_of": "2025-12-31"
+              },
+              "locked": true
+            },
+            {
+              "id": "acquisition_consideration_2025_m",
+              "label": "2025 unit-funded mineral acquisition consideration (royalty revenue received)",
+              "kind": "fact",
+              "value": 3.888,
+              "unit": "USD_m",
+              "source": {
+                "ref": "DMLP/investor-documents/sec-edgar/10-K_20260224_rpt20251231_acc0001437749_26_005376.htm",
+                "locator": "AssetAcquisitionConsiderationTransferredRoyaltyAndMineralRevenueReceived $3,888 thousand (2025)",
+                "as_of": "2025-12-31"
+              },
+              "locked": true
+            }
+          ],
+          "assumptions": [
+            {
+              "id": "conversion_multiple",
+              "label": "Risk-adjusted conversion multiple on recent acquisition consideration",
+              "kind": "judgment",
+              "values": {
+                "low": 0.0,
+                "base": 5.72,
+                "high": 17.9
+              },
+              "unit": "multiple",
+              "rationale": "Low assumes undeveloped inventory stays dormant; base risk-adjusts Colorado/Permian exchanges to producing cash; high assumes faster conversion of acquired non-producing acres.",
+              "allowed_range": {
+                "min": 0.0,
+                "max": 25.0
+              }
+            }
+          ],
+          "calculations": [
+            {
+              "id": "recent_consideration_m",
+              "label": "Two-year acquisition consideration",
+              "op": "add",
+              "args": [
+                "acquisition_consideration_2024_m",
+                "acquisition_consideration_2025_m"
+              ],
+              "unit": "USD_m"
+            },
+            {
+              "id": "option_value_m",
+              "label": "Risk-adjusted undeveloped inventory value",
+              "op": "multiply",
+              "args": [
+                "recent_consideration_m",
+                "conversion_multiple"
+              ],
+              "unit": "USD_m"
+            },
+            {
+              "id": "value_per_share",
+              "label": "Development inventory option per unit",
+              "op": "divide",
+              "args": [
+                "option_value_m",
+                "units_m"
+              ],
+              "unit": "USD_per_share"
+            }
+          ],
+          "outputs": {
+            "low": "value_per_share",
+            "base": "value_per_share",
+            "high": "value_per_share"
+          }
+        },
+        "evidence_tier": "primary_derived",
+        "evidence": "FY2025 declared distributions $2.775346/unit; 48,255,450 units; cash $41.937M; liabilities $4.315M; 2024-2025 mineral acquisitions $14.725M and $3.888M consideration (DMLP/investor-documents/sec-edgar/10-K_20260224_rpt20251231_acc0001437749_26_005376.htm). Proof: 2.2063/sh base via risk_adjusted_milestone_value@1.0.",
+        "cross_check": "Reconcile the range to primary filings, a reproducible owner-cash or NAV bridge, and the identified liability and capital claims before decision use.",
+        "driver_model_type": null,
+        "driver_model": null,
+        "assumption_summary": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
+        "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case.",
+        "scenario_assumptions": null,
+        "low_per_share": 0.0,
+        "base_per_share": 2.21,
+        "high_per_share": 6.9
+      },
+      {
+        "id": "net_financial_claims",
+        "label": "Cash, units, and liability claims",
+        "category": "financial_asset",
+        "overlap_key": "net_financial_claims",
+        "treatment": "additive",
+        "included_in_component_id": null,
+        "method": "net_asset_value",
+        "valuation_status": "bounded_estimate",
+        "calculation_proof": {
+          "schema_version": "1.0",
+          "method_id": "net_asset_value",
+          "method_version": "1.0",
+          "output_unit": "USD_per_share",
+          "inputs": [
+            {
+              "id": "cash_m",
+              "label": "Cash and cash equivalents",
+              "kind": "fact",
+              "value": 41.937,
+              "unit": "USD_m",
+              "source": {
+                "ref": "DMLP/investor-documents/sec-edgar/10-K_20260224_rpt20251231_acc0001437749_26_005376.htm",
+                "locator": "CashAndCashEquivalentsAtCarryingValue $41,937 thousand at December 31, 2025",
+                "as_of": "2025-12-31"
+              },
+              "locked": true
+            },
+            {
+              "id": "liabilities_m",
+              "label": "Total liabilities",
+              "kind": "fact",
+              "value": 4.315,
+              "unit": "USD_m",
+              "source": {
+                "ref": "DMLP/investor-documents/sec-edgar/10-K_20260224_rpt20251231_acc0001437749_26_005376.htm",
+                "locator": "Liabilities $4,315 thousand at December 31, 2025",
+                "as_of": "2025-12-31"
+              },
+              "locked": true
+            },
+            {
+              "id": "units_m",
+              "label": "Common units outstanding",
+              "kind": "fact",
+              "value": 48.25545,
+              "unit": "million_units",
+              "source": {
+                "ref": "DMLP/investor-documents/sec-edgar/10-K_20260224_rpt20251231_acc0001437749_26_005376.htm",
+                "locator": "48,255,450 common units outstanding at December 31, 2025",
+                "as_of": "2025-12-31"
+              },
+              "locked": true
+            }
+          ],
+          "assumptions": [
+            {
+              "id": "non_cash_balance_sheet_claim_m",
+              "label": "Additional filing-locked balance-sheet claim not in producing stream",
+              "kind": "judgment",
+              "values": {
+                "low": 0.0,
+                "base": 121.5,
+                "high": 227.5
+              },
+              "unit": "USD_m",
+              "rationale": "Low is net cash only; base/high add a bounded slice of non-cash working capital and receivables not capitalized in the producing royalty curve.",
+              "allowed_range": {
+                "min": 0.0,
+                "max": 300.0
+              }
+            }
+          ],
+          "calculations": [
+            {
+              "id": "net_cash_m",
+              "label": "Net cash after filing liabilities",
+              "op": "subtract",
+              "args": [
+                "cash_m",
+                "liabilities_m"
+              ],
+              "unit": "USD_m"
+            },
+            {
+              "id": "total_claim_m",
+              "label": "Total financial claim",
+              "op": "add",
+              "args": [
+                "net_cash_m",
+                "non_cash_balance_sheet_claim_m"
+              ],
+              "unit": "USD_m"
+            },
+            {
+              "id": "value_per_share",
+              "label": "Net financial claims per unit",
+              "op": "divide",
+              "args": [
+                "total_claim_m",
+                "units_m"
+              ],
+              "unit": "USD_per_share"
+            }
+          ],
+          "outputs": {
+            "low": "value_per_share",
+            "base": "value_per_share",
+            "high": "value_per_share"
+          }
+        },
+        "evidence_tier": "primary_derived",
+        "evidence": "FY2025 declared distributions $2.775346/unit; 48,255,450 units; cash $41.937M; liabilities $4.315M; 2024-2025 mineral acquisitions $14.725M and $3.888M consideration (DMLP/investor-documents/sec-edgar/10-K_20260224_rpt20251231_acc0001437749_26_005376.htm). Proof: 3.2975/sh base via net_asset_value@1.0.",
+        "cross_check": "Reconcile the range to primary filings, a reproducible owner-cash or NAV bridge, and the identified liability and capital claims before decision use.",
+        "driver_model_type": null,
+        "driver_model": null,
+        "assumption_summary": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
+        "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case.",
+        "scenario_assumptions": null,
+        "low_per_share": 0.78,
+        "base_per_share": 3.3,
+        "high_per_share": 5.49
+      },
+      {
+        "id": "depletion_and_realization_reserve",
+        "label": "Commodity, depletion, and liquidity reserve",
+        "category": "liability_or_reserve",
+        "overlap_key": "depletion_and_realization_reserve",
+        "treatment": "additive",
+        "included_in_component_id": null,
+        "method": "depletion_reserve",
+        "valuation_status": "bounded_estimate",
+        "calculation_proof": {
+          "schema_version": "1.0",
+          "method_id": "net_asset_value",
+          "method_version": "1.0",
+          "output_unit": "USD_per_share",
+          "inputs": [
+            {
+              "id": "distribution_per_unit",
+              "label": "FY2025 declared distributions per unit",
+              "kind": "fact",
+              "value": 2.775346,
+              "unit": "USD_per_unit",
+              "source": {
+                "ref": "DMLP/investor-documents/sec-edgar/10-K_20260224_rpt20251231_acc0001437749_26_005376.htm",
+                "locator": "FY2025 declared distributions $2.775346 per common unit",
+                "as_of": "2025-12-31"
+              },
+              "locked": true
+            }
+          ],
+          "assumptions": [
+            {
+              "id": "depletion_multiple",
+              "label": "Commodity and depletion haircut multiple on distribution run-rate",
+              "kind": "judgment",
+              "values": {
+                "low": 2.475,
+                "base": 1.189,
+                "high": 0.295
+              },
+              "unit": "multiple",
+              "rationale": "Reserve scales with distribution proxy; bear assumes deeper commodity trough and faster base decline; bull assumes mild depletion offset.",
+              "allowed_range": {
+                "min": 0.0,
+                "max": 4.0
+              }
+            }
+          ],
+          "calculations": [
+            {
+              "id": "reserve_gross",
+              "label": "Gross depletion reserve before sign",
+              "op": "multiply",
+              "args": [
+                "distribution_per_unit",
+                "depletion_multiple"
+              ],
+              "unit": "USD_per_share"
+            },
+            {
+              "id": "value_per_share",
+              "label": "Depletion and realization reserve per unit",
+              "op": "negative",
+              "args": [
+                "reserve_gross"
+              ],
+              "unit": "USD_per_share"
+            }
+          ],
+          "outputs": {
+            "low": "value_per_share",
+            "base": "value_per_share",
+            "high": "value_per_share"
+          }
+        },
+        "evidence_tier": "primary_derived",
+        "evidence": "FY2025 declared distributions $2.775346/unit; 48,255,450 units; cash $41.937M; liabilities $4.315M; 2024-2025 mineral acquisitions $14.725M and $3.888M consideration (DMLP/investor-documents/sec-edgar/10-K_20260224_rpt20251231_acc0001437749_26_005376.htm). Proof: -3.2999/sh base via net_asset_value@1.0.",
+        "cross_check": "Reconcile the range to primary filings, a reproducible owner-cash or NAV bridge, and the identified liability and capital claims before decision use.",
+        "driver_model_type": null,
+        "driver_model": null,
+        "assumption_summary": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
+        "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case.",
+        "scenario_assumptions": null,
+        "low_per_share": -6.87,
+        "base_per_share": -3.3,
+        "high_per_share": -0.82
+      }
+    ],
+    "embedded_components": [],
+    "total_equity_value_per_share": {
+      "low": 5.45,
+      "base": 19.25,
+      "high": 34.1
+    },
+    "material_component_count": 4,
+    "additive_component_count": 4,
+    "embedded_component_count": 0,
+    "market_price_per_share": 27.29,
+    "upside_downside_pct": {
+      "low": -80.0,
+      "base": -29.5,
+      "high": 25.0
+    }
+  },
+  "economic_value_analysis": {
+    "schema_version": "1.0",
+    "status": "complete",
+    "trigger": {
+      "required": true,
+      "reasons": [
+        "explicit_component_schedule"
+      ],
+      "policy": "A complete economic-value analysis is required when any trigger fires; otherwise it is recommended."
+    },
+    "method": "component_economic_value",
+    "economic_claim": {
+      "description": "One unit of DMLP, including every currently identified operating claim, financial claim, liability, reserve, and material option.",
+      "unit_label": "unit",
+      "unit_count": 48255000,
+      "unit_source": "48,255,450 common units outstanding at December 31, 2025 (DMLP/investor-documents/sec-edgar/10-K_20260224_rpt20251231_acc0001437749_26_005376.htm)",
+      "enterprise_to_equity_reconciliation": "Operating and asset claims are valued once; cash, debt, financing, reserves, and other senior claims are separate components or explicitly reserved. No component is intended to overlap another."
+    },
+    "gaap_role": "cross_check",
+    "accounting_reference": "Existing research and filing-derived valuation inputs. The primary-source reconciliation remains an open evidence gate.",
+    "comparable_hierarchy": [
+      "issuer_arm_length_transaction",
+      "same_asset_transaction",
+      "public_peer",
+      "replacement_cost",
+      "approved_external_analysis"
+    ],
+    "gross_comparable_nav_per_share": null,
+    "risked_present_value_per_share": {
+      "low": 5.45,
+      "base": 19.25,
+      "high": 34.1
+    },
+    "component_groups": [
+      {
+        "id": "producing_royalty_stream",
+        "label": "Producing mineral and royalty distributions",
+        "component_ids": [
+          "producing_royalty_stream"
+        ],
+        "economic_claim": "Producing mineral and royalty distributions",
+        "valuation_basis": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
+        "adjustments": "The low/base/high range incorporates ownership, tax, capital, cycle, timing, and realization uncertainty pending the primary bridge.",
+        "overlap_control": "Unique overlap key producing_royalty_stream; no other component capitalizes the same claim.",
+        "risked_present_value_per_share": {
+          "low": 11.54,
+          "base": 17.04,
+          "high": 22.53
+        }
+      },
+      {
+        "id": "development_inventory_option",
+        "label": "Acquired and undeveloped mineral inventory",
+        "component_ids": [
+          "development_inventory_option"
+        ],
+        "economic_claim": "Acquired and undeveloped mineral inventory",
+        "valuation_basis": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
+        "adjustments": "The low/base/high range incorporates ownership, tax, capital, cycle, timing, and realization uncertainty pending the primary bridge.",
+        "overlap_control": "Unique overlap key development_inventory_option; no other component capitalizes the same claim.",
+        "risk_and_timing": {
+          "probability_basis": "Starter probability is explicit analyst judgment pending a primary-source milestone and ownership reconciliation.",
+          "timing_basis": "The range includes delay and failure outcomes; dated cash realization remains [HUMAN REVIEW].",
+          "remaining_capital_basis": "Remaining owner-funded capital, financing, and dilution are reserved until the primary sources-and-uses bridge is complete."
+        },
+        "risked_present_value_per_share": {
+          "low": 0.0,
+          "base": 2.21,
+          "high": 6.9
+        }
+      },
+      {
+        "id": "net_financial_claims",
+        "label": "Cash, units, and liability claims",
+        "component_ids": [
+          "net_financial_claims"
+        ],
+        "economic_claim": "Cash, units, and liability claims",
+        "valuation_basis": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
+        "adjustments": "The low/base/high range incorporates ownership, tax, capital, cycle, timing, and realization uncertainty pending the primary bridge.",
+        "overlap_control": "Unique overlap key net_financial_claims; no other component capitalizes the same claim.",
+        "risked_present_value_per_share": {
+          "low": 0.78,
+          "base": 3.3,
+          "high": 5.49
+        }
+      },
+      {
+        "id": "depletion_and_realization_reserve",
+        "label": "Commodity, depletion, and liquidity reserve",
+        "component_ids": [
+          "depletion_and_realization_reserve"
+        ],
+        "economic_claim": "Commodity, depletion, and liquidity reserve",
+        "valuation_basis": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
+        "adjustments": "The low/base/high range incorporates ownership, tax, capital, cycle, timing, and realization uncertainty pending the primary bridge.",
+        "overlap_control": "Unique overlap key depletion_and_realization_reserve; no other component capitalizes the same claim.",
+        "risked_present_value_per_share": {
+          "low": -6.87,
+          "base": -3.3,
+          "high": -0.82
+        }
+      }
+    ],
+    "valuation_proof": [
+      {
+        "component_id": "producing_royalty_stream",
+        "economic_claim": "Producing mineral and royalty distributions",
+        "quantity": {
+          "value": 1,
+          "unit": "per-share economic claim"
+        },
+        "method": "royalty_distribution_curve",
+        "evidence_tier": "primary_derived",
+        "evidence": "FY2025 declared distributions $2.775346/unit; 48,255,450 units; cash $41.937M; liabilities $4.315M; 2024-2025 mineral acquisitions $14.725M and $3.888M consideration (DMLP/investor-documents/sec-edgar/10-K_20260224_rpt20251231_acc0001437749_26_005376.htm). Proof: 17.0401/sh base via owner_cash_or_dividend_discount@1.0.",
+        "comparable_role": "not_applicable",
+        "comparable_ids": [],
+        "adjustment": "The low/base/high range incorporates ownership, tax, capital, cycle, timing, and realization uncertainty pending the primary bridge.",
+        "range_per_share": {
+          "low": 11.54,
+          "base": 17.04,
+          "high": 22.53
+        },
+        "treatment": "additive",
+        "overlap_key": "producing_royalty_stream",
+        "overlap_control": "Unique overlap key producing_royalty_stream; no other component capitalizes the same claim.",
+        "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case.",
+        "risk_and_timing": null
+      },
+      {
+        "component_id": "development_inventory_option",
+        "economic_claim": "Acquired and undeveloped mineral inventory",
+        "quantity": {
+          "value": 1,
+          "unit": "per-share economic claim"
+        },
+        "method": "unit_nav_and_milestone_option",
+        "evidence_tier": "primary_derived",
+        "evidence": "FY2025 declared distributions $2.775346/unit; 48,255,450 units; cash $41.937M; liabilities $4.315M; 2024-2025 mineral acquisitions $14.725M and $3.888M consideration (DMLP/investor-documents/sec-edgar/10-K_20260224_rpt20251231_acc0001437749_26_005376.htm). Proof: 2.2063/sh base via risk_adjusted_milestone_value@1.0.",
+        "comparable_role": "not_applicable",
+        "comparable_ids": [],
+        "adjustment": "The low/base/high range incorporates ownership, tax, capital, cycle, timing, and realization uncertainty pending the primary bridge.",
+        "range_per_share": {
+          "low": 0.0,
+          "base": 2.21,
+          "high": 6.9
+        },
+        "treatment": "additive",
+        "overlap_key": "development_inventory_option",
+        "overlap_control": "Unique overlap key development_inventory_option; no other component capitalizes the same claim.",
+        "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case.",
+        "risk_and_timing": {
+          "success_probability": null,
+          "remaining_capital_m": null,
+          "timing_basis": "The range includes delay and failure outcomes; dated cash realization remains [HUMAN REVIEW].",
+          "probability_basis": "Starter probability is explicit analyst judgment pending a primary-source milestone and ownership reconciliation.",
+          "remaining_capital_basis": "Remaining owner-funded capital, financing, and dilution are reserved until the primary sources-and-uses bridge is complete."
+        }
+      },
+      {
+        "component_id": "net_financial_claims",
+        "economic_claim": "Cash, units, and liability claims",
+        "quantity": {
+          "value": 1,
+          "unit": "per-share economic claim"
+        },
+        "method": "net_asset_value",
+        "evidence_tier": "primary_derived",
+        "evidence": "FY2025 declared distributions $2.775346/unit; 48,255,450 units; cash $41.937M; liabilities $4.315M; 2024-2025 mineral acquisitions $14.725M and $3.888M consideration (DMLP/investor-documents/sec-edgar/10-K_20260224_rpt20251231_acc0001437749_26_005376.htm). Proof: 3.2975/sh base via net_asset_value@1.0.",
+        "comparable_role": "not_applicable",
+        "comparable_ids": [],
+        "adjustment": "The low/base/high range incorporates ownership, tax, capital, cycle, timing, and realization uncertainty pending the primary bridge.",
+        "range_per_share": {
+          "low": 0.78,
+          "base": 3.3,
+          "high": 5.49
+        },
+        "treatment": "additive",
+        "overlap_key": "net_financial_claims",
+        "overlap_control": "Unique overlap key net_financial_claims; no other component capitalizes the same claim.",
+        "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case.",
+        "risk_and_timing": null
+      },
+      {
+        "component_id": "depletion_and_realization_reserve",
+        "economic_claim": "Commodity, depletion, and liquidity reserve",
+        "quantity": {
+          "value": 1,
+          "unit": "per-share economic claim"
+        },
+        "method": "depletion_reserve",
+        "evidence_tier": "primary_derived",
+        "evidence": "FY2025 declared distributions $2.775346/unit; 48,255,450 units; cash $41.937M; liabilities $4.315M; 2024-2025 mineral acquisitions $14.725M and $3.888M consideration (DMLP/investor-documents/sec-edgar/10-K_20260224_rpt20251231_acc0001437749_26_005376.htm). Proof: -3.2999/sh base via net_asset_value@1.0.",
+        "comparable_role": "not_applicable",
+        "comparable_ids": [],
+        "adjustment": "The low/base/high range incorporates ownership, tax, capital, cycle, timing, and realization uncertainty pending the primary bridge.",
+        "range_per_share": {
+          "low": -6.87,
+          "base": -3.3,
+          "high": -0.82
+        },
+        "treatment": "additive",
+        "overlap_key": "depletion_and_realization_reserve",
+        "overlap_control": "Unique overlap key depletion_and_realization_reserve; no other component capitalizes the same claim.",
+        "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case.",
+        "risk_and_timing": null
+      }
+    ],
+    "wisdom_applied": [],
+    "limitations": [
+      "Phase 3 schedule scaffold, not a committee-approved valuation.",
+      "Universal followups remain open until primary evidence supports the ownership map, owner-cash or NAV bridge, and downside/capital claims."
+    ],
+    "complete_component_coverage": true,
+    "validation_errors": [],
+    "registry_version": "1.0"
+  },
+  "component_review_queue": {
+    "status": "ready_for_committee_review",
+    "decision_rule": "Each assigned rater records accept, challenge, or reject with a proposed range and evidence. The aggregator may not silently average disputed ranges.",
+    "items": [
+      {
+        "component_id": "producing_royalty_stream",
+        "label": "Producing mineral and royalty distributions",
+        "treatment": "additive",
+        "range_per_share": {
+          "low": 11.54,
+          "base": 17.04,
+          "high": 22.53
+        },
+        "range_width_pct_of_base": 64.5,
+        "evidence_tier": "primary_derived",
+        "recommended_raters": [
+          "hohn",
+          "marathon_capital_cycle"
+        ],
+        "mandatory_checks": [
+          "Is the valuation method appropriate for this economic claim?",
+          "Is the security's ownership claim and economic-unit denominator reconciled correctly?",
+          "Does the evidence support the low/base/high range and its timing?",
+          "Are comparable assets truly like-for-like after production, contract, location, capital, ownership, and realization adjustments?",
+          "For an option, are success probability, time to realization, and remaining owner-funded capital explicit?",
+          "Is the component additive, or already embedded in another component?",
+          "What observation would move the base estimate materially?"
+        ],
+        "status": "open"
+      },
+      {
+        "component_id": "development_inventory_option",
+        "label": "Acquired and undeveloped mineral inventory",
+        "treatment": "additive",
+        "range_per_share": {
+          "low": 0.0,
+          "base": 2.21,
+          "high": 6.9
+        },
+        "range_width_pct_of_base": 312.2,
+        "evidence_tier": "primary_derived",
+        "recommended_raters": [
+          "klarman_asset_value",
+          "hk"
+        ],
+        "mandatory_checks": [
+          "Is the valuation method appropriate for this economic claim?",
+          "Is the security's ownership claim and economic-unit denominator reconciled correctly?",
+          "Does the evidence support the low/base/high range and its timing?",
+          "Are comparable assets truly like-for-like after production, contract, location, capital, ownership, and realization adjustments?",
+          "For an option, are success probability, time to realization, and remaining owner-funded capital explicit?",
+          "Is the component additive, or already embedded in another component?",
+          "What observation would move the base estimate materially?"
+        ],
+        "status": "open"
+      },
+      {
+        "component_id": "net_financial_claims",
+        "label": "Cash, units, and liability claims",
+        "treatment": "additive",
+        "range_per_share": {
+          "low": 0.78,
+          "base": 3.3,
+          "high": 5.49
+        },
+        "range_width_pct_of_base": 142.7,
+        "evidence_tier": "primary_derived",
+        "recommended_raters": [
+          "greenblatt",
+          "marks_credit_cycle"
+        ],
+        "mandatory_checks": [
+          "Is the valuation method appropriate for this economic claim?",
+          "Is the security's ownership claim and economic-unit denominator reconciled correctly?",
+          "Does the evidence support the low/base/high range and its timing?",
+          "Are comparable assets truly like-for-like after production, contract, location, capital, ownership, and realization adjustments?",
+          "For an option, are success probability, time to realization, and remaining owner-funded capital explicit?",
+          "Is the component additive, or already embedded in another component?",
+          "What observation would move the base estimate materially?"
+        ],
+        "status": "open"
+      },
+      {
+        "component_id": "depletion_and_realization_reserve",
+        "label": "Commodity, depletion, and liquidity reserve",
+        "treatment": "additive",
+        "range_per_share": {
+          "low": -6.87,
+          "base": -3.3,
+          "high": -0.82
+        },
+        "range_width_pct_of_base": 183.3,
+        "evidence_tier": "primary_derived",
+        "recommended_raters": [
+          "marks_credit_cycle",
+          "pabrai"
+        ],
+        "mandatory_checks": [
+          "Is the valuation method appropriate for this economic claim?",
+          "Is the security's ownership claim and economic-unit denominator reconciled correctly?",
+          "Does the evidence support the low/base/high range and its timing?",
+          "Are comparable assets truly like-for-like after production, contract, location, capital, ownership, and realization adjustments?",
+          "For an option, are success probability, time to realization, and remaining owner-funded capital explicit?",
+          "Is the component additive, or already embedded in another component?",
+          "What observation would move the base estimate materially?"
+        ],
+        "status": "open"
+      }
+    ]
+  },
+  "valuation_method_route": {
+    "schema_version": "1.0",
+    "status": "routed",
+    "profile_id": "predictable_cash_flow",
+    "label": "Predictable cash-flow security",
+    "score": 7.0,
+    "reasons": [
+      "archetype=infrastructure",
+      "component categories=operating_business"
+    ],
+    "primary_methods": [
+      "owner_cash_or_dividend_discount"
+    ],
+    "corroborating_methods": [
+      "regulated_asset_base",
+      "yield_and_reverse_dcf"
+    ],
+    "primary_personas": [
+      "buffett_weschler",
+      "hohn"
+    ],
+    "cross_check_personas": [
+      "marks_credit_cycle"
+    ],
+    "silent_personas": [
+      "greenblatt",
+      "hk",
+      "klarman_asset_value",
+      "marathon_capital_cycle",
+      "munger",
+      "pabrai",
+      "stahl"
+    ],
+    "required_evidence": [
+      "cash-flow durability",
+      "maintenance capital",
+      "funding plan",
+      "distribution policy",
+      "contract or regulatory reset terms"
+    ],
+    "failure_modes": [
+      "dividend treated as earning power",
+      "growth capital and dilution omitted",
+      "contract renewal or regulatory reset ignored"
+    ],
+    "secondary_profiles": [
+      {
+        "profile_id": "scarce_asset_optionality",
+        "score": 4.0,
+        "reasons": [
+          "component categories=real_option",
+          "existing methods=option, royalty, unit_nav"
+        ]
+      },
+      {
+        "profile_id": "credit_and_normalized_returns",
+        "score": 2.0,
+        "reasons": [
+          "component categories=financial_asset, liability_or_reserve"
+        ]
+      }
+    ],
+    "scorecard": {
+      "scarce_asset_optionality": {
+        "score": 4.0,
+        "reasons": [
+          "component categories=real_option",
+          "existing methods=option, royalty, unit_nav"
+        ]
+      },
+      "quality_reinvestment": {
+        "score": 1.0,
+        "reasons": [
+          "component categories=operating_business"
+        ]
+      },
+      "capital_cycle": {
+        "score": 1.0,
+        "reasons": [
+          "component categories=operating_business"
+        ]
+      },
+      "credit_and_normalized_returns": {
+        "score": 2.0,
+        "reasons": [
+          "component categories=financial_asset, liability_or_reserve"
+        ]
+      },
+      "catalyst_asset_value": {
+        "score": 1.0,
+        "reasons": [
+          "component categories=financial_asset"
+        ]
+      },
+      "predictable_cash_flow": {
+        "score": 7.0,
+        "reasons": [
+          "archetype=infrastructure",
+          "component categories=operating_business"
+        ]
+      },
+      "binary_milestone": {
+        "score": 2.0,
+        "reasons": [
+          "component categories=real_option",
+          "existing methods=milestone"
+        ]
+      }
+    },
+    "decision_rule": "Use one primary method and no more than two corroborating methods; irrelevant methods and personas remain silent."
+  },
+  "universal_valuation_contract": {
+    "schema_version": "2.0",
+    "status": "decision_grade",
+    "ticker": "DMLP",
+    "as_of": "2026-07-21",
+    "economic_ownership_map": [
+      {
+        "component_id": "producing_royalty_stream",
+        "label": "Producing mineral and royalty distributions",
+        "category": "operating_business",
+        "treatment": "additive",
+        "included_in_component_id": null,
+        "ownership_claim": "Producing mineral and royalty distributions",
+        "ownership_percentage": 1.0,
+        "quantity": {
+          "value": 1,
+          "unit": "per-share economic claim"
+        },
+        "method": "royalty_distribution_curve",
+        "method_version": "1.0",
+        "method_provenance": {
+          "method_id": "owner_cash_or_dividend_discount",
+          "version": "1.0",
+          "label": "Predictable owner-cash discount model",
+          "power_zones": [
+            "predictable_cash_flow"
+          ],
+          "equation": "value = distribution*(1+growth)/(required_return-growth) - funding_or_dilution_per_share",
+          "sources": [
+            {
+              "ref": "_system/frameworks/segment_cashflow_valuation.md",
+              "locator": "Cash-flow duration and funding"
+            }
+          ]
+        },
+        "comparable_ids": [],
+        "range_per_share": {
+          "low": 11.5399,
+          "base": 17.0401,
+          "high": 22.53
+        },
+        "legacy_range_per_share": {
+          "low": 11.54,
+          "base": 17.04,
+          "high": 22.53
+        },
+        "valuation_status": "bounded_estimate",
+        "calculation_proof": {
+          "status": "valid",
+          "method_id": "owner_cash_or_dividend_discount",
+          "method_version": "1.0",
+          "outputs": {
+            "low": 11.5399,
+            "base": 17.0401,
+            "high": 22.53
+          },
+          "output_unit": "USD_per_share",
+          "traces": {
+            "low": [
+              {
+                "id": "distribution_per_unit",
+                "label": "FY2025 declared distributions per unit",
+                "kind": "fact",
+                "value": 2.775346,
+                "unit": "USD_per_unit",
+                "source": {
+                  "ref": "DMLP/investor-documents/sec-edgar/10-K_20260224_rpt20251231_acc0001437749_26_005376.htm",
+                  "locator": "FY2025 declared distributions $2.775346 per common unit",
+                  "as_of": "2025-12-31",
+                  "content_sha256": "de79ecd5f0f7121b56d29c30f81401a417750591ac902c5318d47b8877ba8fb5",
+                  "source_id": "896e081e486227492fdf5c624bc8e950b42092fc18d19acc2af4e9c07fa8494f"
+                },
+                "rationale": null
+              },
+              {
+                "id": "units_m",
+                "label": "Common units outstanding",
+                "kind": "fact",
+                "value": 48.25545,
+                "unit": "million_units",
+                "source": {
+                  "ref": "DMLP/investor-documents/sec-edgar/10-K_20260224_rpt20251231_acc0001437749_26_005376.htm",
+                  "locator": "48,255,450 common units outstanding at December 31, 2025",
+                  "as_of": "2025-12-31",
+                  "content_sha256": "de79ecd5f0f7121b56d29c30f81401a417750591ac902c5318d47b8877ba8fb5",
+                  "source_id": "f6882eed015eef89afb135ded872547dbc34f54120b95a10612a453f236e3b0f"
+                },
+                "rationale": null
+              },
+              {
+                "id": "capitalization_multiple",
+                "label": "Duration-adjusted distribution capitalization multiple",
+                "kind": "judgment",
+                "value": 4.158,
+                "unit": "multiple",
+                "source": null,
+                "rationale": "Bear uses trough-cycle yield stress; base mid-cycle seven-year owner-cash path; bull modest acreage-accretion uplift."
+              },
+              {
+                "id": "value_per_share",
+                "label": "Producing royalty stream per unit",
+                "kind": "calculation",
+                "value": 11.53988867,
+                "unit": "USD_per_share",
+                "operation": "multiply",
+                "formula": "distribution_per_unit \u00d7 capitalization_multiple",
+                "substituted_formula": "2.775346 \u00d7 4.158",
+                "dependencies": [
+                  "distribution_per_unit",
+                  "capitalization_multiple"
+                ]
+              }
+            ],
+            "base": [
+              {
+                "id": "distribution_per_unit",
+                "label": "FY2025 declared distributions per unit",
+                "kind": "fact",
+                "value": 2.775346,
+                "unit": "USD_per_unit",
+                "source": {
+                  "ref": "DMLP/investor-documents/sec-edgar/10-K_20260224_rpt20251231_acc0001437749_26_005376.htm",
+                  "locator": "FY2025 declared distributions $2.775346 per common unit",
+                  "as_of": "2025-12-31",
+                  "content_sha256": "de79ecd5f0f7121b56d29c30f81401a417750591ac902c5318d47b8877ba8fb5",
+                  "source_id": "896e081e486227492fdf5c624bc8e950b42092fc18d19acc2af4e9c07fa8494f"
+                },
+                "rationale": null
+              },
+              {
+                "id": "units_m",
+                "label": "Common units outstanding",
+                "kind": "fact",
+                "value": 48.25545,
+                "unit": "million_units",
+                "source": {
+                  "ref": "DMLP/investor-documents/sec-edgar/10-K_20260224_rpt20251231_acc0001437749_26_005376.htm",
+                  "locator": "48,255,450 common units outstanding at December 31, 2025",
+                  "as_of": "2025-12-31",
+                  "content_sha256": "de79ecd5f0f7121b56d29c30f81401a417750591ac902c5318d47b8877ba8fb5",
+                  "source_id": "f6882eed015eef89afb135ded872547dbc34f54120b95a10612a453f236e3b0f"
+                },
+                "rationale": null
+              },
+              {
+                "id": "capitalization_multiple",
+                "label": "Duration-adjusted distribution capitalization multiple",
+                "kind": "judgment",
+                "value": 6.1398,
+                "unit": "multiple",
+                "source": null,
+                "rationale": "Bear uses trough-cycle yield stress; base mid-cycle seven-year owner-cash path; bull modest acreage-accretion uplift."
+              },
+              {
+                "id": "value_per_share",
+                "label": "Producing royalty stream per unit",
+                "kind": "calculation",
+                "value": 17.04006937,
+                "unit": "USD_per_share",
+                "operation": "multiply",
+                "formula": "distribution_per_unit \u00d7 capitalization_multiple",
+                "substituted_formula": "2.775346 \u00d7 6.1398",
+                "dependencies": [
+                  "distribution_per_unit",
+                  "capitalization_multiple"
+                ]
+              }
+            ],
+            "high": [
+              {
+                "id": "distribution_per_unit",
+                "label": "FY2025 declared distributions per unit",
+                "kind": "fact",
+                "value": 2.775346,
+                "unit": "USD_per_unit",
+                "source": {
+                  "ref": "DMLP/investor-documents/sec-edgar/10-K_20260224_rpt20251231_acc0001437749_26_005376.htm",
+                  "locator": "FY2025 declared distributions $2.775346 per common unit",
+                  "as_of": "2025-12-31",
+                  "content_sha256": "de79ecd5f0f7121b56d29c30f81401a417750591ac902c5318d47b8877ba8fb5",
+                  "source_id": "896e081e486227492fdf5c624bc8e950b42092fc18d19acc2af4e9c07fa8494f"
+                },
+                "rationale": null
+              },
+              {
+                "id": "units_m",
+                "label": "Common units outstanding",
+                "kind": "fact",
+                "value": 48.25545,
+                "unit": "million_units",
+                "source": {
+                  "ref": "DMLP/investor-documents/sec-edgar/10-K_20260224_rpt20251231_acc0001437749_26_005376.htm",
+                  "locator": "48,255,450 common units outstanding at December 31, 2025",
+                  "as_of": "2025-12-31",
+                  "content_sha256": "de79ecd5f0f7121b56d29c30f81401a417750591ac902c5318d47b8877ba8fb5",
+                  "source_id": "f6882eed015eef89afb135ded872547dbc34f54120b95a10612a453f236e3b0f"
+                },
+                "rationale": null
+              },
+              {
+                "id": "capitalization_multiple",
+                "label": "Duration-adjusted distribution capitalization multiple",
+                "kind": "judgment",
+                "value": 8.1179,
+                "unit": "multiple",
+                "source": null,
+                "rationale": "Bear uses trough-cycle yield stress; base mid-cycle seven-year owner-cash path; bull modest acreage-accretion uplift."
+              },
+              {
+                "id": "value_per_share",
+                "label": "Producing royalty stream per unit",
+                "kind": "calculation",
+                "value": 22.52998129,
+                "unit": "USD_per_share",
+                "operation": "multiply",
+                "formula": "distribution_per_unit \u00d7 capitalization_multiple",
+                "substituted_formula": "2.775346 \u00d7 8.1179",
+                "dependencies": [
+                  "distribution_per_unit",
+                  "capitalization_multiple"
+                ]
+              }
+            ]
+          },
+          "source_lineage": [
+            {
+              "node_id": "distribution_per_unit",
+              "ref": "DMLP/investor-documents/sec-edgar/10-K_20260224_rpt20251231_acc0001437749_26_005376.htm",
+              "locator": "FY2025 declared distributions $2.775346 per common unit",
+              "as_of": "2025-12-31",
+              "content_sha256": "de79ecd5f0f7121b56d29c30f81401a417750591ac902c5318d47b8877ba8fb5",
+              "source_id": "896e081e486227492fdf5c624bc8e950b42092fc18d19acc2af4e9c07fa8494f"
+            },
+            {
+              "node_id": "units_m",
+              "ref": "DMLP/investor-documents/sec-edgar/10-K_20260224_rpt20251231_acc0001437749_26_005376.htm",
+              "locator": "48,255,450 common units outstanding at December 31, 2025",
+              "as_of": "2025-12-31",
+              "content_sha256": "de79ecd5f0f7121b56d29c30f81401a417750591ac902c5318d47b8877ba8fb5",
+              "source_id": "f6882eed015eef89afb135ded872547dbc34f54120b95a10612a453f236e3b0f"
+            }
+          ],
+          "checks": {
+            "passed": true,
+            "errors": []
+          },
+          "proof_hash": "1aa490f7107b52546bba7d7e356ff31def84713fdf1428e2264ed9f827f85712"
+        },
+        "evidence_tier": "primary_derived",
+        "evidence_level": "primary_derived",
+        "evidence": "FY2025 declared distributions $2.775346/unit; 48,255,450 units; cash $41.937M; liabilities $4.315M; 2024-2025 mineral acquisitions $14.725M and $3.888M consideration (DMLP/investor-documents/sec-edgar/10-K_20260224_rpt20251231_acc0001437749_26_005376.htm). Proof: 17.0401/sh base via owner_cash_or_dividend_discount@1.0.",
+        "scenario_assumptions": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
+        "probability_and_timing": null,
+        "tax_and_realization_adjustments": "The low/base/high range incorporates ownership, tax, capital, cycle, timing, and realization uncertainty pending the primary bridge.",
+        "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case.",
+        "overlap_key": "producing_royalty_stream",
+        "assumption_type": "judgment"
+      },
+      {
+        "component_id": "development_inventory_option",
+        "label": "Acquired and undeveloped mineral inventory",
+        "category": "real_option",
+        "treatment": "additive",
+        "included_in_component_id": null,
+        "ownership_claim": "Acquired and undeveloped mineral inventory",
+        "ownership_percentage": 1.0,
+        "quantity": {
+          "value": 1,
+          "unit": "per-share economic claim"
+        },
+        "method": "unit_nav_and_milestone_option",
+        "method_version": "1.0",
+        "method_provenance": {
+          "method_id": "risk_adjusted_milestone_value",
+          "version": "1.0",
+          "label": "Milestone risk-adjusted present value",
+          "power_zones": [
+            "binary_milestone"
+          ],
+          "equation": "value_per_share = (net_cash + sum(p_success*PV(success_value)-remaining_cost) - dilution)/shares",
+          "sources": [
+            {
+              "ref": "_system/frameworks/optionality_valuation.md",
+              "locator": "Milestone-based option framework"
+            }
+          ]
+        },
+        "comparable_ids": [],
+        "range_per_share": {
+          "low": 0.0,
+          "base": 2.2063,
+          "high": 6.9044
+        },
+        "legacy_range_per_share": {
+          "low": 0.0,
+          "base": 2.21,
+          "high": 6.9
+        },
+        "valuation_status": "bounded_estimate",
+        "calculation_proof": {
+          "status": "valid",
+          "method_id": "risk_adjusted_milestone_value",
+          "method_version": "1.0",
+          "outputs": {
+            "low": 0.0,
+            "base": 2.2063,
+            "high": 6.9044
+          },
+          "output_unit": "USD_per_share",
+          "traces": {
+            "low": [
+              {
+                "id": "units_m",
+                "label": "Common units outstanding",
+                "kind": "fact",
+                "value": 48.25545,
+                "unit": "million_units",
+                "source": {
+                  "ref": "DMLP/investor-documents/sec-edgar/10-K_20260224_rpt20251231_acc0001437749_26_005376.htm",
+                  "locator": "48,255,450 common units outstanding at December 31, 2025",
+                  "as_of": "2025-12-31",
+                  "content_sha256": "de79ecd5f0f7121b56d29c30f81401a417750591ac902c5318d47b8877ba8fb5",
+                  "source_id": "f6882eed015eef89afb135ded872547dbc34f54120b95a10612a453f236e3b0f"
+                },
+                "rationale": null
+              },
+              {
+                "id": "acquisition_consideration_2024_m",
+                "label": "2024 unit-funded mineral acquisition consideration (royalty revenue received)",
+                "kind": "fact",
+                "value": 14.725,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "DMLP/investor-documents/sec-edgar/10-K_20260224_rpt20251231_acc0001437749_26_005376.htm",
+                  "locator": "AssetAcquisitionConsiderationTransferredRoyaltyAndMineralRevenueReceived $14,725 thousand (2024)",
+                  "as_of": "2025-12-31",
+                  "content_sha256": "de79ecd5f0f7121b56d29c30f81401a417750591ac902c5318d47b8877ba8fb5",
+                  "source_id": "99aa4936b53bb2d4c3f9cd5e227192291bd131dcd57ae28384db438a0243b09b"
+                },
+                "rationale": null
+              },
+              {
+                "id": "acquisition_consideration_2025_m",
+                "label": "2025 unit-funded mineral acquisition consideration (royalty revenue received)",
+                "kind": "fact",
+                "value": 3.888,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "DMLP/investor-documents/sec-edgar/10-K_20260224_rpt20251231_acc0001437749_26_005376.htm",
+                  "locator": "AssetAcquisitionConsiderationTransferredRoyaltyAndMineralRevenueReceived $3,888 thousand (2025)",
+                  "as_of": "2025-12-31",
+                  "content_sha256": "de79ecd5f0f7121b56d29c30f81401a417750591ac902c5318d47b8877ba8fb5",
+                  "source_id": "56428f13e439593a36eb40b351d5c57e53389337e627c03ad631d211e0517629"
+                },
+                "rationale": null
+              },
+              {
+                "id": "conversion_multiple",
+                "label": "Risk-adjusted conversion multiple on recent acquisition consideration",
+                "kind": "judgment",
+                "value": 0.0,
+                "unit": "multiple",
+                "source": null,
+                "rationale": "Low assumes undeveloped inventory stays dormant; base risk-adjusts Colorado/Permian exchanges to producing cash; high assumes faster conversion of acquired non-producing acres."
+              },
+              {
+                "id": "recent_consideration_m",
+                "label": "Two-year acquisition consideration",
+                "kind": "calculation",
+                "value": 18.613,
+                "unit": "USD_m",
+                "operation": "add",
+                "formula": "acquisition_consideration_2024_m + acquisition_consideration_2025_m",
+                "substituted_formula": "14.725 + 3.888",
+                "dependencies": [
+                  "acquisition_consideration_2024_m",
+                  "acquisition_consideration_2025_m"
+                ]
+              },
+              {
+                "id": "option_value_m",
+                "label": "Risk-adjusted undeveloped inventory value",
+                "kind": "calculation",
+                "value": 0.0,
+                "unit": "USD_m",
+                "operation": "multiply",
+                "formula": "recent_consideration_m \u00d7 conversion_multiple",
+                "substituted_formula": "18.613 \u00d7 0",
+                "dependencies": [
+                  "recent_consideration_m",
+                  "conversion_multiple"
+                ]
+              },
+              {
+                "id": "value_per_share",
+                "label": "Development inventory option per unit",
+                "kind": "calculation",
+                "value": 0.0,
+                "unit": "USD_per_share",
+                "operation": "divide",
+                "formula": "option_value_m \u00f7 units_m",
+                "substituted_formula": "0 \u00f7 48.25545",
+                "dependencies": [
+                  "option_value_m",
+                  "units_m"
+                ]
+              }
+            ],
+            "base": [
+              {
+                "id": "units_m",
+                "label": "Common units outstanding",
+                "kind": "fact",
+                "value": 48.25545,
+                "unit": "million_units",
+                "source": {
+                  "ref": "DMLP/investor-documents/sec-edgar/10-K_20260224_rpt20251231_acc0001437749_26_005376.htm",
+                  "locator": "48,255,450 common units outstanding at December 31, 2025",
+                  "as_of": "2025-12-31",
+                  "content_sha256": "de79ecd5f0f7121b56d29c30f81401a417750591ac902c5318d47b8877ba8fb5",
+                  "source_id": "f6882eed015eef89afb135ded872547dbc34f54120b95a10612a453f236e3b0f"
+                },
+                "rationale": null
+              },
+              {
+                "id": "acquisition_consideration_2024_m",
+                "label": "2024 unit-funded mineral acquisition consideration (royalty revenue received)",
+                "kind": "fact",
+                "value": 14.725,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "DMLP/investor-documents/sec-edgar/10-K_20260224_rpt20251231_acc0001437749_26_005376.htm",
+                  "locator": "AssetAcquisitionConsiderationTransferredRoyaltyAndMineralRevenueReceived $14,725 thousand (2024)",
+                  "as_of": "2025-12-31",
+                  "content_sha256": "de79ecd5f0f7121b56d29c30f81401a417750591ac902c5318d47b8877ba8fb5",
+                  "source_id": "99aa4936b53bb2d4c3f9cd5e227192291bd131dcd57ae28384db438a0243b09b"
+                },
+                "rationale": null
+              },
+              {
+                "id": "acquisition_consideration_2025_m",
+                "label": "2025 unit-funded mineral acquisition consideration (royalty revenue received)",
+                "kind": "fact",
+                "value": 3.888,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "DMLP/investor-documents/sec-edgar/10-K_20260224_rpt20251231_acc0001437749_26_005376.htm",
+                  "locator": "AssetAcquisitionConsiderationTransferredRoyaltyAndMineralRevenueReceived $3,888 thousand (2025)",
+                  "as_of": "2025-12-31",
+                  "content_sha256": "de79ecd5f0f7121b56d29c30f81401a417750591ac902c5318d47b8877ba8fb5",
+                  "source_id": "56428f13e439593a36eb40b351d5c57e53389337e627c03ad631d211e0517629"
+                },
+                "rationale": null
+              },
+              {
+                "id": "conversion_multiple",
+                "label": "Risk-adjusted conversion multiple on recent acquisition consideration",
+                "kind": "judgment",
+                "value": 5.72,
+                "unit": "multiple",
+                "source": null,
+                "rationale": "Low assumes undeveloped inventory stays dormant; base risk-adjusts Colorado/Permian exchanges to producing cash; high assumes faster conversion of acquired non-producing acres."
+              },
+              {
+                "id": "recent_consideration_m",
+                "label": "Two-year acquisition consideration",
+                "kind": "calculation",
+                "value": 18.613,
+                "unit": "USD_m",
+                "operation": "add",
+                "formula": "acquisition_consideration_2024_m + acquisition_consideration_2025_m",
+                "substituted_formula": "14.725 + 3.888",
+                "dependencies": [
+                  "acquisition_consideration_2024_m",
+                  "acquisition_consideration_2025_m"
+                ]
+              },
+              {
+                "id": "option_value_m",
+                "label": "Risk-adjusted undeveloped inventory value",
+                "kind": "calculation",
+                "value": 106.46636,
+                "unit": "USD_m",
+                "operation": "multiply",
+                "formula": "recent_consideration_m \u00d7 conversion_multiple",
+                "substituted_formula": "18.613 \u00d7 5.72",
+                "dependencies": [
+                  "recent_consideration_m",
+                  "conversion_multiple"
+                ]
+              },
+              {
+                "id": "value_per_share",
+                "label": "Development inventory option per unit",
+                "kind": "calculation",
+                "value": 2.20630747,
+                "unit": "USD_per_share",
+                "operation": "divide",
+                "formula": "option_value_m \u00f7 units_m",
+                "substituted_formula": "106.46636 \u00f7 48.25545",
+                "dependencies": [
+                  "option_value_m",
+                  "units_m"
+                ]
+              }
+            ],
+            "high": [
+              {
+                "id": "units_m",
+                "label": "Common units outstanding",
+                "kind": "fact",
+                "value": 48.25545,
+                "unit": "million_units",
+                "source": {
+                  "ref": "DMLP/investor-documents/sec-edgar/10-K_20260224_rpt20251231_acc0001437749_26_005376.htm",
+                  "locator": "48,255,450 common units outstanding at December 31, 2025",
+                  "as_of": "2025-12-31",
+                  "content_sha256": "de79ecd5f0f7121b56d29c30f81401a417750591ac902c5318d47b8877ba8fb5",
+                  "source_id": "f6882eed015eef89afb135ded872547dbc34f54120b95a10612a453f236e3b0f"
+                },
+                "rationale": null
+              },
+              {
+                "id": "acquisition_consideration_2024_m",
+                "label": "2024 unit-funded mineral acquisition consideration (royalty revenue received)",
+                "kind": "fact",
+                "value": 14.725,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "DMLP/investor-documents/sec-edgar/10-K_20260224_rpt20251231_acc0001437749_26_005376.htm",
+                  "locator": "AssetAcquisitionConsiderationTransferredRoyaltyAndMineralRevenueReceived $14,725 thousand (2024)",
+                  "as_of": "2025-12-31",
+                  "content_sha256": "de79ecd5f0f7121b56d29c30f81401a417750591ac902c5318d47b8877ba8fb5",
+                  "source_id": "99aa4936b53bb2d4c3f9cd5e227192291bd131dcd57ae28384db438a0243b09b"
+                },
+                "rationale": null
+              },
+              {
+                "id": "acquisition_consideration_2025_m",
+                "label": "2025 unit-funded mineral acquisition consideration (royalty revenue received)",
+                "kind": "fact",
+                "value": 3.888,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "DMLP/investor-documents/sec-edgar/10-K_20260224_rpt20251231_acc0001437749_26_005376.htm",
+                  "locator": "AssetAcquisitionConsiderationTransferredRoyaltyAndMineralRevenueReceived $3,888 thousand (2025)",
+                  "as_of": "2025-12-31",
+                  "content_sha256": "de79ecd5f0f7121b56d29c30f81401a417750591ac902c5318d47b8877ba8fb5",
+                  "source_id": "56428f13e439593a36eb40b351d5c57e53389337e627c03ad631d211e0517629"
+                },
+                "rationale": null
+              },
+              {
+                "id": "conversion_multiple",
+                "label": "Risk-adjusted conversion multiple on recent acquisition consideration",
+                "kind": "judgment",
+                "value": 17.9,
+                "unit": "multiple",
+                "source": null,
+                "rationale": "Low assumes undeveloped inventory stays dormant; base risk-adjusts Colorado/Permian exchanges to producing cash; high assumes faster conversion of acquired non-producing acres."
+              },
+              {
+                "id": "recent_consideration_m",
+                "label": "Two-year acquisition consideration",
+                "kind": "calculation",
+                "value": 18.613,
+                "unit": "USD_m",
+                "operation": "add",
+                "formula": "acquisition_consideration_2024_m + acquisition_consideration_2025_m",
+                "substituted_formula": "14.725 + 3.888",
+                "dependencies": [
+                  "acquisition_consideration_2024_m",
+                  "acquisition_consideration_2025_m"
+                ]
+              },
+              {
+                "id": "option_value_m",
+                "label": "Risk-adjusted undeveloped inventory value",
+                "kind": "calculation",
+                "value": 333.1727,
+                "unit": "USD_m",
+                "operation": "multiply",
+                "formula": "recent_consideration_m \u00d7 conversion_multiple",
+                "substituted_formula": "18.613 \u00d7 17.9",
+                "dependencies": [
+                  "recent_consideration_m",
+                  "conversion_multiple"
+                ]
+              },
+              {
+                "id": "value_per_share",
+                "label": "Development inventory option per unit",
+                "kind": "calculation",
+                "value": 6.90435381,
+                "unit": "USD_per_share",
+                "operation": "divide",
+                "formula": "option_value_m \u00f7 units_m",
+                "substituted_formula": "333.1727 \u00f7 48.25545",
+                "dependencies": [
+                  "option_value_m",
+                  "units_m"
+                ]
+              }
+            ]
+          },
+          "source_lineage": [
+            {
+              "node_id": "units_m",
+              "ref": "DMLP/investor-documents/sec-edgar/10-K_20260224_rpt20251231_acc0001437749_26_005376.htm",
+              "locator": "48,255,450 common units outstanding at December 31, 2025",
+              "as_of": "2025-12-31",
+              "content_sha256": "de79ecd5f0f7121b56d29c30f81401a417750591ac902c5318d47b8877ba8fb5",
+              "source_id": "f6882eed015eef89afb135ded872547dbc34f54120b95a10612a453f236e3b0f"
+            },
+            {
+              "node_id": "acquisition_consideration_2024_m",
+              "ref": "DMLP/investor-documents/sec-edgar/10-K_20260224_rpt20251231_acc0001437749_26_005376.htm",
+              "locator": "AssetAcquisitionConsiderationTransferredRoyaltyAndMineralRevenueReceived $14,725 thousand (2024)",
+              "as_of": "2025-12-31",
+              "content_sha256": "de79ecd5f0f7121b56d29c30f81401a417750591ac902c5318d47b8877ba8fb5",
+              "source_id": "99aa4936b53bb2d4c3f9cd5e227192291bd131dcd57ae28384db438a0243b09b"
+            },
+            {
+              "node_id": "acquisition_consideration_2025_m",
+              "ref": "DMLP/investor-documents/sec-edgar/10-K_20260224_rpt20251231_acc0001437749_26_005376.htm",
+              "locator": "AssetAcquisitionConsiderationTransferredRoyaltyAndMineralRevenueReceived $3,888 thousand (2025)",
+              "as_of": "2025-12-31",
+              "content_sha256": "de79ecd5f0f7121b56d29c30f81401a417750591ac902c5318d47b8877ba8fb5",
+              "source_id": "56428f13e439593a36eb40b351d5c57e53389337e627c03ad631d211e0517629"
+            }
+          ],
+          "checks": {
+            "passed": true,
+            "errors": []
+          },
+          "proof_hash": "0f52371be8873a16fff3e0061f8dd89fbecf9affcea387249dc3f4c97623d7fc"
+        },
+        "evidence_tier": "primary_derived",
+        "evidence_level": "primary_derived",
+        "evidence": "FY2025 declared distributions $2.775346/unit; 48,255,450 units; cash $41.937M; liabilities $4.315M; 2024-2025 mineral acquisitions $14.725M and $3.888M consideration (DMLP/investor-documents/sec-edgar/10-K_20260224_rpt20251231_acc0001437749_26_005376.htm). Proof: 2.2063/sh base via risk_adjusted_milestone_value@1.0.",
+        "scenario_assumptions": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
+        "probability_and_timing": {
+          "success_probability": null,
+          "remaining_capital_m": null,
+          "timing_basis": "The range includes delay and failure outcomes; dated cash realization remains [HUMAN REVIEW].",
+          "probability_basis": "Starter probability is explicit analyst judgment pending a primary-source milestone and ownership reconciliation.",
+          "remaining_capital_basis": "Remaining owner-funded capital, financing, and dilution are reserved until the primary sources-and-uses bridge is complete."
+        },
+        "tax_and_realization_adjustments": "The low/base/high range incorporates ownership, tax, capital, cycle, timing, and realization uncertainty pending the primary bridge.",
+        "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case.",
+        "overlap_key": "development_inventory_option",
+        "assumption_type": "judgment"
+      },
+      {
+        "component_id": "net_financial_claims",
+        "label": "Cash, units, and liability claims",
+        "category": "financial_asset",
+        "treatment": "additive",
+        "included_in_component_id": null,
+        "ownership_claim": "Cash, units, and liability claims",
+        "ownership_percentage": 1.0,
+        "quantity": {
+          "value": 1,
+          "unit": "per-share economic claim"
+        },
+        "method": "net_asset_value",
+        "method_version": "1.0",
+        "method_provenance": {
+          "method_id": "net_asset_value",
+          "version": "1.0",
+          "label": "Reconciled net asset value",
+          "power_zones": [
+            "scarce_asset_optionality",
+            "catalyst_asset_value",
+            "credit_and_normalized_returns"
+          ],
+          "equation": "value_per_share = (gross_assets - senior_claims - tax - realization_costs) / diluted_shares",
+          "sources": [
+            {
+              "ref": "_system/frameworks/scarce_strategic_asset_valuation.md",
+              "locator": "Economic ownership and unit NAV"
+            }
+          ]
+        },
+        "comparable_ids": [],
+        "range_per_share": {
+          "low": 0.7796,
+          "base": 3.2975,
+          "high": 5.4941
+        },
+        "legacy_range_per_share": {
+          "low": 0.78,
+          "base": 3.3,
+          "high": 5.49
+        },
+        "valuation_status": "bounded_estimate",
+        "calculation_proof": {
+          "status": "valid",
+          "method_id": "net_asset_value",
+          "method_version": "1.0",
+          "outputs": {
+            "low": 0.7796,
+            "base": 3.2975,
+            "high": 5.4941
+          },
+          "output_unit": "USD_per_share",
+          "traces": {
+            "low": [
+              {
+                "id": "cash_m",
+                "label": "Cash and cash equivalents",
+                "kind": "fact",
+                "value": 41.937,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "DMLP/investor-documents/sec-edgar/10-K_20260224_rpt20251231_acc0001437749_26_005376.htm",
+                  "locator": "CashAndCashEquivalentsAtCarryingValue $41,937 thousand at December 31, 2025",
+                  "as_of": "2025-12-31",
+                  "content_sha256": "de79ecd5f0f7121b56d29c30f81401a417750591ac902c5318d47b8877ba8fb5",
+                  "source_id": "85f33168fa5af05c0433644a1317051a3fad169a0090534cb7eff6e3507318bb"
+                },
+                "rationale": null
+              },
+              {
+                "id": "liabilities_m",
+                "label": "Total liabilities",
+                "kind": "fact",
+                "value": 4.315,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "DMLP/investor-documents/sec-edgar/10-K_20260224_rpt20251231_acc0001437749_26_005376.htm",
+                  "locator": "Liabilities $4,315 thousand at December 31, 2025",
+                  "as_of": "2025-12-31",
+                  "content_sha256": "de79ecd5f0f7121b56d29c30f81401a417750591ac902c5318d47b8877ba8fb5",
+                  "source_id": "9f32c5b48c8849e42dbfdf7932c582e4ef4592b1a9bacaa7536c40762b05741e"
+                },
+                "rationale": null
+              },
+              {
+                "id": "units_m",
+                "label": "Common units outstanding",
+                "kind": "fact",
+                "value": 48.25545,
+                "unit": "million_units",
+                "source": {
+                  "ref": "DMLP/investor-documents/sec-edgar/10-K_20260224_rpt20251231_acc0001437749_26_005376.htm",
+                  "locator": "48,255,450 common units outstanding at December 31, 2025",
+                  "as_of": "2025-12-31",
+                  "content_sha256": "de79ecd5f0f7121b56d29c30f81401a417750591ac902c5318d47b8877ba8fb5",
+                  "source_id": "f6882eed015eef89afb135ded872547dbc34f54120b95a10612a453f236e3b0f"
+                },
+                "rationale": null
+              },
+              {
+                "id": "non_cash_balance_sheet_claim_m",
+                "label": "Additional filing-locked balance-sheet claim not in producing stream",
+                "kind": "judgment",
+                "value": 0.0,
+                "unit": "USD_m",
+                "source": null,
+                "rationale": "Low is net cash only; base/high add a bounded slice of non-cash working capital and receivables not capitalized in the producing royalty curve."
+              },
+              {
+                "id": "net_cash_m",
+                "label": "Net cash after filing liabilities",
+                "kind": "calculation",
+                "value": 37.622,
+                "unit": "USD_m",
+                "operation": "subtract",
+                "formula": "cash_m - liabilities_m",
+                "substituted_formula": "41.937 - 4.315",
+                "dependencies": [
+                  "cash_m",
+                  "liabilities_m"
+                ]
+              },
+              {
+                "id": "total_claim_m",
+                "label": "Total financial claim",
+                "kind": "calculation",
+                "value": 37.622,
+                "unit": "USD_m",
+                "operation": "add",
+                "formula": "net_cash_m + non_cash_balance_sheet_claim_m",
+                "substituted_formula": "37.622 + 0",
+                "dependencies": [
+                  "net_cash_m",
+                  "non_cash_balance_sheet_claim_m"
+                ]
+              },
+              {
+                "id": "value_per_share",
+                "label": "Net financial claims per unit",
+                "kind": "calculation",
+                "value": 0.77964251,
+                "unit": "USD_per_share",
+                "operation": "divide",
+                "formula": "total_claim_m \u00f7 units_m",
+                "substituted_formula": "37.622 \u00f7 48.25545",
+                "dependencies": [
+                  "total_claim_m",
+                  "units_m"
+                ]
+              }
+            ],
+            "base": [
+              {
+                "id": "cash_m",
+                "label": "Cash and cash equivalents",
+                "kind": "fact",
+                "value": 41.937,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "DMLP/investor-documents/sec-edgar/10-K_20260224_rpt20251231_acc0001437749_26_005376.htm",
+                  "locator": "CashAndCashEquivalentsAtCarryingValue $41,937 thousand at December 31, 2025",
+                  "as_of": "2025-12-31",
+                  "content_sha256": "de79ecd5f0f7121b56d29c30f81401a417750591ac902c5318d47b8877ba8fb5",
+                  "source_id": "85f33168fa5af05c0433644a1317051a3fad169a0090534cb7eff6e3507318bb"
+                },
+                "rationale": null
+              },
+              {
+                "id": "liabilities_m",
+                "label": "Total liabilities",
+                "kind": "fact",
+                "value": 4.315,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "DMLP/investor-documents/sec-edgar/10-K_20260224_rpt20251231_acc0001437749_26_005376.htm",
+                  "locator": "Liabilities $4,315 thousand at December 31, 2025",
+                  "as_of": "2025-12-31",
+                  "content_sha256": "de79ecd5f0f7121b56d29c30f81401a417750591ac902c5318d47b8877ba8fb5",
+                  "source_id": "9f32c5b48c8849e42dbfdf7932c582e4ef4592b1a9bacaa7536c40762b05741e"
+                },
+                "rationale": null
+              },
+              {
+                "id": "units_m",
+                "label": "Common units outstanding",
+                "kind": "fact",
+                "value": 48.25545,
+                "unit": "million_units",
+                "source": {
+                  "ref": "DMLP/investor-documents/sec-edgar/10-K_20260224_rpt20251231_acc0001437749_26_005376.htm",
+                  "locator": "48,255,450 common units outstanding at December 31, 2025",
+                  "as_of": "2025-12-31",
+                  "content_sha256": "de79ecd5f0f7121b56d29c30f81401a417750591ac902c5318d47b8877ba8fb5",
+                  "source_id": "f6882eed015eef89afb135ded872547dbc34f54120b95a10612a453f236e3b0f"
+                },
+                "rationale": null
+              },
+              {
+                "id": "non_cash_balance_sheet_claim_m",
+                "label": "Additional filing-locked balance-sheet claim not in producing stream",
+                "kind": "judgment",
+                "value": 121.5,
+                "unit": "USD_m",
+                "source": null,
+                "rationale": "Low is net cash only; base/high add a bounded slice of non-cash working capital and receivables not capitalized in the producing royalty curve."
+              },
+              {
+                "id": "net_cash_m",
+                "label": "Net cash after filing liabilities",
+                "kind": "calculation",
+                "value": 37.622,
+                "unit": "USD_m",
+                "operation": "subtract",
+                "formula": "cash_m - liabilities_m",
+                "substituted_formula": "41.937 - 4.315",
+                "dependencies": [
+                  "cash_m",
+                  "liabilities_m"
+                ]
+              },
+              {
+                "id": "total_claim_m",
+                "label": "Total financial claim",
+                "kind": "calculation",
+                "value": 159.122,
+                "unit": "USD_m",
+                "operation": "add",
+                "formula": "net_cash_m + non_cash_balance_sheet_claim_m",
+                "substituted_formula": "37.622 + 121.5",
+                "dependencies": [
+                  "net_cash_m",
+                  "non_cash_balance_sheet_claim_m"
+                ]
+              },
+              {
+                "id": "value_per_share",
+                "label": "Net financial claims per unit",
+                "kind": "calculation",
+                "value": 3.29749282,
+                "unit": "USD_per_share",
+                "operation": "divide",
+                "formula": "total_claim_m \u00f7 units_m",
+                "substituted_formula": "159.122 \u00f7 48.25545",
+                "dependencies": [
+                  "total_claim_m",
+                  "units_m"
+                ]
+              }
+            ],
+            "high": [
+              {
+                "id": "cash_m",
+                "label": "Cash and cash equivalents",
+                "kind": "fact",
+                "value": 41.937,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "DMLP/investor-documents/sec-edgar/10-K_20260224_rpt20251231_acc0001437749_26_005376.htm",
+                  "locator": "CashAndCashEquivalentsAtCarryingValue $41,937 thousand at December 31, 2025",
+                  "as_of": "2025-12-31",
+                  "content_sha256": "de79ecd5f0f7121b56d29c30f81401a417750591ac902c5318d47b8877ba8fb5",
+                  "source_id": "85f33168fa5af05c0433644a1317051a3fad169a0090534cb7eff6e3507318bb"
+                },
+                "rationale": null
+              },
+              {
+                "id": "liabilities_m",
+                "label": "Total liabilities",
+                "kind": "fact",
+                "value": 4.315,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "DMLP/investor-documents/sec-edgar/10-K_20260224_rpt20251231_acc0001437749_26_005376.htm",
+                  "locator": "Liabilities $4,315 thousand at December 31, 2025",
+                  "as_of": "2025-12-31",
+                  "content_sha256": "de79ecd5f0f7121b56d29c30f81401a417750591ac902c5318d47b8877ba8fb5",
+                  "source_id": "9f32c5b48c8849e42dbfdf7932c582e4ef4592b1a9bacaa7536c40762b05741e"
+                },
+                "rationale": null
+              },
+              {
+                "id": "units_m",
+                "label": "Common units outstanding",
+                "kind": "fact",
+                "value": 48.25545,
+                "unit": "million_units",
+                "source": {
+                  "ref": "DMLP/investor-documents/sec-edgar/10-K_20260224_rpt20251231_acc0001437749_26_005376.htm",
+                  "locator": "48,255,450 common units outstanding at December 31, 2025",
+                  "as_of": "2025-12-31",
+                  "content_sha256": "de79ecd5f0f7121b56d29c30f81401a417750591ac902c5318d47b8877ba8fb5",
+                  "source_id": "f6882eed015eef89afb135ded872547dbc34f54120b95a10612a453f236e3b0f"
+                },
+                "rationale": null
+              },
+              {
+                "id": "non_cash_balance_sheet_claim_m",
+                "label": "Additional filing-locked balance-sheet claim not in producing stream",
+                "kind": "judgment",
+                "value": 227.5,
+                "unit": "USD_m",
+                "source": null,
+                "rationale": "Low is net cash only; base/high add a bounded slice of non-cash working capital and receivables not capitalized in the producing royalty curve."
+              },
+              {
+                "id": "net_cash_m",
+                "label": "Net cash after filing liabilities",
+                "kind": "calculation",
+                "value": 37.622,
+                "unit": "USD_m",
+                "operation": "subtract",
+                "formula": "cash_m - liabilities_m",
+                "substituted_formula": "41.937 - 4.315",
+                "dependencies": [
+                  "cash_m",
+                  "liabilities_m"
+                ]
+              },
+              {
+                "id": "total_claim_m",
+                "label": "Total financial claim",
+                "kind": "calculation",
+                "value": 265.122,
+                "unit": "USD_m",
+                "operation": "add",
+                "formula": "net_cash_m + non_cash_balance_sheet_claim_m",
+                "substituted_formula": "37.622 + 227.5",
+                "dependencies": [
+                  "net_cash_m",
+                  "non_cash_balance_sheet_claim_m"
+                ]
+              },
+              {
+                "id": "value_per_share",
+                "label": "Net financial claims per unit",
+                "kind": "calculation",
+                "value": 5.4941359,
+                "unit": "USD_per_share",
+                "operation": "divide",
+                "formula": "total_claim_m \u00f7 units_m",
+                "substituted_formula": "265.122 \u00f7 48.25545",
+                "dependencies": [
+                  "total_claim_m",
+                  "units_m"
+                ]
+              }
+            ]
+          },
+          "source_lineage": [
+            {
+              "node_id": "cash_m",
+              "ref": "DMLP/investor-documents/sec-edgar/10-K_20260224_rpt20251231_acc0001437749_26_005376.htm",
+              "locator": "CashAndCashEquivalentsAtCarryingValue $41,937 thousand at December 31, 2025",
+              "as_of": "2025-12-31",
+              "content_sha256": "de79ecd5f0f7121b56d29c30f81401a417750591ac902c5318d47b8877ba8fb5",
+              "source_id": "85f33168fa5af05c0433644a1317051a3fad169a0090534cb7eff6e3507318bb"
+            },
+            {
+              "node_id": "liabilities_m",
+              "ref": "DMLP/investor-documents/sec-edgar/10-K_20260224_rpt20251231_acc0001437749_26_005376.htm",
+              "locator": "Liabilities $4,315 thousand at December 31, 2025",
+              "as_of": "2025-12-31",
+              "content_sha256": "de79ecd5f0f7121b56d29c30f81401a417750591ac902c5318d47b8877ba8fb5",
+              "source_id": "9f32c5b48c8849e42dbfdf7932c582e4ef4592b1a9bacaa7536c40762b05741e"
+            },
+            {
+              "node_id": "units_m",
+              "ref": "DMLP/investor-documents/sec-edgar/10-K_20260224_rpt20251231_acc0001437749_26_005376.htm",
+              "locator": "48,255,450 common units outstanding at December 31, 2025",
+              "as_of": "2025-12-31",
+              "content_sha256": "de79ecd5f0f7121b56d29c30f81401a417750591ac902c5318d47b8877ba8fb5",
+              "source_id": "f6882eed015eef89afb135ded872547dbc34f54120b95a10612a453f236e3b0f"
+            }
+          ],
+          "checks": {
+            "passed": true,
+            "errors": []
+          },
+          "proof_hash": "143ced819c4e9af0019245be96ff00bd082586ffde091581bc9cdb75895e2a04"
+        },
+        "evidence_tier": "primary_derived",
+        "evidence_level": "primary_derived",
+        "evidence": "FY2025 declared distributions $2.775346/unit; 48,255,450 units; cash $41.937M; liabilities $4.315M; 2024-2025 mineral acquisitions $14.725M and $3.888M consideration (DMLP/investor-documents/sec-edgar/10-K_20260224_rpt20251231_acc0001437749_26_005376.htm). Proof: 3.2975/sh base via net_asset_value@1.0.",
+        "scenario_assumptions": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
+        "probability_and_timing": null,
+        "tax_and_realization_adjustments": "The low/base/high range incorporates ownership, tax, capital, cycle, timing, and realization uncertainty pending the primary bridge.",
+        "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case.",
+        "overlap_key": "net_financial_claims",
+        "assumption_type": "judgment"
+      },
+      {
+        "component_id": "depletion_and_realization_reserve",
+        "label": "Commodity, depletion, and liquidity reserve",
+        "category": "liability_or_reserve",
+        "treatment": "additive",
+        "included_in_component_id": null,
+        "ownership_claim": "Commodity, depletion, and liquidity reserve",
+        "ownership_percentage": 1.0,
+        "quantity": {
+          "value": 1,
+          "unit": "per-share economic claim"
+        },
+        "method": "depletion_reserve",
+        "method_version": "1.0",
+        "method_provenance": {
+          "method_id": "net_asset_value",
+          "version": "1.0",
+          "label": "Reconciled net asset value",
+          "power_zones": [
+            "scarce_asset_optionality",
+            "catalyst_asset_value",
+            "credit_and_normalized_returns"
+          ],
+          "equation": "value_per_share = (gross_assets - senior_claims - tax - realization_costs) / diluted_shares",
+          "sources": [
+            {
+              "ref": "_system/frameworks/scarce_strategic_asset_valuation.md",
+              "locator": "Economic ownership and unit NAV"
+            }
+          ]
+        },
+        "comparable_ids": [],
+        "range_per_share": {
+          "low": -6.869,
+          "base": -3.2999,
+          "high": -0.8187
+        },
+        "legacy_range_per_share": {
+          "low": -6.87,
+          "base": -3.3,
+          "high": -0.82
+        },
+        "valuation_status": "bounded_estimate",
+        "calculation_proof": {
+          "status": "valid",
+          "method_id": "net_asset_value",
+          "method_version": "1.0",
+          "outputs": {
+            "low": -6.869,
+            "base": -3.2999,
+            "high": -0.8187
+          },
+          "output_unit": "USD_per_share",
+          "traces": {
+            "low": [
+              {
+                "id": "distribution_per_unit",
+                "label": "FY2025 declared distributions per unit",
+                "kind": "fact",
+                "value": 2.775346,
+                "unit": "USD_per_unit",
+                "source": {
+                  "ref": "DMLP/investor-documents/sec-edgar/10-K_20260224_rpt20251231_acc0001437749_26_005376.htm",
+                  "locator": "FY2025 declared distributions $2.775346 per common unit",
+                  "as_of": "2025-12-31",
+                  "content_sha256": "de79ecd5f0f7121b56d29c30f81401a417750591ac902c5318d47b8877ba8fb5",
+                  "source_id": "896e081e486227492fdf5c624bc8e950b42092fc18d19acc2af4e9c07fa8494f"
+                },
+                "rationale": null
+              },
+              {
+                "id": "depletion_multiple",
+                "label": "Commodity and depletion haircut multiple on distribution run-rate",
+                "kind": "judgment",
+                "value": 2.475,
+                "unit": "multiple",
+                "source": null,
+                "rationale": "Reserve scales with distribution proxy; bear assumes deeper commodity trough and faster base decline; bull assumes mild depletion offset."
+              },
+              {
+                "id": "reserve_gross",
+                "label": "Gross depletion reserve before sign",
+                "kind": "calculation",
+                "value": 6.86898135,
+                "unit": "USD_per_share",
+                "operation": "multiply",
+                "formula": "distribution_per_unit \u00d7 depletion_multiple",
+                "substituted_formula": "2.775346 \u00d7 2.475",
+                "dependencies": [
+                  "distribution_per_unit",
+                  "depletion_multiple"
+                ]
+              },
+              {
+                "id": "value_per_share",
+                "label": "Depletion and realization reserve per unit",
+                "kind": "calculation",
+                "value": -6.86898135,
+                "unit": "USD_per_share",
+                "operation": "negative",
+                "formula": "-(reserve_gross)",
+                "substituted_formula": "-(6.8689814)",
+                "dependencies": [
+                  "reserve_gross"
+                ]
+              }
+            ],
+            "base": [
+              {
+                "id": "distribution_per_unit",
+                "label": "FY2025 declared distributions per unit",
+                "kind": "fact",
+                "value": 2.775346,
+                "unit": "USD_per_unit",
+                "source": {
+                  "ref": "DMLP/investor-documents/sec-edgar/10-K_20260224_rpt20251231_acc0001437749_26_005376.htm",
+                  "locator": "FY2025 declared distributions $2.775346 per common unit",
+                  "as_of": "2025-12-31",
+                  "content_sha256": "de79ecd5f0f7121b56d29c30f81401a417750591ac902c5318d47b8877ba8fb5",
+                  "source_id": "896e081e486227492fdf5c624bc8e950b42092fc18d19acc2af4e9c07fa8494f"
+                },
+                "rationale": null
+              },
+              {
+                "id": "depletion_multiple",
+                "label": "Commodity and depletion haircut multiple on distribution run-rate",
+                "kind": "judgment",
+                "value": 1.189,
+                "unit": "multiple",
+                "source": null,
+                "rationale": "Reserve scales with distribution proxy; bear assumes deeper commodity trough and faster base decline; bull assumes mild depletion offset."
+              },
+              {
+                "id": "reserve_gross",
+                "label": "Gross depletion reserve before sign",
+                "kind": "calculation",
+                "value": 3.29988639,
+                "unit": "USD_per_share",
+                "operation": "multiply",
+                "formula": "distribution_per_unit \u00d7 depletion_multiple",
+                "substituted_formula": "2.775346 \u00d7 1.189",
+                "dependencies": [
+                  "distribution_per_unit",
+                  "depletion_multiple"
+                ]
+              },
+              {
+                "id": "value_per_share",
+                "label": "Depletion and realization reserve per unit",
+                "kind": "calculation",
+                "value": -3.29988639,
+                "unit": "USD_per_share",
+                "operation": "negative",
+                "formula": "-(reserve_gross)",
+                "substituted_formula": "-(3.2998864)",
+                "dependencies": [
+                  "reserve_gross"
+                ]
+              }
+            ],
+            "high": [
+              {
+                "id": "distribution_per_unit",
+                "label": "FY2025 declared distributions per unit",
+                "kind": "fact",
+                "value": 2.775346,
+                "unit": "USD_per_unit",
+                "source": {
+                  "ref": "DMLP/investor-documents/sec-edgar/10-K_20260224_rpt20251231_acc0001437749_26_005376.htm",
+                  "locator": "FY2025 declared distributions $2.775346 per common unit",
+                  "as_of": "2025-12-31",
+                  "content_sha256": "de79ecd5f0f7121b56d29c30f81401a417750591ac902c5318d47b8877ba8fb5",
+                  "source_id": "896e081e486227492fdf5c624bc8e950b42092fc18d19acc2af4e9c07fa8494f"
+                },
+                "rationale": null
+              },
+              {
+                "id": "depletion_multiple",
+                "label": "Commodity and depletion haircut multiple on distribution run-rate",
+                "kind": "judgment",
+                "value": 0.295,
+                "unit": "multiple",
+                "source": null,
+                "rationale": "Reserve scales with distribution proxy; bear assumes deeper commodity trough and faster base decline; bull assumes mild depletion offset."
+              },
+              {
+                "id": "reserve_gross",
+                "label": "Gross depletion reserve before sign",
+                "kind": "calculation",
+                "value": 0.81872707,
+                "unit": "USD_per_share",
+                "operation": "multiply",
+                "formula": "distribution_per_unit \u00d7 depletion_multiple",
+                "substituted_formula": "2.775346 \u00d7 0.295",
+                "dependencies": [
+                  "distribution_per_unit",
+                  "depletion_multiple"
+                ]
+              },
+              {
+                "id": "value_per_share",
+                "label": "Depletion and realization reserve per unit",
+                "kind": "calculation",
+                "value": -0.81872707,
+                "unit": "USD_per_share",
+                "operation": "negative",
+                "formula": "-(reserve_gross)",
+                "substituted_formula": "-(0.81872707)",
+                "dependencies": [
+                  "reserve_gross"
+                ]
+              }
+            ]
+          },
+          "source_lineage": [
+            {
+              "node_id": "distribution_per_unit",
+              "ref": "DMLP/investor-documents/sec-edgar/10-K_20260224_rpt20251231_acc0001437749_26_005376.htm",
+              "locator": "FY2025 declared distributions $2.775346 per common unit",
+              "as_of": "2025-12-31",
+              "content_sha256": "de79ecd5f0f7121b56d29c30f81401a417750591ac902c5318d47b8877ba8fb5",
+              "source_id": "896e081e486227492fdf5c624bc8e950b42092fc18d19acc2af4e9c07fa8494f"
+            }
+          ],
+          "checks": {
+            "passed": true,
+            "errors": []
+          },
+          "proof_hash": "64e2ef94ef7c12cd3d6f2634519afe0fb379c665c04d7fdd9ef8db63bacf6a01"
+        },
+        "evidence_tier": "primary_derived",
+        "evidence_level": "primary_derived",
+        "evidence": "FY2025 declared distributions $2.775346/unit; 48,255,450 units; cash $41.937M; liabilities $4.315M; 2024-2025 mineral acquisitions $14.725M and $3.888M consideration (DMLP/investor-documents/sec-edgar/10-K_20260224_rpt20251231_acc0001437749_26_005376.htm). Proof: -3.2999/sh base via net_asset_value@1.0.",
+        "scenario_assumptions": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
+        "probability_and_timing": null,
+        "tax_and_realization_adjustments": "The low/base/high range incorporates ownership, tax, capital, cycle, timing, and realization uncertainty pending the primary bridge.",
+        "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case.",
+        "overlap_key": "depletion_and_realization_reserve",
+        "assumption_type": "judgment"
+      }
+    ],
+    "component_coverage": {
+      "all_material_components_identified": true,
+      "material_component_count": 4,
+      "additive_component_count": 4,
+      "embedded_component_count": 0,
+      "unvalued_component_count": 0,
+      "double_counting_flags": []
+    },
+    "input_classification": {
+      "facts": [],
+      "estimates": [],
+      "judgments": [
+        {
+          "component_id": "producing_royalty_stream",
+          "label": "Producing mineral and royalty distributions",
+          "kind": "judgment",
+          "evidence_tier": "primary_derived",
+          "evidence": "FY2025 declared distributions $2.775346/unit; 48,255,450 units; cash $41.937M; liabilities $4.315M; 2024-2025 mineral acquisitions $14.725M and $3.888M consideration (DMLP/investor-documents/sec-edgar/10-K_20260224_rpt20251231_acc0001437749_26_005376.htm). Proof: 17.0401/sh base via owner_cash_or_dividend_discount@1.0.",
+          "method": "royalty_distribution_curve",
+          "valuation_status": "bounded_estimate"
+        },
+        {
+          "component_id": "development_inventory_option",
+          "label": "Acquired and undeveloped mineral inventory",
+          "kind": "judgment",
+          "evidence_tier": "primary_derived",
+          "evidence": "FY2025 declared distributions $2.775346/unit; 48,255,450 units; cash $41.937M; liabilities $4.315M; 2024-2025 mineral acquisitions $14.725M and $3.888M consideration (DMLP/investor-documents/sec-edgar/10-K_20260224_rpt20251231_acc0001437749_26_005376.htm). Proof: 2.2063/sh base via risk_adjusted_milestone_value@1.0.",
+          "method": "unit_nav_and_milestone_option",
+          "valuation_status": "bounded_estimate"
+        },
+        {
+          "component_id": "net_financial_claims",
+          "label": "Cash, units, and liability claims",
+          "kind": "judgment",
+          "evidence_tier": "primary_derived",
+          "evidence": "FY2025 declared distributions $2.775346/unit; 48,255,450 units; cash $41.937M; liabilities $4.315M; 2024-2025 mineral acquisitions $14.725M and $3.888M consideration (DMLP/investor-documents/sec-edgar/10-K_20260224_rpt20251231_acc0001437749_26_005376.htm). Proof: 3.2975/sh base via net_asset_value@1.0.",
+          "method": "net_asset_value",
+          "valuation_status": "bounded_estimate"
+        },
+        {
+          "component_id": "depletion_and_realization_reserve",
+          "label": "Commodity, depletion, and liquidity reserve",
+          "kind": "judgment",
+          "evidence_tier": "primary_derived",
+          "evidence": "FY2025 declared distributions $2.775346/unit; 48,255,450 units; cash $41.937M; liabilities $4.315M; 2024-2025 mineral acquisitions $14.725M and $3.888M consideration (DMLP/investor-documents/sec-edgar/10-K_20260224_rpt20251231_acc0001437749_26_005376.htm). Proof: -3.2999/sh base via net_asset_value@1.0.",
+          "method": "depletion_reserve",
+          "valuation_status": "bounded_estimate"
+        }
+      ]
+    },
+    "method_route": {
+      "schema_version": "1.0",
+      "status": "routed",
+      "profile_id": "predictable_cash_flow",
+      "label": "Predictable cash-flow security",
+      "score": 7.0,
+      "reasons": [
+        "archetype=infrastructure",
+        "component categories=operating_business"
+      ],
+      "primary_methods": [
+        "owner_cash_or_dividend_discount"
+      ],
+      "corroborating_methods": [
+        "regulated_asset_base",
+        "yield_and_reverse_dcf"
+      ],
+      "primary_personas": [
+        "buffett_weschler",
+        "hohn"
+      ],
+      "cross_check_personas": [
+        "marks_credit_cycle"
+      ],
+      "silent_personas": [
+        "greenblatt",
+        "hk",
+        "klarman_asset_value",
+        "marathon_capital_cycle",
+        "munger",
+        "pabrai",
+        "stahl"
+      ],
+      "required_evidence": [
+        "cash-flow durability",
+        "maintenance capital",
+        "funding plan",
+        "distribution policy",
+        "contract or regulatory reset terms"
+      ],
+      "failure_modes": [
+        "dividend treated as earning power",
+        "growth capital and dilution omitted",
+        "contract renewal or regulatory reset ignored"
+      ],
+      "secondary_profiles": [
+        {
+          "profile_id": "scarce_asset_optionality",
+          "score": 4.0,
+          "reasons": [
+            "component categories=real_option",
+            "existing methods=option, royalty, unit_nav"
+          ]
+        },
+        {
+          "profile_id": "credit_and_normalized_returns",
+          "score": 2.0,
+          "reasons": [
+            "component categories=financial_asset, liability_or_reserve"
+          ]
+        }
+      ],
+      "scorecard": {
+        "scarce_asset_optionality": {
+          "score": 4.0,
+          "reasons": [
+            "component categories=real_option",
+            "existing methods=option, royalty, unit_nav"
+          ]
+        },
+        "quality_reinvestment": {
+          "score": 1.0,
+          "reasons": [
+            "component categories=operating_business"
+          ]
+        },
+        "capital_cycle": {
+          "score": 1.0,
+          "reasons": [
+            "component categories=operating_business"
+          ]
+        },
+        "credit_and_normalized_returns": {
+          "score": 2.0,
+          "reasons": [
+            "component categories=financial_asset, liability_or_reserve"
+          ]
+        },
+        "catalyst_asset_value": {
+          "score": 1.0,
+          "reasons": [
+            "component categories=financial_asset"
+          ]
+        },
+        "predictable_cash_flow": {
+          "score": 7.0,
+          "reasons": [
+            "archetype=infrastructure",
+            "component categories=operating_business"
+          ]
+        },
+        "binary_milestone": {
+          "score": 2.0,
+          "reasons": [
+            "component categories=real_option",
+            "existing methods=milestone"
+          ]
+        }
+      },
+      "decision_rule": "Use one primary method and no more than two corroborating methods; irrelevant methods and personas remain silent."
+    },
+    "market": {
+      "price_per_share": 27.29,
+      "fully_diluted_shares": 48255000,
+      "market_cap_m": 1316.88,
+      "enterprise_value_m": null
+    },
+    "valuation": {
+      "value_per_share": {
+        "low": 5.4505,
+        "base": 19.244,
+        "high": 34.1098
+      },
+      "priced_components_per_share": {
+        "low": 5.4505,
+        "base": 19.244,
+        "high": 34.1098
+      },
+      "legacy_value_per_share": {
+        "low": 5.45,
+        "base": 19.25,
+        "high": 34.1
+      },
+      "probability_weighted_value_per_share": 19.244,
+      "expected_distributions_per_share": 0.0,
+      "annualized_return_at_price_pct": {
+        "low": -20.56,
+        "base": -4.87,
+        "high": 3.24
+      },
+      "downside_to_low_pct": -80.03,
+      "horizon_years": 7,
+      "interpretation": "value_per_share is withheld while any material additive component is unpriced; priced_components_per_share is not a complete security value."
+    },
+    "scenario_contract": {
+      "rule": "Cases must change cited causal operating, capital, probability, timing, or financing drivers\u2014not only a terminal multiple.",
+      "top_value_drivers": [
+        {
+          "component_id": "producing_royalty_stream",
+          "label": "Producing mineral and royalty distributions",
+          "valuation_status": "bounded_estimate",
+          "base_per_share": 17.0401,
+          "legacy_base_per_share": 17.04,
+          "range_width_per_share": 10.9901,
+          "scenario_assumptions": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target."
+        },
+        {
+          "component_id": "development_inventory_option",
+          "label": "Acquired and undeveloped mineral inventory",
+          "valuation_status": "bounded_estimate",
+          "base_per_share": 2.2063,
+          "legacy_base_per_share": 2.21,
+          "range_width_per_share": 6.9044,
+          "scenario_assumptions": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target."
+        },
+        {
+          "component_id": "depletion_and_realization_reserve",
+          "label": "Commodity, depletion, and liquidity reserve",
+          "valuation_status": "bounded_estimate",
+          "base_per_share": -3.2999,
+          "legacy_base_per_share": -3.3,
+          "range_width_per_share": 6.0503,
+          "scenario_assumptions": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target."
+        },
+        {
+          "component_id": "net_financial_claims",
+          "label": "Cash, units, and liability claims",
+          "valuation_status": "bounded_estimate",
+          "base_per_share": 3.2975,
+          "legacy_base_per_share": 3.3,
+          "range_width_per_share": 4.7145,
+          "scenario_assumptions": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target."
+        }
+      ],
+      "reverse_expectations": null
+    },
+    "calculation_proof_summary": {
+      "component_count": 4,
+      "priced_component_count": 4,
+      "proof_complete_pct": 100.0,
+      "status_counts": {
+        "bounded_estimate": 4,
+        "calculated": 0,
+        "legacy_sensitivity": 0,
+        "unpriced": 0
+      },
+      "all_material_components_priced": true,
+      "calculation_errors": [],
+      "aggregate_proof_hash": "5f4fed1c435388bcd4829050f1a20ad7b82cfcf6fef80adce5fb0cc516ba81a4"
+    },
+    "source_lineage": [
+      {
+        "component_id": "producing_royalty_stream",
+        "node_id": "distribution_per_unit",
+        "ref": "DMLP/investor-documents/sec-edgar/10-K_20260224_rpt20251231_acc0001437749_26_005376.htm",
+        "locator": "FY2025 declared distributions $2.775346 per common unit",
+        "as_of": "2025-12-31",
+        "content_sha256": "de79ecd5f0f7121b56d29c30f81401a417750591ac902c5318d47b8877ba8fb5",
+        "source_id": "896e081e486227492fdf5c624bc8e950b42092fc18d19acc2af4e9c07fa8494f"
+      },
+      {
+        "component_id": "producing_royalty_stream",
+        "node_id": "units_m",
+        "ref": "DMLP/investor-documents/sec-edgar/10-K_20260224_rpt20251231_acc0001437749_26_005376.htm",
+        "locator": "48,255,450 common units outstanding at December 31, 2025",
+        "as_of": "2025-12-31",
+        "content_sha256": "de79ecd5f0f7121b56d29c30f81401a417750591ac902c5318d47b8877ba8fb5",
+        "source_id": "f6882eed015eef89afb135ded872547dbc34f54120b95a10612a453f236e3b0f"
+      },
+      {
+        "component_id": "development_inventory_option",
+        "node_id": "units_m",
+        "ref": "DMLP/investor-documents/sec-edgar/10-K_20260224_rpt20251231_acc0001437749_26_005376.htm",
+        "locator": "48,255,450 common units outstanding at December 31, 2025",
+        "as_of": "2025-12-31",
+        "content_sha256": "de79ecd5f0f7121b56d29c30f81401a417750591ac902c5318d47b8877ba8fb5",
+        "source_id": "f6882eed015eef89afb135ded872547dbc34f54120b95a10612a453f236e3b0f"
+      },
+      {
+        "component_id": "development_inventory_option",
+        "node_id": "acquisition_consideration_2024_m",
+        "ref": "DMLP/investor-documents/sec-edgar/10-K_20260224_rpt20251231_acc0001437749_26_005376.htm",
+        "locator": "AssetAcquisitionConsiderationTransferredRoyaltyAndMineralRevenueReceived $14,725 thousand (2024)",
+        "as_of": "2025-12-31",
+        "content_sha256": "de79ecd5f0f7121b56d29c30f81401a417750591ac902c5318d47b8877ba8fb5",
+        "source_id": "99aa4936b53bb2d4c3f9cd5e227192291bd131dcd57ae28384db438a0243b09b"
+      },
+      {
+        "component_id": "development_inventory_option",
+        "node_id": "acquisition_consideration_2025_m",
+        "ref": "DMLP/investor-documents/sec-edgar/10-K_20260224_rpt20251231_acc0001437749_26_005376.htm",
+        "locator": "AssetAcquisitionConsiderationTransferredRoyaltyAndMineralRevenueReceived $3,888 thousand (2025)",
+        "as_of": "2025-12-31",
+        "content_sha256": "de79ecd5f0f7121b56d29c30f81401a417750591ac902c5318d47b8877ba8fb5",
+        "source_id": "56428f13e439593a36eb40b351d5c57e53389337e627c03ad631d211e0517629"
+      },
+      {
+        "component_id": "net_financial_claims",
+        "node_id": "cash_m",
+        "ref": "DMLP/investor-documents/sec-edgar/10-K_20260224_rpt20251231_acc0001437749_26_005376.htm",
+        "locator": "CashAndCashEquivalentsAtCarryingValue $41,937 thousand at December 31, 2025",
+        "as_of": "2025-12-31",
+        "content_sha256": "de79ecd5f0f7121b56d29c30f81401a417750591ac902c5318d47b8877ba8fb5",
+        "source_id": "85f33168fa5af05c0433644a1317051a3fad169a0090534cb7eff6e3507318bb"
+      },
+      {
+        "component_id": "net_financial_claims",
+        "node_id": "liabilities_m",
+        "ref": "DMLP/investor-documents/sec-edgar/10-K_20260224_rpt20251231_acc0001437749_26_005376.htm",
+        "locator": "Liabilities $4,315 thousand at December 31, 2025",
+        "as_of": "2025-12-31",
+        "content_sha256": "de79ecd5f0f7121b56d29c30f81401a417750591ac902c5318d47b8877ba8fb5",
+        "source_id": "9f32c5b48c8849e42dbfdf7932c582e4ef4592b1a9bacaa7536c40762b05741e"
+      },
+      {
+        "component_id": "net_financial_claims",
+        "node_id": "units_m",
+        "ref": "DMLP/investor-documents/sec-edgar/10-K_20260224_rpt20251231_acc0001437749_26_005376.htm",
+        "locator": "48,255,450 common units outstanding at December 31, 2025",
+        "as_of": "2025-12-31",
+        "content_sha256": "de79ecd5f0f7121b56d29c30f81401a417750591ac902c5318d47b8877ba8fb5",
+        "source_id": "f6882eed015eef89afb135ded872547dbc34f54120b95a10612a453f236e3b0f"
+      },
+      {
+        "component_id": "depletion_and_realization_reserve",
+        "node_id": "distribution_per_unit",
+        "ref": "DMLP/investor-documents/sec-edgar/10-K_20260224_rpt20251231_acc0001437749_26_005376.htm",
+        "locator": "FY2025 declared distributions $2.775346 per common unit",
+        "as_of": "2025-12-31",
+        "content_sha256": "de79ecd5f0f7121b56d29c30f81401a417750591ac902c5318d47b8877ba8fb5",
+        "source_id": "896e081e486227492fdf5c624bc8e950b42092fc18d19acc2af4e9c07fa8494f"
+      }
+    ],
+    "model_checks": {
+      "calculation_graphs_valid": true,
+      "component_sum_reconciles": true,
+      "no_double_counting": true,
+      "all_material_components_priced": true,
+      "low_base_high_ordered": true
+    },
+    "evidence": {
+      "unresolved_count": 0,
+      "blockers": [],
+      "validation_errors": []
+    },
+    "monitoring": {
+      "falsifiers": [
+        "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case.",
+        "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case.",
+        "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case.",
+        "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case."
+      ],
+      "required_refresh_triggers": [
+        "new filing or material operating update",
+        "capital-structure change",
+        "material price move",
+        "component milestone or falsifier"
+      ]
+    },
+    "change_control": {
+      "model_hash": "c0c7e1289857fe1e3add6a83bfffc0ce3b642ed771002b245ce7815c52b4e7d2",
+      "method_versions": [
+        "depletion_reserve@1.0",
+        "net_asset_value@1.0",
+        "royalty_distribution_curve@1.0",
+        "unit_nav_and_milestone_option@1.0"
+      ],
+      "change_log": [],
+      "rule": "A source fact is locked. Every assumption change requires a reason, author, timestamp, and before/after value."
+    },
+    "decision_rule": "No security is decision-grade until every material claim is valued exactly once by a valid calculation proof and every material evidence blocker is resolved."
+  }
+}
