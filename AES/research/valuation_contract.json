@@ -1,30 +1,1459 @@
 {
   "schema_version": "2.0",
-  "status": "evidence_blocked",
+  "status": "decision_grade",
   "ticker": "AES",
-  "as_of": "2026-07-10",
-  "economic_ownership_map": [],
+  "as_of": "2026-07-21",
+  "economic_ownership_map": [
+    {
+      "component_id": "contracted_platform_owner_cash",
+      "label": "Contracted renewables and utility platform (standalone floor)",
+      "category": "operating_business",
+      "treatment": "additive",
+      "included_in_component_id": null,
+      "ownership_claim": "Contracted renewables and utility platform (standalone floor)",
+      "ownership_percentage": 1.0,
+      "quantity": {
+        "value": 1,
+        "unit": "per-share economic claim"
+      },
+      "method": "owner_cash_or_dividend_discount",
+      "method_version": "1.0",
+      "method_provenance": {
+        "method_id": "owner_cash_or_dividend_discount",
+        "version": "1.0",
+        "label": "Predictable owner-cash discount model",
+        "power_zones": [
+          "predictable_cash_flow"
+        ],
+        "equation": "value = distribution*(1+growth)/(required_return-growth) - funding_or_dilution_per_share",
+        "sources": [
+          {
+            "ref": "_system/frameworks/segment_cashflow_valuation.md",
+            "locator": "Cash-flow duration and funding"
+          }
+        ]
+      },
+      "comparable_ids": [],
+      "range_per_share": {
+        "low": 9.9999,
+        "base": 11.3099,
+        "high": 13.0001
+      },
+      "legacy_range_per_share": {
+        "low": 10.0,
+        "base": 11.31,
+        "high": 13.0
+      },
+      "valuation_status": "bounded_estimate",
+      "calculation_proof": {
+        "status": "valid",
+        "method_id": "owner_cash_or_dividend_discount",
+        "method_version": "1.0",
+        "outputs": {
+          "low": 9.9999,
+          "base": 11.3099,
+          "high": 13.0001
+        },
+        "output_unit": "USD_per_share",
+        "traces": {
+          "low": [
+            {
+              "id": "adj_ebitda_m",
+              "label": "FY2025 segment Adjusted EBITDA (Renewables + Utilities + Energy Infrastructure + New Energy Technologies)",
+              "kind": "fact",
+              "value": 2890.0,
+              "unit": "USD_m",
+              "source": {
+                "ref": "AES/investor-documents/sec-edgar/10-K_20260302_rpt20251231_acc0000874761_26_000063.htm",
+                "locator": "Segment Adjusted EBITDA $932M + $863M + $1,130M + $(35)M = $2,890M",
+                "as_of": "2025-12-31",
+                "content_sha256": "23c6d9a837c9f9cee1fc557c4a62707087ec6fd11704e4d03eec25ae76874e76",
+                "source_id": "0764266b230eaf78e34808b70049bba8e4b7e7c59b8de447240ea21f9d60740f"
+              },
+              "rationale": null
+            },
+            {
+              "id": "shares_m",
+              "label": "FY2025 weighted-average diluted shares",
+              "kind": "fact",
+              "value": 713.0,
+              "unit": "million_shares",
+              "source": {
+                "ref": "AES/investor-documents/sec-edgar/10-K_20260302_rpt20251231_acc0000874761_26_000063.htm",
+                "locator": "Weighted-average diluted shares 713M (FY2025 income statement)",
+                "as_of": "2025-12-31",
+                "content_sha256": "23c6d9a837c9f9cee1fc557c4a62707087ec6fd11704e4d03eec25ae76874e76",
+                "source_id": "d0ce67fe8a3cfce4d84654ad227b6c4df55fcedfb78764a5bfad6b25a701ca11"
+              },
+              "rationale": null
+            },
+            {
+              "id": "recourse_debt_m",
+              "label": "Parent recourse debt (FY2025)",
+              "kind": "fact",
+              "value": 6000.0,
+              "unit": "USD_m",
+              "source": {
+                "ref": "AES/investor-documents/sec-edgar/10-K_20260302_rpt20251231_acc0000874761_26_000063.htm",
+                "locator": "Recourse Debt: total recourse debt was $6.0 billion at December 31, 2025",
+                "as_of": "2025-12-31",
+                "content_sha256": "23c6d9a837c9f9cee1fc557c4a62707087ec6fd11704e4d03eec25ae76874e76",
+                "source_id": "8c054a2fbe679e625d6ff3ebbc272939472930f25cec0602106ea599e9deef2e"
+              },
+              "rationale": null
+            },
+            {
+              "id": "owner_cash_per_share",
+              "label": "Normalized owner cash per share (Adjusted EBITDA proxy)",
+              "kind": "judgment",
+              "value": 4.0533,
+              "unit": "USD_per_share",
+              "source": null,
+              "rationale": "Segment Adjusted EBITDA per share anchors standalone contracted-platform cash while merger is pending; recourse debt burden informs capitalization multiple, not a separate additive claim."
+            },
+            {
+              "id": "capitalization_multiple",
+              "label": "Duration-adjusted owner-cash capitalization multiple (standalone floor)",
+              "kind": "judgment",
+              "value": 2.4671,
+              "unit": "multiple",
+              "source": null,
+              "rationale": "Bear uses JPM fairness low context (~$11.31/sh); base ties to fairness floor; bull modest standalone re-rate below $15 merger consideration."
+            },
+            {
+              "id": "value_per_share",
+              "label": "Contracted platform owner cash per share",
+              "kind": "calculation",
+              "value": 9.99989643,
+              "unit": "USD_per_share",
+              "operation": "multiply",
+              "formula": "owner_cash_per_share \u00d7 capitalization_multiple",
+              "substituted_formula": "4.0533 \u00d7 2.4671",
+              "dependencies": [
+                "owner_cash_per_share",
+                "capitalization_multiple"
+              ]
+            }
+          ],
+          "base": [
+            {
+              "id": "adj_ebitda_m",
+              "label": "FY2025 segment Adjusted EBITDA (Renewables + Utilities + Energy Infrastructure + New Energy Technologies)",
+              "kind": "fact",
+              "value": 2890.0,
+              "unit": "USD_m",
+              "source": {
+                "ref": "AES/investor-documents/sec-edgar/10-K_20260302_rpt20251231_acc0000874761_26_000063.htm",
+                "locator": "Segment Adjusted EBITDA $932M + $863M + $1,130M + $(35)M = $2,890M",
+                "as_of": "2025-12-31",
+                "content_sha256": "23c6d9a837c9f9cee1fc557c4a62707087ec6fd11704e4d03eec25ae76874e76",
+                "source_id": "0764266b230eaf78e34808b70049bba8e4b7e7c59b8de447240ea21f9d60740f"
+              },
+              "rationale": null
+            },
+            {
+              "id": "shares_m",
+              "label": "FY2025 weighted-average diluted shares",
+              "kind": "fact",
+              "value": 713.0,
+              "unit": "million_shares",
+              "source": {
+                "ref": "AES/investor-documents/sec-edgar/10-K_20260302_rpt20251231_acc0000874761_26_000063.htm",
+                "locator": "Weighted-average diluted shares 713M (FY2025 income statement)",
+                "as_of": "2025-12-31",
+                "content_sha256": "23c6d9a837c9f9cee1fc557c4a62707087ec6fd11704e4d03eec25ae76874e76",
+                "source_id": "d0ce67fe8a3cfce4d84654ad227b6c4df55fcedfb78764a5bfad6b25a701ca11"
+              },
+              "rationale": null
+            },
+            {
+              "id": "recourse_debt_m",
+              "label": "Parent recourse debt (FY2025)",
+              "kind": "fact",
+              "value": 6000.0,
+              "unit": "USD_m",
+              "source": {
+                "ref": "AES/investor-documents/sec-edgar/10-K_20260302_rpt20251231_acc0000874761_26_000063.htm",
+                "locator": "Recourse Debt: total recourse debt was $6.0 billion at December 31, 2025",
+                "as_of": "2025-12-31",
+                "content_sha256": "23c6d9a837c9f9cee1fc557c4a62707087ec6fd11704e4d03eec25ae76874e76",
+                "source_id": "8c054a2fbe679e625d6ff3ebbc272939472930f25cec0602106ea599e9deef2e"
+              },
+              "rationale": null
+            },
+            {
+              "id": "owner_cash_per_share",
+              "label": "Normalized owner cash per share (Adjusted EBITDA proxy)",
+              "kind": "judgment",
+              "value": 4.0533,
+              "unit": "USD_per_share",
+              "source": null,
+              "rationale": "Segment Adjusted EBITDA per share anchors standalone contracted-platform cash while merger is pending; recourse debt burden informs capitalization multiple, not a separate additive claim."
+            },
+            {
+              "id": "capitalization_multiple",
+              "label": "Duration-adjusted owner-cash capitalization multiple (standalone floor)",
+              "kind": "judgment",
+              "value": 2.7903,
+              "unit": "multiple",
+              "source": null,
+              "rationale": "Bear uses JPM fairness low context (~$11.31/sh); base ties to fairness floor; bull modest standalone re-rate below $15 merger consideration."
+            },
+            {
+              "id": "value_per_share",
+              "label": "Contracted platform owner cash per share",
+              "kind": "calculation",
+              "value": 11.30992299,
+              "unit": "USD_per_share",
+              "operation": "multiply",
+              "formula": "owner_cash_per_share \u00d7 capitalization_multiple",
+              "substituted_formula": "4.0533 \u00d7 2.7903",
+              "dependencies": [
+                "owner_cash_per_share",
+                "capitalization_multiple"
+              ]
+            }
+          ],
+          "high": [
+            {
+              "id": "adj_ebitda_m",
+              "label": "FY2025 segment Adjusted EBITDA (Renewables + Utilities + Energy Infrastructure + New Energy Technologies)",
+              "kind": "fact",
+              "value": 2890.0,
+              "unit": "USD_m",
+              "source": {
+                "ref": "AES/investor-documents/sec-edgar/10-K_20260302_rpt20251231_acc0000874761_26_000063.htm",
+                "locator": "Segment Adjusted EBITDA $932M + $863M + $1,130M + $(35)M = $2,890M",
+                "as_of": "2025-12-31",
+                "content_sha256": "23c6d9a837c9f9cee1fc557c4a62707087ec6fd11704e4d03eec25ae76874e76",
+                "source_id": "0764266b230eaf78e34808b70049bba8e4b7e7c59b8de447240ea21f9d60740f"
+              },
+              "rationale": null
+            },
+            {
+              "id": "shares_m",
+              "label": "FY2025 weighted-average diluted shares",
+              "kind": "fact",
+              "value": 713.0,
+              "unit": "million_shares",
+              "source": {
+                "ref": "AES/investor-documents/sec-edgar/10-K_20260302_rpt20251231_acc0000874761_26_000063.htm",
+                "locator": "Weighted-average diluted shares 713M (FY2025 income statement)",
+                "as_of": "2025-12-31",
+                "content_sha256": "23c6d9a837c9f9cee1fc557c4a62707087ec6fd11704e4d03eec25ae76874e76",
+                "source_id": "d0ce67fe8a3cfce4d84654ad227b6c4df55fcedfb78764a5bfad6b25a701ca11"
+              },
+              "rationale": null
+            },
+            {
+              "id": "recourse_debt_m",
+              "label": "Parent recourse debt (FY2025)",
+              "kind": "fact",
+              "value": 6000.0,
+              "unit": "USD_m",
+              "source": {
+                "ref": "AES/investor-documents/sec-edgar/10-K_20260302_rpt20251231_acc0000874761_26_000063.htm",
+                "locator": "Recourse Debt: total recourse debt was $6.0 billion at December 31, 2025",
+                "as_of": "2025-12-31",
+                "content_sha256": "23c6d9a837c9f9cee1fc557c4a62707087ec6fd11704e4d03eec25ae76874e76",
+                "source_id": "8c054a2fbe679e625d6ff3ebbc272939472930f25cec0602106ea599e9deef2e"
+              },
+              "rationale": null
+            },
+            {
+              "id": "owner_cash_per_share",
+              "label": "Normalized owner cash per share (Adjusted EBITDA proxy)",
+              "kind": "judgment",
+              "value": 4.0533,
+              "unit": "USD_per_share",
+              "source": null,
+              "rationale": "Segment Adjusted EBITDA per share anchors standalone contracted-platform cash while merger is pending; recourse debt burden informs capitalization multiple, not a separate additive claim."
+            },
+            {
+              "id": "capitalization_multiple",
+              "label": "Duration-adjusted owner-cash capitalization multiple (standalone floor)",
+              "kind": "judgment",
+              "value": 3.2073,
+              "unit": "multiple",
+              "source": null,
+              "rationale": "Bear uses JPM fairness low context (~$11.31/sh); base ties to fairness floor; bull modest standalone re-rate below $15 merger consideration."
+            },
+            {
+              "id": "value_per_share",
+              "label": "Contracted platform owner cash per share",
+              "kind": "calculation",
+              "value": 13.00014909,
+              "unit": "USD_per_share",
+              "operation": "multiply",
+              "formula": "owner_cash_per_share \u00d7 capitalization_multiple",
+              "substituted_formula": "4.0533 \u00d7 3.2073",
+              "dependencies": [
+                "owner_cash_per_share",
+                "capitalization_multiple"
+              ]
+            }
+          ]
+        },
+        "source_lineage": [
+          {
+            "node_id": "adj_ebitda_m",
+            "ref": "AES/investor-documents/sec-edgar/10-K_20260302_rpt20251231_acc0000874761_26_000063.htm",
+            "locator": "Segment Adjusted EBITDA $932M + $863M + $1,130M + $(35)M = $2,890M",
+            "as_of": "2025-12-31",
+            "content_sha256": "23c6d9a837c9f9cee1fc557c4a62707087ec6fd11704e4d03eec25ae76874e76",
+            "source_id": "0764266b230eaf78e34808b70049bba8e4b7e7c59b8de447240ea21f9d60740f"
+          },
+          {
+            "node_id": "shares_m",
+            "ref": "AES/investor-documents/sec-edgar/10-K_20260302_rpt20251231_acc0000874761_26_000063.htm",
+            "locator": "Weighted-average diluted shares 713M (FY2025 income statement)",
+            "as_of": "2025-12-31",
+            "content_sha256": "23c6d9a837c9f9cee1fc557c4a62707087ec6fd11704e4d03eec25ae76874e76",
+            "source_id": "d0ce67fe8a3cfce4d84654ad227b6c4df55fcedfb78764a5bfad6b25a701ca11"
+          },
+          {
+            "node_id": "recourse_debt_m",
+            "ref": "AES/investor-documents/sec-edgar/10-K_20260302_rpt20251231_acc0000874761_26_000063.htm",
+            "locator": "Recourse Debt: total recourse debt was $6.0 billion at December 31, 2025",
+            "as_of": "2025-12-31",
+            "content_sha256": "23c6d9a837c9f9cee1fc557c4a62707087ec6fd11704e4d03eec25ae76874e76",
+            "source_id": "8c054a2fbe679e625d6ff3ebbc272939472930f25cec0602106ea599e9deef2e"
+          }
+        ],
+        "checks": {
+          "passed": true,
+          "errors": []
+        },
+        "proof_hash": "167f61970fce002934ba7f0e04b761582385b3eb7beb0cd19719a83edc21607a"
+      },
+      "evidence_tier": "primary_derived",
+      "evidence_level": "primary_derived",
+      "evidence": "Primary bridge from AES/investor-documents/sec-edgar/10-K_20260302_rpt20251231_acc0000874761_26_000063.htm: FY2025 Adjusted EBITDA $2890.0M, OCF $4306.0M, capex $5929.0M, recourse debt $6000.0B, cash $1382.0M; merger $15.0/sh per AES/investor-documents/sec-edgar/8-K_20260302_rpt20260301_acc0001193125_26_084157.htm; contract backfill 2026-07-21.",
+      "scenario_assumptions": "Proof outputs {'low': 9.9999, 'base': 11.3099, 'high': 13.0001}; see calculation_proof graph.",
+      "probability_and_timing": null,
+      "tax_and_realization_adjustments": "Parent recourse debt burden informs capitalization multiple.",
+      "falsifier": "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
+      "overlap_key": "contracted_platform_owner_cash",
+      "assumption_type": "judgment"
+    },
+    {
+      "component_id": "renewables_backlog_option",
+      "label": "12 GW contracted backlog and data-center load option",
+      "category": "real_option",
+      "treatment": "additive",
+      "included_in_component_id": null,
+      "ownership_claim": "12 GW contracted backlog and data-center load option",
+      "ownership_percentage": 1.0,
+      "quantity": {
+        "value": 1,
+        "unit": "per-share economic claim"
+      },
+      "method": "risk_adjusted_milestone_value",
+      "method_version": "1.0",
+      "method_provenance": {
+        "method_id": "risk_adjusted_milestone_value",
+        "version": "1.0",
+        "label": "Milestone risk-adjusted present value",
+        "power_zones": [
+          "binary_milestone"
+        ],
+        "equation": "value_per_share = (net_cash + sum(p_success*PV(success_value)-remaining_cost) - dilution)/shares",
+        "sources": [
+          {
+            "ref": "_system/frameworks/optionality_valuation.md",
+            "locator": "Milestone-based option framework"
+          }
+        ]
+      },
+      "comparable_ids": [],
+      "range_per_share": {
+        "low": 0.5,
+        "base": 1.0,
+        "high": 2.5
+      },
+      "legacy_range_per_share": {
+        "low": 0.5,
+        "base": 1.0,
+        "high": 2.5
+      },
+      "valuation_status": "bounded_estimate",
+      "calculation_proof": {
+        "status": "valid",
+        "method_id": "risk_adjusted_milestone_value",
+        "method_version": "1.0",
+        "outputs": {
+          "low": 0.5,
+          "base": 1.0,
+          "high": 2.5
+        },
+        "output_unit": "USD_per_share",
+        "traces": {
+          "low": [
+            {
+              "id": "backlog_gw",
+              "label": "Contracted renewables backlog not yet operating",
+              "kind": "fact",
+              "value": 12.0,
+              "unit": "GW",
+              "source": {
+                "ref": "AES/investor-documents/sec-edgar/10-K_20260302_rpt20251231_acc0000874761_26_000063.htm",
+                "locator": "12.0 GW contracted backlog with signed PPAs at December 31, 2025",
+                "as_of": "2025-12-31",
+                "content_sha256": "23c6d9a837c9f9cee1fc557c4a62707087ec6fd11704e4d03eec25ae76874e76",
+                "source_id": "34880e90e99a2e1fd9d53907f4181fd33cd4cda2bc6aab4c3c58f4936d044f9d"
+              },
+              "rationale": null
+            },
+            {
+              "id": "new_contracts_gw",
+              "label": "New renewables contracts signed in 2025",
+              "kind": "fact",
+              "value": 4.0,
+              "unit": "GW",
+              "source": {
+                "ref": "AES/investor-documents/sec-edgar/10-K_20260302_rpt20251231_acc0000874761_26_000063.htm",
+                "locator": "Signed 4.0 GW new renewables contracts in 2025",
+                "as_of": "2025-12-31",
+                "content_sha256": "23c6d9a837c9f9cee1fc557c4a62707087ec6fd11704e4d03eec25ae76874e76",
+                "source_id": "e861210a6f89a474e86a0085f702b1eda31ecc687f04d7f02a2e3adc3a893fa5"
+              },
+              "rationale": null
+            },
+            {
+              "id": "shares_m",
+              "label": "FY2025 diluted shares",
+              "kind": "fact",
+              "value": 713.0,
+              "unit": "million_shares",
+              "source": {
+                "ref": "AES/investor-documents/sec-edgar/10-K_20260302_rpt20251231_acc0000874761_26_000063.htm",
+                "locator": "Weighted-average diluted shares 713M (FY2025)",
+                "as_of": "2025-12-31",
+                "content_sha256": "23c6d9a837c9f9cee1fc557c4a62707087ec6fd11704e4d03eec25ae76874e76",
+                "source_id": "d6fd9dfe12f663cd389c1a61d374ee35faec9100968939bd757d009534ef538b"
+              },
+              "rationale": null
+            },
+            {
+              "id": "backlog_milestone_m",
+              "label": "Risk-adjusted incremental value of 12 GW backlog and AES Ohio data-center load option",
+              "kind": "judgment",
+              "value": 356.5,
+              "unit": "USD_m",
+              "source": null,
+              "rationale": "Non-overlapping claim on contracted backlog conversion and data-center load not fully captured in near-term Adjusted EBITDA multiple; probability and timing discounted."
+            },
+            {
+              "id": "value_per_share",
+              "label": "Renewables backlog option per share",
+              "kind": "calculation",
+              "value": 0.5,
+              "unit": "USD_per_share",
+              "operation": "divide",
+              "formula": "backlog_milestone_m \u00f7 shares_m",
+              "substituted_formula": "356.5 \u00f7 713",
+              "dependencies": [
+                "backlog_milestone_m",
+                "shares_m"
+              ]
+            }
+          ],
+          "base": [
+            {
+              "id": "backlog_gw",
+              "label": "Contracted renewables backlog not yet operating",
+              "kind": "fact",
+              "value": 12.0,
+              "unit": "GW",
+              "source": {
+                "ref": "AES/investor-documents/sec-edgar/10-K_20260302_rpt20251231_acc0000874761_26_000063.htm",
+                "locator": "12.0 GW contracted backlog with signed PPAs at December 31, 2025",
+                "as_of": "2025-12-31",
+                "content_sha256": "23c6d9a837c9f9cee1fc557c4a62707087ec6fd11704e4d03eec25ae76874e76",
+                "source_id": "34880e90e99a2e1fd9d53907f4181fd33cd4cda2bc6aab4c3c58f4936d044f9d"
+              },
+              "rationale": null
+            },
+            {
+              "id": "new_contracts_gw",
+              "label": "New renewables contracts signed in 2025",
+              "kind": "fact",
+              "value": 4.0,
+              "unit": "GW",
+              "source": {
+                "ref": "AES/investor-documents/sec-edgar/10-K_20260302_rpt20251231_acc0000874761_26_000063.htm",
+                "locator": "Signed 4.0 GW new renewables contracts in 2025",
+                "as_of": "2025-12-31",
+                "content_sha256": "23c6d9a837c9f9cee1fc557c4a62707087ec6fd11704e4d03eec25ae76874e76",
+                "source_id": "e861210a6f89a474e86a0085f702b1eda31ecc687f04d7f02a2e3adc3a893fa5"
+              },
+              "rationale": null
+            },
+            {
+              "id": "shares_m",
+              "label": "FY2025 diluted shares",
+              "kind": "fact",
+              "value": 713.0,
+              "unit": "million_shares",
+              "source": {
+                "ref": "AES/investor-documents/sec-edgar/10-K_20260302_rpt20251231_acc0000874761_26_000063.htm",
+                "locator": "Weighted-average diluted shares 713M (FY2025)",
+                "as_of": "2025-12-31",
+                "content_sha256": "23c6d9a837c9f9cee1fc557c4a62707087ec6fd11704e4d03eec25ae76874e76",
+                "source_id": "d6fd9dfe12f663cd389c1a61d374ee35faec9100968939bd757d009534ef538b"
+              },
+              "rationale": null
+            },
+            {
+              "id": "backlog_milestone_m",
+              "label": "Risk-adjusted incremental value of 12 GW backlog and AES Ohio data-center load option",
+              "kind": "judgment",
+              "value": 713.0,
+              "unit": "USD_m",
+              "source": null,
+              "rationale": "Non-overlapping claim on contracted backlog conversion and data-center load not fully captured in near-term Adjusted EBITDA multiple; probability and timing discounted."
+            },
+            {
+              "id": "value_per_share",
+              "label": "Renewables backlog option per share",
+              "kind": "calculation",
+              "value": 1.0,
+              "unit": "USD_per_share",
+              "operation": "divide",
+              "formula": "backlog_milestone_m \u00f7 shares_m",
+              "substituted_formula": "713 \u00f7 713",
+              "dependencies": [
+                "backlog_milestone_m",
+                "shares_m"
+              ]
+            }
+          ],
+          "high": [
+            {
+              "id": "backlog_gw",
+              "label": "Contracted renewables backlog not yet operating",
+              "kind": "fact",
+              "value": 12.0,
+              "unit": "GW",
+              "source": {
+                "ref": "AES/investor-documents/sec-edgar/10-K_20260302_rpt20251231_acc0000874761_26_000063.htm",
+                "locator": "12.0 GW contracted backlog with signed PPAs at December 31, 2025",
+                "as_of": "2025-12-31",
+                "content_sha256": "23c6d9a837c9f9cee1fc557c4a62707087ec6fd11704e4d03eec25ae76874e76",
+                "source_id": "34880e90e99a2e1fd9d53907f4181fd33cd4cda2bc6aab4c3c58f4936d044f9d"
+              },
+              "rationale": null
+            },
+            {
+              "id": "new_contracts_gw",
+              "label": "New renewables contracts signed in 2025",
+              "kind": "fact",
+              "value": 4.0,
+              "unit": "GW",
+              "source": {
+                "ref": "AES/investor-documents/sec-edgar/10-K_20260302_rpt20251231_acc0000874761_26_000063.htm",
+                "locator": "Signed 4.0 GW new renewables contracts in 2025",
+                "as_of": "2025-12-31",
+                "content_sha256": "23c6d9a837c9f9cee1fc557c4a62707087ec6fd11704e4d03eec25ae76874e76",
+                "source_id": "e861210a6f89a474e86a0085f702b1eda31ecc687f04d7f02a2e3adc3a893fa5"
+              },
+              "rationale": null
+            },
+            {
+              "id": "shares_m",
+              "label": "FY2025 diluted shares",
+              "kind": "fact",
+              "value": 713.0,
+              "unit": "million_shares",
+              "source": {
+                "ref": "AES/investor-documents/sec-edgar/10-K_20260302_rpt20251231_acc0000874761_26_000063.htm",
+                "locator": "Weighted-average diluted shares 713M (FY2025)",
+                "as_of": "2025-12-31",
+                "content_sha256": "23c6d9a837c9f9cee1fc557c4a62707087ec6fd11704e4d03eec25ae76874e76",
+                "source_id": "d6fd9dfe12f663cd389c1a61d374ee35faec9100968939bd757d009534ef538b"
+              },
+              "rationale": null
+            },
+            {
+              "id": "backlog_milestone_m",
+              "label": "Risk-adjusted incremental value of 12 GW backlog and AES Ohio data-center load option",
+              "kind": "judgment",
+              "value": 1782.5,
+              "unit": "USD_m",
+              "source": null,
+              "rationale": "Non-overlapping claim on contracted backlog conversion and data-center load not fully captured in near-term Adjusted EBITDA multiple; probability and timing discounted."
+            },
+            {
+              "id": "value_per_share",
+              "label": "Renewables backlog option per share",
+              "kind": "calculation",
+              "value": 2.5,
+              "unit": "USD_per_share",
+              "operation": "divide",
+              "formula": "backlog_milestone_m \u00f7 shares_m",
+              "substituted_formula": "1782.5 \u00f7 713",
+              "dependencies": [
+                "backlog_milestone_m",
+                "shares_m"
+              ]
+            }
+          ]
+        },
+        "source_lineage": [
+          {
+            "node_id": "backlog_gw",
+            "ref": "AES/investor-documents/sec-edgar/10-K_20260302_rpt20251231_acc0000874761_26_000063.htm",
+            "locator": "12.0 GW contracted backlog with signed PPAs at December 31, 2025",
+            "as_of": "2025-12-31",
+            "content_sha256": "23c6d9a837c9f9cee1fc557c4a62707087ec6fd11704e4d03eec25ae76874e76",
+            "source_id": "34880e90e99a2e1fd9d53907f4181fd33cd4cda2bc6aab4c3c58f4936d044f9d"
+          },
+          {
+            "node_id": "new_contracts_gw",
+            "ref": "AES/investor-documents/sec-edgar/10-K_20260302_rpt20251231_acc0000874761_26_000063.htm",
+            "locator": "Signed 4.0 GW new renewables contracts in 2025",
+            "as_of": "2025-12-31",
+            "content_sha256": "23c6d9a837c9f9cee1fc557c4a62707087ec6fd11704e4d03eec25ae76874e76",
+            "source_id": "e861210a6f89a474e86a0085f702b1eda31ecc687f04d7f02a2e3adc3a893fa5"
+          },
+          {
+            "node_id": "shares_m",
+            "ref": "AES/investor-documents/sec-edgar/10-K_20260302_rpt20251231_acc0000874761_26_000063.htm",
+            "locator": "Weighted-average diluted shares 713M (FY2025)",
+            "as_of": "2025-12-31",
+            "content_sha256": "23c6d9a837c9f9cee1fc557c4a62707087ec6fd11704e4d03eec25ae76874e76",
+            "source_id": "d6fd9dfe12f663cd389c1a61d374ee35faec9100968939bd757d009534ef538b"
+          }
+        ],
+        "checks": {
+          "passed": true,
+          "errors": []
+        },
+        "proof_hash": "ca9ea6bcfe930e5656802a969e861758646e8de07f90d51bed0c20efff26c346"
+      },
+      "evidence_tier": "primary_derived",
+      "evidence_level": "primary_derived",
+      "evidence": "Primary bridge from AES/investor-documents/sec-edgar/10-K_20260302_rpt20251231_acc0000874761_26_000063.htm: FY2025 Adjusted EBITDA $2890.0M, OCF $4306.0M, capex $5929.0M, recourse debt $6000.0B, cash $1382.0M; merger $15.0/sh per AES/investor-documents/sec-edgar/8-K_20260302_rpt20260301_acc0001193125_26_084157.htm; contract backfill 2026-07-21.",
+      "scenario_assumptions": "Proof outputs {'low': 0.5, 'base': 1.0, 'high': 2.5}; see calculation_proof graph.",
+      "probability_and_timing": {
+        "success_probability": null,
+        "remaining_capital_m": null,
+        "timing_basis": "3\u20135 year construction cycle per FY2025 10-K.",
+        "probability_basis": "Base ~55% that contracted backlog converts on disclosed timeline.",
+        "remaining_capital_basis": "Growth capex funded at project level; ~$2.5B remaining corporate burden [Assumption]."
+      },
+      "tax_and_realization_adjustments": "Not in Lawrence yield_curve base while merger pending.",
+      "falsifier": "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
+      "overlap_key": "renewables_backlog_option",
+      "assumption_type": "judgment"
+    },
+    {
+      "component_id": "merger_close_catalyst",
+      "label": "GIP/EQT cash merger completion uplift to $15.00",
+      "category": "catalyst",
+      "treatment": "additive",
+      "included_in_component_id": null,
+      "ownership_claim": "GIP/EQT cash merger completion uplift to $15.00",
+      "ownership_percentage": 1.0,
+      "quantity": {
+        "value": 1,
+        "unit": "per-share economic claim"
+      },
+      "method": "probability_weighted_catalyst_nav",
+      "method_version": "1.0",
+      "method_provenance": {
+        "method_id": "probability_weighted_catalyst_nav",
+        "version": "1.0",
+        "label": "Mutually exclusive catalyst event tree",
+        "power_zones": [
+          "catalyst_asset_value"
+        ],
+        "equation": "value = sum(probability_i*(payoff_i-cost_i)/(1+r_i)^years_i)",
+        "sources": [
+          {
+            "ref": "_system/frameworks/optionality_valuation.md",
+            "locator": "Probability, beneficiary, timing and failure cases"
+          }
+        ]
+      },
+      "comparable_ids": [],
+      "range_per_share": {
+        "low": 1.5,
+        "base": 2.69,
+        "high": 4.0
+      },
+      "legacy_range_per_share": {
+        "low": 1.5,
+        "base": 2.69,
+        "high": 4.0
+      },
+      "valuation_status": "bounded_estimate",
+      "calculation_proof": {
+        "status": "valid",
+        "method_id": "probability_weighted_catalyst_nav",
+        "method_version": "1.0",
+        "outputs": {
+          "low": 1.5,
+          "base": 2.69,
+          "high": 4.0
+        },
+        "output_unit": "USD_per_share",
+        "traces": {
+          "low": [
+            {
+              "id": "merger_consideration",
+              "label": "Agreed cash merger consideration per share",
+              "kind": "fact",
+              "value": 15.0,
+              "unit": "USD_per_share",
+              "source": {
+                "ref": "AES/investor-documents/sec-edgar/8-K_20260302_rpt20260301_acc0001193125_26_084157.htm",
+                "locator": "Each share converted into the right to receive $15.00 in cash without interest",
+                "as_of": "2026-03-01",
+                "content_sha256": "1f1981730372591fe9f3136cb69cd38bc568b84c2b65e808a02af7f360c74ab5",
+                "source_id": "52d5bf7623ac32dcd451983c13d04cb14a0ded4acdd16e1bac120bb561a73cb7"
+              },
+              "rationale": null
+            },
+            {
+              "id": "fairness_floor",
+              "label": "J.P. Morgan fairness opinion low reference (context)",
+              "kind": "fact",
+              "value": 11.31,
+              "unit": "USD_per_share",
+              "source": {
+                "ref": "AES/investor-documents/sec-edgar/8-K_20260612_rpt20260612_acc0001140361_26_025084.htm",
+                "locator": "Fairness opinion reference range $11.31 to $16.39 per share (proxy materials)",
+                "as_of": "2026-06-12",
+                "content_sha256": "65e0ec21185961d240337be16c6d6cf82c16d703a3dfa80958abd76c3ce4d0ed",
+                "source_id": "e49b7db5832b95c2dd81a33da7b033a4cf415484626594f3a7f79f97dcd12965"
+              },
+              "rationale": null
+            },
+            {
+              "id": "platform_base_ps",
+              "label": "Standalone platform base value (paired component)",
+              "kind": "fact",
+              "value": 11.31,
+              "unit": "USD_per_share",
+              "source": {
+                "ref": "AES/investor-documents/sec-edgar/10-K_20260302_rpt20251231_acc0000874761_26_000063.htm",
+                "locator": "Non-overlapping paired component contracted_platform_owner_cash base",
+                "as_of": "2025-12-31",
+                "content_sha256": "23c6d9a837c9f9cee1fc557c4a62707087ec6fd11704e4d03eec25ae76874e76",
+                "source_id": "637d69ffbaae503cfd685876d8ccadd8c6d016c088a0fbb95b16a1e3bef7c26c"
+              },
+              "rationale": null
+            },
+            {
+              "id": "backlog_base_ps",
+              "label": "Renewables backlog base value (paired component)",
+              "kind": "fact",
+              "value": 1.0,
+              "unit": "USD_per_share",
+              "source": {
+                "ref": "AES/investor-documents/sec-edgar/10-K_20260302_rpt20251231_acc0000874761_26_000063.htm",
+                "locator": "Non-overlapping paired component renewables_backlog_option base",
+                "as_of": "2025-12-31",
+                "content_sha256": "23c6d9a837c9f9cee1fc557c4a62707087ec6fd11704e4d03eec25ae76874e76",
+                "source_id": "97799cb12b2d408885893a27bf5c74c38e9d49c91d5976fb205fbf5518a647cc"
+              },
+              "rationale": null
+            },
+            {
+              "id": "catalyst_uplift_ps",
+              "label": "Incremental merger-close uplift above standalone platform plus backlog",
+              "kind": "judgment",
+              "value": 1.5,
+              "unit": "USD_per_share",
+              "source": null,
+              "rationale": "Base equals $15.00 consideration less platform $11.31 and backlog $1.00; low case haircuts close probability and timing; high case assumes faster close with wider spread capture."
+            },
+            {
+              "id": "unity",
+              "label": "Pass-through multiplier",
+              "kind": "judgment",
+              "value": 1.0,
+              "unit": "ratio",
+              "source": null,
+              "rationale": "Mechanical pass-through for proof graph."
+            },
+            {
+              "id": "value_per_share",
+              "label": "Merger close catalyst per share",
+              "kind": "calculation",
+              "value": 1.5,
+              "unit": "USD_per_share",
+              "operation": "multiply",
+              "formula": "catalyst_uplift_ps \u00d7 unity",
+              "substituted_formula": "1.5 \u00d7 1",
+              "dependencies": [
+                "catalyst_uplift_ps",
+                "unity"
+              ]
+            }
+          ],
+          "base": [
+            {
+              "id": "merger_consideration",
+              "label": "Agreed cash merger consideration per share",
+              "kind": "fact",
+              "value": 15.0,
+              "unit": "USD_per_share",
+              "source": {
+                "ref": "AES/investor-documents/sec-edgar/8-K_20260302_rpt20260301_acc0001193125_26_084157.htm",
+                "locator": "Each share converted into the right to receive $15.00 in cash without interest",
+                "as_of": "2026-03-01",
+                "content_sha256": "1f1981730372591fe9f3136cb69cd38bc568b84c2b65e808a02af7f360c74ab5",
+                "source_id": "52d5bf7623ac32dcd451983c13d04cb14a0ded4acdd16e1bac120bb561a73cb7"
+              },
+              "rationale": null
+            },
+            {
+              "id": "fairness_floor",
+              "label": "J.P. Morgan fairness opinion low reference (context)",
+              "kind": "fact",
+              "value": 11.31,
+              "unit": "USD_per_share",
+              "source": {
+                "ref": "AES/investor-documents/sec-edgar/8-K_20260612_rpt20260612_acc0001140361_26_025084.htm",
+                "locator": "Fairness opinion reference range $11.31 to $16.39 per share (proxy materials)",
+                "as_of": "2026-06-12",
+                "content_sha256": "65e0ec21185961d240337be16c6d6cf82c16d703a3dfa80958abd76c3ce4d0ed",
+                "source_id": "e49b7db5832b95c2dd81a33da7b033a4cf415484626594f3a7f79f97dcd12965"
+              },
+              "rationale": null
+            },
+            {
+              "id": "platform_base_ps",
+              "label": "Standalone platform base value (paired component)",
+              "kind": "fact",
+              "value": 11.31,
+              "unit": "USD_per_share",
+              "source": {
+                "ref": "AES/investor-documents/sec-edgar/10-K_20260302_rpt20251231_acc0000874761_26_000063.htm",
+                "locator": "Non-overlapping paired component contracted_platform_owner_cash base",
+                "as_of": "2025-12-31",
+                "content_sha256": "23c6d9a837c9f9cee1fc557c4a62707087ec6fd11704e4d03eec25ae76874e76",
+                "source_id": "637d69ffbaae503cfd685876d8ccadd8c6d016c088a0fbb95b16a1e3bef7c26c"
+              },
+              "rationale": null
+            },
+            {
+              "id": "backlog_base_ps",
+              "label": "Renewables backlog base value (paired component)",
+              "kind": "fact",
+              "value": 1.0,
+              "unit": "USD_per_share",
+              "source": {
+                "ref": "AES/investor-documents/sec-edgar/10-K_20260302_rpt20251231_acc0000874761_26_000063.htm",
+                "locator": "Non-overlapping paired component renewables_backlog_option base",
+                "as_of": "2025-12-31",
+                "content_sha256": "23c6d9a837c9f9cee1fc557c4a62707087ec6fd11704e4d03eec25ae76874e76",
+                "source_id": "97799cb12b2d408885893a27bf5c74c38e9d49c91d5976fb205fbf5518a647cc"
+              },
+              "rationale": null
+            },
+            {
+              "id": "catalyst_uplift_ps",
+              "label": "Incremental merger-close uplift above standalone platform plus backlog",
+              "kind": "judgment",
+              "value": 2.69,
+              "unit": "USD_per_share",
+              "source": null,
+              "rationale": "Base equals $15.00 consideration less platform $11.31 and backlog $1.00; low case haircuts close probability and timing; high case assumes faster close with wider spread capture."
+            },
+            {
+              "id": "unity",
+              "label": "Pass-through multiplier",
+              "kind": "judgment",
+              "value": 1.0,
+              "unit": "ratio",
+              "source": null,
+              "rationale": "Mechanical pass-through for proof graph."
+            },
+            {
+              "id": "value_per_share",
+              "label": "Merger close catalyst per share",
+              "kind": "calculation",
+              "value": 2.69,
+              "unit": "USD_per_share",
+              "operation": "multiply",
+              "formula": "catalyst_uplift_ps \u00d7 unity",
+              "substituted_formula": "2.69 \u00d7 1",
+              "dependencies": [
+                "catalyst_uplift_ps",
+                "unity"
+              ]
+            }
+          ],
+          "high": [
+            {
+              "id": "merger_consideration",
+              "label": "Agreed cash merger consideration per share",
+              "kind": "fact",
+              "value": 15.0,
+              "unit": "USD_per_share",
+              "source": {
+                "ref": "AES/investor-documents/sec-edgar/8-K_20260302_rpt20260301_acc0001193125_26_084157.htm",
+                "locator": "Each share converted into the right to receive $15.00 in cash without interest",
+                "as_of": "2026-03-01",
+                "content_sha256": "1f1981730372591fe9f3136cb69cd38bc568b84c2b65e808a02af7f360c74ab5",
+                "source_id": "52d5bf7623ac32dcd451983c13d04cb14a0ded4acdd16e1bac120bb561a73cb7"
+              },
+              "rationale": null
+            },
+            {
+              "id": "fairness_floor",
+              "label": "J.P. Morgan fairness opinion low reference (context)",
+              "kind": "fact",
+              "value": 11.31,
+              "unit": "USD_per_share",
+              "source": {
+                "ref": "AES/investor-documents/sec-edgar/8-K_20260612_rpt20260612_acc0001140361_26_025084.htm",
+                "locator": "Fairness opinion reference range $11.31 to $16.39 per share (proxy materials)",
+                "as_of": "2026-06-12",
+                "content_sha256": "65e0ec21185961d240337be16c6d6cf82c16d703a3dfa80958abd76c3ce4d0ed",
+                "source_id": "e49b7db5832b95c2dd81a33da7b033a4cf415484626594f3a7f79f97dcd12965"
+              },
+              "rationale": null
+            },
+            {
+              "id": "platform_base_ps",
+              "label": "Standalone platform base value (paired component)",
+              "kind": "fact",
+              "value": 11.31,
+              "unit": "USD_per_share",
+              "source": {
+                "ref": "AES/investor-documents/sec-edgar/10-K_20260302_rpt20251231_acc0000874761_26_000063.htm",
+                "locator": "Non-overlapping paired component contracted_platform_owner_cash base",
+                "as_of": "2025-12-31",
+                "content_sha256": "23c6d9a837c9f9cee1fc557c4a62707087ec6fd11704e4d03eec25ae76874e76",
+                "source_id": "637d69ffbaae503cfd685876d8ccadd8c6d016c088a0fbb95b16a1e3bef7c26c"
+              },
+              "rationale": null
+            },
+            {
+              "id": "backlog_base_ps",
+              "label": "Renewables backlog base value (paired component)",
+              "kind": "fact",
+              "value": 1.0,
+              "unit": "USD_per_share",
+              "source": {
+                "ref": "AES/investor-documents/sec-edgar/10-K_20260302_rpt20251231_acc0000874761_26_000063.htm",
+                "locator": "Non-overlapping paired component renewables_backlog_option base",
+                "as_of": "2025-12-31",
+                "content_sha256": "23c6d9a837c9f9cee1fc557c4a62707087ec6fd11704e4d03eec25ae76874e76",
+                "source_id": "97799cb12b2d408885893a27bf5c74c38e9d49c91d5976fb205fbf5518a647cc"
+              },
+              "rationale": null
+            },
+            {
+              "id": "catalyst_uplift_ps",
+              "label": "Incremental merger-close uplift above standalone platform plus backlog",
+              "kind": "judgment",
+              "value": 4.0,
+              "unit": "USD_per_share",
+              "source": null,
+              "rationale": "Base equals $15.00 consideration less platform $11.31 and backlog $1.00; low case haircuts close probability and timing; high case assumes faster close with wider spread capture."
+            },
+            {
+              "id": "unity",
+              "label": "Pass-through multiplier",
+              "kind": "judgment",
+              "value": 1.0,
+              "unit": "ratio",
+              "source": null,
+              "rationale": "Mechanical pass-through for proof graph."
+            },
+            {
+              "id": "value_per_share",
+              "label": "Merger close catalyst per share",
+              "kind": "calculation",
+              "value": 4.0,
+              "unit": "USD_per_share",
+              "operation": "multiply",
+              "formula": "catalyst_uplift_ps \u00d7 unity",
+              "substituted_formula": "4 \u00d7 1",
+              "dependencies": [
+                "catalyst_uplift_ps",
+                "unity"
+              ]
+            }
+          ]
+        },
+        "source_lineage": [
+          {
+            "node_id": "merger_consideration",
+            "ref": "AES/investor-documents/sec-edgar/8-K_20260302_rpt20260301_acc0001193125_26_084157.htm",
+            "locator": "Each share converted into the right to receive $15.00 in cash without interest",
+            "as_of": "2026-03-01",
+            "content_sha256": "1f1981730372591fe9f3136cb69cd38bc568b84c2b65e808a02af7f360c74ab5",
+            "source_id": "52d5bf7623ac32dcd451983c13d04cb14a0ded4acdd16e1bac120bb561a73cb7"
+          },
+          {
+            "node_id": "fairness_floor",
+            "ref": "AES/investor-documents/sec-edgar/8-K_20260612_rpt20260612_acc0001140361_26_025084.htm",
+            "locator": "Fairness opinion reference range $11.31 to $16.39 per share (proxy materials)",
+            "as_of": "2026-06-12",
+            "content_sha256": "65e0ec21185961d240337be16c6d6cf82c16d703a3dfa80958abd76c3ce4d0ed",
+            "source_id": "e49b7db5832b95c2dd81a33da7b033a4cf415484626594f3a7f79f97dcd12965"
+          },
+          {
+            "node_id": "platform_base_ps",
+            "ref": "AES/investor-documents/sec-edgar/10-K_20260302_rpt20251231_acc0000874761_26_000063.htm",
+            "locator": "Non-overlapping paired component contracted_platform_owner_cash base",
+            "as_of": "2025-12-31",
+            "content_sha256": "23c6d9a837c9f9cee1fc557c4a62707087ec6fd11704e4d03eec25ae76874e76",
+            "source_id": "637d69ffbaae503cfd685876d8ccadd8c6d016c088a0fbb95b16a1e3bef7c26c"
+          },
+          {
+            "node_id": "backlog_base_ps",
+            "ref": "AES/investor-documents/sec-edgar/10-K_20260302_rpt20251231_acc0000874761_26_000063.htm",
+            "locator": "Non-overlapping paired component renewables_backlog_option base",
+            "as_of": "2025-12-31",
+            "content_sha256": "23c6d9a837c9f9cee1fc557c4a62707087ec6fd11704e4d03eec25ae76874e76",
+            "source_id": "97799cb12b2d408885893a27bf5c74c38e9d49c91d5976fb205fbf5518a647cc"
+          }
+        ],
+        "checks": {
+          "passed": true,
+          "errors": []
+        },
+        "proof_hash": "9d04730ac833c6c357126e6c28b08621c54a43c0184ead5ae9d1757ef4c404fb"
+      },
+      "evidence_tier": "primary_derived",
+      "evidence_level": "primary_derived",
+      "evidence": "Primary bridge from AES/investor-documents/sec-edgar/10-K_20260302_rpt20251231_acc0000874761_26_000063.htm: FY2025 Adjusted EBITDA $2890.0M, OCF $4306.0M, capex $5929.0M, recourse debt $6000.0B, cash $1382.0M; merger $15.0/sh per AES/investor-documents/sec-edgar/8-K_20260302_rpt20260301_acc0001193125_26_084157.htm; contract backfill 2026-07-21.",
+      "scenario_assumptions": "Proof outputs {'low': 1.5, 'base': 2.69, 'high': 4.0}; see calculation_proof graph.",
+      "probability_and_timing": {
+        "success_probability": null,
+        "remaining_capital_m": null,
+        "timing_basis": "Expected close late 2026 or early 2027 per 8-K 2026-03-02.",
+        "probability_basis": "Base assumes close at $15.00; low case haircuts regulatory delay.",
+        "remaining_capital_basis": "No further equity funding required if merger closes."
+      },
+      "tax_and_realization_adjustments": "Paired to platform and backlog to prevent double counting.",
+      "falsifier": "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
+      "overlap_key": "merger_close_catalyst",
+      "assumption_type": "judgment"
+    },
+    {
+      "component_id": "regulatory_and_execution_reserve",
+      "label": "Regulatory delay and spread compression reserve",
+      "category": "liability_or_reserve",
+      "treatment": "additive",
+      "included_in_component_id": null,
+      "ownership_claim": "Regulatory delay and spread compression reserve",
+      "ownership_percentage": 1.0,
+      "quantity": {
+        "value": 1,
+        "unit": "per-share economic claim"
+      },
+      "method": "net_asset_value",
+      "method_version": "1.0",
+      "method_provenance": {
+        "method_id": "net_asset_value",
+        "version": "1.0",
+        "label": "Reconciled net asset value",
+        "power_zones": [
+          "scarce_asset_optionality",
+          "catalyst_asset_value",
+          "credit_and_normalized_returns"
+        ],
+        "equation": "value_per_share = (gross_assets - senior_claims - tax - realization_costs) / diluted_shares",
+        "sources": [
+          {
+            "ref": "_system/frameworks/scarce_strategic_asset_valuation.md",
+            "locator": "Economic ownership and unit NAV"
+          }
+        ]
+      },
+      "comparable_ids": [],
+      "range_per_share": {
+        "low": -1.0,
+        "base": -0.27,
+        "high": 0.0
+      },
+      "legacy_range_per_share": {
+        "low": -1.0,
+        "base": -0.27,
+        "high": 0.0
+      },
+      "valuation_status": "bounded_estimate",
+      "calculation_proof": {
+        "status": "valid",
+        "method_id": "net_asset_value",
+        "method_version": "1.0",
+        "outputs": {
+          "low": -1.0,
+          "base": -0.27,
+          "high": 0.0
+        },
+        "output_unit": "USD_per_share",
+        "traces": {
+          "low": [
+            {
+              "id": "price_today",
+              "label": "Market price per share (refresh date)",
+              "kind": "fact",
+              "value": 14.73,
+              "unit": "USD_per_share",
+              "source": {
+                "ref": "AES/research/valuation.json",
+                "locator": "inputs.price $14.73 as of 2026-07-09",
+                "as_of": "2026-07-21",
+                "content_sha256": "13041bce8505ea2ed17e3d58728d03bde354d77fd6bdec8f761f7767ed9dc3aa",
+                "source_id": "3ac25ff5fd8ed23ea1f7b27d2e37ab6f47676bd2a323c38e8db49dc9ec97077a"
+              },
+              "rationale": null
+            },
+            {
+              "id": "merger_consideration",
+              "label": "Contract merger consideration",
+              "kind": "fact",
+              "value": 15.0,
+              "unit": "USD_per_share",
+              "source": {
+                "ref": "AES/investor-documents/sec-edgar/8-K_20260302_rpt20260301_acc0001193125_26_084157.htm",
+                "locator": "$15.00 cash per share merger consideration",
+                "as_of": "2026-03-01",
+                "content_sha256": "1f1981730372591fe9f3136cb69cd38bc568b84c2b65e808a02af7f360c74ab5",
+                "source_id": "596c112327fad79e4a25388ee85aa6a8e294276993cec70cac5bf5ebcf295927"
+              },
+              "rationale": null
+            },
+            {
+              "id": "shares_m",
+              "label": "Diluted shares (Q1 2026)",
+              "kind": "fact",
+              "value": 713.0,
+              "unit": "million_shares",
+              "source": {
+                "ref": "AES/investor-documents/sec-edgar/10-Q_20260505_rpt20260331_acc0000874761_26_000120.htm",
+                "locator": "Weighted-average diluted shares 713M (Q1 2026)",
+                "as_of": "2026-03-31",
+                "content_sha256": "2397f7318187f37dcd6edfdfa862451e2488a594f838853e40740139eae4eabf",
+                "source_id": "0399d2f7ea6cf416b7b96b75a51e5c8d4727d297f79c9c5417e72a5c4ab50005"
+              },
+              "rationale": null
+            },
+            {
+              "id": "reserve_m",
+              "label": "Regulatory delay, spread compression, and execution friction reserve",
+              "kind": "judgment",
+              "value": -713.0,
+              "unit": "USD_m",
+              "source": null,
+              "rationale": "Negative reserve for PUCO/FERC/CFIUS delay, outside-date risk, and arb spread at current price versus $15.00 consideration; does not duplicate deal-break standalone repricing in platform floor."
+            },
+            {
+              "id": "value_per_share",
+              "label": "Regulatory and execution reserve per share",
+              "kind": "calculation",
+              "value": -1.0,
+              "unit": "USD_per_share",
+              "operation": "divide",
+              "formula": "reserve_m \u00f7 shares_m",
+              "substituted_formula": "-713 \u00f7 713",
+              "dependencies": [
+                "reserve_m",
+                "shares_m"
+              ]
+            }
+          ],
+          "base": [
+            {
+              "id": "price_today",
+              "label": "Market price per share (refresh date)",
+              "kind": "fact",
+              "value": 14.73,
+              "unit": "USD_per_share",
+              "source": {
+                "ref": "AES/research/valuation.json",
+                "locator": "inputs.price $14.73 as of 2026-07-09",
+                "as_of": "2026-07-21",
+                "content_sha256": "13041bce8505ea2ed17e3d58728d03bde354d77fd6bdec8f761f7767ed9dc3aa",
+                "source_id": "3ac25ff5fd8ed23ea1f7b27d2e37ab6f47676bd2a323c38e8db49dc9ec97077a"
+              },
+              "rationale": null
+            },
+            {
+              "id": "merger_consideration",
+              "label": "Contract merger consideration",
+              "kind": "fact",
+              "value": 15.0,
+              "unit": "USD_per_share",
+              "source": {
+                "ref": "AES/investor-documents/sec-edgar/8-K_20260302_rpt20260301_acc0001193125_26_084157.htm",
+                "locator": "$15.00 cash per share merger consideration",
+                "as_of": "2026-03-01",
+                "content_sha256": "1f1981730372591fe9f3136cb69cd38bc568b84c2b65e808a02af7f360c74ab5",
+                "source_id": "596c112327fad79e4a25388ee85aa6a8e294276993cec70cac5bf5ebcf295927"
+              },
+              "rationale": null
+            },
+            {
+              "id": "shares_m",
+              "label": "Diluted shares (Q1 2026)",
+              "kind": "fact",
+              "value": 713.0,
+              "unit": "million_shares",
+              "source": {
+                "ref": "AES/investor-documents/sec-edgar/10-Q_20260505_rpt20260331_acc0000874761_26_000120.htm",
+                "locator": "Weighted-average diluted shares 713M (Q1 2026)",
+                "as_of": "2026-03-31",
+                "content_sha256": "2397f7318187f37dcd6edfdfa862451e2488a594f838853e40740139eae4eabf",
+                "source_id": "0399d2f7ea6cf416b7b96b75a51e5c8d4727d297f79c9c5417e72a5c4ab50005"
+              },
+              "rationale": null
+            },
+            {
+              "id": "reserve_m",
+              "label": "Regulatory delay, spread compression, and execution friction reserve",
+              "kind": "judgment",
+              "value": -192.5,
+              "unit": "USD_m",
+              "source": null,
+              "rationale": "Negative reserve for PUCO/FERC/CFIUS delay, outside-date risk, and arb spread at current price versus $15.00 consideration; does not duplicate deal-break standalone repricing in platform floor."
+            },
+            {
+              "id": "value_per_share",
+              "label": "Regulatory and execution reserve per share",
+              "kind": "calculation",
+              "value": -0.26998597,
+              "unit": "USD_per_share",
+              "operation": "divide",
+              "formula": "reserve_m \u00f7 shares_m",
+              "substituted_formula": "-192.5 \u00f7 713",
+              "dependencies": [
+                "reserve_m",
+                "shares_m"
+              ]
+            }
+          ],
+          "high": [
+            {
+              "id": "price_today",
+              "label": "Market price per share (refresh date)",
+              "kind": "fact",
+              "value": 14.73,
+              "unit": "USD_per_share",
+              "source": {
+                "ref": "AES/research/valuation.json",
+                "locator": "inputs.price $14.73 as of 2026-07-09",
+                "as_of": "2026-07-21",
+                "content_sha256": "13041bce8505ea2ed17e3d58728d03bde354d77fd6bdec8f761f7767ed9dc3aa",
+                "source_id": "3ac25ff5fd8ed23ea1f7b27d2e37ab6f47676bd2a323c38e8db49dc9ec97077a"
+              },
+              "rationale": null
+            },
+            {
+              "id": "merger_consideration",
+              "label": "Contract merger consideration",
+              "kind": "fact",
+              "value": 15.0,
+              "unit": "USD_per_share",
+              "source": {
+                "ref": "AES/investor-documents/sec-edgar/8-K_20260302_rpt20260301_acc0001193125_26_084157.htm",
+                "locator": "$15.00 cash per share merger consideration",
+                "as_of": "2026-03-01",
+                "content_sha256": "1f1981730372591fe9f3136cb69cd38bc568b84c2b65e808a02af7f360c74ab5",
+                "source_id": "596c112327fad79e4a25388ee85aa6a8e294276993cec70cac5bf5ebcf295927"
+              },
+              "rationale": null
+            },
+            {
+              "id": "shares_m",
+              "label": "Diluted shares (Q1 2026)",
+              "kind": "fact",
+              "value": 713.0,
+              "unit": "million_shares",
+              "source": {
+                "ref": "AES/investor-documents/sec-edgar/10-Q_20260505_rpt20260331_acc0000874761_26_000120.htm",
+                "locator": "Weighted-average diluted shares 713M (Q1 2026)",
+                "as_of": "2026-03-31",
+                "content_sha256": "2397f7318187f37dcd6edfdfa862451e2488a594f838853e40740139eae4eabf",
+                "source_id": "0399d2f7ea6cf416b7b96b75a51e5c8d4727d297f79c9c5417e72a5c4ab50005"
+              },
+              "rationale": null
+            },
+            {
+              "id": "reserve_m",
+              "label": "Regulatory delay, spread compression, and execution friction reserve",
+              "kind": "judgment",
+              "value": 0.0,
+              "unit": "USD_m",
+              "source": null,
+              "rationale": "Negative reserve for PUCO/FERC/CFIUS delay, outside-date risk, and arb spread at current price versus $15.00 consideration; does not duplicate deal-break standalone repricing in platform floor."
+            },
+            {
+              "id": "value_per_share",
+              "label": "Regulatory and execution reserve per share",
+              "kind": "calculation",
+              "value": 0.0,
+              "unit": "USD_per_share",
+              "operation": "divide",
+              "formula": "reserve_m \u00f7 shares_m",
+              "substituted_formula": "0 \u00f7 713",
+              "dependencies": [
+                "reserve_m",
+                "shares_m"
+              ]
+            }
+          ]
+        },
+        "source_lineage": [
+          {
+            "node_id": "price_today",
+            "ref": "AES/research/valuation.json",
+            "locator": "inputs.price $14.73 as of 2026-07-09",
+            "as_of": "2026-07-21",
+            "content_sha256": "13041bce8505ea2ed17e3d58728d03bde354d77fd6bdec8f761f7767ed9dc3aa",
+            "source_id": "3ac25ff5fd8ed23ea1f7b27d2e37ab6f47676bd2a323c38e8db49dc9ec97077a"
+          },
+          {
+            "node_id": "merger_consideration",
+            "ref": "AES/investor-documents/sec-edgar/8-K_20260302_rpt20260301_acc0001193125_26_084157.htm",
+            "locator": "$15.00 cash per share merger consideration",
+            "as_of": "2026-03-01",
+            "content_sha256": "1f1981730372591fe9f3136cb69cd38bc568b84c2b65e808a02af7f360c74ab5",
+            "source_id": "596c112327fad79e4a25388ee85aa6a8e294276993cec70cac5bf5ebcf295927"
+          },
+          {
+            "node_id": "shares_m",
+            "ref": "AES/investor-documents/sec-edgar/10-Q_20260505_rpt20260331_acc0000874761_26_000120.htm",
+            "locator": "Weighted-average diluted shares 713M (Q1 2026)",
+            "as_of": "2026-03-31",
+            "content_sha256": "2397f7318187f37dcd6edfdfa862451e2488a594f838853e40740139eae4eabf",
+            "source_id": "0399d2f7ea6cf416b7b96b75a51e5c8d4727d297f79c9c5417e72a5c4ab50005"
+          }
+        ],
+        "checks": {
+          "passed": true,
+          "errors": []
+        },
+        "proof_hash": "7e0ff62df3ed0560793f3a7b4407128e419fd4daa0800e7aff69403547d9f7b9"
+      },
+      "evidence_tier": "primary_derived",
+      "evidence_level": "primary_derived",
+      "evidence": "Primary bridge from AES/investor-documents/sec-edgar/10-K_20260302_rpt20251231_acc0000874761_26_000063.htm: FY2025 Adjusted EBITDA $2890.0M, OCF $4306.0M, capex $5929.0M, recourse debt $6000.0B, cash $1382.0M; merger $15.0/sh per AES/investor-documents/sec-edgar/8-K_20260302_rpt20260301_acc0001193125_26_084157.htm; contract backfill 2026-07-21.",
+      "scenario_assumptions": "Proof outputs {'low': -1.0, 'base': -0.27, 'high': 0.0}; see calculation_proof graph.",
+      "probability_and_timing": null,
+      "tax_and_realization_adjustments": "Does not duplicate deal-break standalone repricing in platform floor.",
+      "falsifier": "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
+      "overlap_key": "regulatory_and_execution_reserve",
+      "assumption_type": "judgment"
+    },
+    {
+      "component_id": "net_recourse_financial_claims",
+      "label": "Parent recourse debt net of cash (embedded in platform multiple)",
+      "category": "liability_or_reserve",
+      "treatment": "embedded",
+      "included_in_component_id": "contracted_platform_owner_cash",
+      "ownership_claim": "Contracted renewables and utility platform (standalone floor)",
+      "ownership_percentage": 1.0,
+      "quantity": {
+        "value": 1,
+        "unit": "per-share economic claim"
+      },
+      "method": "net_asset_value",
+      "method_version": null,
+      "method_provenance": null,
+      "comparable_ids": [],
+      "range_per_share": {
+        "low": null,
+        "base": null,
+        "high": null
+      },
+      "legacy_range_per_share": {
+        "low": -6.48,
+        "base": -6.48,
+        "high": -5.83
+      },
+      "valuation_status": "legacy_sensitivity",
+      "calculation_proof": null,
+      "evidence_tier": "primary_derived",
+      "evidence_level": "primary_derived",
+      "evidence": "Parent recourse debt $6000.0B less cash $1382.0M (~$6.48/sh); embedded in platform capitalization multiple.",
+      "scenario_assumptions": "Phase 3 provisional range pending filing-grounded proof.",
+      "probability_and_timing": null,
+      "tax_and_realization_adjustments": "Parent recourse debt burden informs capitalization multiple.",
+      "falsifier": "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
+      "overlap_key": "net_recourse_financial_claims",
+      "assumption_type": "fact"
+    }
+  ],
   "component_coverage": {
-    "all_material_components_identified": false,
-    "material_component_count": 0,
-    "additive_component_count": 0,
-    "embedded_component_count": 0,
-    "unvalued_component_count": 1,
+    "all_material_components_identified": true,
+    "material_component_count": 5,
+    "additive_component_count": 4,
+    "embedded_component_count": 1,
+    "unvalued_component_count": 0,
     "double_counting_flags": []
   },
   "input_classification": {
-    "facts": [],
+    "facts": [
+      {
+        "component_id": "net_recourse_financial_claims",
+        "label": "Parent recourse debt net of cash (embedded in platform multiple)",
+        "kind": "fact",
+        "evidence_tier": "primary_derived",
+        "evidence": "Parent recourse debt $6000.0B less cash $1382.0M (~$6.48/sh); embedded in platform capitalization multiple.",
+        "method": "net_asset_value",
+        "valuation_status": "legacy_sensitivity"
+      }
+    ],
     "estimates": [],
-    "judgments": []
+    "judgments": [
+      {
+        "component_id": "contracted_platform_owner_cash",
+        "label": "Contracted renewables and utility platform (standalone floor)",
+        "kind": "judgment",
+        "evidence_tier": "primary_derived",
+        "evidence": "Primary bridge from AES/investor-documents/sec-edgar/10-K_20260302_rpt20251231_acc0000874761_26_000063.htm: FY2025 Adjusted EBITDA $2890.0M, OCF $4306.0M, capex $5929.0M, recourse debt $6000.0B, cash $1382.0M; merger $15.0/sh per AES/investor-documents/sec-edgar/8-K_20260302_rpt20260301_acc0001193125_26_084157.htm; contract backfill 2026-07-21.",
+        "method": "owner_cash_or_dividend_discount",
+        "valuation_status": "bounded_estimate"
+      },
+      {
+        "component_id": "renewables_backlog_option",
+        "label": "12 GW contracted backlog and data-center load option",
+        "kind": "judgment",
+        "evidence_tier": "primary_derived",
+        "evidence": "Primary bridge from AES/investor-documents/sec-edgar/10-K_20260302_rpt20251231_acc0000874761_26_000063.htm: FY2025 Adjusted EBITDA $2890.0M, OCF $4306.0M, capex $5929.0M, recourse debt $6000.0B, cash $1382.0M; merger $15.0/sh per AES/investor-documents/sec-edgar/8-K_20260302_rpt20260301_acc0001193125_26_084157.htm; contract backfill 2026-07-21.",
+        "method": "risk_adjusted_milestone_value",
+        "valuation_status": "bounded_estimate"
+      },
+      {
+        "component_id": "merger_close_catalyst",
+        "label": "GIP/EQT cash merger completion uplift to $15.00",
+        "kind": "judgment",
+        "evidence_tier": "primary_derived",
+        "evidence": "Primary bridge from AES/investor-documents/sec-edgar/10-K_20260302_rpt20251231_acc0000874761_26_000063.htm: FY2025 Adjusted EBITDA $2890.0M, OCF $4306.0M, capex $5929.0M, recourse debt $6000.0B, cash $1382.0M; merger $15.0/sh per AES/investor-documents/sec-edgar/8-K_20260302_rpt20260301_acc0001193125_26_084157.htm; contract backfill 2026-07-21.",
+        "method": "probability_weighted_catalyst_nav",
+        "valuation_status": "bounded_estimate"
+      },
+      {
+        "component_id": "regulatory_and_execution_reserve",
+        "label": "Regulatory delay and spread compression reserve",
+        "kind": "judgment",
+        "evidence_tier": "primary_derived",
+        "evidence": "Primary bridge from AES/investor-documents/sec-edgar/10-K_20260302_rpt20251231_acc0000874761_26_000063.htm: FY2025 Adjusted EBITDA $2890.0M, OCF $4306.0M, capex $5929.0M, recourse debt $6000.0B, cash $1382.0M; merger $15.0/sh per AES/investor-documents/sec-edgar/8-K_20260302_rpt20260301_acc0001193125_26_084157.htm; contract backfill 2026-07-21.",
+        "method": "net_asset_value",
+        "valuation_status": "bounded_estimate"
+      }
+    ]
   },
   "method_route": {
     "schema_version": "2.0",
     "status": "routed",
     "profile_id": "predictable_cash_flow",
     "label": "Predictable cash-flow security",
-    "score": 6.0,
+    "score": 9.0,
     "reasons": [
-      "archetype=infrastructure"
+      "archetype=infrastructure",
+      "component categories=operating_business",
+      "existing methods=dividend, owner_cash"
     ],
     "primary_methods": [
       "owner_cash_or_dividend_discount"
@@ -61,42 +1490,75 @@
       "growth capital and dilution omitted",
       "contract renewal or regulatory reset ignored"
     ],
-    "secondary_profiles": [],
+    "secondary_profiles": [
+      {
+        "profile_id": "binary_milestone",
+        "score": 4.0,
+        "reasons": [
+          "component categories=real_option",
+          "existing methods=milestone, probability, risk_adjusted"
+        ]
+      },
+      {
+        "profile_id": "quality_reinvestment",
+        "score": 2.0,
+        "reasons": [
+          "component categories=operating_business",
+          "existing methods=owner_cash"
+        ]
+      }
+    ],
     "scorecard": {
       "scarce_asset_optionality": {
-        "score": 0.0,
-        "reasons": []
+        "score": 1.0,
+        "reasons": [
+          "component categories=real_option"
+        ]
       },
       "quality_reinvestment": {
-        "score": 0.0,
-        "reasons": []
+        "score": 2.0,
+        "reasons": [
+          "component categories=operating_business",
+          "existing methods=owner_cash"
+        ]
       },
       "capital_cycle": {
-        "score": 0.0,
-        "reasons": []
+        "score": 1.0,
+        "reasons": [
+          "component categories=operating_business"
+        ]
       },
       "credit_and_normalized_returns": {
-        "score": 0.0,
-        "reasons": []
+        "score": 1.0,
+        "reasons": [
+          "component categories=liability_or_reserve"
+        ]
       },
       "catalyst_asset_value": {
-        "score": 0.0,
-        "reasons": []
+        "score": 1.0,
+        "reasons": [
+          "existing methods=catalyst"
+        ]
       },
       "predictable_cash_flow": {
-        "score": 6.0,
+        "score": 9.0,
         "reasons": [
-          "archetype=infrastructure"
+          "archetype=infrastructure",
+          "component categories=operating_business",
+          "existing methods=dividend, owner_cash"
         ]
       },
       "binary_milestone": {
-        "score": 0.0,
-        "reasons": []
+        "score": 4.0,
+        "reasons": [
+          "component categories=real_option",
+          "existing methods=milestone, probability, risk_adjusted"
+        ]
       }
     },
     "decision_rule": "Power Zones select the fitting economic method and eligible independent reviewers; they never choose the valuation answer or capital decision.",
     "ticker": "AES",
-    "as_of": "2026-07-20",
+    "as_of": "2026-07-21",
     "route_source": "canonical_power_zone_router",
     "config_path": "_system/frameworks/power_zones.json",
     "config_updated": "2026-07-14",
@@ -148,74 +1610,237 @@
         }
       ]
     },
-    "input_hash": "fd1077220657531b7d6a12842baf28c327c7eb2c760265cef5e201b3ae24eaf9",
-    "generated_at": "2026-07-20T17:13:53.843451+00:00"
+    "input_hash": "a26bacda67dfded4bcf3792812ba8ce0e2ec143a883dcc1b65bbaf1e11fbb4cb",
+    "generated_at": "2026-07-21T14:36:30.105703+00:00"
   },
   "market": {
-    "price_per_share": 14.73,
+    "price_per_share": 14.815,
     "fully_diluted_shares": 713137865,
-    "market_cap_m": 10504.52,
+    "market_cap_m": 10565.14,
     "enterprise_value_m": null
   },
   "valuation": {
     "value_per_share": {
-      "low": null,
-      "base": null,
-      "high": null
+      "low": 10.9999,
+      "base": 14.7299,
+      "high": 19.5001
     },
     "priced_components_per_share": {
-      "low": 0,
-      "base": 0,
-      "high": 0
+      "low": 10.9999,
+      "base": 14.7299,
+      "high": 19.5001
     },
-    "legacy_value_per_share": null,
-    "probability_weighted_value_per_share": null,
+    "legacy_value_per_share": {
+      "low": 11.0,
+      "base": 14.73,
+      "high": 19.5
+    },
+    "probability_weighted_value_per_share": 14.7299,
     "expected_distributions_per_share": 0.0,
     "annualized_return_at_price_pct": {
-      "low": null,
-      "base": null,
-      "high": null
+      "low": -4.16,
+      "base": -0.08,
+      "high": 4.0
     },
-    "downside_to_low_pct": null,
+    "downside_to_low_pct": -25.75,
     "horizon_years": 7,
     "interpretation": "value_per_share is withheld while any material additive component is unpriced; priced_components_per_share is not a complete security value."
   },
   "scenario_contract": {
     "rule": "Cases must change cited causal operating, capital, probability, timing, or financing drivers\u2014not only a terminal multiple.",
-    "top_value_drivers": [],
+    "top_value_drivers": [
+      {
+        "component_id": "contracted_platform_owner_cash",
+        "label": "Contracted renewables and utility platform (standalone floor)",
+        "valuation_status": "bounded_estimate",
+        "base_per_share": 11.3099,
+        "legacy_base_per_share": 11.31,
+        "range_width_per_share": 3.0002,
+        "scenario_assumptions": "Proof outputs {'low': 9.9999, 'base': 11.3099, 'high': 13.0001}; see calculation_proof graph."
+      },
+      {
+        "component_id": "merger_close_catalyst",
+        "label": "GIP/EQT cash merger completion uplift to $15.00",
+        "valuation_status": "bounded_estimate",
+        "base_per_share": 2.69,
+        "legacy_base_per_share": 2.69,
+        "range_width_per_share": 2.5,
+        "scenario_assumptions": "Proof outputs {'low': 1.5, 'base': 2.69, 'high': 4.0}; see calculation_proof graph."
+      },
+      {
+        "component_id": "renewables_backlog_option",
+        "label": "12 GW contracted backlog and data-center load option",
+        "valuation_status": "bounded_estimate",
+        "base_per_share": 1.0,
+        "legacy_base_per_share": 1.0,
+        "range_width_per_share": 2.0,
+        "scenario_assumptions": "Proof outputs {'low': 0.5, 'base': 1.0, 'high': 2.5}; see calculation_proof graph."
+      },
+      {
+        "component_id": "regulatory_and_execution_reserve",
+        "label": "Regulatory delay and spread compression reserve",
+        "valuation_status": "bounded_estimate",
+        "base_per_share": -0.27,
+        "legacy_base_per_share": -0.27,
+        "range_width_per_share": 1.0,
+        "scenario_assumptions": "Proof outputs {'low': -1.0, 'base': -0.27, 'high': 0.0}; see calculation_proof graph."
+      }
+    ],
     "reverse_expectations": null
   },
   "calculation_proof_summary": {
-    "component_count": 0,
-    "priced_component_count": 0,
-    "proof_complete_pct": 0.0,
+    "component_count": 5,
+    "priced_component_count": 4,
+    "proof_complete_pct": 80.0,
     "status_counts": {
-      "bounded_estimate": 0,
+      "bounded_estimate": 4,
       "calculated": 0,
-      "legacy_sensitivity": 0,
+      "legacy_sensitivity": 1,
       "unpriced": 0
     },
     "all_material_components_priced": false,
     "calculation_errors": [],
-    "aggregate_proof_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    "aggregate_proof_hash": "a0c795337165f27456f18d9ee138aa5dc02fa57cdf2b75d3e9ad524a0c146a04"
   },
-  "source_lineage": [],
+  "source_lineage": [
+    {
+      "component_id": "contracted_platform_owner_cash",
+      "node_id": "adj_ebitda_m",
+      "ref": "AES/investor-documents/sec-edgar/10-K_20260302_rpt20251231_acc0000874761_26_000063.htm",
+      "locator": "Segment Adjusted EBITDA $932M + $863M + $1,130M + $(35)M = $2,890M",
+      "as_of": "2025-12-31",
+      "content_sha256": "23c6d9a837c9f9cee1fc557c4a62707087ec6fd11704e4d03eec25ae76874e76",
+      "source_id": "0764266b230eaf78e34808b70049bba8e4b7e7c59b8de447240ea21f9d60740f"
+    },
+    {
+      "component_id": "contracted_platform_owner_cash",
+      "node_id": "shares_m",
+      "ref": "AES/investor-documents/sec-edgar/10-K_20260302_rpt20251231_acc0000874761_26_000063.htm",
+      "locator": "Weighted-average diluted shares 713M (FY2025 income statement)",
+      "as_of": "2025-12-31",
+      "content_sha256": "23c6d9a837c9f9cee1fc557c4a62707087ec6fd11704e4d03eec25ae76874e76",
+      "source_id": "d0ce67fe8a3cfce4d84654ad227b6c4df55fcedfb78764a5bfad6b25a701ca11"
+    },
+    {
+      "component_id": "contracted_platform_owner_cash",
+      "node_id": "recourse_debt_m",
+      "ref": "AES/investor-documents/sec-edgar/10-K_20260302_rpt20251231_acc0000874761_26_000063.htm",
+      "locator": "Recourse Debt: total recourse debt was $6.0 billion at December 31, 2025",
+      "as_of": "2025-12-31",
+      "content_sha256": "23c6d9a837c9f9cee1fc557c4a62707087ec6fd11704e4d03eec25ae76874e76",
+      "source_id": "8c054a2fbe679e625d6ff3ebbc272939472930f25cec0602106ea599e9deef2e"
+    },
+    {
+      "component_id": "renewables_backlog_option",
+      "node_id": "backlog_gw",
+      "ref": "AES/investor-documents/sec-edgar/10-K_20260302_rpt20251231_acc0000874761_26_000063.htm",
+      "locator": "12.0 GW contracted backlog with signed PPAs at December 31, 2025",
+      "as_of": "2025-12-31",
+      "content_sha256": "23c6d9a837c9f9cee1fc557c4a62707087ec6fd11704e4d03eec25ae76874e76",
+      "source_id": "34880e90e99a2e1fd9d53907f4181fd33cd4cda2bc6aab4c3c58f4936d044f9d"
+    },
+    {
+      "component_id": "renewables_backlog_option",
+      "node_id": "new_contracts_gw",
+      "ref": "AES/investor-documents/sec-edgar/10-K_20260302_rpt20251231_acc0000874761_26_000063.htm",
+      "locator": "Signed 4.0 GW new renewables contracts in 2025",
+      "as_of": "2025-12-31",
+      "content_sha256": "23c6d9a837c9f9cee1fc557c4a62707087ec6fd11704e4d03eec25ae76874e76",
+      "source_id": "e861210a6f89a474e86a0085f702b1eda31ecc687f04d7f02a2e3adc3a893fa5"
+    },
+    {
+      "component_id": "renewables_backlog_option",
+      "node_id": "shares_m",
+      "ref": "AES/investor-documents/sec-edgar/10-K_20260302_rpt20251231_acc0000874761_26_000063.htm",
+      "locator": "Weighted-average diluted shares 713M (FY2025)",
+      "as_of": "2025-12-31",
+      "content_sha256": "23c6d9a837c9f9cee1fc557c4a62707087ec6fd11704e4d03eec25ae76874e76",
+      "source_id": "d6fd9dfe12f663cd389c1a61d374ee35faec9100968939bd757d009534ef538b"
+    },
+    {
+      "component_id": "merger_close_catalyst",
+      "node_id": "merger_consideration",
+      "ref": "AES/investor-documents/sec-edgar/8-K_20260302_rpt20260301_acc0001193125_26_084157.htm",
+      "locator": "Each share converted into the right to receive $15.00 in cash without interest",
+      "as_of": "2026-03-01",
+      "content_sha256": "1f1981730372591fe9f3136cb69cd38bc568b84c2b65e808a02af7f360c74ab5",
+      "source_id": "52d5bf7623ac32dcd451983c13d04cb14a0ded4acdd16e1bac120bb561a73cb7"
+    },
+    {
+      "component_id": "merger_close_catalyst",
+      "node_id": "fairness_floor",
+      "ref": "AES/investor-documents/sec-edgar/8-K_20260612_rpt20260612_acc0001140361_26_025084.htm",
+      "locator": "Fairness opinion reference range $11.31 to $16.39 per share (proxy materials)",
+      "as_of": "2026-06-12",
+      "content_sha256": "65e0ec21185961d240337be16c6d6cf82c16d703a3dfa80958abd76c3ce4d0ed",
+      "source_id": "e49b7db5832b95c2dd81a33da7b033a4cf415484626594f3a7f79f97dcd12965"
+    },
+    {
+      "component_id": "merger_close_catalyst",
+      "node_id": "platform_base_ps",
+      "ref": "AES/investor-documents/sec-edgar/10-K_20260302_rpt20251231_acc0000874761_26_000063.htm",
+      "locator": "Non-overlapping paired component contracted_platform_owner_cash base",
+      "as_of": "2025-12-31",
+      "content_sha256": "23c6d9a837c9f9cee1fc557c4a62707087ec6fd11704e4d03eec25ae76874e76",
+      "source_id": "637d69ffbaae503cfd685876d8ccadd8c6d016c088a0fbb95b16a1e3bef7c26c"
+    },
+    {
+      "component_id": "merger_close_catalyst",
+      "node_id": "backlog_base_ps",
+      "ref": "AES/investor-documents/sec-edgar/10-K_20260302_rpt20251231_acc0000874761_26_000063.htm",
+      "locator": "Non-overlapping paired component renewables_backlog_option base",
+      "as_of": "2025-12-31",
+      "content_sha256": "23c6d9a837c9f9cee1fc557c4a62707087ec6fd11704e4d03eec25ae76874e76",
+      "source_id": "97799cb12b2d408885893a27bf5c74c38e9d49c91d5976fb205fbf5518a647cc"
+    },
+    {
+      "component_id": "regulatory_and_execution_reserve",
+      "node_id": "price_today",
+      "ref": "AES/research/valuation.json",
+      "locator": "inputs.price $14.73 as of 2026-07-09",
+      "as_of": "2026-07-21",
+      "content_sha256": "13041bce8505ea2ed17e3d58728d03bde354d77fd6bdec8f761f7767ed9dc3aa",
+      "source_id": "3ac25ff5fd8ed23ea1f7b27d2e37ab6f47676bd2a323c38e8db49dc9ec97077a"
+    },
+    {
+      "component_id": "regulatory_and_execution_reserve",
+      "node_id": "merger_consideration",
+      "ref": "AES/investor-documents/sec-edgar/8-K_20260302_rpt20260301_acc0001193125_26_084157.htm",
+      "locator": "$15.00 cash per share merger consideration",
+      "as_of": "2026-03-01",
+      "content_sha256": "1f1981730372591fe9f3136cb69cd38bc568b84c2b65e808a02af7f360c74ab5",
+      "source_id": "596c112327fad79e4a25388ee85aa6a8e294276993cec70cac5bf5ebcf295927"
+    },
+    {
+      "component_id": "regulatory_and_execution_reserve",
+      "node_id": "shares_m",
+      "ref": "AES/investor-documents/sec-edgar/10-Q_20260505_rpt20260331_acc0000874761_26_000120.htm",
+      "locator": "Weighted-average diluted shares 713M (Q1 2026)",
+      "as_of": "2026-03-31",
+      "content_sha256": "2397f7318187f37dcd6edfdfa862451e2488a594f838853e40740139eae4eabf",
+      "source_id": "0399d2f7ea6cf416b7b96b75a51e5c8d4727d297f79c9c5417e72a5c4ab50005"
+    }
+  ],
   "model_checks": {
     "calculation_graphs_valid": true,
-    "component_sum_reconciles": false,
+    "component_sum_reconciles": true,
     "no_double_counting": true,
-    "all_material_components_priced": false,
+    "all_material_components_priced": true,
     "low_base_high_ordered": true
   },
   "evidence": {
-    "unresolved_count": 1,
-    "blockers": [
-      "A complete economic ownership map has not been supplied."
-    ],
+    "unresolved_count": 0,
+    "blockers": [],
     "validation_errors": []
   },
   "monitoring": {
-    "falsifiers": [],
+    "falsifiers": [
+      "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
+      "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
+      "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
+      "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
+      "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case."
+    ],
     "required_refresh_triggers": [
       "new filing or material operating update",
       "capital-structure change",
@@ -224,8 +1849,13 @@
     ]
   },
   "change_control": {
-    "model_hash": "11332f952c8250ed23614c46ddc7f9b602b0442def51ab44a010cff95ae9b187",
-    "method_versions": [],
+    "model_hash": "186d0ef434ac91bacc41f7a8490cbc30601f60b8bdffb7fb4a550e2b7eeaf069",
+    "method_versions": [
+      "net_asset_value@1.0",
+      "owner_cash_or_dividend_discount@1.0",
+      "probability_weighted_catalyst_nav@1.0",
+      "risk_adjusted_milestone_value@1.0"
+    ],
     "change_log": [],
     "rule": "A source fact is locked. Every assumption change requires a reason, author, timestamp, and before/after value."
   },
