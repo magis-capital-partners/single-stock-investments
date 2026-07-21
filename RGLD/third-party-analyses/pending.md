@@ -1,9 +1,9 @@
-# RGLD - Pending third-party sources
+# RGLD — Pending third-party sources
 
-**Updated:** 2026-06-20
+**Updated:** 2026-07-21
 
 Approve in `_system/frameworks/third_party_sources.md` before using in base IRR.
 
 | File | Status |
 |------|--------|
-| `RGLD/third-party-analyses/vic/vic_pdf_2026-06-20_rgld-vic-pdf_21b5ea5eca.pdf` | Pending VIC intake captured 2026-06-20; human approval required before IRR/stance use |
+| (none) | — |
