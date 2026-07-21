@@ -40,9 +40,20 @@ Isolation and delivery rules:
 
 try {
   const repoSpec = startingRef ? { url: `https://github.com/${repo}`, startingRef } : { url: `https://github.com/${repo}` };
+  // Cloud catalog ids are bare (e.g. claude-sonnet-5); thinking/effort are params.
+  const model =
+    modelId === "claude-sonnet-5"
+      ? {
+          id: modelId,
+          params: [
+            { id: "thinking", value: "true" },
+            { id: "effort", value: "high" },
+          ],
+        }
+      : { id: modelId };
   const result = await Agent.prompt(prompt, {
     apiKey,
-    model: { id: modelId },
+    model,
     cloud: { repos: [repoSpec], autoCreatePR: true, skipReviewerRequest: true },
   });
   console.log("Status:", result.status);
