@@ -475,6 +475,84 @@ def main() -> int:
     data["as_of"] = AS_OF
     data["component_valuation"] = build_component_schedule()
     data["economic_value_analysis"] = economic_value_block()
+    data["valuation_mode"] = "economic_value"
+    data["economic_value"] = {
+        "schema_version": "1.0",
+        "method": "component_economic_value",
+        "economic_claim": {
+            "description": (
+                "One diluted AES common share: contracted platform owner cash, renewables backlog option, "
+                "merger-close catalyst to $15.00, less regulatory execution reserve while GIP/EQT deal pending."
+            ),
+            "unit_label": "diluted share",
+            "unit_count": int(SHARES_M * 1_000_000),
+            "unit_source": (
+                f"FY2025 weighted-average diluted shares {SHARES_M}M "
+                f"({FILING_10K})."
+            ),
+            "enterprise_to_equity_reconciliation": (
+                "Platform valued via Adjusted EBITDA owner-cash multiple; backlog and merger catalyst are "
+                "non-overlapping options; parent recourse debt embedded in platform capitalization."
+            ),
+        },
+        "gaap_role": "cross_check",
+        "accounting_reference": (
+            f"FY2025 10-K: stockholders' equity ${4063}M; parent recourse debt ${RECOURSE_DEBT_M}B; "
+            "economic value uses component proofs, not GAAP book alone while merger is pending."
+        ),
+        "component_groups": [
+            {
+                "id": "contracted_platform_owner_cash",
+                "label": "Contracted renewables and utility platform (standalone floor)",
+                "component_ids": ["contracted_platform_owner_cash"],
+                "economic_claim": "Contracted renewables and utility platform (standalone floor)",
+                "valuation_basis": "Owner-cash discount on FY2025 segment Adjusted EBITDA per share.",
+                "adjustments": "Parent recourse debt burden informs capitalization multiple.",
+                "overlap_control": "Unique overlap key contracted_platform_owner_cash.",
+            },
+            {
+                "id": "renewables_backlog_option",
+                "label": "12 GW contracted backlog and data-center load option",
+                "component_ids": ["renewables_backlog_option"],
+                "economic_claim": "12 GW contracted backlog and data-center load option",
+                "valuation_basis": "Risk-adjusted milestone on backlog conversion.",
+                "adjustments": "Not in Lawrence yield_curve base while merger pending.",
+                "overlap_control": "Unique overlap key renewables_backlog_option.",
+                "risk_and_timing": {
+                    "probability_basis": "Base ~55% that contracted backlog converts on disclosed timeline.",
+                    "timing_basis": "3–5 year construction cycle per FY2025 10-K.",
+                    "remaining_capital_basis": "Growth capex funded at project level; ~$2.5B remaining corporate burden [Assumption].",
+                },
+            },
+            {
+                "id": "merger_close_catalyst",
+                "label": "GIP/EQT cash merger completion uplift to $15.00",
+                "component_ids": ["merger_close_catalyst"],
+                "economic_claim": "GIP/EQT cash merger completion uplift to $15.00",
+                "valuation_basis": "Probability-weighted catalyst NAV to $15.00 consideration.",
+                "adjustments": "Paired to platform and backlog to prevent double counting.",
+                "overlap_control": "Unique overlap key merger_close_catalyst.",
+                "risk_and_timing": {
+                    "probability_basis": "Base assumes close at $15.00; low case haircuts regulatory delay.",
+                    "timing_basis": "Expected close late 2026 or early 2027 per 8-K 2026-03-02.",
+                    "remaining_capital_basis": "No further equity funding required if merger closes.",
+                },
+            },
+            {
+                "id": "regulatory_and_execution_reserve",
+                "label": "Regulatory delay and spread compression reserve",
+                "component_ids": ["regulatory_and_execution_reserve"],
+                "economic_claim": "Regulatory delay and spread compression reserve",
+                "valuation_basis": "Bounded negative reserve for PUCO/FERC/CFIUS friction.",
+                "adjustments": "Does not duplicate deal-break standalone repricing in platform floor.",
+                "overlap_control": "Unique overlap key regulatory_and_execution_reserve.",
+            },
+        ],
+        "limitations": [
+            "Merger event supersedes standalone Lawrence path for stance gate.",
+            "Project-level non-recourse debt stays with operating assets; buyer assumes capital structure.",
+        ],
+    }
     data.setdefault("valuation_methodology", {})
     data["valuation_methodology"]["horizon_years"] = 7
     data["valuation_methodology"]["expected_distributions_per_share"] = 0.0
@@ -511,6 +589,17 @@ def main() -> int:
                 "scenarios": {
                     "base": {"close_probability": 1.0, "payoff_per_share": MERGER_PRICE},
                     "bear": {"close_probability": 0.85, "payoff_per_share": 14.5},
+                },
+            }
+        if cid == "renewables_backlog_option":
+            comp["driver_model"] = {
+                "timing_basis": "Backlog converts over 3–5 years per FY2025 10-K construction cycle.",
+                "scenarios": {
+                    "base": {
+                        "success_probability": 0.55,
+                        "remaining_cost_m": 2500.0,
+                        "timing_years": 4.0,
+                    }
                 },
             }
         for case in ("low", "base", "high"):
