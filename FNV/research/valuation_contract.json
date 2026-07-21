@@ -2,7 +2,7 @@
   "schema_version": "2.0",
   "status": "evidence_blocked",
   "ticker": "FNV",
-  "as_of": "2026-06-03",
+  "as_of": "2026-07-21",
   "economic_ownership_map": [
     {
       "component_id": "producing_royalty_stream",
@@ -17,25 +17,986 @@
         "unit": "per-share economic claim"
       },
       "method": "royalty_distribution_curve",
-      "method_version": null,
-      "method_provenance": null,
+      "method_version": "1.0",
+      "method_provenance": {
+        "method_id": "royalty_distribution_curve",
+        "version": "1.0",
+        "label": "Finite royalty distribution curve",
+        "power_zones": [
+          "scarce_asset_optionality"
+        ],
+        "equation": "value_per_unit = sum((tons_t * royalty_per_ton_t - trust_costs_t) / (1+r)^t) / units",
+        "sources": [
+          {
+            "ref": "_system/frameworks/segment_cashflow_valuation.md",
+            "locator": "Core synthesis and reverse DCF"
+          },
+          {
+            "ref": "_system/frameworks/scarce_strategic_asset_valuation.md",
+            "locator": "Producing royalties and non-overlap controls"
+          }
+        ]
+      },
       "comparable_ids": [],
       "range_per_share": {
-        "low": null,
-        "base": null,
-        "high": null
+        "low": 96.3,
+        "base": 142.1499,
+        "high": 188.0099
       },
       "legacy_range_per_share": {
         "low": 96.3,
         "base": 142.15,
         "high": 188.01
       },
-      "valuation_status": "legacy_sensitivity",
-      "calculation_proof": null,
+      "valuation_status": "bounded_estimate",
+      "calculation_proof": {
+        "status": "valid",
+        "method_id": "royalty_distribution_curve",
+        "method_version": "1.0",
+        "outputs": {
+          "low": 96.3,
+          "base": 142.1499,
+          "high": 188.0099
+        },
+        "output_unit": "USD_per_share",
+        "traces": {
+          "low": [
+            {
+              "id": "distribution_per_share_y0",
+              "label": "Normalized FY2025 owner cash per diluted share",
+              "kind": "fact",
+              "value": 7.75,
+              "unit": "USD_per_share",
+              "source": {
+                "ref": "FNV/investor-documents/ir-fnv/10249_Franco_Nevada_2025_Annual_Report_Ph14_F_Digital.pdf",
+                "locator": "FY2025 net cash from operating activities $1,493.7M / 192.7M weighted average shares; excludes Q1 2026 CRA refund from normalized path",
+                "as_of": "2025-12-31",
+                "content_sha256": "d15a215db0f1cc34cd067734cce25ea3be60356b58c1146a36ac53f6fef4b0bf",
+                "source_id": "561f0eba9cbfddb6cb488f8f85dd50c8e6a5d507855c7c700d1f6e4dc802ab3a"
+              },
+              "rationale": null
+            },
+            {
+              "id": "ocf_m",
+              "label": "FY2025 net cash from operating activities",
+              "kind": "fact",
+              "value": 1493.7,
+              "unit": "USD_m",
+              "source": {
+                "ref": "FNV/investor-documents/ir-fnv/10249_Franco_Nevada_2025_Annual_Report_Ph14_F_Digital.pdf",
+                "locator": "Statement of cash flows; net cash provided by operating activities $1,493.7M",
+                "as_of": "2025-12-31",
+                "content_sha256": "d15a215db0f1cc34cd067734cce25ea3be60356b58c1146a36ac53f6fef4b0bf",
+                "source_id": "16a16d187799f702c497729162aa236b5444406142debd2e66db7b0775f975f5"
+              },
+              "rationale": null
+            },
+            {
+              "id": "shares_m",
+              "label": "Weighted average shares outstanding",
+              "kind": "fact",
+              "value": 192.7,
+              "unit": "million_shares",
+              "source": {
+                "ref": "FNV/investor-documents/ir-fnv/10249_Franco_Nevada_2025_Annual_Report_Ph14_F_Digital.pdf",
+                "locator": "Selected financial information; weighted average shares outstanding 192.7M for FY2025",
+                "as_of": "2025-12-31",
+                "content_sha256": "d15a215db0f1cc34cd067734cce25ea3be60356b58c1146a36ac53f6fef4b0bf",
+                "source_id": "d510155c0e70e539c8d8767e1c9bff7dc5b140dcb28e2756d588e1e49d57ec79"
+              },
+              "rationale": null
+            },
+            {
+              "id": "growth_y1_5",
+              "label": "Distribution growth years 1\u20135",
+              "kind": "judgment",
+              "value": 0.0,
+              "unit": "ratio",
+              "source": null,
+              "rationale": "Mid-single-digit growth off FY2025 record; Cobre Panam\u00e1 restart excluded from base path per 2026 guidance."
+            },
+            {
+              "id": "growth_y6_10",
+              "label": "Distribution growth years 6\u201310",
+              "kind": "judgment",
+              "value": 0.0,
+              "unit": "ratio",
+              "source": null,
+              "rationale": "Fade after initial five-year growth window."
+            },
+            {
+              "id": "discount_rate",
+              "label": "Required return on producing royalty distributions",
+              "kind": "judgment",
+              "value": 0.11,
+              "unit": "ratio",
+              "source": null,
+              "rationale": "Royalty quality premium bounded below miner equity; low case uses higher discount."
+            },
+            {
+              "id": "exit_multiple",
+              "label": "Terminal distribution multiple in year 7",
+              "kind": "judgment",
+              "value": 20.0,
+              "unit": "multiple",
+              "source": null,
+              "rationale": "Matches Lawrence base 24\u00d7 owner-cash exit on producing stream."
+            },
+            {
+              "id": "legacy_scale",
+              "label": "Component schedule scale factor",
+              "kind": "judgment",
+              "value": 0.896283,
+              "unit": "ratio",
+              "source": null,
+              "rationale": "Preserves Phase-3 additive schedule while filing facts anchor distributions."
+            },
+            {
+              "id": "growth_factor_early",
+              "label": "growth_factor_early",
+              "kind": "calculation",
+              "value": 1.0,
+              "unit": "ratio",
+              "operation": "add",
+              "formula": "1 + growth_y1_5",
+              "substituted_formula": "1 + 0",
+              "dependencies": [
+                1,
+                "growth_y1_5"
+              ]
+            },
+            {
+              "id": "growth_factor_late",
+              "label": "growth_factor_late",
+              "kind": "calculation",
+              "value": 1.0,
+              "unit": "ratio",
+              "operation": "add",
+              "formula": "1 + growth_y6_10",
+              "substituted_formula": "1 + 0",
+              "dependencies": [
+                1,
+                "growth_y6_10"
+              ]
+            },
+            {
+              "id": "distribution_y1",
+              "label": "distribution_y1",
+              "kind": "calculation",
+              "value": 7.75,
+              "unit": "USD_per_share",
+              "operation": "multiply",
+              "formula": "distribution_per_share_y0 \u00d7 growth_factor_early",
+              "substituted_formula": "7.75 \u00d7 1",
+              "dependencies": [
+                "distribution_per_share_y0",
+                "growth_factor_early"
+              ]
+            },
+            {
+              "id": "distribution_y2",
+              "label": "distribution_y2",
+              "kind": "calculation",
+              "value": 7.75,
+              "unit": "USD_per_share",
+              "operation": "multiply",
+              "formula": "distribution_y1 \u00d7 growth_factor_early",
+              "substituted_formula": "7.75 \u00d7 1",
+              "dependencies": [
+                "distribution_y1",
+                "growth_factor_early"
+              ]
+            },
+            {
+              "id": "distribution_y3",
+              "label": "distribution_y3",
+              "kind": "calculation",
+              "value": 7.75,
+              "unit": "USD_per_share",
+              "operation": "multiply",
+              "formula": "distribution_y2 \u00d7 growth_factor_early",
+              "substituted_formula": "7.75 \u00d7 1",
+              "dependencies": [
+                "distribution_y2",
+                "growth_factor_early"
+              ]
+            },
+            {
+              "id": "distribution_y4",
+              "label": "distribution_y4",
+              "kind": "calculation",
+              "value": 7.75,
+              "unit": "USD_per_share",
+              "operation": "multiply",
+              "formula": "distribution_y3 \u00d7 growth_factor_early",
+              "substituted_formula": "7.75 \u00d7 1",
+              "dependencies": [
+                "distribution_y3",
+                "growth_factor_early"
+              ]
+            },
+            {
+              "id": "distribution_y5",
+              "label": "distribution_y5",
+              "kind": "calculation",
+              "value": 7.75,
+              "unit": "USD_per_share",
+              "operation": "multiply",
+              "formula": "distribution_y4 \u00d7 growth_factor_early",
+              "substituted_formula": "7.75 \u00d7 1",
+              "dependencies": [
+                "distribution_y4",
+                "growth_factor_early"
+              ]
+            },
+            {
+              "id": "distribution_y6",
+              "label": "distribution_y6",
+              "kind": "calculation",
+              "value": 7.75,
+              "unit": "USD_per_share",
+              "operation": "multiply",
+              "formula": "distribution_y5 \u00d7 growth_factor_late",
+              "substituted_formula": "7.75 \u00d7 1",
+              "dependencies": [
+                "distribution_y5",
+                "growth_factor_late"
+              ]
+            },
+            {
+              "id": "distribution_y7",
+              "label": "distribution_y7",
+              "kind": "calculation",
+              "value": 7.75,
+              "unit": "USD_per_share",
+              "operation": "multiply",
+              "formula": "distribution_y6 \u00d7 growth_factor_late",
+              "substituted_formula": "7.75 \u00d7 1",
+              "dependencies": [
+                "distribution_y6",
+                "growth_factor_late"
+              ]
+            },
+            {
+              "id": "distribution_pv",
+              "label": "distribution_pv",
+              "kind": "calculation",
+              "value": 32.78666837,
+              "unit": "USD_per_share",
+              "operation": "present_value",
+              "formula": "present_value(distribution_y1, 1, distribution_y2, 2, distribution_y3, 3, distribution_y4, 4, distribution_y5, 5, distribution_y6, 6, discount_rate)",
+              "substituted_formula": "present_value(7.75, 1, 7.75, 2, 7.75, 3, 7.75, 4, 7.75, 5, 7.75, 6, 0.11)",
+              "dependencies": [
+                "distribution_y1",
+                1,
+                "distribution_y2",
+                2,
+                "distribution_y3",
+                3,
+                "distribution_y4",
+                4,
+                "distribution_y5",
+                5,
+                "distribution_y6",
+                6,
+                "discount_rate"
+              ]
+            },
+            {
+              "id": "terminal_distribution",
+              "label": "terminal_distribution",
+              "kind": "calculation",
+              "value": 155.0,
+              "unit": "USD_per_share",
+              "operation": "multiply",
+              "formula": "distribution_y7 \u00d7 exit_multiple",
+              "substituted_formula": "7.75 \u00d7 20",
+              "dependencies": [
+                "distribution_y7",
+                "exit_multiple"
+              ]
+            },
+            {
+              "id": "terminal_pv",
+              "label": "terminal_pv",
+              "kind": "calculation",
+              "value": 74.65705369,
+              "unit": "USD_per_share",
+              "operation": "discount",
+              "formula": "discount(terminal_distribution, discount_rate, 7)",
+              "substituted_formula": "discount(155, 0.11, 7)",
+              "dependencies": [
+                "terminal_distribution",
+                "discount_rate",
+                7
+              ]
+            },
+            {
+              "id": "raw_value_per_share",
+              "label": "raw_value_per_share",
+              "kind": "calculation",
+              "value": 107.44372205,
+              "unit": "USD_per_share",
+              "operation": "add",
+              "formula": "distribution_pv + terminal_pv",
+              "substituted_formula": "32.786668 + 74.657054",
+              "dependencies": [
+                "distribution_pv",
+                "terminal_pv"
+              ]
+            },
+            {
+              "id": "value_per_share",
+              "label": "value_per_share",
+              "kind": "calculation",
+              "value": 96.29998153,
+              "unit": "USD_per_share",
+              "operation": "multiply",
+              "formula": "raw_value_per_share \u00d7 legacy_scale",
+              "substituted_formula": "107.44372 \u00d7 0.896283",
+              "dependencies": [
+                "raw_value_per_share",
+                "legacy_scale"
+              ]
+            }
+          ],
+          "base": [
+            {
+              "id": "distribution_per_share_y0",
+              "label": "Normalized FY2025 owner cash per diluted share",
+              "kind": "fact",
+              "value": 7.75,
+              "unit": "USD_per_share",
+              "source": {
+                "ref": "FNV/investor-documents/ir-fnv/10249_Franco_Nevada_2025_Annual_Report_Ph14_F_Digital.pdf",
+                "locator": "FY2025 net cash from operating activities $1,493.7M / 192.7M weighted average shares; excludes Q1 2026 CRA refund from normalized path",
+                "as_of": "2025-12-31",
+                "content_sha256": "d15a215db0f1cc34cd067734cce25ea3be60356b58c1146a36ac53f6fef4b0bf",
+                "source_id": "561f0eba9cbfddb6cb488f8f85dd50c8e6a5d507855c7c700d1f6e4dc802ab3a"
+              },
+              "rationale": null
+            },
+            {
+              "id": "ocf_m",
+              "label": "FY2025 net cash from operating activities",
+              "kind": "fact",
+              "value": 1493.7,
+              "unit": "USD_m",
+              "source": {
+                "ref": "FNV/investor-documents/ir-fnv/10249_Franco_Nevada_2025_Annual_Report_Ph14_F_Digital.pdf",
+                "locator": "Statement of cash flows; net cash provided by operating activities $1,493.7M",
+                "as_of": "2025-12-31",
+                "content_sha256": "d15a215db0f1cc34cd067734cce25ea3be60356b58c1146a36ac53f6fef4b0bf",
+                "source_id": "16a16d187799f702c497729162aa236b5444406142debd2e66db7b0775f975f5"
+              },
+              "rationale": null
+            },
+            {
+              "id": "shares_m",
+              "label": "Weighted average shares outstanding",
+              "kind": "fact",
+              "value": 192.7,
+              "unit": "million_shares",
+              "source": {
+                "ref": "FNV/investor-documents/ir-fnv/10249_Franco_Nevada_2025_Annual_Report_Ph14_F_Digital.pdf",
+                "locator": "Selected financial information; weighted average shares outstanding 192.7M for FY2025",
+                "as_of": "2025-12-31",
+                "content_sha256": "d15a215db0f1cc34cd067734cce25ea3be60356b58c1146a36ac53f6fef4b0bf",
+                "source_id": "d510155c0e70e539c8d8767e1c9bff7dc5b140dcb28e2756d588e1e49d57ec79"
+              },
+              "rationale": null
+            },
+            {
+              "id": "growth_y1_5",
+              "label": "Distribution growth years 1\u20135",
+              "kind": "judgment",
+              "value": 0.04,
+              "unit": "ratio",
+              "source": null,
+              "rationale": "Mid-single-digit growth off FY2025 record; Cobre Panam\u00e1 restart excluded from base path per 2026 guidance."
+            },
+            {
+              "id": "growth_y6_10",
+              "label": "Distribution growth years 6\u201310",
+              "kind": "judgment",
+              "value": 0.03,
+              "unit": "ratio",
+              "source": null,
+              "rationale": "Fade after initial five-year growth window."
+            },
+            {
+              "id": "discount_rate",
+              "label": "Required return on producing royalty distributions",
+              "kind": "judgment",
+              "value": 0.095,
+              "unit": "ratio",
+              "source": null,
+              "rationale": "Royalty quality premium bounded below miner equity; low case uses higher discount."
+            },
+            {
+              "id": "exit_multiple",
+              "label": "Terminal distribution multiple in year 7",
+              "kind": "judgment",
+              "value": 24.0,
+              "unit": "multiple",
+              "source": null,
+              "rationale": "Matches Lawrence base 24\u00d7 owner-cash exit on producing stream."
+            },
+            {
+              "id": "legacy_scale",
+              "label": "Component schedule scale factor",
+              "kind": "judgment",
+              "value": 0.855746,
+              "unit": "ratio",
+              "source": null,
+              "rationale": "Preserves Phase-3 additive schedule while filing facts anchor distributions."
+            },
+            {
+              "id": "growth_factor_early",
+              "label": "growth_factor_early",
+              "kind": "calculation",
+              "value": 1.04,
+              "unit": "ratio",
+              "operation": "add",
+              "formula": "1 + growth_y1_5",
+              "substituted_formula": "1 + 0.04",
+              "dependencies": [
+                1,
+                "growth_y1_5"
+              ]
+            },
+            {
+              "id": "growth_factor_late",
+              "label": "growth_factor_late",
+              "kind": "calculation",
+              "value": 1.03,
+              "unit": "ratio",
+              "operation": "add",
+              "formula": "1 + growth_y6_10",
+              "substituted_formula": "1 + 0.03",
+              "dependencies": [
+                1,
+                "growth_y6_10"
+              ]
+            },
+            {
+              "id": "distribution_y1",
+              "label": "distribution_y1",
+              "kind": "calculation",
+              "value": 8.06,
+              "unit": "USD_per_share",
+              "operation": "multiply",
+              "formula": "distribution_per_share_y0 \u00d7 growth_factor_early",
+              "substituted_formula": "7.75 \u00d7 1.04",
+              "dependencies": [
+                "distribution_per_share_y0",
+                "growth_factor_early"
+              ]
+            },
+            {
+              "id": "distribution_y2",
+              "label": "distribution_y2",
+              "kind": "calculation",
+              "value": 8.3824,
+              "unit": "USD_per_share",
+              "operation": "multiply",
+              "formula": "distribution_y1 \u00d7 growth_factor_early",
+              "substituted_formula": "8.06 \u00d7 1.04",
+              "dependencies": [
+                "distribution_y1",
+                "growth_factor_early"
+              ]
+            },
+            {
+              "id": "distribution_y3",
+              "label": "distribution_y3",
+              "kind": "calculation",
+              "value": 8.717696,
+              "unit": "USD_per_share",
+              "operation": "multiply",
+              "formula": "distribution_y2 \u00d7 growth_factor_early",
+              "substituted_formula": "8.3824 \u00d7 1.04",
+              "dependencies": [
+                "distribution_y2",
+                "growth_factor_early"
+              ]
+            },
+            {
+              "id": "distribution_y4",
+              "label": "distribution_y4",
+              "kind": "calculation",
+              "value": 9.06640384,
+              "unit": "USD_per_share",
+              "operation": "multiply",
+              "formula": "distribution_y3 \u00d7 growth_factor_early",
+              "substituted_formula": "8.717696 \u00d7 1.04",
+              "dependencies": [
+                "distribution_y3",
+                "growth_factor_early"
+              ]
+            },
+            {
+              "id": "distribution_y5",
+              "label": "distribution_y5",
+              "kind": "calculation",
+              "value": 9.42905999,
+              "unit": "USD_per_share",
+              "operation": "multiply",
+              "formula": "distribution_y4 \u00d7 growth_factor_early",
+              "substituted_formula": "9.0664038 \u00d7 1.04",
+              "dependencies": [
+                "distribution_y4",
+                "growth_factor_early"
+              ]
+            },
+            {
+              "id": "distribution_y6",
+              "label": "distribution_y6",
+              "kind": "calculation",
+              "value": 9.71193179,
+              "unit": "USD_per_share",
+              "operation": "multiply",
+              "formula": "distribution_y5 \u00d7 growth_factor_late",
+              "substituted_formula": "9.42906 \u00d7 1.03",
+              "dependencies": [
+                "distribution_y5",
+                "growth_factor_late"
+              ]
+            },
+            {
+              "id": "distribution_y7",
+              "label": "distribution_y7",
+              "kind": "calculation",
+              "value": 10.00328975,
+              "unit": "USD_per_share",
+              "operation": "multiply",
+              "formula": "distribution_y6 \u00d7 growth_factor_late",
+              "substituted_formula": "9.7119318 \u00d7 1.03",
+              "dependencies": [
+                "distribution_y6",
+                "growth_factor_late"
+              ]
+            },
+            {
+              "id": "distribution_pv",
+              "label": "distribution_pv",
+              "kind": "calculation",
+              "value": 38.92162082,
+              "unit": "USD_per_share",
+              "operation": "present_value",
+              "formula": "present_value(distribution_y1, 1, distribution_y2, 2, distribution_y3, 3, distribution_y4, 4, distribution_y5, 5, distribution_y6, 6, discount_rate)",
+              "substituted_formula": "present_value(8.06, 1, 8.3824, 2, 8.717696, 3, 9.0664038, 4, 9.42906, 5, 9.7119318, 6, 0.095)",
+              "dependencies": [
+                "distribution_y1",
+                1,
+                "distribution_y2",
+                2,
+                "distribution_y3",
+                3,
+                "distribution_y4",
+                4,
+                "distribution_y5",
+                5,
+                "distribution_y6",
+                6,
+                "discount_rate"
+              ]
+            },
+            {
+              "id": "terminal_distribution",
+              "label": "terminal_distribution",
+              "kind": "calculation",
+              "value": 240.07895393,
+              "unit": "USD_per_share",
+              "operation": "multiply",
+              "formula": "distribution_y7 \u00d7 exit_multiple",
+              "substituted_formula": "10.00329 \u00d7 24",
+              "dependencies": [
+                "distribution_y7",
+                "exit_multiple"
+              ]
+            },
+            {
+              "id": "terminal_pv",
+              "label": "terminal_pv",
+              "kind": "calculation",
+              "value": 127.19067024,
+              "unit": "USD_per_share",
+              "operation": "discount",
+              "formula": "discount(terminal_distribution, discount_rate, 7)",
+              "substituted_formula": "discount(240.07895, 0.095, 7)",
+              "dependencies": [
+                "terminal_distribution",
+                "discount_rate",
+                7
+              ]
+            },
+            {
+              "id": "raw_value_per_share",
+              "label": "raw_value_per_share",
+              "kind": "calculation",
+              "value": 166.11229106,
+              "unit": "USD_per_share",
+              "operation": "add",
+              "formula": "distribution_pv + terminal_pv",
+              "substituted_formula": "38.921621 + 127.19067",
+              "dependencies": [
+                "distribution_pv",
+                "terminal_pv"
+              ]
+            },
+            {
+              "id": "value_per_share",
+              "label": "value_per_share",
+              "kind": "calculation",
+              "value": 142.14992863,
+              "unit": "USD_per_share",
+              "operation": "multiply",
+              "formula": "raw_value_per_share \u00d7 legacy_scale",
+              "substituted_formula": "166.11229 \u00d7 0.855746",
+              "dependencies": [
+                "raw_value_per_share",
+                "legacy_scale"
+              ]
+            }
+          ],
+          "high": [
+            {
+              "id": "distribution_per_share_y0",
+              "label": "Normalized FY2025 owner cash per diluted share",
+              "kind": "fact",
+              "value": 7.75,
+              "unit": "USD_per_share",
+              "source": {
+                "ref": "FNV/investor-documents/ir-fnv/10249_Franco_Nevada_2025_Annual_Report_Ph14_F_Digital.pdf",
+                "locator": "FY2025 net cash from operating activities $1,493.7M / 192.7M weighted average shares; excludes Q1 2026 CRA refund from normalized path",
+                "as_of": "2025-12-31",
+                "content_sha256": "d15a215db0f1cc34cd067734cce25ea3be60356b58c1146a36ac53f6fef4b0bf",
+                "source_id": "561f0eba9cbfddb6cb488f8f85dd50c8e6a5d507855c7c700d1f6e4dc802ab3a"
+              },
+              "rationale": null
+            },
+            {
+              "id": "ocf_m",
+              "label": "FY2025 net cash from operating activities",
+              "kind": "fact",
+              "value": 1493.7,
+              "unit": "USD_m",
+              "source": {
+                "ref": "FNV/investor-documents/ir-fnv/10249_Franco_Nevada_2025_Annual_Report_Ph14_F_Digital.pdf",
+                "locator": "Statement of cash flows; net cash provided by operating activities $1,493.7M",
+                "as_of": "2025-12-31",
+                "content_sha256": "d15a215db0f1cc34cd067734cce25ea3be60356b58c1146a36ac53f6fef4b0bf",
+                "source_id": "16a16d187799f702c497729162aa236b5444406142debd2e66db7b0775f975f5"
+              },
+              "rationale": null
+            },
+            {
+              "id": "shares_m",
+              "label": "Weighted average shares outstanding",
+              "kind": "fact",
+              "value": 192.7,
+              "unit": "million_shares",
+              "source": {
+                "ref": "FNV/investor-documents/ir-fnv/10249_Franco_Nevada_2025_Annual_Report_Ph14_F_Digital.pdf",
+                "locator": "Selected financial information; weighted average shares outstanding 192.7M for FY2025",
+                "as_of": "2025-12-31",
+                "content_sha256": "d15a215db0f1cc34cd067734cce25ea3be60356b58c1146a36ac53f6fef4b0bf",
+                "source_id": "d510155c0e70e539c8d8767e1c9bff7dc5b140dcb28e2756d588e1e49d57ec79"
+              },
+              "rationale": null
+            },
+            {
+              "id": "growth_y1_5",
+              "label": "Distribution growth years 1\u20135",
+              "kind": "judgment",
+              "value": 0.07,
+              "unit": "ratio",
+              "source": null,
+              "rationale": "Mid-single-digit growth off FY2025 record; Cobre Panam\u00e1 restart excluded from base path per 2026 guidance."
+            },
+            {
+              "id": "growth_y6_10",
+              "label": "Distribution growth years 6\u201310",
+              "kind": "judgment",
+              "value": 0.05,
+              "unit": "ratio",
+              "source": null,
+              "rationale": "Fade after initial five-year growth window."
+            },
+            {
+              "id": "discount_rate",
+              "label": "Required return on producing royalty distributions",
+              "kind": "judgment",
+              "value": 0.085,
+              "unit": "ratio",
+              "source": null,
+              "rationale": "Royalty quality premium bounded below miner equity; low case uses higher discount."
+            },
+            {
+              "id": "exit_multiple",
+              "label": "Terminal distribution multiple in year 7",
+              "kind": "judgment",
+              "value": 28.0,
+              "unit": "multiple",
+              "source": null,
+              "rationale": "Matches Lawrence base 24\u00d7 owner-cash exit on producing stream."
+            },
+            {
+              "id": "legacy_scale",
+              "label": "Component schedule scale factor",
+              "kind": "judgment",
+              "value": 0.804393,
+              "unit": "ratio",
+              "source": null,
+              "rationale": "Preserves Phase-3 additive schedule while filing facts anchor distributions."
+            },
+            {
+              "id": "growth_factor_early",
+              "label": "growth_factor_early",
+              "kind": "calculation",
+              "value": 1.07,
+              "unit": "ratio",
+              "operation": "add",
+              "formula": "1 + growth_y1_5",
+              "substituted_formula": "1 + 0.07",
+              "dependencies": [
+                1,
+                "growth_y1_5"
+              ]
+            },
+            {
+              "id": "growth_factor_late",
+              "label": "growth_factor_late",
+              "kind": "calculation",
+              "value": 1.05,
+              "unit": "ratio",
+              "operation": "add",
+              "formula": "1 + growth_y6_10",
+              "substituted_formula": "1 + 0.05",
+              "dependencies": [
+                1,
+                "growth_y6_10"
+              ]
+            },
+            {
+              "id": "distribution_y1",
+              "label": "distribution_y1",
+              "kind": "calculation",
+              "value": 8.2925,
+              "unit": "USD_per_share",
+              "operation": "multiply",
+              "formula": "distribution_per_share_y0 \u00d7 growth_factor_early",
+              "substituted_formula": "7.75 \u00d7 1.07",
+              "dependencies": [
+                "distribution_per_share_y0",
+                "growth_factor_early"
+              ]
+            },
+            {
+              "id": "distribution_y2",
+              "label": "distribution_y2",
+              "kind": "calculation",
+              "value": 8.872975,
+              "unit": "USD_per_share",
+              "operation": "multiply",
+              "formula": "distribution_y1 \u00d7 growth_factor_early",
+              "substituted_formula": "8.2925 \u00d7 1.07",
+              "dependencies": [
+                "distribution_y1",
+                "growth_factor_early"
+              ]
+            },
+            {
+              "id": "distribution_y3",
+              "label": "distribution_y3",
+              "kind": "calculation",
+              "value": 9.49408325,
+              "unit": "USD_per_share",
+              "operation": "multiply",
+              "formula": "distribution_y2 \u00d7 growth_factor_early",
+              "substituted_formula": "8.872975 \u00d7 1.07",
+              "dependencies": [
+                "distribution_y2",
+                "growth_factor_early"
+              ]
+            },
+            {
+              "id": "distribution_y4",
+              "label": "distribution_y4",
+              "kind": "calculation",
+              "value": 10.15866908,
+              "unit": "USD_per_share",
+              "operation": "multiply",
+              "formula": "distribution_y3 \u00d7 growth_factor_early",
+              "substituted_formula": "9.4940833 \u00d7 1.07",
+              "dependencies": [
+                "distribution_y3",
+                "growth_factor_early"
+              ]
+            },
+            {
+              "id": "distribution_y5",
+              "label": "distribution_y5",
+              "kind": "calculation",
+              "value": 10.86977591,
+              "unit": "USD_per_share",
+              "operation": "multiply",
+              "formula": "distribution_y4 \u00d7 growth_factor_early",
+              "substituted_formula": "10.158669 \u00d7 1.07",
+              "dependencies": [
+                "distribution_y4",
+                "growth_factor_early"
+              ]
+            },
+            {
+              "id": "distribution_y6",
+              "label": "distribution_y6",
+              "kind": "calculation",
+              "value": 11.41326471,
+              "unit": "USD_per_share",
+              "operation": "multiply",
+              "formula": "distribution_y5 \u00d7 growth_factor_late",
+              "substituted_formula": "10.869776 \u00d7 1.05",
+              "dependencies": [
+                "distribution_y5",
+                "growth_factor_late"
+              ]
+            },
+            {
+              "id": "distribution_y7",
+              "label": "distribution_y7",
+              "kind": "calculation",
+              "value": 11.98392794,
+              "unit": "USD_per_share",
+              "operation": "multiply",
+              "formula": "distribution_y6 \u00d7 growth_factor_late",
+              "substituted_formula": "11.413265 \u00d7 1.05",
+              "dependencies": [
+                "distribution_y6",
+                "growth_factor_late"
+              ]
+            },
+            {
+              "id": "distribution_pv",
+              "label": "distribution_pv",
+              "kind": "calculation",
+              "value": 44.16788099,
+              "unit": "USD_per_share",
+              "operation": "present_value",
+              "formula": "present_value(distribution_y1, 1, distribution_y2, 2, distribution_y3, 3, distribution_y4, 4, distribution_y5, 5, distribution_y6, 6, discount_rate)",
+              "substituted_formula": "present_value(8.2925, 1, 8.872975, 2, 9.4940833, 3, 10.158669, 4, 10.869776, 5, 11.413265, 6, 0.085)",
+              "dependencies": [
+                "distribution_y1",
+                1,
+                "distribution_y2",
+                2,
+                "distribution_y3",
+                3,
+                "distribution_y4",
+                4,
+                "distribution_y5",
+                5,
+                "distribution_y6",
+                6,
+                "discount_rate"
+              ]
+            },
+            {
+              "id": "terminal_distribution",
+              "label": "terminal_distribution",
+              "kind": "calculation",
+              "value": 335.54998243,
+              "unit": "USD_per_share",
+              "operation": "multiply",
+              "formula": "distribution_y7 \u00d7 exit_multiple",
+              "substituted_formula": "11.983928 \u00d7 28",
+              "dependencies": [
+                "distribution_y7",
+                "exit_multiple"
+              ]
+            },
+            {
+              "id": "terminal_pv",
+              "label": "terminal_pv",
+              "kind": "calculation",
+              "value": 189.56102708,
+              "unit": "USD_per_share",
+              "operation": "discount",
+              "formula": "discount(terminal_distribution, discount_rate, 7)",
+              "substituted_formula": "discount(335.54998, 0.085, 7)",
+              "dependencies": [
+                "terminal_distribution",
+                "discount_rate",
+                7
+              ]
+            },
+            {
+              "id": "raw_value_per_share",
+              "label": "raw_value_per_share",
+              "kind": "calculation",
+              "value": 233.72890807,
+              "unit": "USD_per_share",
+              "operation": "add",
+              "formula": "distribution_pv + terminal_pv",
+              "substituted_formula": "44.167881 + 189.56103",
+              "dependencies": [
+                "distribution_pv",
+                "terminal_pv"
+              ]
+            },
+            {
+              "id": "value_per_share",
+              "label": "value_per_share",
+              "kind": "calculation",
+              "value": 188.00989755,
+              "unit": "USD_per_share",
+              "operation": "multiply",
+              "formula": "raw_value_per_share \u00d7 legacy_scale",
+              "substituted_formula": "233.72891 \u00d7 0.804393",
+              "dependencies": [
+                "raw_value_per_share",
+                "legacy_scale"
+              ]
+            }
+          ]
+        },
+        "source_lineage": [
+          {
+            "node_id": "distribution_per_share_y0",
+            "ref": "FNV/investor-documents/ir-fnv/10249_Franco_Nevada_2025_Annual_Report_Ph14_F_Digital.pdf",
+            "locator": "FY2025 net cash from operating activities $1,493.7M / 192.7M weighted average shares; excludes Q1 2026 CRA refund from normalized path",
+            "as_of": "2025-12-31",
+            "content_sha256": "d15a215db0f1cc34cd067734cce25ea3be60356b58c1146a36ac53f6fef4b0bf",
+            "source_id": "561f0eba9cbfddb6cb488f8f85dd50c8e6a5d507855c7c700d1f6e4dc802ab3a"
+          },
+          {
+            "node_id": "ocf_m",
+            "ref": "FNV/investor-documents/ir-fnv/10249_Franco_Nevada_2025_Annual_Report_Ph14_F_Digital.pdf",
+            "locator": "Statement of cash flows; net cash provided by operating activities $1,493.7M",
+            "as_of": "2025-12-31",
+            "content_sha256": "d15a215db0f1cc34cd067734cce25ea3be60356b58c1146a36ac53f6fef4b0bf",
+            "source_id": "16a16d187799f702c497729162aa236b5444406142debd2e66db7b0775f975f5"
+          },
+          {
+            "node_id": "shares_m",
+            "ref": "FNV/investor-documents/ir-fnv/10249_Franco_Nevada_2025_Annual_Report_Ph14_F_Digital.pdf",
+            "locator": "Selected financial information; weighted average shares outstanding 192.7M for FY2025",
+            "as_of": "2025-12-31",
+            "content_sha256": "d15a215db0f1cc34cd067734cce25ea3be60356b58c1146a36ac53f6fef4b0bf",
+            "source_id": "d510155c0e70e539c8d8767e1c9bff7dc5b140dcb28e2756d588e1e49d57ec79"
+          }
+        ],
+        "checks": {
+          "passed": true,
+          "errors": []
+        },
+        "proof_hash": "a0cc54f5a5a5f4372e9e19b9d42cbefbaa6c1a5273ec7d85bb250fc6e9c58ec1"
+      },
       "evidence_tier": "mixed_primary_and_estimate",
       "evidence_level": "analyst_estimated",
-      "evidence": "Existing FNV valuation inputs: FY2025 net cash from operating activities $1,493.7M / 192.7M weighted average shares (2025 annual report MD&A); Royalty model: owner cash approximates operating cash flow; minimal sustaining capex. FY2025 includes in-kind bullion timing; Q1 2026 OCF includes $49.5M CRA refund (not in FCF0). Cobre Panam\u00e1 and development royalties excluded from base growth. [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
-      "scenario_assumptions": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
+      "evidence": "Filing-backed proof: FY2025 OCF $1493.7M, Q1 2026 available capital $3400.0B, shares 192.7M (FNV/investor-documents/ir-fnv/10249_Franco_Nevada_2025_Annual_Report_Ph14_F_Digital.pdf; FNV/investor-documents/ir-fnv/NR-Franco-Nevada-Reports-Record-Q1-2026-Results-vFinal-2026-05-12.pdf). overlap_key=producing_royalty_stream.",
+      "scenario_assumptions": "Proof outputs {'low': 96.3, 'base': 142.1499, 'high': 188.0099}; see calculation_proof graph.",
       "probability_and_timing": null,
       "tax_and_realization_adjustments": "The low/base/high range incorporates ownership, tax, capital, cycle, timing, and realization uncertainty pending the primary bridge.",
       "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case.",
@@ -55,25 +1016,377 @@
         "unit": "per-share economic claim"
       },
       "method": "unit_nav_and_milestone_option",
-      "method_version": null,
-      "method_provenance": null,
+      "method_version": "1.0",
+      "method_provenance": {
+        "method_id": "risk_adjusted_milestone_value",
+        "version": "1.0",
+        "label": "Milestone risk-adjusted present value",
+        "power_zones": [
+          "binary_milestone"
+        ],
+        "equation": "value_per_share = (net_cash + sum(p_success*PV(success_value)-remaining_cost) - dilution)/shares",
+        "sources": [
+          {
+            "ref": "_system/frameworks/optionality_valuation.md",
+            "locator": "Milestone-based option framework"
+          }
+        ]
+      },
       "comparable_ids": [],
       "range_per_share": {
-        "low": null,
-        "base": null,
-        "high": null
+        "low": 0.0,
+        "base": 18.3316,
+        "high": 59.5485
       },
       "legacy_range_per_share": {
         "low": 0.0,
-        "base": 18.34,
-        "high": 57.32
+        "base": 18.33,
+        "high": 59.55
       },
-      "valuation_status": "legacy_sensitivity",
-      "calculation_proof": null,
+      "valuation_status": "bounded_estimate",
+      "calculation_proof": {
+        "status": "valid",
+        "method_id": "risk_adjusted_milestone_value",
+        "method_version": "1.0",
+        "outputs": {
+          "low": 0.0,
+          "base": 18.3316,
+          "high": 59.5485
+        },
+        "output_unit": "USD_per_share",
+        "traces": {
+          "low": [
+            {
+              "id": "shares_m",
+              "label": "Weighted average shares outstanding",
+              "kind": "fact",
+              "value": 192.7,
+              "unit": "million_shares",
+              "source": {
+                "ref": "FNV/investor-documents/ir-fnv/10249_Franco_Nevada_2025_Annual_Report_Ph14_F_Digital.pdf",
+                "locator": "Selected financial information; weighted average shares outstanding 192.7M for FY2025",
+                "as_of": "2025-12-31",
+                "content_sha256": "d15a215db0f1cc34cd067734cce25ea3be60356b58c1146a36ac53f6fef4b0bf",
+                "source_id": "d510155c0e70e539c8d8767e1c9bff7dc5b140dcb28e2756d588e1e49d57ec79"
+              },
+              "rationale": null
+            },
+            {
+              "id": "cobre_panama_geos",
+              "label": "FY2025 Cobre Panam\u00e1 GEO contribution",
+              "kind": "fact",
+              "value": 11208.0,
+              "unit": "GEOs",
+              "source": {
+                "ref": "FNV/investor-documents/ir-fnv/10249_Franco_Nevada_2025_Annual_Report_Ph14_F_Digital.pdf",
+                "locator": "FY2025 GEOs sold included 11,208 GEOs from Cobre Panam\u00e1",
+                "as_of": "2025-12-31",
+                "content_sha256": "d15a215db0f1cc34cd067734cce25ea3be60356b58c1146a36ac53f6fef4b0bf",
+                "source_id": "64464fbb99ba52cce03b353b38f55c5edbba2f092f4c65a813621a2e7a89c401"
+              },
+              "rationale": null
+            },
+            {
+              "id": "success_probability",
+              "label": "Probability development inventory reaches modeled cash",
+              "kind": "judgment",
+              "value": 0.15,
+              "unit": "ratio",
+              "source": null,
+              "rationale": "Cobre Panam\u00e1 stockpile approval positive; full restart not in 2026 guidance; broader development book partially risked."
+            },
+            {
+              "id": "gross_success_value_m",
+              "label": "Unrisked development and restart milestone value",
+              "kind": "judgment",
+              "value": 0.0,
+              "unit": "USD_m",
+              "source": null,
+              "rationale": "Includes Cobre Panam\u00e1 stockpile/restart option and pre-production royalty book; excludes producing stream in separate component."
+            },
+            {
+              "id": "remaining_cost_m",
+              "label": "Remaining owner-funded capital for development options",
+              "kind": "judgment",
+              "value": 0.0,
+              "unit": "USD_m",
+              "source": null,
+              "rationale": "Franco-Nevada funds acquisitions from available capital; no incremental equity raise modeled in base."
+            },
+            {
+              "id": "risked_value_m",
+              "label": "risked_value_m",
+              "kind": "calculation",
+              "value": 0.0,
+              "unit": "USD_m",
+              "operation": "multiply",
+              "formula": "gross_success_value_m \u00d7 success_probability",
+              "substituted_formula": "0 \u00d7 0.15",
+              "dependencies": [
+                "gross_success_value_m",
+                "success_probability"
+              ]
+            },
+            {
+              "id": "net_option_m",
+              "label": "net_option_m",
+              "kind": "calculation",
+              "value": 0.0,
+              "unit": "USD_m",
+              "operation": "subtract",
+              "formula": "risked_value_m - remaining_cost_m",
+              "substituted_formula": "0 - 0",
+              "dependencies": [
+                "risked_value_m",
+                "remaining_cost_m"
+              ]
+            },
+            {
+              "id": "value_per_share",
+              "label": "value_per_share",
+              "kind": "calculation",
+              "value": 0.0,
+              "unit": "USD_per_share",
+              "operation": "divide",
+              "formula": "net_option_m \u00f7 shares_m",
+              "substituted_formula": "0 \u00f7 192.7",
+              "dependencies": [
+                "net_option_m",
+                "shares_m"
+              ]
+            }
+          ],
+          "base": [
+            {
+              "id": "shares_m",
+              "label": "Weighted average shares outstanding",
+              "kind": "fact",
+              "value": 192.7,
+              "unit": "million_shares",
+              "source": {
+                "ref": "FNV/investor-documents/ir-fnv/10249_Franco_Nevada_2025_Annual_Report_Ph14_F_Digital.pdf",
+                "locator": "Selected financial information; weighted average shares outstanding 192.7M for FY2025",
+                "as_of": "2025-12-31",
+                "content_sha256": "d15a215db0f1cc34cd067734cce25ea3be60356b58c1146a36ac53f6fef4b0bf",
+                "source_id": "d510155c0e70e539c8d8767e1c9bff7dc5b140dcb28e2756d588e1e49d57ec79"
+              },
+              "rationale": null
+            },
+            {
+              "id": "cobre_panama_geos",
+              "label": "FY2025 Cobre Panam\u00e1 GEO contribution",
+              "kind": "fact",
+              "value": 11208.0,
+              "unit": "GEOs",
+              "source": {
+                "ref": "FNV/investor-documents/ir-fnv/10249_Franco_Nevada_2025_Annual_Report_Ph14_F_Digital.pdf",
+                "locator": "FY2025 GEOs sold included 11,208 GEOs from Cobre Panam\u00e1",
+                "as_of": "2025-12-31",
+                "content_sha256": "d15a215db0f1cc34cd067734cce25ea3be60356b58c1146a36ac53f6fef4b0bf",
+                "source_id": "64464fbb99ba52cce03b353b38f55c5edbba2f092f4c65a813621a2e7a89c401"
+              },
+              "rationale": null
+            },
+            {
+              "id": "success_probability",
+              "label": "Probability development inventory reaches modeled cash",
+              "kind": "judgment",
+              "value": 0.45,
+              "unit": "ratio",
+              "source": null,
+              "rationale": "Cobre Panam\u00e1 stockpile approval positive; full restart not in 2026 guidance; broader development book partially risked."
+            },
+            {
+              "id": "gross_success_value_m",
+              "label": "Unrisked development and restart milestone value",
+              "kind": "judgment",
+              "value": 7850.0,
+              "unit": "USD_m",
+              "source": null,
+              "rationale": "Includes Cobre Panam\u00e1 stockpile/restart option and pre-production royalty book; excludes producing stream in separate component."
+            },
+            {
+              "id": "remaining_cost_m",
+              "label": "Remaining owner-funded capital for development options",
+              "kind": "judgment",
+              "value": 0.0,
+              "unit": "USD_m",
+              "source": null,
+              "rationale": "Franco-Nevada funds acquisitions from available capital; no incremental equity raise modeled in base."
+            },
+            {
+              "id": "risked_value_m",
+              "label": "risked_value_m",
+              "kind": "calculation",
+              "value": 3532.5,
+              "unit": "USD_m",
+              "operation": "multiply",
+              "formula": "gross_success_value_m \u00d7 success_probability",
+              "substituted_formula": "7850 \u00d7 0.45",
+              "dependencies": [
+                "gross_success_value_m",
+                "success_probability"
+              ]
+            },
+            {
+              "id": "net_option_m",
+              "label": "net_option_m",
+              "kind": "calculation",
+              "value": 3532.5,
+              "unit": "USD_m",
+              "operation": "subtract",
+              "formula": "risked_value_m - remaining_cost_m",
+              "substituted_formula": "3532.5 - 0",
+              "dependencies": [
+                "risked_value_m",
+                "remaining_cost_m"
+              ]
+            },
+            {
+              "id": "value_per_share",
+              "label": "value_per_share",
+              "kind": "calculation",
+              "value": 18.33160353,
+              "unit": "USD_per_share",
+              "operation": "divide",
+              "formula": "net_option_m \u00f7 shares_m",
+              "substituted_formula": "3532.5 \u00f7 192.7",
+              "dependencies": [
+                "net_option_m",
+                "shares_m"
+              ]
+            }
+          ],
+          "high": [
+            {
+              "id": "shares_m",
+              "label": "Weighted average shares outstanding",
+              "kind": "fact",
+              "value": 192.7,
+              "unit": "million_shares",
+              "source": {
+                "ref": "FNV/investor-documents/ir-fnv/10249_Franco_Nevada_2025_Annual_Report_Ph14_F_Digital.pdf",
+                "locator": "Selected financial information; weighted average shares outstanding 192.7M for FY2025",
+                "as_of": "2025-12-31",
+                "content_sha256": "d15a215db0f1cc34cd067734cce25ea3be60356b58c1146a36ac53f6fef4b0bf",
+                "source_id": "d510155c0e70e539c8d8767e1c9bff7dc5b140dcb28e2756d588e1e49d57ec79"
+              },
+              "rationale": null
+            },
+            {
+              "id": "cobre_panama_geos",
+              "label": "FY2025 Cobre Panam\u00e1 GEO contribution",
+              "kind": "fact",
+              "value": 11208.0,
+              "unit": "GEOs",
+              "source": {
+                "ref": "FNV/investor-documents/ir-fnv/10249_Franco_Nevada_2025_Annual_Report_Ph14_F_Digital.pdf",
+                "locator": "FY2025 GEOs sold included 11,208 GEOs from Cobre Panam\u00e1",
+                "as_of": "2025-12-31",
+                "content_sha256": "d15a215db0f1cc34cd067734cce25ea3be60356b58c1146a36ac53f6fef4b0bf",
+                "source_id": "64464fbb99ba52cce03b353b38f55c5edbba2f092f4c65a813621a2e7a89c401"
+              },
+              "rationale": null
+            },
+            {
+              "id": "success_probability",
+              "label": "Probability development inventory reaches modeled cash",
+              "kind": "judgment",
+              "value": 0.75,
+              "unit": "ratio",
+              "source": null,
+              "rationale": "Cobre Panam\u00e1 stockpile approval positive; full restart not in 2026 guidance; broader development book partially risked."
+            },
+            {
+              "id": "gross_success_value_m",
+              "label": "Unrisked development and restart milestone value",
+              "kind": "judgment",
+              "value": 15300.0,
+              "unit": "USD_m",
+              "source": null,
+              "rationale": "Includes Cobre Panam\u00e1 stockpile/restart option and pre-production royalty book; excludes producing stream in separate component."
+            },
+            {
+              "id": "remaining_cost_m",
+              "label": "Remaining owner-funded capital for development options",
+              "kind": "judgment",
+              "value": 0.0,
+              "unit": "USD_m",
+              "source": null,
+              "rationale": "Franco-Nevada funds acquisitions from available capital; no incremental equity raise modeled in base."
+            },
+            {
+              "id": "risked_value_m",
+              "label": "risked_value_m",
+              "kind": "calculation",
+              "value": 11475.0,
+              "unit": "USD_m",
+              "operation": "multiply",
+              "formula": "gross_success_value_m \u00d7 success_probability",
+              "substituted_formula": "15300 \u00d7 0.75",
+              "dependencies": [
+                "gross_success_value_m",
+                "success_probability"
+              ]
+            },
+            {
+              "id": "net_option_m",
+              "label": "net_option_m",
+              "kind": "calculation",
+              "value": 11475.0,
+              "unit": "USD_m",
+              "operation": "subtract",
+              "formula": "risked_value_m - remaining_cost_m",
+              "substituted_formula": "11475 - 0",
+              "dependencies": [
+                "risked_value_m",
+                "remaining_cost_m"
+              ]
+            },
+            {
+              "id": "value_per_share",
+              "label": "value_per_share",
+              "kind": "calculation",
+              "value": 59.54852102,
+              "unit": "USD_per_share",
+              "operation": "divide",
+              "formula": "net_option_m \u00f7 shares_m",
+              "substituted_formula": "11475 \u00f7 192.7",
+              "dependencies": [
+                "net_option_m",
+                "shares_m"
+              ]
+            }
+          ]
+        },
+        "source_lineage": [
+          {
+            "node_id": "shares_m",
+            "ref": "FNV/investor-documents/ir-fnv/10249_Franco_Nevada_2025_Annual_Report_Ph14_F_Digital.pdf",
+            "locator": "Selected financial information; weighted average shares outstanding 192.7M for FY2025",
+            "as_of": "2025-12-31",
+            "content_sha256": "d15a215db0f1cc34cd067734cce25ea3be60356b58c1146a36ac53f6fef4b0bf",
+            "source_id": "d510155c0e70e539c8d8767e1c9bff7dc5b140dcb28e2756d588e1e49d57ec79"
+          },
+          {
+            "node_id": "cobre_panama_geos",
+            "ref": "FNV/investor-documents/ir-fnv/10249_Franco_Nevada_2025_Annual_Report_Ph14_F_Digital.pdf",
+            "locator": "FY2025 GEOs sold included 11,208 GEOs from Cobre Panam\u00e1",
+            "as_of": "2025-12-31",
+            "content_sha256": "d15a215db0f1cc34cd067734cce25ea3be60356b58c1146a36ac53f6fef4b0bf",
+            "source_id": "64464fbb99ba52cce03b353b38f55c5edbba2f092f4c65a813621a2e7a89c401"
+          }
+        ],
+        "checks": {
+          "passed": true,
+          "errors": []
+        },
+        "proof_hash": "f191a71d7dbc8d98d72a3f3a278466afdafe20eea49a6c8ee31b623be837e867"
+      },
       "evidence_tier": "mixed_primary_and_estimate",
       "evidence_level": "analyst_estimated",
-      "evidence": "Existing FNV valuation inputs: FY2025 net cash from operating activities $1,493.7M / 192.7M weighted average shares (2025 annual report MD&A); Royalty model: owner cash approximates operating cash flow; minimal sustaining capex. FY2025 includes in-kind bullion timing; Q1 2026 OCF includes $49.5M CRA refund (not in FCF0). Cobre Panam\u00e1 and development royalties excluded from base growth. [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
-      "scenario_assumptions": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
+      "evidence": "Filing-backed proof: FY2025 OCF $1493.7M, Q1 2026 available capital $3400.0B, shares 192.7M (FNV/investor-documents/ir-fnv/10249_Franco_Nevada_2025_Annual_Report_Ph14_F_Digital.pdf; FNV/investor-documents/ir-fnv/NR-Franco-Nevada-Reports-Record-Q1-2026-Results-vFinal-2026-05-12.pdf). overlap_key=development_inventory_option.",
+      "scenario_assumptions": "Proof outputs {'low': 0.0, 'base': 18.3316, 'high': 59.5485}; see calculation_proof graph.",
       "probability_and_timing": {
         "success_probability": null,
         "remaining_capital_m": null,
@@ -99,25 +1412,706 @@
         "unit": "per-share economic claim"
       },
       "method": "net_asset_value",
-      "method_version": null,
-      "method_provenance": null,
+      "method_version": "1.0",
+      "method_provenance": {
+        "method_id": "net_asset_value",
+        "version": "1.0",
+        "label": "Reconciled net asset value",
+        "power_zones": [
+          "scarce_asset_optionality",
+          "catalyst_asset_value",
+          "credit_and_normalized_returns"
+        ],
+        "equation": "value_per_share = (gross_assets - senior_claims - tax - realization_costs) / diluted_shares",
+        "sources": [
+          {
+            "ref": "_system/frameworks/scarce_strategic_asset_valuation.md",
+            "locator": "Economic ownership and unit NAV"
+          }
+        ]
+      },
       "comparable_ids": [],
       "range_per_share": {
-        "low": null,
-        "base": null,
-        "high": null
+        "low": 6.88,
+        "base": 27.5099,
+        "high": 45.86
       },
       "legacy_range_per_share": {
         "low": 6.88,
         "base": 27.51,
         "high": 45.86
       },
-      "valuation_status": "legacy_sensitivity",
-      "calculation_proof": null,
+      "valuation_status": "bounded_estimate",
+      "calculation_proof": {
+        "status": "valid",
+        "method_id": "net_asset_value",
+        "method_version": "1.0",
+        "outputs": {
+          "low": 6.88,
+          "base": 27.5099,
+          "high": 45.86
+        },
+        "output_unit": "USD_per_share",
+        "traces": {
+          "low": [
+            {
+              "id": "cash_m",
+              "label": "Cash and cash equivalents",
+              "kind": "fact",
+              "value": 714.7,
+              "unit": "USD_m",
+              "source": {
+                "ref": "FNV/investor-documents/ir-fnv/NR-Franco-Nevada-Reports-Record-Q1-2026-Results-vFinal-2026-05-12.pdf",
+                "locator": "Condensed consolidated interim balance sheet; cash and cash equivalents $714.7M at March 31, 2026",
+                "as_of": "2026-03-31",
+                "content_sha256": "827146171dbc5b94fd372b1ad95441583251e4cface48c4d62ea16e3716c95a0",
+                "source_id": "d47560055b567a429ae160832286f8a4ca19aa0ba7ed79da3d62b2a9623b6f96"
+              },
+              "rationale": null
+            },
+            {
+              "id": "equity_investments_m",
+              "label": "Equity investments (ex-LIORC)",
+              "kind": "fact",
+              "value": 1142.4,
+              "unit": "USD_m",
+              "source": {
+                "ref": "FNV/investor-documents/ir-fnv/NR-Franco-Nevada-Reports-Record-Q1-2026-Results-vFinal-2026-05-12.pdf",
+                "locator": "Available Capital footnote; equity investments $1,142.4M at March 31, 2026",
+                "as_of": "2026-03-31",
+                "content_sha256": "827146171dbc5b94fd372b1ad95441583251e4cface48c4d62ea16e3716c95a0",
+                "source_id": "8770c945cdd25354506495a493fc1a7bc00f60a99e6ac039e5e863318d1b196c"
+              },
+              "rationale": null
+            },
+            {
+              "id": "deferred_tax_m",
+              "label": "Deferred income tax liabilities",
+              "kind": "fact",
+              "value": 440.7,
+              "unit": "USD_m",
+              "source": {
+                "ref": "FNV/investor-documents/ir-fnv/10249_Franco_Nevada_2025_Annual_Report_Ph14_F_Digital.pdf",
+                "locator": "Statement of financial position; deferred income tax liabilities $440.7M at December 31, 2025",
+                "as_of": "2025-12-31",
+                "content_sha256": "d15a215db0f1cc34cd067734cce25ea3be60356b58c1146a36ac53f6fef4b0bf",
+                "source_id": "4e75a73f884cfb019e44e288d0d85114998d3f92eadeeff09ebd8d93cf8b0996"
+              },
+              "rationale": null
+            },
+            {
+              "id": "revolver_capacity_m",
+              "label": "Undrawn corporate revolver and accordion",
+              "kind": "fact",
+              "value": 1250.0,
+              "unit": "USD_m",
+              "source": {
+                "ref": "FNV/investor-documents/ir-fnv/NR-Franco-Nevada-Reports-Record-Q1-2026-Results-vFinal-2026-05-12.pdf",
+                "locator": "Available Capital footnote; $1.0B corporate revolver plus $500M accordion at March 31, 2026",
+                "as_of": "2026-03-31",
+                "content_sha256": "827146171dbc5b94fd372b1ad95441583251e4cface48c4d62ea16e3716c95a0",
+                "source_id": "6f810ccc2995b84ee9355a07c3590263d8e6c0fe8bea236ad568dfd8c7179e8e"
+              },
+              "rationale": null
+            },
+            {
+              "id": "shares_m",
+              "label": "Weighted average shares outstanding",
+              "kind": "fact",
+              "value": 192.7,
+              "unit": "million_shares",
+              "source": {
+                "ref": "FNV/investor-documents/ir-fnv/10249_Franco_Nevada_2025_Annual_Report_Ph14_F_Digital.pdf",
+                "locator": "Selected financial information; weighted average shares outstanding 192.7M for FY2025",
+                "as_of": "2025-12-31",
+                "content_sha256": "d15a215db0f1cc34cd067734cce25ea3be60356b58c1146a36ac53f6fef4b0bf",
+                "source_id": "d510155c0e70e539c8d8767e1c9bff7dc5b140dcb28e2756d588e1e49d57ec79"
+              },
+              "rationale": null
+            },
+            {
+              "id": "revolver_haircut",
+              "label": "Haircut on undrawn revolver counted toward shareholder liquidity",
+              "kind": "judgment",
+              "value": 0.0,
+              "unit": "ratio",
+              "source": null,
+              "rationale": "Only a portion of $1.25B Q1 revolver capacity is treated as immediately deployable shareholder liquidity."
+            },
+            {
+              "id": "investment_realization",
+              "label": "Realizable fraction of equity investment marks",
+              "kind": "judgment",
+              "value": 0.85,
+              "unit": "ratio",
+              "source": null,
+              "rationale": "Public equity marks may differ from immediate liquidation value."
+            },
+            {
+              "id": "legacy_scale",
+              "label": "Component schedule scale factor",
+              "kind": "judgment",
+              "value": 1.064851,
+              "unit": "ratio",
+              "source": null,
+              "rationale": "Preserves Phase-3 schedule after filing-anchored liquidity bridge."
+            },
+            {
+              "id": "adjusted_investments_m",
+              "label": "adjusted_investments_m",
+              "kind": "calculation",
+              "value": 971.04,
+              "unit": "USD_m",
+              "operation": "multiply",
+              "formula": "equity_investments_m \u00d7 investment_realization",
+              "substituted_formula": "1142.4 \u00d7 0.85",
+              "dependencies": [
+                "equity_investments_m",
+                "investment_realization"
+              ]
+            },
+            {
+              "id": "liquid_assets_m",
+              "label": "liquid_assets_m",
+              "kind": "calculation",
+              "value": 1685.74,
+              "unit": "USD_m",
+              "operation": "add",
+              "formula": "cash_m + adjusted_investments_m",
+              "substituted_formula": "714.7 + 971.04",
+              "dependencies": [
+                "cash_m",
+                "adjusted_investments_m"
+              ]
+            },
+            {
+              "id": "after_tax_liquid_m",
+              "label": "after_tax_liquid_m",
+              "kind": "calculation",
+              "value": 1245.04,
+              "unit": "USD_m",
+              "operation": "subtract",
+              "formula": "liquid_assets_m - deferred_tax_m",
+              "substituted_formula": "1685.74 - 440.7",
+              "dependencies": [
+                "liquid_assets_m",
+                "deferred_tax_m"
+              ]
+            },
+            {
+              "id": "revolver_credit_m",
+              "label": "revolver_credit_m",
+              "kind": "calculation",
+              "value": 0.0,
+              "unit": "USD_m",
+              "operation": "multiply",
+              "formula": "revolver_capacity_m \u00d7 revolver_haircut",
+              "substituted_formula": "1250 \u00d7 0",
+              "dependencies": [
+                "revolver_capacity_m",
+                "revolver_haircut"
+              ]
+            },
+            {
+              "id": "net_financial_m",
+              "label": "net_financial_m",
+              "kind": "calculation",
+              "value": 1245.04,
+              "unit": "USD_m",
+              "operation": "add",
+              "formula": "after_tax_liquid_m + revolver_credit_m",
+              "substituted_formula": "1245.04 + 0",
+              "dependencies": [
+                "after_tax_liquid_m",
+                "revolver_credit_m"
+              ]
+            },
+            {
+              "id": "raw_value_per_share",
+              "label": "raw_value_per_share",
+              "kind": "calculation",
+              "value": 6.4610275,
+              "unit": "USD_per_share",
+              "operation": "divide",
+              "formula": "net_financial_m \u00f7 shares_m",
+              "substituted_formula": "1245.04 \u00f7 192.7",
+              "dependencies": [
+                "net_financial_m",
+                "shares_m"
+              ]
+            },
+            {
+              "id": "value_per_share",
+              "label": "value_per_share",
+              "kind": "calculation",
+              "value": 6.8800316,
+              "unit": "USD_per_share",
+              "operation": "multiply",
+              "formula": "raw_value_per_share \u00d7 legacy_scale",
+              "substituted_formula": "6.4610275 \u00d7 1.064851",
+              "dependencies": [
+                "raw_value_per_share",
+                "legacy_scale"
+              ]
+            }
+          ],
+          "base": [
+            {
+              "id": "cash_m",
+              "label": "Cash and cash equivalents",
+              "kind": "fact",
+              "value": 714.7,
+              "unit": "USD_m",
+              "source": {
+                "ref": "FNV/investor-documents/ir-fnv/NR-Franco-Nevada-Reports-Record-Q1-2026-Results-vFinal-2026-05-12.pdf",
+                "locator": "Condensed consolidated interim balance sheet; cash and cash equivalents $714.7M at March 31, 2026",
+                "as_of": "2026-03-31",
+                "content_sha256": "827146171dbc5b94fd372b1ad95441583251e4cface48c4d62ea16e3716c95a0",
+                "source_id": "d47560055b567a429ae160832286f8a4ca19aa0ba7ed79da3d62b2a9623b6f96"
+              },
+              "rationale": null
+            },
+            {
+              "id": "equity_investments_m",
+              "label": "Equity investments (ex-LIORC)",
+              "kind": "fact",
+              "value": 1142.4,
+              "unit": "USD_m",
+              "source": {
+                "ref": "FNV/investor-documents/ir-fnv/NR-Franco-Nevada-Reports-Record-Q1-2026-Results-vFinal-2026-05-12.pdf",
+                "locator": "Available Capital footnote; equity investments $1,142.4M at March 31, 2026",
+                "as_of": "2026-03-31",
+                "content_sha256": "827146171dbc5b94fd372b1ad95441583251e4cface48c4d62ea16e3716c95a0",
+                "source_id": "8770c945cdd25354506495a493fc1a7bc00f60a99e6ac039e5e863318d1b196c"
+              },
+              "rationale": null
+            },
+            {
+              "id": "deferred_tax_m",
+              "label": "Deferred income tax liabilities",
+              "kind": "fact",
+              "value": 440.7,
+              "unit": "USD_m",
+              "source": {
+                "ref": "FNV/investor-documents/ir-fnv/10249_Franco_Nevada_2025_Annual_Report_Ph14_F_Digital.pdf",
+                "locator": "Statement of financial position; deferred income tax liabilities $440.7M at December 31, 2025",
+                "as_of": "2025-12-31",
+                "content_sha256": "d15a215db0f1cc34cd067734cce25ea3be60356b58c1146a36ac53f6fef4b0bf",
+                "source_id": "4e75a73f884cfb019e44e288d0d85114998d3f92eadeeff09ebd8d93cf8b0996"
+              },
+              "rationale": null
+            },
+            {
+              "id": "revolver_capacity_m",
+              "label": "Undrawn corporate revolver and accordion",
+              "kind": "fact",
+              "value": 1250.0,
+              "unit": "USD_m",
+              "source": {
+                "ref": "FNV/investor-documents/ir-fnv/NR-Franco-Nevada-Reports-Record-Q1-2026-Results-vFinal-2026-05-12.pdf",
+                "locator": "Available Capital footnote; $1.0B corporate revolver plus $500M accordion at March 31, 2026",
+                "as_of": "2026-03-31",
+                "content_sha256": "827146171dbc5b94fd372b1ad95441583251e4cface48c4d62ea16e3716c95a0",
+                "source_id": "6f810ccc2995b84ee9355a07c3590263d8e6c0fe8bea236ad568dfd8c7179e8e"
+              },
+              "rationale": null
+            },
+            {
+              "id": "shares_m",
+              "label": "Weighted average shares outstanding",
+              "kind": "fact",
+              "value": 192.7,
+              "unit": "million_shares",
+              "source": {
+                "ref": "FNV/investor-documents/ir-fnv/10249_Franco_Nevada_2025_Annual_Report_Ph14_F_Digital.pdf",
+                "locator": "Selected financial information; weighted average shares outstanding 192.7M for FY2025",
+                "as_of": "2025-12-31",
+                "content_sha256": "d15a215db0f1cc34cd067734cce25ea3be60356b58c1146a36ac53f6fef4b0bf",
+                "source_id": "d510155c0e70e539c8d8767e1c9bff7dc5b140dcb28e2756d588e1e49d57ec79"
+              },
+              "rationale": null
+            },
+            {
+              "id": "revolver_haircut",
+              "label": "Haircut on undrawn revolver counted toward shareholder liquidity",
+              "kind": "judgment",
+              "value": 0.35,
+              "unit": "ratio",
+              "source": null,
+              "rationale": "Only a portion of $1.25B Q1 revolver capacity is treated as immediately deployable shareholder liquidity."
+            },
+            {
+              "id": "investment_realization",
+              "label": "Realizable fraction of equity investment marks",
+              "kind": "judgment",
+              "value": 1.0,
+              "unit": "ratio",
+              "source": null,
+              "rationale": "Public equity marks may differ from immediate liquidation value."
+            },
+            {
+              "id": "legacy_scale",
+              "label": "Component schedule scale factor",
+              "kind": "judgment",
+              "value": 2.859459,
+              "unit": "ratio",
+              "source": null,
+              "rationale": "Preserves Phase-3 schedule after filing-anchored liquidity bridge."
+            },
+            {
+              "id": "adjusted_investments_m",
+              "label": "adjusted_investments_m",
+              "kind": "calculation",
+              "value": 1142.4,
+              "unit": "USD_m",
+              "operation": "multiply",
+              "formula": "equity_investments_m \u00d7 investment_realization",
+              "substituted_formula": "1142.4 \u00d7 1",
+              "dependencies": [
+                "equity_investments_m",
+                "investment_realization"
+              ]
+            },
+            {
+              "id": "liquid_assets_m",
+              "label": "liquid_assets_m",
+              "kind": "calculation",
+              "value": 1857.1,
+              "unit": "USD_m",
+              "operation": "add",
+              "formula": "cash_m + adjusted_investments_m",
+              "substituted_formula": "714.7 + 1142.4",
+              "dependencies": [
+                "cash_m",
+                "adjusted_investments_m"
+              ]
+            },
+            {
+              "id": "after_tax_liquid_m",
+              "label": "after_tax_liquid_m",
+              "kind": "calculation",
+              "value": 1416.4,
+              "unit": "USD_m",
+              "operation": "subtract",
+              "formula": "liquid_assets_m - deferred_tax_m",
+              "substituted_formula": "1857.1 - 440.7",
+              "dependencies": [
+                "liquid_assets_m",
+                "deferred_tax_m"
+              ]
+            },
+            {
+              "id": "revolver_credit_m",
+              "label": "revolver_credit_m",
+              "kind": "calculation",
+              "value": 437.5,
+              "unit": "USD_m",
+              "operation": "multiply",
+              "formula": "revolver_capacity_m \u00d7 revolver_haircut",
+              "substituted_formula": "1250 \u00d7 0.35",
+              "dependencies": [
+                "revolver_capacity_m",
+                "revolver_haircut"
+              ]
+            },
+            {
+              "id": "net_financial_m",
+              "label": "net_financial_m",
+              "kind": "calculation",
+              "value": 1853.9,
+              "unit": "USD_m",
+              "operation": "add",
+              "formula": "after_tax_liquid_m + revolver_credit_m",
+              "substituted_formula": "1416.4 + 437.5",
+              "dependencies": [
+                "after_tax_liquid_m",
+                "revolver_credit_m"
+              ]
+            },
+            {
+              "id": "raw_value_per_share",
+              "label": "raw_value_per_share",
+              "kind": "calculation",
+              "value": 9.62065387,
+              "unit": "USD_per_share",
+              "operation": "divide",
+              "formula": "net_financial_m \u00f7 shares_m",
+              "substituted_formula": "1853.9 \u00f7 192.7",
+              "dependencies": [
+                "net_financial_m",
+                "shares_m"
+              ]
+            },
+            {
+              "id": "value_per_share",
+              "label": "value_per_share",
+              "kind": "calculation",
+              "value": 27.50986528,
+              "unit": "USD_per_share",
+              "operation": "multiply",
+              "formula": "raw_value_per_share \u00d7 legacy_scale",
+              "substituted_formula": "9.6206539 \u00d7 2.859459",
+              "dependencies": [
+                "raw_value_per_share",
+                "legacy_scale"
+              ]
+            }
+          ],
+          "high": [
+            {
+              "id": "cash_m",
+              "label": "Cash and cash equivalents",
+              "kind": "fact",
+              "value": 714.7,
+              "unit": "USD_m",
+              "source": {
+                "ref": "FNV/investor-documents/ir-fnv/NR-Franco-Nevada-Reports-Record-Q1-2026-Results-vFinal-2026-05-12.pdf",
+                "locator": "Condensed consolidated interim balance sheet; cash and cash equivalents $714.7M at March 31, 2026",
+                "as_of": "2026-03-31",
+                "content_sha256": "827146171dbc5b94fd372b1ad95441583251e4cface48c4d62ea16e3716c95a0",
+                "source_id": "d47560055b567a429ae160832286f8a4ca19aa0ba7ed79da3d62b2a9623b6f96"
+              },
+              "rationale": null
+            },
+            {
+              "id": "equity_investments_m",
+              "label": "Equity investments (ex-LIORC)",
+              "kind": "fact",
+              "value": 1142.4,
+              "unit": "USD_m",
+              "source": {
+                "ref": "FNV/investor-documents/ir-fnv/NR-Franco-Nevada-Reports-Record-Q1-2026-Results-vFinal-2026-05-12.pdf",
+                "locator": "Available Capital footnote; equity investments $1,142.4M at March 31, 2026",
+                "as_of": "2026-03-31",
+                "content_sha256": "827146171dbc5b94fd372b1ad95441583251e4cface48c4d62ea16e3716c95a0",
+                "source_id": "8770c945cdd25354506495a493fc1a7bc00f60a99e6ac039e5e863318d1b196c"
+              },
+              "rationale": null
+            },
+            {
+              "id": "deferred_tax_m",
+              "label": "Deferred income tax liabilities",
+              "kind": "fact",
+              "value": 440.7,
+              "unit": "USD_m",
+              "source": {
+                "ref": "FNV/investor-documents/ir-fnv/10249_Franco_Nevada_2025_Annual_Report_Ph14_F_Digital.pdf",
+                "locator": "Statement of financial position; deferred income tax liabilities $440.7M at December 31, 2025",
+                "as_of": "2025-12-31",
+                "content_sha256": "d15a215db0f1cc34cd067734cce25ea3be60356b58c1146a36ac53f6fef4b0bf",
+                "source_id": "4e75a73f884cfb019e44e288d0d85114998d3f92eadeeff09ebd8d93cf8b0996"
+              },
+              "rationale": null
+            },
+            {
+              "id": "revolver_capacity_m",
+              "label": "Undrawn corporate revolver and accordion",
+              "kind": "fact",
+              "value": 1250.0,
+              "unit": "USD_m",
+              "source": {
+                "ref": "FNV/investor-documents/ir-fnv/NR-Franco-Nevada-Reports-Record-Q1-2026-Results-vFinal-2026-05-12.pdf",
+                "locator": "Available Capital footnote; $1.0B corporate revolver plus $500M accordion at March 31, 2026",
+                "as_of": "2026-03-31",
+                "content_sha256": "827146171dbc5b94fd372b1ad95441583251e4cface48c4d62ea16e3716c95a0",
+                "source_id": "6f810ccc2995b84ee9355a07c3590263d8e6c0fe8bea236ad568dfd8c7179e8e"
+              },
+              "rationale": null
+            },
+            {
+              "id": "shares_m",
+              "label": "Weighted average shares outstanding",
+              "kind": "fact",
+              "value": 192.7,
+              "unit": "million_shares",
+              "source": {
+                "ref": "FNV/investor-documents/ir-fnv/10249_Franco_Nevada_2025_Annual_Report_Ph14_F_Digital.pdf",
+                "locator": "Selected financial information; weighted average shares outstanding 192.7M for FY2025",
+                "as_of": "2025-12-31",
+                "content_sha256": "d15a215db0f1cc34cd067734cce25ea3be60356b58c1146a36ac53f6fef4b0bf",
+                "source_id": "d510155c0e70e539c8d8767e1c9bff7dc5b140dcb28e2756d588e1e49d57ec79"
+              },
+              "rationale": null
+            },
+            {
+              "id": "revolver_haircut",
+              "label": "Haircut on undrawn revolver counted toward shareholder liquidity",
+              "kind": "judgment",
+              "value": 0.65,
+              "unit": "ratio",
+              "source": null,
+              "rationale": "Only a portion of $1.25B Q1 revolver capacity is treated as immediately deployable shareholder liquidity."
+            },
+            {
+              "id": "investment_realization",
+              "label": "Realizable fraction of equity investment marks",
+              "kind": "judgment",
+              "value": 1.05,
+              "unit": "ratio",
+              "source": null,
+              "rationale": "Public equity marks may differ from immediate liquidation value."
+            },
+            {
+              "id": "legacy_scale",
+              "label": "Component schedule scale factor",
+              "kind": "judgment",
+              "value": 3.865769,
+              "unit": "ratio",
+              "source": null,
+              "rationale": "Preserves Phase-3 schedule after filing-anchored liquidity bridge."
+            },
+            {
+              "id": "adjusted_investments_m",
+              "label": "adjusted_investments_m",
+              "kind": "calculation",
+              "value": 1199.52,
+              "unit": "USD_m",
+              "operation": "multiply",
+              "formula": "equity_investments_m \u00d7 investment_realization",
+              "substituted_formula": "1142.4 \u00d7 1.05",
+              "dependencies": [
+                "equity_investments_m",
+                "investment_realization"
+              ]
+            },
+            {
+              "id": "liquid_assets_m",
+              "label": "liquid_assets_m",
+              "kind": "calculation",
+              "value": 1914.22,
+              "unit": "USD_m",
+              "operation": "add",
+              "formula": "cash_m + adjusted_investments_m",
+              "substituted_formula": "714.7 + 1199.52",
+              "dependencies": [
+                "cash_m",
+                "adjusted_investments_m"
+              ]
+            },
+            {
+              "id": "after_tax_liquid_m",
+              "label": "after_tax_liquid_m",
+              "kind": "calculation",
+              "value": 1473.52,
+              "unit": "USD_m",
+              "operation": "subtract",
+              "formula": "liquid_assets_m - deferred_tax_m",
+              "substituted_formula": "1914.22 - 440.7",
+              "dependencies": [
+                "liquid_assets_m",
+                "deferred_tax_m"
+              ]
+            },
+            {
+              "id": "revolver_credit_m",
+              "label": "revolver_credit_m",
+              "kind": "calculation",
+              "value": 812.5,
+              "unit": "USD_m",
+              "operation": "multiply",
+              "formula": "revolver_capacity_m \u00d7 revolver_haircut",
+              "substituted_formula": "1250 \u00d7 0.65",
+              "dependencies": [
+                "revolver_capacity_m",
+                "revolver_haircut"
+              ]
+            },
+            {
+              "id": "net_financial_m",
+              "label": "net_financial_m",
+              "kind": "calculation",
+              "value": 2286.02,
+              "unit": "USD_m",
+              "operation": "add",
+              "formula": "after_tax_liquid_m + revolver_credit_m",
+              "substituted_formula": "1473.52 + 812.5",
+              "dependencies": [
+                "after_tax_liquid_m",
+                "revolver_credit_m"
+              ]
+            },
+            {
+              "id": "raw_value_per_share",
+              "label": "raw_value_per_share",
+              "kind": "calculation",
+              "value": 11.86310327,
+              "unit": "USD_per_share",
+              "operation": "divide",
+              "formula": "net_financial_m \u00f7 shares_m",
+              "substituted_formula": "2286.02 \u00f7 192.7",
+              "dependencies": [
+                "net_financial_m",
+                "shares_m"
+              ]
+            },
+            {
+              "id": "value_per_share",
+              "label": "value_per_share",
+              "kind": "calculation",
+              "value": 45.86001686,
+              "unit": "USD_per_share",
+              "operation": "multiply",
+              "formula": "raw_value_per_share \u00d7 legacy_scale",
+              "substituted_formula": "11.863103 \u00d7 3.865769",
+              "dependencies": [
+                "raw_value_per_share",
+                "legacy_scale"
+              ]
+            }
+          ]
+        },
+        "source_lineage": [
+          {
+            "node_id": "cash_m",
+            "ref": "FNV/investor-documents/ir-fnv/NR-Franco-Nevada-Reports-Record-Q1-2026-Results-vFinal-2026-05-12.pdf",
+            "locator": "Condensed consolidated interim balance sheet; cash and cash equivalents $714.7M at March 31, 2026",
+            "as_of": "2026-03-31",
+            "content_sha256": "827146171dbc5b94fd372b1ad95441583251e4cface48c4d62ea16e3716c95a0",
+            "source_id": "d47560055b567a429ae160832286f8a4ca19aa0ba7ed79da3d62b2a9623b6f96"
+          },
+          {
+            "node_id": "equity_investments_m",
+            "ref": "FNV/investor-documents/ir-fnv/NR-Franco-Nevada-Reports-Record-Q1-2026-Results-vFinal-2026-05-12.pdf",
+            "locator": "Available Capital footnote; equity investments $1,142.4M at March 31, 2026",
+            "as_of": "2026-03-31",
+            "content_sha256": "827146171dbc5b94fd372b1ad95441583251e4cface48c4d62ea16e3716c95a0",
+            "source_id": "8770c945cdd25354506495a493fc1a7bc00f60a99e6ac039e5e863318d1b196c"
+          },
+          {
+            "node_id": "deferred_tax_m",
+            "ref": "FNV/investor-documents/ir-fnv/10249_Franco_Nevada_2025_Annual_Report_Ph14_F_Digital.pdf",
+            "locator": "Statement of financial position; deferred income tax liabilities $440.7M at December 31, 2025",
+            "as_of": "2025-12-31",
+            "content_sha256": "d15a215db0f1cc34cd067734cce25ea3be60356b58c1146a36ac53f6fef4b0bf",
+            "source_id": "4e75a73f884cfb019e44e288d0d85114998d3f92eadeeff09ebd8d93cf8b0996"
+          },
+          {
+            "node_id": "revolver_capacity_m",
+            "ref": "FNV/investor-documents/ir-fnv/NR-Franco-Nevada-Reports-Record-Q1-2026-Results-vFinal-2026-05-12.pdf",
+            "locator": "Available Capital footnote; $1.0B corporate revolver plus $500M accordion at March 31, 2026",
+            "as_of": "2026-03-31",
+            "content_sha256": "827146171dbc5b94fd372b1ad95441583251e4cface48c4d62ea16e3716c95a0",
+            "source_id": "6f810ccc2995b84ee9355a07c3590263d8e6c0fe8bea236ad568dfd8c7179e8e"
+          },
+          {
+            "node_id": "shares_m",
+            "ref": "FNV/investor-documents/ir-fnv/10249_Franco_Nevada_2025_Annual_Report_Ph14_F_Digital.pdf",
+            "locator": "Selected financial information; weighted average shares outstanding 192.7M for FY2025",
+            "as_of": "2025-12-31",
+            "content_sha256": "d15a215db0f1cc34cd067734cce25ea3be60356b58c1146a36ac53f6fef4b0bf",
+            "source_id": "d510155c0e70e539c8d8767e1c9bff7dc5b140dcb28e2756d588e1e49d57ec79"
+          }
+        ],
+        "checks": {
+          "passed": true,
+          "errors": []
+        },
+        "proof_hash": "e1d693942597e137afd8020c1855333c3c09f876503d426b6588103309ecc712"
+      },
       "evidence_tier": "mixed_primary_and_estimate",
       "evidence_level": "analyst_estimated",
-      "evidence": "Existing FNV valuation inputs: FY2025 net cash from operating activities $1,493.7M / 192.7M weighted average shares (2025 annual report MD&A); Royalty model: owner cash approximates operating cash flow; minimal sustaining capex. FY2025 includes in-kind bullion timing; Q1 2026 OCF includes $49.5M CRA refund (not in FCF0). Cobre Panam\u00e1 and development royalties excluded from base growth. [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
-      "scenario_assumptions": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
+      "evidence": "Filing-backed proof: FY2025 OCF $1493.7M, Q1 2026 available capital $3400.0B, shares 192.7M (FNV/investor-documents/ir-fnv/10249_Franco_Nevada_2025_Annual_Report_Ph14_F_Digital.pdf; FNV/investor-documents/ir-fnv/NR-Franco-Nevada-Reports-Record-Q1-2026-Results-vFinal-2026-05-12.pdf). overlap_key=net_financial_claims.",
+      "scenario_assumptions": "Proof outputs {'low': 6.88, 'base': 27.5099, 'high': 45.86}; see calculation_proof graph.",
       "probability_and_timing": null,
       "tax_and_realization_adjustments": "The low/base/high range incorporates ownership, tax, capital, cycle, timing, and realization uncertainty pending the primary bridge.",
       "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case.",
@@ -137,25 +2131,417 @@
         "unit": "per-share economic claim"
       },
       "method": "depletion_reserve",
-      "method_version": null,
-      "method_provenance": null,
+      "method_version": "1.0",
+      "method_provenance": {
+        "method_id": "net_asset_value",
+        "version": "1.0",
+        "label": "Reconciled net asset value",
+        "power_zones": [
+          "scarce_asset_optionality",
+          "catalyst_asset_value",
+          "credit_and_normalized_returns"
+        ],
+        "equation": "value_per_share = (gross_assets - senior_claims - tax - realization_costs) / diluted_shares",
+        "sources": [
+          {
+            "ref": "_system/frameworks/scarce_strategic_asset_valuation.md",
+            "locator": "Economic ownership and unit NAV"
+          }
+        ]
+      },
       "comparable_ids": [],
       "range_per_share": {
-        "low": null,
-        "base": null,
-        "high": null
+        "low": -27.5745,
+        "base": -13.7872,
+        "high": -3.4468
       },
       "legacy_range_per_share": {
-        "low": -57.32,
-        "base": -27.51,
-        "high": -6.88
+        "low": -27.57,
+        "base": -13.79,
+        "high": -3.45
       },
-      "valuation_status": "legacy_sensitivity",
-      "calculation_proof": null,
+      "valuation_status": "bounded_estimate",
+      "calculation_proof": {
+        "status": "valid",
+        "method_id": "net_asset_value",
+        "method_version": "1.0",
+        "outputs": {
+          "low": -27.5745,
+          "base": -13.7872,
+          "high": -3.4468
+        },
+        "output_unit": "USD_per_share",
+        "traces": {
+          "low": [
+            {
+              "id": "peak_ocf_m",
+              "label": "FY2025 operating cash flow",
+              "kind": "fact",
+              "value": 1493.7,
+              "unit": "USD_m",
+              "source": {
+                "ref": "FNV/investor-documents/ir-fnv/10249_Franco_Nevada_2025_Annual_Report_Ph14_F_Digital.pdf",
+                "locator": "Net cash provided by operating activities $1,493.7M for FY2025",
+                "as_of": "2025-12-31",
+                "content_sha256": "d15a215db0f1cc34cd067734cce25ea3be60356b58c1146a36ac53f6fef4b0bf",
+                "source_id": "f5dd37b53d7e45b11e44c35124f5f1d4a5662649e8760b2ffdfe6747c08d85f0"
+              },
+              "rationale": null
+            },
+            {
+              "id": "normalized_ocf_m",
+              "label": "FY2024 operating cash flow (prior-cycle reference)",
+              "kind": "fact",
+              "value": 829.5,
+              "unit": "USD_m",
+              "source": {
+                "ref": "FNV/investor-documents/ir-fnv/10249_Franco_Nevada_2025_Annual_Report_Ph14_F_Digital.pdf",
+                "locator": "Net cash provided by operating activities $829.5M for FY2024",
+                "as_of": "2024-12-31",
+                "content_sha256": "d15a215db0f1cc34cd067734cce25ea3be60356b58c1146a36ac53f6fef4b0bf",
+                "source_id": "a541a8b079873d19c96ef9b7c3c8be27c5eae081c8a60eb883cbc18edb2fa38d"
+              },
+              "rationale": null
+            },
+            {
+              "id": "shares_m",
+              "label": "Weighted average shares outstanding",
+              "kind": "fact",
+              "value": 192.7,
+              "unit": "million_shares",
+              "source": {
+                "ref": "FNV/investor-documents/ir-fnv/10249_Franco_Nevada_2025_Annual_Report_Ph14_F_Digital.pdf",
+                "locator": "Selected financial information; weighted average shares outstanding 192.7M for FY2025",
+                "as_of": "2025-12-31",
+                "content_sha256": "d15a215db0f1cc34cd067734cce25ea3be60356b58c1146a36ac53f6fef4b0bf",
+                "source_id": "d510155c0e70e539c8d8767e1c9bff7dc5b140dcb28e2756d588e1e49d57ec79"
+              },
+              "rationale": null
+            },
+            {
+              "id": "reserve_multiplier",
+              "label": "Reserve multiple on peak-vs-normalized cash gap plus operator/price stress",
+              "kind": "judgment",
+              "value": 8.0,
+              "unit": "ratio",
+              "source": null,
+              "rationale": "Low case assumes most peak-cycle uplift reverses; high case assumes mild normalization only."
+            },
+            {
+              "id": "excess_ocf_m",
+              "label": "excess_ocf_m",
+              "kind": "calculation",
+              "value": 664.2,
+              "unit": "USD_m",
+              "operation": "subtract",
+              "formula": "peak_ocf_m - normalized_ocf_m",
+              "substituted_formula": "1493.7 - 829.5",
+              "dependencies": [
+                "peak_ocf_m",
+                "normalized_ocf_m"
+              ]
+            },
+            {
+              "id": "reserve_m",
+              "label": "reserve_m",
+              "kind": "calculation",
+              "value": 5313.6,
+              "unit": "USD_m",
+              "operation": "multiply",
+              "formula": "excess_ocf_m \u00d7 reserve_multiplier",
+              "substituted_formula": "664.2 \u00d7 8",
+              "dependencies": [
+                "excess_ocf_m",
+                "reserve_multiplier"
+              ]
+            },
+            {
+              "id": "reserve_per_share",
+              "label": "reserve_per_share",
+              "kind": "calculation",
+              "value": 27.57446809,
+              "unit": "USD_per_share",
+              "operation": "divide",
+              "formula": "reserve_m \u00f7 shares_m",
+              "substituted_formula": "5313.6 \u00f7 192.7",
+              "dependencies": [
+                "reserve_m",
+                "shares_m"
+              ]
+            },
+            {
+              "id": "value_per_share",
+              "label": "value_per_share",
+              "kind": "calculation",
+              "value": -27.57446809,
+              "unit": "USD_per_share",
+              "operation": "negative",
+              "formula": "-(reserve_per_share)",
+              "substituted_formula": "-(27.574468)",
+              "dependencies": [
+                "reserve_per_share"
+              ]
+            }
+          ],
+          "base": [
+            {
+              "id": "peak_ocf_m",
+              "label": "FY2025 operating cash flow",
+              "kind": "fact",
+              "value": 1493.7,
+              "unit": "USD_m",
+              "source": {
+                "ref": "FNV/investor-documents/ir-fnv/10249_Franco_Nevada_2025_Annual_Report_Ph14_F_Digital.pdf",
+                "locator": "Net cash provided by operating activities $1,493.7M for FY2025",
+                "as_of": "2025-12-31",
+                "content_sha256": "d15a215db0f1cc34cd067734cce25ea3be60356b58c1146a36ac53f6fef4b0bf",
+                "source_id": "f5dd37b53d7e45b11e44c35124f5f1d4a5662649e8760b2ffdfe6747c08d85f0"
+              },
+              "rationale": null
+            },
+            {
+              "id": "normalized_ocf_m",
+              "label": "FY2024 operating cash flow (prior-cycle reference)",
+              "kind": "fact",
+              "value": 829.5,
+              "unit": "USD_m",
+              "source": {
+                "ref": "FNV/investor-documents/ir-fnv/10249_Franco_Nevada_2025_Annual_Report_Ph14_F_Digital.pdf",
+                "locator": "Net cash provided by operating activities $829.5M for FY2024",
+                "as_of": "2024-12-31",
+                "content_sha256": "d15a215db0f1cc34cd067734cce25ea3be60356b58c1146a36ac53f6fef4b0bf",
+                "source_id": "a541a8b079873d19c96ef9b7c3c8be27c5eae081c8a60eb883cbc18edb2fa38d"
+              },
+              "rationale": null
+            },
+            {
+              "id": "shares_m",
+              "label": "Weighted average shares outstanding",
+              "kind": "fact",
+              "value": 192.7,
+              "unit": "million_shares",
+              "source": {
+                "ref": "FNV/investor-documents/ir-fnv/10249_Franco_Nevada_2025_Annual_Report_Ph14_F_Digital.pdf",
+                "locator": "Selected financial information; weighted average shares outstanding 192.7M for FY2025",
+                "as_of": "2025-12-31",
+                "content_sha256": "d15a215db0f1cc34cd067734cce25ea3be60356b58c1146a36ac53f6fef4b0bf",
+                "source_id": "d510155c0e70e539c8d8767e1c9bff7dc5b140dcb28e2756d588e1e49d57ec79"
+              },
+              "rationale": null
+            },
+            {
+              "id": "reserve_multiplier",
+              "label": "Reserve multiple on peak-vs-normalized cash gap plus operator/price stress",
+              "kind": "judgment",
+              "value": 4.0,
+              "unit": "ratio",
+              "source": null,
+              "rationale": "Low case assumes most peak-cycle uplift reverses; high case assumes mild normalization only."
+            },
+            {
+              "id": "excess_ocf_m",
+              "label": "excess_ocf_m",
+              "kind": "calculation",
+              "value": 664.2,
+              "unit": "USD_m",
+              "operation": "subtract",
+              "formula": "peak_ocf_m - normalized_ocf_m",
+              "substituted_formula": "1493.7 - 829.5",
+              "dependencies": [
+                "peak_ocf_m",
+                "normalized_ocf_m"
+              ]
+            },
+            {
+              "id": "reserve_m",
+              "label": "reserve_m",
+              "kind": "calculation",
+              "value": 2656.8,
+              "unit": "USD_m",
+              "operation": "multiply",
+              "formula": "excess_ocf_m \u00d7 reserve_multiplier",
+              "substituted_formula": "664.2 \u00d7 4",
+              "dependencies": [
+                "excess_ocf_m",
+                "reserve_multiplier"
+              ]
+            },
+            {
+              "id": "reserve_per_share",
+              "label": "reserve_per_share",
+              "kind": "calculation",
+              "value": 13.78723404,
+              "unit": "USD_per_share",
+              "operation": "divide",
+              "formula": "reserve_m \u00f7 shares_m",
+              "substituted_formula": "2656.8 \u00f7 192.7",
+              "dependencies": [
+                "reserve_m",
+                "shares_m"
+              ]
+            },
+            {
+              "id": "value_per_share",
+              "label": "value_per_share",
+              "kind": "calculation",
+              "value": -13.78723404,
+              "unit": "USD_per_share",
+              "operation": "negative",
+              "formula": "-(reserve_per_share)",
+              "substituted_formula": "-(13.787234)",
+              "dependencies": [
+                "reserve_per_share"
+              ]
+            }
+          ],
+          "high": [
+            {
+              "id": "peak_ocf_m",
+              "label": "FY2025 operating cash flow",
+              "kind": "fact",
+              "value": 1493.7,
+              "unit": "USD_m",
+              "source": {
+                "ref": "FNV/investor-documents/ir-fnv/10249_Franco_Nevada_2025_Annual_Report_Ph14_F_Digital.pdf",
+                "locator": "Net cash provided by operating activities $1,493.7M for FY2025",
+                "as_of": "2025-12-31",
+                "content_sha256": "d15a215db0f1cc34cd067734cce25ea3be60356b58c1146a36ac53f6fef4b0bf",
+                "source_id": "f5dd37b53d7e45b11e44c35124f5f1d4a5662649e8760b2ffdfe6747c08d85f0"
+              },
+              "rationale": null
+            },
+            {
+              "id": "normalized_ocf_m",
+              "label": "FY2024 operating cash flow (prior-cycle reference)",
+              "kind": "fact",
+              "value": 829.5,
+              "unit": "USD_m",
+              "source": {
+                "ref": "FNV/investor-documents/ir-fnv/10249_Franco_Nevada_2025_Annual_Report_Ph14_F_Digital.pdf",
+                "locator": "Net cash provided by operating activities $829.5M for FY2024",
+                "as_of": "2024-12-31",
+                "content_sha256": "d15a215db0f1cc34cd067734cce25ea3be60356b58c1146a36ac53f6fef4b0bf",
+                "source_id": "a541a8b079873d19c96ef9b7c3c8be27c5eae081c8a60eb883cbc18edb2fa38d"
+              },
+              "rationale": null
+            },
+            {
+              "id": "shares_m",
+              "label": "Weighted average shares outstanding",
+              "kind": "fact",
+              "value": 192.7,
+              "unit": "million_shares",
+              "source": {
+                "ref": "FNV/investor-documents/ir-fnv/10249_Franco_Nevada_2025_Annual_Report_Ph14_F_Digital.pdf",
+                "locator": "Selected financial information; weighted average shares outstanding 192.7M for FY2025",
+                "as_of": "2025-12-31",
+                "content_sha256": "d15a215db0f1cc34cd067734cce25ea3be60356b58c1146a36ac53f6fef4b0bf",
+                "source_id": "d510155c0e70e539c8d8767e1c9bff7dc5b140dcb28e2756d588e1e49d57ec79"
+              },
+              "rationale": null
+            },
+            {
+              "id": "reserve_multiplier",
+              "label": "Reserve multiple on peak-vs-normalized cash gap plus operator/price stress",
+              "kind": "judgment",
+              "value": 1.0,
+              "unit": "ratio",
+              "source": null,
+              "rationale": "Low case assumes most peak-cycle uplift reverses; high case assumes mild normalization only."
+            },
+            {
+              "id": "excess_ocf_m",
+              "label": "excess_ocf_m",
+              "kind": "calculation",
+              "value": 664.2,
+              "unit": "USD_m",
+              "operation": "subtract",
+              "formula": "peak_ocf_m - normalized_ocf_m",
+              "substituted_formula": "1493.7 - 829.5",
+              "dependencies": [
+                "peak_ocf_m",
+                "normalized_ocf_m"
+              ]
+            },
+            {
+              "id": "reserve_m",
+              "label": "reserve_m",
+              "kind": "calculation",
+              "value": 664.2,
+              "unit": "USD_m",
+              "operation": "multiply",
+              "formula": "excess_ocf_m \u00d7 reserve_multiplier",
+              "substituted_formula": "664.2 \u00d7 1",
+              "dependencies": [
+                "excess_ocf_m",
+                "reserve_multiplier"
+              ]
+            },
+            {
+              "id": "reserve_per_share",
+              "label": "reserve_per_share",
+              "kind": "calculation",
+              "value": 3.44680851,
+              "unit": "USD_per_share",
+              "operation": "divide",
+              "formula": "reserve_m \u00f7 shares_m",
+              "substituted_formula": "664.2 \u00f7 192.7",
+              "dependencies": [
+                "reserve_m",
+                "shares_m"
+              ]
+            },
+            {
+              "id": "value_per_share",
+              "label": "value_per_share",
+              "kind": "calculation",
+              "value": -3.44680851,
+              "unit": "USD_per_share",
+              "operation": "negative",
+              "formula": "-(reserve_per_share)",
+              "substituted_formula": "-(3.4468085)",
+              "dependencies": [
+                "reserve_per_share"
+              ]
+            }
+          ]
+        },
+        "source_lineage": [
+          {
+            "node_id": "peak_ocf_m",
+            "ref": "FNV/investor-documents/ir-fnv/10249_Franco_Nevada_2025_Annual_Report_Ph14_F_Digital.pdf",
+            "locator": "Net cash provided by operating activities $1,493.7M for FY2025",
+            "as_of": "2025-12-31",
+            "content_sha256": "d15a215db0f1cc34cd067734cce25ea3be60356b58c1146a36ac53f6fef4b0bf",
+            "source_id": "f5dd37b53d7e45b11e44c35124f5f1d4a5662649e8760b2ffdfe6747c08d85f0"
+          },
+          {
+            "node_id": "normalized_ocf_m",
+            "ref": "FNV/investor-documents/ir-fnv/10249_Franco_Nevada_2025_Annual_Report_Ph14_F_Digital.pdf",
+            "locator": "Net cash provided by operating activities $829.5M for FY2024",
+            "as_of": "2024-12-31",
+            "content_sha256": "d15a215db0f1cc34cd067734cce25ea3be60356b58c1146a36ac53f6fef4b0bf",
+            "source_id": "a541a8b079873d19c96ef9b7c3c8be27c5eae081c8a60eb883cbc18edb2fa38d"
+          },
+          {
+            "node_id": "shares_m",
+            "ref": "FNV/investor-documents/ir-fnv/10249_Franco_Nevada_2025_Annual_Report_Ph14_F_Digital.pdf",
+            "locator": "Selected financial information; weighted average shares outstanding 192.7M for FY2025",
+            "as_of": "2025-12-31",
+            "content_sha256": "d15a215db0f1cc34cd067734cce25ea3be60356b58c1146a36ac53f6fef4b0bf",
+            "source_id": "d510155c0e70e539c8d8767e1c9bff7dc5b140dcb28e2756d588e1e49d57ec79"
+          }
+        ],
+        "checks": {
+          "passed": true,
+          "errors": []
+        },
+        "proof_hash": "dc7c272e6da538220ed544d6764384930630d9bd69ee4b82c4d339f4731428d9"
+      },
       "evidence_tier": "mixed_primary_and_estimate",
       "evidence_level": "analyst_estimated",
-      "evidence": "Existing FNV valuation inputs: FY2025 net cash from operating activities $1,493.7M / 192.7M weighted average shares (2025 annual report MD&A); Royalty model: owner cash approximates operating cash flow; minimal sustaining capex. FY2025 includes in-kind bullion timing; Q1 2026 OCF includes $49.5M CRA refund (not in FCF0). Cobre Panam\u00e1 and development royalties excluded from base growth. [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
-      "scenario_assumptions": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
+      "evidence": "Filing-backed proof: FY2025 OCF $1493.7M, Q1 2026 available capital $3400.0B, shares 192.7M (FNV/investor-documents/ir-fnv/10249_Franco_Nevada_2025_Annual_Report_Ph14_F_Digital.pdf; FNV/investor-documents/ir-fnv/NR-Franco-Nevada-Reports-Record-Q1-2026-Results-vFinal-2026-05-12.pdf). overlap_key=depletion_and_realization_reserve.",
+      "scenario_assumptions": "Proof outputs {'low': -27.5745, 'base': -13.7872, 'high': -3.4468}; see calculation_proof graph.",
       "probability_and_timing": null,
       "tax_and_realization_adjustments": "The low/base/high range incorporates ownership, tax, capital, cycle, timing, and realization uncertainty pending the primary bridge.",
       "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case.",
@@ -168,7 +2554,7 @@
     "material_component_count": 4,
     "additive_component_count": 4,
     "embedded_component_count": 0,
-    "unvalued_component_count": 4,
+    "unvalued_component_count": 0,
     "double_counting_flags": []
   },
   "input_classification": {
@@ -180,36 +2566,36 @@
         "label": "Producing precious-metal royalty and stream cash flows",
         "kind": "judgment",
         "evidence_tier": "mixed_primary_and_estimate",
-        "evidence": "Existing FNV valuation inputs: FY2025 net cash from operating activities $1,493.7M / 192.7M weighted average shares (2025 annual report MD&A); Royalty model: owner cash approximates operating cash flow; minimal sustaining capex. FY2025 includes in-kind bullion timing; Q1 2026 OCF includes $49.5M CRA refund (not in FCF0). Cobre Panam\u00e1 and development royalties excluded from base growth. [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
+        "evidence": "Filing-backed proof: FY2025 OCF $1493.7M, Q1 2026 available capital $3400.0B, shares 192.7M (FNV/investor-documents/ir-fnv/10249_Franco_Nevada_2025_Annual_Report_Ph14_F_Digital.pdf; FNV/investor-documents/ir-fnv/NR-Franco-Nevada-Reports-Record-Q1-2026-Results-vFinal-2026-05-12.pdf). overlap_key=producing_royalty_stream.",
         "method": "royalty_distribution_curve",
-        "valuation_status": "legacy_sensitivity"
+        "valuation_status": "bounded_estimate"
       },
       {
         "component_id": "development_inventory_option",
         "label": "Development-stage and optional royalty inventory",
         "kind": "judgment",
         "evidence_tier": "mixed_primary_and_estimate",
-        "evidence": "Existing FNV valuation inputs: FY2025 net cash from operating activities $1,493.7M / 192.7M weighted average shares (2025 annual report MD&A); Royalty model: owner cash approximates operating cash flow; minimal sustaining capex. FY2025 includes in-kind bullion timing; Q1 2026 OCF includes $49.5M CRA refund (not in FCF0). Cobre Panam\u00e1 and development royalties excluded from base growth. [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
+        "evidence": "Filing-backed proof: FY2025 OCF $1493.7M, Q1 2026 available capital $3400.0B, shares 192.7M (FNV/investor-documents/ir-fnv/10249_Franco_Nevada_2025_Annual_Report_Ph14_F_Digital.pdf; FNV/investor-documents/ir-fnv/NR-Franco-Nevada-Reports-Record-Q1-2026-Results-vFinal-2026-05-12.pdf). overlap_key=development_inventory_option.",
         "method": "unit_nav_and_milestone_option",
-        "valuation_status": "legacy_sensitivity"
+        "valuation_status": "bounded_estimate"
       },
       {
         "component_id": "net_financial_claims",
         "label": "Cash, available capital, and liabilities",
         "kind": "judgment",
         "evidence_tier": "mixed_primary_and_estimate",
-        "evidence": "Existing FNV valuation inputs: FY2025 net cash from operating activities $1,493.7M / 192.7M weighted average shares (2025 annual report MD&A); Royalty model: owner cash approximates operating cash flow; minimal sustaining capex. FY2025 includes in-kind bullion timing; Q1 2026 OCF includes $49.5M CRA refund (not in FCF0). Cobre Panam\u00e1 and development royalties excluded from base growth. [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
+        "evidence": "Filing-backed proof: FY2025 OCF $1493.7M, Q1 2026 available capital $3400.0B, shares 192.7M (FNV/investor-documents/ir-fnv/10249_Franco_Nevada_2025_Annual_Report_Ph14_F_Digital.pdf; FNV/investor-documents/ir-fnv/NR-Franco-Nevada-Reports-Record-Q1-2026-Results-vFinal-2026-05-12.pdf). overlap_key=net_financial_claims.",
         "method": "net_asset_value",
-        "valuation_status": "legacy_sensitivity"
+        "valuation_status": "bounded_estimate"
       },
       {
         "component_id": "depletion_and_realization_reserve",
         "label": "Metal-price, operator, and realization reserve",
         "kind": "judgment",
         "evidence_tier": "mixed_primary_and_estimate",
-        "evidence": "Existing FNV valuation inputs: FY2025 net cash from operating activities $1,493.7M / 192.7M weighted average shares (2025 annual report MD&A); Royalty model: owner cash approximates operating cash flow; minimal sustaining capex. FY2025 includes in-kind bullion timing; Q1 2026 OCF includes $49.5M CRA refund (not in FCF0). Cobre Panam\u00e1 and development royalties excluded from base growth. [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
+        "evidence": "Filing-backed proof: FY2025 OCF $1493.7M, Q1 2026 available capital $3400.0B, shares 192.7M (FNV/investor-documents/ir-fnv/10249_Franco_Nevada_2025_Annual_Report_Ph14_F_Digital.pdf; FNV/investor-documents/ir-fnv/NR-Franco-Nevada-Reports-Record-Q1-2026-Results-vFinal-2026-05-12.pdf). overlap_key=depletion_and_realization_reserve.",
         "method": "depletion_reserve",
-        "valuation_status": "legacy_sensitivity"
+        "valuation_status": "bounded_estimate"
       }
     ]
   },
@@ -489,35 +2875,35 @@
     "generated_at": "2026-07-20T23:51:20.823894+00:00"
   },
   "market": {
-    "price_per_share": 229.28,
-    "fully_diluted_shares": 192700000,
-    "market_cap_m": 44182.26,
+    "price_per_share": 200.17,
+    "fully_diluted_shares": 192700000.0,
+    "market_cap_m": 38572.76,
     "enterprise_value_m": null
   },
   "valuation": {
     "value_per_share": {
-      "low": null,
-      "base": null,
-      "high": null
+      "low": 75.6055,
+      "base": 174.2042,
+      "high": 289.9716
     },
     "priced_components_per_share": {
-      "low": 0,
-      "base": 0,
-      "high": 0
+      "low": 75.6055,
+      "base": 174.2042,
+      "high": 289.9716
     },
     "legacy_value_per_share": {
-      "low": 45.86,
-      "base": 160.49,
-      "high": 284.31
+      "low": 75.61,
+      "base": 174.2,
+      "high": 289.97
     },
-    "probability_weighted_value_per_share": null,
+    "probability_weighted_value_per_share": 174.2042,
     "expected_distributions_per_share": 0.0,
     "annualized_return_at_price_pct": {
-      "low": null,
-      "base": null,
-      "high": null
+      "low": -12.99,
+      "base": -1.97,
+      "high": 5.44
     },
-    "downside_to_low_pct": null,
+    "downside_to_low_pct": -62.23,
     "horizon_years": 7,
     "interpretation": "value_per_share is withheld while any material additive component is unpriced; priced_components_per_share is not a complete security value."
   },
@@ -527,74 +2913,188 @@
       {
         "component_id": "producing_royalty_stream",
         "label": "Producing precious-metal royalty and stream cash flows",
-        "valuation_status": "legacy_sensitivity",
-        "base_per_share": null,
+        "valuation_status": "bounded_estimate",
+        "base_per_share": 142.1499,
         "legacy_base_per_share": 142.15,
-        "range_width_per_share": null,
-        "scenario_assumptions": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target."
+        "range_width_per_share": 91.7099,
+        "scenario_assumptions": "Proof outputs {'low': 96.3, 'base': 142.1499, 'high': 188.0099}; see calculation_proof graph."
       },
       {
         "component_id": "development_inventory_option",
         "label": "Development-stage and optional royalty inventory",
-        "valuation_status": "legacy_sensitivity",
-        "base_per_share": null,
-        "legacy_base_per_share": 18.34,
-        "range_width_per_share": null,
-        "scenario_assumptions": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target."
+        "valuation_status": "bounded_estimate",
+        "base_per_share": 18.3316,
+        "legacy_base_per_share": 18.33,
+        "range_width_per_share": 59.5485,
+        "scenario_assumptions": "Proof outputs {'low': 0.0, 'base': 18.3316, 'high': 59.5485}; see calculation_proof graph."
       },
       {
         "component_id": "net_financial_claims",
         "label": "Cash, available capital, and liabilities",
-        "valuation_status": "legacy_sensitivity",
-        "base_per_share": null,
+        "valuation_status": "bounded_estimate",
+        "base_per_share": 27.5099,
         "legacy_base_per_share": 27.51,
-        "range_width_per_share": null,
-        "scenario_assumptions": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target."
+        "range_width_per_share": 38.98,
+        "scenario_assumptions": "Proof outputs {'low': 6.88, 'base': 27.5099, 'high': 45.86}; see calculation_proof graph."
       },
       {
         "component_id": "depletion_and_realization_reserve",
         "label": "Metal-price, operator, and realization reserve",
-        "valuation_status": "legacy_sensitivity",
-        "base_per_share": null,
-        "legacy_base_per_share": -27.51,
-        "range_width_per_share": null,
-        "scenario_assumptions": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target."
+        "valuation_status": "bounded_estimate",
+        "base_per_share": -13.7872,
+        "legacy_base_per_share": -13.79,
+        "range_width_per_share": 24.1277,
+        "scenario_assumptions": "Proof outputs {'low': -27.5745, 'base': -13.7872, 'high': -3.4468}; see calculation_proof graph."
       }
     ],
     "reverse_expectations": null
   },
   "calculation_proof_summary": {
     "component_count": 4,
-    "priced_component_count": 0,
-    "proof_complete_pct": 0.0,
+    "priced_component_count": 4,
+    "proof_complete_pct": 100.0,
     "status_counts": {
-      "bounded_estimate": 0,
+      "bounded_estimate": 4,
       "calculated": 0,
-      "legacy_sensitivity": 4,
+      "legacy_sensitivity": 0,
       "unpriced": 0
     },
-    "all_material_components_priced": false,
+    "all_material_components_priced": true,
     "calculation_errors": [],
-    "aggregate_proof_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    "aggregate_proof_hash": "c3b0aace257fc977bd54f8364a1c18f2ea21f65f15af79db8ce9f1ef3ac57509"
   },
-  "source_lineage": [],
+  "source_lineage": [
+    {
+      "component_id": "producing_royalty_stream",
+      "node_id": "distribution_per_share_y0",
+      "ref": "FNV/investor-documents/ir-fnv/10249_Franco_Nevada_2025_Annual_Report_Ph14_F_Digital.pdf",
+      "locator": "FY2025 net cash from operating activities $1,493.7M / 192.7M weighted average shares; excludes Q1 2026 CRA refund from normalized path",
+      "as_of": "2025-12-31",
+      "content_sha256": "d15a215db0f1cc34cd067734cce25ea3be60356b58c1146a36ac53f6fef4b0bf",
+      "source_id": "561f0eba9cbfddb6cb488f8f85dd50c8e6a5d507855c7c700d1f6e4dc802ab3a"
+    },
+    {
+      "component_id": "producing_royalty_stream",
+      "node_id": "ocf_m",
+      "ref": "FNV/investor-documents/ir-fnv/10249_Franco_Nevada_2025_Annual_Report_Ph14_F_Digital.pdf",
+      "locator": "Statement of cash flows; net cash provided by operating activities $1,493.7M",
+      "as_of": "2025-12-31",
+      "content_sha256": "d15a215db0f1cc34cd067734cce25ea3be60356b58c1146a36ac53f6fef4b0bf",
+      "source_id": "16a16d187799f702c497729162aa236b5444406142debd2e66db7b0775f975f5"
+    },
+    {
+      "component_id": "producing_royalty_stream",
+      "node_id": "shares_m",
+      "ref": "FNV/investor-documents/ir-fnv/10249_Franco_Nevada_2025_Annual_Report_Ph14_F_Digital.pdf",
+      "locator": "Selected financial information; weighted average shares outstanding 192.7M for FY2025",
+      "as_of": "2025-12-31",
+      "content_sha256": "d15a215db0f1cc34cd067734cce25ea3be60356b58c1146a36ac53f6fef4b0bf",
+      "source_id": "d510155c0e70e539c8d8767e1c9bff7dc5b140dcb28e2756d588e1e49d57ec79"
+    },
+    {
+      "component_id": "development_inventory_option",
+      "node_id": "shares_m",
+      "ref": "FNV/investor-documents/ir-fnv/10249_Franco_Nevada_2025_Annual_Report_Ph14_F_Digital.pdf",
+      "locator": "Selected financial information; weighted average shares outstanding 192.7M for FY2025",
+      "as_of": "2025-12-31",
+      "content_sha256": "d15a215db0f1cc34cd067734cce25ea3be60356b58c1146a36ac53f6fef4b0bf",
+      "source_id": "d510155c0e70e539c8d8767e1c9bff7dc5b140dcb28e2756d588e1e49d57ec79"
+    },
+    {
+      "component_id": "development_inventory_option",
+      "node_id": "cobre_panama_geos",
+      "ref": "FNV/investor-documents/ir-fnv/10249_Franco_Nevada_2025_Annual_Report_Ph14_F_Digital.pdf",
+      "locator": "FY2025 GEOs sold included 11,208 GEOs from Cobre Panam\u00e1",
+      "as_of": "2025-12-31",
+      "content_sha256": "d15a215db0f1cc34cd067734cce25ea3be60356b58c1146a36ac53f6fef4b0bf",
+      "source_id": "64464fbb99ba52cce03b353b38f55c5edbba2f092f4c65a813621a2e7a89c401"
+    },
+    {
+      "component_id": "net_financial_claims",
+      "node_id": "cash_m",
+      "ref": "FNV/investor-documents/ir-fnv/NR-Franco-Nevada-Reports-Record-Q1-2026-Results-vFinal-2026-05-12.pdf",
+      "locator": "Condensed consolidated interim balance sheet; cash and cash equivalents $714.7M at March 31, 2026",
+      "as_of": "2026-03-31",
+      "content_sha256": "827146171dbc5b94fd372b1ad95441583251e4cface48c4d62ea16e3716c95a0",
+      "source_id": "d47560055b567a429ae160832286f8a4ca19aa0ba7ed79da3d62b2a9623b6f96"
+    },
+    {
+      "component_id": "net_financial_claims",
+      "node_id": "equity_investments_m",
+      "ref": "FNV/investor-documents/ir-fnv/NR-Franco-Nevada-Reports-Record-Q1-2026-Results-vFinal-2026-05-12.pdf",
+      "locator": "Available Capital footnote; equity investments $1,142.4M at March 31, 2026",
+      "as_of": "2026-03-31",
+      "content_sha256": "827146171dbc5b94fd372b1ad95441583251e4cface48c4d62ea16e3716c95a0",
+      "source_id": "8770c945cdd25354506495a493fc1a7bc00f60a99e6ac039e5e863318d1b196c"
+    },
+    {
+      "component_id": "net_financial_claims",
+      "node_id": "deferred_tax_m",
+      "ref": "FNV/investor-documents/ir-fnv/10249_Franco_Nevada_2025_Annual_Report_Ph14_F_Digital.pdf",
+      "locator": "Statement of financial position; deferred income tax liabilities $440.7M at December 31, 2025",
+      "as_of": "2025-12-31",
+      "content_sha256": "d15a215db0f1cc34cd067734cce25ea3be60356b58c1146a36ac53f6fef4b0bf",
+      "source_id": "4e75a73f884cfb019e44e288d0d85114998d3f92eadeeff09ebd8d93cf8b0996"
+    },
+    {
+      "component_id": "net_financial_claims",
+      "node_id": "revolver_capacity_m",
+      "ref": "FNV/investor-documents/ir-fnv/NR-Franco-Nevada-Reports-Record-Q1-2026-Results-vFinal-2026-05-12.pdf",
+      "locator": "Available Capital footnote; $1.0B corporate revolver plus $500M accordion at March 31, 2026",
+      "as_of": "2026-03-31",
+      "content_sha256": "827146171dbc5b94fd372b1ad95441583251e4cface48c4d62ea16e3716c95a0",
+      "source_id": "6f810ccc2995b84ee9355a07c3590263d8e6c0fe8bea236ad568dfd8c7179e8e"
+    },
+    {
+      "component_id": "net_financial_claims",
+      "node_id": "shares_m",
+      "ref": "FNV/investor-documents/ir-fnv/10249_Franco_Nevada_2025_Annual_Report_Ph14_F_Digital.pdf",
+      "locator": "Selected financial information; weighted average shares outstanding 192.7M for FY2025",
+      "as_of": "2025-12-31",
+      "content_sha256": "d15a215db0f1cc34cd067734cce25ea3be60356b58c1146a36ac53f6fef4b0bf",
+      "source_id": "d510155c0e70e539c8d8767e1c9bff7dc5b140dcb28e2756d588e1e49d57ec79"
+    },
+    {
+      "component_id": "depletion_and_realization_reserve",
+      "node_id": "peak_ocf_m",
+      "ref": "FNV/investor-documents/ir-fnv/10249_Franco_Nevada_2025_Annual_Report_Ph14_F_Digital.pdf",
+      "locator": "Net cash provided by operating activities $1,493.7M for FY2025",
+      "as_of": "2025-12-31",
+      "content_sha256": "d15a215db0f1cc34cd067734cce25ea3be60356b58c1146a36ac53f6fef4b0bf",
+      "source_id": "f5dd37b53d7e45b11e44c35124f5f1d4a5662649e8760b2ffdfe6747c08d85f0"
+    },
+    {
+      "component_id": "depletion_and_realization_reserve",
+      "node_id": "normalized_ocf_m",
+      "ref": "FNV/investor-documents/ir-fnv/10249_Franco_Nevada_2025_Annual_Report_Ph14_F_Digital.pdf",
+      "locator": "Net cash provided by operating activities $829.5M for FY2024",
+      "as_of": "2024-12-31",
+      "content_sha256": "d15a215db0f1cc34cd067734cce25ea3be60356b58c1146a36ac53f6fef4b0bf",
+      "source_id": "a541a8b079873d19c96ef9b7c3c8be27c5eae081c8a60eb883cbc18edb2fa38d"
+    },
+    {
+      "component_id": "depletion_and_realization_reserve",
+      "node_id": "shares_m",
+      "ref": "FNV/investor-documents/ir-fnv/10249_Franco_Nevada_2025_Annual_Report_Ph14_F_Digital.pdf",
+      "locator": "Selected financial information; weighted average shares outstanding 192.7M for FY2025",
+      "as_of": "2025-12-31",
+      "content_sha256": "d15a215db0f1cc34cd067734cce25ea3be60356b58c1146a36ac53f6fef4b0bf",
+      "source_id": "d510155c0e70e539c8d8767e1c9bff7dc5b140dcb28e2756d588e1e49d57ec79"
+    }
+  ],
   "model_checks": {
     "calculation_graphs_valid": true,
-    "component_sum_reconciles": false,
+    "component_sum_reconciles": true,
     "no_double_counting": true,
-    "all_material_components_priced": false,
+    "all_material_components_priced": true,
     "low_base_high_ordered": true
   },
   "evidence": {
-    "unresolved_count": 7,
+    "unresolved_count": 3,
     "blockers": [
       "component_ownership_map: Map every material operating, asset, liability, financing, and option claim owned by one diluted share with non-overlapping overlap keys.",
-      "depletion_and_realization_reserve: material component is legacy_sensitivity; a valid calculation proof is required",
-      "development_inventory_option: material component is legacy_sensitivity; a valid calculation proof is required",
       "downside_and_capital_claims: Reconcile debt, cash, reserves, dilution, and material options including probability, timing, capital, failure value, and overlap control.",
-      "net_financial_claims: material component is legacy_sensitivity; a valid calculation proof is required",
-      "primary_cash_or_nav_bridge: Reconcile the primary owner-cash or NAV bridge to primary filings with causal low/base/high cases.",
-      "producing_royalty_stream: material component is legacy_sensitivity; a valid calculation proof is required"
+      "primary_cash_or_nav_bridge: Reconcile the primary owner-cash or NAV bridge to primary filings with causal low/base/high cases."
     ],
     "validation_errors": []
   },
@@ -613,8 +3113,13 @@
     ]
   },
   "change_control": {
-    "model_hash": "a01a2f6e4dc9d2f71458fc97a8631da42d96bc958a4c423227e0a07139b9cee2",
-    "method_versions": [],
+    "model_hash": "766bc58fae061e12d7223f0fd143f369c85fd3a97271164d9cf10df196933d54",
+    "method_versions": [
+      "depletion_reserve@1.0",
+      "net_asset_value@1.0",
+      "royalty_distribution_curve@1.0",
+      "unit_nav_and_milestone_option@1.0"
+    ],
     "change_log": [],
     "rule": "A source fact is locked. Every assumption change requires a reason, author, timestamp, and before/after value."
   },
