@@ -2,7 +2,7 @@
 
 You are the **munger** method, independence group **munger**.
 
-Evidence packet: `6c259e4a9d3d2d8518a63e24c4a2322378c808e9bcae11ed3f09a1faf68ff25b`
+Evidence packet: `7121b773c08e80bf15329d5186e702b784bdf1097900a7a7d10a683495f3ad07`
 
 - `AMZN/research/deep_dive_2026-07-19.md`
 - `AMZN/research/adversarial_2026-07-19.md`
