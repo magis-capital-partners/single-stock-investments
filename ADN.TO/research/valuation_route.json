@@ -3,9 +3,10 @@
   "status": "routed",
   "profile_id": "scarce_asset_optionality",
   "label": "Scarce assets, royalties, and optionality",
-  "score": 8.0,
+  "score": 9.0,
   "reasons": [
     "archetype=optionality",
+    "component categories=real_option",
     "investment_sleeve=real_assets_land"
   ],
   "primary_methods": [
@@ -43,43 +44,76 @@
     "operating cash flow and NAV counted twice",
     "remote options treated as contracted cash"
   ],
-  "secondary_profiles": [],
+  "secondary_profiles": [
+    {
+      "profile_id": "predictable_cash_flow",
+      "score": 3.0,
+      "reasons": [
+        "component categories=operating_business",
+        "existing methods=dividend, owner_cash"
+      ]
+    },
+    {
+      "profile_id": "binary_milestone",
+      "score": 3.0,
+      "reasons": [
+        "component categories=real_option",
+        "existing methods=milestone, risk_adjusted"
+      ]
+    }
+  ],
   "scorecard": {
     "scarce_asset_optionality": {
-      "score": 8.0,
+      "score": 9.0,
       "reasons": [
         "archetype=optionality",
+        "component categories=real_option",
         "investment_sleeve=real_assets_land"
       ]
     },
     "quality_reinvestment": {
-      "score": 0.0,
-      "reasons": []
+      "score": 2.0,
+      "reasons": [
+        "component categories=operating_business",
+        "existing methods=owner_cash"
+      ]
     },
     "capital_cycle": {
-      "score": 0.0,
-      "reasons": []
+      "score": 1.0,
+      "reasons": [
+        "component categories=operating_business"
+      ]
     },
     "credit_and_normalized_returns": {
-      "score": 0.0,
-      "reasons": []
+      "score": 2.0,
+      "reasons": [
+        "component categories=financial_asset, liability_or_reserve"
+      ]
     },
     "catalyst_asset_value": {
-      "score": 0.0,
-      "reasons": []
+      "score": 1.0,
+      "reasons": [
+        "component categories=financial_asset"
+      ]
     },
     "predictable_cash_flow": {
-      "score": 0.0,
-      "reasons": []
+      "score": 3.0,
+      "reasons": [
+        "component categories=operating_business",
+        "existing methods=dividend, owner_cash"
+      ]
     },
     "binary_milestone": {
-      "score": 0.0,
-      "reasons": []
+      "score": 3.0,
+      "reasons": [
+        "component categories=real_option",
+        "existing methods=milestone, risk_adjusted"
+      ]
     }
   },
   "decision_rule": "Power Zones select the fitting economic method and eligible independent reviewers; they never choose the valuation answer or capital decision.",
   "ticker": "ADN.TO",
-  "as_of": "2026-07-20",
+  "as_of": "2026-07-21",
   "route_source": "canonical_power_zone_router",
   "config_path": "_system/frameworks/power_zones.json",
   "config_updated": "2026-07-14",
@@ -220,6 +254,6 @@
       }
     ]
   },
-  "input_hash": "b480840f455f1702d23c715019eb837783c2603287a03fe3f1c0f465c7624c89",
-  "generated_at": "2026-07-20T17:13:53.817727+00:00"
+  "input_hash": "8725b92db3c7415c5cc1059590048b1e5fa81515372b65d1ebba712c7493f62c",
+  "generated_at": "2026-07-21T13:35:06.821661+00:00"
 }

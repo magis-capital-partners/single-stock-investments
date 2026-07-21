@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-20T23:25:15Z",
+  "generated_at": "2026-07-21T05:01:09Z",
   "account_id": "roth",
   "tier": 0,
   "phase": "0-tier0",
@@ -37,32 +37,32 @@
   },
   "universe_spec": "registry_sp500_liquid",
   "universe_spec_effective": "registry_sp500_liquid",
-  "universe_count": 502,
+  "universe_count": 503,
   "universe_excluded_sample": [
     "0388.HK",
     "3905.T",
     "7176.T",
     "8697.T",
+    "AAL",
     "AAOI",
     "ABMD.CVR",
     "ABX",
-    "ADN.TO",
-    "ALS.TO",
-    "APLD",
-    "ASPN",
-    "ASTS"
+    "ACHR",
+    "ACLS",
+    "ACMR",
+    "ADN.TO"
   ],
   "universe_exclusions": {
-    "eligible_count": 502,
-    "eligible_with_returns": 498,
-    "excluded_total": 653,
+    "eligible_count": 503,
+    "eligible_with_returns": 499,
+    "excluded_total": 712,
     "by_reason": {
-      "not_in_sp500": 146,
+      "not_in_sp500": 204,
       "adr_otc": 0,
       "liquidity_miss": 0,
       "no_options": 1,
       "returns_missing": 4,
-      "research_eligibility_miss": 502
+      "research_eligibility_miss": 503
     },
     "samples": {
       "not_in_sp500": [
@@ -70,14 +70,14 @@
         "3905.T",
         "7176.T",
         "8697.T",
+        "AAL",
         "AAOI",
         "ABMD.CVR",
         "ABX",
-        "ADN.TO",
-        "ALS.TO",
-        "APLD",
-        "ASPN",
-        "ASTS"
+        "ACHR",
+        "ACLS",
+        "ACMR",
+        "ADN.TO"
       ],
       "adr_otc": [],
       "liquidity_miss": [],
@@ -112,7 +112,7 @@
       "as_of": "2026-07-11",
       "source": "yahoo_chart_adv_proxy",
       "stale": false,
-      "age_days": 7,
+      "age_days": 9,
       "stale_after_days": 30,
       "eligible_buckets": [
         "A",
@@ -143,7 +143,7 @@
     "as_of": "2026-07-11",
     "source": "yahoo_chart_adv_proxy",
     "stale": false,
-    "age_days": 7,
+    "age_days": 9,
     "stale_after_days": 30,
     "eligible_buckets": [
       "A",
@@ -223,7 +223,7 @@
     }
   },
   "cc_scenarios": {
-    "generated_at": "2026-07-20T23:25:15Z",
+    "generated_at": "2026-07-21T05:01:09Z",
     "long_only_max_names": 40,
     "cc_concentrated_max_names": 8,
     "production_policy": "research_committee",
@@ -243,7 +243,7 @@
     "human_approve_note": "Approve scenario_cc_weights before changing live paper book."
   },
   "cc_lab": {
-    "generated_at": "2026-07-20T23:25:15Z",
+    "generated_at": "2026-07-21T05:01:09Z",
     "lab": "cc_knob_ga",
     "disclaimer": "Lab only. Does not overwrite Marvin stance or production weights.",
     "n_trials": 12,
@@ -280,9 +280,7 @@
   "weights": [],
   "cash_weight_pct": 100.0,
   "data_integrity": {
-    "status": "blocked_preserved_prior_weights",
-    "reason": "zero_research_eligible_names",
-    "action": "Rebuild the compact research snapshot from a full checkout before rebalancing."
+    "status": "ok"
   },
   "research_queue": [
     {
@@ -752,36 +750,8 @@
       "rebalance_frequency": "semiannual"
     }
   },
-  "conflicts": [
-    {
-      "ticker": "ADBE",
-      "severity": "review",
-      "reason": "human_review_pending",
-      "weight_pct": 8.64
-    },
-    {
-      "ticker": "ADBE",
-      "severity": "review",
-      "reason": "high_weight_low_stance",
-      "weight_pct": 8.64,
-      "stance": "watch"
-    }
-  ],
-  "human_review": [
-    {
-      "ticker": "ADBE",
-      "severity": "review",
-      "reason": "human_review_pending",
-      "weight_pct": 8.64
-    },
-    {
-      "ticker": "ADBE",
-      "severity": "review",
-      "reason": "high_weight_low_stance",
-      "weight_pct": 8.64,
-      "stance": "watch"
-    }
-  ],
+  "conflicts": [],
+  "human_review": [],
   "attribution": [],
   "latent_factors": {
     "labels": [],
@@ -858,6 +828,7 @@
       "BMY": "csv_vault",
       "BNY": "csv_vault",
       "BR": "csv_vault",
+      "BRK-B": "csv_vault",
       "BRK.B": "missing_returns",
       "BRO": "csv_vault",
       "BSX": "csv_vault",
@@ -1296,7 +1267,7 @@
   },
   "evolution_log": [
     {
-      "date": "2026-07-20",
+      "date": "2026-07-21",
       "event": "rebalance",
       "policy": "research_committee",
       "turnover_pct": 10.0,
@@ -1304,15 +1275,6 @@
     }
   ],
   "lineage": [
-    {
-      "event": "rebalance",
-      "policy": "ira_marvin",
-      "regime": "calm",
-      "turnover_pct": 10.0,
-      "champion_sharpe": 0.0,
-      "population_size": 8,
-      "ts": "2026-07-13T14:15:52Z"
-    },
     {
       "event": "rebalance",
       "policy": "ira_marvin",
@@ -1348,6 +1310,15 @@
       "champion_sharpe": 0.0,
       "population_size": 8,
       "ts": "2026-07-20T23:25:15Z"
+    },
+    {
+      "event": "rebalance",
+      "policy": "research_committee",
+      "regime": "calm",
+      "turnover_pct": 10.0,
+      "champion_sharpe": 0.0,
+      "population_size": 8,
+      "ts": "2026-07-21T05:01:09Z"
     }
   ],
   "source_alignment_version": null,
@@ -2177,7 +2148,7 @@
     "champion_selection": "ira_default",
     "regime": "calm",
     "top_holdings": [],
-    "excluded_count": 502,
+    "excluded_count": 503,
     "excluded_sample": [
       "A",
       "AAPL",
@@ -2238,7 +2209,7 @@
     "synthetic_count": 0
   },
   "pit_status": {
-    "generated_at": "2026-07-20T23:25:15Z",
+    "generated_at": "2026-07-21T05:01:09Z",
     "audit_pass": true,
     "leakage_count": 0,
     "synthetic_tickers": [
@@ -2256,7 +2227,7 @@
     "pit_error": null
   },
   "bias_scan": {
-    "generated_at": "2026-07-20T23:25:15Z",
+    "generated_at": "2026-07-21T05:01:09Z",
     "flag_count": 0,
     "by_severity": {
       "review": 0,
@@ -2267,7 +2238,7 @@
     "pass": true
   },
   "observatory": {
-    "generated_at": "2026-07-20T23:25:15Z",
+    "generated_at": "2026-07-21T05:01:09Z",
     "regime": {
       "label": "calm",
       "research": "calm",
@@ -2293,7 +2264,7 @@
     "research_stress": {
       "stale_research_pct": 0.0,
       "falsifier_count_total": 0,
-      "human_review_pending": 502
+      "human_review_pending": 503
     },
     "vrp_health": {
       "build_time": "2026-06-07T00:30:07.576981Z",
@@ -13248,7 +13219,7 @@
     ],
     "sources_manifest": "/home/runner/work/single-stock-investments/single-stock-investments/_system/reference/market-data/external/sources_manifest.json"
   },
-  "regime_brief": "_system/reviews/pending/darwin_regime_brief_2026-07-20.md",
+  "regime_brief": "_system/reviews/pending/darwin_regime_brief_2026-07-21.md",
   "exploration": {
     "enabled": false,
     "champion_mode": null
@@ -13258,7 +13229,7 @@
     "account_id": "roth",
     "inception_date": "2026-06-03",
     "last_mark": {
-      "date": "2026-07-20",
+      "date": "2026-07-21",
       "nav_usd": 167343.01,
       "period_return_pct": 0.0,
       "cumulative_return_pct": 67.343
