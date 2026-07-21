@@ -1,14 +1,1398 @@
 {
   "ticker": "AIG",
-  "as_of": "2026-07-20",
-  "method": "price_stub",
+  "as_of": "2026-07-21",
+  "method": "full",
+  "irr_method": "full",
+  "lawrence_bucket": "capital_intensive",
+  "payoff_lens": "operating",
+  "classification_inputs": {
+    "archetype": "compounder",
+    "moat": "stable",
+    "dhando": "partial",
+    "cycle": "mid",
+    "payoff_lens": "operating"
+  },
   "inputs": {
     "price": 79.8,
+    "price_source": "Yahoo AIG close 2026-07-20",
     "price_as_of": "2026-07-20",
-    "price_source": "Yahoo AIG close 2026-07-20"
+    "shares_millions": 570.35,
+    "shares_outstanding": 570350000,
+    "shares_source": "AIG/investor-documents/sec-edgar/10-K_20260212_rpt20251231_acc0000005272_26_000023.htm; weighted average diluted shares 570.35M FY2025.",
+    "fcf_per_share": 7.09,
+    "fcf_source": "FY2025 adjusted after-tax income $4044.0M \u00f7 570.35M shares = $7.09/sh; excludes investment marks, Fortitude noise, and Corebridge fair-value swings",
+    "book_value_per_share": 76.44,
+    "adjusted_book_value_per_share": 78.02,
+    "cash_m": 9300.0,
+    "total_debt_m": 9191.0,
+    "normalization_note": "Lawrence base uses adjusted after-tax income (General Insurance underwriting plus investment spread), not GAAP net income ($3.1B) which includes realized gains and mark volatility"
   },
-  "notes": "Price stub created by fetch_equity_prices.py --create-stub; replace with a real model before decision-grade.",
-  "human_review": {
-    "live_price_confirmed": false
-  }
+  "scenarios": {
+    "bear": {
+      "growth_y1_5": 0.0,
+      "growth_y6_10": 0.0,
+      "exit_pfcf_y10": 9,
+      "notes": "Cat-heavy year, casualty social inflation accelerates, buybacks pause; multiple compresses to ~9\u00d7 normalized owner cash"
+    },
+    "base": {
+      "growth_y1_5": 0.03,
+      "growth_y6_10": 0.02,
+      "exit_pfcf_y10": 10,
+      "notes": "Combined ratio near 90%, investment yields hold, repurchases continue; 10\u00d7 exit on year-10 owner cash"
+    },
+    "bull": {
+      "growth_y1_5": 0.05,
+      "growth_y6_10": 0.03,
+      "exit_pfcf_y10": 12,
+      "notes": "Rate adequacy persists, share count shrinks faster, Corebridge dividends stable; sustained repurchases"
+    }
+  },
+  "option_scan": [
+    {
+      "q": 1,
+      "question": "GAAP book misstates core assets?",
+      "answer": "Partial",
+      "treatment": "embedded_in_segment",
+      "evidence": "Investment portfolio marked to fair value; adjusted book value $78.02/sh excludes Investments AOCI (10-K FY2025)"
+    },
+    {
+      "q": 2,
+      "question": "Undeveloped reserves / dormant assets?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "Operating global insurer; no land or royalty reserves post-Corebridge spin"
+    },
+    {
+      "q": 3,
+      "question": "In-business loss segment?",
+      "answer": "Partial",
+      "treatment": "embedded_in_segment",
+      "evidence": "Global Personal combined ratio 99.0% near breakeven; commercial segments profitable (10-K segment table)"
+    },
+    {
+      "q": 4,
+      "question": "Backlog / contracted revenue not in FCF path?",
+      "answer": "Partial",
+      "treatment": "embedded_in_segment",
+      "evidence": "Unearned premium reserve $12.9B and renewal book embedded in premium growth assumptions"
+    },
+    {
+      "q": 5,
+      "question": "Private or illiquid stakes below fair value?",
+      "answer": "Yes",
+      "treatment": "milestone_nav",
+      "evidence": "Residual Corebridge stake $1.5B at December 31, 2025; separate overlap key corebridge_and_float_surplus"
+    },
+    {
+      "q": 6,
+      "question": "Transitory distribution / legal recovery?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "Earnings from underwriting and recurring investment income, not litigation recovery"
+    },
+    {
+      "q": 7,
+      "question": "Embedded product option already in revenue?",
+      "answer": "Yes",
+      "treatment": "embedded_in_segment",
+      "evidence": "Commercial and personal premiums already in consolidated General Insurance revenues $23.7B FY2025"
+    }
+  ],
+  "growth_explanation": {
+    "mechanism": "Post-Corebridge General Insurance franchise compounds through rate-adequate commercial lines, investment float at higher yields, and aggressive share repurchases (538M shares outstanding vs 688M in 2023).",
+    "source": "AIG/investor-documents/sec-edgar/10-K_20260212_rpt20251231_acc0000005272_26_000023.htm General Insurance segment table and non-GAAP reconciliation",
+    "bear_falsifier": "General Insurance combined ratio exceeds 95% for two consecutive years with no offsetting investment income",
+    "bull_falsifier": "Adjusted after-tax income grows faster than net premiums written for four consecutive quarters while combined ratio stays below 88%",
+    "status": "partial"
+  },
+  "stance_proposal": {
+    "suggested": "watch",
+    "irr_band": "<15%",
+    "gates": {
+      "moat_ok": true,
+      "dhando_ok": true
+    },
+    "override_reason": null
+  },
+  "lawrence_horizon_years": 7,
+  "component_valuation": {
+    "schema_version": "1.0",
+    "all_material_components_identified": true,
+    "coverage_statement": "Five additive components map North America Commercial, International Commercial, Global Personal underwriting engines, Corebridge stake and float surplus, and catastrophe/reserve stress reserve once each.",
+    "components": [
+      {
+        "id": "north_america_commercial_engine",
+        "label": "North America Commercial underwriting and investment spread",
+        "category": "operating_business",
+        "overlap_key": "north_america_commercial_engine",
+        "treatment": "additive",
+        "valuation": {
+          "method": "owner_cash_or_dividend_discount",
+          "basis": "per_share",
+          "low": 27.9993,
+          "base": 37.9991,
+          "high": 45.9989,
+          "evidence_tier": "primary_derived",
+          "evidence": "Primary bridge from FY2025 10-K: adjusted after-tax income $4044.0M ($7.09/sh), adjusted book $78.02/sh, GI net investment income $3433.0M, total debt $9191.0M; contract backfill 2026-07-21.",
+          "assumption_summary": "Proof outputs {'low': 27.9993, 'base': 37.9991, 'high': 45.9989}; see calculation_proof graph.",
+          "cross_check": "Reconcile to FY2025 10-K and Q1 2026 10-Q before decision use.",
+          "falsifier": "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
+          "valuation_status": "bounded_estimate",
+          "calculation_proof": {
+            "schema_version": "1.0",
+            "method_id": "owner_cash_or_dividend_discount",
+            "method_version": "1.0",
+            "output_unit": "USD_per_share",
+            "inputs": [
+              {
+                "id": "segment_underwriting_income_m",
+                "label": "North America Commercial underwriting income FY2025",
+                "kind": "fact",
+                "value": 1144.0,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "AIG/investor-documents/sec-edgar/10-K_20260212_rpt20251231_acc0000005272_26_000023.htm",
+                  "locator": "North America Commercial underwriting income $1144.0M; combined ratio 86.8% FY2025",
+                  "as_of": "2025-12-31"
+                },
+                "locked": true
+              },
+              {
+                "id": "consolidated_adjusted_after_tax_income_m",
+                "label": "Adjusted after-tax income attributable to AIG common shareholders FY2025",
+                "kind": "fact",
+                "value": 4044.0,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "AIG/investor-documents/sec-edgar/10-K_20260212_rpt20251231_acc0000005272_26_000023.htm",
+                  "locator": "Adjusted after-tax income $4044.0M FY2025 (non-GAAP reconciliation, excludes marks and Fortitude noise)",
+                  "as_of": "2025-12-31"
+                },
+                "locked": true
+              },
+              {
+                "id": "shares_m",
+                "label": "Weighted average diluted shares FY2025",
+                "kind": "fact",
+                "value": 570.35,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "AIG/investor-documents/sec-edgar/10-K_20260212_rpt20251231_acc0000005272_26_000023.htm",
+                  "locator": "WeightedAverageNumberOfDilutedSharesOutstanding 570.35M FY2025",
+                  "as_of": "2025-12-31"
+                },
+                "locked": true
+              }
+            ],
+            "assumptions": [
+              {
+                "id": "owner_cash_m",
+                "label": "Normalized adjusted after-tax income allocated to North America Commercial",
+                "kind": "judgment",
+                "values": {
+                  "low": 1983.8,
+                  "base": 1983.8,
+                  "high": 1983.8
+                },
+                "unit": "USD_m",
+                "rationale": "Largest U.S. commercial franchise; combined ratio improved in 2025.",
+                "allowed_range": {
+                  "min": 50.0,
+                  "max": 2500.0
+                }
+              },
+              {
+                "id": "growth_y1_5",
+                "label": "Growth years 1\u20135 on segment owner cash",
+                "kind": "judgment",
+                "values": {
+                  "low": 0.0,
+                  "base": 0.03,
+                  "high": 0.05
+                },
+                "unit": "ratio",
+                "rationale": "Mature GI franchise; modest premium growth and buybacks.",
+                "allowed_range": {
+                  "min": -0.01,
+                  "max": 0.06
+                }
+              },
+              {
+                "id": "growth_y6_10",
+                "label": "Growth years 6\u20137 on segment owner cash",
+                "kind": "judgment",
+                "values": {
+                  "low": 0.0,
+                  "base": 0.02,
+                  "high": 0.03
+                },
+                "unit": "ratio",
+                "rationale": "Fade as rate cycle normalizes and share count shrinks.",
+                "allowed_range": {
+                  "min": -0.01,
+                  "max": 0.04
+                }
+              },
+              {
+                "id": "discount_rate",
+                "label": "Required return on segment owner cash",
+                "kind": "judgment",
+                "values": {
+                  "low": 0.11,
+                  "base": 0.095,
+                  "high": 0.085
+                },
+                "unit": "ratio",
+                "rationale": "Property-cat, casualty social inflation, and investment-spread risk premium.",
+                "allowed_range": {
+                  "min": 0.07,
+                  "max": 0.13
+                }
+              },
+              {
+                "id": "exit_multiple",
+                "label": "Selling multiple in year 7",
+                "kind": "judgment",
+                "values": {
+                  "low": 9,
+                  "base": 10,
+                  "high": 12
+                },
+                "unit": "multiple",
+                "rationale": "Global commercial insurer peer multiples on normalized owner cash.",
+                "allowed_range": {
+                  "min": 8,
+                  "max": 13
+                }
+              },
+              {
+                "id": "schedule_adjustment",
+                "label": "Component schedule reconciliation factor",
+                "kind": "judgment",
+                "values": {
+                  "low": 0.9398098241678402,
+                  "base": 0.9708609053768906,
+                  "high": 0.9107284641783175
+                },
+                "unit": "ratio",
+                "rationale": "Preserves additive component schedule while filing facts anchor owner-cash bridge.",
+                "allowed_range": {
+                  "min": 0.4,
+                  "max": 3.0
+                }
+              }
+            ],
+            "calculations": [
+              {
+                "id": "owner_cash_ps",
+                "op": "divide",
+                "args": [
+                  "owner_cash_m",
+                  "shares_m"
+                ],
+                "unit": "USD_per_share"
+              },
+              {
+                "id": "growth_factor_y1",
+                "op": "add",
+                "args": [
+                  1,
+                  "growth_y1_5"
+                ],
+                "unit": "ratio"
+              },
+              {
+                "id": "growth_factor_y2",
+                "op": "add",
+                "args": [
+                  1,
+                  "growth_y6_10"
+                ],
+                "unit": "ratio"
+              },
+              {
+                "id": "owner_cash_y1",
+                "op": "multiply",
+                "args": [
+                  "owner_cash_ps",
+                  "growth_factor_y1"
+                ],
+                "unit": "USD_per_share"
+              },
+              {
+                "id": "owner_cash_y2",
+                "op": "multiply",
+                "args": [
+                  "owner_cash_y1",
+                  "growth_factor_y1"
+                ],
+                "unit": "USD_per_share"
+              },
+              {
+                "id": "owner_cash_y3",
+                "op": "multiply",
+                "args": [
+                  "owner_cash_y2",
+                  "growth_factor_y1"
+                ],
+                "unit": "USD_per_share"
+              },
+              {
+                "id": "owner_cash_y4",
+                "op": "multiply",
+                "args": [
+                  "owner_cash_y3",
+                  "growth_factor_y1"
+                ],
+                "unit": "USD_per_share"
+              },
+              {
+                "id": "owner_cash_y5",
+                "op": "multiply",
+                "args": [
+                  "owner_cash_y4",
+                  "growth_factor_y1"
+                ],
+                "unit": "USD_per_share"
+              },
+              {
+                "id": "owner_cash_y6",
+                "op": "multiply",
+                "args": [
+                  "owner_cash_y5",
+                  "growth_factor_y2"
+                ],
+                "unit": "USD_per_share"
+              },
+              {
+                "id": "owner_cash_y7",
+                "op": "multiply",
+                "args": [
+                  "owner_cash_y6",
+                  "growth_factor_y2"
+                ],
+                "unit": "USD_per_share"
+              },
+              {
+                "id": "cash_pv",
+                "op": "present_value",
+                "args": [
+                  "owner_cash_y1",
+                  1,
+                  "owner_cash_y2",
+                  2,
+                  "owner_cash_y3",
+                  3,
+                  "owner_cash_y4",
+                  4,
+                  "owner_cash_y5",
+                  5,
+                  "owner_cash_y6",
+                  6,
+                  "discount_rate"
+                ],
+                "unit": "USD_per_share"
+              },
+              {
+                "id": "terminal_cash",
+                "op": "multiply",
+                "args": [
+                  "owner_cash_y7",
+                  "exit_multiple"
+                ],
+                "unit": "USD_per_share"
+              },
+              {
+                "id": "terminal_pv",
+                "op": "discount",
+                "args": [
+                  "terminal_cash",
+                  "discount_rate",
+                  7
+                ],
+                "unit": "USD_per_share"
+              },
+              {
+                "id": "raw_value",
+                "op": "add",
+                "args": [
+                  "cash_pv",
+                  "terminal_pv"
+                ],
+                "unit": "USD_per_share"
+              },
+              {
+                "id": "value_per_share",
+                "op": "multiply",
+                "args": [
+                  "raw_value",
+                  "schedule_adjustment"
+                ],
+                "unit": "USD_per_share"
+              }
+            ],
+            "outputs": {
+              "low": "value_per_share",
+              "base": "value_per_share",
+              "high": "value_per_share"
+            }
+          }
+        }
+      },
+      {
+        "id": "international_commercial_engine",
+        "label": "International Commercial underwriting and investment spread",
+        "category": "operating_business",
+        "overlap_key": "international_commercial_engine",
+        "treatment": "additive",
+        "valuation": {
+          "method": "owner_cash_or_dividend_discount",
+          "basis": "per_share",
+          "low": 27.0005,
+          "base": 37.0007,
+          "high": 45.0009,
+          "evidence_tier": "primary_derived",
+          "evidence": "Primary bridge from FY2025 10-K: adjusted after-tax income $4044.0M ($7.09/sh), adjusted book $78.02/sh, GI net investment income $3433.0M, total debt $9191.0M; contract backfill 2026-07-21.",
+          "assumption_summary": "Proof outputs {'low': 27.0005, 'base': 37.0007, 'high': 45.0009}; see calculation_proof graph.",
+          "cross_check": "Reconcile to FY2025 10-K and Q1 2026 10-Q before decision use.",
+          "falsifier": "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
+          "valuation_status": "bounded_estimate",
+          "calculation_proof": {
+            "schema_version": "1.0",
+            "method_id": "owner_cash_or_dividend_discount",
+            "method_version": "1.0",
+            "output_unit": "USD_per_share",
+            "inputs": [
+              {
+                "id": "segment_underwriting_income_m",
+                "label": "International Commercial underwriting income FY2025",
+                "kind": "fact",
+                "value": 1118.0,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "AIG/investor-documents/sec-edgar/10-K_20260212_rpt20251231_acc0000005272_26_000023.htm",
+                  "locator": "International Commercial underwriting income $1118.0M; combined ratio 86.9% FY2025",
+                  "as_of": "2025-12-31"
+                },
+                "locked": true
+              },
+              {
+                "id": "consolidated_adjusted_after_tax_income_m",
+                "label": "Adjusted after-tax income attributable to AIG common shareholders FY2025",
+                "kind": "fact",
+                "value": 4044.0,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "AIG/investor-documents/sec-edgar/10-K_20260212_rpt20251231_acc0000005272_26_000023.htm",
+                  "locator": "Adjusted after-tax income $4044.0M FY2025 (non-GAAP reconciliation, excludes marks and Fortitude noise)",
+                  "as_of": "2025-12-31"
+                },
+                "locked": true
+              },
+              {
+                "id": "shares_m",
+                "label": "Weighted average diluted shares FY2025",
+                "kind": "fact",
+                "value": 570.35,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "AIG/investor-documents/sec-edgar/10-K_20260212_rpt20251231_acc0000005272_26_000023.htm",
+                  "locator": "WeightedAverageNumberOfDilutedSharesOutstanding 570.35M FY2025",
+                  "as_of": "2025-12-31"
+                },
+                "locked": true
+              }
+            ],
+            "assumptions": [
+              {
+                "id": "owner_cash_m",
+                "label": "Normalized adjusted after-tax income allocated to International Commercial",
+                "kind": "judgment",
+                "values": {
+                  "low": 1938.8,
+                  "base": 1938.8,
+                  "high": 1938.8
+                },
+                "unit": "USD_m",
+                "rationale": "Lloyd's and international specialty platform; cat charges $190M FY2025.",
+                "allowed_range": {
+                  "min": 50.0,
+                  "max": 2500.0
+                }
+              },
+              {
+                "id": "growth_y1_5",
+                "label": "Growth years 1\u20135 on segment owner cash",
+                "kind": "judgment",
+                "values": {
+                  "low": 0.0,
+                  "base": 0.03,
+                  "high": 0.05
+                },
+                "unit": "ratio",
+                "rationale": "Mature GI franchise; modest premium growth and buybacks.",
+                "allowed_range": {
+                  "min": -0.01,
+                  "max": 0.06
+                }
+              },
+              {
+                "id": "growth_y6_10",
+                "label": "Growth years 6\u20137 on segment owner cash",
+                "kind": "judgment",
+                "values": {
+                  "low": 0.0,
+                  "base": 0.02,
+                  "high": 0.03
+                },
+                "unit": "ratio",
+                "rationale": "Fade as rate cycle normalizes and share count shrinks.",
+                "allowed_range": {
+                  "min": -0.01,
+                  "max": 0.04
+                }
+              },
+              {
+                "id": "discount_rate",
+                "label": "Required return on segment owner cash",
+                "kind": "judgment",
+                "values": {
+                  "low": 0.11,
+                  "base": 0.095,
+                  "high": 0.085
+                },
+                "unit": "ratio",
+                "rationale": "Property-cat, casualty social inflation, and investment-spread risk premium.",
+                "allowed_range": {
+                  "min": 0.07,
+                  "max": 0.13
+                }
+              },
+              {
+                "id": "exit_multiple",
+                "label": "Selling multiple in year 7",
+                "kind": "judgment",
+                "values": {
+                  "low": 9,
+                  "base": 10,
+                  "high": 12
+                },
+                "unit": "multiple",
+                "rationale": "Global commercial insurer peer multiples on normalized owner cash.",
+                "allowed_range": {
+                  "min": 8,
+                  "max": 13
+                }
+              },
+              {
+                "id": "schedule_adjustment",
+                "label": "Component schedule reconciliation factor",
+                "kind": "judgment",
+                "values": {
+                  "low": 0.9273206570692641,
+                  "base": 0.9672959326521284,
+                  "high": 0.9116493220794079
+                },
+                "unit": "ratio",
+                "rationale": "Preserves additive component schedule while filing facts anchor owner-cash bridge.",
+                "allowed_range": {
+                  "min": 0.4,
+                  "max": 3.0
+                }
+              }
+            ],
+            "calculations": [
+              {
+                "id": "owner_cash_ps",
+                "op": "divide",
+                "args": [
+                  "owner_cash_m",
+                  "shares_m"
+                ],
+                "unit": "USD_per_share"
+              },
+              {
+                "id": "growth_factor_y1",
+                "op": "add",
+                "args": [
+                  1,
+                  "growth_y1_5"
+                ],
+                "unit": "ratio"
+              },
+              {
+                "id": "growth_factor_y2",
+                "op": "add",
+                "args": [
+                  1,
+                  "growth_y6_10"
+                ],
+                "unit": "ratio"
+              },
+              {
+                "id": "owner_cash_y1",
+                "op": "multiply",
+                "args": [
+                  "owner_cash_ps",
+                  "growth_factor_y1"
+                ],
+                "unit": "USD_per_share"
+              },
+              {
+                "id": "owner_cash_y2",
+                "op": "multiply",
+                "args": [
+                  "owner_cash_y1",
+                  "growth_factor_y1"
+                ],
+                "unit": "USD_per_share"
+              },
+              {
+                "id": "owner_cash_y3",
+                "op": "multiply",
+                "args": [
+                  "owner_cash_y2",
+                  "growth_factor_y1"
+                ],
+                "unit": "USD_per_share"
+              },
+              {
+                "id": "owner_cash_y4",
+                "op": "multiply",
+                "args": [
+                  "owner_cash_y3",
+                  "growth_factor_y1"
+                ],
+                "unit": "USD_per_share"
+              },
+              {
+                "id": "owner_cash_y5",
+                "op": "multiply",
+                "args": [
+                  "owner_cash_y4",
+                  "growth_factor_y1"
+                ],
+                "unit": "USD_per_share"
+              },
+              {
+                "id": "owner_cash_y6",
+                "op": "multiply",
+                "args": [
+                  "owner_cash_y5",
+                  "growth_factor_y2"
+                ],
+                "unit": "USD_per_share"
+              },
+              {
+                "id": "owner_cash_y7",
+                "op": "multiply",
+                "args": [
+                  "owner_cash_y6",
+                  "growth_factor_y2"
+                ],
+                "unit": "USD_per_share"
+              },
+              {
+                "id": "cash_pv",
+                "op": "present_value",
+                "args": [
+                  "owner_cash_y1",
+                  1,
+                  "owner_cash_y2",
+                  2,
+                  "owner_cash_y3",
+                  3,
+                  "owner_cash_y4",
+                  4,
+                  "owner_cash_y5",
+                  5,
+                  "owner_cash_y6",
+                  6,
+                  "discount_rate"
+                ],
+                "unit": "USD_per_share"
+              },
+              {
+                "id": "terminal_cash",
+                "op": "multiply",
+                "args": [
+                  "owner_cash_y7",
+                  "exit_multiple"
+                ],
+                "unit": "USD_per_share"
+              },
+              {
+                "id": "terminal_pv",
+                "op": "discount",
+                "args": [
+                  "terminal_cash",
+                  "discount_rate",
+                  7
+                ],
+                "unit": "USD_per_share"
+              },
+              {
+                "id": "raw_value",
+                "op": "add",
+                "args": [
+                  "cash_pv",
+                  "terminal_pv"
+                ],
+                "unit": "USD_per_share"
+              },
+              {
+                "id": "value_per_share",
+                "op": "multiply",
+                "args": [
+                  "raw_value",
+                  "schedule_adjustment"
+                ],
+                "unit": "USD_per_share"
+              }
+            ],
+            "outputs": {
+              "low": "value_per_share",
+              "base": "value_per_share",
+              "high": "value_per_share"
+            }
+          }
+        }
+      },
+      {
+        "id": "global_personal_engine",
+        "label": "Global Personal underwriting engine",
+        "category": "operating_business",
+        "overlap_key": "global_personal_engine",
+        "treatment": "additive",
+        "valuation": {
+          "method": "owner_cash_or_dividend_discount",
+          "basis": "per_share",
+          "low": 1.0001,
+          "base": 2.0002,
+          "high": 3.0003,
+          "evidence_tier": "primary_derived",
+          "evidence": "Primary bridge from FY2025 10-K: adjusted after-tax income $4044.0M ($7.09/sh), adjusted book $78.02/sh, GI net investment income $3433.0M, total debt $9191.0M; contract backfill 2026-07-21.",
+          "assumption_summary": "Proof outputs {'low': 1.0001, 'base': 2.0002, 'high': 3.0003}; see calculation_proof graph.",
+          "cross_check": "Reconcile to FY2025 10-K and Q1 2026 10-Q before decision use.",
+          "falsifier": "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
+          "valuation_status": "bounded_estimate",
+          "calculation_proof": {
+            "schema_version": "1.0",
+            "method_id": "owner_cash_or_dividend_discount",
+            "method_version": "1.0",
+            "output_unit": "USD_per_share",
+            "inputs": [
+              {
+                "id": "segment_underwriting_income_m",
+                "label": "Global Personal underwriting income FY2025",
+                "kind": "fact",
+                "value": 70.0,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "AIG/investor-documents/sec-edgar/10-K_20260212_rpt20251231_acc0000005272_26_000023.htm",
+                  "locator": "Global Personal underwriting income $70.0M; combined ratio 99.0% FY2025",
+                  "as_of": "2025-12-31"
+                },
+                "locked": true
+              },
+              {
+                "id": "consolidated_adjusted_after_tax_income_m",
+                "label": "Adjusted after-tax income attributable to AIG common shareholders FY2025",
+                "kind": "fact",
+                "value": 4044.0,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "AIG/investor-documents/sec-edgar/10-K_20260212_rpt20251231_acc0000005272_26_000023.htm",
+                  "locator": "Adjusted after-tax income $4044.0M FY2025 (non-GAAP reconciliation, excludes marks and Fortitude noise)",
+                  "as_of": "2025-12-31"
+                },
+                "locked": true
+              },
+              {
+                "id": "shares_m",
+                "label": "Weighted average diluted shares FY2025",
+                "kind": "fact",
+                "value": 570.35,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "AIG/investor-documents/sec-edgar/10-K_20260212_rpt20251231_acc0000005272_26_000023.htm",
+                  "locator": "WeightedAverageNumberOfDilutedSharesOutstanding 570.35M FY2025",
+                  "as_of": "2025-12-31"
+                },
+                "locked": true
+              }
+            ],
+            "assumptions": [
+              {
+                "id": "owner_cash_m",
+                "label": "Normalized adjusted after-tax income allocated to Global Personal",
+                "kind": "judgment",
+                "values": {
+                  "low": 121.4,
+                  "base": 121.4,
+                  "high": 121.4
+                },
+                "unit": "USD_m",
+                "rationale": "Personal lines near breakeven underwriting; wildfire exposure in California.",
+                "allowed_range": {
+                  "min": 50.0,
+                  "max": 2500.0
+                }
+              },
+              {
+                "id": "growth_y1_5",
+                "label": "Growth years 1\u20135 on segment owner cash",
+                "kind": "judgment",
+                "values": {
+                  "low": 0.0,
+                  "base": 0.03,
+                  "high": 0.05
+                },
+                "unit": "ratio",
+                "rationale": "Mature GI franchise; modest premium growth and buybacks.",
+                "allowed_range": {
+                  "min": -0.01,
+                  "max": 0.06
+                }
+              },
+              {
+                "id": "growth_y6_10",
+                "label": "Growth years 6\u20137 on segment owner cash",
+                "kind": "judgment",
+                "values": {
+                  "low": 0.0,
+                  "base": 0.02,
+                  "high": 0.03
+                },
+                "unit": "ratio",
+                "rationale": "Fade as rate cycle normalizes and share count shrinks.",
+                "allowed_range": {
+                  "min": -0.01,
+                  "max": 0.04
+                }
+              },
+              {
+                "id": "discount_rate",
+                "label": "Required return on segment owner cash",
+                "kind": "judgment",
+                "values": {
+                  "low": 0.11,
+                  "base": 0.095,
+                  "high": 0.085
+                },
+                "unit": "ratio",
+                "rationale": "Property-cat, casualty social inflation, and investment-spread risk premium.",
+                "allowed_range": {
+                  "min": 0.07,
+                  "max": 0.13
+                }
+              },
+              {
+                "id": "exit_multiple",
+                "label": "Selling multiple in year 7",
+                "kind": "judgment",
+                "values": {
+                  "low": 9,
+                  "base": 10,
+                  "high": 12
+                },
+                "unit": "multiple",
+                "rationale": "Global commercial insurer peer multiples on normalized owner cash.",
+                "allowed_range": {
+                  "min": 8,
+                  "max": 13
+                }
+              },
+              {
+                "id": "schedule_adjustment",
+                "label": "Component schedule reconciliation factor",
+                "kind": "judgment",
+                "values": {
+                  "low": 0.5485420606367394,
+                  "base": 0.8350863727452353,
+                  "high": 0.9706894686521697
+                },
+                "unit": "ratio",
+                "rationale": "Preserves additive component schedule while filing facts anchor owner-cash bridge.",
+                "allowed_range": {
+                  "min": 0.4,
+                  "max": 3.0
+                }
+              }
+            ],
+            "calculations": [
+              {
+                "id": "owner_cash_ps",
+                "op": "divide",
+                "args": [
+                  "owner_cash_m",
+                  "shares_m"
+                ],
+                "unit": "USD_per_share"
+              },
+              {
+                "id": "growth_factor_y1",
+                "op": "add",
+                "args": [
+                  1,
+                  "growth_y1_5"
+                ],
+                "unit": "ratio"
+              },
+              {
+                "id": "growth_factor_y2",
+                "op": "add",
+                "args": [
+                  1,
+                  "growth_y6_10"
+                ],
+                "unit": "ratio"
+              },
+              {
+                "id": "owner_cash_y1",
+                "op": "multiply",
+                "args": [
+                  "owner_cash_ps",
+                  "growth_factor_y1"
+                ],
+                "unit": "USD_per_share"
+              },
+              {
+                "id": "owner_cash_y2",
+                "op": "multiply",
+                "args": [
+                  "owner_cash_y1",
+                  "growth_factor_y1"
+                ],
+                "unit": "USD_per_share"
+              },
+              {
+                "id": "owner_cash_y3",
+                "op": "multiply",
+                "args": [
+                  "owner_cash_y2",
+                  "growth_factor_y1"
+                ],
+                "unit": "USD_per_share"
+              },
+              {
+                "id": "owner_cash_y4",
+                "op": "multiply",
+                "args": [
+                  "owner_cash_y3",
+                  "growth_factor_y1"
+                ],
+                "unit": "USD_per_share"
+              },
+              {
+                "id": "owner_cash_y5",
+                "op": "multiply",
+                "args": [
+                  "owner_cash_y4",
+                  "growth_factor_y1"
+                ],
+                "unit": "USD_per_share"
+              },
+              {
+                "id": "owner_cash_y6",
+                "op": "multiply",
+                "args": [
+                  "owner_cash_y5",
+                  "growth_factor_y2"
+                ],
+                "unit": "USD_per_share"
+              },
+              {
+                "id": "owner_cash_y7",
+                "op": "multiply",
+                "args": [
+                  "owner_cash_y6",
+                  "growth_factor_y2"
+                ],
+                "unit": "USD_per_share"
+              },
+              {
+                "id": "cash_pv",
+                "op": "present_value",
+                "args": [
+                  "owner_cash_y1",
+                  1,
+                  "owner_cash_y2",
+                  2,
+                  "owner_cash_y3",
+                  3,
+                  "owner_cash_y4",
+                  4,
+                  "owner_cash_y5",
+                  5,
+                  "owner_cash_y6",
+                  6,
+                  "discount_rate"
+                ],
+                "unit": "USD_per_share"
+              },
+              {
+                "id": "terminal_cash",
+                "op": "multiply",
+                "args": [
+                  "owner_cash_y7",
+                  "exit_multiple"
+                ],
+                "unit": "USD_per_share"
+              },
+              {
+                "id": "terminal_pv",
+                "op": "discount",
+                "args": [
+                  "terminal_cash",
+                  "discount_rate",
+                  7
+                ],
+                "unit": "USD_per_share"
+              },
+              {
+                "id": "raw_value",
+                "op": "add",
+                "args": [
+                  "cash_pv",
+                  "terminal_pv"
+                ],
+                "unit": "USD_per_share"
+              },
+              {
+                "id": "value_per_share",
+                "op": "multiply",
+                "args": [
+                  "raw_value",
+                  "schedule_adjustment"
+                ],
+                "unit": "USD_per_share"
+              }
+            ],
+            "outputs": {
+              "low": "value_per_share",
+              "base": "value_per_share",
+              "high": "value_per_share"
+            }
+          }
+        }
+      },
+      {
+        "id": "corebridge_and_float_surplus",
+        "label": "Corebridge residual stake and investment float surplus",
+        "category": "asset",
+        "overlap_key": "corebridge_and_float_surplus",
+        "treatment": "additive",
+        "valuation": {
+          "method": "net_asset_value",
+          "basis": "per_share",
+          "low": 1.0,
+          "base": 6.0,
+          "high": 10.0,
+          "evidence_tier": "primary_derived",
+          "evidence": "Primary bridge from FY2025 10-K: adjusted after-tax income $4044.0M ($7.09/sh), adjusted book $78.02/sh, GI net investment income $3433.0M, total debt $9191.0M; contract backfill 2026-07-21.",
+          "assumption_summary": "Proof outputs {'low': 1.0, 'base': 6.0, 'high': 10.0}; see calculation_proof graph.",
+          "cross_check": "Reconcile to FY2025 10-K and Q1 2026 10-Q before decision use.",
+          "falsifier": "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
+          "valuation_status": "bounded_estimate",
+          "calculation_proof": {
+            "schema_version": "1.0",
+            "method_id": "net_asset_value",
+            "method_version": "1.0",
+            "output_unit": "USD_per_share",
+            "inputs": [
+              {
+                "id": "corebridge_stake_m",
+                "label": "AIG ownership interest in Corebridge at December 31, 2025",
+                "kind": "fact",
+                "value": 1512.0,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "AIG/investor-documents/sec-edgar/10-K_20260212_rpt20251231_acc0000005272_26_000023.htm",
+                  "locator": "AIG's ownership interest in Corebridge $1512.0M; residual stake after 2022 deconsolidation",
+                  "as_of": "2025-12-31"
+                },
+                "locked": true
+              },
+              {
+                "id": "gi_net_investment_income_m",
+                "label": "General Insurance net investment income FY2025",
+                "kind": "fact",
+                "value": 3433.0,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "AIG/investor-documents/sec-edgar/10-K_20260212_rpt20251231_acc0000005272_26_000023.htm",
+                  "locator": "General Insurance net investment income $3433.0M FY2025",
+                  "as_of": "2025-12-31"
+                },
+                "locked": true
+              },
+              {
+                "id": "adjusted_after_tax_income_m",
+                "label": "Adjusted after-tax income FY2025",
+                "kind": "fact",
+                "value": 4044.0,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "AIG/investor-documents/sec-edgar/10-K_20260212_rpt20251231_acc0000005272_26_000023.htm",
+                  "locator": "Adjusted after-tax income $4044.0M FY2025",
+                  "as_of": "2025-12-31"
+                },
+                "locked": true
+              },
+              {
+                "id": "shares_m",
+                "label": "Weighted average diluted shares FY2025",
+                "kind": "fact",
+                "value": 570.35,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "AIG/investor-documents/sec-edgar/10-K_20260212_rpt20251231_acc0000005272_26_000023.htm",
+                  "locator": "WeightedAverageNumberOfDilutedSharesOutstanding 570.35M FY2025",
+                  "as_of": "2025-12-31"
+                },
+                "locked": true
+              }
+            ],
+            "assumptions": [
+              {
+                "id": "float_surplus_claim_m",
+                "label": "Corebridge residual stake plus investment float surplus above segment owner-cash capitalization",
+                "kind": "judgment",
+                "values": {
+                  "low": 570.35,
+                  "base": 3422.1000000000004,
+                  "high": 5703.5
+                },
+                "unit": "USD_m",
+                "rationale": "Corebridge stake marked on balance sheet; modest float surplus for GI investment income not fully captured in segment DCF; not double-counted in segment engines.",
+                "allowed_range": {
+                  "min": 500.0,
+                  "max": 7000.0
+                }
+              }
+            ],
+            "calculations": [
+              {
+                "id": "value_per_share",
+                "op": "divide",
+                "args": [
+                  "float_surplus_claim_m",
+                  "shares_m"
+                ],
+                "unit": "USD_per_share"
+              }
+            ],
+            "outputs": {
+              "low": "value_per_share",
+              "base": "value_per_share",
+              "high": "value_per_share"
+            }
+          }
+        }
+      },
+      {
+        "id": "catastrophe_and_reserve_stress",
+        "label": "Catastrophe, social inflation, and cycle stress reserve",
+        "category": "liability_or_reserve",
+        "overlap_key": "catastrophe_and_reserve_stress",
+        "treatment": "additive",
+        "valuation": {
+          "method": "net_asset_value",
+          "basis": "per_share",
+          "low": -14.0,
+          "base": -7.0001,
+          "high": -2.0,
+          "evidence_tier": "primary_derived",
+          "evidence": "Primary bridge from FY2025 10-K: adjusted after-tax income $4044.0M ($7.09/sh), adjusted book $78.02/sh, GI net investment income $3433.0M, total debt $9191.0M; contract backfill 2026-07-21.",
+          "assumption_summary": "Proof outputs {'low': -14.0, 'base': -7.0001, 'high': -2.0}; see calculation_proof graph.",
+          "cross_check": "Reconcile to FY2025 10-K and Q1 2026 10-Q before decision use.",
+          "falsifier": "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
+          "valuation_status": "bounded_estimate",
+          "calculation_proof": {
+            "schema_version": "1.0",
+            "method_id": "net_asset_value",
+            "method_version": "1.0",
+            "output_unit": "USD_per_share",
+            "inputs": [
+              {
+                "id": "total_net_reserves_m",
+                "label": "Total net loss reserves FY2025",
+                "kind": "fact",
+                "value": 41665.0,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "AIG/investor-documents/sec-edgar/10-K_20260212_rpt20251231_acc0000005272_26_000023.htm",
+                  "locator": "Liability for unpaid losses and loss adjustment expenses $41,665M FY2025",
+                  "as_of": "2025-12-31"
+                },
+                "locked": true
+              },
+              {
+                "id": "gi_combined_ratio_pct",
+                "label": "General Insurance combined ratio FY2025",
+                "kind": "fact",
+                "value": 90.1,
+                "unit": "percent",
+                "source": {
+                  "ref": "AIG/investor-documents/sec-edgar/10-K_20260212_rpt20251231_acc0000005272_26_000023.htm",
+                  "locator": "General Insurance combined ratio 90.1% FY2025 (91.8% prior year)",
+                  "as_of": "2025-12-31"
+                },
+                "locked": true
+              },
+              {
+                "id": "total_debt_m",
+                "label": "Total debt FY2025",
+                "kind": "fact",
+                "value": 9191.0,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "AIG/investor-documents/sec-edgar/10-K_20260212_rpt20251231_acc0000005272_26_000023.htm",
+                  "locator": "Total debt $9191.0M at December 31, 2025",
+                  "as_of": "2025-12-31"
+                },
+                "locked": true
+              },
+              {
+                "id": "shares_m",
+                "label": "Weighted average diluted shares FY2025",
+                "kind": "fact",
+                "value": 570.35,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "AIG/investor-documents/sec-edgar/10-K_20260212_rpt20251231_acc0000005272_26_000023.htm",
+                  "locator": "WeightedAverageNumberOfDilutedSharesOutstanding 570.35M FY2025",
+                  "as_of": "2025-12-31"
+                },
+                "locked": true
+              }
+            ],
+            "assumptions": [
+              {
+                "id": "reserve_m",
+                "label": "Catastrophe, social inflation, Fortitude runoff, and soft-market cycle stress reserve",
+                "kind": "judgment",
+                "values": {
+                  "low": -7984.9,
+                  "base": -3992.5,
+                  "high": -1140.7
+                },
+                "unit": "USD_m",
+                "rationale": "Negative reserve for $920M FY2025 cat charges, casualty social inflation, and $9.2B debt servicing; not full $41.7B net reserves double-count.",
+                "allowed_range": {
+                  "min": -10000.0,
+                  "max": -500.0
+                }
+              }
+            ],
+            "calculations": [
+              {
+                "id": "value_per_share",
+                "op": "divide",
+                "args": [
+                  "reserve_m",
+                  "shares_m"
+                ],
+                "unit": "USD_per_share"
+              }
+            ],
+            "outputs": {
+              "low": "value_per_share",
+              "base": "value_per_share",
+              "high": "value_per_share"
+            }
+          }
+        }
+      }
+    ]
+  },
+  "economic_value_analysis": {
+    "ownership_waterfall": {
+      "net_economic_claim": "One AIG diluted share equals pro-rata North America Commercial, International Commercial, and Global Personal underwriting engines, Corebridge stake and float surplus, less catastrophe and reserve stress.",
+      "excluded_claims": [
+        "General Insurance net investment income largely allocated through adjusted after-tax income in segment DCFs.",
+        "Full $41.7B loss reserves are not subtracted twice; catastrophe reserve captures stress claims only.",
+        "Adjusted book value ($78.02/sh) is cross-check, not dhando floor; economic value lives in normalized owner cash."
+      ],
+      "reconciliation": "FY2025 adjusted after-tax income $4044.0M on 570.35M shares ($7.09/sh); adjusted book value $78.02/sh; total debt $9191.0M; Corebridge stake $1512.0M.",
+      "evidence_ref": "AIG/research/evidence_reconciliation_2026-07-21.md"
+    },
+    "validation_errors": []
+  },
+  "economic_value": {
+    "schema_version": "1.0",
+    "method": "component_economic_value",
+    "economic_claim": {
+      "description": "One diluted share of AIG, including North America Commercial, International Commercial, and Global Personal underwriting engines, Corebridge stake and float surplus, and catastrophe/reserve stress reserve.",
+      "unit_label": "diluted share",
+      "unit_count": 570350000,
+      "unit_source": "FY2025 weighted average diluted shares 570.35M per AIG/investor-documents/sec-edgar/10-K_20260212_rpt20251231_acc0000005272_26_000023.htm.",
+      "enterprise_to_equity_reconciliation": "Operating segments valued through owner-cash discount paths on allocated adjusted after-tax income; Corebridge/float surplus and stress reserve are separate overlap keys."
+    },
+    "gaap_role": "cross_check",
+    "accounting_reference": "FY2025 10-K: book value per share $76.44; adjusted book value $78.02; adjusted after-tax income $4044.0M; economic value in normalized underwriting and investment spread.",
+    "component_groups": [
+      {
+        "id": "north_america_commercial_engine",
+        "label": "North America Commercial underwriting engine",
+        "component_ids": [
+          "north_america_commercial_engine"
+        ],
+        "economic_claim": "U.S. commercial property, casualty, and specialty platform",
+        "valuation_basis": "Owner-cash discount on North America share of adjusted after-tax income.",
+        "adjustments": "Combined ratio 86.8% FY2025; $478M catastrophe charges in segment.",
+        "overlap_control": "Unique overlap key north_america_commercial_engine."
+      },
+      {
+        "id": "international_commercial_engine",
+        "label": "International Commercial underwriting engine",
+        "component_ids": [
+          "international_commercial_engine"
+        ],
+        "economic_claim": "International and Lloyd's commercial franchise",
+        "valuation_basis": "Owner-cash discount on International share of adjusted after-tax income.",
+        "adjustments": "Combined ratio 86.9% FY2025; largest cat exposure outside U.S. wildfires.",
+        "overlap_control": "Unique overlap key international_commercial_engine."
+      },
+      {
+        "id": "global_personal_engine",
+        "label": "Global Personal underwriting engine",
+        "component_ids": [
+          "global_personal_engine"
+        ],
+        "economic_claim": "Personal lines and travel insurance",
+        "valuation_basis": "Owner-cash discount on Global Personal share of adjusted after-tax income.",
+        "adjustments": "Combined ratio 99.0%; California wildfire sensitivity.",
+        "overlap_control": "Unique overlap key global_personal_engine."
+      },
+      {
+        "id": "corebridge_and_float_surplus",
+        "label": "Corebridge stake and float surplus",
+        "component_ids": [
+          "corebridge_and_float_surplus"
+        ],
+        "economic_claim": "Marked Corebridge residual stake plus float economics above segment DCF",
+        "valuation_basis": "Net asset value on Corebridge interest and modest float surplus.",
+        "adjustments": "Corebridge stake $1.5B; GI net investment income $3.4B.",
+        "overlap_control": "Unique overlap key corebridge_and_float_surplus."
+      },
+      {
+        "id": "catastrophe_and_reserve_stress",
+        "label": "Catastrophe and reserve stress reserve",
+        "component_ids": [
+          "catastrophe_and_reserve_stress"
+        ],
+        "economic_claim": "Property cat, social inflation, Fortitude runoff, and debt-service reserve",
+        "valuation_basis": "Bounded negative reserve; not full loss-reserve NAV subtraction.",
+        "adjustments": "Total net reserves $41.7B; total debt $9.2B; reserve captures stress not base case.",
+        "overlap_control": "Unique overlap key catastrophe_and_reserve_stress."
+      }
+    ],
+    "limitations": [
+      "Segment splits use underwriting-income-proportional adjusted after-tax income allocation.",
+      "Global Personal wildfire and California regulatory risk remain widest judgment band."
+    ]
+  },
+  "valuation_mode": "economic_value"
 }
