@@ -516,15 +516,6 @@
               "high": "value_per_share"
             }
           }
-        },
-        "driver_model": {
-          "timing_basis": "Enterprise reinvention programs convert over 3\u20135 years.",
-          "scenarios": {
-            "base": {
-              "success_probability": 0.45,
-              "remaining_cost_m": 1000.0
-            }
-          }
         }
       },
       {
@@ -751,7 +742,7 @@
   },
   "economic_value_analysis": {
     "schema_version": "1.0",
-    "status": "complete",
+    "status": "evidence_blocked",
     "trigger": {
       "required": true,
       "reasons": [
@@ -759,16 +750,10 @@
       ],
       "policy": "A complete economic-value analysis is required when any trigger fires; otherwise it is recommended."
     },
-    "method": "component_economic_value",
-    "economic_claim": {
-      "description": "One diluted share of ACN, including consulting and managed-services owner cash, Gen AI reinvention upside, net financial claims, and IT-cycle/AI disruption reserve.",
-      "unit_label": "diluted share",
-      "unit_count": 632000000,
-      "unit_source": "FY2025 net income $7678.4M / diluted EPS $12.15 (ACN/investor-documents/sec-edgar/10-K_20251010_rpt20250831_acc0001467373_25_000217.htm).",
-      "enterprise_to_equity_reconciliation": "Consolidated services engine valued through owner-cash discount on FY2025 FCF per share; Gen AI option, net liquidity, and disruption reserve are separate overlap keys."
-    },
-    "gaap_role": "cross_check",
-    "accounting_reference": "FY2025 10-K: stockholders' equity ~$31.2B; economic value in normalized owner cash ($17.1994/sh), not GAAP book alone.",
+    "method": "economic_claim_to_risked_present_value",
+    "economic_claim": {},
+    "gaap_role": null,
+    "accounting_reference": null,
     "comparable_hierarchy": [
       "issuer_arm_length_transaction",
       "same_asset_transaction",
@@ -789,9 +774,9 @@
         "component_ids": [
           "services_owner_cash_engine"
         ],
-        "economic_claim": "Global consulting and managed-services normalized free cash flow",
-        "valuation_basis": "Owner-cash discount on FY2025 FCF per diluted share.",
-        "adjustments": "Business optimization charges already in OCF; managed-services mix shift supports base growth.",
+        "economic_claim": "Consulting and managed-services owner-cash engine",
+        "valuation_basis": "Proof outputs {'low': 231.84, 'base': 294.8, 'high': 366.26}; see calculation_proof graph.",
+        "adjustments": "Reconcile to FY2025 10-K and Q2 FY2026 10-Q before decision use.",
         "overlap_control": "Unique overlap key services_owner_cash_engine.",
         "risked_present_value_per_share": {
           "low": 231.84,
@@ -805,15 +790,10 @@
         "component_ids": [
           "gen_ai_reinvention_option"
         ],
-        "economic_claim": "Incremental enterprise Gen AI reinvention monetization beyond normalized FCF",
-        "valuation_basis": "Risk-adjusted milestone value on reinvention bookings upside.",
-        "adjustments": "Not in Lawrence base FCF path; Q2 FY2026 bookings stabilization supports base band.",
+        "economic_claim": "Generative AI reinvention and managed-services upside option",
+        "valuation_basis": "Proof outputs {'low': 0.0, 'base': 12.0, 'high': 35.0}; see calculation_proof graph.",
+        "adjustments": "Reconcile to FY2025 10-K and Q2 FY2026 10-Q before decision use.",
         "overlap_control": "Unique overlap key gen_ai_reinvention_option.",
-        "risk_and_timing": {
-          "probability_basis": "Base ~45% that Gen AI reinvention sustains mid-single-digit bookings growth; low case zero.",
-          "timing_basis": "Enterprise reinvention programs convert over 3\u20135 years per FY2025 10-K disclosures.",
-          "remaining_capital_basis": "$3B Gen AI investment since 2023; ~$1B remaining run-rate in proof judgment band."
-        },
         "risked_present_value_per_share": {
           "low": 0.0,
           "base": 12.0,
@@ -826,9 +806,9 @@
         "component_ids": [
           "net_financial_claims"
         ],
-        "economic_claim": "Net corporate liquidity after long-term debt and operating minimum",
-        "valuation_basis": "Net asset value on filing-locked cash less debt.",
-        "adjustments": "Operating cash minimum judgment; no double-count with core engine.",
+        "economic_claim": "Net cash and debt claims on common equity",
+        "valuation_basis": "Proof outputs {'low': -3.0, 'base': 10.197, 'high': 14.0}; see calculation_proof graph.",
+        "adjustments": "Reconcile to FY2025 10-K and Q2 FY2026 10-Q before decision use.",
         "overlap_control": "Unique overlap key net_financial_claims.",
         "risked_present_value_per_share": {
           "low": -3.0,
@@ -842,9 +822,9 @@
         "component_ids": [
           "it_cycle_and_ai_disruption_reserve"
         ],
-        "economic_claim": "Consulting commoditization and margin compression stress",
-        "valuation_basis": "Bounded negative reserve; not full enterprise value haircut.",
-        "adjustments": "Partial dhando: AI could compress FCF faster than low-growth scenario.",
+        "economic_claim": "IT spending cycle and AI labor-substitution stress reserve",
+        "valuation_basis": "Proof outputs {'low': -35.0, 'base': -15.0, 'high': -5.0}; see calculation_proof graph.",
+        "adjustments": "Reconcile to FY2025 10-K and Q2 FY2026 10-Q before decision use.",
         "overlap_control": "Unique overlap key it_cycle_and_ai_disruption_reserve.",
         "risked_present_value_per_share": {
           "low": -35.0,
@@ -856,7 +836,7 @@
     "valuation_proof": [
       {
         "component_id": "services_owner_cash_engine",
-        "economic_claim": "Global consulting and managed-services normalized free cash flow",
+        "economic_claim": "Consulting and managed-services owner-cash engine",
         "quantity": {
           "value": 1,
           "unit": "per-share economic claim"
@@ -866,7 +846,7 @@
         "evidence": "Primary bridge from ACN/investor-documents/sec-edgar/10-K_20251010_rpt20250831_acc0001467373_25_000217.htm: FY2025 revenue $69673.0M, OCF $11470.0M, FCF $10870.0M, cash $11478.7M, debt $5034.2M; contract backfill 2026-07-21.",
         "comparable_role": "not_applicable",
         "comparable_ids": [],
-        "adjustment": "Business optimization charges already in OCF; managed-services mix shift supports base growth.",
+        "adjustment": "Reconcile to FY2025 10-K and Q2 FY2026 10-Q before decision use.",
         "range_per_share": {
           "low": 231.84,
           "base": 294.8,
@@ -880,7 +860,7 @@
       },
       {
         "component_id": "gen_ai_reinvention_option",
-        "economic_claim": "Incremental enterprise Gen AI reinvention monetization beyond normalized FCF",
+        "economic_claim": "Generative AI reinvention and managed-services upside option",
         "quantity": {
           "value": 1,
           "unit": "per-share economic claim"
@@ -890,7 +870,7 @@
         "evidence": "Primary bridge from ACN/investor-documents/sec-edgar/10-K_20251010_rpt20250831_acc0001467373_25_000217.htm: FY2025 revenue $69673.0M, OCF $11470.0M, FCF $10870.0M, cash $11478.7M, debt $5034.2M; contract backfill 2026-07-21.",
         "comparable_role": "not_applicable",
         "comparable_ids": [],
-        "adjustment": "Not in Lawrence base FCF path; Q2 FY2026 bookings stabilization supports base band.",
+        "adjustment": "Reconcile to FY2025 10-K and Q2 FY2026 10-Q before decision use.",
         "range_per_share": {
           "low": 0.0,
           "base": 12.0,
@@ -903,14 +883,14 @@
         "risk_and_timing": {
           "success_probability": null,
           "remaining_capital_m": null,
-          "timing_basis": "Enterprise reinvention programs convert over 3\u20135 years per FY2025 10-K disclosures.",
-          "probability_basis": "Base ~45% that Gen AI reinvention sustains mid-single-digit bookings growth; low case zero.",
-          "remaining_capital_basis": "$3B Gen AI investment since 2023; ~$1B remaining run-rate in proof judgment band."
+          "timing_basis": null,
+          "probability_basis": null,
+          "remaining_capital_basis": null
         }
       },
       {
         "component_id": "net_financial_claims",
-        "economic_claim": "Net corporate liquidity after long-term debt and operating minimum",
+        "economic_claim": "Net cash and debt claims on common equity",
         "quantity": {
           "value": 1,
           "unit": "per-share economic claim"
@@ -920,7 +900,7 @@
         "evidence": "Primary bridge from ACN/investor-documents/sec-edgar/10-K_20251010_rpt20250831_acc0001467373_25_000217.htm: FY2025 revenue $69673.0M, OCF $11470.0M, FCF $10870.0M, cash $11478.7M, debt $5034.2M; contract backfill 2026-07-21.",
         "comparable_role": "not_applicable",
         "comparable_ids": [],
-        "adjustment": "Operating cash minimum judgment; no double-count with core engine.",
+        "adjustment": "Reconcile to FY2025 10-K and Q2 FY2026 10-Q before decision use.",
         "range_per_share": {
           "low": -3.0,
           "base": 10.2,
@@ -934,7 +914,7 @@
       },
       {
         "component_id": "it_cycle_and_ai_disruption_reserve",
-        "economic_claim": "Consulting commoditization and margin compression stress",
+        "economic_claim": "IT spending cycle and AI labor-substitution stress reserve",
         "quantity": {
           "value": 1,
           "unit": "per-share economic claim"
@@ -944,7 +924,7 @@
         "evidence": "Primary bridge from ACN/investor-documents/sec-edgar/10-K_20251010_rpt20250831_acc0001467373_25_000217.htm: FY2025 revenue $69673.0M, OCF $11470.0M, FCF $10870.0M, cash $11478.7M, debt $5034.2M; contract backfill 2026-07-21.",
         "comparable_role": "not_applicable",
         "comparable_ids": [],
-        "adjustment": "Partial dhando: AI could compress FCF faster than low-growth scenario.",
+        "adjustment": "Reconcile to FY2025 10-K and Q2 FY2026 10-Q before decision use.",
         "range_per_share": {
           "low": -35.0,
           "base": -15.0,
@@ -958,81 +938,19 @@
       }
     ],
     "wisdom_applied": [],
-    "limitations": [
-      "Segment-level FCF not separately disclosed; consolidated engine with option overlay.",
-      "Gen AI reinvention probability and remaining investment are judgment bands."
-    ],
+    "limitations": [],
     "complete_component_coverage": true,
-    "validation_errors": [],
-    "registry_version": "1.0"
-  },
-  "economic_value": {
-    "schema_version": "1.0",
-    "method": "component_economic_value",
-    "economic_claim": {
-      "description": "One diluted share of ACN, including consulting and managed-services owner cash, Gen AI reinvention upside, net financial claims, and IT-cycle/AI disruption reserve.",
-      "unit_label": "diluted share",
-      "unit_count": 632000000,
-      "unit_source": "FY2025 net income $7678.4M / diluted EPS $12.15 (ACN/investor-documents/sec-edgar/10-K_20251010_rpt20250831_acc0001467373_25_000217.htm).",
-      "enterprise_to_equity_reconciliation": "Consolidated services engine valued through owner-cash discount on FY2025 FCF per share; Gen AI option, net liquidity, and disruption reserve are separate overlap keys."
-    },
-    "gaap_role": "cross_check",
-    "accounting_reference": "FY2025 10-K: stockholders' equity ~$31.2B; economic value in normalized owner cash ($17.1994/sh), not GAAP book alone.",
-    "component_groups": [
-      {
-        "id": "services_owner_cash_engine",
-        "label": "Consulting and managed-services owner-cash engine",
-        "component_ids": [
-          "services_owner_cash_engine"
-        ],
-        "economic_claim": "Global consulting and managed-services normalized free cash flow",
-        "valuation_basis": "Owner-cash discount on FY2025 FCF per diluted share.",
-        "adjustments": "Business optimization charges already in OCF; managed-services mix shift supports base growth.",
-        "overlap_control": "Unique overlap key services_owner_cash_engine."
-      },
-      {
-        "id": "gen_ai_reinvention_option",
-        "label": "Generative AI reinvention and managed-services upside option",
-        "component_ids": [
-          "gen_ai_reinvention_option"
-        ],
-        "economic_claim": "Incremental enterprise Gen AI reinvention monetization beyond normalized FCF",
-        "valuation_basis": "Risk-adjusted milestone value on reinvention bookings upside.",
-        "adjustments": "Not in Lawrence base FCF path; Q2 FY2026 bookings stabilization supports base band.",
-        "overlap_control": "Unique overlap key gen_ai_reinvention_option.",
-        "risk_and_timing": {
-          "probability_basis": "Base ~45% that Gen AI reinvention sustains mid-single-digit bookings growth; low case zero.",
-          "timing_basis": "Enterprise reinvention programs convert over 3\u20135 years per FY2025 10-K disclosures.",
-          "remaining_capital_basis": "$3B Gen AI investment since 2023; ~$1B remaining run-rate in proof judgment band."
-        }
-      },
-      {
-        "id": "net_financial_claims",
-        "label": "Net cash and debt claims on common equity",
-        "component_ids": [
-          "net_financial_claims"
-        ],
-        "economic_claim": "Net corporate liquidity after long-term debt and operating minimum",
-        "valuation_basis": "Net asset value on filing-locked cash less debt.",
-        "adjustments": "Operating cash minimum judgment; no double-count with core engine.",
-        "overlap_control": "Unique overlap key net_financial_claims."
-      },
-      {
-        "id": "it_cycle_and_ai_disruption_reserve",
-        "label": "IT spending cycle and AI labor-substitution stress reserve",
-        "component_ids": [
-          "it_cycle_and_ai_disruption_reserve"
-        ],
-        "economic_claim": "Consulting commoditization and margin compression stress",
-        "valuation_basis": "Bounded negative reserve; not full enterprise value haircut.",
-        "adjustments": "Partial dhando: AI could compress FCF faster than low-growth scenario.",
-        "overlap_control": "Unique overlap key it_cycle_and_ai_disruption_reserve."
-      }
+    "validation_errors": [
+      "economic_claim.description required",
+      "economic_claim.enterprise_to_equity_reconciliation required",
+      "economic_claim.unit_count required",
+      "economic_claim.unit_label required",
+      "economic_claim.unit_source required",
+      "economic_value.schema_version 1.0 required",
+      "gaap_role required",
+      "option component gen_ai_reinvention_option requires probability, timing, and remaining-capital treatment"
     ],
-    "limitations": [
-      "Segment-level FCF not separately disclosed; consolidated engine with option overlay.",
-      "Gen AI reinvention probability and remaining investment are judgment bands."
-    ]
+    "registry_version": "1.0"
   },
   "human_review": {
     "live_price_confirmed": false
@@ -2010,7 +1928,7 @@
   },
   "universal_valuation_contract": {
     "schema_version": "2.0",
-    "status": "decision_grade",
+    "status": "evidence_blocked",
     "ticker": "ACN",
     "as_of": "2026-07-21",
     "economic_ownership_map": [
@@ -2020,7 +1938,7 @@
         "category": "operating_business",
         "treatment": "additive",
         "included_in_component_id": null,
-        "ownership_claim": "Global consulting and managed-services normalized free cash flow",
+        "ownership_claim": "Consulting and managed-services owner-cash engine",
         "ownership_percentage": 1.0,
         "quantity": {
           "value": 1,
@@ -3031,7 +2949,7 @@
         "evidence": "Primary bridge from ACN/investor-documents/sec-edgar/10-K_20251010_rpt20250831_acc0001467373_25_000217.htm: FY2025 revenue $69673.0M, OCF $11470.0M, FCF $10870.0M, cash $11478.7M, debt $5034.2M; contract backfill 2026-07-21.",
         "scenario_assumptions": "Proof outputs {'low': 231.84, 'base': 294.8, 'high': 366.26}; see calculation_proof graph.",
         "probability_and_timing": null,
-        "tax_and_realization_adjustments": "Business optimization charges already in OCF; managed-services mix shift supports base growth.",
+        "tax_and_realization_adjustments": "Reconcile to FY2025 10-K and Q2 FY2026 10-Q before decision use.",
         "falsifier": "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
         "overlap_key": "services_owner_cash_engine",
         "assumption_type": "judgment"
@@ -3042,7 +2960,7 @@
         "category": "real_option",
         "treatment": "additive",
         "included_in_component_id": null,
-        "ownership_claim": "Incremental enterprise Gen AI reinvention monetization beyond normalized FCF",
+        "ownership_claim": "Generative AI reinvention and managed-services upside option",
         "ownership_percentage": 1.0,
         "quantity": {
           "value": 1,
@@ -3338,11 +3256,11 @@
         "probability_and_timing": {
           "success_probability": null,
           "remaining_capital_m": null,
-          "timing_basis": "Enterprise reinvention programs convert over 3\u20135 years per FY2025 10-K disclosures.",
-          "probability_basis": "Base ~45% that Gen AI reinvention sustains mid-single-digit bookings growth; low case zero.",
-          "remaining_capital_basis": "$3B Gen AI investment since 2023; ~$1B remaining run-rate in proof judgment band."
+          "timing_basis": null,
+          "probability_basis": null,
+          "remaining_capital_basis": null
         },
-        "tax_and_realization_adjustments": "Not in Lawrence base FCF path; Q2 FY2026 bookings stabilization supports base band.",
+        "tax_and_realization_adjustments": "Reconcile to FY2025 10-K and Q2 FY2026 10-Q before decision use.",
         "falsifier": "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
         "overlap_key": "gen_ai_reinvention_option",
         "assumption_type": "judgment"
@@ -3353,7 +3271,7 @@
         "category": "liability_or_reserve",
         "treatment": "additive",
         "included_in_component_id": null,
-        "ownership_claim": "Net corporate liquidity after long-term debt and operating minimum",
+        "ownership_claim": "Net cash and debt claims on common equity",
         "ownership_percentage": 1.0,
         "quantity": {
           "value": 1,
@@ -3676,7 +3594,7 @@
         "evidence": "Primary bridge from ACN/investor-documents/sec-edgar/10-K_20251010_rpt20250831_acc0001467373_25_000217.htm: FY2025 revenue $69673.0M, OCF $11470.0M, FCF $10870.0M, cash $11478.7M, debt $5034.2M; contract backfill 2026-07-21.",
         "scenario_assumptions": "Proof outputs {'low': -3.0, 'base': 10.197, 'high': 14.0}; see calculation_proof graph.",
         "probability_and_timing": null,
-        "tax_and_realization_adjustments": "Operating cash minimum judgment; no double-count with core engine.",
+        "tax_and_realization_adjustments": "Reconcile to FY2025 10-K and Q2 FY2026 10-Q before decision use.",
         "falsifier": "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
         "overlap_key": "net_financial_claims",
         "assumption_type": "judgment"
@@ -3687,7 +3605,7 @@
         "category": "liability_or_reserve",
         "treatment": "additive",
         "included_in_component_id": null,
-        "ownership_claim": "Consulting commoditization and margin compression stress",
+        "ownership_claim": "IT spending cycle and AI labor-substitution stress reserve",
         "ownership_percentage": 1.0,
         "quantity": {
           "value": 1,
@@ -3983,7 +3901,7 @@
         "evidence": "Primary bridge from ACN/investor-documents/sec-edgar/10-K_20251010_rpt20250831_acc0001467373_25_000217.htm: FY2025 revenue $69673.0M, OCF $11470.0M, FCF $10870.0M, cash $11478.7M, debt $5034.2M; contract backfill 2026-07-21.",
         "scenario_assumptions": "Proof outputs {'low': -35.0, 'base': -15.0, 'high': -5.0}; see calculation_proof graph.",
         "probability_and_timing": null,
-        "tax_and_realization_adjustments": "Partial dhando: AI could compress FCF faster than low-growth scenario.",
+        "tax_and_realization_adjustments": "Reconcile to FY2025 10-K and Q2 FY2026 10-Q before decision use.",
         "falsifier": "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
         "overlap_key": "it_cycle_and_ai_disruption_reserve",
         "assumption_type": "judgment"
@@ -4358,9 +4276,27 @@
       "low_base_high_ordered": true
     },
     "evidence": {
-      "unresolved_count": 0,
-      "blockers": [],
-      "validation_errors": []
+      "unresolved_count": 8,
+      "blockers": [
+        "economic_claim.description required",
+        "economic_claim.enterprise_to_equity_reconciliation required",
+        "economic_claim.unit_count required",
+        "economic_claim.unit_label required",
+        "economic_claim.unit_source required",
+        "economic_value.schema_version 1.0 required",
+        "gaap_role required",
+        "option component gen_ai_reinvention_option requires probability, timing, and remaining-capital treatment"
+      ],
+      "validation_errors": [
+        "economic_claim.description required",
+        "economic_claim.enterprise_to_equity_reconciliation required",
+        "economic_claim.unit_count required",
+        "economic_claim.unit_label required",
+        "economic_claim.unit_source required",
+        "economic_value.schema_version 1.0 required",
+        "gaap_role required",
+        "option component gen_ai_reinvention_option requires probability, timing, and remaining-capital treatment"
+      ]
     },
     "monitoring": {
       "falsifiers": [
@@ -4377,7 +4313,7 @@
       ]
     },
     "change_control": {
-      "model_hash": "1aaa0a53bf200f2d9b1a5f5d3c168506a3fdaf322e1e4f2a27d07b9260c8b13c",
+      "model_hash": "b42de671bf6f122b440c08277b79fa473efe0aa15acf5e3f2f616649407cbc43",
       "method_versions": [
         "net_asset_value@1.0",
         "owner_cash_or_dividend_discount@1.0",
@@ -4469,268 +4405,5 @@
       }
     },
     "notes": "Capstone IRR combining filings, segments, overlays, third-party, qualitative"
-  },
-  "context_overlay": {
-    "as_of": "2026-07-21",
-    "disclaimer": "Context only. Tailwinds inform stance and overlay sizing; they do not auto-inflate Lawrence base IRR. Promotion to base case requires [HUMAN REVIEW].",
-    "themes": [
-      {
-        "theme_id": "macro_regime",
-        "label": "Macro risk regime",
-        "indicators": [
-          {
-            "id": "hy_oas",
-            "label": "High-yield OAS credit spread (%)",
-            "latest": 1.43,
-            "as_of": "2026-07-20",
-            "yoy_pct": 248.8,
-            "direction": "up",
-            "good_for": "risk_regime",
-            "source": "spread:HYG-LQD:21d (HYG-LQD 1m spread proxy, not OAS)",
-            "stale": false,
-            "in_base_irr": false
-          },
-          {
-            "id": "ust_10y",
-            "label": "US Treasury 10Y yield (%)",
-            "latest": 4.605999946594238,
-            "as_of": "2026-07-21",
-            "yoy_pct": 5.4,
-            "direction": "up",
-            "good_for": "rates_regime",
-            "source": "yahoo:^TNX",
-            "stale": false,
-            "in_base_irr": false
-          },
-          {
-            "id": "ust_2y",
-            "label": "US Treasury 2Y yield (%)",
-            "latest": 4.331999778747559,
-            "as_of": "2026-07-21",
-            "yoy_pct": 10.8,
-            "direction": "up",
-            "good_for": "rates_regime",
-            "source": "yahoo:^FVX",
-            "stale": false,
-            "in_base_irr": false
-          },
-          {
-            "id": "dxy_broad",
-            "label": "Trade-weighted USD index (broad)",
-            "latest": 101.01399993896484,
-            "as_of": "2026-07-21",
-            "yoy_pct": 3.2,
-            "direction": "up",
-            "good_for": "dollar_regime",
-            "source": "yahoo:DX-Y.NYB",
-            "stale": false,
-            "in_base_irr": false
-          },
-          {
-            "id": "vix_level",
-            "label": "VIX index level",
-            "latest": 17.93000030517578,
-            "as_of": "2026-07-21",
-            "yoy_pct": 7.7,
-            "direction": "up",
-            "good_for": "vol_regime",
-            "source": "yahoo:^VIX",
-            "stale": false,
-            "in_base_irr": false
-          },
-          {
-            "id": "credit_impulse_1m",
-            "label": "HYG vs TLT 1-month return spread (%)",
-            "latest": 2.76,
-            "as_of": "2026-07-20",
-            "yoy_pct": 55.9,
-            "direction": "up",
-            "good_for": "credit_impulse",
-            "source": "spread:HYG-TLT:21d",
-            "stale": false,
-            "in_base_irr": false
-          },
-          {
-            "id": "spy_20d_realized_vol",
-            "label": "SPY 20-day realized vol (annualized %)",
-            "latest": 11.37,
-            "as_of": "2026-07-20",
-            "yoy_pct": 31.3,
-            "direction": "up",
-            "good_for": "equity_vol",
-            "source": "realized_vol:SPY:20d",
-            "stale": false,
-            "in_base_irr": false
-          }
-        ]
-      }
-    ]
-  },
-  "insider_signal": {
-    "as_of": "2026-07-21",
-    "disclaimer": "Context only. Insider activity informs scenario confidence and stance discussion; it does not auto-inflate Lawrence base IRR. Promotion requires [HUMAN REVIEW].",
-    "in_base_irr": false,
-    "window_days": 365,
-    "ics": 10.0,
-    "band": "exceptional",
-    "bull_case_support": "moderate",
-    "scenario_confidence": {
-      "priors": {
-        "bear": 0.2,
-        "base": 0.55,
-        "bull": 0.25
-      },
-      "tilted": {
-        "bear": 0.2,
-        "base": 0.4,
-        "bull": 0.4
-      },
-      "bull_delta": 0.15,
-      "bear_delta": 0.0,
-      "note": "Scenario weights are qualitative confidence only; Lawrence base IRR unchanged."
-    },
-    "factors": {
-      "buy_score": 58.483,
-      "sell_score": -1.0,
-      "cluster_bonus": 0.0,
-      "net_buy_usd": 1195970.56,
-      "net_sell_usd": 4327275.59,
-      "price_today": 144.73
-    },
-    "top_buys": [
-      {
-        "insider": "Sweet Julie Spellman",
-        "date": "2026-07-05",
-        "shares": 285,
-        "price": 135.92,
-        "value_usd": 38737.2,
-        "shares_owned_after": 16520,
-        "contrib": 2.142
-      },
-      {
-        "insider": "Sweet Julie Spellman",
-        "date": "2026-06-05",
-        "shares": 216,
-        "price": 179.755,
-        "value_usd": 38827.08,
-        "shares_owned_after": 16235,
-        "contrib": 2.018
-      },
-      {
-        "insider": "Clifford Katherine Lee",
-        "date": "2026-05-01",
-        "shares": 41,
-        "price": 153.3868,
-        "value_usd": 6288.86,
-        "shares_owned_after": 68,
-        "contrib": 1.84
-      },
-      {
-        "insider": "Sharma Manish",
-        "date": "2026-07-05",
-        "shares": 135,
-        "price": 135.92,
-        "value_usd": 18349.2,
-        "shares_owned_after": 5680,
-        "contrib": 1.566
-      },
-      {
-        "insider": "Sweet Julie Spellman",
-        "date": "2026-05-05",
-        "shares": 219,
-        "price": 176.995,
-        "value_usd": 38761.9,
-        "shares_owned_after": 15970,
-        "contrib": 1.564
-      }
-    ],
-    "top_sells": [
-      {
-        "insider": "Sweet Julie Spellman",
-        "date": "2026-02-13",
-        "shares": 80,
-        "price": 224.1125,
-        "value_usd": 17929.0,
-        "is_10b5_1": false,
-        "contrib": -0.129
-      },
-      {
-        "insider": "Macchi Mauro",
-        "date": "2026-02-13",
-        "shares": 15,
-        "price": 224.1125,
-        "value_usd": 3361.69,
-        "is_10b5_1": false,
-        "contrib": -0.124
-      },
-      {
-        "insider": "Uotani Masahiko",
-        "date": "2026-02-13",
-        "shares": 3,
-        "price": 224.1125,
-        "value_usd": 672.34,
-        "is_10b5_1": false,
-        "contrib": -0.113
-      },
-      {
-        "insider": "Travis Tracey Thomas",
-        "date": "2026-02-13",
-        "shares": 3,
-        "price": 224.1125,
-        "value_usd": 672.34,
-        "is_10b5_1": false,
-        "contrib": -0.113
-      },
-      {
-        "insider": "Sarin Arun",
-        "date": "2026-02-13",
-        "shares": 2,
-        "price": 224.1125,
-        "value_usd": 448.23,
-        "is_10b5_1": false,
-        "contrib": -0.113
-      }
-    ],
-    "narrative_hooks": [],
-    "transaction_count": 134
-  },
-  "lens_consensus": {
-    "as_of": "2026-07-21",
-    "shared_inputs_ref": "valuation.json@2026-07-21",
-    "valuation_richness": 0.0,
-    "blended_return_pct": 23.65,
-    "band_pct": [
-      16.88,
-      26.7
-    ],
-    "weighted_median_pct": 24.7,
-    "median_mean_flag": false,
-    "stance": "accumulate",
-    "agreement_pct": 79,
-    "dissent_count": 2,
-    "lawrence_divergence": false,
-    "top_dissents": [
-      {
-        "persona": "pabrai",
-        "label": "Mohnish Pabrai",
-        "verdict": "hold",
-        "return_pct": 19.8,
-        "key_metric": "downside_upside_ratio=0.678",
-        "conviction": 0.24,
-        "falsifier": "dhando -> none OR net-debt/EBITDA > 3 OR bear return < -15%"
-      },
-      {
-        "persona": "greenblatt",
-        "label": "Joel Greenblatt",
-        "verdict": "hold",
-        "return_pct": 16.88,
-        "key_metric": "earnings_yield=11.88",
-        "conviction": 0.094,
-        "falsifier": "FCF yield below universe median OR base IRR below median"
-      }
-    ],
-    "contributor_count": 11,
-    "in_base_irr": false,
-    "disclaimer": "Advisory lens blend only. Does not replace Lawrence total-synthesis stance gate without [HUMAN REVIEW]."
   }
 }
