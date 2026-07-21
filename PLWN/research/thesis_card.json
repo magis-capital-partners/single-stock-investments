@@ -1,28 +1,46 @@
 {
-  "ticker": "PLWN",
-  "as_of": "2026-07-21",
-  "thesis_one_liner": "Long Island cemetery franchise with ~$162M FY2024 net assets trades OTC with unverified share count; proof-first component schedule base ~$54/sh vs ~$575 quote pending governance verification.",
   "base_irr_pct": null,
-  "base_irr_label": "pending (share count blocked)",
-  "component_economic_value_base_per_share": 53.8,
-  "price_per_share": 575.0,
-  "stance": "watch",
+  "classification": {
+    "archetype": "optionality",
+    "cycle": "mid",
+    "dhando": "partial",
+    "lawrence_bucket": "other",
+    "moat": "narrow",
+    "payoff_lens": "asset",
+    "predictive_attribute": "market_structure_discount",
+    "stance": "watch"
+  },
+  "evidence_citations": [
+    "PLWN/research/deep_dive_2026-07-17.md",
+    "PLWN/research/cross_check_third_party_2026-07-21.md",
+    "PLWN/research/adversarial_2026-07-21.md",
+    "PLWN/research/evidence_reconciliation_2026-07-21.md"
+  ],
+  "filing_digest": "PLWN/research/evidence/filing_digest_2026-07-21.md",
+  "generated_at": "2026-07-21T04:02:28+00:00",
+  "irr_label": "pending",
   "key_assumptions": [
-    "FY2024 Form 990 net assets $161.9M and net income $5.3M (ProPublica extract)",
-    "Provisional 3.46M shares from OTC aggregators — conflicts with $45.40 indicated dividend versus $5.3M NI",
-    "Land fair-value gap modeled as risk-adjusted option until Schedule D PDF is local",
-    "OTC illiquidity and 501(c)(13) governance reserve -$20/sh base"
+    {
+      "input": "Price today",
+      "source": "Yahoo Finance PLWN 2026-07-17",
+      "value": "**$575.0**"
+    }
   ],
+  "last_verified": {
+    "deep_dive": "2026-07-21",
+    "human_approved": null,
+    "valuation_as_of": "2026-07-21"
+  },
   "open_questions": [
-    "Verified shares outstanding and economic unit definition for PLWN OTC",
-    "Whether $45.40 indicated dividend reflects actual cash paid",
-    "Schedule D land marks and perpetual-care trust restrictions",
-    "Local Form 990 PDF harvest (Vicki brief)"
+    "Pull Form 990 PDFs (see Vicki brief).",
+    "Verify shares outstanding and dividend cash history.",
+    "Reject 3.46M share figure unless proven.",
+    "Confirm whether component schedule denominator matches economic OTC unit."
   ],
-  "top_citations": [
-    "PLWN/research/evidence/form990_fy2024_extract.json",
-    "PLWN/research/evidence_reconciliation_2026-07-21.md",
-    "PLWN/research/valuation.json"
-  ],
-  "prior_dive": "PLWN/research/deep_dive_2026-07-17.md"
+  "scenarios": {},
+  "schema_version": "1.0",
+  "stance": null,
+  "thesis": "Pinelawn Cemetery is a Long Island cemetery and memorial business based in Farmingdale, New York. **[Fact]** It is organized as a tax-exempt **501(c)(13) cemetery company** (EIN 11-1190044), not a normal SEC reporting corporation. **[Fact]** Common shares trade thinly on OTC Pink as **PLWN**. **[Fact]** FY2024 Form 990 extract shows about **$42.9 million** revenue, **$5.3 million** net income, and **$161.9 million** net assets with liabilities reported at zero on the extract. **[Fact]**",
+  "ticker": "PLWN",
+  "why_market_wrong": "The quote may ignore a **land-heavy cemetery franchise** because there is no 10-K and volume is tiny. **[Inference]** Predictive attribute: **market structure discount**. **[Inference]** Equally, aggregator share counts and the indicated **$45.40** dividend may be wrong, so apparent cheapness or richness can be a data error rather than a mispriced asset. **[Inference]** Contract backfill now attaches proof graphs to a provisional component schedule base **~$54 per share** versus a **$575** quote, which reinforces that the denominator or quote quality is the binding question. **[Inference]**"
 }
