@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /** Run exactly one isolated Investment Committee task via Cursor Cloud Agent. */
 import { readFileSync } from "node:fs";
-import { Agent, CursorAgentError } from "@cursor/sdk";
+import { Agent, Cursor, CursorAgentError } from "@cursor/sdk";
 
 const apiKey = process.env.CURSOR_API_KEY?.trim();
 const repo = process.env.GITHUB_REPOSITORY?.trim();
@@ -52,6 +52,17 @@ try {
 } catch (err) {
   if (err instanceof CursorAgentError) {
     console.error("Startup failed:", err.message, "retryable=", err.isRetryable);
+    if (/not available or invalid/i.test(err.message || "")) {
+      try {
+        const models = await Cursor.models.list({ apiKey });
+        const ids = (Array.isArray(models) ? models : models?.items || [])
+          .map((row) => row?.model?.id || row?.id || row)
+          .filter(Boolean);
+        console.error("Available Cursor model ids:", ids.join(", ") || JSON.stringify(models));
+      } catch (listErr) {
+        console.error("Could not list Cursor models:", listErr?.message || listErr);
+      }
+    }
     process.exit(1);
   }
   throw err;
