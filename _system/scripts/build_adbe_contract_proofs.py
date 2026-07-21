@@ -458,19 +458,6 @@ def _component(cid: str, label: str, category: str, overlap_key: str) -> dict:
         },
     }
     if cid == "firefly_ai_monetization_option":
-        comp["valuation"]["driver_model"] = {
-            "type": "milestone_option",
-            "scenarios": {
-                "base": {
-                    "success_probability": 0.55,
-                    "remaining_cost_m": 850.0,
-                }
-            },
-            "timing_basis": (
-                "Generative-AI credit monetization and ARPU lift over 3 to 7 years; "
-                "Firefly embedded in Creative Cloud since September 2023."
-            ),
-        }
         comp["valuation"]["probability_and_timing"] = {
             "success_probability": 0.55,
             "remaining_capital_m": 850.0,
