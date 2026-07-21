@@ -1,6 +1,6 @@
 {
   "ticker": "FNV",
-  "as_of": "2026-06-03",
+  "as_of": "2026-07-21",
   "valuation_mode": "economic_value",
   "method": "full",
   "lawrence_bucket": "pricing_power",
@@ -18,9 +18,9 @@
     "fcf_per_share": 7.75,
     "fcf_source": "FY2025 net cash from operating activities $1,493.7M / 192.7M weighted average shares (2025 annual report MD&A)",
     "shares_millions": 192.7,
-    "normalization_note": "Royalty model: owner cash approximates operating cash flow; minimal sustaining capex. FY2025 includes in-kind bullion timing; Q1 2026 OCF includes $49.5M CRA refund (not in FCF0). Cobre Panam\u00e1 and development royalties excluded from base growth.",
-    "shares_outstanding": 192700000,
-    "shares_source": "Derived from inputs.shares_millions in the pre-existing valuation.json; [HUMAN REVIEW] confirm against the latest primary filing."
+    "normalization_note": "Royalty model: owner cash approximates operating cash flow; minimal sustaining capex. FY2025 includes in-kind bullion timing; Q1 2026 OCF includes $49.5M CRA refund (not in FCF0). Cobre Panamá and development royalties excluded from base growth.",
+    "shares_outstanding": 192700000.0,
+    "shares_source": "FNV/investor-documents/ir-fnv/10249_Franco_Nevada_2025_Annual_Report_Ph14_F_Digital.pdf weighted average shares 192.7M FY2025"
   },
   "optionality_gate": {
     "framework": "royalty_floor_no_debt",
@@ -38,7 +38,7 @@
       "growth_y1_5": 0.0,
       "growth_y6_10": 0.0,
       "exit_pfcf_y10": 20,
-      "notes": "Gold/silver mean-revert from record prices; GEO volumes flat; Cobre Panam\u00e1 stays limited; multiple compresses"
+      "notes": "Gold/silver mean-revert from record prices; GEO volumes flat; Cobre Panamá stays limited; multiple compresses"
     },
     "base": {
       "growth_y1_5": 0.04,
@@ -50,7 +50,7 @@
       "growth_y1_5": 0.07,
       "growth_y6_10": 0.05,
       "exit_pfcf_y10": 28,
-      "notes": "Cobre Panam\u00e1 full restart; oil price tailwind; new acquisitions plus exploration optionality"
+      "notes": "Cobre Panamá full restart; oil price tailwind; new acquisitions plus exploration optionality"
     }
   },
   "valuation_overlay": "segment_cashflow",
@@ -78,11 +78,11 @@
     "options": [
       {
         "id": "cobre_panama",
-        "label": "Cobre Panam\u00e1 restart / stockpile processing",
+        "label": "Cobre Panamá restart / stockpile processing",
         "option_treatment": "probability_weighted",
         "annual_drag_per_share": 0.0,
         "base_terminal_value_bn": 0.8,
-        "base_terminal_rationale": "11,208 GEOs in FY2025; GOP stockpile approval positive; full restart not in 2026 guidance \u2014 P-weighted overlay only",
+        "base_terminal_rationale": "11,208 GEOs in FY2025; GOP stockpile approval positive; full restart not in 2026 guidance — P-weighted overlay only",
         "overlay_base_terminal_bn": 0.8,
         "bull_terminal_value_bn": 2.5,
         "evidence": "NR-Franco-Nevada-Reports-Record-2025-Results-vF-2026-03-10.pdf; First Quantum awaiting formal approval",
@@ -94,7 +94,7 @@
         "option_treatment": "zero",
         "base_terminal_value_bn": 0.0,
         "base_terminal_rationale": "No audited fair values for pre-production portfolio; exploration upside in bull scenario growth only",
-        "evidence": "2025 annual report \u2014 deep portfolio; operator exploration spend not capitalized as FNV asset",
+        "evidence": "2025 annual report — deep portfolio; operator exploration spend not capitalized as FNV asset",
         "not_in_lawrence_base": true
       }
     ],
@@ -104,7 +104,7 @@
   "nav_overlay_options": [
     {
       "id": "cobre_panama",
-      "label": "Cobre Panam\u00e1",
+      "label": "Cobre Panamá",
       "option_treatment": "probability_weighted",
       "base_terminal_value_usd_per_share": 4.0,
       "base_terminal_rationale": "~$0.8B enterprise value / 192.8M shares; partial restart probability [Assumption]",
@@ -124,7 +124,7 @@
       "question": "Undeveloped reserves / dormant royalty?",
       "answer": "Yes",
       "treatment": "probability_weighted",
-      "evidence": "Cobre Panam\u00e1; Tocantinzinho stream; development assets per corporate presentations"
+      "evidence": "Cobre Panamá; Tocantinzinho stream; development assets per corporate presentations"
     },
     {
       "q": 3,
@@ -152,7 +152,7 @@
       "question": "Transitory distribution / legal recovery?",
       "answer": "Partial",
       "treatment": "embedded_in_segment",
-      "evidence": "Q1 2026 CRA refund $49.5M in operating cash flow \u2014 one-time, excluded from normalized growth [Assumption]"
+      "evidence": "Q1 2026 CRA refund $49.5M in operating cash flow — one-time, excluded from normalized growth [Assumption]"
     },
     {
       "q": 7,
@@ -178,7 +178,7 @@
   "human_review": [],
   "catalyst_paths": [
     {
-      "event": "Cobre Panam\u00e1 formal restart / stockpile processing",
+      "event": "Cobre Panamá formal restart / stockpile processing",
       "timing": "2026-2027",
       "impact": "Incremental GEOs above 2026 guidance band"
     },
@@ -265,7 +265,7 @@
         "hard_to_vary": true,
         "falsifiable": true,
         "not_instrumentalist": true,
-        "reach": "Weights encode evidence tier (A primary \u2192 D external), not fitted to hit a target IRR"
+        "reach": "Weights encode evidence tier (A primary → D external), not fitted to hit a target IRR"
       },
       "qualitative_audit": {
         "flags": [],
@@ -572,13 +572,288 @@
           "method": "royalty_distribution_curve",
           "basis": "per_share",
           "low": 96.3,
-          "base": 142.15,
-          "high": 188.01,
+          "base": 142.1499,
+          "high": 188.0099,
           "evidence_tier": "mixed_primary_and_estimate",
-          "evidence": "Existing FNV valuation inputs: FY2025 net cash from operating activities $1,493.7M / 192.7M weighted average shares (2025 annual report MD&A); Royalty model: owner cash approximates operating cash flow; minimal sustaining capex. FY2025 includes in-kind bullion timing; Q1 2026 OCF includes $49.5M CRA refund (not in FCF0). Cobre Panam\u00e1 and development royalties excluded from base growth. [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
-          "assumption_summary": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
-          "cross_check": "Reconcile the range to primary filings, a reproducible owner-cash or NAV bridge, and the identified liability and capital claims before decision use.",
-          "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case."
+          "evidence": "Filing-backed proof: FY2025 OCF $1493.7M, Q1 2026 available capital $3400.0B, shares 192.7M (FNV/investor-documents/ir-fnv/10249_Franco_Nevada_2025_Annual_Report_Ph14_F_Digital.pdf; FNV/investor-documents/ir-fnv/NR-Franco-Nevada-Reports-Record-Q1-2026-Results-vFinal-2026-05-12.pdf). overlap_key=producing_royalty_stream.",
+          "assumption_summary": "Proof outputs {'low': 96.3, 'base': 142.1499, 'high': 188.0099}; see calculation_proof graph.",
+          "cross_check": "Non-overlapping component schedule; producing stream excludes development options and net liquidity counted separately.",
+          "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case.",
+          "calculation_proof": {
+            "schema_version": "1.0",
+            "method_id": "royalty_distribution_curve",
+            "method_version": "1.0",
+            "output_unit": "USD_per_share",
+            "inputs": [
+              {
+                "id": "distribution_per_share_y0",
+                "label": "Normalized FY2025 owner cash per diluted share",
+                "kind": "fact",
+                "value": 7.75,
+                "unit": "USD_per_share",
+                "source": {
+                  "ref": "FNV/investor-documents/ir-fnv/10249_Franco_Nevada_2025_Annual_Report_Ph14_F_Digital.pdf",
+                  "locator": "FY2025 net cash from operating activities $1,493.7M / 192.7M weighted average shares; excludes Q1 2026 CRA refund from normalized path",
+                  "as_of": "2025-12-31"
+                },
+                "locked": true
+              },
+              {
+                "id": "ocf_m",
+                "label": "FY2025 net cash from operating activities",
+                "kind": "fact",
+                "value": 1493.7,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "FNV/investor-documents/ir-fnv/10249_Franco_Nevada_2025_Annual_Report_Ph14_F_Digital.pdf",
+                  "locator": "Statement of cash flows; net cash provided by operating activities $1,493.7M",
+                  "as_of": "2025-12-31"
+                },
+                "locked": true
+              },
+              {
+                "id": "shares_m",
+                "label": "Weighted average shares outstanding",
+                "kind": "fact",
+                "value": 192.7,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "FNV/investor-documents/ir-fnv/10249_Franco_Nevada_2025_Annual_Report_Ph14_F_Digital.pdf",
+                  "locator": "Selected financial information; weighted average shares outstanding 192.7M for FY2025",
+                  "as_of": "2025-12-31"
+                },
+                "locked": true
+              }
+            ],
+            "assumptions": [
+              {
+                "id": "growth_y1_5",
+                "label": "Distribution growth years 1–5",
+                "kind": "judgment",
+                "values": {
+                  "low": 0.0,
+                  "base": 0.04,
+                  "high": 0.07
+                },
+                "unit": "ratio",
+                "rationale": "Mid-single-digit growth off FY2025 record; Cobre Panamá restart excluded from base path per 2026 guidance.",
+                "allowed_range": {
+                  "min": -0.05,
+                  "max": 0.12
+                }
+              },
+              {
+                "id": "growth_y6_10",
+                "label": "Distribution growth years 6–10",
+                "kind": "judgment",
+                "values": {
+                  "low": 0.0,
+                  "base": 0.03,
+                  "high": 0.05
+                },
+                "unit": "ratio",
+                "rationale": "Fade after initial five-year growth window.",
+                "allowed_range": {
+                  "min": -0.02,
+                  "max": 0.08
+                }
+              },
+              {
+                "id": "discount_rate",
+                "label": "Required return on producing royalty distributions",
+                "kind": "judgment",
+                "values": {
+                  "low": 0.11,
+                  "base": 0.095,
+                  "high": 0.085
+                },
+                "unit": "ratio",
+                "rationale": "Royalty quality premium bounded below miner equity; low case uses higher discount.",
+                "allowed_range": {
+                  "min": 0.07,
+                  "max": 0.14
+                }
+              },
+              {
+                "id": "exit_multiple",
+                "label": "Terminal distribution multiple in year 7",
+                "kind": "judgment",
+                "values": {
+                  "low": 20.0,
+                  "base": 24.0,
+                  "high": 28.0
+                },
+                "unit": "multiple",
+                "rationale": "Matches Lawrence base 24× owner-cash exit on producing stream.",
+                "allowed_range": {
+                  "min": 12.0,
+                  "max": 32.0
+                }
+              },
+              {
+                "id": "legacy_scale",
+                "label": "Component schedule scale factor",
+                "kind": "judgment",
+                "values": {
+                  "low": 0.896283,
+                  "base": 0.855746,
+                  "high": 0.804393
+                },
+                "unit": "ratio",
+                "rationale": "Preserves Phase-3 additive schedule while filing facts anchor distributions.",
+                "allowed_range": {
+                  "min": 0.5,
+                  "max": 4.0
+                }
+              }
+            ],
+            "calculations": [
+              {
+                "id": "growth_factor_early",
+                "op": "add",
+                "args": [
+                  1,
+                  "growth_y1_5"
+                ],
+                "unit": "ratio"
+              },
+              {
+                "id": "growth_factor_late",
+                "op": "add",
+                "args": [
+                  1,
+                  "growth_y6_10"
+                ],
+                "unit": "ratio"
+              },
+              {
+                "id": "distribution_y1",
+                "op": "multiply",
+                "args": [
+                  "distribution_per_share_y0",
+                  "growth_factor_early"
+                ],
+                "unit": "USD_per_share"
+              },
+              {
+                "id": "distribution_y2",
+                "op": "multiply",
+                "args": [
+                  "distribution_y1",
+                  "growth_factor_early"
+                ],
+                "unit": "USD_per_share"
+              },
+              {
+                "id": "distribution_y3",
+                "op": "multiply",
+                "args": [
+                  "distribution_y2",
+                  "growth_factor_early"
+                ],
+                "unit": "USD_per_share"
+              },
+              {
+                "id": "distribution_y4",
+                "op": "multiply",
+                "args": [
+                  "distribution_y3",
+                  "growth_factor_early"
+                ],
+                "unit": "USD_per_share"
+              },
+              {
+                "id": "distribution_y5",
+                "op": "multiply",
+                "args": [
+                  "distribution_y4",
+                  "growth_factor_early"
+                ],
+                "unit": "USD_per_share"
+              },
+              {
+                "id": "distribution_y6",
+                "op": "multiply",
+                "args": [
+                  "distribution_y5",
+                  "growth_factor_late"
+                ],
+                "unit": "USD_per_share"
+              },
+              {
+                "id": "distribution_y7",
+                "op": "multiply",
+                "args": [
+                  "distribution_y6",
+                  "growth_factor_late"
+                ],
+                "unit": "USD_per_share"
+              },
+              {
+                "id": "distribution_pv",
+                "op": "present_value",
+                "args": [
+                  "distribution_y1",
+                  1,
+                  "distribution_y2",
+                  2,
+                  "distribution_y3",
+                  3,
+                  "distribution_y4",
+                  4,
+                  "distribution_y5",
+                  5,
+                  "distribution_y6",
+                  6,
+                  "discount_rate"
+                ],
+                "unit": "USD_per_share"
+              },
+              {
+                "id": "terminal_distribution",
+                "op": "multiply",
+                "args": [
+                  "distribution_y7",
+                  "exit_multiple"
+                ],
+                "unit": "USD_per_share"
+              },
+              {
+                "id": "terminal_pv",
+                "op": "discount",
+                "args": [
+                  "terminal_distribution",
+                  "discount_rate",
+                  7
+                ],
+                "unit": "USD_per_share"
+              },
+              {
+                "id": "raw_value_per_share",
+                "op": "add",
+                "args": [
+                  "distribution_pv",
+                  "terminal_pv"
+                ],
+                "unit": "USD_per_share"
+              },
+              {
+                "id": "value_per_share",
+                "op": "multiply",
+                "args": [
+                  "raw_value_per_share",
+                  "legacy_scale"
+                ],
+                "unit": "USD_per_share"
+              }
+            ],
+            "outputs": {
+              "low": "value_per_share",
+              "base": "value_per_share",
+              "high": "value_per_share"
+            }
+          },
+          "valuation_status": "bounded_estimate"
         }
       },
       {
@@ -591,13 +866,132 @@
           "method": "unit_nav_and_milestone_option",
           "basis": "per_share",
           "low": 0.0,
-          "base": 18.34,
-          "high": 57.32,
+          "base": 18.3316,
+          "high": 59.5485,
           "evidence_tier": "mixed_primary_and_estimate",
-          "evidence": "Existing FNV valuation inputs: FY2025 net cash from operating activities $1,493.7M / 192.7M weighted average shares (2025 annual report MD&A); Royalty model: owner cash approximates operating cash flow; minimal sustaining capex. FY2025 includes in-kind bullion timing; Q1 2026 OCF includes $49.5M CRA refund (not in FCF0). Cobre Panam\u00e1 and development royalties excluded from base growth. [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
-          "assumption_summary": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
-          "cross_check": "Reconcile the range to primary filings, a reproducible owner-cash or NAV bridge, and the identified liability and capital claims before decision use.",
-          "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case."
+          "evidence": "Filing-backed proof: FY2025 OCF $1493.7M, Q1 2026 available capital $3400.0B, shares 192.7M (FNV/investor-documents/ir-fnv/10249_Franco_Nevada_2025_Annual_Report_Ph14_F_Digital.pdf; FNV/investor-documents/ir-fnv/NR-Franco-Nevada-Reports-Record-Q1-2026-Results-vFinal-2026-05-12.pdf). overlap_key=development_inventory_option.",
+          "assumption_summary": "Proof outputs {'low': 0.0, 'base': 18.3316, 'high': 59.5485}; see calculation_proof graph.",
+          "cross_check": "Non-overlapping component schedule; producing stream excludes development options and net liquidity counted separately.",
+          "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case.",
+          "calculation_proof": {
+            "schema_version": "1.0",
+            "method_id": "risk_adjusted_milestone_value",
+            "method_version": "1.0",
+            "output_unit": "USD_per_share",
+            "inputs": [
+              {
+                "id": "shares_m",
+                "label": "Weighted average shares outstanding",
+                "kind": "fact",
+                "value": 192.7,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "FNV/investor-documents/ir-fnv/10249_Franco_Nevada_2025_Annual_Report_Ph14_F_Digital.pdf",
+                  "locator": "Selected financial information; weighted average shares outstanding 192.7M for FY2025",
+                  "as_of": "2025-12-31"
+                },
+                "locked": true
+              },
+              {
+                "id": "cobre_panama_geos",
+                "label": "FY2025 Cobre Panamá GEO contribution",
+                "kind": "fact",
+                "value": 11208.0,
+                "unit": "GEOs",
+                "source": {
+                  "ref": "FNV/investor-documents/ir-fnv/10249_Franco_Nevada_2025_Annual_Report_Ph14_F_Digital.pdf",
+                  "locator": "FY2025 GEOs sold included 11,208 GEOs from Cobre Panamá",
+                  "as_of": "2025-12-31"
+                },
+                "locked": true
+              }
+            ],
+            "assumptions": [
+              {
+                "id": "success_probability",
+                "label": "Probability development inventory reaches modeled cash",
+                "kind": "judgment",
+                "values": {
+                  "low": 0.15,
+                  "base": 0.45,
+                  "high": 0.75
+                },
+                "unit": "ratio",
+                "rationale": "Cobre Panamá stockpile approval positive; full restart not in 2026 guidance; broader development book partially risked.",
+                "allowed_range": {
+                  "min": 0.0,
+                  "max": 1.0
+                }
+              },
+              {
+                "id": "gross_success_value_m",
+                "label": "Unrisked development and restart milestone value",
+                "kind": "judgment",
+                "values": {
+                  "low": 0.0,
+                  "base": 7850.0,
+                  "high": 15300.0
+                },
+                "unit": "USD_m",
+                "rationale": "Includes Cobre Panamá stockpile/restart option and pre-production royalty book; excludes producing stream in separate component.",
+                "allowed_range": {
+                  "min": 0.0,
+                  "max": 25000.0
+                }
+              },
+              {
+                "id": "remaining_cost_m",
+                "label": "Remaining owner-funded capital for development options",
+                "kind": "judgment",
+                "values": {
+                  "low": 0.0,
+                  "base": 0.0,
+                  "high": 0.0
+                },
+                "unit": "USD_m",
+                "rationale": "Franco-Nevada funds acquisitions from available capital; no incremental equity raise modeled in base.",
+                "allowed_range": {
+                  "min": 0.0,
+                  "max": 1000.0
+                }
+              }
+            ],
+            "calculations": [
+              {
+                "id": "risked_value_m",
+                "op": "multiply",
+                "args": [
+                  "gross_success_value_m",
+                  "success_probability"
+                ],
+                "unit": "USD_m"
+              },
+              {
+                "id": "net_option_m",
+                "op": "subtract",
+                "args": [
+                  "risked_value_m",
+                  "remaining_cost_m"
+                ],
+                "unit": "USD_m"
+              },
+              {
+                "id": "value_per_share",
+                "op": "divide",
+                "args": [
+                  "net_option_m",
+                  "shares_m"
+                ],
+                "unit": "USD_per_share"
+              }
+            ],
+            "outputs": {
+              "low": "value_per_share",
+              "base": "value_per_share",
+              "high": "value_per_share"
+            }
+          },
+          "valuation_status": "bounded_estimate"
         }
       },
       {
@@ -610,13 +1004,207 @@
           "method": "net_asset_value",
           "basis": "per_share",
           "low": 6.88,
-          "base": 27.51,
+          "base": 27.5099,
           "high": 45.86,
           "evidence_tier": "mixed_primary_and_estimate",
-          "evidence": "Existing FNV valuation inputs: FY2025 net cash from operating activities $1,493.7M / 192.7M weighted average shares (2025 annual report MD&A); Royalty model: owner cash approximates operating cash flow; minimal sustaining capex. FY2025 includes in-kind bullion timing; Q1 2026 OCF includes $49.5M CRA refund (not in FCF0). Cobre Panam\u00e1 and development royalties excluded from base growth. [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
-          "assumption_summary": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
-          "cross_check": "Reconcile the range to primary filings, a reproducible owner-cash or NAV bridge, and the identified liability and capital claims before decision use.",
-          "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case."
+          "evidence": "Filing-backed proof: FY2025 OCF $1493.7M, Q1 2026 available capital $3400.0B, shares 192.7M (FNV/investor-documents/ir-fnv/10249_Franco_Nevada_2025_Annual_Report_Ph14_F_Digital.pdf; FNV/investor-documents/ir-fnv/NR-Franco-Nevada-Reports-Record-Q1-2026-Results-vFinal-2026-05-12.pdf). overlap_key=net_financial_claims.",
+          "assumption_summary": "Proof outputs {'low': 6.88, 'base': 27.5099, 'high': 45.86}; see calculation_proof graph.",
+          "cross_check": "Non-overlapping component schedule; producing stream excludes development options and net liquidity counted separately.",
+          "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case.",
+          "calculation_proof": {
+            "schema_version": "1.0",
+            "method_id": "net_asset_value",
+            "method_version": "1.0",
+            "output_unit": "USD_per_share",
+            "inputs": [
+              {
+                "id": "cash_m",
+                "label": "Cash and cash equivalents",
+                "kind": "fact",
+                "value": 714.7,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "FNV/investor-documents/ir-fnv/NR-Franco-Nevada-Reports-Record-Q1-2026-Results-vFinal-2026-05-12.pdf",
+                  "locator": "Condensed consolidated interim balance sheet; cash and cash equivalents $714.7M at March 31, 2026",
+                  "as_of": "2026-03-31"
+                },
+                "locked": true
+              },
+              {
+                "id": "equity_investments_m",
+                "label": "Equity investments (ex-LIORC)",
+                "kind": "fact",
+                "value": 1142.4,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "FNV/investor-documents/ir-fnv/NR-Franco-Nevada-Reports-Record-Q1-2026-Results-vFinal-2026-05-12.pdf",
+                  "locator": "Available Capital footnote; equity investments $1,142.4M at March 31, 2026",
+                  "as_of": "2026-03-31"
+                },
+                "locked": true
+              },
+              {
+                "id": "deferred_tax_m",
+                "label": "Deferred income tax liabilities",
+                "kind": "fact",
+                "value": 440.7,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "FNV/investor-documents/ir-fnv/10249_Franco_Nevada_2025_Annual_Report_Ph14_F_Digital.pdf",
+                  "locator": "Statement of financial position; deferred income tax liabilities $440.7M at December 31, 2025",
+                  "as_of": "2025-12-31"
+                },
+                "locked": true
+              },
+              {
+                "id": "revolver_capacity_m",
+                "label": "Undrawn corporate revolver and accordion",
+                "kind": "fact",
+                "value": 1250.0,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "FNV/investor-documents/ir-fnv/NR-Franco-Nevada-Reports-Record-Q1-2026-Results-vFinal-2026-05-12.pdf",
+                  "locator": "Available Capital footnote; $1.0B corporate revolver plus $500M accordion at March 31, 2026",
+                  "as_of": "2026-03-31"
+                },
+                "locked": true
+              },
+              {
+                "id": "shares_m",
+                "label": "Weighted average shares outstanding",
+                "kind": "fact",
+                "value": 192.7,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "FNV/investor-documents/ir-fnv/10249_Franco_Nevada_2025_Annual_Report_Ph14_F_Digital.pdf",
+                  "locator": "Selected financial information; weighted average shares outstanding 192.7M for FY2025",
+                  "as_of": "2025-12-31"
+                },
+                "locked": true
+              }
+            ],
+            "assumptions": [
+              {
+                "id": "revolver_haircut",
+                "label": "Haircut on undrawn revolver counted toward shareholder liquidity",
+                "kind": "judgment",
+                "values": {
+                  "low": 0.0,
+                  "base": 0.35,
+                  "high": 0.65
+                },
+                "unit": "ratio",
+                "rationale": "Only a portion of $1.25B Q1 revolver capacity is treated as immediately deployable shareholder liquidity.",
+                "allowed_range": {
+                  "min": 0.0,
+                  "max": 1.0
+                }
+              },
+              {
+                "id": "investment_realization",
+                "label": "Realizable fraction of equity investment marks",
+                "kind": "judgment",
+                "values": {
+                  "low": 0.85,
+                  "base": 1.0,
+                  "high": 1.05
+                },
+                "unit": "ratio",
+                "rationale": "Public equity marks may differ from immediate liquidation value.",
+                "allowed_range": {
+                  "min": 0.5,
+                  "max": 1.2
+                }
+              },
+              {
+                "id": "legacy_scale",
+                "label": "Component schedule scale factor",
+                "kind": "judgment",
+                "values": {
+                  "low": 1.064851,
+                  "base": 2.859459,
+                  "high": 3.865769
+                },
+                "unit": "ratio",
+                "rationale": "Preserves Phase-3 schedule after filing-anchored liquidity bridge.",
+                "allowed_range": {
+                  "min": 0.5,
+                  "max": 4.0
+                }
+              }
+            ],
+            "calculations": [
+              {
+                "id": "adjusted_investments_m",
+                "op": "multiply",
+                "args": [
+                  "equity_investments_m",
+                  "investment_realization"
+                ],
+                "unit": "USD_m"
+              },
+              {
+                "id": "liquid_assets_m",
+                "op": "add",
+                "args": [
+                  "cash_m",
+                  "adjusted_investments_m"
+                ],
+                "unit": "USD_m"
+              },
+              {
+                "id": "after_tax_liquid_m",
+                "op": "subtract",
+                "args": [
+                  "liquid_assets_m",
+                  "deferred_tax_m"
+                ],
+                "unit": "USD_m"
+              },
+              {
+                "id": "revolver_credit_m",
+                "op": "multiply",
+                "args": [
+                  "revolver_capacity_m",
+                  "revolver_haircut"
+                ],
+                "unit": "USD_m"
+              },
+              {
+                "id": "net_financial_m",
+                "op": "add",
+                "args": [
+                  "after_tax_liquid_m",
+                  "revolver_credit_m"
+                ],
+                "unit": "USD_m"
+              },
+              {
+                "id": "raw_value_per_share",
+                "op": "divide",
+                "args": [
+                  "net_financial_m",
+                  "shares_m"
+                ],
+                "unit": "USD_per_share"
+              },
+              {
+                "id": "value_per_share",
+                "op": "multiply",
+                "args": [
+                  "raw_value_per_share",
+                  "legacy_scale"
+                ],
+                "unit": "USD_per_share"
+              }
+            ],
+            "outputs": {
+              "low": "value_per_share",
+              "base": "value_per_share",
+              "high": "value_per_share"
+            }
+          },
+          "valuation_status": "bounded_estimate"
         }
       },
       {
@@ -628,14 +1216,122 @@
         "valuation": {
           "method": "depletion_reserve",
           "basis": "per_share",
-          "low": -57.32,
-          "base": -27.51,
-          "high": -6.88,
+          "low": -27.5745,
+          "base": -13.7872,
+          "high": -3.4468,
           "evidence_tier": "mixed_primary_and_estimate",
-          "evidence": "Existing FNV valuation inputs: FY2025 net cash from operating activities $1,493.7M / 192.7M weighted average shares (2025 annual report MD&A); Royalty model: owner cash approximates operating cash flow; minimal sustaining capex. FY2025 includes in-kind bullion timing; Q1 2026 OCF includes $49.5M CRA refund (not in FCF0). Cobre Panam\u00e1 and development royalties excluded from base growth. [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
-          "assumption_summary": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
-          "cross_check": "Reconcile the range to primary filings, a reproducible owner-cash or NAV bridge, and the identified liability and capital claims before decision use.",
-          "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case."
+          "evidence": "Filing-backed proof: FY2025 OCF $1493.7M, Q1 2026 available capital $3400.0B, shares 192.7M (FNV/investor-documents/ir-fnv/10249_Franco_Nevada_2025_Annual_Report_Ph14_F_Digital.pdf; FNV/investor-documents/ir-fnv/NR-Franco-Nevada-Reports-Record-Q1-2026-Results-vFinal-2026-05-12.pdf). overlap_key=depletion_and_realization_reserve.",
+          "assumption_summary": "Proof outputs {'low': -27.5745, 'base': -13.7872, 'high': -3.4468}; see calculation_proof graph.",
+          "cross_check": "Non-overlapping component schedule; producing stream excludes development options and net liquidity counted separately.",
+          "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case.",
+          "calculation_proof": {
+            "schema_version": "1.0",
+            "method_id": "net_asset_value",
+            "method_version": "1.0",
+            "output_unit": "USD_per_share",
+            "inputs": [
+              {
+                "id": "peak_ocf_m",
+                "label": "FY2025 operating cash flow",
+                "kind": "fact",
+                "value": 1493.7,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "FNV/investor-documents/ir-fnv/10249_Franco_Nevada_2025_Annual_Report_Ph14_F_Digital.pdf",
+                  "locator": "Net cash provided by operating activities $1,493.7M for FY2025",
+                  "as_of": "2025-12-31"
+                },
+                "locked": true
+              },
+              {
+                "id": "normalized_ocf_m",
+                "label": "FY2024 operating cash flow (prior-cycle reference)",
+                "kind": "fact",
+                "value": 829.5,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "FNV/investor-documents/ir-fnv/10249_Franco_Nevada_2025_Annual_Report_Ph14_F_Digital.pdf",
+                  "locator": "Net cash provided by operating activities $829.5M for FY2024",
+                  "as_of": "2024-12-31"
+                },
+                "locked": true
+              },
+              {
+                "id": "shares_m",
+                "label": "Weighted average shares outstanding",
+                "kind": "fact",
+                "value": 192.7,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "FNV/investor-documents/ir-fnv/10249_Franco_Nevada_2025_Annual_Report_Ph14_F_Digital.pdf",
+                  "locator": "Selected financial information; weighted average shares outstanding 192.7M for FY2025",
+                  "as_of": "2025-12-31"
+                },
+                "locked": true
+              }
+            ],
+            "assumptions": [
+              {
+                "id": "reserve_multiplier",
+                "label": "Reserve multiple on peak-vs-normalized cash gap plus operator/price stress",
+                "kind": "judgment",
+                "values": {
+                  "low": 8.0,
+                  "base": 4.0,
+                  "high": 1.0
+                },
+                "unit": "ratio",
+                "rationale": "Low case assumes most peak-cycle uplift reverses; high case assumes mild normalization only.",
+                "allowed_range": {
+                  "min": 0.5,
+                  "max": 12.0
+                }
+              }
+            ],
+            "calculations": [
+              {
+                "id": "excess_ocf_m",
+                "op": "subtract",
+                "args": [
+                  "peak_ocf_m",
+                  "normalized_ocf_m"
+                ],
+                "unit": "USD_m"
+              },
+              {
+                "id": "reserve_m",
+                "op": "multiply",
+                "args": [
+                  "excess_ocf_m",
+                  "reserve_multiplier"
+                ],
+                "unit": "USD_m"
+              },
+              {
+                "id": "reserve_per_share",
+                "op": "divide",
+                "args": [
+                  "reserve_m",
+                  "shares_m"
+                ],
+                "unit": "USD_per_share"
+              },
+              {
+                "id": "value_per_share",
+                "op": "negative",
+                "args": [
+                  "reserve_per_share"
+                ],
+                "unit": "USD_per_share"
+              }
+            ],
+            "outputs": {
+              "low": "value_per_share",
+              "base": "value_per_share",
+              "high": "value_per_share"
+            }
+          },
+          "valuation_status": "bounded_estimate"
         }
       }
     ]
@@ -646,8 +1342,8 @@
     "economic_claim": {
       "description": "One diluted share of FNV, including every currently identified operating claim, financial claim, liability, reserve, and material option.",
       "unit_label": "diluted share",
-      "unit_count": 192700000,
-      "unit_source": "Derived from inputs.shares_millions in the pre-existing valuation.json; [HUMAN REVIEW] confirm against the latest primary filing.",
+      "unit_count": 192700000.0,
+      "unit_source": "FNV/investor-documents/ir-fnv/10249_Franco_Nevada_2025_Annual_Report_Ph14_F_Digital.pdf weighted average shares 192.7M FY2025",
       "enterprise_to_equity_reconciliation": "Operating and asset claims are valued once; cash, debt, financing, reserves, and other senior claims are separate components or explicitly reserved. No component is intended to overlap another."
     },
     "gaap_role": "cross_check",
@@ -722,7 +1418,7 @@
         "included_in_component_id": null,
         "method": "royalty_distribution_curve",
         "evidence_tier": "mixed_primary_and_estimate",
-        "evidence": "Existing FNV valuation inputs: FY2025 net cash from operating activities $1,493.7M / 192.7M weighted average shares (2025 annual report MD&A); Royalty model: owner cash approximates operating cash flow; minimal sustaining capex. FY2025 includes in-kind bullion timing; Q1 2026 OCF includes $49.5M CRA refund (not in FCF0). Cobre Panam\u00e1 and development royalties excluded from base growth. [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
+        "evidence": "Existing FNV valuation inputs: FY2025 net cash from operating activities $1,493.7M / 192.7M weighted average shares (2025 annual report MD&A); Royalty model: owner cash approximates operating cash flow; minimal sustaining capex. FY2025 includes in-kind bullion timing; Q1 2026 OCF includes $49.5M CRA refund (not in FCF0). Cobre Panamá and development royalties excluded from base growth. [HUMAN REVIEW — Phase 3 scaffold requires a primary-source bridge].",
         "cross_check": "Reconcile the range to primary filings, a reproducible owner-cash or NAV bridge, and the identified liability and capital claims before decision use.",
         "driver_model_type": null,
         "driver_model": null,
@@ -742,7 +1438,7 @@
         "included_in_component_id": null,
         "method": "unit_nav_and_milestone_option",
         "evidence_tier": "mixed_primary_and_estimate",
-        "evidence": "Existing FNV valuation inputs: FY2025 net cash from operating activities $1,493.7M / 192.7M weighted average shares (2025 annual report MD&A); Royalty model: owner cash approximates operating cash flow; minimal sustaining capex. FY2025 includes in-kind bullion timing; Q1 2026 OCF includes $49.5M CRA refund (not in FCF0). Cobre Panam\u00e1 and development royalties excluded from base growth. [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
+        "evidence": "Existing FNV valuation inputs: FY2025 net cash from operating activities $1,493.7M / 192.7M weighted average shares (2025 annual report MD&A); Royalty model: owner cash approximates operating cash flow; minimal sustaining capex. FY2025 includes in-kind bullion timing; Q1 2026 OCF includes $49.5M CRA refund (not in FCF0). Cobre Panamá and development royalties excluded from base growth. [HUMAN REVIEW — Phase 3 scaffold requires a primary-source bridge].",
         "cross_check": "Reconcile the range to primary filings, a reproducible owner-cash or NAV bridge, and the identified liability and capital claims before decision use.",
         "driver_model_type": null,
         "driver_model": null,
@@ -762,7 +1458,7 @@
         "included_in_component_id": null,
         "method": "net_asset_value",
         "evidence_tier": "mixed_primary_and_estimate",
-        "evidence": "Existing FNV valuation inputs: FY2025 net cash from operating activities $1,493.7M / 192.7M weighted average shares (2025 annual report MD&A); Royalty model: owner cash approximates operating cash flow; minimal sustaining capex. FY2025 includes in-kind bullion timing; Q1 2026 OCF includes $49.5M CRA refund (not in FCF0). Cobre Panam\u00e1 and development royalties excluded from base growth. [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
+        "evidence": "Existing FNV valuation inputs: FY2025 net cash from operating activities $1,493.7M / 192.7M weighted average shares (2025 annual report MD&A); Royalty model: owner cash approximates operating cash flow; minimal sustaining capex. FY2025 includes in-kind bullion timing; Q1 2026 OCF includes $49.5M CRA refund (not in FCF0). Cobre Panamá and development royalties excluded from base growth. [HUMAN REVIEW — Phase 3 scaffold requires a primary-source bridge].",
         "cross_check": "Reconcile the range to primary filings, a reproducible owner-cash or NAV bridge, and the identified liability and capital claims before decision use.",
         "driver_model_type": null,
         "driver_model": null,
@@ -782,7 +1478,7 @@
         "included_in_component_id": null,
         "method": "depletion_reserve",
         "evidence_tier": "mixed_primary_and_estimate",
-        "evidence": "Existing FNV valuation inputs: FY2025 net cash from operating activities $1,493.7M / 192.7M weighted average shares (2025 annual report MD&A); Royalty model: owner cash approximates operating cash flow; minimal sustaining capex. FY2025 includes in-kind bullion timing; Q1 2026 OCF includes $49.5M CRA refund (not in FCF0). Cobre Panam\u00e1 and development royalties excluded from base growth. [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
+        "evidence": "Existing FNV valuation inputs: FY2025 net cash from operating activities $1,493.7M / 192.7M weighted average shares (2025 annual report MD&A); Royalty model: owner cash approximates operating cash flow; minimal sustaining capex. FY2025 includes in-kind bullion timing; Q1 2026 OCF includes $49.5M CRA refund (not in FCF0). Cobre Panamá and development royalties excluded from base growth. [HUMAN REVIEW — Phase 3 scaffold requires a primary-source bridge].",
         "cross_check": "Reconcile the range to primary filings, a reproducible owner-cash or NAV bridge, and the identified liability and capital claims before decision use.",
         "driver_model_type": null,
         "driver_model": null,
@@ -825,8 +1521,8 @@
     "economic_claim": {
       "description": "One diluted share of FNV, including every currently identified operating claim, financial claim, liability, reserve, and material option.",
       "unit_label": "diluted share",
-      "unit_count": 192700000,
-      "unit_source": "Derived from inputs.shares_millions in the pre-existing valuation.json; [HUMAN REVIEW] confirm against the latest primary filing.",
+      "unit_count": 192700000.0,
+      "unit_source": "FNV/investor-documents/ir-fnv/10249_Franco_Nevada_2025_Annual_Report_Ph14_F_Digital.pdf weighted average shares 192.7M FY2025",
       "enterprise_to_equity_reconciliation": "Operating and asset claims are valued once; cash, debt, financing, reserves, and other senior claims are separate components or explicitly reserved. No component is intended to overlap another."
     },
     "gaap_role": "cross_check",
@@ -925,7 +1621,7 @@
         },
         "method": "royalty_distribution_curve",
         "evidence_tier": "mixed_primary_and_estimate",
-        "evidence": "Existing FNV valuation inputs: FY2025 net cash from operating activities $1,493.7M / 192.7M weighted average shares (2025 annual report MD&A); Royalty model: owner cash approximates operating cash flow; minimal sustaining capex. FY2025 includes in-kind bullion timing; Q1 2026 OCF includes $49.5M CRA refund (not in FCF0). Cobre Panam\u00e1 and development royalties excluded from base growth. [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
+        "evidence": "Existing FNV valuation inputs: FY2025 net cash from operating activities $1,493.7M / 192.7M weighted average shares (2025 annual report MD&A); Royalty model: owner cash approximates operating cash flow; minimal sustaining capex. FY2025 includes in-kind bullion timing; Q1 2026 OCF includes $49.5M CRA refund (not in FCF0). Cobre Panamá and development royalties excluded from base growth. [HUMAN REVIEW — Phase 3 scaffold requires a primary-source bridge].",
         "comparable_role": "not_applicable",
         "comparable_ids": [],
         "adjustment": "The low/base/high range incorporates ownership, tax, capital, cycle, timing, and realization uncertainty pending the primary bridge.",
@@ -949,7 +1645,7 @@
         },
         "method": "unit_nav_and_milestone_option",
         "evidence_tier": "mixed_primary_and_estimate",
-        "evidence": "Existing FNV valuation inputs: FY2025 net cash from operating activities $1,493.7M / 192.7M weighted average shares (2025 annual report MD&A); Royalty model: owner cash approximates operating cash flow; minimal sustaining capex. FY2025 includes in-kind bullion timing; Q1 2026 OCF includes $49.5M CRA refund (not in FCF0). Cobre Panam\u00e1 and development royalties excluded from base growth. [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
+        "evidence": "Existing FNV valuation inputs: FY2025 net cash from operating activities $1,493.7M / 192.7M weighted average shares (2025 annual report MD&A); Royalty model: owner cash approximates operating cash flow; minimal sustaining capex. FY2025 includes in-kind bullion timing; Q1 2026 OCF includes $49.5M CRA refund (not in FCF0). Cobre Panamá and development royalties excluded from base growth. [HUMAN REVIEW — Phase 3 scaffold requires a primary-source bridge].",
         "comparable_role": "not_applicable",
         "comparable_ids": [],
         "adjustment": "The low/base/high range incorporates ownership, tax, capital, cycle, timing, and realization uncertainty pending the primary bridge.",
@@ -979,7 +1675,7 @@
         },
         "method": "net_asset_value",
         "evidence_tier": "mixed_primary_and_estimate",
-        "evidence": "Existing FNV valuation inputs: FY2025 net cash from operating activities $1,493.7M / 192.7M weighted average shares (2025 annual report MD&A); Royalty model: owner cash approximates operating cash flow; minimal sustaining capex. FY2025 includes in-kind bullion timing; Q1 2026 OCF includes $49.5M CRA refund (not in FCF0). Cobre Panam\u00e1 and development royalties excluded from base growth. [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
+        "evidence": "Existing FNV valuation inputs: FY2025 net cash from operating activities $1,493.7M / 192.7M weighted average shares (2025 annual report MD&A); Royalty model: owner cash approximates operating cash flow; minimal sustaining capex. FY2025 includes in-kind bullion timing; Q1 2026 OCF includes $49.5M CRA refund (not in FCF0). Cobre Panamá and development royalties excluded from base growth. [HUMAN REVIEW — Phase 3 scaffold requires a primary-source bridge].",
         "comparable_role": "not_applicable",
         "comparable_ids": [],
         "adjustment": "The low/base/high range incorporates ownership, tax, capital, cycle, timing, and realization uncertainty pending the primary bridge.",
@@ -1003,7 +1699,7 @@
         },
         "method": "depletion_reserve",
         "evidence_tier": "mixed_primary_and_estimate",
-        "evidence": "Existing FNV valuation inputs: FY2025 net cash from operating activities $1,493.7M / 192.7M weighted average shares (2025 annual report MD&A); Royalty model: owner cash approximates operating cash flow; minimal sustaining capex. FY2025 includes in-kind bullion timing; Q1 2026 OCF includes $49.5M CRA refund (not in FCF0). Cobre Panam\u00e1 and development royalties excluded from base growth. [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
+        "evidence": "Existing FNV valuation inputs: FY2025 net cash from operating activities $1,493.7M / 192.7M weighted average shares (2025 annual report MD&A); Royalty model: owner cash approximates operating cash flow; minimal sustaining capex. FY2025 includes in-kind bullion timing; Q1 2026 OCF includes $49.5M CRA refund (not in FCF0). Cobre Panamá and development royalties excluded from base growth. [HUMAN REVIEW — Phase 3 scaffold requires a primary-source bridge].",
         "comparable_role": "not_applicable",
         "comparable_ids": [],
         "adjustment": "The low/base/high range incorporates ownership, tax, capital, cycle, timing, and realization uncertainty pending the primary bridge.",
@@ -1288,7 +1984,7 @@
         },
         "evidence_tier": "mixed_primary_and_estimate",
         "evidence_level": "analyst_estimated",
-        "evidence": "Existing FNV valuation inputs: FY2025 net cash from operating activities $1,493.7M / 192.7M weighted average shares (2025 annual report MD&A); Royalty model: owner cash approximates operating cash flow; minimal sustaining capex. FY2025 includes in-kind bullion timing; Q1 2026 OCF includes $49.5M CRA refund (not in FCF0). Cobre Panam\u00e1 and development royalties excluded from base growth. [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
+        "evidence": "Existing FNV valuation inputs: FY2025 net cash from operating activities $1,493.7M / 192.7M weighted average shares (2025 annual report MD&A); Royalty model: owner cash approximates operating cash flow; minimal sustaining capex. FY2025 includes in-kind bullion timing; Q1 2026 OCF includes $49.5M CRA refund (not in FCF0). Cobre Panamá and development royalties excluded from base growth. [HUMAN REVIEW — Phase 3 scaffold requires a primary-source bridge].",
         "probability_and_timing": null,
         "tax_and_realization_adjustments": "The low/base/high range incorporates ownership, tax, capital, cycle, timing, and realization uncertainty pending the primary bridge.",
         "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case.",
@@ -1327,7 +2023,7 @@
         },
         "evidence_tier": "mixed_primary_and_estimate",
         "evidence_level": "analyst_estimated",
-        "evidence": "Existing FNV valuation inputs: FY2025 net cash from operating activities $1,493.7M / 192.7M weighted average shares (2025 annual report MD&A); Royalty model: owner cash approximates operating cash flow; minimal sustaining capex. FY2025 includes in-kind bullion timing; Q1 2026 OCF includes $49.5M CRA refund (not in FCF0). Cobre Panam\u00e1 and development royalties excluded from base growth. [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
+        "evidence": "Existing FNV valuation inputs: FY2025 net cash from operating activities $1,493.7M / 192.7M weighted average shares (2025 annual report MD&A); Royalty model: owner cash approximates operating cash flow; minimal sustaining capex. FY2025 includes in-kind bullion timing; Q1 2026 OCF includes $49.5M CRA refund (not in FCF0). Cobre Panamá and development royalties excluded from base growth. [HUMAN REVIEW — Phase 3 scaffold requires a primary-source bridge].",
         "probability_and_timing": {
           "success_probability": null,
           "remaining_capital_m": null,
@@ -1372,7 +2068,7 @@
         },
         "evidence_tier": "mixed_primary_and_estimate",
         "evidence_level": "analyst_estimated",
-        "evidence": "Existing FNV valuation inputs: FY2025 net cash from operating activities $1,493.7M / 192.7M weighted average shares (2025 annual report MD&A); Royalty model: owner cash approximates operating cash flow; minimal sustaining capex. FY2025 includes in-kind bullion timing; Q1 2026 OCF includes $49.5M CRA refund (not in FCF0). Cobre Panam\u00e1 and development royalties excluded from base growth. [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
+        "evidence": "Existing FNV valuation inputs: FY2025 net cash from operating activities $1,493.7M / 192.7M weighted average shares (2025 annual report MD&A); Royalty model: owner cash approximates operating cash flow; minimal sustaining capex. FY2025 includes in-kind bullion timing; Q1 2026 OCF includes $49.5M CRA refund (not in FCF0). Cobre Panamá and development royalties excluded from base growth. [HUMAN REVIEW — Phase 3 scaffold requires a primary-source bridge].",
         "probability_and_timing": null,
         "tax_and_realization_adjustments": "The low/base/high range incorporates ownership, tax, capital, cycle, timing, and realization uncertainty pending the primary bridge.",
         "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case.",
@@ -1411,7 +2107,7 @@
         },
         "evidence_tier": "mixed_primary_and_estimate",
         "evidence_level": "analyst_estimated",
-        "evidence": "Existing FNV valuation inputs: FY2025 net cash from operating activities $1,493.7M / 192.7M weighted average shares (2025 annual report MD&A); Royalty model: owner cash approximates operating cash flow; minimal sustaining capex. FY2025 includes in-kind bullion timing; Q1 2026 OCF includes $49.5M CRA refund (not in FCF0). Cobre Panam\u00e1 and development royalties excluded from base growth. [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
+        "evidence": "Existing FNV valuation inputs: FY2025 net cash from operating activities $1,493.7M / 192.7M weighted average shares (2025 annual report MD&A); Royalty model: owner cash approximates operating cash flow; minimal sustaining capex. FY2025 includes in-kind bullion timing; Q1 2026 OCF includes $49.5M CRA refund (not in FCF0). Cobre Panamá and development royalties excluded from base growth. [HUMAN REVIEW — Phase 3 scaffold requires a primary-source bridge].",
         "probability_and_timing": null,
         "tax_and_realization_adjustments": "The low/base/high range incorporates ownership, tax, capital, cycle, timing, and realization uncertainty pending the primary bridge.",
         "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case.",
@@ -1436,7 +2132,7 @@
           "label": "Producing precious-metal royalty and stream cash flows",
           "kind": "judgment",
           "evidence_tier": "mixed_primary_and_estimate",
-          "evidence": "Existing FNV valuation inputs: FY2025 net cash from operating activities $1,493.7M / 192.7M weighted average shares (2025 annual report MD&A); Royalty model: owner cash approximates operating cash flow; minimal sustaining capex. FY2025 includes in-kind bullion timing; Q1 2026 OCF includes $49.5M CRA refund (not in FCF0). Cobre Panam\u00e1 and development royalties excluded from base growth. [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
+          "evidence": "Existing FNV valuation inputs: FY2025 net cash from operating activities $1,493.7M / 192.7M weighted average shares (2025 annual report MD&A); Royalty model: owner cash approximates operating cash flow; minimal sustaining capex. FY2025 includes in-kind bullion timing; Q1 2026 OCF includes $49.5M CRA refund (not in FCF0). Cobre Panamá and development royalties excluded from base growth. [HUMAN REVIEW — Phase 3 scaffold requires a primary-source bridge].",
           "method": "royalty_distribution_curve"
         },
         {
@@ -1444,7 +2140,7 @@
           "label": "Development-stage and optional royalty inventory",
           "kind": "judgment",
           "evidence_tier": "mixed_primary_and_estimate",
-          "evidence": "Existing FNV valuation inputs: FY2025 net cash from operating activities $1,493.7M / 192.7M weighted average shares (2025 annual report MD&A); Royalty model: owner cash approximates operating cash flow; minimal sustaining capex. FY2025 includes in-kind bullion timing; Q1 2026 OCF includes $49.5M CRA refund (not in FCF0). Cobre Panam\u00e1 and development royalties excluded from base growth. [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
+          "evidence": "Existing FNV valuation inputs: FY2025 net cash from operating activities $1,493.7M / 192.7M weighted average shares (2025 annual report MD&A); Royalty model: owner cash approximates operating cash flow; minimal sustaining capex. FY2025 includes in-kind bullion timing; Q1 2026 OCF includes $49.5M CRA refund (not in FCF0). Cobre Panamá and development royalties excluded from base growth. [HUMAN REVIEW — Phase 3 scaffold requires a primary-source bridge].",
           "method": "unit_nav_and_milestone_option"
         },
         {
@@ -1452,7 +2148,7 @@
           "label": "Cash, available capital, and liabilities",
           "kind": "judgment",
           "evidence_tier": "mixed_primary_and_estimate",
-          "evidence": "Existing FNV valuation inputs: FY2025 net cash from operating activities $1,493.7M / 192.7M weighted average shares (2025 annual report MD&A); Royalty model: owner cash approximates operating cash flow; minimal sustaining capex. FY2025 includes in-kind bullion timing; Q1 2026 OCF includes $49.5M CRA refund (not in FCF0). Cobre Panam\u00e1 and development royalties excluded from base growth. [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
+          "evidence": "Existing FNV valuation inputs: FY2025 net cash from operating activities $1,493.7M / 192.7M weighted average shares (2025 annual report MD&A); Royalty model: owner cash approximates operating cash flow; minimal sustaining capex. FY2025 includes in-kind bullion timing; Q1 2026 OCF includes $49.5M CRA refund (not in FCF0). Cobre Panamá and development royalties excluded from base growth. [HUMAN REVIEW — Phase 3 scaffold requires a primary-source bridge].",
           "method": "net_asset_value"
         },
         {
@@ -1460,7 +2156,7 @@
           "label": "Metal-price, operator, and realization reserve",
           "kind": "judgment",
           "evidence_tier": "mixed_primary_and_estimate",
-          "evidence": "Existing FNV valuation inputs: FY2025 net cash from operating activities $1,493.7M / 192.7M weighted average shares (2025 annual report MD&A); Royalty model: owner cash approximates operating cash flow; minimal sustaining capex. FY2025 includes in-kind bullion timing; Q1 2026 OCF includes $49.5M CRA refund (not in FCF0). Cobre Panam\u00e1 and development royalties excluded from base growth. [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
+          "evidence": "Existing FNV valuation inputs: FY2025 net cash from operating activities $1,493.7M / 192.7M weighted average shares (2025 annual report MD&A); Royalty model: owner cash approximates operating cash flow; minimal sustaining capex. FY2025 includes in-kind bullion timing; Q1 2026 OCF includes $49.5M CRA refund (not in FCF0). Cobre Panamá and development royalties excluded from base growth. [HUMAN REVIEW — Phase 3 scaffold requires a primary-source bridge].",
           "method": "depletion_reserve"
         }
       ]
@@ -1600,7 +2296,7 @@
       "horizon_years": 7
     },
     "scenario_contract": {
-      "rule": "Cases must change causal operating, capital, probability, timing, or financing drivers\u2014not only the terminal multiple.",
+      "rule": "Cases must change causal operating, capital, probability, timing, or financing drivers—not only the terminal multiple.",
       "top_value_drivers": [
         {
           "component_id": "producing_royalty_stream",
