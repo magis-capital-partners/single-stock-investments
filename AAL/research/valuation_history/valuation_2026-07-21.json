@@ -564,7 +564,7 @@
   },
   "economic_value_analysis": {
     "schema_version": "1.0",
-    "status": "complete",
+    "status": "evidence_blocked",
     "trigger": {
       "required": true,
       "reasons": [
@@ -572,16 +572,10 @@
       ],
       "policy": "A complete economic-value analysis is required when any trigger fires; otherwise it is recommended."
     },
-    "method": "component_economic_value",
-    "economic_claim": {
-      "description": "One diluted share of AAL, including mid-cycle network operations, AAdvantage co-brand optionality, net financial claims, and cycle/leverage reserve.",
-      "unit_label": "diluted share",
-      "unit_count": 658621000,
-      "unit_source": "Q1 2026 net income $382M / diluted EPS $0.58 (AAL/investor-documents/sec-edgar/10-Q_20260423_rpt20260331_acc0000006201_26_000032.htm)",
-      "enterprise_to_equity_reconciliation": "Operating network cash is valued once; cash, debt, co-brand option, and cycle reserve are separate additive components with unique overlap keys."
-    },
-    "gaap_role": "cross_check",
-    "accounting_reference": "FY2025 10-K and Q1 2026 10-Q filing extracts; GAAP net income is cross-check only for levered airline.",
+    "method": "economic_claim_to_risked_present_value",
+    "economic_claim": {},
+    "gaap_role": null,
+    "accounting_reference": null,
     "comparable_hierarchy": [
       "issuer_arm_length_transaction",
       "same_asset_transaction",
@@ -626,13 +620,6 @@
           "low": 0.0,
           "base": 8.0,
           "high": 20.0
-        },
-        "risk_and_timing": {
-          "success_probability": 0.65,
-          "remaining_capital_m": 0.0,
-          "timing_basis": "Co-brand and partner mile contracts renew over 3 to 7 years; base case assumes continued monetization through FY2030.",
-          "probability_basis": "Judgment from industry loyalty precedents; American does not disclose standalone AAdvantage segment economics in SEC filings.",
-          "remaining_capital_basis": "Partner-funded mile sales require no incremental owner capital in base case."
         }
       },
       {
@@ -718,9 +705,9 @@
         "risk_and_timing": {
           "success_probability": null,
           "remaining_capital_m": null,
-          "timing_basis": "Co-brand and partner mile contracts renew over 3 to 7 years; base case assumes continued monetization through FY2030.",
-          "probability_basis": "Judgment from industry loyalty precedents; American does not disclose standalone AAdvantage segment economics in SEC filings.",
-          "remaining_capital_basis": "Partner-funded mile sales require no incremental owner capital in base case."
+          "timing_basis": null,
+          "probability_basis": null,
+          "remaining_capital_basis": null
         }
       },
       {
@@ -773,12 +760,18 @@
       }
     ],
     "wisdom_applied": [],
-    "limitations": [
-      "AAdvantage standalone value is judgment-based pending issuer disclosure.",
-      "Levered equity stub; component sum can be negative while market prices recovery."
-    ],
+    "limitations": [],
     "complete_component_coverage": true,
-    "validation_errors": [],
+    "validation_errors": [
+      "economic_claim.description required",
+      "economic_claim.enterprise_to_equity_reconciliation required",
+      "economic_claim.unit_count required",
+      "economic_claim.unit_label required",
+      "economic_claim.unit_source required",
+      "economic_value.schema_version 1.0 required",
+      "gaap_role required",
+      "option component aadvantage_co_brand_option requires probability, timing, and remaining-capital treatment"
+    ],
     "registry_version": "1.0"
   },
   "total_return_panel": {
@@ -1544,7 +1537,7 @@
   },
   "universal_valuation_contract": {
     "schema_version": "2.0",
-    "status": "decision_grade",
+    "status": "evidence_blocked",
     "ticker": "AAL",
     "as_of": "2026-07-21",
     "economic_ownership_map": [
@@ -2129,9 +2122,9 @@
         "probability_and_timing": {
           "success_probability": null,
           "remaining_capital_m": null,
-          "timing_basis": "Co-brand and partner mile contracts renew over 3 to 7 years; base case assumes continued monetization through FY2030.",
-          "probability_basis": "Judgment from industry loyalty precedents; American does not disclose standalone AAdvantage segment economics in SEC filings.",
-          "remaining_capital_basis": "Partner-funded mile sales require no incremental owner capital in base case."
+          "timing_basis": null,
+          "probability_basis": null,
+          "remaining_capital_basis": null
         },
         "tax_and_realization_adjustments": "Reconcile to FY2025 10-K and Q1 2026 10-Q before decision use.",
         "falsifier": "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
@@ -3173,9 +3166,27 @@
       "low_base_high_ordered": true
     },
     "evidence": {
-      "unresolved_count": 0,
-      "blockers": [],
-      "validation_errors": []
+      "unresolved_count": 8,
+      "blockers": [
+        "economic_claim.description required",
+        "economic_claim.enterprise_to_equity_reconciliation required",
+        "economic_claim.unit_count required",
+        "economic_claim.unit_label required",
+        "economic_claim.unit_source required",
+        "economic_value.schema_version 1.0 required",
+        "gaap_role required",
+        "option component aadvantage_co_brand_option requires probability, timing, and remaining-capital treatment"
+      ],
+      "validation_errors": [
+        "economic_claim.description required",
+        "economic_claim.enterprise_to_equity_reconciliation required",
+        "economic_claim.unit_count required",
+        "economic_claim.unit_label required",
+        "economic_claim.unit_source required",
+        "economic_value.schema_version 1.0 required",
+        "gaap_role required",
+        "option component aadvantage_co_brand_option requires probability, timing, and remaining-capital treatment"
+      ]
     },
     "monitoring": {
       "falsifiers": [
@@ -3192,7 +3203,7 @@
       ]
     },
     "change_control": {
-      "model_hash": "721088623389d00524f0d2f45af168f8fb659112945638cef3263f2837a8b8fb",
+      "model_hash": "da43ef313eb525528d6ae7b6634d1d441f45251774a902694c213f72e21bfdfd",
       "method_versions": [
         "net_asset_value@1.0",
         "owner_cash_or_dividend_discount@1.0",
@@ -3275,294 +3286,5 @@
       }
     },
     "notes": "Capstone IRR combining filings, segments, overlays, third-party, qualitative"
-  },
-  "context_overlay": {
-    "as_of": "2026-07-21",
-    "disclaimer": "Context only. Tailwinds inform stance and overlay sizing; they do not auto-inflate Lawrence base IRR. Promotion to base case requires [HUMAN REVIEW].",
-    "themes": [
-      {
-        "theme_id": "macro_regime",
-        "label": "Macro risk regime",
-        "indicators": [
-          {
-            "id": "hy_oas",
-            "label": "High-yield OAS credit spread (%)",
-            "latest": 1.43,
-            "as_of": "2026-07-20",
-            "yoy_pct": 248.8,
-            "direction": "up",
-            "good_for": "risk_regime",
-            "source": "spread:HYG-LQD:21d (HYG-LQD 1m spread proxy, not OAS)",
-            "stale": false,
-            "in_base_irr": false
-          },
-          {
-            "id": "ust_10y",
-            "label": "US Treasury 10Y yield (%)",
-            "latest": 4.5980000495910645,
-            "as_of": "2026-07-20",
-            "yoy_pct": 5.2,
-            "direction": "up",
-            "good_for": "rates_regime",
-            "source": "yahoo:^TNX",
-            "stale": false,
-            "in_base_irr": false
-          },
-          {
-            "id": "ust_2y",
-            "label": "US Treasury 2Y yield (%)",
-            "latest": 4.328000068664551,
-            "as_of": "2026-07-20",
-            "yoy_pct": 10.7,
-            "direction": "up",
-            "good_for": "rates_regime",
-            "source": "yahoo:^FVX",
-            "stale": false,
-            "in_base_irr": false
-          },
-          {
-            "id": "dxy_broad",
-            "label": "Trade-weighted USD index (broad)",
-            "latest": 100.93699645996094,
-            "as_of": "2026-07-21",
-            "yoy_pct": 3.2,
-            "direction": "up",
-            "good_for": "dollar_regime",
-            "source": "yahoo:DX-Y.NYB",
-            "stale": false,
-            "in_base_irr": false
-          },
-          {
-            "id": "vix_level",
-            "label": "VIX index level",
-            "latest": 18.649999618530273,
-            "as_of": "2026-07-20",
-            "yoy_pct": 12.0,
-            "direction": "up",
-            "good_for": "vol_regime",
-            "source": "yahoo:^VIX",
-            "stale": false,
-            "in_base_irr": false
-          },
-          {
-            "id": "credit_impulse_1m",
-            "label": "HYG vs TLT 1-month return spread (%)",
-            "latest": 2.76,
-            "as_of": "2026-07-20",
-            "yoy_pct": 55.9,
-            "direction": "up",
-            "good_for": "credit_impulse",
-            "source": "spread:HYG-TLT:21d",
-            "stale": false,
-            "in_base_irr": false
-          },
-          {
-            "id": "spy_20d_realized_vol",
-            "label": "SPY 20-day realized vol (annualized %)",
-            "latest": 11.37,
-            "as_of": "2026-07-20",
-            "yoy_pct": 31.3,
-            "direction": "up",
-            "good_for": "equity_vol",
-            "source": "realized_vol:SPY:20d",
-            "stale": false,
-            "in_base_irr": false
-          }
-        ]
-      }
-    ]
-  },
-  "insider_signal": {
-    "as_of": "2026-07-21",
-    "disclaimer": "Context only. Insider activity informs scenario confidence and stance discussion; it does not auto-inflate Lawrence base IRR. Promotion requires [HUMAN REVIEW].",
-    "in_base_irr": false,
-    "window_days": 365,
-    "ics": 0.0,
-    "band": "negligible",
-    "bull_case_support": "none",
-    "scenario_confidence": {
-      "priors": {
-        "bear": 0.2,
-        "base": 0.55,
-        "bull": 0.25
-      },
-      "tilted": {
-        "bear": 0.28,
-        "base": 0.47,
-        "bull": 0.25
-      },
-      "bull_delta": 0.0,
-      "bear_delta": 0.08,
-      "note": "Scenario weights are qualitative confidence only; Lawrence base IRR unchanged."
-    },
-    "factors": {
-      "buy_score": 0.0,
-      "sell_score": -1.0,
-      "cluster_bonus": 0.0,
-      "net_buy_usd": 0,
-      "net_sell_usd": 10177019.61,
-      "price_today": 15.14
-    },
-    "top_buys": [],
-    "top_sells": [
-      {
-        "insider": "Seymour David",
-        "date": "2026-07-12",
-        "shares": 4801,
-        "price": 16.95,
-        "value_usd": 81376.95,
-        "is_10b5_1": false,
-        "contrib": -0.186
-      },
-      {
-        "insider": "Seymour David",
-        "date": "2026-06-25",
-        "shares": 56456,
-        "price": 18.0006,
-        "value_usd": 1016241.87,
-        "is_10b5_1": false,
-        "contrib": -0.161
-      },
-      {
-        "insider": "Seymour David",
-        "date": "2026-06-24",
-        "shares": 69343,
-        "price": 17.0,
-        "value_usd": 1178831.0,
-        "is_10b5_1": false,
-        "contrib": -0.16
-      },
-      {
-        "insider": "Johnson Stephen L",
-        "date": "2026-02-20",
-        "shares": 17078,
-        "price": 13.59,
-        "value_usd": 232090.02,
-        "is_10b5_1": false,
-        "contrib": -0.129
-      },
-      {
-        "insider": "Johnson Stephen L",
-        "date": "2026-02-18",
-        "shares": 24449,
-        "price": 14.1,
-        "value_usd": 344730.9,
-        "is_10b5_1": false,
-        "contrib": -0.129
-      }
-    ],
-    "narrative_hooks": [],
-    "transaction_count": 50
-  },
-  "lens_consensus": {
-    "as_of": "2026-07-21",
-    "shared_inputs_ref": "valuation.json@2026-07-21",
-    "valuation_richness": 0.0,
-    "blended_return_pct": 25.56,
-    "band_pct": [
-      15.2,
-      28.48
-    ],
-    "weighted_median_pct": 27.0,
-    "median_mean_flag": false,
-    "stance": "watch",
-    "agreement_pct": 100,
-    "dissent_count": 0,
-    "lawrence_divergence": false,
-    "top_dissents": [],
-    "contributor_count": 8,
-    "in_base_irr": false,
-    "disclaimer": "Advisory lens blend only. Does not replace Lawrence total-synthesis stance gate without [HUMAN REVIEW]."
-  },
-  "economic_value": {
-    "schema_version": "1.0",
-    "method": "component_economic_value",
-    "economic_claim": {
-      "description": "One diluted share of AAL, including mid-cycle network operations, AAdvantage co-brand optionality, net financial claims, and cycle/leverage reserve.",
-      "unit_label": "diluted share",
-      "unit_count": 658621000,
-      "unit_source": "Q1 2026 net income $382M / diluted EPS $0.58 (AAL/investor-documents/sec-edgar/10-Q_20260423_rpt20260331_acc0000006201_26_000032.htm)",
-      "enterprise_to_equity_reconciliation": "Operating network cash is valued once; cash, debt, co-brand option, and cycle reserve are separate additive components with unique overlap keys."
-    },
-    "gaap_role": "cross_check",
-    "accounting_reference": "FY2025 10-K and Q1 2026 10-Q filing extracts; GAAP net income is cross-check only for levered airline.",
-    "component_groups": [
-      {
-        "id": "midcycle_passenger_network",
-        "label": "Mid-cycle U.S. network passenger and cargo operations",
-        "component_ids": [
-          "midcycle_passenger_network"
-        ],
-        "economic_claim": "Mid-cycle U.S. network passenger and cargo operations",
-        "valuation_basis": "Proof outputs {'low': 21.1701, 'base': 33.88, 'high': 49.4099}; see calculation_proof graph.",
-        "adjustments": "Reconcile to FY2025 10-K and Q1 2026 10-Q before decision use.",
-        "overlap_control": "Unique overlap key midcycle_passenger_network.",
-        "risked_present_value_per_share": {
-          "low": 21.17,
-          "base": 33.88,
-          "high": 49.41
-        }
-      },
-      {
-        "id": "aadvantage_co_brand_option",
-        "label": "AAdvantage co-brand and partner loyalty economics",
-        "component_ids": [
-          "aadvantage_co_brand_option"
-        ],
-        "economic_claim": "AAdvantage co-brand and partner loyalty economics",
-        "valuation_basis": "Proof outputs {'low': 0.0, 'base': 8.0, 'high': 20.0}; see calculation_proof graph.",
-        "adjustments": "Reconcile to FY2025 10-K and Q1 2026 10-Q before decision use.",
-        "overlap_control": "Unique overlap key aadvantage_co_brand_option.",
-        "risked_present_value_per_share": {
-          "low": 0.0,
-          "base": 8.0,
-          "high": 20.0
-        },
-        "risk_and_timing": {
-          "success_probability": 0.65,
-          "remaining_capital_m": 0.0,
-          "timing_basis": "Co-brand and partner mile contracts renew over 3 to 7 years; base case assumes continued monetization through FY2030.",
-          "probability_basis": "Judgment from industry loyalty precedents; American does not disclose standalone AAdvantage segment economics in SEC filings.",
-          "remaining_capital_basis": "Partner-funded mile sales require no incremental owner capital in base case."
-        }
-      },
-      {
-        "id": "net_financial_claims",
-        "label": "Net cash and debt claims on common equity",
-        "component_ids": [
-          "net_financial_claims"
-        ],
-        "economic_claim": "Net cash and debt claims on common equity",
-        "valuation_basis": "Proof outputs {'low': -44.8747, 'base': -42.6725, 'high': -40.2649}; see calculation_proof graph.",
-        "adjustments": "Reconcile to FY2025 10-K and Q1 2026 10-Q before decision use.",
-        "overlap_control": "Unique overlap key net_financial_claims.",
-        "risked_present_value_per_share": {
-          "low": -44.87,
-          "base": -42.67,
-          "high": -40.26
-        }
-      },
-      {
-        "id": "cycle_leverage_reserve",
-        "label": "Fuel, recession, and leverage stress reserve",
-        "component_ids": [
-          "cycle_leverage_reserve"
-        ],
-        "economic_claim": "Fuel, recession, and leverage stress reserve",
-        "valuation_basis": "Proof outputs {'low': -18.0, 'base': -9.0, 'high': -3.0001}; see calculation_proof graph.",
-        "adjustments": "Reconcile to FY2025 10-K and Q1 2026 10-Q before decision use.",
-        "overlap_control": "Unique overlap key cycle_leverage_reserve.",
-        "risked_present_value_per_share": {
-          "low": -18.0,
-          "base": -9.0,
-          "high": -3.0
-        }
-      }
-    ],
-    "limitations": [
-      "AAdvantage standalone value is judgment-based pending issuer disclosure.",
-      "Levered equity stub; component sum can be negative while market prices recovery."
-    ]
-  },
-  "valuation_mode": "economic_value"
+  }
 }
