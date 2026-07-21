@@ -9,9 +9,9 @@
 
 ## Executive summary
 
-Marvin floor **19.82%** per year (compounder; stance **hold**) from primary filings and `valuation.json`. No third-party sources indexed; filings-only stance. **[HUMAN REVIEW]** for approved-source numeric blend.
+Marvin floor **19.52%** per year (compounder; stance **hold**) from primary filings and `valuation.json`. No third-party sources indexed; filings-only stance. **[HUMAN REVIEW]** for approved-source numeric blend.
 
-**Synthesis (best estimate):** Marvin **19.82%** base · stance **hold**; external sources adjust conviction on catalyst timing, not primary IRR without human OK.
+**Synthesis (best estimate):** Marvin **19.52%** base · stance **hold**; external sources adjust conviction on catalyst timing, not primary IRR without human OK.
 
 ## Sources in scope
 
@@ -23,7 +23,7 @@ Marvin floor **19.82%** per year (compounder; stance **hold**) from primary fili
 
 | Topic | Marvin (filings) | External | Source |
 |-------|------------------|----------|--------|
-| Base return anchor | **19.82%** per year | Qualitative support only | `ALL/research/deep_dive_2026-07-21.md` |
+| Base return anchor | **19.52%** per year | Qualitative support only | `ALL/research/deep_dive_2026-07-21.md` |
 | Component economic value | **$230/sh** base sum | Filing-derived proof schedule | `ALL/research/evidence_reconciliation_2026-07-21.md` |
 | Archetype / stance | **compounder** · **hold** | See indexed sources | `valuation.json` |
 | Normalization | P&C insurer owner cash normalized from peak-cycle FY2025 GAAP earnings; OCF $10. | Cross-check vs posts | Marvin |
@@ -32,20 +32,20 @@ Marvin floor **19.82%** per year (compounder; stance **hold**) from primary fili
 
 | Topic | Marvin floor | External | Blend logic |
 |-------|--------------|----------|-------------|
-| Primary IRR | **19.82%** (Lawrence / scenarios) | No single approved IRR unless promoted | Marvin **70%** numeric; external **30%** catalyst timing |
+| Primary IRR | **19.52%** (Lawrence / scenarios) | No single approved IRR unless promoted | Marvin **70%** numeric; external **30%** catalyst timing |
 | Third party | Filing-first | Context tier only | No numeric upgrade without human OK |
 
 ## Blended estimate (best judgment)
 
 | Lens | Owner cash / value | Return / horizon | Stance hint |
 |------|-------------------|------------------|-------------|
-| Marvin floor | See assumption ledger | **19.82%** | **hold** |
+| Marvin floor | See assumption ledger | **19.52%** | **hold** |
 | External (combined) | Narrative / catalyst | No change to base % | **hold** (conviction) |
-| **Blended best estimate** | **Filing anchor** | **19.82%** | **hold** |
+| **Blended best estimate** | **Filing anchor** | **19.52%** | **hold** |
 
 **Weights:** Marvin **70%** on numbers; indexed third party **30%** on catalyst timing and narrative (approved Substacks/HK context only in qualitative layer until human promotes).
 
-**Returns statement (blended):** We expect **19.82%** per year at today's price on the Marvin base case; third-party sources may raise or lower conviction on timing but do not replace filing math without **[HUMAN REVIEW]**.
+**Returns statement (blended):** We expect **19.52%** per year at today's price on the Marvin base case; third-party sources may raise or lower conviction on timing but do not replace filing math without **[HUMAN REVIEW]**.
 
 ## [HUMAN REVIEW]
 
