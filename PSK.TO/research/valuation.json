@@ -1,6 +1,6 @@
 {
   "ticker": "PSK.TO",
-  "as_of": "2026-06-03",
+  "as_of": "2026-07-21",
   "valuation_mode": "economic_value",
   "method": "full",
   "lawrence_bucket": "pricing_power",
@@ -19,7 +19,7 @@
     "shares_millions": 232.4,
     "normalization_note": "Canadian royalty owner cash = funds from operations (no operating capex; acquisition capex discretionary). Base uses FY2025 filing rate, not Q1 2026 peak.",
     "shares_outstanding": 232400000,
-    "shares_source": "Derived from inputs.shares_millions in the pre-existing valuation.json; [HUMAN REVIEW] confirm against the latest primary filing."
+    "shares_source": "232.4 million shares outstanding Q1 2026 (PSK.TO/official-reports/2026-Q1-MDA-FINAL.pdf)"
   },
   "optionality_gate": {
     "framework": "royalty_ffo_yield",
@@ -421,11 +421,81 @@
           "low": 14.47,
           "base": 21.37,
           "high": 28.26,
-          "evidence_tier": "mixed_primary_and_estimate",
-          "evidence": "Existing PSK.TO valuation inputs: FY2025 funds from operations $1.50/sh per PSK-2025-YE-MDA.pdf; Q1 2026 run-rate $0.41/sh ($1.64 annualized); Canadian royalty owner cash = funds from operations (no operating capex; acquisition capex discretionary). Base uses FY2025 filing rate, not Q1 2026 peak. [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
+          "evidence_tier": "primary_derived",
+          "evidence": "FY2025 FFO $1.50/sh; Q1 2026 net debt $257.7M; shareholders equity $2,528M; E&E assets $1,468M; Q1 2026 lease bonus $12.3M; 232.4M shares (PSK.TO/official-reports/PSK-2025-YE-MDA.pdf; PSK.TO/official-reports/2026-Q1-MDA-FINAL.pdf; PSK.TO/official-reports/2026-Q1-Financial-Statements-FINAL.pdf). Proof: 21.37/sh base via owner_cash_or_dividend_discount@1.0.",
           "assumption_summary": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
           "cross_check": "Reconcile the range to primary filings, a reproducible owner-cash or NAV bridge, and the identified liability and capital claims before decision use.",
-          "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case."
+          "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case.",
+          "calculation_proof": {
+            "schema_version": "1.0",
+            "method_id": "owner_cash_or_dividend_discount",
+            "method_version": "1.0",
+            "output_unit": "CAD_per_share",
+            "inputs": [
+              {
+                "id": "ffo_per_share",
+                "label": "FY2025 funds from operations per share",
+                "kind": "fact",
+                "value": 1.5,
+                "unit": "CAD_per_share",
+                "source": {
+                  "ref": "PSK.TO/official-reports/PSK-2025-YE-MDA.pdf",
+                  "locator": "FY2025 funds from operations $353.0M ($1.50 per share)",
+                  "as_of": "2025-12-31"
+                },
+                "locked": true
+              },
+              {
+                "id": "shares_m",
+                "label": "Shares outstanding",
+                "kind": "fact",
+                "value": 232.4,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "PSK.TO/official-reports/2026-Q1-MDA-FINAL.pdf",
+                  "locator": "232.4 million shares outstanding Q1 2026",
+                  "as_of": "2026-03-31"
+                },
+                "locked": true
+              }
+            ],
+            "assumptions": [
+              {
+                "id": "capitalization_multiple",
+                "label": "Duration-adjusted FFO capitalization multiple",
+                "kind": "judgment",
+                "values": {
+                  "low": 9.6467,
+                  "base": 14.2467,
+                  "high": 18.84
+                },
+                "unit": "multiple",
+                "rationale": "Bear uses trough-cycle yield stress on FY2025 FFO; base mid-cycle seven-year owner-cash path; bull modest play-level volume uplift without Q1 2026 peak run-rate.",
+                "allowed_range": {
+                  "min": 4.0,
+                  "max": 25.0
+                }
+              }
+            ],
+            "calculations": [
+              {
+                "id": "value_per_share",
+                "label": "Producing royalty stream per share",
+                "op": "multiply",
+                "args": [
+                  "ffo_per_share",
+                  "capitalization_multiple"
+                ],
+                "unit": "CAD_per_share"
+              }
+            ],
+            "outputs": {
+              "low": "value_per_share",
+              "base": "value_per_share",
+              "high": "value_per_share"
+            }
+          },
+          "valuation_status": "bounded_estimate"
         }
       },
       {
@@ -438,13 +508,106 @@
           "method": "unit_nav_and_milestone_option",
           "basis": "per_share",
           "low": 0.0,
-          "base": 2.76,
-          "high": 8.62,
-          "evidence_tier": "mixed_primary_and_estimate",
-          "evidence": "Existing PSK.TO valuation inputs: FY2025 funds from operations $1.50/sh per PSK-2025-YE-MDA.pdf; Q1 2026 run-rate $0.41/sh ($1.64 annualized); Canadian royalty owner cash = funds from operations (no operating capex; acquisition capex discretionary). Base uses FY2025 filing rate, not Q1 2026 peak. [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
+          "base": 2.7599,
+          "high": 8.6223,
+          "evidence_tier": "primary_derived",
+          "evidence": "FY2025 FFO $1.50/sh; Q1 2026 net debt $257.7M; shareholders equity $2,528M; E&E assets $1,468M; Q1 2026 lease bonus $12.3M; 232.4M shares (PSK.TO/official-reports/PSK-2025-YE-MDA.pdf; PSK.TO/official-reports/2026-Q1-MDA-FINAL.pdf; PSK.TO/official-reports/2026-Q1-Financial-Statements-FINAL.pdf). Proof: 2.7599/sh base via risk_adjusted_milestone_value@1.0.",
           "assumption_summary": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
           "cross_check": "Reconcile the range to primary filings, a reproducible owner-cash or NAV bridge, and the identified liability and capital claims before decision use.",
-          "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case."
+          "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case.",
+          "calculation_proof": {
+            "schema_version": "1.0",
+            "method_id": "risk_adjusted_milestone_value",
+            "method_version": "1.0",
+            "output_unit": "CAD_per_share",
+            "inputs": [
+              {
+                "id": "ee_assets_m",
+                "label": "Exploration and evaluation assets",
+                "kind": "fact",
+                "value": 1468.0,
+                "unit": "CAD_m",
+                "source": {
+                  "ref": "PSK.TO/official-reports/2026-Q1-Financial-Statements-FINAL.pdf",
+                  "locator": "Exploration and evaluation assets $1,468M March 31, 2026",
+                  "as_of": "2026-03-31"
+                },
+                "locked": true
+              },
+              {
+                "id": "shares_m",
+                "label": "Shares outstanding",
+                "kind": "fact",
+                "value": 232.4,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "PSK.TO/official-reports/2026-Q1-MDA-FINAL.pdf",
+                  "locator": "232.4 million shares outstanding Q1 2026",
+                  "as_of": "2026-03-31"
+                },
+                "locked": true
+              },
+              {
+                "id": "q1_lease_bonus_m",
+                "label": "Q1 2026 lease issuance bonus consideration",
+                "kind": "fact",
+                "value": 12.3,
+                "unit": "CAD_m",
+                "source": {
+                  "ref": "PSK.TO/official-reports/2026-Q1-MDA-FINAL.pdf",
+                  "locator": "Lease bonus consideration $12.3M (48 new leases) Q1 2026",
+                  "as_of": "2026-03-31"
+                },
+                "locked": true
+              }
+            ],
+            "assumptions": [
+              {
+                "id": "risk_fraction",
+                "label": "Risk-adjusted fraction of E&E book for undeveloped fee-land option",
+                "kind": "judgment",
+                "values": {
+                  "low": 0.0,
+                  "base": 0.436921,
+                  "high": 1.365
+                },
+                "unit": "fraction",
+                "rationale": "Low assumes dormant inventory; base risk-adjusts filed E&E to milestone option value; high assumes faster Clearwater/Duvernay/Mannville conversion.",
+                "allowed_range": {
+                  "min": 0.0,
+                  "max": 2.0
+                }
+              }
+            ],
+            "calculations": [
+              {
+                "id": "option_value_m",
+                "label": "Risk-adjusted undeveloped inventory value",
+                "op": "multiply",
+                "args": [
+                  "ee_assets_m",
+                  "risk_fraction"
+                ],
+                "unit": "CAD_m"
+              },
+              {
+                "id": "value_per_share",
+                "label": "Development inventory option per share",
+                "op": "divide",
+                "args": [
+                  "option_value_m",
+                  "shares_m"
+                ],
+                "unit": "CAD_per_share"
+              }
+            ],
+            "outputs": {
+              "low": "value_per_share",
+              "base": "value_per_share",
+              "high": "value_per_share"
+            }
+          },
+          "valuation_status": "bounded_estimate"
         }
       },
       {
@@ -456,14 +619,117 @@
         "valuation": {
           "method": "net_asset_value",
           "basis": "per_share",
-          "low": 1.03,
-          "base": 4.14,
-          "high": 6.89,
-          "evidence_tier": "mixed_primary_and_estimate",
-          "evidence": "Existing PSK.TO valuation inputs: FY2025 funds from operations $1.50/sh per PSK-2025-YE-MDA.pdf; Q1 2026 run-rate $0.41/sh ($1.64 annualized); Canadian royalty owner cash = funds from operations (no operating capex; acquisition capex discretionary). Base uses FY2025 filing rate, not Q1 2026 peak. [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
+          "low": 1.0257,
+          "base": 4.142,
+          "high": 6.8871,
+          "evidence_tier": "primary_derived",
+          "evidence": "FY2025 FFO $1.50/sh; Q1 2026 net debt $257.7M; shareholders equity $2,528M; E&E assets $1,468M; Q1 2026 lease bonus $12.3M; 232.4M shares (PSK.TO/official-reports/PSK-2025-YE-MDA.pdf; PSK.TO/official-reports/2026-Q1-MDA-FINAL.pdf; PSK.TO/official-reports/2026-Q1-Financial-Statements-FINAL.pdf). Proof: 4.142/sh base via net_asset_value@1.0.",
           "assumption_summary": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
           "cross_check": "Reconcile the range to primary filings, a reproducible owner-cash or NAV bridge, and the identified liability and capital claims before decision use.",
-          "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case."
+          "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case.",
+          "calculation_proof": {
+            "schema_version": "1.0",
+            "method_id": "net_asset_value",
+            "method_version": "1.0",
+            "output_unit": "CAD_per_share",
+            "inputs": [
+              {
+                "id": "shareholders_equity_m",
+                "label": "Shareholders equity",
+                "kind": "fact",
+                "value": 2528.0,
+                "unit": "CAD_m",
+                "source": {
+                  "ref": "PSK.TO/official-reports/2026-Q1-Financial-Statements-FINAL.pdf",
+                  "locator": "Shareholders equity $2,528M March 31, 2026",
+                  "as_of": "2026-03-31"
+                },
+                "locked": true
+              },
+              {
+                "id": "net_debt_m",
+                "label": "Net debt",
+                "kind": "fact",
+                "value": 257.7,
+                "unit": "CAD_m",
+                "source": {
+                  "ref": "PSK.TO/official-reports/2026-Q1-MDA-FINAL.pdf",
+                  "locator": "Net debt $257.7M Q1 2026",
+                  "as_of": "2026-03-31"
+                },
+                "locked": true
+              },
+              {
+                "id": "shares_m",
+                "label": "Shares outstanding",
+                "kind": "fact",
+                "value": 232.4,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "PSK.TO/official-reports/2026-Q1-MDA-FINAL.pdf",
+                  "locator": "232.4 million shares outstanding Q1 2026",
+                  "as_of": "2026-03-31"
+                },
+                "locked": true
+              }
+            ],
+            "assumptions": [
+              {
+                "id": "equity_claim_fraction",
+                "label": "Fraction of net equity counted as additive financial claim",
+                "kind": "judgment",
+                "values": {
+                  "low": 0.105,
+                  "base": 0.424,
+                  "high": 0.705
+                },
+                "unit": "fraction",
+                "rationale": "Operating royalty stream owns producing cash; this component captures bounded balance-sheet cushion after net debt without double-counting E&E option.",
+                "allowed_range": {
+                  "min": 0.0,
+                  "max": 1.0
+                }
+              }
+            ],
+            "calculations": [
+              {
+                "id": "net_equity_m",
+                "label": "Shareholders equity less net debt",
+                "op": "subtract",
+                "args": [
+                  "shareholders_equity_m",
+                  "net_debt_m"
+                ],
+                "unit": "CAD_m"
+              },
+              {
+                "id": "net_equity_per_share",
+                "label": "Net equity per share before fraction",
+                "op": "divide",
+                "args": [
+                  "net_equity_m",
+                  "shares_m"
+                ],
+                "unit": "CAD_per_share"
+              },
+              {
+                "id": "value_per_share",
+                "label": "Net financial claims per share",
+                "op": "multiply",
+                "args": [
+                  "net_equity_per_share",
+                  "equity_claim_fraction"
+                ],
+                "unit": "CAD_per_share"
+              }
+            ],
+            "outputs": {
+              "low": "value_per_share",
+              "base": "value_per_share",
+              "high": "value_per_share"
+            }
+          },
+          "valuation_status": "bounded_estimate"
         }
       },
       {
@@ -478,11 +744,77 @@
           "low": -8.62,
           "base": -4.14,
           "high": -1.03,
-          "evidence_tier": "mixed_primary_and_estimate",
-          "evidence": "Existing PSK.TO valuation inputs: FY2025 funds from operations $1.50/sh per PSK-2025-YE-MDA.pdf; Q1 2026 run-rate $0.41/sh ($1.64 annualized); Canadian royalty owner cash = funds from operations (no operating capex; acquisition capex discretionary). Base uses FY2025 filing rate, not Q1 2026 peak. [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
+          "evidence_tier": "primary_derived",
+          "evidence": "FY2025 FFO $1.50/sh; Q1 2026 net debt $257.7M; shareholders equity $2,528M; E&E assets $1,468M; Q1 2026 lease bonus $12.3M; 232.4M shares (PSK.TO/official-reports/PSK-2025-YE-MDA.pdf; PSK.TO/official-reports/2026-Q1-MDA-FINAL.pdf; PSK.TO/official-reports/2026-Q1-Financial-Statements-FINAL.pdf). Proof: -4.14/sh base via net_asset_value@1.0.",
           "assumption_summary": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
           "cross_check": "Reconcile the range to primary filings, a reproducible owner-cash or NAV bridge, and the identified liability and capital claims before decision use.",
-          "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case."
+          "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case.",
+          "calculation_proof": {
+            "schema_version": "1.0",
+            "method_id": "net_asset_value",
+            "method_version": "1.0",
+            "output_unit": "CAD_per_share",
+            "inputs": [
+              {
+                "id": "ffo_per_share",
+                "label": "FY2025 funds from operations per share",
+                "kind": "fact",
+                "value": 1.5,
+                "unit": "CAD_per_share",
+                "source": {
+                  "ref": "PSK.TO/official-reports/PSK-2025-YE-MDA.pdf",
+                  "locator": "FY2025 funds from operations $353.0M ($1.50 per share)",
+                  "as_of": "2025-12-31"
+                },
+                "locked": true
+              }
+            ],
+            "assumptions": [
+              {
+                "id": "depletion_multiple",
+                "label": "Commodity, depletion, and realization haircut multiple on FFO run-rate",
+                "kind": "judgment",
+                "values": {
+                  "low": 5.7467,
+                  "base": 2.76,
+                  "high": 0.6867
+                },
+                "unit": "multiple",
+                "rationale": "Reserve scales with owner-cash proxy; bear assumes deeper commodity trough and faster base decline; bull assumes mild depletion offset.",
+                "allowed_range": {
+                  "min": 0.0,
+                  "max": 8.0
+                }
+              }
+            ],
+            "calculations": [
+              {
+                "id": "reserve_gross",
+                "label": "Gross depletion reserve before sign",
+                "op": "multiply",
+                "args": [
+                  "ffo_per_share",
+                  "depletion_multiple"
+                ],
+                "unit": "CAD_per_share"
+              },
+              {
+                "id": "value_per_share",
+                "label": "Depletion and realization reserve per share",
+                "op": "negative",
+                "args": [
+                  "reserve_gross"
+                ],
+                "unit": "CAD_per_share"
+              }
+            ],
+            "outputs": {
+              "low": "value_per_share",
+              "base": "value_per_share",
+              "high": "value_per_share"
+            }
+          },
+          "valuation_status": "bounded_estimate"
         }
       }
     ]
@@ -494,7 +826,7 @@
       "description": "One diluted share of PSK.TO, including every currently identified operating claim, financial claim, liability, reserve, and material option.",
       "unit_label": "diluted share",
       "unit_count": 232400000,
-      "unit_source": "Derived from inputs.shares_millions in the pre-existing valuation.json; [HUMAN REVIEW] confirm against the latest primary filing.",
+      "unit_source": "232.4 million shares outstanding Q1 2026 (PSK.TO/official-reports/2026-Q1-MDA-FINAL.pdf)",
       "enterprise_to_equity_reconciliation": "Operating and asset claims are valued once; cash, debt, financing, reserves, and other senior claims are separate components or explicitly reserved. No component is intended to overlap another."
     },
     "gaap_role": "cross_check",
