@@ -247,6 +247,13 @@ def stance_proposal_block(val: dict) -> str:
 
 
 def primary_irr_pct(val: dict) -> float | int | str | None:
+    from optionality_evidence_common import synthesis_in_dive
+
+    ir = val.get("implied_return") or {}
+    if synthesis_in_dive(val):
+        syn = ir.get("synthesis_pct") if ir.get("synthesis_pct") is not None else ir.get("base_pct")
+        if syn is not None:
+            return syn
     ticker = str(val.get("ticker") or "").upper()
     method = val.get("method") or val.get("irr_method")
     legacy_pct = val.get("implied_return", {}).get("base_pct") or (val.get("results") or {}).get("base", {}).get(
@@ -258,7 +265,7 @@ def primary_irr_pct(val: dict) -> float | int | str | None:
     contract_base = (authority.get("return_range_pct") or {}).get("base")
     if contract_base is not None:
         return contract_base
-    return legacy_pct
+    return ir.get("base_pct") or (val.get("results") or {}).get("base", {}).get("return_pct")
 
 
 def format_headline_pct(base_pct: float | int | str) -> str:
@@ -295,12 +302,19 @@ def patch_classification_stance(text: str, val: dict) -> str:
         text,
         count=1,
     )
+    from optionality_evidence_common import synthesis_in_dive
+
+    ir = val.get("implied_return") or {}
     contract_base = (authority.get("return_range_pct") or {}).get("base")
-    display = (
-        f"{contract_base}% (contract base)"
-        if contract_base is not None
-        else ((val.get("implied_return") or {}).get("display") if authority.get("authority_level") == "legacy_reference" else None)
-    )
+    if synthesis_in_dive(val):
+        syn = ir.get("synthesis_pct") if ir.get("synthesis_pct") is not None else ir.get("base_pct")
+        display = f"{syn}% (total synthesis)" if syn is not None else None
+    else:
+        display = (
+            f"{contract_base}% (contract base)"
+            if contract_base is not None
+            else (ir.get("display") if authority.get("authority_level") == "legacy_reference" else None)
+        )
     if display:
         text = re.sub(
             rf"(\|\s*\*\*{re.escape(IMPLIED_IRR_LABEL)}\*\*[^|]*\|\s*)([^\|]+)(\|)",
@@ -1742,11 +1756,9 @@ def build_valuation_section(ticker: str, val: dict, preserved_val: str | None) -
     be_body = book_estimate_section(ticker)
     if be_body and "### Current book value estimate" not in (preserved_val or ""):
         parts += [be_body, ""]
-    parts += [
-        upside,
-        "",
-        ret,
-    ]
+    parts += [upside, ""]
+    if not synthesis_in_dive(val):
+        parts.append(ret)
     return "\n\n".join(parts)
 
 

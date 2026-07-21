@@ -1,6 +1,6 @@
 {
   "ticker": "RGLD",
-  "as_of": "2026-06-03",
+  "as_of": "2026-07-21",
   "method": "full",
   "lawrence_bucket": "fee_based",
   "classification_inputs": {
@@ -12,16 +12,17 @@
     "moi_bucket": "pending"
   },
   "inputs": {
-    "price": 216.755,
-    "price_source": "Stooq RGLD.US close 2026-06-03",
+    "price": 187.36,
+    "price_source": "Yahoo RGLD close 2026-07-20",
     "fcf_per_share": 9.0,
     "fcf_source": "FY2025 cash from operations $704.8M minus immaterial capital spending, divided by ~78M diluted shares (pre-full Sandstorm weighting); Q1 2026 run-rate ~$8.3/sh on ~85M shares",
-    "shares_millions": 84.9,
-    "shares_source": "Q1 2026 net income $281.1M / diluted EPS $3.30 (10-Q filed 2026-05-07)",
+    "shares_millions": 85.2,
+    "shares_source": "Q1 FY2026 net income $281.130M / diluted EPS $3.30 (RGLD/investor-documents/sec-edgar/10-Q_20260507_rpt20260331_acc0000085535_26_000028.htm); FY2025 owner-cash bridge uses normalized ~78.3M share base (RGLD/investor-documents/sec-edgar/10-K_20260219_rpt20251231_acc0000085535_26_000008.htm)",
     "book_per_share": 87.2,
     "book_source": "Q1 2026 stockholders equity $7,415M / ~85M shares",
     "normalization_note": "FY2025 revenue +43% YoY includes Sandstorm Gold combination and elevated metal prices; Lawrence uses run-rate owner cash near $9/sh, not peak spot-year heroics.",
-    "shares_outstanding": 84900000
+    "shares_outstanding": 85190909,
+    "price_as_of": "2026-07-20"
   },
   "scenarios": {
     "bear": {
@@ -97,33 +98,33 @@
   "lawrence_horizon_years": 7,
   "results_lawrence_legacy": {
     "bear": {
-      "return_pct": 0.1
+      "return_pct": 2.5
     },
     "base": {
-      "return_pct": 6.7
+      "return_pct": 9.3
     },
     "bull": {
-      "return_pct": 12.7
+      "return_pct": 15.4
     }
   },
   "results": {
     "bear": {
-      "return_pct": 0.1
+      "return_pct": 2.5
     },
     "base": {
-      "return_pct": 6.7
+      "return_pct": 9.3
     },
     "bull": {
-      "return_pct": 12.7
+      "return_pct": 15.4
     }
   },
   "implied_return": {
-    "base_pct": 8.06,
+    "base_pct": 10.67,
     "label": "7yr IRR (total synthesis)",
-    "display": "8.06% (total synthesis)",
-    "lawrence_stance_gate_pct": 6.7,
-    "falsifier_adjusted_pct": 6.7,
-    "synthesis_pct": 8.06
+    "display": "10.67% (total synthesis)",
+    "lawrence_stance_gate_pct": 9.3,
+    "falsifier_adjusted_pct": 9.3,
+    "synthesis_pct": 10.67
   },
   "overlay_results": [],
   "synthesis": {
@@ -133,7 +134,7 @@
         "id": "theory_implied",
         "label": "Growth theory (pre-falsifier)",
         "source": "growth_explanation + filing revenue YoY",
-        "return_pct": 6.7,
+        "return_pct": 9.3,
         "weight": 0.08,
         "type": "numeric",
         "epistemic_tier": "B (pre-falsifier derivation)",
@@ -147,7 +148,7 @@
         "id": "scenario_bear",
         "label": "Bear scenario (Lawrence)",
         "source": "scenarios.bear",
-        "return_pct": 0.1,
+        "return_pct": 2.5,
         "weight": 0.05,
         "type": "numeric",
         "epistemic_tier": "C (scenario envelope)",
@@ -161,7 +162,7 @@
         "id": "scenario_bull",
         "label": "Bull scenario (Lawrence)",
         "source": "scenarios.bull",
-        "return_pct": 12.7,
+        "return_pct": 15.4,
         "weight": 0.12,
         "type": "numeric",
         "epistemic_tier": "C (scenario envelope)",
@@ -184,9 +185,9 @@
     ],
     "qualitative_manual": false,
     "qualitative_pp_cap_applied": false,
-    "numeric_weighted_pct": 8.26,
+    "numeric_weighted_pct": 10.87,
     "qualitative_pp": -0.2,
-    "total_synthesis_pct": 8.06,
+    "total_synthesis_pct": 10.67,
     "human_approval": "pending",
     "weight_audit": {
       "flags": [],
@@ -210,14 +211,14 @@
   },
   "results_growth_theory": {
     "theory_implied": {
-      "return_pct": 6.7
+      "return_pct": 9.3
     },
     "falsifier_adjusted": {
-      "return_pct": 6.7
+      "return_pct": 9.3
     }
   },
   "context_overlay": {
-    "as_of": "2026-07-20",
+    "as_of": "2026-07-21",
     "disclaimer": "Context only. Tailwinds inform stance and overlay sizing; they do not auto-inflate Lawrence base IRR. Promotion to base case requires [HUMAN REVIEW].",
     "themes": [
       {
@@ -227,9 +228,9 @@
           {
             "id": "hy_oas",
             "label": "High-yield OAS credit spread (%)",
-            "latest": 1.3,
+            "latest": 1.43,
             "as_of": "2026-07-20",
-            "yoy_pct": 217.1,
+            "yoy_pct": 248.8,
             "direction": "up",
             "good_for": "risk_regime",
             "source": "spread:HYG-LQD:21d (HYG-LQD 1m spread proxy, not OAS)",
@@ -239,9 +240,9 @@
           {
             "id": "ust_10y",
             "label": "US Treasury 10Y yield (%)",
-            "latest": 4.579999923706055,
+            "latest": 4.5980000495910645,
             "as_of": "2026-07-20",
-            "yoy_pct": 4.8,
+            "yoy_pct": 5.2,
             "direction": "up",
             "good_for": "rates_regime",
             "source": "yahoo:^TNX",
@@ -251,9 +252,9 @@
           {
             "id": "ust_2y",
             "label": "US Treasury 2Y yield (%)",
-            "latest": 4.314000129699707,
+            "latest": 4.328000068664551,
             "as_of": "2026-07-20",
-            "yoy_pct": 10.4,
+            "yoy_pct": 10.7,
             "direction": "up",
             "good_for": "rates_regime",
             "source": "yahoo:^FVX",
@@ -263,8 +264,8 @@
           {
             "id": "dxy_broad",
             "label": "Trade-weighted USD index (broad)",
-            "latest": 100.93699645996094,
-            "as_of": "2026-07-20",
+            "latest": 100.97200012207031,
+            "as_of": "2026-07-21",
             "yoy_pct": 3.2,
             "direction": "up",
             "good_for": "dollar_regime",
@@ -275,9 +276,9 @@
           {
             "id": "vix_level",
             "label": "VIX index level",
-            "latest": 18.280000686645508,
+            "latest": 18.649999618530273,
             "as_of": "2026-07-20",
-            "yoy_pct": 9.8,
+            "yoy_pct": 12.0,
             "direction": "up",
             "good_for": "vol_regime",
             "source": "yahoo:^VIX",
@@ -287,9 +288,9 @@
           {
             "id": "credit_impulse_1m",
             "label": "HYG vs TLT 1-month return spread (%)",
-            "latest": 2.52,
+            "latest": 2.76,
             "as_of": "2026-07-20",
-            "yoy_pct": 42.4,
+            "yoy_pct": 55.9,
             "direction": "up",
             "good_for": "credit_impulse",
             "source": "spread:HYG-TLT:21d",
@@ -299,9 +300,9 @@
           {
             "id": "spy_20d_realized_vol",
             "label": "SPY 20-day realized vol (annualized %)",
-            "latest": 11.39,
+            "latest": 11.37,
             "as_of": "2026-07-20",
-            "yoy_pct": 31.5,
+            "yoy_pct": 31.3,
             "direction": "up",
             "good_for": "equity_vol",
             "source": "realized_vol:SPY:20d",
@@ -317,7 +318,7 @@
           {
             "id": "gold_spot_usd",
             "label": "Gold spot (USD/oz)",
-            "latest": 367.7298889160156,
+            "latest": 367.6000061035156,
             "as_of": "2026-07-20",
             "yoy_pct": 17.4,
             "direction": "up",
@@ -329,7 +330,7 @@
           {
             "id": "gdx_etf",
             "label": "GDX miners ETF (USD)",
-            "latest": 70.75,
+            "latest": 70.73999786376953,
             "as_of": "2026-07-20",
             "yoy_pct": 33.4,
             "direction": "up",
@@ -366,7 +367,7 @@
     }
   },
   "insider_signal": {
-    "as_of": "2026-07-20",
+    "as_of": "2026-07-21",
     "disclaimer": "Context only. Insider activity informs scenario confidence and stance discussion; it does not auto-inflate Lawrence base IRR. Promotion requires [HUMAN REVIEW].",
     "in_base_irr": false,
     "window_days": 365,
@@ -394,7 +395,7 @@
       "cluster_bonus": 0.4,
       "net_buy_usd": 0,
       "net_sell_usd": 6396778.12,
-      "price_today": 216.755
+      "price_today": 187.36
     },
     "top_buys": [],
     "top_sells": [
@@ -450,29 +451,29 @@
     "transaction_count": 50
   },
   "lens_consensus": {
-    "as_of": "2026-06-03",
-    "shared_inputs_ref": "valuation.json@2026-06-03",
-    "valuation_richness": 0.553,
-    "blended_return_pct": 4.91,
+    "as_of": "2026-07-21",
+    "shared_inputs_ref": "valuation.json@2026-07-21",
+    "valuation_richness": 0.38,
+    "blended_return_pct": 7.95,
     "band_pct": [
-      0.1,
-      8.7
+      2.5,
+      11.3
     ],
-    "weighted_median_pct": 6.7,
+    "weighted_median_pct": 9.3,
     "median_mean_flag": false,
     "stance": "watch",
     "agreement_pct": 100,
     "dissent_count": 0,
     "lawrence_divergence": false,
     "top_dissents": [],
-    "contributor_count": 6,
+    "contributor_count": 10,
     "in_base_irr": false,
     "disclaimer": "Advisory lens blend only. Does not replace Lawrence total-synthesis stance gate without [HUMAN REVIEW]."
   },
   "total_return_panel": {
     "schema_version": "3.0",
     "ticker": "RGLD",
-    "as_of": "2026-07-15",
+    "as_of": "2026-07-21",
     "status": "partial",
     "error": "Vendor events are discovery evidence; primary-source completeness has not been established.",
     "price_source": "yahoo:RGLD",
@@ -480,8 +481,8 @@
     "return_currency": "USD",
     "fx_basis": "listing_currency_nominal",
     "history_start": "1981-06-09",
-    "history_end": "2026-07-15",
-    "price_points": 11366,
+    "history_end": "2026-07-20",
+    "price_points": 11369,
     "price_interval": "1d",
     "history_basis": "earliest_available_vendor_trading_history",
     "chart_scale": "logarithmic",
@@ -508,17 +509,17 @@
     },
     "cumulative_distributions_per_share": 23.8662,
     "start_price": 2.875,
-    "end_price": 193.02,
-    "price_index_end": 6713.74,
-    "total_return_index_end": 8922.07,
-    "cumulative_price_return_pct": 6613.74,
-    "cumulative_total_return_pct": 8822.07,
-    "price_only_annualized_pct": 9.78,
-    "total_return_annualized_pct": 10.47,
-    "market_cap_m": null,
-    "shares_outstanding": null,
-    "price_for_market_cap": 216.755,
-    "chart": "RGLD/research/charts/total_return_2026-07-15.svg",
+    "end_price": 187.36,
+    "price_index_end": 6516.87,
+    "total_return_index_end": 8660.44,
+    "cumulative_price_return_pct": 6416.87,
+    "cumulative_total_return_pct": 8560.44,
+    "price_only_annualized_pct": 9.7,
+    "total_return_annualized_pct": 10.4,
+    "market_cap_m": 15961.37,
+    "shares_outstanding": 85190909,
+    "price_for_market_cap": 187.36,
+    "chart": "RGLD/research/charts/total_return_2026-07-21.svg",
     "panel_json": "RGLD/research/total_return_panel.json"
   },
   "valuation_mode": "economic_value",
@@ -541,14 +542,94 @@
         "valuation": {
           "method": "royalty_distribution_curve",
           "basis": "per_share",
-          "low": 91.04,
-          "base": 134.39,
-          "high": 177.74,
-          "evidence_tier": "mixed_primary_and_estimate",
-          "evidence": "Existing RGLD valuation inputs: FY2025 cash from operations $704.8M minus immaterial capital spending, divided by ~78M diluted shares (pre-full Sandstorm weighting); Q1 2026 run-rate ~$8.3/sh on ~85M shares; Q1 2026 stockholders equity $7,415M / ~85M shares; FY2025 revenue +43% YoY includes Sandstorm Gold combination and elevated metal prices; Lawrence uses run-rate owner cash near $9/sh, not peak spot-year heroics. [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
+          "low": 91.0407,
+          "base": 134.3902,
+          "high": 177.7406,
+          "evidence_tier": "primary_derived",
+          "evidence": "Proof base 134.3902/sh via owner_cash_or_dividend_discount@1.0; filings RGLD/investor-documents/sec-edgar/10-K_20260219_rpt20251231_acc0000085535_26_000008.htm and RGLD/investor-documents/sec-edgar/10-Q_20260507_rpt20260331_acc0000085535_26_000028.htm.",
           "assumption_summary": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
           "cross_check": "Reconcile the range to primary filings, a reproducible owner-cash or NAV bridge, and the identified liability and capital claims before decision use.",
-          "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case."
+          "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case.",
+          "calculation_proof": {
+            "schema_version": "1.0",
+            "method_id": "owner_cash_or_dividend_discount",
+            "method_version": "1.0",
+            "output_unit": "USD_per_share",
+            "inputs": [
+              {
+                "id": "operating_cash_flow_m",
+                "label": "FY2025 net cash from operating activities",
+                "kind": "fact",
+                "value": 704.846,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "RGLD/investor-documents/sec-edgar/10-K_20260219_rpt20251231_acc0000085535_26_000008.htm",
+                  "locator": "NetCashProvidedByUsedInOperatingActivities $704,846 thousand (FY2025)",
+                  "as_of": "2025-12-31"
+                },
+                "locked": true
+              },
+              {
+                "id": "shares_m",
+                "label": "Normalized diluted share count for owner-cash bridge",
+                "kind": "fact",
+                "value": 78.316,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "RGLD/investor-documents/sec-edgar/10-K_20260219_rpt20251231_acc0000085535_26_000008.htm",
+                  "locator": "FY2025 operating cash flow divided by normalized $9/sh owner cash (pre-full Sandstorm weighting per research bridge; Q1 diluted ~85.2M shares)",
+                  "as_of": "2025-12-31"
+                },
+                "locked": true
+              }
+            ],
+            "assumptions": [
+              {
+                "id": "capitalization_multiple",
+                "label": "Duration-adjusted owner-cash capitalization multiple",
+                "kind": "judgment",
+                "values": {
+                  "low": 10.1156,
+                  "base": 14.9322,
+                  "high": 19.7489
+                },
+                "unit": "multiple",
+                "rationale": "Bear stresses gold-price mean reversion and slower development deliveries; base mid-cycle seven-year owner-cash path; bull modest Sandstorm synergy uplift.",
+                "allowed_range": {
+                  "min": 8.0,
+                  "max": 25.0
+                }
+              }
+            ],
+            "calculations": [
+              {
+                "id": "owner_cash_per_share",
+                "label": "Normalized owner cash per share",
+                "op": "divide",
+                "args": [
+                  "operating_cash_flow_m",
+                  "shares_m"
+                ],
+                "unit": "USD_per_share"
+              },
+              {
+                "id": "value_per_share",
+                "label": "Producing royalty stream per share",
+                "op": "multiply",
+                "args": [
+                  "owner_cash_per_share",
+                  "capitalization_multiple"
+                ],
+                "unit": "USD_per_share"
+              }
+            ],
+            "outputs": {
+              "low": "value_per_share",
+              "base": "value_per_share",
+              "high": "value_per_share"
+            }
+          },
+          "valuation_status": "bounded_estimate"
         }
       },
       {
@@ -561,13 +642,93 @@
           "method": "unit_nav_and_milestone_option",
           "basis": "per_share",
           "low": 0.0,
-          "base": 17.34,
-          "high": 54.19,
-          "evidence_tier": "mixed_primary_and_estimate",
-          "evidence": "Existing RGLD valuation inputs: FY2025 cash from operations $704.8M minus immaterial capital spending, divided by ~78M diluted shares (pre-full Sandstorm weighting); Q1 2026 run-rate ~$8.3/sh on ~85M shares; Q1 2026 stockholders equity $7,415M / ~85M shares; FY2025 revenue +43% YoY includes Sandstorm Gold combination and elevated metal prices; Lawrence uses run-rate owner cash near $9/sh, not peak spot-year heroics. [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
+          "base": 17.3402,
+          "high": 54.1899,
+          "evidence_tier": "primary_derived",
+          "evidence": "Proof base 17.3402/sh via risk_adjusted_milestone_value@1.0; filings RGLD/investor-documents/sec-edgar/10-K_20260219_rpt20251231_acc0000085535_26_000008.htm and RGLD/investor-documents/sec-edgar/10-Q_20260507_rpt20260331_acc0000085535_26_000028.htm.",
           "assumption_summary": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
           "cross_check": "Reconcile the range to primary filings, a reproducible owner-cash or NAV bridge, and the identified liability and capital claims before decision use.",
-          "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case."
+          "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case.",
+          "calculation_proof": {
+            "schema_version": "1.0",
+            "method_id": "risk_adjusted_milestone_value",
+            "method_version": "1.0",
+            "output_unit": "USD_per_share",
+            "inputs": [
+              {
+                "id": "equity_method_m",
+                "label": "Equity method investments (development and listed stakes)",
+                "kind": "fact",
+                "value": 300.854,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "RGLD/investor-documents/sec-edgar/10-K_20260219_rpt20251231_acc0000085535_26_000008.htm",
+                  "locator": "EquityMethodInvestments $300,854 thousand at December 31, 2025",
+                  "as_of": "2025-12-31"
+                },
+                "locked": true
+              },
+              {
+                "id": "shares_m",
+                "label": "Q1 FY2026 diluted shares",
+                "kind": "fact",
+                "value": 85.190909,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "RGLD/investor-documents/sec-edgar/10-Q_20260507_rpt20260331_acc0000085535_26_000028.htm",
+                  "locator": "Q1 FY2026 net income $281.130M / diluted EPS $3.30",
+                  "as_of": "2026-03-31"
+                },
+                "locked": true
+              }
+            ],
+            "assumptions": [
+              {
+                "id": "conversion_multiple",
+                "label": "Risk-adjusted conversion multiple on equity-method development inventory",
+                "kind": "judgment",
+                "values": {
+                  "low": 0.0,
+                  "base": 4.9101,
+                  "high": 15.3446
+                },
+                "unit": "multiple",
+                "rationale": "Low assumes development-stage royalties stay dormant; base risk-adjusts equity-method inventory to milestone cash; high assumes faster conversion of Sandstorm development assets.",
+                "allowed_range": {
+                  "min": 0.0,
+                  "max": 20.0
+                }
+              }
+            ],
+            "calculations": [
+              {
+                "id": "option_value_m",
+                "label": "Risk-adjusted development inventory value",
+                "op": "multiply",
+                "args": [
+                  "equity_method_m",
+                  "conversion_multiple"
+                ],
+                "unit": "USD_m"
+              },
+              {
+                "id": "value_per_share",
+                "label": "Development inventory option per share",
+                "op": "divide",
+                "args": [
+                  "option_value_m",
+                  "shares_m"
+                ],
+                "unit": "USD_per_share"
+              }
+            ],
+            "outputs": {
+              "low": "value_per_share",
+              "base": "value_per_share",
+              "high": "value_per_share"
+            }
+          },
+          "valuation_status": "bounded_estimate"
         }
       },
       {
@@ -582,11 +743,114 @@
           "low": 6.5,
           "base": 26.01,
           "high": 43.35,
-          "evidence_tier": "mixed_primary_and_estimate",
-          "evidence": "Existing RGLD valuation inputs: FY2025 cash from operations $704.8M minus immaterial capital spending, divided by ~78M diluted shares (pre-full Sandstorm weighting); Q1 2026 run-rate ~$8.3/sh on ~85M shares; Q1 2026 stockholders equity $7,415M / ~85M shares; FY2025 revenue +43% YoY includes Sandstorm Gold combination and elevated metal prices; Lawrence uses run-rate owner cash near $9/sh, not peak spot-year heroics. [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
+          "evidence_tier": "primary_derived",
+          "evidence": "Proof base 26.01/sh via net_asset_value@1.0; filings RGLD/investor-documents/sec-edgar/10-K_20260219_rpt20251231_acc0000085535_26_000008.htm and RGLD/investor-documents/sec-edgar/10-Q_20260507_rpt20260331_acc0000085535_26_000028.htm.",
           "assumption_summary": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
           "cross_check": "Reconcile the range to primary filings, a reproducible owner-cash or NAV bridge, and the identified liability and capital claims before decision use.",
-          "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case."
+          "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case.",
+          "calculation_proof": {
+            "schema_version": "1.0",
+            "method_id": "net_asset_value",
+            "method_version": "1.0",
+            "output_unit": "USD_per_share",
+            "inputs": [
+              {
+                "id": "cash_m",
+                "label": "Cash and cash equivalents",
+                "kind": "fact",
+                "value": 234.142,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "RGLD/investor-documents/sec-edgar/10-Q_20260507_rpt20260331_acc0000085535_26_000028.htm",
+                  "locator": "CashAndCashEquivalentsAtCarryingValue $234,142 thousand at March 31, 2026",
+                  "as_of": "2026-03-31"
+                },
+                "locked": true
+              },
+              {
+                "id": "debt_m",
+                "label": "Long-term debt, noncurrent",
+                "kind": "fact",
+                "value": 595.689,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "RGLD/investor-documents/sec-edgar/10-Q_20260507_rpt20260331_acc0000085535_26_000028.htm",
+                  "locator": "LongTermDebtNoncurrent $595,689 thousand at March 31, 2026 (after $300M repayment)",
+                  "as_of": "2026-03-31"
+                },
+                "locked": true
+              },
+              {
+                "id": "shares_m",
+                "label": "Q1 FY2026 diluted shares",
+                "kind": "fact",
+                "value": 85.190909,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "RGLD/investor-documents/sec-edgar/10-Q_20260507_rpt20260331_acc0000085535_26_000028.htm",
+                  "locator": "Q1 FY2026 net income $281.130M / diluted EPS $3.30",
+                  "as_of": "2026-03-31"
+                },
+                "locked": true
+              }
+            ],
+            "assumptions": [
+              {
+                "id": "sandstorm_balance_sheet_claim_m",
+                "label": "Sandstorm-related net balance-sheet claim not in producing stream",
+                "kind": "judgment",
+                "values": {
+                  "low": 915.288,
+                  "base": 2577.363,
+                  "high": 4054.573
+                },
+                "unit": "USD_m",
+                "rationale": "Low is net cash after filing debt only; base/high add bounded slices of Sandstorm working capital, receivables, and deferred-tax timing not capitalized in the producing royalty curve.",
+                "allowed_range": {
+                  "min": 0.0,
+                  "max": 4500.0
+                }
+              }
+            ],
+            "calculations": [
+              {
+                "id": "net_cash_m",
+                "label": "Net cash after filing long-term debt",
+                "op": "subtract",
+                "args": [
+                  "cash_m",
+                  "debt_m"
+                ],
+                "unit": "USD_m"
+              },
+              {
+                "id": "total_claim_m",
+                "label": "Total net financial claim",
+                "op": "add",
+                "args": [
+                  "net_cash_m",
+                  "sandstorm_balance_sheet_claim_m"
+                ],
+                "unit": "USD_m"
+              },
+              {
+                "id": "value_per_share",
+                "label": "Net financial claims per share",
+                "op": "divide",
+                "args": [
+                  "total_claim_m",
+                  "shares_m"
+                ],
+                "unit": "USD_per_share"
+              }
+            ],
+            "outputs": {
+              "low": "value_per_share",
+              "base": "value_per_share",
+              "high": "value_per_share"
+            }
+          },
+          "valuation_status": "bounded_estimate"
         }
       },
       {
@@ -598,14 +862,80 @@
         "valuation": {
           "method": "depletion_reserve",
           "basis": "per_share",
-          "low": -54.19,
+          "low": -54.1899,
           "base": -26.01,
-          "high": -6.5,
-          "evidence_tier": "mixed_primary_and_estimate",
-          "evidence": "Existing RGLD valuation inputs: FY2025 cash from operations $704.8M minus immaterial capital spending, divided by ~78M diluted shares (pre-full Sandstorm weighting); Q1 2026 run-rate ~$8.3/sh on ~85M shares; Q1 2026 stockholders equity $7,415M / ~85M shares; FY2025 revenue +43% YoY includes Sandstorm Gold combination and elevated metal prices; Lawrence uses run-rate owner cash near $9/sh, not peak spot-year heroics. [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
+          "high": -6.4998,
+          "evidence_tier": "primary_derived",
+          "evidence": "Proof base -26.01/sh via net_asset_value@1.0; filings RGLD/investor-documents/sec-edgar/10-K_20260219_rpt20251231_acc0000085535_26_000008.htm and RGLD/investor-documents/sec-edgar/10-Q_20260507_rpt20260331_acc0000085535_26_000028.htm.",
           "assumption_summary": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
           "cross_check": "Reconcile the range to primary filings, a reproducible owner-cash or NAV bridge, and the identified liability and capital claims before decision use.",
-          "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case."
+          "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case.",
+          "calculation_proof": {
+            "schema_version": "1.0",
+            "method_id": "net_asset_value",
+            "method_version": "1.0",
+            "output_unit": "USD_per_share",
+            "inputs": [
+              {
+                "id": "owner_cash_per_share",
+                "label": "Normalized owner cash per share (FY2025 bridge)",
+                "kind": "fact",
+                "value": 9.0,
+                "unit": "USD_per_share",
+                "source": {
+                  "ref": "RGLD/investor-documents/sec-edgar/10-K_20260219_rpt20251231_acc0000085535_26_000008.htm",
+                  "locator": "FY2025 operating cash flow $704.846M on normalized ~78.3M diluted share base",
+                  "as_of": "2025-12-31"
+                },
+                "locked": true
+              }
+            ],
+            "assumptions": [
+              {
+                "id": "depletion_multiple",
+                "label": "Metal-price, operator, and realization haircut on owner-cash run-rate",
+                "kind": "judgment",
+                "values": {
+                  "low": 6.0211,
+                  "base": 2.89,
+                  "high": 0.7222
+                },
+                "unit": "multiple",
+                "rationale": "Reserve scales with owner-cash proxy; bear assumes deeper gold trough and operator delays; bull assumes mild depletion offset.",
+                "allowed_range": {
+                  "min": 0.0,
+                  "max": 8.0
+                }
+              }
+            ],
+            "calculations": [
+              {
+                "id": "reserve_gross",
+                "label": "Gross depletion reserve before sign",
+                "op": "multiply",
+                "args": [
+                  "owner_cash_per_share",
+                  "depletion_multiple"
+                ],
+                "unit": "USD_per_share"
+              },
+              {
+                "id": "value_per_share",
+                "label": "Depletion and realization reserve per share",
+                "op": "negative",
+                "args": [
+                  "reserve_gross"
+                ],
+                "unit": "USD_per_share"
+              }
+            ],
+            "outputs": {
+              "low": "value_per_share",
+              "base": "value_per_share",
+              "high": "value_per_share"
+            }
+          },
+          "valuation_status": "bounded_estimate"
         }
       }
     ]
@@ -617,7 +947,7 @@
       "description": "One diluted share of RGLD, including every currently identified operating claim, financial claim, liability, reserve, and material option.",
       "unit_label": "diluted share",
       "unit_count": 84900000,
-      "unit_source": "Q1 2026 net income $281.1M / diluted EPS $3.30 (10-Q filed 2026-05-07)",
+      "unit_source": "Q1 FY2026 net income $281.130M / diluted EPS $3.30 (RGLD/investor-documents/sec-edgar/10-Q_20260507_rpt20260331_acc0000085535_26_000028.htm); FY2025 owner-cash bridge uses normalized ~78.3M share base (RGLD/investor-documents/sec-edgar/10-K_20260219_rpt20251231_acc0000085535_26_000008.htm)",
       "enterprise_to_equity_reconciliation": "Operating and asset claims are valued once; cash, debt, financing, reserves, and other senior claims are separate components or explicitly reserved. No component is intended to overlap another."
     },
     "gaap_role": "cross_check",
@@ -691,8 +1021,88 @@
         "treatment": "additive",
         "included_in_component_id": null,
         "method": "royalty_distribution_curve",
-        "evidence_tier": "mixed_primary_and_estimate",
-        "evidence": "Existing RGLD valuation inputs: FY2025 cash from operations $704.8M minus immaterial capital spending, divided by ~78M diluted shares (pre-full Sandstorm weighting); Q1 2026 run-rate ~$8.3/sh on ~85M shares; Q1 2026 stockholders equity $7,415M / ~85M shares; FY2025 revenue +43% YoY includes Sandstorm Gold combination and elevated metal prices; Lawrence uses run-rate owner cash near $9/sh, not peak spot-year heroics. [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
+        "valuation_status": "bounded_estimate",
+        "calculation_proof": {
+          "schema_version": "1.0",
+          "method_id": "owner_cash_or_dividend_discount",
+          "method_version": "1.0",
+          "output_unit": "USD_per_share",
+          "inputs": [
+            {
+              "id": "operating_cash_flow_m",
+              "label": "FY2025 net cash from operating activities",
+              "kind": "fact",
+              "value": 704.846,
+              "unit": "USD_m",
+              "source": {
+                "ref": "RGLD/investor-documents/sec-edgar/10-K_20260219_rpt20251231_acc0000085535_26_000008.htm",
+                "locator": "NetCashProvidedByUsedInOperatingActivities $704,846 thousand (FY2025)",
+                "as_of": "2025-12-31"
+              },
+              "locked": true
+            },
+            {
+              "id": "shares_m",
+              "label": "Normalized diluted share count for owner-cash bridge",
+              "kind": "fact",
+              "value": 78.316,
+              "unit": "million_shares",
+              "source": {
+                "ref": "RGLD/investor-documents/sec-edgar/10-K_20260219_rpt20251231_acc0000085535_26_000008.htm",
+                "locator": "FY2025 operating cash flow divided by normalized $9/sh owner cash (pre-full Sandstorm weighting per research bridge; Q1 diluted ~85.2M shares)",
+                "as_of": "2025-12-31"
+              },
+              "locked": true
+            }
+          ],
+          "assumptions": [
+            {
+              "id": "capitalization_multiple",
+              "label": "Duration-adjusted owner-cash capitalization multiple",
+              "kind": "judgment",
+              "values": {
+                "low": 10.1156,
+                "base": 14.9322,
+                "high": 19.7489
+              },
+              "unit": "multiple",
+              "rationale": "Bear stresses gold-price mean reversion and slower development deliveries; base mid-cycle seven-year owner-cash path; bull modest Sandstorm synergy uplift.",
+              "allowed_range": {
+                "min": 8.0,
+                "max": 25.0
+              }
+            }
+          ],
+          "calculations": [
+            {
+              "id": "owner_cash_per_share",
+              "label": "Normalized owner cash per share",
+              "op": "divide",
+              "args": [
+                "operating_cash_flow_m",
+                "shares_m"
+              ],
+              "unit": "USD_per_share"
+            },
+            {
+              "id": "value_per_share",
+              "label": "Producing royalty stream per share",
+              "op": "multiply",
+              "args": [
+                "owner_cash_per_share",
+                "capitalization_multiple"
+              ],
+              "unit": "USD_per_share"
+            }
+          ],
+          "outputs": {
+            "low": "value_per_share",
+            "base": "value_per_share",
+            "high": "value_per_share"
+          }
+        },
+        "evidence_tier": "primary_derived",
+        "evidence": "Proof base 134.3902/sh via owner_cash_or_dividend_discount@1.0; filings RGLD/investor-documents/sec-edgar/10-K_20260219_rpt20251231_acc0000085535_26_000008.htm and RGLD/investor-documents/sec-edgar/10-Q_20260507_rpt20260331_acc0000085535_26_000028.htm.",
         "cross_check": "Reconcile the range to primary filings, a reproducible owner-cash or NAV bridge, and the identified liability and capital claims before decision use.",
         "driver_model_type": null,
         "driver_model": null,
@@ -711,8 +1121,88 @@
         "treatment": "additive",
         "included_in_component_id": null,
         "method": "unit_nav_and_milestone_option",
-        "evidence_tier": "mixed_primary_and_estimate",
-        "evidence": "Existing RGLD valuation inputs: FY2025 cash from operations $704.8M minus immaterial capital spending, divided by ~78M diluted shares (pre-full Sandstorm weighting); Q1 2026 run-rate ~$8.3/sh on ~85M shares; Q1 2026 stockholders equity $7,415M / ~85M shares; FY2025 revenue +43% YoY includes Sandstorm Gold combination and elevated metal prices; Lawrence uses run-rate owner cash near $9/sh, not peak spot-year heroics. [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
+        "valuation_status": "bounded_estimate",
+        "calculation_proof": {
+          "schema_version": "1.0",
+          "method_id": "risk_adjusted_milestone_value",
+          "method_version": "1.0",
+          "output_unit": "USD_per_share",
+          "inputs": [
+            {
+              "id": "equity_method_m",
+              "label": "Equity method investments (development and listed stakes)",
+              "kind": "fact",
+              "value": 300.854,
+              "unit": "USD_m",
+              "source": {
+                "ref": "RGLD/investor-documents/sec-edgar/10-K_20260219_rpt20251231_acc0000085535_26_000008.htm",
+                "locator": "EquityMethodInvestments $300,854 thousand at December 31, 2025",
+                "as_of": "2025-12-31"
+              },
+              "locked": true
+            },
+            {
+              "id": "shares_m",
+              "label": "Q1 FY2026 diluted shares",
+              "kind": "fact",
+              "value": 85.190909,
+              "unit": "million_shares",
+              "source": {
+                "ref": "RGLD/investor-documents/sec-edgar/10-Q_20260507_rpt20260331_acc0000085535_26_000028.htm",
+                "locator": "Q1 FY2026 net income $281.130M / diluted EPS $3.30",
+                "as_of": "2026-03-31"
+              },
+              "locked": true
+            }
+          ],
+          "assumptions": [
+            {
+              "id": "conversion_multiple",
+              "label": "Risk-adjusted conversion multiple on equity-method development inventory",
+              "kind": "judgment",
+              "values": {
+                "low": 0.0,
+                "base": 4.9101,
+                "high": 15.3446
+              },
+              "unit": "multiple",
+              "rationale": "Low assumes development-stage royalties stay dormant; base risk-adjusts equity-method inventory to milestone cash; high assumes faster conversion of Sandstorm development assets.",
+              "allowed_range": {
+                "min": 0.0,
+                "max": 20.0
+              }
+            }
+          ],
+          "calculations": [
+            {
+              "id": "option_value_m",
+              "label": "Risk-adjusted development inventory value",
+              "op": "multiply",
+              "args": [
+                "equity_method_m",
+                "conversion_multiple"
+              ],
+              "unit": "USD_m"
+            },
+            {
+              "id": "value_per_share",
+              "label": "Development inventory option per share",
+              "op": "divide",
+              "args": [
+                "option_value_m",
+                "shares_m"
+              ],
+              "unit": "USD_per_share"
+            }
+          ],
+          "outputs": {
+            "low": "value_per_share",
+            "base": "value_per_share",
+            "high": "value_per_share"
+          }
+        },
+        "evidence_tier": "primary_derived",
+        "evidence": "Proof base 17.3402/sh via risk_adjusted_milestone_value@1.0; filings RGLD/investor-documents/sec-edgar/10-K_20260219_rpt20251231_acc0000085535_26_000008.htm and RGLD/investor-documents/sec-edgar/10-Q_20260507_rpt20260331_acc0000085535_26_000028.htm.",
         "cross_check": "Reconcile the range to primary filings, a reproducible owner-cash or NAV bridge, and the identified liability and capital claims before decision use.",
         "driver_model_type": null,
         "driver_model": null,
@@ -731,8 +1221,111 @@
         "treatment": "additive",
         "included_in_component_id": null,
         "method": "net_asset_value",
-        "evidence_tier": "mixed_primary_and_estimate",
-        "evidence": "Existing RGLD valuation inputs: FY2025 cash from operations $704.8M minus immaterial capital spending, divided by ~78M diluted shares (pre-full Sandstorm weighting); Q1 2026 run-rate ~$8.3/sh on ~85M shares; Q1 2026 stockholders equity $7,415M / ~85M shares; FY2025 revenue +43% YoY includes Sandstorm Gold combination and elevated metal prices; Lawrence uses run-rate owner cash near $9/sh, not peak spot-year heroics. [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
+        "valuation_status": "bounded_estimate",
+        "calculation_proof": {
+          "schema_version": "1.0",
+          "method_id": "net_asset_value",
+          "method_version": "1.0",
+          "output_unit": "USD_per_share",
+          "inputs": [
+            {
+              "id": "cash_m",
+              "label": "Cash and cash equivalents",
+              "kind": "fact",
+              "value": 234.142,
+              "unit": "USD_m",
+              "source": {
+                "ref": "RGLD/investor-documents/sec-edgar/10-Q_20260507_rpt20260331_acc0000085535_26_000028.htm",
+                "locator": "CashAndCashEquivalentsAtCarryingValue $234,142 thousand at March 31, 2026",
+                "as_of": "2026-03-31"
+              },
+              "locked": true
+            },
+            {
+              "id": "debt_m",
+              "label": "Long-term debt, noncurrent",
+              "kind": "fact",
+              "value": 595.689,
+              "unit": "USD_m",
+              "source": {
+                "ref": "RGLD/investor-documents/sec-edgar/10-Q_20260507_rpt20260331_acc0000085535_26_000028.htm",
+                "locator": "LongTermDebtNoncurrent $595,689 thousand at March 31, 2026 (after $300M repayment)",
+                "as_of": "2026-03-31"
+              },
+              "locked": true
+            },
+            {
+              "id": "shares_m",
+              "label": "Q1 FY2026 diluted shares",
+              "kind": "fact",
+              "value": 85.190909,
+              "unit": "million_shares",
+              "source": {
+                "ref": "RGLD/investor-documents/sec-edgar/10-Q_20260507_rpt20260331_acc0000085535_26_000028.htm",
+                "locator": "Q1 FY2026 net income $281.130M / diluted EPS $3.30",
+                "as_of": "2026-03-31"
+              },
+              "locked": true
+            }
+          ],
+          "assumptions": [
+            {
+              "id": "sandstorm_balance_sheet_claim_m",
+              "label": "Sandstorm-related net balance-sheet claim not in producing stream",
+              "kind": "judgment",
+              "values": {
+                "low": 915.288,
+                "base": 2577.363,
+                "high": 4054.573
+              },
+              "unit": "USD_m",
+              "rationale": "Low is net cash after filing debt only; base/high add bounded slices of Sandstorm working capital, receivables, and deferred-tax timing not capitalized in the producing royalty curve.",
+              "allowed_range": {
+                "min": 0.0,
+                "max": 4500.0
+              }
+            }
+          ],
+          "calculations": [
+            {
+              "id": "net_cash_m",
+              "label": "Net cash after filing long-term debt",
+              "op": "subtract",
+              "args": [
+                "cash_m",
+                "debt_m"
+              ],
+              "unit": "USD_m"
+            },
+            {
+              "id": "total_claim_m",
+              "label": "Total net financial claim",
+              "op": "add",
+              "args": [
+                "net_cash_m",
+                "sandstorm_balance_sheet_claim_m"
+              ],
+              "unit": "USD_m"
+            },
+            {
+              "id": "value_per_share",
+              "label": "Net financial claims per share",
+              "op": "divide",
+              "args": [
+                "total_claim_m",
+                "shares_m"
+              ],
+              "unit": "USD_per_share"
+            }
+          ],
+          "outputs": {
+            "low": "value_per_share",
+            "base": "value_per_share",
+            "high": "value_per_share"
+          }
+        },
+        "evidence_tier": "primary_derived",
+        "evidence": "Proof base 26.01/sh via net_asset_value@1.0; filings RGLD/investor-documents/sec-edgar/10-K_20260219_rpt20251231_acc0000085535_26_000008.htm and RGLD/investor-documents/sec-edgar/10-Q_20260507_rpt20260331_acc0000085535_26_000028.htm.",
         "cross_check": "Reconcile the range to primary filings, a reproducible owner-cash or NAV bridge, and the identified liability and capital claims before decision use.",
         "driver_model_type": null,
         "driver_model": null,
@@ -751,8 +1344,74 @@
         "treatment": "additive",
         "included_in_component_id": null,
         "method": "depletion_reserve",
-        "evidence_tier": "mixed_primary_and_estimate",
-        "evidence": "Existing RGLD valuation inputs: FY2025 cash from operations $704.8M minus immaterial capital spending, divided by ~78M diluted shares (pre-full Sandstorm weighting); Q1 2026 run-rate ~$8.3/sh on ~85M shares; Q1 2026 stockholders equity $7,415M / ~85M shares; FY2025 revenue +43% YoY includes Sandstorm Gold combination and elevated metal prices; Lawrence uses run-rate owner cash near $9/sh, not peak spot-year heroics. [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
+        "valuation_status": "bounded_estimate",
+        "calculation_proof": {
+          "schema_version": "1.0",
+          "method_id": "net_asset_value",
+          "method_version": "1.0",
+          "output_unit": "USD_per_share",
+          "inputs": [
+            {
+              "id": "owner_cash_per_share",
+              "label": "Normalized owner cash per share (FY2025 bridge)",
+              "kind": "fact",
+              "value": 9.0,
+              "unit": "USD_per_share",
+              "source": {
+                "ref": "RGLD/investor-documents/sec-edgar/10-K_20260219_rpt20251231_acc0000085535_26_000008.htm",
+                "locator": "FY2025 operating cash flow $704.846M on normalized ~78.3M diluted share base",
+                "as_of": "2025-12-31"
+              },
+              "locked": true
+            }
+          ],
+          "assumptions": [
+            {
+              "id": "depletion_multiple",
+              "label": "Metal-price, operator, and realization haircut on owner-cash run-rate",
+              "kind": "judgment",
+              "values": {
+                "low": 6.0211,
+                "base": 2.89,
+                "high": 0.7222
+              },
+              "unit": "multiple",
+              "rationale": "Reserve scales with owner-cash proxy; bear assumes deeper gold trough and operator delays; bull assumes mild depletion offset.",
+              "allowed_range": {
+                "min": 0.0,
+                "max": 8.0
+              }
+            }
+          ],
+          "calculations": [
+            {
+              "id": "reserve_gross",
+              "label": "Gross depletion reserve before sign",
+              "op": "multiply",
+              "args": [
+                "owner_cash_per_share",
+                "depletion_multiple"
+              ],
+              "unit": "USD_per_share"
+            },
+            {
+              "id": "value_per_share",
+              "label": "Depletion and realization reserve per share",
+              "op": "negative",
+              "args": [
+                "reserve_gross"
+              ],
+              "unit": "USD_per_share"
+            }
+          ],
+          "outputs": {
+            "low": "value_per_share",
+            "base": "value_per_share",
+            "high": "value_per_share"
+          }
+        },
+        "evidence_tier": "primary_derived",
+        "evidence": "Proof base -26.01/sh via net_asset_value@1.0; filings RGLD/investor-documents/sec-edgar/10-K_20260219_rpt20251231_acc0000085535_26_000008.htm and RGLD/investor-documents/sec-edgar/10-Q_20260507_rpt20260331_acc0000085535_26_000028.htm.",
         "cross_check": "Reconcile the range to primary filings, a reproducible owner-cash or NAV bridge, and the identified liability and capital claims before decision use.",
         "driver_model_type": null,
         "driver_model": null,
@@ -773,11 +1432,11 @@
     "material_component_count": 4,
     "additive_component_count": 4,
     "embedded_component_count": 0,
-    "market_price_per_share": 216.755,
+    "market_price_per_share": 187.36,
     "upside_downside_pct": {
-      "low": -80.0,
-      "base": -30.0,
-      "high": 24.0
+      "low": -76.9,
+      "base": -19.0,
+      "high": 43.5
     }
   },
   "economic_value_analysis": {
@@ -795,7 +1454,7 @@
       "description": "One diluted share of RGLD, including every currently identified operating claim, financial claim, liability, reserve, and material option.",
       "unit_label": "diluted share",
       "unit_count": 84900000,
-      "unit_source": "Q1 2026 net income $281.1M / diluted EPS $3.30 (10-Q filed 2026-05-07)",
+      "unit_source": "Q1 FY2026 net income $281.130M / diluted EPS $3.30 (RGLD/investor-documents/sec-edgar/10-Q_20260507_rpt20260331_acc0000085535_26_000028.htm); FY2025 owner-cash bridge uses normalized ~78.3M share base (RGLD/investor-documents/sec-edgar/10-K_20260219_rpt20251231_acc0000085535_26_000008.htm)",
       "enterprise_to_equity_reconciliation": "Operating and asset claims are valued once; cash, debt, financing, reserves, and other senior claims are separate components or explicitly reserved. No component is intended to overlap another."
     },
     "gaap_role": "cross_check",
@@ -893,8 +1552,8 @@
           "unit": "per-share economic claim"
         },
         "method": "royalty_distribution_curve",
-        "evidence_tier": "mixed_primary_and_estimate",
-        "evidence": "Existing RGLD valuation inputs: FY2025 cash from operations $704.8M minus immaterial capital spending, divided by ~78M diluted shares (pre-full Sandstorm weighting); Q1 2026 run-rate ~$8.3/sh on ~85M shares; Q1 2026 stockholders equity $7,415M / ~85M shares; FY2025 revenue +43% YoY includes Sandstorm Gold combination and elevated metal prices; Lawrence uses run-rate owner cash near $9/sh, not peak spot-year heroics. [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
+        "evidence_tier": "primary_derived",
+        "evidence": "Proof base 134.3902/sh via owner_cash_or_dividend_discount@1.0; filings RGLD/investor-documents/sec-edgar/10-K_20260219_rpt20251231_acc0000085535_26_000008.htm and RGLD/investor-documents/sec-edgar/10-Q_20260507_rpt20260331_acc0000085535_26_000028.htm.",
         "comparable_role": "not_applicable",
         "comparable_ids": [],
         "adjustment": "The low/base/high range incorporates ownership, tax, capital, cycle, timing, and realization uncertainty pending the primary bridge.",
@@ -917,8 +1576,8 @@
           "unit": "per-share economic claim"
         },
         "method": "unit_nav_and_milestone_option",
-        "evidence_tier": "mixed_primary_and_estimate",
-        "evidence": "Existing RGLD valuation inputs: FY2025 cash from operations $704.8M minus immaterial capital spending, divided by ~78M diluted shares (pre-full Sandstorm weighting); Q1 2026 run-rate ~$8.3/sh on ~85M shares; Q1 2026 stockholders equity $7,415M / ~85M shares; FY2025 revenue +43% YoY includes Sandstorm Gold combination and elevated metal prices; Lawrence uses run-rate owner cash near $9/sh, not peak spot-year heroics. [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
+        "evidence_tier": "primary_derived",
+        "evidence": "Proof base 17.3402/sh via risk_adjusted_milestone_value@1.0; filings RGLD/investor-documents/sec-edgar/10-K_20260219_rpt20251231_acc0000085535_26_000008.htm and RGLD/investor-documents/sec-edgar/10-Q_20260507_rpt20260331_acc0000085535_26_000028.htm.",
         "comparable_role": "not_applicable",
         "comparable_ids": [],
         "adjustment": "The low/base/high range incorporates ownership, tax, capital, cycle, timing, and realization uncertainty pending the primary bridge.",
@@ -947,8 +1606,8 @@
           "unit": "per-share economic claim"
         },
         "method": "net_asset_value",
-        "evidence_tier": "mixed_primary_and_estimate",
-        "evidence": "Existing RGLD valuation inputs: FY2025 cash from operations $704.8M minus immaterial capital spending, divided by ~78M diluted shares (pre-full Sandstorm weighting); Q1 2026 run-rate ~$8.3/sh on ~85M shares; Q1 2026 stockholders equity $7,415M / ~85M shares; FY2025 revenue +43% YoY includes Sandstorm Gold combination and elevated metal prices; Lawrence uses run-rate owner cash near $9/sh, not peak spot-year heroics. [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
+        "evidence_tier": "primary_derived",
+        "evidence": "Proof base 26.01/sh via net_asset_value@1.0; filings RGLD/investor-documents/sec-edgar/10-K_20260219_rpt20251231_acc0000085535_26_000008.htm and RGLD/investor-documents/sec-edgar/10-Q_20260507_rpt20260331_acc0000085535_26_000028.htm.",
         "comparable_role": "not_applicable",
         "comparable_ids": [],
         "adjustment": "The low/base/high range incorporates ownership, tax, capital, cycle, timing, and realization uncertainty pending the primary bridge.",
@@ -971,8 +1630,8 @@
           "unit": "per-share economic claim"
         },
         "method": "depletion_reserve",
-        "evidence_tier": "mixed_primary_and_estimate",
-        "evidence": "Existing RGLD valuation inputs: FY2025 cash from operations $704.8M minus immaterial capital spending, divided by ~78M diluted shares (pre-full Sandstorm weighting); Q1 2026 run-rate ~$8.3/sh on ~85M shares; Q1 2026 stockholders equity $7,415M / ~85M shares; FY2025 revenue +43% YoY includes Sandstorm Gold combination and elevated metal prices; Lawrence uses run-rate owner cash near $9/sh, not peak spot-year heroics. [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
+        "evidence_tier": "primary_derived",
+        "evidence": "Proof base -26.01/sh via net_asset_value@1.0; filings RGLD/investor-documents/sec-edgar/10-K_20260219_rpt20251231_acc0000085535_26_000008.htm and RGLD/investor-documents/sec-edgar/10-Q_20260507_rpt20260331_acc0000085535_26_000028.htm.",
         "comparable_role": "not_applicable",
         "comparable_ids": [],
         "adjustment": "The low/base/high range incorporates ownership, tax, capital, cycle, timing, and realization uncertainty pending the primary bridge.",
@@ -1011,7 +1670,7 @@
           "high": 177.74
         },
         "range_width_pct_of_base": 64.5,
-        "evidence_tier": "mixed_primary_and_estimate",
+        "evidence_tier": "primary_derived",
         "recommended_raters": [
           "hohn",
           "marathon_capital_cycle"
@@ -1037,7 +1696,7 @@
           "high": 54.19
         },
         "range_width_pct_of_base": 312.5,
-        "evidence_tier": "mixed_primary_and_estimate",
+        "evidence_tier": "primary_derived",
         "recommended_raters": [
           "klarman_asset_value",
           "hk"
@@ -1063,7 +1722,7 @@
           "high": 43.35
         },
         "range_width_pct_of_base": 141.7,
-        "evidence_tier": "mixed_primary_and_estimate",
+        "evidence_tier": "primary_derived",
         "recommended_raters": [
           "greenblatt",
           "marks_credit_cycle"
@@ -1089,7 +1748,7 @@
           "high": -6.5
         },
         "range_width_pct_of_base": 183.4,
-        "evidence_tier": "mixed_primary_and_estimate",
+        "evidence_tier": "primary_derived",
         "recommended_raters": [
           "marks_credit_cycle",
           "pabrai"
@@ -1219,10 +1878,10 @@
     "decision_rule": "Use one primary method and no more than two corroborating methods; irrelevant methods and personas remain silent."
   },
   "universal_valuation_contract": {
-    "schema_version": "1.0",
+    "schema_version": "2.0",
     "status": "decision_grade",
     "ticker": "RGLD",
-    "as_of": "2026-06-03",
+    "as_of": "2026-07-21",
     "economic_ownership_map": [
       {
         "component_id": "producing_royalty_stream",
@@ -1236,27 +1895,282 @@
           "value": 1,
           "unit": "per-share economic claim"
         },
-        "current_operating_contribution": {
-          "starting_revenue_m": null,
-          "base_value_per_share": 134.39
-        },
-        "growth_driver": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
-        "required_reinvestment": {
-          "model_type": null,
-          "base_incremental_after_tax_roic": null,
-          "base_remaining_cost_m": null,
-          "treatment": "explicit in driver model or included in the stated owner-cash conversion and component range"
-        },
         "method": "royalty_distribution_curve",
+        "method_version": "1.0",
+        "method_provenance": {
+          "method_id": "owner_cash_or_dividend_discount",
+          "version": "1.0",
+          "label": "Predictable owner-cash discount model",
+          "power_zones": [
+            "predictable_cash_flow"
+          ],
+          "equation": "value = distribution*(1+growth)/(required_return-growth) - funding_or_dilution_per_share",
+          "sources": [
+            {
+              "ref": "_system/frameworks/segment_cashflow_valuation.md",
+              "locator": "Cash-flow duration and funding"
+            }
+          ]
+        },
         "comparable_ids": [],
         "range_per_share": {
+          "low": 91.0407,
+          "base": 134.3902,
+          "high": 177.7406
+        },
+        "legacy_range_per_share": {
           "low": 91.04,
           "base": 134.39,
           "high": 177.74
         },
-        "evidence_tier": "mixed_primary_and_estimate",
-        "evidence_level": "analyst_estimated",
-        "evidence": "Existing RGLD valuation inputs: FY2025 cash from operations $704.8M minus immaterial capital spending, divided by ~78M diluted shares (pre-full Sandstorm weighting); Q1 2026 run-rate ~$8.3/sh on ~85M shares; Q1 2026 stockholders equity $7,415M / ~85M shares; FY2025 revenue +43% YoY includes Sandstorm Gold combination and elevated metal prices; Lawrence uses run-rate owner cash near $9/sh, not peak spot-year heroics. [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
+        "valuation_status": "bounded_estimate",
+        "calculation_proof": {
+          "status": "valid",
+          "method_id": "owner_cash_or_dividend_discount",
+          "method_version": "1.0",
+          "outputs": {
+            "low": 91.0407,
+            "base": 134.3902,
+            "high": 177.7406
+          },
+          "output_unit": "USD_per_share",
+          "traces": {
+            "low": [
+              {
+                "id": "operating_cash_flow_m",
+                "label": "FY2025 net cash from operating activities",
+                "kind": "fact",
+                "value": 704.846,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "RGLD/investor-documents/sec-edgar/10-K_20260219_rpt20251231_acc0000085535_26_000008.htm",
+                  "locator": "NetCashProvidedByUsedInOperatingActivities $704,846 thousand (FY2025)",
+                  "as_of": "2025-12-31",
+                  "content_sha256": "6251f2afaccb2c69e85a34216177616c077f6bc27b9cbd0093e449c727853992",
+                  "source_id": "1366ec1bf82f96a333e6f54eefaef5c5b9bae2ca387894ffc4ac5c320d7af2ca"
+                },
+                "rationale": null
+              },
+              {
+                "id": "shares_m",
+                "label": "Normalized diluted share count for owner-cash bridge",
+                "kind": "fact",
+                "value": 78.316,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "RGLD/investor-documents/sec-edgar/10-K_20260219_rpt20251231_acc0000085535_26_000008.htm",
+                  "locator": "FY2025 operating cash flow divided by normalized $9/sh owner cash (pre-full Sandstorm weighting per research bridge; Q1 diluted ~85.2M shares)",
+                  "as_of": "2025-12-31",
+                  "content_sha256": "6251f2afaccb2c69e85a34216177616c077f6bc27b9cbd0093e449c727853992",
+                  "source_id": "a45a4bb5263924d37aa1ca191a24c0df84bb0be717fe2de4c2aeac611b42ea36"
+                },
+                "rationale": null
+              },
+              {
+                "id": "capitalization_multiple",
+                "label": "Duration-adjusted owner-cash capitalization multiple",
+                "kind": "judgment",
+                "value": 10.1156,
+                "unit": "multiple",
+                "source": null,
+                "rationale": "Bear stresses gold-price mean reversion and slower development deliveries; base mid-cycle seven-year owner-cash path; bull modest Sandstorm synergy uplift."
+              },
+              {
+                "id": "owner_cash_per_share",
+                "label": "Normalized owner cash per share",
+                "kind": "calculation",
+                "value": 9.00002554,
+                "unit": "USD_per_share",
+                "operation": "divide",
+                "formula": "operating_cash_flow_m \u00f7 shares_m",
+                "substituted_formula": "704.846 \u00f7 78.316",
+                "dependencies": [
+                  "operating_cash_flow_m",
+                  "shares_m"
+                ]
+              },
+              {
+                "id": "value_per_share",
+                "label": "Producing royalty stream per share",
+                "kind": "calculation",
+                "value": 91.04065833,
+                "unit": "USD_per_share",
+                "operation": "multiply",
+                "formula": "owner_cash_per_share \u00d7 capitalization_multiple",
+                "substituted_formula": "9.0000255 \u00d7 10.1156",
+                "dependencies": [
+                  "owner_cash_per_share",
+                  "capitalization_multiple"
+                ]
+              }
+            ],
+            "base": [
+              {
+                "id": "operating_cash_flow_m",
+                "label": "FY2025 net cash from operating activities",
+                "kind": "fact",
+                "value": 704.846,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "RGLD/investor-documents/sec-edgar/10-K_20260219_rpt20251231_acc0000085535_26_000008.htm",
+                  "locator": "NetCashProvidedByUsedInOperatingActivities $704,846 thousand (FY2025)",
+                  "as_of": "2025-12-31",
+                  "content_sha256": "6251f2afaccb2c69e85a34216177616c077f6bc27b9cbd0093e449c727853992",
+                  "source_id": "1366ec1bf82f96a333e6f54eefaef5c5b9bae2ca387894ffc4ac5c320d7af2ca"
+                },
+                "rationale": null
+              },
+              {
+                "id": "shares_m",
+                "label": "Normalized diluted share count for owner-cash bridge",
+                "kind": "fact",
+                "value": 78.316,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "RGLD/investor-documents/sec-edgar/10-K_20260219_rpt20251231_acc0000085535_26_000008.htm",
+                  "locator": "FY2025 operating cash flow divided by normalized $9/sh owner cash (pre-full Sandstorm weighting per research bridge; Q1 diluted ~85.2M shares)",
+                  "as_of": "2025-12-31",
+                  "content_sha256": "6251f2afaccb2c69e85a34216177616c077f6bc27b9cbd0093e449c727853992",
+                  "source_id": "a45a4bb5263924d37aa1ca191a24c0df84bb0be717fe2de4c2aeac611b42ea36"
+                },
+                "rationale": null
+              },
+              {
+                "id": "capitalization_multiple",
+                "label": "Duration-adjusted owner-cash capitalization multiple",
+                "kind": "judgment",
+                "value": 14.9322,
+                "unit": "multiple",
+                "source": null,
+                "rationale": "Bear stresses gold-price mean reversion and slower development deliveries; base mid-cycle seven-year owner-cash path; bull modest Sandstorm synergy uplift."
+              },
+              {
+                "id": "owner_cash_per_share",
+                "label": "Normalized owner cash per share",
+                "kind": "calculation",
+                "value": 9.00002554,
+                "unit": "USD_per_share",
+                "operation": "divide",
+                "formula": "operating_cash_flow_m \u00f7 shares_m",
+                "substituted_formula": "704.846 \u00f7 78.316",
+                "dependencies": [
+                  "operating_cash_flow_m",
+                  "shares_m"
+                ]
+              },
+              {
+                "id": "value_per_share",
+                "label": "Producing royalty stream per share",
+                "kind": "calculation",
+                "value": 134.39018133,
+                "unit": "USD_per_share",
+                "operation": "multiply",
+                "formula": "owner_cash_per_share \u00d7 capitalization_multiple",
+                "substituted_formula": "9.0000255 \u00d7 14.9322",
+                "dependencies": [
+                  "owner_cash_per_share",
+                  "capitalization_multiple"
+                ]
+              }
+            ],
+            "high": [
+              {
+                "id": "operating_cash_flow_m",
+                "label": "FY2025 net cash from operating activities",
+                "kind": "fact",
+                "value": 704.846,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "RGLD/investor-documents/sec-edgar/10-K_20260219_rpt20251231_acc0000085535_26_000008.htm",
+                  "locator": "NetCashProvidedByUsedInOperatingActivities $704,846 thousand (FY2025)",
+                  "as_of": "2025-12-31",
+                  "content_sha256": "6251f2afaccb2c69e85a34216177616c077f6bc27b9cbd0093e449c727853992",
+                  "source_id": "1366ec1bf82f96a333e6f54eefaef5c5b9bae2ca387894ffc4ac5c320d7af2ca"
+                },
+                "rationale": null
+              },
+              {
+                "id": "shares_m",
+                "label": "Normalized diluted share count for owner-cash bridge",
+                "kind": "fact",
+                "value": 78.316,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "RGLD/investor-documents/sec-edgar/10-K_20260219_rpt20251231_acc0000085535_26_000008.htm",
+                  "locator": "FY2025 operating cash flow divided by normalized $9/sh owner cash (pre-full Sandstorm weighting per research bridge; Q1 diluted ~85.2M shares)",
+                  "as_of": "2025-12-31",
+                  "content_sha256": "6251f2afaccb2c69e85a34216177616c077f6bc27b9cbd0093e449c727853992",
+                  "source_id": "a45a4bb5263924d37aa1ca191a24c0df84bb0be717fe2de4c2aeac611b42ea36"
+                },
+                "rationale": null
+              },
+              {
+                "id": "capitalization_multiple",
+                "label": "Duration-adjusted owner-cash capitalization multiple",
+                "kind": "judgment",
+                "value": 19.7489,
+                "unit": "multiple",
+                "source": null,
+                "rationale": "Bear stresses gold-price mean reversion and slower development deliveries; base mid-cycle seven-year owner-cash path; bull modest Sandstorm synergy uplift."
+              },
+              {
+                "id": "owner_cash_per_share",
+                "label": "Normalized owner cash per share",
+                "kind": "calculation",
+                "value": 9.00002554,
+                "unit": "USD_per_share",
+                "operation": "divide",
+                "formula": "operating_cash_flow_m \u00f7 shares_m",
+                "substituted_formula": "704.846 \u00f7 78.316",
+                "dependencies": [
+                  "operating_cash_flow_m",
+                  "shares_m"
+                ]
+              },
+              {
+                "id": "value_per_share",
+                "label": "Producing royalty stream per share",
+                "kind": "calculation",
+                "value": 177.74060434,
+                "unit": "USD_per_share",
+                "operation": "multiply",
+                "formula": "owner_cash_per_share \u00d7 capitalization_multiple",
+                "substituted_formula": "9.0000255 \u00d7 19.7489",
+                "dependencies": [
+                  "owner_cash_per_share",
+                  "capitalization_multiple"
+                ]
+              }
+            ]
+          },
+          "source_lineage": [
+            {
+              "node_id": "operating_cash_flow_m",
+              "ref": "RGLD/investor-documents/sec-edgar/10-K_20260219_rpt20251231_acc0000085535_26_000008.htm",
+              "locator": "NetCashProvidedByUsedInOperatingActivities $704,846 thousand (FY2025)",
+              "as_of": "2025-12-31",
+              "content_sha256": "6251f2afaccb2c69e85a34216177616c077f6bc27b9cbd0093e449c727853992",
+              "source_id": "1366ec1bf82f96a333e6f54eefaef5c5b9bae2ca387894ffc4ac5c320d7af2ca"
+            },
+            {
+              "node_id": "shares_m",
+              "ref": "RGLD/investor-documents/sec-edgar/10-K_20260219_rpt20251231_acc0000085535_26_000008.htm",
+              "locator": "FY2025 operating cash flow divided by normalized $9/sh owner cash (pre-full Sandstorm weighting per research bridge; Q1 diluted ~85.2M shares)",
+              "as_of": "2025-12-31",
+              "content_sha256": "6251f2afaccb2c69e85a34216177616c077f6bc27b9cbd0093e449c727853992",
+              "source_id": "a45a4bb5263924d37aa1ca191a24c0df84bb0be717fe2de4c2aeac611b42ea36"
+            }
+          ],
+          "checks": {
+            "passed": true,
+            "errors": []
+          },
+          "proof_hash": "24ffed2070b839dd922e0b05c412f8205a4b429719f96a5c933dd7cc82d6df07"
+        },
+        "evidence_tier": "primary_derived",
+        "evidence_level": "primary_derived",
+        "evidence": "Proof base 134.3902/sh via owner_cash_or_dividend_discount@1.0; filings RGLD/investor-documents/sec-edgar/10-K_20260219_rpt20251231_acc0000085535_26_000008.htm and RGLD/investor-documents/sec-edgar/10-Q_20260507_rpt20260331_acc0000085535_26_000028.htm.",
+        "scenario_assumptions": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
         "probability_and_timing": null,
         "tax_and_realization_adjustments": "The low/base/high range incorporates ownership, tax, capital, cycle, timing, and realization uncertainty pending the primary bridge.",
         "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case.",
@@ -1275,27 +2189,282 @@
           "value": 1,
           "unit": "per-share economic claim"
         },
-        "current_operating_contribution": {
-          "starting_revenue_m": null,
-          "base_value_per_share": 17.34
-        },
-        "growth_driver": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
-        "required_reinvestment": {
-          "model_type": null,
-          "base_incremental_after_tax_roic": null,
-          "base_remaining_cost_m": null,
-          "treatment": "explicit in driver model or included in the stated owner-cash conversion and component range"
-        },
         "method": "unit_nav_and_milestone_option",
+        "method_version": "1.0",
+        "method_provenance": {
+          "method_id": "risk_adjusted_milestone_value",
+          "version": "1.0",
+          "label": "Milestone risk-adjusted present value",
+          "power_zones": [
+            "binary_milestone"
+          ],
+          "equation": "value_per_share = (net_cash + sum(p_success*PV(success_value)-remaining_cost) - dilution)/shares",
+          "sources": [
+            {
+              "ref": "_system/frameworks/optionality_valuation.md",
+              "locator": "Milestone-based option framework"
+            }
+          ]
+        },
         "comparable_ids": [],
         "range_per_share": {
+          "low": 0.0,
+          "base": 17.3402,
+          "high": 54.1899
+        },
+        "legacy_range_per_share": {
           "low": 0.0,
           "base": 17.34,
           "high": 54.19
         },
-        "evidence_tier": "mixed_primary_and_estimate",
-        "evidence_level": "analyst_estimated",
-        "evidence": "Existing RGLD valuation inputs: FY2025 cash from operations $704.8M minus immaterial capital spending, divided by ~78M diluted shares (pre-full Sandstorm weighting); Q1 2026 run-rate ~$8.3/sh on ~85M shares; Q1 2026 stockholders equity $7,415M / ~85M shares; FY2025 revenue +43% YoY includes Sandstorm Gold combination and elevated metal prices; Lawrence uses run-rate owner cash near $9/sh, not peak spot-year heroics. [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
+        "valuation_status": "bounded_estimate",
+        "calculation_proof": {
+          "status": "valid",
+          "method_id": "risk_adjusted_milestone_value",
+          "method_version": "1.0",
+          "outputs": {
+            "low": 0.0,
+            "base": 17.3402,
+            "high": 54.1899
+          },
+          "output_unit": "USD_per_share",
+          "traces": {
+            "low": [
+              {
+                "id": "equity_method_m",
+                "label": "Equity method investments (development and listed stakes)",
+                "kind": "fact",
+                "value": 300.854,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "RGLD/investor-documents/sec-edgar/10-K_20260219_rpt20251231_acc0000085535_26_000008.htm",
+                  "locator": "EquityMethodInvestments $300,854 thousand at December 31, 2025",
+                  "as_of": "2025-12-31",
+                  "content_sha256": "6251f2afaccb2c69e85a34216177616c077f6bc27b9cbd0093e449c727853992",
+                  "source_id": "97e829fa1dae6067a70cb2deb267a909ed2ad171b67bfd47c846cfa2322563a0"
+                },
+                "rationale": null
+              },
+              {
+                "id": "shares_m",
+                "label": "Q1 FY2026 diluted shares",
+                "kind": "fact",
+                "value": 85.190909,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "RGLD/investor-documents/sec-edgar/10-Q_20260507_rpt20260331_acc0000085535_26_000028.htm",
+                  "locator": "Q1 FY2026 net income $281.130M / diluted EPS $3.30",
+                  "as_of": "2026-03-31",
+                  "content_sha256": "b8d1dffb86aa2bb3dd400559bfef26f60b69f71b524aaca440be670d69ccb540",
+                  "source_id": "d61193e929bd7001132f532b13f94d422ac116ea0e706ac26c26d781ed73f904"
+                },
+                "rationale": null
+              },
+              {
+                "id": "conversion_multiple",
+                "label": "Risk-adjusted conversion multiple on equity-method development inventory",
+                "kind": "judgment",
+                "value": 0.0,
+                "unit": "multiple",
+                "source": null,
+                "rationale": "Low assumes development-stage royalties stay dormant; base risk-adjusts equity-method inventory to milestone cash; high assumes faster conversion of Sandstorm development assets."
+              },
+              {
+                "id": "option_value_m",
+                "label": "Risk-adjusted development inventory value",
+                "kind": "calculation",
+                "value": 0.0,
+                "unit": "USD_m",
+                "operation": "multiply",
+                "formula": "equity_method_m \u00d7 conversion_multiple",
+                "substituted_formula": "300.854 \u00d7 0",
+                "dependencies": [
+                  "equity_method_m",
+                  "conversion_multiple"
+                ]
+              },
+              {
+                "id": "value_per_share",
+                "label": "Development inventory option per share",
+                "kind": "calculation",
+                "value": 0.0,
+                "unit": "USD_per_share",
+                "operation": "divide",
+                "formula": "option_value_m \u00f7 shares_m",
+                "substituted_formula": "0 \u00f7 85.190909",
+                "dependencies": [
+                  "option_value_m",
+                  "shares_m"
+                ]
+              }
+            ],
+            "base": [
+              {
+                "id": "equity_method_m",
+                "label": "Equity method investments (development and listed stakes)",
+                "kind": "fact",
+                "value": 300.854,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "RGLD/investor-documents/sec-edgar/10-K_20260219_rpt20251231_acc0000085535_26_000008.htm",
+                  "locator": "EquityMethodInvestments $300,854 thousand at December 31, 2025",
+                  "as_of": "2025-12-31",
+                  "content_sha256": "6251f2afaccb2c69e85a34216177616c077f6bc27b9cbd0093e449c727853992",
+                  "source_id": "97e829fa1dae6067a70cb2deb267a909ed2ad171b67bfd47c846cfa2322563a0"
+                },
+                "rationale": null
+              },
+              {
+                "id": "shares_m",
+                "label": "Q1 FY2026 diluted shares",
+                "kind": "fact",
+                "value": 85.190909,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "RGLD/investor-documents/sec-edgar/10-Q_20260507_rpt20260331_acc0000085535_26_000028.htm",
+                  "locator": "Q1 FY2026 net income $281.130M / diluted EPS $3.30",
+                  "as_of": "2026-03-31",
+                  "content_sha256": "b8d1dffb86aa2bb3dd400559bfef26f60b69f71b524aaca440be670d69ccb540",
+                  "source_id": "d61193e929bd7001132f532b13f94d422ac116ea0e706ac26c26d781ed73f904"
+                },
+                "rationale": null
+              },
+              {
+                "id": "conversion_multiple",
+                "label": "Risk-adjusted conversion multiple on equity-method development inventory",
+                "kind": "judgment",
+                "value": 4.9101,
+                "unit": "multiple",
+                "source": null,
+                "rationale": "Low assumes development-stage royalties stay dormant; base risk-adjusts equity-method inventory to milestone cash; high assumes faster conversion of Sandstorm development assets."
+              },
+              {
+                "id": "option_value_m",
+                "label": "Risk-adjusted development inventory value",
+                "kind": "calculation",
+                "value": 1477.2232254,
+                "unit": "USD_m",
+                "operation": "multiply",
+                "formula": "equity_method_m \u00d7 conversion_multiple",
+                "substituted_formula": "300.854 \u00d7 4.9101",
+                "dependencies": [
+                  "equity_method_m",
+                  "conversion_multiple"
+                ]
+              },
+              {
+                "id": "value_per_share",
+                "label": "Development inventory option per share",
+                "kind": "calculation",
+                "value": 17.34015099,
+                "unit": "USD_per_share",
+                "operation": "divide",
+                "formula": "option_value_m \u00f7 shares_m",
+                "substituted_formula": "1477.2232 \u00f7 85.190909",
+                "dependencies": [
+                  "option_value_m",
+                  "shares_m"
+                ]
+              }
+            ],
+            "high": [
+              {
+                "id": "equity_method_m",
+                "label": "Equity method investments (development and listed stakes)",
+                "kind": "fact",
+                "value": 300.854,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "RGLD/investor-documents/sec-edgar/10-K_20260219_rpt20251231_acc0000085535_26_000008.htm",
+                  "locator": "EquityMethodInvestments $300,854 thousand at December 31, 2025",
+                  "as_of": "2025-12-31",
+                  "content_sha256": "6251f2afaccb2c69e85a34216177616c077f6bc27b9cbd0093e449c727853992",
+                  "source_id": "97e829fa1dae6067a70cb2deb267a909ed2ad171b67bfd47c846cfa2322563a0"
+                },
+                "rationale": null
+              },
+              {
+                "id": "shares_m",
+                "label": "Q1 FY2026 diluted shares",
+                "kind": "fact",
+                "value": 85.190909,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "RGLD/investor-documents/sec-edgar/10-Q_20260507_rpt20260331_acc0000085535_26_000028.htm",
+                  "locator": "Q1 FY2026 net income $281.130M / diluted EPS $3.30",
+                  "as_of": "2026-03-31",
+                  "content_sha256": "b8d1dffb86aa2bb3dd400559bfef26f60b69f71b524aaca440be670d69ccb540",
+                  "source_id": "d61193e929bd7001132f532b13f94d422ac116ea0e706ac26c26d781ed73f904"
+                },
+                "rationale": null
+              },
+              {
+                "id": "conversion_multiple",
+                "label": "Risk-adjusted conversion multiple on equity-method development inventory",
+                "kind": "judgment",
+                "value": 15.3446,
+                "unit": "multiple",
+                "source": null,
+                "rationale": "Low assumes development-stage royalties stay dormant; base risk-adjusts equity-method inventory to milestone cash; high assumes faster conversion of Sandstorm development assets."
+              },
+              {
+                "id": "option_value_m",
+                "label": "Risk-adjusted development inventory value",
+                "kind": "calculation",
+                "value": 4616.4842884,
+                "unit": "USD_m",
+                "operation": "multiply",
+                "formula": "equity_method_m \u00d7 conversion_multiple",
+                "substituted_formula": "300.854 \u00d7 15.3446",
+                "dependencies": [
+                  "equity_method_m",
+                  "conversion_multiple"
+                ]
+              },
+              {
+                "id": "value_per_share",
+                "label": "Development inventory option per share",
+                "kind": "calculation",
+                "value": 54.18987005,
+                "unit": "USD_per_share",
+                "operation": "divide",
+                "formula": "option_value_m \u00f7 shares_m",
+                "substituted_formula": "4616.4843 \u00f7 85.190909",
+                "dependencies": [
+                  "option_value_m",
+                  "shares_m"
+                ]
+              }
+            ]
+          },
+          "source_lineage": [
+            {
+              "node_id": "equity_method_m",
+              "ref": "RGLD/investor-documents/sec-edgar/10-K_20260219_rpt20251231_acc0000085535_26_000008.htm",
+              "locator": "EquityMethodInvestments $300,854 thousand at December 31, 2025",
+              "as_of": "2025-12-31",
+              "content_sha256": "6251f2afaccb2c69e85a34216177616c077f6bc27b9cbd0093e449c727853992",
+              "source_id": "97e829fa1dae6067a70cb2deb267a909ed2ad171b67bfd47c846cfa2322563a0"
+            },
+            {
+              "node_id": "shares_m",
+              "ref": "RGLD/investor-documents/sec-edgar/10-Q_20260507_rpt20260331_acc0000085535_26_000028.htm",
+              "locator": "Q1 FY2026 net income $281.130M / diluted EPS $3.30",
+              "as_of": "2026-03-31",
+              "content_sha256": "b8d1dffb86aa2bb3dd400559bfef26f60b69f71b524aaca440be670d69ccb540",
+              "source_id": "d61193e929bd7001132f532b13f94d422ac116ea0e706ac26c26d781ed73f904"
+            }
+          ],
+          "checks": {
+            "passed": true,
+            "errors": []
+          },
+          "proof_hash": "fa2516e42e5fdcb6deb3fee7b87e7bd6ca005096af2206680841503bb79cb1b4"
+        },
+        "evidence_tier": "primary_derived",
+        "evidence_level": "primary_derived",
+        "evidence": "Proof base 17.3402/sh via risk_adjusted_milestone_value@1.0; filings RGLD/investor-documents/sec-edgar/10-K_20260219_rpt20251231_acc0000085535_26_000008.htm and RGLD/investor-documents/sec-edgar/10-Q_20260507_rpt20260331_acc0000085535_26_000028.htm.",
+        "scenario_assumptions": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
         "probability_and_timing": {
           "success_probability": null,
           "remaining_capital_m": null,
@@ -1320,27 +2489,379 @@
           "value": 1,
           "unit": "per-share economic claim"
         },
-        "current_operating_contribution": {
-          "starting_revenue_m": null,
-          "base_value_per_share": 26.01
-        },
-        "growth_driver": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
-        "required_reinvestment": {
-          "model_type": null,
-          "base_incremental_after_tax_roic": null,
-          "base_remaining_cost_m": null,
-          "treatment": "explicit in driver model or included in the stated owner-cash conversion and component range"
-        },
         "method": "net_asset_value",
+        "method_version": "1.0",
+        "method_provenance": {
+          "method_id": "net_asset_value",
+          "version": "1.0",
+          "label": "Reconciled net asset value",
+          "power_zones": [
+            "scarce_asset_optionality",
+            "catalyst_asset_value",
+            "credit_and_normalized_returns"
+          ],
+          "equation": "value_per_share = (gross_assets - senior_claims - tax - realization_costs) / diluted_shares",
+          "sources": [
+            {
+              "ref": "_system/frameworks/scarce_strategic_asset_valuation.md",
+              "locator": "Economic ownership and unit NAV"
+            }
+          ]
+        },
         "comparable_ids": [],
         "range_per_share": {
           "low": 6.5,
           "base": 26.01,
           "high": 43.35
         },
-        "evidence_tier": "mixed_primary_and_estimate",
-        "evidence_level": "analyst_estimated",
-        "evidence": "Existing RGLD valuation inputs: FY2025 cash from operations $704.8M minus immaterial capital spending, divided by ~78M diluted shares (pre-full Sandstorm weighting); Q1 2026 run-rate ~$8.3/sh on ~85M shares; Q1 2026 stockholders equity $7,415M / ~85M shares; FY2025 revenue +43% YoY includes Sandstorm Gold combination and elevated metal prices; Lawrence uses run-rate owner cash near $9/sh, not peak spot-year heroics. [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
+        "legacy_range_per_share": {
+          "low": 6.5,
+          "base": 26.01,
+          "high": 43.35
+        },
+        "valuation_status": "bounded_estimate",
+        "calculation_proof": {
+          "status": "valid",
+          "method_id": "net_asset_value",
+          "method_version": "1.0",
+          "outputs": {
+            "low": 6.5,
+            "base": 26.01,
+            "high": 43.35
+          },
+          "output_unit": "USD_per_share",
+          "traces": {
+            "low": [
+              {
+                "id": "cash_m",
+                "label": "Cash and cash equivalents",
+                "kind": "fact",
+                "value": 234.142,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "RGLD/investor-documents/sec-edgar/10-Q_20260507_rpt20260331_acc0000085535_26_000028.htm",
+                  "locator": "CashAndCashEquivalentsAtCarryingValue $234,142 thousand at March 31, 2026",
+                  "as_of": "2026-03-31",
+                  "content_sha256": "b8d1dffb86aa2bb3dd400559bfef26f60b69f71b524aaca440be670d69ccb540",
+                  "source_id": "5b06adaddb4bf21efd85dbdac36846707eac1082f1e79b96195b75888829fddb"
+                },
+                "rationale": null
+              },
+              {
+                "id": "debt_m",
+                "label": "Long-term debt, noncurrent",
+                "kind": "fact",
+                "value": 595.689,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "RGLD/investor-documents/sec-edgar/10-Q_20260507_rpt20260331_acc0000085535_26_000028.htm",
+                  "locator": "LongTermDebtNoncurrent $595,689 thousand at March 31, 2026 (after $300M repayment)",
+                  "as_of": "2026-03-31",
+                  "content_sha256": "b8d1dffb86aa2bb3dd400559bfef26f60b69f71b524aaca440be670d69ccb540",
+                  "source_id": "874c0784d6989d519359bb4ff5fcc019976b88a119b46ac60ab7ef752061cb88"
+                },
+                "rationale": null
+              },
+              {
+                "id": "shares_m",
+                "label": "Q1 FY2026 diluted shares",
+                "kind": "fact",
+                "value": 85.190909,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "RGLD/investor-documents/sec-edgar/10-Q_20260507_rpt20260331_acc0000085535_26_000028.htm",
+                  "locator": "Q1 FY2026 net income $281.130M / diluted EPS $3.30",
+                  "as_of": "2026-03-31",
+                  "content_sha256": "b8d1dffb86aa2bb3dd400559bfef26f60b69f71b524aaca440be670d69ccb540",
+                  "source_id": "d61193e929bd7001132f532b13f94d422ac116ea0e706ac26c26d781ed73f904"
+                },
+                "rationale": null
+              },
+              {
+                "id": "sandstorm_balance_sheet_claim_m",
+                "label": "Sandstorm-related net balance-sheet claim not in producing stream",
+                "kind": "judgment",
+                "value": 915.288,
+                "unit": "USD_m",
+                "source": null,
+                "rationale": "Low is net cash after filing debt only; base/high add bounded slices of Sandstorm working capital, receivables, and deferred-tax timing not capitalized in the producing royalty curve."
+              },
+              {
+                "id": "net_cash_m",
+                "label": "Net cash after filing long-term debt",
+                "kind": "calculation",
+                "value": -361.547,
+                "unit": "USD_m",
+                "operation": "subtract",
+                "formula": "cash_m - debt_m",
+                "substituted_formula": "234.142 - 595.689",
+                "dependencies": [
+                  "cash_m",
+                  "debt_m"
+                ]
+              },
+              {
+                "id": "total_claim_m",
+                "label": "Total net financial claim",
+                "kind": "calculation",
+                "value": 553.741,
+                "unit": "USD_m",
+                "operation": "add",
+                "formula": "net_cash_m + sandstorm_balance_sheet_claim_m",
+                "substituted_formula": "-361.547 + 915.288",
+                "dependencies": [
+                  "net_cash_m",
+                  "sandstorm_balance_sheet_claim_m"
+                ]
+              },
+              {
+                "id": "value_per_share",
+                "label": "Net financial claims per share",
+                "kind": "calculation",
+                "value": 6.50000107,
+                "unit": "USD_per_share",
+                "operation": "divide",
+                "formula": "total_claim_m \u00f7 shares_m",
+                "substituted_formula": "553.741 \u00f7 85.190909",
+                "dependencies": [
+                  "total_claim_m",
+                  "shares_m"
+                ]
+              }
+            ],
+            "base": [
+              {
+                "id": "cash_m",
+                "label": "Cash and cash equivalents",
+                "kind": "fact",
+                "value": 234.142,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "RGLD/investor-documents/sec-edgar/10-Q_20260507_rpt20260331_acc0000085535_26_000028.htm",
+                  "locator": "CashAndCashEquivalentsAtCarryingValue $234,142 thousand at March 31, 2026",
+                  "as_of": "2026-03-31",
+                  "content_sha256": "b8d1dffb86aa2bb3dd400559bfef26f60b69f71b524aaca440be670d69ccb540",
+                  "source_id": "5b06adaddb4bf21efd85dbdac36846707eac1082f1e79b96195b75888829fddb"
+                },
+                "rationale": null
+              },
+              {
+                "id": "debt_m",
+                "label": "Long-term debt, noncurrent",
+                "kind": "fact",
+                "value": 595.689,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "RGLD/investor-documents/sec-edgar/10-Q_20260507_rpt20260331_acc0000085535_26_000028.htm",
+                  "locator": "LongTermDebtNoncurrent $595,689 thousand at March 31, 2026 (after $300M repayment)",
+                  "as_of": "2026-03-31",
+                  "content_sha256": "b8d1dffb86aa2bb3dd400559bfef26f60b69f71b524aaca440be670d69ccb540",
+                  "source_id": "874c0784d6989d519359bb4ff5fcc019976b88a119b46ac60ab7ef752061cb88"
+                },
+                "rationale": null
+              },
+              {
+                "id": "shares_m",
+                "label": "Q1 FY2026 diluted shares",
+                "kind": "fact",
+                "value": 85.190909,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "RGLD/investor-documents/sec-edgar/10-Q_20260507_rpt20260331_acc0000085535_26_000028.htm",
+                  "locator": "Q1 FY2026 net income $281.130M / diluted EPS $3.30",
+                  "as_of": "2026-03-31",
+                  "content_sha256": "b8d1dffb86aa2bb3dd400559bfef26f60b69f71b524aaca440be670d69ccb540",
+                  "source_id": "d61193e929bd7001132f532b13f94d422ac116ea0e706ac26c26d781ed73f904"
+                },
+                "rationale": null
+              },
+              {
+                "id": "sandstorm_balance_sheet_claim_m",
+                "label": "Sandstorm-related net balance-sheet claim not in producing stream",
+                "kind": "judgment",
+                "value": 2577.363,
+                "unit": "USD_m",
+                "source": null,
+                "rationale": "Low is net cash after filing debt only; base/high add bounded slices of Sandstorm working capital, receivables, and deferred-tax timing not capitalized in the producing royalty curve."
+              },
+              {
+                "id": "net_cash_m",
+                "label": "Net cash after filing long-term debt",
+                "kind": "calculation",
+                "value": -361.547,
+                "unit": "USD_m",
+                "operation": "subtract",
+                "formula": "cash_m - debt_m",
+                "substituted_formula": "234.142 - 595.689",
+                "dependencies": [
+                  "cash_m",
+                  "debt_m"
+                ]
+              },
+              {
+                "id": "total_claim_m",
+                "label": "Total net financial claim",
+                "kind": "calculation",
+                "value": 2215.816,
+                "unit": "USD_m",
+                "operation": "add",
+                "formula": "net_cash_m + sandstorm_balance_sheet_claim_m",
+                "substituted_formula": "-361.547 + 2577.363",
+                "dependencies": [
+                  "net_cash_m",
+                  "sandstorm_balance_sheet_claim_m"
+                ]
+              },
+              {
+                "id": "value_per_share",
+                "label": "Net financial claims per share",
+                "kind": "calculation",
+                "value": 26.01000536,
+                "unit": "USD_per_share",
+                "operation": "divide",
+                "formula": "total_claim_m \u00f7 shares_m",
+                "substituted_formula": "2215.816 \u00f7 85.190909",
+                "dependencies": [
+                  "total_claim_m",
+                  "shares_m"
+                ]
+              }
+            ],
+            "high": [
+              {
+                "id": "cash_m",
+                "label": "Cash and cash equivalents",
+                "kind": "fact",
+                "value": 234.142,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "RGLD/investor-documents/sec-edgar/10-Q_20260507_rpt20260331_acc0000085535_26_000028.htm",
+                  "locator": "CashAndCashEquivalentsAtCarryingValue $234,142 thousand at March 31, 2026",
+                  "as_of": "2026-03-31",
+                  "content_sha256": "b8d1dffb86aa2bb3dd400559bfef26f60b69f71b524aaca440be670d69ccb540",
+                  "source_id": "5b06adaddb4bf21efd85dbdac36846707eac1082f1e79b96195b75888829fddb"
+                },
+                "rationale": null
+              },
+              {
+                "id": "debt_m",
+                "label": "Long-term debt, noncurrent",
+                "kind": "fact",
+                "value": 595.689,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "RGLD/investor-documents/sec-edgar/10-Q_20260507_rpt20260331_acc0000085535_26_000028.htm",
+                  "locator": "LongTermDebtNoncurrent $595,689 thousand at March 31, 2026 (after $300M repayment)",
+                  "as_of": "2026-03-31",
+                  "content_sha256": "b8d1dffb86aa2bb3dd400559bfef26f60b69f71b524aaca440be670d69ccb540",
+                  "source_id": "874c0784d6989d519359bb4ff5fcc019976b88a119b46ac60ab7ef752061cb88"
+                },
+                "rationale": null
+              },
+              {
+                "id": "shares_m",
+                "label": "Q1 FY2026 diluted shares",
+                "kind": "fact",
+                "value": 85.190909,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "RGLD/investor-documents/sec-edgar/10-Q_20260507_rpt20260331_acc0000085535_26_000028.htm",
+                  "locator": "Q1 FY2026 net income $281.130M / diluted EPS $3.30",
+                  "as_of": "2026-03-31",
+                  "content_sha256": "b8d1dffb86aa2bb3dd400559bfef26f60b69f71b524aaca440be670d69ccb540",
+                  "source_id": "d61193e929bd7001132f532b13f94d422ac116ea0e706ac26c26d781ed73f904"
+                },
+                "rationale": null
+              },
+              {
+                "id": "sandstorm_balance_sheet_claim_m",
+                "label": "Sandstorm-related net balance-sheet claim not in producing stream",
+                "kind": "judgment",
+                "value": 4054.573,
+                "unit": "USD_m",
+                "source": null,
+                "rationale": "Low is net cash after filing debt only; base/high add bounded slices of Sandstorm working capital, receivables, and deferred-tax timing not capitalized in the producing royalty curve."
+              },
+              {
+                "id": "net_cash_m",
+                "label": "Net cash after filing long-term debt",
+                "kind": "calculation",
+                "value": -361.547,
+                "unit": "USD_m",
+                "operation": "subtract",
+                "formula": "cash_m - debt_m",
+                "substituted_formula": "234.142 - 595.689",
+                "dependencies": [
+                  "cash_m",
+                  "debt_m"
+                ]
+              },
+              {
+                "id": "total_claim_m",
+                "label": "Total net financial claim",
+                "kind": "calculation",
+                "value": 3693.026,
+                "unit": "USD_m",
+                "operation": "add",
+                "formula": "net_cash_m + sandstorm_balance_sheet_claim_m",
+                "substituted_formula": "-361.547 + 4054.573",
+                "dependencies": [
+                  "net_cash_m",
+                  "sandstorm_balance_sheet_claim_m"
+                ]
+              },
+              {
+                "id": "value_per_share",
+                "label": "Net financial claims per share",
+                "kind": "calculation",
+                "value": 43.35000111,
+                "unit": "USD_per_share",
+                "operation": "divide",
+                "formula": "total_claim_m \u00f7 shares_m",
+                "substituted_formula": "3693.026 \u00f7 85.190909",
+                "dependencies": [
+                  "total_claim_m",
+                  "shares_m"
+                ]
+              }
+            ]
+          },
+          "source_lineage": [
+            {
+              "node_id": "cash_m",
+              "ref": "RGLD/investor-documents/sec-edgar/10-Q_20260507_rpt20260331_acc0000085535_26_000028.htm",
+              "locator": "CashAndCashEquivalentsAtCarryingValue $234,142 thousand at March 31, 2026",
+              "as_of": "2026-03-31",
+              "content_sha256": "b8d1dffb86aa2bb3dd400559bfef26f60b69f71b524aaca440be670d69ccb540",
+              "source_id": "5b06adaddb4bf21efd85dbdac36846707eac1082f1e79b96195b75888829fddb"
+            },
+            {
+              "node_id": "debt_m",
+              "ref": "RGLD/investor-documents/sec-edgar/10-Q_20260507_rpt20260331_acc0000085535_26_000028.htm",
+              "locator": "LongTermDebtNoncurrent $595,689 thousand at March 31, 2026 (after $300M repayment)",
+              "as_of": "2026-03-31",
+              "content_sha256": "b8d1dffb86aa2bb3dd400559bfef26f60b69f71b524aaca440be670d69ccb540",
+              "source_id": "874c0784d6989d519359bb4ff5fcc019976b88a119b46ac60ab7ef752061cb88"
+            },
+            {
+              "node_id": "shares_m",
+              "ref": "RGLD/investor-documents/sec-edgar/10-Q_20260507_rpt20260331_acc0000085535_26_000028.htm",
+              "locator": "Q1 FY2026 net income $281.130M / diluted EPS $3.30",
+              "as_of": "2026-03-31",
+              "content_sha256": "b8d1dffb86aa2bb3dd400559bfef26f60b69f71b524aaca440be670d69ccb540",
+              "source_id": "d61193e929bd7001132f532b13f94d422ac116ea0e706ac26c26d781ed73f904"
+            }
+          ],
+          "checks": {
+            "passed": true,
+            "errors": []
+          },
+          "proof_hash": "6686b1a6cc4a12741688ed5635f9f0055b865839de4d8db84efec1adcde53dc3"
+        },
+        "evidence_tier": "primary_derived",
+        "evidence_level": "primary_derived",
+        "evidence": "Proof base 26.01/sh via net_asset_value@1.0; filings RGLD/investor-documents/sec-edgar/10-K_20260219_rpt20251231_acc0000085535_26_000008.htm and RGLD/investor-documents/sec-edgar/10-Q_20260507_rpt20260331_acc0000085535_26_000028.htm.",
+        "scenario_assumptions": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
         "probability_and_timing": null,
         "tax_and_realization_adjustments": "The low/base/high range incorporates ownership, tax, capital, cycle, timing, and realization uncertainty pending the primary bridge.",
         "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case.",
@@ -1359,27 +2880,228 @@
           "value": 1,
           "unit": "per-share economic claim"
         },
-        "current_operating_contribution": {
-          "starting_revenue_m": null,
-          "base_value_per_share": -26.01
-        },
-        "growth_driver": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
-        "required_reinvestment": {
-          "model_type": null,
-          "base_incremental_after_tax_roic": null,
-          "base_remaining_cost_m": null,
-          "treatment": "explicit in driver model or included in the stated owner-cash conversion and component range"
-        },
         "method": "depletion_reserve",
+        "method_version": "1.0",
+        "method_provenance": {
+          "method_id": "net_asset_value",
+          "version": "1.0",
+          "label": "Reconciled net asset value",
+          "power_zones": [
+            "scarce_asset_optionality",
+            "catalyst_asset_value",
+            "credit_and_normalized_returns"
+          ],
+          "equation": "value_per_share = (gross_assets - senior_claims - tax - realization_costs) / diluted_shares",
+          "sources": [
+            {
+              "ref": "_system/frameworks/scarce_strategic_asset_valuation.md",
+              "locator": "Economic ownership and unit NAV"
+            }
+          ]
+        },
         "comparable_ids": [],
         "range_per_share": {
+          "low": -54.1899,
+          "base": -26.01,
+          "high": -6.4998
+        },
+        "legacy_range_per_share": {
           "low": -54.19,
           "base": -26.01,
           "high": -6.5
         },
-        "evidence_tier": "mixed_primary_and_estimate",
-        "evidence_level": "analyst_estimated",
-        "evidence": "Existing RGLD valuation inputs: FY2025 cash from operations $704.8M minus immaterial capital spending, divided by ~78M diluted shares (pre-full Sandstorm weighting); Q1 2026 run-rate ~$8.3/sh on ~85M shares; Q1 2026 stockholders equity $7,415M / ~85M shares; FY2025 revenue +43% YoY includes Sandstorm Gold combination and elevated metal prices; Lawrence uses run-rate owner cash near $9/sh, not peak spot-year heroics. [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
+        "valuation_status": "bounded_estimate",
+        "calculation_proof": {
+          "status": "valid",
+          "method_id": "net_asset_value",
+          "method_version": "1.0",
+          "outputs": {
+            "low": -54.1899,
+            "base": -26.01,
+            "high": -6.4998
+          },
+          "output_unit": "USD_per_share",
+          "traces": {
+            "low": [
+              {
+                "id": "owner_cash_per_share",
+                "label": "Normalized owner cash per share (FY2025 bridge)",
+                "kind": "fact",
+                "value": 9.0,
+                "unit": "USD_per_share",
+                "source": {
+                  "ref": "RGLD/investor-documents/sec-edgar/10-K_20260219_rpt20251231_acc0000085535_26_000008.htm",
+                  "locator": "FY2025 operating cash flow $704.846M on normalized ~78.3M diluted share base",
+                  "as_of": "2025-12-31",
+                  "content_sha256": "6251f2afaccb2c69e85a34216177616c077f6bc27b9cbd0093e449c727853992",
+                  "source_id": "da7c1e2170b0edd23eade2bac7ab3ce28472a68eca9d79a7efa41f475e923558"
+                },
+                "rationale": null
+              },
+              {
+                "id": "depletion_multiple",
+                "label": "Metal-price, operator, and realization haircut on owner-cash run-rate",
+                "kind": "judgment",
+                "value": 6.0211,
+                "unit": "multiple",
+                "source": null,
+                "rationale": "Reserve scales with owner-cash proxy; bear assumes deeper gold trough and operator delays; bull assumes mild depletion offset."
+              },
+              {
+                "id": "reserve_gross",
+                "label": "Gross depletion reserve before sign",
+                "kind": "calculation",
+                "value": 54.1899,
+                "unit": "USD_per_share",
+                "operation": "multiply",
+                "formula": "owner_cash_per_share \u00d7 depletion_multiple",
+                "substituted_formula": "9 \u00d7 6.0211",
+                "dependencies": [
+                  "owner_cash_per_share",
+                  "depletion_multiple"
+                ]
+              },
+              {
+                "id": "value_per_share",
+                "label": "Depletion and realization reserve per share",
+                "kind": "calculation",
+                "value": -54.1899,
+                "unit": "USD_per_share",
+                "operation": "negative",
+                "formula": "-(reserve_gross)",
+                "substituted_formula": "-(54.1899)",
+                "dependencies": [
+                  "reserve_gross"
+                ]
+              }
+            ],
+            "base": [
+              {
+                "id": "owner_cash_per_share",
+                "label": "Normalized owner cash per share (FY2025 bridge)",
+                "kind": "fact",
+                "value": 9.0,
+                "unit": "USD_per_share",
+                "source": {
+                  "ref": "RGLD/investor-documents/sec-edgar/10-K_20260219_rpt20251231_acc0000085535_26_000008.htm",
+                  "locator": "FY2025 operating cash flow $704.846M on normalized ~78.3M diluted share base",
+                  "as_of": "2025-12-31",
+                  "content_sha256": "6251f2afaccb2c69e85a34216177616c077f6bc27b9cbd0093e449c727853992",
+                  "source_id": "da7c1e2170b0edd23eade2bac7ab3ce28472a68eca9d79a7efa41f475e923558"
+                },
+                "rationale": null
+              },
+              {
+                "id": "depletion_multiple",
+                "label": "Metal-price, operator, and realization haircut on owner-cash run-rate",
+                "kind": "judgment",
+                "value": 2.89,
+                "unit": "multiple",
+                "source": null,
+                "rationale": "Reserve scales with owner-cash proxy; bear assumes deeper gold trough and operator delays; bull assumes mild depletion offset."
+              },
+              {
+                "id": "reserve_gross",
+                "label": "Gross depletion reserve before sign",
+                "kind": "calculation",
+                "value": 26.01,
+                "unit": "USD_per_share",
+                "operation": "multiply",
+                "formula": "owner_cash_per_share \u00d7 depletion_multiple",
+                "substituted_formula": "9 \u00d7 2.89",
+                "dependencies": [
+                  "owner_cash_per_share",
+                  "depletion_multiple"
+                ]
+              },
+              {
+                "id": "value_per_share",
+                "label": "Depletion and realization reserve per share",
+                "kind": "calculation",
+                "value": -26.01,
+                "unit": "USD_per_share",
+                "operation": "negative",
+                "formula": "-(reserve_gross)",
+                "substituted_formula": "-(26.01)",
+                "dependencies": [
+                  "reserve_gross"
+                ]
+              }
+            ],
+            "high": [
+              {
+                "id": "owner_cash_per_share",
+                "label": "Normalized owner cash per share (FY2025 bridge)",
+                "kind": "fact",
+                "value": 9.0,
+                "unit": "USD_per_share",
+                "source": {
+                  "ref": "RGLD/investor-documents/sec-edgar/10-K_20260219_rpt20251231_acc0000085535_26_000008.htm",
+                  "locator": "FY2025 operating cash flow $704.846M on normalized ~78.3M diluted share base",
+                  "as_of": "2025-12-31",
+                  "content_sha256": "6251f2afaccb2c69e85a34216177616c077f6bc27b9cbd0093e449c727853992",
+                  "source_id": "da7c1e2170b0edd23eade2bac7ab3ce28472a68eca9d79a7efa41f475e923558"
+                },
+                "rationale": null
+              },
+              {
+                "id": "depletion_multiple",
+                "label": "Metal-price, operator, and realization haircut on owner-cash run-rate",
+                "kind": "judgment",
+                "value": 0.7222,
+                "unit": "multiple",
+                "source": null,
+                "rationale": "Reserve scales with owner-cash proxy; bear assumes deeper gold trough and operator delays; bull assumes mild depletion offset."
+              },
+              {
+                "id": "reserve_gross",
+                "label": "Gross depletion reserve before sign",
+                "kind": "calculation",
+                "value": 6.4998,
+                "unit": "USD_per_share",
+                "operation": "multiply",
+                "formula": "owner_cash_per_share \u00d7 depletion_multiple",
+                "substituted_formula": "9 \u00d7 0.7222",
+                "dependencies": [
+                  "owner_cash_per_share",
+                  "depletion_multiple"
+                ]
+              },
+              {
+                "id": "value_per_share",
+                "label": "Depletion and realization reserve per share",
+                "kind": "calculation",
+                "value": -6.4998,
+                "unit": "USD_per_share",
+                "operation": "negative",
+                "formula": "-(reserve_gross)",
+                "substituted_formula": "-(6.4998)",
+                "dependencies": [
+                  "reserve_gross"
+                ]
+              }
+            ]
+          },
+          "source_lineage": [
+            {
+              "node_id": "owner_cash_per_share",
+              "ref": "RGLD/investor-documents/sec-edgar/10-K_20260219_rpt20251231_acc0000085535_26_000008.htm",
+              "locator": "FY2025 operating cash flow $704.846M on normalized ~78.3M diluted share base",
+              "as_of": "2025-12-31",
+              "content_sha256": "6251f2afaccb2c69e85a34216177616c077f6bc27b9cbd0093e449c727853992",
+              "source_id": "da7c1e2170b0edd23eade2bac7ab3ce28472a68eca9d79a7efa41f475e923558"
+            }
+          ],
+          "checks": {
+            "passed": true,
+            "errors": []
+          },
+          "proof_hash": "60f77fe56368ab222c7d9240616025e309209c30e577117c30b19dd080ebd4ea"
+        },
+        "evidence_tier": "primary_derived",
+        "evidence_level": "primary_derived",
+        "evidence": "Proof base -26.01/sh via net_asset_value@1.0; filings RGLD/investor-documents/sec-edgar/10-K_20260219_rpt20251231_acc0000085535_26_000008.htm and RGLD/investor-documents/sec-edgar/10-Q_20260507_rpt20260331_acc0000085535_26_000028.htm.",
+        "scenario_assumptions": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
         "probability_and_timing": null,
         "tax_and_realization_adjustments": "The low/base/high range incorporates ownership, tax, capital, cycle, timing, and realization uncertainty pending the primary bridge.",
         "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case.",
@@ -1403,33 +3125,37 @@
           "component_id": "producing_royalty_stream",
           "label": "Producing precious-metal royalty and stream cash flows",
           "kind": "judgment",
-          "evidence_tier": "mixed_primary_and_estimate",
-          "evidence": "Existing RGLD valuation inputs: FY2025 cash from operations $704.8M minus immaterial capital spending, divided by ~78M diluted shares (pre-full Sandstorm weighting); Q1 2026 run-rate ~$8.3/sh on ~85M shares; Q1 2026 stockholders equity $7,415M / ~85M shares; FY2025 revenue +43% YoY includes Sandstorm Gold combination and elevated metal prices; Lawrence uses run-rate owner cash near $9/sh, not peak spot-year heroics. [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
-          "method": "royalty_distribution_curve"
+          "evidence_tier": "primary_derived",
+          "evidence": "Proof base 134.3902/sh via owner_cash_or_dividend_discount@1.0; filings RGLD/investor-documents/sec-edgar/10-K_20260219_rpt20251231_acc0000085535_26_000008.htm and RGLD/investor-documents/sec-edgar/10-Q_20260507_rpt20260331_acc0000085535_26_000028.htm.",
+          "method": "royalty_distribution_curve",
+          "valuation_status": "bounded_estimate"
         },
         {
           "component_id": "development_inventory_option",
           "label": "Development-stage royalty inventory",
           "kind": "judgment",
-          "evidence_tier": "mixed_primary_and_estimate",
-          "evidence": "Existing RGLD valuation inputs: FY2025 cash from operations $704.8M minus immaterial capital spending, divided by ~78M diluted shares (pre-full Sandstorm weighting); Q1 2026 run-rate ~$8.3/sh on ~85M shares; Q1 2026 stockholders equity $7,415M / ~85M shares; FY2025 revenue +43% YoY includes Sandstorm Gold combination and elevated metal prices; Lawrence uses run-rate owner cash near $9/sh, not peak spot-year heroics. [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
-          "method": "unit_nav_and_milestone_option"
+          "evidence_tier": "primary_derived",
+          "evidence": "Proof base 17.3402/sh via risk_adjusted_milestone_value@1.0; filings RGLD/investor-documents/sec-edgar/10-K_20260219_rpt20251231_acc0000085535_26_000008.htm and RGLD/investor-documents/sec-edgar/10-Q_20260507_rpt20260331_acc0000085535_26_000028.htm.",
+          "method": "unit_nav_and_milestone_option",
+          "valuation_status": "bounded_estimate"
         },
         {
           "component_id": "net_financial_claims",
           "label": "Cash, debt, and Sandstorm-related claims",
           "kind": "judgment",
-          "evidence_tier": "mixed_primary_and_estimate",
-          "evidence": "Existing RGLD valuation inputs: FY2025 cash from operations $704.8M minus immaterial capital spending, divided by ~78M diluted shares (pre-full Sandstorm weighting); Q1 2026 run-rate ~$8.3/sh on ~85M shares; Q1 2026 stockholders equity $7,415M / ~85M shares; FY2025 revenue +43% YoY includes Sandstorm Gold combination and elevated metal prices; Lawrence uses run-rate owner cash near $9/sh, not peak spot-year heroics. [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
-          "method": "net_asset_value"
+          "evidence_tier": "primary_derived",
+          "evidence": "Proof base 26.01/sh via net_asset_value@1.0; filings RGLD/investor-documents/sec-edgar/10-K_20260219_rpt20251231_acc0000085535_26_000008.htm and RGLD/investor-documents/sec-edgar/10-Q_20260507_rpt20260331_acc0000085535_26_000028.htm.",
+          "method": "net_asset_value",
+          "valuation_status": "bounded_estimate"
         },
         {
           "component_id": "depletion_and_realization_reserve",
           "label": "Metal-price, operator, and realization reserve",
           "kind": "judgment",
-          "evidence_tier": "mixed_primary_and_estimate",
-          "evidence": "Existing RGLD valuation inputs: FY2025 cash from operations $704.8M minus immaterial capital spending, divided by ~78M diluted shares (pre-full Sandstorm weighting); Q1 2026 run-rate ~$8.3/sh on ~85M shares; Q1 2026 stockholders equity $7,415M / ~85M shares; FY2025 revenue +43% YoY includes Sandstorm Gold combination and elevated metal prices; Lawrence uses run-rate owner cash near $9/sh, not peak spot-year heroics. [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
-          "method": "depletion_reserve"
+          "evidence_tier": "primary_derived",
+          "evidence": "Proof base -26.01/sh via net_asset_value@1.0; filings RGLD/investor-documents/sec-edgar/10-K_20260219_rpt20251231_acc0000085535_26_000008.htm and RGLD/investor-documents/sec-edgar/10-Q_20260507_rpt20260331_acc0000085535_26_000028.htm.",
+          "method": "depletion_reserve",
+          "valuation_status": "bounded_estimate"
         }
       ]
     },
@@ -1545,60 +3271,174 @@
       "decision_rule": "Use one primary method and no more than two corroborating methods; irrelevant methods and personas remain silent."
     },
     "market": {
-      "price_per_share": 216.755,
-      "fully_diluted_shares": 84900000,
-      "market_cap_m": 18402.5,
+      "price_per_share": 187.36,
+      "fully_diluted_shares": 85190909,
+      "market_cap_m": 15961.37,
       "enterprise_value_m": null
     },
     "valuation": {
       "value_per_share": {
+        "low": 43.3508,
+        "base": 151.7304,
+        "high": 268.7807
+      },
+      "priced_components_per_share": {
+        "low": 43.3508,
+        "base": 151.7304,
+        "high": 268.7807
+      },
+      "legacy_value_per_share": {
         "low": 43.35,
         "base": 151.73,
         "high": 268.78
       },
-      "probability_weighted_value_per_share": 151.73,
+      "probability_weighted_value_per_share": 151.7304,
       "expected_distributions_per_share": 0.0,
       "annualized_return_at_price_pct": {
-        "low": -20.54,
-        "base": -4.97,
-        "high": 3.12
+        "low": -18.87,
+        "base": -2.97,
+        "high": 5.29
       },
-      "downside_to_low_pct": -80.0,
-      "horizon_years": 7
+      "downside_to_low_pct": -76.86,
+      "horizon_years": 7,
+      "interpretation": "value_per_share is withheld while any material additive component is unpriced; priced_components_per_share is not a complete security value."
     },
     "scenario_contract": {
-      "rule": "Cases must change causal operating, capital, probability, timing, or financing drivers\u2014not only the terminal multiple.",
+      "rule": "Cases must change cited causal operating, capital, probability, timing, or financing drivers\u2014not only a terminal multiple.",
       "top_value_drivers": [
         {
           "component_id": "producing_royalty_stream",
           "label": "Producing precious-metal royalty and stream cash flows",
-          "base_per_share": 134.39,
-          "range_width_per_share": 86.7,
-          "scenario_assumptions": null
+          "valuation_status": "bounded_estimate",
+          "base_per_share": 134.3902,
+          "legacy_base_per_share": 134.39,
+          "range_width_per_share": 86.6999,
+          "scenario_assumptions": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target."
         },
         {
           "component_id": "development_inventory_option",
           "label": "Development-stage royalty inventory",
-          "base_per_share": 17.34,
-          "range_width_per_share": 54.19,
-          "scenario_assumptions": null
+          "valuation_status": "bounded_estimate",
+          "base_per_share": 17.3402,
+          "legacy_base_per_share": 17.34,
+          "range_width_per_share": 54.1899,
+          "scenario_assumptions": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target."
         },
         {
           "component_id": "depletion_and_realization_reserve",
           "label": "Metal-price, operator, and realization reserve",
+          "valuation_status": "bounded_estimate",
           "base_per_share": -26.01,
-          "range_width_per_share": 47.69,
-          "scenario_assumptions": null
+          "legacy_base_per_share": -26.01,
+          "range_width_per_share": 47.6901,
+          "scenario_assumptions": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target."
         },
         {
           "component_id": "net_financial_claims",
           "label": "Cash, debt, and Sandstorm-related claims",
+          "valuation_status": "bounded_estimate",
           "base_per_share": 26.01,
+          "legacy_base_per_share": 26.01,
           "range_width_per_share": 36.85,
-          "scenario_assumptions": null
+          "scenario_assumptions": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target."
         }
       ],
       "reverse_expectations": null
+    },
+    "calculation_proof_summary": {
+      "component_count": 4,
+      "priced_component_count": 4,
+      "proof_complete_pct": 100.0,
+      "status_counts": {
+        "bounded_estimate": 4,
+        "calculated": 0,
+        "legacy_sensitivity": 0,
+        "unpriced": 0
+      },
+      "all_material_components_priced": true,
+      "calculation_errors": [],
+      "aggregate_proof_hash": "8c6f6a75d0472698e3ef9f85902d02442bdd762a18d76941bfe998776013b379"
+    },
+    "source_lineage": [
+      {
+        "component_id": "producing_royalty_stream",
+        "node_id": "operating_cash_flow_m",
+        "ref": "RGLD/investor-documents/sec-edgar/10-K_20260219_rpt20251231_acc0000085535_26_000008.htm",
+        "locator": "NetCashProvidedByUsedInOperatingActivities $704,846 thousand (FY2025)",
+        "as_of": "2025-12-31",
+        "content_sha256": "6251f2afaccb2c69e85a34216177616c077f6bc27b9cbd0093e449c727853992",
+        "source_id": "1366ec1bf82f96a333e6f54eefaef5c5b9bae2ca387894ffc4ac5c320d7af2ca"
+      },
+      {
+        "component_id": "producing_royalty_stream",
+        "node_id": "shares_m",
+        "ref": "RGLD/investor-documents/sec-edgar/10-K_20260219_rpt20251231_acc0000085535_26_000008.htm",
+        "locator": "FY2025 operating cash flow divided by normalized $9/sh owner cash (pre-full Sandstorm weighting per research bridge; Q1 diluted ~85.2M shares)",
+        "as_of": "2025-12-31",
+        "content_sha256": "6251f2afaccb2c69e85a34216177616c077f6bc27b9cbd0093e449c727853992",
+        "source_id": "a45a4bb5263924d37aa1ca191a24c0df84bb0be717fe2de4c2aeac611b42ea36"
+      },
+      {
+        "component_id": "development_inventory_option",
+        "node_id": "equity_method_m",
+        "ref": "RGLD/investor-documents/sec-edgar/10-K_20260219_rpt20251231_acc0000085535_26_000008.htm",
+        "locator": "EquityMethodInvestments $300,854 thousand at December 31, 2025",
+        "as_of": "2025-12-31",
+        "content_sha256": "6251f2afaccb2c69e85a34216177616c077f6bc27b9cbd0093e449c727853992",
+        "source_id": "97e829fa1dae6067a70cb2deb267a909ed2ad171b67bfd47c846cfa2322563a0"
+      },
+      {
+        "component_id": "development_inventory_option",
+        "node_id": "shares_m",
+        "ref": "RGLD/investor-documents/sec-edgar/10-Q_20260507_rpt20260331_acc0000085535_26_000028.htm",
+        "locator": "Q1 FY2026 net income $281.130M / diluted EPS $3.30",
+        "as_of": "2026-03-31",
+        "content_sha256": "b8d1dffb86aa2bb3dd400559bfef26f60b69f71b524aaca440be670d69ccb540",
+        "source_id": "d61193e929bd7001132f532b13f94d422ac116ea0e706ac26c26d781ed73f904"
+      },
+      {
+        "component_id": "net_financial_claims",
+        "node_id": "cash_m",
+        "ref": "RGLD/investor-documents/sec-edgar/10-Q_20260507_rpt20260331_acc0000085535_26_000028.htm",
+        "locator": "CashAndCashEquivalentsAtCarryingValue $234,142 thousand at March 31, 2026",
+        "as_of": "2026-03-31",
+        "content_sha256": "b8d1dffb86aa2bb3dd400559bfef26f60b69f71b524aaca440be670d69ccb540",
+        "source_id": "5b06adaddb4bf21efd85dbdac36846707eac1082f1e79b96195b75888829fddb"
+      },
+      {
+        "component_id": "net_financial_claims",
+        "node_id": "debt_m",
+        "ref": "RGLD/investor-documents/sec-edgar/10-Q_20260507_rpt20260331_acc0000085535_26_000028.htm",
+        "locator": "LongTermDebtNoncurrent $595,689 thousand at March 31, 2026 (after $300M repayment)",
+        "as_of": "2026-03-31",
+        "content_sha256": "b8d1dffb86aa2bb3dd400559bfef26f60b69f71b524aaca440be670d69ccb540",
+        "source_id": "874c0784d6989d519359bb4ff5fcc019976b88a119b46ac60ab7ef752061cb88"
+      },
+      {
+        "component_id": "net_financial_claims",
+        "node_id": "shares_m",
+        "ref": "RGLD/investor-documents/sec-edgar/10-Q_20260507_rpt20260331_acc0000085535_26_000028.htm",
+        "locator": "Q1 FY2026 net income $281.130M / diluted EPS $3.30",
+        "as_of": "2026-03-31",
+        "content_sha256": "b8d1dffb86aa2bb3dd400559bfef26f60b69f71b524aaca440be670d69ccb540",
+        "source_id": "d61193e929bd7001132f532b13f94d422ac116ea0e706ac26c26d781ed73f904"
+      },
+      {
+        "component_id": "depletion_and_realization_reserve",
+        "node_id": "owner_cash_per_share",
+        "ref": "RGLD/investor-documents/sec-edgar/10-K_20260219_rpt20251231_acc0000085535_26_000008.htm",
+        "locator": "FY2025 operating cash flow $704.846M on normalized ~78.3M diluted share base",
+        "as_of": "2025-12-31",
+        "content_sha256": "6251f2afaccb2c69e85a34216177616c077f6bc27b9cbd0093e449c727853992",
+        "source_id": "da7c1e2170b0edd23eade2bac7ab3ce28472a68eca9d79a7efa41f475e923558"
+      }
+    ],
+    "model_checks": {
+      "calculation_graphs_valid": true,
+      "component_sum_reconciles": true,
+      "no_double_counting": true,
+      "all_material_components_priced": true,
+      "low_base_high_ordered": true
     },
     "evidence": {
       "unresolved_count": 0,
@@ -1619,6 +3459,20 @@
         "component milestone or falsifier"
       ]
     },
-    "decision_rule": "No security is decision-grade until every material economic claim is valued exactly once and every material evidence blocker is resolved."
+    "change_control": {
+      "model_hash": "fd4da931697dad21b57f72f69f14eebb403acb400d1b2a6806ac484b90ffcd61",
+      "method_versions": [
+        "depletion_reserve@1.0",
+        "net_asset_value@1.0",
+        "royalty_distribution_curve@1.0",
+        "unit_nav_and_milestone_option@1.0"
+      ],
+      "change_log": [],
+      "rule": "A source fact is locked. Every assumption change requires a reason, author, timestamp, and before/after value."
+    },
+    "decision_rule": "No security is decision-grade until every material claim is valued exactly once by a valid calculation proof and every material evidence blocker is resolved."
+  },
+  "human_review": {
+    "live_price_confirmed": false
   }
 }
