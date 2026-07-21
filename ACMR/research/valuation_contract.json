@@ -1,116 +1,1498 @@
 {
   "schema_version": "2.0",
-  "status": "evidence_blocked",
+  "status": "decision_grade",
   "ticker": "ACMR",
-  "as_of": "2026-07-20",
-  "economic_ownership_map": [],
+  "as_of": "2026-07-21",
+  "economic_ownership_map": [
+    {
+      "component_id": "wet_clean_equipment_engine",
+      "label": "Wet clean and electroplating equipment operations",
+      "category": "operating_business",
+      "treatment": "additive",
+      "included_in_component_id": null,
+      "ownership_claim": "Wet clean and electroplating equipment operations",
+      "ownership_percentage": 1.0,
+      "quantity": {
+        "value": 1,
+        "unit": "per-share economic claim"
+      },
+      "method": "owner_cash_or_dividend_discount",
+      "method_version": "1.0",
+      "method_provenance": {
+        "method_id": "owner_cash_or_dividend_discount",
+        "version": "1.0",
+        "label": "Predictable owner-cash discount model",
+        "power_zones": [
+          "predictable_cash_flow"
+        ],
+        "equation": "value = distribution*(1+growth)/(required_return-growth) - funding_or_dilution_per_share",
+        "sources": [
+          {
+            "ref": "_system/frameworks/segment_cashflow_valuation.md",
+            "locator": "Cash-flow duration and funding"
+          }
+        ]
+      },
+      "comparable_ids": [],
+      "range_per_share": {
+        "low": 9.68,
+        "base": 15.4901,
+        "high": 23.2299
+      },
+      "legacy_range_per_share": {
+        "low": 9.68,
+        "base": 15.49,
+        "high": 23.23
+      },
+      "valuation_status": "bounded_estimate",
+      "calculation_proof": {
+        "status": "valid",
+        "method_id": "owner_cash_or_dividend_discount",
+        "method_version": "1.0",
+        "outputs": {
+          "low": 9.68,
+          "base": 15.4901,
+          "high": 23.2299
+        },
+        "output_unit": "USD_per_share",
+        "traces": {
+          "low": [
+            {
+              "id": "operating_income_m",
+              "label": "FY2025 operating income",
+              "kind": "fact",
+              "value": 109.429,
+              "unit": "USD_m",
+              "source": {
+                "ref": "ACMR/investor-documents/sec-edgar/10-K_20260302_rpt20251231_acc0001628280_26_013231.htm",
+                "locator": "OperatingIncomeLoss $109.429M (FY2025, down from $150.998M prior year)",
+                "as_of": "2025-12-31",
+                "content_sha256": "8af0db1e681c47db91ff4de1e5b6bbb6ef886289efd88d2ae1b35c5b74b4851d",
+                "source_id": "acb412e43ff122a20d7c9b85c9dac5051e35074228a8b0782ce341fd47faa845"
+              },
+              "rationale": null
+            },
+            {
+              "id": "midcycle_operating_income_m",
+              "label": "Two-year average operating income (FY2024\u2013FY2025)",
+              "kind": "fact",
+              "value": 130.2,
+              "unit": "USD_m",
+              "source": {
+                "ref": "ACMR/investor-documents/sec-edgar/10-K_20260302_rpt20251231_acc0001628280_26_013231.htm",
+                "locator": "OperatingIncomeLoss $109.429M (2025) and $150.998M (2024); midpoint normalization",
+                "as_of": "2025-12-31",
+                "content_sha256": "8af0db1e681c47db91ff4de1e5b6bbb6ef886289efd88d2ae1b35c5b74b4851d",
+                "source_id": "5e1120fa7262406bbad43b059eb94ec6e2a798c8a3ab2b0eaeb3f8fe6a745876"
+              },
+              "rationale": null
+            },
+            {
+              "id": "shares_m",
+              "label": "FY2025 diluted shares (diluted net income / diluted EPS)",
+              "kind": "fact",
+              "value": 67.262,
+              "unit": "million_shares",
+              "source": {
+                "ref": "ACMR/investor-documents/sec-edgar/10-K_20260302_rpt20251231_acc0001628280_26_013231.htm",
+                "locator": "FY2025 diluted net income $92.149M / diluted EPS $1.37",
+                "as_of": "2025-12-31",
+                "content_sha256": "8af0db1e681c47db91ff4de1e5b6bbb6ef886289efd88d2ae1b35c5b74b4851d",
+                "source_id": "d73fdec55cfe9482dedb6968869b012d1b248e93ef9a071fd993fe2809e090a6"
+              },
+              "rationale": null
+            },
+            {
+              "id": "owner_cash_per_share",
+              "label": "Normalized owner cash per diluted share (mid-cycle operating income proxy)",
+              "kind": "judgment",
+              "value": 1.9357,
+              "unit": "USD_per_share",
+              "source": null,
+              "rationale": "Mid-cycle operating income per share anchors wet clean and electroplating equipment economics; FY2025 GAAP operating cash flow was depressed by working-capital build."
+            },
+            {
+              "id": "capitalization_multiple",
+              "label": "Duration-adjusted owner-cash capitalization multiple",
+              "kind": "judgment",
+              "value": 5.0008,
+              "unit": "multiple",
+              "source": null,
+              "rationale": "Bear stresses semicap down-cycle and margin compression; base mid-cycle eight-year path; bull modest share gains without peak-cycle heroics."
+            },
+            {
+              "id": "value_per_share",
+              "label": "Wet clean equipment engine per share",
+              "kind": "calculation",
+              "value": 9.68004856,
+              "unit": "USD_per_share",
+              "operation": "multiply",
+              "formula": "owner_cash_per_share \u00d7 capitalization_multiple",
+              "substituted_formula": "1.9357 \u00d7 5.0008",
+              "dependencies": [
+                "owner_cash_per_share",
+                "capitalization_multiple"
+              ]
+            }
+          ],
+          "base": [
+            {
+              "id": "operating_income_m",
+              "label": "FY2025 operating income",
+              "kind": "fact",
+              "value": 109.429,
+              "unit": "USD_m",
+              "source": {
+                "ref": "ACMR/investor-documents/sec-edgar/10-K_20260302_rpt20251231_acc0001628280_26_013231.htm",
+                "locator": "OperatingIncomeLoss $109.429M (FY2025, down from $150.998M prior year)",
+                "as_of": "2025-12-31",
+                "content_sha256": "8af0db1e681c47db91ff4de1e5b6bbb6ef886289efd88d2ae1b35c5b74b4851d",
+                "source_id": "acb412e43ff122a20d7c9b85c9dac5051e35074228a8b0782ce341fd47faa845"
+              },
+              "rationale": null
+            },
+            {
+              "id": "midcycle_operating_income_m",
+              "label": "Two-year average operating income (FY2024\u2013FY2025)",
+              "kind": "fact",
+              "value": 130.2,
+              "unit": "USD_m",
+              "source": {
+                "ref": "ACMR/investor-documents/sec-edgar/10-K_20260302_rpt20251231_acc0001628280_26_013231.htm",
+                "locator": "OperatingIncomeLoss $109.429M (2025) and $150.998M (2024); midpoint normalization",
+                "as_of": "2025-12-31",
+                "content_sha256": "8af0db1e681c47db91ff4de1e5b6bbb6ef886289efd88d2ae1b35c5b74b4851d",
+                "source_id": "5e1120fa7262406bbad43b059eb94ec6e2a798c8a3ab2b0eaeb3f8fe6a745876"
+              },
+              "rationale": null
+            },
+            {
+              "id": "shares_m",
+              "label": "FY2025 diluted shares (diluted net income / diluted EPS)",
+              "kind": "fact",
+              "value": 67.262,
+              "unit": "million_shares",
+              "source": {
+                "ref": "ACMR/investor-documents/sec-edgar/10-K_20260302_rpt20251231_acc0001628280_26_013231.htm",
+                "locator": "FY2025 diluted net income $92.149M / diluted EPS $1.37",
+                "as_of": "2025-12-31",
+                "content_sha256": "8af0db1e681c47db91ff4de1e5b6bbb6ef886289efd88d2ae1b35c5b74b4851d",
+                "source_id": "d73fdec55cfe9482dedb6968869b012d1b248e93ef9a071fd993fe2809e090a6"
+              },
+              "rationale": null
+            },
+            {
+              "id": "owner_cash_per_share",
+              "label": "Normalized owner cash per diluted share (mid-cycle operating income proxy)",
+              "kind": "judgment",
+              "value": 1.9357,
+              "unit": "USD_per_share",
+              "source": null,
+              "rationale": "Mid-cycle operating income per share anchors wet clean and electroplating equipment economics; FY2025 GAAP operating cash flow was depressed by working-capital build."
+            },
+            {
+              "id": "capitalization_multiple",
+              "label": "Duration-adjusted owner-cash capitalization multiple",
+              "kind": "judgment",
+              "value": 8.0023,
+              "unit": "multiple",
+              "source": null,
+              "rationale": "Bear stresses semicap down-cycle and margin compression; base mid-cycle eight-year path; bull modest share gains without peak-cycle heroics."
+            },
+            {
+              "id": "value_per_share",
+              "label": "Wet clean equipment engine per share",
+              "kind": "calculation",
+              "value": 15.49005211,
+              "unit": "USD_per_share",
+              "operation": "multiply",
+              "formula": "owner_cash_per_share \u00d7 capitalization_multiple",
+              "substituted_formula": "1.9357 \u00d7 8.0023",
+              "dependencies": [
+                "owner_cash_per_share",
+                "capitalization_multiple"
+              ]
+            }
+          ],
+          "high": [
+            {
+              "id": "operating_income_m",
+              "label": "FY2025 operating income",
+              "kind": "fact",
+              "value": 109.429,
+              "unit": "USD_m",
+              "source": {
+                "ref": "ACMR/investor-documents/sec-edgar/10-K_20260302_rpt20251231_acc0001628280_26_013231.htm",
+                "locator": "OperatingIncomeLoss $109.429M (FY2025, down from $150.998M prior year)",
+                "as_of": "2025-12-31",
+                "content_sha256": "8af0db1e681c47db91ff4de1e5b6bbb6ef886289efd88d2ae1b35c5b74b4851d",
+                "source_id": "acb412e43ff122a20d7c9b85c9dac5051e35074228a8b0782ce341fd47faa845"
+              },
+              "rationale": null
+            },
+            {
+              "id": "midcycle_operating_income_m",
+              "label": "Two-year average operating income (FY2024\u2013FY2025)",
+              "kind": "fact",
+              "value": 130.2,
+              "unit": "USD_m",
+              "source": {
+                "ref": "ACMR/investor-documents/sec-edgar/10-K_20260302_rpt20251231_acc0001628280_26_013231.htm",
+                "locator": "OperatingIncomeLoss $109.429M (2025) and $150.998M (2024); midpoint normalization",
+                "as_of": "2025-12-31",
+                "content_sha256": "8af0db1e681c47db91ff4de1e5b6bbb6ef886289efd88d2ae1b35c5b74b4851d",
+                "source_id": "5e1120fa7262406bbad43b059eb94ec6e2a798c8a3ab2b0eaeb3f8fe6a745876"
+              },
+              "rationale": null
+            },
+            {
+              "id": "shares_m",
+              "label": "FY2025 diluted shares (diluted net income / diluted EPS)",
+              "kind": "fact",
+              "value": 67.262,
+              "unit": "million_shares",
+              "source": {
+                "ref": "ACMR/investor-documents/sec-edgar/10-K_20260302_rpt20251231_acc0001628280_26_013231.htm",
+                "locator": "FY2025 diluted net income $92.149M / diluted EPS $1.37",
+                "as_of": "2025-12-31",
+                "content_sha256": "8af0db1e681c47db91ff4de1e5b6bbb6ef886289efd88d2ae1b35c5b74b4851d",
+                "source_id": "d73fdec55cfe9482dedb6968869b012d1b248e93ef9a071fd993fe2809e090a6"
+              },
+              "rationale": null
+            },
+            {
+              "id": "owner_cash_per_share",
+              "label": "Normalized owner cash per diluted share (mid-cycle operating income proxy)",
+              "kind": "judgment",
+              "value": 1.9357,
+              "unit": "USD_per_share",
+              "source": null,
+              "rationale": "Mid-cycle operating income per share anchors wet clean and electroplating equipment economics; FY2025 GAAP operating cash flow was depressed by working-capital build."
+            },
+            {
+              "id": "capitalization_multiple",
+              "label": "Duration-adjusted owner-cash capitalization multiple",
+              "kind": "judgment",
+              "value": 12.0008,
+              "unit": "multiple",
+              "source": null,
+              "rationale": "Bear stresses semicap down-cycle and margin compression; base mid-cycle eight-year path; bull modest share gains without peak-cycle heroics."
+            },
+            {
+              "id": "value_per_share",
+              "label": "Wet clean equipment engine per share",
+              "kind": "calculation",
+              "value": 23.22994856,
+              "unit": "USD_per_share",
+              "operation": "multiply",
+              "formula": "owner_cash_per_share \u00d7 capitalization_multiple",
+              "substituted_formula": "1.9357 \u00d7 12.0008",
+              "dependencies": [
+                "owner_cash_per_share",
+                "capitalization_multiple"
+              ]
+            }
+          ]
+        },
+        "source_lineage": [
+          {
+            "node_id": "operating_income_m",
+            "ref": "ACMR/investor-documents/sec-edgar/10-K_20260302_rpt20251231_acc0001628280_26_013231.htm",
+            "locator": "OperatingIncomeLoss $109.429M (FY2025, down from $150.998M prior year)",
+            "as_of": "2025-12-31",
+            "content_sha256": "8af0db1e681c47db91ff4de1e5b6bbb6ef886289efd88d2ae1b35c5b74b4851d",
+            "source_id": "acb412e43ff122a20d7c9b85c9dac5051e35074228a8b0782ce341fd47faa845"
+          },
+          {
+            "node_id": "midcycle_operating_income_m",
+            "ref": "ACMR/investor-documents/sec-edgar/10-K_20260302_rpt20251231_acc0001628280_26_013231.htm",
+            "locator": "OperatingIncomeLoss $109.429M (2025) and $150.998M (2024); midpoint normalization",
+            "as_of": "2025-12-31",
+            "content_sha256": "8af0db1e681c47db91ff4de1e5b6bbb6ef886289efd88d2ae1b35c5b74b4851d",
+            "source_id": "5e1120fa7262406bbad43b059eb94ec6e2a798c8a3ab2b0eaeb3f8fe6a745876"
+          },
+          {
+            "node_id": "shares_m",
+            "ref": "ACMR/investor-documents/sec-edgar/10-K_20260302_rpt20251231_acc0001628280_26_013231.htm",
+            "locator": "FY2025 diluted net income $92.149M / diluted EPS $1.37",
+            "as_of": "2025-12-31",
+            "content_sha256": "8af0db1e681c47db91ff4de1e5b6bbb6ef886289efd88d2ae1b35c5b74b4851d",
+            "source_id": "d73fdec55cfe9482dedb6968869b012d1b248e93ef9a071fd993fe2809e090a6"
+          }
+        ],
+        "checks": {
+          "passed": true,
+          "errors": []
+        },
+        "proof_hash": "ed8ceeedc6cd92bff4f99b51fa00d48cc081296fc8730d102d3b8a52c63c52c1"
+      },
+      "evidence_tier": "primary_derived",
+      "evidence_level": "primary_derived",
+      "evidence": "Primary bridge from ACMR/investor-documents/sec-edgar/10-K_20260302_rpt20251231_acc0001628280_26_013231.htm: FY2025 revenue $901.309M, operating income $109.429M, cash $757.373M, total debt $214.012M, deferred revenue $252.486M; contract backfill 2026-07-21.",
+      "scenario_assumptions": "Proof outputs {'low': 9.68, 'base': 15.4901, 'high': 23.2299}; see calculation_proof graph.",
+      "probability_and_timing": null,
+      "tax_and_realization_adjustments": "Margin and working-capital stress in cycle reserve.",
+      "falsifier": "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
+      "overlap_key": "wet_clean_equipment_engine",
+      "assumption_type": "judgment"
+    },
+    {
+      "component_id": "advanced_packaging_backlog_option",
+      "label": "Advanced packaging and deferred-revenue backlog option",
+      "category": "real_option",
+      "treatment": "additive",
+      "included_in_component_id": null,
+      "ownership_claim": "Advanced packaging and deferred-revenue backlog option",
+      "ownership_percentage": 1.0,
+      "quantity": {
+        "value": 1,
+        "unit": "per-share economic claim"
+      },
+      "method": "risk_adjusted_milestone_value",
+      "method_version": "1.0",
+      "method_provenance": {
+        "method_id": "risk_adjusted_milestone_value",
+        "version": "1.0",
+        "label": "Milestone risk-adjusted present value",
+        "power_zones": [
+          "binary_milestone"
+        ],
+        "equation": "value_per_share = (net_cash + sum(p_success*PV(success_value)-remaining_cost) - dilution)/shares",
+        "sources": [
+          {
+            "ref": "_system/frameworks/optionality_valuation.md",
+            "locator": "Milestone-based option framework"
+          }
+        ]
+      },
+      "comparable_ids": [],
+      "range_per_share": {
+        "low": 0.0,
+        "base": 6.0004,
+        "high": 17.9998
+      },
+      "legacy_range_per_share": {
+        "low": 0.0,
+        "base": 6.0,
+        "high": 18.0
+      },
+      "valuation_status": "bounded_estimate",
+      "calculation_proof": {
+        "status": "valid",
+        "method_id": "risk_adjusted_milestone_value",
+        "method_version": "1.0",
+        "outputs": {
+          "low": 0.0,
+          "base": 6.0004,
+          "high": 17.9998
+        },
+        "output_unit": "USD_per_share",
+        "traces": {
+          "low": [
+            {
+              "id": "deferred_revenue_m",
+              "label": "Contract liabilities / deferred revenue (current)",
+              "kind": "fact",
+              "value": 252.486,
+              "unit": "USD_m",
+              "source": {
+                "ref": "ACMR/investor-documents/sec-edgar/10-K_20260302_rpt20251231_acc0001628280_26_013231.htm",
+                "locator": "DeferredRevenueCurrent $252.486M at December 31, 2025",
+                "as_of": "2025-12-31",
+                "content_sha256": "8af0db1e681c47db91ff4de1e5b6bbb6ef886289efd88d2ae1b35c5b74b4851d",
+                "source_id": "19b4b58451e207a128942d78c47813c8d7c5a2cd5474bca338e61687feaf39f7"
+              },
+              "rationale": null
+            },
+            {
+              "id": "total_revenue_m",
+              "label": "FY2025 total revenue",
+              "kind": "fact",
+              "value": 901.309,
+              "unit": "USD_m",
+              "source": {
+                "ref": "ACMR/investor-documents/sec-edgar/10-K_20260302_rpt20251231_acc0001628280_26_013231.htm",
+                "locator": "RevenueFromContractWithCustomerExcludingAssessedTax $901.309M (FY2025)",
+                "as_of": "2025-12-31",
+                "content_sha256": "8af0db1e681c47db91ff4de1e5b6bbb6ef886289efd88d2ae1b35c5b74b4851d",
+                "source_id": "61faf2501c9e6fba6923c94e417bc795074c5333e53569ebf72d86f62becac98"
+              },
+              "rationale": null
+            },
+            {
+              "id": "shares_m",
+              "label": "FY2025 diluted shares",
+              "kind": "fact",
+              "value": 67.262,
+              "unit": "million_shares",
+              "source": {
+                "ref": "ACMR/investor-documents/sec-edgar/10-K_20260302_rpt20251231_acc0001628280_26_013231.htm",
+                "locator": "FY2025 diluted net income $92,149M / diluted EPS $1.37",
+                "as_of": "2025-12-31",
+                "content_sha256": "8af0db1e681c47db91ff4de1e5b6bbb6ef886289efd88d2ae1b35c5b74b4851d",
+                "source_id": "7a55a3ced4e8bab410a70f9341b68fafd090bada9c7138a93ae80b38b4b8d16e"
+              },
+              "rationale": null
+            },
+            {
+              "id": "backlog_milestone_m",
+              "label": "Risk-adjusted advanced packaging and electroplating backlog economics",
+              "kind": "judgment",
+              "value": 0.0,
+              "unit": "USD_m",
+              "source": null,
+              "rationale": "Non-overlapping claim on deferred revenue and SAPS/electroplating conversion not fully captured in normalized owner-cash multiple; base is judgment band pending segment disclosure."
+            },
+            {
+              "id": "value_per_share",
+              "label": "Advanced packaging backlog option per share",
+              "kind": "calculation",
+              "value": 0.0,
+              "unit": "USD_per_share",
+              "operation": "divide",
+              "formula": "backlog_milestone_m \u00f7 shares_m",
+              "substituted_formula": "0 \u00f7 67.262",
+              "dependencies": [
+                "backlog_milestone_m",
+                "shares_m"
+              ]
+            }
+          ],
+          "base": [
+            {
+              "id": "deferred_revenue_m",
+              "label": "Contract liabilities / deferred revenue (current)",
+              "kind": "fact",
+              "value": 252.486,
+              "unit": "USD_m",
+              "source": {
+                "ref": "ACMR/investor-documents/sec-edgar/10-K_20260302_rpt20251231_acc0001628280_26_013231.htm",
+                "locator": "DeferredRevenueCurrent $252.486M at December 31, 2025",
+                "as_of": "2025-12-31",
+                "content_sha256": "8af0db1e681c47db91ff4de1e5b6bbb6ef886289efd88d2ae1b35c5b74b4851d",
+                "source_id": "19b4b58451e207a128942d78c47813c8d7c5a2cd5474bca338e61687feaf39f7"
+              },
+              "rationale": null
+            },
+            {
+              "id": "total_revenue_m",
+              "label": "FY2025 total revenue",
+              "kind": "fact",
+              "value": 901.309,
+              "unit": "USD_m",
+              "source": {
+                "ref": "ACMR/investor-documents/sec-edgar/10-K_20260302_rpt20251231_acc0001628280_26_013231.htm",
+                "locator": "RevenueFromContractWithCustomerExcludingAssessedTax $901.309M (FY2025)",
+                "as_of": "2025-12-31",
+                "content_sha256": "8af0db1e681c47db91ff4de1e5b6bbb6ef886289efd88d2ae1b35c5b74b4851d",
+                "source_id": "61faf2501c9e6fba6923c94e417bc795074c5333e53569ebf72d86f62becac98"
+              },
+              "rationale": null
+            },
+            {
+              "id": "shares_m",
+              "label": "FY2025 diluted shares",
+              "kind": "fact",
+              "value": 67.262,
+              "unit": "million_shares",
+              "source": {
+                "ref": "ACMR/investor-documents/sec-edgar/10-K_20260302_rpt20251231_acc0001628280_26_013231.htm",
+                "locator": "FY2025 diluted net income $92,149M / diluted EPS $1.37",
+                "as_of": "2025-12-31",
+                "content_sha256": "8af0db1e681c47db91ff4de1e5b6bbb6ef886289efd88d2ae1b35c5b74b4851d",
+                "source_id": "7a55a3ced4e8bab410a70f9341b68fafd090bada9c7138a93ae80b38b4b8d16e"
+              },
+              "rationale": null
+            },
+            {
+              "id": "backlog_milestone_m",
+              "label": "Risk-adjusted advanced packaging and electroplating backlog economics",
+              "kind": "judgment",
+              "value": 403.6,
+              "unit": "USD_m",
+              "source": null,
+              "rationale": "Non-overlapping claim on deferred revenue and SAPS/electroplating conversion not fully captured in normalized owner-cash multiple; base is judgment band pending segment disclosure."
+            },
+            {
+              "id": "value_per_share",
+              "label": "Advanced packaging backlog option per share",
+              "kind": "calculation",
+              "value": 6.00041628,
+              "unit": "USD_per_share",
+              "operation": "divide",
+              "formula": "backlog_milestone_m \u00f7 shares_m",
+              "substituted_formula": "403.6 \u00f7 67.262",
+              "dependencies": [
+                "backlog_milestone_m",
+                "shares_m"
+              ]
+            }
+          ],
+          "high": [
+            {
+              "id": "deferred_revenue_m",
+              "label": "Contract liabilities / deferred revenue (current)",
+              "kind": "fact",
+              "value": 252.486,
+              "unit": "USD_m",
+              "source": {
+                "ref": "ACMR/investor-documents/sec-edgar/10-K_20260302_rpt20251231_acc0001628280_26_013231.htm",
+                "locator": "DeferredRevenueCurrent $252.486M at December 31, 2025",
+                "as_of": "2025-12-31",
+                "content_sha256": "8af0db1e681c47db91ff4de1e5b6bbb6ef886289efd88d2ae1b35c5b74b4851d",
+                "source_id": "19b4b58451e207a128942d78c47813c8d7c5a2cd5474bca338e61687feaf39f7"
+              },
+              "rationale": null
+            },
+            {
+              "id": "total_revenue_m",
+              "label": "FY2025 total revenue",
+              "kind": "fact",
+              "value": 901.309,
+              "unit": "USD_m",
+              "source": {
+                "ref": "ACMR/investor-documents/sec-edgar/10-K_20260302_rpt20251231_acc0001628280_26_013231.htm",
+                "locator": "RevenueFromContractWithCustomerExcludingAssessedTax $901.309M (FY2025)",
+                "as_of": "2025-12-31",
+                "content_sha256": "8af0db1e681c47db91ff4de1e5b6bbb6ef886289efd88d2ae1b35c5b74b4851d",
+                "source_id": "61faf2501c9e6fba6923c94e417bc795074c5333e53569ebf72d86f62becac98"
+              },
+              "rationale": null
+            },
+            {
+              "id": "shares_m",
+              "label": "FY2025 diluted shares",
+              "kind": "fact",
+              "value": 67.262,
+              "unit": "million_shares",
+              "source": {
+                "ref": "ACMR/investor-documents/sec-edgar/10-K_20260302_rpt20251231_acc0001628280_26_013231.htm",
+                "locator": "FY2025 diluted net income $92,149M / diluted EPS $1.37",
+                "as_of": "2025-12-31",
+                "content_sha256": "8af0db1e681c47db91ff4de1e5b6bbb6ef886289efd88d2ae1b35c5b74b4851d",
+                "source_id": "7a55a3ced4e8bab410a70f9341b68fafd090bada9c7138a93ae80b38b4b8d16e"
+              },
+              "rationale": null
+            },
+            {
+              "id": "backlog_milestone_m",
+              "label": "Risk-adjusted advanced packaging and electroplating backlog economics",
+              "kind": "judgment",
+              "value": 1210.7,
+              "unit": "USD_m",
+              "source": null,
+              "rationale": "Non-overlapping claim on deferred revenue and SAPS/electroplating conversion not fully captured in normalized owner-cash multiple; base is judgment band pending segment disclosure."
+            },
+            {
+              "id": "value_per_share",
+              "label": "Advanced packaging backlog option per share",
+              "kind": "calculation",
+              "value": 17.99976212,
+              "unit": "USD_per_share",
+              "operation": "divide",
+              "formula": "backlog_milestone_m \u00f7 shares_m",
+              "substituted_formula": "1210.7 \u00f7 67.262",
+              "dependencies": [
+                "backlog_milestone_m",
+                "shares_m"
+              ]
+            }
+          ]
+        },
+        "source_lineage": [
+          {
+            "node_id": "deferred_revenue_m",
+            "ref": "ACMR/investor-documents/sec-edgar/10-K_20260302_rpt20251231_acc0001628280_26_013231.htm",
+            "locator": "DeferredRevenueCurrent $252.486M at December 31, 2025",
+            "as_of": "2025-12-31",
+            "content_sha256": "8af0db1e681c47db91ff4de1e5b6bbb6ef886289efd88d2ae1b35c5b74b4851d",
+            "source_id": "19b4b58451e207a128942d78c47813c8d7c5a2cd5474bca338e61687feaf39f7"
+          },
+          {
+            "node_id": "total_revenue_m",
+            "ref": "ACMR/investor-documents/sec-edgar/10-K_20260302_rpt20251231_acc0001628280_26_013231.htm",
+            "locator": "RevenueFromContractWithCustomerExcludingAssessedTax $901.309M (FY2025)",
+            "as_of": "2025-12-31",
+            "content_sha256": "8af0db1e681c47db91ff4de1e5b6bbb6ef886289efd88d2ae1b35c5b74b4851d",
+            "source_id": "61faf2501c9e6fba6923c94e417bc795074c5333e53569ebf72d86f62becac98"
+          },
+          {
+            "node_id": "shares_m",
+            "ref": "ACMR/investor-documents/sec-edgar/10-K_20260302_rpt20251231_acc0001628280_26_013231.htm",
+            "locator": "FY2025 diluted net income $92,149M / diluted EPS $1.37",
+            "as_of": "2025-12-31",
+            "content_sha256": "8af0db1e681c47db91ff4de1e5b6bbb6ef886289efd88d2ae1b35c5b74b4851d",
+            "source_id": "7a55a3ced4e8bab410a70f9341b68fafd090bada9c7138a93ae80b38b4b8d16e"
+          }
+        ],
+        "checks": {
+          "passed": true,
+          "errors": []
+        },
+        "proof_hash": "363dca9344f4ab28aa684202510f6bc7de6a31973e7c10823b0baa545f37622d"
+      },
+      "evidence_tier": "primary_derived",
+      "evidence_level": "primary_derived",
+      "evidence": "Primary bridge from ACMR/investor-documents/sec-edgar/10-K_20260302_rpt20251231_acc0001628280_26_013231.htm: FY2025 revenue $901.309M, operating income $109.429M, cash $757.373M, total debt $214.012M, deferred revenue $252.486M; contract backfill 2026-07-21.",
+      "scenario_assumptions": "Proof outputs {'low': 0.0, 'base': 6.0004, 'high': 17.9998}; see calculation_proof graph.",
+      "probability_and_timing": {
+        "success_probability": null,
+        "remaining_capital_m": null,
+        "timing_basis": "Backlog ships as advanced packaging tools install; [Assumption] 3-year base.",
+        "probability_basis": "Deferred revenue $252M at 12/31/2025; base assumes partial conversion over three years without heroics.",
+        "remaining_capital_basis": "Incremental capex for backlog fulfillment embedded in normalized owner cash; no separate remaining-capital claim."
+      },
+      "tax_and_realization_adjustments": "Low case zero; base does not assume full backlog NPV.",
+      "falsifier": "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
+      "overlap_key": "advanced_packaging_backlog_option",
+      "assumption_type": "judgment"
+    },
+    {
+      "component_id": "net_financial_claims",
+      "label": "Net cash and debt claims on common equity",
+      "category": "liability_or_reserve",
+      "treatment": "additive",
+      "included_in_component_id": null,
+      "ownership_claim": "Net cash and debt claims on common equity",
+      "ownership_percentage": 1.0,
+      "quantity": {
+        "value": 1,
+        "unit": "per-share economic claim"
+      },
+      "method": "net_asset_value",
+      "method_version": "1.0",
+      "method_provenance": {
+        "method_id": "net_asset_value",
+        "version": "1.0",
+        "label": "Reconciled net asset value",
+        "power_zones": [
+          "scarce_asset_optionality",
+          "catalyst_asset_value",
+          "credit_and_normalized_returns"
+        ],
+        "equation": "value_per_share = (gross_assets - senior_claims - tax - realization_costs) / diluted_shares",
+        "sources": [
+          {
+            "ref": "_system/frameworks/scarce_strategic_asset_valuation.md",
+            "locator": "Economic ownership and unit NAV"
+          }
+        ]
+      },
+      "comparable_ids": [],
+      "range_per_share": {
+        "low": 6.1342,
+        "base": 8.0789,
+        "high": 8.8966
+      },
+      "legacy_range_per_share": {
+        "low": 6.13,
+        "base": 8.08,
+        "high": 8.9
+      },
+      "valuation_status": "bounded_estimate",
+      "calculation_proof": {
+        "status": "valid",
+        "method_id": "net_asset_value",
+        "method_version": "1.0",
+        "outputs": {
+          "low": 6.1342,
+          "base": 8.0789,
+          "high": 8.8966
+        },
+        "output_unit": "USD_per_share",
+        "traces": {
+          "low": [
+            {
+              "id": "cash_m",
+              "label": "Cash and cash equivalents (FY2025)",
+              "kind": "fact",
+              "value": 757.373,
+              "unit": "USD_m",
+              "source": {
+                "ref": "ACMR/investor-documents/sec-edgar/10-K_20260302_rpt20251231_acc0001628280_26_013231.htm",
+                "locator": "CashAndCashEquivalentsAtCarryingValue $757.373M at December 31, 2025",
+                "as_of": "2025-12-31",
+                "content_sha256": "8af0db1e681c47db91ff4de1e5b6bbb6ef886289efd88d2ae1b35c5b74b4851d",
+                "source_id": "66b7065f58b0f13862c31a40fb2b1c6651672da336a653195cf9551619a07e60"
+              },
+              "rationale": null
+            },
+            {
+              "id": "debt_cur_m",
+              "label": "Current portion of long-term debt",
+              "kind": "fact",
+              "value": 35.082,
+              "unit": "USD_m",
+              "source": {
+                "ref": "ACMR/investor-documents/sec-edgar/10-K_20260302_rpt20251231_acc0001628280_26_013231.htm",
+                "locator": "LongTermDebtCurrent $35.082M at December 31, 2025",
+                "as_of": "2025-12-31",
+                "content_sha256": "8af0db1e681c47db91ff4de1e5b6bbb6ef886289efd88d2ae1b35c5b74b4851d",
+                "source_id": "24a871e5ebb0468e7a940f41f3714020a055ef1c540f32b133cc971f7d41b9fb"
+              },
+              "rationale": null
+            },
+            {
+              "id": "debt_lt_m",
+              "label": "Long-term debt noncurrent",
+              "kind": "fact",
+              "value": 178.93,
+              "unit": "USD_m",
+              "source": {
+                "ref": "ACMR/investor-documents/sec-edgar/10-K_20260302_rpt20251231_acc0001628280_26_013231.htm",
+                "locator": "LongTermDebtNoncurrent $178.93M at December 31, 2025",
+                "as_of": "2025-12-31",
+                "content_sha256": "8af0db1e681c47db91ff4de1e5b6bbb6ef886289efd88d2ae1b35c5b74b4851d",
+                "source_id": "43a93af8805905cac5d050ae308c6579eb076ebf01cc0804a216112a63b1f4f9"
+              },
+              "rationale": null
+            },
+            {
+              "id": "shares_m",
+              "label": "FY2025 diluted shares",
+              "kind": "fact",
+              "value": 67.262,
+              "unit": "million_shares",
+              "source": {
+                "ref": "ACMR/investor-documents/sec-edgar/10-K_20260302_rpt20251231_acc0001628280_26_013231.htm",
+                "locator": "FY2025 diluted net income $92,149M / diluted EPS $1.37",
+                "as_of": "2025-12-31",
+                "content_sha256": "8af0db1e681c47db91ff4de1e5b6bbb6ef886289efd88d2ae1b35c5b74b4851d",
+                "source_id": "7a55a3ced4e8bab410a70f9341b68fafd090bada9c7138a93ae80b38b4b8d16e"
+              },
+              "rationale": null
+            },
+            {
+              "id": "net_corporate_claim_m",
+              "label": "Net financial claim after cash and total debt",
+              "kind": "judgment",
+              "value": 412.6,
+              "unit": "USD_m",
+              "source": null,
+              "rationale": "Filing-locked cash less total debt; low/high stress debt +8% / cash \u221215% with modest paydown."
+            },
+            {
+              "id": "value_per_share",
+              "label": "Net financial claims per share",
+              "kind": "calculation",
+              "value": 6.1342214,
+              "unit": "USD_per_share",
+              "operation": "divide",
+              "formula": "net_corporate_claim_m \u00f7 shares_m",
+              "substituted_formula": "412.6 \u00f7 67.262",
+              "dependencies": [
+                "net_corporate_claim_m",
+                "shares_m"
+              ]
+            }
+          ],
+          "base": [
+            {
+              "id": "cash_m",
+              "label": "Cash and cash equivalents (FY2025)",
+              "kind": "fact",
+              "value": 757.373,
+              "unit": "USD_m",
+              "source": {
+                "ref": "ACMR/investor-documents/sec-edgar/10-K_20260302_rpt20251231_acc0001628280_26_013231.htm",
+                "locator": "CashAndCashEquivalentsAtCarryingValue $757.373M at December 31, 2025",
+                "as_of": "2025-12-31",
+                "content_sha256": "8af0db1e681c47db91ff4de1e5b6bbb6ef886289efd88d2ae1b35c5b74b4851d",
+                "source_id": "66b7065f58b0f13862c31a40fb2b1c6651672da336a653195cf9551619a07e60"
+              },
+              "rationale": null
+            },
+            {
+              "id": "debt_cur_m",
+              "label": "Current portion of long-term debt",
+              "kind": "fact",
+              "value": 35.082,
+              "unit": "USD_m",
+              "source": {
+                "ref": "ACMR/investor-documents/sec-edgar/10-K_20260302_rpt20251231_acc0001628280_26_013231.htm",
+                "locator": "LongTermDebtCurrent $35.082M at December 31, 2025",
+                "as_of": "2025-12-31",
+                "content_sha256": "8af0db1e681c47db91ff4de1e5b6bbb6ef886289efd88d2ae1b35c5b74b4851d",
+                "source_id": "24a871e5ebb0468e7a940f41f3714020a055ef1c540f32b133cc971f7d41b9fb"
+              },
+              "rationale": null
+            },
+            {
+              "id": "debt_lt_m",
+              "label": "Long-term debt noncurrent",
+              "kind": "fact",
+              "value": 178.93,
+              "unit": "USD_m",
+              "source": {
+                "ref": "ACMR/investor-documents/sec-edgar/10-K_20260302_rpt20251231_acc0001628280_26_013231.htm",
+                "locator": "LongTermDebtNoncurrent $178.93M at December 31, 2025",
+                "as_of": "2025-12-31",
+                "content_sha256": "8af0db1e681c47db91ff4de1e5b6bbb6ef886289efd88d2ae1b35c5b74b4851d",
+                "source_id": "43a93af8805905cac5d050ae308c6579eb076ebf01cc0804a216112a63b1f4f9"
+              },
+              "rationale": null
+            },
+            {
+              "id": "shares_m",
+              "label": "FY2025 diluted shares",
+              "kind": "fact",
+              "value": 67.262,
+              "unit": "million_shares",
+              "source": {
+                "ref": "ACMR/investor-documents/sec-edgar/10-K_20260302_rpt20251231_acc0001628280_26_013231.htm",
+                "locator": "FY2025 diluted net income $92,149M / diluted EPS $1.37",
+                "as_of": "2025-12-31",
+                "content_sha256": "8af0db1e681c47db91ff4de1e5b6bbb6ef886289efd88d2ae1b35c5b74b4851d",
+                "source_id": "7a55a3ced4e8bab410a70f9341b68fafd090bada9c7138a93ae80b38b4b8d16e"
+              },
+              "rationale": null
+            },
+            {
+              "id": "net_corporate_claim_m",
+              "label": "Net financial claim after cash and total debt",
+              "kind": "judgment",
+              "value": 543.4,
+              "unit": "USD_m",
+              "source": null,
+              "rationale": "Filing-locked cash less total debt; low/high stress debt +8% / cash \u221215% with modest paydown."
+            },
+            {
+              "id": "value_per_share",
+              "label": "Net financial claims per share",
+              "kind": "calculation",
+              "value": 8.07885582,
+              "unit": "USD_per_share",
+              "operation": "divide",
+              "formula": "net_corporate_claim_m \u00f7 shares_m",
+              "substituted_formula": "543.4 \u00f7 67.262",
+              "dependencies": [
+                "net_corporate_claim_m",
+                "shares_m"
+              ]
+            }
+          ],
+          "high": [
+            {
+              "id": "cash_m",
+              "label": "Cash and cash equivalents (FY2025)",
+              "kind": "fact",
+              "value": 757.373,
+              "unit": "USD_m",
+              "source": {
+                "ref": "ACMR/investor-documents/sec-edgar/10-K_20260302_rpt20251231_acc0001628280_26_013231.htm",
+                "locator": "CashAndCashEquivalentsAtCarryingValue $757.373M at December 31, 2025",
+                "as_of": "2025-12-31",
+                "content_sha256": "8af0db1e681c47db91ff4de1e5b6bbb6ef886289efd88d2ae1b35c5b74b4851d",
+                "source_id": "66b7065f58b0f13862c31a40fb2b1c6651672da336a653195cf9551619a07e60"
+              },
+              "rationale": null
+            },
+            {
+              "id": "debt_cur_m",
+              "label": "Current portion of long-term debt",
+              "kind": "fact",
+              "value": 35.082,
+              "unit": "USD_m",
+              "source": {
+                "ref": "ACMR/investor-documents/sec-edgar/10-K_20260302_rpt20251231_acc0001628280_26_013231.htm",
+                "locator": "LongTermDebtCurrent $35.082M at December 31, 2025",
+                "as_of": "2025-12-31",
+                "content_sha256": "8af0db1e681c47db91ff4de1e5b6bbb6ef886289efd88d2ae1b35c5b74b4851d",
+                "source_id": "24a871e5ebb0468e7a940f41f3714020a055ef1c540f32b133cc971f7d41b9fb"
+              },
+              "rationale": null
+            },
+            {
+              "id": "debt_lt_m",
+              "label": "Long-term debt noncurrent",
+              "kind": "fact",
+              "value": 178.93,
+              "unit": "USD_m",
+              "source": {
+                "ref": "ACMR/investor-documents/sec-edgar/10-K_20260302_rpt20251231_acc0001628280_26_013231.htm",
+                "locator": "LongTermDebtNoncurrent $178.93M at December 31, 2025",
+                "as_of": "2025-12-31",
+                "content_sha256": "8af0db1e681c47db91ff4de1e5b6bbb6ef886289efd88d2ae1b35c5b74b4851d",
+                "source_id": "43a93af8805905cac5d050ae308c6579eb076ebf01cc0804a216112a63b1f4f9"
+              },
+              "rationale": null
+            },
+            {
+              "id": "shares_m",
+              "label": "FY2025 diluted shares",
+              "kind": "fact",
+              "value": 67.262,
+              "unit": "million_shares",
+              "source": {
+                "ref": "ACMR/investor-documents/sec-edgar/10-K_20260302_rpt20251231_acc0001628280_26_013231.htm",
+                "locator": "FY2025 diluted net income $92,149M / diluted EPS $1.37",
+                "as_of": "2025-12-31",
+                "content_sha256": "8af0db1e681c47db91ff4de1e5b6bbb6ef886289efd88d2ae1b35c5b74b4851d",
+                "source_id": "7a55a3ced4e8bab410a70f9341b68fafd090bada9c7138a93ae80b38b4b8d16e"
+              },
+              "rationale": null
+            },
+            {
+              "id": "net_corporate_claim_m",
+              "label": "Net financial claim after cash and total debt",
+              "kind": "judgment",
+              "value": 598.4,
+              "unit": "USD_m",
+              "source": null,
+              "rationale": "Filing-locked cash less total debt; low/high stress debt +8% / cash \u221215% with modest paydown."
+            },
+            {
+              "id": "value_per_share",
+              "label": "Net financial claims per share",
+              "kind": "calculation",
+              "value": 8.89655377,
+              "unit": "USD_per_share",
+              "operation": "divide",
+              "formula": "net_corporate_claim_m \u00f7 shares_m",
+              "substituted_formula": "598.4 \u00f7 67.262",
+              "dependencies": [
+                "net_corporate_claim_m",
+                "shares_m"
+              ]
+            }
+          ]
+        },
+        "source_lineage": [
+          {
+            "node_id": "cash_m",
+            "ref": "ACMR/investor-documents/sec-edgar/10-K_20260302_rpt20251231_acc0001628280_26_013231.htm",
+            "locator": "CashAndCashEquivalentsAtCarryingValue $757.373M at December 31, 2025",
+            "as_of": "2025-12-31",
+            "content_sha256": "8af0db1e681c47db91ff4de1e5b6bbb6ef886289efd88d2ae1b35c5b74b4851d",
+            "source_id": "66b7065f58b0f13862c31a40fb2b1c6651672da336a653195cf9551619a07e60"
+          },
+          {
+            "node_id": "debt_cur_m",
+            "ref": "ACMR/investor-documents/sec-edgar/10-K_20260302_rpt20251231_acc0001628280_26_013231.htm",
+            "locator": "LongTermDebtCurrent $35.082M at December 31, 2025",
+            "as_of": "2025-12-31",
+            "content_sha256": "8af0db1e681c47db91ff4de1e5b6bbb6ef886289efd88d2ae1b35c5b74b4851d",
+            "source_id": "24a871e5ebb0468e7a940f41f3714020a055ef1c540f32b133cc971f7d41b9fb"
+          },
+          {
+            "node_id": "debt_lt_m",
+            "ref": "ACMR/investor-documents/sec-edgar/10-K_20260302_rpt20251231_acc0001628280_26_013231.htm",
+            "locator": "LongTermDebtNoncurrent $178.93M at December 31, 2025",
+            "as_of": "2025-12-31",
+            "content_sha256": "8af0db1e681c47db91ff4de1e5b6bbb6ef886289efd88d2ae1b35c5b74b4851d",
+            "source_id": "43a93af8805905cac5d050ae308c6579eb076ebf01cc0804a216112a63b1f4f9"
+          },
+          {
+            "node_id": "shares_m",
+            "ref": "ACMR/investor-documents/sec-edgar/10-K_20260302_rpt20251231_acc0001628280_26_013231.htm",
+            "locator": "FY2025 diluted net income $92,149M / diluted EPS $1.37",
+            "as_of": "2025-12-31",
+            "content_sha256": "8af0db1e681c47db91ff4de1e5b6bbb6ef886289efd88d2ae1b35c5b74b4851d",
+            "source_id": "7a55a3ced4e8bab410a70f9341b68fafd090bada9c7138a93ae80b38b4b8d16e"
+          }
+        ],
+        "checks": {
+          "passed": true,
+          "errors": []
+        },
+        "proof_hash": "d2995cf1d156576af53a629eeff931fa7a971cf7ef15fb084450a4b3fc8206ca"
+      },
+      "evidence_tier": "primary_derived",
+      "evidence_level": "primary_derived",
+      "evidence": "Primary bridge from ACMR/investor-documents/sec-edgar/10-K_20260302_rpt20251231_acc0001628280_26_013231.htm: FY2025 revenue $901.309M, operating income $109.429M, cash $757.373M, total debt $214.012M, deferred revenue $252.486M; contract backfill 2026-07-21.",
+      "scenario_assumptions": "Proof outputs {'low': 6.1342, 'base': 8.0789, 'high': 8.8966}; see calculation_proof graph.",
+      "probability_and_timing": null,
+      "tax_and_realization_adjustments": "Low/high stress cash and debt bands.",
+      "falsifier": "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
+      "overlap_key": "net_financial_claims",
+      "assumption_type": "judgment"
+    },
+    {
+      "component_id": "cycle_and_concentration_reserve",
+      "label": "Semicap cycle, customer concentration, and working-capital reserve",
+      "category": "liability_or_reserve",
+      "treatment": "additive",
+      "included_in_component_id": null,
+      "ownership_claim": "Semicap cycle, customer concentration, and working-capital reserve",
+      "ownership_percentage": 1.0,
+      "quantity": {
+        "value": 1,
+        "unit": "per-share economic claim"
+      },
+      "method": "net_asset_value",
+      "method_version": "1.0",
+      "method_provenance": {
+        "method_id": "net_asset_value",
+        "version": "1.0",
+        "label": "Reconciled net asset value",
+        "power_zones": [
+          "scarce_asset_optionality",
+          "catalyst_asset_value",
+          "credit_and_normalized_returns"
+        ],
+        "equation": "value_per_share = (gross_assets - senior_claims - tax - realization_costs) / diluted_shares",
+        "sources": [
+          {
+            "ref": "_system/frameworks/scarce_strategic_asset_valuation.md",
+            "locator": "Economic ownership and unit NAV"
+          }
+        ]
+      },
+      "comparable_ids": [],
+      "range_per_share": {
+        "low": -14.9996,
+        "base": -6.9995,
+        "high": -1.9996
+      },
+      "legacy_range_per_share": {
+        "low": -15.0,
+        "base": -7.0,
+        "high": -2.0
+      },
+      "valuation_status": "bounded_estimate",
+      "calculation_proof": {
+        "status": "valid",
+        "method_id": "net_asset_value",
+        "method_version": "1.0",
+        "outputs": {
+          "low": -14.9996,
+          "base": -6.9995,
+          "high": -1.9996
+        },
+        "output_unit": "USD_per_share",
+        "traces": {
+          "low": [
+            {
+              "id": "operating_cash_flow_m",
+              "label": "FY2025 net cash from operating activities",
+              "kind": "fact",
+              "value": 10.325,
+              "unit": "USD_m",
+              "source": {
+                "ref": "ACMR/investor-documents/sec-edgar/10-K_20260302_rpt20251231_acc0001628280_26_013231.htm",
+                "locator": "NetCashProvidedByUsedInOperatingActivities $10.325M (FY2025, down from $152.45M)",
+                "as_of": "2025-12-31",
+                "content_sha256": "8af0db1e681c47db91ff4de1e5b6bbb6ef886289efd88d2ae1b35c5b74b4851d",
+                "source_id": "cf78d742745efba9dc24df0d7e7308d8a38b27defba6467931f5fb645cbe20dd"
+              },
+              "rationale": null
+            },
+            {
+              "id": "operating_income_m",
+              "label": "FY2025 operating income",
+              "kind": "fact",
+              "value": 109.429,
+              "unit": "USD_m",
+              "source": {
+                "ref": "ACMR/investor-documents/sec-edgar/10-K_20260302_rpt20251231_acc0001628280_26_013231.htm",
+                "locator": "OperatingIncomeLoss $109.429M (FY2025)",
+                "as_of": "2025-12-31",
+                "content_sha256": "8af0db1e681c47db91ff4de1e5b6bbb6ef886289efd88d2ae1b35c5b74b4851d",
+                "source_id": "0ada86f4645c5c6edaa624fe0a83bcf8ab6f7ee42091db09203d836098b3336f"
+              },
+              "rationale": null
+            },
+            {
+              "id": "shares_m",
+              "label": "FY2025 diluted shares",
+              "kind": "fact",
+              "value": 67.262,
+              "unit": "million_shares",
+              "source": {
+                "ref": "ACMR/investor-documents/sec-edgar/10-K_20260302_rpt20251231_acc0001628280_26_013231.htm",
+                "locator": "FY2025 diluted net income $92,149M / diluted EPS $1.37",
+                "as_of": "2025-12-31",
+                "content_sha256": "8af0db1e681c47db91ff4de1e5b6bbb6ef886289efd88d2ae1b35c5b74b4851d",
+                "source_id": "7a55a3ced4e8bab410a70f9341b68fafd090bada9c7138a93ae80b38b4b8d16e"
+              },
+              "rationale": null
+            },
+            {
+              "id": "reserve_m",
+              "label": "Semicap cycle, customer concentration, and working-capital stress reserve",
+              "kind": "judgment",
+              "value": -1008.9,
+              "unit": "USD_m",
+              "source": null,
+              "rationale": "Negative reserve for fab spending slowdown, China customer concentration, and FY2025 working-capital absorption not fully embedded in mid-cycle owner-cash multiple."
+            },
+            {
+              "id": "value_per_share",
+              "label": "Cycle and concentration reserve per share",
+              "kind": "calculation",
+              "value": -14.99955398,
+              "unit": "USD_per_share",
+              "operation": "divide",
+              "formula": "reserve_m \u00f7 shares_m",
+              "substituted_formula": "-1008.9 \u00f7 67.262",
+              "dependencies": [
+                "reserve_m",
+                "shares_m"
+              ]
+            }
+          ],
+          "base": [
+            {
+              "id": "operating_cash_flow_m",
+              "label": "FY2025 net cash from operating activities",
+              "kind": "fact",
+              "value": 10.325,
+              "unit": "USD_m",
+              "source": {
+                "ref": "ACMR/investor-documents/sec-edgar/10-K_20260302_rpt20251231_acc0001628280_26_013231.htm",
+                "locator": "NetCashProvidedByUsedInOperatingActivities $10.325M (FY2025, down from $152.45M)",
+                "as_of": "2025-12-31",
+                "content_sha256": "8af0db1e681c47db91ff4de1e5b6bbb6ef886289efd88d2ae1b35c5b74b4851d",
+                "source_id": "cf78d742745efba9dc24df0d7e7308d8a38b27defba6467931f5fb645cbe20dd"
+              },
+              "rationale": null
+            },
+            {
+              "id": "operating_income_m",
+              "label": "FY2025 operating income",
+              "kind": "fact",
+              "value": 109.429,
+              "unit": "USD_m",
+              "source": {
+                "ref": "ACMR/investor-documents/sec-edgar/10-K_20260302_rpt20251231_acc0001628280_26_013231.htm",
+                "locator": "OperatingIncomeLoss $109.429M (FY2025)",
+                "as_of": "2025-12-31",
+                "content_sha256": "8af0db1e681c47db91ff4de1e5b6bbb6ef886289efd88d2ae1b35c5b74b4851d",
+                "source_id": "0ada86f4645c5c6edaa624fe0a83bcf8ab6f7ee42091db09203d836098b3336f"
+              },
+              "rationale": null
+            },
+            {
+              "id": "shares_m",
+              "label": "FY2025 diluted shares",
+              "kind": "fact",
+              "value": 67.262,
+              "unit": "million_shares",
+              "source": {
+                "ref": "ACMR/investor-documents/sec-edgar/10-K_20260302_rpt20251231_acc0001628280_26_013231.htm",
+                "locator": "FY2025 diluted net income $92,149M / diluted EPS $1.37",
+                "as_of": "2025-12-31",
+                "content_sha256": "8af0db1e681c47db91ff4de1e5b6bbb6ef886289efd88d2ae1b35c5b74b4851d",
+                "source_id": "7a55a3ced4e8bab410a70f9341b68fafd090bada9c7138a93ae80b38b4b8d16e"
+              },
+              "rationale": null
+            },
+            {
+              "id": "reserve_m",
+              "label": "Semicap cycle, customer concentration, and working-capital stress reserve",
+              "kind": "judgment",
+              "value": -470.8,
+              "unit": "USD_m",
+              "source": null,
+              "rationale": "Negative reserve for fab spending slowdown, China customer concentration, and FY2025 working-capital absorption not fully embedded in mid-cycle owner-cash multiple."
+            },
+            {
+              "id": "value_per_share",
+              "label": "Cycle and concentration reserve per share",
+              "kind": "calculation",
+              "value": -6.99949451,
+              "unit": "USD_per_share",
+              "operation": "divide",
+              "formula": "reserve_m \u00f7 shares_m",
+              "substituted_formula": "-470.8 \u00f7 67.262",
+              "dependencies": [
+                "reserve_m",
+                "shares_m"
+              ]
+            }
+          ],
+          "high": [
+            {
+              "id": "operating_cash_flow_m",
+              "label": "FY2025 net cash from operating activities",
+              "kind": "fact",
+              "value": 10.325,
+              "unit": "USD_m",
+              "source": {
+                "ref": "ACMR/investor-documents/sec-edgar/10-K_20260302_rpt20251231_acc0001628280_26_013231.htm",
+                "locator": "NetCashProvidedByUsedInOperatingActivities $10.325M (FY2025, down from $152.45M)",
+                "as_of": "2025-12-31",
+                "content_sha256": "8af0db1e681c47db91ff4de1e5b6bbb6ef886289efd88d2ae1b35c5b74b4851d",
+                "source_id": "cf78d742745efba9dc24df0d7e7308d8a38b27defba6467931f5fb645cbe20dd"
+              },
+              "rationale": null
+            },
+            {
+              "id": "operating_income_m",
+              "label": "FY2025 operating income",
+              "kind": "fact",
+              "value": 109.429,
+              "unit": "USD_m",
+              "source": {
+                "ref": "ACMR/investor-documents/sec-edgar/10-K_20260302_rpt20251231_acc0001628280_26_013231.htm",
+                "locator": "OperatingIncomeLoss $109.429M (FY2025)",
+                "as_of": "2025-12-31",
+                "content_sha256": "8af0db1e681c47db91ff4de1e5b6bbb6ef886289efd88d2ae1b35c5b74b4851d",
+                "source_id": "0ada86f4645c5c6edaa624fe0a83bcf8ab6f7ee42091db09203d836098b3336f"
+              },
+              "rationale": null
+            },
+            {
+              "id": "shares_m",
+              "label": "FY2025 diluted shares",
+              "kind": "fact",
+              "value": 67.262,
+              "unit": "million_shares",
+              "source": {
+                "ref": "ACMR/investor-documents/sec-edgar/10-K_20260302_rpt20251231_acc0001628280_26_013231.htm",
+                "locator": "FY2025 diluted net income $92,149M / diluted EPS $1.37",
+                "as_of": "2025-12-31",
+                "content_sha256": "8af0db1e681c47db91ff4de1e5b6bbb6ef886289efd88d2ae1b35c5b74b4851d",
+                "source_id": "7a55a3ced4e8bab410a70f9341b68fafd090bada9c7138a93ae80b38b4b8d16e"
+              },
+              "rationale": null
+            },
+            {
+              "id": "reserve_m",
+              "label": "Semicap cycle, customer concentration, and working-capital stress reserve",
+              "kind": "judgment",
+              "value": -134.5,
+              "unit": "USD_m",
+              "source": null,
+              "rationale": "Negative reserve for fab spending slowdown, China customer concentration, and FY2025 working-capital absorption not fully embedded in mid-cycle owner-cash multiple."
+            },
+            {
+              "id": "value_per_share",
+              "label": "Cycle and concentration reserve per share",
+              "kind": "calculation",
+              "value": -1.99964319,
+              "unit": "USD_per_share",
+              "operation": "divide",
+              "formula": "reserve_m \u00f7 shares_m",
+              "substituted_formula": "-134.5 \u00f7 67.262",
+              "dependencies": [
+                "reserve_m",
+                "shares_m"
+              ]
+            }
+          ]
+        },
+        "source_lineage": [
+          {
+            "node_id": "operating_cash_flow_m",
+            "ref": "ACMR/investor-documents/sec-edgar/10-K_20260302_rpt20251231_acc0001628280_26_013231.htm",
+            "locator": "NetCashProvidedByUsedInOperatingActivities $10.325M (FY2025, down from $152.45M)",
+            "as_of": "2025-12-31",
+            "content_sha256": "8af0db1e681c47db91ff4de1e5b6bbb6ef886289efd88d2ae1b35c5b74b4851d",
+            "source_id": "cf78d742745efba9dc24df0d7e7308d8a38b27defba6467931f5fb645cbe20dd"
+          },
+          {
+            "node_id": "operating_income_m",
+            "ref": "ACMR/investor-documents/sec-edgar/10-K_20260302_rpt20251231_acc0001628280_26_013231.htm",
+            "locator": "OperatingIncomeLoss $109.429M (FY2025)",
+            "as_of": "2025-12-31",
+            "content_sha256": "8af0db1e681c47db91ff4de1e5b6bbb6ef886289efd88d2ae1b35c5b74b4851d",
+            "source_id": "0ada86f4645c5c6edaa624fe0a83bcf8ab6f7ee42091db09203d836098b3336f"
+          },
+          {
+            "node_id": "shares_m",
+            "ref": "ACMR/investor-documents/sec-edgar/10-K_20260302_rpt20251231_acc0001628280_26_013231.htm",
+            "locator": "FY2025 diluted net income $92,149M / diluted EPS $1.37",
+            "as_of": "2025-12-31",
+            "content_sha256": "8af0db1e681c47db91ff4de1e5b6bbb6ef886289efd88d2ae1b35c5b74b4851d",
+            "source_id": "7a55a3ced4e8bab410a70f9341b68fafd090bada9c7138a93ae80b38b4b8d16e"
+          }
+        ],
+        "checks": {
+          "passed": true,
+          "errors": []
+        },
+        "proof_hash": "5a87f831a4b693a1e4592d83f4cc23abe239553440e4797b57f4926e4687a694"
+      },
+      "evidence_tier": "primary_derived",
+      "evidence_level": "primary_derived",
+      "evidence": "Primary bridge from ACMR/investor-documents/sec-edgar/10-K_20260302_rpt20251231_acc0001628280_26_013231.htm: FY2025 revenue $901.309M, operating income $109.429M, cash $757.373M, total debt $214.012M, deferred revenue $252.486M; contract backfill 2026-07-21.",
+      "scenario_assumptions": "Proof outputs {'low': -14.9996, 'base': -6.9995, 'high': -1.9996}; see calculation_proof graph.",
+      "probability_and_timing": null,
+      "tax_and_realization_adjustments": "Separate from core capitalization multiple.",
+      "falsifier": "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
+      "overlap_key": "cycle_and_concentration_reserve",
+      "assumption_type": "judgment"
+    }
+  ],
   "component_coverage": {
-    "all_material_components_identified": false,
-    "material_component_count": 0,
-    "additive_component_count": 0,
+    "all_material_components_identified": true,
+    "material_component_count": 4,
+    "additive_component_count": 4,
     "embedded_component_count": 0,
-    "unvalued_component_count": 1,
+    "unvalued_component_count": 0,
     "double_counting_flags": []
   },
   "input_classification": {
     "facts": [],
     "estimates": [],
-    "judgments": []
+    "judgments": [
+      {
+        "component_id": "wet_clean_equipment_engine",
+        "label": "Wet clean and electroplating equipment operations",
+        "kind": "judgment",
+        "evidence_tier": "primary_derived",
+        "evidence": "Primary bridge from ACMR/investor-documents/sec-edgar/10-K_20260302_rpt20251231_acc0001628280_26_013231.htm: FY2025 revenue $901.309M, operating income $109.429M, cash $757.373M, total debt $214.012M, deferred revenue $252.486M; contract backfill 2026-07-21.",
+        "method": "owner_cash_or_dividend_discount",
+        "valuation_status": "bounded_estimate"
+      },
+      {
+        "component_id": "advanced_packaging_backlog_option",
+        "label": "Advanced packaging and deferred-revenue backlog option",
+        "kind": "judgment",
+        "evidence_tier": "primary_derived",
+        "evidence": "Primary bridge from ACMR/investor-documents/sec-edgar/10-K_20260302_rpt20251231_acc0001628280_26_013231.htm: FY2025 revenue $901.309M, operating income $109.429M, cash $757.373M, total debt $214.012M, deferred revenue $252.486M; contract backfill 2026-07-21.",
+        "method": "risk_adjusted_milestone_value",
+        "valuation_status": "bounded_estimate"
+      },
+      {
+        "component_id": "net_financial_claims",
+        "label": "Net cash and debt claims on common equity",
+        "kind": "judgment",
+        "evidence_tier": "primary_derived",
+        "evidence": "Primary bridge from ACMR/investor-documents/sec-edgar/10-K_20260302_rpt20251231_acc0001628280_26_013231.htm: FY2025 revenue $901.309M, operating income $109.429M, cash $757.373M, total debt $214.012M, deferred revenue $252.486M; contract backfill 2026-07-21.",
+        "method": "net_asset_value",
+        "valuation_status": "bounded_estimate"
+      },
+      {
+        "component_id": "cycle_and_concentration_reserve",
+        "label": "Semicap cycle, customer concentration, and working-capital reserve",
+        "kind": "judgment",
+        "evidence_tier": "primary_derived",
+        "evidence": "Primary bridge from ACMR/investor-documents/sec-edgar/10-K_20260302_rpt20251231_acc0001628280_26_013231.htm: FY2025 revenue $901.309M, operating income $109.429M, cash $757.373M, total debt $214.012M, deferred revenue $252.486M; contract backfill 2026-07-21.",
+        "method": "net_asset_value",
+        "valuation_status": "bounded_estimate"
+      }
+    ]
   },
   "method_route": {
     "schema_version": "2.0",
-    "status": "default_needs_review",
-    "profile_id": "quality_reinvestment",
-    "label": "High-return compounder",
-    "score": 0.0,
+    "status": "routed",
+    "profile_id": "predictable_cash_flow",
+    "label": "Predictable cash-flow security",
+    "score": 3.0,
     "reasons": [
-      "No decisive classification was supplied; owner-earnings is the conservative operating default."
+      "component categories=operating_business",
+      "existing methods=dividend, owner_cash"
     ],
     "primary_methods": [
-      "owner_earnings_reinvestment_dcf"
+      "owner_cash_or_dividend_discount"
     ],
     "corroborating_methods": [
-      "reverse_dcf",
-      "incremental_roic_runway"
+      "regulated_asset_base",
+      "yield_and_reverse_dcf"
     ],
     "primary_personas": [
       "buffett_weschler",
       "hohn"
     ],
     "cross_check_personas": [
-      "munger",
-      "marathon_capital_cycle"
+      "marks_credit_cycle"
     ],
     "silent_personas": [
       "greenblatt",
       "hk",
       "klarman_asset_value",
-      "marks_credit_cycle",
+      "marathon_capital_cycle",
+      "munger",
       "pabrai",
       "stahl"
     ],
     "required_evidence": [
-      "normalized owner earnings",
-      "incremental return on capital",
-      "reinvestment runway",
-      "diluted share count",
-      "competitive-advantage mechanism"
+      "cash-flow durability",
+      "maintenance capital",
+      "funding plan",
+      "distribution policy",
+      "contract or regulatory reset terms"
     ],
     "failure_modes": [
-      "growth projected without its capital cost",
-      "stock compensation or acquisitions omitted",
-      "terminal value unsupported by a durable mechanism"
+      "dividend treated as earning power",
+      "growth capital and dilution omitted",
+      "contract renewal or regulatory reset ignored"
     ],
-    "secondary_profiles": [],
+    "secondary_profiles": [
+      {
+        "profile_id": "binary_milestone",
+        "score": 3.0,
+        "reasons": [
+          "component categories=real_option",
+          "existing methods=milestone, risk_adjusted"
+        ]
+      },
+      {
+        "profile_id": "quality_reinvestment",
+        "score": 2.0,
+        "reasons": [
+          "component categories=operating_business",
+          "existing methods=owner_cash"
+        ]
+      }
+    ],
     "scorecard": {
       "scarce_asset_optionality": {
-        "score": 0.0,
-        "reasons": []
+        "score": 1.0,
+        "reasons": [
+          "component categories=real_option"
+        ]
       },
       "quality_reinvestment": {
-        "score": 0.0,
-        "reasons": []
+        "score": 2.0,
+        "reasons": [
+          "component categories=operating_business",
+          "existing methods=owner_cash"
+        ]
       },
       "capital_cycle": {
-        "score": 0.0,
-        "reasons": []
+        "score": 1.0,
+        "reasons": [
+          "component categories=operating_business"
+        ]
       },
       "credit_and_normalized_returns": {
-        "score": 0.0,
-        "reasons": []
+        "score": 1.0,
+        "reasons": [
+          "component categories=liability_or_reserve"
+        ]
       },
       "catalyst_asset_value": {
         "score": 0.0,
         "reasons": []
       },
       "predictable_cash_flow": {
-        "score": 0.0,
-        "reasons": []
+        "score": 3.0,
+        "reasons": [
+          "component categories=operating_business",
+          "existing methods=dividend, owner_cash"
+        ]
       },
       "binary_milestone": {
-        "score": 0.0,
-        "reasons": []
+        "score": 3.0,
+        "reasons": [
+          "component categories=real_option",
+          "existing methods=milestone, risk_adjusted"
+        ]
       }
     },
     "decision_rule": "Power Zones select the fitting economic method and eligible independent reviewers; they never choose the valuation answer or capital decision.",
     "ticker": "ACMR",
-    "as_of": "2026-07-20",
+    "as_of": "2026-07-21",
     "route_source": "canonical_power_zone_router",
     "config_path": "_system/frameworks/power_zones.json",
     "config_updated": "2026-07-14",
     "classification": {
-      "archetype": "unknown",
-      "moat": "unproven",
-      "dhando": "pending",
+      "archetype": "capital_cycle",
+      "moat": "narrow",
+      "dhando": "partial",
       "stance": "watch",
-      "cycle": "-",
+      "cycle": "mid",
       "moi_bucket": "pending",
-      "payoff_lens": "pending",
-      "investment_sleeve": "ls_algo_underlying"
+      "payoff_lens": "operating",
+      "investment_sleeve": "ls_algo_underlying",
+      "predictive_attribute": "semicap_cycle_mismatch"
     },
     "specialist_power_zones": [],
     "committee": {
-      "candidate_count": 4,
+      "candidate_count": 3,
       "independence_group_count": 3,
       "committee_seatable": true,
       "candidates": [
@@ -123,83 +1505,241 @@
           "independence_group": "competitive_advantage"
         },
         {
-          "persona": "munger",
-          "independence_group": "quality_reinvestment"
-        },
-        {
-          "persona": "marathon_capital_cycle",
-          "independence_group": "capital_cycle"
+          "persona": "marks_credit_cycle",
+          "independence_group": "credit_cycle"
         }
       ]
     },
-    "input_hash": "19d698d8a35c642606920b3d0bbf28c1378bcca2c00066a2dd610c7657156a27",
-    "generated_at": "2026-07-20T17:13:53.791627+00:00"
+    "input_hash": "f4819bd711ea1f42e564df43efc7429c7d2ff7f6aaa28fde300d3cfecd741c4c",
+    "generated_at": "2026-07-21T12:53:11.403921+00:00"
   },
   "market": {
     "price_per_share": 82.52,
-    "fully_diluted_shares": null,
-    "market_cap_m": null,
-    "enterprise_value_m": null
+    "fully_diluted_shares": 67262000,
+    "market_cap_m": 5550.46,
+    "enterprise_value_m": 5007.1
   },
   "valuation": {
     "value_per_share": {
-      "low": null,
-      "base": null,
-      "high": null
+      "low": 0.8146,
+      "base": 22.5699,
+      "high": 48.1267
     },
     "priced_components_per_share": {
-      "low": 0,
-      "base": 0,
-      "high": 0
+      "low": 0.8146,
+      "base": 22.5699,
+      "high": 48.1267
     },
-    "legacy_value_per_share": null,
-    "probability_weighted_value_per_share": null,
+    "legacy_value_per_share": {
+      "low": 0.81,
+      "base": 22.57,
+      "high": 48.13
+    },
+    "probability_weighted_value_per_share": 22.5699,
     "expected_distributions_per_share": 0.0,
     "annualized_return_at_price_pct": {
-      "low": null,
-      "base": null,
-      "high": null
+      "low": -48.3,
+      "base": -16.91,
+      "high": -7.41
     },
-    "downside_to_low_pct": null,
+    "downside_to_low_pct": -99.01,
     "horizon_years": 7,
     "interpretation": "value_per_share is withheld while any material additive component is unpriced; priced_components_per_share is not a complete security value."
   },
   "scenario_contract": {
     "rule": "Cases must change cited causal operating, capital, probability, timing, or financing drivers\u2014not only a terminal multiple.",
-    "top_value_drivers": [],
+    "top_value_drivers": [
+      {
+        "component_id": "advanced_packaging_backlog_option",
+        "label": "Advanced packaging and deferred-revenue backlog option",
+        "valuation_status": "bounded_estimate",
+        "base_per_share": 6.0004,
+        "legacy_base_per_share": 6.0,
+        "range_width_per_share": 17.9998,
+        "scenario_assumptions": "Proof outputs {'low': 0.0, 'base': 6.0004, 'high': 17.9998}; see calculation_proof graph."
+      },
+      {
+        "component_id": "wet_clean_equipment_engine",
+        "label": "Wet clean and electroplating equipment operations",
+        "valuation_status": "bounded_estimate",
+        "base_per_share": 15.4901,
+        "legacy_base_per_share": 15.49,
+        "range_width_per_share": 13.5499,
+        "scenario_assumptions": "Proof outputs {'low': 9.68, 'base': 15.4901, 'high': 23.2299}; see calculation_proof graph."
+      },
+      {
+        "component_id": "cycle_and_concentration_reserve",
+        "label": "Semicap cycle, customer concentration, and working-capital reserve",
+        "valuation_status": "bounded_estimate",
+        "base_per_share": -6.9995,
+        "legacy_base_per_share": -7.0,
+        "range_width_per_share": 13.0,
+        "scenario_assumptions": "Proof outputs {'low': -14.9996, 'base': -6.9995, 'high': -1.9996}; see calculation_proof graph."
+      },
+      {
+        "component_id": "net_financial_claims",
+        "label": "Net cash and debt claims on common equity",
+        "valuation_status": "bounded_estimate",
+        "base_per_share": 8.0789,
+        "legacy_base_per_share": 8.08,
+        "range_width_per_share": 2.7624,
+        "scenario_assumptions": "Proof outputs {'low': 6.1342, 'base': 8.0789, 'high': 8.8966}; see calculation_proof graph."
+      }
+    ],
     "reverse_expectations": null
   },
   "calculation_proof_summary": {
-    "component_count": 0,
-    "priced_component_count": 0,
-    "proof_complete_pct": 0.0,
+    "component_count": 4,
+    "priced_component_count": 4,
+    "proof_complete_pct": 100.0,
     "status_counts": {
-      "bounded_estimate": 0,
+      "bounded_estimate": 4,
       "calculated": 0,
       "legacy_sensitivity": 0,
       "unpriced": 0
     },
-    "all_material_components_priced": false,
+    "all_material_components_priced": true,
     "calculation_errors": [],
-    "aggregate_proof_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    "aggregate_proof_hash": "19a1eff4a3a831fedd8afe00a4ee18332c572ec4c16dc47e9dea5c341c72b8ad"
   },
-  "source_lineage": [],
+  "source_lineage": [
+    {
+      "component_id": "wet_clean_equipment_engine",
+      "node_id": "operating_income_m",
+      "ref": "ACMR/investor-documents/sec-edgar/10-K_20260302_rpt20251231_acc0001628280_26_013231.htm",
+      "locator": "OperatingIncomeLoss $109.429M (FY2025, down from $150.998M prior year)",
+      "as_of": "2025-12-31",
+      "content_sha256": "8af0db1e681c47db91ff4de1e5b6bbb6ef886289efd88d2ae1b35c5b74b4851d",
+      "source_id": "acb412e43ff122a20d7c9b85c9dac5051e35074228a8b0782ce341fd47faa845"
+    },
+    {
+      "component_id": "wet_clean_equipment_engine",
+      "node_id": "midcycle_operating_income_m",
+      "ref": "ACMR/investor-documents/sec-edgar/10-K_20260302_rpt20251231_acc0001628280_26_013231.htm",
+      "locator": "OperatingIncomeLoss $109.429M (2025) and $150.998M (2024); midpoint normalization",
+      "as_of": "2025-12-31",
+      "content_sha256": "8af0db1e681c47db91ff4de1e5b6bbb6ef886289efd88d2ae1b35c5b74b4851d",
+      "source_id": "5e1120fa7262406bbad43b059eb94ec6e2a798c8a3ab2b0eaeb3f8fe6a745876"
+    },
+    {
+      "component_id": "wet_clean_equipment_engine",
+      "node_id": "shares_m",
+      "ref": "ACMR/investor-documents/sec-edgar/10-K_20260302_rpt20251231_acc0001628280_26_013231.htm",
+      "locator": "FY2025 diluted net income $92.149M / diluted EPS $1.37",
+      "as_of": "2025-12-31",
+      "content_sha256": "8af0db1e681c47db91ff4de1e5b6bbb6ef886289efd88d2ae1b35c5b74b4851d",
+      "source_id": "d73fdec55cfe9482dedb6968869b012d1b248e93ef9a071fd993fe2809e090a6"
+    },
+    {
+      "component_id": "advanced_packaging_backlog_option",
+      "node_id": "deferred_revenue_m",
+      "ref": "ACMR/investor-documents/sec-edgar/10-K_20260302_rpt20251231_acc0001628280_26_013231.htm",
+      "locator": "DeferredRevenueCurrent $252.486M at December 31, 2025",
+      "as_of": "2025-12-31",
+      "content_sha256": "8af0db1e681c47db91ff4de1e5b6bbb6ef886289efd88d2ae1b35c5b74b4851d",
+      "source_id": "19b4b58451e207a128942d78c47813c8d7c5a2cd5474bca338e61687feaf39f7"
+    },
+    {
+      "component_id": "advanced_packaging_backlog_option",
+      "node_id": "total_revenue_m",
+      "ref": "ACMR/investor-documents/sec-edgar/10-K_20260302_rpt20251231_acc0001628280_26_013231.htm",
+      "locator": "RevenueFromContractWithCustomerExcludingAssessedTax $901.309M (FY2025)",
+      "as_of": "2025-12-31",
+      "content_sha256": "8af0db1e681c47db91ff4de1e5b6bbb6ef886289efd88d2ae1b35c5b74b4851d",
+      "source_id": "61faf2501c9e6fba6923c94e417bc795074c5333e53569ebf72d86f62becac98"
+    },
+    {
+      "component_id": "advanced_packaging_backlog_option",
+      "node_id": "shares_m",
+      "ref": "ACMR/investor-documents/sec-edgar/10-K_20260302_rpt20251231_acc0001628280_26_013231.htm",
+      "locator": "FY2025 diluted net income $92,149M / diluted EPS $1.37",
+      "as_of": "2025-12-31",
+      "content_sha256": "8af0db1e681c47db91ff4de1e5b6bbb6ef886289efd88d2ae1b35c5b74b4851d",
+      "source_id": "7a55a3ced4e8bab410a70f9341b68fafd090bada9c7138a93ae80b38b4b8d16e"
+    },
+    {
+      "component_id": "net_financial_claims",
+      "node_id": "cash_m",
+      "ref": "ACMR/investor-documents/sec-edgar/10-K_20260302_rpt20251231_acc0001628280_26_013231.htm",
+      "locator": "CashAndCashEquivalentsAtCarryingValue $757.373M at December 31, 2025",
+      "as_of": "2025-12-31",
+      "content_sha256": "8af0db1e681c47db91ff4de1e5b6bbb6ef886289efd88d2ae1b35c5b74b4851d",
+      "source_id": "66b7065f58b0f13862c31a40fb2b1c6651672da336a653195cf9551619a07e60"
+    },
+    {
+      "component_id": "net_financial_claims",
+      "node_id": "debt_cur_m",
+      "ref": "ACMR/investor-documents/sec-edgar/10-K_20260302_rpt20251231_acc0001628280_26_013231.htm",
+      "locator": "LongTermDebtCurrent $35.082M at December 31, 2025",
+      "as_of": "2025-12-31",
+      "content_sha256": "8af0db1e681c47db91ff4de1e5b6bbb6ef886289efd88d2ae1b35c5b74b4851d",
+      "source_id": "24a871e5ebb0468e7a940f41f3714020a055ef1c540f32b133cc971f7d41b9fb"
+    },
+    {
+      "component_id": "net_financial_claims",
+      "node_id": "debt_lt_m",
+      "ref": "ACMR/investor-documents/sec-edgar/10-K_20260302_rpt20251231_acc0001628280_26_013231.htm",
+      "locator": "LongTermDebtNoncurrent $178.93M at December 31, 2025",
+      "as_of": "2025-12-31",
+      "content_sha256": "8af0db1e681c47db91ff4de1e5b6bbb6ef886289efd88d2ae1b35c5b74b4851d",
+      "source_id": "43a93af8805905cac5d050ae308c6579eb076ebf01cc0804a216112a63b1f4f9"
+    },
+    {
+      "component_id": "net_financial_claims",
+      "node_id": "shares_m",
+      "ref": "ACMR/investor-documents/sec-edgar/10-K_20260302_rpt20251231_acc0001628280_26_013231.htm",
+      "locator": "FY2025 diluted net income $92,149M / diluted EPS $1.37",
+      "as_of": "2025-12-31",
+      "content_sha256": "8af0db1e681c47db91ff4de1e5b6bbb6ef886289efd88d2ae1b35c5b74b4851d",
+      "source_id": "7a55a3ced4e8bab410a70f9341b68fafd090bada9c7138a93ae80b38b4b8d16e"
+    },
+    {
+      "component_id": "cycle_and_concentration_reserve",
+      "node_id": "operating_cash_flow_m",
+      "ref": "ACMR/investor-documents/sec-edgar/10-K_20260302_rpt20251231_acc0001628280_26_013231.htm",
+      "locator": "NetCashProvidedByUsedInOperatingActivities $10.325M (FY2025, down from $152.45M)",
+      "as_of": "2025-12-31",
+      "content_sha256": "8af0db1e681c47db91ff4de1e5b6bbb6ef886289efd88d2ae1b35c5b74b4851d",
+      "source_id": "cf78d742745efba9dc24df0d7e7308d8a38b27defba6467931f5fb645cbe20dd"
+    },
+    {
+      "component_id": "cycle_and_concentration_reserve",
+      "node_id": "operating_income_m",
+      "ref": "ACMR/investor-documents/sec-edgar/10-K_20260302_rpt20251231_acc0001628280_26_013231.htm",
+      "locator": "OperatingIncomeLoss $109.429M (FY2025)",
+      "as_of": "2025-12-31",
+      "content_sha256": "8af0db1e681c47db91ff4de1e5b6bbb6ef886289efd88d2ae1b35c5b74b4851d",
+      "source_id": "0ada86f4645c5c6edaa624fe0a83bcf8ab6f7ee42091db09203d836098b3336f"
+    },
+    {
+      "component_id": "cycle_and_concentration_reserve",
+      "node_id": "shares_m",
+      "ref": "ACMR/investor-documents/sec-edgar/10-K_20260302_rpt20251231_acc0001628280_26_013231.htm",
+      "locator": "FY2025 diluted net income $92,149M / diluted EPS $1.37",
+      "as_of": "2025-12-31",
+      "content_sha256": "8af0db1e681c47db91ff4de1e5b6bbb6ef886289efd88d2ae1b35c5b74b4851d",
+      "source_id": "7a55a3ced4e8bab410a70f9341b68fafd090bada9c7138a93ae80b38b4b8d16e"
+    }
+  ],
   "model_checks": {
     "calculation_graphs_valid": true,
-    "component_sum_reconciles": false,
+    "component_sum_reconciles": true,
     "no_double_counting": true,
-    "all_material_components_priced": false,
+    "all_material_components_priced": true,
     "low_base_high_ordered": true
   },
   "evidence": {
-    "unresolved_count": 1,
-    "blockers": [
-      "A complete economic ownership map has not been supplied."
-    ],
+    "unresolved_count": 0,
+    "blockers": [],
     "validation_errors": []
   },
   "monitoring": {
-    "falsifiers": [],
+    "falsifiers": [
+      "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
+      "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
+      "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
+      "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case."
+    ],
     "required_refresh_triggers": [
       "new filing or material operating update",
       "capital-structure change",
@@ -208,12 +1748,16 @@
     ]
   },
   "change_control": {
-    "model_hash": "8c1d17dbb3c64372f61474b3052f7ef10aff89ad7e7acd5710755dbcb2ac0fab",
-    "method_versions": [],
+    "model_hash": "474793bcb7962bf2cddd589b901e5e8d50c96cd8511dacc860c059be80f48126",
+    "method_versions": [
+      "net_asset_value@1.0",
+      "owner_cash_or_dividend_discount@1.0",
+      "risk_adjusted_milestone_value@1.0"
+    ],
     "change_log": [],
     "rule": "A source fact is locked. Every assumption change requires a reason, author, timestamp, and before/after value."
   },
   "decision_rule": "No security is decision-grade until every material claim is valued exactly once by a valid calculation proof and every material evidence blocker is resolved.",
   "authority": "universal_valuation_contract",
-  "legacy_reference_present": false
+  "legacy_reference_present": true
 }

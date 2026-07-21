@@ -493,8 +493,14 @@ def lint_file(path: Path, *, legacy: bool, strict: bool) -> tuple[list[str], lis
         base_pct = (val.get("implied_return") or {}).get("base_pct")
         if base_pct is not None:
             tol = 0.25
+            rs_syn = SYNTHESIS_RETURNS.search(text)
             rs = RETURNS_STATEMENT.search(text)
-            if rs and abs(float(rs.group(1)) - float(base_pct)) > tol:
+            if rs_syn:
+                if abs(float(rs_syn.group(1)) - float(base_pct)) > tol:
+                    errors.append(
+                        f"{rel}: Returns statement (synthesis) {rs_syn.group(1)}% vs valuation.json base {base_pct}% (tol {tol}pp)"
+                    )
+            elif rs and abs(float(rs.group(1)) - float(base_pct)) > tol:
                 errors.append(
                     f"{rel}: Returns statement {rs.group(1)}% vs valuation.json base {base_pct}% (tol {tol}pp)"
                 )

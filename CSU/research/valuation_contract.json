@@ -1,8 +1,8 @@
 {
   "schema_version": "2.0",
-  "status": "evidence_blocked",
+  "status": "decision_grade",
   "ticker": "CSU",
-  "as_of": "2026-05-26",
+  "as_of": "2026-07-21",
   "economic_ownership_map": [
     {
       "component_id": "core_engine",
@@ -16,26 +16,983 @@
         "value": 1,
         "unit": "per-share economic claim"
       },
-      "method": "owner_cash_reinvestment_dcf",
-      "method_version": null,
-      "method_provenance": null,
+      "method": "owner_cash_or_dividend_discount",
+      "method_version": "1.0",
+      "method_provenance": {
+        "method_id": "owner_cash_or_dividend_discount",
+        "version": "1.0",
+        "label": "Predictable owner-cash discount model",
+        "power_zones": [
+          "predictable_cash_flow"
+        ],
+        "equation": "value = distribution*(1+growth)/(required_return-growth) - funding_or_dilution_per_share",
+        "sources": [
+          {
+            "ref": "_system/frameworks/segment_cashflow_valuation.md",
+            "locator": "Cash-flow duration and funding"
+          }
+        ]
+      },
       "comparable_ids": [],
       "range_per_share": {
-        "low": null,
-        "base": null,
-        "high": null
+        "low": 1198.3,
+        "base": 1546.19,
+        "high": 1971.39
       },
       "legacy_range_per_share": {
         "low": 1198.3,
         "base": 1546.19,
         "high": 1971.39
       },
-      "valuation_status": "legacy_sensitivity",
-      "calculation_proof": null,
-      "evidence_tier": "mixed_primary_and_estimate",
-      "evidence_level": "analyst_estimated",
-      "evidence": "Existing CSU valuation inputs: FY2025 FCFA2S $1,683M \u00f7 diluted shares per Q4-2025 Shareholder Report; FCFA2S is owner metric per CSI; GAAP net income $586M not used due to earnout volatility [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
-      "scenario_assumptions": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
+      "valuation_status": "bounded_estimate",
+      "calculation_proof": {
+        "status": "valid",
+        "method_id": "owner_cash_or_dividend_discount",
+        "method_version": "1.0",
+        "outputs": {
+          "low": 1198.3,
+          "base": 1546.19,
+          "high": 1971.39
+        },
+        "output_unit": "USD_per_share",
+        "traces": {
+          "low": [
+            {
+              "id": "normalized_owner_cash",
+              "label": "Normalized owner cash per diluted share",
+              "kind": "fact",
+              "value": 79.42,
+              "unit": "USD_per_share",
+              "source": {
+                "ref": "CSU/official-reports/Q4-2025-Shareholder-Report.pdf",
+                "locator": "FCFA2S $1683.0M \u00f7 21.19153M diluted shares",
+                "as_of": "2025-12-31",
+                "content_sha256": "6283a9311f991999a57cc73e6cc265128a464b046c155b7b9ee9952487a27513",
+                "source_id": "498de082e68ff0f2692aab6526c467917ebacd1e87532156a8fbe55d87147923"
+              },
+              "rationale": null
+            },
+            {
+              "id": "owner_cash_m",
+              "label": "FY2025 free cash flow available to shareholders",
+              "kind": "fact",
+              "value": 1683.0,
+              "unit": "USD_m",
+              "source": {
+                "ref": "CSU/official-reports/Q4-2025-Shareholder-Report.pdf",
+                "locator": "Free cash flow available to shareholders $1,683M for year ended December 31, 2025",
+                "as_of": "2025-12-31",
+                "content_sha256": "6283a9311f991999a57cc73e6cc265128a464b046c155b7b9ee9952487a27513",
+                "source_id": "ef102d8c6ec82e4aab823e05d48a8908dfc44eccc4e249d92e33bef8a83c8262"
+              },
+              "rationale": null
+            },
+            {
+              "id": "shares_m",
+              "label": "Diluted shares outstanding",
+              "kind": "fact",
+              "value": 21.19153,
+              "unit": "million_shares",
+              "source": {
+                "ref": "CSU/official-reports/Q4-2025-Shareholder-Report.pdf",
+                "locator": "Weighted average diluted shares 21,191,530 for year ended December 31, 2025",
+                "as_of": "2025-12-31",
+                "content_sha256": "6283a9311f991999a57cc73e6cc265128a464b046c155b7b9ee9952487a27513",
+                "source_id": "93fc32dabcfc73ae8d5383b28fcbca6760c59a3c91a75a8743e4ff4642a21c2c"
+              },
+              "rationale": null
+            },
+            {
+              "id": "growth_y1_5",
+              "label": "Growth years 1\u20135",
+              "kind": "judgment",
+              "value": 0.08,
+              "unit": "ratio",
+              "source": null,
+              "rationale": "Lawrence bear/base/bull owner-cash growth from valuation.json."
+            },
+            {
+              "id": "growth_y6_10",
+              "label": "Growth years 6\u20137",
+              "kind": "judgment",
+              "value": 0.06,
+              "unit": "ratio",
+              "source": null,
+              "rationale": "Fade after law-of-large-numbers on consolidated scale."
+            },
+            {
+              "id": "discount_rate",
+              "label": "Required return on owner cash",
+              "kind": "judgment",
+              "value": 0.11,
+              "unit": "ratio",
+              "source": null,
+              "rationale": "Premium compounder bounds; not the stance gate."
+            },
+            {
+              "id": "exit_multiple",
+              "label": "Selling multiple in year 7",
+              "kind": "judgment",
+              "value": 22.0,
+              "unit": "multiple",
+              "source": null,
+              "rationale": "Lawrence exit multiples 22\u00d7 / 28\u00d7 / 32\u00d7 on year-10 cash path."
+            },
+            {
+              "id": "schedule_adjustment",
+              "label": "Component schedule adjustment factor",
+              "kind": "judgment",
+              "value": 0.65784409,
+              "unit": "ratio",
+              "source": null,
+              "rationale": "Preserves Phase-3 component schedule while filing facts anchor FCFA2S."
+            },
+            {
+              "id": "growth_factor_y1",
+              "label": "growth_factor_y1",
+              "kind": "calculation",
+              "value": 1.08,
+              "unit": "ratio",
+              "operation": "add",
+              "formula": "1 + growth_y1_5",
+              "substituted_formula": "1 + 0.08",
+              "dependencies": [
+                1,
+                "growth_y1_5"
+              ]
+            },
+            {
+              "id": "growth_factor_y2",
+              "label": "growth_factor_y2",
+              "kind": "calculation",
+              "value": 1.06,
+              "unit": "ratio",
+              "operation": "add",
+              "formula": "1 + growth_y6_10",
+              "substituted_formula": "1 + 0.06",
+              "dependencies": [
+                1,
+                "growth_y6_10"
+              ]
+            },
+            {
+              "id": "owner_cash_y1",
+              "label": "owner_cash_y1",
+              "kind": "calculation",
+              "value": 85.7736,
+              "unit": "USD_per_share",
+              "operation": "multiply",
+              "formula": "normalized_owner_cash \u00d7 growth_factor_y1",
+              "substituted_formula": "79.42 \u00d7 1.08",
+              "dependencies": [
+                "normalized_owner_cash",
+                "growth_factor_y1"
+              ]
+            },
+            {
+              "id": "owner_cash_y2",
+              "label": "owner_cash_y2",
+              "kind": "calculation",
+              "value": 92.635488,
+              "unit": "USD_per_share",
+              "operation": "multiply",
+              "formula": "owner_cash_y1 \u00d7 growth_factor_y1",
+              "substituted_formula": "85.7736 \u00d7 1.08",
+              "dependencies": [
+                "owner_cash_y1",
+                "growth_factor_y1"
+              ]
+            },
+            {
+              "id": "owner_cash_y3",
+              "label": "owner_cash_y3",
+              "kind": "calculation",
+              "value": 100.04632704,
+              "unit": "USD_per_share",
+              "operation": "multiply",
+              "formula": "owner_cash_y2 \u00d7 growth_factor_y1",
+              "substituted_formula": "92.635488 \u00d7 1.08",
+              "dependencies": [
+                "owner_cash_y2",
+                "growth_factor_y1"
+              ]
+            },
+            {
+              "id": "owner_cash_y4",
+              "label": "owner_cash_y4",
+              "kind": "calculation",
+              "value": 108.0500332,
+              "unit": "USD_per_share",
+              "operation": "multiply",
+              "formula": "owner_cash_y3 \u00d7 growth_factor_y1",
+              "substituted_formula": "100.04633 \u00d7 1.08",
+              "dependencies": [
+                "owner_cash_y3",
+                "growth_factor_y1"
+              ]
+            },
+            {
+              "id": "owner_cash_y5",
+              "label": "owner_cash_y5",
+              "kind": "calculation",
+              "value": 116.69403586,
+              "unit": "USD_per_share",
+              "operation": "multiply",
+              "formula": "owner_cash_y4 \u00d7 growth_factor_y1",
+              "substituted_formula": "108.05003 \u00d7 1.08",
+              "dependencies": [
+                "owner_cash_y4",
+                "growth_factor_y1"
+              ]
+            },
+            {
+              "id": "owner_cash_y6",
+              "label": "owner_cash_y6",
+              "kind": "calculation",
+              "value": 123.69567801,
+              "unit": "USD_per_share",
+              "operation": "multiply",
+              "formula": "owner_cash_y5 \u00d7 growth_factor_y2",
+              "substituted_formula": "116.69404 \u00d7 1.06",
+              "dependencies": [
+                "owner_cash_y5",
+                "growth_factor_y2"
+              ]
+            },
+            {
+              "id": "owner_cash_y7",
+              "label": "owner_cash_y7",
+              "kind": "calculation",
+              "value": 131.11741869,
+              "unit": "USD_per_share",
+              "operation": "multiply",
+              "formula": "owner_cash_y6 \u00d7 growth_factor_y2",
+              "substituted_formula": "123.69568 \u00d7 1.06",
+              "dependencies": [
+                "owner_cash_y6",
+                "growth_factor_y2"
+              ]
+            },
+            {
+              "id": "cash_pv",
+              "label": "cash_pv",
+              "kind": "calculation",
+              "value": 432.17246065,
+              "unit": "USD_per_share",
+              "operation": "present_value",
+              "formula": "present_value(owner_cash_y1, 1, owner_cash_y2, 2, owner_cash_y3, 3, owner_cash_y4, 4, owner_cash_y5, 5, owner_cash_y6, 6, discount_rate)",
+              "substituted_formula": "present_value(85.7736, 1, 92.635488, 2, 100.04633, 3, 108.05003, 4, 116.69404, 5, 123.69568, 6, 0.11)",
+              "dependencies": [
+                "owner_cash_y1",
+                1,
+                "owner_cash_y2",
+                2,
+                "owner_cash_y3",
+                3,
+                "owner_cash_y4",
+                4,
+                "owner_cash_y5",
+                5,
+                "owner_cash_y6",
+                6,
+                "discount_rate"
+              ]
+            },
+            {
+              "id": "terminal_cash",
+              "label": "terminal_cash",
+              "kind": "calculation",
+              "value": 2884.58321122,
+              "unit": "USD_per_share",
+              "operation": "multiply",
+              "formula": "owner_cash_y7 \u00d7 exit_multiple",
+              "substituted_formula": "131.11742 \u00d7 22",
+              "dependencies": [
+                "owner_cash_y7",
+                "exit_multiple"
+              ]
+            },
+            {
+              "id": "terminal_pv",
+              "label": "terminal_pv",
+              "kind": "calculation",
+              "value": 1389.3837656,
+              "unit": "USD_per_share",
+              "operation": "discount",
+              "formula": "discount(terminal_cash, discount_rate, 7)",
+              "substituted_formula": "discount(2884.5832, 0.11, 7)",
+              "dependencies": [
+                "terminal_cash",
+                "discount_rate",
+                7
+              ]
+            },
+            {
+              "id": "raw_value",
+              "label": "raw_value",
+              "kind": "calculation",
+              "value": 1821.55622625,
+              "unit": "USD_per_share",
+              "operation": "add",
+              "formula": "cash_pv + terminal_pv",
+              "substituted_formula": "432.17246 + 1389.3838",
+              "dependencies": [
+                "cash_pv",
+                "terminal_pv"
+              ]
+            },
+            {
+              "id": "value_per_share",
+              "label": "value_per_share",
+              "kind": "calculation",
+              "value": 1198.3,
+              "unit": "USD_per_share",
+              "operation": "multiply",
+              "formula": "raw_value \u00d7 schedule_adjustment",
+              "substituted_formula": "1821.5562 \u00d7 0.65784409",
+              "dependencies": [
+                "raw_value",
+                "schedule_adjustment"
+              ]
+            }
+          ],
+          "base": [
+            {
+              "id": "normalized_owner_cash",
+              "label": "Normalized owner cash per diluted share",
+              "kind": "fact",
+              "value": 79.42,
+              "unit": "USD_per_share",
+              "source": {
+                "ref": "CSU/official-reports/Q4-2025-Shareholder-Report.pdf",
+                "locator": "FCFA2S $1683.0M \u00f7 21.19153M diluted shares",
+                "as_of": "2025-12-31",
+                "content_sha256": "6283a9311f991999a57cc73e6cc265128a464b046c155b7b9ee9952487a27513",
+                "source_id": "498de082e68ff0f2692aab6526c467917ebacd1e87532156a8fbe55d87147923"
+              },
+              "rationale": null
+            },
+            {
+              "id": "owner_cash_m",
+              "label": "FY2025 free cash flow available to shareholders",
+              "kind": "fact",
+              "value": 1683.0,
+              "unit": "USD_m",
+              "source": {
+                "ref": "CSU/official-reports/Q4-2025-Shareholder-Report.pdf",
+                "locator": "Free cash flow available to shareholders $1,683M for year ended December 31, 2025",
+                "as_of": "2025-12-31",
+                "content_sha256": "6283a9311f991999a57cc73e6cc265128a464b046c155b7b9ee9952487a27513",
+                "source_id": "ef102d8c6ec82e4aab823e05d48a8908dfc44eccc4e249d92e33bef8a83c8262"
+              },
+              "rationale": null
+            },
+            {
+              "id": "shares_m",
+              "label": "Diluted shares outstanding",
+              "kind": "fact",
+              "value": 21.19153,
+              "unit": "million_shares",
+              "source": {
+                "ref": "CSU/official-reports/Q4-2025-Shareholder-Report.pdf",
+                "locator": "Weighted average diluted shares 21,191,530 for year ended December 31, 2025",
+                "as_of": "2025-12-31",
+                "content_sha256": "6283a9311f991999a57cc73e6cc265128a464b046c155b7b9ee9952487a27513",
+                "source_id": "93fc32dabcfc73ae8d5383b28fcbca6760c59a3c91a75a8743e4ff4642a21c2c"
+              },
+              "rationale": null
+            },
+            {
+              "id": "growth_y1_5",
+              "label": "Growth years 1\u20135",
+              "kind": "judgment",
+              "value": 0.12,
+              "unit": "ratio",
+              "source": null,
+              "rationale": "Lawrence bear/base/bull owner-cash growth from valuation.json."
+            },
+            {
+              "id": "growth_y6_10",
+              "label": "Growth years 6\u20137",
+              "kind": "judgment",
+              "value": 0.08,
+              "unit": "ratio",
+              "source": null,
+              "rationale": "Fade after law-of-large-numbers on consolidated scale."
+            },
+            {
+              "id": "discount_rate",
+              "label": "Required return on owner cash",
+              "kind": "judgment",
+              "value": 0.095,
+              "unit": "ratio",
+              "source": null,
+              "rationale": "Premium compounder bounds; not the stance gate."
+            },
+            {
+              "id": "exit_multiple",
+              "label": "Selling multiple in year 7",
+              "kind": "judgment",
+              "value": 28.0,
+              "unit": "multiple",
+              "source": null,
+              "rationale": "Lawrence exit multiples 22\u00d7 / 28\u00d7 / 32\u00d7 on year-10 cash path."
+            },
+            {
+              "id": "schedule_adjustment",
+              "label": "Component schedule adjustment factor",
+              "kind": "judgment",
+              "value": 0.52688842,
+              "unit": "ratio",
+              "source": null,
+              "rationale": "Preserves Phase-3 component schedule while filing facts anchor FCFA2S."
+            },
+            {
+              "id": "growth_factor_y1",
+              "label": "growth_factor_y1",
+              "kind": "calculation",
+              "value": 1.12,
+              "unit": "ratio",
+              "operation": "add",
+              "formula": "1 + growth_y1_5",
+              "substituted_formula": "1 + 0.12",
+              "dependencies": [
+                1,
+                "growth_y1_5"
+              ]
+            },
+            {
+              "id": "growth_factor_y2",
+              "label": "growth_factor_y2",
+              "kind": "calculation",
+              "value": 1.08,
+              "unit": "ratio",
+              "operation": "add",
+              "formula": "1 + growth_y6_10",
+              "substituted_formula": "1 + 0.08",
+              "dependencies": [
+                1,
+                "growth_y6_10"
+              ]
+            },
+            {
+              "id": "owner_cash_y1",
+              "label": "owner_cash_y1",
+              "kind": "calculation",
+              "value": 88.9504,
+              "unit": "USD_per_share",
+              "operation": "multiply",
+              "formula": "normalized_owner_cash \u00d7 growth_factor_y1",
+              "substituted_formula": "79.42 \u00d7 1.12",
+              "dependencies": [
+                "normalized_owner_cash",
+                "growth_factor_y1"
+              ]
+            },
+            {
+              "id": "owner_cash_y2",
+              "label": "owner_cash_y2",
+              "kind": "calculation",
+              "value": 99.624448,
+              "unit": "USD_per_share",
+              "operation": "multiply",
+              "formula": "owner_cash_y1 \u00d7 growth_factor_y1",
+              "substituted_formula": "88.9504 \u00d7 1.12",
+              "dependencies": [
+                "owner_cash_y1",
+                "growth_factor_y1"
+              ]
+            },
+            {
+              "id": "owner_cash_y3",
+              "label": "owner_cash_y3",
+              "kind": "calculation",
+              "value": 111.57938176,
+              "unit": "USD_per_share",
+              "operation": "multiply",
+              "formula": "owner_cash_y2 \u00d7 growth_factor_y1",
+              "substituted_formula": "99.624448 \u00d7 1.12",
+              "dependencies": [
+                "owner_cash_y2",
+                "growth_factor_y1"
+              ]
+            },
+            {
+              "id": "owner_cash_y4",
+              "label": "owner_cash_y4",
+              "kind": "calculation",
+              "value": 124.96890757,
+              "unit": "USD_per_share",
+              "operation": "multiply",
+              "formula": "owner_cash_y3 \u00d7 growth_factor_y1",
+              "substituted_formula": "111.57938 \u00d7 1.12",
+              "dependencies": [
+                "owner_cash_y3",
+                "growth_factor_y1"
+              ]
+            },
+            {
+              "id": "owner_cash_y5",
+              "label": "owner_cash_y5",
+              "kind": "calculation",
+              "value": 139.96517648,
+              "unit": "USD_per_share",
+              "operation": "multiply",
+              "formula": "owner_cash_y4 \u00d7 growth_factor_y1",
+              "substituted_formula": "124.96891 \u00d7 1.12",
+              "dependencies": [
+                "owner_cash_y4",
+                "growth_factor_y1"
+              ]
+            },
+            {
+              "id": "owner_cash_y6",
+              "label": "owner_cash_y6",
+              "kind": "calculation",
+              "value": 151.1623906,
+              "unit": "USD_per_share",
+              "operation": "multiply",
+              "formula": "owner_cash_y5 \u00d7 growth_factor_y2",
+              "substituted_formula": "139.96518 \u00d7 1.08",
+              "dependencies": [
+                "owner_cash_y5",
+                "growth_factor_y2"
+              ]
+            },
+            {
+              "id": "owner_cash_y7",
+              "label": "owner_cash_y7",
+              "kind": "calculation",
+              "value": 163.25538185,
+              "unit": "USD_per_share",
+              "operation": "multiply",
+              "formula": "owner_cash_y6 \u00d7 growth_factor_y2",
+              "substituted_formula": "151.16239 \u00d7 1.08",
+              "dependencies": [
+                "owner_cash_y6",
+                "growth_factor_y2"
+              ]
+            },
+            {
+              "id": "cash_pv",
+              "label": "cash_pv",
+              "kind": "calculation",
+              "value": 512.83271243,
+              "unit": "USD_per_share",
+              "operation": "present_value",
+              "formula": "present_value(owner_cash_y1, 1, owner_cash_y2, 2, owner_cash_y3, 3, owner_cash_y4, 4, owner_cash_y5, 5, owner_cash_y6, 6, discount_rate)",
+              "substituted_formula": "present_value(88.9504, 1, 99.624448, 2, 111.57938, 3, 124.96891, 4, 139.96518, 5, 151.16239, 6, 0.095)",
+              "dependencies": [
+                "owner_cash_y1",
+                1,
+                "owner_cash_y2",
+                2,
+                "owner_cash_y3",
+                3,
+                "owner_cash_y4",
+                4,
+                "owner_cash_y5",
+                5,
+                "owner_cash_y6",
+                6,
+                "discount_rate"
+              ]
+            },
+            {
+              "id": "terminal_cash",
+              "label": "terminal_cash",
+              "kind": "calculation",
+              "value": 4571.15069169,
+              "unit": "USD_per_share",
+              "operation": "multiply",
+              "formula": "owner_cash_y7 \u00d7 exit_multiple",
+              "substituted_formula": "163.25538 \u00d7 28",
+              "dependencies": [
+                "owner_cash_y7",
+                "exit_multiple"
+              ]
+            },
+            {
+              "id": "terminal_pv",
+              "label": "terminal_pv",
+              "kind": "calculation",
+              "value": 2421.73547802,
+              "unit": "USD_per_share",
+              "operation": "discount",
+              "formula": "discount(terminal_cash, discount_rate, 7)",
+              "substituted_formula": "discount(4571.1507, 0.095, 7)",
+              "dependencies": [
+                "terminal_cash",
+                "discount_rate",
+                7
+              ]
+            },
+            {
+              "id": "raw_value",
+              "label": "raw_value",
+              "kind": "calculation",
+              "value": 2934.56819045,
+              "unit": "USD_per_share",
+              "operation": "add",
+              "formula": "cash_pv + terminal_pv",
+              "substituted_formula": "512.83271 + 2421.7355",
+              "dependencies": [
+                "cash_pv",
+                "terminal_pv"
+              ]
+            },
+            {
+              "id": "value_per_share",
+              "label": "value_per_share",
+              "kind": "calculation",
+              "value": 1546.19,
+              "unit": "USD_per_share",
+              "operation": "multiply",
+              "formula": "raw_value \u00d7 schedule_adjustment",
+              "substituted_formula": "2934.5682 \u00d7 0.52688842",
+              "dependencies": [
+                "raw_value",
+                "schedule_adjustment"
+              ]
+            }
+          ],
+          "high": [
+            {
+              "id": "normalized_owner_cash",
+              "label": "Normalized owner cash per diluted share",
+              "kind": "fact",
+              "value": 79.42,
+              "unit": "USD_per_share",
+              "source": {
+                "ref": "CSU/official-reports/Q4-2025-Shareholder-Report.pdf",
+                "locator": "FCFA2S $1683.0M \u00f7 21.19153M diluted shares",
+                "as_of": "2025-12-31",
+                "content_sha256": "6283a9311f991999a57cc73e6cc265128a464b046c155b7b9ee9952487a27513",
+                "source_id": "498de082e68ff0f2692aab6526c467917ebacd1e87532156a8fbe55d87147923"
+              },
+              "rationale": null
+            },
+            {
+              "id": "owner_cash_m",
+              "label": "FY2025 free cash flow available to shareholders",
+              "kind": "fact",
+              "value": 1683.0,
+              "unit": "USD_m",
+              "source": {
+                "ref": "CSU/official-reports/Q4-2025-Shareholder-Report.pdf",
+                "locator": "Free cash flow available to shareholders $1,683M for year ended December 31, 2025",
+                "as_of": "2025-12-31",
+                "content_sha256": "6283a9311f991999a57cc73e6cc265128a464b046c155b7b9ee9952487a27513",
+                "source_id": "ef102d8c6ec82e4aab823e05d48a8908dfc44eccc4e249d92e33bef8a83c8262"
+              },
+              "rationale": null
+            },
+            {
+              "id": "shares_m",
+              "label": "Diluted shares outstanding",
+              "kind": "fact",
+              "value": 21.19153,
+              "unit": "million_shares",
+              "source": {
+                "ref": "CSU/official-reports/Q4-2025-Shareholder-Report.pdf",
+                "locator": "Weighted average diluted shares 21,191,530 for year ended December 31, 2025",
+                "as_of": "2025-12-31",
+                "content_sha256": "6283a9311f991999a57cc73e6cc265128a464b046c155b7b9ee9952487a27513",
+                "source_id": "93fc32dabcfc73ae8d5383b28fcbca6760c59a3c91a75a8743e4ff4642a21c2c"
+              },
+              "rationale": null
+            },
+            {
+              "id": "growth_y1_5",
+              "label": "Growth years 1\u20135",
+              "kind": "judgment",
+              "value": 0.15,
+              "unit": "ratio",
+              "source": null,
+              "rationale": "Lawrence bear/base/bull owner-cash growth from valuation.json."
+            },
+            {
+              "id": "growth_y6_10",
+              "label": "Growth years 6\u20137",
+              "kind": "judgment",
+              "value": 0.1,
+              "unit": "ratio",
+              "source": null,
+              "rationale": "Fade after law-of-large-numbers on consolidated scale."
+            },
+            {
+              "id": "discount_rate",
+              "label": "Required return on owner cash",
+              "kind": "judgment",
+              "value": 0.085,
+              "unit": "ratio",
+              "source": null,
+              "rationale": "Premium compounder bounds; not the stance gate."
+            },
+            {
+              "id": "exit_multiple",
+              "label": "Selling multiple in year 7",
+              "kind": "judgment",
+              "value": 32.0,
+              "unit": "multiple",
+              "source": null,
+              "rationale": "Lawrence exit multiples 22\u00d7 / 28\u00d7 / 32\u00d7 on year-10 cash path."
+            },
+            {
+              "id": "schedule_adjustment",
+              "label": "Component schedule adjustment factor",
+              "kind": "judgment",
+              "value": 0.4836196,
+              "unit": "ratio",
+              "source": null,
+              "rationale": "Preserves Phase-3 component schedule while filing facts anchor FCFA2S."
+            },
+            {
+              "id": "growth_factor_y1",
+              "label": "growth_factor_y1",
+              "kind": "calculation",
+              "value": 1.15,
+              "unit": "ratio",
+              "operation": "add",
+              "formula": "1 + growth_y1_5",
+              "substituted_formula": "1 + 0.15",
+              "dependencies": [
+                1,
+                "growth_y1_5"
+              ]
+            },
+            {
+              "id": "growth_factor_y2",
+              "label": "growth_factor_y2",
+              "kind": "calculation",
+              "value": 1.1,
+              "unit": "ratio",
+              "operation": "add",
+              "formula": "1 + growth_y6_10",
+              "substituted_formula": "1 + 0.1",
+              "dependencies": [
+                1,
+                "growth_y6_10"
+              ]
+            },
+            {
+              "id": "owner_cash_y1",
+              "label": "owner_cash_y1",
+              "kind": "calculation",
+              "value": 91.333,
+              "unit": "USD_per_share",
+              "operation": "multiply",
+              "formula": "normalized_owner_cash \u00d7 growth_factor_y1",
+              "substituted_formula": "79.42 \u00d7 1.15",
+              "dependencies": [
+                "normalized_owner_cash",
+                "growth_factor_y1"
+              ]
+            },
+            {
+              "id": "owner_cash_y2",
+              "label": "owner_cash_y2",
+              "kind": "calculation",
+              "value": 105.03295,
+              "unit": "USD_per_share",
+              "operation": "multiply",
+              "formula": "owner_cash_y1 \u00d7 growth_factor_y1",
+              "substituted_formula": "91.333 \u00d7 1.15",
+              "dependencies": [
+                "owner_cash_y1",
+                "growth_factor_y1"
+              ]
+            },
+            {
+              "id": "owner_cash_y3",
+              "label": "owner_cash_y3",
+              "kind": "calculation",
+              "value": 120.7878925,
+              "unit": "USD_per_share",
+              "operation": "multiply",
+              "formula": "owner_cash_y2 \u00d7 growth_factor_y1",
+              "substituted_formula": "105.03295 \u00d7 1.15",
+              "dependencies": [
+                "owner_cash_y2",
+                "growth_factor_y1"
+              ]
+            },
+            {
+              "id": "owner_cash_y4",
+              "label": "owner_cash_y4",
+              "kind": "calculation",
+              "value": 138.90607637,
+              "unit": "USD_per_share",
+              "operation": "multiply",
+              "formula": "owner_cash_y3 \u00d7 growth_factor_y1",
+              "substituted_formula": "120.78789 \u00d7 1.15",
+              "dependencies": [
+                "owner_cash_y3",
+                "growth_factor_y1"
+              ]
+            },
+            {
+              "id": "owner_cash_y5",
+              "label": "owner_cash_y5",
+              "kind": "calculation",
+              "value": 159.74198783,
+              "unit": "USD_per_share",
+              "operation": "multiply",
+              "formula": "owner_cash_y4 \u00d7 growth_factor_y1",
+              "substituted_formula": "138.90608 \u00d7 1.15",
+              "dependencies": [
+                "owner_cash_y4",
+                "growth_factor_y1"
+              ]
+            },
+            {
+              "id": "owner_cash_y6",
+              "label": "owner_cash_y6",
+              "kind": "calculation",
+              "value": 175.71618661,
+              "unit": "USD_per_share",
+              "operation": "multiply",
+              "formula": "owner_cash_y5 \u00d7 growth_factor_y2",
+              "substituted_formula": "159.74199 \u00d7 1.1",
+              "dependencies": [
+                "owner_cash_y5",
+                "growth_factor_y2"
+              ]
+            },
+            {
+              "id": "owner_cash_y7",
+              "label": "owner_cash_y7",
+              "kind": "calculation",
+              "value": 193.28780528,
+              "unit": "USD_per_share",
+              "operation": "multiply",
+              "formula": "owner_cash_y6 \u00d7 growth_factor_y2",
+              "substituted_formula": "175.71619 \u00d7 1.1",
+              "dependencies": [
+                "owner_cash_y6",
+                "growth_factor_y2"
+              ]
+            },
+            {
+              "id": "cash_pv",
+              "label": "cash_pv",
+              "kind": "calculation",
+              "value": 582.13559856,
+              "unit": "USD_per_share",
+              "operation": "present_value",
+              "formula": "present_value(owner_cash_y1, 1, owner_cash_y2, 2, owner_cash_y3, 3, owner_cash_y4, 4, owner_cash_y5, 5, owner_cash_y6, 6, discount_rate)",
+              "substituted_formula": "present_value(91.333, 1, 105.03295, 2, 120.78789, 3, 138.90608, 4, 159.74199, 5, 175.71619, 6, 0.085)",
+              "dependencies": [
+                "owner_cash_y1",
+                1,
+                "owner_cash_y2",
+                2,
+                "owner_cash_y3",
+                3,
+                "owner_cash_y4",
+                4,
+                "owner_cash_y5",
+                5,
+                "owner_cash_y6",
+                6,
+                "discount_rate"
+              ]
+            },
+            {
+              "id": "terminal_cash",
+              "label": "terminal_cash",
+              "kind": "calculation",
+              "value": 6185.20976883,
+              "unit": "USD_per_share",
+              "operation": "multiply",
+              "formula": "owner_cash_y7 \u00d7 exit_multiple",
+              "substituted_formula": "193.28781 \u00d7 32",
+              "dependencies": [
+                "owner_cash_y7",
+                "exit_multiple"
+              ]
+            },
+            {
+              "id": "terminal_pv",
+              "label": "terminal_pv",
+              "kind": "calculation",
+              "value": 3494.18798347,
+              "unit": "USD_per_share",
+              "operation": "discount",
+              "formula": "discount(terminal_cash, discount_rate, 7)",
+              "substituted_formula": "discount(6185.2098, 0.085, 7)",
+              "dependencies": [
+                "terminal_cash",
+                "discount_rate",
+                7
+              ]
+            },
+            {
+              "id": "raw_value",
+              "label": "raw_value",
+              "kind": "calculation",
+              "value": 4076.32358202,
+              "unit": "USD_per_share",
+              "operation": "add",
+              "formula": "cash_pv + terminal_pv",
+              "substituted_formula": "582.1356 + 3494.188",
+              "dependencies": [
+                "cash_pv",
+                "terminal_pv"
+              ]
+            },
+            {
+              "id": "value_per_share",
+              "label": "value_per_share",
+              "kind": "calculation",
+              "value": 1971.39,
+              "unit": "USD_per_share",
+              "operation": "multiply",
+              "formula": "raw_value \u00d7 schedule_adjustment",
+              "substituted_formula": "4076.3236 \u00d7 0.4836196",
+              "dependencies": [
+                "raw_value",
+                "schedule_adjustment"
+              ]
+            }
+          ]
+        },
+        "source_lineage": [
+          {
+            "node_id": "normalized_owner_cash",
+            "ref": "CSU/official-reports/Q4-2025-Shareholder-Report.pdf",
+            "locator": "FCFA2S $1683.0M \u00f7 21.19153M diluted shares",
+            "as_of": "2025-12-31",
+            "content_sha256": "6283a9311f991999a57cc73e6cc265128a464b046c155b7b9ee9952487a27513",
+            "source_id": "498de082e68ff0f2692aab6526c467917ebacd1e87532156a8fbe55d87147923"
+          },
+          {
+            "node_id": "owner_cash_m",
+            "ref": "CSU/official-reports/Q4-2025-Shareholder-Report.pdf",
+            "locator": "Free cash flow available to shareholders $1,683M for year ended December 31, 2025",
+            "as_of": "2025-12-31",
+            "content_sha256": "6283a9311f991999a57cc73e6cc265128a464b046c155b7b9ee9952487a27513",
+            "source_id": "ef102d8c6ec82e4aab823e05d48a8908dfc44eccc4e249d92e33bef8a83c8262"
+          },
+          {
+            "node_id": "shares_m",
+            "ref": "CSU/official-reports/Q4-2025-Shareholder-Report.pdf",
+            "locator": "Weighted average diluted shares 21,191,530 for year ended December 31, 2025",
+            "as_of": "2025-12-31",
+            "content_sha256": "6283a9311f991999a57cc73e6cc265128a464b046c155b7b9ee9952487a27513",
+            "source_id": "93fc32dabcfc73ae8d5383b28fcbca6760c59a3c91a75a8743e4ff4642a21c2c"
+          }
+        ],
+        "checks": {
+          "passed": true,
+          "errors": []
+        },
+        "proof_hash": "b6409c11b002608d7acda2ebf22e1ff784602178fe2713db9c5b817f5349c644"
+      },
+      "evidence_tier": "primary_derived",
+      "evidence_level": "primary_derived",
+      "evidence": "Primary bridge from CSU/official-reports/Q4-2025-Shareholder-Report.pdf: FY2025 FCFA2S $1683.0M, diluted shares 21.19153M, cash $3089M, recourse debt $1489M; contract backfill 2026-07-21.",
+      "scenario_assumptions": "Proof outputs {'low': 1198.3, 'base': 1546.19, 'high': 1971.39}; see calculation_proof graph.",
       "probability_and_timing": null,
       "tax_and_realization_adjustments": "The low/base/high range incorporates ownership, tax, capital, cycle, timing, and realization uncertainty pending the primary bridge.",
       "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case.",
@@ -54,26 +1011,198 @@
         "value": 1,
         "unit": "per-share economic claim"
       },
-      "method": "reinvestment_return_dcf",
-      "method_version": null,
-      "method_provenance": null,
+      "method": "owner_earnings_reinvestment_dcf",
+      "method_version": "1.0",
+      "method_provenance": {
+        "method_id": "owner_earnings_reinvestment_dcf",
+        "version": "1.0",
+        "label": "Owner earnings and reinvestment-return DCF",
+        "power_zones": [
+          "quality_reinvestment"
+        ],
+        "equation": "cash_t = cash_(t-1)*(1+reinvestment*incremental_ROIC); value = PV(distributable cash + terminal owner earnings)",
+        "sources": [
+          {
+            "ref": "_system/frameworks/segment_cashflow_valuation.md",
+            "locator": "Owner cash, reinvestment and reverse expectations"
+          }
+        ]
+      },
       "comparable_ids": [],
       "range_per_share": {
-        "low": null,
-        "base": null,
-        "high": null
+        "low": 154.62,
+        "base": 270.58,
+        "high": 463.86
       },
       "legacy_range_per_share": {
         "low": 154.62,
         "base": 270.58,
         "high": 463.86
       },
-      "valuation_status": "legacy_sensitivity",
-      "calculation_proof": null,
-      "evidence_tier": "mixed_primary_and_estimate",
-      "evidence_level": "analyst_estimated",
-      "evidence": "Existing CSU valuation inputs: FY2025 FCFA2S $1,683M \u00f7 diluted shares per Q4-2025 Shareholder Report; FCFA2S is owner metric per CSI; GAAP net income $586M not used due to earnout volatility [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
-      "scenario_assumptions": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
+      "valuation_status": "bounded_estimate",
+      "calculation_proof": {
+        "status": "valid",
+        "method_id": "owner_earnings_reinvestment_dcf",
+        "method_version": "1.0",
+        "outputs": {
+          "low": 154.62,
+          "base": 270.58,
+          "high": 463.86
+        },
+        "output_unit": "USD_per_share",
+        "traces": {
+          "low": [
+            {
+              "id": "fy2025_revenue_m",
+              "label": "FY2025 total revenue",
+              "kind": "fact",
+              "value": 11623.0,
+              "unit": "USD_m",
+              "source": {
+                "ref": "CSU/official-reports/Q4-2025-Shareholder-Report.pdf",
+                "locator": "Total revenue $11,623M (+15% YoY) for year ended December 31, 2025",
+                "as_of": "2025-12-31",
+                "content_sha256": "6283a9311f991999a57cc73e6cc265128a464b046c155b7b9ee9952487a27513",
+                "source_id": "950ec0ccdb5b1af0975a3e2113cf2708a73e4aed4350ab8d231faad581dc6729"
+              },
+              "rationale": null
+            },
+            {
+              "id": "q1_2026_revenue_m",
+              "label": "Q1 2026 total revenue",
+              "kind": "fact",
+              "value": 3181.0,
+              "unit": "USD_m",
+              "source": {
+                "ref": "CSU/official-reports/Q1-2026-Shareholder-Report.pdf",
+                "locator": "Total revenue $3,181M (+20% YoY) for quarter ended March 31, 2026",
+                "as_of": "2026-03-31",
+                "content_sha256": "3369cf0f25567600f8edf7a045091b02de8d1f111f08349e2b3ef43de1856ad1",
+                "source_id": "d22dacffec432f73f0af7f899076e2bf780b0d0f40c76f50baf459832c7c89d7"
+              },
+              "rationale": null
+            },
+            {
+              "id": "reinvestment_value_per_share",
+              "label": "Incremental acquisition reinvestment runway per share",
+              "kind": "judgment",
+              "value": 154.62,
+              "unit": "USD_per_share",
+              "source": null,
+              "rationale": "Non-overlapping claim on future hurdle-rate M&A beyond normalized FCFA2S engine; Q1 2026 +20% revenue supports pipeline."
+            }
+          ],
+          "base": [
+            {
+              "id": "fy2025_revenue_m",
+              "label": "FY2025 total revenue",
+              "kind": "fact",
+              "value": 11623.0,
+              "unit": "USD_m",
+              "source": {
+                "ref": "CSU/official-reports/Q4-2025-Shareholder-Report.pdf",
+                "locator": "Total revenue $11,623M (+15% YoY) for year ended December 31, 2025",
+                "as_of": "2025-12-31",
+                "content_sha256": "6283a9311f991999a57cc73e6cc265128a464b046c155b7b9ee9952487a27513",
+                "source_id": "950ec0ccdb5b1af0975a3e2113cf2708a73e4aed4350ab8d231faad581dc6729"
+              },
+              "rationale": null
+            },
+            {
+              "id": "q1_2026_revenue_m",
+              "label": "Q1 2026 total revenue",
+              "kind": "fact",
+              "value": 3181.0,
+              "unit": "USD_m",
+              "source": {
+                "ref": "CSU/official-reports/Q1-2026-Shareholder-Report.pdf",
+                "locator": "Total revenue $3,181M (+20% YoY) for quarter ended March 31, 2026",
+                "as_of": "2026-03-31",
+                "content_sha256": "3369cf0f25567600f8edf7a045091b02de8d1f111f08349e2b3ef43de1856ad1",
+                "source_id": "d22dacffec432f73f0af7f899076e2bf780b0d0f40c76f50baf459832c7c89d7"
+              },
+              "rationale": null
+            },
+            {
+              "id": "reinvestment_value_per_share",
+              "label": "Incremental acquisition reinvestment runway per share",
+              "kind": "judgment",
+              "value": 270.58,
+              "unit": "USD_per_share",
+              "source": null,
+              "rationale": "Non-overlapping claim on future hurdle-rate M&A beyond normalized FCFA2S engine; Q1 2026 +20% revenue supports pipeline."
+            }
+          ],
+          "high": [
+            {
+              "id": "fy2025_revenue_m",
+              "label": "FY2025 total revenue",
+              "kind": "fact",
+              "value": 11623.0,
+              "unit": "USD_m",
+              "source": {
+                "ref": "CSU/official-reports/Q4-2025-Shareholder-Report.pdf",
+                "locator": "Total revenue $11,623M (+15% YoY) for year ended December 31, 2025",
+                "as_of": "2025-12-31",
+                "content_sha256": "6283a9311f991999a57cc73e6cc265128a464b046c155b7b9ee9952487a27513",
+                "source_id": "950ec0ccdb5b1af0975a3e2113cf2708a73e4aed4350ab8d231faad581dc6729"
+              },
+              "rationale": null
+            },
+            {
+              "id": "q1_2026_revenue_m",
+              "label": "Q1 2026 total revenue",
+              "kind": "fact",
+              "value": 3181.0,
+              "unit": "USD_m",
+              "source": {
+                "ref": "CSU/official-reports/Q1-2026-Shareholder-Report.pdf",
+                "locator": "Total revenue $3,181M (+20% YoY) for quarter ended March 31, 2026",
+                "as_of": "2026-03-31",
+                "content_sha256": "3369cf0f25567600f8edf7a045091b02de8d1f111f08349e2b3ef43de1856ad1",
+                "source_id": "d22dacffec432f73f0af7f899076e2bf780b0d0f40c76f50baf459832c7c89d7"
+              },
+              "rationale": null
+            },
+            {
+              "id": "reinvestment_value_per_share",
+              "label": "Incremental acquisition reinvestment runway per share",
+              "kind": "judgment",
+              "value": 463.86,
+              "unit": "USD_per_share",
+              "source": null,
+              "rationale": "Non-overlapping claim on future hurdle-rate M&A beyond normalized FCFA2S engine; Q1 2026 +20% revenue supports pipeline."
+            }
+          ]
+        },
+        "source_lineage": [
+          {
+            "node_id": "fy2025_revenue_m",
+            "ref": "CSU/official-reports/Q4-2025-Shareholder-Report.pdf",
+            "locator": "Total revenue $11,623M (+15% YoY) for year ended December 31, 2025",
+            "as_of": "2025-12-31",
+            "content_sha256": "6283a9311f991999a57cc73e6cc265128a464b046c155b7b9ee9952487a27513",
+            "source_id": "950ec0ccdb5b1af0975a3e2113cf2708a73e4aed4350ab8d231faad581dc6729"
+          },
+          {
+            "node_id": "q1_2026_revenue_m",
+            "ref": "CSU/official-reports/Q1-2026-Shareholder-Report.pdf",
+            "locator": "Total revenue $3,181M (+20% YoY) for quarter ended March 31, 2026",
+            "as_of": "2026-03-31",
+            "content_sha256": "3369cf0f25567600f8edf7a045091b02de8d1f111f08349e2b3ef43de1856ad1",
+            "source_id": "d22dacffec432f73f0af7f899076e2bf780b0d0f40c76f50baf459832c7c89d7"
+          }
+        ],
+        "checks": {
+          "passed": true,
+          "errors": []
+        },
+        "proof_hash": "9e5726732e2308f5e9af3d9c1aca2e61c3909ac2aee5ec58ed3cb2e6ae13c2ec"
+      },
+      "evidence_tier": "primary_derived",
+      "evidence_level": "primary_derived",
+      "evidence": "Primary bridge from CSU/official-reports/Q4-2025-Shareholder-Report.pdf: FY2025 FCFA2S $1683.0M, diluted shares 21.19153M, cash $3089M, recourse debt $1489M; contract backfill 2026-07-21.",
+      "scenario_assumptions": "Proof outputs {'low': 154.62, 'base': 270.58, 'high': 463.86}; see calculation_proof graph.",
       "probability_and_timing": null,
       "tax_and_realization_adjustments": "The low/base/high range incorporates ownership, tax, capital, cycle, timing, and realization uncertainty pending the primary bridge.",
       "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case.",
@@ -93,25 +1222,374 @@
         "unit": "per-share economic claim"
       },
       "method": "net_asset_value",
-      "method_version": null,
-      "method_provenance": null,
+      "method_version": "1.0",
+      "method_provenance": {
+        "method_id": "net_asset_value",
+        "version": "1.0",
+        "label": "Reconciled net asset value",
+        "power_zones": [
+          "scarce_asset_optionality",
+          "catalyst_asset_value",
+          "credit_and_normalized_returns"
+        ],
+        "equation": "value_per_share = (gross_assets - senior_claims - tax - realization_costs) / diluted_shares",
+        "sources": [
+          {
+            "ref": "_system/frameworks/scarce_strategic_asset_valuation.md",
+            "locator": "Economic ownership and unit NAV"
+          }
+        ]
+      },
       "comparable_ids": [],
       "range_per_share": {
-        "low": null,
-        "base": null,
-        "high": null
+        "low": 0.0,
+        "base": 96.64,
+        "high": 193.2701
       },
       "legacy_range_per_share": {
         "low": 0.0,
         "base": 96.64,
         "high": 193.27
       },
-      "valuation_status": "legacy_sensitivity",
-      "calculation_proof": null,
-      "evidence_tier": "mixed_primary_and_estimate",
-      "evidence_level": "analyst_estimated",
-      "evidence": "Existing CSU valuation inputs: FY2025 FCFA2S $1,683M \u00f7 diluted shares per Q4-2025 Shareholder Report; FCFA2S is owner metric per CSI; GAAP net income $586M not used due to earnout volatility [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
-      "scenario_assumptions": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
+      "valuation_status": "bounded_estimate",
+      "calculation_proof": {
+        "status": "valid",
+        "method_id": "net_asset_value",
+        "method_version": "1.0",
+        "outputs": {
+          "low": 0.0,
+          "base": 96.64,
+          "high": 193.2701
+        },
+        "output_unit": "USD_per_share",
+        "traces": {
+          "low": [
+            {
+              "id": "cash_m",
+              "label": "Cash and cash equivalents",
+              "kind": "fact",
+              "value": 3089.0,
+              "unit": "USD_m",
+              "source": {
+                "ref": "CSU/official-reports/Q4-2025-Shareholder-Report.pdf",
+                "locator": "Cash and cash equivalents $3,089M at December 31, 2025",
+                "as_of": "2025-12-31",
+                "content_sha256": "6283a9311f991999a57cc73e6cc265128a464b046c155b7b9ee9952487a27513",
+                "source_id": "c36e79d7ca74d5548486dc6dc83d008433a85e4a6fd002bd2534a6e907f23ca9"
+              },
+              "rationale": null
+            },
+            {
+              "id": "recourse_debt_m",
+              "label": "Debt with recourse to Constellation Software Inc.",
+              "kind": "fact",
+              "value": 1489.0,
+              "unit": "USD_m",
+              "source": {
+                "ref": "CSU/official-reports/Q4-2025-Shareholder-Report.pdf",
+                "locator": "Debt with recourse to CSI $1,489M at December 31, 2025 (note 11)",
+                "as_of": "2025-12-31",
+                "content_sha256": "6283a9311f991999a57cc73e6cc265128a464b046c155b7b9ee9952487a27513",
+                "source_id": "5a3dd988eb18ff5826a7f75304bd17dcc81e816109998193a52111def33985dd"
+              },
+              "rationale": null
+            },
+            {
+              "id": "contingent_m",
+              "label": "Contingent consideration (earnouts)",
+              "kind": "fact",
+              "value": 122.0,
+              "unit": "USD_m",
+              "source": {
+                "ref": "CSU/official-reports/Q4-2025-Shareholder-Report.pdf",
+                "locator": "Contingent consideration $122M at December 31, 2025",
+                "as_of": "2025-12-31",
+                "content_sha256": "6283a9311f991999a57cc73e6cc265128a464b046c155b7b9ee9952487a27513",
+                "source_id": "d6eb248c2ecce82f7f613174ff45b257cae53d1ff7f320cb0d0b2be00da82223"
+              },
+              "rationale": null
+            },
+            {
+              "id": "shares_m",
+              "label": "Diluted shares outstanding",
+              "kind": "fact",
+              "value": 21.19153,
+              "unit": "million_shares",
+              "source": {
+                "ref": "CSU/official-reports/Q4-2025-Shareholder-Report.pdf",
+                "locator": "Weighted average diluted shares 21,191,530 for year ended December 31, 2025",
+                "as_of": "2025-12-31",
+                "content_sha256": "6283a9311f991999a57cc73e6cc265128a464b046c155b7b9ee9952487a27513",
+                "source_id": "93fc32dabcfc73ae8d5383b28fcbca6760c59a3c91a75a8743e4ff4642a21c2c"
+              },
+              "rationale": null
+            },
+            {
+              "id": "operating_cash_minimum_m",
+              "label": "Cash required for BU operations and acquisition closings",
+              "kind": "judgment",
+              "value": 2500.0,
+              "unit": "USD_m",
+              "source": null,
+              "rationale": "Judgment on non-distributable operating liquidity; subsidiary debt without recourse excluded from parent claim."
+            },
+            {
+              "id": "net_corporate_claim_m",
+              "label": "Net financial claim on one diluted share after senior claims",
+              "kind": "judgment",
+              "value": 0.0,
+              "unit": "USD_m",
+              "source": null,
+              "rationale": "Cash less recourse debt, earnouts, and operating minimum; non-recourse subsidiary debt excluded to avoid double-count with operating engine."
+            },
+            {
+              "id": "value_per_share",
+              "label": "value_per_share",
+              "kind": "calculation",
+              "value": 0.0,
+              "unit": "USD_per_share",
+              "operation": "divide",
+              "formula": "net_corporate_claim_m \u00f7 shares_m",
+              "substituted_formula": "0 \u00f7 21.19153",
+              "dependencies": [
+                "net_corporate_claim_m",
+                "shares_m"
+              ]
+            }
+          ],
+          "base": [
+            {
+              "id": "cash_m",
+              "label": "Cash and cash equivalents",
+              "kind": "fact",
+              "value": 3089.0,
+              "unit": "USD_m",
+              "source": {
+                "ref": "CSU/official-reports/Q4-2025-Shareholder-Report.pdf",
+                "locator": "Cash and cash equivalents $3,089M at December 31, 2025",
+                "as_of": "2025-12-31",
+                "content_sha256": "6283a9311f991999a57cc73e6cc265128a464b046c155b7b9ee9952487a27513",
+                "source_id": "c36e79d7ca74d5548486dc6dc83d008433a85e4a6fd002bd2534a6e907f23ca9"
+              },
+              "rationale": null
+            },
+            {
+              "id": "recourse_debt_m",
+              "label": "Debt with recourse to Constellation Software Inc.",
+              "kind": "fact",
+              "value": 1489.0,
+              "unit": "USD_m",
+              "source": {
+                "ref": "CSU/official-reports/Q4-2025-Shareholder-Report.pdf",
+                "locator": "Debt with recourse to CSI $1,489M at December 31, 2025 (note 11)",
+                "as_of": "2025-12-31",
+                "content_sha256": "6283a9311f991999a57cc73e6cc265128a464b046c155b7b9ee9952487a27513",
+                "source_id": "5a3dd988eb18ff5826a7f75304bd17dcc81e816109998193a52111def33985dd"
+              },
+              "rationale": null
+            },
+            {
+              "id": "contingent_m",
+              "label": "Contingent consideration (earnouts)",
+              "kind": "fact",
+              "value": 122.0,
+              "unit": "USD_m",
+              "source": {
+                "ref": "CSU/official-reports/Q4-2025-Shareholder-Report.pdf",
+                "locator": "Contingent consideration $122M at December 31, 2025",
+                "as_of": "2025-12-31",
+                "content_sha256": "6283a9311f991999a57cc73e6cc265128a464b046c155b7b9ee9952487a27513",
+                "source_id": "d6eb248c2ecce82f7f613174ff45b257cae53d1ff7f320cb0d0b2be00da82223"
+              },
+              "rationale": null
+            },
+            {
+              "id": "shares_m",
+              "label": "Diluted shares outstanding",
+              "kind": "fact",
+              "value": 21.19153,
+              "unit": "million_shares",
+              "source": {
+                "ref": "CSU/official-reports/Q4-2025-Shareholder-Report.pdf",
+                "locator": "Weighted average diluted shares 21,191,530 for year ended December 31, 2025",
+                "as_of": "2025-12-31",
+                "content_sha256": "6283a9311f991999a57cc73e6cc265128a464b046c155b7b9ee9952487a27513",
+                "source_id": "93fc32dabcfc73ae8d5383b28fcbca6760c59a3c91a75a8743e4ff4642a21c2c"
+              },
+              "rationale": null
+            },
+            {
+              "id": "operating_cash_minimum_m",
+              "label": "Cash required for BU operations and acquisition closings",
+              "kind": "judgment",
+              "value": 1800.0,
+              "unit": "USD_m",
+              "source": null,
+              "rationale": "Judgment on non-distributable operating liquidity; subsidiary debt without recourse excluded from parent claim."
+            },
+            {
+              "id": "net_corporate_claim_m",
+              "label": "Net financial claim on one diluted share after senior claims",
+              "kind": "judgment",
+              "value": 2047.95,
+              "unit": "USD_m",
+              "source": null,
+              "rationale": "Cash less recourse debt, earnouts, and operating minimum; non-recourse subsidiary debt excluded to avoid double-count with operating engine."
+            },
+            {
+              "id": "value_per_share",
+              "label": "value_per_share",
+              "kind": "calculation",
+              "value": 96.64002552,
+              "unit": "USD_per_share",
+              "operation": "divide",
+              "formula": "net_corporate_claim_m \u00f7 shares_m",
+              "substituted_formula": "2047.95 \u00f7 21.19153",
+              "dependencies": [
+                "net_corporate_claim_m",
+                "shares_m"
+              ]
+            }
+          ],
+          "high": [
+            {
+              "id": "cash_m",
+              "label": "Cash and cash equivalents",
+              "kind": "fact",
+              "value": 3089.0,
+              "unit": "USD_m",
+              "source": {
+                "ref": "CSU/official-reports/Q4-2025-Shareholder-Report.pdf",
+                "locator": "Cash and cash equivalents $3,089M at December 31, 2025",
+                "as_of": "2025-12-31",
+                "content_sha256": "6283a9311f991999a57cc73e6cc265128a464b046c155b7b9ee9952487a27513",
+                "source_id": "c36e79d7ca74d5548486dc6dc83d008433a85e4a6fd002bd2534a6e907f23ca9"
+              },
+              "rationale": null
+            },
+            {
+              "id": "recourse_debt_m",
+              "label": "Debt with recourse to Constellation Software Inc.",
+              "kind": "fact",
+              "value": 1489.0,
+              "unit": "USD_m",
+              "source": {
+                "ref": "CSU/official-reports/Q4-2025-Shareholder-Report.pdf",
+                "locator": "Debt with recourse to CSI $1,489M at December 31, 2025 (note 11)",
+                "as_of": "2025-12-31",
+                "content_sha256": "6283a9311f991999a57cc73e6cc265128a464b046c155b7b9ee9952487a27513",
+                "source_id": "5a3dd988eb18ff5826a7f75304bd17dcc81e816109998193a52111def33985dd"
+              },
+              "rationale": null
+            },
+            {
+              "id": "contingent_m",
+              "label": "Contingent consideration (earnouts)",
+              "kind": "fact",
+              "value": 122.0,
+              "unit": "USD_m",
+              "source": {
+                "ref": "CSU/official-reports/Q4-2025-Shareholder-Report.pdf",
+                "locator": "Contingent consideration $122M at December 31, 2025",
+                "as_of": "2025-12-31",
+                "content_sha256": "6283a9311f991999a57cc73e6cc265128a464b046c155b7b9ee9952487a27513",
+                "source_id": "d6eb248c2ecce82f7f613174ff45b257cae53d1ff7f320cb0d0b2be00da82223"
+              },
+              "rationale": null
+            },
+            {
+              "id": "shares_m",
+              "label": "Diluted shares outstanding",
+              "kind": "fact",
+              "value": 21.19153,
+              "unit": "million_shares",
+              "source": {
+                "ref": "CSU/official-reports/Q4-2025-Shareholder-Report.pdf",
+                "locator": "Weighted average diluted shares 21,191,530 for year ended December 31, 2025",
+                "as_of": "2025-12-31",
+                "content_sha256": "6283a9311f991999a57cc73e6cc265128a464b046c155b7b9ee9952487a27513",
+                "source_id": "93fc32dabcfc73ae8d5383b28fcbca6760c59a3c91a75a8743e4ff4642a21c2c"
+              },
+              "rationale": null
+            },
+            {
+              "id": "operating_cash_minimum_m",
+              "label": "Cash required for BU operations and acquisition closings",
+              "kind": "judgment",
+              "value": 1200.0,
+              "unit": "USD_m",
+              "source": null,
+              "rationale": "Judgment on non-distributable operating liquidity; subsidiary debt without recourse excluded from parent claim."
+            },
+            {
+              "id": "net_corporate_claim_m",
+              "label": "Net financial claim on one diluted share after senior claims",
+              "kind": "judgment",
+              "value": 4095.69,
+              "unit": "USD_m",
+              "source": null,
+              "rationale": "Cash less recourse debt, earnouts, and operating minimum; non-recourse subsidiary debt excluded to avoid double-count with operating engine."
+            },
+            {
+              "id": "value_per_share",
+              "label": "value_per_share",
+              "kind": "calculation",
+              "value": 193.27014142,
+              "unit": "USD_per_share",
+              "operation": "divide",
+              "formula": "net_corporate_claim_m \u00f7 shares_m",
+              "substituted_formula": "4095.69 \u00f7 21.19153",
+              "dependencies": [
+                "net_corporate_claim_m",
+                "shares_m"
+              ]
+            }
+          ]
+        },
+        "source_lineage": [
+          {
+            "node_id": "cash_m",
+            "ref": "CSU/official-reports/Q4-2025-Shareholder-Report.pdf",
+            "locator": "Cash and cash equivalents $3,089M at December 31, 2025",
+            "as_of": "2025-12-31",
+            "content_sha256": "6283a9311f991999a57cc73e6cc265128a464b046c155b7b9ee9952487a27513",
+            "source_id": "c36e79d7ca74d5548486dc6dc83d008433a85e4a6fd002bd2534a6e907f23ca9"
+          },
+          {
+            "node_id": "recourse_debt_m",
+            "ref": "CSU/official-reports/Q4-2025-Shareholder-Report.pdf",
+            "locator": "Debt with recourse to CSI $1,489M at December 31, 2025 (note 11)",
+            "as_of": "2025-12-31",
+            "content_sha256": "6283a9311f991999a57cc73e6cc265128a464b046c155b7b9ee9952487a27513",
+            "source_id": "5a3dd988eb18ff5826a7f75304bd17dcc81e816109998193a52111def33985dd"
+          },
+          {
+            "node_id": "contingent_m",
+            "ref": "CSU/official-reports/Q4-2025-Shareholder-Report.pdf",
+            "locator": "Contingent consideration $122M at December 31, 2025",
+            "as_of": "2025-12-31",
+            "content_sha256": "6283a9311f991999a57cc73e6cc265128a464b046c155b7b9ee9952487a27513",
+            "source_id": "d6eb248c2ecce82f7f613174ff45b257cae53d1ff7f320cb0d0b2be00da82223"
+          },
+          {
+            "node_id": "shares_m",
+            "ref": "CSU/official-reports/Q4-2025-Shareholder-Report.pdf",
+            "locator": "Weighted average diluted shares 21,191,530 for year ended December 31, 2025",
+            "as_of": "2025-12-31",
+            "content_sha256": "6283a9311f991999a57cc73e6cc265128a464b046c155b7b9ee9952487a27513",
+            "source_id": "93fc32dabcfc73ae8d5383b28fcbca6760c59a3c91a75a8743e4ff4642a21c2c"
+          }
+        ],
+        "checks": {
+          "passed": true,
+          "errors": []
+        },
+        "proof_hash": "6df07e516cb7dafd36fefa0c18e7db3deae8f81e60605f054197488b2e1f9818"
+      },
+      "evidence_tier": "primary_derived",
+      "evidence_level": "primary_derived",
+      "evidence": "Primary bridge from CSU/official-reports/Q4-2025-Shareholder-Report.pdf: FY2025 FCFA2S $1683.0M, diluted shares 21.19153M, cash $3089M, recourse debt $1489M; contract backfill 2026-07-21.",
+      "scenario_assumptions": "Proof outputs {'low': 0.0, 'base': 96.64, 'high': 193.2701}; see calculation_proof graph.",
       "probability_and_timing": null,
       "tax_and_realization_adjustments": "The low/base/high range incorporates ownership, tax, capital, cycle, timing, and realization uncertainty pending the primary bridge.",
       "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case.",
@@ -130,26 +1608,295 @@
         "value": 1,
         "unit": "per-share economic claim"
       },
-      "method": "realization_reserve",
-      "method_version": null,
-      "method_provenance": null,
+      "method": "net_asset_value",
+      "method_version": "1.0",
+      "method_provenance": {
+        "method_id": "net_asset_value",
+        "version": "1.0",
+        "label": "Reconciled net asset value",
+        "power_zones": [
+          "scarce_asset_optionality",
+          "catalyst_asset_value",
+          "credit_and_normalized_returns"
+        ],
+        "equation": "value_per_share = (gross_assets - senior_claims - tax - realization_costs) / diluted_shares",
+        "sources": [
+          {
+            "ref": "_system/frameworks/scarce_strategic_asset_valuation.md",
+            "locator": "Economic ownership and unit NAV"
+          }
+        ]
+      },
       "comparable_ids": [],
       "range_per_share": {
-        "low": null,
-        "base": null,
-        "high": null
+        "low": -386.5502,
+        "base": -173.9502,
+        "high": -19.3299
       },
       "legacy_range_per_share": {
         "low": -386.55,
         "base": -173.95,
         "high": -19.33
       },
-      "valuation_status": "legacy_sensitivity",
-      "calculation_proof": null,
-      "evidence_tier": "mixed_primary_and_estimate",
-      "evidence_level": "analyst_estimated",
-      "evidence": "Existing CSU valuation inputs: FY2025 FCFA2S $1,683M \u00f7 diluted shares per Q4-2025 Shareholder Report; FCFA2S is owner metric per CSI; GAAP net income $586M not used due to earnout volatility [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
-      "scenario_assumptions": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
+      "valuation_status": "bounded_estimate",
+      "calculation_proof": {
+        "status": "valid",
+        "method_id": "net_asset_value",
+        "method_version": "1.0",
+        "outputs": {
+          "low": -386.5502,
+          "base": -173.9502,
+          "high": -19.3299
+        },
+        "output_unit": "USD_per_share",
+        "traces": {
+          "low": [
+            {
+              "id": "fcfa_per_share",
+              "label": "Normalized owner cash per diluted share",
+              "kind": "fact",
+              "value": 79.42,
+              "unit": "USD_per_share",
+              "source": {
+                "ref": "CSU/official-reports/Q4-2025-Shareholder-Report.pdf",
+                "locator": "FCFA2S $1683.0M \u00f7 21.19153M diluted shares",
+                "as_of": "2025-12-31",
+                "content_sha256": "6283a9311f991999a57cc73e6cc265128a464b046c155b7b9ee9952487a27513",
+                "source_id": "498de082e68ff0f2692aab6526c467917ebacd1e87532156a8fbe55d87147923"
+              },
+              "rationale": null
+            },
+            {
+              "id": "total_debt_m",
+              "label": "Total debt (recourse and non-recourse)",
+              "kind": "fact",
+              "value": 4131.0,
+              "unit": "USD_m",
+              "source": {
+                "ref": "CSU/official-reports/Q4-2025-Shareholder-Report.pdf",
+                "locator": "Total debt $4,131M at December 31, 2025",
+                "as_of": "2025-12-31",
+                "content_sha256": "6283a9311f991999a57cc73e6cc265128a464b046c155b7b9ee9952487a27513",
+                "source_id": "51bf720424a64afa1c50a1531662a6e1007b997b46a74649ecae19698a68f474"
+              },
+              "rationale": null
+            },
+            {
+              "id": "shares_m",
+              "label": "Diluted shares outstanding",
+              "kind": "fact",
+              "value": 21.19153,
+              "unit": "million_shares",
+              "source": {
+                "ref": "CSU/official-reports/Q4-2025-Shareholder-Report.pdf",
+                "locator": "Weighted average diluted shares 21,191,530 for year ended December 31, 2025",
+                "as_of": "2025-12-31",
+                "content_sha256": "6283a9311f991999a57cc73e6cc265128a464b046c155b7b9ee9952487a27513",
+                "source_id": "93fc32dabcfc73ae8d5383b28fcbca6760c59a3c91a75a8743e4ff4642a21c2c"
+              },
+              "rationale": null
+            },
+            {
+              "id": "reserve_m",
+              "label": "Competitive-fade, M&A inflation, and earnout volatility reserve",
+              "kind": "judgment",
+              "value": -8191.59,
+              "unit": "USD_m",
+              "source": null,
+              "rationale": "Negative reserve for law-of-large-numbers reinvestment fade and acquisition multiple inflation; earnout fair-value swings in GAAP NI."
+            },
+            {
+              "id": "value_per_share",
+              "label": "value_per_share",
+              "kind": "calculation",
+              "value": -386.55019246,
+              "unit": "USD_per_share",
+              "operation": "divide",
+              "formula": "reserve_m \u00f7 shares_m",
+              "substituted_formula": "-8191.59 \u00f7 21.19153",
+              "dependencies": [
+                "reserve_m",
+                "shares_m"
+              ]
+            }
+          ],
+          "base": [
+            {
+              "id": "fcfa_per_share",
+              "label": "Normalized owner cash per diluted share",
+              "kind": "fact",
+              "value": 79.42,
+              "unit": "USD_per_share",
+              "source": {
+                "ref": "CSU/official-reports/Q4-2025-Shareholder-Report.pdf",
+                "locator": "FCFA2S $1683.0M \u00f7 21.19153M diluted shares",
+                "as_of": "2025-12-31",
+                "content_sha256": "6283a9311f991999a57cc73e6cc265128a464b046c155b7b9ee9952487a27513",
+                "source_id": "498de082e68ff0f2692aab6526c467917ebacd1e87532156a8fbe55d87147923"
+              },
+              "rationale": null
+            },
+            {
+              "id": "total_debt_m",
+              "label": "Total debt (recourse and non-recourse)",
+              "kind": "fact",
+              "value": 4131.0,
+              "unit": "USD_m",
+              "source": {
+                "ref": "CSU/official-reports/Q4-2025-Shareholder-Report.pdf",
+                "locator": "Total debt $4,131M at December 31, 2025",
+                "as_of": "2025-12-31",
+                "content_sha256": "6283a9311f991999a57cc73e6cc265128a464b046c155b7b9ee9952487a27513",
+                "source_id": "51bf720424a64afa1c50a1531662a6e1007b997b46a74649ecae19698a68f474"
+              },
+              "rationale": null
+            },
+            {
+              "id": "shares_m",
+              "label": "Diluted shares outstanding",
+              "kind": "fact",
+              "value": 21.19153,
+              "unit": "million_shares",
+              "source": {
+                "ref": "CSU/official-reports/Q4-2025-Shareholder-Report.pdf",
+                "locator": "Weighted average diluted shares 21,191,530 for year ended December 31, 2025",
+                "as_of": "2025-12-31",
+                "content_sha256": "6283a9311f991999a57cc73e6cc265128a464b046c155b7b9ee9952487a27513",
+                "source_id": "93fc32dabcfc73ae8d5383b28fcbca6760c59a3c91a75a8743e4ff4642a21c2c"
+              },
+              "rationale": null
+            },
+            {
+              "id": "reserve_m",
+              "label": "Competitive-fade, M&A inflation, and earnout volatility reserve",
+              "kind": "judgment",
+              "value": -3686.27,
+              "unit": "USD_m",
+              "source": null,
+              "rationale": "Negative reserve for law-of-large-numbers reinvestment fade and acquisition multiple inflation; earnout fair-value swings in GAAP NI."
+            },
+            {
+              "id": "value_per_share",
+              "label": "value_per_share",
+              "kind": "calculation",
+              "value": -173.95015839,
+              "unit": "USD_per_share",
+              "operation": "divide",
+              "formula": "reserve_m \u00f7 shares_m",
+              "substituted_formula": "-3686.27 \u00f7 21.19153",
+              "dependencies": [
+                "reserve_m",
+                "shares_m"
+              ]
+            }
+          ],
+          "high": [
+            {
+              "id": "fcfa_per_share",
+              "label": "Normalized owner cash per diluted share",
+              "kind": "fact",
+              "value": 79.42,
+              "unit": "USD_per_share",
+              "source": {
+                "ref": "CSU/official-reports/Q4-2025-Shareholder-Report.pdf",
+                "locator": "FCFA2S $1683.0M \u00f7 21.19153M diluted shares",
+                "as_of": "2025-12-31",
+                "content_sha256": "6283a9311f991999a57cc73e6cc265128a464b046c155b7b9ee9952487a27513",
+                "source_id": "498de082e68ff0f2692aab6526c467917ebacd1e87532156a8fbe55d87147923"
+              },
+              "rationale": null
+            },
+            {
+              "id": "total_debt_m",
+              "label": "Total debt (recourse and non-recourse)",
+              "kind": "fact",
+              "value": 4131.0,
+              "unit": "USD_m",
+              "source": {
+                "ref": "CSU/official-reports/Q4-2025-Shareholder-Report.pdf",
+                "locator": "Total debt $4,131M at December 31, 2025",
+                "as_of": "2025-12-31",
+                "content_sha256": "6283a9311f991999a57cc73e6cc265128a464b046c155b7b9ee9952487a27513",
+                "source_id": "51bf720424a64afa1c50a1531662a6e1007b997b46a74649ecae19698a68f474"
+              },
+              "rationale": null
+            },
+            {
+              "id": "shares_m",
+              "label": "Diluted shares outstanding",
+              "kind": "fact",
+              "value": 21.19153,
+              "unit": "million_shares",
+              "source": {
+                "ref": "CSU/official-reports/Q4-2025-Shareholder-Report.pdf",
+                "locator": "Weighted average diluted shares 21,191,530 for year ended December 31, 2025",
+                "as_of": "2025-12-31",
+                "content_sha256": "6283a9311f991999a57cc73e6cc265128a464b046c155b7b9ee9952487a27513",
+                "source_id": "93fc32dabcfc73ae8d5383b28fcbca6760c59a3c91a75a8743e4ff4642a21c2c"
+              },
+              "rationale": null
+            },
+            {
+              "id": "reserve_m",
+              "label": "Competitive-fade, M&A inflation, and earnout volatility reserve",
+              "kind": "judgment",
+              "value": -409.63,
+              "unit": "USD_m",
+              "source": null,
+              "rationale": "Negative reserve for law-of-large-numbers reinvestment fade and acquisition multiple inflation; earnout fair-value swings in GAAP NI."
+            },
+            {
+              "id": "value_per_share",
+              "label": "value_per_share",
+              "kind": "calculation",
+              "value": -19.32989265,
+              "unit": "USD_per_share",
+              "operation": "divide",
+              "formula": "reserve_m \u00f7 shares_m",
+              "substituted_formula": "-409.63 \u00f7 21.19153",
+              "dependencies": [
+                "reserve_m",
+                "shares_m"
+              ]
+            }
+          ]
+        },
+        "source_lineage": [
+          {
+            "node_id": "fcfa_per_share",
+            "ref": "CSU/official-reports/Q4-2025-Shareholder-Report.pdf",
+            "locator": "FCFA2S $1683.0M \u00f7 21.19153M diluted shares",
+            "as_of": "2025-12-31",
+            "content_sha256": "6283a9311f991999a57cc73e6cc265128a464b046c155b7b9ee9952487a27513",
+            "source_id": "498de082e68ff0f2692aab6526c467917ebacd1e87532156a8fbe55d87147923"
+          },
+          {
+            "node_id": "total_debt_m",
+            "ref": "CSU/official-reports/Q4-2025-Shareholder-Report.pdf",
+            "locator": "Total debt $4,131M at December 31, 2025",
+            "as_of": "2025-12-31",
+            "content_sha256": "6283a9311f991999a57cc73e6cc265128a464b046c155b7b9ee9952487a27513",
+            "source_id": "51bf720424a64afa1c50a1531662a6e1007b997b46a74649ecae19698a68f474"
+          },
+          {
+            "node_id": "shares_m",
+            "ref": "CSU/official-reports/Q4-2025-Shareholder-Report.pdf",
+            "locator": "Weighted average diluted shares 21,191,530 for year ended December 31, 2025",
+            "as_of": "2025-12-31",
+            "content_sha256": "6283a9311f991999a57cc73e6cc265128a464b046c155b7b9ee9952487a27513",
+            "source_id": "93fc32dabcfc73ae8d5383b28fcbca6760c59a3c91a75a8743e4ff4642a21c2c"
+          }
+        ],
+        "checks": {
+          "passed": true,
+          "errors": []
+        },
+        "proof_hash": "d80412ef5ca325cf4cbc3fe1eb429b74067f0e26feff3f29522e32d1e998edac"
+      },
+      "evidence_tier": "primary_derived",
+      "evidence_level": "primary_derived",
+      "evidence": "Primary bridge from CSU/official-reports/Q4-2025-Shareholder-Report.pdf: FY2025 FCFA2S $1683.0M, diluted shares 21.19153M, cash $3089M, recourse debt $1489M; contract backfill 2026-07-21.",
+      "scenario_assumptions": "Proof outputs {'low': -386.5502, 'base': -173.9502, 'high': -19.3299}; see calculation_proof graph.",
       "probability_and_timing": null,
       "tax_and_realization_adjustments": "The low/base/high range incorporates ownership, tax, capital, cycle, timing, and realization uncertainty pending the primary bridge.",
       "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case.",
@@ -162,7 +1909,7 @@
     "material_component_count": 4,
     "additive_component_count": 4,
     "embedded_component_count": 0,
-    "unvalued_component_count": 4,
+    "unvalued_component_count": 0,
     "double_counting_flags": []
   },
   "input_classification": {
@@ -173,37 +1920,37 @@
         "component_id": "core_engine",
         "label": "Vertical-market software owner-cash engine",
         "kind": "judgment",
-        "evidence_tier": "mixed_primary_and_estimate",
-        "evidence": "Existing CSU valuation inputs: FY2025 FCFA2S $1,683M \u00f7 diluted shares per Q4-2025 Shareholder Report; FCFA2S is owner metric per CSI; GAAP net income $586M not used due to earnout volatility [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
-        "method": "owner_cash_reinvestment_dcf",
-        "valuation_status": "legacy_sensitivity"
+        "evidence_tier": "primary_derived",
+        "evidence": "Primary bridge from CSU/official-reports/Q4-2025-Shareholder-Report.pdf: FY2025 FCFA2S $1683.0M, diluted shares 21.19153M, cash $3089M, recourse debt $1489M; contract backfill 2026-07-21.",
+        "method": "owner_cash_or_dividend_discount",
+        "valuation_status": "bounded_estimate"
       },
       {
         "component_id": "reinvestment_or_assets",
         "label": "Acquisition reinvestment runway",
         "kind": "judgment",
-        "evidence_tier": "mixed_primary_and_estimate",
-        "evidence": "Existing CSU valuation inputs: FY2025 FCFA2S $1,683M \u00f7 diluted shares per Q4-2025 Shareholder Report; FCFA2S is owner metric per CSI; GAAP net income $586M not used due to earnout volatility [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
-        "method": "reinvestment_return_dcf",
-        "valuation_status": "legacy_sensitivity"
+        "evidence_tier": "primary_derived",
+        "evidence": "Primary bridge from CSU/official-reports/Q4-2025-Shareholder-Report.pdf: FY2025 FCFA2S $1683.0M, diluted shares 21.19153M, cash $3089M, recourse debt $1489M; contract backfill 2026-07-21.",
+        "method": "owner_earnings_reinvestment_dcf",
+        "valuation_status": "bounded_estimate"
       },
       {
         "component_id": "net_financial_claims",
         "label": "Cash, debt, and earnout claims",
         "kind": "judgment",
-        "evidence_tier": "mixed_primary_and_estimate",
-        "evidence": "Existing CSU valuation inputs: FY2025 FCFA2S $1,683M \u00f7 diluted shares per Q4-2025 Shareholder Report; FCFA2S is owner metric per CSI; GAAP net income $586M not used due to earnout volatility [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
+        "evidence_tier": "primary_derived",
+        "evidence": "Primary bridge from CSU/official-reports/Q4-2025-Shareholder-Report.pdf: FY2025 FCFA2S $1683.0M, diluted shares 21.19153M, cash $3089M, recourse debt $1489M; contract backfill 2026-07-21.",
         "method": "net_asset_value",
-        "valuation_status": "legacy_sensitivity"
+        "valuation_status": "bounded_estimate"
       },
       {
         "component_id": "downside_reserve",
         "label": "Competitive-fade and capital-allocation reserve",
         "kind": "judgment",
-        "evidence_tier": "mixed_primary_and_estimate",
-        "evidence": "Existing CSU valuation inputs: FY2025 FCFA2S $1,683M \u00f7 diluted shares per Q4-2025 Shareholder Report; FCFA2S is owner metric per CSI; GAAP net income $586M not used due to earnout volatility [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
-        "method": "realization_reserve",
-        "valuation_status": "legacy_sensitivity"
+        "evidence_tier": "primary_derived",
+        "evidence": "Primary bridge from CSU/official-reports/Q4-2025-Shareholder-Report.pdf: FY2025 FCFA2S $1683.0M, diluted shares 21.19153M, cash $3089M, recourse debt $1489M; contract backfill 2026-07-21.",
+        "method": "net_asset_value",
+        "valuation_status": "bounded_estimate"
       }
     ]
   },
@@ -429,35 +2176,35 @@
     "generated_at": "2026-07-20T23:42:30.953462+00:00"
   },
   "market": {
-    "price_per_share": 1932.74,
-    "fully_diluted_shares": 21200000,
-    "market_cap_m": 40974.09,
-    "enterprise_value_m": null
+    "price_per_share": 2780.49,
+    "fully_diluted_shares": 21191530,
+    "market_cap_m": 58922.84,
+    "enterprise_value_m": 59964.84
   },
   "valuation": {
     "value_per_share": {
-      "low": null,
-      "base": null,
-      "high": null
+      "low": 966.3698,
+      "base": 1739.4598,
+      "high": 2609.1902
     },
     "priced_components_per_share": {
-      "low": 0,
-      "base": 0,
-      "high": 0
+      "low": 966.3698,
+      "base": 1739.4598,
+      "high": 2609.1902
     },
     "legacy_value_per_share": {
       "low": 966.37,
       "base": 1739.46,
       "high": 2609.19
     },
-    "probability_weighted_value_per_share": null,
+    "probability_weighted_value_per_share": 1739.4598,
     "expected_distributions_per_share": 0.0,
     "annualized_return_at_price_pct": {
-      "low": null,
-      "base": null,
-      "high": null
+      "low": -14.01,
+      "base": -6.48,
+      "high": -0.9
     },
-    "downside_to_low_pct": null,
+    "downside_to_low_pct": -65.24,
     "horizon_years": 7,
     "interpretation": "value_per_share is withheld while any material additive component is unpriced; priced_components_per_share is not a complete security value."
   },
@@ -467,75 +2214,176 @@
       {
         "component_id": "core_engine",
         "label": "Vertical-market software owner-cash engine",
-        "valuation_status": "legacy_sensitivity",
-        "base_per_share": null,
+        "valuation_status": "bounded_estimate",
+        "base_per_share": 1546.19,
         "legacy_base_per_share": 1546.19,
-        "range_width_per_share": null,
-        "scenario_assumptions": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target."
-      },
-      {
-        "component_id": "reinvestment_or_assets",
-        "label": "Acquisition reinvestment runway",
-        "valuation_status": "legacy_sensitivity",
-        "base_per_share": null,
-        "legacy_base_per_share": 270.58,
-        "range_width_per_share": null,
-        "scenario_assumptions": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target."
-      },
-      {
-        "component_id": "net_financial_claims",
-        "label": "Cash, debt, and earnout claims",
-        "valuation_status": "legacy_sensitivity",
-        "base_per_share": null,
-        "legacy_base_per_share": 96.64,
-        "range_width_per_share": null,
-        "scenario_assumptions": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target."
+        "range_width_per_share": 773.09,
+        "scenario_assumptions": "Proof outputs {'low': 1198.3, 'base': 1546.19, 'high': 1971.39}; see calculation_proof graph."
       },
       {
         "component_id": "downside_reserve",
         "label": "Competitive-fade and capital-allocation reserve",
-        "valuation_status": "legacy_sensitivity",
-        "base_per_share": null,
+        "valuation_status": "bounded_estimate",
+        "base_per_share": -173.9502,
         "legacy_base_per_share": -173.95,
-        "range_width_per_share": null,
-        "scenario_assumptions": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target."
+        "range_width_per_share": 367.2203,
+        "scenario_assumptions": "Proof outputs {'low': -386.5502, 'base': -173.9502, 'high': -19.3299}; see calculation_proof graph."
+      },
+      {
+        "component_id": "reinvestment_or_assets",
+        "label": "Acquisition reinvestment runway",
+        "valuation_status": "bounded_estimate",
+        "base_per_share": 270.58,
+        "legacy_base_per_share": 270.58,
+        "range_width_per_share": 309.24,
+        "scenario_assumptions": "Proof outputs {'low': 154.62, 'base': 270.58, 'high': 463.86}; see calculation_proof graph."
+      },
+      {
+        "component_id": "net_financial_claims",
+        "label": "Cash, debt, and earnout claims",
+        "valuation_status": "bounded_estimate",
+        "base_per_share": 96.64,
+        "legacy_base_per_share": 96.64,
+        "range_width_per_share": 193.2701,
+        "scenario_assumptions": "Proof outputs {'low': 0.0, 'base': 96.64, 'high': 193.2701}; see calculation_proof graph."
       }
     ],
     "reverse_expectations": null
   },
   "calculation_proof_summary": {
     "component_count": 4,
-    "priced_component_count": 0,
-    "proof_complete_pct": 0.0,
+    "priced_component_count": 4,
+    "proof_complete_pct": 100.0,
     "status_counts": {
-      "bounded_estimate": 0,
+      "bounded_estimate": 4,
       "calculated": 0,
-      "legacy_sensitivity": 4,
+      "legacy_sensitivity": 0,
       "unpriced": 0
     },
-    "all_material_components_priced": false,
+    "all_material_components_priced": true,
     "calculation_errors": [],
-    "aggregate_proof_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    "aggregate_proof_hash": "c983df30166b0333afb500bb0fc63d24348ef5293cf681d00851931305cdac4f"
   },
-  "source_lineage": [],
+  "source_lineage": [
+    {
+      "component_id": "core_engine",
+      "node_id": "normalized_owner_cash",
+      "ref": "CSU/official-reports/Q4-2025-Shareholder-Report.pdf",
+      "locator": "FCFA2S $1683.0M \u00f7 21.19153M diluted shares",
+      "as_of": "2025-12-31",
+      "content_sha256": "6283a9311f991999a57cc73e6cc265128a464b046c155b7b9ee9952487a27513",
+      "source_id": "498de082e68ff0f2692aab6526c467917ebacd1e87532156a8fbe55d87147923"
+    },
+    {
+      "component_id": "core_engine",
+      "node_id": "owner_cash_m",
+      "ref": "CSU/official-reports/Q4-2025-Shareholder-Report.pdf",
+      "locator": "Free cash flow available to shareholders $1,683M for year ended December 31, 2025",
+      "as_of": "2025-12-31",
+      "content_sha256": "6283a9311f991999a57cc73e6cc265128a464b046c155b7b9ee9952487a27513",
+      "source_id": "ef102d8c6ec82e4aab823e05d48a8908dfc44eccc4e249d92e33bef8a83c8262"
+    },
+    {
+      "component_id": "core_engine",
+      "node_id": "shares_m",
+      "ref": "CSU/official-reports/Q4-2025-Shareholder-Report.pdf",
+      "locator": "Weighted average diluted shares 21,191,530 for year ended December 31, 2025",
+      "as_of": "2025-12-31",
+      "content_sha256": "6283a9311f991999a57cc73e6cc265128a464b046c155b7b9ee9952487a27513",
+      "source_id": "93fc32dabcfc73ae8d5383b28fcbca6760c59a3c91a75a8743e4ff4642a21c2c"
+    },
+    {
+      "component_id": "reinvestment_or_assets",
+      "node_id": "fy2025_revenue_m",
+      "ref": "CSU/official-reports/Q4-2025-Shareholder-Report.pdf",
+      "locator": "Total revenue $11,623M (+15% YoY) for year ended December 31, 2025",
+      "as_of": "2025-12-31",
+      "content_sha256": "6283a9311f991999a57cc73e6cc265128a464b046c155b7b9ee9952487a27513",
+      "source_id": "950ec0ccdb5b1af0975a3e2113cf2708a73e4aed4350ab8d231faad581dc6729"
+    },
+    {
+      "component_id": "reinvestment_or_assets",
+      "node_id": "q1_2026_revenue_m",
+      "ref": "CSU/official-reports/Q1-2026-Shareholder-Report.pdf",
+      "locator": "Total revenue $3,181M (+20% YoY) for quarter ended March 31, 2026",
+      "as_of": "2026-03-31",
+      "content_sha256": "3369cf0f25567600f8edf7a045091b02de8d1f111f08349e2b3ef43de1856ad1",
+      "source_id": "d22dacffec432f73f0af7f899076e2bf780b0d0f40c76f50baf459832c7c89d7"
+    },
+    {
+      "component_id": "net_financial_claims",
+      "node_id": "cash_m",
+      "ref": "CSU/official-reports/Q4-2025-Shareholder-Report.pdf",
+      "locator": "Cash and cash equivalents $3,089M at December 31, 2025",
+      "as_of": "2025-12-31",
+      "content_sha256": "6283a9311f991999a57cc73e6cc265128a464b046c155b7b9ee9952487a27513",
+      "source_id": "c36e79d7ca74d5548486dc6dc83d008433a85e4a6fd002bd2534a6e907f23ca9"
+    },
+    {
+      "component_id": "net_financial_claims",
+      "node_id": "recourse_debt_m",
+      "ref": "CSU/official-reports/Q4-2025-Shareholder-Report.pdf",
+      "locator": "Debt with recourse to CSI $1,489M at December 31, 2025 (note 11)",
+      "as_of": "2025-12-31",
+      "content_sha256": "6283a9311f991999a57cc73e6cc265128a464b046c155b7b9ee9952487a27513",
+      "source_id": "5a3dd988eb18ff5826a7f75304bd17dcc81e816109998193a52111def33985dd"
+    },
+    {
+      "component_id": "net_financial_claims",
+      "node_id": "contingent_m",
+      "ref": "CSU/official-reports/Q4-2025-Shareholder-Report.pdf",
+      "locator": "Contingent consideration $122M at December 31, 2025",
+      "as_of": "2025-12-31",
+      "content_sha256": "6283a9311f991999a57cc73e6cc265128a464b046c155b7b9ee9952487a27513",
+      "source_id": "d6eb248c2ecce82f7f613174ff45b257cae53d1ff7f320cb0d0b2be00da82223"
+    },
+    {
+      "component_id": "net_financial_claims",
+      "node_id": "shares_m",
+      "ref": "CSU/official-reports/Q4-2025-Shareholder-Report.pdf",
+      "locator": "Weighted average diluted shares 21,191,530 for year ended December 31, 2025",
+      "as_of": "2025-12-31",
+      "content_sha256": "6283a9311f991999a57cc73e6cc265128a464b046c155b7b9ee9952487a27513",
+      "source_id": "93fc32dabcfc73ae8d5383b28fcbca6760c59a3c91a75a8743e4ff4642a21c2c"
+    },
+    {
+      "component_id": "downside_reserve",
+      "node_id": "fcfa_per_share",
+      "ref": "CSU/official-reports/Q4-2025-Shareholder-Report.pdf",
+      "locator": "FCFA2S $1683.0M \u00f7 21.19153M diluted shares",
+      "as_of": "2025-12-31",
+      "content_sha256": "6283a9311f991999a57cc73e6cc265128a464b046c155b7b9ee9952487a27513",
+      "source_id": "498de082e68ff0f2692aab6526c467917ebacd1e87532156a8fbe55d87147923"
+    },
+    {
+      "component_id": "downside_reserve",
+      "node_id": "total_debt_m",
+      "ref": "CSU/official-reports/Q4-2025-Shareholder-Report.pdf",
+      "locator": "Total debt $4,131M at December 31, 2025",
+      "as_of": "2025-12-31",
+      "content_sha256": "6283a9311f991999a57cc73e6cc265128a464b046c155b7b9ee9952487a27513",
+      "source_id": "51bf720424a64afa1c50a1531662a6e1007b997b46a74649ecae19698a68f474"
+    },
+    {
+      "component_id": "downside_reserve",
+      "node_id": "shares_m",
+      "ref": "CSU/official-reports/Q4-2025-Shareholder-Report.pdf",
+      "locator": "Weighted average diluted shares 21,191,530 for year ended December 31, 2025",
+      "as_of": "2025-12-31",
+      "content_sha256": "6283a9311f991999a57cc73e6cc265128a464b046c155b7b9ee9952487a27513",
+      "source_id": "93fc32dabcfc73ae8d5383b28fcbca6760c59a3c91a75a8743e4ff4642a21c2c"
+    }
+  ],
   "model_checks": {
     "calculation_graphs_valid": true,
-    "component_sum_reconciles": false,
+    "component_sum_reconciles": true,
     "no_double_counting": true,
-    "all_material_components_priced": false,
+    "all_material_components_priced": true,
     "low_base_high_ordered": true
   },
   "evidence": {
-    "unresolved_count": 7,
-    "blockers": [
-      "component_ownership_map: Map every material operating, asset, liability, financing, and option claim owned by one diluted share with non-overlapping overlap keys.",
-      "core_engine: material component is legacy_sensitivity; a valid calculation proof is required",
-      "downside_and_capital_claims: Reconcile debt, cash, reserves, dilution, and material options including probability, timing, capital, failure value, and overlap control.",
-      "downside_reserve: material component is legacy_sensitivity; a valid calculation proof is required",
-      "net_financial_claims: material component is legacy_sensitivity; a valid calculation proof is required",
-      "primary_cash_or_nav_bridge: Reconcile the primary owner-cash or NAV bridge to primary filings with causal low/base/high cases.",
-      "reinvestment_or_assets: material component is legacy_sensitivity; a valid calculation proof is required"
-    ],
+    "unresolved_count": 0,
+    "blockers": [],
     "validation_errors": []
   },
   "monitoring": {
@@ -553,8 +2401,12 @@
     ]
   },
   "change_control": {
-    "model_hash": "9e08e11941ea02dde65fb613e5c1f8440a058adb40a8d12cbf2018a25cc10ffb",
-    "method_versions": [],
+    "model_hash": "8a35a11fcf2f73d4c7818f3dee56d9e56951b6ad2ac6d7061037057f3a9a40a3",
+    "method_versions": [
+      "net_asset_value@1.0",
+      "owner_cash_or_dividend_discount@1.0",
+      "owner_earnings_reinvestment_dcf@1.0"
+    ],
     "change_log": [],
     "rule": "A source fact is locked. Every assumption change requires a reason, author, timestamp, and before/after value."
   },

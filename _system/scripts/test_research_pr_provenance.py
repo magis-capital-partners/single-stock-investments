@@ -30,6 +30,10 @@ class ResearchPrProvenanceTests(unittest.TestCase):
         manifest = {**MANIFEST, "primary_evidence_ready": False}
         self.assertIn("manifest does not authorize primary evidence", validate(manifest, STATE, "AAA"))
 
+    def test_contract_backfill_consumer_is_accepted(self):
+        state = {**STATE, "consumer": "marvin_contract_backfill"}
+        self.assertEqual(validate(MANIFEST, state, "AAA"), [])
+
 
 if __name__ == "__main__":
     unittest.main()
