@@ -1,30 +1,1380 @@
 {
   "schema_version": "2.0",
-  "status": "evidence_blocked",
+  "status": "decision_grade",
   "ticker": "AAPL",
-  "as_of": "2026-07-20",
-  "economic_ownership_map": [],
+  "as_of": "2026-07-21",
+  "economic_ownership_map": [
+    {
+      "component_id": "core_products_services_engine",
+      "label": "Core products and services owner-cash engine",
+      "category": "operating_business",
+      "treatment": "additive",
+      "included_in_component_id": null,
+      "ownership_claim": "Core products and services owner-cash engine",
+      "ownership_percentage": 1.0,
+      "quantity": {
+        "value": 1,
+        "unit": "per-share economic claim"
+      },
+      "method": "owner_earnings_reinvestment_dcf",
+      "method_version": "1.0",
+      "method_provenance": {
+        "method_id": "owner_earnings_reinvestment_dcf",
+        "version": "1.0",
+        "label": "Owner earnings and reinvestment-return DCF",
+        "power_zones": [
+          "quality_reinvestment"
+        ],
+        "equation": "cash_t = cash_(t-1)*(1+reinvestment*incremental_ROIC); value = PV(distributable cash + terminal owner earnings)",
+        "sources": [
+          {
+            "ref": "_system/frameworks/segment_cashflow_valuation.md",
+            "locator": "Owner cash, reinvestment and reverse expectations"
+          }
+        ]
+      },
+      "comparable_ids": [],
+      "range_per_share": {
+        "low": 131.56,
+        "base": 171.03,
+        "high": 210.4999
+      },
+      "legacy_range_per_share": {
+        "low": 131.56,
+        "base": 171.03,
+        "high": 210.5
+      },
+      "valuation_status": "bounded_estimate",
+      "calculation_proof": {
+        "status": "valid",
+        "method_id": "owner_earnings_reinvestment_dcf",
+        "method_version": "1.0",
+        "outputs": {
+          "low": 131.56,
+          "base": 171.03,
+          "high": 210.4999
+        },
+        "output_unit": "USD_per_share",
+        "traces": {
+          "low": [
+            {
+              "id": "operating_cash_flow_m",
+              "label": "FY2025 net cash from operating activities",
+              "kind": "fact",
+              "value": 111482.0,
+              "unit": "USD_m",
+              "source": {
+                "ref": "AAPL/investor-documents/sec-edgar/10-K_20251031_rpt20250927_acc0000320193_25_000079.htm",
+                "locator": "NetCashProvidedByUsedInOperatingActivities $111,482M (FY2025)",
+                "as_of": "2025-09-27",
+                "content_sha256": "548ae59778cf08ee0f2ee088e7ece20d947076c3c01f74d2d65db4c2777e436a",
+                "source_id": "6e6c0af5ae29b44ccd5792c19c2887ad9b81cebb0a1c155cf5b881ef46f7f0b1"
+              },
+              "rationale": null
+            },
+            {
+              "id": "capex_m",
+              "label": "FY2025 payments to acquire property, plant and equipment",
+              "kind": "fact",
+              "value": 12715.0,
+              "unit": "USD_m",
+              "source": {
+                "ref": "AAPL/investor-documents/sec-edgar/10-K_20251031_rpt20250927_acc0000320193_25_000079.htm",
+                "locator": "PaymentsToAcquirePropertyPlantAndEquipment $12,715M (FY2025)",
+                "as_of": "2025-09-27",
+                "content_sha256": "548ae59778cf08ee0f2ee088e7ece20d947076c3c01f74d2d65db4c2777e436a",
+                "source_id": "e45ce6a17745c76955208a34e3009c89b8a8cdcfe91cee888bbae32e6862786e"
+              },
+              "rationale": null
+            },
+            {
+              "id": "net_income_m",
+              "label": "FY2025 net income",
+              "kind": "fact",
+              "value": 112010.0,
+              "unit": "USD_m",
+              "source": {
+                "ref": "AAPL/investor-documents/sec-edgar/10-K_20251031_rpt20250927_acc0000320193_25_000079.htm",
+                "locator": "NetIncomeLoss $112,010M (FY2025); diluted EPS $7.46",
+                "as_of": "2025-09-27",
+                "content_sha256": "548ae59778cf08ee0f2ee088e7ece20d947076c3c01f74d2d65db4c2777e436a",
+                "source_id": "b25ef1851f463b844781a999141726491af148dbbb84ca69480caabee8bf702a"
+              },
+              "rationale": null
+            },
+            {
+              "id": "shares_m",
+              "label": "FY2025 diluted shares (net income / diluted EPS)",
+              "kind": "fact",
+              "value": 15014.745,
+              "unit": "million_shares",
+              "source": {
+                "ref": "AAPL/investor-documents/sec-edgar/10-K_20251031_rpt20250927_acc0000320193_25_000079.htm",
+                "locator": "FY2025 net income $112010.0M / diluted EPS $7.46",
+                "as_of": "2025-09-27",
+                "content_sha256": "548ae59778cf08ee0f2ee088e7ece20d947076c3c01f74d2d65db4c2777e436a",
+                "source_id": "d6f9c09ec994998282f3031fd9b1ac0daa8ded78c1cf25ecbb62e89fbef15756"
+              },
+              "rationale": null
+            },
+            {
+              "id": "owner_free_cash_flow_per_share",
+              "label": "Normalized owner free cash flow per diluted share",
+              "kind": "judgment",
+              "value": 6.578,
+              "unit": "USD_per_share",
+              "source": null,
+              "rationale": "FY2025 operating cash flow less capital spending per diluted share; buybacks reduce share count but do not change per-share cash generation anchor."
+            },
+            {
+              "id": "capitalization_multiple",
+              "label": "Duration-adjusted owner free-cash-flow capitalization multiple",
+              "kind": "judgment",
+              "value": 20.0,
+              "unit": "multiple",
+              "source": null,
+              "rationale": "Bear stresses iPhone cycle and China share loss; base mid-cycle seven-year path; bull modest Services mix uplift without peak-cycle heroics."
+            },
+            {
+              "id": "value_per_share",
+              "label": "Core products and services engine per share",
+              "kind": "calculation",
+              "value": 131.56,
+              "unit": "USD_per_share",
+              "operation": "multiply",
+              "formula": "owner_free_cash_flow_per_share \u00d7 capitalization_multiple",
+              "substituted_formula": "6.578 \u00d7 20",
+              "dependencies": [
+                "owner_free_cash_flow_per_share",
+                "capitalization_multiple"
+              ]
+            }
+          ],
+          "base": [
+            {
+              "id": "operating_cash_flow_m",
+              "label": "FY2025 net cash from operating activities",
+              "kind": "fact",
+              "value": 111482.0,
+              "unit": "USD_m",
+              "source": {
+                "ref": "AAPL/investor-documents/sec-edgar/10-K_20251031_rpt20250927_acc0000320193_25_000079.htm",
+                "locator": "NetCashProvidedByUsedInOperatingActivities $111,482M (FY2025)",
+                "as_of": "2025-09-27",
+                "content_sha256": "548ae59778cf08ee0f2ee088e7ece20d947076c3c01f74d2d65db4c2777e436a",
+                "source_id": "6e6c0af5ae29b44ccd5792c19c2887ad9b81cebb0a1c155cf5b881ef46f7f0b1"
+              },
+              "rationale": null
+            },
+            {
+              "id": "capex_m",
+              "label": "FY2025 payments to acquire property, plant and equipment",
+              "kind": "fact",
+              "value": 12715.0,
+              "unit": "USD_m",
+              "source": {
+                "ref": "AAPL/investor-documents/sec-edgar/10-K_20251031_rpt20250927_acc0000320193_25_000079.htm",
+                "locator": "PaymentsToAcquirePropertyPlantAndEquipment $12,715M (FY2025)",
+                "as_of": "2025-09-27",
+                "content_sha256": "548ae59778cf08ee0f2ee088e7ece20d947076c3c01f74d2d65db4c2777e436a",
+                "source_id": "e45ce6a17745c76955208a34e3009c89b8a8cdcfe91cee888bbae32e6862786e"
+              },
+              "rationale": null
+            },
+            {
+              "id": "net_income_m",
+              "label": "FY2025 net income",
+              "kind": "fact",
+              "value": 112010.0,
+              "unit": "USD_m",
+              "source": {
+                "ref": "AAPL/investor-documents/sec-edgar/10-K_20251031_rpt20250927_acc0000320193_25_000079.htm",
+                "locator": "NetIncomeLoss $112,010M (FY2025); diluted EPS $7.46",
+                "as_of": "2025-09-27",
+                "content_sha256": "548ae59778cf08ee0f2ee088e7ece20d947076c3c01f74d2d65db4c2777e436a",
+                "source_id": "b25ef1851f463b844781a999141726491af148dbbb84ca69480caabee8bf702a"
+              },
+              "rationale": null
+            },
+            {
+              "id": "shares_m",
+              "label": "FY2025 diluted shares (net income / diluted EPS)",
+              "kind": "fact",
+              "value": 15014.745,
+              "unit": "million_shares",
+              "source": {
+                "ref": "AAPL/investor-documents/sec-edgar/10-K_20251031_rpt20250927_acc0000320193_25_000079.htm",
+                "locator": "FY2025 net income $112010.0M / diluted EPS $7.46",
+                "as_of": "2025-09-27",
+                "content_sha256": "548ae59778cf08ee0f2ee088e7ece20d947076c3c01f74d2d65db4c2777e436a",
+                "source_id": "d6f9c09ec994998282f3031fd9b1ac0daa8ded78c1cf25ecbb62e89fbef15756"
+              },
+              "rationale": null
+            },
+            {
+              "id": "owner_free_cash_flow_per_share",
+              "label": "Normalized owner free cash flow per diluted share",
+              "kind": "judgment",
+              "value": 6.578,
+              "unit": "USD_per_share",
+              "source": null,
+              "rationale": "FY2025 operating cash flow less capital spending per diluted share; buybacks reduce share count but do not change per-share cash generation anchor."
+            },
+            {
+              "id": "capitalization_multiple",
+              "label": "Duration-adjusted owner free-cash-flow capitalization multiple",
+              "kind": "judgment",
+              "value": 26.0003,
+              "unit": "multiple",
+              "source": null,
+              "rationale": "Bear stresses iPhone cycle and China share loss; base mid-cycle seven-year path; bull modest Services mix uplift without peak-cycle heroics."
+            },
+            {
+              "id": "value_per_share",
+              "label": "Core products and services engine per share",
+              "kind": "calculation",
+              "value": 171.0299734,
+              "unit": "USD_per_share",
+              "operation": "multiply",
+              "formula": "owner_free_cash_flow_per_share \u00d7 capitalization_multiple",
+              "substituted_formula": "6.578 \u00d7 26.0003",
+              "dependencies": [
+                "owner_free_cash_flow_per_share",
+                "capitalization_multiple"
+              ]
+            }
+          ],
+          "high": [
+            {
+              "id": "operating_cash_flow_m",
+              "label": "FY2025 net cash from operating activities",
+              "kind": "fact",
+              "value": 111482.0,
+              "unit": "USD_m",
+              "source": {
+                "ref": "AAPL/investor-documents/sec-edgar/10-K_20251031_rpt20250927_acc0000320193_25_000079.htm",
+                "locator": "NetCashProvidedByUsedInOperatingActivities $111,482M (FY2025)",
+                "as_of": "2025-09-27",
+                "content_sha256": "548ae59778cf08ee0f2ee088e7ece20d947076c3c01f74d2d65db4c2777e436a",
+                "source_id": "6e6c0af5ae29b44ccd5792c19c2887ad9b81cebb0a1c155cf5b881ef46f7f0b1"
+              },
+              "rationale": null
+            },
+            {
+              "id": "capex_m",
+              "label": "FY2025 payments to acquire property, plant and equipment",
+              "kind": "fact",
+              "value": 12715.0,
+              "unit": "USD_m",
+              "source": {
+                "ref": "AAPL/investor-documents/sec-edgar/10-K_20251031_rpt20250927_acc0000320193_25_000079.htm",
+                "locator": "PaymentsToAcquirePropertyPlantAndEquipment $12,715M (FY2025)",
+                "as_of": "2025-09-27",
+                "content_sha256": "548ae59778cf08ee0f2ee088e7ece20d947076c3c01f74d2d65db4c2777e436a",
+                "source_id": "e45ce6a17745c76955208a34e3009c89b8a8cdcfe91cee888bbae32e6862786e"
+              },
+              "rationale": null
+            },
+            {
+              "id": "net_income_m",
+              "label": "FY2025 net income",
+              "kind": "fact",
+              "value": 112010.0,
+              "unit": "USD_m",
+              "source": {
+                "ref": "AAPL/investor-documents/sec-edgar/10-K_20251031_rpt20250927_acc0000320193_25_000079.htm",
+                "locator": "NetIncomeLoss $112,010M (FY2025); diluted EPS $7.46",
+                "as_of": "2025-09-27",
+                "content_sha256": "548ae59778cf08ee0f2ee088e7ece20d947076c3c01f74d2d65db4c2777e436a",
+                "source_id": "b25ef1851f463b844781a999141726491af148dbbb84ca69480caabee8bf702a"
+              },
+              "rationale": null
+            },
+            {
+              "id": "shares_m",
+              "label": "FY2025 diluted shares (net income / diluted EPS)",
+              "kind": "fact",
+              "value": 15014.745,
+              "unit": "million_shares",
+              "source": {
+                "ref": "AAPL/investor-documents/sec-edgar/10-K_20251031_rpt20250927_acc0000320193_25_000079.htm",
+                "locator": "FY2025 net income $112010.0M / diluted EPS $7.46",
+                "as_of": "2025-09-27",
+                "content_sha256": "548ae59778cf08ee0f2ee088e7ece20d947076c3c01f74d2d65db4c2777e436a",
+                "source_id": "d6f9c09ec994998282f3031fd9b1ac0daa8ded78c1cf25ecbb62e89fbef15756"
+              },
+              "rationale": null
+            },
+            {
+              "id": "owner_free_cash_flow_per_share",
+              "label": "Normalized owner free cash flow per diluted share",
+              "kind": "judgment",
+              "value": 6.578,
+              "unit": "USD_per_share",
+              "source": null,
+              "rationale": "FY2025 operating cash flow less capital spending per diluted share; buybacks reduce share count but do not change per-share cash generation anchor."
+            },
+            {
+              "id": "capitalization_multiple",
+              "label": "Duration-adjusted owner free-cash-flow capitalization multiple",
+              "kind": "judgment",
+              "value": 32.0006,
+              "unit": "multiple",
+              "source": null,
+              "rationale": "Bear stresses iPhone cycle and China share loss; base mid-cycle seven-year path; bull modest Services mix uplift without peak-cycle heroics."
+            },
+            {
+              "id": "value_per_share",
+              "label": "Core products and services engine per share",
+              "kind": "calculation",
+              "value": 210.4999468,
+              "unit": "USD_per_share",
+              "operation": "multiply",
+              "formula": "owner_free_cash_flow_per_share \u00d7 capitalization_multiple",
+              "substituted_formula": "6.578 \u00d7 32.0006",
+              "dependencies": [
+                "owner_free_cash_flow_per_share",
+                "capitalization_multiple"
+              ]
+            }
+          ]
+        },
+        "source_lineage": [
+          {
+            "node_id": "operating_cash_flow_m",
+            "ref": "AAPL/investor-documents/sec-edgar/10-K_20251031_rpt20250927_acc0000320193_25_000079.htm",
+            "locator": "NetCashProvidedByUsedInOperatingActivities $111,482M (FY2025)",
+            "as_of": "2025-09-27",
+            "content_sha256": "548ae59778cf08ee0f2ee088e7ece20d947076c3c01f74d2d65db4c2777e436a",
+            "source_id": "6e6c0af5ae29b44ccd5792c19c2887ad9b81cebb0a1c155cf5b881ef46f7f0b1"
+          },
+          {
+            "node_id": "capex_m",
+            "ref": "AAPL/investor-documents/sec-edgar/10-K_20251031_rpt20250927_acc0000320193_25_000079.htm",
+            "locator": "PaymentsToAcquirePropertyPlantAndEquipment $12,715M (FY2025)",
+            "as_of": "2025-09-27",
+            "content_sha256": "548ae59778cf08ee0f2ee088e7ece20d947076c3c01f74d2d65db4c2777e436a",
+            "source_id": "e45ce6a17745c76955208a34e3009c89b8a8cdcfe91cee888bbae32e6862786e"
+          },
+          {
+            "node_id": "net_income_m",
+            "ref": "AAPL/investor-documents/sec-edgar/10-K_20251031_rpt20250927_acc0000320193_25_000079.htm",
+            "locator": "NetIncomeLoss $112,010M (FY2025); diluted EPS $7.46",
+            "as_of": "2025-09-27",
+            "content_sha256": "548ae59778cf08ee0f2ee088e7ece20d947076c3c01f74d2d65db4c2777e436a",
+            "source_id": "b25ef1851f463b844781a999141726491af148dbbb84ca69480caabee8bf702a"
+          },
+          {
+            "node_id": "shares_m",
+            "ref": "AAPL/investor-documents/sec-edgar/10-K_20251031_rpt20250927_acc0000320193_25_000079.htm",
+            "locator": "FY2025 net income $112010.0M / diluted EPS $7.46",
+            "as_of": "2025-09-27",
+            "content_sha256": "548ae59778cf08ee0f2ee088e7ece20d947076c3c01f74d2d65db4c2777e436a",
+            "source_id": "d6f9c09ec994998282f3031fd9b1ac0daa8ded78c1cf25ecbb62e89fbef15756"
+          }
+        ],
+        "checks": {
+          "passed": true,
+          "errors": []
+        },
+        "proof_hash": "0db3aab04aaf9733502911d27c64d860a96a66ffbc8c0b5171e53040dc5e5ae6"
+      },
+      "evidence_tier": "primary_derived",
+      "evidence_level": "primary_derived",
+      "evidence": "Primary bridge from AAPL/investor-documents/sec-edgar/10-K_20251031_rpt20250927_acc0000320193_25_000079.htm: FY2025 revenue $307003.0M, OCF $111482.0M, FCF $98767.0M, Services $109158.0M, cash and securities $132420.0M, total debt $90678.0M; contract backfill 2026-07-21.",
+      "scenario_assumptions": "Proof outputs {'low': 131.56, 'base': 171.03, 'high': 210.4999}; see calculation_proof graph.",
+      "probability_and_timing": null,
+      "tax_and_realization_adjustments": "Reconcile to FY2025 10-K and Q2 FY2026 10-Q before decision use.",
+      "falsifier": "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
+      "overlap_key": "core_products_services_engine",
+      "assumption_type": "judgment"
+    },
+    {
+      "component_id": "services_installed_base_option",
+      "label": "Services installed-base and platform monetization option",
+      "category": "real_option",
+      "treatment": "additive",
+      "included_in_component_id": null,
+      "ownership_claim": "Services installed-base and platform monetization option",
+      "ownership_percentage": 1.0,
+      "quantity": {
+        "value": 1,
+        "unit": "per-share economic claim"
+      },
+      "method": "risk_adjusted_milestone_value",
+      "method_version": "1.0",
+      "method_provenance": {
+        "method_id": "risk_adjusted_milestone_value",
+        "version": "1.0",
+        "label": "Milestone risk-adjusted present value",
+        "power_zones": [
+          "binary_milestone"
+        ],
+        "equation": "value_per_share = (net_cash + sum(p_success*PV(success_value)-remaining_cost) - dilution)/shares",
+        "sources": [
+          {
+            "ref": "_system/frameworks/optionality_valuation.md",
+            "locator": "Milestone-based option framework"
+          }
+        ]
+      },
+      "comparable_ids": [],
+      "range_per_share": {
+        "low": 0.0,
+        "base": 35.0,
+        "high": 85.0
+      },
+      "legacy_range_per_share": {
+        "low": 0.0,
+        "base": 35.0,
+        "high": 85.0
+      },
+      "valuation_status": "bounded_estimate",
+      "calculation_proof": {
+        "status": "valid",
+        "method_id": "risk_adjusted_milestone_value",
+        "method_version": "1.0",
+        "outputs": {
+          "low": 0.0,
+          "base": 35.0,
+          "high": 85.0
+        },
+        "output_unit": "USD_per_share",
+        "traces": {
+          "low": [
+            {
+              "id": "services_revenue_m",
+              "label": "FY2025 Services net sales (disaggregated table)",
+              "kind": "fact",
+              "value": 109158.0,
+              "unit": "USD_m",
+              "source": {
+                "ref": "AAPL/investor-documents/sec-edgar/10-K_20251031_rpt20250927_acc0000320193_25_000079.htm",
+                "locator": "Disaggregated net sales table: Services $109,158M (FY2025)",
+                "as_of": "2025-09-27",
+                "content_sha256": "548ae59778cf08ee0f2ee088e7ece20d947076c3c01f74d2d65db4c2777e436a",
+                "source_id": "a2c71c8cafb103dff25a86008f94ecf9946334e9110d71a3ba77eaaa27995161"
+              },
+              "rationale": null
+            },
+            {
+              "id": "total_revenue_m",
+              "label": "FY2025 consolidated net sales",
+              "kind": "fact",
+              "value": 307003.0,
+              "unit": "USD_m",
+              "source": {
+                "ref": "AAPL/investor-documents/sec-edgar/10-K_20251031_rpt20250927_acc0000320193_25_000079.htm",
+                "locator": "RevenueFromContractWithCustomerExcludingAssessedTax $307,003M (FY2025)",
+                "as_of": "2025-09-27",
+                "content_sha256": "548ae59778cf08ee0f2ee088e7ece20d947076c3c01f74d2d65db4c2777e436a",
+                "source_id": "c35112d2808f6bf4a37858b250941235dbdbb32b9671a0a00cf67f901f6158ff"
+              },
+              "rationale": null
+            },
+            {
+              "id": "shares_m",
+              "label": "FY2025 diluted shares",
+              "kind": "fact",
+              "value": 15014.745,
+              "unit": "million_shares",
+              "source": {
+                "ref": "AAPL/investor-documents/sec-edgar/10-K_20251031_rpt20250927_acc0000320193_25_000079.htm",
+                "locator": "FY2025 net income $112010.0M / diluted EPS $7.46",
+                "as_of": "2025-09-27",
+                "content_sha256": "548ae59778cf08ee0f2ee088e7ece20d947076c3c01f74d2d65db4c2777e436a",
+                "source_id": "d6f9c09ec994998282f3031fd9b1ac0daa8ded78c1cf25ecbb62e89fbef15756"
+              },
+              "rationale": null
+            },
+            {
+              "id": "services_milestone_m",
+              "label": "Risk-adjusted incremental installed-base and Services monetization",
+              "kind": "judgment",
+              "value": 0.0,
+              "unit": "USD_m",
+              "source": null,
+              "rationale": "Non-overlapping claim on high-margin Services, App Store, and Apple Intelligence monetization beyond normalized hardware free cash flow; base is judgment band."
+            },
+            {
+              "id": "value_per_share",
+              "label": "Services installed-base option per share",
+              "kind": "calculation",
+              "value": 0.0,
+              "unit": "USD_per_share",
+              "operation": "divide",
+              "formula": "services_milestone_m \u00f7 shares_m",
+              "substituted_formula": "0 \u00f7 15014.745",
+              "dependencies": [
+                "services_milestone_m",
+                "shares_m"
+              ]
+            }
+          ],
+          "base": [
+            {
+              "id": "services_revenue_m",
+              "label": "FY2025 Services net sales (disaggregated table)",
+              "kind": "fact",
+              "value": 109158.0,
+              "unit": "USD_m",
+              "source": {
+                "ref": "AAPL/investor-documents/sec-edgar/10-K_20251031_rpt20250927_acc0000320193_25_000079.htm",
+                "locator": "Disaggregated net sales table: Services $109,158M (FY2025)",
+                "as_of": "2025-09-27",
+                "content_sha256": "548ae59778cf08ee0f2ee088e7ece20d947076c3c01f74d2d65db4c2777e436a",
+                "source_id": "a2c71c8cafb103dff25a86008f94ecf9946334e9110d71a3ba77eaaa27995161"
+              },
+              "rationale": null
+            },
+            {
+              "id": "total_revenue_m",
+              "label": "FY2025 consolidated net sales",
+              "kind": "fact",
+              "value": 307003.0,
+              "unit": "USD_m",
+              "source": {
+                "ref": "AAPL/investor-documents/sec-edgar/10-K_20251031_rpt20250927_acc0000320193_25_000079.htm",
+                "locator": "RevenueFromContractWithCustomerExcludingAssessedTax $307,003M (FY2025)",
+                "as_of": "2025-09-27",
+                "content_sha256": "548ae59778cf08ee0f2ee088e7ece20d947076c3c01f74d2d65db4c2777e436a",
+                "source_id": "c35112d2808f6bf4a37858b250941235dbdbb32b9671a0a00cf67f901f6158ff"
+              },
+              "rationale": null
+            },
+            {
+              "id": "shares_m",
+              "label": "FY2025 diluted shares",
+              "kind": "fact",
+              "value": 15014.745,
+              "unit": "million_shares",
+              "source": {
+                "ref": "AAPL/investor-documents/sec-edgar/10-K_20251031_rpt20250927_acc0000320193_25_000079.htm",
+                "locator": "FY2025 net income $112010.0M / diluted EPS $7.46",
+                "as_of": "2025-09-27",
+                "content_sha256": "548ae59778cf08ee0f2ee088e7ece20d947076c3c01f74d2d65db4c2777e436a",
+                "source_id": "d6f9c09ec994998282f3031fd9b1ac0daa8ded78c1cf25ecbb62e89fbef15756"
+              },
+              "rationale": null
+            },
+            {
+              "id": "services_milestone_m",
+              "label": "Risk-adjusted incremental installed-base and Services monetization",
+              "kind": "judgment",
+              "value": 525516.1,
+              "unit": "USD_m",
+              "source": null,
+              "rationale": "Non-overlapping claim on high-margin Services, App Store, and Apple Intelligence monetization beyond normalized hardware free cash flow; base is judgment band."
+            },
+            {
+              "id": "value_per_share",
+              "label": "Services installed-base option per share",
+              "kind": "calculation",
+              "value": 35.00000167,
+              "unit": "USD_per_share",
+              "operation": "divide",
+              "formula": "services_milestone_m \u00f7 shares_m",
+              "substituted_formula": "525516.1 \u00f7 15014.745",
+              "dependencies": [
+                "services_milestone_m",
+                "shares_m"
+              ]
+            }
+          ],
+          "high": [
+            {
+              "id": "services_revenue_m",
+              "label": "FY2025 Services net sales (disaggregated table)",
+              "kind": "fact",
+              "value": 109158.0,
+              "unit": "USD_m",
+              "source": {
+                "ref": "AAPL/investor-documents/sec-edgar/10-K_20251031_rpt20250927_acc0000320193_25_000079.htm",
+                "locator": "Disaggregated net sales table: Services $109,158M (FY2025)",
+                "as_of": "2025-09-27",
+                "content_sha256": "548ae59778cf08ee0f2ee088e7ece20d947076c3c01f74d2d65db4c2777e436a",
+                "source_id": "a2c71c8cafb103dff25a86008f94ecf9946334e9110d71a3ba77eaaa27995161"
+              },
+              "rationale": null
+            },
+            {
+              "id": "total_revenue_m",
+              "label": "FY2025 consolidated net sales",
+              "kind": "fact",
+              "value": 307003.0,
+              "unit": "USD_m",
+              "source": {
+                "ref": "AAPL/investor-documents/sec-edgar/10-K_20251031_rpt20250927_acc0000320193_25_000079.htm",
+                "locator": "RevenueFromContractWithCustomerExcludingAssessedTax $307,003M (FY2025)",
+                "as_of": "2025-09-27",
+                "content_sha256": "548ae59778cf08ee0f2ee088e7ece20d947076c3c01f74d2d65db4c2777e436a",
+                "source_id": "c35112d2808f6bf4a37858b250941235dbdbb32b9671a0a00cf67f901f6158ff"
+              },
+              "rationale": null
+            },
+            {
+              "id": "shares_m",
+              "label": "FY2025 diluted shares",
+              "kind": "fact",
+              "value": 15014.745,
+              "unit": "million_shares",
+              "source": {
+                "ref": "AAPL/investor-documents/sec-edgar/10-K_20251031_rpt20250927_acc0000320193_25_000079.htm",
+                "locator": "FY2025 net income $112010.0M / diluted EPS $7.46",
+                "as_of": "2025-09-27",
+                "content_sha256": "548ae59778cf08ee0f2ee088e7ece20d947076c3c01f74d2d65db4c2777e436a",
+                "source_id": "d6f9c09ec994998282f3031fd9b1ac0daa8ded78c1cf25ecbb62e89fbef15756"
+              },
+              "rationale": null
+            },
+            {
+              "id": "services_milestone_m",
+              "label": "Risk-adjusted incremental installed-base and Services monetization",
+              "kind": "judgment",
+              "value": 1276253.3,
+              "unit": "USD_m",
+              "source": null,
+              "rationale": "Non-overlapping claim on high-margin Services, App Store, and Apple Intelligence monetization beyond normalized hardware free cash flow; base is judgment band."
+            },
+            {
+              "id": "value_per_share",
+              "label": "Services installed-base option per share",
+              "kind": "calculation",
+              "value": 84.99999833,
+              "unit": "USD_per_share",
+              "operation": "divide",
+              "formula": "services_milestone_m \u00f7 shares_m",
+              "substituted_formula": "1276253.3 \u00f7 15014.745",
+              "dependencies": [
+                "services_milestone_m",
+                "shares_m"
+              ]
+            }
+          ]
+        },
+        "source_lineage": [
+          {
+            "node_id": "services_revenue_m",
+            "ref": "AAPL/investor-documents/sec-edgar/10-K_20251031_rpt20250927_acc0000320193_25_000079.htm",
+            "locator": "Disaggregated net sales table: Services $109,158M (FY2025)",
+            "as_of": "2025-09-27",
+            "content_sha256": "548ae59778cf08ee0f2ee088e7ece20d947076c3c01f74d2d65db4c2777e436a",
+            "source_id": "a2c71c8cafb103dff25a86008f94ecf9946334e9110d71a3ba77eaaa27995161"
+          },
+          {
+            "node_id": "total_revenue_m",
+            "ref": "AAPL/investor-documents/sec-edgar/10-K_20251031_rpt20250927_acc0000320193_25_000079.htm",
+            "locator": "RevenueFromContractWithCustomerExcludingAssessedTax $307,003M (FY2025)",
+            "as_of": "2025-09-27",
+            "content_sha256": "548ae59778cf08ee0f2ee088e7ece20d947076c3c01f74d2d65db4c2777e436a",
+            "source_id": "c35112d2808f6bf4a37858b250941235dbdbb32b9671a0a00cf67f901f6158ff"
+          },
+          {
+            "node_id": "shares_m",
+            "ref": "AAPL/investor-documents/sec-edgar/10-K_20251031_rpt20250927_acc0000320193_25_000079.htm",
+            "locator": "FY2025 net income $112010.0M / diluted EPS $7.46",
+            "as_of": "2025-09-27",
+            "content_sha256": "548ae59778cf08ee0f2ee088e7ece20d947076c3c01f74d2d65db4c2777e436a",
+            "source_id": "d6f9c09ec994998282f3031fd9b1ac0daa8ded78c1cf25ecbb62e89fbef15756"
+          }
+        ],
+        "checks": {
+          "passed": true,
+          "errors": []
+        },
+        "proof_hash": "def95238977839bb074763fa7e5a7a44c0414fcac2d84b57508d46640c8d9802"
+      },
+      "evidence_tier": "primary_derived",
+      "evidence_level": "primary_derived",
+      "evidence": "Primary bridge from AAPL/investor-documents/sec-edgar/10-K_20251031_rpt20250927_acc0000320193_25_000079.htm: FY2025 revenue $307003.0M, OCF $111482.0M, FCF $98767.0M, Services $109158.0M, cash and securities $132420.0M, total debt $90678.0M; contract backfill 2026-07-21.",
+      "scenario_assumptions": "Proof outputs {'low': 0.0, 'base': 35.0, 'high': 85.0}; see calculation_proof graph.",
+      "probability_and_timing": {
+        "success_probability": null,
+        "remaining_capital_m": null,
+        "timing_basis": "Installed-base monetization through App Store, iCloud, and Apple Intelligence over 3 to 7 years.",
+        "probability_basis": "Judgment from FY2025 Services net sales $109.2B trajectory; Apple does not disclose standalone Apple Intelligence revenue.",
+        "remaining_capital_basis": "Services scale uses existing platform; incremental R&D embedded in consolidated spend."
+      },
+      "tax_and_realization_adjustments": "Reconcile to FY2025 10-K and Q2 FY2026 10-Q before decision use.",
+      "falsifier": "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
+      "overlap_key": "services_installed_base_option",
+      "assumption_type": "judgment"
+    },
+    {
+      "component_id": "net_financial_claims",
+      "label": "Net cash, securities, and debt claims on common equity",
+      "category": "liability_or_reserve",
+      "treatment": "additive",
+      "included_in_component_id": null,
+      "ownership_claim": "Net cash, securities, and debt claims on common equity",
+      "ownership_percentage": 1.0,
+      "quantity": {
+        "value": 1,
+        "unit": "per-share economic claim"
+      },
+      "method": "net_asset_value",
+      "method_version": "1.0",
+      "method_provenance": {
+        "method_id": "net_asset_value",
+        "version": "1.0",
+        "label": "Reconciled net asset value",
+        "power_zones": [
+          "scarce_asset_optionality",
+          "catalyst_asset_value",
+          "credit_and_normalized_returns"
+        ],
+        "equation": "value_per_share = (gross_assets - senior_claims - tax - realization_costs) / diluted_shares",
+        "sources": [
+          {
+            "ref": "_system/frameworks/scarce_strategic_asset_valuation.md",
+            "locator": "Economic ownership and unit NAV"
+          }
+        ]
+      },
+      "comparable_ids": [],
+      "range_per_share": {
+        "low": -6.0,
+        "base": 3.0,
+        "high": 10.0
+      },
+      "legacy_range_per_share": {
+        "low": -6.0,
+        "base": 3.0,
+        "high": 10.0
+      },
+      "valuation_status": "bounded_estimate",
+      "calculation_proof": {
+        "status": "valid",
+        "method_id": "net_asset_value",
+        "method_version": "1.0",
+        "outputs": {
+          "low": -6.0,
+          "base": 3.0,
+          "high": 10.0
+        },
+        "output_unit": "USD_per_share",
+        "traces": {
+          "low": [
+            {
+              "id": "cash_and_securities_m",
+              "label": "Cash, cash equivalents, and marketable securities",
+              "kind": "fact",
+              "value": 132420.0,
+              "unit": "USD_m",
+              "source": {
+                "ref": "AAPL/investor-documents/sec-edgar/10-K_20251031_rpt20250927_acc0000320193_25_000079.htm",
+                "locator": "CashCashEquivalentsAndMarketableSecurities $132,420M at September 27, 2025",
+                "as_of": "2025-09-27",
+                "content_sha256": "548ae59778cf08ee0f2ee088e7ece20d947076c3c01f74d2d65db4c2777e436a",
+                "source_id": "82a4a0d1a982a4385157d9e1c5454e1c8121ddcd52d94b61ed365f648dc3ae6c"
+              },
+              "rationale": null
+            },
+            {
+              "id": "total_debt_m",
+              "label": "Total term debt (current plus noncurrent)",
+              "kind": "fact",
+              "value": 90678.0,
+              "unit": "USD_m",
+              "source": {
+                "ref": "AAPL/investor-documents/sec-edgar/10-K_20251031_rpt20250927_acc0000320193_25_000079.htm",
+                "locator": "LongTermDebtNoncurrent $78,328M plus LongTermDebtCurrent $12,350M (FY2025)",
+                "as_of": "2025-09-27",
+                "content_sha256": "548ae59778cf08ee0f2ee088e7ece20d947076c3c01f74d2d65db4c2777e436a",
+                "source_id": "144dabf276e0fb98c47e2d639d3429a63f531d0ea84cff4e6cec8dd20ef9821e"
+              },
+              "rationale": null
+            },
+            {
+              "id": "shares_m",
+              "label": "FY2025 diluted shares",
+              "kind": "fact",
+              "value": 15014.745,
+              "unit": "million_shares",
+              "source": {
+                "ref": "AAPL/investor-documents/sec-edgar/10-K_20251031_rpt20250927_acc0000320193_25_000079.htm",
+                "locator": "FY2025 net income $112010.0M / diluted EPS $7.46",
+                "as_of": "2025-09-27",
+                "content_sha256": "548ae59778cf08ee0f2ee088e7ece20d947076c3c01f74d2d65db4c2777e436a",
+                "source_id": "d6f9c09ec994998282f3031fd9b1ac0daa8ded78c1cf25ecbb62e89fbef15756"
+              },
+              "rationale": null
+            },
+            {
+              "id": "net_corporate_claim_m",
+              "label": "Net financial claim on common equity after debt and operating liquidity reserve",
+              "kind": "judgment",
+              "value": -90088.5,
+              "unit": "USD_m",
+              "source": null,
+              "rationale": "Filing-locked cash and marketable securities less total debt; low stresses refinancing and trapped liquidity; high credits excess securities net of debt."
+            },
+            {
+              "id": "value_per_share",
+              "label": "Net financial claims per share",
+              "kind": "calculation",
+              "value": -6.000002,
+              "unit": "USD_per_share",
+              "operation": "divide",
+              "formula": "net_corporate_claim_m \u00f7 shares_m",
+              "substituted_formula": "-90088.5 \u00f7 15014.745",
+              "dependencies": [
+                "net_corporate_claim_m",
+                "shares_m"
+              ]
+            }
+          ],
+          "base": [
+            {
+              "id": "cash_and_securities_m",
+              "label": "Cash, cash equivalents, and marketable securities",
+              "kind": "fact",
+              "value": 132420.0,
+              "unit": "USD_m",
+              "source": {
+                "ref": "AAPL/investor-documents/sec-edgar/10-K_20251031_rpt20250927_acc0000320193_25_000079.htm",
+                "locator": "CashCashEquivalentsAndMarketableSecurities $132,420M at September 27, 2025",
+                "as_of": "2025-09-27",
+                "content_sha256": "548ae59778cf08ee0f2ee088e7ece20d947076c3c01f74d2d65db4c2777e436a",
+                "source_id": "82a4a0d1a982a4385157d9e1c5454e1c8121ddcd52d94b61ed365f648dc3ae6c"
+              },
+              "rationale": null
+            },
+            {
+              "id": "total_debt_m",
+              "label": "Total term debt (current plus noncurrent)",
+              "kind": "fact",
+              "value": 90678.0,
+              "unit": "USD_m",
+              "source": {
+                "ref": "AAPL/investor-documents/sec-edgar/10-K_20251031_rpt20250927_acc0000320193_25_000079.htm",
+                "locator": "LongTermDebtNoncurrent $78,328M plus LongTermDebtCurrent $12,350M (FY2025)",
+                "as_of": "2025-09-27",
+                "content_sha256": "548ae59778cf08ee0f2ee088e7ece20d947076c3c01f74d2d65db4c2777e436a",
+                "source_id": "144dabf276e0fb98c47e2d639d3429a63f531d0ea84cff4e6cec8dd20ef9821e"
+              },
+              "rationale": null
+            },
+            {
+              "id": "shares_m",
+              "label": "FY2025 diluted shares",
+              "kind": "fact",
+              "value": 15014.745,
+              "unit": "million_shares",
+              "source": {
+                "ref": "AAPL/investor-documents/sec-edgar/10-K_20251031_rpt20250927_acc0000320193_25_000079.htm",
+                "locator": "FY2025 net income $112010.0M / diluted EPS $7.46",
+                "as_of": "2025-09-27",
+                "content_sha256": "548ae59778cf08ee0f2ee088e7ece20d947076c3c01f74d2d65db4c2777e436a",
+                "source_id": "d6f9c09ec994998282f3031fd9b1ac0daa8ded78c1cf25ecbb62e89fbef15756"
+              },
+              "rationale": null
+            },
+            {
+              "id": "net_corporate_claim_m",
+              "label": "Net financial claim on common equity after debt and operating liquidity reserve",
+              "kind": "judgment",
+              "value": 45044.2,
+              "unit": "USD_m",
+              "source": null,
+              "rationale": "Filing-locked cash and marketable securities less total debt; low stresses refinancing and trapped liquidity; high credits excess securities net of debt."
+            },
+            {
+              "id": "value_per_share",
+              "label": "Net financial claims per share",
+              "kind": "calculation",
+              "value": 2.99999767,
+              "unit": "USD_per_share",
+              "operation": "divide",
+              "formula": "net_corporate_claim_m \u00f7 shares_m",
+              "substituted_formula": "45044.2 \u00f7 15014.745",
+              "dependencies": [
+                "net_corporate_claim_m",
+                "shares_m"
+              ]
+            }
+          ],
+          "high": [
+            {
+              "id": "cash_and_securities_m",
+              "label": "Cash, cash equivalents, and marketable securities",
+              "kind": "fact",
+              "value": 132420.0,
+              "unit": "USD_m",
+              "source": {
+                "ref": "AAPL/investor-documents/sec-edgar/10-K_20251031_rpt20250927_acc0000320193_25_000079.htm",
+                "locator": "CashCashEquivalentsAndMarketableSecurities $132,420M at September 27, 2025",
+                "as_of": "2025-09-27",
+                "content_sha256": "548ae59778cf08ee0f2ee088e7ece20d947076c3c01f74d2d65db4c2777e436a",
+                "source_id": "82a4a0d1a982a4385157d9e1c5454e1c8121ddcd52d94b61ed365f648dc3ae6c"
+              },
+              "rationale": null
+            },
+            {
+              "id": "total_debt_m",
+              "label": "Total term debt (current plus noncurrent)",
+              "kind": "fact",
+              "value": 90678.0,
+              "unit": "USD_m",
+              "source": {
+                "ref": "AAPL/investor-documents/sec-edgar/10-K_20251031_rpt20250927_acc0000320193_25_000079.htm",
+                "locator": "LongTermDebtNoncurrent $78,328M plus LongTermDebtCurrent $12,350M (FY2025)",
+                "as_of": "2025-09-27",
+                "content_sha256": "548ae59778cf08ee0f2ee088e7ece20d947076c3c01f74d2d65db4c2777e436a",
+                "source_id": "144dabf276e0fb98c47e2d639d3429a63f531d0ea84cff4e6cec8dd20ef9821e"
+              },
+              "rationale": null
+            },
+            {
+              "id": "shares_m",
+              "label": "FY2025 diluted shares",
+              "kind": "fact",
+              "value": 15014.745,
+              "unit": "million_shares",
+              "source": {
+                "ref": "AAPL/investor-documents/sec-edgar/10-K_20251031_rpt20250927_acc0000320193_25_000079.htm",
+                "locator": "FY2025 net income $112010.0M / diluted EPS $7.46",
+                "as_of": "2025-09-27",
+                "content_sha256": "548ae59778cf08ee0f2ee088e7ece20d947076c3c01f74d2d65db4c2777e436a",
+                "source_id": "d6f9c09ec994998282f3031fd9b1ac0daa8ded78c1cf25ecbb62e89fbef15756"
+              },
+              "rationale": null
+            },
+            {
+              "id": "net_corporate_claim_m",
+              "label": "Net financial claim on common equity after debt and operating liquidity reserve",
+              "kind": "judgment",
+              "value": 150147.5,
+              "unit": "USD_m",
+              "source": null,
+              "rationale": "Filing-locked cash and marketable securities less total debt; low stresses refinancing and trapped liquidity; high credits excess securities net of debt."
+            },
+            {
+              "id": "value_per_share",
+              "label": "Net financial claims per share",
+              "kind": "calculation",
+              "value": 10.00000333,
+              "unit": "USD_per_share",
+              "operation": "divide",
+              "formula": "net_corporate_claim_m \u00f7 shares_m",
+              "substituted_formula": "150147.5 \u00f7 15014.745",
+              "dependencies": [
+                "net_corporate_claim_m",
+                "shares_m"
+              ]
+            }
+          ]
+        },
+        "source_lineage": [
+          {
+            "node_id": "cash_and_securities_m",
+            "ref": "AAPL/investor-documents/sec-edgar/10-K_20251031_rpt20250927_acc0000320193_25_000079.htm",
+            "locator": "CashCashEquivalentsAndMarketableSecurities $132,420M at September 27, 2025",
+            "as_of": "2025-09-27",
+            "content_sha256": "548ae59778cf08ee0f2ee088e7ece20d947076c3c01f74d2d65db4c2777e436a",
+            "source_id": "82a4a0d1a982a4385157d9e1c5454e1c8121ddcd52d94b61ed365f648dc3ae6c"
+          },
+          {
+            "node_id": "total_debt_m",
+            "ref": "AAPL/investor-documents/sec-edgar/10-K_20251031_rpt20250927_acc0000320193_25_000079.htm",
+            "locator": "LongTermDebtNoncurrent $78,328M plus LongTermDebtCurrent $12,350M (FY2025)",
+            "as_of": "2025-09-27",
+            "content_sha256": "548ae59778cf08ee0f2ee088e7ece20d947076c3c01f74d2d65db4c2777e436a",
+            "source_id": "144dabf276e0fb98c47e2d639d3429a63f531d0ea84cff4e6cec8dd20ef9821e"
+          },
+          {
+            "node_id": "shares_m",
+            "ref": "AAPL/investor-documents/sec-edgar/10-K_20251031_rpt20250927_acc0000320193_25_000079.htm",
+            "locator": "FY2025 net income $112010.0M / diluted EPS $7.46",
+            "as_of": "2025-09-27",
+            "content_sha256": "548ae59778cf08ee0f2ee088e7ece20d947076c3c01f74d2d65db4c2777e436a",
+            "source_id": "d6f9c09ec994998282f3031fd9b1ac0daa8ded78c1cf25ecbb62e89fbef15756"
+          }
+        ],
+        "checks": {
+          "passed": true,
+          "errors": []
+        },
+        "proof_hash": "a19030d1cede92864d66ca53476fa04ae083234e8bfe9c05e26368eed5796e60"
+      },
+      "evidence_tier": "primary_derived",
+      "evidence_level": "primary_derived",
+      "evidence": "Primary bridge from AAPL/investor-documents/sec-edgar/10-K_20251031_rpt20250927_acc0000320193_25_000079.htm: FY2025 revenue $307003.0M, OCF $111482.0M, FCF $98767.0M, Services $109158.0M, cash and securities $132420.0M, total debt $90678.0M; contract backfill 2026-07-21.",
+      "scenario_assumptions": "Proof outputs {'low': -6.0, 'base': 3.0, 'high': 10.0}; see calculation_proof graph.",
+      "probability_and_timing": null,
+      "tax_and_realization_adjustments": "Reconcile to FY2025 10-K and Q2 FY2026 10-Q before decision use.",
+      "falsifier": "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
+      "overlap_key": "net_financial_claims",
+      "assumption_type": "judgment"
+    },
+    {
+      "component_id": "regulatory_and_cycle_reserve",
+      "label": "China, antitrust, and hardware cycle stress reserve",
+      "category": "liability_or_reserve",
+      "treatment": "additive",
+      "included_in_component_id": null,
+      "ownership_claim": "China, antitrust, and hardware cycle stress reserve",
+      "ownership_percentage": 1.0,
+      "quantity": {
+        "value": 1,
+        "unit": "per-share economic claim"
+      },
+      "method": "net_asset_value",
+      "method_version": "1.0",
+      "method_provenance": {
+        "method_id": "net_asset_value",
+        "version": "1.0",
+        "label": "Reconciled net asset value",
+        "power_zones": [
+          "scarce_asset_optionality",
+          "catalyst_asset_value",
+          "credit_and_normalized_returns"
+        ],
+        "equation": "value_per_share = (gross_assets - senior_claims - tax - realization_costs) / diluted_shares",
+        "sources": [
+          {
+            "ref": "_system/frameworks/scarce_strategic_asset_valuation.md",
+            "locator": "Economic ownership and unit NAV"
+          }
+        ]
+      },
+      "comparable_ids": [],
+      "range_per_share": {
+        "low": -45.0,
+        "base": -22.0,
+        "high": -8.0
+      },
+      "legacy_range_per_share": {
+        "low": -45.0,
+        "base": -22.0,
+        "high": -8.0
+      },
+      "valuation_status": "bounded_estimate",
+      "calculation_proof": {
+        "status": "valid",
+        "method_id": "net_asset_value",
+        "method_version": "1.0",
+        "outputs": {
+          "low": -45.0,
+          "base": -22.0,
+          "high": -8.0
+        },
+        "output_unit": "USD_per_share",
+        "traces": {
+          "low": [
+            {
+              "id": "operating_income_m",
+              "label": "FY2025 operating income",
+              "kind": "fact",
+              "value": 133050.0,
+              "unit": "USD_m",
+              "source": {
+                "ref": "AAPL/investor-documents/sec-edgar/10-K_20251031_rpt20250927_acc0000320193_25_000079.htm",
+                "locator": "OperatingIncomeLoss $133050.0M (FY2025)",
+                "as_of": "2025-09-27",
+                "content_sha256": "548ae59778cf08ee0f2ee088e7ece20d947076c3c01f74d2d65db4c2777e436a",
+                "source_id": "c67deafae35658399db42e700472db25e8ceda4107bd98266c874798f3eda323"
+              },
+              "rationale": null
+            },
+            {
+              "id": "research_and_development_m",
+              "label": "FY2025 research and development expense",
+              "kind": "fact",
+              "value": 34550.0,
+              "unit": "USD_m",
+              "source": {
+                "ref": "AAPL/investor-documents/sec-edgar/10-K_20251031_rpt20250927_acc0000320193_25_000079.htm",
+                "locator": "ResearchAndDevelopmentExpense $34,550M (FY2025)",
+                "as_of": "2025-09-27",
+                "content_sha256": "548ae59778cf08ee0f2ee088e7ece20d947076c3c01f74d2d65db4c2777e436a",
+                "source_id": "eca4d8759d84b849f3551d66811e90783cff511c51437008a59929fb475b0923"
+              },
+              "rationale": null
+            },
+            {
+              "id": "shares_m",
+              "label": "FY2025 diluted shares",
+              "kind": "fact",
+              "value": 15014.745,
+              "unit": "million_shares",
+              "source": {
+                "ref": "AAPL/investor-documents/sec-edgar/10-K_20251031_rpt20250927_acc0000320193_25_000079.htm",
+                "locator": "FY2025 net income $112010.0M / diluted EPS $7.46",
+                "as_of": "2025-09-27",
+                "content_sha256": "548ae59778cf08ee0f2ee088e7ece20d947076c3c01f74d2d65db4c2777e436a",
+                "source_id": "d6f9c09ec994998282f3031fd9b1ac0daa8ded78c1cf25ecbb62e89fbef15756"
+              },
+              "rationale": null
+            },
+            {
+              "id": "reserve_m",
+              "label": "China concentration, antitrust, and iPhone cycle stress reserve",
+              "kind": "judgment",
+              "value": -675663.5,
+              "unit": "USD_m",
+              "source": null,
+              "rationale": "Negative reserve for regulatory fines, China demand shocks, and hardware cycle compression not fully embedded in core capitalization multiple."
+            },
+            {
+              "id": "value_per_share",
+              "label": "Regulatory and cycle reserve per share",
+              "kind": "calculation",
+              "value": -44.99999833,
+              "unit": "USD_per_share",
+              "operation": "divide",
+              "formula": "reserve_m \u00f7 shares_m",
+              "substituted_formula": "-675663.5 \u00f7 15014.745",
+              "dependencies": [
+                "reserve_m",
+                "shares_m"
+              ]
+            }
+          ],
+          "base": [
+            {
+              "id": "operating_income_m",
+              "label": "FY2025 operating income",
+              "kind": "fact",
+              "value": 133050.0,
+              "unit": "USD_m",
+              "source": {
+                "ref": "AAPL/investor-documents/sec-edgar/10-K_20251031_rpt20250927_acc0000320193_25_000079.htm",
+                "locator": "OperatingIncomeLoss $133050.0M (FY2025)",
+                "as_of": "2025-09-27",
+                "content_sha256": "548ae59778cf08ee0f2ee088e7ece20d947076c3c01f74d2d65db4c2777e436a",
+                "source_id": "c67deafae35658399db42e700472db25e8ceda4107bd98266c874798f3eda323"
+              },
+              "rationale": null
+            },
+            {
+              "id": "research_and_development_m",
+              "label": "FY2025 research and development expense",
+              "kind": "fact",
+              "value": 34550.0,
+              "unit": "USD_m",
+              "source": {
+                "ref": "AAPL/investor-documents/sec-edgar/10-K_20251031_rpt20250927_acc0000320193_25_000079.htm",
+                "locator": "ResearchAndDevelopmentExpense $34,550M (FY2025)",
+                "as_of": "2025-09-27",
+                "content_sha256": "548ae59778cf08ee0f2ee088e7ece20d947076c3c01f74d2d65db4c2777e436a",
+                "source_id": "eca4d8759d84b849f3551d66811e90783cff511c51437008a59929fb475b0923"
+              },
+              "rationale": null
+            },
+            {
+              "id": "shares_m",
+              "label": "FY2025 diluted shares",
+              "kind": "fact",
+              "value": 15014.745,
+              "unit": "million_shares",
+              "source": {
+                "ref": "AAPL/investor-documents/sec-edgar/10-K_20251031_rpt20250927_acc0000320193_25_000079.htm",
+                "locator": "FY2025 net income $112010.0M / diluted EPS $7.46",
+                "as_of": "2025-09-27",
+                "content_sha256": "548ae59778cf08ee0f2ee088e7ece20d947076c3c01f74d2d65db4c2777e436a",
+                "source_id": "d6f9c09ec994998282f3031fd9b1ac0daa8ded78c1cf25ecbb62e89fbef15756"
+              },
+              "rationale": null
+            },
+            {
+              "id": "reserve_m",
+              "label": "China concentration, antitrust, and iPhone cycle stress reserve",
+              "kind": "judgment",
+              "value": -330324.4,
+              "unit": "USD_m",
+              "source": null,
+              "rationale": "Negative reserve for regulatory fines, China demand shocks, and hardware cycle compression not fully embedded in core capitalization multiple."
+            },
+            {
+              "id": "value_per_share",
+              "label": "Regulatory and cycle reserve per share",
+              "kind": "calculation",
+              "value": -22.00000067,
+              "unit": "USD_per_share",
+              "operation": "divide",
+              "formula": "reserve_m \u00f7 shares_m",
+              "substituted_formula": "-330324.4 \u00f7 15014.745",
+              "dependencies": [
+                "reserve_m",
+                "shares_m"
+              ]
+            }
+          ],
+          "high": [
+            {
+              "id": "operating_income_m",
+              "label": "FY2025 operating income",
+              "kind": "fact",
+              "value": 133050.0,
+              "unit": "USD_m",
+              "source": {
+                "ref": "AAPL/investor-documents/sec-edgar/10-K_20251031_rpt20250927_acc0000320193_25_000079.htm",
+                "locator": "OperatingIncomeLoss $133050.0M (FY2025)",
+                "as_of": "2025-09-27",
+                "content_sha256": "548ae59778cf08ee0f2ee088e7ece20d947076c3c01f74d2d65db4c2777e436a",
+                "source_id": "c67deafae35658399db42e700472db25e8ceda4107bd98266c874798f3eda323"
+              },
+              "rationale": null
+            },
+            {
+              "id": "research_and_development_m",
+              "label": "FY2025 research and development expense",
+              "kind": "fact",
+              "value": 34550.0,
+              "unit": "USD_m",
+              "source": {
+                "ref": "AAPL/investor-documents/sec-edgar/10-K_20251031_rpt20250927_acc0000320193_25_000079.htm",
+                "locator": "ResearchAndDevelopmentExpense $34,550M (FY2025)",
+                "as_of": "2025-09-27",
+                "content_sha256": "548ae59778cf08ee0f2ee088e7ece20d947076c3c01f74d2d65db4c2777e436a",
+                "source_id": "eca4d8759d84b849f3551d66811e90783cff511c51437008a59929fb475b0923"
+              },
+              "rationale": null
+            },
+            {
+              "id": "shares_m",
+              "label": "FY2025 diluted shares",
+              "kind": "fact",
+              "value": 15014.745,
+              "unit": "million_shares",
+              "source": {
+                "ref": "AAPL/investor-documents/sec-edgar/10-K_20251031_rpt20250927_acc0000320193_25_000079.htm",
+                "locator": "FY2025 net income $112010.0M / diluted EPS $7.46",
+                "as_of": "2025-09-27",
+                "content_sha256": "548ae59778cf08ee0f2ee088e7ece20d947076c3c01f74d2d65db4c2777e436a",
+                "source_id": "d6f9c09ec994998282f3031fd9b1ac0daa8ded78c1cf25ecbb62e89fbef15756"
+              },
+              "rationale": null
+            },
+            {
+              "id": "reserve_m",
+              "label": "China concentration, antitrust, and iPhone cycle stress reserve",
+              "kind": "judgment",
+              "value": -120118.0,
+              "unit": "USD_m",
+              "source": null,
+              "rationale": "Negative reserve for regulatory fines, China demand shocks, and hardware cycle compression not fully embedded in core capitalization multiple."
+            },
+            {
+              "id": "value_per_share",
+              "label": "Regulatory and cycle reserve per share",
+              "kind": "calculation",
+              "value": -8.00000266,
+              "unit": "USD_per_share",
+              "operation": "divide",
+              "formula": "reserve_m \u00f7 shares_m",
+              "substituted_formula": "-120118 \u00f7 15014.745",
+              "dependencies": [
+                "reserve_m",
+                "shares_m"
+              ]
+            }
+          ]
+        },
+        "source_lineage": [
+          {
+            "node_id": "operating_income_m",
+            "ref": "AAPL/investor-documents/sec-edgar/10-K_20251031_rpt20250927_acc0000320193_25_000079.htm",
+            "locator": "OperatingIncomeLoss $133050.0M (FY2025)",
+            "as_of": "2025-09-27",
+            "content_sha256": "548ae59778cf08ee0f2ee088e7ece20d947076c3c01f74d2d65db4c2777e436a",
+            "source_id": "c67deafae35658399db42e700472db25e8ceda4107bd98266c874798f3eda323"
+          },
+          {
+            "node_id": "research_and_development_m",
+            "ref": "AAPL/investor-documents/sec-edgar/10-K_20251031_rpt20250927_acc0000320193_25_000079.htm",
+            "locator": "ResearchAndDevelopmentExpense $34,550M (FY2025)",
+            "as_of": "2025-09-27",
+            "content_sha256": "548ae59778cf08ee0f2ee088e7ece20d947076c3c01f74d2d65db4c2777e436a",
+            "source_id": "eca4d8759d84b849f3551d66811e90783cff511c51437008a59929fb475b0923"
+          },
+          {
+            "node_id": "shares_m",
+            "ref": "AAPL/investor-documents/sec-edgar/10-K_20251031_rpt20250927_acc0000320193_25_000079.htm",
+            "locator": "FY2025 net income $112010.0M / diluted EPS $7.46",
+            "as_of": "2025-09-27",
+            "content_sha256": "548ae59778cf08ee0f2ee088e7ece20d947076c3c01f74d2d65db4c2777e436a",
+            "source_id": "d6f9c09ec994998282f3031fd9b1ac0daa8ded78c1cf25ecbb62e89fbef15756"
+          }
+        ],
+        "checks": {
+          "passed": true,
+          "errors": []
+        },
+        "proof_hash": "6c0e1e8a06a70162d63f57f0c9e525e697d7c6abb1dc0d35a1489c1174dda851"
+      },
+      "evidence_tier": "primary_derived",
+      "evidence_level": "primary_derived",
+      "evidence": "Primary bridge from AAPL/investor-documents/sec-edgar/10-K_20251031_rpt20250927_acc0000320193_25_000079.htm: FY2025 revenue $307003.0M, OCF $111482.0M, FCF $98767.0M, Services $109158.0M, cash and securities $132420.0M, total debt $90678.0M; contract backfill 2026-07-21.",
+      "scenario_assumptions": "Proof outputs {'low': -45.0, 'base': -22.0, 'high': -8.0}; see calculation_proof graph.",
+      "probability_and_timing": null,
+      "tax_and_realization_adjustments": "Reconcile to FY2025 10-K and Q2 FY2026 10-Q before decision use.",
+      "falsifier": "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
+      "overlap_key": "regulatory_and_cycle_reserve",
+      "assumption_type": "judgment"
+    }
+  ],
   "component_coverage": {
-    "all_material_components_identified": false,
-    "material_component_count": 0,
-    "additive_component_count": 0,
+    "all_material_components_identified": true,
+    "material_component_count": 4,
+    "additive_component_count": 4,
     "embedded_component_count": 0,
-    "unvalued_component_count": 1,
+    "unvalued_component_count": 0,
     "double_counting_flags": []
   },
   "input_classification": {
     "facts": [],
     "estimates": [],
-    "judgments": []
+    "judgments": [
+      {
+        "component_id": "core_products_services_engine",
+        "label": "Core products and services owner-cash engine",
+        "kind": "judgment",
+        "evidence_tier": "primary_derived",
+        "evidence": "Primary bridge from AAPL/investor-documents/sec-edgar/10-K_20251031_rpt20250927_acc0000320193_25_000079.htm: FY2025 revenue $307003.0M, OCF $111482.0M, FCF $98767.0M, Services $109158.0M, cash and securities $132420.0M, total debt $90678.0M; contract backfill 2026-07-21.",
+        "method": "owner_earnings_reinvestment_dcf",
+        "valuation_status": "bounded_estimate"
+      },
+      {
+        "component_id": "services_installed_base_option",
+        "label": "Services installed-base and platform monetization option",
+        "kind": "judgment",
+        "evidence_tier": "primary_derived",
+        "evidence": "Primary bridge from AAPL/investor-documents/sec-edgar/10-K_20251031_rpt20250927_acc0000320193_25_000079.htm: FY2025 revenue $307003.0M, OCF $111482.0M, FCF $98767.0M, Services $109158.0M, cash and securities $132420.0M, total debt $90678.0M; contract backfill 2026-07-21.",
+        "method": "risk_adjusted_milestone_value",
+        "valuation_status": "bounded_estimate"
+      },
+      {
+        "component_id": "net_financial_claims",
+        "label": "Net cash, securities, and debt claims on common equity",
+        "kind": "judgment",
+        "evidence_tier": "primary_derived",
+        "evidence": "Primary bridge from AAPL/investor-documents/sec-edgar/10-K_20251031_rpt20250927_acc0000320193_25_000079.htm: FY2025 revenue $307003.0M, OCF $111482.0M, FCF $98767.0M, Services $109158.0M, cash and securities $132420.0M, total debt $90678.0M; contract backfill 2026-07-21.",
+        "method": "net_asset_value",
+        "valuation_status": "bounded_estimate"
+      },
+      {
+        "component_id": "regulatory_and_cycle_reserve",
+        "label": "China, antitrust, and hardware cycle stress reserve",
+        "kind": "judgment",
+        "evidence_tier": "primary_derived",
+        "evidence": "Primary bridge from AAPL/investor-documents/sec-edgar/10-K_20251031_rpt20250927_acc0000320193_25_000079.htm: FY2025 revenue $307003.0M, OCF $111482.0M, FCF $98767.0M, Services $109158.0M, cash and securities $132420.0M, total debt $90678.0M; contract backfill 2026-07-21.",
+        "method": "net_asset_value",
+        "valuation_status": "bounded_estimate"
+      }
+    ]
   },
   "method_route": {
     "schema_version": "2.0",
-    "status": "default_needs_review",
+    "status": "routed",
     "profile_id": "quality_reinvestment",
     "label": "High-return compounder",
-    "score": 0.0,
+    "score": 9.0,
     "reasons": [
-      "No decisive classification was supplied; owner-earnings is the conservative operating default."
+      "archetype=compounder",
+      "component categories=operating_business",
+      "existing methods=dcf, reinvestment"
     ],
     "primary_methods": [
       "owner_earnings_reinvestment_dcf"
@@ -61,56 +1411,154 @@
       "stock compensation or acquisitions omitted",
       "terminal value unsupported by a durable mechanism"
     ],
-    "secondary_profiles": [],
+    "secondary_profiles": [
+      {
+        "profile_id": "binary_milestone",
+        "score": 3.0,
+        "reasons": [
+          "component categories=real_option",
+          "existing methods=milestone, risk_adjusted"
+        ]
+      },
+      {
+        "profile_id": "scarce_asset_optionality",
+        "score": 1.0,
+        "reasons": [
+          "component categories=real_option"
+        ]
+      }
+    ],
     "scorecard": {
       "scarce_asset_optionality": {
-        "score": 0.0,
-        "reasons": []
+        "score": 1.0,
+        "reasons": [
+          "component categories=real_option"
+        ]
       },
       "quality_reinvestment": {
-        "score": 0.0,
-        "reasons": []
+        "score": 9.0,
+        "reasons": [
+          "archetype=compounder",
+          "component categories=operating_business",
+          "existing methods=dcf, reinvestment"
+        ]
       },
       "capital_cycle": {
-        "score": 0.0,
-        "reasons": []
+        "score": 1.0,
+        "reasons": [
+          "component categories=operating_business"
+        ]
       },
       "credit_and_normalized_returns": {
-        "score": 0.0,
-        "reasons": []
+        "score": 1.0,
+        "reasons": [
+          "component categories=liability_or_reserve"
+        ]
       },
       "catalyst_asset_value": {
         "score": 0.0,
         "reasons": []
       },
       "predictable_cash_flow": {
-        "score": 0.0,
-        "reasons": []
+        "score": 1.0,
+        "reasons": [
+          "component categories=operating_business"
+        ]
       },
       "binary_milestone": {
-        "score": 0.0,
-        "reasons": []
+        "score": 3.0,
+        "reasons": [
+          "component categories=real_option",
+          "existing methods=milestone, risk_adjusted"
+        ]
       }
     },
     "decision_rule": "Power Zones select the fitting economic method and eligible independent reviewers; they never choose the valuation answer or capital decision.",
     "ticker": "AAPL",
-    "as_of": "2026-07-20",
+    "as_of": "2026-07-21",
     "route_source": "canonical_power_zone_router",
     "config_path": "_system/frameworks/power_zones.json",
     "config_updated": "2026-07-14",
     "classification": {
-      "archetype": "unknown",
-      "moat": "unproven",
-      "dhando": "pending",
+      "archetype": "compounder",
+      "moat": "stable",
+      "dhando": "partial",
       "stance": "watch",
-      "cycle": "-",
+      "cycle": "mid",
       "moi_bucket": "pending",
-      "payoff_lens": "pending",
-      "investment_sleeve": "ls_algo_underlying"
+      "payoff_lens": "operating",
+      "investment_sleeve": "ls_algo_underlying",
+      "predictive_attribute": "quality_at_rich_price"
     },
-    "specialist_power_zones": [],
+    "specialist_power_zones": [
+      {
+        "persona": "lawrence",
+        "label": "Bryan Lawrence",
+        "independence_group": "quality_reinvestment",
+        "in_power_zone": true,
+        "fit": 1.0,
+        "matched": 3,
+        "known_fields": 3,
+        "matched_fields": [
+          "archetype",
+          "moat",
+          "dhando"
+        ],
+        "excluded_by": null,
+        "match_rate": null,
+        "score": 85
+      },
+      {
+        "persona": "buffett_weschler",
+        "label": "Buffett / Weschler",
+        "independence_group": "quality_reinvestment",
+        "in_power_zone": true,
+        "fit": 0.667,
+        "matched": 2,
+        "known_fields": 3,
+        "matched_fields": [
+          "archetype",
+          "moat"
+        ],
+        "excluded_by": null,
+        "match_rate": null,
+        "score": 57
+      },
+      {
+        "persona": "hohn",
+        "label": "Chris Hohn",
+        "independence_group": "competitive_advantage",
+        "in_power_zone": true,
+        "fit": 0.667,
+        "matched": 2,
+        "known_fields": 3,
+        "matched_fields": [
+          "archetype",
+          "moat"
+        ],
+        "excluded_by": null,
+        "match_rate": null,
+        "score": 57
+      },
+      {
+        "persona": "munger",
+        "label": "Charlie Munger",
+        "independence_group": "quality_reinvestment",
+        "in_power_zone": true,
+        "fit": 0.667,
+        "matched": 2,
+        "known_fields": 3,
+        "matched_fields": [
+          "archetype",
+          "moat"
+        ],
+        "excluded_by": null,
+        "match_rate": null,
+        "score": 57
+      }
+    ],
     "committee": {
-      "candidate_count": 4,
+      "candidate_count": 5,
       "independence_group_count": 3,
       "committee_seatable": true,
       "candidates": [
@@ -129,77 +1577,243 @@
         {
           "persona": "marathon_capital_cycle",
           "independence_group": "capital_cycle"
+        },
+        {
+          "persona": "lawrence",
+          "independence_group": "quality_reinvestment"
         }
       ]
     },
-    "input_hash": "c4a860ee153a34a6bafd4d15ed5e3934664b7ee21980f5fe5de1bacaf7897c34",
-    "generated_at": "2026-07-20T17:13:53.752558+00:00"
+    "input_hash": "2204160cd2fc9cfd8f6f3df998450af502091469fb10da2812bf85e0d9d2ae4d",
+    "generated_at": "2026-07-21T11:52:00.974513+00:00"
   },
   "market": {
     "price_per_share": 326.59,
-    "fully_diluted_shares": null,
-    "market_cap_m": null,
-    "enterprise_value_m": null
+    "fully_diluted_shares": 15014745000,
+    "market_cap_m": 4903665.57,
+    "enterprise_value_m": 4861923.57
   },
   "valuation": {
     "value_per_share": {
-      "low": null,
-      "base": null,
-      "high": null
+      "low": 80.56,
+      "base": 187.03,
+      "high": 297.4999
     },
     "priced_components_per_share": {
-      "low": 0,
-      "base": 0,
-      "high": 0
+      "low": 80.56,
+      "base": 187.03,
+      "high": 297.4999
     },
-    "legacy_value_per_share": null,
-    "probability_weighted_value_per_share": null,
+    "legacy_value_per_share": {
+      "low": 80.56,
+      "base": 187.03,
+      "high": 297.5
+    },
+    "probability_weighted_value_per_share": 187.03,
     "expected_distributions_per_share": 0.0,
     "annualized_return_at_price_pct": {
-      "low": null,
-      "base": null,
-      "high": null
+      "low": -18.12,
+      "base": -7.65,
+      "high": -1.32
     },
-    "downside_to_low_pct": null,
+    "downside_to_low_pct": -75.33,
     "horizon_years": 7,
     "interpretation": "value_per_share is withheld while any material additive component is unpriced; priced_components_per_share is not a complete security value."
   },
   "scenario_contract": {
     "rule": "Cases must change cited causal operating, capital, probability, timing, or financing drivers\u2014not only a terminal multiple.",
-    "top_value_drivers": [],
+    "top_value_drivers": [
+      {
+        "component_id": "services_installed_base_option",
+        "label": "Services installed-base and platform monetization option",
+        "valuation_status": "bounded_estimate",
+        "base_per_share": 35.0,
+        "legacy_base_per_share": 35.0,
+        "range_width_per_share": 85.0,
+        "scenario_assumptions": "Proof outputs {'low': 0.0, 'base': 35.0, 'high': 85.0}; see calculation_proof graph."
+      },
+      {
+        "component_id": "core_products_services_engine",
+        "label": "Core products and services owner-cash engine",
+        "valuation_status": "bounded_estimate",
+        "base_per_share": 171.03,
+        "legacy_base_per_share": 171.03,
+        "range_width_per_share": 78.9399,
+        "scenario_assumptions": "Proof outputs {'low': 131.56, 'base': 171.03, 'high': 210.4999}; see calculation_proof graph."
+      },
+      {
+        "component_id": "regulatory_and_cycle_reserve",
+        "label": "China, antitrust, and hardware cycle stress reserve",
+        "valuation_status": "bounded_estimate",
+        "base_per_share": -22.0,
+        "legacy_base_per_share": -22.0,
+        "range_width_per_share": 37.0,
+        "scenario_assumptions": "Proof outputs {'low': -45.0, 'base': -22.0, 'high': -8.0}; see calculation_proof graph."
+      },
+      {
+        "component_id": "net_financial_claims",
+        "label": "Net cash, securities, and debt claims on common equity",
+        "valuation_status": "bounded_estimate",
+        "base_per_share": 3.0,
+        "legacy_base_per_share": 3.0,
+        "range_width_per_share": 16.0,
+        "scenario_assumptions": "Proof outputs {'low': -6.0, 'base': 3.0, 'high': 10.0}; see calculation_proof graph."
+      }
+    ],
     "reverse_expectations": null
   },
   "calculation_proof_summary": {
-    "component_count": 0,
-    "priced_component_count": 0,
-    "proof_complete_pct": 0.0,
+    "component_count": 4,
+    "priced_component_count": 4,
+    "proof_complete_pct": 100.0,
     "status_counts": {
-      "bounded_estimate": 0,
+      "bounded_estimate": 4,
       "calculated": 0,
       "legacy_sensitivity": 0,
       "unpriced": 0
     },
-    "all_material_components_priced": false,
+    "all_material_components_priced": true,
     "calculation_errors": [],
-    "aggregate_proof_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    "aggregate_proof_hash": "f799dfba7def52f401249d2a0cd6c25973ed5cc8ecb5aceebea9b260cf59600f"
   },
-  "source_lineage": [],
+  "source_lineage": [
+    {
+      "component_id": "core_products_services_engine",
+      "node_id": "operating_cash_flow_m",
+      "ref": "AAPL/investor-documents/sec-edgar/10-K_20251031_rpt20250927_acc0000320193_25_000079.htm",
+      "locator": "NetCashProvidedByUsedInOperatingActivities $111,482M (FY2025)",
+      "as_of": "2025-09-27",
+      "content_sha256": "548ae59778cf08ee0f2ee088e7ece20d947076c3c01f74d2d65db4c2777e436a",
+      "source_id": "6e6c0af5ae29b44ccd5792c19c2887ad9b81cebb0a1c155cf5b881ef46f7f0b1"
+    },
+    {
+      "component_id": "core_products_services_engine",
+      "node_id": "capex_m",
+      "ref": "AAPL/investor-documents/sec-edgar/10-K_20251031_rpt20250927_acc0000320193_25_000079.htm",
+      "locator": "PaymentsToAcquirePropertyPlantAndEquipment $12,715M (FY2025)",
+      "as_of": "2025-09-27",
+      "content_sha256": "548ae59778cf08ee0f2ee088e7ece20d947076c3c01f74d2d65db4c2777e436a",
+      "source_id": "e45ce6a17745c76955208a34e3009c89b8a8cdcfe91cee888bbae32e6862786e"
+    },
+    {
+      "component_id": "core_products_services_engine",
+      "node_id": "net_income_m",
+      "ref": "AAPL/investor-documents/sec-edgar/10-K_20251031_rpt20250927_acc0000320193_25_000079.htm",
+      "locator": "NetIncomeLoss $112,010M (FY2025); diluted EPS $7.46",
+      "as_of": "2025-09-27",
+      "content_sha256": "548ae59778cf08ee0f2ee088e7ece20d947076c3c01f74d2d65db4c2777e436a",
+      "source_id": "b25ef1851f463b844781a999141726491af148dbbb84ca69480caabee8bf702a"
+    },
+    {
+      "component_id": "core_products_services_engine",
+      "node_id": "shares_m",
+      "ref": "AAPL/investor-documents/sec-edgar/10-K_20251031_rpt20250927_acc0000320193_25_000079.htm",
+      "locator": "FY2025 net income $112010.0M / diluted EPS $7.46",
+      "as_of": "2025-09-27",
+      "content_sha256": "548ae59778cf08ee0f2ee088e7ece20d947076c3c01f74d2d65db4c2777e436a",
+      "source_id": "d6f9c09ec994998282f3031fd9b1ac0daa8ded78c1cf25ecbb62e89fbef15756"
+    },
+    {
+      "component_id": "services_installed_base_option",
+      "node_id": "services_revenue_m",
+      "ref": "AAPL/investor-documents/sec-edgar/10-K_20251031_rpt20250927_acc0000320193_25_000079.htm",
+      "locator": "Disaggregated net sales table: Services $109,158M (FY2025)",
+      "as_of": "2025-09-27",
+      "content_sha256": "548ae59778cf08ee0f2ee088e7ece20d947076c3c01f74d2d65db4c2777e436a",
+      "source_id": "a2c71c8cafb103dff25a86008f94ecf9946334e9110d71a3ba77eaaa27995161"
+    },
+    {
+      "component_id": "services_installed_base_option",
+      "node_id": "total_revenue_m",
+      "ref": "AAPL/investor-documents/sec-edgar/10-K_20251031_rpt20250927_acc0000320193_25_000079.htm",
+      "locator": "RevenueFromContractWithCustomerExcludingAssessedTax $307,003M (FY2025)",
+      "as_of": "2025-09-27",
+      "content_sha256": "548ae59778cf08ee0f2ee088e7ece20d947076c3c01f74d2d65db4c2777e436a",
+      "source_id": "c35112d2808f6bf4a37858b250941235dbdbb32b9671a0a00cf67f901f6158ff"
+    },
+    {
+      "component_id": "services_installed_base_option",
+      "node_id": "shares_m",
+      "ref": "AAPL/investor-documents/sec-edgar/10-K_20251031_rpt20250927_acc0000320193_25_000079.htm",
+      "locator": "FY2025 net income $112010.0M / diluted EPS $7.46",
+      "as_of": "2025-09-27",
+      "content_sha256": "548ae59778cf08ee0f2ee088e7ece20d947076c3c01f74d2d65db4c2777e436a",
+      "source_id": "d6f9c09ec994998282f3031fd9b1ac0daa8ded78c1cf25ecbb62e89fbef15756"
+    },
+    {
+      "component_id": "net_financial_claims",
+      "node_id": "cash_and_securities_m",
+      "ref": "AAPL/investor-documents/sec-edgar/10-K_20251031_rpt20250927_acc0000320193_25_000079.htm",
+      "locator": "CashCashEquivalentsAndMarketableSecurities $132,420M at September 27, 2025",
+      "as_of": "2025-09-27",
+      "content_sha256": "548ae59778cf08ee0f2ee088e7ece20d947076c3c01f74d2d65db4c2777e436a",
+      "source_id": "82a4a0d1a982a4385157d9e1c5454e1c8121ddcd52d94b61ed365f648dc3ae6c"
+    },
+    {
+      "component_id": "net_financial_claims",
+      "node_id": "total_debt_m",
+      "ref": "AAPL/investor-documents/sec-edgar/10-K_20251031_rpt20250927_acc0000320193_25_000079.htm",
+      "locator": "LongTermDebtNoncurrent $78,328M plus LongTermDebtCurrent $12,350M (FY2025)",
+      "as_of": "2025-09-27",
+      "content_sha256": "548ae59778cf08ee0f2ee088e7ece20d947076c3c01f74d2d65db4c2777e436a",
+      "source_id": "144dabf276e0fb98c47e2d639d3429a63f531d0ea84cff4e6cec8dd20ef9821e"
+    },
+    {
+      "component_id": "net_financial_claims",
+      "node_id": "shares_m",
+      "ref": "AAPL/investor-documents/sec-edgar/10-K_20251031_rpt20250927_acc0000320193_25_000079.htm",
+      "locator": "FY2025 net income $112010.0M / diluted EPS $7.46",
+      "as_of": "2025-09-27",
+      "content_sha256": "548ae59778cf08ee0f2ee088e7ece20d947076c3c01f74d2d65db4c2777e436a",
+      "source_id": "d6f9c09ec994998282f3031fd9b1ac0daa8ded78c1cf25ecbb62e89fbef15756"
+    },
+    {
+      "component_id": "regulatory_and_cycle_reserve",
+      "node_id": "operating_income_m",
+      "ref": "AAPL/investor-documents/sec-edgar/10-K_20251031_rpt20250927_acc0000320193_25_000079.htm",
+      "locator": "OperatingIncomeLoss $133050.0M (FY2025)",
+      "as_of": "2025-09-27",
+      "content_sha256": "548ae59778cf08ee0f2ee088e7ece20d947076c3c01f74d2d65db4c2777e436a",
+      "source_id": "c67deafae35658399db42e700472db25e8ceda4107bd98266c874798f3eda323"
+    },
+    {
+      "component_id": "regulatory_and_cycle_reserve",
+      "node_id": "research_and_development_m",
+      "ref": "AAPL/investor-documents/sec-edgar/10-K_20251031_rpt20250927_acc0000320193_25_000079.htm",
+      "locator": "ResearchAndDevelopmentExpense $34,550M (FY2025)",
+      "as_of": "2025-09-27",
+      "content_sha256": "548ae59778cf08ee0f2ee088e7ece20d947076c3c01f74d2d65db4c2777e436a",
+      "source_id": "eca4d8759d84b849f3551d66811e90783cff511c51437008a59929fb475b0923"
+    },
+    {
+      "component_id": "regulatory_and_cycle_reserve",
+      "node_id": "shares_m",
+      "ref": "AAPL/investor-documents/sec-edgar/10-K_20251031_rpt20250927_acc0000320193_25_000079.htm",
+      "locator": "FY2025 net income $112010.0M / diluted EPS $7.46",
+      "as_of": "2025-09-27",
+      "content_sha256": "548ae59778cf08ee0f2ee088e7ece20d947076c3c01f74d2d65db4c2777e436a",
+      "source_id": "d6f9c09ec994998282f3031fd9b1ac0daa8ded78c1cf25ecbb62e89fbef15756"
+    }
+  ],
   "model_checks": {
     "calculation_graphs_valid": true,
-    "component_sum_reconciles": false,
+    "component_sum_reconciles": true,
     "no_double_counting": true,
-    "all_material_components_priced": false,
+    "all_material_components_priced": true,
     "low_base_high_ordered": true
   },
   "evidence": {
-    "unresolved_count": 1,
-    "blockers": [
-      "A complete economic ownership map has not been supplied."
-    ],
+    "unresolved_count": 0,
+    "blockers": [],
     "validation_errors": []
   },
   "monitoring": {
-    "falsifiers": [],
+    "falsifiers": [
+      "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
+      "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
+      "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
+      "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case."
+    ],
     "required_refresh_triggers": [
       "new filing or material operating update",
       "capital-structure change",
@@ -208,12 +1822,16 @@
     ]
   },
   "change_control": {
-    "model_hash": "75fedfe1e19189339a5799cbbd0f592212db4f93a21ec1dc9a873fbf54d7485f",
-    "method_versions": [],
+    "model_hash": "96b2629ec22fa50dbecaa7d4b6cd11ca955f276c8ac63bb75bfc19af319ef63e",
+    "method_versions": [
+      "net_asset_value@1.0",
+      "owner_earnings_reinvestment_dcf@1.0",
+      "risk_adjusted_milestone_value@1.0"
+    ],
     "change_log": [],
     "rule": "A source fact is locked. Every assumption change requires a reason, author, timestamp, and before/after value."
   },
   "decision_rule": "No security is decision-grade until every material claim is valued exactly once by a valid calculation proof and every material evidence blocker is resolved.",
   "authority": "universal_valuation_contract",
-  "legacy_reference_present": false
+  "legacy_reference_present": true
 }
