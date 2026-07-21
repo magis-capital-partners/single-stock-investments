@@ -1,69 +1,72 @@
 {
-  "schema_version": "1.0",
-  "ticker": "GYRO",
-  "thesis": "Gyrodyne, LLC is liquidating two remaining New York real estate properties (Flowerfield on Long Island and Cortlandt Manor in Westchester) under ASC 205-30 liquidation-basis accounting. **[Fact]** As of March 31, 2026, net assets in liquidation were **$25,924,002** (**$11.79** per share on **2,199,308** shares) versus a thin-market quote near **$5.80**. **[Fact]** A signed B2K agreement covers the largest Flowerfield parcel for **$24.0M–$28.74M**, contingent on subdivision and site-plan approval. **[Fact]** Target dissolution is **December 31, 2028**, twice extended from an original 2026 target.",
-  "why_market_wrong": "The company publishes an audited liquidation NAV and a dated payoff path, but micro-cap illiquidity (~2,000 shares/day), an unresolved Article 78 appeal on Flowerfield, and K-1-style obscurity keep most investors away. **[Inference]** The discount to disclosed NAV looks like a market-structure and litigation-timing mispricing rather than a hidden operating failure. **[Inference]** Proof-first component math at base case sums to **$11.79/sh** economic value versus price near **$5.80**.",
   "base_irr_pct": 33.4,
-  "irr_label": "annualized return (equity yield curve)",
-  "scenarios": {
-    "bear": 13.5,
-    "base": 33.4,
-    "bull": 41.0
-  },
   "classification": {
     "archetype": "optionality",
-    "moat": "n/a",
-    "dhando": "partial",
-    "stance": "hold",
     "cycle": "-",
+    "dhando": "partial",
+    "lawrence_bucket": "other",
+    "moat": "n/a",
     "payoff_lens": "asset",
     "predictive_attribute": "equity_yield_curve",
-    "lawrence_bucket": "other"
+    "stance": "hold"
   },
+  "evidence_citations": [
+    "GYRO/third-party-analyses/source_inventory_2026-07-17.md",
+    "GYRO/INDEX.csv",
+    "investor-documents/sec-edgar/10-K_20260327_rpt20251231_acc0001437749_26_010078.htm",
+    "investor-documents/sec-edgar/10-Q_20260513_rpt20260331_acc0001437749_26_016537.htm",
+    "investor-documents/sec-edgar/DEF 14A_20251017_rpt20251105_acc0001437749_25_031274.htm"
+  ],
+  "filing_digest": "GYRO/research/evidence/filing_digest_2026-07-21.md",
+  "generated_at": "2026-07-21T03:13:24+00:00",
+  "irr_label": "annualized return",
   "key_assumptions": [
     {
       "input": "Price today",
-      "value": "**$5.80**",
-      "source": "Yahoo Finance GYRO close 2026-07-16"
+      "source": "Yahoo Finance GYRO close 2026-07-16 (last session on or before as_of; thin volume ~2,000 shares)",
+      "value": "**$5.8**"
     },
     {
-      "input": "Disclosed net assets in liquidation per share",
-      "value": "**$11.79**",
-      "source": "10-Q Q1 2026 liquidation-basis statement (2026-03-31)"
+      "input": "Payoff price (Year 2.46)",
+      "source": "Sum of parts / catalyst path in IRR steps",
+      "value": "**$11.79**"
     },
     {
-      "input": "Liquidation target date",
-      "value": "**December 31, 2028**",
-      "source": "10-K FY2025 MD&A"
+      "input": "Horizon (years)",
+      "source": "Model choice in valuation.json (not company guidance)",
+      "value": "**2.46**"
     },
     {
-      "input": "Horizon to target",
-      "value": "**2.46 years**",
-      "source": "Days from as-of to 2028-12-31"
+      "input": "Operating / distribution path uplift",
+      "source": "[Assumption] \u2014 see scenario notes in valuation.json",
+      "value": "**+$3.0/sh**"
     },
     {
-      "input": "Component schedule base economic value",
-      "value": "**$11.79/sh**",
-      "source": "Five filing-backed net_asset_value proofs summing to disclosed NAV"
+      "input": "Catalyst or terminal re-rate uplift",
+      "source": "[Assumption] \u2014 see scenario notes in valuation.json",
+      "value": "**+$2.99/sh**"
     }
   ],
-  "open_questions": [
-    "Article 78 appeal status since 10-Q filed 2026-05-13.",
-    "B2K Smithtown site-plan approval timing (company expected Q3 2026).",
-    "2021 mortgage maturity/extension October 2026.",
-    "Human sign-off before sizing up despite mechanical accumulate signal."
-  ],
-  "evidence_citations": [
-    "GYRO/investor-documents/sec-edgar/10-Q_20260513_rpt20260331_acc0001437749_26_016537.htm",
-    "GYRO/investor-documents/sec-edgar/10-K_20260327_rpt20251231_acc0001437749_26_010078.htm",
-    "GYRO/research/evidence_reconciliation_2026-07-21.md"
-  ],
-  "filing_digest": "GYRO/research/evidence/filing_digest_2026-07-17.md",
   "last_verified": {
-    "valuation_as_of": "2026-07-21",
     "deep_dive": "2026-07-21",
-    "human_approved": null
+    "human_approved": null,
+    "valuation_as_of": "2026-07-21"
   },
+  "open_questions": [
+    "Confirm whether the Article 78 appeal (Incorporated Village of Head of the Harbor v. Town of Smithtown, et al.) has been decided since the 10-Q filed 2026-05-13. As of that filing it remained pending.",
+    "Confirm current status of the B2K site-plan submission with the Town of Smithtown; company expected approval in the third quarter of 2026.",
+    "Mechanical stance tool proposes \"accumulate\" (base return above 20%, partial dhando, floor passes); Marvin recommends holding at \"hold\" pending human sign-off given thin daily volume (about 2,000-6,000 shares) and the unresolved litigation described above.",
+    "Verify whether any interim or special distribution has been declared since 2026-03-31.",
+    "Confirm the exact composition of the $10,790,194 total loans payable; filings disclose three separate facilities (an original bank line at 3.85%, a 2021 mortgage loan with Rialto Capital at 3.75% maturing October 2026 with an extension option, and a 2023 mortgage loan with LLYR Resources refinanced in January 2026 at 15%) but the pieces identified in the text extract do not fully reconcile to the balance-sheet total; worth a line-item confirmation against the debt footnote table."
+  ],
+  "scenarios": {
+    "base": 33.4,
+    "bear": 13.5,
+    "bull": 41.0
+  },
+  "schema_version": "1.0",
   "stance": null,
-  "generated_at": "2026-07-21T03:06:00+00:00"
+  "thesis": "Gyrodyne, LLC owns two real estate properties left over from a much larger portfolio it has been selling off for two decades. **[Fact]** One is Flowerfield, an industrial park and vacant land in St. James, New York (Suffolk County, Long Island). **[Fact]** The other is Cortlandt Manor, a set of medical office buildings and vacant land in Westchester County. **[Fact]** The company is not trying to grow. It is trying to get government approval to subdivide and improve these properties, sell them for the highest price it can, pay off its debts, and then dissolve and send shareholders the cash. **[Fact]** It reports its books on a \"liquidation basis\" of accounting, which means the balance sheet already shows management's best estimate of what everything is worth in cash, not the price originally paid for it decades ago. **[Fact]**",
+  "ticker": "GYRO",
+  "why_market_wrong": "The company itself discloses, every quarter, its own best estimate of the total cash left for shareholders once the properties are sold and debts are paid: about $11.79 per share as of March 31, 2026. **[Fact]** The stock trades around $5.80, roughly half that estimate. **[Inference]** This is a small, thinly traded stock (about 2.2 million shares total, often only a few thousand shares change hands a day) with an unresolved lawsuit over one of its two properties, so index funds, brokers, and most individual investors cannot or will not hold it, even though the company tells shareholders almost exactly what it expects to distribute and roughly when."
 }
