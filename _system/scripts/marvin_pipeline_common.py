@@ -6,6 +6,16 @@ import json
 from pathlib import Path
 
 
+def load_research_json(path: Path) -> dict:
+    """Load research provenance JSON, ignoring trailing // pragma comments."""
+    text = path.read_text(encoding="utf-8")
+    stripped = "\n".join(line.split("//", 1)[0].rstrip() for line in text.splitlines())
+    value = json.loads(stripped)
+    if not isinstance(value, dict):
+        raise json.JSONDecodeError("expected JSON object", stripped, 0)
+    return value
+
+
 def latest_deep_dive_date(research_dir: Path) -> str | None:
     """Return YYYY-MM-DD from newest deep_dive_*.md, or None."""
     dives = sorted(research_dir.glob("deep_dive_*.md"), reverse=True)

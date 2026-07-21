@@ -9,9 +9,14 @@ from pathlib import Path
 
 def read_json(path: Path) -> dict:
     try:
-        value = json.loads(path.read_text(encoding="utf-8"))
-    except (OSError, json.JSONDecodeError) as exc:
-        raise ValueError(f"cannot read {path}: {exc}") from exc
+        from marvin_pipeline_common import load_research_json
+
+        value = load_research_json(path)
+    except (OSError, json.JSONDecodeError, ImportError) as exc:
+        try:
+            value = json.loads(path.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError) as fallback_exc:
+            raise ValueError(f"cannot read {path}: {exc}") from fallback_exc
     if not isinstance(value, dict):
         raise ValueError(f"{path} must contain a JSON object")
     return value

@@ -1,29 +1,78 @@
 {
-  "ticker": "8697.T",
-  "as_of": "2026-07-21",
-  "one_liner": "Japan's exchange and clearing toll booth with ~58% margins; peak FY2025 volume makes spot earnings a poor entry anchor.",
-  "base_irr_pct": 3.2,
-  "base_irr_label": "7yr Lawrence synthesis",
-  "stance_context": "watch",
-  "archetype": "croupier",
+  "base_irr_pct": 3.19,
+  "classification": {
+    "archetype": "croupier",
+    "cycle": "peak",
+    "dhando": "partial",
+    "lawrence_bucket": "multi_sided",
+    "moat": "stable"
+  },
+  "evidence_citations": [
+    "8697.T/INDEX.csv",
+    "8697.T/research/deep_dive_2026-06-04.md",
+    "8697.T/research/evidence/filing_digest_2026-07-21.md",
+    "8697.T/research/cross_check_third_party_2026-07-21.md",
+    "8697.T/research/adversarial_2026-07-21.md"
+  ],
+  "filing_digest": "8697.T/research/evidence/filing_digest_2026-07-21.md",
+  "generated_at": "2026-07-21T01:51:40+00:00",
+  "irr_label": "7yr IRR (total synthesis)",
   "key_assumptions": [
-    "Normalized owner cash ¥70/sh (below FY2025 EPS ¥76.81)",
-    "Mid-cycle growth 5% years 1–5, 4% years 6–10; exit 19× owner cash",
-    "Price ¥2,000.5 (2026-05-25 Stooq; confirm live)",
-    "Shares ~1,030M [HUMAN REVIEW]"
+    {
+      "input": "Price today",
+      "source": "Yahoo 8697.T close 2026-07-21",
+      "value": "**$2190.0**"
+    },
+    {
+      "input": "Starting free cash flow per share",
+      "source": "FY2025 parent EPS \u00a576.81 normalized down for clearing pass-through / volume cyclicality",
+      "value": "**$70**"
+    },
+    {
+      "input": "Cycle adjustment (starting cash)",
+      "source": "Peak FY2025 activity; base owner earnings below spot EPS 76.81",
+      "value": "**peak**"
+    },
+    {
+      "input": "Growth in years 1 through 5",
+      "source": "Mid-cycle volume + modest data monetization",
+      "value": "**5.0%** per year"
+    },
+    {
+      "input": "Growth in years 6 through 7",
+      "source": "Scenario base",
+      "value": "**4.0%** per year"
+    },
+    {
+      "input": "Selling multiple in year 10",
+      "source": "Scenario base",
+      "value": "**19 times cash flow**"
+    },
+    {
+      "input": "Time horizon",
+      "source": "7-year owner-cash model",
+      "value": "**7 years**"
+    }
   ],
+  "last_verified": {
+    "deep_dive": "2026-07-21",
+    "human_approved": null,
+    "valuation_as_of": "2026-07-21"
+  },
   "open_questions": [
-    "Confirm latest issued share count from FY2025 annual securities report",
-    "FY2027 management guide vs peak FY2025 operating income",
-    "Regulatory fee-cap risk on exchange services"
+    "Confirm JPY price; separate core trading fees from clearing pass-through in normalized earnings.",
+    "Hold override?** Croupier sleeve incumbent vs **3.2%** total synthesis IRR at spot.",
+    "Re-run extract on **`20251113_j.pdf`** (encoding failure) and **`E_ER_JPX_Q2FY2025.pdf`** for filing-verified H1 FY2026 flow.",
+    "Entry math: what ADV/revenue decline restores ~15% IRR at \u00a52,000?"
   ],
-  "top_citations": [
-    "8697.T/02_Quarterly/Earnings_Releases/E_ER_JPX_Q4FY2025.pdf",
-    "8697.T/02_Quarterly/Explanatory_Materials/E_EM_JPX_Q4FY2025.pdf",
-    "8697.T/01_Official/Annual_Securities_Reports/English/Annual_Securities_Report_fy2024.pdf",
-    "8697.T/research/valuation.json",
-    "8697.T/research/evidence_reconciliation_2026-07-21.md"
-  ],
-  "component_value_base_per_share": 1800.46,
-  "contract_status": "evidence_reconciliation_2026-07-21"
+  "scenarios": {
+    "base": 1.7,
+    "bear": -6.3,
+    "bull": 5.8
+  },
+  "schema_version": "1.0",
+  "stance": null,
+  "thesis": "Japan Exchange Group (JPX) operates Japan's dominant stock exchange, clearing house, and market-data platform. **[Fact]** Brokers, issuers, and clearing members pay trading, clearing, listing, and data fees. Revenue scales with cash-equity turnover and clearing collateral balances, not proprietary trading on core operations. **[Fact]** FY2025 (Mar-2026) operating revenue was **\u00a5198.7B** (+22.5%) with operating margin ~58.5% and ROE 23.1% (scan-tier Q4 FY2025 release; see Primary sources). Cash equities average daily turnover reached **\u00a57.52T** (+31.9% YoY). The group holds a regulatory and network monopoly on domestic market infrastructure.",
+  "ticker": "8697.T",
+  "why_market_wrong": "No clear mispricing signal. **[Inference]** FY2025 was exceptional: retail and inbound equity engagement drove ADV +31.9% and clearing collateral income surged. **[Inference]** FY2027 management forecast implies flat-to-down operating income vs the FY2025 peak, so the market may correctly price cycle-peak earnings at ~26\u00d7 P/E. Return is franchise earnings at price unless volume normalizes and the multiple compresses further."
 }

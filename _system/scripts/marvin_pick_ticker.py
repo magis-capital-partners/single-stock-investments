@@ -237,9 +237,14 @@ def _activity_snapshot(ticker: str) -> dict:
 def agent_state(ticker: str) -> dict:
     path = ROOT / ticker.upper() / "research" / "agent_run_state.json"
     try:
-        return json.loads(path.read_text(encoding="utf-8"))
-    except (OSError, json.JSONDecodeError):
-        return {}
+        from marvin_pipeline_common import load_research_json
+
+        return load_research_json(path)
+    except (OSError, json.JSONDecodeError, ImportError):
+        try:
+            return json.loads(path.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError):
+            return {}
 
 
 def research_candidate(ticker: str, reason: str, *, force: bool = False) -> dict | None:
