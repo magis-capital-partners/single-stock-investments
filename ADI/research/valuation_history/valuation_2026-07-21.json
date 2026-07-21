@@ -369,13 +369,6 @@
               "high": "value_per_share"
             }
           }
-        },
-        "risk_and_timing": {
-          "success_probability": 0.55,
-          "remaining_capital_m": 0.0,
-          "timing_basis": "Data-center power delivery and high-speed connectivity design wins over 3 to 7 years.",
-          "probability_basis": "Judgment from FY2025 Industrial revenue $4.93B and 10-K data-center market commentary; ADI does not disclose standalone AI revenue.",
-          "remaining_capital_basis": "Incremental R&D embedded in consolidated $1.77B FY2025 spend."
         }
       },
       {
@@ -586,7 +579,7 @@
   },
   "economic_value_analysis": {
     "schema_version": "1.0",
-    "status": "complete",
+    "status": "evidence_blocked",
     "trigger": {
       "required": true,
       "reasons": [
@@ -594,16 +587,10 @@
       ],
       "policy": "A complete economic-value analysis is required when any trigger fires; otherwise it is recommended."
     },
-    "method": "component_economic_value",
-    "economic_claim": {
-      "description": "One diluted share of ADI, including analog semiconductor owner cash, AI/data-center edge option, net financial claims, and cycle/integration reserve.",
-      "unit_label": "diluted share",
-      "unit_count": 496709000,
-      "unit_source": "FY2025 net income $2267.3M / diluted EPS $4.56 (ADI/investor-documents/sec-edgar/10-K_20251125_rpt20251101_acc0000006281_25_000153.htm)",
-      "enterprise_to_equity_reconciliation": "Core owner free cash flow is valued once; AI/data-center option, net financial claims, and cycle reserve are separate additive components with unique overlap keys."
-    },
-    "gaap_role": "cross_check",
-    "accounting_reference": "FY2025 10-K and Q2 FY2026 10-Q filing extracts; GAAP net income is cross-check only for analog compounder.",
+    "method": "economic_claim_to_risked_present_value",
+    "economic_claim": {},
+    "gaap_role": null,
+    "accounting_reference": null,
     "comparable_hierarchy": [
       "issuer_arm_length_transaction",
       "same_asset_transaction",
@@ -648,13 +635,6 @@
           "low": 0.0,
           "base": 18.0,
           "high": 45.0
-        },
-        "risk_and_timing": {
-          "success_probability": 0.55,
-          "remaining_capital_m": 0.0,
-          "timing_basis": "Data-center power delivery and high-speed connectivity design wins over 3 to 7 years.",
-          "probability_basis": "Judgment from FY2025 Industrial revenue $4.93B and 10-K data-center market commentary; ADI does not disclose standalone AI revenue.",
-          "remaining_capital_basis": "Incremental R&D embedded in consolidated $1.77B FY2025 spend."
         }
       },
       {
@@ -738,11 +718,11 @@
         "overlap_control": "Unique overlap key ai_data_center_edge_option.",
         "falsifier": "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
         "risk_and_timing": {
-          "success_probability": 0.55,
-          "remaining_capital_m": 0.0,
-          "timing_basis": "Data-center power delivery and high-speed connectivity design wins over 3 to 7 years.",
-          "probability_basis": "Judgment from FY2025 Industrial revenue $4.93B and 10-K data-center market commentary; ADI does not disclose standalone AI revenue.",
-          "remaining_capital_basis": "Incremental R&D embedded in consolidated $1.77B FY2025 spend."
+          "success_probability": null,
+          "remaining_capital_m": null,
+          "timing_basis": null,
+          "probability_basis": null,
+          "remaining_capital_basis": null
         }
       },
       {
@@ -795,12 +775,18 @@
       }
     ],
     "wisdom_applied": [],
-    "limitations": [
-      "AI/data-center milestone value is judgment-based; industrial revenue partially embedded in consolidated free cash flow.",
-      "Cycle and integration reserve bands remain widest judgment components."
-    ],
+    "limitations": [],
     "complete_component_coverage": true,
-    "validation_errors": [],
+    "validation_errors": [
+      "economic_claim.description required",
+      "economic_claim.enterprise_to_equity_reconciliation required",
+      "economic_claim.unit_count required",
+      "economic_claim.unit_label required",
+      "economic_claim.unit_source required",
+      "economic_value.schema_version 1.0 required",
+      "gaap_role required",
+      "option component ai_data_center_edge_option requires probability, timing, and remaining-capital treatment"
+    ],
     "registry_version": "1.0"
   },
   "total_return_panel": {
@@ -1580,7 +1566,7 @@
   },
   "universal_valuation_contract": {
     "schema_version": "2.0",
-    "status": "decision_grade",
+    "status": "evidence_blocked",
     "ticker": "ADI",
     "as_of": "2026-07-21",
     "economic_ownership_map": [
@@ -2271,9 +2257,9 @@
         "probability_and_timing": {
           "success_probability": null,
           "remaining_capital_m": null,
-          "timing_basis": "Data-center power delivery and high-speed connectivity design wins over 3 to 7 years.",
-          "probability_basis": "Judgment from FY2025 Industrial revenue $4.93B and 10-K data-center market commentary; ADI does not disclose standalone AI revenue.",
-          "remaining_capital_basis": "Incremental R&D embedded in consolidated $1.77B FY2025 spend."
+          "timing_basis": null,
+          "probability_basis": null,
+          "remaining_capital_basis": null
         },
         "tax_and_realization_adjustments": "Reconcile to FY2025 10-K and Q2 FY2026 10-Q before decision use.",
         "falsifier": "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
@@ -3271,9 +3257,27 @@
       "low_base_high_ordered": true
     },
     "evidence": {
-      "unresolved_count": 0,
-      "blockers": [],
-      "validation_errors": []
+      "unresolved_count": 8,
+      "blockers": [
+        "economic_claim.description required",
+        "economic_claim.enterprise_to_equity_reconciliation required",
+        "economic_claim.unit_count required",
+        "economic_claim.unit_label required",
+        "economic_claim.unit_source required",
+        "economic_value.schema_version 1.0 required",
+        "gaap_role required",
+        "option component ai_data_center_edge_option requires probability, timing, and remaining-capital treatment"
+      ],
+      "validation_errors": [
+        "economic_claim.description required",
+        "economic_claim.enterprise_to_equity_reconciliation required",
+        "economic_claim.unit_count required",
+        "economic_claim.unit_label required",
+        "economic_claim.unit_source required",
+        "economic_value.schema_version 1.0 required",
+        "gaap_role required",
+        "option component ai_data_center_edge_option requires probability, timing, and remaining-capital treatment"
+      ]
     },
     "monitoring": {
       "falsifiers": [
@@ -3290,7 +3294,7 @@
       ]
     },
     "change_control": {
-      "model_hash": "35509549e75dc459faf85ec8f3601eac617cb8d57023471f120e49893f95f8f9",
+      "model_hash": "8adfa193ad5712eddd6cd825951eec1e78c3d19dd2d69d9a6e9ef4433733420c",
       "method_versions": [
         "net_asset_value@1.0",
         "owner_earnings_reinvestment_dcf@1.0",
@@ -3373,367 +3377,5 @@
       }
     },
     "notes": "Capstone IRR combining filings, segments, overlays, third-party, qualitative"
-  },
-  "context_overlay": {
-    "as_of": "2026-07-21",
-    "disclaimer": "Context only. Tailwinds inform stance and overlay sizing; they do not auto-inflate Lawrence base IRR. Promotion to base case requires [HUMAN REVIEW].",
-    "themes": [
-      {
-        "theme_id": "macro_regime",
-        "label": "Macro risk regime",
-        "indicators": [
-          {
-            "id": "hy_oas",
-            "label": "High-yield OAS credit spread (%)",
-            "latest": 1.43,
-            "as_of": "2026-07-20",
-            "yoy_pct": 248.8,
-            "direction": "up",
-            "good_for": "risk_regime",
-            "source": "spread:HYG-LQD:21d (HYG-LQD 1m spread proxy, not OAS)",
-            "stale": false,
-            "in_base_irr": false
-          },
-          {
-            "id": "ust_10y",
-            "label": "US Treasury 10Y yield (%)",
-            "latest": 4.604000091552734,
-            "as_of": "2026-07-21",
-            "yoy_pct": 5.3,
-            "direction": "up",
-            "good_for": "rates_regime",
-            "source": "yahoo:^TNX",
-            "stale": false,
-            "in_base_irr": false
-          },
-          {
-            "id": "ust_2y",
-            "label": "US Treasury 2Y yield (%)",
-            "latest": 4.331999778747559,
-            "as_of": "2026-07-21",
-            "yoy_pct": 10.8,
-            "direction": "up",
-            "good_for": "rates_regime",
-            "source": "yahoo:^FVX",
-            "stale": false,
-            "in_base_irr": false
-          },
-          {
-            "id": "dxy_broad",
-            "label": "Trade-weighted USD index (broad)",
-            "latest": 101.02100372314453,
-            "as_of": "2026-07-21",
-            "yoy_pct": 3.2,
-            "direction": "up",
-            "good_for": "dollar_regime",
-            "source": "yahoo:DX-Y.NYB",
-            "stale": false,
-            "in_base_irr": false
-          },
-          {
-            "id": "vix_level",
-            "label": "VIX index level",
-            "latest": 17.84000015258789,
-            "as_of": "2026-07-21",
-            "yoy_pct": 7.1,
-            "direction": "up",
-            "good_for": "vol_regime",
-            "source": "yahoo:^VIX",
-            "stale": false,
-            "in_base_irr": false
-          },
-          {
-            "id": "credit_impulse_1m",
-            "label": "HYG vs TLT 1-month return spread (%)",
-            "latest": 2.76,
-            "as_of": "2026-07-20",
-            "yoy_pct": 55.9,
-            "direction": "up",
-            "good_for": "credit_impulse",
-            "source": "spread:HYG-TLT:21d",
-            "stale": false,
-            "in_base_irr": false
-          },
-          {
-            "id": "spy_20d_realized_vol",
-            "label": "SPY 20-day realized vol (annualized %)",
-            "latest": 11.37,
-            "as_of": "2026-07-20",
-            "yoy_pct": 31.3,
-            "direction": "up",
-            "good_for": "equity_vol",
-            "source": "realized_vol:SPY:20d",
-            "stale": false,
-            "in_base_irr": false
-          }
-        ]
-      }
-    ]
-  },
-  "insider_signal": {
-    "as_of": "2026-07-21",
-    "disclaimer": "Context only. Insider activity informs scenario confidence and stance discussion; it does not auto-inflate Lawrence base IRR. Promotion requires [HUMAN REVIEW].",
-    "in_base_irr": false,
-    "window_days": 365,
-    "ics": 10.0,
-    "band": "exceptional",
-    "bull_case_support": "moderate",
-    "scenario_confidence": {
-      "priors": {
-        "bear": 0.2,
-        "base": 0.55,
-        "bull": 0.25
-      },
-      "tilted": {
-        "bear": 0.2,
-        "base": 0.4,
-        "bull": 0.4
-      },
-      "bull_delta": 0.15,
-      "bear_delta": 0.0,
-      "note": "Scenario weights are qualitative confidence only; Lawrence base IRR unchanged."
-    },
-    "factors": {
-      "buy_score": 31.385,
-      "sell_score": -1.0,
-      "cluster_bonus": 0.0,
-      "net_buy_usd": 22212447.14,
-      "net_sell_usd": 129202202.8,
-      "price_today": 372.46
-    },
-    "top_buys": [
-      {
-        "insider": "ROCHE VINCENT",
-        "date": "2026-07-01",
-        "shares": 10000,
-        "price": 108.08,
-        "value_usd": 1080800.0,
-        "shares_owned_after": 147537,
-        "contrib": 2.828
-      },
-      {
-        "insider": "ROCHE VINCENT",
-        "date": "2026-05-26",
-        "shares": 30000,
-        "price": 144.06,
-        "value_usd": 4321800.0,
-        "shares_owned_after": 167537,
-        "contrib": 2.365
-      },
-      {
-        "insider": "ROCHE VINCENT",
-        "date": "2026-05-22",
-        "shares": 30000,
-        "price": 144.06,
-        "value_usd": 4321800.0,
-        "shares_owned_after": 167537,
-        "contrib": 2.287
-      },
-      {
-        "insider": "ROCHE VINCENT",
-        "date": "2026-06-01",
-        "shares": 10000,
-        "price": 108.08,
-        "value_usd": 1080800.0,
-        "shares_owned_after": 147537,
-        "contrib": 2.202
-      },
-      {
-        "insider": "Cotter Martin",
-        "date": "2026-06-02",
-        "shares": 17594,
-        "price": 83.48,
-        "value_usd": 1468747.12,
-        "shares_owned_after": 73925,
-        "contrib": 2.038
-      }
-    ],
-    "top_sells": [
-      {
-        "insider": "ROCHE VINCENT",
-        "date": "2026-05-26",
-        "shares": 20038,
-        "price": 414.8255,
-        "value_usd": 8312273.37,
-        "is_10b5_1": false,
-        "contrib": -0.18
-      },
-      {
-        "insider": "ROCHE VINCENT",
-        "date": "2026-05-26",
-        "shares": 9962,
-        "price": 415.738,
-        "value_usd": 4141581.96,
-        "is_10b5_1": false,
-        "contrib": -0.18
-      },
-      {
-        "insider": "ROCHE VINCENT",
-        "date": "2026-05-22",
-        "shares": 29335,
-        "price": 396.803,
-        "value_usd": 11640216.01,
-        "is_10b5_1": false,
-        "contrib": -0.174
-      },
-      {
-        "insider": "ROCHE VINCENT",
-        "date": "2026-05-22",
-        "shares": 665,
-        "price": 397.4956,
-        "value_usd": 264334.57,
-        "is_10b5_1": false,
-        "contrib": -0.174
-      },
-      {
-        "insider": "ROCHE VINCENT",
-        "date": "2026-03-30",
-        "shares": 27027,
-        "price": 303.1,
-        "value_usd": 8191883.7,
-        "is_10b5_1": false,
-        "contrib": -0.129
-      }
-    ],
-    "narrative_hooks": [],
-    "transaction_count": 255
-  },
-  "lens_consensus": {
-    "as_of": "2026-07-21",
-    "shared_inputs_ref": "valuation.json@2026-07-21",
-    "valuation_richness": 0.705,
-    "blended_return_pct": -0.66,
-    "band_pct": [
-      -5.6,
-      1.44
-    ],
-    "weighted_median_pct": 0.2,
-    "median_mean_flag": false,
-    "stance": "pass",
-    "agreement_pct": 17,
-    "dissent_count": 8,
-    "lawrence_divergence": true,
-    "top_dissents": [
-      {
-        "persona": "hohn",
-        "label": "Chris Hohn / TCI",
-        "verdict": "watch",
-        "return_pct": 0.2,
-        "key_metric": "fcf_yield=2.31",
-        "conviction": 0.74,
-        "falsifier": "FCF yield < 0.5% or commoditized archetype (turnaround/optionality only)"
-      },
-      {
-        "persona": "klarman_asset_value",
-        "label": "Klarman / Baupost",
-        "verdict": "watch",
-        "return_pct": 0.2,
-        "key_metric": "asset_nav_per_share=None",
-        "conviction": 0.74,
-        "falsifier": "Asset value lacks an independently evidenced realization path or is already capitalized in operating cash flow."
-      },
-      {
-        "persona": "lawrence",
-        "label": "Lawrence (house IRR)",
-        "verdict": "watch",
-        "return_pct": 1.44,
-        "key_metric": "synthesis_pct=1.44",
-        "conviction": 0.678,
-        "falsifier": "Synthesis incomplete or irr_method pending"
-      }
-    ],
-    "contributor_count": 9,
-    "in_base_irr": false,
-    "disclaimer": "Advisory lens blend only. Does not replace Lawrence total-synthesis stance gate without [HUMAN REVIEW]."
-  },
-  "economic_value": {
-    "schema_version": "1.0",
-    "method": "component_economic_value",
-    "economic_claim": {
-      "description": "One diluted share of ADI, including analog semiconductor owner cash, AI/data-center edge option, net financial claims, and cycle/integration reserve.",
-      "unit_label": "diluted share",
-      "unit_count": 496709000,
-      "unit_source": "FY2025 net income $2267.3M / diluted EPS $4.56 (ADI/investor-documents/sec-edgar/10-K_20251125_rpt20251101_acc0000006281_25_000153.htm)",
-      "enterprise_to_equity_reconciliation": "Core owner free cash flow is valued once; AI/data-center option, net financial claims, and cycle reserve are separate additive components with unique overlap keys."
-    },
-    "gaap_role": "cross_check",
-    "accounting_reference": "FY2025 10-K and Q2 FY2026 10-Q filing extracts; GAAP net income is cross-check only for analog compounder.",
-    "component_groups": [
-      {
-        "id": "analog_semiconductor_engine",
-        "label": "Analog semiconductor owner-cash engine",
-        "component_ids": [
-          "analog_semiconductor_engine"
-        ],
-        "economic_claim": "Analog semiconductor owner-cash engine",
-        "valuation_basis": "Proof outputs {'low': 172.2797, 'base': 223.9597, 'high': 275.6396}; see calculation_proof graph.",
-        "adjustments": "Reconcile to FY2025 10-K and Q2 FY2026 10-Q before decision use.",
-        "overlap_control": "Unique overlap key analog_semiconductor_engine.",
-        "risked_present_value_per_share": {
-          "low": 172.2797,
-          "base": 223.9597,
-          "high": 275.6396
-        }
-      },
-      {
-        "id": "ai_data_center_edge_option",
-        "label": "AI and data-center power and connectivity option",
-        "component_ids": [
-          "ai_data_center_edge_option"
-        ],
-        "economic_claim": "AI and data-center power and connectivity option",
-        "valuation_basis": "Proof outputs {'low': 0.0, 'base': 18.0001, 'high': 45.0}; see calculation_proof graph.",
-        "adjustments": "Reconcile to FY2025 10-K and Q2 FY2026 10-Q before decision use.",
-        "overlap_control": "Unique overlap key ai_data_center_edge_option.",
-        "risked_present_value_per_share": {
-          "low": 0.0,
-          "base": 18.0001,
-          "high": 45.0
-        },
-        "risk_and_timing": {
-          "success_probability": 0.55,
-          "remaining_capital_m": 0.0,
-          "timing_basis": "Data-center power delivery and high-speed connectivity design wins over 3 to 7 years.",
-          "probability_basis": "Judgment from FY2025 Industrial revenue $4.93B and 10-K data-center market commentary; ADI does not disclose standalone AI revenue.",
-          "remaining_capital_basis": "Incremental R&D embedded in consolidated $1.77B FY2025 spend."
-        }
-      },
-      {
-        "id": "net_financial_claims",
-        "label": "Net cash and debt claims on common equity",
-        "component_ids": [
-          "net_financial_claims"
-        ],
-        "economic_claim": "Net cash and debt claims on common equity",
-        "valuation_basis": "Proof outputs {'low': -15.9999, 'base': -12.0, 'high': -8.0001}; see calculation_proof graph.",
-        "adjustments": "Reconcile to FY2025 10-K and Q2 FY2026 10-Q before decision use.",
-        "overlap_control": "Unique overlap key net_financial_claims.",
-        "risked_present_value_per_share": {
-          "low": -15.9999,
-          "base": -12.0,
-          "high": -8.0001
-        }
-      },
-      {
-        "id": "cycle_integration_reserve",
-        "label": "Semiconductor cycle and integration stress reserve",
-        "component_ids": [
-          "cycle_integration_reserve"
-        ],
-        "economic_claim": "Semiconductor cycle and integration stress reserve",
-        "valuation_basis": "Proof outputs {'low': -35.0, 'base': -20.0, 'high': -10.0}; see calculation_proof graph.",
-        "adjustments": "Reconcile to FY2025 10-K and Q2 FY2026 10-Q before decision use.",
-        "overlap_control": "Unique overlap key cycle_integration_reserve.",
-        "risked_present_value_per_share": {
-          "low": -35.0,
-          "base": -20.0,
-          "high": -10.0
-        }
-      }
-    ],
-    "limitations": [
-      "AI/data-center milestone value is judgment-based; industrial revenue partially embedded in consolidated free cash flow.",
-      "Cycle and integration reserve bands remain widest judgment components."
-    ]
   }
 }
