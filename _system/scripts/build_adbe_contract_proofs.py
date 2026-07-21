@@ -437,7 +437,7 @@ def ai_reserve_proof() -> dict:
 
 
 def _component(cid: str, label: str, category: str, overlap_key: str) -> dict:
-    return {
+    comp = {
         "id": cid,
         "label": label,
         "category": category,
@@ -456,6 +456,139 @@ def _component(cid: str, label: str, category: str, overlap_key: str) -> dict:
             "falsifier": "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
             "valuation_status": "legacy_sensitivity",
         },
+    }
+    if cid == "firefly_ai_monetization_option":
+        comp["valuation"]["driver_model"] = {
+            "type": "milestone_option",
+            "scenarios": {
+                "base": {
+                    "success_probability": 0.55,
+                    "remaining_cost_m": 850.0,
+                }
+            },
+            "timing_basis": (
+                "Generative-AI credit monetization and ARPU lift over 3 to 7 years; "
+                "Firefly embedded in Creative Cloud since September 2023."
+            ),
+        }
+        comp["valuation"]["probability_and_timing"] = {
+            "success_probability": 0.55,
+            "remaining_capital_m": 850.0,
+            "timing_basis": (
+                "Generative-AI credit monetization and ARPU lift over 3 to 7 years; "
+                "Firefly embedded in Creative Cloud since September 2023."
+            ),
+            "probability_basis": (
+                "Judgment from FY2025 RPO $22.5B and subscription mix; Adobe does not disclose "
+                "standalone Firefly revenue."
+            ),
+            "remaining_capital_basis": (
+                "Incremental generative-AI model training and inference spend embedded in consolidated "
+                "R&D and cost of revenue; base reserves ~$850M incremental burden."
+            ),
+        }
+    return comp
+
+
+def economic_value_block() -> dict:
+    return {
+        "schema_version": "1.0",
+        "method": "component_economic_value",
+        "economic_claim": {
+            "description": (
+                "One diluted share of ADBE, including Digital Media and Document Cloud owner cash, "
+                "Digital Experience engine, Firefly AI monetization option, net financial claims, "
+                "and AI competition reserve."
+            ),
+            "unit_label": "diluted share",
+            "unit_count": int(round(SHARES_M * 1_000_000)),
+            "unit_source": (
+                f"FY2025 weighted average diluted shares {SHARES_M}M per {FILING_10K}; "
+                "inputs.shares_millions in valuation.json."
+            ),
+            "enterprise_to_equity_reconciliation": (
+                "Segment engines value revenue-weighted owner cash once; Firefly option is a separate "
+                "milestone band; net financial claims and AI reserve use unique overlap keys. "
+                "Consolidated free cash flow is not double-counted across segments."
+            ),
+        },
+        "gaap_role": "cross_check",
+        "accounting_reference": (
+            "FY2025 10-K and Q2 FY2026 10-Q filing extracts; GAAP net income is cross-check only "
+            "for subscription software compounder."
+        ),
+        "component_groups": [
+            {
+                "id": "digital_media_document_engine",
+                "label": "Digital Media and Document Cloud owner-cash engine",
+                "component_ids": ["digital_media_document_engine"],
+                "economic_claim": "Digital Media and Document Cloud owner-cash engine",
+                "valuation_basis": "Revenue-weighted owner cash capitalization on Creative Cloud and Acrobat.",
+                "adjustments": "Publishing segment cash embedded in residual allocation.",
+                "overlap_control": "Unique overlap key digital_media_document_engine.",
+                "risked_present_value_per_share": LEGACY["digital_media_document_engine"],
+            },
+            {
+                "id": "digital_experience_engine",
+                "label": "Digital Experience Cloud owner-cash engine",
+                "component_ids": ["digital_experience_engine"],
+                "economic_claim": "Digital Experience Cloud owner-cash engine",
+                "valuation_basis": "Revenue-weighted owner cash capitalization on enterprise marketing stack.",
+                "adjustments": "Competitive share shifts versus Salesforce and Google reflected in multiple band.",
+                "overlap_control": "Unique overlap key digital_experience_engine.",
+                "risked_present_value_per_share": LEGACY["digital_experience_engine"],
+            },
+            {
+                "id": "firefly_ai_monetization_option",
+                "label": "Firefly and generative-AI monetization option",
+                "component_ids": ["firefly_ai_monetization_option"],
+                "economic_claim": "Firefly and generative-AI monetization option",
+                "valuation_basis": "Risk-adjusted milestone value beyond segment capitalization multiples.",
+                "adjustments": "Not in Lawrence base free cash flow path; bull sensitivity only.",
+                "overlap_control": "Unique overlap key firefly_ai_monetization_option.",
+                "risked_present_value_per_share": LEGACY["firefly_ai_monetization_option"],
+                "risk_and_timing": {
+                    "success_probability": 0.55,
+                    "remaining_capital_m": 850.0,
+                    "timing_basis": (
+                        "Generative-AI credit monetization and ARPU lift over 3 to 7 years; "
+                        "Firefly embedded in Creative Cloud since September 2023."
+                    ),
+                    "probability_basis": (
+                        "Judgment from FY2025 RPO $22.5B and subscription mix; Adobe does not disclose "
+                        "standalone Firefly revenue."
+                    ),
+                    "remaining_capital_basis": (
+                        "Incremental generative-AI model training and inference spend embedded in consolidated "
+                        "R&D and cost of revenue."
+                    ),
+                },
+            },
+            {
+                "id": "net_financial_claims",
+                "label": "Net cash and debt claims on common equity",
+                "component_ids": ["net_financial_claims"],
+                "economic_claim": "Net cash and debt claims on common equity",
+                "valuation_basis": "Cash $5.43B less long-term debt $6.21B with operating liquidity reserve.",
+                "adjustments": "January 2025 note offering adds leverage for buybacks.",
+                "overlap_control": "Unique overlap key net_financial_claims.",
+                "risked_present_value_per_share": LEGACY["net_financial_claims"],
+            },
+            {
+                "id": "ai_competition_and_sbc_reserve",
+                "label": "Generative-AI competition and stock-based compensation reserve",
+                "component_ids": ["ai_competition_and_sbc_reserve"],
+                "economic_claim": "Generative-AI competition and stock-based compensation reserve",
+                "valuation_basis": "Negative reserve for seat churn, SBC dilution, and multiple compression.",
+                "adjustments": "Separate from segment capitalization multiples.",
+                "overlap_control": "Unique overlap key ai_competition_and_sbc_reserve.",
+                "risked_present_value_per_share": LEGACY["ai_competition_and_sbc_reserve"],
+            },
+        ],
+        "limitations": [
+            "Revenue-weighted free cash flow split is approximate; Adobe does not disclose segment cash flow.",
+            "Firefly milestone band and AI competition reserve remain widest judgment components.",
+        ],
     }
 
 
@@ -623,6 +756,10 @@ def build_valuation_scaffold() -> dict:
                 "evidence_ref": f"{TICKER}/research/evidence_reconciliation_{AS_OF}.md",
             },
             "validation_errors": [],
+            "status": "complete",
+            "economic_claim": economic_value_block()["economic_claim"],
+            "gaap_role": "cross_check",
+            "accounting_reference": economic_value_block()["accounting_reference"],
         },
     }
 
@@ -672,6 +809,9 @@ def main() -> int:
         )
         for case in ("low", "base", "high"):
             comp["valuation"][case] = outputs[cid][case]
+
+    data["economic_value"] = economic_value_block()
+    data["valuation_mode"] = "economic_value"
 
     path.write_text(json.dumps(data, indent=2) + "\n", encoding="utf-8")
     base_sum = sum(outputs[c]["base"] for c in outputs)

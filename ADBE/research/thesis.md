@@ -9,15 +9,15 @@
 | **Archetype** (Stahl) | compounder |
 | **Moat** (Munger) | stable |
 | **Dhando** (Pabrai) | partial |
-| **Stance** | accumulate |
+| **Stance** | watch |
 | **Cycle** | mid |
-| **Implied 7yr IRR** (base) | 33.28% (total synthesis) |
-| **IRR method** | full |
+| **Implied 7yr IRR** (base) | — |
+| **IRR method** | quality_reinvestment |
 | **Lawrence bucket** | pricing_power |
 | **Payoff lens** | operating |
 | **MOI bucket** | pending |
 
-**Deep dive:** `ADBE/research/deep_dive_2026-07-10.md` (auto-sync)
+**Deep dive:** `ADBE/research/deep_dive_2026-07-21.md` (auto-sync)
 
 ## One-line thesis
 

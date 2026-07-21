@@ -382,6 +382,23 @@
           "cross_check": "Reconcile to FY2025 10-K and Q2 FY2026 10-Q before decision use.",
           "falsifier": "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
           "valuation_status": "bounded_estimate",
+          "driver_model": {
+            "type": "milestone_option",
+            "scenarios": {
+              "base": {
+                "success_probability": 0.55,
+                "remaining_cost_m": 850.0
+              }
+            },
+            "timing_basis": "Generative-AI credit monetization and ARPU lift over 3 to 7 years; Firefly embedded in Creative Cloud since September 2023."
+          },
+          "probability_and_timing": {
+            "success_probability": 0.55,
+            "remaining_capital_m": 850.0,
+            "timing_basis": "Generative-AI credit monetization and ARPU lift over 3 to 7 years; Firefly embedded in Creative Cloud since September 2023.",
+            "probability_basis": "Judgment from FY2025 RPO $22.5B and subscription mix; Adobe does not disclose standalone Firefly revenue.",
+            "remaining_capital_basis": "Incremental generative-AI model training and inference spend embedded in consolidated R&D and cost of revenue; base reserves ~$850M incremental burden."
+          },
           "calculation_proof": {
             "schema_version": "1.0",
             "method_id": "risk_adjusted_milestone_value",
@@ -682,6 +699,122 @@
       "reconciliation": "FY2025 FCF $9852.0M on 427.0M shares; cash $5431.0M less long-term debt $6210.0M; RPO $22520.0M.",
       "evidence_ref": "ADBE/research/evidence_reconciliation_2026-07-21.md"
     },
-    "validation_errors": []
+    "validation_errors": [],
+    "status": "complete",
+    "economic_claim": {
+      "description": "One diluted share of ADBE, including Digital Media and Document Cloud owner cash, Digital Experience engine, Firefly AI monetization option, net financial claims, and AI competition reserve.",
+      "unit_label": "diluted share",
+      "unit_count": 427000000,
+      "unit_source": "FY2025 weighted average diluted shares 427.0M per ADBE/investor-documents/sec-edgar/10-K_20260115_rpt20251128_acc0000796343_26_000003.htm; inputs.shares_millions in valuation.json.",
+      "enterprise_to_equity_reconciliation": "Segment engines value revenue-weighted owner cash once; Firefly option is a separate milestone band; net financial claims and AI reserve use unique overlap keys. Consolidated free cash flow is not double-counted across segments."
+    },
+    "gaap_role": "cross_check",
+    "accounting_reference": "FY2025 10-K and Q2 FY2026 10-Q filing extracts; GAAP net income is cross-check only for subscription software compounder."
+  },
+  "economic_value": {
+    "schema_version": "1.0",
+    "method": "component_economic_value",
+    "economic_claim": {
+      "description": "One diluted share of ADBE, including Digital Media and Document Cloud owner cash, Digital Experience engine, Firefly AI monetization option, net financial claims, and AI competition reserve.",
+      "unit_label": "diluted share",
+      "unit_count": 427000000,
+      "unit_source": "FY2025 weighted average diluted shares 427.0M per ADBE/investor-documents/sec-edgar/10-K_20260115_rpt20251128_acc0000796343_26_000003.htm; inputs.shares_millions in valuation.json.",
+      "enterprise_to_equity_reconciliation": "Segment engines value revenue-weighted owner cash once; Firefly option is a separate milestone band; net financial claims and AI reserve use unique overlap keys. Consolidated free cash flow is not double-counted across segments."
+    },
+    "gaap_role": "cross_check",
+    "accounting_reference": "FY2025 10-K and Q2 FY2026 10-Q filing extracts; GAAP net income is cross-check only for subscription software compounder.",
+    "component_groups": [
+      {
+        "id": "digital_media_document_engine",
+        "label": "Digital Media and Document Cloud owner-cash engine",
+        "component_ids": [
+          "digital_media_document_engine"
+        ],
+        "economic_claim": "Digital Media and Document Cloud owner-cash engine",
+        "valuation_basis": "Revenue-weighted owner cash capitalization on Creative Cloud and Acrobat.",
+        "adjustments": "Publishing segment cash embedded in residual allocation.",
+        "overlap_control": "Unique overlap key digital_media_document_engine.",
+        "risked_present_value_per_share": {
+          "low": 320.0,
+          "base": 493.0,
+          "high": 680.0
+        }
+      },
+      {
+        "id": "digital_experience_engine",
+        "label": "Digital Experience Cloud owner-cash engine",
+        "component_ids": [
+          "digital_experience_engine"
+        ],
+        "economic_claim": "Digital Experience Cloud owner-cash engine",
+        "valuation_basis": "Revenue-weighted owner cash capitalization on enterprise marketing stack.",
+        "adjustments": "Competitive share shifts versus Salesforce and Google reflected in multiple band.",
+        "overlap_control": "Unique overlap key digital_experience_engine.",
+        "risked_present_value_per_share": {
+          "low": 85.0,
+          "base": 133.0,
+          "high": 195.0
+        }
+      },
+      {
+        "id": "firefly_ai_monetization_option",
+        "label": "Firefly and generative-AI monetization option",
+        "component_ids": [
+          "firefly_ai_monetization_option"
+        ],
+        "economic_claim": "Firefly and generative-AI monetization option",
+        "valuation_basis": "Risk-adjusted milestone value beyond segment capitalization multiples.",
+        "adjustments": "Not in Lawrence base free cash flow path; bull sensitivity only.",
+        "overlap_control": "Unique overlap key firefly_ai_monetization_option.",
+        "risked_present_value_per_share": {
+          "low": 0.0,
+          "base": 50.0,
+          "high": 120.0
+        },
+        "risk_and_timing": {
+          "success_probability": 0.55,
+          "remaining_capital_m": 850.0,
+          "timing_basis": "Generative-AI credit monetization and ARPU lift over 3 to 7 years; Firefly embedded in Creative Cloud since September 2023.",
+          "probability_basis": "Judgment from FY2025 RPO $22.5B and subscription mix; Adobe does not disclose standalone Firefly revenue.",
+          "remaining_capital_basis": "Incremental generative-AI model training and inference spend embedded in consolidated R&D and cost of revenue."
+        }
+      },
+      {
+        "id": "net_financial_claims",
+        "label": "Net cash and debt claims on common equity",
+        "component_ids": [
+          "net_financial_claims"
+        ],
+        "economic_claim": "Net cash and debt claims on common equity",
+        "valuation_basis": "Cash $5.43B less long-term debt $6.21B with operating liquidity reserve.",
+        "adjustments": "January 2025 note offering adds leverage for buybacks.",
+        "overlap_control": "Unique overlap key net_financial_claims.",
+        "risked_present_value_per_share": {
+          "low": -10.0,
+          "base": -2.0,
+          "high": 6.0
+        }
+      },
+      {
+        "id": "ai_competition_and_sbc_reserve",
+        "label": "Generative-AI competition and stock-based compensation reserve",
+        "component_ids": [
+          "ai_competition_and_sbc_reserve"
+        ],
+        "economic_claim": "Generative-AI competition and stock-based compensation reserve",
+        "valuation_basis": "Negative reserve for seat churn, SBC dilution, and multiple compression.",
+        "adjustments": "Separate from segment capitalization multiples.",
+        "overlap_control": "Unique overlap key ai_competition_and_sbc_reserve.",
+        "risked_present_value_per_share": {
+          "low": -45.0,
+          "base": -18.0,
+          "high": -5.0
+        }
+      }
+    ],
+    "limitations": [
+      "Revenue-weighted free cash flow split is approximate; Adobe does not disclose segment cash flow.",
+      "Firefly milestone band and AI competition reserve remain widest judgment components."
+    ]
   }
 }
