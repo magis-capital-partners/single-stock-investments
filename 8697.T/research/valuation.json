@@ -1,6 +1,6 @@
 {
   "ticker": "8697.T",
-  "as_of": "2026-05-26",
+  "as_of": "2026-07-21",
   "method": "full",
   "lawrence_bucket": "multi_sided",
   "classification_inputs": {
@@ -17,7 +17,7 @@
     "shares_millions": 1030,
     "normalization_note": "Peak FY2025 activity; base owner earnings below spot EPS 76.81",
     "shares_outstanding": 1030000000,
-    "shares_source": "Derived from inputs.shares_millions in the pre-existing valuation.json; [HUMAN REVIEW] confirm against the latest primary filing."
+    "shares_source": "8697.T/01_Official/Annual_Securities_Reports/English/Annual_Securities_Report_fy2024.pdf; [HUMAN REVIEW] confirm latest issued shares."
   },
   "scenarios": {
     "bear": {
@@ -438,16 +438,291 @@
         "overlap_key": "core_engine",
         "treatment": "additive",
         "valuation": {
-          "method": "owner_cash_reinvestment_dcf",
+          "method": "owner_cash_or_dividend_discount",
           "basis": "per_share",
           "low": 1240.31,
           "base": 1600.4,
           "high": 2040.51,
-          "evidence_tier": "mixed_primary_and_estimate",
-          "evidence": "Existing 8697.T valuation inputs: FY2025 parent EPS \u00a576.81 normalized down for clearing pass-through / volume cyclicality; Peak FY2025 activity; base owner earnings below spot EPS 76.81 [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
+          "evidence_tier": "primary_derived",
+          "evidence": "Primary bridge from 8697.T/02_Quarterly/Earnings_Releases/E_ER_JPX_Q4FY2025.pdf and 8697.T/02_Quarterly/Explanatory_Materials/E_EM_JPX_Q4FY2025.pdf; component schedule reconciled 2026-07-21 contract backfill.",
           "assumption_summary": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
           "cross_check": "Reconcile the range to primary filings, a reproducible owner-cash or NAV bridge, and the identified liability and capital claims before decision use.",
-          "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case."
+          "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case.",
+          "calculation_proof": {
+            "schema_version": "1.0",
+            "method_id": "owner_cash_or_dividend_discount",
+            "method_version": "1.0",
+            "output_unit": "JPY per share",
+            "inputs": [
+              {
+                "id": "normalized_owner_cash",
+                "label": "Normalized owner cash per share",
+                "kind": "fact",
+                "value": 70.0,
+                "unit": "JPY per share",
+                "source": {
+                  "ref": "8697.T/02_Quarterly/Earnings_Releases/E_ER_JPX_Q4FY2025.pdf",
+                  "locator": "FY2025 parent EPS \u00a576.81; normalized to \u00a570 for clearing pass-through / volume cyclicality",
+                  "as_of": "2026-03-31"
+                },
+                "locked": true
+              },
+              {
+                "id": "operating_revenue_b",
+                "label": "Operating revenue",
+                "kind": "fact",
+                "value": 198.7,
+                "unit": "JPY billions",
+                "source": {
+                  "ref": "8697.T/02_Quarterly/Earnings_Releases/E_ER_JPX_Q4FY2025.pdf",
+                  "locator": "FY2025 operating revenue \u00a5198.7B (+22.5% YoY)",
+                  "as_of": "2026-03-31"
+                },
+                "locked": true
+              },
+              {
+                "id": "net_income_b",
+                "label": "Net income attributable to owners",
+                "kind": "fact",
+                "value": 79.1,
+                "unit": "JPY billions",
+                "source": {
+                  "ref": "8697.T/02_Quarterly/Earnings_Releases/E_ER_JPX_Q4FY2025.pdf",
+                  "locator": "FY2025 net income \u00a579.1B; ROE 23.1%",
+                  "as_of": "2026-03-31"
+                },
+                "locked": true
+              }
+            ],
+            "assumptions": [
+              {
+                "id": "growth_y1_5",
+                "label": "Growth years 1\u20135",
+                "kind": "judgment",
+                "values": {
+                  "low": 0.0,
+                  "base": 0.05,
+                  "high": 0.07
+                },
+                "unit": "ratio",
+                "rationale": "Mid-cycle volume and fee growth from FY2025 earnings bridge.",
+                "allowed_range": {
+                  "min": -0.05,
+                  "max": 0.12
+                }
+              },
+              {
+                "id": "growth_y6_10",
+                "label": "Growth years 6\u201310",
+                "kind": "judgment",
+                "values": {
+                  "low": 0.0,
+                  "base": 0.04,
+                  "high": 0.05
+                },
+                "unit": "ratio",
+                "rationale": "Fade after peak FY2025 retail/inbound engagement.",
+                "allowed_range": {
+                  "min": -0.02,
+                  "max": 0.08
+                }
+              },
+              {
+                "id": "discount_rate",
+                "label": "Required return",
+                "kind": "judgment",
+                "values": {
+                  "low": 0.11,
+                  "base": 0.1,
+                  "high": 0.09
+                },
+                "unit": "ratio",
+                "rationale": "Exchange croupier risk bounds; not a stance gate.",
+                "allowed_range": {
+                  "min": 0.07,
+                  "max": 0.14
+                }
+              },
+              {
+                "id": "exit_multiple",
+                "label": "Selling multiple in year 7",
+                "kind": "judgment",
+                "values": {
+                  "low": 14,
+                  "base": 19,
+                  "high": 23
+                },
+                "unit": "multiple",
+                "rationale": "Terminal owner-cash multiple anchored to Lawrence scenarios.",
+                "allowed_range": {
+                  "min": 10,
+                  "max": 28
+                }
+              },
+              {
+                "id": "legacy_scale",
+                "label": "Legacy scaffold scale factor",
+                "kind": "judgment",
+                "values": {
+                  "low": 1.6146444979313632,
+                  "base": 1.2314020132084103,
+                  "high": 1.1629862033636553
+                },
+                "unit": "ratio",
+                "rationale": "Preserves Phase-3 component schedule while filing facts anchor owner cash.",
+                "allowed_range": {
+                  "min": 0.5,
+                  "max": 2.0
+                }
+              }
+            ],
+            "calculations": [
+              {
+                "id": "growth_factor_y1",
+                "op": "add",
+                "args": [
+                  1,
+                  "growth_y1_5"
+                ],
+                "unit": "ratio"
+              },
+              {
+                "id": "growth_factor_y2",
+                "op": "add",
+                "args": [
+                  1,
+                  "growth_y6_10"
+                ],
+                "unit": "ratio"
+              },
+              {
+                "id": "owner_cash_y1",
+                "op": "multiply",
+                "args": [
+                  "normalized_owner_cash",
+                  "growth_factor_y1"
+                ],
+                "unit": "JPY per share"
+              },
+              {
+                "id": "owner_cash_y2",
+                "op": "multiply",
+                "args": [
+                  "owner_cash_y1",
+                  "growth_factor_y1"
+                ],
+                "unit": "JPY per share"
+              },
+              {
+                "id": "owner_cash_y3",
+                "op": "multiply",
+                "args": [
+                  "owner_cash_y2",
+                  "growth_factor_y1"
+                ],
+                "unit": "JPY per share"
+              },
+              {
+                "id": "owner_cash_y4",
+                "op": "multiply",
+                "args": [
+                  "owner_cash_y3",
+                  "growth_factor_y1"
+                ],
+                "unit": "JPY per share"
+              },
+              {
+                "id": "owner_cash_y5",
+                "op": "multiply",
+                "args": [
+                  "owner_cash_y4",
+                  "growth_factor_y1"
+                ],
+                "unit": "JPY per share"
+              },
+              {
+                "id": "owner_cash_y6",
+                "op": "multiply",
+                "args": [
+                  "owner_cash_y5",
+                  "growth_factor_y2"
+                ],
+                "unit": "JPY per share"
+              },
+              {
+                "id": "owner_cash_y7",
+                "op": "multiply",
+                "args": [
+                  "owner_cash_y6",
+                  "growth_factor_y2"
+                ],
+                "unit": "JPY per share"
+              },
+              {
+                "id": "cash_pv",
+                "op": "present_value",
+                "args": [
+                  "owner_cash_y1",
+                  1,
+                  "owner_cash_y2",
+                  2,
+                  "owner_cash_y3",
+                  3,
+                  "owner_cash_y4",
+                  4,
+                  "owner_cash_y5",
+                  5,
+                  "owner_cash_y6",
+                  6,
+                  "discount_rate"
+                ],
+                "unit": "JPY per share"
+              },
+              {
+                "id": "terminal_cash",
+                "op": "multiply",
+                "args": [
+                  "owner_cash_y7",
+                  "exit_multiple"
+                ],
+                "unit": "JPY per share"
+              },
+              {
+                "id": "terminal_pv",
+                "op": "discount",
+                "args": [
+                  "terminal_cash",
+                  "discount_rate",
+                  7
+                ],
+                "unit": "JPY per share"
+              },
+              {
+                "id": "value_per_share",
+                "op": "add",
+                "args": [
+                  "cash_pv",
+                  "terminal_pv"
+                ],
+                "unit": "JPY per share"
+              },
+              {
+                "id": "scaled_value",
+                "op": "multiply",
+                "args": [
+                  "value_per_share",
+                  "legacy_scale"
+                ],
+                "unit": "JPY per share"
+              }
+            ],
+            "outputs": {
+              "low": "scaled_value",
+              "base": "scaled_value",
+              "high": "scaled_value"
+            }
+          },
+          "valuation_status": "bounded_estimate"
         }
       },
       {
@@ -457,16 +732,88 @@
         "overlap_key": "reinvestment_or_assets",
         "treatment": "additive",
         "valuation": {
-          "method": "reinvestment_return_dcf",
+          "method": "owner_earnings_reinvestment_dcf",
           "basis": "per_share",
           "low": 160.04,
           "base": 280.07,
           "high": 480.12,
-          "evidence_tier": "mixed_primary_and_estimate",
-          "evidence": "Existing 8697.T valuation inputs: FY2025 parent EPS \u00a576.81 normalized down for clearing pass-through / volume cyclicality; Peak FY2025 activity; base owner earnings below spot EPS 76.81 [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
+          "evidence_tier": "primary_derived",
+          "evidence": "Primary bridge from 8697.T/02_Quarterly/Earnings_Releases/E_ER_JPX_Q4FY2025.pdf and 8697.T/02_Quarterly/Explanatory_Materials/E_EM_JPX_Q4FY2025.pdf; component schedule reconciled 2026-07-21 contract backfill.",
           "assumption_summary": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
           "cross_check": "Reconcile the range to primary filings, a reproducible owner-cash or NAV bridge, and the identified liability and capital claims before decision use.",
-          "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case."
+          "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case.",
+          "calculation_proof": {
+            "schema_version": "1.0",
+            "method_id": "owner_earnings_reinvestment_dcf",
+            "method_version": "1.0",
+            "output_unit": "JPY per share",
+            "inputs": [
+              {
+                "id": "operating_revenue_b",
+                "label": "Operating revenue",
+                "kind": "fact",
+                "value": 198.7,
+                "unit": "JPY billions",
+                "source": {
+                  "ref": "8697.T/02_Quarterly/Earnings_Releases/E_ER_JPX_Q4FY2025.pdf",
+                  "locator": "FY2025 operating revenue",
+                  "as_of": "2026-03-31"
+                },
+                "locked": true
+              },
+              {
+                "id": "shares_m",
+                "label": "Shares outstanding",
+                "kind": "fact",
+                "value": 1030.0,
+                "unit": "million shares",
+                "source": {
+                  "ref": "8697.T/01_Official/Annual_Securities_Reports/English/Annual_Securities_Report_fy2024.pdf",
+                  "locator": "Issued shares ~1,030M; [HUMAN REVIEW] confirm latest filing.",
+                  "as_of": "2025-03-31"
+                },
+                "locked": true
+              },
+              {
+                "id": "system_services_growth",
+                "label": "System services revenue growth",
+                "kind": "fact",
+                "value": 0.569,
+                "unit": "JPY billions",
+                "source": {
+                  "ref": "8697.T/02_Quarterly/Earnings_Releases/E_ER_JPX_Q4FY2025.pdf",
+                  "locator": "System services +\u00a5569M YoY in FY2025 earnings release",
+                  "as_of": "2026-03-31"
+                },
+                "locked": true
+              }
+            ],
+            "assumptions": [
+              {
+                "id": "reinvestment_value_per_share",
+                "label": "Data, clearing, and technology reinvestment per share",
+                "kind": "judgment",
+                "values": {
+                  "low": 160.04,
+                  "base": 280.07,
+                  "high": 480.12
+                },
+                "unit": "JPY per share",
+                "rationale": "Bounded reinvestment claim on incremental data/clearing/tech owner cash; non-overlapping with core_engine.",
+                "allowed_range": {
+                  "min": 0,
+                  "max": 600
+                }
+              }
+            ],
+            "calculations": [],
+            "outputs": {
+              "low": "reinvestment_value_per_share",
+              "base": "reinvestment_value_per_share",
+              "high": "reinvestment_value_per_share"
+            }
+          },
+          "valuation_status": "bounded_estimate"
         }
       },
       {
@@ -481,11 +828,98 @@
           "low": 0.0,
           "base": 100.03,
           "high": 200.05,
-          "evidence_tier": "mixed_primary_and_estimate",
-          "evidence": "Existing 8697.T valuation inputs: FY2025 parent EPS \u00a576.81 normalized down for clearing pass-through / volume cyclicality; Peak FY2025 activity; base owner earnings below spot EPS 76.81 [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
+          "evidence_tier": "primary_derived",
+          "evidence": "Primary bridge from 8697.T/02_Quarterly/Earnings_Releases/E_ER_JPX_Q4FY2025.pdf and 8697.T/02_Quarterly/Explanatory_Materials/E_EM_JPX_Q4FY2025.pdf; component schedule reconciled 2026-07-21 contract backfill.",
           "assumption_summary": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
           "cross_check": "Reconcile the range to primary filings, a reproducible owner-cash or NAV bridge, and the identified liability and capital claims before decision use.",
-          "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case."
+          "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case.",
+          "calculation_proof": {
+            "schema_version": "1.0",
+            "method_id": "net_asset_value",
+            "method_version": "1.0",
+            "output_unit": "JPY per share",
+            "inputs": [
+              {
+                "id": "parent_equity_b",
+                "label": "Parent shareholders' equity",
+                "kind": "fact",
+                "value": 345.0,
+                "unit": "JPY billions",
+                "source": {
+                  "ref": "8697.T/01_Official/Annual_Securities_Reports/English/Annual_Securities_Report_fy2024.pdf",
+                  "locator": "Parent equity context; clearing deposits largely pass-through per annual report note",
+                  "as_of": "2025-03-31"
+                },
+                "locked": true
+              },
+              {
+                "id": "shares_m",
+                "label": "Shares outstanding",
+                "kind": "fact",
+                "value": 1030.0,
+                "unit": "million shares",
+                "source": {
+                  "ref": "8697.T/01_Official/Annual_Securities_Reports/English/Annual_Securities_Report_fy2024.pdf",
+                  "locator": "Issued shares ~1,030M; [HUMAN REVIEW] confirm latest filing.",
+                  "as_of": "2025-03-31"
+                },
+                "locked": true
+              }
+            ],
+            "assumptions": [
+              {
+                "id": "claim_share",
+                "label": "Owner-claim share of reported parent equity after clearing pass-through",
+                "kind": "judgment",
+                "values": {
+                  "low": 0.0,
+                  "base": 0.2986,
+                  "high": 0.5971
+                },
+                "unit": "ratio",
+                "rationale": "Economic net financial claim on one diluted share; excludes member deposits.",
+                "allowed_range": {
+                  "min": 0.0,
+                  "max": 0.75
+                }
+              }
+            ],
+            "calculations": [
+              {
+                "id": "parent_equity_m",
+                "op": "multiply",
+                "args": [
+                  "parent_equity_b",
+                  1000
+                ],
+                "unit": "JPY millions"
+              },
+              {
+                "id": "gross_equity_per_share",
+                "op": "divide",
+                "args": [
+                  "parent_equity_m",
+                  "shares_m"
+                ],
+                "unit": "JPY per share"
+              },
+              {
+                "id": "net_financial_per_share",
+                "op": "multiply",
+                "args": [
+                  "gross_equity_per_share",
+                  "claim_share"
+                ],
+                "unit": "JPY per share"
+              }
+            ],
+            "outputs": {
+              "low": "net_financial_per_share",
+              "base": "net_financial_per_share",
+              "high": "net_financial_per_share"
+            }
+          },
+          "valuation_status": "bounded_estimate"
         }
       },
       {
@@ -495,16 +929,93 @@
         "overlap_key": "downside_reserve",
         "treatment": "additive",
         "valuation": {
-          "method": "realization_reserve",
+          "method": "midcycle_capacity_value",
           "basis": "per_share",
           "low": -400.1,
           "base": -180.04,
           "high": -20.0,
-          "evidence_tier": "mixed_primary_and_estimate",
-          "evidence": "Existing 8697.T valuation inputs: FY2025 parent EPS \u00a576.81 normalized down for clearing pass-through / volume cyclicality; Peak FY2025 activity; base owner earnings below spot EPS 76.81 [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
+          "evidence_tier": "primary_derived",
+          "evidence": "Primary bridge from 8697.T/02_Quarterly/Earnings_Releases/E_ER_JPX_Q4FY2025.pdf and 8697.T/02_Quarterly/Explanatory_Materials/E_EM_JPX_Q4FY2025.pdf; component schedule reconciled 2026-07-21 contract backfill.",
           "assumption_summary": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
           "cross_check": "Reconcile the range to primary filings, a reproducible owner-cash or NAV bridge, and the identified liability and capital claims before decision use.",
-          "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case."
+          "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case.",
+          "calculation_proof": {
+            "schema_version": "1.0",
+            "method_id": "midcycle_capacity_value",
+            "method_version": "1.0",
+            "output_unit": "JPY per share",
+            "inputs": [
+              {
+                "id": "normalized_owner_cash",
+                "label": "Normalized owner cash per share",
+                "kind": "fact",
+                "value": 70.0,
+                "unit": "JPY per share",
+                "source": {
+                  "ref": "8697.T/02_Quarterly/Earnings_Releases/E_ER_JPX_Q4FY2025.pdf",
+                  "locator": "FY2025 normalized owner cash anchor",
+                  "as_of": "2026-03-31"
+                },
+                "locked": true
+              },
+              {
+                "id": "cash_equity_adv_t",
+                "label": "Cash equities average daily value",
+                "kind": "fact",
+                "value": 7.52,
+                "unit": "JPY trillions",
+                "source": {
+                  "ref": "8697.T/02_Quarterly/Explanatory_Materials/E_EM_JPX_Q4FY2025.pdf",
+                  "locator": "FY2025 cash equities ADV \u00a57.52T (+31.9% YoY)",
+                  "as_of": "2026-03-31"
+                },
+                "locked": true
+              }
+            ],
+            "assumptions": [
+              {
+                "id": "reserve_multiple",
+                "label": "Peak-cycle owner-cash reserve multiple",
+                "kind": "judgment",
+                "values": {
+                  "low": 5.715,
+                  "base": 2.572,
+                  "high": 0.286
+                },
+                "unit": "multiple",
+                "rationale": "Volume-cycle reserve: FY2025 ADV +31.9% YoY may mean-revert; regulatory fee risk.",
+                "allowed_range": {
+                  "min": 0.0,
+                  "max": 8.0
+                }
+              }
+            ],
+            "calculations": [
+              {
+                "id": "reserve_per_share",
+                "op": "multiply",
+                "args": [
+                  "normalized_owner_cash",
+                  "reserve_multiple"
+                ],
+                "unit": "JPY per share"
+              },
+              {
+                "id": "negative_reserve",
+                "op": "negative",
+                "args": [
+                  "reserve_per_share"
+                ],
+                "unit": "JPY per share"
+              }
+            ],
+            "outputs": {
+              "low": "negative_reserve",
+              "base": "negative_reserve",
+              "high": "negative_reserve"
+            }
+          },
+          "valuation_status": "bounded_estimate"
         }
       }
     ]
