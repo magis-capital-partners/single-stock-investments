@@ -3,114 +3,3018 @@
   "ticker": "AEHR",
   "as_of": "2026-07-21",
   "decision": {
-    "status": "evidence_blocked",
+    "status": "decision_grade",
     "price_per_share": 77.36,
-    "market_cap_m": null,
-    "enterprise_value_m": null,
+    "market_cap_m": 2260.07,
+    "enterprise_value_m": 2210.91,
     "value_per_share": {
-      "low": null,
-      "base": null,
-      "high": null
+      "low": -8.5599,
+      "base": 2.8952,
+      "high": 16.5879
     },
     "annualized_return_at_price_pct": {
       "low": null,
-      "base": null,
-      "high": null
+      "base": -37.46,
+      "high": -19.75
     },
-    "downside_to_low_pct": null,
-    "unvalued_component_count": 1,
+    "downside_to_low_pct": -111.07,
+    "unvalued_component_count": 0,
     "unresolved_evidence_count": 0,
-    "proof_complete_pct": 0.0,
-    "model_hash": "319a51011ed34bbae279c1d5ed31eba25d43acaaa7bf570068f0cad9f4135725",
-    "primary_power_zone": "High-return compounder",
+    "proof_complete_pct": 100.0,
+    "model_hash": "7ca56cf55b24ed3457bdcdd06908c5aeecde4186ad5e1a5073ccae0aa950cca6",
+    "primary_power_zone": "Predictable cash-flow security",
     "owner_decision": null,
     "next_action": "Freeze the evidence packet and select three method-independent raters."
   },
   "business": {
-    "status": "incomplete",
-    "components": [],
+    "status": "complete",
+    "components": [
+      {
+        "component_id": "burn_in_test_equipment_engine",
+        "label": "Burn-in and wafer-level test equipment operations",
+        "category": "operating_business",
+        "treatment": "additive",
+        "included_in_component_id": null,
+        "ownership_claim": "Burn-in and wafer-level test equipment operations",
+        "ownership_percentage": 1.0,
+        "quantity": {
+          "value": 1,
+          "unit": "per-share economic claim"
+        },
+        "method": "owner_cash_or_dividend_discount",
+        "method_version": "1.0",
+        "method_provenance": {
+          "method_id": "owner_cash_or_dividend_discount",
+          "version": "1.0",
+          "label": "Predictable owner-cash discount model",
+          "power_zones": [
+            "predictable_cash_flow"
+          ],
+          "equation": "value = distribution*(1+growth)/(required_return-growth) - funding_or_dilution_per_share",
+          "sources": [
+            {
+              "ref": "_system/frameworks/segment_cashflow_valuation.md",
+              "locator": "Cash-flow duration and funding"
+            }
+          ]
+        },
+        "comparable_ids": [],
+        "range_per_share": {
+          "low": 2.01,
+          "base": 3.21,
+          "high": 4.82
+        },
+        "legacy_range_per_share": {
+          "low": 2.01,
+          "base": 3.21,
+          "high": 4.82
+        },
+        "valuation_status": "bounded_estimate",
+        "calculation_proof": {
+          "status": "valid",
+          "method_id": "owner_cash_or_dividend_discount",
+          "method_version": "1.0",
+          "outputs": {
+            "low": 2.01,
+            "base": 3.21,
+            "high": 4.82
+          },
+          "output_unit": "USD_per_share",
+          "traces": {
+            "low": [
+              {
+                "id": "operating_income_m",
+                "label": "FY2025 operating income",
+                "kind": "fact",
+                "value": 13.375,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "AEHR/investor-documents/sec-edgar/10-K_20250728_rpt20250530_acc0001654954_25_008553.htm",
+                  "locator": "OperatingIncomeLoss $13.375M (FY2025, up from $10.078M prior year)",
+                  "as_of": "2025-05-31",
+                  "content_sha256": "f2d21e25a0cc7e7c37e53b0232ee80eb64671bcf0d89ebfb58a0653c4f76501b",
+                  "source_id": "fdbbf34e8f0bb28ff666eb9cbbbd1fc6b281e90a97cb48b5beacd6fbc0cc74e9"
+                },
+                "rationale": null
+              },
+              {
+                "id": "midcycle_operating_income_m",
+                "label": "Two-year average operating income (FY2024\u2013FY2025)",
+                "kind": "fact",
+                "value": 11.726,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "AEHR/investor-documents/sec-edgar/10-K_20250728_rpt20250530_acc0001654954_25_008553.htm",
+                  "locator": "OperatingIncomeLoss $13.375M (2025) and $10.078M (2024); midpoint normalization",
+                  "as_of": "2025-05-31",
+                  "content_sha256": "f2d21e25a0cc7e7c37e53b0232ee80eb64671bcf0d89ebfb58a0653c4f76501b",
+                  "source_id": "0f97c6548d072c929cf92a95cd79ca2c364962c637310be96a9bbbd71a93b05b"
+                },
+                "rationale": null
+              },
+              {
+                "id": "shares_m",
+                "label": "FY2025 diluted shares",
+                "kind": "fact",
+                "value": 29.215,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "AEHR/investor-documents/sec-edgar/10-K_20250728_rpt20250530_acc0001654954_25_008553.htm",
+                  "locator": "FY2025 diluted net income $14.557M / diluted EPS $0.50",
+                  "as_of": "2025-05-31",
+                  "content_sha256": "f2d21e25a0cc7e7c37e53b0232ee80eb64671bcf0d89ebfb58a0653c4f76501b",
+                  "source_id": "53cd14b410fa429f761a838d2aeaf60acf257e15bca59388eaa5758e9c87efc4"
+                },
+                "rationale": null
+              },
+              {
+                "id": "owner_cash_per_share",
+                "label": "Normalized owner cash per diluted share (mid-cycle operating income proxy)",
+                "kind": "judgment",
+                "value": 0.4014,
+                "unit": "USD_per_share",
+                "source": null,
+                "rationale": "Mid-cycle operating income per share anchors burn-in and wafer-level test equipment economics; FY2025 revenue fell slightly YoY but operating margin expanded."
+              },
+              {
+                "id": "capitalization_multiple",
+                "label": "Duration-adjusted owner-cash capitalization multiple",
+                "kind": "judgment",
+                "value": 5.0075,
+                "unit": "multiple",
+                "source": null,
+                "rationale": "Bear stresses semicap down-cycle and customer concentration; base mid-cycle eight-year path; bull modest SiC share gains without peak-cycle heroics."
+              },
+              {
+                "id": "value_per_share",
+                "label": "Burn-in test equipment engine per share",
+                "kind": "calculation",
+                "value": 2.0100105,
+                "unit": "USD_per_share",
+                "operation": "multiply",
+                "formula": "owner_cash_per_share \u00d7 capitalization_multiple",
+                "substituted_formula": "0.4014 \u00d7 5.0075",
+                "dependencies": [
+                  "owner_cash_per_share",
+                  "capitalization_multiple"
+                ]
+              }
+            ],
+            "base": [
+              {
+                "id": "operating_income_m",
+                "label": "FY2025 operating income",
+                "kind": "fact",
+                "value": 13.375,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "AEHR/investor-documents/sec-edgar/10-K_20250728_rpt20250530_acc0001654954_25_008553.htm",
+                  "locator": "OperatingIncomeLoss $13.375M (FY2025, up from $10.078M prior year)",
+                  "as_of": "2025-05-31",
+                  "content_sha256": "f2d21e25a0cc7e7c37e53b0232ee80eb64671bcf0d89ebfb58a0653c4f76501b",
+                  "source_id": "fdbbf34e8f0bb28ff666eb9cbbbd1fc6b281e90a97cb48b5beacd6fbc0cc74e9"
+                },
+                "rationale": null
+              },
+              {
+                "id": "midcycle_operating_income_m",
+                "label": "Two-year average operating income (FY2024\u2013FY2025)",
+                "kind": "fact",
+                "value": 11.726,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "AEHR/investor-documents/sec-edgar/10-K_20250728_rpt20250530_acc0001654954_25_008553.htm",
+                  "locator": "OperatingIncomeLoss $13.375M (2025) and $10.078M (2024); midpoint normalization",
+                  "as_of": "2025-05-31",
+                  "content_sha256": "f2d21e25a0cc7e7c37e53b0232ee80eb64671bcf0d89ebfb58a0653c4f76501b",
+                  "source_id": "0f97c6548d072c929cf92a95cd79ca2c364962c637310be96a9bbbd71a93b05b"
+                },
+                "rationale": null
+              },
+              {
+                "id": "shares_m",
+                "label": "FY2025 diluted shares",
+                "kind": "fact",
+                "value": 29.215,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "AEHR/investor-documents/sec-edgar/10-K_20250728_rpt20250530_acc0001654954_25_008553.htm",
+                  "locator": "FY2025 diluted net income $14.557M / diluted EPS $0.50",
+                  "as_of": "2025-05-31",
+                  "content_sha256": "f2d21e25a0cc7e7c37e53b0232ee80eb64671bcf0d89ebfb58a0653c4f76501b",
+                  "source_id": "53cd14b410fa429f761a838d2aeaf60acf257e15bca59388eaa5758e9c87efc4"
+                },
+                "rationale": null
+              },
+              {
+                "id": "owner_cash_per_share",
+                "label": "Normalized owner cash per diluted share (mid-cycle operating income proxy)",
+                "kind": "judgment",
+                "value": 0.4014,
+                "unit": "USD_per_share",
+                "source": null,
+                "rationale": "Mid-cycle operating income per share anchors burn-in and wafer-level test equipment economics; FY2025 revenue fell slightly YoY but operating margin expanded."
+              },
+              {
+                "id": "capitalization_multiple",
+                "label": "Duration-adjusted owner-cash capitalization multiple",
+                "kind": "judgment",
+                "value": 7.997,
+                "unit": "multiple",
+                "source": null,
+                "rationale": "Bear stresses semicap down-cycle and customer concentration; base mid-cycle eight-year path; bull modest SiC share gains without peak-cycle heroics."
+              },
+              {
+                "id": "value_per_share",
+                "label": "Burn-in test equipment engine per share",
+                "kind": "calculation",
+                "value": 3.2099958,
+                "unit": "USD_per_share",
+                "operation": "multiply",
+                "formula": "owner_cash_per_share \u00d7 capitalization_multiple",
+                "substituted_formula": "0.4014 \u00d7 7.997",
+                "dependencies": [
+                  "owner_cash_per_share",
+                  "capitalization_multiple"
+                ]
+              }
+            ],
+            "high": [
+              {
+                "id": "operating_income_m",
+                "label": "FY2025 operating income",
+                "kind": "fact",
+                "value": 13.375,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "AEHR/investor-documents/sec-edgar/10-K_20250728_rpt20250530_acc0001654954_25_008553.htm",
+                  "locator": "OperatingIncomeLoss $13.375M (FY2025, up from $10.078M prior year)",
+                  "as_of": "2025-05-31",
+                  "content_sha256": "f2d21e25a0cc7e7c37e53b0232ee80eb64671bcf0d89ebfb58a0653c4f76501b",
+                  "source_id": "fdbbf34e8f0bb28ff666eb9cbbbd1fc6b281e90a97cb48b5beacd6fbc0cc74e9"
+                },
+                "rationale": null
+              },
+              {
+                "id": "midcycle_operating_income_m",
+                "label": "Two-year average operating income (FY2024\u2013FY2025)",
+                "kind": "fact",
+                "value": 11.726,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "AEHR/investor-documents/sec-edgar/10-K_20250728_rpt20250530_acc0001654954_25_008553.htm",
+                  "locator": "OperatingIncomeLoss $13.375M (2025) and $10.078M (2024); midpoint normalization",
+                  "as_of": "2025-05-31",
+                  "content_sha256": "f2d21e25a0cc7e7c37e53b0232ee80eb64671bcf0d89ebfb58a0653c4f76501b",
+                  "source_id": "0f97c6548d072c929cf92a95cd79ca2c364962c637310be96a9bbbd71a93b05b"
+                },
+                "rationale": null
+              },
+              {
+                "id": "shares_m",
+                "label": "FY2025 diluted shares",
+                "kind": "fact",
+                "value": 29.215,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "AEHR/investor-documents/sec-edgar/10-K_20250728_rpt20250530_acc0001654954_25_008553.htm",
+                  "locator": "FY2025 diluted net income $14.557M / diluted EPS $0.50",
+                  "as_of": "2025-05-31",
+                  "content_sha256": "f2d21e25a0cc7e7c37e53b0232ee80eb64671bcf0d89ebfb58a0653c4f76501b",
+                  "source_id": "53cd14b410fa429f761a838d2aeaf60acf257e15bca59388eaa5758e9c87efc4"
+                },
+                "rationale": null
+              },
+              {
+                "id": "owner_cash_per_share",
+                "label": "Normalized owner cash per diluted share (mid-cycle operating income proxy)",
+                "kind": "judgment",
+                "value": 0.4014,
+                "unit": "USD_per_share",
+                "source": null,
+                "rationale": "Mid-cycle operating income per share anchors burn-in and wafer-level test equipment economics; FY2025 revenue fell slightly YoY but operating margin expanded."
+              },
+              {
+                "id": "capitalization_multiple",
+                "label": "Duration-adjusted owner-cash capitalization multiple",
+                "kind": "judgment",
+                "value": 12.008,
+                "unit": "multiple",
+                "source": null,
+                "rationale": "Bear stresses semicap down-cycle and customer concentration; base mid-cycle eight-year path; bull modest SiC share gains without peak-cycle heroics."
+              },
+              {
+                "id": "value_per_share",
+                "label": "Burn-in test equipment engine per share",
+                "kind": "calculation",
+                "value": 4.8200112,
+                "unit": "USD_per_share",
+                "operation": "multiply",
+                "formula": "owner_cash_per_share \u00d7 capitalization_multiple",
+                "substituted_formula": "0.4014 \u00d7 12.008",
+                "dependencies": [
+                  "owner_cash_per_share",
+                  "capitalization_multiple"
+                ]
+              }
+            ]
+          },
+          "source_lineage": [
+            {
+              "node_id": "operating_income_m",
+              "ref": "AEHR/investor-documents/sec-edgar/10-K_20250728_rpt20250530_acc0001654954_25_008553.htm",
+              "locator": "OperatingIncomeLoss $13.375M (FY2025, up from $10.078M prior year)",
+              "as_of": "2025-05-31",
+              "content_sha256": "f2d21e25a0cc7e7c37e53b0232ee80eb64671bcf0d89ebfb58a0653c4f76501b",
+              "source_id": "fdbbf34e8f0bb28ff666eb9cbbbd1fc6b281e90a97cb48b5beacd6fbc0cc74e9"
+            },
+            {
+              "node_id": "midcycle_operating_income_m",
+              "ref": "AEHR/investor-documents/sec-edgar/10-K_20250728_rpt20250530_acc0001654954_25_008553.htm",
+              "locator": "OperatingIncomeLoss $13.375M (2025) and $10.078M (2024); midpoint normalization",
+              "as_of": "2025-05-31",
+              "content_sha256": "f2d21e25a0cc7e7c37e53b0232ee80eb64671bcf0d89ebfb58a0653c4f76501b",
+              "source_id": "0f97c6548d072c929cf92a95cd79ca2c364962c637310be96a9bbbd71a93b05b"
+            },
+            {
+              "node_id": "shares_m",
+              "ref": "AEHR/investor-documents/sec-edgar/10-K_20250728_rpt20250530_acc0001654954_25_008553.htm",
+              "locator": "FY2025 diluted net income $14.557M / diluted EPS $0.50",
+              "as_of": "2025-05-31",
+              "content_sha256": "f2d21e25a0cc7e7c37e53b0232ee80eb64671bcf0d89ebfb58a0653c4f76501b",
+              "source_id": "53cd14b410fa429f761a838d2aeaf60acf257e15bca59388eaa5758e9c87efc4"
+            }
+          ],
+          "checks": {
+            "passed": true,
+            "errors": []
+          },
+          "proof_hash": "23008202bf04d8674ea6f45fc47fe441c08b6045716a39cb470cd63b6b4318b5"
+        },
+        "evidence_tier": "primary_derived",
+        "evidence_level": "primary_derived",
+        "evidence": "Primary bridge from AEHR/investor-documents/sec-edgar/10-K_20250728_rpt20250530_acc0001654954_25_008553.htm: FY2025 revenue $64.961M, operating income $13.375M, cash $49.159M, inventory $41.997M; contract backfill 2026-07-21.",
+        "scenario_assumptions": "Proof outputs {'low': 2.01, 'base': 3.21, 'high': 4.82}; see calculation_proof graph.",
+        "probability_and_timing": null,
+        "tax_and_realization_adjustments": "Inventory and cash-burn stress in cycle reserve.",
+        "falsifier": "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
+        "overlap_key": "burn_in_test_equipment_engine",
+        "assumption_type": "judgment"
+      },
+      {
+        "component_id": "sic_wafer_level_option",
+        "label": "Silicon carbide wafer-level burn-in adoption option",
+        "category": "real_option",
+        "treatment": "additive",
+        "included_in_component_id": null,
+        "ownership_claim": "Silicon carbide wafer-level burn-in adoption option",
+        "ownership_percentage": 1.0,
+        "quantity": {
+          "value": 1,
+          "unit": "per-share economic claim"
+        },
+        "method": "risk_adjusted_milestone_value",
+        "method_version": "1.0",
+        "method_provenance": {
+          "method_id": "risk_adjusted_milestone_value",
+          "version": "1.0",
+          "label": "Milestone risk-adjusted present value",
+          "power_zones": [
+            "binary_milestone"
+          ],
+          "equation": "value_per_share = (net_cash + sum(p_success*PV(success_value)-remaining_cost) - dilution)/shares",
+          "sources": [
+            {
+              "ref": "_system/frameworks/optionality_valuation.md",
+              "locator": "Milestone-based option framework"
+            }
+          ]
+        },
+        "comparable_ids": [],
+        "range_per_share": {
+          "low": 0.0,
+          "base": 4.0014,
+          "high": 12.0007
+        },
+        "legacy_range_per_share": {
+          "low": 0.0,
+          "base": 4.0,
+          "high": 12.0
+        },
+        "valuation_status": "bounded_estimate",
+        "calculation_proof": {
+          "status": "valid",
+          "method_id": "risk_adjusted_milestone_value",
+          "method_version": "1.0",
+          "outputs": {
+            "low": 0.0,
+            "base": 4.0014,
+            "high": 12.0007
+          },
+          "output_unit": "USD_per_share",
+          "traces": {
+            "low": [
+              {
+                "id": "inventory_m",
+                "label": "Inventory net (FY2025)",
+                "kind": "fact",
+                "value": 41.997,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "AEHR/investor-documents/sec-edgar/10-K_20250728_rpt20250530_acc0001654954_25_008553.htm",
+                  "locator": "InventoryNet $41.997M at May 31, 2025",
+                  "as_of": "2025-05-31",
+                  "content_sha256": "f2d21e25a0cc7e7c37e53b0232ee80eb64671bcf0d89ebfb58a0653c4f76501b",
+                  "source_id": "f8216ce638faf2baa138d47bf446200b3a1ee0d645aa13d7f960c331849905e4"
+                },
+                "rationale": null
+              },
+              {
+                "id": "deferred_revenue_m",
+                "label": "Customer deposits and deferred revenue (current)",
+                "kind": "fact",
+                "value": 1.345,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "AEHR/investor-documents/sec-edgar/10-K_20250728_rpt20250530_acc0001654954_25_008553.htm",
+                  "locator": "CustomerDepositsAndDeferredRevenueShortTerm $1.345M at May 31, 2025",
+                  "as_of": "2025-05-31",
+                  "content_sha256": "f2d21e25a0cc7e7c37e53b0232ee80eb64671bcf0d89ebfb58a0653c4f76501b",
+                  "source_id": "869a07392018e2a9e1839c24e9ada1db197f72d1b99078c11cb95bae203a497d"
+                },
+                "rationale": null
+              },
+              {
+                "id": "shares_m",
+                "label": "FY2025 diluted shares",
+                "kind": "fact",
+                "value": 29.215,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "AEHR/investor-documents/sec-edgar/10-K_20250728_rpt20250530_acc0001654954_25_008553.htm",
+                  "locator": "FY2025 diluted net income $14.557M / diluted EPS $0.50",
+                  "as_of": "2025-05-31",
+                  "content_sha256": "f2d21e25a0cc7e7c37e53b0232ee80eb64671bcf0d89ebfb58a0653c4f76501b",
+                  "source_id": "53cd14b410fa429f761a838d2aeaf60acf257e15bca59388eaa5758e9c87efc4"
+                },
+                "rationale": null
+              },
+              {
+                "id": "sic_milestone_m",
+                "label": "Risk-adjusted silicon carbide wafer-level burn-in adoption economics",
+                "kind": "judgment",
+                "value": 0.0,
+                "unit": "USD_m",
+                "source": null,
+                "rationale": "Non-overlapping claim on SiC and wafer-level test adoption not fully captured in normalized owner-cash multiple; base is judgment band pending order disclosure."
+              },
+              {
+                "id": "value_per_share",
+                "label": "SiC wafer-level option per share",
+                "kind": "calculation",
+                "value": 0.0,
+                "unit": "USD_per_share",
+                "operation": "divide",
+                "formula": "sic_milestone_m \u00f7 shares_m",
+                "substituted_formula": "0 \u00f7 29.215",
+                "dependencies": [
+                  "sic_milestone_m",
+                  "shares_m"
+                ]
+              }
+            ],
+            "base": [
+              {
+                "id": "inventory_m",
+                "label": "Inventory net (FY2025)",
+                "kind": "fact",
+                "value": 41.997,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "AEHR/investor-documents/sec-edgar/10-K_20250728_rpt20250530_acc0001654954_25_008553.htm",
+                  "locator": "InventoryNet $41.997M at May 31, 2025",
+                  "as_of": "2025-05-31",
+                  "content_sha256": "f2d21e25a0cc7e7c37e53b0232ee80eb64671bcf0d89ebfb58a0653c4f76501b",
+                  "source_id": "f8216ce638faf2baa138d47bf446200b3a1ee0d645aa13d7f960c331849905e4"
+                },
+                "rationale": null
+              },
+              {
+                "id": "deferred_revenue_m",
+                "label": "Customer deposits and deferred revenue (current)",
+                "kind": "fact",
+                "value": 1.345,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "AEHR/investor-documents/sec-edgar/10-K_20250728_rpt20250530_acc0001654954_25_008553.htm",
+                  "locator": "CustomerDepositsAndDeferredRevenueShortTerm $1.345M at May 31, 2025",
+                  "as_of": "2025-05-31",
+                  "content_sha256": "f2d21e25a0cc7e7c37e53b0232ee80eb64671bcf0d89ebfb58a0653c4f76501b",
+                  "source_id": "869a07392018e2a9e1839c24e9ada1db197f72d1b99078c11cb95bae203a497d"
+                },
+                "rationale": null
+              },
+              {
+                "id": "shares_m",
+                "label": "FY2025 diluted shares",
+                "kind": "fact",
+                "value": 29.215,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "AEHR/investor-documents/sec-edgar/10-K_20250728_rpt20250530_acc0001654954_25_008553.htm",
+                  "locator": "FY2025 diluted net income $14.557M / diluted EPS $0.50",
+                  "as_of": "2025-05-31",
+                  "content_sha256": "f2d21e25a0cc7e7c37e53b0232ee80eb64671bcf0d89ebfb58a0653c4f76501b",
+                  "source_id": "53cd14b410fa429f761a838d2aeaf60acf257e15bca59388eaa5758e9c87efc4"
+                },
+                "rationale": null
+              },
+              {
+                "id": "sic_milestone_m",
+                "label": "Risk-adjusted silicon carbide wafer-level burn-in adoption economics",
+                "kind": "judgment",
+                "value": 116.9,
+                "unit": "USD_m",
+                "source": null,
+                "rationale": "Non-overlapping claim on SiC and wafer-level test adoption not fully captured in normalized owner-cash multiple; base is judgment band pending order disclosure."
+              },
+              {
+                "id": "value_per_share",
+                "label": "SiC wafer-level option per share",
+                "kind": "calculation",
+                "value": 4.00136916,
+                "unit": "USD_per_share",
+                "operation": "divide",
+                "formula": "sic_milestone_m \u00f7 shares_m",
+                "substituted_formula": "116.9 \u00f7 29.215",
+                "dependencies": [
+                  "sic_milestone_m",
+                  "shares_m"
+                ]
+              }
+            ],
+            "high": [
+              {
+                "id": "inventory_m",
+                "label": "Inventory net (FY2025)",
+                "kind": "fact",
+                "value": 41.997,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "AEHR/investor-documents/sec-edgar/10-K_20250728_rpt20250530_acc0001654954_25_008553.htm",
+                  "locator": "InventoryNet $41.997M at May 31, 2025",
+                  "as_of": "2025-05-31",
+                  "content_sha256": "f2d21e25a0cc7e7c37e53b0232ee80eb64671bcf0d89ebfb58a0653c4f76501b",
+                  "source_id": "f8216ce638faf2baa138d47bf446200b3a1ee0d645aa13d7f960c331849905e4"
+                },
+                "rationale": null
+              },
+              {
+                "id": "deferred_revenue_m",
+                "label": "Customer deposits and deferred revenue (current)",
+                "kind": "fact",
+                "value": 1.345,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "AEHR/investor-documents/sec-edgar/10-K_20250728_rpt20250530_acc0001654954_25_008553.htm",
+                  "locator": "CustomerDepositsAndDeferredRevenueShortTerm $1.345M at May 31, 2025",
+                  "as_of": "2025-05-31",
+                  "content_sha256": "f2d21e25a0cc7e7c37e53b0232ee80eb64671bcf0d89ebfb58a0653c4f76501b",
+                  "source_id": "869a07392018e2a9e1839c24e9ada1db197f72d1b99078c11cb95bae203a497d"
+                },
+                "rationale": null
+              },
+              {
+                "id": "shares_m",
+                "label": "FY2025 diluted shares",
+                "kind": "fact",
+                "value": 29.215,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "AEHR/investor-documents/sec-edgar/10-K_20250728_rpt20250530_acc0001654954_25_008553.htm",
+                  "locator": "FY2025 diluted net income $14.557M / diluted EPS $0.50",
+                  "as_of": "2025-05-31",
+                  "content_sha256": "f2d21e25a0cc7e7c37e53b0232ee80eb64671bcf0d89ebfb58a0653c4f76501b",
+                  "source_id": "53cd14b410fa429f761a838d2aeaf60acf257e15bca59388eaa5758e9c87efc4"
+                },
+                "rationale": null
+              },
+              {
+                "id": "sic_milestone_m",
+                "label": "Risk-adjusted silicon carbide wafer-level burn-in adoption economics",
+                "kind": "judgment",
+                "value": 350.6,
+                "unit": "USD_m",
+                "source": null,
+                "rationale": "Non-overlapping claim on SiC and wafer-level test adoption not fully captured in normalized owner-cash multiple; base is judgment band pending order disclosure."
+              },
+              {
+                "id": "value_per_share",
+                "label": "SiC wafer-level option per share",
+                "kind": "calculation",
+                "value": 12.00068458,
+                "unit": "USD_per_share",
+                "operation": "divide",
+                "formula": "sic_milestone_m \u00f7 shares_m",
+                "substituted_formula": "350.6 \u00f7 29.215",
+                "dependencies": [
+                  "sic_milestone_m",
+                  "shares_m"
+                ]
+              }
+            ]
+          },
+          "source_lineage": [
+            {
+              "node_id": "inventory_m",
+              "ref": "AEHR/investor-documents/sec-edgar/10-K_20250728_rpt20250530_acc0001654954_25_008553.htm",
+              "locator": "InventoryNet $41.997M at May 31, 2025",
+              "as_of": "2025-05-31",
+              "content_sha256": "f2d21e25a0cc7e7c37e53b0232ee80eb64671bcf0d89ebfb58a0653c4f76501b",
+              "source_id": "f8216ce638faf2baa138d47bf446200b3a1ee0d645aa13d7f960c331849905e4"
+            },
+            {
+              "node_id": "deferred_revenue_m",
+              "ref": "AEHR/investor-documents/sec-edgar/10-K_20250728_rpt20250530_acc0001654954_25_008553.htm",
+              "locator": "CustomerDepositsAndDeferredRevenueShortTerm $1.345M at May 31, 2025",
+              "as_of": "2025-05-31",
+              "content_sha256": "f2d21e25a0cc7e7c37e53b0232ee80eb64671bcf0d89ebfb58a0653c4f76501b",
+              "source_id": "869a07392018e2a9e1839c24e9ada1db197f72d1b99078c11cb95bae203a497d"
+            },
+            {
+              "node_id": "shares_m",
+              "ref": "AEHR/investor-documents/sec-edgar/10-K_20250728_rpt20250530_acc0001654954_25_008553.htm",
+              "locator": "FY2025 diluted net income $14.557M / diluted EPS $0.50",
+              "as_of": "2025-05-31",
+              "content_sha256": "f2d21e25a0cc7e7c37e53b0232ee80eb64671bcf0d89ebfb58a0653c4f76501b",
+              "source_id": "53cd14b410fa429f761a838d2aeaf60acf257e15bca59388eaa5758e9c87efc4"
+            }
+          ],
+          "checks": {
+            "passed": true,
+            "errors": []
+          },
+          "proof_hash": "0be85e072501112ff4e861762189b670c99bec3c5990ffa958847d509eaef282"
+        },
+        "evidence_tier": "primary_derived",
+        "evidence_level": "primary_derived",
+        "evidence": "Primary bridge from AEHR/investor-documents/sec-edgar/10-K_20250728_rpt20250530_acc0001654954_25_008553.htm: FY2025 revenue $64.961M, operating income $13.375M, cash $49.159M, inventory $41.997M; contract backfill 2026-07-21.",
+        "scenario_assumptions": "Proof outputs {'low': 0.0, 'base': 4.0014, 'high': 12.0007}; see calculation_proof graph.",
+        "probability_and_timing": {
+          "success_probability": null,
+          "remaining_capital_m": null,
+          "timing_basis": "EV and industrial SiC capacity ramps; [Assumption] 4-year base.",
+          "probability_basis": "SiC wafer-level burn-in is filed growth focus; base assumes partial adoption over four years. [Assumption]",
+          "remaining_capital_basis": "Incremental capex for backlog fulfillment embedded in normalized owner cash."
+        },
+        "tax_and_realization_adjustments": "Low case zero; base does not assume full EV SiC TAM.",
+        "falsifier": "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
+        "overlap_key": "sic_wafer_level_option",
+        "assumption_type": "judgment"
+      },
+      {
+        "component_id": "net_financial_claims",
+        "label": "Net cash claims on common equity",
+        "category": "liability_or_reserve",
+        "treatment": "additive",
+        "included_in_component_id": null,
+        "ownership_claim": "Net cash claims on common equity",
+        "ownership_percentage": 1.0,
+        "quantity": {
+          "value": 1,
+          "unit": "per-share economic claim"
+        },
+        "method": "net_asset_value",
+        "method_version": "1.0",
+        "method_provenance": {
+          "method_id": "net_asset_value",
+          "version": "1.0",
+          "label": "Reconciled net asset value",
+          "power_zones": [
+            "scarce_asset_optionality",
+            "catalyst_asset_value",
+            "credit_and_normalized_returns"
+          ],
+          "equation": "value_per_share = (gross_assets - senior_claims - tax - realization_costs) / diluted_shares",
+          "sources": [
+            {
+              "ref": "_system/frameworks/scarce_strategic_asset_valuation.md",
+              "locator": "Economic ownership and unit NAV"
+            }
+          ]
+        },
+        "comparable_ids": [],
+        "range_per_share": {
+          "low": 1.4308,
+          "base": 1.6841,
+          "high": 1.7662
+        },
+        "legacy_range_per_share": {
+          "low": 1.43,
+          "base": 1.68,
+          "high": 1.77
+        },
+        "valuation_status": "bounded_estimate",
+        "calculation_proof": {
+          "status": "valid",
+          "method_id": "net_asset_value",
+          "method_version": "1.0",
+          "outputs": {
+            "low": 1.4308,
+            "base": 1.6841,
+            "high": 1.7662
+          },
+          "output_unit": "USD_per_share",
+          "traces": {
+            "low": [
+              {
+                "id": "cash_m",
+                "label": "Cash and cash equivalents (FY2025)",
+                "kind": "fact",
+                "value": 49.159,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "AEHR/investor-documents/sec-edgar/10-K_20250728_rpt20250530_acc0001654954_25_008553.htm",
+                  "locator": "CashAndCashEquivalentsAtCarryingValue $49.159M at May 31, 2025",
+                  "as_of": "2025-05-31",
+                  "content_sha256": "f2d21e25a0cc7e7c37e53b0232ee80eb64671bcf0d89ebfb58a0653c4f76501b",
+                  "source_id": "711513d75b84c959e29d2ab90a1add9e126e06bb9631307e10cecfe1f0b71201"
+                },
+                "rationale": null
+              },
+              {
+                "id": "shares_m",
+                "label": "FY2025 diluted shares",
+                "kind": "fact",
+                "value": 29.215,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "AEHR/investor-documents/sec-edgar/10-K_20250728_rpt20250530_acc0001654954_25_008553.htm",
+                  "locator": "FY2025 diluted net income $14.557M / diluted EPS $0.50",
+                  "as_of": "2025-05-31",
+                  "content_sha256": "f2d21e25a0cc7e7c37e53b0232ee80eb64671bcf0d89ebfb58a0653c4f76501b",
+                  "source_id": "53cd14b410fa429f761a838d2aeaf60acf257e15bca59388eaa5758e9c87efc4"
+                },
+                "rationale": null
+              },
+              {
+                "id": "net_liquid_claim_m",
+                "label": "Net financial claim (cash; no material long-term debt filed)",
+                "kind": "judgment",
+                "value": 41.8,
+                "unit": "USD_m",
+                "source": null,
+                "rationale": "Filing-locked cash with no long-term debt tags in FY2025 10-K; low/high stress cash \u221215% / +5% for working-capital burn observed in Q3 FY2026."
+              },
+              {
+                "id": "value_per_share",
+                "label": "Net financial claims per share",
+                "kind": "calculation",
+                "value": 1.43077186,
+                "unit": "USD_per_share",
+                "operation": "divide",
+                "formula": "net_liquid_claim_m \u00f7 shares_m",
+                "substituted_formula": "41.8 \u00f7 29.215",
+                "dependencies": [
+                  "net_liquid_claim_m",
+                  "shares_m"
+                ]
+              }
+            ],
+            "base": [
+              {
+                "id": "cash_m",
+                "label": "Cash and cash equivalents (FY2025)",
+                "kind": "fact",
+                "value": 49.159,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "AEHR/investor-documents/sec-edgar/10-K_20250728_rpt20250530_acc0001654954_25_008553.htm",
+                  "locator": "CashAndCashEquivalentsAtCarryingValue $49.159M at May 31, 2025",
+                  "as_of": "2025-05-31",
+                  "content_sha256": "f2d21e25a0cc7e7c37e53b0232ee80eb64671bcf0d89ebfb58a0653c4f76501b",
+                  "source_id": "711513d75b84c959e29d2ab90a1add9e126e06bb9631307e10cecfe1f0b71201"
+                },
+                "rationale": null
+              },
+              {
+                "id": "shares_m",
+                "label": "FY2025 diluted shares",
+                "kind": "fact",
+                "value": 29.215,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "AEHR/investor-documents/sec-edgar/10-K_20250728_rpt20250530_acc0001654954_25_008553.htm",
+                  "locator": "FY2025 diluted net income $14.557M / diluted EPS $0.50",
+                  "as_of": "2025-05-31",
+                  "content_sha256": "f2d21e25a0cc7e7c37e53b0232ee80eb64671bcf0d89ebfb58a0653c4f76501b",
+                  "source_id": "53cd14b410fa429f761a838d2aeaf60acf257e15bca59388eaa5758e9c87efc4"
+                },
+                "rationale": null
+              },
+              {
+                "id": "net_liquid_claim_m",
+                "label": "Net financial claim (cash; no material long-term debt filed)",
+                "kind": "judgment",
+                "value": 49.2,
+                "unit": "USD_m",
+                "source": null,
+                "rationale": "Filing-locked cash with no long-term debt tags in FY2025 10-K; low/high stress cash \u221215% / +5% for working-capital burn observed in Q3 FY2026."
+              },
+              {
+                "id": "value_per_share",
+                "label": "Net financial claims per share",
+                "kind": "calculation",
+                "value": 1.6840664,
+                "unit": "USD_per_share",
+                "operation": "divide",
+                "formula": "net_liquid_claim_m \u00f7 shares_m",
+                "substituted_formula": "49.2 \u00f7 29.215",
+                "dependencies": [
+                  "net_liquid_claim_m",
+                  "shares_m"
+                ]
+              }
+            ],
+            "high": [
+              {
+                "id": "cash_m",
+                "label": "Cash and cash equivalents (FY2025)",
+                "kind": "fact",
+                "value": 49.159,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "AEHR/investor-documents/sec-edgar/10-K_20250728_rpt20250530_acc0001654954_25_008553.htm",
+                  "locator": "CashAndCashEquivalentsAtCarryingValue $49.159M at May 31, 2025",
+                  "as_of": "2025-05-31",
+                  "content_sha256": "f2d21e25a0cc7e7c37e53b0232ee80eb64671bcf0d89ebfb58a0653c4f76501b",
+                  "source_id": "711513d75b84c959e29d2ab90a1add9e126e06bb9631307e10cecfe1f0b71201"
+                },
+                "rationale": null
+              },
+              {
+                "id": "shares_m",
+                "label": "FY2025 diluted shares",
+                "kind": "fact",
+                "value": 29.215,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "AEHR/investor-documents/sec-edgar/10-K_20250728_rpt20250530_acc0001654954_25_008553.htm",
+                  "locator": "FY2025 diluted net income $14.557M / diluted EPS $0.50",
+                  "as_of": "2025-05-31",
+                  "content_sha256": "f2d21e25a0cc7e7c37e53b0232ee80eb64671bcf0d89ebfb58a0653c4f76501b",
+                  "source_id": "53cd14b410fa429f761a838d2aeaf60acf257e15bca59388eaa5758e9c87efc4"
+                },
+                "rationale": null
+              },
+              {
+                "id": "net_liquid_claim_m",
+                "label": "Net financial claim (cash; no material long-term debt filed)",
+                "kind": "judgment",
+                "value": 51.6,
+                "unit": "USD_m",
+                "source": null,
+                "rationale": "Filing-locked cash with no long-term debt tags in FY2025 10-K; low/high stress cash \u221215% / +5% for working-capital burn observed in Q3 FY2026."
+              },
+              {
+                "id": "value_per_share",
+                "label": "Net financial claims per share",
+                "kind": "calculation",
+                "value": 1.76621598,
+                "unit": "USD_per_share",
+                "operation": "divide",
+                "formula": "net_liquid_claim_m \u00f7 shares_m",
+                "substituted_formula": "51.6 \u00f7 29.215",
+                "dependencies": [
+                  "net_liquid_claim_m",
+                  "shares_m"
+                ]
+              }
+            ]
+          },
+          "source_lineage": [
+            {
+              "node_id": "cash_m",
+              "ref": "AEHR/investor-documents/sec-edgar/10-K_20250728_rpt20250530_acc0001654954_25_008553.htm",
+              "locator": "CashAndCashEquivalentsAtCarryingValue $49.159M at May 31, 2025",
+              "as_of": "2025-05-31",
+              "content_sha256": "f2d21e25a0cc7e7c37e53b0232ee80eb64671bcf0d89ebfb58a0653c4f76501b",
+              "source_id": "711513d75b84c959e29d2ab90a1add9e126e06bb9631307e10cecfe1f0b71201"
+            },
+            {
+              "node_id": "shares_m",
+              "ref": "AEHR/investor-documents/sec-edgar/10-K_20250728_rpt20250530_acc0001654954_25_008553.htm",
+              "locator": "FY2025 diluted net income $14.557M / diluted EPS $0.50",
+              "as_of": "2025-05-31",
+              "content_sha256": "f2d21e25a0cc7e7c37e53b0232ee80eb64671bcf0d89ebfb58a0653c4f76501b",
+              "source_id": "53cd14b410fa429f761a838d2aeaf60acf257e15bca59388eaa5758e9c87efc4"
+            }
+          ],
+          "checks": {
+            "passed": true,
+            "errors": []
+          },
+          "proof_hash": "80c546031ddae69c30b1ed0b8b6ab6978f897a6f47f07b39152aa3990b93cf5a"
+        },
+        "evidence_tier": "primary_derived",
+        "evidence_level": "primary_derived",
+        "evidence": "Primary bridge from AEHR/investor-documents/sec-edgar/10-K_20250728_rpt20250530_acc0001654954_25_008553.htm: FY2025 revenue $64.961M, operating income $13.375M, cash $49.159M, inventory $41.997M; contract backfill 2026-07-21.",
+        "scenario_assumptions": "Proof outputs {'low': 1.4308, 'base': 1.6841, 'high': 1.7662}; see calculation_proof graph.",
+        "probability_and_timing": null,
+        "tax_and_realization_adjustments": "Low/high stress cash bands for Q3 burn.",
+        "falsifier": "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
+        "overlap_key": "net_financial_claims",
+        "assumption_type": "judgment"
+      },
+      {
+        "component_id": "cycle_and_inventory_reserve",
+        "label": "Semicap cycle, inventory build, and cash-burn reserve",
+        "category": "liability_or_reserve",
+        "treatment": "additive",
+        "included_in_component_id": null,
+        "ownership_claim": "Semicap cycle, inventory build, and cash-burn reserve",
+        "ownership_percentage": 1.0,
+        "quantity": {
+          "value": 1,
+          "unit": "per-share economic claim"
+        },
+        "method": "net_asset_value",
+        "method_version": "1.0",
+        "method_provenance": {
+          "method_id": "net_asset_value",
+          "version": "1.0",
+          "label": "Reconciled net asset value",
+          "power_zones": [
+            "scarce_asset_optionality",
+            "catalyst_asset_value",
+            "credit_and_normalized_returns"
+          ],
+          "equation": "value_per_share = (gross_assets - senior_claims - tax - realization_costs) / diluted_shares",
+          "sources": [
+            {
+              "ref": "_system/frameworks/scarce_strategic_asset_valuation.md",
+              "locator": "Economic ownership and unit NAV"
+            }
+          ]
+        },
+        "comparable_ids": [],
+        "range_per_share": {
+          "low": -12.0007,
+          "base": -6.0003,
+          "high": -1.999
+        },
+        "legacy_range_per_share": {
+          "low": -12.0,
+          "base": -6.0,
+          "high": -2.0
+        },
+        "valuation_status": "bounded_estimate",
+        "calculation_proof": {
+          "status": "valid",
+          "method_id": "net_asset_value",
+          "method_version": "1.0",
+          "outputs": {
+            "low": -12.0007,
+            "base": -6.0003,
+            "high": -1.999
+          },
+          "output_unit": "USD_per_share",
+          "traces": {
+            "low": [
+              {
+                "id": "cash_q3_m",
+                "label": "Cash and equivalents (Q3 FY2026)",
+                "kind": "fact",
+                "value": 24.529,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "AEHR/investor-documents/sec-edgar/10-Q_20260408_rpt20260227_acc0001654954_26_003348.htm",
+                  "locator": "CashAndCashEquivalentsAtCarryingValue $24.529M at February 27, 2026 (down from $49.159M)",
+                  "as_of": "2026-02-27",
+                  "content_sha256": "a5e18f3b4894bc4b4b447d77d45f25e572de1eb64843d10d9b0e10f72a69b4ac",
+                  "source_id": "eb828b8875b36bc576a648ce63a8a9c51be3b5a6b9aa86be748489fed0bcbba4"
+                },
+                "rationale": null
+              },
+              {
+                "id": "inventory_m",
+                "label": "Inventory net (FY2025)",
+                "kind": "fact",
+                "value": 41.997,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "AEHR/investor-documents/sec-edgar/10-K_20250728_rpt20250530_acc0001654954_25_008553.htm",
+                  "locator": "InventoryNet $41.997M at May 31, 2025",
+                  "as_of": "2025-05-31",
+                  "content_sha256": "f2d21e25a0cc7e7c37e53b0232ee80eb64671bcf0d89ebfb58a0653c4f76501b",
+                  "source_id": "f8216ce638faf2baa138d47bf446200b3a1ee0d645aa13d7f960c331849905e4"
+                },
+                "rationale": null
+              },
+              {
+                "id": "shares_m",
+                "label": "FY2025 diluted shares",
+                "kind": "fact",
+                "value": 29.215,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "AEHR/investor-documents/sec-edgar/10-K_20250728_rpt20250530_acc0001654954_25_008553.htm",
+                  "locator": "FY2025 diluted net income $14.557M / diluted EPS $0.50",
+                  "as_of": "2025-05-31",
+                  "content_sha256": "f2d21e25a0cc7e7c37e53b0232ee80eb64671bcf0d89ebfb58a0653c4f76501b",
+                  "source_id": "53cd14b410fa429f761a838d2aeaf60acf257e15bca59388eaa5758e9c87efc4"
+                },
+                "rationale": null
+              },
+              {
+                "id": "reserve_m",
+                "label": "Semicap cycle, inventory build, and cash-burn reserve",
+                "kind": "judgment",
+                "value": -350.6,
+                "unit": "USD_m",
+                "source": null,
+                "rationale": "Negative reserve for nine-month revenue trough, inventory build, and cash decline from $49M to $25M not fully embedded in mid-cycle owner-cash multiple."
+              },
+              {
+                "id": "value_per_share",
+                "label": "Cycle and inventory reserve per share",
+                "kind": "calculation",
+                "value": -12.00068458,
+                "unit": "USD_per_share",
+                "operation": "divide",
+                "formula": "reserve_m \u00f7 shares_m",
+                "substituted_formula": "-350.6 \u00f7 29.215",
+                "dependencies": [
+                  "reserve_m",
+                  "shares_m"
+                ]
+              }
+            ],
+            "base": [
+              {
+                "id": "cash_q3_m",
+                "label": "Cash and equivalents (Q3 FY2026)",
+                "kind": "fact",
+                "value": 24.529,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "AEHR/investor-documents/sec-edgar/10-Q_20260408_rpt20260227_acc0001654954_26_003348.htm",
+                  "locator": "CashAndCashEquivalentsAtCarryingValue $24.529M at February 27, 2026 (down from $49.159M)",
+                  "as_of": "2026-02-27",
+                  "content_sha256": "a5e18f3b4894bc4b4b447d77d45f25e572de1eb64843d10d9b0e10f72a69b4ac",
+                  "source_id": "eb828b8875b36bc576a648ce63a8a9c51be3b5a6b9aa86be748489fed0bcbba4"
+                },
+                "rationale": null
+              },
+              {
+                "id": "inventory_m",
+                "label": "Inventory net (FY2025)",
+                "kind": "fact",
+                "value": 41.997,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "AEHR/investor-documents/sec-edgar/10-K_20250728_rpt20250530_acc0001654954_25_008553.htm",
+                  "locator": "InventoryNet $41.997M at May 31, 2025",
+                  "as_of": "2025-05-31",
+                  "content_sha256": "f2d21e25a0cc7e7c37e53b0232ee80eb64671bcf0d89ebfb58a0653c4f76501b",
+                  "source_id": "f8216ce638faf2baa138d47bf446200b3a1ee0d645aa13d7f960c331849905e4"
+                },
+                "rationale": null
+              },
+              {
+                "id": "shares_m",
+                "label": "FY2025 diluted shares",
+                "kind": "fact",
+                "value": 29.215,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "AEHR/investor-documents/sec-edgar/10-K_20250728_rpt20250530_acc0001654954_25_008553.htm",
+                  "locator": "FY2025 diluted net income $14.557M / diluted EPS $0.50",
+                  "as_of": "2025-05-31",
+                  "content_sha256": "f2d21e25a0cc7e7c37e53b0232ee80eb64671bcf0d89ebfb58a0653c4f76501b",
+                  "source_id": "53cd14b410fa429f761a838d2aeaf60acf257e15bca59388eaa5758e9c87efc4"
+                },
+                "rationale": null
+              },
+              {
+                "id": "reserve_m",
+                "label": "Semicap cycle, inventory build, and cash-burn reserve",
+                "kind": "judgment",
+                "value": -175.3,
+                "unit": "USD_m",
+                "source": null,
+                "rationale": "Negative reserve for nine-month revenue trough, inventory build, and cash decline from $49M to $25M not fully embedded in mid-cycle owner-cash multiple."
+              },
+              {
+                "id": "value_per_share",
+                "label": "Cycle and inventory reserve per share",
+                "kind": "calculation",
+                "value": -6.00034229,
+                "unit": "USD_per_share",
+                "operation": "divide",
+                "formula": "reserve_m \u00f7 shares_m",
+                "substituted_formula": "-175.3 \u00f7 29.215",
+                "dependencies": [
+                  "reserve_m",
+                  "shares_m"
+                ]
+              }
+            ],
+            "high": [
+              {
+                "id": "cash_q3_m",
+                "label": "Cash and equivalents (Q3 FY2026)",
+                "kind": "fact",
+                "value": 24.529,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "AEHR/investor-documents/sec-edgar/10-Q_20260408_rpt20260227_acc0001654954_26_003348.htm",
+                  "locator": "CashAndCashEquivalentsAtCarryingValue $24.529M at February 27, 2026 (down from $49.159M)",
+                  "as_of": "2026-02-27",
+                  "content_sha256": "a5e18f3b4894bc4b4b447d77d45f25e572de1eb64843d10d9b0e10f72a69b4ac",
+                  "source_id": "eb828b8875b36bc576a648ce63a8a9c51be3b5a6b9aa86be748489fed0bcbba4"
+                },
+                "rationale": null
+              },
+              {
+                "id": "inventory_m",
+                "label": "Inventory net (FY2025)",
+                "kind": "fact",
+                "value": 41.997,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "AEHR/investor-documents/sec-edgar/10-K_20250728_rpt20250530_acc0001654954_25_008553.htm",
+                  "locator": "InventoryNet $41.997M at May 31, 2025",
+                  "as_of": "2025-05-31",
+                  "content_sha256": "f2d21e25a0cc7e7c37e53b0232ee80eb64671bcf0d89ebfb58a0653c4f76501b",
+                  "source_id": "f8216ce638faf2baa138d47bf446200b3a1ee0d645aa13d7f960c331849905e4"
+                },
+                "rationale": null
+              },
+              {
+                "id": "shares_m",
+                "label": "FY2025 diluted shares",
+                "kind": "fact",
+                "value": 29.215,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "AEHR/investor-documents/sec-edgar/10-K_20250728_rpt20250530_acc0001654954_25_008553.htm",
+                  "locator": "FY2025 diluted net income $14.557M / diluted EPS $0.50",
+                  "as_of": "2025-05-31",
+                  "content_sha256": "f2d21e25a0cc7e7c37e53b0232ee80eb64671bcf0d89ebfb58a0653c4f76501b",
+                  "source_id": "53cd14b410fa429f761a838d2aeaf60acf257e15bca59388eaa5758e9c87efc4"
+                },
+                "rationale": null
+              },
+              {
+                "id": "reserve_m",
+                "label": "Semicap cycle, inventory build, and cash-burn reserve",
+                "kind": "judgment",
+                "value": -58.4,
+                "unit": "USD_m",
+                "source": null,
+                "rationale": "Negative reserve for nine-month revenue trough, inventory build, and cash decline from $49M to $25M not fully embedded in mid-cycle owner-cash multiple."
+              },
+              {
+                "id": "value_per_share",
+                "label": "Cycle and inventory reserve per share",
+                "kind": "calculation",
+                "value": -1.99897313,
+                "unit": "USD_per_share",
+                "operation": "divide",
+                "formula": "reserve_m \u00f7 shares_m",
+                "substituted_formula": "-58.4 \u00f7 29.215",
+                "dependencies": [
+                  "reserve_m",
+                  "shares_m"
+                ]
+              }
+            ]
+          },
+          "source_lineage": [
+            {
+              "node_id": "cash_q3_m",
+              "ref": "AEHR/investor-documents/sec-edgar/10-Q_20260408_rpt20260227_acc0001654954_26_003348.htm",
+              "locator": "CashAndCashEquivalentsAtCarryingValue $24.529M at February 27, 2026 (down from $49.159M)",
+              "as_of": "2026-02-27",
+              "content_sha256": "a5e18f3b4894bc4b4b447d77d45f25e572de1eb64843d10d9b0e10f72a69b4ac",
+              "source_id": "eb828b8875b36bc576a648ce63a8a9c51be3b5a6b9aa86be748489fed0bcbba4"
+            },
+            {
+              "node_id": "inventory_m",
+              "ref": "AEHR/investor-documents/sec-edgar/10-K_20250728_rpt20250530_acc0001654954_25_008553.htm",
+              "locator": "InventoryNet $41.997M at May 31, 2025",
+              "as_of": "2025-05-31",
+              "content_sha256": "f2d21e25a0cc7e7c37e53b0232ee80eb64671bcf0d89ebfb58a0653c4f76501b",
+              "source_id": "f8216ce638faf2baa138d47bf446200b3a1ee0d645aa13d7f960c331849905e4"
+            },
+            {
+              "node_id": "shares_m",
+              "ref": "AEHR/investor-documents/sec-edgar/10-K_20250728_rpt20250530_acc0001654954_25_008553.htm",
+              "locator": "FY2025 diluted net income $14.557M / diluted EPS $0.50",
+              "as_of": "2025-05-31",
+              "content_sha256": "f2d21e25a0cc7e7c37e53b0232ee80eb64671bcf0d89ebfb58a0653c4f76501b",
+              "source_id": "53cd14b410fa429f761a838d2aeaf60acf257e15bca59388eaa5758e9c87efc4"
+            }
+          ],
+          "checks": {
+            "passed": true,
+            "errors": []
+          },
+          "proof_hash": "5495279d7f0bedc7d1e920055f53fd5b1f03a5288ac562250dbfaa247d76407c"
+        },
+        "evidence_tier": "primary_derived",
+        "evidence_level": "primary_derived",
+        "evidence": "Primary bridge from AEHR/investor-documents/sec-edgar/10-K_20250728_rpt20250530_acc0001654954_25_008553.htm: FY2025 revenue $64.961M, operating income $13.375M, cash $49.159M, inventory $41.997M; contract backfill 2026-07-21.",
+        "scenario_assumptions": "Proof outputs {'low': -12.0007, 'base': -6.0003, 'high': -1.999}; see calculation_proof graph.",
+        "probability_and_timing": null,
+        "tax_and_realization_adjustments": "Separate from core capitalization multiple.",
+        "falsifier": "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
+        "overlap_key": "cycle_and_inventory_reserve",
+        "assumption_type": "judgment"
+      }
+    ],
     "component_coverage": {
-      "all_material_components_identified": false,
-      "material_component_count": 0,
-      "additive_component_count": 0,
+      "all_material_components_identified": true,
+      "material_component_count": 4,
+      "additive_component_count": 4,
       "embedded_component_count": 0,
-      "unvalued_component_count": 1,
+      "unvalued_component_count": 0,
       "double_counting_flags": []
     },
     "facts": [],
     "estimates": [],
-    "judgments": []
+    "judgments": [
+      {
+        "component_id": "burn_in_test_equipment_engine",
+        "label": "Burn-in and wafer-level test equipment operations",
+        "kind": "judgment",
+        "evidence_tier": "primary_derived",
+        "evidence": "Primary bridge from AEHR/investor-documents/sec-edgar/10-K_20250728_rpt20250530_acc0001654954_25_008553.htm: FY2025 revenue $64.961M, operating income $13.375M, cash $49.159M, inventory $41.997M; contract backfill 2026-07-21.",
+        "method": "owner_cash_or_dividend_discount",
+        "valuation_status": "bounded_estimate"
+      },
+      {
+        "component_id": "sic_wafer_level_option",
+        "label": "Silicon carbide wafer-level burn-in adoption option",
+        "kind": "judgment",
+        "evidence_tier": "primary_derived",
+        "evidence": "Primary bridge from AEHR/investor-documents/sec-edgar/10-K_20250728_rpt20250530_acc0001654954_25_008553.htm: FY2025 revenue $64.961M, operating income $13.375M, cash $49.159M, inventory $41.997M; contract backfill 2026-07-21.",
+        "method": "risk_adjusted_milestone_value",
+        "valuation_status": "bounded_estimate"
+      },
+      {
+        "component_id": "net_financial_claims",
+        "label": "Net cash claims on common equity",
+        "kind": "judgment",
+        "evidence_tier": "primary_derived",
+        "evidence": "Primary bridge from AEHR/investor-documents/sec-edgar/10-K_20250728_rpt20250530_acc0001654954_25_008553.htm: FY2025 revenue $64.961M, operating income $13.375M, cash $49.159M, inventory $41.997M; contract backfill 2026-07-21.",
+        "method": "net_asset_value",
+        "valuation_status": "bounded_estimate"
+      },
+      {
+        "component_id": "cycle_and_inventory_reserve",
+        "label": "Semicap cycle, inventory build, and cash-burn reserve",
+        "kind": "judgment",
+        "evidence_tier": "primary_derived",
+        "evidence": "Primary bridge from AEHR/investor-documents/sec-edgar/10-K_20250728_rpt20250530_acc0001654954_25_008553.htm: FY2025 revenue $64.961M, operating income $13.375M, cash $49.159M, inventory $41.997M; contract backfill 2026-07-21.",
+        "method": "net_asset_value",
+        "valuation_status": "bounded_estimate"
+      }
+    ]
   },
   "valuation": {
-    "status": "evidence_blocked",
+    "status": "decision_grade",
     "market": {
       "price_per_share": 77.36,
-      "fully_diluted_shares": null,
-      "market_cap_m": null,
-      "enterprise_value_m": null
+      "fully_diluted_shares": 29215000,
+      "market_cap_m": 2260.07,
+      "enterprise_value_m": 2210.91
     },
     "valuation": {
       "value_per_share": {
-        "low": null,
-        "base": null,
-        "high": null
+        "low": -8.5599,
+        "base": 2.8952,
+        "high": 16.5879
       },
       "priced_components_per_share": {
-        "low": 0,
-        "base": 0,
-        "high": 0
+        "low": -8.5599,
+        "base": 2.8952,
+        "high": 16.5879
       },
-      "legacy_value_per_share": null,
-      "probability_weighted_value_per_share": null,
+      "legacy_value_per_share": {
+        "low": -8.56,
+        "base": 2.89,
+        "high": 16.59
+      },
+      "probability_weighted_value_per_share": 2.8952,
       "expected_distributions_per_share": 0.0,
       "annualized_return_at_price_pct": {
         "low": null,
-        "base": null,
-        "high": null
+        "base": -37.46,
+        "high": -19.75
       },
-      "downside_to_low_pct": null,
+      "downside_to_low_pct": -111.07,
       "horizon_years": 7,
       "interpretation": "value_per_share is withheld while any material additive component is unpriced; priced_components_per_share is not a complete security value."
     },
-    "components": [],
+    "components": [
+      {
+        "component_id": "burn_in_test_equipment_engine",
+        "label": "Burn-in and wafer-level test equipment operations",
+        "category": "operating_business",
+        "treatment": "additive",
+        "included_in_component_id": null,
+        "ownership_claim": "Burn-in and wafer-level test equipment operations",
+        "ownership_percentage": 1.0,
+        "quantity": {
+          "value": 1,
+          "unit": "per-share economic claim"
+        },
+        "method": "owner_cash_or_dividend_discount",
+        "method_version": "1.0",
+        "method_provenance": {
+          "method_id": "owner_cash_or_dividend_discount",
+          "version": "1.0",
+          "label": "Predictable owner-cash discount model",
+          "power_zones": [
+            "predictable_cash_flow"
+          ],
+          "equation": "value = distribution*(1+growth)/(required_return-growth) - funding_or_dilution_per_share",
+          "sources": [
+            {
+              "ref": "_system/frameworks/segment_cashflow_valuation.md",
+              "locator": "Cash-flow duration and funding"
+            }
+          ]
+        },
+        "comparable_ids": [],
+        "range_per_share": {
+          "low": 2.01,
+          "base": 3.21,
+          "high": 4.82
+        },
+        "legacy_range_per_share": {
+          "low": 2.01,
+          "base": 3.21,
+          "high": 4.82
+        },
+        "valuation_status": "bounded_estimate",
+        "calculation_proof": {
+          "status": "valid",
+          "method_id": "owner_cash_or_dividend_discount",
+          "method_version": "1.0",
+          "outputs": {
+            "low": 2.01,
+            "base": 3.21,
+            "high": 4.82
+          },
+          "output_unit": "USD_per_share",
+          "traces": {
+            "low": [
+              {
+                "id": "operating_income_m",
+                "label": "FY2025 operating income",
+                "kind": "fact",
+                "value": 13.375,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "AEHR/investor-documents/sec-edgar/10-K_20250728_rpt20250530_acc0001654954_25_008553.htm",
+                  "locator": "OperatingIncomeLoss $13.375M (FY2025, up from $10.078M prior year)",
+                  "as_of": "2025-05-31",
+                  "content_sha256": "f2d21e25a0cc7e7c37e53b0232ee80eb64671bcf0d89ebfb58a0653c4f76501b",
+                  "source_id": "fdbbf34e8f0bb28ff666eb9cbbbd1fc6b281e90a97cb48b5beacd6fbc0cc74e9"
+                },
+                "rationale": null
+              },
+              {
+                "id": "midcycle_operating_income_m",
+                "label": "Two-year average operating income (FY2024\u2013FY2025)",
+                "kind": "fact",
+                "value": 11.726,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "AEHR/investor-documents/sec-edgar/10-K_20250728_rpt20250530_acc0001654954_25_008553.htm",
+                  "locator": "OperatingIncomeLoss $13.375M (2025) and $10.078M (2024); midpoint normalization",
+                  "as_of": "2025-05-31",
+                  "content_sha256": "f2d21e25a0cc7e7c37e53b0232ee80eb64671bcf0d89ebfb58a0653c4f76501b",
+                  "source_id": "0f97c6548d072c929cf92a95cd79ca2c364962c637310be96a9bbbd71a93b05b"
+                },
+                "rationale": null
+              },
+              {
+                "id": "shares_m",
+                "label": "FY2025 diluted shares",
+                "kind": "fact",
+                "value": 29.215,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "AEHR/investor-documents/sec-edgar/10-K_20250728_rpt20250530_acc0001654954_25_008553.htm",
+                  "locator": "FY2025 diluted net income $14.557M / diluted EPS $0.50",
+                  "as_of": "2025-05-31",
+                  "content_sha256": "f2d21e25a0cc7e7c37e53b0232ee80eb64671bcf0d89ebfb58a0653c4f76501b",
+                  "source_id": "53cd14b410fa429f761a838d2aeaf60acf257e15bca59388eaa5758e9c87efc4"
+                },
+                "rationale": null
+              },
+              {
+                "id": "owner_cash_per_share",
+                "label": "Normalized owner cash per diluted share (mid-cycle operating income proxy)",
+                "kind": "judgment",
+                "value": 0.4014,
+                "unit": "USD_per_share",
+                "source": null,
+                "rationale": "Mid-cycle operating income per share anchors burn-in and wafer-level test equipment economics; FY2025 revenue fell slightly YoY but operating margin expanded."
+              },
+              {
+                "id": "capitalization_multiple",
+                "label": "Duration-adjusted owner-cash capitalization multiple",
+                "kind": "judgment",
+                "value": 5.0075,
+                "unit": "multiple",
+                "source": null,
+                "rationale": "Bear stresses semicap down-cycle and customer concentration; base mid-cycle eight-year path; bull modest SiC share gains without peak-cycle heroics."
+              },
+              {
+                "id": "value_per_share",
+                "label": "Burn-in test equipment engine per share",
+                "kind": "calculation",
+                "value": 2.0100105,
+                "unit": "USD_per_share",
+                "operation": "multiply",
+                "formula": "owner_cash_per_share \u00d7 capitalization_multiple",
+                "substituted_formula": "0.4014 \u00d7 5.0075",
+                "dependencies": [
+                  "owner_cash_per_share",
+                  "capitalization_multiple"
+                ]
+              }
+            ],
+            "base": [
+              {
+                "id": "operating_income_m",
+                "label": "FY2025 operating income",
+                "kind": "fact",
+                "value": 13.375,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "AEHR/investor-documents/sec-edgar/10-K_20250728_rpt20250530_acc0001654954_25_008553.htm",
+                  "locator": "OperatingIncomeLoss $13.375M (FY2025, up from $10.078M prior year)",
+                  "as_of": "2025-05-31",
+                  "content_sha256": "f2d21e25a0cc7e7c37e53b0232ee80eb64671bcf0d89ebfb58a0653c4f76501b",
+                  "source_id": "fdbbf34e8f0bb28ff666eb9cbbbd1fc6b281e90a97cb48b5beacd6fbc0cc74e9"
+                },
+                "rationale": null
+              },
+              {
+                "id": "midcycle_operating_income_m",
+                "label": "Two-year average operating income (FY2024\u2013FY2025)",
+                "kind": "fact",
+                "value": 11.726,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "AEHR/investor-documents/sec-edgar/10-K_20250728_rpt20250530_acc0001654954_25_008553.htm",
+                  "locator": "OperatingIncomeLoss $13.375M (2025) and $10.078M (2024); midpoint normalization",
+                  "as_of": "2025-05-31",
+                  "content_sha256": "f2d21e25a0cc7e7c37e53b0232ee80eb64671bcf0d89ebfb58a0653c4f76501b",
+                  "source_id": "0f97c6548d072c929cf92a95cd79ca2c364962c637310be96a9bbbd71a93b05b"
+                },
+                "rationale": null
+              },
+              {
+                "id": "shares_m",
+                "label": "FY2025 diluted shares",
+                "kind": "fact",
+                "value": 29.215,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "AEHR/investor-documents/sec-edgar/10-K_20250728_rpt20250530_acc0001654954_25_008553.htm",
+                  "locator": "FY2025 diluted net income $14.557M / diluted EPS $0.50",
+                  "as_of": "2025-05-31",
+                  "content_sha256": "f2d21e25a0cc7e7c37e53b0232ee80eb64671bcf0d89ebfb58a0653c4f76501b",
+                  "source_id": "53cd14b410fa429f761a838d2aeaf60acf257e15bca59388eaa5758e9c87efc4"
+                },
+                "rationale": null
+              },
+              {
+                "id": "owner_cash_per_share",
+                "label": "Normalized owner cash per diluted share (mid-cycle operating income proxy)",
+                "kind": "judgment",
+                "value": 0.4014,
+                "unit": "USD_per_share",
+                "source": null,
+                "rationale": "Mid-cycle operating income per share anchors burn-in and wafer-level test equipment economics; FY2025 revenue fell slightly YoY but operating margin expanded."
+              },
+              {
+                "id": "capitalization_multiple",
+                "label": "Duration-adjusted owner-cash capitalization multiple",
+                "kind": "judgment",
+                "value": 7.997,
+                "unit": "multiple",
+                "source": null,
+                "rationale": "Bear stresses semicap down-cycle and customer concentration; base mid-cycle eight-year path; bull modest SiC share gains without peak-cycle heroics."
+              },
+              {
+                "id": "value_per_share",
+                "label": "Burn-in test equipment engine per share",
+                "kind": "calculation",
+                "value": 3.2099958,
+                "unit": "USD_per_share",
+                "operation": "multiply",
+                "formula": "owner_cash_per_share \u00d7 capitalization_multiple",
+                "substituted_formula": "0.4014 \u00d7 7.997",
+                "dependencies": [
+                  "owner_cash_per_share",
+                  "capitalization_multiple"
+                ]
+              }
+            ],
+            "high": [
+              {
+                "id": "operating_income_m",
+                "label": "FY2025 operating income",
+                "kind": "fact",
+                "value": 13.375,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "AEHR/investor-documents/sec-edgar/10-K_20250728_rpt20250530_acc0001654954_25_008553.htm",
+                  "locator": "OperatingIncomeLoss $13.375M (FY2025, up from $10.078M prior year)",
+                  "as_of": "2025-05-31",
+                  "content_sha256": "f2d21e25a0cc7e7c37e53b0232ee80eb64671bcf0d89ebfb58a0653c4f76501b",
+                  "source_id": "fdbbf34e8f0bb28ff666eb9cbbbd1fc6b281e90a97cb48b5beacd6fbc0cc74e9"
+                },
+                "rationale": null
+              },
+              {
+                "id": "midcycle_operating_income_m",
+                "label": "Two-year average operating income (FY2024\u2013FY2025)",
+                "kind": "fact",
+                "value": 11.726,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "AEHR/investor-documents/sec-edgar/10-K_20250728_rpt20250530_acc0001654954_25_008553.htm",
+                  "locator": "OperatingIncomeLoss $13.375M (2025) and $10.078M (2024); midpoint normalization",
+                  "as_of": "2025-05-31",
+                  "content_sha256": "f2d21e25a0cc7e7c37e53b0232ee80eb64671bcf0d89ebfb58a0653c4f76501b",
+                  "source_id": "0f97c6548d072c929cf92a95cd79ca2c364962c637310be96a9bbbd71a93b05b"
+                },
+                "rationale": null
+              },
+              {
+                "id": "shares_m",
+                "label": "FY2025 diluted shares",
+                "kind": "fact",
+                "value": 29.215,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "AEHR/investor-documents/sec-edgar/10-K_20250728_rpt20250530_acc0001654954_25_008553.htm",
+                  "locator": "FY2025 diluted net income $14.557M / diluted EPS $0.50",
+                  "as_of": "2025-05-31",
+                  "content_sha256": "f2d21e25a0cc7e7c37e53b0232ee80eb64671bcf0d89ebfb58a0653c4f76501b",
+                  "source_id": "53cd14b410fa429f761a838d2aeaf60acf257e15bca59388eaa5758e9c87efc4"
+                },
+                "rationale": null
+              },
+              {
+                "id": "owner_cash_per_share",
+                "label": "Normalized owner cash per diluted share (mid-cycle operating income proxy)",
+                "kind": "judgment",
+                "value": 0.4014,
+                "unit": "USD_per_share",
+                "source": null,
+                "rationale": "Mid-cycle operating income per share anchors burn-in and wafer-level test equipment economics; FY2025 revenue fell slightly YoY but operating margin expanded."
+              },
+              {
+                "id": "capitalization_multiple",
+                "label": "Duration-adjusted owner-cash capitalization multiple",
+                "kind": "judgment",
+                "value": 12.008,
+                "unit": "multiple",
+                "source": null,
+                "rationale": "Bear stresses semicap down-cycle and customer concentration; base mid-cycle eight-year path; bull modest SiC share gains without peak-cycle heroics."
+              },
+              {
+                "id": "value_per_share",
+                "label": "Burn-in test equipment engine per share",
+                "kind": "calculation",
+                "value": 4.8200112,
+                "unit": "USD_per_share",
+                "operation": "multiply",
+                "formula": "owner_cash_per_share \u00d7 capitalization_multiple",
+                "substituted_formula": "0.4014 \u00d7 12.008",
+                "dependencies": [
+                  "owner_cash_per_share",
+                  "capitalization_multiple"
+                ]
+              }
+            ]
+          },
+          "source_lineage": [
+            {
+              "node_id": "operating_income_m",
+              "ref": "AEHR/investor-documents/sec-edgar/10-K_20250728_rpt20250530_acc0001654954_25_008553.htm",
+              "locator": "OperatingIncomeLoss $13.375M (FY2025, up from $10.078M prior year)",
+              "as_of": "2025-05-31",
+              "content_sha256": "f2d21e25a0cc7e7c37e53b0232ee80eb64671bcf0d89ebfb58a0653c4f76501b",
+              "source_id": "fdbbf34e8f0bb28ff666eb9cbbbd1fc6b281e90a97cb48b5beacd6fbc0cc74e9"
+            },
+            {
+              "node_id": "midcycle_operating_income_m",
+              "ref": "AEHR/investor-documents/sec-edgar/10-K_20250728_rpt20250530_acc0001654954_25_008553.htm",
+              "locator": "OperatingIncomeLoss $13.375M (2025) and $10.078M (2024); midpoint normalization",
+              "as_of": "2025-05-31",
+              "content_sha256": "f2d21e25a0cc7e7c37e53b0232ee80eb64671bcf0d89ebfb58a0653c4f76501b",
+              "source_id": "0f97c6548d072c929cf92a95cd79ca2c364962c637310be96a9bbbd71a93b05b"
+            },
+            {
+              "node_id": "shares_m",
+              "ref": "AEHR/investor-documents/sec-edgar/10-K_20250728_rpt20250530_acc0001654954_25_008553.htm",
+              "locator": "FY2025 diluted net income $14.557M / diluted EPS $0.50",
+              "as_of": "2025-05-31",
+              "content_sha256": "f2d21e25a0cc7e7c37e53b0232ee80eb64671bcf0d89ebfb58a0653c4f76501b",
+              "source_id": "53cd14b410fa429f761a838d2aeaf60acf257e15bca59388eaa5758e9c87efc4"
+            }
+          ],
+          "checks": {
+            "passed": true,
+            "errors": []
+          },
+          "proof_hash": "23008202bf04d8674ea6f45fc47fe441c08b6045716a39cb470cd63b6b4318b5"
+        },
+        "evidence_tier": "primary_derived",
+        "evidence_level": "primary_derived",
+        "evidence": "Primary bridge from AEHR/investor-documents/sec-edgar/10-K_20250728_rpt20250530_acc0001654954_25_008553.htm: FY2025 revenue $64.961M, operating income $13.375M, cash $49.159M, inventory $41.997M; contract backfill 2026-07-21.",
+        "scenario_assumptions": "Proof outputs {'low': 2.01, 'base': 3.21, 'high': 4.82}; see calculation_proof graph.",
+        "probability_and_timing": null,
+        "tax_and_realization_adjustments": "Inventory and cash-burn stress in cycle reserve.",
+        "falsifier": "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
+        "overlap_key": "burn_in_test_equipment_engine",
+        "assumption_type": "judgment"
+      },
+      {
+        "component_id": "sic_wafer_level_option",
+        "label": "Silicon carbide wafer-level burn-in adoption option",
+        "category": "real_option",
+        "treatment": "additive",
+        "included_in_component_id": null,
+        "ownership_claim": "Silicon carbide wafer-level burn-in adoption option",
+        "ownership_percentage": 1.0,
+        "quantity": {
+          "value": 1,
+          "unit": "per-share economic claim"
+        },
+        "method": "risk_adjusted_milestone_value",
+        "method_version": "1.0",
+        "method_provenance": {
+          "method_id": "risk_adjusted_milestone_value",
+          "version": "1.0",
+          "label": "Milestone risk-adjusted present value",
+          "power_zones": [
+            "binary_milestone"
+          ],
+          "equation": "value_per_share = (net_cash + sum(p_success*PV(success_value)-remaining_cost) - dilution)/shares",
+          "sources": [
+            {
+              "ref": "_system/frameworks/optionality_valuation.md",
+              "locator": "Milestone-based option framework"
+            }
+          ]
+        },
+        "comparable_ids": [],
+        "range_per_share": {
+          "low": 0.0,
+          "base": 4.0014,
+          "high": 12.0007
+        },
+        "legacy_range_per_share": {
+          "low": 0.0,
+          "base": 4.0,
+          "high": 12.0
+        },
+        "valuation_status": "bounded_estimate",
+        "calculation_proof": {
+          "status": "valid",
+          "method_id": "risk_adjusted_milestone_value",
+          "method_version": "1.0",
+          "outputs": {
+            "low": 0.0,
+            "base": 4.0014,
+            "high": 12.0007
+          },
+          "output_unit": "USD_per_share",
+          "traces": {
+            "low": [
+              {
+                "id": "inventory_m",
+                "label": "Inventory net (FY2025)",
+                "kind": "fact",
+                "value": 41.997,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "AEHR/investor-documents/sec-edgar/10-K_20250728_rpt20250530_acc0001654954_25_008553.htm",
+                  "locator": "InventoryNet $41.997M at May 31, 2025",
+                  "as_of": "2025-05-31",
+                  "content_sha256": "f2d21e25a0cc7e7c37e53b0232ee80eb64671bcf0d89ebfb58a0653c4f76501b",
+                  "source_id": "f8216ce638faf2baa138d47bf446200b3a1ee0d645aa13d7f960c331849905e4"
+                },
+                "rationale": null
+              },
+              {
+                "id": "deferred_revenue_m",
+                "label": "Customer deposits and deferred revenue (current)",
+                "kind": "fact",
+                "value": 1.345,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "AEHR/investor-documents/sec-edgar/10-K_20250728_rpt20250530_acc0001654954_25_008553.htm",
+                  "locator": "CustomerDepositsAndDeferredRevenueShortTerm $1.345M at May 31, 2025",
+                  "as_of": "2025-05-31",
+                  "content_sha256": "f2d21e25a0cc7e7c37e53b0232ee80eb64671bcf0d89ebfb58a0653c4f76501b",
+                  "source_id": "869a07392018e2a9e1839c24e9ada1db197f72d1b99078c11cb95bae203a497d"
+                },
+                "rationale": null
+              },
+              {
+                "id": "shares_m",
+                "label": "FY2025 diluted shares",
+                "kind": "fact",
+                "value": 29.215,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "AEHR/investor-documents/sec-edgar/10-K_20250728_rpt20250530_acc0001654954_25_008553.htm",
+                  "locator": "FY2025 diluted net income $14.557M / diluted EPS $0.50",
+                  "as_of": "2025-05-31",
+                  "content_sha256": "f2d21e25a0cc7e7c37e53b0232ee80eb64671bcf0d89ebfb58a0653c4f76501b",
+                  "source_id": "53cd14b410fa429f761a838d2aeaf60acf257e15bca59388eaa5758e9c87efc4"
+                },
+                "rationale": null
+              },
+              {
+                "id": "sic_milestone_m",
+                "label": "Risk-adjusted silicon carbide wafer-level burn-in adoption economics",
+                "kind": "judgment",
+                "value": 0.0,
+                "unit": "USD_m",
+                "source": null,
+                "rationale": "Non-overlapping claim on SiC and wafer-level test adoption not fully captured in normalized owner-cash multiple; base is judgment band pending order disclosure."
+              },
+              {
+                "id": "value_per_share",
+                "label": "SiC wafer-level option per share",
+                "kind": "calculation",
+                "value": 0.0,
+                "unit": "USD_per_share",
+                "operation": "divide",
+                "formula": "sic_milestone_m \u00f7 shares_m",
+                "substituted_formula": "0 \u00f7 29.215",
+                "dependencies": [
+                  "sic_milestone_m",
+                  "shares_m"
+                ]
+              }
+            ],
+            "base": [
+              {
+                "id": "inventory_m",
+                "label": "Inventory net (FY2025)",
+                "kind": "fact",
+                "value": 41.997,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "AEHR/investor-documents/sec-edgar/10-K_20250728_rpt20250530_acc0001654954_25_008553.htm",
+                  "locator": "InventoryNet $41.997M at May 31, 2025",
+                  "as_of": "2025-05-31",
+                  "content_sha256": "f2d21e25a0cc7e7c37e53b0232ee80eb64671bcf0d89ebfb58a0653c4f76501b",
+                  "source_id": "f8216ce638faf2baa138d47bf446200b3a1ee0d645aa13d7f960c331849905e4"
+                },
+                "rationale": null
+              },
+              {
+                "id": "deferred_revenue_m",
+                "label": "Customer deposits and deferred revenue (current)",
+                "kind": "fact",
+                "value": 1.345,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "AEHR/investor-documents/sec-edgar/10-K_20250728_rpt20250530_acc0001654954_25_008553.htm",
+                  "locator": "CustomerDepositsAndDeferredRevenueShortTerm $1.345M at May 31, 2025",
+                  "as_of": "2025-05-31",
+                  "content_sha256": "f2d21e25a0cc7e7c37e53b0232ee80eb64671bcf0d89ebfb58a0653c4f76501b",
+                  "source_id": "869a07392018e2a9e1839c24e9ada1db197f72d1b99078c11cb95bae203a497d"
+                },
+                "rationale": null
+              },
+              {
+                "id": "shares_m",
+                "label": "FY2025 diluted shares",
+                "kind": "fact",
+                "value": 29.215,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "AEHR/investor-documents/sec-edgar/10-K_20250728_rpt20250530_acc0001654954_25_008553.htm",
+                  "locator": "FY2025 diluted net income $14.557M / diluted EPS $0.50",
+                  "as_of": "2025-05-31",
+                  "content_sha256": "f2d21e25a0cc7e7c37e53b0232ee80eb64671bcf0d89ebfb58a0653c4f76501b",
+                  "source_id": "53cd14b410fa429f761a838d2aeaf60acf257e15bca59388eaa5758e9c87efc4"
+                },
+                "rationale": null
+              },
+              {
+                "id": "sic_milestone_m",
+                "label": "Risk-adjusted silicon carbide wafer-level burn-in adoption economics",
+                "kind": "judgment",
+                "value": 116.9,
+                "unit": "USD_m",
+                "source": null,
+                "rationale": "Non-overlapping claim on SiC and wafer-level test adoption not fully captured in normalized owner-cash multiple; base is judgment band pending order disclosure."
+              },
+              {
+                "id": "value_per_share",
+                "label": "SiC wafer-level option per share",
+                "kind": "calculation",
+                "value": 4.00136916,
+                "unit": "USD_per_share",
+                "operation": "divide",
+                "formula": "sic_milestone_m \u00f7 shares_m",
+                "substituted_formula": "116.9 \u00f7 29.215",
+                "dependencies": [
+                  "sic_milestone_m",
+                  "shares_m"
+                ]
+              }
+            ],
+            "high": [
+              {
+                "id": "inventory_m",
+                "label": "Inventory net (FY2025)",
+                "kind": "fact",
+                "value": 41.997,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "AEHR/investor-documents/sec-edgar/10-K_20250728_rpt20250530_acc0001654954_25_008553.htm",
+                  "locator": "InventoryNet $41.997M at May 31, 2025",
+                  "as_of": "2025-05-31",
+                  "content_sha256": "f2d21e25a0cc7e7c37e53b0232ee80eb64671bcf0d89ebfb58a0653c4f76501b",
+                  "source_id": "f8216ce638faf2baa138d47bf446200b3a1ee0d645aa13d7f960c331849905e4"
+                },
+                "rationale": null
+              },
+              {
+                "id": "deferred_revenue_m",
+                "label": "Customer deposits and deferred revenue (current)",
+                "kind": "fact",
+                "value": 1.345,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "AEHR/investor-documents/sec-edgar/10-K_20250728_rpt20250530_acc0001654954_25_008553.htm",
+                  "locator": "CustomerDepositsAndDeferredRevenueShortTerm $1.345M at May 31, 2025",
+                  "as_of": "2025-05-31",
+                  "content_sha256": "f2d21e25a0cc7e7c37e53b0232ee80eb64671bcf0d89ebfb58a0653c4f76501b",
+                  "source_id": "869a07392018e2a9e1839c24e9ada1db197f72d1b99078c11cb95bae203a497d"
+                },
+                "rationale": null
+              },
+              {
+                "id": "shares_m",
+                "label": "FY2025 diluted shares",
+                "kind": "fact",
+                "value": 29.215,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "AEHR/investor-documents/sec-edgar/10-K_20250728_rpt20250530_acc0001654954_25_008553.htm",
+                  "locator": "FY2025 diluted net income $14.557M / diluted EPS $0.50",
+                  "as_of": "2025-05-31",
+                  "content_sha256": "f2d21e25a0cc7e7c37e53b0232ee80eb64671bcf0d89ebfb58a0653c4f76501b",
+                  "source_id": "53cd14b410fa429f761a838d2aeaf60acf257e15bca59388eaa5758e9c87efc4"
+                },
+                "rationale": null
+              },
+              {
+                "id": "sic_milestone_m",
+                "label": "Risk-adjusted silicon carbide wafer-level burn-in adoption economics",
+                "kind": "judgment",
+                "value": 350.6,
+                "unit": "USD_m",
+                "source": null,
+                "rationale": "Non-overlapping claim on SiC and wafer-level test adoption not fully captured in normalized owner-cash multiple; base is judgment band pending order disclosure."
+              },
+              {
+                "id": "value_per_share",
+                "label": "SiC wafer-level option per share",
+                "kind": "calculation",
+                "value": 12.00068458,
+                "unit": "USD_per_share",
+                "operation": "divide",
+                "formula": "sic_milestone_m \u00f7 shares_m",
+                "substituted_formula": "350.6 \u00f7 29.215",
+                "dependencies": [
+                  "sic_milestone_m",
+                  "shares_m"
+                ]
+              }
+            ]
+          },
+          "source_lineage": [
+            {
+              "node_id": "inventory_m",
+              "ref": "AEHR/investor-documents/sec-edgar/10-K_20250728_rpt20250530_acc0001654954_25_008553.htm",
+              "locator": "InventoryNet $41.997M at May 31, 2025",
+              "as_of": "2025-05-31",
+              "content_sha256": "f2d21e25a0cc7e7c37e53b0232ee80eb64671bcf0d89ebfb58a0653c4f76501b",
+              "source_id": "f8216ce638faf2baa138d47bf446200b3a1ee0d645aa13d7f960c331849905e4"
+            },
+            {
+              "node_id": "deferred_revenue_m",
+              "ref": "AEHR/investor-documents/sec-edgar/10-K_20250728_rpt20250530_acc0001654954_25_008553.htm",
+              "locator": "CustomerDepositsAndDeferredRevenueShortTerm $1.345M at May 31, 2025",
+              "as_of": "2025-05-31",
+              "content_sha256": "f2d21e25a0cc7e7c37e53b0232ee80eb64671bcf0d89ebfb58a0653c4f76501b",
+              "source_id": "869a07392018e2a9e1839c24e9ada1db197f72d1b99078c11cb95bae203a497d"
+            },
+            {
+              "node_id": "shares_m",
+              "ref": "AEHR/investor-documents/sec-edgar/10-K_20250728_rpt20250530_acc0001654954_25_008553.htm",
+              "locator": "FY2025 diluted net income $14.557M / diluted EPS $0.50",
+              "as_of": "2025-05-31",
+              "content_sha256": "f2d21e25a0cc7e7c37e53b0232ee80eb64671bcf0d89ebfb58a0653c4f76501b",
+              "source_id": "53cd14b410fa429f761a838d2aeaf60acf257e15bca59388eaa5758e9c87efc4"
+            }
+          ],
+          "checks": {
+            "passed": true,
+            "errors": []
+          },
+          "proof_hash": "0be85e072501112ff4e861762189b670c99bec3c5990ffa958847d509eaef282"
+        },
+        "evidence_tier": "primary_derived",
+        "evidence_level": "primary_derived",
+        "evidence": "Primary bridge from AEHR/investor-documents/sec-edgar/10-K_20250728_rpt20250530_acc0001654954_25_008553.htm: FY2025 revenue $64.961M, operating income $13.375M, cash $49.159M, inventory $41.997M; contract backfill 2026-07-21.",
+        "scenario_assumptions": "Proof outputs {'low': 0.0, 'base': 4.0014, 'high': 12.0007}; see calculation_proof graph.",
+        "probability_and_timing": {
+          "success_probability": null,
+          "remaining_capital_m": null,
+          "timing_basis": "EV and industrial SiC capacity ramps; [Assumption] 4-year base.",
+          "probability_basis": "SiC wafer-level burn-in is filed growth focus; base assumes partial adoption over four years. [Assumption]",
+          "remaining_capital_basis": "Incremental capex for backlog fulfillment embedded in normalized owner cash."
+        },
+        "tax_and_realization_adjustments": "Low case zero; base does not assume full EV SiC TAM.",
+        "falsifier": "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
+        "overlap_key": "sic_wafer_level_option",
+        "assumption_type": "judgment"
+      },
+      {
+        "component_id": "net_financial_claims",
+        "label": "Net cash claims on common equity",
+        "category": "liability_or_reserve",
+        "treatment": "additive",
+        "included_in_component_id": null,
+        "ownership_claim": "Net cash claims on common equity",
+        "ownership_percentage": 1.0,
+        "quantity": {
+          "value": 1,
+          "unit": "per-share economic claim"
+        },
+        "method": "net_asset_value",
+        "method_version": "1.0",
+        "method_provenance": {
+          "method_id": "net_asset_value",
+          "version": "1.0",
+          "label": "Reconciled net asset value",
+          "power_zones": [
+            "scarce_asset_optionality",
+            "catalyst_asset_value",
+            "credit_and_normalized_returns"
+          ],
+          "equation": "value_per_share = (gross_assets - senior_claims - tax - realization_costs) / diluted_shares",
+          "sources": [
+            {
+              "ref": "_system/frameworks/scarce_strategic_asset_valuation.md",
+              "locator": "Economic ownership and unit NAV"
+            }
+          ]
+        },
+        "comparable_ids": [],
+        "range_per_share": {
+          "low": 1.4308,
+          "base": 1.6841,
+          "high": 1.7662
+        },
+        "legacy_range_per_share": {
+          "low": 1.43,
+          "base": 1.68,
+          "high": 1.77
+        },
+        "valuation_status": "bounded_estimate",
+        "calculation_proof": {
+          "status": "valid",
+          "method_id": "net_asset_value",
+          "method_version": "1.0",
+          "outputs": {
+            "low": 1.4308,
+            "base": 1.6841,
+            "high": 1.7662
+          },
+          "output_unit": "USD_per_share",
+          "traces": {
+            "low": [
+              {
+                "id": "cash_m",
+                "label": "Cash and cash equivalents (FY2025)",
+                "kind": "fact",
+                "value": 49.159,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "AEHR/investor-documents/sec-edgar/10-K_20250728_rpt20250530_acc0001654954_25_008553.htm",
+                  "locator": "CashAndCashEquivalentsAtCarryingValue $49.159M at May 31, 2025",
+                  "as_of": "2025-05-31",
+                  "content_sha256": "f2d21e25a0cc7e7c37e53b0232ee80eb64671bcf0d89ebfb58a0653c4f76501b",
+                  "source_id": "711513d75b84c959e29d2ab90a1add9e126e06bb9631307e10cecfe1f0b71201"
+                },
+                "rationale": null
+              },
+              {
+                "id": "shares_m",
+                "label": "FY2025 diluted shares",
+                "kind": "fact",
+                "value": 29.215,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "AEHR/investor-documents/sec-edgar/10-K_20250728_rpt20250530_acc0001654954_25_008553.htm",
+                  "locator": "FY2025 diluted net income $14.557M / diluted EPS $0.50",
+                  "as_of": "2025-05-31",
+                  "content_sha256": "f2d21e25a0cc7e7c37e53b0232ee80eb64671bcf0d89ebfb58a0653c4f76501b",
+                  "source_id": "53cd14b410fa429f761a838d2aeaf60acf257e15bca59388eaa5758e9c87efc4"
+                },
+                "rationale": null
+              },
+              {
+                "id": "net_liquid_claim_m",
+                "label": "Net financial claim (cash; no material long-term debt filed)",
+                "kind": "judgment",
+                "value": 41.8,
+                "unit": "USD_m",
+                "source": null,
+                "rationale": "Filing-locked cash with no long-term debt tags in FY2025 10-K; low/high stress cash \u221215% / +5% for working-capital burn observed in Q3 FY2026."
+              },
+              {
+                "id": "value_per_share",
+                "label": "Net financial claims per share",
+                "kind": "calculation",
+                "value": 1.43077186,
+                "unit": "USD_per_share",
+                "operation": "divide",
+                "formula": "net_liquid_claim_m \u00f7 shares_m",
+                "substituted_formula": "41.8 \u00f7 29.215",
+                "dependencies": [
+                  "net_liquid_claim_m",
+                  "shares_m"
+                ]
+              }
+            ],
+            "base": [
+              {
+                "id": "cash_m",
+                "label": "Cash and cash equivalents (FY2025)",
+                "kind": "fact",
+                "value": 49.159,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "AEHR/investor-documents/sec-edgar/10-K_20250728_rpt20250530_acc0001654954_25_008553.htm",
+                  "locator": "CashAndCashEquivalentsAtCarryingValue $49.159M at May 31, 2025",
+                  "as_of": "2025-05-31",
+                  "content_sha256": "f2d21e25a0cc7e7c37e53b0232ee80eb64671bcf0d89ebfb58a0653c4f76501b",
+                  "source_id": "711513d75b84c959e29d2ab90a1add9e126e06bb9631307e10cecfe1f0b71201"
+                },
+                "rationale": null
+              },
+              {
+                "id": "shares_m",
+                "label": "FY2025 diluted shares",
+                "kind": "fact",
+                "value": 29.215,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "AEHR/investor-documents/sec-edgar/10-K_20250728_rpt20250530_acc0001654954_25_008553.htm",
+                  "locator": "FY2025 diluted net income $14.557M / diluted EPS $0.50",
+                  "as_of": "2025-05-31",
+                  "content_sha256": "f2d21e25a0cc7e7c37e53b0232ee80eb64671bcf0d89ebfb58a0653c4f76501b",
+                  "source_id": "53cd14b410fa429f761a838d2aeaf60acf257e15bca59388eaa5758e9c87efc4"
+                },
+                "rationale": null
+              },
+              {
+                "id": "net_liquid_claim_m",
+                "label": "Net financial claim (cash; no material long-term debt filed)",
+                "kind": "judgment",
+                "value": 49.2,
+                "unit": "USD_m",
+                "source": null,
+                "rationale": "Filing-locked cash with no long-term debt tags in FY2025 10-K; low/high stress cash \u221215% / +5% for working-capital burn observed in Q3 FY2026."
+              },
+              {
+                "id": "value_per_share",
+                "label": "Net financial claims per share",
+                "kind": "calculation",
+                "value": 1.6840664,
+                "unit": "USD_per_share",
+                "operation": "divide",
+                "formula": "net_liquid_claim_m \u00f7 shares_m",
+                "substituted_formula": "49.2 \u00f7 29.215",
+                "dependencies": [
+                  "net_liquid_claim_m",
+                  "shares_m"
+                ]
+              }
+            ],
+            "high": [
+              {
+                "id": "cash_m",
+                "label": "Cash and cash equivalents (FY2025)",
+                "kind": "fact",
+                "value": 49.159,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "AEHR/investor-documents/sec-edgar/10-K_20250728_rpt20250530_acc0001654954_25_008553.htm",
+                  "locator": "CashAndCashEquivalentsAtCarryingValue $49.159M at May 31, 2025",
+                  "as_of": "2025-05-31",
+                  "content_sha256": "f2d21e25a0cc7e7c37e53b0232ee80eb64671bcf0d89ebfb58a0653c4f76501b",
+                  "source_id": "711513d75b84c959e29d2ab90a1add9e126e06bb9631307e10cecfe1f0b71201"
+                },
+                "rationale": null
+              },
+              {
+                "id": "shares_m",
+                "label": "FY2025 diluted shares",
+                "kind": "fact",
+                "value": 29.215,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "AEHR/investor-documents/sec-edgar/10-K_20250728_rpt20250530_acc0001654954_25_008553.htm",
+                  "locator": "FY2025 diluted net income $14.557M / diluted EPS $0.50",
+                  "as_of": "2025-05-31",
+                  "content_sha256": "f2d21e25a0cc7e7c37e53b0232ee80eb64671bcf0d89ebfb58a0653c4f76501b",
+                  "source_id": "53cd14b410fa429f761a838d2aeaf60acf257e15bca59388eaa5758e9c87efc4"
+                },
+                "rationale": null
+              },
+              {
+                "id": "net_liquid_claim_m",
+                "label": "Net financial claim (cash; no material long-term debt filed)",
+                "kind": "judgment",
+                "value": 51.6,
+                "unit": "USD_m",
+                "source": null,
+                "rationale": "Filing-locked cash with no long-term debt tags in FY2025 10-K; low/high stress cash \u221215% / +5% for working-capital burn observed in Q3 FY2026."
+              },
+              {
+                "id": "value_per_share",
+                "label": "Net financial claims per share",
+                "kind": "calculation",
+                "value": 1.76621598,
+                "unit": "USD_per_share",
+                "operation": "divide",
+                "formula": "net_liquid_claim_m \u00f7 shares_m",
+                "substituted_formula": "51.6 \u00f7 29.215",
+                "dependencies": [
+                  "net_liquid_claim_m",
+                  "shares_m"
+                ]
+              }
+            ]
+          },
+          "source_lineage": [
+            {
+              "node_id": "cash_m",
+              "ref": "AEHR/investor-documents/sec-edgar/10-K_20250728_rpt20250530_acc0001654954_25_008553.htm",
+              "locator": "CashAndCashEquivalentsAtCarryingValue $49.159M at May 31, 2025",
+              "as_of": "2025-05-31",
+              "content_sha256": "f2d21e25a0cc7e7c37e53b0232ee80eb64671bcf0d89ebfb58a0653c4f76501b",
+              "source_id": "711513d75b84c959e29d2ab90a1add9e126e06bb9631307e10cecfe1f0b71201"
+            },
+            {
+              "node_id": "shares_m",
+              "ref": "AEHR/investor-documents/sec-edgar/10-K_20250728_rpt20250530_acc0001654954_25_008553.htm",
+              "locator": "FY2025 diluted net income $14.557M / diluted EPS $0.50",
+              "as_of": "2025-05-31",
+              "content_sha256": "f2d21e25a0cc7e7c37e53b0232ee80eb64671bcf0d89ebfb58a0653c4f76501b",
+              "source_id": "53cd14b410fa429f761a838d2aeaf60acf257e15bca59388eaa5758e9c87efc4"
+            }
+          ],
+          "checks": {
+            "passed": true,
+            "errors": []
+          },
+          "proof_hash": "80c546031ddae69c30b1ed0b8b6ab6978f897a6f47f07b39152aa3990b93cf5a"
+        },
+        "evidence_tier": "primary_derived",
+        "evidence_level": "primary_derived",
+        "evidence": "Primary bridge from AEHR/investor-documents/sec-edgar/10-K_20250728_rpt20250530_acc0001654954_25_008553.htm: FY2025 revenue $64.961M, operating income $13.375M, cash $49.159M, inventory $41.997M; contract backfill 2026-07-21.",
+        "scenario_assumptions": "Proof outputs {'low': 1.4308, 'base': 1.6841, 'high': 1.7662}; see calculation_proof graph.",
+        "probability_and_timing": null,
+        "tax_and_realization_adjustments": "Low/high stress cash bands for Q3 burn.",
+        "falsifier": "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
+        "overlap_key": "net_financial_claims",
+        "assumption_type": "judgment"
+      },
+      {
+        "component_id": "cycle_and_inventory_reserve",
+        "label": "Semicap cycle, inventory build, and cash-burn reserve",
+        "category": "liability_or_reserve",
+        "treatment": "additive",
+        "included_in_component_id": null,
+        "ownership_claim": "Semicap cycle, inventory build, and cash-burn reserve",
+        "ownership_percentage": 1.0,
+        "quantity": {
+          "value": 1,
+          "unit": "per-share economic claim"
+        },
+        "method": "net_asset_value",
+        "method_version": "1.0",
+        "method_provenance": {
+          "method_id": "net_asset_value",
+          "version": "1.0",
+          "label": "Reconciled net asset value",
+          "power_zones": [
+            "scarce_asset_optionality",
+            "catalyst_asset_value",
+            "credit_and_normalized_returns"
+          ],
+          "equation": "value_per_share = (gross_assets - senior_claims - tax - realization_costs) / diluted_shares",
+          "sources": [
+            {
+              "ref": "_system/frameworks/scarce_strategic_asset_valuation.md",
+              "locator": "Economic ownership and unit NAV"
+            }
+          ]
+        },
+        "comparable_ids": [],
+        "range_per_share": {
+          "low": -12.0007,
+          "base": -6.0003,
+          "high": -1.999
+        },
+        "legacy_range_per_share": {
+          "low": -12.0,
+          "base": -6.0,
+          "high": -2.0
+        },
+        "valuation_status": "bounded_estimate",
+        "calculation_proof": {
+          "status": "valid",
+          "method_id": "net_asset_value",
+          "method_version": "1.0",
+          "outputs": {
+            "low": -12.0007,
+            "base": -6.0003,
+            "high": -1.999
+          },
+          "output_unit": "USD_per_share",
+          "traces": {
+            "low": [
+              {
+                "id": "cash_q3_m",
+                "label": "Cash and equivalents (Q3 FY2026)",
+                "kind": "fact",
+                "value": 24.529,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "AEHR/investor-documents/sec-edgar/10-Q_20260408_rpt20260227_acc0001654954_26_003348.htm",
+                  "locator": "CashAndCashEquivalentsAtCarryingValue $24.529M at February 27, 2026 (down from $49.159M)",
+                  "as_of": "2026-02-27",
+                  "content_sha256": "a5e18f3b4894bc4b4b447d77d45f25e572de1eb64843d10d9b0e10f72a69b4ac",
+                  "source_id": "eb828b8875b36bc576a648ce63a8a9c51be3b5a6b9aa86be748489fed0bcbba4"
+                },
+                "rationale": null
+              },
+              {
+                "id": "inventory_m",
+                "label": "Inventory net (FY2025)",
+                "kind": "fact",
+                "value": 41.997,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "AEHR/investor-documents/sec-edgar/10-K_20250728_rpt20250530_acc0001654954_25_008553.htm",
+                  "locator": "InventoryNet $41.997M at May 31, 2025",
+                  "as_of": "2025-05-31",
+                  "content_sha256": "f2d21e25a0cc7e7c37e53b0232ee80eb64671bcf0d89ebfb58a0653c4f76501b",
+                  "source_id": "f8216ce638faf2baa138d47bf446200b3a1ee0d645aa13d7f960c331849905e4"
+                },
+                "rationale": null
+              },
+              {
+                "id": "shares_m",
+                "label": "FY2025 diluted shares",
+                "kind": "fact",
+                "value": 29.215,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "AEHR/investor-documents/sec-edgar/10-K_20250728_rpt20250530_acc0001654954_25_008553.htm",
+                  "locator": "FY2025 diluted net income $14.557M / diluted EPS $0.50",
+                  "as_of": "2025-05-31",
+                  "content_sha256": "f2d21e25a0cc7e7c37e53b0232ee80eb64671bcf0d89ebfb58a0653c4f76501b",
+                  "source_id": "53cd14b410fa429f761a838d2aeaf60acf257e15bca59388eaa5758e9c87efc4"
+                },
+                "rationale": null
+              },
+              {
+                "id": "reserve_m",
+                "label": "Semicap cycle, inventory build, and cash-burn reserve",
+                "kind": "judgment",
+                "value": -350.6,
+                "unit": "USD_m",
+                "source": null,
+                "rationale": "Negative reserve for nine-month revenue trough, inventory build, and cash decline from $49M to $25M not fully embedded in mid-cycle owner-cash multiple."
+              },
+              {
+                "id": "value_per_share",
+                "label": "Cycle and inventory reserve per share",
+                "kind": "calculation",
+                "value": -12.00068458,
+                "unit": "USD_per_share",
+                "operation": "divide",
+                "formula": "reserve_m \u00f7 shares_m",
+                "substituted_formula": "-350.6 \u00f7 29.215",
+                "dependencies": [
+                  "reserve_m",
+                  "shares_m"
+                ]
+              }
+            ],
+            "base": [
+              {
+                "id": "cash_q3_m",
+                "label": "Cash and equivalents (Q3 FY2026)",
+                "kind": "fact",
+                "value": 24.529,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "AEHR/investor-documents/sec-edgar/10-Q_20260408_rpt20260227_acc0001654954_26_003348.htm",
+                  "locator": "CashAndCashEquivalentsAtCarryingValue $24.529M at February 27, 2026 (down from $49.159M)",
+                  "as_of": "2026-02-27",
+                  "content_sha256": "a5e18f3b4894bc4b4b447d77d45f25e572de1eb64843d10d9b0e10f72a69b4ac",
+                  "source_id": "eb828b8875b36bc576a648ce63a8a9c51be3b5a6b9aa86be748489fed0bcbba4"
+                },
+                "rationale": null
+              },
+              {
+                "id": "inventory_m",
+                "label": "Inventory net (FY2025)",
+                "kind": "fact",
+                "value": 41.997,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "AEHR/investor-documents/sec-edgar/10-K_20250728_rpt20250530_acc0001654954_25_008553.htm",
+                  "locator": "InventoryNet $41.997M at May 31, 2025",
+                  "as_of": "2025-05-31",
+                  "content_sha256": "f2d21e25a0cc7e7c37e53b0232ee80eb64671bcf0d89ebfb58a0653c4f76501b",
+                  "source_id": "f8216ce638faf2baa138d47bf446200b3a1ee0d645aa13d7f960c331849905e4"
+                },
+                "rationale": null
+              },
+              {
+                "id": "shares_m",
+                "label": "FY2025 diluted shares",
+                "kind": "fact",
+                "value": 29.215,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "AEHR/investor-documents/sec-edgar/10-K_20250728_rpt20250530_acc0001654954_25_008553.htm",
+                  "locator": "FY2025 diluted net income $14.557M / diluted EPS $0.50",
+                  "as_of": "2025-05-31",
+                  "content_sha256": "f2d21e25a0cc7e7c37e53b0232ee80eb64671bcf0d89ebfb58a0653c4f76501b",
+                  "source_id": "53cd14b410fa429f761a838d2aeaf60acf257e15bca59388eaa5758e9c87efc4"
+                },
+                "rationale": null
+              },
+              {
+                "id": "reserve_m",
+                "label": "Semicap cycle, inventory build, and cash-burn reserve",
+                "kind": "judgment",
+                "value": -175.3,
+                "unit": "USD_m",
+                "source": null,
+                "rationale": "Negative reserve for nine-month revenue trough, inventory build, and cash decline from $49M to $25M not fully embedded in mid-cycle owner-cash multiple."
+              },
+              {
+                "id": "value_per_share",
+                "label": "Cycle and inventory reserve per share",
+                "kind": "calculation",
+                "value": -6.00034229,
+                "unit": "USD_per_share",
+                "operation": "divide",
+                "formula": "reserve_m \u00f7 shares_m",
+                "substituted_formula": "-175.3 \u00f7 29.215",
+                "dependencies": [
+                  "reserve_m",
+                  "shares_m"
+                ]
+              }
+            ],
+            "high": [
+              {
+                "id": "cash_q3_m",
+                "label": "Cash and equivalents (Q3 FY2026)",
+                "kind": "fact",
+                "value": 24.529,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "AEHR/investor-documents/sec-edgar/10-Q_20260408_rpt20260227_acc0001654954_26_003348.htm",
+                  "locator": "CashAndCashEquivalentsAtCarryingValue $24.529M at February 27, 2026 (down from $49.159M)",
+                  "as_of": "2026-02-27",
+                  "content_sha256": "a5e18f3b4894bc4b4b447d77d45f25e572de1eb64843d10d9b0e10f72a69b4ac",
+                  "source_id": "eb828b8875b36bc576a648ce63a8a9c51be3b5a6b9aa86be748489fed0bcbba4"
+                },
+                "rationale": null
+              },
+              {
+                "id": "inventory_m",
+                "label": "Inventory net (FY2025)",
+                "kind": "fact",
+                "value": 41.997,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "AEHR/investor-documents/sec-edgar/10-K_20250728_rpt20250530_acc0001654954_25_008553.htm",
+                  "locator": "InventoryNet $41.997M at May 31, 2025",
+                  "as_of": "2025-05-31",
+                  "content_sha256": "f2d21e25a0cc7e7c37e53b0232ee80eb64671bcf0d89ebfb58a0653c4f76501b",
+                  "source_id": "f8216ce638faf2baa138d47bf446200b3a1ee0d645aa13d7f960c331849905e4"
+                },
+                "rationale": null
+              },
+              {
+                "id": "shares_m",
+                "label": "FY2025 diluted shares",
+                "kind": "fact",
+                "value": 29.215,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "AEHR/investor-documents/sec-edgar/10-K_20250728_rpt20250530_acc0001654954_25_008553.htm",
+                  "locator": "FY2025 diluted net income $14.557M / diluted EPS $0.50",
+                  "as_of": "2025-05-31",
+                  "content_sha256": "f2d21e25a0cc7e7c37e53b0232ee80eb64671bcf0d89ebfb58a0653c4f76501b",
+                  "source_id": "53cd14b410fa429f761a838d2aeaf60acf257e15bca59388eaa5758e9c87efc4"
+                },
+                "rationale": null
+              },
+              {
+                "id": "reserve_m",
+                "label": "Semicap cycle, inventory build, and cash-burn reserve",
+                "kind": "judgment",
+                "value": -58.4,
+                "unit": "USD_m",
+                "source": null,
+                "rationale": "Negative reserve for nine-month revenue trough, inventory build, and cash decline from $49M to $25M not fully embedded in mid-cycle owner-cash multiple."
+              },
+              {
+                "id": "value_per_share",
+                "label": "Cycle and inventory reserve per share",
+                "kind": "calculation",
+                "value": -1.99897313,
+                "unit": "USD_per_share",
+                "operation": "divide",
+                "formula": "reserve_m \u00f7 shares_m",
+                "substituted_formula": "-58.4 \u00f7 29.215",
+                "dependencies": [
+                  "reserve_m",
+                  "shares_m"
+                ]
+              }
+            ]
+          },
+          "source_lineage": [
+            {
+              "node_id": "cash_q3_m",
+              "ref": "AEHR/investor-documents/sec-edgar/10-Q_20260408_rpt20260227_acc0001654954_26_003348.htm",
+              "locator": "CashAndCashEquivalentsAtCarryingValue $24.529M at February 27, 2026 (down from $49.159M)",
+              "as_of": "2026-02-27",
+              "content_sha256": "a5e18f3b4894bc4b4b447d77d45f25e572de1eb64843d10d9b0e10f72a69b4ac",
+              "source_id": "eb828b8875b36bc576a648ce63a8a9c51be3b5a6b9aa86be748489fed0bcbba4"
+            },
+            {
+              "node_id": "inventory_m",
+              "ref": "AEHR/investor-documents/sec-edgar/10-K_20250728_rpt20250530_acc0001654954_25_008553.htm",
+              "locator": "InventoryNet $41.997M at May 31, 2025",
+              "as_of": "2025-05-31",
+              "content_sha256": "f2d21e25a0cc7e7c37e53b0232ee80eb64671bcf0d89ebfb58a0653c4f76501b",
+              "source_id": "f8216ce638faf2baa138d47bf446200b3a1ee0d645aa13d7f960c331849905e4"
+            },
+            {
+              "node_id": "shares_m",
+              "ref": "AEHR/investor-documents/sec-edgar/10-K_20250728_rpt20250530_acc0001654954_25_008553.htm",
+              "locator": "FY2025 diluted net income $14.557M / diluted EPS $0.50",
+              "as_of": "2025-05-31",
+              "content_sha256": "f2d21e25a0cc7e7c37e53b0232ee80eb64671bcf0d89ebfb58a0653c4f76501b",
+              "source_id": "53cd14b410fa429f761a838d2aeaf60acf257e15bca59388eaa5758e9c87efc4"
+            }
+          ],
+          "checks": {
+            "passed": true,
+            "errors": []
+          },
+          "proof_hash": "5495279d7f0bedc7d1e920055f53fd5b1f03a5288ac562250dbfaa247d76407c"
+        },
+        "evidence_tier": "primary_derived",
+        "evidence_level": "primary_derived",
+        "evidence": "Primary bridge from AEHR/investor-documents/sec-edgar/10-K_20250728_rpt20250530_acc0001654954_25_008553.htm: FY2025 revenue $64.961M, operating income $13.375M, cash $49.159M, inventory $41.997M; contract backfill 2026-07-21.",
+        "scenario_assumptions": "Proof outputs {'low': -12.0007, 'base': -6.0003, 'high': -1.999}; see calculation_proof graph.",
+        "probability_and_timing": null,
+        "tax_and_realization_adjustments": "Separate from core capitalization multiple.",
+        "falsifier": "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
+        "overlap_key": "cycle_and_inventory_reserve",
+        "assumption_type": "judgment"
+      }
+    ],
     "scenario_contract": {
       "rule": "Cases must change cited causal operating, capital, probability, timing, or financing drivers\u2014not only a terminal multiple.",
-      "top_value_drivers": [],
+      "top_value_drivers": [
+        {
+          "component_id": "sic_wafer_level_option",
+          "label": "Silicon carbide wafer-level burn-in adoption option",
+          "valuation_status": "bounded_estimate",
+          "base_per_share": 4.0014,
+          "legacy_base_per_share": 4.0,
+          "range_width_per_share": 12.0007,
+          "scenario_assumptions": "Proof outputs {'low': 0.0, 'base': 4.0014, 'high': 12.0007}; see calculation_proof graph."
+        },
+        {
+          "component_id": "cycle_and_inventory_reserve",
+          "label": "Semicap cycle, inventory build, and cash-burn reserve",
+          "valuation_status": "bounded_estimate",
+          "base_per_share": -6.0003,
+          "legacy_base_per_share": -6.0,
+          "range_width_per_share": 10.0017,
+          "scenario_assumptions": "Proof outputs {'low': -12.0007, 'base': -6.0003, 'high': -1.999}; see calculation_proof graph."
+        },
+        {
+          "component_id": "burn_in_test_equipment_engine",
+          "label": "Burn-in and wafer-level test equipment operations",
+          "valuation_status": "bounded_estimate",
+          "base_per_share": 3.21,
+          "legacy_base_per_share": 3.21,
+          "range_width_per_share": 2.81,
+          "scenario_assumptions": "Proof outputs {'low': 2.01, 'base': 3.21, 'high': 4.82}; see calculation_proof graph."
+        },
+        {
+          "component_id": "net_financial_claims",
+          "label": "Net cash claims on common equity",
+          "valuation_status": "bounded_estimate",
+          "base_per_share": 1.6841,
+          "legacy_base_per_share": 1.68,
+          "range_width_per_share": 0.3354,
+          "scenario_assumptions": "Proof outputs {'low': 1.4308, 'base': 1.6841, 'high': 1.7662}; see calculation_proof graph."
+        }
+      ],
       "reverse_expectations": null
     },
     "calculation_proof_summary": {
-      "component_count": 0,
-      "priced_component_count": 0,
-      "proof_complete_pct": 0.0,
+      "component_count": 4,
+      "priced_component_count": 4,
+      "proof_complete_pct": 100.0,
       "status_counts": {
-        "bounded_estimate": 0,
+        "bounded_estimate": 4,
         "calculated": 0,
         "legacy_sensitivity": 0,
         "unpriced": 0
       },
-      "all_material_components_priced": false,
+      "all_material_components_priced": true,
       "calculation_errors": [],
-      "aggregate_proof_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      "aggregate_proof_hash": "12bd84568904ec937bb1f57bf80632ba6e137abcac265c33afab035c56267481"
     },
     "model_checks": {
       "calculation_graphs_valid": true,
-      "component_sum_reconciles": false,
+      "component_sum_reconciles": true,
       "no_double_counting": true,
-      "all_material_components_priced": false,
+      "all_material_components_priced": true,
       "low_base_high_ordered": true
     },
-    "source_lineage": [],
+    "source_lineage": [
+      {
+        "component_id": "burn_in_test_equipment_engine",
+        "node_id": "operating_income_m",
+        "ref": "AEHR/investor-documents/sec-edgar/10-K_20250728_rpt20250530_acc0001654954_25_008553.htm",
+        "locator": "OperatingIncomeLoss $13.375M (FY2025, up from $10.078M prior year)",
+        "as_of": "2025-05-31",
+        "content_sha256": "f2d21e25a0cc7e7c37e53b0232ee80eb64671bcf0d89ebfb58a0653c4f76501b",
+        "source_id": "fdbbf34e8f0bb28ff666eb9cbbbd1fc6b281e90a97cb48b5beacd6fbc0cc74e9"
+      },
+      {
+        "component_id": "burn_in_test_equipment_engine",
+        "node_id": "midcycle_operating_income_m",
+        "ref": "AEHR/investor-documents/sec-edgar/10-K_20250728_rpt20250530_acc0001654954_25_008553.htm",
+        "locator": "OperatingIncomeLoss $13.375M (2025) and $10.078M (2024); midpoint normalization",
+        "as_of": "2025-05-31",
+        "content_sha256": "f2d21e25a0cc7e7c37e53b0232ee80eb64671bcf0d89ebfb58a0653c4f76501b",
+        "source_id": "0f97c6548d072c929cf92a95cd79ca2c364962c637310be96a9bbbd71a93b05b"
+      },
+      {
+        "component_id": "burn_in_test_equipment_engine",
+        "node_id": "shares_m",
+        "ref": "AEHR/investor-documents/sec-edgar/10-K_20250728_rpt20250530_acc0001654954_25_008553.htm",
+        "locator": "FY2025 diluted net income $14.557M / diluted EPS $0.50",
+        "as_of": "2025-05-31",
+        "content_sha256": "f2d21e25a0cc7e7c37e53b0232ee80eb64671bcf0d89ebfb58a0653c4f76501b",
+        "source_id": "53cd14b410fa429f761a838d2aeaf60acf257e15bca59388eaa5758e9c87efc4"
+      },
+      {
+        "component_id": "sic_wafer_level_option",
+        "node_id": "inventory_m",
+        "ref": "AEHR/investor-documents/sec-edgar/10-K_20250728_rpt20250530_acc0001654954_25_008553.htm",
+        "locator": "InventoryNet $41.997M at May 31, 2025",
+        "as_of": "2025-05-31",
+        "content_sha256": "f2d21e25a0cc7e7c37e53b0232ee80eb64671bcf0d89ebfb58a0653c4f76501b",
+        "source_id": "f8216ce638faf2baa138d47bf446200b3a1ee0d645aa13d7f960c331849905e4"
+      },
+      {
+        "component_id": "sic_wafer_level_option",
+        "node_id": "deferred_revenue_m",
+        "ref": "AEHR/investor-documents/sec-edgar/10-K_20250728_rpt20250530_acc0001654954_25_008553.htm",
+        "locator": "CustomerDepositsAndDeferredRevenueShortTerm $1.345M at May 31, 2025",
+        "as_of": "2025-05-31",
+        "content_sha256": "f2d21e25a0cc7e7c37e53b0232ee80eb64671bcf0d89ebfb58a0653c4f76501b",
+        "source_id": "869a07392018e2a9e1839c24e9ada1db197f72d1b99078c11cb95bae203a497d"
+      },
+      {
+        "component_id": "sic_wafer_level_option",
+        "node_id": "shares_m",
+        "ref": "AEHR/investor-documents/sec-edgar/10-K_20250728_rpt20250530_acc0001654954_25_008553.htm",
+        "locator": "FY2025 diluted net income $14.557M / diluted EPS $0.50",
+        "as_of": "2025-05-31",
+        "content_sha256": "f2d21e25a0cc7e7c37e53b0232ee80eb64671bcf0d89ebfb58a0653c4f76501b",
+        "source_id": "53cd14b410fa429f761a838d2aeaf60acf257e15bca59388eaa5758e9c87efc4"
+      },
+      {
+        "component_id": "net_financial_claims",
+        "node_id": "cash_m",
+        "ref": "AEHR/investor-documents/sec-edgar/10-K_20250728_rpt20250530_acc0001654954_25_008553.htm",
+        "locator": "CashAndCashEquivalentsAtCarryingValue $49.159M at May 31, 2025",
+        "as_of": "2025-05-31",
+        "content_sha256": "f2d21e25a0cc7e7c37e53b0232ee80eb64671bcf0d89ebfb58a0653c4f76501b",
+        "source_id": "711513d75b84c959e29d2ab90a1add9e126e06bb9631307e10cecfe1f0b71201"
+      },
+      {
+        "component_id": "net_financial_claims",
+        "node_id": "shares_m",
+        "ref": "AEHR/investor-documents/sec-edgar/10-K_20250728_rpt20250530_acc0001654954_25_008553.htm",
+        "locator": "FY2025 diluted net income $14.557M / diluted EPS $0.50",
+        "as_of": "2025-05-31",
+        "content_sha256": "f2d21e25a0cc7e7c37e53b0232ee80eb64671bcf0d89ebfb58a0653c4f76501b",
+        "source_id": "53cd14b410fa429f761a838d2aeaf60acf257e15bca59388eaa5758e9c87efc4"
+      },
+      {
+        "component_id": "cycle_and_inventory_reserve",
+        "node_id": "cash_q3_m",
+        "ref": "AEHR/investor-documents/sec-edgar/10-Q_20260408_rpt20260227_acc0001654954_26_003348.htm",
+        "locator": "CashAndCashEquivalentsAtCarryingValue $24.529M at February 27, 2026 (down from $49.159M)",
+        "as_of": "2026-02-27",
+        "content_sha256": "a5e18f3b4894bc4b4b447d77d45f25e572de1eb64843d10d9b0e10f72a69b4ac",
+        "source_id": "eb828b8875b36bc576a648ce63a8a9c51be3b5a6b9aa86be748489fed0bcbba4"
+      },
+      {
+        "component_id": "cycle_and_inventory_reserve",
+        "node_id": "inventory_m",
+        "ref": "AEHR/investor-documents/sec-edgar/10-K_20250728_rpt20250530_acc0001654954_25_008553.htm",
+        "locator": "InventoryNet $41.997M at May 31, 2025",
+        "as_of": "2025-05-31",
+        "content_sha256": "f2d21e25a0cc7e7c37e53b0232ee80eb64671bcf0d89ebfb58a0653c4f76501b",
+        "source_id": "f8216ce638faf2baa138d47bf446200b3a1ee0d645aa13d7f960c331849905e4"
+      },
+      {
+        "component_id": "cycle_and_inventory_reserve",
+        "node_id": "shares_m",
+        "ref": "AEHR/investor-documents/sec-edgar/10-K_20250728_rpt20250530_acc0001654954_25_008553.htm",
+        "locator": "FY2025 diluted net income $14.557M / diluted EPS $0.50",
+        "as_of": "2025-05-31",
+        "content_sha256": "f2d21e25a0cc7e7c37e53b0232ee80eb64671bcf0d89ebfb58a0653c4f76501b",
+        "source_id": "53cd14b410fa429f761a838d2aeaf60acf257e15bca59388eaa5758e9c87efc4"
+      }
+    ],
     "change_control": {
-      "model_hash": "319a51011ed34bbae279c1d5ed31eba25d43acaaa7bf570068f0cad9f4135725",
-      "method_versions": [],
+      "model_hash": "7ca56cf55b24ed3457bdcdd06908c5aeecde4186ad5e1a5073ccae0aa950cca6",
+      "method_versions": [
+        "net_asset_value@1.0",
+        "owner_cash_or_dividend_discount@1.0",
+        "risk_adjusted_milestone_value@1.0"
+      ],
       "change_log": [],
       "rule": "A source fact is locked. Every assumption change requires a reason, author, timestamp, and before/after value."
     }
   },
   "optionality": {
-    "status": "not_material_or_separately_identified",
-    "option_count": 0,
-    "options": [],
+    "status": "present",
+    "option_count": 1,
+    "options": [
+      {
+        "component_id": "sic_wafer_level_option",
+        "label": "Silicon carbide wafer-level burn-in adoption option",
+        "category": "real_option",
+        "treatment": "additive",
+        "included_in_component_id": null,
+        "ownership_claim": "Silicon carbide wafer-level burn-in adoption option",
+        "ownership_percentage": 1.0,
+        "quantity": {
+          "value": 1,
+          "unit": "per-share economic claim"
+        },
+        "method": "risk_adjusted_milestone_value",
+        "method_version": "1.0",
+        "method_provenance": {
+          "method_id": "risk_adjusted_milestone_value",
+          "version": "1.0",
+          "label": "Milestone risk-adjusted present value",
+          "power_zones": [
+            "binary_milestone"
+          ],
+          "equation": "value_per_share = (net_cash + sum(p_success*PV(success_value)-remaining_cost) - dilution)/shares",
+          "sources": [
+            {
+              "ref": "_system/frameworks/optionality_valuation.md",
+              "locator": "Milestone-based option framework"
+            }
+          ]
+        },
+        "comparable_ids": [],
+        "range_per_share": {
+          "low": 0.0,
+          "base": 4.0014,
+          "high": 12.0007
+        },
+        "legacy_range_per_share": {
+          "low": 0.0,
+          "base": 4.0,
+          "high": 12.0
+        },
+        "valuation_status": "bounded_estimate",
+        "calculation_proof": {
+          "status": "valid",
+          "method_id": "risk_adjusted_milestone_value",
+          "method_version": "1.0",
+          "outputs": {
+            "low": 0.0,
+            "base": 4.0014,
+            "high": 12.0007
+          },
+          "output_unit": "USD_per_share",
+          "traces": {
+            "low": [
+              {
+                "id": "inventory_m",
+                "label": "Inventory net (FY2025)",
+                "kind": "fact",
+                "value": 41.997,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "AEHR/investor-documents/sec-edgar/10-K_20250728_rpt20250530_acc0001654954_25_008553.htm",
+                  "locator": "InventoryNet $41.997M at May 31, 2025",
+                  "as_of": "2025-05-31",
+                  "content_sha256": "f2d21e25a0cc7e7c37e53b0232ee80eb64671bcf0d89ebfb58a0653c4f76501b",
+                  "source_id": "f8216ce638faf2baa138d47bf446200b3a1ee0d645aa13d7f960c331849905e4"
+                },
+                "rationale": null
+              },
+              {
+                "id": "deferred_revenue_m",
+                "label": "Customer deposits and deferred revenue (current)",
+                "kind": "fact",
+                "value": 1.345,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "AEHR/investor-documents/sec-edgar/10-K_20250728_rpt20250530_acc0001654954_25_008553.htm",
+                  "locator": "CustomerDepositsAndDeferredRevenueShortTerm $1.345M at May 31, 2025",
+                  "as_of": "2025-05-31",
+                  "content_sha256": "f2d21e25a0cc7e7c37e53b0232ee80eb64671bcf0d89ebfb58a0653c4f76501b",
+                  "source_id": "869a07392018e2a9e1839c24e9ada1db197f72d1b99078c11cb95bae203a497d"
+                },
+                "rationale": null
+              },
+              {
+                "id": "shares_m",
+                "label": "FY2025 diluted shares",
+                "kind": "fact",
+                "value": 29.215,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "AEHR/investor-documents/sec-edgar/10-K_20250728_rpt20250530_acc0001654954_25_008553.htm",
+                  "locator": "FY2025 diluted net income $14.557M / diluted EPS $0.50",
+                  "as_of": "2025-05-31",
+                  "content_sha256": "f2d21e25a0cc7e7c37e53b0232ee80eb64671bcf0d89ebfb58a0653c4f76501b",
+                  "source_id": "53cd14b410fa429f761a838d2aeaf60acf257e15bca59388eaa5758e9c87efc4"
+                },
+                "rationale": null
+              },
+              {
+                "id": "sic_milestone_m",
+                "label": "Risk-adjusted silicon carbide wafer-level burn-in adoption economics",
+                "kind": "judgment",
+                "value": 0.0,
+                "unit": "USD_m",
+                "source": null,
+                "rationale": "Non-overlapping claim on SiC and wafer-level test adoption not fully captured in normalized owner-cash multiple; base is judgment band pending order disclosure."
+              },
+              {
+                "id": "value_per_share",
+                "label": "SiC wafer-level option per share",
+                "kind": "calculation",
+                "value": 0.0,
+                "unit": "USD_per_share",
+                "operation": "divide",
+                "formula": "sic_milestone_m \u00f7 shares_m",
+                "substituted_formula": "0 \u00f7 29.215",
+                "dependencies": [
+                  "sic_milestone_m",
+                  "shares_m"
+                ]
+              }
+            ],
+            "base": [
+              {
+                "id": "inventory_m",
+                "label": "Inventory net (FY2025)",
+                "kind": "fact",
+                "value": 41.997,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "AEHR/investor-documents/sec-edgar/10-K_20250728_rpt20250530_acc0001654954_25_008553.htm",
+                  "locator": "InventoryNet $41.997M at May 31, 2025",
+                  "as_of": "2025-05-31",
+                  "content_sha256": "f2d21e25a0cc7e7c37e53b0232ee80eb64671bcf0d89ebfb58a0653c4f76501b",
+                  "source_id": "f8216ce638faf2baa138d47bf446200b3a1ee0d645aa13d7f960c331849905e4"
+                },
+                "rationale": null
+              },
+              {
+                "id": "deferred_revenue_m",
+                "label": "Customer deposits and deferred revenue (current)",
+                "kind": "fact",
+                "value": 1.345,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "AEHR/investor-documents/sec-edgar/10-K_20250728_rpt20250530_acc0001654954_25_008553.htm",
+                  "locator": "CustomerDepositsAndDeferredRevenueShortTerm $1.345M at May 31, 2025",
+                  "as_of": "2025-05-31",
+                  "content_sha256": "f2d21e25a0cc7e7c37e53b0232ee80eb64671bcf0d89ebfb58a0653c4f76501b",
+                  "source_id": "869a07392018e2a9e1839c24e9ada1db197f72d1b99078c11cb95bae203a497d"
+                },
+                "rationale": null
+              },
+              {
+                "id": "shares_m",
+                "label": "FY2025 diluted shares",
+                "kind": "fact",
+                "value": 29.215,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "AEHR/investor-documents/sec-edgar/10-K_20250728_rpt20250530_acc0001654954_25_008553.htm",
+                  "locator": "FY2025 diluted net income $14.557M / diluted EPS $0.50",
+                  "as_of": "2025-05-31",
+                  "content_sha256": "f2d21e25a0cc7e7c37e53b0232ee80eb64671bcf0d89ebfb58a0653c4f76501b",
+                  "source_id": "53cd14b410fa429f761a838d2aeaf60acf257e15bca59388eaa5758e9c87efc4"
+                },
+                "rationale": null
+              },
+              {
+                "id": "sic_milestone_m",
+                "label": "Risk-adjusted silicon carbide wafer-level burn-in adoption economics",
+                "kind": "judgment",
+                "value": 116.9,
+                "unit": "USD_m",
+                "source": null,
+                "rationale": "Non-overlapping claim on SiC and wafer-level test adoption not fully captured in normalized owner-cash multiple; base is judgment band pending order disclosure."
+              },
+              {
+                "id": "value_per_share",
+                "label": "SiC wafer-level option per share",
+                "kind": "calculation",
+                "value": 4.00136916,
+                "unit": "USD_per_share",
+                "operation": "divide",
+                "formula": "sic_milestone_m \u00f7 shares_m",
+                "substituted_formula": "116.9 \u00f7 29.215",
+                "dependencies": [
+                  "sic_milestone_m",
+                  "shares_m"
+                ]
+              }
+            ],
+            "high": [
+              {
+                "id": "inventory_m",
+                "label": "Inventory net (FY2025)",
+                "kind": "fact",
+                "value": 41.997,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "AEHR/investor-documents/sec-edgar/10-K_20250728_rpt20250530_acc0001654954_25_008553.htm",
+                  "locator": "InventoryNet $41.997M at May 31, 2025",
+                  "as_of": "2025-05-31",
+                  "content_sha256": "f2d21e25a0cc7e7c37e53b0232ee80eb64671bcf0d89ebfb58a0653c4f76501b",
+                  "source_id": "f8216ce638faf2baa138d47bf446200b3a1ee0d645aa13d7f960c331849905e4"
+                },
+                "rationale": null
+              },
+              {
+                "id": "deferred_revenue_m",
+                "label": "Customer deposits and deferred revenue (current)",
+                "kind": "fact",
+                "value": 1.345,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "AEHR/investor-documents/sec-edgar/10-K_20250728_rpt20250530_acc0001654954_25_008553.htm",
+                  "locator": "CustomerDepositsAndDeferredRevenueShortTerm $1.345M at May 31, 2025",
+                  "as_of": "2025-05-31",
+                  "content_sha256": "f2d21e25a0cc7e7c37e53b0232ee80eb64671bcf0d89ebfb58a0653c4f76501b",
+                  "source_id": "869a07392018e2a9e1839c24e9ada1db197f72d1b99078c11cb95bae203a497d"
+                },
+                "rationale": null
+              },
+              {
+                "id": "shares_m",
+                "label": "FY2025 diluted shares",
+                "kind": "fact",
+                "value": 29.215,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "AEHR/investor-documents/sec-edgar/10-K_20250728_rpt20250530_acc0001654954_25_008553.htm",
+                  "locator": "FY2025 diluted net income $14.557M / diluted EPS $0.50",
+                  "as_of": "2025-05-31",
+                  "content_sha256": "f2d21e25a0cc7e7c37e53b0232ee80eb64671bcf0d89ebfb58a0653c4f76501b",
+                  "source_id": "53cd14b410fa429f761a838d2aeaf60acf257e15bca59388eaa5758e9c87efc4"
+                },
+                "rationale": null
+              },
+              {
+                "id": "sic_milestone_m",
+                "label": "Risk-adjusted silicon carbide wafer-level burn-in adoption economics",
+                "kind": "judgment",
+                "value": 350.6,
+                "unit": "USD_m",
+                "source": null,
+                "rationale": "Non-overlapping claim on SiC and wafer-level test adoption not fully captured in normalized owner-cash multiple; base is judgment band pending order disclosure."
+              },
+              {
+                "id": "value_per_share",
+                "label": "SiC wafer-level option per share",
+                "kind": "calculation",
+                "value": 12.00068458,
+                "unit": "USD_per_share",
+                "operation": "divide",
+                "formula": "sic_milestone_m \u00f7 shares_m",
+                "substituted_formula": "350.6 \u00f7 29.215",
+                "dependencies": [
+                  "sic_milestone_m",
+                  "shares_m"
+                ]
+              }
+            ]
+          },
+          "source_lineage": [
+            {
+              "node_id": "inventory_m",
+              "ref": "AEHR/investor-documents/sec-edgar/10-K_20250728_rpt20250530_acc0001654954_25_008553.htm",
+              "locator": "InventoryNet $41.997M at May 31, 2025",
+              "as_of": "2025-05-31",
+              "content_sha256": "f2d21e25a0cc7e7c37e53b0232ee80eb64671bcf0d89ebfb58a0653c4f76501b",
+              "source_id": "f8216ce638faf2baa138d47bf446200b3a1ee0d645aa13d7f960c331849905e4"
+            },
+            {
+              "node_id": "deferred_revenue_m",
+              "ref": "AEHR/investor-documents/sec-edgar/10-K_20250728_rpt20250530_acc0001654954_25_008553.htm",
+              "locator": "CustomerDepositsAndDeferredRevenueShortTerm $1.345M at May 31, 2025",
+              "as_of": "2025-05-31",
+              "content_sha256": "f2d21e25a0cc7e7c37e53b0232ee80eb64671bcf0d89ebfb58a0653c4f76501b",
+              "source_id": "869a07392018e2a9e1839c24e9ada1db197f72d1b99078c11cb95bae203a497d"
+            },
+            {
+              "node_id": "shares_m",
+              "ref": "AEHR/investor-documents/sec-edgar/10-K_20250728_rpt20250530_acc0001654954_25_008553.htm",
+              "locator": "FY2025 diluted net income $14.557M / diluted EPS $0.50",
+              "as_of": "2025-05-31",
+              "content_sha256": "f2d21e25a0cc7e7c37e53b0232ee80eb64671bcf0d89ebfb58a0653c4f76501b",
+              "source_id": "53cd14b410fa429f761a838d2aeaf60acf257e15bca59388eaa5758e9c87efc4"
+            }
+          ],
+          "checks": {
+            "passed": true,
+            "errors": []
+          },
+          "proof_hash": "0be85e072501112ff4e861762189b670c99bec3c5990ffa958847d509eaef282"
+        },
+        "evidence_tier": "primary_derived",
+        "evidence_level": "primary_derived",
+        "evidence": "Primary bridge from AEHR/investor-documents/sec-edgar/10-K_20250728_rpt20250530_acc0001654954_25_008553.htm: FY2025 revenue $64.961M, operating income $13.375M, cash $49.159M, inventory $41.997M; contract backfill 2026-07-21.",
+        "scenario_assumptions": "Proof outputs {'low': 0.0, 'base': 4.0014, 'high': 12.0007}; see calculation_proof graph.",
+        "probability_and_timing": {
+          "success_probability": null,
+          "remaining_capital_m": null,
+          "timing_basis": "EV and industrial SiC capacity ramps; [Assumption] 4-year base.",
+          "probability_basis": "SiC wafer-level burn-in is filed growth focus; base assumes partial adoption over four years. [Assumption]",
+          "remaining_capital_basis": "Incremental capex for backlog fulfillment embedded in normalized owner cash."
+        },
+        "tax_and_realization_adjustments": "Low case zero; base does not assume full EV SiC TAM.",
+        "falsifier": "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
+        "overlap_key": "sic_wafer_level_option",
+        "assumption_type": "judgment"
+      }
+    ],
     "rule": "Every option requires a beneficiary, probability, timing, remaining capital, failure case, and non-overlap control; absence of option value must be explicit rather than unvalued."
   },
   "committee": {
@@ -149,47 +3053,48 @@
     "gaps": []
   },
   "method_fit": {
-    "profile_id": "quality_reinvestment",
-    "label": "High-return compounder",
-    "current_archetype": null,
+    "profile_id": "predictable_cash_flow",
+    "label": "Predictable cash-flow security",
+    "current_archetype": "capital_cycle",
     "primary_methods": [
-      "owner_earnings_reinvestment_dcf"
+      "owner_cash_or_dividend_discount"
     ],
     "corroborating_methods": [
-      "reverse_dcf",
-      "incremental_roic_runway"
+      "regulated_asset_base",
+      "yield_and_reverse_dcf"
     ],
     "primary_personas": [
       "buffett_weschler",
       "hohn"
     ],
     "cross_check_personas": [
-      "munger",
-      "marathon_capital_cycle"
+      "marks_credit_cycle"
     ],
     "silent_personas": [
       "greenblatt",
       "hk",
       "klarman_asset_value",
-      "marks_credit_cycle",
+      "marathon_capital_cycle",
+      "munger",
       "pabrai",
       "stahl"
     ],
     "routing_reasons": [
-      "No decisive classification was supplied; owner-earnings is the conservative operating default."
+      "component categories=operating_business",
+      "existing methods=dividend, owner_cash"
     ],
     "required_evidence": [
-      "normalized owner earnings",
-      "incremental return on capital",
-      "reinvestment runway",
-      "diluted share count",
-      "competitive-advantage mechanism"
+      "cash-flow durability",
+      "maintenance capital",
+      "funding plan",
+      "distribution policy",
+      "contract or regulatory reset terms"
     ],
     "applicability_tests": [],
     "failure_modes": [
-      "growth projected without its capital cost",
-      "stock compensation or acquisitions omitted",
-      "terminal value unsupported by a durable mechanism"
+      "dividend treated as earning power",
+      "growth capital and dilution omitted",
+      "contract renewal or regulatory reset ignored"
     ],
     "validation_cohort": [
       {
@@ -266,12 +3171,12 @@
     "weighting_rule": "Do not change a persona's relevance within a power zone until at least 20 attributable, dividend-aware outcomes exist there; never reweight automatically."
   },
   "attribution": {
-    "status": "waiting_for_proof_complete_baseline",
+    "status": "baseline_established",
     "current": {
-      "as_of": "2026-07-20",
-      "low": null,
-      "base": null,
-      "high": null
+      "as_of": "2026-07-21",
+      "low": -8.5599,
+      "base": 2.8952,
+      "high": 16.5879
     },
     "prior": null,
     "base_change_per_share": null,
@@ -279,7 +3184,6 @@
     "drivers": [],
     "category_totals_per_share": {},
     "unexplained_per_share": null,
-    "legacy_value_per_share": null,
-    "explanation": "A complete security value is intentionally withheld while material components are unpriced. Attribution restarts after the first proof-complete baseline."
+    "explanation": "The current component schedule is the first decision-grade baseline; attribution begins with the next dated valuation snapshot."
   }
 }
