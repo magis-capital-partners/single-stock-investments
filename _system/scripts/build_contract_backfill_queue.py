@@ -74,12 +74,20 @@ def authorize(ticker: str, contract: dict, *, cohort: str) -> dict:
     return packet
 
 
-def build_queue(*, wave_size: int, authorize_packets: bool) -> dict:
+def build_queue(
+    *,
+    wave_size: int,
+    authorize_packets: bool,
+    exclude_tickers: set[str] | None = None,
+) -> dict:
     registry = read_json(REGISTRY)
     holdings = registry.get("holdings") or {}
+    excluded = {t.upper() for t in (exclude_tickers or set())}
     almost: list[str] = []
     unmapped: list[tuple[int, str]] = []
     for ticker in sorted(holdings):
+        if ticker.upper() in excluded:
+            continue
         contract = read_json(ROOT / ticker / "research" / "valuation_contract.json")
         if not contract or contract.get("status") == "decision_grade":
             continue
@@ -120,13 +128,24 @@ def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--wave-size", type=int, default=40, help="Tickers to authorize and queue now")
     parser.add_argument("--no-authorize", action="store_true", help="Write queue without authorized_evidence packets")
+    parser.add_argument(
+        "--exclude-ticker",
+        action="append",
+        default=[],
+        help="Ticker to skip (repeatable); used to avoid open Cursor PRs",
+    )
     parser.add_argument("--dry-run", action="store_true")
     args = parser.parse_args()
+    exclude = {t.strip().upper() for t in args.exclude_ticker if t.strip()}
     if args.dry_run:
-        payload = build_queue(wave_size=args.wave_size, authorize_packets=False)
+        payload = build_queue(wave_size=args.wave_size, authorize_packets=False, exclude_tickers=exclude)
         print(json.dumps({k: payload[k] for k in ("total_pending", "almost_there_count", "unmapped_count", "wave_size", "tickers")}, indent=2))
         return 0
-    payload = build_queue(wave_size=args.wave_size, authorize_packets=not args.no_authorize)
+    payload = build_queue(
+        wave_size=args.wave_size,
+        authorize_packets=not args.no_authorize,
+        exclude_tickers=exclude,
+    )
     print(json.dumps({k: payload[k] for k in ("total_pending", "almost_there_count", "wave_size", "authorized_packets", "tickers")}, indent=2))
     print(f"Wrote {QUEUE.relative_to(ROOT).as_posix()}")
     return 0

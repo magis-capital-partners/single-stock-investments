@@ -7,10 +7,15 @@ on:
     paths:
       - _system/data/deep_dive_dispatch_queue.json
       - _system/data/contract_backfill_queue.json
+  workflow_dispatch:
 
 permissions:
   contents: read
   pull-requests: write
+
+concurrency:
+  group: research-queue
+  cancel-in-progress: false
 
 jobs:
   batch-prepare:

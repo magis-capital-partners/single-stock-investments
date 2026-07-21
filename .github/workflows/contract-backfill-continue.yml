@@ -1,0 +1,127 @@
+name: Auto - Contract Backfill Continue
+
+# Overnight / continuous drain: when the research queue is idle, rebuild the next
+# contract_backfill wave (skipping tickers with open Cursor PRs) and push it so
+# Auto - Research Queue dispatches the next batch under the daily budget.
+on:
+  schedule:
+    - cron: "33 */2 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  actions: read
+  pull-requests: read
+
+concurrency:
+  group: contract-backfill-continue
+  cancel-in-progress: false
+
+jobs:
+  refill:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Skip while Research Queue is already running
+        id: gate
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          ACTIVE=$(gh api "repos/${{ github.repository }}/actions/workflows/marvin-deep-dive.yml/runs?status=in_progress&per_page=5" \
+            --jq '.total_count')
+          QUEUED=$(gh api "repos/${{ github.repository }}/actions/workflows/marvin-deep-dive.yml/runs?status=queued&per_page=5" \
+            --jq '.total_count')
+          if [ "${ACTIVE}" != "0" ] || [ "${QUEUED}" != "0" ]; then
+            echo "Research Queue still active (in_progress=${ACTIVE}, queued=${QUEUED}); skipping refill."
+            echo "refill=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          echo "refill=true" >> "$GITHUB_OUTPUT"
+
+      - uses: actions/checkout@v4
+        if: steps.gate.outputs.refill == 'true'
+        with:
+          fetch-depth: 0
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /_system/scripts/build_contract_backfill_queue.py
+            /_system/scripts/ci_push_main.sh
+            /_system/data/contract_backfill_queue.json
+            /_system/portfolio/registry.json
+            /*/research/valuation_contract.json
+            /*/research/authorized_evidence.json
+
+      - uses: actions/setup-python@v5
+        if: steps.gate.outputs.refill == 'true'
+        with:
+          python-version: "3.12"
+
+      - name: Rebuild next wave excluding open Cursor PRs
+        if: steps.gate.outputs.refill == 'true'
+        id: build
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          BEFORE=$(python - <<'PY'
+          import json
+          from pathlib import Path
+          path = Path("_system/data/contract_backfill_queue.json")
+          if not path.is_file():
+              print("")
+              raise SystemExit
+          data = json.loads(path.read_text(encoding="utf-8"))
+          print(",".join(data.get("tickers") or []))
+          PY
+          )
+          mapfile -t OPEN < <(gh pr list --state open --limit 100 --json headRefName,title --jq '
+            .[]
+            | select(.headRefName|startswith("cursor/"))
+            | (.title|capture("^(?<t>[A-Z0-9._-]+)").t // empty)
+          ' | sort -u)
+          ARGS=(--wave-size 40)
+          for t in "${OPEN[@]+"${OPEN[@]}"}"; do
+            [ -n "$t" ] || continue
+            ARGS+=(--exclude-ticker "$t")
+          done
+          python _system/scripts/build_contract_backfill_queue.py "${ARGS[@]}"
+          AFTER=$(python - <<'PY'
+          import json
+          from pathlib import Path
+          data = json.loads(Path("_system/data/contract_backfill_queue.json").read_text(encoding="utf-8"))
+          print(",".join(data.get("tickers") or []))
+          PY
+          )
+          echo "before=$BEFORE"
+          echo "after=$AFTER"
+          echo "excluded=${#OPEN[@]} open cursor PR ticker(s)"
+          if [ -z "$AFTER" ]; then
+            echo "No pending contract_backfill tickers remain."
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          if [ "$BEFORE" = "$AFTER" ]; then
+            echo "Queue tickers unchanged; no push."
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          echo "changed=true" >> "$GITHUB_OUTPUT"
+
+      - name: Commit and push refilled queue
+        if: steps.gate.outputs.refill == 'true' && steps.build.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add _system/data/contract_backfill_queue.json
+          while IFS= read -r path; do
+            git add -- "$path"
+          done < <(git diff --name-only -- '*/research/authorized_evidence.json' || true)
+          if git diff --cached --quiet; then
+            echo "Nothing staged."
+            exit 0
+          fi
+          bash _system/scripts/ci_push_main.sh "chore(queue): refill contract_backfill wave for overnight drain"
