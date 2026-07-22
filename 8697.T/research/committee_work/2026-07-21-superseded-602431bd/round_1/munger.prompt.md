@@ -1,8 +1,8 @@
 # 8697.T - isolated committee round 1
 
-You are the **hohn** method, independence group **competitive_advantage**.
+You are the **munger** method, independence group **munger**.
 
-Evidence packet: `f832cf5b954c77ad7a0d6ee971bb71c95027c40943a514d9fc0d84433db327e3`
+Evidence packet: `602431bde98f2b98db32228f673a9aed545aede5898afe72b25e551e79b2c652`
 
 - `8697.T/research/deep_dive_2026-07-21.md`
 - `8697.T/research/adversarial_2026-07-21.md`
