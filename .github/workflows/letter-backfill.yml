@@ -15,10 +15,6 @@ on:
 permissions:
   contents: write
 
-concurrency:
-  group: data-commit-main
-  cancel-in-progress: false
-
 env:
   RESEARCH_VAULT_REPO_URL: ${{ secrets.RESEARCH_VAULT_REPO_URL }}
   RESEARCH_VAULT_CLONE_TOKEN: ${{ secrets.RESEARCH_VAULT_CLONE_TOKEN }}
@@ -28,9 +24,15 @@ jobs:
   # Cold Drive import of ~20k PDFs can take ~4h. Commit the vault *before*
   # text extract so a later timeout does not throw away the download, and so
   # the next run can skip existing PDFs by size/sha.
+  #
+  # Download uses its own concurrency group so it is not blocked behind
+  # Data Pipeline / other data-commit-main writers (vault-only commits).
   download-letters:
     runs-on: ubuntu-latest
     timeout-minutes: 360
+    concurrency:
+      group: letter-vault-download
+      cancel-in-progress: false
     steps:
       - uses: jlumbroso/free-disk-space@54081f138730dfa15788a46383842cd2f914a1be # v1.3.1
         with:
@@ -100,6 +102,9 @@ jobs:
     needs: download-letters
     runs-on: ubuntu-latest
     timeout-minutes: 360
+    concurrency:
+      group: data-commit-main
+      cancel-in-progress: false
     steps:
       - uses: jlumbroso/free-disk-space@54081f138730dfa15788a46383842cd2f914a1be # v1.3.1
         with:
