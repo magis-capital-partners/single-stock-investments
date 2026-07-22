@@ -74,7 +74,7 @@ Entry prices were computed mechanically from the routed power-zone profile (Pred
 
 **Strongest counter-explanation:** dividend treated as earning power
 
-**Committee routing:** not_initialized — not initialized
+**Committee routing:** round_one_open — buffett_weschler, hohn, marks_credit_cycle
 
 **Falsifiers:**
 
