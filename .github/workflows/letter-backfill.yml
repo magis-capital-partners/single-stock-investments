@@ -19,14 +19,18 @@ concurrency:
   group: data-commit-main
   cancel-in-progress: false
 
+env:
+  RESEARCH_VAULT_REPO_URL: ${{ secrets.RESEARCH_VAULT_REPO_URL }}
+  RESEARCH_VAULT_CLONE_TOKEN: ${{ secrets.RESEARCH_VAULT_CLONE_TOKEN }}
+  RESEARCH_VAULT_ROOT: _external/research-vault
+
 jobs:
-  letter-backfill:
+  # Cold Drive import of ~20k PDFs can take ~4h. Commit the vault *before*
+  # text extract so a later timeout does not throw away the download, and so
+  # the next run can skip existing PDFs by size/sha.
+  download-letters:
     runs-on: ubuntu-latest
-    timeout-minutes: 300
-    env:
-      RESEARCH_VAULT_REPO_URL: ${{ secrets.RESEARCH_VAULT_REPO_URL }}
-      RESEARCH_VAULT_CLONE_TOKEN: ${{ secrets.RESEARCH_VAULT_CLONE_TOKEN }}
-      RESEARCH_VAULT_ROOT: _external/research-vault
+    timeout-minutes: 360
     steps:
       - uses: jlumbroso/free-disk-space@54081f138730dfa15788a46383842cd2f914a1be # v1.3.1
         with:
@@ -48,16 +52,13 @@ jobs:
         run: bash _system/scripts/ci_checkout_workspace.sh minimal
 
       - name: Check Google credentials secret
-        id: google_creds
         env:
           GOOGLE_APPLICATION_CREDENTIALS_JSON: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS_JSON }}
         run: |
           if [ -z "$GOOGLE_APPLICATION_CREDENTIALS_JSON" ]; then
-            echo "configured=false" >> "$GITHUB_OUTPUT"
             echo "GOOGLE_APPLICATION_CREDENTIALS_JSON is not configured."
             exit 1
           fi
-          echo "configured=true" >> "$GITHUB_OUTPUT"
 
       - uses: actions/setup-python@v5
         with:
@@ -76,9 +77,6 @@ jobs:
           printf '%s' "$GOOGLE_APPLICATION_CREDENTIALS_JSON" > "$RUNNER_TEMP/google-service-account.json"
           echo "GOOGLE_APPLICATION_CREDENTIALS=$RUNNER_TEMP/google-service-account.json" >> "$GITHUB_ENV"
 
-      # Download only — text extraction is the next step. Running extract inside
-      # --all previously burned the 5h job budget after a full-corpus re-download
-      # (unique_dest skipped 0/19952 because existing basenames minted new paths).
       - name: Import letters from Google Drive
         env:
           SINCE_YEAR: ${{ github.event.inputs.since_year || '' }}
@@ -89,11 +87,54 @@ jobs:
           fi
           python _system/scripts/import_drive_letter_orphans.py "${ARGS[@]}"
 
+      - name: Commit downloaded letter PDFs to research vault
+        uses: ./.github/actions/commit-vault
+        with:
+          message: |
+            Download superinvestor letter PDFs from Google Drive.
+
+            Automated import from letter-backfill download-letters job.
+          git_add: superinvestor-letters/
+
+  extract-and-publish:
+    needs: download-letters
+    runs-on: ubuntu-latest
+    timeout-minutes: 360
+    steps:
+      - uses: jlumbroso/free-disk-space@54081f138730dfa15788a46383842cd2f914a1be # v1.3.1
+        with:
+          tool-cache: false
+          android: true
+          dotnet: true
+          haskell: true
+          docker-images: true
+          swap-storage: true
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            _system/scripts/ci_checkout_workspace.sh
+            _system/scripts/ci_resolve_checkout_ref.sh
+            _system/scripts/ci_sparse_checkout_paths.py
+          sparse-checkout-cone-mode: false
+          fetch-depth: 1
+      - name: Checkout workspace (minimal + scripts)
+        run: bash _system/scripts/ci_checkout_workspace.sh minimal
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: pip install -r _system/scripts/requirements.txt
+
+      - name: Checkout research vault
+        uses: ./.github/actions/checkout-vault
+
       - name: Extract text from local letter PDFs
         env:
           SINCE_YEAR: ${{ github.event.inputs.since_year || '' }}
         run: |
-          ARGS=(--skip-download --build)
+          ARGS=(--skip-download)
           if [ -n "$SINCE_YEAR" ]; then
             ARGS+=(--since-year "$SINCE_YEAR")
           fi
@@ -102,16 +143,29 @@ jobs:
       - name: Letter date parser gold gate
         run: make letter-date-check
 
+      - name: Configure Google credentials
+        env:
+          GOOGLE_APPLICATION_CREDENTIALS_JSON: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS_JSON }}
+        run: |
+          if [ -z "$GOOGLE_APPLICATION_CREDENTIALS_JSON" ]; then
+            echo "Skipping Drive registry sync — credentials not configured."
+            echo "SKIP_DRIVE_SYNC=1" >> "$GITHUB_ENV"
+            exit 0
+          fi
+          printf '%s' "$GOOGLE_APPLICATION_CREDENTIALS_JSON" > "$RUNNER_TEMP/google-service-account.json"
+          echo "GOOGLE_APPLICATION_CREDENTIALS=$RUNNER_TEMP/google-service-account.json" >> "$GITHUB_ENV"
+
       - name: Sync letter registry to Drive
+        if: env.SKIP_DRIVE_SYNC != '1'
         run: make document-sync-drive-letters
 
-      - name: Commit letter corpus to research vault
+      - name: Commit letter extracts to research vault
         uses: ./.github/actions/commit-vault
         with:
           message: |
-            Backfill superinvestor letters from Google Drive.
+            Extract text for superinvestor letters.
 
-            Automated import from letter-backfill workflow.
+            Automated extract from letter-backfill extract-and-publish job.
           git_add: superinvestor-letters/
 
       - name: Rebuild ops dashboard payloads
