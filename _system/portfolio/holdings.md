@@ -14,14 +14,14 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-07-22.
 | AAL | AAL/ | AAL | US | 2026-07-19 | 2026-07-22 | unknown | watch |
 | AAOI | AAOI/ | Applied Optoelectronics, Inc. | US | 2026-07-19 | 2026-07-22 | unknown | watch |
 | AAPL | AAPL/ | Apple Inc. | US | 2026-07-19 | 2026-07-22 | unknown | watch |
-| ABBV | ABBV/ | AbbVie | US | 2026-07-10 | 2026-07-22 | compounder | watch |
-| ABMD.CVR | ABMD.CVR/ | Abiomed CVR (Johnson & Johnson acquisition) | US | 2026-07-09 | 2026-07-22 | unknown | watch |
-| ABNB | ABNB/ | Airbnb | US | 2026-07-10 | 2026-07-22 | unknown | watch |
-| ABT | ABT/ | Abbott Laboratories | US | 2026-07-09 | 2026-07-22 | unknown | watch |
-| ABX | ABX/ | Abacus Life Inc. | US | 2026-07-09 | 2026-07-22 | unknown | watch |
-| ACGL | ACGL/ | Arch Capital Group | US | 2026-07-09 | 2026-07-22 | unknown | watch |
-| ACHR | ACHR/ | ACHR | US | 2026-07-21 | 2026-07-22 | unknown | watch |
-| ACLS | ACLS/ | ACLS | US | 2026-07-21 | 2026-07-22 | unknown | watch |
+| ABBV | ABBV/ | AbbVie | US | 2026-07-22 | 2026-07-22 | compounder | watch |
+| ABMD.CVR | ABMD.CVR/ | Abiomed CVR (Johnson & Johnson acquisition) | US | 2026-07-22 | 2026-07-22 | unknown | watch |
+| ABNB | ABNB/ | Airbnb | US | 2026-07-22 | 2026-07-22 | unknown | watch |
+| ABT | ABT/ | Abbott Laboratories | US | 2026-07-22 | 2026-07-22 | unknown | watch |
+| ABX | ABX/ | Abacus Life Inc. | US | 2026-07-22 | 2026-07-22 | unknown | watch |
+| ACGL | ACGL/ | Arch Capital Group | US | 2026-07-22 | 2026-07-22 | unknown | watch |
+| ACHR | ACHR/ | ACHR | US | 2026-07-22 | 2026-07-22 | unknown | watch |
+| ACLS | ACLS/ | ACLS | US | 2026-07-22 | 2026-07-22 | unknown | watch |
 | ACMR | ACMR/ | ACMR | US | 2026-07-21 | 2026-07-22 | unknown | watch |
 | ACN | ACN/ | Accenture | US | 2026-07-09 | 2026-07-22 | unknown | watch |
 | ADBE | ADBE/ | Adobe Inc. | US | 2026-07-09 | 2026-07-22 | unknown | watch |
