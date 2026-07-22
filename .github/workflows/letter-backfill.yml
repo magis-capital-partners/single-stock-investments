@@ -70,10 +70,11 @@ jobs:
           printf '%s' "$GOOGLE_APPLICATION_CREDENTIALS_JSON" > "$RUNNER_TEMP/google-service-account.json"
           echo "GOOGLE_APPLICATION_CREDENTIALS=$RUNNER_TEMP/google-service-account.json" >> "$GITHUB_ENV"
 
+      # Download only — text extraction is the next step. Running extract inside
+      # --all previously burned the 5h job budget after a full-corpus re-download
+      # (unique_dest skipped 0/19952 because existing basenames minted new paths).
       - name: Import letters from Google Drive
-        run: |
-          ARGS=(--all)
-          python _system/scripts/import_drive_letter_orphans.py "${ARGS[@]}"
+        run: python _system/scripts/import_drive_letter_orphans.py --all --skip-text
 
       - name: Extract text from local letter PDFs
         run: python _system/scripts/import_drive_letter_orphans.py --skip-download --build
