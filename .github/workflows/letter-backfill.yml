@@ -5,6 +5,12 @@ on:
     # Sunday 16:00 UTC — off the 06:00 activist slot and the 10:00 full
     # downloads run so heavy jobs do not queue behind each other.
     - cron: "0 16 * * 0"
+  workflow_dispatch:
+    inputs:
+      since_year:
+        description: "Optional lower bound year (e.g. 2024). Empty = all quarters."
+        required: false
+        default: ""
 
 permissions:
   contents: write
@@ -74,10 +80,24 @@ jobs:
       # --all previously burned the 5h job budget after a full-corpus re-download
       # (unique_dest skipped 0/19952 because existing basenames minted new paths).
       - name: Import letters from Google Drive
-        run: python _system/scripts/import_drive_letter_orphans.py --all --skip-text
+        env:
+          SINCE_YEAR: ${{ github.event.inputs.since_year || '' }}
+        run: |
+          ARGS=(--all --skip-text)
+          if [ -n "$SINCE_YEAR" ]; then
+            ARGS+=(--since-year "$SINCE_YEAR")
+          fi
+          python _system/scripts/import_drive_letter_orphans.py "${ARGS[@]}"
 
       - name: Extract text from local letter PDFs
-        run: python _system/scripts/import_drive_letter_orphans.py --skip-download --build
+        env:
+          SINCE_YEAR: ${{ github.event.inputs.since_year || '' }}
+        run: |
+          ARGS=(--skip-download --build)
+          if [ -n "$SINCE_YEAR" ]; then
+            ARGS+=(--since-year "$SINCE_YEAR")
+          fi
+          python _system/scripts/import_drive_letter_orphans.py "${ARGS[@]}"
 
       - name: Letter date parser gold gate
         run: make letter-date-check
