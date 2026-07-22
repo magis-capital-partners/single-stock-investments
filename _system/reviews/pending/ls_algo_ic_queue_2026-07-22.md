@@ -29,6 +29,7 @@
 - **HOOD** — workbench evidence_blocked; triggers: material live ls-algo book position
 - **IBIT** — workbench evidence_blocked; triggers: material live ls-algo book position
 - **IONQ** — workbench evidence_blocked; triggers: material live ls-algo book position
+- **IREN** — workbench evidence_blocked; triggers: material live ls-algo book position
 - **LITE** — workbench evidence_blocked; triggers: material live ls-algo book position
 - **META** — workbench evidence_blocked; triggers: material live ls-algo book position
 - **MSTR** — workbench evidence_blocked; triggers: material live ls-algo book position

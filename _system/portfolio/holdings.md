@@ -398,6 +398,7 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-07-22.
 | IEX.NS | IEX.NS/ | Indian Energy Exchange Limited | IN | 2026-07-09 | 2026-07-22 | unknown | watch |
 | IFF | IFF/ | International Flavors & Fragrances | US | 2026-07-10 | 2026-07-22 | unknown | watch |
 | INCY | INCY/ | Incyte | US | 2026-07-10 | 2026-07-22 | unknown | watch |
+| INFQ | INFQ/ | INFQ | US | — | 2026-07-22 | unknown | watch |
 | INTC | INTC/ | Intel | US | 2026-07-10 | 2026-07-22 | unknown | watch |
 | INTU | INTU/ | Intuit | US | 2026-07-10 | 2026-07-22 | unknown | watch |
 | INV | INV/ | Innovex International, Inc. | US | 2026-07-09 | 2026-07-22 | unknown | watch |
@@ -407,11 +408,13 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-07-22.
 | IPCXR | IPCXR/ | Inflection Point Acquisition Corp. II (Rights) | US | 2026-07-09 | 2026-07-22 | unknown | watch |
 | IQV | IQV/ | IQVIA | US | 2026-07-10 | 2026-07-22 | unknown | watch |
 | IR | IR/ | Ingersoll Rand | US | 2026-07-10 | 2026-07-22 | unknown | watch |
+| IREN | IREN/ | IREN | US | — | 2026-07-22 | unknown | watch |
 | IRM | IRM/ | Iron Mountain | US | 2026-07-10 | 2026-07-22 | unknown | watch |
 | ISRG | ISRG/ | Intuitive Surgical | US | 2026-07-10 | 2026-07-22 | unknown | watch |
 | IT | IT/ | Gartner | US | 2026-07-10 | 2026-07-22 | unknown | watch |
 | ITW | ITW/ | Illinois Tool Works | US | 2026-07-10 | 2026-07-22 | unknown | watch |
 | IVZ | IVZ/ | Invesco | US | 2026-07-10 | 2026-07-22 | unknown | watch |
+| IWM | IWM/ | IWM | US | — | 2026-07-22 | unknown | watch |
 | J | J/ | Jacobs Solutions | US | 2026-07-10 | 2026-07-22 | unknown | watch |
 | JBHT | JBHT/ | J.B. Hunt | US | 2026-07-10 | 2026-07-22 | unknown | watch |
 | JBL | JBL/ | Jabil | US | 2026-07-10 | 2026-07-22 | unknown | watch |
@@ -419,6 +422,7 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-07-22.
 | JKHY | JKHY/ | Jack Henry & Associates | US | 2026-07-10 | 2026-07-22 | unknown | watch |
 | JL80.DE | JL80.DE/ | Norconsult ASA | EU | — | 2026-07-22 | unknown | watch |
 | JNJ | JNJ/ | Johnson & Johnson | US | 2026-07-10 | 2026-07-22 | unknown | watch |
+| JOBY | JOBY/ | JOBY | US | — | 2026-07-22 | unknown | watch |
 | JPM | JPM/ | JPMorgan Chase & Co. | US | 2026-07-09 | 2026-07-22 | unknown | watch |
 | KDP | KDP/ | Keurig Dr Pepper | US | 2026-07-10 | 2026-07-22 | unknown | watch |
 | KEWL | KEWL/ | Keweenaw Land Association | US | 2026-07-09 | 2026-07-22 | optionality | watch |
@@ -723,4 +727,4 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-07-22.
 | ZBRA | ZBRA/ | Zebra Technologies | US | 2026-07-10 | 2026-07-22 | unknown | watch |
 | ZTS | ZTS/ | Zoetis | US | 2026-07-10 | 2026-07-22 | unknown | watch |
 
-**716 holdings total.** Registry: `_system/portfolio/registry.json`
+**720 holdings total.** Registry: `_system/portfolio/registry.json`
