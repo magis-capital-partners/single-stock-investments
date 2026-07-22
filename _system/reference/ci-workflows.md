@@ -44,7 +44,7 @@ New tickers            → LS-algo Universe Intake (registry-driven onboarding)
 | Auto - Agent PR Merge | Cursor PR events | Wait for research checks, resolve allowed conflicts, squash merge |
 | Auto - IR Recovery | IR queue change | Exception-only browser adapter repair |
 | Darwin Portfolio Refresh | weekday 01:20 and Darwin code changes | Full Darwin data rebuild (includes research snapshot) |
-| Letter Backfill | Sunday 16:00 | Import letters (download `--skip-text`, then extract/build) and rebuild insights; skips existing PDFs by size/sha |
+| Letter Backfill | Sunday 16:00 + manual | Import letters (download `--skip-text`, then extract/build) and rebuild insights; skips existing PDFs by size/sha |
 | Memory Digest | Sunday 14:00 | Aggregate unpromoted [PROPOSED] bullets + corrections into one pending review |
 | Deploy Dashboard | relevant push or successful upstream run | Validate and publish Pages |
 | Deploy OAuth Proxy | OAuth source change | Deploy Cloudflare worker when configured |
