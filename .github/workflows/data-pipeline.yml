@@ -11,6 +11,7 @@ on:
     - cron: "0 14 * * *"    # drive intake (daily)
     - cron: "30 */6 * * *"  # portfolio news
     - cron: "0 15 * * 1"    # CVR discovery (SEC + inbox) Mondays
+    - cron: "0 16 * * 0"    # World Model weekly (Sunday UTC: themes + KPI ledgers + strip)
 
 permissions:
   contents: write
@@ -31,6 +32,7 @@ jobs:
       drive: ${{ steps.pick.outputs.drive }}
       news: ${{ steps.pick.outputs.news }}
       cvr_discover: ${{ steps.pick.outputs.cvr_discover }}
+      world_model: ${{ steps.pick.outputs.world_model }}
     steps:
       - id: pick
         env:
@@ -38,7 +40,7 @@ jobs:
           SCHEDULE: ${{ github.event.schedule }}
         run: |
           set -euo pipefail
-          intake_full=false; activist=false; downloads=false; drive=false; news=false; cvr_discover=false; download_mode=light
+          intake_full=false; activist=false; downloads=false; drive=false; news=false; cvr_discover=false; world_model=false; download_mode=light
           case "$SCHEDULE" in
             "0 3 * * *") intake_full=true ;;
             "0 6 * * *") activist=true ;;
@@ -47,6 +49,7 @@ jobs:
             "0 14 * * *") drive=true ;;
             "30 */6 * * *") news=true ;;
             "0 15 * * 1") cvr_discover=true ;;
+            "0 16 * * 0") world_model=true ;;
             *) echo "::error::Unrecognized schedule='$SCHEDULE'"; exit 1 ;;
           esac
           {
@@ -57,8 +60,9 @@ jobs:
             echo "drive=$drive"
             echo "news=$news"
             echo "cvr_discover=$cvr_discover"
+            echo "world_model=$world_model"
           } >> "$GITHUB_OUTPUT"
-          echo "Selected: intake_full=$intake_full activist=$activist downloads=$downloads($download_mode) drive=$drive news=$news cvr_discover=$cvr_discover"
+          echo "Selected: intake_full=$intake_full activist=$activist downloads=$downloads($download_mode) drive=$drive news=$news cvr_discover=$cvr_discover world_model=$world_model"
 
   intake-full:
     needs: decide
@@ -430,8 +434,43 @@ jobs:
             _system/reviews/pending/
             _system/data/cvr_agent_queue.json
 
+  world-model:
+    needs: decide
+    if: needs.decide.outputs.world_model == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    concurrency:
+      group: data-commit-main
+      cancel-in-progress: false
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            _system/scripts/ci_checkout_workspace.sh
+            _system/scripts/ci_resolve_checkout_ref.sh
+            _system/scripts/ci_sparse_checkout_paths.py
+          sparse-checkout-cone-mode: false
+          fetch-depth: 1
+      - name: Checkout workspace (full)
+        run: bash _system/scripts/ci_checkout_workspace.sh full
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: World Model monthly rebuild
+        uses: ./.github/actions/rebuild-data
+        env:
+          OAUTH_CLIENT_ID: ${{ vars.OAUTH_CLIENT_ID }}
+          OAUTH_PROXY_URL: ${{ vars.OAUTH_PROXY_URL }}
+        with:
+          profile: world-model-weekly
+          validate: "false"
+      - name: Commit World Model artifacts
+        uses: ./.github/actions/commit-main
+        with:
+          message: "chore: world-model weekly $(date -u +%Y-%m-%d)"
+
   pipeline-summary:
-    needs: [decide, intake-full, activist, downloads, drive, news, cvr-discover]
+    needs: [decide, intake-full, activist, downloads, drive, news, cvr-discover, world-model]
     if: always()
     runs-on: ubuntu-latest
     timeout-minutes: 5
@@ -445,4 +484,5 @@ jobs:
           echo "drive=${{ needs.decide.outputs.drive }} result=${{ needs.drive.result }}"
           echo "news=${{ needs.decide.outputs.news }} result=${{ needs.news.result }}"
           echo "cvr_discover=${{ needs.decide.outputs.cvr_discover }} result=${{ needs.cvr-discover.result }}"
+          echo "world_model=${{ needs.decide.outputs.world_model }} result=${{ needs.world-model.result }}"
           echo "Deploy Dashboard chains via workflow_run on successful commits."

@@ -83,7 +83,7 @@
       "question": "Material options after scan?",
       "answer": "No",
       "treatment": "n/a",
-      "evidence": "Operating compounder / croupier \u2014 Lawrence full cash-flow path sufficient"
+      "evidence": "Operating compounder / croupier — Lawrence full cash-flow path sufficient"
     }
   ],
   "synthesis": {
@@ -140,7 +140,7 @@
         "hard_to_vary": true,
         "falsifiable": true,
         "not_instrumentalist": true,
-        "reach": "Weights encode evidence tier (A primary \u2192 D external), not fitted to hit a target IRR"
+        "reach": "Weights encode evidence tier (A primary → D external), not fitted to hit a target IRR"
       },
       "qualitative_audit": {
         "flags": [],
@@ -325,5 +325,89 @@
     "price_for_market_cap": 52.11,
     "chart": "OTCM/research/charts/total_return_2026-07-15.svg",
     "panel_json": "OTCM/research/total_return_panel.json"
+  },
+  "world_model_context": {
+    "as_of": "2026-07-23",
+    "strip_label": "steady",
+    "industry_node_ids": [
+      "exchange_markets",
+      "market_data_indices"
+    ],
+    "industries": [
+      {
+        "node_id": "exchange_markets",
+        "label": "Exchange and clearing markets",
+        "kind": "thesis",
+        "checklist": {
+          "capacity": {
+            "status": "ok",
+            "note": "Clearing and data capacity scale with volumes; not a physical MW constraint."
+          },
+          "pricing": {
+            "status": "watch",
+            "note": "Fee and data pricing power; vol regime affects transaction intensity."
+          },
+          "regulatory": {
+            "status": "permissioning",
+            "note": "Continuous oversight; license and clearing-house rules."
+          }
+        }
+      },
+      {
+        "node_id": "market_data_indices",
+        "label": "Index / ratings / market-data croupiers",
+        "kind": "thesis",
+        "checklist": {
+          "capacity": {
+            "status": "ok",
+            "note": "Data platforms scale with modest incremental cost."
+          },
+          "pricing": {
+            "status": "watch",
+            "note": "Subscription and benchmark fee power."
+          },
+          "regulatory": {
+            "status": "permissioning",
+            "note": "Benchmark and data-licensing oversight."
+          }
+        }
+      }
+    ],
+    "theme_ids": [
+      "exchange_volatility",
+      "index_data_fees",
+      "macro_regime"
+    ],
+    "prediction_cards": [
+      {
+        "theme_id": "exchange_volatility",
+        "phase_transition": "gradual",
+        "regulatory": "permissioning",
+        "recursive": false,
+        "tam_magnetism": "high"
+      },
+      {
+        "theme_id": "index_data_fees",
+        "phase_transition": "watch",
+        "regulatory": "permissioning",
+        "recursive": true,
+        "tam_magnetism": "medium"
+      },
+      {
+        "theme_id": "macro_regime",
+        "phase_transition": "gradual",
+        "regulatory": "uncertain",
+        "recursive": false,
+        "tam_magnetism": "low"
+      }
+    ],
+    "kpi_fails": [],
+    "kpi_stale": [],
+    "superorg_gaps": [],
+    "horizon_convergence": {},
+    "in_base_irr": false,
+    "promotion": null,
+    "disclaimer": "Context only. World Model fails and Superorg gaps flag [HUMAN REVIEW]; they do not auto-rewrite Lawrence base IRR. Promotion requires _system/reviews/pending/world_model_promote_{TICKER}_{date}.md.",
+    "human_review_required": false
   }
 }

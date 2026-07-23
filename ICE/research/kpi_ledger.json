@@ -1,0 +1,116 @@
+{
+  "ticker": "ICE",
+  "as_of": "2026-07-23",
+  "theme_ids": [
+    "exchange_volatility",
+    "macro_regime"
+  ],
+  "schema_version": "1.0",
+  "kpis": [
+    {
+      "kpi_id": "vix_level",
+      "label": "VIX index level",
+      "unit": "index",
+      "expected": {
+        "op": "gte",
+        "value": 12,
+        "horizon": "vol_floor_for_croupier"
+      },
+      "actual": {
+        "value": 19.510000228881836,
+        "as_of": "2026-07-23"
+      },
+      "status": "pass",
+      "source": "theme:vix_level",
+      "evidence_tier": "market",
+      "last_checked": "2026-07-23",
+      "binds_to": {
+        "valuation_path": "context_overlay.themes[1].indicators[0]",
+        "on_fail": "human_review",
+        "note": "exchange_volatility VIX pulse for ICE croupier"
+      },
+      "in_base_irr": false,
+      "prediction_role": "orientation"
+    },
+    {
+      "kpi_id": "spy_20d_realized_vol",
+      "label": "SPY 20-day realized vol (annualized %)",
+      "unit": "pct",
+      "expected": {
+        "op": "gte",
+        "value": 8,
+        "horizon": "equity_vol_floor"
+      },
+      "actual": {
+        "value": 11.56,
+        "as_of": "2026-07-23"
+      },
+      "status": "pass",
+      "source": "theme:spy_20d_realized_vol",
+      "evidence_tier": "market",
+      "last_checked": "2026-07-23",
+      "binds_to": {
+        "valuation_path": "context_overlay.themes[1].indicators[1]",
+        "on_fail": "human_review"
+      },
+      "in_base_irr": false,
+      "prediction_role": "orientation"
+    },
+    {
+      "kpi_id": "owner_earnings_m",
+      "label": "Normalized owner earnings (USD m)",
+      "unit": "usd_m",
+      "expected": {
+        "op": "gte",
+        "value": 3000,
+        "horizon": "trailing"
+      },
+      "actual": {
+        "value": 4289.0,
+        "as_of": "2026-07-20"
+      },
+      "status": "pass",
+      "source": "valuation:component_valuation_results.additive_components[0].calculation_proof.inputs[0].value",
+      "evidence_tier": "filing",
+      "last_checked": "2026-07-23",
+      "binds_to": {
+        "valuation_path": "component_valuation_results.additive_components[0].calculation_proof.inputs[0]",
+        "on_fail": "human_review",
+        "note": "operating_business owner_earnings"
+      },
+      "in_base_irr": false,
+      "prediction_role": "reinforcement"
+    },
+    {
+      "kpi_id": "price_usd",
+      "label": "Share price (USD)",
+      "unit": "usd",
+      "expected": {
+        "op": "gt",
+        "value": 0,
+        "horizon": "listing"
+      },
+      "actual": {
+        "value": 141.57,
+        "as_of": "2026-07-20"
+      },
+      "status": "pass",
+      "source": "valuation:inputs.price",
+      "evidence_tier": "market",
+      "last_checked": "2026-07-23",
+      "binds_to": {
+        "valuation_path": "inputs.price",
+        "on_fail": "stance_only",
+        "note": "Price is context for stance sizing only; not a thesis falsifier"
+      },
+      "in_base_irr": false,
+      "prediction_role": "interference"
+    }
+  ],
+  "summary": {
+    "pass": 4,
+    "fail": 0,
+    "stale": 0,
+    "unchecked": 0
+  }
+}

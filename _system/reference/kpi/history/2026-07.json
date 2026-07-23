@@ -1,0 +1,5147 @@
+{
+  "month": "2026-07",
+  "generated_at": "2026-07-23T19:01:17Z",
+  "counts": {
+    "fail": 1,
+    "stale": 0,
+    "unchecked": 19,
+    "pass": 126,
+    "drifted_edges": 0,
+    "ledgers": 62,
+    "prediction_cards": 11,
+    "superorgs": 2,
+    "expert_horizon_domains": 2,
+    "industry_nodes": 13,
+    "thesis_industries": 11,
+    "horizon_industries": 2
+  },
+  "broken": [
+    {
+      "ticker": "ASX.AX",
+      "kpi_id": "asx200_20d_realized_vol",
+      "label": "ASX 200 20-day realized vol (annualized %)",
+      "status": "fail",
+      "actual": 7.49,
+      "expected": {
+        "op": "gte",
+        "value": 8.0,
+        "horizon": "equity_vol_floor"
+      },
+      "binds_to": {
+        "on_fail": "open_diligence",
+        "note": "Home-market realized vol (AU)"
+      },
+      "last_checked": "2026-07-23",
+      "source": "theme:asx200_20d_realized_vol",
+      "prediction_role": "orientation",
+      "industry_node_ids": [
+        "exchange_markets"
+      ]
+    }
+  ],
+  "stale": [],
+  "drifted_edges": [],
+  "unchecked": [
+    {
+      "ticker": "ABBV",
+      "kpi_id": "loe_patent_watch",
+      "label": "LOE / patent cliff watch (human)",
+      "status": "unchecked",
+      "actual": null,
+      "expected": {
+        "op": "gte",
+        "value": 0,
+        "horizon": "human"
+      },
+      "binds_to": {
+        "on_fail": "human_review",
+        "note": "Fail if material LOE without replacement royalty coverage"
+      },
+      "last_checked": "2026-07-23",
+      "source": "manual:human",
+      "prediction_role": "interference",
+      "industry_node_ids": [
+        "pharma_royalty"
+      ]
+    },
+    {
+      "ticker": "ACHR",
+      "kpi_id": "robotaxi_horizon_watch",
+      "label": "Robotaxi expert-horizon / city permit watch (human)",
+      "status": "unchecked",
+      "actual": null,
+      "expected": {
+        "op": "gte",
+        "value": 0,
+        "horizon": "human"
+      },
+      "binds_to": {
+        "on_fail": "human_review",
+        "note": "Cross-check expert_horizons/robotaxi.csv and city AV permits"
+      },
+      "last_checked": "2026-07-23",
+      "source": "manual:human",
+      "prediction_role": "orientation",
+      "industry_node_ids": [
+        "robotaxi"
+      ]
+    },
+    {
+      "ticker": "ADN.TO",
+      "kpi_id": "timber_housing_watch",
+      "label": "Housing / stumpage cycle watch (human)",
+      "status": "unchecked",
+      "actual": null,
+      "expected": {
+        "op": "gte",
+        "value": 0,
+        "horizon": "human"
+      },
+      "binds_to": {
+        "on_fail": "human_review",
+        "note": "Fill from housing starts / stumpage disclosures when available"
+      },
+      "last_checked": "2026-07-23",
+      "source": "manual:human",
+      "prediction_role": "orientation",
+      "industry_node_ids": [
+        "timber_land"
+      ]
+    },
+    {
+      "ticker": "AZLCZ",
+      "kpi_id": "water_activity_watch",
+      "label": "Water / surface activity watch (human)",
+      "status": "unchecked",
+      "actual": null,
+      "expected": {
+        "op": "gte",
+        "value": 0,
+        "horizon": "human"
+      },
+      "binds_to": {
+        "on_fail": "human_review",
+        "note": "Fill from filings: water revenue, produced-water volumes, or easements"
+      },
+      "last_checked": "2026-07-23",
+      "source": "manual:human",
+      "prediction_role": "reinforcement",
+      "industry_node_ids": [
+        "ai_power",
+        "water_surface"
+      ]
+    },
+    {
+      "ticker": "BWEL",
+      "kpi_id": "water_activity_watch",
+      "label": "Water / surface activity watch (human)",
+      "status": "unchecked",
+      "actual": null,
+      "expected": {
+        "op": "gte",
+        "value": 0,
+        "horizon": "human"
+      },
+      "binds_to": {
+        "on_fail": "human_review",
+        "note": "Fill from filings: water revenue, produced-water volumes, or easements"
+      },
+      "last_checked": "2026-07-23",
+      "source": "manual:human",
+      "prediction_role": "reinforcement",
+      "industry_node_ids": [
+        "ai_power",
+        "water_surface"
+      ]
+    },
+    {
+      "ticker": "CDZI",
+      "kpi_id": "water_activity_watch",
+      "label": "Water / surface activity watch (human)",
+      "status": "unchecked",
+      "actual": null,
+      "expected": {
+        "op": "gte",
+        "value": 0,
+        "horizon": "human"
+      },
+      "binds_to": {
+        "on_fail": "human_review",
+        "note": "Fill from filings: water revenue, produced-water volumes, or easements"
+      },
+      "last_checked": "2026-07-23",
+      "source": "manual:human",
+      "prediction_role": "reinforcement",
+      "industry_node_ids": [
+        "water_surface"
+      ]
+    },
+    {
+      "ticker": "GYRO",
+      "kpi_id": "water_activity_watch",
+      "label": "Water / surface activity watch (human)",
+      "status": "unchecked",
+      "actual": null,
+      "expected": {
+        "op": "gte",
+        "value": 0,
+        "horizon": "human"
+      },
+      "binds_to": {
+        "on_fail": "human_review",
+        "note": "Fill from filings: water revenue, produced-water volumes, or easements"
+      },
+      "last_checked": "2026-07-23",
+      "source": "manual:human",
+      "prediction_role": "reinforcement",
+      "industry_node_ids": [
+        "water_surface"
+      ]
+    },
+    {
+      "ticker": "JOBY",
+      "kpi_id": "robotaxi_horizon_watch",
+      "label": "Robotaxi expert-horizon / city permit watch (human)",
+      "status": "unchecked",
+      "actual": null,
+      "expected": {
+        "op": "gte",
+        "value": 0,
+        "horizon": "human"
+      },
+      "binds_to": {
+        "on_fail": "human_review",
+        "note": "Cross-check expert_horizons/robotaxi.csv and city AV permits"
+      },
+      "last_checked": "2026-07-23",
+      "source": "manual:human",
+      "prediction_role": "orientation",
+      "industry_node_ids": [
+        "robotaxi"
+      ]
+    },
+    {
+      "ticker": "JOBY",
+      "kpi_id": "price_usd",
+      "label": "Share price (USD)",
+      "status": "unchecked",
+      "actual": null,
+      "expected": {
+        "op": "gte",
+        "value": 1,
+        "horizon": "listing"
+      },
+      "binds_to": {
+        "on_fail": "human_review",
+        "note": "Price tape; fails if valuation inputs.price missing (inputs.price unavailable — manual until valuation priced)"
+      },
+      "last_checked": "2026-07-23",
+      "source": "manual:human",
+      "prediction_role": "interference",
+      "industry_node_ids": [
+        "robotaxi"
+      ]
+    },
+    {
+      "ticker": "LLY",
+      "kpi_id": "loe_patent_watch",
+      "label": "LOE / patent cliff watch (human)",
+      "status": "unchecked",
+      "actual": null,
+      "expected": {
+        "op": "gte",
+        "value": 0,
+        "horizon": "human"
+      },
+      "binds_to": {
+        "on_fail": "human_review",
+        "note": "Fail if material LOE without replacement royalty coverage"
+      },
+      "last_checked": "2026-07-23",
+      "source": "manual:human",
+      "prediction_role": "interference",
+      "industry_node_ids": [
+        "pharma_royalty"
+      ]
+    },
+    {
+      "ticker": "PCH",
+      "kpi_id": "timber_housing_watch",
+      "label": "Housing / stumpage cycle watch (human)",
+      "status": "unchecked",
+      "actual": null,
+      "expected": {
+        "op": "gte",
+        "value": 0,
+        "horizon": "human"
+      },
+      "binds_to": {
+        "on_fail": "human_review",
+        "note": "Fill from housing starts / stumpage disclosures when available"
+      },
+      "last_checked": "2026-07-23",
+      "source": "manual:human",
+      "prediction_role": "orientation",
+      "industry_node_ids": [
+        "timber_land"
+      ]
+    },
+    {
+      "ticker": "RPRX",
+      "kpi_id": "loe_patent_watch",
+      "label": "LOE / patent cliff watch (human)",
+      "status": "unchecked",
+      "actual": null,
+      "expected": {
+        "op": "gte",
+        "value": 0,
+        "horizon": "human"
+      },
+      "binds_to": {
+        "on_fail": "human_review",
+        "note": "Fail if material LOE without replacement royalty coverage"
+      },
+      "last_checked": "2026-07-23",
+      "source": "manual:human",
+      "prediction_role": "interference",
+      "industry_node_ids": [
+        "pharma_royalty"
+      ]
+    },
+    {
+      "ticker": "RYN",
+      "kpi_id": "timber_housing_watch",
+      "label": "Housing / stumpage cycle watch (human)",
+      "status": "unchecked",
+      "actual": null,
+      "expected": {
+        "op": "gte",
+        "value": 0,
+        "horizon": "human"
+      },
+      "binds_to": {
+        "on_fail": "human_review",
+        "note": "Fill from housing starts / stumpage disclosures when available"
+      },
+      "last_checked": "2026-07-23",
+      "source": "manual:human",
+      "prediction_role": "orientation",
+      "industry_node_ids": [
+        "timber_land"
+      ]
+    },
+    {
+      "ticker": "TRC",
+      "kpi_id": "water_activity_watch",
+      "label": "Water / surface activity watch (human)",
+      "status": "unchecked",
+      "actual": null,
+      "expected": {
+        "op": "gte",
+        "value": 0,
+        "horizon": "human"
+      },
+      "binds_to": {
+        "on_fail": "human_review",
+        "note": "Fill from filings: water revenue, produced-water volumes, or easements"
+      },
+      "last_checked": "2026-07-23",
+      "source": "manual:human",
+      "prediction_role": "reinforcement",
+      "industry_node_ids": [
+        "water_surface"
+      ]
+    },
+    {
+      "ticker": "TSLA",
+      "kpi_id": "robotaxi_horizon_watch",
+      "label": "Robotaxi expert-horizon / city permit watch (human)",
+      "status": "unchecked",
+      "actual": null,
+      "expected": {
+        "op": "gte",
+        "value": 0,
+        "horizon": "human"
+      },
+      "binds_to": {
+        "on_fail": "human_review",
+        "note": "Cross-check expert_horizons/robotaxi.csv and city AV permits"
+      },
+      "last_checked": "2026-07-23",
+      "source": "manual:human",
+      "prediction_role": "orientation",
+      "industry_node_ids": [
+        "robotaxi"
+      ]
+    },
+    {
+      "ticker": "UBER",
+      "kpi_id": "robotaxi_horizon_watch",
+      "label": "Robotaxi expert-horizon / city permit watch (human)",
+      "status": "unchecked",
+      "actual": null,
+      "expected": {
+        "op": "gte",
+        "value": 0,
+        "horizon": "human"
+      },
+      "binds_to": {
+        "on_fail": "human_review",
+        "note": "Cross-check expert_horizons/robotaxi.csv and city AV permits"
+      },
+      "last_checked": "2026-07-23",
+      "source": "manual:human",
+      "prediction_role": "orientation",
+      "industry_node_ids": [
+        "robotaxi"
+      ]
+    },
+    {
+      "ticker": "VTRS",
+      "kpi_id": "loe_patent_watch",
+      "label": "LOE / patent cliff watch (human)",
+      "status": "unchecked",
+      "actual": null,
+      "expected": {
+        "op": "gte",
+        "value": 0,
+        "horizon": "human"
+      },
+      "binds_to": {
+        "on_fail": "human_review",
+        "note": "Fail if material LOE without replacement royalty coverage"
+      },
+      "last_checked": "2026-07-23",
+      "source": "manual:human",
+      "prediction_role": "interference",
+      "industry_node_ids": [
+        "pharma_royalty"
+      ]
+    },
+    {
+      "ticker": "WBI",
+      "kpi_id": "water_activity_watch",
+      "label": "Water / surface activity watch (human)",
+      "status": "unchecked",
+      "actual": null,
+      "expected": {
+        "op": "gte",
+        "value": 0,
+        "horizon": "human"
+      },
+      "binds_to": {
+        "on_fail": "human_review",
+        "note": "Fill from filings: water revenue, produced-water volumes, or easements"
+      },
+      "last_checked": "2026-07-23",
+      "source": "manual:human",
+      "prediction_role": "reinforcement",
+      "industry_node_ids": [
+        "ai_power",
+        "water_surface"
+      ]
+    },
+    {
+      "ticker": "WY",
+      "kpi_id": "timber_housing_watch",
+      "label": "Housing / stumpage cycle watch (human)",
+      "status": "unchecked",
+      "actual": null,
+      "expected": {
+        "op": "gte",
+        "value": 0,
+        "horizon": "human"
+      },
+      "binds_to": {
+        "on_fail": "human_review",
+        "note": "Fill from housing starts / stumpage disclosures when available"
+      },
+      "last_checked": "2026-07-23",
+      "source": "manual:human",
+      "prediction_role": "orientation",
+      "industry_node_ids": [
+        "timber_land"
+      ]
+    }
+  ],
+  "passes": [
+    {
+      "ticker": "0388.HK",
+      "kpi_id": "hsi_20d_realized_vol",
+      "label": "Hang Seng 20-day realized vol (annualized %)",
+      "status": "pass",
+      "actual": 21.0,
+      "expected": {
+        "op": "gte",
+        "value": 8.0,
+        "horizon": "equity_vol_floor"
+      },
+      "binds_to": {
+        "on_fail": "open_diligence",
+        "note": "Home-market realized vol (HK)"
+      },
+      "last_checked": "2026-07-23",
+      "source": "theme:hsi_20d_realized_vol",
+      "prediction_role": "orientation",
+      "industry_node_ids": [
+        "exchange_markets"
+      ]
+    },
+    {
+      "ticker": "0388.HK",
+      "kpi_id": "vix_level_global",
+      "label": "US VIX (global risk context)",
+      "status": "pass",
+      "actual": 19.510000228881836,
+      "expected": {
+        "op": "gte",
+        "value": 12,
+        "horizon": "global_risk"
+      },
+      "binds_to": {
+        "on_fail": "open_diligence",
+        "note": "Secondary global risk overlay - not the home-market croupier pulse"
+      },
+      "last_checked": "2026-07-23",
+      "source": "theme:vix_level",
+      "prediction_role": "orientation",
+      "industry_node_ids": [
+        "exchange_markets"
+      ]
+    },
+    {
+      "ticker": "8697.T",
+      "kpi_id": "n225_20d_realized_vol",
+      "label": "Nikkei 225 20-day realized vol (annualized %)",
+      "status": "pass",
+      "actual": 35.99,
+      "expected": {
+        "op": "gte",
+        "value": 8.0,
+        "horizon": "equity_vol_floor"
+      },
+      "binds_to": {
+        "on_fail": "open_diligence",
+        "note": "Home-market realized vol (JP) - Nikkei 225 realized until official Nikkei VI feed is stable"
+      },
+      "last_checked": "2026-07-23",
+      "source": "theme:n225_20d_realized_vol",
+      "prediction_role": "orientation",
+      "industry_node_ids": [
+        "exchange_markets"
+      ]
+    },
+    {
+      "ticker": "8697.T",
+      "kpi_id": "vix_level_global",
+      "label": "US VIX (global risk context)",
+      "status": "pass",
+      "actual": 19.510000228881836,
+      "expected": {
+        "op": "gte",
+        "value": 12,
+        "horizon": "global_risk"
+      },
+      "binds_to": {
+        "on_fail": "open_diligence",
+        "note": "Secondary global risk overlay - not the home-market croupier pulse"
+      },
+      "last_checked": "2026-07-23",
+      "source": "theme:vix_level",
+      "prediction_role": "orientation",
+      "industry_node_ids": [
+        "exchange_markets"
+      ]
+    },
+    {
+      "ticker": "ABBV",
+      "kpi_id": "price_usd",
+      "label": "Share price (USD)",
+      "status": "pass",
+      "actual": 249.91,
+      "expected": {
+        "op": "gte",
+        "value": 1,
+        "horizon": "listing"
+      },
+      "binds_to": {
+        "on_fail": "human_review",
+        "note": "Price tape; fails if valuation inputs.price missing"
+      },
+      "last_checked": "2026-07-23",
+      "source": "valuation:inputs.price",
+      "prediction_role": "interference",
+      "industry_node_ids": [
+        "pharma_royalty"
+      ]
+    },
+    {
+      "ticker": "ACHR",
+      "kpi_id": "price_usd",
+      "label": "Share price (USD)",
+      "status": "pass",
+      "actual": 5.31,
+      "expected": {
+        "op": "gte",
+        "value": 1,
+        "horizon": "listing"
+      },
+      "binds_to": {
+        "on_fail": "human_review",
+        "note": "Price tape; fails if valuation inputs.price missing"
+      },
+      "last_checked": "2026-07-23",
+      "source": "valuation:inputs.price",
+      "prediction_role": "interference",
+      "industry_node_ids": [
+        "robotaxi"
+      ]
+    },
+    {
+      "ticker": "ADN.TO",
+      "kpi_id": "price_usd",
+      "label": "Share price (USD)",
+      "status": "pass",
+      "actual": 17.35,
+      "expected": {
+        "op": "gte",
+        "value": 1,
+        "horizon": "listing"
+      },
+      "binds_to": {
+        "on_fail": "human_review",
+        "note": "Price tape; fails if valuation inputs.price missing"
+      },
+      "last_checked": "2026-07-23",
+      "source": "valuation:inputs.price",
+      "prediction_role": "interference",
+      "industry_node_ids": [
+        "timber_land"
+      ]
+    },
+    {
+      "ticker": "AES",
+      "kpi_id": "hyperscaler_capex_guide_bn",
+      "label": "Hyperscaler capex guide (USD bn)",
+      "status": "pass",
+      "actual": 320.0,
+      "expected": {
+        "op": "gte",
+        "value": 300,
+        "horizon": "2026"
+      },
+      "binds_to": {
+        "on_fail": "human_review",
+        "note": "Upstream AI demand pulse for industry cluster"
+      },
+      "last_checked": "2026-07-23",
+      "source": "theme:hyperscaler_capex_ttm_usd_bn",
+      "prediction_role": "orientation",
+      "industry_node_ids": [
+        "nuclear_firm_power"
+      ]
+    },
+    {
+      "ticker": "AES",
+      "kpi_id": "henry_hub_gas",
+      "label": "Henry Hub gas (USD/mmbtu)",
+      "status": "pass",
+      "actual": 2.928999900817871,
+      "expected": {
+        "op": "lte",
+        "value": 8,
+        "horizon": "cost_ceiling"
+      },
+      "binds_to": {
+        "on_fail": "human_review",
+        "note": "Power/gas cost interference for hosting and miners"
+      },
+      "last_checked": "2026-07-23",
+      "source": "theme:henry_hub_gas",
+      "prediction_role": "interference",
+      "industry_node_ids": [
+        "nuclear_firm_power"
+      ]
+    },
+    {
+      "ticker": "AMZN",
+      "kpi_id": "hyperscaler_capex_guide_bn",
+      "label": "Hyperscaler capex guide (USD bn)",
+      "status": "pass",
+      "actual": 320.0,
+      "expected": {
+        "op": "gte",
+        "value": 300,
+        "horizon": "2026"
+      },
+      "binds_to": {
+        "on_fail": "human_review",
+        "note": "Upstream AI demand pulse for industry cluster"
+      },
+      "last_checked": "2026-07-23",
+      "source": "theme:hyperscaler_capex_ttm_usd_bn",
+      "prediction_role": "orientation",
+      "industry_node_ids": [
+        "hyperscaler_cloud"
+      ]
+    },
+    {
+      "ticker": "AMZN",
+      "kpi_id": "henry_hub_gas",
+      "label": "Henry Hub gas (USD/mmbtu)",
+      "status": "pass",
+      "actual": 2.928999900817871,
+      "expected": {
+        "op": "lte",
+        "value": 8,
+        "horizon": "cost_ceiling"
+      },
+      "binds_to": {
+        "on_fail": "human_review",
+        "note": "Power/gas cost interference for hosting and miners"
+      },
+      "last_checked": "2026-07-23",
+      "source": "theme:henry_hub_gas",
+      "prediction_role": "interference",
+      "industry_node_ids": [
+        "hyperscaler_cloud"
+      ]
+    },
+    {
+      "ticker": "APLD",
+      "kpi_id": "hyperscaler_capex_guide_bn",
+      "label": "Hyperscaler capex guide (USD bn)",
+      "status": "pass",
+      "actual": 320.0,
+      "expected": {
+        "op": "gte",
+        "value": 300,
+        "horizon": "2026"
+      },
+      "binds_to": {
+        "valuation_path": "context_overlay.themes[0].indicators[0]",
+        "on_fail": "human_review",
+        "note": "Upstream demand for hosting / power offtake"
+      },
+      "last_checked": "2026-07-23",
+      "source": "theme:hyperscaler_capex_ttm_usd_bn",
+      "prediction_role": "orientation",
+      "industry_node_ids": [
+        "agi",
+        "ai_power",
+        "btc_mining_power"
+      ]
+    },
+    {
+      "ticker": "APLD",
+      "kpi_id": "contracted_backlog_m",
+      "label": "Contracted revenue backlog (USD m)",
+      "status": "pass",
+      "actual": 31000.0,
+      "expected": {
+        "op": "gte",
+        "value": 20000,
+        "horizon": "disclosed"
+      },
+      "binds_to": {
+        "valuation_path": "component_valuation.components[1].valuation.calculation_proof.inputs[0]",
+        "on_fail": "human_review",
+        "note": "contracted_expansion backlog_m"
+      },
+      "last_checked": "2026-07-23",
+      "source": "valuation:component_valuation.components[1].valuation.calculation_proof.inputs[0].value",
+      "prediction_role": "reinforcement",
+      "industry_node_ids": [
+        "agi",
+        "ai_power",
+        "btc_mining_power"
+      ]
+    },
+    {
+      "ticker": "APLD",
+      "kpi_id": "uncontracted_mw",
+      "label": "Uncontracted marketed megawatts",
+      "status": "pass",
+      "actual": 500.0,
+      "expected": {
+        "op": "gte",
+        "value": 0,
+        "horizon": "option_floor"
+      },
+      "binds_to": {
+        "valuation_path": "component_valuation.components[2].valuation.calculation_proof.inputs[0]",
+        "on_fail": "human_review",
+        "note": "uncontracted_option option_mw"
+      },
+      "last_checked": "2026-07-23",
+      "source": "valuation:component_valuation.components[2].valuation.calculation_proof.inputs[0].value",
+      "prediction_role": "reinforcement",
+      "industry_node_ids": [
+        "agi",
+        "ai_power",
+        "btc_mining_power"
+      ]
+    },
+    {
+      "ticker": "APLD",
+      "kpi_id": "henry_hub_gas",
+      "label": "Henry Hub natural gas spot (USD/MMBtu)",
+      "status": "pass",
+      "actual": 2.928999900817871,
+      "expected": {
+        "op": "lte",
+        "value": 8,
+        "horizon": "power_cost_ceiling"
+      },
+      "binds_to": {
+        "valuation_path": "context_overlay.themes[0]",
+        "on_fail": "human_review",
+        "note": "Power-cost midstream signal; theme series may be stale offline"
+      },
+      "last_checked": "2026-07-23",
+      "source": "theme:henry_hub_gas",
+      "prediction_role": "interference",
+      "industry_node_ids": [
+        "agi",
+        "ai_power",
+        "btc_mining_power"
+      ]
+    },
+    {
+      "ticker": "ASX.AX",
+      "kpi_id": "vix_level_global",
+      "label": "US VIX (global risk context)",
+      "status": "pass",
+      "actual": 19.510000228881836,
+      "expected": {
+        "op": "gte",
+        "value": 12,
+        "horizon": "global_risk"
+      },
+      "binds_to": {
+        "on_fail": "open_diligence",
+        "note": "Secondary global risk overlay - not the home-market croupier pulse"
+      },
+      "last_checked": "2026-07-23",
+      "source": "theme:vix_level",
+      "prediction_role": "orientation",
+      "industry_node_ids": [
+        "exchange_markets"
+      ]
+    },
+    {
+      "ticker": "AZLCZ",
+      "kpi_id": "hyperscaler_capex_guide_bn",
+      "label": "Hyperscaler capex guide (USD bn)",
+      "status": "pass",
+      "actual": 320.0,
+      "expected": {
+        "op": "gte",
+        "value": 300,
+        "horizon": "2026"
+      },
+      "binds_to": {
+        "on_fail": "human_review",
+        "note": "Upstream AI demand pulse for industry cluster"
+      },
+      "last_checked": "2026-07-23",
+      "source": "theme:hyperscaler_capex_ttm_usd_bn",
+      "prediction_role": "orientation",
+      "industry_node_ids": [
+        "ai_power",
+        "water_surface"
+      ]
+    },
+    {
+      "ticker": "AZLCZ",
+      "kpi_id": "wti_crude_usd",
+      "label": "WTI crude (USD/bbl)",
+      "status": "pass",
+      "actual": 93.16000366210938,
+      "expected": {
+        "op": "gte",
+        "value": 50,
+        "horizon": "cycle_floor"
+      },
+      "binds_to": {
+        "on_fail": "human_review",
+        "note": "Commodity cycle floor for land/royalty activity"
+      },
+      "last_checked": "2026-07-23",
+      "source": "theme:wti_crude",
+      "prediction_role": "orientation",
+      "industry_node_ids": [
+        "ai_power",
+        "water_surface"
+      ]
+    },
+    {
+      "ticker": "AZLCZ",
+      "kpi_id": "henry_hub_gas",
+      "label": "Henry Hub gas (USD/mmbtu)",
+      "status": "pass",
+      "actual": 2.928999900817871,
+      "expected": {
+        "op": "lte",
+        "value": 8,
+        "horizon": "cost_ceiling"
+      },
+      "binds_to": {
+        "on_fail": "human_review",
+        "note": "Power/gas cost interference for hosting and miners"
+      },
+      "last_checked": "2026-07-23",
+      "source": "theme:henry_hub_gas",
+      "prediction_role": "interference",
+      "industry_node_ids": [
+        "ai_power",
+        "water_surface"
+      ]
+    },
+    {
+      "ticker": "BMNR",
+      "kpi_id": "hyperscaler_capex_guide_bn",
+      "label": "Hyperscaler capex guide (USD bn)",
+      "status": "pass",
+      "actual": 320.0,
+      "expected": {
+        "op": "gte",
+        "value": 300,
+        "horizon": "2026"
+      },
+      "binds_to": {
+        "on_fail": "human_review",
+        "note": "Upstream AI demand pulse for industry cluster"
+      },
+      "last_checked": "2026-07-23",
+      "source": "theme:hyperscaler_capex_ttm_usd_bn",
+      "prediction_role": "orientation",
+      "industry_node_ids": [
+        "btc_mining_power"
+      ]
+    },
+    {
+      "ticker": "BMNR",
+      "kpi_id": "henry_hub_gas",
+      "label": "Henry Hub gas (USD/mmbtu)",
+      "status": "pass",
+      "actual": 2.928999900817871,
+      "expected": {
+        "op": "lte",
+        "value": 8,
+        "horizon": "cost_ceiling"
+      },
+      "binds_to": {
+        "on_fail": "human_review",
+        "note": "Power/gas cost interference for hosting and miners"
+      },
+      "last_checked": "2026-07-23",
+      "source": "theme:henry_hub_gas",
+      "prediction_role": "interference",
+      "industry_node_ids": [
+        "btc_mining_power"
+      ]
+    },
+    {
+      "ticker": "BSM",
+      "kpi_id": "wti_crude_usd",
+      "label": "WTI crude (USD/bbl)",
+      "status": "pass",
+      "actual": 93.16000366210938,
+      "expected": {
+        "op": "gte",
+        "value": 50,
+        "horizon": "cycle_floor"
+      },
+      "binds_to": {
+        "on_fail": "human_review",
+        "note": "Commodity cycle floor for land/royalty activity"
+      },
+      "last_checked": "2026-07-23",
+      "source": "theme:wti_crude",
+      "prediction_role": "orientation",
+      "industry_node_ids": [
+        "energy_royalty"
+      ]
+    },
+    {
+      "ticker": "BSM",
+      "kpi_id": "henry_hub_gas",
+      "label": "Henry Hub gas (USD/mmbtu)",
+      "status": "pass",
+      "actual": 2.928999900817871,
+      "expected": {
+        "op": "lte",
+        "value": 8,
+        "horizon": "cost_ceiling"
+      },
+      "binds_to": {
+        "on_fail": "human_review",
+        "note": "Power/gas cost interference for hosting and miners"
+      },
+      "last_checked": "2026-07-23",
+      "source": "theme:henry_hub_gas",
+      "prediction_role": "interference",
+      "industry_node_ids": [
+        "energy_royalty"
+      ]
+    },
+    {
+      "ticker": "BWEL",
+      "kpi_id": "hyperscaler_capex_guide_bn",
+      "label": "Hyperscaler capex guide (USD bn)",
+      "status": "pass",
+      "actual": 320.0,
+      "expected": {
+        "op": "gte",
+        "value": 300,
+        "horizon": "2026"
+      },
+      "binds_to": {
+        "on_fail": "human_review",
+        "note": "Upstream AI demand pulse for industry cluster"
+      },
+      "last_checked": "2026-07-23",
+      "source": "theme:hyperscaler_capex_ttm_usd_bn",
+      "prediction_role": "orientation",
+      "industry_node_ids": [
+        "ai_power",
+        "water_surface"
+      ]
+    },
+    {
+      "ticker": "BWEL",
+      "kpi_id": "wti_crude_usd",
+      "label": "WTI crude (USD/bbl)",
+      "status": "pass",
+      "actual": 93.16000366210938,
+      "expected": {
+        "op": "gte",
+        "value": 50,
+        "horizon": "cycle_floor"
+      },
+      "binds_to": {
+        "on_fail": "human_review",
+        "note": "Commodity cycle floor for land/royalty activity"
+      },
+      "last_checked": "2026-07-23",
+      "source": "theme:wti_crude",
+      "prediction_role": "orientation",
+      "industry_node_ids": [
+        "ai_power",
+        "water_surface"
+      ]
+    },
+    {
+      "ticker": "BWEL",
+      "kpi_id": "henry_hub_gas",
+      "label": "Henry Hub gas (USD/mmbtu)",
+      "status": "pass",
+      "actual": 2.928999900817871,
+      "expected": {
+        "op": "lte",
+        "value": 8,
+        "horizon": "cost_ceiling"
+      },
+      "binds_to": {
+        "on_fail": "human_review",
+        "note": "Power/gas cost interference for hosting and miners"
+      },
+      "last_checked": "2026-07-23",
+      "source": "theme:henry_hub_gas",
+      "prediction_role": "interference",
+      "industry_node_ids": [
+        "ai_power",
+        "water_surface"
+      ]
+    },
+    {
+      "ticker": "CBOE",
+      "kpi_id": "spy_20d_realized_vol",
+      "label": "SPY 20-day realized vol (annualized %)",
+      "status": "pass",
+      "actual": 11.56,
+      "expected": {
+        "op": "gte",
+        "value": 8.0,
+        "horizon": "equity_vol_floor"
+      },
+      "binds_to": {
+        "on_fail": "open_diligence",
+        "note": "Home-market realized vol (US)"
+      },
+      "last_checked": "2026-07-23",
+      "source": "theme:spy_20d_realized_vol",
+      "prediction_role": "orientation",
+      "industry_node_ids": [
+        "exchange_markets"
+      ]
+    },
+    {
+      "ticker": "CBOE",
+      "kpi_id": "vix_level",
+      "label": "VIX index level",
+      "status": "pass",
+      "actual": 19.510000228881836,
+      "expected": {
+        "op": "gte",
+        "value": 12.0,
+        "horizon": "vol_floor_for_croupier"
+      },
+      "binds_to": {
+        "on_fail": "open_diligence",
+        "note": "Home-market implied vol (US)"
+      },
+      "last_checked": "2026-07-23",
+      "source": "theme:vix_level",
+      "prediction_role": "orientation",
+      "industry_node_ids": [
+        "exchange_markets"
+      ]
+    },
+    {
+      "ticker": "CDZI",
+      "kpi_id": "hyperscaler_capex_guide_bn",
+      "label": "Hyperscaler capex guide (USD bn)",
+      "status": "pass",
+      "actual": 320.0,
+      "expected": {
+        "op": "gte",
+        "value": 300,
+        "horizon": "2026"
+      },
+      "binds_to": {
+        "on_fail": "human_review",
+        "note": "Upstream AI demand pulse for industry cluster"
+      },
+      "last_checked": "2026-07-23",
+      "source": "theme:hyperscaler_capex_ttm_usd_bn",
+      "prediction_role": "orientation",
+      "industry_node_ids": [
+        "water_surface"
+      ]
+    },
+    {
+      "ticker": "CDZI",
+      "kpi_id": "wti_crude_usd",
+      "label": "WTI crude (USD/bbl)",
+      "status": "pass",
+      "actual": 93.16000366210938,
+      "expected": {
+        "op": "gte",
+        "value": 50,
+        "horizon": "cycle_floor"
+      },
+      "binds_to": {
+        "on_fail": "human_review",
+        "note": "Commodity cycle floor for land/royalty activity"
+      },
+      "last_checked": "2026-07-23",
+      "source": "theme:wti_crude",
+      "prediction_role": "orientation",
+      "industry_node_ids": [
+        "water_surface"
+      ]
+    },
+    {
+      "ticker": "CEG",
+      "kpi_id": "hyperscaler_capex_guide_bn",
+      "label": "Hyperscaler capex guide (USD bn)",
+      "status": "pass",
+      "actual": 320.0,
+      "expected": {
+        "op": "gte",
+        "value": 300,
+        "horizon": "2026"
+      },
+      "binds_to": {
+        "on_fail": "human_review",
+        "note": "Upstream AI demand pulse for industry cluster"
+      },
+      "last_checked": "2026-07-23",
+      "source": "theme:hyperscaler_capex_ttm_usd_bn",
+      "prediction_role": "orientation",
+      "industry_node_ids": [
+        "nuclear_firm_power"
+      ]
+    },
+    {
+      "ticker": "CEG",
+      "kpi_id": "henry_hub_gas",
+      "label": "Henry Hub gas (USD/mmbtu)",
+      "status": "pass",
+      "actual": 2.928999900817871,
+      "expected": {
+        "op": "lte",
+        "value": 8,
+        "horizon": "cost_ceiling"
+      },
+      "binds_to": {
+        "on_fail": "human_review",
+        "note": "Power/gas cost interference for hosting and miners"
+      },
+      "last_checked": "2026-07-23",
+      "source": "theme:henry_hub_gas",
+      "prediction_role": "interference",
+      "industry_node_ids": [
+        "nuclear_firm_power"
+      ]
+    },
+    {
+      "ticker": "CLSK",
+      "kpi_id": "hyperscaler_capex_guide_bn",
+      "label": "Hyperscaler capex guide (USD bn)",
+      "status": "pass",
+      "actual": 320.0,
+      "expected": {
+        "op": "gte",
+        "value": 300,
+        "horizon": "2026"
+      },
+      "binds_to": {
+        "on_fail": "human_review",
+        "note": "Upstream AI demand pulse for industry cluster"
+      },
+      "last_checked": "2026-07-23",
+      "source": "theme:hyperscaler_capex_ttm_usd_bn",
+      "prediction_role": "orientation",
+      "industry_node_ids": [
+        "btc_mining_power"
+      ]
+    },
+    {
+      "ticker": "CLSK",
+      "kpi_id": "henry_hub_gas",
+      "label": "Henry Hub gas (USD/mmbtu)",
+      "status": "pass",
+      "actual": 2.928999900817871,
+      "expected": {
+        "op": "lte",
+        "value": 8,
+        "horizon": "cost_ceiling"
+      },
+      "binds_to": {
+        "on_fail": "human_review",
+        "note": "Power/gas cost interference for hosting and miners"
+      },
+      "last_checked": "2026-07-23",
+      "source": "theme:henry_hub_gas",
+      "prediction_role": "interference",
+      "industry_node_ids": [
+        "btc_mining_power"
+      ]
+    },
+    {
+      "ticker": "CME",
+      "kpi_id": "spy_20d_realized_vol",
+      "label": "SPY 20-day realized vol (annualized %)",
+      "status": "pass",
+      "actual": 11.56,
+      "expected": {
+        "op": "gte",
+        "value": 8.0,
+        "horizon": "equity_vol_floor"
+      },
+      "binds_to": {
+        "on_fail": "open_diligence",
+        "note": "Home-market realized vol (US)"
+      },
+      "last_checked": "2026-07-23",
+      "source": "theme:spy_20d_realized_vol",
+      "prediction_role": "orientation",
+      "industry_node_ids": [
+        "exchange_markets"
+      ]
+    },
+    {
+      "ticker": "CME",
+      "kpi_id": "vix_level",
+      "label": "VIX index level",
+      "status": "pass",
+      "actual": 19.510000228881836,
+      "expected": {
+        "op": "gte",
+        "value": 12.0,
+        "horizon": "vol_floor_for_croupier"
+      },
+      "binds_to": {
+        "on_fail": "open_diligence",
+        "note": "Home-market implied vol (US)"
+      },
+      "last_checked": "2026-07-23",
+      "source": "theme:vix_level",
+      "prediction_role": "orientation",
+      "industry_node_ids": [
+        "exchange_markets"
+      ]
+    },
+    {
+      "ticker": "CMSG",
+      "kpi_id": "hyperscaler_capex_guide_bn",
+      "label": "Hyperscaler capex guide (USD bn)",
+      "status": "pass",
+      "actual": 320.0,
+      "expected": {
+        "op": "gte",
+        "value": 300,
+        "horizon": "2026"
+      },
+      "binds_to": {
+        "on_fail": "human_review",
+        "note": "Upstream AI demand pulse for industry cluster"
+      },
+      "last_checked": "2026-07-23",
+      "source": "theme:hyperscaler_capex_ttm_usd_bn",
+      "prediction_role": "orientation",
+      "industry_node_ids": [
+        "btc_mining_power"
+      ]
+    },
+    {
+      "ticker": "CMSG",
+      "kpi_id": "henry_hub_gas",
+      "label": "Henry Hub gas (USD/mmbtu)",
+      "status": "pass",
+      "actual": 2.928999900817871,
+      "expected": {
+        "op": "lte",
+        "value": 8,
+        "horizon": "cost_ceiling"
+      },
+      "binds_to": {
+        "on_fail": "human_review",
+        "note": "Power/gas cost interference for hosting and miners"
+      },
+      "last_checked": "2026-07-23",
+      "source": "theme:henry_hub_gas",
+      "prediction_role": "interference",
+      "industry_node_ids": [
+        "btc_mining_power"
+      ]
+    },
+    {
+      "ticker": "DMLP",
+      "kpi_id": "wti_crude_usd",
+      "label": "WTI crude (USD/bbl)",
+      "status": "pass",
+      "actual": 93.16000366210938,
+      "expected": {
+        "op": "gte",
+        "value": 50,
+        "horizon": "cycle_floor"
+      },
+      "binds_to": {
+        "on_fail": "human_review",
+        "note": "Commodity cycle floor for land/royalty activity"
+      },
+      "last_checked": "2026-07-23",
+      "source": "theme:wti_crude",
+      "prediction_role": "orientation",
+      "industry_node_ids": [
+        "energy_royalty"
+      ]
+    },
+    {
+      "ticker": "DMLP",
+      "kpi_id": "henry_hub_gas",
+      "label": "Henry Hub gas (USD/mmbtu)",
+      "status": "pass",
+      "actual": 2.928999900817871,
+      "expected": {
+        "op": "lte",
+        "value": 8,
+        "horizon": "cost_ceiling"
+      },
+      "binds_to": {
+        "on_fail": "human_review",
+        "note": "Power/gas cost interference for hosting and miners"
+      },
+      "last_checked": "2026-07-23",
+      "source": "theme:henry_hub_gas",
+      "prediction_role": "interference",
+      "industry_node_ids": [
+        "energy_royalty"
+      ]
+    },
+    {
+      "ticker": "DNN",
+      "kpi_id": "hyperscaler_capex_guide_bn",
+      "label": "Hyperscaler capex guide (USD bn)",
+      "status": "pass",
+      "actual": 320.0,
+      "expected": {
+        "op": "gte",
+        "value": 300,
+        "horizon": "2026"
+      },
+      "binds_to": {
+        "on_fail": "human_review",
+        "note": "Upstream AI demand pulse for industry cluster"
+      },
+      "last_checked": "2026-07-23",
+      "source": "theme:hyperscaler_capex_ttm_usd_bn",
+      "prediction_role": "orientation",
+      "industry_node_ids": [
+        "nuclear_firm_power"
+      ]
+    },
+    {
+      "ticker": "DNN",
+      "kpi_id": "henry_hub_gas",
+      "label": "Henry Hub gas (USD/mmbtu)",
+      "status": "pass",
+      "actual": 2.928999900817871,
+      "expected": {
+        "op": "lte",
+        "value": 8,
+        "horizon": "cost_ceiling"
+      },
+      "binds_to": {
+        "on_fail": "human_review",
+        "note": "Power/gas cost interference for hosting and miners"
+      },
+      "last_checked": "2026-07-23",
+      "source": "theme:henry_hub_gas",
+      "prediction_role": "interference",
+      "industry_node_ids": [
+        "nuclear_firm_power"
+      ]
+    },
+    {
+      "ticker": "FDS",
+      "kpi_id": "vix_level",
+      "label": "VIX index level",
+      "status": "pass",
+      "actual": 19.510000228881836,
+      "expected": {
+        "op": "gte",
+        "value": 12,
+        "horizon": "vol_floor_for_croupier"
+      },
+      "binds_to": {
+        "on_fail": "human_review",
+        "note": "Vol pulse for exchange / market-data croupiers"
+      },
+      "last_checked": "2026-07-23",
+      "source": "theme:vix_level",
+      "prediction_role": "orientation",
+      "industry_node_ids": [
+        "market_data_indices"
+      ]
+    },
+    {
+      "ticker": "FDS",
+      "kpi_id": "spy_20d_realized_vol",
+      "label": "SPY 20-day realized vol (annualized %)",
+      "status": "pass",
+      "actual": 11.56,
+      "expected": {
+        "op": "gte",
+        "value": 8,
+        "horizon": "equity_vol_floor"
+      },
+      "binds_to": {
+        "on_fail": "human_review",
+        "note": "Equity vol context for fee/transaction intensity"
+      },
+      "last_checked": "2026-07-23",
+      "source": "theme:spy_20d_realized_vol",
+      "prediction_role": "orientation",
+      "industry_node_ids": [
+        "market_data_indices"
+      ]
+    },
+    {
+      "ticker": "FNV",
+      "kpi_id": "gold_spot_proxy",
+      "label": "Gold spot proxy (GLD USD when London fix unavailable)",
+      "status": "pass",
+      "actual": 370.7300109863281,
+      "expected": {
+        "op": "gte",
+        "value": 200,
+        "horizon": "bullion_floor"
+      },
+      "binds_to": {
+        "on_fail": "human_review",
+        "note": "Bullion floor for royalty compounders"
+      },
+      "last_checked": "2026-07-23",
+      "source": "theme:gold_spot_usd",
+      "prediction_role": "orientation",
+      "industry_node_ids": [
+        "gold_royalty"
+      ]
+    },
+    {
+      "ticker": "FNV",
+      "kpi_id": "gdx_gld_ratio",
+      "label": "GDX / GLD ratio (miners vs bullion)",
+      "status": "pass",
+      "actual": 0.2017,
+      "expected": {
+        "op": "gte",
+        "value": 0.1,
+        "horizon": "sentiment_floor"
+      },
+      "binds_to": {
+        "on_fail": "human_review",
+        "note": "Miner vs bullion sentiment for royalty multiples"
+      },
+      "last_checked": "2026-07-23",
+      "source": "theme:gdx_gld_ratio",
+      "prediction_role": "orientation",
+      "industry_node_ids": [
+        "gold_royalty"
+      ]
+    },
+    {
+      "ticker": "GOOGL",
+      "kpi_id": "hyperscaler_capex_guide_bn",
+      "label": "Hyperscaler capex guide (USD bn)",
+      "status": "pass",
+      "actual": 320.0,
+      "expected": {
+        "op": "gte",
+        "value": 300,
+        "horizon": "2026"
+      },
+      "binds_to": {
+        "on_fail": "human_review",
+        "note": "Upstream AI demand pulse for industry cluster"
+      },
+      "last_checked": "2026-07-23",
+      "source": "theme:hyperscaler_capex_ttm_usd_bn",
+      "prediction_role": "orientation",
+      "industry_node_ids": [
+        "hyperscaler_cloud"
+      ]
+    },
+    {
+      "ticker": "GOOGL",
+      "kpi_id": "henry_hub_gas",
+      "label": "Henry Hub gas (USD/mmbtu)",
+      "status": "pass",
+      "actual": 2.928999900817871,
+      "expected": {
+        "op": "lte",
+        "value": 8,
+        "horizon": "cost_ceiling"
+      },
+      "binds_to": {
+        "on_fail": "human_review",
+        "note": "Power/gas cost interference for hosting and miners"
+      },
+      "last_checked": "2026-07-23",
+      "source": "theme:henry_hub_gas",
+      "prediction_role": "interference",
+      "industry_node_ids": [
+        "hyperscaler_cloud"
+      ]
+    },
+    {
+      "ticker": "GYRO",
+      "kpi_id": "hyperscaler_capex_guide_bn",
+      "label": "Hyperscaler capex guide (USD bn)",
+      "status": "pass",
+      "actual": 320.0,
+      "expected": {
+        "op": "gte",
+        "value": 300,
+        "horizon": "2026"
+      },
+      "binds_to": {
+        "on_fail": "human_review",
+        "note": "Upstream AI demand pulse for industry cluster"
+      },
+      "last_checked": "2026-07-23",
+      "source": "theme:hyperscaler_capex_ttm_usd_bn",
+      "prediction_role": "orientation",
+      "industry_node_ids": [
+        "water_surface"
+      ]
+    },
+    {
+      "ticker": "GYRO",
+      "kpi_id": "wti_crude_usd",
+      "label": "WTI crude (USD/bbl)",
+      "status": "pass",
+      "actual": 93.16000366210938,
+      "expected": {
+        "op": "gte",
+        "value": 50,
+        "horizon": "cycle_floor"
+      },
+      "binds_to": {
+        "on_fail": "human_review",
+        "note": "Commodity cycle floor for land/royalty activity"
+      },
+      "last_checked": "2026-07-23",
+      "source": "theme:wti_crude",
+      "prediction_role": "orientation",
+      "industry_node_ids": [
+        "water_surface"
+      ]
+    },
+    {
+      "ticker": "HUT",
+      "kpi_id": "hyperscaler_capex_guide_bn",
+      "label": "Hyperscaler capex guide (USD bn)",
+      "status": "pass",
+      "actual": 320.0,
+      "expected": {
+        "op": "gte",
+        "value": 300,
+        "horizon": "2026"
+      },
+      "binds_to": {
+        "on_fail": "human_review",
+        "note": "Upstream AI demand pulse for industry cluster"
+      },
+      "last_checked": "2026-07-23",
+      "source": "theme:hyperscaler_capex_ttm_usd_bn",
+      "prediction_role": "orientation",
+      "industry_node_ids": [
+        "btc_mining_power"
+      ]
+    },
+    {
+      "ticker": "HUT",
+      "kpi_id": "henry_hub_gas",
+      "label": "Henry Hub gas (USD/mmbtu)",
+      "status": "pass",
+      "actual": 2.928999900817871,
+      "expected": {
+        "op": "lte",
+        "value": 8,
+        "horizon": "cost_ceiling"
+      },
+      "binds_to": {
+        "on_fail": "human_review",
+        "note": "Power/gas cost interference for hosting and miners"
+      },
+      "last_checked": "2026-07-23",
+      "source": "theme:henry_hub_gas",
+      "prediction_role": "interference",
+      "industry_node_ids": [
+        "btc_mining_power"
+      ]
+    },
+    {
+      "ticker": "ICE",
+      "kpi_id": "vix_level",
+      "label": "VIX index level",
+      "status": "pass",
+      "actual": 19.510000228881836,
+      "expected": {
+        "op": "gte",
+        "value": 12,
+        "horizon": "vol_floor_for_croupier"
+      },
+      "binds_to": {
+        "valuation_path": "context_overlay.themes[1].indicators[0]",
+        "on_fail": "human_review",
+        "note": "exchange_volatility VIX pulse for ICE croupier"
+      },
+      "last_checked": "2026-07-23",
+      "source": "theme:vix_level",
+      "prediction_role": "orientation",
+      "industry_node_ids": [
+        "exchange_markets"
+      ]
+    },
+    {
+      "ticker": "ICE",
+      "kpi_id": "spy_20d_realized_vol",
+      "label": "SPY 20-day realized vol (annualized %)",
+      "status": "pass",
+      "actual": 11.56,
+      "expected": {
+        "op": "gte",
+        "value": 8,
+        "horizon": "equity_vol_floor"
+      },
+      "binds_to": {
+        "valuation_path": "context_overlay.themes[1].indicators[1]",
+        "on_fail": "human_review"
+      },
+      "last_checked": "2026-07-23",
+      "source": "theme:spy_20d_realized_vol",
+      "prediction_role": "orientation",
+      "industry_node_ids": [
+        "exchange_markets"
+      ]
+    },
+    {
+      "ticker": "ICE",
+      "kpi_id": "owner_earnings_m",
+      "label": "Normalized owner earnings (USD m)",
+      "status": "pass",
+      "actual": 4289.0,
+      "expected": {
+        "op": "gte",
+        "value": 3000,
+        "horizon": "trailing"
+      },
+      "binds_to": {
+        "valuation_path": "component_valuation_results.additive_components[0].calculation_proof.inputs[0]",
+        "on_fail": "human_review",
+        "note": "operating_business owner_earnings"
+      },
+      "last_checked": "2026-07-23",
+      "source": "valuation:component_valuation_results.additive_components[0].calculation_proof.inputs[0].value",
+      "prediction_role": "reinforcement",
+      "industry_node_ids": [
+        "exchange_markets"
+      ]
+    },
+    {
+      "ticker": "ICE",
+      "kpi_id": "price_usd",
+      "label": "Share price (USD)",
+      "status": "pass",
+      "actual": 141.57,
+      "expected": {
+        "op": "gt",
+        "value": 0,
+        "horizon": "listing"
+      },
+      "binds_to": {
+        "valuation_path": "inputs.price",
+        "on_fail": "stance_only",
+        "note": "Price is context for stance sizing only; not a thesis falsifier"
+      },
+      "last_checked": "2026-07-23",
+      "source": "valuation:inputs.price",
+      "prediction_role": "interference",
+      "industry_node_ids": [
+        "exchange_markets"
+      ]
+    },
+    {
+      "ticker": "IREN",
+      "kpi_id": "hyperscaler_capex_guide_bn",
+      "label": "Hyperscaler capex guide (USD bn)",
+      "status": "pass",
+      "actual": 320.0,
+      "expected": {
+        "op": "gte",
+        "value": 300,
+        "horizon": "2026"
+      },
+      "binds_to": {
+        "on_fail": "human_review",
+        "note": "Upstream AI demand pulse for industry cluster"
+      },
+      "last_checked": "2026-07-23",
+      "source": "theme:hyperscaler_capex_ttm_usd_bn",
+      "prediction_role": "orientation",
+      "industry_node_ids": [
+        "btc_mining_power"
+      ]
+    },
+    {
+      "ticker": "IREN",
+      "kpi_id": "henry_hub_gas",
+      "label": "Henry Hub gas (USD/mmbtu)",
+      "status": "pass",
+      "actual": 2.928999900817871,
+      "expected": {
+        "op": "lte",
+        "value": 8,
+        "horizon": "cost_ceiling"
+      },
+      "binds_to": {
+        "on_fail": "human_review",
+        "note": "Power/gas cost interference for hosting and miners"
+      },
+      "last_checked": "2026-07-23",
+      "source": "theme:henry_hub_gas",
+      "prediction_role": "interference",
+      "industry_node_ids": [
+        "btc_mining_power"
+      ]
+    },
+    {
+      "ticker": "KRP",
+      "kpi_id": "wti_crude_usd",
+      "label": "WTI crude (USD/bbl)",
+      "status": "pass",
+      "actual": 93.16000366210938,
+      "expected": {
+        "op": "gte",
+        "value": 50,
+        "horizon": "cycle_floor"
+      },
+      "binds_to": {
+        "on_fail": "human_review",
+        "note": "Commodity cycle floor for land/royalty activity"
+      },
+      "last_checked": "2026-07-23",
+      "source": "theme:wti_crude",
+      "prediction_role": "orientation",
+      "industry_node_ids": [
+        "energy_royalty"
+      ]
+    },
+    {
+      "ticker": "KRP",
+      "kpi_id": "henry_hub_gas",
+      "label": "Henry Hub gas (USD/mmbtu)",
+      "status": "pass",
+      "actual": 2.928999900817871,
+      "expected": {
+        "op": "lte",
+        "value": 8,
+        "horizon": "cost_ceiling"
+      },
+      "binds_to": {
+        "on_fail": "human_review",
+        "note": "Power/gas cost interference for hosting and miners"
+      },
+      "last_checked": "2026-07-23",
+      "source": "theme:henry_hub_gas",
+      "prediction_role": "interference",
+      "industry_node_ids": [
+        "energy_royalty"
+      ]
+    },
+    {
+      "ticker": "LB",
+      "kpi_id": "hyperscaler_capex_guide_bn",
+      "label": "Hyperscaler capex guide (USD bn)",
+      "status": "pass",
+      "actual": 320.0,
+      "expected": {
+        "op": "gte",
+        "value": 300,
+        "horizon": "2026"
+      },
+      "binds_to": {
+        "valuation_path": "growth_explanation.mechanism",
+        "on_fail": "human_review",
+        "note": "AI/power demand supports surface and easement optionality"
+      },
+      "last_checked": "2026-07-23",
+      "source": "theme:hyperscaler_capex_ttm_usd_bn",
+      "prediction_role": "orientation",
+      "industry_node_ids": [
+        "agi",
+        "ai_power",
+        "water_surface"
+      ]
+    },
+    {
+      "ticker": "LB",
+      "kpi_id": "easements_growth_y1_5",
+      "label": "Easements segment growth years 1-5 (fraction)",
+      "status": "pass",
+      "actual": 0.07,
+      "expected": {
+        "op": "gte",
+        "value": 0.04,
+        "horizon": "base"
+      },
+      "binds_to": {
+        "valuation_path": "segment_build.segments[1].growth_y1_5",
+        "on_fail": "human_review",
+        "note": "easements segment"
+      },
+      "last_checked": "2026-07-23",
+      "source": "valuation:segment_build.segments[1].growth_y1_5",
+      "prediction_role": "reinforcement",
+      "industry_node_ids": [
+        "agi",
+        "ai_power",
+        "water_surface"
+      ]
+    },
+    {
+      "ticker": "LB",
+      "kpi_id": "surface_royalties_growth_y1_5",
+      "label": "Surface royalties growth years 1-5 (fraction)",
+      "status": "pass",
+      "actual": 0.08,
+      "expected": {
+        "op": "gte",
+        "value": 0.04,
+        "horizon": "base"
+      },
+      "binds_to": {
+        "valuation_path": "segment_build.segments[0].growth_y1_5",
+        "on_fail": "human_review"
+      },
+      "last_checked": "2026-07-23",
+      "source": "valuation:segment_build.segments[0].growth_y1_5",
+      "prediction_role": "reinforcement",
+      "industry_node_ids": [
+        "agi",
+        "ai_power",
+        "water_surface"
+      ]
+    },
+    {
+      "ticker": "LB",
+      "kpi_id": "wti_crude_usd",
+      "label": "WTI crude (USD/bbl)",
+      "status": "pass",
+      "actual": 93.16000366210938,
+      "expected": {
+        "op": "gte",
+        "value": 50,
+        "horizon": "cycle_floor"
+      },
+      "binds_to": {
+        "valuation_path": "growth_explanation.theory_implied.y1_5",
+        "on_fail": "human_review",
+        "note": "Delaware Basin activity context for surface fees"
+      },
+      "last_checked": "2026-07-23",
+      "source": "theme:wti_crude",
+      "prediction_role": "orientation",
+      "industry_node_ids": [
+        "agi",
+        "ai_power",
+        "water_surface"
+      ]
+    },
+    {
+      "ticker": "LB",
+      "kpi_id": "theory_growth_y1_5",
+      "label": "Theory-implied growth years 1-5 (fraction)",
+      "status": "pass",
+      "actual": 0.0687,
+      "expected": {
+        "op": "gte",
+        "value": 0.04,
+        "horizon": "theory"
+      },
+      "binds_to": {
+        "valuation_path": "growth_explanation.theory_implied.y1_5",
+        "on_fail": "human_review"
+      },
+      "last_checked": "2026-07-23",
+      "source": "valuation:growth_explanation.theory_implied.y1_5",
+      "prediction_role": "orientation",
+      "industry_node_ids": [
+        "agi",
+        "ai_power",
+        "water_surface"
+      ]
+    },
+    {
+      "ticker": "LLY",
+      "kpi_id": "price_usd",
+      "label": "Share price (USD)",
+      "status": "pass",
+      "actual": 1187.18,
+      "expected": {
+        "op": "gte",
+        "value": 1,
+        "horizon": "listing"
+      },
+      "binds_to": {
+        "on_fail": "human_review",
+        "note": "Price tape; fails if valuation inputs.price missing"
+      },
+      "last_checked": "2026-07-23",
+      "source": "valuation:inputs.price",
+      "prediction_role": "interference",
+      "industry_node_ids": [
+        "pharma_royalty"
+      ]
+    },
+    {
+      "ticker": "MCO",
+      "kpi_id": "vix_level",
+      "label": "VIX index level",
+      "status": "pass",
+      "actual": 19.510000228881836,
+      "expected": {
+        "op": "gte",
+        "value": 12,
+        "horizon": "vol_floor_for_croupier"
+      },
+      "binds_to": {
+        "on_fail": "human_review",
+        "note": "Vol pulse for exchange / market-data croupiers"
+      },
+      "last_checked": "2026-07-23",
+      "source": "theme:vix_level",
+      "prediction_role": "orientation",
+      "industry_node_ids": [
+        "market_data_indices"
+      ]
+    },
+    {
+      "ticker": "MCO",
+      "kpi_id": "spy_20d_realized_vol",
+      "label": "SPY 20-day realized vol (annualized %)",
+      "status": "pass",
+      "actual": 11.56,
+      "expected": {
+        "op": "gte",
+        "value": 8,
+        "horizon": "equity_vol_floor"
+      },
+      "binds_to": {
+        "on_fail": "human_review",
+        "note": "Equity vol context for fee/transaction intensity"
+      },
+      "last_checked": "2026-07-23",
+      "source": "theme:spy_20d_realized_vol",
+      "prediction_role": "orientation",
+      "industry_node_ids": [
+        "market_data_indices"
+      ]
+    },
+    {
+      "ticker": "META",
+      "kpi_id": "hyperscaler_capex_guide_bn",
+      "label": "Hyperscaler capex guide (USD bn)",
+      "status": "pass",
+      "actual": 320.0,
+      "expected": {
+        "op": "gte",
+        "value": 300,
+        "horizon": "2026"
+      },
+      "binds_to": {
+        "on_fail": "human_review",
+        "note": "Upstream AI demand pulse for industry cluster"
+      },
+      "last_checked": "2026-07-23",
+      "source": "theme:hyperscaler_capex_ttm_usd_bn",
+      "prediction_role": "orientation",
+      "industry_node_ids": [
+        "hyperscaler_cloud"
+      ]
+    },
+    {
+      "ticker": "META",
+      "kpi_id": "henry_hub_gas",
+      "label": "Henry Hub gas (USD/mmbtu)",
+      "status": "pass",
+      "actual": 2.928999900817871,
+      "expected": {
+        "op": "lte",
+        "value": 8,
+        "horizon": "cost_ceiling"
+      },
+      "binds_to": {
+        "on_fail": "human_review",
+        "note": "Power/gas cost interference for hosting and miners"
+      },
+      "last_checked": "2026-07-23",
+      "source": "theme:henry_hub_gas",
+      "prediction_role": "interference",
+      "industry_node_ids": [
+        "hyperscaler_cloud"
+      ]
+    },
+    {
+      "ticker": "MSB",
+      "kpi_id": "gold_spot_proxy",
+      "label": "Gold spot proxy (GLD USD) — sleeve pulse",
+      "status": "pass",
+      "actual": 370.7300109863281,
+      "expected": {
+        "op": "gte",
+        "value": 200,
+        "horizon": "sleeve_pulse"
+      },
+      "binds_to": {
+        "valuation_path": "inputs.price",
+        "on_fail": "stance_only",
+        "note": "Sleeve pulse only; MSB economics are iron-ore royalties not gold"
+      },
+      "last_checked": "2026-07-23",
+      "source": "theme:gold_spot_usd",
+      "prediction_role": "orientation",
+      "industry_node_ids": [
+        "gold_royalty"
+      ]
+    },
+    {
+      "ticker": "MSB",
+      "kpi_id": "distribution_per_unit",
+      "label": "FY2026 declared distributions per unit (USD)",
+      "status": "pass",
+      "actual": 1.28,
+      "expected": {
+        "op": "gte",
+        "value": 0.5,
+        "horizon": "FY2026"
+      },
+      "binds_to": {
+        "valuation_path": "component_valuation.components[0].valuation.calculation_proof.inputs[0]",
+        "on_fail": "human_review",
+        "note": "producing_royalty_stream distribution_per_unit"
+      },
+      "last_checked": "2026-07-23",
+      "source": "valuation:component_valuation.components[0].valuation.calculation_proof.inputs[0].value",
+      "prediction_role": "reinforcement",
+      "industry_node_ids": [
+        "gold_royalty"
+      ]
+    },
+    {
+      "ticker": "MSB",
+      "kpi_id": "price_usd",
+      "label": "Unit price (USD)",
+      "status": "pass",
+      "actual": 24.4,
+      "expected": {
+        "op": "gt",
+        "value": 0,
+        "horizon": "listing"
+      },
+      "binds_to": {
+        "valuation_path": "inputs.price",
+        "on_fail": "stance_only"
+      },
+      "last_checked": "2026-07-23",
+      "source": "valuation:inputs.price",
+      "prediction_role": "interference",
+      "industry_node_ids": [
+        "gold_royalty"
+      ]
+    },
+    {
+      "ticker": "MSCI",
+      "kpi_id": "vix_level",
+      "label": "VIX index level",
+      "status": "pass",
+      "actual": 19.510000228881836,
+      "expected": {
+        "op": "gte",
+        "value": 12,
+        "horizon": "vol_floor_for_croupier"
+      },
+      "binds_to": {
+        "on_fail": "human_review",
+        "note": "Vol pulse for exchange / market-data croupiers"
+      },
+      "last_checked": "2026-07-23",
+      "source": "theme:vix_level",
+      "prediction_role": "orientation",
+      "industry_node_ids": [
+        "market_data_indices"
+      ]
+    },
+    {
+      "ticker": "MSCI",
+      "kpi_id": "spy_20d_realized_vol",
+      "label": "SPY 20-day realized vol (annualized %)",
+      "status": "pass",
+      "actual": 11.56,
+      "expected": {
+        "op": "gte",
+        "value": 8,
+        "horizon": "equity_vol_floor"
+      },
+      "binds_to": {
+        "on_fail": "human_review",
+        "note": "Equity vol context for fee/transaction intensity"
+      },
+      "last_checked": "2026-07-23",
+      "source": "theme:spy_20d_realized_vol",
+      "prediction_role": "orientation",
+      "industry_node_ids": [
+        "market_data_indices"
+      ]
+    },
+    {
+      "ticker": "MSFT",
+      "kpi_id": "hyperscaler_capex_guide_bn",
+      "label": "Hyperscaler capex guide (USD bn)",
+      "status": "pass",
+      "actual": 320.0,
+      "expected": {
+        "op": "gte",
+        "value": 300,
+        "horizon": "2026"
+      },
+      "binds_to": {
+        "on_fail": "human_review",
+        "note": "Upstream AI demand pulse for industry cluster"
+      },
+      "last_checked": "2026-07-23",
+      "source": "theme:hyperscaler_capex_ttm_usd_bn",
+      "prediction_role": "orientation",
+      "industry_node_ids": [
+        "hyperscaler_cloud"
+      ]
+    },
+    {
+      "ticker": "MSFT",
+      "kpi_id": "henry_hub_gas",
+      "label": "Henry Hub gas (USD/mmbtu)",
+      "status": "pass",
+      "actual": 2.928999900817871,
+      "expected": {
+        "op": "lte",
+        "value": 8,
+        "horizon": "cost_ceiling"
+      },
+      "binds_to": {
+        "on_fail": "human_review",
+        "note": "Power/gas cost interference for hosting and miners"
+      },
+      "last_checked": "2026-07-23",
+      "source": "theme:henry_hub_gas",
+      "prediction_role": "interference",
+      "industry_node_ids": [
+        "hyperscaler_cloud"
+      ]
+    },
+    {
+      "ticker": "MSTR",
+      "kpi_id": "hyperscaler_capex_guide_bn",
+      "label": "Hyperscaler capex guide (USD bn)",
+      "status": "pass",
+      "actual": 320.0,
+      "expected": {
+        "op": "gte",
+        "value": 300,
+        "horizon": "2026"
+      },
+      "binds_to": {
+        "on_fail": "human_review",
+        "note": "Upstream AI demand pulse for industry cluster"
+      },
+      "last_checked": "2026-07-23",
+      "source": "theme:hyperscaler_capex_ttm_usd_bn",
+      "prediction_role": "orientation",
+      "industry_node_ids": [
+        "btc_mining_power"
+      ]
+    },
+    {
+      "ticker": "MSTR",
+      "kpi_id": "henry_hub_gas",
+      "label": "Henry Hub gas (USD/mmbtu)",
+      "status": "pass",
+      "actual": 2.928999900817871,
+      "expected": {
+        "op": "lte",
+        "value": 8,
+        "horizon": "cost_ceiling"
+      },
+      "binds_to": {
+        "on_fail": "human_review",
+        "note": "Power/gas cost interference for hosting and miners"
+      },
+      "last_checked": "2026-07-23",
+      "source": "theme:henry_hub_gas",
+      "prediction_role": "interference",
+      "industry_node_ids": [
+        "btc_mining_power"
+      ]
+    },
+    {
+      "ticker": "NRP",
+      "kpi_id": "wti_crude_usd",
+      "label": "WTI crude (USD/bbl)",
+      "status": "pass",
+      "actual": 93.16000366210938,
+      "expected": {
+        "op": "gte",
+        "value": 50,
+        "horizon": "cycle_floor"
+      },
+      "binds_to": {
+        "on_fail": "human_review",
+        "note": "Commodity cycle floor for land/royalty activity"
+      },
+      "last_checked": "2026-07-23",
+      "source": "theme:wti_crude",
+      "prediction_role": "orientation",
+      "industry_node_ids": [
+        "energy_royalty"
+      ]
+    },
+    {
+      "ticker": "NRP",
+      "kpi_id": "henry_hub_gas",
+      "label": "Henry Hub gas (USD/mmbtu)",
+      "status": "pass",
+      "actual": 2.928999900817871,
+      "expected": {
+        "op": "lte",
+        "value": 8,
+        "horizon": "cost_ceiling"
+      },
+      "binds_to": {
+        "on_fail": "human_review",
+        "note": "Power/gas cost interference for hosting and miners"
+      },
+      "last_checked": "2026-07-23",
+      "source": "theme:henry_hub_gas",
+      "prediction_role": "interference",
+      "industry_node_ids": [
+        "energy_royalty"
+      ]
+    },
+    {
+      "ticker": "OR",
+      "kpi_id": "gold_spot_proxy",
+      "label": "Gold spot proxy (GLD USD when London fix unavailable)",
+      "status": "pass",
+      "actual": 370.7300109863281,
+      "expected": {
+        "op": "gte",
+        "value": 200,
+        "horizon": "bullion_floor"
+      },
+      "binds_to": {
+        "on_fail": "human_review",
+        "note": "Bullion floor for royalty compounders"
+      },
+      "last_checked": "2026-07-23",
+      "source": "theme:gold_spot_usd",
+      "prediction_role": "orientation",
+      "industry_node_ids": [
+        "gold_royalty"
+      ]
+    },
+    {
+      "ticker": "OR",
+      "kpi_id": "gdx_gld_ratio",
+      "label": "GDX / GLD ratio (miners vs bullion)",
+      "status": "pass",
+      "actual": 0.2017,
+      "expected": {
+        "op": "gte",
+        "value": 0.1,
+        "horizon": "sentiment_floor"
+      },
+      "binds_to": {
+        "on_fail": "human_review",
+        "note": "Miner vs bullion sentiment for royalty multiples"
+      },
+      "last_checked": "2026-07-23",
+      "source": "theme:gdx_gld_ratio",
+      "prediction_role": "orientation",
+      "industry_node_ids": [
+        "gold_royalty"
+      ]
+    },
+    {
+      "ticker": "OTCM",
+      "kpi_id": "spy_20d_realized_vol",
+      "label": "SPY 20-day realized vol (annualized %)",
+      "status": "pass",
+      "actual": 11.56,
+      "expected": {
+        "op": "gte",
+        "value": 8.0,
+        "horizon": "equity_vol_floor"
+      },
+      "binds_to": {
+        "on_fail": "open_diligence",
+        "note": "Home-market realized vol (US)"
+      },
+      "last_checked": "2026-07-23",
+      "source": "theme:spy_20d_realized_vol",
+      "prediction_role": "orientation",
+      "industry_node_ids": [
+        "exchange_markets",
+        "market_data_indices"
+      ]
+    },
+    {
+      "ticker": "OTCM",
+      "kpi_id": "vix_level",
+      "label": "VIX index level",
+      "status": "pass",
+      "actual": 19.510000228881836,
+      "expected": {
+        "op": "gte",
+        "value": 12.0,
+        "horizon": "vol_floor_for_croupier"
+      },
+      "binds_to": {
+        "on_fail": "open_diligence",
+        "note": "Home-market implied vol (US)"
+      },
+      "last_checked": "2026-07-23",
+      "source": "theme:vix_level",
+      "prediction_role": "orientation",
+      "industry_node_ids": [
+        "exchange_markets",
+        "market_data_indices"
+      ]
+    },
+    {
+      "ticker": "PBT",
+      "kpi_id": "wti_crude_usd",
+      "label": "WTI crude (USD/bbl)",
+      "status": "pass",
+      "actual": 93.16000366210938,
+      "expected": {
+        "op": "gte",
+        "value": 50,
+        "horizon": "cycle_floor"
+      },
+      "binds_to": {
+        "on_fail": "human_review",
+        "note": "Commodity cycle floor for land/royalty activity"
+      },
+      "last_checked": "2026-07-23",
+      "source": "theme:wti_crude",
+      "prediction_role": "orientation",
+      "industry_node_ids": [
+        "energy_royalty"
+      ]
+    },
+    {
+      "ticker": "PBT",
+      "kpi_id": "henry_hub_gas",
+      "label": "Henry Hub gas (USD/mmbtu)",
+      "status": "pass",
+      "actual": 2.928999900817871,
+      "expected": {
+        "op": "lte",
+        "value": 8,
+        "horizon": "cost_ceiling"
+      },
+      "binds_to": {
+        "on_fail": "human_review",
+        "note": "Power/gas cost interference for hosting and miners"
+      },
+      "last_checked": "2026-07-23",
+      "source": "theme:henry_hub_gas",
+      "prediction_role": "interference",
+      "industry_node_ids": [
+        "energy_royalty"
+      ]
+    },
+    {
+      "ticker": "PCH",
+      "kpi_id": "price_usd",
+      "label": "Share price (USD)",
+      "status": "pass",
+      "actual": 39.25,
+      "expected": {
+        "op": "gte",
+        "value": 1,
+        "horizon": "listing"
+      },
+      "binds_to": {
+        "on_fail": "human_review",
+        "note": "Price tape; fails if valuation inputs.price missing"
+      },
+      "last_checked": "2026-07-23",
+      "source": "valuation:inputs.price",
+      "prediction_role": "interference",
+      "industry_node_ids": [
+        "timber_land"
+      ]
+    },
+    {
+      "ticker": "PSK.TO",
+      "kpi_id": "wti_crude_usd",
+      "label": "WTI crude (USD/bbl)",
+      "status": "pass",
+      "actual": 93.16000366210938,
+      "expected": {
+        "op": "gte",
+        "value": 50,
+        "horizon": "cycle_floor"
+      },
+      "binds_to": {
+        "on_fail": "human_review",
+        "note": "Commodity cycle floor for land/royalty activity"
+      },
+      "last_checked": "2026-07-23",
+      "source": "theme:wti_crude",
+      "prediction_role": "orientation",
+      "industry_node_ids": [
+        "energy_royalty"
+      ]
+    },
+    {
+      "ticker": "PSK.TO",
+      "kpi_id": "henry_hub_gas",
+      "label": "Henry Hub gas (USD/mmbtu)",
+      "status": "pass",
+      "actual": 2.928999900817871,
+      "expected": {
+        "op": "lte",
+        "value": 8,
+        "horizon": "cost_ceiling"
+      },
+      "binds_to": {
+        "on_fail": "human_review",
+        "note": "Power/gas cost interference for hosting and miners"
+      },
+      "last_checked": "2026-07-23",
+      "source": "theme:henry_hub_gas",
+      "prediction_role": "interference",
+      "industry_node_ids": [
+        "energy_royalty"
+      ]
+    },
+    {
+      "ticker": "RGLD",
+      "kpi_id": "gold_spot_proxy",
+      "label": "Gold spot proxy (GLD USD when London fix unavailable)",
+      "status": "pass",
+      "actual": 370.7300109863281,
+      "expected": {
+        "op": "gte",
+        "value": 200,
+        "horizon": "bullion_floor"
+      },
+      "binds_to": {
+        "valuation_path": "context_overlay.themes[1].indicators[0]",
+        "on_fail": "human_review",
+        "note": "gold_royalties theme gold_spot_usd (GLD proxy)"
+      },
+      "last_checked": "2026-07-23",
+      "source": "theme:gold_spot_usd",
+      "prediction_role": "orientation",
+      "industry_node_ids": [
+        "gold_royalty"
+      ]
+    },
+    {
+      "ticker": "RGLD",
+      "kpi_id": "gdx_gld_ratio",
+      "label": "GDX / GLD ratio (miners vs bullion)",
+      "status": "pass",
+      "actual": 0.2017,
+      "expected": {
+        "op": "gte",
+        "value": 0.1,
+        "horizon": "sentiment_floor"
+      },
+      "binds_to": {
+        "valuation_path": "growth_explanation.mechanism",
+        "on_fail": "human_review",
+        "note": "Royalty multiple sentiment context"
+      },
+      "last_checked": "2026-07-23",
+      "source": "theme:gdx_gld_ratio",
+      "prediction_role": "orientation",
+      "industry_node_ids": [
+        "gold_royalty"
+      ]
+    },
+    {
+      "ticker": "RGLD",
+      "kpi_id": "fcf_per_share",
+      "label": "Owner cash / free cash flow per share (USD)",
+      "status": "pass",
+      "actual": 9.0,
+      "expected": {
+        "op": "gte",
+        "value": 6,
+        "horizon": "run_rate"
+      },
+      "binds_to": {
+        "valuation_path": "inputs.fcf_per_share",
+        "on_fail": "human_review"
+      },
+      "last_checked": "2026-07-23",
+      "source": "valuation:inputs.fcf_per_share",
+      "prediction_role": "reinforcement",
+      "industry_node_ids": [
+        "gold_royalty"
+      ]
+    },
+    {
+      "ticker": "RGLD",
+      "kpi_id": "growth_y1_5",
+      "label": "Base growth years 1-5 (fraction)",
+      "status": "pass",
+      "actual": 0.04,
+      "expected": {
+        "op": "gte",
+        "value": 0.02,
+        "horizon": "base"
+      },
+      "binds_to": {
+        "valuation_path": "scenarios.base.growth_y1_5",
+        "on_fail": "human_review"
+      },
+      "last_checked": "2026-07-23",
+      "source": "valuation:scenarios.base.growth_y1_5",
+      "prediction_role": "orientation",
+      "industry_node_ids": [
+        "gold_royalty"
+      ]
+    },
+    {
+      "ticker": "RPRX",
+      "kpi_id": "price_usd",
+      "label": "Share price (USD)",
+      "status": "pass",
+      "actual": 54.97,
+      "expected": {
+        "op": "gte",
+        "value": 1,
+        "horizon": "listing"
+      },
+      "binds_to": {
+        "on_fail": "human_review",
+        "note": "Price tape; fails if valuation inputs.price missing"
+      },
+      "last_checked": "2026-07-23",
+      "source": "valuation:inputs.price",
+      "prediction_role": "interference",
+      "industry_node_ids": [
+        "pharma_royalty"
+      ]
+    },
+    {
+      "ticker": "RYN",
+      "kpi_id": "price_usd",
+      "label": "Share price (USD)",
+      "status": "pass",
+      "actual": 19.82,
+      "expected": {
+        "op": "gte",
+        "value": 1,
+        "horizon": "listing"
+      },
+      "binds_to": {
+        "on_fail": "human_review",
+        "note": "Price tape; fails if valuation inputs.price missing"
+      },
+      "last_checked": "2026-07-23",
+      "source": "valuation:inputs.price",
+      "prediction_role": "interference",
+      "industry_node_ids": [
+        "timber_land"
+      ]
+    },
+    {
+      "ticker": "SBR",
+      "kpi_id": "wti_crude_usd",
+      "label": "WTI crude (USD/bbl)",
+      "status": "pass",
+      "actual": 93.16000366210938,
+      "expected": {
+        "op": "gte",
+        "value": 50,
+        "horizon": "cycle_floor"
+      },
+      "binds_to": {
+        "on_fail": "human_review",
+        "note": "Commodity cycle floor for land/royalty activity"
+      },
+      "last_checked": "2026-07-23",
+      "source": "theme:wti_crude",
+      "prediction_role": "orientation",
+      "industry_node_ids": [
+        "energy_royalty"
+      ]
+    },
+    {
+      "ticker": "SBR",
+      "kpi_id": "henry_hub_gas",
+      "label": "Henry Hub gas (USD/mmbtu)",
+      "status": "pass",
+      "actual": 2.928999900817871,
+      "expected": {
+        "op": "lte",
+        "value": 8,
+        "horizon": "cost_ceiling"
+      },
+      "binds_to": {
+        "on_fail": "human_review",
+        "note": "Power/gas cost interference for hosting and miners"
+      },
+      "last_checked": "2026-07-23",
+      "source": "theme:henry_hub_gas",
+      "prediction_role": "interference",
+      "industry_node_ids": [
+        "energy_royalty"
+      ]
+    },
+    {
+      "ticker": "SJT",
+      "kpi_id": "wti_crude_usd",
+      "label": "WTI crude (USD/bbl)",
+      "status": "pass",
+      "actual": 93.16000366210938,
+      "expected": {
+        "op": "gte",
+        "value": 50,
+        "horizon": "cycle_floor"
+      },
+      "binds_to": {
+        "on_fail": "human_review",
+        "note": "Commodity cycle floor for land/royalty activity"
+      },
+      "last_checked": "2026-07-23",
+      "source": "theme:wti_crude",
+      "prediction_role": "orientation",
+      "industry_node_ids": [
+        "energy_royalty"
+      ]
+    },
+    {
+      "ticker": "SJT",
+      "kpi_id": "henry_hub_gas",
+      "label": "Henry Hub gas (USD/mmbtu)",
+      "status": "pass",
+      "actual": 2.928999900817871,
+      "expected": {
+        "op": "lte",
+        "value": 8,
+        "horizon": "cost_ceiling"
+      },
+      "binds_to": {
+        "on_fail": "human_review",
+        "note": "Power/gas cost interference for hosting and miners"
+      },
+      "last_checked": "2026-07-23",
+      "source": "theme:henry_hub_gas",
+      "prediction_role": "interference",
+      "industry_node_ids": [
+        "energy_royalty"
+      ]
+    },
+    {
+      "ticker": "SMR",
+      "kpi_id": "hyperscaler_capex_guide_bn",
+      "label": "Hyperscaler capex guide (USD bn)",
+      "status": "pass",
+      "actual": 320.0,
+      "expected": {
+        "op": "gte",
+        "value": 300,
+        "horizon": "2026"
+      },
+      "binds_to": {
+        "on_fail": "human_review",
+        "note": "Upstream AI demand pulse for industry cluster"
+      },
+      "last_checked": "2026-07-23",
+      "source": "theme:hyperscaler_capex_ttm_usd_bn",
+      "prediction_role": "orientation",
+      "industry_node_ids": [
+        "nuclear_firm_power"
+      ]
+    },
+    {
+      "ticker": "SMR",
+      "kpi_id": "henry_hub_gas",
+      "label": "Henry Hub gas (USD/mmbtu)",
+      "status": "pass",
+      "actual": 2.928999900817871,
+      "expected": {
+        "op": "lte",
+        "value": 8,
+        "horizon": "cost_ceiling"
+      },
+      "binds_to": {
+        "on_fail": "human_review",
+        "note": "Power/gas cost interference for hosting and miners"
+      },
+      "last_checked": "2026-07-23",
+      "source": "theme:henry_hub_gas",
+      "prediction_role": "interference",
+      "industry_node_ids": [
+        "nuclear_firm_power"
+      ]
+    },
+    {
+      "ticker": "SPGI",
+      "kpi_id": "vix_level",
+      "label": "VIX index level",
+      "status": "pass",
+      "actual": 19.510000228881836,
+      "expected": {
+        "op": "gte",
+        "value": 12,
+        "horizon": "vol_floor_for_croupier"
+      },
+      "binds_to": {
+        "on_fail": "human_review",
+        "note": "Vol pulse for exchange / market-data croupiers"
+      },
+      "last_checked": "2026-07-23",
+      "source": "theme:vix_level",
+      "prediction_role": "orientation",
+      "industry_node_ids": [
+        "market_data_indices"
+      ]
+    },
+    {
+      "ticker": "SPGI",
+      "kpi_id": "spy_20d_realized_vol",
+      "label": "SPY 20-day realized vol (annualized %)",
+      "status": "pass",
+      "actual": 11.56,
+      "expected": {
+        "op": "gte",
+        "value": 8,
+        "horizon": "equity_vol_floor"
+      },
+      "binds_to": {
+        "on_fail": "human_review",
+        "note": "Equity vol context for fee/transaction intensity"
+      },
+      "last_checked": "2026-07-23",
+      "source": "theme:spy_20d_realized_vol",
+      "prediction_role": "orientation",
+      "industry_node_ids": [
+        "market_data_indices"
+      ]
+    },
+    {
+      "ticker": "TFPM",
+      "kpi_id": "gold_spot_proxy",
+      "label": "Gold spot proxy (GLD USD when London fix unavailable)",
+      "status": "pass",
+      "actual": 370.7300109863281,
+      "expected": {
+        "op": "gte",
+        "value": 200,
+        "horizon": "bullion_floor"
+      },
+      "binds_to": {
+        "on_fail": "human_review",
+        "note": "Bullion floor for royalty compounders"
+      },
+      "last_checked": "2026-07-23",
+      "source": "theme:gold_spot_usd",
+      "prediction_role": "orientation",
+      "industry_node_ids": [
+        "gold_royalty"
+      ]
+    },
+    {
+      "ticker": "TFPM",
+      "kpi_id": "gdx_gld_ratio",
+      "label": "GDX / GLD ratio (miners vs bullion)",
+      "status": "pass",
+      "actual": 0.2017,
+      "expected": {
+        "op": "gte",
+        "value": 0.1,
+        "horizon": "sentiment_floor"
+      },
+      "binds_to": {
+        "on_fail": "human_review",
+        "note": "Miner vs bullion sentiment for royalty multiples"
+      },
+      "last_checked": "2026-07-23",
+      "source": "theme:gdx_gld_ratio",
+      "prediction_role": "orientation",
+      "industry_node_ids": [
+        "gold_royalty"
+      ]
+    },
+    {
+      "ticker": "TPL",
+      "kpi_id": "hyperscaler_capex_guide_bn",
+      "label": "Hyperscaler capex guide (USD bn)",
+      "status": "pass",
+      "actual": 320.0,
+      "expected": {
+        "op": "gte",
+        "value": 300,
+        "horizon": "2026"
+      },
+      "binds_to": {
+        "valuation_path": "growth_explanation.falsifiers[0]",
+        "on_fail": "human_review",
+        "note": "Upstream AI demand pulse for Permian land/water optionality"
+      },
+      "last_checked": "2026-07-23",
+      "source": "theme:hyperscaler_capex_ttm_usd_bn",
+      "prediction_role": "orientation",
+      "industry_node_ids": [
+        "agi",
+        "ai_power",
+        "water_surface"
+      ]
+    },
+    {
+      "ticker": "TPL",
+      "kpi_id": "water_revenue_m",
+      "label": "TPL water segment revenue (USD m, FY)",
+      "status": "pass",
+      "actual": 307.5,
+      "expected": {
+        "op": "gte",
+        "value": 300,
+        "horizon": "FY2025"
+      },
+      "binds_to": {
+        "valuation_path": "growth_explanation.falsifiers[1]",
+        "on_fail": "human_review",
+        "note": "Water uplift falsifier; FY2026 risky prediction targets >$330M"
+      },
+      "last_checked": "2026-07-23",
+      "source": "theme:tpl_water_revenue_m",
+      "prediction_role": "reinforcement",
+      "industry_node_ids": [
+        "agi",
+        "ai_power",
+        "water_surface"
+      ]
+    },
+    {
+      "ticker": "TPL",
+      "kpi_id": "consolidated_growth_y1_5",
+      "label": "Consolidated growth years 1-5 (fraction)",
+      "status": "pass",
+      "actual": 0.05,
+      "expected": {
+        "op": "gte",
+        "value": 0.03,
+        "horizon": "base"
+      },
+      "binds_to": {
+        "valuation_path": "growth_explanation.consolidated_growth.y1_5",
+        "on_fail": "human_review"
+      },
+      "last_checked": "2026-07-23",
+      "source": "valuation:growth_explanation.consolidated_growth.y1_5",
+      "prediction_role": "interference",
+      "industry_node_ids": [
+        "agi",
+        "ai_power",
+        "water_surface"
+      ]
+    },
+    {
+      "ticker": "TPL",
+      "kpi_id": "wti_crude_usd",
+      "label": "WTI crude (USD/bbl)",
+      "status": "pass",
+      "actual": 93.16000366210938,
+      "expected": {
+        "op": "gte",
+        "value": 50,
+        "horizon": "cycle_floor"
+      },
+      "binds_to": {
+        "valuation_path": "growth_explanation.mechanisms[0]",
+        "on_fail": "human_review",
+        "note": "Permian royalty toll activity context"
+      },
+      "last_checked": "2026-07-23",
+      "source": "theme:wti_crude",
+      "prediction_role": "orientation",
+      "industry_node_ids": [
+        "agi",
+        "ai_power",
+        "water_surface"
+      ]
+    },
+    {
+      "ticker": "TPL",
+      "kpi_id": "trailing_owner_cash_m",
+      "label": "Trailing owner cash / FCF (USD m, FY2025)",
+      "status": "pass",
+      "actual": 484.5,
+      "expected": {
+        "op": "gte",
+        "value": 450,
+        "horizon": "FY2025"
+      },
+      "binds_to": {
+        "valuation_path": "growth_explanation.falsifiers[2]",
+        "on_fail": "human_review",
+        "note": "FY2025 FCF $484.5M from inputs.fcf_source. FY2026 OCF <$550M falsifier still applies when next 10-K lands."
+      },
+      "last_checked": "2026-07-23",
+      "source": "manual:fy2025_fcf",
+      "prediction_role": "interference",
+      "industry_node_ids": [
+        "agi",
+        "ai_power",
+        "water_surface"
+      ]
+    },
+    {
+      "ticker": "TRC",
+      "kpi_id": "hyperscaler_capex_guide_bn",
+      "label": "Hyperscaler capex guide (USD bn)",
+      "status": "pass",
+      "actual": 320.0,
+      "expected": {
+        "op": "gte",
+        "value": 300,
+        "horizon": "2026"
+      },
+      "binds_to": {
+        "on_fail": "human_review",
+        "note": "Upstream AI demand pulse for industry cluster"
+      },
+      "last_checked": "2026-07-23",
+      "source": "theme:hyperscaler_capex_ttm_usd_bn",
+      "prediction_role": "orientation",
+      "industry_node_ids": [
+        "water_surface"
+      ]
+    },
+    {
+      "ticker": "TRC",
+      "kpi_id": "wti_crude_usd",
+      "label": "WTI crude (USD/bbl)",
+      "status": "pass",
+      "actual": 93.16000366210938,
+      "expected": {
+        "op": "gte",
+        "value": 50,
+        "horizon": "cycle_floor"
+      },
+      "binds_to": {
+        "on_fail": "human_review",
+        "note": "Commodity cycle floor for land/royalty activity"
+      },
+      "last_checked": "2026-07-23",
+      "source": "theme:wti_crude",
+      "prediction_role": "orientation",
+      "industry_node_ids": [
+        "water_surface"
+      ]
+    },
+    {
+      "ticker": "TSLA",
+      "kpi_id": "price_usd",
+      "label": "Share price (USD)",
+      "status": "pass",
+      "actual": 391.0,
+      "expected": {
+        "op": "gte",
+        "value": 1,
+        "horizon": "listing"
+      },
+      "binds_to": {
+        "on_fail": "human_review",
+        "note": "Price tape; fails if valuation inputs.price missing"
+      },
+      "last_checked": "2026-07-23",
+      "source": "valuation:inputs.price",
+      "prediction_role": "interference",
+      "industry_node_ids": [
+        "robotaxi"
+      ]
+    },
+    {
+      "ticker": "UBER",
+      "kpi_id": "price_usd",
+      "label": "Share price (USD)",
+      "status": "pass",
+      "actual": 72.17,
+      "expected": {
+        "op": "gte",
+        "value": 1,
+        "horizon": "listing"
+      },
+      "binds_to": {
+        "on_fail": "human_review",
+        "note": "Price tape; fails if valuation inputs.price missing"
+      },
+      "last_checked": "2026-07-23",
+      "source": "valuation:inputs.price",
+      "prediction_role": "interference",
+      "industry_node_ids": [
+        "robotaxi"
+      ]
+    },
+    {
+      "ticker": "VST",
+      "kpi_id": "hyperscaler_capex_guide_bn",
+      "label": "Hyperscaler capex guide (USD bn)",
+      "status": "pass",
+      "actual": 320.0,
+      "expected": {
+        "op": "gte",
+        "value": 300,
+        "horizon": "2026"
+      },
+      "binds_to": {
+        "on_fail": "human_review",
+        "note": "Upstream AI demand pulse for industry cluster"
+      },
+      "last_checked": "2026-07-23",
+      "source": "theme:hyperscaler_capex_ttm_usd_bn",
+      "prediction_role": "orientation",
+      "industry_node_ids": [
+        "nuclear_firm_power"
+      ]
+    },
+    {
+      "ticker": "VST",
+      "kpi_id": "henry_hub_gas",
+      "label": "Henry Hub gas (USD/mmbtu)",
+      "status": "pass",
+      "actual": 2.928999900817871,
+      "expected": {
+        "op": "lte",
+        "value": 8,
+        "horizon": "cost_ceiling"
+      },
+      "binds_to": {
+        "on_fail": "human_review",
+        "note": "Power/gas cost interference for hosting and miners"
+      },
+      "last_checked": "2026-07-23",
+      "source": "theme:henry_hub_gas",
+      "prediction_role": "interference",
+      "industry_node_ids": [
+        "nuclear_firm_power"
+      ]
+    },
+    {
+      "ticker": "VTRS",
+      "kpi_id": "price_usd",
+      "label": "Share price (USD)",
+      "status": "pass",
+      "actual": 15.69,
+      "expected": {
+        "op": "gte",
+        "value": 1,
+        "horizon": "listing"
+      },
+      "binds_to": {
+        "on_fail": "human_review",
+        "note": "Price tape; fails if valuation inputs.price missing"
+      },
+      "last_checked": "2026-07-23",
+      "source": "valuation:inputs.price",
+      "prediction_role": "interference",
+      "industry_node_ids": [
+        "pharma_royalty"
+      ]
+    },
+    {
+      "ticker": "WBI",
+      "kpi_id": "hyperscaler_capex_guide_bn",
+      "label": "Hyperscaler capex guide (USD bn)",
+      "status": "pass",
+      "actual": 320.0,
+      "expected": {
+        "op": "gte",
+        "value": 300,
+        "horizon": "2026"
+      },
+      "binds_to": {
+        "on_fail": "human_review",
+        "note": "Upstream AI demand pulse for industry cluster"
+      },
+      "last_checked": "2026-07-23",
+      "source": "theme:hyperscaler_capex_ttm_usd_bn",
+      "prediction_role": "orientation",
+      "industry_node_ids": [
+        "ai_power",
+        "water_surface"
+      ]
+    },
+    {
+      "ticker": "WBI",
+      "kpi_id": "wti_crude_usd",
+      "label": "WTI crude (USD/bbl)",
+      "status": "pass",
+      "actual": 93.16000366210938,
+      "expected": {
+        "op": "gte",
+        "value": 50,
+        "horizon": "cycle_floor"
+      },
+      "binds_to": {
+        "on_fail": "human_review",
+        "note": "Commodity cycle floor for land/royalty activity"
+      },
+      "last_checked": "2026-07-23",
+      "source": "theme:wti_crude",
+      "prediction_role": "orientation",
+      "industry_node_ids": [
+        "ai_power",
+        "water_surface"
+      ]
+    },
+    {
+      "ticker": "WBI",
+      "kpi_id": "henry_hub_gas",
+      "label": "Henry Hub gas (USD/mmbtu)",
+      "status": "pass",
+      "actual": 2.928999900817871,
+      "expected": {
+        "op": "lte",
+        "value": 8,
+        "horizon": "cost_ceiling"
+      },
+      "binds_to": {
+        "on_fail": "human_review",
+        "note": "Power/gas cost interference for hosting and miners"
+      },
+      "last_checked": "2026-07-23",
+      "source": "theme:henry_hub_gas",
+      "prediction_role": "interference",
+      "industry_node_ids": [
+        "ai_power",
+        "water_surface"
+      ]
+    },
+    {
+      "ticker": "WPM",
+      "kpi_id": "gold_spot_proxy",
+      "label": "Gold spot proxy (GLD USD when London fix unavailable)",
+      "status": "pass",
+      "actual": 370.7300109863281,
+      "expected": {
+        "op": "gte",
+        "value": 200,
+        "horizon": "bullion_floor"
+      },
+      "binds_to": {
+        "on_fail": "human_review",
+        "note": "Bullion floor for royalty compounders"
+      },
+      "last_checked": "2026-07-23",
+      "source": "theme:gold_spot_usd",
+      "prediction_role": "orientation",
+      "industry_node_ids": [
+        "gold_royalty"
+      ]
+    },
+    {
+      "ticker": "WPM",
+      "kpi_id": "gdx_gld_ratio",
+      "label": "GDX / GLD ratio (miners vs bullion)",
+      "status": "pass",
+      "actual": 0.2017,
+      "expected": {
+        "op": "gte",
+        "value": 0.1,
+        "horizon": "sentiment_floor"
+      },
+      "binds_to": {
+        "on_fail": "human_review",
+        "note": "Miner vs bullion sentiment for royalty multiples"
+      },
+      "last_checked": "2026-07-23",
+      "source": "theme:gdx_gld_ratio",
+      "prediction_role": "orientation",
+      "industry_node_ids": [
+        "gold_royalty"
+      ]
+    },
+    {
+      "ticker": "WY",
+      "kpi_id": "price_usd",
+      "label": "Share price (USD)",
+      "status": "pass",
+      "actual": 23.51,
+      "expected": {
+        "op": "gte",
+        "value": 1,
+        "horizon": "listing"
+      },
+      "binds_to": {
+        "on_fail": "human_review",
+        "note": "Price tape; fails if valuation inputs.price missing"
+      },
+      "last_checked": "2026-07-23",
+      "source": "valuation:inputs.price",
+      "prediction_role": "interference",
+      "industry_node_ids": [
+        "timber_land"
+      ]
+    },
+    {
+      "ticker": "XEL",
+      "kpi_id": "hyperscaler_capex_guide_bn",
+      "label": "Hyperscaler capex guide (USD bn)",
+      "status": "pass",
+      "actual": 320.0,
+      "expected": {
+        "op": "gte",
+        "value": 300,
+        "horizon": "2026"
+      },
+      "binds_to": {
+        "on_fail": "human_review",
+        "note": "Upstream AI demand pulse for industry cluster"
+      },
+      "last_checked": "2026-07-23",
+      "source": "theme:hyperscaler_capex_ttm_usd_bn",
+      "prediction_role": "orientation",
+      "industry_node_ids": [
+        "nuclear_firm_power"
+      ]
+    },
+    {
+      "ticker": "XEL",
+      "kpi_id": "henry_hub_gas",
+      "label": "Henry Hub gas (USD/mmbtu)",
+      "status": "pass",
+      "actual": 2.928999900817871,
+      "expected": {
+        "op": "lte",
+        "value": 8,
+        "horizon": "cost_ceiling"
+      },
+      "binds_to": {
+        "on_fail": "human_review",
+        "note": "Power/gas cost interference for hosting and miners"
+      },
+      "last_checked": "2026-07-23",
+      "source": "theme:henry_hub_gas",
+      "prediction_role": "interference",
+      "industry_node_ids": [
+        "nuclear_firm_power"
+      ]
+    }
+  ],
+  "ledgers": [
+    {
+      "ticker": "0388.HK",
+      "as_of": "2026-07-23",
+      "theme_ids": [
+        "exchange_volatility",
+        "macro_regime"
+      ],
+      "industry_node_ids": [
+        "exchange_markets"
+      ],
+      "scaffold": true,
+      "summary": {
+        "pass": 2,
+        "fail": 0,
+        "stale": 0,
+        "unchecked": 0
+      },
+      "path": "0388.HK/research/kpi_ledger.json"
+    },
+    {
+      "ticker": "8697.T",
+      "as_of": "2026-07-23",
+      "theme_ids": [
+        "exchange_volatility",
+        "macro_regime"
+      ],
+      "industry_node_ids": [
+        "exchange_markets"
+      ],
+      "scaffold": true,
+      "summary": {
+        "pass": 2,
+        "fail": 0,
+        "stale": 0,
+        "unchecked": 0
+      },
+      "path": "8697.T/research/kpi_ledger.json"
+    },
+    {
+      "ticker": "ABBV",
+      "as_of": "2026-07-23",
+      "theme_ids": [
+        "pharma_royalty",
+        "macro_regime"
+      ],
+      "industry_node_ids": [
+        "pharma_royalty"
+      ],
+      "scaffold": true,
+      "summary": {
+        "pass": 1,
+        "fail": 0,
+        "stale": 0,
+        "unchecked": 1
+      },
+      "path": "ABBV/research/kpi_ledger.json"
+    },
+    {
+      "ticker": "ACHR",
+      "as_of": "2026-07-23",
+      "theme_ids": [
+        "macro_regime"
+      ],
+      "industry_node_ids": [
+        "robotaxi"
+      ],
+      "scaffold": true,
+      "summary": {
+        "pass": 1,
+        "fail": 0,
+        "stale": 0,
+        "unchecked": 1
+      },
+      "path": "ACHR/research/kpi_ledger.json"
+    },
+    {
+      "ticker": "ADN.TO",
+      "as_of": "2026-07-23",
+      "theme_ids": [
+        "timber_housing",
+        "macro_regime"
+      ],
+      "industry_node_ids": [
+        "timber_land"
+      ],
+      "scaffold": true,
+      "summary": {
+        "pass": 1,
+        "fail": 0,
+        "stale": 0,
+        "unchecked": 1
+      },
+      "path": "ADN.TO/research/kpi_ledger.json"
+    },
+    {
+      "ticker": "AES",
+      "as_of": "2026-07-23",
+      "theme_ids": [
+        "nuclear_power",
+        "ai_power_land",
+        "macro_regime"
+      ],
+      "industry_node_ids": [
+        "nuclear_firm_power"
+      ],
+      "scaffold": true,
+      "summary": {
+        "pass": 2,
+        "fail": 0,
+        "stale": 0,
+        "unchecked": 0
+      },
+      "path": "AES/research/kpi_ledger.json"
+    },
+    {
+      "ticker": "AMZN",
+      "as_of": "2026-07-23",
+      "theme_ids": [
+        "ai_power_land",
+        "macro_regime"
+      ],
+      "industry_node_ids": [
+        "hyperscaler_cloud"
+      ],
+      "scaffold": true,
+      "summary": {
+        "pass": 2,
+        "fail": 0,
+        "stale": 0,
+        "unchecked": 0
+      },
+      "path": "AMZN/research/kpi_ledger.json"
+    },
+    {
+      "ticker": "APLD",
+      "as_of": "2026-07-23",
+      "theme_ids": [
+        "ai_power_land"
+      ],
+      "industry_node_ids": [
+        "agi",
+        "ai_power",
+        "btc_mining_power"
+      ],
+      "scaffold": false,
+      "summary": {
+        "pass": 4,
+        "fail": 0,
+        "stale": 0,
+        "unchecked": 0
+      },
+      "path": "APLD/research/kpi_ledger.json"
+    },
+    {
+      "ticker": "ASX.AX",
+      "as_of": "2026-07-23",
+      "theme_ids": [
+        "exchange_volatility",
+        "macro_regime"
+      ],
+      "industry_node_ids": [
+        "exchange_markets"
+      ],
+      "scaffold": true,
+      "summary": {
+        "pass": 1,
+        "fail": 1,
+        "stale": 0,
+        "unchecked": 0
+      },
+      "path": "ASX.AX/research/kpi_ledger.json"
+    },
+    {
+      "ticker": "AZLCZ",
+      "as_of": "2026-07-23",
+      "theme_ids": [
+        "ai_power_land",
+        "water_surface",
+        "macro_regime"
+      ],
+      "industry_node_ids": [
+        "ai_power",
+        "water_surface"
+      ],
+      "scaffold": true,
+      "summary": {
+        "pass": 3,
+        "fail": 0,
+        "stale": 0,
+        "unchecked": 1
+      },
+      "path": "AZLCZ/research/kpi_ledger.json"
+    },
+    {
+      "ticker": "BMNR",
+      "as_of": "2026-07-23",
+      "theme_ids": [
+        "btc_hash_power",
+        "ai_power_land",
+        "macro_regime"
+      ],
+      "industry_node_ids": [
+        "btc_mining_power"
+      ],
+      "scaffold": true,
+      "summary": {
+        "pass": 2,
+        "fail": 0,
+        "stale": 0,
+        "unchecked": 0
+      },
+      "path": "BMNR/research/kpi_ledger.json"
+    },
+    {
+      "ticker": "BSM",
+      "as_of": "2026-07-23",
+      "theme_ids": [
+        "energy_royalty",
+        "macro_regime"
+      ],
+      "industry_node_ids": [
+        "energy_royalty"
+      ],
+      "scaffold": true,
+      "summary": {
+        "pass": 2,
+        "fail": 0,
+        "stale": 0,
+        "unchecked": 0
+      },
+      "path": "BSM/research/kpi_ledger.json"
+    },
+    {
+      "ticker": "BWEL",
+      "as_of": "2026-07-23",
+      "theme_ids": [
+        "ai_power_land",
+        "water_surface",
+        "macro_regime"
+      ],
+      "industry_node_ids": [
+        "ai_power",
+        "water_surface"
+      ],
+      "scaffold": true,
+      "summary": {
+        "pass": 3,
+        "fail": 0,
+        "stale": 0,
+        "unchecked": 1
+      },
+      "path": "BWEL/research/kpi_ledger.json"
+    },
+    {
+      "ticker": "CBOE",
+      "as_of": "2026-07-23",
+      "theme_ids": [
+        "exchange_volatility",
+        "macro_regime"
+      ],
+      "industry_node_ids": [
+        "exchange_markets"
+      ],
+      "scaffold": true,
+      "summary": {
+        "pass": 2,
+        "fail": 0,
+        "stale": 0,
+        "unchecked": 0
+      },
+      "path": "CBOE/research/kpi_ledger.json"
+    },
+    {
+      "ticker": "CDZI",
+      "as_of": "2026-07-23",
+      "theme_ids": [
+        "water_surface",
+        "ai_power_land",
+        "macro_regime"
+      ],
+      "industry_node_ids": [
+        "water_surface"
+      ],
+      "scaffold": true,
+      "summary": {
+        "pass": 2,
+        "fail": 0,
+        "stale": 0,
+        "unchecked": 1
+      },
+      "path": "CDZI/research/kpi_ledger.json"
+    },
+    {
+      "ticker": "CEG",
+      "as_of": "2026-07-23",
+      "theme_ids": [
+        "nuclear_power",
+        "ai_power_land",
+        "macro_regime"
+      ],
+      "industry_node_ids": [
+        "nuclear_firm_power"
+      ],
+      "scaffold": true,
+      "summary": {
+        "pass": 2,
+        "fail": 0,
+        "stale": 0,
+        "unchecked": 0
+      },
+      "path": "CEG/research/kpi_ledger.json"
+    },
+    {
+      "ticker": "CLSK",
+      "as_of": "2026-07-23",
+      "theme_ids": [
+        "btc_hash_power",
+        "ai_power_land",
+        "macro_regime"
+      ],
+      "industry_node_ids": [
+        "btc_mining_power"
+      ],
+      "scaffold": true,
+      "summary": {
+        "pass": 2,
+        "fail": 0,
+        "stale": 0,
+        "unchecked": 0
+      },
+      "path": "CLSK/research/kpi_ledger.json"
+    },
+    {
+      "ticker": "CME",
+      "as_of": "2026-07-23",
+      "theme_ids": [
+        "exchange_volatility",
+        "macro_regime"
+      ],
+      "industry_node_ids": [
+        "exchange_markets"
+      ],
+      "scaffold": true,
+      "summary": {
+        "pass": 2,
+        "fail": 0,
+        "stale": 0,
+        "unchecked": 0
+      },
+      "path": "CME/research/kpi_ledger.json"
+    },
+    {
+      "ticker": "CMSG",
+      "as_of": "2026-07-23",
+      "theme_ids": [
+        "btc_hash_power",
+        "ai_power_land",
+        "macro_regime"
+      ],
+      "industry_node_ids": [
+        "btc_mining_power"
+      ],
+      "scaffold": true,
+      "summary": {
+        "pass": 2,
+        "fail": 0,
+        "stale": 0,
+        "unchecked": 0
+      },
+      "path": "CMSG/research/kpi_ledger.json"
+    },
+    {
+      "ticker": "DMLP",
+      "as_of": "2026-07-23",
+      "theme_ids": [
+        "energy_royalty",
+        "macro_regime"
+      ],
+      "industry_node_ids": [
+        "energy_royalty"
+      ],
+      "scaffold": true,
+      "summary": {
+        "pass": 2,
+        "fail": 0,
+        "stale": 0,
+        "unchecked": 0
+      },
+      "path": "DMLP/research/kpi_ledger.json"
+    },
+    {
+      "ticker": "DNN",
+      "as_of": "2026-07-23",
+      "theme_ids": [
+        "nuclear_power",
+        "ai_power_land",
+        "macro_regime"
+      ],
+      "industry_node_ids": [
+        "nuclear_firm_power"
+      ],
+      "scaffold": true,
+      "summary": {
+        "pass": 2,
+        "fail": 0,
+        "stale": 0,
+        "unchecked": 0
+      },
+      "path": "DNN/research/kpi_ledger.json"
+    },
+    {
+      "ticker": "FDS",
+      "as_of": "2026-07-23",
+      "theme_ids": [
+        "index_data_fees",
+        "exchange_volatility",
+        "macro_regime"
+      ],
+      "industry_node_ids": [
+        "market_data_indices"
+      ],
+      "scaffold": true,
+      "summary": {
+        "pass": 2,
+        "fail": 0,
+        "stale": 0,
+        "unchecked": 0
+      },
+      "path": "FDS/research/kpi_ledger.json"
+    },
+    {
+      "ticker": "FNV",
+      "as_of": "2026-07-23",
+      "theme_ids": [
+        "gold_royalties",
+        "macro_regime"
+      ],
+      "industry_node_ids": [
+        "gold_royalty"
+      ],
+      "scaffold": true,
+      "summary": {
+        "pass": 2,
+        "fail": 0,
+        "stale": 0,
+        "unchecked": 0
+      },
+      "path": "FNV/research/kpi_ledger.json"
+    },
+    {
+      "ticker": "GOOGL",
+      "as_of": "2026-07-23",
+      "theme_ids": [
+        "ai_power_land",
+        "macro_regime"
+      ],
+      "industry_node_ids": [
+        "hyperscaler_cloud"
+      ],
+      "scaffold": true,
+      "summary": {
+        "pass": 2,
+        "fail": 0,
+        "stale": 0,
+        "unchecked": 0
+      },
+      "path": "GOOGL/research/kpi_ledger.json"
+    },
+    {
+      "ticker": "GYRO",
+      "as_of": "2026-07-23",
+      "theme_ids": [
+        "water_surface",
+        "ai_power_land",
+        "macro_regime"
+      ],
+      "industry_node_ids": [
+        "water_surface"
+      ],
+      "scaffold": true,
+      "summary": {
+        "pass": 2,
+        "fail": 0,
+        "stale": 0,
+        "unchecked": 1
+      },
+      "path": "GYRO/research/kpi_ledger.json"
+    },
+    {
+      "ticker": "HUT",
+      "as_of": "2026-07-23",
+      "theme_ids": [
+        "btc_hash_power",
+        "ai_power_land",
+        "macro_regime"
+      ],
+      "industry_node_ids": [
+        "btc_mining_power"
+      ],
+      "scaffold": true,
+      "summary": {
+        "pass": 2,
+        "fail": 0,
+        "stale": 0,
+        "unchecked": 0
+      },
+      "path": "HUT/research/kpi_ledger.json"
+    },
+    {
+      "ticker": "ICE",
+      "as_of": "2026-07-23",
+      "theme_ids": [
+        "exchange_volatility",
+        "macro_regime"
+      ],
+      "industry_node_ids": [
+        "exchange_markets"
+      ],
+      "scaffold": false,
+      "summary": {
+        "pass": 4,
+        "fail": 0,
+        "stale": 0,
+        "unchecked": 0
+      },
+      "path": "ICE/research/kpi_ledger.json"
+    },
+    {
+      "ticker": "IREN",
+      "as_of": "2026-07-23",
+      "theme_ids": [
+        "btc_hash_power",
+        "ai_power_land",
+        "macro_regime"
+      ],
+      "industry_node_ids": [
+        "btc_mining_power"
+      ],
+      "scaffold": true,
+      "summary": {
+        "pass": 2,
+        "fail": 0,
+        "stale": 0,
+        "unchecked": 0
+      },
+      "path": "IREN/research/kpi_ledger.json"
+    },
+    {
+      "ticker": "JOBY",
+      "as_of": "2026-07-23",
+      "theme_ids": [
+        "macro_regime"
+      ],
+      "industry_node_ids": [
+        "robotaxi"
+      ],
+      "scaffold": true,
+      "summary": {
+        "pass": 0,
+        "fail": 0,
+        "stale": 0,
+        "unchecked": 2
+      },
+      "path": "JOBY/research/kpi_ledger.json"
+    },
+    {
+      "ticker": "KRP",
+      "as_of": "2026-07-23",
+      "theme_ids": [
+        "energy_royalty",
+        "macro_regime"
+      ],
+      "industry_node_ids": [
+        "energy_royalty"
+      ],
+      "scaffold": true,
+      "summary": {
+        "pass": 2,
+        "fail": 0,
+        "stale": 0,
+        "unchecked": 0
+      },
+      "path": "KRP/research/kpi_ledger.json"
+    },
+    {
+      "ticker": "LB",
+      "as_of": "2026-07-23",
+      "theme_ids": [
+        "ai_power_land"
+      ],
+      "industry_node_ids": [
+        "agi",
+        "ai_power",
+        "water_surface"
+      ],
+      "scaffold": false,
+      "summary": {
+        "pass": 5,
+        "fail": 0,
+        "stale": 0,
+        "unchecked": 0
+      },
+      "path": "LB/research/kpi_ledger.json"
+    },
+    {
+      "ticker": "LLY",
+      "as_of": "2026-07-23",
+      "theme_ids": [
+        "pharma_royalty",
+        "macro_regime"
+      ],
+      "industry_node_ids": [
+        "pharma_royalty"
+      ],
+      "scaffold": true,
+      "summary": {
+        "pass": 1,
+        "fail": 0,
+        "stale": 0,
+        "unchecked": 1
+      },
+      "path": "LLY/research/kpi_ledger.json"
+    },
+    {
+      "ticker": "MCO",
+      "as_of": "2026-07-23",
+      "theme_ids": [
+        "index_data_fees",
+        "exchange_volatility",
+        "macro_regime"
+      ],
+      "industry_node_ids": [
+        "market_data_indices"
+      ],
+      "scaffold": true,
+      "summary": {
+        "pass": 2,
+        "fail": 0,
+        "stale": 0,
+        "unchecked": 0
+      },
+      "path": "MCO/research/kpi_ledger.json"
+    },
+    {
+      "ticker": "META",
+      "as_of": "2026-07-23",
+      "theme_ids": [
+        "ai_power_land",
+        "macro_regime"
+      ],
+      "industry_node_ids": [
+        "hyperscaler_cloud"
+      ],
+      "scaffold": true,
+      "summary": {
+        "pass": 2,
+        "fail": 0,
+        "stale": 0,
+        "unchecked": 0
+      },
+      "path": "META/research/kpi_ledger.json"
+    },
+    {
+      "ticker": "MSB",
+      "as_of": "2026-07-23",
+      "theme_ids": [
+        "gold_royalties"
+      ],
+      "industry_node_ids": [
+        "gold_royalty"
+      ],
+      "scaffold": false,
+      "summary": {
+        "pass": 3,
+        "fail": 0,
+        "stale": 0,
+        "unchecked": 0
+      },
+      "path": "MSB/research/kpi_ledger.json"
+    },
+    {
+      "ticker": "MSCI",
+      "as_of": "2026-07-23",
+      "theme_ids": [
+        "index_data_fees",
+        "exchange_volatility",
+        "macro_regime"
+      ],
+      "industry_node_ids": [
+        "market_data_indices"
+      ],
+      "scaffold": true,
+      "summary": {
+        "pass": 2,
+        "fail": 0,
+        "stale": 0,
+        "unchecked": 0
+      },
+      "path": "MSCI/research/kpi_ledger.json"
+    },
+    {
+      "ticker": "MSFT",
+      "as_of": "2026-07-23",
+      "theme_ids": [
+        "ai_power_land",
+        "macro_regime"
+      ],
+      "industry_node_ids": [
+        "hyperscaler_cloud"
+      ],
+      "scaffold": true,
+      "summary": {
+        "pass": 2,
+        "fail": 0,
+        "stale": 0,
+        "unchecked": 0
+      },
+      "path": "MSFT/research/kpi_ledger.json"
+    },
+    {
+      "ticker": "MSTR",
+      "as_of": "2026-07-23",
+      "theme_ids": [
+        "btc_hash_power",
+        "ai_power_land",
+        "macro_regime"
+      ],
+      "industry_node_ids": [
+        "btc_mining_power"
+      ],
+      "scaffold": true,
+      "summary": {
+        "pass": 2,
+        "fail": 0,
+        "stale": 0,
+        "unchecked": 0
+      },
+      "path": "MSTR/research/kpi_ledger.json"
+    },
+    {
+      "ticker": "NRP",
+      "as_of": "2026-07-23",
+      "theme_ids": [
+        "energy_royalty",
+        "macro_regime"
+      ],
+      "industry_node_ids": [
+        "energy_royalty"
+      ],
+      "scaffold": true,
+      "summary": {
+        "pass": 2,
+        "fail": 0,
+        "stale": 0,
+        "unchecked": 0
+      },
+      "path": "NRP/research/kpi_ledger.json"
+    },
+    {
+      "ticker": "OR",
+      "as_of": "2026-07-23",
+      "theme_ids": [
+        "gold_royalties",
+        "macro_regime"
+      ],
+      "industry_node_ids": [
+        "gold_royalty"
+      ],
+      "scaffold": true,
+      "summary": {
+        "pass": 2,
+        "fail": 0,
+        "stale": 0,
+        "unchecked": 0
+      },
+      "path": "OR/research/kpi_ledger.json"
+    },
+    {
+      "ticker": "OTCM",
+      "as_of": "2026-07-23",
+      "theme_ids": [
+        "exchange_volatility",
+        "index_data_fees",
+        "macro_regime"
+      ],
+      "industry_node_ids": [
+        "exchange_markets",
+        "market_data_indices"
+      ],
+      "scaffold": true,
+      "summary": {
+        "pass": 2,
+        "fail": 0,
+        "stale": 0,
+        "unchecked": 0
+      },
+      "path": "OTCM/research/kpi_ledger.json"
+    },
+    {
+      "ticker": "PBT",
+      "as_of": "2026-07-23",
+      "theme_ids": [
+        "energy_royalty",
+        "macro_regime"
+      ],
+      "industry_node_ids": [
+        "energy_royalty"
+      ],
+      "scaffold": true,
+      "summary": {
+        "pass": 2,
+        "fail": 0,
+        "stale": 0,
+        "unchecked": 0
+      },
+      "path": "PBT/research/kpi_ledger.json"
+    },
+    {
+      "ticker": "PCH",
+      "as_of": "2026-07-23",
+      "theme_ids": [
+        "timber_housing",
+        "macro_regime"
+      ],
+      "industry_node_ids": [
+        "timber_land"
+      ],
+      "scaffold": true,
+      "summary": {
+        "pass": 1,
+        "fail": 0,
+        "stale": 0,
+        "unchecked": 1
+      },
+      "path": "PCH/research/kpi_ledger.json"
+    },
+    {
+      "ticker": "PSK.TO",
+      "as_of": "2026-07-23",
+      "theme_ids": [
+        "energy_royalty",
+        "macro_regime"
+      ],
+      "industry_node_ids": [
+        "energy_royalty"
+      ],
+      "scaffold": true,
+      "summary": {
+        "pass": 2,
+        "fail": 0,
+        "stale": 0,
+        "unchecked": 0
+      },
+      "path": "PSK.TO/research/kpi_ledger.json"
+    },
+    {
+      "ticker": "RGLD",
+      "as_of": "2026-07-23",
+      "theme_ids": [
+        "gold_royalties"
+      ],
+      "industry_node_ids": [
+        "gold_royalty"
+      ],
+      "scaffold": false,
+      "summary": {
+        "pass": 4,
+        "fail": 0,
+        "stale": 0,
+        "unchecked": 0
+      },
+      "path": "RGLD/research/kpi_ledger.json"
+    },
+    {
+      "ticker": "RPRX",
+      "as_of": "2026-07-23",
+      "theme_ids": [
+        "pharma_royalty",
+        "macro_regime"
+      ],
+      "industry_node_ids": [
+        "pharma_royalty"
+      ],
+      "scaffold": true,
+      "summary": {
+        "pass": 1,
+        "fail": 0,
+        "stale": 0,
+        "unchecked": 1
+      },
+      "path": "RPRX/research/kpi_ledger.json"
+    },
+    {
+      "ticker": "RYN",
+      "as_of": "2026-07-23",
+      "theme_ids": [
+        "timber_housing",
+        "macro_regime"
+      ],
+      "industry_node_ids": [
+        "timber_land"
+      ],
+      "scaffold": true,
+      "summary": {
+        "pass": 1,
+        "fail": 0,
+        "stale": 0,
+        "unchecked": 1
+      },
+      "path": "RYN/research/kpi_ledger.json"
+    },
+    {
+      "ticker": "SBR",
+      "as_of": "2026-07-23",
+      "theme_ids": [
+        "energy_royalty",
+        "macro_regime"
+      ],
+      "industry_node_ids": [
+        "energy_royalty"
+      ],
+      "scaffold": true,
+      "summary": {
+        "pass": 2,
+        "fail": 0,
+        "stale": 0,
+        "unchecked": 0
+      },
+      "path": "SBR/research/kpi_ledger.json"
+    },
+    {
+      "ticker": "SJT",
+      "as_of": "2026-07-23",
+      "theme_ids": [
+        "energy_royalty",
+        "macro_regime"
+      ],
+      "industry_node_ids": [
+        "energy_royalty"
+      ],
+      "scaffold": true,
+      "summary": {
+        "pass": 2,
+        "fail": 0,
+        "stale": 0,
+        "unchecked": 0
+      },
+      "path": "SJT/research/kpi_ledger.json"
+    },
+    {
+      "ticker": "SMR",
+      "as_of": "2026-07-23",
+      "theme_ids": [
+        "nuclear_power",
+        "ai_power_land",
+        "macro_regime"
+      ],
+      "industry_node_ids": [
+        "nuclear_firm_power"
+      ],
+      "scaffold": true,
+      "summary": {
+        "pass": 2,
+        "fail": 0,
+        "stale": 0,
+        "unchecked": 0
+      },
+      "path": "SMR/research/kpi_ledger.json"
+    },
+    {
+      "ticker": "SPGI",
+      "as_of": "2026-07-23",
+      "theme_ids": [
+        "index_data_fees",
+        "exchange_volatility",
+        "macro_regime"
+      ],
+      "industry_node_ids": [
+        "market_data_indices"
+      ],
+      "scaffold": true,
+      "summary": {
+        "pass": 2,
+        "fail": 0,
+        "stale": 0,
+        "unchecked": 0
+      },
+      "path": "SPGI/research/kpi_ledger.json"
+    },
+    {
+      "ticker": "TFPM",
+      "as_of": "2026-07-23",
+      "theme_ids": [
+        "gold_royalties",
+        "macro_regime"
+      ],
+      "industry_node_ids": [
+        "gold_royalty"
+      ],
+      "scaffold": true,
+      "summary": {
+        "pass": 2,
+        "fail": 0,
+        "stale": 0,
+        "unchecked": 0
+      },
+      "path": "TFPM/research/kpi_ledger.json"
+    },
+    {
+      "ticker": "TPL",
+      "as_of": "2026-07-23",
+      "theme_ids": [
+        "ai_power_land"
+      ],
+      "industry_node_ids": [
+        "agi",
+        "ai_power",
+        "water_surface"
+      ],
+      "scaffold": false,
+      "summary": {
+        "pass": 5,
+        "fail": 0,
+        "stale": 0,
+        "unchecked": 0
+      },
+      "path": "TPL/research/kpi_ledger.json"
+    },
+    {
+      "ticker": "TRC",
+      "as_of": "2026-07-23",
+      "theme_ids": [
+        "water_surface",
+        "ai_power_land",
+        "macro_regime"
+      ],
+      "industry_node_ids": [
+        "water_surface"
+      ],
+      "scaffold": true,
+      "summary": {
+        "pass": 2,
+        "fail": 0,
+        "stale": 0,
+        "unchecked": 1
+      },
+      "path": "TRC/research/kpi_ledger.json"
+    },
+    {
+      "ticker": "TSLA",
+      "as_of": "2026-07-23",
+      "theme_ids": [
+        "macro_regime"
+      ],
+      "industry_node_ids": [
+        "robotaxi"
+      ],
+      "scaffold": true,
+      "summary": {
+        "pass": 1,
+        "fail": 0,
+        "stale": 0,
+        "unchecked": 1
+      },
+      "path": "TSLA/research/kpi_ledger.json"
+    },
+    {
+      "ticker": "UBER",
+      "as_of": "2026-07-23",
+      "theme_ids": [
+        "macro_regime"
+      ],
+      "industry_node_ids": [
+        "robotaxi"
+      ],
+      "scaffold": true,
+      "summary": {
+        "pass": 1,
+        "fail": 0,
+        "stale": 0,
+        "unchecked": 1
+      },
+      "path": "UBER/research/kpi_ledger.json"
+    },
+    {
+      "ticker": "VST",
+      "as_of": "2026-07-23",
+      "theme_ids": [
+        "nuclear_power",
+        "ai_power_land",
+        "macro_regime"
+      ],
+      "industry_node_ids": [
+        "nuclear_firm_power"
+      ],
+      "scaffold": true,
+      "summary": {
+        "pass": 2,
+        "fail": 0,
+        "stale": 0,
+        "unchecked": 0
+      },
+      "path": "VST/research/kpi_ledger.json"
+    },
+    {
+      "ticker": "VTRS",
+      "as_of": "2026-07-23",
+      "theme_ids": [
+        "pharma_royalty",
+        "macro_regime"
+      ],
+      "industry_node_ids": [
+        "pharma_royalty"
+      ],
+      "scaffold": true,
+      "summary": {
+        "pass": 1,
+        "fail": 0,
+        "stale": 0,
+        "unchecked": 1
+      },
+      "path": "VTRS/research/kpi_ledger.json"
+    },
+    {
+      "ticker": "WBI",
+      "as_of": "2026-07-23",
+      "theme_ids": [
+        "ai_power_land",
+        "water_surface",
+        "macro_regime"
+      ],
+      "industry_node_ids": [
+        "ai_power",
+        "water_surface"
+      ],
+      "scaffold": true,
+      "summary": {
+        "pass": 3,
+        "fail": 0,
+        "stale": 0,
+        "unchecked": 1
+      },
+      "path": "WBI/research/kpi_ledger.json"
+    },
+    {
+      "ticker": "WPM",
+      "as_of": "2026-07-23",
+      "theme_ids": [
+        "gold_royalties",
+        "macro_regime"
+      ],
+      "industry_node_ids": [
+        "gold_royalty"
+      ],
+      "scaffold": true,
+      "summary": {
+        "pass": 2,
+        "fail": 0,
+        "stale": 0,
+        "unchecked": 0
+      },
+      "path": "WPM/research/kpi_ledger.json"
+    },
+    {
+      "ticker": "WY",
+      "as_of": "2026-07-23",
+      "theme_ids": [
+        "timber_housing",
+        "macro_regime"
+      ],
+      "industry_node_ids": [
+        "timber_land"
+      ],
+      "scaffold": true,
+      "summary": {
+        "pass": 1,
+        "fail": 0,
+        "stale": 0,
+        "unchecked": 1
+      },
+      "path": "WY/research/kpi_ledger.json"
+    },
+    {
+      "ticker": "XEL",
+      "as_of": "2026-07-23",
+      "theme_ids": [
+        "nuclear_power",
+        "ai_power_land",
+        "macro_regime"
+      ],
+      "industry_node_ids": [
+        "nuclear_firm_power"
+      ],
+      "scaffold": true,
+      "summary": {
+        "pass": 2,
+        "fail": 0,
+        "stale": 0,
+        "unchecked": 0
+      },
+      "path": "XEL/research/kpi_ledger.json"
+    }
+  ],
+  "prediction_cards": [
+    {
+      "theme_id": "ai_power_land",
+      "label": "AI compute → power → land/hosting",
+      "phase_transition": "likely",
+      "regulatory": "permissioning",
+      "recursive": true,
+      "gov_stimulus": "rising",
+      "superorg_ids": [
+        "hyperscaler_ai_builders"
+      ],
+      "tam_magnetism": "high",
+      "expected_value_note": "Context only. Weight land/power optionality when orientation+reinforcement hold; do not auto-inflate Lawrence IRR.",
+      "path": "_system/reference/world_model/themes/ai_power_land.json"
+    },
+    {
+      "theme_id": "btc_hash_power",
+      "label": "Bitcoin mining hashpower and power arbitrage",
+      "phase_transition": "watch",
+      "regulatory": "permissioning",
+      "recursive": true,
+      "gov_stimulus": "mixed",
+      "superorg_ids": [],
+      "tam_magnetism": "medium",
+      "expected_value_note": "Context only. Do not auto-inflate Lawrence IRR.",
+      "path": "_system/reference/world_model/themes/btc_hash_power.json"
+    },
+    {
+      "theme_id": "energy_royalty",
+      "label": "Oil & gas royalties and mineral streams",
+      "phase_transition": "watch",
+      "regulatory": "uncertain",
+      "recursive": true,
+      "gov_stimulus": "mixed",
+      "superorg_ids": [],
+      "tam_magnetism": "medium",
+      "expected_value_note": "Context only. Do not auto-inflate Lawrence IRR.",
+      "path": "_system/reference/world_model/themes/energy_royalty.json"
+    },
+    {
+      "theme_id": "exchange_volatility",
+      "label": "Exchange vol / croupier pulse",
+      "phase_transition": "gradual",
+      "regulatory": "permissioning",
+      "recursive": false,
+      "gov_stimulus": "flat",
+      "superorg_ids": [
+        "ice"
+      ],
+      "tam_magnetism": "high",
+      "expected_value_note": "Home-market vol by venue; US VIX is global overlay. Superorg card (ICE) carries structural conviction.",
+      "path": "_system/reference/world_model/themes/exchange_volatility.json"
+    },
+    {
+      "theme_id": "gold_royalties",
+      "label": "Gold royalty / bullion sentiment",
+      "phase_transition": "gradual",
+      "regulatory": "uncertain",
+      "recursive": false,
+      "gov_stimulus": "flat",
+      "superorg_ids": [],
+      "tam_magnetism": "medium",
+      "expected_value_note": "Context for royalty sleeve sizing; gradual theme — fail gates matter less than phase-transition themes.",
+      "path": "_system/reference/world_model/themes/gold_royalties.json"
+    },
+    {
+      "theme_id": "index_data_fees",
+      "label": "Index, ratings, and market-data fee croupiers",
+      "phase_transition": "watch",
+      "regulatory": "permissioning",
+      "recursive": true,
+      "gov_stimulus": "mixed",
+      "superorg_ids": [],
+      "tam_magnetism": "medium",
+      "expected_value_note": "Context only. Do not auto-inflate Lawrence IRR.",
+      "path": "_system/reference/world_model/themes/index_data_fees.json"
+    },
+    {
+      "theme_id": "macro_regime",
+      "label": "Portfolio macro risk regime",
+      "phase_transition": "gradual",
+      "regulatory": "uncertain",
+      "recursive": false,
+      "gov_stimulus": "flat",
+      "superorg_ids": [],
+      "tam_magnetism": "low",
+      "expected_value_note": "Portfolio strip only — never promotes into ticker base IRR.",
+      "path": "_system/reference/world_model/themes/macro_regime.json"
+    },
+    {
+      "theme_id": "nuclear_power",
+      "label": "Nuclear / SMR firm power for AI grids",
+      "phase_transition": "watch",
+      "regulatory": "permissioning",
+      "recursive": true,
+      "gov_stimulus": "mixed",
+      "superorg_ids": [],
+      "tam_magnetism": "medium",
+      "expected_value_note": "Context only. Do not auto-inflate Lawrence IRR.",
+      "path": "_system/reference/world_model/themes/nuclear_power.json"
+    },
+    {
+      "theme_id": "pharma_royalty",
+      "label": "Pharma royalty and durable drug cash",
+      "phase_transition": "watch",
+      "regulatory": "permissioning",
+      "recursive": true,
+      "gov_stimulus": "mixed",
+      "superorg_ids": [],
+      "tam_magnetism": "medium",
+      "expected_value_note": "Context only. Do not auto-inflate Lawrence IRR.",
+      "path": "_system/reference/world_model/themes/pharma_royalty.json"
+    },
+    {
+      "theme_id": "timber_housing",
+      "label": "Timberland and housing-linked wood fiber",
+      "phase_transition": "watch",
+      "regulatory": "permissioning",
+      "recursive": true,
+      "gov_stimulus": "mixed",
+      "superorg_ids": [],
+      "tam_magnetism": "medium",
+      "expected_value_note": "Context only. Do not auto-inflate Lawrence IRR.",
+      "path": "_system/reference/world_model/themes/timber_housing.json"
+    },
+    {
+      "theme_id": "water_surface",
+      "label": "Permian / Southwest water & surface rights",
+      "phase_transition": "watch",
+      "regulatory": "permissioning",
+      "recursive": true,
+      "gov_stimulus": "mixed",
+      "superorg_ids": [],
+      "tam_magnetism": "medium",
+      "expected_value_note": "Context only. Do not auto-inflate Lawrence IRR.",
+      "path": "_system/reference/world_model/themes/water_surface.json"
+    }
+  ],
+  "superorgs": [
+    {
+      "org_id": "hyperscaler_ai_builders",
+      "label": "Hyperscaler AI builders (demand Superorg proxy)",
+      "ticker": null,
+      "tickers": [
+        "GOOGL",
+        "MSFT",
+        "META",
+        "AMZN"
+      ],
+      "role": "demand_superorg_proxy",
+      "summary": {
+        "pass": 4,
+        "partial": 1,
+        "fail": 0
+      },
+      "pillars": {
+        "exceptional_leadership": "pass",
+        "scale_beyond_individual": "pass",
+        "multi_domain_specialisation": "pass",
+        "efficient_coordination": "partial",
+        "tools_network_freeride": "pass"
+      },
+      "stance_implication": "Demand reinforcement for power/land/hosting sleeve (TPL/APLD/LB). Context only — never writes base IRR.",
+      "path": "_system/reference/world_model/superorg/hyperscaler_ai_builders.json"
+    },
+    {
+      "org_id": "ice",
+      "label": "Intercontinental Exchange (ICE)",
+      "ticker": "ICE",
+      "tickers": null,
+      "role": "portfolio_superorg",
+      "summary": {
+        "pass": 4,
+        "partial": 1,
+        "fail": 0
+      },
+      "pillars": {
+        "exceptional_leadership": "pass",
+        "scale_beyond_individual": "pass",
+        "multi_domain_specialisation": "pass",
+        "efficient_coordination": "partial",
+        "tools_network_freeride": "pass"
+      },
+      "stance_implication": "Structural croupier reinforcement supports holding through vol quiet spells when KPI gates pass; coordination pillar needs HUMAN REVIEW before treating ICE as full five-pillar Superorg.",
+      "path": "_system/reference/world_model/superorg/ice.json"
+    }
+  ],
+  "expert_horizons": [
+    {
+      "domain": "agi",
+      "convergence": "converging",
+      "years_ahead_delta": -18.5,
+      "latest": {
+        "date": "2026-03-18",
+        "speaker": "GA-Courtenay",
+        "org": "GA-Courtenay",
+        "years_ahead": 1.5,
+        "quote_note": "Paper cites Musk 2026 / Smith decades as convergence signal"
+      },
+      "quote_count": 3,
+      "in_base_irr": false,
+      "path": "_system/reference/world_model/expert_horizons/agi.csv"
+    },
+    {
+      "domain": "robotaxi",
+      "convergence": "converging",
+      "years_ahead_delta": -8.0,
+      "latest": {
+        "date": "2025-01-01",
+        "speaker": "Elon Musk",
+        "org": "Tesla",
+        "years_ahead": 2.0,
+        "quote_note": "Continued convergence narrative in Courtenay paper"
+      },
+      "quote_count": 3,
+      "in_base_irr": false,
+      "path": "_system/reference/world_model/expert_horizons/robotaxi.csv"
+    }
+  ],
+  "industry_nodes": [
+    {
+      "node_id": "agi",
+      "label": "AGI / frontier model race",
+      "kind": "horizon_industry",
+      "checklist": {
+        "capacity": {
+          "status": "watch",
+          "note": "Compute, power, and talent constrain training runs; overlaps ai_power grid bottlenecks."
+        },
+        "pricing": {
+          "status": "uncertain",
+          "note": "No settled AGI product price. Track token/API economics and capex intensity via hyperscaler overlays."
+        },
+        "regulatory": {
+          "status": "permissioning",
+          "note": "Safety, export, and antitrust regimes can delay deployment (Courtenay interference)."
+        }
+      },
+      "linked_theme_ids": [
+        "ai_power_land",
+        "macro_regime"
+      ],
+      "linked_horizon_domains": [
+        "agi"
+      ],
+      "linked_tickers": [
+        "APLD",
+        "TPL",
+        "LB"
+      ],
+      "path": "_system/reference/industry/agi.json"
+    },
+    {
+      "node_id": "ai_power",
+      "label": "AI power and grid capacity",
+      "kind": "thesis",
+      "checklist": {
+        "capacity": {
+          "status": "watch",
+          "note": "US electricity growth and interconnect queues constrain hyperscale sites."
+        },
+        "pricing": {
+          "status": "watch",
+          "note": "Power and gas prices (Henry Hub / electricity FRED series) midstream signals."
+        },
+        "regulatory": {
+          "status": "permissioning",
+          "note": "Permits and interconnection — transition risk per Courtenay interference scan."
+        }
+      },
+      "linked_theme_ids": [
+        "ai_power_land"
+      ],
+      "linked_horizon_domains": [],
+      "linked_tickers": [
+        "APLD",
+        "TPL",
+        "LB",
+        "WBI",
+        "AZLCZ",
+        "BWEL"
+      ],
+      "path": "_system/reference/industry/ai_power.json"
+    },
+    {
+      "node_id": "btc_mining_power",
+      "label": "Bitcoin mining & hashpower / power arbitrage",
+      "kind": "thesis",
+      "checklist": {
+        "capacity": {
+          "status": "watch",
+          "note": "Energized MW and fleet efficiency."
+        },
+        "pricing": {
+          "status": "watch",
+          "note": "Hashprice vs power cost; curtailment economics."
+        },
+        "regulatory": {
+          "status": "permissioning",
+          "note": "Interconnect and local energy politics."
+        }
+      },
+      "linked_theme_ids": [
+        "btc_hash_power",
+        "ai_power_land"
+      ],
+      "linked_horizon_domains": [],
+      "linked_tickers": [
+        "CMSG",
+        "CLSK",
+        "BMNR",
+        "MSTR",
+        "IREN",
+        "HUT",
+        "APLD"
+      ],
+      "path": "_system/reference/industry/btc_mining_power.json"
+    },
+    {
+      "node_id": "energy_royalty",
+      "label": "Oil & gas royalty trusts / mineral streams",
+      "kind": "thesis",
+      "checklist": {
+        "capacity": {
+          "status": "watch",
+          "note": "Attributed volumes and well decline."
+        },
+        "pricing": {
+          "status": "watch",
+          "note": "WTI / gas realizations."
+        },
+        "regulatory": {
+          "status": "uncertain",
+          "note": "Trust deeds and commodity cycles."
+        }
+      },
+      "linked_theme_ids": [
+        "energy_royalty"
+      ],
+      "linked_horizon_domains": [],
+      "linked_tickers": [
+        "SJT",
+        "DMLP",
+        "PSK.TO",
+        "BSM",
+        "PBT",
+        "SBR",
+        "KRP",
+        "NRP"
+      ],
+      "path": "_system/reference/industry/energy_royalty.json"
+    },
+    {
+      "node_id": "exchange_markets",
+      "label": "Exchange and clearing markets",
+      "kind": "thesis",
+      "checklist": {
+        "capacity": {
+          "status": "ok",
+          "note": "Clearing and data capacity scale with volumes; not a physical MW constraint."
+        },
+        "pricing": {
+          "status": "watch",
+          "note": "Fee and data pricing power; home-market vol (see exchange_vol_map) drives transaction intensity; US VIX is secondary for non-US venues."
+        },
+        "regulatory": {
+          "status": "permissioning",
+          "note": "Continuous oversight; license and clearing-house rules."
+        }
+      },
+      "linked_theme_ids": [
+        "exchange_volatility"
+      ],
+      "linked_horizon_domains": [],
+      "linked_tickers": [
+        "ICE",
+        "8697.T",
+        "CME",
+        "CBOE",
+        "0388.HK",
+        "OTCM",
+        "ASX.AX"
+      ],
+      "path": "_system/reference/industry/exchange_markets.json"
+    },
+    {
+      "node_id": "gold_royalty",
+      "label": "Gold royalty and streaming",
+      "kind": "thesis",
+      "checklist": {
+        "capacity": {
+          "status": "watch",
+          "note": "Attributable ounces and development pipeline — gradual."
+        },
+        "pricing": {
+          "status": "watch",
+          "note": "Gold spot / GLD proxy and GDX-GLD sentiment."
+        },
+        "regulatory": {
+          "status": "uncertain",
+          "note": "Mine-level jurisdiction risk."
+        }
+      },
+      "linked_theme_ids": [
+        "gold_royalties"
+      ],
+      "linked_horizon_domains": [],
+      "linked_tickers": [
+        "RGLD",
+        "MSB",
+        "WPM",
+        "OR",
+        "FNV",
+        "TFPM"
+      ],
+      "path": "_system/reference/industry/gold_royalty.json"
+    },
+    {
+      "node_id": "hyperscaler_cloud",
+      "label": "Hyperscaler cloud / AI platforms",
+      "kind": "thesis",
+      "checklist": {
+        "capacity": {
+          "status": "watch",
+          "note": "Capex and power constrain training/inference growth."
+        },
+        "pricing": {
+          "status": "watch",
+          "note": "Cloud pricing and AI product monetization still evolving."
+        },
+        "regulatory": {
+          "status": "permissioning",
+          "note": "Antitrust and AI safety regimes."
+        }
+      },
+      "linked_theme_ids": [
+        "ai_power_land"
+      ],
+      "linked_horizon_domains": [
+        "agi"
+      ],
+      "linked_tickers": [
+        "AMZN",
+        "GOOGL",
+        "META",
+        "MSFT"
+      ],
+      "path": "_system/reference/industry/hyperscaler_cloud.json"
+    },
+    {
+      "node_id": "market_data_indices",
+      "label": "Index / ratings / market-data croupiers",
+      "kind": "thesis",
+      "checklist": {
+        "capacity": {
+          "status": "ok",
+          "note": "Data platforms scale with modest incremental cost."
+        },
+        "pricing": {
+          "status": "watch",
+          "note": "Subscription and benchmark fee power."
+        },
+        "regulatory": {
+          "status": "permissioning",
+          "note": "Benchmark and data-licensing oversight."
+        }
+      },
+      "linked_theme_ids": [
+        "index_data_fees",
+        "exchange_volatility"
+      ],
+      "linked_horizon_domains": [],
+      "linked_tickers": [
+        "SPGI",
+        "OTCM",
+        "MCO",
+        "MSCI",
+        "FDS"
+      ],
+      "path": "_system/reference/industry/market_data_indices.json"
+    },
+    {
+      "node_id": "nuclear_firm_power",
+      "label": "Nuclear / SMR firm power for AI grid",
+      "kind": "thesis",
+      "checklist": {
+        "capacity": {
+          "status": "watch",
+          "note": "GW online and interconnection queues."
+        },
+        "pricing": {
+          "status": "watch",
+          "note": "Power price and contracted offtake to hyperscalers."
+        },
+        "regulatory": {
+          "status": "permissioning",
+          "note": "NRC/state siting is the binding gate."
+        }
+      },
+      "linked_theme_ids": [
+        "nuclear_power",
+        "ai_power_land"
+      ],
+      "linked_horizon_domains": [
+        "agi"
+      ],
+      "linked_tickers": [
+        "SMR",
+        "CEG",
+        "VST",
+        "DNN",
+        "AES",
+        "XEL"
+      ],
+      "path": "_system/reference/industry/nuclear_firm_power.json"
+    },
+    {
+      "node_id": "pharma_royalty",
+      "label": "Pharma royalty / durable drug cash",
+      "kind": "thesis",
+      "checklist": {
+        "capacity": {
+          "status": "watch",
+          "note": "Pipeline and royalty coverage."
+        },
+        "pricing": {
+          "status": "watch",
+          "note": "Net pricing and LOE cliffs."
+        },
+        "regulatory": {
+          "status": "permissioning",
+          "note": "FDA and drug-pricing policy."
+        }
+      },
+      "linked_theme_ids": [
+        "pharma_royalty"
+      ],
+      "linked_horizon_domains": [],
+      "linked_tickers": [
+        "RPRX",
+        "ABBV",
+        "LLY",
+        "VTRS"
+      ],
+      "path": "_system/reference/industry/pharma_royalty.json"
+    },
+    {
+      "node_id": "robotaxi",
+      "label": "Robotaxi / autonomous mobility",
+      "kind": "horizon_industry",
+      "checklist": {
+        "capacity": {
+          "status": "watch",
+          "note": "Fleet scale, city permits, and HD mapping capacity; slow geographic rollout."
+        },
+        "pricing": {
+          "status": "uncertain",
+          "note": "Unit economics vs ride-hail and private car TCO still contested."
+        },
+        "regulatory": {
+          "status": "permissioning",
+          "note": "City/state AV approvals are the binding interference gate."
+        }
+      },
+      "linked_theme_ids": [
+        "macro_regime"
+      ],
+      "linked_horizon_domains": [
+        "robotaxi"
+      ],
+      "linked_tickers": [
+        "TSLA",
+        "UBER",
+        "JOBY",
+        "ACHR"
+      ],
+      "path": "_system/reference/industry/robotaxi.json"
+    },
+    {
+      "node_id": "timber_land",
+      "label": "Timberland REITs and timber ops",
+      "kind": "thesis",
+      "checklist": {
+        "capacity": {
+          "status": "ok",
+          "note": "Biological growth is the capacity clock."
+        },
+        "pricing": {
+          "status": "watch",
+          "note": "Stumpage and lumber prices cycle with housing."
+        },
+        "regulatory": {
+          "status": "permissioning",
+          "note": "Harvest and conservation rules."
+        }
+      },
+      "linked_theme_ids": [
+        "timber_housing"
+      ],
+      "linked_horizon_domains": [],
+      "linked_tickers": [
+        "ADN.TO",
+        "RYN",
+        "PCH",
+        "WY"
+      ],
+      "path": "_system/reference/industry/timber_land.json"
+    },
+    {
+      "node_id": "water_surface",
+      "label": "Permian / Southwest water & surface rights",
+      "kind": "thesis",
+      "checklist": {
+        "capacity": {
+          "status": "watch",
+          "note": "Produced-water volumes and disposal capacity."
+        },
+        "pricing": {
+          "status": "watch",
+          "note": "Water and surface royalty pricing vs WTI / activity."
+        },
+        "regulatory": {
+          "status": "permissioning",
+          "note": "Water rights and environmental permits."
+        }
+      },
+      "linked_theme_ids": [
+        "water_surface",
+        "ai_power_land"
+      ],
+      "linked_horizon_domains": [],
+      "linked_tickers": [
+        "TPL",
+        "LB",
+        "WBI",
+        "BWEL",
+        "AZLCZ",
+        "GYRO",
+        "TRC",
+        "CDZI"
+      ],
+      "path": "_system/reference/industry/water_surface.json"
+    }
+  ],
+  "derived_metrics_as_of": "2026-07-23"
+}
