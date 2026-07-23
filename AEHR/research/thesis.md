@@ -1,6 +1,6 @@
 # AEHR — Investment Thesis
 
-**Last updated:** 2026-07-23
+**Last updated:** auto-sync
 
 ## Classification
 
@@ -11,10 +11,13 @@
 | **Dhando** (Pabrai) | partial |
 | **Stance** | watch |
 | **Cycle** | trough |
-| **Implied 7yr IRR** (Lawrence) | -33.31% (total synthesis) |
-| **IRR method** | full |
+| **Implied 7yr IRR** (base) | — |
+| **IRR method** | quality_reinvestment |
 | **Lawrence bucket** | low_cost |
 | **Payoff lens** | operating |
+| **MOI bucket** | pending |
+
+**Deep dive:** `AEHR/research/deep_dive_2026-07-23.md` (auto-sync)
 
 ## One-line thesis
 
