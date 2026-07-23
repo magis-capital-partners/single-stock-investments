@@ -60,6 +60,6 @@ Marvin floor **3.04%** per year (compounder; stance **watch**) from primary fili
 
 ## Primary sources cited
 
-1. `AMCR/research/deep_dive_2026-07-10.md`
+1. `AMCR/research/deep_dive_2026-07-23.md`
 2. `AMCR/research/valuation.json`
 3. `AMCR/third-party-analyses/source_inventory_2026-07-10.md`
