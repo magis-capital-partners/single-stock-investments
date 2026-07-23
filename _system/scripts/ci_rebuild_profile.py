@@ -132,7 +132,16 @@ def expand_steps(steps: list[list[str]]) -> list[list[str]]:
     out: list[list[str]] = []
     for step in steps:
         if step and step[0].endswith("build_dashboard_data.py"):
-            out.append(["_system/scripts/refresh_cvr_universe.py"])
+            # Nightly/CI sync: prices + stage transitions + scoped sleeve (no SEC).
+            out.append(
+                [
+                    "_system/scripts/refresh_cvr_universe.py",
+                    "--refresh-prices",
+                    "--apply-transitions",
+                    "--queue-stubs",
+                ]
+            )
+            out.append(["_system/scripts/check_cvr_universe.py"])
         out.append(step)
     return out
 
