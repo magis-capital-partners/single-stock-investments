@@ -52,8 +52,7 @@ re_pass: false
 | Valuation bridge base | 7.22% | 7.22% | Yes |
 
 **Lint notes:**
-- FNV/research/deep_dive_2026-07-23.md: executive_summary_first_pct 4.5% vs valuation.json base 7.22% (tol 0.25pp)
-- FNV/research: adversarial date adversarial_2026-06-03.md != dive 2026-07-23
+- FNV/research/deep_dive_2026-07-23.md: executive_summary_first_pct 5.6% vs valuation.json base 7.22% (tol 0.25pp)
 
 ---
 
