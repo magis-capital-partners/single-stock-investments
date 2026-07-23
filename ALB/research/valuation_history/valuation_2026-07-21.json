@@ -1,0 +1,3291 @@
+{
+  "ticker": "ALB",
+  "as_of": "2026-07-21",
+  "method": "full",
+  "irr_method": "full",
+  "lawrence_bucket": "capital_intensive",
+  "payoff_lens": "levered",
+  "classification_inputs": {
+    "archetype": "capital_cycle",
+    "moat": "narrow",
+    "dhando": "partial",
+    "cycle": "trough",
+    "payoff_lens": "levered",
+    "predictive_attribute": "complexity_discount"
+  },
+  "inputs": {
+    "price": 118.2,
+    "price_source": "Yahoo ALB close 2026-07-20",
+    "price_as_of": "2026-07-20",
+    "shares_millions": 118.6,
+    "shares_outstanding": 118607000,
+    "shares_source": "Q1 2026 weighted average diluted shares 118.607M (ALB/investor-documents/sec-edgar/10-Q_20260506_rpt20260331_acc0000915913_26_000072.htm)",
+    "fcf_per_share": 10.81,
+    "fcf_source": "Three-year average OCF $1098.909M \u00f7 118.607M shares; FY2025 OCF $1282.267M and capex $589.801M per ALB/investor-documents/sec-edgar/10-K_20260211_rpt20251231_acc0000915913_26_000018.htm",
+    "cash_m": 1089.809,
+    "total_debt_m": 1881.831,
+    "normalization_note": "FY2025 GAAP net loss $511M reflects lithium trough pricing and depreciation; Lawrence base uses three-year average operating cash flow per share, not 2022 peak earnings."
+  },
+  "scenarios": {
+    "bear": {
+      "growth_y1_5": -0.05,
+      "growth_y6_10": -0.02,
+      "exit_pfcf_y10": 6,
+      "notes": "Prolonged lithium oversupply; conversion delays; debt service pressure"
+    },
+    "base": {
+      "growth_y1_5": 0.04,
+      "growth_y6_10": 0.03,
+      "exit_pfcf_y10": 9,
+      "notes": "Mid-cycle lithium normalization; modest deleveraging from OCF; exit 9\u00d7 owner cash"
+    },
+    "bull": {
+      "growth_y1_5": 0.1,
+      "growth_y6_10": 0.05,
+      "exit_pfcf_y10": 12,
+      "notes": "EV demand recovery and contract pricing lift; faster conversion ramp"
+    }
+  },
+  "option_scan": [
+    {
+      "q": 1,
+      "question": "GAAP book misstates core assets?",
+      "answer": "Partial",
+      "treatment": "embedded_in_segment",
+      "evidence": "Conversion assets and resource rights carried at depreciated cost; lithium reserves not separately marked to spot"
+    },
+    {
+      "q": 2,
+      "question": "Undeveloped reserves / dormant assets?",
+      "answer": "Yes",
+      "treatment": "milestone_nav",
+      "evidence": "Greenfield and brownfield conversion capacity; modeled in conversion_capacity_and_contract_option"
+    },
+    {
+      "q": 3,
+      "question": "In-business loss segment?",
+      "answer": "Yes",
+      "treatment": "embedded_in_segment",
+      "evidence": "Energy Storage segment loss in trough; consolidated operating loss FY2025 $367M"
+    },
+    {
+      "q": 4,
+      "question": "Backlog / contracted revenue not in FCF path?",
+      "answer": "Yes",
+      "treatment": "milestone_nav",
+      "evidence": "Long-term offtake and conversion contracts; separate option component"
+    },
+    {
+      "q": 5,
+      "question": "Private or illiquid stakes below fair value?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "No material private equity stakes disclosed (10-K)"
+    },
+    {
+      "q": 6,
+      "question": "Transitory distribution / legal recovery?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "No special dividend or litigation recovery catalyst"
+    }
+  ],
+  "growth_explanation": {
+    "mechanism": "Revenue scales with lithium carbonate/hydroxide pricing and conversion volumes; bromine and specialty catalysts provide counter-cyclical cash; capital spending ramps conversion capacity tied to EV battery demand.",
+    "source": "ALB/investor-documents/sec-edgar/10-K_20260211_rpt20251231_acc0000915913_26_000018.htm net sales $5142.733M and operating cash flow trend",
+    "falsifiers": [
+      {
+        "id": "lithium_price_trough",
+        "trigger": "Spot lithium price stays below cash-cost curve for four consecutive quarters without volume offset",
+        "source": "10-Q segment disclosures and market inputs"
+      },
+      {
+        "id": "capex_overrun",
+        "trigger": "Capital spending exceeds $800M for two consecutive years while OCF falls below $800M",
+        "source": "10-K cash-flow statement"
+      }
+    ],
+    "lawrence_legacy": {
+      "y1_5": 0.04,
+      "y6_10": 0.03,
+      "return_pct": null
+    },
+    "falsifier_adjusted": {
+      "y1_5": 0.04,
+      "y6_10": 0.03,
+      "exit_pfcf_y10": 9.0,
+      "adjustments": [],
+      "triggered": [],
+      "filing_revenue_yoy": null,
+      "as_of_filing_facts": "evidence/_text/10-K-A_20260331_rpt20251231_acc0000915913_26_000060.htm.txt"
+    },
+    "status": "partial"
+  },
+  "lawrence_horizon_years": 7,
+  "stance_proposal": {
+    "suggested": "watch",
+    "irr_band": "<15%",
+    "gates": {
+      "moat_ok": true,
+      "dhando_ok": true
+    },
+    "override_reason": null
+  },
+  "component_valuation": {
+    "schema_version": "1.0",
+    "all_material_components_identified": true,
+    "coverage_statement": "Four additive components map mid-cycle lithium and specialty operations, conversion capacity option, net financial claims, and cycle/capex reserve once each.",
+    "components": [
+      {
+        "id": "midcycle_lithium_and_specialty_operations",
+        "label": "Mid-cycle lithium, bromine, and specialty chemicals operations",
+        "category": "operating_business",
+        "overlap_key": "midcycle_lithium_and_specialty_operations",
+        "treatment": "additive",
+        "valuation": {
+          "method": "owner_cash_or_dividend_discount",
+          "basis": "per_share",
+          "low": 18.5302,
+          "base": 32.4297,
+          "high": 50.9599,
+          "evidence_tier": "primary_derived",
+          "evidence": "Primary bridge from ALB/investor-documents/sec-edgar/10-K_20260211_rpt20251231_acc0000915913_26_000018.htm: FY2025 net sales $5142.733M, OCF $1282.267M, Q1 2026 cash $1089.809M, total debt $1881.831M; contract backfill 2026-07-21.",
+          "assumption_summary": "Proof outputs {'low': 18.5302, 'base': 32.4297, 'high': 50.9599}; see calculation_proof graph.",
+          "cross_check": "Reconcile to FY2025 10-K and Q1 2026 10-Q before decision use.",
+          "falsifier": "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
+          "valuation_status": "bounded_estimate",
+          "calculation_proof": {
+            "schema_version": "1.0",
+            "method_id": "owner_cash_or_dividend_discount",
+            "method_version": "1.0",
+            "output_unit": "USD_per_share",
+            "inputs": [
+              {
+                "id": "ocf_fy2025_m",
+                "label": "FY2025 net cash from operating activities",
+                "kind": "fact",
+                "value": 1282.267,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "ALB/investor-documents/sec-edgar/10-K_20260211_rpt20251231_acc0000915913_26_000018.htm",
+                  "locator": "NetCashProvidedByUsedInOperatingActivities $1,282.3M (FY2025)",
+                  "as_of": "2025-12-31"
+                },
+                "locked": true
+              },
+              {
+                "id": "ocf_three_year_avg_m",
+                "label": "Three-year average operating cash flow (FY2023\u2013FY2025)",
+                "kind": "fact",
+                "value": 1098.909,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "ALB/investor-documents/sec-edgar/10-K_20260211_rpt20251231_acc0000915913_26_000018.htm",
+                  "locator": "FY2025 $1282.267M, FY2024 $687.876M, FY2023 $1326.583M; midpoint normalization",
+                  "as_of": "2025-12-31"
+                },
+                "locked": true
+              },
+              {
+                "id": "shares_m",
+                "label": "Q1 2026 diluted shares (weighted average)",
+                "kind": "fact",
+                "value": 118.607,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "ALB/investor-documents/sec-edgar/10-Q_20260506_rpt20260331_acc0000915913_26_000072.htm",
+                  "locator": "Q1 2026 weighted average diluted shares 118.607M; net income $319.091M / EPS $2.34",
+                  "as_of": "2026-03-31"
+                },
+                "locked": true
+              }
+            ],
+            "assumptions": [
+              {
+                "id": "owner_cash_per_share",
+                "label": "Normalized owner cash per diluted share (three-year average OCF proxy)",
+                "kind": "judgment",
+                "values": {
+                  "low": 9.2651,
+                  "base": 9.2651,
+                  "high": 9.2651
+                },
+                "unit": "USD_per_share",
+                "rationale": "Lithium trough years distort GAAP earnings; three-year average operating cash flow per share anchors specialty chemicals and energy storage cash conversion.",
+                "allowed_range": {
+                  "min": 0.0,
+                  "max": 25.0
+                }
+              },
+              {
+                "id": "capitalization_multiple",
+                "label": "Duration-adjusted owner-cash capitalization multiple",
+                "kind": "judgment",
+                "values": {
+                  "low": 2.0,
+                  "base": 3.5002,
+                  "high": 5.5002
+                },
+                "unit": "multiple",
+                "rationale": "Bear stresses prolonged lithium price weakness; base mid-cycle seven-year path; bull modest recovery without 2022 peak-cycle heroics.",
+                "allowed_range": {
+                  "min": 1.5,
+                  "max": 8.0
+                }
+              }
+            ],
+            "calculations": [
+              {
+                "id": "value_per_share",
+                "label": "Mid-cycle lithium and specialty operations per share",
+                "op": "multiply",
+                "args": [
+                  "owner_cash_per_share",
+                  "capitalization_multiple"
+                ],
+                "unit": "USD_per_share"
+              }
+            ],
+            "outputs": {
+              "low": "value_per_share",
+              "base": "value_per_share",
+              "high": "value_per_share"
+            }
+          }
+        }
+      },
+      {
+        "id": "conversion_capacity_and_contract_option",
+        "label": "Conversion capacity ramp and long-term contract volume option",
+        "category": "real_option",
+        "overlap_key": "conversion_capacity_and_contract_option",
+        "treatment": "additive",
+        "valuation": {
+          "method": "risk_adjusted_milestone_value",
+          "basis": "per_share",
+          "low": 0.0,
+          "base": 15.0,
+          "high": 40.0002,
+          "evidence_tier": "primary_derived",
+          "evidence": "Primary bridge from ALB/investor-documents/sec-edgar/10-K_20260211_rpt20251231_acc0000915913_26_000018.htm: FY2025 net sales $5142.733M, OCF $1282.267M, Q1 2026 cash $1089.809M, total debt $1881.831M; contract backfill 2026-07-21.",
+          "assumption_summary": "Proof outputs {'low': 0.0, 'base': 15.0, 'high': 40.0002}; see calculation_proof graph.",
+          "cross_check": "Reconcile to FY2025 10-K and Q1 2026 10-Q before decision use.",
+          "falsifier": "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
+          "valuation_status": "bounded_estimate",
+          "calculation_proof": {
+            "schema_version": "1.0",
+            "method_id": "risk_adjusted_milestone_value",
+            "method_version": "1.0",
+            "output_unit": "USD_per_share",
+            "inputs": [
+              {
+                "id": "total_revenue_m",
+                "label": "FY2025 consolidated net sales",
+                "kind": "fact",
+                "value": 5142.733,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "ALB/investor-documents/sec-edgar/10-K_20260211_rpt20251231_acc0000915913_26_000018.htm",
+                  "locator": "Revenues $5142.733M (FY2025 consolidated)",
+                  "as_of": "2025-12-31"
+                },
+                "locked": true
+              },
+              {
+                "id": "shares_m",
+                "label": "Q1 2026 diluted shares",
+                "kind": "fact",
+                "value": 118.607,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "ALB/investor-documents/sec-edgar/10-Q_20260506_rpt20260331_acc0000915913_26_000072.htm",
+                  "locator": "Q1 2026 weighted average diluted shares 118.607M",
+                  "as_of": "2026-03-31"
+                },
+                "locked": true
+              }
+            ],
+            "assumptions": [
+              {
+                "id": "conversion_milestone_m",
+                "label": "Risk-adjusted incremental conversion capacity and contract volume economics",
+                "kind": "judgment",
+                "values": {
+                  "low": 0.0,
+                  "base": 1779.1,
+                  "high": 4744.3
+                },
+                "unit": "USD_m",
+                "rationale": "Non-overlapping claim on ramping lithium conversion and long-term offtake economics not fully captured in trough-year owner-cash multiple; base is judgment band.",
+                "allowed_range": {
+                  "min": 0.0,
+                  "max": 6000.0
+                }
+              }
+            ],
+            "calculations": [
+              {
+                "id": "value_per_share",
+                "label": "Conversion capacity and contract option per share",
+                "op": "divide",
+                "args": [
+                  "conversion_milestone_m",
+                  "shares_m"
+                ],
+                "unit": "USD_per_share"
+              }
+            ],
+            "outputs": {
+              "low": "value_per_share",
+              "base": "value_per_share",
+              "high": "value_per_share"
+            }
+          }
+        }
+      },
+      {
+        "id": "net_financial_claims",
+        "label": "Net cash and debt claims on common equity",
+        "category": "liability_or_reserve",
+        "overlap_key": "net_financial_claims",
+        "treatment": "additive",
+        "valuation": {
+          "method": "net_asset_value",
+          "basis": "per_share",
+          "low": -9.3249,
+          "base": -6.6775,
+          "high": -4.0301,
+          "evidence_tier": "primary_derived",
+          "evidence": "Primary bridge from ALB/investor-documents/sec-edgar/10-K_20260211_rpt20251231_acc0000915913_26_000018.htm: FY2025 net sales $5142.733M, OCF $1282.267M, Q1 2026 cash $1089.809M, total debt $1881.831M; contract backfill 2026-07-21.",
+          "assumption_summary": "Proof outputs {'low': -9.3249, 'base': -6.6775, 'high': -4.0301}; see calculation_proof graph.",
+          "cross_check": "Reconcile to FY2025 10-K and Q1 2026 10-Q before decision use.",
+          "falsifier": "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
+          "valuation_status": "bounded_estimate",
+          "calculation_proof": {
+            "schema_version": "1.0",
+            "method_id": "net_asset_value",
+            "method_version": "1.0",
+            "output_unit": "USD_per_share",
+            "inputs": [
+              {
+                "id": "cash_m",
+                "label": "Cash and cash equivalents (Q1 2026)",
+                "kind": "fact",
+                "value": 1089.809,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "ALB/investor-documents/sec-edgar/10-Q_20260506_rpt20260331_acc0000915913_26_000072.htm",
+                  "locator": "CashAndCashEquivalentsAtCarryingValue $1089.809M at March 31, 2026",
+                  "as_of": "2026-03-31"
+                },
+                "locked": true
+              },
+              {
+                "id": "debt_lt_m",
+                "label": "Long-term debt",
+                "kind": "fact",
+                "value": 1807.203,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "ALB/investor-documents/sec-edgar/10-Q_20260506_rpt20260331_acc0000915913_26_000072.htm",
+                  "locator": "LongTermDebtNoncurrent $1807.203M at March 31, 2026",
+                  "as_of": "2026-03-31"
+                },
+                "locked": true
+              },
+              {
+                "id": "debt_cur_m",
+                "label": "Current portion of long-term debt",
+                "kind": "fact",
+                "value": 74.628,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "ALB/investor-documents/sec-edgar/10-Q_20260506_rpt20260331_acc0000915913_26_000072.htm",
+                  "locator": "LongTermDebtCurrent $74.628M at March 31, 2026",
+                  "as_of": "2026-03-31"
+                },
+                "locked": true
+              },
+              {
+                "id": "shares_m",
+                "label": "Q1 2026 diluted shares",
+                "kind": "fact",
+                "value": 118.607,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "ALB/investor-documents/sec-edgar/10-Q_20260506_rpt20260331_acc0000915913_26_000072.htm",
+                  "locator": "Q1 2026 weighted average diluted shares 118.607M",
+                  "as_of": "2026-03-31"
+                },
+                "locked": true
+              }
+            ],
+            "assumptions": [
+              {
+                "id": "net_corporate_claim_m",
+                "label": "Net financial claim after cash and total debt",
+                "kind": "judgment",
+                "values": {
+                  "low": -1106.0,
+                  "base": -792.0,
+                  "high": -478.0
+                },
+                "unit": "USD_m",
+                "rationale": "Filing-locked cash less total debt at Q1 2026; low/high stress debt +8% / cash \u221215%.",
+                "allowed_range": {
+                  "min": -2500.0,
+                  "max": 500.0
+                }
+              }
+            ],
+            "calculations": [
+              {
+                "id": "value_per_share",
+                "label": "Net financial claims per share",
+                "op": "divide",
+                "args": [
+                  "net_corporate_claim_m",
+                  "shares_m"
+                ],
+                "unit": "USD_per_share"
+              }
+            ],
+            "outputs": {
+              "low": "value_per_share",
+              "base": "value_per_share",
+              "high": "value_per_share"
+            }
+          }
+        }
+      },
+      {
+        "id": "lithium_cycle_and_capex_reserve",
+        "label": "Lithium price, conversion timing, and capex execution reserve",
+        "category": "liability_or_reserve",
+        "overlap_key": "lithium_cycle_and_capex_reserve",
+        "treatment": "additive",
+        "valuation": {
+          "method": "net_asset_value",
+          "basis": "per_share",
+          "low": -40.0002,
+          "base": -22.0004,
+          "high": -10.0003,
+          "evidence_tier": "primary_derived",
+          "evidence": "Primary bridge from ALB/investor-documents/sec-edgar/10-K_20260211_rpt20251231_acc0000915913_26_000018.htm: FY2025 net sales $5142.733M, OCF $1282.267M, Q1 2026 cash $1089.809M, total debt $1881.831M; contract backfill 2026-07-21.",
+          "assumption_summary": "Proof outputs {'low': -40.0002, 'base': -22.0004, 'high': -10.0003}; see calculation_proof graph.",
+          "cross_check": "Reconcile to FY2025 10-K and Q1 2026 10-Q before decision use.",
+          "falsifier": "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
+          "valuation_status": "bounded_estimate",
+          "calculation_proof": {
+            "schema_version": "1.0",
+            "method_id": "net_asset_value",
+            "method_version": "1.0",
+            "output_unit": "USD_per_share",
+            "inputs": [
+              {
+                "id": "operating_income_m",
+                "label": "FY2025 operating (loss) income",
+                "kind": "fact",
+                "value": -367.084,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "ALB/investor-documents/sec-edgar/10-K_20260211_rpt20251231_acc0000915913_26_000018.htm",
+                  "locator": "OperatingIncomeLoss $-367.084M (FY2025, improved from $-1776.545M prior year)",
+                  "as_of": "2025-12-31"
+                },
+                "locked": true
+              },
+              {
+                "id": "capex_m",
+                "label": "FY2025 payments to acquire property, plant and equipment",
+                "kind": "fact",
+                "value": 589.801,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "ALB/investor-documents/sec-edgar/10-K_20260211_rpt20251231_acc0000915913_26_000018.htm",
+                  "locator": "PaymentsToAcquirePropertyPlantAndEquipment $589.801M (FY2025)",
+                  "as_of": "2025-12-31"
+                },
+                "locked": true
+              },
+              {
+                "id": "shares_m",
+                "label": "Q1 2026 diluted shares",
+                "kind": "fact",
+                "value": 118.607,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "ALB/investor-documents/sec-edgar/10-Q_20260506_rpt20260331_acc0000915913_26_000072.htm",
+                  "locator": "Q1 2026 weighted average diluted shares 118.607M",
+                  "as_of": "2026-03-31"
+                },
+                "locked": true
+              }
+            ],
+            "assumptions": [
+              {
+                "id": "reserve_m",
+                "label": "Lithium price, conversion timing, and capex execution stress reserve",
+                "kind": "judgment",
+                "values": {
+                  "low": -4744.3,
+                  "base": -2609.4,
+                  "high": -1186.1
+                },
+                "unit": "USD_m",
+                "rationale": "Negative reserve for prolonged lithium price weakness, project delays, and write-down risk not fully embedded in trough-year owner-cash multiple.",
+                "allowed_range": {
+                  "min": -6000.0,
+                  "max": -500.0
+                }
+              }
+            ],
+            "calculations": [
+              {
+                "id": "value_per_share",
+                "label": "Lithium cycle and capex reserve per share",
+                "op": "divide",
+                "args": [
+                  "reserve_m",
+                  "shares_m"
+                ],
+                "unit": "USD_per_share"
+              }
+            ],
+            "outputs": {
+              "low": "value_per_share",
+              "base": "value_per_share",
+              "high": "value_per_share"
+            }
+          }
+        }
+      }
+    ]
+  },
+  "economic_value_analysis": {
+    "schema_version": "1.0",
+    "status": "evidence_blocked",
+    "trigger": {
+      "required": true,
+      "reasons": [
+        "explicit_component_schedule"
+      ],
+      "policy": "A complete economic-value analysis is required when any trigger fires; otherwise it is recommended."
+    },
+    "method": "economic_claim_to_risked_present_value",
+    "economic_claim": {},
+    "gaap_role": null,
+    "accounting_reference": null,
+    "comparable_hierarchy": [
+      "issuer_arm_length_transaction",
+      "same_asset_transaction",
+      "public_peer",
+      "replacement_cost",
+      "approved_external_analysis"
+    ],
+    "gross_comparable_nav_per_share": null,
+    "risked_present_value_per_share": {
+      "low": -30.79,
+      "base": 18.75,
+      "high": 76.93
+    },
+    "component_groups": [
+      {
+        "id": "midcycle_lithium_and_specialty_operations",
+        "label": "Mid-cycle lithium, bromine, and specialty chemicals operations",
+        "component_ids": [
+          "midcycle_lithium_and_specialty_operations"
+        ],
+        "economic_claim": "Mid-cycle lithium, bromine, and specialty chemicals operations",
+        "valuation_basis": "Proof outputs {'low': 18.5302, 'base': 32.4297, 'high': 50.9599}; see calculation_proof graph.",
+        "adjustments": "Reconcile to FY2025 10-K and Q1 2026 10-Q before decision use.",
+        "overlap_control": "Unique overlap key midcycle_lithium_and_specialty_operations.",
+        "risked_present_value_per_share": {
+          "low": 18.53,
+          "base": 32.43,
+          "high": 50.96
+        }
+      },
+      {
+        "id": "conversion_capacity_and_contract_option",
+        "label": "Conversion capacity ramp and long-term contract volume option",
+        "component_ids": [
+          "conversion_capacity_and_contract_option"
+        ],
+        "economic_claim": "Conversion capacity ramp and long-term contract volume option",
+        "valuation_basis": "Proof outputs {'low': 0.0, 'base': 15.0, 'high': 40.0002}; see calculation_proof graph.",
+        "adjustments": "Reconcile to FY2025 10-K and Q1 2026 10-Q before decision use.",
+        "overlap_control": "Unique overlap key conversion_capacity_and_contract_option.",
+        "risked_present_value_per_share": {
+          "low": 0.0,
+          "base": 15.0,
+          "high": 40.0
+        }
+      },
+      {
+        "id": "net_financial_claims",
+        "label": "Net cash and debt claims on common equity",
+        "component_ids": [
+          "net_financial_claims"
+        ],
+        "economic_claim": "Net cash and debt claims on common equity",
+        "valuation_basis": "Proof outputs {'low': -9.3249, 'base': -6.6775, 'high': -4.0301}; see calculation_proof graph.",
+        "adjustments": "Reconcile to FY2025 10-K and Q1 2026 10-Q before decision use.",
+        "overlap_control": "Unique overlap key net_financial_claims.",
+        "risked_present_value_per_share": {
+          "low": -9.32,
+          "base": -6.68,
+          "high": -4.03
+        }
+      },
+      {
+        "id": "lithium_cycle_and_capex_reserve",
+        "label": "Lithium price, conversion timing, and capex execution reserve",
+        "component_ids": [
+          "lithium_cycle_and_capex_reserve"
+        ],
+        "economic_claim": "Lithium price, conversion timing, and capex execution reserve",
+        "valuation_basis": "Proof outputs {'low': -40.0002, 'base': -22.0004, 'high': -10.0003}; see calculation_proof graph.",
+        "adjustments": "Reconcile to FY2025 10-K and Q1 2026 10-Q before decision use.",
+        "overlap_control": "Unique overlap key lithium_cycle_and_capex_reserve.",
+        "risked_present_value_per_share": {
+          "low": -40.0,
+          "base": -22.0,
+          "high": -10.0
+        }
+      }
+    ],
+    "valuation_proof": [
+      {
+        "component_id": "midcycle_lithium_and_specialty_operations",
+        "economic_claim": "Mid-cycle lithium, bromine, and specialty chemicals operations",
+        "quantity": {
+          "value": 1,
+          "unit": "per-share economic claim"
+        },
+        "method": "owner_cash_or_dividend_discount",
+        "evidence_tier": "primary_derived",
+        "evidence": "Primary bridge from ALB/investor-documents/sec-edgar/10-K_20260211_rpt20251231_acc0000915913_26_000018.htm: FY2025 net sales $5142.733M, OCF $1282.267M, Q1 2026 cash $1089.809M, total debt $1881.831M; contract backfill 2026-07-21.",
+        "comparable_role": "not_applicable",
+        "comparable_ids": [],
+        "adjustment": "Reconcile to FY2025 10-K and Q1 2026 10-Q before decision use.",
+        "range_per_share": {
+          "low": 18.53,
+          "base": 32.43,
+          "high": 50.96
+        },
+        "treatment": "additive",
+        "overlap_key": "midcycle_lithium_and_specialty_operations",
+        "overlap_control": "Unique overlap key midcycle_lithium_and_specialty_operations.",
+        "falsifier": "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
+        "risk_and_timing": null
+      },
+      {
+        "component_id": "conversion_capacity_and_contract_option",
+        "economic_claim": "Conversion capacity ramp and long-term contract volume option",
+        "quantity": {
+          "value": 1,
+          "unit": "per-share economic claim"
+        },
+        "method": "risk_adjusted_milestone_value",
+        "evidence_tier": "primary_derived",
+        "evidence": "Primary bridge from ALB/investor-documents/sec-edgar/10-K_20260211_rpt20251231_acc0000915913_26_000018.htm: FY2025 net sales $5142.733M, OCF $1282.267M, Q1 2026 cash $1089.809M, total debt $1881.831M; contract backfill 2026-07-21.",
+        "comparable_role": "not_applicable",
+        "comparable_ids": [],
+        "adjustment": "Reconcile to FY2025 10-K and Q1 2026 10-Q before decision use.",
+        "range_per_share": {
+          "low": 0.0,
+          "base": 15.0,
+          "high": 40.0
+        },
+        "treatment": "additive",
+        "overlap_key": "conversion_capacity_and_contract_option",
+        "overlap_control": "Unique overlap key conversion_capacity_and_contract_option.",
+        "falsifier": "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
+        "risk_and_timing": {
+          "success_probability": null,
+          "remaining_capital_m": null,
+          "timing_basis": null,
+          "probability_basis": null,
+          "remaining_capital_basis": null
+        }
+      },
+      {
+        "component_id": "net_financial_claims",
+        "economic_claim": "Net cash and debt claims on common equity",
+        "quantity": {
+          "value": 1,
+          "unit": "per-share economic claim"
+        },
+        "method": "net_asset_value",
+        "evidence_tier": "primary_derived",
+        "evidence": "Primary bridge from ALB/investor-documents/sec-edgar/10-K_20260211_rpt20251231_acc0000915913_26_000018.htm: FY2025 net sales $5142.733M, OCF $1282.267M, Q1 2026 cash $1089.809M, total debt $1881.831M; contract backfill 2026-07-21.",
+        "comparable_role": "not_applicable",
+        "comparable_ids": [],
+        "adjustment": "Reconcile to FY2025 10-K and Q1 2026 10-Q before decision use.",
+        "range_per_share": {
+          "low": -9.32,
+          "base": -6.68,
+          "high": -4.03
+        },
+        "treatment": "additive",
+        "overlap_key": "net_financial_claims",
+        "overlap_control": "Unique overlap key net_financial_claims.",
+        "falsifier": "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
+        "risk_and_timing": null
+      },
+      {
+        "component_id": "lithium_cycle_and_capex_reserve",
+        "economic_claim": "Lithium price, conversion timing, and capex execution reserve",
+        "quantity": {
+          "value": 1,
+          "unit": "per-share economic claim"
+        },
+        "method": "net_asset_value",
+        "evidence_tier": "primary_derived",
+        "evidence": "Primary bridge from ALB/investor-documents/sec-edgar/10-K_20260211_rpt20251231_acc0000915913_26_000018.htm: FY2025 net sales $5142.733M, OCF $1282.267M, Q1 2026 cash $1089.809M, total debt $1881.831M; contract backfill 2026-07-21.",
+        "comparable_role": "not_applicable",
+        "comparable_ids": [],
+        "adjustment": "Reconcile to FY2025 10-K and Q1 2026 10-Q before decision use.",
+        "range_per_share": {
+          "low": -40.0,
+          "base": -22.0,
+          "high": -10.0
+        },
+        "treatment": "additive",
+        "overlap_key": "lithium_cycle_and_capex_reserve",
+        "overlap_control": "Unique overlap key lithium_cycle_and_capex_reserve.",
+        "falsifier": "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
+        "risk_and_timing": null
+      }
+    ],
+    "wisdom_applied": [],
+    "limitations": [],
+    "complete_component_coverage": true,
+    "validation_errors": [
+      "economic_claim.description required",
+      "economic_claim.enterprise_to_equity_reconciliation required",
+      "economic_claim.unit_count required",
+      "economic_claim.unit_label required",
+      "economic_claim.unit_source required",
+      "economic_value.schema_version 1.0 required",
+      "gaap_role required",
+      "option component conversion_capacity_and_contract_option requires probability, timing, and remaining-capital treatment"
+    ],
+    "registry_version": "1.0"
+  },
+  "total_return_panel": {
+    "schema_version": "3.0",
+    "ticker": "ALB",
+    "as_of": "2026-07-21",
+    "status": "partial",
+    "error": "Vendor events are discovery evidence; primary-source completeness has not been established.",
+    "price_source": "yahoo:ALB",
+    "currency": "USD",
+    "return_currency": "USD",
+    "fx_basis": "listing_currency_nominal",
+    "history_start": "1994-02-22",
+    "history_end": "2026-07-21",
+    "price_points": 8156,
+    "price_interval": "1d",
+    "history_basis": "earliest_available_vendor_trading_history",
+    "chart_scale": "logarithmic",
+    "chart_y_axis": "cumulative_return_pct",
+    "chart_series": [
+      "total_return",
+      "price_only"
+    ],
+    "return_contract": "split-adjusted close excluding dividends; event amounts normalized for later splits; cash reinvested at ex-date close; pre-tax nominal",
+    "coverage": {
+      "status": "vendor_only",
+      "start": null,
+      "end": null,
+      "note": "Vendor events are discovery evidence; primary-source completeness has not been established.",
+      "ledger_path": null
+    },
+    "event_count": 133,
+    "event_counts": {
+      "regular_dividend": 132,
+      "split": 1
+    },
+    "cash_distributions_on_initial_share_path": 31.916,
+    "distribution_contribution_by_type": {
+      "regular_dividend": 31.915967
+    },
+    "cumulative_distributions_per_share": 31.916,
+    "start_price": 7.25,
+    "end_price": 118.53,
+    "price_index_end": 1634.9,
+    "total_return_index_end": 2465.98,
+    "cumulative_price_return_pct": 1534.9,
+    "cumulative_total_return_pct": 2365.98,
+    "price_only_annualized_pct": 9.0,
+    "total_return_annualized_pct": 10.4,
+    "market_cap_m": 14019.35,
+    "shares_outstanding": 118607000,
+    "price_for_market_cap": 118.2,
+    "chart": "ALB/research/charts/total_return_2026-07-21.svg",
+    "panel_json": "ALB/research/total_return_panel.json"
+  },
+  "results_lawrence_legacy": {
+    "bear": {
+      "return_pct": -1.2
+    },
+    "base": {
+      "return_pct": 11.2
+    },
+    "bull": {
+      "return_pct": 19.9
+    }
+  },
+  "results": {
+    "bear": {
+      "return_pct": -1.2
+    },
+    "base": {
+      "return_pct": 11.2
+    },
+    "bull": {
+      "return_pct": 19.9
+    }
+  },
+  "results_growth_theory": {
+    "theory_implied": {
+      "return_pct": 11.2
+    },
+    "falsifier_adjusted": {
+      "return_pct": 11.2
+    }
+  },
+  "implied_return": {
+    "base_pct": 12.9,
+    "label": "7yr IRR (total synthesis)",
+    "display": "12.9% (total synthesis)",
+    "lawrence_stance_gate_pct": 11.2,
+    "falsifier_adjusted_pct": 11.2,
+    "synthesis_pct": 12.9
+  },
+  "overlay_results": [],
+  "component_valuation_results": {
+    "status": "complete",
+    "decision_rule": "Use the complete low/base/high component schedule. Embedded components are estimated but not added twice.",
+    "all_material_components_identified": true,
+    "additive_components": [
+      {
+        "id": "midcycle_lithium_and_specialty_operations",
+        "label": "Mid-cycle lithium, bromine, and specialty chemicals operations",
+        "category": "operating_business",
+        "overlap_key": "midcycle_lithium_and_specialty_operations",
+        "treatment": "additive",
+        "included_in_component_id": null,
+        "method": "owner_cash_or_dividend_discount",
+        "valuation_status": "bounded_estimate",
+        "calculation_proof": {
+          "schema_version": "1.0",
+          "method_id": "owner_cash_or_dividend_discount",
+          "method_version": "1.0",
+          "output_unit": "USD_per_share",
+          "inputs": [
+            {
+              "id": "ocf_fy2025_m",
+              "label": "FY2025 net cash from operating activities",
+              "kind": "fact",
+              "value": 1282.267,
+              "unit": "USD_m",
+              "source": {
+                "ref": "ALB/investor-documents/sec-edgar/10-K_20260211_rpt20251231_acc0000915913_26_000018.htm",
+                "locator": "NetCashProvidedByUsedInOperatingActivities $1,282.3M (FY2025)",
+                "as_of": "2025-12-31"
+              },
+              "locked": true
+            },
+            {
+              "id": "ocf_three_year_avg_m",
+              "label": "Three-year average operating cash flow (FY2023\u2013FY2025)",
+              "kind": "fact",
+              "value": 1098.909,
+              "unit": "USD_m",
+              "source": {
+                "ref": "ALB/investor-documents/sec-edgar/10-K_20260211_rpt20251231_acc0000915913_26_000018.htm",
+                "locator": "FY2025 $1282.267M, FY2024 $687.876M, FY2023 $1326.583M; midpoint normalization",
+                "as_of": "2025-12-31"
+              },
+              "locked": true
+            },
+            {
+              "id": "shares_m",
+              "label": "Q1 2026 diluted shares (weighted average)",
+              "kind": "fact",
+              "value": 118.607,
+              "unit": "million_shares",
+              "source": {
+                "ref": "ALB/investor-documents/sec-edgar/10-Q_20260506_rpt20260331_acc0000915913_26_000072.htm",
+                "locator": "Q1 2026 weighted average diluted shares 118.607M; net income $319.091M / EPS $2.34",
+                "as_of": "2026-03-31"
+              },
+              "locked": true
+            }
+          ],
+          "assumptions": [
+            {
+              "id": "owner_cash_per_share",
+              "label": "Normalized owner cash per diluted share (three-year average OCF proxy)",
+              "kind": "judgment",
+              "values": {
+                "low": 9.2651,
+                "base": 9.2651,
+                "high": 9.2651
+              },
+              "unit": "USD_per_share",
+              "rationale": "Lithium trough years distort GAAP earnings; three-year average operating cash flow per share anchors specialty chemicals and energy storage cash conversion.",
+              "allowed_range": {
+                "min": 0.0,
+                "max": 25.0
+              }
+            },
+            {
+              "id": "capitalization_multiple",
+              "label": "Duration-adjusted owner-cash capitalization multiple",
+              "kind": "judgment",
+              "values": {
+                "low": 2.0,
+                "base": 3.5002,
+                "high": 5.5002
+              },
+              "unit": "multiple",
+              "rationale": "Bear stresses prolonged lithium price weakness; base mid-cycle seven-year path; bull modest recovery without 2022 peak-cycle heroics.",
+              "allowed_range": {
+                "min": 1.5,
+                "max": 8.0
+              }
+            }
+          ],
+          "calculations": [
+            {
+              "id": "value_per_share",
+              "label": "Mid-cycle lithium and specialty operations per share",
+              "op": "multiply",
+              "args": [
+                "owner_cash_per_share",
+                "capitalization_multiple"
+              ],
+              "unit": "USD_per_share"
+            }
+          ],
+          "outputs": {
+            "low": "value_per_share",
+            "base": "value_per_share",
+            "high": "value_per_share"
+          }
+        },
+        "evidence_tier": "primary_derived",
+        "evidence": "Primary bridge from ALB/investor-documents/sec-edgar/10-K_20260211_rpt20251231_acc0000915913_26_000018.htm: FY2025 net sales $5142.733M, OCF $1282.267M, Q1 2026 cash $1089.809M, total debt $1881.831M; contract backfill 2026-07-21.",
+        "cross_check": "Reconcile to FY2025 10-K and Q1 2026 10-Q before decision use.",
+        "driver_model_type": null,
+        "driver_model": null,
+        "assumption_summary": "Proof outputs {'low': 18.5302, 'base': 32.4297, 'high': 50.9599}; see calculation_proof graph.",
+        "falsifier": "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
+        "scenario_assumptions": null,
+        "low_per_share": 18.53,
+        "base_per_share": 32.43,
+        "high_per_share": 50.96
+      },
+      {
+        "id": "conversion_capacity_and_contract_option",
+        "label": "Conversion capacity ramp and long-term contract volume option",
+        "category": "real_option",
+        "overlap_key": "conversion_capacity_and_contract_option",
+        "treatment": "additive",
+        "included_in_component_id": null,
+        "method": "risk_adjusted_milestone_value",
+        "valuation_status": "bounded_estimate",
+        "calculation_proof": {
+          "schema_version": "1.0",
+          "method_id": "risk_adjusted_milestone_value",
+          "method_version": "1.0",
+          "output_unit": "USD_per_share",
+          "inputs": [
+            {
+              "id": "total_revenue_m",
+              "label": "FY2025 consolidated net sales",
+              "kind": "fact",
+              "value": 5142.733,
+              "unit": "USD_m",
+              "source": {
+                "ref": "ALB/investor-documents/sec-edgar/10-K_20260211_rpt20251231_acc0000915913_26_000018.htm",
+                "locator": "Revenues $5142.733M (FY2025 consolidated)",
+                "as_of": "2025-12-31"
+              },
+              "locked": true
+            },
+            {
+              "id": "shares_m",
+              "label": "Q1 2026 diluted shares",
+              "kind": "fact",
+              "value": 118.607,
+              "unit": "million_shares",
+              "source": {
+                "ref": "ALB/investor-documents/sec-edgar/10-Q_20260506_rpt20260331_acc0000915913_26_000072.htm",
+                "locator": "Q1 2026 weighted average diluted shares 118.607M",
+                "as_of": "2026-03-31"
+              },
+              "locked": true
+            }
+          ],
+          "assumptions": [
+            {
+              "id": "conversion_milestone_m",
+              "label": "Risk-adjusted incremental conversion capacity and contract volume economics",
+              "kind": "judgment",
+              "values": {
+                "low": 0.0,
+                "base": 1779.1,
+                "high": 4744.3
+              },
+              "unit": "USD_m",
+              "rationale": "Non-overlapping claim on ramping lithium conversion and long-term offtake economics not fully captured in trough-year owner-cash multiple; base is judgment band.",
+              "allowed_range": {
+                "min": 0.0,
+                "max": 6000.0
+              }
+            }
+          ],
+          "calculations": [
+            {
+              "id": "value_per_share",
+              "label": "Conversion capacity and contract option per share",
+              "op": "divide",
+              "args": [
+                "conversion_milestone_m",
+                "shares_m"
+              ],
+              "unit": "USD_per_share"
+            }
+          ],
+          "outputs": {
+            "low": "value_per_share",
+            "base": "value_per_share",
+            "high": "value_per_share"
+          }
+        },
+        "evidence_tier": "primary_derived",
+        "evidence": "Primary bridge from ALB/investor-documents/sec-edgar/10-K_20260211_rpt20251231_acc0000915913_26_000018.htm: FY2025 net sales $5142.733M, OCF $1282.267M, Q1 2026 cash $1089.809M, total debt $1881.831M; contract backfill 2026-07-21.",
+        "cross_check": "Reconcile to FY2025 10-K and Q1 2026 10-Q before decision use.",
+        "driver_model_type": null,
+        "driver_model": null,
+        "assumption_summary": "Proof outputs {'low': 0.0, 'base': 15.0, 'high': 40.0002}; see calculation_proof graph.",
+        "falsifier": "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
+        "scenario_assumptions": null,
+        "low_per_share": 0.0,
+        "base_per_share": 15.0,
+        "high_per_share": 40.0
+      },
+      {
+        "id": "net_financial_claims",
+        "label": "Net cash and debt claims on common equity",
+        "category": "liability_or_reserve",
+        "overlap_key": "net_financial_claims",
+        "treatment": "additive",
+        "included_in_component_id": null,
+        "method": "net_asset_value",
+        "valuation_status": "bounded_estimate",
+        "calculation_proof": {
+          "schema_version": "1.0",
+          "method_id": "net_asset_value",
+          "method_version": "1.0",
+          "output_unit": "USD_per_share",
+          "inputs": [
+            {
+              "id": "cash_m",
+              "label": "Cash and cash equivalents (Q1 2026)",
+              "kind": "fact",
+              "value": 1089.809,
+              "unit": "USD_m",
+              "source": {
+                "ref": "ALB/investor-documents/sec-edgar/10-Q_20260506_rpt20260331_acc0000915913_26_000072.htm",
+                "locator": "CashAndCashEquivalentsAtCarryingValue $1089.809M at March 31, 2026",
+                "as_of": "2026-03-31"
+              },
+              "locked": true
+            },
+            {
+              "id": "debt_lt_m",
+              "label": "Long-term debt",
+              "kind": "fact",
+              "value": 1807.203,
+              "unit": "USD_m",
+              "source": {
+                "ref": "ALB/investor-documents/sec-edgar/10-Q_20260506_rpt20260331_acc0000915913_26_000072.htm",
+                "locator": "LongTermDebtNoncurrent $1807.203M at March 31, 2026",
+                "as_of": "2026-03-31"
+              },
+              "locked": true
+            },
+            {
+              "id": "debt_cur_m",
+              "label": "Current portion of long-term debt",
+              "kind": "fact",
+              "value": 74.628,
+              "unit": "USD_m",
+              "source": {
+                "ref": "ALB/investor-documents/sec-edgar/10-Q_20260506_rpt20260331_acc0000915913_26_000072.htm",
+                "locator": "LongTermDebtCurrent $74.628M at March 31, 2026",
+                "as_of": "2026-03-31"
+              },
+              "locked": true
+            },
+            {
+              "id": "shares_m",
+              "label": "Q1 2026 diluted shares",
+              "kind": "fact",
+              "value": 118.607,
+              "unit": "million_shares",
+              "source": {
+                "ref": "ALB/investor-documents/sec-edgar/10-Q_20260506_rpt20260331_acc0000915913_26_000072.htm",
+                "locator": "Q1 2026 weighted average diluted shares 118.607M",
+                "as_of": "2026-03-31"
+              },
+              "locked": true
+            }
+          ],
+          "assumptions": [
+            {
+              "id": "net_corporate_claim_m",
+              "label": "Net financial claim after cash and total debt",
+              "kind": "judgment",
+              "values": {
+                "low": -1106.0,
+                "base": -792.0,
+                "high": -478.0
+              },
+              "unit": "USD_m",
+              "rationale": "Filing-locked cash less total debt at Q1 2026; low/high stress debt +8% / cash \u221215%.",
+              "allowed_range": {
+                "min": -2500.0,
+                "max": 500.0
+              }
+            }
+          ],
+          "calculations": [
+            {
+              "id": "value_per_share",
+              "label": "Net financial claims per share",
+              "op": "divide",
+              "args": [
+                "net_corporate_claim_m",
+                "shares_m"
+              ],
+              "unit": "USD_per_share"
+            }
+          ],
+          "outputs": {
+            "low": "value_per_share",
+            "base": "value_per_share",
+            "high": "value_per_share"
+          }
+        },
+        "evidence_tier": "primary_derived",
+        "evidence": "Primary bridge from ALB/investor-documents/sec-edgar/10-K_20260211_rpt20251231_acc0000915913_26_000018.htm: FY2025 net sales $5142.733M, OCF $1282.267M, Q1 2026 cash $1089.809M, total debt $1881.831M; contract backfill 2026-07-21.",
+        "cross_check": "Reconcile to FY2025 10-K and Q1 2026 10-Q before decision use.",
+        "driver_model_type": null,
+        "driver_model": null,
+        "assumption_summary": "Proof outputs {'low': -9.3249, 'base': -6.6775, 'high': -4.0301}; see calculation_proof graph.",
+        "falsifier": "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
+        "scenario_assumptions": null,
+        "low_per_share": -9.32,
+        "base_per_share": -6.68,
+        "high_per_share": -4.03
+      },
+      {
+        "id": "lithium_cycle_and_capex_reserve",
+        "label": "Lithium price, conversion timing, and capex execution reserve",
+        "category": "liability_or_reserve",
+        "overlap_key": "lithium_cycle_and_capex_reserve",
+        "treatment": "additive",
+        "included_in_component_id": null,
+        "method": "net_asset_value",
+        "valuation_status": "bounded_estimate",
+        "calculation_proof": {
+          "schema_version": "1.0",
+          "method_id": "net_asset_value",
+          "method_version": "1.0",
+          "output_unit": "USD_per_share",
+          "inputs": [
+            {
+              "id": "operating_income_m",
+              "label": "FY2025 operating (loss) income",
+              "kind": "fact",
+              "value": -367.084,
+              "unit": "USD_m",
+              "source": {
+                "ref": "ALB/investor-documents/sec-edgar/10-K_20260211_rpt20251231_acc0000915913_26_000018.htm",
+                "locator": "OperatingIncomeLoss $-367.084M (FY2025, improved from $-1776.545M prior year)",
+                "as_of": "2025-12-31"
+              },
+              "locked": true
+            },
+            {
+              "id": "capex_m",
+              "label": "FY2025 payments to acquire property, plant and equipment",
+              "kind": "fact",
+              "value": 589.801,
+              "unit": "USD_m",
+              "source": {
+                "ref": "ALB/investor-documents/sec-edgar/10-K_20260211_rpt20251231_acc0000915913_26_000018.htm",
+                "locator": "PaymentsToAcquirePropertyPlantAndEquipment $589.801M (FY2025)",
+                "as_of": "2025-12-31"
+              },
+              "locked": true
+            },
+            {
+              "id": "shares_m",
+              "label": "Q1 2026 diluted shares",
+              "kind": "fact",
+              "value": 118.607,
+              "unit": "million_shares",
+              "source": {
+                "ref": "ALB/investor-documents/sec-edgar/10-Q_20260506_rpt20260331_acc0000915913_26_000072.htm",
+                "locator": "Q1 2026 weighted average diluted shares 118.607M",
+                "as_of": "2026-03-31"
+              },
+              "locked": true
+            }
+          ],
+          "assumptions": [
+            {
+              "id": "reserve_m",
+              "label": "Lithium price, conversion timing, and capex execution stress reserve",
+              "kind": "judgment",
+              "values": {
+                "low": -4744.3,
+                "base": -2609.4,
+                "high": -1186.1
+              },
+              "unit": "USD_m",
+              "rationale": "Negative reserve for prolonged lithium price weakness, project delays, and write-down risk not fully embedded in trough-year owner-cash multiple.",
+              "allowed_range": {
+                "min": -6000.0,
+                "max": -500.0
+              }
+            }
+          ],
+          "calculations": [
+            {
+              "id": "value_per_share",
+              "label": "Lithium cycle and capex reserve per share",
+              "op": "divide",
+              "args": [
+                "reserve_m",
+                "shares_m"
+              ],
+              "unit": "USD_per_share"
+            }
+          ],
+          "outputs": {
+            "low": "value_per_share",
+            "base": "value_per_share",
+            "high": "value_per_share"
+          }
+        },
+        "evidence_tier": "primary_derived",
+        "evidence": "Primary bridge from ALB/investor-documents/sec-edgar/10-K_20260211_rpt20251231_acc0000915913_26_000018.htm: FY2025 net sales $5142.733M, OCF $1282.267M, Q1 2026 cash $1089.809M, total debt $1881.831M; contract backfill 2026-07-21.",
+        "cross_check": "Reconcile to FY2025 10-K and Q1 2026 10-Q before decision use.",
+        "driver_model_type": null,
+        "driver_model": null,
+        "assumption_summary": "Proof outputs {'low': -40.0002, 'base': -22.0004, 'high': -10.0003}; see calculation_proof graph.",
+        "falsifier": "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
+        "scenario_assumptions": null,
+        "low_per_share": -40.0,
+        "base_per_share": -22.0,
+        "high_per_share": -10.0
+      }
+    ],
+    "embedded_components": [],
+    "total_equity_value_per_share": {
+      "low": -30.79,
+      "base": 18.75,
+      "high": 76.93
+    },
+    "material_component_count": 4,
+    "additive_component_count": 4,
+    "embedded_component_count": 0,
+    "market_price_per_share": 118.2,
+    "upside_downside_pct": {
+      "low": -126.0,
+      "base": -84.1,
+      "high": -34.9
+    }
+  },
+  "component_review_queue": {
+    "status": "ready_for_committee_review",
+    "decision_rule": "Each assigned rater records accept, challenge, or reject with a proposed range and evidence. The aggregator may not silently average disputed ranges.",
+    "items": [
+      {
+        "component_id": "midcycle_lithium_and_specialty_operations",
+        "label": "Mid-cycle lithium, bromine, and specialty chemicals operations",
+        "treatment": "additive",
+        "range_per_share": {
+          "low": 18.53,
+          "base": 32.43,
+          "high": 50.96
+        },
+        "range_width_pct_of_base": 100.0,
+        "evidence_tier": "primary_derived",
+        "recommended_raters": [
+          "hohn",
+          "marathon_capital_cycle"
+        ],
+        "mandatory_checks": [
+          "Is the valuation method appropriate for this economic claim?",
+          "Is the security's ownership claim and economic-unit denominator reconciled correctly?",
+          "Does the evidence support the low/base/high range and its timing?",
+          "Are comparable assets truly like-for-like after production, contract, location, capital, ownership, and realization adjustments?",
+          "For an option, are success probability, time to realization, and remaining owner-funded capital explicit?",
+          "Is the component additive, or already embedded in another component?",
+          "What observation would move the base estimate materially?"
+        ],
+        "status": "open"
+      },
+      {
+        "component_id": "conversion_capacity_and_contract_option",
+        "label": "Conversion capacity ramp and long-term contract volume option",
+        "treatment": "additive",
+        "range_per_share": {
+          "low": 0.0,
+          "base": 15.0,
+          "high": 40.0
+        },
+        "range_width_pct_of_base": 266.7,
+        "evidence_tier": "primary_derived",
+        "recommended_raters": [
+          "klarman_asset_value",
+          "hk"
+        ],
+        "mandatory_checks": [
+          "Is the valuation method appropriate for this economic claim?",
+          "Is the security's ownership claim and economic-unit denominator reconciled correctly?",
+          "Does the evidence support the low/base/high range and its timing?",
+          "Are comparable assets truly like-for-like after production, contract, location, capital, ownership, and realization adjustments?",
+          "For an option, are success probability, time to realization, and remaining owner-funded capital explicit?",
+          "Is the component additive, or already embedded in another component?",
+          "What observation would move the base estimate materially?"
+        ],
+        "status": "open"
+      },
+      {
+        "component_id": "net_financial_claims",
+        "label": "Net cash and debt claims on common equity",
+        "treatment": "additive",
+        "range_per_share": {
+          "low": -9.32,
+          "base": -6.68,
+          "high": -4.03
+        },
+        "range_width_pct_of_base": 79.2,
+        "evidence_tier": "primary_derived",
+        "recommended_raters": [
+          "marks_credit_cycle",
+          "pabrai"
+        ],
+        "mandatory_checks": [
+          "Is the valuation method appropriate for this economic claim?",
+          "Is the security's ownership claim and economic-unit denominator reconciled correctly?",
+          "Does the evidence support the low/base/high range and its timing?",
+          "Are comparable assets truly like-for-like after production, contract, location, capital, ownership, and realization adjustments?",
+          "For an option, are success probability, time to realization, and remaining owner-funded capital explicit?",
+          "Is the component additive, or already embedded in another component?",
+          "What observation would move the base estimate materially?"
+        ],
+        "status": "open"
+      },
+      {
+        "component_id": "lithium_cycle_and_capex_reserve",
+        "label": "Lithium price, conversion timing, and capex execution reserve",
+        "treatment": "additive",
+        "range_per_share": {
+          "low": -40.0,
+          "base": -22.0,
+          "high": -10.0
+        },
+        "range_width_pct_of_base": 136.4,
+        "evidence_tier": "primary_derived",
+        "recommended_raters": [
+          "marks_credit_cycle",
+          "pabrai"
+        ],
+        "mandatory_checks": [
+          "Is the valuation method appropriate for this economic claim?",
+          "Is the security's ownership claim and economic-unit denominator reconciled correctly?",
+          "Does the evidence support the low/base/high range and its timing?",
+          "Are comparable assets truly like-for-like after production, contract, location, capital, ownership, and realization adjustments?",
+          "For an option, are success probability, time to realization, and remaining owner-funded capital explicit?",
+          "Is the component additive, or already embedded in another component?",
+          "What observation would move the base estimate materially?"
+        ],
+        "status": "open"
+      }
+    ]
+  },
+  "valuation_method_route": {
+    "schema_version": "1.0",
+    "status": "routed",
+    "profile_id": "predictable_cash_flow",
+    "label": "Predictable cash-flow security",
+    "score": 3.0,
+    "reasons": [
+      "component categories=operating_business",
+      "existing methods=dividend, owner_cash"
+    ],
+    "primary_methods": [
+      "owner_cash_or_dividend_discount"
+    ],
+    "corroborating_methods": [
+      "regulated_asset_base",
+      "yield_and_reverse_dcf"
+    ],
+    "primary_personas": [
+      "buffett_weschler",
+      "hohn"
+    ],
+    "cross_check_personas": [
+      "marks_credit_cycle"
+    ],
+    "silent_personas": [
+      "greenblatt",
+      "hk",
+      "klarman_asset_value",
+      "marathon_capital_cycle",
+      "munger",
+      "pabrai",
+      "stahl"
+    ],
+    "required_evidence": [
+      "cash-flow durability",
+      "maintenance capital",
+      "funding plan",
+      "distribution policy",
+      "contract or regulatory reset terms"
+    ],
+    "failure_modes": [
+      "dividend treated as earning power",
+      "growth capital and dilution omitted",
+      "contract renewal or regulatory reset ignored"
+    ],
+    "secondary_profiles": [
+      {
+        "profile_id": "binary_milestone",
+        "score": 3.0,
+        "reasons": [
+          "component categories=real_option",
+          "existing methods=milestone, risk_adjusted"
+        ]
+      },
+      {
+        "profile_id": "quality_reinvestment",
+        "score": 2.0,
+        "reasons": [
+          "component categories=operating_business",
+          "existing methods=owner_cash"
+        ]
+      }
+    ],
+    "scorecard": {
+      "scarce_asset_optionality": {
+        "score": 1.0,
+        "reasons": [
+          "component categories=real_option"
+        ]
+      },
+      "quality_reinvestment": {
+        "score": 2.0,
+        "reasons": [
+          "component categories=operating_business",
+          "existing methods=owner_cash"
+        ]
+      },
+      "capital_cycle": {
+        "score": 1.0,
+        "reasons": [
+          "component categories=operating_business"
+        ]
+      },
+      "credit_and_normalized_returns": {
+        "score": 1.0,
+        "reasons": [
+          "component categories=liability_or_reserve"
+        ]
+      },
+      "catalyst_asset_value": {
+        "score": 0.0,
+        "reasons": []
+      },
+      "predictable_cash_flow": {
+        "score": 3.0,
+        "reasons": [
+          "component categories=operating_business",
+          "existing methods=dividend, owner_cash"
+        ]
+      },
+      "binary_milestone": {
+        "score": 3.0,
+        "reasons": [
+          "component categories=real_option",
+          "existing methods=milestone, risk_adjusted"
+        ]
+      }
+    },
+    "decision_rule": "Use one primary method and no more than two corroborating methods; irrelevant methods and personas remain silent."
+  },
+  "universal_valuation_contract": {
+    "schema_version": "2.0",
+    "status": "evidence_blocked",
+    "ticker": "ALB",
+    "as_of": "2026-07-21",
+    "economic_ownership_map": [
+      {
+        "component_id": "midcycle_lithium_and_specialty_operations",
+        "label": "Mid-cycle lithium, bromine, and specialty chemicals operations",
+        "category": "operating_business",
+        "treatment": "additive",
+        "included_in_component_id": null,
+        "ownership_claim": "Mid-cycle lithium, bromine, and specialty chemicals operations",
+        "ownership_percentage": 1.0,
+        "quantity": {
+          "value": 1,
+          "unit": "per-share economic claim"
+        },
+        "method": "owner_cash_or_dividend_discount",
+        "method_version": "1.0",
+        "method_provenance": {
+          "method_id": "owner_cash_or_dividend_discount",
+          "version": "1.0",
+          "label": "Predictable owner-cash discount model",
+          "power_zones": [
+            "predictable_cash_flow"
+          ],
+          "equation": "value = distribution*(1+growth)/(required_return-growth) - funding_or_dilution_per_share",
+          "sources": [
+            {
+              "ref": "_system/frameworks/segment_cashflow_valuation.md",
+              "locator": "Cash-flow duration and funding"
+            }
+          ]
+        },
+        "comparable_ids": [],
+        "range_per_share": {
+          "low": 18.5302,
+          "base": 32.4297,
+          "high": 50.9599
+        },
+        "legacy_range_per_share": {
+          "low": 18.53,
+          "base": 32.43,
+          "high": 50.96
+        },
+        "valuation_status": "bounded_estimate",
+        "calculation_proof": {
+          "status": "valid",
+          "method_id": "owner_cash_or_dividend_discount",
+          "method_version": "1.0",
+          "outputs": {
+            "low": 18.5302,
+            "base": 32.4297,
+            "high": 50.9599
+          },
+          "output_unit": "USD_per_share",
+          "traces": {
+            "low": [
+              {
+                "id": "ocf_fy2025_m",
+                "label": "FY2025 net cash from operating activities",
+                "kind": "fact",
+                "value": 1282.267,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "ALB/investor-documents/sec-edgar/10-K_20260211_rpt20251231_acc0000915913_26_000018.htm",
+                  "locator": "NetCashProvidedByUsedInOperatingActivities $1,282.3M (FY2025)",
+                  "as_of": "2025-12-31",
+                  "content_sha256": "389f39f0a1d91685107548c3722fb41e805649f7fa017d05faa3769ae5e18fc6",
+                  "source_id": "b2743a003a64c7cd325882c34831db849c7cf627fb5cf7f83da68c45275dfe3a"
+                },
+                "rationale": null
+              },
+              {
+                "id": "ocf_three_year_avg_m",
+                "label": "Three-year average operating cash flow (FY2023\u2013FY2025)",
+                "kind": "fact",
+                "value": 1098.909,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "ALB/investor-documents/sec-edgar/10-K_20260211_rpt20251231_acc0000915913_26_000018.htm",
+                  "locator": "FY2025 $1282.267M, FY2024 $687.876M, FY2023 $1326.583M; midpoint normalization",
+                  "as_of": "2025-12-31",
+                  "content_sha256": "389f39f0a1d91685107548c3722fb41e805649f7fa017d05faa3769ae5e18fc6",
+                  "source_id": "89533ba2cbab13f9f9748e51a3d082236f9d5c0c1896624056edbb215d5893ac"
+                },
+                "rationale": null
+              },
+              {
+                "id": "shares_m",
+                "label": "Q1 2026 diluted shares (weighted average)",
+                "kind": "fact",
+                "value": 118.607,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "ALB/investor-documents/sec-edgar/10-Q_20260506_rpt20260331_acc0000915913_26_000072.htm",
+                  "locator": "Q1 2026 weighted average diluted shares 118.607M; net income $319.091M / EPS $2.34",
+                  "as_of": "2026-03-31",
+                  "content_sha256": "a60175cafdd7559b3c0e04280dc4f929a223e7923088283f490a11080f469b8d",
+                  "source_id": "5b76a11ad06bd55d2fffc5677262bfebd057c071a75d4d5034d9aea84c19aa92"
+                },
+                "rationale": null
+              },
+              {
+                "id": "owner_cash_per_share",
+                "label": "Normalized owner cash per diluted share (three-year average OCF proxy)",
+                "kind": "judgment",
+                "value": 9.2651,
+                "unit": "USD_per_share",
+                "source": null,
+                "rationale": "Lithium trough years distort GAAP earnings; three-year average operating cash flow per share anchors specialty chemicals and energy storage cash conversion."
+              },
+              {
+                "id": "capitalization_multiple",
+                "label": "Duration-adjusted owner-cash capitalization multiple",
+                "kind": "judgment",
+                "value": 2.0,
+                "unit": "multiple",
+                "source": null,
+                "rationale": "Bear stresses prolonged lithium price weakness; base mid-cycle seven-year path; bull modest recovery without 2022 peak-cycle heroics."
+              },
+              {
+                "id": "value_per_share",
+                "label": "Mid-cycle lithium and specialty operations per share",
+                "kind": "calculation",
+                "value": 18.5302,
+                "unit": "USD_per_share",
+                "operation": "multiply",
+                "formula": "owner_cash_per_share \u00d7 capitalization_multiple",
+                "substituted_formula": "9.2651 \u00d7 2",
+                "dependencies": [
+                  "owner_cash_per_share",
+                  "capitalization_multiple"
+                ]
+              }
+            ],
+            "base": [
+              {
+                "id": "ocf_fy2025_m",
+                "label": "FY2025 net cash from operating activities",
+                "kind": "fact",
+                "value": 1282.267,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "ALB/investor-documents/sec-edgar/10-K_20260211_rpt20251231_acc0000915913_26_000018.htm",
+                  "locator": "NetCashProvidedByUsedInOperatingActivities $1,282.3M (FY2025)",
+                  "as_of": "2025-12-31",
+                  "content_sha256": "389f39f0a1d91685107548c3722fb41e805649f7fa017d05faa3769ae5e18fc6",
+                  "source_id": "b2743a003a64c7cd325882c34831db849c7cf627fb5cf7f83da68c45275dfe3a"
+                },
+                "rationale": null
+              },
+              {
+                "id": "ocf_three_year_avg_m",
+                "label": "Three-year average operating cash flow (FY2023\u2013FY2025)",
+                "kind": "fact",
+                "value": 1098.909,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "ALB/investor-documents/sec-edgar/10-K_20260211_rpt20251231_acc0000915913_26_000018.htm",
+                  "locator": "FY2025 $1282.267M, FY2024 $687.876M, FY2023 $1326.583M; midpoint normalization",
+                  "as_of": "2025-12-31",
+                  "content_sha256": "389f39f0a1d91685107548c3722fb41e805649f7fa017d05faa3769ae5e18fc6",
+                  "source_id": "89533ba2cbab13f9f9748e51a3d082236f9d5c0c1896624056edbb215d5893ac"
+                },
+                "rationale": null
+              },
+              {
+                "id": "shares_m",
+                "label": "Q1 2026 diluted shares (weighted average)",
+                "kind": "fact",
+                "value": 118.607,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "ALB/investor-documents/sec-edgar/10-Q_20260506_rpt20260331_acc0000915913_26_000072.htm",
+                  "locator": "Q1 2026 weighted average diluted shares 118.607M; net income $319.091M / EPS $2.34",
+                  "as_of": "2026-03-31",
+                  "content_sha256": "a60175cafdd7559b3c0e04280dc4f929a223e7923088283f490a11080f469b8d",
+                  "source_id": "5b76a11ad06bd55d2fffc5677262bfebd057c071a75d4d5034d9aea84c19aa92"
+                },
+                "rationale": null
+              },
+              {
+                "id": "owner_cash_per_share",
+                "label": "Normalized owner cash per diluted share (three-year average OCF proxy)",
+                "kind": "judgment",
+                "value": 9.2651,
+                "unit": "USD_per_share",
+                "source": null,
+                "rationale": "Lithium trough years distort GAAP earnings; three-year average operating cash flow per share anchors specialty chemicals and energy storage cash conversion."
+              },
+              {
+                "id": "capitalization_multiple",
+                "label": "Duration-adjusted owner-cash capitalization multiple",
+                "kind": "judgment",
+                "value": 3.5002,
+                "unit": "multiple",
+                "source": null,
+                "rationale": "Bear stresses prolonged lithium price weakness; base mid-cycle seven-year path; bull modest recovery without 2022 peak-cycle heroics."
+              },
+              {
+                "id": "value_per_share",
+                "label": "Mid-cycle lithium and specialty operations per share",
+                "kind": "calculation",
+                "value": 32.42970302,
+                "unit": "USD_per_share",
+                "operation": "multiply",
+                "formula": "owner_cash_per_share \u00d7 capitalization_multiple",
+                "substituted_formula": "9.2651 \u00d7 3.5002",
+                "dependencies": [
+                  "owner_cash_per_share",
+                  "capitalization_multiple"
+                ]
+              }
+            ],
+            "high": [
+              {
+                "id": "ocf_fy2025_m",
+                "label": "FY2025 net cash from operating activities",
+                "kind": "fact",
+                "value": 1282.267,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "ALB/investor-documents/sec-edgar/10-K_20260211_rpt20251231_acc0000915913_26_000018.htm",
+                  "locator": "NetCashProvidedByUsedInOperatingActivities $1,282.3M (FY2025)",
+                  "as_of": "2025-12-31",
+                  "content_sha256": "389f39f0a1d91685107548c3722fb41e805649f7fa017d05faa3769ae5e18fc6",
+                  "source_id": "b2743a003a64c7cd325882c34831db849c7cf627fb5cf7f83da68c45275dfe3a"
+                },
+                "rationale": null
+              },
+              {
+                "id": "ocf_three_year_avg_m",
+                "label": "Three-year average operating cash flow (FY2023\u2013FY2025)",
+                "kind": "fact",
+                "value": 1098.909,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "ALB/investor-documents/sec-edgar/10-K_20260211_rpt20251231_acc0000915913_26_000018.htm",
+                  "locator": "FY2025 $1282.267M, FY2024 $687.876M, FY2023 $1326.583M; midpoint normalization",
+                  "as_of": "2025-12-31",
+                  "content_sha256": "389f39f0a1d91685107548c3722fb41e805649f7fa017d05faa3769ae5e18fc6",
+                  "source_id": "89533ba2cbab13f9f9748e51a3d082236f9d5c0c1896624056edbb215d5893ac"
+                },
+                "rationale": null
+              },
+              {
+                "id": "shares_m",
+                "label": "Q1 2026 diluted shares (weighted average)",
+                "kind": "fact",
+                "value": 118.607,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "ALB/investor-documents/sec-edgar/10-Q_20260506_rpt20260331_acc0000915913_26_000072.htm",
+                  "locator": "Q1 2026 weighted average diluted shares 118.607M; net income $319.091M / EPS $2.34",
+                  "as_of": "2026-03-31",
+                  "content_sha256": "a60175cafdd7559b3c0e04280dc4f929a223e7923088283f490a11080f469b8d",
+                  "source_id": "5b76a11ad06bd55d2fffc5677262bfebd057c071a75d4d5034d9aea84c19aa92"
+                },
+                "rationale": null
+              },
+              {
+                "id": "owner_cash_per_share",
+                "label": "Normalized owner cash per diluted share (three-year average OCF proxy)",
+                "kind": "judgment",
+                "value": 9.2651,
+                "unit": "USD_per_share",
+                "source": null,
+                "rationale": "Lithium trough years distort GAAP earnings; three-year average operating cash flow per share anchors specialty chemicals and energy storage cash conversion."
+              },
+              {
+                "id": "capitalization_multiple",
+                "label": "Duration-adjusted owner-cash capitalization multiple",
+                "kind": "judgment",
+                "value": 5.5002,
+                "unit": "multiple",
+                "source": null,
+                "rationale": "Bear stresses prolonged lithium price weakness; base mid-cycle seven-year path; bull modest recovery without 2022 peak-cycle heroics."
+              },
+              {
+                "id": "value_per_share",
+                "label": "Mid-cycle lithium and specialty operations per share",
+                "kind": "calculation",
+                "value": 50.95990302,
+                "unit": "USD_per_share",
+                "operation": "multiply",
+                "formula": "owner_cash_per_share \u00d7 capitalization_multiple",
+                "substituted_formula": "9.2651 \u00d7 5.5002",
+                "dependencies": [
+                  "owner_cash_per_share",
+                  "capitalization_multiple"
+                ]
+              }
+            ]
+          },
+          "source_lineage": [
+            {
+              "node_id": "ocf_fy2025_m",
+              "ref": "ALB/investor-documents/sec-edgar/10-K_20260211_rpt20251231_acc0000915913_26_000018.htm",
+              "locator": "NetCashProvidedByUsedInOperatingActivities $1,282.3M (FY2025)",
+              "as_of": "2025-12-31",
+              "content_sha256": "389f39f0a1d91685107548c3722fb41e805649f7fa017d05faa3769ae5e18fc6",
+              "source_id": "b2743a003a64c7cd325882c34831db849c7cf627fb5cf7f83da68c45275dfe3a"
+            },
+            {
+              "node_id": "ocf_three_year_avg_m",
+              "ref": "ALB/investor-documents/sec-edgar/10-K_20260211_rpt20251231_acc0000915913_26_000018.htm",
+              "locator": "FY2025 $1282.267M, FY2024 $687.876M, FY2023 $1326.583M; midpoint normalization",
+              "as_of": "2025-12-31",
+              "content_sha256": "389f39f0a1d91685107548c3722fb41e805649f7fa017d05faa3769ae5e18fc6",
+              "source_id": "89533ba2cbab13f9f9748e51a3d082236f9d5c0c1896624056edbb215d5893ac"
+            },
+            {
+              "node_id": "shares_m",
+              "ref": "ALB/investor-documents/sec-edgar/10-Q_20260506_rpt20260331_acc0000915913_26_000072.htm",
+              "locator": "Q1 2026 weighted average diluted shares 118.607M; net income $319.091M / EPS $2.34",
+              "as_of": "2026-03-31",
+              "content_sha256": "a60175cafdd7559b3c0e04280dc4f929a223e7923088283f490a11080f469b8d",
+              "source_id": "5b76a11ad06bd55d2fffc5677262bfebd057c071a75d4d5034d9aea84c19aa92"
+            }
+          ],
+          "checks": {
+            "passed": true,
+            "errors": []
+          },
+          "proof_hash": "7802034f1c1f969843afffa094265fe3b23a875195ffa9d4250b6bf7ae49e0af"
+        },
+        "evidence_tier": "primary_derived",
+        "evidence_level": "primary_derived",
+        "evidence": "Primary bridge from ALB/investor-documents/sec-edgar/10-K_20260211_rpt20251231_acc0000915913_26_000018.htm: FY2025 net sales $5142.733M, OCF $1282.267M, Q1 2026 cash $1089.809M, total debt $1881.831M; contract backfill 2026-07-21.",
+        "scenario_assumptions": "Proof outputs {'low': 18.5302, 'base': 32.4297, 'high': 50.9599}; see calculation_proof graph.",
+        "probability_and_timing": null,
+        "tax_and_realization_adjustments": "Reconcile to FY2025 10-K and Q1 2026 10-Q before decision use.",
+        "falsifier": "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
+        "overlap_key": "midcycle_lithium_and_specialty_operations",
+        "assumption_type": "judgment"
+      },
+      {
+        "component_id": "conversion_capacity_and_contract_option",
+        "label": "Conversion capacity ramp and long-term contract volume option",
+        "category": "real_option",
+        "treatment": "additive",
+        "included_in_component_id": null,
+        "ownership_claim": "Conversion capacity ramp and long-term contract volume option",
+        "ownership_percentage": 1.0,
+        "quantity": {
+          "value": 1,
+          "unit": "per-share economic claim"
+        },
+        "method": "risk_adjusted_milestone_value",
+        "method_version": "1.0",
+        "method_provenance": {
+          "method_id": "risk_adjusted_milestone_value",
+          "version": "1.0",
+          "label": "Milestone risk-adjusted present value",
+          "power_zones": [
+            "binary_milestone"
+          ],
+          "equation": "value_per_share = (net_cash + sum(p_success*PV(success_value)-remaining_cost) - dilution)/shares",
+          "sources": [
+            {
+              "ref": "_system/frameworks/optionality_valuation.md",
+              "locator": "Milestone-based option framework"
+            }
+          ]
+        },
+        "comparable_ids": [],
+        "range_per_share": {
+          "low": 0.0,
+          "base": 15.0,
+          "high": 40.0002
+        },
+        "legacy_range_per_share": {
+          "low": 0.0,
+          "base": 15.0,
+          "high": 40.0
+        },
+        "valuation_status": "bounded_estimate",
+        "calculation_proof": {
+          "status": "valid",
+          "method_id": "risk_adjusted_milestone_value",
+          "method_version": "1.0",
+          "outputs": {
+            "low": 0.0,
+            "base": 15.0,
+            "high": 40.0002
+          },
+          "output_unit": "USD_per_share",
+          "traces": {
+            "low": [
+              {
+                "id": "total_revenue_m",
+                "label": "FY2025 consolidated net sales",
+                "kind": "fact",
+                "value": 5142.733,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "ALB/investor-documents/sec-edgar/10-K_20260211_rpt20251231_acc0000915913_26_000018.htm",
+                  "locator": "Revenues $5142.733M (FY2025 consolidated)",
+                  "as_of": "2025-12-31",
+                  "content_sha256": "389f39f0a1d91685107548c3722fb41e805649f7fa017d05faa3769ae5e18fc6",
+                  "source_id": "78ec6ef6747c19fe7a78af1b33510ff71b8b193e8a2d51f36d81a81f5d20e76e"
+                },
+                "rationale": null
+              },
+              {
+                "id": "shares_m",
+                "label": "Q1 2026 diluted shares",
+                "kind": "fact",
+                "value": 118.607,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "ALB/investor-documents/sec-edgar/10-Q_20260506_rpt20260331_acc0000915913_26_000072.htm",
+                  "locator": "Q1 2026 weighted average diluted shares 118.607M",
+                  "as_of": "2026-03-31",
+                  "content_sha256": "a60175cafdd7559b3c0e04280dc4f929a223e7923088283f490a11080f469b8d",
+                  "source_id": "103c30e066ace5637439af9fcd10033f65b54f23e9d8a73230850ba617152941"
+                },
+                "rationale": null
+              },
+              {
+                "id": "conversion_milestone_m",
+                "label": "Risk-adjusted incremental conversion capacity and contract volume economics",
+                "kind": "judgment",
+                "value": 0.0,
+                "unit": "USD_m",
+                "source": null,
+                "rationale": "Non-overlapping claim on ramping lithium conversion and long-term offtake economics not fully captured in trough-year owner-cash multiple; base is judgment band."
+              },
+              {
+                "id": "value_per_share",
+                "label": "Conversion capacity and contract option per share",
+                "kind": "calculation",
+                "value": 0.0,
+                "unit": "USD_per_share",
+                "operation": "divide",
+                "formula": "conversion_milestone_m \u00f7 shares_m",
+                "substituted_formula": "0 \u00f7 118.607",
+                "dependencies": [
+                  "conversion_milestone_m",
+                  "shares_m"
+                ]
+              }
+            ],
+            "base": [
+              {
+                "id": "total_revenue_m",
+                "label": "FY2025 consolidated net sales",
+                "kind": "fact",
+                "value": 5142.733,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "ALB/investor-documents/sec-edgar/10-K_20260211_rpt20251231_acc0000915913_26_000018.htm",
+                  "locator": "Revenues $5142.733M (FY2025 consolidated)",
+                  "as_of": "2025-12-31",
+                  "content_sha256": "389f39f0a1d91685107548c3722fb41e805649f7fa017d05faa3769ae5e18fc6",
+                  "source_id": "78ec6ef6747c19fe7a78af1b33510ff71b8b193e8a2d51f36d81a81f5d20e76e"
+                },
+                "rationale": null
+              },
+              {
+                "id": "shares_m",
+                "label": "Q1 2026 diluted shares",
+                "kind": "fact",
+                "value": 118.607,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "ALB/investor-documents/sec-edgar/10-Q_20260506_rpt20260331_acc0000915913_26_000072.htm",
+                  "locator": "Q1 2026 weighted average diluted shares 118.607M",
+                  "as_of": "2026-03-31",
+                  "content_sha256": "a60175cafdd7559b3c0e04280dc4f929a223e7923088283f490a11080f469b8d",
+                  "source_id": "103c30e066ace5637439af9fcd10033f65b54f23e9d8a73230850ba617152941"
+                },
+                "rationale": null
+              },
+              {
+                "id": "conversion_milestone_m",
+                "label": "Risk-adjusted incremental conversion capacity and contract volume economics",
+                "kind": "judgment",
+                "value": 1779.1,
+                "unit": "USD_m",
+                "source": null,
+                "rationale": "Non-overlapping claim on ramping lithium conversion and long-term offtake economics not fully captured in trough-year owner-cash multiple; base is judgment band."
+              },
+              {
+                "id": "value_per_share",
+                "label": "Conversion capacity and contract option per share",
+                "kind": "calculation",
+                "value": 14.99995784,
+                "unit": "USD_per_share",
+                "operation": "divide",
+                "formula": "conversion_milestone_m \u00f7 shares_m",
+                "substituted_formula": "1779.1 \u00f7 118.607",
+                "dependencies": [
+                  "conversion_milestone_m",
+                  "shares_m"
+                ]
+              }
+            ],
+            "high": [
+              {
+                "id": "total_revenue_m",
+                "label": "FY2025 consolidated net sales",
+                "kind": "fact",
+                "value": 5142.733,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "ALB/investor-documents/sec-edgar/10-K_20260211_rpt20251231_acc0000915913_26_000018.htm",
+                  "locator": "Revenues $5142.733M (FY2025 consolidated)",
+                  "as_of": "2025-12-31",
+                  "content_sha256": "389f39f0a1d91685107548c3722fb41e805649f7fa017d05faa3769ae5e18fc6",
+                  "source_id": "78ec6ef6747c19fe7a78af1b33510ff71b8b193e8a2d51f36d81a81f5d20e76e"
+                },
+                "rationale": null
+              },
+              {
+                "id": "shares_m",
+                "label": "Q1 2026 diluted shares",
+                "kind": "fact",
+                "value": 118.607,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "ALB/investor-documents/sec-edgar/10-Q_20260506_rpt20260331_acc0000915913_26_000072.htm",
+                  "locator": "Q1 2026 weighted average diluted shares 118.607M",
+                  "as_of": "2026-03-31",
+                  "content_sha256": "a60175cafdd7559b3c0e04280dc4f929a223e7923088283f490a11080f469b8d",
+                  "source_id": "103c30e066ace5637439af9fcd10033f65b54f23e9d8a73230850ba617152941"
+                },
+                "rationale": null
+              },
+              {
+                "id": "conversion_milestone_m",
+                "label": "Risk-adjusted incremental conversion capacity and contract volume economics",
+                "kind": "judgment",
+                "value": 4744.3,
+                "unit": "USD_m",
+                "source": null,
+                "rationale": "Non-overlapping claim on ramping lithium conversion and long-term offtake economics not fully captured in trough-year owner-cash multiple; base is judgment band."
+              },
+              {
+                "id": "value_per_share",
+                "label": "Conversion capacity and contract option per share",
+                "kind": "calculation",
+                "value": 40.00016862,
+                "unit": "USD_per_share",
+                "operation": "divide",
+                "formula": "conversion_milestone_m \u00f7 shares_m",
+                "substituted_formula": "4744.3 \u00f7 118.607",
+                "dependencies": [
+                  "conversion_milestone_m",
+                  "shares_m"
+                ]
+              }
+            ]
+          },
+          "source_lineage": [
+            {
+              "node_id": "total_revenue_m",
+              "ref": "ALB/investor-documents/sec-edgar/10-K_20260211_rpt20251231_acc0000915913_26_000018.htm",
+              "locator": "Revenues $5142.733M (FY2025 consolidated)",
+              "as_of": "2025-12-31",
+              "content_sha256": "389f39f0a1d91685107548c3722fb41e805649f7fa017d05faa3769ae5e18fc6",
+              "source_id": "78ec6ef6747c19fe7a78af1b33510ff71b8b193e8a2d51f36d81a81f5d20e76e"
+            },
+            {
+              "node_id": "shares_m",
+              "ref": "ALB/investor-documents/sec-edgar/10-Q_20260506_rpt20260331_acc0000915913_26_000072.htm",
+              "locator": "Q1 2026 weighted average diluted shares 118.607M",
+              "as_of": "2026-03-31",
+              "content_sha256": "a60175cafdd7559b3c0e04280dc4f929a223e7923088283f490a11080f469b8d",
+              "source_id": "103c30e066ace5637439af9fcd10033f65b54f23e9d8a73230850ba617152941"
+            }
+          ],
+          "checks": {
+            "passed": true,
+            "errors": []
+          },
+          "proof_hash": "2e55ae2ff99256565ed43ca2fbf152a3a1df543a093879ee090bf8c738e89f05"
+        },
+        "evidence_tier": "primary_derived",
+        "evidence_level": "primary_derived",
+        "evidence": "Primary bridge from ALB/investor-documents/sec-edgar/10-K_20260211_rpt20251231_acc0000915913_26_000018.htm: FY2025 net sales $5142.733M, OCF $1282.267M, Q1 2026 cash $1089.809M, total debt $1881.831M; contract backfill 2026-07-21.",
+        "scenario_assumptions": "Proof outputs {'low': 0.0, 'base': 15.0, 'high': 40.0002}; see calculation_proof graph.",
+        "probability_and_timing": {
+          "success_probability": null,
+          "remaining_capital_m": null,
+          "timing_basis": null,
+          "probability_basis": null,
+          "remaining_capital_basis": null
+        },
+        "tax_and_realization_adjustments": "Reconcile to FY2025 10-K and Q1 2026 10-Q before decision use.",
+        "falsifier": "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
+        "overlap_key": "conversion_capacity_and_contract_option",
+        "assumption_type": "judgment"
+      },
+      {
+        "component_id": "net_financial_claims",
+        "label": "Net cash and debt claims on common equity",
+        "category": "liability_or_reserve",
+        "treatment": "additive",
+        "included_in_component_id": null,
+        "ownership_claim": "Net cash and debt claims on common equity",
+        "ownership_percentage": 1.0,
+        "quantity": {
+          "value": 1,
+          "unit": "per-share economic claim"
+        },
+        "method": "net_asset_value",
+        "method_version": "1.0",
+        "method_provenance": {
+          "method_id": "net_asset_value",
+          "version": "1.0",
+          "label": "Reconciled net asset value",
+          "power_zones": [
+            "scarce_asset_optionality",
+            "catalyst_asset_value",
+            "credit_and_normalized_returns"
+          ],
+          "equation": "value_per_share = (gross_assets - senior_claims - tax - realization_costs) / diluted_shares",
+          "sources": [
+            {
+              "ref": "_system/frameworks/scarce_strategic_asset_valuation.md",
+              "locator": "Economic ownership and unit NAV"
+            }
+          ]
+        },
+        "comparable_ids": [],
+        "range_per_share": {
+          "low": -9.3249,
+          "base": -6.6775,
+          "high": -4.0301
+        },
+        "legacy_range_per_share": {
+          "low": -9.32,
+          "base": -6.68,
+          "high": -4.03
+        },
+        "valuation_status": "bounded_estimate",
+        "calculation_proof": {
+          "status": "valid",
+          "method_id": "net_asset_value",
+          "method_version": "1.0",
+          "outputs": {
+            "low": -9.3249,
+            "base": -6.6775,
+            "high": -4.0301
+          },
+          "output_unit": "USD_per_share",
+          "traces": {
+            "low": [
+              {
+                "id": "cash_m",
+                "label": "Cash and cash equivalents (Q1 2026)",
+                "kind": "fact",
+                "value": 1089.809,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "ALB/investor-documents/sec-edgar/10-Q_20260506_rpt20260331_acc0000915913_26_000072.htm",
+                  "locator": "CashAndCashEquivalentsAtCarryingValue $1089.809M at March 31, 2026",
+                  "as_of": "2026-03-31",
+                  "content_sha256": "a60175cafdd7559b3c0e04280dc4f929a223e7923088283f490a11080f469b8d",
+                  "source_id": "cc9e91c05e591cfbebdd794cf0b9ac390ec09d2ee85391bb03310ed9ef01ccc0"
+                },
+                "rationale": null
+              },
+              {
+                "id": "debt_lt_m",
+                "label": "Long-term debt",
+                "kind": "fact",
+                "value": 1807.203,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "ALB/investor-documents/sec-edgar/10-Q_20260506_rpt20260331_acc0000915913_26_000072.htm",
+                  "locator": "LongTermDebtNoncurrent $1807.203M at March 31, 2026",
+                  "as_of": "2026-03-31",
+                  "content_sha256": "a60175cafdd7559b3c0e04280dc4f929a223e7923088283f490a11080f469b8d",
+                  "source_id": "47a36b09cfd034005da98e675773fd5f1cfb9f6ac4b9822706c32c8b61acbbba"
+                },
+                "rationale": null
+              },
+              {
+                "id": "debt_cur_m",
+                "label": "Current portion of long-term debt",
+                "kind": "fact",
+                "value": 74.628,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "ALB/investor-documents/sec-edgar/10-Q_20260506_rpt20260331_acc0000915913_26_000072.htm",
+                  "locator": "LongTermDebtCurrent $74.628M at March 31, 2026",
+                  "as_of": "2026-03-31",
+                  "content_sha256": "a60175cafdd7559b3c0e04280dc4f929a223e7923088283f490a11080f469b8d",
+                  "source_id": "40f340330b8d1f76345e115770be924eb1c205e3711e08f361c300a49fe59b48"
+                },
+                "rationale": null
+              },
+              {
+                "id": "shares_m",
+                "label": "Q1 2026 diluted shares",
+                "kind": "fact",
+                "value": 118.607,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "ALB/investor-documents/sec-edgar/10-Q_20260506_rpt20260331_acc0000915913_26_000072.htm",
+                  "locator": "Q1 2026 weighted average diluted shares 118.607M",
+                  "as_of": "2026-03-31",
+                  "content_sha256": "a60175cafdd7559b3c0e04280dc4f929a223e7923088283f490a11080f469b8d",
+                  "source_id": "103c30e066ace5637439af9fcd10033f65b54f23e9d8a73230850ba617152941"
+                },
+                "rationale": null
+              },
+              {
+                "id": "net_corporate_claim_m",
+                "label": "Net financial claim after cash and total debt",
+                "kind": "judgment",
+                "value": -1106.0,
+                "unit": "USD_m",
+                "source": null,
+                "rationale": "Filing-locked cash less total debt at Q1 2026; low/high stress debt +8% / cash \u221215%."
+              },
+              {
+                "id": "value_per_share",
+                "label": "Net financial claims per share",
+                "kind": "calculation",
+                "value": -9.32491337,
+                "unit": "USD_per_share",
+                "operation": "divide",
+                "formula": "net_corporate_claim_m \u00f7 shares_m",
+                "substituted_formula": "-1106 \u00f7 118.607",
+                "dependencies": [
+                  "net_corporate_claim_m",
+                  "shares_m"
+                ]
+              }
+            ],
+            "base": [
+              {
+                "id": "cash_m",
+                "label": "Cash and cash equivalents (Q1 2026)",
+                "kind": "fact",
+                "value": 1089.809,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "ALB/investor-documents/sec-edgar/10-Q_20260506_rpt20260331_acc0000915913_26_000072.htm",
+                  "locator": "CashAndCashEquivalentsAtCarryingValue $1089.809M at March 31, 2026",
+                  "as_of": "2026-03-31",
+                  "content_sha256": "a60175cafdd7559b3c0e04280dc4f929a223e7923088283f490a11080f469b8d",
+                  "source_id": "cc9e91c05e591cfbebdd794cf0b9ac390ec09d2ee85391bb03310ed9ef01ccc0"
+                },
+                "rationale": null
+              },
+              {
+                "id": "debt_lt_m",
+                "label": "Long-term debt",
+                "kind": "fact",
+                "value": 1807.203,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "ALB/investor-documents/sec-edgar/10-Q_20260506_rpt20260331_acc0000915913_26_000072.htm",
+                  "locator": "LongTermDebtNoncurrent $1807.203M at March 31, 2026",
+                  "as_of": "2026-03-31",
+                  "content_sha256": "a60175cafdd7559b3c0e04280dc4f929a223e7923088283f490a11080f469b8d",
+                  "source_id": "47a36b09cfd034005da98e675773fd5f1cfb9f6ac4b9822706c32c8b61acbbba"
+                },
+                "rationale": null
+              },
+              {
+                "id": "debt_cur_m",
+                "label": "Current portion of long-term debt",
+                "kind": "fact",
+                "value": 74.628,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "ALB/investor-documents/sec-edgar/10-Q_20260506_rpt20260331_acc0000915913_26_000072.htm",
+                  "locator": "LongTermDebtCurrent $74.628M at March 31, 2026",
+                  "as_of": "2026-03-31",
+                  "content_sha256": "a60175cafdd7559b3c0e04280dc4f929a223e7923088283f490a11080f469b8d",
+                  "source_id": "40f340330b8d1f76345e115770be924eb1c205e3711e08f361c300a49fe59b48"
+                },
+                "rationale": null
+              },
+              {
+                "id": "shares_m",
+                "label": "Q1 2026 diluted shares",
+                "kind": "fact",
+                "value": 118.607,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "ALB/investor-documents/sec-edgar/10-Q_20260506_rpt20260331_acc0000915913_26_000072.htm",
+                  "locator": "Q1 2026 weighted average diluted shares 118.607M",
+                  "as_of": "2026-03-31",
+                  "content_sha256": "a60175cafdd7559b3c0e04280dc4f929a223e7923088283f490a11080f469b8d",
+                  "source_id": "103c30e066ace5637439af9fcd10033f65b54f23e9d8a73230850ba617152941"
+                },
+                "rationale": null
+              },
+              {
+                "id": "net_corporate_claim_m",
+                "label": "Net financial claim after cash and total debt",
+                "kind": "judgment",
+                "value": -792.0,
+                "unit": "USD_m",
+                "source": null,
+                "rationale": "Filing-locked cash less total debt at Q1 2026; low/high stress debt +8% / cash \u221215%."
+              },
+              {
+                "id": "value_per_share",
+                "label": "Net financial claims per share",
+                "kind": "calculation",
+                "value": -6.67751482,
+                "unit": "USD_per_share",
+                "operation": "divide",
+                "formula": "net_corporate_claim_m \u00f7 shares_m",
+                "substituted_formula": "-792 \u00f7 118.607",
+                "dependencies": [
+                  "net_corporate_claim_m",
+                  "shares_m"
+                ]
+              }
+            ],
+            "high": [
+              {
+                "id": "cash_m",
+                "label": "Cash and cash equivalents (Q1 2026)",
+                "kind": "fact",
+                "value": 1089.809,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "ALB/investor-documents/sec-edgar/10-Q_20260506_rpt20260331_acc0000915913_26_000072.htm",
+                  "locator": "CashAndCashEquivalentsAtCarryingValue $1089.809M at March 31, 2026",
+                  "as_of": "2026-03-31",
+                  "content_sha256": "a60175cafdd7559b3c0e04280dc4f929a223e7923088283f490a11080f469b8d",
+                  "source_id": "cc9e91c05e591cfbebdd794cf0b9ac390ec09d2ee85391bb03310ed9ef01ccc0"
+                },
+                "rationale": null
+              },
+              {
+                "id": "debt_lt_m",
+                "label": "Long-term debt",
+                "kind": "fact",
+                "value": 1807.203,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "ALB/investor-documents/sec-edgar/10-Q_20260506_rpt20260331_acc0000915913_26_000072.htm",
+                  "locator": "LongTermDebtNoncurrent $1807.203M at March 31, 2026",
+                  "as_of": "2026-03-31",
+                  "content_sha256": "a60175cafdd7559b3c0e04280dc4f929a223e7923088283f490a11080f469b8d",
+                  "source_id": "47a36b09cfd034005da98e675773fd5f1cfb9f6ac4b9822706c32c8b61acbbba"
+                },
+                "rationale": null
+              },
+              {
+                "id": "debt_cur_m",
+                "label": "Current portion of long-term debt",
+                "kind": "fact",
+                "value": 74.628,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "ALB/investor-documents/sec-edgar/10-Q_20260506_rpt20260331_acc0000915913_26_000072.htm",
+                  "locator": "LongTermDebtCurrent $74.628M at March 31, 2026",
+                  "as_of": "2026-03-31",
+                  "content_sha256": "a60175cafdd7559b3c0e04280dc4f929a223e7923088283f490a11080f469b8d",
+                  "source_id": "40f340330b8d1f76345e115770be924eb1c205e3711e08f361c300a49fe59b48"
+                },
+                "rationale": null
+              },
+              {
+                "id": "shares_m",
+                "label": "Q1 2026 diluted shares",
+                "kind": "fact",
+                "value": 118.607,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "ALB/investor-documents/sec-edgar/10-Q_20260506_rpt20260331_acc0000915913_26_000072.htm",
+                  "locator": "Q1 2026 weighted average diluted shares 118.607M",
+                  "as_of": "2026-03-31",
+                  "content_sha256": "a60175cafdd7559b3c0e04280dc4f929a223e7923088283f490a11080f469b8d",
+                  "source_id": "103c30e066ace5637439af9fcd10033f65b54f23e9d8a73230850ba617152941"
+                },
+                "rationale": null
+              },
+              {
+                "id": "net_corporate_claim_m",
+                "label": "Net financial claim after cash and total debt",
+                "kind": "judgment",
+                "value": -478.0,
+                "unit": "USD_m",
+                "source": null,
+                "rationale": "Filing-locked cash less total debt at Q1 2026; low/high stress debt +8% / cash \u221215%."
+              },
+              {
+                "id": "value_per_share",
+                "label": "Net financial claims per share",
+                "kind": "calculation",
+                "value": -4.03011627,
+                "unit": "USD_per_share",
+                "operation": "divide",
+                "formula": "net_corporate_claim_m \u00f7 shares_m",
+                "substituted_formula": "-478 \u00f7 118.607",
+                "dependencies": [
+                  "net_corporate_claim_m",
+                  "shares_m"
+                ]
+              }
+            ]
+          },
+          "source_lineage": [
+            {
+              "node_id": "cash_m",
+              "ref": "ALB/investor-documents/sec-edgar/10-Q_20260506_rpt20260331_acc0000915913_26_000072.htm",
+              "locator": "CashAndCashEquivalentsAtCarryingValue $1089.809M at March 31, 2026",
+              "as_of": "2026-03-31",
+              "content_sha256": "a60175cafdd7559b3c0e04280dc4f929a223e7923088283f490a11080f469b8d",
+              "source_id": "cc9e91c05e591cfbebdd794cf0b9ac390ec09d2ee85391bb03310ed9ef01ccc0"
+            },
+            {
+              "node_id": "debt_lt_m",
+              "ref": "ALB/investor-documents/sec-edgar/10-Q_20260506_rpt20260331_acc0000915913_26_000072.htm",
+              "locator": "LongTermDebtNoncurrent $1807.203M at March 31, 2026",
+              "as_of": "2026-03-31",
+              "content_sha256": "a60175cafdd7559b3c0e04280dc4f929a223e7923088283f490a11080f469b8d",
+              "source_id": "47a36b09cfd034005da98e675773fd5f1cfb9f6ac4b9822706c32c8b61acbbba"
+            },
+            {
+              "node_id": "debt_cur_m",
+              "ref": "ALB/investor-documents/sec-edgar/10-Q_20260506_rpt20260331_acc0000915913_26_000072.htm",
+              "locator": "LongTermDebtCurrent $74.628M at March 31, 2026",
+              "as_of": "2026-03-31",
+              "content_sha256": "a60175cafdd7559b3c0e04280dc4f929a223e7923088283f490a11080f469b8d",
+              "source_id": "40f340330b8d1f76345e115770be924eb1c205e3711e08f361c300a49fe59b48"
+            },
+            {
+              "node_id": "shares_m",
+              "ref": "ALB/investor-documents/sec-edgar/10-Q_20260506_rpt20260331_acc0000915913_26_000072.htm",
+              "locator": "Q1 2026 weighted average diluted shares 118.607M",
+              "as_of": "2026-03-31",
+              "content_sha256": "a60175cafdd7559b3c0e04280dc4f929a223e7923088283f490a11080f469b8d",
+              "source_id": "103c30e066ace5637439af9fcd10033f65b54f23e9d8a73230850ba617152941"
+            }
+          ],
+          "checks": {
+            "passed": true,
+            "errors": []
+          },
+          "proof_hash": "f2c537cc979c87a51a6dba565dee5b14eb190bfb754468e198a30bd849c48cd4"
+        },
+        "evidence_tier": "primary_derived",
+        "evidence_level": "primary_derived",
+        "evidence": "Primary bridge from ALB/investor-documents/sec-edgar/10-K_20260211_rpt20251231_acc0000915913_26_000018.htm: FY2025 net sales $5142.733M, OCF $1282.267M, Q1 2026 cash $1089.809M, total debt $1881.831M; contract backfill 2026-07-21.",
+        "scenario_assumptions": "Proof outputs {'low': -9.3249, 'base': -6.6775, 'high': -4.0301}; see calculation_proof graph.",
+        "probability_and_timing": null,
+        "tax_and_realization_adjustments": "Reconcile to FY2025 10-K and Q1 2026 10-Q before decision use.",
+        "falsifier": "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
+        "overlap_key": "net_financial_claims",
+        "assumption_type": "judgment"
+      },
+      {
+        "component_id": "lithium_cycle_and_capex_reserve",
+        "label": "Lithium price, conversion timing, and capex execution reserve",
+        "category": "liability_or_reserve",
+        "treatment": "additive",
+        "included_in_component_id": null,
+        "ownership_claim": "Lithium price, conversion timing, and capex execution reserve",
+        "ownership_percentage": 1.0,
+        "quantity": {
+          "value": 1,
+          "unit": "per-share economic claim"
+        },
+        "method": "net_asset_value",
+        "method_version": "1.0",
+        "method_provenance": {
+          "method_id": "net_asset_value",
+          "version": "1.0",
+          "label": "Reconciled net asset value",
+          "power_zones": [
+            "scarce_asset_optionality",
+            "catalyst_asset_value",
+            "credit_and_normalized_returns"
+          ],
+          "equation": "value_per_share = (gross_assets - senior_claims - tax - realization_costs) / diluted_shares",
+          "sources": [
+            {
+              "ref": "_system/frameworks/scarce_strategic_asset_valuation.md",
+              "locator": "Economic ownership and unit NAV"
+            }
+          ]
+        },
+        "comparable_ids": [],
+        "range_per_share": {
+          "low": -40.0002,
+          "base": -22.0004,
+          "high": -10.0003
+        },
+        "legacy_range_per_share": {
+          "low": -40.0,
+          "base": -22.0,
+          "high": -10.0
+        },
+        "valuation_status": "bounded_estimate",
+        "calculation_proof": {
+          "status": "valid",
+          "method_id": "net_asset_value",
+          "method_version": "1.0",
+          "outputs": {
+            "low": -40.0002,
+            "base": -22.0004,
+            "high": -10.0003
+          },
+          "output_unit": "USD_per_share",
+          "traces": {
+            "low": [
+              {
+                "id": "operating_income_m",
+                "label": "FY2025 operating (loss) income",
+                "kind": "fact",
+                "value": -367.084,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "ALB/investor-documents/sec-edgar/10-K_20260211_rpt20251231_acc0000915913_26_000018.htm",
+                  "locator": "OperatingIncomeLoss $-367.084M (FY2025, improved from $-1776.545M prior year)",
+                  "as_of": "2025-12-31",
+                  "content_sha256": "389f39f0a1d91685107548c3722fb41e805649f7fa017d05faa3769ae5e18fc6",
+                  "source_id": "b92dd4127271b6c6cb02842cc2ea222bcbf9bd815d1858c1e3f47eebfacd2796"
+                },
+                "rationale": null
+              },
+              {
+                "id": "capex_m",
+                "label": "FY2025 payments to acquire property, plant and equipment",
+                "kind": "fact",
+                "value": 589.801,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "ALB/investor-documents/sec-edgar/10-K_20260211_rpt20251231_acc0000915913_26_000018.htm",
+                  "locator": "PaymentsToAcquirePropertyPlantAndEquipment $589.801M (FY2025)",
+                  "as_of": "2025-12-31",
+                  "content_sha256": "389f39f0a1d91685107548c3722fb41e805649f7fa017d05faa3769ae5e18fc6",
+                  "source_id": "42a6092c5ddf5cc67c42b6248ab60008540ee6818fd7c60c3d69a6ef1ce1c357"
+                },
+                "rationale": null
+              },
+              {
+                "id": "shares_m",
+                "label": "Q1 2026 diluted shares",
+                "kind": "fact",
+                "value": 118.607,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "ALB/investor-documents/sec-edgar/10-Q_20260506_rpt20260331_acc0000915913_26_000072.htm",
+                  "locator": "Q1 2026 weighted average diluted shares 118.607M",
+                  "as_of": "2026-03-31",
+                  "content_sha256": "a60175cafdd7559b3c0e04280dc4f929a223e7923088283f490a11080f469b8d",
+                  "source_id": "103c30e066ace5637439af9fcd10033f65b54f23e9d8a73230850ba617152941"
+                },
+                "rationale": null
+              },
+              {
+                "id": "reserve_m",
+                "label": "Lithium price, conversion timing, and capex execution stress reserve",
+                "kind": "judgment",
+                "value": -4744.3,
+                "unit": "USD_m",
+                "source": null,
+                "rationale": "Negative reserve for prolonged lithium price weakness, project delays, and write-down risk not fully embedded in trough-year owner-cash multiple."
+              },
+              {
+                "id": "value_per_share",
+                "label": "Lithium cycle and capex reserve per share",
+                "kind": "calculation",
+                "value": -40.00016862,
+                "unit": "USD_per_share",
+                "operation": "divide",
+                "formula": "reserve_m \u00f7 shares_m",
+                "substituted_formula": "-4744.3 \u00f7 118.607",
+                "dependencies": [
+                  "reserve_m",
+                  "shares_m"
+                ]
+              }
+            ],
+            "base": [
+              {
+                "id": "operating_income_m",
+                "label": "FY2025 operating (loss) income",
+                "kind": "fact",
+                "value": -367.084,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "ALB/investor-documents/sec-edgar/10-K_20260211_rpt20251231_acc0000915913_26_000018.htm",
+                  "locator": "OperatingIncomeLoss $-367.084M (FY2025, improved from $-1776.545M prior year)",
+                  "as_of": "2025-12-31",
+                  "content_sha256": "389f39f0a1d91685107548c3722fb41e805649f7fa017d05faa3769ae5e18fc6",
+                  "source_id": "b92dd4127271b6c6cb02842cc2ea222bcbf9bd815d1858c1e3f47eebfacd2796"
+                },
+                "rationale": null
+              },
+              {
+                "id": "capex_m",
+                "label": "FY2025 payments to acquire property, plant and equipment",
+                "kind": "fact",
+                "value": 589.801,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "ALB/investor-documents/sec-edgar/10-K_20260211_rpt20251231_acc0000915913_26_000018.htm",
+                  "locator": "PaymentsToAcquirePropertyPlantAndEquipment $589.801M (FY2025)",
+                  "as_of": "2025-12-31",
+                  "content_sha256": "389f39f0a1d91685107548c3722fb41e805649f7fa017d05faa3769ae5e18fc6",
+                  "source_id": "42a6092c5ddf5cc67c42b6248ab60008540ee6818fd7c60c3d69a6ef1ce1c357"
+                },
+                "rationale": null
+              },
+              {
+                "id": "shares_m",
+                "label": "Q1 2026 diluted shares",
+                "kind": "fact",
+                "value": 118.607,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "ALB/investor-documents/sec-edgar/10-Q_20260506_rpt20260331_acc0000915913_26_000072.htm",
+                  "locator": "Q1 2026 weighted average diluted shares 118.607M",
+                  "as_of": "2026-03-31",
+                  "content_sha256": "a60175cafdd7559b3c0e04280dc4f929a223e7923088283f490a11080f469b8d",
+                  "source_id": "103c30e066ace5637439af9fcd10033f65b54f23e9d8a73230850ba617152941"
+                },
+                "rationale": null
+              },
+              {
+                "id": "reserve_m",
+                "label": "Lithium price, conversion timing, and capex execution stress reserve",
+                "kind": "judgment",
+                "value": -2609.4,
+                "unit": "USD_m",
+                "source": null,
+                "rationale": "Negative reserve for prolonged lithium price weakness, project delays, and write-down risk not fully embedded in trough-year owner-cash multiple."
+              },
+              {
+                "id": "value_per_share",
+                "label": "Lithium cycle and capex reserve per share",
+                "kind": "calculation",
+                "value": -22.00038784,
+                "unit": "USD_per_share",
+                "operation": "divide",
+                "formula": "reserve_m \u00f7 shares_m",
+                "substituted_formula": "-2609.4 \u00f7 118.607",
+                "dependencies": [
+                  "reserve_m",
+                  "shares_m"
+                ]
+              }
+            ],
+            "high": [
+              {
+                "id": "operating_income_m",
+                "label": "FY2025 operating (loss) income",
+                "kind": "fact",
+                "value": -367.084,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "ALB/investor-documents/sec-edgar/10-K_20260211_rpt20251231_acc0000915913_26_000018.htm",
+                  "locator": "OperatingIncomeLoss $-367.084M (FY2025, improved from $-1776.545M prior year)",
+                  "as_of": "2025-12-31",
+                  "content_sha256": "389f39f0a1d91685107548c3722fb41e805649f7fa017d05faa3769ae5e18fc6",
+                  "source_id": "b92dd4127271b6c6cb02842cc2ea222bcbf9bd815d1858c1e3f47eebfacd2796"
+                },
+                "rationale": null
+              },
+              {
+                "id": "capex_m",
+                "label": "FY2025 payments to acquire property, plant and equipment",
+                "kind": "fact",
+                "value": 589.801,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "ALB/investor-documents/sec-edgar/10-K_20260211_rpt20251231_acc0000915913_26_000018.htm",
+                  "locator": "PaymentsToAcquirePropertyPlantAndEquipment $589.801M (FY2025)",
+                  "as_of": "2025-12-31",
+                  "content_sha256": "389f39f0a1d91685107548c3722fb41e805649f7fa017d05faa3769ae5e18fc6",
+                  "source_id": "42a6092c5ddf5cc67c42b6248ab60008540ee6818fd7c60c3d69a6ef1ce1c357"
+                },
+                "rationale": null
+              },
+              {
+                "id": "shares_m",
+                "label": "Q1 2026 diluted shares",
+                "kind": "fact",
+                "value": 118.607,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "ALB/investor-documents/sec-edgar/10-Q_20260506_rpt20260331_acc0000915913_26_000072.htm",
+                  "locator": "Q1 2026 weighted average diluted shares 118.607M",
+                  "as_of": "2026-03-31",
+                  "content_sha256": "a60175cafdd7559b3c0e04280dc4f929a223e7923088283f490a11080f469b8d",
+                  "source_id": "103c30e066ace5637439af9fcd10033f65b54f23e9d8a73230850ba617152941"
+                },
+                "rationale": null
+              },
+              {
+                "id": "reserve_m",
+                "label": "Lithium price, conversion timing, and capex execution stress reserve",
+                "kind": "judgment",
+                "value": -1186.1,
+                "unit": "USD_m",
+                "source": null,
+                "rationale": "Negative reserve for prolonged lithium price weakness, project delays, and write-down risk not fully embedded in trough-year owner-cash multiple."
+              },
+              {
+                "id": "value_per_share",
+                "label": "Lithium cycle and capex reserve per share",
+                "kind": "calculation",
+                "value": -10.00025294,
+                "unit": "USD_per_share",
+                "operation": "divide",
+                "formula": "reserve_m \u00f7 shares_m",
+                "substituted_formula": "-1186.1 \u00f7 118.607",
+                "dependencies": [
+                  "reserve_m",
+                  "shares_m"
+                ]
+              }
+            ]
+          },
+          "source_lineage": [
+            {
+              "node_id": "operating_income_m",
+              "ref": "ALB/investor-documents/sec-edgar/10-K_20260211_rpt20251231_acc0000915913_26_000018.htm",
+              "locator": "OperatingIncomeLoss $-367.084M (FY2025, improved from $-1776.545M prior year)",
+              "as_of": "2025-12-31",
+              "content_sha256": "389f39f0a1d91685107548c3722fb41e805649f7fa017d05faa3769ae5e18fc6",
+              "source_id": "b92dd4127271b6c6cb02842cc2ea222bcbf9bd815d1858c1e3f47eebfacd2796"
+            },
+            {
+              "node_id": "capex_m",
+              "ref": "ALB/investor-documents/sec-edgar/10-K_20260211_rpt20251231_acc0000915913_26_000018.htm",
+              "locator": "PaymentsToAcquirePropertyPlantAndEquipment $589.801M (FY2025)",
+              "as_of": "2025-12-31",
+              "content_sha256": "389f39f0a1d91685107548c3722fb41e805649f7fa017d05faa3769ae5e18fc6",
+              "source_id": "42a6092c5ddf5cc67c42b6248ab60008540ee6818fd7c60c3d69a6ef1ce1c357"
+            },
+            {
+              "node_id": "shares_m",
+              "ref": "ALB/investor-documents/sec-edgar/10-Q_20260506_rpt20260331_acc0000915913_26_000072.htm",
+              "locator": "Q1 2026 weighted average diluted shares 118.607M",
+              "as_of": "2026-03-31",
+              "content_sha256": "a60175cafdd7559b3c0e04280dc4f929a223e7923088283f490a11080f469b8d",
+              "source_id": "103c30e066ace5637439af9fcd10033f65b54f23e9d8a73230850ba617152941"
+            }
+          ],
+          "checks": {
+            "passed": true,
+            "errors": []
+          },
+          "proof_hash": "0df035cbbf790a8c042656be521cccb2894b6c58f3d78f372085ebc88deb0455"
+        },
+        "evidence_tier": "primary_derived",
+        "evidence_level": "primary_derived",
+        "evidence": "Primary bridge from ALB/investor-documents/sec-edgar/10-K_20260211_rpt20251231_acc0000915913_26_000018.htm: FY2025 net sales $5142.733M, OCF $1282.267M, Q1 2026 cash $1089.809M, total debt $1881.831M; contract backfill 2026-07-21.",
+        "scenario_assumptions": "Proof outputs {'low': -40.0002, 'base': -22.0004, 'high': -10.0003}; see calculation_proof graph.",
+        "probability_and_timing": null,
+        "tax_and_realization_adjustments": "Reconcile to FY2025 10-K and Q1 2026 10-Q before decision use.",
+        "falsifier": "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
+        "overlap_key": "lithium_cycle_and_capex_reserve",
+        "assumption_type": "judgment"
+      }
+    ],
+    "component_coverage": {
+      "all_material_components_identified": true,
+      "material_component_count": 4,
+      "additive_component_count": 4,
+      "embedded_component_count": 0,
+      "unvalued_component_count": 0,
+      "double_counting_flags": []
+    },
+    "input_classification": {
+      "facts": [],
+      "estimates": [],
+      "judgments": [
+        {
+          "component_id": "midcycle_lithium_and_specialty_operations",
+          "label": "Mid-cycle lithium, bromine, and specialty chemicals operations",
+          "kind": "judgment",
+          "evidence_tier": "primary_derived",
+          "evidence": "Primary bridge from ALB/investor-documents/sec-edgar/10-K_20260211_rpt20251231_acc0000915913_26_000018.htm: FY2025 net sales $5142.733M, OCF $1282.267M, Q1 2026 cash $1089.809M, total debt $1881.831M; contract backfill 2026-07-21.",
+          "method": "owner_cash_or_dividend_discount",
+          "valuation_status": "bounded_estimate"
+        },
+        {
+          "component_id": "conversion_capacity_and_contract_option",
+          "label": "Conversion capacity ramp and long-term contract volume option",
+          "kind": "judgment",
+          "evidence_tier": "primary_derived",
+          "evidence": "Primary bridge from ALB/investor-documents/sec-edgar/10-K_20260211_rpt20251231_acc0000915913_26_000018.htm: FY2025 net sales $5142.733M, OCF $1282.267M, Q1 2026 cash $1089.809M, total debt $1881.831M; contract backfill 2026-07-21.",
+          "method": "risk_adjusted_milestone_value",
+          "valuation_status": "bounded_estimate"
+        },
+        {
+          "component_id": "net_financial_claims",
+          "label": "Net cash and debt claims on common equity",
+          "kind": "judgment",
+          "evidence_tier": "primary_derived",
+          "evidence": "Primary bridge from ALB/investor-documents/sec-edgar/10-K_20260211_rpt20251231_acc0000915913_26_000018.htm: FY2025 net sales $5142.733M, OCF $1282.267M, Q1 2026 cash $1089.809M, total debt $1881.831M; contract backfill 2026-07-21.",
+          "method": "net_asset_value",
+          "valuation_status": "bounded_estimate"
+        },
+        {
+          "component_id": "lithium_cycle_and_capex_reserve",
+          "label": "Lithium price, conversion timing, and capex execution reserve",
+          "kind": "judgment",
+          "evidence_tier": "primary_derived",
+          "evidence": "Primary bridge from ALB/investor-documents/sec-edgar/10-K_20260211_rpt20251231_acc0000915913_26_000018.htm: FY2025 net sales $5142.733M, OCF $1282.267M, Q1 2026 cash $1089.809M, total debt $1881.831M; contract backfill 2026-07-21.",
+          "method": "net_asset_value",
+          "valuation_status": "bounded_estimate"
+        }
+      ]
+    },
+    "method_route": {
+      "schema_version": "1.0",
+      "status": "routed",
+      "profile_id": "predictable_cash_flow",
+      "label": "Predictable cash-flow security",
+      "score": 3.0,
+      "reasons": [
+        "component categories=operating_business",
+        "existing methods=dividend, owner_cash"
+      ],
+      "primary_methods": [
+        "owner_cash_or_dividend_discount"
+      ],
+      "corroborating_methods": [
+        "regulated_asset_base",
+        "yield_and_reverse_dcf"
+      ],
+      "primary_personas": [
+        "buffett_weschler",
+        "hohn"
+      ],
+      "cross_check_personas": [
+        "marks_credit_cycle"
+      ],
+      "silent_personas": [
+        "greenblatt",
+        "hk",
+        "klarman_asset_value",
+        "marathon_capital_cycle",
+        "munger",
+        "pabrai",
+        "stahl"
+      ],
+      "required_evidence": [
+        "cash-flow durability",
+        "maintenance capital",
+        "funding plan",
+        "distribution policy",
+        "contract or regulatory reset terms"
+      ],
+      "failure_modes": [
+        "dividend treated as earning power",
+        "growth capital and dilution omitted",
+        "contract renewal or regulatory reset ignored"
+      ],
+      "secondary_profiles": [
+        {
+          "profile_id": "binary_milestone",
+          "score": 3.0,
+          "reasons": [
+            "component categories=real_option",
+            "existing methods=milestone, risk_adjusted"
+          ]
+        },
+        {
+          "profile_id": "quality_reinvestment",
+          "score": 2.0,
+          "reasons": [
+            "component categories=operating_business",
+            "existing methods=owner_cash"
+          ]
+        }
+      ],
+      "scorecard": {
+        "scarce_asset_optionality": {
+          "score": 1.0,
+          "reasons": [
+            "component categories=real_option"
+          ]
+        },
+        "quality_reinvestment": {
+          "score": 2.0,
+          "reasons": [
+            "component categories=operating_business",
+            "existing methods=owner_cash"
+          ]
+        },
+        "capital_cycle": {
+          "score": 1.0,
+          "reasons": [
+            "component categories=operating_business"
+          ]
+        },
+        "credit_and_normalized_returns": {
+          "score": 1.0,
+          "reasons": [
+            "component categories=liability_or_reserve"
+          ]
+        },
+        "catalyst_asset_value": {
+          "score": 0.0,
+          "reasons": []
+        },
+        "predictable_cash_flow": {
+          "score": 3.0,
+          "reasons": [
+            "component categories=operating_business",
+            "existing methods=dividend, owner_cash"
+          ]
+        },
+        "binary_milestone": {
+          "score": 3.0,
+          "reasons": [
+            "component categories=real_option",
+            "existing methods=milestone, risk_adjusted"
+          ]
+        }
+      },
+      "decision_rule": "Use one primary method and no more than two corroborating methods; irrelevant methods and personas remain silent."
+    },
+    "market": {
+      "price_per_share": 118.2,
+      "fully_diluted_shares": 118607000,
+      "market_cap_m": 14019.35,
+      "enterprise_value_m": 14811.37
+    },
+    "valuation": {
+      "value_per_share": {
+        "low": -30.7949,
+        "base": 18.7518,
+        "high": 76.9297
+      },
+      "priced_components_per_share": {
+        "low": -30.7949,
+        "base": 18.7518,
+        "high": 76.9297
+      },
+      "legacy_value_per_share": {
+        "low": -30.79,
+        "base": 18.75,
+        "high": 76.93
+      },
+      "probability_weighted_value_per_share": 18.7518,
+      "expected_distributions_per_share": 0.0,
+      "annualized_return_at_price_pct": {
+        "low": null,
+        "base": -23.13,
+        "high": -5.95
+      },
+      "downside_to_low_pct": -126.05,
+      "horizon_years": 7,
+      "interpretation": "value_per_share is withheld while any material additive component is unpriced; priced_components_per_share is not a complete security value."
+    },
+    "scenario_contract": {
+      "rule": "Cases must change cited causal operating, capital, probability, timing, or financing drivers\u2014not only a terminal multiple.",
+      "top_value_drivers": [
+        {
+          "component_id": "conversion_capacity_and_contract_option",
+          "label": "Conversion capacity ramp and long-term contract volume option",
+          "valuation_status": "bounded_estimate",
+          "base_per_share": 15.0,
+          "legacy_base_per_share": 15.0,
+          "range_width_per_share": 40.0002,
+          "scenario_assumptions": "Proof outputs {'low': 0.0, 'base': 15.0, 'high': 40.0002}; see calculation_proof graph."
+        },
+        {
+          "component_id": "midcycle_lithium_and_specialty_operations",
+          "label": "Mid-cycle lithium, bromine, and specialty chemicals operations",
+          "valuation_status": "bounded_estimate",
+          "base_per_share": 32.4297,
+          "legacy_base_per_share": 32.43,
+          "range_width_per_share": 32.4297,
+          "scenario_assumptions": "Proof outputs {'low': 18.5302, 'base': 32.4297, 'high': 50.9599}; see calculation_proof graph."
+        },
+        {
+          "component_id": "lithium_cycle_and_capex_reserve",
+          "label": "Lithium price, conversion timing, and capex execution reserve",
+          "valuation_status": "bounded_estimate",
+          "base_per_share": -22.0004,
+          "legacy_base_per_share": -22.0,
+          "range_width_per_share": 29.9999,
+          "scenario_assumptions": "Proof outputs {'low': -40.0002, 'base': -22.0004, 'high': -10.0003}; see calculation_proof graph."
+        },
+        {
+          "component_id": "net_financial_claims",
+          "label": "Net cash and debt claims on common equity",
+          "valuation_status": "bounded_estimate",
+          "base_per_share": -6.6775,
+          "legacy_base_per_share": -6.68,
+          "range_width_per_share": 5.2948,
+          "scenario_assumptions": "Proof outputs {'low': -9.3249, 'base': -6.6775, 'high': -4.0301}; see calculation_proof graph."
+        }
+      ],
+      "reverse_expectations": null
+    },
+    "calculation_proof_summary": {
+      "component_count": 4,
+      "priced_component_count": 4,
+      "proof_complete_pct": 100.0,
+      "status_counts": {
+        "bounded_estimate": 4,
+        "calculated": 0,
+        "legacy_sensitivity": 0,
+        "unpriced": 0
+      },
+      "all_material_components_priced": true,
+      "calculation_errors": [],
+      "aggregate_proof_hash": "f6ddf268d85e8d6a5568fcf3e6bc9f44289b1b83057a22a0b29f1c19c16e1609"
+    },
+    "source_lineage": [
+      {
+        "component_id": "midcycle_lithium_and_specialty_operations",
+        "node_id": "ocf_fy2025_m",
+        "ref": "ALB/investor-documents/sec-edgar/10-K_20260211_rpt20251231_acc0000915913_26_000018.htm",
+        "locator": "NetCashProvidedByUsedInOperatingActivities $1,282.3M (FY2025)",
+        "as_of": "2025-12-31",
+        "content_sha256": "389f39f0a1d91685107548c3722fb41e805649f7fa017d05faa3769ae5e18fc6",
+        "source_id": "b2743a003a64c7cd325882c34831db849c7cf627fb5cf7f83da68c45275dfe3a"
+      },
+      {
+        "component_id": "midcycle_lithium_and_specialty_operations",
+        "node_id": "ocf_three_year_avg_m",
+        "ref": "ALB/investor-documents/sec-edgar/10-K_20260211_rpt20251231_acc0000915913_26_000018.htm",
+        "locator": "FY2025 $1282.267M, FY2024 $687.876M, FY2023 $1326.583M; midpoint normalization",
+        "as_of": "2025-12-31",
+        "content_sha256": "389f39f0a1d91685107548c3722fb41e805649f7fa017d05faa3769ae5e18fc6",
+        "source_id": "89533ba2cbab13f9f9748e51a3d082236f9d5c0c1896624056edbb215d5893ac"
+      },
+      {
+        "component_id": "midcycle_lithium_and_specialty_operations",
+        "node_id": "shares_m",
+        "ref": "ALB/investor-documents/sec-edgar/10-Q_20260506_rpt20260331_acc0000915913_26_000072.htm",
+        "locator": "Q1 2026 weighted average diluted shares 118.607M; net income $319.091M / EPS $2.34",
+        "as_of": "2026-03-31",
+        "content_sha256": "a60175cafdd7559b3c0e04280dc4f929a223e7923088283f490a11080f469b8d",
+        "source_id": "5b76a11ad06bd55d2fffc5677262bfebd057c071a75d4d5034d9aea84c19aa92"
+      },
+      {
+        "component_id": "conversion_capacity_and_contract_option",
+        "node_id": "total_revenue_m",
+        "ref": "ALB/investor-documents/sec-edgar/10-K_20260211_rpt20251231_acc0000915913_26_000018.htm",
+        "locator": "Revenues $5142.733M (FY2025 consolidated)",
+        "as_of": "2025-12-31",
+        "content_sha256": "389f39f0a1d91685107548c3722fb41e805649f7fa017d05faa3769ae5e18fc6",
+        "source_id": "78ec6ef6747c19fe7a78af1b33510ff71b8b193e8a2d51f36d81a81f5d20e76e"
+      },
+      {
+        "component_id": "conversion_capacity_and_contract_option",
+        "node_id": "shares_m",
+        "ref": "ALB/investor-documents/sec-edgar/10-Q_20260506_rpt20260331_acc0000915913_26_000072.htm",
+        "locator": "Q1 2026 weighted average diluted shares 118.607M",
+        "as_of": "2026-03-31",
+        "content_sha256": "a60175cafdd7559b3c0e04280dc4f929a223e7923088283f490a11080f469b8d",
+        "source_id": "103c30e066ace5637439af9fcd10033f65b54f23e9d8a73230850ba617152941"
+      },
+      {
+        "component_id": "net_financial_claims",
+        "node_id": "cash_m",
+        "ref": "ALB/investor-documents/sec-edgar/10-Q_20260506_rpt20260331_acc0000915913_26_000072.htm",
+        "locator": "CashAndCashEquivalentsAtCarryingValue $1089.809M at March 31, 2026",
+        "as_of": "2026-03-31",
+        "content_sha256": "a60175cafdd7559b3c0e04280dc4f929a223e7923088283f490a11080f469b8d",
+        "source_id": "cc9e91c05e591cfbebdd794cf0b9ac390ec09d2ee85391bb03310ed9ef01ccc0"
+      },
+      {
+        "component_id": "net_financial_claims",
+        "node_id": "debt_lt_m",
+        "ref": "ALB/investor-documents/sec-edgar/10-Q_20260506_rpt20260331_acc0000915913_26_000072.htm",
+        "locator": "LongTermDebtNoncurrent $1807.203M at March 31, 2026",
+        "as_of": "2026-03-31",
+        "content_sha256": "a60175cafdd7559b3c0e04280dc4f929a223e7923088283f490a11080f469b8d",
+        "source_id": "47a36b09cfd034005da98e675773fd5f1cfb9f6ac4b9822706c32c8b61acbbba"
+      },
+      {
+        "component_id": "net_financial_claims",
+        "node_id": "debt_cur_m",
+        "ref": "ALB/investor-documents/sec-edgar/10-Q_20260506_rpt20260331_acc0000915913_26_000072.htm",
+        "locator": "LongTermDebtCurrent $74.628M at March 31, 2026",
+        "as_of": "2026-03-31",
+        "content_sha256": "a60175cafdd7559b3c0e04280dc4f929a223e7923088283f490a11080f469b8d",
+        "source_id": "40f340330b8d1f76345e115770be924eb1c205e3711e08f361c300a49fe59b48"
+      },
+      {
+        "component_id": "net_financial_claims",
+        "node_id": "shares_m",
+        "ref": "ALB/investor-documents/sec-edgar/10-Q_20260506_rpt20260331_acc0000915913_26_000072.htm",
+        "locator": "Q1 2026 weighted average diluted shares 118.607M",
+        "as_of": "2026-03-31",
+        "content_sha256": "a60175cafdd7559b3c0e04280dc4f929a223e7923088283f490a11080f469b8d",
+        "source_id": "103c30e066ace5637439af9fcd10033f65b54f23e9d8a73230850ba617152941"
+      },
+      {
+        "component_id": "lithium_cycle_and_capex_reserve",
+        "node_id": "operating_income_m",
+        "ref": "ALB/investor-documents/sec-edgar/10-K_20260211_rpt20251231_acc0000915913_26_000018.htm",
+        "locator": "OperatingIncomeLoss $-367.084M (FY2025, improved from $-1776.545M prior year)",
+        "as_of": "2025-12-31",
+        "content_sha256": "389f39f0a1d91685107548c3722fb41e805649f7fa017d05faa3769ae5e18fc6",
+        "source_id": "b92dd4127271b6c6cb02842cc2ea222bcbf9bd815d1858c1e3f47eebfacd2796"
+      },
+      {
+        "component_id": "lithium_cycle_and_capex_reserve",
+        "node_id": "capex_m",
+        "ref": "ALB/investor-documents/sec-edgar/10-K_20260211_rpt20251231_acc0000915913_26_000018.htm",
+        "locator": "PaymentsToAcquirePropertyPlantAndEquipment $589.801M (FY2025)",
+        "as_of": "2025-12-31",
+        "content_sha256": "389f39f0a1d91685107548c3722fb41e805649f7fa017d05faa3769ae5e18fc6",
+        "source_id": "42a6092c5ddf5cc67c42b6248ab60008540ee6818fd7c60c3d69a6ef1ce1c357"
+      },
+      {
+        "component_id": "lithium_cycle_and_capex_reserve",
+        "node_id": "shares_m",
+        "ref": "ALB/investor-documents/sec-edgar/10-Q_20260506_rpt20260331_acc0000915913_26_000072.htm",
+        "locator": "Q1 2026 weighted average diluted shares 118.607M",
+        "as_of": "2026-03-31",
+        "content_sha256": "a60175cafdd7559b3c0e04280dc4f929a223e7923088283f490a11080f469b8d",
+        "source_id": "103c30e066ace5637439af9fcd10033f65b54f23e9d8a73230850ba617152941"
+      }
+    ],
+    "model_checks": {
+      "calculation_graphs_valid": true,
+      "component_sum_reconciles": true,
+      "no_double_counting": true,
+      "all_material_components_priced": true,
+      "low_base_high_ordered": true
+    },
+    "evidence": {
+      "unresolved_count": 8,
+      "blockers": [
+        "economic_claim.description required",
+        "economic_claim.enterprise_to_equity_reconciliation required",
+        "economic_claim.unit_count required",
+        "economic_claim.unit_label required",
+        "economic_claim.unit_source required",
+        "economic_value.schema_version 1.0 required",
+        "gaap_role required",
+        "option component conversion_capacity_and_contract_option requires probability, timing, and remaining-capital treatment"
+      ],
+      "validation_errors": [
+        "economic_claim.description required",
+        "economic_claim.enterprise_to_equity_reconciliation required",
+        "economic_claim.unit_count required",
+        "economic_claim.unit_label required",
+        "economic_claim.unit_source required",
+        "economic_value.schema_version 1.0 required",
+        "gaap_role required",
+        "option component conversion_capacity_and_contract_option requires probability, timing, and remaining-capital treatment"
+      ]
+    },
+    "monitoring": {
+      "falsifiers": [
+        "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
+        "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
+        "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
+        "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case."
+      ],
+      "required_refresh_triggers": [
+        "new filing or material operating update",
+        "capital-structure change",
+        "material price move",
+        "component milestone or falsifier"
+      ]
+    },
+    "change_control": {
+      "model_hash": "2205f6dfaf36d51a76d50acb40542641488359477f03c497b595c599a27220e0",
+      "method_versions": [
+        "net_asset_value@1.0",
+        "owner_cash_or_dividend_discount@1.0",
+        "risk_adjusted_milestone_value@1.0"
+      ],
+      "change_log": [],
+      "rule": "A source fact is locked. Every assumption change requires a reason, author, timestamp, and before/after value."
+    },
+    "decision_rule": "No security is decision-grade until every material claim is valued exactly once by a valid calculation proof and every material evidence blocker is resolved."
+  },
+  "synthesis": {
+    "status": "complete",
+    "paths": [
+      {
+        "id": "theory_implied",
+        "label": "Growth theory (pre-falsifier)",
+        "source": "growth_explanation + filing revenue YoY",
+        "return_pct": 11.2,
+        "weight": 0.08,
+        "type": "numeric",
+        "epistemic_tier": "B (pre-falsifier derivation)",
+        "weight_why": "Segment blend before falsifier pass; diagnostic only when it differs from falsifier-adjusted.",
+        "weight_falsifiers": [
+          "Included at full weight alongside falsifier-adjusted without divergence note"
+        ],
+        "hard_to_vary": "partial"
+      },
+      {
+        "id": "scenario_bear",
+        "label": "Bear scenario (Lawrence)",
+        "source": "scenarios.bear",
+        "return_pct": -1.2,
+        "weight": 0.05,
+        "type": "numeric",
+        "epistemic_tier": "C (scenario envelope)",
+        "weight_why": "Downside stress; low weight because bear is a sensitivity, not a competing explanation of base mechanics.",
+        "weight_falsifiers": [
+          "Bear assumptions become base case in filings (e.g. sustained volume collapse)"
+        ],
+        "hard_to_vary": "yes: asymmetric low weight is structural"
+      },
+      {
+        "id": "scenario_bull",
+        "label": "Bull scenario (Lawrence)",
+        "source": "scenarios.bull",
+        "return_pct": 19.9,
+        "weight": 0.12,
+        "type": "numeric",
+        "epistemic_tier": "C (scenario envelope)",
+        "weight_why": "Upside stress probe; higher than bear because optionality archetype has skew, but still below primary paths.",
+        "weight_falsifiers": [
+          "Bull growth sustained in filings for 4+ quarters without falsifier trigger"
+        ],
+        "hard_to_vary": "yes"
+      }
+    ],
+    "qualitative_adjustments": [],
+    "qualitative_manual": false,
+    "qualitative_pp_cap_applied": false,
+    "numeric_weighted_pct": 12.9,
+    "qualitative_pp": 0,
+    "total_synthesis_pct": 12.9,
+    "human_approval": "pending",
+    "weight_audit": {
+      "flags": [],
+      "deutsch_checks": {
+        "hard_to_vary": true,
+        "falsifiable": true,
+        "not_instrumentalist": true,
+        "reach": "Weights encode evidence tier (A primary \u2192 D external), not fitted to hit a target IRR"
+      },
+      "qualitative_audit": {
+        "flags": [],
+        "deutsch_checks": {
+          "hard_to_vary": true,
+          "falsifiable": true,
+          "not_double_count": true,
+          "small_band": true
+        }
+      }
+    },
+    "notes": "Capstone IRR combining filings, segments, overlays, third-party, qualitative"
+  }
+}
