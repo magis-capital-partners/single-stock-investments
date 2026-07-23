@@ -11,7 +11,7 @@ VAL_PATH = ROOT / "WBI" / "research" / "valuation.json"
 
 K10 = "WBI/investor-documents/sec-edgar/10-K_20260316_rpt20251231_acc0001193125_26_106541.htm"
 Q10 = "WBI/investor-documents/sec-edgar/10-Q_20260507_rpt20260331_acc0001193125_26_209490.htm"
-EVIDENCE = "WBI/research/evidence_reconciliation_2026-07-21.md"
+EVIDENCE = "WBI/research/evidence_reconciliation_2026-07-23.md"
 AS_OF = "2026-03-31"
 
 SHARES_M = 123.456209
