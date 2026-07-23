@@ -43,6 +43,27 @@
     return `${name} <span class="tier-sub">(+${extra})</span>`;
   }
 
+  function sourceBadgeLabel(source) {
+    if (source === 'sec_edgar') return 'SEC';
+    if (source === 'publisher_site') return 'Site';
+    if (source === 'press_wire') return 'Wire';
+    if (source === 'local') return 'Local';
+    if (source === 'short_reports_md') return 'Short MD';
+    return source || '—';
+  }
+
+  function sourceLinkLabel(row) {
+    if (row.source === 'sec_edgar') return 'SEC filing';
+    if (row.source === 'press_wire') {
+      if ((row.filing_class || '').includes('letter') || (row.title || '').toLowerCase().includes('letter')) {
+        return 'Open letter';
+      }
+      return 'Press wire';
+    }
+    if (row.source === 'publisher_site') return 'Firm site';
+    return 'Original';
+  }
+
   function fileStatusBadge(row) {
     if (row?.body_verified === false) {
       return ' <span class="badge badge-warn" title="Ticker not found in document body — likely false positive">unverified</span>';
@@ -137,7 +158,7 @@
   function renderReportLinks(row, linkHtml) {
     const parts = [];
     if (row.source_url && row.source_url_ok !== false) {
-      parts.push(linkHtml(row.source_url, row.source === 'sec_edgar' ? 'SEC filing' : 'Original', 'source-open-link'));
+      parts.push(linkHtml(row.source_url, sourceLinkLabel(row), 'source-open-link'));
     }
     if (row.file_exists !== false && row.github_url) {
       const label = isPdfReport(row) ? 'Archived PDF' : 'Archived copy';
@@ -195,7 +216,7 @@
         <td><span class="badge ${sideBadge(r.side)}">${state.escapeHtml(r.side || '—')}</span></td>
         <td><div>${firmDisplay(r)}${reviewBadge}${fileStatusBadge(r)}</div><div class="tier-sub">Target: ${state.escapeHtml(r.target_company || r.ticker || '')} · ${state.escapeHtml(r.target_match_evidence || 'unverified')} · ${state.escapeHtml((r.report_kind || 'activist_report').replaceAll('_', ' '))}</div></td>
         <td>${state.escapeHtml(r.title || '—')}${groupBadge}${extra?.expander || ''}</td>
-        <td>${state.escapeHtml(r.source || '—')}${r.status === 'new' ? ' <span class="badge badge-warn">new</span>' : ''}</td>
+        <td><span class="badge badge-us" title="${state.escapeHtml(r.source || '')}">${state.escapeHtml(sourceBadgeLabel(r.source))}</span>${r.status === 'new' ? ' <span class="badge badge-warn">new</span>' : ''}${r.filing_class === 'open_letter' ? ' <span class="badge badge-purple">letter</span>' : ''}</td>
         <td>${renderReportLinks(r, state.linkHtml)}</td>
       </tr>`;
   }

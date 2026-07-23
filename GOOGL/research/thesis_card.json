@@ -1,0 +1,82 @@
+{
+  "base_irr_pct": -0.97,
+  "classification": {
+    "archetype": "compounder",
+    "cycle": "-",
+    "dhando": "partial",
+    "lawrence_bucket": "pricing_power",
+    "moat": "widening"
+  },
+  "evidence_citations": [
+    "investor-documents/sec-edgar/10-K_20260205_rpt20251231_acc0001652044_26_000018.htm",
+    "investor-documents/sec-edgar/10-Q_20260430_rpt20260331_acc0001652044_26_000048.htm",
+    "investor-documents/sec-edgar/8-K_20260429_rpt20260429_acc0001652044_26_000043.htm",
+    "investor-documents/sec-edgar/DEF 14A_20260424_rpt20260605_acc0001308179_26_000342.htm",
+    "GOOGL/research/deep_dive_2026-06-04.md"
+  ],
+  "filing_digest": "GOOGL/research/evidence/filing_digest_2026-07-21.md",
+  "generated_at": "2026-07-21T03:06:00+00:00",
+  "irr_label": "7yr IRR (total synthesis)",
+  "key_assumptions": [
+    {
+      "input": "Price today",
+      "source": "NASDAQ ~May 26, 2026 (CNBC quote; confirm live)",
+      "value": "**$386.0**"
+    },
+    {
+      "input": "Starting free cash flow per share",
+      "source": "FY2025 OCF $125.3B \u2212 capex $52.5B \u00f7 ~12.45B diluted shares (10-K)",
+      "value": "**$5.85**"
+    },
+    {
+      "input": "Growth in years 1 through 5",
+      "source": "Cloud AI mix shift; normalize post-capex ramp",
+      "value": "**11.0%** per year"
+    },
+    {
+      "input": "Growth in years 6 through 7",
+      "source": "Scenario base",
+      "value": "**8.0%** per year"
+    },
+    {
+      "input": "Selling multiple in year 10",
+      "source": "Scenario base",
+      "value": "**25 times cash flow**"
+    },
+    {
+      "input": "Time horizon",
+      "source": "7-year owner-cash model",
+      "value": "**7 years**"
+    },
+    {
+      "input": "AI inflection FCF\u2080 (sensitivity)",
+      "source": "[Assumption] normalized ~2028 post-capex; needs filing bridge",
+      "value": "**$8.0/sh**"
+    },
+    {
+      "input": "AI inflection implied return",
+      "source": "`marvin_valuation.py` overlay",
+      "value": "**10.2%**"
+    }
+  ],
+  "last_verified": {
+    "deep_dive": "2026-07-21",
+    "human_approved": null,
+    "valuation_as_of": "2026-07-21"
+  },
+  "open_questions": [
+    "Confirm live price and diluted share count against latest filing.",
+    "Promote AI inflection or third-party views into base case only after human OK.",
+    "Stance and sizing require `human_decision.json`."
+  ],
+  "scenarios": {
+    "base": -1.5,
+    "bear": -9.5,
+    "bull": 2.4
+  },
+  "schema_version": "1.0",
+  "stance": null,
+  "thesis": "Alphabet Inc. owns Google (Search, YouTube, Android, Chrome) and Google Cloud. **[Fact]** Advertisers and enterprises pay for ad auctions, cloud compute, and subscriptions; consumers use free products that drive query volume and data. **[Fact]** FY2025 revenue was **$402.8B** (+15%); Q1 2026 revenue **$109.9B** (+22%). **[Fact]** Reportable segments are **Google Services**, **Google Cloud**, and **Other Bets** (Waymo, etc.), plus **Alphabet-level activities** (centralized AI R&D). **[Fact]** FY2025 consolidated operating cash flow **$125.3B**, capital spending **$52.5B**, owner free cash flow **~$72.8B**; management guides **$180-190B** capital spending in 2026. **[Inference]** Owner economics depend on Cloud return on invested capital versus the capital spending step-up and whether Search monetization holds as interfaces shift to AI.",
+  "ticker": "GOOGL",
+  "why_market_wrong": "There is **no clear dated mispricing signal** (predictive attribute: **none**). **[Inference]** At **~$386**, the stock prices Cloud AI optionality and Search resilience together. **[Inference]** A single consolidated free cash flow growth rate hides **divergent segment economics**: Services throws off most cash today while Cloud and Alphabet-level spend absorb the 2026 capital guide. **[Inference]** Proof-first component math sums to **~$348 per share** base economic value versus **~$386** price, implying the market embeds higher Cloud multiples or faster capex normalization than the bounded proof schedule."
+}

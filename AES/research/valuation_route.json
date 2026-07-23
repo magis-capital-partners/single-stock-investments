@@ -3,9 +3,11 @@
   "status": "routed",
   "profile_id": "predictable_cash_flow",
   "label": "Predictable cash-flow security",
-  "score": 6.0,
+  "score": 9.0,
   "reasons": [
-    "archetype=infrastructure"
+    "archetype=infrastructure",
+    "component categories=operating_business",
+    "existing methods=dividend, owner_cash"
   ],
   "primary_methods": [
     "owner_cash_or_dividend_discount"
@@ -42,42 +44,75 @@
     "growth capital and dilution omitted",
     "contract renewal or regulatory reset ignored"
   ],
-  "secondary_profiles": [],
+  "secondary_profiles": [
+    {
+      "profile_id": "binary_milestone",
+      "score": 4.0,
+      "reasons": [
+        "component categories=real_option",
+        "existing methods=milestone, probability, risk_adjusted"
+      ]
+    },
+    {
+      "profile_id": "quality_reinvestment",
+      "score": 2.0,
+      "reasons": [
+        "component categories=operating_business",
+        "existing methods=owner_cash"
+      ]
+    }
+  ],
   "scorecard": {
     "scarce_asset_optionality": {
-      "score": 0.0,
-      "reasons": []
+      "score": 1.0,
+      "reasons": [
+        "component categories=real_option"
+      ]
     },
     "quality_reinvestment": {
-      "score": 0.0,
-      "reasons": []
+      "score": 2.0,
+      "reasons": [
+        "component categories=operating_business",
+        "existing methods=owner_cash"
+      ]
     },
     "capital_cycle": {
-      "score": 0.0,
-      "reasons": []
+      "score": 1.0,
+      "reasons": [
+        "component categories=operating_business"
+      ]
     },
     "credit_and_normalized_returns": {
-      "score": 0.0,
-      "reasons": []
+      "score": 1.0,
+      "reasons": [
+        "component categories=liability_or_reserve"
+      ]
     },
     "catalyst_asset_value": {
-      "score": 0.0,
-      "reasons": []
+      "score": 1.0,
+      "reasons": [
+        "existing methods=catalyst"
+      ]
     },
     "predictable_cash_flow": {
-      "score": 6.0,
+      "score": 9.0,
       "reasons": [
-        "archetype=infrastructure"
+        "archetype=infrastructure",
+        "component categories=operating_business",
+        "existing methods=dividend, owner_cash"
       ]
     },
     "binary_milestone": {
-      "score": 0.0,
-      "reasons": []
+      "score": 4.0,
+      "reasons": [
+        "component categories=real_option",
+        "existing methods=milestone, probability, risk_adjusted"
+      ]
     }
   },
   "decision_rule": "Power Zones select the fitting economic method and eligible independent reviewers; they never choose the valuation answer or capital decision.",
   "ticker": "AES",
-  "as_of": "2026-07-20",
+  "as_of": "2026-07-21",
   "route_source": "canonical_power_zone_router",
   "config_path": "_system/frameworks/power_zones.json",
   "config_updated": "2026-07-14",
@@ -129,6 +164,6 @@
       }
     ]
   },
-  "input_hash": "fd1077220657531b7d6a12842baf28c327c7eb2c760265cef5e201b3ae24eaf9",
-  "generated_at": "2026-07-20T17:13:53.843451+00:00"
+  "input_hash": "a26bacda67dfded4bcf3792812ba8ce0e2ec143a883dcc1b65bbaf1e11fbb4cb",
+  "generated_at": "2026-07-21T14:36:30.105703+00:00"
 }
