@@ -66,7 +66,7 @@
 | calculation | Non-overlapping overlap keys; base sum **$107.00/sh**. |
 | remaining uncertainty | Judgment bands on franchise normalization and capital release timing. |
 | affected components | All |
-| valuation consequence | Universal contract advances from `legacy_sensitivity` toward `bounded_estimate`; Lawrence synthesis **-3.25%** per year at **$134.89**. |
+| valuation consequence | Universal contract advances from `legacy_sensitivity` toward `bounded_estimate`; Lawrence synthesis **-2.94%** per year at **$131.89**. |
 | falsifier | Primary filing revises TCE, ACL, or CET1 by >10% without matching proof refresh. |
 
 ## Facts vs judgments
@@ -77,4 +77,4 @@
 
 ## Valuation consequence
 
-Proof-complete additive schedule at **$107/sh** base vs **~$135** price implies negative component-economic return; remain **watch** until human capital decision. No stance or sizing authority recorded in `human_decision.json`.
+Proof-complete additive schedule at **$107/sh** base vs **~$132** price implies **-2.94%** annual return; remain **watch** until human capital decision. No stance or sizing authority recorded in `human_decision.json`.
