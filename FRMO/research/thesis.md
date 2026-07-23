@@ -9,15 +9,15 @@
 | **Archetype** (Stahl) | holding_co |
 | **Moat** (Munger) | stable |
 | **Dhando** (Pabrai) | partial |
-| **Stance** | accumulate |
+| **Stance** | hold |
 | **Cycle** | - |
-| **Implied 7yr IRR** (base) | 21.9% (base) |
-| **IRR method** | yield_curve |
+| **Implied 7yr IRR** (base) | -2.08% (contract base, provisional) |
+| **IRR method** | quality_reinvestment |
 | **Lawrence bucket** | other |
 | **Payoff lens** | pending |
 | **MOI bucket** | pending |
 
-**Deep dive:** `FRMO/research/deep_dive_2026-06-04.md` (auto-sync)
+**Deep dive:** `FRMO/research/deep_dive_2026-07-21.md` (auto-sync)
 
 ## One-line thesis
 

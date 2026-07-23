@@ -3,93 +3,142 @@ name: Auto - Agent PR Merge
 # Squash-merge Cursor cloud-agent PRs (Marvin research or Investment Committee
 # task artifacts) after research-quality CI passes. Resolves shared-file
 # conflicts with main before merge when needed.
+#
+# Consistency guardrails:
+# 1. Wait for the Research quality workflow run (does not fail if checks have
+#    not appeared yet). Also re-trigger when that workflow completes.
+# 2. Serialize squash merges with a global concurrency group so parallel agent
+#    PRs do not race conflict resolution against main.
 
 on:
   pull_request:
     types: [opened, synchronize, reopened, ready_for_review]
     branches: [main]
+  workflow_run:
+    workflows: ["Research quality (PR)"]
+    types: [completed]
 
 permissions:
   contents: write
   pull-requests: write
   checks: read
-
-concurrency:
-  group: agent-automerge-${{ github.event.pull_request.number }}
-  cancel-in-progress: true
+  actions: read
 
 jobs:
-  automerge:
+  resolve-pr:
+    if: >
+      github.event_name == 'pull_request' ||
+      github.event.workflow_run.conclusion == 'success'
     runs-on: ubuntu-latest
-    timeout-minutes: 60
+    timeout-minutes: 5
+    outputs:
+      number: ${{ steps.pr.outputs.number }}
+      eligible: ${{ steps.pr.outputs.eligible }}
+      head_ref: ${{ steps.pr.outputs.head_ref }}
+      head_sha: ${{ steps.pr.outputs.head_sha }}
+      is_draft: ${{ steps.pr.outputs.is_draft }}
     steps:
-      - name: Resolve PR number
+      - name: Resolve PR number and eligibility
         id: pr
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          EVENT_NAME: ${{ github.event_name }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          RUN_SHA: ${{ github.event.workflow_run.head_sha }}
+          REPO: ${{ github.repository }}
         run: |
-          echo "number=${{ github.event.pull_request.number }}" >> "$GITHUB_OUTPUT"
-
-      - name: Load PR metadata
-        id: meta
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          PR="${{ steps.pr.outputs.number }}"
-          HEAD_REF=$(gh pr view "$PR" --repo "${{ github.repository }}" --json headRefName --jq '.headRefName')
-          IS_DRAFT=$(gh pr view "$PR" --repo "${{ github.repository }}" --json isDraft --jq '.isDraft')
-          HEAD_SHA=$(gh pr view "$PR" --repo "${{ github.repository }}" --json headRefOid --jq '.headRefOid')
+          set -euo pipefail
+          if [ "$EVENT_NAME" = "pull_request" ]; then
+            PR="$PR_NUMBER"
+          else
+            PR=$(gh api "repos/${REPO}/commits/${RUN_SHA}/pulls" \
+              -H "Accept: application/vnd.github.groot-preview+json" \
+              --jq '.[0].number // empty')
+            if [ -z "$PR" ]; then
+              echo "No open PR for workflow_run SHA ${RUN_SHA}; skipping."
+              echo "eligible=false" >> "$GITHUB_OUTPUT"
+              echo "number=" >> "$GITHUB_OUTPUT"
+              echo "head_ref=" >> "$GITHUB_OUTPUT"
+              echo "head_sha=" >> "$GITHUB_OUTPUT"
+              echo "is_draft=false" >> "$GITHUB_OUTPUT"
+              exit 0
+            fi
+          fi
+          HEAD_REF=$(gh pr view "$PR" --repo "$REPO" --json headRefName --jq '.headRefName')
+          IS_DRAFT=$(gh pr view "$PR" --repo "$REPO" --json isDraft --jq '.isDraft')
+          HEAD_SHA=$(gh pr view "$PR" --repo "$REPO" --json headRefOid --jq '.headRefOid')
+          STATE=$(gh pr view "$PR" --repo "$REPO" --json state --jq '.state')
+          if [ "$STATE" != "OPEN" ]; then
+            echo "PR #$PR state=$STATE — skipping automerge."
+            echo "eligible=false" >> "$GITHUB_OUTPUT"
+            echo "number=$PR" >> "$GITHUB_OUTPUT"
+            echo "head_ref=$HEAD_REF" >> "$GITHUB_OUTPUT"
+            echo "head_sha=$HEAD_SHA" >> "$GITHUB_OUTPUT"
+            echo "is_draft=$IS_DRAFT" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
           if [[ ! "$HEAD_REF" =~ ^cursor/ ]]; then
             echo "PR #$PR head ref '$HEAD_REF' is not a cursor/* branch — skipping automerge."
             echo "eligible=false" >> "$GITHUB_OUTPUT"
+            echo "number=$PR" >> "$GITHUB_OUTPUT"
+            echo "head_ref=$HEAD_REF" >> "$GITHUB_OUTPUT"
+            echo "head_sha=$HEAD_SHA" >> "$GITHUB_OUTPUT"
+            echo "is_draft=$IS_DRAFT" >> "$GITHUB_OUTPUT"
             exit 0
           fi
           echo "eligible=true" >> "$GITHUB_OUTPUT"
+          echo "number=$PR" >> "$GITHUB_OUTPUT"
           echo "head_ref=$HEAD_REF" >> "$GITHUB_OUTPUT"
-          echo "is_draft=$IS_DRAFT" >> "$GITHUB_OUTPUT"
           echo "head_sha=$HEAD_SHA" >> "$GITHUB_OUTPUT"
+          echo "is_draft=$IS_DRAFT" >> "$GITHUB_OUTPUT"
 
+  gate:
+    needs: resolve-pr
+    if: needs.resolve-pr.outputs.eligible == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 55
+    concurrency:
+      group: agent-automerge-gate-${{ needs.resolve-pr.outputs.number }}
+      cancel-in-progress: true
+    outputs:
+      number: ${{ needs.resolve-pr.outputs.number }}
+      head_ref: ${{ needs.resolve-pr.outputs.head_ref }}
+      head_sha: ${{ steps.head.outputs.sha }}
+    steps:
       - name: Mark draft PR ready (Cursor cloud agent opens drafts)
-        if: steps.meta.outputs.eligible == 'true' && steps.meta.outputs.is_draft == 'true'
+        if: needs.resolve-pr.outputs.is_draft == 'true'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          gh pr ready "${{ steps.pr.outputs.number }}" \
+          gh pr ready "${{ needs.resolve-pr.outputs.number }}" \
             --repo "${{ github.repository }}"
 
-      - name: Reload PR metadata after ready promotion
-        id: meta2
-        if: steps.meta.outputs.eligible == 'true'
+      - name: Confirm PR is ready
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          PR="${{ steps.pr.outputs.number }}"
+          PR="${{ needs.resolve-pr.outputs.number }}"
           sleep 3
           IS_DRAFT=$(gh pr view "$PR" --repo "${{ github.repository }}" --json isDraft --jq '.isDraft')
-          HEAD_SHA=$(gh pr view "$PR" --repo "${{ github.repository }}" --json headRefOid --jq '.headRefOid')
           if [ "$IS_DRAFT" = "true" ]; then
             echo "::error::PR #$PR is still a draft after ready promotion."
             exit 1
           fi
-          echo "head_sha=$HEAD_SHA" >> "$GITHUB_OUTPUT"
 
       - uses: actions/checkout@v4
-        if: steps.meta.outputs.eligible == 'true'
         with:
           fetch-depth: 1
 
       - uses: actions/setup-python@v5
-        if: steps.meta.outputs.eligible == 'true'
         with:
           python-version: "3.12"
 
       - name: Verify immutable agent provenance
-        if: steps.meta.outputs.eligible == 'true'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          PR: ${{ steps.pr.outputs.number }}
+          PR: ${{ needs.resolve-pr.outputs.number }}
           REPO: ${{ github.repository }}
-          HEAD_REF: ${{ steps.meta.outputs.head_ref }}
+          HEAD_REF: ${{ needs.resolve-pr.outputs.head_ref }}
         run: |
           mapfile -t FILES < <(gh api --paginate "repos/$REPO/pulls/$PR/files" --jq '.[].filename')
           mapfile -t RESEARCH_TICKERS < <(printf '%s\n' "${FILES[@]}" | sed -nE 's|^([^/]+)/research/research_agent_manifest\.json$|\1|p' | sort -u)
@@ -114,46 +163,73 @@ jobs:
           # Workspace is the PR merge commit: main packet + this task's artifact.
           printf '%s\n' "${COMMITTEE_FILES[@]}" | python _system/scripts/validate_committee_pr_artifacts.py
 
-      - name: Resolve merge conflicts with main
-        if: steps.meta.outputs.eligible == 'true'
-        id: resolve
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          PR="${{ steps.pr.outputs.number }}"
-          MERGEABLE=$(gh pr view "$PR" --repo "${{ github.repository }}" --json mergeable -q .mergeable)
-          if [ "$MERGEABLE" = "CONFLICTING" ]; then
-            python _system/scripts/resolve_marvin_pr_conflicts.py "$PR"
-            echo "resolved=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "resolved=false" >> "$GITHUB_OUTPUT"
-          fi
-
       - name: Refresh head SHA
-        if: steps.meta.outputs.eligible == 'true'
         id: head
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          SHA=$(gh pr view "${{ steps.pr.outputs.number }}" --repo "${{ github.repository }}" --json headRefOid -q .headRefOid)
+          SHA=$(gh pr view "${{ needs.resolve-pr.outputs.number }}" --repo "${{ github.repository }}" --json headRefOid -q .headRefOid)
           echo "sha=$SHA" >> "$GITHUB_OUTPUT"
 
-      - name: Wait for research quality checks
-        if: steps.meta.outputs.eligible == 'true'
-        uses: lewagon/wait-on-check-action@v1.3.4
-        with:
-          ref: ${{ steps.head.outputs.sha }}
-          repo-token: ${{ secrets.GITHUB_TOKEN }}
-          wait-interval: 10
-          check-regexp: (cloud-prompt-sync|research-lint|dashboard-integrity)
-          allowed-conclusions: success,skipped
-
-      - name: Ensure mergeable before squash
-        if: steps.meta.outputs.eligible == 'true'
+      - name: Wait for Research quality workflow
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          PR="${{ steps.pr.outputs.number }}"
+          python _system/scripts/wait_for_workflow_run.py \
+            --repo "${{ github.repository }}" \
+            --sha "${{ steps.head.outputs.sha }}" \
+            --workflow "Research quality (PR)" \
+            --timeout-seconds 2700 \
+            --poll-seconds 15
+
+  merge:
+    needs: gate
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    # Serialize squash merges across all agent PRs to avoid main-tip races.
+    concurrency:
+      group: agent-automerge-main
+      cancel-in-progress: false
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Skip if already merged
+        id: state
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          PR="${{ needs.gate.outputs.number }}"
+          STATE=$(gh pr view "$PR" --repo "${{ github.repository }}" --json state --jq '.state')
+          if [ "$STATE" != "OPEN" ]; then
+            echo "PR #$PR already $STATE; nothing to merge."
+            echo "merge=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          echo "merge=true" >> "$GITHUB_OUTPUT"
+
+      - name: Resolve merge conflicts with main
+        if: steps.state.outputs.merge == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          PR="${{ needs.gate.outputs.number }}"
+          MERGEABLE=$(gh pr view "$PR" --repo "${{ github.repository }}" --json mergeable -q .mergeable)
+          if [ "$MERGEABLE" = "CONFLICTING" ]; then
+            python _system/scripts/resolve_marvin_pr_conflicts.py "$PR"
+          fi
+
+      - name: Ensure mergeable before squash
+        if: steps.state.outputs.merge == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          PR="${{ needs.gate.outputs.number }}"
           REPO="${{ github.repository }}"
           for attempt in 1 2 3 4 5; do
             MERGEABLE=$(gh pr view "$PR" --repo "$REPO" --json mergeable -q .mergeable)
@@ -174,13 +250,13 @@ jobs:
           fi
 
       - name: Squash merge and delete branch
-        if: steps.meta.outputs.eligible == 'true'
+        if: steps.state.outputs.merge == 'true'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          PR="${{ steps.pr.outputs.number }}"
+          PR="${{ needs.gate.outputs.number }}"
           REPO="${{ github.repository }}"
-          HEAD_REF="${{ steps.meta.outputs.head_ref }}"
+          HEAD_REF="${{ needs.gate.outputs.head_ref }}"
 
           gh api --method PUT "repos/${REPO}/pulls/${PR}/merge" \
             -f merge_method=squash
@@ -189,12 +265,12 @@ jobs:
             || echo "Branch ${HEAD_REF} already deleted."
 
       - name: Summary
-        if: steps.meta.outputs.eligible == 'true'
+        if: steps.state.outputs.merge == 'true'
         run: |
-          echo "Merged PR #${{ steps.pr.outputs.number }} (${{ steps.meta.outputs.head_ref }}) into main."
+          echo "Merged PR #${{ needs.gate.outputs.number }} (${{ needs.gate.outputs.head_ref }}) into main."
 
       - name: Advance any committee task merged by this PR
-        if: steps.meta.outputs.eligible == 'true'
+        if: steps.state.outputs.merge == 'true'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
