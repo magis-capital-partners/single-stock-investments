@@ -61,12 +61,12 @@
       "label": "Iron ore / steel operator context (Mesabi ↔ Cliffs)",
       "description": "Commodity orientation plus Cliffs steel shipment cadence for MSB Northshore royalty transmission. Iron ore spot and steel ETF are orientation only; MSB cash still comes from Mesabi royalty 8-K exhibits (deemed pellet price vs bonus threshold). Never auto-inflate Lawrence base IRR.",
       "series": [
-        {"id": "iron_ore_spot_usd", "label": "Global iron ore spot (USD/metric ton, IMF via FRED)", "source": "fred", "fred_id": "PIORECRUSDM", "good_for": "pellet_price_regime", "optional": true, "note": "Orientation only; MSB bonus uses Cliffs deemed pellet price vs threshold. No equity fallback (avoids VALE/stock mislabel)."},
+        {"id": "iron_ore_spot_usd", "label": "Global iron ore spot (USD/metric ton, IMF via FRED)", "source": "fred", "fred_id": "PIORECRUSDM", "good_for": "pellet_price_regime", "optional": true, "staleness_max_days": 45, "note": "Orientation only; MSB bonus uses Cliffs deemed pellet price vs threshold. No equity fallback (avoids VALE/stock mislabel)."},
         {"id": "steel_producer_etf", "label": "Steel producers ETF SLX (USD)", "source": "yahoo_daily", "yahoo_symbol": "SLX", "good_for": "steel_demand_sentiment"},
-        {"id": "clf_steel_shipments_q_mtons", "label": "CLF quarterly steel shipments (million net tons)", "source": "filing_panel", "panel": "clf_operating_panel.csv", "metric": "steel_shipments_mtons", "good_for": "operator_volume", "note": "Seeded/updated from CLF earnings; not Northshore tons"},
-        {"id": "clf_fy_shipment_guide_mid_mtons", "label": "CLF FY steel shipment guide midpoint (million net tons)", "source": "filing_panel", "panel": "clf_operating_panel.csv", "metric": "fy_guide_mid_mtons", "good_for": "operator_volume_guide", "optional": true},
-        {"id": "msb_northshore_tons", "label": "MSB Northshore tons shipped (quarterly)", "source": "filing_panel", "panel": "msb_royalty_panel.csv", "metric": "tons_shipped", "good_for": "royalty_volume", "note": "Parsed from Mesabi royalty 8-K Ex. 99.1"},
-        {"id": "msb_bonus_royalty_usd", "label": "MSB quarterly bonus royalty (USD)", "source": "filing_panel", "panel": "msb_royalty_panel.csv", "metric": "bonus_royalty_usd", "good_for": "bonus_switch", "note": "Zero when deemed price below threshold"}
+        {"id": "clf_steel_shipments_q_mtons", "label": "CLF quarterly steel shipments (million net tons)", "source": "filing_panel", "panel": "clf_operating_panel.csv", "metric": "steel_shipments_mtons", "good_for": "operator_volume", "staleness_max_days": 120, "note": "Seeded/updated from CLF earnings; not Northshore tons"},
+        {"id": "clf_fy_shipment_guide_mid_mtons", "label": "CLF FY steel shipment guide midpoint (million net tons)", "source": "filing_panel", "panel": "clf_operating_panel.csv", "metric": "fy_guide_mid_mtons", "good_for": "operator_volume_guide", "optional": true, "staleness_max_days": 120},
+        {"id": "msb_northshore_tons", "label": "MSB Northshore tons shipped (quarterly)", "source": "filing_panel", "panel": "msb_royalty_panel.csv", "metric": "tons_shipped", "good_for": "royalty_volume", "staleness_max_days": 120, "note": "Parsed from Mesabi royalty 8-K Ex. 99.1"},
+        {"id": "msb_bonus_royalty_usd", "label": "MSB quarterly bonus royalty (USD)", "source": "filing_panel", "panel": "msb_royalty_panel.csv", "metric": "bonus_royalty_usd", "good_for": "bonus_switch", "staleness_max_days": 120, "note": "Zero when deemed price below threshold"}
       ]
     }
   }

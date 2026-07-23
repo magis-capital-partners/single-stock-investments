@@ -857,6 +857,7 @@ def segment_build_section(val: dict, preserved: str | None) -> str:
 SEGMENT_MAP_HEADING = "#### Segment map (filings)"
 AI_INFRA_HEADING = "#### AI infrastructure — what the valuation captures vs gaps"
 THEMATIC_CONTEXT_HEADING = "#### Thematic context"
+OPERATOR_TRANSMISSION_HEADING = "#### Operator transmission (Cliffs / Northshore)"
 INSIDER_CONVICTION_HEADING = "#### Insider conviction"
 
 
@@ -936,6 +937,46 @@ def insider_conviction_business_block(val: dict, body: str | None) -> str:
     if hooks:
         lines += ["", "**Hooks:** " + "; ".join(hooks)]
     lines.append("")
+    return "\n".join(lines)
+
+
+def operator_transmission_business_block(ticker: str) -> str:
+    """MSB-only block from research/operator_model.json (context; not base IRR)."""
+    if str(ticker).upper() != "MSB":
+        return ""
+    path = ROOT / "MSB" / "research" / "operator_model.json"
+    if not path.exists():
+        return ""
+    try:
+        model = json.loads(path.read_text(encoding="utf-8"))
+    except json.JSONDecodeError:
+        return ""
+    royalty = model.get("royalty") or {}
+    tx = model.get("transmission") or {}
+    commodities = model.get("commodities") or {}
+    iron = commodities.get("iron_ore_spot_usd") or {}
+    lines = [
+        OPERATOR_TRANSMISSION_HEADING,
+        "",
+        f"> {(model.get('disclaimer') or 'Context only. Not in Lawrence base IRR.')}",
+        "",
+        f"**Bonus switch:** {tx.get('bonus_switch', 'n/a')} · "
+        f"**Volume signal:** {tx.get('volume_signal', 'n/a')} · "
+        f"**As of:** {model.get('as_of', 'n/a')}",
+        "",
+        "| Field | Value |",
+        "|-------|-------|",
+        f"| Northshore tons (latest royalty qtr) | {royalty.get('tons_shipped', 'n/a')} |",
+        f"| Bonus royalty (USD) | {royalty.get('bonus_royalty_usd', 'n/a')} |",
+        f"| Bonus threshold (USD/ton) | {royalty.get('bonus_threshold_usd', 'n/a')} |",
+        f"| Period end | {royalty.get('period_end', 'n/a')} |",
+        f"| Iron ore spot (orientation) | {iron.get('latest', 'n/a')} as of {iron.get('as_of', 'n/a')} |",
+        "",
+    ]
+    watch = tx.get("watch_next") or []
+    if watch:
+        lines.append("**Watch next:** " + "; ".join(str(w) for w in watch))
+        lines.append("")
     return "\n".join(lines)
 
 
@@ -1473,6 +1514,23 @@ def enrich_business_moat(body: str, val: dict, ticker: str, preserved: str | Non
             body = re.sub(
                 r"#### Thematic context.*?(?=\n#### |\n### |\n\*\*Upside / downside|\n## |\Z)",
                 thematic.rstrip() + "\n",
+                body,
+                count=1,
+                flags=re.DOTALL | re.IGNORECASE,
+            )
+    operator_tx = operator_transmission_business_block(ticker)
+    if operator_tx:
+        if not re.search(r"#### Operator transmission\b", body, re.I):
+            if "#### Thesis pillars" in body:
+                body = inject_before_marker(body, "#### Thesis pillars", operator_tx)
+            elif "**Disruption" in body:
+                body = inject_before_marker(body, "**Disruption", operator_tx)
+            else:
+                body = body.rstrip() + "\n\n" + operator_tx
+        else:
+            body = re.sub(
+                r"#### Operator transmission.*?(?=\n#### |\n### |\n\*\*Upside / downside|\n## |\Z)",
+                operator_tx.rstrip() + "\n",
                 body,
                 count=1,
                 flags=re.DOTALL | re.IGNORECASE,
