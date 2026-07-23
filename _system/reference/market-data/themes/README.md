@@ -42,7 +42,18 @@ Live data: `_external/etf-dashboard` (see `.gitmodules`). Override path with `DA
 |-------|-------|-----------------|
 | `ai_power_land` | AI compute -> power -> grid/water -> land/hosting | TPL, LB, WBI, APLD, BWEL, **AZLCZ** |
 | `macro_regime` | HY OAS, rates, dollar, VIX, credit impulse | All registry holdings (`*`) |
-| `gold_royalties` | Gold spot, GDX, GDX/GLD ratio | RGLD, FNV, WPM, OR, MSB |
+| `gold_royalties` | Gold spot, GDX, GDX/GLD ratio | RGLD, FNV, WPM, OR, MSB (sleeve pulse) |
 | `exchange_volatility` | VIX, realized vol, VRP health | CME, ICE, CBOE, MIAX, 8697.T |
+| `iron_ore_steel` | Iron ore spot + steel ETF + Cliffs shipments + Mesabi royalty facts | **MSB** |
+
+### MSB operator automation
+
+```bash
+python _system/scripts/parse_msb_royalty_report.py --write
+python _system/scripts/fetch_theme_panel.py --theme iron_ore_steel
+python _system/scripts/build_msb_operator_model.py --write
+```
+
+Writes `MSB/research/evidence/royalty_report_latest.json` and `MSB/research/operator_model.json`. Hooked into `marvin_cloud_refresh.py MSB`. Context only — does not rewrite base IRR.
 
 See `_system/frameworks/optionality_valuation.md` § **Thematic context layer**.

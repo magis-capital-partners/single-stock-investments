@@ -1,0 +1,75 @@
+{
+  "ticker": "MSB",
+  "operator_ticker": "CLF",
+  "as_of": "2026-07-23",
+  "generated_at": "2026-07-23T17:03:27Z",
+  "in_base_irr": false,
+  "disclaimer": "Context only. Commodity prices and CLF steel shipments orient stance; MSB distributions are driven by Northshore tons and deemed pellet price vs the bonus threshold from Mesabi royalty 8-Ks. Do not auto-edit valuation.json component proofs or implied_return from this file.",
+  "commodities": {
+    "iron_ore_spot_usd": {
+      "latest": 103.7909090909091,
+      "as_of": "2026-06-01",
+      "source": "fred:PIORECRUSDM",
+      "stale": true,
+      "direction": "up"
+    },
+    "steel_producer_etf": {
+      "latest": 102.31999969482422,
+      "as_of": "2026-07-23",
+      "source": "yahoo:SLX",
+      "stale": false,
+      "direction": "up"
+    }
+  },
+  "operator": {
+    "clf_steel_shipments_q_mtons": {
+      "latest": 4.025,
+      "as_of": "2026-06-30",
+      "source": "filing_panel:clf_operating_panel.csv:steel_shipments_mtons",
+      "stale": true,
+      "direction": "flat"
+    },
+    "clf_fy_shipment_guide_mid_mtons": {
+      "latest": 16.75,
+      "as_of": "2026-06-30",
+      "source": "filing_panel:clf_operating_panel.csv:fy_guide_mid_mtons",
+      "stale": true,
+      "direction": "flat"
+    },
+    "msb_northshore_tons": {
+      "latest": 938572.0,
+      "as_of": "2026-03-31",
+      "source": "filing_panel:msb_royalty_panel.csv:tons_shipped",
+      "stale": true,
+      "direction": "flat"
+    },
+    "msb_bonus_royalty_usd": {
+      "latest": 0.0,
+      "as_of": "2026-03-31",
+      "source": "filing_panel:msb_royalty_panel.csv:bonus_royalty_usd",
+      "stale": true,
+      "direction": "flat"
+    }
+  },
+  "royalty": {
+    "period_end": "2026-03-31",
+    "tons_shipped": 938572,
+    "base_royalty_usd": 1201501.0,
+    "bonus_royalty_usd": 0.0,
+    "bonus_threshold_usd": 71.7,
+    "bonus_on": false,
+    "source_path": "MSB/investor-documents/sec-edgar/8-K_20260504_exhibit_msb-20260430xex99d1.htm_acc0001104659_26_054941.htm"
+  },
+  "transmission": {
+    "bonus_switch": "off",
+    "volume_signal": "constructive",
+    "watch_next": [
+      "Next Mesabi quarterly royalty 8-K (tons, deemed price, bonus vs threshold)",
+      "CLF earnings for Northshore / idle / pellet commentary (not consolidated EPS alone)"
+    ],
+    "notes": [
+      "Iron ore spot and SLX are orientation for pellet/steel regime \u2014 not the contractual deemed price.",
+      "CLF quarterly steel tons \u2260 Northshore tons; use royalty exhibit for MSB cash."
+    ]
+  }
+}

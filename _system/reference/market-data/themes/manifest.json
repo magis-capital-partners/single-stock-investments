@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-07-22T11:59:09Z",
-  "as_of": "2026-07-22",
+  "generated_at": "2026-07-23T17:03:26Z",
+  "as_of": "2026-07-23",
   "staleness_max_days": 10,
   "disclaimer": "Context only. Tailwinds inform stance and overlay sizing; never auto-inflate Lawrence base IRR (human review promotes to base).",
   "themes": {
@@ -351,6 +351,96 @@
           "stale": false,
           "error": null,
           "note": null
+        }
+      }
+    },
+    "iron_ore_steel": {
+      "label": "Iron ore / steel operator context (Mesabi \u2194 Cliffs)",
+      "description": "Commodity orientation plus Cliffs steel shipment cadence for MSB Northshore royalty transmission. Iron ore spot and steel ETF are orientation only; MSB cash still comes from Mesabi royalty 8-K exhibits (deemed pellet price vs bonus threshold). Never auto-inflate Lawrence base IRR.",
+      "series": {
+        "iron_ore_spot_usd": {
+          "label": "Global iron ore spot (USD/metric ton, IMF via FRED)",
+          "latest": 103.7909090909091,
+          "as_of": "2026-06-01",
+          "prior_year": 96.16666666666669,
+          "yoy_pct": 7.9,
+          "direction": "up",
+          "good_for": "pellet_price_regime",
+          "source": "fred:PIORECRUSDM",
+          "optional": true,
+          "stale": true,
+          "error": null,
+          "note": "Orientation only; MSB bonus uses Cliffs deemed pellet price vs threshold. No equity fallback (avoids VALE/stock mislabel)."
+        },
+        "steel_producer_etf": {
+          "label": "Steel producers ETF SLX (USD)",
+          "latest": 102.31999969482422,
+          "as_of": "2026-07-23",
+          "prior_year": 74.16000366210938,
+          "yoy_pct": 38.0,
+          "direction": "up",
+          "good_for": "steel_demand_sentiment",
+          "source": "yahoo:SLX",
+          "optional": false,
+          "stale": false,
+          "error": null,
+          "note": null
+        },
+        "clf_steel_shipments_q_mtons": {
+          "label": "CLF quarterly steel shipments (million net tons)",
+          "latest": 4.025,
+          "as_of": "2026-06-30",
+          "prior_year": null,
+          "yoy_pct": null,
+          "direction": "flat",
+          "good_for": "operator_volume",
+          "source": "filing_panel:clf_operating_panel.csv:steel_shipments_mtons",
+          "optional": false,
+          "stale": true,
+          "error": null,
+          "note": "Seeded/updated from CLF earnings; not Northshore tons"
+        },
+        "clf_fy_shipment_guide_mid_mtons": {
+          "label": "CLF FY steel shipment guide midpoint (million net tons)",
+          "latest": 16.75,
+          "as_of": "2026-06-30",
+          "prior_year": null,
+          "yoy_pct": null,
+          "direction": "flat",
+          "good_for": "operator_volume_guide",
+          "source": "filing_panel:clf_operating_panel.csv:fy_guide_mid_mtons",
+          "optional": true,
+          "stale": true,
+          "error": null,
+          "note": null
+        },
+        "msb_northshore_tons": {
+          "label": "MSB Northshore tons shipped (quarterly)",
+          "latest": 938572.0,
+          "as_of": "2026-03-31",
+          "prior_year": null,
+          "yoy_pct": null,
+          "direction": "flat",
+          "good_for": "royalty_volume",
+          "source": "filing_panel:msb_royalty_panel.csv:tons_shipped",
+          "optional": false,
+          "stale": true,
+          "error": null,
+          "note": "Parsed from Mesabi royalty 8-K Ex. 99.1"
+        },
+        "msb_bonus_royalty_usd": {
+          "label": "MSB quarterly bonus royalty (USD)",
+          "latest": 0.0,
+          "as_of": "2026-03-31",
+          "prior_year": null,
+          "yoy_pct": null,
+          "direction": "flat",
+          "good_for": "bonus_switch",
+          "source": "filing_panel:msb_royalty_panel.csv:bonus_royalty_usd",
+          "optional": false,
+          "stale": true,
+          "error": null,
+          "note": "Zero when deemed price below threshold"
         }
       }
     }

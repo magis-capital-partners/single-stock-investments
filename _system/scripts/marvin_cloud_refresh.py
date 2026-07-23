@@ -267,6 +267,17 @@ def main() -> int:
             [PY, str(SCRIPTS / "apply_context_overlay.py"), ticker],
             optional=True,
         )
+        if ticker.upper() == "MSB":
+            run(
+                "MSB royalty 8-K parse",
+                [PY, str(SCRIPTS / "parse_msb_royalty_report.py"), "--write"],
+                optional=True,
+            )
+            run(
+                "MSB operator model (CLF + commodities)",
+                [PY, str(SCRIPTS / "build_msb_operator_model.py"), "--write"],
+                optional=True,
+            )
         run(
             "peer panels",
             [PY, str(SCRIPTS / "fetch_peer_panel.py")],
