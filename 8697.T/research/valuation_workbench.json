@@ -3,7 +3,7 @@
   "ticker": "8697.T",
   "as_of": "2026-07-21",
   "decision": {
-    "status": "decision_grade",
+    "status": "evidence_blocked",
     "price_per_share": 2190.0,
     "market_cap_m": 2255700.0,
     "enterprise_value_m": null,
@@ -19,12 +19,12 @@
     },
     "downside_to_low_pct": -54.32,
     "unvalued_component_count": 0,
-    "unresolved_evidence_count": 0,
+    "unresolved_evidence_count": 3,
     "proof_complete_pct": 100.0,
     "model_hash": "31773dc982c90bf0a4241646a7152b843811647613112775478c2a22372b7fbd",
     "primary_power_zone": "High-return compounder",
     "owner_decision": null,
-    "next_action": "Validate and assemble the independent rounds, then route the synthesis to the owner."
+    "next_action": "Close critical evidence gaps before freezing a decision-grade packet."
   },
   "business": {
     "status": "complete",
@@ -4064,10 +4064,10 @@
     "rule": "Every option requires a beneficiary, probability, timing, remaining capital, failure case, and non-overlap control; absence of option value must be explicit rather than unvalued."
   },
   "committee": {
-    "status": "ready_to_assemble",
+    "status": "owner_decision_pending",
     "as_of": "2026-07-21",
-    "packet_hash": "602431bde98f2b98db32228f673a9aed545aede5898afe72b25e551e79b2c652",
-    "stage": "chair_pending",
+    "packet_hash": "f832cf5b954c77ad7a0d6ee971bb71c95027c40943a514d9fc0d84433db327e3",
+    "stage": "committee_complete_decision_pending",
     "selected_raters": [
       "buffett_weschler",
       "hohn",
@@ -4095,18 +4095,62 @@
     "missing_outputs": [],
     "owner_status": "pending",
     "owner_decision": null,
-    "strongest_dissent": null,
-    "unresolved_items": [],
-    "next_action": "Validate and assemble the independent rounds, then route the synthesis to the owner.",
-    "record_ref": null,
+    "strongest_dissent": "Japan's structural equity re-rating and sustained retail/inbound engagement make FY2025 the new floor, not the peak: double-digit volume growth persists, clearing collateral and data monetization lift normalized owner cash above \u00a570 with limited fee compression, and the market correctly pays a premium multiple for a widening-moat toll collector whose distributable cash will compound faster than the normalized base case assumes.",
+    "unresolved_items": [
+      "A filing-verified mid-cycle owner-cash bridge at current scale that separates core trading fees from clearing collateral pass-through, ideally from a usable full-tier yuho extract or H1 FY2026 earnings release.",
+      "Filing-verified H1 FY2026 (Apr\u2013Sep 2025) cash-equity ADV and clearing-fee run-rate from E_ER_JPX_Q2FY2025.pdf or a successful extract of 20251113_j.pdf, to test whether the FY2025 volume spike is already normalizing before the next full-year print.",
+      "Filing-verified mid-cycle normalized owner cash per share with core trading fees separated from clearing collateral pass-through, from a usable full-tier FY2025 annual securities report extract (20251113_j.pdf currently failed) plus confirmed latest diluted share count."
+    ],
+    "next_action": "Owner records decision, sizing, and a direct response to the strongest dissent.",
+    "record_ref": "8697.T/research/committee_2026-07-21.json",
     "previous_record_ref": null,
     "manifest_ref": "8697.T/research/committee_work/2026-07-21/manifest.json"
   },
   "evidence": {
-    "status": "clear",
-    "open_count": 0,
+    "status": "gaps_open",
+    "open_count": 3,
     "critical_count": 0,
-    "gaps": []
+    "gaps": [
+      {
+        "id": "committee_unresolved_1",
+        "priority": "high",
+        "component_ids": [],
+        "question": "A filing-verified mid-cycle owner-cash bridge at current scale that separates core trading fees from clearing collateral pass-through, ideally from a usable full-tier yuho extract or H1 FY2026 earnings release.",
+        "evidence_required": "Resolve the committee's missing fact with primary evidence and update the affected valuation proof row.",
+        "acceptance_test": "The committee item is explicitly closed, sourced, and reflected in the valuation range or documented as immaterial.",
+        "valuation_effect": "Pending committee assessment.",
+        "status": "open",
+        "base_value_exposure_per_share": null,
+        "current_methods": [],
+        "source": "committee"
+      },
+      {
+        "id": "committee_unresolved_2",
+        "priority": "high",
+        "component_ids": [],
+        "question": "Filing-verified H1 FY2026 (Apr\u2013Sep 2025) cash-equity ADV and clearing-fee run-rate from E_ER_JPX_Q2FY2025.pdf or a successful extract of 20251113_j.pdf, to test whether the FY2025 volume spike is already normalizing before the next full-year print.",
+        "evidence_required": "Resolve the committee's missing fact with primary evidence and update the affected valuation proof row.",
+        "acceptance_test": "The committee item is explicitly closed, sourced, and reflected in the valuation range or documented as immaterial.",
+        "valuation_effect": "Pending committee assessment.",
+        "status": "open",
+        "base_value_exposure_per_share": null,
+        "current_methods": [],
+        "source": "committee"
+      },
+      {
+        "id": "committee_unresolved_3",
+        "priority": "high",
+        "component_ids": [],
+        "question": "Filing-verified mid-cycle normalized owner cash per share with core trading fees separated from clearing collateral pass-through, from a usable full-tier FY2025 annual securities report extract (20251113_j.pdf currently failed) plus confirmed latest diluted share count.",
+        "evidence_required": "Resolve the committee's missing fact with primary evidence and update the affected valuation proof row.",
+        "acceptance_test": "The committee item is explicitly closed, sourced, and reflected in the valuation range or documented as immaterial.",
+        "valuation_effect": "Pending committee assessment.",
+        "status": "open",
+        "base_value_exposure_per_share": null,
+        "current_methods": [],
+        "source": "committee"
+      }
+    ]
   },
   "method_fit": {
     "profile_id": "predictable_cash_flow",
