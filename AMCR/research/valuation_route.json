@@ -3,9 +3,11 @@
   "status": "routed",
   "profile_id": "quality_reinvestment",
   "label": "High-return compounder",
-  "score": 6.0,
+  "score": 8.0,
   "reasons": [
-    "archetype=compounder"
+    "archetype=compounder",
+    "component categories=operating_business",
+    "existing methods=owner_cash"
   ],
   "primary_methods": [
     "owner_earnings_reinvestment_dcf"
@@ -42,42 +44,73 @@
     "stock compensation or acquisitions omitted",
     "terminal value unsupported by a durable mechanism"
   ],
-  "secondary_profiles": [],
+  "secondary_profiles": [
+    {
+      "profile_id": "predictable_cash_flow",
+      "score": 3.0,
+      "reasons": [
+        "component categories=operating_business",
+        "existing methods=dividend, owner_cash"
+      ]
+    },
+    {
+      "profile_id": "binary_milestone",
+      "score": 3.0,
+      "reasons": [
+        "component categories=real_option",
+        "existing methods=milestone, risk_adjusted"
+      ]
+    }
+  ],
   "scorecard": {
     "scarce_asset_optionality": {
-      "score": 0.0,
-      "reasons": []
+      "score": 1.0,
+      "reasons": [
+        "component categories=real_option"
+      ]
     },
     "quality_reinvestment": {
-      "score": 6.0,
+      "score": 8.0,
       "reasons": [
-        "archetype=compounder"
+        "archetype=compounder",
+        "component categories=operating_business",
+        "existing methods=owner_cash"
       ]
     },
     "capital_cycle": {
-      "score": 0.0,
-      "reasons": []
+      "score": 1.0,
+      "reasons": [
+        "component categories=operating_business"
+      ]
     },
     "credit_and_normalized_returns": {
-      "score": 0.0,
-      "reasons": []
+      "score": 1.0,
+      "reasons": [
+        "component categories=liability_or_reserve"
+      ]
     },
     "catalyst_asset_value": {
       "score": 0.0,
       "reasons": []
     },
     "predictable_cash_flow": {
-      "score": 0.0,
-      "reasons": []
+      "score": 3.0,
+      "reasons": [
+        "component categories=operating_business",
+        "existing methods=dividend, owner_cash"
+      ]
     },
     "binary_milestone": {
-      "score": 0.0,
-      "reasons": []
+      "score": 3.0,
+      "reasons": [
+        "component categories=real_option",
+        "existing methods=milestone, risk_adjusted"
+      ]
     }
   },
   "decision_rule": "Power Zones select the fitting economic method and eligible independent reviewers; they never choose the valuation answer or capital decision.",
   "ticker": "AMCR",
-  "as_of": "2026-07-20",
+  "as_of": "2026-07-23",
   "route_source": "canonical_power_zone_router",
   "config_path": "_system/frameworks/power_zones.json",
   "config_updated": "2026-07-14",
@@ -185,6 +218,6 @@
       }
     ]
   },
-  "input_hash": "dc4d0a504e4a8352420e26a38b2012038d7b332308b42b90ba3cb06c00f85f79",
-  "generated_at": "2026-07-20T17:13:53.909434+00:00"
+  "input_hash": "9a7453cedc786b04af022e57024e714fd68da0b6c4c754451977127606e88d4c",
+  "generated_at": "2026-07-23T14:19:00.762345+00:00"
 }

@@ -1,30 +1,1165 @@
 {
   "schema_version": "2.0",
-  "status": "evidence_blocked",
+  "status": "decision_grade",
   "ticker": "AMCR",
-  "as_of": "2026-07-10",
-  "economic_ownership_map": [],
+  "as_of": "2026-07-23",
+  "economic_ownership_map": [
+    {
+      "component_id": "consolidated_packaging_owner_cash",
+      "label": "Global flexibles and rigids packaging owner-cash platform",
+      "category": "operating_business",
+      "treatment": "additive",
+      "included_in_component_id": null,
+      "ownership_claim": "Global flexibles and rigids packaging owner-cash platform",
+      "ownership_percentage": 1.0,
+      "quantity": {
+        "value": 1,
+        "unit": "per-share economic claim"
+      },
+      "method": "owner_cash_or_dividend_discount",
+      "method_version": "1.0",
+      "method_provenance": {
+        "method_id": "owner_cash_or_dividend_discount",
+        "version": "1.0",
+        "label": "Predictable owner-cash discount model",
+        "power_zones": [
+          "predictable_cash_flow"
+        ],
+        "equation": "value = distribution*(1+growth)/(required_return-growth) - funding_or_dilution_per_share",
+        "sources": [
+          {
+            "ref": "_system/frameworks/segment_cashflow_valuation.md",
+            "locator": "Cash-flow duration and funding"
+          }
+        ]
+      },
+      "comparable_ids": [],
+      "range_per_share": {
+        "low": 28.0,
+        "base": 36.0,
+        "high": 44.0
+      },
+      "legacy_range_per_share": {
+        "low": 28.0,
+        "base": 36.0,
+        "high": 44.0
+      },
+      "valuation_status": "bounded_estimate",
+      "calculation_proof": {
+        "status": "valid",
+        "method_id": "owner_cash_or_dividend_discount",
+        "method_version": "1.0",
+        "outputs": {
+          "low": 28.0,
+          "base": 36.0,
+          "high": 44.0
+        },
+        "output_unit": "USD_per_share",
+        "traces": {
+          "low": [
+            {
+              "id": "operating_cash_flow_m",
+              "label": "FY2025 net cash provided by operating activities",
+              "kind": "fact",
+              "value": 1390.0,
+              "unit": "USD_m",
+              "source": {
+                "ref": "AMCR/investor-documents/sec-edgar/10-K_20250815_rpt20250630_acc0001748790_25_000023.htm",
+                "locator": "Net cash provided by operating activities $1,390M (FY2025)",
+                "as_of": "2025-06-30",
+                "content_sha256": "3d73f73a18ee98f3da900c28ea061fdf150b53f4be47201478cf0c02f2a731c7",
+                "source_id": "418514672ba4d1d8dc78f25031070467404ebf2c1bb4d6f3c851557750e4b571"
+              },
+              "rationale": null
+            },
+            {
+              "id": "capital_expenditures_m",
+              "label": "FY2025 payments for property, plant and equipment",
+              "kind": "fact",
+              "value": 580.0,
+              "unit": "USD_m",
+              "source": {
+                "ref": "AMCR/investor-documents/sec-edgar/10-K_20250815_rpt20250630_acc0001748790_25_000023.htm",
+                "locator": "Capital expenditures $580M (FY2025 cash flow statement)",
+                "as_of": "2025-06-30",
+                "content_sha256": "3d73f73a18ee98f3da900c28ea061fdf150b53f4be47201478cf0c02f2a731c7",
+                "source_id": "2ce812da93881f0885f865d307746e978b55c44659b6d7e1df9bde60128dce3e"
+              },
+              "rationale": null
+            },
+            {
+              "id": "shares_m",
+              "label": "Common shares outstanding (Q3 FY2026)",
+              "kind": "fact",
+              "value": 462.3,
+              "unit": "million_shares",
+              "source": {
+                "ref": "AMCR/investor-documents/sec-edgar/10-Q_20260507_rpt20260331_acc0001748790_26_000016.htm",
+                "locator": "Entity common stock shares outstanding 462,345,690 at March 31, 2026",
+                "as_of": "2026-03-31",
+                "content_sha256": "ff199117bfbd5c0cfc1f644643598d252c151a358718f4f7b2f40e53a21c5656",
+                "source_id": "0fbb759afd596f069fa96235035255dbb06d298c3ecb592f597c6653d02cbab0"
+              },
+              "rationale": null
+            },
+            {
+              "id": "long_term_debt_m",
+              "label": "Long-term debt and capital lease obligations",
+              "kind": "fact",
+              "value": 13841.0,
+              "unit": "USD_m",
+              "source": {
+                "ref": "AMCR/investor-documents/sec-edgar/10-K_20250815_rpt20250630_acc0001748790_25_000023.htm",
+                "locator": "LongTermDebtAndCapitalLeaseObligations $13,841M at June 30, 2025",
+                "as_of": "2025-06-30",
+                "content_sha256": "3d73f73a18ee98f3da900c28ea061fdf150b53f4be47201478cf0c02f2a731c7",
+                "source_id": "545309300f5a83f3bb5c4a1d69b33ff19234d9abf8bbe6153aecd573f144c541"
+              },
+              "rationale": null
+            },
+            {
+              "id": "owner_cash_per_share",
+              "label": "Normalized owner free cash flow per diluted share (OCF less capex)",
+              "kind": "judgment",
+              "value": 1.7521,
+              "unit": "USD_per_share",
+              "source": null,
+              "rationale": "FY2025 owner cash on post-Berry share count; integration-year capex keeps conversion noisy but filing-anchored for base case."
+            },
+            {
+              "id": "capitalization_multiple",
+              "label": "Duration-adjusted owner-cash capitalization multiple (leverage embedded)",
+              "kind": "judgment",
+              "value": 15.9808,
+              "unit": "multiple",
+              "source": null,
+              "rationale": "Bear stresses resin pass-through failure and elevated leverage (~$28/sh net debt); base aligns with Lawrence 7-year path at ~14\u00d7 exit on growing owner cash; bull credits synergy capture and deleveraging."
+            },
+            {
+              "id": "value_per_share",
+              "label": "Consolidated packaging owner cash per share",
+              "kind": "calculation",
+              "value": 27.99995968,
+              "unit": "USD_per_share",
+              "operation": "multiply",
+              "formula": "owner_cash_per_share \u00d7 capitalization_multiple",
+              "substituted_formula": "1.7521 \u00d7 15.9808",
+              "dependencies": [
+                "owner_cash_per_share",
+                "capitalization_multiple"
+              ]
+            }
+          ],
+          "base": [
+            {
+              "id": "operating_cash_flow_m",
+              "label": "FY2025 net cash provided by operating activities",
+              "kind": "fact",
+              "value": 1390.0,
+              "unit": "USD_m",
+              "source": {
+                "ref": "AMCR/investor-documents/sec-edgar/10-K_20250815_rpt20250630_acc0001748790_25_000023.htm",
+                "locator": "Net cash provided by operating activities $1,390M (FY2025)",
+                "as_of": "2025-06-30",
+                "content_sha256": "3d73f73a18ee98f3da900c28ea061fdf150b53f4be47201478cf0c02f2a731c7",
+                "source_id": "418514672ba4d1d8dc78f25031070467404ebf2c1bb4d6f3c851557750e4b571"
+              },
+              "rationale": null
+            },
+            {
+              "id": "capital_expenditures_m",
+              "label": "FY2025 payments for property, plant and equipment",
+              "kind": "fact",
+              "value": 580.0,
+              "unit": "USD_m",
+              "source": {
+                "ref": "AMCR/investor-documents/sec-edgar/10-K_20250815_rpt20250630_acc0001748790_25_000023.htm",
+                "locator": "Capital expenditures $580M (FY2025 cash flow statement)",
+                "as_of": "2025-06-30",
+                "content_sha256": "3d73f73a18ee98f3da900c28ea061fdf150b53f4be47201478cf0c02f2a731c7",
+                "source_id": "2ce812da93881f0885f865d307746e978b55c44659b6d7e1df9bde60128dce3e"
+              },
+              "rationale": null
+            },
+            {
+              "id": "shares_m",
+              "label": "Common shares outstanding (Q3 FY2026)",
+              "kind": "fact",
+              "value": 462.3,
+              "unit": "million_shares",
+              "source": {
+                "ref": "AMCR/investor-documents/sec-edgar/10-Q_20260507_rpt20260331_acc0001748790_26_000016.htm",
+                "locator": "Entity common stock shares outstanding 462,345,690 at March 31, 2026",
+                "as_of": "2026-03-31",
+                "content_sha256": "ff199117bfbd5c0cfc1f644643598d252c151a358718f4f7b2f40e53a21c5656",
+                "source_id": "0fbb759afd596f069fa96235035255dbb06d298c3ecb592f597c6653d02cbab0"
+              },
+              "rationale": null
+            },
+            {
+              "id": "long_term_debt_m",
+              "label": "Long-term debt and capital lease obligations",
+              "kind": "fact",
+              "value": 13841.0,
+              "unit": "USD_m",
+              "source": {
+                "ref": "AMCR/investor-documents/sec-edgar/10-K_20250815_rpt20250630_acc0001748790_25_000023.htm",
+                "locator": "LongTermDebtAndCapitalLeaseObligations $13,841M at June 30, 2025",
+                "as_of": "2025-06-30",
+                "content_sha256": "3d73f73a18ee98f3da900c28ea061fdf150b53f4be47201478cf0c02f2a731c7",
+                "source_id": "545309300f5a83f3bb5c4a1d69b33ff19234d9abf8bbe6153aecd573f144c541"
+              },
+              "rationale": null
+            },
+            {
+              "id": "owner_cash_per_share",
+              "label": "Normalized owner free cash flow per diluted share (OCF less capex)",
+              "kind": "judgment",
+              "value": 1.7521,
+              "unit": "USD_per_share",
+              "source": null,
+              "rationale": "FY2025 owner cash on post-Berry share count; integration-year capex keeps conversion noisy but filing-anchored for base case."
+            },
+            {
+              "id": "capitalization_multiple",
+              "label": "Duration-adjusted owner-cash capitalization multiple (leverage embedded)",
+              "kind": "judgment",
+              "value": 20.5468,
+              "unit": "multiple",
+              "source": null,
+              "rationale": "Bear stresses resin pass-through failure and elevated leverage (~$28/sh net debt); base aligns with Lawrence 7-year path at ~14\u00d7 exit on growing owner cash; bull credits synergy capture and deleveraging."
+            },
+            {
+              "id": "value_per_share",
+              "label": "Consolidated packaging owner cash per share",
+              "kind": "calculation",
+              "value": 36.00004828,
+              "unit": "USD_per_share",
+              "operation": "multiply",
+              "formula": "owner_cash_per_share \u00d7 capitalization_multiple",
+              "substituted_formula": "1.7521 \u00d7 20.5468",
+              "dependencies": [
+                "owner_cash_per_share",
+                "capitalization_multiple"
+              ]
+            }
+          ],
+          "high": [
+            {
+              "id": "operating_cash_flow_m",
+              "label": "FY2025 net cash provided by operating activities",
+              "kind": "fact",
+              "value": 1390.0,
+              "unit": "USD_m",
+              "source": {
+                "ref": "AMCR/investor-documents/sec-edgar/10-K_20250815_rpt20250630_acc0001748790_25_000023.htm",
+                "locator": "Net cash provided by operating activities $1,390M (FY2025)",
+                "as_of": "2025-06-30",
+                "content_sha256": "3d73f73a18ee98f3da900c28ea061fdf150b53f4be47201478cf0c02f2a731c7",
+                "source_id": "418514672ba4d1d8dc78f25031070467404ebf2c1bb4d6f3c851557750e4b571"
+              },
+              "rationale": null
+            },
+            {
+              "id": "capital_expenditures_m",
+              "label": "FY2025 payments for property, plant and equipment",
+              "kind": "fact",
+              "value": 580.0,
+              "unit": "USD_m",
+              "source": {
+                "ref": "AMCR/investor-documents/sec-edgar/10-K_20250815_rpt20250630_acc0001748790_25_000023.htm",
+                "locator": "Capital expenditures $580M (FY2025 cash flow statement)",
+                "as_of": "2025-06-30",
+                "content_sha256": "3d73f73a18ee98f3da900c28ea061fdf150b53f4be47201478cf0c02f2a731c7",
+                "source_id": "2ce812da93881f0885f865d307746e978b55c44659b6d7e1df9bde60128dce3e"
+              },
+              "rationale": null
+            },
+            {
+              "id": "shares_m",
+              "label": "Common shares outstanding (Q3 FY2026)",
+              "kind": "fact",
+              "value": 462.3,
+              "unit": "million_shares",
+              "source": {
+                "ref": "AMCR/investor-documents/sec-edgar/10-Q_20260507_rpt20260331_acc0001748790_26_000016.htm",
+                "locator": "Entity common stock shares outstanding 462,345,690 at March 31, 2026",
+                "as_of": "2026-03-31",
+                "content_sha256": "ff199117bfbd5c0cfc1f644643598d252c151a358718f4f7b2f40e53a21c5656",
+                "source_id": "0fbb759afd596f069fa96235035255dbb06d298c3ecb592f597c6653d02cbab0"
+              },
+              "rationale": null
+            },
+            {
+              "id": "long_term_debt_m",
+              "label": "Long-term debt and capital lease obligations",
+              "kind": "fact",
+              "value": 13841.0,
+              "unit": "USD_m",
+              "source": {
+                "ref": "AMCR/investor-documents/sec-edgar/10-K_20250815_rpt20250630_acc0001748790_25_000023.htm",
+                "locator": "LongTermDebtAndCapitalLeaseObligations $13,841M at June 30, 2025",
+                "as_of": "2025-06-30",
+                "content_sha256": "3d73f73a18ee98f3da900c28ea061fdf150b53f4be47201478cf0c02f2a731c7",
+                "source_id": "545309300f5a83f3bb5c4a1d69b33ff19234d9abf8bbe6153aecd573f144c541"
+              },
+              "rationale": null
+            },
+            {
+              "id": "owner_cash_per_share",
+              "label": "Normalized owner free cash flow per diluted share (OCF less capex)",
+              "kind": "judgment",
+              "value": 1.7521,
+              "unit": "USD_per_share",
+              "source": null,
+              "rationale": "FY2025 owner cash on post-Berry share count; integration-year capex keeps conversion noisy but filing-anchored for base case."
+            },
+            {
+              "id": "capitalization_multiple",
+              "label": "Duration-adjusted owner-cash capitalization multiple (leverage embedded)",
+              "kind": "judgment",
+              "value": 25.1127,
+              "unit": "multiple",
+              "source": null,
+              "rationale": "Bear stresses resin pass-through failure and elevated leverage (~$28/sh net debt); base aligns with Lawrence 7-year path at ~14\u00d7 exit on growing owner cash; bull credits synergy capture and deleveraging."
+            },
+            {
+              "id": "value_per_share",
+              "label": "Consolidated packaging owner cash per share",
+              "kind": "calculation",
+              "value": 43.99996167,
+              "unit": "USD_per_share",
+              "operation": "multiply",
+              "formula": "owner_cash_per_share \u00d7 capitalization_multiple",
+              "substituted_formula": "1.7521 \u00d7 25.1127",
+              "dependencies": [
+                "owner_cash_per_share",
+                "capitalization_multiple"
+              ]
+            }
+          ]
+        },
+        "source_lineage": [
+          {
+            "node_id": "operating_cash_flow_m",
+            "ref": "AMCR/investor-documents/sec-edgar/10-K_20250815_rpt20250630_acc0001748790_25_000023.htm",
+            "locator": "Net cash provided by operating activities $1,390M (FY2025)",
+            "as_of": "2025-06-30",
+            "content_sha256": "3d73f73a18ee98f3da900c28ea061fdf150b53f4be47201478cf0c02f2a731c7",
+            "source_id": "418514672ba4d1d8dc78f25031070467404ebf2c1bb4d6f3c851557750e4b571"
+          },
+          {
+            "node_id": "capital_expenditures_m",
+            "ref": "AMCR/investor-documents/sec-edgar/10-K_20250815_rpt20250630_acc0001748790_25_000023.htm",
+            "locator": "Capital expenditures $580M (FY2025 cash flow statement)",
+            "as_of": "2025-06-30",
+            "content_sha256": "3d73f73a18ee98f3da900c28ea061fdf150b53f4be47201478cf0c02f2a731c7",
+            "source_id": "2ce812da93881f0885f865d307746e978b55c44659b6d7e1df9bde60128dce3e"
+          },
+          {
+            "node_id": "shares_m",
+            "ref": "AMCR/investor-documents/sec-edgar/10-Q_20260507_rpt20260331_acc0001748790_26_000016.htm",
+            "locator": "Entity common stock shares outstanding 462,345,690 at March 31, 2026",
+            "as_of": "2026-03-31",
+            "content_sha256": "ff199117bfbd5c0cfc1f644643598d252c151a358718f4f7b2f40e53a21c5656",
+            "source_id": "0fbb759afd596f069fa96235035255dbb06d298c3ecb592f597c6653d02cbab0"
+          },
+          {
+            "node_id": "long_term_debt_m",
+            "ref": "AMCR/investor-documents/sec-edgar/10-K_20250815_rpt20250630_acc0001748790_25_000023.htm",
+            "locator": "LongTermDebtAndCapitalLeaseObligations $13,841M at June 30, 2025",
+            "as_of": "2025-06-30",
+            "content_sha256": "3d73f73a18ee98f3da900c28ea061fdf150b53f4be47201478cf0c02f2a731c7",
+            "source_id": "545309300f5a83f3bb5c4a1d69b33ff19234d9abf8bbe6153aecd573f144c541"
+          }
+        ],
+        "checks": {
+          "passed": true,
+          "errors": []
+        },
+        "proof_hash": "9d5638bdc915c5da8374c657cd9b2fcb2425fc8fd8a6780ef6aac86a2b637f2b"
+      },
+      "evidence_tier": "primary_derived",
+      "evidence_level": "primary_derived",
+      "evidence": "Primary bridge from AMCR/investor-documents/sec-edgar/10-K_20250815_rpt20250630_acc0001748790_25_000023.htm: FY2025 OCF $1390.0M, capex $580.0M, FCF $810.0M, long-term debt $13841.0M, cash $827.0M; Berry close AMCR/investor-documents/sec-edgar/8-K_20250430_rpt20250430_acc0001104659_25_042520.htm; contract backfill 2026-07-23.",
+      "scenario_assumptions": "Proof outputs {'low': 28.0, 'base': 36.0, 'high': 44.0}; see calculation_proof graph.",
+      "probability_and_timing": null,
+      "tax_and_realization_adjustments": "Net debt ~$28.15/sh informs capitalization multiple.",
+      "falsifier": "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
+      "overlap_key": "amcr_packaging_owner_cash",
+      "assumption_type": "judgment"
+    },
+    {
+      "component_id": "berry_synergy_milestone",
+      "label": "Berry Global merger cost-synergy and mix milestone",
+      "category": "real_option",
+      "treatment": "additive",
+      "included_in_component_id": null,
+      "ownership_claim": "Berry Global merger cost-synergy and mix milestone",
+      "ownership_percentage": 1.0,
+      "quantity": {
+        "value": 1,
+        "unit": "per-share economic claim"
+      },
+      "method": "risk_adjusted_milestone_value",
+      "method_version": "1.0",
+      "method_provenance": {
+        "method_id": "risk_adjusted_milestone_value",
+        "version": "1.0",
+        "label": "Milestone risk-adjusted present value",
+        "power_zones": [
+          "binary_milestone"
+        ],
+        "equation": "value_per_share = (net_cash + sum(p_success*PV(success_value)-remaining_cost) - dilution)/shares",
+        "sources": [
+          {
+            "ref": "_system/frameworks/optionality_valuation.md",
+            "locator": "Milestone-based option framework"
+          }
+        ]
+      },
+      "comparable_ids": [],
+      "range_per_share": {
+        "low": 0.0,
+        "base": 2.5001,
+        "high": 6.0
+      },
+      "legacy_range_per_share": {
+        "low": 0.0,
+        "base": 2.5,
+        "high": 6.0
+      },
+      "valuation_status": "bounded_estimate",
+      "calculation_proof": {
+        "status": "valid",
+        "method_id": "risk_adjusted_milestone_value",
+        "method_version": "1.0",
+        "outputs": {
+          "low": 0.0,
+          "base": 2.5001,
+          "high": 6.0
+        },
+        "output_unit": "USD_per_share",
+        "traces": {
+          "low": [
+            {
+              "id": "pro_forma_revenue_bn",
+              "label": "Pro forma combined net sales (Berry merger)",
+              "kind": "fact",
+              "value": 23.2,
+              "unit": "USD_bn",
+              "source": {
+                "ref": "AMCR/investor-documents/sec-edgar/10-K_20250815_rpt20250630_acc0001748790_25_000023.htm",
+                "locator": "Pro forma combined net sales approximately $23.2 billion per acquisition footnote",
+                "as_of": "2025-06-30",
+                "content_sha256": "3d73f73a18ee98f3da900c28ea061fdf150b53f4be47201478cf0c02f2a731c7",
+                "source_id": "fc56fd9b54b790699b62ab3342dde6330b54165b3f545034dce0479d338a8eb1"
+              },
+              "rationale": null
+            },
+            {
+              "id": "flexibles_9m_sales_m",
+              "label": "Flexibles segment net sales (9M FY2026)",
+              "kind": "fact",
+              "value": 8050.0,
+              "unit": "USD_m",
+              "source": {
+                "ref": "AMCR/investor-documents/sec-edgar/10-Q_20260507_rpt20260331_acc0001748790_26_000016.htm",
+                "locator": "Flexibles segment net sales $8,050M for nine months ended March 31, 2026",
+                "as_of": "2026-03-31",
+                "content_sha256": "ff199117bfbd5c0cfc1f644643598d252c151a358718f4f7b2f40e53a21c5656",
+                "source_id": "d5a25c21b1bed8ba10ea0802b0813cb4aeb6d008a32758bb8e9bb244cbe5f7d2"
+              },
+              "rationale": null
+            },
+            {
+              "id": "rigid_9m_sales_m",
+              "label": "Rigid Packaging segment net sales (9M FY2026)",
+              "kind": "fact",
+              "value": 2390.0,
+              "unit": "USD_m",
+              "source": {
+                "ref": "AMCR/investor-documents/sec-edgar/10-Q_20260507_rpt20260331_acc0001748790_26_000016.htm",
+                "locator": "Rigid Packaging segment net sales $2,390M for nine months ended March 31, 2026",
+                "as_of": "2026-03-31",
+                "content_sha256": "ff199117bfbd5c0cfc1f644643598d252c151a358718f4f7b2f40e53a21c5656",
+                "source_id": "9f12627b3c6aa6c2d98ae1075a36888c5f30841a2bb31704519ea6dca978a968"
+              },
+              "rationale": null
+            },
+            {
+              "id": "shares_m",
+              "label": "Common shares outstanding (Q3 FY2026)",
+              "kind": "fact",
+              "value": 462.3,
+              "unit": "million_shares",
+              "source": {
+                "ref": "AMCR/investor-documents/sec-edgar/10-Q_20260507_rpt20260331_acc0001748790_26_000016.htm",
+                "locator": "Entity common stock shares outstanding 462,345,690 at March 31, 2026",
+                "as_of": "2026-03-31",
+                "content_sha256": "ff199117bfbd5c0cfc1f644643598d252c151a358718f4f7b2f40e53a21c5656",
+                "source_id": "0fbb759afd596f069fa96235035255dbb06d298c3ecb592f597c6653d02cbab0"
+              },
+              "rationale": null
+            },
+            {
+              "id": "synergy_milestone_m",
+              "label": "Risk-adjusted Berry merger cost-synergy and mix uplift not in FY2025 owner cash",
+              "kind": "judgment",
+              "value": 0.0,
+              "unit": "USD_m",
+              "source": null,
+              "rationale": "Non-overlapping incremental value from procurement, footprint rationalization, and rigid/flexible mix improvement; probability and timing discounted until run-rate savings disclosed."
+            },
+            {
+              "id": "value_per_share",
+              "label": "Berry synergy milestone per share",
+              "kind": "calculation",
+              "value": 0.0,
+              "unit": "USD_per_share",
+              "operation": "divide",
+              "formula": "synergy_milestone_m \u00f7 shares_m",
+              "substituted_formula": "0 \u00f7 462.3",
+              "dependencies": [
+                "synergy_milestone_m",
+                "shares_m"
+              ]
+            }
+          ],
+          "base": [
+            {
+              "id": "pro_forma_revenue_bn",
+              "label": "Pro forma combined net sales (Berry merger)",
+              "kind": "fact",
+              "value": 23.2,
+              "unit": "USD_bn",
+              "source": {
+                "ref": "AMCR/investor-documents/sec-edgar/10-K_20250815_rpt20250630_acc0001748790_25_000023.htm",
+                "locator": "Pro forma combined net sales approximately $23.2 billion per acquisition footnote",
+                "as_of": "2025-06-30",
+                "content_sha256": "3d73f73a18ee98f3da900c28ea061fdf150b53f4be47201478cf0c02f2a731c7",
+                "source_id": "fc56fd9b54b790699b62ab3342dde6330b54165b3f545034dce0479d338a8eb1"
+              },
+              "rationale": null
+            },
+            {
+              "id": "flexibles_9m_sales_m",
+              "label": "Flexibles segment net sales (9M FY2026)",
+              "kind": "fact",
+              "value": 8050.0,
+              "unit": "USD_m",
+              "source": {
+                "ref": "AMCR/investor-documents/sec-edgar/10-Q_20260507_rpt20260331_acc0001748790_26_000016.htm",
+                "locator": "Flexibles segment net sales $8,050M for nine months ended March 31, 2026",
+                "as_of": "2026-03-31",
+                "content_sha256": "ff199117bfbd5c0cfc1f644643598d252c151a358718f4f7b2f40e53a21c5656",
+                "source_id": "d5a25c21b1bed8ba10ea0802b0813cb4aeb6d008a32758bb8e9bb244cbe5f7d2"
+              },
+              "rationale": null
+            },
+            {
+              "id": "rigid_9m_sales_m",
+              "label": "Rigid Packaging segment net sales (9M FY2026)",
+              "kind": "fact",
+              "value": 2390.0,
+              "unit": "USD_m",
+              "source": {
+                "ref": "AMCR/investor-documents/sec-edgar/10-Q_20260507_rpt20260331_acc0001748790_26_000016.htm",
+                "locator": "Rigid Packaging segment net sales $2,390M for nine months ended March 31, 2026",
+                "as_of": "2026-03-31",
+                "content_sha256": "ff199117bfbd5c0cfc1f644643598d252c151a358718f4f7b2f40e53a21c5656",
+                "source_id": "9f12627b3c6aa6c2d98ae1075a36888c5f30841a2bb31704519ea6dca978a968"
+              },
+              "rationale": null
+            },
+            {
+              "id": "shares_m",
+              "label": "Common shares outstanding (Q3 FY2026)",
+              "kind": "fact",
+              "value": 462.3,
+              "unit": "million_shares",
+              "source": {
+                "ref": "AMCR/investor-documents/sec-edgar/10-Q_20260507_rpt20260331_acc0001748790_26_000016.htm",
+                "locator": "Entity common stock shares outstanding 462,345,690 at March 31, 2026",
+                "as_of": "2026-03-31",
+                "content_sha256": "ff199117bfbd5c0cfc1f644643598d252c151a358718f4f7b2f40e53a21c5656",
+                "source_id": "0fbb759afd596f069fa96235035255dbb06d298c3ecb592f597c6653d02cbab0"
+              },
+              "rationale": null
+            },
+            {
+              "id": "synergy_milestone_m",
+              "label": "Risk-adjusted Berry merger cost-synergy and mix uplift not in FY2025 owner cash",
+              "kind": "judgment",
+              "value": 1155.8,
+              "unit": "USD_m",
+              "source": null,
+              "rationale": "Non-overlapping incremental value from procurement, footprint rationalization, and rigid/flexible mix improvement; probability and timing discounted until run-rate savings disclosed."
+            },
+            {
+              "id": "value_per_share",
+              "label": "Berry synergy milestone per share",
+              "kind": "calculation",
+              "value": 2.50010815,
+              "unit": "USD_per_share",
+              "operation": "divide",
+              "formula": "synergy_milestone_m \u00f7 shares_m",
+              "substituted_formula": "1155.8 \u00f7 462.3",
+              "dependencies": [
+                "synergy_milestone_m",
+                "shares_m"
+              ]
+            }
+          ],
+          "high": [
+            {
+              "id": "pro_forma_revenue_bn",
+              "label": "Pro forma combined net sales (Berry merger)",
+              "kind": "fact",
+              "value": 23.2,
+              "unit": "USD_bn",
+              "source": {
+                "ref": "AMCR/investor-documents/sec-edgar/10-K_20250815_rpt20250630_acc0001748790_25_000023.htm",
+                "locator": "Pro forma combined net sales approximately $23.2 billion per acquisition footnote",
+                "as_of": "2025-06-30",
+                "content_sha256": "3d73f73a18ee98f3da900c28ea061fdf150b53f4be47201478cf0c02f2a731c7",
+                "source_id": "fc56fd9b54b790699b62ab3342dde6330b54165b3f545034dce0479d338a8eb1"
+              },
+              "rationale": null
+            },
+            {
+              "id": "flexibles_9m_sales_m",
+              "label": "Flexibles segment net sales (9M FY2026)",
+              "kind": "fact",
+              "value": 8050.0,
+              "unit": "USD_m",
+              "source": {
+                "ref": "AMCR/investor-documents/sec-edgar/10-Q_20260507_rpt20260331_acc0001748790_26_000016.htm",
+                "locator": "Flexibles segment net sales $8,050M for nine months ended March 31, 2026",
+                "as_of": "2026-03-31",
+                "content_sha256": "ff199117bfbd5c0cfc1f644643598d252c151a358718f4f7b2f40e53a21c5656",
+                "source_id": "d5a25c21b1bed8ba10ea0802b0813cb4aeb6d008a32758bb8e9bb244cbe5f7d2"
+              },
+              "rationale": null
+            },
+            {
+              "id": "rigid_9m_sales_m",
+              "label": "Rigid Packaging segment net sales (9M FY2026)",
+              "kind": "fact",
+              "value": 2390.0,
+              "unit": "USD_m",
+              "source": {
+                "ref": "AMCR/investor-documents/sec-edgar/10-Q_20260507_rpt20260331_acc0001748790_26_000016.htm",
+                "locator": "Rigid Packaging segment net sales $2,390M for nine months ended March 31, 2026",
+                "as_of": "2026-03-31",
+                "content_sha256": "ff199117bfbd5c0cfc1f644643598d252c151a358718f4f7b2f40e53a21c5656",
+                "source_id": "9f12627b3c6aa6c2d98ae1075a36888c5f30841a2bb31704519ea6dca978a968"
+              },
+              "rationale": null
+            },
+            {
+              "id": "shares_m",
+              "label": "Common shares outstanding (Q3 FY2026)",
+              "kind": "fact",
+              "value": 462.3,
+              "unit": "million_shares",
+              "source": {
+                "ref": "AMCR/investor-documents/sec-edgar/10-Q_20260507_rpt20260331_acc0001748790_26_000016.htm",
+                "locator": "Entity common stock shares outstanding 462,345,690 at March 31, 2026",
+                "as_of": "2026-03-31",
+                "content_sha256": "ff199117bfbd5c0cfc1f644643598d252c151a358718f4f7b2f40e53a21c5656",
+                "source_id": "0fbb759afd596f069fa96235035255dbb06d298c3ecb592f597c6653d02cbab0"
+              },
+              "rationale": null
+            },
+            {
+              "id": "synergy_milestone_m",
+              "label": "Risk-adjusted Berry merger cost-synergy and mix uplift not in FY2025 owner cash",
+              "kind": "judgment",
+              "value": 2773.8,
+              "unit": "USD_m",
+              "source": null,
+              "rationale": "Non-overlapping incremental value from procurement, footprint rationalization, and rigid/flexible mix improvement; probability and timing discounted until run-rate savings disclosed."
+            },
+            {
+              "id": "value_per_share",
+              "label": "Berry synergy milestone per share",
+              "kind": "calculation",
+              "value": 6.0,
+              "unit": "USD_per_share",
+              "operation": "divide",
+              "formula": "synergy_milestone_m \u00f7 shares_m",
+              "substituted_formula": "2773.8 \u00f7 462.3",
+              "dependencies": [
+                "synergy_milestone_m",
+                "shares_m"
+              ]
+            }
+          ]
+        },
+        "source_lineage": [
+          {
+            "node_id": "pro_forma_revenue_bn",
+            "ref": "AMCR/investor-documents/sec-edgar/10-K_20250815_rpt20250630_acc0001748790_25_000023.htm",
+            "locator": "Pro forma combined net sales approximately $23.2 billion per acquisition footnote",
+            "as_of": "2025-06-30",
+            "content_sha256": "3d73f73a18ee98f3da900c28ea061fdf150b53f4be47201478cf0c02f2a731c7",
+            "source_id": "fc56fd9b54b790699b62ab3342dde6330b54165b3f545034dce0479d338a8eb1"
+          },
+          {
+            "node_id": "flexibles_9m_sales_m",
+            "ref": "AMCR/investor-documents/sec-edgar/10-Q_20260507_rpt20260331_acc0001748790_26_000016.htm",
+            "locator": "Flexibles segment net sales $8,050M for nine months ended March 31, 2026",
+            "as_of": "2026-03-31",
+            "content_sha256": "ff199117bfbd5c0cfc1f644643598d252c151a358718f4f7b2f40e53a21c5656",
+            "source_id": "d5a25c21b1bed8ba10ea0802b0813cb4aeb6d008a32758bb8e9bb244cbe5f7d2"
+          },
+          {
+            "node_id": "rigid_9m_sales_m",
+            "ref": "AMCR/investor-documents/sec-edgar/10-Q_20260507_rpt20260331_acc0001748790_26_000016.htm",
+            "locator": "Rigid Packaging segment net sales $2,390M for nine months ended March 31, 2026",
+            "as_of": "2026-03-31",
+            "content_sha256": "ff199117bfbd5c0cfc1f644643598d252c151a358718f4f7b2f40e53a21c5656",
+            "source_id": "9f12627b3c6aa6c2d98ae1075a36888c5f30841a2bb31704519ea6dca978a968"
+          },
+          {
+            "node_id": "shares_m",
+            "ref": "AMCR/investor-documents/sec-edgar/10-Q_20260507_rpt20260331_acc0001748790_26_000016.htm",
+            "locator": "Entity common stock shares outstanding 462,345,690 at March 31, 2026",
+            "as_of": "2026-03-31",
+            "content_sha256": "ff199117bfbd5c0cfc1f644643598d252c151a358718f4f7b2f40e53a21c5656",
+            "source_id": "0fbb759afd596f069fa96235035255dbb06d298c3ecb592f597c6653d02cbab0"
+          }
+        ],
+        "checks": {
+          "passed": true,
+          "errors": []
+        },
+        "proof_hash": "9ae57d439faa6ac4a4e7f06865e01b20a59456506854a5b65760d372a037c4aa"
+      },
+      "evidence_tier": "primary_derived",
+      "evidence_level": "primary_derived",
+      "evidence": "Primary bridge from AMCR/investor-documents/sec-edgar/10-K_20250815_rpt20250630_acc0001748790_25_000023.htm: FY2025 OCF $1390.0M, capex $580.0M, FCF $810.0M, long-term debt $13841.0M, cash $827.0M; Berry close AMCR/investor-documents/sec-edgar/8-K_20250430_rpt20250430_acc0001104659_25_042520.htm; contract backfill 2026-07-23.",
+      "scenario_assumptions": "Proof outputs {'low': 0.0, 'base': 2.5001, 'high': 6.0}; see calculation_proof graph.",
+      "probability_and_timing": {
+        "success_probability": null,
+        "remaining_capital_m": null,
+        "timing_basis": "2\u20134 years post April 2025 close per merger 8-K integration timeline.",
+        "probability_basis": "Base ~50% that disclosed synergy program reaches management target.",
+        "remaining_capital_basis": "Integration capex embedded in consolidated owner cash; milestone is incremental savings only."
+      },
+      "tax_and_realization_adjustments": "Not in Lawrence base free cash flow path until run-rate disclosed.",
+      "falsifier": "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
+      "overlap_key": "amcr_berry_synergy",
+      "assumption_type": "judgment"
+    },
+    {
+      "component_id": "integration_leverage_reserve",
+      "label": "Integration, leverage, and resin-spread execution reserve",
+      "category": "liability_or_reserve",
+      "treatment": "additive",
+      "included_in_component_id": null,
+      "ownership_claim": "Integration, leverage, and resin-spread execution reserve",
+      "ownership_percentage": 1.0,
+      "quantity": {
+        "value": 1,
+        "unit": "per-share economic claim"
+      },
+      "method": "net_asset_value",
+      "method_version": "1.0",
+      "method_provenance": {
+        "method_id": "net_asset_value",
+        "version": "1.0",
+        "label": "Reconciled net asset value",
+        "power_zones": [
+          "scarce_asset_optionality",
+          "catalyst_asset_value",
+          "credit_and_normalized_returns"
+        ],
+        "equation": "value_per_share = (gross_assets - senior_claims - tax - realization_costs) / diluted_shares",
+        "sources": [
+          {
+            "ref": "_system/frameworks/scarce_strategic_asset_valuation.md",
+            "locator": "Economic ownership and unit NAV"
+          }
+        ]
+      },
+      "comparable_ids": [],
+      "range_per_share": {
+        "low": -3.0,
+        "base": -1.5001,
+        "high": 0.0
+      },
+      "legacy_range_per_share": {
+        "low": -3.0,
+        "base": -1.5,
+        "high": 0.0
+      },
+      "valuation_status": "bounded_estimate",
+      "calculation_proof": {
+        "status": "valid",
+        "method_id": "net_asset_value",
+        "method_version": "1.0",
+        "outputs": {
+          "low": -3.0,
+          "base": -1.5001,
+          "high": 0.0
+        },
+        "output_unit": "USD_per_share",
+        "traces": {
+          "low": [
+            {
+              "id": "price_today",
+              "label": "Market price per share (refresh date)",
+              "kind": "fact",
+              "value": 42.7,
+              "unit": "USD_per_share",
+              "source": {
+                "ref": "AMCR/research/valuation.json",
+                "locator": "inputs.price $42.70 as of 2026-07-09",
+                "as_of": "2026-07-23",
+                "content_sha256": "026676f60a24fd8c323ee8a018d6c9c990f52da23f750757d8bfe3c611fed859",
+                "source_id": "e63c283faff237e65405e0cadd8916ce070a9982e4f6fc9416c4c8c7a7014903"
+              },
+              "rationale": null
+            },
+            {
+              "id": "net_debt_m",
+              "label": "Long-term debt less cash (FY2025)",
+              "kind": "fact",
+              "value": 13014.0,
+              "unit": "USD_m",
+              "source": {
+                "ref": "AMCR/investor-documents/sec-edgar/10-K_20250815_rpt20250630_acc0001748790_25_000023.htm",
+                "locator": "Long-term debt $13841.0M less cash $827.0M = $13014.0M",
+                "as_of": "2025-06-30",
+                "content_sha256": "3d73f73a18ee98f3da900c28ea061fdf150b53f4be47201478cf0c02f2a731c7",
+                "source_id": "9b963dfefa7de0d585d049c07951f13454ad7e2db592e7f681f23c40e7d00aed"
+              },
+              "rationale": null
+            },
+            {
+              "id": "shares_m",
+              "label": "Common shares outstanding (Q3 FY2026)",
+              "kind": "fact",
+              "value": 462.3,
+              "unit": "million_shares",
+              "source": {
+                "ref": "AMCR/investor-documents/sec-edgar/10-Q_20260507_rpt20260331_acc0001748790_26_000016.htm",
+                "locator": "Entity common stock shares outstanding 462,345,690 at March 31, 2026",
+                "as_of": "2026-03-31",
+                "content_sha256": "ff199117bfbd5c0cfc1f644643598d252c151a358718f4f7b2f40e53a21c5656",
+                "source_id": "0fbb759afd596f069fa96235035255dbb06d298c3ecb592f597c6653d02cbab0"
+              },
+              "rationale": null
+            },
+            {
+              "id": "reserve_m",
+              "label": "Berry integration, leverage, and resin-spread execution reserve",
+              "kind": "judgment",
+              "value": -1386.9,
+              "unit": "USD_m",
+              "source": null,
+              "rationale": "Negative reserve for synergy delays, elevated integration capex (Q3 FY2026 quarterly capex $687M vs $360M prior year), and refinancing risk; net debt burden embedded in platform multiple, not double-counted additively."
+            },
+            {
+              "id": "value_per_share",
+              "label": "Integration and leverage reserve per share",
+              "kind": "calculation",
+              "value": -3.0,
+              "unit": "USD_per_share",
+              "operation": "divide",
+              "formula": "reserve_m \u00f7 shares_m",
+              "substituted_formula": "-1386.9 \u00f7 462.3",
+              "dependencies": [
+                "reserve_m",
+                "shares_m"
+              ]
+            }
+          ],
+          "base": [
+            {
+              "id": "price_today",
+              "label": "Market price per share (refresh date)",
+              "kind": "fact",
+              "value": 42.7,
+              "unit": "USD_per_share",
+              "source": {
+                "ref": "AMCR/research/valuation.json",
+                "locator": "inputs.price $42.70 as of 2026-07-09",
+                "as_of": "2026-07-23",
+                "content_sha256": "026676f60a24fd8c323ee8a018d6c9c990f52da23f750757d8bfe3c611fed859",
+                "source_id": "e63c283faff237e65405e0cadd8916ce070a9982e4f6fc9416c4c8c7a7014903"
+              },
+              "rationale": null
+            },
+            {
+              "id": "net_debt_m",
+              "label": "Long-term debt less cash (FY2025)",
+              "kind": "fact",
+              "value": 13014.0,
+              "unit": "USD_m",
+              "source": {
+                "ref": "AMCR/investor-documents/sec-edgar/10-K_20250815_rpt20250630_acc0001748790_25_000023.htm",
+                "locator": "Long-term debt $13841.0M less cash $827.0M = $13014.0M",
+                "as_of": "2025-06-30",
+                "content_sha256": "3d73f73a18ee98f3da900c28ea061fdf150b53f4be47201478cf0c02f2a731c7",
+                "source_id": "9b963dfefa7de0d585d049c07951f13454ad7e2db592e7f681f23c40e7d00aed"
+              },
+              "rationale": null
+            },
+            {
+              "id": "shares_m",
+              "label": "Common shares outstanding (Q3 FY2026)",
+              "kind": "fact",
+              "value": 462.3,
+              "unit": "million_shares",
+              "source": {
+                "ref": "AMCR/investor-documents/sec-edgar/10-Q_20260507_rpt20260331_acc0001748790_26_000016.htm",
+                "locator": "Entity common stock shares outstanding 462,345,690 at March 31, 2026",
+                "as_of": "2026-03-31",
+                "content_sha256": "ff199117bfbd5c0cfc1f644643598d252c151a358718f4f7b2f40e53a21c5656",
+                "source_id": "0fbb759afd596f069fa96235035255dbb06d298c3ecb592f597c6653d02cbab0"
+              },
+              "rationale": null
+            },
+            {
+              "id": "reserve_m",
+              "label": "Berry integration, leverage, and resin-spread execution reserve",
+              "kind": "judgment",
+              "value": -693.5,
+              "unit": "USD_m",
+              "source": null,
+              "rationale": "Negative reserve for synergy delays, elevated integration capex (Q3 FY2026 quarterly capex $687M vs $360M prior year), and refinancing risk; net debt burden embedded in platform multiple, not double-counted additively."
+            },
+            {
+              "id": "value_per_share",
+              "label": "Integration and leverage reserve per share",
+              "kind": "calculation",
+              "value": -1.50010815,
+              "unit": "USD_per_share",
+              "operation": "divide",
+              "formula": "reserve_m \u00f7 shares_m",
+              "substituted_formula": "-693.5 \u00f7 462.3",
+              "dependencies": [
+                "reserve_m",
+                "shares_m"
+              ]
+            }
+          ],
+          "high": [
+            {
+              "id": "price_today",
+              "label": "Market price per share (refresh date)",
+              "kind": "fact",
+              "value": 42.7,
+              "unit": "USD_per_share",
+              "source": {
+                "ref": "AMCR/research/valuation.json",
+                "locator": "inputs.price $42.70 as of 2026-07-09",
+                "as_of": "2026-07-23",
+                "content_sha256": "026676f60a24fd8c323ee8a018d6c9c990f52da23f750757d8bfe3c611fed859",
+                "source_id": "e63c283faff237e65405e0cadd8916ce070a9982e4f6fc9416c4c8c7a7014903"
+              },
+              "rationale": null
+            },
+            {
+              "id": "net_debt_m",
+              "label": "Long-term debt less cash (FY2025)",
+              "kind": "fact",
+              "value": 13014.0,
+              "unit": "USD_m",
+              "source": {
+                "ref": "AMCR/investor-documents/sec-edgar/10-K_20250815_rpt20250630_acc0001748790_25_000023.htm",
+                "locator": "Long-term debt $13841.0M less cash $827.0M = $13014.0M",
+                "as_of": "2025-06-30",
+                "content_sha256": "3d73f73a18ee98f3da900c28ea061fdf150b53f4be47201478cf0c02f2a731c7",
+                "source_id": "9b963dfefa7de0d585d049c07951f13454ad7e2db592e7f681f23c40e7d00aed"
+              },
+              "rationale": null
+            },
+            {
+              "id": "shares_m",
+              "label": "Common shares outstanding (Q3 FY2026)",
+              "kind": "fact",
+              "value": 462.3,
+              "unit": "million_shares",
+              "source": {
+                "ref": "AMCR/investor-documents/sec-edgar/10-Q_20260507_rpt20260331_acc0001748790_26_000016.htm",
+                "locator": "Entity common stock shares outstanding 462,345,690 at March 31, 2026",
+                "as_of": "2026-03-31",
+                "content_sha256": "ff199117bfbd5c0cfc1f644643598d252c151a358718f4f7b2f40e53a21c5656",
+                "source_id": "0fbb759afd596f069fa96235035255dbb06d298c3ecb592f597c6653d02cbab0"
+              },
+              "rationale": null
+            },
+            {
+              "id": "reserve_m",
+              "label": "Berry integration, leverage, and resin-spread execution reserve",
+              "kind": "judgment",
+              "value": 0.0,
+              "unit": "USD_m",
+              "source": null,
+              "rationale": "Negative reserve for synergy delays, elevated integration capex (Q3 FY2026 quarterly capex $687M vs $360M prior year), and refinancing risk; net debt burden embedded in platform multiple, not double-counted additively."
+            },
+            {
+              "id": "value_per_share",
+              "label": "Integration and leverage reserve per share",
+              "kind": "calculation",
+              "value": 0.0,
+              "unit": "USD_per_share",
+              "operation": "divide",
+              "formula": "reserve_m \u00f7 shares_m",
+              "substituted_formula": "0 \u00f7 462.3",
+              "dependencies": [
+                "reserve_m",
+                "shares_m"
+              ]
+            }
+          ]
+        },
+        "source_lineage": [
+          {
+            "node_id": "price_today",
+            "ref": "AMCR/research/valuation.json",
+            "locator": "inputs.price $42.70 as of 2026-07-09",
+            "as_of": "2026-07-23",
+            "content_sha256": "026676f60a24fd8c323ee8a018d6c9c990f52da23f750757d8bfe3c611fed859",
+            "source_id": "e63c283faff237e65405e0cadd8916ce070a9982e4f6fc9416c4c8c7a7014903"
+          },
+          {
+            "node_id": "net_debt_m",
+            "ref": "AMCR/investor-documents/sec-edgar/10-K_20250815_rpt20250630_acc0001748790_25_000023.htm",
+            "locator": "Long-term debt $13841.0M less cash $827.0M = $13014.0M",
+            "as_of": "2025-06-30",
+            "content_sha256": "3d73f73a18ee98f3da900c28ea061fdf150b53f4be47201478cf0c02f2a731c7",
+            "source_id": "9b963dfefa7de0d585d049c07951f13454ad7e2db592e7f681f23c40e7d00aed"
+          },
+          {
+            "node_id": "shares_m",
+            "ref": "AMCR/investor-documents/sec-edgar/10-Q_20260507_rpt20260331_acc0001748790_26_000016.htm",
+            "locator": "Entity common stock shares outstanding 462,345,690 at March 31, 2026",
+            "as_of": "2026-03-31",
+            "content_sha256": "ff199117bfbd5c0cfc1f644643598d252c151a358718f4f7b2f40e53a21c5656",
+            "source_id": "0fbb759afd596f069fa96235035255dbb06d298c3ecb592f597c6653d02cbab0"
+          }
+        ],
+        "checks": {
+          "passed": true,
+          "errors": []
+        },
+        "proof_hash": "625d19da1cea073fa2a5667ccc756296cfb1a0d174421d81db3c75d9f2b933ee"
+      },
+      "evidence_tier": "primary_derived",
+      "evidence_level": "primary_derived",
+      "evidence": "Primary bridge from AMCR/investor-documents/sec-edgar/10-K_20250815_rpt20250630_acc0001748790_25_000023.htm: FY2025 OCF $1390.0M, capex $580.0M, FCF $810.0M, long-term debt $13841.0M, cash $827.0M; Berry close AMCR/investor-documents/sec-edgar/8-K_20250430_rpt20250430_acc0001104659_25_042520.htm; contract backfill 2026-07-23.",
+      "scenario_assumptions": "Proof outputs {'low': -3.0, 'base': -1.5001, 'high': 0.0}; see calculation_proof graph.",
+      "probability_and_timing": null,
+      "tax_and_realization_adjustments": "Does not duplicate net debt embedded in platform multiple.",
+      "falsifier": "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
+      "overlap_key": "amcr_integration_reserve",
+      "assumption_type": "judgment"
+    },
+    {
+      "component_id": "net_financial_claims",
+      "label": "Long-term debt net of cash (embedded in platform multiple)",
+      "category": "liability_or_reserve",
+      "treatment": "embedded",
+      "included_in_component_id": "consolidated_packaging_owner_cash",
+      "ownership_claim": "Global flexibles and rigids packaging owner-cash platform",
+      "ownership_percentage": 1.0,
+      "quantity": {
+        "value": 1,
+        "unit": "per-share economic claim"
+      },
+      "method": "net_asset_value",
+      "method_version": null,
+      "method_provenance": null,
+      "comparable_ids": [],
+      "range_per_share": {
+        "low": null,
+        "base": null,
+        "high": null
+      },
+      "legacy_range_per_share": {
+        "low": -28.15,
+        "base": -28.15,
+        "high": -25.34
+      },
+      "valuation_status": "legacy_sensitivity",
+      "calculation_proof": null,
+      "evidence_tier": "primary_derived",
+      "evidence_level": "primary_derived",
+      "evidence": "Long-term debt $13841.0M less cash $827.0M (~$28.15/sh); embedded in platform capitalization multiple.",
+      "scenario_assumptions": "Phase 3 provisional range pending filing-grounded proof.",
+      "probability_and_timing": null,
+      "tax_and_realization_adjustments": "Net debt ~$28.15/sh informs capitalization multiple.",
+      "falsifier": "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
+      "overlap_key": "amcr_net_debt",
+      "assumption_type": "fact"
+    }
+  ],
   "component_coverage": {
-    "all_material_components_identified": false,
-    "material_component_count": 0,
-    "additive_component_count": 0,
-    "embedded_component_count": 0,
-    "unvalued_component_count": 1,
+    "all_material_components_identified": true,
+    "material_component_count": 4,
+    "additive_component_count": 3,
+    "embedded_component_count": 1,
+    "unvalued_component_count": 0,
     "double_counting_flags": []
   },
   "input_classification": {
-    "facts": [],
+    "facts": [
+      {
+        "component_id": "net_financial_claims",
+        "label": "Long-term debt net of cash (embedded in platform multiple)",
+        "kind": "fact",
+        "evidence_tier": "primary_derived",
+        "evidence": "Long-term debt $13841.0M less cash $827.0M (~$28.15/sh); embedded in platform capitalization multiple.",
+        "method": "net_asset_value",
+        "valuation_status": "legacy_sensitivity"
+      }
+    ],
     "estimates": [],
-    "judgments": []
+    "judgments": [
+      {
+        "component_id": "consolidated_packaging_owner_cash",
+        "label": "Global flexibles and rigids packaging owner-cash platform",
+        "kind": "judgment",
+        "evidence_tier": "primary_derived",
+        "evidence": "Primary bridge from AMCR/investor-documents/sec-edgar/10-K_20250815_rpt20250630_acc0001748790_25_000023.htm: FY2025 OCF $1390.0M, capex $580.0M, FCF $810.0M, long-term debt $13841.0M, cash $827.0M; Berry close AMCR/investor-documents/sec-edgar/8-K_20250430_rpt20250430_acc0001104659_25_042520.htm; contract backfill 2026-07-23.",
+        "method": "owner_cash_or_dividend_discount",
+        "valuation_status": "bounded_estimate"
+      },
+      {
+        "component_id": "berry_synergy_milestone",
+        "label": "Berry Global merger cost-synergy and mix milestone",
+        "kind": "judgment",
+        "evidence_tier": "primary_derived",
+        "evidence": "Primary bridge from AMCR/investor-documents/sec-edgar/10-K_20250815_rpt20250630_acc0001748790_25_000023.htm: FY2025 OCF $1390.0M, capex $580.0M, FCF $810.0M, long-term debt $13841.0M, cash $827.0M; Berry close AMCR/investor-documents/sec-edgar/8-K_20250430_rpt20250430_acc0001104659_25_042520.htm; contract backfill 2026-07-23.",
+        "method": "risk_adjusted_milestone_value",
+        "valuation_status": "bounded_estimate"
+      },
+      {
+        "component_id": "integration_leverage_reserve",
+        "label": "Integration, leverage, and resin-spread execution reserve",
+        "kind": "judgment",
+        "evidence_tier": "primary_derived",
+        "evidence": "Primary bridge from AMCR/investor-documents/sec-edgar/10-K_20250815_rpt20250630_acc0001748790_25_000023.htm: FY2025 OCF $1390.0M, capex $580.0M, FCF $810.0M, long-term debt $13841.0M, cash $827.0M; Berry close AMCR/investor-documents/sec-edgar/8-K_20250430_rpt20250430_acc0001104659_25_042520.htm; contract backfill 2026-07-23.",
+        "method": "net_asset_value",
+        "valuation_status": "bounded_estimate"
+      }
+    ]
   },
   "method_route": {
     "schema_version": "2.0",
     "status": "routed",
     "profile_id": "quality_reinvestment",
     "label": "High-return compounder",
-    "score": 6.0,
+    "score": 8.0,
     "reasons": [
-      "archetype=compounder"
+      "archetype=compounder",
+      "component categories=operating_business",
+      "existing methods=owner_cash"
     ],
     "primary_methods": [
       "owner_earnings_reinvestment_dcf"
@@ -61,42 +1196,73 @@
       "stock compensation or acquisitions omitted",
       "terminal value unsupported by a durable mechanism"
     ],
-    "secondary_profiles": [],
+    "secondary_profiles": [
+      {
+        "profile_id": "predictable_cash_flow",
+        "score": 3.0,
+        "reasons": [
+          "component categories=operating_business",
+          "existing methods=dividend, owner_cash"
+        ]
+      },
+      {
+        "profile_id": "binary_milestone",
+        "score": 3.0,
+        "reasons": [
+          "component categories=real_option",
+          "existing methods=milestone, risk_adjusted"
+        ]
+      }
+    ],
     "scorecard": {
       "scarce_asset_optionality": {
-        "score": 0.0,
-        "reasons": []
+        "score": 1.0,
+        "reasons": [
+          "component categories=real_option"
+        ]
       },
       "quality_reinvestment": {
-        "score": 6.0,
+        "score": 8.0,
         "reasons": [
-          "archetype=compounder"
+          "archetype=compounder",
+          "component categories=operating_business",
+          "existing methods=owner_cash"
         ]
       },
       "capital_cycle": {
-        "score": 0.0,
-        "reasons": []
+        "score": 1.0,
+        "reasons": [
+          "component categories=operating_business"
+        ]
       },
       "credit_and_normalized_returns": {
-        "score": 0.0,
-        "reasons": []
+        "score": 1.0,
+        "reasons": [
+          "component categories=liability_or_reserve"
+        ]
       },
       "catalyst_asset_value": {
         "score": 0.0,
         "reasons": []
       },
       "predictable_cash_flow": {
-        "score": 0.0,
-        "reasons": []
+        "score": 3.0,
+        "reasons": [
+          "component categories=operating_business",
+          "existing methods=dividend, owner_cash"
+        ]
       },
       "binary_milestone": {
-        "score": 0.0,
-        "reasons": []
+        "score": 3.0,
+        "reasons": [
+          "component categories=real_option",
+          "existing methods=milestone, risk_adjusted"
+        ]
       }
     },
     "decision_rule": "Power Zones select the fitting economic method and eligible independent reviewers; they never choose the valuation answer or capital decision.",
     "ticker": "AMCR",
-    "as_of": "2026-07-20",
+    "as_of": "2026-07-23",
     "route_source": "canonical_power_zone_router",
     "config_path": "_system/frameworks/power_zones.json",
     "config_updated": "2026-07-14",
@@ -204,74 +1370,209 @@
         }
       ]
     },
-    "input_hash": "dc4d0a504e4a8352420e26a38b2012038d7b332308b42b90ba3cb06c00f85f79",
-    "generated_at": "2026-07-20T17:13:53.909434+00:00"
+    "input_hash": "9a7453cedc786b04af022e57024e714fd68da0b6c4c754451977127606e88d4c",
+    "generated_at": "2026-07-23T14:19:00.762345+00:00"
   },
   "market": {
-    "price_per_share": 42.7,
+    "price_per_share": 42.84,
     "fully_diluted_shares": null,
     "market_cap_m": null,
     "enterprise_value_m": null
   },
   "valuation": {
     "value_per_share": {
-      "low": null,
-      "base": null,
-      "high": null
+      "low": 25.0,
+      "base": 37.0,
+      "high": 50.0
     },
     "priced_components_per_share": {
-      "low": 0,
-      "base": 0,
-      "high": 0
+      "low": 25.0,
+      "base": 37.0,
+      "high": 50.0
     },
-    "legacy_value_per_share": null,
-    "probability_weighted_value_per_share": null,
+    "legacy_value_per_share": {
+      "low": 25.0,
+      "base": 37.0,
+      "high": 50.0
+    },
+    "probability_weighted_value_per_share": 37.0,
     "expected_distributions_per_share": 0.0,
     "annualized_return_at_price_pct": {
-      "low": null,
-      "base": null,
-      "high": null
+      "low": -7.41,
+      "base": -2.07,
+      "high": 2.23
     },
-    "downside_to_low_pct": null,
+    "downside_to_low_pct": -41.64,
     "horizon_years": 7,
     "interpretation": "value_per_share is withheld while any material additive component is unpriced; priced_components_per_share is not a complete security value."
   },
   "scenario_contract": {
     "rule": "Cases must change cited causal operating, capital, probability, timing, or financing drivers\u2014not only a terminal multiple.",
-    "top_value_drivers": [],
+    "top_value_drivers": [
+      {
+        "component_id": "consolidated_packaging_owner_cash",
+        "label": "Global flexibles and rigids packaging owner-cash platform",
+        "valuation_status": "bounded_estimate",
+        "base_per_share": 36.0,
+        "legacy_base_per_share": 36.0,
+        "range_width_per_share": 16.0,
+        "scenario_assumptions": "Proof outputs {'low': 28.0, 'base': 36.0, 'high': 44.0}; see calculation_proof graph."
+      },
+      {
+        "component_id": "berry_synergy_milestone",
+        "label": "Berry Global merger cost-synergy and mix milestone",
+        "valuation_status": "bounded_estimate",
+        "base_per_share": 2.5001,
+        "legacy_base_per_share": 2.5,
+        "range_width_per_share": 6.0,
+        "scenario_assumptions": "Proof outputs {'low': 0.0, 'base': 2.5001, 'high': 6.0}; see calculation_proof graph."
+      },
+      {
+        "component_id": "integration_leverage_reserve",
+        "label": "Integration, leverage, and resin-spread execution reserve",
+        "valuation_status": "bounded_estimate",
+        "base_per_share": -1.5001,
+        "legacy_base_per_share": -1.5,
+        "range_width_per_share": 3.0,
+        "scenario_assumptions": "Proof outputs {'low': -3.0, 'base': -1.5001, 'high': 0.0}; see calculation_proof graph."
+      }
+    ],
     "reverse_expectations": null
   },
   "calculation_proof_summary": {
-    "component_count": 0,
-    "priced_component_count": 0,
-    "proof_complete_pct": 0.0,
+    "component_count": 4,
+    "priced_component_count": 3,
+    "proof_complete_pct": 75.0,
     "status_counts": {
-      "bounded_estimate": 0,
+      "bounded_estimate": 3,
       "calculated": 0,
-      "legacy_sensitivity": 0,
+      "legacy_sensitivity": 1,
       "unpriced": 0
     },
     "all_material_components_priced": false,
     "calculation_errors": [],
-    "aggregate_proof_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    "aggregate_proof_hash": "82c95ec5e5a2d04d857c28d7222edac373afe068a1a84df212980a1ab4fa9264"
   },
-  "source_lineage": [],
+  "source_lineage": [
+    {
+      "component_id": "consolidated_packaging_owner_cash",
+      "node_id": "operating_cash_flow_m",
+      "ref": "AMCR/investor-documents/sec-edgar/10-K_20250815_rpt20250630_acc0001748790_25_000023.htm",
+      "locator": "Net cash provided by operating activities $1,390M (FY2025)",
+      "as_of": "2025-06-30",
+      "content_sha256": "3d73f73a18ee98f3da900c28ea061fdf150b53f4be47201478cf0c02f2a731c7",
+      "source_id": "418514672ba4d1d8dc78f25031070467404ebf2c1bb4d6f3c851557750e4b571"
+    },
+    {
+      "component_id": "consolidated_packaging_owner_cash",
+      "node_id": "capital_expenditures_m",
+      "ref": "AMCR/investor-documents/sec-edgar/10-K_20250815_rpt20250630_acc0001748790_25_000023.htm",
+      "locator": "Capital expenditures $580M (FY2025 cash flow statement)",
+      "as_of": "2025-06-30",
+      "content_sha256": "3d73f73a18ee98f3da900c28ea061fdf150b53f4be47201478cf0c02f2a731c7",
+      "source_id": "2ce812da93881f0885f865d307746e978b55c44659b6d7e1df9bde60128dce3e"
+    },
+    {
+      "component_id": "consolidated_packaging_owner_cash",
+      "node_id": "shares_m",
+      "ref": "AMCR/investor-documents/sec-edgar/10-Q_20260507_rpt20260331_acc0001748790_26_000016.htm",
+      "locator": "Entity common stock shares outstanding 462,345,690 at March 31, 2026",
+      "as_of": "2026-03-31",
+      "content_sha256": "ff199117bfbd5c0cfc1f644643598d252c151a358718f4f7b2f40e53a21c5656",
+      "source_id": "0fbb759afd596f069fa96235035255dbb06d298c3ecb592f597c6653d02cbab0"
+    },
+    {
+      "component_id": "consolidated_packaging_owner_cash",
+      "node_id": "long_term_debt_m",
+      "ref": "AMCR/investor-documents/sec-edgar/10-K_20250815_rpt20250630_acc0001748790_25_000023.htm",
+      "locator": "LongTermDebtAndCapitalLeaseObligations $13,841M at June 30, 2025",
+      "as_of": "2025-06-30",
+      "content_sha256": "3d73f73a18ee98f3da900c28ea061fdf150b53f4be47201478cf0c02f2a731c7",
+      "source_id": "545309300f5a83f3bb5c4a1d69b33ff19234d9abf8bbe6153aecd573f144c541"
+    },
+    {
+      "component_id": "berry_synergy_milestone",
+      "node_id": "pro_forma_revenue_bn",
+      "ref": "AMCR/investor-documents/sec-edgar/10-K_20250815_rpt20250630_acc0001748790_25_000023.htm",
+      "locator": "Pro forma combined net sales approximately $23.2 billion per acquisition footnote",
+      "as_of": "2025-06-30",
+      "content_sha256": "3d73f73a18ee98f3da900c28ea061fdf150b53f4be47201478cf0c02f2a731c7",
+      "source_id": "fc56fd9b54b790699b62ab3342dde6330b54165b3f545034dce0479d338a8eb1"
+    },
+    {
+      "component_id": "berry_synergy_milestone",
+      "node_id": "flexibles_9m_sales_m",
+      "ref": "AMCR/investor-documents/sec-edgar/10-Q_20260507_rpt20260331_acc0001748790_26_000016.htm",
+      "locator": "Flexibles segment net sales $8,050M for nine months ended March 31, 2026",
+      "as_of": "2026-03-31",
+      "content_sha256": "ff199117bfbd5c0cfc1f644643598d252c151a358718f4f7b2f40e53a21c5656",
+      "source_id": "d5a25c21b1bed8ba10ea0802b0813cb4aeb6d008a32758bb8e9bb244cbe5f7d2"
+    },
+    {
+      "component_id": "berry_synergy_milestone",
+      "node_id": "rigid_9m_sales_m",
+      "ref": "AMCR/investor-documents/sec-edgar/10-Q_20260507_rpt20260331_acc0001748790_26_000016.htm",
+      "locator": "Rigid Packaging segment net sales $2,390M for nine months ended March 31, 2026",
+      "as_of": "2026-03-31",
+      "content_sha256": "ff199117bfbd5c0cfc1f644643598d252c151a358718f4f7b2f40e53a21c5656",
+      "source_id": "9f12627b3c6aa6c2d98ae1075a36888c5f30841a2bb31704519ea6dca978a968"
+    },
+    {
+      "component_id": "berry_synergy_milestone",
+      "node_id": "shares_m",
+      "ref": "AMCR/investor-documents/sec-edgar/10-Q_20260507_rpt20260331_acc0001748790_26_000016.htm",
+      "locator": "Entity common stock shares outstanding 462,345,690 at March 31, 2026",
+      "as_of": "2026-03-31",
+      "content_sha256": "ff199117bfbd5c0cfc1f644643598d252c151a358718f4f7b2f40e53a21c5656",
+      "source_id": "0fbb759afd596f069fa96235035255dbb06d298c3ecb592f597c6653d02cbab0"
+    },
+    {
+      "component_id": "integration_leverage_reserve",
+      "node_id": "price_today",
+      "ref": "AMCR/research/valuation.json",
+      "locator": "inputs.price $42.70 as of 2026-07-09",
+      "as_of": "2026-07-23",
+      "content_sha256": "026676f60a24fd8c323ee8a018d6c9c990f52da23f750757d8bfe3c611fed859",
+      "source_id": "e63c283faff237e65405e0cadd8916ce070a9982e4f6fc9416c4c8c7a7014903"
+    },
+    {
+      "component_id": "integration_leverage_reserve",
+      "node_id": "net_debt_m",
+      "ref": "AMCR/investor-documents/sec-edgar/10-K_20250815_rpt20250630_acc0001748790_25_000023.htm",
+      "locator": "Long-term debt $13841.0M less cash $827.0M = $13014.0M",
+      "as_of": "2025-06-30",
+      "content_sha256": "3d73f73a18ee98f3da900c28ea061fdf150b53f4be47201478cf0c02f2a731c7",
+      "source_id": "9b963dfefa7de0d585d049c07951f13454ad7e2db592e7f681f23c40e7d00aed"
+    },
+    {
+      "component_id": "integration_leverage_reserve",
+      "node_id": "shares_m",
+      "ref": "AMCR/investor-documents/sec-edgar/10-Q_20260507_rpt20260331_acc0001748790_26_000016.htm",
+      "locator": "Entity common stock shares outstanding 462,345,690 at March 31, 2026",
+      "as_of": "2026-03-31",
+      "content_sha256": "ff199117bfbd5c0cfc1f644643598d252c151a358718f4f7b2f40e53a21c5656",
+      "source_id": "0fbb759afd596f069fa96235035255dbb06d298c3ecb592f597c6653d02cbab0"
+    }
+  ],
   "model_checks": {
     "calculation_graphs_valid": true,
-    "component_sum_reconciles": false,
+    "component_sum_reconciles": true,
     "no_double_counting": true,
-    "all_material_components_priced": false,
+    "all_material_components_priced": true,
     "low_base_high_ordered": true
   },
   "evidence": {
-    "unresolved_count": 1,
-    "blockers": [
-      "A complete economic ownership map has not been supplied."
-    ],
+    "unresolved_count": 0,
+    "blockers": [],
     "validation_errors": []
   },
   "monitoring": {
-    "falsifiers": [],
+    "falsifiers": [
+      "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
+      "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
+      "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
+      "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case."
+    ],
     "required_refresh_triggers": [
       "new filing or material operating update",
       "capital-structure change",
@@ -280,8 +1581,12 @@
     ]
   },
   "change_control": {
-    "model_hash": "89f4377aac41a4def4292b8e7783a841a25409382c14421430749ab732dfbfca",
-    "method_versions": [],
+    "model_hash": "ea25496833a26989ce5eafbc6b6d343fce553427ef5e3c95cb8586b3dbf911c7",
+    "method_versions": [
+      "net_asset_value@1.0",
+      "owner_cash_or_dividend_discount@1.0",
+      "risk_adjusted_milestone_value@1.0"
+    ],
     "change_log": [],
     "rule": "A source fact is locked. Every assumption change requires a reason, author, timestamp, and before/after value."
   },
