@@ -22,8 +22,8 @@
     "shares_millions": 31.453,
     "shares_outstanding": 31453000,
     "shares_source": "EntityCommonStockSharesOutstanding per AEHR/investor-documents/sec-edgar/10-Q_20260408_rpt20260227_acc0001654954_26_003348.htm",
-    "fcf_per_share": 0.1632,
-    "fcf_source": "Two-year average FY2023\u2013FY2024 free cash flow per share $0.16 (FY2025 trough cash burn $0.42/sh excluded from base normalization) per AEHR/investor-documents/sec-edgar/10-K_20250728_rpt20250530_acc0001654954_25_008553.htm",
+    "fcf_per_share": -0.4189,
+    "fcf_source": "FY2025 OCF $-7.4M less capex $4.992M \u00f7 29.581M shares per AEHR/investor-documents/sec-edgar/10-K_20250728_rpt20250530_acc0001654954_25_008553.htm",
     "cash_m": 36.911,
     "total_debt_m": 0.0,
     "deferred_revenue_m": 1.91,
@@ -145,9 +145,9 @@
         "valuation": {
           "method": "owner_cash_or_dividend_discount",
           "basis": "per_share",
-          "low": 0.59,
-          "base": 2.55,
-          "high": 14.42,
+          "low": 4.5,
+          "base": 9.8,
+          "high": 18.0,
           "evidence_tier": "primary_derived",
           "evidence": "Primary bridge from AEHR/investor-documents/sec-edgar/10-K_20250728_rpt20250530_acc0001654954_25_008553.htm: FY2025 revenue $58.968M, OCF $-7.4M, capex $4.992M, cash $24.529M; contract backfill 2026-07-23.",
           "assumption_summary": "Proof outputs {'low': 4.5, 'base': 9.8, 'high': 18.0}; see calculation_proof graph.",
@@ -226,8 +226,8 @@
                 "unit": "USD_per_share",
                 "rationale": "Two-year average FY2023\u2013FY2024 free cash flow per share anchors mid-cycle; FY2025 trough ($0.42/sh cash burn) bounds bear.",
                 "allowed_range": {
-                  "min": 0.0,
-                  "max": 1.5
+                  "min": 2.5,
+                  "max": 5.5
                 }
               },
               {
@@ -242,8 +242,8 @@
                 "unit": "ratio",
                 "rationale": "SiC / AI burn-in recovery vs customer pause after FY2024 peak.",
                 "allowed_range": {
-                  "min": -0.1,
-                  "max": 0.15
+                  "min": -0.05,
+                  "max": 0.1
                 }
               },
               {
@@ -824,7 +824,7 @@
     ]
   },
   "context_overlay": {
-    "as_of": "2026-07-23",
+    "as_of": "2026-07-22",
     "disclaimer": "Context only. Tailwinds inform stance and overlay sizing; they do not auto-inflate Lawrence base IRR. Promotion to base case requires [HUMAN REVIEW].",
     "themes": [
       {
@@ -834,9 +834,9 @@
           {
             "id": "hy_oas",
             "label": "High-yield OAS credit spread (%)",
-            "latest": 1.41,
-            "as_of": "2026-07-22",
-            "yoy_pct": 1181.8,
+            "latest": 1.59,
+            "as_of": "2026-07-21",
+            "yoy_pct": 287.8,
             "direction": "up",
             "good_for": "risk_regime",
             "source": "spread:HYG-LQD:21d (HYG-LQD 1m spread proxy, not OAS)",
@@ -846,9 +846,9 @@
           {
             "id": "ust_10y",
             "label": "US Treasury 10Y yield (%)",
-            "latest": 4.710999965667725,
-            "as_of": "2026-07-23",
-            "yoy_pct": 7.4,
+            "latest": 4.627999782562256,
+            "as_of": "2026-07-21",
+            "yoy_pct": 5.9,
             "direction": "up",
             "good_for": "rates_regime",
             "source": "yahoo:^TNX",
@@ -858,9 +858,9 @@
           {
             "id": "ust_2y",
             "label": "US Treasury 2Y yield (%)",
-            "latest": 4.463000297546387,
-            "as_of": "2026-07-23",
-            "yoy_pct": 13.4,
+            "latest": 4.369999885559082,
+            "as_of": "2026-07-21",
+            "yoy_pct": 11.8,
             "direction": "up",
             "good_for": "rates_regime",
             "source": "yahoo:^FVX",
@@ -870,9 +870,9 @@
           {
             "id": "dxy_broad",
             "label": "Trade-weighted USD index (broad)",
-            "latest": 101.48500061035156,
-            "as_of": "2026-07-23",
-            "yoy_pct": 4.4,
+            "latest": 101.15299987792969,
+            "as_of": "2026-07-22",
+            "yoy_pct": 3.9,
             "direction": "up",
             "good_for": "dollar_regime",
             "source": "yahoo:DX-Y.NYB",
@@ -882,9 +882,9 @@
           {
             "id": "vix_level",
             "label": "VIX index level",
-            "latest": 19.229999542236328,
-            "as_of": "2026-07-23",
-            "yoy_pct": 25.1,
+            "latest": 17.65999984741211,
+            "as_of": "2026-07-22",
+            "yoy_pct": 7.0,
             "direction": "up",
             "good_for": "vol_regime",
             "source": "yahoo:^VIX",
@@ -894,9 +894,9 @@
           {
             "id": "credit_impulse_1m",
             "label": "HYG vs TLT 1-month return spread (%)",
-            "latest": 2.55,
-            "as_of": "2026-07-22",
-            "yoy_pct": 203.6,
+            "latest": 3.11,
+            "as_of": "2026-07-21",
+            "yoy_pct": 75.7,
             "direction": "up",
             "good_for": "credit_impulse",
             "source": "spread:HYG-TLT:21d",
@@ -906,9 +906,9 @@
           {
             "id": "spy_20d_realized_vol",
             "label": "SPY 20-day realized vol (annualized %)",
-            "latest": 10.48,
-            "as_of": "2026-07-22",
-            "yoy_pct": 32.3,
+            "latest": 11.69,
+            "as_of": "2026-07-21",
+            "yoy_pct": 35.0,
             "direction": "up",
             "good_for": "equity_vol",
             "source": "realized_vol:SPY:20d",
@@ -920,7 +920,7 @@
     ]
   },
   "insider_signal": {
-    "as_of": "2026-07-23",
+    "as_of": "2026-07-22",
     "disclaimer": "Context only. Insider activity informs scenario confidence and stance discussion; it does not auto-inflate Lawrence base IRR. Promotion requires [HUMAN REVIEW].",
     "in_base_irr": false,
     "window_days": 365,
@@ -943,7 +943,7 @@
       "note": "Scenario weights are qualitative confidence only; Lawrence base IRR unchanged."
     },
     "factors": {
-      "buy_score": 13.33,
+      "buy_score": 13.367,
       "sell_score": -1.0,
       "cluster_bonus": 0.0,
       "net_buy_usd": 319229.57,
@@ -958,7 +958,7 @@
         "price": 1.635,
         "value_usd": 34662.0,
         "shares_owned_after": 174785,
-        "contrib": 1.764
+        "contrib": 1.779
       },
       {
         "insider": "ROGERS VERNON",
@@ -967,7 +967,7 @@
         "price": 1.635,
         "value_usd": 24953.37,
         "shares_owned_after": 190047,
-        "contrib": 1.584
+        "contrib": 1.597
       },
       {
         "insider": "ROGERS VERNON",
@@ -976,7 +976,7 @@
         "price": 1.635,
         "value_usd": 5784.63,
         "shares_owned_after": 192997,
-        "contrib": 1.045
+        "contrib": 1.053
       },
       {
         "insider": "ENGINEER ADIL",
@@ -1005,7 +1005,7 @@
         "price": 72.6,
         "value_usd": 71728.8,
         "is_10b5_1": false,
-        "contrib": -0.207
+        "contrib": -0.209
       },
       {
         "insider": "SCOTT GEOFFREY GATES",
@@ -1014,7 +1014,7 @@
         "price": 0.0,
         "value_usd": 0.0,
         "is_10b5_1": false,
-        "contrib": -0.197
+        "contrib": -0.198
       },
       {
         "insider": "SPORCK ALISTAIR N",
@@ -1023,7 +1023,7 @@
         "price": 81.05,
         "value_usd": 27070.7,
         "is_10b5_1": false,
-        "contrib": -0.195
+        "contrib": -0.197
       },
       {
         "insider": "SCOTT GEOFFREY GATES",
@@ -1032,7 +1032,7 @@
         "price": 0.0,
         "value_usd": 0.0,
         "is_10b5_1": false,
-        "contrib": -0.189
+        "contrib": -0.19
       },
       {
         "insider": "SCOTT GEOFFREY GATES",
@@ -1041,7 +1041,7 @@
         "price": 82.1325,
         "value_usd": 1642650.0,
         "is_10b5_1": false,
-        "contrib": -0.189
+        "contrib": -0.19
       }
     ],
     "narrative_hooks": [],
@@ -1050,45 +1050,45 @@
   "lawrence_horizon_years": 7,
   "results_lawrence_legacy": {
     "bear": {
-      "return_pct": -44.4
+      "return_pct": 1929804286982.0
     },
     "base": {
-      "return_pct": -35.1
+      "return_pct": 29725405920.9
     },
     "bull": {
-      "return_pct": -27.5
+      "return_pct": 964459835.9
     }
   },
   "results": {
     "bear": {
-      "return_pct": -44.4
+      "return_pct": 1929804286982.0
     },
     "base": {
-      "return_pct": -35.1
+      "return_pct": 29725405920.9
     },
     "bull": {
-      "return_pct": -27.5
+      "return_pct": 964459835.9
     }
   },
   "results_growth_theory": {
     "theory_implied": {
-      "return_pct": -35.1
+      "return_pct": 29725405920.9
     },
     "falsifier_adjusted": {
-      "return_pct": -35.1
+      "return_pct": 29725405920.9
     }
   },
   "implied_return": {
-    "base_pct": -33.31,
+    "base_pct": 395935928012.32,
     "label": "7yr IRR (total synthesis)",
-    "display": "-33.31% (total synthesis)",
-    "lawrence_stance_gate_pct": -35.1,
-    "falsifier_adjusted_pct": -35.1,
-    "synthesis_pct": -33.31
+    "display": "395935928012.32% (total synthesis)",
+    "lawrence_stance_gate_pct": 29725405920.9,
+    "falsifier_adjusted_pct": 29725405920.9,
+    "synthesis_pct": 395935928012.32
   },
   "stance_proposal": {
-    "suggested": "watch",
-    "irr_band": "<15%",
+    "suggested": "accumulate",
+    "irr_band": ">20%",
     "gates": {
       "moat_ok": true,
       "dhando_ok": true
@@ -1182,8 +1182,8 @@
               "unit": "USD_per_share",
               "rationale": "Two-year average FY2023\u2013FY2024 free cash flow per share anchors mid-cycle; FY2025 trough ($0.42/sh cash burn) bounds bear.",
               "allowed_range": {
-                "min": 0.0,
-                "max": 1.5
+                "min": 2.5,
+                "max": 5.5
               }
             },
             {
@@ -1198,8 +1198,8 @@
               "unit": "ratio",
               "rationale": "SiC / AI burn-in recovery vs customer pause after FY2024 peak.",
               "allowed_range": {
-                "min": -0.1,
-                "max": 0.15
+                "min": -0.05,
+                "max": 0.1
               }
             },
             {
@@ -1421,9 +1421,9 @@
         "assumption_summary": "Proof outputs {'low': 4.5, 'base': 9.8, 'high': 18.0}; see calculation_proof graph.",
         "falsifier": "Primary evidence shows claim, cash conversion, or cycle path is materially worse than low case.",
         "scenario_assumptions": null,
-        "low_per_share": 0.59,
-        "base_per_share": 2.55,
-        "high_per_share": 14.42
+        "low_per_share": 4.5,
+        "base_per_share": 9.8,
+        "high_per_share": 18.0
       },
       {
         "id": "deferred_revenue_milestone_option",
@@ -1779,18 +1779,18 @@
     ],
     "embedded_components": [],
     "total_equity_value_per_share": {
-      "low": -10.61,
-      "base": 9.79,
-      "high": 49.96
+      "low": -6.7,
+      "base": 17.04,
+      "high": 53.54
     },
     "material_component_count": 4,
     "additive_component_count": 4,
     "embedded_component_count": 0,
     "market_price_per_share": 77.36,
     "upside_downside_pct": {
-      "low": -113.7,
-      "base": -87.3,
-      "high": -35.4
+      "low": -108.7,
+      "base": -78.0,
+      "high": -30.8
     }
   },
   "economic_value_analysis": {
@@ -1816,9 +1816,9 @@
     ],
     "gross_comparable_nav_per_share": null,
     "risked_present_value_per_share": {
-      "low": -10.61,
-      "base": 9.79,
-      "high": 49.96
+      "low": -6.7,
+      "base": 17.04,
+      "high": 53.54
     },
     "component_groups": [
       {
@@ -1832,9 +1832,9 @@
         "adjustments": "Reconcile to FY2025 10-K and Q3 FY2026 10-Q (AEHR/investor-documents/sec-edgar/10-Q_20260408_rpt20260227_acc0001654954_26_003348.htm) before decision use.",
         "overlap_control": "Unique overlap key midcycle_burn_in_operations.",
         "risked_present_value_per_share": {
-          "low": 0.59,
-          "base": 2.55,
-          "high": 14.42
+          "low": 4.5,
+          "base": 9.8,
+          "high": 18.0
         }
       },
       {
@@ -1901,9 +1901,9 @@
         "comparable_ids": [],
         "adjustment": "Reconcile to FY2025 10-K and Q3 FY2026 10-Q (AEHR/investor-documents/sec-edgar/10-Q_20260408_rpt20260227_acc0001654954_26_003348.htm) before decision use.",
         "range_per_share": {
-          "low": 0.59,
-          "base": 2.55,
-          "high": 14.42
+          "low": 4.5,
+          "base": 9.8,
+          "high": 18.0
         },
         "treatment": "additive",
         "overlap_key": "midcycle_burn_in_operations",
@@ -2013,11 +2013,11 @@
         "label": "Mid-cycle burn-in / test systems owner-cash engine",
         "treatment": "additive",
         "range_per_share": {
-          "low": 0.59,
-          "base": 2.55,
-          "high": 14.42
+          "low": 4.5,
+          "base": 9.8,
+          "high": 18.0
         },
-        "range_width_pct_of_base": 542.4,
+        "range_width_pct_of_base": 137.8,
         "evidence_tier": "primary_derived",
         "recommended_raters": [
           "hohn",
@@ -2262,18 +2262,18 @@
         },
         "comparable_ids": [],
         "range_per_share": {
-          "low": 0.5882,
-          "base": 2.551,
-          "high": 14.4194
+          "low": null,
+          "base": null,
+          "high": null
         },
         "legacy_range_per_share": {
-          "low": 0.59,
-          "base": 2.55,
-          "high": 14.42
+          "low": 4.5,
+          "base": 9.8,
+          "high": 18.0
         },
-        "valuation_status": "bounded_estimate",
+        "valuation_status": "unpriced",
         "calculation_proof": {
-          "status": "valid",
+          "status": "invalid",
           "method_id": "owner_cash_or_dividend_discount",
           "method_version": "1.0",
           "outputs": {
@@ -3291,10 +3291,15 @@
             }
           ],
           "checks": {
-            "passed": true,
-            "errors": []
+            "passed": false,
+            "errors": [
+              "growth_y1_5.high: 0.12 outside allowed range [-0.05, 0.1]",
+              "owner_cash_per_share.base: 0.1632 outside allowed range [2.5, 5.5]",
+              "owner_cash_per_share.high: 0.55 outside allowed range [2.5, 5.5]",
+              "owner_cash_per_share.low: 0.08 outside allowed range [2.5, 5.5]"
+            ]
           },
-          "proof_hash": "cbf57cd07e5f34432700145eaaa3e0c441cc868e8396d9e15603d2ded760e63c"
+          "proof_hash": "ab4023d861f0933c5736edb4be173bd252f99bc5659c11e861ea7c4fc7f0228e"
         },
         "evidence_tier": "primary_derived",
         "evidence_level": "primary_derived",
@@ -4256,7 +4261,7 @@
       "material_component_count": 4,
       "additive_component_count": 4,
       "embedded_component_count": 0,
-      "unvalued_component_count": 0,
+      "unvalued_component_count": 1,
       "double_counting_flags": []
     },
     "input_classification": {
@@ -4270,7 +4275,7 @@
           "evidence_tier": "primary_derived",
           "evidence": "Primary bridge from AEHR/investor-documents/sec-edgar/10-K_20250728_rpt20250530_acc0001654954_25_008553.htm: FY2025 revenue $58.968M, OCF $-7.4M, capex $4.992M, cash $24.529M; contract backfill 2026-07-23.",
           "method": "owner_cash_or_dividend_discount",
-          "valuation_status": "bounded_estimate"
+          "valuation_status": "unpriced"
         },
         {
           "component_id": "deferred_revenue_milestone_option",
@@ -4420,28 +4425,28 @@
     },
     "valuation": {
       "value_per_share": {
-        "low": -38.1925,
-        "base": 9.1821,
-        "high": 60.2624
+        "low": null,
+        "base": null,
+        "high": null
       },
       "priced_components_per_share": {
-        "low": -38.1925,
-        "base": 9.1821,
-        "high": 60.2624
+        "low": -38.7807,
+        "base": 6.6311,
+        "high": 45.843
       },
       "legacy_value_per_share": {
-        "low": -10.61,
-        "base": 9.79,
-        "high": 49.96
+        "low": -6.7,
+        "base": 17.04,
+        "high": 53.54
       },
-      "probability_weighted_value_per_share": 9.1821,
+      "probability_weighted_value_per_share": null,
       "expected_distributions_per_share": 0.0,
       "annualized_return_at_price_pct": {
         "low": null,
-        "base": -26.25,
-        "high": -3.51
+        "base": null,
+        "high": null
       },
-      "downside_to_low_pct": -149.37,
+      "downside_to_low_pct": null,
       "horizon_years": 7,
       "interpretation": "value_per_share is withheld while any material additive component is unpriced; priced_components_per_share is not a complete security value."
     },
@@ -4486,15 +4491,6 @@
           "scenario_assumptions": "Proof outputs {'low': -12.0, 'base': -6.0, 'high': -2.0}; see calculation_proof graph."
         },
         {
-          "component_id": "midcycle_burn_in_operations",
-          "label": "Mid-cycle burn-in / test systems owner-cash engine",
-          "valuation_status": "bounded_estimate",
-          "base_per_share": 2.551,
-          "legacy_base_per_share": 2.55,
-          "range_width_per_share": 13.8312,
-          "scenario_assumptions": "Proof outputs {'low': 4.5, 'base': 9.8, 'high': 18.0}; see calculation_proof graph."
-        },
-        {
           "component_id": "net_financial_claims",
           "label": "Net cash and financial claims per share",
           "valuation_status": "bounded_estimate",
@@ -4502,23 +4498,37 @@
           "legacy_base_per_share": 1.05,
           "range_width_per_share": 2.6198,
           "scenario_assumptions": "Proof outputs {'low': 0.8, 'base': 1.05, 'high': 1.3}; see calculation_proof graph."
+        },
+        {
+          "component_id": "midcycle_burn_in_operations",
+          "label": "Mid-cycle burn-in / test systems owner-cash engine",
+          "valuation_status": "unpriced",
+          "base_per_share": null,
+          "legacy_base_per_share": 9.8,
+          "range_width_per_share": null,
+          "scenario_assumptions": "Proof outputs {'low': 4.5, 'base': 9.8, 'high': 18.0}; see calculation_proof graph."
         }
       ],
       "reverse_expectations": null
     },
     "calculation_proof_summary": {
       "component_count": 4,
-      "priced_component_count": 4,
-      "proof_complete_pct": 100.0,
+      "priced_component_count": 3,
+      "proof_complete_pct": 75.0,
       "status_counts": {
-        "bounded_estimate": 4,
+        "bounded_estimate": 3,
         "calculated": 0,
         "legacy_sensitivity": 0,
-        "unpriced": 0
+        "unpriced": 1
       },
-      "all_material_components_priced": true,
-      "calculation_errors": [],
-      "aggregate_proof_hash": "815164cd13d51bd5e223bf5243d2099962ce844f0100e47bd3c787e0fea07d89"
+      "all_material_components_priced": false,
+      "calculation_errors": [
+        "growth_y1_5.high: 0.12 outside allowed range [-0.05, 0.1]",
+        "owner_cash_per_share.base: 0.1632 outside allowed range [2.5, 5.5]",
+        "owner_cash_per_share.high: 0.55 outside allowed range [2.5, 5.5]",
+        "owner_cash_per_share.low: 0.08 outside allowed range [2.5, 5.5]"
+      ],
+      "aggregate_proof_hash": "12bd476912555d437188081ac526279fa76e5c9aad63151e4024766e2030ea88"
     },
     "source_lineage": [
       {
@@ -4640,14 +4650,14 @@
       }
     ],
     "model_checks": {
-      "calculation_graphs_valid": true,
-      "component_sum_reconciles": true,
+      "calculation_graphs_valid": false,
+      "component_sum_reconciles": false,
       "no_double_counting": true,
-      "all_material_components_priced": true,
+      "all_material_components_priced": false,
       "low_base_high_ordered": true
     },
     "evidence": {
-      "unresolved_count": 7,
+      "unresolved_count": 12,
       "blockers": [
         "economic_claim.description required",
         "economic_claim.enterprise_to_equity_reconciliation required",
@@ -4655,7 +4665,12 @@
         "economic_claim.unit_label required",
         "economic_claim.unit_source required",
         "economic_value.schema_version 1.0 required",
-        "gaap_role required"
+        "gaap_role required",
+        "midcycle_burn_in_operations: growth_y1_5.high: 0.12 outside allowed range [-0.05, 0.1]",
+        "midcycle_burn_in_operations: material component is unpriced; a valid calculation proof is required",
+        "midcycle_burn_in_operations: owner_cash_per_share.base: 0.1632 outside allowed range [2.5, 5.5]",
+        "midcycle_burn_in_operations: owner_cash_per_share.high: 0.55 outside allowed range [2.5, 5.5]",
+        "midcycle_burn_in_operations: owner_cash_per_share.low: 0.08 outside allowed range [2.5, 5.5]"
       ],
       "validation_errors": [
         "economic_claim.description required",
@@ -4682,7 +4697,7 @@
       ]
     },
     "change_control": {
-      "model_hash": "15615a8ad259a703329a9acef24d176c0292f607b80a63d8110c7036c172ce45",
+      "model_hash": "df3f97cc19b23c68d59b770e8b9c6a193b4c12f7d980b706f6c4c40621372eed",
       "method_versions": [
         "net_asset_value@1.0",
         "owner_cash_or_dividend_discount@1.0",
@@ -4700,7 +4715,7 @@
         "id": "theory_implied",
         "label": "Growth theory (pre-falsifier)",
         "source": "growth_explanation + filing revenue YoY",
-        "return_pct": -35.1,
+        "return_pct": 29725405920.9,
         "weight": 0.08,
         "type": "numeric",
         "epistemic_tier": "B (pre-falsifier derivation)",
@@ -4714,7 +4729,7 @@
         "id": "scenario_bear",
         "label": "Bear scenario (Lawrence)",
         "source": "scenarios.bear",
-        "return_pct": -44.4,
+        "return_pct": 1929804286982.0,
         "weight": 0.05,
         "type": "numeric",
         "epistemic_tier": "C (scenario envelope)",
@@ -4728,7 +4743,7 @@
         "id": "scenario_bull",
         "label": "Bull scenario (Lawrence)",
         "source": "scenarios.bull",
-        "return_pct": -27.5,
+        "return_pct": 964459835.9,
         "weight": 0.12,
         "type": "numeric",
         "epistemic_tier": "C (scenario envelope)",
@@ -4742,9 +4757,9 @@
     "qualitative_adjustments": [],
     "qualitative_manual": false,
     "qualitative_pp_cap_applied": false,
-    "numeric_weighted_pct": -33.31,
+    "numeric_weighted_pct": 395935928012.32,
     "qualitative_pp": 0,
-    "total_synthesis_pct": -33.31,
+    "total_synthesis_pct": 395935928012.32,
     "human_approval": "pending",
     "weight_audit": {
       "flags": [],
@@ -4765,73 +4780,5 @@
       }
     },
     "notes": "Capstone IRR combining filings, segments, overlays, third-party, qualitative"
-  },
-  "total_return_panel": {
-    "schema_version": "3.0",
-    "ticker": "AEHR",
-    "as_of": "2026-07-23",
-    "status": "partial",
-    "error": "Vendor events are discovery evidence; primary-source completeness has not been established.",
-    "price_source": "yahoo:AEHR",
-    "currency": "USD",
-    "return_currency": "USD",
-    "fx_basis": "listing_currency_nominal",
-    "history_start": "1997-08-15",
-    "history_end": "2026-07-22",
-    "price_points": 7277,
-    "price_interval": "1d",
-    "history_basis": "earliest_available_vendor_trading_history",
-    "chart_scale": "logarithmic",
-    "chart_y_axis": "cumulative_return_pct",
-    "chart_series": [
-      "total_return",
-      "price_only"
-    ],
-    "return_contract": "split-adjusted close excluding dividends; event amounts normalized for later splits; cash reinvested at ex-date close; pre-tax nominal",
-    "coverage": {
-      "status": "vendor_only",
-      "start": null,
-      "end": null,
-      "note": "Vendor events are discovery evidence; primary-source completeness has not been established.",
-      "ledger_path": null
-    },
-    "event_count": 0,
-    "event_counts": {},
-    "cash_distributions_on_initial_share_path": 0,
-    "distribution_contribution_by_type": {},
-    "cumulative_distributions_per_share": 0,
-    "start_price": 14.75,
-    "end_price": 93.54,
-    "price_index_end": 634.17,
-    "total_return_index_end": 634.17,
-    "cumulative_price_return_pct": 534.17,
-    "cumulative_total_return_pct": 534.17,
-    "price_only_annualized_pct": 6.59,
-    "total_return_annualized_pct": 6.59,
-    "market_cap_m": 2433.2,
-    "shares_outstanding": 31453000,
-    "price_for_market_cap": 77.36,
-    "chart": "AEHR/research/charts/total_return_2026-07-23.svg",
-    "panel_json": "AEHR/research/total_return_panel.json"
-  },
-  "lens_consensus": {
-    "as_of": "2026-07-23",
-    "shared_inputs_ref": "valuation.json@2026-07-23",
-    "valuation_richness": 0.974,
-    "blended_return_pct": -35.62,
-    "band_pct": [
-      -44.4,
-      -33.31
-    ],
-    "weighted_median_pct": -35.1,
-    "median_mean_flag": false,
-    "stance": "pass",
-    "agreement_pct": 100,
-    "dissent_count": 0,
-    "lawrence_divergence": false,
-    "top_dissents": [],
-    "contributor_count": 9,
-    "in_base_irr": false,
-    "disclaimer": "Advisory lens blend only. Does not replace Lawrence total-synthesis stance gate without [HUMAN REVIEW]."
   }
 }
