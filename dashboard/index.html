@@ -1690,6 +1690,7 @@ function loadLazyFile(key) {
     research_memory: () => loadShardOnce('file:research_memory', 'data/research_memory.json', (doc) => { data.research_memory = doc; }),
     index_membership: () => loadShardOnce('file:index_membership', 'data/index_membership.json', (doc) => { data.index_membership = doc; }),
     kpi_trends: () => loadShardOnce('file:kpi_trends', 'data/kpi_trends.json', (doc) => { data.kpi_trends = doc; }),
+    world_model: () => loadShardOnce('file:world_model', 'data/world_model.json', (doc) => { data.world_model = doc; }),
     document_catalog: () => loadShardOnce('file:document_catalog', 'data/document_catalog.json', (doc) => { data.document_catalog = doc; }),
     activist_feed: () => loadShardOnce('file:activist_feed', 'data/activist_feed.json', (doc) => { data.activist_feed = doc; }),
     darwin_bundle: () => loadShardOnce('file:darwin_bundle', 'data/darwin_bundle.json', (doc) => {
@@ -1716,6 +1717,7 @@ const INSIGHTS_SECTION_FILES = {
   index_watch: ['index_membership'],
   documents: ['document_catalog'],
   memory: ['research_memory'],
+  tickers: ['world_model'],
 };
 
 function insightsSectionReady(section) {
@@ -1992,6 +1994,7 @@ function renderInsights(opts = {}) {
     pdfTimeMode: insightsPdfTimeMode,
     portfolioMacro: data.portfolio_macro || [],
     portfolioMacroRegime: data.portfolio_macro_regime || null,
+    worldModel: data.world_model || null,
     tickerSourceFilter: insightsTickerSourceFilter,
     tickerViewMode: insightsTickerViewMode,
     tickerSortMode: insightsTickerSortMode,

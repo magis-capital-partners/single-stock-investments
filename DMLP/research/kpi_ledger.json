@@ -1,0 +1,74 @@
+{
+  "ticker": "DMLP",
+  "as_of": "2026-07-23",
+  "theme_ids": [
+    "energy_royalty",
+    "macro_regime"
+  ],
+  "industry_node_ids": [
+    "energy_royalty"
+  ],
+  "schema_version": "1.0",
+  "scaffold_meta": {
+    "generated_by": "scaffold_industry_kpi_ledgers.py",
+    "generated_at": "2026-07-23",
+    "note": "Industry-template scaffold. Context only; refine gates from filings."
+  },
+  "kpis": [
+    {
+      "kpi_id": "wti_crude_usd",
+      "label": "WTI crude (USD/bbl)",
+      "unit": "usd_bbl",
+      "expected": {
+        "op": "gte",
+        "value": 50,
+        "horizon": "cycle_floor"
+      },
+      "actual": {
+        "value": 93.16000366210938,
+        "as_of": "2026-07-23"
+      },
+      "status": "pass",
+      "source": "theme:wti_crude",
+      "evidence_tier": "market",
+      "last_checked": "2026-07-23",
+      "binds_to": {
+        "on_fail": "human_review",
+        "note": "Commodity cycle floor for land/royalty activity"
+      },
+      "in_base_irr": false,
+      "prediction_role": "orientation"
+    },
+    {
+      "kpi_id": "henry_hub_gas",
+      "label": "Henry Hub gas (USD/mmbtu)",
+      "unit": "usd_mmbtu",
+      "expected": {
+        "op": "lte",
+        "value": 8,
+        "horizon": "cost_ceiling"
+      },
+      "actual": {
+        "value": 2.928999900817871,
+        "as_of": "2026-07-23"
+      },
+      "status": "pass",
+      "source": "theme:henry_hub_gas",
+      "evidence_tier": "market",
+      "last_checked": "2026-07-23",
+      "binds_to": {
+        "on_fail": "human_review",
+        "note": "Power/gas cost interference for hosting and miners"
+      },
+      "in_base_irr": false,
+      "prediction_role": "interference"
+    }
+  ],
+  "summary": {
+    "pass": 2,
+    "fail": 0,
+    "stale": 0,
+    "unchecked": 0
+  },
+  "disclaimer": "Context only. Industry-scaffold KPIs do not auto-rewrite Lawrence base IRR."
+}

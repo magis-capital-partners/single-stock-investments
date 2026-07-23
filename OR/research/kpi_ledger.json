@@ -1,0 +1,74 @@
+{
+  "ticker": "OR",
+  "as_of": "2026-07-23",
+  "theme_ids": [
+    "gold_royalties",
+    "macro_regime"
+  ],
+  "industry_node_ids": [
+    "gold_royalty"
+  ],
+  "schema_version": "1.0",
+  "scaffold_meta": {
+    "generated_by": "scaffold_industry_kpi_ledgers.py",
+    "generated_at": "2026-07-23",
+    "note": "Industry-template scaffold. Context only; refine gates from filings."
+  },
+  "kpis": [
+    {
+      "kpi_id": "gold_spot_proxy",
+      "label": "Gold spot proxy (GLD USD when London fix unavailable)",
+      "unit": "usd_gld",
+      "expected": {
+        "op": "gte",
+        "value": 200,
+        "horizon": "bullion_floor"
+      },
+      "actual": {
+        "value": 370.7300109863281,
+        "as_of": "2026-07-23"
+      },
+      "status": "pass",
+      "source": "theme:gold_spot_usd",
+      "evidence_tier": "market",
+      "last_checked": "2026-07-23",
+      "binds_to": {
+        "on_fail": "human_review",
+        "note": "Bullion floor for royalty compounders"
+      },
+      "in_base_irr": false,
+      "prediction_role": "orientation"
+    },
+    {
+      "kpi_id": "gdx_gld_ratio",
+      "label": "GDX / GLD ratio (miners vs bullion)",
+      "unit": "ratio",
+      "expected": {
+        "op": "gte",
+        "value": 0.1,
+        "horizon": "sentiment_floor"
+      },
+      "actual": {
+        "value": 0.2017,
+        "as_of": "2026-07-23"
+      },
+      "status": "pass",
+      "source": "theme:gdx_gld_ratio",
+      "evidence_tier": "market",
+      "last_checked": "2026-07-23",
+      "binds_to": {
+        "on_fail": "human_review",
+        "note": "Miner vs bullion sentiment for royalty multiples"
+      },
+      "in_base_irr": false,
+      "prediction_role": "orientation"
+    }
+  ],
+  "summary": {
+    "pass": 2,
+    "fail": 0,
+    "stale": 0,
+    "unchecked": 0
+  },
+  "disclaimer": "Context only. Industry-scaffold KPIs do not auto-rewrite Lawrence base IRR."
+}

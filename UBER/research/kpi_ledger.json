@@ -1,0 +1,73 @@
+{
+  "ticker": "UBER",
+  "as_of": "2026-07-23",
+  "theme_ids": [
+    "macro_regime"
+  ],
+  "industry_node_ids": [
+    "robotaxi"
+  ],
+  "schema_version": "1.0",
+  "scaffold_meta": {
+    "generated_by": "scaffold_industry_kpi_ledgers.py",
+    "generated_at": "2026-07-23",
+    "note": "Industry-template scaffold. Context only; refine gates from filings."
+  },
+  "kpis": [
+    {
+      "kpi_id": "robotaxi_horizon_watch",
+      "label": "Robotaxi expert-horizon / city permit watch (human)",
+      "unit": "flag",
+      "expected": {
+        "op": "gte",
+        "value": 0,
+        "horizon": "human"
+      },
+      "actual": {
+        "value": null,
+        "as_of": null
+      },
+      "status": "unchecked",
+      "source": "manual:human",
+      "evidence_tier": "assumption",
+      "last_checked": "2026-07-23",
+      "binds_to": {
+        "on_fail": "human_review",
+        "note": "Cross-check expert_horizons/robotaxi.csv and city AV permits"
+      },
+      "in_base_irr": false,
+      "prediction_role": "orientation"
+    },
+    {
+      "kpi_id": "price_usd",
+      "label": "Share price (USD)",
+      "unit": "usd",
+      "expected": {
+        "op": "gte",
+        "value": 1,
+        "horizon": "listing"
+      },
+      "actual": {
+        "value": 72.17,
+        "as_of": "2026-07-20"
+      },
+      "status": "pass",
+      "source": "valuation:inputs.price",
+      "evidence_tier": "market",
+      "last_checked": "2026-07-23",
+      "binds_to": {
+        "on_fail": "human_review",
+        "note": "Price tape; fails if valuation inputs.price missing"
+      },
+      "in_base_irr": false,
+      "prediction_role": "interference"
+    }
+  ],
+  "summary": {
+    "pass": 1,
+    "fail": 0,
+    "stale": 0,
+    "unchecked": 1
+  },
+  "disclaimer": "Context only. Industry-scaffold KPIs do not auto-rewrite Lawrence base IRR."
+}

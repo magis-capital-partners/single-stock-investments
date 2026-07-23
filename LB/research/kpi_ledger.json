@@ -1,0 +1,139 @@
+{
+  "ticker": "LB",
+  "as_of": "2026-07-23",
+  "theme_ids": [
+    "ai_power_land"
+  ],
+  "schema_version": "1.0",
+  "kpis": [
+    {
+      "kpi_id": "hyperscaler_capex_guide_bn",
+      "label": "Hyperscaler capex guide (USD bn)",
+      "unit": "usd_bn",
+      "expected": {
+        "op": "gte",
+        "value": 300,
+        "horizon": "2026"
+      },
+      "actual": {
+        "value": 320.0,
+        "as_of": "2026-07-23"
+      },
+      "status": "pass",
+      "source": "theme:hyperscaler_capex_ttm_usd_bn",
+      "evidence_tier": "derived_filing",
+      "last_checked": "2026-07-23",
+      "binds_to": {
+        "valuation_path": "growth_explanation.mechanism",
+        "on_fail": "human_review",
+        "note": "AI/power demand supports surface and easement optionality"
+      },
+      "in_base_irr": false,
+      "prediction_role": "orientation"
+    },
+    {
+      "kpi_id": "easements_growth_y1_5",
+      "label": "Easements segment growth years 1-5 (fraction)",
+      "unit": "fraction",
+      "expected": {
+        "op": "gte",
+        "value": 0.04,
+        "horizon": "base"
+      },
+      "actual": {
+        "value": 0.07,
+        "as_of": "2026-07-15"
+      },
+      "status": "pass",
+      "source": "valuation:segment_build.segments[1].growth_y1_5",
+      "evidence_tier": "assumption",
+      "last_checked": "2026-07-23",
+      "binds_to": {
+        "valuation_path": "segment_build.segments[1].growth_y1_5",
+        "on_fail": "human_review",
+        "note": "easements segment"
+      },
+      "in_base_irr": false,
+      "prediction_role": "reinforcement"
+    },
+    {
+      "kpi_id": "surface_royalties_growth_y1_5",
+      "label": "Surface royalties growth years 1-5 (fraction)",
+      "unit": "fraction",
+      "expected": {
+        "op": "gte",
+        "value": 0.04,
+        "horizon": "base"
+      },
+      "actual": {
+        "value": 0.08,
+        "as_of": "2026-07-15"
+      },
+      "status": "pass",
+      "source": "valuation:segment_build.segments[0].growth_y1_5",
+      "evidence_tier": "assumption",
+      "last_checked": "2026-07-23",
+      "binds_to": {
+        "valuation_path": "segment_build.segments[0].growth_y1_5",
+        "on_fail": "human_review"
+      },
+      "in_base_irr": false,
+      "prediction_role": "reinforcement"
+    },
+    {
+      "kpi_id": "wti_crude_usd",
+      "label": "WTI crude (USD/bbl)",
+      "unit": "usd_bbl",
+      "expected": {
+        "op": "gte",
+        "value": 50,
+        "horizon": "cycle_floor"
+      },
+      "actual": {
+        "value": 93.16000366210938,
+        "as_of": "2026-07-23"
+      },
+      "status": "pass",
+      "source": "theme:wti_crude",
+      "evidence_tier": "market",
+      "last_checked": "2026-07-23",
+      "binds_to": {
+        "valuation_path": "growth_explanation.theory_implied.y1_5",
+        "on_fail": "human_review",
+        "note": "Delaware Basin activity context for surface fees"
+      },
+      "in_base_irr": false,
+      "prediction_role": "orientation"
+    },
+    {
+      "kpi_id": "theory_growth_y1_5",
+      "label": "Theory-implied growth years 1-5 (fraction)",
+      "unit": "fraction",
+      "expected": {
+        "op": "gte",
+        "value": 0.04,
+        "horizon": "theory"
+      },
+      "actual": {
+        "value": 0.0687,
+        "as_of": "2026-07-15"
+      },
+      "status": "pass",
+      "source": "valuation:growth_explanation.theory_implied.y1_5",
+      "evidence_tier": "assumption",
+      "last_checked": "2026-07-23",
+      "binds_to": {
+        "valuation_path": "growth_explanation.theory_implied.y1_5",
+        "on_fail": "human_review"
+      },
+      "in_base_irr": false,
+      "prediction_role": "orientation"
+    }
+  ],
+  "summary": {
+    "pass": 5,
+    "fail": 0,
+    "stale": 0,
+    "unchecked": 0
+  }
+}

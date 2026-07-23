@@ -15,7 +15,7 @@
       "description": "Demand chain behind land/surface/water optionality (TPL water, LB easements, WBI infra, APLD hosting, AZLCZ Southwest renewable). Hyperscaler capex is the upstream pulse; power and gas prices and Permian activity are the midstream signals.",
       "series": [
         {"id": "hyperscaler_capex_ttm_usd_bn", "label": "Hyperscaler capex guide (USD bn, latest)", "source": "repo_valuation", "good_for": "land_power_demand", "note": "Derived from ai_overlay in GOOGL/AMZN/META/MSFT valuation.json; filing-cited"},
-        {"id": "henry_hub_gas", "label": "Henry Hub natural gas spot (USD/MMBtu)", "source": "fred", "fred_id": "DHHNGSP", "good_for": "power_cost"},
+        {"id": "henry_hub_gas", "label": "Henry Hub natural gas spot (USD/MMBtu)", "source": "fred", "fred_id": "DHHNGSP", "good_for": "power_cost", "fallback": {"source": "yahoo_daily", "yahoo_symbol": "NG=F", "note": "NYMEX natural gas front-month when FRED DHHNGSP unavailable"}},
         {"id": "electricity_price_us", "label": "US avg electricity price (cents/kWh)", "source": "fred", "fred_id": "APU000072610", "good_for": "power_cost"},
         {"id": "wti_crude", "label": "WTI crude (USD/bbl)", "source": "fred", "fred_id": "DCOILWTICO", "good_for": "permian_cashflow", "fallback": {"source": "yahoo_daily", "yahoo_symbol": "CL=F", "note": "WTI front-month futures when FRED unavailable"}},
         {"id": "permian_crude_production_mbbl_d", "label": "Permian crude production (kbbl/d)", "source": "eia", "eia_route": "petroleum/crd/crpdn", "eia_facets": {"duoarea": "RTPP", "product": "EPC0", "process": "FPF"}, "good_for": "permian_volume", "optional": true, "note": "Requires EIA_API_KEY; null when absent"},

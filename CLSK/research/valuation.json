@@ -908,7 +908,7 @@
       "horizon_years": 7
     },
     "scenario_contract": {
-      "rule": "Cases must change causal operating, capital, probability, timing, or financing drivers\u2014not only the terminal multiple.",
+      "rule": "Cases must change causal operating, capital, probability, timing, or financing drivers—not only the terminal multiple.",
       "top_value_drivers": [
         {
           "component_id": "operating_business_fallback",
@@ -985,7 +985,7 @@
         "hard_to_vary": true,
         "falsifiable": true,
         "not_instrumentalist": true,
-        "reach": "Weights encode evidence tier (A primary \u2192 D external), not fitted to hit a target IRR"
+        "reach": "Weights encode evidence tier (A primary → D external), not fitted to hit a target IRR"
       },
       "qualitative_audit": {
         "flags": [],
@@ -998,5 +998,69 @@
       }
     },
     "notes": "Capstone IRR combining filings, segments, overlays, third-party, qualitative"
+  },
+  "world_model_context": {
+    "as_of": "2026-07-23",
+    "strip_label": "steady",
+    "industry_node_ids": [
+      "btc_mining_power"
+    ],
+    "industries": [
+      {
+        "node_id": "btc_mining_power",
+        "label": "Bitcoin mining & hashpower / power arbitrage",
+        "kind": "thesis",
+        "checklist": {
+          "capacity": {
+            "status": "watch",
+            "note": "Energized MW and fleet efficiency."
+          },
+          "pricing": {
+            "status": "watch",
+            "note": "Hashprice vs power cost; curtailment economics."
+          },
+          "regulatory": {
+            "status": "permissioning",
+            "note": "Interconnect and local energy politics."
+          }
+        }
+      }
+    ],
+    "theme_ids": [
+      "btc_hash_power",
+      "ai_power_land",
+      "macro_regime"
+    ],
+    "prediction_cards": [
+      {
+        "theme_id": "ai_power_land",
+        "phase_transition": "likely",
+        "regulatory": "permissioning",
+        "recursive": true,
+        "tam_magnetism": "high"
+      },
+      {
+        "theme_id": "btc_hash_power",
+        "phase_transition": "watch",
+        "regulatory": "permissioning",
+        "recursive": true,
+        "tam_magnetism": "medium"
+      },
+      {
+        "theme_id": "macro_regime",
+        "phase_transition": "gradual",
+        "regulatory": "uncertain",
+        "recursive": false,
+        "tam_magnetism": "low"
+      }
+    ],
+    "kpi_fails": [],
+    "kpi_stale": [],
+    "superorg_gaps": [],
+    "horizon_convergence": {},
+    "in_base_irr": false,
+    "promotion": null,
+    "disclaimer": "Context only. World Model fails and Superorg gaps flag [HUMAN REVIEW]; they do not auto-rewrite Lawrence base IRR. Promotion requires _system/reviews/pending/world_model_promote_{TICKER}_{date}.md.",
+    "human_review_required": false
   }
 }

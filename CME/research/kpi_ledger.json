@@ -1,0 +1,74 @@
+{
+  "ticker": "CME",
+  "as_of": "2026-07-23",
+  "theme_ids": [
+    "exchange_volatility",
+    "macro_regime"
+  ],
+  "industry_node_ids": [
+    "exchange_markets"
+  ],
+  "schema_version": "1.0",
+  "scaffold_meta": {
+    "generated_by": "scaffold_industry_kpi_ledgers.py",
+    "generated_at": "2026-07-23",
+    "note": "Industry-template scaffold. Context only; refine gates from filings."
+  },
+  "kpis": [
+    {
+      "kpi_id": "vix_level",
+      "label": "VIX index level",
+      "unit": "index",
+      "expected": {
+        "op": "gte",
+        "value": 12,
+        "horizon": "vol_floor_for_croupier"
+      },
+      "actual": {
+        "value": 19.639999389648438,
+        "as_of": "2026-07-23"
+      },
+      "status": "pass",
+      "source": "theme:vix_level",
+      "evidence_tier": "market",
+      "last_checked": "2026-07-23",
+      "binds_to": {
+        "on_fail": "human_review",
+        "note": "Vol pulse for exchange / market-data croupiers"
+      },
+      "in_base_irr": false,
+      "prediction_role": "orientation"
+    },
+    {
+      "kpi_id": "spy_20d_realized_vol",
+      "label": "SPY 20-day realized vol (annualized %)",
+      "unit": "pct",
+      "expected": {
+        "op": "gte",
+        "value": 8,
+        "horizon": "equity_vol_floor"
+      },
+      "actual": {
+        "value": 11.55,
+        "as_of": "2026-07-23"
+      },
+      "status": "pass",
+      "source": "theme:spy_20d_realized_vol",
+      "evidence_tier": "market",
+      "last_checked": "2026-07-23",
+      "binds_to": {
+        "on_fail": "human_review",
+        "note": "Equity vol context for fee/transaction intensity"
+      },
+      "in_base_irr": false,
+      "prediction_role": "orientation"
+    }
+  ],
+  "summary": {
+    "pass": 2,
+    "fail": 0,
+    "stale": 0,
+    "unchecked": 0
+  },
+  "disclaimer": "Context only. Industry-scaffold KPIs do not auto-rewrite Lawrence base IRR."
+}
