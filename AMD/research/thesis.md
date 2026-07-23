@@ -11,13 +11,13 @@
 | **Dhando** (Pabrai) | partial |
 | **Stance** | watch |
 | **Cycle** | up |
-| **Implied 7yr IRR** (base) | 7.84% (total synthesis) |
-| **IRR method** | full |
+| **Implied 7yr IRR** (base) | — |
+| **IRR method** | quality_reinvestment |
 | **Lawrence bucket** | pricing_power |
-| **Payoff lens** | pending |
+| **Payoff lens** | operating |
 | **MOI bucket** | pending |
 
-**Deep dive:** `AMD/research/deep_dive_2026-06-07.md` (auto-sync)
+**Deep dive:** `AMD/research/deep_dive_2026-07-23.md` (auto-sync)
 
 ## One-line thesis
 
