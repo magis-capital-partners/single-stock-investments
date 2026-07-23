@@ -1,0 +1,67 @@
+{
+  "as_of": "2026-07-23",
+  "status": "provisional_context_tier",
+  "disclaimer": "Practitioner priors for display and stress only. Context-tier priors only until reconstructed from SEC payout notices; then may enter base with cite. Reconstruct from SEC payout notices when possible.",
+  "priors": [
+    {
+      "id": "accelerate_market_implied_price_per_dollar",
+      "value": 0.15,
+      "unit": "usd_per_usd_max_payout",
+      "source": "Accelerate / Julian Klymochko Medium primer 2025-11-02",
+      "url": "https://julian-34159.medium.com/cvrs-unlocking-hidden-upside-in-m-a-deals-07019ae24d0e",
+      "tier": "context",
+      "notes": "Backed out from target price vs primary consideration near close; ~15y observation claim."
+    },
+    {
+      "id": "accelerate_avg_resolved_payout_per_dollar",
+      "value": 0.54,
+      "unit": "usd_per_usd_max_payout",
+      "source": "Accelerate Medium primer 2025-11-02",
+      "url": "https://julian-34159.medium.com/cvrs-unlocking-hidden-upside-in-m-a-deals-07019ae24d0e",
+      "tier": "context",
+      "notes": "Average among resolved CVRs with available data; sample spotty."
+    },
+    {
+      "id": "accelerate_avg_resolved_payout_per_dollar_v2",
+      "value": 0.52,
+      "unit": "usd_per_usd_max_payout",
+      "source": "Accelerate AlphaRank memo 2026-05-01; 26 of 84 CVRs since 2013 with payout data",
+      "url": "https://accelerateshares.com/research/alpharank-merger-spac-monitor-the-rise-of-the-cvr/",
+      "tier": "context",
+      "notes": "Range 0% to 100%."
+    },
+    {
+      "id": "secondary_any_payout_rate",
+      "value": 0.33,
+      "unit": "probability",
+      "source": "Secondary writeups citing Cleary / life-sciences surveys (p05)",
+      "url": "https://www.p05.org/contingent-value-rights-in-biotech-m-a-a-quantitative-analysis-of-market-evolution-and-valuation-dynamics/",
+      "tier": "context_low_confidence",
+      "notes": "Verify before use; heterogeneous samples."
+    },
+    {
+      "id": "secondary_full_payout_rate",
+      "value": 0.13,
+      "unit": "probability",
+      "source": "Secondary writeups citing Cleary / life-sciences surveys (p05)",
+      "url": "https://www.p05.org/contingent-value-rights-in-biotech-m-a-a-quantitative-analysis-of-market-evolution-and-valuation-dynamics/",
+      "tier": "context_low_confidence",
+      "notes": "Verify before use."
+    },
+    {
+      "id": "deal_completion_lift_with_cvr",
+      "value_low": 0.139,
+      "value_high": 0.221,
+      "unit": "probability_points",
+      "source": "Empirical review thesis / Academia abstract (matched Probit on ~41 CVRs)",
+      "url": "https://www.academia.edu/118089653/The_use_of_contingent_value_rights_in_M_and_A_an_empirical_review",
+      "tier": "academic_small_n",
+      "notes": "Deal completion effect for issuers, not secondary holder IRR."
+    }
+  ],
+  "manual_download_queue": [
+    "https://papers.ssrn.com/sol3/papers.cfm?abstract_id=424903",
+    "https://papers.ssrn.com/sol3/papers.cfm?abstract_id=3658643",
+    "https://www.academia.edu/118089653/"
+  ]
+}

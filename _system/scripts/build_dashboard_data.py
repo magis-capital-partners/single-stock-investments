@@ -43,6 +43,7 @@ DRIVE_FOLDER_INDEX_PATH = ROOT / "_system" / "reference" / "document-store" / "d
 CLASS_PATH = ROOT / "_system" / "portfolio" / "classification.json"
 REGISTRY_PATH = ROOT / "_system" / "portfolio" / "registry.json"
 SLEEVES_PATH = ROOT / "_system" / "portfolio" / "investment_sleeves.json"
+CVR_UNIVERSE_PATH = ROOT / "_system" / "reference" / "cvr" / "cvr_universe.json"
 GITHUB_REPO = "GoldmanDrew/single-stock-investments"
 UNIVERSE_INTAKE_WORKFLOW = "ls-algo-universe.yml"
 
@@ -650,6 +651,126 @@ def load_valuation(ticker_dir: Path) -> dict | None:
             except json.JSONDecodeError:
                 return None
     return None
+
+
+_CVR_UNIVERSE_CACHE: dict | None = None
+
+
+def load_cvr_universe() -> dict:
+    global _CVR_UNIVERSE_CACHE
+    if _CVR_UNIVERSE_CACHE is None:
+        _CVR_UNIVERSE_CACHE = _load_json(CVR_UNIVERSE_PATH) or {}
+    return _CVR_UNIVERSE_CACHE or {}
+
+
+def cvr_universe_index() -> dict[str, dict]:
+    """Map dashboard ticker -> universe row (pre_close or post_close)."""
+    doc = load_cvr_universe()
+    out: dict[str, dict] = {}
+    for row in doc.get("pre_close_opportunities") or []:
+        t = str(row.get("ticker") or "").strip()
+        if t:
+            out[t.upper()] = {**row, "stage": row.get("stage") or "pre_close"}
+    for row in doc.get("post_close_universe") or []:
+        t = str(row.get("ticker") or "").strip()
+        if t:
+            out[t.upper()] = {**row, "stage": row.get("stage") or "post_close"}
+    return out
+
+
+def _cvr_next_milestone(terms: dict) -> dict | None:
+    milestones = terms.get("milestones") or []
+    open_ms = [m for m in milestones if (m.get("status") or "open") == "open"]
+    pool = open_ms or milestones
+    if not pool:
+        return None
+    best = pool[0]
+    # Prefer explicit ISO-ish deadline strings for sorting when present.
+    def _key(m: dict) -> str:
+        return str(
+            m.get("deadline")
+            or m.get("outside_date")
+            or m.get("deadline_press")
+            or m.get("deadline_primary")
+            or "9999"
+        )
+
+    best = sorted(pool, key=_key)[0]
+    return {
+        "id": best.get("id"),
+        "description": best.get("description"),
+        "amount_usd": best.get("amount_usd")
+        or best.get("amount_primary_usd")
+        or best.get("max_payout_usd"),
+        "deadline": best.get("deadline")
+        or best.get("deadline_press")
+        or best.get("deadline_primary")
+        or best.get("outside_date"),
+        "status": best.get("status") or "open",
+    }
+
+
+def cvr_summary(ticker: str, ticker_dir: Path) -> dict | None:
+    """Compact CVR / contingent-consideration payload for dashboard filter + detail."""
+    urow = cvr_universe_index().get(ticker.upper())
+    terms_path = ticker_dir / "research" / "cvr_terms.json"
+    terms = _load_json(terms_path) if terms_path.exists() else None
+    if not urow and not terms:
+        return None
+    terms = terms or {}
+    parent = terms.get("parent_deal") or {}
+    stage = (urow or {}).get("stage") or terms.get("stage") or "unknown"
+    max_payout = (
+        (urow or {}).get("max_contingent_usd")
+        or (urow or {}).get("max_payout_usd")
+        or terms.get("max_payout_usd")
+        or parent.get("contingent_cash_per_share")
+    )
+    tradeable = terms.get("tradeable")
+    if tradeable is None:
+        tradeable = bool((urow or {}).get("tradeable")) if "tradeable" in (urow or {}) else stage == "pre_close"
+    sec_links = terms.get("sec_links") or []
+    primary_sec = None
+    for link in sec_links:
+        if link.get("url"):
+            primary_sec = {"label": link.get("label") or "SEC", "url": link.get("url")}
+            break
+    next_ms = _cvr_next_milestone(terms)
+    display = {
+        "pre_close": "Pre-close opportunity",
+        "post_close": "Post-close claim",
+        "resolved": "Resolved",
+    }.get(str(stage), str(stage).replace("_", " "))
+    return {
+        "id": (urow or {}).get("id") or terms.get("cvr_id") or ticker,
+        "stage": stage,
+        "stage_label": display,
+        "role": (urow or {}).get("role") or terms.get("sleeve_classification", {}).get("book_type"),
+        "tradeable": bool(tradeable),
+        "tradeable_vehicle": (urow or {}).get("tradeable_vehicle")
+        or terms.get("tradeable_vehicle")
+        or (ticker if stage == "pre_close" else None),
+        "max_payout_usd": max_payout,
+        "upfront_cash_usd": (urow or {}).get("upfront_cash_usd") or parent.get("upfront_cash_per_share"),
+        "stated_max_usd": (urow or {}).get("stated_max_usd") or parent.get("total_stated_max_per_share"),
+        "acquirer": (urow or {}).get("acquirer") or parent.get("acquirer") or parent.get("acquirer_ticker"),
+        "outside_date": (urow or {}).get("outside_date") or terms.get("outside_date"),
+        "expected_close": (urow or {}).get("expected_close") or parent.get("expected_close"),
+        "catalyst": (urow or {}).get("catalyst"),
+        "next_milestone": next_ms,
+        "p_market": terms.get("p_market")
+        if terms.get("p_market") is not None
+        else ((terms.get("display") or {}).get("p_market") if isinstance(terms.get("display"), dict) else None),
+        "p_marvin": terms.get("p_marvin")
+        if terms.get("p_marvin") is not None
+        else ((terms.get("display") or {}).get("p_marvin") if isinstance(terms.get("display"), dict) else None),
+        "irr_at_buy": terms.get("irr_at_buy")
+        if terms.get("irr_at_buy") is not None
+        else ((terms.get("display") or {}).get("irr_at_buy") if isinstance(terms.get("display"), dict) else None),
+        "primary_sec": primary_sec,
+        "terms_path": str(terms_path.relative_to(ROOT)).replace("\\", "/") if terms_path.exists() else None,
+        "as_of": terms.get("as_of") or terms.get("extraction_date") or (urow or {}).get("as_of"),
+    }
 
 
 def fund_nav_summary(ticker_dir: Path, holdings_meta: dict | None = None) -> dict | None:
@@ -2325,6 +2446,12 @@ def build_ticker_row(
         classification["instrument_type"] = row["fund_nav"].get("instrument_type") or "—"
     if row["fund_nav"] and classification.get("fund_edge") in ("—", "-", None, ""):
         classification["fund_edge"] = row["fund_nav"].get("edge") or "—"
+    row["cvr"] = cvr_summary(ticker, ticker_dir)
+    if row["cvr"] and classification.get("investment_sleeve") in ("—", "-", "pending", None, ""):
+        classification["investment_sleeve"] = "cvr_contingent"
+        classification["investment_sleeve_label"] = _INVESTMENT_SLEEVE_LABELS.get(
+            "cvr_contingent", "CVRs"
+        )
     return row
 
 
@@ -2469,6 +2596,7 @@ def build() -> dict:
     sleeve_filters = [{"id": "ALL", "label": "All sleeves"}]
     real_assets_union: set[str] = set()
     fund_nav_union: set[str] = set()
+    cvr_union: set[str] = set()
     for sleeve_id in _INVESTMENT_SLEEVE_LABELS:
         if sleeve_id.startswith("real_assets"):
             real_assets_union.update(
@@ -2482,6 +2610,33 @@ def build() -> dict:
                 for t, sid in _INVESTMENT_SLEEVE_INDEX.items()
                 if sid == sleeve_id
             )
+        if sleeve_id == "cvr_contingent":
+            cvr_union.update(
+                t
+                for t, sid in _INVESTMENT_SLEEVE_INDEX.items()
+                if sid == sleeve_id
+            )
+    # Also count rows that carry a cvr payload even if sleeve sync lagged.
+    cvr_union.update(
+        str(r.get("ticker") or "").upper()
+        for r in rows
+        if r.get("cvr")
+    )
+    if cvr_union:
+        sleeve_filters.append(
+            {
+                "id": "cvr_all",
+                "label": "CVRs",
+                "count": sum(
+                    1
+                    for r in rows
+                    if (r.get("classification") or {}).get("investment_sleeve")
+                    == "cvr_contingent"
+                    or r.get("cvr")
+                    or str(r.get("ticker") or "").upper() in cvr_union
+                ),
+            }
+        )
     if real_assets_union:
         sleeve_filters.append(
             {
@@ -2503,8 +2658,10 @@ def build() -> dict:
             }
         )
     for sleeve_id, label in sorted(_INVESTMENT_SLEEVE_LABELS.items(), key=lambda x: x[1]):
-        # Meta filter fund_nav_all already covers this single sleeve.
+        # Meta filters already cover these single sleeves near the top.
         if sleeve_id == "fund_nav_discounts" and fund_nav_union:
+            continue
+        if sleeve_id == "cvr_contingent" and cvr_union:
             continue
         count = sum(
             1
