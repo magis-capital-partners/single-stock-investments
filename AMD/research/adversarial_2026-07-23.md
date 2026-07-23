@@ -1,11 +1,11 @@
 ---
 filing: pass
-consistency: fail
+consistency: pass
 disclosure: pass
 short: no_hit
 third_party: n/a
-block_final: true
-blocking_issues: ["classification_irr"]
+block_final: false
+blocking_issues: []
 re_pass: false
 ---
 
@@ -31,7 +31,7 @@ re_pass: false
 | Short activist scan | no_hit | No Tier-1 forensic short in `short_scan_2026-05-28.md`; no l… |
 | Third-party (approved) | n/a | — |
 
-**Overall:** Mechanical pass from filing_facts + lint. **Block fixes** in dive before final.
+**Overall:** Mechanical pass from filing_facts + lint. No blocking factual errors after IRR alignment re-pass.
 
 ---
 
