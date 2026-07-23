@@ -105,6 +105,34 @@ def quarter_matches_filter(quarter_id: str | None, quarter_filter: str | None, s
     return True
 
 
+def shard_bucket(identifier: str, shard_count: int) -> int:
+    """Deterministic shard index in ``[0, shard_count)`` from a stable id."""
+    if shard_count <= 1:
+        return 0
+    digest = hashlib.sha256(str(identifier).encode("utf-8")).hexdigest()
+    return int(digest[:16], 16) % shard_count
+
+
+def in_shard(identifier: str, *, shard_index: int, shard_count: int) -> bool:
+    if shard_count <= 1:
+        return True
+    if shard_index < 0 or shard_index >= shard_count:
+        raise ValueError(f"shard_index {shard_index} out of range for shard_count {shard_count}")
+    return shard_bucket(identifier, shard_count) == shard_index
+
+
+def filter_shard(
+    rows: list,
+    *,
+    shard_index: int,
+    shard_count: int,
+    key_fn,
+) -> list:
+    if shard_count <= 1:
+        return rows
+    return [row for row in rows if in_shard(key_fn(row), shard_index=shard_index, shard_count=shard_count)]
+
+
 def load_manifest() -> dict:
     data = load_json(MANIFEST_PATH)
     data.setdefault("schema_version", 1)
@@ -367,9 +395,26 @@ def main() -> int:
     parser.add_argument("--skip-download", action="store_true", help="Only run text extraction on existing PDFs")
     parser.add_argument("--skip-text", action="store_true", help="Skip PDF -> txt extraction")
     parser.add_argument("--max-files", type=int, help="Limit downloads/extractions (smoke test)")
+    parser.add_argument(
+        "--shard-index",
+        type=int,
+        default=0,
+        help="Zero-based shard to process (with --shard-count). Deterministic by file id / path.",
+    )
+    parser.add_argument(
+        "--shard-count",
+        type=int,
+        default=1,
+        help="Split work into N deterministic shards so each CI job stays under timeout.",
+    )
     parser.add_argument("--build", action="store_true", help="Run insights + dashboard build after import")
     parser.add_argument("--report", action="store_true", help="Write letter_drive_gaps report without importing")
     args = parser.parse_args()
+
+    if args.shard_count < 1:
+        parser.error("--shard-count must be >= 1")
+    if args.shard_index < 0 or args.shard_index >= args.shard_count:
+        parser.error(f"--shard-index must be in [0, {args.shard_count})")
 
     if args.report:
         from datetime import date as date_cls
@@ -415,7 +460,11 @@ def main() -> int:
     quarter_filter = args.quarter.upper() if args.quarter else None
     since_year = args.since_year
 
-    print(f"=== import_drive_letter_orphans (roots={len(root_ids)}) ===", flush=True)
+    print(
+        f"=== import_drive_letter_orphans (roots={len(root_ids)}, "
+        f"shard={args.shard_index}/{args.shard_count}) ===",
+        flush=True,
+    )
     service = None if args.skip_download or (args.dry_run and args.from_index) else drive_service(readonly=args.dry_run)
     manifest = load_manifest()
     manifest_files: dict = manifest["files"]
@@ -426,9 +475,19 @@ def main() -> int:
             pdfs = [p for p in pdfs if p.parent.name.upper() == quarter_filter]
         if since_year:
             pdfs = [p for p in pdfs if int(p.parent.name[:4]) >= since_year]
+        before_shard = len(pdfs)
+        pdfs = filter_shard(
+            pdfs,
+            shard_index=args.shard_index,
+            shard_count=args.shard_count,
+            key_fn=lambda p: f"{p.parent.name}/{p.name}".replace("\\", "/"),
+        )
         if args.max_files:
             pdfs = pdfs[: args.max_files]
-        print(f"  Existing local PDFs: {len(pdfs)}")
+        print(
+            f"  Existing local PDFs: {len(pdfs)} "
+            f"(from {before_shard} after shard {args.shard_index}/{args.shard_count})"
+        )
     else:
         if args.from_index:
             candidates = collect_letter_pdfs_from_index(
@@ -442,9 +501,19 @@ def main() -> int:
                 quarter_filter=quarter_filter,
                 since_year=since_year,
             )
+        before_shard = len(candidates)
+        candidates = filter_shard(
+            candidates,
+            shard_index=args.shard_index,
+            shard_count=args.shard_count,
+            key_fn=lambda row: row.get("file_id") or row.get("drive_path") or row.get("name") or "",
+        )
         if args.max_files:
             candidates = candidates[: args.max_files]
-        print(f"  Drive letter PDFs matched: {len(candidates)}")
+        print(
+            f"  Drive letter PDFs matched: {len(candidates)} "
+            f"(from {before_shard} after shard {args.shard_index}/{args.shard_count})"
+        )
         if args.dry_run:
             by_q: dict[str, int] = {}
             for row in candidates:

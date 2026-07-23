@@ -11,6 +11,10 @@ on:
         description: "Optional lower bound year (e.g. 2024). Empty = all quarters."
         required: false
         default: ""
+      shard_count:
+        description: "Deterministic shard count (each shard is its own job/timeout)."
+        required: false
+        default: "8"
 
 permissions:
   contents: write
@@ -21,17 +25,42 @@ env:
   RESEARCH_VAULT_ROOT: _external/research-vault
 
 jobs:
-  # Cold Drive import of ~20k PDFs can take ~4h. Commit the vault *before*
-  # text extract so a later timeout does not throw away the download, and so
-  # the next run can skip existing PDFs by size/sha.
-  #
-  # Download uses its own concurrency group so it is not blocked behind
-  # Data Pipeline / other data-commit-main writers (vault-only commits).
-  download-letters:
+  prepare:
     runs-on: ubuntu-latest
-    timeout-minutes: 360
+    timeout-minutes: 5
+    outputs:
+      shard_count: ${{ steps.matrix.outputs.shard_count }}
+      shard_matrix: ${{ steps.matrix.outputs.shard_matrix }}
+    steps:
+      - id: matrix
+        env:
+          RAW: ${{ github.event.inputs.shard_count || '8' }}
+        run: |
+          set -euo pipefail
+          COUNT="$RAW"
+          if ! [[ "$COUNT" =~ ^[0-9]+$ ]] || [ "$COUNT" -lt 1 ] || [ "$COUNT" -gt 16 ]; then
+            echo "::error::shard_count must be an integer 1..16 (got '$COUNT')"
+            exit 1
+          fi
+          MATRIX=$(python -c "import json; print(json.dumps({'shard': list(range($COUNT))}))")
+          echo "shard_count=$COUNT" >> "$GITHUB_OUTPUT"
+          echo "shard_matrix=$MATRIX" >> "$GITHUB_OUTPUT"
+          echo "Using $COUNT deterministic letter shards"
+
+  # Cold Drive import of ~20k PDFs previously timed out as one job. Split into
+  # deterministic shards (stable sha256(file_id) % N). Each shard commits to the
+  # vault before the next starts (max-parallel: 1) so progress is checkpointed
+  # and skip-existing can resume after cancel/timeout.
+  download-letters:
+    needs: prepare
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    strategy:
+      fail-fast: false
+      max-parallel: 1
+      matrix: ${{ fromJson(needs.prepare.outputs.shard_matrix) }}
     concurrency:
-      group: letter-vault-download
+      group: letter-vault-download-${{ matrix.shard }}
       cancel-in-progress: false
     steps:
       - uses: jlumbroso/free-disk-space@54081f138730dfa15788a46383842cd2f914a1be # v1.3.1
@@ -42,6 +71,7 @@ jobs:
           haskell: true
           docker-images: true
           swap-storage: true
+
       - uses: actions/checkout@v4
         with:
           sparse-checkout: |
@@ -50,6 +80,7 @@ jobs:
             _system/scripts/ci_sparse_checkout_paths.py
           sparse-checkout-cone-mode: false
           fetch-depth: 1
+
       - name: Checkout workspace (minimal + scripts)
         run: bash _system/scripts/ci_checkout_workspace.sh minimal
 
@@ -79,11 +110,13 @@ jobs:
           printf '%s' "$GOOGLE_APPLICATION_CREDENTIALS_JSON" > "$RUNNER_TEMP/google-service-account.json"
           echo "GOOGLE_APPLICATION_CREDENTIALS=$RUNNER_TEMP/google-service-account.json" >> "$GITHUB_ENV"
 
-      - name: Import letters from Google Drive
+      - name: Import letter shard from Google Drive
         env:
           SINCE_YEAR: ${{ github.event.inputs.since_year || '' }}
+          SHARD: ${{ matrix.shard }}
+          SHARD_COUNT: ${{ needs.prepare.outputs.shard_count }}
         run: |
-          ARGS=(--all --skip-text)
+          ARGS=(--all --skip-text --shard-index "$SHARD" --shard-count "$SHARD_COUNT")
           if [ -n "$SINCE_YEAR" ]; then
             ARGS+=(--since-year "$SINCE_YEAR")
           fi
@@ -93,15 +126,79 @@ jobs:
         uses: ./.github/actions/commit-vault
         with:
           message: |
-            Download superinvestor letter PDFs from Google Drive.
+            Download superinvestor letter PDFs (shard ${{ matrix.shard }}/${{ needs.prepare.outputs.shard_count }}).
 
             Automated import from letter-backfill download-letters job.
           git_add: superinvestor-letters/
 
-  extract-and-publish:
-    needs: download-letters
+  extract-letters:
+    needs: [prepare, download-letters]
     runs-on: ubuntu-latest
-    timeout-minutes: 360
+    timeout-minutes: 120
+    strategy:
+      fail-fast: false
+      max-parallel: 1
+      matrix: ${{ fromJson(needs.prepare.outputs.shard_matrix) }}
+    concurrency:
+      group: letter-vault-extract-${{ matrix.shard }}
+      cancel-in-progress: false
+    steps:
+      - uses: jlumbroso/free-disk-space@54081f138730dfa15788a46383842cd2f914a1be # v1.3.1
+        with:
+          tool-cache: false
+          android: true
+          dotnet: true
+          haskell: true
+          docker-images: true
+          swap-storage: true
+
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            _system/scripts/ci_checkout_workspace.sh
+            _system/scripts/ci_resolve_checkout_ref.sh
+            _system/scripts/ci_sparse_checkout_paths.py
+          sparse-checkout-cone-mode: false
+          fetch-depth: 1
+
+      - name: Checkout workspace (minimal + scripts)
+        run: bash _system/scripts/ci_checkout_workspace.sh minimal
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: pip install -r _system/scripts/requirements.txt
+
+      - name: Checkout research vault
+        uses: ./.github/actions/checkout-vault
+
+      - name: Extract text for letter shard
+        env:
+          SINCE_YEAR: ${{ github.event.inputs.since_year || '' }}
+          SHARD: ${{ matrix.shard }}
+          SHARD_COUNT: ${{ needs.prepare.outputs.shard_count }}
+        run: |
+          ARGS=(--skip-download --shard-index "$SHARD" --shard-count "$SHARD_COUNT")
+          if [ -n "$SINCE_YEAR" ]; then
+            ARGS+=(--since-year "$SINCE_YEAR")
+          fi
+          python _system/scripts/import_drive_letter_orphans.py "${ARGS[@]}"
+
+      - name: Commit letter extracts to research vault
+        uses: ./.github/actions/commit-vault
+        with:
+          message: |
+            Extract text for superinvestor letters (shard ${{ matrix.shard }}/${{ needs.prepare.outputs.shard_count }}).
+
+            Automated extract from letter-backfill extract-letters job.
+          git_add: superinvestor-letters/
+
+  publish-dashboard:
+    needs: extract-letters
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
     concurrency:
       group: data-commit-main
       cancel-in-progress: false
@@ -135,16 +232,6 @@ jobs:
       - name: Checkout research vault
         uses: ./.github/actions/checkout-vault
 
-      - name: Extract text from local letter PDFs
-        env:
-          SINCE_YEAR: ${{ github.event.inputs.since_year || '' }}
-        run: |
-          ARGS=(--skip-download)
-          if [ -n "$SINCE_YEAR" ]; then
-            ARGS+=(--since-year "$SINCE_YEAR")
-          fi
-          python _system/scripts/import_drive_letter_orphans.py "${ARGS[@]}"
-
       - name: Letter date parser gold gate
         run: make letter-date-check
 
@@ -163,15 +250,6 @@ jobs:
       - name: Sync letter registry to Drive
         if: env.SKIP_DRIVE_SYNC != '1'
         run: make document-sync-drive-letters
-
-      - name: Commit letter extracts to research vault
-        uses: ./.github/actions/commit-vault
-        with:
-          message: |
-            Extract text for superinvestor letters.
-
-            Automated extract from letter-backfill extract-and-publish job.
-          git_add: superinvestor-letters/
 
       - name: Rebuild ops dashboard payloads
         run: |
