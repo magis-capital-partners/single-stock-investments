@@ -1434,6 +1434,161 @@
     return rows;
   }
 
+  function renderWorldModelStrip(worldModel, escapeHtml) {
+    const strip = worldModel && worldModel.strip;
+    if (!strip) {
+      return `<div class="detail-section world-model-strip" style="margin-bottom:14px">
+        <h3 style="font-size:14px;margin:0 0 6px">World Model</h3>
+        <p class="tier-sub">No snapshot yet. Run: python _system/scripts/build_world_model_snapshot.py</p>
+      </div>`;
+    }
+    const label = strip.label || 'steady';
+    const labelCls = label === 'broken' ? 'badge-bad' : (label === 'attention' ? 'badge-warn' : 'badge-ok');
+    const counts = strip.counts || {};
+    const countLine = [
+      counts.fail != null ? `${counts.fail} failed` : '',
+      counts.stale != null ? `${counts.stale} stale` : '',
+      counts.drifted_edges != null ? `${counts.drifted_edges} drifted` : '',
+      counts.pass != null ? `${counts.pass} passing` : '',
+      counts.unchecked != null ? `${counts.unchecked} unchecked` : '',
+      counts.ledgers != null ? `${counts.ledgers} ledgers` : '',
+    ].filter(Boolean).join(' · ');
+
+    const alertRows = [...(strip.broken || []), ...(strip.stale || [])].slice(0, 12).map(r => `
+      <tr>
+        <td class="mono">${escapeHtml(r.ticker || '')}</td>
+        <td><span class="badge ${r.status === 'fail' ? 'badge-bad' : 'badge-warn'}">${escapeHtml(r.status || '')}</span></td>
+        <td style="font-size:12px">${escapeHtml(r.kpi_id || r.label || '')}</td>
+      </tr>`).join('');
+
+    const passRows = (strip.passes || []).slice(0, 80).map(r => {
+      const role = r.prediction_role || '';
+      const inds = (r.industry_node_ids || []).join(', ');
+      const exp = r.expected || {};
+      const gate = exp.op && exp.value != null ? `${exp.op} ${exp.value}` : '';
+      return `<tr>
+        <td class="mono">${escapeHtml(r.ticker || '')}</td>
+        <td class="tier-sub" style="font-size:11px">${escapeHtml(inds)}</td>
+        <td style="font-size:12px">${escapeHtml(r.kpi_id || '')}${role ? ` <span class="badge badge-us">${escapeHtml(role)}</span>` : ''}</td>
+        <td class="mono">${r.actual != null ? escapeHtml(String(r.actual)) : '—'}</td>
+        <td class="mono tier-sub">${escapeHtml(gate)}</td>
+      </tr>`;
+    }).join('');
+
+    const cardRows = (strip.prediction_cards || []).map(c => `<tr>
+      <td class="mono">${escapeHtml(c.theme_id || '')}</td>
+      <td>${escapeHtml(c.phase_transition || '')}</td>
+      <td>${escapeHtml(c.regulatory || '')}</td>
+      <td class="tier-sub">${c.recursive ? 'recursive' : '—'} · ${escapeHtml(c.tam_magnetism || '')}</td>
+    </tr>`).join('');
+
+    const superRows = (strip.superorgs || []).map(s => {
+      const pillars = s.pillars || {};
+      const bits = Object.keys(pillars).map(k => `${k}:${pillars[k]}`).join(' · ');
+      return `<tr>
+        <td class="mono">${escapeHtml(s.org_id || s.label || '')}</td>
+        <td class="tier-sub" style="font-size:11px">${escapeHtml(bits)}</td>
+        <td style="font-size:12px">${escapeHtml(s.stance_implication || '')}</td>
+      </tr>`;
+    }).join('');
+
+    const horizonRows = (strip.expert_horizons || []).map(h => {
+      const latest = h.latest || {};
+      const convCls = h.convergence === 'converging' ? 'badge-ok' : (h.convergence === 'receding' ? 'badge-bad' : 'badge-us');
+      return `<tr>
+        <td class="mono">${escapeHtml(h.domain || '')}</td>
+        <td><span class="badge ${convCls}">${escapeHtml(h.convergence || '')}</span></td>
+        <td class="mono">${latest.years_ahead != null ? escapeHtml(String(latest.years_ahead)) : '—'}y</td>
+        <td style="font-size:12px">${escapeHtml(latest.speaker || '')}: ${escapeHtml(latest.quote_note || '')}</td>
+      </tr>`;
+    }).join('');
+
+    const industryNodes = strip.industry_nodes || [];
+    const thesisInd = industryNodes.filter(n => (n.kind || 'thesis') !== 'horizon_industry');
+    const horizonInd = industryNodes.filter(n => n.kind === 'horizon_industry');
+    const industryScope = strip.industry_scope
+      || `Industries: ${industryNodes.length} (${thesisInd.length} thesis, ${horizonInd.length} horizon). Macro is a regime card, not an industry.`;
+    const industryRows = industryNodes.map(n => {
+      const cl = n.checklist || {};
+      const bits = ['capacity', 'pricing', 'regulatory'].map(k => {
+        const st = (cl[k] && cl[k].status) || '—';
+        return `${k}:${st}`;
+      }).join(' · ');
+      const kind = n.kind || 'thesis';
+      return `<tr>
+        <td class="mono">${escapeHtml(n.node_id || '')}</td>
+        <td><span class="badge ${kind === 'horizon_industry' ? 'badge-warn' : 'badge-ok'}">${escapeHtml(kind === 'horizon_industry' ? 'horizon' : 'thesis')}</span></td>
+        <td style="font-size:12px">${escapeHtml(n.label || '')}</td>
+        <td class="tier-sub">${escapeHtml(bits)}</td>
+      </tr>`;
+    }).join('');
+
+    return `
+      <div class="detail-section world-model-strip" style="margin-bottom:14px">
+        <div style="display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-bottom:8px">
+          <h3 style="font-size:14px;margin:0">World Model</h3>
+          <span class="badge ${labelCls}" style="font-size:13px;padding:4px 10px">${escapeHtml(label)}</span>
+          ${strip.as_of ? `<span class="mono tier-sub">${escapeHtml(String(strip.as_of))}</span>` : ''}
+          ${countLine ? `<span class="tier-sub">${escapeHtml(countLine)}</span>` : ''}
+        </div>
+        <p style="margin:0 0 6px;font-size:13px;max-width:900px">${escapeHtml(strip.summary || '')}</p>
+        <p style="margin:0 0 8px;font-size:12px;max-width:900px;color:var(--text-secondary)">${escapeHtml(industryScope)}</p>
+        ${strip.ev_stance ? `<p style="margin:0 0 10px;font-size:12px;max-width:900px;color:var(--text-secondary)">${escapeHtml(strip.ev_stance)}</p>` : ''}
+        ${alertRows ? `
+        <table class="darwin-table" style="max-width:900px;margin-bottom:8px">
+          <thead><tr><th>Ticker</th><th>Status</th><th>KPI</th></tr></thead>
+          <tbody>${alertRows}</tbody>
+        </table>` : `<p class="tier-sub" style="margin-bottom:8px">No exceptions — expand panels below for passing KPIs across industry buckets.</p>`}
+        <details class="world-model-panel" style="margin:6px 0" ${label === 'steady' || label === 'attention' ? 'open' : ''}>
+          <summary style="cursor:pointer;font-size:13px">Passing KPIs (${(strip.passes || []).length})</summary>
+          ${passRows ? `<table class="darwin-table" style="max-width:980px;margin-top:8px">
+            <thead><tr><th>Ticker</th><th>Industry</th><th>KPI</th><th>Actual</th><th>Gate</th></tr></thead>
+            <tbody>${passRows}</tbody>
+          </table>` : '<p class="tier-sub">No pass rows.</p>'}
+        </details>
+        <details class="world-model-panel" style="margin:6px 0">
+          <summary style="cursor:pointer;font-size:13px">Unchecked / human KPIs (${(strip.unchecked || []).length})</summary>
+          ${(strip.unchecked || []).length ? `<table class="darwin-table" style="max-width:900px;margin-top:8px">
+            <thead><tr><th>Ticker</th><th>Industry</th><th>KPI</th></tr></thead>
+            <tbody>${(strip.unchecked || []).slice(0, 60).map(r => `<tr>
+              <td class="mono">${escapeHtml(r.ticker || '')}</td>
+              <td class="tier-sub" style="font-size:11px">${escapeHtml((r.industry_node_ids || []).join(', '))}</td>
+              <td style="font-size:12px">${escapeHtml(r.kpi_id || '')}</td>
+            </tr>`).join('')}</tbody>
+          </table>` : '<p class="tier-sub">None.</p>'}
+        </details>
+        <details class="world-model-panel" style="margin:6px 0">
+          <summary style="cursor:pointer;font-size:13px">Theme prediction cards (${(strip.prediction_cards || []).length})</summary>
+          ${cardRows ? `<table class="darwin-table" style="max-width:900px;margin-top:8px">
+            <thead><tr><th>Theme</th><th>Phase</th><th>Regulatory</th><th>Reinforcement</th></tr></thead>
+            <tbody>${cardRows}</tbody>
+          </table>` : '<p class="tier-sub">No prediction cards.</p>'}
+        </details>
+        <details class="world-model-panel" style="margin:6px 0">
+          <summary style="cursor:pointer;font-size:13px">Superorganisations (${(strip.superorgs || []).length})</summary>
+          ${superRows ? `<table class="darwin-table" style="max-width:960px;margin-top:8px">
+            <thead><tr><th>Org</th><th>Pillars</th><th>Stance implication</th></tr></thead>
+            <tbody>${superRows}</tbody>
+          </table>` : '<p class="tier-sub">No Superorg cards.</p>'}
+        </details>
+        <details class="world-model-panel" style="margin:6px 0">
+          <summary style="cursor:pointer;font-size:13px">Expert horizons (${(strip.expert_horizons || []).length}) · context only</summary>
+          ${horizonRows ? `<table class="darwin-table" style="max-width:900px;margin-top:8px">
+            <thead><tr><th>Domain</th><th>Convergence</th><th>Latest</th><th>Quote</th></tr></thead>
+            <tbody>${horizonRows}</tbody>
+          </table>` : '<p class="tier-sub">No horizon series.</p>'}
+        </details>
+        <details class="world-model-panel" style="margin:6px 0">
+          <summary style="cursor:pointer;font-size:13px">Industries (${industryNodes.length}: ${thesisInd.length} thesis + ${horizonInd.length} horizon)</summary>
+          ${industryRows ? `<table class="darwin-table" style="max-width:900px;margin-top:8px">
+            <thead><tr><th>Node</th><th>Kind</th><th>Label</th><th>Checklist</th></tr></thead>
+            <tbody>${industryRows}</tbody>
+          </table>` : '<p class="tier-sub">No industry nodes.</p>'}
+        </details>
+        <p class="tier-sub" style="margin-top:8px">Courtenay foresight layer — fail/stale/Superorg gaps → [HUMAN REVIEW]; does not auto-rewrite base IRR.</p>
+      </div>`;
+  }
+
   function renderPortfolioMacroStrip(portfolioMacroRegime, escapeHtml, linkHtml, portfolioMacro) {
     const regime = portfolioMacroRegime || null;
     if (regime && (regime.label || (regime.series || []).length)) {
@@ -3444,6 +3599,7 @@
       pdfTimeMode = 'period',
       portfolioMacro = [],
       portfolioMacroRegime = null,
+      worldModel = null,
       tickerSourceFilter = 'ownership',
       kpiTrends = null,
       inflectionTier = 'displayed',
@@ -3590,7 +3746,8 @@
         pdfTimeMode,
       });
     } else if (activeSection === 'tickers') {
-      body = renderPortfolioMacroStrip(portfolioMacroRegime, escapeHtml, linkHtml, portfolioMacro)
+      body = renderWorldModelStrip(worldModel, escapeHtml)
+        + renderPortfolioMacroStrip(portfolioMacroRegime, escapeHtml, linkHtml, portfolioMacro)
         + renderTickerEssentials(tickers, escapeHtml, linkHtml, {
           search: fundSearch,
           bookOnly,

@@ -1,0 +1,72 @@
+{
+  "description": "Cross-ticker derivation edges for the World Model. Context only: never auto-inflate Lawrence base IRR. fetch_theme_panel remains the fetcher; this registry is the graph + write policy.",
+  "schema_version": "1.0",
+  "in_base_irr_default": false,
+  "edges": [
+    {
+      "edge_id": "hyperscaler_capex_to_land_power",
+      "theme_id": "ai_power_land",
+      "label": "Hyperscaler capex guide → land/power KPIs",
+      "from": {
+        "metric": "hyperscaler_capex_ttm_usd_bn",
+        "unit": "usd_bn",
+        "source": "theme"
+      },
+      "to": {
+        "tickers": ["TPL", "APLD", "LB"],
+        "kpi_ids": ["hyperscaler_capex_guide_bn"]
+      },
+      "formula": {
+        "type": "passthrough_theme",
+        "theme_series": "hyperscaler_capex_ttm_usd_bn"
+      },
+      "evidence_tier": "derived_filing",
+      "writes": "derived_metrics",
+      "in_base_irr": false
+    },
+    {
+      "edge_id": "gold_spot_to_royalty_sentiment",
+      "theme_id": "gold_royalties",
+      "label": "Gold spot / GDX-GLD → royalty sentiment",
+      "from": {
+        "metric": "gold_spot_usd",
+        "unit": "usd_oz_or_gld_proxy",
+        "source": "theme"
+      },
+      "to": {
+        "tickers": ["RGLD", "MSB"],
+        "kpi_ids": ["gold_spot_proxy"]
+      },
+      "formula": {
+        "type": "passthrough_theme",
+        "theme_series": "gold_spot_usd"
+      },
+      "evidence_tier": "market",
+      "writes": "derived_metrics",
+      "in_base_irr": false,
+      "note": "Ledger rows optional; derived_metrics always updated when theme series present"
+    },
+    {
+      "edge_id": "vix_to_exchange_vol_context",
+      "theme_id": "exchange_volatility",
+      "label": "VIX → exchange vol context",
+      "from": {
+        "metric": "vix_level",
+        "unit": "index",
+        "source": "theme"
+      },
+      "to": {
+        "tickers": ["ICE"],
+        "kpi_ids": ["vix_level"]
+      },
+      "formula": {
+        "type": "passthrough_theme",
+        "theme_series": "vix_level"
+      },
+      "evidence_tier": "market",
+      "writes": "derived_metrics",
+      "in_base_irr": false,
+      "note": "Croupier vol pulse; context for stance sizing only"
+    }
+  ]
+}

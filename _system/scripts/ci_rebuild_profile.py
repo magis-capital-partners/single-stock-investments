@@ -26,6 +26,7 @@ ALIASES = {
     "pages-fast": "insights",
     "darwin-full": "darwin",
     "intake-full": "full",
+    "world-model-monthly": "world-model-weekly",
 }
 
 # Steps that require GOOGLE_APPLICATION_CREDENTIALS (Shared Drive API).
@@ -102,6 +103,26 @@ PROFILES: dict[str, list[list[str]]] = {
         # Valuation authority is owned by the Power Zone Universe workflow
         # (run_security_decision_pipeline) and the activist slice by the
         # dedicated 06:00 Data Pipeline job; neither is duplicated here.
+        ["_system/scripts/build_dashboard_data.py"],
+    ],
+    "world-model-weekly": [
+        ["_system/scripts/fetch_theme_panel.py"],
+        ["_system/scripts/scaffold_industry_kpi_ledgers.py", "--write"],
+        ["_system/scripts/resolve_linkages.py", "--update-ledgers"],
+        [
+            "_system/scripts/check_kpi_ledger.py",
+            "--write",
+            "--mark-auto",
+            "--queue-reviews",
+        ],
+        ["_system/scripts/lint_kpi_ledger.py"],
+        ["_system/scripts/build_world_model_snapshot.py", "--skip-resolve"],
+        [
+            "_system/scripts/apply_world_model_context.py",
+            "--all",
+            "--write",
+            "--queue-reviews",
+        ],
         ["_system/scripts/build_dashboard_data.py"],
     ],
 }

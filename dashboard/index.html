@@ -403,6 +403,8 @@
   .nav-disc-pos { color: var(--positive); font-variant-numeric: tabular-nums; }
   .nav-disc-neg { color: var(--negative); font-variant-numeric: tabular-nums; }
   .nav-disc-flat { color: var(--text-muted); font-variant-numeric: tabular-nums; }
+  .nav-disc-stack { display: flex; flex-direction: column; gap: 1px; line-height: 1.25; font-variant-numeric: tabular-nums; }
+  .nav-disc-stack .nav-disc-sub { font-size: 10px; color: var(--text-muted); }
   .sleeve-cell { display: flex; flex-direction: column; gap: 3px; align-items: flex-start; }
   .persona-tabs .view-tab { font-size: 11px; padding: 4px 8px; }
   .darwin-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; margin-bottom: 18px; }
@@ -863,7 +865,7 @@ const HOLDINGS_COLUMNS = [
   { id: 'market', label: 'Mkt', sort: 'market', group: 'core' },
   { id: 'sleeve', label: 'Sleeve', sort: 'classification.investment_sleeve_label', group: 'core' },
   { id: 'cvr_stage', label: 'CVR', sort: 'cvr.stage', group: 'core' },
-  { id: 'nav_disc', label: 'NAV disc.', sort: 'fund_nav.discount_to_reported_nav_pct', group: 'core' },
+  { id: 'nav_disc', label: 'NAV disc.', sort: 'fund_nav.display_discount_pct', group: 'core' },
   { id: 'stance', label: 'Stance', sort: 'classification.stance', group: 'core' },
   { id: 'valuation', label: 'Val', sort: 'component_valuation.status', group: 'core' },
   { id: 'value', label: 'Value', sort: 'component_valuation.total_equity_value_per_share.base', group: 'core' },
@@ -1690,6 +1692,7 @@ function loadLazyFile(key) {
     research_memory: () => loadShardOnce('file:research_memory', 'data/research_memory.json', (doc) => { data.research_memory = doc; }),
     index_membership: () => loadShardOnce('file:index_membership', 'data/index_membership.json', (doc) => { data.index_membership = doc; }),
     kpi_trends: () => loadShardOnce('file:kpi_trends', 'data/kpi_trends.json', (doc) => { data.kpi_trends = doc; }),
+    world_model: () => loadShardOnce('file:world_model', 'data/world_model.json', (doc) => { data.world_model = doc; }),
     document_catalog: () => loadShardOnce('file:document_catalog', 'data/document_catalog.json', (doc) => { data.document_catalog = doc; }),
     activist_feed: () => loadShardOnce('file:activist_feed', 'data/activist_feed.json', (doc) => { data.activist_feed = doc; }),
     darwin_bundle: () => loadShardOnce('file:darwin_bundle', 'data/darwin_bundle.json', (doc) => {
@@ -1716,6 +1719,7 @@ const INSIGHTS_SECTION_FILES = {
   index_watch: ['index_membership'],
   documents: ['document_catalog'],
   memory: ['research_memory'],
+  tickers: ['world_model'],
 };
 
 function insightsSectionReady(section) {
@@ -1992,6 +1996,7 @@ function renderInsights(opts = {}) {
     pdfTimeMode: insightsPdfTimeMode,
     portfolioMacro: data.portfolio_macro || [],
     portfolioMacroRegime: data.portfolio_macro_regime || null,
+    worldModel: data.world_model || null,
     tickerSourceFilter: insightsTickerSourceFilter,
     tickerViewMode: insightsTickerViewMode,
     tickerSortMode: insightsTickerSortMode,
@@ -3005,9 +3010,9 @@ function filtered() {
       av = parts.reduce((o, k) => (o == null ? o : o[k]), a);
       bv = parts.reduce((o, k) => (o == null ? o : o[k]), b);
     }
-    if (sortKey === 'fund_nav.discount_to_reported_nav_pct') {
-      av = a.fund_nav?.discount_to_reported_nav_pct;
-      bv = b.fund_nav?.discount_to_reported_nav_pct;
+    if (sortKey === 'fund_nav.display_discount_pct' || sortKey === 'fund_nav.discount_to_reported_nav_pct') {
+      av = fundNavDisplayDiscount(a);
+      bv = fundNavDisplayDiscount(b);
       av = av == null ? Infinity : av;
       bv = bv == null ? Infinity : bv;
     } else if (sortKey === 'classification.analysis_irr_pct') {
@@ -3120,20 +3125,8 @@ function renderHoldingsCell(colId, t) {
       ].filter(Boolean).join(' · ');
       return `<td title="${escapeHtml(title)}"><span class="badge badge-cvr-stage">${escapeHtml(c.stage === 'pre_close' ? 'Pre' : (c.stage === 'post_close' ? 'Post' : (c.stage || '—')))}</span> <span style="font-size:11px;color:var(--text-muted)">${escapeHtml(max)}</span></td>`;
     }
-    case 'nav_disc': {
-      const d = t.fund_nav?.discount_to_reported_nav_pct;
-      if (d == null || Number.isNaN(Number(d))) {
-        return '<td><span style="color:var(--text-muted)">—</span></td>';
-      }
-      const n = Number(d);
-      const cls = n < -1 ? 'nav-disc-pos' : (n > 1 ? 'nav-disc-neg' : 'nav-disc-flat');
-      const title = [
-        t.fund_nav?.as_of ? `as of ${t.fund_nav.as_of}` : '',
-        t.fund_nav?.reported_nav != null ? `NAV ${t.fund_nav.reported_nav}` : '',
-        t.fund_nav?.market_price != null ? `px ${t.fund_nav.market_price}` : '',
-      ].filter(Boolean).join(' · ');
-      return `<td class="${cls}" title="${escapeHtml(title)}">${n > 0 ? '+' : ''}${n.toFixed(1)}%</td>`;
-    }
+    case 'nav_disc':
+      return renderNavDiscCell(t);
     case 'stance':
       return `<td><span class="badge ${STANCE_BADGE[t.classification?.stance] || 'badge-warn'}">${t.classification?.stance || '—'}</span></td>`;
     case 'valuation':
@@ -3204,25 +3197,87 @@ function renderCvrPanel(t) {
   </div>`;
 }
 
+function formatNavDiscPct(v) {
+  if (v == null || Number.isNaN(Number(v))) return null;
+  const n = Number(v);
+  return `${n > 0 ? '+' : ''}${n.toFixed(1)}%`;
+}
+
+function navDiscClass(v) {
+  if (v == null || Number.isNaN(Number(v))) return 'nav-disc-flat';
+  const n = Number(v);
+  if (n < -1) return 'nav-disc-pos';
+  if (n > 1) return 'nav-disc-neg';
+  return 'nav-disc-flat';
+}
+
+function fundNavDisplayDiscount(t) {
+  const f = t?.fund_nav;
+  if (!f) return null;
+  if (f.show_reported_and_economic_discount && f.discount_to_economic_nav_pct != null) {
+    return Number(f.discount_to_economic_nav_pct);
+  }
+  return f.discount_to_reported_nav_pct == null ? null : Number(f.discount_to_reported_nav_pct);
+}
+
+function renderNavDiscCell(t) {
+  const f = t.fund_nav;
+  if (!f) return '<td><span style="color:var(--text-muted)">—</span></td>';
+  const reported = f.discount_to_reported_nav_pct;
+  const econ = f.discount_to_economic_nav_pct;
+  const showBoth = !!f.show_reported_and_economic_discount && econ != null;
+  const reportedTxt = formatNavDiscPct(reported);
+  const econTxt = formatNavDiscPct(econ);
+  if (!showBoth && reportedTxt == null && econTxt == null) {
+    return '<td><span style="color:var(--text-muted)">—</span></td>';
+  }
+  const title = [
+    showBoth ? 'Economic NAV uses MTM illustration for zero-marked sleeves; GAAP/reported NAV may mark those at $0' : '',
+    f.as_of ? `as of ${f.as_of}` : '',
+    f.market_price != null ? `px ${f.market_price}` : '',
+    f.reported_nav != null ? `reported NAV ${f.reported_nav}` : '',
+    f.complete_nav_per_share_illustration_local != null
+      ? `econ NAV (local) ${f.complete_nav_per_share_illustration_local}`
+      : '',
+    f.discount_to_mtm_nav_full_proxy_pct != null
+      ? `full proxy ${formatNavDiscPct(f.discount_to_mtm_nav_full_proxy_pct)}`
+      : '',
+  ].filter(Boolean).join(' · ');
+  if (showBoth) {
+    return `<td title="${escapeHtml(title)}"><div class="nav-disc-stack">
+      <span class="${navDiscClass(econ)}">${econTxt} <span class="nav-disc-sub">econ</span></span>
+      <span class="nav-disc-sub">${reportedTxt == null ? '—' : reportedTxt} GAAP</span>
+    </div></td>`;
+  }
+  const n = reported != null ? Number(reported) : Number(econ);
+  return `<td class="${navDiscClass(n)}" title="${escapeHtml(title)}">${formatNavDiscPct(n)}</td>`;
+}
+
 function renderFundNavPanel(t) {
   const f = t.fund_nav;
   if (!f) return '';
   const disc = f.discount_to_reported_nav_pct;
-  const discTxt = disc == null || Number.isNaN(Number(disc))
-    ? '—'
-    : `${Number(disc) > 0 ? '+' : ''}${Number(disc).toFixed(1)}%`;
-  const discCls = disc == null ? '' : (Number(disc) < -1 ? 'nav-disc-pos' : (Number(disc) > 1 ? 'nav-disc-neg' : 'nav-disc-flat'));
+  const econ = f.discount_to_economic_nav_pct;
+  const discTxt = formatNavDiscPct(disc) || '—';
+  const econTxt = formatNavDiscPct(econ) || '—';
+  const discCls = navDiscClass(disc);
+  const econCls = navDiscClass(econ);
+  const showBoth = !!f.show_reported_and_economic_discount && econ != null;
+  const fullTxt = formatNavDiscPct(f.discount_to_mtm_nav_full_proxy_pct);
   return `<div class="detail-section">
     <h3>NAV discount</h3>
     <div class="metric-grid" style="margin-top:8px">
       <div class="metric"><div class="k">Edge</div><div class="v"><span class="badge badge-fund-edge">${escapeHtml(f.edge_label || f.edge || '—')}</span></div></div>
-      <div class="metric"><div class="k">Vs reported NAV</div><div class="v ${discCls}">${discTxt}</div></div>
+      ${showBoth ? `<div class="metric"><div class="k">Vs economic NAV</div><div class="v ${econCls}">${econTxt}</div></div>` : ''}
+      <div class="metric"><div class="k">Vs reported NAV (GAAP)</div><div class="v ${discCls}">${discTxt}</div></div>
+      ${showBoth && fullTxt && fullTxt !== econTxt ? `<div class="metric"><div class="k">Vs full MTM proxy</div><div class="v ${navDiscClass(f.discount_to_mtm_nav_full_proxy_pct)}">${fullTxt}</div></div>` : ''}
       <div class="metric"><div class="k">Price</div><div class="v">${f.market_price != null ? escapeHtml(String(f.market_price)) : '—'}${f.currency ? ` <span style="color:var(--text-muted);font-size:11px">${escapeHtml(f.currency)}</span>` : ''}</div></div>
       <div class="metric"><div class="k">Reported NAV</div><div class="v">${f.reported_nav != null ? escapeHtml(String(f.reported_nav)) : '—'}</div></div>
+      ${f.complete_nav_per_share_illustration_local != null ? `<div class="metric"><div class="k">Economic NAV (local)</div><div class="v">${escapeHtml(String(f.complete_nav_per_share_illustration_local))}</div></div>` : ''}
       <div class="metric"><div class="k">Instrument</div><div class="v">${escapeHtml(String(f.instrument_type || '—').replace(/_/g, ' '))}</div></div>
       <div class="metric"><div class="k">As of</div><div class="v">${escapeHtml(f.as_of || '—')}</div></div>
     </div>
-    ${f.has_zero_marked_sleeve ? `<p class="subhead" style="margin-top:8px">Includes a zero-marked / Level-3 sleeve — base case keeps recovery at zero until human sets probability.</p>` : ''}
+    ${f.has_zero_marked_sleeve ? `<p class="subhead" style="margin-top:8px">Includes a zero-marked / Level-3 sleeve. Reported (GAAP) NAV marks that sleeve at $0; economic NAV illustration restores Moscow/local marks. Base IRR still keeps recovery at zero until human sets probability.</p>` : ''}
   </div>`;
 }
 
