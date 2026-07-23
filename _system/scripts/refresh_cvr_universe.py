@@ -44,8 +44,11 @@ from cvr_common import (  # noqa: E402
     SEC_QUERY_PRIMARY,
     SLEEVES_PATH,
     UNIVERSE_PATH,
+    clinicaltrials_status,
     create_candidate_stub,
     enqueue_cvr_agent_task,
+    fetch_google_news_cvr_items,
+    fetch_sec_atom_cvr_items,
     fetch_yahoo_price,
     form_is_preferred,
     hit_looks_risk_factor_only,
@@ -54,8 +57,10 @@ from cvr_common import (  # noqa: E402
     infer_milestone_status_from_text,
     iter_universe_rows,
     normalize_tickers,
+    openfda_device_510k_hits,
     pick_target_ticker,
     post_slack,
+    resolve_ticker_for_cik,
     row_is_sleeve_ready,
     row_is_watch_candidate,
     terms_are_complete,
@@ -307,9 +312,6 @@ def _row_from_sec_hit(
 
     ticker = pick_target_ticker(display_tickers, filing_cik=filing_cik_s)
     if not ticker and filing_cik_s:
-        # CIK-only resolve when display_names empty / noisy
-        from cvr_common import resolve_ticker_for_cik
-
         ticker = resolve_ticker_for_cik(filing_cik_s)
     if not ticker:
         return None
@@ -425,6 +427,91 @@ def discover_sec_cvrs(
         print("WARN: SEC discovery returned no payload; skipping discover (fail-soft)")
         return 0, False, []
     return len(added_rows), any_ok, added_rows
+
+
+def discover_free_news_cvrs(
+    doc: dict, *, limit: int = 25
+) -> tuple[int, list[dict]]:
+    """Google News RSS + SEC Atom — free, no API keys (fail-soft)."""
+    existing = _existing_tickers(doc)
+    added_rows: list[dict] = []
+
+    # Google News
+    try:
+        news_items = fetch_google_news_cvr_items(limit=max(limit * 2, 40))
+    except Exception as exc:  # noqa: BLE001
+        print(f"WARN: Google News discover failed: {exc}")
+        news_items = []
+    for item in news_items:
+        if len(added_rows) >= limit:
+            break
+        tickers = item.get("tickers") or []
+        if not tickers:
+            continue
+        # Prefer non-acquirer when multiple symbols appear.
+        ticker = pick_target_ticker(tickers)
+        if not ticker or ticker in existing:
+            continue
+        row = {
+            "id": f"{ticker}.CVR_CANDIDATE",
+            "ticker": ticker,
+            "stage": "pre_close",
+            "tradeable_vehicle": ticker,
+            "role": "opportunity",
+            "source": "google_news_rss",
+            "source_tier": "context",
+            "query_family": "free_news",
+            "discovered_at": today(),
+            "news_title": item.get("title"),
+            "news_link": item.get("link"),
+            "notes": (
+                f"Google News: {item.get('title')}. Confirm with SEC primary docs. "
+                "Not sleeved until terms_complete=true."
+            ),
+        }
+        doc.setdefault("pre_close_opportunities", []).append(row)
+        existing.add(ticker)
+        added_rows.append(row)
+
+    # SEC Atom (recent 8-K titles) — catches filings EFTS may miss temporarily
+    try:
+        atom_items = fetch_sec_atom_cvr_items(limit=100)
+    except Exception as exc:  # noqa: BLE001
+        print(f"WARN: SEC Atom discover failed: {exc}")
+        atom_items = []
+    for item in atom_items:
+        if len(added_rows) >= limit:
+            break
+        ticker = item.get("ticker")
+        if not ticker:
+            continue
+        ticker = str(ticker).upper()
+        if ticker in existing:
+            continue
+        row = {
+            "id": f"{ticker}.CVR_CANDIDATE",
+            "ticker": ticker,
+            "cik": item.get("cik"),
+            "stage": "pre_close",
+            "tradeable_vehicle": ticker,
+            "role": "opportunity",
+            "source": "sec_atom_current",
+            "source_tier": "context",
+            "query_family": "free_atom",
+            "form": "8-K",
+            "discovered_at": today(),
+            "sec_hint": item.get("link"),
+            "entity_name": item.get("title"),
+            "notes": (
+                f"SEC Atom current 8-K: {item.get('title')}. "
+                "Not sleeved until terms_complete=true."
+            ),
+        }
+        doc.setdefault("pre_close_opportunities", []).append(row)
+        existing.add(ticker)
+        added_rows.append(row)
+
+    return len(added_rows), added_rows
 
 
 def ingest_screener_csv(doc: dict, csv_path: Path) -> tuple[int, list[dict]]:
@@ -657,6 +744,7 @@ def write_discovery_review(
 ) -> Path | None:
     if (
         sec_added + csv_added == 0
+        and not new_rows
         and not unhealthy
         and not outside_alerts
         and not stubs_created
@@ -670,13 +758,15 @@ def write_discovery_review(
         f"**UTC:** {utc_now()}  ",
         f"**SEC ok:** {sec_ok}  ",
         f"**SEC added:** {sec_added}  ",
-        f"**CSV/inbox added:** {csv_added}  ",
+        f"**CSV/inbox / free-news added:** {csv_added + len(new_rows)}  ",
         f"**Stubs created:** {len(stubs_created)}  ",
         f"**Unhealthy streak:** {unhealthy}  ",
         "",
         "Context-tier candidates / stubs stay off the **CVRs** filter until "
         "`cvr_terms.json` has `stub=false` and `terms_complete=true` with max payout "
         "or milestones.",
+        "",
+        "Free auto feeds: SEC EFTS, Google News RSS, SEC Atom (no API keys).",
         "",
     ]
     if processed_csvs:
@@ -691,11 +781,13 @@ def write_discovery_review(
         lines += [
             "## New candidates",
             "",
-            "| Ticker | Source | Form | CIK | SEC hint |",
-            "|--------|--------|------|-----|----------|",
+            "| Ticker | Source | Form | CIK | Hint |",
+            "|--------|--------|------|-----|------|",
         ]
         for r in new_rows:
-            hint = r.get("sec_hint") or "—"
+            hint = r.get("sec_hint") or r.get("news_title") or r.get("news_link") or "—"
+            if isinstance(hint, str) and len(hint) > 80:
+                hint = hint[:77] + "..."
             lines.append(
                 f"| `{r.get('ticker')}` | {r.get('source')} | {r.get('form') or '—'} | "
                 f"{r.get('cik') or '—'} | {hint} |"
@@ -774,7 +866,7 @@ def refresh_prices(doc: dict) -> int:
 
 
 def refresh_milestones(doc: dict) -> int:
-    """Re-read linked local/remote SEC HTML for paid/failed/extended cues."""
+    """SEC HTML heuristics + free ClinicalTrials.gov / OpenFDA context."""
     updated = 0
     for row in iter_universe_rows(doc):
         ticker = str(row.get("ticker") or "").strip()
@@ -806,19 +898,63 @@ def refresh_milestones(doc: dict) -> int:
                 if remote:
                     texts.append(remote[:200_000])
                 time.sleep(0.15)
-        if not texts:
-            continue
-        blob = "\n".join(texts)
+        blob = "\n".join(texts) if texts else ""
         changed = False
+        free_ctx = terms.setdefault("free_source_context", {})
         for ms in milestones:
             if ms.get("status") in ("paid", "failed"):
                 continue
-            status = infer_milestone_status_from_text(blob)
-            if status and status != ms.get("status"):
-                ms["status"] = status
-                ms["status_inferred_at"] = utc_now()
-                ms["status_source"] = "sec_html_heuristic"
-                changed = True
+            if blob:
+                status = infer_milestone_status_from_text(blob)
+                if status and status != ms.get("status"):
+                    ms["status"] = status
+                    ms["status_inferred_at"] = utc_now()
+                    ms["status_source"] = "sec_html_heuristic"
+                    changed = True
+
+            # Free trial / device feeds for regulatory-style milestones.
+            mtype = str(ms.get("type") or "").lower()
+            desc = str(ms.get("description") or "")
+            query = ms.get("trial_query") or ms.get("nct_id") or ""
+            if not query and mtype in (
+                "clinical",
+                "clinical_guideline",
+                "regulatory",
+                "fda",
+            ):
+                # Use first distinctive token phrase from description.
+                query = re.sub(r"\s+", " ", desc)[:80]
+            if query and mtype in (
+                "clinical",
+                "clinical_guideline",
+                "regulatory",
+                "fda",
+                "",
+            ):
+                ct = clinicaltrials_status(str(query))
+                if ct:
+                    ms["clinicaltrials"] = ct
+                    free_ctx[f"clinicaltrials_{ms.get('id') or 'ms'}"] = {
+                        "as_of": utc_now(),
+                        **ct,
+                    }
+                    changed = True
+                    time.sleep(0.2)
+
+            device = ms.get("device_name")
+            if not device and "impella" in desc.lower():
+                device = "Impella"
+            if device:
+                hits = openfda_device_510k_hits(str(device))
+                if hits:
+                    ms["openfda_510k"] = hits
+                    free_ctx[f"openfda_{ms.get('id') or 'ms'}"] = {
+                        "as_of": utc_now(),
+                        "hits": hits,
+                    }
+                    changed = True
+                    time.sleep(0.2)
+
         if changed:
             terms["last_refresh_utc"] = utc_now()
             path.write_text(json.dumps(terms, indent=2) + "\n", encoding="utf-8")
@@ -923,6 +1059,16 @@ def main() -> int:
         action="store_true",
         help="Also run ECIP/bank contingent heuristic SEC query",
     )
+    ap.add_argument(
+        "--discover-news",
+        action="store_true",
+        help="Google News RSS + SEC Atom free feeds (no API keys)",
+    )
+    ap.add_argument(
+        "--no-news",
+        action="store_true",
+        help="With --discover, skip free news/atom feeds",
+    )
     ap.add_argument("--ingest-csv", type=Path, help="Optional screener CSV (context tier)")
     ap.add_argument("--ingest-inbox", action="store_true", help="Ingest inbox/*.csv")
     ap.add_argument(
@@ -981,6 +1127,7 @@ def main() -> int:
     if args.sync_alpharank or args.alpharank_path:
         sync_alpharank_drop(args.alpharank_path)
 
+    news_added = 0
     if args.discover:
         sec_added, sec_ok, sec_rows = discover_sec_cvrs(
             doc,
@@ -991,6 +1138,16 @@ def main() -> int:
         )
         new_rows.extend(sec_rows)
         print(f"SEC discover: +{sec_added} pre-close candidates (ok={sec_ok})")
+        if not args.no_news:
+            news_added, news_rows = discover_free_news_cvrs(
+                doc, limit=args.discover_limit
+            )
+            new_rows.extend(news_rows)
+            print(f"Free news/atom discover: +{news_added} pre-close candidates")
+    elif args.discover_news:
+        news_added, news_rows = discover_free_news_cvrs(doc, limit=args.discover_limit)
+        new_rows.extend(news_rows)
+        print(f"Free news/atom discover: +{news_added} pre-close candidates")
     if args.ingest_csv:
         n, rows = ingest_screener_csv(doc, args.ingest_csv)
         csv_added += n
@@ -1043,7 +1200,11 @@ def main() -> int:
     outside_alerts = outside_dates_within(doc, days=90)
     review_path_str = None
     ran_discovery = bool(
-        args.discover or args.ingest_inbox or args.ingest_csv or args.sync_alpharank
+        args.discover
+        or args.discover_news
+        or args.ingest_inbox
+        or args.ingest_csv
+        or args.sync_alpharank
     )
     if ran_discovery or args.write_review:
         if ran_discovery:

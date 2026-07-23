@@ -374,6 +374,8 @@ jobs:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
           CVR_ALPHARANK_DROP_PATH: ${{ vars.CVR_ALPHARANK_DROP_PATH }}
         run: |
+          # Free auto feeds (no keys): SEC EFTS + Google News RSS + SEC Atom.
+          # Optional AlphaRank CSV drop / Slack if vars/secrets set.
           python _system/scripts/refresh_cvr_universe.py \
             --discover \
             --discover-non-sec-family \

@@ -563,3 +563,220 @@ def infer_milestone_status_from_text(text: str) -> str | None:
     if MILESTONE_EXTENDED_RE.search(text):
         return "extended"
     return None
+
+
+# --- Free automatic discovery feeds (no API keys) ---
+
+GOOGLE_NEWS_CVR_QUERY = (
+    '"contingent value right" OR "CVR Agreement" OR "earn-out" OR earnout '
+    'OR "contingent consideration" merger OR acquisition'
+)
+GOOGLE_NEWS_RSS = (
+    "https://news.google.com/rss/search?q={q}&hl=en-US&gl=US&ceid=US:en"
+)
+SEC_ATOM_8K = (
+    "https://www.sec.gov/cgi-bin/browse-edgar?action=getcurrent"
+    "&type=8-K&company=&dateb=&owner=include&count=100&output=atom"
+)
+
+EXCHANGE_TICKER_RE = re.compile(
+    r"\((?:NASDAQ|NYSE|NYSEAMERICAN|AMEX|OTCQX|OTCQB|OTCMKTS|OTC)[:\s]+"
+    r"([A-Z]{1,5}(?:\.[A-Z]{1,2})?)\)",
+    re.I,
+)
+PAREN_TICKER_RE = re.compile(r"\(([A-Z]{1,5}(?:\.[A-Z]{1,2})?)\)")
+TICKER_STOPWORDS = {
+    "CVR",
+    "CEO",
+    "CFO",
+    "FDA",
+    "SEC",
+    "USD",
+    "IPO",
+    "LLC",
+    "INC",
+    "THE",
+    "FOR",
+    "AND",
+    "NEW",
+    "USA",
+    "PDF",
+    "EPS",
+    "GAAP",
+    "Q1",
+    "Q2",
+    "Q3",
+    "Q4",
+    "NYSE",
+    "AMEX",
+    "OTC",
+    "PRESS",
+    "WIRE",
+}
+
+
+def extract_tickers_from_headline(title: str) -> list[str]:
+    """Pull equity symbols from news headlines (free-feed helper)."""
+    out: list[str] = []
+    if not title:
+        return out
+    for m in EXCHANGE_TICKER_RE.finditer(title):
+        t = m.group(1).upper()
+        if t not in TICKER_STOPWORDS and t not in out:
+            out.append(t)
+    for m in PAREN_TICKER_RE.finditer(title):
+        t = m.group(1).upper()
+        if t not in TICKER_STOPWORDS and TICKER_RE.fullmatch(t) and t not in out:
+            out.append(t)
+    return out
+
+
+def fetch_google_news_cvr_items(*, limit: int = 40) -> list[dict]:
+    """Google News RSS — free, no key. Fail-soft → []."""
+    import xml.etree.ElementTree as ET
+    import urllib.parse
+
+    q = urllib.parse.quote_plus(GOOGLE_NEWS_CVR_QUERY)
+    url = GOOGLE_NEWS_RSS.format(q=q)
+    text = http_get_text(url)
+    if not text:
+        return []
+    try:
+        root = ET.fromstring(text)
+    except ET.ParseError as exc:
+        print(f"WARN: Google News RSS parse failed: {exc}")
+        return []
+    items: list[dict] = []
+    for it in root.findall("./channel/item")[:limit]:
+        title = (it.findtext("title") or "").strip()
+        link = (it.findtext("link") or "").strip()
+        pub = (it.findtext("pubDate") or "").strip()
+        if not title:
+            continue
+        blob = title.lower()
+        if not any(
+            k in blob
+            for k in (
+                "cvr",
+                "contingent value",
+                "earnout",
+                "earn-out",
+                "contingent consideration",
+                "contingent cash",
+            )
+        ):
+            continue
+        items.append(
+            {
+                "title": title,
+                "link": link,
+                "published": pub,
+                "tickers": extract_tickers_from_headline(title),
+            }
+        )
+    return items
+
+
+def fetch_sec_atom_cvr_items(*, limit: int = 100) -> list[dict]:
+    """SEC current 8-K Atom feed — free. Keyword filter on title/summary."""
+    import xml.etree.ElementTree as ET
+
+    text = http_get_text(SEC_ATOM_8K)
+    if not text:
+        return []
+    try:
+        root = ET.fromstring(text)
+    except ET.ParseError as exc:
+        print(f"WARN: SEC Atom parse failed: {exc}")
+        return []
+    ns = {"a": "http://www.w3.org/2005/Atom"}
+    items: list[dict] = []
+    for e in root.findall("a:entry", ns)[:limit]:
+        title = e.findtext("a:title", default="", namespaces=ns) or ""
+        summary = e.findtext("a:summary", default="", namespaces=ns) or ""
+        link_el = e.find("a:link", ns)
+        href = link_el.get("href") if link_el is not None else None
+        blob = f"{title} {summary}".lower()
+        if not any(
+            k in blob
+            for k in (
+                "cvr",
+                "contingent value",
+                "earnout",
+                "earn-out",
+                "contingent consideration",
+            )
+        ):
+            continue
+        # Title format often: "Company Name (CIK) (Filer)"
+        cik_m = re.search(r"\((\d{6,10})\)", title)
+        cik = cik_m.group(1).zfill(10) if cik_m else None
+        ticker = resolve_ticker_for_cik(cik) if cik else None
+        items.append(
+            {
+                "title": title.strip(),
+                "link": href,
+                "cik": cik,
+                "ticker": ticker,
+                "summary": summary[:500],
+            }
+        )
+    return items
+
+
+def clinicaltrials_status(query: str) -> dict | None:
+    """ClinicalTrials.gov v2 — free status snapshot for a milestone query."""
+    import urllib.parse
+
+    if not query or len(query.strip()) < 3:
+        return None
+    params = urllib.parse.urlencode(
+        {"query.term": query.strip()[:120], "pageSize": "3", "format": "json"}
+    )
+    url = f"https://clinicaltrials.gov/api/v2/studies?{params}"
+    data = http_get_json(url)
+    if not isinstance(data, dict):
+        return None
+    studies = data.get("studies") or []
+    if not studies:
+        return {"query": query, "n_studies": 0, "statuses": []}
+    statuses = []
+    for st in studies[:3]:
+        proto = (st.get("protocolSection") or {})
+        status_mod = proto.get("statusModule") or {}
+        id_mod = proto.get("identificationModule") or {}
+        statuses.append(
+            {
+                "nct": id_mod.get("nctId"),
+                "title": id_mod.get("briefTitle"),
+                "overall_status": status_mod.get("overallStatus"),
+                "last_update": status_mod.get("lastUpdatePostDateStruct", {}).get("date")
+                if isinstance(status_mod.get("lastUpdatePostDateStruct"), dict)
+                else status_mod.get("lastUpdatePostDate"),
+            }
+        )
+    return {"query": query, "n_studies": len(studies), "statuses": statuses}
+
+
+def openfda_device_510k_hits(device_name: str) -> list[dict]:
+    """OpenFDA 510(k) — free device clearance hits (fail-soft)."""
+    import urllib.parse
+
+    if not device_name or len(device_name.strip()) < 3:
+        return []
+    q = urllib.parse.quote(f'device_name:"{device_name.strip()[:80]}"')
+    url = f"https://api.fda.gov/device/510k.json?search={q}&limit=3"
+    data = http_get_json(url)
+    if not isinstance(data, dict):
+        return []
+    out = []
+    for row in data.get("results") or []:
+        out.append(
+            {
+                "k_number": row.get("k_number"),
+                "device_name": row.get("device_name"),
+                "decision_date": row.get("decision_date"),
+                "decision_description": row.get("decision_description"),
+            }
+        )
+    return out

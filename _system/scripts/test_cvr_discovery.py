@@ -54,6 +54,18 @@ class CvrCommonTests(unittest.TestCase):
             "failed",
         )
 
+    def test_extract_tickers_from_headline(self):
+        t = cvr_common.extract_tickers_from_headline(
+            "AtaiBeckley (NASDAQ:ATAI) shares trade with Merger CVR"
+        )
+        self.assertEqual(t, ["ATAI"])
+        t2 = cvr_common.extract_tickers_from_headline(
+            "Senti Biosciences (SNTI) outlines CVR-only merger"
+        )
+        self.assertEqual(t2, ["SNTI"])
+        t3 = cvr_common.extract_tickers_from_headline("FDA approves something (FDA)")
+        self.assertEqual(t3, [])
+
 
 class CvrRefreshTests(unittest.TestCase):
     def test_csv_rejects_missing_ticker(self):

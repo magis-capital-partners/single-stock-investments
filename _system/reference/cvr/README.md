@@ -39,8 +39,9 @@ refresh_cvr_universe.py
   --discover --discover-non-sec-family
   --sync-alpharank --ingest-inbox --create-stubs
   --write-review --alert --skip-sync
-  → SEC primary + expanded + ECIP/bank family (fail-soft)
-  → AlphaRank drop path → inbox/ → processed/
+  → SEC EFTS primary + expanded + ECIP/bank family (fail-soft)
+  → Google News RSS + SEC Atom current 8-K (free, no keys)
+  → AlphaRank drop path → inbox/ → processed/ (optional)
   → CIK→target resolve, form filters, accession+CIK dedupe
   → stub folders (skeleton terms; sleeve NOT ready)
   → reviews/pending/cvr_discovery_*.md (+ optional Slack)
@@ -65,11 +66,16 @@ build_dashboard_data.py
 
 **Secondary feeds**
 
-| Feed | How |
-|------|-----|
-| CSV inbox | Drop files in `inbox/` (see `inbox/README.md`) |
-| AlphaRank path | Set repo variable `CVR_ALPHARANK_DROP_PATH` or env `ALPHARANK_CSV_PATH` to a folder/file of CSVs; weekly job copies into inbox |
-| Slack alerts | Optional secret `SLACK_WEBHOOK_URL` |
+| Feed | How | Key? |
+|------|-----|------|
+| SEC EDGAR full-text (EFTS) | `--discover` | Free |
+| Google News RSS | auto with `--discover` (or `--discover-news`) | Free |
+| SEC Atom current 8-K | auto with `--discover` | Free |
+| ClinicalTrials.gov / OpenFDA | `--refresh-milestones` | Free |
+| Yahoo chart quotes | `--refresh-prices` | Free |
+| CSV inbox | Drop files in `inbox/` | Manual |
+| AlphaRank CSV drop | `CVR_ALPHARANK_DROP_PATH` (optional) | Manual export |
+| Slack alerts | `SLACK_WEBHOOK_URL` (optional) | Optional |
 
 **Manual**
 

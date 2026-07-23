@@ -96,15 +96,25 @@ Nightly sync
 
 ---
 
-## Secrets / vars needed (human)
+## Free automatic sources (wired — no keys)
+
+| Source | Flag / path | Use |
+|--------|-------------|-----|
+| SEC EDGAR EFTS | `--discover` | Primary CVR / contingent / earnout / ECIP |
+| Google News RSS | auto with `--discover` | Live deal headlines → tickers |
+| SEC Atom current 8-K | auto with `--discover` | Recent filings keyword filter |
+| ClinicalTrials.gov | `--refresh-milestones` | Trial status on clinical milestones |
+| OpenFDA 510(k) | `--refresh-milestones` | Device clearance context |
+| Yahoo chart API | `--refresh-prices` | Quotes / p_market |
+
+## Optional secrets / vars
 
 | Name | Type | Required? | Use |
 |------|------|-----------|-----|
 | `SLACK_WEBHOOK_URL` | Actions secret | Optional | Discovery / outside-date alerts |
-| `CVR_ALPHARANK_DROP_PATH` | Actions variable | Optional | Folder/file of AlphaRank CSVs on runner or mounted Drive |
-| AlphaRank login | External | Optional | No public API found — export CSV manually or script outside CI |
+| `CVR_ALPHARANK_DROP_PATH` | Actions variable | Optional | Manual AlphaRank CSV export drop |
 
-Other useful sources (no keys in-repo yet): OTC Markets news (MFBP-class), BioPharmCatalyst / FierceBiotech deal wires, EDGAR full-text (free), CourtListener for CVR litigation.
+OTC Markets has no free public news search API (Disclosure API is commercial). Bank/ECIP names still come from SEC ECIP query + Google News + inbox CSV.
 
 ---
 
