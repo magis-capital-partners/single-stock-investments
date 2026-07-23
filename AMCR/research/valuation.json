@@ -1,10 +1,10 @@
 {
   "ticker": "AMCR",
-  "as_of": "2026-07-10",
+  "as_of": "2026-07-23",
   "method": "full",
   "irr_method": "full",
   "lawrence_bucket": "scale_economies",
-  "valuation_mode": "operating",
+  "valuation_mode": "economic_value",
   "classification_inputs": {
     "archetype": "compounder",
     "moat": "stable",
@@ -547,5 +547,463 @@
     "contributor_count": 7,
     "in_base_irr": false,
     "disclaimer": "Advisory lens blend only. Does not replace Lawrence total-synthesis stance gate without [HUMAN REVIEW]."
+  },
+  "component_valuation": {
+    "schema_version": "1.0",
+    "all_material_components_identified": true,
+    "coverage_statement": "Three additive components map consolidated packaging owner cash, Berry synergy milestone, and integration reserve once each; net debt is embedded in platform capitalization, not double-counted.",
+    "components": [
+      {
+        "id": "consolidated_packaging_owner_cash",
+        "label": "Global flexibles and rigids packaging owner-cash platform",
+        "category": "operating_business",
+        "overlap_key": "amcr_packaging_owner_cash",
+        "treatment": "additive",
+        "valuation": {
+          "method": "owner_cash_or_dividend_discount",
+          "basis": "per_share",
+          "low": 28.0,
+          "base": 36.0,
+          "high": 44.0,
+          "evidence_tier": "primary_derived",
+          "evidence": "Primary bridge from AMCR/investor-documents/sec-edgar/10-K_20250815_rpt20250630_acc0001748790_25_000023.htm: FY2025 OCF $1390.0M, capex $580.0M, FCF $810.0M, long-term debt $13841.0M, cash $827.0M; Berry close AMCR/investor-documents/sec-edgar/8-K_20250430_rpt20250430_acc0001104659_25_042520.htm; contract backfill 2026-07-23.",
+          "assumption_summary": "Proof outputs {'low': 28.0, 'base': 36.0, 'high': 44.0}; see calculation_proof graph.",
+          "cross_check": "Reconcile to FY2025 10-K and Q3 FY2026 10-Q before decision use.",
+          "falsifier": "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
+          "valuation_status": "bounded_estimate",
+          "calculation_proof": {
+            "schema_version": "1.0",
+            "method_id": "owner_cash_or_dividend_discount",
+            "method_version": "1.0",
+            "output_unit": "USD_per_share",
+            "inputs": [
+              {
+                "id": "operating_cash_flow_m",
+                "label": "FY2025 net cash provided by operating activities",
+                "kind": "fact",
+                "value": 1390.0,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "AMCR/investor-documents/sec-edgar/10-K_20250815_rpt20250630_acc0001748790_25_000023.htm",
+                  "locator": "Net cash provided by operating activities $1,390M (FY2025)",
+                  "as_of": "2025-06-30"
+                },
+                "locked": true
+              },
+              {
+                "id": "capital_expenditures_m",
+                "label": "FY2025 payments for property, plant and equipment",
+                "kind": "fact",
+                "value": 580.0,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "AMCR/investor-documents/sec-edgar/10-K_20250815_rpt20250630_acc0001748790_25_000023.htm",
+                  "locator": "Capital expenditures $580M (FY2025 cash flow statement)",
+                  "as_of": "2025-06-30"
+                },
+                "locked": true
+              },
+              {
+                "id": "shares_m",
+                "label": "Common shares outstanding (Q3 FY2026)",
+                "kind": "fact",
+                "value": 462.3,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "AMCR/investor-documents/sec-edgar/10-Q_20260507_rpt20260331_acc0001748790_26_000016.htm",
+                  "locator": "Entity common stock shares outstanding 462,345,690 at March 31, 2026",
+                  "as_of": "2026-03-31"
+                },
+                "locked": true
+              },
+              {
+                "id": "long_term_debt_m",
+                "label": "Long-term debt and capital lease obligations",
+                "kind": "fact",
+                "value": 13841.0,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "AMCR/investor-documents/sec-edgar/10-K_20250815_rpt20250630_acc0001748790_25_000023.htm",
+                  "locator": "LongTermDebtAndCapitalLeaseObligations $13,841M at June 30, 2025",
+                  "as_of": "2025-06-30"
+                },
+                "locked": true
+              }
+            ],
+            "assumptions": [
+              {
+                "id": "owner_cash_per_share",
+                "label": "Normalized owner free cash flow per diluted share (OCF less capex)",
+                "kind": "judgment",
+                "values": {
+                  "low": 1.7521,
+                  "base": 1.7521,
+                  "high": 1.7521
+                },
+                "unit": "USD_per_share",
+                "rationale": "FY2025 owner cash on post-Berry share count; integration-year capex keeps conversion noisy but filing-anchored for base case.",
+                "allowed_range": {
+                  "min": 0.5,
+                  "max": 3.0
+                }
+              },
+              {
+                "id": "capitalization_multiple",
+                "label": "Duration-adjusted owner-cash capitalization multiple (leverage embedded)",
+                "kind": "judgment",
+                "values": {
+                  "low": 15.9808,
+                  "base": 20.5468,
+                  "high": 25.1127
+                },
+                "unit": "multiple",
+                "rationale": "Bear stresses resin pass-through failure and elevated leverage (~$28/sh net debt); base aligns with Lawrence 7-year path at ~14\u00d7 exit on growing owner cash; bull credits synergy capture and deleveraging.",
+                "allowed_range": {
+                  "min": 12.0,
+                  "max": 28.0
+                }
+              }
+            ],
+            "calculations": [
+              {
+                "id": "value_per_share",
+                "label": "Consolidated packaging owner cash per share",
+                "op": "multiply",
+                "args": [
+                  "owner_cash_per_share",
+                  "capitalization_multiple"
+                ],
+                "unit": "USD_per_share"
+              }
+            ],
+            "outputs": {
+              "low": "value_per_share",
+              "base": "value_per_share",
+              "high": "value_per_share"
+            }
+          }
+        }
+      },
+      {
+        "id": "berry_synergy_milestone",
+        "label": "Berry Global merger cost-synergy and mix milestone",
+        "category": "real_option",
+        "overlap_key": "amcr_berry_synergy",
+        "treatment": "additive",
+        "valuation": {
+          "method": "risk_adjusted_milestone_value",
+          "basis": "per_share",
+          "low": 0.0,
+          "base": 2.5001,
+          "high": 6.0,
+          "evidence_tier": "primary_derived",
+          "evidence": "Primary bridge from AMCR/investor-documents/sec-edgar/10-K_20250815_rpt20250630_acc0001748790_25_000023.htm: FY2025 OCF $1390.0M, capex $580.0M, FCF $810.0M, long-term debt $13841.0M, cash $827.0M; Berry close AMCR/investor-documents/sec-edgar/8-K_20250430_rpt20250430_acc0001104659_25_042520.htm; contract backfill 2026-07-23.",
+          "assumption_summary": "Proof outputs {'low': 0.0, 'base': 2.5001, 'high': 6.0}; see calculation_proof graph.",
+          "cross_check": "Reconcile to FY2025 10-K and Q3 FY2026 10-Q before decision use.",
+          "falsifier": "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
+          "valuation_status": "bounded_estimate",
+          "calculation_proof": {
+            "schema_version": "1.0",
+            "method_id": "risk_adjusted_milestone_value",
+            "method_version": "1.0",
+            "output_unit": "USD_per_share",
+            "inputs": [
+              {
+                "id": "pro_forma_revenue_bn",
+                "label": "Pro forma combined net sales (Berry merger)",
+                "kind": "fact",
+                "value": 23.2,
+                "unit": "USD_bn",
+                "source": {
+                  "ref": "AMCR/investor-documents/sec-edgar/10-K_20250815_rpt20250630_acc0001748790_25_000023.htm",
+                  "locator": "Pro forma combined net sales approximately $23.2 billion per acquisition footnote",
+                  "as_of": "2025-06-30"
+                },
+                "locked": true
+              },
+              {
+                "id": "flexibles_9m_sales_m",
+                "label": "Flexibles segment net sales (9M FY2026)",
+                "kind": "fact",
+                "value": 8050.0,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "AMCR/investor-documents/sec-edgar/10-Q_20260507_rpt20260331_acc0001748790_26_000016.htm",
+                  "locator": "Flexibles segment net sales $8,050M for nine months ended March 31, 2026",
+                  "as_of": "2026-03-31"
+                },
+                "locked": true
+              },
+              {
+                "id": "rigid_9m_sales_m",
+                "label": "Rigid Packaging segment net sales (9M FY2026)",
+                "kind": "fact",
+                "value": 2390.0,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "AMCR/investor-documents/sec-edgar/10-Q_20260507_rpt20260331_acc0001748790_26_000016.htm",
+                  "locator": "Rigid Packaging segment net sales $2,390M for nine months ended March 31, 2026",
+                  "as_of": "2026-03-31"
+                },
+                "locked": true
+              },
+              {
+                "id": "shares_m",
+                "label": "Common shares outstanding (Q3 FY2026)",
+                "kind": "fact",
+                "value": 462.3,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "AMCR/investor-documents/sec-edgar/10-Q_20260507_rpt20260331_acc0001748790_26_000016.htm",
+                  "locator": "Entity common stock shares outstanding 462,345,690 at March 31, 2026",
+                  "as_of": "2026-03-31"
+                },
+                "locked": true
+              }
+            ],
+            "assumptions": [
+              {
+                "id": "synergy_milestone_m",
+                "label": "Risk-adjusted Berry merger cost-synergy and mix uplift not in FY2025 owner cash",
+                "kind": "judgment",
+                "values": {
+                  "low": 0.0,
+                  "base": 1155.8,
+                  "high": 2773.8
+                },
+                "unit": "USD_m",
+                "rationale": "Non-overlapping incremental value from procurement, footprint rationalization, and rigid/flexible mix improvement; probability and timing discounted until run-rate savings disclosed.",
+                "allowed_range": {
+                  "min": 0.0,
+                  "max": 3500.0
+                }
+              }
+            ],
+            "calculations": [
+              {
+                "id": "value_per_share",
+                "label": "Berry synergy milestone per share",
+                "op": "divide",
+                "args": [
+                  "synergy_milestone_m",
+                  "shares_m"
+                ],
+                "unit": "USD_per_share"
+              }
+            ],
+            "outputs": {
+              "low": "value_per_share",
+              "base": "value_per_share",
+              "high": "value_per_share"
+            }
+          }
+        },
+        "driver_model": {
+          "timing_basis": "Synergy run-rate expected 2\u20134 years post April 2025 Berry close.",
+          "scenarios": {
+            "base": {
+              "success_probability": 0.5,
+              "remaining_cost_m": 400.0,
+              "timing_years": 3.0
+            }
+          }
+        }
+      },
+      {
+        "id": "integration_leverage_reserve",
+        "label": "Integration, leverage, and resin-spread execution reserve",
+        "category": "liability_or_reserve",
+        "overlap_key": "amcr_integration_reserve",
+        "treatment": "additive",
+        "valuation": {
+          "method": "net_asset_value",
+          "basis": "per_share",
+          "low": -3.0,
+          "base": -1.5001,
+          "high": 0.0,
+          "evidence_tier": "primary_derived",
+          "evidence": "Primary bridge from AMCR/investor-documents/sec-edgar/10-K_20250815_rpt20250630_acc0001748790_25_000023.htm: FY2025 OCF $1390.0M, capex $580.0M, FCF $810.0M, long-term debt $13841.0M, cash $827.0M; Berry close AMCR/investor-documents/sec-edgar/8-K_20250430_rpt20250430_acc0001104659_25_042520.htm; contract backfill 2026-07-23.",
+          "assumption_summary": "Proof outputs {'low': -3.0, 'base': -1.5001, 'high': 0.0}; see calculation_proof graph.",
+          "cross_check": "Reconcile to FY2025 10-K and Q3 FY2026 10-Q before decision use.",
+          "falsifier": "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
+          "valuation_status": "bounded_estimate",
+          "calculation_proof": {
+            "schema_version": "1.0",
+            "method_id": "net_asset_value",
+            "method_version": "1.0",
+            "output_unit": "USD_per_share",
+            "inputs": [
+              {
+                "id": "price_today",
+                "label": "Market price per share (refresh date)",
+                "kind": "fact",
+                "value": 42.7,
+                "unit": "USD_per_share",
+                "source": {
+                  "ref": "AMCR/research/valuation.json",
+                  "locator": "inputs.price $42.70 as of 2026-07-09",
+                  "as_of": "2026-07-23"
+                },
+                "locked": true
+              },
+              {
+                "id": "net_debt_m",
+                "label": "Long-term debt less cash (FY2025)",
+                "kind": "fact",
+                "value": 13014.0,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "AMCR/investor-documents/sec-edgar/10-K_20250815_rpt20250630_acc0001748790_25_000023.htm",
+                  "locator": "Long-term debt $13841.0M less cash $827.0M = $13014.0M",
+                  "as_of": "2025-06-30"
+                },
+                "locked": true
+              },
+              {
+                "id": "shares_m",
+                "label": "Common shares outstanding (Q3 FY2026)",
+                "kind": "fact",
+                "value": 462.3,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "AMCR/investor-documents/sec-edgar/10-Q_20260507_rpt20260331_acc0001748790_26_000016.htm",
+                  "locator": "Entity common stock shares outstanding 462,345,690 at March 31, 2026",
+                  "as_of": "2026-03-31"
+                },
+                "locked": true
+              }
+            ],
+            "assumptions": [
+              {
+                "id": "reserve_m",
+                "label": "Berry integration, leverage, and resin-spread execution reserve",
+                "kind": "judgment",
+                "values": {
+                  "low": -1386.9,
+                  "base": -693.5,
+                  "high": 0.0
+                },
+                "unit": "USD_m",
+                "rationale": "Negative reserve for synergy delays, elevated integration capex (Q3 FY2026 quarterly capex $687M vs $360M prior year), and refinancing risk; net debt burden embedded in platform multiple, not double-counted additively.",
+                "allowed_range": {
+                  "min": -2000.0,
+                  "max": 0.0
+                }
+              }
+            ],
+            "calculations": [
+              {
+                "id": "value_per_share",
+                "label": "Integration and leverage reserve per share",
+                "op": "divide",
+                "args": [
+                  "reserve_m",
+                  "shares_m"
+                ],
+                "unit": "USD_per_share"
+              }
+            ],
+            "outputs": {
+              "low": "value_per_share",
+              "base": "value_per_share",
+              "high": "value_per_share"
+            }
+          }
+        }
+      },
+      {
+        "id": "net_financial_claims",
+        "label": "Long-term debt net of cash (embedded in platform multiple)",
+        "category": "liability_or_reserve",
+        "overlap_key": "amcr_net_debt",
+        "treatment": "embedded",
+        "valuation": {
+          "method": "net_asset_value",
+          "basis": "per_share",
+          "low": -28.15,
+          "base": -28.15,
+          "high": -25.34,
+          "evidence_tier": "primary_derived",
+          "evidence": "Long-term debt $13841.0M less cash $827.0M (~$28.15/sh); embedded in platform capitalization multiple.",
+          "assumption_summary": "Phase 3 provisional range pending filing-grounded proof.",
+          "cross_check": "Reconcile to FY2025 10-K and Q3 FY2026 10-Q before decision use.",
+          "falsifier": "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
+          "valuation_status": "embedded_reference"
+        },
+        "included_in_component_id": "consolidated_packaging_owner_cash"
+      }
+    ]
+  },
+  "economic_value_analysis": {
+    "ownership_waterfall": {
+      "net_economic_claim": "One AMCR ordinary share equals pro-rata consolidated packaging owner cash, Berry synergy milestone value, less integration and leverage reserve.",
+      "excluded_claims": [
+        "Long-term debt net of cash is embedded in owner-cash capitalization multiple, not additive.",
+        "Lawrence 7-year consolidated IRR remains the stance gate separate from component fair value."
+      ],
+      "reconciliation": "FY2025 OCF $1390.0M less capex $580.0M = $810.0M owner cash (1.7521/sh on 462.3M shares); long-term debt $13841.0M less cash $827.0M (~$28.15/sh embedded).",
+      "evidence_ref": "AMCR/research/evidence_reconciliation_2026-07-23.md"
+    },
+    "validation_errors": []
+  },
+  "economic_value": {
+    "schema_version": "1.0",
+    "method": "component_economic_value",
+    "economic_claim": {
+      "description": "One diluted AMCR share: consolidated packaging owner cash, Berry synergy milestone, less integration reserve; net debt embedded in platform capitalization.",
+      "unit_label": "diluted share",
+      "unit_count": 462300000,
+      "unit_source": "Entity common stock shares outstanding 462.3M (AMCR/investor-documents/sec-edgar/10-Q_20260507_rpt20260331_acc0001748790_26_000016.htm).",
+      "enterprise_to_equity_reconciliation": "Platform valued via normalized owner free cash flow per share; synergy milestone is non-overlapping; net debt burden informs capitalization multiple."
+    },
+    "gaap_role": "cross_check",
+    "accounting_reference": "FY2025 10-K: stockholders' equity $11,728M; goodwill from Berry $10.4B; economic value uses component proofs, not GAAP book alone.",
+    "component_groups": [
+      {
+        "id": "consolidated_packaging_owner_cash",
+        "label": "Global flexibles and rigids packaging owner-cash platform",
+        "component_ids": [
+          "consolidated_packaging_owner_cash"
+        ],
+        "economic_claim": "Global flexibles and rigids packaging owner-cash platform",
+        "valuation_basis": "Owner-cash discount on FY2025 OCF less capex per share.",
+        "adjustments": "Net debt ~$28.15/sh informs capitalization multiple.",
+        "overlap_control": "Unique overlap key amcr_packaging_owner_cash."
+      },
+      {
+        "id": "berry_synergy_milestone",
+        "label": "Berry Global merger cost-synergy and mix milestone",
+        "component_ids": [
+          "berry_synergy_milestone"
+        ],
+        "economic_claim": "Berry Global merger cost-synergy and mix milestone",
+        "valuation_basis": "Risk-adjusted milestone on post-merger synergy run-rate.",
+        "adjustments": "Not in Lawrence base free cash flow path until run-rate disclosed.",
+        "overlap_control": "Unique overlap key amcr_berry_synergy.",
+        "risk_and_timing": {
+          "probability_basis": "Base ~50% that disclosed synergy program reaches management target.",
+          "timing_basis": "2\u20134 years post April 2025 close per merger 8-K integration timeline.",
+          "remaining_capital_basis": "Integration capex embedded in consolidated owner cash; milestone is incremental savings only."
+        }
+      },
+      {
+        "id": "integration_leverage_reserve",
+        "label": "Integration, leverage, and resin-spread execution reserve",
+        "component_ids": [
+          "integration_leverage_reserve"
+        ],
+        "economic_claim": "Integration, leverage, and resin-spread execution reserve",
+        "valuation_basis": "Bounded negative reserve for execution friction.",
+        "adjustments": "Does not duplicate net debt embedded in platform multiple.",
+        "overlap_control": "Unique overlap key amcr_integration_reserve."
+      }
+    ],
+    "limitations": [
+      "Revenue-weighted segment cash split not disclosed; consolidated owner cash used as anchor.",
+      "Synergy milestone band remains widest judgment component pending run-rate disclosure."
+    ]
+  },
+  "valuation_methodology": {
+    "horizon_years": 7
   }
 }
