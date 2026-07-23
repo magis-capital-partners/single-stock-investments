@@ -23,6 +23,7 @@ import world_model_common as wm  # noqa: E402
 
 TODAY = date.today().isoformat()
 GENERATOR = "scaffold_industry_kpi_ledgers.py"
+EXCHANGE_VOL_MAP = wm.WORLD_MODEL_DIR / "exchange_vol_map.json"
 
 
 def _kpi(
@@ -49,7 +50,7 @@ def _kpi(
         "evidence_tier": evidence_tier,
         "last_checked": TODAY,
         "binds_to": {
-            "on_fail": "human_review",
+            "on_fail": "open_diligence",
             "note": note,
         },
         "in_base_irr": False,
@@ -100,7 +101,7 @@ VIX = _kpi(
     value=12,
     source="theme:vix_level",
     role="orientation",
-    note="Vol pulse for exchange / market-data croupiers",
+    note="US VIX — global risk / US croupier pulse",
     horizon="vol_floor_for_croupier",
 )
 SPYVOL = _kpi(
@@ -111,9 +112,78 @@ SPYVOL = _kpi(
     value=8,
     source="theme:spy_20d_realized_vol",
     role="orientation",
-    note="Equity vol context for fee/transaction intensity",
+    note="US equity realized vol for fee/transaction intensity",
     horizon="equity_vol_floor",
 )
+def load_exchange_vol_map() -> dict:
+    return wm.load_json(EXCHANGE_VOL_MAP) or {}
+
+
+def region_for_ticker(ticker: str, vol_map: dict | None = None) -> str:
+    vol_map = vol_map or load_exchange_vol_map()
+    regions = (vol_map.get("ticker_region") or {})
+    return str(regions.get(ticker.upper()) or vol_map.get("default_region") or "US")
+
+
+def exchange_market_kpis(ticker: str) -> list[dict]:
+    """Home-market vol primary; US VIX secondary for non-US venues."""
+    vol_map = load_exchange_vol_map()
+    region_id = region_for_ticker(ticker, vol_map)
+    region = (vol_map.get("regions") or {}).get(region_id) or (vol_map.get("regions") or {}).get("US") or {}
+    out: list[dict] = []
+
+    realized_id = region.get("realized_vol_series")
+    if realized_id:
+        gate = float(region.get("gate_realized_gte") or 8)
+        out.append(
+            _kpi(
+                realized_id,
+                str(region.get("realized_vol_label") or realized_id),
+                unit="pct",
+                op="gte",
+                value=gate,
+                source=f"theme:{realized_id}",
+                role="orientation",
+                note=f"Home-market realized vol ({region_id})"
+                + (f" - {region['note']}" if region.get("note") else ""),
+                horizon="equity_vol_floor",
+            )
+        )
+
+    implied_id = region.get("implied_vol_series")
+    if implied_id:
+        gate_i = float(region.get("gate_implied_gte") or 12)
+        out.append(
+            _kpi(
+                implied_id,
+                str(region.get("implied_vol_label") or implied_id),
+                unit="index",
+                op="gte",
+                value=gate_i,
+                source=f"theme:{implied_id}",
+                role="orientation",
+                note=f"Home-market implied vol ({region_id})",
+                horizon="vol_floor_for_croupier",
+            )
+        )
+
+    # Non-US: keep US VIX as secondary global risk context.
+    if region_id != "US":
+        out.append(
+            _kpi(
+                "vix_level_global",
+                "US VIX (global risk context)",
+                unit="index",
+                op="gte",
+                value=12,
+                source="theme:vix_level",
+                role="orientation",
+                note="Secondary global risk overlay - not the home-market croupier pulse",
+                horizon="global_risk",
+            )
+        )
+
+    return out or [VIX, SPYVOL]
 GOLD = _kpi(
     "gold_spot_proxy",
     "Gold spot proxy (GLD USD when London fix unavailable)",
@@ -175,7 +245,8 @@ INDUSTRY_TEMPLATES: dict[str, list[dict]] = {
     )],
     "hyperscaler_cloud": [HYPER, HH],
     "gold_royalty": [GOLD, GDX],
-    "exchange_markets": [VIX, SPYVOL],
+    # exchange_markets resolved per-ticker via exchange_market_kpis()
+    "exchange_markets": [],
     "market_data_indices": [VIX, SPYVOL],
     "timber_land": [
         _manual(
@@ -241,25 +312,24 @@ def themes_for_industries(industry_ids: list[str]) -> list[str]:
     return themes
 
 
-def merge_template_kpis(industry_ids: list[str]) -> list[dict]:
+def merge_template_kpis(industry_ids: list[str], ticker: str | None = None) -> list[dict]:
     """Union KPIs across industries; first industry wins on duplicate kpi_id."""
     out: list[dict] = []
     seen: set[str] = set()
     for nid in industry_ids:
-        for kpi in INDUSTRY_TEMPLATES.get(nid) or []:
+        if nid == "exchange_markets" and ticker:
+            template_rows = exchange_market_kpis(ticker)
+        else:
+            template_rows = INDUSTRY_TEMPLATES.get(nid) or []
+        for kpi in template_rows:
             kid = kpi["kpi_id"]
             if kid in seen:
                 continue
             seen.add(kid)
-            # Deep copy via json roundtrip-lite
             row = dict(kpi)
             row["expected"] = dict(kpi["expected"])
-            row["actual"] = dict(kpi["actual"])
+            row["actual"] = dict(kpi.get("actual") or {"value": None, "as_of": None})
             row["binds_to"] = dict(kpi["binds_to"])
-            # Drop valuation-backed price if path will fail lint — keep note-only variant
-            if row["source"].startswith("valuation:"):
-                # Keep; check_kpi may fill; lint needs path — swap to note-only if missing later
-                pass
             out.append(row)
             if len(out) >= 12:
                 return out
@@ -285,7 +355,7 @@ def adapt_kpis_for_ticker(ticker: str, kpis: list[dict]) -> list[dict]:
                 row["status"] = "unchecked"
                 row["actual"] = {"value": None, "as_of": None}
                 row["binds_to"] = {
-                    "on_fail": "human_review",
+                    "on_fail": "open_diligence",
                     "note": f"{row['binds_to'].get('note', row['kpi_id'])} "
                     f"(inputs.price unavailable — manual until valuation priced)",
                 }
@@ -294,7 +364,10 @@ def adapt_kpis_for_ticker(ticker: str, kpis: list[dict]) -> list[dict]:
 
 
 def build_ledger(ticker: str, industry_ids: list[str]) -> dict:
-    kpis = adapt_kpis_for_ticker(ticker, merge_template_kpis(industry_ids))
+    kpis = adapt_kpis_for_ticker(ticker, merge_template_kpis(industry_ids, ticker=ticker))
+    meta_note = "Industry-template scaffold. Context only; refine gates from filings."
+    if "exchange_markets" in industry_ids:
+        meta_note += f" Exchange vol region={region_for_ticker(ticker)}."
     return {
         "ticker": ticker,
         "as_of": TODAY,
@@ -304,7 +377,12 @@ def build_ledger(ticker: str, industry_ids: list[str]) -> dict:
         "scaffold_meta": {
             "generated_by": GENERATOR,
             "generated_at": TODAY,
-            "note": "Industry-template scaffold. Context only; refine gates from filings.",
+            "note": meta_note,
+            **(
+                {"exchange_vol_region": region_for_ticker(ticker)}
+                if "exchange_markets" in industry_ids
+                else {}
+            ),
         },
         "kpis": kpis,
         "summary": wm.summarize_statuses(kpis),
@@ -327,9 +405,16 @@ def main() -> int:
         action="store_true",
         help="Overwrite ledgers previously generated by this script",
     )
+    ap.add_argument(
+        "--industry",
+        action="append",
+        default=[],
+        help="Only tickers linked to this industry node (repeatable)",
+    )
     ap.add_argument("tickers", nargs="*", help="Limit to these tickers")
     args = ap.parse_args()
     wanted = {t.upper() for t in args.tickers} if args.tickers else None
+    industry_filter = {str(x) for x in (args.industry or [])}
 
     membership = load_industry_membership()
     created = 0
@@ -337,6 +422,8 @@ def main() -> int:
     refreshed = 0
     for ticker, industry_ids in sorted(membership.items()):
         if wanted and ticker not in wanted:
+            continue
+        if industry_filter and not industry_filter.intersection(industry_ids):
             continue
         # Skip names with no folder at all? Create research/ under ticker if folder exists
         ticker_dir = wm.ROOT / ticker

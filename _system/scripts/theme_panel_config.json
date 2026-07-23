@@ -1,5 +1,5 @@
 {
-  "description": "Thematic macro/industry indicator panels. Broadly ingested context, consumed narrowly by tagged holdings. Tailwinds inform stance and overlay sizing only; they never auto-inflate Lawrence base IRR (human review promotes to base case).",
+  "description": "Thematic macro/industry indicator panels. Broadly ingested context, consumed narrowly by tagged holdings. Tailwinds inform stance and overlay sizing only; they never auto-inflate Lawrence base IRR (dual-agent promote to base case).",
   "staleness_max_days": 10,
   "sources": {
     "fred": "https://fred.stlouisfed.org/graph/fredgraph.csv?id={id}",
@@ -49,10 +49,15 @@
     },
     "exchange_volatility": {
       "label": "Exchange vol tailwind",
-      "description": "Vol level, realized equity vol, and term-structure context for exchange croupiers.",
+      "description": "Home-market vol for exchange croupiers (US VIX/SPY plus regional realized vol). Map: world_model/exchange_vol_map.json.",
       "series": [
         {"id": "vix_level", "label": "VIX index level", "source": "fred", "fred_id": "VIXCLS", "good_for": "vol_regime", "fallback": {"source": "yahoo_daily", "yahoo_symbol": "^VIX"}},
         {"id": "spy_20d_realized_vol", "label": "SPY 20-day realized vol (annualized %)", "source": "computed_realized_vol", "ticker": "SPY", "window_days": 20, "good_for": "equity_vol"},
+        {"id": "n225_20d_realized_vol", "label": "Nikkei 225 20-day realized vol (annualized %)", "source": "computed_realized_vol", "ticker": "^N225", "window_days": 20, "good_for": "equity_vol_jp"},
+        {"id": "hsi_20d_realized_vol", "label": "Hang Seng 20-day realized vol (annualized %)", "source": "computed_realized_vol", "ticker": "^HSI", "window_days": 20, "good_for": "equity_vol_hk"},
+        {"id": "asx200_20d_realized_vol", "label": "ASX 200 20-day realized vol (annualized %)", "source": "computed_realized_vol", "ticker": "^AXJO", "window_days": 20, "good_for": "equity_vol_au"},
+        {"id": "ftse_20d_realized_vol", "label": "FTSE 100 20-day realized vol (annualized %)", "source": "computed_realized_vol", "ticker": "^FTSE", "window_days": 20, "good_for": "equity_vol_uk"},
+        {"id": "stoxx50_20d_realized_vol", "label": "Euro Stoxx 50 20-day realized vol (annualized %)", "source": "computed_realized_vol", "ticker": "^STOXX50E", "window_days": 20, "good_for": "equity_vol_eu"},
         {"id": "vrp_health_score", "label": "VRP health score (etf-dashboard)", "source": "etf_dashboard_snapshot", "snapshot_file": "vrp_health.json", "json_path": "health_score", "good_for": "options_market_health", "optional": true},
         {"id": "vol_term_slope", "label": "Vol term-structure slope (etf-dashboard)", "source": "etf_dashboard_snapshot", "snapshot_file": "vol_shape_history.json", "json_path": "latest.slope", "good_for": "vol_term_structure", "optional": true}
       ]

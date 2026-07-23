@@ -21,8 +21,8 @@ Cross-ticker derivation graph for thesis KPIs. **Context only** — never auto-i
 ## Rules
 
 - Broad ingest via theme panels; narrow consume via `holdings_themes.json` + ledger binds.
-- Fail / stale → `[HUMAN REVIEW]` on `binds_to.valuation_path`; do not rewrite `inputs` / `scenarios` / `implied_return`.
-- `in_base_irr` stays `false` unless a human promotes under review.
+- Fail / stale → `[OPEN DILIGENCE]` on `binds_to.valuation_path` (agent re-fetch + `[Assumption]`); do not rewrite `inputs` / `scenarios` / `implied_return`.
+- `in_base_irr` stays `false` unless dual-agent promote (capital names still human-gated).
 - Do not duplicate `kpi_trends.json` into ledgers. Trends are mechanical; ledgers are thesis-narrow.
 
 ## Commands
@@ -41,15 +41,15 @@ python _system/scripts/ci_rebuild_profile.py world-model-weekly
 
 1. `hyperscaler_capex_to_land_power` → TPL / APLD / LB ledgers
 2. `gold_spot_to_royalty_sentiment` → RGLD / MSB ledgers
-3. `vix_to_exchange_vol_context` → ICE ledger
+3. `vix_to_exchange_vol_context` → ICE ledger (US); foreign venues use home realized series from `exchange_vol_map.json`
 
 ## Operating rules (tight)
 
 - Context only — never auto-edit `inputs` / `scenarios` / `implied_return`
 - Cap 5–15 KPIs; every row binds to a valuation path or stance-only note
-- **Fail** = decision input; **stale feed with null actual** = ops fix; filing annuals with a value are not auto-stale
+- **Fail** = decision input; **stale feed with null actual** = ops/agent re-fetch; filing annuals with a value are not auto-stale
 - Weekly CI: Data Pipeline cron `0 16 * * 0` (Sunday UTC) → profile `world-model-weekly`
-- Human ritual (weekend): open strip → triage fails → annotate bound assumption under `[HUMAN REVIEW]`
+- Agent weekend pass: open strip → triage fails → annotate `[Assumption]` or `[OPEN DILIGENCE]` (not a human inbox)
 
 ```bash
 python _system/scripts/ci_rebuild_profile.py world-model-weekly

@@ -101,6 +101,38 @@ def test_apply_world_model_context_ice():
     assert "implied_return" not in ctx
 
 
+def test_exchange_vol_map_regions():
+    import scaffold_industry_kpi_ledgers as sc  # noqa: WPS433
+
+    vol_map = sc.load_exchange_vol_map()
+    assert vol_map.get("regions")
+    watch = set(vol_map.get("watch_only_tickers") or [])
+    for ticker, region in (vol_map.get("ticker_region") or {}).items():
+        assert region in vol_map["regions"], ticker
+        folder = ROOT / ticker
+        if ticker in watch:
+            continue
+        assert folder.is_dir(), f"{ticker} missing folder (add to watch_only_tickers if intentional)"
+
+    jp = sc.exchange_market_kpis("8697.T")
+    sources = {k["source"] for k in jp}
+    assert "theme:n225_20d_realized_vol" in sources
+    assert "theme:vix_level" in sources  # secondary global
+    assert "theme:spy_20d_realized_vol" not in sources
+
+    us = sc.exchange_market_kpis("CME")
+    us_sources = {k["source"] for k in us}
+    assert "theme:vix_level" in us_sources
+    assert "theme:spy_20d_realized_vol" in us_sources
+    assert "theme:n225_20d_realized_vol" not in us_sources
+
+    ledger_jp = wm.load_json(ROOT / "8697.T" / "research" / "kpi_ledger.json")
+    jp_ids = [k["kpi_id"] for k in (ledger_jp.get("kpis") or [])]
+    assert "n225_20d_realized_vol" in jp_ids
+    assert "vix_level" not in jp_ids  # primary is home; secondary uses vix_level_global
+    assert "vix_level_global" in jp_ids
+
+
 if __name__ == "__main__":
     test_resolve_path_indexed()
     test_eval_expected()
@@ -109,4 +141,5 @@ if __name__ == "__main__":
     test_hyperscaler_edge_resolves()
     test_foresight_artifacts_exist()
     test_apply_world_model_context_ice()
+    test_exchange_vol_map_regions()
     print("test_world_model: ok")

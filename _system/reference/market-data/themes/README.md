@@ -32,7 +32,7 @@ Live data: `_external/etf-dashboard` (see `.gitmodules`). Override path with `DA
 ## Rules
 
 - **Context only.** Every indicator carries `in_base_irr: false`. Tailwinds inform stance and overlay sizing; they never auto-inflate Lawrence base IRR.
-- Promotion to base case requires a human to set `in_base_irr: true` (preserved across refreshes) under **[HUMAN REVIEW]**.
+- Promotion to base case requires dual-agent promote to set `in_base_irr: true` (preserved across refreshes); live capital still human-gated. Residual gaps → **[OPEN DILIGENCE]** / **[Assumption]**.
 - Offline-safe: on network failure, cached CSV history is kept; Yahoo proxies used for WTI/VIX/GLD when FRED times out.
 - Deep dives: `#### Thematic context` in Business & moat (mechanical table + Marvin narrative preserved on refresh).
 
@@ -43,6 +43,6 @@ Live data: `_external/etf-dashboard` (see `.gitmodules`). Override path with `DA
 | `ai_power_land` | AI compute -> power -> grid/water -> land/hosting | TPL, LB, WBI, APLD, BWEL, **AZLCZ** |
 | `macro_regime` | HY OAS, rates, dollar, VIX, credit impulse | All registry holdings (`*`) |
 | `gold_royalties` | Gold spot, GDX, GDX/GLD ratio | RGLD, FNV, WPM, OR, MSB |
-| `exchange_volatility` | VIX, realized vol, VRP health | CME, ICE, CBOE, MIAX, 8697.T |
+| `exchange_volatility` | Home-market vol (US VIX/SPY + regional realized); VRP optional | CME, ICE, CBOE, MIAX, 8697.T, 0388.HK, ASX.AX |
 
 See `_system/frameworks/optionality_valuation.md` § **Thematic context layer**.

@@ -24,7 +24,7 @@ Strip field `counts.industry_nodes` must match the industry table below.
 | `water_surface` | thesis | `water_surface`, `ai_power_land` | — | TPL, LB, WBI, GYRO, TRC, CDZI |
 | `hyperscaler_cloud` | thesis | `ai_power_land` | Superorg + AGI horizon | AMZN, GOOGL, META, MSFT |
 | `gold_royalty` | thesis | `gold_royalties` | — | RGLD, MSB, WPM, OR, FNV, TFPM |
-| `exchange_markets` | thesis | `exchange_volatility` | Superorg ICE | ICE, 8697.T, CME, CBOE, 0388.HK |
+| `exchange_markets` | thesis | `exchange_volatility` | Superorg ICE; regional vol via `exchange_vol_map.json` | ICE, 8697.T, CME, CBOE, 0388.HK, ASX.AX |
 | `market_data_indices` | thesis | `index_data_fees`, `exchange_volatility` | — | SPGI, MCO, MSCI, FDS, OTCM |
 | `timber_land` | thesis | `timber_housing` | — | ADN.TO, RYN, PCH, WY |
 | `btc_mining_power` | thesis | `btc_hash_power`, `ai_power_land` | — | CMSG, CLSK, IREN, HUT, APLD, MSTR |
@@ -47,6 +47,14 @@ python _system/scripts/build_world_model_snapshot.py
 ```
 
 Scaffolded ledgers carry `scaffold_meta`; curated pilots (TPL, APLD, LB, ICE, RGLD, MSB) are never overwritten unless `--force-scaffolded`.
+
+### Regional exchange vol
+
+Foreign exchange croupiers use **home-market realized vol** (Nikkei / Hang Seng / ASX 200 / FTSE / Stoxx 50), not US VIX as primary. Map: `exchange_vol_map.json`. Non-US scaffolds keep US VIX as secondary `vix_level_global`. Context only.
+
+```bash
+python _system/scripts/scaffold_industry_kpi_ledgers.py --write --force-scaffolded --industry exchange_markets
+```
 
 ## Growth rule (when to add an industry)
 
