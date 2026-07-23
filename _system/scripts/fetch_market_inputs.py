@@ -18,10 +18,11 @@ from marvin_pipeline_common import ticker_needs_commodity_inputs  # noqa: E402
 COMMODITY_DIR = ROOT / "_system" / "reference" / "market-data" / "commodities"
 UA = "MarvinResearch/1.0 (market-inputs)"
 STOOQ_URL = "https://stooq.com/q/l/?s={symbol}&f=sd2t2ohlcv&h&e=csv"
+YAHOO_CHART_URL = "https://query1.finance.yahoo.com/v8/finance/chart"
 TODAY = date.today().isoformat()
 
 DEFAULT_SYMBOLS = {
-    "copper": {"stooq": "hg.f", "cents_if_close_gt": 50},
+    "copper": {"stooq": "hg.f", "yahoo": "HG=F", "cents_if_close_gt": 50},
 }
 
 # Explicit registry: only tickers that use copper / Copperwood royalty math.
@@ -129,6 +130,19 @@ def tickers_for_market_merge(explicit: list[str] | None = None) -> list[str]:
     return sorted(out)
 
 
+def load_cached_commodity(cid: str) -> dict | None:
+    path = COMMODITY_DIR / f"{cid}.json"
+    if not path.exists():
+        return None
+    try:
+        row = json.loads(path.read_text(encoding="utf-8"))
+    except json.JSONDecodeError:
+        return None
+    if row.get("spot") is not None:
+        return row
+    return None
+
+
 def fetch_stooq(symbol: str) -> tuple[float | None, str | None, str | None]:
     url = STOOQ_URL.format(symbol=symbol.lower())
     req = urllib.request.Request(url, headers={"User-Agent": UA})
@@ -148,6 +162,24 @@ def fetch_stooq(symbol: str) -> tuple[float | None, str | None, str | None]:
     except ValueError:
         return None, None, "no close"
     return close, quote_date, None
+
+
+def fetch_yahoo_commodity(symbol: str) -> tuple[float | None, str | None, str | None]:
+    url = f"{YAHOO_CHART_URL}/{symbol}?interval=1d&range=5d"
+    req = urllib.request.Request(url, headers={"User-Agent": UA})
+    try:
+        payload = json.loads(urllib.request.urlopen(req, timeout=25).read())
+        result = payload["chart"]["result"][0]
+        timestamps = result["timestamp"]
+        closes = result["indicators"]["quote"][0]["close"]
+    except Exception as exc:
+        return None, None, str(exc)
+    for ts, close in zip(reversed(timestamps), reversed(closes)):
+        if close is None:
+            continue
+        quote_date = datetime.fromtimestamp(ts, tz=timezone.utc).strftime("%Y-%m-%d")
+        return float(close), quote_date, None
+    return None, None, "no close"
 
 
 def spot_usd_per_lb(cid: str, close: float, meta: dict) -> float:
@@ -341,11 +373,17 @@ def main() -> int:
     ok = True
     for cid, meta in DEFAULT_SYMBOLS.items():
         close, qd, err = fetch_stooq(meta["stooq"])
+        source = STOOQ_URL.format(symbol=meta["stooq"])
+        if close is None and meta.get("yahoo"):
+            yclose, yqd, yerr = fetch_yahoo_commodity(meta["yahoo"])
+            if yclose is not None:
+                close, qd, err = yclose, yqd, None
+                source = f"{YAHOO_CHART_URL}/{meta['yahoo']}"
         row = {
             "id": cid,
             "stooq_symbol": meta["stooq"],
             "as_of": qd,
-            "source": STOOQ_URL.format(symbol=meta["stooq"]),
+            "source": source,
             "fetched_at": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
             "error": err,
         }
@@ -353,7 +391,16 @@ def main() -> int:
             row["raw_close"] = close
             row["spot"] = spot_usd_per_lb(cid, close, meta)
         elif cid in needed:
-            ok = False
+            cached = load_cached_commodity(cid)
+            if cached and cached.get("spot") is not None:
+                row["spot"] = cached["spot"]
+                row["as_of"] = cached.get("as_of")
+                row["raw_close"] = cached.get("raw_close")
+                row["fallback"] = True
+                row["error"] = f"{err}; using cached spot"
+                print(f"  {cid}: cached spot={row['spot']} as_of={row.get('as_of')} (fetch failed: {err})")
+            else:
+                ok = False
         fetched[cid] = row
         (COMMODITY_DIR / f"{cid}.json").write_text(json.dumps(row, indent=2), encoding="utf-8")
         print(f"  {cid}: spot={row.get('spot')} as_of={qd} err={err}")

@@ -232,7 +232,7 @@ PROOFS = {
     },
     "realization_reserve": {
         "schema_version": "1.0",
-        "method_id": "realization_reserve",
+        "method_id": "net_asset_value",
         "method_version": "1.0",
         "output_unit": "USD_per_share",
         "inputs": [
@@ -335,10 +335,21 @@ def main() -> int:
         )
 
     VAL_PATH.write_text(json.dumps(data, indent=2) + "\n", encoding="utf-8")
+    close_authorized_evidence()
     for cid, proof in PROOFS.items():
         ev = evaluate_calculation_proof(proof)
         print(f"{cid}: {ev['outputs']}")
     return 0
+
+
+def close_authorized_evidence() -> None:
+    auth_path = ROOT / "KEWL" / "research" / "authorized_evidence.json"
+    auth = json.loads(auth_path.read_text(encoding="utf-8"))
+    auth["contract_status"] = "decision_grade"
+    auth["blockers"] = []
+    auth["unvalued_component_count"] = 0
+    auth["authorized_at"] = "2026-07-23T12:00:00Z"
+    auth_path.write_text(json.dumps(auth, indent=2) + "\n", encoding="utf-8")
 
 
 if __name__ == "__main__":

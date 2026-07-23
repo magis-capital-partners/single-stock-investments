@@ -1,29 +1,83 @@
 {
-  "ticker": "KEWL",
-  "as_of": "2026-07-23",
-  "one_liner": "Michigan mineral estate (>1.3M acres) with Copperwood production royalty option atop modest lease income; GAAP book misstates fair value.",
-  "base_irr_pct": -8.3,
-  "stance": "watch",
-  "archetype": "optionality",
-  "payoff_lens": "asset",
+  "base_irr_pct": -7.46,
+  "classification": {
+    "archetype": "optionality",
+    "cycle": "-",
+    "dhando": "partial",
+    "lawrence_bucket": "other",
+    "moat": "n/a",
+    "payoff_lens": "asset"
+  },
+  "evidence_citations": [
+    "KEWL/third-party-analyses/references.md",
+    "KEWL/INDEX.csv",
+    "investor-documents/ir-kewl/2025-12-31_Annual_Report.pdf",
+    "investor-documents/ir-kewl/2021-09-30_Quarterly_Report.pdf",
+    "investor-documents/ir-kewl/2021-11-22_Proxy_Statement.pdf"
+  ],
+  "filing_digest": "KEWL/research/evidence/filing_digest_2026-07-23.md",
+  "generated_at": "2026-07-23T21:21:06+00:00",
+  "irr_label": "7yr IRR (total synthesis)",
   "key_assumptions": [
-    "Mineral lease run-rate ~$365K/yr capitalized in operating component proof",
-    "Copperwood royalty P=35% at spot copper (~$6.54/lb vs SSI $4/lb reference)",
-    "GAAP book ~$12.70/sh; economic floor ~$21/sh not GAAP book",
-    "Price ~$55 embeds much of the Copperwood option"
+    {
+      "input": "Price today",
+      "source": "Yahoo KEWL close 2026-07-23",
+      "value": "**$59.33**"
+    },
+    {
+      "input": "GAAP book per share",
+      "source": "Filing equity \u00f7 shares",
+      "value": "**$12.7**"
+    },
+    {
+      "input": "Payoff price (Year 7)",
+      "source": "Sum of parts / catalyst path in IRR steps",
+      "value": "**$30.0**"
+    },
+    {
+      "input": "Horizon (years)",
+      "source": "Model choice in valuation.json (not company guidance)",
+      "value": "**7**"
+    },
+    {
+      "input": "Mineral lease run-rate capitalized uplift",
+      "source": "~$365K/yr x 10.0x / shares",
+      "value": "**+$3.24/sh**"
+    },
+    {
+      "input": "Production option (partially in price) uplift",
+      "source": "P=35% x spot royalty $12.2M/yr",
+      "value": "**+$3.79/sh**"
+    },
+    {
+      "input": "Acreage + secondary lessee uplift",
+      "source": "Filing + option [Assumption]",
+      "value": "**+$1.0/sh**"
+    },
+    {
+      "input": "Residual to Lawrence base payoff uplift",
+      "source": "Tie to $30.0 path",
+      "value": "**+$9.27/sh**"
+    }
   ],
+  "last_verified": {
+    "deep_dive": "2026-07-23",
+    "human_approved": null,
+    "valuation_as_of": "2026-07-23"
+  },
   "open_questions": [
-    "Does management achieve cash-flow positive operations from 2026 as stated at 2025 shareholder meeting?",
-    "Highland Copper Copperwood production timing and royalty start date",
-    "Secondary lessee on 667K-acre June 2024 expansion package"
+    "Price refreshed: Stooq **$55.00** (2026-05-22) vs mgmt repurchase **$27** (Jun 2024)",
+    "Verify FY2025 machine-readable financials",
+    "Track Highland Copper Copperwood milestones"
   ],
-  "top_citations": [
-    "KEWL/investor-documents/ir-kewl/2025-12-31_Annual_Report.pdf",
-    "KEWL/investor-documents/ir-kewl/2024-12-31_Annual_Report.pdf",
-    "KEWL/investor-documents/ir-kewl/2025-06-30_Semi-Annual_Report.pdf",
-    "KEWL/research/valuation.json",
-    "KEWL/research/evidence_reconciliation_2026-07-23.md"
-  ],
-  "component_value_base_per_share": 35.75,
-  "prior_deep_dive": "KEWL/research/deep_dive_2026-06-04.md"
+  "scenarios": {
+    "base": -9.28,
+    "bear": -18.64,
+    "bull": 2.39
+  },
+  "schema_version": "1.0",
+  "stance": null,
+  "thesis": "Keweenaw Land Association owns mineral rights on more than one million net acres in Michigan's Upper Peninsula. **[Fact]** Revenue today is mineral lease income, primarily from Highland Copper's Copperwood project leases (~$349,700 in FY2024). **[Fact]** The company is not an operator; it collects rent and royalties if lessees develop mines. **[Fact]** Book value was about $14.3 million (~$12.70 per share) at December 2024 with roughly $4 million in cash and treasuries against ~$160,000 per year operating burn. **[Fact]** In June 2024 management repurchased 51,633 shares at $27 and acquired 667,000 additional acres at roughly $1.52 per acre. The stock trades OTC with very thin volume.",
+  "ticker": "KEWL",
+  "why_market_wrong": "The market may either ignore Copperwood production royalties priced at zero in lease-only cash flow, or overpay after a move from management's $27 repurchase to much higher OTC quotes. **[Inference]** At **$59.33** (Yahoo close, 2026-07-23), roughly 4.7\u00d7 book, the dormant asset (Copperwood royalties) is partially in the price. **[Inference]** OTC illiquidity and CEO-prepared statements keep the acreage option opaque to generalists. SSI framing (May 2024) used **$4/lb copper**; we scale the SSI royalty bridge to spot copper when available. Lawrence base still assumes **no production royalties** in operating cash; overlay uses **35% probability** on spot royalty math."
 }

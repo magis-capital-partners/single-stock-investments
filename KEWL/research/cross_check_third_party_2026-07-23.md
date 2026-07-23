@@ -1,22 +1,23 @@
 # KEWL — Cross-Check: Third-Party Sources
 
 **Date:** 2026-07-23
-**Agent:** Marvin (contract backfill refresh)
-**Marvin dive:** `KEWL/research/deep_dive_2026-06-04.md` (prior; mechanical refresh pending)
-**Source inventory:** `KEWL/third-party-analyses/source_inventory_2026-06-02.md`
+**Agent:** Marvin (automated fill)
+**Marvin dive:** `KEWL/research/deep_dive_2026-07-23.md`
+**Source inventory:** `KEWL/third-party-analyses/source_inventory_2026-07-23.md`
 **Framework:** `_system/frameworks/third_party_cross_reference.md`, `external_view_blend.md`
 
 ## Executive summary
 
-Marvin floor **-8.3%** per year (optionality; stance **watch**) from primary filings and `valuation.json`. Component economic value base **~$35.75/sh** vs price **~$55** after contract backfill proofs. **3** approved third-party source(s) support narrative timing; numeric anchor unchanged unless human promotes blend into base IRR. **[HUMAN REVIEW]** for approved-source numeric blend.
+Marvin floor **-7.46%** per year (optionality; stance **watch**) from primary filings and `valuation.json`. **3** approved third-party source(s) support narrative timing; numeric anchor unchanged unless human promotes blend into base IRR. **[HUMAN REVIEW]** for approved-source numeric blend.
 
-**Synthesis (best estimate):** Marvin **-8.3%** base · stance **watch**; external sources adjust conviction on catalyst timing, not primary IRR without human OK.
+**Synthesis (best estimate):** Marvin **-7.46%** base · stance **watch**; external sources adjust conviction on catalyst timing, not primary IRR without human OK.
 
 ## Sources in scope
 
 | Source ID | Title | Path | Status | Cross-check status |
 |-----------|-------|------|--------|-------------------|
 | hk_context_kewl | HK + SSI context (KEWL) | `KEWL/third-party-analyses/references.md` | approved | [x] approved |
+| vic | VIC PDF intake - KEWL - KEWL VIC PDF | `KEWL/third-party-analyses/vic/vic_pdf_2026-06-18_kewl-vic-pdf_35c3c4c41a.pdf` | pending | [ ] pending |
 | reference | Keweenaw Land Association (KEWL) | `https://specialsituationinvesting.substack.com/p/keweenaw-land-association-kewl` | approved | [x] approved |
 | reference | Update: Keweenaw Land Association (KEWL) | `https://specialsituationinvesting.substack.com/p/update-keweenaw-land-association` | approved | [x] approved |
 
@@ -24,31 +25,31 @@ Marvin floor **-8.3%** per year (optionality; stance **watch**) from primary fil
 
 | Topic | Marvin (filings) | External | Source |
 |-------|------------------|----------|--------|
-| Base return anchor | **-8.3%** per year | Qualitative support only | `KEWL/research/valuation.json` |
-| Component NAV base | **~$35.75/sh** additive proof sum | SSI mineral-floor framing consistent | `KEWL/research/evidence_reconciliation_2026-07-23.md` |
+| Base return anchor | **-7.46%** per year | Qualitative support only | `KEWL/research/deep_dive_2026-07-23.md` |
 | Archetype / stance | **optionality** · **watch** | See indexed sources | `valuation.json` |
-| GAAP vs fair value | Book ~$12.70/sh; economic floor higher | SSI confirms hidden NAV | `references.md` |
-| Copperwood option | P=35% in base overlay | SSI ~$7.7M/yr @ $4/lb reference | Substack posts |
+| Normalization | SSI mineral-floor + free-option. At $55, ~4.3× book — option yield falls vs $27  | Cross-check vs posts | Marvin |
+| Theme | Filing-grounded thesis | HK + SSI context (KEWL) | `KEWL/third-party-analyses/references.md` |
+| Theme | Filing-grounded thesis | Keweenaw Land Association (KEWL) | `https://specialsituationinvesting.substack.com/p/keweenaw-land-association-kewl` |
+| Theme | Filing-grounded thesis | Update: Keweenaw Land Association (KEWL) | `https://specialsituationinvesting.substack.com/p/update-keweenaw-land-association` |
 
 ## Divergences (normalization / stance)
 
 | Topic | Marvin floor | External | Blend logic |
 |-------|--------------|----------|-------------|
-| Primary IRR | **-8.3%** (Lawrence / scenarios) | No single approved IRR unless promoted | Marvin **70%** numeric; external **30%** catalyst timing |
-| Spot price vs entry | Watch at ~$55 (~4.3× book) | SSI framed value at lower prices | External timing support does not upgrade base IRR |
-| Third party | Filing-first + proof bridge | Context tier only | No numeric upgrade without human OK |
+| Primary IRR | **-7.46%** (Lawrence / scenarios) | No single approved IRR unless promoted | Marvin **70%** numeric; external **30%** catalyst timing |
+| Pending sell-side / notes | Not in base IRR | **[PENDING APPROVAL]** | Do not blend until approved |
 
 ## Blended estimate (best judgment)
 
 | Lens | Owner cash / value | Return / horizon | Stance hint |
 |------|-------------------|------------------|-------------|
-| Marvin floor | Component sum ~$35.75/sh | **-8.3%** | **watch** |
+| Marvin floor | See assumption ledger | **-7.46%** | **watch** |
 | External (combined) | Narrative / catalyst | No change to base % | **watch** (conviction) |
-| **Blended best estimate** | **Filing anchor + proof bridge** | **-8.3%** | **watch** |
+| **Blended best estimate** | **Filing anchor** | **-7.46%** | **watch** |
 
 **Weights:** Marvin **70%** on numbers; indexed third party **30%** on catalyst timing and narrative (approved Substacks/HK context only in qualitative layer until human promotes).
 
-**Returns statement (blended):** We expect **-8.3%** per year at today's price on the Marvin base case; third-party sources may raise or lower conviction on Copperwood timing but do not replace filing math without **[HUMAN REVIEW]**.
+**Returns statement (blended):** We expect **-7.46%** per year at today's price on the Marvin base case; third-party sources may raise or lower conviction on timing but do not replace filing math without **[HUMAN REVIEW]**.
 
 ## [HUMAN REVIEW]
 
@@ -58,11 +59,10 @@ Marvin floor **-8.3%** per year (optionality; stance **watch**) from primary fil
 
 ## [PROPOSED MEMORY]
 
-- [PROPOSED COMPANY] KEWL: contract backfill 2026-07-23 closed four calculation_proof blockers; component base ~$35.75/sh vs price ~$55
+- [PROPOSED COMPANY] KEWL: third-party cross-check fill 2026-07-23 — Marvin -7.46% unchanged
 
 ## Primary sources cited
 
-1. `KEWL/research/evidence_reconciliation_2026-07-23.md`
+1. `KEWL/research/deep_dive_2026-07-23.md`
 2. `KEWL/research/valuation.json`
-3. `KEWL/investor-documents/ir-kewl/2025-12-31_Annual_Report.pdf`
-4. `KEWL/third-party-analyses/source_inventory_2026-06-02.md`
+3. `KEWL/third-party-analyses/source_inventory_2026-07-23.md`
