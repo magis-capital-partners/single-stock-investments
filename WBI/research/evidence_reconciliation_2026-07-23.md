@@ -1,6 +1,6 @@
 # WBI valuation evidence reconciliation — 2026-07-23
 
-**Scope:** Contract backfill refresh per authorized evidence packet and `research_agent_manifest.json`.
+**Scope:** Contract backfill refresh per authorized evidence packet (DOWNLOAD_MANIFEST + authorized_evidence).
 
 ## Proofs attached (unchanged evidence packet)
 

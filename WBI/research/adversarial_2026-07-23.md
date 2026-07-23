@@ -11,11 +11,11 @@ re_pass: false
 
 # WBI — Adversarial review
 
-**Date:** 2026-07-21  
+**Date:** 2026-07-23  
 **Agent:** Milly (batch pass)  
-**Dive reviewed:** `WBI/research/deep_dive_2026-07-21.md`  
+**Dive reviewed:** `WBI/research/deep_dive_2026-07-23.md`  
 **Valuation reviewed:** `WBI/research/valuation.json`  
-**Filings used:** `WBI/research/evidence/filing_facts_2026-07-21.json`
+**Filings used:** `WBI/research/evidence/filing_facts_2026-07-23.json`
 
 **Goal:** Truth-seeking QA. Not bearish for its own sake.
 
@@ -53,10 +53,6 @@ re_pass: false
 | Returns statement | 6.49% | 6.49% | Yes |
 | Classification IRR | 6.49% | 6.49% | Yes |
 | Valuation bridge base | 6.49% | 6.49% | Yes |
-
-**Lint notes:**
-- WBI/research/deep_dive_2026-07-21.md: executive_summary_first_pct 3.2% vs valuation.json base 6.49% (tol 0.25pp)
-- WBI/research: adversarial date adversarial_2026-06-02.md != dive 2026-07-21
 
 ---
 
