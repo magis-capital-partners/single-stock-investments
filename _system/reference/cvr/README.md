@@ -32,10 +32,19 @@ Pinned sleeve filter: **CVRs** (`cvr_all`) — first sleeve button after **All**
 ## Automatic pipeline
 
 ```text
+# Weekly (Monday 15:00 UTC) — discovery only
+refresh_cvr_universe.py --discover --ingest-inbox --write-review --skip-sync
+  → SEC full-text 8-K CVR search (fail-soft)
+  → inbox/*.csv secondary feed → inbox/processed/
+  → append context-tier pre_close_opportunities
+  → reviews/pending/cvr_discovery_*.md
+  → discovery_state health counters
+
+# Nightly / every dashboard build — sync only (no SEC)
 refresh_cvr_universe.py
-  → sync cvr_contingent tickers from cvr_universe.json
-  → ensure registry holdings + classification.investment_sleeve
-  → refresh display fields on cvr_terms.json
+  → sleeve cvr_contingent = universe tickers with cvr_terms.json (ready policy)
+  → registry holdings + classification
+  → display refresh on terms
   → sync_investment_sleeves.py
 build_dashboard_data.py
   → row["cvr"] payload + pinned sleeve_filters cvr_all
@@ -43,18 +52,25 @@ build_dashboard_data.py
 
 **Hooks**
 
-- Nightly / light download: `download_all_holdings.py` → `daily_refresh` runs refresh before dashboard build
-- CI profiles: `ci_rebuild_profile.py` inserts refresh before every `build_dashboard_data.py`
+- Weekly discovery: Data Pipeline cron `0 15 * * 1` → job `cvr-discover`
+- Nightly / light download: `download_all_holdings.py` → sync before dashboard build
+- CI profiles: `ci_rebuild_profile.py` inserts sync before every `build_dashboard_data.py`
 - Direct workflows: `ls-algo-universe.yml`, `letter-backfill.yml`
 
-**Optional discovery**
+**Secondary feeds**
+
+Drop CSVs in `inbox/` (see `inbox/README.md`). Schema sample: `examples/sample_screener_inbox.csv`.
+
+**Manual discovery**
 
 ```bash
-python _system/scripts/refresh_cvr_universe.py --discover
-python _system/scripts/refresh_cvr_universe.py --ingest-csv path/to/screener.csv
+python _system/scripts/refresh_cvr_universe.py --discover --ingest-inbox --write-review --skip-sync
+python _system/scripts/refresh_cvr_universe.py --ingest-csv path/to/screener.csv --write-review
 ```
 
-SEC / CSV hits land as context-tier `pre_close` candidates until an agent fills `cvr_terms.json` from primary exhibits.
+SEC / CSV hits land as context-tier `pre_close` candidates and stay **off** the dashboard CVRs filter until `{TICKER}/research/cvr_terms.json` exists.
+
+**Roadmap:** `_system/reviews/pending/cvr_discovery_robustness_plan_2026-07-23.md` (Parts 1–4).
 
 ## Local papers
 
