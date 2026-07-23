@@ -368,11 +368,12 @@ test_main_writer_workflows_share_lock() {
     # letter-backfill: download job is vault-only (letter-vault-download);
     # publish-dashboard must still take the shared ops lock.
     if [ "$workflow" = "letter-backfill.yml" ]; then
-      if ! printf '%s\n' "$text" | grep -A3 'publish-dashboard:' | grep -q 'group: data-commit-main'; then
+      # concurrency sits a few lines under the job key (needs/runs-on/timeout first).
+      if ! printf '%s\n' "$text" | grep -A8 'publish-dashboard:' | grep -q 'group: data-commit-main'; then
         echo "FAIL: letter-backfill publish-dashboard must use data-commit-main"
         exit 1
       fi
-      if ! printf '%s\n' "$text" | grep -A8 'publish-dashboard:' | grep -q 'cancel-in-progress: false'; then
+      if ! printf '%s\n' "$text" | grep -A10 'publish-dashboard:' | grep -q 'cancel-in-progress: false'; then
         echo "FAIL: letter-backfill publish-dashboard must keep queued writers"
         exit 1
       fi
