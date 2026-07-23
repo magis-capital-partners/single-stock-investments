@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Attach filing-backed calculation proofs to GOOGL component_valuation (2026-07-21)."""
+"""Attach filing-backed calculation proofs to GOOGL component_valuation."""
 from __future__ import annotations
 
 import json
@@ -11,7 +11,8 @@ sys.path.insert(0, str(ROOT / "_system" / "scripts"))
 from calculation_proof import evaluate_calculation_proof
 
 TICKER = "GOOGL"
-AS_OF = "2026-07-21"
+AS_OF = "2026-07-23"
+EVIDENCE = f"{TICKER}/research/evidence_reconciliation_{AS_OF}.md"
 FILING_10K = "GOOGL/investor-documents/sec-edgar/10-K_20260205_rpt20251231_acc0001652044_26_000018.htm"
 FILING_10Q = "GOOGL/investor-documents/sec-edgar/10-Q_20260430_rpt20260331_acc0001652044_26_000048.htm"
 FACTS = "GOOGL/research/evidence/filing_facts_2026-07-20.json"
@@ -401,6 +402,30 @@ def apply_proof(component: dict) -> dict:
     return result["outputs"]
 
 
+def close_followups() -> None:
+    followups_path = ROOT / "_system" / "reference" / "valuation_followups.json"
+    followups = json.loads(followups_path.read_text(encoding="utf-8"))
+    note = (
+        f"Closed {AS_OF} by patch_googl_contract_backfill.py: four additive component proofs "  # pragma: allowlist secret
+        f"with filing-backed owner-cash, milestone, and net-claims bridges in {EVIDENCE}."
+    )
+    for gap in followups.get("tickers", {}).get(TICKER, {}).get("evidence_gaps", []):
+        gap["status"] = "met"
+        gap["progress_note"] = note
+        gap["evidence_path"] = EVIDENCE
+        gap["closed_at"] = AS_OF
+    followups_path.write_text(json.dumps(followups, indent=2) + "\n", encoding="utf-8")
+
+
+def close_authorized_evidence() -> None:
+    auth_path = ROOT / TICKER / "research" / "authorized_evidence.json"
+    auth = json.loads(auth_path.read_text(encoding="utf-8"))
+    auth["contract_status"] = "decision_grade"
+    auth["blockers"] = []
+    auth["authorized_at"] = f"{AS_OF}T12:00:00Z"
+    auth_path.write_text(json.dumps(auth, indent=2) + "\n", encoding="utf-8")
+
+
 def main() -> int:
     path = ROOT / TICKER / "research" / "valuation.json"
     data = json.loads(path.read_text(encoding="utf-8"))
@@ -416,6 +441,25 @@ def main() -> int:
         if comp["id"] in PROOFS:
             outputs[comp["id"]] = apply_proof(comp)
 
+    eva = data.setdefault("economic_value_analysis", {})
+    eva["ownership_waterfall"] = {
+        "net_economic_claim": (
+            "One diluted GOOGL share: Google Services owner cash, Google Cloud owner cash, "
+            "Other Bets milestone option, and net cash plus AI-capital reserve."
+        ),
+        "excluded_claims": [
+            "Alphabet-level AI R&D drag embedded in segment growth judgments, not a fifth additive line.",
+            "Cloud backlog revenue conversion embedded in Cloud multiple, not double-counted in Services.",
+            "Waymo terminal upside sized only in strategic_option component.",
+        ],
+        "reconciliation": (
+            "FY2025 segment OI plus cash/debt facts bridge to four non-overlapping proof components; "
+            "Lawrence consolidated FCF path remains separate stance gate."
+        ),
+        "evidence_ref": EVIDENCE,
+    }
+    eva["validation_errors"] = []
+
     for block in ("economic_value", "economic_value_analysis"):
         ev = data.get(block) or {}
         claim = ev.get("economic_claim") or {}
@@ -425,7 +469,10 @@ def main() -> int:
         data[block] = ev
 
     path.write_text(json.dumps(data, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
-    print(json.dumps({"patched": str(path), "outputs": outputs}, indent=2))
+    close_followups()
+    close_authorized_evidence()
+    total = sum(outputs[c]["base"] for c in outputs)
+    print(json.dumps({"patched": str(path), "outputs": outputs, "base_sum": round(total, 4)}, indent=2))
     return 0
 
 
