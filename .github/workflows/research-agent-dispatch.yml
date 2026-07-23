@@ -90,7 +90,9 @@ jobs:
           HASH=$(python -c "import json; print(json.load(open('manifest.json'))['evidence_hash'])")
           PRIMARY_COUNT=$(python -c "import json; print(json.load(open('manifest.json'))['artifact_count'])")
           MANIFEST=$(python -c "import json; print(json.dumps(json.load(open('manifest.json')), separators=(',', ':')))")
-          OPEN_CURSOR_COUNT=$(gh pr list --repo "$GITHUB_REPOSITORY" --state open --limit 100 --json headRefName --jq '[.[] | select(.headRefName|startswith("cursor/"))] | length')
+          # Count only non-conflicting cursor PRs. Dirty/conflicted agent PRs do not
+          # represent active research capacity and must not block new admissions.
+OPEN_CURSOR_COUNT=$(gh pr list --repo "$GITHUB_REPOSITORY" --state open --limit 100 --json headRefName,mergeable,mergeStateStatus --jq '[.[] | select(.headRefName|startswith("cursor/")) | select((.mergeable != "CONFLICTING") and (.mergeStateStatus != "DIRTY"))] | length')
           MAX_OPEN_CURSOR_PRS="${MAX_OPEN_CURSOR_PRS:-5}"
           if [ "${OPEN_CURSOR_COUNT}" -ge "${MAX_OPEN_CURSOR_PRS}" ]; then
             echo "ticker=" >> "$GITHUB_OUTPUT"
@@ -101,7 +103,7 @@ jobs:
             echo "primary_evidence_count=$PRIMARY_COUNT" >> "$GITHUB_OUTPUT"
             echo "manifest_json=$MANIFEST" >> "$GITHUB_OUTPUT"
             echo "### Research dispatch suppressed" >> "$GITHUB_STEP_SUMMARY"
-            echo "Open cursor/* PRs=${OPEN_CURSOR_COUNT} >= ${MAX_OPEN_CURSOR_PRS}; waiting for automerge drain." >> "$GITHUB_STEP_SUMMARY"
+            echo "Open mergeable cursor/* PRs=${OPEN_CURSOR_COUNT} >= ${MAX_OPEN_CURSOR_PRS}; waiting for automerge drain." >> "$GITHUB_STEP_SUMMARY"
             exit 0
           fi
           ACTIVE_PR=$(gh pr list --repo "$GITHUB_REPOSITORY" --state open --json number,headRefName,title | TICKER="$TICKER" python -c 'import json, os, sys; ticker=os.environ["TICKER"].upper(); prs=json.load(sys.stdin); matches=[p for p in prs if p["headRefName"].startswith("cursor/") and (ticker in p["headRefName"].upper() or ticker in p["title"].upper())]; print(matches[0]["number"] if matches else "")')
