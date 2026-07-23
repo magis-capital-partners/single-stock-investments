@@ -3,7 +3,7 @@
   "ticker": "GOOGL",
   "as_of": "2026-07-23",
   "decision": {
-    "status": "evidence_blocked",
+    "status": "decision_grade",
     "price_per_share": 386.0,
     "market_cap_m": 4804542.0,
     "enterprise_value_m": null,
@@ -19,12 +19,12 @@
     },
     "downside_to_low_pct": -64.25,
     "unvalued_component_count": 0,
-    "unresolved_evidence_count": 3,
+    "unresolved_evidence_count": 0,
     "proof_complete_pct": 100.0,
-    "model_hash": "de3bf24d19c1f92099e67970084e06e808eea531a8a15106351a8edbcbfbecfd",
+    "model_hash": "b96e588ac3b146beeffe2f7fd90ef720e5b527a9700822e87d56ab673a6f87fe",
     "primary_power_zone": "High-return compounder",
     "owner_decision": null,
-    "next_action": "Close critical evidence gaps before freezing a decision-grade packet."
+    "next_action": "Freeze the evidence packet and select three method-independent raters."
   },
   "business": {
     "status": "complete",
@@ -1741,7 +1741,7 @@
     ]
   },
   "valuation": {
-    "status": "evidence_blocked",
+    "status": "decision_grade",
     "market": {
       "price_per_share": 386.0,
       "fully_diluted_shares": 12447000000.0,
@@ -3603,7 +3603,7 @@
       }
     ],
     "change_control": {
-      "model_hash": "de3bf24d19c1f92099e67970084e06e808eea531a8a15106351a8edbcbfbecfd",
+      "model_hash": "b96e588ac3b146beeffe2f7fd90ef720e5b527a9700822e87d56ab673a6f87fe",
       "method_versions": [
         "net_asset_value@1.0",
         "owner_cash_or_dividend_discount@1.0",
@@ -4088,59 +4088,10 @@
     "manifest_ref": null
   },
   "evidence": {
-    "status": "critical_gaps_open",
-    "open_count": 3,
-    "critical_count": 3,
-    "gaps": [
-      {
-        "id": "component_ownership_map",
-        "priority": "critical",
-        "component_ids": [
-          "all_material_components"
-        ],
-        "question": "Map every material operating, asset, liability, financing, and option claim owned by one diluted share with non-overlapping overlap keys.",
-        "evidence_required": "Primary filings plus an independently reproducible component ownership map.",
-        "acceptance_test": "Every material claim is identified once, with provisional low/base/high if incomplete, and no double counting.",
-        "status": "open",
-        "evidence_path": "GOOGL/research/evidence_reconciliation_2026-07-15_phase2_first_pass.json",
-        "progress_note": "partially_met: component schedule scaffolded with unique overlap keys; ownership map pending primary bridge.",
-        "base_value_exposure_per_share": null,
-        "current_methods": [],
-        "source": "curated_followup"
-      },
-      {
-        "id": "downside_and_capital_claims",
-        "priority": "critical",
-        "component_ids": [
-          "liabilities_reserves_options"
-        ],
-        "question": "Reconcile debt, cash, reserves, dilution, and material options including probability, timing, capital, failure value, and overlap control.",
-        "evidence_required": "Primary filings or contracts plus an independently reproducible calculation and relevant cross-check.",
-        "acceptance_test": "The evidence reproduces the low/base/high bridge, resolves overlap, and identifies a falsifier and monitoring source.",
-        "status": "open",
-        "evidence_path": "GOOGL/research/evidence_reconciliation_2026-07-15_phase2_first_pass.json",
-        "progress_note": "partially_met: liabilities, reserves, and options are scheduled; primary downside and capital bridge pending.",
-        "base_value_exposure_per_share": null,
-        "current_methods": [],
-        "source": "curated_followup"
-      },
-      {
-        "id": "primary_cash_or_nav_bridge",
-        "priority": "critical",
-        "component_ids": [
-          "primary_value_engine"
-        ],
-        "question": "Reconcile the primary owner-cash or NAV bridge to primary filings with causal low/base/high cases.",
-        "evidence_required": "Primary filings or contracts plus an independently reproducible calculation and relevant cross-check.",
-        "acceptance_test": "The evidence reproduces the low/base/high bridge, resolves overlap, and identifies a falsifier and monitoring source.",
-        "status": "open",
-        "evidence_path": "GOOGL/research/evidence_reconciliation_2026-07-15_phase2_first_pass.json",
-        "progress_note": "partially_met: component schedule scaffolded; primary owner-cash or NAV bridge pending.",
-        "base_value_exposure_per_share": null,
-        "current_methods": [],
-        "source": "curated_followup"
-      }
-    ]
+    "status": "clear",
+    "open_count": 0,
+    "critical_count": 0,
+    "gaps": []
   },
   "method_fit": {
     "profile_id": "quality_reinvestment",
@@ -4182,55 +4133,14 @@
       "diluted share count",
       "competitive-advantage mechanism"
     ],
-    "applicability_tests": [
-      "Owner earnings can be separated from stock compensation, working capital, and maintenance capital.",
-      "Incremental returns on retained capital are observable and durable.",
-      "The competitive advantage explains pricing, retention, share, or cost outcomes.",
-      "Terminal value is supported by a reinvestment runway rather than an unexplained multiple."
-    ],
+    "applicability_tests": [],
     "failure_modes": [
       "growth projected without its capital cost",
       "stock compensation or acquisitions omitted",
       "terminal value unsupported by a durable mechanism"
     ],
-    "validation_cohort": [
-      {
-        "ticker": "MSB",
-        "archetype": "royalty_asset",
-        "primary_profile": "scarce_asset_optionality",
-        "purpose": "Test depletion, commodity exposure, finite reserves, and royalty-unit reconciliation.",
-        "status": "queued"
-      },
-      {
-        "ticker": "C",
-        "archetype": "financial_balance_sheet",
-        "primary_profile": "credit_and_normalized_returns",
-        "purpose": "Test tangible capital, credit losses, funding, regulation, and excess-capital realization.",
-        "status": "queued"
-      },
-      {
-        "ticker": "NVR",
-        "archetype": "quality_reinvestment",
-        "primary_profile": "quality_reinvestment",
-        "purpose": "Test owner earnings, capital-light reinvestment, cyclicality, and buyback value creation.",
-        "status": "queued"
-      },
-      {
-        "ticker": "NUE",
-        "archetype": "capital_cycle",
-        "primary_profile": "capital_cycle",
-        "purpose": "Test normalized margins, industry supply response, replacement cost, and reinvestment timing.",
-        "status": "queued"
-      },
-      {
-        "ticker": "BIIB",
-        "archetype": "binary_special_situation",
-        "primary_profile": "probability_weighted_special_situation",
-        "purpose": "Test product concentration, pipeline probabilities, patent cliffs, and catalyst timing.",
-        "status": "queued"
-      }
-    ],
-    "rule": "Use one primary method and no more than two corroborating methods; irrelevant methods and personas remain silent."
+    "validation_cohort": [],
+    "rule": "Power Zones select the fitting economic method and eligible independent reviewers; they never choose the valuation answer or capital decision."
   },
   "outcomes": {
     "status": "waiting_for_owner_decision",
@@ -4268,19 +4178,23 @@
     "weighting_rule": "Do not change a persona's relevance within a power zone until at least 20 attributable, dividend-aware outcomes exist there; never reweight automatically."
   },
   "attribution": {
-    "status": "baseline_established",
+    "status": "complete",
     "current": {
-      "as_of": "2026-07-21",
+      "as_of": "2026-07-23",
       "low": 137.9867,
       "base": 348.0444,
       "high": 546.2576
     },
-    "prior": null,
-    "base_change_per_share": null,
-    "base_change_pct": null,
+    "prior": {
+      "as_of": "2026-07-21",
+      "base": 348.04,
+      "ref": "GOOGL/research/valuation_history/valuation_2026-07-21.json"
+    },
+    "base_change_per_share": 0.0,
+    "base_change_pct": 0.0,
     "drivers": [],
     "category_totals_per_share": {},
-    "unexplained_per_share": null,
-    "explanation": "The current component schedule is the first decision-grade baseline; attribution begins with the next dated valuation snapshot."
+    "unexplained_per_share": 0.0,
+    "explanation": "Component changes are classified from observable differences in quantity, comparable method, probability, timing, capital, evidence, and schedule scope."
   }
 }

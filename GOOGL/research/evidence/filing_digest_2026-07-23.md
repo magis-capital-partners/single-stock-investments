@@ -4,16 +4,18 @@
 **Agent:** Marvin (`build_filing_evidence.py`)  
 **Inventory:** `GOOGL/research/evidence/document_inventory.json`  
 
-Documents in folder: **45** (all listed below; Tier 1–3 extracted or keyword-scanned).
+Documents in folder: **66** (all listed below; Tier 1–3 extracted or keyword-scanned).
 
 ## Document inventory
 
 | Tier | Kind | File date | Path | Chars |
 |------|------|-----------|------|-------|
+| partial | 10-K | 2023-02-03 | `investor-documents/sec-edgar/10-K_20230203_rpt20221231_acc0001652044_23_000016.htm` | 30000 |
 | partial | 10-K | 2024-01-31 | `investor-documents/sec-edgar/10-K_20240131_rpt20231231_acc0001652044_24_000022.htm` | 30000 |
 | partial | 10-K | 2025-02-05 | `investor-documents/sec-edgar/10-K_20250205_rpt20241231_acc0001652044_25_000014.htm` | 30000 |
 | full | 10-K | 2026-02-05 | `investor-documents/sec-edgar/10-K_20260205_rpt20251231_acc0001652044_26_000018.htm` | 120000 |
-| partial | 10-Q | 2023-07-26 | `investor-documents/sec-edgar/10-Q_20230726_rpt20230630_acc0001652044_23_000070.htm` | 30000 |
+| scan | 10-Q | 2023-04-26 | `investor-documents/sec-edgar/10-Q_20230426_rpt20230331_acc0001652044_23_000045.htm` | 8000 |
+| scan | 10-Q | 2023-07-26 | `investor-documents/sec-edgar/10-Q_20230726_rpt20230630_acc0001652044_23_000070.htm` | 8000 |
 | partial | 10-Q | 2023-10-25 | `investor-documents/sec-edgar/10-Q_20231025_rpt20230930_acc0001652044_23_000094.htm` | 30000 |
 | partial | 10-Q | 2024-04-26 | `investor-documents/sec-edgar/10-Q_20240426_rpt20240331_acc0001652044_24_000053.htm` | 30000 |
 | partial | 10-Q | 2024-07-24 | `investor-documents/sec-edgar/10-Q_20240724_rpt20240630_acc0001652044_24_000079.htm` | 30000 |
@@ -22,9 +24,16 @@ Documents in folder: **45** (all listed below; Tier 1–3 extracted or keyword-s
 | partial | 10-Q | 2025-07-24 | `investor-documents/sec-edgar/10-Q_20250724_rpt20250630_acc0001652044_25_000062.htm` | 30000 |
 | partial | 10-Q | 2025-10-30 | `investor-documents/sec-edgar/10-Q_20251030_rpt20250930_acc0001652044_25_000091.htm` | 30000 |
 | full | 10-Q | 2026-04-30 | `investor-documents/sec-edgar/10-Q_20260430_rpt20260331_acc0001652044_26_000048.htm` | 120000 |
+| scan | proxy | 2023-04-21 | `investor-documents/sec-edgar/DEF 14A_20230421_rpt_acc0001308179_23_000736.htm` | 8000 |
 | scan | proxy | 2024-04-26 | `investor-documents/sec-edgar/DEF 14A_20240426_rpt20240607_acc0001308179_24_000612.htm` | 8000 |
 | scan | proxy | 2025-04-25 | `investor-documents/sec-edgar/DEF 14A_20250425_rpt20250606_acc0001308179_25_000511.htm` | 8000 |
 | full | proxy | 2026-04-24 | `investor-documents/sec-edgar/DEF 14A_20260424_rpt20260605_acc0001308179_26_000342.htm` | 120000 |
+| scan | 8-K | 2024-07-23 | `investor-documents/sec-edgar/8-K_20240723_rpt20240723_acc0001652044_24_000076.htm` | 4595 |
+| scan | 8-K | 2024-08-06 | `investor-documents/sec-edgar/8-K_20240806_rpt20240805_acc0001652044_24_000085.htm` | 3423 |
+| scan | 8-K | 2024-09-24 | `investor-documents/sec-edgar/8-K_20240924_rpt20240924_acc0001652044_24_000097.htm` | 4556 |
+| scan | 8-K | 2024-10-17 | `investor-documents/sec-edgar/8-K_20241017_rpt20241017_acc0001193125_24_238769.htm` | 3498 |
+| scan | 8-K | 2024-10-29 | `investor-documents/sec-edgar/8-K_20241029_rpt20241029_acc0001652044_24_000115.htm` | 4603 |
+| scan | 8-K | 2025-02-04 | `investor-documents/sec-edgar/8-K_20250204_rpt20250204_acc0001652044_25_000010.htm` | 4615 |
 | scan | 8-K | 2025-03-18 | `investor-documents/sec-edgar/8-K_20250318_rpt20250318_acc0001652044_25_000027.htm` | 7425 |
 | scan | 8-K | 2025-04-18 | `investor-documents/sec-edgar/8-K_20250418_rpt20250417_acc0001652044_25_000033.htm` | 3616 |
 | scan | 8-K | 2025-04-24 | `investor-documents/sec-edgar/8-K_20250424_rpt20250423_acc0001652044_25_000040.htm` | 4761 |
@@ -49,12 +58,24 @@ Documents in folder: **45** (all listed below; Tier 1–3 extracted or keyword-s
 | scan | 8-K | 2026-06-05 | `investor-documents/sec-edgar/8-K_20260605_rpt20260602_acc0001652044_26_000059.htm` | 7601 |
 | scan | 8-K | 2026-06-05 | `investor-documents/sec-edgar/8-K_20260605_rpt20260605_acc0001193125_26_259830.htm` | 8000 |
 | scan | 8-K | 2026-06-11 | `investor-documents/sec-edgar/8-K_20260611_rpt20260605_acc0001193125_26_267578.htm` | 8000 |
+| inventory | other | 2026-05-05 | `investor-documents/sec-edgar/424B5_20260505_rpt_acc0001193125_26_204938.htm` | 0 |
+| inventory | other | 2026-05-05 | `investor-documents/sec-edgar/424B5_20260505_rpt_acc0001193125_26_205120.htm` | 0 |
+| inventory | other | 2026-05-11 | `investor-documents/sec-edgar/424B5_20260511_rpt_acc0001193125_26_215570.htm` | 0 |
+| inventory | other | 2026-05-18 | `investor-documents/sec-edgar/424B5_20260518_rpt_acc0001193125_26_228923.htm` | 0 |
+| inventory | other | 2026-06-02 | `investor-documents/sec-edgar/424B5_20260602_rpt_acc0001193125_26_252362.htm` | 0 |
+| inventory | other | 2026-06-02 | `investor-documents/sec-edgar/424B5_20260602_rpt_acc0001193125_26_252374.htm` | 0 |
+| inventory | other | 2026-06-02 | `investor-documents/sec-edgar/424B5_20260602_rpt_acc0001193125_26_252392.htm` | 0 |
 | inventory | other | 2026-06-02 | `investor-documents/sec-edgar/424B5_20260602_rpt_acc0001193125_26_252439.htm` | 0 |
 | inventory | other | 2026-06-04 | `investor-documents/sec-edgar/424B5_20260604_rpt_acc0001193125_26_256375.htm` | 0 |
 | inventory | other | 2026-06-04 | `investor-documents/sec-edgar/424B5_20260604_rpt_acc0001193125_26_257690.htm` | 0 |
 | inventory | other | 2026-06-04 | `investor-documents/sec-edgar/424B5_20260604_rpt_acc0001193125_26_257702.htm` | 0 |
 | inventory | other | 2025-04-25 | `investor-documents/sec-edgar/S-3ASR_20250425_rpt_acc0001193125_25_095696.htm` | 0 |
 | inventory | other | 2026-06-01 | `investor-documents/sec-edgar/S-3ASR_20260601_rpt_acc0001193125_26_251560.htm` | 0 |
+| inventory | other | 2024-02-12 | `third-party-analyses/activist_reports/long/SC-13G/A_20240212_acc0001193125_24_032286.htm` | 0 |
+| inventory | other | 2024-02-13 | `third-party-analyses/activist_reports/long/SC-13G/A_20240213_acc0001104659_24_020000.htm` | 0 |
+| inventory | other | 2024-02-13 | `third-party-analyses/activist_reports/long/SC-13G/A_20240213_acc0001104659_24_020001.htm` | 0 |
+| inventory | other | 2024-02-14 | `third-party-analyses/activist_reports/long/SC-13G/A_20240214_acc0001193125_24_036532.htm` | 0 |
+| inventory | other | 2026-06-18 | `third-party-analyses/vic/vic_pdf_2026-06-18_googl-vic-pdf_6482670561.pdf` | 0 |
 
 ## Tier: full — extracts
 
@@ -184,6 +205,29 @@ Documents in folder: **45** (all listed below; Tier 1–3 extracted or keyword-s
 - CostOfRevenue: 126,203
 - CostOfRevenue: 133,332
 - StockholdersEquity: 58,510
+
+### `investor-documents/sec-edgar/10-K_20230203_rpt20221231_acc0001652044_23_000016.htm`
+**Keyword snippets (related party, financials, segments):**
+- RevenueRemainingPerformanceObligationPercentage: 50
+- OperatingLeaseRightOfUseAsset: 12,959
+- OperatingLeaseRightOfUseAsset: 14,381
+- AccruedRevenueShare: 8,996
+- AccruedRevenueShare: 8,370
+- LongTermDebtAndCapitalLeaseObligations: 14,817
+- LongTermDebtAndCapitalLeaseObligations: 14,701
+- OperatingLeaseLiabilityNoncurrent: 11,389
+- OperatingLeaseLiabilityNoncurrent: 12,501
+- StockholdersEquity: 251,635
+- StockholdersEquity: 256,144
+- LiabilitiesAndStockholdersEquity: 359,268
+- LiabilitiesAndStockholdersEquity: 365,264
+- RevenueFromContractWithCustomerExcludingAssessedTax: 182,527
+- RevenueFromContractWithCustomerExcludingAssessedTax: 257,637
+- RevenueFromContractWithCustomerExcludingAssessedTax: 282,836
+- CostOfRevenue: 84,732
+- CostOfRevenue: 110,939
+- CostOfRevenue: 126,203
+- StockholdersEquity: 50,552
 
 ### `investor-documents/sec-edgar/10-Q_20251030_rpt20250930_acc0001652044_25_000091.htm`
 **Keyword snippets (related party, financials, segments):**
@@ -345,26 +389,3 @@ Documents in folder: **45** (all listed below; Tier 1–3 extracted or keyword-s
 - CostOfRevenue: 31,158
 - CostOfRevenue: 33,229
 - CostOfRevenue: 90,861
-
-### `investor-documents/sec-edgar/10-Q_20230726_rpt20230630_acc0001652044_23_000070.htm`
-**Keyword snippets (related party, financials, segments):**
-- RevenueRemainingPerformanceObligationPercentage: 50
-- OperatingLeaseRightOfUseAsset: 14,381
-- OperatingLeaseRightOfUseAsset: 14,469
-- AccruedRevenueShare: 8,370
-- AccruedRevenueShare: 7,990
-- LongTermDebtAndCapitalLeaseObligations: 14,701
-- LongTermDebtAndCapitalLeaseObligations: 13,705
-- OperatingLeaseLiabilityNoncurrent: 12,501
-- OperatingLeaseLiabilityNoncurrent: 12,746
-- StockholdersEquity: 256,144
-- StockholdersEquity: 267,141
-- LiabilitiesAndStockholdersEquity: 365,264
-- LiabilitiesAndStockholdersEquity: 383,044
-- RevenueFromContractWithCustomerExcludingAssessedTax: 69,685
-- RevenueFromContractWithCustomerExcludingAssessedTax: 74,604
-- RevenueFromContractWithCustomerExcludingAssessedTax: 137,696
-- RevenueFromContractWithCustomerExcludingAssessedTax: 144,391
-- CostOfRevenue: 30,104
-- CostOfRevenue: 31,916
-- CostOfRevenue: 59,703
