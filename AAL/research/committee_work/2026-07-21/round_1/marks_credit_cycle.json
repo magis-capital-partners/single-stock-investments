@@ -1,0 +1,59 @@
+{
+  "persona": "marks_credit_cycle",
+  "independence_group": "credit_cycle",
+  "evidence_status": "insufficient_evidence",
+  "scores": {
+    "explanatory_strength": {
+      "value": 3,
+      "rationale": "The packet states a specific levered-stub mechanism: mid-cycle operating cash flow ($3.1B FY2025, ~$4.70/sh) must service ~$29B debt and leases while capex ($3.8B) exceeds GAAP free cash flow. Component proofs separate network cash, net financial claims, and a cycle reserve. The distinguishing test is whether OCF can deleverage the stack before refinancing stress; that test is named but not tied to a year-by-year maturity or interest-coverage bridge, and the Lawrence 27% path conflates operating recovery with credit survival."
+    },
+    "evidence_sufficiency": {
+      "value": 2,
+      "rationale": "Core balance-sheet facts reconcile from FY2025 10-K and Q1 2026 10-Q: cash $902M, total debt and leases $29,007M (current $3,753M), operating income $1,467M, OCF $3,099M, diluted shares ~658.6M. All four valuation-proof rows are mechanically valid with clean overlap keys. Decision-critical credit inputs remain absent: no maturity schedule, interest expense, covenant headroom, or refinancing-rate stress; management_facts carries zero extracted claims; AAdvantage co-brand success_probability is null."
+    },
+    "downside_control": {
+      "value": 2,
+      "rationale": "Net financial claims are filing-locked at −$42.67/sh base and a separate cycle reserve (−$9/sh base) acknowledges fuel, recession, and leverage stress. Equity downside is not bounded: dhando is none, component low sums to −$41.70/sh (−375% to low per contract), and Lawrence bear still implies 15.2% annualized return without modeling dilutive refinancing, liquidity exhaustion, or insolvency. Thin cash ($902M) against $3.75B current maturities leaves tail loss plausible and unquantified."
+    },
+    "return_vs_alternatives": {
+      "value": 1,
+      "rationale": "Proof-first component base economic value is −$9.79/sh at $15.14, so contract base annualized return is null; only the high component case reaches 8.12% annualized, below the 12% credit-cycle hurdle. Lawrence synthesis 28.48% and bear 15.2% assume mid-cycle owner-cash growth and exit multiples without credit-stressed equity math. Return paths that ignore negative filing-locked intrinsic value do not dominate alternatives on a financing-cycle basis."
+    }
+  },
+  "vote": "defer",
+  "expected_return_range_pct": [-75, 15],
+  "horizon_years": 5,
+  "claims": [
+    {
+      "claim": "American Airlines is squarely in the credit-cycle power zone: ~$28.1B net debt (filing-locked), $902M cash, FY2025 operating income down 44% YoY to $1.5B, and capex exceeding OCF—equity is a levered stub whose value depends on refinancing access, not base-case earnings alone.",
+      "evidence_paths": [
+        "AAL/research/deep_dive_2026-07-21.md",
+        "AAL/research/valuation_contract.json",
+        "AAL/research/evidence/filing_facts_2026-07-21.json"
+      ]
+    },
+    {
+      "claim": "All four additive proof rows reconcile mechanically (midcycle_passenger_network $33.88, aadvantage_co_brand_option $8.00, net_financial_claims −$42.67, cycle_leverage_reserve −$9.00; sum −$9.79/sh) with unique overlap keys and no double_counting_flags, but the credit reserve is judgment-only and omits interest coverage and maturity-wall arithmetic required for stress modeling.",
+      "evidence_paths": [
+        "AAL/research/valuation_contract.json",
+        "AAL/research/evidence_reconciliation_2026-07-21.md"
+      ]
+    },
+    {
+      "claim": "At $15.14 the market embeds deleveraging optionality beyond filing-locked components, yet the packet cannot certify survival under credit tightening because maturity schedule, covenant terms, and a credit-default bear path are missing—defer until those reconcile.",
+      "evidence_paths": [
+        "AAL/research/valuation.json",
+        "AAL/research/adversarial_2026-07-21.md"
+      ]
+    }
+  ],
+  "strongest_counter_explanation": "Credit markets remain open for investment-grade airline issuers, Q1 2026 net income of $382M shows operating recovery, and sustained $3B+ operating cash flow can roll the ~$3.8B current debt wall while modestly paying down the $29B stack; AAdvantage co-brand economics lift normalized owner cash above depressed GAAP earnings, making $15 equity a cheap call on orderly deleveraging rather than a distressed stub.",
+  "most_important_missing_fact": "Year-by-year debt and finance-lease maturity schedule with annual interest expense, weighted-average coupon, and covenant headroom reconciled to the FY2025 10-K debt footnote, so a credit-tightening stress case can be run on equity recovery versus dilution.",
+  "falsifiers": [
+    "Total debt rises above $32B without proportional operating income recovery for two consecutive quarters.",
+    "Trailing four-quarter operating cash flow per share falls below $3.50 while current maturities exceed unrestricted cash plus revolver availability.",
+    "Any 12-month window where interest coverage on consolidated EBIT falls below 1.5× without a disclosed liquidity backstop."
+  ],
+  "specialist_findings": "Audited economic claim and all four valuation-proof rows. midcycle_passenger_network uses FY2025 OCF ($4.70/sh) × judgment capitalization multiple despite capex ($3.8B) exceeding OCF; no maintenance-capex bridge. aadvantage_co_brand_option base $8/sh is pure judgment ($5.3B milestone / 658.6M shares) with null success_probability and no standalone SEC disclosure—overlap control vs network OCF is stated but unverified at claim level. net_financial_claims filing-locked: ($902M − $29,007M) / 658.6M ≈ −$42.67/sh; low/high only ±5% debt / +15% cash haircuts, no distressed refinancing rate. cycle_leverage_reserve (−$9/sh base) lacks tie to interest burden or maturity concentration. No comparables attached. Lawrence bear (15.2%) is an earnings-path sensitivity, not credit-default stress. Contract base annualized return null at negative intrinsic value; high case 8.12% fails 12% hurdle. management_facts empty. Credit-cycle decision blocked pending maturity and coverage reconciliation.",
+  "confidence": "medium"
+}
