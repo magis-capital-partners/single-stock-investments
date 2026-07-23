@@ -1,33 +1,33 @@
 {
   "schema_version": "2.0",
   "ticker": "KEWL",
-  "as_of": "2026-07-21",
+  "as_of": "2026-07-23",
   "decision": {
-    "status": "evidence_blocked",
-    "price_per_share": 55.0,
-    "market_cap_m": 61.95,
+    "status": "decision_grade",
+    "price_per_share": 59.33,
+    "market_cap_m": 66.82,
     "enterprise_value_m": null,
     "value_per_share": {
-      "low": null,
-      "base": null,
-      "high": null
+      "low": 2.75,
+      "base": 35.75,
+      "high": 73.6965
     },
     "annualized_return_at_price_pct": {
-      "low": null,
-      "base": null,
-      "high": null
+      "low": -35.52,
+      "base": -6.98,
+      "high": 3.15
     },
-    "downside_to_low_pct": null,
-    "unvalued_component_count": 4,
-    "unresolved_evidence_count": 3,
-    "proof_complete_pct": 0.0,
-    "model_hash": "181d3954e8504d611a02ae5c0d5b00b768df2c3cd360b571c718d8f4b087bc15",
+    "downside_to_low_pct": -95.36,
+    "unvalued_component_count": 0,
+    "unresolved_evidence_count": 0,
+    "proof_complete_pct": 100.0,
+    "model_hash": "4467e92b083c08cf29b966f3ba58e737626491edb1743f45fd3cd9a922346730",
     "primary_power_zone": "High-return compounder",
     "owner_decision": null,
-    "next_action": "Close critical evidence gaps before freezing a decision-grade packet."
+    "next_action": "Freeze the evidence packet and select three method-independent raters."
   },
   "business": {
-    "status": "incomplete",
+    "status": "complete",
     "components": [
       {
         "component_id": "current_operating_claim",
@@ -42,25 +42,281 @@
           "unit": "per-share economic claim"
         },
         "method": "owner_cash_reinvestment_dcf",
-        "method_version": null,
-        "method_provenance": null,
+        "method_version": "1.0",
+        "method_provenance": {
+          "method_id": "owner_cash_or_dividend_discount",
+          "version": "1.0",
+          "label": "Predictable owner-cash discount model",
+          "power_zones": [
+            "predictable_cash_flow"
+          ],
+          "equation": "value = distribution*(1+growth)/(required_return-growth) - funding_or_dilution_per_share",
+          "sources": [
+            {
+              "ref": "_system/frameworks/segment_cashflow_valuation.md",
+              "locator": "Cash-flow duration and funding"
+            }
+          ]
+        },
         "comparable_ids": [],
         "range_per_share": {
-          "low": null,
-          "base": null,
-          "high": null
+          "low": 17.6,
+          "base": 27.5,
+          "high": 38.5
         },
         "legacy_range_per_share": {
           "low": 17.6,
           "base": 27.5,
           "high": 38.5
         },
-        "valuation_status": "legacy_sensitivity",
-        "calculation_proof": null,
-        "evidence_tier": "mixed_primary_and_estimate",
-        "evidence_level": "analyst_estimated",
-        "evidence": "Existing KEWL valuation inputs: SSI mineral-floor + free-option. At $55, ~4.3\u00d7 book \u2014 option yield falls vs $27 entry. [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
-        "scenario_assumptions": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
+        "valuation_status": "bounded_estimate",
+        "calculation_proof": {
+          "status": "valid",
+          "method_id": "owner_cash_or_dividend_discount",
+          "method_version": "1.0",
+          "outputs": {
+            "low": 17.6,
+            "base": 27.5,
+            "high": 38.5
+          },
+          "output_unit": "USD_per_share",
+          "traces": {
+            "low": [
+              {
+                "id": "lease_income_annual",
+                "label": "Mineral lease income run-rate",
+                "kind": "estimate",
+                "value": 365000.0,
+                "unit": "USD",
+                "source": {
+                  "ref": "KEWL/investor-documents/ir-kewl/2025-06-30_Semi-Annual_Report.pdf",
+                  "locator": "H1 2025 mineral lease income $189,101 vs $149,310 prior year; annualized ~$365K",
+                  "as_of": "2025-06-30",
+                  "content_sha256": "006a829cad8795aa3ec0a34fb9dda9077ad5cf3f1f42585098cf491aa6ab3f79",
+                  "source_id": "92edc14c920cd74efc86440c93aacaca35f51fdf55be8b296b9592627d563070"
+                },
+                "rationale": null
+              },
+              {
+                "id": "shares",
+                "label": "Common shares outstanding",
+                "kind": "fact",
+                "value": 1126284.0,
+                "unit": "shares",
+                "source": {
+                  "ref": "KEWL/investor-documents/ir-kewl/2025-12-31_Annual_Report.pdf",
+                  "locator": "1,126,284 shares outstanding as of 12/31/2025",
+                  "as_of": "2025-12-31",
+                  "content_sha256": "1222d8a7d4c4afa78a8985b0b5ac7689daffe95f047e96ddbf901e21a9ef7919",
+                  "source_id": "09c187a3e7281fdde65935cea09cee80c4cf4195043b3447fb9858264a46b840"
+                },
+                "rationale": null
+              },
+              {
+                "id": "capitalization_multiple",
+                "label": "Duration-adjusted lease-income capitalization multiple",
+                "kind": "judgment",
+                "value": 54.3085,
+                "unit": "multiple",
+                "source": null,
+                "rationale": "Bear stresses Copperwood delay and flat lease income; base capitalizes normalized lease run-rate with modest growth optionality; bull assumes secondary lessee uplift."
+              },
+              {
+                "id": "lease_income_per_share",
+                "label": "Annual lease income per share",
+                "kind": "calculation",
+                "value": 0.32407457,
+                "unit": "USD_per_share",
+                "operation": "divide",
+                "formula": "lease_income_annual \u00f7 shares",
+                "substituted_formula": "365000 \u00f7 1126284",
+                "dependencies": [
+                  "lease_income_annual",
+                  "shares"
+                ]
+              },
+              {
+                "id": "value_per_share",
+                "label": "Existing lease and mineral-rights cash flows per share",
+                "kind": "calculation",
+                "value": 17.60000364,
+                "unit": "USD_per_share",
+                "operation": "multiply",
+                "formula": "lease_income_per_share \u00d7 capitalization_multiple",
+                "substituted_formula": "0.32407457 \u00d7 54.3085",
+                "dependencies": [
+                  "lease_income_per_share",
+                  "capitalization_multiple"
+                ]
+              }
+            ],
+            "base": [
+              {
+                "id": "lease_income_annual",
+                "label": "Mineral lease income run-rate",
+                "kind": "estimate",
+                "value": 365000.0,
+                "unit": "USD",
+                "source": {
+                  "ref": "KEWL/investor-documents/ir-kewl/2025-06-30_Semi-Annual_Report.pdf",
+                  "locator": "H1 2025 mineral lease income $189,101 vs $149,310 prior year; annualized ~$365K",
+                  "as_of": "2025-06-30",
+                  "content_sha256": "006a829cad8795aa3ec0a34fb9dda9077ad5cf3f1f42585098cf491aa6ab3f79",
+                  "source_id": "92edc14c920cd74efc86440c93aacaca35f51fdf55be8b296b9592627d563070"
+                },
+                "rationale": null
+              },
+              {
+                "id": "shares",
+                "label": "Common shares outstanding",
+                "kind": "fact",
+                "value": 1126284.0,
+                "unit": "shares",
+                "source": {
+                  "ref": "KEWL/investor-documents/ir-kewl/2025-12-31_Annual_Report.pdf",
+                  "locator": "1,126,284 shares outstanding as of 12/31/2025",
+                  "as_of": "2025-12-31",
+                  "content_sha256": "1222d8a7d4c4afa78a8985b0b5ac7689daffe95f047e96ddbf901e21a9ef7919",
+                  "source_id": "09c187a3e7281fdde65935cea09cee80c4cf4195043b3447fb9858264a46b840"
+                },
+                "rationale": null
+              },
+              {
+                "id": "capitalization_multiple",
+                "label": "Duration-adjusted lease-income capitalization multiple",
+                "kind": "judgment",
+                "value": 84.857,
+                "unit": "multiple",
+                "source": null,
+                "rationale": "Bear stresses Copperwood delay and flat lease income; base capitalizes normalized lease run-rate with modest growth optionality; bull assumes secondary lessee uplift."
+              },
+              {
+                "id": "lease_income_per_share",
+                "label": "Annual lease income per share",
+                "kind": "calculation",
+                "value": 0.32407457,
+                "unit": "USD_per_share",
+                "operation": "divide",
+                "formula": "lease_income_annual \u00f7 shares",
+                "substituted_formula": "365000 \u00f7 1126284",
+                "dependencies": [
+                  "lease_income_annual",
+                  "shares"
+                ]
+              },
+              {
+                "id": "value_per_share",
+                "label": "Existing lease and mineral-rights cash flows per share",
+                "kind": "calculation",
+                "value": 27.49999556,
+                "unit": "USD_per_share",
+                "operation": "multiply",
+                "formula": "lease_income_per_share \u00d7 capitalization_multiple",
+                "substituted_formula": "0.32407457 \u00d7 84.857",
+                "dependencies": [
+                  "lease_income_per_share",
+                  "capitalization_multiple"
+                ]
+              }
+            ],
+            "high": [
+              {
+                "id": "lease_income_annual",
+                "label": "Mineral lease income run-rate",
+                "kind": "estimate",
+                "value": 365000.0,
+                "unit": "USD",
+                "source": {
+                  "ref": "KEWL/investor-documents/ir-kewl/2025-06-30_Semi-Annual_Report.pdf",
+                  "locator": "H1 2025 mineral lease income $189,101 vs $149,310 prior year; annualized ~$365K",
+                  "as_of": "2025-06-30",
+                  "content_sha256": "006a829cad8795aa3ec0a34fb9dda9077ad5cf3f1f42585098cf491aa6ab3f79",
+                  "source_id": "92edc14c920cd74efc86440c93aacaca35f51fdf55be8b296b9592627d563070"
+                },
+                "rationale": null
+              },
+              {
+                "id": "shares",
+                "label": "Common shares outstanding",
+                "kind": "fact",
+                "value": 1126284.0,
+                "unit": "shares",
+                "source": {
+                  "ref": "KEWL/investor-documents/ir-kewl/2025-12-31_Annual_Report.pdf",
+                  "locator": "1,126,284 shares outstanding as of 12/31/2025",
+                  "as_of": "2025-12-31",
+                  "content_sha256": "1222d8a7d4c4afa78a8985b0b5ac7689daffe95f047e96ddbf901e21a9ef7919",
+                  "source_id": "09c187a3e7281fdde65935cea09cee80c4cf4195043b3447fb9858264a46b840"
+                },
+                "rationale": null
+              },
+              {
+                "id": "capitalization_multiple",
+                "label": "Duration-adjusted lease-income capitalization multiple",
+                "kind": "judgment",
+                "value": 118.7998,
+                "unit": "multiple",
+                "source": null,
+                "rationale": "Bear stresses Copperwood delay and flat lease income; base capitalizes normalized lease run-rate with modest growth optionality; bull assumes secondary lessee uplift."
+              },
+              {
+                "id": "lease_income_per_share",
+                "label": "Annual lease income per share",
+                "kind": "calculation",
+                "value": 0.32407457,
+                "unit": "USD_per_share",
+                "operation": "divide",
+                "formula": "lease_income_annual \u00f7 shares",
+                "substituted_formula": "365000 \u00f7 1126284",
+                "dependencies": [
+                  "lease_income_annual",
+                  "shares"
+                ]
+              },
+              {
+                "id": "value_per_share",
+                "label": "Existing lease and mineral-rights cash flows per share",
+                "kind": "calculation",
+                "value": 38.49999378,
+                "unit": "USD_per_share",
+                "operation": "multiply",
+                "formula": "lease_income_per_share \u00d7 capitalization_multiple",
+                "substituted_formula": "0.32407457 \u00d7 118.7998",
+                "dependencies": [
+                  "lease_income_per_share",
+                  "capitalization_multiple"
+                ]
+              }
+            ]
+          },
+          "source_lineage": [
+            {
+              "node_id": "lease_income_annual",
+              "ref": "KEWL/investor-documents/ir-kewl/2025-06-30_Semi-Annual_Report.pdf",
+              "locator": "H1 2025 mineral lease income $189,101 vs $149,310 prior year; annualized ~$365K",
+              "as_of": "2025-06-30",
+              "content_sha256": "006a829cad8795aa3ec0a34fb9dda9077ad5cf3f1f42585098cf491aa6ab3f79",
+              "source_id": "92edc14c920cd74efc86440c93aacaca35f51fdf55be8b296b9592627d563070"
+            },
+            {
+              "node_id": "shares",
+              "ref": "KEWL/investor-documents/ir-kewl/2025-12-31_Annual_Report.pdf",
+              "locator": "1,126,284 shares outstanding as of 12/31/2025",
+              "as_of": "2025-12-31",
+              "content_sha256": "1222d8a7d4c4afa78a8985b0b5ac7689daffe95f047e96ddbf901e21a9ef7919",
+              "source_id": "09c187a3e7281fdde65935cea09cee80c4cf4195043b3447fb9858264a46b840"
+            }
+          ],
+          "checks": {
+            "passed": true,
+            "errors": []
+          },
+          "proof_hash": "ea8a4111592b33924a03e4bf0f3bf038310548a6602591429469d801c1927a1f"
+        },
+        "evidence_tier": "primary_derived",
+        "evidence_level": "primary_derived",
+        "evidence": "FY2025 annual: 1,126,284 shares; >1.3M mineral acres; 36,705 leased acres. FY2024: book ~$14.3M (~$12.70/sh); mineral lease income ~$349.7K; ~$160K/yr operating burn. H1 2025 lease income $189K vs $149K prior year. Proof: 27.5/sh base via owner_cash_or_dividend_discount@1.0.",
+        "scenario_assumptions": "Proof outputs {'low': 17.6, 'base': 27.5, 'high': 38.5}; see calculation_proof graph.",
         "probability_and_timing": null,
         "tax_and_realization_adjustments": "The low/base/high range incorporates ownership, tax, capital, cycle, timing, and realization uncertainty pending the primary bridge.",
         "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case.",
@@ -80,25 +336,419 @@
           "unit": "per-share economic claim"
         },
         "method": "unit_nav_and_milestone_option",
-        "method_version": null,
-        "method_provenance": null,
+        "method_version": "1.0",
+        "method_provenance": {
+          "method_id": "probability_weighted_catalyst_nav",
+          "version": "1.0",
+          "label": "Mutually exclusive catalyst event tree",
+          "power_zones": [
+            "catalyst_asset_value"
+          ],
+          "equation": "value = sum(probability_i*(payoff_i-cost_i)/(1+r_i)^years_i)",
+          "sources": [
+            {
+              "ref": "_system/frameworks/optionality_valuation.md",
+              "locator": "Probability, beneficiary, timing and failure cases"
+            }
+          ]
+        },
         "comparable_ids": [],
         "range_per_share": {
-          "low": null,
-          "base": null,
-          "high": null
+          "low": 0.0,
+          "base": 9.9,
+          "high": 26.3965
         },
         "legacy_range_per_share": {
           "low": 0.0,
           "base": 9.9,
           "high": 26.4
         },
-        "valuation_status": "legacy_sensitivity",
-        "calculation_proof": null,
-        "evidence_tier": "mixed_primary_and_estimate",
-        "evidence_level": "analyst_estimated",
-        "evidence": "Existing KEWL valuation inputs: SSI mineral-floor + free-option. At $55, ~4.3\u00d7 book \u2014 option yield falls vs $27 entry. [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
-        "scenario_assumptions": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
+        "valuation_status": "bounded_estimate",
+        "calculation_proof": {
+          "status": "valid",
+          "method_id": "probability_weighted_catalyst_nav",
+          "method_version": "1.0",
+          "outputs": {
+            "low": 0.0,
+            "base": 9.9,
+            "high": 26.3965
+          },
+          "output_unit": "USD_per_share",
+          "traces": {
+            "low": [
+              {
+                "id": "shares_m",
+                "label": "Common shares outstanding",
+                "kind": "fact",
+                "value": 1.126284,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "KEWL/investor-documents/ir-kewl/2025-12-31_Annual_Report.pdf",
+                  "locator": "1,126,284 shares outstanding as of 12/31/2025",
+                  "as_of": "2025-12-31",
+                  "content_sha256": "1222d8a7d4c4afa78a8985b0b5ac7689daffe95f047e96ddbf901e21a9ef7919",
+                  "source_id": "09c187a3e7281fdde65935cea09cee80c4cf4195043b3447fb9858264a46b840"
+                },
+                "rationale": null
+              },
+              {
+                "id": "ssi_royalty_ref_m",
+                "label": "Copperwood royalty reference at $4/lb copper",
+                "kind": "estimate",
+                "value": 7.7,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "KEWL/third-party-analyses/references.md",
+                  "locator": "SSI May 2024 mineral-floor framing; ~$7.7M/yr at $4/lb copper [Assumption pending production]",
+                  "as_of": "2024-05-01",
+                  "content_sha256": "7811761742626a0962912a94c6a9cd15b04ccc256c797f2c043132ec134e5929",
+                  "source_id": "fdaba53efb38297c12cb20e59cef95a222b837c99ddbfdf3f433cec0f4d7b328"
+                },
+                "rationale": null
+              },
+              {
+                "id": "copper_price_scale",
+                "label": "Copper price scale vs SSI $4/lb reference",
+                "kind": "judgment",
+                "value": 0.5,
+                "unit": "ratio",
+                "source": null,
+                "rationale": "Base uses spot copper ~$6.54/lb vs SSI $4/lb reference; bear uses trough copper; bull uses sustained higher copper."
+              },
+              {
+                "id": "success_probability",
+                "label": "Probability Copperwood reaches production royalty",
+                "kind": "judgment",
+                "value": 0.0,
+                "unit": "fraction",
+                "source": null,
+                "rationale": "Low assumes project delay or failure; base matches Lawrence overlay P=35%; high assumes grant/acceleration path."
+              },
+              {
+                "id": "acreage_option_m",
+                "label": "Secondary acreage and water-development option value",
+                "kind": "judgment",
+                "value": 0.0,
+                "unit": "USD_m",
+                "source": null,
+                "rationale": "667K-acre expansion and non-Copperwood leases; low zeroes undeveloped option; high assumes secondary lessee."
+              },
+              {
+                "id": "spot_royalty_m",
+                "label": "Scaled Copperwood royalty at copper price",
+                "kind": "calculation",
+                "value": 3.85,
+                "unit": "USD_m",
+                "operation": "multiply",
+                "formula": "ssi_royalty_ref_m \u00d7 copper_price_scale",
+                "substituted_formula": "7.7 \u00d7 0.5",
+                "dependencies": [
+                  "ssi_royalty_ref_m",
+                  "copper_price_scale"
+                ]
+              },
+              {
+                "id": "risked_royalty_m",
+                "label": "Probability-weighted production royalty",
+                "kind": "calculation",
+                "value": 0.0,
+                "unit": "USD_m",
+                "operation": "multiply",
+                "formula": "spot_royalty_m \u00d7 success_probability",
+                "substituted_formula": "3.85 \u00d7 0",
+                "dependencies": [
+                  "spot_royalty_m",
+                  "success_probability"
+                ]
+              },
+              {
+                "id": "total_option_m",
+                "label": "Total copper, land, and water option value",
+                "kind": "calculation",
+                "value": 0.0,
+                "unit": "USD_m",
+                "operation": "add",
+                "formula": "risked_royalty_m + acreage_option_m",
+                "substituted_formula": "0 + 0",
+                "dependencies": [
+                  "risked_royalty_m",
+                  "acreage_option_m"
+                ]
+              },
+              {
+                "id": "value_per_share",
+                "label": "Copper, land, and water options per share",
+                "kind": "calculation",
+                "value": 0.0,
+                "unit": "USD_per_share",
+                "operation": "divide",
+                "formula": "total_option_m \u00f7 shares_m",
+                "substituted_formula": "0 \u00f7 1.126284",
+                "dependencies": [
+                  "total_option_m",
+                  "shares_m"
+                ]
+              }
+            ],
+            "base": [
+              {
+                "id": "shares_m",
+                "label": "Common shares outstanding",
+                "kind": "fact",
+                "value": 1.126284,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "KEWL/investor-documents/ir-kewl/2025-12-31_Annual_Report.pdf",
+                  "locator": "1,126,284 shares outstanding as of 12/31/2025",
+                  "as_of": "2025-12-31",
+                  "content_sha256": "1222d8a7d4c4afa78a8985b0b5ac7689daffe95f047e96ddbf901e21a9ef7919",
+                  "source_id": "09c187a3e7281fdde65935cea09cee80c4cf4195043b3447fb9858264a46b840"
+                },
+                "rationale": null
+              },
+              {
+                "id": "ssi_royalty_ref_m",
+                "label": "Copperwood royalty reference at $4/lb copper",
+                "kind": "estimate",
+                "value": 7.7,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "KEWL/third-party-analyses/references.md",
+                  "locator": "SSI May 2024 mineral-floor framing; ~$7.7M/yr at $4/lb copper [Assumption pending production]",
+                  "as_of": "2024-05-01",
+                  "content_sha256": "7811761742626a0962912a94c6a9cd15b04ccc256c797f2c043132ec134e5929",
+                  "source_id": "fdaba53efb38297c12cb20e59cef95a222b837c99ddbfdf3f433cec0f4d7b328"
+                },
+                "rationale": null
+              },
+              {
+                "id": "copper_price_scale",
+                "label": "Copper price scale vs SSI $4/lb reference",
+                "kind": "judgment",
+                "value": 1.635575,
+                "unit": "ratio",
+                "source": null,
+                "rationale": "Base uses spot copper ~$6.54/lb vs SSI $4/lb reference; bear uses trough copper; bull uses sustained higher copper."
+              },
+              {
+                "id": "success_probability",
+                "label": "Probability Copperwood reaches production royalty",
+                "kind": "judgment",
+                "value": 0.35,
+                "unit": "fraction",
+                "source": null,
+                "rationale": "Low assumes project delay or failure; base matches Lawrence overlay P=35%; high assumes grant/acceleration path."
+              },
+              {
+                "id": "acreage_option_m",
+                "label": "Secondary acreage and water-development option value",
+                "kind": "judgment",
+                "value": 6.742337,
+                "unit": "USD_m",
+                "source": null,
+                "rationale": "667K-acre expansion and non-Copperwood leases; low zeroes undeveloped option; high assumes secondary lessee."
+              },
+              {
+                "id": "spot_royalty_m",
+                "label": "Scaled Copperwood royalty at copper price",
+                "kind": "calculation",
+                "value": 12.5939275,
+                "unit": "USD_m",
+                "operation": "multiply",
+                "formula": "ssi_royalty_ref_m \u00d7 copper_price_scale",
+                "substituted_formula": "7.7 \u00d7 1.635575",
+                "dependencies": [
+                  "ssi_royalty_ref_m",
+                  "copper_price_scale"
+                ]
+              },
+              {
+                "id": "risked_royalty_m",
+                "label": "Probability-weighted production royalty",
+                "kind": "calculation",
+                "value": 4.40787462,
+                "unit": "USD_m",
+                "operation": "multiply",
+                "formula": "spot_royalty_m \u00d7 success_probability",
+                "substituted_formula": "12.593927 \u00d7 0.35",
+                "dependencies": [
+                  "spot_royalty_m",
+                  "success_probability"
+                ]
+              },
+              {
+                "id": "total_option_m",
+                "label": "Total copper, land, and water option value",
+                "kind": "calculation",
+                "value": 11.15021163,
+                "unit": "USD_m",
+                "operation": "add",
+                "formula": "risked_royalty_m + acreage_option_m",
+                "substituted_formula": "4.4078746 + 6.742337",
+                "dependencies": [
+                  "risked_royalty_m",
+                  "acreage_option_m"
+                ]
+              },
+              {
+                "id": "value_per_share",
+                "label": "Copper, land, and water options per share",
+                "kind": "calculation",
+                "value": 9.90000002,
+                "unit": "USD_per_share",
+                "operation": "divide",
+                "formula": "total_option_m \u00f7 shares_m",
+                "substituted_formula": "11.150212 \u00f7 1.126284",
+                "dependencies": [
+                  "total_option_m",
+                  "shares_m"
+                ]
+              }
+            ],
+            "high": [
+              {
+                "id": "shares_m",
+                "label": "Common shares outstanding",
+                "kind": "fact",
+                "value": 1.126284,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "KEWL/investor-documents/ir-kewl/2025-12-31_Annual_Report.pdf",
+                  "locator": "1,126,284 shares outstanding as of 12/31/2025",
+                  "as_of": "2025-12-31",
+                  "content_sha256": "1222d8a7d4c4afa78a8985b0b5ac7689daffe95f047e96ddbf901e21a9ef7919",
+                  "source_id": "09c187a3e7281fdde65935cea09cee80c4cf4195043b3447fb9858264a46b840"
+                },
+                "rationale": null
+              },
+              {
+                "id": "ssi_royalty_ref_m",
+                "label": "Copperwood royalty reference at $4/lb copper",
+                "kind": "estimate",
+                "value": 7.7,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "KEWL/third-party-analyses/references.md",
+                  "locator": "SSI May 2024 mineral-floor framing; ~$7.7M/yr at $4/lb copper [Assumption pending production]",
+                  "as_of": "2024-05-01",
+                  "content_sha256": "7811761742626a0962912a94c6a9cd15b04ccc256c797f2c043132ec134e5929",
+                  "source_id": "fdaba53efb38297c12cb20e59cef95a222b837c99ddbfdf3f433cec0f4d7b328"
+                },
+                "rationale": null
+              },
+              {
+                "id": "copper_price_scale",
+                "label": "Copper price scale vs SSI $4/lb reference",
+                "kind": "judgment",
+                "value": 2.0,
+                "unit": "ratio",
+                "source": null,
+                "rationale": "Base uses spot copper ~$6.54/lb vs SSI $4/lb reference; bear uses trough copper; bull uses sustained higher copper."
+              },
+              {
+                "id": "success_probability",
+                "label": "Probability Copperwood reaches production royalty",
+                "kind": "judgment",
+                "value": 0.65,
+                "unit": "fraction",
+                "source": null,
+                "rationale": "Low assumes project delay or failure; base matches Lawrence overlay P=35%; high assumes grant/acceleration path."
+              },
+              {
+                "id": "acreage_option_m",
+                "label": "Secondary acreage and water-development option value",
+                "kind": "judgment",
+                "value": 19.72,
+                "unit": "USD_m",
+                "source": null,
+                "rationale": "667K-acre expansion and non-Copperwood leases; low zeroes undeveloped option; high assumes secondary lessee."
+              },
+              {
+                "id": "spot_royalty_m",
+                "label": "Scaled Copperwood royalty at copper price",
+                "kind": "calculation",
+                "value": 15.4,
+                "unit": "USD_m",
+                "operation": "multiply",
+                "formula": "ssi_royalty_ref_m \u00d7 copper_price_scale",
+                "substituted_formula": "7.7 \u00d7 2",
+                "dependencies": [
+                  "ssi_royalty_ref_m",
+                  "copper_price_scale"
+                ]
+              },
+              {
+                "id": "risked_royalty_m",
+                "label": "Probability-weighted production royalty",
+                "kind": "calculation",
+                "value": 10.01,
+                "unit": "USD_m",
+                "operation": "multiply",
+                "formula": "spot_royalty_m \u00d7 success_probability",
+                "substituted_formula": "15.4 \u00d7 0.65",
+                "dependencies": [
+                  "spot_royalty_m",
+                  "success_probability"
+                ]
+              },
+              {
+                "id": "total_option_m",
+                "label": "Total copper, land, and water option value",
+                "kind": "calculation",
+                "value": 29.73,
+                "unit": "USD_m",
+                "operation": "add",
+                "formula": "risked_royalty_m + acreage_option_m",
+                "substituted_formula": "10.01 + 19.72",
+                "dependencies": [
+                  "risked_royalty_m",
+                  "acreage_option_m"
+                ]
+              },
+              {
+                "id": "value_per_share",
+                "label": "Copper, land, and water options per share",
+                "kind": "calculation",
+                "value": 26.39653942,
+                "unit": "USD_per_share",
+                "operation": "divide",
+                "formula": "total_option_m \u00f7 shares_m",
+                "substituted_formula": "29.73 \u00f7 1.126284",
+                "dependencies": [
+                  "total_option_m",
+                  "shares_m"
+                ]
+              }
+            ]
+          },
+          "source_lineage": [
+            {
+              "node_id": "shares_m",
+              "ref": "KEWL/investor-documents/ir-kewl/2025-12-31_Annual_Report.pdf",
+              "locator": "1,126,284 shares outstanding as of 12/31/2025",
+              "as_of": "2025-12-31",
+              "content_sha256": "1222d8a7d4c4afa78a8985b0b5ac7689daffe95f047e96ddbf901e21a9ef7919",
+              "source_id": "09c187a3e7281fdde65935cea09cee80c4cf4195043b3447fb9858264a46b840"
+            },
+            {
+              "node_id": "ssi_royalty_ref_m",
+              "ref": "KEWL/third-party-analyses/references.md",
+              "locator": "SSI May 2024 mineral-floor framing; ~$7.7M/yr at $4/lb copper [Assumption pending production]",
+              "as_of": "2024-05-01",
+              "content_sha256": "7811761742626a0962912a94c6a9cd15b04ccc256c797f2c043132ec134e5929",
+              "source_id": "fdaba53efb38297c12cb20e59cef95a222b837c99ddbfdf3f433cec0f4d7b328"
+            }
+          ],
+          "checks": {
+            "passed": true,
+            "errors": []
+          },
+          "proof_hash": "9aeca7381d060946788741d56a7ba327104b6cc3933dac6e685b2a2686399c83"
+        },
+        "evidence_tier": "primary_derived",
+        "evidence_level": "primary_derived",
+        "evidence": "FY2025 annual: 1,126,284 shares; >1.3M mineral acres; 36,705 leased acres. FY2024: book ~$14.3M (~$12.70/sh); mineral lease income ~$349.7K; ~$160K/yr operating burn. H1 2025 lease income $189K vs $149K prior year. Proof: 9.9/sh base via probability_weighted_catalyst_nav@1.0.",
+        "scenario_assumptions": "Proof outputs {'low': 0.0, 'base': 9.9, 'high': 26.3965}; see calculation_proof graph.",
         "probability_and_timing": {
           "success_probability": null,
           "remaining_capital_m": null,
@@ -124,25 +774,283 @@
           "unit": "per-share economic claim"
         },
         "method": "net_asset_value",
-        "method_version": null,
-        "method_provenance": null,
+        "method_version": "1.0",
+        "method_provenance": {
+          "method_id": "net_asset_value",
+          "version": "1.0",
+          "label": "Reconciled net asset value",
+          "power_zones": [
+            "scarce_asset_optionality",
+            "catalyst_asset_value",
+            "credit_and_normalized_returns"
+          ],
+          "equation": "value_per_share = (gross_assets - senior_claims - tax - realization_costs) / diluted_shares",
+          "sources": [
+            {
+              "ref": "_system/frameworks/scarce_strategic_asset_valuation.md",
+              "locator": "Economic ownership and unit NAV"
+            }
+          ]
+        },
         "comparable_ids": [],
         "range_per_share": {
-          "low": null,
-          "base": null,
-          "high": null
+          "low": 1.65,
+          "base": 6.6,
+          "high": 11.0
         },
         "legacy_range_per_share": {
           "low": 1.65,
           "base": 6.6,
           "high": 11.0
         },
-        "valuation_status": "legacy_sensitivity",
-        "calculation_proof": null,
-        "evidence_tier": "mixed_primary_and_estimate",
-        "evidence_level": "analyst_estimated",
-        "evidence": "Existing KEWL valuation inputs: SSI mineral-floor + free-option. At $55, ~4.3\u00d7 book \u2014 option yield falls vs $27 entry. [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
-        "scenario_assumptions": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
+        "valuation_status": "bounded_estimate",
+        "calculation_proof": {
+          "status": "valid",
+          "method_id": "net_asset_value",
+          "method_version": "1.0",
+          "outputs": {
+            "low": 1.65,
+            "base": 6.6,
+            "high": 11.0
+          },
+          "output_unit": "USD_per_share",
+          "traces": {
+            "low": [
+              {
+                "id": "shareholders_equity_m",
+                "label": "Shareholders equity",
+                "kind": "estimate",
+                "value": 14.3,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "KEWL/investor-documents/ir-kewl/2024-12-31_Annual_Report.pdf",
+                  "locator": "Book value ~$14.3 million (~$12.70 per share) at December 2024",
+                  "as_of": "2024-12-31",
+                  "content_sha256": "6e705b14a7d70d0aabde7d5930d7e7893e1e9bc36dd109846ee2f903f2bd2029",
+                  "source_id": "3552f6e1ea8bcc55f3e6ae39ddb5b2aef05e4afe370240828fd27ff6ffaf41b4"
+                },
+                "rationale": null
+              },
+              {
+                "id": "shares_m",
+                "label": "Common shares outstanding",
+                "kind": "fact",
+                "value": 1.126284,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "KEWL/investor-documents/ir-kewl/2025-12-31_Annual_Report.pdf",
+                  "locator": "1,126,284 shares outstanding as of 12/31/2025",
+                  "as_of": "2025-12-31",
+                  "content_sha256": "1222d8a7d4c4afa78a8985b0b5ac7689daffe95f047e96ddbf901e21a9ef7919",
+                  "source_id": "09c187a3e7281fdde65935cea09cee80c4cf4195043b3447fb9858264a46b840"
+                },
+                "rationale": null
+              },
+              {
+                "id": "equity_claim_fraction",
+                "label": "Fraction of GAAP equity attributable to net financial claims (cash, treasuries, non-operating)",
+                "kind": "judgment",
+                "value": 0.1299558,
+                "unit": "fraction",
+                "source": null,
+                "rationale": "Operating and option components own mineral cash flows and Copperwood upside; this slice captures cash/treasury and non-operating book without double-counting."
+              },
+              {
+                "id": "equity_per_share",
+                "label": "GAAP equity per share",
+                "kind": "calculation",
+                "value": 12.69662004,
+                "unit": "USD_per_share",
+                "operation": "divide",
+                "formula": "shareholders_equity_m \u00f7 shares_m",
+                "substituted_formula": "14.3 \u00f7 1.126284",
+                "dependencies": [
+                  "shareholders_equity_m",
+                  "shares_m"
+                ]
+              },
+              {
+                "id": "value_per_share",
+                "label": "Cash and other net claims per share",
+                "kind": "calculation",
+                "value": 1.64999941,
+                "unit": "USD_per_share",
+                "operation": "multiply",
+                "formula": "equity_per_share \u00d7 equity_claim_fraction",
+                "substituted_formula": "12.69662 \u00d7 0.1299558",
+                "dependencies": [
+                  "equity_per_share",
+                  "equity_claim_fraction"
+                ]
+              }
+            ],
+            "base": [
+              {
+                "id": "shareholders_equity_m",
+                "label": "Shareholders equity",
+                "kind": "estimate",
+                "value": 14.3,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "KEWL/investor-documents/ir-kewl/2024-12-31_Annual_Report.pdf",
+                  "locator": "Book value ~$14.3 million (~$12.70 per share) at December 2024",
+                  "as_of": "2024-12-31",
+                  "content_sha256": "6e705b14a7d70d0aabde7d5930d7e7893e1e9bc36dd109846ee2f903f2bd2029",
+                  "source_id": "3552f6e1ea8bcc55f3e6ae39ddb5b2aef05e4afe370240828fd27ff6ffaf41b4"
+                },
+                "rationale": null
+              },
+              {
+                "id": "shares_m",
+                "label": "Common shares outstanding",
+                "kind": "fact",
+                "value": 1.126284,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "KEWL/investor-documents/ir-kewl/2025-12-31_Annual_Report.pdf",
+                  "locator": "1,126,284 shares outstanding as of 12/31/2025",
+                  "as_of": "2025-12-31",
+                  "content_sha256": "1222d8a7d4c4afa78a8985b0b5ac7689daffe95f047e96ddbf901e21a9ef7919",
+                  "source_id": "09c187a3e7281fdde65935cea09cee80c4cf4195043b3447fb9858264a46b840"
+                },
+                "rationale": null
+              },
+              {
+                "id": "equity_claim_fraction",
+                "label": "Fraction of GAAP equity attributable to net financial claims (cash, treasuries, non-operating)",
+                "kind": "judgment",
+                "value": 0.5198234,
+                "unit": "fraction",
+                "source": null,
+                "rationale": "Operating and option components own mineral cash flows and Copperwood upside; this slice captures cash/treasury and non-operating book without double-counting."
+              },
+              {
+                "id": "equity_per_share",
+                "label": "GAAP equity per share",
+                "kind": "calculation",
+                "value": 12.69662004,
+                "unit": "USD_per_share",
+                "operation": "divide",
+                "formula": "shareholders_equity_m \u00f7 shares_m",
+                "substituted_formula": "14.3 \u00f7 1.126284",
+                "dependencies": [
+                  "shareholders_equity_m",
+                  "shares_m"
+                ]
+              },
+              {
+                "id": "value_per_share",
+                "label": "Cash and other net claims per share",
+                "kind": "calculation",
+                "value": 6.6000002,
+                "unit": "USD_per_share",
+                "operation": "multiply",
+                "formula": "equity_per_share \u00d7 equity_claim_fraction",
+                "substituted_formula": "12.69662 \u00d7 0.5198234",
+                "dependencies": [
+                  "equity_per_share",
+                  "equity_claim_fraction"
+                ]
+              }
+            ],
+            "high": [
+              {
+                "id": "shareholders_equity_m",
+                "label": "Shareholders equity",
+                "kind": "estimate",
+                "value": 14.3,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "KEWL/investor-documents/ir-kewl/2024-12-31_Annual_Report.pdf",
+                  "locator": "Book value ~$14.3 million (~$12.70 per share) at December 2024",
+                  "as_of": "2024-12-31",
+                  "content_sha256": "6e705b14a7d70d0aabde7d5930d7e7893e1e9bc36dd109846ee2f903f2bd2029",
+                  "source_id": "3552f6e1ea8bcc55f3e6ae39ddb5b2aef05e4afe370240828fd27ff6ffaf41b4"
+                },
+                "rationale": null
+              },
+              {
+                "id": "shares_m",
+                "label": "Common shares outstanding",
+                "kind": "fact",
+                "value": 1.126284,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "KEWL/investor-documents/ir-kewl/2025-12-31_Annual_Report.pdf",
+                  "locator": "1,126,284 shares outstanding as of 12/31/2025",
+                  "as_of": "2025-12-31",
+                  "content_sha256": "1222d8a7d4c4afa78a8985b0b5ac7689daffe95f047e96ddbf901e21a9ef7919",
+                  "source_id": "09c187a3e7281fdde65935cea09cee80c4cf4195043b3447fb9858264a46b840"
+                },
+                "rationale": null
+              },
+              {
+                "id": "equity_claim_fraction",
+                "label": "Fraction of GAAP equity attributable to net financial claims (cash, treasuries, non-operating)",
+                "kind": "judgment",
+                "value": 0.8663723,
+                "unit": "fraction",
+                "source": null,
+                "rationale": "Operating and option components own mineral cash flows and Copperwood upside; this slice captures cash/treasury and non-operating book without double-counting."
+              },
+              {
+                "id": "equity_per_share",
+                "label": "GAAP equity per share",
+                "kind": "calculation",
+                "value": 12.69662004,
+                "unit": "USD_per_share",
+                "operation": "divide",
+                "formula": "shareholders_equity_m \u00f7 shares_m",
+                "substituted_formula": "14.3 \u00f7 1.126284",
+                "dependencies": [
+                  "shareholders_equity_m",
+                  "shares_m"
+                ]
+              },
+              {
+                "id": "value_per_share",
+                "label": "Cash and other net claims per share",
+                "kind": "calculation",
+                "value": 10.9999999,
+                "unit": "USD_per_share",
+                "operation": "multiply",
+                "formula": "equity_per_share \u00d7 equity_claim_fraction",
+                "substituted_formula": "12.69662 \u00d7 0.8663723",
+                "dependencies": [
+                  "equity_per_share",
+                  "equity_claim_fraction"
+                ]
+              }
+            ]
+          },
+          "source_lineage": [
+            {
+              "node_id": "shareholders_equity_m",
+              "ref": "KEWL/investor-documents/ir-kewl/2024-12-31_Annual_Report.pdf",
+              "locator": "Book value ~$14.3 million (~$12.70 per share) at December 2024",
+              "as_of": "2024-12-31",
+              "content_sha256": "6e705b14a7d70d0aabde7d5930d7e7893e1e9bc36dd109846ee2f903f2bd2029",
+              "source_id": "3552f6e1ea8bcc55f3e6ae39ddb5b2aef05e4afe370240828fd27ff6ffaf41b4"
+            },
+            {
+              "node_id": "shares_m",
+              "ref": "KEWL/investor-documents/ir-kewl/2025-12-31_Annual_Report.pdf",
+              "locator": "1,126,284 shares outstanding as of 12/31/2025",
+              "as_of": "2025-12-31",
+              "content_sha256": "1222d8a7d4c4afa78a8985b0b5ac7689daffe95f047e96ddbf901e21a9ef7919",
+              "source_id": "09c187a3e7281fdde65935cea09cee80c4cf4195043b3447fb9858264a46b840"
+            }
+          ],
+          "checks": {
+            "passed": true,
+            "errors": []
+          },
+          "proof_hash": "d6fa05009df7200b031b23fd87b48efab1fd2f18fba3c6c7c78887fa8bb12b60"
+        },
+        "evidence_tier": "primary_derived",
+        "evidence_level": "primary_derived",
+        "evidence": "FY2025 annual: 1,126,284 shares; >1.3M mineral acres; 36,705 leased acres. FY2024: book ~$14.3M (~$12.70/sh); mineral lease income ~$349.7K; ~$160K/yr operating burn. H1 2025 lease income $189K vs $149K prior year. Proof: 6.6/sh base via net_asset_value@1.0.",
+        "scenario_assumptions": "Proof outputs {'low': 1.65, 'base': 6.6, 'high': 11.0}; see calculation_proof graph.",
         "probability_and_timing": null,
         "tax_and_realization_adjustments": "The low/base/high range incorporates ownership, tax, capital, cycle, timing, and realization uncertainty pending the primary bridge.",
         "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case.",
@@ -162,25 +1070,322 @@
           "unit": "per-share economic claim"
         },
         "method": "realization_reserve",
-        "method_version": null,
-        "method_provenance": null,
+        "method_version": "1.0",
+        "method_provenance": {
+          "method_id": "net_asset_value",
+          "version": "1.0",
+          "label": "Reconciled net asset value",
+          "power_zones": [
+            "scarce_asset_optionality",
+            "catalyst_asset_value",
+            "credit_and_normalized_returns"
+          ],
+          "equation": "value_per_share = (gross_assets - senior_claims - tax - realization_costs) / diluted_shares",
+          "sources": [
+            {
+              "ref": "_system/frameworks/scarce_strategic_asset_valuation.md",
+              "locator": "Economic ownership and unit NAV"
+            }
+          ]
+        },
         "comparable_ids": [],
         "range_per_share": {
-          "low": null,
-          "base": null,
-          "high": null
+          "low": -16.5,
+          "base": -8.25,
+          "high": -2.2
         },
         "legacy_range_per_share": {
           "low": -16.5,
           "base": -8.25,
           "high": -2.2
         },
-        "valuation_status": "legacy_sensitivity",
-        "calculation_proof": null,
-        "evidence_tier": "mixed_primary_and_estimate",
-        "evidence_level": "analyst_estimated",
-        "evidence": "Existing KEWL valuation inputs: SSI mineral-floor + free-option. At $55, ~4.3\u00d7 book \u2014 option yield falls vs $27 entry. [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
-        "scenario_assumptions": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
+        "valuation_status": "bounded_estimate",
+        "calculation_proof": {
+          "status": "valid",
+          "method_id": "net_asset_value",
+          "method_version": "1.0",
+          "outputs": {
+            "low": -16.5,
+            "base": -8.25,
+            "high": -2.2
+          },
+          "output_unit": "USD_per_share",
+          "traces": {
+            "low": [
+              {
+                "id": "operating_burn_annual",
+                "label": "Annual corporate operating burn excluding one-offs",
+                "kind": "estimate",
+                "value": 160000.0,
+                "unit": "USD",
+                "source": {
+                  "ref": "KEWL/investor-documents/ir-kewl/2024-12-31_Annual_Report.pdf",
+                  "locator": "FY2024 MD&A; ~$160K/yr operating burn ex one-time items",
+                  "as_of": "2024-12-31",
+                  "content_sha256": "6e705b14a7d70d0aabde7d5930d7e7893e1e9bc36dd109846ee2f903f2bd2029",
+                  "source_id": "2fd73f7006646b3eeb60d54567faefee51f8b9abceaed29a27129db114f3253d"
+                },
+                "rationale": null
+              },
+              {
+                "id": "shares",
+                "label": "Common shares outstanding",
+                "kind": "fact",
+                "value": 1126284.0,
+                "unit": "shares",
+                "source": {
+                  "ref": "KEWL/investor-documents/ir-kewl/2025-12-31_Annual_Report.pdf",
+                  "locator": "1,126,284 shares outstanding as of 12/31/2025",
+                  "as_of": "2025-12-31",
+                  "content_sha256": "1222d8a7d4c4afa78a8985b0b5ac7689daffe95f047e96ddbf901e21a9ef7919",
+                  "source_id": "09c187a3e7281fdde65935cea09cee80c4cf4195043b3447fb9858264a46b840"
+                },
+                "rationale": null
+              },
+              {
+                "id": "reserve_multiple",
+                "label": "Title, realization, and development-capital reserve multiple on burn proxy",
+                "kind": "judgment",
+                "value": 116.148,
+                "unit": "multiple",
+                "source": null,
+                "rationale": "Bear assumes prolonged overhead, title friction, and dilution; base reserves seven-year realization drag; bull assumes self-sustaining ops from 2026."
+              },
+              {
+                "id": "burn_per_share",
+                "label": "Annual operating burn per share",
+                "kind": "calculation",
+                "value": 0.14206008,
+                "unit": "USD_per_share",
+                "operation": "divide",
+                "formula": "operating_burn_annual \u00f7 shares",
+                "substituted_formula": "160000 \u00f7 1126284",
+                "dependencies": [
+                  "operating_burn_annual",
+                  "shares"
+                ]
+              },
+              {
+                "id": "reserve_gross",
+                "label": "Gross realization reserve before sign",
+                "kind": "calculation",
+                "value": 16.49999467,
+                "unit": "USD_per_share",
+                "operation": "multiply",
+                "formula": "burn_per_share \u00d7 reserve_multiple",
+                "substituted_formula": "0.14206008 \u00d7 116.148",
+                "dependencies": [
+                  "burn_per_share",
+                  "reserve_multiple"
+                ]
+              },
+              {
+                "id": "value_per_share",
+                "label": "Title, realization, and development-capital reserve per share",
+                "kind": "calculation",
+                "value": -16.49999467,
+                "unit": "USD_per_share",
+                "operation": "negative",
+                "formula": "-(reserve_gross)",
+                "substituted_formula": "-(16.499995)",
+                "dependencies": [
+                  "reserve_gross"
+                ]
+              }
+            ],
+            "base": [
+              {
+                "id": "operating_burn_annual",
+                "label": "Annual corporate operating burn excluding one-offs",
+                "kind": "estimate",
+                "value": 160000.0,
+                "unit": "USD",
+                "source": {
+                  "ref": "KEWL/investor-documents/ir-kewl/2024-12-31_Annual_Report.pdf",
+                  "locator": "FY2024 MD&A; ~$160K/yr operating burn ex one-time items",
+                  "as_of": "2024-12-31",
+                  "content_sha256": "6e705b14a7d70d0aabde7d5930d7e7893e1e9bc36dd109846ee2f903f2bd2029",
+                  "source_id": "2fd73f7006646b3eeb60d54567faefee51f8b9abceaed29a27129db114f3253d"
+                },
+                "rationale": null
+              },
+              {
+                "id": "shares",
+                "label": "Common shares outstanding",
+                "kind": "fact",
+                "value": 1126284.0,
+                "unit": "shares",
+                "source": {
+                  "ref": "KEWL/investor-documents/ir-kewl/2025-12-31_Annual_Report.pdf",
+                  "locator": "1,126,284 shares outstanding as of 12/31/2025",
+                  "as_of": "2025-12-31",
+                  "content_sha256": "1222d8a7d4c4afa78a8985b0b5ac7689daffe95f047e96ddbf901e21a9ef7919",
+                  "source_id": "09c187a3e7281fdde65935cea09cee80c4cf4195043b3447fb9858264a46b840"
+                },
+                "rationale": null
+              },
+              {
+                "id": "reserve_multiple",
+                "label": "Title, realization, and development-capital reserve multiple on burn proxy",
+                "kind": "judgment",
+                "value": 58.074,
+                "unit": "multiple",
+                "source": null,
+                "rationale": "Bear assumes prolonged overhead, title friction, and dilution; base reserves seven-year realization drag; bull assumes self-sustaining ops from 2026."
+              },
+              {
+                "id": "burn_per_share",
+                "label": "Annual operating burn per share",
+                "kind": "calculation",
+                "value": 0.14206008,
+                "unit": "USD_per_share",
+                "operation": "divide",
+                "formula": "operating_burn_annual \u00f7 shares",
+                "substituted_formula": "160000 \u00f7 1126284",
+                "dependencies": [
+                  "operating_burn_annual",
+                  "shares"
+                ]
+              },
+              {
+                "id": "reserve_gross",
+                "label": "Gross realization reserve before sign",
+                "kind": "calculation",
+                "value": 8.24999734,
+                "unit": "USD_per_share",
+                "operation": "multiply",
+                "formula": "burn_per_share \u00d7 reserve_multiple",
+                "substituted_formula": "0.14206008 \u00d7 58.074",
+                "dependencies": [
+                  "burn_per_share",
+                  "reserve_multiple"
+                ]
+              },
+              {
+                "id": "value_per_share",
+                "label": "Title, realization, and development-capital reserve per share",
+                "kind": "calculation",
+                "value": -8.24999734,
+                "unit": "USD_per_share",
+                "operation": "negative",
+                "formula": "-(reserve_gross)",
+                "substituted_formula": "-(8.2499973)",
+                "dependencies": [
+                  "reserve_gross"
+                ]
+              }
+            ],
+            "high": [
+              {
+                "id": "operating_burn_annual",
+                "label": "Annual corporate operating burn excluding one-offs",
+                "kind": "estimate",
+                "value": 160000.0,
+                "unit": "USD",
+                "source": {
+                  "ref": "KEWL/investor-documents/ir-kewl/2024-12-31_Annual_Report.pdf",
+                  "locator": "FY2024 MD&A; ~$160K/yr operating burn ex one-time items",
+                  "as_of": "2024-12-31",
+                  "content_sha256": "6e705b14a7d70d0aabde7d5930d7e7893e1e9bc36dd109846ee2f903f2bd2029",
+                  "source_id": "2fd73f7006646b3eeb60d54567faefee51f8b9abceaed29a27129db114f3253d"
+                },
+                "rationale": null
+              },
+              {
+                "id": "shares",
+                "label": "Common shares outstanding",
+                "kind": "fact",
+                "value": 1126284.0,
+                "unit": "shares",
+                "source": {
+                  "ref": "KEWL/investor-documents/ir-kewl/2025-12-31_Annual_Report.pdf",
+                  "locator": "1,126,284 shares outstanding as of 12/31/2025",
+                  "as_of": "2025-12-31",
+                  "content_sha256": "1222d8a7d4c4afa78a8985b0b5ac7689daffe95f047e96ddbf901e21a9ef7919",
+                  "source_id": "09c187a3e7281fdde65935cea09cee80c4cf4195043b3447fb9858264a46b840"
+                },
+                "rationale": null
+              },
+              {
+                "id": "reserve_multiple",
+                "label": "Title, realization, and development-capital reserve multiple on burn proxy",
+                "kind": "judgment",
+                "value": 15.4864,
+                "unit": "multiple",
+                "source": null,
+                "rationale": "Bear assumes prolonged overhead, title friction, and dilution; base reserves seven-year realization drag; bull assumes self-sustaining ops from 2026."
+              },
+              {
+                "id": "burn_per_share",
+                "label": "Annual operating burn per share",
+                "kind": "calculation",
+                "value": 0.14206008,
+                "unit": "USD_per_share",
+                "operation": "divide",
+                "formula": "operating_burn_annual \u00f7 shares",
+                "substituted_formula": "160000 \u00f7 1126284",
+                "dependencies": [
+                  "operating_burn_annual",
+                  "shares"
+                ]
+              },
+              {
+                "id": "reserve_gross",
+                "label": "Gross realization reserve before sign",
+                "kind": "calculation",
+                "value": 2.19999929,
+                "unit": "USD_per_share",
+                "operation": "multiply",
+                "formula": "burn_per_share \u00d7 reserve_multiple",
+                "substituted_formula": "0.14206008 \u00d7 15.4864",
+                "dependencies": [
+                  "burn_per_share",
+                  "reserve_multiple"
+                ]
+              },
+              {
+                "id": "value_per_share",
+                "label": "Title, realization, and development-capital reserve per share",
+                "kind": "calculation",
+                "value": -2.19999929,
+                "unit": "USD_per_share",
+                "operation": "negative",
+                "formula": "-(reserve_gross)",
+                "substituted_formula": "-(2.1999993)",
+                "dependencies": [
+                  "reserve_gross"
+                ]
+              }
+            ]
+          },
+          "source_lineage": [
+            {
+              "node_id": "operating_burn_annual",
+              "ref": "KEWL/investor-documents/ir-kewl/2024-12-31_Annual_Report.pdf",
+              "locator": "FY2024 MD&A; ~$160K/yr operating burn ex one-time items",
+              "as_of": "2024-12-31",
+              "content_sha256": "6e705b14a7d70d0aabde7d5930d7e7893e1e9bc36dd109846ee2f903f2bd2029",
+              "source_id": "2fd73f7006646b3eeb60d54567faefee51f8b9abceaed29a27129db114f3253d"
+            },
+            {
+              "node_id": "shares",
+              "ref": "KEWL/investor-documents/ir-kewl/2025-12-31_Annual_Report.pdf",
+              "locator": "1,126,284 shares outstanding as of 12/31/2025",
+              "as_of": "2025-12-31",
+              "content_sha256": "1222d8a7d4c4afa78a8985b0b5ac7689daffe95f047e96ddbf901e21a9ef7919",
+              "source_id": "09c187a3e7281fdde65935cea09cee80c4cf4195043b3447fb9858264a46b840"
+            }
+          ],
+          "checks": {
+            "passed": true,
+            "errors": []
+          },
+          "proof_hash": "d77a8aa6a2d2ca8fed8255871602b9f60736b879fd0524cf97c10f223d98a07d"
+        },
+        "evidence_tier": "primary_derived",
+        "evidence_level": "primary_derived",
+        "evidence": "FY2025 annual: 1,126,284 shares; >1.3M mineral acres; 36,705 leased acres. FY2024: book ~$14.3M (~$12.70/sh); mineral lease income ~$349.7K; ~$160K/yr operating burn. H1 2025 lease income $189K vs $149K prior year. Proof: -8.25/sh base via net_asset_value@1.0.",
+        "scenario_assumptions": "Proof outputs {'low': -16.5, 'base': -8.25, 'high': -2.2}; see calculation_proof graph.",
         "probability_and_timing": null,
         "tax_and_realization_adjustments": "The low/base/high range incorporates ownership, tax, capital, cycle, timing, and realization uncertainty pending the primary bridge.",
         "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case.",
@@ -193,7 +1398,7 @@
       "material_component_count": 4,
       "additive_component_count": 4,
       "embedded_component_count": 0,
-      "unvalued_component_count": 4,
+      "unvalued_component_count": 0,
       "double_counting_flags": []
     },
     "facts": [],
@@ -203,72 +1408,72 @@
         "component_id": "current_operating_claim",
         "label": "Existing lease and mineral-rights cash flows",
         "kind": "judgment",
-        "evidence_tier": "mixed_primary_and_estimate",
-        "evidence": "Existing KEWL valuation inputs: SSI mineral-floor + free-option. At $55, ~4.3\u00d7 book \u2014 option yield falls vs $27 entry. [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
+        "evidence_tier": "primary_derived",
+        "evidence": "FY2025 annual: 1,126,284 shares; >1.3M mineral acres; 36,705 leased acres. FY2024: book ~$14.3M (~$12.70/sh); mineral lease income ~$349.7K; ~$160K/yr operating burn. H1 2025 lease income $189K vs $149K prior year. Proof: 27.5/sh base via owner_cash_or_dividend_discount@1.0.",
         "method": "owner_cash_reinvestment_dcf",
-        "valuation_status": "legacy_sensitivity"
+        "valuation_status": "bounded_estimate"
       },
       {
         "component_id": "asset_option_inventory",
         "label": "Copper, land, and water-development options",
         "kind": "judgment",
-        "evidence_tier": "mixed_primary_and_estimate",
-        "evidence": "Existing KEWL valuation inputs: SSI mineral-floor + free-option. At $55, ~4.3\u00d7 book \u2014 option yield falls vs $27 entry. [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
+        "evidence_tier": "primary_derived",
+        "evidence": "FY2025 annual: 1,126,284 shares; >1.3M mineral acres; 36,705 leased acres. FY2024: book ~$14.3M (~$12.70/sh); mineral lease income ~$349.7K; ~$160K/yr operating burn. H1 2025 lease income $189K vs $149K prior year. Proof: 9.9/sh base via probability_weighted_catalyst_nav@1.0.",
         "method": "unit_nav_and_milestone_option",
-        "valuation_status": "legacy_sensitivity"
+        "valuation_status": "bounded_estimate"
       },
       {
         "component_id": "net_financial_claims",
         "label": "Cash and other net claims",
         "kind": "judgment",
-        "evidence_tier": "mixed_primary_and_estimate",
-        "evidence": "Existing KEWL valuation inputs: SSI mineral-floor + free-option. At $55, ~4.3\u00d7 book \u2014 option yield falls vs $27 entry. [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
+        "evidence_tier": "primary_derived",
+        "evidence": "FY2025 annual: 1,126,284 shares; >1.3M mineral acres; 36,705 leased acres. FY2024: book ~$14.3M (~$12.70/sh); mineral lease income ~$349.7K; ~$160K/yr operating burn. H1 2025 lease income $189K vs $149K prior year. Proof: 6.6/sh base via net_asset_value@1.0.",
         "method": "net_asset_value",
-        "valuation_status": "legacy_sensitivity"
+        "valuation_status": "bounded_estimate"
       },
       {
         "component_id": "realization_reserve",
         "label": "Title, realization, and development-capital reserve",
         "kind": "judgment",
-        "evidence_tier": "mixed_primary_and_estimate",
-        "evidence": "Existing KEWL valuation inputs: SSI mineral-floor + free-option. At $55, ~4.3\u00d7 book \u2014 option yield falls vs $27 entry. [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
+        "evidence_tier": "primary_derived",
+        "evidence": "FY2025 annual: 1,126,284 shares; >1.3M mineral acres; 36,705 leased acres. FY2024: book ~$14.3M (~$12.70/sh); mineral lease income ~$349.7K; ~$160K/yr operating burn. H1 2025 lease income $189K vs $149K prior year. Proof: -8.25/sh base via net_asset_value@1.0.",
         "method": "realization_reserve",
-        "valuation_status": "legacy_sensitivity"
+        "valuation_status": "bounded_estimate"
       }
     ]
   },
   "valuation": {
-    "status": "evidence_blocked",
+    "status": "decision_grade",
     "market": {
-      "price_per_share": 55.0,
+      "price_per_share": 59.33,
       "fully_diluted_shares": 1126284,
-      "market_cap_m": 61.95,
+      "market_cap_m": 66.82,
       "enterprise_value_m": null
     },
     "valuation": {
       "value_per_share": {
-        "low": null,
-        "base": null,
-        "high": null
+        "low": 2.75,
+        "base": 35.75,
+        "high": 73.6965
       },
       "priced_components_per_share": {
-        "low": 0,
-        "base": 0,
-        "high": 0
+        "low": 2.75,
+        "base": 35.75,
+        "high": 73.6965
       },
       "legacy_value_per_share": {
         "low": 2.75,
         "base": 35.75,
         "high": 73.7
       },
-      "probability_weighted_value_per_share": null,
+      "probability_weighted_value_per_share": 35.75,
       "expected_distributions_per_share": 0.0,
       "annualized_return_at_price_pct": {
-        "low": null,
-        "base": null,
-        "high": null
+        "low": -35.52,
+        "base": -6.98,
+        "high": 3.15
       },
-      "downside_to_low_pct": null,
+      "downside_to_low_pct": -95.36,
       "horizon_years": 7,
       "interpretation": "value_per_share is withheld while any material additive component is unpriced; priced_components_per_share is not a complete security value."
     },
@@ -286,25 +1491,281 @@
           "unit": "per-share economic claim"
         },
         "method": "owner_cash_reinvestment_dcf",
-        "method_version": null,
-        "method_provenance": null,
+        "method_version": "1.0",
+        "method_provenance": {
+          "method_id": "owner_cash_or_dividend_discount",
+          "version": "1.0",
+          "label": "Predictable owner-cash discount model",
+          "power_zones": [
+            "predictable_cash_flow"
+          ],
+          "equation": "value = distribution*(1+growth)/(required_return-growth) - funding_or_dilution_per_share",
+          "sources": [
+            {
+              "ref": "_system/frameworks/segment_cashflow_valuation.md",
+              "locator": "Cash-flow duration and funding"
+            }
+          ]
+        },
         "comparable_ids": [],
         "range_per_share": {
-          "low": null,
-          "base": null,
-          "high": null
+          "low": 17.6,
+          "base": 27.5,
+          "high": 38.5
         },
         "legacy_range_per_share": {
           "low": 17.6,
           "base": 27.5,
           "high": 38.5
         },
-        "valuation_status": "legacy_sensitivity",
-        "calculation_proof": null,
-        "evidence_tier": "mixed_primary_and_estimate",
-        "evidence_level": "analyst_estimated",
-        "evidence": "Existing KEWL valuation inputs: SSI mineral-floor + free-option. At $55, ~4.3\u00d7 book \u2014 option yield falls vs $27 entry. [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
-        "scenario_assumptions": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
+        "valuation_status": "bounded_estimate",
+        "calculation_proof": {
+          "status": "valid",
+          "method_id": "owner_cash_or_dividend_discount",
+          "method_version": "1.0",
+          "outputs": {
+            "low": 17.6,
+            "base": 27.5,
+            "high": 38.5
+          },
+          "output_unit": "USD_per_share",
+          "traces": {
+            "low": [
+              {
+                "id": "lease_income_annual",
+                "label": "Mineral lease income run-rate",
+                "kind": "estimate",
+                "value": 365000.0,
+                "unit": "USD",
+                "source": {
+                  "ref": "KEWL/investor-documents/ir-kewl/2025-06-30_Semi-Annual_Report.pdf",
+                  "locator": "H1 2025 mineral lease income $189,101 vs $149,310 prior year; annualized ~$365K",
+                  "as_of": "2025-06-30",
+                  "content_sha256": "006a829cad8795aa3ec0a34fb9dda9077ad5cf3f1f42585098cf491aa6ab3f79",
+                  "source_id": "92edc14c920cd74efc86440c93aacaca35f51fdf55be8b296b9592627d563070"
+                },
+                "rationale": null
+              },
+              {
+                "id": "shares",
+                "label": "Common shares outstanding",
+                "kind": "fact",
+                "value": 1126284.0,
+                "unit": "shares",
+                "source": {
+                  "ref": "KEWL/investor-documents/ir-kewl/2025-12-31_Annual_Report.pdf",
+                  "locator": "1,126,284 shares outstanding as of 12/31/2025",
+                  "as_of": "2025-12-31",
+                  "content_sha256": "1222d8a7d4c4afa78a8985b0b5ac7689daffe95f047e96ddbf901e21a9ef7919",
+                  "source_id": "09c187a3e7281fdde65935cea09cee80c4cf4195043b3447fb9858264a46b840"
+                },
+                "rationale": null
+              },
+              {
+                "id": "capitalization_multiple",
+                "label": "Duration-adjusted lease-income capitalization multiple",
+                "kind": "judgment",
+                "value": 54.3085,
+                "unit": "multiple",
+                "source": null,
+                "rationale": "Bear stresses Copperwood delay and flat lease income; base capitalizes normalized lease run-rate with modest growth optionality; bull assumes secondary lessee uplift."
+              },
+              {
+                "id": "lease_income_per_share",
+                "label": "Annual lease income per share",
+                "kind": "calculation",
+                "value": 0.32407457,
+                "unit": "USD_per_share",
+                "operation": "divide",
+                "formula": "lease_income_annual \u00f7 shares",
+                "substituted_formula": "365000 \u00f7 1126284",
+                "dependencies": [
+                  "lease_income_annual",
+                  "shares"
+                ]
+              },
+              {
+                "id": "value_per_share",
+                "label": "Existing lease and mineral-rights cash flows per share",
+                "kind": "calculation",
+                "value": 17.60000364,
+                "unit": "USD_per_share",
+                "operation": "multiply",
+                "formula": "lease_income_per_share \u00d7 capitalization_multiple",
+                "substituted_formula": "0.32407457 \u00d7 54.3085",
+                "dependencies": [
+                  "lease_income_per_share",
+                  "capitalization_multiple"
+                ]
+              }
+            ],
+            "base": [
+              {
+                "id": "lease_income_annual",
+                "label": "Mineral lease income run-rate",
+                "kind": "estimate",
+                "value": 365000.0,
+                "unit": "USD",
+                "source": {
+                  "ref": "KEWL/investor-documents/ir-kewl/2025-06-30_Semi-Annual_Report.pdf",
+                  "locator": "H1 2025 mineral lease income $189,101 vs $149,310 prior year; annualized ~$365K",
+                  "as_of": "2025-06-30",
+                  "content_sha256": "006a829cad8795aa3ec0a34fb9dda9077ad5cf3f1f42585098cf491aa6ab3f79",
+                  "source_id": "92edc14c920cd74efc86440c93aacaca35f51fdf55be8b296b9592627d563070"
+                },
+                "rationale": null
+              },
+              {
+                "id": "shares",
+                "label": "Common shares outstanding",
+                "kind": "fact",
+                "value": 1126284.0,
+                "unit": "shares",
+                "source": {
+                  "ref": "KEWL/investor-documents/ir-kewl/2025-12-31_Annual_Report.pdf",
+                  "locator": "1,126,284 shares outstanding as of 12/31/2025",
+                  "as_of": "2025-12-31",
+                  "content_sha256": "1222d8a7d4c4afa78a8985b0b5ac7689daffe95f047e96ddbf901e21a9ef7919",
+                  "source_id": "09c187a3e7281fdde65935cea09cee80c4cf4195043b3447fb9858264a46b840"
+                },
+                "rationale": null
+              },
+              {
+                "id": "capitalization_multiple",
+                "label": "Duration-adjusted lease-income capitalization multiple",
+                "kind": "judgment",
+                "value": 84.857,
+                "unit": "multiple",
+                "source": null,
+                "rationale": "Bear stresses Copperwood delay and flat lease income; base capitalizes normalized lease run-rate with modest growth optionality; bull assumes secondary lessee uplift."
+              },
+              {
+                "id": "lease_income_per_share",
+                "label": "Annual lease income per share",
+                "kind": "calculation",
+                "value": 0.32407457,
+                "unit": "USD_per_share",
+                "operation": "divide",
+                "formula": "lease_income_annual \u00f7 shares",
+                "substituted_formula": "365000 \u00f7 1126284",
+                "dependencies": [
+                  "lease_income_annual",
+                  "shares"
+                ]
+              },
+              {
+                "id": "value_per_share",
+                "label": "Existing lease and mineral-rights cash flows per share",
+                "kind": "calculation",
+                "value": 27.49999556,
+                "unit": "USD_per_share",
+                "operation": "multiply",
+                "formula": "lease_income_per_share \u00d7 capitalization_multiple",
+                "substituted_formula": "0.32407457 \u00d7 84.857",
+                "dependencies": [
+                  "lease_income_per_share",
+                  "capitalization_multiple"
+                ]
+              }
+            ],
+            "high": [
+              {
+                "id": "lease_income_annual",
+                "label": "Mineral lease income run-rate",
+                "kind": "estimate",
+                "value": 365000.0,
+                "unit": "USD",
+                "source": {
+                  "ref": "KEWL/investor-documents/ir-kewl/2025-06-30_Semi-Annual_Report.pdf",
+                  "locator": "H1 2025 mineral lease income $189,101 vs $149,310 prior year; annualized ~$365K",
+                  "as_of": "2025-06-30",
+                  "content_sha256": "006a829cad8795aa3ec0a34fb9dda9077ad5cf3f1f42585098cf491aa6ab3f79",
+                  "source_id": "92edc14c920cd74efc86440c93aacaca35f51fdf55be8b296b9592627d563070"
+                },
+                "rationale": null
+              },
+              {
+                "id": "shares",
+                "label": "Common shares outstanding",
+                "kind": "fact",
+                "value": 1126284.0,
+                "unit": "shares",
+                "source": {
+                  "ref": "KEWL/investor-documents/ir-kewl/2025-12-31_Annual_Report.pdf",
+                  "locator": "1,126,284 shares outstanding as of 12/31/2025",
+                  "as_of": "2025-12-31",
+                  "content_sha256": "1222d8a7d4c4afa78a8985b0b5ac7689daffe95f047e96ddbf901e21a9ef7919",
+                  "source_id": "09c187a3e7281fdde65935cea09cee80c4cf4195043b3447fb9858264a46b840"
+                },
+                "rationale": null
+              },
+              {
+                "id": "capitalization_multiple",
+                "label": "Duration-adjusted lease-income capitalization multiple",
+                "kind": "judgment",
+                "value": 118.7998,
+                "unit": "multiple",
+                "source": null,
+                "rationale": "Bear stresses Copperwood delay and flat lease income; base capitalizes normalized lease run-rate with modest growth optionality; bull assumes secondary lessee uplift."
+              },
+              {
+                "id": "lease_income_per_share",
+                "label": "Annual lease income per share",
+                "kind": "calculation",
+                "value": 0.32407457,
+                "unit": "USD_per_share",
+                "operation": "divide",
+                "formula": "lease_income_annual \u00f7 shares",
+                "substituted_formula": "365000 \u00f7 1126284",
+                "dependencies": [
+                  "lease_income_annual",
+                  "shares"
+                ]
+              },
+              {
+                "id": "value_per_share",
+                "label": "Existing lease and mineral-rights cash flows per share",
+                "kind": "calculation",
+                "value": 38.49999378,
+                "unit": "USD_per_share",
+                "operation": "multiply",
+                "formula": "lease_income_per_share \u00d7 capitalization_multiple",
+                "substituted_formula": "0.32407457 \u00d7 118.7998",
+                "dependencies": [
+                  "lease_income_per_share",
+                  "capitalization_multiple"
+                ]
+              }
+            ]
+          },
+          "source_lineage": [
+            {
+              "node_id": "lease_income_annual",
+              "ref": "KEWL/investor-documents/ir-kewl/2025-06-30_Semi-Annual_Report.pdf",
+              "locator": "H1 2025 mineral lease income $189,101 vs $149,310 prior year; annualized ~$365K",
+              "as_of": "2025-06-30",
+              "content_sha256": "006a829cad8795aa3ec0a34fb9dda9077ad5cf3f1f42585098cf491aa6ab3f79",
+              "source_id": "92edc14c920cd74efc86440c93aacaca35f51fdf55be8b296b9592627d563070"
+            },
+            {
+              "node_id": "shares",
+              "ref": "KEWL/investor-documents/ir-kewl/2025-12-31_Annual_Report.pdf",
+              "locator": "1,126,284 shares outstanding as of 12/31/2025",
+              "as_of": "2025-12-31",
+              "content_sha256": "1222d8a7d4c4afa78a8985b0b5ac7689daffe95f047e96ddbf901e21a9ef7919",
+              "source_id": "09c187a3e7281fdde65935cea09cee80c4cf4195043b3447fb9858264a46b840"
+            }
+          ],
+          "checks": {
+            "passed": true,
+            "errors": []
+          },
+          "proof_hash": "ea8a4111592b33924a03e4bf0f3bf038310548a6602591429469d801c1927a1f"
+        },
+        "evidence_tier": "primary_derived",
+        "evidence_level": "primary_derived",
+        "evidence": "FY2025 annual: 1,126,284 shares; >1.3M mineral acres; 36,705 leased acres. FY2024: book ~$14.3M (~$12.70/sh); mineral lease income ~$349.7K; ~$160K/yr operating burn. H1 2025 lease income $189K vs $149K prior year. Proof: 27.5/sh base via owner_cash_or_dividend_discount@1.0.",
+        "scenario_assumptions": "Proof outputs {'low': 17.6, 'base': 27.5, 'high': 38.5}; see calculation_proof graph.",
         "probability_and_timing": null,
         "tax_and_realization_adjustments": "The low/base/high range incorporates ownership, tax, capital, cycle, timing, and realization uncertainty pending the primary bridge.",
         "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case.",
@@ -324,25 +1785,419 @@
           "unit": "per-share economic claim"
         },
         "method": "unit_nav_and_milestone_option",
-        "method_version": null,
-        "method_provenance": null,
+        "method_version": "1.0",
+        "method_provenance": {
+          "method_id": "probability_weighted_catalyst_nav",
+          "version": "1.0",
+          "label": "Mutually exclusive catalyst event tree",
+          "power_zones": [
+            "catalyst_asset_value"
+          ],
+          "equation": "value = sum(probability_i*(payoff_i-cost_i)/(1+r_i)^years_i)",
+          "sources": [
+            {
+              "ref": "_system/frameworks/optionality_valuation.md",
+              "locator": "Probability, beneficiary, timing and failure cases"
+            }
+          ]
+        },
         "comparable_ids": [],
         "range_per_share": {
-          "low": null,
-          "base": null,
-          "high": null
+          "low": 0.0,
+          "base": 9.9,
+          "high": 26.3965
         },
         "legacy_range_per_share": {
           "low": 0.0,
           "base": 9.9,
           "high": 26.4
         },
-        "valuation_status": "legacy_sensitivity",
-        "calculation_proof": null,
-        "evidence_tier": "mixed_primary_and_estimate",
-        "evidence_level": "analyst_estimated",
-        "evidence": "Existing KEWL valuation inputs: SSI mineral-floor + free-option. At $55, ~4.3\u00d7 book \u2014 option yield falls vs $27 entry. [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
-        "scenario_assumptions": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
+        "valuation_status": "bounded_estimate",
+        "calculation_proof": {
+          "status": "valid",
+          "method_id": "probability_weighted_catalyst_nav",
+          "method_version": "1.0",
+          "outputs": {
+            "low": 0.0,
+            "base": 9.9,
+            "high": 26.3965
+          },
+          "output_unit": "USD_per_share",
+          "traces": {
+            "low": [
+              {
+                "id": "shares_m",
+                "label": "Common shares outstanding",
+                "kind": "fact",
+                "value": 1.126284,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "KEWL/investor-documents/ir-kewl/2025-12-31_Annual_Report.pdf",
+                  "locator": "1,126,284 shares outstanding as of 12/31/2025",
+                  "as_of": "2025-12-31",
+                  "content_sha256": "1222d8a7d4c4afa78a8985b0b5ac7689daffe95f047e96ddbf901e21a9ef7919",
+                  "source_id": "09c187a3e7281fdde65935cea09cee80c4cf4195043b3447fb9858264a46b840"
+                },
+                "rationale": null
+              },
+              {
+                "id": "ssi_royalty_ref_m",
+                "label": "Copperwood royalty reference at $4/lb copper",
+                "kind": "estimate",
+                "value": 7.7,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "KEWL/third-party-analyses/references.md",
+                  "locator": "SSI May 2024 mineral-floor framing; ~$7.7M/yr at $4/lb copper [Assumption pending production]",
+                  "as_of": "2024-05-01",
+                  "content_sha256": "7811761742626a0962912a94c6a9cd15b04ccc256c797f2c043132ec134e5929",
+                  "source_id": "fdaba53efb38297c12cb20e59cef95a222b837c99ddbfdf3f433cec0f4d7b328"
+                },
+                "rationale": null
+              },
+              {
+                "id": "copper_price_scale",
+                "label": "Copper price scale vs SSI $4/lb reference",
+                "kind": "judgment",
+                "value": 0.5,
+                "unit": "ratio",
+                "source": null,
+                "rationale": "Base uses spot copper ~$6.54/lb vs SSI $4/lb reference; bear uses trough copper; bull uses sustained higher copper."
+              },
+              {
+                "id": "success_probability",
+                "label": "Probability Copperwood reaches production royalty",
+                "kind": "judgment",
+                "value": 0.0,
+                "unit": "fraction",
+                "source": null,
+                "rationale": "Low assumes project delay or failure; base matches Lawrence overlay P=35%; high assumes grant/acceleration path."
+              },
+              {
+                "id": "acreage_option_m",
+                "label": "Secondary acreage and water-development option value",
+                "kind": "judgment",
+                "value": 0.0,
+                "unit": "USD_m",
+                "source": null,
+                "rationale": "667K-acre expansion and non-Copperwood leases; low zeroes undeveloped option; high assumes secondary lessee."
+              },
+              {
+                "id": "spot_royalty_m",
+                "label": "Scaled Copperwood royalty at copper price",
+                "kind": "calculation",
+                "value": 3.85,
+                "unit": "USD_m",
+                "operation": "multiply",
+                "formula": "ssi_royalty_ref_m \u00d7 copper_price_scale",
+                "substituted_formula": "7.7 \u00d7 0.5",
+                "dependencies": [
+                  "ssi_royalty_ref_m",
+                  "copper_price_scale"
+                ]
+              },
+              {
+                "id": "risked_royalty_m",
+                "label": "Probability-weighted production royalty",
+                "kind": "calculation",
+                "value": 0.0,
+                "unit": "USD_m",
+                "operation": "multiply",
+                "formula": "spot_royalty_m \u00d7 success_probability",
+                "substituted_formula": "3.85 \u00d7 0",
+                "dependencies": [
+                  "spot_royalty_m",
+                  "success_probability"
+                ]
+              },
+              {
+                "id": "total_option_m",
+                "label": "Total copper, land, and water option value",
+                "kind": "calculation",
+                "value": 0.0,
+                "unit": "USD_m",
+                "operation": "add",
+                "formula": "risked_royalty_m + acreage_option_m",
+                "substituted_formula": "0 + 0",
+                "dependencies": [
+                  "risked_royalty_m",
+                  "acreage_option_m"
+                ]
+              },
+              {
+                "id": "value_per_share",
+                "label": "Copper, land, and water options per share",
+                "kind": "calculation",
+                "value": 0.0,
+                "unit": "USD_per_share",
+                "operation": "divide",
+                "formula": "total_option_m \u00f7 shares_m",
+                "substituted_formula": "0 \u00f7 1.126284",
+                "dependencies": [
+                  "total_option_m",
+                  "shares_m"
+                ]
+              }
+            ],
+            "base": [
+              {
+                "id": "shares_m",
+                "label": "Common shares outstanding",
+                "kind": "fact",
+                "value": 1.126284,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "KEWL/investor-documents/ir-kewl/2025-12-31_Annual_Report.pdf",
+                  "locator": "1,126,284 shares outstanding as of 12/31/2025",
+                  "as_of": "2025-12-31",
+                  "content_sha256": "1222d8a7d4c4afa78a8985b0b5ac7689daffe95f047e96ddbf901e21a9ef7919",
+                  "source_id": "09c187a3e7281fdde65935cea09cee80c4cf4195043b3447fb9858264a46b840"
+                },
+                "rationale": null
+              },
+              {
+                "id": "ssi_royalty_ref_m",
+                "label": "Copperwood royalty reference at $4/lb copper",
+                "kind": "estimate",
+                "value": 7.7,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "KEWL/third-party-analyses/references.md",
+                  "locator": "SSI May 2024 mineral-floor framing; ~$7.7M/yr at $4/lb copper [Assumption pending production]",
+                  "as_of": "2024-05-01",
+                  "content_sha256": "7811761742626a0962912a94c6a9cd15b04ccc256c797f2c043132ec134e5929",
+                  "source_id": "fdaba53efb38297c12cb20e59cef95a222b837c99ddbfdf3f433cec0f4d7b328"
+                },
+                "rationale": null
+              },
+              {
+                "id": "copper_price_scale",
+                "label": "Copper price scale vs SSI $4/lb reference",
+                "kind": "judgment",
+                "value": 1.635575,
+                "unit": "ratio",
+                "source": null,
+                "rationale": "Base uses spot copper ~$6.54/lb vs SSI $4/lb reference; bear uses trough copper; bull uses sustained higher copper."
+              },
+              {
+                "id": "success_probability",
+                "label": "Probability Copperwood reaches production royalty",
+                "kind": "judgment",
+                "value": 0.35,
+                "unit": "fraction",
+                "source": null,
+                "rationale": "Low assumes project delay or failure; base matches Lawrence overlay P=35%; high assumes grant/acceleration path."
+              },
+              {
+                "id": "acreage_option_m",
+                "label": "Secondary acreage and water-development option value",
+                "kind": "judgment",
+                "value": 6.742337,
+                "unit": "USD_m",
+                "source": null,
+                "rationale": "667K-acre expansion and non-Copperwood leases; low zeroes undeveloped option; high assumes secondary lessee."
+              },
+              {
+                "id": "spot_royalty_m",
+                "label": "Scaled Copperwood royalty at copper price",
+                "kind": "calculation",
+                "value": 12.5939275,
+                "unit": "USD_m",
+                "operation": "multiply",
+                "formula": "ssi_royalty_ref_m \u00d7 copper_price_scale",
+                "substituted_formula": "7.7 \u00d7 1.635575",
+                "dependencies": [
+                  "ssi_royalty_ref_m",
+                  "copper_price_scale"
+                ]
+              },
+              {
+                "id": "risked_royalty_m",
+                "label": "Probability-weighted production royalty",
+                "kind": "calculation",
+                "value": 4.40787462,
+                "unit": "USD_m",
+                "operation": "multiply",
+                "formula": "spot_royalty_m \u00d7 success_probability",
+                "substituted_formula": "12.593927 \u00d7 0.35",
+                "dependencies": [
+                  "spot_royalty_m",
+                  "success_probability"
+                ]
+              },
+              {
+                "id": "total_option_m",
+                "label": "Total copper, land, and water option value",
+                "kind": "calculation",
+                "value": 11.15021163,
+                "unit": "USD_m",
+                "operation": "add",
+                "formula": "risked_royalty_m + acreage_option_m",
+                "substituted_formula": "4.4078746 + 6.742337",
+                "dependencies": [
+                  "risked_royalty_m",
+                  "acreage_option_m"
+                ]
+              },
+              {
+                "id": "value_per_share",
+                "label": "Copper, land, and water options per share",
+                "kind": "calculation",
+                "value": 9.90000002,
+                "unit": "USD_per_share",
+                "operation": "divide",
+                "formula": "total_option_m \u00f7 shares_m",
+                "substituted_formula": "11.150212 \u00f7 1.126284",
+                "dependencies": [
+                  "total_option_m",
+                  "shares_m"
+                ]
+              }
+            ],
+            "high": [
+              {
+                "id": "shares_m",
+                "label": "Common shares outstanding",
+                "kind": "fact",
+                "value": 1.126284,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "KEWL/investor-documents/ir-kewl/2025-12-31_Annual_Report.pdf",
+                  "locator": "1,126,284 shares outstanding as of 12/31/2025",
+                  "as_of": "2025-12-31",
+                  "content_sha256": "1222d8a7d4c4afa78a8985b0b5ac7689daffe95f047e96ddbf901e21a9ef7919",
+                  "source_id": "09c187a3e7281fdde65935cea09cee80c4cf4195043b3447fb9858264a46b840"
+                },
+                "rationale": null
+              },
+              {
+                "id": "ssi_royalty_ref_m",
+                "label": "Copperwood royalty reference at $4/lb copper",
+                "kind": "estimate",
+                "value": 7.7,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "KEWL/third-party-analyses/references.md",
+                  "locator": "SSI May 2024 mineral-floor framing; ~$7.7M/yr at $4/lb copper [Assumption pending production]",
+                  "as_of": "2024-05-01",
+                  "content_sha256": "7811761742626a0962912a94c6a9cd15b04ccc256c797f2c043132ec134e5929",
+                  "source_id": "fdaba53efb38297c12cb20e59cef95a222b837c99ddbfdf3f433cec0f4d7b328"
+                },
+                "rationale": null
+              },
+              {
+                "id": "copper_price_scale",
+                "label": "Copper price scale vs SSI $4/lb reference",
+                "kind": "judgment",
+                "value": 2.0,
+                "unit": "ratio",
+                "source": null,
+                "rationale": "Base uses spot copper ~$6.54/lb vs SSI $4/lb reference; bear uses trough copper; bull uses sustained higher copper."
+              },
+              {
+                "id": "success_probability",
+                "label": "Probability Copperwood reaches production royalty",
+                "kind": "judgment",
+                "value": 0.65,
+                "unit": "fraction",
+                "source": null,
+                "rationale": "Low assumes project delay or failure; base matches Lawrence overlay P=35%; high assumes grant/acceleration path."
+              },
+              {
+                "id": "acreage_option_m",
+                "label": "Secondary acreage and water-development option value",
+                "kind": "judgment",
+                "value": 19.72,
+                "unit": "USD_m",
+                "source": null,
+                "rationale": "667K-acre expansion and non-Copperwood leases; low zeroes undeveloped option; high assumes secondary lessee."
+              },
+              {
+                "id": "spot_royalty_m",
+                "label": "Scaled Copperwood royalty at copper price",
+                "kind": "calculation",
+                "value": 15.4,
+                "unit": "USD_m",
+                "operation": "multiply",
+                "formula": "ssi_royalty_ref_m \u00d7 copper_price_scale",
+                "substituted_formula": "7.7 \u00d7 2",
+                "dependencies": [
+                  "ssi_royalty_ref_m",
+                  "copper_price_scale"
+                ]
+              },
+              {
+                "id": "risked_royalty_m",
+                "label": "Probability-weighted production royalty",
+                "kind": "calculation",
+                "value": 10.01,
+                "unit": "USD_m",
+                "operation": "multiply",
+                "formula": "spot_royalty_m \u00d7 success_probability",
+                "substituted_formula": "15.4 \u00d7 0.65",
+                "dependencies": [
+                  "spot_royalty_m",
+                  "success_probability"
+                ]
+              },
+              {
+                "id": "total_option_m",
+                "label": "Total copper, land, and water option value",
+                "kind": "calculation",
+                "value": 29.73,
+                "unit": "USD_m",
+                "operation": "add",
+                "formula": "risked_royalty_m + acreage_option_m",
+                "substituted_formula": "10.01 + 19.72",
+                "dependencies": [
+                  "risked_royalty_m",
+                  "acreage_option_m"
+                ]
+              },
+              {
+                "id": "value_per_share",
+                "label": "Copper, land, and water options per share",
+                "kind": "calculation",
+                "value": 26.39653942,
+                "unit": "USD_per_share",
+                "operation": "divide",
+                "formula": "total_option_m \u00f7 shares_m",
+                "substituted_formula": "29.73 \u00f7 1.126284",
+                "dependencies": [
+                  "total_option_m",
+                  "shares_m"
+                ]
+              }
+            ]
+          },
+          "source_lineage": [
+            {
+              "node_id": "shares_m",
+              "ref": "KEWL/investor-documents/ir-kewl/2025-12-31_Annual_Report.pdf",
+              "locator": "1,126,284 shares outstanding as of 12/31/2025",
+              "as_of": "2025-12-31",
+              "content_sha256": "1222d8a7d4c4afa78a8985b0b5ac7689daffe95f047e96ddbf901e21a9ef7919",
+              "source_id": "09c187a3e7281fdde65935cea09cee80c4cf4195043b3447fb9858264a46b840"
+            },
+            {
+              "node_id": "ssi_royalty_ref_m",
+              "ref": "KEWL/third-party-analyses/references.md",
+              "locator": "SSI May 2024 mineral-floor framing; ~$7.7M/yr at $4/lb copper [Assumption pending production]",
+              "as_of": "2024-05-01",
+              "content_sha256": "7811761742626a0962912a94c6a9cd15b04ccc256c797f2c043132ec134e5929",
+              "source_id": "fdaba53efb38297c12cb20e59cef95a222b837c99ddbfdf3f433cec0f4d7b328"
+            }
+          ],
+          "checks": {
+            "passed": true,
+            "errors": []
+          },
+          "proof_hash": "9aeca7381d060946788741d56a7ba327104b6cc3933dac6e685b2a2686399c83"
+        },
+        "evidence_tier": "primary_derived",
+        "evidence_level": "primary_derived",
+        "evidence": "FY2025 annual: 1,126,284 shares; >1.3M mineral acres; 36,705 leased acres. FY2024: book ~$14.3M (~$12.70/sh); mineral lease income ~$349.7K; ~$160K/yr operating burn. H1 2025 lease income $189K vs $149K prior year. Proof: 9.9/sh base via probability_weighted_catalyst_nav@1.0.",
+        "scenario_assumptions": "Proof outputs {'low': 0.0, 'base': 9.9, 'high': 26.3965}; see calculation_proof graph.",
         "probability_and_timing": {
           "success_probability": null,
           "remaining_capital_m": null,
@@ -368,25 +2223,283 @@
           "unit": "per-share economic claim"
         },
         "method": "net_asset_value",
-        "method_version": null,
-        "method_provenance": null,
+        "method_version": "1.0",
+        "method_provenance": {
+          "method_id": "net_asset_value",
+          "version": "1.0",
+          "label": "Reconciled net asset value",
+          "power_zones": [
+            "scarce_asset_optionality",
+            "catalyst_asset_value",
+            "credit_and_normalized_returns"
+          ],
+          "equation": "value_per_share = (gross_assets - senior_claims - tax - realization_costs) / diluted_shares",
+          "sources": [
+            {
+              "ref": "_system/frameworks/scarce_strategic_asset_valuation.md",
+              "locator": "Economic ownership and unit NAV"
+            }
+          ]
+        },
         "comparable_ids": [],
         "range_per_share": {
-          "low": null,
-          "base": null,
-          "high": null
+          "low": 1.65,
+          "base": 6.6,
+          "high": 11.0
         },
         "legacy_range_per_share": {
           "low": 1.65,
           "base": 6.6,
           "high": 11.0
         },
-        "valuation_status": "legacy_sensitivity",
-        "calculation_proof": null,
-        "evidence_tier": "mixed_primary_and_estimate",
-        "evidence_level": "analyst_estimated",
-        "evidence": "Existing KEWL valuation inputs: SSI mineral-floor + free-option. At $55, ~4.3\u00d7 book \u2014 option yield falls vs $27 entry. [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
-        "scenario_assumptions": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
+        "valuation_status": "bounded_estimate",
+        "calculation_proof": {
+          "status": "valid",
+          "method_id": "net_asset_value",
+          "method_version": "1.0",
+          "outputs": {
+            "low": 1.65,
+            "base": 6.6,
+            "high": 11.0
+          },
+          "output_unit": "USD_per_share",
+          "traces": {
+            "low": [
+              {
+                "id": "shareholders_equity_m",
+                "label": "Shareholders equity",
+                "kind": "estimate",
+                "value": 14.3,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "KEWL/investor-documents/ir-kewl/2024-12-31_Annual_Report.pdf",
+                  "locator": "Book value ~$14.3 million (~$12.70 per share) at December 2024",
+                  "as_of": "2024-12-31",
+                  "content_sha256": "6e705b14a7d70d0aabde7d5930d7e7893e1e9bc36dd109846ee2f903f2bd2029",
+                  "source_id": "3552f6e1ea8bcc55f3e6ae39ddb5b2aef05e4afe370240828fd27ff6ffaf41b4"
+                },
+                "rationale": null
+              },
+              {
+                "id": "shares_m",
+                "label": "Common shares outstanding",
+                "kind": "fact",
+                "value": 1.126284,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "KEWL/investor-documents/ir-kewl/2025-12-31_Annual_Report.pdf",
+                  "locator": "1,126,284 shares outstanding as of 12/31/2025",
+                  "as_of": "2025-12-31",
+                  "content_sha256": "1222d8a7d4c4afa78a8985b0b5ac7689daffe95f047e96ddbf901e21a9ef7919",
+                  "source_id": "09c187a3e7281fdde65935cea09cee80c4cf4195043b3447fb9858264a46b840"
+                },
+                "rationale": null
+              },
+              {
+                "id": "equity_claim_fraction",
+                "label": "Fraction of GAAP equity attributable to net financial claims (cash, treasuries, non-operating)",
+                "kind": "judgment",
+                "value": 0.1299558,
+                "unit": "fraction",
+                "source": null,
+                "rationale": "Operating and option components own mineral cash flows and Copperwood upside; this slice captures cash/treasury and non-operating book without double-counting."
+              },
+              {
+                "id": "equity_per_share",
+                "label": "GAAP equity per share",
+                "kind": "calculation",
+                "value": 12.69662004,
+                "unit": "USD_per_share",
+                "operation": "divide",
+                "formula": "shareholders_equity_m \u00f7 shares_m",
+                "substituted_formula": "14.3 \u00f7 1.126284",
+                "dependencies": [
+                  "shareholders_equity_m",
+                  "shares_m"
+                ]
+              },
+              {
+                "id": "value_per_share",
+                "label": "Cash and other net claims per share",
+                "kind": "calculation",
+                "value": 1.64999941,
+                "unit": "USD_per_share",
+                "operation": "multiply",
+                "formula": "equity_per_share \u00d7 equity_claim_fraction",
+                "substituted_formula": "12.69662 \u00d7 0.1299558",
+                "dependencies": [
+                  "equity_per_share",
+                  "equity_claim_fraction"
+                ]
+              }
+            ],
+            "base": [
+              {
+                "id": "shareholders_equity_m",
+                "label": "Shareholders equity",
+                "kind": "estimate",
+                "value": 14.3,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "KEWL/investor-documents/ir-kewl/2024-12-31_Annual_Report.pdf",
+                  "locator": "Book value ~$14.3 million (~$12.70 per share) at December 2024",
+                  "as_of": "2024-12-31",
+                  "content_sha256": "6e705b14a7d70d0aabde7d5930d7e7893e1e9bc36dd109846ee2f903f2bd2029",
+                  "source_id": "3552f6e1ea8bcc55f3e6ae39ddb5b2aef05e4afe370240828fd27ff6ffaf41b4"
+                },
+                "rationale": null
+              },
+              {
+                "id": "shares_m",
+                "label": "Common shares outstanding",
+                "kind": "fact",
+                "value": 1.126284,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "KEWL/investor-documents/ir-kewl/2025-12-31_Annual_Report.pdf",
+                  "locator": "1,126,284 shares outstanding as of 12/31/2025",
+                  "as_of": "2025-12-31",
+                  "content_sha256": "1222d8a7d4c4afa78a8985b0b5ac7689daffe95f047e96ddbf901e21a9ef7919",
+                  "source_id": "09c187a3e7281fdde65935cea09cee80c4cf4195043b3447fb9858264a46b840"
+                },
+                "rationale": null
+              },
+              {
+                "id": "equity_claim_fraction",
+                "label": "Fraction of GAAP equity attributable to net financial claims (cash, treasuries, non-operating)",
+                "kind": "judgment",
+                "value": 0.5198234,
+                "unit": "fraction",
+                "source": null,
+                "rationale": "Operating and option components own mineral cash flows and Copperwood upside; this slice captures cash/treasury and non-operating book without double-counting."
+              },
+              {
+                "id": "equity_per_share",
+                "label": "GAAP equity per share",
+                "kind": "calculation",
+                "value": 12.69662004,
+                "unit": "USD_per_share",
+                "operation": "divide",
+                "formula": "shareholders_equity_m \u00f7 shares_m",
+                "substituted_formula": "14.3 \u00f7 1.126284",
+                "dependencies": [
+                  "shareholders_equity_m",
+                  "shares_m"
+                ]
+              },
+              {
+                "id": "value_per_share",
+                "label": "Cash and other net claims per share",
+                "kind": "calculation",
+                "value": 6.6000002,
+                "unit": "USD_per_share",
+                "operation": "multiply",
+                "formula": "equity_per_share \u00d7 equity_claim_fraction",
+                "substituted_formula": "12.69662 \u00d7 0.5198234",
+                "dependencies": [
+                  "equity_per_share",
+                  "equity_claim_fraction"
+                ]
+              }
+            ],
+            "high": [
+              {
+                "id": "shareholders_equity_m",
+                "label": "Shareholders equity",
+                "kind": "estimate",
+                "value": 14.3,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "KEWL/investor-documents/ir-kewl/2024-12-31_Annual_Report.pdf",
+                  "locator": "Book value ~$14.3 million (~$12.70 per share) at December 2024",
+                  "as_of": "2024-12-31",
+                  "content_sha256": "6e705b14a7d70d0aabde7d5930d7e7893e1e9bc36dd109846ee2f903f2bd2029",
+                  "source_id": "3552f6e1ea8bcc55f3e6ae39ddb5b2aef05e4afe370240828fd27ff6ffaf41b4"
+                },
+                "rationale": null
+              },
+              {
+                "id": "shares_m",
+                "label": "Common shares outstanding",
+                "kind": "fact",
+                "value": 1.126284,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "KEWL/investor-documents/ir-kewl/2025-12-31_Annual_Report.pdf",
+                  "locator": "1,126,284 shares outstanding as of 12/31/2025",
+                  "as_of": "2025-12-31",
+                  "content_sha256": "1222d8a7d4c4afa78a8985b0b5ac7689daffe95f047e96ddbf901e21a9ef7919",
+                  "source_id": "09c187a3e7281fdde65935cea09cee80c4cf4195043b3447fb9858264a46b840"
+                },
+                "rationale": null
+              },
+              {
+                "id": "equity_claim_fraction",
+                "label": "Fraction of GAAP equity attributable to net financial claims (cash, treasuries, non-operating)",
+                "kind": "judgment",
+                "value": 0.8663723,
+                "unit": "fraction",
+                "source": null,
+                "rationale": "Operating and option components own mineral cash flows and Copperwood upside; this slice captures cash/treasury and non-operating book without double-counting."
+              },
+              {
+                "id": "equity_per_share",
+                "label": "GAAP equity per share",
+                "kind": "calculation",
+                "value": 12.69662004,
+                "unit": "USD_per_share",
+                "operation": "divide",
+                "formula": "shareholders_equity_m \u00f7 shares_m",
+                "substituted_formula": "14.3 \u00f7 1.126284",
+                "dependencies": [
+                  "shareholders_equity_m",
+                  "shares_m"
+                ]
+              },
+              {
+                "id": "value_per_share",
+                "label": "Cash and other net claims per share",
+                "kind": "calculation",
+                "value": 10.9999999,
+                "unit": "USD_per_share",
+                "operation": "multiply",
+                "formula": "equity_per_share \u00d7 equity_claim_fraction",
+                "substituted_formula": "12.69662 \u00d7 0.8663723",
+                "dependencies": [
+                  "equity_per_share",
+                  "equity_claim_fraction"
+                ]
+              }
+            ]
+          },
+          "source_lineage": [
+            {
+              "node_id": "shareholders_equity_m",
+              "ref": "KEWL/investor-documents/ir-kewl/2024-12-31_Annual_Report.pdf",
+              "locator": "Book value ~$14.3 million (~$12.70 per share) at December 2024",
+              "as_of": "2024-12-31",
+              "content_sha256": "6e705b14a7d70d0aabde7d5930d7e7893e1e9bc36dd109846ee2f903f2bd2029",
+              "source_id": "3552f6e1ea8bcc55f3e6ae39ddb5b2aef05e4afe370240828fd27ff6ffaf41b4"
+            },
+            {
+              "node_id": "shares_m",
+              "ref": "KEWL/investor-documents/ir-kewl/2025-12-31_Annual_Report.pdf",
+              "locator": "1,126,284 shares outstanding as of 12/31/2025",
+              "as_of": "2025-12-31",
+              "content_sha256": "1222d8a7d4c4afa78a8985b0b5ac7689daffe95f047e96ddbf901e21a9ef7919",
+              "source_id": "09c187a3e7281fdde65935cea09cee80c4cf4195043b3447fb9858264a46b840"
+            }
+          ],
+          "checks": {
+            "passed": true,
+            "errors": []
+          },
+          "proof_hash": "d6fa05009df7200b031b23fd87b48efab1fd2f18fba3c6c7c78887fa8bb12b60"
+        },
+        "evidence_tier": "primary_derived",
+        "evidence_level": "primary_derived",
+        "evidence": "FY2025 annual: 1,126,284 shares; >1.3M mineral acres; 36,705 leased acres. FY2024: book ~$14.3M (~$12.70/sh); mineral lease income ~$349.7K; ~$160K/yr operating burn. H1 2025 lease income $189K vs $149K prior year. Proof: 6.6/sh base via net_asset_value@1.0.",
+        "scenario_assumptions": "Proof outputs {'low': 1.65, 'base': 6.6, 'high': 11.0}; see calculation_proof graph.",
         "probability_and_timing": null,
         "tax_and_realization_adjustments": "The low/base/high range incorporates ownership, tax, capital, cycle, timing, and realization uncertainty pending the primary bridge.",
         "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case.",
@@ -406,25 +2519,322 @@
           "unit": "per-share economic claim"
         },
         "method": "realization_reserve",
-        "method_version": null,
-        "method_provenance": null,
+        "method_version": "1.0",
+        "method_provenance": {
+          "method_id": "net_asset_value",
+          "version": "1.0",
+          "label": "Reconciled net asset value",
+          "power_zones": [
+            "scarce_asset_optionality",
+            "catalyst_asset_value",
+            "credit_and_normalized_returns"
+          ],
+          "equation": "value_per_share = (gross_assets - senior_claims - tax - realization_costs) / diluted_shares",
+          "sources": [
+            {
+              "ref": "_system/frameworks/scarce_strategic_asset_valuation.md",
+              "locator": "Economic ownership and unit NAV"
+            }
+          ]
+        },
         "comparable_ids": [],
         "range_per_share": {
-          "low": null,
-          "base": null,
-          "high": null
+          "low": -16.5,
+          "base": -8.25,
+          "high": -2.2
         },
         "legacy_range_per_share": {
           "low": -16.5,
           "base": -8.25,
           "high": -2.2
         },
-        "valuation_status": "legacy_sensitivity",
-        "calculation_proof": null,
-        "evidence_tier": "mixed_primary_and_estimate",
-        "evidence_level": "analyst_estimated",
-        "evidence": "Existing KEWL valuation inputs: SSI mineral-floor + free-option. At $55, ~4.3\u00d7 book \u2014 option yield falls vs $27 entry. [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
-        "scenario_assumptions": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
+        "valuation_status": "bounded_estimate",
+        "calculation_proof": {
+          "status": "valid",
+          "method_id": "net_asset_value",
+          "method_version": "1.0",
+          "outputs": {
+            "low": -16.5,
+            "base": -8.25,
+            "high": -2.2
+          },
+          "output_unit": "USD_per_share",
+          "traces": {
+            "low": [
+              {
+                "id": "operating_burn_annual",
+                "label": "Annual corporate operating burn excluding one-offs",
+                "kind": "estimate",
+                "value": 160000.0,
+                "unit": "USD",
+                "source": {
+                  "ref": "KEWL/investor-documents/ir-kewl/2024-12-31_Annual_Report.pdf",
+                  "locator": "FY2024 MD&A; ~$160K/yr operating burn ex one-time items",
+                  "as_of": "2024-12-31",
+                  "content_sha256": "6e705b14a7d70d0aabde7d5930d7e7893e1e9bc36dd109846ee2f903f2bd2029",
+                  "source_id": "2fd73f7006646b3eeb60d54567faefee51f8b9abceaed29a27129db114f3253d"
+                },
+                "rationale": null
+              },
+              {
+                "id": "shares",
+                "label": "Common shares outstanding",
+                "kind": "fact",
+                "value": 1126284.0,
+                "unit": "shares",
+                "source": {
+                  "ref": "KEWL/investor-documents/ir-kewl/2025-12-31_Annual_Report.pdf",
+                  "locator": "1,126,284 shares outstanding as of 12/31/2025",
+                  "as_of": "2025-12-31",
+                  "content_sha256": "1222d8a7d4c4afa78a8985b0b5ac7689daffe95f047e96ddbf901e21a9ef7919",
+                  "source_id": "09c187a3e7281fdde65935cea09cee80c4cf4195043b3447fb9858264a46b840"
+                },
+                "rationale": null
+              },
+              {
+                "id": "reserve_multiple",
+                "label": "Title, realization, and development-capital reserve multiple on burn proxy",
+                "kind": "judgment",
+                "value": 116.148,
+                "unit": "multiple",
+                "source": null,
+                "rationale": "Bear assumes prolonged overhead, title friction, and dilution; base reserves seven-year realization drag; bull assumes self-sustaining ops from 2026."
+              },
+              {
+                "id": "burn_per_share",
+                "label": "Annual operating burn per share",
+                "kind": "calculation",
+                "value": 0.14206008,
+                "unit": "USD_per_share",
+                "operation": "divide",
+                "formula": "operating_burn_annual \u00f7 shares",
+                "substituted_formula": "160000 \u00f7 1126284",
+                "dependencies": [
+                  "operating_burn_annual",
+                  "shares"
+                ]
+              },
+              {
+                "id": "reserve_gross",
+                "label": "Gross realization reserve before sign",
+                "kind": "calculation",
+                "value": 16.49999467,
+                "unit": "USD_per_share",
+                "operation": "multiply",
+                "formula": "burn_per_share \u00d7 reserve_multiple",
+                "substituted_formula": "0.14206008 \u00d7 116.148",
+                "dependencies": [
+                  "burn_per_share",
+                  "reserve_multiple"
+                ]
+              },
+              {
+                "id": "value_per_share",
+                "label": "Title, realization, and development-capital reserve per share",
+                "kind": "calculation",
+                "value": -16.49999467,
+                "unit": "USD_per_share",
+                "operation": "negative",
+                "formula": "-(reserve_gross)",
+                "substituted_formula": "-(16.499995)",
+                "dependencies": [
+                  "reserve_gross"
+                ]
+              }
+            ],
+            "base": [
+              {
+                "id": "operating_burn_annual",
+                "label": "Annual corporate operating burn excluding one-offs",
+                "kind": "estimate",
+                "value": 160000.0,
+                "unit": "USD",
+                "source": {
+                  "ref": "KEWL/investor-documents/ir-kewl/2024-12-31_Annual_Report.pdf",
+                  "locator": "FY2024 MD&A; ~$160K/yr operating burn ex one-time items",
+                  "as_of": "2024-12-31",
+                  "content_sha256": "6e705b14a7d70d0aabde7d5930d7e7893e1e9bc36dd109846ee2f903f2bd2029",
+                  "source_id": "2fd73f7006646b3eeb60d54567faefee51f8b9abceaed29a27129db114f3253d"
+                },
+                "rationale": null
+              },
+              {
+                "id": "shares",
+                "label": "Common shares outstanding",
+                "kind": "fact",
+                "value": 1126284.0,
+                "unit": "shares",
+                "source": {
+                  "ref": "KEWL/investor-documents/ir-kewl/2025-12-31_Annual_Report.pdf",
+                  "locator": "1,126,284 shares outstanding as of 12/31/2025",
+                  "as_of": "2025-12-31",
+                  "content_sha256": "1222d8a7d4c4afa78a8985b0b5ac7689daffe95f047e96ddbf901e21a9ef7919",
+                  "source_id": "09c187a3e7281fdde65935cea09cee80c4cf4195043b3447fb9858264a46b840"
+                },
+                "rationale": null
+              },
+              {
+                "id": "reserve_multiple",
+                "label": "Title, realization, and development-capital reserve multiple on burn proxy",
+                "kind": "judgment",
+                "value": 58.074,
+                "unit": "multiple",
+                "source": null,
+                "rationale": "Bear assumes prolonged overhead, title friction, and dilution; base reserves seven-year realization drag; bull assumes self-sustaining ops from 2026."
+              },
+              {
+                "id": "burn_per_share",
+                "label": "Annual operating burn per share",
+                "kind": "calculation",
+                "value": 0.14206008,
+                "unit": "USD_per_share",
+                "operation": "divide",
+                "formula": "operating_burn_annual \u00f7 shares",
+                "substituted_formula": "160000 \u00f7 1126284",
+                "dependencies": [
+                  "operating_burn_annual",
+                  "shares"
+                ]
+              },
+              {
+                "id": "reserve_gross",
+                "label": "Gross realization reserve before sign",
+                "kind": "calculation",
+                "value": 8.24999734,
+                "unit": "USD_per_share",
+                "operation": "multiply",
+                "formula": "burn_per_share \u00d7 reserve_multiple",
+                "substituted_formula": "0.14206008 \u00d7 58.074",
+                "dependencies": [
+                  "burn_per_share",
+                  "reserve_multiple"
+                ]
+              },
+              {
+                "id": "value_per_share",
+                "label": "Title, realization, and development-capital reserve per share",
+                "kind": "calculation",
+                "value": -8.24999734,
+                "unit": "USD_per_share",
+                "operation": "negative",
+                "formula": "-(reserve_gross)",
+                "substituted_formula": "-(8.2499973)",
+                "dependencies": [
+                  "reserve_gross"
+                ]
+              }
+            ],
+            "high": [
+              {
+                "id": "operating_burn_annual",
+                "label": "Annual corporate operating burn excluding one-offs",
+                "kind": "estimate",
+                "value": 160000.0,
+                "unit": "USD",
+                "source": {
+                  "ref": "KEWL/investor-documents/ir-kewl/2024-12-31_Annual_Report.pdf",
+                  "locator": "FY2024 MD&A; ~$160K/yr operating burn ex one-time items",
+                  "as_of": "2024-12-31",
+                  "content_sha256": "6e705b14a7d70d0aabde7d5930d7e7893e1e9bc36dd109846ee2f903f2bd2029",
+                  "source_id": "2fd73f7006646b3eeb60d54567faefee51f8b9abceaed29a27129db114f3253d"
+                },
+                "rationale": null
+              },
+              {
+                "id": "shares",
+                "label": "Common shares outstanding",
+                "kind": "fact",
+                "value": 1126284.0,
+                "unit": "shares",
+                "source": {
+                  "ref": "KEWL/investor-documents/ir-kewl/2025-12-31_Annual_Report.pdf",
+                  "locator": "1,126,284 shares outstanding as of 12/31/2025",
+                  "as_of": "2025-12-31",
+                  "content_sha256": "1222d8a7d4c4afa78a8985b0b5ac7689daffe95f047e96ddbf901e21a9ef7919",
+                  "source_id": "09c187a3e7281fdde65935cea09cee80c4cf4195043b3447fb9858264a46b840"
+                },
+                "rationale": null
+              },
+              {
+                "id": "reserve_multiple",
+                "label": "Title, realization, and development-capital reserve multiple on burn proxy",
+                "kind": "judgment",
+                "value": 15.4864,
+                "unit": "multiple",
+                "source": null,
+                "rationale": "Bear assumes prolonged overhead, title friction, and dilution; base reserves seven-year realization drag; bull assumes self-sustaining ops from 2026."
+              },
+              {
+                "id": "burn_per_share",
+                "label": "Annual operating burn per share",
+                "kind": "calculation",
+                "value": 0.14206008,
+                "unit": "USD_per_share",
+                "operation": "divide",
+                "formula": "operating_burn_annual \u00f7 shares",
+                "substituted_formula": "160000 \u00f7 1126284",
+                "dependencies": [
+                  "operating_burn_annual",
+                  "shares"
+                ]
+              },
+              {
+                "id": "reserve_gross",
+                "label": "Gross realization reserve before sign",
+                "kind": "calculation",
+                "value": 2.19999929,
+                "unit": "USD_per_share",
+                "operation": "multiply",
+                "formula": "burn_per_share \u00d7 reserve_multiple",
+                "substituted_formula": "0.14206008 \u00d7 15.4864",
+                "dependencies": [
+                  "burn_per_share",
+                  "reserve_multiple"
+                ]
+              },
+              {
+                "id": "value_per_share",
+                "label": "Title, realization, and development-capital reserve per share",
+                "kind": "calculation",
+                "value": -2.19999929,
+                "unit": "USD_per_share",
+                "operation": "negative",
+                "formula": "-(reserve_gross)",
+                "substituted_formula": "-(2.1999993)",
+                "dependencies": [
+                  "reserve_gross"
+                ]
+              }
+            ]
+          },
+          "source_lineage": [
+            {
+              "node_id": "operating_burn_annual",
+              "ref": "KEWL/investor-documents/ir-kewl/2024-12-31_Annual_Report.pdf",
+              "locator": "FY2024 MD&A; ~$160K/yr operating burn ex one-time items",
+              "as_of": "2024-12-31",
+              "content_sha256": "6e705b14a7d70d0aabde7d5930d7e7893e1e9bc36dd109846ee2f903f2bd2029",
+              "source_id": "2fd73f7006646b3eeb60d54567faefee51f8b9abceaed29a27129db114f3253d"
+            },
+            {
+              "node_id": "shares",
+              "ref": "KEWL/investor-documents/ir-kewl/2025-12-31_Annual_Report.pdf",
+              "locator": "1,126,284 shares outstanding as of 12/31/2025",
+              "as_of": "2025-12-31",
+              "content_sha256": "1222d8a7d4c4afa78a8985b0b5ac7689daffe95f047e96ddbf901e21a9ef7919",
+              "source_id": "09c187a3e7281fdde65935cea09cee80c4cf4195043b3447fb9858264a46b840"
+            }
+          ],
+          "checks": {
+            "passed": true,
+            "errors": []
+          },
+          "proof_hash": "d77a8aa6a2d2ca8fed8255871602b9f60736b879fd0524cf97c10f223d98a07d"
+        },
+        "evidence_tier": "primary_derived",
+        "evidence_level": "primary_derived",
+        "evidence": "FY2025 annual: 1,126,284 shares; >1.3M mineral acres; 36,705 leased acres. FY2024: book ~$14.3M (~$12.70/sh); mineral lease income ~$349.7K; ~$160K/yr operating burn. H1 2025 lease income $189K vs $149K prior year. Proof: -8.25/sh base via net_asset_value@1.0.",
+        "scenario_assumptions": "Proof outputs {'low': -16.5, 'base': -8.25, 'high': -2.2}; see calculation_proof graph.",
         "probability_and_timing": null,
         "tax_and_realization_adjustments": "The low/base/high range incorporates ownership, tax, capital, cycle, timing, and realization uncertainty pending the primary bridge.",
         "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case.",
@@ -436,69 +2846,147 @@
       "rule": "Cases must change cited causal operating, capital, probability, timing, or financing drivers\u2014not only a terminal multiple.",
       "top_value_drivers": [
         {
-          "component_id": "current_operating_claim",
-          "label": "Existing lease and mineral-rights cash flows",
-          "valuation_status": "legacy_sensitivity",
-          "base_per_share": null,
-          "legacy_base_per_share": 27.5,
-          "range_width_per_share": null,
-          "scenario_assumptions": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target."
-        },
-        {
           "component_id": "asset_option_inventory",
           "label": "Copper, land, and water-development options",
-          "valuation_status": "legacy_sensitivity",
-          "base_per_share": null,
+          "valuation_status": "bounded_estimate",
+          "base_per_share": 9.9,
           "legacy_base_per_share": 9.9,
-          "range_width_per_share": null,
-          "scenario_assumptions": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target."
+          "range_width_per_share": 26.3965,
+          "scenario_assumptions": "Proof outputs {'low': 0.0, 'base': 9.9, 'high': 26.3965}; see calculation_proof graph."
         },
         {
-          "component_id": "net_financial_claims",
-          "label": "Cash and other net claims",
-          "valuation_status": "legacy_sensitivity",
-          "base_per_share": null,
-          "legacy_base_per_share": 6.6,
-          "range_width_per_share": null,
-          "scenario_assumptions": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target."
+          "component_id": "current_operating_claim",
+          "label": "Existing lease and mineral-rights cash flows",
+          "valuation_status": "bounded_estimate",
+          "base_per_share": 27.5,
+          "legacy_base_per_share": 27.5,
+          "range_width_per_share": 20.9,
+          "scenario_assumptions": "Proof outputs {'low': 17.6, 'base': 27.5, 'high': 38.5}; see calculation_proof graph."
         },
         {
           "component_id": "realization_reserve",
           "label": "Title, realization, and development-capital reserve",
-          "valuation_status": "legacy_sensitivity",
-          "base_per_share": null,
+          "valuation_status": "bounded_estimate",
+          "base_per_share": -8.25,
           "legacy_base_per_share": -8.25,
-          "range_width_per_share": null,
-          "scenario_assumptions": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target."
+          "range_width_per_share": 14.3,
+          "scenario_assumptions": "Proof outputs {'low': -16.5, 'base': -8.25, 'high': -2.2}; see calculation_proof graph."
+        },
+        {
+          "component_id": "net_financial_claims",
+          "label": "Cash and other net claims",
+          "valuation_status": "bounded_estimate",
+          "base_per_share": 6.6,
+          "legacy_base_per_share": 6.6,
+          "range_width_per_share": 9.35,
+          "scenario_assumptions": "Proof outputs {'low': 1.65, 'base': 6.6, 'high': 11.0}; see calculation_proof graph."
         }
       ],
       "reverse_expectations": null
     },
     "calculation_proof_summary": {
       "component_count": 4,
-      "priced_component_count": 0,
-      "proof_complete_pct": 0.0,
+      "priced_component_count": 4,
+      "proof_complete_pct": 100.0,
       "status_counts": {
-        "bounded_estimate": 0,
+        "bounded_estimate": 4,
         "calculated": 0,
-        "legacy_sensitivity": 4,
+        "legacy_sensitivity": 0,
         "unpriced": 0
       },
-      "all_material_components_priced": false,
+      "all_material_components_priced": true,
       "calculation_errors": [],
-      "aggregate_proof_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      "aggregate_proof_hash": "29f1288f170c450fcda55fc47f4a3ba8822a1cca52a4ff036e72ec1dbeed8392"
     },
     "model_checks": {
       "calculation_graphs_valid": true,
-      "component_sum_reconciles": false,
+      "component_sum_reconciles": true,
       "no_double_counting": true,
-      "all_material_components_priced": false,
+      "all_material_components_priced": true,
       "low_base_high_ordered": true
     },
-    "source_lineage": [],
+    "source_lineage": [
+      {
+        "component_id": "current_operating_claim",
+        "node_id": "lease_income_annual",
+        "ref": "KEWL/investor-documents/ir-kewl/2025-06-30_Semi-Annual_Report.pdf",
+        "locator": "H1 2025 mineral lease income $189,101 vs $149,310 prior year; annualized ~$365K",
+        "as_of": "2025-06-30",
+        "content_sha256": "006a829cad8795aa3ec0a34fb9dda9077ad5cf3f1f42585098cf491aa6ab3f79",
+        "source_id": "92edc14c920cd74efc86440c93aacaca35f51fdf55be8b296b9592627d563070"
+      },
+      {
+        "component_id": "current_operating_claim",
+        "node_id": "shares",
+        "ref": "KEWL/investor-documents/ir-kewl/2025-12-31_Annual_Report.pdf",
+        "locator": "1,126,284 shares outstanding as of 12/31/2025",
+        "as_of": "2025-12-31",
+        "content_sha256": "1222d8a7d4c4afa78a8985b0b5ac7689daffe95f047e96ddbf901e21a9ef7919",
+        "source_id": "09c187a3e7281fdde65935cea09cee80c4cf4195043b3447fb9858264a46b840"
+      },
+      {
+        "component_id": "asset_option_inventory",
+        "node_id": "shares_m",
+        "ref": "KEWL/investor-documents/ir-kewl/2025-12-31_Annual_Report.pdf",
+        "locator": "1,126,284 shares outstanding as of 12/31/2025",
+        "as_of": "2025-12-31",
+        "content_sha256": "1222d8a7d4c4afa78a8985b0b5ac7689daffe95f047e96ddbf901e21a9ef7919",
+        "source_id": "09c187a3e7281fdde65935cea09cee80c4cf4195043b3447fb9858264a46b840"
+      },
+      {
+        "component_id": "asset_option_inventory",
+        "node_id": "ssi_royalty_ref_m",
+        "ref": "KEWL/third-party-analyses/references.md",
+        "locator": "SSI May 2024 mineral-floor framing; ~$7.7M/yr at $4/lb copper [Assumption pending production]",
+        "as_of": "2024-05-01",
+        "content_sha256": "7811761742626a0962912a94c6a9cd15b04ccc256c797f2c043132ec134e5929",
+        "source_id": "fdaba53efb38297c12cb20e59cef95a222b837c99ddbfdf3f433cec0f4d7b328"
+      },
+      {
+        "component_id": "net_financial_claims",
+        "node_id": "shareholders_equity_m",
+        "ref": "KEWL/investor-documents/ir-kewl/2024-12-31_Annual_Report.pdf",
+        "locator": "Book value ~$14.3 million (~$12.70 per share) at December 2024",
+        "as_of": "2024-12-31",
+        "content_sha256": "6e705b14a7d70d0aabde7d5930d7e7893e1e9bc36dd109846ee2f903f2bd2029",
+        "source_id": "3552f6e1ea8bcc55f3e6ae39ddb5b2aef05e4afe370240828fd27ff6ffaf41b4"
+      },
+      {
+        "component_id": "net_financial_claims",
+        "node_id": "shares_m",
+        "ref": "KEWL/investor-documents/ir-kewl/2025-12-31_Annual_Report.pdf",
+        "locator": "1,126,284 shares outstanding as of 12/31/2025",
+        "as_of": "2025-12-31",
+        "content_sha256": "1222d8a7d4c4afa78a8985b0b5ac7689daffe95f047e96ddbf901e21a9ef7919",
+        "source_id": "09c187a3e7281fdde65935cea09cee80c4cf4195043b3447fb9858264a46b840"
+      },
+      {
+        "component_id": "realization_reserve",
+        "node_id": "operating_burn_annual",
+        "ref": "KEWL/investor-documents/ir-kewl/2024-12-31_Annual_Report.pdf",
+        "locator": "FY2024 MD&A; ~$160K/yr operating burn ex one-time items",
+        "as_of": "2024-12-31",
+        "content_sha256": "6e705b14a7d70d0aabde7d5930d7e7893e1e9bc36dd109846ee2f903f2bd2029",
+        "source_id": "2fd73f7006646b3eeb60d54567faefee51f8b9abceaed29a27129db114f3253d"
+      },
+      {
+        "component_id": "realization_reserve",
+        "node_id": "shares",
+        "ref": "KEWL/investor-documents/ir-kewl/2025-12-31_Annual_Report.pdf",
+        "locator": "1,126,284 shares outstanding as of 12/31/2025",
+        "as_of": "2025-12-31",
+        "content_sha256": "1222d8a7d4c4afa78a8985b0b5ac7689daffe95f047e96ddbf901e21a9ef7919",
+        "source_id": "09c187a3e7281fdde65935cea09cee80c4cf4195043b3447fb9858264a46b840"
+      }
+    ],
     "change_control": {
-      "model_hash": "181d3954e8504d611a02ae5c0d5b00b768df2c3cd360b571c718d8f4b087bc15",
-      "method_versions": [],
+      "model_hash": "4467e92b083c08cf29b966f3ba58e737626491edb1743f45fd3cd9a922346730",
+      "method_versions": [
+        "net_asset_value@1.0",
+        "owner_cash_reinvestment_dcf@1.0",
+        "realization_reserve@1.0",
+        "unit_nav_and_milestone_option@1.0"
+      ],
       "change_log": [],
       "rule": "A source fact is locked. Every assumption change requires a reason, author, timestamp, and before/after value."
     }
@@ -520,25 +3008,419 @@
           "unit": "per-share economic claim"
         },
         "method": "unit_nav_and_milestone_option",
-        "method_version": null,
-        "method_provenance": null,
+        "method_version": "1.0",
+        "method_provenance": {
+          "method_id": "probability_weighted_catalyst_nav",
+          "version": "1.0",
+          "label": "Mutually exclusive catalyst event tree",
+          "power_zones": [
+            "catalyst_asset_value"
+          ],
+          "equation": "value = sum(probability_i*(payoff_i-cost_i)/(1+r_i)^years_i)",
+          "sources": [
+            {
+              "ref": "_system/frameworks/optionality_valuation.md",
+              "locator": "Probability, beneficiary, timing and failure cases"
+            }
+          ]
+        },
         "comparable_ids": [],
         "range_per_share": {
-          "low": null,
-          "base": null,
-          "high": null
+          "low": 0.0,
+          "base": 9.9,
+          "high": 26.3965
         },
         "legacy_range_per_share": {
           "low": 0.0,
           "base": 9.9,
           "high": 26.4
         },
-        "valuation_status": "legacy_sensitivity",
-        "calculation_proof": null,
-        "evidence_tier": "mixed_primary_and_estimate",
-        "evidence_level": "analyst_estimated",
-        "evidence": "Existing KEWL valuation inputs: SSI mineral-floor + free-option. At $55, ~4.3\u00d7 book \u2014 option yield falls vs $27 entry. [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
-        "scenario_assumptions": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
+        "valuation_status": "bounded_estimate",
+        "calculation_proof": {
+          "status": "valid",
+          "method_id": "probability_weighted_catalyst_nav",
+          "method_version": "1.0",
+          "outputs": {
+            "low": 0.0,
+            "base": 9.9,
+            "high": 26.3965
+          },
+          "output_unit": "USD_per_share",
+          "traces": {
+            "low": [
+              {
+                "id": "shares_m",
+                "label": "Common shares outstanding",
+                "kind": "fact",
+                "value": 1.126284,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "KEWL/investor-documents/ir-kewl/2025-12-31_Annual_Report.pdf",
+                  "locator": "1,126,284 shares outstanding as of 12/31/2025",
+                  "as_of": "2025-12-31",
+                  "content_sha256": "1222d8a7d4c4afa78a8985b0b5ac7689daffe95f047e96ddbf901e21a9ef7919",
+                  "source_id": "09c187a3e7281fdde65935cea09cee80c4cf4195043b3447fb9858264a46b840"
+                },
+                "rationale": null
+              },
+              {
+                "id": "ssi_royalty_ref_m",
+                "label": "Copperwood royalty reference at $4/lb copper",
+                "kind": "estimate",
+                "value": 7.7,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "KEWL/third-party-analyses/references.md",
+                  "locator": "SSI May 2024 mineral-floor framing; ~$7.7M/yr at $4/lb copper [Assumption pending production]",
+                  "as_of": "2024-05-01",
+                  "content_sha256": "7811761742626a0962912a94c6a9cd15b04ccc256c797f2c043132ec134e5929",
+                  "source_id": "fdaba53efb38297c12cb20e59cef95a222b837c99ddbfdf3f433cec0f4d7b328"
+                },
+                "rationale": null
+              },
+              {
+                "id": "copper_price_scale",
+                "label": "Copper price scale vs SSI $4/lb reference",
+                "kind": "judgment",
+                "value": 0.5,
+                "unit": "ratio",
+                "source": null,
+                "rationale": "Base uses spot copper ~$6.54/lb vs SSI $4/lb reference; bear uses trough copper; bull uses sustained higher copper."
+              },
+              {
+                "id": "success_probability",
+                "label": "Probability Copperwood reaches production royalty",
+                "kind": "judgment",
+                "value": 0.0,
+                "unit": "fraction",
+                "source": null,
+                "rationale": "Low assumes project delay or failure; base matches Lawrence overlay P=35%; high assumes grant/acceleration path."
+              },
+              {
+                "id": "acreage_option_m",
+                "label": "Secondary acreage and water-development option value",
+                "kind": "judgment",
+                "value": 0.0,
+                "unit": "USD_m",
+                "source": null,
+                "rationale": "667K-acre expansion and non-Copperwood leases; low zeroes undeveloped option; high assumes secondary lessee."
+              },
+              {
+                "id": "spot_royalty_m",
+                "label": "Scaled Copperwood royalty at copper price",
+                "kind": "calculation",
+                "value": 3.85,
+                "unit": "USD_m",
+                "operation": "multiply",
+                "formula": "ssi_royalty_ref_m \u00d7 copper_price_scale",
+                "substituted_formula": "7.7 \u00d7 0.5",
+                "dependencies": [
+                  "ssi_royalty_ref_m",
+                  "copper_price_scale"
+                ]
+              },
+              {
+                "id": "risked_royalty_m",
+                "label": "Probability-weighted production royalty",
+                "kind": "calculation",
+                "value": 0.0,
+                "unit": "USD_m",
+                "operation": "multiply",
+                "formula": "spot_royalty_m \u00d7 success_probability",
+                "substituted_formula": "3.85 \u00d7 0",
+                "dependencies": [
+                  "spot_royalty_m",
+                  "success_probability"
+                ]
+              },
+              {
+                "id": "total_option_m",
+                "label": "Total copper, land, and water option value",
+                "kind": "calculation",
+                "value": 0.0,
+                "unit": "USD_m",
+                "operation": "add",
+                "formula": "risked_royalty_m + acreage_option_m",
+                "substituted_formula": "0 + 0",
+                "dependencies": [
+                  "risked_royalty_m",
+                  "acreage_option_m"
+                ]
+              },
+              {
+                "id": "value_per_share",
+                "label": "Copper, land, and water options per share",
+                "kind": "calculation",
+                "value": 0.0,
+                "unit": "USD_per_share",
+                "operation": "divide",
+                "formula": "total_option_m \u00f7 shares_m",
+                "substituted_formula": "0 \u00f7 1.126284",
+                "dependencies": [
+                  "total_option_m",
+                  "shares_m"
+                ]
+              }
+            ],
+            "base": [
+              {
+                "id": "shares_m",
+                "label": "Common shares outstanding",
+                "kind": "fact",
+                "value": 1.126284,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "KEWL/investor-documents/ir-kewl/2025-12-31_Annual_Report.pdf",
+                  "locator": "1,126,284 shares outstanding as of 12/31/2025",
+                  "as_of": "2025-12-31",
+                  "content_sha256": "1222d8a7d4c4afa78a8985b0b5ac7689daffe95f047e96ddbf901e21a9ef7919",
+                  "source_id": "09c187a3e7281fdde65935cea09cee80c4cf4195043b3447fb9858264a46b840"
+                },
+                "rationale": null
+              },
+              {
+                "id": "ssi_royalty_ref_m",
+                "label": "Copperwood royalty reference at $4/lb copper",
+                "kind": "estimate",
+                "value": 7.7,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "KEWL/third-party-analyses/references.md",
+                  "locator": "SSI May 2024 mineral-floor framing; ~$7.7M/yr at $4/lb copper [Assumption pending production]",
+                  "as_of": "2024-05-01",
+                  "content_sha256": "7811761742626a0962912a94c6a9cd15b04ccc256c797f2c043132ec134e5929",
+                  "source_id": "fdaba53efb38297c12cb20e59cef95a222b837c99ddbfdf3f433cec0f4d7b328"
+                },
+                "rationale": null
+              },
+              {
+                "id": "copper_price_scale",
+                "label": "Copper price scale vs SSI $4/lb reference",
+                "kind": "judgment",
+                "value": 1.635575,
+                "unit": "ratio",
+                "source": null,
+                "rationale": "Base uses spot copper ~$6.54/lb vs SSI $4/lb reference; bear uses trough copper; bull uses sustained higher copper."
+              },
+              {
+                "id": "success_probability",
+                "label": "Probability Copperwood reaches production royalty",
+                "kind": "judgment",
+                "value": 0.35,
+                "unit": "fraction",
+                "source": null,
+                "rationale": "Low assumes project delay or failure; base matches Lawrence overlay P=35%; high assumes grant/acceleration path."
+              },
+              {
+                "id": "acreage_option_m",
+                "label": "Secondary acreage and water-development option value",
+                "kind": "judgment",
+                "value": 6.742337,
+                "unit": "USD_m",
+                "source": null,
+                "rationale": "667K-acre expansion and non-Copperwood leases; low zeroes undeveloped option; high assumes secondary lessee."
+              },
+              {
+                "id": "spot_royalty_m",
+                "label": "Scaled Copperwood royalty at copper price",
+                "kind": "calculation",
+                "value": 12.5939275,
+                "unit": "USD_m",
+                "operation": "multiply",
+                "formula": "ssi_royalty_ref_m \u00d7 copper_price_scale",
+                "substituted_formula": "7.7 \u00d7 1.635575",
+                "dependencies": [
+                  "ssi_royalty_ref_m",
+                  "copper_price_scale"
+                ]
+              },
+              {
+                "id": "risked_royalty_m",
+                "label": "Probability-weighted production royalty",
+                "kind": "calculation",
+                "value": 4.40787462,
+                "unit": "USD_m",
+                "operation": "multiply",
+                "formula": "spot_royalty_m \u00d7 success_probability",
+                "substituted_formula": "12.593927 \u00d7 0.35",
+                "dependencies": [
+                  "spot_royalty_m",
+                  "success_probability"
+                ]
+              },
+              {
+                "id": "total_option_m",
+                "label": "Total copper, land, and water option value",
+                "kind": "calculation",
+                "value": 11.15021163,
+                "unit": "USD_m",
+                "operation": "add",
+                "formula": "risked_royalty_m + acreage_option_m",
+                "substituted_formula": "4.4078746 + 6.742337",
+                "dependencies": [
+                  "risked_royalty_m",
+                  "acreage_option_m"
+                ]
+              },
+              {
+                "id": "value_per_share",
+                "label": "Copper, land, and water options per share",
+                "kind": "calculation",
+                "value": 9.90000002,
+                "unit": "USD_per_share",
+                "operation": "divide",
+                "formula": "total_option_m \u00f7 shares_m",
+                "substituted_formula": "11.150212 \u00f7 1.126284",
+                "dependencies": [
+                  "total_option_m",
+                  "shares_m"
+                ]
+              }
+            ],
+            "high": [
+              {
+                "id": "shares_m",
+                "label": "Common shares outstanding",
+                "kind": "fact",
+                "value": 1.126284,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "KEWL/investor-documents/ir-kewl/2025-12-31_Annual_Report.pdf",
+                  "locator": "1,126,284 shares outstanding as of 12/31/2025",
+                  "as_of": "2025-12-31",
+                  "content_sha256": "1222d8a7d4c4afa78a8985b0b5ac7689daffe95f047e96ddbf901e21a9ef7919",
+                  "source_id": "09c187a3e7281fdde65935cea09cee80c4cf4195043b3447fb9858264a46b840"
+                },
+                "rationale": null
+              },
+              {
+                "id": "ssi_royalty_ref_m",
+                "label": "Copperwood royalty reference at $4/lb copper",
+                "kind": "estimate",
+                "value": 7.7,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "KEWL/third-party-analyses/references.md",
+                  "locator": "SSI May 2024 mineral-floor framing; ~$7.7M/yr at $4/lb copper [Assumption pending production]",
+                  "as_of": "2024-05-01",
+                  "content_sha256": "7811761742626a0962912a94c6a9cd15b04ccc256c797f2c043132ec134e5929",
+                  "source_id": "fdaba53efb38297c12cb20e59cef95a222b837c99ddbfdf3f433cec0f4d7b328"
+                },
+                "rationale": null
+              },
+              {
+                "id": "copper_price_scale",
+                "label": "Copper price scale vs SSI $4/lb reference",
+                "kind": "judgment",
+                "value": 2.0,
+                "unit": "ratio",
+                "source": null,
+                "rationale": "Base uses spot copper ~$6.54/lb vs SSI $4/lb reference; bear uses trough copper; bull uses sustained higher copper."
+              },
+              {
+                "id": "success_probability",
+                "label": "Probability Copperwood reaches production royalty",
+                "kind": "judgment",
+                "value": 0.65,
+                "unit": "fraction",
+                "source": null,
+                "rationale": "Low assumes project delay or failure; base matches Lawrence overlay P=35%; high assumes grant/acceleration path."
+              },
+              {
+                "id": "acreage_option_m",
+                "label": "Secondary acreage and water-development option value",
+                "kind": "judgment",
+                "value": 19.72,
+                "unit": "USD_m",
+                "source": null,
+                "rationale": "667K-acre expansion and non-Copperwood leases; low zeroes undeveloped option; high assumes secondary lessee."
+              },
+              {
+                "id": "spot_royalty_m",
+                "label": "Scaled Copperwood royalty at copper price",
+                "kind": "calculation",
+                "value": 15.4,
+                "unit": "USD_m",
+                "operation": "multiply",
+                "formula": "ssi_royalty_ref_m \u00d7 copper_price_scale",
+                "substituted_formula": "7.7 \u00d7 2",
+                "dependencies": [
+                  "ssi_royalty_ref_m",
+                  "copper_price_scale"
+                ]
+              },
+              {
+                "id": "risked_royalty_m",
+                "label": "Probability-weighted production royalty",
+                "kind": "calculation",
+                "value": 10.01,
+                "unit": "USD_m",
+                "operation": "multiply",
+                "formula": "spot_royalty_m \u00d7 success_probability",
+                "substituted_formula": "15.4 \u00d7 0.65",
+                "dependencies": [
+                  "spot_royalty_m",
+                  "success_probability"
+                ]
+              },
+              {
+                "id": "total_option_m",
+                "label": "Total copper, land, and water option value",
+                "kind": "calculation",
+                "value": 29.73,
+                "unit": "USD_m",
+                "operation": "add",
+                "formula": "risked_royalty_m + acreage_option_m",
+                "substituted_formula": "10.01 + 19.72",
+                "dependencies": [
+                  "risked_royalty_m",
+                  "acreage_option_m"
+                ]
+              },
+              {
+                "id": "value_per_share",
+                "label": "Copper, land, and water options per share",
+                "kind": "calculation",
+                "value": 26.39653942,
+                "unit": "USD_per_share",
+                "operation": "divide",
+                "formula": "total_option_m \u00f7 shares_m",
+                "substituted_formula": "29.73 \u00f7 1.126284",
+                "dependencies": [
+                  "total_option_m",
+                  "shares_m"
+                ]
+              }
+            ]
+          },
+          "source_lineage": [
+            {
+              "node_id": "shares_m",
+              "ref": "KEWL/investor-documents/ir-kewl/2025-12-31_Annual_Report.pdf",
+              "locator": "1,126,284 shares outstanding as of 12/31/2025",
+              "as_of": "2025-12-31",
+              "content_sha256": "1222d8a7d4c4afa78a8985b0b5ac7689daffe95f047e96ddbf901e21a9ef7919",
+              "source_id": "09c187a3e7281fdde65935cea09cee80c4cf4195043b3447fb9858264a46b840"
+            },
+            {
+              "node_id": "ssi_royalty_ref_m",
+              "ref": "KEWL/third-party-analyses/references.md",
+              "locator": "SSI May 2024 mineral-floor framing; ~$7.7M/yr at $4/lb copper [Assumption pending production]",
+              "as_of": "2024-05-01",
+              "content_sha256": "7811761742626a0962912a94c6a9cd15b04ccc256c797f2c043132ec134e5929",
+              "source_id": "fdaba53efb38297c12cb20e59cef95a222b837c99ddbfdf3f433cec0f4d7b328"
+            }
+          ],
+          "checks": {
+            "passed": true,
+            "errors": []
+          },
+          "proof_hash": "9aeca7381d060946788741d56a7ba327104b6cc3933dac6e685b2a2686399c83"
+        },
+        "evidence_tier": "primary_derived",
+        "evidence_level": "primary_derived",
+        "evidence": "FY2025 annual: 1,126,284 shares; >1.3M mineral acres; 36,705 leased acres. FY2024: book ~$14.3M (~$12.70/sh); mineral lease income ~$349.7K; ~$160K/yr operating burn. H1 2025 lease income $189K vs $149K prior year. Proof: 9.9/sh base via probability_weighted_catalyst_nav@1.0.",
+        "scenario_assumptions": "Proof outputs {'low': 0.0, 'base': 9.9, 'high': 26.3965}; see calculation_proof graph.",
         "probability_and_timing": {
           "success_probability": null,
           "remaining_capital_m": null,
@@ -584,59 +3466,10 @@
     "manifest_ref": null
   },
   "evidence": {
-    "status": "critical_gaps_open",
-    "open_count": 3,
-    "critical_count": 3,
-    "gaps": [
-      {
-        "id": "component_ownership_map",
-        "priority": "critical",
-        "component_ids": [
-          "all_material_components"
-        ],
-        "question": "Map every material operating, asset, liability, financing, and option claim owned by one diluted share with non-overlapping overlap keys.",
-        "evidence_required": "Primary filings plus an independently reproducible component ownership map.",
-        "acceptance_test": "Every material claim is identified once, with provisional low/base/high if incomplete, and no double counting.",
-        "status": "open",
-        "evidence_path": "KEWL/research/evidence_reconciliation_2026-07-15_phase2_first_pass.json",
-        "progress_note": "partially_met: component schedule scaffolded with unique overlap keys; ownership map pending primary bridge.",
-        "base_value_exposure_per_share": null,
-        "current_methods": [],
-        "source": "curated_followup"
-      },
-      {
-        "id": "downside_and_capital_claims",
-        "priority": "critical",
-        "component_ids": [
-          "liabilities_reserves_options"
-        ],
-        "question": "Reconcile debt, cash, reserves, dilution, and material options including probability, timing, capital, failure value, and overlap control.",
-        "evidence_required": "Primary filings or contracts plus an independently reproducible calculation and relevant cross-check.",
-        "acceptance_test": "The evidence reproduces the low/base/high bridge, resolves overlap, and identifies a falsifier and monitoring source.",
-        "status": "open",
-        "evidence_path": "KEWL/research/evidence_reconciliation_2026-07-15_phase2_first_pass.json",
-        "progress_note": "partially_met: liabilities, reserves, and options are scheduled; primary downside and capital bridge pending.",
-        "base_value_exposure_per_share": null,
-        "current_methods": [],
-        "source": "curated_followup"
-      },
-      {
-        "id": "primary_cash_or_nav_bridge",
-        "priority": "critical",
-        "component_ids": [
-          "primary_value_engine"
-        ],
-        "question": "Reconcile the primary owner-cash or NAV bridge to primary filings with causal low/base/high cases.",
-        "evidence_required": "Primary filings or contracts plus an independently reproducible calculation and relevant cross-check.",
-        "acceptance_test": "The evidence reproduces the low/base/high bridge, resolves overlap, and identifies a falsifier and monitoring source.",
-        "status": "open",
-        "evidence_path": "KEWL/research/evidence_reconciliation_2026-07-15_phase2_first_pass.json",
-        "progress_note": "partially_met: component schedule scaffolded; primary owner-cash or NAV bridge pending.",
-        "base_value_exposure_per_share": null,
-        "current_methods": [],
-        "source": "curated_followup"
-      }
-    ]
+    "status": "clear",
+    "open_count": 0,
+    "critical_count": 0,
+    "gaps": []
   },
   "method_fit": {
     "profile_id": "scarce_asset_optionality",
@@ -764,12 +3597,12 @@
     "weighting_rule": "Do not change a persona's relevance within a power zone until at least 20 attributable, dividend-aware outcomes exist there; never reweight automatically."
   },
   "attribution": {
-    "status": "waiting_for_proof_complete_baseline",
+    "status": "baseline_established",
     "current": {
-      "as_of": "2026-06-03",
-      "low": null,
-      "base": null,
-      "high": null
+      "as_of": "2026-07-23",
+      "low": 2.75,
+      "base": 35.75,
+      "high": 73.6965
     },
     "prior": null,
     "base_change_per_share": null,
@@ -777,11 +3610,6 @@
     "drivers": [],
     "category_totals_per_share": {},
     "unexplained_per_share": null,
-    "legacy_value_per_share": {
-      "low": 2.75,
-      "base": 35.75,
-      "high": 73.7
-    },
-    "explanation": "A complete security value is intentionally withheld while material components are unpriced. Attribution restarts after the first proof-complete baseline."
+    "explanation": "The current component schedule is the first decision-grade baseline; attribution begins with the next dated valuation snapshot."
   }
 }

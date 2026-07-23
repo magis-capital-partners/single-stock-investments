@@ -332,6 +332,15 @@ def main() -> int:
     if not args.skip_milly:
         ok &= run_milly(ticker, args.date, strict_evidence=strict_evidence)
 
+    fill_cc_args = [PY, str(SCRIPTS / "fill_cross_check.py"), ticker, "--date", args.date, "--write"]
+    if strict_evidence:
+        fill_cc_args.append("--force")
+    ok &= run(
+        "fill cross-check (sync IRR)",
+        fill_cc_args,
+        optional=not strict_evidence,
+    )
+
     ok &= run(
         "evidence completeness",
         [PY, str(SCRIPTS / "check_evidence_completeness.py"), ticker, "--date", args.date]
