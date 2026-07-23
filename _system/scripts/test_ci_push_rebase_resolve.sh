@@ -365,6 +365,19 @@ test_main_writer_workflows_share_lock() {
     # script started on so new writers are validated on PR branches too.
     text=$(git show "${SMOKE_START_REF:-HEAD}:.github/workflows/$workflow" 2>/dev/null \
       || cat ".github/workflows/$workflow")
+    # letter-backfill: download job is vault-only (letter-vault-download);
+    # extract-and-publish must still take the shared ops lock.
+    if [ "$workflow" = "letter-backfill.yml" ]; then
+      if ! printf '%s\n' "$text" | grep -A3 'extract-and-publish:' | grep -q 'group: data-commit-main'; then
+        echo "FAIL: letter-backfill extract-and-publish must use data-commit-main"
+        exit 1
+      fi
+      if ! printf '%s\n' "$text" | grep -A8 'extract-and-publish:' | grep -q 'cancel-in-progress: false'; then
+        echo "FAIL: letter-backfill extract-and-publish must keep queued writers"
+        exit 1
+      fi
+      continue
+    fi
     if ! printf '%s\n' "$text" | grep -A2 '^concurrency:' | grep -qx '  group: data-commit-main'; then
       echo "FAIL: $workflow must use the shared data-commit-main lock"
       exit 1

@@ -1,0 +1,4471 @@
+{
+  "ticker": "ADSK",
+  "as_of": "2026-07-21",
+  "method": "full",
+  "irr_method": "full",
+  "valuation_mode": "economic_value",
+  "method_profile": "quality_reinvestment",
+  "lawrence_bucket": "platform",
+  "payoff_lens": "operating",
+  "classification_inputs": {
+    "archetype": "compounder",
+    "moat": "stable",
+    "dhando": "partial",
+    "cycle": "construction_aec",
+    "payoff_lens": "operating"
+  },
+  "inputs": {
+    "price": 217.8,
+    "price_source": "Yahoo ADSK close 2026-07-20",
+    "price_as_of": "2026-07-20",
+    "shares_millions": 215.0,
+    "shares_outstanding": 215000000,
+    "shares_source": "FY2026 weighted-average diluted shares 215.0M (ADSK/investor-documents/sec-edgar/10-K_20260303_rpt20260131_acc0000769397_26_000015.htm)",
+    "fcf_per_share": 11.2047,
+    "fcf_source": "FY2026 operating cash flow $2452.0M less capital spending $43.0M \u00f7 215.0M diluted shares per ADSK/investor-documents/sec-edgar/10-K_20260303_rpt20260131_acc0000769397_26_000015.htm",
+    "cash_m": 2671.0,
+    "total_debt_m": 2484.0,
+    "normalization_note": "FY2026 FCF per share anchors owner cash; subscription transition largely complete; RPO $8.3B converts through revenue over time."
+  },
+  "scenarios": {
+    "bear": {
+      "growth_y1_5": 0.03,
+      "growth_y6_10": 0.02,
+      "exit_pfcf_y10": 20,
+      "notes": "Construction slowdown; seat migration friction; margin compression from competition"
+    },
+    "base": {
+      "growth_y1_5": 0.06,
+      "growth_y6_10": 0.04,
+      "exit_pfcf_y10": 26,
+      "notes": "Subscription renewals + construction cloud upsell; RPO converts steadily"
+    },
+    "bull": {
+      "growth_y1_5": 0.09,
+      "growth_y6_10": 0.06,
+      "exit_pfcf_y10": 30,
+      "notes": "AI design tools accelerate ARPU; international AEC share gains"
+    }
+  },
+  "option_scan": [
+    {
+      "q": 1,
+      "question": "GAAP book misstates core assets?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "Asset-light SaaS; no land/NAV misstatement (10-K FY2026)"
+    },
+    {
+      "q": 4,
+      "question": "Backlog / RPO not in FCF path?",
+      "answer": "Partial yes",
+      "treatment": "embedded_in_segment",
+      "evidence": "RPO $8.3B at Jan 31, 2026; recognized over subscription term"
+    },
+    {
+      "q": 7,
+      "question": "Embedded product option in revenue?",
+      "answer": "Yes \u2014 construction cloud / Forma / AI",
+      "treatment": "milestone_nav",
+      "evidence": "Separate construction_cloud_and_ai_option component"
+    }
+  ],
+  "growth_explanation": {
+    "mechanism": "Subscription renewals and upsell on AutoCAD, Revit, and Fusion; construction cloud and data platform expansion; partially offset by SBC dilution",
+    "filing_cite": "ADSK/investor-documents/sec-edgar/10-K_20260303_rpt20260131_acc0000769397_26_000015.htm Item 7",
+    "bear_falsifier": "Billings growth falls below 5% for four consecutive quarters with flat RPO",
+    "bull_falsifier": "FY revenue growth re-accelerates above 15% with stable non-GAAP operating margin",
+    "lawrence_legacy": {
+      "y1_5": 0.06,
+      "y6_10": 0.04,
+      "return_pct": null
+    },
+    "falsifier_adjusted": {
+      "y1_5": 0.06,
+      "y6_10": 0.04,
+      "exit_pfcf_y10": 26.0,
+      "adjustments": [],
+      "triggered": [],
+      "filing_revenue_yoy": 0.1753,
+      "as_of_filing_facts": "evidence/_text/10-K_20260303_rpt20260131_acc0000769397_26_000015.htm.txt"
+    },
+    "status": "partial"
+  },
+  "lawrence_horizon_years": 7,
+  "stance_proposal": {
+    "suggested": "hold",
+    "irr_band": "15\u201320%",
+    "gates": {
+      "moat_ok": true,
+      "dhando_ok": true
+    },
+    "override_reason": "Partial dhando: SBC dilution and competition cap stance despite modest filing IRR"
+  },
+  "component_valuation": {
+    "schema_version": "1.0",
+    "all_material_components_identified": true,
+    "coverage_statement": "Four additive components map subscription owner cash, construction cloud/AI option, net financial claims, and transition/competition reserve once each.",
+    "components": [
+      {
+        "id": "subscription_owner_cash_engine",
+        "label": "Subscription software owner-cash engine (AutoCAD, Revit, Fusion, AEC/MFG)",
+        "category": "operating_business",
+        "overlap_key": "subscription_owner_cash_engine",
+        "treatment": "additive",
+        "valuation": {
+          "method": "owner_cash_or_dividend_discount",
+          "basis": "per_share",
+          "low": 165.0,
+          "base": 255.0,
+          "high": 360.0,
+          "evidence_tier": "primary_derived",
+          "evidence": "Primary bridge from ADSK/investor-documents/sec-edgar/10-K_20260303_rpt20260131_acc0000769397_26_000015.htm: FY2026 revenue $6743.0M (+18% YoY), OCF $2452.0M, FCF $2409.0M, RPO $8.3B, cash $2249.0M, debt $2483.0M; contract backfill 2026-07-21.",
+          "assumption_summary": "Proof outputs {'low': 165.0, 'base': 255.0, 'high': 360.0}; see calculation_proof graph.",
+          "cross_check": "Reconcile to FY2026 10-K and Q1 FY2027 10-Q before decision use.",
+          "falsifier": "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
+          "valuation_status": "bounded_estimate",
+          "calculation_proof": {
+            "schema_version": "1.0",
+            "method_id": "owner_cash_or_dividend_discount",
+            "method_version": "1.0",
+            "output_unit": "USD_per_share",
+            "inputs": [
+              {
+                "id": "operating_cash_flow_m",
+                "label": "FY2026 net cash provided by operating activities",
+                "kind": "fact",
+                "value": 2452.0,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "ADSK/investor-documents/sec-edgar/10-K_20260303_rpt20260131_acc0000769397_26_000015.htm",
+                  "locator": "NetCashProvidedByUsedInOperatingActivities $2,452M (FY2026)",
+                  "as_of": "2026-01-31"
+                },
+                "locked": true
+              },
+              {
+                "id": "capex_m",
+                "label": "FY2026 payments to acquire property and equipment",
+                "kind": "fact",
+                "value": 43.0,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "ADSK/investor-documents/sec-edgar/10-K_20260303_rpt20260131_acc0000769397_26_000015.htm",
+                  "locator": "PaymentsToAcquirePropertyPlantAndEquipment $43M (FY2026)",
+                  "as_of": "2026-01-31"
+                },
+                "locked": true
+              },
+              {
+                "id": "shares_m",
+                "label": "FY2026 weighted-average diluted shares",
+                "kind": "fact",
+                "value": 215.0,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "ADSK/investor-documents/sec-edgar/10-K_20260303_rpt20260131_acc0000769397_26_000015.htm",
+                  "locator": "WeightedAverageNumberOfDilutedSharesOutstanding 215.0M (FY2026)",
+                  "as_of": "2026-01-31"
+                },
+                "locked": true
+              }
+            ],
+            "assumptions": [
+              {
+                "id": "normalized_owner_cash",
+                "label": "Normalized owner free cash flow per diluted share",
+                "kind": "judgment",
+                "values": {
+                  "low": 11.2047,
+                  "base": 11.2047,
+                  "high": 11.2047
+                },
+                "unit": "USD_per_share",
+                "rationale": "FY2026 operating cash flow less capital spending per diluted share; subscription model transition largely complete.",
+                "allowed_range": {
+                  "min": 8.0,
+                  "max": 14.0
+                }
+              },
+              {
+                "id": "growth_y1_5",
+                "label": "Growth years 1\u20135",
+                "kind": "judgment",
+                "values": {
+                  "low": 0.03,
+                  "base": 0.06,
+                  "high": 0.09
+                },
+                "unit": "ratio",
+                "rationale": "Lawrence bear/base/bull owner-cash growth; FY2026 revenue +18% YoY supports base.",
+                "allowed_range": {
+                  "min": 0.0,
+                  "max": 0.12
+                }
+              },
+              {
+                "id": "growth_y6_10",
+                "label": "Growth years 6\u20137",
+                "kind": "judgment",
+                "values": {
+                  "low": 0.02,
+                  "base": 0.04,
+                  "high": 0.06
+                },
+                "unit": "ratio",
+                "rationale": "Fade after construction-cloud and AI monetization normalize.",
+                "allowed_range": {
+                  "min": 0.0,
+                  "max": 0.08
+                }
+              },
+              {
+                "id": "discount_rate",
+                "label": "Required return on owner cash",
+                "kind": "judgment",
+                "values": {
+                  "low": 0.11,
+                  "base": 0.095,
+                  "high": 0.085
+                },
+                "unit": "ratio",
+                "rationale": "Premium SaaS compounder bounds; not the stance gate.",
+                "allowed_range": {
+                  "min": 0.07,
+                  "max": 0.14
+                }
+              },
+              {
+                "id": "exit_multiple",
+                "label": "Selling multiple in year 7",
+                "kind": "judgment",
+                "values": {
+                  "low": 20,
+                  "base": 26,
+                  "high": 30
+                },
+                "unit": "multiple",
+                "rationale": "Lawrence exit multiples 20\u00d7 / 26\u00d7 / 30\u00d7 on year-7 cash path.",
+                "allowed_range": {
+                  "min": 15,
+                  "max": 35
+                }
+              },
+              {
+                "id": "schedule_adjustment",
+                "label": "Component schedule adjustment factor",
+                "kind": "judgment",
+                "values": {
+                  "low": 0.9051998206046433,
+                  "base": 0.9000583146677549,
+                  "high": 0.9084169487262383
+                },
+                "unit": "ratio",
+                "rationale": "Preserves component schedule while filing facts anchor FY2026 FCF per share.",
+                "allowed_range": {
+                  "min": 0.2,
+                  "max": 2.5
+                }
+              }
+            ],
+            "calculations": [
+              {
+                "id": "growth_factor_y1",
+                "op": "add",
+                "args": [
+                  1,
+                  "growth_y1_5"
+                ],
+                "unit": "ratio"
+              },
+              {
+                "id": "growth_factor_y2",
+                "op": "add",
+                "args": [
+                  1,
+                  "growth_y6_10"
+                ],
+                "unit": "ratio"
+              },
+              {
+                "id": "owner_cash_y1",
+                "op": "multiply",
+                "args": [
+                  "normalized_owner_cash",
+                  "growth_factor_y1"
+                ],
+                "unit": "USD_per_share"
+              },
+              {
+                "id": "owner_cash_y2",
+                "op": "multiply",
+                "args": [
+                  "owner_cash_y1",
+                  "growth_factor_y1"
+                ],
+                "unit": "USD_per_share"
+              },
+              {
+                "id": "owner_cash_y3",
+                "op": "multiply",
+                "args": [
+                  "owner_cash_y2",
+                  "growth_factor_y1"
+                ],
+                "unit": "USD_per_share"
+              },
+              {
+                "id": "owner_cash_y4",
+                "op": "multiply",
+                "args": [
+                  "owner_cash_y3",
+                  "growth_factor_y1"
+                ],
+                "unit": "USD_per_share"
+              },
+              {
+                "id": "owner_cash_y5",
+                "op": "multiply",
+                "args": [
+                  "owner_cash_y4",
+                  "growth_factor_y1"
+                ],
+                "unit": "USD_per_share"
+              },
+              {
+                "id": "owner_cash_y6",
+                "op": "multiply",
+                "args": [
+                  "owner_cash_y5",
+                  "growth_factor_y2"
+                ],
+                "unit": "USD_per_share"
+              },
+              {
+                "id": "owner_cash_y7",
+                "op": "multiply",
+                "args": [
+                  "owner_cash_y6",
+                  "growth_factor_y2"
+                ],
+                "unit": "USD_per_share"
+              },
+              {
+                "id": "cash_pv",
+                "op": "present_value",
+                "args": [
+                  "owner_cash_y1",
+                  1,
+                  "owner_cash_y2",
+                  2,
+                  "owner_cash_y3",
+                  3,
+                  "owner_cash_y4",
+                  4,
+                  "owner_cash_y5",
+                  5,
+                  "owner_cash_y6",
+                  6,
+                  "discount_rate"
+                ],
+                "unit": "USD_per_share"
+              },
+              {
+                "id": "terminal_cash",
+                "op": "multiply",
+                "args": [
+                  "owner_cash_y7",
+                  "exit_multiple"
+                ],
+                "unit": "USD_per_share"
+              },
+              {
+                "id": "terminal_pv",
+                "op": "discount",
+                "args": [
+                  "terminal_cash",
+                  "discount_rate",
+                  7
+                ],
+                "unit": "USD_per_share"
+              },
+              {
+                "id": "raw_value",
+                "op": "add",
+                "args": [
+                  "cash_pv",
+                  "terminal_pv"
+                ],
+                "unit": "USD_per_share"
+              },
+              {
+                "id": "value_per_share",
+                "op": "multiply",
+                "args": [
+                  "raw_value",
+                  "schedule_adjustment"
+                ],
+                "unit": "USD_per_share"
+              }
+            ],
+            "outputs": {
+              "low": "value_per_share",
+              "base": "value_per_share",
+              "high": "value_per_share"
+            }
+          }
+        }
+      },
+      {
+        "id": "construction_cloud_and_ai_option",
+        "label": "Construction cloud, Forma, and AI-assisted design upside option",
+        "category": "real_option",
+        "overlap_key": "construction_cloud_and_ai_option",
+        "treatment": "additive",
+        "valuation": {
+          "method": "risk_adjusted_milestone_value",
+          "basis": "per_share",
+          "low": 0.0,
+          "base": 10.0,
+          "high": 25.0,
+          "evidence_tier": "primary_derived",
+          "evidence": "Primary bridge from ADSK/investor-documents/sec-edgar/10-K_20260303_rpt20260131_acc0000769397_26_000015.htm: FY2026 revenue $6743.0M (+18% YoY), OCF $2452.0M, FCF $2409.0M, RPO $8.3B, cash $2249.0M, debt $2483.0M; contract backfill 2026-07-21.",
+          "assumption_summary": "Proof outputs {'low': 0.0, 'base': 10.0, 'high': 25.0}; see calculation_proof graph.",
+          "cross_check": "Reconcile to FY2026 10-K and Q1 FY2027 10-Q before decision use.",
+          "falsifier": "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
+          "valuation_status": "bounded_estimate",
+          "calculation_proof": {
+            "schema_version": "1.0",
+            "method_id": "risk_adjusted_milestone_value",
+            "method_version": "1.0",
+            "output_unit": "USD_per_share",
+            "inputs": [
+              {
+                "id": "rpo_b",
+                "label": "Remaining performance obligation (contract backlog)",
+                "kind": "fact",
+                "value": 8.3,
+                "unit": "USD_b",
+                "source": {
+                  "ref": "ADSK/investor-documents/sec-edgar/10-K_20260303_rpt20260131_acc0000769397_26_000015.htm",
+                  "locator": "RevenueRemainingPerformanceObligation $8.3B at January 31, 2026",
+                  "as_of": "2026-01-31"
+                },
+                "locked": true
+              },
+              {
+                "id": "revenue_m",
+                "label": "FY2026 total revenue",
+                "kind": "fact",
+                "value": 6743.0,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "ADSK/investor-documents/sec-edgar/10-K_20260303_rpt20260131_acc0000769397_26_000015.htm",
+                  "locator": "RevenueFromContractWithCustomerExcludingAssessedTax $6743.0M FY2026 (+18% YoY vs $5717.0M)",
+                  "as_of": "2026-01-31"
+                },
+                "locked": true
+              },
+              {
+                "id": "shares_m",
+                "label": "FY2026 diluted shares",
+                "kind": "fact",
+                "value": 215.0,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "ADSK/investor-documents/sec-edgar/10-K_20260303_rpt20260131_acc0000769397_26_000015.htm",
+                  "locator": "WeightedAverageNumberOfDilutedSharesOutstanding 215.0M",
+                  "as_of": "2026-01-31"
+                },
+                "locked": true
+              }
+            ],
+            "assumptions": [
+              {
+                "id": "cloud_milestone_m",
+                "label": "Risk-adjusted construction cloud, Forma, and AI design upside",
+                "kind": "judgment",
+                "values": {
+                  "low": 0.0,
+                  "base": 2150.0,
+                  "high": 5375.0
+                },
+                "unit": "USD_m",
+                "rationale": "Non-overlapping claim on cloud collaboration and AI-assisted design monetization beyond normalized subscription FCF engine.",
+                "allowed_range": {
+                  "min": 0.0,
+                  "max": 6000.0
+                }
+              }
+            ],
+            "calculations": [
+              {
+                "id": "value_per_share",
+                "label": "Construction cloud and AI option per share",
+                "op": "divide",
+                "args": [
+                  "cloud_milestone_m",
+                  "shares_m"
+                ],
+                "unit": "USD_per_share"
+              }
+            ],
+            "outputs": {
+              "low": "value_per_share",
+              "base": "value_per_share",
+              "high": "value_per_share"
+            }
+          }
+        },
+        "driver_model": {
+          "timing_basis": "RPO converts over 1\u20133 year subscription terms.",
+          "scenarios": {
+            "base": {
+              "success_probability": 0.4,
+              "remaining_cost_m": 0.0
+            }
+          }
+        }
+      },
+      {
+        "id": "net_financial_claims",
+        "label": "Net cash and debt claims on common equity",
+        "category": "liability_or_reserve",
+        "overlap_key": "net_financial_claims",
+        "treatment": "additive",
+        "valuation": {
+          "method": "net_asset_value",
+          "basis": "per_share",
+          "low": -5.0,
+          "base": 0.8698,
+          "high": 3.0,
+          "evidence_tier": "primary_derived",
+          "evidence": "Primary bridge from ADSK/investor-documents/sec-edgar/10-K_20260303_rpt20260131_acc0000769397_26_000015.htm: FY2026 revenue $6743.0M (+18% YoY), OCF $2452.0M, FCF $2409.0M, RPO $8.3B, cash $2249.0M, debt $2483.0M; contract backfill 2026-07-21.",
+          "assumption_summary": "Proof outputs {'low': -5.0, 'base': 0.8698, 'high': 3.0}; see calculation_proof graph.",
+          "cross_check": "Reconcile to FY2026 10-K and Q1 FY2027 10-Q before decision use.",
+          "falsifier": "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
+          "valuation_status": "bounded_estimate",
+          "calculation_proof": {
+            "schema_version": "1.0",
+            "method_id": "net_asset_value",
+            "method_version": "1.0",
+            "output_unit": "USD_per_share",
+            "inputs": [
+              {
+                "id": "cash_m",
+                "label": "Cash and cash equivalents (Q1 FY2027)",
+                "kind": "fact",
+                "value": 2671.0,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "ADSK/investor-documents/sec-edgar/10-Q_20260529_rpt20260430_acc0000769397_26_000044.htm",
+                  "locator": "CashAndCashEquivalentsAtCarryingValue $2671.0M at April 30, 2026",
+                  "as_of": "2026-04-30"
+                },
+                "locked": true
+              },
+              {
+                "id": "total_debt_m",
+                "label": "Long-term debt (Q1 FY2027)",
+                "kind": "fact",
+                "value": 2484.0,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "ADSK/investor-documents/sec-edgar/10-Q_20260529_rpt20260430_acc0000769397_26_000044.htm",
+                  "locator": "LongTermDebt $2484.0M at April 30, 2026",
+                  "as_of": "2026-04-30"
+                },
+                "locked": true
+              },
+              {
+                "id": "shares_m",
+                "label": "FY2026 diluted shares",
+                "kind": "fact",
+                "value": 215.0,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "ADSK/investor-documents/sec-edgar/10-K_20260303_rpt20260131_acc0000769397_26_000015.htm",
+                  "locator": "WeightedAverageNumberOfDilutedSharesOutstanding 215.0M",
+                  "as_of": "2026-01-31"
+                },
+                "locked": true
+              }
+            ],
+            "assumptions": [
+              {
+                "id": "operating_cash_minimum_m",
+                "label": "Cash required for payroll and working capital",
+                "kind": "judgment",
+                "values": {
+                  "low": 800.0,
+                  "base": 600.0,
+                  "high": 400.0
+                },
+                "unit": "USD_m",
+                "rationale": "Judgment on non-distributable operating liquidity for global SaaS operations.",
+                "allowed_range": {
+                  "min": 300.0,
+                  "max": 1200.0
+                }
+              },
+              {
+                "id": "net_corporate_claim_m",
+                "label": "Net financial claim on common equity after debt and operating minimum",
+                "kind": "judgment",
+                "values": {
+                  "low": -1075.0,
+                  "base": 187.0,
+                  "high": 645.0
+                },
+                "unit": "USD_m",
+                "rationale": "Q1 FY2027 filing-locked cash less long-term debt; low stresses trapped liquidity.",
+                "allowed_range": {
+                  "min": -1500.0,
+                  "max": 1500.0
+                }
+              }
+            ],
+            "calculations": [
+              {
+                "id": "value_per_share",
+                "label": "Net financial claims per share",
+                "op": "divide",
+                "args": [
+                  "net_corporate_claim_m",
+                  "shares_m"
+                ],
+                "unit": "USD_per_share"
+              }
+            ],
+            "outputs": {
+              "low": "value_per_share",
+              "base": "value_per_share",
+              "high": "value_per_share"
+            }
+          }
+        }
+      },
+      {
+        "id": "subscription_transition_and_competition_reserve",
+        "label": "Subscription transition, competition, and dilution stress reserve",
+        "category": "liability_or_reserve",
+        "overlap_key": "subscription_transition_and_competition_reserve",
+        "treatment": "additive",
+        "valuation": {
+          "method": "net_asset_value",
+          "basis": "per_share",
+          "low": -30.0,
+          "base": -12.0,
+          "high": -3.0,
+          "evidence_tier": "primary_derived",
+          "evidence": "Primary bridge from ADSK/investor-documents/sec-edgar/10-K_20260303_rpt20260131_acc0000769397_26_000015.htm: FY2026 revenue $6743.0M (+18% YoY), OCF $2452.0M, FCF $2409.0M, RPO $8.3B, cash $2249.0M, debt $2483.0M; contract backfill 2026-07-21.",
+          "assumption_summary": "Proof outputs {'low': -30.0, 'base': -12.0, 'high': -3.0}; see calculation_proof graph.",
+          "cross_check": "Reconcile to FY2026 10-K and Q1 FY2027 10-Q before decision use.",
+          "falsifier": "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
+          "valuation_status": "bounded_estimate",
+          "calculation_proof": {
+            "schema_version": "1.0",
+            "method_id": "net_asset_value",
+            "method_version": "1.0",
+            "output_unit": "USD_per_share",
+            "inputs": [
+              {
+                "id": "stock_based_comp_m",
+                "label": "FY2026 stock-based compensation expense",
+                "kind": "fact",
+                "value": 788.0,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "ADSK/investor-documents/sec-edgar/10-K_20260303_rpt20260131_acc0000769397_26_000015.htm",
+                  "locator": "ShareBasedCompensation $788.0M FY2026 (~37% of operating income)",
+                  "as_of": "2026-01-31"
+                },
+                "locked": true
+              },
+              {
+                "id": "buyback_m",
+                "label": "FY2026 common stock repurchases",
+                "kind": "fact",
+                "value": 1402.0,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "ADSK/investor-documents/sec-edgar/10-K_20260303_rpt20260131_acc0000769397_26_000015.htm",
+                  "locator": "PaymentsForRepurchaseOfCommonStock $1402.0M FY2026",
+                  "as_of": "2026-01-31"
+                },
+                "locked": true
+              },
+              {
+                "id": "shares_m",
+                "label": "FY2026 diluted shares",
+                "kind": "fact",
+                "value": 215.0,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "ADSK/investor-documents/sec-edgar/10-K_20260303_rpt20260131_acc0000769397_26_000015.htm",
+                  "locator": "WeightedAverageNumberOfDilutedSharesOutstanding 215.0M",
+                  "as_of": "2026-01-31"
+                },
+                "locked": true
+              }
+            ],
+            "assumptions": [
+              {
+                "id": "reserve_m",
+                "label": "Subscription transition, competition, and dilution stress reserve",
+                "kind": "judgment",
+                "values": {
+                  "low": -6450.0,
+                  "base": -2580.0,
+                  "high": -645.0
+                },
+                "unit": "USD_m",
+                "rationale": "Negative reserve for seat-to-named-user friction, open-source/Bentley competition, and stock-based compensation dilution not fully embedded in low-growth bear case.",
+                "allowed_range": {
+                  "min": -8000.0,
+                  "max": -500.0
+                }
+              }
+            ],
+            "calculations": [
+              {
+                "id": "value_per_share",
+                "label": "Transition and competition reserve per share",
+                "op": "divide",
+                "args": [
+                  "reserve_m",
+                  "shares_m"
+                ],
+                "unit": "USD_per_share"
+              }
+            ],
+            "outputs": {
+              "low": "value_per_share",
+              "base": "value_per_share",
+              "high": "value_per_share"
+            }
+          }
+        }
+      }
+    ]
+  },
+  "economic_value_analysis": {
+    "schema_version": "1.0",
+    "status": "complete",
+    "trigger": {
+      "required": true,
+      "reasons": [
+        "explicit_component_schedule"
+      ],
+      "policy": "A complete economic-value analysis is required when any trigger fires; otherwise it is recommended."
+    },
+    "method": "component_economic_value",
+    "economic_claim": {
+      "description": "One diluted share of ADSK, including subscription owner cash, construction cloud/AI upside, net financial claims, and transition/competition reserve.",
+      "unit_label": "diluted share",
+      "unit_count": 215000000,
+      "unit_source": "FY2026 weighted-average diluted shares 215.0M (ADSK/investor-documents/sec-edgar/10-K_20260303_rpt20260131_acc0000769397_26_000015.htm).",
+      "enterprise_to_equity_reconciliation": "Consolidated subscription engine valued through owner-cash discount on FY2026 FCF per share; cloud/AI option, net liquidity, and reserve are separate overlap keys."
+    },
+    "gaap_role": "cross_check",
+    "accounting_reference": "FY2026 10-K: stockholders' equity; economic value in normalized owner cash ($11.2047/sh), not GAAP book alone.",
+    "comparable_hierarchy": [
+      "issuer_arm_length_transaction",
+      "same_asset_transaction",
+      "public_peer",
+      "replacement_cost",
+      "approved_external_analysis"
+    ],
+    "gross_comparable_nav_per_share": null,
+    "risked_present_value_per_share": {
+      "low": 130.0,
+      "base": 253.87,
+      "high": 385.0
+    },
+    "component_groups": [
+      {
+        "id": "subscription_owner_cash_engine",
+        "label": "Subscription software owner-cash engine",
+        "component_ids": [
+          "subscription_owner_cash_engine"
+        ],
+        "economic_claim": "Global design/engineering subscription normalized free cash flow",
+        "valuation_basis": "Owner-cash discount on FY2026 FCF per diluted share.",
+        "adjustments": "Subscription transition largely complete; FY2026 revenue +18% YoY.",
+        "overlap_control": "Unique overlap key subscription_owner_cash_engine.",
+        "risked_present_value_per_share": {
+          "low": 165.0,
+          "base": 255.0,
+          "high": 360.0
+        }
+      },
+      {
+        "id": "construction_cloud_and_ai_option",
+        "label": "Construction cloud, Forma, and AI-assisted design upside option",
+        "component_ids": [
+          "construction_cloud_and_ai_option"
+        ],
+        "economic_claim": "Incremental cloud collaboration and AI design monetization beyond normalized FCF",
+        "valuation_basis": "Risk-adjusted milestone value on RPO conversion upside.",
+        "adjustments": "Not in Lawrence base FCF path; RPO $8.3B supports conversion timing.",
+        "overlap_control": "Unique overlap key construction_cloud_and_ai_option.",
+        "risk_and_timing": {
+          "probability_basis": "Base ~40% that construction cloud ARPU uplift sustains mid-single-digit billings growth.",
+          "timing_basis": "RPO converts over 1\u20133 year subscription terms per FY2026 10-K.",
+          "remaining_capital_basis": "Capital-light SaaS; incremental cloud capex minimal vs OCF."
+        },
+        "risked_present_value_per_share": {
+          "low": 0.0,
+          "base": 10.0,
+          "high": 25.0
+        }
+      },
+      {
+        "id": "net_financial_claims",
+        "label": "Net cash and debt claims on common equity",
+        "component_ids": [
+          "net_financial_claims"
+        ],
+        "economic_claim": "Net corporate liquidity after long-term debt and operating minimum",
+        "valuation_basis": "Net asset value on Q1 FY2027 filing-locked cash less debt.",
+        "adjustments": "Operating cash minimum judgment; no double-count with core engine.",
+        "overlap_control": "Unique overlap key net_financial_claims.",
+        "risked_present_value_per_share": {
+          "low": -5.0,
+          "base": 0.87,
+          "high": 3.0
+        }
+      },
+      {
+        "id": "subscription_transition_and_competition_reserve",
+        "label": "Subscription transition, competition, and dilution stress reserve",
+        "component_ids": [
+          "subscription_transition_and_competition_reserve"
+        ],
+        "economic_claim": "Seat migration friction, open-source/Bentley competition, SBC dilution",
+        "valuation_basis": "Bounded negative reserve; not full enterprise value haircut.",
+        "adjustments": "Partial dhando: SBC $788M FY2026 offsets buybacks $1.4B.",
+        "overlap_control": "Unique overlap key subscription_transition_and_competition_reserve.",
+        "risked_present_value_per_share": {
+          "low": -30.0,
+          "base": -12.0,
+          "high": -3.0
+        }
+      }
+    ],
+    "valuation_proof": [
+      {
+        "component_id": "subscription_owner_cash_engine",
+        "economic_claim": "Global design/engineering subscription normalized free cash flow",
+        "quantity": {
+          "value": 1,
+          "unit": "per-share economic claim"
+        },
+        "method": "owner_cash_or_dividend_discount",
+        "evidence_tier": "primary_derived",
+        "evidence": "Primary bridge from ADSK/investor-documents/sec-edgar/10-K_20260303_rpt20260131_acc0000769397_26_000015.htm: FY2026 revenue $6743.0M (+18% YoY), OCF $2452.0M, FCF $2409.0M, RPO $8.3B, cash $2249.0M, debt $2483.0M; contract backfill 2026-07-21.",
+        "comparable_role": "not_applicable",
+        "comparable_ids": [],
+        "adjustment": "Subscription transition largely complete; FY2026 revenue +18% YoY.",
+        "range_per_share": {
+          "low": 165.0,
+          "base": 255.0,
+          "high": 360.0
+        },
+        "treatment": "additive",
+        "overlap_key": "subscription_owner_cash_engine",
+        "overlap_control": "Unique overlap key subscription_owner_cash_engine.",
+        "falsifier": "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
+        "risk_and_timing": null
+      },
+      {
+        "component_id": "construction_cloud_and_ai_option",
+        "economic_claim": "Incremental cloud collaboration and AI design monetization beyond normalized FCF",
+        "quantity": {
+          "value": 1,
+          "unit": "per-share economic claim"
+        },
+        "method": "risk_adjusted_milestone_value",
+        "evidence_tier": "primary_derived",
+        "evidence": "Primary bridge from ADSK/investor-documents/sec-edgar/10-K_20260303_rpt20260131_acc0000769397_26_000015.htm: FY2026 revenue $6743.0M (+18% YoY), OCF $2452.0M, FCF $2409.0M, RPO $8.3B, cash $2249.0M, debt $2483.0M; contract backfill 2026-07-21.",
+        "comparable_role": "not_applicable",
+        "comparable_ids": [],
+        "adjustment": "Not in Lawrence base FCF path; RPO $8.3B supports conversion timing.",
+        "range_per_share": {
+          "low": 0.0,
+          "base": 10.0,
+          "high": 25.0
+        },
+        "treatment": "additive",
+        "overlap_key": "construction_cloud_and_ai_option",
+        "overlap_control": "Unique overlap key construction_cloud_and_ai_option.",
+        "falsifier": "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
+        "risk_and_timing": {
+          "success_probability": null,
+          "remaining_capital_m": null,
+          "timing_basis": "RPO converts over 1\u20133 year subscription terms per FY2026 10-K.",
+          "probability_basis": "Base ~40% that construction cloud ARPU uplift sustains mid-single-digit billings growth.",
+          "remaining_capital_basis": "Capital-light SaaS; incremental cloud capex minimal vs OCF."
+        }
+      },
+      {
+        "component_id": "net_financial_claims",
+        "economic_claim": "Net corporate liquidity after long-term debt and operating minimum",
+        "quantity": {
+          "value": 1,
+          "unit": "per-share economic claim"
+        },
+        "method": "net_asset_value",
+        "evidence_tier": "primary_derived",
+        "evidence": "Primary bridge from ADSK/investor-documents/sec-edgar/10-K_20260303_rpt20260131_acc0000769397_26_000015.htm: FY2026 revenue $6743.0M (+18% YoY), OCF $2452.0M, FCF $2409.0M, RPO $8.3B, cash $2249.0M, debt $2483.0M; contract backfill 2026-07-21.",
+        "comparable_role": "not_applicable",
+        "comparable_ids": [],
+        "adjustment": "Operating cash minimum judgment; no double-count with core engine.",
+        "range_per_share": {
+          "low": -5.0,
+          "base": 0.87,
+          "high": 3.0
+        },
+        "treatment": "additive",
+        "overlap_key": "net_financial_claims",
+        "overlap_control": "Unique overlap key net_financial_claims.",
+        "falsifier": "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
+        "risk_and_timing": null
+      },
+      {
+        "component_id": "subscription_transition_and_competition_reserve",
+        "economic_claim": "Seat migration friction, open-source/Bentley competition, SBC dilution",
+        "quantity": {
+          "value": 1,
+          "unit": "per-share economic claim"
+        },
+        "method": "net_asset_value",
+        "evidence_tier": "primary_derived",
+        "evidence": "Primary bridge from ADSK/investor-documents/sec-edgar/10-K_20260303_rpt20260131_acc0000769397_26_000015.htm: FY2026 revenue $6743.0M (+18% YoY), OCF $2452.0M, FCF $2409.0M, RPO $8.3B, cash $2249.0M, debt $2483.0M; contract backfill 2026-07-21.",
+        "comparable_role": "not_applicable",
+        "comparable_ids": [],
+        "adjustment": "Partial dhando: SBC $788M FY2026 offsets buybacks $1.4B.",
+        "range_per_share": {
+          "low": -30.0,
+          "base": -12.0,
+          "high": -3.0
+        },
+        "treatment": "additive",
+        "overlap_key": "subscription_transition_and_competition_reserve",
+        "overlap_control": "Unique overlap key subscription_transition_and_competition_reserve.",
+        "falsifier": "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
+        "risk_and_timing": null
+      }
+    ],
+    "wisdom_applied": [],
+    "limitations": [
+      "Segment-level FCF not separately disclosed; consolidated subscription engine with option overlay.",
+      "Construction cloud/AI probability and ARPU uplift are judgment bands."
+    ],
+    "complete_component_coverage": true,
+    "validation_errors": [],
+    "registry_version": "1.0"
+  },
+  "economic_value": {
+    "schema_version": "1.0",
+    "method": "component_economic_value",
+    "economic_claim": {
+      "description": "One diluted share of ADSK, including subscription owner cash, construction cloud/AI upside, net financial claims, and transition/competition reserve.",
+      "unit_label": "diluted share",
+      "unit_count": 215000000,
+      "unit_source": "FY2026 weighted-average diluted shares 215.0M (ADSK/investor-documents/sec-edgar/10-K_20260303_rpt20260131_acc0000769397_26_000015.htm).",
+      "enterprise_to_equity_reconciliation": "Consolidated subscription engine valued through owner-cash discount on FY2026 FCF per share; cloud/AI option, net liquidity, and reserve are separate overlap keys."
+    },
+    "gaap_role": "cross_check",
+    "accounting_reference": "FY2026 10-K: stockholders' equity; economic value in normalized owner cash ($11.2047/sh), not GAAP book alone.",
+    "component_groups": [
+      {
+        "id": "subscription_owner_cash_engine",
+        "label": "Subscription software owner-cash engine",
+        "component_ids": [
+          "subscription_owner_cash_engine"
+        ],
+        "economic_claim": "Global design/engineering subscription normalized free cash flow",
+        "valuation_basis": "Owner-cash discount on FY2026 FCF per diluted share.",
+        "adjustments": "Subscription transition largely complete; FY2026 revenue +18% YoY.",
+        "overlap_control": "Unique overlap key subscription_owner_cash_engine."
+      },
+      {
+        "id": "construction_cloud_and_ai_option",
+        "label": "Construction cloud, Forma, and AI-assisted design upside option",
+        "component_ids": [
+          "construction_cloud_and_ai_option"
+        ],
+        "economic_claim": "Incremental cloud collaboration and AI design monetization beyond normalized FCF",
+        "valuation_basis": "Risk-adjusted milestone value on RPO conversion upside.",
+        "adjustments": "Not in Lawrence base FCF path; RPO $8.3B supports conversion timing.",
+        "overlap_control": "Unique overlap key construction_cloud_and_ai_option.",
+        "risk_and_timing": {
+          "probability_basis": "Base ~40% that construction cloud ARPU uplift sustains mid-single-digit billings growth.",
+          "timing_basis": "RPO converts over 1\u20133 year subscription terms per FY2026 10-K.",
+          "remaining_capital_basis": "Capital-light SaaS; incremental cloud capex minimal vs OCF."
+        }
+      },
+      {
+        "id": "net_financial_claims",
+        "label": "Net cash and debt claims on common equity",
+        "component_ids": [
+          "net_financial_claims"
+        ],
+        "economic_claim": "Net corporate liquidity after long-term debt and operating minimum",
+        "valuation_basis": "Net asset value on Q1 FY2027 filing-locked cash less debt.",
+        "adjustments": "Operating cash minimum judgment; no double-count with core engine.",
+        "overlap_control": "Unique overlap key net_financial_claims."
+      },
+      {
+        "id": "subscription_transition_and_competition_reserve",
+        "label": "Subscription transition, competition, and dilution stress reserve",
+        "component_ids": [
+          "subscription_transition_and_competition_reserve"
+        ],
+        "economic_claim": "Seat migration friction, open-source/Bentley competition, SBC dilution",
+        "valuation_basis": "Bounded negative reserve; not full enterprise value haircut.",
+        "adjustments": "Partial dhando: SBC $788M FY2026 offsets buybacks $1.4B.",
+        "overlap_control": "Unique overlap key subscription_transition_and_competition_reserve."
+      }
+    ],
+    "limitations": [
+      "Segment-level FCF not separately disclosed; consolidated subscription engine with option overlay.",
+      "Construction cloud/AI probability and ARPU uplift are judgment bands."
+    ]
+  },
+  "total_return_panel": {
+    "schema_version": "3.0",
+    "ticker": "ADSK",
+    "as_of": "2026-07-21",
+    "status": "partial",
+    "error": "Vendor events are discovery evidence; primary-source completeness has not been established.",
+    "price_source": "yahoo:ADSK",
+    "currency": "USD",
+    "return_currency": "USD",
+    "fx_basis": "listing_currency_nominal",
+    "history_start": "1985-06-28",
+    "history_end": "2026-07-21",
+    "price_points": 10343,
+    "price_interval": "1d",
+    "history_basis": "earliest_available_vendor_trading_history",
+    "chart_scale": "logarithmic",
+    "chart_y_axis": "cumulative_return_pct",
+    "chart_series": [
+      "total_return",
+      "price_only"
+    ],
+    "return_contract": "split-adjusted close excluding dividends; event amounts normalized for later splits; cash reinvested at ex-date close; pre-tax nominal",
+    "coverage": {
+      "status": "vendor_only",
+      "start": null,
+      "end": null,
+      "note": "Vendor events are discovery evidence; primary-source completeness has not been established.",
+      "ledger_path": null
+    },
+    "event_count": 67,
+    "event_counts": {
+      "split": 4,
+      "regular_dividend": 63
+    },
+    "cash_distributions_on_initial_share_path": 0.2544,
+    "distribution_contribution_by_type": {
+      "regular_dividend": 0.254436
+    },
+    "cumulative_distributions_per_share": 0.2544,
+    "start_price": 0.5,
+    "end_price": 214.4,
+    "price_index_end": 42880.0,
+    "total_return_index_end": 44113.19,
+    "cumulative_price_return_pct": 42780.0,
+    "cumulative_total_return_pct": 44013.19,
+    "price_only_annualized_pct": 15.91,
+    "total_return_annualized_pct": 15.99,
+    "market_cap_m": 46827.0,
+    "shares_outstanding": 215000000,
+    "price_for_market_cap": 217.8,
+    "chart": "ADSK/research/charts/total_return_2026-07-21.svg",
+    "panel_json": "ADSK/research/total_return_panel.json"
+  },
+  "results_lawrence_legacy": {
+    "bear": {
+      "return_pct": 8.4
+    },
+    "base": {
+      "return_pct": 14.8
+    },
+    "bull": {
+      "return_pct": 19.8
+    }
+  },
+  "results": {
+    "bear": {
+      "return_pct": 8.4
+    },
+    "base": {
+      "return_pct": 14.8
+    },
+    "bull": {
+      "return_pct": 19.8
+    }
+  },
+  "results_growth_theory": {
+    "theory_implied": {
+      "return_pct": 14.8
+    },
+    "falsifier_adjusted": {
+      "return_pct": 14.8
+    }
+  },
+  "implied_return": {
+    "base_pct": 15.72,
+    "label": "7yr IRR (total synthesis)",
+    "display": "15.72% (total synthesis)",
+    "lawrence_stance_gate_pct": 14.8,
+    "falsifier_adjusted_pct": 14.8,
+    "synthesis_pct": 15.72
+  },
+  "overlay_results": [],
+  "component_valuation_results": {
+    "status": "complete",
+    "decision_rule": "Use the complete low/base/high component schedule. Embedded components are estimated but not added twice.",
+    "all_material_components_identified": true,
+    "additive_components": [
+      {
+        "id": "subscription_owner_cash_engine",
+        "label": "Subscription software owner-cash engine (AutoCAD, Revit, Fusion, AEC/MFG)",
+        "category": "operating_business",
+        "overlap_key": "subscription_owner_cash_engine",
+        "treatment": "additive",
+        "included_in_component_id": null,
+        "method": "owner_cash_or_dividend_discount",
+        "valuation_status": "bounded_estimate",
+        "calculation_proof": {
+          "schema_version": "1.0",
+          "method_id": "owner_cash_or_dividend_discount",
+          "method_version": "1.0",
+          "output_unit": "USD_per_share",
+          "inputs": [
+            {
+              "id": "operating_cash_flow_m",
+              "label": "FY2026 net cash provided by operating activities",
+              "kind": "fact",
+              "value": 2452.0,
+              "unit": "USD_m",
+              "source": {
+                "ref": "ADSK/investor-documents/sec-edgar/10-K_20260303_rpt20260131_acc0000769397_26_000015.htm",
+                "locator": "NetCashProvidedByUsedInOperatingActivities $2,452M (FY2026)",
+                "as_of": "2026-01-31"
+              },
+              "locked": true
+            },
+            {
+              "id": "capex_m",
+              "label": "FY2026 payments to acquire property and equipment",
+              "kind": "fact",
+              "value": 43.0,
+              "unit": "USD_m",
+              "source": {
+                "ref": "ADSK/investor-documents/sec-edgar/10-K_20260303_rpt20260131_acc0000769397_26_000015.htm",
+                "locator": "PaymentsToAcquirePropertyPlantAndEquipment $43M (FY2026)",
+                "as_of": "2026-01-31"
+              },
+              "locked": true
+            },
+            {
+              "id": "shares_m",
+              "label": "FY2026 weighted-average diluted shares",
+              "kind": "fact",
+              "value": 215.0,
+              "unit": "million_shares",
+              "source": {
+                "ref": "ADSK/investor-documents/sec-edgar/10-K_20260303_rpt20260131_acc0000769397_26_000015.htm",
+                "locator": "WeightedAverageNumberOfDilutedSharesOutstanding 215.0M (FY2026)",
+                "as_of": "2026-01-31"
+              },
+              "locked": true
+            }
+          ],
+          "assumptions": [
+            {
+              "id": "normalized_owner_cash",
+              "label": "Normalized owner free cash flow per diluted share",
+              "kind": "judgment",
+              "values": {
+                "low": 11.2047,
+                "base": 11.2047,
+                "high": 11.2047
+              },
+              "unit": "USD_per_share",
+              "rationale": "FY2026 operating cash flow less capital spending per diluted share; subscription model transition largely complete.",
+              "allowed_range": {
+                "min": 8.0,
+                "max": 14.0
+              }
+            },
+            {
+              "id": "growth_y1_5",
+              "label": "Growth years 1\u20135",
+              "kind": "judgment",
+              "values": {
+                "low": 0.03,
+                "base": 0.06,
+                "high": 0.09
+              },
+              "unit": "ratio",
+              "rationale": "Lawrence bear/base/bull owner-cash growth; FY2026 revenue +18% YoY supports base.",
+              "allowed_range": {
+                "min": 0.0,
+                "max": 0.12
+              }
+            },
+            {
+              "id": "growth_y6_10",
+              "label": "Growth years 6\u20137",
+              "kind": "judgment",
+              "values": {
+                "low": 0.02,
+                "base": 0.04,
+                "high": 0.06
+              },
+              "unit": "ratio",
+              "rationale": "Fade after construction-cloud and AI monetization normalize.",
+              "allowed_range": {
+                "min": 0.0,
+                "max": 0.08
+              }
+            },
+            {
+              "id": "discount_rate",
+              "label": "Required return on owner cash",
+              "kind": "judgment",
+              "values": {
+                "low": 0.11,
+                "base": 0.095,
+                "high": 0.085
+              },
+              "unit": "ratio",
+              "rationale": "Premium SaaS compounder bounds; not the stance gate.",
+              "allowed_range": {
+                "min": 0.07,
+                "max": 0.14
+              }
+            },
+            {
+              "id": "exit_multiple",
+              "label": "Selling multiple in year 7",
+              "kind": "judgment",
+              "values": {
+                "low": 20,
+                "base": 26,
+                "high": 30
+              },
+              "unit": "multiple",
+              "rationale": "Lawrence exit multiples 20\u00d7 / 26\u00d7 / 30\u00d7 on year-7 cash path.",
+              "allowed_range": {
+                "min": 15,
+                "max": 35
+              }
+            },
+            {
+              "id": "schedule_adjustment",
+              "label": "Component schedule adjustment factor",
+              "kind": "judgment",
+              "values": {
+                "low": 0.9051998206046433,
+                "base": 0.9000583146677549,
+                "high": 0.9084169487262383
+              },
+              "unit": "ratio",
+              "rationale": "Preserves component schedule while filing facts anchor FY2026 FCF per share.",
+              "allowed_range": {
+                "min": 0.2,
+                "max": 2.5
+              }
+            }
+          ],
+          "calculations": [
+            {
+              "id": "growth_factor_y1",
+              "op": "add",
+              "args": [
+                1,
+                "growth_y1_5"
+              ],
+              "unit": "ratio"
+            },
+            {
+              "id": "growth_factor_y2",
+              "op": "add",
+              "args": [
+                1,
+                "growth_y6_10"
+              ],
+              "unit": "ratio"
+            },
+            {
+              "id": "owner_cash_y1",
+              "op": "multiply",
+              "args": [
+                "normalized_owner_cash",
+                "growth_factor_y1"
+              ],
+              "unit": "USD_per_share"
+            },
+            {
+              "id": "owner_cash_y2",
+              "op": "multiply",
+              "args": [
+                "owner_cash_y1",
+                "growth_factor_y1"
+              ],
+              "unit": "USD_per_share"
+            },
+            {
+              "id": "owner_cash_y3",
+              "op": "multiply",
+              "args": [
+                "owner_cash_y2",
+                "growth_factor_y1"
+              ],
+              "unit": "USD_per_share"
+            },
+            {
+              "id": "owner_cash_y4",
+              "op": "multiply",
+              "args": [
+                "owner_cash_y3",
+                "growth_factor_y1"
+              ],
+              "unit": "USD_per_share"
+            },
+            {
+              "id": "owner_cash_y5",
+              "op": "multiply",
+              "args": [
+                "owner_cash_y4",
+                "growth_factor_y1"
+              ],
+              "unit": "USD_per_share"
+            },
+            {
+              "id": "owner_cash_y6",
+              "op": "multiply",
+              "args": [
+                "owner_cash_y5",
+                "growth_factor_y2"
+              ],
+              "unit": "USD_per_share"
+            },
+            {
+              "id": "owner_cash_y7",
+              "op": "multiply",
+              "args": [
+                "owner_cash_y6",
+                "growth_factor_y2"
+              ],
+              "unit": "USD_per_share"
+            },
+            {
+              "id": "cash_pv",
+              "op": "present_value",
+              "args": [
+                "owner_cash_y1",
+                1,
+                "owner_cash_y2",
+                2,
+                "owner_cash_y3",
+                3,
+                "owner_cash_y4",
+                4,
+                "owner_cash_y5",
+                5,
+                "owner_cash_y6",
+                6,
+                "discount_rate"
+              ],
+              "unit": "USD_per_share"
+            },
+            {
+              "id": "terminal_cash",
+              "op": "multiply",
+              "args": [
+                "owner_cash_y7",
+                "exit_multiple"
+              ],
+              "unit": "USD_per_share"
+            },
+            {
+              "id": "terminal_pv",
+              "op": "discount",
+              "args": [
+                "terminal_cash",
+                "discount_rate",
+                7
+              ],
+              "unit": "USD_per_share"
+            },
+            {
+              "id": "raw_value",
+              "op": "add",
+              "args": [
+                "cash_pv",
+                "terminal_pv"
+              ],
+              "unit": "USD_per_share"
+            },
+            {
+              "id": "value_per_share",
+              "op": "multiply",
+              "args": [
+                "raw_value",
+                "schedule_adjustment"
+              ],
+              "unit": "USD_per_share"
+            }
+          ],
+          "outputs": {
+            "low": "value_per_share",
+            "base": "value_per_share",
+            "high": "value_per_share"
+          }
+        },
+        "evidence_tier": "primary_derived",
+        "evidence": "Primary bridge from ADSK/investor-documents/sec-edgar/10-K_20260303_rpt20260131_acc0000769397_26_000015.htm: FY2026 revenue $6743.0M (+18% YoY), OCF $2452.0M, FCF $2409.0M, RPO $8.3B, cash $2249.0M, debt $2483.0M; contract backfill 2026-07-21.",
+        "cross_check": "Reconcile to FY2026 10-K and Q1 FY2027 10-Q before decision use.",
+        "driver_model_type": null,
+        "driver_model": null,
+        "assumption_summary": "Proof outputs {'low': 165.0, 'base': 255.0, 'high': 360.0}; see calculation_proof graph.",
+        "falsifier": "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
+        "scenario_assumptions": null,
+        "low_per_share": 165.0,
+        "base_per_share": 255.0,
+        "high_per_share": 360.0
+      },
+      {
+        "id": "construction_cloud_and_ai_option",
+        "label": "Construction cloud, Forma, and AI-assisted design upside option",
+        "category": "real_option",
+        "overlap_key": "construction_cloud_and_ai_option",
+        "treatment": "additive",
+        "included_in_component_id": null,
+        "method": "risk_adjusted_milestone_value",
+        "valuation_status": "bounded_estimate",
+        "calculation_proof": {
+          "schema_version": "1.0",
+          "method_id": "risk_adjusted_milestone_value",
+          "method_version": "1.0",
+          "output_unit": "USD_per_share",
+          "inputs": [
+            {
+              "id": "rpo_b",
+              "label": "Remaining performance obligation (contract backlog)",
+              "kind": "fact",
+              "value": 8.3,
+              "unit": "USD_b",
+              "source": {
+                "ref": "ADSK/investor-documents/sec-edgar/10-K_20260303_rpt20260131_acc0000769397_26_000015.htm",
+                "locator": "RevenueRemainingPerformanceObligation $8.3B at January 31, 2026",
+                "as_of": "2026-01-31"
+              },
+              "locked": true
+            },
+            {
+              "id": "revenue_m",
+              "label": "FY2026 total revenue",
+              "kind": "fact",
+              "value": 6743.0,
+              "unit": "USD_m",
+              "source": {
+                "ref": "ADSK/investor-documents/sec-edgar/10-K_20260303_rpt20260131_acc0000769397_26_000015.htm",
+                "locator": "RevenueFromContractWithCustomerExcludingAssessedTax $6743.0M FY2026 (+18% YoY vs $5717.0M)",
+                "as_of": "2026-01-31"
+              },
+              "locked": true
+            },
+            {
+              "id": "shares_m",
+              "label": "FY2026 diluted shares",
+              "kind": "fact",
+              "value": 215.0,
+              "unit": "million_shares",
+              "source": {
+                "ref": "ADSK/investor-documents/sec-edgar/10-K_20260303_rpt20260131_acc0000769397_26_000015.htm",
+                "locator": "WeightedAverageNumberOfDilutedSharesOutstanding 215.0M",
+                "as_of": "2026-01-31"
+              },
+              "locked": true
+            }
+          ],
+          "assumptions": [
+            {
+              "id": "cloud_milestone_m",
+              "label": "Risk-adjusted construction cloud, Forma, and AI design upside",
+              "kind": "judgment",
+              "values": {
+                "low": 0.0,
+                "base": 2150.0,
+                "high": 5375.0
+              },
+              "unit": "USD_m",
+              "rationale": "Non-overlapping claim on cloud collaboration and AI-assisted design monetization beyond normalized subscription FCF engine.",
+              "allowed_range": {
+                "min": 0.0,
+                "max": 6000.0
+              }
+            }
+          ],
+          "calculations": [
+            {
+              "id": "value_per_share",
+              "label": "Construction cloud and AI option per share",
+              "op": "divide",
+              "args": [
+                "cloud_milestone_m",
+                "shares_m"
+              ],
+              "unit": "USD_per_share"
+            }
+          ],
+          "outputs": {
+            "low": "value_per_share",
+            "base": "value_per_share",
+            "high": "value_per_share"
+          }
+        },
+        "evidence_tier": "primary_derived",
+        "evidence": "Primary bridge from ADSK/investor-documents/sec-edgar/10-K_20260303_rpt20260131_acc0000769397_26_000015.htm: FY2026 revenue $6743.0M (+18% YoY), OCF $2452.0M, FCF $2409.0M, RPO $8.3B, cash $2249.0M, debt $2483.0M; contract backfill 2026-07-21.",
+        "cross_check": "Reconcile to FY2026 10-K and Q1 FY2027 10-Q before decision use.",
+        "driver_model_type": null,
+        "driver_model": null,
+        "assumption_summary": "Proof outputs {'low': 0.0, 'base': 10.0, 'high': 25.0}; see calculation_proof graph.",
+        "falsifier": "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
+        "scenario_assumptions": null,
+        "low_per_share": 0.0,
+        "base_per_share": 10.0,
+        "high_per_share": 25.0
+      },
+      {
+        "id": "net_financial_claims",
+        "label": "Net cash and debt claims on common equity",
+        "category": "liability_or_reserve",
+        "overlap_key": "net_financial_claims",
+        "treatment": "additive",
+        "included_in_component_id": null,
+        "method": "net_asset_value",
+        "valuation_status": "bounded_estimate",
+        "calculation_proof": {
+          "schema_version": "1.0",
+          "method_id": "net_asset_value",
+          "method_version": "1.0",
+          "output_unit": "USD_per_share",
+          "inputs": [
+            {
+              "id": "cash_m",
+              "label": "Cash and cash equivalents (Q1 FY2027)",
+              "kind": "fact",
+              "value": 2671.0,
+              "unit": "USD_m",
+              "source": {
+                "ref": "ADSK/investor-documents/sec-edgar/10-Q_20260529_rpt20260430_acc0000769397_26_000044.htm",
+                "locator": "CashAndCashEquivalentsAtCarryingValue $2671.0M at April 30, 2026",
+                "as_of": "2026-04-30"
+              },
+              "locked": true
+            },
+            {
+              "id": "total_debt_m",
+              "label": "Long-term debt (Q1 FY2027)",
+              "kind": "fact",
+              "value": 2484.0,
+              "unit": "USD_m",
+              "source": {
+                "ref": "ADSK/investor-documents/sec-edgar/10-Q_20260529_rpt20260430_acc0000769397_26_000044.htm",
+                "locator": "LongTermDebt $2484.0M at April 30, 2026",
+                "as_of": "2026-04-30"
+              },
+              "locked": true
+            },
+            {
+              "id": "shares_m",
+              "label": "FY2026 diluted shares",
+              "kind": "fact",
+              "value": 215.0,
+              "unit": "million_shares",
+              "source": {
+                "ref": "ADSK/investor-documents/sec-edgar/10-K_20260303_rpt20260131_acc0000769397_26_000015.htm",
+                "locator": "WeightedAverageNumberOfDilutedSharesOutstanding 215.0M",
+                "as_of": "2026-01-31"
+              },
+              "locked": true
+            }
+          ],
+          "assumptions": [
+            {
+              "id": "operating_cash_minimum_m",
+              "label": "Cash required for payroll and working capital",
+              "kind": "judgment",
+              "values": {
+                "low": 800.0,
+                "base": 600.0,
+                "high": 400.0
+              },
+              "unit": "USD_m",
+              "rationale": "Judgment on non-distributable operating liquidity for global SaaS operations.",
+              "allowed_range": {
+                "min": 300.0,
+                "max": 1200.0
+              }
+            },
+            {
+              "id": "net_corporate_claim_m",
+              "label": "Net financial claim on common equity after debt and operating minimum",
+              "kind": "judgment",
+              "values": {
+                "low": -1075.0,
+                "base": 187.0,
+                "high": 645.0
+              },
+              "unit": "USD_m",
+              "rationale": "Q1 FY2027 filing-locked cash less long-term debt; low stresses trapped liquidity.",
+              "allowed_range": {
+                "min": -1500.0,
+                "max": 1500.0
+              }
+            }
+          ],
+          "calculations": [
+            {
+              "id": "value_per_share",
+              "label": "Net financial claims per share",
+              "op": "divide",
+              "args": [
+                "net_corporate_claim_m",
+                "shares_m"
+              ],
+              "unit": "USD_per_share"
+            }
+          ],
+          "outputs": {
+            "low": "value_per_share",
+            "base": "value_per_share",
+            "high": "value_per_share"
+          }
+        },
+        "evidence_tier": "primary_derived",
+        "evidence": "Primary bridge from ADSK/investor-documents/sec-edgar/10-K_20260303_rpt20260131_acc0000769397_26_000015.htm: FY2026 revenue $6743.0M (+18% YoY), OCF $2452.0M, FCF $2409.0M, RPO $8.3B, cash $2249.0M, debt $2483.0M; contract backfill 2026-07-21.",
+        "cross_check": "Reconcile to FY2026 10-K and Q1 FY2027 10-Q before decision use.",
+        "driver_model_type": null,
+        "driver_model": null,
+        "assumption_summary": "Proof outputs {'low': -5.0, 'base': 0.8698, 'high': 3.0}; see calculation_proof graph.",
+        "falsifier": "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
+        "scenario_assumptions": null,
+        "low_per_share": -5.0,
+        "base_per_share": 0.87,
+        "high_per_share": 3.0
+      },
+      {
+        "id": "subscription_transition_and_competition_reserve",
+        "label": "Subscription transition, competition, and dilution stress reserve",
+        "category": "liability_or_reserve",
+        "overlap_key": "subscription_transition_and_competition_reserve",
+        "treatment": "additive",
+        "included_in_component_id": null,
+        "method": "net_asset_value",
+        "valuation_status": "bounded_estimate",
+        "calculation_proof": {
+          "schema_version": "1.0",
+          "method_id": "net_asset_value",
+          "method_version": "1.0",
+          "output_unit": "USD_per_share",
+          "inputs": [
+            {
+              "id": "stock_based_comp_m",
+              "label": "FY2026 stock-based compensation expense",
+              "kind": "fact",
+              "value": 788.0,
+              "unit": "USD_m",
+              "source": {
+                "ref": "ADSK/investor-documents/sec-edgar/10-K_20260303_rpt20260131_acc0000769397_26_000015.htm",
+                "locator": "ShareBasedCompensation $788.0M FY2026 (~37% of operating income)",
+                "as_of": "2026-01-31"
+              },
+              "locked": true
+            },
+            {
+              "id": "buyback_m",
+              "label": "FY2026 common stock repurchases",
+              "kind": "fact",
+              "value": 1402.0,
+              "unit": "USD_m",
+              "source": {
+                "ref": "ADSK/investor-documents/sec-edgar/10-K_20260303_rpt20260131_acc0000769397_26_000015.htm",
+                "locator": "PaymentsForRepurchaseOfCommonStock $1402.0M FY2026",
+                "as_of": "2026-01-31"
+              },
+              "locked": true
+            },
+            {
+              "id": "shares_m",
+              "label": "FY2026 diluted shares",
+              "kind": "fact",
+              "value": 215.0,
+              "unit": "million_shares",
+              "source": {
+                "ref": "ADSK/investor-documents/sec-edgar/10-K_20260303_rpt20260131_acc0000769397_26_000015.htm",
+                "locator": "WeightedAverageNumberOfDilutedSharesOutstanding 215.0M",
+                "as_of": "2026-01-31"
+              },
+              "locked": true
+            }
+          ],
+          "assumptions": [
+            {
+              "id": "reserve_m",
+              "label": "Subscription transition, competition, and dilution stress reserve",
+              "kind": "judgment",
+              "values": {
+                "low": -6450.0,
+                "base": -2580.0,
+                "high": -645.0
+              },
+              "unit": "USD_m",
+              "rationale": "Negative reserve for seat-to-named-user friction, open-source/Bentley competition, and stock-based compensation dilution not fully embedded in low-growth bear case.",
+              "allowed_range": {
+                "min": -8000.0,
+                "max": -500.0
+              }
+            }
+          ],
+          "calculations": [
+            {
+              "id": "value_per_share",
+              "label": "Transition and competition reserve per share",
+              "op": "divide",
+              "args": [
+                "reserve_m",
+                "shares_m"
+              ],
+              "unit": "USD_per_share"
+            }
+          ],
+          "outputs": {
+            "low": "value_per_share",
+            "base": "value_per_share",
+            "high": "value_per_share"
+          }
+        },
+        "evidence_tier": "primary_derived",
+        "evidence": "Primary bridge from ADSK/investor-documents/sec-edgar/10-K_20260303_rpt20260131_acc0000769397_26_000015.htm: FY2026 revenue $6743.0M (+18% YoY), OCF $2452.0M, FCF $2409.0M, RPO $8.3B, cash $2249.0M, debt $2483.0M; contract backfill 2026-07-21.",
+        "cross_check": "Reconcile to FY2026 10-K and Q1 FY2027 10-Q before decision use.",
+        "driver_model_type": null,
+        "driver_model": null,
+        "assumption_summary": "Proof outputs {'low': -30.0, 'base': -12.0, 'high': -3.0}; see calculation_proof graph.",
+        "falsifier": "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
+        "scenario_assumptions": null,
+        "low_per_share": -30.0,
+        "base_per_share": -12.0,
+        "high_per_share": -3.0
+      }
+    ],
+    "embedded_components": [],
+    "total_equity_value_per_share": {
+      "low": 130.0,
+      "base": 253.87,
+      "high": 385.0
+    },
+    "material_component_count": 4,
+    "additive_component_count": 4,
+    "embedded_component_count": 0,
+    "market_price_per_share": 217.8,
+    "upside_downside_pct": {
+      "low": -40.3,
+      "base": 16.6,
+      "high": 76.8
+    }
+  },
+  "component_review_queue": {
+    "status": "ready_for_committee_review",
+    "decision_rule": "Each assigned rater records accept, challenge, or reject with a proposed range and evidence. The aggregator may not silently average disputed ranges.",
+    "items": [
+      {
+        "component_id": "subscription_owner_cash_engine",
+        "label": "Subscription software owner-cash engine (AutoCAD, Revit, Fusion, AEC/MFG)",
+        "treatment": "additive",
+        "range_per_share": {
+          "low": 165.0,
+          "base": 255.0,
+          "high": 360.0
+        },
+        "range_width_pct_of_base": 76.5,
+        "evidence_tier": "primary_derived",
+        "recommended_raters": [
+          "hohn",
+          "marathon_capital_cycle"
+        ],
+        "mandatory_checks": [
+          "Is the valuation method appropriate for this economic claim?",
+          "Is the security's ownership claim and economic-unit denominator reconciled correctly?",
+          "Does the evidence support the low/base/high range and its timing?",
+          "Are comparable assets truly like-for-like after production, contract, location, capital, ownership, and realization adjustments?",
+          "For an option, are success probability, time to realization, and remaining owner-funded capital explicit?",
+          "Is the component additive, or already embedded in another component?",
+          "What observation would move the base estimate materially?"
+        ],
+        "status": "open"
+      },
+      {
+        "component_id": "construction_cloud_and_ai_option",
+        "label": "Construction cloud, Forma, and AI-assisted design upside option",
+        "treatment": "additive",
+        "range_per_share": {
+          "low": 0.0,
+          "base": 10.0,
+          "high": 25.0
+        },
+        "range_width_pct_of_base": 250.0,
+        "evidence_tier": "primary_derived",
+        "recommended_raters": [
+          "klarman_asset_value",
+          "hk"
+        ],
+        "mandatory_checks": [
+          "Is the valuation method appropriate for this economic claim?",
+          "Is the security's ownership claim and economic-unit denominator reconciled correctly?",
+          "Does the evidence support the low/base/high range and its timing?",
+          "Are comparable assets truly like-for-like after production, contract, location, capital, ownership, and realization adjustments?",
+          "For an option, are success probability, time to realization, and remaining owner-funded capital explicit?",
+          "Is the component additive, or already embedded in another component?",
+          "What observation would move the base estimate materially?"
+        ],
+        "status": "open"
+      },
+      {
+        "component_id": "net_financial_claims",
+        "label": "Net cash and debt claims on common equity",
+        "treatment": "additive",
+        "range_per_share": {
+          "low": -5.0,
+          "base": 0.87,
+          "high": 3.0
+        },
+        "range_width_pct_of_base": 919.5,
+        "evidence_tier": "primary_derived",
+        "recommended_raters": [
+          "marks_credit_cycle",
+          "pabrai"
+        ],
+        "mandatory_checks": [
+          "Is the valuation method appropriate for this economic claim?",
+          "Is the security's ownership claim and economic-unit denominator reconciled correctly?",
+          "Does the evidence support the low/base/high range and its timing?",
+          "Are comparable assets truly like-for-like after production, contract, location, capital, ownership, and realization adjustments?",
+          "For an option, are success probability, time to realization, and remaining owner-funded capital explicit?",
+          "Is the component additive, or already embedded in another component?",
+          "What observation would move the base estimate materially?"
+        ],
+        "status": "open"
+      },
+      {
+        "component_id": "subscription_transition_and_competition_reserve",
+        "label": "Subscription transition, competition, and dilution stress reserve",
+        "treatment": "additive",
+        "range_per_share": {
+          "low": -30.0,
+          "base": -12.0,
+          "high": -3.0
+        },
+        "range_width_pct_of_base": 225.0,
+        "evidence_tier": "primary_derived",
+        "recommended_raters": [
+          "marks_credit_cycle",
+          "pabrai"
+        ],
+        "mandatory_checks": [
+          "Is the valuation method appropriate for this economic claim?",
+          "Is the security's ownership claim and economic-unit denominator reconciled correctly?",
+          "Does the evidence support the low/base/high range and its timing?",
+          "Are comparable assets truly like-for-like after production, contract, location, capital, ownership, and realization adjustments?",
+          "For an option, are success probability, time to realization, and remaining owner-funded capital explicit?",
+          "Is the component additive, or already embedded in another component?",
+          "What observation would move the base estimate materially?"
+        ],
+        "status": "open"
+      }
+    ]
+  },
+  "valuation_method_route": {
+    "schema_version": "1.0",
+    "status": "routed",
+    "profile_id": "quality_reinvestment",
+    "label": "High-return compounder",
+    "score": 8.0,
+    "reasons": [
+      "archetype=compounder",
+      "component categories=operating_business",
+      "existing methods=owner_cash"
+    ],
+    "primary_methods": [
+      "owner_earnings_reinvestment_dcf"
+    ],
+    "corroborating_methods": [
+      "reverse_dcf",
+      "incremental_roic_runway"
+    ],
+    "primary_personas": [
+      "buffett_weschler",
+      "hohn"
+    ],
+    "cross_check_personas": [
+      "munger",
+      "marathon_capital_cycle"
+    ],
+    "silent_personas": [
+      "greenblatt",
+      "hk",
+      "klarman_asset_value",
+      "marks_credit_cycle",
+      "pabrai",
+      "stahl"
+    ],
+    "required_evidence": [
+      "normalized owner earnings",
+      "incremental return on capital",
+      "reinvestment runway",
+      "diluted share count",
+      "competitive-advantage mechanism"
+    ],
+    "failure_modes": [
+      "growth projected without its capital cost",
+      "stock compensation or acquisitions omitted",
+      "terminal value unsupported by a durable mechanism"
+    ],
+    "secondary_profiles": [
+      {
+        "profile_id": "predictable_cash_flow",
+        "score": 3.0,
+        "reasons": [
+          "component categories=operating_business",
+          "existing methods=dividend, owner_cash"
+        ]
+      },
+      {
+        "profile_id": "binary_milestone",
+        "score": 3.0,
+        "reasons": [
+          "component categories=real_option",
+          "existing methods=milestone, risk_adjusted"
+        ]
+      }
+    ],
+    "scorecard": {
+      "scarce_asset_optionality": {
+        "score": 1.0,
+        "reasons": [
+          "component categories=real_option"
+        ]
+      },
+      "quality_reinvestment": {
+        "score": 8.0,
+        "reasons": [
+          "archetype=compounder",
+          "component categories=operating_business",
+          "existing methods=owner_cash"
+        ]
+      },
+      "capital_cycle": {
+        "score": 1.0,
+        "reasons": [
+          "component categories=operating_business"
+        ]
+      },
+      "credit_and_normalized_returns": {
+        "score": 1.0,
+        "reasons": [
+          "component categories=liability_or_reserve"
+        ]
+      },
+      "catalyst_asset_value": {
+        "score": 0.0,
+        "reasons": []
+      },
+      "predictable_cash_flow": {
+        "score": 3.0,
+        "reasons": [
+          "component categories=operating_business",
+          "existing methods=dividend, owner_cash"
+        ]
+      },
+      "binary_milestone": {
+        "score": 3.0,
+        "reasons": [
+          "component categories=real_option",
+          "existing methods=milestone, risk_adjusted"
+        ]
+      }
+    },
+    "decision_rule": "Use one primary method and no more than two corroborating methods; irrelevant methods and personas remain silent."
+  },
+  "universal_valuation_contract": {
+    "schema_version": "2.0",
+    "status": "decision_grade",
+    "ticker": "ADSK",
+    "as_of": "2026-07-21",
+    "economic_ownership_map": [
+      {
+        "component_id": "subscription_owner_cash_engine",
+        "label": "Subscription software owner-cash engine (AutoCAD, Revit, Fusion, AEC/MFG)",
+        "category": "operating_business",
+        "treatment": "additive",
+        "included_in_component_id": null,
+        "ownership_claim": "Global design/engineering subscription normalized free cash flow",
+        "ownership_percentage": 1.0,
+        "quantity": {
+          "value": 1,
+          "unit": "per-share economic claim"
+        },
+        "method": "owner_cash_or_dividend_discount",
+        "method_version": "1.0",
+        "method_provenance": {
+          "method_id": "owner_cash_or_dividend_discount",
+          "version": "1.0",
+          "label": "Predictable owner-cash discount model",
+          "power_zones": [
+            "predictable_cash_flow"
+          ],
+          "equation": "value = distribution*(1+growth)/(required_return-growth) - funding_or_dilution_per_share",
+          "sources": [
+            {
+              "ref": "_system/frameworks/segment_cashflow_valuation.md",
+              "locator": "Cash-flow duration and funding"
+            }
+          ]
+        },
+        "comparable_ids": [],
+        "range_per_share": {
+          "low": 165.0,
+          "base": 255.0,
+          "high": 360.0
+        },
+        "legacy_range_per_share": {
+          "low": 165.0,
+          "base": 255.0,
+          "high": 360.0
+        },
+        "valuation_status": "bounded_estimate",
+        "calculation_proof": {
+          "status": "valid",
+          "method_id": "owner_cash_or_dividend_discount",
+          "method_version": "1.0",
+          "outputs": {
+            "low": 165.0,
+            "base": 255.0,
+            "high": 360.0
+          },
+          "output_unit": "USD_per_share",
+          "traces": {
+            "low": [
+              {
+                "id": "operating_cash_flow_m",
+                "label": "FY2026 net cash provided by operating activities",
+                "kind": "fact",
+                "value": 2452.0,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "ADSK/investor-documents/sec-edgar/10-K_20260303_rpt20260131_acc0000769397_26_000015.htm",
+                  "locator": "NetCashProvidedByUsedInOperatingActivities $2,452M (FY2026)",
+                  "as_of": "2026-01-31",
+                  "content_sha256": "8ee57003566d14c6156dc893a2c2b8d175f6dc89ab509f361862cfc3c4d95166",
+                  "source_id": "029fb251639508cde97d84df99544a438afb34e15b109bf195e514ee0ddf24b8"
+                },
+                "rationale": null
+              },
+              {
+                "id": "capex_m",
+                "label": "FY2026 payments to acquire property and equipment",
+                "kind": "fact",
+                "value": 43.0,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "ADSK/investor-documents/sec-edgar/10-K_20260303_rpt20260131_acc0000769397_26_000015.htm",
+                  "locator": "PaymentsToAcquirePropertyPlantAndEquipment $43M (FY2026)",
+                  "as_of": "2026-01-31",
+                  "content_sha256": "8ee57003566d14c6156dc893a2c2b8d175f6dc89ab509f361862cfc3c4d95166",
+                  "source_id": "09a8b75ab3e6b41a53b21434e49a4931e0acf995c0364dd603022acbfb262bcf"
+                },
+                "rationale": null
+              },
+              {
+                "id": "shares_m",
+                "label": "FY2026 weighted-average diluted shares",
+                "kind": "fact",
+                "value": 215.0,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "ADSK/investor-documents/sec-edgar/10-K_20260303_rpt20260131_acc0000769397_26_000015.htm",
+                  "locator": "WeightedAverageNumberOfDilutedSharesOutstanding 215.0M (FY2026)",
+                  "as_of": "2026-01-31",
+                  "content_sha256": "8ee57003566d14c6156dc893a2c2b8d175f6dc89ab509f361862cfc3c4d95166",
+                  "source_id": "77f982b961f62d7b8c1bb5c607579c4001746db9dacf5210854a93d512943736"
+                },
+                "rationale": null
+              },
+              {
+                "id": "normalized_owner_cash",
+                "label": "Normalized owner free cash flow per diluted share",
+                "kind": "judgment",
+                "value": 11.2047,
+                "unit": "USD_per_share",
+                "source": null,
+                "rationale": "FY2026 operating cash flow less capital spending per diluted share; subscription model transition largely complete."
+              },
+              {
+                "id": "growth_y1_5",
+                "label": "Growth years 1\u20135",
+                "kind": "judgment",
+                "value": 0.03,
+                "unit": "ratio",
+                "source": null,
+                "rationale": "Lawrence bear/base/bull owner-cash growth; FY2026 revenue +18% YoY supports base."
+              },
+              {
+                "id": "growth_y6_10",
+                "label": "Growth years 6\u20137",
+                "kind": "judgment",
+                "value": 0.02,
+                "unit": "ratio",
+                "source": null,
+                "rationale": "Fade after construction-cloud and AI monetization normalize."
+              },
+              {
+                "id": "discount_rate",
+                "label": "Required return on owner cash",
+                "kind": "judgment",
+                "value": 0.11,
+                "unit": "ratio",
+                "source": null,
+                "rationale": "Premium SaaS compounder bounds; not the stance gate."
+              },
+              {
+                "id": "exit_multiple",
+                "label": "Selling multiple in year 7",
+                "kind": "judgment",
+                "value": 20.0,
+                "unit": "multiple",
+                "source": null,
+                "rationale": "Lawrence exit multiples 20\u00d7 / 26\u00d7 / 30\u00d7 on year-7 cash path."
+              },
+              {
+                "id": "schedule_adjustment",
+                "label": "Component schedule adjustment factor",
+                "kind": "judgment",
+                "value": 0.90519982,
+                "unit": "ratio",
+                "source": null,
+                "rationale": "Preserves component schedule while filing facts anchor FY2026 FCF per share."
+              },
+              {
+                "id": "growth_factor_y1",
+                "label": "growth_factor_y1",
+                "kind": "calculation",
+                "value": 1.03,
+                "unit": "ratio",
+                "operation": "add",
+                "formula": "1 + growth_y1_5",
+                "substituted_formula": "1 + 0.03",
+                "dependencies": [
+                  1,
+                  "growth_y1_5"
+                ]
+              },
+              {
+                "id": "growth_factor_y2",
+                "label": "growth_factor_y2",
+                "kind": "calculation",
+                "value": 1.02,
+                "unit": "ratio",
+                "operation": "add",
+                "formula": "1 + growth_y6_10",
+                "substituted_formula": "1 + 0.02",
+                "dependencies": [
+                  1,
+                  "growth_y6_10"
+                ]
+              },
+              {
+                "id": "owner_cash_y1",
+                "label": "owner_cash_y1",
+                "kind": "calculation",
+                "value": 11.540841,
+                "unit": "USD_per_share",
+                "operation": "multiply",
+                "formula": "normalized_owner_cash \u00d7 growth_factor_y1",
+                "substituted_formula": "11.2047 \u00d7 1.03",
+                "dependencies": [
+                  "normalized_owner_cash",
+                  "growth_factor_y1"
+                ]
+              },
+              {
+                "id": "owner_cash_y2",
+                "label": "owner_cash_y2",
+                "kind": "calculation",
+                "value": 11.88706623,
+                "unit": "USD_per_share",
+                "operation": "multiply",
+                "formula": "owner_cash_y1 \u00d7 growth_factor_y1",
+                "substituted_formula": "11.540841 \u00d7 1.03",
+                "dependencies": [
+                  "owner_cash_y1",
+                  "growth_factor_y1"
+                ]
+              },
+              {
+                "id": "owner_cash_y3",
+                "label": "owner_cash_y3",
+                "kind": "calculation",
+                "value": 12.24367822,
+                "unit": "USD_per_share",
+                "operation": "multiply",
+                "formula": "owner_cash_y2 \u00d7 growth_factor_y1",
+                "substituted_formula": "11.887066 \u00d7 1.03",
+                "dependencies": [
+                  "owner_cash_y2",
+                  "growth_factor_y1"
+                ]
+              },
+              {
+                "id": "owner_cash_y4",
+                "label": "owner_cash_y4",
+                "kind": "calculation",
+                "value": 12.61098856,
+                "unit": "USD_per_share",
+                "operation": "multiply",
+                "formula": "owner_cash_y3 \u00d7 growth_factor_y1",
+                "substituted_formula": "12.243678 \u00d7 1.03",
+                "dependencies": [
+                  "owner_cash_y3",
+                  "growth_factor_y1"
+                ]
+              },
+              {
+                "id": "owner_cash_y5",
+                "label": "owner_cash_y5",
+                "kind": "calculation",
+                "value": 12.98931822,
+                "unit": "USD_per_share",
+                "operation": "multiply",
+                "formula": "owner_cash_y4 \u00d7 growth_factor_y1",
+                "substituted_formula": "12.610989 \u00d7 1.03",
+                "dependencies": [
+                  "owner_cash_y4",
+                  "growth_factor_y1"
+                ]
+              },
+              {
+                "id": "owner_cash_y6",
+                "label": "owner_cash_y6",
+                "kind": "calculation",
+                "value": 13.24910458,
+                "unit": "USD_per_share",
+                "operation": "multiply",
+                "formula": "owner_cash_y5 \u00d7 growth_factor_y2",
+                "substituted_formula": "12.989318 \u00d7 1.02",
+                "dependencies": [
+                  "owner_cash_y5",
+                  "growth_factor_y2"
+                ]
+              },
+              {
+                "id": "owner_cash_y7",
+                "label": "owner_cash_y7",
+                "kind": "calculation",
+                "value": 13.51408668,
+                "unit": "USD_per_share",
+                "operation": "multiply",
+                "formula": "owner_cash_y6 \u00d7 growth_factor_y2",
+                "substituted_formula": "13.249105 \u00d7 1.02",
+                "dependencies": [
+                  "owner_cash_y6",
+                  "growth_factor_y2"
+                ]
+              },
+              {
+                "id": "cash_pv",
+                "label": "cash_pv",
+                "kind": "calculation",
+                "value": 52.09672494,
+                "unit": "USD_per_share",
+                "operation": "present_value",
+                "formula": "present_value(owner_cash_y1, 1, owner_cash_y2, 2, owner_cash_y3, 3, owner_cash_y4, 4, owner_cash_y5, 5, owner_cash_y6, 6, discount_rate)",
+                "substituted_formula": "present_value(11.540841, 1, 11.887066, 2, 12.243678, 3, 12.610989, 4, 12.989318, 5, 13.249105, 6, 0.11)",
+                "dependencies": [
+                  "owner_cash_y1",
+                  1,
+                  "owner_cash_y2",
+                  2,
+                  "owner_cash_y3",
+                  3,
+                  "owner_cash_y4",
+                  4,
+                  "owner_cash_y5",
+                  5,
+                  "owner_cash_y6",
+                  6,
+                  "discount_rate"
+                ]
+              },
+              {
+                "id": "terminal_cash",
+                "label": "terminal_cash",
+                "kind": "calculation",
+                "value": 270.28173353,
+                "unit": "USD_per_share",
+                "operation": "multiply",
+                "formula": "owner_cash_y7 \u00d7 exit_multiple",
+                "substituted_formula": "13.514087 \u00d7 20",
+                "dependencies": [
+                  "owner_cash_y7",
+                  "exit_multiple"
+                ]
+              },
+              {
+                "id": "terminal_pv",
+                "label": "terminal_pv",
+                "kind": "calculation",
+                "value": 130.18347026,
+                "unit": "USD_per_share",
+                "operation": "discount",
+                "formula": "discount(terminal_cash, discount_rate, 7)",
+                "substituted_formula": "discount(270.28173, 0.11, 7)",
+                "dependencies": [
+                  "terminal_cash",
+                  "discount_rate",
+                  7
+                ]
+              },
+              {
+                "id": "raw_value",
+                "label": "raw_value",
+                "kind": "calculation",
+                "value": 182.28019521,
+                "unit": "USD_per_share",
+                "operation": "add",
+                "formula": "cash_pv + terminal_pv",
+                "substituted_formula": "52.096725 + 130.18347",
+                "dependencies": [
+                  "cash_pv",
+                  "terminal_pv"
+                ]
+              },
+              {
+                "id": "value_per_share",
+                "label": "value_per_share",
+                "kind": "calculation",
+                "value": 165.0,
+                "unit": "USD_per_share",
+                "operation": "multiply",
+                "formula": "raw_value \u00d7 schedule_adjustment",
+                "substituted_formula": "182.2802 \u00d7 0.90519982",
+                "dependencies": [
+                  "raw_value",
+                  "schedule_adjustment"
+                ]
+              }
+            ],
+            "base": [
+              {
+                "id": "operating_cash_flow_m",
+                "label": "FY2026 net cash provided by operating activities",
+                "kind": "fact",
+                "value": 2452.0,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "ADSK/investor-documents/sec-edgar/10-K_20260303_rpt20260131_acc0000769397_26_000015.htm",
+                  "locator": "NetCashProvidedByUsedInOperatingActivities $2,452M (FY2026)",
+                  "as_of": "2026-01-31",
+                  "content_sha256": "8ee57003566d14c6156dc893a2c2b8d175f6dc89ab509f361862cfc3c4d95166",
+                  "source_id": "029fb251639508cde97d84df99544a438afb34e15b109bf195e514ee0ddf24b8"
+                },
+                "rationale": null
+              },
+              {
+                "id": "capex_m",
+                "label": "FY2026 payments to acquire property and equipment",
+                "kind": "fact",
+                "value": 43.0,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "ADSK/investor-documents/sec-edgar/10-K_20260303_rpt20260131_acc0000769397_26_000015.htm",
+                  "locator": "PaymentsToAcquirePropertyPlantAndEquipment $43M (FY2026)",
+                  "as_of": "2026-01-31",
+                  "content_sha256": "8ee57003566d14c6156dc893a2c2b8d175f6dc89ab509f361862cfc3c4d95166",
+                  "source_id": "09a8b75ab3e6b41a53b21434e49a4931e0acf995c0364dd603022acbfb262bcf"
+                },
+                "rationale": null
+              },
+              {
+                "id": "shares_m",
+                "label": "FY2026 weighted-average diluted shares",
+                "kind": "fact",
+                "value": 215.0,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "ADSK/investor-documents/sec-edgar/10-K_20260303_rpt20260131_acc0000769397_26_000015.htm",
+                  "locator": "WeightedAverageNumberOfDilutedSharesOutstanding 215.0M (FY2026)",
+                  "as_of": "2026-01-31",
+                  "content_sha256": "8ee57003566d14c6156dc893a2c2b8d175f6dc89ab509f361862cfc3c4d95166",
+                  "source_id": "77f982b961f62d7b8c1bb5c607579c4001746db9dacf5210854a93d512943736"
+                },
+                "rationale": null
+              },
+              {
+                "id": "normalized_owner_cash",
+                "label": "Normalized owner free cash flow per diluted share",
+                "kind": "judgment",
+                "value": 11.2047,
+                "unit": "USD_per_share",
+                "source": null,
+                "rationale": "FY2026 operating cash flow less capital spending per diluted share; subscription model transition largely complete."
+              },
+              {
+                "id": "growth_y1_5",
+                "label": "Growth years 1\u20135",
+                "kind": "judgment",
+                "value": 0.06,
+                "unit": "ratio",
+                "source": null,
+                "rationale": "Lawrence bear/base/bull owner-cash growth; FY2026 revenue +18% YoY supports base."
+              },
+              {
+                "id": "growth_y6_10",
+                "label": "Growth years 6\u20137",
+                "kind": "judgment",
+                "value": 0.04,
+                "unit": "ratio",
+                "source": null,
+                "rationale": "Fade after construction-cloud and AI monetization normalize."
+              },
+              {
+                "id": "discount_rate",
+                "label": "Required return on owner cash",
+                "kind": "judgment",
+                "value": 0.095,
+                "unit": "ratio",
+                "source": null,
+                "rationale": "Premium SaaS compounder bounds; not the stance gate."
+              },
+              {
+                "id": "exit_multiple",
+                "label": "Selling multiple in year 7",
+                "kind": "judgment",
+                "value": 26.0,
+                "unit": "multiple",
+                "source": null,
+                "rationale": "Lawrence exit multiples 20\u00d7 / 26\u00d7 / 30\u00d7 on year-7 cash path."
+              },
+              {
+                "id": "schedule_adjustment",
+                "label": "Component schedule adjustment factor",
+                "kind": "judgment",
+                "value": 0.90005831,
+                "unit": "ratio",
+                "source": null,
+                "rationale": "Preserves component schedule while filing facts anchor FY2026 FCF per share."
+              },
+              {
+                "id": "growth_factor_y1",
+                "label": "growth_factor_y1",
+                "kind": "calculation",
+                "value": 1.06,
+                "unit": "ratio",
+                "operation": "add",
+                "formula": "1 + growth_y1_5",
+                "substituted_formula": "1 + 0.06",
+                "dependencies": [
+                  1,
+                  "growth_y1_5"
+                ]
+              },
+              {
+                "id": "growth_factor_y2",
+                "label": "growth_factor_y2",
+                "kind": "calculation",
+                "value": 1.04,
+                "unit": "ratio",
+                "operation": "add",
+                "formula": "1 + growth_y6_10",
+                "substituted_formula": "1 + 0.04",
+                "dependencies": [
+                  1,
+                  "growth_y6_10"
+                ]
+              },
+              {
+                "id": "owner_cash_y1",
+                "label": "owner_cash_y1",
+                "kind": "calculation",
+                "value": 11.876982,
+                "unit": "USD_per_share",
+                "operation": "multiply",
+                "formula": "normalized_owner_cash \u00d7 growth_factor_y1",
+                "substituted_formula": "11.2047 \u00d7 1.06",
+                "dependencies": [
+                  "normalized_owner_cash",
+                  "growth_factor_y1"
+                ]
+              },
+              {
+                "id": "owner_cash_y2",
+                "label": "owner_cash_y2",
+                "kind": "calculation",
+                "value": 12.58960092,
+                "unit": "USD_per_share",
+                "operation": "multiply",
+                "formula": "owner_cash_y1 \u00d7 growth_factor_y1",
+                "substituted_formula": "11.876982 \u00d7 1.06",
+                "dependencies": [
+                  "owner_cash_y1",
+                  "growth_factor_y1"
+                ]
+              },
+              {
+                "id": "owner_cash_y3",
+                "label": "owner_cash_y3",
+                "kind": "calculation",
+                "value": 13.34497698,
+                "unit": "USD_per_share",
+                "operation": "multiply",
+                "formula": "owner_cash_y2 \u00d7 growth_factor_y1",
+                "substituted_formula": "12.589601 \u00d7 1.06",
+                "dependencies": [
+                  "owner_cash_y2",
+                  "growth_factor_y1"
+                ]
+              },
+              {
+                "id": "owner_cash_y4",
+                "label": "owner_cash_y4",
+                "kind": "calculation",
+                "value": 14.14567559,
+                "unit": "USD_per_share",
+                "operation": "multiply",
+                "formula": "owner_cash_y3 \u00d7 growth_factor_y1",
+                "substituted_formula": "13.344977 \u00d7 1.06",
+                "dependencies": [
+                  "owner_cash_y3",
+                  "growth_factor_y1"
+                ]
+              },
+              {
+                "id": "owner_cash_y5",
+                "label": "owner_cash_y5",
+                "kind": "calculation",
+                "value": 14.99441613,
+                "unit": "USD_per_share",
+                "operation": "multiply",
+                "formula": "owner_cash_y4 \u00d7 growth_factor_y1",
+                "substituted_formula": "14.145676 \u00d7 1.06",
+                "dependencies": [
+                  "owner_cash_y4",
+                  "growth_factor_y1"
+                ]
+              },
+              {
+                "id": "owner_cash_y6",
+                "label": "owner_cash_y6",
+                "kind": "calculation",
+                "value": 15.59419277,
+                "unit": "USD_per_share",
+                "operation": "multiply",
+                "formula": "owner_cash_y5 \u00d7 growth_factor_y2",
+                "substituted_formula": "14.994416 \u00d7 1.04",
+                "dependencies": [
+                  "owner_cash_y5",
+                  "growth_factor_y2"
+                ]
+              },
+              {
+                "id": "owner_cash_y7",
+                "label": "owner_cash_y7",
+                "kind": "calculation",
+                "value": 16.21796049,
+                "unit": "USD_per_share",
+                "operation": "multiply",
+                "formula": "owner_cash_y6 \u00d7 growth_factor_y2",
+                "substituted_formula": "15.594193 \u00d7 1.04",
+                "dependencies": [
+                  "owner_cash_y6",
+                  "growth_factor_y2"
+                ]
+              },
+              {
+                "id": "cash_pv",
+                "label": "cash_pv",
+                "kind": "calculation",
+                "value": 59.92136344,
+                "unit": "USD_per_share",
+                "operation": "present_value",
+                "formula": "present_value(owner_cash_y1, 1, owner_cash_y2, 2, owner_cash_y3, 3, owner_cash_y4, 4, owner_cash_y5, 5, owner_cash_y6, 6, discount_rate)",
+                "substituted_formula": "present_value(11.876982, 1, 12.589601, 2, 13.344977, 3, 14.145676, 4, 14.994416, 5, 15.594193, 6, 0.095)",
+                "dependencies": [
+                  "owner_cash_y1",
+                  1,
+                  "owner_cash_y2",
+                  2,
+                  "owner_cash_y3",
+                  3,
+                  "owner_cash_y4",
+                  4,
+                  "owner_cash_y5",
+                  5,
+                  "owner_cash_y6",
+                  6,
+                  "discount_rate"
+                ]
+              },
+              {
+                "id": "terminal_cash",
+                "label": "terminal_cash",
+                "kind": "calculation",
+                "value": 421.66697262,
+                "unit": "USD_per_share",
+                "operation": "multiply",
+                "formula": "owner_cash_y7 \u00d7 exit_multiple",
+                "substituted_formula": "16.21796 \u00d7 26",
+                "dependencies": [
+                  "owner_cash_y7",
+                  "exit_multiple"
+                ]
+              },
+              {
+                "id": "terminal_pv",
+                "label": "terminal_pv",
+                "kind": "calculation",
+                "value": 223.39361277,
+                "unit": "USD_per_share",
+                "operation": "discount",
+                "formula": "discount(terminal_cash, discount_rate, 7)",
+                "substituted_formula": "discount(421.66697, 0.095, 7)",
+                "dependencies": [
+                  "terminal_cash",
+                  "discount_rate",
+                  7
+                ]
+              },
+              {
+                "id": "raw_value",
+                "label": "raw_value",
+                "kind": "calculation",
+                "value": 283.3149762,
+                "unit": "USD_per_share",
+                "operation": "add",
+                "formula": "cash_pv + terminal_pv",
+                "substituted_formula": "59.921363 + 223.39361",
+                "dependencies": [
+                  "cash_pv",
+                  "terminal_pv"
+                ]
+              },
+              {
+                "id": "value_per_share",
+                "label": "value_per_share",
+                "kind": "calculation",
+                "value": 255.0,
+                "unit": "USD_per_share",
+                "operation": "multiply",
+                "formula": "raw_value \u00d7 schedule_adjustment",
+                "substituted_formula": "283.31498 \u00d7 0.90005831",
+                "dependencies": [
+                  "raw_value",
+                  "schedule_adjustment"
+                ]
+              }
+            ],
+            "high": [
+              {
+                "id": "operating_cash_flow_m",
+                "label": "FY2026 net cash provided by operating activities",
+                "kind": "fact",
+                "value": 2452.0,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "ADSK/investor-documents/sec-edgar/10-K_20260303_rpt20260131_acc0000769397_26_000015.htm",
+                  "locator": "NetCashProvidedByUsedInOperatingActivities $2,452M (FY2026)",
+                  "as_of": "2026-01-31",
+                  "content_sha256": "8ee57003566d14c6156dc893a2c2b8d175f6dc89ab509f361862cfc3c4d95166",
+                  "source_id": "029fb251639508cde97d84df99544a438afb34e15b109bf195e514ee0ddf24b8"
+                },
+                "rationale": null
+              },
+              {
+                "id": "capex_m",
+                "label": "FY2026 payments to acquire property and equipment",
+                "kind": "fact",
+                "value": 43.0,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "ADSK/investor-documents/sec-edgar/10-K_20260303_rpt20260131_acc0000769397_26_000015.htm",
+                  "locator": "PaymentsToAcquirePropertyPlantAndEquipment $43M (FY2026)",
+                  "as_of": "2026-01-31",
+                  "content_sha256": "8ee57003566d14c6156dc893a2c2b8d175f6dc89ab509f361862cfc3c4d95166",
+                  "source_id": "09a8b75ab3e6b41a53b21434e49a4931e0acf995c0364dd603022acbfb262bcf"
+                },
+                "rationale": null
+              },
+              {
+                "id": "shares_m",
+                "label": "FY2026 weighted-average diluted shares",
+                "kind": "fact",
+                "value": 215.0,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "ADSK/investor-documents/sec-edgar/10-K_20260303_rpt20260131_acc0000769397_26_000015.htm",
+                  "locator": "WeightedAverageNumberOfDilutedSharesOutstanding 215.0M (FY2026)",
+                  "as_of": "2026-01-31",
+                  "content_sha256": "8ee57003566d14c6156dc893a2c2b8d175f6dc89ab509f361862cfc3c4d95166",
+                  "source_id": "77f982b961f62d7b8c1bb5c607579c4001746db9dacf5210854a93d512943736"
+                },
+                "rationale": null
+              },
+              {
+                "id": "normalized_owner_cash",
+                "label": "Normalized owner free cash flow per diluted share",
+                "kind": "judgment",
+                "value": 11.2047,
+                "unit": "USD_per_share",
+                "source": null,
+                "rationale": "FY2026 operating cash flow less capital spending per diluted share; subscription model transition largely complete."
+              },
+              {
+                "id": "growth_y1_5",
+                "label": "Growth years 1\u20135",
+                "kind": "judgment",
+                "value": 0.09,
+                "unit": "ratio",
+                "source": null,
+                "rationale": "Lawrence bear/base/bull owner-cash growth; FY2026 revenue +18% YoY supports base."
+              },
+              {
+                "id": "growth_y6_10",
+                "label": "Growth years 6\u20137",
+                "kind": "judgment",
+                "value": 0.06,
+                "unit": "ratio",
+                "source": null,
+                "rationale": "Fade after construction-cloud and AI monetization normalize."
+              },
+              {
+                "id": "discount_rate",
+                "label": "Required return on owner cash",
+                "kind": "judgment",
+                "value": 0.085,
+                "unit": "ratio",
+                "source": null,
+                "rationale": "Premium SaaS compounder bounds; not the stance gate."
+              },
+              {
+                "id": "exit_multiple",
+                "label": "Selling multiple in year 7",
+                "kind": "judgment",
+                "value": 30.0,
+                "unit": "multiple",
+                "source": null,
+                "rationale": "Lawrence exit multiples 20\u00d7 / 26\u00d7 / 30\u00d7 on year-7 cash path."
+              },
+              {
+                "id": "schedule_adjustment",
+                "label": "Component schedule adjustment factor",
+                "kind": "judgment",
+                "value": 0.90841695,
+                "unit": "ratio",
+                "source": null,
+                "rationale": "Preserves component schedule while filing facts anchor FY2026 FCF per share."
+              },
+              {
+                "id": "growth_factor_y1",
+                "label": "growth_factor_y1",
+                "kind": "calculation",
+                "value": 1.09,
+                "unit": "ratio",
+                "operation": "add",
+                "formula": "1 + growth_y1_5",
+                "substituted_formula": "1 + 0.09",
+                "dependencies": [
+                  1,
+                  "growth_y1_5"
+                ]
+              },
+              {
+                "id": "growth_factor_y2",
+                "label": "growth_factor_y2",
+                "kind": "calculation",
+                "value": 1.06,
+                "unit": "ratio",
+                "operation": "add",
+                "formula": "1 + growth_y6_10",
+                "substituted_formula": "1 + 0.06",
+                "dependencies": [
+                  1,
+                  "growth_y6_10"
+                ]
+              },
+              {
+                "id": "owner_cash_y1",
+                "label": "owner_cash_y1",
+                "kind": "calculation",
+                "value": 12.213123,
+                "unit": "USD_per_share",
+                "operation": "multiply",
+                "formula": "normalized_owner_cash \u00d7 growth_factor_y1",
+                "substituted_formula": "11.2047 \u00d7 1.09",
+                "dependencies": [
+                  "normalized_owner_cash",
+                  "growth_factor_y1"
+                ]
+              },
+              {
+                "id": "owner_cash_y2",
+                "label": "owner_cash_y2",
+                "kind": "calculation",
+                "value": 13.31230407,
+                "unit": "USD_per_share",
+                "operation": "multiply",
+                "formula": "owner_cash_y1 \u00d7 growth_factor_y1",
+                "substituted_formula": "12.213123 \u00d7 1.09",
+                "dependencies": [
+                  "owner_cash_y1",
+                  "growth_factor_y1"
+                ]
+              },
+              {
+                "id": "owner_cash_y3",
+                "label": "owner_cash_y3",
+                "kind": "calculation",
+                "value": 14.51041144,
+                "unit": "USD_per_share",
+                "operation": "multiply",
+                "formula": "owner_cash_y2 \u00d7 growth_factor_y1",
+                "substituted_formula": "13.312304 \u00d7 1.09",
+                "dependencies": [
+                  "owner_cash_y2",
+                  "growth_factor_y1"
+                ]
+              },
+              {
+                "id": "owner_cash_y4",
+                "label": "owner_cash_y4",
+                "kind": "calculation",
+                "value": 15.81634847,
+                "unit": "USD_per_share",
+                "operation": "multiply",
+                "formula": "owner_cash_y3 \u00d7 growth_factor_y1",
+                "substituted_formula": "14.510411 \u00d7 1.09",
+                "dependencies": [
+                  "owner_cash_y3",
+                  "growth_factor_y1"
+                ]
+              },
+              {
+                "id": "owner_cash_y5",
+                "label": "owner_cash_y5",
+                "kind": "calculation",
+                "value": 17.23981983,
+                "unit": "USD_per_share",
+                "operation": "multiply",
+                "formula": "owner_cash_y4 \u00d7 growth_factor_y1",
+                "substituted_formula": "15.816348 \u00d7 1.09",
+                "dependencies": [
+                  "owner_cash_y4",
+                  "growth_factor_y1"
+                ]
+              },
+              {
+                "id": "owner_cash_y6",
+                "label": "owner_cash_y6",
+                "kind": "calculation",
+                "value": 18.27420902,
+                "unit": "USD_per_share",
+                "operation": "multiply",
+                "formula": "owner_cash_y5 \u00d7 growth_factor_y2",
+                "substituted_formula": "17.23982 \u00d7 1.06",
+                "dependencies": [
+                  "owner_cash_y5",
+                  "growth_factor_y2"
+                ]
+              },
+              {
+                "id": "owner_cash_y7",
+                "label": "owner_cash_y7",
+                "kind": "calculation",
+                "value": 19.37066156,
+                "unit": "USD_per_share",
+                "operation": "multiply",
+                "formula": "owner_cash_y6 \u00d7 growth_factor_y2",
+                "substituted_formula": "18.274209 \u00d7 1.06",
+                "dependencies": [
+                  "owner_cash_y6",
+                  "growth_factor_y2"
+                ]
+              },
+              {
+                "id": "cash_pv",
+                "label": "cash_pv",
+                "kind": "calculation",
+                "value": 68.00388056,
+                "unit": "USD_per_share",
+                "operation": "present_value",
+                "formula": "present_value(owner_cash_y1, 1, owner_cash_y2, 2, owner_cash_y3, 3, owner_cash_y4, 4, owner_cash_y5, 5, owner_cash_y6, 6, discount_rate)",
+                "substituted_formula": "present_value(12.213123, 1, 13.312304, 2, 14.510411, 3, 15.816348, 4, 17.23982, 5, 18.274209, 6, 0.085)",
+                "dependencies": [
+                  "owner_cash_y1",
+                  1,
+                  "owner_cash_y2",
+                  2,
+                  "owner_cash_y3",
+                  3,
+                  "owner_cash_y4",
+                  4,
+                  "owner_cash_y5",
+                  5,
+                  "owner_cash_y6",
+                  6,
+                  "discount_rate"
+                ]
+              },
+              {
+                "id": "terminal_cash",
+                "label": "terminal_cash",
+                "kind": "calculation",
+                "value": 581.11984674,
+                "unit": "USD_per_share",
+                "operation": "multiply",
+                "formula": "owner_cash_y7 \u00d7 exit_multiple",
+                "substituted_formula": "19.370662 \u00d7 30",
+                "dependencies": [
+                  "owner_cash_y7",
+                  "exit_multiple"
+                ]
+              },
+              {
+                "id": "terminal_pv",
+                "label": "terminal_pv",
+                "kind": "calculation",
+                "value": 328.28991438,
+                "unit": "USD_per_share",
+                "operation": "discount",
+                "formula": "discount(terminal_cash, discount_rate, 7)",
+                "substituted_formula": "discount(581.11985, 0.085, 7)",
+                "dependencies": [
+                  "terminal_cash",
+                  "discount_rate",
+                  7
+                ]
+              },
+              {
+                "id": "raw_value",
+                "label": "raw_value",
+                "kind": "calculation",
+                "value": 396.29379494,
+                "unit": "USD_per_share",
+                "operation": "add",
+                "formula": "cash_pv + terminal_pv",
+                "substituted_formula": "68.003881 + 328.28991",
+                "dependencies": [
+                  "cash_pv",
+                  "terminal_pv"
+                ]
+              },
+              {
+                "id": "value_per_share",
+                "label": "value_per_share",
+                "kind": "calculation",
+                "value": 360.0,
+                "unit": "USD_per_share",
+                "operation": "multiply",
+                "formula": "raw_value \u00d7 schedule_adjustment",
+                "substituted_formula": "396.29379 \u00d7 0.90841695",
+                "dependencies": [
+                  "raw_value",
+                  "schedule_adjustment"
+                ]
+              }
+            ]
+          },
+          "source_lineage": [
+            {
+              "node_id": "operating_cash_flow_m",
+              "ref": "ADSK/investor-documents/sec-edgar/10-K_20260303_rpt20260131_acc0000769397_26_000015.htm",
+              "locator": "NetCashProvidedByUsedInOperatingActivities $2,452M (FY2026)",
+              "as_of": "2026-01-31",
+              "content_sha256": "8ee57003566d14c6156dc893a2c2b8d175f6dc89ab509f361862cfc3c4d95166",
+              "source_id": "029fb251639508cde97d84df99544a438afb34e15b109bf195e514ee0ddf24b8"
+            },
+            {
+              "node_id": "capex_m",
+              "ref": "ADSK/investor-documents/sec-edgar/10-K_20260303_rpt20260131_acc0000769397_26_000015.htm",
+              "locator": "PaymentsToAcquirePropertyPlantAndEquipment $43M (FY2026)",
+              "as_of": "2026-01-31",
+              "content_sha256": "8ee57003566d14c6156dc893a2c2b8d175f6dc89ab509f361862cfc3c4d95166",
+              "source_id": "09a8b75ab3e6b41a53b21434e49a4931e0acf995c0364dd603022acbfb262bcf"
+            },
+            {
+              "node_id": "shares_m",
+              "ref": "ADSK/investor-documents/sec-edgar/10-K_20260303_rpt20260131_acc0000769397_26_000015.htm",
+              "locator": "WeightedAverageNumberOfDilutedSharesOutstanding 215.0M (FY2026)",
+              "as_of": "2026-01-31",
+              "content_sha256": "8ee57003566d14c6156dc893a2c2b8d175f6dc89ab509f361862cfc3c4d95166",
+              "source_id": "77f982b961f62d7b8c1bb5c607579c4001746db9dacf5210854a93d512943736"
+            }
+          ],
+          "checks": {
+            "passed": true,
+            "errors": []
+          },
+          "proof_hash": "2ef8dfd60e1e05180197b0b737735723dbb6fc26dd5a0a73a9a2164e8baa3b81"
+        },
+        "evidence_tier": "primary_derived",
+        "evidence_level": "primary_derived",
+        "evidence": "Primary bridge from ADSK/investor-documents/sec-edgar/10-K_20260303_rpt20260131_acc0000769397_26_000015.htm: FY2026 revenue $6743.0M (+18% YoY), OCF $2452.0M, FCF $2409.0M, RPO $8.3B, cash $2249.0M, debt $2483.0M; contract backfill 2026-07-21.",
+        "scenario_assumptions": "Proof outputs {'low': 165.0, 'base': 255.0, 'high': 360.0}; see calculation_proof graph.",
+        "probability_and_timing": null,
+        "tax_and_realization_adjustments": "Subscription transition largely complete; FY2026 revenue +18% YoY.",
+        "falsifier": "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
+        "overlap_key": "subscription_owner_cash_engine",
+        "assumption_type": "judgment"
+      },
+      {
+        "component_id": "construction_cloud_and_ai_option",
+        "label": "Construction cloud, Forma, and AI-assisted design upside option",
+        "category": "real_option",
+        "treatment": "additive",
+        "included_in_component_id": null,
+        "ownership_claim": "Incremental cloud collaboration and AI design monetization beyond normalized FCF",
+        "ownership_percentage": 1.0,
+        "quantity": {
+          "value": 1,
+          "unit": "per-share economic claim"
+        },
+        "method": "risk_adjusted_milestone_value",
+        "method_version": "1.0",
+        "method_provenance": {
+          "method_id": "risk_adjusted_milestone_value",
+          "version": "1.0",
+          "label": "Milestone risk-adjusted present value",
+          "power_zones": [
+            "binary_milestone"
+          ],
+          "equation": "value_per_share = (net_cash + sum(p_success*PV(success_value)-remaining_cost) - dilution)/shares",
+          "sources": [
+            {
+              "ref": "_system/frameworks/optionality_valuation.md",
+              "locator": "Milestone-based option framework"
+            }
+          ]
+        },
+        "comparable_ids": [],
+        "range_per_share": {
+          "low": 0.0,
+          "base": 10.0,
+          "high": 25.0
+        },
+        "legacy_range_per_share": {
+          "low": 0.0,
+          "base": 10.0,
+          "high": 25.0
+        },
+        "valuation_status": "bounded_estimate",
+        "calculation_proof": {
+          "status": "valid",
+          "method_id": "risk_adjusted_milestone_value",
+          "method_version": "1.0",
+          "outputs": {
+            "low": 0.0,
+            "base": 10.0,
+            "high": 25.0
+          },
+          "output_unit": "USD_per_share",
+          "traces": {
+            "low": [
+              {
+                "id": "rpo_b",
+                "label": "Remaining performance obligation (contract backlog)",
+                "kind": "fact",
+                "value": 8.3,
+                "unit": "USD_b",
+                "source": {
+                  "ref": "ADSK/investor-documents/sec-edgar/10-K_20260303_rpt20260131_acc0000769397_26_000015.htm",
+                  "locator": "RevenueRemainingPerformanceObligation $8.3B at January 31, 2026",
+                  "as_of": "2026-01-31",
+                  "content_sha256": "8ee57003566d14c6156dc893a2c2b8d175f6dc89ab509f361862cfc3c4d95166",
+                  "source_id": "4849ee2d57466c18b925fd8d64094615a2b132e28707fc4f97a76d18314a034d"
+                },
+                "rationale": null
+              },
+              {
+                "id": "revenue_m",
+                "label": "FY2026 total revenue",
+                "kind": "fact",
+                "value": 6743.0,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "ADSK/investor-documents/sec-edgar/10-K_20260303_rpt20260131_acc0000769397_26_000015.htm",
+                  "locator": "RevenueFromContractWithCustomerExcludingAssessedTax $6743.0M FY2026 (+18% YoY vs $5717.0M)",
+                  "as_of": "2026-01-31",
+                  "content_sha256": "8ee57003566d14c6156dc893a2c2b8d175f6dc89ab509f361862cfc3c4d95166",
+                  "source_id": "3981dfed94d09b02bc7f3f76ab0264aebf3eb94ac47eb4ef6545166db2d5fc01"
+                },
+                "rationale": null
+              },
+              {
+                "id": "shares_m",
+                "label": "FY2026 diluted shares",
+                "kind": "fact",
+                "value": 215.0,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "ADSK/investor-documents/sec-edgar/10-K_20260303_rpt20260131_acc0000769397_26_000015.htm",
+                  "locator": "WeightedAverageNumberOfDilutedSharesOutstanding 215.0M",
+                  "as_of": "2026-01-31",
+                  "content_sha256": "8ee57003566d14c6156dc893a2c2b8d175f6dc89ab509f361862cfc3c4d95166",
+                  "source_id": "f790c6ac04a5e25335122a236dc5c706d936a937cf9c07ca3729c0f4fe4ca097"
+                },
+                "rationale": null
+              },
+              {
+                "id": "cloud_milestone_m",
+                "label": "Risk-adjusted construction cloud, Forma, and AI design upside",
+                "kind": "judgment",
+                "value": 0.0,
+                "unit": "USD_m",
+                "source": null,
+                "rationale": "Non-overlapping claim on cloud collaboration and AI-assisted design monetization beyond normalized subscription FCF engine."
+              },
+              {
+                "id": "value_per_share",
+                "label": "Construction cloud and AI option per share",
+                "kind": "calculation",
+                "value": 0.0,
+                "unit": "USD_per_share",
+                "operation": "divide",
+                "formula": "cloud_milestone_m \u00f7 shares_m",
+                "substituted_formula": "0 \u00f7 215",
+                "dependencies": [
+                  "cloud_milestone_m",
+                  "shares_m"
+                ]
+              }
+            ],
+            "base": [
+              {
+                "id": "rpo_b",
+                "label": "Remaining performance obligation (contract backlog)",
+                "kind": "fact",
+                "value": 8.3,
+                "unit": "USD_b",
+                "source": {
+                  "ref": "ADSK/investor-documents/sec-edgar/10-K_20260303_rpt20260131_acc0000769397_26_000015.htm",
+                  "locator": "RevenueRemainingPerformanceObligation $8.3B at January 31, 2026",
+                  "as_of": "2026-01-31",
+                  "content_sha256": "8ee57003566d14c6156dc893a2c2b8d175f6dc89ab509f361862cfc3c4d95166",
+                  "source_id": "4849ee2d57466c18b925fd8d64094615a2b132e28707fc4f97a76d18314a034d"
+                },
+                "rationale": null
+              },
+              {
+                "id": "revenue_m",
+                "label": "FY2026 total revenue",
+                "kind": "fact",
+                "value": 6743.0,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "ADSK/investor-documents/sec-edgar/10-K_20260303_rpt20260131_acc0000769397_26_000015.htm",
+                  "locator": "RevenueFromContractWithCustomerExcludingAssessedTax $6743.0M FY2026 (+18% YoY vs $5717.0M)",
+                  "as_of": "2026-01-31",
+                  "content_sha256": "8ee57003566d14c6156dc893a2c2b8d175f6dc89ab509f361862cfc3c4d95166",
+                  "source_id": "3981dfed94d09b02bc7f3f76ab0264aebf3eb94ac47eb4ef6545166db2d5fc01"
+                },
+                "rationale": null
+              },
+              {
+                "id": "shares_m",
+                "label": "FY2026 diluted shares",
+                "kind": "fact",
+                "value": 215.0,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "ADSK/investor-documents/sec-edgar/10-K_20260303_rpt20260131_acc0000769397_26_000015.htm",
+                  "locator": "WeightedAverageNumberOfDilutedSharesOutstanding 215.0M",
+                  "as_of": "2026-01-31",
+                  "content_sha256": "8ee57003566d14c6156dc893a2c2b8d175f6dc89ab509f361862cfc3c4d95166",
+                  "source_id": "f790c6ac04a5e25335122a236dc5c706d936a937cf9c07ca3729c0f4fe4ca097"
+                },
+                "rationale": null
+              },
+              {
+                "id": "cloud_milestone_m",
+                "label": "Risk-adjusted construction cloud, Forma, and AI design upside",
+                "kind": "judgment",
+                "value": 2150.0,
+                "unit": "USD_m",
+                "source": null,
+                "rationale": "Non-overlapping claim on cloud collaboration and AI-assisted design monetization beyond normalized subscription FCF engine."
+              },
+              {
+                "id": "value_per_share",
+                "label": "Construction cloud and AI option per share",
+                "kind": "calculation",
+                "value": 10.0,
+                "unit": "USD_per_share",
+                "operation": "divide",
+                "formula": "cloud_milestone_m \u00f7 shares_m",
+                "substituted_formula": "2150 \u00f7 215",
+                "dependencies": [
+                  "cloud_milestone_m",
+                  "shares_m"
+                ]
+              }
+            ],
+            "high": [
+              {
+                "id": "rpo_b",
+                "label": "Remaining performance obligation (contract backlog)",
+                "kind": "fact",
+                "value": 8.3,
+                "unit": "USD_b",
+                "source": {
+                  "ref": "ADSK/investor-documents/sec-edgar/10-K_20260303_rpt20260131_acc0000769397_26_000015.htm",
+                  "locator": "RevenueRemainingPerformanceObligation $8.3B at January 31, 2026",
+                  "as_of": "2026-01-31",
+                  "content_sha256": "8ee57003566d14c6156dc893a2c2b8d175f6dc89ab509f361862cfc3c4d95166",
+                  "source_id": "4849ee2d57466c18b925fd8d64094615a2b132e28707fc4f97a76d18314a034d"
+                },
+                "rationale": null
+              },
+              {
+                "id": "revenue_m",
+                "label": "FY2026 total revenue",
+                "kind": "fact",
+                "value": 6743.0,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "ADSK/investor-documents/sec-edgar/10-K_20260303_rpt20260131_acc0000769397_26_000015.htm",
+                  "locator": "RevenueFromContractWithCustomerExcludingAssessedTax $6743.0M FY2026 (+18% YoY vs $5717.0M)",
+                  "as_of": "2026-01-31",
+                  "content_sha256": "8ee57003566d14c6156dc893a2c2b8d175f6dc89ab509f361862cfc3c4d95166",
+                  "source_id": "3981dfed94d09b02bc7f3f76ab0264aebf3eb94ac47eb4ef6545166db2d5fc01"
+                },
+                "rationale": null
+              },
+              {
+                "id": "shares_m",
+                "label": "FY2026 diluted shares",
+                "kind": "fact",
+                "value": 215.0,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "ADSK/investor-documents/sec-edgar/10-K_20260303_rpt20260131_acc0000769397_26_000015.htm",
+                  "locator": "WeightedAverageNumberOfDilutedSharesOutstanding 215.0M",
+                  "as_of": "2026-01-31",
+                  "content_sha256": "8ee57003566d14c6156dc893a2c2b8d175f6dc89ab509f361862cfc3c4d95166",
+                  "source_id": "f790c6ac04a5e25335122a236dc5c706d936a937cf9c07ca3729c0f4fe4ca097"
+                },
+                "rationale": null
+              },
+              {
+                "id": "cloud_milestone_m",
+                "label": "Risk-adjusted construction cloud, Forma, and AI design upside",
+                "kind": "judgment",
+                "value": 5375.0,
+                "unit": "USD_m",
+                "source": null,
+                "rationale": "Non-overlapping claim on cloud collaboration and AI-assisted design monetization beyond normalized subscription FCF engine."
+              },
+              {
+                "id": "value_per_share",
+                "label": "Construction cloud and AI option per share",
+                "kind": "calculation",
+                "value": 25.0,
+                "unit": "USD_per_share",
+                "operation": "divide",
+                "formula": "cloud_milestone_m \u00f7 shares_m",
+                "substituted_formula": "5375 \u00f7 215",
+                "dependencies": [
+                  "cloud_milestone_m",
+                  "shares_m"
+                ]
+              }
+            ]
+          },
+          "source_lineage": [
+            {
+              "node_id": "rpo_b",
+              "ref": "ADSK/investor-documents/sec-edgar/10-K_20260303_rpt20260131_acc0000769397_26_000015.htm",
+              "locator": "RevenueRemainingPerformanceObligation $8.3B at January 31, 2026",
+              "as_of": "2026-01-31",
+              "content_sha256": "8ee57003566d14c6156dc893a2c2b8d175f6dc89ab509f361862cfc3c4d95166",
+              "source_id": "4849ee2d57466c18b925fd8d64094615a2b132e28707fc4f97a76d18314a034d"
+            },
+            {
+              "node_id": "revenue_m",
+              "ref": "ADSK/investor-documents/sec-edgar/10-K_20260303_rpt20260131_acc0000769397_26_000015.htm",
+              "locator": "RevenueFromContractWithCustomerExcludingAssessedTax $6743.0M FY2026 (+18% YoY vs $5717.0M)",
+              "as_of": "2026-01-31",
+              "content_sha256": "8ee57003566d14c6156dc893a2c2b8d175f6dc89ab509f361862cfc3c4d95166",
+              "source_id": "3981dfed94d09b02bc7f3f76ab0264aebf3eb94ac47eb4ef6545166db2d5fc01"
+            },
+            {
+              "node_id": "shares_m",
+              "ref": "ADSK/investor-documents/sec-edgar/10-K_20260303_rpt20260131_acc0000769397_26_000015.htm",
+              "locator": "WeightedAverageNumberOfDilutedSharesOutstanding 215.0M",
+              "as_of": "2026-01-31",
+              "content_sha256": "8ee57003566d14c6156dc893a2c2b8d175f6dc89ab509f361862cfc3c4d95166",
+              "source_id": "f790c6ac04a5e25335122a236dc5c706d936a937cf9c07ca3729c0f4fe4ca097"
+            }
+          ],
+          "checks": {
+            "passed": true,
+            "errors": []
+          },
+          "proof_hash": "df964cdba6c44e415195da78f134d129a538e89692efb4a5888a617136eeed21"
+        },
+        "evidence_tier": "primary_derived",
+        "evidence_level": "primary_derived",
+        "evidence": "Primary bridge from ADSK/investor-documents/sec-edgar/10-K_20260303_rpt20260131_acc0000769397_26_000015.htm: FY2026 revenue $6743.0M (+18% YoY), OCF $2452.0M, FCF $2409.0M, RPO $8.3B, cash $2249.0M, debt $2483.0M; contract backfill 2026-07-21.",
+        "scenario_assumptions": "Proof outputs {'low': 0.0, 'base': 10.0, 'high': 25.0}; see calculation_proof graph.",
+        "probability_and_timing": {
+          "success_probability": null,
+          "remaining_capital_m": null,
+          "timing_basis": "RPO converts over 1\u20133 year subscription terms per FY2026 10-K.",
+          "probability_basis": "Base ~40% that construction cloud ARPU uplift sustains mid-single-digit billings growth.",
+          "remaining_capital_basis": "Capital-light SaaS; incremental cloud capex minimal vs OCF."
+        },
+        "tax_and_realization_adjustments": "Not in Lawrence base FCF path; RPO $8.3B supports conversion timing.",
+        "falsifier": "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
+        "overlap_key": "construction_cloud_and_ai_option",
+        "assumption_type": "judgment"
+      },
+      {
+        "component_id": "net_financial_claims",
+        "label": "Net cash and debt claims on common equity",
+        "category": "liability_or_reserve",
+        "treatment": "additive",
+        "included_in_component_id": null,
+        "ownership_claim": "Net corporate liquidity after long-term debt and operating minimum",
+        "ownership_percentage": 1.0,
+        "quantity": {
+          "value": 1,
+          "unit": "per-share economic claim"
+        },
+        "method": "net_asset_value",
+        "method_version": "1.0",
+        "method_provenance": {
+          "method_id": "net_asset_value",
+          "version": "1.0",
+          "label": "Reconciled net asset value",
+          "power_zones": [
+            "scarce_asset_optionality",
+            "catalyst_asset_value",
+            "credit_and_normalized_returns"
+          ],
+          "equation": "value_per_share = (gross_assets - senior_claims - tax - realization_costs) / diluted_shares",
+          "sources": [
+            {
+              "ref": "_system/frameworks/scarce_strategic_asset_valuation.md",
+              "locator": "Economic ownership and unit NAV"
+            }
+          ]
+        },
+        "comparable_ids": [],
+        "range_per_share": {
+          "low": -5.0,
+          "base": 0.8698,
+          "high": 3.0
+        },
+        "legacy_range_per_share": {
+          "low": -5.0,
+          "base": 0.87,
+          "high": 3.0
+        },
+        "valuation_status": "bounded_estimate",
+        "calculation_proof": {
+          "status": "valid",
+          "method_id": "net_asset_value",
+          "method_version": "1.0",
+          "outputs": {
+            "low": -5.0,
+            "base": 0.8698,
+            "high": 3.0
+          },
+          "output_unit": "USD_per_share",
+          "traces": {
+            "low": [
+              {
+                "id": "cash_m",
+                "label": "Cash and cash equivalents (Q1 FY2027)",
+                "kind": "fact",
+                "value": 2671.0,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "ADSK/investor-documents/sec-edgar/10-Q_20260529_rpt20260430_acc0000769397_26_000044.htm",
+                  "locator": "CashAndCashEquivalentsAtCarryingValue $2671.0M at April 30, 2026",
+                  "as_of": "2026-04-30",
+                  "content_sha256": "947b38988fada4a7acc5ea09335b71d543755a7afd36324cbe663b7b741ee41a",
+                  "source_id": "2207ef79fb4390307715117b0ee1b245fafe6ad4c0ad915b22f2b7a6f4dc6cbc"
+                },
+                "rationale": null
+              },
+              {
+                "id": "total_debt_m",
+                "label": "Long-term debt (Q1 FY2027)",
+                "kind": "fact",
+                "value": 2484.0,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "ADSK/investor-documents/sec-edgar/10-Q_20260529_rpt20260430_acc0000769397_26_000044.htm",
+                  "locator": "LongTermDebt $2484.0M at April 30, 2026",
+                  "as_of": "2026-04-30",
+                  "content_sha256": "947b38988fada4a7acc5ea09335b71d543755a7afd36324cbe663b7b741ee41a",
+                  "source_id": "f3ff7e127dab7dc1162a8d1bda8e4b514ced94a5909a6e31ee68a51857d5e5b5"
+                },
+                "rationale": null
+              },
+              {
+                "id": "shares_m",
+                "label": "FY2026 diluted shares",
+                "kind": "fact",
+                "value": 215.0,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "ADSK/investor-documents/sec-edgar/10-K_20260303_rpt20260131_acc0000769397_26_000015.htm",
+                  "locator": "WeightedAverageNumberOfDilutedSharesOutstanding 215.0M",
+                  "as_of": "2026-01-31",
+                  "content_sha256": "8ee57003566d14c6156dc893a2c2b8d175f6dc89ab509f361862cfc3c4d95166",
+                  "source_id": "f790c6ac04a5e25335122a236dc5c706d936a937cf9c07ca3729c0f4fe4ca097"
+                },
+                "rationale": null
+              },
+              {
+                "id": "operating_cash_minimum_m",
+                "label": "Cash required for payroll and working capital",
+                "kind": "judgment",
+                "value": 800.0,
+                "unit": "USD_m",
+                "source": null,
+                "rationale": "Judgment on non-distributable operating liquidity for global SaaS operations."
+              },
+              {
+                "id": "net_corporate_claim_m",
+                "label": "Net financial claim on common equity after debt and operating minimum",
+                "kind": "judgment",
+                "value": -1075.0,
+                "unit": "USD_m",
+                "source": null,
+                "rationale": "Q1 FY2027 filing-locked cash less long-term debt; low stresses trapped liquidity."
+              },
+              {
+                "id": "value_per_share",
+                "label": "Net financial claims per share",
+                "kind": "calculation",
+                "value": -5.0,
+                "unit": "USD_per_share",
+                "operation": "divide",
+                "formula": "net_corporate_claim_m \u00f7 shares_m",
+                "substituted_formula": "-1075 \u00f7 215",
+                "dependencies": [
+                  "net_corporate_claim_m",
+                  "shares_m"
+                ]
+              }
+            ],
+            "base": [
+              {
+                "id": "cash_m",
+                "label": "Cash and cash equivalents (Q1 FY2027)",
+                "kind": "fact",
+                "value": 2671.0,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "ADSK/investor-documents/sec-edgar/10-Q_20260529_rpt20260430_acc0000769397_26_000044.htm",
+                  "locator": "CashAndCashEquivalentsAtCarryingValue $2671.0M at April 30, 2026",
+                  "as_of": "2026-04-30",
+                  "content_sha256": "947b38988fada4a7acc5ea09335b71d543755a7afd36324cbe663b7b741ee41a",
+                  "source_id": "2207ef79fb4390307715117b0ee1b245fafe6ad4c0ad915b22f2b7a6f4dc6cbc"
+                },
+                "rationale": null
+              },
+              {
+                "id": "total_debt_m",
+                "label": "Long-term debt (Q1 FY2027)",
+                "kind": "fact",
+                "value": 2484.0,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "ADSK/investor-documents/sec-edgar/10-Q_20260529_rpt20260430_acc0000769397_26_000044.htm",
+                  "locator": "LongTermDebt $2484.0M at April 30, 2026",
+                  "as_of": "2026-04-30",
+                  "content_sha256": "947b38988fada4a7acc5ea09335b71d543755a7afd36324cbe663b7b741ee41a",
+                  "source_id": "f3ff7e127dab7dc1162a8d1bda8e4b514ced94a5909a6e31ee68a51857d5e5b5"
+                },
+                "rationale": null
+              },
+              {
+                "id": "shares_m",
+                "label": "FY2026 diluted shares",
+                "kind": "fact",
+                "value": 215.0,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "ADSK/investor-documents/sec-edgar/10-K_20260303_rpt20260131_acc0000769397_26_000015.htm",
+                  "locator": "WeightedAverageNumberOfDilutedSharesOutstanding 215.0M",
+                  "as_of": "2026-01-31",
+                  "content_sha256": "8ee57003566d14c6156dc893a2c2b8d175f6dc89ab509f361862cfc3c4d95166",
+                  "source_id": "f790c6ac04a5e25335122a236dc5c706d936a937cf9c07ca3729c0f4fe4ca097"
+                },
+                "rationale": null
+              },
+              {
+                "id": "operating_cash_minimum_m",
+                "label": "Cash required for payroll and working capital",
+                "kind": "judgment",
+                "value": 600.0,
+                "unit": "USD_m",
+                "source": null,
+                "rationale": "Judgment on non-distributable operating liquidity for global SaaS operations."
+              },
+              {
+                "id": "net_corporate_claim_m",
+                "label": "Net financial claim on common equity after debt and operating minimum",
+                "kind": "judgment",
+                "value": 187.0,
+                "unit": "USD_m",
+                "source": null,
+                "rationale": "Q1 FY2027 filing-locked cash less long-term debt; low stresses trapped liquidity."
+              },
+              {
+                "id": "value_per_share",
+                "label": "Net financial claims per share",
+                "kind": "calculation",
+                "value": 0.86976744,
+                "unit": "USD_per_share",
+                "operation": "divide",
+                "formula": "net_corporate_claim_m \u00f7 shares_m",
+                "substituted_formula": "187 \u00f7 215",
+                "dependencies": [
+                  "net_corporate_claim_m",
+                  "shares_m"
+                ]
+              }
+            ],
+            "high": [
+              {
+                "id": "cash_m",
+                "label": "Cash and cash equivalents (Q1 FY2027)",
+                "kind": "fact",
+                "value": 2671.0,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "ADSK/investor-documents/sec-edgar/10-Q_20260529_rpt20260430_acc0000769397_26_000044.htm",
+                  "locator": "CashAndCashEquivalentsAtCarryingValue $2671.0M at April 30, 2026",
+                  "as_of": "2026-04-30",
+                  "content_sha256": "947b38988fada4a7acc5ea09335b71d543755a7afd36324cbe663b7b741ee41a",
+                  "source_id": "2207ef79fb4390307715117b0ee1b245fafe6ad4c0ad915b22f2b7a6f4dc6cbc"
+                },
+                "rationale": null
+              },
+              {
+                "id": "total_debt_m",
+                "label": "Long-term debt (Q1 FY2027)",
+                "kind": "fact",
+                "value": 2484.0,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "ADSK/investor-documents/sec-edgar/10-Q_20260529_rpt20260430_acc0000769397_26_000044.htm",
+                  "locator": "LongTermDebt $2484.0M at April 30, 2026",
+                  "as_of": "2026-04-30",
+                  "content_sha256": "947b38988fada4a7acc5ea09335b71d543755a7afd36324cbe663b7b741ee41a",
+                  "source_id": "f3ff7e127dab7dc1162a8d1bda8e4b514ced94a5909a6e31ee68a51857d5e5b5"
+                },
+                "rationale": null
+              },
+              {
+                "id": "shares_m",
+                "label": "FY2026 diluted shares",
+                "kind": "fact",
+                "value": 215.0,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "ADSK/investor-documents/sec-edgar/10-K_20260303_rpt20260131_acc0000769397_26_000015.htm",
+                  "locator": "WeightedAverageNumberOfDilutedSharesOutstanding 215.0M",
+                  "as_of": "2026-01-31",
+                  "content_sha256": "8ee57003566d14c6156dc893a2c2b8d175f6dc89ab509f361862cfc3c4d95166",
+                  "source_id": "f790c6ac04a5e25335122a236dc5c706d936a937cf9c07ca3729c0f4fe4ca097"
+                },
+                "rationale": null
+              },
+              {
+                "id": "operating_cash_minimum_m",
+                "label": "Cash required for payroll and working capital",
+                "kind": "judgment",
+                "value": 400.0,
+                "unit": "USD_m",
+                "source": null,
+                "rationale": "Judgment on non-distributable operating liquidity for global SaaS operations."
+              },
+              {
+                "id": "net_corporate_claim_m",
+                "label": "Net financial claim on common equity after debt and operating minimum",
+                "kind": "judgment",
+                "value": 645.0,
+                "unit": "USD_m",
+                "source": null,
+                "rationale": "Q1 FY2027 filing-locked cash less long-term debt; low stresses trapped liquidity."
+              },
+              {
+                "id": "value_per_share",
+                "label": "Net financial claims per share",
+                "kind": "calculation",
+                "value": 3.0,
+                "unit": "USD_per_share",
+                "operation": "divide",
+                "formula": "net_corporate_claim_m \u00f7 shares_m",
+                "substituted_formula": "645 \u00f7 215",
+                "dependencies": [
+                  "net_corporate_claim_m",
+                  "shares_m"
+                ]
+              }
+            ]
+          },
+          "source_lineage": [
+            {
+              "node_id": "cash_m",
+              "ref": "ADSK/investor-documents/sec-edgar/10-Q_20260529_rpt20260430_acc0000769397_26_000044.htm",
+              "locator": "CashAndCashEquivalentsAtCarryingValue $2671.0M at April 30, 2026",
+              "as_of": "2026-04-30",
+              "content_sha256": "947b38988fada4a7acc5ea09335b71d543755a7afd36324cbe663b7b741ee41a",
+              "source_id": "2207ef79fb4390307715117b0ee1b245fafe6ad4c0ad915b22f2b7a6f4dc6cbc"
+            },
+            {
+              "node_id": "total_debt_m",
+              "ref": "ADSK/investor-documents/sec-edgar/10-Q_20260529_rpt20260430_acc0000769397_26_000044.htm",
+              "locator": "LongTermDebt $2484.0M at April 30, 2026",
+              "as_of": "2026-04-30",
+              "content_sha256": "947b38988fada4a7acc5ea09335b71d543755a7afd36324cbe663b7b741ee41a",
+              "source_id": "f3ff7e127dab7dc1162a8d1bda8e4b514ced94a5909a6e31ee68a51857d5e5b5"
+            },
+            {
+              "node_id": "shares_m",
+              "ref": "ADSK/investor-documents/sec-edgar/10-K_20260303_rpt20260131_acc0000769397_26_000015.htm",
+              "locator": "WeightedAverageNumberOfDilutedSharesOutstanding 215.0M",
+              "as_of": "2026-01-31",
+              "content_sha256": "8ee57003566d14c6156dc893a2c2b8d175f6dc89ab509f361862cfc3c4d95166",
+              "source_id": "f790c6ac04a5e25335122a236dc5c706d936a937cf9c07ca3729c0f4fe4ca097"
+            }
+          ],
+          "checks": {
+            "passed": true,
+            "errors": []
+          },
+          "proof_hash": "9d4e9adce58618802eba6b012b91d51406c8a74ced4c8a6f581afa2adb46b653"
+        },
+        "evidence_tier": "primary_derived",
+        "evidence_level": "primary_derived",
+        "evidence": "Primary bridge from ADSK/investor-documents/sec-edgar/10-K_20260303_rpt20260131_acc0000769397_26_000015.htm: FY2026 revenue $6743.0M (+18% YoY), OCF $2452.0M, FCF $2409.0M, RPO $8.3B, cash $2249.0M, debt $2483.0M; contract backfill 2026-07-21.",
+        "scenario_assumptions": "Proof outputs {'low': -5.0, 'base': 0.8698, 'high': 3.0}; see calculation_proof graph.",
+        "probability_and_timing": null,
+        "tax_and_realization_adjustments": "Operating cash minimum judgment; no double-count with core engine.",
+        "falsifier": "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
+        "overlap_key": "net_financial_claims",
+        "assumption_type": "judgment"
+      },
+      {
+        "component_id": "subscription_transition_and_competition_reserve",
+        "label": "Subscription transition, competition, and dilution stress reserve",
+        "category": "liability_or_reserve",
+        "treatment": "additive",
+        "included_in_component_id": null,
+        "ownership_claim": "Seat migration friction, open-source/Bentley competition, SBC dilution",
+        "ownership_percentage": 1.0,
+        "quantity": {
+          "value": 1,
+          "unit": "per-share economic claim"
+        },
+        "method": "net_asset_value",
+        "method_version": "1.0",
+        "method_provenance": {
+          "method_id": "net_asset_value",
+          "version": "1.0",
+          "label": "Reconciled net asset value",
+          "power_zones": [
+            "scarce_asset_optionality",
+            "catalyst_asset_value",
+            "credit_and_normalized_returns"
+          ],
+          "equation": "value_per_share = (gross_assets - senior_claims - tax - realization_costs) / diluted_shares",
+          "sources": [
+            {
+              "ref": "_system/frameworks/scarce_strategic_asset_valuation.md",
+              "locator": "Economic ownership and unit NAV"
+            }
+          ]
+        },
+        "comparable_ids": [],
+        "range_per_share": {
+          "low": -30.0,
+          "base": -12.0,
+          "high": -3.0
+        },
+        "legacy_range_per_share": {
+          "low": -30.0,
+          "base": -12.0,
+          "high": -3.0
+        },
+        "valuation_status": "bounded_estimate",
+        "calculation_proof": {
+          "status": "valid",
+          "method_id": "net_asset_value",
+          "method_version": "1.0",
+          "outputs": {
+            "low": -30.0,
+            "base": -12.0,
+            "high": -3.0
+          },
+          "output_unit": "USD_per_share",
+          "traces": {
+            "low": [
+              {
+                "id": "stock_based_comp_m",
+                "label": "FY2026 stock-based compensation expense",
+                "kind": "fact",
+                "value": 788.0,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "ADSK/investor-documents/sec-edgar/10-K_20260303_rpt20260131_acc0000769397_26_000015.htm",
+                  "locator": "ShareBasedCompensation $788.0M FY2026 (~37% of operating income)",
+                  "as_of": "2026-01-31",
+                  "content_sha256": "8ee57003566d14c6156dc893a2c2b8d175f6dc89ab509f361862cfc3c4d95166",
+                  "source_id": "a09649cca6297c11b68d63ed404cfd2e62f368fee5916c17dc01edfb8c291422"
+                },
+                "rationale": null
+              },
+              {
+                "id": "buyback_m",
+                "label": "FY2026 common stock repurchases",
+                "kind": "fact",
+                "value": 1402.0,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "ADSK/investor-documents/sec-edgar/10-K_20260303_rpt20260131_acc0000769397_26_000015.htm",
+                  "locator": "PaymentsForRepurchaseOfCommonStock $1402.0M FY2026",
+                  "as_of": "2026-01-31",
+                  "content_sha256": "8ee57003566d14c6156dc893a2c2b8d175f6dc89ab509f361862cfc3c4d95166",
+                  "source_id": "b9430bfb1e7c5479b621eda3c2e3fff51238c7ea5377fc65e1007318e29d0bdb"
+                },
+                "rationale": null
+              },
+              {
+                "id": "shares_m",
+                "label": "FY2026 diluted shares",
+                "kind": "fact",
+                "value": 215.0,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "ADSK/investor-documents/sec-edgar/10-K_20260303_rpt20260131_acc0000769397_26_000015.htm",
+                  "locator": "WeightedAverageNumberOfDilutedSharesOutstanding 215.0M",
+                  "as_of": "2026-01-31",
+                  "content_sha256": "8ee57003566d14c6156dc893a2c2b8d175f6dc89ab509f361862cfc3c4d95166",
+                  "source_id": "f790c6ac04a5e25335122a236dc5c706d936a937cf9c07ca3729c0f4fe4ca097"
+                },
+                "rationale": null
+              },
+              {
+                "id": "reserve_m",
+                "label": "Subscription transition, competition, and dilution stress reserve",
+                "kind": "judgment",
+                "value": -6450.0,
+                "unit": "USD_m",
+                "source": null,
+                "rationale": "Negative reserve for seat-to-named-user friction, open-source/Bentley competition, and stock-based compensation dilution not fully embedded in low-growth bear case."
+              },
+              {
+                "id": "value_per_share",
+                "label": "Transition and competition reserve per share",
+                "kind": "calculation",
+                "value": -30.0,
+                "unit": "USD_per_share",
+                "operation": "divide",
+                "formula": "reserve_m \u00f7 shares_m",
+                "substituted_formula": "-6450 \u00f7 215",
+                "dependencies": [
+                  "reserve_m",
+                  "shares_m"
+                ]
+              }
+            ],
+            "base": [
+              {
+                "id": "stock_based_comp_m",
+                "label": "FY2026 stock-based compensation expense",
+                "kind": "fact",
+                "value": 788.0,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "ADSK/investor-documents/sec-edgar/10-K_20260303_rpt20260131_acc0000769397_26_000015.htm",
+                  "locator": "ShareBasedCompensation $788.0M FY2026 (~37% of operating income)",
+                  "as_of": "2026-01-31",
+                  "content_sha256": "8ee57003566d14c6156dc893a2c2b8d175f6dc89ab509f361862cfc3c4d95166",
+                  "source_id": "a09649cca6297c11b68d63ed404cfd2e62f368fee5916c17dc01edfb8c291422"
+                },
+                "rationale": null
+              },
+              {
+                "id": "buyback_m",
+                "label": "FY2026 common stock repurchases",
+                "kind": "fact",
+                "value": 1402.0,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "ADSK/investor-documents/sec-edgar/10-K_20260303_rpt20260131_acc0000769397_26_000015.htm",
+                  "locator": "PaymentsForRepurchaseOfCommonStock $1402.0M FY2026",
+                  "as_of": "2026-01-31",
+                  "content_sha256": "8ee57003566d14c6156dc893a2c2b8d175f6dc89ab509f361862cfc3c4d95166",
+                  "source_id": "b9430bfb1e7c5479b621eda3c2e3fff51238c7ea5377fc65e1007318e29d0bdb"
+                },
+                "rationale": null
+              },
+              {
+                "id": "shares_m",
+                "label": "FY2026 diluted shares",
+                "kind": "fact",
+                "value": 215.0,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "ADSK/investor-documents/sec-edgar/10-K_20260303_rpt20260131_acc0000769397_26_000015.htm",
+                  "locator": "WeightedAverageNumberOfDilutedSharesOutstanding 215.0M",
+                  "as_of": "2026-01-31",
+                  "content_sha256": "8ee57003566d14c6156dc893a2c2b8d175f6dc89ab509f361862cfc3c4d95166",
+                  "source_id": "f790c6ac04a5e25335122a236dc5c706d936a937cf9c07ca3729c0f4fe4ca097"
+                },
+                "rationale": null
+              },
+              {
+                "id": "reserve_m",
+                "label": "Subscription transition, competition, and dilution stress reserve",
+                "kind": "judgment",
+                "value": -2580.0,
+                "unit": "USD_m",
+                "source": null,
+                "rationale": "Negative reserve for seat-to-named-user friction, open-source/Bentley competition, and stock-based compensation dilution not fully embedded in low-growth bear case."
+              },
+              {
+                "id": "value_per_share",
+                "label": "Transition and competition reserve per share",
+                "kind": "calculation",
+                "value": -12.0,
+                "unit": "USD_per_share",
+                "operation": "divide",
+                "formula": "reserve_m \u00f7 shares_m",
+                "substituted_formula": "-2580 \u00f7 215",
+                "dependencies": [
+                  "reserve_m",
+                  "shares_m"
+                ]
+              }
+            ],
+            "high": [
+              {
+                "id": "stock_based_comp_m",
+                "label": "FY2026 stock-based compensation expense",
+                "kind": "fact",
+                "value": 788.0,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "ADSK/investor-documents/sec-edgar/10-K_20260303_rpt20260131_acc0000769397_26_000015.htm",
+                  "locator": "ShareBasedCompensation $788.0M FY2026 (~37% of operating income)",
+                  "as_of": "2026-01-31",
+                  "content_sha256": "8ee57003566d14c6156dc893a2c2b8d175f6dc89ab509f361862cfc3c4d95166",
+                  "source_id": "a09649cca6297c11b68d63ed404cfd2e62f368fee5916c17dc01edfb8c291422"
+                },
+                "rationale": null
+              },
+              {
+                "id": "buyback_m",
+                "label": "FY2026 common stock repurchases",
+                "kind": "fact",
+                "value": 1402.0,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "ADSK/investor-documents/sec-edgar/10-K_20260303_rpt20260131_acc0000769397_26_000015.htm",
+                  "locator": "PaymentsForRepurchaseOfCommonStock $1402.0M FY2026",
+                  "as_of": "2026-01-31",
+                  "content_sha256": "8ee57003566d14c6156dc893a2c2b8d175f6dc89ab509f361862cfc3c4d95166",
+                  "source_id": "b9430bfb1e7c5479b621eda3c2e3fff51238c7ea5377fc65e1007318e29d0bdb"
+                },
+                "rationale": null
+              },
+              {
+                "id": "shares_m",
+                "label": "FY2026 diluted shares",
+                "kind": "fact",
+                "value": 215.0,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "ADSK/investor-documents/sec-edgar/10-K_20260303_rpt20260131_acc0000769397_26_000015.htm",
+                  "locator": "WeightedAverageNumberOfDilutedSharesOutstanding 215.0M",
+                  "as_of": "2026-01-31",
+                  "content_sha256": "8ee57003566d14c6156dc893a2c2b8d175f6dc89ab509f361862cfc3c4d95166",
+                  "source_id": "f790c6ac04a5e25335122a236dc5c706d936a937cf9c07ca3729c0f4fe4ca097"
+                },
+                "rationale": null
+              },
+              {
+                "id": "reserve_m",
+                "label": "Subscription transition, competition, and dilution stress reserve",
+                "kind": "judgment",
+                "value": -645.0,
+                "unit": "USD_m",
+                "source": null,
+                "rationale": "Negative reserve for seat-to-named-user friction, open-source/Bentley competition, and stock-based compensation dilution not fully embedded in low-growth bear case."
+              },
+              {
+                "id": "value_per_share",
+                "label": "Transition and competition reserve per share",
+                "kind": "calculation",
+                "value": -3.0,
+                "unit": "USD_per_share",
+                "operation": "divide",
+                "formula": "reserve_m \u00f7 shares_m",
+                "substituted_formula": "-645 \u00f7 215",
+                "dependencies": [
+                  "reserve_m",
+                  "shares_m"
+                ]
+              }
+            ]
+          },
+          "source_lineage": [
+            {
+              "node_id": "stock_based_comp_m",
+              "ref": "ADSK/investor-documents/sec-edgar/10-K_20260303_rpt20260131_acc0000769397_26_000015.htm",
+              "locator": "ShareBasedCompensation $788.0M FY2026 (~37% of operating income)",
+              "as_of": "2026-01-31",
+              "content_sha256": "8ee57003566d14c6156dc893a2c2b8d175f6dc89ab509f361862cfc3c4d95166",
+              "source_id": "a09649cca6297c11b68d63ed404cfd2e62f368fee5916c17dc01edfb8c291422"
+            },
+            {
+              "node_id": "buyback_m",
+              "ref": "ADSK/investor-documents/sec-edgar/10-K_20260303_rpt20260131_acc0000769397_26_000015.htm",
+              "locator": "PaymentsForRepurchaseOfCommonStock $1402.0M FY2026",
+              "as_of": "2026-01-31",
+              "content_sha256": "8ee57003566d14c6156dc893a2c2b8d175f6dc89ab509f361862cfc3c4d95166",
+              "source_id": "b9430bfb1e7c5479b621eda3c2e3fff51238c7ea5377fc65e1007318e29d0bdb"
+            },
+            {
+              "node_id": "shares_m",
+              "ref": "ADSK/investor-documents/sec-edgar/10-K_20260303_rpt20260131_acc0000769397_26_000015.htm",
+              "locator": "WeightedAverageNumberOfDilutedSharesOutstanding 215.0M",
+              "as_of": "2026-01-31",
+              "content_sha256": "8ee57003566d14c6156dc893a2c2b8d175f6dc89ab509f361862cfc3c4d95166",
+              "source_id": "f790c6ac04a5e25335122a236dc5c706d936a937cf9c07ca3729c0f4fe4ca097"
+            }
+          ],
+          "checks": {
+            "passed": true,
+            "errors": []
+          },
+          "proof_hash": "262a5f96592903adb1274ac03794cf0c0325a057090623f46ebdad5543be3fd6"
+        },
+        "evidence_tier": "primary_derived",
+        "evidence_level": "primary_derived",
+        "evidence": "Primary bridge from ADSK/investor-documents/sec-edgar/10-K_20260303_rpt20260131_acc0000769397_26_000015.htm: FY2026 revenue $6743.0M (+18% YoY), OCF $2452.0M, FCF $2409.0M, RPO $8.3B, cash $2249.0M, debt $2483.0M; contract backfill 2026-07-21.",
+        "scenario_assumptions": "Proof outputs {'low': -30.0, 'base': -12.0, 'high': -3.0}; see calculation_proof graph.",
+        "probability_and_timing": null,
+        "tax_and_realization_adjustments": "Partial dhando: SBC $788M FY2026 offsets buybacks $1.4B.",
+        "falsifier": "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
+        "overlap_key": "subscription_transition_and_competition_reserve",
+        "assumption_type": "judgment"
+      }
+    ],
+    "component_coverage": {
+      "all_material_components_identified": true,
+      "material_component_count": 4,
+      "additive_component_count": 4,
+      "embedded_component_count": 0,
+      "unvalued_component_count": 0,
+      "double_counting_flags": []
+    },
+    "input_classification": {
+      "facts": [],
+      "estimates": [],
+      "judgments": [
+        {
+          "component_id": "subscription_owner_cash_engine",
+          "label": "Subscription software owner-cash engine (AutoCAD, Revit, Fusion, AEC/MFG)",
+          "kind": "judgment",
+          "evidence_tier": "primary_derived",
+          "evidence": "Primary bridge from ADSK/investor-documents/sec-edgar/10-K_20260303_rpt20260131_acc0000769397_26_000015.htm: FY2026 revenue $6743.0M (+18% YoY), OCF $2452.0M, FCF $2409.0M, RPO $8.3B, cash $2249.0M, debt $2483.0M; contract backfill 2026-07-21.",
+          "method": "owner_cash_or_dividend_discount",
+          "valuation_status": "bounded_estimate"
+        },
+        {
+          "component_id": "construction_cloud_and_ai_option",
+          "label": "Construction cloud, Forma, and AI-assisted design upside option",
+          "kind": "judgment",
+          "evidence_tier": "primary_derived",
+          "evidence": "Primary bridge from ADSK/investor-documents/sec-edgar/10-K_20260303_rpt20260131_acc0000769397_26_000015.htm: FY2026 revenue $6743.0M (+18% YoY), OCF $2452.0M, FCF $2409.0M, RPO $8.3B, cash $2249.0M, debt $2483.0M; contract backfill 2026-07-21.",
+          "method": "risk_adjusted_milestone_value",
+          "valuation_status": "bounded_estimate"
+        },
+        {
+          "component_id": "net_financial_claims",
+          "label": "Net cash and debt claims on common equity",
+          "kind": "judgment",
+          "evidence_tier": "primary_derived",
+          "evidence": "Primary bridge from ADSK/investor-documents/sec-edgar/10-K_20260303_rpt20260131_acc0000769397_26_000015.htm: FY2026 revenue $6743.0M (+18% YoY), OCF $2452.0M, FCF $2409.0M, RPO $8.3B, cash $2249.0M, debt $2483.0M; contract backfill 2026-07-21.",
+          "method": "net_asset_value",
+          "valuation_status": "bounded_estimate"
+        },
+        {
+          "component_id": "subscription_transition_and_competition_reserve",
+          "label": "Subscription transition, competition, and dilution stress reserve",
+          "kind": "judgment",
+          "evidence_tier": "primary_derived",
+          "evidence": "Primary bridge from ADSK/investor-documents/sec-edgar/10-K_20260303_rpt20260131_acc0000769397_26_000015.htm: FY2026 revenue $6743.0M (+18% YoY), OCF $2452.0M, FCF $2409.0M, RPO $8.3B, cash $2249.0M, debt $2483.0M; contract backfill 2026-07-21.",
+          "method": "net_asset_value",
+          "valuation_status": "bounded_estimate"
+        }
+      ]
+    },
+    "method_route": {
+      "schema_version": "1.0",
+      "status": "routed",
+      "profile_id": "quality_reinvestment",
+      "label": "High-return compounder",
+      "score": 8.0,
+      "reasons": [
+        "archetype=compounder",
+        "component categories=operating_business",
+        "existing methods=owner_cash"
+      ],
+      "primary_methods": [
+        "owner_earnings_reinvestment_dcf"
+      ],
+      "corroborating_methods": [
+        "reverse_dcf",
+        "incremental_roic_runway"
+      ],
+      "primary_personas": [
+        "buffett_weschler",
+        "hohn"
+      ],
+      "cross_check_personas": [
+        "munger",
+        "marathon_capital_cycle"
+      ],
+      "silent_personas": [
+        "greenblatt",
+        "hk",
+        "klarman_asset_value",
+        "marks_credit_cycle",
+        "pabrai",
+        "stahl"
+      ],
+      "required_evidence": [
+        "normalized owner earnings",
+        "incremental return on capital",
+        "reinvestment runway",
+        "diluted share count",
+        "competitive-advantage mechanism"
+      ],
+      "failure_modes": [
+        "growth projected without its capital cost",
+        "stock compensation or acquisitions omitted",
+        "terminal value unsupported by a durable mechanism"
+      ],
+      "secondary_profiles": [
+        {
+          "profile_id": "predictable_cash_flow",
+          "score": 3.0,
+          "reasons": [
+            "component categories=operating_business",
+            "existing methods=dividend, owner_cash"
+          ]
+        },
+        {
+          "profile_id": "binary_milestone",
+          "score": 3.0,
+          "reasons": [
+            "component categories=real_option",
+            "existing methods=milestone, risk_adjusted"
+          ]
+        }
+      ],
+      "scorecard": {
+        "scarce_asset_optionality": {
+          "score": 1.0,
+          "reasons": [
+            "component categories=real_option"
+          ]
+        },
+        "quality_reinvestment": {
+          "score": 8.0,
+          "reasons": [
+            "archetype=compounder",
+            "component categories=operating_business",
+            "existing methods=owner_cash"
+          ]
+        },
+        "capital_cycle": {
+          "score": 1.0,
+          "reasons": [
+            "component categories=operating_business"
+          ]
+        },
+        "credit_and_normalized_returns": {
+          "score": 1.0,
+          "reasons": [
+            "component categories=liability_or_reserve"
+          ]
+        },
+        "catalyst_asset_value": {
+          "score": 0.0,
+          "reasons": []
+        },
+        "predictable_cash_flow": {
+          "score": 3.0,
+          "reasons": [
+            "component categories=operating_business",
+            "existing methods=dividend, owner_cash"
+          ]
+        },
+        "binary_milestone": {
+          "score": 3.0,
+          "reasons": [
+            "component categories=real_option",
+            "existing methods=milestone, risk_adjusted"
+          ]
+        }
+      },
+      "decision_rule": "Use one primary method and no more than two corroborating methods; irrelevant methods and personas remain silent."
+    },
+    "market": {
+      "price_per_share": 217.8,
+      "fully_diluted_shares": 215000000,
+      "market_cap_m": 46827.0,
+      "enterprise_value_m": 46640.0
+    },
+    "valuation": {
+      "value_per_share": {
+        "low": 130.0,
+        "base": 253.8698,
+        "high": 385.0
+      },
+      "priced_components_per_share": {
+        "low": 130.0,
+        "base": 253.8698,
+        "high": 385.0
+      },
+      "legacy_value_per_share": {
+        "low": 130.0,
+        "base": 253.87,
+        "high": 385.0
+      },
+      "probability_weighted_value_per_share": 253.8698,
+      "expected_distributions_per_share": 0.0,
+      "annualized_return_at_price_pct": {
+        "low": -7.11,
+        "base": 2.21,
+        "high": 8.48
+      },
+      "downside_to_low_pct": -40.31,
+      "horizon_years": 7,
+      "interpretation": "value_per_share is withheld while any material additive component is unpriced; priced_components_per_share is not a complete security value."
+    },
+    "scenario_contract": {
+      "rule": "Cases must change cited causal operating, capital, probability, timing, or financing drivers\u2014not only a terminal multiple.",
+      "top_value_drivers": [
+        {
+          "component_id": "subscription_owner_cash_engine",
+          "label": "Subscription software owner-cash engine (AutoCAD, Revit, Fusion, AEC/MFG)",
+          "valuation_status": "bounded_estimate",
+          "base_per_share": 255.0,
+          "legacy_base_per_share": 255.0,
+          "range_width_per_share": 195.0,
+          "scenario_assumptions": "Proof outputs {'low': 165.0, 'base': 255.0, 'high': 360.0}; see calculation_proof graph."
+        },
+        {
+          "component_id": "subscription_transition_and_competition_reserve",
+          "label": "Subscription transition, competition, and dilution stress reserve",
+          "valuation_status": "bounded_estimate",
+          "base_per_share": -12.0,
+          "legacy_base_per_share": -12.0,
+          "range_width_per_share": 27.0,
+          "scenario_assumptions": "Proof outputs {'low': -30.0, 'base': -12.0, 'high': -3.0}; see calculation_proof graph."
+        },
+        {
+          "component_id": "construction_cloud_and_ai_option",
+          "label": "Construction cloud, Forma, and AI-assisted design upside option",
+          "valuation_status": "bounded_estimate",
+          "base_per_share": 10.0,
+          "legacy_base_per_share": 10.0,
+          "range_width_per_share": 25.0,
+          "scenario_assumptions": "Proof outputs {'low': 0.0, 'base': 10.0, 'high': 25.0}; see calculation_proof graph."
+        },
+        {
+          "component_id": "net_financial_claims",
+          "label": "Net cash and debt claims on common equity",
+          "valuation_status": "bounded_estimate",
+          "base_per_share": 0.8698,
+          "legacy_base_per_share": 0.87,
+          "range_width_per_share": 8.0,
+          "scenario_assumptions": "Proof outputs {'low': -5.0, 'base': 0.8698, 'high': 3.0}; see calculation_proof graph."
+        }
+      ],
+      "reverse_expectations": null
+    },
+    "calculation_proof_summary": {
+      "component_count": 4,
+      "priced_component_count": 4,
+      "proof_complete_pct": 100.0,
+      "status_counts": {
+        "bounded_estimate": 4,
+        "calculated": 0,
+        "legacy_sensitivity": 0,
+        "unpriced": 0
+      },
+      "all_material_components_priced": true,
+      "calculation_errors": [],
+      "aggregate_proof_hash": "47f0f8d6917eb5a40ba0a1170d867640dbb9c86a85bdc74f79e04097154f8b47"
+    },
+    "source_lineage": [
+      {
+        "component_id": "subscription_owner_cash_engine",
+        "node_id": "operating_cash_flow_m",
+        "ref": "ADSK/investor-documents/sec-edgar/10-K_20260303_rpt20260131_acc0000769397_26_000015.htm",
+        "locator": "NetCashProvidedByUsedInOperatingActivities $2,452M (FY2026)",
+        "as_of": "2026-01-31",
+        "content_sha256": "8ee57003566d14c6156dc893a2c2b8d175f6dc89ab509f361862cfc3c4d95166",
+        "source_id": "029fb251639508cde97d84df99544a438afb34e15b109bf195e514ee0ddf24b8"
+      },
+      {
+        "component_id": "subscription_owner_cash_engine",
+        "node_id": "capex_m",
+        "ref": "ADSK/investor-documents/sec-edgar/10-K_20260303_rpt20260131_acc0000769397_26_000015.htm",
+        "locator": "PaymentsToAcquirePropertyPlantAndEquipment $43M (FY2026)",
+        "as_of": "2026-01-31",
+        "content_sha256": "8ee57003566d14c6156dc893a2c2b8d175f6dc89ab509f361862cfc3c4d95166",
+        "source_id": "09a8b75ab3e6b41a53b21434e49a4931e0acf995c0364dd603022acbfb262bcf"
+      },
+      {
+        "component_id": "subscription_owner_cash_engine",
+        "node_id": "shares_m",
+        "ref": "ADSK/investor-documents/sec-edgar/10-K_20260303_rpt20260131_acc0000769397_26_000015.htm",
+        "locator": "WeightedAverageNumberOfDilutedSharesOutstanding 215.0M (FY2026)",
+        "as_of": "2026-01-31",
+        "content_sha256": "8ee57003566d14c6156dc893a2c2b8d175f6dc89ab509f361862cfc3c4d95166",
+        "source_id": "77f982b961f62d7b8c1bb5c607579c4001746db9dacf5210854a93d512943736"
+      },
+      {
+        "component_id": "construction_cloud_and_ai_option",
+        "node_id": "rpo_b",
+        "ref": "ADSK/investor-documents/sec-edgar/10-K_20260303_rpt20260131_acc0000769397_26_000015.htm",
+        "locator": "RevenueRemainingPerformanceObligation $8.3B at January 31, 2026",
+        "as_of": "2026-01-31",
+        "content_sha256": "8ee57003566d14c6156dc893a2c2b8d175f6dc89ab509f361862cfc3c4d95166",
+        "source_id": "4849ee2d57466c18b925fd8d64094615a2b132e28707fc4f97a76d18314a034d"
+      },
+      {
+        "component_id": "construction_cloud_and_ai_option",
+        "node_id": "revenue_m",
+        "ref": "ADSK/investor-documents/sec-edgar/10-K_20260303_rpt20260131_acc0000769397_26_000015.htm",
+        "locator": "RevenueFromContractWithCustomerExcludingAssessedTax $6743.0M FY2026 (+18% YoY vs $5717.0M)",
+        "as_of": "2026-01-31",
+        "content_sha256": "8ee57003566d14c6156dc893a2c2b8d175f6dc89ab509f361862cfc3c4d95166",
+        "source_id": "3981dfed94d09b02bc7f3f76ab0264aebf3eb94ac47eb4ef6545166db2d5fc01"
+      },
+      {
+        "component_id": "construction_cloud_and_ai_option",
+        "node_id": "shares_m",
+        "ref": "ADSK/investor-documents/sec-edgar/10-K_20260303_rpt20260131_acc0000769397_26_000015.htm",
+        "locator": "WeightedAverageNumberOfDilutedSharesOutstanding 215.0M",
+        "as_of": "2026-01-31",
+        "content_sha256": "8ee57003566d14c6156dc893a2c2b8d175f6dc89ab509f361862cfc3c4d95166",
+        "source_id": "f790c6ac04a5e25335122a236dc5c706d936a937cf9c07ca3729c0f4fe4ca097"
+      },
+      {
+        "component_id": "net_financial_claims",
+        "node_id": "cash_m",
+        "ref": "ADSK/investor-documents/sec-edgar/10-Q_20260529_rpt20260430_acc0000769397_26_000044.htm",
+        "locator": "CashAndCashEquivalentsAtCarryingValue $2671.0M at April 30, 2026",
+        "as_of": "2026-04-30",
+        "content_sha256": "947b38988fada4a7acc5ea09335b71d543755a7afd36324cbe663b7b741ee41a",
+        "source_id": "2207ef79fb4390307715117b0ee1b245fafe6ad4c0ad915b22f2b7a6f4dc6cbc"
+      },
+      {
+        "component_id": "net_financial_claims",
+        "node_id": "total_debt_m",
+        "ref": "ADSK/investor-documents/sec-edgar/10-Q_20260529_rpt20260430_acc0000769397_26_000044.htm",
+        "locator": "LongTermDebt $2484.0M at April 30, 2026",
+        "as_of": "2026-04-30",
+        "content_sha256": "947b38988fada4a7acc5ea09335b71d543755a7afd36324cbe663b7b741ee41a",
+        "source_id": "f3ff7e127dab7dc1162a8d1bda8e4b514ced94a5909a6e31ee68a51857d5e5b5"
+      },
+      {
+        "component_id": "net_financial_claims",
+        "node_id": "shares_m",
+        "ref": "ADSK/investor-documents/sec-edgar/10-K_20260303_rpt20260131_acc0000769397_26_000015.htm",
+        "locator": "WeightedAverageNumberOfDilutedSharesOutstanding 215.0M",
+        "as_of": "2026-01-31",
+        "content_sha256": "8ee57003566d14c6156dc893a2c2b8d175f6dc89ab509f361862cfc3c4d95166",
+        "source_id": "f790c6ac04a5e25335122a236dc5c706d936a937cf9c07ca3729c0f4fe4ca097"
+      },
+      {
+        "component_id": "subscription_transition_and_competition_reserve",
+        "node_id": "stock_based_comp_m",
+        "ref": "ADSK/investor-documents/sec-edgar/10-K_20260303_rpt20260131_acc0000769397_26_000015.htm",
+        "locator": "ShareBasedCompensation $788.0M FY2026 (~37% of operating income)",
+        "as_of": "2026-01-31",
+        "content_sha256": "8ee57003566d14c6156dc893a2c2b8d175f6dc89ab509f361862cfc3c4d95166",
+        "source_id": "a09649cca6297c11b68d63ed404cfd2e62f368fee5916c17dc01edfb8c291422"
+      },
+      {
+        "component_id": "subscription_transition_and_competition_reserve",
+        "node_id": "buyback_m",
+        "ref": "ADSK/investor-documents/sec-edgar/10-K_20260303_rpt20260131_acc0000769397_26_000015.htm",
+        "locator": "PaymentsForRepurchaseOfCommonStock $1402.0M FY2026",
+        "as_of": "2026-01-31",
+        "content_sha256": "8ee57003566d14c6156dc893a2c2b8d175f6dc89ab509f361862cfc3c4d95166",
+        "source_id": "b9430bfb1e7c5479b621eda3c2e3fff51238c7ea5377fc65e1007318e29d0bdb"
+      },
+      {
+        "component_id": "subscription_transition_and_competition_reserve",
+        "node_id": "shares_m",
+        "ref": "ADSK/investor-documents/sec-edgar/10-K_20260303_rpt20260131_acc0000769397_26_000015.htm",
+        "locator": "WeightedAverageNumberOfDilutedSharesOutstanding 215.0M",
+        "as_of": "2026-01-31",
+        "content_sha256": "8ee57003566d14c6156dc893a2c2b8d175f6dc89ab509f361862cfc3c4d95166",
+        "source_id": "f790c6ac04a5e25335122a236dc5c706d936a937cf9c07ca3729c0f4fe4ca097"
+      }
+    ],
+    "model_checks": {
+      "calculation_graphs_valid": true,
+      "component_sum_reconciles": true,
+      "no_double_counting": true,
+      "all_material_components_priced": true,
+      "low_base_high_ordered": true
+    },
+    "evidence": {
+      "unresolved_count": 0,
+      "blockers": [],
+      "validation_errors": []
+    },
+    "monitoring": {
+      "falsifiers": [
+        "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
+        "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
+        "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
+        "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case."
+      ],
+      "required_refresh_triggers": [
+        "new filing or material operating update",
+        "capital-structure change",
+        "material price move",
+        "component milestone or falsifier"
+      ]
+    },
+    "change_control": {
+      "model_hash": "5f67f4af14aebe341ee7312e33148d8dcaa8f47c40a39917c840865ad1b2a43c",
+      "method_versions": [
+        "net_asset_value@1.0",
+        "owner_cash_or_dividend_discount@1.0",
+        "risk_adjusted_milestone_value@1.0"
+      ],
+      "change_log": [],
+      "rule": "A source fact is locked. Every assumption change requires a reason, author, timestamp, and before/after value."
+    },
+    "decision_rule": "No security is decision-grade until every material claim is valued exactly once by a valid calculation proof and every material evidence blocker is resolved."
+  },
+  "synthesis": {
+    "status": "complete",
+    "paths": [
+      {
+        "id": "theory_implied",
+        "label": "Growth theory (pre-falsifier)",
+        "source": "growth_explanation + filing revenue YoY",
+        "return_pct": 14.8,
+        "weight": 0.08,
+        "type": "numeric",
+        "epistemic_tier": "B (pre-falsifier derivation)",
+        "weight_why": "Segment blend before falsifier pass; diagnostic only when it differs from falsifier-adjusted.",
+        "weight_falsifiers": [
+          "Included at full weight alongside falsifier-adjusted without divergence note"
+        ],
+        "hard_to_vary": "partial"
+      },
+      {
+        "id": "scenario_bear",
+        "label": "Bear scenario (Lawrence)",
+        "source": "scenarios.bear",
+        "return_pct": 8.4,
+        "weight": 0.05,
+        "type": "numeric",
+        "epistemic_tier": "C (scenario envelope)",
+        "weight_why": "Downside stress; low weight because bear is a sensitivity, not a competing explanation of base mechanics.",
+        "weight_falsifiers": [
+          "Bear assumptions become base case in filings (e.g. sustained volume collapse)"
+        ],
+        "hard_to_vary": "yes: asymmetric low weight is structural"
+      },
+      {
+        "id": "scenario_bull",
+        "label": "Bull scenario (Lawrence)",
+        "source": "scenarios.bull",
+        "return_pct": 19.8,
+        "weight": 0.12,
+        "type": "numeric",
+        "epistemic_tier": "C (scenario envelope)",
+        "weight_why": "Upside stress probe; higher than bear because optionality archetype has skew, but still below primary paths.",
+        "weight_falsifiers": [
+          "Bull growth sustained in filings for 4+ quarters without falsifier trigger"
+        ],
+        "hard_to_vary": "yes"
+      }
+    ],
+    "qualitative_adjustments": [
+      {
+        "id": "no_predictive_attribute",
+        "factor": "No dated predictive attribute at spot",
+        "pp": -0.2,
+        "rationale": "Scarcity is descriptive; no timed mispricing catalyst in base",
+        "sources": "HK predictive attributes framework",
+        "falsifier": "Cross-check names dated catalyst with timeline"
+      }
+    ],
+    "qualitative_manual": false,
+    "qualitative_pp_cap_applied": false,
+    "numeric_weighted_pct": 15.92,
+    "qualitative_pp": -0.2,
+    "total_synthesis_pct": 15.72,
+    "human_approval": "pending",
+    "weight_audit": {
+      "flags": [],
+      "deutsch_checks": {
+        "hard_to_vary": true,
+        "falsifiable": true,
+        "not_instrumentalist": true,
+        "reach": "Weights encode evidence tier (A primary \u2192 D external), not fitted to hit a target IRR"
+      },
+      "qualitative_audit": {
+        "flags": [],
+        "deutsch_checks": {
+          "hard_to_vary": true,
+          "falsifiable": true,
+          "not_double_count": true,
+          "small_band": true
+        }
+      }
+    },
+    "notes": "Capstone IRR combining filings, segments, overlays, third-party, qualitative"
+  }
+}

@@ -1,18 +1,23 @@
 # GDRZF — Investment Thesis
 
-**Last updated:** 2026-07-02
+**Last updated:** auto-sync
 
 ## Classification
 
 | Field | Value |
 |-------|-------|
-| **Archetype** (Stahl) | unknown |
+| **Archetype** (Stahl) | optionality |
 | **Moat** (Munger) | unproven |
-| **Dhando** (Pabrai) | pending |
+| **Dhando** (Pabrai) | partial |
 | **Stance** | watch |
-| **Cycle** | - |
-| **MOI bucket** (legacy) | pending |
-| **Payoff lens** | pending |
+| **Cycle** | mid |
+| **Implied 7yr IRR** (base) | 11.3 |
+| **IRR method** | scarce_asset_optionality |
+| **Lawrence bucket** | other |
+| **Payoff lens** | event |
+| **MOI bucket** | pending |
+
+**Deep dive:** `GDRZF/research/deep_dive_2026-07-21.md` (auto-sync)
 
 ## One-line thesis
 

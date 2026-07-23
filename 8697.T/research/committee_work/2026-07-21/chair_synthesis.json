@@ -1,0 +1,157 @@
+{
+  "status": "complete",
+  "ticker": "8697.T",
+  "as_of": "2026-07-21",
+  "evidence_packet_hash": "602431bde98f2b98db32228f673a9aed545aede5898afe72b25e551e79b2c652",
+  "primary_method": "quality_reinvestment / owner_earnings_reinvestment_dcf",
+  "corroborating_methods": ["reverse_dcf", "incremental_roic_runway"],
+  "silenced_methods_and_personas": ["greenblatt", "hk", "klarman_asset_value", "marks_credit_cycle", "pabrai", "stahl"],
+  "weighting_rationale": "The canonical Power Zone router (8697.T/research/valuation_route.json) selected quality_reinvestment as the primary profile with score 20.0, an order of magnitude above the next-best fit (credit_and_normalized_returns and predictable_cash_flow, each 2.0). It matched on archetype=compounder, component category=operating_business, and existing methods dcf/owner_cash/reinvestment, and the router chose the method and the seated raters (buffett_weschler, hohn as primary personas; munger as cross-check) before any scoring occurred, not after seeing the vote outcome. The concrete primary method is owner_earnings_reinvestment_dcf: normalized owner cash of \u00a570/share (below peak FY2025 parent EPS \u00a576.81) is compounded and exit-multiplied to build the core_engine and reinvestment_or_assets components. reverse_dcf and incremental_roic_runway are corroborating checks on that same owner-cash mechanism, not separate valuation philosophies: reverse_dcf asks what volume/ADV path the \u00a52,190 price already implies, and incremental_roic_runway tests whether the +\u00a5280.07/share reinvestment_or_assets component is earned at a return above cost of capital. Both checks currently expose the same weakness the raters flagged (an opaque ~1.23x legacy_scale factor in core_engine and a judgment-only reinvestment bridge with no disclosed incremental ROIC), which is exactly why the primary method dominates: a corroborating check that surfaces a gap in the primary method's proof is evidence about the primary method's reliability, not a competing estimate to blend into it. The four-component contract value (\u00a51,800.4466/share base) is an additive sum of non-overlapping economic claims (core_engine, reinvestment_or_assets, net_financial_claims, downside_reserve) with model_checks.no_double_counting=true and model_checks.component_sum_reconciles=true \u2014 it is not an average of competing methods, and the committee did not average the filing-only Lawrence base (1.7%), the contract base (-2.76%), and the displayed total synthesis (3.19%) to manufacture a single consensus number. Those three figures are retained side by side below as different, clearly labeled readings of the same owner-cash economics (filing-only vs full additive contract vs qualitative-adjusted synthesis pending human approval), and the dispersion between them is preserved rather than netted out.",
+  "vote_summary": {
+    "round_one": {"approve": 0, "watch": 3, "defer": 0, "reject": 0},
+    "round_two": "Carried forward unchanged from round one (8697.T/research/committee_work/2026-07-21/round_2/*.json). The deterministic escalation check (max score dispersion of 1 point across all four dimensions, unanimous vote, evidence_status sufficient for all three raters, expected-return midpoint spread of 2.0pp) found no trigger for a second independent round, so round two is an exact carry-forward, not a second vote.",
+    "independence_groups_seated": ["quality_reinvestment (buffett_weschler)", "competitive_advantage (hohn)", "munger (munger)"]
+  },
+  "agreed_facts": [
+    {
+      "fact": "8697.T (Japan Exchange Group) is a durable, moated domestic exchange and clearing monopoly with FY2025 operating revenue \u00a5198.7B (+22.5% YoY), cash equities ADV \u00a57.52T (+31.9% YoY), ~58.5% operating margin, and ROE 23.1%.",
+      "agreement": "unanimous across buffett_weschler, hohn, munger",
+      "evidence_paths": ["8697.T/research/deep_dive_2026-07-21.md", "8697.T/research/evidence_reconciliation_2026-07-21.md", "8697.T/research/valuation_contract.json"]
+    },
+    {
+      "fact": "FY2025 was a peak-cycle year, not a permanent baseline; the +31.9% YoY ADV surge and clearing-collateral income are treated as cyclical, not structural, by all three raters and by the frozen classification (cycle=peak).",
+      "agreement": "unanimous",
+      "evidence_paths": ["8697.T/research/valuation_route.json", "8697.T/research/thesis.md", "8697.T/research/deep_dive_2026-07-21.md"]
+    },
+    {
+      "fact": "Normalized owner cash of \u00a570/share, below spot FY2025 parent EPS \u00a576.81, is the correct starting anchor for the primary method, though the split between core trading fees and rate-sensitive clearing collateral pass-through is not yet verified at the statutory line-item level.",
+      "agreement": "unanimous",
+      "evidence_paths": ["8697.T/research/valuation_contract.json", "8697.T/research/valuation.json", "8697.T/research/evidence_reconciliation_2026-07-21.md"]
+    },
+    {
+      "fact": "At the frozen price of \u00a52,190/share, the additive four-component contract base value is \u00a51,800.4466/share, implying an annualized return of -2.76% over a 7-year horizon \u2014 well below any of the raters' stated ~12-15% hurdles.",
+      "agreement": "unanimous; identical figure cited by all three raters",
+      "evidence_paths": ["8697.T/research/valuation_contract.json", "8697.T/research/valuation.json"]
+    },
+    {
+      "fact": "Filing-only (Lawrence) scenario returns are bear -6.3%, base 1.7%, bull 5.8%; the displayed total-synthesis figure is 3.19%. None of these clear the stated hurdle even in the bull case.",
+      "agreement": "unanimous",
+      "evidence_paths": ["8697.T/research/valuation.json"]
+    },
+    {
+      "fact": "Downside is bounded but not tight: no material operating net debt and a stable ~79%-payout dividend (\u00a561/share) support survival, but the contract low case is \u00a51,000.30/share (-54.32% downside to low) with a -10.59% annualized return, and payout leaves limited retained-earnings cushion against a volume-cycle shock.",
+      "agreement": "unanimous",
+      "evidence_paths": ["8697.T/research/valuation_contract.json", "8697.T/research/deep_dive_2026-07-21.md"]
+    },
+    {
+      "fact": "The core_engine calculation proof applies an unexplained ~1.23x legacy_scale factor between the raw owner-earnings DCF output (~\u00a51,300/share) and the published component value (~\u00a51,600.40/share) with no filing-sourced bridge; the reinvestment_or_assets component (+\u00a5280.07/share) is a judgment plug without a disclosed incremental-ROIC or distributable-cash runway.",
+      "agreement": "unanimous; flagged independently by buffett_weschler, hohn, and munger",
+      "evidence_paths": ["8697.T/research/valuation_contract.json", "8697.T/research/adversarial_2026-07-21.md"]
+    },
+    {
+      "fact": "Automated filing QA is currently unusable: filing_facts_2026-07-21.json returns no_full_tier_text_extract with a stale net-income stub (30.0 vs \u00a579.1B in the earnings release), and the Nov 2025 Japanese annual securities report (20251113_j.pdf) full-tier extract failed on an encoding error, so governance, share count, and H1 FY2026 run-rate remain unverified at full tier.",
+      "agreement": "unanimous; corroborated by the deterministic evidence tribunal and the independent pre-mortem",
+      "evidence_paths": ["8697.T/research/evidence/filing_facts_2026-07-21.json", "8697.T/research/adversarial_2026-07-21.md", "8697.T/research/committee_work/2026-07-21/pre_mortem.json"]
+    },
+    {
+      "fact": "The deterministic evidence tribunal found zero disputed or unresolved material facts in the frozen packet (8697.T/research/committee_work/2026-07-21/evidence_tribunal.json: disputed_facts=[], unresolved_material_facts=[]); everything the raters disagree about below is interpretation, method fit, or documentation consistency, not a contested number.",
+      "agreement": "structural, not a rater claim",
+      "evidence_paths": ["8697.T/research/committee_work/2026-07-21/evidence_tribunal.json"]
+    }
+  ],
+  "disputed_facts": [
+    {
+      "issue": "Archetype/method-fit mismatch: the canonical Power Zone router classifies 8697.T as archetype=compounder and routes to quality_reinvestment (owner-earnings reinvestment DCF, seating buffett_weschler/hohn/munger), while thesis.md and valuation.json's classification_inputs independently tag the same security archetype=croupier at cycle=peak (a Stahl toll-booth/mid-cycle-normalization lens).",
+      "positions": "Router position: compounder framing is defensible because reinvestment_or_assets and incremental ROIC are live, priced components, not zero. Pre-mortem/Munger position: 'Quality_reinvestment route vs croupier peak-cycle classification not reconciled before sizing a volume-leveraged exchange at cycle high' \u2014 flagged as an explicit unresolved item.",
+      "status": "unresolved; not adjudicated by this synthesis \u2014 routed to human review before any sizing decision, since it determines which seated personas' judgment should carry the most weight",
+      "evidence_paths": ["8697.T/research/valuation_route.json", "8697.T/research/thesis.md", "8697.T/research/committee_work/2026-07-21/pre_mortem.json", "8697.T/research/committee_work/2026-07-21/round_1/munger.json"]
+    },
+    {
+      "issue": "Internal documentation inconsistency flagged by the independent adversarial pass (Milly): the deep dive's Classification IRR field shows -2.76% while its own returns-statement / valuation-bridge line shows 3.19% for the same security in the same document.",
+      "positions": "No rater treats this as decision-blocking (adversarial status is complete_with_residual_risks, block_final=false), but it is an unresolved factual inconsistency in the frozen evidence, not merely a rater opinion.",
+      "status": "unresolved; non-blocking per Milly, flagged for correction on next deep-dive refresh",
+      "evidence_paths": ["8697.T/research/adversarial_2026-07-21.md"]
+    },
+    {
+      "issue": "Score dispersion on explanatory_strength and evidence_sufficiency: munger scored explanatory_strength 4 (vs 3 for buffett_weschler and hohn) and evidence_sufficiency 2 (vs 3 for buffett_weschler and hohn), with confidence=low versus their confidence=medium.",
+      "positions": "Munger: the monopoly/inversion mechanism is more hard-to-vary than the other two credit, but the evidence base is thinner because filing_facts and the Japanese annual extract are both broken and reinvestment/net-financial-claims proof rows are judgment plugs, not independent DCF or NAV bridges. Buffett_weschler/hohn: mechanism is one notch less proven (compounder framing sits awkwardly on a cyclical toll booth) but scan-tier Q4 filings and the four-component proof are adequate to vote.",
+      "status": "unresolved but non-material \u2014 dispersion of 1 point on each dimension is below the >2-point escalation threshold (8697.T/research/committee_work/2026-07-21/manifest.json conditional_escalation.required=false), so this synthesis preserves the disagreement rather than averaging the scores into a single number",
+      "evidence_paths": ["8697.T/research/committee_work/2026-07-21/valuation_reconciliation.json", "8697.T/research/committee_work/2026-07-21/round_1/munger.json", "8697.T/research/committee_work/2026-07-21/round_1/buffett_weschler.json", "8697.T/research/committee_work/2026-07-21/round_1/hohn.json"]
+    },
+    {
+      "issue": "Silenced personas: the router excluded pabrai (asymmetry_downside) and stahl (scarce_assets/croupier) from the seated committee for this cycle, even though thesis.md's own archetype tag is 'croupier' (Stahl) and Pabrai's own dhando score in the same file is 'partial' \u2014 both directly on-point lenses for a peak-cycle volume business.",
+      "positions": "Router position: the exclusion followed the documented rule (method chosen before scoring, not after seeing the outcome) and quality_reinvestment scored 20.0 versus 0.0 for scarce_asset_optionality and unscored dhando/asymmetry profiles. Chair note: this is a legitimate methodological choice, not a violation, but it means no seated rater independently pressure-tested the croupier/mid-cycle-normalization framing that the classification file itself uses, or applied a dhando-style margin-of-safety screen distinct from the reinvestment lens.",
+      "status": "unresolved; flagged for human consideration of whether a stahl or pabrai cross-check should be added on the next refresh, not for this cycle's vote",
+      "evidence_paths": ["8697.T/research/valuation_route.json", "8697.T/research/thesis.md"]
+    }
+  ],
+  "preserved_dissent": {
+    "note": "All three independent raters voted watch with no vote split, so there is no minority vote to preserve. The dissent that matters here is the shared bull counter-explanation each rater raised against their own base case \u2014 it is preserved verbatim below rather than netted into the base return figures.",
+    "bull_counter_explanation_by_rater": [
+      {
+        "persona": "buffett_weschler",
+        "counter_explanation": "Japan's structural equity re-rating and sustained retail/inbound engagement make FY2025 the new floor, not the peak: double-digit volume growth persists, clearing collateral and data monetization lift normalized owner cash above \u00a570 with limited fee compression, and the market correctly pays a premium multiple for a widening-moat toll collector whose distributable cash will compound faster than the normalized base case assumes."
+      },
+      {
+        "persona": "hohn",
+        "counter_explanation": "The market correctly prices JPX as a durable domestic exchange monopoly at cycle-peak earnings: FY2025 retail and inbound equity engagement inflated turnover and clearing collateral income, and even normalized \u00a570/sh owner cash cannot compound fast enough from \u00a52,190 to clear a 15% return if volume mean-reverts toward the \u00a5133-162B pre-FY2025 revenue band."
+      },
+      {
+        "persona": "munger",
+        "counter_explanation": "Japan's structural equity re-rating, TSE reforms, and sustained retail/inbound engagement keep turnover and data monetization above mid-cycle, so \u00a570/sh normalized owner cash is too conservative and mid-single-digit growth at ~26x earnings is rational for a scarce monopoly toll booth."
+      }
+    ],
+    "pre_mortem_failure_path_preserved_verbatim": "We sized Japan Exchange Group at \u00a52,190 as a durable croupier monopoly, trusting normalized owner cash of \u00a570 per share and a four-component contract base of \u00a51,800 per share despite cycle classification at peak and contract base return of -2.76% per year (total synthesis 3.19%) far below the ~15% accumulate hurdle. FY2025 was treated as partially normalized when cash equities ADV had already surged +31.9% YoY to \u00a57.52T and clearing collateral income inflated the revenue bridge. The post-boom mean reversion was sharper than the downside_reserve component assumed. Hold-period total return landed near the bear envelope (-6.3% per year) rather than the 1.7% Lawrence base or 3.19% synthesis case \u2014 severe underperformance on a franchise-quality position held for toll-booth durability at the wrong point in the volume cycle."
+  },
+  "value_and_entry_ranges": {
+    "current_price_per_share_jpy": 2190.0,
+    "fair_value_range_per_share_jpy": {"low": 1000.3, "base": 1800.4466, "high": 2700.6095},
+    "price_vs_base_value": "Spot is approximately 21.7% above the additive contract base value (2190 / 1800.4466 - 1), i.e. the packet's own margin-of-safety anchor, not just a bearish rater opinion.",
+    "annualized_return_at_spot_pct_7yr": {"contract_low": -10.59, "contract_base": -2.76, "contract_high": 3.04, "filing_only_bear": -6.3, "filing_only_base": 1.7, "filing_only_bull": 5.8, "displayed_total_synthesis": 3.19},
+    "downside_to_contract_low_pct": -54.32,
+    "component_build_jpy_per_share_base": {"core_engine": 1600.4001, "reinvestment_or_assets": 280.07, "net_financial_claims": 100.0165, "downside_reserve": -180.04},
+    "entry_consideration_zone": "No price computed in the frozen packet clears the raters' stated ~12-15% hurdle; the contract's own base value (\u00a51,800.4466/share, about 18% below spot) is the first margin-of-safety checkpoint the primary method would need before re-approaching an approve vote, and the low case (\u00a51,000.30/share) is the level at which the packet's own bounded low estimate would begin to look like a portfolio-grade return. A specific reverse-DCF entry price (what ADV/revenue path at \u00a52,190 the market is already paying for, and what price would earn ~15% from \u00a570 starting owner cash at a 19x base exit multiple) is listed as an open forensic check in the pre-mortem and has not been computed by this synthesis; the chair is not issuing a price target or sizing instruction.",
+    "caveat": "This is a value-range description drawn from the frozen packet, not a chair-issued price target, entry order, or capital/sizing decision."
+  },
+  "recommendation": "Watch, do not initiate or add to a position at the current \u00a52,190 price. All three independently seated raters (buffett_weschler, hohn, munger), across three distinct independence groups, converged on 'watch' with sufficient evidence and no material score dispersion (all four score dimensions within a 1-point range, expected-return midpoints within 2.0pp of each other) \u2014 the deterministic escalation check found no trigger for a second independent round, so this is not an averaged or diluted consensus but three separately-reasoned confirmations of the same conclusion. The primary quality_reinvestment method (owner-earnings reinvestment DCF) and its two corroborating checks (reverse_dcf, incremental_roic_runway) all point the same way: at \u00a52,190 the contract base value of \u00a51,800.4466/share implies -2.76% per year over 7 years, the filing-only base is 1.7%, and even the bull case (5.8%) and contract high case (3.04%) sit far below any of the stated ~12-15% hurdles. The franchise quality, moat, and downside bounding (no material operating net debt, stable dividend) are not disputed \u2014 the reason to hold off is price relative to a peak-cycle owner-cash base, not business quality. Before any capital decision, the human owner should resolve the unreconciled compounder-vs-croupier archetype conflict (which determines whether reinvestment or mid-cycle-normalization framing should dominate on the next cycle), obtain a usable full-tier extract of the Japanese annual securities report and a filing-verified H1 FY2026 run-rate (both currently broken), and treat the shared bull counter-explanation above as the live falsifier to monitor rather than a reason to override three independent 'watch' votes today. This synthesis makes no capital allocation or position-sizing decision; that remains with human_decision.json.",
+  "monitoring_plan": {
+    "operational_milestones": [
+      "Successfully re-extract the Nov 2025 Japanese annual securities report (20251113_j.pdf); current extract fails on encoding and leaves governance, share count, and statutory detail unverified.",
+      "Obtain a filing-verified H1 FY2026 (Apr-Sep 2025) cash-equity ADV and clearing-fee run-rate from E_ER_JPX_Q2FY2025.pdf or an equivalent full-tier source; the packet currently has scan-tier only.",
+      "Repair filing_facts_2026-07-21.json automated extraction (currently no_full_tier_text_extract with a stale net-income stub of 30.0 vs the \u00a579.1B earnings-release figure) before trusting automated filing QA again.",
+      "Confirm current diluted shares outstanding from the latest yuho; the packet still uses ~1,030M from the FY2024 annual report under [HUMAN REVIEW].",
+      "Trace the core_engine ~1.23x legacy_scale factor and the reinvestment_or_assets judgment plug (+\u00a5280.07/share) to a disclosed, filing-sourced bridge (incremental ROIC, reinvestment rate, or distributable-cash runway) rather than leaving them as unexplained scaffolding."
+    ],
+    "evidence_refresh_dates": [
+      "Next quarterly earnings release (Q1 FY2027) for updated ADV, revenue, and clearing-collateral bridge.",
+      "Next annual securities report (yuho) filing following FY2026 fiscal year-end (2027-03-31)."
+    ],
+    "valuation_refresh_triggers": [
+      "Normalized owner cash per share falls below \u00a555 for two consecutive fiscal years without a disclosed structural fee cut (shared falsifier, all three raters).",
+      "Two consecutive quarters with cash equities ADV below \u00a55.5T without a disclosed structural fee cut.",
+      "Cash equities ADV declines more than 20% year over year for two consecutive quarters with no offsetting fee or data revenue.",
+      "Operating margin compresses below 50% while ADV remains above \u00a56T, indicating fee-cap or mix deterioration rather than pure volume cyclicality.",
+      "Regulatory fee-cap legislation or proposal with a quantified EPS impact.",
+      "Incremental return on capital on disclosed technology/data reinvestment stays below 12% while payout remains above 75% and share count is not reduced.",
+      "material filing",
+      "capital-structure change",
+      "thesis falsifier"
+    ],
+    "price_review_thresholds": [
+      "Price approaches or falls to the additive contract base value of approximately \u00a51,800/share (the primary method's own margin-of-safety anchor).",
+      "Price falls toward the contract low-case value of approximately \u00a51,000/share, where the packet's own bounded low estimate would begin to imply a portfolio-grade return.",
+      "Price rises further while normalized owner cash and ADV show early signs of mean reversion, widening the gap between spot and the base contract value rather than closing it."
+    ],
+    "thesis_break_conditions": [
+      "Franchise moat impairment: loss of exclusive domestic clearing/exchange infrastructure position or material competitive entry.",
+      "Operating net debt becomes material, removing the current downside bound cited by all three raters.",
+      "The compounder-vs-croupier archetype conflict resolves toward croupier/mid-cycle-normalization framing with no credible reinvestment runway, which would remove the basis for the currently seated quality_reinvestment primary method itself.",
+      "Two consecutive years of normalized owner cash below \u00a555/share (shared hard falsifier)."
+    ],
+    "expected_catalyst_dates": [
+      "Next earnings release carrying an update to the FY2027 management guide (revenue \u00a5205B / operating income \u00a5115B) versus the FY2025 peak (\u00a5116.3B operating income).",
+      "Any TSE/JPX regulatory fee-cap proposal or legislative announcement."
+    ],
+    "outcome_horizons_months": [6, 12, 24]
+  }
+}

@@ -111,7 +111,7 @@ def build_queue(
         "updated": now(),
         "source": "build_contract_backfill_queue.py",
         "reason": "contract_backfill",
-        "max_parallel": 3,
+        "max_parallel": 1,
         "total_pending": len(ordered),
         "almost_there_count": len(almost),
         "unmapped_count": len(unmapped),
@@ -126,7 +126,12 @@ def build_queue(
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--wave-size", type=int, default=40, help="Tickers to authorize and queue now")
+    parser.add_argument(
+        "--wave-size",
+        type=int,
+        default=5,
+        help="Tickers to authorize and queue now (keep small so CI/automerge can drain)",
+    )
     parser.add_argument("--no-authorize", action="store_true", help="Write queue without authorized_evidence packets")
     parser.add_argument(
         "--exclude-ticker",
