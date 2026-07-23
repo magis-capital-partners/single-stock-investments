@@ -1061,7 +1061,7 @@ def synthesis_markdown(data: dict) -> str:
             f"{q.get('rationale', '')[:70]} | {q.get('sources', '')[:50]} |"
         )
     if not syn.get("qualitative_adjustments"):
-        lines.append("| — | (none) | 0 | — | — |")
+        lines.append("| n/a | (none) | 0 | n/a | n/a |")
     qdc = qaudit.get("deutsch_checks") or {}
     lines += [
         "",

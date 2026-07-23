@@ -1,18 +1,23 @@
 # CRML — Investment Thesis
 
-**Last updated:** 2026-07-20
+**Last updated:** auto-sync
 
 ## Classification
 
 | Field | Value |
 |-------|-------|
-| **Archetype** (Stahl) | unknown |
+| **Archetype** (Stahl) | optionality |
 | **Moat** (Munger) | unproven |
-| **Dhando** (Pabrai) | pending |
+| **Dhando** (Pabrai) | none |
 | **Stance** | watch |
-| **Cycle** | - |
-| **MOI bucket** (legacy) | pending |
-| **Payoff lens** | pending |
+| **Cycle** | up |
+| **Implied 7yr IRR** (base) | -9.96% (contract base) |
+| **IRR method** | quality_reinvestment |
+| **Lawrence bucket** | other |
+| **Payoff lens** | asset |
+| **MOI bucket** | pending |
+
+**Deep dive:** `CRML/research/deep_dive_2026-07-23.md` (auto-sync)
 
 ## One-line thesis
 

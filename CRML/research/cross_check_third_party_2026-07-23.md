@@ -37,13 +37,13 @@ No approved third-party sources are indexed for CRML. Marvin stance and componen
 | Lens | Owner cash / value | Return / horizon | Stance hint |
 |------|-------------------|------------------|-------------|
 | Marvin component base | $3.07/sh risked sum | 7yr @ $6.40 → ~-10% annualized on component NAV | watch |
-| Lawrence scenario base | $4.00/sh payoff | -6.5% per year (7yr) | watch |
+| Lawrence scenario base | $4.00/sh payoff | **-7.34%** per year (7yr) | watch |
 | External (combined) | — | — | — |
-| **Blended best estimate** | **$4.00/sh** (Lawrence base; filings only) | **-6.5%** per year | **watch** |
+| **Blended best estimate** | **$4.00/sh** (Lawrence base; filings only) | **-7.34%** per year | **watch** |
 
 **Weights:** 100% primary filings; no approved third party in base.
 
-**Returns statement (blended):** Base return remains **-6.5%** per year on **$4.00** seven-year risked payoff; component proof sum **$3.07/sh** is corroborating NAV view, not blended into Lawrence gate without [HUMAN REVIEW].
+**Returns statement (blended):** Base return remains **-7.34%** per year on **$4.00** seven-year risked payoff; component proof sum **$3.07/sh** is corroborating NAV view, not blended into Lawrence gate without [HUMAN REVIEW].
 
 ## [HUMAN REVIEW]
 
