@@ -289,6 +289,24 @@ def build_ticker(ticker: str) -> int:
         if len(annuals) >= 2 and annuals[1].get("tier") == "partial":
             annuals[1]["tier"] = "full"
 
+    # Foreign/private issuers: multiple 20-F / 40-F / 10-K filings — promote prior annual to full
+    if sum(1 for d in docs if d.get("tier") == "full") < 2:
+        sec_annuals = sorted(
+            [
+                d
+                for d in docs
+                if d.get("kind") in ("20-F", "40-F", "10-K", "20-f", "40-f", "10-k")
+                and d.get("tier") in ("full", "partial")
+            ],
+            key=lambda d: (d.get("file_date") or "", d.get("filename") or ""),
+            reverse=True,
+        )
+        for d in sec_annuals[1:]:
+            if sum(1 for x in docs if x.get("tier") == "full") >= 2:
+                break
+            if d.get("tier") == "partial":
+                d["tier"] = "full"
+
     transcript_latest.sort(
         key=lambda d: (d.get("file_date") or "", d.get("filename") or ""), reverse=True
     )
