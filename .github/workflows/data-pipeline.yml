@@ -368,28 +368,65 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-      - name: CVR discovery (SEC + inbox, fail-soft)
+      - name: CVR discovery (SEC + inbox + stubs, fail-soft)
         # Script exits 0 on EDGAR failures; discovery_state.unhealthy tracks streaks.
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          CVR_ALPHARANK_DROP_PATH: ${{ vars.CVR_ALPHARANK_DROP_PATH }}
         run: |
           python _system/scripts/refresh_cvr_universe.py \
             --discover \
+            --discover-non-sec-family \
             --ingest-inbox \
+            --sync-alpharank \
+            --create-stubs \
             --write-review \
+            --alert \
             --skip-sync \
             --sleeve-policy ready \
             --discover-days 14 \
             --discover-limit 25
+          python _system/scripts/check_cvr_universe.py || true
+      - name: Stage stub ticker folders from universe
+        run: |
+          python - <<'PY'
+          import json
+          import subprocess
+          from pathlib import Path
+
+          doc = json.loads(Path("_system/reference/cvr/cvr_universe.json").read_text(encoding="utf-8"))
+          paths: list[str] = []
+          for row in (doc.get("pre_close_opportunities") or []) + (doc.get("post_close_universe") or []):
+              ticker = str(row.get("ticker") or "").strip()
+              if not ticker:
+                  continue
+              for rel in (
+                  f"{ticker}/README.md",
+                  f"{ticker}/research/cvr_terms.json",
+                  f"{ticker}/research/authorized_evidence.json",
+                  f"{ticker}/research/research_agent_manifest.json",
+              ):
+                  if Path(rel).exists():
+                      paths.append(rel)
+          if paths:
+              subprocess.check_call(["git", "add", "--", *paths])
+              print(f"staged {len(paths)} stub paths")
+          else:
+              print("no stub ticker paths to stage")
+          PY
       - name: Commit discovery artifacts
         uses: ./.github/actions/commit-main
         with:
           message: |
             chore: CVR weekly discovery $(date -u +%Y-%m-%d)
 
-            SEC full-text + inbox CSV ingest into cvr_universe.json (context tier).
+            SEC full-text + inbox CSV + stubs into cvr_universe.json (context tier).
           git_add: >-
             _system/reference/cvr/
             _system/portfolio/investment_sleeves.json
+            _system/portfolio/registry.json
             _system/reviews/pending/
+            _system/data/cvr_agent_queue.json
 
   pipeline-summary:
     needs: [decide, intake-full, activist, downloads, drive, news, cvr-discover]
