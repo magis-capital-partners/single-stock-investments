@@ -127,6 +127,16 @@ def should_skip_step(step: list[str]) -> bool:
     return script in DRIVE_API_STEPS and not drive_api_configured()
 
 
+def expand_steps(steps: list[list[str]]) -> list[list[str]]:
+    """Insert CVR universe refresh immediately before each dashboard build."""
+    out: list[list[str]] = []
+    for step in steps:
+        if step and step[0].endswith("build_dashboard_data.py"):
+            out.append(["_system/scripts/refresh_cvr_universe.py"])
+        out.append(step)
+    return out
+
+
 def run_profile(profile: str, *, dry_run: bool = False) -> int:
     resolved = resolve_profile(profile)
     steps = PROFILES.get(resolved)
@@ -134,6 +144,7 @@ def run_profile(profile: str, *, dry_run: bool = False) -> int:
         known = ", ".join(sorted(set(PROFILES) | set(ALIASES)))
         raise SystemExit(f"Unknown rebuild profile: {profile!r} (known: {known})")
 
+    steps = expand_steps(steps)
     print(f"ci_rebuild_profile: profile={profile} resolved={resolved} steps={len(steps)}")
     env = os.environ.copy()
     for step in steps:

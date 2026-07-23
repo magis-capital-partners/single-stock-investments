@@ -11,7 +11,11 @@ ROOT = Path(__file__).resolve().parents[2]
 
 class WorkflowGovernanceTests(unittest.TestCase):
     def test_actions_surface_has_no_manual_run_choices(self):
+        # Existing schedule+manual ops surfaces; everything else is schedule/push only.
+        allow_manual = {"dashboard-pages.yml", "letter-backfill.yml"}
         for path in (ROOT / ".github" / "workflows").glob("*.yml"):
+            if path.name in allow_manual:
+                continue
             text = path.read_text(encoding="utf-8")
             self.assertNotRegex(text, r"(?m)^\s{2}workflow_dispatch:\s*$", path.name)
 

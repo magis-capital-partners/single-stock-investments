@@ -366,14 +366,15 @@ test_main_writer_workflows_share_lock() {
     text=$(git show "${SMOKE_START_REF:-HEAD}:.github/workflows/$workflow" 2>/dev/null \
       || cat ".github/workflows/$workflow")
     # letter-backfill: download job is vault-only (letter-vault-download);
-    # extract-and-publish must still take the shared ops lock.
+    # publish-dashboard must still take the shared ops lock.
     if [ "$workflow" = "letter-backfill.yml" ]; then
-      if ! printf '%s\n' "$text" | grep -A3 'extract-and-publish:' | grep -q 'group: data-commit-main'; then
-        echo "FAIL: letter-backfill extract-and-publish must use data-commit-main"
+      # concurrency sits a few lines under the job key (needs/runs-on/timeout first).
+      if ! printf '%s\n' "$text" | grep -A8 'publish-dashboard:' | grep -q 'group: data-commit-main'; then
+        echo "FAIL: letter-backfill publish-dashboard must use data-commit-main"
         exit 1
       fi
-      if ! printf '%s\n' "$text" | grep -A8 'extract-and-publish:' | grep -q 'cancel-in-progress: false'; then
-        echo "FAIL: letter-backfill extract-and-publish must keep queued writers"
+      if ! printf '%s\n' "$text" | grep -A10 'publish-dashboard:' | grep -q 'cancel-in-progress: false'; then
+        echo "FAIL: letter-backfill publish-dashboard must keep queued writers"
         exit 1
       fi
       continue

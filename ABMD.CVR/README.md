@@ -1,7 +1,14 @@
 # Abiomed CVR (Johnson & Johnson acquisition) (ABMD.CVR)
 
-**Ticker:** ABMD.CVR | **Market:** US
-**Last updated:** 2026-07-02
+**Ticker:** ABMD.CVR | **Market:** US  
+**Last updated:** 2026-07-23  
+**Stage:** post-close | **Tradeable:** no | **Max:** $35.00
+
+## Term sheet
+
+- `research/term_sheet.md`
+- `research/cvr_terms.json`
+- SEC HTML: `investor-documents/sec/`
 
 ## Download
 
