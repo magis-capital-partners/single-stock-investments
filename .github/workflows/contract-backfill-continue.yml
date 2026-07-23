@@ -21,10 +21,12 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
-      - name: Skip while Research Queue is already running
+      - name: Skip while Research Queue is busy or open Cursor PRs are saturated
         id: gate
         env:
           GH_TOKEN: ${{ github.token }}
+          # Cap in-flight agent PRs so CI/automerge can drain consistently.
+          MAX_OPEN_CURSOR_PRS: "5"
         run: |
           set -euo pipefail
           ACTIVE=$(gh api "repos/${{ github.repository }}/actions/workflows/marvin-deep-dive.yml/runs?status=in_progress&per_page=5" \
@@ -33,6 +35,15 @@ jobs:
             --jq '.total_count')
           if [ "${ACTIVE}" != "0" ] || [ "${QUEUED}" != "0" ]; then
             echo "Research Queue still active (in_progress=${ACTIVE}, queued=${QUEUED}); skipping refill."
+            echo "refill=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          # Gate runs before checkout — gh must get an explicit --repo (no local .git).
+          OPEN_CURSOR=$(gh pr list --repo "${{ github.repository }}" --state open --limit 100 --json headRefName --jq '
+            [.[] | select(.headRefName|startswith("cursor/"))] | length
+          ')
+          if [ "${OPEN_CURSOR}" -ge "${MAX_OPEN_CURSOR_PRS}" ]; then
+            echo "Open cursor/* PRs=${OPEN_CURSOR} >= ${MAX_OPEN_CURSOR_PRS}; skipping refill until automerge drains."
             echo "refill=false" >> "$GITHUB_OUTPUT"
             exit 0
           fi
@@ -74,12 +85,12 @@ jobs:
           print(",".join(data.get("tickers") or []))
           PY
           )
-          mapfile -t OPEN < <(gh pr list --state open --limit 100 --json headRefName,title --jq '
+          mapfile -t OPEN < <(gh pr list --repo "${{ github.repository }}" --state open --limit 100 --json headRefName,title --jq '
             .[]
             | select(.headRefName|startswith("cursor/"))
             | (.title|capture("^(?<t>[A-Z0-9._-]+)").t // empty)
           ' | sort -u)
-          ARGS=(--wave-size 40)
+          ARGS=(--wave-size 5)
           for t in "${OPEN[@]+"${OPEN[@]}"}"; do
             [ -n "$t" ] || continue
             ARGS+=(--exclude-ticker "$t")
