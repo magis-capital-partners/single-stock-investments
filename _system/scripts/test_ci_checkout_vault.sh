@@ -39,4 +39,27 @@ assert_url embedded-token "https://github.com/magis-capital-partners/research-va
 assert_token trims-newline "ghp_test" $'ghp_test\n'
 assert_token trims-cr "ghp_test" $'ghp_test\r\n'
 
+assert_auth_url() {
+  local name="$1"
+  local expected="$2"
+  local actual
+  actual="$(
+    RESEARCH_VAULT_CLONE_TOKEN="$3" vault_authenticated_url "$4"
+  )"
+  if [ "$actual" != "$expected" ]; then
+    echo "FAIL: $name - expected '$expected', got '$actual'" >&2
+    exit 1
+  fi
+  echo "OK: $name"
+}
+
+assert_auth_url embeds-token \
+  "https://x-access-token:ghp_abc@github.com/magis-capital-partners/research-vault.git" \
+  "ghp_abc" \
+  "https://github.com/magis-capital-partners/research-vault.git"
+assert_auth_url strips-embedded-then-reauths \
+  "https://x-access-token:gho_xyz@github.com/magis-capital-partners/research-vault.git" \
+  "gho_xyz" \
+  "https://x-access-token:old@github.com/magis-capital-partners/research-vault.git"
+
 echo "All ci_checkout_vault_lib tests passed."
