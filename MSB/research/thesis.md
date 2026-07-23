@@ -17,7 +17,7 @@
 | **Payoff lens** | pending |
 | **MOI bucket** | pending |
 
-**Deep dive:** `MSB/research/deep_dive_2026-07-21.md` (auto-sync)
+**Deep dive:** `MSB/research/deep_dive_2026-07-23.md` (auto-sync)
 
 Predictive-attribute tag (portfolio JSON): **equity_yield_curve** — legal/pricing hiatus vs long-lived pellet royalty contract (human to confirm usefulness).
 
