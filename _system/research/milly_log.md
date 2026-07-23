@@ -196,5 +196,5 @@ One row per adversarial or consistency re-pass. Append via `milly_repass.py` or 
 | 2026-07-21 | ABBV | standard_batch | OK | marvin_cloud_refresh |
 | 2026-07-21 | ADN.TO | standard_batch | OK | marvin_cloud_refresh |
 | 2026-07-21 | ADN.TO | standard_batch | OK | marvin_cloud_refresh |
-| 2026-07-21 | AFRM | standard_batch | OK | marvin_cloud_refresh |
-| 2026-07-21 | AFRM | standard_batch | OK | marvin_cloud_refresh |
+| 2026-07-21 | 8697.T | consistency_repass | OK | â€” |
+| 2026-06-01 | TPL | consistency_repass | OK | â€” |

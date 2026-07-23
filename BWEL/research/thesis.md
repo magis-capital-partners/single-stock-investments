@@ -11,13 +11,13 @@
 | **Dhando** (Pabrai) | partial |
 | **Stance** | watch |
 | **Cycle** | trough |
-| **Implied 7yr IRR** (base) | 2.57% (total synthesis) |
-| **IRR method** | full |
+| **Implied 7yr IRR** (base) | — |
+| **IRR method** | quality_reinvestment |
 | **Lawrence bucket** | low_cost |
 | **Payoff lens** | asset |
 | **MOI bucket** | pending |
 
-**Deep dive:** `BWEL/research/deep_dive_2026-06-04.md` (auto-sync)
+**Deep dive:** `BWEL/research/deep_dive_2026-07-21.md` (auto-sync)
 **Fact-check:** `BWEL/research/fact_check_water_nav_2026-06-02.md`
 
 ## One-line thesis

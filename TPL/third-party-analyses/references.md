@@ -14,7 +14,7 @@
 
 ### Horizon Kinetics cross-reference
 
-Auto-scan `TPL/third-party-analyses/hk_scan_2026-06-02.md`. Mental models: predictive_attributes, hard_asset_scarcity, water_rights.
+Auto-scan `TPL/third-party-analyses/hk_scan_2026-07-21.md`. Mental models: predictive_attributes, hard_asset_scarcity, water_rights.
 
 **Cross-check:** `TPL/research/cross_check_HK_2026-06-01.md`
 
@@ -26,4 +26,3 @@ Auto-scan `TPL/third-party-analyses/hk_scan_2026-06-02.md`. Mental models: predi
 | `_system/reference/investment-wisdom/horizon-kinetics/HK-Q3-2025-Commentary-extract.txt` | Line 1642: (“TPL”) and Miami International Holdings (“MIAX”), both of which are  | Context (not in base IRR) |
 | `_system/reference/investment-wisdom/horizon-kinetics/HK-Q3-2025-Commentary-extract.txt` | Line 1644: substantial amounts of TPL and MIAX, both directly and indirectly, in | Context (not in base IRR) |
 | `_system/reference/investment-wisdom/horizon-kinetics/HK-Q3-2025-Commentary-extract.txt` | Line 1646: and physical safeguards. Additionally, Mr. Stahl does not exercise in | Context (not in base IRR) |
-| VIC: TPL VIC PDF | 2026-06-20 | TPL/third-party-analyses/vic/vic_pdf_2026-06-20_tpl-vic-pdf_f4469e89be.pdf | **Pending** - local single-page intake `TPL/third-party-analyses/vic/vic_pdf_2026-06-20_tpl-vic-pdf_f4469e89be.pdf`; not in base IRR |

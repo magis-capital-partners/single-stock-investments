@@ -255,6 +255,12 @@ def primary_irr_pct(val: dict) -> float | int | str | None:
         if syn is not None:
             return syn
     ticker = str(val.get("ticker") or "").upper()
+    method = val.get("method") or val.get("irr_method")
+    legacy_pct = val.get("implied_return", {}).get("base_pct") or (val.get("results") or {}).get("base", {}).get(
+        "return_pct"
+    )
+    if method in ("yield_curve", "full", "scenario") and legacy_pct is not None:
+        return legacy_pct
     authority = resolve_authority(ROOT / ticker / "research", val) if ticker else {}
     contract_base = (authority.get("return_range_pct") or {}).get("base")
     if contract_base is not None:
