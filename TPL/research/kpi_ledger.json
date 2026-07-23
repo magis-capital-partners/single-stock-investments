@@ -1,0 +1,140 @@
+{
+  "ticker": "TPL",
+  "as_of": "2026-07-23",
+  "theme_ids": [
+    "ai_power_land"
+  ],
+  "schema_version": "1.0",
+  "kpis": [
+    {
+      "kpi_id": "hyperscaler_capex_guide_bn",
+      "label": "Hyperscaler capex guide (USD bn)",
+      "unit": "usd_bn",
+      "expected": {
+        "op": "gte",
+        "value": 300,
+        "horizon": "2026"
+      },
+      "actual": {
+        "value": 320.0,
+        "as_of": "2026-07-23"
+      },
+      "status": "pass",
+      "source": "theme:hyperscaler_capex_ttm_usd_bn",
+      "evidence_tier": "derived_filing",
+      "last_checked": "2026-07-23",
+      "binds_to": {
+        "valuation_path": "growth_explanation.falsifiers[0]",
+        "on_fail": "human_review",
+        "note": "Upstream AI demand pulse for Permian land/water optionality"
+      },
+      "in_base_irr": false,
+      "prediction_role": "orientation"
+    },
+    {
+      "kpi_id": "water_revenue_m",
+      "label": "TPL water segment revenue (USD m, FY)",
+      "unit": "usd_m",
+      "expected": {
+        "op": "gte",
+        "value": 300,
+        "horizon": "FY2025"
+      },
+      "actual": {
+        "value": 307.5,
+        "as_of": "2026-06-01"
+      },
+      "status": "pass",
+      "source": "theme:tpl_water_revenue_m",
+      "evidence_tier": "filing",
+      "last_checked": "2026-07-23",
+      "binds_to": {
+        "valuation_path": "growth_explanation.falsifiers[1]",
+        "on_fail": "human_review",
+        "note": "Water uplift falsifier; FY2026 risky prediction targets >$330M"
+      },
+      "in_base_irr": false,
+      "prediction_role": "reinforcement"
+    },
+    {
+      "kpi_id": "consolidated_growth_y1_5",
+      "label": "Consolidated growth years 1-5 (fraction)",
+      "unit": "fraction",
+      "expected": {
+        "op": "gte",
+        "value": 0.03,
+        "horizon": "base"
+      },
+      "actual": {
+        "value": 0.05,
+        "as_of": "2026-07-21"
+      },
+      "status": "pass",
+      "source": "valuation:growth_explanation.consolidated_growth.y1_5",
+      "evidence_tier": "assumption",
+      "last_checked": "2026-07-23",
+      "binds_to": {
+        "valuation_path": "growth_explanation.consolidated_growth.y1_5",
+        "on_fail": "human_review"
+      },
+      "in_base_irr": false,
+      "prediction_role": "interference"
+    },
+    {
+      "kpi_id": "wti_crude_usd",
+      "label": "WTI crude (USD/bbl)",
+      "unit": "usd_bbl",
+      "expected": {
+        "op": "gte",
+        "value": 50,
+        "horizon": "cycle_floor"
+      },
+      "actual": {
+        "value": 93.16000366210938,
+        "as_of": "2026-07-23"
+      },
+      "status": "pass",
+      "source": "theme:wti_crude",
+      "evidence_tier": "market",
+      "last_checked": "2026-07-23",
+      "binds_to": {
+        "valuation_path": "growth_explanation.mechanisms[0]",
+        "on_fail": "human_review",
+        "note": "Permian royalty toll activity context"
+      },
+      "in_base_irr": false,
+      "prediction_role": "orientation"
+    },
+    {
+      "kpi_id": "trailing_owner_cash_m",
+      "label": "Trailing owner cash / FCF (USD m, FY2025)",
+      "unit": "usd_m",
+      "expected": {
+        "op": "gte",
+        "value": 450,
+        "horizon": "FY2025"
+      },
+      "actual": {
+        "value": 484.5,
+        "as_of": "2026-02-18"
+      },
+      "status": "pass",
+      "source": "manual:fy2025_fcf",
+      "evidence_tier": "filing",
+      "last_checked": "2026-07-23",
+      "binds_to": {
+        "valuation_path": "growth_explanation.falsifiers[2]",
+        "on_fail": "human_review",
+        "note": "FY2025 FCF $484.5M from inputs.fcf_source. FY2026 OCF <$550M falsifier still applies when next 10-K lands."
+      },
+      "in_base_irr": false,
+      "prediction_role": "interference"
+    }
+  ],
+  "summary": {
+    "pass": 5,
+    "fail": 0,
+    "stale": 0,
+    "unchecked": 0
+  }
+}

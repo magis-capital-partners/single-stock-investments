@@ -80,6 +80,7 @@ Legacy `moi_bucket` values map 1:1 → `payoff_lens` (see `moi_lens.md`).
 | Crypto / digital-asset look-through discount | `holdings_crypto.json` + book or crypto NAV ≫ price | `crypto_economics_valuation.md` look-through §; lint fails if Q5/exec ignore NAV gap |
 | Mechanical overlay refresh | `evidence_refresh.type` in valuation.json | `optionality_valuation.md` § Mechanical refresh; `marvin_cloud_refresh.py` |
 | Insider conviction (Form 4) | US CIK + `insider_signal` in valuation.json | `optionality_valuation.md` § Insider conviction; `apply_insider_signal.py` |
+| World Model / industry KPIs | `kpi_ledger.json` / industry nodes | `optionality_valuation.md` § World Model; `scaffold_industry_kpi_ledgers.py`; `build_world_model_snapshot.py` |
 | Option treatment ladder | Every dive — scan table | `option_treatment.md` |
 | Equity stub scenarios | `levered` lens | `equity_stub_valuation.md` |
 | External view blend | Approved third party cited | `external_view_blend.md` |

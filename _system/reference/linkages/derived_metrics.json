@@ -1,0 +1,86 @@
+{
+  "generated_at": "2026-07-23T18:19:57Z",
+  "as_of": "2026-07-23",
+  "disclaimer": "Context only. Derived linkages inform stance and KPI ledgers; they never auto-inflate Lawrence base IRR.",
+  "edge_count": 3,
+  "metrics": {
+    "hyperscaler_capex_to_land_power": {
+      "edge_id": "hyperscaler_capex_to_land_power",
+      "metric": "hyperscaler_capex_ttm_usd_bn",
+      "latest": 320.0,
+      "as_of": "2026-07-23",
+      "status": "ok",
+      "theme_id": "ai_power_land",
+      "unit": "usd_bn",
+      "evidence_tier": "derived_filing",
+      "in_base_irr": false,
+      "to": {
+        "tickers": [
+          "TPL",
+          "APLD",
+          "LB"
+        ],
+        "kpi_ids": [
+          "hyperscaler_capex_guide_bn"
+        ]
+      },
+      "stale": false,
+      "direction": "flat",
+      "yoy_pct": null,
+      "source": "repo:valuation.json/ai_overlay",
+      "contributors": [
+        "GOOGL:185",
+        "META:135"
+      ]
+    },
+    "gold_spot_to_royalty_sentiment": {
+      "edge_id": "gold_spot_to_royalty_sentiment",
+      "metric": "gold_spot_usd",
+      "latest": 370.8555908203125,
+      "as_of": "2026-07-23",
+      "status": "ok",
+      "theme_id": "gold_royalties",
+      "unit": "usd_oz_or_gld_proxy",
+      "evidence_tier": "market",
+      "in_base_irr": false,
+      "to": {
+        "tickers": [
+          "RGLD",
+          "MSB"
+        ],
+        "kpi_ids": [
+          "gold_spot_proxy"
+        ]
+      },
+      "stale": false,
+      "direction": "up",
+      "yoy_pct": 18.8,
+      "source": "yahoo:GLD (GLD price proxy when London fix unavailable)",
+      "contributors": null
+    },
+    "vix_to_exchange_vol_context": {
+      "edge_id": "vix_to_exchange_vol_context",
+      "metric": "vix_level",
+      "latest": 19.65999984741211,
+      "as_of": "2026-07-23",
+      "status": "ok",
+      "theme_id": "exchange_volatility",
+      "unit": "index",
+      "evidence_tier": "market",
+      "in_base_irr": false,
+      "to": {
+        "tickers": [
+          "ICE"
+        ],
+        "kpi_ids": [
+          "vix_level"
+        ]
+      },
+      "stale": false,
+      "direction": "up",
+      "yoy_pct": 27.9,
+      "source": "yahoo:^VIX",
+      "contributors": null
+    }
+  }
+}

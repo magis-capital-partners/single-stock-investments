@@ -18,8 +18,10 @@ Pinned sleeve filter: **CVRs** (`cvr_all`) — first sleeve button after **All**
 |----------|------|
 | Universe registry | `cvr_universe.json` |
 | Sleeve membership | `_system/portfolio/investment_sleeves.json` → `cvr_contingent` |
+| Optional watch sleeve | `cvr_watch` (context stubs; opt-in `--enable-watch-sleeve`) |
 | Per-name terms | `{TICKER}/research/cvr_terms.json` |
-| Term sheet index | `examples/term_sheet_index.md` |
+| Agent handoff queue | `_system/data/cvr_agent_queue.json` |
+| Integrity check | `_system/scripts/check_cvr_universe.py` |
 | Refresh script | `_system/scripts/refresh_cvr_universe.py` |
 
 ### Current membership
@@ -32,29 +34,64 @@ Pinned sleeve filter: **CVRs** (`cvr_all`) — first sleeve button after **All**
 ## Automatic pipeline
 
 ```text
+# Weekly (Monday 15:00 UTC) — Parts 1–3 discovery
 refresh_cvr_universe.py
-  → sync cvr_contingent tickers from cvr_universe.json
-  → ensure registry holdings + classification.investment_sleeve
-  → refresh display fields on cvr_terms.json
-  → sync_investment_sleeves.py
+  --discover --discover-non-sec-family
+  --sync-alpharank --ingest-inbox --create-stubs
+  --write-review --alert --skip-sync
+  → SEC EFTS primary + expanded + ECIP/bank family (fail-soft)
+  → Google News RSS + SEC Atom current 8-K (free, no keys)
+  → AlphaRank drop path → inbox/ → processed/ (optional)
+  → CIK→target resolve, form filters, accession+CIK dedupe
+  → stub folders (skeleton terms; sleeve NOT ready)
+  → reviews/pending/cvr_discovery_*.md (+ optional Slack)
+
+# Nightly / every dashboard build — Part 4 monitoring (no SEC)
+refresh_cvr_universe.py --refresh-prices --apply-transitions --queue-stubs
+  → Yahoo quotes → p_market / naive IRR display
+  → pre→post stage transitions when close_date set
+  → queue incomplete stubs for Marvin
+  → sleeve = terms_complete only
+check_cvr_universe.py
 build_dashboard_data.py
-  → row["cvr"] payload + pinned sleeve_filters cvr_all
 ```
+
+**Sleeve guardrail:** `cvr_terms.json` must have `stub=false`, `terms_complete=true`, and max payout or milestones before a name appears on the pinned **CVRs** filter.
 
 **Hooks**
 
-- Nightly / light download: `download_all_holdings.py` → `daily_refresh` runs refresh before dashboard build
-- CI profiles: `ci_rebuild_profile.py` inserts refresh before every `build_dashboard_data.py`
-- Direct workflows: `ls-algo-universe.yml`, `letter-backfill.yml`
+- Weekly discovery: Data Pipeline cron `0 15 * * 1` → job `cvr-discover`
+- Nightly / light download: `download_all_holdings.py`
+- CI profiles: `ci_rebuild_profile.py` inserts refresh + check before every `build_dashboard_data.py`
 
-**Optional discovery**
+**Secondary feeds**
+
+| Feed | How | Key? |
+|------|-----|------|
+| SEC EDGAR full-text (EFTS) | `--discover` | Free |
+| Google News RSS | auto with `--discover` (or `--discover-news`) | Free |
+| SEC Atom current 8-K | auto with `--discover` | Free |
+| ClinicalTrials.gov / OpenFDA | `--refresh-milestones` | Free |
+| Yahoo chart quotes | `--refresh-prices` | Free |
+| CSV inbox | Drop files in `inbox/` | Manual |
+| AlphaRank CSV drop | `CVR_ALPHARANK_DROP_PATH` (optional) | Manual export |
+| Slack alerts | `SLACK_WEBHOOK_URL` (optional) | Optional |
+
+**Manual**
 
 ```bash
-python _system/scripts/refresh_cvr_universe.py --discover
-python _system/scripts/refresh_cvr_universe.py --ingest-csv path/to/screener.csv
+python _system/scripts/refresh_cvr_universe.py \
+  --discover --discover-non-sec-family --ingest-inbox --sync-alpharank \
+  --create-stubs --write-review --alert --skip-sync
+
+python _system/scripts/refresh_cvr_universe.py \
+  --refresh-prices --refresh-milestones --apply-transitions --queue-stubs
+
+python _system/scripts/check_cvr_universe.py --strict
+python _system/scripts/test_cvr_discovery.py
 ```
 
-SEC / CSV hits land as context-tier `pre_close` candidates until an agent fills `cvr_terms.json` from primary exhibits.
+**Roadmap:** `_system/reviews/pending/cvr_discovery_robustness_plan_2026-07-23.md` (Parts 1–4).
 
 ## Local papers
 

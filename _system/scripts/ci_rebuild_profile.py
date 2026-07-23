@@ -26,6 +26,7 @@ ALIASES = {
     "pages-fast": "insights",
     "darwin-full": "darwin",
     "intake-full": "full",
+    "world-model-monthly": "world-model-weekly",
 }
 
 # Steps that require GOOGLE_APPLICATION_CREDENTIALS (Shared Drive API).
@@ -104,6 +105,26 @@ PROFILES: dict[str, list[list[str]]] = {
         # dedicated 06:00 Data Pipeline job; neither is duplicated here.
         ["_system/scripts/build_dashboard_data.py"],
     ],
+    "world-model-weekly": [
+        ["_system/scripts/fetch_theme_panel.py"],
+        ["_system/scripts/scaffold_industry_kpi_ledgers.py", "--write"],
+        ["_system/scripts/resolve_linkages.py", "--update-ledgers"],
+        [
+            "_system/scripts/check_kpi_ledger.py",
+            "--write",
+            "--mark-auto",
+            "--queue-reviews",
+        ],
+        ["_system/scripts/lint_kpi_ledger.py"],
+        ["_system/scripts/build_world_model_snapshot.py", "--skip-resolve"],
+        [
+            "_system/scripts/apply_world_model_context.py",
+            "--all",
+            "--write",
+            "--queue-reviews",
+        ],
+        ["_system/scripts/build_dashboard_data.py"],
+    ],
 }
 
 
@@ -132,7 +153,16 @@ def expand_steps(steps: list[list[str]]) -> list[list[str]]:
     out: list[list[str]] = []
     for step in steps:
         if step and step[0].endswith("build_dashboard_data.py"):
-            out.append(["_system/scripts/refresh_cvr_universe.py"])
+            # Nightly/CI sync: prices + stage transitions + scoped sleeve (no SEC).
+            out.append(
+                [
+                    "_system/scripts/refresh_cvr_universe.py",
+                    "--refresh-prices",
+                    "--apply-transitions",
+                    "--queue-stubs",
+                ]
+            )
+            out.append(["_system/scripts/check_cvr_universe.py"])
         out.append(step)
     return out
 

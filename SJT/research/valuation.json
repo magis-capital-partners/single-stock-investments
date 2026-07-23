@@ -42,14 +42,14 @@
             "label": "Royalties resume ~2028; avg ~$0.80/yr distributions NPV",
             "gaap_per_share": 0.0,
             "uplift_per_share": 1.85,
-            "math": "[Assumption] \u2014 see scenario notes in valuation.json"
+            "math": "[Assumption] — see scenario notes in valuation.json"
           },
           {
             "id": "terminal_trust",
             "label": "Terminal trust value on gas recovery",
             "gaap_per_share": 0.0,
             "uplift_per_share": 0.5,
-            "math": "[Assumption] \u2014 see scenario notes in valuation.json"
+            "math": "[Assumption] — see scenario notes in valuation.json"
           }
         ],
         "year5_economic_nav_per_share": 6.5,
@@ -202,7 +202,7 @@
         "hard_to_vary": false,
         "falsifiable": true,
         "not_instrumentalist": false,
-        "reach": "Weights encode evidence tier (A primary \u2192 D external), not fitted to hit a target IRR"
+        "reach": "Weights encode evidence tier (A primary → D external), not fitted to hit a target IRR"
       }
     },
     "notes": "Capstone IRR combining filings, segments, overlays, third-party, qualitative"
@@ -377,5 +377,61 @@
     "price_for_market_cap": 4.15,
     "chart": "SJT/research/charts/total_return_2026-07-15.svg",
     "panel_json": "SJT/research/total_return_panel.json"
+  },
+  "world_model_context": {
+    "as_of": "2026-07-23",
+    "strip_label": "steady",
+    "industry_node_ids": [
+      "energy_royalty"
+    ],
+    "industries": [
+      {
+        "node_id": "energy_royalty",
+        "label": "Oil & gas royalty trusts / mineral streams",
+        "kind": "thesis",
+        "checklist": {
+          "capacity": {
+            "status": "watch",
+            "note": "Attributed volumes and well decline."
+          },
+          "pricing": {
+            "status": "watch",
+            "note": "WTI / gas realizations."
+          },
+          "regulatory": {
+            "status": "uncertain",
+            "note": "Trust deeds and commodity cycles."
+          }
+        }
+      }
+    ],
+    "theme_ids": [
+      "energy_royalty",
+      "macro_regime"
+    ],
+    "prediction_cards": [
+      {
+        "theme_id": "energy_royalty",
+        "phase_transition": "watch",
+        "regulatory": "uncertain",
+        "recursive": true,
+        "tam_magnetism": "medium"
+      },
+      {
+        "theme_id": "macro_regime",
+        "phase_transition": "gradual",
+        "regulatory": "uncertain",
+        "recursive": false,
+        "tam_magnetism": "low"
+      }
+    ],
+    "kpi_fails": [],
+    "kpi_stale": [],
+    "superorg_gaps": [],
+    "horizon_convergence": {},
+    "in_base_irr": false,
+    "promotion": null,
+    "disclaimer": "Context only. World Model fails and Superorg gaps flag [HUMAN REVIEW]; they do not auto-rewrite Lawrence base IRR. Promotion requires _system/reviews/pending/world_model_promote_{TICKER}_{date}.md.",
+    "human_review_required": false
   }
 }

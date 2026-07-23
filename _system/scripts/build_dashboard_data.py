@@ -791,24 +791,50 @@ def fund_nav_summary(ticker_dir: Path, holdings_meta: dict | None = None) -> dic
         return None
     overlay = overlay or {}
     disc = overlay.get("discount_to_reported_nav_pct")
+    disc_econ_local = overlay.get("discount_to_mtm_nav_local_only_pct")
+    disc_econ_full = overlay.get("discount_to_mtm_nav_full_proxy_pct")
+    # Prefer local-only MTM when present (ADR/GDR mapping can overstate full proxy).
+    disc_econ = disc_econ_local if disc_econ_local is not None else disc_econ_full
+    has_zero = bool(overlay.get("zero_marked_sleeves"))
+    edge_key = str(edge or "classic")
+    # Shadow / zero-marked sleeves: reported (GAAP) NAV is not the economic source of truth.
+    show_both = bool(
+        edge_key == "shadow"
+        or has_zero
+        or (
+            disc is not None
+            and disc_econ is not None
+            and abs(float(disc_econ) - float(disc)) >= 5.0
+        )
+    )
     return {
         "instrument_type": instrument or "closed_end_fund",
-        "edge": edge or "classic",
+        "edge": edge_key,
         "edge_label": {
             "classic": "Classic discount",
             "shadow": "Shadow NAV",
             "holdco": "Holdco look-through",
-        }.get(str(edge or "classic"), str(edge or "classic")),
+        }.get(edge_key, edge_key),
         "as_of": overlay.get("as_of") or val.get("as_of"),
         "currency": overlay.get("currency") or (val.get("inputs") or {}).get("currency"),
         "market_price": overlay.get("market_price"),
         "reported_nav": overlay.get("reported_nav"),
         "liquid_nav_per_share": overlay.get("liquid_nav_per_share"),
         "complete_nav_per_share_base": overlay.get("complete_nav_per_share_base"),
+        "complete_nav_per_share_illustration_local": overlay.get(
+            "complete_nav_per_share_illustration_local"
+        ),
+        "complete_nav_per_share_illustration_full_proxy": overlay.get(
+            "complete_nav_per_share_illustration_full_proxy"
+        ),
         "discount_to_reported_nav_pct": disc,
         "discount_to_liquid_nav_pct": overlay.get("discount_to_liquid_nav_pct"),
         "discount_to_complete_nav_pct": overlay.get("discount_to_complete_nav_pct"),
-        "has_zero_marked_sleeve": bool(overlay.get("zero_marked_sleeves")),
+        "discount_to_mtm_nav_local_only_pct": disc_econ_local,
+        "discount_to_mtm_nav_full_proxy_pct": disc_econ_full,
+        "discount_to_economic_nav_pct": disc_econ,
+        "show_reported_and_economic_discount": show_both,
+        "has_zero_marked_sleeve": has_zero,
     }
 
 

@@ -14,7 +14,7 @@
     "price": 54.97,
     "price_source": "Stooq RPRX.US close 2026-06-03",
     "fcf_per_share": 1.65,
-    "fcf_source": "FY2025 net income $771M \u00f7 ~428M Class A shares (10-K FY2025); normalized owner cash proxy for royalty collections net of operating burden",
+    "fcf_source": "FY2025 net income $771M ÷ ~428M Class A shares (10-K FY2025); normalized owner cash proxy for royalty collections net of operating burden",
     "shares_millions": 428.4,
     "normalization_note": "Not using $0.88 dividend alone (reinvestment-heavy). OCF $2.49B includes NCI and new royalty deployment; base uses earnings power per Class A share."
   },
@@ -126,7 +126,7 @@
         "hard_to_vary": true,
         "falsifiable": false,
         "not_instrumentalist": true,
-        "reach": "Weights encode evidence tier (A primary \u2192 D external), not fitted to hit a target IRR"
+        "reach": "Weights encode evidence tier (A primary → D external), not fitted to hit a target IRR"
       },
       "qualitative_audit": {
         "flags": [],
@@ -458,5 +458,61 @@
     "price_for_market_cap": 54.97,
     "chart": "RPRX/research/charts/total_return_2026-07-15.svg",
     "panel_json": "RPRX/research/total_return_panel.json"
+  },
+  "world_model_context": {
+    "as_of": "2026-07-23",
+    "strip_label": "steady",
+    "industry_node_ids": [
+      "pharma_royalty"
+    ],
+    "industries": [
+      {
+        "node_id": "pharma_royalty",
+        "label": "Pharma royalty / durable drug cash",
+        "kind": "thesis",
+        "checklist": {
+          "capacity": {
+            "status": "watch",
+            "note": "Pipeline and royalty coverage."
+          },
+          "pricing": {
+            "status": "watch",
+            "note": "Net pricing and LOE cliffs."
+          },
+          "regulatory": {
+            "status": "permissioning",
+            "note": "FDA and drug-pricing policy."
+          }
+        }
+      }
+    ],
+    "theme_ids": [
+      "pharma_royalty",
+      "macro_regime"
+    ],
+    "prediction_cards": [
+      {
+        "theme_id": "macro_regime",
+        "phase_transition": "gradual",
+        "regulatory": "uncertain",
+        "recursive": false,
+        "tam_magnetism": "low"
+      },
+      {
+        "theme_id": "pharma_royalty",
+        "phase_transition": "watch",
+        "regulatory": "permissioning",
+        "recursive": true,
+        "tam_magnetism": "medium"
+      }
+    ],
+    "kpi_fails": [],
+    "kpi_stale": [],
+    "superorg_gaps": [],
+    "horizon_convergence": {},
+    "in_base_irr": false,
+    "promotion": null,
+    "disclaimer": "Context only. World Model fails and Superorg gaps flag [HUMAN REVIEW]; they do not auto-rewrite Lawrence base IRR. Promotion requires _system/reviews/pending/world_model_promote_{TICKER}_{date}.md.",
+    "human_review_required": false
   }
 }

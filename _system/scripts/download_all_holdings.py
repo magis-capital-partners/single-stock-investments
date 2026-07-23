@@ -157,8 +157,18 @@ def daily_refresh(holdings: dict, *, build_indexes: bool = True) -> None:
         run([PY, str(SCRIPTS / "build_folder_indexes.py")], "Build INDEX.csv files", timeout=1200)
     run([PY, str(SCRIPTS / "sync_portfolio_from_registry.py")], "Sync portfolio from registry")
     run(
-        [PY, str(SCRIPTS / "refresh_cvr_universe.py")],
-        "CVR universe refresh (sleeve + registry)",
+        [
+            PY,
+            str(SCRIPTS / "refresh_cvr_universe.py"),
+            "--refresh-prices",
+            "--apply-transitions",
+            "--queue-stubs",
+        ],
+        "CVR universe refresh (prices + sleeve + registry)",
+    )
+    run(
+        [PY, str(SCRIPTS / "check_cvr_universe.py")],
+        "CVR universe integrity check",
     )
     run([PY, str(SCRIPTS / "build_dashboard_data.py")], "Rebuild dashboard JSON")
 

@@ -1,0 +1,116 @@
+{
+  "ticker": "APLD",
+  "as_of": "2026-07-23",
+  "theme_ids": [
+    "ai_power_land"
+  ],
+  "schema_version": "1.0",
+  "kpis": [
+    {
+      "kpi_id": "hyperscaler_capex_guide_bn",
+      "label": "Hyperscaler capex guide (USD bn)",
+      "unit": "usd_bn",
+      "expected": {
+        "op": "gte",
+        "value": 300,
+        "horizon": "2026"
+      },
+      "actual": {
+        "value": 320.0,
+        "as_of": "2026-07-23"
+      },
+      "status": "pass",
+      "source": "theme:hyperscaler_capex_ttm_usd_bn",
+      "evidence_tier": "derived_filing",
+      "last_checked": "2026-07-23",
+      "binds_to": {
+        "valuation_path": "context_overlay.themes[0].indicators[0]",
+        "on_fail": "human_review",
+        "note": "Upstream demand for hosting / power offtake"
+      },
+      "in_base_irr": false,
+      "prediction_role": "orientation"
+    },
+    {
+      "kpi_id": "contracted_backlog_m",
+      "label": "Contracted revenue backlog (USD m)",
+      "unit": "usd_m",
+      "expected": {
+        "op": "gte",
+        "value": 20000,
+        "horizon": "disclosed"
+      },
+      "actual": {
+        "value": 31000.0,
+        "as_of": "2026-07-21"
+      },
+      "status": "pass",
+      "source": "valuation:component_valuation.components[1].valuation.calculation_proof.inputs[0].value",
+      "evidence_tier": "primary_derived",
+      "last_checked": "2026-07-23",
+      "binds_to": {
+        "valuation_path": "component_valuation.components[1].valuation.calculation_proof.inputs[0]",
+        "on_fail": "human_review",
+        "note": "contracted_expansion backlog_m"
+      },
+      "in_base_irr": false,
+      "prediction_role": "reinforcement"
+    },
+    {
+      "kpi_id": "uncontracted_mw",
+      "label": "Uncontracted marketed megawatts",
+      "unit": "MW",
+      "expected": {
+        "op": "gte",
+        "value": 0,
+        "horizon": "option_floor"
+      },
+      "actual": {
+        "value": 500.0,
+        "as_of": "2026-07-21"
+      },
+      "status": "pass",
+      "source": "valuation:component_valuation.components[2].valuation.calculation_proof.inputs[0].value",
+      "evidence_tier": "primary_derived",
+      "last_checked": "2026-07-23",
+      "binds_to": {
+        "valuation_path": "component_valuation.components[2].valuation.calculation_proof.inputs[0]",
+        "on_fail": "human_review",
+        "note": "uncontracted_option option_mw"
+      },
+      "in_base_irr": false,
+      "prediction_role": "reinforcement"
+    },
+    {
+      "kpi_id": "henry_hub_gas",
+      "label": "Henry Hub natural gas spot (USD/MMBtu)",
+      "unit": "usd_mmbtu",
+      "expected": {
+        "op": "lte",
+        "value": 8,
+        "horizon": "power_cost_ceiling"
+      },
+      "actual": {
+        "value": 2.928999900817871,
+        "as_of": "2026-07-23"
+      },
+      "status": "pass",
+      "source": "theme:henry_hub_gas",
+      "evidence_tier": "market",
+      "last_checked": "2026-07-23",
+      "binds_to": {
+        "valuation_path": "context_overlay.themes[0]",
+        "on_fail": "human_review",
+        "note": "Power-cost midstream signal; theme series may be stale offline"
+      },
+      "in_base_irr": false,
+      "prediction_role": "interference"
+    }
+  ],
+  "summary": {
+    "pass": 4,
+    "fail": 0,
+    "stale": 0,
+    "unchecked": 0
+  }
+}

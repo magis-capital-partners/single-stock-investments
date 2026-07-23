@@ -1,5 +1,5 @@
 {
-  "description": "Thematic macro/industry indicator panels. Broadly ingested context, consumed narrowly by tagged holdings. Tailwinds inform stance and overlay sizing only; they never auto-inflate Lawrence base IRR (human review promotes to base case).",
+  "description": "Thematic macro/industry indicator panels. Broadly ingested context, consumed narrowly by tagged holdings. Tailwinds inform stance and overlay sizing only; they never auto-inflate Lawrence base IRR (dual-agent promote to base case).",
   "staleness_max_days": 10,
   "sources": {
     "fred": "https://fred.stlouisfed.org/graph/fredgraph.csv?id={id}",
@@ -15,7 +15,7 @@
       "description": "Demand chain behind land/surface/water optionality (TPL water, LB easements, WBI infra, APLD hosting, AZLCZ Southwest renewable). Hyperscaler capex is the upstream pulse; power and gas prices and Permian activity are the midstream signals.",
       "series": [
         {"id": "hyperscaler_capex_ttm_usd_bn", "label": "Hyperscaler capex guide (USD bn, latest)", "source": "repo_valuation", "good_for": "land_power_demand", "note": "Derived from ai_overlay in GOOGL/AMZN/META/MSFT valuation.json; filing-cited"},
-        {"id": "henry_hub_gas", "label": "Henry Hub natural gas spot (USD/MMBtu)", "source": "fred", "fred_id": "DHHNGSP", "good_for": "power_cost"},
+        {"id": "henry_hub_gas", "label": "Henry Hub natural gas spot (USD/MMBtu)", "source": "fred", "fred_id": "DHHNGSP", "good_for": "power_cost", "fallback": {"source": "yahoo_daily", "yahoo_symbol": "NG=F", "note": "NYMEX natural gas front-month when FRED DHHNGSP unavailable"}},
         {"id": "electricity_price_us", "label": "US avg electricity price (cents/kWh)", "source": "fred", "fred_id": "APU000072610", "good_for": "power_cost"},
         {"id": "wti_crude", "label": "WTI crude (USD/bbl)", "source": "fred", "fred_id": "DCOILWTICO", "good_for": "permian_cashflow", "fallback": {"source": "yahoo_daily", "yahoo_symbol": "CL=F", "note": "WTI front-month futures when FRED unavailable"}},
         {"id": "permian_crude_production_mbbl_d", "label": "Permian crude production (kbbl/d)", "source": "eia", "eia_route": "petroleum/crd/crpdn", "eia_facets": {"duoarea": "RTPP", "product": "EPC0", "process": "FPF"}, "good_for": "permian_volume", "optional": true, "note": "Requires EIA_API_KEY; null when absent"},
@@ -49,10 +49,15 @@
     },
     "exchange_volatility": {
       "label": "Exchange vol tailwind",
-      "description": "Vol level, realized equity vol, and term-structure context for exchange croupiers.",
+      "description": "Home-market vol for exchange croupiers (US VIX/SPY plus regional realized vol). Map: world_model/exchange_vol_map.json.",
       "series": [
         {"id": "vix_level", "label": "VIX index level", "source": "fred", "fred_id": "VIXCLS", "good_for": "vol_regime", "fallback": {"source": "yahoo_daily", "yahoo_symbol": "^VIX"}},
         {"id": "spy_20d_realized_vol", "label": "SPY 20-day realized vol (annualized %)", "source": "computed_realized_vol", "ticker": "SPY", "window_days": 20, "good_for": "equity_vol"},
+        {"id": "n225_20d_realized_vol", "label": "Nikkei 225 20-day realized vol (annualized %)", "source": "computed_realized_vol", "ticker": "^N225", "window_days": 20, "good_for": "equity_vol_jp"},
+        {"id": "hsi_20d_realized_vol", "label": "Hang Seng 20-day realized vol (annualized %)", "source": "computed_realized_vol", "ticker": "^HSI", "window_days": 20, "good_for": "equity_vol_hk"},
+        {"id": "asx200_20d_realized_vol", "label": "ASX 200 20-day realized vol (annualized %)", "source": "computed_realized_vol", "ticker": "^AXJO", "window_days": 20, "good_for": "equity_vol_au"},
+        {"id": "ftse_20d_realized_vol", "label": "FTSE 100 20-day realized vol (annualized %)", "source": "computed_realized_vol", "ticker": "^FTSE", "window_days": 20, "good_for": "equity_vol_uk"},
+        {"id": "stoxx50_20d_realized_vol", "label": "Euro Stoxx 50 20-day realized vol (annualized %)", "source": "computed_realized_vol", "ticker": "^STOXX50E", "window_days": 20, "good_for": "equity_vol_eu"},
         {"id": "vrp_health_score", "label": "VRP health score (etf-dashboard)", "source": "etf_dashboard_snapshot", "snapshot_file": "vrp_health.json", "json_path": "health_score", "good_for": "options_market_health", "optional": true},
         {"id": "vol_term_slope", "label": "Vol term-structure slope (etf-dashboard)", "source": "etf_dashboard_snapshot", "snapshot_file": "vol_shape_history.json", "json_path": "latest.slope", "good_for": "vol_term_structure", "optional": true}
       ]

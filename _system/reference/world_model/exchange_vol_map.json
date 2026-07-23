@@ -1,0 +1,69 @@
+{
+  "schema_version": "1.0",
+  "as_of": "2026-07-23",
+  "default_region": "US",
+  "disclaimer": "Context only. Home-market realized vol is primary for non-US exchanges; US VIX may appear as secondary global risk. Not a base-IRR input.",
+  "regions": {
+    "US": {
+      "label": "United States",
+      "implied_vol_series": "vix_level",
+      "implied_vol_label": "VIX index level",
+      "realized_vol_series": "spy_20d_realized_vol",
+      "realized_vol_label": "SPY 20-day realized vol (annualized %)",
+      "gate_implied_gte": 12,
+      "gate_realized_gte": 8
+    },
+    "JP": {
+      "label": "Japan",
+      "implied_vol_series": null,
+      "realized_vol_series": "n225_20d_realized_vol",
+      "realized_vol_label": "Nikkei 225 20-day realized vol (annualized %)",
+      "gate_realized_gte": 8,
+      "note": "Nikkei 225 realized until official Nikkei VI feed is stable"
+    },
+    "HK": {
+      "label": "Hong Kong",
+      "implied_vol_series": null,
+      "realized_vol_series": "hsi_20d_realized_vol",
+      "realized_vol_label": "Hang Seng 20-day realized vol (annualized %)",
+      "gate_realized_gte": 8
+    },
+    "AU": {
+      "label": "Australia",
+      "implied_vol_series": null,
+      "realized_vol_series": "asx200_20d_realized_vol",
+      "realized_vol_label": "ASX 200 20-day realized vol (annualized %)",
+      "gate_realized_gte": 8
+    },
+    "UK": {
+      "label": "United Kingdom",
+      "implied_vol_series": null,
+      "realized_vol_series": "ftse_20d_realized_vol",
+      "realized_vol_label": "FTSE 100 20-day realized vol (annualized %)",
+      "gate_realized_gte": 8
+    },
+    "EU": {
+      "label": "Euro area",
+      "implied_vol_series": null,
+      "realized_vol_series": "stoxx50_20d_realized_vol",
+      "realized_vol_label": "Euro Stoxx 50 20-day realized vol (annualized %)",
+      "gate_realized_gte": 8
+    }
+  },
+  "ticker_region": {
+    "ICE": "US",
+    "CME": "US",
+    "CBOE": "US",
+    "MIAX": "US",
+    "OTCM": "US",
+    "8697.T": "JP",
+    "0388.HK": "HK",
+    "ASX.AX": "AU",
+    "LSEG.L": "UK",
+    "LSE.L": "UK"
+  },
+  "watch_only_tickers": [
+    "LSEG.L",
+    "LSE.L"
+  ]
+}

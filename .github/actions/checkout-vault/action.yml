@@ -16,7 +16,7 @@ runs:
         if [ -z "${{ env.RESEARCH_VAULT_CLONE_TOKEN }}" ]; then
           echo "::error::RESEARCH_VAULT_CLONE_TOKEN is required."
           echo "::error::Public single-stock-investments cannot use GITHUB_TOKEN to read private research-vault."
-          echo "::error::Add a fine-grained PAT with Contents: Read on magis-capital-partners/research-vault."
+          echo "::error::Add a fine-grained PAT with Contents: Read and write on magis-capital-partners/research-vault."
           exit 1
         fi
 

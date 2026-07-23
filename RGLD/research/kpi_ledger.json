@@ -1,0 +1,114 @@
+{
+  "ticker": "RGLD",
+  "as_of": "2026-07-23",
+  "theme_ids": [
+    "gold_royalties"
+  ],
+  "schema_version": "1.0",
+  "kpis": [
+    {
+      "kpi_id": "gold_spot_proxy",
+      "label": "Gold spot proxy (GLD USD when London fix unavailable)",
+      "unit": "usd_gld",
+      "expected": {
+        "op": "gte",
+        "value": 200,
+        "horizon": "bullion_floor"
+      },
+      "actual": {
+        "value": 370.7300109863281,
+        "as_of": "2026-07-23"
+      },
+      "status": "pass",
+      "source": "theme:gold_spot_usd",
+      "evidence_tier": "market",
+      "last_checked": "2026-07-23",
+      "binds_to": {
+        "valuation_path": "context_overlay.themes[1].indicators[0]",
+        "on_fail": "human_review",
+        "note": "gold_royalties theme gold_spot_usd (GLD proxy)"
+      },
+      "in_base_irr": false,
+      "prediction_role": "orientation"
+    },
+    {
+      "kpi_id": "gdx_gld_ratio",
+      "label": "GDX / GLD ratio (miners vs bullion)",
+      "unit": "ratio",
+      "expected": {
+        "op": "gte",
+        "value": 0.1,
+        "horizon": "sentiment_floor"
+      },
+      "actual": {
+        "value": 0.2017,
+        "as_of": "2026-07-23"
+      },
+      "status": "pass",
+      "source": "theme:gdx_gld_ratio",
+      "evidence_tier": "market",
+      "last_checked": "2026-07-23",
+      "binds_to": {
+        "valuation_path": "growth_explanation.mechanism",
+        "on_fail": "human_review",
+        "note": "Royalty multiple sentiment context"
+      },
+      "in_base_irr": false,
+      "prediction_role": "orientation"
+    },
+    {
+      "kpi_id": "fcf_per_share",
+      "label": "Owner cash / free cash flow per share (USD)",
+      "unit": "usd",
+      "expected": {
+        "op": "gte",
+        "value": 6,
+        "horizon": "run_rate"
+      },
+      "actual": {
+        "value": 9.0,
+        "as_of": "2026-07-21"
+      },
+      "status": "pass",
+      "source": "valuation:inputs.fcf_per_share",
+      "evidence_tier": "filing",
+      "last_checked": "2026-07-23",
+      "binds_to": {
+        "valuation_path": "inputs.fcf_per_share",
+        "on_fail": "human_review"
+      },
+      "in_base_irr": false,
+      "prediction_role": "reinforcement"
+    },
+    {
+      "kpi_id": "growth_y1_5",
+      "label": "Base growth years 1-5 (fraction)",
+      "unit": "fraction",
+      "expected": {
+        "op": "gte",
+        "value": 0.02,
+        "horizon": "base"
+      },
+      "actual": {
+        "value": 0.04,
+        "as_of": "2026-07-21"
+      },
+      "status": "pass",
+      "source": "valuation:scenarios.base.growth_y1_5",
+      "evidence_tier": "assumption",
+      "last_checked": "2026-07-23",
+      "binds_to": {
+        "valuation_path": "scenarios.base.growth_y1_5",
+        "on_fail": "human_review"
+      },
+      "in_base_irr": false,
+      "prediction_role": "orientation"
+    }
+  ],
+  "summary": {
+    "pass": 4,
+    "fail": 0,
+    "stale": 0,
+    "unchecked": 0
+  }
+}

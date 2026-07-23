@@ -11,11 +11,8 @@ MSG="${1:?commit message required}"
 GIT_ADD="${2:--A}"
 MAX_ATTEMPTS="${CI_PUSH_MAX_ATTEMPTS:-5}"
 CLONE_TOKEN="$(trim_clone_token "${RESEARCH_VAULT_CLONE_TOKEN:-}")"
-
-git_auth_args=()
-if [ -n "$CLONE_TOKEN" ]; then
-  git_auth_args=(-c "http.extraHeader=AUTHORIZATION: bearer ${CLONE_TOKEN}")
-fi
+REPO_URL="${RESEARCH_VAULT_REPO_URL:-https://github.com/magis-capital-partners/research-vault.git}"
+AUTH_URL="$(vault_authenticated_url "$REPO_URL")"
 
 if [ ! -d "$VAULT_ROOT/.git" ]; then
   echo "::error::Vault git dir not found at $VAULT_ROOT"
@@ -24,6 +21,7 @@ fi
 
 if [ -z "$CLONE_TOKEN" ]; then
   echo "::error::RESEARCH_VAULT_CLONE_TOKEN is required to push research-vault."
+  echo "::error::Use a token with Contents: Read and write on magis-capital-partners/research-vault."
   exit 1
 fi
 
@@ -42,7 +40,9 @@ git commit -m "$MSG"
 
 attempt=1
 while [ "$attempt" -le "$MAX_ATTEMPTS" ]; do
-  git "${git_auth_args[@]}" fetch origin main 2>/dev/null || git "${git_auth_args[@]}" fetch origin master 2>/dev/null || true
+  git fetch "$AUTH_URL" main:refs/remotes/origin/main 2>/dev/null \
+    || git fetch "$AUTH_URL" master:refs/remotes/origin/master 2>/dev/null \
+    || true
   BRANCH=$(git symbolic-ref --short HEAD 2>/dev/null || echo main)
   if git show-ref --verify --quiet "refs/remotes/origin/$BRANCH"; then
     if ! git rebase "origin/$BRANCH"; then
@@ -51,7 +51,7 @@ while [ "$attempt" -le "$MAX_ATTEMPTS" ]; do
       exit 1
     fi
   fi
-  if git "${git_auth_args[@]}" push origin "HEAD:$BRANCH"; then
+  if git push "$AUTH_URL" "HEAD:$BRANCH"; then
     echo "Vault pushed (attempt $attempt)."
     exit 0
   fi

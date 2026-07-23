@@ -47,7 +47,17 @@ def commodities_for_ticker(ticker: str, val: dict | None = None) -> list[str]:
         return list(TICKER_SYMBOLS[t])
     if val and ticker_needs_commodity_inputs(val):
         er = val.get("evidence_refresh") or {}
-        return [str(er.get("commodity") or "copper")]
+        listed = [str(c) for c in (er.get("commodities") or []) if c]
+        fetchable = [c for c in listed if c in DEFAULT_SYMBOLS]
+        if listed and not fetchable:
+            return []
+        if fetchable:
+            return fetchable
+        explicit = er.get("commodity")
+        if explicit and str(explicit) in DEFAULT_SYMBOLS:
+            return [str(explicit)]
+        if (val.get("inputs") or {}).get("copperwood_royalty_est_usd"):
+            return ["copper"]
     return []
 
 
@@ -310,6 +320,22 @@ def main() -> int:
         print(f"Done. {len(cleaned)} ticker(s) cleaned.")
         return 0
 
+    if args.tickers:
+        tickers = [t.upper() for t in args.tickers]
+    elif args.merge:
+        tickers = tickers_for_market_merge()
+    else:
+        tickers = []
+    needed: set[str] = set()
+    for t in tickers:
+        val = None
+        vp = ROOT / t / "research" / "valuation.json"
+        if vp.exists():
+            try:
+                val = json.loads(vp.read_text(encoding="utf-8"))
+            except json.JSONDecodeError:
+                val = None
+        needed.update(commodities_for_ticker(t, val))
     COMMODITY_DIR.mkdir(parents=True, exist_ok=True)
     fetched: dict[str, dict] = {}
     ok = True
@@ -326,7 +352,7 @@ def main() -> int:
         if close is not None:
             row["raw_close"] = close
             row["spot"] = spot_usd_per_lb(cid, close, meta)
-        else:
+        elif cid in needed:
             ok = False
         fetched[cid] = row
         (COMMODITY_DIR / f"{cid}.json").write_text(json.dumps(row, indent=2), encoding="utf-8")
@@ -335,12 +361,6 @@ def main() -> int:
     manifest = {"as_of": TODAY, "commodities": {k: {"spot": v.get("spot"), "as_of": v.get("as_of")} for k, v in fetched.items()}}
     (COMMODITY_DIR / "manifest.json").write_text(json.dumps(manifest, indent=2), encoding="utf-8")
 
-    if args.tickers:
-        tickers = [t.upper() for t in args.tickers]
-    elif args.merge:
-        tickers = tickers_for_market_merge()
-    else:
-        tickers = []
     for t in tickers:
         val = None
         vp = ROOT / t / "research" / "valuation.json"

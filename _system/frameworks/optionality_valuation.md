@@ -382,6 +382,16 @@ For names whose optionality is driven by an external demand chain (TPL water / L
 
 Order: runs after `marvin_valuation.py --write` (so the overlay survives recomputation) in both `marvin_cloud_refresh.py` (tagged tickers) and the daily `download_all_holdings.py` tail.
 
+### World Model layer (Courtenay foresight)
+
+Thin KPI graph over themes, industry nodes, Superorgs, and expert horizons. **Context only.**
+
+- **Coverage:** every industry-linked ticker has `{TICKER}/research/kpi_ledger.json` (scaffold via `scaffold_industry_kpi_ledgers.py`; 6 curated pilots kept).
+- **Industries (13):** 11 thesis + 2 horizon (`agi`, `robotaxi`). Taxonomy: `_system/reference/world_model/README.md`.
+- **Strip:** Insights → Ticker insights (`dashboard/data/world_model.json`).
+- **Weekly CI:** Data Pipeline Sunday `0 16 * * 0` UTC → profile `world-model-weekly`.
+- **Hard rule:** fail → `[HUMAN REVIEW]`; never auto-edit IRR keys. Auto-link: `apply_world_model_context.py` + promotion template.
+
 ### Insider conviction layer (Form 4 cluster)
 
 For US-listed holdings with CIK, maintain an **insider conviction** context block that tilts **scenario confidence** toward the bull case when qualified insiders buy on the open market. This is a qualitative corroboration layer for optionality names (water/land, holdco stakes, dated catalysts), not a second IRR engine.

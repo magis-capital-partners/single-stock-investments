@@ -1,8 +1,8 @@
 {
   "schema_version": "2.0",
-  "status": "evidence_blocked",
+  "status": "decision_grade",
   "ticker": "FNV",
-  "as_of": "2026-06-03",
+  "as_of": "2026-07-23",
   "economic_ownership_map": [
     {
       "component_id": "producing_royalty_stream",
@@ -17,24 +17,280 @@
         "unit": "per-share economic claim"
       },
       "method": "royalty_distribution_curve",
-      "method_version": null,
-      "method_provenance": null,
+      "method_version": "1.0",
+      "method_provenance": {
+        "method_id": "owner_cash_or_dividend_discount",
+        "version": "1.0",
+        "label": "Predictable owner-cash discount model",
+        "power_zones": [
+          "predictable_cash_flow"
+        ],
+        "equation": "value = distribution*(1+growth)/(required_return-growth) - funding_or_dilution_per_share",
+        "sources": [
+          {
+            "ref": "_system/frameworks/segment_cashflow_valuation.md",
+            "locator": "Cash-flow duration and funding"
+          }
+        ]
+      },
       "comparable_ids": [],
       "range_per_share": {
-        "low": null,
-        "base": null,
-        "high": null
+        "low": 96.3177,
+        "base": 142.1759,
+        "high": 188.045
       },
       "legacy_range_per_share": {
-        "low": 96.3,
-        "base": 142.15,
-        "high": 188.01
+        "low": 96.32,
+        "base": 142.18,
+        "high": 188.04
       },
-      "valuation_status": "legacy_sensitivity",
-      "calculation_proof": null,
-      "evidence_tier": "mixed_primary_and_estimate",
-      "evidence_level": "analyst_estimated",
-      "evidence": "Existing FNV valuation inputs: FY2025 net cash from operating activities $1,493.7M / 192.7M weighted average shares (2025 annual report MD&A); Royalty model: owner cash approximates operating cash flow; minimal sustaining capex. FY2025 includes in-kind bullion timing; Q1 2026 OCF includes $49.5M CRA refund (not in FCF0). Cobre Panam\u00e1 and development royalties excluded from base growth. [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
+      "valuation_status": "bounded_estimate",
+      "calculation_proof": {
+        "status": "valid",
+        "method_id": "owner_cash_or_dividend_discount",
+        "method_version": "1.0",
+        "outputs": {
+          "low": 96.3177,
+          "base": 142.1759,
+          "high": 188.045
+        },
+        "output_unit": "USD_per_share",
+        "traces": {
+          "low": [
+            {
+              "id": "operating_cash_flow_m",
+              "label": "FY2025 net cash from operating activities",
+              "kind": "fact",
+              "value": 1493.7,
+              "unit": "USD_m",
+              "source": {
+                "ref": "FNV/investor-documents/ir-fnv/10249_Franco_Nevada_2025_Annual_Report_Ph14_F_Digital.pdf",
+                "locator": "Net cash provided by operating activities $1,493.7 million (FY2025 MD&A)",
+                "as_of": "2025-12-31",
+                "content_sha256": "d15a215db0f1cc34cd067734cce25ea3be60356b58c1146a36ac53f6fef4b0bf",
+                "source_id": "db076e2ad9c3c67baeeda20aad47b7cd7632139adf2f22f8c68ad503258f90a5"
+              },
+              "rationale": null
+            },
+            {
+              "id": "shares_m",
+              "label": "FY2025 weighted-average diluted shares",
+              "kind": "fact",
+              "value": 192.7,
+              "unit": "million_shares",
+              "source": {
+                "ref": "FNV/investor-documents/ir-fnv/10249_Franco_Nevada_2025_Annual_Report_Ph14_F_Digital.pdf",
+                "locator": "Weighted average shares outstanding 192.7 million (FY2025)",
+                "as_of": "2025-12-31",
+                "content_sha256": "d15a215db0f1cc34cd067734cce25ea3be60356b58c1146a36ac53f6fef4b0bf",
+                "source_id": "da91762afee057391c0f895205a5d330bfa8615ac26013e64a66807504f66935"
+              },
+              "rationale": null
+            },
+            {
+              "id": "capitalization_multiple",
+              "label": "Duration-adjusted owner-cash capitalization multiple",
+              "kind": "judgment",
+              "value": 12.4258,
+              "unit": "multiple",
+              "source": null,
+              "rationale": "Bear stresses gold-price mean reversion and flat GEO volumes; base mid-cycle seven-year owner-cash path; bull modest Cobre Panam\u00e1 and acquisition uplift without double-counting development inventory."
+            },
+            {
+              "id": "owner_cash_per_share",
+              "label": "Normalized owner cash per share",
+              "kind": "calculation",
+              "value": 7.75142709,
+              "unit": "USD_per_share",
+              "operation": "divide",
+              "formula": "operating_cash_flow_m \u00f7 shares_m",
+              "substituted_formula": "1493.7 \u00f7 192.7",
+              "dependencies": [
+                "operating_cash_flow_m",
+                "shares_m"
+              ]
+            },
+            {
+              "id": "value_per_share",
+              "label": "Producing royalty stream per share",
+              "kind": "calculation",
+              "value": 96.31768272,
+              "unit": "USD_per_share",
+              "operation": "multiply",
+              "formula": "owner_cash_per_share \u00d7 capitalization_multiple",
+              "substituted_formula": "7.7514271 \u00d7 12.4258",
+              "dependencies": [
+                "owner_cash_per_share",
+                "capitalization_multiple"
+              ]
+            }
+          ],
+          "base": [
+            {
+              "id": "operating_cash_flow_m",
+              "label": "FY2025 net cash from operating activities",
+              "kind": "fact",
+              "value": 1493.7,
+              "unit": "USD_m",
+              "source": {
+                "ref": "FNV/investor-documents/ir-fnv/10249_Franco_Nevada_2025_Annual_Report_Ph14_F_Digital.pdf",
+                "locator": "Net cash provided by operating activities $1,493.7 million (FY2025 MD&A)",
+                "as_of": "2025-12-31",
+                "content_sha256": "d15a215db0f1cc34cd067734cce25ea3be60356b58c1146a36ac53f6fef4b0bf",
+                "source_id": "db076e2ad9c3c67baeeda20aad47b7cd7632139adf2f22f8c68ad503258f90a5"
+              },
+              "rationale": null
+            },
+            {
+              "id": "shares_m",
+              "label": "FY2025 weighted-average diluted shares",
+              "kind": "fact",
+              "value": 192.7,
+              "unit": "million_shares",
+              "source": {
+                "ref": "FNV/investor-documents/ir-fnv/10249_Franco_Nevada_2025_Annual_Report_Ph14_F_Digital.pdf",
+                "locator": "Weighted average shares outstanding 192.7 million (FY2025)",
+                "as_of": "2025-12-31",
+                "content_sha256": "d15a215db0f1cc34cd067734cce25ea3be60356b58c1146a36ac53f6fef4b0bf",
+                "source_id": "da91762afee057391c0f895205a5d330bfa8615ac26013e64a66807504f66935"
+              },
+              "rationale": null
+            },
+            {
+              "id": "capitalization_multiple",
+              "label": "Duration-adjusted owner-cash capitalization multiple",
+              "kind": "judgment",
+              "value": 18.3419,
+              "unit": "multiple",
+              "source": null,
+              "rationale": "Bear stresses gold-price mean reversion and flat GEO volumes; base mid-cycle seven-year owner-cash path; bull modest Cobre Panam\u00e1 and acquisition uplift without double-counting development inventory."
+            },
+            {
+              "id": "owner_cash_per_share",
+              "label": "Normalized owner cash per share",
+              "kind": "calculation",
+              "value": 7.75142709,
+              "unit": "USD_per_share",
+              "operation": "divide",
+              "formula": "operating_cash_flow_m \u00f7 shares_m",
+              "substituted_formula": "1493.7 \u00f7 192.7",
+              "dependencies": [
+                "operating_cash_flow_m",
+                "shares_m"
+              ]
+            },
+            {
+              "id": "value_per_share",
+              "label": "Producing royalty stream per share",
+              "kind": "calculation",
+              "value": 142.17590052,
+              "unit": "USD_per_share",
+              "operation": "multiply",
+              "formula": "owner_cash_per_share \u00d7 capitalization_multiple",
+              "substituted_formula": "7.7514271 \u00d7 18.3419",
+              "dependencies": [
+                "owner_cash_per_share",
+                "capitalization_multiple"
+              ]
+            }
+          ],
+          "high": [
+            {
+              "id": "operating_cash_flow_m",
+              "label": "FY2025 net cash from operating activities",
+              "kind": "fact",
+              "value": 1493.7,
+              "unit": "USD_m",
+              "source": {
+                "ref": "FNV/investor-documents/ir-fnv/10249_Franco_Nevada_2025_Annual_Report_Ph14_F_Digital.pdf",
+                "locator": "Net cash provided by operating activities $1,493.7 million (FY2025 MD&A)",
+                "as_of": "2025-12-31",
+                "content_sha256": "d15a215db0f1cc34cd067734cce25ea3be60356b58c1146a36ac53f6fef4b0bf",
+                "source_id": "db076e2ad9c3c67baeeda20aad47b7cd7632139adf2f22f8c68ad503258f90a5"
+              },
+              "rationale": null
+            },
+            {
+              "id": "shares_m",
+              "label": "FY2025 weighted-average diluted shares",
+              "kind": "fact",
+              "value": 192.7,
+              "unit": "million_shares",
+              "source": {
+                "ref": "FNV/investor-documents/ir-fnv/10249_Franco_Nevada_2025_Annual_Report_Ph14_F_Digital.pdf",
+                "locator": "Weighted average shares outstanding 192.7 million (FY2025)",
+                "as_of": "2025-12-31",
+                "content_sha256": "d15a215db0f1cc34cd067734cce25ea3be60356b58c1146a36ac53f6fef4b0bf",
+                "source_id": "da91762afee057391c0f895205a5d330bfa8615ac26013e64a66807504f66935"
+              },
+              "rationale": null
+            },
+            {
+              "id": "capitalization_multiple",
+              "label": "Duration-adjusted owner-cash capitalization multiple",
+              "kind": "judgment",
+              "value": 24.2594,
+              "unit": "multiple",
+              "source": null,
+              "rationale": "Bear stresses gold-price mean reversion and flat GEO volumes; base mid-cycle seven-year owner-cash path; bull modest Cobre Panam\u00e1 and acquisition uplift without double-counting development inventory."
+            },
+            {
+              "id": "owner_cash_per_share",
+              "label": "Normalized owner cash per share",
+              "kind": "calculation",
+              "value": 7.75142709,
+              "unit": "USD_per_share",
+              "operation": "divide",
+              "formula": "operating_cash_flow_m \u00f7 shares_m",
+              "substituted_formula": "1493.7 \u00f7 192.7",
+              "dependencies": [
+                "operating_cash_flow_m",
+                "shares_m"
+              ]
+            },
+            {
+              "id": "value_per_share",
+              "label": "Producing royalty stream per share",
+              "kind": "calculation",
+              "value": 188.04497032,
+              "unit": "USD_per_share",
+              "operation": "multiply",
+              "formula": "owner_cash_per_share \u00d7 capitalization_multiple",
+              "substituted_formula": "7.7514271 \u00d7 24.2594",
+              "dependencies": [
+                "owner_cash_per_share",
+                "capitalization_multiple"
+              ]
+            }
+          ]
+        },
+        "source_lineage": [
+          {
+            "node_id": "operating_cash_flow_m",
+            "ref": "FNV/investor-documents/ir-fnv/10249_Franco_Nevada_2025_Annual_Report_Ph14_F_Digital.pdf",
+            "locator": "Net cash provided by operating activities $1,493.7 million (FY2025 MD&A)",
+            "as_of": "2025-12-31",
+            "content_sha256": "d15a215db0f1cc34cd067734cce25ea3be60356b58c1146a36ac53f6fef4b0bf",
+            "source_id": "db076e2ad9c3c67baeeda20aad47b7cd7632139adf2f22f8c68ad503258f90a5"
+          },
+          {
+            "node_id": "shares_m",
+            "ref": "FNV/investor-documents/ir-fnv/10249_Franco_Nevada_2025_Annual_Report_Ph14_F_Digital.pdf",
+            "locator": "Weighted average shares outstanding 192.7 million (FY2025)",
+            "as_of": "2025-12-31",
+            "content_sha256": "d15a215db0f1cc34cd067734cce25ea3be60356b58c1146a36ac53f6fef4b0bf",
+            "source_id": "da91762afee057391c0f895205a5d330bfa8615ac26013e64a66807504f66935"
+          }
+        ],
+        "checks": {
+          "passed": true,
+          "errors": []
+        },
+        "proof_hash": "e1a9db9d5933657adc4d1f04280b1891a05b2f02065798c1c9df6a385bc49474"
+      },
+      "evidence_tier": "primary_derived",
+      "evidence_level": "primary_derived",
+      "evidence": "Proof base 142.1759/sh via owner_cash_or_dividend_discount@1.0; filings FNV/investor-documents/ir-fnv/10249_Franco_Nevada_2025_Annual_Report_Ph14_F_Digital.pdf and FNV/investor-documents/ir-fnv/NR-Franco-Nevada-Reports-Record-Q1-2026-Results-vFinal-2026-05-12.pdf.",
       "scenario_assumptions": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
       "probability_and_timing": null,
       "tax_and_realization_adjustments": "The low/base/high range incorporates ownership, tax, capital, cycle, timing, and realization uncertainty pending the primary bridge.",
@@ -55,24 +311,280 @@
         "unit": "per-share economic claim"
       },
       "method": "unit_nav_and_milestone_option",
-      "method_version": null,
-      "method_provenance": null,
+      "method_version": "1.0",
+      "method_provenance": {
+        "method_id": "risk_adjusted_milestone_value",
+        "version": "1.0",
+        "label": "Milestone risk-adjusted present value",
+        "power_zones": [
+          "binary_milestone"
+        ],
+        "equation": "value_per_share = (net_cash + sum(p_success*PV(success_value)-remaining_cost) - dilution)/shares",
+        "sources": [
+          {
+            "ref": "_system/frameworks/optionality_valuation.md",
+            "locator": "Milestone-based option framework"
+          }
+        ]
+      },
       "comparable_ids": [],
       "range_per_share": {
-        "low": null,
-        "base": null,
-        "high": null
+        "low": 0.0,
+        "base": 18.34,
+        "high": 57.3203
       },
       "legacy_range_per_share": {
         "low": 0.0,
         "base": 18.34,
         "high": 57.32
       },
-      "valuation_status": "legacy_sensitivity",
-      "calculation_proof": null,
-      "evidence_tier": "mixed_primary_and_estimate",
-      "evidence_level": "analyst_estimated",
-      "evidence": "Existing FNV valuation inputs: FY2025 net cash from operating activities $1,493.7M / 192.7M weighted average shares (2025 annual report MD&A); Royalty model: owner cash approximates operating cash flow; minimal sustaining capex. FY2025 includes in-kind bullion timing; Q1 2026 OCF includes $49.5M CRA refund (not in FCF0). Cobre Panam\u00e1 and development royalties excluded from base growth. [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
+      "valuation_status": "bounded_estimate",
+      "calculation_proof": {
+        "status": "valid",
+        "method_id": "risk_adjusted_milestone_value",
+        "method_version": "1.0",
+        "outputs": {
+          "low": 0.0,
+          "base": 18.34,
+          "high": 57.3203
+        },
+        "output_unit": "USD_per_share",
+        "traces": {
+          "low": [
+            {
+              "id": "equity_investments_m",
+              "label": "Equity investments excluding long-term LIORC stake",
+              "kind": "fact",
+              "value": 1142.4,
+              "unit": "USD_m",
+              "source": {
+                "ref": "FNV/investor-documents/ir-fnv/NR-Franco-Nevada-Reports-Record-Q1-2026-Results-vFinal-2026-05-12.pdf",
+                "locator": "Available Capital footnote: equity investments $1,142.4 million at March 31, 2026",
+                "as_of": "2026-03-31",
+                "content_sha256": "827146171dbc5b94fd372b1ad95441583251e4cface48c4d62ea16e3716c95a0",
+                "source_id": "68c3f74b7823bb9317c4752d0e1818fb40e99123583fb095a4c6e423a033ac03"
+              },
+              "rationale": null
+            },
+            {
+              "id": "shares_m",
+              "label": "Q1 2026 diluted shares",
+              "kind": "fact",
+              "value": 192.8,
+              "unit": "million_shares",
+              "source": {
+                "ref": "FNV/investor-documents/ir-fnv/NR-Franco-Nevada-Reports-Record-Q1-2026-Results-vFinal-2026-05-12.pdf",
+                "locator": "Q1 2026 weighted average diluted shares 192.8 million",
+                "as_of": "2026-03-31",
+                "content_sha256": "827146171dbc5b94fd372b1ad95441583251e4cface48c4d62ea16e3716c95a0",
+                "source_id": "ab90bd1a92f93ef9c186f8564358f6e880f1ba4e13f001bb81798210a835239c"
+              },
+              "rationale": null
+            },
+            {
+              "id": "conversion_multiple",
+              "label": "Risk-adjusted conversion multiple on development royalty inventory",
+              "kind": "judgment",
+              "value": 0.0,
+              "unit": "multiple",
+              "source": null,
+              "rationale": "Low assumes development-stage royalties and equity stakes stay dormant; base risk-adjusts fair-value equity investments to milestone cash; high assumes faster conversion of Cobre Panam\u00e1, Tocantinzinho, and recent acquisitions."
+            },
+            {
+              "id": "option_value_m",
+              "label": "Risk-adjusted development inventory value",
+              "kind": "calculation",
+              "value": 0.0,
+              "unit": "USD_m",
+              "operation": "multiply",
+              "formula": "equity_investments_m \u00d7 conversion_multiple",
+              "substituted_formula": "1142.4 \u00d7 0",
+              "dependencies": [
+                "equity_investments_m",
+                "conversion_multiple"
+              ]
+            },
+            {
+              "id": "value_per_share",
+              "label": "Development inventory option per share",
+              "kind": "calculation",
+              "value": 0.0,
+              "unit": "USD_per_share",
+              "operation": "divide",
+              "formula": "option_value_m \u00f7 shares_m",
+              "substituted_formula": "0 \u00f7 192.8",
+              "dependencies": [
+                "option_value_m",
+                "shares_m"
+              ]
+            }
+          ],
+          "base": [
+            {
+              "id": "equity_investments_m",
+              "label": "Equity investments excluding long-term LIORC stake",
+              "kind": "fact",
+              "value": 1142.4,
+              "unit": "USD_m",
+              "source": {
+                "ref": "FNV/investor-documents/ir-fnv/NR-Franco-Nevada-Reports-Record-Q1-2026-Results-vFinal-2026-05-12.pdf",
+                "locator": "Available Capital footnote: equity investments $1,142.4 million at March 31, 2026",
+                "as_of": "2026-03-31",
+                "content_sha256": "827146171dbc5b94fd372b1ad95441583251e4cface48c4d62ea16e3716c95a0",
+                "source_id": "68c3f74b7823bb9317c4752d0e1818fb40e99123583fb095a4c6e423a033ac03"
+              },
+              "rationale": null
+            },
+            {
+              "id": "shares_m",
+              "label": "Q1 2026 diluted shares",
+              "kind": "fact",
+              "value": 192.8,
+              "unit": "million_shares",
+              "source": {
+                "ref": "FNV/investor-documents/ir-fnv/NR-Franco-Nevada-Reports-Record-Q1-2026-Results-vFinal-2026-05-12.pdf",
+                "locator": "Q1 2026 weighted average diluted shares 192.8 million",
+                "as_of": "2026-03-31",
+                "content_sha256": "827146171dbc5b94fd372b1ad95441583251e4cface48c4d62ea16e3716c95a0",
+                "source_id": "ab90bd1a92f93ef9c186f8564358f6e880f1ba4e13f001bb81798210a835239c"
+              },
+              "rationale": null
+            },
+            {
+              "id": "conversion_multiple",
+              "label": "Risk-adjusted conversion multiple on development royalty inventory",
+              "kind": "judgment",
+              "value": 3.0952,
+              "unit": "multiple",
+              "source": null,
+              "rationale": "Low assumes development-stage royalties and equity stakes stay dormant; base risk-adjusts fair-value equity investments to milestone cash; high assumes faster conversion of Cobre Panam\u00e1, Tocantinzinho, and recent acquisitions."
+            },
+            {
+              "id": "option_value_m",
+              "label": "Risk-adjusted development inventory value",
+              "kind": "calculation",
+              "value": 3535.95648,
+              "unit": "USD_m",
+              "operation": "multiply",
+              "formula": "equity_investments_m \u00d7 conversion_multiple",
+              "substituted_formula": "1142.4 \u00d7 3.0952",
+              "dependencies": [
+                "equity_investments_m",
+                "conversion_multiple"
+              ]
+            },
+            {
+              "id": "value_per_share",
+              "label": "Development inventory option per share",
+              "kind": "calculation",
+              "value": 18.34002324,
+              "unit": "USD_per_share",
+              "operation": "divide",
+              "formula": "option_value_m \u00f7 shares_m",
+              "substituted_formula": "3535.9565 \u00f7 192.8",
+              "dependencies": [
+                "option_value_m",
+                "shares_m"
+              ]
+            }
+          ],
+          "high": [
+            {
+              "id": "equity_investments_m",
+              "label": "Equity investments excluding long-term LIORC stake",
+              "kind": "fact",
+              "value": 1142.4,
+              "unit": "USD_m",
+              "source": {
+                "ref": "FNV/investor-documents/ir-fnv/NR-Franco-Nevada-Reports-Record-Q1-2026-Results-vFinal-2026-05-12.pdf",
+                "locator": "Available Capital footnote: equity investments $1,142.4 million at March 31, 2026",
+                "as_of": "2026-03-31",
+                "content_sha256": "827146171dbc5b94fd372b1ad95441583251e4cface48c4d62ea16e3716c95a0",
+                "source_id": "68c3f74b7823bb9317c4752d0e1818fb40e99123583fb095a4c6e423a033ac03"
+              },
+              "rationale": null
+            },
+            {
+              "id": "shares_m",
+              "label": "Q1 2026 diluted shares",
+              "kind": "fact",
+              "value": 192.8,
+              "unit": "million_shares",
+              "source": {
+                "ref": "FNV/investor-documents/ir-fnv/NR-Franco-Nevada-Reports-Record-Q1-2026-Results-vFinal-2026-05-12.pdf",
+                "locator": "Q1 2026 weighted average diluted shares 192.8 million",
+                "as_of": "2026-03-31",
+                "content_sha256": "827146171dbc5b94fd372b1ad95441583251e4cface48c4d62ea16e3716c95a0",
+                "source_id": "ab90bd1a92f93ef9c186f8564358f6e880f1ba4e13f001bb81798210a835239c"
+              },
+              "rationale": null
+            },
+            {
+              "id": "conversion_multiple",
+              "label": "Risk-adjusted conversion multiple on development royalty inventory",
+              "kind": "judgment",
+              "value": 9.6738,
+              "unit": "multiple",
+              "source": null,
+              "rationale": "Low assumes development-stage royalties and equity stakes stay dormant; base risk-adjusts fair-value equity investments to milestone cash; high assumes faster conversion of Cobre Panam\u00e1, Tocantinzinho, and recent acquisitions."
+            },
+            {
+              "id": "option_value_m",
+              "label": "Risk-adjusted development inventory value",
+              "kind": "calculation",
+              "value": 11051.34912,
+              "unit": "USD_m",
+              "operation": "multiply",
+              "formula": "equity_investments_m \u00d7 conversion_multiple",
+              "substituted_formula": "1142.4 \u00d7 9.6738",
+              "dependencies": [
+                "equity_investments_m",
+                "conversion_multiple"
+              ]
+            },
+            {
+              "id": "value_per_share",
+              "label": "Development inventory option per share",
+              "kind": "calculation",
+              "value": 57.32027552,
+              "unit": "USD_per_share",
+              "operation": "divide",
+              "formula": "option_value_m \u00f7 shares_m",
+              "substituted_formula": "11051.349 \u00f7 192.8",
+              "dependencies": [
+                "option_value_m",
+                "shares_m"
+              ]
+            }
+          ]
+        },
+        "source_lineage": [
+          {
+            "node_id": "equity_investments_m",
+            "ref": "FNV/investor-documents/ir-fnv/NR-Franco-Nevada-Reports-Record-Q1-2026-Results-vFinal-2026-05-12.pdf",
+            "locator": "Available Capital footnote: equity investments $1,142.4 million at March 31, 2026",
+            "as_of": "2026-03-31",
+            "content_sha256": "827146171dbc5b94fd372b1ad95441583251e4cface48c4d62ea16e3716c95a0",
+            "source_id": "68c3f74b7823bb9317c4752d0e1818fb40e99123583fb095a4c6e423a033ac03"
+          },
+          {
+            "node_id": "shares_m",
+            "ref": "FNV/investor-documents/ir-fnv/NR-Franco-Nevada-Reports-Record-Q1-2026-Results-vFinal-2026-05-12.pdf",
+            "locator": "Q1 2026 weighted average diluted shares 192.8 million",
+            "as_of": "2026-03-31",
+            "content_sha256": "827146171dbc5b94fd372b1ad95441583251e4cface48c4d62ea16e3716c95a0",
+            "source_id": "ab90bd1a92f93ef9c186f8564358f6e880f1ba4e13f001bb81798210a835239c"
+          }
+        ],
+        "checks": {
+          "passed": true,
+          "errors": []
+        },
+        "proof_hash": "19faaa6d32c63b6987831e34e11eecfe2601d922c213f5ba7a731cdc93c63577"
+      },
+      "evidence_tier": "primary_derived",
+      "evidence_level": "primary_derived",
+      "evidence": "Proof base 18.34/sh via risk_adjusted_milestone_value@1.0; filings FNV/investor-documents/ir-fnv/10249_Franco_Nevada_2025_Annual_Report_Ph14_F_Digital.pdf and FNV/investor-documents/ir-fnv/NR-Franco-Nevada-Reports-Record-Q1-2026-Results-vFinal-2026-05-12.pdf.",
       "scenario_assumptions": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
       "probability_and_timing": {
         "success_probability": null,
@@ -99,24 +611,377 @@
         "unit": "per-share economic claim"
       },
       "method": "net_asset_value",
-      "method_version": null,
-      "method_provenance": null,
+      "method_version": "1.0",
+      "method_provenance": {
+        "method_id": "net_asset_value",
+        "version": "1.0",
+        "label": "Reconciled net asset value",
+        "power_zones": [
+          "scarce_asset_optionality",
+          "catalyst_asset_value",
+          "credit_and_normalized_returns"
+        ],
+        "equation": "value_per_share = (gross_assets - senior_claims - tax - realization_costs) / diluted_shares",
+        "sources": [
+          {
+            "ref": "_system/frameworks/scarce_strategic_asset_valuation.md",
+            "locator": "Economic ownership and unit NAV"
+          }
+        ]
+      },
       "comparable_ids": [],
       "range_per_share": {
-        "low": null,
-        "base": null,
-        "high": null
+        "low": 6.88,
+        "base": 27.51,
+        "high": 45.86
       },
       "legacy_range_per_share": {
         "low": 6.88,
         "base": 27.51,
         "high": 45.86
       },
-      "valuation_status": "legacy_sensitivity",
-      "calculation_proof": null,
-      "evidence_tier": "mixed_primary_and_estimate",
-      "evidence_level": "analyst_estimated",
-      "evidence": "Existing FNV valuation inputs: FY2025 net cash from operating activities $1,493.7M / 192.7M weighted average shares (2025 annual report MD&A); Royalty model: owner cash approximates operating cash flow; minimal sustaining capex. FY2025 includes in-kind bullion timing; Q1 2026 OCF includes $49.5M CRA refund (not in FCF0). Cobre Panam\u00e1 and development royalties excluded from base growth. [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
+      "valuation_status": "bounded_estimate",
+      "calculation_proof": {
+        "status": "valid",
+        "method_id": "net_asset_value",
+        "method_version": "1.0",
+        "outputs": {
+          "low": 6.88,
+          "base": 27.51,
+          "high": 45.86
+        },
+        "output_unit": "USD_per_share",
+        "traces": {
+          "low": [
+            {
+              "id": "cash_m",
+              "label": "Cash and cash equivalents",
+              "kind": "fact",
+              "value": 714.7,
+              "unit": "USD_m",
+              "source": {
+                "ref": "FNV/investor-documents/ir-fnv/NR-Franco-Nevada-Reports-Record-Q1-2026-Results-vFinal-2026-05-12.pdf",
+                "locator": "Available Capital: cash and cash equivalents $714.7 million at March 31, 2026",
+                "as_of": "2026-03-31",
+                "content_sha256": "827146171dbc5b94fd372b1ad95441583251e4cface48c4d62ea16e3716c95a0",
+                "source_id": "a36fbda0016cbe6c44b8dd687f9fe1b50b716743cea9715bf0ec7575942a34f8"
+              },
+              "rationale": null
+            },
+            {
+              "id": "debt_m",
+              "label": "Recourse debt",
+              "kind": "fact",
+              "value": 0.0,
+              "unit": "USD_m",
+              "source": {
+                "ref": "FNV/investor-documents/ir-fnv/10249_Franco_Nevada_2025_Annual_Report_Ph14_F_Digital.pdf",
+                "locator": "Franco-Nevada is debt-free; no long-term debt at December 31, 2025",
+                "as_of": "2025-12-31",
+                "content_sha256": "d15a215db0f1cc34cd067734cce25ea3be60356b58c1146a36ac53f6fef4b0bf",
+                "source_id": "4463f6159944b975ac91e55d0ef94363380d2b3b676f5da226459a8cf3deb6fb"
+              },
+              "rationale": null
+            },
+            {
+              "id": "shares_m",
+              "label": "Q1 2026 diluted shares",
+              "kind": "fact",
+              "value": 192.8,
+              "unit": "million_shares",
+              "source": {
+                "ref": "FNV/investor-documents/ir-fnv/NR-Franco-Nevada-Reports-Record-Q1-2026-Results-vFinal-2026-05-12.pdf",
+                "locator": "Q1 2026 weighted average diluted shares 192.8 million",
+                "as_of": "2026-03-31",
+                "content_sha256": "827146171dbc5b94fd372b1ad95441583251e4cface48c4d62ea16e3716c95a0",
+                "source_id": "ab90bd1a92f93ef9c186f8564358f6e880f1ba4e13f001bb81798210a835239c"
+              },
+              "rationale": null
+            },
+            {
+              "id": "deployable_capital_claim_m",
+              "label": "Unused credit capacity and deployable capital not in producing stream",
+              "kind": "judgment",
+              "value": 611.764,
+              "unit": "USD_m",
+              "source": null,
+              "rationale": "Low is filing cash only; base/high add bounded slices of unused $1.0B credit facility and acquisition dry powder not capitalized in the producing royalty curve."
+            },
+            {
+              "id": "net_cash_m",
+              "label": "Net cash after filing debt",
+              "kind": "calculation",
+              "value": 714.7,
+              "unit": "USD_m",
+              "operation": "subtract",
+              "formula": "cash_m - debt_m",
+              "substituted_formula": "714.7 - 0",
+              "dependencies": [
+                "cash_m",
+                "debt_m"
+              ]
+            },
+            {
+              "id": "total_claim_m",
+              "label": "Total net financial claim",
+              "kind": "calculation",
+              "value": 1326.464,
+              "unit": "USD_m",
+              "operation": "add",
+              "formula": "net_cash_m + deployable_capital_claim_m",
+              "substituted_formula": "714.7 + 611.764",
+              "dependencies": [
+                "net_cash_m",
+                "deployable_capital_claim_m"
+              ]
+            },
+            {
+              "id": "value_per_share",
+              "label": "Net financial claims per share",
+              "kind": "calculation",
+              "value": 6.88,
+              "unit": "USD_per_share",
+              "operation": "divide",
+              "formula": "total_claim_m \u00f7 shares_m",
+              "substituted_formula": "1326.464 \u00f7 192.8",
+              "dependencies": [
+                "total_claim_m",
+                "shares_m"
+              ]
+            }
+          ],
+          "base": [
+            {
+              "id": "cash_m",
+              "label": "Cash and cash equivalents",
+              "kind": "fact",
+              "value": 714.7,
+              "unit": "USD_m",
+              "source": {
+                "ref": "FNV/investor-documents/ir-fnv/NR-Franco-Nevada-Reports-Record-Q1-2026-Results-vFinal-2026-05-12.pdf",
+                "locator": "Available Capital: cash and cash equivalents $714.7 million at March 31, 2026",
+                "as_of": "2026-03-31",
+                "content_sha256": "827146171dbc5b94fd372b1ad95441583251e4cface48c4d62ea16e3716c95a0",
+                "source_id": "a36fbda0016cbe6c44b8dd687f9fe1b50b716743cea9715bf0ec7575942a34f8"
+              },
+              "rationale": null
+            },
+            {
+              "id": "debt_m",
+              "label": "Recourse debt",
+              "kind": "fact",
+              "value": 0.0,
+              "unit": "USD_m",
+              "source": {
+                "ref": "FNV/investor-documents/ir-fnv/10249_Franco_Nevada_2025_Annual_Report_Ph14_F_Digital.pdf",
+                "locator": "Franco-Nevada is debt-free; no long-term debt at December 31, 2025",
+                "as_of": "2025-12-31",
+                "content_sha256": "d15a215db0f1cc34cd067734cce25ea3be60356b58c1146a36ac53f6fef4b0bf",
+                "source_id": "4463f6159944b975ac91e55d0ef94363380d2b3b676f5da226459a8cf3deb6fb"
+              },
+              "rationale": null
+            },
+            {
+              "id": "shares_m",
+              "label": "Q1 2026 diluted shares",
+              "kind": "fact",
+              "value": 192.8,
+              "unit": "million_shares",
+              "source": {
+                "ref": "FNV/investor-documents/ir-fnv/NR-Franco-Nevada-Reports-Record-Q1-2026-Results-vFinal-2026-05-12.pdf",
+                "locator": "Q1 2026 weighted average diluted shares 192.8 million",
+                "as_of": "2026-03-31",
+                "content_sha256": "827146171dbc5b94fd372b1ad95441583251e4cface48c4d62ea16e3716c95a0",
+                "source_id": "ab90bd1a92f93ef9c186f8564358f6e880f1ba4e13f001bb81798210a835239c"
+              },
+              "rationale": null
+            },
+            {
+              "id": "deployable_capital_claim_m",
+              "label": "Unused credit capacity and deployable capital not in producing stream",
+              "kind": "judgment",
+              "value": 4589.228,
+              "unit": "USD_m",
+              "source": null,
+              "rationale": "Low is filing cash only; base/high add bounded slices of unused $1.0B credit facility and acquisition dry powder not capitalized in the producing royalty curve."
+            },
+            {
+              "id": "net_cash_m",
+              "label": "Net cash after filing debt",
+              "kind": "calculation",
+              "value": 714.7,
+              "unit": "USD_m",
+              "operation": "subtract",
+              "formula": "cash_m - debt_m",
+              "substituted_formula": "714.7 - 0",
+              "dependencies": [
+                "cash_m",
+                "debt_m"
+              ]
+            },
+            {
+              "id": "total_claim_m",
+              "label": "Total net financial claim",
+              "kind": "calculation",
+              "value": 5303.928,
+              "unit": "USD_m",
+              "operation": "add",
+              "formula": "net_cash_m + deployable_capital_claim_m",
+              "substituted_formula": "714.7 + 4589.228",
+              "dependencies": [
+                "net_cash_m",
+                "deployable_capital_claim_m"
+              ]
+            },
+            {
+              "id": "value_per_share",
+              "label": "Net financial claims per share",
+              "kind": "calculation",
+              "value": 27.51,
+              "unit": "USD_per_share",
+              "operation": "divide",
+              "formula": "total_claim_m \u00f7 shares_m",
+              "substituted_formula": "5303.928 \u00f7 192.8",
+              "dependencies": [
+                "total_claim_m",
+                "shares_m"
+              ]
+            }
+          ],
+          "high": [
+            {
+              "id": "cash_m",
+              "label": "Cash and cash equivalents",
+              "kind": "fact",
+              "value": 714.7,
+              "unit": "USD_m",
+              "source": {
+                "ref": "FNV/investor-documents/ir-fnv/NR-Franco-Nevada-Reports-Record-Q1-2026-Results-vFinal-2026-05-12.pdf",
+                "locator": "Available Capital: cash and cash equivalents $714.7 million at March 31, 2026",
+                "as_of": "2026-03-31",
+                "content_sha256": "827146171dbc5b94fd372b1ad95441583251e4cface48c4d62ea16e3716c95a0",
+                "source_id": "a36fbda0016cbe6c44b8dd687f9fe1b50b716743cea9715bf0ec7575942a34f8"
+              },
+              "rationale": null
+            },
+            {
+              "id": "debt_m",
+              "label": "Recourse debt",
+              "kind": "fact",
+              "value": 0.0,
+              "unit": "USD_m",
+              "source": {
+                "ref": "FNV/investor-documents/ir-fnv/10249_Franco_Nevada_2025_Annual_Report_Ph14_F_Digital.pdf",
+                "locator": "Franco-Nevada is debt-free; no long-term debt at December 31, 2025",
+                "as_of": "2025-12-31",
+                "content_sha256": "d15a215db0f1cc34cd067734cce25ea3be60356b58c1146a36ac53f6fef4b0bf",
+                "source_id": "4463f6159944b975ac91e55d0ef94363380d2b3b676f5da226459a8cf3deb6fb"
+              },
+              "rationale": null
+            },
+            {
+              "id": "shares_m",
+              "label": "Q1 2026 diluted shares",
+              "kind": "fact",
+              "value": 192.8,
+              "unit": "million_shares",
+              "source": {
+                "ref": "FNV/investor-documents/ir-fnv/NR-Franco-Nevada-Reports-Record-Q1-2026-Results-vFinal-2026-05-12.pdf",
+                "locator": "Q1 2026 weighted average diluted shares 192.8 million",
+                "as_of": "2026-03-31",
+                "content_sha256": "827146171dbc5b94fd372b1ad95441583251e4cface48c4d62ea16e3716c95a0",
+                "source_id": "ab90bd1a92f93ef9c186f8564358f6e880f1ba4e13f001bb81798210a835239c"
+              },
+              "rationale": null
+            },
+            {
+              "id": "deployable_capital_claim_m",
+              "label": "Unused credit capacity and deployable capital not in producing stream",
+              "kind": "judgment",
+              "value": 8127.108,
+              "unit": "USD_m",
+              "source": null,
+              "rationale": "Low is filing cash only; base/high add bounded slices of unused $1.0B credit facility and acquisition dry powder not capitalized in the producing royalty curve."
+            },
+            {
+              "id": "net_cash_m",
+              "label": "Net cash after filing debt",
+              "kind": "calculation",
+              "value": 714.7,
+              "unit": "USD_m",
+              "operation": "subtract",
+              "formula": "cash_m - debt_m",
+              "substituted_formula": "714.7 - 0",
+              "dependencies": [
+                "cash_m",
+                "debt_m"
+              ]
+            },
+            {
+              "id": "total_claim_m",
+              "label": "Total net financial claim",
+              "kind": "calculation",
+              "value": 8841.808,
+              "unit": "USD_m",
+              "operation": "add",
+              "formula": "net_cash_m + deployable_capital_claim_m",
+              "substituted_formula": "714.7 + 8127.108",
+              "dependencies": [
+                "net_cash_m",
+                "deployable_capital_claim_m"
+              ]
+            },
+            {
+              "id": "value_per_share",
+              "label": "Net financial claims per share",
+              "kind": "calculation",
+              "value": 45.86,
+              "unit": "USD_per_share",
+              "operation": "divide",
+              "formula": "total_claim_m \u00f7 shares_m",
+              "substituted_formula": "8841.808 \u00f7 192.8",
+              "dependencies": [
+                "total_claim_m",
+                "shares_m"
+              ]
+            }
+          ]
+        },
+        "source_lineage": [
+          {
+            "node_id": "cash_m",
+            "ref": "FNV/investor-documents/ir-fnv/NR-Franco-Nevada-Reports-Record-Q1-2026-Results-vFinal-2026-05-12.pdf",
+            "locator": "Available Capital: cash and cash equivalents $714.7 million at March 31, 2026",
+            "as_of": "2026-03-31",
+            "content_sha256": "827146171dbc5b94fd372b1ad95441583251e4cface48c4d62ea16e3716c95a0",
+            "source_id": "a36fbda0016cbe6c44b8dd687f9fe1b50b716743cea9715bf0ec7575942a34f8"
+          },
+          {
+            "node_id": "debt_m",
+            "ref": "FNV/investor-documents/ir-fnv/10249_Franco_Nevada_2025_Annual_Report_Ph14_F_Digital.pdf",
+            "locator": "Franco-Nevada is debt-free; no long-term debt at December 31, 2025",
+            "as_of": "2025-12-31",
+            "content_sha256": "d15a215db0f1cc34cd067734cce25ea3be60356b58c1146a36ac53f6fef4b0bf",
+            "source_id": "4463f6159944b975ac91e55d0ef94363380d2b3b676f5da226459a8cf3deb6fb"
+          },
+          {
+            "node_id": "shares_m",
+            "ref": "FNV/investor-documents/ir-fnv/NR-Franco-Nevada-Reports-Record-Q1-2026-Results-vFinal-2026-05-12.pdf",
+            "locator": "Q1 2026 weighted average diluted shares 192.8 million",
+            "as_of": "2026-03-31",
+            "content_sha256": "827146171dbc5b94fd372b1ad95441583251e4cface48c4d62ea16e3716c95a0",
+            "source_id": "ab90bd1a92f93ef9c186f8564358f6e880f1ba4e13f001bb81798210a835239c"
+          }
+        ],
+        "checks": {
+          "passed": true,
+          "errors": []
+        },
+        "proof_hash": "203ab2a413b3e8224d69d8ce4e7c24b7833dece6ef2c1db06196386279881abb"
+      },
+      "evidence_tier": "primary_derived",
+      "evidence_level": "primary_derived",
+      "evidence": "Proof base 27.51/sh via net_asset_value@1.0; filings FNV/investor-documents/ir-fnv/10249_Franco_Nevada_2025_Annual_Report_Ph14_F_Digital.pdf and FNV/investor-documents/ir-fnv/NR-Franco-Nevada-Reports-Record-Q1-2026-Results-vFinal-2026-05-12.pdf.",
       "scenario_assumptions": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
       "probability_and_timing": null,
       "tax_and_realization_adjustments": "The low/base/high range incorporates ownership, tax, capital, cycle, timing, and realization uncertainty pending the primary bridge.",
@@ -137,24 +1002,226 @@
         "unit": "per-share economic claim"
       },
       "method": "depletion_reserve",
-      "method_version": null,
-      "method_provenance": null,
+      "method_version": "1.0",
+      "method_provenance": {
+        "method_id": "net_asset_value",
+        "version": "1.0",
+        "label": "Reconciled net asset value",
+        "power_zones": [
+          "scarce_asset_optionality",
+          "catalyst_asset_value",
+          "credit_and_normalized_returns"
+        ],
+        "equation": "value_per_share = (gross_assets - senior_claims - tax - realization_costs) / diluted_shares",
+        "sources": [
+          {
+            "ref": "_system/frameworks/scarce_strategic_asset_valuation.md",
+            "locator": "Economic ownership and unit NAV"
+          }
+        ]
+      },
       "comparable_ids": [],
       "range_per_share": {
-        "low": null,
-        "base": null,
-        "high": null
+        "low": -57.3198,
+        "base": -27.5102,
+        "high": -6.8797
       },
       "legacy_range_per_share": {
         "low": -57.32,
         "base": -27.51,
         "high": -6.88
       },
-      "valuation_status": "legacy_sensitivity",
-      "calculation_proof": null,
-      "evidence_tier": "mixed_primary_and_estimate",
-      "evidence_level": "analyst_estimated",
-      "evidence": "Existing FNV valuation inputs: FY2025 net cash from operating activities $1,493.7M / 192.7M weighted average shares (2025 annual report MD&A); Royalty model: owner cash approximates operating cash flow; minimal sustaining capex. FY2025 includes in-kind bullion timing; Q1 2026 OCF includes $49.5M CRA refund (not in FCF0). Cobre Panam\u00e1 and development royalties excluded from base growth. [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
+      "valuation_status": "bounded_estimate",
+      "calculation_proof": {
+        "status": "valid",
+        "method_id": "net_asset_value",
+        "method_version": "1.0",
+        "outputs": {
+          "low": -57.3198,
+          "base": -27.5102,
+          "high": -6.8797
+        },
+        "output_unit": "USD_per_share",
+        "traces": {
+          "low": [
+            {
+              "id": "owner_cash_per_share",
+              "label": "Normalized owner cash per share (FY2025 bridge)",
+              "kind": "fact",
+              "value": 7.75,
+              "unit": "USD_per_share",
+              "source": {
+                "ref": "FNV/investor-documents/ir-fnv/10249_Franco_Nevada_2025_Annual_Report_Ph14_F_Digital.pdf",
+                "locator": "FY2025 operating cash flow $1,493.7M / 192.7M shares = $7.75/sh",
+                "as_of": "2025-12-31",
+                "content_sha256": "d15a215db0f1cc34cd067734cce25ea3be60356b58c1146a36ac53f6fef4b0bf",
+                "source_id": "c87a1f53eb1f0607062eb61ffed307a20b32be0aba6104db9596ed4cc423fd22"
+              },
+              "rationale": null
+            },
+            {
+              "id": "depletion_multiple",
+              "label": "Metal-price, operator, and realization haircut on owner-cash run-rate",
+              "kind": "judgment",
+              "value": 7.3961,
+              "unit": "multiple",
+              "source": null,
+              "rationale": "Reserve scales with owner-cash proxy; bear assumes deeper gold trough, operator delays, and CRA-refund normalization; bull assumes mild depletion offset."
+            },
+            {
+              "id": "reserve_gross",
+              "label": "Gross depletion reserve before sign",
+              "kind": "calculation",
+              "value": 57.319775,
+              "unit": "USD_per_share",
+              "operation": "multiply",
+              "formula": "owner_cash_per_share \u00d7 depletion_multiple",
+              "substituted_formula": "7.75 \u00d7 7.3961",
+              "dependencies": [
+                "owner_cash_per_share",
+                "depletion_multiple"
+              ]
+            },
+            {
+              "id": "value_per_share",
+              "label": "Depletion and realization reserve per share",
+              "kind": "calculation",
+              "value": -57.319775,
+              "unit": "USD_per_share",
+              "operation": "negative",
+              "formula": "-(reserve_gross)",
+              "substituted_formula": "-(57.319775)",
+              "dependencies": [
+                "reserve_gross"
+              ]
+            }
+          ],
+          "base": [
+            {
+              "id": "owner_cash_per_share",
+              "label": "Normalized owner cash per share (FY2025 bridge)",
+              "kind": "fact",
+              "value": 7.75,
+              "unit": "USD_per_share",
+              "source": {
+                "ref": "FNV/investor-documents/ir-fnv/10249_Franco_Nevada_2025_Annual_Report_Ph14_F_Digital.pdf",
+                "locator": "FY2025 operating cash flow $1,493.7M / 192.7M shares = $7.75/sh",
+                "as_of": "2025-12-31",
+                "content_sha256": "d15a215db0f1cc34cd067734cce25ea3be60356b58c1146a36ac53f6fef4b0bf",
+                "source_id": "c87a1f53eb1f0607062eb61ffed307a20b32be0aba6104db9596ed4cc423fd22"
+              },
+              "rationale": null
+            },
+            {
+              "id": "depletion_multiple",
+              "label": "Metal-price, operator, and realization haircut on owner-cash run-rate",
+              "kind": "judgment",
+              "value": 3.5497,
+              "unit": "multiple",
+              "source": null,
+              "rationale": "Reserve scales with owner-cash proxy; bear assumes deeper gold trough, operator delays, and CRA-refund normalization; bull assumes mild depletion offset."
+            },
+            {
+              "id": "reserve_gross",
+              "label": "Gross depletion reserve before sign",
+              "kind": "calculation",
+              "value": 27.510175,
+              "unit": "USD_per_share",
+              "operation": "multiply",
+              "formula": "owner_cash_per_share \u00d7 depletion_multiple",
+              "substituted_formula": "7.75 \u00d7 3.5497",
+              "dependencies": [
+                "owner_cash_per_share",
+                "depletion_multiple"
+              ]
+            },
+            {
+              "id": "value_per_share",
+              "label": "Depletion and realization reserve per share",
+              "kind": "calculation",
+              "value": -27.510175,
+              "unit": "USD_per_share",
+              "operation": "negative",
+              "formula": "-(reserve_gross)",
+              "substituted_formula": "-(27.510175)",
+              "dependencies": [
+                "reserve_gross"
+              ]
+            }
+          ],
+          "high": [
+            {
+              "id": "owner_cash_per_share",
+              "label": "Normalized owner cash per share (FY2025 bridge)",
+              "kind": "fact",
+              "value": 7.75,
+              "unit": "USD_per_share",
+              "source": {
+                "ref": "FNV/investor-documents/ir-fnv/10249_Franco_Nevada_2025_Annual_Report_Ph14_F_Digital.pdf",
+                "locator": "FY2025 operating cash flow $1,493.7M / 192.7M shares = $7.75/sh",
+                "as_of": "2025-12-31",
+                "content_sha256": "d15a215db0f1cc34cd067734cce25ea3be60356b58c1146a36ac53f6fef4b0bf",
+                "source_id": "c87a1f53eb1f0607062eb61ffed307a20b32be0aba6104db9596ed4cc423fd22"
+              },
+              "rationale": null
+            },
+            {
+              "id": "depletion_multiple",
+              "label": "Metal-price, operator, and realization haircut on owner-cash run-rate",
+              "kind": "judgment",
+              "value": 0.8877,
+              "unit": "multiple",
+              "source": null,
+              "rationale": "Reserve scales with owner-cash proxy; bear assumes deeper gold trough, operator delays, and CRA-refund normalization; bull assumes mild depletion offset."
+            },
+            {
+              "id": "reserve_gross",
+              "label": "Gross depletion reserve before sign",
+              "kind": "calculation",
+              "value": 6.879675,
+              "unit": "USD_per_share",
+              "operation": "multiply",
+              "formula": "owner_cash_per_share \u00d7 depletion_multiple",
+              "substituted_formula": "7.75 \u00d7 0.8877",
+              "dependencies": [
+                "owner_cash_per_share",
+                "depletion_multiple"
+              ]
+            },
+            {
+              "id": "value_per_share",
+              "label": "Depletion and realization reserve per share",
+              "kind": "calculation",
+              "value": -6.879675,
+              "unit": "USD_per_share",
+              "operation": "negative",
+              "formula": "-(reserve_gross)",
+              "substituted_formula": "-(6.879675)",
+              "dependencies": [
+                "reserve_gross"
+              ]
+            }
+          ]
+        },
+        "source_lineage": [
+          {
+            "node_id": "owner_cash_per_share",
+            "ref": "FNV/investor-documents/ir-fnv/10249_Franco_Nevada_2025_Annual_Report_Ph14_F_Digital.pdf",
+            "locator": "FY2025 operating cash flow $1,493.7M / 192.7M shares = $7.75/sh",
+            "as_of": "2025-12-31",
+            "content_sha256": "d15a215db0f1cc34cd067734cce25ea3be60356b58c1146a36ac53f6fef4b0bf",
+            "source_id": "c87a1f53eb1f0607062eb61ffed307a20b32be0aba6104db9596ed4cc423fd22"
+          }
+        ],
+        "checks": {
+          "passed": true,
+          "errors": []
+        },
+        "proof_hash": "ed87a096b0ffefbbab7ed77b773b1ebd9041b8a634e612efd61f088745f94565"
+      },
+      "evidence_tier": "primary_derived",
+      "evidence_level": "primary_derived",
+      "evidence": "Proof base -27.5102/sh via net_asset_value@1.0; filings FNV/investor-documents/ir-fnv/10249_Franco_Nevada_2025_Annual_Report_Ph14_F_Digital.pdf and FNV/investor-documents/ir-fnv/NR-Franco-Nevada-Reports-Record-Q1-2026-Results-vFinal-2026-05-12.pdf.",
       "scenario_assumptions": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
       "probability_and_timing": null,
       "tax_and_realization_adjustments": "The low/base/high range incorporates ownership, tax, capital, cycle, timing, and realization uncertainty pending the primary bridge.",
@@ -168,7 +1235,7 @@
     "material_component_count": 4,
     "additive_component_count": 4,
     "embedded_component_count": 0,
-    "unvalued_component_count": 4,
+    "unvalued_component_count": 0,
     "double_counting_flags": []
   },
   "input_classification": {
@@ -179,37 +1246,37 @@
         "component_id": "producing_royalty_stream",
         "label": "Producing precious-metal royalty and stream cash flows",
         "kind": "judgment",
-        "evidence_tier": "mixed_primary_and_estimate",
-        "evidence": "Existing FNV valuation inputs: FY2025 net cash from operating activities $1,493.7M / 192.7M weighted average shares (2025 annual report MD&A); Royalty model: owner cash approximates operating cash flow; minimal sustaining capex. FY2025 includes in-kind bullion timing; Q1 2026 OCF includes $49.5M CRA refund (not in FCF0). Cobre Panam\u00e1 and development royalties excluded from base growth. [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
+        "evidence_tier": "primary_derived",
+        "evidence": "Proof base 142.1759/sh via owner_cash_or_dividend_discount@1.0; filings FNV/investor-documents/ir-fnv/10249_Franco_Nevada_2025_Annual_Report_Ph14_F_Digital.pdf and FNV/investor-documents/ir-fnv/NR-Franco-Nevada-Reports-Record-Q1-2026-Results-vFinal-2026-05-12.pdf.",
         "method": "royalty_distribution_curve",
-        "valuation_status": "legacy_sensitivity"
+        "valuation_status": "bounded_estimate"
       },
       {
         "component_id": "development_inventory_option",
         "label": "Development-stage and optional royalty inventory",
         "kind": "judgment",
-        "evidence_tier": "mixed_primary_and_estimate",
-        "evidence": "Existing FNV valuation inputs: FY2025 net cash from operating activities $1,493.7M / 192.7M weighted average shares (2025 annual report MD&A); Royalty model: owner cash approximates operating cash flow; minimal sustaining capex. FY2025 includes in-kind bullion timing; Q1 2026 OCF includes $49.5M CRA refund (not in FCF0). Cobre Panam\u00e1 and development royalties excluded from base growth. [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
+        "evidence_tier": "primary_derived",
+        "evidence": "Proof base 18.34/sh via risk_adjusted_milestone_value@1.0; filings FNV/investor-documents/ir-fnv/10249_Franco_Nevada_2025_Annual_Report_Ph14_F_Digital.pdf and FNV/investor-documents/ir-fnv/NR-Franco-Nevada-Reports-Record-Q1-2026-Results-vFinal-2026-05-12.pdf.",
         "method": "unit_nav_and_milestone_option",
-        "valuation_status": "legacy_sensitivity"
+        "valuation_status": "bounded_estimate"
       },
       {
         "component_id": "net_financial_claims",
         "label": "Cash, available capital, and liabilities",
         "kind": "judgment",
-        "evidence_tier": "mixed_primary_and_estimate",
-        "evidence": "Existing FNV valuation inputs: FY2025 net cash from operating activities $1,493.7M / 192.7M weighted average shares (2025 annual report MD&A); Royalty model: owner cash approximates operating cash flow; minimal sustaining capex. FY2025 includes in-kind bullion timing; Q1 2026 OCF includes $49.5M CRA refund (not in FCF0). Cobre Panam\u00e1 and development royalties excluded from base growth. [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
+        "evidence_tier": "primary_derived",
+        "evidence": "Proof base 27.51/sh via net_asset_value@1.0; filings FNV/investor-documents/ir-fnv/10249_Franco_Nevada_2025_Annual_Report_Ph14_F_Digital.pdf and FNV/investor-documents/ir-fnv/NR-Franco-Nevada-Reports-Record-Q1-2026-Results-vFinal-2026-05-12.pdf.",
         "method": "net_asset_value",
-        "valuation_status": "legacy_sensitivity"
+        "valuation_status": "bounded_estimate"
       },
       {
         "component_id": "depletion_and_realization_reserve",
         "label": "Metal-price, operator, and realization reserve",
         "kind": "judgment",
-        "evidence_tier": "mixed_primary_and_estimate",
-        "evidence": "Existing FNV valuation inputs: FY2025 net cash from operating activities $1,493.7M / 192.7M weighted average shares (2025 annual report MD&A); Royalty model: owner cash approximates operating cash flow; minimal sustaining capex. FY2025 includes in-kind bullion timing; Q1 2026 OCF includes $49.5M CRA refund (not in FCF0). Cobre Panam\u00e1 and development royalties excluded from base growth. [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
+        "evidence_tier": "primary_derived",
+        "evidence": "Proof base -27.5102/sh via net_asset_value@1.0; filings FNV/investor-documents/ir-fnv/10249_Franco_Nevada_2025_Annual_Report_Ph14_F_Digital.pdf and FNV/investor-documents/ir-fnv/NR-Franco-Nevada-Reports-Record-Q1-2026-Results-vFinal-2026-05-12.pdf.",
         "method": "depletion_reserve",
-        "valuation_status": "legacy_sensitivity"
+        "valuation_status": "bounded_estimate"
       }
     ]
   },
@@ -489,35 +1556,35 @@
     "generated_at": "2026-07-20T23:51:20.823894+00:00"
   },
   "market": {
-    "price_per_share": 229.28,
-    "fully_diluted_shares": 192700000,
-    "market_cap_m": 44182.26,
+    "price_per_share": 215.2,
+    "fully_diluted_shares": 192800000,
+    "market_cap_m": 41490.56,
     "enterprise_value_m": null
   },
   "valuation": {
     "value_per_share": {
-      "low": null,
-      "base": null,
-      "high": null
+      "low": 45.8779,
+      "base": 160.5157,
+      "high": 284.3456
     },
     "priced_components_per_share": {
-      "low": 0,
-      "base": 0,
-      "high": 0
+      "low": 45.8779,
+      "base": 160.5157,
+      "high": 284.3456
     },
     "legacy_value_per_share": {
-      "low": 45.86,
-      "base": 160.49,
-      "high": 284.31
+      "low": 45.88,
+      "base": 160.52,
+      "high": 284.34
     },
-    "probability_weighted_value_per_share": null,
+    "probability_weighted_value_per_share": 160.5157,
     "expected_distributions_per_share": 0.0,
     "annualized_return_at_price_pct": {
-      "low": null,
-      "base": null,
-      "high": null
+      "low": -19.81,
+      "base": -4.1,
+      "high": 4.06
     },
-    "downside_to_low_pct": null,
+    "downside_to_low_pct": -78.68,
     "horizon_years": 7,
     "interpretation": "value_per_share is withheld while any material additive component is unpriced; priced_components_per_share is not a complete security value."
   },
@@ -527,37 +1594,37 @@
       {
         "component_id": "producing_royalty_stream",
         "label": "Producing precious-metal royalty and stream cash flows",
-        "valuation_status": "legacy_sensitivity",
-        "base_per_share": null,
-        "legacy_base_per_share": 142.15,
-        "range_width_per_share": null,
+        "valuation_status": "bounded_estimate",
+        "base_per_share": 142.1759,
+        "legacy_base_per_share": 142.18,
+        "range_width_per_share": 91.7273,
         "scenario_assumptions": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target."
       },
       {
         "component_id": "development_inventory_option",
         "label": "Development-stage and optional royalty inventory",
-        "valuation_status": "legacy_sensitivity",
-        "base_per_share": null,
+        "valuation_status": "bounded_estimate",
+        "base_per_share": 18.34,
         "legacy_base_per_share": 18.34,
-        "range_width_per_share": null,
-        "scenario_assumptions": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target."
-      },
-      {
-        "component_id": "net_financial_claims",
-        "label": "Cash, available capital, and liabilities",
-        "valuation_status": "legacy_sensitivity",
-        "base_per_share": null,
-        "legacy_base_per_share": 27.51,
-        "range_width_per_share": null,
+        "range_width_per_share": 57.3203,
         "scenario_assumptions": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target."
       },
       {
         "component_id": "depletion_and_realization_reserve",
         "label": "Metal-price, operator, and realization reserve",
-        "valuation_status": "legacy_sensitivity",
-        "base_per_share": null,
+        "valuation_status": "bounded_estimate",
+        "base_per_share": -27.5102,
         "legacy_base_per_share": -27.51,
-        "range_width_per_share": null,
+        "range_width_per_share": 50.4401,
+        "scenario_assumptions": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target."
+      },
+      {
+        "component_id": "net_financial_claims",
+        "label": "Cash, available capital, and liabilities",
+        "valuation_status": "bounded_estimate",
+        "base_per_share": 27.51,
+        "legacy_base_per_share": 27.51,
+        "range_width_per_share": 38.98,
         "scenario_assumptions": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target."
       }
     ],
@@ -565,37 +1632,102 @@
   },
   "calculation_proof_summary": {
     "component_count": 4,
-    "priced_component_count": 0,
-    "proof_complete_pct": 0.0,
+    "priced_component_count": 4,
+    "proof_complete_pct": 100.0,
     "status_counts": {
-      "bounded_estimate": 0,
+      "bounded_estimate": 4,
       "calculated": 0,
-      "legacy_sensitivity": 4,
+      "legacy_sensitivity": 0,
       "unpriced": 0
     },
-    "all_material_components_priced": false,
+    "all_material_components_priced": true,
     "calculation_errors": [],
-    "aggregate_proof_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    "aggregate_proof_hash": "d07fe5c3e900f10b16b66ad46d17695192f065bb2f4b84ab46e9f3a141672909"
   },
-  "source_lineage": [],
+  "source_lineage": [
+    {
+      "component_id": "producing_royalty_stream",
+      "node_id": "operating_cash_flow_m",
+      "ref": "FNV/investor-documents/ir-fnv/10249_Franco_Nevada_2025_Annual_Report_Ph14_F_Digital.pdf",
+      "locator": "Net cash provided by operating activities $1,493.7 million (FY2025 MD&A)",
+      "as_of": "2025-12-31",
+      "content_sha256": "d15a215db0f1cc34cd067734cce25ea3be60356b58c1146a36ac53f6fef4b0bf",
+      "source_id": "db076e2ad9c3c67baeeda20aad47b7cd7632139adf2f22f8c68ad503258f90a5"
+    },
+    {
+      "component_id": "producing_royalty_stream",
+      "node_id": "shares_m",
+      "ref": "FNV/investor-documents/ir-fnv/10249_Franco_Nevada_2025_Annual_Report_Ph14_F_Digital.pdf",
+      "locator": "Weighted average shares outstanding 192.7 million (FY2025)",
+      "as_of": "2025-12-31",
+      "content_sha256": "d15a215db0f1cc34cd067734cce25ea3be60356b58c1146a36ac53f6fef4b0bf",
+      "source_id": "da91762afee057391c0f895205a5d330bfa8615ac26013e64a66807504f66935"
+    },
+    {
+      "component_id": "development_inventory_option",
+      "node_id": "equity_investments_m",
+      "ref": "FNV/investor-documents/ir-fnv/NR-Franco-Nevada-Reports-Record-Q1-2026-Results-vFinal-2026-05-12.pdf",
+      "locator": "Available Capital footnote: equity investments $1,142.4 million at March 31, 2026",
+      "as_of": "2026-03-31",
+      "content_sha256": "827146171dbc5b94fd372b1ad95441583251e4cface48c4d62ea16e3716c95a0",
+      "source_id": "68c3f74b7823bb9317c4752d0e1818fb40e99123583fb095a4c6e423a033ac03"
+    },
+    {
+      "component_id": "development_inventory_option",
+      "node_id": "shares_m",
+      "ref": "FNV/investor-documents/ir-fnv/NR-Franco-Nevada-Reports-Record-Q1-2026-Results-vFinal-2026-05-12.pdf",
+      "locator": "Q1 2026 weighted average diluted shares 192.8 million",
+      "as_of": "2026-03-31",
+      "content_sha256": "827146171dbc5b94fd372b1ad95441583251e4cface48c4d62ea16e3716c95a0",
+      "source_id": "ab90bd1a92f93ef9c186f8564358f6e880f1ba4e13f001bb81798210a835239c"
+    },
+    {
+      "component_id": "net_financial_claims",
+      "node_id": "cash_m",
+      "ref": "FNV/investor-documents/ir-fnv/NR-Franco-Nevada-Reports-Record-Q1-2026-Results-vFinal-2026-05-12.pdf",
+      "locator": "Available Capital: cash and cash equivalents $714.7 million at March 31, 2026",
+      "as_of": "2026-03-31",
+      "content_sha256": "827146171dbc5b94fd372b1ad95441583251e4cface48c4d62ea16e3716c95a0",
+      "source_id": "a36fbda0016cbe6c44b8dd687f9fe1b50b716743cea9715bf0ec7575942a34f8"
+    },
+    {
+      "component_id": "net_financial_claims",
+      "node_id": "debt_m",
+      "ref": "FNV/investor-documents/ir-fnv/10249_Franco_Nevada_2025_Annual_Report_Ph14_F_Digital.pdf",
+      "locator": "Franco-Nevada is debt-free; no long-term debt at December 31, 2025",
+      "as_of": "2025-12-31",
+      "content_sha256": "d15a215db0f1cc34cd067734cce25ea3be60356b58c1146a36ac53f6fef4b0bf",
+      "source_id": "4463f6159944b975ac91e55d0ef94363380d2b3b676f5da226459a8cf3deb6fb"
+    },
+    {
+      "component_id": "net_financial_claims",
+      "node_id": "shares_m",
+      "ref": "FNV/investor-documents/ir-fnv/NR-Franco-Nevada-Reports-Record-Q1-2026-Results-vFinal-2026-05-12.pdf",
+      "locator": "Q1 2026 weighted average diluted shares 192.8 million",
+      "as_of": "2026-03-31",
+      "content_sha256": "827146171dbc5b94fd372b1ad95441583251e4cface48c4d62ea16e3716c95a0",
+      "source_id": "ab90bd1a92f93ef9c186f8564358f6e880f1ba4e13f001bb81798210a835239c"
+    },
+    {
+      "component_id": "depletion_and_realization_reserve",
+      "node_id": "owner_cash_per_share",
+      "ref": "FNV/investor-documents/ir-fnv/10249_Franco_Nevada_2025_Annual_Report_Ph14_F_Digital.pdf",
+      "locator": "FY2025 operating cash flow $1,493.7M / 192.7M shares = $7.75/sh",
+      "as_of": "2025-12-31",
+      "content_sha256": "d15a215db0f1cc34cd067734cce25ea3be60356b58c1146a36ac53f6fef4b0bf",
+      "source_id": "c87a1f53eb1f0607062eb61ffed307a20b32be0aba6104db9596ed4cc423fd22"
+    }
+  ],
   "model_checks": {
     "calculation_graphs_valid": true,
-    "component_sum_reconciles": false,
+    "component_sum_reconciles": true,
     "no_double_counting": true,
-    "all_material_components_priced": false,
+    "all_material_components_priced": true,
     "low_base_high_ordered": true
   },
   "evidence": {
-    "unresolved_count": 7,
-    "blockers": [
-      "component_ownership_map: Map every material operating, asset, liability, financing, and option claim owned by one diluted share with non-overlapping overlap keys.",
-      "depletion_and_realization_reserve: material component is legacy_sensitivity; a valid calculation proof is required",
-      "development_inventory_option: material component is legacy_sensitivity; a valid calculation proof is required",
-      "downside_and_capital_claims: Reconcile debt, cash, reserves, dilution, and material options including probability, timing, capital, failure value, and overlap control.",
-      "net_financial_claims: material component is legacy_sensitivity; a valid calculation proof is required",
-      "primary_cash_or_nav_bridge: Reconcile the primary owner-cash or NAV bridge to primary filings with causal low/base/high cases.",
-      "producing_royalty_stream: material component is legacy_sensitivity; a valid calculation proof is required"
-    ],
+    "unresolved_count": 0,
+    "blockers": [],
     "validation_errors": []
   },
   "monitoring": {
@@ -613,8 +1745,13 @@
     ]
   },
   "change_control": {
-    "model_hash": "a01a2f6e4dc9d2f71458fc97a8631da42d96bc958a4c423227e0a07139b9cee2",
-    "method_versions": [],
+    "model_hash": "cf82f2142e5a1823b59491cdc7575a79096a8bb90844bf3de2ba0886b80c29e8",
+    "method_versions": [
+      "depletion_reserve@1.0",
+      "net_asset_value@1.0",
+      "royalty_distribution_curve@1.0",
+      "unit_nav_and_milestone_option@1.0"
+    ],
     "change_log": [],
     "rule": "A source fact is locked. Every assumption change requires a reason, author, timestamp, and before/after value."
   },

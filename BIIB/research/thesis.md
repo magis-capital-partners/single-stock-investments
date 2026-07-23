@@ -11,13 +11,13 @@
 | **Dhando** (Pabrai) | pending |
 | **Stance** | watch |
 | **Cycle** | mid |
-| **Implied 7yr IRR** (base) | -4.47% (contract base, provisional) |
+| **Implied 7yr IRR** (base) | -4.47% (contract base) |
 | **IRR method** | binary_milestone |
 | **Lawrence bucket** | — |
 | **Payoff lens** | pending |
 | **MOI bucket** | pending |
 
-**Deep dive:** `BIIB/research/deep_dive_2026-07-21.md` (auto-sync)
+**Deep dive:** `BIIB/research/deep_dive_2026-07-23.md` (auto-sync)
 
 ## One-line thesis
 

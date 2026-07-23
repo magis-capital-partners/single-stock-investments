@@ -10,6 +10,8 @@ on:
     - cron: "0 10 * * 0,3"  # full document harvest twice weekly
     - cron: "0 14 * * *"    # drive intake (daily)
     - cron: "30 */6 * * *"  # portfolio news
+    - cron: "0 15 * * 1"    # CVR discovery (SEC + inbox) Mondays
+    - cron: "0 16 * * 0"    # World Model weekly (Sunday UTC: themes + KPI ledgers + strip)
 
 permissions:
   contents: write
@@ -29,6 +31,8 @@ jobs:
       download_mode: ${{ steps.pick.outputs.download_mode }}
       drive: ${{ steps.pick.outputs.drive }}
       news: ${{ steps.pick.outputs.news }}
+      cvr_discover: ${{ steps.pick.outputs.cvr_discover }}
+      world_model: ${{ steps.pick.outputs.world_model }}
     steps:
       - id: pick
         env:
@@ -36,7 +40,7 @@ jobs:
           SCHEDULE: ${{ github.event.schedule }}
         run: |
           set -euo pipefail
-          intake_full=false; activist=false; downloads=false; drive=false; news=false; download_mode=light
+          intake_full=false; activist=false; downloads=false; drive=false; news=false; cvr_discover=false; world_model=false; download_mode=light
           case "$SCHEDULE" in
             "0 3 * * *") intake_full=true ;;
             "0 6 * * *") activist=true ;;
@@ -44,6 +48,8 @@ jobs:
             "0 10 * * 0,3") downloads=true; download_mode=full ;;
             "0 14 * * *") drive=true ;;
             "30 */6 * * *") news=true ;;
+            "0 15 * * 1") cvr_discover=true ;;
+            "0 16 * * 0") world_model=true ;;
             *) echo "::error::Unrecognized schedule='$SCHEDULE'"; exit 1 ;;
           esac
           {
@@ -53,8 +59,10 @@ jobs:
             echo "download_mode=$download_mode"
             echo "drive=$drive"
             echo "news=$news"
+            echo "cvr_discover=$cvr_discover"
+            echo "world_model=$world_model"
           } >> "$GITHUB_OUTPUT"
-          echo "Selected: intake_full=$intake_full activist=$activist downloads=$downloads($download_mode) drive=$drive news=$news"
+          echo "Selected: intake_full=$intake_full activist=$activist downloads=$downloads($download_mode) drive=$drive news=$news cvr_discover=$cvr_discover world_model=$world_model"
 
   intake-full:
     needs: decide
@@ -342,8 +350,127 @@ jobs:
           git add '*/research/news/news_index.json' 2>/dev/null || true
           bash _system/scripts/ci_push_main.sh "chore: refresh portfolio news $(date -u +%Y-%m-%d)"
 
+  cvr-discover:
+    needs: decide
+    if: needs.decide.outputs.cvr_discover == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    concurrency:
+      group: data-commit-main
+      cancel-in-progress: false
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            _system/scripts/ci_checkout_workspace.sh
+            _system/scripts/ci_resolve_checkout_ref.sh
+            _system/scripts/ci_sparse_checkout_paths.py
+          sparse-checkout-cone-mode: false
+          fetch-depth: 1
+      - name: Checkout workspace (CVR reference + scripts)
+        run: bash _system/scripts/ci_checkout_workspace.sh minimal
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: CVR discovery (SEC + inbox + stubs, fail-soft)
+        # Script exits 0 on EDGAR failures; discovery_state.unhealthy tracks streaks.
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          CVR_ALPHARANK_DROP_PATH: ${{ vars.CVR_ALPHARANK_DROP_PATH }}
+        run: |
+          # Free auto feeds (no keys): SEC EFTS + Google News RSS + SEC Atom.
+          # Optional AlphaRank CSV drop / Slack if vars/secrets set.
+          python _system/scripts/refresh_cvr_universe.py \
+            --discover \
+            --discover-non-sec-family \
+            --ingest-inbox \
+            --sync-alpharank \
+            --create-stubs \
+            --write-review \
+            --alert \
+            --skip-sync \
+            --sleeve-policy ready \
+            --discover-days 14 \
+            --discover-limit 25
+          python _system/scripts/check_cvr_universe.py || true
+      - name: Stage stub ticker folders from universe
+        run: |
+          python - <<'PY'
+          import json
+          import subprocess
+          from pathlib import Path
+
+          doc = json.loads(Path("_system/reference/cvr/cvr_universe.json").read_text(encoding="utf-8"))
+          paths: list[str] = []
+          for row in (doc.get("pre_close_opportunities") or []) + (doc.get("post_close_universe") or []):
+              ticker = str(row.get("ticker") or "").strip()
+              if not ticker:
+                  continue
+              for rel in (
+                  f"{ticker}/README.md",
+                  f"{ticker}/research/cvr_terms.json",
+                  f"{ticker}/research/authorized_evidence.json",
+                  f"{ticker}/research/research_agent_manifest.json",
+              ):
+                  if Path(rel).exists():
+                      paths.append(rel)
+          if paths:
+              subprocess.check_call(["git", "add", "--", *paths])
+              print(f"staged {len(paths)} stub paths")
+          else:
+              print("no stub ticker paths to stage")
+          PY
+      - name: Commit discovery artifacts
+        uses: ./.github/actions/commit-main
+        with:
+          message: |
+            chore: CVR weekly discovery $(date -u +%Y-%m-%d)
+
+            SEC full-text + inbox CSV + stubs into cvr_universe.json (context tier).
+          git_add: >-
+            _system/reference/cvr/
+            _system/portfolio/investment_sleeves.json
+            _system/portfolio/registry.json
+            _system/reviews/pending/
+            _system/data/cvr_agent_queue.json
+
+  world-model:
+    needs: decide
+    if: needs.decide.outputs.world_model == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    concurrency:
+      group: data-commit-main
+      cancel-in-progress: false
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            _system/scripts/ci_checkout_workspace.sh
+            _system/scripts/ci_resolve_checkout_ref.sh
+            _system/scripts/ci_sparse_checkout_paths.py
+          sparse-checkout-cone-mode: false
+          fetch-depth: 1
+      - name: Checkout workspace (full)
+        run: bash _system/scripts/ci_checkout_workspace.sh full
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: World Model monthly rebuild
+        uses: ./.github/actions/rebuild-data
+        env:
+          OAUTH_CLIENT_ID: ${{ vars.OAUTH_CLIENT_ID }}
+          OAUTH_PROXY_URL: ${{ vars.OAUTH_PROXY_URL }}
+        with:
+          profile: world-model-weekly
+          validate: "false"
+      - name: Commit World Model artifacts
+        uses: ./.github/actions/commit-main
+        with:
+          message: "chore: world-model weekly $(date -u +%Y-%m-%d)"
+
   pipeline-summary:
-    needs: [decide, intake-full, activist, downloads, drive, news]
+    needs: [decide, intake-full, activist, downloads, drive, news, cvr-discover, world-model]
     if: always()
     runs-on: ubuntu-latest
     timeout-minutes: 5
@@ -356,4 +483,6 @@ jobs:
           echo "downloads=${{ needs.decide.outputs.downloads }} result=${{ needs.downloads.result }}"
           echo "drive=${{ needs.decide.outputs.drive }} result=${{ needs.drive.result }}"
           echo "news=${{ needs.decide.outputs.news }} result=${{ needs.news.result }}"
+          echo "cvr_discover=${{ needs.decide.outputs.cvr_discover }} result=${{ needs.cvr-discover.result }}"
+          echo "world_model=${{ needs.decide.outputs.world_model }} result=${{ needs.world-model.result }}"
           echo "Deploy Dashboard chains via workflow_run on successful commits."
