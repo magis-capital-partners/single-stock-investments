@@ -4,7 +4,7 @@
 
 ### Horizon Kinetics cross-reference
 
-Auto-scan `MSB/third-party-analyses/hk_scan_2026-07-21.md`. Mental models: equity_yield_curve, time_arbitrage, predictive_attributes.
+Auto-scan `MSB/third-party-analyses/hk_scan_2026-07-23.md`. Mental models: equity_yield_curve, time_arbitrage, predictive_attributes.
 
 **Cross-check:** `MSB/research/cross_check_HK_2026-06-01.md`
 
