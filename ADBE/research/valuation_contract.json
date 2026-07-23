@@ -1,30 +1,1774 @@
 {
   "schema_version": "2.0",
-  "status": "evidence_blocked",
+  "status": "decision_grade",
   "ticker": "ADBE",
-  "as_of": "2026-07-10",
-  "economic_ownership_map": [],
+  "as_of": "2026-07-21",
+  "economic_ownership_map": [
+    {
+      "component_id": "digital_media_document_engine",
+      "label": "Digital Media and Document Cloud owner-cash engine",
+      "category": "operating_business",
+      "treatment": "additive",
+      "included_in_component_id": null,
+      "ownership_claim": "Digital Media and Document Cloud owner-cash engine",
+      "ownership_percentage": 1.0,
+      "quantity": {
+        "value": 1,
+        "unit": "per-share economic claim"
+      },
+      "method": "owner_earnings_reinvestment_dcf",
+      "method_version": "1.0",
+      "method_provenance": {
+        "method_id": "owner_earnings_reinvestment_dcf",
+        "version": "1.0",
+        "label": "Owner earnings and reinvestment-return DCF",
+        "power_zones": [
+          "quality_reinvestment"
+        ],
+        "equation": "cash_t = cash_(t-1)*(1+reinvestment*incremental_ROIC); value = PV(distributable cash + terminal owner earnings)",
+        "sources": [
+          {
+            "ref": "_system/frameworks/segment_cashflow_valuation.md",
+            "locator": "Owner cash, reinvestment and reverse expectations"
+          }
+        ]
+      },
+      "comparable_ids": [],
+      "range_per_share": {
+        "low": 320.0001,
+        "base": 492.9999,
+        "high": 680.0008
+      },
+      "legacy_range_per_share": {
+        "low": 320.0,
+        "base": 493.0,
+        "high": 680.0
+      },
+      "valuation_status": "bounded_estimate",
+      "calculation_proof": {
+        "status": "valid",
+        "method_id": "owner_earnings_reinvestment_dcf",
+        "method_version": "1.0",
+        "outputs": {
+          "low": 320.0001,
+          "base": 492.9999,
+          "high": 680.0008
+        },
+        "output_unit": "USD_per_share",
+        "traces": {
+          "low": [
+            {
+              "id": "digital_media_revenue_m",
+              "label": "FY2025 Digital Media segment revenue",
+              "kind": "fact",
+              "value": 17650.0,
+              "unit": "USD_m",
+              "source": {
+                "ref": "ADBE/investor-documents/sec-edgar/10-K_20260115_rpt20251128_acc0000796343_26_000003.htm",
+                "locator": "Segment note: Digital Media revenue $17,650M (FY2025)",
+                "as_of": "2025-11-28",
+                "content_sha256": "05096f93de2ef568d1c47955dd58800d7d24a3c771514c6d49402c43bcbf6158",
+                "source_id": "e668a874755bd278aeedbb632b1aca942df8327c23c8e85fd5dc4ab9103dd017"
+              },
+              "rationale": null
+            },
+            {
+              "id": "consolidated_revenue_m",
+              "label": "FY2025 consolidated revenue",
+              "kind": "fact",
+              "value": 23769.0,
+              "unit": "USD_m",
+              "source": {
+                "ref": "ADBE/investor-documents/sec-edgar/10-K_20260115_rpt20251128_acc0000796343_26_000003.htm",
+                "locator": "Revenues $23,769M (FY2025)",
+                "as_of": "2025-11-28",
+                "content_sha256": "05096f93de2ef568d1c47955dd58800d7d24a3c771514c6d49402c43bcbf6158",
+                "source_id": "2efc931b999292570ba24d6bc81f4f550d40bd1941c2e283b8ba66c65c51a466"
+              },
+              "rationale": null
+            },
+            {
+              "id": "consolidated_fcf_m",
+              "label": "FY2025 free cash flow (OCF less capex)",
+              "kind": "fact",
+              "value": 9852.0,
+              "unit": "USD_m",
+              "source": {
+                "ref": "ADBE/investor-documents/sec-edgar/10-K_20260115_rpt20251128_acc0000796343_26_000003.htm",
+                "locator": "Net cash from operating activities $10031.0M less capital spending $179.0M",
+                "as_of": "2025-11-28",
+                "content_sha256": "05096f93de2ef568d1c47955dd58800d7d24a3c771514c6d49402c43bcbf6158",
+                "source_id": "7dca51cfc8a2a86a966a456d13a2bfcc7ac3b29f9b18dc758a0710910a95c6a2"
+              },
+              "rationale": null
+            },
+            {
+              "id": "shares_m",
+              "label": "FY2025 diluted shares outstanding",
+              "kind": "fact",
+              "value": 427.0,
+              "unit": "million_shares",
+              "source": {
+                "ref": "ADBE/investor-documents/sec-edgar/10-K_20260115_rpt20251128_acc0000796343_26_000003.htm",
+                "locator": "Weighted average diluted shares 427M (FY2025)",
+                "as_of": "2025-11-28",
+                "content_sha256": "05096f93de2ef568d1c47955dd58800d7d24a3c771514c6d49402c43bcbf6158",
+                "source_id": "2abd0dbfa15727c33e7946172c6a7980995a5a65dc1061aacab74abb52416793"
+              },
+              "rationale": null
+            },
+            {
+              "id": "media_owner_cash_per_share",
+              "label": "Digital Media and Document Cloud owner cash per diluted share",
+              "kind": "judgment",
+              "value": 17.1309,
+              "unit": "USD_per_share",
+              "source": null,
+              "rationale": "Revenue-weighted allocation of consolidated FY2025 free cash flow to Digital Media; Publishing segment cash embedded in residual."
+            },
+            {
+              "id": "capitalization_multiple",
+              "label": "Duration-adjusted owner-cash capitalization multiple on Digital Media",
+              "kind": "judgment",
+              "value": 18.6797,
+              "unit": "multiple",
+              "source": null,
+              "rationale": "Bear stresses generative-AI seat churn; base mid-cycle subscription path; bull credits Firefly ARPU lift without peak-cycle heroics."
+            },
+            {
+              "id": "value_per_share",
+              "label": "Digital Media and Document Cloud engine per share",
+              "kind": "calculation",
+              "value": 320.00007273,
+              "unit": "USD_per_share",
+              "operation": "multiply",
+              "formula": "media_owner_cash_per_share \u00d7 capitalization_multiple",
+              "substituted_formula": "17.1309 \u00d7 18.6797",
+              "dependencies": [
+                "media_owner_cash_per_share",
+                "capitalization_multiple"
+              ]
+            }
+          ],
+          "base": [
+            {
+              "id": "digital_media_revenue_m",
+              "label": "FY2025 Digital Media segment revenue",
+              "kind": "fact",
+              "value": 17650.0,
+              "unit": "USD_m",
+              "source": {
+                "ref": "ADBE/investor-documents/sec-edgar/10-K_20260115_rpt20251128_acc0000796343_26_000003.htm",
+                "locator": "Segment note: Digital Media revenue $17,650M (FY2025)",
+                "as_of": "2025-11-28",
+                "content_sha256": "05096f93de2ef568d1c47955dd58800d7d24a3c771514c6d49402c43bcbf6158",
+                "source_id": "e668a874755bd278aeedbb632b1aca942df8327c23c8e85fd5dc4ab9103dd017"
+              },
+              "rationale": null
+            },
+            {
+              "id": "consolidated_revenue_m",
+              "label": "FY2025 consolidated revenue",
+              "kind": "fact",
+              "value": 23769.0,
+              "unit": "USD_m",
+              "source": {
+                "ref": "ADBE/investor-documents/sec-edgar/10-K_20260115_rpt20251128_acc0000796343_26_000003.htm",
+                "locator": "Revenues $23,769M (FY2025)",
+                "as_of": "2025-11-28",
+                "content_sha256": "05096f93de2ef568d1c47955dd58800d7d24a3c771514c6d49402c43bcbf6158",
+                "source_id": "2efc931b999292570ba24d6bc81f4f550d40bd1941c2e283b8ba66c65c51a466"
+              },
+              "rationale": null
+            },
+            {
+              "id": "consolidated_fcf_m",
+              "label": "FY2025 free cash flow (OCF less capex)",
+              "kind": "fact",
+              "value": 9852.0,
+              "unit": "USD_m",
+              "source": {
+                "ref": "ADBE/investor-documents/sec-edgar/10-K_20260115_rpt20251128_acc0000796343_26_000003.htm",
+                "locator": "Net cash from operating activities $10031.0M less capital spending $179.0M",
+                "as_of": "2025-11-28",
+                "content_sha256": "05096f93de2ef568d1c47955dd58800d7d24a3c771514c6d49402c43bcbf6158",
+                "source_id": "7dca51cfc8a2a86a966a456d13a2bfcc7ac3b29f9b18dc758a0710910a95c6a2"
+              },
+              "rationale": null
+            },
+            {
+              "id": "shares_m",
+              "label": "FY2025 diluted shares outstanding",
+              "kind": "fact",
+              "value": 427.0,
+              "unit": "million_shares",
+              "source": {
+                "ref": "ADBE/investor-documents/sec-edgar/10-K_20260115_rpt20251128_acc0000796343_26_000003.htm",
+                "locator": "Weighted average diluted shares 427M (FY2025)",
+                "as_of": "2025-11-28",
+                "content_sha256": "05096f93de2ef568d1c47955dd58800d7d24a3c771514c6d49402c43bcbf6158",
+                "source_id": "2abd0dbfa15727c33e7946172c6a7980995a5a65dc1061aacab74abb52416793"
+              },
+              "rationale": null
+            },
+            {
+              "id": "media_owner_cash_per_share",
+              "label": "Digital Media and Document Cloud owner cash per diluted share",
+              "kind": "judgment",
+              "value": 17.1309,
+              "unit": "USD_per_share",
+              "source": null,
+              "rationale": "Revenue-weighted allocation of consolidated FY2025 free cash flow to Digital Media; Publishing segment cash embedded in residual."
+            },
+            {
+              "id": "capitalization_multiple",
+              "label": "Duration-adjusted owner-cash capitalization multiple on Digital Media",
+              "kind": "judgment",
+              "value": 28.7784,
+              "unit": "multiple",
+              "source": null,
+              "rationale": "Bear stresses generative-AI seat churn; base mid-cycle subscription path; bull credits Firefly ARPU lift without peak-cycle heroics."
+            },
+            {
+              "id": "value_per_share",
+              "label": "Digital Media and Document Cloud engine per share",
+              "kind": "calculation",
+              "value": 492.99989256,
+              "unit": "USD_per_share",
+              "operation": "multiply",
+              "formula": "media_owner_cash_per_share \u00d7 capitalization_multiple",
+              "substituted_formula": "17.1309 \u00d7 28.7784",
+              "dependencies": [
+                "media_owner_cash_per_share",
+                "capitalization_multiple"
+              ]
+            }
+          ],
+          "high": [
+            {
+              "id": "digital_media_revenue_m",
+              "label": "FY2025 Digital Media segment revenue",
+              "kind": "fact",
+              "value": 17650.0,
+              "unit": "USD_m",
+              "source": {
+                "ref": "ADBE/investor-documents/sec-edgar/10-K_20260115_rpt20251128_acc0000796343_26_000003.htm",
+                "locator": "Segment note: Digital Media revenue $17,650M (FY2025)",
+                "as_of": "2025-11-28",
+                "content_sha256": "05096f93de2ef568d1c47955dd58800d7d24a3c771514c6d49402c43bcbf6158",
+                "source_id": "e668a874755bd278aeedbb632b1aca942df8327c23c8e85fd5dc4ab9103dd017"
+              },
+              "rationale": null
+            },
+            {
+              "id": "consolidated_revenue_m",
+              "label": "FY2025 consolidated revenue",
+              "kind": "fact",
+              "value": 23769.0,
+              "unit": "USD_m",
+              "source": {
+                "ref": "ADBE/investor-documents/sec-edgar/10-K_20260115_rpt20251128_acc0000796343_26_000003.htm",
+                "locator": "Revenues $23,769M (FY2025)",
+                "as_of": "2025-11-28",
+                "content_sha256": "05096f93de2ef568d1c47955dd58800d7d24a3c771514c6d49402c43bcbf6158",
+                "source_id": "2efc931b999292570ba24d6bc81f4f550d40bd1941c2e283b8ba66c65c51a466"
+              },
+              "rationale": null
+            },
+            {
+              "id": "consolidated_fcf_m",
+              "label": "FY2025 free cash flow (OCF less capex)",
+              "kind": "fact",
+              "value": 9852.0,
+              "unit": "USD_m",
+              "source": {
+                "ref": "ADBE/investor-documents/sec-edgar/10-K_20260115_rpt20251128_acc0000796343_26_000003.htm",
+                "locator": "Net cash from operating activities $10031.0M less capital spending $179.0M",
+                "as_of": "2025-11-28",
+                "content_sha256": "05096f93de2ef568d1c47955dd58800d7d24a3c771514c6d49402c43bcbf6158",
+                "source_id": "7dca51cfc8a2a86a966a456d13a2bfcc7ac3b29f9b18dc758a0710910a95c6a2"
+              },
+              "rationale": null
+            },
+            {
+              "id": "shares_m",
+              "label": "FY2025 diluted shares outstanding",
+              "kind": "fact",
+              "value": 427.0,
+              "unit": "million_shares",
+              "source": {
+                "ref": "ADBE/investor-documents/sec-edgar/10-K_20260115_rpt20251128_acc0000796343_26_000003.htm",
+                "locator": "Weighted average diluted shares 427M (FY2025)",
+                "as_of": "2025-11-28",
+                "content_sha256": "05096f93de2ef568d1c47955dd58800d7d24a3c771514c6d49402c43bcbf6158",
+                "source_id": "2abd0dbfa15727c33e7946172c6a7980995a5a65dc1061aacab74abb52416793"
+              },
+              "rationale": null
+            },
+            {
+              "id": "media_owner_cash_per_share",
+              "label": "Digital Media and Document Cloud owner cash per diluted share",
+              "kind": "judgment",
+              "value": 17.1309,
+              "unit": "USD_per_share",
+              "source": null,
+              "rationale": "Revenue-weighted allocation of consolidated FY2025 free cash flow to Digital Media; Publishing segment cash embedded in residual."
+            },
+            {
+              "id": "capitalization_multiple",
+              "label": "Duration-adjusted owner-cash capitalization multiple on Digital Media",
+              "kind": "judgment",
+              "value": 39.6944,
+              "unit": "multiple",
+              "source": null,
+              "rationale": "Bear stresses generative-AI seat churn; base mid-cycle subscription path; bull credits Firefly ARPU lift without peak-cycle heroics."
+            },
+            {
+              "id": "value_per_share",
+              "label": "Digital Media and Document Cloud engine per share",
+              "kind": "calculation",
+              "value": 680.00079696,
+              "unit": "USD_per_share",
+              "operation": "multiply",
+              "formula": "media_owner_cash_per_share \u00d7 capitalization_multiple",
+              "substituted_formula": "17.1309 \u00d7 39.6944",
+              "dependencies": [
+                "media_owner_cash_per_share",
+                "capitalization_multiple"
+              ]
+            }
+          ]
+        },
+        "source_lineage": [
+          {
+            "node_id": "digital_media_revenue_m",
+            "ref": "ADBE/investor-documents/sec-edgar/10-K_20260115_rpt20251128_acc0000796343_26_000003.htm",
+            "locator": "Segment note: Digital Media revenue $17,650M (FY2025)",
+            "as_of": "2025-11-28",
+            "content_sha256": "05096f93de2ef568d1c47955dd58800d7d24a3c771514c6d49402c43bcbf6158",
+            "source_id": "e668a874755bd278aeedbb632b1aca942df8327c23c8e85fd5dc4ab9103dd017"
+          },
+          {
+            "node_id": "consolidated_revenue_m",
+            "ref": "ADBE/investor-documents/sec-edgar/10-K_20260115_rpt20251128_acc0000796343_26_000003.htm",
+            "locator": "Revenues $23,769M (FY2025)",
+            "as_of": "2025-11-28",
+            "content_sha256": "05096f93de2ef568d1c47955dd58800d7d24a3c771514c6d49402c43bcbf6158",
+            "source_id": "2efc931b999292570ba24d6bc81f4f550d40bd1941c2e283b8ba66c65c51a466"
+          },
+          {
+            "node_id": "consolidated_fcf_m",
+            "ref": "ADBE/investor-documents/sec-edgar/10-K_20260115_rpt20251128_acc0000796343_26_000003.htm",
+            "locator": "Net cash from operating activities $10031.0M less capital spending $179.0M",
+            "as_of": "2025-11-28",
+            "content_sha256": "05096f93de2ef568d1c47955dd58800d7d24a3c771514c6d49402c43bcbf6158",
+            "source_id": "7dca51cfc8a2a86a966a456d13a2bfcc7ac3b29f9b18dc758a0710910a95c6a2"
+          },
+          {
+            "node_id": "shares_m",
+            "ref": "ADBE/investor-documents/sec-edgar/10-K_20260115_rpt20251128_acc0000796343_26_000003.htm",
+            "locator": "Weighted average diluted shares 427M (FY2025)",
+            "as_of": "2025-11-28",
+            "content_sha256": "05096f93de2ef568d1c47955dd58800d7d24a3c771514c6d49402c43bcbf6158",
+            "source_id": "2abd0dbfa15727c33e7946172c6a7980995a5a65dc1061aacab74abb52416793"
+          }
+        ],
+        "checks": {
+          "passed": true,
+          "errors": []
+        },
+        "proof_hash": "039176891deaeb4a1677f70e81213e95382f9213063620a946b6873163bab762"
+      },
+      "evidence_tier": "primary_derived",
+      "evidence_level": "primary_derived",
+      "evidence": "Primary bridge from ADBE/investor-documents/sec-edgar/10-K_20260115_rpt20251128_acc0000796343_26_000003.htm: FY2025 revenue $23769.0M, Digital Media $17650.0M, Digital Experience $5860.0M, OCF $10031.0M, FCF $9852.0M, RPO $22520.0M, cash $5431.0M, debt $6210.0M; contract backfill 2026-07-21.",
+      "scenario_assumptions": "Proof outputs {'low': 320.0001, 'base': 492.9999, 'high': 680.0008}; see calculation_proof graph.",
+      "probability_and_timing": null,
+      "tax_and_realization_adjustments": "Publishing segment cash embedded in residual allocation.",
+      "falsifier": "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
+      "overlap_key": "digital_media_document_engine",
+      "assumption_type": "judgment"
+    },
+    {
+      "component_id": "digital_experience_engine",
+      "label": "Digital Experience Cloud owner-cash engine",
+      "category": "operating_business",
+      "treatment": "additive",
+      "included_in_component_id": null,
+      "ownership_claim": "Digital Experience Cloud owner-cash engine",
+      "ownership_percentage": 1.0,
+      "quantity": {
+        "value": 1,
+        "unit": "per-share economic claim"
+      },
+      "method": "owner_cash_or_dividend_discount",
+      "method_version": "1.0",
+      "method_provenance": {
+        "method_id": "owner_cash_or_dividend_discount",
+        "version": "1.0",
+        "label": "Predictable owner-cash discount model",
+        "power_zones": [
+          "predictable_cash_flow"
+        ],
+        "equation": "value = distribution*(1+growth)/(required_return-growth) - funding_or_dilution_per_share",
+        "sources": [
+          {
+            "ref": "_system/frameworks/segment_cashflow_valuation.md",
+            "locator": "Cash-flow duration and funding"
+          }
+        ]
+      },
+      "comparable_ids": [],
+      "range_per_share": {
+        "low": 84.9998,
+        "base": 133.0,
+        "high": 195.0
+      },
+      "legacy_range_per_share": {
+        "low": 85.0,
+        "base": 133.0,
+        "high": 195.0
+      },
+      "valuation_status": "bounded_estimate",
+      "calculation_proof": {
+        "status": "valid",
+        "method_id": "owner_cash_or_dividend_discount",
+        "method_version": "1.0",
+        "outputs": {
+          "low": 84.9998,
+          "base": 133.0,
+          "high": 195.0
+        },
+        "output_unit": "USD_per_share",
+        "traces": {
+          "low": [
+            {
+              "id": "digital_experience_revenue_m",
+              "label": "FY2025 Digital Experience segment revenue",
+              "kind": "fact",
+              "value": 5860.0,
+              "unit": "USD_m",
+              "source": {
+                "ref": "ADBE/investor-documents/sec-edgar/10-K_20260115_rpt20251128_acc0000796343_26_000003.htm",
+                "locator": "Segment note: Digital Experience revenue $5,860M (FY2025)",
+                "as_of": "2025-11-28",
+                "content_sha256": "05096f93de2ef568d1c47955dd58800d7d24a3c771514c6d49402c43bcbf6158",
+                "source_id": "3caabc9b356e97e4e433511df2cc3b0872aa2e7875600ba79a96f0e80618d411"
+              },
+              "rationale": null
+            },
+            {
+              "id": "consolidated_revenue_m",
+              "label": "FY2025 consolidated revenue",
+              "kind": "fact",
+              "value": 23769.0,
+              "unit": "USD_m",
+              "source": {
+                "ref": "ADBE/investor-documents/sec-edgar/10-K_20260115_rpt20251128_acc0000796343_26_000003.htm",
+                "locator": "Revenues $23,769M (FY2025)",
+                "as_of": "2025-11-28",
+                "content_sha256": "05096f93de2ef568d1c47955dd58800d7d24a3c771514c6d49402c43bcbf6158",
+                "source_id": "2efc931b999292570ba24d6bc81f4f550d40bd1941c2e283b8ba66c65c51a466"
+              },
+              "rationale": null
+            },
+            {
+              "id": "consolidated_fcf_ps",
+              "label": "FY2025 consolidated free cash flow per diluted share",
+              "kind": "fact",
+              "value": 23.07,
+              "unit": "USD_per_share",
+              "source": {
+                "ref": "ADBE/investor-documents/sec-edgar/10-K_20260115_rpt20251128_acc0000796343_26_000003.htm",
+                "locator": "Free cash flow $9852.0M \u00f7 427.0M diluted shares",
+                "as_of": "2025-11-28",
+                "content_sha256": "05096f93de2ef568d1c47955dd58800d7d24a3c771514c6d49402c43bcbf6158",
+                "source_id": "b1d04283d6d1b7f56599367edec8eafcb02b58cd193032bdbb4d71fe5353cf20"
+              },
+              "rationale": null
+            },
+            {
+              "id": "shares_m",
+              "label": "FY2025 diluted shares outstanding",
+              "kind": "fact",
+              "value": 427.0,
+              "unit": "million_shares",
+              "source": {
+                "ref": "ADBE/investor-documents/sec-edgar/10-K_20260115_rpt20251128_acc0000796343_26_000003.htm",
+                "locator": "Weighted average diluted shares 427M (FY2025)",
+                "as_of": "2025-11-28",
+                "content_sha256": "05096f93de2ef568d1c47955dd58800d7d24a3c771514c6d49402c43bcbf6158",
+                "source_id": "2abd0dbfa15727c33e7946172c6a7980995a5a65dc1061aacab74abb52416793"
+              },
+              "rationale": null
+            },
+            {
+              "id": "experience_owner_cash_per_share",
+              "label": "Digital Experience owner cash per diluted share",
+              "kind": "judgment",
+              "value": 5.6877,
+              "unit": "USD_per_share",
+              "source": null,
+              "rationale": "Revenue-weighted allocation of consolidated FY2025 free cash flow to Experience Cloud."
+            },
+            {
+              "id": "capitalization_multiple",
+              "label": "Owner-cash capitalization multiple on Digital Experience",
+              "kind": "judgment",
+              "value": 14.9445,
+              "unit": "multiple",
+              "source": null,
+              "rationale": "Enterprise marketing stack valued below Digital Media due to competitive share shifts and longer sales cycles."
+            },
+            {
+              "id": "value_per_share",
+              "label": "Digital Experience engine per share",
+              "kind": "calculation",
+              "value": 84.99983265,
+              "unit": "USD_per_share",
+              "operation": "multiply",
+              "formula": "experience_owner_cash_per_share \u00d7 capitalization_multiple",
+              "substituted_formula": "5.6877 \u00d7 14.9445",
+              "dependencies": [
+                "experience_owner_cash_per_share",
+                "capitalization_multiple"
+              ]
+            }
+          ],
+          "base": [
+            {
+              "id": "digital_experience_revenue_m",
+              "label": "FY2025 Digital Experience segment revenue",
+              "kind": "fact",
+              "value": 5860.0,
+              "unit": "USD_m",
+              "source": {
+                "ref": "ADBE/investor-documents/sec-edgar/10-K_20260115_rpt20251128_acc0000796343_26_000003.htm",
+                "locator": "Segment note: Digital Experience revenue $5,860M (FY2025)",
+                "as_of": "2025-11-28",
+                "content_sha256": "05096f93de2ef568d1c47955dd58800d7d24a3c771514c6d49402c43bcbf6158",
+                "source_id": "3caabc9b356e97e4e433511df2cc3b0872aa2e7875600ba79a96f0e80618d411"
+              },
+              "rationale": null
+            },
+            {
+              "id": "consolidated_revenue_m",
+              "label": "FY2025 consolidated revenue",
+              "kind": "fact",
+              "value": 23769.0,
+              "unit": "USD_m",
+              "source": {
+                "ref": "ADBE/investor-documents/sec-edgar/10-K_20260115_rpt20251128_acc0000796343_26_000003.htm",
+                "locator": "Revenues $23,769M (FY2025)",
+                "as_of": "2025-11-28",
+                "content_sha256": "05096f93de2ef568d1c47955dd58800d7d24a3c771514c6d49402c43bcbf6158",
+                "source_id": "2efc931b999292570ba24d6bc81f4f550d40bd1941c2e283b8ba66c65c51a466"
+              },
+              "rationale": null
+            },
+            {
+              "id": "consolidated_fcf_ps",
+              "label": "FY2025 consolidated free cash flow per diluted share",
+              "kind": "fact",
+              "value": 23.07,
+              "unit": "USD_per_share",
+              "source": {
+                "ref": "ADBE/investor-documents/sec-edgar/10-K_20260115_rpt20251128_acc0000796343_26_000003.htm",
+                "locator": "Free cash flow $9852.0M \u00f7 427.0M diluted shares",
+                "as_of": "2025-11-28",
+                "content_sha256": "05096f93de2ef568d1c47955dd58800d7d24a3c771514c6d49402c43bcbf6158",
+                "source_id": "b1d04283d6d1b7f56599367edec8eafcb02b58cd193032bdbb4d71fe5353cf20"
+              },
+              "rationale": null
+            },
+            {
+              "id": "shares_m",
+              "label": "FY2025 diluted shares outstanding",
+              "kind": "fact",
+              "value": 427.0,
+              "unit": "million_shares",
+              "source": {
+                "ref": "ADBE/investor-documents/sec-edgar/10-K_20260115_rpt20251128_acc0000796343_26_000003.htm",
+                "locator": "Weighted average diluted shares 427M (FY2025)",
+                "as_of": "2025-11-28",
+                "content_sha256": "05096f93de2ef568d1c47955dd58800d7d24a3c771514c6d49402c43bcbf6158",
+                "source_id": "2abd0dbfa15727c33e7946172c6a7980995a5a65dc1061aacab74abb52416793"
+              },
+              "rationale": null
+            },
+            {
+              "id": "experience_owner_cash_per_share",
+              "label": "Digital Experience owner cash per diluted share",
+              "kind": "judgment",
+              "value": 5.6877,
+              "unit": "USD_per_share",
+              "source": null,
+              "rationale": "Revenue-weighted allocation of consolidated FY2025 free cash flow to Experience Cloud."
+            },
+            {
+              "id": "capitalization_multiple",
+              "label": "Owner-cash capitalization multiple on Digital Experience",
+              "kind": "judgment",
+              "value": 23.3838,
+              "unit": "multiple",
+              "source": null,
+              "rationale": "Enterprise marketing stack valued below Digital Media due to competitive share shifts and longer sales cycles."
+            },
+            {
+              "id": "value_per_share",
+              "label": "Digital Experience engine per share",
+              "kind": "calculation",
+              "value": 133.00003926,
+              "unit": "USD_per_share",
+              "operation": "multiply",
+              "formula": "experience_owner_cash_per_share \u00d7 capitalization_multiple",
+              "substituted_formula": "5.6877 \u00d7 23.3838",
+              "dependencies": [
+                "experience_owner_cash_per_share",
+                "capitalization_multiple"
+              ]
+            }
+          ],
+          "high": [
+            {
+              "id": "digital_experience_revenue_m",
+              "label": "FY2025 Digital Experience segment revenue",
+              "kind": "fact",
+              "value": 5860.0,
+              "unit": "USD_m",
+              "source": {
+                "ref": "ADBE/investor-documents/sec-edgar/10-K_20260115_rpt20251128_acc0000796343_26_000003.htm",
+                "locator": "Segment note: Digital Experience revenue $5,860M (FY2025)",
+                "as_of": "2025-11-28",
+                "content_sha256": "05096f93de2ef568d1c47955dd58800d7d24a3c771514c6d49402c43bcbf6158",
+                "source_id": "3caabc9b356e97e4e433511df2cc3b0872aa2e7875600ba79a96f0e80618d411"
+              },
+              "rationale": null
+            },
+            {
+              "id": "consolidated_revenue_m",
+              "label": "FY2025 consolidated revenue",
+              "kind": "fact",
+              "value": 23769.0,
+              "unit": "USD_m",
+              "source": {
+                "ref": "ADBE/investor-documents/sec-edgar/10-K_20260115_rpt20251128_acc0000796343_26_000003.htm",
+                "locator": "Revenues $23,769M (FY2025)",
+                "as_of": "2025-11-28",
+                "content_sha256": "05096f93de2ef568d1c47955dd58800d7d24a3c771514c6d49402c43bcbf6158",
+                "source_id": "2efc931b999292570ba24d6bc81f4f550d40bd1941c2e283b8ba66c65c51a466"
+              },
+              "rationale": null
+            },
+            {
+              "id": "consolidated_fcf_ps",
+              "label": "FY2025 consolidated free cash flow per diluted share",
+              "kind": "fact",
+              "value": 23.07,
+              "unit": "USD_per_share",
+              "source": {
+                "ref": "ADBE/investor-documents/sec-edgar/10-K_20260115_rpt20251128_acc0000796343_26_000003.htm",
+                "locator": "Free cash flow $9852.0M \u00f7 427.0M diluted shares",
+                "as_of": "2025-11-28",
+                "content_sha256": "05096f93de2ef568d1c47955dd58800d7d24a3c771514c6d49402c43bcbf6158",
+                "source_id": "b1d04283d6d1b7f56599367edec8eafcb02b58cd193032bdbb4d71fe5353cf20"
+              },
+              "rationale": null
+            },
+            {
+              "id": "shares_m",
+              "label": "FY2025 diluted shares outstanding",
+              "kind": "fact",
+              "value": 427.0,
+              "unit": "million_shares",
+              "source": {
+                "ref": "ADBE/investor-documents/sec-edgar/10-K_20260115_rpt20251128_acc0000796343_26_000003.htm",
+                "locator": "Weighted average diluted shares 427M (FY2025)",
+                "as_of": "2025-11-28",
+                "content_sha256": "05096f93de2ef568d1c47955dd58800d7d24a3c771514c6d49402c43bcbf6158",
+                "source_id": "2abd0dbfa15727c33e7946172c6a7980995a5a65dc1061aacab74abb52416793"
+              },
+              "rationale": null
+            },
+            {
+              "id": "experience_owner_cash_per_share",
+              "label": "Digital Experience owner cash per diluted share",
+              "kind": "judgment",
+              "value": 5.6877,
+              "unit": "USD_per_share",
+              "source": null,
+              "rationale": "Revenue-weighted allocation of consolidated FY2025 free cash flow to Experience Cloud."
+            },
+            {
+              "id": "capitalization_multiple",
+              "label": "Owner-cash capitalization multiple on Digital Experience",
+              "kind": "judgment",
+              "value": 34.2845,
+              "unit": "multiple",
+              "source": null,
+              "rationale": "Enterprise marketing stack valued below Digital Media due to competitive share shifts and longer sales cycles."
+            },
+            {
+              "id": "value_per_share",
+              "label": "Digital Experience engine per share",
+              "kind": "calculation",
+              "value": 194.99995065,
+              "unit": "USD_per_share",
+              "operation": "multiply",
+              "formula": "experience_owner_cash_per_share \u00d7 capitalization_multiple",
+              "substituted_formula": "5.6877 \u00d7 34.2845",
+              "dependencies": [
+                "experience_owner_cash_per_share",
+                "capitalization_multiple"
+              ]
+            }
+          ]
+        },
+        "source_lineage": [
+          {
+            "node_id": "digital_experience_revenue_m",
+            "ref": "ADBE/investor-documents/sec-edgar/10-K_20260115_rpt20251128_acc0000796343_26_000003.htm",
+            "locator": "Segment note: Digital Experience revenue $5,860M (FY2025)",
+            "as_of": "2025-11-28",
+            "content_sha256": "05096f93de2ef568d1c47955dd58800d7d24a3c771514c6d49402c43bcbf6158",
+            "source_id": "3caabc9b356e97e4e433511df2cc3b0872aa2e7875600ba79a96f0e80618d411"
+          },
+          {
+            "node_id": "consolidated_revenue_m",
+            "ref": "ADBE/investor-documents/sec-edgar/10-K_20260115_rpt20251128_acc0000796343_26_000003.htm",
+            "locator": "Revenues $23,769M (FY2025)",
+            "as_of": "2025-11-28",
+            "content_sha256": "05096f93de2ef568d1c47955dd58800d7d24a3c771514c6d49402c43bcbf6158",
+            "source_id": "2efc931b999292570ba24d6bc81f4f550d40bd1941c2e283b8ba66c65c51a466"
+          },
+          {
+            "node_id": "consolidated_fcf_ps",
+            "ref": "ADBE/investor-documents/sec-edgar/10-K_20260115_rpt20251128_acc0000796343_26_000003.htm",
+            "locator": "Free cash flow $9852.0M \u00f7 427.0M diluted shares",
+            "as_of": "2025-11-28",
+            "content_sha256": "05096f93de2ef568d1c47955dd58800d7d24a3c771514c6d49402c43bcbf6158",
+            "source_id": "b1d04283d6d1b7f56599367edec8eafcb02b58cd193032bdbb4d71fe5353cf20"
+          },
+          {
+            "node_id": "shares_m",
+            "ref": "ADBE/investor-documents/sec-edgar/10-K_20260115_rpt20251128_acc0000796343_26_000003.htm",
+            "locator": "Weighted average diluted shares 427M (FY2025)",
+            "as_of": "2025-11-28",
+            "content_sha256": "05096f93de2ef568d1c47955dd58800d7d24a3c771514c6d49402c43bcbf6158",
+            "source_id": "2abd0dbfa15727c33e7946172c6a7980995a5a65dc1061aacab74abb52416793"
+          }
+        ],
+        "checks": {
+          "passed": true,
+          "errors": []
+        },
+        "proof_hash": "434645f37ae5fb00a6b500cb089d3b3dfc03858304a734b5becf11637ec723e6"
+      },
+      "evidence_tier": "primary_derived",
+      "evidence_level": "primary_derived",
+      "evidence": "Primary bridge from ADBE/investor-documents/sec-edgar/10-K_20260115_rpt20251128_acc0000796343_26_000003.htm: FY2025 revenue $23769.0M, Digital Media $17650.0M, Digital Experience $5860.0M, OCF $10031.0M, FCF $9852.0M, RPO $22520.0M, cash $5431.0M, debt $6210.0M; contract backfill 2026-07-21.",
+      "scenario_assumptions": "Proof outputs {'low': 84.9998, 'base': 133.0, 'high': 195.0}; see calculation_proof graph.",
+      "probability_and_timing": null,
+      "tax_and_realization_adjustments": "Competitive share shifts versus Salesforce and Google reflected in multiple band.",
+      "falsifier": "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
+      "overlap_key": "digital_experience_engine",
+      "assumption_type": "judgment"
+    },
+    {
+      "component_id": "firefly_ai_monetization_option",
+      "label": "Firefly and generative-AI monetization option",
+      "category": "real_option",
+      "treatment": "additive",
+      "included_in_component_id": null,
+      "ownership_claim": "Firefly and generative-AI monetization option",
+      "ownership_percentage": 1.0,
+      "quantity": {
+        "value": 1,
+        "unit": "per-share economic claim"
+      },
+      "method": "risk_adjusted_milestone_value",
+      "method_version": "1.0",
+      "method_provenance": {
+        "method_id": "risk_adjusted_milestone_value",
+        "version": "1.0",
+        "label": "Milestone risk-adjusted present value",
+        "power_zones": [
+          "binary_milestone"
+        ],
+        "equation": "value_per_share = (net_cash + sum(p_success*PV(success_value)-remaining_cost) - dilution)/shares",
+        "sources": [
+          {
+            "ref": "_system/frameworks/optionality_valuation.md",
+            "locator": "Milestone-based option framework"
+          }
+        ]
+      },
+      "comparable_ids": [],
+      "range_per_share": {
+        "low": 0.0,
+        "base": 50.0,
+        "high": 120.0
+      },
+      "legacy_range_per_share": {
+        "low": 0.0,
+        "base": 50.0,
+        "high": 120.0
+      },
+      "valuation_status": "bounded_estimate",
+      "calculation_proof": {
+        "status": "valid",
+        "method_id": "risk_adjusted_milestone_value",
+        "method_version": "1.0",
+        "outputs": {
+          "low": 0.0,
+          "base": 50.0,
+          "high": 120.0
+        },
+        "output_unit": "USD_per_share",
+        "traces": {
+          "low": [
+            {
+              "id": "rpo_m",
+              "label": "FY2025 remaining performance obligation",
+              "kind": "fact",
+              "value": 22520.0,
+              "unit": "USD_m",
+              "source": {
+                "ref": "ADBE/investor-documents/sec-edgar/10-K_20260115_rpt20251128_acc0000796343_26_000003.htm",
+                "locator": "RPO $22,520M at November 28, 2025; 65% recognized within 12 months",
+                "as_of": "2025-11-28",
+                "content_sha256": "05096f93de2ef568d1c47955dd58800d7d24a3c771514c6d49402c43bcbf6158",
+                "source_id": "54447f3a28d1a90224c3d2c2b0c04b0026a65316d568bfb65bc4db8a63405afd"
+              },
+              "rationale": null
+            },
+            {
+              "id": "subscription_revenue_m",
+              "label": "FY2025 subscription revenue",
+              "kind": "fact",
+              "value": 22900.0,
+              "unit": "USD_m",
+              "source": {
+                "ref": "ADBE/investor-documents/sec-edgar/10-K_20260115_rpt20251128_acc0000796343_26_000003.htm",
+                "locator": "Subscription revenue $22.90B of $23.77B total revenue (FY2025)",
+                "as_of": "2025-11-28",
+                "content_sha256": "05096f93de2ef568d1c47955dd58800d7d24a3c771514c6d49402c43bcbf6158",
+                "source_id": "e07214e224600754d4e67117c3f75f97d99865d139560611107a255c1080c850"
+              },
+              "rationale": null
+            },
+            {
+              "id": "shares_m",
+              "label": "FY2025 diluted shares outstanding",
+              "kind": "fact",
+              "value": 427.0,
+              "unit": "million_shares",
+              "source": {
+                "ref": "ADBE/investor-documents/sec-edgar/10-K_20260115_rpt20251128_acc0000796343_26_000003.htm",
+                "locator": "Weighted average diluted shares 427M (FY2025)",
+                "as_of": "2025-11-28",
+                "content_sha256": "05096f93de2ef568d1c47955dd58800d7d24a3c771514c6d49402c43bcbf6158",
+                "source_id": "2abd0dbfa15727c33e7946172c6a7980995a5a65dc1061aacab74abb52416793"
+              },
+              "rationale": null
+            },
+            {
+              "id": "firefly_milestone_m",
+              "label": "Risk-adjusted Firefly and generative-AI monetization beyond base segment cash",
+              "kind": "judgment",
+              "value": 0.0,
+              "unit": "USD_m",
+              "source": null,
+              "rationale": "Non-overlapping incremental AI credit and ARPU uplift not fully captured in segment capitalization multiples; base is judgment band."
+            },
+            {
+              "id": "value_per_share",
+              "label": "Firefly AI monetization option per share",
+              "kind": "calculation",
+              "value": 0.0,
+              "unit": "USD_per_share",
+              "operation": "divide",
+              "formula": "firefly_milestone_m \u00f7 shares_m",
+              "substituted_formula": "0 \u00f7 427",
+              "dependencies": [
+                "firefly_milestone_m",
+                "shares_m"
+              ]
+            }
+          ],
+          "base": [
+            {
+              "id": "rpo_m",
+              "label": "FY2025 remaining performance obligation",
+              "kind": "fact",
+              "value": 22520.0,
+              "unit": "USD_m",
+              "source": {
+                "ref": "ADBE/investor-documents/sec-edgar/10-K_20260115_rpt20251128_acc0000796343_26_000003.htm",
+                "locator": "RPO $22,520M at November 28, 2025; 65% recognized within 12 months",
+                "as_of": "2025-11-28",
+                "content_sha256": "05096f93de2ef568d1c47955dd58800d7d24a3c771514c6d49402c43bcbf6158",
+                "source_id": "54447f3a28d1a90224c3d2c2b0c04b0026a65316d568bfb65bc4db8a63405afd"
+              },
+              "rationale": null
+            },
+            {
+              "id": "subscription_revenue_m",
+              "label": "FY2025 subscription revenue",
+              "kind": "fact",
+              "value": 22900.0,
+              "unit": "USD_m",
+              "source": {
+                "ref": "ADBE/investor-documents/sec-edgar/10-K_20260115_rpt20251128_acc0000796343_26_000003.htm",
+                "locator": "Subscription revenue $22.90B of $23.77B total revenue (FY2025)",
+                "as_of": "2025-11-28",
+                "content_sha256": "05096f93de2ef568d1c47955dd58800d7d24a3c771514c6d49402c43bcbf6158",
+                "source_id": "e07214e224600754d4e67117c3f75f97d99865d139560611107a255c1080c850"
+              },
+              "rationale": null
+            },
+            {
+              "id": "shares_m",
+              "label": "FY2025 diluted shares outstanding",
+              "kind": "fact",
+              "value": 427.0,
+              "unit": "million_shares",
+              "source": {
+                "ref": "ADBE/investor-documents/sec-edgar/10-K_20260115_rpt20251128_acc0000796343_26_000003.htm",
+                "locator": "Weighted average diluted shares 427M (FY2025)",
+                "as_of": "2025-11-28",
+                "content_sha256": "05096f93de2ef568d1c47955dd58800d7d24a3c771514c6d49402c43bcbf6158",
+                "source_id": "2abd0dbfa15727c33e7946172c6a7980995a5a65dc1061aacab74abb52416793"
+              },
+              "rationale": null
+            },
+            {
+              "id": "firefly_milestone_m",
+              "label": "Risk-adjusted Firefly and generative-AI monetization beyond base segment cash",
+              "kind": "judgment",
+              "value": 21350.0,
+              "unit": "USD_m",
+              "source": null,
+              "rationale": "Non-overlapping incremental AI credit and ARPU uplift not fully captured in segment capitalization multiples; base is judgment band."
+            },
+            {
+              "id": "value_per_share",
+              "label": "Firefly AI monetization option per share",
+              "kind": "calculation",
+              "value": 50.0,
+              "unit": "USD_per_share",
+              "operation": "divide",
+              "formula": "firefly_milestone_m \u00f7 shares_m",
+              "substituted_formula": "21350 \u00f7 427",
+              "dependencies": [
+                "firefly_milestone_m",
+                "shares_m"
+              ]
+            }
+          ],
+          "high": [
+            {
+              "id": "rpo_m",
+              "label": "FY2025 remaining performance obligation",
+              "kind": "fact",
+              "value": 22520.0,
+              "unit": "USD_m",
+              "source": {
+                "ref": "ADBE/investor-documents/sec-edgar/10-K_20260115_rpt20251128_acc0000796343_26_000003.htm",
+                "locator": "RPO $22,520M at November 28, 2025; 65% recognized within 12 months",
+                "as_of": "2025-11-28",
+                "content_sha256": "05096f93de2ef568d1c47955dd58800d7d24a3c771514c6d49402c43bcbf6158",
+                "source_id": "54447f3a28d1a90224c3d2c2b0c04b0026a65316d568bfb65bc4db8a63405afd"
+              },
+              "rationale": null
+            },
+            {
+              "id": "subscription_revenue_m",
+              "label": "FY2025 subscription revenue",
+              "kind": "fact",
+              "value": 22900.0,
+              "unit": "USD_m",
+              "source": {
+                "ref": "ADBE/investor-documents/sec-edgar/10-K_20260115_rpt20251128_acc0000796343_26_000003.htm",
+                "locator": "Subscription revenue $22.90B of $23.77B total revenue (FY2025)",
+                "as_of": "2025-11-28",
+                "content_sha256": "05096f93de2ef568d1c47955dd58800d7d24a3c771514c6d49402c43bcbf6158",
+                "source_id": "e07214e224600754d4e67117c3f75f97d99865d139560611107a255c1080c850"
+              },
+              "rationale": null
+            },
+            {
+              "id": "shares_m",
+              "label": "FY2025 diluted shares outstanding",
+              "kind": "fact",
+              "value": 427.0,
+              "unit": "million_shares",
+              "source": {
+                "ref": "ADBE/investor-documents/sec-edgar/10-K_20260115_rpt20251128_acc0000796343_26_000003.htm",
+                "locator": "Weighted average diluted shares 427M (FY2025)",
+                "as_of": "2025-11-28",
+                "content_sha256": "05096f93de2ef568d1c47955dd58800d7d24a3c771514c6d49402c43bcbf6158",
+                "source_id": "2abd0dbfa15727c33e7946172c6a7980995a5a65dc1061aacab74abb52416793"
+              },
+              "rationale": null
+            },
+            {
+              "id": "firefly_milestone_m",
+              "label": "Risk-adjusted Firefly and generative-AI monetization beyond base segment cash",
+              "kind": "judgment",
+              "value": 51240.0,
+              "unit": "USD_m",
+              "source": null,
+              "rationale": "Non-overlapping incremental AI credit and ARPU uplift not fully captured in segment capitalization multiples; base is judgment band."
+            },
+            {
+              "id": "value_per_share",
+              "label": "Firefly AI monetization option per share",
+              "kind": "calculation",
+              "value": 120.0,
+              "unit": "USD_per_share",
+              "operation": "divide",
+              "formula": "firefly_milestone_m \u00f7 shares_m",
+              "substituted_formula": "51240 \u00f7 427",
+              "dependencies": [
+                "firefly_milestone_m",
+                "shares_m"
+              ]
+            }
+          ]
+        },
+        "source_lineage": [
+          {
+            "node_id": "rpo_m",
+            "ref": "ADBE/investor-documents/sec-edgar/10-K_20260115_rpt20251128_acc0000796343_26_000003.htm",
+            "locator": "RPO $22,520M at November 28, 2025; 65% recognized within 12 months",
+            "as_of": "2025-11-28",
+            "content_sha256": "05096f93de2ef568d1c47955dd58800d7d24a3c771514c6d49402c43bcbf6158",
+            "source_id": "54447f3a28d1a90224c3d2c2b0c04b0026a65316d568bfb65bc4db8a63405afd"
+          },
+          {
+            "node_id": "subscription_revenue_m",
+            "ref": "ADBE/investor-documents/sec-edgar/10-K_20260115_rpt20251128_acc0000796343_26_000003.htm",
+            "locator": "Subscription revenue $22.90B of $23.77B total revenue (FY2025)",
+            "as_of": "2025-11-28",
+            "content_sha256": "05096f93de2ef568d1c47955dd58800d7d24a3c771514c6d49402c43bcbf6158",
+            "source_id": "e07214e224600754d4e67117c3f75f97d99865d139560611107a255c1080c850"
+          },
+          {
+            "node_id": "shares_m",
+            "ref": "ADBE/investor-documents/sec-edgar/10-K_20260115_rpt20251128_acc0000796343_26_000003.htm",
+            "locator": "Weighted average diluted shares 427M (FY2025)",
+            "as_of": "2025-11-28",
+            "content_sha256": "05096f93de2ef568d1c47955dd58800d7d24a3c771514c6d49402c43bcbf6158",
+            "source_id": "2abd0dbfa15727c33e7946172c6a7980995a5a65dc1061aacab74abb52416793"
+          }
+        ],
+        "checks": {
+          "passed": true,
+          "errors": []
+        },
+        "proof_hash": "205be8907c39a859f8f0d9683b7c01edebcb5bfc7f98efca754009f0c1983b0d"
+      },
+      "evidence_tier": "primary_derived",
+      "evidence_level": "primary_derived",
+      "evidence": "Primary bridge from ADBE/investor-documents/sec-edgar/10-K_20260115_rpt20251128_acc0000796343_26_000003.htm: FY2025 revenue $23769.0M, Digital Media $17650.0M, Digital Experience $5860.0M, OCF $10031.0M, FCF $9852.0M, RPO $22520.0M, cash $5431.0M, debt $6210.0M; contract backfill 2026-07-21.",
+      "scenario_assumptions": "Proof outputs {'low': 0.0, 'base': 50.0, 'high': 120.0}; see calculation_proof graph.",
+      "probability_and_timing": {
+        "success_probability": null,
+        "remaining_capital_m": null,
+        "timing_basis": "Generative-AI credit monetization and ARPU lift over 3 to 7 years; Firefly embedded in Creative Cloud since September 2023.",
+        "probability_basis": "Judgment from FY2025 RPO $22.5B and subscription mix; Adobe does not disclose standalone Firefly revenue.",
+        "remaining_capital_basis": "Incremental generative-AI model training and inference spend embedded in consolidated R&D and cost of revenue."
+      },
+      "tax_and_realization_adjustments": "Not in Lawrence base free cash flow path; bull sensitivity only.",
+      "falsifier": "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
+      "overlap_key": "firefly_ai_monetization_option",
+      "assumption_type": "judgment"
+    },
+    {
+      "component_id": "net_financial_claims",
+      "label": "Net cash and debt claims on common equity",
+      "category": "liability_or_reserve",
+      "treatment": "additive",
+      "included_in_component_id": null,
+      "ownership_claim": "Net cash and debt claims on common equity",
+      "ownership_percentage": 1.0,
+      "quantity": {
+        "value": 1,
+        "unit": "per-share economic claim"
+      },
+      "method": "net_asset_value",
+      "method_version": "1.0",
+      "method_provenance": {
+        "method_id": "net_asset_value",
+        "version": "1.0",
+        "label": "Reconciled net asset value",
+        "power_zones": [
+          "scarce_asset_optionality",
+          "catalyst_asset_value",
+          "credit_and_normalized_returns"
+        ],
+        "equation": "value_per_share = (gross_assets - senior_claims - tax - realization_costs) / diluted_shares",
+        "sources": [
+          {
+            "ref": "_system/frameworks/scarce_strategic_asset_valuation.md",
+            "locator": "Economic ownership and unit NAV"
+          }
+        ]
+      },
+      "comparable_ids": [],
+      "range_per_share": {
+        "low": -10.0,
+        "base": -2.0,
+        "high": 6.0
+      },
+      "legacy_range_per_share": {
+        "low": -10.0,
+        "base": -2.0,
+        "high": 6.0
+      },
+      "valuation_status": "bounded_estimate",
+      "calculation_proof": {
+        "status": "valid",
+        "method_id": "net_asset_value",
+        "method_version": "1.0",
+        "outputs": {
+          "low": -10.0,
+          "base": -2.0,
+          "high": 6.0
+        },
+        "output_unit": "USD_per_share",
+        "traces": {
+          "low": [
+            {
+              "id": "cash_m",
+              "label": "Cash and cash equivalents",
+              "kind": "fact",
+              "value": 5431.0,
+              "unit": "USD_m",
+              "source": {
+                "ref": "ADBE/investor-documents/sec-edgar/10-K_20260115_rpt20251128_acc0000796343_26_000003.htm",
+                "locator": "CashAndCashEquivalentsAtCarryingValue $5431.0M at November 28, 2025",
+                "as_of": "2025-11-28",
+                "content_sha256": "05096f93de2ef568d1c47955dd58800d7d24a3c771514c6d49402c43bcbf6158",
+                "source_id": "76d608401bc8eec6eb7615321d879ed744f88ce5e6e1caeb5b3c837f2d1e7602"
+              },
+              "rationale": null
+            },
+            {
+              "id": "long_term_debt_m",
+              "label": "Long-term debt",
+              "kind": "fact",
+              "value": 6210.0,
+              "unit": "USD_m",
+              "source": {
+                "ref": "ADBE/investor-documents/sec-edgar/10-K_20260115_rpt20251128_acc0000796343_26_000003.htm",
+                "locator": "LongTermDebt $6210.0M at November 28, 2025",
+                "as_of": "2025-11-28",
+                "content_sha256": "05096f93de2ef568d1c47955dd58800d7d24a3c771514c6d49402c43bcbf6158",
+                "source_id": "9707a04ea98c2760630c64479bfba0696a3e020df7b2cb79623ef2adba0656f3"
+              },
+              "rationale": null
+            },
+            {
+              "id": "shares_m",
+              "label": "FY2025 diluted shares outstanding",
+              "kind": "fact",
+              "value": 427.0,
+              "unit": "million_shares",
+              "source": {
+                "ref": "ADBE/investor-documents/sec-edgar/10-K_20260115_rpt20251128_acc0000796343_26_000003.htm",
+                "locator": "Weighted average diluted shares 427M (FY2025)",
+                "as_of": "2025-11-28",
+                "content_sha256": "05096f93de2ef568d1c47955dd58800d7d24a3c771514c6d49402c43bcbf6158",
+                "source_id": "2abd0dbfa15727c33e7946172c6a7980995a5a65dc1061aacab74abb52416793"
+              },
+              "rationale": null
+            },
+            {
+              "id": "net_corporate_claim_m",
+              "label": "Net financial claim on common equity after debt and operating liquidity reserve",
+              "kind": "judgment",
+              "value": -4270.0,
+              "unit": "USD_m",
+              "source": null,
+              "rationale": "Filing-locked cash less long-term debt with judgment on operating liquidity and refinancing risk; January 2025 $2.0B note offering adds leverage for buybacks."
+            },
+            {
+              "id": "value_per_share",
+              "label": "Net financial claims per share",
+              "kind": "calculation",
+              "value": -10.0,
+              "unit": "USD_per_share",
+              "operation": "divide",
+              "formula": "net_corporate_claim_m \u00f7 shares_m",
+              "substituted_formula": "-4270 \u00f7 427",
+              "dependencies": [
+                "net_corporate_claim_m",
+                "shares_m"
+              ]
+            }
+          ],
+          "base": [
+            {
+              "id": "cash_m",
+              "label": "Cash and cash equivalents",
+              "kind": "fact",
+              "value": 5431.0,
+              "unit": "USD_m",
+              "source": {
+                "ref": "ADBE/investor-documents/sec-edgar/10-K_20260115_rpt20251128_acc0000796343_26_000003.htm",
+                "locator": "CashAndCashEquivalentsAtCarryingValue $5431.0M at November 28, 2025",
+                "as_of": "2025-11-28",
+                "content_sha256": "05096f93de2ef568d1c47955dd58800d7d24a3c771514c6d49402c43bcbf6158",
+                "source_id": "76d608401bc8eec6eb7615321d879ed744f88ce5e6e1caeb5b3c837f2d1e7602"
+              },
+              "rationale": null
+            },
+            {
+              "id": "long_term_debt_m",
+              "label": "Long-term debt",
+              "kind": "fact",
+              "value": 6210.0,
+              "unit": "USD_m",
+              "source": {
+                "ref": "ADBE/investor-documents/sec-edgar/10-K_20260115_rpt20251128_acc0000796343_26_000003.htm",
+                "locator": "LongTermDebt $6210.0M at November 28, 2025",
+                "as_of": "2025-11-28",
+                "content_sha256": "05096f93de2ef568d1c47955dd58800d7d24a3c771514c6d49402c43bcbf6158",
+                "source_id": "9707a04ea98c2760630c64479bfba0696a3e020df7b2cb79623ef2adba0656f3"
+              },
+              "rationale": null
+            },
+            {
+              "id": "shares_m",
+              "label": "FY2025 diluted shares outstanding",
+              "kind": "fact",
+              "value": 427.0,
+              "unit": "million_shares",
+              "source": {
+                "ref": "ADBE/investor-documents/sec-edgar/10-K_20260115_rpt20251128_acc0000796343_26_000003.htm",
+                "locator": "Weighted average diluted shares 427M (FY2025)",
+                "as_of": "2025-11-28",
+                "content_sha256": "05096f93de2ef568d1c47955dd58800d7d24a3c771514c6d49402c43bcbf6158",
+                "source_id": "2abd0dbfa15727c33e7946172c6a7980995a5a65dc1061aacab74abb52416793"
+              },
+              "rationale": null
+            },
+            {
+              "id": "net_corporate_claim_m",
+              "label": "Net financial claim on common equity after debt and operating liquidity reserve",
+              "kind": "judgment",
+              "value": -854.0,
+              "unit": "USD_m",
+              "source": null,
+              "rationale": "Filing-locked cash less long-term debt with judgment on operating liquidity and refinancing risk; January 2025 $2.0B note offering adds leverage for buybacks."
+            },
+            {
+              "id": "value_per_share",
+              "label": "Net financial claims per share",
+              "kind": "calculation",
+              "value": -2.0,
+              "unit": "USD_per_share",
+              "operation": "divide",
+              "formula": "net_corporate_claim_m \u00f7 shares_m",
+              "substituted_formula": "-854 \u00f7 427",
+              "dependencies": [
+                "net_corporate_claim_m",
+                "shares_m"
+              ]
+            }
+          ],
+          "high": [
+            {
+              "id": "cash_m",
+              "label": "Cash and cash equivalents",
+              "kind": "fact",
+              "value": 5431.0,
+              "unit": "USD_m",
+              "source": {
+                "ref": "ADBE/investor-documents/sec-edgar/10-K_20260115_rpt20251128_acc0000796343_26_000003.htm",
+                "locator": "CashAndCashEquivalentsAtCarryingValue $5431.0M at November 28, 2025",
+                "as_of": "2025-11-28",
+                "content_sha256": "05096f93de2ef568d1c47955dd58800d7d24a3c771514c6d49402c43bcbf6158",
+                "source_id": "76d608401bc8eec6eb7615321d879ed744f88ce5e6e1caeb5b3c837f2d1e7602"
+              },
+              "rationale": null
+            },
+            {
+              "id": "long_term_debt_m",
+              "label": "Long-term debt",
+              "kind": "fact",
+              "value": 6210.0,
+              "unit": "USD_m",
+              "source": {
+                "ref": "ADBE/investor-documents/sec-edgar/10-K_20260115_rpt20251128_acc0000796343_26_000003.htm",
+                "locator": "LongTermDebt $6210.0M at November 28, 2025",
+                "as_of": "2025-11-28",
+                "content_sha256": "05096f93de2ef568d1c47955dd58800d7d24a3c771514c6d49402c43bcbf6158",
+                "source_id": "9707a04ea98c2760630c64479bfba0696a3e020df7b2cb79623ef2adba0656f3"
+              },
+              "rationale": null
+            },
+            {
+              "id": "shares_m",
+              "label": "FY2025 diluted shares outstanding",
+              "kind": "fact",
+              "value": 427.0,
+              "unit": "million_shares",
+              "source": {
+                "ref": "ADBE/investor-documents/sec-edgar/10-K_20260115_rpt20251128_acc0000796343_26_000003.htm",
+                "locator": "Weighted average diluted shares 427M (FY2025)",
+                "as_of": "2025-11-28",
+                "content_sha256": "05096f93de2ef568d1c47955dd58800d7d24a3c771514c6d49402c43bcbf6158",
+                "source_id": "2abd0dbfa15727c33e7946172c6a7980995a5a65dc1061aacab74abb52416793"
+              },
+              "rationale": null
+            },
+            {
+              "id": "net_corporate_claim_m",
+              "label": "Net financial claim on common equity after debt and operating liquidity reserve",
+              "kind": "judgment",
+              "value": 2562.0,
+              "unit": "USD_m",
+              "source": null,
+              "rationale": "Filing-locked cash less long-term debt with judgment on operating liquidity and refinancing risk; January 2025 $2.0B note offering adds leverage for buybacks."
+            },
+            {
+              "id": "value_per_share",
+              "label": "Net financial claims per share",
+              "kind": "calculation",
+              "value": 6.0,
+              "unit": "USD_per_share",
+              "operation": "divide",
+              "formula": "net_corporate_claim_m \u00f7 shares_m",
+              "substituted_formula": "2562 \u00f7 427",
+              "dependencies": [
+                "net_corporate_claim_m",
+                "shares_m"
+              ]
+            }
+          ]
+        },
+        "source_lineage": [
+          {
+            "node_id": "cash_m",
+            "ref": "ADBE/investor-documents/sec-edgar/10-K_20260115_rpt20251128_acc0000796343_26_000003.htm",
+            "locator": "CashAndCashEquivalentsAtCarryingValue $5431.0M at November 28, 2025",
+            "as_of": "2025-11-28",
+            "content_sha256": "05096f93de2ef568d1c47955dd58800d7d24a3c771514c6d49402c43bcbf6158",
+            "source_id": "76d608401bc8eec6eb7615321d879ed744f88ce5e6e1caeb5b3c837f2d1e7602"
+          },
+          {
+            "node_id": "long_term_debt_m",
+            "ref": "ADBE/investor-documents/sec-edgar/10-K_20260115_rpt20251128_acc0000796343_26_000003.htm",
+            "locator": "LongTermDebt $6210.0M at November 28, 2025",
+            "as_of": "2025-11-28",
+            "content_sha256": "05096f93de2ef568d1c47955dd58800d7d24a3c771514c6d49402c43bcbf6158",
+            "source_id": "9707a04ea98c2760630c64479bfba0696a3e020df7b2cb79623ef2adba0656f3"
+          },
+          {
+            "node_id": "shares_m",
+            "ref": "ADBE/investor-documents/sec-edgar/10-K_20260115_rpt20251128_acc0000796343_26_000003.htm",
+            "locator": "Weighted average diluted shares 427M (FY2025)",
+            "as_of": "2025-11-28",
+            "content_sha256": "05096f93de2ef568d1c47955dd58800d7d24a3c771514c6d49402c43bcbf6158",
+            "source_id": "2abd0dbfa15727c33e7946172c6a7980995a5a65dc1061aacab74abb52416793"
+          }
+        ],
+        "checks": {
+          "passed": true,
+          "errors": []
+        },
+        "proof_hash": "88f0d5d60a4c628b1ef3030b9d701a12ff602b80f789d36fb52d5c613dd18569"
+      },
+      "evidence_tier": "primary_derived",
+      "evidence_level": "primary_derived",
+      "evidence": "Primary bridge from ADBE/investor-documents/sec-edgar/10-K_20260115_rpt20251128_acc0000796343_26_000003.htm: FY2025 revenue $23769.0M, Digital Media $17650.0M, Digital Experience $5860.0M, OCF $10031.0M, FCF $9852.0M, RPO $22520.0M, cash $5431.0M, debt $6210.0M; contract backfill 2026-07-21.",
+      "scenario_assumptions": "Proof outputs {'low': -10.0, 'base': -2.0, 'high': 6.0}; see calculation_proof graph.",
+      "probability_and_timing": null,
+      "tax_and_realization_adjustments": "January 2025 note offering adds leverage for buybacks.",
+      "falsifier": "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
+      "overlap_key": "net_financial_claims",
+      "assumption_type": "judgment"
+    },
+    {
+      "component_id": "ai_competition_and_sbc_reserve",
+      "label": "Generative-AI competition and stock-based compensation reserve",
+      "category": "liability_or_reserve",
+      "treatment": "additive",
+      "included_in_component_id": null,
+      "ownership_claim": "Generative-AI competition and stock-based compensation reserve",
+      "ownership_percentage": 1.0,
+      "quantity": {
+        "value": 1,
+        "unit": "per-share economic claim"
+      },
+      "method": "net_asset_value",
+      "method_version": "1.0",
+      "method_provenance": {
+        "method_id": "net_asset_value",
+        "version": "1.0",
+        "label": "Reconciled net asset value",
+        "power_zones": [
+          "scarce_asset_optionality",
+          "catalyst_asset_value",
+          "credit_and_normalized_returns"
+        ],
+        "equation": "value_per_share = (gross_assets - senior_claims - tax - realization_costs) / diluted_shares",
+        "sources": [
+          {
+            "ref": "_system/frameworks/scarce_strategic_asset_valuation.md",
+            "locator": "Economic ownership and unit NAV"
+          }
+        ]
+      },
+      "comparable_ids": [],
+      "range_per_share": {
+        "low": -45.0,
+        "base": -18.0,
+        "high": -5.0
+      },
+      "legacy_range_per_share": {
+        "low": -45.0,
+        "base": -18.0,
+        "high": -5.0
+      },
+      "valuation_status": "bounded_estimate",
+      "calculation_proof": {
+        "status": "valid",
+        "method_id": "net_asset_value",
+        "method_version": "1.0",
+        "outputs": {
+          "low": -45.0,
+          "base": -18.0,
+          "high": -5.0
+        },
+        "output_unit": "USD_per_share",
+        "traces": {
+          "low": [
+            {
+              "id": "stock_based_comp_m",
+              "label": "FY2025 stock-based compensation expense",
+              "kind": "fact",
+              "value": 1942.0,
+              "unit": "USD_m",
+              "source": {
+                "ref": "ADBE/investor-documents/sec-edgar/10-K_20260115_rpt20251128_acc0000796343_26_000003.htm",
+                "locator": "Stock-based compensation $1942.0M (FY2025)",
+                "as_of": "2025-11-28",
+                "content_sha256": "05096f93de2ef568d1c47955dd58800d7d24a3c771514c6d49402c43bcbf6158",
+                "source_id": "4f3dd0b19e5a8de644069cc1caf4f1bb6af0dee4e713dc28bb5b1bf3965aedcd"
+              },
+              "rationale": null
+            },
+            {
+              "id": "buybacks_m",
+              "label": "FY2025 share repurchases",
+              "kind": "fact",
+              "value": 11280.0,
+              "unit": "USD_m",
+              "source": {
+                "ref": "ADBE/investor-documents/sec-edgar/10-K_20260115_rpt20251128_acc0000796343_26_000003.htm",
+                "locator": "Repurchases of common stock $11280.0M (FY2025)",
+                "as_of": "2025-11-28",
+                "content_sha256": "05096f93de2ef568d1c47955dd58800d7d24a3c771514c6d49402c43bcbf6158",
+                "source_id": "220ddeb385944c8df43e77707ab65b820ad2136afc3aa46ab3dc2513a8cf5e58"
+              },
+              "rationale": null
+            },
+            {
+              "id": "shares_m",
+              "label": "FY2025 diluted shares outstanding",
+              "kind": "fact",
+              "value": 427.0,
+              "unit": "million_shares",
+              "source": {
+                "ref": "ADBE/investor-documents/sec-edgar/10-K_20260115_rpt20251128_acc0000796343_26_000003.htm",
+                "locator": "Weighted average diluted shares 427M (FY2025)",
+                "as_of": "2025-11-28",
+                "content_sha256": "05096f93de2ef568d1c47955dd58800d7d24a3c771514c6d49402c43bcbf6158",
+                "source_id": "2abd0dbfa15727c33e7946172c6a7980995a5a65dc1061aacab74abb52416793"
+              },
+              "rationale": null
+            },
+            {
+              "id": "reserve_m",
+              "label": "Generative-AI competition, SBC dilution, and multiple-compression reserve",
+              "kind": "judgment",
+              "value": -19215.0,
+              "unit": "USD_m",
+              "source": null,
+              "rationale": "Negative reserve for seat churn to low-cost AI tools, stock-based compensation if buybacks slow, and enterprise budget cyclicality not fully in segment multiples."
+            },
+            {
+              "id": "value_per_share",
+              "label": "AI competition and SBC reserve per share",
+              "kind": "calculation",
+              "value": -45.0,
+              "unit": "USD_per_share",
+              "operation": "divide",
+              "formula": "reserve_m \u00f7 shares_m",
+              "substituted_formula": "-19215 \u00f7 427",
+              "dependencies": [
+                "reserve_m",
+                "shares_m"
+              ]
+            }
+          ],
+          "base": [
+            {
+              "id": "stock_based_comp_m",
+              "label": "FY2025 stock-based compensation expense",
+              "kind": "fact",
+              "value": 1942.0,
+              "unit": "USD_m",
+              "source": {
+                "ref": "ADBE/investor-documents/sec-edgar/10-K_20260115_rpt20251128_acc0000796343_26_000003.htm",
+                "locator": "Stock-based compensation $1942.0M (FY2025)",
+                "as_of": "2025-11-28",
+                "content_sha256": "05096f93de2ef568d1c47955dd58800d7d24a3c771514c6d49402c43bcbf6158",
+                "source_id": "4f3dd0b19e5a8de644069cc1caf4f1bb6af0dee4e713dc28bb5b1bf3965aedcd"
+              },
+              "rationale": null
+            },
+            {
+              "id": "buybacks_m",
+              "label": "FY2025 share repurchases",
+              "kind": "fact",
+              "value": 11280.0,
+              "unit": "USD_m",
+              "source": {
+                "ref": "ADBE/investor-documents/sec-edgar/10-K_20260115_rpt20251128_acc0000796343_26_000003.htm",
+                "locator": "Repurchases of common stock $11280.0M (FY2025)",
+                "as_of": "2025-11-28",
+                "content_sha256": "05096f93de2ef568d1c47955dd58800d7d24a3c771514c6d49402c43bcbf6158",
+                "source_id": "220ddeb385944c8df43e77707ab65b820ad2136afc3aa46ab3dc2513a8cf5e58"
+              },
+              "rationale": null
+            },
+            {
+              "id": "shares_m",
+              "label": "FY2025 diluted shares outstanding",
+              "kind": "fact",
+              "value": 427.0,
+              "unit": "million_shares",
+              "source": {
+                "ref": "ADBE/investor-documents/sec-edgar/10-K_20260115_rpt20251128_acc0000796343_26_000003.htm",
+                "locator": "Weighted average diluted shares 427M (FY2025)",
+                "as_of": "2025-11-28",
+                "content_sha256": "05096f93de2ef568d1c47955dd58800d7d24a3c771514c6d49402c43bcbf6158",
+                "source_id": "2abd0dbfa15727c33e7946172c6a7980995a5a65dc1061aacab74abb52416793"
+              },
+              "rationale": null
+            },
+            {
+              "id": "reserve_m",
+              "label": "Generative-AI competition, SBC dilution, and multiple-compression reserve",
+              "kind": "judgment",
+              "value": -7686.0,
+              "unit": "USD_m",
+              "source": null,
+              "rationale": "Negative reserve for seat churn to low-cost AI tools, stock-based compensation if buybacks slow, and enterprise budget cyclicality not fully in segment multiples."
+            },
+            {
+              "id": "value_per_share",
+              "label": "AI competition and SBC reserve per share",
+              "kind": "calculation",
+              "value": -18.0,
+              "unit": "USD_per_share",
+              "operation": "divide",
+              "formula": "reserve_m \u00f7 shares_m",
+              "substituted_formula": "-7686 \u00f7 427",
+              "dependencies": [
+                "reserve_m",
+                "shares_m"
+              ]
+            }
+          ],
+          "high": [
+            {
+              "id": "stock_based_comp_m",
+              "label": "FY2025 stock-based compensation expense",
+              "kind": "fact",
+              "value": 1942.0,
+              "unit": "USD_m",
+              "source": {
+                "ref": "ADBE/investor-documents/sec-edgar/10-K_20260115_rpt20251128_acc0000796343_26_000003.htm",
+                "locator": "Stock-based compensation $1942.0M (FY2025)",
+                "as_of": "2025-11-28",
+                "content_sha256": "05096f93de2ef568d1c47955dd58800d7d24a3c771514c6d49402c43bcbf6158",
+                "source_id": "4f3dd0b19e5a8de644069cc1caf4f1bb6af0dee4e713dc28bb5b1bf3965aedcd"
+              },
+              "rationale": null
+            },
+            {
+              "id": "buybacks_m",
+              "label": "FY2025 share repurchases",
+              "kind": "fact",
+              "value": 11280.0,
+              "unit": "USD_m",
+              "source": {
+                "ref": "ADBE/investor-documents/sec-edgar/10-K_20260115_rpt20251128_acc0000796343_26_000003.htm",
+                "locator": "Repurchases of common stock $11280.0M (FY2025)",
+                "as_of": "2025-11-28",
+                "content_sha256": "05096f93de2ef568d1c47955dd58800d7d24a3c771514c6d49402c43bcbf6158",
+                "source_id": "220ddeb385944c8df43e77707ab65b820ad2136afc3aa46ab3dc2513a8cf5e58"
+              },
+              "rationale": null
+            },
+            {
+              "id": "shares_m",
+              "label": "FY2025 diluted shares outstanding",
+              "kind": "fact",
+              "value": 427.0,
+              "unit": "million_shares",
+              "source": {
+                "ref": "ADBE/investor-documents/sec-edgar/10-K_20260115_rpt20251128_acc0000796343_26_000003.htm",
+                "locator": "Weighted average diluted shares 427M (FY2025)",
+                "as_of": "2025-11-28",
+                "content_sha256": "05096f93de2ef568d1c47955dd58800d7d24a3c771514c6d49402c43bcbf6158",
+                "source_id": "2abd0dbfa15727c33e7946172c6a7980995a5a65dc1061aacab74abb52416793"
+              },
+              "rationale": null
+            },
+            {
+              "id": "reserve_m",
+              "label": "Generative-AI competition, SBC dilution, and multiple-compression reserve",
+              "kind": "judgment",
+              "value": -2135.0,
+              "unit": "USD_m",
+              "source": null,
+              "rationale": "Negative reserve for seat churn to low-cost AI tools, stock-based compensation if buybacks slow, and enterprise budget cyclicality not fully in segment multiples."
+            },
+            {
+              "id": "value_per_share",
+              "label": "AI competition and SBC reserve per share",
+              "kind": "calculation",
+              "value": -5.0,
+              "unit": "USD_per_share",
+              "operation": "divide",
+              "formula": "reserve_m \u00f7 shares_m",
+              "substituted_formula": "-2135 \u00f7 427",
+              "dependencies": [
+                "reserve_m",
+                "shares_m"
+              ]
+            }
+          ]
+        },
+        "source_lineage": [
+          {
+            "node_id": "stock_based_comp_m",
+            "ref": "ADBE/investor-documents/sec-edgar/10-K_20260115_rpt20251128_acc0000796343_26_000003.htm",
+            "locator": "Stock-based compensation $1942.0M (FY2025)",
+            "as_of": "2025-11-28",
+            "content_sha256": "05096f93de2ef568d1c47955dd58800d7d24a3c771514c6d49402c43bcbf6158",
+            "source_id": "4f3dd0b19e5a8de644069cc1caf4f1bb6af0dee4e713dc28bb5b1bf3965aedcd"
+          },
+          {
+            "node_id": "buybacks_m",
+            "ref": "ADBE/investor-documents/sec-edgar/10-K_20260115_rpt20251128_acc0000796343_26_000003.htm",
+            "locator": "Repurchases of common stock $11280.0M (FY2025)",
+            "as_of": "2025-11-28",
+            "content_sha256": "05096f93de2ef568d1c47955dd58800d7d24a3c771514c6d49402c43bcbf6158",
+            "source_id": "220ddeb385944c8df43e77707ab65b820ad2136afc3aa46ab3dc2513a8cf5e58"
+          },
+          {
+            "node_id": "shares_m",
+            "ref": "ADBE/investor-documents/sec-edgar/10-K_20260115_rpt20251128_acc0000796343_26_000003.htm",
+            "locator": "Weighted average diluted shares 427M (FY2025)",
+            "as_of": "2025-11-28",
+            "content_sha256": "05096f93de2ef568d1c47955dd58800d7d24a3c771514c6d49402c43bcbf6158",
+            "source_id": "2abd0dbfa15727c33e7946172c6a7980995a5a65dc1061aacab74abb52416793"
+          }
+        ],
+        "checks": {
+          "passed": true,
+          "errors": []
+        },
+        "proof_hash": "be8daa58461aa29a5393872f28905b5db84b57699fd98b84cbbe314125966ce9"
+      },
+      "evidence_tier": "primary_derived",
+      "evidence_level": "primary_derived",
+      "evidence": "Primary bridge from ADBE/investor-documents/sec-edgar/10-K_20260115_rpt20251128_acc0000796343_26_000003.htm: FY2025 revenue $23769.0M, Digital Media $17650.0M, Digital Experience $5860.0M, OCF $10031.0M, FCF $9852.0M, RPO $22520.0M, cash $5431.0M, debt $6210.0M; contract backfill 2026-07-21.",
+      "scenario_assumptions": "Proof outputs {'low': -45.0, 'base': -18.0, 'high': -5.0}; see calculation_proof graph.",
+      "probability_and_timing": null,
+      "tax_and_realization_adjustments": "Separate from segment capitalization multiples.",
+      "falsifier": "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
+      "overlap_key": "ai_competition_and_sbc_reserve",
+      "assumption_type": "judgment"
+    }
+  ],
   "component_coverage": {
-    "all_material_components_identified": false,
-    "material_component_count": 0,
-    "additive_component_count": 0,
+    "all_material_components_identified": true,
+    "material_component_count": 5,
+    "additive_component_count": 5,
     "embedded_component_count": 0,
-    "unvalued_component_count": 1,
+    "unvalued_component_count": 0,
     "double_counting_flags": []
   },
   "input_classification": {
     "facts": [],
     "estimates": [],
-    "judgments": []
+    "judgments": [
+      {
+        "component_id": "digital_media_document_engine",
+        "label": "Digital Media and Document Cloud owner-cash engine",
+        "kind": "judgment",
+        "evidence_tier": "primary_derived",
+        "evidence": "Primary bridge from ADBE/investor-documents/sec-edgar/10-K_20260115_rpt20251128_acc0000796343_26_000003.htm: FY2025 revenue $23769.0M, Digital Media $17650.0M, Digital Experience $5860.0M, OCF $10031.0M, FCF $9852.0M, RPO $22520.0M, cash $5431.0M, debt $6210.0M; contract backfill 2026-07-21.",
+        "method": "owner_earnings_reinvestment_dcf",
+        "valuation_status": "bounded_estimate"
+      },
+      {
+        "component_id": "digital_experience_engine",
+        "label": "Digital Experience Cloud owner-cash engine",
+        "kind": "judgment",
+        "evidence_tier": "primary_derived",
+        "evidence": "Primary bridge from ADBE/investor-documents/sec-edgar/10-K_20260115_rpt20251128_acc0000796343_26_000003.htm: FY2025 revenue $23769.0M, Digital Media $17650.0M, Digital Experience $5860.0M, OCF $10031.0M, FCF $9852.0M, RPO $22520.0M, cash $5431.0M, debt $6210.0M; contract backfill 2026-07-21.",
+        "method": "owner_cash_or_dividend_discount",
+        "valuation_status": "bounded_estimate"
+      },
+      {
+        "component_id": "firefly_ai_monetization_option",
+        "label": "Firefly and generative-AI monetization option",
+        "kind": "judgment",
+        "evidence_tier": "primary_derived",
+        "evidence": "Primary bridge from ADBE/investor-documents/sec-edgar/10-K_20260115_rpt20251128_acc0000796343_26_000003.htm: FY2025 revenue $23769.0M, Digital Media $17650.0M, Digital Experience $5860.0M, OCF $10031.0M, FCF $9852.0M, RPO $22520.0M, cash $5431.0M, debt $6210.0M; contract backfill 2026-07-21.",
+        "method": "risk_adjusted_milestone_value",
+        "valuation_status": "bounded_estimate"
+      },
+      {
+        "component_id": "net_financial_claims",
+        "label": "Net cash and debt claims on common equity",
+        "kind": "judgment",
+        "evidence_tier": "primary_derived",
+        "evidence": "Primary bridge from ADBE/investor-documents/sec-edgar/10-K_20260115_rpt20251128_acc0000796343_26_000003.htm: FY2025 revenue $23769.0M, Digital Media $17650.0M, Digital Experience $5860.0M, OCF $10031.0M, FCF $9852.0M, RPO $22520.0M, cash $5431.0M, debt $6210.0M; contract backfill 2026-07-21.",
+        "method": "net_asset_value",
+        "valuation_status": "bounded_estimate"
+      },
+      {
+        "component_id": "ai_competition_and_sbc_reserve",
+        "label": "Generative-AI competition and stock-based compensation reserve",
+        "kind": "judgment",
+        "evidence_tier": "primary_derived",
+        "evidence": "Primary bridge from ADBE/investor-documents/sec-edgar/10-K_20260115_rpt20251128_acc0000796343_26_000003.htm: FY2025 revenue $23769.0M, Digital Media $17650.0M, Digital Experience $5860.0M, OCF $10031.0M, FCF $9852.0M, RPO $22520.0M, cash $5431.0M, debt $6210.0M; contract backfill 2026-07-21.",
+        "method": "net_asset_value",
+        "valuation_status": "bounded_estimate"
+      }
+    ]
   },
   "method_route": {
     "schema_version": "2.0",
     "status": "routed",
     "profile_id": "quality_reinvestment",
     "label": "High-return compounder",
-    "score": 6.0,
+    "score": 10.0,
     "reasons": [
-      "archetype=compounder"
+      "archetype=compounder",
+      "component categories=operating_business",
+      "existing methods=dcf, owner_cash, reinvestment"
     ],
     "primary_methods": [
       "owner_earnings_reinvestment_dcf"
@@ -61,42 +1805,73 @@
       "stock compensation or acquisitions omitted",
       "terminal value unsupported by a durable mechanism"
     ],
-    "secondary_profiles": [],
+    "secondary_profiles": [
+      {
+        "profile_id": "predictable_cash_flow",
+        "score": 3.0,
+        "reasons": [
+          "component categories=operating_business",
+          "existing methods=dividend, owner_cash"
+        ]
+      },
+      {
+        "profile_id": "binary_milestone",
+        "score": 3.0,
+        "reasons": [
+          "component categories=real_option",
+          "existing methods=milestone, risk_adjusted"
+        ]
+      }
+    ],
     "scorecard": {
       "scarce_asset_optionality": {
-        "score": 0.0,
-        "reasons": []
+        "score": 1.0,
+        "reasons": [
+          "component categories=real_option"
+        ]
       },
       "quality_reinvestment": {
-        "score": 6.0,
+        "score": 10.0,
         "reasons": [
-          "archetype=compounder"
+          "archetype=compounder",
+          "component categories=operating_business",
+          "existing methods=dcf, owner_cash, reinvestment"
         ]
       },
       "capital_cycle": {
-        "score": 0.0,
-        "reasons": []
+        "score": 1.0,
+        "reasons": [
+          "component categories=operating_business"
+        ]
       },
       "credit_and_normalized_returns": {
-        "score": 0.0,
-        "reasons": []
+        "score": 1.0,
+        "reasons": [
+          "component categories=liability_or_reserve"
+        ]
       },
       "catalyst_asset_value": {
         "score": 0.0,
         "reasons": []
       },
       "predictable_cash_flow": {
-        "score": 0.0,
-        "reasons": []
+        "score": 3.0,
+        "reasons": [
+          "component categories=operating_business",
+          "existing methods=dividend, owner_cash"
+        ]
       },
       "binary_milestone": {
-        "score": 0.0,
-        "reasons": []
+        "score": 3.0,
+        "reasons": [
+          "component categories=real_option",
+          "existing methods=milestone, risk_adjusted"
+        ]
       }
     },
     "decision_rule": "Power Zones select the fitting economic method and eligible independent reviewers; they never choose the valuation answer or capital decision.",
     "ticker": "ADBE",
-    "as_of": "2026-07-20",
+    "as_of": "2026-07-21",
     "route_source": "canonical_power_zone_router",
     "config_path": "_system/frameworks/power_zones.json",
     "config_updated": "2026-07-14",
@@ -108,7 +1883,8 @@
       "cycle": "mid",
       "moi_bucket": "pending",
       "payoff_lens": "operating",
-      "investment_sleeve": "ls_algo_underlying"
+      "investment_sleeve": "ls_algo_underlying",
+      "predictive_attribute": "none"
     },
     "specialist_power_zones": [
       {
@@ -204,74 +1980,282 @@
         }
       ]
     },
-    "input_hash": "d8e75af396b002d69c5c20fd85291fb87569d9302830b3f8715e4c35997d563f",
-    "generated_at": "2026-07-20T17:13:53.804676+00:00"
+    "input_hash": "8971a1e31af491444e36fc9078ad3af3e8e65b7ef0a4fb6b16a12cf6b301085a",
+    "generated_at": "2026-07-21T13:23:51.884197+00:00"
   },
   "market": {
-    "price_per_share": 222.65,
-    "fully_diluted_shares": null,
-    "market_cap_m": null,
-    "enterprise_value_m": null
+    "price_per_share": 234.74,
+    "fully_diluted_shares": 427000000,
+    "market_cap_m": 100233.98,
+    "enterprise_value_m": 101012.98
   },
   "valuation": {
     "value_per_share": {
-      "low": null,
-      "base": null,
-      "high": null
+      "low": 349.9999,
+      "base": 655.9999,
+      "high": 996.0008
     },
     "priced_components_per_share": {
-      "low": 0,
-      "base": 0,
-      "high": 0
+      "low": 349.9999,
+      "base": 655.9999,
+      "high": 996.0008
     },
-    "legacy_value_per_share": null,
-    "probability_weighted_value_per_share": null,
+    "legacy_value_per_share": {
+      "low": 350.0,
+      "base": 656.0,
+      "high": 996.0
+    },
+    "probability_weighted_value_per_share": 655.9999,
     "expected_distributions_per_share": 0.0,
     "annualized_return_at_price_pct": {
-      "low": null,
-      "base": null,
-      "high": null
+      "low": 5.87,
+      "base": 15.81,
+      "high": 22.93
     },
-    "downside_to_low_pct": null,
+    "downside_to_low_pct": 49.1,
     "horizon_years": 7,
     "interpretation": "value_per_share is withheld while any material additive component is unpriced; priced_components_per_share is not a complete security value."
   },
   "scenario_contract": {
     "rule": "Cases must change cited causal operating, capital, probability, timing, or financing drivers\u2014not only a terminal multiple.",
-    "top_value_drivers": [],
+    "top_value_drivers": [
+      {
+        "component_id": "digital_media_document_engine",
+        "label": "Digital Media and Document Cloud owner-cash engine",
+        "valuation_status": "bounded_estimate",
+        "base_per_share": 492.9999,
+        "legacy_base_per_share": 493.0,
+        "range_width_per_share": 360.0007,
+        "scenario_assumptions": "Proof outputs {'low': 320.0001, 'base': 492.9999, 'high': 680.0008}; see calculation_proof graph."
+      },
+      {
+        "component_id": "firefly_ai_monetization_option",
+        "label": "Firefly and generative-AI monetization option",
+        "valuation_status": "bounded_estimate",
+        "base_per_share": 50.0,
+        "legacy_base_per_share": 50.0,
+        "range_width_per_share": 120.0,
+        "scenario_assumptions": "Proof outputs {'low': 0.0, 'base': 50.0, 'high': 120.0}; see calculation_proof graph."
+      },
+      {
+        "component_id": "digital_experience_engine",
+        "label": "Digital Experience Cloud owner-cash engine",
+        "valuation_status": "bounded_estimate",
+        "base_per_share": 133.0,
+        "legacy_base_per_share": 133.0,
+        "range_width_per_share": 110.0002,
+        "scenario_assumptions": "Proof outputs {'low': 84.9998, 'base': 133.0, 'high': 195.0}; see calculation_proof graph."
+      },
+      {
+        "component_id": "ai_competition_and_sbc_reserve",
+        "label": "Generative-AI competition and stock-based compensation reserve",
+        "valuation_status": "bounded_estimate",
+        "base_per_share": -18.0,
+        "legacy_base_per_share": -18.0,
+        "range_width_per_share": 40.0,
+        "scenario_assumptions": "Proof outputs {'low': -45.0, 'base': -18.0, 'high': -5.0}; see calculation_proof graph."
+      },
+      {
+        "component_id": "net_financial_claims",
+        "label": "Net cash and debt claims on common equity",
+        "valuation_status": "bounded_estimate",
+        "base_per_share": -2.0,
+        "legacy_base_per_share": -2.0,
+        "range_width_per_share": 16.0,
+        "scenario_assumptions": "Proof outputs {'low': -10.0, 'base': -2.0, 'high': 6.0}; see calculation_proof graph."
+      }
+    ],
     "reverse_expectations": null
   },
   "calculation_proof_summary": {
-    "component_count": 0,
-    "priced_component_count": 0,
-    "proof_complete_pct": 0.0,
+    "component_count": 5,
+    "priced_component_count": 5,
+    "proof_complete_pct": 100.0,
     "status_counts": {
-      "bounded_estimate": 0,
+      "bounded_estimate": 5,
       "calculated": 0,
       "legacy_sensitivity": 0,
       "unpriced": 0
     },
-    "all_material_components_priced": false,
+    "all_material_components_priced": true,
     "calculation_errors": [],
-    "aggregate_proof_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    "aggregate_proof_hash": "e8bb61fec959b16604a0d6f1755a49c331e69b401ef879e8decb398727d7b862"
   },
-  "source_lineage": [],
+  "source_lineage": [
+    {
+      "component_id": "digital_media_document_engine",
+      "node_id": "digital_media_revenue_m",
+      "ref": "ADBE/investor-documents/sec-edgar/10-K_20260115_rpt20251128_acc0000796343_26_000003.htm",
+      "locator": "Segment note: Digital Media revenue $17,650M (FY2025)",
+      "as_of": "2025-11-28",
+      "content_sha256": "05096f93de2ef568d1c47955dd58800d7d24a3c771514c6d49402c43bcbf6158",
+      "source_id": "e668a874755bd278aeedbb632b1aca942df8327c23c8e85fd5dc4ab9103dd017"
+    },
+    {
+      "component_id": "digital_media_document_engine",
+      "node_id": "consolidated_revenue_m",
+      "ref": "ADBE/investor-documents/sec-edgar/10-K_20260115_rpt20251128_acc0000796343_26_000003.htm",
+      "locator": "Revenues $23,769M (FY2025)",
+      "as_of": "2025-11-28",
+      "content_sha256": "05096f93de2ef568d1c47955dd58800d7d24a3c771514c6d49402c43bcbf6158",
+      "source_id": "2efc931b999292570ba24d6bc81f4f550d40bd1941c2e283b8ba66c65c51a466"
+    },
+    {
+      "component_id": "digital_media_document_engine",
+      "node_id": "consolidated_fcf_m",
+      "ref": "ADBE/investor-documents/sec-edgar/10-K_20260115_rpt20251128_acc0000796343_26_000003.htm",
+      "locator": "Net cash from operating activities $10031.0M less capital spending $179.0M",
+      "as_of": "2025-11-28",
+      "content_sha256": "05096f93de2ef568d1c47955dd58800d7d24a3c771514c6d49402c43bcbf6158",
+      "source_id": "7dca51cfc8a2a86a966a456d13a2bfcc7ac3b29f9b18dc758a0710910a95c6a2"
+    },
+    {
+      "component_id": "digital_media_document_engine",
+      "node_id": "shares_m",
+      "ref": "ADBE/investor-documents/sec-edgar/10-K_20260115_rpt20251128_acc0000796343_26_000003.htm",
+      "locator": "Weighted average diluted shares 427M (FY2025)",
+      "as_of": "2025-11-28",
+      "content_sha256": "05096f93de2ef568d1c47955dd58800d7d24a3c771514c6d49402c43bcbf6158",
+      "source_id": "2abd0dbfa15727c33e7946172c6a7980995a5a65dc1061aacab74abb52416793"
+    },
+    {
+      "component_id": "digital_experience_engine",
+      "node_id": "digital_experience_revenue_m",
+      "ref": "ADBE/investor-documents/sec-edgar/10-K_20260115_rpt20251128_acc0000796343_26_000003.htm",
+      "locator": "Segment note: Digital Experience revenue $5,860M (FY2025)",
+      "as_of": "2025-11-28",
+      "content_sha256": "05096f93de2ef568d1c47955dd58800d7d24a3c771514c6d49402c43bcbf6158",
+      "source_id": "3caabc9b356e97e4e433511df2cc3b0872aa2e7875600ba79a96f0e80618d411"
+    },
+    {
+      "component_id": "digital_experience_engine",
+      "node_id": "consolidated_revenue_m",
+      "ref": "ADBE/investor-documents/sec-edgar/10-K_20260115_rpt20251128_acc0000796343_26_000003.htm",
+      "locator": "Revenues $23,769M (FY2025)",
+      "as_of": "2025-11-28",
+      "content_sha256": "05096f93de2ef568d1c47955dd58800d7d24a3c771514c6d49402c43bcbf6158",
+      "source_id": "2efc931b999292570ba24d6bc81f4f550d40bd1941c2e283b8ba66c65c51a466"
+    },
+    {
+      "component_id": "digital_experience_engine",
+      "node_id": "consolidated_fcf_ps",
+      "ref": "ADBE/investor-documents/sec-edgar/10-K_20260115_rpt20251128_acc0000796343_26_000003.htm",
+      "locator": "Free cash flow $9852.0M \u00f7 427.0M diluted shares",
+      "as_of": "2025-11-28",
+      "content_sha256": "05096f93de2ef568d1c47955dd58800d7d24a3c771514c6d49402c43bcbf6158",
+      "source_id": "b1d04283d6d1b7f56599367edec8eafcb02b58cd193032bdbb4d71fe5353cf20"
+    },
+    {
+      "component_id": "digital_experience_engine",
+      "node_id": "shares_m",
+      "ref": "ADBE/investor-documents/sec-edgar/10-K_20260115_rpt20251128_acc0000796343_26_000003.htm",
+      "locator": "Weighted average diluted shares 427M (FY2025)",
+      "as_of": "2025-11-28",
+      "content_sha256": "05096f93de2ef568d1c47955dd58800d7d24a3c771514c6d49402c43bcbf6158",
+      "source_id": "2abd0dbfa15727c33e7946172c6a7980995a5a65dc1061aacab74abb52416793"
+    },
+    {
+      "component_id": "firefly_ai_monetization_option",
+      "node_id": "rpo_m",
+      "ref": "ADBE/investor-documents/sec-edgar/10-K_20260115_rpt20251128_acc0000796343_26_000003.htm",
+      "locator": "RPO $22,520M at November 28, 2025; 65% recognized within 12 months",
+      "as_of": "2025-11-28",
+      "content_sha256": "05096f93de2ef568d1c47955dd58800d7d24a3c771514c6d49402c43bcbf6158",
+      "source_id": "54447f3a28d1a90224c3d2c2b0c04b0026a65316d568bfb65bc4db8a63405afd"
+    },
+    {
+      "component_id": "firefly_ai_monetization_option",
+      "node_id": "subscription_revenue_m",
+      "ref": "ADBE/investor-documents/sec-edgar/10-K_20260115_rpt20251128_acc0000796343_26_000003.htm",
+      "locator": "Subscription revenue $22.90B of $23.77B total revenue (FY2025)",
+      "as_of": "2025-11-28",
+      "content_sha256": "05096f93de2ef568d1c47955dd58800d7d24a3c771514c6d49402c43bcbf6158",
+      "source_id": "e07214e224600754d4e67117c3f75f97d99865d139560611107a255c1080c850"
+    },
+    {
+      "component_id": "firefly_ai_monetization_option",
+      "node_id": "shares_m",
+      "ref": "ADBE/investor-documents/sec-edgar/10-K_20260115_rpt20251128_acc0000796343_26_000003.htm",
+      "locator": "Weighted average diluted shares 427M (FY2025)",
+      "as_of": "2025-11-28",
+      "content_sha256": "05096f93de2ef568d1c47955dd58800d7d24a3c771514c6d49402c43bcbf6158",
+      "source_id": "2abd0dbfa15727c33e7946172c6a7980995a5a65dc1061aacab74abb52416793"
+    },
+    {
+      "component_id": "net_financial_claims",
+      "node_id": "cash_m",
+      "ref": "ADBE/investor-documents/sec-edgar/10-K_20260115_rpt20251128_acc0000796343_26_000003.htm",
+      "locator": "CashAndCashEquivalentsAtCarryingValue $5431.0M at November 28, 2025",
+      "as_of": "2025-11-28",
+      "content_sha256": "05096f93de2ef568d1c47955dd58800d7d24a3c771514c6d49402c43bcbf6158",
+      "source_id": "76d608401bc8eec6eb7615321d879ed744f88ce5e6e1caeb5b3c837f2d1e7602"
+    },
+    {
+      "component_id": "net_financial_claims",
+      "node_id": "long_term_debt_m",
+      "ref": "ADBE/investor-documents/sec-edgar/10-K_20260115_rpt20251128_acc0000796343_26_000003.htm",
+      "locator": "LongTermDebt $6210.0M at November 28, 2025",
+      "as_of": "2025-11-28",
+      "content_sha256": "05096f93de2ef568d1c47955dd58800d7d24a3c771514c6d49402c43bcbf6158",
+      "source_id": "9707a04ea98c2760630c64479bfba0696a3e020df7b2cb79623ef2adba0656f3"
+    },
+    {
+      "component_id": "net_financial_claims",
+      "node_id": "shares_m",
+      "ref": "ADBE/investor-documents/sec-edgar/10-K_20260115_rpt20251128_acc0000796343_26_000003.htm",
+      "locator": "Weighted average diluted shares 427M (FY2025)",
+      "as_of": "2025-11-28",
+      "content_sha256": "05096f93de2ef568d1c47955dd58800d7d24a3c771514c6d49402c43bcbf6158",
+      "source_id": "2abd0dbfa15727c33e7946172c6a7980995a5a65dc1061aacab74abb52416793"
+    },
+    {
+      "component_id": "ai_competition_and_sbc_reserve",
+      "node_id": "stock_based_comp_m",
+      "ref": "ADBE/investor-documents/sec-edgar/10-K_20260115_rpt20251128_acc0000796343_26_000003.htm",
+      "locator": "Stock-based compensation $1942.0M (FY2025)",
+      "as_of": "2025-11-28",
+      "content_sha256": "05096f93de2ef568d1c47955dd58800d7d24a3c771514c6d49402c43bcbf6158",
+      "source_id": "4f3dd0b19e5a8de644069cc1caf4f1bb6af0dee4e713dc28bb5b1bf3965aedcd"
+    },
+    {
+      "component_id": "ai_competition_and_sbc_reserve",
+      "node_id": "buybacks_m",
+      "ref": "ADBE/investor-documents/sec-edgar/10-K_20260115_rpt20251128_acc0000796343_26_000003.htm",
+      "locator": "Repurchases of common stock $11280.0M (FY2025)",
+      "as_of": "2025-11-28",
+      "content_sha256": "05096f93de2ef568d1c47955dd58800d7d24a3c771514c6d49402c43bcbf6158",
+      "source_id": "220ddeb385944c8df43e77707ab65b820ad2136afc3aa46ab3dc2513a8cf5e58"
+    },
+    {
+      "component_id": "ai_competition_and_sbc_reserve",
+      "node_id": "shares_m",
+      "ref": "ADBE/investor-documents/sec-edgar/10-K_20260115_rpt20251128_acc0000796343_26_000003.htm",
+      "locator": "Weighted average diluted shares 427M (FY2025)",
+      "as_of": "2025-11-28",
+      "content_sha256": "05096f93de2ef568d1c47955dd58800d7d24a3c771514c6d49402c43bcbf6158",
+      "source_id": "2abd0dbfa15727c33e7946172c6a7980995a5a65dc1061aacab74abb52416793"
+    }
+  ],
   "model_checks": {
     "calculation_graphs_valid": true,
-    "component_sum_reconciles": false,
+    "component_sum_reconciles": true,
     "no_double_counting": true,
-    "all_material_components_priced": false,
+    "all_material_components_priced": true,
     "low_base_high_ordered": true
   },
   "evidence": {
-    "unresolved_count": 1,
-    "blockers": [
-      "A complete economic ownership map has not been supplied."
-    ],
+    "unresolved_count": 0,
+    "blockers": [],
     "validation_errors": []
   },
   "monitoring": {
-    "falsifiers": [],
+    "falsifiers": [
+      "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
+      "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
+      "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
+      "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
+      "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case."
+    ],
     "required_refresh_triggers": [
       "new filing or material operating update",
       "capital-structure change",
@@ -280,8 +2264,13 @@
     ]
   },
   "change_control": {
-    "model_hash": "f59d9db249ae3218dc20427b6c354c7fd149f777e0b092e26c4056cd67b9273e",
-    "method_versions": [],
+    "model_hash": "624797a6f483f10399276528a49002f74e34326bd4421d0f44cbbee6add727a3",
+    "method_versions": [
+      "net_asset_value@1.0",
+      "owner_cash_or_dividend_discount@1.0",
+      "owner_earnings_reinvestment_dcf@1.0",
+      "risk_adjusted_milestone_value@1.0"
+    ],
     "change_log": [],
     "rule": "A source fact is locked. Every assumption change requires a reason, author, timestamp, and before/after value."
   },

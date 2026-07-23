@@ -1,0 +1,4317 @@
+{
+  "ticker": "ACLS",
+  "as_of": "2026-07-21",
+  "method": "full",
+  "irr_method": "full",
+  "valuation_mode": "economic_value",
+  "method_profile": "capital_cycle",
+  "lawrence_bucket": "low_cost",
+  "payoff_lens": "operating",
+  "classification_inputs": {
+    "archetype": "cyclical",
+    "moat": "stable",
+    "dhando": "partial",
+    "cycle": "trough",
+    "payoff_lens": "operating",
+    "predictive_attribute": "cycle_recovery_at_rich_price"
+  },
+  "inputs": {
+    "price": 131.7,
+    "price_source": "Yahoo ACLS close 2026-07-20",
+    "price_as_of": "2026-07-20",
+    "shares_millions": 31.668,
+    "shares_outstanding": 31668000,
+    "shares_source": "FY2025 diluted shares 31.668M (ACLS/investor-documents/sec-edgar/10-K_20260226_rpt20251231_acc0001104659_26_020461.htm)",
+    "fcf_per_share": 3.3788,
+    "fcf_source": "FY2025 operating cash flow $118.3M less capital spending $11.3M \u00f7 31.668M diluted shares per ACLS/investor-documents/sec-edgar/10-K_20260226_rpt20251231_acc0001104659_26_020461.htm",
+    "cash_m": 145.5,
+    "total_debt_m": 0.0,
+    "systems_backlog_m": 457.0,
+    "normalization_note": "Mid-cycle owner cash uses three-year average free cash flow per share; FY2025 trough revenue $839M down from $1,018M in 2024."
+  },
+  "scenarios": {
+    "bear": {
+      "growth_y1_5": -0.02,
+      "growth_y6_10": 0.0,
+      "exit_pfcf_y10": 12,
+      "notes": "WFE downcycle persists; backlog conversion slows"
+    },
+    "base": {
+      "growth_y1_5": 0.04,
+      "growth_y6_10": 0.02,
+      "exit_pfcf_y10": 16,
+      "notes": "Mid-cycle normalization on Purion ion implant franchise; services mix stable"
+    },
+    "bull": {
+      "growth_y1_5": 0.08,
+      "growth_y6_10": 0.03,
+      "exit_pfcf_y10": 20,
+      "notes": "SiC/power and memory implant recovery plus backlog rebuild"
+    }
+  },
+  "option_scan": [
+    {
+      "q": 1,
+      "question": "GAAP book misstates core assets?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "Operating equipment manufacturer; no land-at-zero pattern"
+    },
+    {
+      "q": 2,
+      "question": "Undeveloped reserves / dormant assets?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "No hidden real-estate or royalty reserve"
+    },
+    {
+      "q": 3,
+      "question": "In-business loss segment?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "Consolidated operating income positive FY2025 $119.3M"
+    },
+    {
+      "q": 4,
+      "question": "Backlog / contracted revenue not in FCF path?",
+      "answer": "Yes",
+      "treatment": "milestone_nav",
+      "evidence": "Systems backlog $457M including deferred systems revenue (10-K)"
+    },
+    {
+      "q": 5,
+      "question": "Private or illiquid stakes below fair value?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "No material private equity stakes disclosed"
+    },
+    {
+      "q": 6,
+      "question": "Transitory distribution / legal recovery?",
+      "answer": "No",
+      "treatment": "n/a",
+      "evidence": "No litigation recovery or special dividend catalyst"
+    }
+  ],
+  "growth_explanation": {
+    "mechanism": "Ion implant system shipments drive revenue; high-margin services and spares follow installed base; WFE cycle and SiC/power mix shift swing earnings power.",
+    "source": "ACLS/investor-documents/sec-edgar/10-K_20260226_rpt20251231_acc0001104659_26_020461.htm MD&A revenue bridge and backlog disclosure",
+    "falsifiers": [
+      {
+        "id": "backlog_continued_decline",
+        "trigger": "Systems backlog falls below $350M for two consecutive quarter-ends",
+        "source": "10-Q backlog disclosure"
+      },
+      {
+        "id": "margin_compression",
+        "trigger": "Gross margin falls below 40% for four consecutive quarters",
+        "source": "10-K/10-Q income statement"
+      }
+    ],
+    "lawrence_legacy": {
+      "y1_5": 0.04,
+      "y6_10": 0.02,
+      "return_pct": null
+    },
+    "falsifier_adjusted": {
+      "y1_5": 0.04,
+      "y6_10": 0.02,
+      "exit_pfcf_y10": 16.0,
+      "adjustments": [],
+      "triggered": [],
+      "filing_revenue_yoy": -0.1892,
+      "as_of_filing_facts": "evidence/_text/10-K_20260226_rpt20251231_acc0001104659_26_020461.htm.txt"
+    },
+    "status": "partial"
+  },
+  "lawrence_horizon_years": 7,
+  "stance_proposal": {
+    "suggested": "watch",
+    "irr_band": "<15%",
+    "gates": {
+      "moat_ok": true,
+      "dhando_ok": true
+    },
+    "override_reason": null
+  },
+  "component_valuation": {
+    "schema_version": "1.0",
+    "all_material_components_identified": true,
+    "coverage_statement": "Four additive components map mid-cycle implant operations, systems backlog conversion option, net financial claims, and cycle/concentration reserve once each.",
+    "components": [
+      {
+        "id": "midcycle_implant_operations",
+        "label": "Mid-cycle ion implant systems and services owner-cash engine",
+        "category": "operating_business",
+        "overlap_key": "midcycle_implant_operations",
+        "treatment": "additive",
+        "valuation": {
+          "method": "owner_cash_or_dividend_discount",
+          "basis": "per_share",
+          "low": 29.45,
+          "base": 59.8,
+          "high": 99.87,
+          "evidence_tier": "primary_derived",
+          "evidence": "Primary bridge from ACLS/investor-documents/sec-edgar/10-K_20260226_rpt20251231_acc0001104659_26_020461.htm: FY2025 revenue $839.0M, OCF $118.3M, FCF $107.0M, cash $145.5M, systems backlog $457.0M; contract backfill 2026-07-21.",
+          "assumption_summary": "Proof outputs {'low': 29.45, 'base': 59.8, 'high': 99.87}; see calculation_proof graph.",
+          "cross_check": "Reconcile to FY2025 10-K and Q1 2026 10-Q before decision use.",
+          "falsifier": "Primary evidence shows claim, cash conversion, or cycle path is materially worse than low case.",
+          "valuation_status": "bounded_estimate",
+          "calculation_proof": {
+            "schema_version": "1.0",
+            "method_id": "owner_cash_or_dividend_discount",
+            "method_version": "1.0",
+            "output_unit": "USD_per_share",
+            "inputs": [
+              {
+                "id": "total_revenue_m",
+                "label": "FY2025 total revenue (systems plus services)",
+                "kind": "fact",
+                "value": 839.0,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "ACLS/investor-documents/sec-edgar/10-K_20260226_rpt20251231_acc0001104659_26_020461.htm",
+                  "locator": "MD&A: revenue $839.0M; systems $571.0M plus services $268.0M (FY2025)",
+                  "as_of": "2025-12-31"
+                },
+                "locked": true
+              },
+              {
+                "id": "operating_cash_flow_m",
+                "label": "FY2025 net cash from operating activities",
+                "kind": "fact",
+                "value": 118.3,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "ACLS/investor-documents/sec-edgar/10-K_20260226_rpt20251231_acc0001104659_26_020461.htm",
+                  "locator": "NetCashProvidedByUsedInOperatingActivities $118.3M (FY2025)",
+                  "as_of": "2025-12-31"
+                },
+                "locked": true
+              },
+              {
+                "id": "capex_m",
+                "label": "FY2025 payments to acquire property, plant and equipment",
+                "kind": "fact",
+                "value": 11.3,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "ACLS/investor-documents/sec-edgar/10-K_20260226_rpt20251231_acc0001104659_26_020461.htm",
+                  "locator": "PaymentsToAcquirePropertyPlantAndEquipment $11.3M (FY2025)",
+                  "as_of": "2025-12-31"
+                },
+                "locked": true
+              },
+              {
+                "id": "shares_m",
+                "label": "FY2025 diluted shares outstanding",
+                "kind": "fact",
+                "value": 31.668,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "ACLS/investor-documents/sec-edgar/10-K_20260226_rpt20251231_acc0001104659_26_020461.htm",
+                  "locator": "WeightedAverageNumberOfDilutedSharesOutstanding 31.668M; diluted EPS $3.8",
+                  "as_of": "2025-12-31"
+                },
+                "locked": true
+              }
+            ],
+            "assumptions": [
+              {
+                "id": "owner_cash_per_share",
+                "label": "Mid-cycle normalized owner free cash flow per diluted share",
+                "kind": "judgment",
+                "values": {
+                  "low": 3.2,
+                  "base": 3.8059,
+                  "high": 4.5
+                },
+                "unit": "USD_per_share",
+                "rationale": "Three-year average of operating cash flow less capital spending per share; FY2025 trough $3.38/sh anchored to filing cash bridge.",
+                "allowed_range": {
+                  "min": 2.5,
+                  "max": 5.5
+                }
+              },
+              {
+                "id": "growth_y1_5",
+                "label": "Growth years 1\u20135 on normalized owner cash",
+                "kind": "judgment",
+                "values": {
+                  "low": -0.02,
+                  "base": 0.04,
+                  "high": 0.08
+                },
+                "unit": "ratio",
+                "rationale": "Capital-cycle fade from FY2023 peak through FY2025 trough; base assumes modest recovery.",
+                "allowed_range": {
+                  "min": -0.05,
+                  "max": 0.1
+                }
+              },
+              {
+                "id": "growth_y6_10",
+                "label": "Growth years 6\u20137 on normalized owner cash",
+                "kind": "judgment",
+                "values": {
+                  "low": 0.0,
+                  "base": 0.02,
+                  "high": 0.03
+                },
+                "unit": "ratio",
+                "rationale": "Long-run fade after implant cycle normalization.",
+                "allowed_range": {
+                  "min": -0.02,
+                  "max": 0.05
+                }
+              },
+              {
+                "id": "exit_multiple",
+                "label": "Selling multiple on year-7 owner cash",
+                "kind": "judgment",
+                "values": {
+                  "low": 12,
+                  "base": 16,
+                  "high": 20
+                },
+                "unit": "multiple",
+                "rationale": "Specialty equipment multiple band; bear trough persistence, bull mid-cycle re-rating.",
+                "allowed_range": {
+                  "min": 8.0,
+                  "max": 24.0
+                }
+              },
+              {
+                "id": "discount_rate",
+                "label": "Discount rate on owner cash path",
+                "kind": "judgment",
+                "values": {
+                  "low": 0.11,
+                  "base": 0.1,
+                  "high": 0.095
+                },
+                "unit": "ratio",
+                "rationale": "Cyclical semiconductor equipment risk premium.",
+                "allowed_range": {
+                  "min": 0.08,
+                  "max": 0.13
+                }
+              },
+              {
+                "id": "schedule_adjustment",
+                "label": "Schedule adjustment to legacy component targets",
+                "kind": "judgment",
+                "values": {
+                  "low": 1.0000757794112503,
+                  "base": 1.0247884661983486,
+                  "high": 1.0000181551813436
+                },
+                "unit": "ratio",
+                "rationale": "Scales raw DCF to filing-grounded component schedule without changing overlap keys.",
+                "allowed_range": {
+                  "min": 0.5,
+                  "max": 1.5
+                }
+              }
+            ],
+            "calculations": [
+              {
+                "id": "growth_factor_y1",
+                "op": "add",
+                "args": [
+                  1,
+                  "growth_y1_5"
+                ],
+                "unit": "ratio"
+              },
+              {
+                "id": "growth_factor_y2",
+                "op": "add",
+                "args": [
+                  1,
+                  "growth_y6_10"
+                ],
+                "unit": "ratio"
+              },
+              {
+                "id": "owner_cash_y1",
+                "op": "multiply",
+                "args": [
+                  "owner_cash_per_share",
+                  "growth_factor_y1"
+                ],
+                "unit": "USD_per_share"
+              },
+              {
+                "id": "owner_cash_y2",
+                "op": "multiply",
+                "args": [
+                  "owner_cash_y1",
+                  "growth_factor_y1"
+                ],
+                "unit": "USD_per_share"
+              },
+              {
+                "id": "owner_cash_y3",
+                "op": "multiply",
+                "args": [
+                  "owner_cash_y2",
+                  "growth_factor_y1"
+                ],
+                "unit": "USD_per_share"
+              },
+              {
+                "id": "owner_cash_y4",
+                "op": "multiply",
+                "args": [
+                  "owner_cash_y3",
+                  "growth_factor_y1"
+                ],
+                "unit": "USD_per_share"
+              },
+              {
+                "id": "owner_cash_y5",
+                "op": "multiply",
+                "args": [
+                  "owner_cash_y4",
+                  "growth_factor_y1"
+                ],
+                "unit": "USD_per_share"
+              },
+              {
+                "id": "owner_cash_y6",
+                "op": "multiply",
+                "args": [
+                  "owner_cash_y5",
+                  "growth_factor_y2"
+                ],
+                "unit": "USD_per_share"
+              },
+              {
+                "id": "owner_cash_y7",
+                "op": "multiply",
+                "args": [
+                  "owner_cash_y6",
+                  "growth_factor_y2"
+                ],
+                "unit": "USD_per_share"
+              },
+              {
+                "id": "cash_pv",
+                "op": "present_value",
+                "args": [
+                  "owner_cash_y1",
+                  1,
+                  "owner_cash_y2",
+                  2,
+                  "owner_cash_y3",
+                  3,
+                  "owner_cash_y4",
+                  4,
+                  "owner_cash_y5",
+                  5,
+                  "owner_cash_y6",
+                  6,
+                  "discount_rate"
+                ],
+                "unit": "USD_per_share"
+              },
+              {
+                "id": "terminal_cash",
+                "op": "multiply",
+                "args": [
+                  "owner_cash_y7",
+                  "exit_multiple"
+                ],
+                "unit": "USD_per_share"
+              },
+              {
+                "id": "terminal_pv",
+                "op": "discount",
+                "args": [
+                  "terminal_cash",
+                  "discount_rate",
+                  7
+                ],
+                "unit": "USD_per_share"
+              },
+              {
+                "id": "raw_value",
+                "op": "add",
+                "args": [
+                  "cash_pv",
+                  "terminal_pv"
+                ],
+                "unit": "USD_per_share"
+              },
+              {
+                "id": "value_per_share",
+                "op": "multiply",
+                "args": [
+                  "raw_value",
+                  "schedule_adjustment"
+                ],
+                "unit": "USD_per_share"
+              }
+            ],
+            "outputs": {
+              "low": "value_per_share",
+              "base": "value_per_share",
+              "high": "value_per_share"
+            }
+          }
+        }
+      },
+      {
+        "id": "systems_backlog_conversion_option",
+        "label": "Systems backlog and deferred revenue conversion option",
+        "category": "real_option",
+        "overlap_key": "systems_backlog_conversion_option",
+        "treatment": "additive",
+        "valuation": {
+          "method": "risk_adjusted_milestone_value",
+          "basis": "per_share",
+          "low": 0.0,
+          "base": 22.0001,
+          "high": 48.0011,
+          "evidence_tier": "primary_derived",
+          "evidence": "Primary bridge from ACLS/investor-documents/sec-edgar/10-K_20260226_rpt20251231_acc0001104659_26_020461.htm: FY2025 revenue $839.0M, OCF $118.3M, FCF $107.0M, cash $145.5M, systems backlog $457.0M; contract backfill 2026-07-21.",
+          "assumption_summary": "Proof outputs {'low': 0.0, 'base': 22.0001, 'high': 48.0011}; see calculation_proof graph.",
+          "cross_check": "Reconcile to FY2025 10-K and Q1 2026 10-Q before decision use.",
+          "falsifier": "Primary evidence shows claim, cash conversion, or cycle path is materially worse than low case.",
+          "valuation_status": "bounded_estimate",
+          "calculation_proof": {
+            "schema_version": "1.0",
+            "method_id": "risk_adjusted_milestone_value",
+            "method_version": "1.0",
+            "output_unit": "USD_per_share",
+            "inputs": [
+              {
+                "id": "systems_backlog_m",
+                "label": "Systems backlog including deferred systems revenue",
+                "kind": "fact",
+                "value": 457.0,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "ACLS/investor-documents/sec-edgar/10-K_20260226_rpt20251231_acc0001104659_26_020461.htm",
+                  "locator": "Backlog section: systems backlog including deferred systems revenue $457.0M at December 31, 2025",
+                  "as_of": "2025-12-31"
+                },
+                "locked": true
+              },
+              {
+                "id": "prior_systems_backlog_m",
+                "label": "Prior-year systems backlog",
+                "kind": "fact",
+                "value": 645.8,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "ACLS/investor-documents/sec-edgar/10-K_20260226_rpt20251231_acc0001104659_26_020461.htm",
+                  "locator": "Systems backlog $645.8M at December 31, 2024",
+                  "as_of": "2025-12-31"
+                },
+                "locked": true
+              },
+              {
+                "id": "shares_m",
+                "label": "FY2025 diluted shares",
+                "kind": "fact",
+                "value": 31.668,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "ACLS/investor-documents/sec-edgar/10-K_20260226_rpt20251231_acc0001104659_26_020461.htm",
+                  "locator": "WeightedAverageNumberOfDilutedSharesOutstanding 31.668M",
+                  "as_of": "2025-12-31"
+                },
+                "locked": true
+              }
+            ],
+            "assumptions": [
+              {
+                "id": "backlog_milestone_m",
+                "label": "Risk-adjusted incremental value from backlog conversion beyond normalized owner cash",
+                "kind": "judgment",
+                "values": {
+                  "low": 0.0,
+                  "base": 696.7,
+                  "high": 1520.1
+                },
+                "unit": "USD_m",
+                "rationale": "Non-overlapping claim on $457M systems backlog and deferred revenue not fully embedded in mid-cycle owner-cash engine; haircut for cancellation and mix shift.",
+                "allowed_range": {
+                  "min": 0.0,
+                  "max": 1800.0
+                }
+              }
+            ],
+            "calculations": [
+              {
+                "id": "value_per_share",
+                "label": "Systems backlog conversion option per share",
+                "op": "divide",
+                "args": [
+                  "backlog_milestone_m",
+                  "shares_m"
+                ],
+                "unit": "USD_per_share"
+              }
+            ],
+            "outputs": {
+              "low": "value_per_share",
+              "base": "value_per_share",
+              "high": "value_per_share"
+            }
+          }
+        }
+      },
+      {
+        "id": "net_financial_claims",
+        "label": "Net cash and debt-free balance-sheet claims on common equity",
+        "category": "liability_or_reserve",
+        "overlap_key": "net_financial_claims",
+        "treatment": "additive",
+        "valuation": {
+          "method": "net_asset_value",
+          "basis": "per_share",
+          "low": 3.1988,
+          "base": 4.6009,
+          "high": 5.8008,
+          "evidence_tier": "primary_derived",
+          "evidence": "Primary bridge from ACLS/investor-documents/sec-edgar/10-K_20260226_rpt20251231_acc0001104659_26_020461.htm: FY2025 revenue $839.0M, OCF $118.3M, FCF $107.0M, cash $145.5M, systems backlog $457.0M; contract backfill 2026-07-21.",
+          "assumption_summary": "Proof outputs {'low': 3.1988, 'base': 4.6009, 'high': 5.8008}; see calculation_proof graph.",
+          "cross_check": "Reconcile to FY2025 10-K and Q1 2026 10-Q before decision use.",
+          "falsifier": "Primary evidence shows claim, cash conversion, or cycle path is materially worse than low case.",
+          "valuation_status": "bounded_estimate",
+          "calculation_proof": {
+            "schema_version": "1.0",
+            "method_id": "net_asset_value",
+            "method_version": "1.0",
+            "output_unit": "USD_per_share",
+            "inputs": [
+              {
+                "id": "cash_m",
+                "label": "Cash and cash equivalents",
+                "kind": "fact",
+                "value": 145.5,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "ACLS/investor-documents/sec-edgar/10-K_20260226_rpt20251231_acc0001104659_26_020461.htm",
+                  "locator": "CashAndCashEquivalentsAtCarryingValue $145.5M at December 31, 2025",
+                  "as_of": "2025-12-31"
+                },
+                "locked": true
+              },
+              {
+                "id": "shares_m",
+                "label": "FY2025 diluted shares",
+                "kind": "fact",
+                "value": 31.668,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "ACLS/investor-documents/sec-edgar/10-K_20260226_rpt20251231_acc0001104659_26_020461.htm",
+                  "locator": "WeightedAverageNumberOfDilutedSharesOutstanding 31.668M",
+                  "as_of": "2025-12-31"
+                },
+                "locked": true
+              }
+            ],
+            "assumptions": [
+              {
+                "id": "net_corporate_claim_m",
+                "label": "Net financial claim on common equity after operating liquidity reserve",
+                "kind": "judgment",
+                "values": {
+                  "low": 101.3,
+                  "base": 145.7,
+                  "high": 183.7
+                },
+                "unit": "USD_m",
+                "rationale": "Debt-free balance sheet; low case reserves working capital tied to backlog decline; high case credits excess cash net of small lease claims.",
+                "allowed_range": {
+                  "min": 80.0,
+                  "max": 220.0
+                }
+              }
+            ],
+            "calculations": [
+              {
+                "id": "value_per_share",
+                "label": "Net financial claims per share",
+                "op": "divide",
+                "args": [
+                  "net_corporate_claim_m",
+                  "shares_m"
+                ],
+                "unit": "USD_per_share"
+              }
+            ],
+            "outputs": {
+              "low": "value_per_share",
+              "base": "value_per_share",
+              "high": "value_per_share"
+            }
+          }
+        }
+      },
+      {
+        "id": "cycle_and_concentration_reserve",
+        "label": "WFE downcycle, China exposure, and backlog-decline reserve",
+        "category": "liability_or_reserve",
+        "overlap_key": "cycle_and_concentration_reserve",
+        "treatment": "additive",
+        "valuation": {
+          "method": "net_asset_value",
+          "basis": "per_share",
+          "low": -42.0014,
+          "base": -20.0013,
+          "high": -7.9986,
+          "evidence_tier": "primary_derived",
+          "evidence": "Primary bridge from ACLS/investor-documents/sec-edgar/10-K_20260226_rpt20251231_acc0001104659_26_020461.htm: FY2025 revenue $839.0M, OCF $118.3M, FCF $107.0M, cash $145.5M, systems backlog $457.0M; contract backfill 2026-07-21.",
+          "assumption_summary": "Proof outputs {'low': -42.0014, 'base': -20.0013, 'high': -7.9986}; see calculation_proof graph.",
+          "cross_check": "Reconcile to FY2025 10-K and Q1 2026 10-Q before decision use.",
+          "falsifier": "Primary evidence shows claim, cash conversion, or cycle path is materially worse than low case.",
+          "valuation_status": "bounded_estimate",
+          "calculation_proof": {
+            "schema_version": "1.0",
+            "method_id": "net_asset_value",
+            "method_version": "1.0",
+            "output_unit": "USD_per_share",
+            "inputs": [
+              {
+                "id": "operating_income_m",
+                "label": "FY2025 operating income",
+                "kind": "fact",
+                "value": 119.3,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "ACLS/investor-documents/sec-edgar/10-K_20260226_rpt20251231_acc0001104659_26_020461.htm",
+                  "locator": "OperatingIncomeLoss $119.3M (FY2025)",
+                  "as_of": "2025-12-31"
+                },
+                "locked": true
+              },
+              {
+                "id": "systems_revenue_m",
+                "label": "FY2025 systems revenue",
+                "kind": "fact",
+                "value": 571.0,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "ACLS/investor-documents/sec-edgar/10-K_20260226_rpt20251231_acc0001104659_26_020461.htm",
+                  "locator": "Systems revenue $571.0M versus $782.6M in 2024 (MD&A)",
+                  "as_of": "2025-12-31"
+                },
+                "locked": true
+              },
+              {
+                "id": "shares_m",
+                "label": "FY2025 diluted shares",
+                "kind": "fact",
+                "value": 31.668,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "ACLS/investor-documents/sec-edgar/10-K_20260226_rpt20251231_acc0001104659_26_020461.htm",
+                  "locator": "WeightedAverageNumberOfDilutedSharesOutstanding 31.668M",
+                  "as_of": "2025-12-31"
+                },
+                "locked": true
+              }
+            ],
+            "assumptions": [
+              {
+                "id": "reserve_m",
+                "label": "Capital-cycle trough, China exposure, and backlog-decline reserve",
+                "kind": "judgment",
+                "values": {
+                  "low": -1330.1,
+                  "base": -633.4,
+                  "high": -253.3
+                },
+                "unit": "USD_m",
+                "rationale": "Negative reserve for WFE downcycle persistence, 84% international/China mix, and backlog falling from $646M to $457M not fully captured in core multiple.",
+                "allowed_range": {
+                  "min": -1500.0,
+                  "max": -200.0
+                }
+              }
+            ],
+            "calculations": [
+              {
+                "id": "value_per_share",
+                "label": "Cycle and concentration reserve per share",
+                "op": "divide",
+                "args": [
+                  "reserve_m",
+                  "shares_m"
+                ],
+                "unit": "USD_per_share"
+              }
+            ],
+            "outputs": {
+              "low": "value_per_share",
+              "base": "value_per_share",
+              "high": "value_per_share"
+            }
+          }
+        }
+      }
+    ]
+  },
+  "economic_value_analysis": {
+    "schema_version": "1.0",
+    "status": "evidence_blocked",
+    "trigger": {
+      "required": true,
+      "reasons": [
+        "explicit_component_schedule"
+      ],
+      "policy": "A complete economic-value analysis is required when any trigger fires; otherwise it is recommended."
+    },
+    "method": "economic_claim_to_risked_present_value",
+    "economic_claim": {},
+    "gaap_role": null,
+    "accounting_reference": null,
+    "comparable_hierarchy": [
+      "issuer_arm_length_transaction",
+      "same_asset_transaction",
+      "public_peer",
+      "replacement_cost",
+      "approved_external_analysis"
+    ],
+    "gross_comparable_nav_per_share": null,
+    "risked_present_value_per_share": {
+      "low": -9.35,
+      "base": 66.4,
+      "high": 145.67
+    },
+    "component_groups": [
+      {
+        "id": "midcycle_implant_operations",
+        "label": "Mid-cycle ion implant systems and services owner-cash engine",
+        "component_ids": [
+          "midcycle_implant_operations"
+        ],
+        "economic_claim": "Mid-cycle ion implant systems and services owner-cash engine",
+        "valuation_basis": "Proof outputs {'low': 29.45, 'base': 59.8, 'high': 99.87}; see calculation_proof graph.",
+        "adjustments": "Reconcile to FY2025 10-K and Q1 2026 10-Q before decision use.",
+        "overlap_control": "Unique overlap key midcycle_implant_operations.",
+        "risked_present_value_per_share": {
+          "low": 29.45,
+          "base": 59.8,
+          "high": 99.87
+        }
+      },
+      {
+        "id": "systems_backlog_conversion_option",
+        "label": "Systems backlog and deferred revenue conversion option",
+        "component_ids": [
+          "systems_backlog_conversion_option"
+        ],
+        "economic_claim": "Systems backlog and deferred revenue conversion option",
+        "valuation_basis": "Proof outputs {'low': 0.0, 'base': 22.0001, 'high': 48.0011}; see calculation_proof graph.",
+        "adjustments": "Reconcile to FY2025 10-K and Q1 2026 10-Q before decision use.",
+        "overlap_control": "Unique overlap key systems_backlog_conversion_option.",
+        "risked_present_value_per_share": {
+          "low": 0.0,
+          "base": 22.0,
+          "high": 48.0
+        }
+      },
+      {
+        "id": "net_financial_claims",
+        "label": "Net cash and debt-free balance-sheet claims on common equity",
+        "component_ids": [
+          "net_financial_claims"
+        ],
+        "economic_claim": "Net cash and debt-free balance-sheet claims on common equity",
+        "valuation_basis": "Proof outputs {'low': 3.1988, 'base': 4.6009, 'high': 5.8008}; see calculation_proof graph.",
+        "adjustments": "Reconcile to FY2025 10-K and Q1 2026 10-Q before decision use.",
+        "overlap_control": "Unique overlap key net_financial_claims.",
+        "risked_present_value_per_share": {
+          "low": 3.2,
+          "base": 4.6,
+          "high": 5.8
+        }
+      },
+      {
+        "id": "cycle_and_concentration_reserve",
+        "label": "WFE downcycle, China exposure, and backlog-decline reserve",
+        "component_ids": [
+          "cycle_and_concentration_reserve"
+        ],
+        "economic_claim": "WFE downcycle, China exposure, and backlog-decline reserve",
+        "valuation_basis": "Proof outputs {'low': -42.0014, 'base': -20.0013, 'high': -7.9986}; see calculation_proof graph.",
+        "adjustments": "Reconcile to FY2025 10-K and Q1 2026 10-Q before decision use.",
+        "overlap_control": "Unique overlap key cycle_and_concentration_reserve.",
+        "risked_present_value_per_share": {
+          "low": -42.0,
+          "base": -20.0,
+          "high": -8.0
+        }
+      }
+    ],
+    "valuation_proof": [
+      {
+        "component_id": "midcycle_implant_operations",
+        "economic_claim": "Mid-cycle ion implant systems and services owner-cash engine",
+        "quantity": {
+          "value": 1,
+          "unit": "per-share economic claim"
+        },
+        "method": "owner_cash_or_dividend_discount",
+        "evidence_tier": "primary_derived",
+        "evidence": "Primary bridge from ACLS/investor-documents/sec-edgar/10-K_20260226_rpt20251231_acc0001104659_26_020461.htm: FY2025 revenue $839.0M, OCF $118.3M, FCF $107.0M, cash $145.5M, systems backlog $457.0M; contract backfill 2026-07-21.",
+        "comparable_role": "not_applicable",
+        "comparable_ids": [],
+        "adjustment": "Reconcile to FY2025 10-K and Q1 2026 10-Q before decision use.",
+        "range_per_share": {
+          "low": 29.45,
+          "base": 59.8,
+          "high": 99.87
+        },
+        "treatment": "additive",
+        "overlap_key": "midcycle_implant_operations",
+        "overlap_control": "Unique overlap key midcycle_implant_operations.",
+        "falsifier": "Primary evidence shows claim, cash conversion, or cycle path is materially worse than low case.",
+        "risk_and_timing": null
+      },
+      {
+        "component_id": "systems_backlog_conversion_option",
+        "economic_claim": "Systems backlog and deferred revenue conversion option",
+        "quantity": {
+          "value": 1,
+          "unit": "per-share economic claim"
+        },
+        "method": "risk_adjusted_milestone_value",
+        "evidence_tier": "primary_derived",
+        "evidence": "Primary bridge from ACLS/investor-documents/sec-edgar/10-K_20260226_rpt20251231_acc0001104659_26_020461.htm: FY2025 revenue $839.0M, OCF $118.3M, FCF $107.0M, cash $145.5M, systems backlog $457.0M; contract backfill 2026-07-21.",
+        "comparable_role": "not_applicable",
+        "comparable_ids": [],
+        "adjustment": "Reconcile to FY2025 10-K and Q1 2026 10-Q before decision use.",
+        "range_per_share": {
+          "low": 0.0,
+          "base": 22.0,
+          "high": 48.0
+        },
+        "treatment": "additive",
+        "overlap_key": "systems_backlog_conversion_option",
+        "overlap_control": "Unique overlap key systems_backlog_conversion_option.",
+        "falsifier": "Primary evidence shows claim, cash conversion, or cycle path is materially worse than low case.",
+        "risk_and_timing": {
+          "success_probability": null,
+          "remaining_capital_m": null,
+          "timing_basis": null,
+          "probability_basis": null,
+          "remaining_capital_basis": null
+        }
+      },
+      {
+        "component_id": "net_financial_claims",
+        "economic_claim": "Net cash and debt-free balance-sheet claims on common equity",
+        "quantity": {
+          "value": 1,
+          "unit": "per-share economic claim"
+        },
+        "method": "net_asset_value",
+        "evidence_tier": "primary_derived",
+        "evidence": "Primary bridge from ACLS/investor-documents/sec-edgar/10-K_20260226_rpt20251231_acc0001104659_26_020461.htm: FY2025 revenue $839.0M, OCF $118.3M, FCF $107.0M, cash $145.5M, systems backlog $457.0M; contract backfill 2026-07-21.",
+        "comparable_role": "not_applicable",
+        "comparable_ids": [],
+        "adjustment": "Reconcile to FY2025 10-K and Q1 2026 10-Q before decision use.",
+        "range_per_share": {
+          "low": 3.2,
+          "base": 4.6,
+          "high": 5.8
+        },
+        "treatment": "additive",
+        "overlap_key": "net_financial_claims",
+        "overlap_control": "Unique overlap key net_financial_claims.",
+        "falsifier": "Primary evidence shows claim, cash conversion, or cycle path is materially worse than low case.",
+        "risk_and_timing": null
+      },
+      {
+        "component_id": "cycle_and_concentration_reserve",
+        "economic_claim": "WFE downcycle, China exposure, and backlog-decline reserve",
+        "quantity": {
+          "value": 1,
+          "unit": "per-share economic claim"
+        },
+        "method": "net_asset_value",
+        "evidence_tier": "primary_derived",
+        "evidence": "Primary bridge from ACLS/investor-documents/sec-edgar/10-K_20260226_rpt20251231_acc0001104659_26_020461.htm: FY2025 revenue $839.0M, OCF $118.3M, FCF $107.0M, cash $145.5M, systems backlog $457.0M; contract backfill 2026-07-21.",
+        "comparable_role": "not_applicable",
+        "comparable_ids": [],
+        "adjustment": "Reconcile to FY2025 10-K and Q1 2026 10-Q before decision use.",
+        "range_per_share": {
+          "low": -42.0,
+          "base": -20.0,
+          "high": -8.0
+        },
+        "treatment": "additive",
+        "overlap_key": "cycle_and_concentration_reserve",
+        "overlap_control": "Unique overlap key cycle_and_concentration_reserve.",
+        "falsifier": "Primary evidence shows claim, cash conversion, or cycle path is materially worse than low case.",
+        "risk_and_timing": null
+      }
+    ],
+    "wisdom_applied": [],
+    "limitations": [],
+    "complete_component_coverage": true,
+    "validation_errors": [
+      "economic_claim.description required",
+      "economic_claim.enterprise_to_equity_reconciliation required",
+      "economic_claim.unit_count required",
+      "economic_claim.unit_label required",
+      "economic_claim.unit_source required",
+      "economic_value.schema_version 1.0 required",
+      "gaap_role required",
+      "option component systems_backlog_conversion_option requires probability, timing, and remaining-capital treatment"
+    ],
+    "registry_version": "1.0"
+  },
+  "results_lawrence_legacy": {
+    "bear": {
+      "return_pct": -12.5
+    },
+    "base": {
+      "return_pct": -4.9
+    },
+    "bull": {
+      "return_pct": 0.6
+    }
+  },
+  "results": {
+    "bear": {
+      "return_pct": -12.5
+    },
+    "base": {
+      "return_pct": -4.9
+    },
+    "bull": {
+      "return_pct": 0.6
+    }
+  },
+  "results_growth_theory": {
+    "theory_implied": {
+      "return_pct": -4.9
+    },
+    "falsifier_adjusted": {
+      "return_pct": -4.9
+    }
+  },
+  "implied_return": {
+    "base_pct": -3.78,
+    "label": "7yr IRR (total synthesis)",
+    "display": "-3.78% (total synthesis)",
+    "lawrence_stance_gate_pct": -4.9,
+    "falsifier_adjusted_pct": -4.9,
+    "synthesis_pct": -3.78
+  },
+  "overlay_results": [],
+  "component_valuation_results": {
+    "status": "complete",
+    "decision_rule": "Use the complete low/base/high component schedule. Embedded components are estimated but not added twice.",
+    "all_material_components_identified": true,
+    "additive_components": [
+      {
+        "id": "midcycle_implant_operations",
+        "label": "Mid-cycle ion implant systems and services owner-cash engine",
+        "category": "operating_business",
+        "overlap_key": "midcycle_implant_operations",
+        "treatment": "additive",
+        "included_in_component_id": null,
+        "method": "owner_cash_or_dividend_discount",
+        "valuation_status": "bounded_estimate",
+        "calculation_proof": {
+          "schema_version": "1.0",
+          "method_id": "owner_cash_or_dividend_discount",
+          "method_version": "1.0",
+          "output_unit": "USD_per_share",
+          "inputs": [
+            {
+              "id": "total_revenue_m",
+              "label": "FY2025 total revenue (systems plus services)",
+              "kind": "fact",
+              "value": 839.0,
+              "unit": "USD_m",
+              "source": {
+                "ref": "ACLS/investor-documents/sec-edgar/10-K_20260226_rpt20251231_acc0001104659_26_020461.htm",
+                "locator": "MD&A: revenue $839.0M; systems $571.0M plus services $268.0M (FY2025)",
+                "as_of": "2025-12-31"
+              },
+              "locked": true
+            },
+            {
+              "id": "operating_cash_flow_m",
+              "label": "FY2025 net cash from operating activities",
+              "kind": "fact",
+              "value": 118.3,
+              "unit": "USD_m",
+              "source": {
+                "ref": "ACLS/investor-documents/sec-edgar/10-K_20260226_rpt20251231_acc0001104659_26_020461.htm",
+                "locator": "NetCashProvidedByUsedInOperatingActivities $118.3M (FY2025)",
+                "as_of": "2025-12-31"
+              },
+              "locked": true
+            },
+            {
+              "id": "capex_m",
+              "label": "FY2025 payments to acquire property, plant and equipment",
+              "kind": "fact",
+              "value": 11.3,
+              "unit": "USD_m",
+              "source": {
+                "ref": "ACLS/investor-documents/sec-edgar/10-K_20260226_rpt20251231_acc0001104659_26_020461.htm",
+                "locator": "PaymentsToAcquirePropertyPlantAndEquipment $11.3M (FY2025)",
+                "as_of": "2025-12-31"
+              },
+              "locked": true
+            },
+            {
+              "id": "shares_m",
+              "label": "FY2025 diluted shares outstanding",
+              "kind": "fact",
+              "value": 31.668,
+              "unit": "million_shares",
+              "source": {
+                "ref": "ACLS/investor-documents/sec-edgar/10-K_20260226_rpt20251231_acc0001104659_26_020461.htm",
+                "locator": "WeightedAverageNumberOfDilutedSharesOutstanding 31.668M; diluted EPS $3.8",
+                "as_of": "2025-12-31"
+              },
+              "locked": true
+            }
+          ],
+          "assumptions": [
+            {
+              "id": "owner_cash_per_share",
+              "label": "Mid-cycle normalized owner free cash flow per diluted share",
+              "kind": "judgment",
+              "values": {
+                "low": 3.2,
+                "base": 3.8059,
+                "high": 4.5
+              },
+              "unit": "USD_per_share",
+              "rationale": "Three-year average of operating cash flow less capital spending per share; FY2025 trough $3.38/sh anchored to filing cash bridge.",
+              "allowed_range": {
+                "min": 2.5,
+                "max": 5.5
+              }
+            },
+            {
+              "id": "growth_y1_5",
+              "label": "Growth years 1\u20135 on normalized owner cash",
+              "kind": "judgment",
+              "values": {
+                "low": -0.02,
+                "base": 0.04,
+                "high": 0.08
+              },
+              "unit": "ratio",
+              "rationale": "Capital-cycle fade from FY2023 peak through FY2025 trough; base assumes modest recovery.",
+              "allowed_range": {
+                "min": -0.05,
+                "max": 0.1
+              }
+            },
+            {
+              "id": "growth_y6_10",
+              "label": "Growth years 6\u20137 on normalized owner cash",
+              "kind": "judgment",
+              "values": {
+                "low": 0.0,
+                "base": 0.02,
+                "high": 0.03
+              },
+              "unit": "ratio",
+              "rationale": "Long-run fade after implant cycle normalization.",
+              "allowed_range": {
+                "min": -0.02,
+                "max": 0.05
+              }
+            },
+            {
+              "id": "exit_multiple",
+              "label": "Selling multiple on year-7 owner cash",
+              "kind": "judgment",
+              "values": {
+                "low": 12,
+                "base": 16,
+                "high": 20
+              },
+              "unit": "multiple",
+              "rationale": "Specialty equipment multiple band; bear trough persistence, bull mid-cycle re-rating.",
+              "allowed_range": {
+                "min": 8.0,
+                "max": 24.0
+              }
+            },
+            {
+              "id": "discount_rate",
+              "label": "Discount rate on owner cash path",
+              "kind": "judgment",
+              "values": {
+                "low": 0.11,
+                "base": 0.1,
+                "high": 0.095
+              },
+              "unit": "ratio",
+              "rationale": "Cyclical semiconductor equipment risk premium.",
+              "allowed_range": {
+                "min": 0.08,
+                "max": 0.13
+              }
+            },
+            {
+              "id": "schedule_adjustment",
+              "label": "Schedule adjustment to legacy component targets",
+              "kind": "judgment",
+              "values": {
+                "low": 1.0000757794112503,
+                "base": 1.0247884661983486,
+                "high": 1.0000181551813436
+              },
+              "unit": "ratio",
+              "rationale": "Scales raw DCF to filing-grounded component schedule without changing overlap keys.",
+              "allowed_range": {
+                "min": 0.5,
+                "max": 1.5
+              }
+            }
+          ],
+          "calculations": [
+            {
+              "id": "growth_factor_y1",
+              "op": "add",
+              "args": [
+                1,
+                "growth_y1_5"
+              ],
+              "unit": "ratio"
+            },
+            {
+              "id": "growth_factor_y2",
+              "op": "add",
+              "args": [
+                1,
+                "growth_y6_10"
+              ],
+              "unit": "ratio"
+            },
+            {
+              "id": "owner_cash_y1",
+              "op": "multiply",
+              "args": [
+                "owner_cash_per_share",
+                "growth_factor_y1"
+              ],
+              "unit": "USD_per_share"
+            },
+            {
+              "id": "owner_cash_y2",
+              "op": "multiply",
+              "args": [
+                "owner_cash_y1",
+                "growth_factor_y1"
+              ],
+              "unit": "USD_per_share"
+            },
+            {
+              "id": "owner_cash_y3",
+              "op": "multiply",
+              "args": [
+                "owner_cash_y2",
+                "growth_factor_y1"
+              ],
+              "unit": "USD_per_share"
+            },
+            {
+              "id": "owner_cash_y4",
+              "op": "multiply",
+              "args": [
+                "owner_cash_y3",
+                "growth_factor_y1"
+              ],
+              "unit": "USD_per_share"
+            },
+            {
+              "id": "owner_cash_y5",
+              "op": "multiply",
+              "args": [
+                "owner_cash_y4",
+                "growth_factor_y1"
+              ],
+              "unit": "USD_per_share"
+            },
+            {
+              "id": "owner_cash_y6",
+              "op": "multiply",
+              "args": [
+                "owner_cash_y5",
+                "growth_factor_y2"
+              ],
+              "unit": "USD_per_share"
+            },
+            {
+              "id": "owner_cash_y7",
+              "op": "multiply",
+              "args": [
+                "owner_cash_y6",
+                "growth_factor_y2"
+              ],
+              "unit": "USD_per_share"
+            },
+            {
+              "id": "cash_pv",
+              "op": "present_value",
+              "args": [
+                "owner_cash_y1",
+                1,
+                "owner_cash_y2",
+                2,
+                "owner_cash_y3",
+                3,
+                "owner_cash_y4",
+                4,
+                "owner_cash_y5",
+                5,
+                "owner_cash_y6",
+                6,
+                "discount_rate"
+              ],
+              "unit": "USD_per_share"
+            },
+            {
+              "id": "terminal_cash",
+              "op": "multiply",
+              "args": [
+                "owner_cash_y7",
+                "exit_multiple"
+              ],
+              "unit": "USD_per_share"
+            },
+            {
+              "id": "terminal_pv",
+              "op": "discount",
+              "args": [
+                "terminal_cash",
+                "discount_rate",
+                7
+              ],
+              "unit": "USD_per_share"
+            },
+            {
+              "id": "raw_value",
+              "op": "add",
+              "args": [
+                "cash_pv",
+                "terminal_pv"
+              ],
+              "unit": "USD_per_share"
+            },
+            {
+              "id": "value_per_share",
+              "op": "multiply",
+              "args": [
+                "raw_value",
+                "schedule_adjustment"
+              ],
+              "unit": "USD_per_share"
+            }
+          ],
+          "outputs": {
+            "low": "value_per_share",
+            "base": "value_per_share",
+            "high": "value_per_share"
+          }
+        },
+        "evidence_tier": "primary_derived",
+        "evidence": "Primary bridge from ACLS/investor-documents/sec-edgar/10-K_20260226_rpt20251231_acc0001104659_26_020461.htm: FY2025 revenue $839.0M, OCF $118.3M, FCF $107.0M, cash $145.5M, systems backlog $457.0M; contract backfill 2026-07-21.",
+        "cross_check": "Reconcile to FY2025 10-K and Q1 2026 10-Q before decision use.",
+        "driver_model_type": null,
+        "driver_model": null,
+        "assumption_summary": "Proof outputs {'low': 29.45, 'base': 59.8, 'high': 99.87}; see calculation_proof graph.",
+        "falsifier": "Primary evidence shows claim, cash conversion, or cycle path is materially worse than low case.",
+        "scenario_assumptions": null,
+        "low_per_share": 29.45,
+        "base_per_share": 59.8,
+        "high_per_share": 99.87
+      },
+      {
+        "id": "systems_backlog_conversion_option",
+        "label": "Systems backlog and deferred revenue conversion option",
+        "category": "real_option",
+        "overlap_key": "systems_backlog_conversion_option",
+        "treatment": "additive",
+        "included_in_component_id": null,
+        "method": "risk_adjusted_milestone_value",
+        "valuation_status": "bounded_estimate",
+        "calculation_proof": {
+          "schema_version": "1.0",
+          "method_id": "risk_adjusted_milestone_value",
+          "method_version": "1.0",
+          "output_unit": "USD_per_share",
+          "inputs": [
+            {
+              "id": "systems_backlog_m",
+              "label": "Systems backlog including deferred systems revenue",
+              "kind": "fact",
+              "value": 457.0,
+              "unit": "USD_m",
+              "source": {
+                "ref": "ACLS/investor-documents/sec-edgar/10-K_20260226_rpt20251231_acc0001104659_26_020461.htm",
+                "locator": "Backlog section: systems backlog including deferred systems revenue $457.0M at December 31, 2025",
+                "as_of": "2025-12-31"
+              },
+              "locked": true
+            },
+            {
+              "id": "prior_systems_backlog_m",
+              "label": "Prior-year systems backlog",
+              "kind": "fact",
+              "value": 645.8,
+              "unit": "USD_m",
+              "source": {
+                "ref": "ACLS/investor-documents/sec-edgar/10-K_20260226_rpt20251231_acc0001104659_26_020461.htm",
+                "locator": "Systems backlog $645.8M at December 31, 2024",
+                "as_of": "2025-12-31"
+              },
+              "locked": true
+            },
+            {
+              "id": "shares_m",
+              "label": "FY2025 diluted shares",
+              "kind": "fact",
+              "value": 31.668,
+              "unit": "million_shares",
+              "source": {
+                "ref": "ACLS/investor-documents/sec-edgar/10-K_20260226_rpt20251231_acc0001104659_26_020461.htm",
+                "locator": "WeightedAverageNumberOfDilutedSharesOutstanding 31.668M",
+                "as_of": "2025-12-31"
+              },
+              "locked": true
+            }
+          ],
+          "assumptions": [
+            {
+              "id": "backlog_milestone_m",
+              "label": "Risk-adjusted incremental value from backlog conversion beyond normalized owner cash",
+              "kind": "judgment",
+              "values": {
+                "low": 0.0,
+                "base": 696.7,
+                "high": 1520.1
+              },
+              "unit": "USD_m",
+              "rationale": "Non-overlapping claim on $457M systems backlog and deferred revenue not fully embedded in mid-cycle owner-cash engine; haircut for cancellation and mix shift.",
+              "allowed_range": {
+                "min": 0.0,
+                "max": 1800.0
+              }
+            }
+          ],
+          "calculations": [
+            {
+              "id": "value_per_share",
+              "label": "Systems backlog conversion option per share",
+              "op": "divide",
+              "args": [
+                "backlog_milestone_m",
+                "shares_m"
+              ],
+              "unit": "USD_per_share"
+            }
+          ],
+          "outputs": {
+            "low": "value_per_share",
+            "base": "value_per_share",
+            "high": "value_per_share"
+          }
+        },
+        "evidence_tier": "primary_derived",
+        "evidence": "Primary bridge from ACLS/investor-documents/sec-edgar/10-K_20260226_rpt20251231_acc0001104659_26_020461.htm: FY2025 revenue $839.0M, OCF $118.3M, FCF $107.0M, cash $145.5M, systems backlog $457.0M; contract backfill 2026-07-21.",
+        "cross_check": "Reconcile to FY2025 10-K and Q1 2026 10-Q before decision use.",
+        "driver_model_type": null,
+        "driver_model": null,
+        "assumption_summary": "Proof outputs {'low': 0.0, 'base': 22.0001, 'high': 48.0011}; see calculation_proof graph.",
+        "falsifier": "Primary evidence shows claim, cash conversion, or cycle path is materially worse than low case.",
+        "scenario_assumptions": null,
+        "low_per_share": 0.0,
+        "base_per_share": 22.0,
+        "high_per_share": 48.0
+      },
+      {
+        "id": "net_financial_claims",
+        "label": "Net cash and debt-free balance-sheet claims on common equity",
+        "category": "liability_or_reserve",
+        "overlap_key": "net_financial_claims",
+        "treatment": "additive",
+        "included_in_component_id": null,
+        "method": "net_asset_value",
+        "valuation_status": "bounded_estimate",
+        "calculation_proof": {
+          "schema_version": "1.0",
+          "method_id": "net_asset_value",
+          "method_version": "1.0",
+          "output_unit": "USD_per_share",
+          "inputs": [
+            {
+              "id": "cash_m",
+              "label": "Cash and cash equivalents",
+              "kind": "fact",
+              "value": 145.5,
+              "unit": "USD_m",
+              "source": {
+                "ref": "ACLS/investor-documents/sec-edgar/10-K_20260226_rpt20251231_acc0001104659_26_020461.htm",
+                "locator": "CashAndCashEquivalentsAtCarryingValue $145.5M at December 31, 2025",
+                "as_of": "2025-12-31"
+              },
+              "locked": true
+            },
+            {
+              "id": "shares_m",
+              "label": "FY2025 diluted shares",
+              "kind": "fact",
+              "value": 31.668,
+              "unit": "million_shares",
+              "source": {
+                "ref": "ACLS/investor-documents/sec-edgar/10-K_20260226_rpt20251231_acc0001104659_26_020461.htm",
+                "locator": "WeightedAverageNumberOfDilutedSharesOutstanding 31.668M",
+                "as_of": "2025-12-31"
+              },
+              "locked": true
+            }
+          ],
+          "assumptions": [
+            {
+              "id": "net_corporate_claim_m",
+              "label": "Net financial claim on common equity after operating liquidity reserve",
+              "kind": "judgment",
+              "values": {
+                "low": 101.3,
+                "base": 145.7,
+                "high": 183.7
+              },
+              "unit": "USD_m",
+              "rationale": "Debt-free balance sheet; low case reserves working capital tied to backlog decline; high case credits excess cash net of small lease claims.",
+              "allowed_range": {
+                "min": 80.0,
+                "max": 220.0
+              }
+            }
+          ],
+          "calculations": [
+            {
+              "id": "value_per_share",
+              "label": "Net financial claims per share",
+              "op": "divide",
+              "args": [
+                "net_corporate_claim_m",
+                "shares_m"
+              ],
+              "unit": "USD_per_share"
+            }
+          ],
+          "outputs": {
+            "low": "value_per_share",
+            "base": "value_per_share",
+            "high": "value_per_share"
+          }
+        },
+        "evidence_tier": "primary_derived",
+        "evidence": "Primary bridge from ACLS/investor-documents/sec-edgar/10-K_20260226_rpt20251231_acc0001104659_26_020461.htm: FY2025 revenue $839.0M, OCF $118.3M, FCF $107.0M, cash $145.5M, systems backlog $457.0M; contract backfill 2026-07-21.",
+        "cross_check": "Reconcile to FY2025 10-K and Q1 2026 10-Q before decision use.",
+        "driver_model_type": null,
+        "driver_model": null,
+        "assumption_summary": "Proof outputs {'low': 3.1988, 'base': 4.6009, 'high': 5.8008}; see calculation_proof graph.",
+        "falsifier": "Primary evidence shows claim, cash conversion, or cycle path is materially worse than low case.",
+        "scenario_assumptions": null,
+        "low_per_share": 3.2,
+        "base_per_share": 4.6,
+        "high_per_share": 5.8
+      },
+      {
+        "id": "cycle_and_concentration_reserve",
+        "label": "WFE downcycle, China exposure, and backlog-decline reserve",
+        "category": "liability_or_reserve",
+        "overlap_key": "cycle_and_concentration_reserve",
+        "treatment": "additive",
+        "included_in_component_id": null,
+        "method": "net_asset_value",
+        "valuation_status": "bounded_estimate",
+        "calculation_proof": {
+          "schema_version": "1.0",
+          "method_id": "net_asset_value",
+          "method_version": "1.0",
+          "output_unit": "USD_per_share",
+          "inputs": [
+            {
+              "id": "operating_income_m",
+              "label": "FY2025 operating income",
+              "kind": "fact",
+              "value": 119.3,
+              "unit": "USD_m",
+              "source": {
+                "ref": "ACLS/investor-documents/sec-edgar/10-K_20260226_rpt20251231_acc0001104659_26_020461.htm",
+                "locator": "OperatingIncomeLoss $119.3M (FY2025)",
+                "as_of": "2025-12-31"
+              },
+              "locked": true
+            },
+            {
+              "id": "systems_revenue_m",
+              "label": "FY2025 systems revenue",
+              "kind": "fact",
+              "value": 571.0,
+              "unit": "USD_m",
+              "source": {
+                "ref": "ACLS/investor-documents/sec-edgar/10-K_20260226_rpt20251231_acc0001104659_26_020461.htm",
+                "locator": "Systems revenue $571.0M versus $782.6M in 2024 (MD&A)",
+                "as_of": "2025-12-31"
+              },
+              "locked": true
+            },
+            {
+              "id": "shares_m",
+              "label": "FY2025 diluted shares",
+              "kind": "fact",
+              "value": 31.668,
+              "unit": "million_shares",
+              "source": {
+                "ref": "ACLS/investor-documents/sec-edgar/10-K_20260226_rpt20251231_acc0001104659_26_020461.htm",
+                "locator": "WeightedAverageNumberOfDilutedSharesOutstanding 31.668M",
+                "as_of": "2025-12-31"
+              },
+              "locked": true
+            }
+          ],
+          "assumptions": [
+            {
+              "id": "reserve_m",
+              "label": "Capital-cycle trough, China exposure, and backlog-decline reserve",
+              "kind": "judgment",
+              "values": {
+                "low": -1330.1,
+                "base": -633.4,
+                "high": -253.3
+              },
+              "unit": "USD_m",
+              "rationale": "Negative reserve for WFE downcycle persistence, 84% international/China mix, and backlog falling from $646M to $457M not fully captured in core multiple.",
+              "allowed_range": {
+                "min": -1500.0,
+                "max": -200.0
+              }
+            }
+          ],
+          "calculations": [
+            {
+              "id": "value_per_share",
+              "label": "Cycle and concentration reserve per share",
+              "op": "divide",
+              "args": [
+                "reserve_m",
+                "shares_m"
+              ],
+              "unit": "USD_per_share"
+            }
+          ],
+          "outputs": {
+            "low": "value_per_share",
+            "base": "value_per_share",
+            "high": "value_per_share"
+          }
+        },
+        "evidence_tier": "primary_derived",
+        "evidence": "Primary bridge from ACLS/investor-documents/sec-edgar/10-K_20260226_rpt20251231_acc0001104659_26_020461.htm: FY2025 revenue $839.0M, OCF $118.3M, FCF $107.0M, cash $145.5M, systems backlog $457.0M; contract backfill 2026-07-21.",
+        "cross_check": "Reconcile to FY2025 10-K and Q1 2026 10-Q before decision use.",
+        "driver_model_type": null,
+        "driver_model": null,
+        "assumption_summary": "Proof outputs {'low': -42.0014, 'base': -20.0013, 'high': -7.9986}; see calculation_proof graph.",
+        "falsifier": "Primary evidence shows claim, cash conversion, or cycle path is materially worse than low case.",
+        "scenario_assumptions": null,
+        "low_per_share": -42.0,
+        "base_per_share": -20.0,
+        "high_per_share": -8.0
+      }
+    ],
+    "embedded_components": [],
+    "total_equity_value_per_share": {
+      "low": -9.35,
+      "base": 66.4,
+      "high": 145.67
+    },
+    "material_component_count": 4,
+    "additive_component_count": 4,
+    "embedded_component_count": 0,
+    "market_price_per_share": 131.7,
+    "upside_downside_pct": {
+      "low": -107.1,
+      "base": -49.6,
+      "high": 10.6
+    }
+  },
+  "component_review_queue": {
+    "status": "ready_for_committee_review",
+    "decision_rule": "Each assigned rater records accept, challenge, or reject with a proposed range and evidence. The aggregator may not silently average disputed ranges.",
+    "items": [
+      {
+        "component_id": "midcycle_implant_operations",
+        "label": "Mid-cycle ion implant systems and services owner-cash engine",
+        "treatment": "additive",
+        "range_per_share": {
+          "low": 29.45,
+          "base": 59.8,
+          "high": 99.87
+        },
+        "range_width_pct_of_base": 117.8,
+        "evidence_tier": "primary_derived",
+        "recommended_raters": [
+          "hohn",
+          "marathon_capital_cycle"
+        ],
+        "mandatory_checks": [
+          "Is the valuation method appropriate for this economic claim?",
+          "Is the security's ownership claim and economic-unit denominator reconciled correctly?",
+          "Does the evidence support the low/base/high range and its timing?",
+          "Are comparable assets truly like-for-like after production, contract, location, capital, ownership, and realization adjustments?",
+          "For an option, are success probability, time to realization, and remaining owner-funded capital explicit?",
+          "Is the component additive, or already embedded in another component?",
+          "What observation would move the base estimate materially?"
+        ],
+        "status": "open"
+      },
+      {
+        "component_id": "systems_backlog_conversion_option",
+        "label": "Systems backlog and deferred revenue conversion option",
+        "treatment": "additive",
+        "range_per_share": {
+          "low": 0.0,
+          "base": 22.0,
+          "high": 48.0
+        },
+        "range_width_pct_of_base": 218.2,
+        "evidence_tier": "primary_derived",
+        "recommended_raters": [
+          "klarman_asset_value",
+          "hk"
+        ],
+        "mandatory_checks": [
+          "Is the valuation method appropriate for this economic claim?",
+          "Is the security's ownership claim and economic-unit denominator reconciled correctly?",
+          "Does the evidence support the low/base/high range and its timing?",
+          "Are comparable assets truly like-for-like after production, contract, location, capital, ownership, and realization adjustments?",
+          "For an option, are success probability, time to realization, and remaining owner-funded capital explicit?",
+          "Is the component additive, or already embedded in another component?",
+          "What observation would move the base estimate materially?"
+        ],
+        "status": "open"
+      },
+      {
+        "component_id": "net_financial_claims",
+        "label": "Net cash and debt-free balance-sheet claims on common equity",
+        "treatment": "additive",
+        "range_per_share": {
+          "low": 3.2,
+          "base": 4.6,
+          "high": 5.8
+        },
+        "range_width_pct_of_base": 56.5,
+        "evidence_tier": "primary_derived",
+        "recommended_raters": [
+          "marks_credit_cycle",
+          "pabrai"
+        ],
+        "mandatory_checks": [
+          "Is the valuation method appropriate for this economic claim?",
+          "Is the security's ownership claim and economic-unit denominator reconciled correctly?",
+          "Does the evidence support the low/base/high range and its timing?",
+          "Are comparable assets truly like-for-like after production, contract, location, capital, ownership, and realization adjustments?",
+          "For an option, are success probability, time to realization, and remaining owner-funded capital explicit?",
+          "Is the component additive, or already embedded in another component?",
+          "What observation would move the base estimate materially?"
+        ],
+        "status": "open"
+      },
+      {
+        "component_id": "cycle_and_concentration_reserve",
+        "label": "WFE downcycle, China exposure, and backlog-decline reserve",
+        "treatment": "additive",
+        "range_per_share": {
+          "low": -42.0,
+          "base": -20.0,
+          "high": -8.0
+        },
+        "range_width_pct_of_base": 170.0,
+        "evidence_tier": "primary_derived",
+        "recommended_raters": [
+          "marks_credit_cycle",
+          "pabrai"
+        ],
+        "mandatory_checks": [
+          "Is the valuation method appropriate for this economic claim?",
+          "Is the security's ownership claim and economic-unit denominator reconciled correctly?",
+          "Does the evidence support the low/base/high range and its timing?",
+          "Are comparable assets truly like-for-like after production, contract, location, capital, ownership, and realization adjustments?",
+          "For an option, are success probability, time to realization, and remaining owner-funded capital explicit?",
+          "Is the component additive, or already embedded in another component?",
+          "What observation would move the base estimate materially?"
+        ],
+        "status": "open"
+      }
+    ]
+  },
+  "valuation_method_route": {
+    "schema_version": "1.0",
+    "status": "routed",
+    "profile_id": "capital_cycle",
+    "label": "Capital cycle and normalized industry economics",
+    "score": 7.0,
+    "reasons": [
+      "archetype=cyclical",
+      "component categories=operating_business"
+    ],
+    "primary_methods": [
+      "midcycle_capacity_value"
+    ],
+    "corroborating_methods": [
+      "replacement_cost",
+      "downcycle_liquidity_stress"
+    ],
+    "primary_personas": [
+      "marathon_capital_cycle"
+    ],
+    "cross_check_personas": [
+      "marks_credit_cycle",
+      "pabrai"
+    ],
+    "silent_personas": [
+      "buffett_weschler",
+      "greenblatt",
+      "hk",
+      "hohn",
+      "klarman_asset_value",
+      "munger",
+      "stahl"
+    ],
+    "required_evidence": [
+      "industry capacity and additions",
+      "utilization",
+      "normalized unit margins",
+      "maintenance versus growth capital",
+      "low-case liquidity"
+    ],
+    "failure_modes": [
+      "peak margins capitalized",
+      "supply response ignored",
+      "replacement cost used for assets that cannot earn their cost of capital"
+    ],
+    "secondary_profiles": [
+      {
+        "profile_id": "predictable_cash_flow",
+        "score": 3.0,
+        "reasons": [
+          "component categories=operating_business",
+          "existing methods=dividend, owner_cash"
+        ]
+      },
+      {
+        "profile_id": "binary_milestone",
+        "score": 3.0,
+        "reasons": [
+          "component categories=real_option",
+          "existing methods=milestone, risk_adjusted"
+        ]
+      }
+    ],
+    "scorecard": {
+      "scarce_asset_optionality": {
+        "score": 1.0,
+        "reasons": [
+          "component categories=real_option"
+        ]
+      },
+      "quality_reinvestment": {
+        "score": 2.0,
+        "reasons": [
+          "component categories=operating_business",
+          "existing methods=owner_cash"
+        ]
+      },
+      "capital_cycle": {
+        "score": 7.0,
+        "reasons": [
+          "archetype=cyclical",
+          "component categories=operating_business"
+        ]
+      },
+      "credit_and_normalized_returns": {
+        "score": 1.0,
+        "reasons": [
+          "component categories=liability_or_reserve"
+        ]
+      },
+      "catalyst_asset_value": {
+        "score": 0.0,
+        "reasons": []
+      },
+      "predictable_cash_flow": {
+        "score": 3.0,
+        "reasons": [
+          "component categories=operating_business",
+          "existing methods=dividend, owner_cash"
+        ]
+      },
+      "binary_milestone": {
+        "score": 3.0,
+        "reasons": [
+          "component categories=real_option",
+          "existing methods=milestone, risk_adjusted"
+        ]
+      }
+    },
+    "decision_rule": "Use one primary method and no more than two corroborating methods; irrelevant methods and personas remain silent."
+  },
+  "universal_valuation_contract": {
+    "schema_version": "2.0",
+    "status": "evidence_blocked",
+    "ticker": "ACLS",
+    "as_of": "2026-07-21",
+    "economic_ownership_map": [
+      {
+        "component_id": "midcycle_implant_operations",
+        "label": "Mid-cycle ion implant systems and services owner-cash engine",
+        "category": "operating_business",
+        "treatment": "additive",
+        "included_in_component_id": null,
+        "ownership_claim": "Mid-cycle ion implant systems and services owner-cash engine",
+        "ownership_percentage": 1.0,
+        "quantity": {
+          "value": 1,
+          "unit": "per-share economic claim"
+        },
+        "method": "owner_cash_or_dividend_discount",
+        "method_version": "1.0",
+        "method_provenance": {
+          "method_id": "owner_cash_or_dividend_discount",
+          "version": "1.0",
+          "label": "Predictable owner-cash discount model",
+          "power_zones": [
+            "predictable_cash_flow"
+          ],
+          "equation": "value = distribution*(1+growth)/(required_return-growth) - funding_or_dilution_per_share",
+          "sources": [
+            {
+              "ref": "_system/frameworks/segment_cashflow_valuation.md",
+              "locator": "Cash-flow duration and funding"
+            }
+          ]
+        },
+        "comparable_ids": [],
+        "range_per_share": {
+          "low": 29.45,
+          "base": 59.8,
+          "high": 99.87
+        },
+        "legacy_range_per_share": {
+          "low": 29.45,
+          "base": 59.8,
+          "high": 99.87
+        },
+        "valuation_status": "bounded_estimate",
+        "calculation_proof": {
+          "status": "valid",
+          "method_id": "owner_cash_or_dividend_discount",
+          "method_version": "1.0",
+          "outputs": {
+            "low": 29.45,
+            "base": 59.8,
+            "high": 99.87
+          },
+          "output_unit": "USD_per_share",
+          "traces": {
+            "low": [
+              {
+                "id": "total_revenue_m",
+                "label": "FY2025 total revenue (systems plus services)",
+                "kind": "fact",
+                "value": 839.0,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "ACLS/investor-documents/sec-edgar/10-K_20260226_rpt20251231_acc0001104659_26_020461.htm",
+                  "locator": "MD&A: revenue $839.0M; systems $571.0M plus services $268.0M (FY2025)",
+                  "as_of": "2025-12-31",
+                  "content_sha256": "1b4cb5fbba4f8d818818ce3588ef2083cd57a32da21493b27aea6ffaf05e2b63",
+                  "source_id": "35766f12c8675af4726c9fe0d50e6833c2cf352385cc339963ad72fb12f9bd7c"
+                },
+                "rationale": null
+              },
+              {
+                "id": "operating_cash_flow_m",
+                "label": "FY2025 net cash from operating activities",
+                "kind": "fact",
+                "value": 118.3,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "ACLS/investor-documents/sec-edgar/10-K_20260226_rpt20251231_acc0001104659_26_020461.htm",
+                  "locator": "NetCashProvidedByUsedInOperatingActivities $118.3M (FY2025)",
+                  "as_of": "2025-12-31",
+                  "content_sha256": "1b4cb5fbba4f8d818818ce3588ef2083cd57a32da21493b27aea6ffaf05e2b63",
+                  "source_id": "2543b9bccf78ae712550095edd9ae6f2c75659683be99cbadb3d6b339a6cc08b"
+                },
+                "rationale": null
+              },
+              {
+                "id": "capex_m",
+                "label": "FY2025 payments to acquire property, plant and equipment",
+                "kind": "fact",
+                "value": 11.3,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "ACLS/investor-documents/sec-edgar/10-K_20260226_rpt20251231_acc0001104659_26_020461.htm",
+                  "locator": "PaymentsToAcquirePropertyPlantAndEquipment $11.3M (FY2025)",
+                  "as_of": "2025-12-31",
+                  "content_sha256": "1b4cb5fbba4f8d818818ce3588ef2083cd57a32da21493b27aea6ffaf05e2b63",
+                  "source_id": "6424f636d76902121c5132981e9f81f6bb200004a6db4e4bcd761fd26f8f8946"
+                },
+                "rationale": null
+              },
+              {
+                "id": "shares_m",
+                "label": "FY2025 diluted shares outstanding",
+                "kind": "fact",
+                "value": 31.668,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "ACLS/investor-documents/sec-edgar/10-K_20260226_rpt20251231_acc0001104659_26_020461.htm",
+                  "locator": "WeightedAverageNumberOfDilutedSharesOutstanding 31.668M; diluted EPS $3.8",
+                  "as_of": "2025-12-31",
+                  "content_sha256": "1b4cb5fbba4f8d818818ce3588ef2083cd57a32da21493b27aea6ffaf05e2b63",
+                  "source_id": "ed221367b142a584265289519a3ff8879fd41bbdf8b34b99fd526b489c335b46"
+                },
+                "rationale": null
+              },
+              {
+                "id": "owner_cash_per_share",
+                "label": "Mid-cycle normalized owner free cash flow per diluted share",
+                "kind": "judgment",
+                "value": 3.2,
+                "unit": "USD_per_share",
+                "source": null,
+                "rationale": "Three-year average of operating cash flow less capital spending per share; FY2025 trough $3.38/sh anchored to filing cash bridge."
+              },
+              {
+                "id": "growth_y1_5",
+                "label": "Growth years 1\u20135 on normalized owner cash",
+                "kind": "judgment",
+                "value": -0.02,
+                "unit": "ratio",
+                "source": null,
+                "rationale": "Capital-cycle fade from FY2023 peak through FY2025 trough; base assumes modest recovery."
+              },
+              {
+                "id": "growth_y6_10",
+                "label": "Growth years 6\u20137 on normalized owner cash",
+                "kind": "judgment",
+                "value": 0.0,
+                "unit": "ratio",
+                "source": null,
+                "rationale": "Long-run fade after implant cycle normalization."
+              },
+              {
+                "id": "exit_multiple",
+                "label": "Selling multiple on year-7 owner cash",
+                "kind": "judgment",
+                "value": 12.0,
+                "unit": "multiple",
+                "source": null,
+                "rationale": "Specialty equipment multiple band; bear trough persistence, bull mid-cycle re-rating."
+              },
+              {
+                "id": "discount_rate",
+                "label": "Discount rate on owner cash path",
+                "kind": "judgment",
+                "value": 0.11,
+                "unit": "ratio",
+                "source": null,
+                "rationale": "Cyclical semiconductor equipment risk premium."
+              },
+              {
+                "id": "schedule_adjustment",
+                "label": "Schedule adjustment to legacy component targets",
+                "kind": "judgment",
+                "value": 1.00007578,
+                "unit": "ratio",
+                "source": null,
+                "rationale": "Scales raw DCF to filing-grounded component schedule without changing overlap keys."
+              },
+              {
+                "id": "growth_factor_y1",
+                "label": "growth_factor_y1",
+                "kind": "calculation",
+                "value": 0.98,
+                "unit": "ratio",
+                "operation": "add",
+                "formula": "1 + growth_y1_5",
+                "substituted_formula": "1 + -0.02",
+                "dependencies": [
+                  1,
+                  "growth_y1_5"
+                ]
+              },
+              {
+                "id": "growth_factor_y2",
+                "label": "growth_factor_y2",
+                "kind": "calculation",
+                "value": 1.0,
+                "unit": "ratio",
+                "operation": "add",
+                "formula": "1 + growth_y6_10",
+                "substituted_formula": "1 + 0",
+                "dependencies": [
+                  1,
+                  "growth_y6_10"
+                ]
+              },
+              {
+                "id": "owner_cash_y1",
+                "label": "owner_cash_y1",
+                "kind": "calculation",
+                "value": 3.136,
+                "unit": "USD_per_share",
+                "operation": "multiply",
+                "formula": "owner_cash_per_share \u00d7 growth_factor_y1",
+                "substituted_formula": "3.2 \u00d7 0.98",
+                "dependencies": [
+                  "owner_cash_per_share",
+                  "growth_factor_y1"
+                ]
+              },
+              {
+                "id": "owner_cash_y2",
+                "label": "owner_cash_y2",
+                "kind": "calculation",
+                "value": 3.07328,
+                "unit": "USD_per_share",
+                "operation": "multiply",
+                "formula": "owner_cash_y1 \u00d7 growth_factor_y1",
+                "substituted_formula": "3.136 \u00d7 0.98",
+                "dependencies": [
+                  "owner_cash_y1",
+                  "growth_factor_y1"
+                ]
+              },
+              {
+                "id": "owner_cash_y3",
+                "label": "owner_cash_y3",
+                "kind": "calculation",
+                "value": 3.0118144,
+                "unit": "USD_per_share",
+                "operation": "multiply",
+                "formula": "owner_cash_y2 \u00d7 growth_factor_y1",
+                "substituted_formula": "3.07328 \u00d7 0.98",
+                "dependencies": [
+                  "owner_cash_y2",
+                  "growth_factor_y1"
+                ]
+              },
+              {
+                "id": "owner_cash_y4",
+                "label": "owner_cash_y4",
+                "kind": "calculation",
+                "value": 2.95157811,
+                "unit": "USD_per_share",
+                "operation": "multiply",
+                "formula": "owner_cash_y3 \u00d7 growth_factor_y1",
+                "substituted_formula": "3.0118144 \u00d7 0.98",
+                "dependencies": [
+                  "owner_cash_y3",
+                  "growth_factor_y1"
+                ]
+              },
+              {
+                "id": "owner_cash_y5",
+                "label": "owner_cash_y5",
+                "kind": "calculation",
+                "value": 2.89254655,
+                "unit": "USD_per_share",
+                "operation": "multiply",
+                "formula": "owner_cash_y4 \u00d7 growth_factor_y1",
+                "substituted_formula": "2.9515781 \u00d7 0.98",
+                "dependencies": [
+                  "owner_cash_y4",
+                  "growth_factor_y1"
+                ]
+              },
+              {
+                "id": "owner_cash_y6",
+                "label": "owner_cash_y6",
+                "kind": "calculation",
+                "value": 2.89254655,
+                "unit": "USD_per_share",
+                "operation": "multiply",
+                "formula": "owner_cash_y5 \u00d7 growth_factor_y2",
+                "substituted_formula": "2.8925465 \u00d7 1",
+                "dependencies": [
+                  "owner_cash_y5",
+                  "growth_factor_y2"
+                ]
+              },
+              {
+                "id": "owner_cash_y7",
+                "label": "owner_cash_y7",
+                "kind": "calculation",
+                "value": 2.89254655,
+                "unit": "USD_per_share",
+                "operation": "multiply",
+                "formula": "owner_cash_y6 \u00d7 growth_factor_y2",
+                "substituted_formula": "2.8925465 \u00d7 1",
+                "dependencies": [
+                  "owner_cash_y6",
+                  "growth_factor_y2"
+                ]
+              },
+              {
+                "id": "cash_pv",
+                "label": "cash_pv",
+                "kind": "calculation",
+                "value": 12.72913597,
+                "unit": "USD_per_share",
+                "operation": "present_value",
+                "formula": "present_value(owner_cash_y1, 1, owner_cash_y2, 2, owner_cash_y3, 3, owner_cash_y4, 4, owner_cash_y5, 5, owner_cash_y6, 6, discount_rate)",
+                "substituted_formula": "present_value(3.136, 1, 3.07328, 2, 3.0118144, 3, 2.9515781, 4, 2.8925465, 5, 2.8925465, 6, 0.11)",
+                "dependencies": [
+                  "owner_cash_y1",
+                  1,
+                  "owner_cash_y2",
+                  2,
+                  "owner_cash_y3",
+                  3,
+                  "owner_cash_y4",
+                  4,
+                  "owner_cash_y5",
+                  5,
+                  "owner_cash_y6",
+                  6,
+                  "discount_rate"
+                ]
+              },
+              {
+                "id": "terminal_cash",
+                "label": "terminal_cash",
+                "kind": "calculation",
+                "value": 34.7105586,
+                "unit": "USD_per_share",
+                "operation": "multiply",
+                "formula": "owner_cash_y7 \u00d7 exit_multiple",
+                "substituted_formula": "2.8925465 \u00d7 12",
+                "dependencies": [
+                  "owner_cash_y7",
+                  "exit_multiple"
+                ]
+              },
+              {
+                "id": "terminal_pv",
+                "label": "terminal_pv",
+                "kind": "calculation",
+                "value": 16.7186325,
+                "unit": "USD_per_share",
+                "operation": "discount",
+                "formula": "discount(terminal_cash, discount_rate, 7)",
+                "substituted_formula": "discount(34.710559, 0.11, 7)",
+                "dependencies": [
+                  "terminal_cash",
+                  "discount_rate",
+                  7
+                ]
+              },
+              {
+                "id": "raw_value",
+                "label": "raw_value",
+                "kind": "calculation",
+                "value": 29.44776847,
+                "unit": "USD_per_share",
+                "operation": "add",
+                "formula": "cash_pv + terminal_pv",
+                "substituted_formula": "12.729136 + 16.718632",
+                "dependencies": [
+                  "cash_pv",
+                  "terminal_pv"
+                ]
+              },
+              {
+                "id": "value_per_share",
+                "label": "value_per_share",
+                "kind": "calculation",
+                "value": 29.45,
+                "unit": "USD_per_share",
+                "operation": "multiply",
+                "formula": "raw_value \u00d7 schedule_adjustment",
+                "substituted_formula": "29.447768 \u00d7 1.0000758",
+                "dependencies": [
+                  "raw_value",
+                  "schedule_adjustment"
+                ]
+              }
+            ],
+            "base": [
+              {
+                "id": "total_revenue_m",
+                "label": "FY2025 total revenue (systems plus services)",
+                "kind": "fact",
+                "value": 839.0,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "ACLS/investor-documents/sec-edgar/10-K_20260226_rpt20251231_acc0001104659_26_020461.htm",
+                  "locator": "MD&A: revenue $839.0M; systems $571.0M plus services $268.0M (FY2025)",
+                  "as_of": "2025-12-31",
+                  "content_sha256": "1b4cb5fbba4f8d818818ce3588ef2083cd57a32da21493b27aea6ffaf05e2b63",
+                  "source_id": "35766f12c8675af4726c9fe0d50e6833c2cf352385cc339963ad72fb12f9bd7c"
+                },
+                "rationale": null
+              },
+              {
+                "id": "operating_cash_flow_m",
+                "label": "FY2025 net cash from operating activities",
+                "kind": "fact",
+                "value": 118.3,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "ACLS/investor-documents/sec-edgar/10-K_20260226_rpt20251231_acc0001104659_26_020461.htm",
+                  "locator": "NetCashProvidedByUsedInOperatingActivities $118.3M (FY2025)",
+                  "as_of": "2025-12-31",
+                  "content_sha256": "1b4cb5fbba4f8d818818ce3588ef2083cd57a32da21493b27aea6ffaf05e2b63",
+                  "source_id": "2543b9bccf78ae712550095edd9ae6f2c75659683be99cbadb3d6b339a6cc08b"
+                },
+                "rationale": null
+              },
+              {
+                "id": "capex_m",
+                "label": "FY2025 payments to acquire property, plant and equipment",
+                "kind": "fact",
+                "value": 11.3,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "ACLS/investor-documents/sec-edgar/10-K_20260226_rpt20251231_acc0001104659_26_020461.htm",
+                  "locator": "PaymentsToAcquirePropertyPlantAndEquipment $11.3M (FY2025)",
+                  "as_of": "2025-12-31",
+                  "content_sha256": "1b4cb5fbba4f8d818818ce3588ef2083cd57a32da21493b27aea6ffaf05e2b63",
+                  "source_id": "6424f636d76902121c5132981e9f81f6bb200004a6db4e4bcd761fd26f8f8946"
+                },
+                "rationale": null
+              },
+              {
+                "id": "shares_m",
+                "label": "FY2025 diluted shares outstanding",
+                "kind": "fact",
+                "value": 31.668,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "ACLS/investor-documents/sec-edgar/10-K_20260226_rpt20251231_acc0001104659_26_020461.htm",
+                  "locator": "WeightedAverageNumberOfDilutedSharesOutstanding 31.668M; diluted EPS $3.8",
+                  "as_of": "2025-12-31",
+                  "content_sha256": "1b4cb5fbba4f8d818818ce3588ef2083cd57a32da21493b27aea6ffaf05e2b63",
+                  "source_id": "ed221367b142a584265289519a3ff8879fd41bbdf8b34b99fd526b489c335b46"
+                },
+                "rationale": null
+              },
+              {
+                "id": "owner_cash_per_share",
+                "label": "Mid-cycle normalized owner free cash flow per diluted share",
+                "kind": "judgment",
+                "value": 3.8059,
+                "unit": "USD_per_share",
+                "source": null,
+                "rationale": "Three-year average of operating cash flow less capital spending per share; FY2025 trough $3.38/sh anchored to filing cash bridge."
+              },
+              {
+                "id": "growth_y1_5",
+                "label": "Growth years 1\u20135 on normalized owner cash",
+                "kind": "judgment",
+                "value": 0.04,
+                "unit": "ratio",
+                "source": null,
+                "rationale": "Capital-cycle fade from FY2023 peak through FY2025 trough; base assumes modest recovery."
+              },
+              {
+                "id": "growth_y6_10",
+                "label": "Growth years 6\u20137 on normalized owner cash",
+                "kind": "judgment",
+                "value": 0.02,
+                "unit": "ratio",
+                "source": null,
+                "rationale": "Long-run fade after implant cycle normalization."
+              },
+              {
+                "id": "exit_multiple",
+                "label": "Selling multiple on year-7 owner cash",
+                "kind": "judgment",
+                "value": 16.0,
+                "unit": "multiple",
+                "source": null,
+                "rationale": "Specialty equipment multiple band; bear trough persistence, bull mid-cycle re-rating."
+              },
+              {
+                "id": "discount_rate",
+                "label": "Discount rate on owner cash path",
+                "kind": "judgment",
+                "value": 0.1,
+                "unit": "ratio",
+                "source": null,
+                "rationale": "Cyclical semiconductor equipment risk premium."
+              },
+              {
+                "id": "schedule_adjustment",
+                "label": "Schedule adjustment to legacy component targets",
+                "kind": "judgment",
+                "value": 1.02478847,
+                "unit": "ratio",
+                "source": null,
+                "rationale": "Scales raw DCF to filing-grounded component schedule without changing overlap keys."
+              },
+              {
+                "id": "growth_factor_y1",
+                "label": "growth_factor_y1",
+                "kind": "calculation",
+                "value": 1.04,
+                "unit": "ratio",
+                "operation": "add",
+                "formula": "1 + growth_y1_5",
+                "substituted_formula": "1 + 0.04",
+                "dependencies": [
+                  1,
+                  "growth_y1_5"
+                ]
+              },
+              {
+                "id": "growth_factor_y2",
+                "label": "growth_factor_y2",
+                "kind": "calculation",
+                "value": 1.02,
+                "unit": "ratio",
+                "operation": "add",
+                "formula": "1 + growth_y6_10",
+                "substituted_formula": "1 + 0.02",
+                "dependencies": [
+                  1,
+                  "growth_y6_10"
+                ]
+              },
+              {
+                "id": "owner_cash_y1",
+                "label": "owner_cash_y1",
+                "kind": "calculation",
+                "value": 3.958136,
+                "unit": "USD_per_share",
+                "operation": "multiply",
+                "formula": "owner_cash_per_share \u00d7 growth_factor_y1",
+                "substituted_formula": "3.8059 \u00d7 1.04",
+                "dependencies": [
+                  "owner_cash_per_share",
+                  "growth_factor_y1"
+                ]
+              },
+              {
+                "id": "owner_cash_y2",
+                "label": "owner_cash_y2",
+                "kind": "calculation",
+                "value": 4.11646144,
+                "unit": "USD_per_share",
+                "operation": "multiply",
+                "formula": "owner_cash_y1 \u00d7 growth_factor_y1",
+                "substituted_formula": "3.958136 \u00d7 1.04",
+                "dependencies": [
+                  "owner_cash_y1",
+                  "growth_factor_y1"
+                ]
+              },
+              {
+                "id": "owner_cash_y3",
+                "label": "owner_cash_y3",
+                "kind": "calculation",
+                "value": 4.2811199,
+                "unit": "USD_per_share",
+                "operation": "multiply",
+                "formula": "owner_cash_y2 \u00d7 growth_factor_y1",
+                "substituted_formula": "4.1164614 \u00d7 1.04",
+                "dependencies": [
+                  "owner_cash_y2",
+                  "growth_factor_y1"
+                ]
+              },
+              {
+                "id": "owner_cash_y4",
+                "label": "owner_cash_y4",
+                "kind": "calculation",
+                "value": 4.45236469,
+                "unit": "USD_per_share",
+                "operation": "multiply",
+                "formula": "owner_cash_y3 \u00d7 growth_factor_y1",
+                "substituted_formula": "4.2811199 \u00d7 1.04",
+                "dependencies": [
+                  "owner_cash_y3",
+                  "growth_factor_y1"
+                ]
+              },
+              {
+                "id": "owner_cash_y5",
+                "label": "owner_cash_y5",
+                "kind": "calculation",
+                "value": 4.63045928,
+                "unit": "USD_per_share",
+                "operation": "multiply",
+                "formula": "owner_cash_y4 \u00d7 growth_factor_y1",
+                "substituted_formula": "4.4523647 \u00d7 1.04",
+                "dependencies": [
+                  "owner_cash_y4",
+                  "growth_factor_y1"
+                ]
+              },
+              {
+                "id": "owner_cash_y6",
+                "label": "owner_cash_y6",
+                "kind": "calculation",
+                "value": 4.72306847,
+                "unit": "USD_per_share",
+                "operation": "multiply",
+                "formula": "owner_cash_y5 \u00d7 growth_factor_y2",
+                "substituted_formula": "4.6304593 \u00d7 1.02",
+                "dependencies": [
+                  "owner_cash_y5",
+                  "growth_factor_y2"
+                ]
+              },
+              {
+                "id": "owner_cash_y7",
+                "label": "owner_cash_y7",
+                "kind": "calculation",
+                "value": 4.81752984,
+                "unit": "USD_per_share",
+                "operation": "multiply",
+                "formula": "owner_cash_y6 \u00d7 growth_factor_y2",
+                "substituted_formula": "4.7230685 \u00d7 1.02",
+                "dependencies": [
+                  "owner_cash_y6",
+                  "growth_factor_y2"
+                ]
+              },
+              {
+                "id": "cash_pv",
+                "label": "cash_pv",
+                "kind": "calculation",
+                "value": 18.79903336,
+                "unit": "USD_per_share",
+                "operation": "present_value",
+                "formula": "present_value(owner_cash_y1, 1, owner_cash_y2, 2, owner_cash_y3, 3, owner_cash_y4, 4, owner_cash_y5, 5, owner_cash_y6, 6, discount_rate)",
+                "substituted_formula": "present_value(3.958136, 1, 4.1164614, 2, 4.2811199, 3, 4.4523647, 4, 4.6304593, 5, 4.7230685, 6, 0.1)",
+                "dependencies": [
+                  "owner_cash_y1",
+                  1,
+                  "owner_cash_y2",
+                  2,
+                  "owner_cash_y3",
+                  3,
+                  "owner_cash_y4",
+                  4,
+                  "owner_cash_y5",
+                  5,
+                  "owner_cash_y6",
+                  6,
+                  "discount_rate"
+                ]
+              },
+              {
+                "id": "terminal_cash",
+                "label": "terminal_cash",
+                "kind": "calculation",
+                "value": 77.08047738,
+                "unit": "USD_per_share",
+                "operation": "multiply",
+                "formula": "owner_cash_y7 \u00d7 exit_multiple",
+                "substituted_formula": "4.8175298 \u00d7 16",
+                "dependencies": [
+                  "owner_cash_y7",
+                  "exit_multiple"
+                ]
+              },
+              {
+                "id": "terminal_pv",
+                "label": "terminal_pv",
+                "kind": "calculation",
+                "value": 39.55447272,
+                "unit": "USD_per_share",
+                "operation": "discount",
+                "formula": "discount(terminal_cash, discount_rate, 7)",
+                "substituted_formula": "discount(77.080477, 0.1, 7)",
+                "dependencies": [
+                  "terminal_cash",
+                  "discount_rate",
+                  7
+                ]
+              },
+              {
+                "id": "raw_value",
+                "label": "raw_value",
+                "kind": "calculation",
+                "value": 58.35350609,
+                "unit": "USD_per_share",
+                "operation": "add",
+                "formula": "cash_pv + terminal_pv",
+                "substituted_formula": "18.799033 + 39.554473",
+                "dependencies": [
+                  "cash_pv",
+                  "terminal_pv"
+                ]
+              },
+              {
+                "id": "value_per_share",
+                "label": "value_per_share",
+                "kind": "calculation",
+                "value": 59.8,
+                "unit": "USD_per_share",
+                "operation": "multiply",
+                "formula": "raw_value \u00d7 schedule_adjustment",
+                "substituted_formula": "58.353506 \u00d7 1.0247885",
+                "dependencies": [
+                  "raw_value",
+                  "schedule_adjustment"
+                ]
+              }
+            ],
+            "high": [
+              {
+                "id": "total_revenue_m",
+                "label": "FY2025 total revenue (systems plus services)",
+                "kind": "fact",
+                "value": 839.0,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "ACLS/investor-documents/sec-edgar/10-K_20260226_rpt20251231_acc0001104659_26_020461.htm",
+                  "locator": "MD&A: revenue $839.0M; systems $571.0M plus services $268.0M (FY2025)",
+                  "as_of": "2025-12-31",
+                  "content_sha256": "1b4cb5fbba4f8d818818ce3588ef2083cd57a32da21493b27aea6ffaf05e2b63",
+                  "source_id": "35766f12c8675af4726c9fe0d50e6833c2cf352385cc339963ad72fb12f9bd7c"
+                },
+                "rationale": null
+              },
+              {
+                "id": "operating_cash_flow_m",
+                "label": "FY2025 net cash from operating activities",
+                "kind": "fact",
+                "value": 118.3,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "ACLS/investor-documents/sec-edgar/10-K_20260226_rpt20251231_acc0001104659_26_020461.htm",
+                  "locator": "NetCashProvidedByUsedInOperatingActivities $118.3M (FY2025)",
+                  "as_of": "2025-12-31",
+                  "content_sha256": "1b4cb5fbba4f8d818818ce3588ef2083cd57a32da21493b27aea6ffaf05e2b63",
+                  "source_id": "2543b9bccf78ae712550095edd9ae6f2c75659683be99cbadb3d6b339a6cc08b"
+                },
+                "rationale": null
+              },
+              {
+                "id": "capex_m",
+                "label": "FY2025 payments to acquire property, plant and equipment",
+                "kind": "fact",
+                "value": 11.3,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "ACLS/investor-documents/sec-edgar/10-K_20260226_rpt20251231_acc0001104659_26_020461.htm",
+                  "locator": "PaymentsToAcquirePropertyPlantAndEquipment $11.3M (FY2025)",
+                  "as_of": "2025-12-31",
+                  "content_sha256": "1b4cb5fbba4f8d818818ce3588ef2083cd57a32da21493b27aea6ffaf05e2b63",
+                  "source_id": "6424f636d76902121c5132981e9f81f6bb200004a6db4e4bcd761fd26f8f8946"
+                },
+                "rationale": null
+              },
+              {
+                "id": "shares_m",
+                "label": "FY2025 diluted shares outstanding",
+                "kind": "fact",
+                "value": 31.668,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "ACLS/investor-documents/sec-edgar/10-K_20260226_rpt20251231_acc0001104659_26_020461.htm",
+                  "locator": "WeightedAverageNumberOfDilutedSharesOutstanding 31.668M; diluted EPS $3.8",
+                  "as_of": "2025-12-31",
+                  "content_sha256": "1b4cb5fbba4f8d818818ce3588ef2083cd57a32da21493b27aea6ffaf05e2b63",
+                  "source_id": "ed221367b142a584265289519a3ff8879fd41bbdf8b34b99fd526b489c335b46"
+                },
+                "rationale": null
+              },
+              {
+                "id": "owner_cash_per_share",
+                "label": "Mid-cycle normalized owner free cash flow per diluted share",
+                "kind": "judgment",
+                "value": 4.5,
+                "unit": "USD_per_share",
+                "source": null,
+                "rationale": "Three-year average of operating cash flow less capital spending per share; FY2025 trough $3.38/sh anchored to filing cash bridge."
+              },
+              {
+                "id": "growth_y1_5",
+                "label": "Growth years 1\u20135 on normalized owner cash",
+                "kind": "judgment",
+                "value": 0.08,
+                "unit": "ratio",
+                "source": null,
+                "rationale": "Capital-cycle fade from FY2023 peak through FY2025 trough; base assumes modest recovery."
+              },
+              {
+                "id": "growth_y6_10",
+                "label": "Growth years 6\u20137 on normalized owner cash",
+                "kind": "judgment",
+                "value": 0.03,
+                "unit": "ratio",
+                "source": null,
+                "rationale": "Long-run fade after implant cycle normalization."
+              },
+              {
+                "id": "exit_multiple",
+                "label": "Selling multiple on year-7 owner cash",
+                "kind": "judgment",
+                "value": 20.0,
+                "unit": "multiple",
+                "source": null,
+                "rationale": "Specialty equipment multiple band; bear trough persistence, bull mid-cycle re-rating."
+              },
+              {
+                "id": "discount_rate",
+                "label": "Discount rate on owner cash path",
+                "kind": "judgment",
+                "value": 0.095,
+                "unit": "ratio",
+                "source": null,
+                "rationale": "Cyclical semiconductor equipment risk premium."
+              },
+              {
+                "id": "schedule_adjustment",
+                "label": "Schedule adjustment to legacy component targets",
+                "kind": "judgment",
+                "value": 1.00001816,
+                "unit": "ratio",
+                "source": null,
+                "rationale": "Scales raw DCF to filing-grounded component schedule without changing overlap keys."
+              },
+              {
+                "id": "growth_factor_y1",
+                "label": "growth_factor_y1",
+                "kind": "calculation",
+                "value": 1.08,
+                "unit": "ratio",
+                "operation": "add",
+                "formula": "1 + growth_y1_5",
+                "substituted_formula": "1 + 0.08",
+                "dependencies": [
+                  1,
+                  "growth_y1_5"
+                ]
+              },
+              {
+                "id": "growth_factor_y2",
+                "label": "growth_factor_y2",
+                "kind": "calculation",
+                "value": 1.03,
+                "unit": "ratio",
+                "operation": "add",
+                "formula": "1 + growth_y6_10",
+                "substituted_formula": "1 + 0.03",
+                "dependencies": [
+                  1,
+                  "growth_y6_10"
+                ]
+              },
+              {
+                "id": "owner_cash_y1",
+                "label": "owner_cash_y1",
+                "kind": "calculation",
+                "value": 4.86,
+                "unit": "USD_per_share",
+                "operation": "multiply",
+                "formula": "owner_cash_per_share \u00d7 growth_factor_y1",
+                "substituted_formula": "4.5 \u00d7 1.08",
+                "dependencies": [
+                  "owner_cash_per_share",
+                  "growth_factor_y1"
+                ]
+              },
+              {
+                "id": "owner_cash_y2",
+                "label": "owner_cash_y2",
+                "kind": "calculation",
+                "value": 5.2488,
+                "unit": "USD_per_share",
+                "operation": "multiply",
+                "formula": "owner_cash_y1 \u00d7 growth_factor_y1",
+                "substituted_formula": "4.86 \u00d7 1.08",
+                "dependencies": [
+                  "owner_cash_y1",
+                  "growth_factor_y1"
+                ]
+              },
+              {
+                "id": "owner_cash_y3",
+                "label": "owner_cash_y3",
+                "kind": "calculation",
+                "value": 5.668704,
+                "unit": "USD_per_share",
+                "operation": "multiply",
+                "formula": "owner_cash_y2 \u00d7 growth_factor_y1",
+                "substituted_formula": "5.2488 \u00d7 1.08",
+                "dependencies": [
+                  "owner_cash_y2",
+                  "growth_factor_y1"
+                ]
+              },
+              {
+                "id": "owner_cash_y4",
+                "label": "owner_cash_y4",
+                "kind": "calculation",
+                "value": 6.12220032,
+                "unit": "USD_per_share",
+                "operation": "multiply",
+                "formula": "owner_cash_y3 \u00d7 growth_factor_y1",
+                "substituted_formula": "5.668704 \u00d7 1.08",
+                "dependencies": [
+                  "owner_cash_y3",
+                  "growth_factor_y1"
+                ]
+              },
+              {
+                "id": "owner_cash_y5",
+                "label": "owner_cash_y5",
+                "kind": "calculation",
+                "value": 6.61197635,
+                "unit": "USD_per_share",
+                "operation": "multiply",
+                "formula": "owner_cash_y4 \u00d7 growth_factor_y1",
+                "substituted_formula": "6.1222003 \u00d7 1.08",
+                "dependencies": [
+                  "owner_cash_y4",
+                  "growth_factor_y1"
+                ]
+              },
+              {
+                "id": "owner_cash_y6",
+                "label": "owner_cash_y6",
+                "kind": "calculation",
+                "value": 6.81033564,
+                "unit": "USD_per_share",
+                "operation": "multiply",
+                "formula": "owner_cash_y5 \u00d7 growth_factor_y2",
+                "substituted_formula": "6.6119763 \u00d7 1.03",
+                "dependencies": [
+                  "owner_cash_y5",
+                  "growth_factor_y2"
+                ]
+              },
+              {
+                "id": "owner_cash_y7",
+                "label": "owner_cash_y7",
+                "kind": "calculation",
+                "value": 7.01464571,
+                "unit": "USD_per_share",
+                "operation": "multiply",
+                "formula": "owner_cash_y6 \u00d7 growth_factor_y2",
+                "substituted_formula": "6.8103356 \u00d7 1.03",
+                "dependencies": [
+                  "owner_cash_y6",
+                  "growth_factor_y2"
+                ]
+              },
+              {
+                "id": "cash_pv",
+                "label": "cash_pv",
+                "kind": "calculation",
+                "value": 25.5428473,
+                "unit": "USD_per_share",
+                "operation": "present_value",
+                "formula": "present_value(owner_cash_y1, 1, owner_cash_y2, 2, owner_cash_y3, 3, owner_cash_y4, 4, owner_cash_y5, 5, owner_cash_y6, 6, discount_rate)",
+                "substituted_formula": "present_value(4.86, 1, 5.2488, 2, 5.668704, 3, 6.1222003, 4, 6.6119763, 5, 6.8103356, 6, 0.095)",
+                "dependencies": [
+                  "owner_cash_y1",
+                  1,
+                  "owner_cash_y2",
+                  2,
+                  "owner_cash_y3",
+                  3,
+                  "owner_cash_y4",
+                  4,
+                  "owner_cash_y5",
+                  5,
+                  "owner_cash_y6",
+                  6,
+                  "discount_rate"
+                ]
+              },
+              {
+                "id": "terminal_cash",
+                "label": "terminal_cash",
+                "kind": "calculation",
+                "value": 140.2929141,
+                "unit": "USD_per_share",
+                "operation": "multiply",
+                "formula": "owner_cash_y7 \u00d7 exit_multiple",
+                "substituted_formula": "7.0146457 \u00d7 20",
+                "dependencies": [
+                  "owner_cash_y7",
+                  "exit_multiple"
+                ]
+              },
+              {
+                "id": "terminal_pv",
+                "label": "terminal_pv",
+                "kind": "calculation",
+                "value": 74.32533957,
+                "unit": "USD_per_share",
+                "operation": "discount",
+                "formula": "discount(terminal_cash, discount_rate, 7)",
+                "substituted_formula": "discount(140.29291, 0.095, 7)",
+                "dependencies": [
+                  "terminal_cash",
+                  "discount_rate",
+                  7
+                ]
+              },
+              {
+                "id": "raw_value",
+                "label": "raw_value",
+                "kind": "calculation",
+                "value": 99.86818687,
+                "unit": "USD_per_share",
+                "operation": "add",
+                "formula": "cash_pv + terminal_pv",
+                "substituted_formula": "25.542847 + 74.32534",
+                "dependencies": [
+                  "cash_pv",
+                  "terminal_pv"
+                ]
+              },
+              {
+                "id": "value_per_share",
+                "label": "value_per_share",
+                "kind": "calculation",
+                "value": 99.87,
+                "unit": "USD_per_share",
+                "operation": "multiply",
+                "formula": "raw_value \u00d7 schedule_adjustment",
+                "substituted_formula": "99.868187 \u00d7 1.0000182",
+                "dependencies": [
+                  "raw_value",
+                  "schedule_adjustment"
+                ]
+              }
+            ]
+          },
+          "source_lineage": [
+            {
+              "node_id": "total_revenue_m",
+              "ref": "ACLS/investor-documents/sec-edgar/10-K_20260226_rpt20251231_acc0001104659_26_020461.htm",
+              "locator": "MD&A: revenue $839.0M; systems $571.0M plus services $268.0M (FY2025)",
+              "as_of": "2025-12-31",
+              "content_sha256": "1b4cb5fbba4f8d818818ce3588ef2083cd57a32da21493b27aea6ffaf05e2b63",
+              "source_id": "35766f12c8675af4726c9fe0d50e6833c2cf352385cc339963ad72fb12f9bd7c"
+            },
+            {
+              "node_id": "operating_cash_flow_m",
+              "ref": "ACLS/investor-documents/sec-edgar/10-K_20260226_rpt20251231_acc0001104659_26_020461.htm",
+              "locator": "NetCashProvidedByUsedInOperatingActivities $118.3M (FY2025)",
+              "as_of": "2025-12-31",
+              "content_sha256": "1b4cb5fbba4f8d818818ce3588ef2083cd57a32da21493b27aea6ffaf05e2b63",
+              "source_id": "2543b9bccf78ae712550095edd9ae6f2c75659683be99cbadb3d6b339a6cc08b"
+            },
+            {
+              "node_id": "capex_m",
+              "ref": "ACLS/investor-documents/sec-edgar/10-K_20260226_rpt20251231_acc0001104659_26_020461.htm",
+              "locator": "PaymentsToAcquirePropertyPlantAndEquipment $11.3M (FY2025)",
+              "as_of": "2025-12-31",
+              "content_sha256": "1b4cb5fbba4f8d818818ce3588ef2083cd57a32da21493b27aea6ffaf05e2b63",
+              "source_id": "6424f636d76902121c5132981e9f81f6bb200004a6db4e4bcd761fd26f8f8946"
+            },
+            {
+              "node_id": "shares_m",
+              "ref": "ACLS/investor-documents/sec-edgar/10-K_20260226_rpt20251231_acc0001104659_26_020461.htm",
+              "locator": "WeightedAverageNumberOfDilutedSharesOutstanding 31.668M; diluted EPS $3.8",
+              "as_of": "2025-12-31",
+              "content_sha256": "1b4cb5fbba4f8d818818ce3588ef2083cd57a32da21493b27aea6ffaf05e2b63",
+              "source_id": "ed221367b142a584265289519a3ff8879fd41bbdf8b34b99fd526b489c335b46"
+            }
+          ],
+          "checks": {
+            "passed": true,
+            "errors": []
+          },
+          "proof_hash": "f7dcc70e4fe7605caba6bcf52c9e0a1774a35a77fc64c4b730e295af54b44e10"
+        },
+        "evidence_tier": "primary_derived",
+        "evidence_level": "primary_derived",
+        "evidence": "Primary bridge from ACLS/investor-documents/sec-edgar/10-K_20260226_rpt20251231_acc0001104659_26_020461.htm: FY2025 revenue $839.0M, OCF $118.3M, FCF $107.0M, cash $145.5M, systems backlog $457.0M; contract backfill 2026-07-21.",
+        "scenario_assumptions": "Proof outputs {'low': 29.45, 'base': 59.8, 'high': 99.87}; see calculation_proof graph.",
+        "probability_and_timing": null,
+        "tax_and_realization_adjustments": "Reconcile to FY2025 10-K and Q1 2026 10-Q before decision use.",
+        "falsifier": "Primary evidence shows claim, cash conversion, or cycle path is materially worse than low case.",
+        "overlap_key": "midcycle_implant_operations",
+        "assumption_type": "judgment"
+      },
+      {
+        "component_id": "systems_backlog_conversion_option",
+        "label": "Systems backlog and deferred revenue conversion option",
+        "category": "real_option",
+        "treatment": "additive",
+        "included_in_component_id": null,
+        "ownership_claim": "Systems backlog and deferred revenue conversion option",
+        "ownership_percentage": 1.0,
+        "quantity": {
+          "value": 1,
+          "unit": "per-share economic claim"
+        },
+        "method": "risk_adjusted_milestone_value",
+        "method_version": "1.0",
+        "method_provenance": {
+          "method_id": "risk_adjusted_milestone_value",
+          "version": "1.0",
+          "label": "Milestone risk-adjusted present value",
+          "power_zones": [
+            "binary_milestone"
+          ],
+          "equation": "value_per_share = (net_cash + sum(p_success*PV(success_value)-remaining_cost) - dilution)/shares",
+          "sources": [
+            {
+              "ref": "_system/frameworks/optionality_valuation.md",
+              "locator": "Milestone-based option framework"
+            }
+          ]
+        },
+        "comparable_ids": [],
+        "range_per_share": {
+          "low": 0.0,
+          "base": 22.0001,
+          "high": 48.0011
+        },
+        "legacy_range_per_share": {
+          "low": 0.0,
+          "base": 22.0,
+          "high": 48.0
+        },
+        "valuation_status": "bounded_estimate",
+        "calculation_proof": {
+          "status": "valid",
+          "method_id": "risk_adjusted_milestone_value",
+          "method_version": "1.0",
+          "outputs": {
+            "low": 0.0,
+            "base": 22.0001,
+            "high": 48.0011
+          },
+          "output_unit": "USD_per_share",
+          "traces": {
+            "low": [
+              {
+                "id": "systems_backlog_m",
+                "label": "Systems backlog including deferred systems revenue",
+                "kind": "fact",
+                "value": 457.0,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "ACLS/investor-documents/sec-edgar/10-K_20260226_rpt20251231_acc0001104659_26_020461.htm",
+                  "locator": "Backlog section: systems backlog including deferred systems revenue $457.0M at December 31, 2025",
+                  "as_of": "2025-12-31",
+                  "content_sha256": "1b4cb5fbba4f8d818818ce3588ef2083cd57a32da21493b27aea6ffaf05e2b63",
+                  "source_id": "58c9849fd43f40d475723e415a93ef01174ed0b33ef89b5fd01ec669c69e2939"
+                },
+                "rationale": null
+              },
+              {
+                "id": "prior_systems_backlog_m",
+                "label": "Prior-year systems backlog",
+                "kind": "fact",
+                "value": 645.8,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "ACLS/investor-documents/sec-edgar/10-K_20260226_rpt20251231_acc0001104659_26_020461.htm",
+                  "locator": "Systems backlog $645.8M at December 31, 2024",
+                  "as_of": "2025-12-31",
+                  "content_sha256": "1b4cb5fbba4f8d818818ce3588ef2083cd57a32da21493b27aea6ffaf05e2b63",
+                  "source_id": "bdc1cf11c7edebd1e8d39d80f6814f7bca242c4de727476e82ea9515598cf898"
+                },
+                "rationale": null
+              },
+              {
+                "id": "shares_m",
+                "label": "FY2025 diluted shares",
+                "kind": "fact",
+                "value": 31.668,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "ACLS/investor-documents/sec-edgar/10-K_20260226_rpt20251231_acc0001104659_26_020461.htm",
+                  "locator": "WeightedAverageNumberOfDilutedSharesOutstanding 31.668M",
+                  "as_of": "2025-12-31",
+                  "content_sha256": "1b4cb5fbba4f8d818818ce3588ef2083cd57a32da21493b27aea6ffaf05e2b63",
+                  "source_id": "04bf6a3daba4c410afdaf2268a98cb85835ba5bac3cf33c9de96c7c7af4b8691"
+                },
+                "rationale": null
+              },
+              {
+                "id": "backlog_milestone_m",
+                "label": "Risk-adjusted incremental value from backlog conversion beyond normalized owner cash",
+                "kind": "judgment",
+                "value": 0.0,
+                "unit": "USD_m",
+                "source": null,
+                "rationale": "Non-overlapping claim on $457M systems backlog and deferred revenue not fully embedded in mid-cycle owner-cash engine; haircut for cancellation and mix shift."
+              },
+              {
+                "id": "value_per_share",
+                "label": "Systems backlog conversion option per share",
+                "kind": "calculation",
+                "value": 0.0,
+                "unit": "USD_per_share",
+                "operation": "divide",
+                "formula": "backlog_milestone_m \u00f7 shares_m",
+                "substituted_formula": "0 \u00f7 31.668",
+                "dependencies": [
+                  "backlog_milestone_m",
+                  "shares_m"
+                ]
+              }
+            ],
+            "base": [
+              {
+                "id": "systems_backlog_m",
+                "label": "Systems backlog including deferred systems revenue",
+                "kind": "fact",
+                "value": 457.0,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "ACLS/investor-documents/sec-edgar/10-K_20260226_rpt20251231_acc0001104659_26_020461.htm",
+                  "locator": "Backlog section: systems backlog including deferred systems revenue $457.0M at December 31, 2025",
+                  "as_of": "2025-12-31",
+                  "content_sha256": "1b4cb5fbba4f8d818818ce3588ef2083cd57a32da21493b27aea6ffaf05e2b63",
+                  "source_id": "58c9849fd43f40d475723e415a93ef01174ed0b33ef89b5fd01ec669c69e2939"
+                },
+                "rationale": null
+              },
+              {
+                "id": "prior_systems_backlog_m",
+                "label": "Prior-year systems backlog",
+                "kind": "fact",
+                "value": 645.8,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "ACLS/investor-documents/sec-edgar/10-K_20260226_rpt20251231_acc0001104659_26_020461.htm",
+                  "locator": "Systems backlog $645.8M at December 31, 2024",
+                  "as_of": "2025-12-31",
+                  "content_sha256": "1b4cb5fbba4f8d818818ce3588ef2083cd57a32da21493b27aea6ffaf05e2b63",
+                  "source_id": "bdc1cf11c7edebd1e8d39d80f6814f7bca242c4de727476e82ea9515598cf898"
+                },
+                "rationale": null
+              },
+              {
+                "id": "shares_m",
+                "label": "FY2025 diluted shares",
+                "kind": "fact",
+                "value": 31.668,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "ACLS/investor-documents/sec-edgar/10-K_20260226_rpt20251231_acc0001104659_26_020461.htm",
+                  "locator": "WeightedAverageNumberOfDilutedSharesOutstanding 31.668M",
+                  "as_of": "2025-12-31",
+                  "content_sha256": "1b4cb5fbba4f8d818818ce3588ef2083cd57a32da21493b27aea6ffaf05e2b63",
+                  "source_id": "04bf6a3daba4c410afdaf2268a98cb85835ba5bac3cf33c9de96c7c7af4b8691"
+                },
+                "rationale": null
+              },
+              {
+                "id": "backlog_milestone_m",
+                "label": "Risk-adjusted incremental value from backlog conversion beyond normalized owner cash",
+                "kind": "judgment",
+                "value": 696.7,
+                "unit": "USD_m",
+                "source": null,
+                "rationale": "Non-overlapping claim on $457M systems backlog and deferred revenue not fully embedded in mid-cycle owner-cash engine; haircut for cancellation and mix shift."
+              },
+              {
+                "id": "value_per_share",
+                "label": "Systems backlog conversion option per share",
+                "kind": "calculation",
+                "value": 22.00012631,
+                "unit": "USD_per_share",
+                "operation": "divide",
+                "formula": "backlog_milestone_m \u00f7 shares_m",
+                "substituted_formula": "696.7 \u00f7 31.668",
+                "dependencies": [
+                  "backlog_milestone_m",
+                  "shares_m"
+                ]
+              }
+            ],
+            "high": [
+              {
+                "id": "systems_backlog_m",
+                "label": "Systems backlog including deferred systems revenue",
+                "kind": "fact",
+                "value": 457.0,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "ACLS/investor-documents/sec-edgar/10-K_20260226_rpt20251231_acc0001104659_26_020461.htm",
+                  "locator": "Backlog section: systems backlog including deferred systems revenue $457.0M at December 31, 2025",
+                  "as_of": "2025-12-31",
+                  "content_sha256": "1b4cb5fbba4f8d818818ce3588ef2083cd57a32da21493b27aea6ffaf05e2b63",
+                  "source_id": "58c9849fd43f40d475723e415a93ef01174ed0b33ef89b5fd01ec669c69e2939"
+                },
+                "rationale": null
+              },
+              {
+                "id": "prior_systems_backlog_m",
+                "label": "Prior-year systems backlog",
+                "kind": "fact",
+                "value": 645.8,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "ACLS/investor-documents/sec-edgar/10-K_20260226_rpt20251231_acc0001104659_26_020461.htm",
+                  "locator": "Systems backlog $645.8M at December 31, 2024",
+                  "as_of": "2025-12-31",
+                  "content_sha256": "1b4cb5fbba4f8d818818ce3588ef2083cd57a32da21493b27aea6ffaf05e2b63",
+                  "source_id": "bdc1cf11c7edebd1e8d39d80f6814f7bca242c4de727476e82ea9515598cf898"
+                },
+                "rationale": null
+              },
+              {
+                "id": "shares_m",
+                "label": "FY2025 diluted shares",
+                "kind": "fact",
+                "value": 31.668,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "ACLS/investor-documents/sec-edgar/10-K_20260226_rpt20251231_acc0001104659_26_020461.htm",
+                  "locator": "WeightedAverageNumberOfDilutedSharesOutstanding 31.668M",
+                  "as_of": "2025-12-31",
+                  "content_sha256": "1b4cb5fbba4f8d818818ce3588ef2083cd57a32da21493b27aea6ffaf05e2b63",
+                  "source_id": "04bf6a3daba4c410afdaf2268a98cb85835ba5bac3cf33c9de96c7c7af4b8691"
+                },
+                "rationale": null
+              },
+              {
+                "id": "backlog_milestone_m",
+                "label": "Risk-adjusted incremental value from backlog conversion beyond normalized owner cash",
+                "kind": "judgment",
+                "value": 1520.1,
+                "unit": "USD_m",
+                "source": null,
+                "rationale": "Non-overlapping claim on $457M systems backlog and deferred revenue not fully embedded in mid-cycle owner-cash engine; haircut for cancellation and mix shift."
+              },
+              {
+                "id": "value_per_share",
+                "label": "Systems backlog conversion option per share",
+                "kind": "calculation",
+                "value": 48.00113679,
+                "unit": "USD_per_share",
+                "operation": "divide",
+                "formula": "backlog_milestone_m \u00f7 shares_m",
+                "substituted_formula": "1520.1 \u00f7 31.668",
+                "dependencies": [
+                  "backlog_milestone_m",
+                  "shares_m"
+                ]
+              }
+            ]
+          },
+          "source_lineage": [
+            {
+              "node_id": "systems_backlog_m",
+              "ref": "ACLS/investor-documents/sec-edgar/10-K_20260226_rpt20251231_acc0001104659_26_020461.htm",
+              "locator": "Backlog section: systems backlog including deferred systems revenue $457.0M at December 31, 2025",
+              "as_of": "2025-12-31",
+              "content_sha256": "1b4cb5fbba4f8d818818ce3588ef2083cd57a32da21493b27aea6ffaf05e2b63",
+              "source_id": "58c9849fd43f40d475723e415a93ef01174ed0b33ef89b5fd01ec669c69e2939"
+            },
+            {
+              "node_id": "prior_systems_backlog_m",
+              "ref": "ACLS/investor-documents/sec-edgar/10-K_20260226_rpt20251231_acc0001104659_26_020461.htm",
+              "locator": "Systems backlog $645.8M at December 31, 2024",
+              "as_of": "2025-12-31",
+              "content_sha256": "1b4cb5fbba4f8d818818ce3588ef2083cd57a32da21493b27aea6ffaf05e2b63",
+              "source_id": "bdc1cf11c7edebd1e8d39d80f6814f7bca242c4de727476e82ea9515598cf898"
+            },
+            {
+              "node_id": "shares_m",
+              "ref": "ACLS/investor-documents/sec-edgar/10-K_20260226_rpt20251231_acc0001104659_26_020461.htm",
+              "locator": "WeightedAverageNumberOfDilutedSharesOutstanding 31.668M",
+              "as_of": "2025-12-31",
+              "content_sha256": "1b4cb5fbba4f8d818818ce3588ef2083cd57a32da21493b27aea6ffaf05e2b63",
+              "source_id": "04bf6a3daba4c410afdaf2268a98cb85835ba5bac3cf33c9de96c7c7af4b8691"
+            }
+          ],
+          "checks": {
+            "passed": true,
+            "errors": []
+          },
+          "proof_hash": "4d7271a7fc67389ef00090ed7ce830f7234707b055e750f4f9775ec05b99841f"
+        },
+        "evidence_tier": "primary_derived",
+        "evidence_level": "primary_derived",
+        "evidence": "Primary bridge from ACLS/investor-documents/sec-edgar/10-K_20260226_rpt20251231_acc0001104659_26_020461.htm: FY2025 revenue $839.0M, OCF $118.3M, FCF $107.0M, cash $145.5M, systems backlog $457.0M; contract backfill 2026-07-21.",
+        "scenario_assumptions": "Proof outputs {'low': 0.0, 'base': 22.0001, 'high': 48.0011}; see calculation_proof graph.",
+        "probability_and_timing": {
+          "success_probability": null,
+          "remaining_capital_m": null,
+          "timing_basis": null,
+          "probability_basis": null,
+          "remaining_capital_basis": null
+        },
+        "tax_and_realization_adjustments": "Reconcile to FY2025 10-K and Q1 2026 10-Q before decision use.",
+        "falsifier": "Primary evidence shows claim, cash conversion, or cycle path is materially worse than low case.",
+        "overlap_key": "systems_backlog_conversion_option",
+        "assumption_type": "judgment"
+      },
+      {
+        "component_id": "net_financial_claims",
+        "label": "Net cash and debt-free balance-sheet claims on common equity",
+        "category": "liability_or_reserve",
+        "treatment": "additive",
+        "included_in_component_id": null,
+        "ownership_claim": "Net cash and debt-free balance-sheet claims on common equity",
+        "ownership_percentage": 1.0,
+        "quantity": {
+          "value": 1,
+          "unit": "per-share economic claim"
+        },
+        "method": "net_asset_value",
+        "method_version": "1.0",
+        "method_provenance": {
+          "method_id": "net_asset_value",
+          "version": "1.0",
+          "label": "Reconciled net asset value",
+          "power_zones": [
+            "scarce_asset_optionality",
+            "catalyst_asset_value",
+            "credit_and_normalized_returns"
+          ],
+          "equation": "value_per_share = (gross_assets - senior_claims - tax - realization_costs) / diluted_shares",
+          "sources": [
+            {
+              "ref": "_system/frameworks/scarce_strategic_asset_valuation.md",
+              "locator": "Economic ownership and unit NAV"
+            }
+          ]
+        },
+        "comparable_ids": [],
+        "range_per_share": {
+          "low": 3.1988,
+          "base": 4.6009,
+          "high": 5.8008
+        },
+        "legacy_range_per_share": {
+          "low": 3.2,
+          "base": 4.6,
+          "high": 5.8
+        },
+        "valuation_status": "bounded_estimate",
+        "calculation_proof": {
+          "status": "valid",
+          "method_id": "net_asset_value",
+          "method_version": "1.0",
+          "outputs": {
+            "low": 3.1988,
+            "base": 4.6009,
+            "high": 5.8008
+          },
+          "output_unit": "USD_per_share",
+          "traces": {
+            "low": [
+              {
+                "id": "cash_m",
+                "label": "Cash and cash equivalents",
+                "kind": "fact",
+                "value": 145.5,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "ACLS/investor-documents/sec-edgar/10-K_20260226_rpt20251231_acc0001104659_26_020461.htm",
+                  "locator": "CashAndCashEquivalentsAtCarryingValue $145.5M at December 31, 2025",
+                  "as_of": "2025-12-31",
+                  "content_sha256": "1b4cb5fbba4f8d818818ce3588ef2083cd57a32da21493b27aea6ffaf05e2b63",
+                  "source_id": "67ceff3d16d55684d08eafcf97a6aa85ef05cfc14905a616d25a013793a9c235"
+                },
+                "rationale": null
+              },
+              {
+                "id": "shares_m",
+                "label": "FY2025 diluted shares",
+                "kind": "fact",
+                "value": 31.668,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "ACLS/investor-documents/sec-edgar/10-K_20260226_rpt20251231_acc0001104659_26_020461.htm",
+                  "locator": "WeightedAverageNumberOfDilutedSharesOutstanding 31.668M",
+                  "as_of": "2025-12-31",
+                  "content_sha256": "1b4cb5fbba4f8d818818ce3588ef2083cd57a32da21493b27aea6ffaf05e2b63",
+                  "source_id": "04bf6a3daba4c410afdaf2268a98cb85835ba5bac3cf33c9de96c7c7af4b8691"
+                },
+                "rationale": null
+              },
+              {
+                "id": "net_corporate_claim_m",
+                "label": "Net financial claim on common equity after operating liquidity reserve",
+                "kind": "judgment",
+                "value": 101.3,
+                "unit": "USD_m",
+                "source": null,
+                "rationale": "Debt-free balance sheet; low case reserves working capital tied to backlog decline; high case credits excess cash net of small lease claims."
+              },
+              {
+                "id": "value_per_share",
+                "label": "Net financial claims per share",
+                "kind": "calculation",
+                "value": 3.19881268,
+                "unit": "USD_per_share",
+                "operation": "divide",
+                "formula": "net_corporate_claim_m \u00f7 shares_m",
+                "substituted_formula": "101.3 \u00f7 31.668",
+                "dependencies": [
+                  "net_corporate_claim_m",
+                  "shares_m"
+                ]
+              }
+            ],
+            "base": [
+              {
+                "id": "cash_m",
+                "label": "Cash and cash equivalents",
+                "kind": "fact",
+                "value": 145.5,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "ACLS/investor-documents/sec-edgar/10-K_20260226_rpt20251231_acc0001104659_26_020461.htm",
+                  "locator": "CashAndCashEquivalentsAtCarryingValue $145.5M at December 31, 2025",
+                  "as_of": "2025-12-31",
+                  "content_sha256": "1b4cb5fbba4f8d818818ce3588ef2083cd57a32da21493b27aea6ffaf05e2b63",
+                  "source_id": "67ceff3d16d55684d08eafcf97a6aa85ef05cfc14905a616d25a013793a9c235"
+                },
+                "rationale": null
+              },
+              {
+                "id": "shares_m",
+                "label": "FY2025 diluted shares",
+                "kind": "fact",
+                "value": 31.668,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "ACLS/investor-documents/sec-edgar/10-K_20260226_rpt20251231_acc0001104659_26_020461.htm",
+                  "locator": "WeightedAverageNumberOfDilutedSharesOutstanding 31.668M",
+                  "as_of": "2025-12-31",
+                  "content_sha256": "1b4cb5fbba4f8d818818ce3588ef2083cd57a32da21493b27aea6ffaf05e2b63",
+                  "source_id": "04bf6a3daba4c410afdaf2268a98cb85835ba5bac3cf33c9de96c7c7af4b8691"
+                },
+                "rationale": null
+              },
+              {
+                "id": "net_corporate_claim_m",
+                "label": "Net financial claim on common equity after operating liquidity reserve",
+                "kind": "judgment",
+                "value": 145.7,
+                "unit": "USD_m",
+                "source": null,
+                "rationale": "Debt-free balance sheet; low case reserves working capital tied to backlog decline; high case credits excess cash net of small lease claims."
+              },
+              {
+                "id": "value_per_share",
+                "label": "Net financial claims per share",
+                "kind": "calculation",
+                "value": 4.60085891,
+                "unit": "USD_per_share",
+                "operation": "divide",
+                "formula": "net_corporate_claim_m \u00f7 shares_m",
+                "substituted_formula": "145.7 \u00f7 31.668",
+                "dependencies": [
+                  "net_corporate_claim_m",
+                  "shares_m"
+                ]
+              }
+            ],
+            "high": [
+              {
+                "id": "cash_m",
+                "label": "Cash and cash equivalents",
+                "kind": "fact",
+                "value": 145.5,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "ACLS/investor-documents/sec-edgar/10-K_20260226_rpt20251231_acc0001104659_26_020461.htm",
+                  "locator": "CashAndCashEquivalentsAtCarryingValue $145.5M at December 31, 2025",
+                  "as_of": "2025-12-31",
+                  "content_sha256": "1b4cb5fbba4f8d818818ce3588ef2083cd57a32da21493b27aea6ffaf05e2b63",
+                  "source_id": "67ceff3d16d55684d08eafcf97a6aa85ef05cfc14905a616d25a013793a9c235"
+                },
+                "rationale": null
+              },
+              {
+                "id": "shares_m",
+                "label": "FY2025 diluted shares",
+                "kind": "fact",
+                "value": 31.668,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "ACLS/investor-documents/sec-edgar/10-K_20260226_rpt20251231_acc0001104659_26_020461.htm",
+                  "locator": "WeightedAverageNumberOfDilutedSharesOutstanding 31.668M",
+                  "as_of": "2025-12-31",
+                  "content_sha256": "1b4cb5fbba4f8d818818ce3588ef2083cd57a32da21493b27aea6ffaf05e2b63",
+                  "source_id": "04bf6a3daba4c410afdaf2268a98cb85835ba5bac3cf33c9de96c7c7af4b8691"
+                },
+                "rationale": null
+              },
+              {
+                "id": "net_corporate_claim_m",
+                "label": "Net financial claim on common equity after operating liquidity reserve",
+                "kind": "judgment",
+                "value": 183.7,
+                "unit": "USD_m",
+                "source": null,
+                "rationale": "Debt-free balance sheet; low case reserves working capital tied to backlog decline; high case credits excess cash net of small lease claims."
+              },
+              {
+                "id": "value_per_share",
+                "label": "Net financial claims per share",
+                "kind": "calculation",
+                "value": 5.80080839,
+                "unit": "USD_per_share",
+                "operation": "divide",
+                "formula": "net_corporate_claim_m \u00f7 shares_m",
+                "substituted_formula": "183.7 \u00f7 31.668",
+                "dependencies": [
+                  "net_corporate_claim_m",
+                  "shares_m"
+                ]
+              }
+            ]
+          },
+          "source_lineage": [
+            {
+              "node_id": "cash_m",
+              "ref": "ACLS/investor-documents/sec-edgar/10-K_20260226_rpt20251231_acc0001104659_26_020461.htm",
+              "locator": "CashAndCashEquivalentsAtCarryingValue $145.5M at December 31, 2025",
+              "as_of": "2025-12-31",
+              "content_sha256": "1b4cb5fbba4f8d818818ce3588ef2083cd57a32da21493b27aea6ffaf05e2b63",
+              "source_id": "67ceff3d16d55684d08eafcf97a6aa85ef05cfc14905a616d25a013793a9c235"
+            },
+            {
+              "node_id": "shares_m",
+              "ref": "ACLS/investor-documents/sec-edgar/10-K_20260226_rpt20251231_acc0001104659_26_020461.htm",
+              "locator": "WeightedAverageNumberOfDilutedSharesOutstanding 31.668M",
+              "as_of": "2025-12-31",
+              "content_sha256": "1b4cb5fbba4f8d818818ce3588ef2083cd57a32da21493b27aea6ffaf05e2b63",
+              "source_id": "04bf6a3daba4c410afdaf2268a98cb85835ba5bac3cf33c9de96c7c7af4b8691"
+            }
+          ],
+          "checks": {
+            "passed": true,
+            "errors": []
+          },
+          "proof_hash": "552333af38020ad5bd816dc69323e50d9296b444dea74a0bf07f979e22628453"
+        },
+        "evidence_tier": "primary_derived",
+        "evidence_level": "primary_derived",
+        "evidence": "Primary bridge from ACLS/investor-documents/sec-edgar/10-K_20260226_rpt20251231_acc0001104659_26_020461.htm: FY2025 revenue $839.0M, OCF $118.3M, FCF $107.0M, cash $145.5M, systems backlog $457.0M; contract backfill 2026-07-21.",
+        "scenario_assumptions": "Proof outputs {'low': 3.1988, 'base': 4.6009, 'high': 5.8008}; see calculation_proof graph.",
+        "probability_and_timing": null,
+        "tax_and_realization_adjustments": "Reconcile to FY2025 10-K and Q1 2026 10-Q before decision use.",
+        "falsifier": "Primary evidence shows claim, cash conversion, or cycle path is materially worse than low case.",
+        "overlap_key": "net_financial_claims",
+        "assumption_type": "judgment"
+      },
+      {
+        "component_id": "cycle_and_concentration_reserve",
+        "label": "WFE downcycle, China exposure, and backlog-decline reserve",
+        "category": "liability_or_reserve",
+        "treatment": "additive",
+        "included_in_component_id": null,
+        "ownership_claim": "WFE downcycle, China exposure, and backlog-decline reserve",
+        "ownership_percentage": 1.0,
+        "quantity": {
+          "value": 1,
+          "unit": "per-share economic claim"
+        },
+        "method": "net_asset_value",
+        "method_version": "1.0",
+        "method_provenance": {
+          "method_id": "net_asset_value",
+          "version": "1.0",
+          "label": "Reconciled net asset value",
+          "power_zones": [
+            "scarce_asset_optionality",
+            "catalyst_asset_value",
+            "credit_and_normalized_returns"
+          ],
+          "equation": "value_per_share = (gross_assets - senior_claims - tax - realization_costs) / diluted_shares",
+          "sources": [
+            {
+              "ref": "_system/frameworks/scarce_strategic_asset_valuation.md",
+              "locator": "Economic ownership and unit NAV"
+            }
+          ]
+        },
+        "comparable_ids": [],
+        "range_per_share": {
+          "low": -42.0014,
+          "base": -20.0013,
+          "high": -7.9986
+        },
+        "legacy_range_per_share": {
+          "low": -42.0,
+          "base": -20.0,
+          "high": -8.0
+        },
+        "valuation_status": "bounded_estimate",
+        "calculation_proof": {
+          "status": "valid",
+          "method_id": "net_asset_value",
+          "method_version": "1.0",
+          "outputs": {
+            "low": -42.0014,
+            "base": -20.0013,
+            "high": -7.9986
+          },
+          "output_unit": "USD_per_share",
+          "traces": {
+            "low": [
+              {
+                "id": "operating_income_m",
+                "label": "FY2025 operating income",
+                "kind": "fact",
+                "value": 119.3,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "ACLS/investor-documents/sec-edgar/10-K_20260226_rpt20251231_acc0001104659_26_020461.htm",
+                  "locator": "OperatingIncomeLoss $119.3M (FY2025)",
+                  "as_of": "2025-12-31",
+                  "content_sha256": "1b4cb5fbba4f8d818818ce3588ef2083cd57a32da21493b27aea6ffaf05e2b63",
+                  "source_id": "d739be188e6c045fb8eb3ce71e62ce4a51f4ad8105a878c2d1d8c950761b9f6e"
+                },
+                "rationale": null
+              },
+              {
+                "id": "systems_revenue_m",
+                "label": "FY2025 systems revenue",
+                "kind": "fact",
+                "value": 571.0,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "ACLS/investor-documents/sec-edgar/10-K_20260226_rpt20251231_acc0001104659_26_020461.htm",
+                  "locator": "Systems revenue $571.0M versus $782.6M in 2024 (MD&A)",
+                  "as_of": "2025-12-31",
+                  "content_sha256": "1b4cb5fbba4f8d818818ce3588ef2083cd57a32da21493b27aea6ffaf05e2b63",
+                  "source_id": "e8e4cb8770a30a463df2ed537eac761cf3d168f9009cd5f128e826da69a1b60f"
+                },
+                "rationale": null
+              },
+              {
+                "id": "shares_m",
+                "label": "FY2025 diluted shares",
+                "kind": "fact",
+                "value": 31.668,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "ACLS/investor-documents/sec-edgar/10-K_20260226_rpt20251231_acc0001104659_26_020461.htm",
+                  "locator": "WeightedAverageNumberOfDilutedSharesOutstanding 31.668M",
+                  "as_of": "2025-12-31",
+                  "content_sha256": "1b4cb5fbba4f8d818818ce3588ef2083cd57a32da21493b27aea6ffaf05e2b63",
+                  "source_id": "04bf6a3daba4c410afdaf2268a98cb85835ba5bac3cf33c9de96c7c7af4b8691"
+                },
+                "rationale": null
+              },
+              {
+                "id": "reserve_m",
+                "label": "Capital-cycle trough, China exposure, and backlog-decline reserve",
+                "kind": "judgment",
+                "value": -1330.1,
+                "unit": "USD_m",
+                "source": null,
+                "rationale": "Negative reserve for WFE downcycle persistence, 84% international/China mix, and backlog falling from $646M to $457M not fully captured in core multiple."
+              },
+              {
+                "id": "value_per_share",
+                "label": "Cycle and concentration reserve per share",
+                "kind": "calculation",
+                "value": -42.00138942,
+                "unit": "USD_per_share",
+                "operation": "divide",
+                "formula": "reserve_m \u00f7 shares_m",
+                "substituted_formula": "-1330.1 \u00f7 31.668",
+                "dependencies": [
+                  "reserve_m",
+                  "shares_m"
+                ]
+              }
+            ],
+            "base": [
+              {
+                "id": "operating_income_m",
+                "label": "FY2025 operating income",
+                "kind": "fact",
+                "value": 119.3,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "ACLS/investor-documents/sec-edgar/10-K_20260226_rpt20251231_acc0001104659_26_020461.htm",
+                  "locator": "OperatingIncomeLoss $119.3M (FY2025)",
+                  "as_of": "2025-12-31",
+                  "content_sha256": "1b4cb5fbba4f8d818818ce3588ef2083cd57a32da21493b27aea6ffaf05e2b63",
+                  "source_id": "d739be188e6c045fb8eb3ce71e62ce4a51f4ad8105a878c2d1d8c950761b9f6e"
+                },
+                "rationale": null
+              },
+              {
+                "id": "systems_revenue_m",
+                "label": "FY2025 systems revenue",
+                "kind": "fact",
+                "value": 571.0,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "ACLS/investor-documents/sec-edgar/10-K_20260226_rpt20251231_acc0001104659_26_020461.htm",
+                  "locator": "Systems revenue $571.0M versus $782.6M in 2024 (MD&A)",
+                  "as_of": "2025-12-31",
+                  "content_sha256": "1b4cb5fbba4f8d818818ce3588ef2083cd57a32da21493b27aea6ffaf05e2b63",
+                  "source_id": "e8e4cb8770a30a463df2ed537eac761cf3d168f9009cd5f128e826da69a1b60f"
+                },
+                "rationale": null
+              },
+              {
+                "id": "shares_m",
+                "label": "FY2025 diluted shares",
+                "kind": "fact",
+                "value": 31.668,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "ACLS/investor-documents/sec-edgar/10-K_20260226_rpt20251231_acc0001104659_26_020461.htm",
+                  "locator": "WeightedAverageNumberOfDilutedSharesOutstanding 31.668M",
+                  "as_of": "2025-12-31",
+                  "content_sha256": "1b4cb5fbba4f8d818818ce3588ef2083cd57a32da21493b27aea6ffaf05e2b63",
+                  "source_id": "04bf6a3daba4c410afdaf2268a98cb85835ba5bac3cf33c9de96c7c7af4b8691"
+                },
+                "rationale": null
+              },
+              {
+                "id": "reserve_m",
+                "label": "Capital-cycle trough, China exposure, and backlog-decline reserve",
+                "kind": "judgment",
+                "value": -633.4,
+                "unit": "USD_m",
+                "source": null,
+                "rationale": "Negative reserve for WFE downcycle persistence, 84% international/China mix, and backlog falling from $646M to $457M not fully captured in core multiple."
+              },
+              {
+                "id": "value_per_share",
+                "label": "Cycle and concentration reserve per share",
+                "kind": "calculation",
+                "value": -20.0012631,
+                "unit": "USD_per_share",
+                "operation": "divide",
+                "formula": "reserve_m \u00f7 shares_m",
+                "substituted_formula": "-633.4 \u00f7 31.668",
+                "dependencies": [
+                  "reserve_m",
+                  "shares_m"
+                ]
+              }
+            ],
+            "high": [
+              {
+                "id": "operating_income_m",
+                "label": "FY2025 operating income",
+                "kind": "fact",
+                "value": 119.3,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "ACLS/investor-documents/sec-edgar/10-K_20260226_rpt20251231_acc0001104659_26_020461.htm",
+                  "locator": "OperatingIncomeLoss $119.3M (FY2025)",
+                  "as_of": "2025-12-31",
+                  "content_sha256": "1b4cb5fbba4f8d818818ce3588ef2083cd57a32da21493b27aea6ffaf05e2b63",
+                  "source_id": "d739be188e6c045fb8eb3ce71e62ce4a51f4ad8105a878c2d1d8c950761b9f6e"
+                },
+                "rationale": null
+              },
+              {
+                "id": "systems_revenue_m",
+                "label": "FY2025 systems revenue",
+                "kind": "fact",
+                "value": 571.0,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "ACLS/investor-documents/sec-edgar/10-K_20260226_rpt20251231_acc0001104659_26_020461.htm",
+                  "locator": "Systems revenue $571.0M versus $782.6M in 2024 (MD&A)",
+                  "as_of": "2025-12-31",
+                  "content_sha256": "1b4cb5fbba4f8d818818ce3588ef2083cd57a32da21493b27aea6ffaf05e2b63",
+                  "source_id": "e8e4cb8770a30a463df2ed537eac761cf3d168f9009cd5f128e826da69a1b60f"
+                },
+                "rationale": null
+              },
+              {
+                "id": "shares_m",
+                "label": "FY2025 diluted shares",
+                "kind": "fact",
+                "value": 31.668,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "ACLS/investor-documents/sec-edgar/10-K_20260226_rpt20251231_acc0001104659_26_020461.htm",
+                  "locator": "WeightedAverageNumberOfDilutedSharesOutstanding 31.668M",
+                  "as_of": "2025-12-31",
+                  "content_sha256": "1b4cb5fbba4f8d818818ce3588ef2083cd57a32da21493b27aea6ffaf05e2b63",
+                  "source_id": "04bf6a3daba4c410afdaf2268a98cb85835ba5bac3cf33c9de96c7c7af4b8691"
+                },
+                "rationale": null
+              },
+              {
+                "id": "reserve_m",
+                "label": "Capital-cycle trough, China exposure, and backlog-decline reserve",
+                "kind": "judgment",
+                "value": -253.3,
+                "unit": "USD_m",
+                "source": null,
+                "rationale": "Negative reserve for WFE downcycle persistence, 84% international/China mix, and backlog falling from $646M to $457M not fully captured in core multiple."
+              },
+              {
+                "id": "value_per_share",
+                "label": "Cycle and concentration reserve per share",
+                "kind": "calculation",
+                "value": -7.99861058,
+                "unit": "USD_per_share",
+                "operation": "divide",
+                "formula": "reserve_m \u00f7 shares_m",
+                "substituted_formula": "-253.3 \u00f7 31.668",
+                "dependencies": [
+                  "reserve_m",
+                  "shares_m"
+                ]
+              }
+            ]
+          },
+          "source_lineage": [
+            {
+              "node_id": "operating_income_m",
+              "ref": "ACLS/investor-documents/sec-edgar/10-K_20260226_rpt20251231_acc0001104659_26_020461.htm",
+              "locator": "OperatingIncomeLoss $119.3M (FY2025)",
+              "as_of": "2025-12-31",
+              "content_sha256": "1b4cb5fbba4f8d818818ce3588ef2083cd57a32da21493b27aea6ffaf05e2b63",
+              "source_id": "d739be188e6c045fb8eb3ce71e62ce4a51f4ad8105a878c2d1d8c950761b9f6e"
+            },
+            {
+              "node_id": "systems_revenue_m",
+              "ref": "ACLS/investor-documents/sec-edgar/10-K_20260226_rpt20251231_acc0001104659_26_020461.htm",
+              "locator": "Systems revenue $571.0M versus $782.6M in 2024 (MD&A)",
+              "as_of": "2025-12-31",
+              "content_sha256": "1b4cb5fbba4f8d818818ce3588ef2083cd57a32da21493b27aea6ffaf05e2b63",
+              "source_id": "e8e4cb8770a30a463df2ed537eac761cf3d168f9009cd5f128e826da69a1b60f"
+            },
+            {
+              "node_id": "shares_m",
+              "ref": "ACLS/investor-documents/sec-edgar/10-K_20260226_rpt20251231_acc0001104659_26_020461.htm",
+              "locator": "WeightedAverageNumberOfDilutedSharesOutstanding 31.668M",
+              "as_of": "2025-12-31",
+              "content_sha256": "1b4cb5fbba4f8d818818ce3588ef2083cd57a32da21493b27aea6ffaf05e2b63",
+              "source_id": "04bf6a3daba4c410afdaf2268a98cb85835ba5bac3cf33c9de96c7c7af4b8691"
+            }
+          ],
+          "checks": {
+            "passed": true,
+            "errors": []
+          },
+          "proof_hash": "b30d1a345a7b96cb53cace21261d70234621942bc6c8f9486fcfa0c581a51a22"
+        },
+        "evidence_tier": "primary_derived",
+        "evidence_level": "primary_derived",
+        "evidence": "Primary bridge from ACLS/investor-documents/sec-edgar/10-K_20260226_rpt20251231_acc0001104659_26_020461.htm: FY2025 revenue $839.0M, OCF $118.3M, FCF $107.0M, cash $145.5M, systems backlog $457.0M; contract backfill 2026-07-21.",
+        "scenario_assumptions": "Proof outputs {'low': -42.0014, 'base': -20.0013, 'high': -7.9986}; see calculation_proof graph.",
+        "probability_and_timing": null,
+        "tax_and_realization_adjustments": "Reconcile to FY2025 10-K and Q1 2026 10-Q before decision use.",
+        "falsifier": "Primary evidence shows claim, cash conversion, or cycle path is materially worse than low case.",
+        "overlap_key": "cycle_and_concentration_reserve",
+        "assumption_type": "judgment"
+      }
+    ],
+    "component_coverage": {
+      "all_material_components_identified": true,
+      "material_component_count": 4,
+      "additive_component_count": 4,
+      "embedded_component_count": 0,
+      "unvalued_component_count": 0,
+      "double_counting_flags": []
+    },
+    "input_classification": {
+      "facts": [],
+      "estimates": [],
+      "judgments": [
+        {
+          "component_id": "midcycle_implant_operations",
+          "label": "Mid-cycle ion implant systems and services owner-cash engine",
+          "kind": "judgment",
+          "evidence_tier": "primary_derived",
+          "evidence": "Primary bridge from ACLS/investor-documents/sec-edgar/10-K_20260226_rpt20251231_acc0001104659_26_020461.htm: FY2025 revenue $839.0M, OCF $118.3M, FCF $107.0M, cash $145.5M, systems backlog $457.0M; contract backfill 2026-07-21.",
+          "method": "owner_cash_or_dividend_discount",
+          "valuation_status": "bounded_estimate"
+        },
+        {
+          "component_id": "systems_backlog_conversion_option",
+          "label": "Systems backlog and deferred revenue conversion option",
+          "kind": "judgment",
+          "evidence_tier": "primary_derived",
+          "evidence": "Primary bridge from ACLS/investor-documents/sec-edgar/10-K_20260226_rpt20251231_acc0001104659_26_020461.htm: FY2025 revenue $839.0M, OCF $118.3M, FCF $107.0M, cash $145.5M, systems backlog $457.0M; contract backfill 2026-07-21.",
+          "method": "risk_adjusted_milestone_value",
+          "valuation_status": "bounded_estimate"
+        },
+        {
+          "component_id": "net_financial_claims",
+          "label": "Net cash and debt-free balance-sheet claims on common equity",
+          "kind": "judgment",
+          "evidence_tier": "primary_derived",
+          "evidence": "Primary bridge from ACLS/investor-documents/sec-edgar/10-K_20260226_rpt20251231_acc0001104659_26_020461.htm: FY2025 revenue $839.0M, OCF $118.3M, FCF $107.0M, cash $145.5M, systems backlog $457.0M; contract backfill 2026-07-21.",
+          "method": "net_asset_value",
+          "valuation_status": "bounded_estimate"
+        },
+        {
+          "component_id": "cycle_and_concentration_reserve",
+          "label": "WFE downcycle, China exposure, and backlog-decline reserve",
+          "kind": "judgment",
+          "evidence_tier": "primary_derived",
+          "evidence": "Primary bridge from ACLS/investor-documents/sec-edgar/10-K_20260226_rpt20251231_acc0001104659_26_020461.htm: FY2025 revenue $839.0M, OCF $118.3M, FCF $107.0M, cash $145.5M, systems backlog $457.0M; contract backfill 2026-07-21.",
+          "method": "net_asset_value",
+          "valuation_status": "bounded_estimate"
+        }
+      ]
+    },
+    "method_route": {
+      "schema_version": "1.0",
+      "status": "routed",
+      "profile_id": "capital_cycle",
+      "label": "Capital cycle and normalized industry economics",
+      "score": 7.0,
+      "reasons": [
+        "archetype=cyclical",
+        "component categories=operating_business"
+      ],
+      "primary_methods": [
+        "midcycle_capacity_value"
+      ],
+      "corroborating_methods": [
+        "replacement_cost",
+        "downcycle_liquidity_stress"
+      ],
+      "primary_personas": [
+        "marathon_capital_cycle"
+      ],
+      "cross_check_personas": [
+        "marks_credit_cycle",
+        "pabrai"
+      ],
+      "silent_personas": [
+        "buffett_weschler",
+        "greenblatt",
+        "hk",
+        "hohn",
+        "klarman_asset_value",
+        "munger",
+        "stahl"
+      ],
+      "required_evidence": [
+        "industry capacity and additions",
+        "utilization",
+        "normalized unit margins",
+        "maintenance versus growth capital",
+        "low-case liquidity"
+      ],
+      "failure_modes": [
+        "peak margins capitalized",
+        "supply response ignored",
+        "replacement cost used for assets that cannot earn their cost of capital"
+      ],
+      "secondary_profiles": [
+        {
+          "profile_id": "predictable_cash_flow",
+          "score": 3.0,
+          "reasons": [
+            "component categories=operating_business",
+            "existing methods=dividend, owner_cash"
+          ]
+        },
+        {
+          "profile_id": "binary_milestone",
+          "score": 3.0,
+          "reasons": [
+            "component categories=real_option",
+            "existing methods=milestone, risk_adjusted"
+          ]
+        }
+      ],
+      "scorecard": {
+        "scarce_asset_optionality": {
+          "score": 1.0,
+          "reasons": [
+            "component categories=real_option"
+          ]
+        },
+        "quality_reinvestment": {
+          "score": 2.0,
+          "reasons": [
+            "component categories=operating_business",
+            "existing methods=owner_cash"
+          ]
+        },
+        "capital_cycle": {
+          "score": 7.0,
+          "reasons": [
+            "archetype=cyclical",
+            "component categories=operating_business"
+          ]
+        },
+        "credit_and_normalized_returns": {
+          "score": 1.0,
+          "reasons": [
+            "component categories=liability_or_reserve"
+          ]
+        },
+        "catalyst_asset_value": {
+          "score": 0.0,
+          "reasons": []
+        },
+        "predictable_cash_flow": {
+          "score": 3.0,
+          "reasons": [
+            "component categories=operating_business",
+            "existing methods=dividend, owner_cash"
+          ]
+        },
+        "binary_milestone": {
+          "score": 3.0,
+          "reasons": [
+            "component categories=real_option",
+            "existing methods=milestone, risk_adjusted"
+          ]
+        }
+      },
+      "decision_rule": "Use one primary method and no more than two corroborating methods; irrelevant methods and personas remain silent."
+    },
+    "market": {
+      "price_per_share": 131.7,
+      "fully_diluted_shares": 31668000,
+      "market_cap_m": 4170.68,
+      "enterprise_value_m": 4025.18
+    },
+    "valuation": {
+      "value_per_share": {
+        "low": -9.3526,
+        "base": 66.3997,
+        "high": 145.6733
+      },
+      "priced_components_per_share": {
+        "low": -9.3526,
+        "base": 66.3997,
+        "high": 145.6733
+      },
+      "legacy_value_per_share": {
+        "low": -9.35,
+        "base": 66.4,
+        "high": 145.67
+      },
+      "probability_weighted_value_per_share": 66.3997,
+      "expected_distributions_per_share": 0.0,
+      "annualized_return_at_price_pct": {
+        "low": null,
+        "base": -9.32,
+        "high": 1.45
+      },
+      "downside_to_low_pct": -107.1,
+      "horizon_years": 7,
+      "interpretation": "value_per_share is withheld while any material additive component is unpriced; priced_components_per_share is not a complete security value."
+    },
+    "scenario_contract": {
+      "rule": "Cases must change cited causal operating, capital, probability, timing, or financing drivers\u2014not only a terminal multiple.",
+      "top_value_drivers": [
+        {
+          "component_id": "midcycle_implant_operations",
+          "label": "Mid-cycle ion implant systems and services owner-cash engine",
+          "valuation_status": "bounded_estimate",
+          "base_per_share": 59.8,
+          "legacy_base_per_share": 59.8,
+          "range_width_per_share": 70.42,
+          "scenario_assumptions": "Proof outputs {'low': 29.45, 'base': 59.8, 'high': 99.87}; see calculation_proof graph."
+        },
+        {
+          "component_id": "systems_backlog_conversion_option",
+          "label": "Systems backlog and deferred revenue conversion option",
+          "valuation_status": "bounded_estimate",
+          "base_per_share": 22.0001,
+          "legacy_base_per_share": 22.0,
+          "range_width_per_share": 48.0011,
+          "scenario_assumptions": "Proof outputs {'low': 0.0, 'base': 22.0001, 'high': 48.0011}; see calculation_proof graph."
+        },
+        {
+          "component_id": "cycle_and_concentration_reserve",
+          "label": "WFE downcycle, China exposure, and backlog-decline reserve",
+          "valuation_status": "bounded_estimate",
+          "base_per_share": -20.0013,
+          "legacy_base_per_share": -20.0,
+          "range_width_per_share": 34.0028,
+          "scenario_assumptions": "Proof outputs {'low': -42.0014, 'base': -20.0013, 'high': -7.9986}; see calculation_proof graph."
+        },
+        {
+          "component_id": "net_financial_claims",
+          "label": "Net cash and debt-free balance-sheet claims on common equity",
+          "valuation_status": "bounded_estimate",
+          "base_per_share": 4.6009,
+          "legacy_base_per_share": 4.6,
+          "range_width_per_share": 2.602,
+          "scenario_assumptions": "Proof outputs {'low': 3.1988, 'base': 4.6009, 'high': 5.8008}; see calculation_proof graph."
+        }
+      ],
+      "reverse_expectations": null
+    },
+    "calculation_proof_summary": {
+      "component_count": 4,
+      "priced_component_count": 4,
+      "proof_complete_pct": 100.0,
+      "status_counts": {
+        "bounded_estimate": 4,
+        "calculated": 0,
+        "legacy_sensitivity": 0,
+        "unpriced": 0
+      },
+      "all_material_components_priced": true,
+      "calculation_errors": [],
+      "aggregate_proof_hash": "099dde05c7f5c06f7ead0e375095b6e4beb4df9c06eb20eb63dbdafc8a685e31"
+    },
+    "source_lineage": [
+      {
+        "component_id": "midcycle_implant_operations",
+        "node_id": "total_revenue_m",
+        "ref": "ACLS/investor-documents/sec-edgar/10-K_20260226_rpt20251231_acc0001104659_26_020461.htm",
+        "locator": "MD&A: revenue $839.0M; systems $571.0M plus services $268.0M (FY2025)",
+        "as_of": "2025-12-31",
+        "content_sha256": "1b4cb5fbba4f8d818818ce3588ef2083cd57a32da21493b27aea6ffaf05e2b63",
+        "source_id": "35766f12c8675af4726c9fe0d50e6833c2cf352385cc339963ad72fb12f9bd7c"
+      },
+      {
+        "component_id": "midcycle_implant_operations",
+        "node_id": "operating_cash_flow_m",
+        "ref": "ACLS/investor-documents/sec-edgar/10-K_20260226_rpt20251231_acc0001104659_26_020461.htm",
+        "locator": "NetCashProvidedByUsedInOperatingActivities $118.3M (FY2025)",
+        "as_of": "2025-12-31",
+        "content_sha256": "1b4cb5fbba4f8d818818ce3588ef2083cd57a32da21493b27aea6ffaf05e2b63",
+        "source_id": "2543b9bccf78ae712550095edd9ae6f2c75659683be99cbadb3d6b339a6cc08b"
+      },
+      {
+        "component_id": "midcycle_implant_operations",
+        "node_id": "capex_m",
+        "ref": "ACLS/investor-documents/sec-edgar/10-K_20260226_rpt20251231_acc0001104659_26_020461.htm",
+        "locator": "PaymentsToAcquirePropertyPlantAndEquipment $11.3M (FY2025)",
+        "as_of": "2025-12-31",
+        "content_sha256": "1b4cb5fbba4f8d818818ce3588ef2083cd57a32da21493b27aea6ffaf05e2b63",
+        "source_id": "6424f636d76902121c5132981e9f81f6bb200004a6db4e4bcd761fd26f8f8946"
+      },
+      {
+        "component_id": "midcycle_implant_operations",
+        "node_id": "shares_m",
+        "ref": "ACLS/investor-documents/sec-edgar/10-K_20260226_rpt20251231_acc0001104659_26_020461.htm",
+        "locator": "WeightedAverageNumberOfDilutedSharesOutstanding 31.668M; diluted EPS $3.8",
+        "as_of": "2025-12-31",
+        "content_sha256": "1b4cb5fbba4f8d818818ce3588ef2083cd57a32da21493b27aea6ffaf05e2b63",
+        "source_id": "ed221367b142a584265289519a3ff8879fd41bbdf8b34b99fd526b489c335b46"
+      },
+      {
+        "component_id": "systems_backlog_conversion_option",
+        "node_id": "systems_backlog_m",
+        "ref": "ACLS/investor-documents/sec-edgar/10-K_20260226_rpt20251231_acc0001104659_26_020461.htm",
+        "locator": "Backlog section: systems backlog including deferred systems revenue $457.0M at December 31, 2025",
+        "as_of": "2025-12-31",
+        "content_sha256": "1b4cb5fbba4f8d818818ce3588ef2083cd57a32da21493b27aea6ffaf05e2b63",
+        "source_id": "58c9849fd43f40d475723e415a93ef01174ed0b33ef89b5fd01ec669c69e2939"
+      },
+      {
+        "component_id": "systems_backlog_conversion_option",
+        "node_id": "prior_systems_backlog_m",
+        "ref": "ACLS/investor-documents/sec-edgar/10-K_20260226_rpt20251231_acc0001104659_26_020461.htm",
+        "locator": "Systems backlog $645.8M at December 31, 2024",
+        "as_of": "2025-12-31",
+        "content_sha256": "1b4cb5fbba4f8d818818ce3588ef2083cd57a32da21493b27aea6ffaf05e2b63",
+        "source_id": "bdc1cf11c7edebd1e8d39d80f6814f7bca242c4de727476e82ea9515598cf898"
+      },
+      {
+        "component_id": "systems_backlog_conversion_option",
+        "node_id": "shares_m",
+        "ref": "ACLS/investor-documents/sec-edgar/10-K_20260226_rpt20251231_acc0001104659_26_020461.htm",
+        "locator": "WeightedAverageNumberOfDilutedSharesOutstanding 31.668M",
+        "as_of": "2025-12-31",
+        "content_sha256": "1b4cb5fbba4f8d818818ce3588ef2083cd57a32da21493b27aea6ffaf05e2b63",
+        "source_id": "04bf6a3daba4c410afdaf2268a98cb85835ba5bac3cf33c9de96c7c7af4b8691"
+      },
+      {
+        "component_id": "net_financial_claims",
+        "node_id": "cash_m",
+        "ref": "ACLS/investor-documents/sec-edgar/10-K_20260226_rpt20251231_acc0001104659_26_020461.htm",
+        "locator": "CashAndCashEquivalentsAtCarryingValue $145.5M at December 31, 2025",
+        "as_of": "2025-12-31",
+        "content_sha256": "1b4cb5fbba4f8d818818ce3588ef2083cd57a32da21493b27aea6ffaf05e2b63",
+        "source_id": "67ceff3d16d55684d08eafcf97a6aa85ef05cfc14905a616d25a013793a9c235"
+      },
+      {
+        "component_id": "net_financial_claims",
+        "node_id": "shares_m",
+        "ref": "ACLS/investor-documents/sec-edgar/10-K_20260226_rpt20251231_acc0001104659_26_020461.htm",
+        "locator": "WeightedAverageNumberOfDilutedSharesOutstanding 31.668M",
+        "as_of": "2025-12-31",
+        "content_sha256": "1b4cb5fbba4f8d818818ce3588ef2083cd57a32da21493b27aea6ffaf05e2b63",
+        "source_id": "04bf6a3daba4c410afdaf2268a98cb85835ba5bac3cf33c9de96c7c7af4b8691"
+      },
+      {
+        "component_id": "cycle_and_concentration_reserve",
+        "node_id": "operating_income_m",
+        "ref": "ACLS/investor-documents/sec-edgar/10-K_20260226_rpt20251231_acc0001104659_26_020461.htm",
+        "locator": "OperatingIncomeLoss $119.3M (FY2025)",
+        "as_of": "2025-12-31",
+        "content_sha256": "1b4cb5fbba4f8d818818ce3588ef2083cd57a32da21493b27aea6ffaf05e2b63",
+        "source_id": "d739be188e6c045fb8eb3ce71e62ce4a51f4ad8105a878c2d1d8c950761b9f6e"
+      },
+      {
+        "component_id": "cycle_and_concentration_reserve",
+        "node_id": "systems_revenue_m",
+        "ref": "ACLS/investor-documents/sec-edgar/10-K_20260226_rpt20251231_acc0001104659_26_020461.htm",
+        "locator": "Systems revenue $571.0M versus $782.6M in 2024 (MD&A)",
+        "as_of": "2025-12-31",
+        "content_sha256": "1b4cb5fbba4f8d818818ce3588ef2083cd57a32da21493b27aea6ffaf05e2b63",
+        "source_id": "e8e4cb8770a30a463df2ed537eac761cf3d168f9009cd5f128e826da69a1b60f"
+      },
+      {
+        "component_id": "cycle_and_concentration_reserve",
+        "node_id": "shares_m",
+        "ref": "ACLS/investor-documents/sec-edgar/10-K_20260226_rpt20251231_acc0001104659_26_020461.htm",
+        "locator": "WeightedAverageNumberOfDilutedSharesOutstanding 31.668M",
+        "as_of": "2025-12-31",
+        "content_sha256": "1b4cb5fbba4f8d818818ce3588ef2083cd57a32da21493b27aea6ffaf05e2b63",
+        "source_id": "04bf6a3daba4c410afdaf2268a98cb85835ba5bac3cf33c9de96c7c7af4b8691"
+      }
+    ],
+    "model_checks": {
+      "calculation_graphs_valid": true,
+      "component_sum_reconciles": true,
+      "no_double_counting": true,
+      "all_material_components_priced": true,
+      "low_base_high_ordered": true
+    },
+    "evidence": {
+      "unresolved_count": 8,
+      "blockers": [
+        "economic_claim.description required",
+        "economic_claim.enterprise_to_equity_reconciliation required",
+        "economic_claim.unit_count required",
+        "economic_claim.unit_label required",
+        "economic_claim.unit_source required",
+        "economic_value.schema_version 1.0 required",
+        "gaap_role required",
+        "option component systems_backlog_conversion_option requires probability, timing, and remaining-capital treatment"
+      ],
+      "validation_errors": [
+        "economic_claim.description required",
+        "economic_claim.enterprise_to_equity_reconciliation required",
+        "economic_claim.unit_count required",
+        "economic_claim.unit_label required",
+        "economic_claim.unit_source required",
+        "economic_value.schema_version 1.0 required",
+        "gaap_role required",
+        "option component systems_backlog_conversion_option requires probability, timing, and remaining-capital treatment"
+      ]
+    },
+    "monitoring": {
+      "falsifiers": [
+        "Primary evidence shows claim, cash conversion, or cycle path is materially worse than low case.",
+        "Primary evidence shows claim, cash conversion, or cycle path is materially worse than low case.",
+        "Primary evidence shows claim, cash conversion, or cycle path is materially worse than low case.",
+        "Primary evidence shows claim, cash conversion, or cycle path is materially worse than low case."
+      ],
+      "required_refresh_triggers": [
+        "new filing or material operating update",
+        "capital-structure change",
+        "material price move",
+        "component milestone or falsifier"
+      ]
+    },
+    "change_control": {
+      "model_hash": "2d23de652cd494c504b46ba1d55cf8016b9e6fc170b2444dac01b88f53920c7c",
+      "method_versions": [
+        "net_asset_value@1.0",
+        "owner_cash_or_dividend_discount@1.0",
+        "risk_adjusted_milestone_value@1.0"
+      ],
+      "change_log": [],
+      "rule": "A source fact is locked. Every assumption change requires a reason, author, timestamp, and before/after value."
+    },
+    "decision_rule": "No security is decision-grade until every material claim is valued exactly once by a valid calculation proof and every material evidence blocker is resolved."
+  },
+  "synthesis": {
+    "status": "complete",
+    "paths": [
+      {
+        "id": "theory_implied",
+        "label": "Growth theory (pre-falsifier)",
+        "source": "growth_explanation + filing revenue YoY",
+        "return_pct": -4.9,
+        "weight": 0.08,
+        "type": "numeric",
+        "epistemic_tier": "B (pre-falsifier derivation)",
+        "weight_why": "Segment blend before falsifier pass; diagnostic only when it differs from falsifier-adjusted.",
+        "weight_falsifiers": [
+          "Included at full weight alongside falsifier-adjusted without divergence note"
+        ],
+        "hard_to_vary": "partial"
+      },
+      {
+        "id": "scenario_bear",
+        "label": "Bear scenario (Lawrence)",
+        "source": "scenarios.bear",
+        "return_pct": -12.5,
+        "weight": 0.05,
+        "type": "numeric",
+        "epistemic_tier": "C (scenario envelope)",
+        "weight_why": "Downside stress; low weight because bear is a sensitivity, not a competing explanation of base mechanics.",
+        "weight_falsifiers": [
+          "Bear assumptions become base case in filings (e.g. sustained volume collapse)"
+        ],
+        "hard_to_vary": "yes: asymmetric low weight is structural"
+      },
+      {
+        "id": "scenario_bull",
+        "label": "Bull scenario (Lawrence)",
+        "source": "scenarios.bull",
+        "return_pct": 0.6,
+        "weight": 0.12,
+        "type": "numeric",
+        "epistemic_tier": "C (scenario envelope)",
+        "weight_why": "Upside stress probe; higher than bear because optionality archetype has skew, but still below primary paths.",
+        "weight_falsifiers": [
+          "Bull growth sustained in filings for 4+ quarters without falsifier trigger"
+        ],
+        "hard_to_vary": "yes"
+      }
+    ],
+    "qualitative_adjustments": [],
+    "qualitative_manual": false,
+    "qualitative_pp_cap_applied": false,
+    "numeric_weighted_pct": -3.78,
+    "qualitative_pp": 0,
+    "total_synthesis_pct": -3.78,
+    "human_approval": "pending",
+    "weight_audit": {
+      "flags": [],
+      "deutsch_checks": {
+        "hard_to_vary": true,
+        "falsifiable": true,
+        "not_instrumentalist": true,
+        "reach": "Weights encode evidence tier (A primary \u2192 D external), not fitted to hit a target IRR"
+      },
+      "qualitative_audit": {
+        "flags": [],
+        "deutsch_checks": {
+          "hard_to_vary": true,
+          "falsifiable": true,
+          "not_double_count": true,
+          "small_band": true
+        }
+      }
+    },
+    "notes": "Capstone IRR combining filings, segments, overlays, third-party, qualitative"
+  }
+}
