@@ -483,6 +483,7 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-07-23.
 | MDT | MDT/ | Medtronic | US | 2026-07-10 | 2026-07-23 | unknown | watch |
 | MET | MET/ | MetLife | US | 2026-07-10 | 2026-07-23 | unknown | watch |
 | META | META/ | Meta Platforms Inc | US | 2026-07-09 | 2026-07-23 | unknown | watch |
+| MFBP | MFBP/ | M&F Bancorp Optus merger — ECIP redemption contingent cash (embedded in MFBP common) | US | — | 2026-07-23 | unknown | watch |
 | MGM | MGM/ | MGM Resorts | US | 2026-07-10 | 2026-07-23 | unknown | watch |
 | MIAX | MIAX/ | Miami International Holdings | US | 2026-07-09 | 2026-07-23 | unknown | watch |
 | MKC | MKC/ | McCormick & Company | US | 2026-07-10 | 2026-07-23 | unknown | watch |
@@ -508,7 +509,7 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-07-23.
 | MTB | MTB/ | M&T Bank | US | 2026-07-10 | 2026-07-23 | unknown | watch |
 | MTD | MTD/ | Mettler Toledo | US | 2026-07-10 | 2026-07-23 | unknown | watch |
 | MU | MU/ | Micron Technology | US | 2026-07-10 | 2026-07-23 | unknown | watch |
-| NAN | NAN/ | Nuveen New York AMT-Free Quality Municipal Income Fund | US | 2026-07-09 | 2026-07-23 | holding_co | watch |
+| NAN | NAN/ | Nuveen New York Quality Municipal Income Fund | US | 2026-07-23 | 2026-07-23 | holding_co | watch |
 | NBIS | NBIS/ | Nebius Group N.V. | US | 2026-07-09 | 2026-07-23 | unknown | watch |
 | NCLH | NCLH/ | Norwegian Cruise Line Holdings | US | 2026-07-10 | 2026-07-23 | unknown | watch |
 | NDAQ | NDAQ/ | Nasdaq Inc. | US | 2026-07-09 | 2026-07-23 | unknown | watch |
@@ -736,4 +737,4 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-07-23.
 | ZBRA | ZBRA/ | Zebra Technologies | US | 2026-07-10 | 2026-07-23 | unknown | watch |
 | ZTS | ZTS/ | Zoetis | US | 2026-07-10 | 2026-07-23 | unknown | watch |
 
-**729 holdings total.** Registry: `_system/portfolio/registry.json`
+**730 holdings total.** Registry: `_system/portfolio/registry.json`
