@@ -1,11 +1,11 @@
 {
   "month": "2026-07",
-  "generated_at": "2026-07-23T18:24:02Z",
+  "generated_at": "2026-07-23T19:01:17Z",
   "counts": {
-    "fail": 0,
+    "fail": 1,
     "stale": 0,
     "unchecked": 19,
-    "pass": 127,
+    "pass": 126,
     "drifted_edges": 0,
     "ledgers": 62,
     "prediction_cards": 11,
@@ -15,7 +15,30 @@
     "thesis_industries": 11,
     "horizon_industries": 2
   },
-  "broken": [],
+  "broken": [
+    {
+      "ticker": "ASX.AX",
+      "kpi_id": "asx200_20d_realized_vol",
+      "label": "ASX 200 20-day realized vol (annualized %)",
+      "status": "fail",
+      "actual": 7.49,
+      "expected": {
+        "op": "gte",
+        "value": 8.0,
+        "horizon": "equity_vol_floor"
+      },
+      "binds_to": {
+        "on_fail": "open_diligence",
+        "note": "Home-market realized vol (AU)"
+      },
+      "last_checked": "2026-07-23",
+      "source": "theme:asx200_20d_realized_vol",
+      "prediction_role": "orientation",
+      "industry_node_ids": [
+        "exchange_markets"
+      ]
+    }
+  ],
   "stale": [],
   "drifted_edges": [],
   "unchecked": [
@@ -444,21 +467,21 @@
   "passes": [
     {
       "ticker": "0388.HK",
-      "kpi_id": "vix_level",
-      "label": "VIX index level",
+      "kpi_id": "hsi_20d_realized_vol",
+      "label": "Hang Seng 20-day realized vol (annualized %)",
       "status": "pass",
-      "actual": 19.639999389648438,
+      "actual": 21.0,
       "expected": {
         "op": "gte",
-        "value": 12,
-        "horizon": "vol_floor_for_croupier"
+        "value": 8.0,
+        "horizon": "equity_vol_floor"
       },
       "binds_to": {
-        "on_fail": "human_review",
-        "note": "Vol pulse for exchange / market-data croupiers"
+        "on_fail": "open_diligence",
+        "note": "Home-market realized vol (HK)"
       },
       "last_checked": "2026-07-23",
-      "source": "theme:vix_level",
+      "source": "theme:hsi_20d_realized_vol",
       "prediction_role": "orientation",
       "industry_node_ids": [
         "exchange_markets"
@@ -466,40 +489,18 @@
     },
     {
       "ticker": "0388.HK",
-      "kpi_id": "spy_20d_realized_vol",
-      "label": "SPY 20-day realized vol (annualized %)",
+      "kpi_id": "vix_level_global",
+      "label": "US VIX (global risk context)",
       "status": "pass",
-      "actual": 11.55,
-      "expected": {
-        "op": "gte",
-        "value": 8,
-        "horizon": "equity_vol_floor"
-      },
-      "binds_to": {
-        "on_fail": "human_review",
-        "note": "Equity vol context for fee/transaction intensity"
-      },
-      "last_checked": "2026-07-23",
-      "source": "theme:spy_20d_realized_vol",
-      "prediction_role": "orientation",
-      "industry_node_ids": [
-        "exchange_markets"
-      ]
-    },
-    {
-      "ticker": "8697.T",
-      "kpi_id": "vix_level",
-      "label": "VIX index level",
-      "status": "pass",
-      "actual": 19.639999389648438,
+      "actual": 19.510000228881836,
       "expected": {
         "op": "gte",
         "value": 12,
-        "horizon": "vol_floor_for_croupier"
+        "horizon": "global_risk"
       },
       "binds_to": {
-        "on_fail": "human_review",
-        "note": "Vol pulse for exchange / market-data croupiers"
+        "on_fail": "open_diligence",
+        "note": "Secondary global risk overlay - not the home-market croupier pulse"
       },
       "last_checked": "2026-07-23",
       "source": "theme:vix_level",
@@ -510,21 +511,43 @@
     },
     {
       "ticker": "8697.T",
-      "kpi_id": "spy_20d_realized_vol",
-      "label": "SPY 20-day realized vol (annualized %)",
+      "kpi_id": "n225_20d_realized_vol",
+      "label": "Nikkei 225 20-day realized vol (annualized %)",
       "status": "pass",
-      "actual": 11.55,
+      "actual": 35.99,
       "expected": {
         "op": "gte",
-        "value": 8,
+        "value": 8.0,
         "horizon": "equity_vol_floor"
       },
       "binds_to": {
-        "on_fail": "human_review",
-        "note": "Equity vol context for fee/transaction intensity"
+        "on_fail": "open_diligence",
+        "note": "Home-market realized vol (JP) - Nikkei 225 realized until official Nikkei VI feed is stable"
       },
       "last_checked": "2026-07-23",
-      "source": "theme:spy_20d_realized_vol",
+      "source": "theme:n225_20d_realized_vol",
+      "prediction_role": "orientation",
+      "industry_node_ids": [
+        "exchange_markets"
+      ]
+    },
+    {
+      "ticker": "8697.T",
+      "kpi_id": "vix_level_global",
+      "label": "US VIX (global risk context)",
+      "status": "pass",
+      "actual": 19.510000228881836,
+      "expected": {
+        "op": "gte",
+        "value": 12,
+        "horizon": "global_risk"
+      },
+      "binds_to": {
+        "on_fail": "open_diligence",
+        "note": "Secondary global risk overlay - not the home-market croupier pulse"
+      },
+      "last_checked": "2026-07-23",
+      "source": "theme:vix_level",
       "prediction_role": "orientation",
       "industry_node_ids": [
         "exchange_markets"
@@ -786,43 +809,21 @@
     },
     {
       "ticker": "ASX.AX",
-      "kpi_id": "vix_level",
-      "label": "VIX index level",
+      "kpi_id": "vix_level_global",
+      "label": "US VIX (global risk context)",
       "status": "pass",
-      "actual": 19.639999389648438,
+      "actual": 19.510000228881836,
       "expected": {
         "op": "gte",
         "value": 12,
-        "horizon": "vol_floor_for_croupier"
+        "horizon": "global_risk"
       },
       "binds_to": {
-        "on_fail": "human_review",
-        "note": "Vol pulse for exchange / market-data croupiers"
+        "on_fail": "open_diligence",
+        "note": "Secondary global risk overlay - not the home-market croupier pulse"
       },
       "last_checked": "2026-07-23",
       "source": "theme:vix_level",
-      "prediction_role": "orientation",
-      "industry_node_ids": [
-        "exchange_markets"
-      ]
-    },
-    {
-      "ticker": "ASX.AX",
-      "kpi_id": "spy_20d_realized_vol",
-      "label": "SPY 20-day realized vol (annualized %)",
-      "status": "pass",
-      "actual": 11.55,
-      "expected": {
-        "op": "gte",
-        "value": 8,
-        "horizon": "equity_vol_floor"
-      },
-      "binds_to": {
-        "on_fail": "human_review",
-        "note": "Equity vol context for fee/transaction intensity"
-      },
-      "last_checked": "2026-07-23",
-      "source": "theme:spy_20d_realized_vol",
       "prediction_role": "orientation",
       "industry_node_ids": [
         "exchange_markets"
@@ -1056,21 +1057,21 @@
     },
     {
       "ticker": "CBOE",
-      "kpi_id": "vix_level",
-      "label": "VIX index level",
+      "kpi_id": "spy_20d_realized_vol",
+      "label": "SPY 20-day realized vol (annualized %)",
       "status": "pass",
-      "actual": 19.639999389648438,
+      "actual": 11.56,
       "expected": {
         "op": "gte",
-        "value": 12,
-        "horizon": "vol_floor_for_croupier"
+        "value": 8.0,
+        "horizon": "equity_vol_floor"
       },
       "binds_to": {
-        "on_fail": "human_review",
-        "note": "Vol pulse for exchange / market-data croupiers"
+        "on_fail": "open_diligence",
+        "note": "Home-market realized vol (US)"
       },
       "last_checked": "2026-07-23",
-      "source": "theme:vix_level",
+      "source": "theme:spy_20d_realized_vol",
       "prediction_role": "orientation",
       "industry_node_ids": [
         "exchange_markets"
@@ -1078,21 +1079,21 @@
     },
     {
       "ticker": "CBOE",
-      "kpi_id": "spy_20d_realized_vol",
-      "label": "SPY 20-day realized vol (annualized %)",
+      "kpi_id": "vix_level",
+      "label": "VIX index level",
       "status": "pass",
-      "actual": 11.55,
+      "actual": 19.510000228881836,
       "expected": {
         "op": "gte",
-        "value": 8,
-        "horizon": "equity_vol_floor"
+        "value": 12.0,
+        "horizon": "vol_floor_for_croupier"
       },
       "binds_to": {
-        "on_fail": "human_review",
-        "note": "Equity vol context for fee/transaction intensity"
+        "on_fail": "open_diligence",
+        "note": "Home-market implied vol (US)"
       },
       "last_checked": "2026-07-23",
-      "source": "theme:spy_20d_realized_vol",
+      "source": "theme:vix_level",
       "prediction_role": "orientation",
       "industry_node_ids": [
         "exchange_markets"
@@ -1232,21 +1233,21 @@
     },
     {
       "ticker": "CME",
-      "kpi_id": "vix_level",
-      "label": "VIX index level",
+      "kpi_id": "spy_20d_realized_vol",
+      "label": "SPY 20-day realized vol (annualized %)",
       "status": "pass",
-      "actual": 19.639999389648438,
+      "actual": 11.56,
       "expected": {
         "op": "gte",
-        "value": 12,
-        "horizon": "vol_floor_for_croupier"
+        "value": 8.0,
+        "horizon": "equity_vol_floor"
       },
       "binds_to": {
-        "on_fail": "human_review",
-        "note": "Vol pulse for exchange / market-data croupiers"
+        "on_fail": "open_diligence",
+        "note": "Home-market realized vol (US)"
       },
       "last_checked": "2026-07-23",
-      "source": "theme:vix_level",
+      "source": "theme:spy_20d_realized_vol",
       "prediction_role": "orientation",
       "industry_node_ids": [
         "exchange_markets"
@@ -1254,21 +1255,21 @@
     },
     {
       "ticker": "CME",
-      "kpi_id": "spy_20d_realized_vol",
-      "label": "SPY 20-day realized vol (annualized %)",
+      "kpi_id": "vix_level",
+      "label": "VIX index level",
       "status": "pass",
-      "actual": 11.55,
+      "actual": 19.510000228881836,
       "expected": {
         "op": "gte",
-        "value": 8,
-        "horizon": "equity_vol_floor"
+        "value": 12.0,
+        "horizon": "vol_floor_for_croupier"
       },
       "binds_to": {
-        "on_fail": "human_review",
-        "note": "Equity vol context for fee/transaction intensity"
+        "on_fail": "open_diligence",
+        "note": "Home-market implied vol (US)"
       },
       "last_checked": "2026-07-23",
-      "source": "theme:spy_20d_realized_vol",
+      "source": "theme:vix_level",
       "prediction_role": "orientation",
       "industry_node_ids": [
         "exchange_markets"
@@ -1411,7 +1412,7 @@
       "kpi_id": "vix_level",
       "label": "VIX index level",
       "status": "pass",
-      "actual": 19.639999389648438,
+      "actual": 19.510000228881836,
       "expected": {
         "op": "gte",
         "value": 12,
@@ -1433,7 +1434,7 @@
       "kpi_id": "spy_20d_realized_vol",
       "label": "SPY 20-day realized vol (annualized %)",
       "status": "pass",
-      "actual": 11.55,
+      "actual": 11.56,
       "expected": {
         "op": "gte",
         "value": 8,
@@ -1631,7 +1632,7 @@
       "kpi_id": "vix_level",
       "label": "VIX index level",
       "status": "pass",
-      "actual": 19.639999389648438,
+      "actual": 19.510000228881836,
       "expected": {
         "op": "gte",
         "value": 12,
@@ -1654,7 +1655,7 @@
       "kpi_id": "spy_20d_realized_vol",
       "label": "SPY 20-day realized vol (annualized %)",
       "status": "pass",
-      "actual": 11.55,
+      "actual": 11.56,
       "expected": {
         "op": "gte",
         "value": 8,
@@ -1955,7 +1956,7 @@
       "kpi_id": "vix_level",
       "label": "VIX index level",
       "status": "pass",
-      "actual": 19.639999389648438,
+      "actual": 19.510000228881836,
       "expected": {
         "op": "gte",
         "value": 12,
@@ -1977,7 +1978,7 @@
       "kpi_id": "spy_20d_realized_vol",
       "label": "SPY 20-day realized vol (annualized %)",
       "status": "pass",
-      "actual": 11.55,
+      "actual": 11.56,
       "expected": {
         "op": "gte",
         "value": 8,
@@ -2111,7 +2112,7 @@
       "kpi_id": "vix_level",
       "label": "VIX index level",
       "status": "pass",
-      "actual": 19.639999389648438,
+      "actual": 19.510000228881836,
       "expected": {
         "op": "gte",
         "value": 12,
@@ -2133,7 +2134,7 @@
       "kpi_id": "spy_20d_realized_vol",
       "label": "SPY 20-day realized vol (annualized %)",
       "status": "pass",
-      "actual": 11.55,
+      "actual": 11.56,
       "expected": {
         "op": "gte",
         "value": 8,
@@ -2328,21 +2329,21 @@
     },
     {
       "ticker": "OTCM",
-      "kpi_id": "vix_level",
-      "label": "VIX index level",
+      "kpi_id": "spy_20d_realized_vol",
+      "label": "SPY 20-day realized vol (annualized %)",
       "status": "pass",
-      "actual": 19.639999389648438,
+      "actual": 11.56,
       "expected": {
         "op": "gte",
-        "value": 12,
-        "horizon": "vol_floor_for_croupier"
+        "value": 8.0,
+        "horizon": "equity_vol_floor"
       },
       "binds_to": {
-        "on_fail": "human_review",
-        "note": "Vol pulse for exchange / market-data croupiers"
+        "on_fail": "open_diligence",
+        "note": "Home-market realized vol (US)"
       },
       "last_checked": "2026-07-23",
-      "source": "theme:vix_level",
+      "source": "theme:spy_20d_realized_vol",
       "prediction_role": "orientation",
       "industry_node_ids": [
         "exchange_markets",
@@ -2351,21 +2352,21 @@
     },
     {
       "ticker": "OTCM",
-      "kpi_id": "spy_20d_realized_vol",
-      "label": "SPY 20-day realized vol (annualized %)",
+      "kpi_id": "vix_level",
+      "label": "VIX index level",
       "status": "pass",
-      "actual": 11.55,
+      "actual": 19.510000228881836,
       "expected": {
         "op": "gte",
-        "value": 8,
-        "horizon": "equity_vol_floor"
+        "value": 12.0,
+        "horizon": "vol_floor_for_croupier"
       },
       "binds_to": {
-        "on_fail": "human_review",
-        "note": "Equity vol context for fee/transaction intensity"
+        "on_fail": "open_diligence",
+        "note": "Home-market implied vol (US)"
       },
       "last_checked": "2026-07-23",
-      "source": "theme:spy_20d_realized_vol",
+      "source": "theme:vix_level",
       "prediction_role": "orientation",
       "industry_node_ids": [
         "exchange_markets",
@@ -2753,7 +2754,7 @@
       "kpi_id": "vix_level",
       "label": "VIX index level",
       "status": "pass",
-      "actual": 19.639999389648438,
+      "actual": 19.510000228881836,
       "expected": {
         "op": "gte",
         "value": 12,
@@ -2775,7 +2776,7 @@
       "kpi_id": "spy_20d_realized_vol",
       "label": "SPY 20-day realized vol (annualized %)",
       "status": "pass",
-      "actual": 11.55,
+      "actual": 11.56,
       "expected": {
         "op": "gte",
         "value": 8,
@@ -3460,8 +3461,8 @@
       ],
       "scaffold": true,
       "summary": {
-        "pass": 2,
-        "fail": 0,
+        "pass": 1,
+        "fail": 1,
         "stale": 0,
         "unchecked": 0
       },
@@ -4548,7 +4549,7 @@
         "ice"
       ],
       "tam_magnetism": "high",
-      "expected_value_note": "Vol pulse informs croupier stance; Superorg card (ICE) carries structural conviction.",
+      "expected_value_note": "Home-market vol by venue; US VIX is global overlay. Superorg card (ICE) carries structural conviction.",
       "path": "_system/reference/world_model/themes/exchange_volatility.json"
     },
     {
@@ -4861,7 +4862,7 @@
         },
         "pricing": {
           "status": "watch",
-          "note": "Fee and data pricing power; vol regime affects transaction intensity."
+          "note": "Fee and data pricing power; home-market vol (see exchange_vol_map) drives transaction intensity; US VIX is secondary for non-US venues."
         },
         "regulatory": {
           "status": "permissioning",

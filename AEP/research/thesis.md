@@ -17,7 +17,7 @@
 | **Payoff lens** | operating |
 | **MOI bucket** | pending |
 
-**Deep dive:** `AEP/research/deep_dive_2026-07-21.md` (auto-sync)
+**Deep dive:** `AEP/research/deep_dive_2026-07-23.md` (auto-sync)
 
 ## One-line thesis
 
