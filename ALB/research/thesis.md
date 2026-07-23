@@ -1,18 +1,23 @@
 # ALB — Investment Thesis
 
-**Last updated:** 2026-07-10
+**Last updated:** auto-sync
 
 ## Classification
 
 | Field | Value |
 |-------|-------|
-| **Archetype** (Stahl) | unknown |
-| **Moat** (Munger) | unproven |
-| **Dhando** (Pabrai) | pending |
+| **Archetype** (Stahl) | capital_cycle |
+| **Moat** (Munger) | narrow |
+| **Dhando** (Pabrai) | partial |
 | **Stance** | watch |
-| **Cycle** | - |
-| **MOI bucket** (legacy) | pending |
-| **Payoff lens** | pending |
+| **Cycle** | trough |
+| **Implied 7yr IRR** (base) | -23.13% (contract base, provisional) |
+| **IRR method** | predictable_cash_flow |
+| **Lawrence bucket** | capital_intensive |
+| **Payoff lens** | levered |
+| **MOI bucket** | pending |
+
+**Deep dive:** `ALB/research/deep_dive_2026-07-21.md` (auto-sync)
 
 ## One-line thesis
 

@@ -45,12 +45,9 @@ jobs:
         run: |
           JOBS=$(python _system/scripts/build_deep_dive_dispatch_matrix.py --use-queue)
           echo "jobs=$JOBS" >> "$GITHUB_OUTPUT"
-          # Backfill may run a few in parallel; onboard stays serial.
-          if echo "$JOBS" | grep -q contract_backfill; then
-            echo "max_parallel=3" >> "$GITHUB_OUTPUT"
-          else
-            echo "max_parallel=1" >> "$GITHUB_OUTPUT"
-          fi
+          # Keep agent PR pressure low so automerge/CI stay consistent.
+          # contract_backfill is serial; onboard stays serial.
+          echo "max_parallel=1" >> "$GITHUB_OUTPUT"
 
   batch:
     needs: batch-prepare

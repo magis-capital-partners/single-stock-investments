@@ -82,8 +82,20 @@ class WorkflowGovernanceTests(unittest.TestCase):
     def test_agent_pr_merge_continues_after_draft_promotion(self):
         workflow = (ROOT / ".github" / "workflows" / "marvin-pr-automerge.yml").read_text(encoding="utf-8")
         self.assertIn('echo "eligible=true"', workflow)
-        self.assertIn("if: steps.meta.outputs.eligible == 'true'", workflow)
+        self.assertIn("if: needs.resolve-pr.outputs.eligible == 'true'", workflow)
         self.assertNotIn("Stop after promoting draft", workflow)
+
+    def test_agent_pr_merge_waits_for_research_quality_without_race(self):
+        workflow = (ROOT / ".github" / "workflows" / "marvin-pr-automerge.yml").read_text(encoding="utf-8")
+        self.assertIn("wait_for_workflow_run.py", workflow)
+        self.assertIn('workflows: ["Research quality (PR)"]', workflow)
+        self.assertNotIn("lewagon/wait-on-check-action", workflow)
+
+    def test_agent_pr_merge_serializes_squash_on_main(self):
+        workflow = (ROOT / ".github" / "workflows" / "marvin-pr-automerge.yml").read_text(encoding="utf-8")
+        self.assertIn("group: agent-automerge-main", workflow)
+        self.assertIn("cancel-in-progress: false", workflow)
+        self.assertIn("Squash merge and delete branch", workflow)
 
     def test_agent_pr_merge_accepts_committee_work_artifacts(self):
         workflow = (ROOT / ".github" / "workflows" / "marvin-pr-automerge.yml").read_text(encoding="utf-8")
@@ -94,6 +106,28 @@ class WorkflowGovernanceTests(unittest.TestCase):
             "Cursor research PR must include research_agent_manifest.json.",
             workflow,
         )
+
+    def test_research_quality_overlays_lint_scripts_from_base(self):
+        workflow = (ROOT / ".github" / "workflows" / "research-quality.yml").read_text(encoding="utf-8")
+        self.assertIn("Overlay lint scripts from base branch", workflow)
+        self.assertIn("lint_pr_research.py", workflow)
+        self.assertIn("lint_deep_dive.py", workflow)
+        self.assertIn("--name-only-file", workflow)
+
+    def test_contract_backfill_wave_is_throttled(self):
+        continue_wf = (ROOT / ".github" / "workflows" / "contract-backfill-continue.yml").read_text(
+            encoding="utf-8"
+        )
+        queue_wf = (ROOT / ".github" / "workflows" / "marvin-deep-dive.yml").read_text(encoding="utf-8")
+        dispatch = (ROOT / ".github" / "workflows" / "research-agent-dispatch.yml").read_text(
+            encoding="utf-8"
+        )
+        self.assertIn("--wave-size 5", continue_wf)
+        self.assertIn("MAX_OPEN_CURSOR_PRS", continue_wf)
+        # Pre-checkout gate must not rely on a local git remote.
+        self.assertIn('gh pr list --repo "${{ github.repository }}"', continue_wf)
+        self.assertIn('echo "max_parallel=1"', queue_wf)
+        self.assertIn("cursor_pr_backlog_", dispatch)
 
     def test_power_zone_writer_uses_shared_lock_and_retry_push(self):
         workflow = (ROOT / ".github" / "workflows" / "power-zone-universe.yml").read_text(encoding="utf-8")
@@ -141,7 +175,7 @@ class WorkflowGovernanceTests(unittest.TestCase):
         policy = json.loads((ROOT / "_system" / "config" / "llm_usage_policy.json").read_text(encoding="utf-8"))
         self.assertEqual(policy["consumers"]["marvin_research"]["daily_repo_limit"], 4)
         self.assertIn("contract_backfill", policy["consumers"]["marvin_research"]["allowed_reasons"])
-        self.assertEqual(policy["consumers"]["marvin_contract_backfill"]["daily_repo_limit"], 50)
+        self.assertEqual(policy["consumers"]["marvin_contract_backfill"]["daily_repo_limit"], 12)
         self.assertEqual(policy["consumers"]["investment_committee"]["baseline_calls_per_ticker"], 5)
         self.assertEqual(policy["consumers"]["investment_committee"]["maximum_calls_per_ticker"], 9)
         self.assertEqual(policy["consumers"]["ci_autofix"]["minimum_repeat_count"], 2)

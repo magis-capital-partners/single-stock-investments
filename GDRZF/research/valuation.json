@@ -1,6 +1,6 @@
 {
   "ticker": "GDRZF",
-  "as_of": "2026-07-17",
+  "as_of": "2026-07-21",
   "method": "yield_curve",
   "irr_method": "yield_curve",
   "valuation_mode": "economic_value",
@@ -202,11 +202,10 @@
     "status": "routed",
     "profile_id": "scarce_asset_optionality",
     "label": "Scarce assets, royalties, and optionality",
-    "score": 8.0,
+    "score": 7.0,
     "reasons": [
       "archetype=optionality",
-      "component categories=real_option",
-      "existing methods=option"
+      "component categories=real_option"
     ],
     "primary_methods": [
       "component_owner_cash_and_unit_nav"
@@ -246,10 +245,10 @@
     "secondary_profiles": [
       {
         "profile_id": "binary_milestone",
-        "score": 3.0,
+        "score": 4.0,
         "reasons": [
           "component categories=real_option",
-          "existing methods=milestone, probability"
+          "existing methods=milestone, probability, risk_adjusted"
         ]
       },
       {
@@ -262,11 +261,10 @@
     ],
     "scorecard": {
       "scarce_asset_optionality": {
-        "score": 8.0,
+        "score": 7.0,
         "reasons": [
           "archetype=optionality",
-          "component categories=real_option",
-          "existing methods=option"
+          "component categories=real_option"
         ]
       },
       "quality_reinvestment": {
@@ -284,9 +282,10 @@
         ]
       },
       "catalyst_asset_value": {
-        "score": 1.0,
+        "score": 2.0,
         "reasons": [
-          "component categories=financial_asset"
+          "component categories=financial_asset",
+          "existing methods=catalyst"
         ]
       },
       "predictable_cash_flow": {
@@ -294,20 +293,20 @@
         "reasons": []
       },
       "binary_milestone": {
-        "score": 3.0,
+        "score": 4.0,
         "reasons": [
           "component categories=real_option",
-          "existing methods=milestone, probability"
+          "existing methods=milestone, probability, risk_adjusted"
         ]
       }
     },
     "decision_rule": "Use one primary method and no more than two corroborating methods; irrelevant methods and personas remain silent."
   },
   "universal_valuation_contract": {
-    "schema_version": "1.0",
+    "schema_version": "2.0",
     "status": "decision_grade",
     "ticker": "GDRZF",
-    "as_of": "2026-07-17",
+    "as_of": "2026-07-21",
     "economic_ownership_map": [
       {
         "component_id": "corporate_cash",
@@ -321,27 +320,189 @@
           "value": 1,
           "unit": "per-share economic claim"
         },
-        "current_operating_contribution": {
-          "starting_revenue_m": null,
-          "base_value_per_share": 0.68
-        },
-        "growth_driver": "Present cash available to common after near-term legal/G&A burn; no award receivable booked.",
-        "required_reinvestment": {
-          "model_type": null,
-          "base_incremental_after_tax_roic": null,
-          "base_remaining_cost_m": null,
-          "treatment": "explicit in driver model or included in the stated owner-cash conversion and component range"
-        },
         "method": "net_asset_value",
+        "method_version": "1.0",
+        "method_provenance": {
+          "method_id": "net_asset_value",
+          "version": "1.0",
+          "label": "Reconciled net asset value",
+          "power_zones": [
+            "scarce_asset_optionality",
+            "catalyst_asset_value",
+            "credit_and_normalized_returns"
+          ],
+          "equation": "value_per_share = (gross_assets - senior_claims - tax - realization_costs) / diluted_shares",
+          "sources": [
+            {
+              "ref": "_system/frameworks/scarce_strategic_asset_valuation.md",
+              "locator": "Economic ownership and unit NAV"
+            }
+          ]
+        },
         "comparable_ids": [],
         "range_per_share": {
+          "low": 0.4,
+          "base": 0.6795,
+          "high": 0.9
+        },
+        "legacy_range_per_share": {
           "low": 0.4,
           "base": 0.68,
           "high": 0.9
         },
+        "valuation_status": "bounded_estimate",
+        "calculation_proof": {
+          "status": "valid",
+          "method_id": "net_asset_value",
+          "method_version": "1.0",
+          "outputs": {
+            "low": 0.4,
+            "base": 0.6795,
+            "high": 0.9
+          },
+          "output_unit": "USD_per_share",
+          "traces": {
+            "low": [
+              {
+                "id": "shares_m",
+                "label": "Diluted shares outstanding",
+                "kind": "estimate",
+                "value": 147.869033,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "GDRZF/research/valuation.json",
+                  "locator": "inputs.shares_outstanding 147,869,033; aggregator pending SEDAR confirmation",
+                  "as_of": "2026-07-17",
+                  "content_sha256": "76865f39e3d3d1b1b9f094a07d5535628efda74d6d1c2b9f9aac41e5aeca5648",
+                  "source_id": "a7ba7872a5613f20bb91413e761b9bb6c36f67b7b51af0502d82c8b21bbcb3fe"
+                },
+                "rationale": null
+              },
+              {
+                "id": "cash_m",
+                "label": "Corporate cash available to common (USD millions)",
+                "kind": "judgment",
+                "value": 59.15,
+                "unit": "USD_m",
+                "source": null,
+                "rationale": "Secondary cash ~USD 100M after 2025/2026 placements; low haircuts burn and placement dilution; high allows modest upside to aggregator cash."
+              },
+              {
+                "id": "value_per_share",
+                "label": "Corporate cash per share",
+                "kind": "calculation",
+                "value": 0.40001614,
+                "unit": "USD_per_share",
+                "operation": "divide",
+                "formula": "cash_m \u00f7 shares_m",
+                "substituted_formula": "59.15 \u00f7 147.86903",
+                "dependencies": [
+                  "cash_m",
+                  "shares_m"
+                ]
+              }
+            ],
+            "base": [
+              {
+                "id": "shares_m",
+                "label": "Diluted shares outstanding",
+                "kind": "estimate",
+                "value": 147.869033,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "GDRZF/research/valuation.json",
+                  "locator": "inputs.shares_outstanding 147,869,033; aggregator pending SEDAR confirmation",
+                  "as_of": "2026-07-17",
+                  "content_sha256": "76865f39e3d3d1b1b9f094a07d5535628efda74d6d1c2b9f9aac41e5aeca5648",
+                  "source_id": "a7ba7872a5613f20bb91413e761b9bb6c36f67b7b51af0502d82c8b21bbcb3fe"
+                },
+                "rationale": null
+              },
+              {
+                "id": "cash_m",
+                "label": "Corporate cash available to common (USD millions)",
+                "kind": "judgment",
+                "value": 100.48,
+                "unit": "USD_m",
+                "source": null,
+                "rationale": "Secondary cash ~USD 100M after 2025/2026 placements; low haircuts burn and placement dilution; high allows modest upside to aggregator cash."
+              },
+              {
+                "id": "value_per_share",
+                "label": "Corporate cash per share",
+                "kind": "calculation",
+                "value": 0.67952023,
+                "unit": "USD_per_share",
+                "operation": "divide",
+                "formula": "cash_m \u00f7 shares_m",
+                "substituted_formula": "100.48 \u00f7 147.86903",
+                "dependencies": [
+                  "cash_m",
+                  "shares_m"
+                ]
+              }
+            ],
+            "high": [
+              {
+                "id": "shares_m",
+                "label": "Diluted shares outstanding",
+                "kind": "estimate",
+                "value": 147.869033,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "GDRZF/research/valuation.json",
+                  "locator": "inputs.shares_outstanding 147,869,033; aggregator pending SEDAR confirmation",
+                  "as_of": "2026-07-17",
+                  "content_sha256": "76865f39e3d3d1b1b9f094a07d5535628efda74d6d1c2b9f9aac41e5aeca5648",
+                  "source_id": "a7ba7872a5613f20bb91413e761b9bb6c36f67b7b51af0502d82c8b21bbcb3fe"
+                },
+                "rationale": null
+              },
+              {
+                "id": "cash_m",
+                "label": "Corporate cash available to common (USD millions)",
+                "kind": "judgment",
+                "value": 133.08,
+                "unit": "USD_m",
+                "source": null,
+                "rationale": "Secondary cash ~USD 100M after 2025/2026 placements; low haircuts burn and placement dilution; high allows modest upside to aggregator cash."
+              },
+              {
+                "id": "value_per_share",
+                "label": "Corporate cash per share",
+                "kind": "calculation",
+                "value": 0.8999856,
+                "unit": "USD_per_share",
+                "operation": "divide",
+                "formula": "cash_m \u00f7 shares_m",
+                "substituted_formula": "133.08 \u00f7 147.86903",
+                "dependencies": [
+                  "cash_m",
+                  "shares_m"
+                ]
+              }
+            ]
+          },
+          "source_lineage": [
+            {
+              "node_id": "shares_m",
+              "ref": "GDRZF/research/valuation.json",
+              "locator": "inputs.shares_outstanding 147,869,033; aggregator pending SEDAR confirmation",
+              "as_of": "2026-07-17",
+              "content_sha256": "76865f39e3d3d1b1b9f094a07d5535628efda74d6d1c2b9f9aac41e5aeca5648",
+              "source_id": "a7ba7872a5613f20bb91413e761b9bb6c36f67b7b51af0502d82c8b21bbcb3fe"
+            }
+          ],
+          "checks": {
+            "passed": true,
+            "errors": []
+          },
+          "proof_hash": "d6593e5b925758597ea06256b8e0aa841e46e2dded700124a10e1363d0be4a9b"
+        },
         "evidence_tier": "analyst_estimate",
         "evidence_level": "analyst_estimated",
         "evidence": "Secondary cash ~USD 100M / 147.9M shares (~$0.68). YE2025 press cited ~USD 69M before later placements. SEDAR annual pending [HUMAN REVIEW].",
+        "scenario_assumptions": "Present cash available to common after near-term legal/G&A burn; no award receivable booked.",
         "probability_and_timing": null,
         "tax_and_realization_adjustments": "Liquidity, FX, and placement dilution bracket the range.",
         "falsifier": "SEDAR cash balance or going-concern burn shows cash floor below the low case after legal spend.",
@@ -360,27 +521,351 @@
           "value": 1,
           "unit": "per-share economic claim"
         },
-        "current_operating_contribution": {
-          "starting_revenue_m": null,
-          "base_value_per_share": 5.5
+        "method": "probability_weighted_catalyst_nav",
+        "method_version": "1.0",
+        "method_provenance": {
+          "method_id": "probability_weighted_catalyst_nav",
+          "version": "1.0",
+          "label": "Mutually exclusive catalyst event tree",
+          "power_zones": [
+            "catalyst_asset_value"
+          ],
+          "equation": "value = sum(probability_i*(payoff_i-cost_i)/(1+r_i)^years_i)",
+          "sources": [
+            {
+              "ref": "_system/frameworks/optionality_valuation.md",
+              "locator": "Probability, beneficiary, timing and failure cases"
+            }
+          ]
         },
-        "growth_driver": "Risked present value of net award collections only; cash remains separate.",
-        "required_reinvestment": {
-          "model_type": null,
-          "base_incremental_after_tax_roic": null,
-          "base_remaining_cost_m": null,
-          "treatment": "explicit in driver model or included in the stated owner-cash conversion and component range"
-        },
-        "method": "probability_weighted_legal_option",
         "comparable_ids": [],
         "range_per_share": {
+          "low": 1.5002,
+          "base": 5.4982,
+          "high": 11.994
+        },
+        "legacy_range_per_share": {
           "low": 1.5,
           "base": 5.5,
           "high": 12.0
         },
+        "valuation_status": "bounded_estimate",
+        "calculation_proof": {
+          "status": "valid",
+          "method_id": "probability_weighted_catalyst_nav",
+          "method_version": "1.0",
+          "outputs": {
+            "low": 1.5002,
+            "base": 5.4982,
+            "high": 11.994
+          },
+          "output_unit": "USD_per_share",
+          "traces": {
+            "low": [
+              {
+                "id": "unpaid_award_m",
+                "label": "Unpaid ICSID/settlement award face (USD millions)",
+                "kind": "estimate",
+                "value": 1180.0,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "GDRZF/investor-documents/ir-gdrzf/GR_Vz_2025.03.05_Arb_II_Final_Draft_RFA__330pm_ET_.pdf",
+                  "locator": "Company H1 2025 interim Note 5 unpaid award estimate ~USD 1.18B as of 2026-06-30",
+                  "as_of": "2025-06-30",
+                  "content_sha256": "3e23269b912b3977e285b58985a964ea996085b9a188421940d3970ac2514f89",
+                  "source_id": "7e9c6f0adc6c985f6f5b4a85a17c1a6073dfaf168bd30bb9f5feda94d49d15f4"
+                },
+                "rationale": null
+              },
+              {
+                "id": "shares_m",
+                "label": "Diluted shares outstanding",
+                "kind": "estimate",
+                "value": 147.869033,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "GDRZF/research/valuation.json",
+                  "locator": "inputs.shares_outstanding 147,869,033; aggregator pending SEDAR confirmation",
+                  "as_of": "2026-07-17",
+                  "content_sha256": "76865f39e3d3d1b1b9f094a07d5535628efda74d6d1c2b9f9aac41e5aeca5648",
+                  "source_id": "a7ba7872a5613f20bb91413e761b9bb6c36f67b7b51af0502d82c8b21bbcb3fe"
+                },
+                "rationale": null
+              },
+              {
+                "id": "net_to_equity_pct",
+                "label": "Risked net recovery to common after CVR, bonus, seniors, timing",
+                "kind": "judgment",
+                "value": 0.188,
+                "unit": "ratio",
+                "source": null,
+                "rationale": "Delaware attached-judgment path and Amber SPA Incremental Consideration mechanics; CVR 5.466% and bonus-plan leakage netted; senior creditor ranking uncertain."
+              },
+              {
+                "id": "timing_discount",
+                "label": "Present-value discount for ~4-year realization horizon",
+                "kind": "judgment",
+                "value": 1.0,
+                "unit": "ratio",
+                "source": null,
+                "rationale": "Risked recovery range already embeds timing and process probability in net_to_equity_pct."
+              },
+              {
+                "id": "risked_recovery_m",
+                "label": "Risked net equity recovery",
+                "kind": "calculation",
+                "value": 221.84,
+                "unit": "USD_m",
+                "operation": "multiply",
+                "formula": "unpaid_award_m \u00d7 net_to_equity_pct",
+                "substituted_formula": "1180 \u00d7 0.188",
+                "dependencies": [
+                  "unpaid_award_m",
+                  "net_to_equity_pct"
+                ]
+              },
+              {
+                "id": "pv_recovery_m",
+                "label": "Present value of risked recovery",
+                "kind": "calculation",
+                "value": 221.84,
+                "unit": "USD_m",
+                "operation": "multiply",
+                "formula": "risked_recovery_m \u00d7 timing_discount",
+                "substituted_formula": "221.84 \u00d7 1",
+                "dependencies": [
+                  "risked_recovery_m",
+                  "timing_discount"
+                ]
+              },
+              {
+                "id": "value_per_share",
+                "label": "Risked award recovery per share",
+                "kind": "calculation",
+                "value": 1.50024651,
+                "unit": "USD_per_share",
+                "operation": "divide",
+                "formula": "pv_recovery_m \u00f7 shares_m",
+                "substituted_formula": "221.84 \u00f7 147.86903",
+                "dependencies": [
+                  "pv_recovery_m",
+                  "shares_m"
+                ]
+              }
+            ],
+            "base": [
+              {
+                "id": "unpaid_award_m",
+                "label": "Unpaid ICSID/settlement award face (USD millions)",
+                "kind": "estimate",
+                "value": 1180.0,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "GDRZF/investor-documents/ir-gdrzf/GR_Vz_2025.03.05_Arb_II_Final_Draft_RFA__330pm_ET_.pdf",
+                  "locator": "Company H1 2025 interim Note 5 unpaid award estimate ~USD 1.18B as of 2026-06-30",
+                  "as_of": "2025-06-30",
+                  "content_sha256": "3e23269b912b3977e285b58985a964ea996085b9a188421940d3970ac2514f89",
+                  "source_id": "7e9c6f0adc6c985f6f5b4a85a17c1a6073dfaf168bd30bb9f5feda94d49d15f4"
+                },
+                "rationale": null
+              },
+              {
+                "id": "shares_m",
+                "label": "Diluted shares outstanding",
+                "kind": "estimate",
+                "value": 147.869033,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "GDRZF/research/valuation.json",
+                  "locator": "inputs.shares_outstanding 147,869,033; aggregator pending SEDAR confirmation",
+                  "as_of": "2026-07-17",
+                  "content_sha256": "76865f39e3d3d1b1b9f094a07d5535628efda74d6d1c2b9f9aac41e5aeca5648",
+                  "source_id": "a7ba7872a5613f20bb91413e761b9bb6c36f67b7b51af0502d82c8b21bbcb3fe"
+                },
+                "rationale": null
+              },
+              {
+                "id": "net_to_equity_pct",
+                "label": "Risked net recovery to common after CVR, bonus, seniors, timing",
+                "kind": "judgment",
+                "value": 0.689,
+                "unit": "ratio",
+                "source": null,
+                "rationale": "Delaware attached-judgment path and Amber SPA Incremental Consideration mechanics; CVR 5.466% and bonus-plan leakage netted; senior creditor ranking uncertain."
+              },
+              {
+                "id": "timing_discount",
+                "label": "Present-value discount for ~4-year realization horizon",
+                "kind": "judgment",
+                "value": 1.0,
+                "unit": "ratio",
+                "source": null,
+                "rationale": "Risked recovery range already embeds timing and process probability in net_to_equity_pct."
+              },
+              {
+                "id": "risked_recovery_m",
+                "label": "Risked net equity recovery",
+                "kind": "calculation",
+                "value": 813.02,
+                "unit": "USD_m",
+                "operation": "multiply",
+                "formula": "unpaid_award_m \u00d7 net_to_equity_pct",
+                "substituted_formula": "1180 \u00d7 0.689",
+                "dependencies": [
+                  "unpaid_award_m",
+                  "net_to_equity_pct"
+                ]
+              },
+              {
+                "id": "pv_recovery_m",
+                "label": "Present value of risked recovery",
+                "kind": "calculation",
+                "value": 813.02,
+                "unit": "USD_m",
+                "operation": "multiply",
+                "formula": "risked_recovery_m \u00d7 timing_discount",
+                "substituted_formula": "813.02 \u00d7 1",
+                "dependencies": [
+                  "risked_recovery_m",
+                  "timing_discount"
+                ]
+              },
+              {
+                "id": "value_per_share",
+                "label": "Risked award recovery per share",
+                "kind": "calculation",
+                "value": 5.49824384,
+                "unit": "USD_per_share",
+                "operation": "divide",
+                "formula": "pv_recovery_m \u00f7 shares_m",
+                "substituted_formula": "813.02 \u00f7 147.86903",
+                "dependencies": [
+                  "pv_recovery_m",
+                  "shares_m"
+                ]
+              }
+            ],
+            "high": [
+              {
+                "id": "unpaid_award_m",
+                "label": "Unpaid ICSID/settlement award face (USD millions)",
+                "kind": "estimate",
+                "value": 1180.0,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "GDRZF/investor-documents/ir-gdrzf/GR_Vz_2025.03.05_Arb_II_Final_Draft_RFA__330pm_ET_.pdf",
+                  "locator": "Company H1 2025 interim Note 5 unpaid award estimate ~USD 1.18B as of 2026-06-30",
+                  "as_of": "2025-06-30",
+                  "content_sha256": "3e23269b912b3977e285b58985a964ea996085b9a188421940d3970ac2514f89",
+                  "source_id": "7e9c6f0adc6c985f6f5b4a85a17c1a6073dfaf168bd30bb9f5feda94d49d15f4"
+                },
+                "rationale": null
+              },
+              {
+                "id": "shares_m",
+                "label": "Diluted shares outstanding",
+                "kind": "estimate",
+                "value": 147.869033,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "GDRZF/research/valuation.json",
+                  "locator": "inputs.shares_outstanding 147,869,033; aggregator pending SEDAR confirmation",
+                  "as_of": "2026-07-17",
+                  "content_sha256": "76865f39e3d3d1b1b9f094a07d5535628efda74d6d1c2b9f9aac41e5aeca5648",
+                  "source_id": "a7ba7872a5613f20bb91413e761b9bb6c36f67b7b51af0502d82c8b21bbcb3fe"
+                },
+                "rationale": null
+              },
+              {
+                "id": "net_to_equity_pct",
+                "label": "Risked net recovery to common after CVR, bonus, seniors, timing",
+                "kind": "judgment",
+                "value": 1.503,
+                "unit": "ratio",
+                "source": null,
+                "rationale": "Delaware attached-judgment path and Amber SPA Incremental Consideration mechanics; CVR 5.466% and bonus-plan leakage netted; senior creditor ranking uncertain."
+              },
+              {
+                "id": "timing_discount",
+                "label": "Present-value discount for ~4-year realization horizon",
+                "kind": "judgment",
+                "value": 1.0,
+                "unit": "ratio",
+                "source": null,
+                "rationale": "Risked recovery range already embeds timing and process probability in net_to_equity_pct."
+              },
+              {
+                "id": "risked_recovery_m",
+                "label": "Risked net equity recovery",
+                "kind": "calculation",
+                "value": 1773.54,
+                "unit": "USD_m",
+                "operation": "multiply",
+                "formula": "unpaid_award_m \u00d7 net_to_equity_pct",
+                "substituted_formula": "1180 \u00d7 1.503",
+                "dependencies": [
+                  "unpaid_award_m",
+                  "net_to_equity_pct"
+                ]
+              },
+              {
+                "id": "pv_recovery_m",
+                "label": "Present value of risked recovery",
+                "kind": "calculation",
+                "value": 1773.54,
+                "unit": "USD_m",
+                "operation": "multiply",
+                "formula": "risked_recovery_m \u00d7 timing_discount",
+                "substituted_formula": "1773.54 \u00d7 1",
+                "dependencies": [
+                  "risked_recovery_m",
+                  "timing_discount"
+                ]
+              },
+              {
+                "id": "value_per_share",
+                "label": "Risked award recovery per share",
+                "kind": "calculation",
+                "value": 11.99399201,
+                "unit": "USD_per_share",
+                "operation": "divide",
+                "formula": "pv_recovery_m \u00f7 shares_m",
+                "substituted_formula": "1773.54 \u00f7 147.86903",
+                "dependencies": [
+                  "pv_recovery_m",
+                  "shares_m"
+                ]
+              }
+            ]
+          },
+          "source_lineage": [
+            {
+              "node_id": "unpaid_award_m",
+              "ref": "GDRZF/investor-documents/ir-gdrzf/GR_Vz_2025.03.05_Arb_II_Final_Draft_RFA__330pm_ET_.pdf",
+              "locator": "Company H1 2025 interim Note 5 unpaid award estimate ~USD 1.18B as of 2026-06-30",
+              "as_of": "2025-06-30",
+              "content_sha256": "3e23269b912b3977e285b58985a964ea996085b9a188421940d3970ac2514f89",
+              "source_id": "7e9c6f0adc6c985f6f5b4a85a17c1a6073dfaf168bd30bb9f5feda94d49d15f4"
+            },
+            {
+              "node_id": "shares_m",
+              "ref": "GDRZF/research/valuation.json",
+              "locator": "inputs.shares_outstanding 147,869,033; aggregator pending SEDAR confirmation",
+              "as_of": "2026-07-17",
+              "content_sha256": "76865f39e3d3d1b1b9f094a07d5535628efda74d6d1c2b9f9aac41e5aeca5648",
+              "source_id": "a7ba7872a5613f20bb91413e761b9bb6c36f67b7b51af0502d82c8b21bbcb3fe"
+            }
+          ],
+          "checks": {
+            "passed": true,
+            "errors": []
+          },
+          "proof_hash": "2c461158e6a8b9138b916300d55489eadf99c05bb57d3535bb3f1ff7870b70c5"
+        },
         "evidence_tier": "filing",
         "evidence_level": "primary_verified",
         "evidence": "Company H1 2025 interim Note 5 unpaid award ~$1.18bn face; Delaware attached judgment / CITGO sale path; net after CVR 5.466% and bonus-plan leakage. Base aligns with four-year dated payoff ~$7 including cash.",
+        "scenario_assumptions": "Risked present value of net award collections only; cash remains separate.",
         "probability_and_timing": {
           "success_probability": null,
           "remaining_capital_m": null,
@@ -391,7 +876,7 @@
         "tax_and_realization_adjustments": "Probability, timing, OFAC/closing, creditor ranking, CVR, and bonus plan are inside the range.",
         "falsifier": "Amber sale closes with de minimis net cash to Gold Reserve after senior creditors, or OFAC/closing permanently blocks distribution.",
         "overlap_key": "risked_award_citgo_recovery",
-        "assumption_type": "fact"
+        "assumption_type": "judgment"
       },
       {
         "component_id": "arb_ii_option",
@@ -405,27 +890,256 @@
           "value": 1,
           "unit": "per-share economic claim"
         },
-        "current_operating_contribution": {
-          "starting_revenue_m": null,
-          "base_value_per_share": 0.0
+        "method": "risk_adjusted_milestone_value",
+        "method_version": "1.0",
+        "method_provenance": {
+          "method_id": "risk_adjusted_milestone_value",
+          "version": "1.0",
+          "label": "Milestone risk-adjusted present value",
+          "power_zones": [
+            "binary_milestone"
+          ],
+          "equation": "value_per_share = (net_cash + sum(p_success*PV(success_value)-remaining_cost) - dilution)/shares",
+          "sources": [
+            {
+              "ref": "_system/frameworks/optionality_valuation.md",
+              "locator": "Milestone-based option framework"
+            }
+          ]
         },
-        "growth_driver": "Incremental option only; does not double-count ICSID/CITGO recovery.",
-        "required_reinvestment": {
-          "model_type": null,
-          "base_incremental_after_tax_roic": null,
-          "base_remaining_cost_m": null,
-          "treatment": "explicit in driver model or included in the stated owner-cash conversion and component range"
-        },
-        "method": "milestone_project_option",
         "comparable_ids": [],
         "range_per_share": {
           "low": 0.0,
           "base": 0.0,
+          "high": 4.9939
+        },
+        "legacy_range_per_share": {
+          "low": 0.0,
+          "base": 0.0,
           "high": 5.0
+        },
+        "valuation_status": "bounded_estimate",
+        "calculation_proof": {
+          "status": "valid",
+          "method_id": "risk_adjusted_milestone_value",
+          "method_version": "1.0",
+          "outputs": {
+            "low": 0.0,
+            "base": 0.0,
+            "high": 4.9939
+          },
+          "output_unit": "USD_per_share",
+          "traces": {
+            "low": [
+              {
+                "id": "shares_m",
+                "label": "Diluted shares outstanding",
+                "kind": "estimate",
+                "value": 147.869033,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "GDRZF/research/valuation.json",
+                  "locator": "inputs.shares_outstanding 147,869,033; aggregator pending SEDAR confirmation",
+                  "as_of": "2026-07-17",
+                  "content_sha256": "76865f39e3d3d1b1b9f094a07d5535628efda74d6d1c2b9f9aac41e5aeca5648",
+                  "source_id": "a7ba7872a5613f20bb91413e761b9bb6c36f67b7b51af0502d82c8b21bbcb3fe"
+                },
+                "rationale": null
+              },
+              {
+                "id": "gross_success_m",
+                "label": "Gross incremental Arb II success value to equity",
+                "kind": "judgment",
+                "value": 0.0,
+                "unit": "USD_m",
+                "source": null,
+                "rationale": "Arb II RFA pleads damages above USD 7B; base zero until tribunal path clearer; high case is bull-only optionality after collectibility haircut."
+              },
+              {
+                "id": "success_probability",
+                "label": "Probability-weighted realization of gross success value",
+                "kind": "judgment",
+                "value": 0.0,
+                "unit": "ratio",
+                "source": null,
+                "rationale": "Base treats success probability as ~0; high case is explicit bull sensitivity only."
+              },
+              {
+                "id": "risked_m",
+                "label": "Risked Arb II option value",
+                "kind": "calculation",
+                "value": 0.0,
+                "unit": "USD_m",
+                "operation": "multiply",
+                "formula": "gross_success_m \u00d7 success_probability",
+                "substituted_formula": "0 \u00d7 0",
+                "dependencies": [
+                  "gross_success_m",
+                  "success_probability"
+                ]
+              },
+              {
+                "id": "value_per_share",
+                "label": "Arb II option per share",
+                "kind": "calculation",
+                "value": 0.0,
+                "unit": "USD_per_share",
+                "operation": "divide",
+                "formula": "risked_m \u00f7 shares_m",
+                "substituted_formula": "0 \u00f7 147.86903",
+                "dependencies": [
+                  "risked_m",
+                  "shares_m"
+                ]
+              }
+            ],
+            "base": [
+              {
+                "id": "shares_m",
+                "label": "Diluted shares outstanding",
+                "kind": "estimate",
+                "value": 147.869033,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "GDRZF/research/valuation.json",
+                  "locator": "inputs.shares_outstanding 147,869,033; aggregator pending SEDAR confirmation",
+                  "as_of": "2026-07-17",
+                  "content_sha256": "76865f39e3d3d1b1b9f094a07d5535628efda74d6d1c2b9f9aac41e5aeca5648",
+                  "source_id": "a7ba7872a5613f20bb91413e761b9bb6c36f67b7b51af0502d82c8b21bbcb3fe"
+                },
+                "rationale": null
+              },
+              {
+                "id": "gross_success_m",
+                "label": "Gross incremental Arb II success value to equity",
+                "kind": "judgment",
+                "value": 0.0,
+                "unit": "USD_m",
+                "source": null,
+                "rationale": "Arb II RFA pleads damages above USD 7B; base zero until tribunal path clearer; high case is bull-only optionality after collectibility haircut."
+              },
+              {
+                "id": "success_probability",
+                "label": "Probability-weighted realization of gross success value",
+                "kind": "judgment",
+                "value": 0.0,
+                "unit": "ratio",
+                "source": null,
+                "rationale": "Base treats success probability as ~0; high case is explicit bull sensitivity only."
+              },
+              {
+                "id": "risked_m",
+                "label": "Risked Arb II option value",
+                "kind": "calculation",
+                "value": 0.0,
+                "unit": "USD_m",
+                "operation": "multiply",
+                "formula": "gross_success_m \u00d7 success_probability",
+                "substituted_formula": "0 \u00d7 0",
+                "dependencies": [
+                  "gross_success_m",
+                  "success_probability"
+                ]
+              },
+              {
+                "id": "value_per_share",
+                "label": "Arb II option per share",
+                "kind": "calculation",
+                "value": 0.0,
+                "unit": "USD_per_share",
+                "operation": "divide",
+                "formula": "risked_m \u00f7 shares_m",
+                "substituted_formula": "0 \u00f7 147.86903",
+                "dependencies": [
+                  "risked_m",
+                  "shares_m"
+                ]
+              }
+            ],
+            "high": [
+              {
+                "id": "shares_m",
+                "label": "Diluted shares outstanding",
+                "kind": "estimate",
+                "value": 147.869033,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "GDRZF/research/valuation.json",
+                  "locator": "inputs.shares_outstanding 147,869,033; aggregator pending SEDAR confirmation",
+                  "as_of": "2026-07-17",
+                  "content_sha256": "76865f39e3d3d1b1b9f094a07d5535628efda74d6d1c2b9f9aac41e5aeca5648",
+                  "source_id": "a7ba7872a5613f20bb91413e761b9bb6c36f67b7b51af0502d82c8b21bbcb3fe"
+                },
+                "rationale": null
+              },
+              {
+                "id": "gross_success_m",
+                "label": "Gross incremental Arb II success value to equity",
+                "kind": "judgment",
+                "value": 738.45,
+                "unit": "USD_m",
+                "source": null,
+                "rationale": "Arb II RFA pleads damages above USD 7B; base zero until tribunal path clearer; high case is bull-only optionality after collectibility haircut."
+              },
+              {
+                "id": "success_probability",
+                "label": "Probability-weighted realization of gross success value",
+                "kind": "judgment",
+                "value": 1.0,
+                "unit": "ratio",
+                "source": null,
+                "rationale": "Base treats success probability as ~0; high case is explicit bull sensitivity only."
+              },
+              {
+                "id": "risked_m",
+                "label": "Risked Arb II option value",
+                "kind": "calculation",
+                "value": 738.45,
+                "unit": "USD_m",
+                "operation": "multiply",
+                "formula": "gross_success_m \u00d7 success_probability",
+                "substituted_formula": "738.45 \u00d7 1",
+                "dependencies": [
+                  "gross_success_m",
+                  "success_probability"
+                ]
+              },
+              {
+                "id": "value_per_share",
+                "label": "Arb II option per share",
+                "kind": "calculation",
+                "value": 4.99394623,
+                "unit": "USD_per_share",
+                "operation": "divide",
+                "formula": "risked_m \u00f7 shares_m",
+                "substituted_formula": "738.45 \u00f7 147.86903",
+                "dependencies": [
+                  "risked_m",
+                  "shares_m"
+                ]
+              }
+            ]
+          },
+          "source_lineage": [
+            {
+              "node_id": "shares_m",
+              "ref": "GDRZF/research/valuation.json",
+              "locator": "inputs.shares_outstanding 147,869,033; aggregator pending SEDAR confirmation",
+              "as_of": "2026-07-17",
+              "content_sha256": "76865f39e3d3d1b1b9f094a07d5535628efda74d6d1c2b9f9aac41e5aeca5648",
+              "source_id": "a7ba7872a5613f20bb91413e761b9bb6c36f67b7b51af0502d82c8b21bbcb3fe"
+            }
+          ],
+          "checks": {
+            "passed": true,
+            "errors": []
+          },
+          "proof_hash": "1c954be4ed4d8997f805aa0ae50082902a2b2cafb87b2385f569cf5f8f396e77"
         },
         "evidence_tier": "filing",
         "evidence_level": "primary_verified",
         "evidence": "Arb II RFA pleadings claim large incremental damages; base zero until tribunal path and collectibility clearer. High case is bull-only optionality.",
+        "scenario_assumptions": "Incremental option only; does not double-count ICSID/CITGO recovery.",
         "probability_and_timing": {
           "success_probability": null,
           "remaining_capital_m": null,
@@ -436,7 +1150,7 @@
         "tax_and_realization_adjustments": "Base zero; high case is success-path optionality only.",
         "falsifier": "Tribunal dismisses Arb II or collectibility collapses so high-case optionality is not supportable.",
         "overlap_key": "arb_ii_option",
-        "assumption_type": "fact"
+        "assumption_type": "judgment"
       },
       {
         "component_id": "legal_burn_and_senior_claims_reserve",
@@ -450,27 +1164,189 @@
           "value": 1,
           "unit": "per-share economic claim"
         },
-        "current_operating_contribution": {
-          "starting_revenue_m": null,
-          "base_value_per_share": -0.5
+        "method": "net_asset_value",
+        "method_version": "1.0",
+        "method_provenance": {
+          "method_id": "net_asset_value",
+          "version": "1.0",
+          "label": "Reconciled net asset value",
+          "power_zones": [
+            "scarce_asset_optionality",
+            "catalyst_asset_value",
+            "credit_and_normalized_returns"
+          ],
+          "equation": "value_per_share = (gross_assets - senior_claims - tax - realization_costs) / diluted_shares",
+          "sources": [
+            {
+              "ref": "_system/frameworks/scarce_strategic_asset_valuation.md",
+              "locator": "Economic ownership and unit NAV"
+            }
+          ]
         },
-        "growth_driver": "Deduction for spend and priority leakage not already netted in the risked recovery line.",
-        "required_reinvestment": {
-          "model_type": null,
-          "base_incremental_after_tax_roic": null,
-          "base_remaining_cost_m": null,
-          "treatment": "explicit in driver model or included in the stated owner-cash conversion and component range"
-        },
-        "method": "realization_reserve",
         "comparable_ids": [],
         "range_per_share": {
           "low": -1.0,
           "base": -0.5,
           "high": -0.2
         },
+        "legacy_range_per_share": {
+          "low": -1.0,
+          "base": -0.5,
+          "high": -0.2
+        },
+        "valuation_status": "bounded_estimate",
+        "calculation_proof": {
+          "status": "valid",
+          "method_id": "net_asset_value",
+          "method_version": "1.0",
+          "outputs": {
+            "low": -1.0,
+            "base": -0.5,
+            "high": -0.2
+          },
+          "output_unit": "USD_per_share",
+          "traces": {
+            "low": [
+              {
+                "id": "shares_m",
+                "label": "Diluted shares outstanding",
+                "kind": "estimate",
+                "value": 147.869033,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "GDRZF/research/valuation.json",
+                  "locator": "inputs.shares_outstanding 147,869,033; aggregator pending SEDAR confirmation",
+                  "as_of": "2026-07-17",
+                  "content_sha256": "76865f39e3d3d1b1b9f094a07d5535628efda74d6d1c2b9f9aac41e5aeca5648",
+                  "source_id": "a7ba7872a5613f20bb91413e761b9bb6c36f67b7b51af0502d82c8b21bbcb3fe"
+                },
+                "rationale": null
+              },
+              {
+                "id": "reserve_m",
+                "label": "Legal burn and senior-claim reserve (USD millions, negative)",
+                "kind": "judgment",
+                "value": -147.87,
+                "unit": "USD_m",
+                "source": null,
+                "rationale": "Ongoing litigation spend and ranking leakage versus other attached judgment creditors on CITGO proceeds; does not double-count CVR already netted in recovery."
+              },
+              {
+                "id": "value_per_share",
+                "label": "Legal burn and senior-claim reserve per share",
+                "kind": "calculation",
+                "value": -1.00000654,
+                "unit": "USD_per_share",
+                "operation": "divide",
+                "formula": "reserve_m \u00f7 shares_m",
+                "substituted_formula": "-147.87 \u00f7 147.86903",
+                "dependencies": [
+                  "reserve_m",
+                  "shares_m"
+                ]
+              }
+            ],
+            "base": [
+              {
+                "id": "shares_m",
+                "label": "Diluted shares outstanding",
+                "kind": "estimate",
+                "value": 147.869033,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "GDRZF/research/valuation.json",
+                  "locator": "inputs.shares_outstanding 147,869,033; aggregator pending SEDAR confirmation",
+                  "as_of": "2026-07-17",
+                  "content_sha256": "76865f39e3d3d1b1b9f094a07d5535628efda74d6d1c2b9f9aac41e5aeca5648",
+                  "source_id": "a7ba7872a5613f20bb91413e761b9bb6c36f67b7b51af0502d82c8b21bbcb3fe"
+                },
+                "rationale": null
+              },
+              {
+                "id": "reserve_m",
+                "label": "Legal burn and senior-claim reserve (USD millions, negative)",
+                "kind": "judgment",
+                "value": -73.935,
+                "unit": "USD_m",
+                "source": null,
+                "rationale": "Ongoing litigation spend and ranking leakage versus other attached judgment creditors on CITGO proceeds; does not double-count CVR already netted in recovery."
+              },
+              {
+                "id": "value_per_share",
+                "label": "Legal burn and senior-claim reserve per share",
+                "kind": "calculation",
+                "value": -0.50000327,
+                "unit": "USD_per_share",
+                "operation": "divide",
+                "formula": "reserve_m \u00f7 shares_m",
+                "substituted_formula": "-73.935 \u00f7 147.86903",
+                "dependencies": [
+                  "reserve_m",
+                  "shares_m"
+                ]
+              }
+            ],
+            "high": [
+              {
+                "id": "shares_m",
+                "label": "Diluted shares outstanding",
+                "kind": "estimate",
+                "value": 147.869033,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "GDRZF/research/valuation.json",
+                  "locator": "inputs.shares_outstanding 147,869,033; aggregator pending SEDAR confirmation",
+                  "as_of": "2026-07-17",
+                  "content_sha256": "76865f39e3d3d1b1b9f094a07d5535628efda74d6d1c2b9f9aac41e5aeca5648",
+                  "source_id": "a7ba7872a5613f20bb91413e761b9bb6c36f67b7b51af0502d82c8b21bbcb3fe"
+                },
+                "rationale": null
+              },
+              {
+                "id": "reserve_m",
+                "label": "Legal burn and senior-claim reserve (USD millions, negative)",
+                "kind": "judgment",
+                "value": -29.574,
+                "unit": "USD_m",
+                "source": null,
+                "rationale": "Ongoing litigation spend and ranking leakage versus other attached judgment creditors on CITGO proceeds; does not double-count CVR already netted in recovery."
+              },
+              {
+                "id": "value_per_share",
+                "label": "Legal burn and senior-claim reserve per share",
+                "kind": "calculation",
+                "value": -0.20000131,
+                "unit": "USD_per_share",
+                "operation": "divide",
+                "formula": "reserve_m \u00f7 shares_m",
+                "substituted_formula": "-29.574 \u00f7 147.86903",
+                "dependencies": [
+                  "reserve_m",
+                  "shares_m"
+                ]
+              }
+            ]
+          },
+          "source_lineage": [
+            {
+              "node_id": "shares_m",
+              "ref": "GDRZF/research/valuation.json",
+              "locator": "inputs.shares_outstanding 147,869,033; aggregator pending SEDAR confirmation",
+              "as_of": "2026-07-17",
+              "content_sha256": "76865f39e3d3d1b1b9f094a07d5535628efda74d6d1c2b9f9aac41e5aeca5648",
+              "source_id": "a7ba7872a5613f20bb91413e761b9bb6c36f67b7b51af0502d82c8b21bbcb3fe"
+            }
+          ],
+          "checks": {
+            "passed": true,
+            "errors": []
+          },
+          "proof_hash": "fafe87afcea0d6a29dee2fc29735652d29c08d23f3639f29de73430cbe832a2f"
+        },
         "evidence_tier": "mixed_primary_and_estimate",
         "evidence_level": "analyst_estimated",
         "evidence": "Ongoing litigation spend and ranking risk versus other attached judgment creditors on CITGO proceeds.",
+        "scenario_assumptions": "Deduction for spend and priority leakage not already netted in the risked recovery line.",
         "probability_and_timing": null,
         "tax_and_realization_adjustments": "Negative additive; does not double-count CVR already netted in recovery.",
         "falsifier": "Creditor waterfall or burn rate shows a larger structural haircut than the low case.",
@@ -487,24 +1363,7 @@
       "double_counting_flags": []
     },
     "input_classification": {
-      "facts": [
-        {
-          "component_id": "risked_award_citgo_recovery",
-          "label": "Risked ICSID/CITGO net recovery",
-          "kind": "fact",
-          "evidence_tier": "filing",
-          "evidence": "Company H1 2025 interim Note 5 unpaid award ~$1.18bn face; Delaware attached judgment / CITGO sale path; net after CVR 5.466% and bonus-plan leakage. Base aligns with four-year dated payoff ~$7 including cash.",
-          "method": "probability_weighted_legal_option"
-        },
-        {
-          "component_id": "arb_ii_option",
-          "label": "Arb II Siembra Minera option",
-          "kind": "fact",
-          "evidence_tier": "filing",
-          "evidence": "Arb II RFA pleadings claim large incremental damages; base zero until tribunal path and collectibility clearer. High case is bull-only optionality.",
-          "method": "milestone_project_option"
-        }
-      ],
+      "facts": [],
       "estimates": [],
       "judgments": [
         {
@@ -513,7 +1372,26 @@
           "kind": "judgment",
           "evidence_tier": "analyst_estimate",
           "evidence": "Secondary cash ~USD 100M / 147.9M shares (~$0.68). YE2025 press cited ~USD 69M before later placements. SEDAR annual pending [HUMAN REVIEW].",
-          "method": "net_asset_value"
+          "method": "net_asset_value",
+          "valuation_status": "bounded_estimate"
+        },
+        {
+          "component_id": "risked_award_citgo_recovery",
+          "label": "Risked ICSID/CITGO net recovery",
+          "kind": "judgment",
+          "evidence_tier": "filing",
+          "evidence": "Company H1 2025 interim Note 5 unpaid award ~$1.18bn face; Delaware attached judgment / CITGO sale path; net after CVR 5.466% and bonus-plan leakage. Base aligns with four-year dated payoff ~$7 including cash.",
+          "method": "probability_weighted_catalyst_nav",
+          "valuation_status": "bounded_estimate"
+        },
+        {
+          "component_id": "arb_ii_option",
+          "label": "Arb II Siembra Minera option",
+          "kind": "judgment",
+          "evidence_tier": "filing",
+          "evidence": "Arb II RFA pleadings claim large incremental damages; base zero until tribunal path and collectibility clearer. High case is bull-only optionality.",
+          "method": "risk_adjusted_milestone_value",
+          "valuation_status": "bounded_estimate"
         },
         {
           "component_id": "legal_burn_and_senior_claims_reserve",
@@ -521,7 +1399,8 @@
           "kind": "judgment",
           "evidence_tier": "mixed_primary_and_estimate",
           "evidence": "Ongoing litigation spend and ranking risk versus other attached judgment creditors on CITGO proceeds.",
-          "method": "realization_reserve"
+          "method": "net_asset_value",
+          "valuation_status": "bounded_estimate"
         }
       ]
     },
@@ -530,11 +1409,10 @@
       "status": "routed",
       "profile_id": "scarce_asset_optionality",
       "label": "Scarce assets, royalties, and optionality",
-      "score": 8.0,
+      "score": 7.0,
       "reasons": [
         "archetype=optionality",
-        "component categories=real_option",
-        "existing methods=option"
+        "component categories=real_option"
       ],
       "primary_methods": [
         "component_owner_cash_and_unit_nav"
@@ -574,10 +1452,10 @@
       "secondary_profiles": [
         {
           "profile_id": "binary_milestone",
-          "score": 3.0,
+          "score": 4.0,
           "reasons": [
             "component categories=real_option",
-            "existing methods=milestone, probability"
+            "existing methods=milestone, probability, risk_adjusted"
           ]
         },
         {
@@ -590,11 +1468,10 @@
       ],
       "scorecard": {
         "scarce_asset_optionality": {
-          "score": 8.0,
+          "score": 7.0,
           "reasons": [
             "archetype=optionality",
-            "component categories=real_option",
-            "existing methods=option"
+            "component categories=real_option"
           ]
         },
         "quality_reinvestment": {
@@ -612,9 +1489,10 @@
           ]
         },
         "catalyst_asset_value": {
-          "score": 1.0,
+          "score": 2.0,
           "reasons": [
-            "component categories=financial_asset"
+            "component categories=financial_asset",
+            "existing methods=catalyst"
           ]
         },
         "predictable_cash_flow": {
@@ -622,10 +1500,10 @@
           "reasons": []
         },
         "binary_milestone": {
-          "score": 3.0,
+          "score": 4.0,
           "reasons": [
             "component categories=real_option",
-            "existing methods=milestone, probability"
+            "existing methods=milestone, probability, risk_adjusted"
           ]
         }
       },
@@ -639,53 +1517,140 @@
     },
     "valuation": {
       "value_per_share": {
+        "low": 0.9002,
+        "base": 5.6777,
+        "high": 17.6879
+      },
+      "priced_components_per_share": {
+        "low": 0.9002,
+        "base": 5.6777,
+        "high": 17.6879
+      },
+      "legacy_value_per_share": {
         "low": 0.9,
         "base": 5.68,
         "high": 17.7
       },
-      "probability_weighted_value_per_share": 5.68,
+      "probability_weighted_value_per_share": 5.6777,
       "expected_distributions_per_share": 0.0,
       "annualized_return_at_price_pct": {
-        "low": -33.35,
-        "base": 5.64,
-        "high": 40.36
+        "low": -33.34,
+        "base": 5.63,
+        "high": 40.34
       },
       "downside_to_low_pct": -80.26,
-      "horizon_years": 4
+      "horizon_years": 4,
+      "interpretation": "value_per_share is withheld while any material additive component is unpriced; priced_components_per_share is not a complete security value."
     },
     "scenario_contract": {
-      "rule": "Cases must change causal operating, capital, probability, timing, or financing drivers\u2014not only the terminal multiple.",
+      "rule": "Cases must change cited causal operating, capital, probability, timing, or financing drivers\u2014not only a terminal multiple.",
       "top_value_drivers": [
         {
           "component_id": "risked_award_citgo_recovery",
           "label": "Risked ICSID/CITGO net recovery",
-          "base_per_share": 5.5,
-          "range_width_per_share": 10.5,
-          "scenario_assumptions": null
+          "valuation_status": "bounded_estimate",
+          "base_per_share": 5.4982,
+          "legacy_base_per_share": 5.5,
+          "range_width_per_share": 10.4938,
+          "scenario_assumptions": "Risked present value of net award collections only; cash remains separate."
         },
         {
           "component_id": "arb_ii_option",
           "label": "Arb II Siembra Minera option",
+          "valuation_status": "bounded_estimate",
           "base_per_share": 0.0,
-          "range_width_per_share": 5.0,
-          "scenario_assumptions": null
+          "legacy_base_per_share": 0.0,
+          "range_width_per_share": 4.9939,
+          "scenario_assumptions": "Incremental option only; does not double-count ICSID/CITGO recovery."
         },
         {
           "component_id": "legal_burn_and_senior_claims_reserve",
           "label": "Legal burn and senior-claim reserve",
+          "valuation_status": "bounded_estimate",
           "base_per_share": -0.5,
+          "legacy_base_per_share": -0.5,
           "range_width_per_share": 0.8,
-          "scenario_assumptions": null
+          "scenario_assumptions": "Deduction for spend and priority leakage not already netted in the risked recovery line."
         },
         {
           "component_id": "corporate_cash",
           "label": "Corporate cash (soft floor)",
-          "base_per_share": 0.68,
+          "valuation_status": "bounded_estimate",
+          "base_per_share": 0.6795,
+          "legacy_base_per_share": 0.68,
           "range_width_per_share": 0.5,
-          "scenario_assumptions": null
+          "scenario_assumptions": "Present cash available to common after near-term legal/G&A burn; no award receivable booked."
         }
       ],
       "reverse_expectations": null
+    },
+    "calculation_proof_summary": {
+      "component_count": 4,
+      "priced_component_count": 4,
+      "proof_complete_pct": 100.0,
+      "status_counts": {
+        "bounded_estimate": 4,
+        "calculated": 0,
+        "legacy_sensitivity": 0,
+        "unpriced": 0
+      },
+      "all_material_components_priced": true,
+      "calculation_errors": [],
+      "aggregate_proof_hash": "94efcbef564808b90daa88fe52ad7c62a11fec9a7757f7485f4f0b9520f2bcdf"
+    },
+    "source_lineage": [
+      {
+        "component_id": "corporate_cash",
+        "node_id": "shares_m",
+        "ref": "GDRZF/research/valuation.json",
+        "locator": "inputs.shares_outstanding 147,869,033; aggregator pending SEDAR confirmation",
+        "as_of": "2026-07-17",
+        "content_sha256": "76865f39e3d3d1b1b9f094a07d5535628efda74d6d1c2b9f9aac41e5aeca5648",
+        "source_id": "a7ba7872a5613f20bb91413e761b9bb6c36f67b7b51af0502d82c8b21bbcb3fe"
+      },
+      {
+        "component_id": "risked_award_citgo_recovery",
+        "node_id": "unpaid_award_m",
+        "ref": "GDRZF/investor-documents/ir-gdrzf/GR_Vz_2025.03.05_Arb_II_Final_Draft_RFA__330pm_ET_.pdf",
+        "locator": "Company H1 2025 interim Note 5 unpaid award estimate ~USD 1.18B as of 2026-06-30",
+        "as_of": "2025-06-30",
+        "content_sha256": "3e23269b912b3977e285b58985a964ea996085b9a188421940d3970ac2514f89",
+        "source_id": "7e9c6f0adc6c985f6f5b4a85a17c1a6073dfaf168bd30bb9f5feda94d49d15f4"
+      },
+      {
+        "component_id": "risked_award_citgo_recovery",
+        "node_id": "shares_m",
+        "ref": "GDRZF/research/valuation.json",
+        "locator": "inputs.shares_outstanding 147,869,033; aggregator pending SEDAR confirmation",
+        "as_of": "2026-07-17",
+        "content_sha256": "76865f39e3d3d1b1b9f094a07d5535628efda74d6d1c2b9f9aac41e5aeca5648",
+        "source_id": "a7ba7872a5613f20bb91413e761b9bb6c36f67b7b51af0502d82c8b21bbcb3fe"
+      },
+      {
+        "component_id": "arb_ii_option",
+        "node_id": "shares_m",
+        "ref": "GDRZF/research/valuation.json",
+        "locator": "inputs.shares_outstanding 147,869,033; aggregator pending SEDAR confirmation",
+        "as_of": "2026-07-17",
+        "content_sha256": "76865f39e3d3d1b1b9f094a07d5535628efda74d6d1c2b9f9aac41e5aeca5648",
+        "source_id": "a7ba7872a5613f20bb91413e761b9bb6c36f67b7b51af0502d82c8b21bbcb3fe"
+      },
+      {
+        "component_id": "legal_burn_and_senior_claims_reserve",
+        "node_id": "shares_m",
+        "ref": "GDRZF/research/valuation.json",
+        "locator": "inputs.shares_outstanding 147,869,033; aggregator pending SEDAR confirmation",
+        "as_of": "2026-07-17",
+        "content_sha256": "76865f39e3d3d1b1b9f094a07d5535628efda74d6d1c2b9f9aac41e5aeca5648",
+        "source_id": "a7ba7872a5613f20bb91413e761b9bb6c36f67b7b51af0502d82c8b21bbcb3fe"
+      }
+    ],
+    "model_checks": {
+      "calculation_graphs_valid": true,
+      "component_sum_reconciles": true,
+      "no_double_counting": true,
+      "all_material_components_priced": true,
+      "low_base_high_ordered": true
     },
     "evidence": {
       "unresolved_count": 0,
@@ -706,7 +1671,17 @@
         "component milestone or falsifier"
       ]
     },
-    "decision_rule": "No security is decision-grade until every material economic claim is valued exactly once and every material evidence blocker is resolved."
+    "change_control": {
+      "model_hash": "3a4ea82cd64580cd987c1242efb50ec826fbc2ca449519bb94fc32c12098b297",
+      "method_versions": [
+        "net_asset_value@1.0",
+        "probability_weighted_catalyst_nav@1.0",
+        "risk_adjusted_milestone_value@1.0"
+      ],
+      "change_log": [],
+      "rule": "A source fact is locked. Every assumption change requires a reason, author, timestamp, and before/after value."
+    },
+    "decision_rule": "No security is decision-grade until every material claim is valued exactly once by a valid calculation proof and every material evidence blocker is resolved."
   },
   "catalyst_paths": [
     {
@@ -723,7 +1698,7 @@
   "total_return_panel": {
     "schema_version": "3.0",
     "ticker": "GDRZF",
-    "as_of": "2026-07-17",
+    "as_of": "2026-07-21",
     "status": "partial",
     "error": "Vendor events are discovery evidence; primary-source completeness has not been established.",
     "price_source": "yahoo:GDRZF",
@@ -731,8 +1706,8 @@
     "return_currency": "USD",
     "fx_basis": "listing_currency_nominal",
     "history_start": "2013-03-18",
-    "history_end": "2026-07-17",
-    "price_points": 3354,
+    "history_end": "2026-07-20",
+    "price_points": 3355,
     "price_interval": "1d",
     "history_basis": "earliest_available_vendor_trading_history",
     "chart_scale": "logarithmic",
@@ -759,21 +1734,21 @@
     },
     "cumulative_distributions_per_share": 0.572,
     "start_price": 2.7,
-    "end_price": 4.64,
-    "price_index_end": 171.85,
-    "total_return_index_end": 211.97,
-    "cumulative_price_return_pct": 71.85,
-    "cumulative_total_return_pct": 111.97,
-    "price_only_annualized_pct": 4.15,
-    "total_return_annualized_pct": 5.8,
+    "end_price": 4.52,
+    "price_index_end": 167.41,
+    "total_return_index_end": 206.49,
+    "cumulative_price_return_pct": 67.41,
+    "cumulative_total_return_pct": 106.49,
+    "price_only_annualized_pct": 3.94,
+    "total_return_annualized_pct": 5.59,
     "market_cap_m": 674.28,
     "shares_outstanding": 147869033,
     "price_for_market_cap": 4.56,
-    "chart": "GDRZF/research/charts/total_return_2026-07-17.svg",
+    "chart": "GDRZF/research/charts/total_return_2026-07-21.svg",
     "panel_json": "GDRZF/research/total_return_panel.json"
   },
   "context_overlay": {
-    "as_of": "2026-07-20",
+    "as_of": "2026-07-22",
     "disclaimer": "Context only. Tailwinds inform stance and overlay sizing; they do not auto-inflate Lawrence base IRR. Promotion to base case requires [HUMAN REVIEW].",
     "themes": [
       {
@@ -783,9 +1758,9 @@
           {
             "id": "hy_oas",
             "label": "High-yield OAS credit spread (%)",
-            "latest": 1.3,
-            "as_of": "2026-07-20",
-            "yoy_pct": 217.1,
+            "latest": 1.59,
+            "as_of": "2026-07-21",
+            "yoy_pct": 287.8,
             "direction": "up",
             "good_for": "risk_regime",
             "source": "spread:HYG-LQD:21d (HYG-LQD 1m spread proxy, not OAS)",
@@ -795,9 +1770,9 @@
           {
             "id": "ust_10y",
             "label": "US Treasury 10Y yield (%)",
-            "latest": 4.579999923706055,
-            "as_of": "2026-07-20",
-            "yoy_pct": 4.8,
+            "latest": 4.627999782562256,
+            "as_of": "2026-07-21",
+            "yoy_pct": 5.9,
             "direction": "up",
             "good_for": "rates_regime",
             "source": "yahoo:^TNX",
@@ -807,9 +1782,9 @@
           {
             "id": "ust_2y",
             "label": "US Treasury 2Y yield (%)",
-            "latest": 4.314000129699707,
-            "as_of": "2026-07-20",
-            "yoy_pct": 10.4,
+            "latest": 4.369999885559082,
+            "as_of": "2026-07-21",
+            "yoy_pct": 11.8,
             "direction": "up",
             "good_for": "rates_regime",
             "source": "yahoo:^FVX",
@@ -819,9 +1794,9 @@
           {
             "id": "dxy_broad",
             "label": "Trade-weighted USD index (broad)",
-            "latest": 100.93699645996094,
-            "as_of": "2026-07-20",
-            "yoy_pct": 3.2,
+            "latest": 101.15299987792969,
+            "as_of": "2026-07-22",
+            "yoy_pct": 3.9,
             "direction": "up",
             "good_for": "dollar_regime",
             "source": "yahoo:DX-Y.NYB",
@@ -831,9 +1806,9 @@
           {
             "id": "vix_level",
             "label": "VIX index level",
-            "latest": 18.280000686645508,
-            "as_of": "2026-07-20",
-            "yoy_pct": 9.8,
+            "latest": 17.65999984741211,
+            "as_of": "2026-07-22",
+            "yoy_pct": 7.0,
             "direction": "up",
             "good_for": "vol_regime",
             "source": "yahoo:^VIX",
@@ -843,9 +1818,9 @@
           {
             "id": "credit_impulse_1m",
             "label": "HYG vs TLT 1-month return spread (%)",
-            "latest": 2.52,
-            "as_of": "2026-07-20",
-            "yoy_pct": 42.4,
+            "latest": 3.11,
+            "as_of": "2026-07-21",
+            "yoy_pct": 75.7,
             "direction": "up",
             "good_for": "credit_impulse",
             "source": "spread:HYG-TLT:21d",
@@ -855,9 +1830,9 @@
           {
             "id": "spy_20d_realized_vol",
             "label": "SPY 20-day realized vol (annualized %)",
-            "latest": 11.39,
-            "as_of": "2026-07-20",
-            "yoy_pct": 31.5,
+            "latest": 11.69,
+            "as_of": "2026-07-21",
+            "yoy_pct": 35.0,
             "direction": "up",
             "good_for": "equity_vol",
             "source": "realized_vol:SPY:20d",
@@ -869,8 +1844,8 @@
     ]
   },
   "lens_consensus": {
-    "as_of": "2026-07-17",
-    "shared_inputs_ref": "valuation.json@2026-07-17",
+    "as_of": "2026-07-21",
+    "shared_inputs_ref": "valuation.json@2026-07-21",
     "valuation_richness": 0.247,
     "blended_return_pct": 4.25,
     "band_pct": [
@@ -910,7 +1885,63 @@
           "evidence": "Secondary cash ~USD 100M / 147.9M shares (~$0.68). YE2025 press cited ~USD 69M before later placements. SEDAR annual pending [HUMAN REVIEW].",
           "assumption_summary": "Present cash available to common after near-term legal/G&A burn; no award receivable booked.",
           "cross_check": "Range must reconcile to primary filings and realization path before IC approval.",
-          "falsifier": "SEDAR cash balance or going-concern burn shows cash floor below the low case after legal spend."
+          "falsifier": "SEDAR cash balance or going-concern burn shows cash floor below the low case after legal spend.",
+          "calculation_proof": {
+            "schema_version": "1.0",
+            "method_id": "net_asset_value",
+            "method_version": "1.0",
+            "output_unit": "USD_per_share",
+            "inputs": [
+              {
+                "id": "shares_m",
+                "label": "Diluted shares outstanding",
+                "kind": "estimate",
+                "value": 147.869033,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "GDRZF/research/valuation.json",
+                  "locator": "inputs.shares_outstanding 147,869,033; aggregator pending SEDAR confirmation",
+                  "as_of": "2026-07-17"
+                }
+              }
+            ],
+            "assumptions": [
+              {
+                "id": "cash_m",
+                "label": "Corporate cash available to common (USD millions)",
+                "kind": "judgment",
+                "values": {
+                  "low": 59.15,
+                  "base": 100.48,
+                  "high": 133.08
+                },
+                "unit": "USD_m",
+                "rationale": "Secondary cash ~USD 100M after 2025/2026 placements; low haircuts burn and placement dilution; high allows modest upside to aggregator cash.",
+                "allowed_range": {
+                  "min": 40.0,
+                  "max": 160.0
+                }
+              }
+            ],
+            "calculations": [
+              {
+                "id": "value_per_share",
+                "label": "Corporate cash per share",
+                "op": "divide",
+                "args": [
+                  "cash_m",
+                  "shares_m"
+                ],
+                "unit": "USD_per_share"
+              }
+            ],
+            "outputs": {
+              "low": "value_per_share",
+              "base": "value_per_share",
+              "high": "value_per_share"
+            }
+          },
+          "valuation_status": "bounded_estimate"
         }
       },
       {
@@ -920,7 +1951,7 @@
         "overlap_key": "risked_award_citgo_recovery",
         "treatment": "additive",
         "valuation": {
-          "method": "probability_weighted_legal_option",
+          "method": "probability_weighted_catalyst_nav",
           "basis": "per_share",
           "low": 1.5,
           "base": 5.5,
@@ -929,7 +1960,111 @@
           "evidence": "Company H1 2025 interim Note 5 unpaid award ~$1.18bn face; Delaware attached judgment / CITGO sale path; net after CVR 5.466% and bonus-plan leakage. Base aligns with four-year dated payoff ~$7 including cash.",
           "assumption_summary": "Risked present value of net award collections only; cash remains separate.",
           "cross_check": "Range must reconcile to primary filings and realization path before IC approval.",
-          "falsifier": "Amber sale closes with de minimis net cash to Gold Reserve after senior creditors, or OFAC/closing permanently blocks distribution."
+          "falsifier": "Amber sale closes with de minimis net cash to Gold Reserve after senior creditors, or OFAC/closing permanently blocks distribution.",
+          "calculation_proof": {
+            "schema_version": "1.0",
+            "method_id": "probability_weighted_catalyst_nav",
+            "method_version": "1.0",
+            "output_unit": "USD_per_share",
+            "inputs": [
+              {
+                "id": "unpaid_award_m",
+                "label": "Unpaid ICSID/settlement award face (USD millions)",
+                "kind": "estimate",
+                "value": 1180.0,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "GDRZF/investor-documents/ir-gdrzf/GR_Vz_2025.03.05_Arb_II_Final_Draft_RFA__330pm_ET_.pdf",
+                  "locator": "Company H1 2025 interim Note 5 unpaid award estimate ~USD 1.18B as of 2026-06-30",
+                  "as_of": "2025-06-30"
+                }
+              },
+              {
+                "id": "shares_m",
+                "label": "Diluted shares outstanding",
+                "kind": "estimate",
+                "value": 147.869033,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "GDRZF/research/valuation.json",
+                  "locator": "inputs.shares_outstanding 147,869,033; aggregator pending SEDAR confirmation",
+                  "as_of": "2026-07-17"
+                }
+              }
+            ],
+            "assumptions": [
+              {
+                "id": "net_to_equity_pct",
+                "label": "Risked net recovery to common after CVR, bonus, seniors, timing",
+                "kind": "judgment",
+                "values": {
+                  "low": 0.188,
+                  "base": 0.689,
+                  "high": 1.503
+                },
+                "unit": "ratio",
+                "rationale": "Delaware attached-judgment path and Amber SPA Incremental Consideration mechanics; CVR 5.466% and bonus-plan leakage netted; senior creditor ranking uncertain.",
+                "allowed_range": {
+                  "min": 0.05,
+                  "max": 2.0
+                }
+              },
+              {
+                "id": "timing_discount",
+                "label": "Present-value discount for ~4-year realization horizon",
+                "kind": "judgment",
+                "values": {
+                  "low": 1.0,
+                  "base": 1.0,
+                  "high": 1.0
+                },
+                "unit": "ratio",
+                "rationale": "Risked recovery range already embeds timing and process probability in net_to_equity_pct.",
+                "allowed_range": {
+                  "min": 0.5,
+                  "max": 1.0
+                }
+              }
+            ],
+            "calculations": [
+              {
+                "id": "risked_recovery_m",
+                "label": "Risked net equity recovery",
+                "op": "multiply",
+                "args": [
+                  "unpaid_award_m",
+                  "net_to_equity_pct"
+                ],
+                "unit": "USD_m"
+              },
+              {
+                "id": "pv_recovery_m",
+                "label": "Present value of risked recovery",
+                "op": "multiply",
+                "args": [
+                  "risked_recovery_m",
+                  "timing_discount"
+                ],
+                "unit": "USD_m"
+              },
+              {
+                "id": "value_per_share",
+                "label": "Risked award recovery per share",
+                "op": "divide",
+                "args": [
+                  "pv_recovery_m",
+                  "shares_m"
+                ],
+                "unit": "USD_per_share"
+              }
+            ],
+            "outputs": {
+              "low": "value_per_share",
+              "base": "value_per_share",
+              "high": "value_per_share"
+            }
+          },
+          "valuation_status": "bounded_estimate"
         }
       },
       {
@@ -939,7 +2074,7 @@
         "overlap_key": "arb_ii_option",
         "treatment": "additive",
         "valuation": {
-          "method": "milestone_project_option",
+          "method": "risk_adjusted_milestone_value",
           "basis": "per_share",
           "low": 0.0,
           "base": 0.0,
@@ -948,7 +2083,89 @@
           "evidence": "Arb II RFA pleadings claim large incremental damages; base zero until tribunal path and collectibility clearer. High case is bull-only optionality.",
           "assumption_summary": "Incremental option only; does not double-count ICSID/CITGO recovery.",
           "cross_check": "Range must reconcile to primary filings and realization path before IC approval.",
-          "falsifier": "Tribunal dismisses Arb II or collectibility collapses so high-case optionality is not supportable."
+          "falsifier": "Tribunal dismisses Arb II or collectibility collapses so high-case optionality is not supportable.",
+          "calculation_proof": {
+            "schema_version": "1.0",
+            "method_id": "risk_adjusted_milestone_value",
+            "method_version": "1.0",
+            "output_unit": "USD_per_share",
+            "inputs": [
+              {
+                "id": "shares_m",
+                "label": "Diluted shares outstanding",
+                "kind": "estimate",
+                "value": 147.869033,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "GDRZF/research/valuation.json",
+                  "locator": "inputs.shares_outstanding 147,869,033; aggregator pending SEDAR confirmation",
+                  "as_of": "2026-07-17"
+                }
+              }
+            ],
+            "assumptions": [
+              {
+                "id": "gross_success_m",
+                "label": "Gross incremental Arb II success value to equity",
+                "kind": "judgment",
+                "values": {
+                  "low": 0.0,
+                  "base": 0.0,
+                  "high": 738.45
+                },
+                "unit": "USD_m",
+                "rationale": "Arb II RFA pleads damages above USD 7B; base zero until tribunal path clearer; high case is bull-only optionality after collectibility haircut.",
+                "allowed_range": {
+                  "min": 0.0,
+                  "max": 2000.0
+                }
+              },
+              {
+                "id": "success_probability",
+                "label": "Probability-weighted realization of gross success value",
+                "kind": "judgment",
+                "values": {
+                  "low": 0.0,
+                  "base": 0.0,
+                  "high": 1.0
+                },
+                "unit": "ratio",
+                "rationale": "Base treats success probability as ~0; high case is explicit bull sensitivity only.",
+                "allowed_range": {
+                  "min": 0.0,
+                  "max": 1.0
+                }
+              }
+            ],
+            "calculations": [
+              {
+                "id": "risked_m",
+                "label": "Risked Arb II option value",
+                "op": "multiply",
+                "args": [
+                  "gross_success_m",
+                  "success_probability"
+                ],
+                "unit": "USD_m"
+              },
+              {
+                "id": "value_per_share",
+                "label": "Arb II option per share",
+                "op": "divide",
+                "args": [
+                  "risked_m",
+                  "shares_m"
+                ],
+                "unit": "USD_per_share"
+              }
+            ],
+            "outputs": {
+              "low": "value_per_share",
+              "base": "value_per_share",
+              "high": "value_per_share"
+            }
+          },
+          "valuation_status": "bounded_estimate"
         }
       },
       {
@@ -958,7 +2175,7 @@
         "overlap_key": "legal_burn_and_senior_claims_reserve",
         "treatment": "additive",
         "valuation": {
-          "method": "realization_reserve",
+          "method": "net_asset_value",
           "basis": "per_share",
           "low": -1.0,
           "base": -0.5,
@@ -967,7 +2184,63 @@
           "evidence": "Ongoing litigation spend and ranking risk versus other attached judgment creditors on CITGO proceeds.",
           "assumption_summary": "Deduction for spend and priority leakage not already netted in the risked recovery line.",
           "cross_check": "Range must reconcile to primary filings and realization path before IC approval.",
-          "falsifier": "Creditor waterfall or burn rate shows a larger structural haircut than the low case."
+          "falsifier": "Creditor waterfall or burn rate shows a larger structural haircut than the low case.",
+          "calculation_proof": {
+            "schema_version": "1.0",
+            "method_id": "net_asset_value",
+            "method_version": "1.0",
+            "output_unit": "USD_per_share",
+            "inputs": [
+              {
+                "id": "shares_m",
+                "label": "Diluted shares outstanding",
+                "kind": "estimate",
+                "value": 147.869033,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "GDRZF/research/valuation.json",
+                  "locator": "inputs.shares_outstanding 147,869,033; aggregator pending SEDAR confirmation",
+                  "as_of": "2026-07-17"
+                }
+              }
+            ],
+            "assumptions": [
+              {
+                "id": "reserve_m",
+                "label": "Legal burn and senior-claim reserve (USD millions, negative)",
+                "kind": "judgment",
+                "values": {
+                  "low": -147.87,
+                  "base": -73.935,
+                  "high": -29.574
+                },
+                "unit": "USD_m",
+                "rationale": "Ongoing litigation spend and ranking leakage versus other attached judgment creditors on CITGO proceeds; does not double-count CVR already netted in recovery.",
+                "allowed_range": {
+                  "min": -250.0,
+                  "max": -10.0
+                }
+              }
+            ],
+            "calculations": [
+              {
+                "id": "value_per_share",
+                "label": "Legal burn and senior-claim reserve per share",
+                "op": "divide",
+                "args": [
+                  "reserve_m",
+                  "shares_m"
+                ],
+                "unit": "USD_per_share"
+              }
+            ],
+            "outputs": {
+              "low": "value_per_share",
+              "base": "value_per_share",
+              "high": "value_per_share"
+            }
+          },
+          "valuation_status": "bounded_estimate"
         }
       }
     ]
@@ -1069,6 +2342,62 @@
         "treatment": "additive",
         "included_in_component_id": null,
         "method": "net_asset_value",
+        "valuation_status": "bounded_estimate",
+        "calculation_proof": {
+          "schema_version": "1.0",
+          "method_id": "net_asset_value",
+          "method_version": "1.0",
+          "output_unit": "USD_per_share",
+          "inputs": [
+            {
+              "id": "shares_m",
+              "label": "Diluted shares outstanding",
+              "kind": "estimate",
+              "value": 147.869033,
+              "unit": "million_shares",
+              "source": {
+                "ref": "GDRZF/research/valuation.json",
+                "locator": "inputs.shares_outstanding 147,869,033; aggregator pending SEDAR confirmation",
+                "as_of": "2026-07-17"
+              }
+            }
+          ],
+          "assumptions": [
+            {
+              "id": "cash_m",
+              "label": "Corporate cash available to common (USD millions)",
+              "kind": "judgment",
+              "values": {
+                "low": 59.15,
+                "base": 100.48,
+                "high": 133.08
+              },
+              "unit": "USD_m",
+              "rationale": "Secondary cash ~USD 100M after 2025/2026 placements; low haircuts burn and placement dilution; high allows modest upside to aggregator cash.",
+              "allowed_range": {
+                "min": 40.0,
+                "max": 160.0
+              }
+            }
+          ],
+          "calculations": [
+            {
+              "id": "value_per_share",
+              "label": "Corporate cash per share",
+              "op": "divide",
+              "args": [
+                "cash_m",
+                "shares_m"
+              ],
+              "unit": "USD_per_share"
+            }
+          ],
+          "outputs": {
+            "low": "value_per_share",
+            "base": "value_per_share",
+            "high": "value_per_share"
+          }
+        },
         "evidence_tier": "analyst_estimate",
         "evidence": "Secondary cash ~USD 100M / 147.9M shares (~$0.68). YE2025 press cited ~USD 69M before later placements. SEDAR annual pending [HUMAN REVIEW].",
         "cross_check": "Range must reconcile to primary filings and realization path before IC approval.",
@@ -1088,7 +2417,111 @@
         "overlap_key": "risked_award_citgo_recovery",
         "treatment": "additive",
         "included_in_component_id": null,
-        "method": "probability_weighted_legal_option",
+        "method": "probability_weighted_catalyst_nav",
+        "valuation_status": "bounded_estimate",
+        "calculation_proof": {
+          "schema_version": "1.0",
+          "method_id": "probability_weighted_catalyst_nav",
+          "method_version": "1.0",
+          "output_unit": "USD_per_share",
+          "inputs": [
+            {
+              "id": "unpaid_award_m",
+              "label": "Unpaid ICSID/settlement award face (USD millions)",
+              "kind": "estimate",
+              "value": 1180.0,
+              "unit": "USD_m",
+              "source": {
+                "ref": "GDRZF/investor-documents/ir-gdrzf/GR_Vz_2025.03.05_Arb_II_Final_Draft_RFA__330pm_ET_.pdf",
+                "locator": "Company H1 2025 interim Note 5 unpaid award estimate ~USD 1.18B as of 2026-06-30",
+                "as_of": "2025-06-30"
+              }
+            },
+            {
+              "id": "shares_m",
+              "label": "Diluted shares outstanding",
+              "kind": "estimate",
+              "value": 147.869033,
+              "unit": "million_shares",
+              "source": {
+                "ref": "GDRZF/research/valuation.json",
+                "locator": "inputs.shares_outstanding 147,869,033; aggregator pending SEDAR confirmation",
+                "as_of": "2026-07-17"
+              }
+            }
+          ],
+          "assumptions": [
+            {
+              "id": "net_to_equity_pct",
+              "label": "Risked net recovery to common after CVR, bonus, seniors, timing",
+              "kind": "judgment",
+              "values": {
+                "low": 0.188,
+                "base": 0.689,
+                "high": 1.503
+              },
+              "unit": "ratio",
+              "rationale": "Delaware attached-judgment path and Amber SPA Incremental Consideration mechanics; CVR 5.466% and bonus-plan leakage netted; senior creditor ranking uncertain.",
+              "allowed_range": {
+                "min": 0.05,
+                "max": 2.0
+              }
+            },
+            {
+              "id": "timing_discount",
+              "label": "Present-value discount for ~4-year realization horizon",
+              "kind": "judgment",
+              "values": {
+                "low": 1.0,
+                "base": 1.0,
+                "high": 1.0
+              },
+              "unit": "ratio",
+              "rationale": "Risked recovery range already embeds timing and process probability in net_to_equity_pct.",
+              "allowed_range": {
+                "min": 0.5,
+                "max": 1.0
+              }
+            }
+          ],
+          "calculations": [
+            {
+              "id": "risked_recovery_m",
+              "label": "Risked net equity recovery",
+              "op": "multiply",
+              "args": [
+                "unpaid_award_m",
+                "net_to_equity_pct"
+              ],
+              "unit": "USD_m"
+            },
+            {
+              "id": "pv_recovery_m",
+              "label": "Present value of risked recovery",
+              "op": "multiply",
+              "args": [
+                "risked_recovery_m",
+                "timing_discount"
+              ],
+              "unit": "USD_m"
+            },
+            {
+              "id": "value_per_share",
+              "label": "Risked award recovery per share",
+              "op": "divide",
+              "args": [
+                "pv_recovery_m",
+                "shares_m"
+              ],
+              "unit": "USD_per_share"
+            }
+          ],
+          "outputs": {
+            "low": "value_per_share",
+            "base": "value_per_share",
+            "high": "value_per_share"
+          }
+        },
         "evidence_tier": "filing",
         "evidence": "Company H1 2025 interim Note 5 unpaid award ~$1.18bn face; Delaware attached judgment / CITGO sale path; net after CVR 5.466% and bonus-plan leakage. Base aligns with four-year dated payoff ~$7 including cash.",
         "cross_check": "Range must reconcile to primary filings and realization path before IC approval.",
@@ -1108,7 +2541,89 @@
         "overlap_key": "arb_ii_option",
         "treatment": "additive",
         "included_in_component_id": null,
-        "method": "milestone_project_option",
+        "method": "risk_adjusted_milestone_value",
+        "valuation_status": "bounded_estimate",
+        "calculation_proof": {
+          "schema_version": "1.0",
+          "method_id": "risk_adjusted_milestone_value",
+          "method_version": "1.0",
+          "output_unit": "USD_per_share",
+          "inputs": [
+            {
+              "id": "shares_m",
+              "label": "Diluted shares outstanding",
+              "kind": "estimate",
+              "value": 147.869033,
+              "unit": "million_shares",
+              "source": {
+                "ref": "GDRZF/research/valuation.json",
+                "locator": "inputs.shares_outstanding 147,869,033; aggregator pending SEDAR confirmation",
+                "as_of": "2026-07-17"
+              }
+            }
+          ],
+          "assumptions": [
+            {
+              "id": "gross_success_m",
+              "label": "Gross incremental Arb II success value to equity",
+              "kind": "judgment",
+              "values": {
+                "low": 0.0,
+                "base": 0.0,
+                "high": 738.45
+              },
+              "unit": "USD_m",
+              "rationale": "Arb II RFA pleads damages above USD 7B; base zero until tribunal path clearer; high case is bull-only optionality after collectibility haircut.",
+              "allowed_range": {
+                "min": 0.0,
+                "max": 2000.0
+              }
+            },
+            {
+              "id": "success_probability",
+              "label": "Probability-weighted realization of gross success value",
+              "kind": "judgment",
+              "values": {
+                "low": 0.0,
+                "base": 0.0,
+                "high": 1.0
+              },
+              "unit": "ratio",
+              "rationale": "Base treats success probability as ~0; high case is explicit bull sensitivity only.",
+              "allowed_range": {
+                "min": 0.0,
+                "max": 1.0
+              }
+            }
+          ],
+          "calculations": [
+            {
+              "id": "risked_m",
+              "label": "Risked Arb II option value",
+              "op": "multiply",
+              "args": [
+                "gross_success_m",
+                "success_probability"
+              ],
+              "unit": "USD_m"
+            },
+            {
+              "id": "value_per_share",
+              "label": "Arb II option per share",
+              "op": "divide",
+              "args": [
+                "risked_m",
+                "shares_m"
+              ],
+              "unit": "USD_per_share"
+            }
+          ],
+          "outputs": {
+            "low": "value_per_share",
+            "base": "value_per_share",
+            "high": "value_per_share"
+          }
+        },
         "evidence_tier": "filing",
         "evidence": "Arb II RFA pleadings claim large incremental damages; base zero until tribunal path and collectibility clearer. High case is bull-only optionality.",
         "cross_check": "Range must reconcile to primary filings and realization path before IC approval.",
@@ -1128,7 +2643,63 @@
         "overlap_key": "legal_burn_and_senior_claims_reserve",
         "treatment": "additive",
         "included_in_component_id": null,
-        "method": "realization_reserve",
+        "method": "net_asset_value",
+        "valuation_status": "bounded_estimate",
+        "calculation_proof": {
+          "schema_version": "1.0",
+          "method_id": "net_asset_value",
+          "method_version": "1.0",
+          "output_unit": "USD_per_share",
+          "inputs": [
+            {
+              "id": "shares_m",
+              "label": "Diluted shares outstanding",
+              "kind": "estimate",
+              "value": 147.869033,
+              "unit": "million_shares",
+              "source": {
+                "ref": "GDRZF/research/valuation.json",
+                "locator": "inputs.shares_outstanding 147,869,033; aggregator pending SEDAR confirmation",
+                "as_of": "2026-07-17"
+              }
+            }
+          ],
+          "assumptions": [
+            {
+              "id": "reserve_m",
+              "label": "Legal burn and senior-claim reserve (USD millions, negative)",
+              "kind": "judgment",
+              "values": {
+                "low": -147.87,
+                "base": -73.935,
+                "high": -29.574
+              },
+              "unit": "USD_m",
+              "rationale": "Ongoing litigation spend and ranking leakage versus other attached judgment creditors on CITGO proceeds; does not double-count CVR already netted in recovery.",
+              "allowed_range": {
+                "min": -250.0,
+                "max": -10.0
+              }
+            }
+          ],
+          "calculations": [
+            {
+              "id": "value_per_share",
+              "label": "Legal burn and senior-claim reserve per share",
+              "op": "divide",
+              "args": [
+                "reserve_m",
+                "shares_m"
+              ],
+              "unit": "USD_per_share"
+            }
+          ],
+          "outputs": {
+            "low": "value_per_share",
+            "base": "value_per_share",
+            "high": "value_per_share"
+          }
+        },
         "evidence_tier": "mixed_primary_and_estimate",
         "evidence": "Ongoing litigation spend and ranking risk versus other attached judgment creditors on CITGO proceeds.",
         "cross_check": "Range must reconcile to primary filings and realization path before IC approval.",
@@ -1300,7 +2871,7 @@
           "value": 1,
           "unit": "per-share economic claim"
         },
-        "method": "probability_weighted_legal_option",
+        "method": "probability_weighted_catalyst_nav",
         "evidence_tier": "filing",
         "evidence": "Company H1 2025 interim Note 5 unpaid award ~$1.18bn face; Delaware attached judgment / CITGO sale path; net after CVR 5.466% and bonus-plan leakage. Base aligns with four-year dated payoff ~$7 including cash.",
         "comparable_role": "not_applicable",
@@ -1330,7 +2901,7 @@
           "value": 1,
           "unit": "per-share economic claim"
         },
-        "method": "milestone_project_option",
+        "method": "risk_adjusted_milestone_value",
         "evidence_tier": "filing",
         "evidence": "Arb II RFA pleadings claim large incremental damages; base zero until tribunal path and collectibility clearer. High case is bull-only optionality.",
         "comparable_role": "not_applicable",
@@ -1360,7 +2931,7 @@
           "value": 1,
           "unit": "per-share economic claim"
         },
-        "method": "realization_reserve",
+        "method": "net_asset_value",
         "evidence_tier": "mixed_primary_and_estimate",
         "evidence": "Ongoing litigation spend and ranking risk versus other attached judgment creditors on CITGO proceeds.",
         "comparable_role": "not_applicable",

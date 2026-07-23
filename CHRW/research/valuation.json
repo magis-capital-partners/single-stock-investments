@@ -10,5 +10,229 @@
   "notes": "Price stub created by fetch_equity_prices.py --create-stub; replace with a real model before decision-grade.",
   "human_review": {
     "live_price_confirmed": false
+  },
+  "context_overlay": {
+    "as_of": "2026-07-22",
+    "disclaimer": "Context only. Tailwinds inform stance and overlay sizing; they do not auto-inflate Lawrence base IRR. Promotion to base case requires [HUMAN REVIEW].",
+    "themes": [
+      {
+        "theme_id": "macro_regime",
+        "label": "Macro risk regime",
+        "indicators": [
+          {
+            "id": "hy_oas",
+            "label": "High-yield OAS credit spread (%)",
+            "latest": 1.59,
+            "as_of": "2026-07-21",
+            "yoy_pct": 287.8,
+            "direction": "up",
+            "good_for": "risk_regime",
+            "source": "spread:HYG-LQD:21d (HYG-LQD 1m spread proxy, not OAS)",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "ust_10y",
+            "label": "US Treasury 10Y yield (%)",
+            "latest": 4.627999782562256,
+            "as_of": "2026-07-21",
+            "yoy_pct": 5.9,
+            "direction": "up",
+            "good_for": "rates_regime",
+            "source": "yahoo:^TNX",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "ust_2y",
+            "label": "US Treasury 2Y yield (%)",
+            "latest": 4.369999885559082,
+            "as_of": "2026-07-21",
+            "yoy_pct": 11.8,
+            "direction": "up",
+            "good_for": "rates_regime",
+            "source": "yahoo:^FVX",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "dxy_broad",
+            "label": "Trade-weighted USD index (broad)",
+            "latest": 101.15299987792969,
+            "as_of": "2026-07-22",
+            "yoy_pct": 3.9,
+            "direction": "up",
+            "good_for": "dollar_regime",
+            "source": "yahoo:DX-Y.NYB",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "vix_level",
+            "label": "VIX index level",
+            "latest": 17.65999984741211,
+            "as_of": "2026-07-22",
+            "yoy_pct": 7.0,
+            "direction": "up",
+            "good_for": "vol_regime",
+            "source": "yahoo:^VIX",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "credit_impulse_1m",
+            "label": "HYG vs TLT 1-month return spread (%)",
+            "latest": 3.11,
+            "as_of": "2026-07-21",
+            "yoy_pct": 75.7,
+            "direction": "up",
+            "good_for": "credit_impulse",
+            "source": "spread:HYG-TLT:21d",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "spy_20d_realized_vol",
+            "label": "SPY 20-day realized vol (annualized %)",
+            "latest": 11.69,
+            "as_of": "2026-07-21",
+            "yoy_pct": 35.0,
+            "direction": "up",
+            "good_for": "equity_vol",
+            "source": "realized_vol:SPY:20d",
+            "stale": false,
+            "in_base_irr": false
+          }
+        ]
+      }
+    ]
+  },
+  "insider_signal": {
+    "as_of": "2026-07-22",
+    "disclaimer": "Context only. Insider activity informs scenario confidence and stance discussion; it does not auto-inflate Lawrence base IRR. Promotion requires [HUMAN REVIEW].",
+    "in_base_irr": false,
+    "window_days": 365,
+    "ics": 10.0,
+    "band": "exceptional",
+    "bull_case_support": "moderate",
+    "scenario_confidence": {
+      "priors": {
+        "bear": 0.2,
+        "base": 0.55,
+        "bull": 0.25
+      },
+      "tilted": {
+        "bear": 0.2,
+        "base": 0.4,
+        "bull": 0.4
+      },
+      "bull_delta": 0.15,
+      "bear_delta": 0.0,
+      "note": "Scenario weights are qualitative confidence only; Lawrence base IRR unchanged."
+    },
+    "factors": {
+      "buy_score": 13.84,
+      "sell_score": -1.0,
+      "cluster_bonus": 0.0,
+      "net_buy_usd": 8650710.06,
+      "net_sell_usd": 38949735.55,
+      "price_today": 205.8
+    },
+    "top_buys": [
+      {
+        "insider": "Castagnetto Michael D.",
+        "date": "2025-11-03",
+        "shares": 20590,
+        "price": 72.74,
+        "value_usd": 1497716.6,
+        "shares_owned_after": 79312,
+        "contrib": 1.397
+      },
+      {
+        "insider": "Freeman Angela K.",
+        "date": "2025-11-06",
+        "shares": 20220,
+        "price": 88.87,
+        "value_usd": 1796951.4,
+        "shares_owned_after": 96520,
+        "contrib": 1.356
+      },
+      {
+        "insider": "Castagnetto Michael D.",
+        "date": "2025-11-03",
+        "shares": 10012,
+        "price": 87.15,
+        "value_usd": 872545.8,
+        "shares_owned_after": 51818,
+        "contrib": 1.342
+      },
+      {
+        "insider": "Castagnetto Michael D.",
+        "date": "2025-11-03",
+        "shares": 7760,
+        "price": 76.72,
+        "value_usd": 595347.2,
+        "shares_owned_after": 41806,
+        "contrib": 1.334
+      },
+      {
+        "insider": "Freeman Angela K.",
+        "date": "2025-11-06",
+        "shares": 19092,
+        "price": 72.74,
+        "value_usd": 1388752.08,
+        "shares_owned_after": 115612,
+        "contrib": 1.314
+      }
+    ],
+    "top_sells": [
+      {
+        "insider": "Lee Damon J.",
+        "date": "2026-07-08",
+        "shares": 4698,
+        "price": 190.95,
+        "value_usd": 897083.1,
+        "is_10b5_1": false,
+        "contrib": -0.2
+      },
+      {
+        "insider": "Lee Damon J.",
+        "date": "2025-12-31",
+        "shares": 2603,
+        "price": 161.96,
+        "value_usd": 421581.88,
+        "is_10b5_1": false,
+        "contrib": -0.101
+      },
+      {
+        "insider": "Bozeman David P",
+        "date": "2026-06-26",
+        "shares": 11693,
+        "price": 180.34,
+        "value_usd": 2108715.62,
+        "is_10b5_1": false,
+        "contrib": -0.06
+      },
+      {
+        "insider": "Capers Dorothy Trefon",
+        "date": "2026-05-05",
+        "shares": 1204,
+        "price": 161.24,
+        "value_usd": 194132.96,
+        "is_10b5_1": false,
+        "contrib": -0.039
+      },
+      {
+        "insider": "Castagnetto Michael D.",
+        "date": "2026-02-17",
+        "shares": 3009,
+        "price": 176.01,
+        "value_usd": 529614.09,
+        "is_10b5_1": false,
+        "contrib": -0.034
+      }
+    ],
+    "narrative_hooks": [],
+    "transaction_count": 57
   }
 }

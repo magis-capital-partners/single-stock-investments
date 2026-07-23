@@ -1,6 +1,6 @@
 {
   "ticker": "FRMO",
-  "as_of": "2026-05-26",
+  "as_of": "2026-07-21",
   "valuation_mode": "economic_value",
   "method": "yield_curve",
   "lawrence_bucket": "other",
@@ -11,28 +11,29 @@
     "cycle": "-"
   },
   "inputs": {
-    "price": 6.7,
-    "price_source": "Stooq FRMO.US close 2026-05-22",
-    "book_per_share": 7.3,
+    "price": 7.0,
+    "price_source": "Yahoo FRMO close 2026-07-20",
+    "book_per_share": 8.55,
     "normalization_note": "Optionality overlay: SOTP + catalyst stack. Price below FRMO-attributable book.",
     "book_per_share_filed": 8.56,
-    "book_per_share_current": 7.3,
+    "book_per_share_current": 8.55,
     "shares_outstanding": 44022781,
-    "shares_source": "FRMO/research/valuation.json pre-existing base SOTP shares, sourced to 2026-02-28_Quarterly_Report.pdf. [HUMAN REVIEW] confirm latest diluted count."
+    "shares_source": "FRMO/research/valuation.json pre-existing base SOTP shares, sourced to 2026-02-28_Quarterly_Report.pdf. [HUMAN REVIEW] confirm latest diluted count.",
+    "price_as_of": "2026-07-20"
   },
   "optionality_gate": {
     "framework": "holdco_sotp",
     "floor_pass": true,
     "floor_metric": "book_per_share",
-    "floor_value": 7.3,
+    "floor_value": 8.55,
     "primary_metric": "lawrence_base",
     "primary_label": "annualized return",
     "primary_return_pct": 21.9,
     "incumbent_sleeve": true,
     "notes": "Trades ~22% below book ($8.55); same SOTP payoffs as prior refresh. HK/MIAX/CMSG catalysts unchanged.",
     "floor_value_filed": 8.56,
-    "floor_value_current": 7.3,
-    "discount_to_current_book_pct": 8.2
+    "floor_value_current": 8.55,
+    "discount_to_current_book_pct": 18.1
   },
   "scenarios": {
     "bear": {
@@ -370,15 +371,15 @@
   },
   "overlay_results": [],
   "book_estimate": {
-    "as_of": "2026-06-02",
+    "as_of": "2026-07-21",
     "filing_period_end": "2026-02-28",
     "filing_source": "investor-documents/ir-frmo/2026-02-28_Quarterly_Report.pdf",
     "filed_book_per_share": 8.56,
-    "current_book_per_share": 7.3,
-    "delta_per_share": -1.25,
-    "delta_pct_of_filed_book": -14.66,
-    "discount_to_filed_book_pct": 21.7,
-    "discount_to_current_estimate_pct": 8.2,
+    "current_book_per_share": 8.55,
+    "delta_per_share": -0.0,
+    "delta_pct_of_filed_book": -0.06,
+    "discount_to_filed_book_pct": 18.2,
+    "discount_to_current_estimate_pct": 18.1,
     "config_path": "FRMO/research/book_estimate_config.json",
     "output_path": "FRMO/research/book_estimate.json"
   },
@@ -503,10 +504,10 @@
     "notes": "Capstone IRR combining filings, segments, overlays, third-party, qualitative"
   },
   "evidence_refresh": {
-    "synthesis_in_dive": true
+    "synthesis_in_dive": false
   },
   "context_overlay": {
-    "as_of": "2026-07-20",
+    "as_of": "2026-07-22",
     "disclaimer": "Context only. Tailwinds inform stance and overlay sizing; they do not auto-inflate Lawrence base IRR. Promotion to base case requires [HUMAN REVIEW].",
     "themes": [
       {
@@ -516,9 +517,9 @@
           {
             "id": "hy_oas",
             "label": "High-yield OAS credit spread (%)",
-            "latest": 1.3,
-            "as_of": "2026-07-20",
-            "yoy_pct": 217.1,
+            "latest": 1.59,
+            "as_of": "2026-07-21",
+            "yoy_pct": 287.8,
             "direction": "up",
             "good_for": "risk_regime",
             "source": "spread:HYG-LQD:21d (HYG-LQD 1m spread proxy, not OAS)",
@@ -528,9 +529,9 @@
           {
             "id": "ust_10y",
             "label": "US Treasury 10Y yield (%)",
-            "latest": 4.579999923706055,
-            "as_of": "2026-07-20",
-            "yoy_pct": 4.8,
+            "latest": 4.627999782562256,
+            "as_of": "2026-07-21",
+            "yoy_pct": 5.9,
             "direction": "up",
             "good_for": "rates_regime",
             "source": "yahoo:^TNX",
@@ -540,9 +541,9 @@
           {
             "id": "ust_2y",
             "label": "US Treasury 2Y yield (%)",
-            "latest": 4.314000129699707,
-            "as_of": "2026-07-20",
-            "yoy_pct": 10.4,
+            "latest": 4.369999885559082,
+            "as_of": "2026-07-21",
+            "yoy_pct": 11.8,
             "direction": "up",
             "good_for": "rates_regime",
             "source": "yahoo:^FVX",
@@ -552,9 +553,9 @@
           {
             "id": "dxy_broad",
             "label": "Trade-weighted USD index (broad)",
-            "latest": 100.93699645996094,
-            "as_of": "2026-07-20",
-            "yoy_pct": 3.2,
+            "latest": 101.15299987792969,
+            "as_of": "2026-07-22",
+            "yoy_pct": 3.9,
             "direction": "up",
             "good_for": "dollar_regime",
             "source": "yahoo:DX-Y.NYB",
@@ -564,9 +565,9 @@
           {
             "id": "vix_level",
             "label": "VIX index level",
-            "latest": 18.280000686645508,
-            "as_of": "2026-07-20",
-            "yoy_pct": 9.8,
+            "latest": 17.65999984741211,
+            "as_of": "2026-07-22",
+            "yoy_pct": 7.0,
             "direction": "up",
             "good_for": "vol_regime",
             "source": "yahoo:^VIX",
@@ -576,9 +577,9 @@
           {
             "id": "credit_impulse_1m",
             "label": "HYG vs TLT 1-month return spread (%)",
-            "latest": 2.52,
-            "as_of": "2026-07-20",
-            "yoy_pct": 42.4,
+            "latest": 3.11,
+            "as_of": "2026-07-21",
+            "yoy_pct": 75.7,
             "direction": "up",
             "good_for": "credit_impulse",
             "source": "spread:HYG-TLT:21d",
@@ -588,9 +589,9 @@
           {
             "id": "spy_20d_realized_vol",
             "label": "SPY 20-day realized vol (annualized %)",
-            "latest": 11.39,
-            "as_of": "2026-07-20",
-            "yoy_pct": 31.5,
+            "latest": 11.69,
+            "as_of": "2026-07-21",
+            "yoy_pct": 35.0,
             "direction": "up",
             "good_for": "equity_vol",
             "source": "realized_vol:SPY:20d",
@@ -602,57 +603,39 @@
     ]
   },
   "lens_consensus": {
-    "as_of": "2026-05-26",
-    "shared_inputs_ref": "valuation.json@2026-05-26",
+    "as_of": "2026-07-21",
+    "shared_inputs_ref": "valuation.json@2026-07-21",
     "valuation_richness": 0.0,
-    "blended_return_pct": 19.78,
+    "blended_return_pct": 20.24,
     "band_pct": [
       7.2,
       26.01
     ],
     "weighted_median_pct": 21.9,
     "median_mean_flag": false,
-    "stance": "hold",
-    "agreement_pct": 0,
-    "dissent_count": 8,
-    "lawrence_divergence": true,
+    "stance": "accumulate",
+    "agreement_pct": 86,
+    "dissent_count": 1,
+    "lawrence_divergence": false,
     "top_dissents": [
       {
-        "persona": "stahl",
-        "label": "Murray Stahl",
-        "verdict": "accumulate",
-        "return_pct": 21.9,
-        "key_metric": "archetype=holding_co",
-        "conviction": 0.595,
-        "falsifier": "No asset intensity / pricing power (moat eroding + non-croupier)"
-      },
-      {
-        "persona": "hk",
-        "label": "Horizon Kinetics",
-        "verdict": "accumulate",
-        "return_pct": 23.9,
-        "key_metric": "payoff_lens=pending",
-        "conviction": 0.595,
-        "falsifier": "No dated contractual payoff or royalty/trust structure"
-      },
-      {
-        "persona": "lawrence",
-        "label": "Lawrence (house IRR)",
-        "verdict": "accumulate",
-        "return_pct": 26.01,
-        "key_metric": "synthesis_pct=26.01",
-        "conviction": 0.551,
-        "falsifier": "Synthesis incomplete or irr_method pending"
+        "persona": "pabrai",
+        "label": "Mohnish Pabrai",
+        "verdict": "watch",
+        "return_pct": 7.2,
+        "key_metric": "downside_upside_ratio=0.239",
+        "conviction": 0.39,
+        "falsifier": "dhando -> none OR net-debt/EBITDA > 3 OR bear return < -15%"
       }
     ],
-    "contributor_count": 8,
+    "contributor_count": 11,
     "in_base_irr": false,
     "disclaimer": "Advisory lens blend only. Does not replace Lawrence total-synthesis stance gate without [HUMAN REVIEW]."
   },
   "total_return_panel": {
     "schema_version": "3.0",
     "ticker": "FRMO",
-    "as_of": "2026-07-15",
+    "as_of": "2026-07-21",
     "status": "partial",
     "error": "Vendor events are discovery evidence; primary-source completeness has not been established.",
     "price_source": "yahoo:FRMO",
@@ -660,8 +643,8 @@
     "return_currency": "USD",
     "fx_basis": "listing_currency_nominal",
     "history_start": "1999-03-16",
-    "history_end": "2026-07-15",
-    "price_points": 6875,
+    "history_end": "2026-07-20",
+    "price_points": 6878,
     "price_interval": "1d",
     "history_basis": "earliest_available_vendor_trading_history",
     "chart_scale": "logarithmic",
@@ -684,17 +667,17 @@
     "distribution_contribution_by_type": {},
     "cumulative_distributions_per_share": 0,
     "start_price": 1.625,
-    "end_price": 7.06,
-    "price_index_end": 434.46,
-    "total_return_index_end": 434.46,
-    "cumulative_price_return_pct": 334.46,
-    "cumulative_total_return_pct": 334.46,
-    "price_only_annualized_pct": 5.52,
-    "total_return_annualized_pct": 5.52,
-    "market_cap_m": null,
-    "shares_outstanding": null,
-    "price_for_market_cap": 6.7,
-    "chart": "FRMO/research/charts/total_return_2026-07-15.svg",
+    "end_price": 7.0,
+    "price_index_end": 430.77,
+    "total_return_index_end": 430.77,
+    "cumulative_price_return_pct": 330.77,
+    "cumulative_total_return_pct": 330.77,
+    "price_only_annualized_pct": 5.49,
+    "total_return_annualized_pct": 5.49,
+    "market_cap_m": 308.16,
+    "shares_outstanding": 44022781,
+    "price_for_market_cap": 7.0,
+    "chart": "FRMO/research/charts/total_return_2026-07-21.svg",
     "panel_json": "FRMO/research/total_return_panel.json"
   },
   "valuation_methodology": {
@@ -714,16 +697,96 @@
         "overlap_key": "core_engine",
         "treatment": "additive",
         "valuation": {
-          "method": "owner_cash_reinvestment_dcf",
+          "method": "net_asset_value",
           "basis": "per_share",
-          "low": 4.15,
+          "low": 4.16,
           "base": 5.36,
           "high": 6.83,
           "evidence_tier": "mixed_primary_and_estimate",
-          "evidence": "Existing FRMO valuation inputs: Optionality overlay: SOTP + catalyst stack. Price below FRMO-attributable book. [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
-          "assumption_summary": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
-          "cross_check": "Reconcile the range to primary filings, a reproducible owner-cash or NAV bridge, and the identified liability and capital claims before decision use.",
-          "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case."
+          "evidence": "Filing-backed proof from FRMO/investor-documents/ir-frmo/2026-02-28_Quarterly_Report.pdf; overlap_key=core_engine. Legacy Lawrence SOTP path remains separate stance gate.",
+          "assumption_summary": "Proof outputs {'low': 4.1621, 'base': 5.3623, 'high': 6.8292}; see calculation_proof graph.",
+          "cross_check": "Non-overlapping component schedule reconciles to Q3 FY2026 quarterly report.",
+          "falsifier": "Primary filing revises Investment A, affiliate marks, or share count >10% without matching proof update.",
+          "calculation_proof": {
+            "schema_version": "1.0",
+            "method_id": "net_asset_value",
+            "method_version": "1.0",
+            "output_unit": "USD_per_share",
+            "inputs": [
+              {
+                "id": "shares_m",
+                "label": "Common shares outstanding",
+                "kind": "fact",
+                "value": 44.022781,
+                "unit": "million_shares",
+                "locked": true,
+                "source": {
+                  "ref": "FRMO/investor-documents/ir-frmo/2026-02-28_Quarterly_Report.pdf",
+                  "locator": "Outstanding shares 44,022,781 as of February 28, 2026",
+                  "as_of": "2026-02-28"
+                }
+              },
+              {
+                "id": "investment_a_m",
+                "label": "Investment A filing fair value",
+                "kind": "fact",
+                "value": 308.984,
+                "unit": "USD_m",
+                "locked": true,
+                "source": {
+                  "ref": "FRMO/research/evidence/_text/2026-02-28_Quarterly_Report.pdf.txt",
+                  "locator": "Concentration table; Investment A $308,984 thousand, 82.0% of FRMO-attributable equity",
+                  "as_of": "2026-02-28"
+                }
+              }
+            ],
+            "assumptions": [
+              {
+                "id": "economic_realization_pct",
+                "label": "Risked realization on look-through marks pending catalyst close",
+                "kind": "judgment",
+                "values": {
+                  "low": 0.593,
+                  "base": 0.764,
+                  "high": 0.973
+                },
+                "unit": "ratio",
+                "rationale": "Base discounts OTC holdco friction and mark volatility; high assumes partial SOTP close on Investment A look-through.",
+                "allowed_range": {
+                  "min": 0.4,
+                  "max": 1.1
+                }
+              }
+            ],
+            "calculations": [
+              {
+                "id": "risked_m",
+                "label": "Risked Investment A economic value",
+                "op": "multiply",
+                "args": [
+                  "investment_a_m",
+                  "economic_realization_pct"
+                ],
+                "unit": "USD_m"
+              },
+              {
+                "id": "value_per_share",
+                "label": "Look-through investment holdings per share",
+                "op": "divide",
+                "args": [
+                  "risked_m",
+                  "shares_m"
+                ],
+                "unit": "USD_per_share"
+              }
+            ],
+            "outputs": {
+              "low": "value_per_share",
+              "base": "value_per_share",
+              "high": "value_per_share"
+            }
+          },
+          "valuation_status": "bounded_estimate"
         }
       },
       {
@@ -733,16 +796,120 @@
         "overlap_key": "reinvestment_or_assets",
         "treatment": "additive",
         "valuation": {
-          "method": "look_through_nav",
+          "method": "probability_weighted_catalyst_nav",
           "basis": "per_share",
           "low": 0.54,
           "base": 0.94,
           "high": 1.61,
           "evidence_tier": "mixed_primary_and_estimate",
-          "evidence": "Existing FRMO valuation inputs: Optionality overlay: SOTP + catalyst stack. Price below FRMO-attributable book. [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
-          "assumption_summary": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
-          "cross_check": "Reconcile the range to primary filings, a reproducible owner-cash or NAV bridge, and the identified liability and capital claims before decision use.",
-          "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case."
+          "evidence": "Filing-backed proof from FRMO/investor-documents/ir-frmo/2026-02-28_Quarterly_Report.pdf; overlap_key=reinvestment_or_assets. Legacy Lawrence SOTP path remains separate stance gate.",
+          "assumption_summary": "Proof outputs {'low': 0.5399, 'base': 0.9406, 'high': 1.6105}; see calculation_proof graph.",
+          "cross_check": "Non-overlapping component schedule reconciles to Q3 FY2026 quarterly report.",
+          "falsifier": "Primary filing revises Investment A, affiliate marks, or share count >10% without matching proof update.",
+          "calculation_proof": {
+            "schema_version": "1.0",
+            "method_id": "probability_weighted_catalyst_nav",
+            "method_version": "1.0",
+            "output_unit": "USD_per_share",
+            "inputs": [
+              {
+                "id": "shares_m",
+                "label": "Common shares outstanding",
+                "kind": "fact",
+                "value": 44.022781,
+                "unit": "million_shares",
+                "locked": true,
+                "source": {
+                  "ref": "FRMO/investor-documents/ir-frmo/2026-02-28_Quarterly_Report.pdf",
+                  "locator": "Outstanding shares 44,022,781 as of February 28, 2026",
+                  "as_of": "2026-02-28"
+                }
+              },
+              {
+                "id": "filed_bundle_m",
+                "label": "Filed management-company and exchange bundle",
+                "kind": "fact",
+                "value": 57.831,
+                "unit": "USD_m",
+                "locked": true,
+                "source": {
+                  "ref": "FRMO/research/evidence/_text/2026-02-28_Quarterly_Report.pdf.txt",
+                  "locator": "MIH $13,917 + CNSX $243 + HKHC equity $27,187 + royalty $10,200 + Winland $5,542 + CMSG $742 (thousands)",
+                  "as_of": "2026-02-28"
+                }
+              }
+            ],
+            "assumptions": [
+              {
+                "id": "catalyst_realization_pct",
+                "label": "Probability-weighted re-rate on exchange and affiliate stakes",
+                "kind": "judgment",
+                "values": {
+                  "low": 0.411,
+                  "base": 0.716,
+                  "high": 1.226
+                },
+                "unit": "ratio",
+                "rationale": "Low reflects MIAX lockup and private-mark lag; high adds partial HKHC/MIH listing re-rate.",
+                "allowed_range": {
+                  "min": 0.2,
+                  "max": 1.5
+                }
+              }
+            ],
+            "calculations": [
+              {
+                "id": "risked_m",
+                "label": "Risked management and exchange NAV",
+                "op": "multiply",
+                "args": [
+                  "filed_bundle_m",
+                  "catalyst_realization_pct"
+                ],
+                "unit": "USD_m"
+              },
+              {
+                "id": "value_per_share",
+                "label": "Management-company and exchange interests per share",
+                "op": "divide",
+                "args": [
+                  "risked_m",
+                  "shares_m"
+                ],
+                "unit": "USD_per_share"
+              }
+            ],
+            "outputs": {
+              "low": "value_per_share",
+              "base": "value_per_share",
+              "high": "value_per_share"
+            }
+          },
+          "valuation_status": "bounded_estimate",
+          "driver_model": {
+            "type": "milestone_project_option",
+            "timing_basis": "5-year catalyst window (MIAX lockup release, Winland control, CMSG/HKHC re-rate)",
+            "scenarios": {
+              "low": {
+                "success_value_m": 57.831,
+                "success_probability": 0.411,
+                "remaining_cost_m": 0.0,
+                "ownership_pct": 1.0
+              },
+              "base": {
+                "success_value_m": 57.831,
+                "success_probability": 0.716,
+                "remaining_cost_m": 0.0,
+                "ownership_pct": 1.0
+              },
+              "high": {
+                "success_value_m": 70.88,
+                "success_probability": 1.0,
+                "remaining_cost_m": 0.0,
+                "ownership_pct": 1.0
+              }
+            }
+          }
         }
       },
       {
@@ -758,10 +925,113 @@
           "base": 0.34,
           "high": 0.67,
           "evidence_tier": "mixed_primary_and_estimate",
-          "evidence": "Existing FRMO valuation inputs: Optionality overlay: SOTP + catalyst stack. Price below FRMO-attributable book. [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
-          "assumption_summary": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
-          "cross_check": "Reconcile the range to primary filings, a reproducible owner-cash or NAV bridge, and the identified liability and capital claims before decision use.",
-          "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case."
+          "evidence": "Filing-backed proof from FRMO/investor-documents/ir-frmo/2026-02-28_Quarterly_Report.pdf; overlap_key=net_financial_claims. Legacy Lawrence SOTP path remains separate stance gate.",
+          "assumption_summary": "Proof outputs {'low': 0.0, 'base': 0.3401, 'high': 0.67}; see calculation_proof graph.",
+          "cross_check": "Non-overlapping component schedule reconciles to Q3 FY2026 quarterly report.",
+          "falsifier": "Primary filing revises Investment A, affiliate marks, or share count >10% without matching proof update.",
+          "calculation_proof": {
+            "schema_version": "1.0",
+            "method_id": "net_asset_value",
+            "method_version": "1.0",
+            "output_unit": "USD_per_share",
+            "inputs": [
+              {
+                "id": "shares_m",
+                "label": "Common shares outstanding",
+                "kind": "fact",
+                "value": 44.022781,
+                "unit": "million_shares",
+                "locked": true,
+                "source": {
+                  "ref": "FRMO/investor-documents/ir-frmo/2026-02-28_Quarterly_Report.pdf",
+                  "locator": "Outstanding shares 44,022,781 as of February 28, 2026",
+                  "as_of": "2026-02-28"
+                }
+              },
+              {
+                "id": "cash_m",
+                "label": "Cash and cash equivalents",
+                "kind": "fact",
+                "value": 45.59,
+                "unit": "USD_m",
+                "locked": true,
+                "source": {
+                  "ref": "FRMO/research/evidence/_text/2026-02-28_Quarterly_Report.pdf.txt",
+                  "locator": "Balance sheet; Cash and cash equivalents $45,590 thousand",
+                  "as_of": "2026-02-28"
+                }
+              },
+              {
+                "id": "digital_assets_m",
+                "label": "Digital assets at fair value",
+                "kind": "fact",
+                "value": 10.911,
+                "unit": "USD_m",
+                "locked": true,
+                "source": {
+                  "ref": "FRMO/research/evidence/_text/2026-02-28_Quarterly_Report.pdf.txt",
+                  "locator": "Balance sheet; Digital assets, at fair value $10,911 thousand",
+                  "as_of": "2026-02-28"
+                }
+              }
+            ],
+            "assumptions": [
+              {
+                "id": "attributable_liquid_pct",
+                "label": "FRMO-attributable excess liquid claims after consolidated subs",
+                "kind": "judgment",
+                "values": {
+                  "low": 0.0,
+                  "base": 0.265,
+                  "high": 0.522
+                },
+                "unit": "ratio",
+                "rationale": "Most consolidated cash sits in operating subs; base counts corporate treasury plus digital sleeve only.",
+                "allowed_range": {
+                  "min": 0.0,
+                  "max": 0.75
+                }
+              }
+            ],
+            "calculations": [
+              {
+                "id": "liquid_m",
+                "label": "Consolidated liquid claims",
+                "op": "add",
+                "args": [
+                  "cash_m",
+                  "digital_assets_m"
+                ],
+                "unit": "USD_m"
+              },
+              {
+                "id": "attributable_m",
+                "label": "Attributable liquid claims",
+                "op": "multiply",
+                "args": [
+                  "liquid_m",
+                  "attributable_liquid_pct"
+                ],
+                "unit": "USD_m"
+              },
+              {
+                "id": "value_per_share",
+                "label": "Cash and net claims per share",
+                "op": "divide",
+                "args": [
+                  "attributable_m",
+                  "shares_m"
+                ],
+                "unit": "USD_per_share"
+              }
+            ],
+            "outputs": {
+              "low": "value_per_share",
+              "base": "value_per_share",
+              "high": "value_per_share"
+            }
+          },
+          "valuation_status": "calculated"
         }
       },
       {
@@ -771,16 +1041,73 @@
         "overlap_key": "downside_reserve",
         "treatment": "additive",
         "valuation": {
-          "method": "realization_reserve",
+          "method": "net_asset_value",
           "basis": "per_share",
           "low": -1.34,
           "base": -0.6,
           "high": -0.07,
           "evidence_tier": "mixed_primary_and_estimate",
-          "evidence": "Existing FRMO valuation inputs: Optionality overlay: SOTP + catalyst stack. Price below FRMO-attributable book. [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
-          "assumption_summary": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
-          "cross_check": "Reconcile the range to primary filings, a reproducible owner-cash or NAV bridge, and the identified liability and capital claims before decision use.",
-          "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case."
+          "evidence": "Filing-backed proof from FRMO/investor-documents/ir-frmo/2026-02-28_Quarterly_Report.pdf; overlap_key=downside_reserve. Legacy Lawrence SOTP path remains separate stance gate.",
+          "assumption_summary": "Proof outputs {'low': -1.3402, 'base': -0.6, 'high': -0.07}; see calculation_proof graph.",
+          "cross_check": "Non-overlapping component schedule reconciles to Q3 FY2026 quarterly report.",
+          "falsifier": "Primary filing revises Investment A, affiliate marks, or share count >10% without matching proof update.",
+          "calculation_proof": {
+            "schema_version": "1.0",
+            "method_id": "net_asset_value",
+            "method_version": "1.0",
+            "output_unit": "USD_per_share",
+            "inputs": [
+              {
+                "id": "shares_m",
+                "label": "Common shares outstanding",
+                "kind": "fact",
+                "value": 44.022781,
+                "unit": "million_shares",
+                "locked": true,
+                "source": {
+                  "ref": "FRMO/investor-documents/ir-frmo/2026-02-28_Quarterly_Report.pdf",
+                  "locator": "Outstanding shares 44,022,781 as of February 28, 2026",
+                  "as_of": "2026-02-28"
+                }
+              }
+            ],
+            "assumptions": [
+              {
+                "id": "reserve_m",
+                "label": "Holdco discount, deferred tax, and realization reserve",
+                "kind": "judgment",
+                "values": {
+                  "low": -59.0,
+                  "base": -26.414,
+                  "high": -3.08
+                },
+                "unit": "USD_m",
+                "rationale": "Low case adds deferred tax ($122.6M consolidated) and OTC illiquidity haircut; high assumes near-par realization.",
+                "allowed_range": {
+                  "min": -150.0,
+                  "max": 0.0
+                }
+              }
+            ],
+            "calculations": [
+              {
+                "id": "value_per_share",
+                "label": "Realization reserve per share",
+                "op": "divide",
+                "args": [
+                  "reserve_m",
+                  "shares_m"
+                ],
+                "unit": "USD_per_share"
+              }
+            ],
+            "outputs": {
+              "low": "value_per_share",
+              "base": "value_per_share",
+              "high": "value_per_share"
+            }
+          },
+          "valuation_status": "bounded_estimate"
         }
       }
     ]
@@ -818,7 +1145,12 @@
         "economic_claim": "Management-company and exchange interests",
         "valuation_basis": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
         "adjustments": "The low/base/high range incorporates ownership, tax, capital, cycle, timing, and realization uncertainty pending the primary bridge.",
-        "overlap_control": "Unique overlap key reinvestment_or_assets; no other component capitalizes the same claim."
+        "overlap_control": "Unique overlap key reinvestment_or_assets; no other component capitalizes the same claim.",
+        "risk_and_timing": {
+          "timing_basis": "5-year catalyst window aligned with Lawrence SOTP horizon",
+          "probability_basis": "Base 71.6% probability weights MIAX lockup release, Winland control, and HKHC re-rate",
+          "remaining_capital_basis": "Affiliate stakes already funded at FRMO parent; no incremental owner capital required for mark re-rate"
+        }
       },
       {
         "id": "net_financial_claims",
@@ -860,16 +1192,96 @@
         "overlap_key": "core_engine",
         "treatment": "additive",
         "included_in_component_id": null,
-        "method": "owner_cash_reinvestment_dcf",
+        "method": "net_asset_value",
+        "valuation_status": "bounded_estimate",
+        "calculation_proof": {
+          "schema_version": "1.0",
+          "method_id": "net_asset_value",
+          "method_version": "1.0",
+          "output_unit": "USD_per_share",
+          "inputs": [
+            {
+              "id": "shares_m",
+              "label": "Common shares outstanding",
+              "kind": "fact",
+              "value": 44.022781,
+              "unit": "million_shares",
+              "locked": true,
+              "source": {
+                "ref": "FRMO/investor-documents/ir-frmo/2026-02-28_Quarterly_Report.pdf",
+                "locator": "Outstanding shares 44,022,781 as of February 28, 2026",
+                "as_of": "2026-02-28"
+              }
+            },
+            {
+              "id": "investment_a_m",
+              "label": "Investment A filing fair value",
+              "kind": "fact",
+              "value": 308.984,
+              "unit": "USD_m",
+              "locked": true,
+              "source": {
+                "ref": "FRMO/research/evidence/_text/2026-02-28_Quarterly_Report.pdf.txt",
+                "locator": "Concentration table; Investment A $308,984 thousand, 82.0% of FRMO-attributable equity",
+                "as_of": "2026-02-28"
+              }
+            }
+          ],
+          "assumptions": [
+            {
+              "id": "economic_realization_pct",
+              "label": "Risked realization on look-through marks pending catalyst close",
+              "kind": "judgment",
+              "values": {
+                "low": 0.593,
+                "base": 0.764,
+                "high": 0.973
+              },
+              "unit": "ratio",
+              "rationale": "Base discounts OTC holdco friction and mark volatility; high assumes partial SOTP close on Investment A look-through.",
+              "allowed_range": {
+                "min": 0.4,
+                "max": 1.1
+              }
+            }
+          ],
+          "calculations": [
+            {
+              "id": "risked_m",
+              "label": "Risked Investment A economic value",
+              "op": "multiply",
+              "args": [
+                "investment_a_m",
+                "economic_realization_pct"
+              ],
+              "unit": "USD_m"
+            },
+            {
+              "id": "value_per_share",
+              "label": "Look-through investment holdings per share",
+              "op": "divide",
+              "args": [
+                "risked_m",
+                "shares_m"
+              ],
+              "unit": "USD_per_share"
+            }
+          ],
+          "outputs": {
+            "low": "value_per_share",
+            "base": "value_per_share",
+            "high": "value_per_share"
+          }
+        },
         "evidence_tier": "mixed_primary_and_estimate",
-        "evidence": "Existing FRMO valuation inputs: Optionality overlay: SOTP + catalyst stack. Price below FRMO-attributable book. [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
-        "cross_check": "Reconcile the range to primary filings, a reproducible owner-cash or NAV bridge, and the identified liability and capital claims before decision use.",
+        "evidence": "Filing-backed proof from FRMO/investor-documents/ir-frmo/2026-02-28_Quarterly_Report.pdf; overlap_key=core_engine. Legacy Lawrence SOTP path remains separate stance gate.",
+        "cross_check": "Non-overlapping component schedule reconciles to Q3 FY2026 quarterly report.",
         "driver_model_type": null,
         "driver_model": null,
-        "assumption_summary": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
-        "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case.",
+        "assumption_summary": "Proof outputs {'low': 4.1621, 'base': 5.3623, 'high': 6.8292}; see calculation_proof graph.",
+        "falsifier": "Primary filing revises Investment A, affiliate marks, or share count >10% without matching proof update.",
         "scenario_assumptions": null,
-        "low_per_share": 4.15,
+        "low_per_share": 4.16,
         "base_per_share": 5.36,
         "high_per_share": 6.83
       },
@@ -880,15 +1292,137 @@
         "overlap_key": "reinvestment_or_assets",
         "treatment": "additive",
         "included_in_component_id": null,
-        "method": "look_through_nav",
+        "method": "probability_weighted_catalyst_nav",
+        "valuation_status": "bounded_estimate",
+        "calculation_proof": {
+          "schema_version": "1.0",
+          "method_id": "probability_weighted_catalyst_nav",
+          "method_version": "1.0",
+          "output_unit": "USD_per_share",
+          "inputs": [
+            {
+              "id": "shares_m",
+              "label": "Common shares outstanding",
+              "kind": "fact",
+              "value": 44.022781,
+              "unit": "million_shares",
+              "locked": true,
+              "source": {
+                "ref": "FRMO/investor-documents/ir-frmo/2026-02-28_Quarterly_Report.pdf",
+                "locator": "Outstanding shares 44,022,781 as of February 28, 2026",
+                "as_of": "2026-02-28"
+              }
+            },
+            {
+              "id": "filed_bundle_m",
+              "label": "Filed management-company and exchange bundle",
+              "kind": "fact",
+              "value": 57.831,
+              "unit": "USD_m",
+              "locked": true,
+              "source": {
+                "ref": "FRMO/research/evidence/_text/2026-02-28_Quarterly_Report.pdf.txt",
+                "locator": "MIH $13,917 + CNSX $243 + HKHC equity $27,187 + royalty $10,200 + Winland $5,542 + CMSG $742 (thousands)",
+                "as_of": "2026-02-28"
+              }
+            }
+          ],
+          "assumptions": [
+            {
+              "id": "catalyst_realization_pct",
+              "label": "Probability-weighted re-rate on exchange and affiliate stakes",
+              "kind": "judgment",
+              "values": {
+                "low": 0.411,
+                "base": 0.716,
+                "high": 1.226
+              },
+              "unit": "ratio",
+              "rationale": "Low reflects MIAX lockup and private-mark lag; high adds partial HKHC/MIH listing re-rate.",
+              "allowed_range": {
+                "min": 0.2,
+                "max": 1.5
+              }
+            }
+          ],
+          "calculations": [
+            {
+              "id": "risked_m",
+              "label": "Risked management and exchange NAV",
+              "op": "multiply",
+              "args": [
+                "filed_bundle_m",
+                "catalyst_realization_pct"
+              ],
+              "unit": "USD_m"
+            },
+            {
+              "id": "value_per_share",
+              "label": "Management-company and exchange interests per share",
+              "op": "divide",
+              "args": [
+                "risked_m",
+                "shares_m"
+              ],
+              "unit": "USD_per_share"
+            }
+          ],
+          "outputs": {
+            "low": "value_per_share",
+            "base": "value_per_share",
+            "high": "value_per_share"
+          }
+        },
         "evidence_tier": "mixed_primary_and_estimate",
-        "evidence": "Existing FRMO valuation inputs: Optionality overlay: SOTP + catalyst stack. Price below FRMO-attributable book. [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
-        "cross_check": "Reconcile the range to primary filings, a reproducible owner-cash or NAV bridge, and the identified liability and capital claims before decision use.",
-        "driver_model_type": null,
-        "driver_model": null,
-        "assumption_summary": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
-        "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case.",
-        "scenario_assumptions": null,
+        "evidence": "Filing-backed proof from FRMO/investor-documents/ir-frmo/2026-02-28_Quarterly_Report.pdf; overlap_key=reinvestment_or_assets. Legacy Lawrence SOTP path remains separate stance gate.",
+        "cross_check": "Non-overlapping component schedule reconciles to Q3 FY2026 quarterly report.",
+        "driver_model_type": "milestone_project_option",
+        "driver_model": {
+          "type": "milestone_project_option",
+          "timing_basis": "5-year catalyst window (MIAX lockup release, Winland control, CMSG/HKHC re-rate)",
+          "scenarios": {
+            "low": {
+              "success_value_m": 57.831,
+              "success_probability": 0.411,
+              "remaining_cost_m": 0.0,
+              "ownership_pct": 1.0
+            },
+            "base": {
+              "success_value_m": 57.831,
+              "success_probability": 0.716,
+              "remaining_cost_m": 0.0,
+              "ownership_pct": 1.0
+            },
+            "high": {
+              "success_value_m": 70.88,
+              "success_probability": 1.0,
+              "remaining_cost_m": 0.0,
+              "ownership_pct": 1.0
+            }
+          }
+        },
+        "assumption_summary": "Proof outputs {'low': 0.5399, 'base': 0.9406, 'high': 1.6105}; see calculation_proof graph.",
+        "falsifier": "Primary filing revises Investment A, affiliate marks, or share count >10% without matching proof update.",
+        "scenario_assumptions": {
+          "low": {
+            "success_value_m": 57.831,
+            "success_probability": 0.411,
+            "remaining_cost_m": 0.0,
+            "ownership_pct": 1.0
+          },
+          "base": {
+            "success_value_m": 57.831,
+            "success_probability": 0.716,
+            "remaining_cost_m": 0.0,
+            "ownership_pct": 1.0
+          },
+          "high": {
+            "success_value_m": 70.88,
+            "success_probability": 1.0,
+            "remaining_cost_m": 0.0,
+            "ownership_pct": 1.0
+          }
+        },
         "low_per_share": 0.54,
         "base_per_share": 0.94,
         "high_per_share": 1.61
@@ -901,13 +1435,116 @@
         "treatment": "additive",
         "included_in_component_id": null,
         "method": "net_asset_value",
+        "valuation_status": "calculated",
+        "calculation_proof": {
+          "schema_version": "1.0",
+          "method_id": "net_asset_value",
+          "method_version": "1.0",
+          "output_unit": "USD_per_share",
+          "inputs": [
+            {
+              "id": "shares_m",
+              "label": "Common shares outstanding",
+              "kind": "fact",
+              "value": 44.022781,
+              "unit": "million_shares",
+              "locked": true,
+              "source": {
+                "ref": "FRMO/investor-documents/ir-frmo/2026-02-28_Quarterly_Report.pdf",
+                "locator": "Outstanding shares 44,022,781 as of February 28, 2026",
+                "as_of": "2026-02-28"
+              }
+            },
+            {
+              "id": "cash_m",
+              "label": "Cash and cash equivalents",
+              "kind": "fact",
+              "value": 45.59,
+              "unit": "USD_m",
+              "locked": true,
+              "source": {
+                "ref": "FRMO/research/evidence/_text/2026-02-28_Quarterly_Report.pdf.txt",
+                "locator": "Balance sheet; Cash and cash equivalents $45,590 thousand",
+                "as_of": "2026-02-28"
+              }
+            },
+            {
+              "id": "digital_assets_m",
+              "label": "Digital assets at fair value",
+              "kind": "fact",
+              "value": 10.911,
+              "unit": "USD_m",
+              "locked": true,
+              "source": {
+                "ref": "FRMO/research/evidence/_text/2026-02-28_Quarterly_Report.pdf.txt",
+                "locator": "Balance sheet; Digital assets, at fair value $10,911 thousand",
+                "as_of": "2026-02-28"
+              }
+            }
+          ],
+          "assumptions": [
+            {
+              "id": "attributable_liquid_pct",
+              "label": "FRMO-attributable excess liquid claims after consolidated subs",
+              "kind": "judgment",
+              "values": {
+                "low": 0.0,
+                "base": 0.265,
+                "high": 0.522
+              },
+              "unit": "ratio",
+              "rationale": "Most consolidated cash sits in operating subs; base counts corporate treasury plus digital sleeve only.",
+              "allowed_range": {
+                "min": 0.0,
+                "max": 0.75
+              }
+            }
+          ],
+          "calculations": [
+            {
+              "id": "liquid_m",
+              "label": "Consolidated liquid claims",
+              "op": "add",
+              "args": [
+                "cash_m",
+                "digital_assets_m"
+              ],
+              "unit": "USD_m"
+            },
+            {
+              "id": "attributable_m",
+              "label": "Attributable liquid claims",
+              "op": "multiply",
+              "args": [
+                "liquid_m",
+                "attributable_liquid_pct"
+              ],
+              "unit": "USD_m"
+            },
+            {
+              "id": "value_per_share",
+              "label": "Cash and net claims per share",
+              "op": "divide",
+              "args": [
+                "attributable_m",
+                "shares_m"
+              ],
+              "unit": "USD_per_share"
+            }
+          ],
+          "outputs": {
+            "low": "value_per_share",
+            "base": "value_per_share",
+            "high": "value_per_share"
+          }
+        },
         "evidence_tier": "mixed_primary_and_estimate",
-        "evidence": "Existing FRMO valuation inputs: Optionality overlay: SOTP + catalyst stack. Price below FRMO-attributable book. [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
-        "cross_check": "Reconcile the range to primary filings, a reproducible owner-cash or NAV bridge, and the identified liability and capital claims before decision use.",
+        "evidence": "Filing-backed proof from FRMO/investor-documents/ir-frmo/2026-02-28_Quarterly_Report.pdf; overlap_key=net_financial_claims. Legacy Lawrence SOTP path remains separate stance gate.",
+        "cross_check": "Non-overlapping component schedule reconciles to Q3 FY2026 quarterly report.",
         "driver_model_type": null,
         "driver_model": null,
-        "assumption_summary": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
-        "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case.",
+        "assumption_summary": "Proof outputs {'low': 0.0, 'base': 0.3401, 'high': 0.67}; see calculation_proof graph.",
+        "falsifier": "Primary filing revises Investment A, affiliate marks, or share count >10% without matching proof update.",
         "scenario_assumptions": null,
         "low_per_share": 0.0,
         "base_per_share": 0.34,
@@ -920,14 +1557,71 @@
         "overlap_key": "downside_reserve",
         "treatment": "additive",
         "included_in_component_id": null,
-        "method": "realization_reserve",
+        "method": "net_asset_value",
+        "valuation_status": "bounded_estimate",
+        "calculation_proof": {
+          "schema_version": "1.0",
+          "method_id": "net_asset_value",
+          "method_version": "1.0",
+          "output_unit": "USD_per_share",
+          "inputs": [
+            {
+              "id": "shares_m",
+              "label": "Common shares outstanding",
+              "kind": "fact",
+              "value": 44.022781,
+              "unit": "million_shares",
+              "locked": true,
+              "source": {
+                "ref": "FRMO/investor-documents/ir-frmo/2026-02-28_Quarterly_Report.pdf",
+                "locator": "Outstanding shares 44,022,781 as of February 28, 2026",
+                "as_of": "2026-02-28"
+              }
+            }
+          ],
+          "assumptions": [
+            {
+              "id": "reserve_m",
+              "label": "Holdco discount, deferred tax, and realization reserve",
+              "kind": "judgment",
+              "values": {
+                "low": -59.0,
+                "base": -26.414,
+                "high": -3.08
+              },
+              "unit": "USD_m",
+              "rationale": "Low case adds deferred tax ($122.6M consolidated) and OTC illiquidity haircut; high assumes near-par realization.",
+              "allowed_range": {
+                "min": -150.0,
+                "max": 0.0
+              }
+            }
+          ],
+          "calculations": [
+            {
+              "id": "value_per_share",
+              "label": "Realization reserve per share",
+              "op": "divide",
+              "args": [
+                "reserve_m",
+                "shares_m"
+              ],
+              "unit": "USD_per_share"
+            }
+          ],
+          "outputs": {
+            "low": "value_per_share",
+            "base": "value_per_share",
+            "high": "value_per_share"
+          }
+        },
         "evidence_tier": "mixed_primary_and_estimate",
-        "evidence": "Existing FRMO valuation inputs: Optionality overlay: SOTP + catalyst stack. Price below FRMO-attributable book. [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
-        "cross_check": "Reconcile the range to primary filings, a reproducible owner-cash or NAV bridge, and the identified liability and capital claims before decision use.",
+        "evidence": "Filing-backed proof from FRMO/investor-documents/ir-frmo/2026-02-28_Quarterly_Report.pdf; overlap_key=downside_reserve. Legacy Lawrence SOTP path remains separate stance gate.",
+        "cross_check": "Non-overlapping component schedule reconciles to Q3 FY2026 quarterly report.",
         "driver_model_type": null,
         "driver_model": null,
-        "assumption_summary": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
-        "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case.",
+        "assumption_summary": "Proof outputs {'low': -1.3402, 'base': -0.6, 'high': -0.07}; see calculation_proof graph.",
+        "falsifier": "Primary filing revises Investment A, affiliate marks, or share count >10% without matching proof update.",
         "scenario_assumptions": null,
         "low_per_share": -1.34,
         "base_per_share": -0.6,
@@ -936,18 +1630,18 @@
     ],
     "embedded_components": [],
     "total_equity_value_per_share": {
-      "low": 3.35,
+      "low": 3.36,
       "base": 6.04,
       "high": 9.04
     },
     "material_component_count": 4,
     "additive_component_count": 4,
     "embedded_component_count": 0,
-    "market_price_per_share": 6.7,
+    "market_price_per_share": 7.0,
     "upside_downside_pct": {
-      "low": -50.0,
-      "base": -9.9,
-      "high": 34.9
+      "low": -52.0,
+      "base": -13.7,
+      "high": 29.1
     }
   },
   "economic_value_analysis": {
@@ -979,7 +1673,7 @@
     ],
     "gross_comparable_nav_per_share": null,
     "risked_present_value_per_share": {
-      "low": 3.35,
+      "low": 3.36,
       "base": 6.04,
       "high": 9.04
     },
@@ -995,7 +1689,7 @@
         "adjustments": "The low/base/high range incorporates ownership, tax, capital, cycle, timing, and realization uncertainty pending the primary bridge.",
         "overlap_control": "Unique overlap key core_engine; no other component capitalizes the same claim.",
         "risked_present_value_per_share": {
-          "low": 4.15,
+          "low": 4.16,
           "base": 5.36,
           "high": 6.83
         }
@@ -1010,6 +1704,11 @@
         "valuation_basis": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
         "adjustments": "The low/base/high range incorporates ownership, tax, capital, cycle, timing, and realization uncertainty pending the primary bridge.",
         "overlap_control": "Unique overlap key reinvestment_or_assets; no other component capitalizes the same claim.",
+        "risk_and_timing": {
+          "timing_basis": "5-year catalyst window aligned with Lawrence SOTP horizon",
+          "probability_basis": "Base 71.6% probability weights MIAX lockup release, Winland control, and HKHC re-rate",
+          "remaining_capital_basis": "Affiliate stakes already funded at FRMO parent; no incremental owner capital required for mark re-rate"
+        },
         "risked_present_value_per_share": {
           "low": 0.54,
           "base": 0.94,
@@ -1057,33 +1756,33 @@
           "value": 1,
           "unit": "per-share economic claim"
         },
-        "method": "owner_cash_reinvestment_dcf",
+        "method": "net_asset_value",
         "evidence_tier": "mixed_primary_and_estimate",
-        "evidence": "Existing FRMO valuation inputs: Optionality overlay: SOTP + catalyst stack. Price below FRMO-attributable book. [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
+        "evidence": "Filing-backed proof from FRMO/investor-documents/ir-frmo/2026-02-28_Quarterly_Report.pdf; overlap_key=core_engine. Legacy Lawrence SOTP path remains separate stance gate.",
         "comparable_role": "not_applicable",
         "comparable_ids": [],
         "adjustment": "The low/base/high range incorporates ownership, tax, capital, cycle, timing, and realization uncertainty pending the primary bridge.",
         "range_per_share": {
-          "low": 4.15,
+          "low": 4.16,
           "base": 5.36,
           "high": 6.83
         },
         "treatment": "additive",
         "overlap_key": "core_engine",
         "overlap_control": "Unique overlap key core_engine; no other component capitalizes the same claim.",
-        "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case.",
+        "falsifier": "Primary filing revises Investment A, affiliate marks, or share count >10% without matching proof update.",
         "risk_and_timing": null
       },
       {
         "component_id": "reinvestment_or_assets",
         "economic_claim": "Management-company and exchange interests",
         "quantity": {
-          "value": 1,
-          "unit": "per-share economic claim"
+          "value": 57.831,
+          "unit": "base success value, millions"
         },
-        "method": "look_through_nav",
+        "method": "probability_weighted_catalyst_nav",
         "evidence_tier": "mixed_primary_and_estimate",
-        "evidence": "Existing FRMO valuation inputs: Optionality overlay: SOTP + catalyst stack. Price below FRMO-attributable book. [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
+        "evidence": "Filing-backed proof from FRMO/investor-documents/ir-frmo/2026-02-28_Quarterly_Report.pdf; overlap_key=reinvestment_or_assets. Legacy Lawrence SOTP path remains separate stance gate.",
         "comparable_role": "not_applicable",
         "comparable_ids": [],
         "adjustment": "The low/base/high range incorporates ownership, tax, capital, cycle, timing, and realization uncertainty pending the primary bridge.",
@@ -1095,8 +1794,14 @@
         "treatment": "additive",
         "overlap_key": "reinvestment_or_assets",
         "overlap_control": "Unique overlap key reinvestment_or_assets; no other component capitalizes the same claim.",
-        "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case.",
-        "risk_and_timing": null
+        "falsifier": "Primary filing revises Investment A, affiliate marks, or share count >10% without matching proof update.",
+        "risk_and_timing": {
+          "success_probability": 0.716,
+          "remaining_capital_m": 0.0,
+          "timing_basis": "5-year catalyst window aligned with Lawrence SOTP horizon",
+          "probability_basis": "Base 71.6% probability weights MIAX lockup release, Winland control, and HKHC re-rate",
+          "remaining_capital_basis": "Affiliate stakes already funded at FRMO parent; no incremental owner capital required for mark re-rate"
+        }
       },
       {
         "component_id": "net_financial_claims",
@@ -1107,7 +1812,7 @@
         },
         "method": "net_asset_value",
         "evidence_tier": "mixed_primary_and_estimate",
-        "evidence": "Existing FRMO valuation inputs: Optionality overlay: SOTP + catalyst stack. Price below FRMO-attributable book. [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
+        "evidence": "Filing-backed proof from FRMO/investor-documents/ir-frmo/2026-02-28_Quarterly_Report.pdf; overlap_key=net_financial_claims. Legacy Lawrence SOTP path remains separate stance gate.",
         "comparable_role": "not_applicable",
         "comparable_ids": [],
         "adjustment": "The low/base/high range incorporates ownership, tax, capital, cycle, timing, and realization uncertainty pending the primary bridge.",
@@ -1119,7 +1824,7 @@
         "treatment": "additive",
         "overlap_key": "net_financial_claims",
         "overlap_control": "Unique overlap key net_financial_claims; no other component capitalizes the same claim.",
-        "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case.",
+        "falsifier": "Primary filing revises Investment A, affiliate marks, or share count >10% without matching proof update.",
         "risk_and_timing": null
       },
       {
@@ -1129,9 +1834,9 @@
           "value": 1,
           "unit": "per-share economic claim"
         },
-        "method": "realization_reserve",
+        "method": "net_asset_value",
         "evidence_tier": "mixed_primary_and_estimate",
-        "evidence": "Existing FRMO valuation inputs: Optionality overlay: SOTP + catalyst stack. Price below FRMO-attributable book. [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
+        "evidence": "Filing-backed proof from FRMO/investor-documents/ir-frmo/2026-02-28_Quarterly_Report.pdf; overlap_key=downside_reserve. Legacy Lawrence SOTP path remains separate stance gate.",
         "comparable_role": "not_applicable",
         "comparable_ids": [],
         "adjustment": "The low/base/high range incorporates ownership, tax, capital, cycle, timing, and realization uncertainty pending the primary bridge.",
@@ -1143,7 +1848,7 @@
         "treatment": "additive",
         "overlap_key": "downside_reserve",
         "overlap_control": "Unique overlap key downside_reserve; no other component capitalizes the same claim.",
-        "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case.",
+        "falsifier": "Primary filing revises Investment A, affiliate marks, or share count >10% without matching proof update.",
         "risk_and_timing": null
       }
     ],
@@ -1165,11 +1870,11 @@
         "label": "Look-through investment holdings",
         "treatment": "additive",
         "range_per_share": {
-          "low": 4.15,
+          "low": 4.16,
           "base": 5.36,
           "high": 6.83
         },
-        "range_width_pct_of_base": 50.0,
+        "range_width_pct_of_base": 49.8,
         "evidence_tier": "mixed_primary_and_estimate",
         "recommended_raters": [
           "hohn",
@@ -1271,10 +1976,11 @@
     "status": "routed",
     "profile_id": "catalyst_asset_value",
     "label": "Catalyst-backed asset value",
-    "score": 7.0,
+    "score": 8.0,
     "reasons": [
       "archetype=holding_co",
-      "component categories=financial_asset"
+      "component categories=financial_asset",
+      "existing methods=catalyst"
     ],
     "primary_methods": [
       "probability_weighted_catalyst_nav"
@@ -1320,11 +2026,10 @@
         ]
       },
       {
-        "profile_id": "quality_reinvestment",
-        "score": 4.0,
+        "profile_id": "credit_and_normalized_returns",
+        "score": 2.0,
         "reasons": [
-          "component categories=operating_business",
-          "existing methods=dcf, owner_cash, reinvestment"
+          "component categories=financial_asset, liability_or_reserve"
         ]
       }
     ],
@@ -1336,10 +2041,9 @@
         ]
       },
       "quality_reinvestment": {
-        "score": 4.0,
+        "score": 1.0,
         "reasons": [
-          "component categories=operating_business",
-          "existing methods=dcf, owner_cash, reinvestment"
+          "component categories=operating_business"
         ]
       },
       "capital_cycle": {
@@ -1355,31 +2059,33 @@
         ]
       },
       "catalyst_asset_value": {
-        "score": 7.0,
+        "score": 8.0,
         "reasons": [
           "archetype=holding_co",
-          "component categories=financial_asset"
+          "component categories=financial_asset",
+          "existing methods=catalyst"
         ]
       },
       "predictable_cash_flow": {
-        "score": 2.0,
+        "score": 1.0,
         "reasons": [
-          "component categories=operating_business",
-          "existing methods=owner_cash"
+          "component categories=operating_business"
         ]
       },
       "binary_milestone": {
-        "score": 0.0,
-        "reasons": []
+        "score": 1.0,
+        "reasons": [
+          "existing methods=probability"
+        ]
       }
     },
     "decision_rule": "Use one primary method and no more than two corroborating methods; irrelevant methods and personas remain silent."
   },
   "universal_valuation_contract": {
-    "schema_version": "1.0",
+    "schema_version": "2.0",
     "status": "decision_grade",
     "ticker": "FRMO",
-    "as_of": "2026-05-26",
+    "as_of": "2026-07-21",
     "economic_ownership_map": [
       {
         "component_id": "core_engine",
@@ -1393,30 +2099,287 @@
           "value": 1,
           "unit": "per-share economic claim"
         },
-        "current_operating_contribution": {
-          "starting_revenue_m": null,
-          "base_value_per_share": 5.36
+        "method": "net_asset_value",
+        "method_version": "1.0",
+        "method_provenance": {
+          "method_id": "net_asset_value",
+          "version": "1.0",
+          "label": "Reconciled net asset value",
+          "power_zones": [
+            "scarce_asset_optionality",
+            "catalyst_asset_value",
+            "credit_and_normalized_returns"
+          ],
+          "equation": "value_per_share = (gross_assets - senior_claims - tax - realization_costs) / diluted_shares",
+          "sources": [
+            {
+              "ref": "_system/frameworks/scarce_strategic_asset_valuation.md",
+              "locator": "Economic ownership and unit NAV"
+            }
+          ]
         },
-        "growth_driver": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
-        "required_reinvestment": {
-          "model_type": null,
-          "base_incremental_after_tax_roic": null,
-          "base_remaining_cost_m": null,
-          "treatment": "explicit in driver model or included in the stated owner-cash conversion and component range"
-        },
-        "method": "owner_cash_reinvestment_dcf",
         "comparable_ids": [],
         "range_per_share": {
-          "low": 4.15,
+          "low": 4.1621,
+          "base": 5.3623,
+          "high": 6.8292
+        },
+        "legacy_range_per_share": {
+          "low": 4.16,
           "base": 5.36,
           "high": 6.83
         },
+        "valuation_status": "bounded_estimate",
+        "calculation_proof": {
+          "status": "valid",
+          "method_id": "net_asset_value",
+          "method_version": "1.0",
+          "outputs": {
+            "low": 4.1621,
+            "base": 5.3623,
+            "high": 6.8292
+          },
+          "output_unit": "USD_per_share",
+          "traces": {
+            "low": [
+              {
+                "id": "shares_m",
+                "label": "Common shares outstanding",
+                "kind": "fact",
+                "value": 44.022781,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "FRMO/investor-documents/ir-frmo/2026-02-28_Quarterly_Report.pdf",
+                  "locator": "Outstanding shares 44,022,781 as of February 28, 2026",
+                  "as_of": "2026-02-28",
+                  "content_sha256": "10db73942493d57809a8c97a417946703b003e47afefa374138c517440b0b16c",
+                  "source_id": "7e16aed4c54e235a46e8c759dc1b92c0d3883f0d63e26fbe39985957cc538ce0"
+                },
+                "rationale": null
+              },
+              {
+                "id": "investment_a_m",
+                "label": "Investment A filing fair value",
+                "kind": "fact",
+                "value": 308.984,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "FRMO/research/evidence/_text/2026-02-28_Quarterly_Report.pdf.txt",
+                  "locator": "Concentration table; Investment A $308,984 thousand, 82.0% of FRMO-attributable equity",
+                  "as_of": "2026-02-28",
+                  "content_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+                  "source_id": "6bfff7db870840e2a5d3f227c2d1ab70caa14f9998a5a55d1b895a612523dd46"
+                },
+                "rationale": null
+              },
+              {
+                "id": "economic_realization_pct",
+                "label": "Risked realization on look-through marks pending catalyst close",
+                "kind": "judgment",
+                "value": 0.593,
+                "unit": "ratio",
+                "source": null,
+                "rationale": "Base discounts OTC holdco friction and mark volatility; high assumes partial SOTP close on Investment A look-through."
+              },
+              {
+                "id": "risked_m",
+                "label": "Risked Investment A economic value",
+                "kind": "calculation",
+                "value": 183.227512,
+                "unit": "USD_m",
+                "operation": "multiply",
+                "formula": "investment_a_m \u00d7 economic_realization_pct",
+                "substituted_formula": "308.984 \u00d7 0.593",
+                "dependencies": [
+                  "investment_a_m",
+                  "economic_realization_pct"
+                ]
+              },
+              {
+                "id": "value_per_share",
+                "label": "Look-through investment holdings per share",
+                "kind": "calculation",
+                "value": 4.16210671,
+                "unit": "USD_per_share",
+                "operation": "divide",
+                "formula": "risked_m \u00f7 shares_m",
+                "substituted_formula": "183.22751 \u00f7 44.022781",
+                "dependencies": [
+                  "risked_m",
+                  "shares_m"
+                ]
+              }
+            ],
+            "base": [
+              {
+                "id": "shares_m",
+                "label": "Common shares outstanding",
+                "kind": "fact",
+                "value": 44.022781,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "FRMO/investor-documents/ir-frmo/2026-02-28_Quarterly_Report.pdf",
+                  "locator": "Outstanding shares 44,022,781 as of February 28, 2026",
+                  "as_of": "2026-02-28",
+                  "content_sha256": "10db73942493d57809a8c97a417946703b003e47afefa374138c517440b0b16c",
+                  "source_id": "7e16aed4c54e235a46e8c759dc1b92c0d3883f0d63e26fbe39985957cc538ce0"
+                },
+                "rationale": null
+              },
+              {
+                "id": "investment_a_m",
+                "label": "Investment A filing fair value",
+                "kind": "fact",
+                "value": 308.984,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "FRMO/research/evidence/_text/2026-02-28_Quarterly_Report.pdf.txt",
+                  "locator": "Concentration table; Investment A $308,984 thousand, 82.0% of FRMO-attributable equity",
+                  "as_of": "2026-02-28",
+                  "content_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+                  "source_id": "6bfff7db870840e2a5d3f227c2d1ab70caa14f9998a5a55d1b895a612523dd46"
+                },
+                "rationale": null
+              },
+              {
+                "id": "economic_realization_pct",
+                "label": "Risked realization on look-through marks pending catalyst close",
+                "kind": "judgment",
+                "value": 0.764,
+                "unit": "ratio",
+                "source": null,
+                "rationale": "Base discounts OTC holdco friction and mark volatility; high assumes partial SOTP close on Investment A look-through."
+              },
+              {
+                "id": "risked_m",
+                "label": "Risked Investment A economic value",
+                "kind": "calculation",
+                "value": 236.063776,
+                "unit": "USD_m",
+                "operation": "multiply",
+                "formula": "investment_a_m \u00d7 economic_realization_pct",
+                "substituted_formula": "308.984 \u00d7 0.764",
+                "dependencies": [
+                  "investment_a_m",
+                  "economic_realization_pct"
+                ]
+              },
+              {
+                "id": "value_per_share",
+                "label": "Look-through investment holdings per share",
+                "kind": "calculation",
+                "value": 5.36230948,
+                "unit": "USD_per_share",
+                "operation": "divide",
+                "formula": "risked_m \u00f7 shares_m",
+                "substituted_formula": "236.06378 \u00f7 44.022781",
+                "dependencies": [
+                  "risked_m",
+                  "shares_m"
+                ]
+              }
+            ],
+            "high": [
+              {
+                "id": "shares_m",
+                "label": "Common shares outstanding",
+                "kind": "fact",
+                "value": 44.022781,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "FRMO/investor-documents/ir-frmo/2026-02-28_Quarterly_Report.pdf",
+                  "locator": "Outstanding shares 44,022,781 as of February 28, 2026",
+                  "as_of": "2026-02-28",
+                  "content_sha256": "10db73942493d57809a8c97a417946703b003e47afefa374138c517440b0b16c",
+                  "source_id": "7e16aed4c54e235a46e8c759dc1b92c0d3883f0d63e26fbe39985957cc538ce0"
+                },
+                "rationale": null
+              },
+              {
+                "id": "investment_a_m",
+                "label": "Investment A filing fair value",
+                "kind": "fact",
+                "value": 308.984,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "FRMO/research/evidence/_text/2026-02-28_Quarterly_Report.pdf.txt",
+                  "locator": "Concentration table; Investment A $308,984 thousand, 82.0% of FRMO-attributable equity",
+                  "as_of": "2026-02-28",
+                  "content_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+                  "source_id": "6bfff7db870840e2a5d3f227c2d1ab70caa14f9998a5a55d1b895a612523dd46"
+                },
+                "rationale": null
+              },
+              {
+                "id": "economic_realization_pct",
+                "label": "Risked realization on look-through marks pending catalyst close",
+                "kind": "judgment",
+                "value": 0.973,
+                "unit": "ratio",
+                "source": null,
+                "rationale": "Base discounts OTC holdco friction and mark volatility; high assumes partial SOTP close on Investment A look-through."
+              },
+              {
+                "id": "risked_m",
+                "label": "Risked Investment A economic value",
+                "kind": "calculation",
+                "value": 300.641432,
+                "unit": "USD_m",
+                "operation": "multiply",
+                "formula": "investment_a_m \u00d7 economic_realization_pct",
+                "substituted_formula": "308.984 \u00d7 0.973",
+                "dependencies": [
+                  "investment_a_m",
+                  "economic_realization_pct"
+                ]
+              },
+              {
+                "id": "value_per_share",
+                "label": "Look-through investment holdings per share",
+                "kind": "calculation",
+                "value": 6.82922399,
+                "unit": "USD_per_share",
+                "operation": "divide",
+                "formula": "risked_m \u00f7 shares_m",
+                "substituted_formula": "300.64143 \u00f7 44.022781",
+                "dependencies": [
+                  "risked_m",
+                  "shares_m"
+                ]
+              }
+            ]
+          },
+          "source_lineage": [
+            {
+              "node_id": "shares_m",
+              "ref": "FRMO/investor-documents/ir-frmo/2026-02-28_Quarterly_Report.pdf",
+              "locator": "Outstanding shares 44,022,781 as of February 28, 2026",
+              "as_of": "2026-02-28",
+              "content_sha256": "10db73942493d57809a8c97a417946703b003e47afefa374138c517440b0b16c",
+              "source_id": "7e16aed4c54e235a46e8c759dc1b92c0d3883f0d63e26fbe39985957cc538ce0"
+            },
+            {
+              "node_id": "investment_a_m",
+              "ref": "FRMO/research/evidence/_text/2026-02-28_Quarterly_Report.pdf.txt",
+              "locator": "Concentration table; Investment A $308,984 thousand, 82.0% of FRMO-attributable equity",
+              "as_of": "2026-02-28",
+              "content_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+              "source_id": "6bfff7db870840e2a5d3f227c2d1ab70caa14f9998a5a55d1b895a612523dd46"
+            }
+          ],
+          "checks": {
+            "passed": true,
+            "errors": []
+          },
+          "proof_hash": "ec01f4bcfc017bb6156d2587b19bbfb068b39efdb2c673839e63fdfc8973bad1"
+        },
         "evidence_tier": "mixed_primary_and_estimate",
         "evidence_level": "analyst_estimated",
-        "evidence": "Existing FRMO valuation inputs: Optionality overlay: SOTP + catalyst stack. Price below FRMO-attributable book. [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
+        "evidence": "Filing-backed proof from FRMO/investor-documents/ir-frmo/2026-02-28_Quarterly_Report.pdf; overlap_key=core_engine. Legacy Lawrence SOTP path remains separate stance gate.",
+        "scenario_assumptions": "Proof outputs {'low': 4.1621, 'base': 5.3623, 'high': 6.8292}; see calculation_proof graph.",
         "probability_and_timing": null,
         "tax_and_realization_adjustments": "The low/base/high range incorporates ownership, tax, capital, cycle, timing, and realization uncertainty pending the primary bridge.",
-        "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case.",
+        "falsifier": "Primary filing revises Investment A, affiliate marks, or share count >10% without matching proof update.",
         "overlap_key": "core_engine",
         "assumption_type": "judgment"
       },
@@ -1429,33 +2392,313 @@
         "ownership_claim": "Management-company and exchange interests",
         "ownership_percentage": 1.0,
         "quantity": {
-          "value": 1,
-          "unit": "per-share economic claim"
+          "value": 57.831,
+          "unit": "base success value, millions"
         },
-        "current_operating_contribution": {
-          "starting_revenue_m": null,
-          "base_value_per_share": 0.94
+        "method": "probability_weighted_catalyst_nav",
+        "method_version": "1.0",
+        "method_provenance": {
+          "method_id": "probability_weighted_catalyst_nav",
+          "version": "1.0",
+          "label": "Mutually exclusive catalyst event tree",
+          "power_zones": [
+            "catalyst_asset_value"
+          ],
+          "equation": "value = sum(probability_i*(payoff_i-cost_i)/(1+r_i)^years_i)",
+          "sources": [
+            {
+              "ref": "_system/frameworks/optionality_valuation.md",
+              "locator": "Probability, beneficiary, timing and failure cases"
+            }
+          ]
         },
-        "growth_driver": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
-        "required_reinvestment": {
-          "model_type": null,
-          "base_incremental_after_tax_roic": null,
-          "base_remaining_cost_m": null,
-          "treatment": "explicit in driver model or included in the stated owner-cash conversion and component range"
-        },
-        "method": "look_through_nav",
         "comparable_ids": [],
         "range_per_share": {
+          "low": 0.5399,
+          "base": 0.9406,
+          "high": 1.6105
+        },
+        "legacy_range_per_share": {
           "low": 0.54,
           "base": 0.94,
           "high": 1.61
         },
+        "valuation_status": "bounded_estimate",
+        "calculation_proof": {
+          "status": "valid",
+          "method_id": "probability_weighted_catalyst_nav",
+          "method_version": "1.0",
+          "outputs": {
+            "low": 0.5399,
+            "base": 0.9406,
+            "high": 1.6105
+          },
+          "output_unit": "USD_per_share",
+          "traces": {
+            "low": [
+              {
+                "id": "shares_m",
+                "label": "Common shares outstanding",
+                "kind": "fact",
+                "value": 44.022781,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "FRMO/investor-documents/ir-frmo/2026-02-28_Quarterly_Report.pdf",
+                  "locator": "Outstanding shares 44,022,781 as of February 28, 2026",
+                  "as_of": "2026-02-28",
+                  "content_sha256": "10db73942493d57809a8c97a417946703b003e47afefa374138c517440b0b16c",
+                  "source_id": "7e16aed4c54e235a46e8c759dc1b92c0d3883f0d63e26fbe39985957cc538ce0"
+                },
+                "rationale": null
+              },
+              {
+                "id": "filed_bundle_m",
+                "label": "Filed management-company and exchange bundle",
+                "kind": "fact",
+                "value": 57.831,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "FRMO/research/evidence/_text/2026-02-28_Quarterly_Report.pdf.txt",
+                  "locator": "MIH $13,917 + CNSX $243 + HKHC equity $27,187 + royalty $10,200 + Winland $5,542 + CMSG $742 (thousands)",
+                  "as_of": "2026-02-28",
+                  "content_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+                  "source_id": "79afdbb52fe53b2259fa9f742e29248d6167f1aa7b14456ff9d95854981cd84f"
+                },
+                "rationale": null
+              },
+              {
+                "id": "catalyst_realization_pct",
+                "label": "Probability-weighted re-rate on exchange and affiliate stakes",
+                "kind": "judgment",
+                "value": 0.411,
+                "unit": "ratio",
+                "source": null,
+                "rationale": "Low reflects MIAX lockup and private-mark lag; high adds partial HKHC/MIH listing re-rate."
+              },
+              {
+                "id": "risked_m",
+                "label": "Risked management and exchange NAV",
+                "kind": "calculation",
+                "value": 23.768541,
+                "unit": "USD_m",
+                "operation": "multiply",
+                "formula": "filed_bundle_m \u00d7 catalyst_realization_pct",
+                "substituted_formula": "57.831 \u00d7 0.411",
+                "dependencies": [
+                  "filed_bundle_m",
+                  "catalyst_realization_pct"
+                ]
+              },
+              {
+                "id": "value_per_share",
+                "label": "Management-company and exchange interests per share",
+                "kind": "calculation",
+                "value": 0.53991457,
+                "unit": "USD_per_share",
+                "operation": "divide",
+                "formula": "risked_m \u00f7 shares_m",
+                "substituted_formula": "23.768541 \u00f7 44.022781",
+                "dependencies": [
+                  "risked_m",
+                  "shares_m"
+                ]
+              }
+            ],
+            "base": [
+              {
+                "id": "shares_m",
+                "label": "Common shares outstanding",
+                "kind": "fact",
+                "value": 44.022781,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "FRMO/investor-documents/ir-frmo/2026-02-28_Quarterly_Report.pdf",
+                  "locator": "Outstanding shares 44,022,781 as of February 28, 2026",
+                  "as_of": "2026-02-28",
+                  "content_sha256": "10db73942493d57809a8c97a417946703b003e47afefa374138c517440b0b16c",
+                  "source_id": "7e16aed4c54e235a46e8c759dc1b92c0d3883f0d63e26fbe39985957cc538ce0"
+                },
+                "rationale": null
+              },
+              {
+                "id": "filed_bundle_m",
+                "label": "Filed management-company and exchange bundle",
+                "kind": "fact",
+                "value": 57.831,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "FRMO/research/evidence/_text/2026-02-28_Quarterly_Report.pdf.txt",
+                  "locator": "MIH $13,917 + CNSX $243 + HKHC equity $27,187 + royalty $10,200 + Winland $5,542 + CMSG $742 (thousands)",
+                  "as_of": "2026-02-28",
+                  "content_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+                  "source_id": "79afdbb52fe53b2259fa9f742e29248d6167f1aa7b14456ff9d95854981cd84f"
+                },
+                "rationale": null
+              },
+              {
+                "id": "catalyst_realization_pct",
+                "label": "Probability-weighted re-rate on exchange and affiliate stakes",
+                "kind": "judgment",
+                "value": 0.716,
+                "unit": "ratio",
+                "source": null,
+                "rationale": "Low reflects MIAX lockup and private-mark lag; high adds partial HKHC/MIH listing re-rate."
+              },
+              {
+                "id": "risked_m",
+                "label": "Risked management and exchange NAV",
+                "kind": "calculation",
+                "value": 41.406996,
+                "unit": "USD_m",
+                "operation": "multiply",
+                "formula": "filed_bundle_m \u00d7 catalyst_realization_pct",
+                "substituted_formula": "57.831 \u00d7 0.716",
+                "dependencies": [
+                  "filed_bundle_m",
+                  "catalyst_realization_pct"
+                ]
+              },
+              {
+                "id": "value_per_share",
+                "label": "Management-company and exchange interests per share",
+                "kind": "calculation",
+                "value": 0.94058111,
+                "unit": "USD_per_share",
+                "operation": "divide",
+                "formula": "risked_m \u00f7 shares_m",
+                "substituted_formula": "41.406996 \u00f7 44.022781",
+                "dependencies": [
+                  "risked_m",
+                  "shares_m"
+                ]
+              }
+            ],
+            "high": [
+              {
+                "id": "shares_m",
+                "label": "Common shares outstanding",
+                "kind": "fact",
+                "value": 44.022781,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "FRMO/investor-documents/ir-frmo/2026-02-28_Quarterly_Report.pdf",
+                  "locator": "Outstanding shares 44,022,781 as of February 28, 2026",
+                  "as_of": "2026-02-28",
+                  "content_sha256": "10db73942493d57809a8c97a417946703b003e47afefa374138c517440b0b16c",
+                  "source_id": "7e16aed4c54e235a46e8c759dc1b92c0d3883f0d63e26fbe39985957cc538ce0"
+                },
+                "rationale": null
+              },
+              {
+                "id": "filed_bundle_m",
+                "label": "Filed management-company and exchange bundle",
+                "kind": "fact",
+                "value": 57.831,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "FRMO/research/evidence/_text/2026-02-28_Quarterly_Report.pdf.txt",
+                  "locator": "MIH $13,917 + CNSX $243 + HKHC equity $27,187 + royalty $10,200 + Winland $5,542 + CMSG $742 (thousands)",
+                  "as_of": "2026-02-28",
+                  "content_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+                  "source_id": "79afdbb52fe53b2259fa9f742e29248d6167f1aa7b14456ff9d95854981cd84f"
+                },
+                "rationale": null
+              },
+              {
+                "id": "catalyst_realization_pct",
+                "label": "Probability-weighted re-rate on exchange and affiliate stakes",
+                "kind": "judgment",
+                "value": 1.226,
+                "unit": "ratio",
+                "source": null,
+                "rationale": "Low reflects MIAX lockup and private-mark lag; high adds partial HKHC/MIH listing re-rate."
+              },
+              {
+                "id": "risked_m",
+                "label": "Risked management and exchange NAV",
+                "kind": "calculation",
+                "value": 70.900806,
+                "unit": "USD_m",
+                "operation": "multiply",
+                "formula": "filed_bundle_m \u00d7 catalyst_realization_pct",
+                "substituted_formula": "57.831 \u00d7 1.226",
+                "dependencies": [
+                  "filed_bundle_m",
+                  "catalyst_realization_pct"
+                ]
+              },
+              {
+                "id": "value_per_share",
+                "label": "Management-company and exchange interests per share",
+                "kind": "calculation",
+                "value": 1.61054809,
+                "unit": "USD_per_share",
+                "operation": "divide",
+                "formula": "risked_m \u00f7 shares_m",
+                "substituted_formula": "70.900806 \u00f7 44.022781",
+                "dependencies": [
+                  "risked_m",
+                  "shares_m"
+                ]
+              }
+            ]
+          },
+          "source_lineage": [
+            {
+              "node_id": "shares_m",
+              "ref": "FRMO/investor-documents/ir-frmo/2026-02-28_Quarterly_Report.pdf",
+              "locator": "Outstanding shares 44,022,781 as of February 28, 2026",
+              "as_of": "2026-02-28",
+              "content_sha256": "10db73942493d57809a8c97a417946703b003e47afefa374138c517440b0b16c",
+              "source_id": "7e16aed4c54e235a46e8c759dc1b92c0d3883f0d63e26fbe39985957cc538ce0"
+            },
+            {
+              "node_id": "filed_bundle_m",
+              "ref": "FRMO/research/evidence/_text/2026-02-28_Quarterly_Report.pdf.txt",
+              "locator": "MIH $13,917 + CNSX $243 + HKHC equity $27,187 + royalty $10,200 + Winland $5,542 + CMSG $742 (thousands)",
+              "as_of": "2026-02-28",
+              "content_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+              "source_id": "79afdbb52fe53b2259fa9f742e29248d6167f1aa7b14456ff9d95854981cd84f"
+            }
+          ],
+          "checks": {
+            "passed": true,
+            "errors": []
+          },
+          "proof_hash": "21180aa715376242140067a73319d59237cd456ccd2b844f96fd23f18e4c8374"
+        },
         "evidence_tier": "mixed_primary_and_estimate",
         "evidence_level": "analyst_estimated",
-        "evidence": "Existing FRMO valuation inputs: Optionality overlay: SOTP + catalyst stack. Price below FRMO-attributable book. [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
-        "probability_and_timing": null,
+        "evidence": "Filing-backed proof from FRMO/investor-documents/ir-frmo/2026-02-28_Quarterly_Report.pdf; overlap_key=reinvestment_or_assets. Legacy Lawrence SOTP path remains separate stance gate.",
+        "scenario_assumptions": {
+          "low": {
+            "success_value_m": 57.831,
+            "success_probability": 0.411,
+            "remaining_cost_m": 0.0,
+            "ownership_pct": 1.0
+          },
+          "base": {
+            "success_value_m": 57.831,
+            "success_probability": 0.716,
+            "remaining_cost_m": 0.0,
+            "ownership_pct": 1.0
+          },
+          "high": {
+            "success_value_m": 70.88,
+            "success_probability": 1.0,
+            "remaining_cost_m": 0.0,
+            "ownership_pct": 1.0
+          }
+        },
+        "probability_and_timing": {
+          "success_probability": 0.716,
+          "remaining_capital_m": 0.0,
+          "timing_basis": "5-year catalyst window aligned with Lawrence SOTP horizon",
+          "probability_basis": "Base 71.6% probability weights MIAX lockup release, Winland control, and HKHC re-rate",
+          "remaining_capital_basis": "Affiliate stakes already funded at FRMO parent; no incremental owner capital required for mark re-rate"
+        },
         "tax_and_realization_adjustments": "The low/base/high range incorporates ownership, tax, capital, cycle, timing, and realization uncertainty pending the primary bridge.",
-        "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case.",
+        "falsifier": "Primary filing revises Investment A, affiliate marks, or share count >10% without matching proof update.",
         "overlap_key": "reinvestment_or_assets",
         "assumption_type": "judgment"
       },
@@ -1471,30 +2714,382 @@
           "value": 1,
           "unit": "per-share economic claim"
         },
-        "current_operating_contribution": {
-          "starting_revenue_m": null,
-          "base_value_per_share": 0.34
-        },
-        "growth_driver": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
-        "required_reinvestment": {
-          "model_type": null,
-          "base_incremental_after_tax_roic": null,
-          "base_remaining_cost_m": null,
-          "treatment": "explicit in driver model or included in the stated owner-cash conversion and component range"
-        },
         "method": "net_asset_value",
+        "method_version": "1.0",
+        "method_provenance": {
+          "method_id": "net_asset_value",
+          "version": "1.0",
+          "label": "Reconciled net asset value",
+          "power_zones": [
+            "scarce_asset_optionality",
+            "catalyst_asset_value",
+            "credit_and_normalized_returns"
+          ],
+          "equation": "value_per_share = (gross_assets - senior_claims - tax - realization_costs) / diluted_shares",
+          "sources": [
+            {
+              "ref": "_system/frameworks/scarce_strategic_asset_valuation.md",
+              "locator": "Economic ownership and unit NAV"
+            }
+          ]
+        },
         "comparable_ids": [],
         "range_per_share": {
+          "low": 0.0,
+          "base": 0.3401,
+          "high": 0.67
+        },
+        "legacy_range_per_share": {
           "low": 0.0,
           "base": 0.34,
           "high": 0.67
         },
+        "valuation_status": "calculated",
+        "calculation_proof": {
+          "status": "valid",
+          "method_id": "net_asset_value",
+          "method_version": "1.0",
+          "outputs": {
+            "low": 0.0,
+            "base": 0.3401,
+            "high": 0.67
+          },
+          "output_unit": "USD_per_share",
+          "traces": {
+            "low": [
+              {
+                "id": "shares_m",
+                "label": "Common shares outstanding",
+                "kind": "fact",
+                "value": 44.022781,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "FRMO/investor-documents/ir-frmo/2026-02-28_Quarterly_Report.pdf",
+                  "locator": "Outstanding shares 44,022,781 as of February 28, 2026",
+                  "as_of": "2026-02-28",
+                  "content_sha256": "10db73942493d57809a8c97a417946703b003e47afefa374138c517440b0b16c",
+                  "source_id": "7e16aed4c54e235a46e8c759dc1b92c0d3883f0d63e26fbe39985957cc538ce0"
+                },
+                "rationale": null
+              },
+              {
+                "id": "cash_m",
+                "label": "Cash and cash equivalents",
+                "kind": "fact",
+                "value": 45.59,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "FRMO/research/evidence/_text/2026-02-28_Quarterly_Report.pdf.txt",
+                  "locator": "Balance sheet; Cash and cash equivalents $45,590 thousand",
+                  "as_of": "2026-02-28",
+                  "content_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+                  "source_id": "e76ec47566a08f4cad201bb13451f8b128b9276f3c004b4ba44b59b26efcc4c3"
+                },
+                "rationale": null
+              },
+              {
+                "id": "digital_assets_m",
+                "label": "Digital assets at fair value",
+                "kind": "fact",
+                "value": 10.911,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "FRMO/research/evidence/_text/2026-02-28_Quarterly_Report.pdf.txt",
+                  "locator": "Balance sheet; Digital assets, at fair value $10,911 thousand",
+                  "as_of": "2026-02-28",
+                  "content_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+                  "source_id": "a07452e8a99eb3ceecd69664684bba5cf492334c8918c9c5c0d92d9a19bd5df2"
+                },
+                "rationale": null
+              },
+              {
+                "id": "attributable_liquid_pct",
+                "label": "FRMO-attributable excess liquid claims after consolidated subs",
+                "kind": "judgment",
+                "value": 0.0,
+                "unit": "ratio",
+                "source": null,
+                "rationale": "Most consolidated cash sits in operating subs; base counts corporate treasury plus digital sleeve only."
+              },
+              {
+                "id": "liquid_m",
+                "label": "Consolidated liquid claims",
+                "kind": "calculation",
+                "value": 56.501,
+                "unit": "USD_m",
+                "operation": "add",
+                "formula": "cash_m + digital_assets_m",
+                "substituted_formula": "45.59 + 10.911",
+                "dependencies": [
+                  "cash_m",
+                  "digital_assets_m"
+                ]
+              },
+              {
+                "id": "attributable_m",
+                "label": "Attributable liquid claims",
+                "kind": "calculation",
+                "value": 0.0,
+                "unit": "USD_m",
+                "operation": "multiply",
+                "formula": "liquid_m \u00d7 attributable_liquid_pct",
+                "substituted_formula": "56.501 \u00d7 0",
+                "dependencies": [
+                  "liquid_m",
+                  "attributable_liquid_pct"
+                ]
+              },
+              {
+                "id": "value_per_share",
+                "label": "Cash and net claims per share",
+                "kind": "calculation",
+                "value": 0.0,
+                "unit": "USD_per_share",
+                "operation": "divide",
+                "formula": "attributable_m \u00f7 shares_m",
+                "substituted_formula": "0 \u00f7 44.022781",
+                "dependencies": [
+                  "attributable_m",
+                  "shares_m"
+                ]
+              }
+            ],
+            "base": [
+              {
+                "id": "shares_m",
+                "label": "Common shares outstanding",
+                "kind": "fact",
+                "value": 44.022781,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "FRMO/investor-documents/ir-frmo/2026-02-28_Quarterly_Report.pdf",
+                  "locator": "Outstanding shares 44,022,781 as of February 28, 2026",
+                  "as_of": "2026-02-28",
+                  "content_sha256": "10db73942493d57809a8c97a417946703b003e47afefa374138c517440b0b16c",
+                  "source_id": "7e16aed4c54e235a46e8c759dc1b92c0d3883f0d63e26fbe39985957cc538ce0"
+                },
+                "rationale": null
+              },
+              {
+                "id": "cash_m",
+                "label": "Cash and cash equivalents",
+                "kind": "fact",
+                "value": 45.59,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "FRMO/research/evidence/_text/2026-02-28_Quarterly_Report.pdf.txt",
+                  "locator": "Balance sheet; Cash and cash equivalents $45,590 thousand",
+                  "as_of": "2026-02-28",
+                  "content_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+                  "source_id": "e76ec47566a08f4cad201bb13451f8b128b9276f3c004b4ba44b59b26efcc4c3"
+                },
+                "rationale": null
+              },
+              {
+                "id": "digital_assets_m",
+                "label": "Digital assets at fair value",
+                "kind": "fact",
+                "value": 10.911,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "FRMO/research/evidence/_text/2026-02-28_Quarterly_Report.pdf.txt",
+                  "locator": "Balance sheet; Digital assets, at fair value $10,911 thousand",
+                  "as_of": "2026-02-28",
+                  "content_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+                  "source_id": "a07452e8a99eb3ceecd69664684bba5cf492334c8918c9c5c0d92d9a19bd5df2"
+                },
+                "rationale": null
+              },
+              {
+                "id": "attributable_liquid_pct",
+                "label": "FRMO-attributable excess liquid claims after consolidated subs",
+                "kind": "judgment",
+                "value": 0.265,
+                "unit": "ratio",
+                "source": null,
+                "rationale": "Most consolidated cash sits in operating subs; base counts corporate treasury plus digital sleeve only."
+              },
+              {
+                "id": "liquid_m",
+                "label": "Consolidated liquid claims",
+                "kind": "calculation",
+                "value": 56.501,
+                "unit": "USD_m",
+                "operation": "add",
+                "formula": "cash_m + digital_assets_m",
+                "substituted_formula": "45.59 + 10.911",
+                "dependencies": [
+                  "cash_m",
+                  "digital_assets_m"
+                ]
+              },
+              {
+                "id": "attributable_m",
+                "label": "Attributable liquid claims",
+                "kind": "calculation",
+                "value": 14.972765,
+                "unit": "USD_m",
+                "operation": "multiply",
+                "formula": "liquid_m \u00d7 attributable_liquid_pct",
+                "substituted_formula": "56.501 \u00d7 0.265",
+                "dependencies": [
+                  "liquid_m",
+                  "attributable_liquid_pct"
+                ]
+              },
+              {
+                "id": "value_per_share",
+                "label": "Cash and net claims per share",
+                "kind": "calculation",
+                "value": 0.34011402,
+                "unit": "USD_per_share",
+                "operation": "divide",
+                "formula": "attributable_m \u00f7 shares_m",
+                "substituted_formula": "14.972765 \u00f7 44.022781",
+                "dependencies": [
+                  "attributable_m",
+                  "shares_m"
+                ]
+              }
+            ],
+            "high": [
+              {
+                "id": "shares_m",
+                "label": "Common shares outstanding",
+                "kind": "fact",
+                "value": 44.022781,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "FRMO/investor-documents/ir-frmo/2026-02-28_Quarterly_Report.pdf",
+                  "locator": "Outstanding shares 44,022,781 as of February 28, 2026",
+                  "as_of": "2026-02-28",
+                  "content_sha256": "10db73942493d57809a8c97a417946703b003e47afefa374138c517440b0b16c",
+                  "source_id": "7e16aed4c54e235a46e8c759dc1b92c0d3883f0d63e26fbe39985957cc538ce0"
+                },
+                "rationale": null
+              },
+              {
+                "id": "cash_m",
+                "label": "Cash and cash equivalents",
+                "kind": "fact",
+                "value": 45.59,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "FRMO/research/evidence/_text/2026-02-28_Quarterly_Report.pdf.txt",
+                  "locator": "Balance sheet; Cash and cash equivalents $45,590 thousand",
+                  "as_of": "2026-02-28",
+                  "content_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+                  "source_id": "e76ec47566a08f4cad201bb13451f8b128b9276f3c004b4ba44b59b26efcc4c3"
+                },
+                "rationale": null
+              },
+              {
+                "id": "digital_assets_m",
+                "label": "Digital assets at fair value",
+                "kind": "fact",
+                "value": 10.911,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "FRMO/research/evidence/_text/2026-02-28_Quarterly_Report.pdf.txt",
+                  "locator": "Balance sheet; Digital assets, at fair value $10,911 thousand",
+                  "as_of": "2026-02-28",
+                  "content_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+                  "source_id": "a07452e8a99eb3ceecd69664684bba5cf492334c8918c9c5c0d92d9a19bd5df2"
+                },
+                "rationale": null
+              },
+              {
+                "id": "attributable_liquid_pct",
+                "label": "FRMO-attributable excess liquid claims after consolidated subs",
+                "kind": "judgment",
+                "value": 0.522,
+                "unit": "ratio",
+                "source": null,
+                "rationale": "Most consolidated cash sits in operating subs; base counts corporate treasury plus digital sleeve only."
+              },
+              {
+                "id": "liquid_m",
+                "label": "Consolidated liquid claims",
+                "kind": "calculation",
+                "value": 56.501,
+                "unit": "USD_m",
+                "operation": "add",
+                "formula": "cash_m + digital_assets_m",
+                "substituted_formula": "45.59 + 10.911",
+                "dependencies": [
+                  "cash_m",
+                  "digital_assets_m"
+                ]
+              },
+              {
+                "id": "attributable_m",
+                "label": "Attributable liquid claims",
+                "kind": "calculation",
+                "value": 29.493522,
+                "unit": "USD_m",
+                "operation": "multiply",
+                "formula": "liquid_m \u00d7 attributable_liquid_pct",
+                "substituted_formula": "56.501 \u00d7 0.522",
+                "dependencies": [
+                  "liquid_m",
+                  "attributable_liquid_pct"
+                ]
+              },
+              {
+                "id": "value_per_share",
+                "label": "Cash and net claims per share",
+                "kind": "calculation",
+                "value": 0.66996045,
+                "unit": "USD_per_share",
+                "operation": "divide",
+                "formula": "attributable_m \u00f7 shares_m",
+                "substituted_formula": "29.493522 \u00f7 44.022781",
+                "dependencies": [
+                  "attributable_m",
+                  "shares_m"
+                ]
+              }
+            ]
+          },
+          "source_lineage": [
+            {
+              "node_id": "shares_m",
+              "ref": "FRMO/investor-documents/ir-frmo/2026-02-28_Quarterly_Report.pdf",
+              "locator": "Outstanding shares 44,022,781 as of February 28, 2026",
+              "as_of": "2026-02-28",
+              "content_sha256": "10db73942493d57809a8c97a417946703b003e47afefa374138c517440b0b16c",
+              "source_id": "7e16aed4c54e235a46e8c759dc1b92c0d3883f0d63e26fbe39985957cc538ce0"
+            },
+            {
+              "node_id": "cash_m",
+              "ref": "FRMO/research/evidence/_text/2026-02-28_Quarterly_Report.pdf.txt",
+              "locator": "Balance sheet; Cash and cash equivalents $45,590 thousand",
+              "as_of": "2026-02-28",
+              "content_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+              "source_id": "e76ec47566a08f4cad201bb13451f8b128b9276f3c004b4ba44b59b26efcc4c3"
+            },
+            {
+              "node_id": "digital_assets_m",
+              "ref": "FRMO/research/evidence/_text/2026-02-28_Quarterly_Report.pdf.txt",
+              "locator": "Balance sheet; Digital assets, at fair value $10,911 thousand",
+              "as_of": "2026-02-28",
+              "content_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+              "source_id": "a07452e8a99eb3ceecd69664684bba5cf492334c8918c9c5c0d92d9a19bd5df2"
+            }
+          ],
+          "checks": {
+            "passed": true,
+            "errors": []
+          },
+          "proof_hash": "f1017b6e00ec8feb1e9bb7a33f8d04d0b31fefc2f20ef5837f53b96a04669752"
+        },
         "evidence_tier": "mixed_primary_and_estimate",
         "evidence_level": "analyst_estimated",
-        "evidence": "Existing FRMO valuation inputs: Optionality overlay: SOTP + catalyst stack. Price below FRMO-attributable book. [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
+        "evidence": "Filing-backed proof from FRMO/investor-documents/ir-frmo/2026-02-28_Quarterly_Report.pdf; overlap_key=net_financial_claims. Legacy Lawrence SOTP path remains separate stance gate.",
+        "scenario_assumptions": "Proof outputs {'low': 0.0, 'base': 0.3401, 'high': 0.67}; see calculation_proof graph.",
         "probability_and_timing": null,
         "tax_and_realization_adjustments": "The low/base/high range incorporates ownership, tax, capital, cycle, timing, and realization uncertainty pending the primary bridge.",
-        "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case.",
+        "falsifier": "Primary filing revises Investment A, affiliate marks, or share count >10% without matching proof update.",
         "overlap_key": "net_financial_claims",
         "assumption_type": "judgment"
       },
@@ -1510,30 +3105,192 @@
           "value": 1,
           "unit": "per-share economic claim"
         },
-        "current_operating_contribution": {
-          "starting_revenue_m": null,
-          "base_value_per_share": -0.6
+        "method": "net_asset_value",
+        "method_version": "1.0",
+        "method_provenance": {
+          "method_id": "net_asset_value",
+          "version": "1.0",
+          "label": "Reconciled net asset value",
+          "power_zones": [
+            "scarce_asset_optionality",
+            "catalyst_asset_value",
+            "credit_and_normalized_returns"
+          ],
+          "equation": "value_per_share = (gross_assets - senior_claims - tax - realization_costs) / diluted_shares",
+          "sources": [
+            {
+              "ref": "_system/frameworks/scarce_strategic_asset_valuation.md",
+              "locator": "Economic ownership and unit NAV"
+            }
+          ]
         },
-        "growth_driver": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
-        "required_reinvestment": {
-          "model_type": null,
-          "base_incremental_after_tax_roic": null,
-          "base_remaining_cost_m": null,
-          "treatment": "explicit in driver model or included in the stated owner-cash conversion and component range"
-        },
-        "method": "realization_reserve",
         "comparable_ids": [],
         "range_per_share": {
+          "low": -1.3402,
+          "base": -0.6,
+          "high": -0.07
+        },
+        "legacy_range_per_share": {
           "low": -1.34,
           "base": -0.6,
           "high": -0.07
         },
+        "valuation_status": "bounded_estimate",
+        "calculation_proof": {
+          "status": "valid",
+          "method_id": "net_asset_value",
+          "method_version": "1.0",
+          "outputs": {
+            "low": -1.3402,
+            "base": -0.6,
+            "high": -0.07
+          },
+          "output_unit": "USD_per_share",
+          "traces": {
+            "low": [
+              {
+                "id": "shares_m",
+                "label": "Common shares outstanding",
+                "kind": "fact",
+                "value": 44.022781,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "FRMO/investor-documents/ir-frmo/2026-02-28_Quarterly_Report.pdf",
+                  "locator": "Outstanding shares 44,022,781 as of February 28, 2026",
+                  "as_of": "2026-02-28",
+                  "content_sha256": "10db73942493d57809a8c97a417946703b003e47afefa374138c517440b0b16c",
+                  "source_id": "7e16aed4c54e235a46e8c759dc1b92c0d3883f0d63e26fbe39985957cc538ce0"
+                },
+                "rationale": null
+              },
+              {
+                "id": "reserve_m",
+                "label": "Holdco discount, deferred tax, and realization reserve",
+                "kind": "judgment",
+                "value": -59.0,
+                "unit": "USD_m",
+                "source": null,
+                "rationale": "Low case adds deferred tax ($122.6M consolidated) and OTC illiquidity haircut; high assumes near-par realization."
+              },
+              {
+                "id": "value_per_share",
+                "label": "Realization reserve per share",
+                "kind": "calculation",
+                "value": -1.34021519,
+                "unit": "USD_per_share",
+                "operation": "divide",
+                "formula": "reserve_m \u00f7 shares_m",
+                "substituted_formula": "-59 \u00f7 44.022781",
+                "dependencies": [
+                  "reserve_m",
+                  "shares_m"
+                ]
+              }
+            ],
+            "base": [
+              {
+                "id": "shares_m",
+                "label": "Common shares outstanding",
+                "kind": "fact",
+                "value": 44.022781,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "FRMO/investor-documents/ir-frmo/2026-02-28_Quarterly_Report.pdf",
+                  "locator": "Outstanding shares 44,022,781 as of February 28, 2026",
+                  "as_of": "2026-02-28",
+                  "content_sha256": "10db73942493d57809a8c97a417946703b003e47afefa374138c517440b0b16c",
+                  "source_id": "7e16aed4c54e235a46e8c759dc1b92c0d3883f0d63e26fbe39985957cc538ce0"
+                },
+                "rationale": null
+              },
+              {
+                "id": "reserve_m",
+                "label": "Holdco discount, deferred tax, and realization reserve",
+                "kind": "judgment",
+                "value": -26.414,
+                "unit": "USD_m",
+                "source": null,
+                "rationale": "Low case adds deferred tax ($122.6M consolidated) and OTC illiquidity haircut; high assumes near-par realization."
+              },
+              {
+                "id": "value_per_share",
+                "label": "Realization reserve per share",
+                "kind": "calculation",
+                "value": -0.60000753,
+                "unit": "USD_per_share",
+                "operation": "divide",
+                "formula": "reserve_m \u00f7 shares_m",
+                "substituted_formula": "-26.414 \u00f7 44.022781",
+                "dependencies": [
+                  "reserve_m",
+                  "shares_m"
+                ]
+              }
+            ],
+            "high": [
+              {
+                "id": "shares_m",
+                "label": "Common shares outstanding",
+                "kind": "fact",
+                "value": 44.022781,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "FRMO/investor-documents/ir-frmo/2026-02-28_Quarterly_Report.pdf",
+                  "locator": "Outstanding shares 44,022,781 as of February 28, 2026",
+                  "as_of": "2026-02-28",
+                  "content_sha256": "10db73942493d57809a8c97a417946703b003e47afefa374138c517440b0b16c",
+                  "source_id": "7e16aed4c54e235a46e8c759dc1b92c0d3883f0d63e26fbe39985957cc538ce0"
+                },
+                "rationale": null
+              },
+              {
+                "id": "reserve_m",
+                "label": "Holdco discount, deferred tax, and realization reserve",
+                "kind": "judgment",
+                "value": -3.08,
+                "unit": "USD_m",
+                "source": null,
+                "rationale": "Low case adds deferred tax ($122.6M consolidated) and OTC illiquidity haircut; high assumes near-par realization."
+              },
+              {
+                "id": "value_per_share",
+                "label": "Realization reserve per share",
+                "kind": "calculation",
+                "value": -0.06996378,
+                "unit": "USD_per_share",
+                "operation": "divide",
+                "formula": "reserve_m \u00f7 shares_m",
+                "substituted_formula": "-3.08 \u00f7 44.022781",
+                "dependencies": [
+                  "reserve_m",
+                  "shares_m"
+                ]
+              }
+            ]
+          },
+          "source_lineage": [
+            {
+              "node_id": "shares_m",
+              "ref": "FRMO/investor-documents/ir-frmo/2026-02-28_Quarterly_Report.pdf",
+              "locator": "Outstanding shares 44,022,781 as of February 28, 2026",
+              "as_of": "2026-02-28",
+              "content_sha256": "10db73942493d57809a8c97a417946703b003e47afefa374138c517440b0b16c",
+              "source_id": "7e16aed4c54e235a46e8c759dc1b92c0d3883f0d63e26fbe39985957cc538ce0"
+            }
+          ],
+          "checks": {
+            "passed": true,
+            "errors": []
+          },
+          "proof_hash": "b261f9e56c0697976c5230e7178e21b274728b4b829ba062d57468f8d980a941"
+        },
         "evidence_tier": "mixed_primary_and_estimate",
         "evidence_level": "analyst_estimated",
-        "evidence": "Existing FRMO valuation inputs: Optionality overlay: SOTP + catalyst stack. Price below FRMO-attributable book. [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
+        "evidence": "Filing-backed proof from FRMO/investor-documents/ir-frmo/2026-02-28_Quarterly_Report.pdf; overlap_key=downside_reserve. Legacy Lawrence SOTP path remains separate stance gate.",
+        "scenario_assumptions": "Proof outputs {'low': -1.3402, 'base': -0.6, 'high': -0.07}; see calculation_proof graph.",
         "probability_and_timing": null,
         "tax_and_realization_adjustments": "The low/base/high range incorporates ownership, tax, capital, cycle, timing, and realization uncertainty pending the primary bridge.",
-        "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case.",
+        "falsifier": "Primary filing revises Investment A, affiliate marks, or share count >10% without matching proof update.",
         "overlap_key": "downside_reserve",
         "assumption_type": "judgment"
       }
@@ -1555,32 +3312,36 @@
           "label": "Look-through investment holdings",
           "kind": "judgment",
           "evidence_tier": "mixed_primary_and_estimate",
-          "evidence": "Existing FRMO valuation inputs: Optionality overlay: SOTP + catalyst stack. Price below FRMO-attributable book. [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
-          "method": "owner_cash_reinvestment_dcf"
+          "evidence": "Filing-backed proof from FRMO/investor-documents/ir-frmo/2026-02-28_Quarterly_Report.pdf; overlap_key=core_engine. Legacy Lawrence SOTP path remains separate stance gate.",
+          "method": "net_asset_value",
+          "valuation_status": "bounded_estimate"
         },
         {
           "component_id": "reinvestment_or_assets",
           "label": "Management-company and exchange interests",
           "kind": "judgment",
           "evidence_tier": "mixed_primary_and_estimate",
-          "evidence": "Existing FRMO valuation inputs: Optionality overlay: SOTP + catalyst stack. Price below FRMO-attributable book. [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
-          "method": "look_through_nav"
+          "evidence": "Filing-backed proof from FRMO/investor-documents/ir-frmo/2026-02-28_Quarterly_Report.pdf; overlap_key=reinvestment_or_assets. Legacy Lawrence SOTP path remains separate stance gate.",
+          "method": "probability_weighted_catalyst_nav",
+          "valuation_status": "bounded_estimate"
         },
         {
           "component_id": "net_financial_claims",
           "label": "Cash and other net claims",
           "kind": "judgment",
           "evidence_tier": "mixed_primary_and_estimate",
-          "evidence": "Existing FRMO valuation inputs: Optionality overlay: SOTP + catalyst stack. Price below FRMO-attributable book. [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
-          "method": "net_asset_value"
+          "evidence": "Filing-backed proof from FRMO/investor-documents/ir-frmo/2026-02-28_Quarterly_Report.pdf; overlap_key=net_financial_claims. Legacy Lawrence SOTP path remains separate stance gate.",
+          "method": "net_asset_value",
+          "valuation_status": "calculated"
         },
         {
           "component_id": "downside_reserve",
           "label": "Holding-company discount and realization reserve",
           "kind": "judgment",
           "evidence_tier": "mixed_primary_and_estimate",
-          "evidence": "Existing FRMO valuation inputs: Optionality overlay: SOTP + catalyst stack. Price below FRMO-attributable book. [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
-          "method": "realization_reserve"
+          "evidence": "Filing-backed proof from FRMO/investor-documents/ir-frmo/2026-02-28_Quarterly_Report.pdf; overlap_key=downside_reserve. Legacy Lawrence SOTP path remains separate stance gate.",
+          "method": "net_asset_value",
+          "valuation_status": "bounded_estimate"
         }
       ]
     },
@@ -1589,10 +3350,11 @@
       "status": "routed",
       "profile_id": "catalyst_asset_value",
       "label": "Catalyst-backed asset value",
-      "score": 7.0,
+      "score": 8.0,
       "reasons": [
         "archetype=holding_co",
-        "component categories=financial_asset"
+        "component categories=financial_asset",
+        "existing methods=catalyst"
       ],
       "primary_methods": [
         "probability_weighted_catalyst_nav"
@@ -1638,11 +3400,10 @@
           ]
         },
         {
-          "profile_id": "quality_reinvestment",
-          "score": 4.0,
+          "profile_id": "credit_and_normalized_returns",
+          "score": 2.0,
           "reasons": [
-            "component categories=operating_business",
-            "existing methods=dcf, owner_cash, reinvestment"
+            "component categories=financial_asset, liability_or_reserve"
           ]
         }
       ],
@@ -1654,10 +3415,9 @@
           ]
         },
         "quality_reinvestment": {
-          "score": 4.0,
+          "score": 1.0,
           "reasons": [
-            "component categories=operating_business",
-            "existing methods=dcf, owner_cash, reinvestment"
+            "component categories=operating_business"
           ]
         },
         "capital_cycle": {
@@ -1673,81 +3433,216 @@
           ]
         },
         "catalyst_asset_value": {
-          "score": 7.0,
+          "score": 8.0,
           "reasons": [
             "archetype=holding_co",
-            "component categories=financial_asset"
+            "component categories=financial_asset",
+            "existing methods=catalyst"
           ]
         },
         "predictable_cash_flow": {
-          "score": 2.0,
+          "score": 1.0,
           "reasons": [
-            "component categories=operating_business",
-            "existing methods=owner_cash"
+            "component categories=operating_business"
           ]
         },
         "binary_milestone": {
-          "score": 0.0,
-          "reasons": []
+          "score": 1.0,
+          "reasons": [
+            "existing methods=probability"
+          ]
         }
       },
       "decision_rule": "Use one primary method and no more than two corroborating methods; irrelevant methods and personas remain silent."
     },
     "market": {
-      "price_per_share": 6.7,
+      "price_per_share": 7.0,
       "fully_diluted_shares": 44022781,
-      "market_cap_m": 294.95,
+      "market_cap_m": 308.16,
       "enterprise_value_m": null
     },
     "valuation": {
       "value_per_share": {
-        "low": 3.35,
+        "low": 3.3618,
+        "base": 6.043,
+        "high": 9.0397
+      },
+      "priced_components_per_share": {
+        "low": 3.3618,
+        "base": 6.043,
+        "high": 9.0397
+      },
+      "legacy_value_per_share": {
+        "low": 3.36,
         "base": 6.04,
         "high": 9.04
       },
-      "probability_weighted_value_per_share": 6.04,
+      "probability_weighted_value_per_share": 6.043,
       "expected_distributions_per_share": 0.0,
       "annualized_return_at_price_pct": {
-        "low": -9.43,
-        "base": -1.47,
-        "high": 4.37
+        "low": -9.95,
+        "base": -2.08,
+        "high": 3.72
       },
-      "downside_to_low_pct": -50.0,
-      "horizon_years": 7
+      "downside_to_low_pct": -51.97,
+      "horizon_years": 7,
+      "interpretation": "value_per_share is withheld while any material additive component is unpriced; priced_components_per_share is not a complete security value."
     },
     "scenario_contract": {
-      "rule": "Cases must change causal operating, capital, probability, timing, or financing drivers\u2014not only the terminal multiple.",
+      "rule": "Cases must change cited causal operating, capital, probability, timing, or financing drivers\u2014not only a terminal multiple.",
       "top_value_drivers": [
         {
           "component_id": "core_engine",
           "label": "Look-through investment holdings",
-          "base_per_share": 5.36,
-          "range_width_per_share": 2.68,
-          "scenario_assumptions": null
+          "valuation_status": "bounded_estimate",
+          "base_per_share": 5.3623,
+          "legacy_base_per_share": 5.36,
+          "range_width_per_share": 2.6671,
+          "scenario_assumptions": "Proof outputs {'low': 4.1621, 'base': 5.3623, 'high': 6.8292}; see calculation_proof graph."
         },
         {
           "component_id": "downside_reserve",
           "label": "Holding-company discount and realization reserve",
+          "valuation_status": "bounded_estimate",
           "base_per_share": -0.6,
-          "range_width_per_share": 1.27,
-          "scenario_assumptions": null
+          "legacy_base_per_share": -0.6,
+          "range_width_per_share": 1.2702,
+          "scenario_assumptions": "Proof outputs {'low': -1.3402, 'base': -0.6, 'high': -0.07}; see calculation_proof graph."
         },
         {
           "component_id": "reinvestment_or_assets",
           "label": "Management-company and exchange interests",
-          "base_per_share": 0.94,
-          "range_width_per_share": 1.07,
-          "scenario_assumptions": null
+          "valuation_status": "bounded_estimate",
+          "base_per_share": 0.9406,
+          "legacy_base_per_share": 0.94,
+          "range_width_per_share": 1.0706,
+          "scenario_assumptions": {
+            "low": {
+              "success_value_m": 57.831,
+              "success_probability": 0.411,
+              "remaining_cost_m": 0.0,
+              "ownership_pct": 1.0
+            },
+            "base": {
+              "success_value_m": 57.831,
+              "success_probability": 0.716,
+              "remaining_cost_m": 0.0,
+              "ownership_pct": 1.0
+            },
+            "high": {
+              "success_value_m": 70.88,
+              "success_probability": 1.0,
+              "remaining_cost_m": 0.0,
+              "ownership_pct": 1.0
+            }
+          }
         },
         {
           "component_id": "net_financial_claims",
           "label": "Cash and other net claims",
-          "base_per_share": 0.34,
+          "valuation_status": "calculated",
+          "base_per_share": 0.3401,
+          "legacy_base_per_share": 0.34,
           "range_width_per_share": 0.67,
-          "scenario_assumptions": null
+          "scenario_assumptions": "Proof outputs {'low': 0.0, 'base': 0.3401, 'high': 0.67}; see calculation_proof graph."
         }
       ],
       "reverse_expectations": null
+    },
+    "calculation_proof_summary": {
+      "component_count": 4,
+      "priced_component_count": 4,
+      "proof_complete_pct": 100.0,
+      "status_counts": {
+        "bounded_estimate": 3,
+        "calculated": 1,
+        "legacy_sensitivity": 0,
+        "unpriced": 0
+      },
+      "all_material_components_priced": true,
+      "calculation_errors": [],
+      "aggregate_proof_hash": "ce2f63465133a9e1bf79d6b5c1af6e51d093c069bffcd631db3553381583c7ac"
+    },
+    "source_lineage": [
+      {
+        "component_id": "core_engine",
+        "node_id": "shares_m",
+        "ref": "FRMO/investor-documents/ir-frmo/2026-02-28_Quarterly_Report.pdf",
+        "locator": "Outstanding shares 44,022,781 as of February 28, 2026",
+        "as_of": "2026-02-28",
+        "content_sha256": "10db73942493d57809a8c97a417946703b003e47afefa374138c517440b0b16c",
+        "source_id": "7e16aed4c54e235a46e8c759dc1b92c0d3883f0d63e26fbe39985957cc538ce0"
+      },
+      {
+        "component_id": "core_engine",
+        "node_id": "investment_a_m",
+        "ref": "FRMO/research/evidence/_text/2026-02-28_Quarterly_Report.pdf.txt",
+        "locator": "Concentration table; Investment A $308,984 thousand, 82.0% of FRMO-attributable equity",
+        "as_of": "2026-02-28",
+        "content_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "source_id": "6bfff7db870840e2a5d3f227c2d1ab70caa14f9998a5a55d1b895a612523dd46"
+      },
+      {
+        "component_id": "reinvestment_or_assets",
+        "node_id": "shares_m",
+        "ref": "FRMO/investor-documents/ir-frmo/2026-02-28_Quarterly_Report.pdf",
+        "locator": "Outstanding shares 44,022,781 as of February 28, 2026",
+        "as_of": "2026-02-28",
+        "content_sha256": "10db73942493d57809a8c97a417946703b003e47afefa374138c517440b0b16c",
+        "source_id": "7e16aed4c54e235a46e8c759dc1b92c0d3883f0d63e26fbe39985957cc538ce0"
+      },
+      {
+        "component_id": "reinvestment_or_assets",
+        "node_id": "filed_bundle_m",
+        "ref": "FRMO/research/evidence/_text/2026-02-28_Quarterly_Report.pdf.txt",
+        "locator": "MIH $13,917 + CNSX $243 + HKHC equity $27,187 + royalty $10,200 + Winland $5,542 + CMSG $742 (thousands)",
+        "as_of": "2026-02-28",
+        "content_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "source_id": "79afdbb52fe53b2259fa9f742e29248d6167f1aa7b14456ff9d95854981cd84f"
+      },
+      {
+        "component_id": "net_financial_claims",
+        "node_id": "shares_m",
+        "ref": "FRMO/investor-documents/ir-frmo/2026-02-28_Quarterly_Report.pdf",
+        "locator": "Outstanding shares 44,022,781 as of February 28, 2026",
+        "as_of": "2026-02-28",
+        "content_sha256": "10db73942493d57809a8c97a417946703b003e47afefa374138c517440b0b16c",
+        "source_id": "7e16aed4c54e235a46e8c759dc1b92c0d3883f0d63e26fbe39985957cc538ce0"
+      },
+      {
+        "component_id": "net_financial_claims",
+        "node_id": "cash_m",
+        "ref": "FRMO/research/evidence/_text/2026-02-28_Quarterly_Report.pdf.txt",
+        "locator": "Balance sheet; Cash and cash equivalents $45,590 thousand",
+        "as_of": "2026-02-28",
+        "content_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "source_id": "e76ec47566a08f4cad201bb13451f8b128b9276f3c004b4ba44b59b26efcc4c3"
+      },
+      {
+        "component_id": "net_financial_claims",
+        "node_id": "digital_assets_m",
+        "ref": "FRMO/research/evidence/_text/2026-02-28_Quarterly_Report.pdf.txt",
+        "locator": "Balance sheet; Digital assets, at fair value $10,911 thousand",
+        "as_of": "2026-02-28",
+        "content_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "source_id": "a07452e8a99eb3ceecd69664684bba5cf492334c8918c9c5c0d92d9a19bd5df2"
+      },
+      {
+        "component_id": "downside_reserve",
+        "node_id": "shares_m",
+        "ref": "FRMO/investor-documents/ir-frmo/2026-02-28_Quarterly_Report.pdf",
+        "locator": "Outstanding shares 44,022,781 as of February 28, 2026",
+        "as_of": "2026-02-28",
+        "content_sha256": "10db73942493d57809a8c97a417946703b003e47afefa374138c517440b0b16c",
+        "source_id": "7e16aed4c54e235a46e8c759dc1b92c0d3883f0d63e26fbe39985957cc538ce0"
+      }
+    ],
+    "model_checks": {
+      "calculation_graphs_valid": true,
+      "component_sum_reconciles": true,
+      "no_double_counting": true,
+      "all_material_components_priced": true,
+      "low_base_high_ordered": true
     },
     "evidence": {
       "unresolved_count": 0,
@@ -1756,10 +3651,10 @@
     },
     "monitoring": {
       "falsifiers": [
-        "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case.",
-        "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case.",
-        "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case.",
-        "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case."
+        "Primary filing revises Investment A, affiliate marks, or share count >10% without matching proof update.",
+        "Primary filing revises Investment A, affiliate marks, or share count >10% without matching proof update.",
+        "Primary filing revises Investment A, affiliate marks, or share count >10% without matching proof update.",
+        "Primary filing revises Investment A, affiliate marks, or share count >10% without matching proof update."
       ],
       "required_refresh_triggers": [
         "new filing or material operating update",
@@ -1768,6 +3663,18 @@
         "component milestone or falsifier"
       ]
     },
-    "decision_rule": "No security is decision-grade until every material economic claim is valued exactly once and every material evidence blocker is resolved."
+    "change_control": {
+      "model_hash": "91cb2f34880b120d1f119613c648bf5139beafbb7bd6fd88780642090fccec05",
+      "method_versions": [
+        "net_asset_value@1.0",
+        "probability_weighted_catalyst_nav@1.0"
+      ],
+      "change_log": [],
+      "rule": "A source fact is locked. Every assumption change requires a reason, author, timestamp, and before/after value."
+    },
+    "decision_rule": "No security is decision-grade until every material claim is valued exactly once by a valid calculation proof and every material evidence blocker is resolved."
+  },
+  "human_review": {
+    "live_price_confirmed": false
   }
 }

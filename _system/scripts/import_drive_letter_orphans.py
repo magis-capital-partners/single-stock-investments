@@ -127,7 +127,32 @@ def download_pdf(service, file_id: str) -> bytes:
     return data
 
 
+def _manifest_local_paths(manifest_entry: dict | None) -> list[Path]:
+    """Resolve possible on-disk paths recorded in drive_import_manifest.json."""
+    if not manifest_entry:
+        return []
+    ref = str(manifest_entry.get("local_pdf_path") or "").replace("\\", "/")
+    if not ref:
+        return []
+    paths: list[Path] = []
+    raw = Path(ref)
+    if raw.is_absolute():
+        paths.append(raw)
+    else:
+        paths.append(ROOT / ref)
+        marker = "/superinvestor-letters/"
+        if marker in f"/{ref}":
+            suffix = ref.split("superinvestor-letters/", 1)[1]
+            paths.append(LETTERS_ROOT / suffix)
+    return paths
+
+
 def unique_dest(dest_dir: Path, name: str, drive_file_id: str) -> Path:
+    """Return a writable path for a new download (collision-safe).
+
+    Prefer :func:`resolve_local_pdf` for import loops — this helper only
+    allocates a path and intentionally avoids the existing-file skip path.
+    """
     dest_dir.mkdir(parents=True, exist_ok=True)
     candidate = dest_dir / safe_filename(name)
     if not candidate.exists():
@@ -152,15 +177,67 @@ def should_skip_download(local_pdf: Path, drive_size: int | None, manifest_entry
     return False
 
 
-def extract_texts(pdfs: list[Path], *, max_pages: int = 40, max_files: int | None = None) -> int:
-    from pdf_ocr import extract_pdf_text  # noqa: WPS433
+def resolve_local_pdf(
+    dest_dir: Path,
+    name: str,
+    drive_file_id: str,
+    *,
+    drive_size: int | None,
+    manifest_entry: dict | None,
+) -> tuple[Path, bool]:
+    """Return ``(path, skip_download)`` for a Drive letter PDF.
 
+    Reuse an existing local file for this Drive id when content matches
+    (manifest sha256 or byte size). Only mint a file-id-suffixed name when
+    the basename is already occupied by a *different* file.
+
+    Prior bug: ``unique_dest`` returned a fresh suffix path whenever the
+    basename existed, so ``should_skip_download`` never saw the existing PDF
+    and weekly backfill re-downloaded the entire ~20k corpus (then timed out
+    mid text-extract).
+    """
+    dest_dir.mkdir(parents=True, exist_ok=True)
+    safe = safe_filename(name)
+    stem = Path(safe).stem
+    candidate = dest_dir / safe
+    alt_short = dest_dir / f"{stem}-{drive_file_id[:8]}.pdf"
+    alt_full = dest_dir / f"{stem}-{drive_file_id}.pdf"
+
+    for existing in (*_manifest_local_paths(manifest_entry), candidate, alt_short, alt_full):
+        if should_skip_download(existing, drive_size, manifest_entry):
+            return existing, True
+
+    if not candidate.exists():
+        return candidate, False
+    if not alt_short.exists():
+        return alt_short, False
+    return alt_full, False
+
+
+def extract_texts(pdfs: list[Path], *, max_pages: int = 40, max_files: int | None = None) -> int:
     updated = 0
+    skipped = 0
+    extract_pdf_text = None
     todo = pdfs[:max_files] if max_files else pdfs
     for i, pdf in enumerate(todo, 1):
         txt = pdf.with_suffix(".txt")
-        if txt.exists() and txt.stat().st_mtime >= pdf.stat().st_mtime:
-            continue
+        if txt.exists():
+            try:
+                existing = txt.read_text(encoding="utf-8", errors="ignore").strip()
+            except OSError:
+                existing = ""
+            # Skip when extract is fresh vs PDF, or when a non-trivial extract
+            # already exists (guards against checkout/download mtime churn
+            # forcing a full-corpus OCR pass inside the 5h job budget).
+            if existing and (
+                txt.stat().st_mtime >= pdf.stat().st_mtime or len(existing) >= 50
+            ):
+                skipped += 1
+                continue
+        if extract_pdf_text is None:
+            from pdf_ocr import extract_pdf_text as _extract_pdf_text  # noqa: WPS433
+
+            extract_pdf_text = _extract_pdf_text
         if i % 25 == 1 or i == len(todo):
             print(f"  Text extract {i}/{len(todo)}: {pdf.name}", flush=True)
         result = extract_pdf_text(pdf, max_pages=max_pages)
@@ -170,6 +247,8 @@ def extract_texts(pdfs: list[Path], *, max_pages: int = 40, max_files: int | Non
             text = (result.get("text") or "").strip()
         txt.write_text(text + "\n", encoding="utf-8")
         updated += 1
+    if skipped:
+        print(f"  Text extract skipped {skipped} existing extracts", flush=True)
     return updated
 
 
@@ -377,17 +456,40 @@ def main() -> int:
         downloaded: list[Path] = []
         skipped = 0
         errors = 0
+        new_downloads = 0
         for i, row in enumerate(candidates, 1):
             quarter = row["quarter"]
             dest_dir = LETTERS_ROOT / quarter
-            dest = unique_dest(dest_dir, row["name"], row["file_id"])
             entry = manifest_files.get(row["file_id"])
-            if should_skip_download(dest, row.get("size_bytes"), entry):
+            dest, skip = resolve_local_pdf(
+                dest_dir,
+                row["name"],
+                row["file_id"],
+                drive_size=row.get("size_bytes"),
+                manifest_entry=entry,
+            )
+            if skip:
                 skipped += 1
                 downloaded.append(dest)
+                # Refresh manifest path if we resolved via size match without an entry.
+                if row["file_id"] not in manifest_files:
+                    manifest_files[row["file_id"]] = {
+                        "drive_file_id": row["file_id"],
+                        "drive_path": row["drive_path"],
+                        "local_pdf_path": path_to_letters_ref(dest) or str(dest).replace("\\", "/"),
+                        "quarter": quarter,
+                        "size_bytes": int(row.get("size_bytes") or dest.stat().st_size),
+                        "webViewLink": row.get("webViewLink"),
+                        "imported_at": now_iso(),
+                        "skipped_existing": True,
+                    }
                 continue
-            if i % 25 == 1 or i == len(candidates):
-                print(f"  Download {i}/{len(candidates)}: {row['drive_path']}", flush=True)
+            if new_downloads % 25 == 0 or i == len(candidates):
+                print(
+                    f"  Download {i}/{len(candidates)} "
+                    f"(new {new_downloads}, skipped {skipped}): {row['drive_path']}",
+                    flush=True,
+                )
             try:
                 data = download_pdf(service, row["file_id"])
                 dest.write_bytes(data)
@@ -403,6 +505,7 @@ def main() -> int:
                     "imported_at": now_iso(),
                 }
                 downloaded.append(dest)
+                new_downloads += 1
                 log_event({"action": "download", "file_id": row["file_id"], "path": manifest_files[row["file_id"]]["local_pdf_path"]})
             except Exception as exc:
                 errors += 1
@@ -410,7 +513,10 @@ def main() -> int:
         manifest["generated_at"] = now_iso()
         manifest["file_count"] = len(manifest_files)
         write_json(MANIFEST_PATH, manifest)
-        print(f"  Downloaded/kept {len(downloaded)} PDFs ({skipped} skipped, {errors} errors)")
+        print(
+            f"  Downloaded/kept {len(downloaded)} PDFs "
+            f"({new_downloads} new, {skipped} skipped, {errors} errors)"
+        )
         pdfs = downloaded
 
     if not args.skip_text and pdfs:
