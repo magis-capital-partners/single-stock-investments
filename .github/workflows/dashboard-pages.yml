@@ -15,6 +15,12 @@ on:
       - ".github/actions/publish-dashboard/**"
       - ".github/actions/rebuild-data/**"
       - ".github/actions/deploy-pages-retry/**"
+  workflow_dispatch:
+    inputs:
+      reason:
+        description: "Why this manual Pages deploy is needed"
+        required: false
+        default: "manual republish of committed dashboard/"
   workflow_run:
     workflows:
       - Data Pipeline

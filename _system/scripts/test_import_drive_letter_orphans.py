@@ -98,5 +98,37 @@ class ResolveLocalPdfTests(unittest.TestCase):
             self.assertEqual(updated, 0)
 
 
+class ShardPartitionTests(unittest.TestCase):
+    def test_shard_bucket_is_deterministic(self) -> None:
+        self.assertEqual(imp.shard_bucket("file-abc", 8), imp.shard_bucket("file-abc", 8))
+        self.assertTrue(0 <= imp.shard_bucket("file-abc", 8) < 8)
+
+    def test_filter_shard_partitions_without_overlap_or_drop(self) -> None:
+        rows = [{"file_id": f"id-{i}", "name": f"n{i}"} for i in range(200)]
+        shard_count = 8
+        parts = [
+            imp.filter_shard(
+                rows,
+                shard_index=i,
+                shard_count=shard_count,
+                key_fn=lambda r: r["file_id"],
+            )
+            for i in range(shard_count)
+        ]
+        seen: set[str] = set()
+        for part in parts:
+            ids = {r["file_id"] for r in part}
+            self.assertTrue(seen.isdisjoint(ids))
+            seen |= ids
+        self.assertEqual(seen, {r["file_id"] for r in rows})
+        # Roughly balanced: no empty shard on 200 ids / 8 buckets is typical but
+        # not guaranteed; require every id assigned and total preserved.
+        self.assertEqual(sum(len(p) for p in parts), len(rows))
+
+    def test_in_shard_rejects_bad_index(self) -> None:
+        with self.assertRaises(ValueError):
+            imp.in_shard("x", shard_index=8, shard_count=8)
+
+
 if __name__ == "__main__":
     raise SystemExit(unittest.main())
