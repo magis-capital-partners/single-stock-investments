@@ -16,6 +16,7 @@
 
   const SOURCE_LABEL = {
     superinvestor_letter: 'Letter',
+    podcast_episode: 'Podcast',
     filing: 'Filing',
     earnings: 'Earnings',
     macro: 'Macro',
@@ -31,6 +32,7 @@
 
   const CATALOG_SOURCE_LABEL = {
     superinvestor_letter: 'Letters',
+    podcast_episode: 'Podcasts',
     company_document: 'Company',
     third_party: 'VIC / third party',
     sumzero_research: 'SumZero',
@@ -595,6 +597,56 @@
     const ref = row?.source_file || row?.source_document || '';
     const stem = String(ref).replace(/\\/g, '/').split('/').pop() || '';
     return stem.replace(/\.(txt|pdf|md)$/i, '').slice(0, 48);
+  }
+
+  function renderPodcastIndex(rows, escapeHtml, linkHtml, ghRepo, { bookOnly = false, search = '' } = {}) {
+    let list = Array.isArray(rows) ? rows.slice() : [];
+    if (bookOnly) list = list.filter(r => r.in_book || (r.tickers || []).length);
+    if (search) {
+      const q = String(search).toLowerCase();
+      list = list.filter(r => {
+        const blob = [
+          r.show_title, r.title, (r.guests || []).join(' '), (r.tickers || []).join(' '),
+          (r.persona_ids || []).join(' '),
+        ].join(' ').toLowerCase();
+        return blob.includes(q);
+      });
+    }
+    if (!list.length) {
+      return '<p class="muted">No podcast episodes indexed yet. Run <code>make podcasts-refresh</code>.</p>';
+    }
+    return `
+      <p class="tier-sub" style="margin-bottom:8px">${list.length} episode(s)${bookOnly ? ' · in-book / ticker overlap' : ''}</p>
+      <table class="darwin-table" id="insights-podcast-table">
+        <thead><tr><th>Date</th><th>Show</th><th>Episode</th><th>Guests / PZ</th><th>Tickers</th><th>Flags</th><th>Highlights</th><th>Source</th></tr></thead>
+        <tbody>
+          ${list.slice(0, 100).map(r => {
+            const flags = [
+              r.has_pz_guest ? 'PZ guest' : '',
+              r.has_officer_hit ? 'Officer' : '',
+              r.near_universe ? 'Near-universe' : '',
+              r.in_book ? 'In book' : '',
+            ].filter(Boolean).join(' · ') || '—';
+            const guests = (r.guests || []).filter(Boolean).slice(0, 4).join(', ') || '—';
+            const personas = (r.persona_ids || []).slice(0, 3).join(', ');
+            const guestCell = personas ? `${escapeHtml(guests)}<div class="tier-sub" style="font-size:10px">${escapeHtml(personas)}</div>` : escapeHtml(guests);
+            const src = r.source_document
+              ? evidenceLink(r.source_document, linkHtml, ghRepo, 'Transcript')
+              : (r.link ? linkHtml(r.link, 'Open', 'source-open-link') : '—');
+            return `<tr>
+              <td class="mono">${escapeHtml(r.published || '—')}</td>
+              <td>${escapeHtml(r.show_title || r.show_id || '—')}</td>
+              <td style="font-size:11px;max-width:260px">${escapeHtml(r.title || '—')}</td>
+              <td style="font-size:11px">${guestCell}</td>
+              <td class="mono" style="font-size:11px">${escapeHtml((r.tickers || []).slice(0, 6).join(', ') || '—')}</td>
+              <td style="font-size:11px">${escapeHtml(flags)}</td>
+              <td class="mono">${escapeHtml(String(r.highlight_count ?? 0))}</td>
+              <td>${src}</td>
+            </tr>`;
+          }).join('')}
+        </tbody>
+      </table>
+      ${list.length > 100 ? `<p class="tier-sub">${list.length - 100} more episodes — refine search</p>` : ''}`;
   }
 
   function renderLetterIndex(rows, escapeHtml, linkHtml, ghRepo, onFundClick, positionStats, period, timeModel, bookOnly) {
@@ -3706,6 +3758,7 @@
       : [];
     const sections = [
       { id: 'letters', label: 'Letters' },
+      { id: 'podcasts', label: 'Podcasts' },
       { id: 'inflections', label: 'Inflections' },
       { id: 'events', label: 'What changed' },
       { id: 'index_watch', label: 'Index Watch' },
@@ -3768,7 +3821,12 @@
       const positionStats = [posPct, `${letters.length} letter(s)`, escapeHtml(period.label), bookOnly ? 'overlap with our book only' : ''].filter(Boolean).join(' · ');
       body = `<p class="tier-sub" style="margin-bottom:8px">${escapeHtml(period.label)}${bookOnly ? ' · overlap with our book only' : ''}</p>`
         + renderLetterIndex(letters, escapeHtml, linkHtml, ghRepo, true, positionStats, period, timeModel, bookOnly);
-    } else if (activeSection === 'funds') {
+        } else if (activeSection === 'podcasts') {
+      body = renderPodcastIndex(insights?.podcast_index || [], escapeHtml, linkHtml, ghRepo, {
+        bookOnly,
+        search: fundSearch,
+      });
+} else if (activeSection === 'funds') {
       body = renderFundRegistry(funds, escapeHtml, linkHtml, ghRepo, bookOnly);
     } else if (activeSection === 'documents') {
       body = renderDocumentCatalog(documentCatalog, escapeHtml, linkHtml, {

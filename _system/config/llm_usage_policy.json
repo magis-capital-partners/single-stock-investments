@@ -17,7 +17,9 @@
         "frontier_task_ids": ["chair-synthesis"]
       },
       "vicki_ir": {},
-      "ci_autofix": {}
+      "ci_autofix": {},
+      "podcast_highlights": {},
+      "podcast_entity_resolve": {}
     }
   },
   "default": {
@@ -74,6 +76,20 @@
       "cooldown_hours": 168,
       "minimum_repeat_count": 2,
       "maximum_failed_jobs": 2
+    },
+    "podcast_highlights": {
+      "daily_repo_limit": 20,
+      "per_subject_daily_limit": 1,
+      "duplicate_evidence_block": true,
+      "cooldown_hours": 168,
+      "allowed_reasons": ["new_episode", "manual_refresh"]
+    },
+    "podcast_entity_resolve": {
+      "daily_repo_limit": 10,
+      "per_subject_daily_limit": 2,
+      "duplicate_evidence_block": true,
+      "cooldown_hours": 72,
+      "allowed_reasons": ["ambiguous_guest_company", "manual_override"]
     }
   }
 }

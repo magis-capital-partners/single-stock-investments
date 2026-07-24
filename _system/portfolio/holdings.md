@@ -272,6 +272,7 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-07-24.
 | ETN | ETN/ | Eaton Corporation | US | 2026-07-09 | 2026-07-24 | unknown | watch |
 | ETOR | ETOR/ | eToro Group Ltd. | US | 2026-07-09 | 2026-07-24 | unknown | watch |
 | ETR | ETR/ | Entergy | US | 2026-07-09 | 2026-07-24 | unknown | watch |
+| EVO.ST | EVO.ST/ | Evolution AB | SE | — | 2026-07-24 | compounder | watch |
 | EVR | EVR/ | Evolve Royalties Ltd | CA | 2026-06-11 | 2026-07-24 | unknown | watch |
 | EVRG | EVRG/ | Evergy | US | 2026-07-09 | 2026-07-24 | unknown | watch |
 | EW | EW/ | Edwards Lifesciences | US | 2026-07-09 | 2026-07-24 | unknown | watch |
@@ -741,4 +742,4 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-07-24.
 | ZBRA | ZBRA/ | Zebra Technologies | US | 2026-07-10 | 2026-07-24 | unknown | watch |
 | ZTS | ZTS/ | Zoetis | US | 2026-07-10 | 2026-07-24 | unknown | watch |
 
-**734 holdings total.** Registry: `_system/portfolio/registry.json`
+**735 holdings total.** Registry: `_system/portfolio/registry.json`

@@ -90,9 +90,18 @@ def document_for_ref(ref: str | None, registry: dict | None = None) -> dict | No
         return idx["by_text"][base]
     path = resolve_ref_to_path(base) or (ROOT / base)
     if path.suffix.lower() in {".txt", ".md"}:
-        pdf = str(path.with_suffix(".pdf").relative_to(ROOT)).replace("\\", "/")
-        if pdf in idx["by_pdf"]:
+        try:
+            pdf = str(path.with_suffix(".pdf").relative_to(ROOT)).replace("\\", "/")
+        except ValueError:
+            # Vault / absolute paths outside ops repo (e.g. podcast transcripts)
+            pdf = None
+        if pdf and pdf in idx["by_pdf"]:
             return idx["by_pdf"][pdf]
+        # Logical podcast refs: strip to sibling .pdf under same logical prefix
+        if base.startswith("_system/reference/podcasts/") and base.lower().endswith((".txt", ".md")):
+            pdf_logical = str(Path(base).with_suffix(".pdf")).replace("\\", "/")
+            if pdf_logical in idx["by_pdf"]:
+                return idx["by_pdf"][pdf_logical]
     if base.endswith(".pdf.txt"):
         pdf = base[: -len(".txt")]
         if pdf in idx["by_pdf"]:
