@@ -11,13 +11,13 @@
 | **Dhando** (Pabrai) | partial |
 | **Stance** | watch |
 | **Cycle** | mid |
-| **Implied 7yr IRR** (base) | 10.4% (base) |
-| **IRR method** | yield_curve |
+| **Implied 7yr IRR** (base) | — |
+| **IRR method** | catalyst_asset_value |
 | **Lawrence bucket** | other |
 | **Payoff lens** | event |
 | **MOI bucket** | pending |
 
-**Deep dive:** `STHO/research/deep_dive_2026-06-12.md` (auto-sync)
+**Deep dive:** `STHO/research/deep_dive_2026-07-24.md` (auto-sync)
 
 ## One-line thesis
 
