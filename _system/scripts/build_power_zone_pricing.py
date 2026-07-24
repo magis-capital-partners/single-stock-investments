@@ -13,6 +13,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 from marvin_valuation import compute_valuation  # noqa: E402
 from economic_value_framework import build_economic_value_analysis  # noqa: E402
+from calculation_proof import floor_equity_value_range  # noqa: E402
 from decision_authority import load_contract, load_route, read_json  # noqa: E402
 
 HURDLES = (0.10, 0.12, 0.15, 0.20)
@@ -28,7 +29,10 @@ def build_contract_pricing(ticker: str, as_of: str | None = None) -> dict:
     if contract.get("status") != "decision_grade":
         raise ValueError(f"{ticker}: contract pricing requires decision_grade")
     market = contract.get("market") or {}
-    value = (contract.get("valuation") or {}).get("value_per_share") or {}
+    value = floor_equity_value_range(
+        (contract.get("valuation") or {}).get("value_per_share") or {},
+        ndigits=4,
+    )
     years = int((contract.get("valuation") or {}).get("horizon_years") or 7)
     distributions = float((contract.get("valuation") or {}).get("expected_distributions_per_share") or 0)
     price = market.get("price_per_share")
@@ -137,7 +141,10 @@ def build_pricing_analysis(data: dict, config: dict) -> dict:
     price, fcf0 = float(inputs["price"]), float(inputs["fcf_per_share"])
     years = int(data.get("lawrence_horizon_years") or 7)
     component = data.get("component_valuation_results") or {}
-    values = component.get("total_equity_value_per_share") or {}
+    values = floor_equity_value_range(
+        component.get("total_equity_value_per_share") or {},
+        ndigits=4,
+    )
     base_scenario = data["scenarios"]["base"]
     exit_multiple = base_scenario.get("exit_pfcf_end", base_scenario.get("exit_pfcf_y10"))
     entry = {

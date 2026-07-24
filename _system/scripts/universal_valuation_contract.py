@@ -4,7 +4,14 @@ from __future__ import annotations
 
 from math import isfinite
 
-from calculation_proof import CASES, PRICED_STATUSES, canonical_hash, component_proof, proof_completeness
+from calculation_proof import (
+    CASES,
+    PRICED_STATUSES,
+    canonical_hash,
+    component_proof,
+    floor_equity_value_range,
+    proof_completeness,
+)
 from valuation_method_registry import approved_method
 from valuation_method_router import route_valuation
 
@@ -169,7 +176,9 @@ def build_universal_valuation_contract(data: dict, explicit_profile: str | None 
     evidence_blockers.extend(double_counting_flags)
 
     priced = _sum_priced([row for row in evaluated_rows if row.get("treatment") == "additive"])
-    total = priced if unvalued_count == 0 else {case: None for case in CASES}
+    # Keep priced_components_per_share as the raw additive sum for audit.
+    # Security value_per_share floors at 0 (limited liability of equity).
+    total = floor_equity_value_range(priced, ndigits=4) if unvalued_count == 0 else {case: None for case in CASES}
     legacy_total = (
         (data.get("legacy_component_valuation_snapshot") or {}).get("value_per_share")
         or ((result.get("total_equity_value_per_share") or {}) if result else {})
@@ -225,7 +234,12 @@ def build_universal_valuation_contract(data: dict, explicit_profile: str | None 
             "annualized_return_at_price_pct": returns,
             "downside_to_low_pct": round((float(total["low"]) / float(price) - 1) * 100, 2) if price and total.get("low") is not None else None,
             "horizon_years": years,
-            "interpretation": "value_per_share is withheld while any material additive component is unpriced; priced_components_per_share is not a complete security value.",
+            "equity_liability_floor": 0.0,
+            "interpretation": (
+                "value_per_share is withheld while any material additive component is unpriced; "
+                "priced_components_per_share is the raw additive sum (may be negative). "
+                "When complete, value_per_share applies a 0 floor (limited liability)."
+            ),
         },
         "scenario_contract": {
             "rule": "Cases must change cited causal operating, capital, probability, timing, or financing drivers—not only a terminal multiple.",

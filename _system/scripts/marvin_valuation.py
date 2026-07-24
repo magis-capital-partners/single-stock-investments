@@ -20,6 +20,7 @@ sys.path.insert(0, str(ROOT / "_system" / "scripts"))
 
 from growth_theory import enrich_growth_explanation, load_filing_facts, theory_scenario  # noqa: E402
 from economic_value_framework import build_economic_value_analysis  # noqa: E402
+from calculation_proof import floor_equity_value_range  # noqa: E402
 from universal_valuation_contract import build_universal_valuation_contract  # noqa: E402
 from lawrence_horizon import LAWRENCE_HORIZON_YEARS, RETURN_LABEL, SYNTHESIS_LABEL  # noqa: E402
 from valuation_synthesis import compute_synthesis  # noqa: E402
@@ -555,10 +556,15 @@ def compute_component_valuation(data: dict) -> dict | None:
         if row["included_in_component_id"] not in additive_ids:
             raise ValueError(f"embedded component {row['id']} must point to an additive component")
 
-    total = {key: round(value, 2) for key, value in totals.items()}
+    raw_total = {key: round(value, 2) for key, value in totals.items()}
+    total = floor_equity_value_range(raw_total, ndigits=2)
+    floor_applied = any(raw_total[key] < 0 for key in COMPONENT_RANGE_KEYS)
     output = {
         "status": "complete",
-        "decision_rule": "Use the complete low/base/high component schedule. Embedded components are estimated but not added twice.",
+        "decision_rule": (
+            "Use the complete low/base/high component schedule. Embedded components are estimated "
+            "but not added twice. Security equity value per share is floored at 0 (limited liability)."
+        ),
         "all_material_components_identified": True,
         "additive_components": additive,
         "embedded_components": embedded,
@@ -567,6 +573,9 @@ def compute_component_valuation(data: dict) -> dict | None:
         "additive_component_count": len(additive),
         "embedded_component_count": len(embedded),
     }
+    if floor_applied:
+        output["total_equity_value_per_share_pre_floor"] = raw_total
+        output["equity_liability_floor"] = 0.0
     if price is not None:
         output["market_price_per_share"] = float(price)
         output["upside_downside_pct"] = {
