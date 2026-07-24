@@ -17,7 +17,9 @@ runs:
       shell: bash
       run: |
         git fetch origin main --depth=1 2>/dev/null || git fetch origin main
-        git add ${{ inputs.git_add }}
+        # --sparse allows staging paths written on disk that sit outside a
+        # sparse-checkout cone (e.g. dashboard/data after a minimal checkout).
+        git add --sparse ${{ inputs.git_add }}
         bash _system/scripts/ci_push_main.sh "${{ inputs.message }}"
 
     - name: Deploy chain note

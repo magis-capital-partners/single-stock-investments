@@ -21,6 +21,7 @@ Root causes:
 | Recent-year default window on schedule (`year-1`) + Wed catch-up cron | New quarter drops finish every week |
 | `quarter` / `since_year` / `full_history` workflow inputs | Manual focused intake (e.g. `2026Q2`) |
 | Sparse checkout includes `Makefile`; publish calls Python directly | Publish gate cannot miss make targets |
+| Publish job uses `pages` checkout (includes `dashboard/`) + `git add --sparse` | Staging rebuilt payloads cannot fail under sparse-checkout |
 | `check_letter_drive_coverage.py` gate after rebuild | Fail the workflow when Drive≫vault for recent quarters |
 
 ## Keep it automatic (operating model)

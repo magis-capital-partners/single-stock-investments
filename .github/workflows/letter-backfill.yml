@@ -197,8 +197,10 @@ jobs:
             _system/scripts/ci_sparse_checkout_paths.py
           sparse-checkout-cone-mode: false
           fetch-depth: 1
-      - name: Checkout workspace (minimal + scripts)
-        run: bash _system/scripts/ci_checkout_workspace.sh minimal
+      # pages profile includes dashboard/ so commit-main can stage rebuilt payloads.
+      # minimal omits dashboard and git add then fails under sparse-checkout rules.
+      - name: Checkout workspace (scripts + dashboard)
+        run: bash _system/scripts/ci_checkout_workspace.sh pages
 
       - uses: actions/setup-python@v5
         with:
@@ -210,8 +212,10 @@ jobs:
       - name: Checkout research vault
         uses: ./.github/actions/checkout-vault
 
-      - name: Assert Makefile present for make targets
-        run: test -f Makefile
+      - name: Assert Makefile and dashboard present
+        run: |
+          test -f Makefile
+          test -d dashboard/data
 
       - name: Letter date parser gold gate
         run: |
