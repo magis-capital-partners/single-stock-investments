@@ -14,7 +14,7 @@
 
 ### Horizon Kinetics cross-reference
 
-Auto-scan `TPL/third-party-analyses/hk_scan_2026-07-21.md`. Mental models: predictive_attributes, hard_asset_scarcity, water_rights.
+Auto-scan `TPL/third-party-analyses/hk_scan_2026-07-24.md`. Mental models: predictive_attributes, hard_asset_scarcity, water_rights.
 
 **Cross-check:** `TPL/research/cross_check_HK_2026-06-01.md`
 
