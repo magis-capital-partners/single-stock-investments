@@ -1,82 +1,83 @@
 # Event triage — human review queue
 
 **Date:** 2026-07-24
-**Rows:** 1160
+**Rows:** 1161
 
 | Date | Ticker | Source | Tier | Materiality | Rules | Title |
 |------|--------|--------|------|-------------|-------|-------|
 | 2026-08-04 | QDEL | earnings | context | 35 | rule_conflict, activist_cross_link, scheduled_context, neutral_low_impact | Upcoming earnings |
 | 2026-07-29 | APLD | earnings | context | 35 | rule_conflict, activist_cross_link, scheduled_context, neutral_low_impact | Upcoming earnings |
 | 2026-07-28 | FRMI | earnings | context | 35 | rule_conflict, activist_cross_link, scheduled_context, neutral_low_impact | Upcoming earnings |
+| 2026-07-24 | LLY | third_party | context | 25 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | Bulldog Investors — SC 13D/A |
+| 2026-07-24 | LLY | third_party | context | 25 | rule_conflict, activist_cross_link, neutral_low_impact | SC 13D/A · LLY · 2022-12-01 |
+| 2026-07-24 | LASR | third_party | context | 25 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | Mariner (+3) — SC 13G/A |
+| 2026-07-24 | IONQ | third_party | context | 25 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | Citron (+7) — SC 13D/A |
+| 2026-07-24 | LDOS | third_party | context | 25 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | Feb 16, 2021 |
+| 2026-07-24 | TRC | third_party | context | 25 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | Bulldog (+4) — DEFC14A (proxy solicitation) |
+| 2026-07-24 | TRC | third_party | context | 25 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | Bulldog Investors — DEFC14A (proxy solicitation) |
+| 2026-07-24 | TRC | third_party | context | 25 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | Bulldog Investors — DFAN14A (proxy solicitation) |
+| 2026-07-24 | TRC | third_party | context | 25 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | Bulldog Investors — PREC14A (proxy solicitation) |
+| 2026-07-24 | FRMI | third_party | context | 25 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | Vicksburg Investments Management — DEFC14A (proxy solicitati |
+| 2026-07-24 | FRMI | third_party | context | 25 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | Vicksburg Investments Management — DFAN14A (proxy solicitati |
+| 2026-07-24 | LLY | third_party | context | 25 | rule_conflict, activist_cross_link, neutral_low_impact | ELI LILLY AND COMPANY — DFAN14A (proxy solicitation) |
+| 2026-07-24 | BUR | third_party | context | 25 | rule_conflict, activist_cross_link, neutral_low_impact | Block on Bloomberg Markets Discussing Latest Short, Burford  |
+| 2026-07-24 | MRSH | third_party | context | 25 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | Elliott Management — SC 13G/A |
+| 2026-07-24 | IONQ | third_party | context | 25 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | Citron Research — SC 13D/A |
+| 2026-07-24 | CVNA | third_party | context | 25 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | ECG II SPE, LLC &#8199 — SC 13D/A |
+| 2026-07-24 | CVNA | third_party | context | 25 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | Verde Investments, Inc. &#8199 — SC 13D/A |
+| 2026-07-24 | MNST | third_party | context | 25 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | Apr 8, 2025 |
+| 2026-07-24 | QDEL | third_party | context | 25 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | `mcintyre` |
+| 2026-07-24 | QDEL | third_party | context | 25 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | The Carlyle Group — SC 13D/A |
+| 2026-07-24 | BMY | third_party | context | 25 | rule_conflict, activist_cross_link, neutral_low_impact | BRISTOL-MYERS SQUIBB COMPANY — DFAN14A (proxy solicitation) |
+| 2026-07-24 | BMY | third_party | context | 25 | rule_conflict, activist_cross_link, neutral_low_impact | DFAN14A (proxy solicitation) · BMY · 2023-12-22 |
+| 2026-07-24 | STX | third_party | context | 25 | rule_conflict, activist_cross_link, neutral_low_impact | Activist on Call: Seagate Brokers Deal to Bring in ValueAct  |
+| 2026-07-24 | CSGP | third_party | context | 25 | rule_conflict, activist_cross_link, neutral_low_impact | Third Point Sends Letter to Board of Directors of CoStar Gro |
+| 2026-07-24 | CSGP | third_party | context | 25 | rule_conflict, activist_cross_link, neutral_low_impact | The D. E. Shaw Group Releases Open Letter and Presentation t |
+| 2026-07-24 | CSGP | third_party | context | 25 | rule_conflict, activist_cross_link, neutral_low_impact | D.E. Shaw Group Letter to CoStar Board: Reduced Transparency |
+| 2026-07-24 | SYK | third_party | context | 25 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | Apr 6, 2022 |
+| 2026-07-24 | ADSK | third_party | context | 25 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | Starboard Value — DFAN14A (proxy solicitation) |
+| 2026-07-24 | ADSK | third_party | context | 25 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | Soroban Capital — SC 13G/A |
+| 2026-07-24 | O | third_party | context | 25 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | Feb 7, 2018 |
+| 2026-07-24 | APD | third_party | context | 25 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | MANTLE RIDGE LP — DFAN14A (proxy solicitation) |
+| 2026-07-24 | CHTR | third_party | context | 25 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | S Advance Publications, Inc. — SC 13D/A |
+| 2026-07-24 | CHTR | third_party | context | 25 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | Soroban Capital — SC 13D/A |
+| 2026-07-24 | SMCI | third_party | context | 25 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | Super Micro: Fresh Evidence Of Accounting Manipulation, Sibl |
+| 2026-07-24 | MSFT | third_party | context | 25 | rule_conflict, activist_cross_link, neutral_low_impact | Microsoft strikes agreement with ValueAct Capital |
+| 2026-07-24 | MSCI | third_party | context | 25 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | Jan 17, 2024 |
+| 2026-07-24 | ULTA | third_party | context | 25 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | Nov 9, 2023 |
+| 2026-07-24 | AVY | third_party | context | 25 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | Nov 10, 2020 |
+| 2026-07-24 | MTD | third_party | context | 25 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | Jul 24, 2019 |
+| 2026-07-24 | CTAS | third_party | context | 25 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | Nov 13, 2019 |
+| 2026-07-24 | APLD | third_party | context | 25 | rule_conflict, activist_cross_link, neutral_low_impact | Applied Digital / Marvin shop summary (PF3 PR) |
+| 2026-07-24 | APLD | third_party | context | 25 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | Research note (run-the-table bull case) |
+| 2026-07-24 | APLD | third_party | context | 25 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | Oasis Management (SC 13D/A) |
+| 2026-07-24 | APLD | third_party | context | 25 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | Wolfpack Research short cache (Jul 2023) |
+| 2026-07-24 | MPWR | third_party | context | 25 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | Oct 9, 2019 |
+| 2026-07-24 | CHD | third_party | context | 25 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | Sep 5, 2019 |
+| 2026-07-24 | QDEL | third_party | context | 25 | rule_conflict, activist_cross_link, neutral_low_impact | McIntyre Partnerships |
+| 2026-07-24 | DXCM | third_party | context | 25 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | Mar 21, 2019 |
+| 2026-07-24 | INTU | third_party | context | 25 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | Sep 20, 2024 |
+| 2026-07-24 | BKR | third_party | context | 25 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | Semper Augustus Investments Group |
+| 2026-07-24 | ROL | third_party | context | 25 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | Oct 4, 2023 |
+| 2026-07-24 | LRCX | third_party | context | 25 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | Oct 18, 2022 |
+| 2026-07-24 | O | third_party | context | 25 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | HK + SSI + LCI context (FRMO) |
+| 2026-07-24 | BR | third_party | context | 25 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | Sep 28, 2022 |
+| 2026-07-24 | ERIE | third_party | context | 25 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | Oct 18, 2024 |
+| 2026-07-24 | HSIC | third_party | context | 25 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | Sep 26, 2018 |
+| 2026-07-24 | GNRC | third_party | context | 25 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | Jun 22, 2022 |
+| 2026-07-24 | BMY | third_party | context | 25 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | I.R.S. IDENTIFICATION NOS. OF ABOVE PERSONS (... — SC 13D/A |
+| 2026-07-24 | O | third_party | context | 25 | rule_conflict, activist_cross_link, neutral_low_impact | Verdad Capital — Biotech Investing (Obenshain, Rasmussen, Wi |
+| 2026-07-24 | AXON | third_party | context | 25 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | Jun 19, 2019 |
+| 2026-07-24 | TRC | third_party | context | 15 | rule_conflict, activist_cross_link, neutral_low_impact | VIC PDF intake - TRC - TRC VIC PDF |
+| 2026-07-24 | APLD | third_party | context | 15 | rule_conflict, activist_cross_link, neutral_low_impact | VIC PDF intake - APLD - APLD VIC PDF |
+| 2026-07-24 | FRMI | third_party | context | 15 | rule_conflict, activist_cross_link, neutral_low_impact | VIC PDF intake - FRMI - FRMI.pdf |
+| 2026-07-24 | FRMI | third_party | context | 15 | rule_conflict, activist_cross_link, neutral_low_impact | VIC PDF intake - FRMI - FRMI VIC PDF |
+| 2026-07-24 | BUR | third_party | context | 15 | rule_conflict, activist_cross_link, neutral_low_impact | VIC PDF intake - BUR - BUR VIC PDF |
+| 2026-07-24 | MRSH | third_party | context | 15 | rule_conflict, activist_cross_link, neutral_low_impact | VIC PDF intake - MRSH - MRSH VIC PDF |
+| 2026-07-24 | QDEL | third_party | context | 15 | rule_conflict, activist_cross_link, neutral_low_impact | VIC PDF intake - QDEL - QDEL VIC PDF |
+| 2026-07-24 | INTU | third_party | context | 15 | rule_conflict, activist_cross_link, neutral_low_impact | INTU - 163568 |
+| 2026-07-24 | CSGP | third_party | context | 15 | rule_conflict, activist_cross_link, neutral_low_impact | VIC PDF intake - CSGP - CSGP VIC PDF |
 | 2026-07-23 | AMCR | filing | context | 47 | rule_conflict, filing_balance_material, small_base_pct | Equity up 202% |
-| 2026-07-23 | LLY | third_party | context | 25 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | Bulldog Investors — SC 13D/A |
-| 2026-07-23 | LLY | third_party | context | 25 | rule_conflict, activist_cross_link, neutral_low_impact | SC 13D/A · LLY · 2022-12-01 |
-| 2026-07-23 | IONQ | third_party | context | 25 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | Citron (+7) — SC 13D/A |
-| 2026-07-23 | LDOS | third_party | context | 25 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | Feb 16, 2021 |
-| 2026-07-23 | TRC | third_party | context | 25 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | Bulldog (+4) — DEFC14A (proxy solicitation) |
-| 2026-07-23 | TRC | third_party | context | 25 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | Bulldog Investors — DEFC14A (proxy solicitation) |
-| 2026-07-23 | TRC | third_party | context | 25 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | Bulldog Investors — DFAN14A (proxy solicitation) |
-| 2026-07-23 | TRC | third_party | context | 25 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | Bulldog Investors — PREC14A (proxy solicitation) |
-| 2026-07-23 | FRMI | third_party | context | 25 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | Vicksburg Investments Management — DEFC14A (proxy solicitati |
-| 2026-07-23 | FRMI | third_party | context | 25 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | Vicksburg Investments Management — DFAN14A (proxy solicitati |
-| 2026-07-23 | LLY | third_party | context | 25 | rule_conflict, activist_cross_link, neutral_low_impact | ELI LILLY AND COMPANY — DFAN14A (proxy solicitation) |
-| 2026-07-23 | BUR | third_party | context | 25 | rule_conflict, activist_cross_link, neutral_low_impact | Block on Bloomberg Markets Discussing Latest Short, Burford  |
-| 2026-07-23 | MRSH | third_party | context | 25 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | Elliott Management — SC 13G/A |
-| 2026-07-23 | IONQ | third_party | context | 25 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | Citron Research — SC 13D/A |
-| 2026-07-23 | CVNA | third_party | context | 25 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | ECG II SPE, LLC &#8199 — SC 13D/A |
-| 2026-07-23 | CVNA | third_party | context | 25 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | Verde Investments, Inc. &#8199 — SC 13D/A |
-| 2026-07-23 | MNST | third_party | context | 25 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | Apr 8, 2025 |
-| 2026-07-23 | QDEL | third_party | context | 25 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | `mcintyre` |
-| 2026-07-23 | QDEL | third_party | context | 25 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | The Carlyle Group — SC 13D/A |
-| 2026-07-23 | BMY | third_party | context | 25 | rule_conflict, activist_cross_link, neutral_low_impact | BRISTOL-MYERS SQUIBB COMPANY — DFAN14A (proxy solicitation) |
-| 2026-07-23 | BMY | third_party | context | 25 | rule_conflict, activist_cross_link, neutral_low_impact | DFAN14A (proxy solicitation) · BMY · 2023-12-22 |
-| 2026-07-23 | STX | third_party | context | 25 | rule_conflict, activist_cross_link, neutral_low_impact | Activist on Call: Seagate Brokers Deal to Bring in ValueAct  |
-| 2026-07-23 | CSGP | third_party | context | 25 | rule_conflict, activist_cross_link, neutral_low_impact | Third Point Sends Letter to Board of Directors of CoStar Gro |
-| 2026-07-23 | CSGP | third_party | context | 25 | rule_conflict, activist_cross_link, neutral_low_impact | The D. E. Shaw Group Releases Open Letter and Presentation t |
-| 2026-07-23 | CSGP | third_party | context | 25 | rule_conflict, activist_cross_link, neutral_low_impact | D.E. Shaw Group Letter to CoStar Board: Reduced Transparency |
-| 2026-07-23 | SYK | third_party | context | 25 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | Apr 6, 2022 |
-| 2026-07-23 | ADSK | third_party | context | 25 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | Starboard Value — DFAN14A (proxy solicitation) |
-| 2026-07-23 | ADSK | third_party | context | 25 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | Soroban Capital — SC 13G/A |
-| 2026-07-23 | O | third_party | context | 25 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | Feb 7, 2018 |
-| 2026-07-23 | APD | third_party | context | 25 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | MANTLE RIDGE LP — DFAN14A (proxy solicitation) |
-| 2026-07-23 | CHTR | third_party | context | 25 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | S Advance Publications, Inc. — SC 13D/A |
-| 2026-07-23 | CHTR | third_party | context | 25 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | Soroban Capital — SC 13D/A |
-| 2026-07-23 | SMCI | third_party | context | 25 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | Super Micro: Fresh Evidence Of Accounting Manipulation, Sibl |
-| 2026-07-23 | MSFT | third_party | context | 25 | rule_conflict, activist_cross_link, neutral_low_impact | Microsoft strikes agreement with ValueAct Capital |
-| 2026-07-23 | MSCI | third_party | context | 25 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | Jan 17, 2024 |
-| 2026-07-23 | ULTA | third_party | context | 25 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | Nov 9, 2023 |
-| 2026-07-23 | AVY | third_party | context | 25 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | Nov 10, 2020 |
-| 2026-07-23 | MTD | third_party | context | 25 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | Jul 24, 2019 |
-| 2026-07-23 | CTAS | third_party | context | 25 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | Nov 13, 2019 |
-| 2026-07-23 | APLD | third_party | context | 25 | rule_conflict, activist_cross_link, neutral_low_impact | Applied Digital / Marvin shop summary (PF3 PR) |
-| 2026-07-23 | APLD | third_party | context | 25 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | Research note (run-the-table bull case) |
-| 2026-07-23 | APLD | third_party | context | 25 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | Oasis Management (SC 13D/A) |
-| 2026-07-23 | APLD | third_party | context | 25 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | Wolfpack Research short cache (Jul 2023) |
-| 2026-07-23 | MPWR | third_party | context | 25 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | Oct 9, 2019 |
-| 2026-07-23 | CHD | third_party | context | 25 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | Sep 5, 2019 |
-| 2026-07-23 | QDEL | third_party | context | 25 | rule_conflict, activist_cross_link, neutral_low_impact | McIntyre Partnerships |
-| 2026-07-23 | DXCM | third_party | context | 25 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | Mar 21, 2019 |
-| 2026-07-23 | INTU | third_party | context | 25 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | Sep 20, 2024 |
-| 2026-07-23 | BKR | third_party | context | 25 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | Semper Augustus Investments Group |
-| 2026-07-23 | ROL | third_party | context | 25 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | Oct 4, 2023 |
-| 2026-07-23 | LRCX | third_party | context | 25 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | Oct 18, 2022 |
-| 2026-07-23 | O | third_party | context | 25 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | HK + SSI + LCI context (FRMO) |
-| 2026-07-23 | BR | third_party | context | 25 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | Sep 28, 2022 |
-| 2026-07-23 | ERIE | third_party | context | 25 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | Oct 18, 2024 |
-| 2026-07-23 | HSIC | third_party | context | 25 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | Sep 26, 2018 |
-| 2026-07-23 | GNRC | third_party | context | 25 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | Jun 22, 2022 |
-| 2026-07-23 | BMY | third_party | context | 25 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | I.R.S. IDENTIFICATION NOS. OF ABOVE PERSONS (... — SC 13D/A |
-| 2026-07-23 | O | third_party | context | 25 | rule_conflict, activist_cross_link, neutral_low_impact | Verdad Capital — Biotech Investing (Obenshain, Rasmussen, Wi |
-| 2026-07-23 | AXON | third_party | context | 25 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | Jun 19, 2019 |
-| 2026-07-23 | TRC | third_party | context | 15 | rule_conflict, activist_cross_link, neutral_low_impact | VIC PDF intake - TRC - TRC VIC PDF |
-| 2026-07-23 | APLD | third_party | context | 15 | rule_conflict, activist_cross_link, neutral_low_impact | VIC PDF intake - APLD - APLD VIC PDF |
-| 2026-07-23 | FRMI | third_party | context | 15 | rule_conflict, activist_cross_link, neutral_low_impact | VIC PDF intake - FRMI - FRMI.pdf |
-| 2026-07-23 | FRMI | third_party | context | 15 | rule_conflict, activist_cross_link, neutral_low_impact | VIC PDF intake - FRMI - FRMI VIC PDF |
-| 2026-07-23 | BUR | third_party | context | 15 | rule_conflict, activist_cross_link, neutral_low_impact | VIC PDF intake - BUR - BUR VIC PDF |
-| 2026-07-23 | MRSH | third_party | context | 15 | rule_conflict, activist_cross_link, neutral_low_impact | VIC PDF intake - MRSH - MRSH VIC PDF |
-| 2026-07-23 | QDEL | third_party | context | 15 | rule_conflict, activist_cross_link, neutral_low_impact | VIC PDF intake - QDEL - QDEL VIC PDF |
-| 2026-07-23 | INTU | third_party | context | 15 | rule_conflict, activist_cross_link, neutral_low_impact | INTU - 163568 |
-| 2026-07-23 | CSGP | third_party | context | 15 | rule_conflict, activist_cross_link, neutral_low_impact | VIC PDF intake - CSGP - CSGP VIC PDF |
 | 2026-07-21 | CSGP | earnings | context | 41 | rule_conflict, activist_cross_link, neutral_low_impact | Upcoming earnings |
 | 2026-07-18 | APD | kpi_trend | context | 66 | rule_conflict, activist_cross_link, routine_governance_watch | Leadership / governance on watch |
 | 2026-07-18 | MRSH | kpi_trend | context | 66 | rule_conflict, activist_cross_link, routine_governance_watch | Leadership / governance on watch |
@@ -204,4 +205,3 @@
 | 2025-03-31 | BKRB | superinvestor_letter | context | 11 | rule_conflict, letter_actionable, stale_event | Letter: BKRB |
 | 2025-03-31 | GOOGL | superinvestor_letter | context | 11 | rule_conflict, letter_actionable, stale_event | Letter: GOOGL |
 | 2025-03-31 | LBRDK | superinvestor_letter | context | 11 | rule_conflict, letter_actionable, stale_event | Letter: LBRDK |
-| 2025-03-31 | DHR | superinvestor_letter | context | 11 | rule_conflict, letter_actionable, stale_event | Letter: DHR |

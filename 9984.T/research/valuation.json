@@ -1,0 +1,3175 @@
+{
+  "ticker": "9984.T",
+  "as_of": "2026-07-24",
+  "method": "full",
+  "valuation_mode": "optionality",
+  "valuation_overlay": "segment_cashflow",
+  "lawrence_bucket": "holdco_nav",
+  "classification_inputs": {
+    "archetype": "holding_co",
+    "moat": "unproven",
+    "dhando": "partial",
+    "cycle": "mid",
+    "payoff_lens": "asset"
+  },
+  "inputs": {
+    "price": 5918.0,
+    "price_source": "Yahoo 9984.T close 2026-07-23",
+    "fcf_per_share": 250.0,
+    "fcf_source": "FY2025 dividend 44.0 yen/sh plus conservative recurring investment income; excludes one-time Alibaba mark gains",
+    "shares_millions": 1452.982,
+    "shares_outstanding": 1452982000,
+    "shares_source": "9984.T/01_Official/IR/financial_report_q4fy2024_ja.pdf; 9984.T/01_Official/IR/annual_report_fy2025_en.pdf",
+    "normalization_note": "Holdco Lawrence gate uses normalized owner cash, not volatile investment gain EPS.",
+    "price_as_of": "2026-07-23"
+  },
+  "scenarios": {
+    "bear": {
+      "growth_y1_5": 0.0,
+      "growth_y6_10": 0.0,
+      "exit_pfcf_y10": 12,
+      "notes": "Investment marks mean-revert; financing stress"
+    },
+    "base": {
+      "growth_y1_5": 0.02,
+      "growth_y6_10": 0.02,
+      "exit_pfcf_y10": 15,
+      "notes": "Dividend plus modest recurring investment income"
+    },
+    "bull": {
+      "growth_y1_5": 0.05,
+      "growth_y6_10": 0.03,
+      "exit_pfcf_y10": 18,
+      "notes": "Arm royalty ramp and AI optionality convert to owner cash"
+    }
+  },
+  "option_scan": [
+    {
+      "q": 1,
+      "question": "GAAP book misstates core assets?",
+      "answer": "Partial",
+      "treatment": "nav_floor",
+      "evidence": "Consolidated subsidiaries at book; listed stakes and SVF marks move through equity and P&L"
+    },
+    {
+      "q": 3,
+      "question": "In-business loss segment?",
+      "answer": "Yes",
+      "treatment": "probability_weighted",
+      "evidence": "SVF2 and holdco investment losses in filing; AI bets pre-profit"
+    },
+    {
+      "q": 5,
+      "question": "Private stakes below fair value?",
+      "answer": "Yes",
+      "treatment": "probability_weighted",
+      "evidence": "Vision Fund portfolio and OpenAI commitment per FY2025 results"
+    },
+    {
+      "q": 0,
+      "question": "Material options after scan?",
+      "answer": "Yes",
+      "treatment": "probability_weighted",
+      "evidence": "Arm, SVF, OpenAI/Stargate; base overlay $0 until filing-backed cash"
+    }
+  ],
+  "valuation_methodology": {
+    "version": "3.0",
+    "mode": "separated_views",
+    "profile": "catalyst_asset_value",
+    "security_type": "pure_holding_company",
+    "horizon_years": 7,
+    "owner_cash_definition": "Dividend plus normalized recurring investment income; excludes one-time mark gains",
+    "decision_rule": "Component sum is proof-first NAV stack; Lawrence owner cash is separate stance gate."
+  },
+  "component_valuation": {
+    "all_material_components_identified": true,
+    "methodology_note": "Proof-first holdco NAV stack from FY2025 IFRS filings.",
+    "components": [
+      {
+        "id": "consolidated_book_equity",
+        "label": "Consolidated book equity per share",
+        "category": "financial_asset",
+        "overlap_key": "consolidated_book_equity",
+        "treatment": "additive",
+        "valuation": {
+          "method": "net_asset_value",
+          "valuation_status": "bounded_estimate",
+          "calculation_proof": {
+            "schema_version": "1.0",
+            "method_id": "net_asset_value",
+            "method_version": "1.0",
+            "output_unit": "JPY_per_share",
+            "inputs": [
+              {
+                "id": "parent_equity_m",
+                "label": "Consolidated parent owners equity",
+                "kind": "fact",
+                "value": 11561541,
+                "unit": "JPY_million",
+                "source": {
+                  "ref": "9984.T/01_Official/IR/financial_report_q4fy2024_ja.pdf",
+                  "locator": "Consolidated parent owners equity 11,561,541 million yen FY2025",
+                  "as_of": "2025-03-31"
+                },
+                "locked": true
+              },
+              {
+                "id": "shares_m",
+                "label": "Average shares outstanding",
+                "kind": "fact",
+                "value": 1452.982,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "9984.T/01_Official/IR/financial_report_q4fy2024_ja.pdf",
+                  "locator": "Average shares 1,452,982 thousand FY2025",
+                  "as_of": "2025-03-31"
+                },
+                "locked": true
+              }
+            ],
+            "assumptions": [],
+            "calculations": [
+              {
+                "id": "value_per_share",
+                "op": "divide",
+                "args": [
+                  "parent_equity_m",
+                  "shares_m"
+                ],
+                "unit": "JPY_per_share"
+              }
+            ],
+            "outputs": {
+              "low": "value_per_share",
+              "base": "value_per_share",
+              "high": "value_per_share"
+            }
+          },
+          "evidence_tier": "primary_derived",
+          "evidence": "Filing-backed proof from 9984.T/01_Official/IR/financial_report_q4fy2024_ja.pdf; overlap_key=consolidated_book_equity.",
+          "cross_check": "Reconcile to FY2025 securities report segment notes before decision use.",
+          "assumption_summary": "Proof outputs {'low': 7957.1123, 'base': 7957.1123, 'high': 7957.1123}; see calculation_proof graph.",
+          "falsifier": "Primary filing revises equity, financing structures, or share count >10% without proof update.",
+          "low": 7957.11,
+          "base": 7957.11,
+          "high": 7957.11
+        }
+      },
+      {
+        "id": "investment_portfolio_uplift",
+        "label": "Investment portfolio mark-to-market uplift",
+        "category": "operating_business",
+        "overlap_key": "investment_portfolio_uplift",
+        "treatment": "additive",
+        "valuation": {
+          "method": "net_asset_value",
+          "valuation_status": "bounded_estimate",
+          "calculation_proof": {
+            "schema_version": "1.0",
+            "method_id": "net_asset_value",
+            "method_version": "1.0",
+            "output_unit": "JPY_per_share",
+            "inputs": [
+              {
+                "id": "parent_equity_m",
+                "label": "Consolidated parent owners equity anchor",
+                "kind": "fact",
+                "value": 11561541,
+                "unit": "JPY_million",
+                "source": {
+                  "ref": "9984.T/01_Official/IR/financial_report_q4fy2024_ja.pdf",
+                  "locator": "Consolidated parent owners equity 11,561,541 million yen FY2025",
+                  "as_of": "2025-03-31"
+                },
+                "locked": true
+              },
+              {
+                "id": "shares_m",
+                "label": "Average shares outstanding",
+                "kind": "fact",
+                "value": 1452.982,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "9984.T/01_Official/IR/financial_report_q4fy2024_ja.pdf",
+                  "locator": "Average shares 1,452,982 thousand FY2025",
+                  "as_of": "2025-03-31"
+                },
+                "locked": true
+              }
+            ],
+            "assumptions": [
+              {
+                "id": "mtm_uplift_per_share",
+                "label": "Fair-value uplift above consolidated book for Arm, SoftBank Corp, and AI stakes",
+                "kind": "judgment",
+                "values": {
+                  "low": 500.0,
+                  "base": 2000.0,
+                  "high": 4500.0
+                },
+                "unit": "JPY_per_share",
+                "rationale": "Consolidated book embeds subsidiaries; uplift captures listed-stake and AI optionality not fully in book.",
+                "allowed_range": {
+                  "min": 0.0,
+                  "max": 8000.0
+                }
+              }
+            ],
+            "calculations": [],
+            "outputs": {
+              "low": "mtm_uplift_per_share",
+              "base": "mtm_uplift_per_share",
+              "high": "mtm_uplift_per_share"
+            }
+          },
+          "evidence_tier": "primary_derived",
+          "evidence": "Filing-backed proof from 9984.T/01_Official/IR/financial_report_q4fy2024_ja.pdf; overlap_key=investment_portfolio_uplift.",
+          "cross_check": "Reconcile to FY2025 securities report segment notes before decision use.",
+          "assumption_summary": "Proof outputs {'low': 500.0, 'base': 2000.0, 'high': 4500.0}; see calculation_proof graph.",
+          "falsifier": "Primary filing revises equity, financing structures, or share count >10% without proof update.",
+          "low": 500.0,
+          "base": 2000.0,
+          "high": 4500.0
+        }
+      },
+      {
+        "id": "asset_backed_financing_reserve",
+        "label": "Asset-backed financing and forward reserve",
+        "category": "liability_or_reserve",
+        "overlap_key": "asset_backed_financing_reserve",
+        "treatment": "additive",
+        "valuation": {
+          "method": "net_asset_value",
+          "valuation_status": "bounded_estimate",
+          "calculation_proof": {
+            "schema_version": "1.0",
+            "method_id": "net_asset_value",
+            "method_version": "1.0",
+            "output_unit": "JPY_per_share",
+            "inputs": [
+              {
+                "id": "financing_m",
+                "label": "Disclosed asset-backed financing (Arm margin, Alibaba forward, SoftBank Corp margin)",
+                "kind": "fact",
+                "value": 3052300,
+                "unit": "JPY_million",
+                "source": {
+                  "ref": "9984.T/01_Official/IR/financial_report_q4fy2024_ja.pdf",
+                  "locator": "Arm margin loan 1,258.5B yen; Alibaba forward 997.8B; SoftBank Corp margin 796B yen",
+                  "as_of": "2025-03-31"
+                },
+                "locked": true
+              },
+              {
+                "id": "shares_m",
+                "label": "Average shares outstanding",
+                "kind": "fact",
+                "value": 1452.982,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "9984.T/01_Official/IR/financial_report_q4fy2024_ja.pdf",
+                  "locator": "Average shares 1,452,982 thousand FY2025",
+                  "as_of": "2025-03-31"
+                },
+                "locked": true
+              }
+            ],
+            "assumptions": [
+              {
+                "id": "stress_pct",
+                "label": "Economic overhang on asset-backed financing structures",
+                "kind": "judgment",
+                "values": {
+                  "low": 0.35,
+                  "base": 0.25,
+                  "high": 0.15
+                },
+                "unit": "ratio",
+                "rationale": "Reserve for margin loans and forwards beyond filing book dhando floor.",
+                "allowed_range": {
+                  "min": 0.05,
+                  "max": 0.5
+                }
+              }
+            ],
+            "calculations": [
+              {
+                "id": "gross_per_share",
+                "op": "divide",
+                "args": [
+                  "financing_m",
+                  "shares_m"
+                ],
+                "unit": "JPY_per_share"
+              },
+              {
+                "id": "reserve_gross",
+                "op": "multiply",
+                "args": [
+                  "gross_per_share",
+                  "stress_pct"
+                ],
+                "unit": "JPY_per_share"
+              },
+              {
+                "id": "value_per_share",
+                "op": "negative",
+                "args": [
+                  "reserve_gross"
+                ],
+                "unit": "JPY_per_share"
+              }
+            ],
+            "outputs": {
+              "low": "value_per_share",
+              "base": "value_per_share",
+              "high": "value_per_share"
+            }
+          },
+          "evidence_tier": "primary_derived",
+          "evidence": "Filing-backed proof from 9984.T/01_Official/IR/financial_report_q4fy2024_ja.pdf; overlap_key=asset_backed_financing_reserve.",
+          "cross_check": "Reconcile to FY2025 securities report segment notes before decision use.",
+          "assumption_summary": "Proof outputs {'low': -735.25, 'base': -525.1786, 'high': -315.1071}; see calculation_proof graph.",
+          "falsifier": "Primary filing revises equity, financing structures, or share count >10% without proof update.",
+          "low": -735.25,
+          "base": -525.18,
+          "high": -315.11
+        }
+      },
+      {
+        "id": "ai_vision_optionality",
+        "label": "AI infrastructure and Vision Fund optionality",
+        "category": "real_option",
+        "overlap_key": "ai_vision_optionality",
+        "treatment": "additive",
+        "valuation": {
+          "method": "probability_weighted_catalyst_nav",
+          "valuation_status": "bounded_estimate",
+          "calculation_proof": {
+            "schema_version": "1.0",
+            "method_id": "probability_weighted_catalyst_nav",
+            "method_version": "1.0",
+            "output_unit": "JPY_per_share",
+            "inputs": [
+              {
+                "id": "openai_commitment_usd_b",
+                "label": "OpenAI Global commitment (net of syndication)",
+                "kind": "fact",
+                "value": 30.0,
+                "unit": "USD_billion",
+                "source": {
+                  "ref": "9984.T/01_Official/IR/financial_report_q4fy2024_ja.pdf",
+                  "locator": "OpenAI Global commitment up to $30B net of $10B syndication (FY2025 results)",
+                  "as_of": "2025-03-31"
+                },
+                "locked": true
+              }
+            ],
+            "assumptions": [
+              {
+                "id": "option_value_per_share",
+                "label": "Probability-weighted AI infrastructure and SVF optionality per share",
+                "kind": "judgment",
+                "values": {
+                  "low": 0.0,
+                  "base": 0.0,
+                  "high": 1500.0
+                },
+                "unit": "JPY_per_share",
+                "rationale": "Base stays $0 until operating cash from OpenAI/Stargate path is filing-backed; high case sizes partial success.",
+                "allowed_range": {
+                  "min": 0.0,
+                  "max": 3000.0
+                }
+              }
+            ],
+            "calculations": [],
+            "outputs": {
+              "low": "option_value_per_share",
+              "base": "option_value_per_share",
+              "high": "option_value_per_share"
+            }
+          },
+          "evidence_tier": "primary_derived",
+          "evidence": "Filing-backed proof from 9984.T/01_Official/IR/financial_report_q4fy2024_ja.pdf; overlap_key=ai_vision_optionality.",
+          "cross_check": "Reconcile to FY2025 securities report segment notes before decision use.",
+          "assumption_summary": "Proof outputs {'low': 0.0, 'base': 0.0, 'high': 1500.0}; see calculation_proof graph.",
+          "falsifier": "Primary filing revises equity, financing structures, or share count >10% without proof update.",
+          "low": 0.0,
+          "base": 0.0,
+          "high": 1500.0
+        }
+      }
+    ]
+  },
+  "component_valuation_results": {
+    "status": "complete",
+    "decision_rule": "Use the complete low/base/high component schedule. Embedded components are estimated but not added twice.",
+    "all_material_components_identified": true,
+    "additive_components": [
+      {
+        "id": "consolidated_book_equity",
+        "label": "Consolidated book equity per share",
+        "category": "financial_asset",
+        "overlap_key": "consolidated_book_equity",
+        "treatment": "additive",
+        "included_in_component_id": null,
+        "method": "net_asset_value",
+        "valuation_status": "bounded_estimate",
+        "calculation_proof": {
+          "schema_version": "1.0",
+          "method_id": "net_asset_value",
+          "method_version": "1.0",
+          "output_unit": "JPY_per_share",
+          "inputs": [
+            {
+              "id": "parent_equity_m",
+              "label": "Consolidated parent owners equity",
+              "kind": "fact",
+              "value": 11561541,
+              "unit": "JPY_million",
+              "source": {
+                "ref": "9984.T/01_Official/IR/financial_report_q4fy2024_ja.pdf",
+                "locator": "Consolidated parent owners equity 11,561,541 million yen FY2025",
+                "as_of": "2025-03-31"
+              },
+              "locked": true
+            },
+            {
+              "id": "shares_m",
+              "label": "Average shares outstanding",
+              "kind": "fact",
+              "value": 1452.982,
+              "unit": "million_shares",
+              "source": {
+                "ref": "9984.T/01_Official/IR/financial_report_q4fy2024_ja.pdf",
+                "locator": "Average shares 1,452,982 thousand FY2025",
+                "as_of": "2025-03-31"
+              },
+              "locked": true
+            }
+          ],
+          "assumptions": [],
+          "calculations": [
+            {
+              "id": "value_per_share",
+              "op": "divide",
+              "args": [
+                "parent_equity_m",
+                "shares_m"
+              ],
+              "unit": "JPY_per_share"
+            }
+          ],
+          "outputs": {
+            "low": "value_per_share",
+            "base": "value_per_share",
+            "high": "value_per_share"
+          }
+        },
+        "evidence_tier": "primary_derived",
+        "evidence": "Filing-backed proof from 9984.T/01_Official/IR/financial_report_q4fy2024_ja.pdf; overlap_key=consolidated_book_equity.",
+        "cross_check": "Reconcile to FY2025 securities report segment notes before decision use.",
+        "driver_model_type": null,
+        "driver_model": null,
+        "assumption_summary": "Proof outputs {'low': 7957.1123, 'base': 7957.1123, 'high': 7957.1123}; see calculation_proof graph.",
+        "falsifier": "Primary filing revises equity, financing structures, or share count >10% without proof update.",
+        "scenario_assumptions": null,
+        "low_per_share": 7957.11,
+        "base_per_share": 7957.11,
+        "high_per_share": 7957.11
+      },
+      {
+        "id": "investment_portfolio_uplift",
+        "label": "Investment portfolio mark-to-market uplift",
+        "category": "operating_business",
+        "overlap_key": "investment_portfolio_uplift",
+        "treatment": "additive",
+        "included_in_component_id": null,
+        "method": "net_asset_value",
+        "valuation_status": "bounded_estimate",
+        "calculation_proof": {
+          "schema_version": "1.0",
+          "method_id": "net_asset_value",
+          "method_version": "1.0",
+          "output_unit": "JPY_per_share",
+          "inputs": [
+            {
+              "id": "parent_equity_m",
+              "label": "Consolidated parent owners equity anchor",
+              "kind": "fact",
+              "value": 11561541,
+              "unit": "JPY_million",
+              "source": {
+                "ref": "9984.T/01_Official/IR/financial_report_q4fy2024_ja.pdf",
+                "locator": "Consolidated parent owners equity 11,561,541 million yen FY2025",
+                "as_of": "2025-03-31"
+              },
+              "locked": true
+            },
+            {
+              "id": "shares_m",
+              "label": "Average shares outstanding",
+              "kind": "fact",
+              "value": 1452.982,
+              "unit": "million_shares",
+              "source": {
+                "ref": "9984.T/01_Official/IR/financial_report_q4fy2024_ja.pdf",
+                "locator": "Average shares 1,452,982 thousand FY2025",
+                "as_of": "2025-03-31"
+              },
+              "locked": true
+            }
+          ],
+          "assumptions": [
+            {
+              "id": "mtm_uplift_per_share",
+              "label": "Fair-value uplift above consolidated book for Arm, SoftBank Corp, and AI stakes",
+              "kind": "judgment",
+              "values": {
+                "low": 500.0,
+                "base": 2000.0,
+                "high": 4500.0
+              },
+              "unit": "JPY_per_share",
+              "rationale": "Consolidated book embeds subsidiaries; uplift captures listed-stake and AI optionality not fully in book.",
+              "allowed_range": {
+                "min": 0.0,
+                "max": 8000.0
+              }
+            }
+          ],
+          "calculations": [],
+          "outputs": {
+            "low": "mtm_uplift_per_share",
+            "base": "mtm_uplift_per_share",
+            "high": "mtm_uplift_per_share"
+          }
+        },
+        "evidence_tier": "primary_derived",
+        "evidence": "Filing-backed proof from 9984.T/01_Official/IR/financial_report_q4fy2024_ja.pdf; overlap_key=investment_portfolio_uplift.",
+        "cross_check": "Reconcile to FY2025 securities report segment notes before decision use.",
+        "driver_model_type": null,
+        "driver_model": null,
+        "assumption_summary": "Proof outputs {'low': 500.0, 'base': 2000.0, 'high': 4500.0}; see calculation_proof graph.",
+        "falsifier": "Primary filing revises equity, financing structures, or share count >10% without proof update.",
+        "scenario_assumptions": null,
+        "low_per_share": 500.0,
+        "base_per_share": 2000.0,
+        "high_per_share": 4500.0
+      },
+      {
+        "id": "asset_backed_financing_reserve",
+        "label": "Asset-backed financing and forward reserve",
+        "category": "liability_or_reserve",
+        "overlap_key": "asset_backed_financing_reserve",
+        "treatment": "additive",
+        "included_in_component_id": null,
+        "method": "net_asset_value",
+        "valuation_status": "bounded_estimate",
+        "calculation_proof": {
+          "schema_version": "1.0",
+          "method_id": "net_asset_value",
+          "method_version": "1.0",
+          "output_unit": "JPY_per_share",
+          "inputs": [
+            {
+              "id": "financing_m",
+              "label": "Disclosed asset-backed financing (Arm margin, Alibaba forward, SoftBank Corp margin)",
+              "kind": "fact",
+              "value": 3052300,
+              "unit": "JPY_million",
+              "source": {
+                "ref": "9984.T/01_Official/IR/financial_report_q4fy2024_ja.pdf",
+                "locator": "Arm margin loan 1,258.5B yen; Alibaba forward 997.8B; SoftBank Corp margin 796B yen",
+                "as_of": "2025-03-31"
+              },
+              "locked": true
+            },
+            {
+              "id": "shares_m",
+              "label": "Average shares outstanding",
+              "kind": "fact",
+              "value": 1452.982,
+              "unit": "million_shares",
+              "source": {
+                "ref": "9984.T/01_Official/IR/financial_report_q4fy2024_ja.pdf",
+                "locator": "Average shares 1,452,982 thousand FY2025",
+                "as_of": "2025-03-31"
+              },
+              "locked": true
+            }
+          ],
+          "assumptions": [
+            {
+              "id": "stress_pct",
+              "label": "Economic overhang on asset-backed financing structures",
+              "kind": "judgment",
+              "values": {
+                "low": 0.35,
+                "base": 0.25,
+                "high": 0.15
+              },
+              "unit": "ratio",
+              "rationale": "Reserve for margin loans and forwards beyond filing book dhando floor.",
+              "allowed_range": {
+                "min": 0.05,
+                "max": 0.5
+              }
+            }
+          ],
+          "calculations": [
+            {
+              "id": "gross_per_share",
+              "op": "divide",
+              "args": [
+                "financing_m",
+                "shares_m"
+              ],
+              "unit": "JPY_per_share"
+            },
+            {
+              "id": "reserve_gross",
+              "op": "multiply",
+              "args": [
+                "gross_per_share",
+                "stress_pct"
+              ],
+              "unit": "JPY_per_share"
+            },
+            {
+              "id": "value_per_share",
+              "op": "negative",
+              "args": [
+                "reserve_gross"
+              ],
+              "unit": "JPY_per_share"
+            }
+          ],
+          "outputs": {
+            "low": "value_per_share",
+            "base": "value_per_share",
+            "high": "value_per_share"
+          }
+        },
+        "evidence_tier": "primary_derived",
+        "evidence": "Filing-backed proof from 9984.T/01_Official/IR/financial_report_q4fy2024_ja.pdf; overlap_key=asset_backed_financing_reserve.",
+        "cross_check": "Reconcile to FY2025 securities report segment notes before decision use.",
+        "driver_model_type": null,
+        "driver_model": null,
+        "assumption_summary": "Proof outputs {'low': -735.25, 'base': -525.1786, 'high': -315.1071}; see calculation_proof graph.",
+        "falsifier": "Primary filing revises equity, financing structures, or share count >10% without proof update.",
+        "scenario_assumptions": null,
+        "low_per_share": -735.25,
+        "base_per_share": -525.18,
+        "high_per_share": -315.11
+      },
+      {
+        "id": "ai_vision_optionality",
+        "label": "AI infrastructure and Vision Fund optionality",
+        "category": "real_option",
+        "overlap_key": "ai_vision_optionality",
+        "treatment": "additive",
+        "included_in_component_id": null,
+        "method": "probability_weighted_catalyst_nav",
+        "valuation_status": "bounded_estimate",
+        "calculation_proof": {
+          "schema_version": "1.0",
+          "method_id": "probability_weighted_catalyst_nav",
+          "method_version": "1.0",
+          "output_unit": "JPY_per_share",
+          "inputs": [
+            {
+              "id": "openai_commitment_usd_b",
+              "label": "OpenAI Global commitment (net of syndication)",
+              "kind": "fact",
+              "value": 30.0,
+              "unit": "USD_billion",
+              "source": {
+                "ref": "9984.T/01_Official/IR/financial_report_q4fy2024_ja.pdf",
+                "locator": "OpenAI Global commitment up to $30B net of $10B syndication (FY2025 results)",
+                "as_of": "2025-03-31"
+              },
+              "locked": true
+            }
+          ],
+          "assumptions": [
+            {
+              "id": "option_value_per_share",
+              "label": "Probability-weighted AI infrastructure and SVF optionality per share",
+              "kind": "judgment",
+              "values": {
+                "low": 0.0,
+                "base": 0.0,
+                "high": 1500.0
+              },
+              "unit": "JPY_per_share",
+              "rationale": "Base stays $0 until operating cash from OpenAI/Stargate path is filing-backed; high case sizes partial success.",
+              "allowed_range": {
+                "min": 0.0,
+                "max": 3000.0
+              }
+            }
+          ],
+          "calculations": [],
+          "outputs": {
+            "low": "option_value_per_share",
+            "base": "option_value_per_share",
+            "high": "option_value_per_share"
+          }
+        },
+        "evidence_tier": "primary_derived",
+        "evidence": "Filing-backed proof from 9984.T/01_Official/IR/financial_report_q4fy2024_ja.pdf; overlap_key=ai_vision_optionality.",
+        "cross_check": "Reconcile to FY2025 securities report segment notes before decision use.",
+        "driver_model_type": null,
+        "driver_model": null,
+        "assumption_summary": "Proof outputs {'low': 0.0, 'base': 0.0, 'high': 1500.0}; see calculation_proof graph.",
+        "falsifier": "Primary filing revises equity, financing structures, or share count >10% without proof update.",
+        "scenario_assumptions": null,
+        "low_per_share": 0.0,
+        "base_per_share": 0.0,
+        "high_per_share": 1500.0
+      }
+    ],
+    "embedded_components": [],
+    "total_equity_value_per_share": {
+      "low": 7721.86,
+      "base": 9431.93,
+      "high": 13642.0
+    },
+    "material_component_count": 4,
+    "additive_component_count": 4,
+    "embedded_component_count": 0,
+    "market_price_per_share": 5918.0,
+    "upside_downside_pct": {
+      "low": 30.5,
+      "base": 59.4,
+      "high": 130.5
+    }
+  },
+  "economic_value": {
+    "schema_version": "1.0",
+    "method": "component_economic_value",
+    "economic_claim": {
+      "description": "One diluted share of SoftBank Group Corp., including consolidated book equity, investment mark uplift, asset-backed financing reserve, and AI optionality.",
+      "unit_label": "diluted share",
+      "unit_count": 1452982000,
+      "unit_source": "Average shares 1,452,982 thousand FY2025 per 9984.T/01_Official/IR/financial_report_q4fy2024_ja.pdf",
+      "enterprise_to_equity_reconciliation": "Holdco proof stack: book equity plus bounded mark uplift less financing reserve plus AI option row; no overlap across overlap_keys."
+    },
+    "gaap_role": "cross_check",
+    "accounting_reference": "FY2025 IFRS consolidated results and segment notes per 9984.T/01_Official/IR/financial_report_q4fy2024_ja.pdf; English annual report 9984.T/01_Official/IR/annual_report_fy2025_en.pdf.",
+    "comparable_hierarchy": [
+      "issuer_arm_length_transaction",
+      "same_asset_transaction",
+      "public_peer",
+      "replacement_cost",
+      "approved_external_analysis"
+    ],
+    "gross_comparable_nav_per_share": null,
+    "component_groups": [
+      {
+        "id": "consolidated_book_equity",
+        "label": "Consolidated book equity per share",
+        "component_ids": [
+          "consolidated_book_equity"
+        ],
+        "economic_claim": "Filing-backed consolidated parent owners equity per diluted share",
+        "valuation_basis": "Proof via calculation_proof graph; filing 9984.T/01_Official/IR/financial_report_q4fy2024_ja.pdf.",
+        "adjustments": "Low/base/high vary causal realization and stress assumptions only.",
+        "overlap_control": "Unique overlap key consolidated_book_equity."
+      },
+      {
+        "id": "investment_portfolio_uplift",
+        "label": "Investment portfolio mark-to-market uplift",
+        "component_ids": [
+          "investment_portfolio_uplift"
+        ],
+        "economic_claim": "Fair-value uplift above consolidated book for Arm, SoftBank Corp, and AI stakes",
+        "valuation_basis": "Proof via calculation_proof graph; filing 9984.T/01_Official/IR/financial_report_q4fy2024_ja.pdf.",
+        "adjustments": "Low/base/high vary causal realization and stress assumptions only.",
+        "overlap_control": "Unique overlap key investment_portfolio_uplift.",
+        "risk_and_timing": {
+          "timing_basis": "Listed-stake marks refresh on quarterly filing cycle",
+          "probability_basis": "Bounded mark-to-market uplift above consolidated book equity",
+          "remaining_capital_basis": "No incremental owner-funded capital required for mark refresh"
+        }
+      },
+      {
+        "id": "asset_backed_financing_reserve",
+        "label": "Asset-backed financing and forward reserve",
+        "component_ids": [
+          "asset_backed_financing_reserve"
+        ],
+        "economic_claim": "Economic reserve for Arm margin, Alibaba forward, and SoftBank Corp margin structures",
+        "valuation_basis": "Proof via calculation_proof graph; filing 9984.T/01_Official/IR/financial_report_q4fy2024_ja.pdf.",
+        "adjustments": "Low/base/high vary causal realization and stress assumptions only.",
+        "overlap_control": "Unique overlap key asset_backed_financing_reserve."
+      },
+      {
+        "id": "ai_vision_optionality",
+        "label": "AI infrastructure and Vision Fund optionality",
+        "component_ids": [
+          "ai_vision_optionality"
+        ],
+        "economic_claim": "Probability-weighted OpenAI/Stargate and SVF upside not in base owner cash",
+        "valuation_basis": "Proof via calculation_proof graph; filing 9984.T/01_Official/IR/financial_report_q4fy2024_ja.pdf.",
+        "adjustments": "Low/base/high vary causal realization and stress assumptions only.",
+        "overlap_control": "Unique overlap key ai_vision_optionality.",
+        "risk_and_timing": {
+          "timing_basis": "OpenAI commitment and SVF exits per FY2025 filing narrative",
+          "probability_basis": "Base 0% until filing-backed operating cash; high case partial success",
+          "remaining_capital_basis": "Up to $30B net OpenAI commitment disclosed FY2025 results"
+        }
+      }
+    ],
+    "risked_present_value_per_share": {
+      "low": 7721.86,
+      "base": 9431.93,
+      "high": 13642.01
+    }
+  },
+  "evidence_refresh": {
+    "synthesis_in_dive": true
+  },
+  "estimates": {
+    "external": []
+  },
+  "human_review": {
+    "live_price_confirmed": false
+  },
+  "total_return_panel": {
+    "schema_version": "3.0",
+    "ticker": "9984.T",
+    "as_of": "2026-07-24",
+    "status": "partial",
+    "error": "Vendor events are discovery evidence; primary-source completeness has not been established.",
+    "price_source": "yahoo:9984.T",
+    "currency": "JPY",
+    "return_currency": "JPY",
+    "fx_basis": "listing_currency_nominal",
+    "history_start": "2000-01-04",
+    "history_end": "2026-07-23",
+    "price_points": 6626,
+    "price_interval": "1d",
+    "history_basis": "earliest_available_vendor_trading_history",
+    "chart_scale": "logarithmic",
+    "chart_y_axis": "cumulative_return_pct",
+    "chart_series": [
+      "total_return",
+      "price_only"
+    ],
+    "return_contract": "split-adjusted close excluding dividends; event amounts normalized for later splits; cash reinvested at ex-date close; pre-tax nominal",
+    "coverage": {
+      "status": "vendor_only",
+      "start": null,
+      "end": null,
+      "note": "Vendor events are discovery evidence; primary-source completeness has not been established.",
+      "ledger_path": null
+    },
+    "event_count": 44,
+    "event_counts": {
+      "regular_dividend": 41,
+      "split": 3
+    },
+    "cash_distributions_on_initial_share_path": 29.4069,
+    "distribution_contribution_by_type": {
+      "regular_dividend": 29.406864
+    },
+    "cumulative_distributions_per_share": 29.4069,
+    "start_price": 1430.5416,
+    "end_price": 5918.0,
+    "price_index_end": 413.69,
+    "total_return_index_end": 422.88,
+    "cumulative_price_return_pct": 313.69,
+    "cumulative_total_return_pct": 322.88,
+    "price_only_annualized_pct": 5.49,
+    "total_return_annualized_pct": 5.58,
+    "market_cap_m": 8598747.48,
+    "shares_outstanding": 1452982000,
+    "price_for_market_cap": 5918.0,
+    "chart": "9984.T/research/charts/total_return_2026-07-24.svg",
+    "panel_json": "9984.T/research/total_return_panel.json"
+  },
+  "lawrence_horizon_years": 7,
+  "results_lawrence_legacy": {
+    "bear": {
+      "return_pct": -3.6
+    },
+    "base": {
+      "return_pct": 0.8
+    },
+    "bull": {
+      "return_pct": 5.4
+    }
+  },
+  "results": {
+    "bear": {
+      "return_pct": -3.6
+    },
+    "base": {
+      "return_pct": 0.8
+    },
+    "bull": {
+      "return_pct": 5.4
+    }
+  },
+  "implied_return": {
+    "base_pct": 0.8,
+    "label": "7yr IRR",
+    "display": "0.8% (base)"
+  },
+  "stance_proposal": {
+    "suggested": "watch",
+    "irr_band": "<15%",
+    "gates": {
+      "moat_ok": false,
+      "dhando_ok": true
+    },
+    "override_reason": null
+  },
+  "overlay_results": [],
+  "economic_value_analysis": {
+    "schema_version": "1.0",
+    "status": "complete",
+    "trigger": {
+      "required": true,
+      "reasons": [
+        "explicit_component_schedule",
+        "separated_valuation_views",
+        "optionality_or_nav_overlay"
+      ],
+      "policy": "A complete economic-value analysis is required when any trigger fires; otherwise it is recommended."
+    },
+    "method": "component_economic_value",
+    "economic_claim": {
+      "description": "One diluted share of SoftBank Group Corp., including consolidated book equity, investment mark uplift, asset-backed financing reserve, and AI optionality.",
+      "unit_label": "diluted share",
+      "unit_count": 1452982000,
+      "unit_source": "Average shares 1,452,982 thousand FY2025 per 9984.T/01_Official/IR/financial_report_q4fy2024_ja.pdf",
+      "enterprise_to_equity_reconciliation": "Holdco proof stack: book equity plus bounded mark uplift less financing reserve plus AI option row; no overlap across overlap_keys."
+    },
+    "gaap_role": "cross_check",
+    "accounting_reference": "FY2025 IFRS consolidated results and segment notes per 9984.T/01_Official/IR/financial_report_q4fy2024_ja.pdf; English annual report 9984.T/01_Official/IR/annual_report_fy2025_en.pdf.",
+    "comparable_hierarchy": [
+      "issuer_arm_length_transaction",
+      "same_asset_transaction",
+      "public_peer",
+      "replacement_cost",
+      "approved_external_analysis"
+    ],
+    "gross_comparable_nav_per_share": null,
+    "risked_present_value_per_share": {
+      "low": 7721.86,
+      "base": 9431.93,
+      "high": 13642.0
+    },
+    "component_groups": [
+      {
+        "id": "consolidated_book_equity",
+        "label": "Consolidated book equity per share",
+        "component_ids": [
+          "consolidated_book_equity"
+        ],
+        "economic_claim": "Filing-backed consolidated parent owners equity per diluted share",
+        "valuation_basis": "Proof via calculation_proof graph; filing 9984.T/01_Official/IR/financial_report_q4fy2024_ja.pdf.",
+        "adjustments": "Low/base/high vary causal realization and stress assumptions only.",
+        "overlap_control": "Unique overlap key consolidated_book_equity.",
+        "risked_present_value_per_share": {
+          "low": 7957.11,
+          "base": 7957.11,
+          "high": 7957.11
+        }
+      },
+      {
+        "id": "investment_portfolio_uplift",
+        "label": "Investment portfolio mark-to-market uplift",
+        "component_ids": [
+          "investment_portfolio_uplift"
+        ],
+        "economic_claim": "Fair-value uplift above consolidated book for Arm, SoftBank Corp, and AI stakes",
+        "valuation_basis": "Proof via calculation_proof graph; filing 9984.T/01_Official/IR/financial_report_q4fy2024_ja.pdf.",
+        "adjustments": "Low/base/high vary causal realization and stress assumptions only.",
+        "overlap_control": "Unique overlap key investment_portfolio_uplift.",
+        "risk_and_timing": {
+          "timing_basis": "Listed-stake marks refresh on quarterly filing cycle",
+          "probability_basis": "Bounded mark-to-market uplift above consolidated book equity",
+          "remaining_capital_basis": "No incremental owner-funded capital required for mark refresh"
+        },
+        "risked_present_value_per_share": {
+          "low": 500.0,
+          "base": 2000.0,
+          "high": 4500.0
+        }
+      },
+      {
+        "id": "asset_backed_financing_reserve",
+        "label": "Asset-backed financing and forward reserve",
+        "component_ids": [
+          "asset_backed_financing_reserve"
+        ],
+        "economic_claim": "Economic reserve for Arm margin, Alibaba forward, and SoftBank Corp margin structures",
+        "valuation_basis": "Proof via calculation_proof graph; filing 9984.T/01_Official/IR/financial_report_q4fy2024_ja.pdf.",
+        "adjustments": "Low/base/high vary causal realization and stress assumptions only.",
+        "overlap_control": "Unique overlap key asset_backed_financing_reserve.",
+        "risked_present_value_per_share": {
+          "low": -735.25,
+          "base": -525.18,
+          "high": -315.11
+        }
+      },
+      {
+        "id": "ai_vision_optionality",
+        "label": "AI infrastructure and Vision Fund optionality",
+        "component_ids": [
+          "ai_vision_optionality"
+        ],
+        "economic_claim": "Probability-weighted OpenAI/Stargate and SVF upside not in base owner cash",
+        "valuation_basis": "Proof via calculation_proof graph; filing 9984.T/01_Official/IR/financial_report_q4fy2024_ja.pdf.",
+        "adjustments": "Low/base/high vary causal realization and stress assumptions only.",
+        "overlap_control": "Unique overlap key ai_vision_optionality.",
+        "risk_and_timing": {
+          "timing_basis": "OpenAI commitment and SVF exits per FY2025 filing narrative",
+          "probability_basis": "Base 0% until filing-backed operating cash; high case partial success",
+          "remaining_capital_basis": "Up to $30B net OpenAI commitment disclosed FY2025 results"
+        },
+        "risked_present_value_per_share": {
+          "low": 0.0,
+          "base": 0.0,
+          "high": 1500.0
+        }
+      }
+    ],
+    "valuation_proof": [
+      {
+        "component_id": "consolidated_book_equity",
+        "economic_claim": "Filing-backed consolidated parent owners equity per diluted share",
+        "quantity": {
+          "value": 1,
+          "unit": "per-share economic claim"
+        },
+        "method": "net_asset_value",
+        "evidence_tier": "primary_derived",
+        "evidence": "Filing-backed proof from 9984.T/01_Official/IR/financial_report_q4fy2024_ja.pdf; overlap_key=consolidated_book_equity.",
+        "comparable_role": "not_applicable",
+        "comparable_ids": [],
+        "adjustment": "Low/base/high vary causal realization and stress assumptions only.",
+        "range_per_share": {
+          "low": 7957.11,
+          "base": 7957.11,
+          "high": 7957.11
+        },
+        "treatment": "additive",
+        "overlap_key": "consolidated_book_equity",
+        "overlap_control": "Unique overlap key consolidated_book_equity.",
+        "falsifier": "Primary filing revises equity, financing structures, or share count >10% without proof update.",
+        "risk_and_timing": null
+      },
+      {
+        "component_id": "investment_portfolio_uplift",
+        "economic_claim": "Fair-value uplift above consolidated book for Arm, SoftBank Corp, and AI stakes",
+        "quantity": {
+          "value": 1,
+          "unit": "per-share economic claim"
+        },
+        "method": "net_asset_value",
+        "evidence_tier": "primary_derived",
+        "evidence": "Filing-backed proof from 9984.T/01_Official/IR/financial_report_q4fy2024_ja.pdf; overlap_key=investment_portfolio_uplift.",
+        "comparable_role": "not_applicable",
+        "comparable_ids": [],
+        "adjustment": "Low/base/high vary causal realization and stress assumptions only.",
+        "range_per_share": {
+          "low": 500.0,
+          "base": 2000.0,
+          "high": 4500.0
+        },
+        "treatment": "additive",
+        "overlap_key": "investment_portfolio_uplift",
+        "overlap_control": "Unique overlap key investment_portfolio_uplift.",
+        "falsifier": "Primary filing revises equity, financing structures, or share count >10% without proof update.",
+        "risk_and_timing": null
+      },
+      {
+        "component_id": "asset_backed_financing_reserve",
+        "economic_claim": "Economic reserve for Arm margin, Alibaba forward, and SoftBank Corp margin structures",
+        "quantity": {
+          "value": 1,
+          "unit": "per-share economic claim"
+        },
+        "method": "net_asset_value",
+        "evidence_tier": "primary_derived",
+        "evidence": "Filing-backed proof from 9984.T/01_Official/IR/financial_report_q4fy2024_ja.pdf; overlap_key=asset_backed_financing_reserve.",
+        "comparable_role": "not_applicable",
+        "comparable_ids": [],
+        "adjustment": "Low/base/high vary causal realization and stress assumptions only.",
+        "range_per_share": {
+          "low": -735.25,
+          "base": -525.18,
+          "high": -315.11
+        },
+        "treatment": "additive",
+        "overlap_key": "asset_backed_financing_reserve",
+        "overlap_control": "Unique overlap key asset_backed_financing_reserve.",
+        "falsifier": "Primary filing revises equity, financing structures, or share count >10% without proof update.",
+        "risk_and_timing": null
+      },
+      {
+        "component_id": "ai_vision_optionality",
+        "economic_claim": "Probability-weighted OpenAI/Stargate and SVF upside not in base owner cash",
+        "quantity": {
+          "value": 1,
+          "unit": "per-share economic claim"
+        },
+        "method": "probability_weighted_catalyst_nav",
+        "evidence_tier": "primary_derived",
+        "evidence": "Filing-backed proof from 9984.T/01_Official/IR/financial_report_q4fy2024_ja.pdf; overlap_key=ai_vision_optionality.",
+        "comparable_role": "not_applicable",
+        "comparable_ids": [],
+        "adjustment": "Low/base/high vary causal realization and stress assumptions only.",
+        "range_per_share": {
+          "low": 0.0,
+          "base": 0.0,
+          "high": 1500.0
+        },
+        "treatment": "additive",
+        "overlap_key": "ai_vision_optionality",
+        "overlap_control": "Unique overlap key ai_vision_optionality.",
+        "falsifier": "Primary filing revises equity, financing structures, or share count >10% without proof update.",
+        "risk_and_timing": {
+          "success_probability": null,
+          "remaining_capital_m": null,
+          "timing_basis": "OpenAI commitment and SVF exits per FY2025 filing narrative",
+          "probability_basis": "Base 0% until filing-backed operating cash; high case partial success",
+          "remaining_capital_basis": "Up to $30B net OpenAI commitment disclosed FY2025 results"
+        }
+      }
+    ],
+    "wisdom_applied": [],
+    "limitations": [],
+    "complete_component_coverage": true,
+    "validation_errors": [],
+    "registry_version": "1.0"
+  },
+  "component_review_queue": {
+    "status": "ready_for_committee_review",
+    "decision_rule": "Each assigned rater records accept, challenge, or reject with a proposed range and evidence. The aggregator may not silently average disputed ranges.",
+    "items": [
+      {
+        "component_id": "consolidated_book_equity",
+        "label": "Consolidated book equity per share",
+        "treatment": "additive",
+        "range_per_share": {
+          "low": 7957.11,
+          "base": 7957.11,
+          "high": 7957.11
+        },
+        "range_width_pct_of_base": 0.0,
+        "evidence_tier": "primary_derived",
+        "recommended_raters": [
+          "greenblatt",
+          "marks_credit_cycle"
+        ],
+        "mandatory_checks": [
+          "Is the valuation method appropriate for this economic claim?",
+          "Is the security's ownership claim and economic-unit denominator reconciled correctly?",
+          "Does the evidence support the low/base/high range and its timing?",
+          "Are comparable assets truly like-for-like after production, contract, location, capital, ownership, and realization adjustments?",
+          "For an option, are success probability, time to realization, and remaining owner-funded capital explicit?",
+          "Is the component additive, or already embedded in another component?",
+          "What observation would move the base estimate materially?"
+        ],
+        "status": "open"
+      },
+      {
+        "component_id": "investment_portfolio_uplift",
+        "label": "Investment portfolio mark-to-market uplift",
+        "treatment": "additive",
+        "range_per_share": {
+          "low": 500.0,
+          "base": 2000.0,
+          "high": 4500.0
+        },
+        "range_width_pct_of_base": 200.0,
+        "evidence_tier": "primary_derived",
+        "recommended_raters": [
+          "hohn",
+          "marathon_capital_cycle"
+        ],
+        "mandatory_checks": [
+          "Is the valuation method appropriate for this economic claim?",
+          "Is the security's ownership claim and economic-unit denominator reconciled correctly?",
+          "Does the evidence support the low/base/high range and its timing?",
+          "Are comparable assets truly like-for-like after production, contract, location, capital, ownership, and realization adjustments?",
+          "For an option, are success probability, time to realization, and remaining owner-funded capital explicit?",
+          "Is the component additive, or already embedded in another component?",
+          "What observation would move the base estimate materially?"
+        ],
+        "status": "open"
+      },
+      {
+        "component_id": "asset_backed_financing_reserve",
+        "label": "Asset-backed financing and forward reserve",
+        "treatment": "additive",
+        "range_per_share": {
+          "low": -735.25,
+          "base": -525.18,
+          "high": -315.11
+        },
+        "range_width_pct_of_base": 80.0,
+        "evidence_tier": "primary_derived",
+        "recommended_raters": [
+          "marks_credit_cycle",
+          "pabrai"
+        ],
+        "mandatory_checks": [
+          "Is the valuation method appropriate for this economic claim?",
+          "Is the security's ownership claim and economic-unit denominator reconciled correctly?",
+          "Does the evidence support the low/base/high range and its timing?",
+          "Are comparable assets truly like-for-like after production, contract, location, capital, ownership, and realization adjustments?",
+          "For an option, are success probability, time to realization, and remaining owner-funded capital explicit?",
+          "Is the component additive, or already embedded in another component?",
+          "What observation would move the base estimate materially?"
+        ],
+        "status": "open"
+      },
+      {
+        "component_id": "ai_vision_optionality",
+        "label": "AI infrastructure and Vision Fund optionality",
+        "treatment": "additive",
+        "range_per_share": {
+          "low": 0.0,
+          "base": 0.0,
+          "high": 1500.0
+        },
+        "range_width_pct_of_base": 15000000.0,
+        "evidence_tier": "primary_derived",
+        "recommended_raters": [
+          "klarman_asset_value",
+          "hk"
+        ],
+        "mandatory_checks": [
+          "Is the valuation method appropriate for this economic claim?",
+          "Is the security's ownership claim and economic-unit denominator reconciled correctly?",
+          "Does the evidence support the low/base/high range and its timing?",
+          "Are comparable assets truly like-for-like after production, contract, location, capital, ownership, and realization adjustments?",
+          "For an option, are success probability, time to realization, and remaining owner-funded capital explicit?",
+          "Is the component additive, or already embedded in another component?",
+          "What observation would move the base estimate materially?"
+        ],
+        "status": "open"
+      }
+    ]
+  },
+  "valuation_method_route": {
+    "schema_version": "1.0",
+    "status": "routed",
+    "profile_id": "catalyst_asset_value",
+    "label": "Catalyst-backed asset value",
+    "score": 8.0,
+    "reasons": [
+      "archetype=holding_co",
+      "component categories=financial_asset",
+      "existing methods=catalyst"
+    ],
+    "primary_methods": [
+      "probability_weighted_catalyst_nav"
+    ],
+    "corroborating_methods": [
+      "break_value",
+      "timing_adjusted_payoff"
+    ],
+    "primary_personas": [
+      "klarman_asset_value",
+      "greenblatt"
+    ],
+    "cross_check_personas": [
+      "pabrai",
+      "marks_credit_cycle"
+    ],
+    "silent_personas": [
+      "buffett_weschler",
+      "hk",
+      "hohn",
+      "marathon_capital_cycle",
+      "munger",
+      "stahl"
+    ],
+    "required_evidence": [
+      "finite event tree",
+      "catalyst control and timing",
+      "break value",
+      "tax and legal claims",
+      "financing through realization"
+    ],
+    "failure_modes": [
+      "catalyst assumed rather than evidenced",
+      "delay and break cases omitted",
+      "gross proceeds used before tax and senior claims"
+    ],
+    "secondary_profiles": [
+      {
+        "profile_id": "scarce_asset_optionality",
+        "score": 7.0,
+        "reasons": [
+          "archetype=holding_co",
+          "component categories=real_option"
+        ]
+      },
+      {
+        "profile_id": "credit_and_normalized_returns",
+        "score": 2.0,
+        "reasons": [
+          "component categories=financial_asset, liability_or_reserve"
+        ]
+      }
+    ],
+    "scorecard": {
+      "scarce_asset_optionality": {
+        "score": 7.0,
+        "reasons": [
+          "archetype=holding_co",
+          "component categories=real_option"
+        ]
+      },
+      "quality_reinvestment": {
+        "score": 1.0,
+        "reasons": [
+          "component categories=operating_business"
+        ]
+      },
+      "capital_cycle": {
+        "score": 1.0,
+        "reasons": [
+          "component categories=operating_business"
+        ]
+      },
+      "credit_and_normalized_returns": {
+        "score": 2.0,
+        "reasons": [
+          "component categories=financial_asset, liability_or_reserve"
+        ]
+      },
+      "catalyst_asset_value": {
+        "score": 8.0,
+        "reasons": [
+          "archetype=holding_co",
+          "component categories=financial_asset",
+          "existing methods=catalyst"
+        ]
+      },
+      "predictable_cash_flow": {
+        "score": 1.0,
+        "reasons": [
+          "component categories=operating_business"
+        ]
+      },
+      "binary_milestone": {
+        "score": 2.0,
+        "reasons": [
+          "component categories=real_option",
+          "existing methods=probability"
+        ]
+      }
+    },
+    "decision_rule": "Use one primary method and no more than two corroborating methods; irrelevant methods and personas remain silent."
+  },
+  "universal_valuation_contract": {
+    "schema_version": "2.0",
+    "status": "decision_grade",
+    "ticker": "9984.T",
+    "as_of": "2026-07-24",
+    "economic_ownership_map": [
+      {
+        "component_id": "consolidated_book_equity",
+        "label": "Consolidated book equity per share",
+        "category": "financial_asset",
+        "treatment": "additive",
+        "included_in_component_id": null,
+        "ownership_claim": "Filing-backed consolidated parent owners equity per diluted share",
+        "ownership_percentage": 1.0,
+        "quantity": {
+          "value": 1,
+          "unit": "per-share economic claim"
+        },
+        "method": "net_asset_value",
+        "method_version": "1.0",
+        "method_provenance": {
+          "method_id": "net_asset_value",
+          "version": "1.0",
+          "label": "Reconciled net asset value",
+          "power_zones": [
+            "scarce_asset_optionality",
+            "catalyst_asset_value",
+            "credit_and_normalized_returns"
+          ],
+          "equation": "value_per_share = (gross_assets - senior_claims - tax - realization_costs) / diluted_shares",
+          "sources": [
+            {
+              "ref": "_system/frameworks/scarce_strategic_asset_valuation.md",
+              "locator": "Economic ownership and unit NAV"
+            }
+          ]
+        },
+        "comparable_ids": [],
+        "range_per_share": {
+          "low": 7957.1123,
+          "base": 7957.1123,
+          "high": 7957.1123
+        },
+        "legacy_range_per_share": {
+          "low": 7957.11,
+          "base": 7957.11,
+          "high": 7957.11
+        },
+        "valuation_status": "bounded_estimate",
+        "calculation_proof": {
+          "status": "valid",
+          "method_id": "net_asset_value",
+          "method_version": "1.0",
+          "outputs": {
+            "low": 7957.1123,
+            "base": 7957.1123,
+            "high": 7957.1123
+          },
+          "output_unit": "JPY_per_share",
+          "traces": {
+            "low": [
+              {
+                "id": "parent_equity_m",
+                "label": "Consolidated parent owners equity",
+                "kind": "fact",
+                "value": 11561541.0,
+                "unit": "JPY_million",
+                "source": {
+                  "ref": "9984.T/01_Official/IR/financial_report_q4fy2024_ja.pdf",
+                  "locator": "Consolidated parent owners equity 11,561,541 million yen FY2025",
+                  "as_of": "2025-03-31",
+                  "content_sha256": "fc7a87b835179741dd669f7848b3e38648421dc16b41458acb51b2c13e7a149f",
+                  "source_id": "2dfe4fc18efd54f04e1ddb62f461d084f492bf1cc218564160a106f2838faf69"
+                },
+                "rationale": null
+              },
+              {
+                "id": "shares_m",
+                "label": "Average shares outstanding",
+                "kind": "fact",
+                "value": 1452.982,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "9984.T/01_Official/IR/financial_report_q4fy2024_ja.pdf",
+                  "locator": "Average shares 1,452,982 thousand FY2025",
+                  "as_of": "2025-03-31",
+                  "content_sha256": "fc7a87b835179741dd669f7848b3e38648421dc16b41458acb51b2c13e7a149f",
+                  "source_id": "3d0fa5547158c9e07eff23b87d00c70fc1571e10c1e0daed6b2873c574b65679"
+                },
+                "rationale": null
+              },
+              {
+                "id": "value_per_share",
+                "label": "value_per_share",
+                "kind": "calculation",
+                "value": 7957.11233862,
+                "unit": "JPY_per_share",
+                "operation": "divide",
+                "formula": "parent_equity_m \u00f7 shares_m",
+                "substituted_formula": "11561541 \u00f7 1452.982",
+                "dependencies": [
+                  "parent_equity_m",
+                  "shares_m"
+                ]
+              }
+            ],
+            "base": [
+              {
+                "id": "parent_equity_m",
+                "label": "Consolidated parent owners equity",
+                "kind": "fact",
+                "value": 11561541.0,
+                "unit": "JPY_million",
+                "source": {
+                  "ref": "9984.T/01_Official/IR/financial_report_q4fy2024_ja.pdf",
+                  "locator": "Consolidated parent owners equity 11,561,541 million yen FY2025",
+                  "as_of": "2025-03-31",
+                  "content_sha256": "fc7a87b835179741dd669f7848b3e38648421dc16b41458acb51b2c13e7a149f",
+                  "source_id": "2dfe4fc18efd54f04e1ddb62f461d084f492bf1cc218564160a106f2838faf69"
+                },
+                "rationale": null
+              },
+              {
+                "id": "shares_m",
+                "label": "Average shares outstanding",
+                "kind": "fact",
+                "value": 1452.982,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "9984.T/01_Official/IR/financial_report_q4fy2024_ja.pdf",
+                  "locator": "Average shares 1,452,982 thousand FY2025",
+                  "as_of": "2025-03-31",
+                  "content_sha256": "fc7a87b835179741dd669f7848b3e38648421dc16b41458acb51b2c13e7a149f",
+                  "source_id": "3d0fa5547158c9e07eff23b87d00c70fc1571e10c1e0daed6b2873c574b65679"
+                },
+                "rationale": null
+              },
+              {
+                "id": "value_per_share",
+                "label": "value_per_share",
+                "kind": "calculation",
+                "value": 7957.11233862,
+                "unit": "JPY_per_share",
+                "operation": "divide",
+                "formula": "parent_equity_m \u00f7 shares_m",
+                "substituted_formula": "11561541 \u00f7 1452.982",
+                "dependencies": [
+                  "parent_equity_m",
+                  "shares_m"
+                ]
+              }
+            ],
+            "high": [
+              {
+                "id": "parent_equity_m",
+                "label": "Consolidated parent owners equity",
+                "kind": "fact",
+                "value": 11561541.0,
+                "unit": "JPY_million",
+                "source": {
+                  "ref": "9984.T/01_Official/IR/financial_report_q4fy2024_ja.pdf",
+                  "locator": "Consolidated parent owners equity 11,561,541 million yen FY2025",
+                  "as_of": "2025-03-31",
+                  "content_sha256": "fc7a87b835179741dd669f7848b3e38648421dc16b41458acb51b2c13e7a149f",
+                  "source_id": "2dfe4fc18efd54f04e1ddb62f461d084f492bf1cc218564160a106f2838faf69"
+                },
+                "rationale": null
+              },
+              {
+                "id": "shares_m",
+                "label": "Average shares outstanding",
+                "kind": "fact",
+                "value": 1452.982,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "9984.T/01_Official/IR/financial_report_q4fy2024_ja.pdf",
+                  "locator": "Average shares 1,452,982 thousand FY2025",
+                  "as_of": "2025-03-31",
+                  "content_sha256": "fc7a87b835179741dd669f7848b3e38648421dc16b41458acb51b2c13e7a149f",
+                  "source_id": "3d0fa5547158c9e07eff23b87d00c70fc1571e10c1e0daed6b2873c574b65679"
+                },
+                "rationale": null
+              },
+              {
+                "id": "value_per_share",
+                "label": "value_per_share",
+                "kind": "calculation",
+                "value": 7957.11233862,
+                "unit": "JPY_per_share",
+                "operation": "divide",
+                "formula": "parent_equity_m \u00f7 shares_m",
+                "substituted_formula": "11561541 \u00f7 1452.982",
+                "dependencies": [
+                  "parent_equity_m",
+                  "shares_m"
+                ]
+              }
+            ]
+          },
+          "source_lineage": [
+            {
+              "node_id": "parent_equity_m",
+              "ref": "9984.T/01_Official/IR/financial_report_q4fy2024_ja.pdf",
+              "locator": "Consolidated parent owners equity 11,561,541 million yen FY2025",
+              "as_of": "2025-03-31",
+              "content_sha256": "fc7a87b835179741dd669f7848b3e38648421dc16b41458acb51b2c13e7a149f",
+              "source_id": "2dfe4fc18efd54f04e1ddb62f461d084f492bf1cc218564160a106f2838faf69"
+            },
+            {
+              "node_id": "shares_m",
+              "ref": "9984.T/01_Official/IR/financial_report_q4fy2024_ja.pdf",
+              "locator": "Average shares 1,452,982 thousand FY2025",
+              "as_of": "2025-03-31",
+              "content_sha256": "fc7a87b835179741dd669f7848b3e38648421dc16b41458acb51b2c13e7a149f",
+              "source_id": "3d0fa5547158c9e07eff23b87d00c70fc1571e10c1e0daed6b2873c574b65679"
+            }
+          ],
+          "checks": {
+            "passed": true,
+            "errors": []
+          },
+          "proof_hash": "2f2097a717cc1200fafc7c8891b7851ac47ed1431858cf1aea9a42b96c7af22c"
+        },
+        "evidence_tier": "primary_derived",
+        "evidence_level": "primary_derived",
+        "evidence": "Filing-backed proof from 9984.T/01_Official/IR/financial_report_q4fy2024_ja.pdf; overlap_key=consolidated_book_equity.",
+        "scenario_assumptions": "Proof outputs {'low': 7957.1123, 'base': 7957.1123, 'high': 7957.1123}; see calculation_proof graph.",
+        "probability_and_timing": null,
+        "tax_and_realization_adjustments": "Low/base/high vary causal realization and stress assumptions only.",
+        "falsifier": "Primary filing revises equity, financing structures, or share count >10% without proof update.",
+        "overlap_key": "consolidated_book_equity",
+        "assumption_type": "fact"
+      },
+      {
+        "component_id": "investment_portfolio_uplift",
+        "label": "Investment portfolio mark-to-market uplift",
+        "category": "operating_business",
+        "treatment": "additive",
+        "included_in_component_id": null,
+        "ownership_claim": "Fair-value uplift above consolidated book for Arm, SoftBank Corp, and AI stakes",
+        "ownership_percentage": 1.0,
+        "quantity": {
+          "value": 1,
+          "unit": "per-share economic claim"
+        },
+        "method": "net_asset_value",
+        "method_version": "1.0",
+        "method_provenance": {
+          "method_id": "net_asset_value",
+          "version": "1.0",
+          "label": "Reconciled net asset value",
+          "power_zones": [
+            "scarce_asset_optionality",
+            "catalyst_asset_value",
+            "credit_and_normalized_returns"
+          ],
+          "equation": "value_per_share = (gross_assets - senior_claims - tax - realization_costs) / diluted_shares",
+          "sources": [
+            {
+              "ref": "_system/frameworks/scarce_strategic_asset_valuation.md",
+              "locator": "Economic ownership and unit NAV"
+            }
+          ]
+        },
+        "comparable_ids": [],
+        "range_per_share": {
+          "low": 500.0,
+          "base": 2000.0,
+          "high": 4500.0
+        },
+        "legacy_range_per_share": {
+          "low": 500.0,
+          "base": 2000.0,
+          "high": 4500.0
+        },
+        "valuation_status": "bounded_estimate",
+        "calculation_proof": {
+          "status": "valid",
+          "method_id": "net_asset_value",
+          "method_version": "1.0",
+          "outputs": {
+            "low": 500.0,
+            "base": 2000.0,
+            "high": 4500.0
+          },
+          "output_unit": "JPY_per_share",
+          "traces": {
+            "low": [
+              {
+                "id": "parent_equity_m",
+                "label": "Consolidated parent owners equity anchor",
+                "kind": "fact",
+                "value": 11561541.0,
+                "unit": "JPY_million",
+                "source": {
+                  "ref": "9984.T/01_Official/IR/financial_report_q4fy2024_ja.pdf",
+                  "locator": "Consolidated parent owners equity 11,561,541 million yen FY2025",
+                  "as_of": "2025-03-31",
+                  "content_sha256": "fc7a87b835179741dd669f7848b3e38648421dc16b41458acb51b2c13e7a149f",
+                  "source_id": "2dfe4fc18efd54f04e1ddb62f461d084f492bf1cc218564160a106f2838faf69"
+                },
+                "rationale": null
+              },
+              {
+                "id": "shares_m",
+                "label": "Average shares outstanding",
+                "kind": "fact",
+                "value": 1452.982,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "9984.T/01_Official/IR/financial_report_q4fy2024_ja.pdf",
+                  "locator": "Average shares 1,452,982 thousand FY2025",
+                  "as_of": "2025-03-31",
+                  "content_sha256": "fc7a87b835179741dd669f7848b3e38648421dc16b41458acb51b2c13e7a149f",
+                  "source_id": "3d0fa5547158c9e07eff23b87d00c70fc1571e10c1e0daed6b2873c574b65679"
+                },
+                "rationale": null
+              },
+              {
+                "id": "mtm_uplift_per_share",
+                "label": "Fair-value uplift above consolidated book for Arm, SoftBank Corp, and AI stakes",
+                "kind": "judgment",
+                "value": 500.0,
+                "unit": "JPY_per_share",
+                "source": null,
+                "rationale": "Consolidated book embeds subsidiaries; uplift captures listed-stake and AI optionality not fully in book."
+              }
+            ],
+            "base": [
+              {
+                "id": "parent_equity_m",
+                "label": "Consolidated parent owners equity anchor",
+                "kind": "fact",
+                "value": 11561541.0,
+                "unit": "JPY_million",
+                "source": {
+                  "ref": "9984.T/01_Official/IR/financial_report_q4fy2024_ja.pdf",
+                  "locator": "Consolidated parent owners equity 11,561,541 million yen FY2025",
+                  "as_of": "2025-03-31",
+                  "content_sha256": "fc7a87b835179741dd669f7848b3e38648421dc16b41458acb51b2c13e7a149f",
+                  "source_id": "2dfe4fc18efd54f04e1ddb62f461d084f492bf1cc218564160a106f2838faf69"
+                },
+                "rationale": null
+              },
+              {
+                "id": "shares_m",
+                "label": "Average shares outstanding",
+                "kind": "fact",
+                "value": 1452.982,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "9984.T/01_Official/IR/financial_report_q4fy2024_ja.pdf",
+                  "locator": "Average shares 1,452,982 thousand FY2025",
+                  "as_of": "2025-03-31",
+                  "content_sha256": "fc7a87b835179741dd669f7848b3e38648421dc16b41458acb51b2c13e7a149f",
+                  "source_id": "3d0fa5547158c9e07eff23b87d00c70fc1571e10c1e0daed6b2873c574b65679"
+                },
+                "rationale": null
+              },
+              {
+                "id": "mtm_uplift_per_share",
+                "label": "Fair-value uplift above consolidated book for Arm, SoftBank Corp, and AI stakes",
+                "kind": "judgment",
+                "value": 2000.0,
+                "unit": "JPY_per_share",
+                "source": null,
+                "rationale": "Consolidated book embeds subsidiaries; uplift captures listed-stake and AI optionality not fully in book."
+              }
+            ],
+            "high": [
+              {
+                "id": "parent_equity_m",
+                "label": "Consolidated parent owners equity anchor",
+                "kind": "fact",
+                "value": 11561541.0,
+                "unit": "JPY_million",
+                "source": {
+                  "ref": "9984.T/01_Official/IR/financial_report_q4fy2024_ja.pdf",
+                  "locator": "Consolidated parent owners equity 11,561,541 million yen FY2025",
+                  "as_of": "2025-03-31",
+                  "content_sha256": "fc7a87b835179741dd669f7848b3e38648421dc16b41458acb51b2c13e7a149f",
+                  "source_id": "2dfe4fc18efd54f04e1ddb62f461d084f492bf1cc218564160a106f2838faf69"
+                },
+                "rationale": null
+              },
+              {
+                "id": "shares_m",
+                "label": "Average shares outstanding",
+                "kind": "fact",
+                "value": 1452.982,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "9984.T/01_Official/IR/financial_report_q4fy2024_ja.pdf",
+                  "locator": "Average shares 1,452,982 thousand FY2025",
+                  "as_of": "2025-03-31",
+                  "content_sha256": "fc7a87b835179741dd669f7848b3e38648421dc16b41458acb51b2c13e7a149f",
+                  "source_id": "3d0fa5547158c9e07eff23b87d00c70fc1571e10c1e0daed6b2873c574b65679"
+                },
+                "rationale": null
+              },
+              {
+                "id": "mtm_uplift_per_share",
+                "label": "Fair-value uplift above consolidated book for Arm, SoftBank Corp, and AI stakes",
+                "kind": "judgment",
+                "value": 4500.0,
+                "unit": "JPY_per_share",
+                "source": null,
+                "rationale": "Consolidated book embeds subsidiaries; uplift captures listed-stake and AI optionality not fully in book."
+              }
+            ]
+          },
+          "source_lineage": [
+            {
+              "node_id": "parent_equity_m",
+              "ref": "9984.T/01_Official/IR/financial_report_q4fy2024_ja.pdf",
+              "locator": "Consolidated parent owners equity 11,561,541 million yen FY2025",
+              "as_of": "2025-03-31",
+              "content_sha256": "fc7a87b835179741dd669f7848b3e38648421dc16b41458acb51b2c13e7a149f",
+              "source_id": "2dfe4fc18efd54f04e1ddb62f461d084f492bf1cc218564160a106f2838faf69"
+            },
+            {
+              "node_id": "shares_m",
+              "ref": "9984.T/01_Official/IR/financial_report_q4fy2024_ja.pdf",
+              "locator": "Average shares 1,452,982 thousand FY2025",
+              "as_of": "2025-03-31",
+              "content_sha256": "fc7a87b835179741dd669f7848b3e38648421dc16b41458acb51b2c13e7a149f",
+              "source_id": "3d0fa5547158c9e07eff23b87d00c70fc1571e10c1e0daed6b2873c574b65679"
+            }
+          ],
+          "checks": {
+            "passed": true,
+            "errors": []
+          },
+          "proof_hash": "ad1c77da5c651a66b7a2b32136927e209c1947d84aed205fe183b534c096f136"
+        },
+        "evidence_tier": "primary_derived",
+        "evidence_level": "primary_derived",
+        "evidence": "Filing-backed proof from 9984.T/01_Official/IR/financial_report_q4fy2024_ja.pdf; overlap_key=investment_portfolio_uplift.",
+        "scenario_assumptions": "Proof outputs {'low': 500.0, 'base': 2000.0, 'high': 4500.0}; see calculation_proof graph.",
+        "probability_and_timing": null,
+        "tax_and_realization_adjustments": "Low/base/high vary causal realization and stress assumptions only.",
+        "falsifier": "Primary filing revises equity, financing structures, or share count >10% without proof update.",
+        "overlap_key": "investment_portfolio_uplift",
+        "assumption_type": "judgment"
+      },
+      {
+        "component_id": "asset_backed_financing_reserve",
+        "label": "Asset-backed financing and forward reserve",
+        "category": "liability_or_reserve",
+        "treatment": "additive",
+        "included_in_component_id": null,
+        "ownership_claim": "Economic reserve for Arm margin, Alibaba forward, and SoftBank Corp margin structures",
+        "ownership_percentage": 1.0,
+        "quantity": {
+          "value": 1,
+          "unit": "per-share economic claim"
+        },
+        "method": "net_asset_value",
+        "method_version": "1.0",
+        "method_provenance": {
+          "method_id": "net_asset_value",
+          "version": "1.0",
+          "label": "Reconciled net asset value",
+          "power_zones": [
+            "scarce_asset_optionality",
+            "catalyst_asset_value",
+            "credit_and_normalized_returns"
+          ],
+          "equation": "value_per_share = (gross_assets - senior_claims - tax - realization_costs) / diluted_shares",
+          "sources": [
+            {
+              "ref": "_system/frameworks/scarce_strategic_asset_valuation.md",
+              "locator": "Economic ownership and unit NAV"
+            }
+          ]
+        },
+        "comparable_ids": [],
+        "range_per_share": {
+          "low": -735.25,
+          "base": -525.1786,
+          "high": -315.1071
+        },
+        "legacy_range_per_share": {
+          "low": -735.25,
+          "base": -525.18,
+          "high": -315.11
+        },
+        "valuation_status": "bounded_estimate",
+        "calculation_proof": {
+          "status": "valid",
+          "method_id": "net_asset_value",
+          "method_version": "1.0",
+          "outputs": {
+            "low": -735.25,
+            "base": -525.1786,
+            "high": -315.1071
+          },
+          "output_unit": "JPY_per_share",
+          "traces": {
+            "low": [
+              {
+                "id": "financing_m",
+                "label": "Disclosed asset-backed financing (Arm margin, Alibaba forward, SoftBank Corp margin)",
+                "kind": "fact",
+                "value": 3052300.0,
+                "unit": "JPY_million",
+                "source": {
+                  "ref": "9984.T/01_Official/IR/financial_report_q4fy2024_ja.pdf",
+                  "locator": "Arm margin loan 1,258.5B yen; Alibaba forward 997.8B; SoftBank Corp margin 796B yen",
+                  "as_of": "2025-03-31",
+                  "content_sha256": "fc7a87b835179741dd669f7848b3e38648421dc16b41458acb51b2c13e7a149f",
+                  "source_id": "814bb0173d26d545e82b1465ab91510317208e9612f7f2afc4e2472bd980dbb8"
+                },
+                "rationale": null
+              },
+              {
+                "id": "shares_m",
+                "label": "Average shares outstanding",
+                "kind": "fact",
+                "value": 1452.982,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "9984.T/01_Official/IR/financial_report_q4fy2024_ja.pdf",
+                  "locator": "Average shares 1,452,982 thousand FY2025",
+                  "as_of": "2025-03-31",
+                  "content_sha256": "fc7a87b835179741dd669f7848b3e38648421dc16b41458acb51b2c13e7a149f",
+                  "source_id": "3d0fa5547158c9e07eff23b87d00c70fc1571e10c1e0daed6b2873c574b65679"
+                },
+                "rationale": null
+              },
+              {
+                "id": "stress_pct",
+                "label": "Economic overhang on asset-backed financing structures",
+                "kind": "judgment",
+                "value": 0.35,
+                "unit": "ratio",
+                "source": null,
+                "rationale": "Reserve for margin loans and forwards beyond filing book dhando floor."
+              },
+              {
+                "id": "gross_per_share",
+                "label": "gross_per_share",
+                "kind": "calculation",
+                "value": 2100.71425524,
+                "unit": "JPY_per_share",
+                "operation": "divide",
+                "formula": "financing_m \u00f7 shares_m",
+                "substituted_formula": "3052300 \u00f7 1452.982",
+                "dependencies": [
+                  "financing_m",
+                  "shares_m"
+                ]
+              },
+              {
+                "id": "reserve_gross",
+                "label": "reserve_gross",
+                "kind": "calculation",
+                "value": 735.24998933,
+                "unit": "JPY_per_share",
+                "operation": "multiply",
+                "formula": "gross_per_share \u00d7 stress_pct",
+                "substituted_formula": "2100.7143 \u00d7 0.35",
+                "dependencies": [
+                  "gross_per_share",
+                  "stress_pct"
+                ]
+              },
+              {
+                "id": "value_per_share",
+                "label": "value_per_share",
+                "kind": "calculation",
+                "value": -735.24998933,
+                "unit": "JPY_per_share",
+                "operation": "negative",
+                "formula": "-(reserve_gross)",
+                "substituted_formula": "-(735.24999)",
+                "dependencies": [
+                  "reserve_gross"
+                ]
+              }
+            ],
+            "base": [
+              {
+                "id": "financing_m",
+                "label": "Disclosed asset-backed financing (Arm margin, Alibaba forward, SoftBank Corp margin)",
+                "kind": "fact",
+                "value": 3052300.0,
+                "unit": "JPY_million",
+                "source": {
+                  "ref": "9984.T/01_Official/IR/financial_report_q4fy2024_ja.pdf",
+                  "locator": "Arm margin loan 1,258.5B yen; Alibaba forward 997.8B; SoftBank Corp margin 796B yen",
+                  "as_of": "2025-03-31",
+                  "content_sha256": "fc7a87b835179741dd669f7848b3e38648421dc16b41458acb51b2c13e7a149f",
+                  "source_id": "814bb0173d26d545e82b1465ab91510317208e9612f7f2afc4e2472bd980dbb8"
+                },
+                "rationale": null
+              },
+              {
+                "id": "shares_m",
+                "label": "Average shares outstanding",
+                "kind": "fact",
+                "value": 1452.982,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "9984.T/01_Official/IR/financial_report_q4fy2024_ja.pdf",
+                  "locator": "Average shares 1,452,982 thousand FY2025",
+                  "as_of": "2025-03-31",
+                  "content_sha256": "fc7a87b835179741dd669f7848b3e38648421dc16b41458acb51b2c13e7a149f",
+                  "source_id": "3d0fa5547158c9e07eff23b87d00c70fc1571e10c1e0daed6b2873c574b65679"
+                },
+                "rationale": null
+              },
+              {
+                "id": "stress_pct",
+                "label": "Economic overhang on asset-backed financing structures",
+                "kind": "judgment",
+                "value": 0.25,
+                "unit": "ratio",
+                "source": null,
+                "rationale": "Reserve for margin loans and forwards beyond filing book dhando floor."
+              },
+              {
+                "id": "gross_per_share",
+                "label": "gross_per_share",
+                "kind": "calculation",
+                "value": 2100.71425524,
+                "unit": "JPY_per_share",
+                "operation": "divide",
+                "formula": "financing_m \u00f7 shares_m",
+                "substituted_formula": "3052300 \u00f7 1452.982",
+                "dependencies": [
+                  "financing_m",
+                  "shares_m"
+                ]
+              },
+              {
+                "id": "reserve_gross",
+                "label": "reserve_gross",
+                "kind": "calculation",
+                "value": 525.17856381,
+                "unit": "JPY_per_share",
+                "operation": "multiply",
+                "formula": "gross_per_share \u00d7 stress_pct",
+                "substituted_formula": "2100.7143 \u00d7 0.25",
+                "dependencies": [
+                  "gross_per_share",
+                  "stress_pct"
+                ]
+              },
+              {
+                "id": "value_per_share",
+                "label": "value_per_share",
+                "kind": "calculation",
+                "value": -525.17856381,
+                "unit": "JPY_per_share",
+                "operation": "negative",
+                "formula": "-(reserve_gross)",
+                "substituted_formula": "-(525.17856)",
+                "dependencies": [
+                  "reserve_gross"
+                ]
+              }
+            ],
+            "high": [
+              {
+                "id": "financing_m",
+                "label": "Disclosed asset-backed financing (Arm margin, Alibaba forward, SoftBank Corp margin)",
+                "kind": "fact",
+                "value": 3052300.0,
+                "unit": "JPY_million",
+                "source": {
+                  "ref": "9984.T/01_Official/IR/financial_report_q4fy2024_ja.pdf",
+                  "locator": "Arm margin loan 1,258.5B yen; Alibaba forward 997.8B; SoftBank Corp margin 796B yen",
+                  "as_of": "2025-03-31",
+                  "content_sha256": "fc7a87b835179741dd669f7848b3e38648421dc16b41458acb51b2c13e7a149f",
+                  "source_id": "814bb0173d26d545e82b1465ab91510317208e9612f7f2afc4e2472bd980dbb8"
+                },
+                "rationale": null
+              },
+              {
+                "id": "shares_m",
+                "label": "Average shares outstanding",
+                "kind": "fact",
+                "value": 1452.982,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "9984.T/01_Official/IR/financial_report_q4fy2024_ja.pdf",
+                  "locator": "Average shares 1,452,982 thousand FY2025",
+                  "as_of": "2025-03-31",
+                  "content_sha256": "fc7a87b835179741dd669f7848b3e38648421dc16b41458acb51b2c13e7a149f",
+                  "source_id": "3d0fa5547158c9e07eff23b87d00c70fc1571e10c1e0daed6b2873c574b65679"
+                },
+                "rationale": null
+              },
+              {
+                "id": "stress_pct",
+                "label": "Economic overhang on asset-backed financing structures",
+                "kind": "judgment",
+                "value": 0.15,
+                "unit": "ratio",
+                "source": null,
+                "rationale": "Reserve for margin loans and forwards beyond filing book dhando floor."
+              },
+              {
+                "id": "gross_per_share",
+                "label": "gross_per_share",
+                "kind": "calculation",
+                "value": 2100.71425524,
+                "unit": "JPY_per_share",
+                "operation": "divide",
+                "formula": "financing_m \u00f7 shares_m",
+                "substituted_formula": "3052300 \u00f7 1452.982",
+                "dependencies": [
+                  "financing_m",
+                  "shares_m"
+                ]
+              },
+              {
+                "id": "reserve_gross",
+                "label": "reserve_gross",
+                "kind": "calculation",
+                "value": 315.10713829,
+                "unit": "JPY_per_share",
+                "operation": "multiply",
+                "formula": "gross_per_share \u00d7 stress_pct",
+                "substituted_formula": "2100.7143 \u00d7 0.15",
+                "dependencies": [
+                  "gross_per_share",
+                  "stress_pct"
+                ]
+              },
+              {
+                "id": "value_per_share",
+                "label": "value_per_share",
+                "kind": "calculation",
+                "value": -315.10713829,
+                "unit": "JPY_per_share",
+                "operation": "negative",
+                "formula": "-(reserve_gross)",
+                "substituted_formula": "-(315.10714)",
+                "dependencies": [
+                  "reserve_gross"
+                ]
+              }
+            ]
+          },
+          "source_lineage": [
+            {
+              "node_id": "financing_m",
+              "ref": "9984.T/01_Official/IR/financial_report_q4fy2024_ja.pdf",
+              "locator": "Arm margin loan 1,258.5B yen; Alibaba forward 997.8B; SoftBank Corp margin 796B yen",
+              "as_of": "2025-03-31",
+              "content_sha256": "fc7a87b835179741dd669f7848b3e38648421dc16b41458acb51b2c13e7a149f",
+              "source_id": "814bb0173d26d545e82b1465ab91510317208e9612f7f2afc4e2472bd980dbb8"
+            },
+            {
+              "node_id": "shares_m",
+              "ref": "9984.T/01_Official/IR/financial_report_q4fy2024_ja.pdf",
+              "locator": "Average shares 1,452,982 thousand FY2025",
+              "as_of": "2025-03-31",
+              "content_sha256": "fc7a87b835179741dd669f7848b3e38648421dc16b41458acb51b2c13e7a149f",
+              "source_id": "3d0fa5547158c9e07eff23b87d00c70fc1571e10c1e0daed6b2873c574b65679"
+            }
+          ],
+          "checks": {
+            "passed": true,
+            "errors": []
+          },
+          "proof_hash": "ea6d1ab8bf660ed71faad40ab84ef086899b1fd09de7abb9a745c678222eb86a"
+        },
+        "evidence_tier": "primary_derived",
+        "evidence_level": "primary_derived",
+        "evidence": "Filing-backed proof from 9984.T/01_Official/IR/financial_report_q4fy2024_ja.pdf; overlap_key=asset_backed_financing_reserve.",
+        "scenario_assumptions": "Proof outputs {'low': -735.25, 'base': -525.1786, 'high': -315.1071}; see calculation_proof graph.",
+        "probability_and_timing": null,
+        "tax_and_realization_adjustments": "Low/base/high vary causal realization and stress assumptions only.",
+        "falsifier": "Primary filing revises equity, financing structures, or share count >10% without proof update.",
+        "overlap_key": "asset_backed_financing_reserve",
+        "assumption_type": "judgment"
+      },
+      {
+        "component_id": "ai_vision_optionality",
+        "label": "AI infrastructure and Vision Fund optionality",
+        "category": "real_option",
+        "treatment": "additive",
+        "included_in_component_id": null,
+        "ownership_claim": "Probability-weighted OpenAI/Stargate and SVF upside not in base owner cash",
+        "ownership_percentage": 1.0,
+        "quantity": {
+          "value": 1,
+          "unit": "per-share economic claim"
+        },
+        "method": "probability_weighted_catalyst_nav",
+        "method_version": "1.0",
+        "method_provenance": {
+          "method_id": "probability_weighted_catalyst_nav",
+          "version": "1.0",
+          "label": "Mutually exclusive catalyst event tree",
+          "power_zones": [
+            "catalyst_asset_value"
+          ],
+          "equation": "value = sum(probability_i*(payoff_i-cost_i)/(1+r_i)^years_i)",
+          "sources": [
+            {
+              "ref": "_system/frameworks/optionality_valuation.md",
+              "locator": "Probability, beneficiary, timing and failure cases"
+            }
+          ]
+        },
+        "comparable_ids": [],
+        "range_per_share": {
+          "low": 0.0,
+          "base": 0.0,
+          "high": 1500.0
+        },
+        "legacy_range_per_share": {
+          "low": 0.0,
+          "base": 0.0,
+          "high": 1500.0
+        },
+        "valuation_status": "bounded_estimate",
+        "calculation_proof": {
+          "status": "valid",
+          "method_id": "probability_weighted_catalyst_nav",
+          "method_version": "1.0",
+          "outputs": {
+            "low": 0.0,
+            "base": 0.0,
+            "high": 1500.0
+          },
+          "output_unit": "JPY_per_share",
+          "traces": {
+            "low": [
+              {
+                "id": "openai_commitment_usd_b",
+                "label": "OpenAI Global commitment (net of syndication)",
+                "kind": "fact",
+                "value": 30.0,
+                "unit": "USD_billion",
+                "source": {
+                  "ref": "9984.T/01_Official/IR/financial_report_q4fy2024_ja.pdf",
+                  "locator": "OpenAI Global commitment up to $30B net of $10B syndication (FY2025 results)",
+                  "as_of": "2025-03-31",
+                  "content_sha256": "fc7a87b835179741dd669f7848b3e38648421dc16b41458acb51b2c13e7a149f",
+                  "source_id": "dd5da146a6062c873aa8166d9a5cb1bcc3fe6cc4cb02cf06137e14a271470a9e"
+                },
+                "rationale": null
+              },
+              {
+                "id": "option_value_per_share",
+                "label": "Probability-weighted AI infrastructure and SVF optionality per share",
+                "kind": "judgment",
+                "value": 0.0,
+                "unit": "JPY_per_share",
+                "source": null,
+                "rationale": "Base stays $0 until operating cash from OpenAI/Stargate path is filing-backed; high case sizes partial success."
+              }
+            ],
+            "base": [
+              {
+                "id": "openai_commitment_usd_b",
+                "label": "OpenAI Global commitment (net of syndication)",
+                "kind": "fact",
+                "value": 30.0,
+                "unit": "USD_billion",
+                "source": {
+                  "ref": "9984.T/01_Official/IR/financial_report_q4fy2024_ja.pdf",
+                  "locator": "OpenAI Global commitment up to $30B net of $10B syndication (FY2025 results)",
+                  "as_of": "2025-03-31",
+                  "content_sha256": "fc7a87b835179741dd669f7848b3e38648421dc16b41458acb51b2c13e7a149f",
+                  "source_id": "dd5da146a6062c873aa8166d9a5cb1bcc3fe6cc4cb02cf06137e14a271470a9e"
+                },
+                "rationale": null
+              },
+              {
+                "id": "option_value_per_share",
+                "label": "Probability-weighted AI infrastructure and SVF optionality per share",
+                "kind": "judgment",
+                "value": 0.0,
+                "unit": "JPY_per_share",
+                "source": null,
+                "rationale": "Base stays $0 until operating cash from OpenAI/Stargate path is filing-backed; high case sizes partial success."
+              }
+            ],
+            "high": [
+              {
+                "id": "openai_commitment_usd_b",
+                "label": "OpenAI Global commitment (net of syndication)",
+                "kind": "fact",
+                "value": 30.0,
+                "unit": "USD_billion",
+                "source": {
+                  "ref": "9984.T/01_Official/IR/financial_report_q4fy2024_ja.pdf",
+                  "locator": "OpenAI Global commitment up to $30B net of $10B syndication (FY2025 results)",
+                  "as_of": "2025-03-31",
+                  "content_sha256": "fc7a87b835179741dd669f7848b3e38648421dc16b41458acb51b2c13e7a149f",
+                  "source_id": "dd5da146a6062c873aa8166d9a5cb1bcc3fe6cc4cb02cf06137e14a271470a9e"
+                },
+                "rationale": null
+              },
+              {
+                "id": "option_value_per_share",
+                "label": "Probability-weighted AI infrastructure and SVF optionality per share",
+                "kind": "judgment",
+                "value": 1500.0,
+                "unit": "JPY_per_share",
+                "source": null,
+                "rationale": "Base stays $0 until operating cash from OpenAI/Stargate path is filing-backed; high case sizes partial success."
+              }
+            ]
+          },
+          "source_lineage": [
+            {
+              "node_id": "openai_commitment_usd_b",
+              "ref": "9984.T/01_Official/IR/financial_report_q4fy2024_ja.pdf",
+              "locator": "OpenAI Global commitment up to $30B net of $10B syndication (FY2025 results)",
+              "as_of": "2025-03-31",
+              "content_sha256": "fc7a87b835179741dd669f7848b3e38648421dc16b41458acb51b2c13e7a149f",
+              "source_id": "dd5da146a6062c873aa8166d9a5cb1bcc3fe6cc4cb02cf06137e14a271470a9e"
+            }
+          ],
+          "checks": {
+            "passed": true,
+            "errors": []
+          },
+          "proof_hash": "eb44317c6fc6fdc10cf7c43dfad04def069a19728ba212303bbae6b11b92e763"
+        },
+        "evidence_tier": "primary_derived",
+        "evidence_level": "primary_derived",
+        "evidence": "Filing-backed proof from 9984.T/01_Official/IR/financial_report_q4fy2024_ja.pdf; overlap_key=ai_vision_optionality.",
+        "scenario_assumptions": "Proof outputs {'low': 0.0, 'base': 0.0, 'high': 1500.0}; see calculation_proof graph.",
+        "probability_and_timing": {
+          "success_probability": null,
+          "remaining_capital_m": null,
+          "timing_basis": "OpenAI commitment and SVF exits per FY2025 filing narrative",
+          "probability_basis": "Base 0% until filing-backed operating cash; high case partial success",
+          "remaining_capital_basis": "Up to $30B net OpenAI commitment disclosed FY2025 results"
+        },
+        "tax_and_realization_adjustments": "Low/base/high vary causal realization and stress assumptions only.",
+        "falsifier": "Primary filing revises equity, financing structures, or share count >10% without proof update.",
+        "overlap_key": "ai_vision_optionality",
+        "assumption_type": "judgment"
+      }
+    ],
+    "component_coverage": {
+      "all_material_components_identified": true,
+      "material_component_count": 4,
+      "additive_component_count": 4,
+      "embedded_component_count": 0,
+      "unvalued_component_count": 0,
+      "double_counting_flags": []
+    },
+    "input_classification": {
+      "facts": [
+        {
+          "component_id": "consolidated_book_equity",
+          "label": "Consolidated book equity per share",
+          "kind": "fact",
+          "evidence_tier": "primary_derived",
+          "evidence": "Filing-backed proof from 9984.T/01_Official/IR/financial_report_q4fy2024_ja.pdf; overlap_key=consolidated_book_equity.",
+          "method": "net_asset_value",
+          "valuation_status": "bounded_estimate"
+        }
+      ],
+      "estimates": [],
+      "judgments": [
+        {
+          "component_id": "investment_portfolio_uplift",
+          "label": "Investment portfolio mark-to-market uplift",
+          "kind": "judgment",
+          "evidence_tier": "primary_derived",
+          "evidence": "Filing-backed proof from 9984.T/01_Official/IR/financial_report_q4fy2024_ja.pdf; overlap_key=investment_portfolio_uplift.",
+          "method": "net_asset_value",
+          "valuation_status": "bounded_estimate"
+        },
+        {
+          "component_id": "asset_backed_financing_reserve",
+          "label": "Asset-backed financing and forward reserve",
+          "kind": "judgment",
+          "evidence_tier": "primary_derived",
+          "evidence": "Filing-backed proof from 9984.T/01_Official/IR/financial_report_q4fy2024_ja.pdf; overlap_key=asset_backed_financing_reserve.",
+          "method": "net_asset_value",
+          "valuation_status": "bounded_estimate"
+        },
+        {
+          "component_id": "ai_vision_optionality",
+          "label": "AI infrastructure and Vision Fund optionality",
+          "kind": "judgment",
+          "evidence_tier": "primary_derived",
+          "evidence": "Filing-backed proof from 9984.T/01_Official/IR/financial_report_q4fy2024_ja.pdf; overlap_key=ai_vision_optionality.",
+          "method": "probability_weighted_catalyst_nav",
+          "valuation_status": "bounded_estimate"
+        }
+      ]
+    },
+    "method_route": {
+      "schema_version": "1.0",
+      "status": "routed",
+      "profile_id": "catalyst_asset_value",
+      "label": "Catalyst-backed asset value",
+      "score": 8.0,
+      "reasons": [
+        "archetype=holding_co",
+        "component categories=financial_asset",
+        "existing methods=catalyst"
+      ],
+      "primary_methods": [
+        "probability_weighted_catalyst_nav"
+      ],
+      "corroborating_methods": [
+        "break_value",
+        "timing_adjusted_payoff"
+      ],
+      "primary_personas": [
+        "klarman_asset_value",
+        "greenblatt"
+      ],
+      "cross_check_personas": [
+        "pabrai",
+        "marks_credit_cycle"
+      ],
+      "silent_personas": [
+        "buffett_weschler",
+        "hk",
+        "hohn",
+        "marathon_capital_cycle",
+        "munger",
+        "stahl"
+      ],
+      "required_evidence": [
+        "finite event tree",
+        "catalyst control and timing",
+        "break value",
+        "tax and legal claims",
+        "financing through realization"
+      ],
+      "failure_modes": [
+        "catalyst assumed rather than evidenced",
+        "delay and break cases omitted",
+        "gross proceeds used before tax and senior claims"
+      ],
+      "secondary_profiles": [
+        {
+          "profile_id": "scarce_asset_optionality",
+          "score": 7.0,
+          "reasons": [
+            "archetype=holding_co",
+            "component categories=real_option"
+          ]
+        },
+        {
+          "profile_id": "credit_and_normalized_returns",
+          "score": 2.0,
+          "reasons": [
+            "component categories=financial_asset, liability_or_reserve"
+          ]
+        }
+      ],
+      "scorecard": {
+        "scarce_asset_optionality": {
+          "score": 7.0,
+          "reasons": [
+            "archetype=holding_co",
+            "component categories=real_option"
+          ]
+        },
+        "quality_reinvestment": {
+          "score": 1.0,
+          "reasons": [
+            "component categories=operating_business"
+          ]
+        },
+        "capital_cycle": {
+          "score": 1.0,
+          "reasons": [
+            "component categories=operating_business"
+          ]
+        },
+        "credit_and_normalized_returns": {
+          "score": 2.0,
+          "reasons": [
+            "component categories=financial_asset, liability_or_reserve"
+          ]
+        },
+        "catalyst_asset_value": {
+          "score": 8.0,
+          "reasons": [
+            "archetype=holding_co",
+            "component categories=financial_asset",
+            "existing methods=catalyst"
+          ]
+        },
+        "predictable_cash_flow": {
+          "score": 1.0,
+          "reasons": [
+            "component categories=operating_business"
+          ]
+        },
+        "binary_milestone": {
+          "score": 2.0,
+          "reasons": [
+            "component categories=real_option",
+            "existing methods=probability"
+          ]
+        }
+      },
+      "decision_rule": "Use one primary method and no more than two corroborating methods; irrelevant methods and personas remain silent."
+    },
+    "market": {
+      "price_per_share": 5918.0,
+      "fully_diluted_shares": 1452982000,
+      "market_cap_m": 8598747.48,
+      "enterprise_value_m": null
+    },
+    "valuation": {
+      "value_per_share": {
+        "low": 7721.8623,
+        "base": 9431.9337,
+        "high": 13642.0052
+      },
+      "priced_components_per_share": {
+        "low": 7721.8623,
+        "base": 9431.9337,
+        "high": 13642.0052
+      },
+      "legacy_value_per_share": {
+        "low": 7721.86,
+        "base": 9431.93,
+        "high": 13642.0
+      },
+      "probability_weighted_value_per_share": 9431.9337,
+      "expected_distributions_per_share": 0.0,
+      "annualized_return_at_price_pct": {
+        "low": 3.87,
+        "base": 6.89,
+        "high": 12.67
+      },
+      "downside_to_low_pct": 30.48,
+      "horizon_years": 7,
+      "interpretation": "value_per_share is withheld while any material additive component is unpriced; priced_components_per_share is not a complete security value."
+    },
+    "scenario_contract": {
+      "rule": "Cases must change cited causal operating, capital, probability, timing, or financing drivers\u2014not only a terminal multiple.",
+      "top_value_drivers": [
+        {
+          "component_id": "investment_portfolio_uplift",
+          "label": "Investment portfolio mark-to-market uplift",
+          "valuation_status": "bounded_estimate",
+          "base_per_share": 2000.0,
+          "legacy_base_per_share": 2000.0,
+          "range_width_per_share": 4000.0,
+          "scenario_assumptions": "Proof outputs {'low': 500.0, 'base': 2000.0, 'high': 4500.0}; see calculation_proof graph."
+        },
+        {
+          "component_id": "ai_vision_optionality",
+          "label": "AI infrastructure and Vision Fund optionality",
+          "valuation_status": "bounded_estimate",
+          "base_per_share": 0.0,
+          "legacy_base_per_share": 0.0,
+          "range_width_per_share": 1500.0,
+          "scenario_assumptions": "Proof outputs {'low': 0.0, 'base': 0.0, 'high': 1500.0}; see calculation_proof graph."
+        },
+        {
+          "component_id": "asset_backed_financing_reserve",
+          "label": "Asset-backed financing and forward reserve",
+          "valuation_status": "bounded_estimate",
+          "base_per_share": -525.1786,
+          "legacy_base_per_share": -525.18,
+          "range_width_per_share": 420.1429,
+          "scenario_assumptions": "Proof outputs {'low': -735.25, 'base': -525.1786, 'high': -315.1071}; see calculation_proof graph."
+        },
+        {
+          "component_id": "consolidated_book_equity",
+          "label": "Consolidated book equity per share",
+          "valuation_status": "bounded_estimate",
+          "base_per_share": 7957.1123,
+          "legacy_base_per_share": 7957.11,
+          "range_width_per_share": 0.0,
+          "scenario_assumptions": "Proof outputs {'low': 7957.1123, 'base': 7957.1123, 'high': 7957.1123}; see calculation_proof graph."
+        }
+      ],
+      "reverse_expectations": null
+    },
+    "calculation_proof_summary": {
+      "component_count": 4,
+      "priced_component_count": 4,
+      "proof_complete_pct": 100.0,
+      "status_counts": {
+        "bounded_estimate": 4,
+        "calculated": 0,
+        "legacy_sensitivity": 0,
+        "unpriced": 0
+      },
+      "all_material_components_priced": true,
+      "calculation_errors": [],
+      "aggregate_proof_hash": "bb0cdc28216ce410ed6d0c05a9f30b68449bebcc64c67b15c6847aeaaeae0130"
+    },
+    "source_lineage": [
+      {
+        "component_id": "consolidated_book_equity",
+        "node_id": "parent_equity_m",
+        "ref": "9984.T/01_Official/IR/financial_report_q4fy2024_ja.pdf",
+        "locator": "Consolidated parent owners equity 11,561,541 million yen FY2025",
+        "as_of": "2025-03-31",
+        "content_sha256": "fc7a87b835179741dd669f7848b3e38648421dc16b41458acb51b2c13e7a149f",
+        "source_id": "2dfe4fc18efd54f04e1ddb62f461d084f492bf1cc218564160a106f2838faf69"
+      },
+      {
+        "component_id": "consolidated_book_equity",
+        "node_id": "shares_m",
+        "ref": "9984.T/01_Official/IR/financial_report_q4fy2024_ja.pdf",
+        "locator": "Average shares 1,452,982 thousand FY2025",
+        "as_of": "2025-03-31",
+        "content_sha256": "fc7a87b835179741dd669f7848b3e38648421dc16b41458acb51b2c13e7a149f",
+        "source_id": "3d0fa5547158c9e07eff23b87d00c70fc1571e10c1e0daed6b2873c574b65679"
+      },
+      {
+        "component_id": "investment_portfolio_uplift",
+        "node_id": "parent_equity_m",
+        "ref": "9984.T/01_Official/IR/financial_report_q4fy2024_ja.pdf",
+        "locator": "Consolidated parent owners equity 11,561,541 million yen FY2025",
+        "as_of": "2025-03-31",
+        "content_sha256": "fc7a87b835179741dd669f7848b3e38648421dc16b41458acb51b2c13e7a149f",
+        "source_id": "2dfe4fc18efd54f04e1ddb62f461d084f492bf1cc218564160a106f2838faf69"
+      },
+      {
+        "component_id": "investment_portfolio_uplift",
+        "node_id": "shares_m",
+        "ref": "9984.T/01_Official/IR/financial_report_q4fy2024_ja.pdf",
+        "locator": "Average shares 1,452,982 thousand FY2025",
+        "as_of": "2025-03-31",
+        "content_sha256": "fc7a87b835179741dd669f7848b3e38648421dc16b41458acb51b2c13e7a149f",
+        "source_id": "3d0fa5547158c9e07eff23b87d00c70fc1571e10c1e0daed6b2873c574b65679"
+      },
+      {
+        "component_id": "asset_backed_financing_reserve",
+        "node_id": "financing_m",
+        "ref": "9984.T/01_Official/IR/financial_report_q4fy2024_ja.pdf",
+        "locator": "Arm margin loan 1,258.5B yen; Alibaba forward 997.8B; SoftBank Corp margin 796B yen",
+        "as_of": "2025-03-31",
+        "content_sha256": "fc7a87b835179741dd669f7848b3e38648421dc16b41458acb51b2c13e7a149f",
+        "source_id": "814bb0173d26d545e82b1465ab91510317208e9612f7f2afc4e2472bd980dbb8"
+      },
+      {
+        "component_id": "asset_backed_financing_reserve",
+        "node_id": "shares_m",
+        "ref": "9984.T/01_Official/IR/financial_report_q4fy2024_ja.pdf",
+        "locator": "Average shares 1,452,982 thousand FY2025",
+        "as_of": "2025-03-31",
+        "content_sha256": "fc7a87b835179741dd669f7848b3e38648421dc16b41458acb51b2c13e7a149f",
+        "source_id": "3d0fa5547158c9e07eff23b87d00c70fc1571e10c1e0daed6b2873c574b65679"
+      },
+      {
+        "component_id": "ai_vision_optionality",
+        "node_id": "openai_commitment_usd_b",
+        "ref": "9984.T/01_Official/IR/financial_report_q4fy2024_ja.pdf",
+        "locator": "OpenAI Global commitment up to $30B net of $10B syndication (FY2025 results)",
+        "as_of": "2025-03-31",
+        "content_sha256": "fc7a87b835179741dd669f7848b3e38648421dc16b41458acb51b2c13e7a149f",
+        "source_id": "dd5da146a6062c873aa8166d9a5cb1bcc3fe6cc4cb02cf06137e14a271470a9e"
+      }
+    ],
+    "model_checks": {
+      "calculation_graphs_valid": true,
+      "component_sum_reconciles": true,
+      "no_double_counting": true,
+      "all_material_components_priced": true,
+      "low_base_high_ordered": true
+    },
+    "evidence": {
+      "unresolved_count": 0,
+      "blockers": [],
+      "validation_errors": []
+    },
+    "monitoring": {
+      "falsifiers": [
+        "Primary filing revises equity, financing structures, or share count >10% without proof update.",
+        "Primary filing revises equity, financing structures, or share count >10% without proof update.",
+        "Primary filing revises equity, financing structures, or share count >10% without proof update.",
+        "Primary filing revises equity, financing structures, or share count >10% without proof update."
+      ],
+      "required_refresh_triggers": [
+        "new filing or material operating update",
+        "capital-structure change",
+        "material price move",
+        "component milestone or falsifier"
+      ]
+    },
+    "change_control": {
+      "model_hash": "08c37ad67979cf814930bd94556d7f3ca96a59d131bb67572022f8a3a20cb572",
+      "method_versions": [
+        "net_asset_value@1.0",
+        "probability_weighted_catalyst_nav@1.0"
+      ],
+      "change_log": [],
+      "rule": "A source fact is locked. Every assumption change requires a reason, author, timestamp, and before/after value."
+    },
+    "decision_rule": "No security is decision-grade until every material claim is valued exactly once by a valid calculation proof and every material evidence blocker is resolved."
+  },
+  "valuation_views": {
+    "decision_rule": "Do not average operating returns, component value, and reverse expectations.",
+    "operating": {
+      "owner_cash_per_share": 250.0,
+      "scenario_returns_pct": {
+        "bear": -3.6,
+        "base": 0.8,
+        "bull": 5.4
+      },
+      "segment_cross_check": null
+    },
+    "assets": {
+      "legacy_supported_decision_value_per_share": 0.0,
+      "ledger": [],
+      "legacy_non_supported_count": 0
+    },
+    "components": {
+      "status": "complete",
+      "decision_rule": "Use the complete low/base/high component schedule. Embedded components are estimated but not added twice.",
+      "all_material_components_identified": true,
+      "additive_components": [
+        {
+          "id": "consolidated_book_equity",
+          "label": "Consolidated book equity per share",
+          "category": "financial_asset",
+          "overlap_key": "consolidated_book_equity",
+          "treatment": "additive",
+          "included_in_component_id": null,
+          "method": "net_asset_value",
+          "valuation_status": "bounded_estimate",
+          "calculation_proof": {
+            "schema_version": "1.0",
+            "method_id": "net_asset_value",
+            "method_version": "1.0",
+            "output_unit": "JPY_per_share",
+            "inputs": [
+              {
+                "id": "parent_equity_m",
+                "label": "Consolidated parent owners equity",
+                "kind": "fact",
+                "value": 11561541,
+                "unit": "JPY_million",
+                "source": {
+                  "ref": "9984.T/01_Official/IR/financial_report_q4fy2024_ja.pdf",
+                  "locator": "Consolidated parent owners equity 11,561,541 million yen FY2025",
+                  "as_of": "2025-03-31"
+                },
+                "locked": true
+              },
+              {
+                "id": "shares_m",
+                "label": "Average shares outstanding",
+                "kind": "fact",
+                "value": 1452.982,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "9984.T/01_Official/IR/financial_report_q4fy2024_ja.pdf",
+                  "locator": "Average shares 1,452,982 thousand FY2025",
+                  "as_of": "2025-03-31"
+                },
+                "locked": true
+              }
+            ],
+            "assumptions": [],
+            "calculations": [
+              {
+                "id": "value_per_share",
+                "op": "divide",
+                "args": [
+                  "parent_equity_m",
+                  "shares_m"
+                ],
+                "unit": "JPY_per_share"
+              }
+            ],
+            "outputs": {
+              "low": "value_per_share",
+              "base": "value_per_share",
+              "high": "value_per_share"
+            }
+          },
+          "evidence_tier": "primary_derived",
+          "evidence": "Filing-backed proof from 9984.T/01_Official/IR/financial_report_q4fy2024_ja.pdf; overlap_key=consolidated_book_equity.",
+          "cross_check": "Reconcile to FY2025 securities report segment notes before decision use.",
+          "driver_model_type": null,
+          "driver_model": null,
+          "assumption_summary": "Proof outputs {'low': 7957.1123, 'base': 7957.1123, 'high': 7957.1123}; see calculation_proof graph.",
+          "falsifier": "Primary filing revises equity, financing structures, or share count >10% without proof update.",
+          "scenario_assumptions": null,
+          "low_per_share": 7957.11,
+          "base_per_share": 7957.11,
+          "high_per_share": 7957.11
+        },
+        {
+          "id": "investment_portfolio_uplift",
+          "label": "Investment portfolio mark-to-market uplift",
+          "category": "operating_business",
+          "overlap_key": "investment_portfolio_uplift",
+          "treatment": "additive",
+          "included_in_component_id": null,
+          "method": "net_asset_value",
+          "valuation_status": "bounded_estimate",
+          "calculation_proof": {
+            "schema_version": "1.0",
+            "method_id": "net_asset_value",
+            "method_version": "1.0",
+            "output_unit": "JPY_per_share",
+            "inputs": [
+              {
+                "id": "parent_equity_m",
+                "label": "Consolidated parent owners equity anchor",
+                "kind": "fact",
+                "value": 11561541,
+                "unit": "JPY_million",
+                "source": {
+                  "ref": "9984.T/01_Official/IR/financial_report_q4fy2024_ja.pdf",
+                  "locator": "Consolidated parent owners equity 11,561,541 million yen FY2025",
+                  "as_of": "2025-03-31"
+                },
+                "locked": true
+              },
+              {
+                "id": "shares_m",
+                "label": "Average shares outstanding",
+                "kind": "fact",
+                "value": 1452.982,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "9984.T/01_Official/IR/financial_report_q4fy2024_ja.pdf",
+                  "locator": "Average shares 1,452,982 thousand FY2025",
+                  "as_of": "2025-03-31"
+                },
+                "locked": true
+              }
+            ],
+            "assumptions": [
+              {
+                "id": "mtm_uplift_per_share",
+                "label": "Fair-value uplift above consolidated book for Arm, SoftBank Corp, and AI stakes",
+                "kind": "judgment",
+                "values": {
+                  "low": 500.0,
+                  "base": 2000.0,
+                  "high": 4500.0
+                },
+                "unit": "JPY_per_share",
+                "rationale": "Consolidated book embeds subsidiaries; uplift captures listed-stake and AI optionality not fully in book.",
+                "allowed_range": {
+                  "min": 0.0,
+                  "max": 8000.0
+                }
+              }
+            ],
+            "calculations": [],
+            "outputs": {
+              "low": "mtm_uplift_per_share",
+              "base": "mtm_uplift_per_share",
+              "high": "mtm_uplift_per_share"
+            }
+          },
+          "evidence_tier": "primary_derived",
+          "evidence": "Filing-backed proof from 9984.T/01_Official/IR/financial_report_q4fy2024_ja.pdf; overlap_key=investment_portfolio_uplift.",
+          "cross_check": "Reconcile to FY2025 securities report segment notes before decision use.",
+          "driver_model_type": null,
+          "driver_model": null,
+          "assumption_summary": "Proof outputs {'low': 500.0, 'base': 2000.0, 'high': 4500.0}; see calculation_proof graph.",
+          "falsifier": "Primary filing revises equity, financing structures, or share count >10% without proof update.",
+          "scenario_assumptions": null,
+          "low_per_share": 500.0,
+          "base_per_share": 2000.0,
+          "high_per_share": 4500.0
+        },
+        {
+          "id": "asset_backed_financing_reserve",
+          "label": "Asset-backed financing and forward reserve",
+          "category": "liability_or_reserve",
+          "overlap_key": "asset_backed_financing_reserve",
+          "treatment": "additive",
+          "included_in_component_id": null,
+          "method": "net_asset_value",
+          "valuation_status": "bounded_estimate",
+          "calculation_proof": {
+            "schema_version": "1.0",
+            "method_id": "net_asset_value",
+            "method_version": "1.0",
+            "output_unit": "JPY_per_share",
+            "inputs": [
+              {
+                "id": "financing_m",
+                "label": "Disclosed asset-backed financing (Arm margin, Alibaba forward, SoftBank Corp margin)",
+                "kind": "fact",
+                "value": 3052300,
+                "unit": "JPY_million",
+                "source": {
+                  "ref": "9984.T/01_Official/IR/financial_report_q4fy2024_ja.pdf",
+                  "locator": "Arm margin loan 1,258.5B yen; Alibaba forward 997.8B; SoftBank Corp margin 796B yen",
+                  "as_of": "2025-03-31"
+                },
+                "locked": true
+              },
+              {
+                "id": "shares_m",
+                "label": "Average shares outstanding",
+                "kind": "fact",
+                "value": 1452.982,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "9984.T/01_Official/IR/financial_report_q4fy2024_ja.pdf",
+                  "locator": "Average shares 1,452,982 thousand FY2025",
+                  "as_of": "2025-03-31"
+                },
+                "locked": true
+              }
+            ],
+            "assumptions": [
+              {
+                "id": "stress_pct",
+                "label": "Economic overhang on asset-backed financing structures",
+                "kind": "judgment",
+                "values": {
+                  "low": 0.35,
+                  "base": 0.25,
+                  "high": 0.15
+                },
+                "unit": "ratio",
+                "rationale": "Reserve for margin loans and forwards beyond filing book dhando floor.",
+                "allowed_range": {
+                  "min": 0.05,
+                  "max": 0.5
+                }
+              }
+            ],
+            "calculations": [
+              {
+                "id": "gross_per_share",
+                "op": "divide",
+                "args": [
+                  "financing_m",
+                  "shares_m"
+                ],
+                "unit": "JPY_per_share"
+              },
+              {
+                "id": "reserve_gross",
+                "op": "multiply",
+                "args": [
+                  "gross_per_share",
+                  "stress_pct"
+                ],
+                "unit": "JPY_per_share"
+              },
+              {
+                "id": "value_per_share",
+                "op": "negative",
+                "args": [
+                  "reserve_gross"
+                ],
+                "unit": "JPY_per_share"
+              }
+            ],
+            "outputs": {
+              "low": "value_per_share",
+              "base": "value_per_share",
+              "high": "value_per_share"
+            }
+          },
+          "evidence_tier": "primary_derived",
+          "evidence": "Filing-backed proof from 9984.T/01_Official/IR/financial_report_q4fy2024_ja.pdf; overlap_key=asset_backed_financing_reserve.",
+          "cross_check": "Reconcile to FY2025 securities report segment notes before decision use.",
+          "driver_model_type": null,
+          "driver_model": null,
+          "assumption_summary": "Proof outputs {'low': -735.25, 'base': -525.1786, 'high': -315.1071}; see calculation_proof graph.",
+          "falsifier": "Primary filing revises equity, financing structures, or share count >10% without proof update.",
+          "scenario_assumptions": null,
+          "low_per_share": -735.25,
+          "base_per_share": -525.18,
+          "high_per_share": -315.11
+        },
+        {
+          "id": "ai_vision_optionality",
+          "label": "AI infrastructure and Vision Fund optionality",
+          "category": "real_option",
+          "overlap_key": "ai_vision_optionality",
+          "treatment": "additive",
+          "included_in_component_id": null,
+          "method": "probability_weighted_catalyst_nav",
+          "valuation_status": "bounded_estimate",
+          "calculation_proof": {
+            "schema_version": "1.0",
+            "method_id": "probability_weighted_catalyst_nav",
+            "method_version": "1.0",
+            "output_unit": "JPY_per_share",
+            "inputs": [
+              {
+                "id": "openai_commitment_usd_b",
+                "label": "OpenAI Global commitment (net of syndication)",
+                "kind": "fact",
+                "value": 30.0,
+                "unit": "USD_billion",
+                "source": {
+                  "ref": "9984.T/01_Official/IR/financial_report_q4fy2024_ja.pdf",
+                  "locator": "OpenAI Global commitment up to $30B net of $10B syndication (FY2025 results)",
+                  "as_of": "2025-03-31"
+                },
+                "locked": true
+              }
+            ],
+            "assumptions": [
+              {
+                "id": "option_value_per_share",
+                "label": "Probability-weighted AI infrastructure and SVF optionality per share",
+                "kind": "judgment",
+                "values": {
+                  "low": 0.0,
+                  "base": 0.0,
+                  "high": 1500.0
+                },
+                "unit": "JPY_per_share",
+                "rationale": "Base stays $0 until operating cash from OpenAI/Stargate path is filing-backed; high case sizes partial success.",
+                "allowed_range": {
+                  "min": 0.0,
+                  "max": 3000.0
+                }
+              }
+            ],
+            "calculations": [],
+            "outputs": {
+              "low": "option_value_per_share",
+              "base": "option_value_per_share",
+              "high": "option_value_per_share"
+            }
+          },
+          "evidence_tier": "primary_derived",
+          "evidence": "Filing-backed proof from 9984.T/01_Official/IR/financial_report_q4fy2024_ja.pdf; overlap_key=ai_vision_optionality.",
+          "cross_check": "Reconcile to FY2025 securities report segment notes before decision use.",
+          "driver_model_type": null,
+          "driver_model": null,
+          "assumption_summary": "Proof outputs {'low': 0.0, 'base': 0.0, 'high': 1500.0}; see calculation_proof graph.",
+          "falsifier": "Primary filing revises equity, financing structures, or share count >10% without proof update.",
+          "scenario_assumptions": null,
+          "low_per_share": 0.0,
+          "base_per_share": 0.0,
+          "high_per_share": 1500.0
+        }
+      ],
+      "embedded_components": [],
+      "total_equity_value_per_share": {
+        "low": 7721.86,
+        "base": 9431.93,
+        "high": 13642.0
+      },
+      "material_component_count": 4,
+      "additive_component_count": 4,
+      "embedded_component_count": 0,
+      "market_price_per_share": 5918.0,
+      "upside_downside_pct": {
+        "low": 30.5,
+        "base": 59.4,
+        "high": 130.5
+      }
+    },
+    "reverse_expectations": {
+      "price": 5918.0,
+      "exit_multiple": 15.0,
+      "constant_owner_cash_growth_required_pct": 1.2,
+      "warning": "Required growth is a diagnostic, not a forecast."
+    },
+    "entry_prices": {
+      "10%": 3519.07,
+      "12%": 3173.53,
+      "15%": 2733.86
+    }
+  },
+  "synthesis": {
+    "status": "disabled_separated_views",
+    "reason": "Correlated operating paths and unsupported asset options must not be averaged into a consensus return."
+  },
+  "legacy_output_policy": {
+    "results_lawrence_legacy": "compatibility alias of the current operating scenarios; not a separate valuation",
+    "growth_explanation": "qualitative scenario context only; legacy numerical paths do not enter the decision",
+    "nav_overlay": "audit history only when decision_use is false",
+    "option_scan": "inventory disclosure only; asset value enters only through valuation_views.assets"
+  },
+  "context_overlay": {
+    "as_of": "2026-07-24",
+    "disclaimer": "Context only. Tailwinds inform stance and overlay sizing; they do not auto-inflate Lawrence base IRR. Promotion to base case requires [HUMAN REVIEW].",
+    "themes": [
+      {
+        "theme_id": "macro_regime",
+        "label": "Macro risk regime",
+        "indicators": [
+          {
+            "id": "hy_oas",
+            "label": "High-yield OAS credit spread (%)",
+            "latest": 1.97,
+            "as_of": "2026-07-24",
+            "yoy_pct": 233.9,
+            "direction": "up",
+            "good_for": "risk_regime",
+            "source": "spread:HYG-LQD:21d (HYG-LQD 1m spread proxy, not OAS)",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "ust_10y",
+            "label": "US Treasury 10Y yield (%)",
+            "latest": 4.666999816894531,
+            "as_of": "2026-07-24",
+            "yoy_pct": 5.9,
+            "direction": "up",
+            "good_for": "rates_regime",
+            "source": "yahoo:^TNX",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "ust_2y",
+            "label": "US Treasury 2Y yield (%)",
+            "latest": 4.424000263214111,
+            "as_of": "2026-07-24",
+            "yoy_pct": 11.4,
+            "direction": "up",
+            "good_for": "rates_regime",
+            "source": "yahoo:^FVX",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "dxy_broad",
+            "label": "Trade-weighted USD index (broad)",
+            "latest": 101.4520034790039,
+            "as_of": "2026-07-24",
+            "yoy_pct": 4.2,
+            "direction": "up",
+            "good_for": "dollar_regime",
+            "source": "yahoo:DX-Y.NYB",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "vix_level",
+            "label": "VIX index level",
+            "latest": 18.639999389648438,
+            "as_of": "2026-07-24",
+            "yoy_pct": 21.1,
+            "direction": "up",
+            "good_for": "vol_regime",
+            "source": "yahoo:^VIX",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "credit_impulse_1m",
+            "label": "HYG vs TLT 1-month return spread (%)",
+            "latest": 3.59,
+            "as_of": "2026-07-24",
+            "yoy_pct": 74.3,
+            "direction": "up",
+            "good_for": "credit_impulse",
+            "source": "spread:HYG-TLT:21d",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "spy_20d_realized_vol",
+            "label": "SPY 20-day realized vol (annualized %)",
+            "latest": 11.36,
+            "as_of": "2026-07-24",
+            "yoy_pct": 51.1,
+            "direction": "up",
+            "good_for": "equity_vol",
+            "source": "realized_vol:SPY:20d",
+            "stale": false,
+            "in_base_irr": false
+          }
+        ]
+      }
+    ]
+  },
+  "lens_consensus": {
+    "as_of": "2026-07-24",
+    "shared_inputs_ref": "valuation.json@2026-07-24",
+    "valuation_richness": 0.947,
+    "blended_return_pct": -0.41,
+    "band_pct": [
+      -3.6,
+      0.8
+    ],
+    "weighted_median_pct": 0.8,
+    "median_mean_flag": false,
+    "stance": "pass",
+    "agreement_pct": 100,
+    "dissent_count": 0,
+    "lawrence_divergence": false,
+    "top_dissents": [],
+    "contributor_count": 9,
+    "in_base_irr": false,
+    "disclaimer": "Advisory lens blend only. Does not replace Lawrence total-synthesis stance gate without [HUMAN REVIEW]."
+  }
+}
