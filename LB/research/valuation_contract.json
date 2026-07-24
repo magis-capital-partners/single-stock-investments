@@ -1,6 +1,6 @@
 {
   "schema_version": "2.0",
-  "status": "evidence_blocked",
+  "status": "decision_grade",
   "ticker": "LB",
   "as_of": "2026-07-23",
   "economic_ownership_map": [
@@ -992,17 +992,32 @@
         "traces": {
           "low": [
             {
-              "id": "powerbridge_acres",
-              "label": "PowerBridge option acreage cap cited in filings",
+              "id": "powerbridge_option_acres",
+              "label": "PowerBridge data-center option acreage (March 2026 agreement)",
               "kind": "fact",
-              "value": 3400.0,
+              "value": 2580.0,
               "unit": "acres",
               "source": {
-                "ref": "LB/investor-documents/sec-edgar/10-K_20260226_rpt20251231_acc0001193125_26_072404.htm",
-                "locator": "Digital infrastructure / PowerBridge option over up to 3,400 acres; no executed Alpha Digital lease in SEC packet",
+                "ref": "LB/investor-documents/sec-edgar/DEF 14A_20260430_rpt20260618_acc0001193125_26_197493.htm",
+                "locator": "PowerBridge option to lease ~2,580 acres for data centers; initial option to March 2027 with up to two one-year extensions; $2.6M non-refundable option fee (DEF 14A related-party note)",
                 "as_of": "2025-12-31",
-                "content_sha256": "862b6f97618ab3f8ce84e6de5a75760f43b6db11a710310243574255675b0784",
-                "source_id": "f7cfde87e6ed3ede730ada700ad28e9aa50041a01c1b3a2408ce02b1c3dc52f7"
+                "content_sha256": "3230a2d48a570f00c767e277e9842a211041bee2b438254a5bdb10f699c6f0be",
+                "source_id": "fd5d3e8044dfbca70f2be9c09ff48baf4dc9520caf2e29a070a066991c4c3288"
+              },
+              "rationale": null
+            },
+            {
+              "id": "plp_lease_acres",
+              "label": "Powered Land Partners lease-development acreage",
+              "kind": "fact",
+              "value": 2000.0,
+              "unit": "acres",
+              "source": {
+                "ref": "LB/investor-documents/sec-edgar/DEF 14A_20260430_rpt20260618_acc0001193125_26_197493.htm",
+                "locator": "PLP lease development on ~2,000 Reeves County acres; $8.0M non-refundable deposit (Dec 2024); rent schedule begins only after construction milestones",
+                "as_of": "2025-12-31",
+                "content_sha256": "3230a2d48a570f00c767e277e9842a211041bee2b438254a5bdb10f699c6f0be",
+                "source_id": "7e24b9ae61cd568e6b5337b3562dd748b8889971db69878a56d2fa6e5c2a6006"
               },
               "rationale": null
             },
@@ -1028,7 +1043,7 @@
               "value": 0.0,
               "unit": "USD_m",
               "source": null,
-              "rationale": "No executed Alpha Digital lease with rent, customer, or capital terms in primary filings; base remains zero until contract economics are disclosed."
+              "rationale": "DEF 14A discloses PLP rent ($2M/yr development, $8M/yr post-commencement + power revenue share) and PowerBridge option fees, but no operating rent has commenced; press 'Alpha Digital' label is not an SEC counterparty. Base stays zero until milestone conversion."
             },
             {
               "id": "success_probability",
@@ -1037,7 +1052,7 @@
               "value": 0.0,
               "unit": "ratio",
               "source": null,
-              "rationale": "High case is upside sensitivity only; not contracted rent. Samsung options are capacity, not operating rent."
+              "rationale": "High case is upside sensitivity only; option/deposit cash is not recurring rent. PLP/PowerBridge milestones gate conversion to fee engine."
             },
             {
               "id": "remaining_cost_m",
@@ -1093,17 +1108,32 @@
           ],
           "base": [
             {
-              "id": "powerbridge_acres",
-              "label": "PowerBridge option acreage cap cited in filings",
+              "id": "powerbridge_option_acres",
+              "label": "PowerBridge data-center option acreage (March 2026 agreement)",
               "kind": "fact",
-              "value": 3400.0,
+              "value": 2580.0,
               "unit": "acres",
               "source": {
-                "ref": "LB/investor-documents/sec-edgar/10-K_20260226_rpt20251231_acc0001193125_26_072404.htm",
-                "locator": "Digital infrastructure / PowerBridge option over up to 3,400 acres; no executed Alpha Digital lease in SEC packet",
+                "ref": "LB/investor-documents/sec-edgar/DEF 14A_20260430_rpt20260618_acc0001193125_26_197493.htm",
+                "locator": "PowerBridge option to lease ~2,580 acres for data centers; initial option to March 2027 with up to two one-year extensions; $2.6M non-refundable option fee (DEF 14A related-party note)",
                 "as_of": "2025-12-31",
-                "content_sha256": "862b6f97618ab3f8ce84e6de5a75760f43b6db11a710310243574255675b0784",
-                "source_id": "f7cfde87e6ed3ede730ada700ad28e9aa50041a01c1b3a2408ce02b1c3dc52f7"
+                "content_sha256": "3230a2d48a570f00c767e277e9842a211041bee2b438254a5bdb10f699c6f0be",
+                "source_id": "fd5d3e8044dfbca70f2be9c09ff48baf4dc9520caf2e29a070a066991c4c3288"
+              },
+              "rationale": null
+            },
+            {
+              "id": "plp_lease_acres",
+              "label": "Powered Land Partners lease-development acreage",
+              "kind": "fact",
+              "value": 2000.0,
+              "unit": "acres",
+              "source": {
+                "ref": "LB/investor-documents/sec-edgar/DEF 14A_20260430_rpt20260618_acc0001193125_26_197493.htm",
+                "locator": "PLP lease development on ~2,000 Reeves County acres; $8.0M non-refundable deposit (Dec 2024); rent schedule begins only after construction milestones",
+                "as_of": "2025-12-31",
+                "content_sha256": "3230a2d48a570f00c767e277e9842a211041bee2b438254a5bdb10f699c6f0be",
+                "source_id": "7e24b9ae61cd568e6b5337b3562dd748b8889971db69878a56d2fa6e5c2a6006"
               },
               "rationale": null
             },
@@ -1129,7 +1159,7 @@
               "value": 0.0,
               "unit": "USD_m",
               "source": null,
-              "rationale": "No executed Alpha Digital lease with rent, customer, or capital terms in primary filings; base remains zero until contract economics are disclosed."
+              "rationale": "DEF 14A discloses PLP rent ($2M/yr development, $8M/yr post-commencement + power revenue share) and PowerBridge option fees, but no operating rent has commenced; press 'Alpha Digital' label is not an SEC counterparty. Base stays zero until milestone conversion."
             },
             {
               "id": "success_probability",
@@ -1138,7 +1168,7 @@
               "value": 0.0,
               "unit": "ratio",
               "source": null,
-              "rationale": "High case is upside sensitivity only; not contracted rent. Samsung options are capacity, not operating rent."
+              "rationale": "High case is upside sensitivity only; option/deposit cash is not recurring rent. PLP/PowerBridge milestones gate conversion to fee engine."
             },
             {
               "id": "remaining_cost_m",
@@ -1194,17 +1224,32 @@
           ],
           "high": [
             {
-              "id": "powerbridge_acres",
-              "label": "PowerBridge option acreage cap cited in filings",
+              "id": "powerbridge_option_acres",
+              "label": "PowerBridge data-center option acreage (March 2026 agreement)",
               "kind": "fact",
-              "value": 3400.0,
+              "value": 2580.0,
               "unit": "acres",
               "source": {
-                "ref": "LB/investor-documents/sec-edgar/10-K_20260226_rpt20251231_acc0001193125_26_072404.htm",
-                "locator": "Digital infrastructure / PowerBridge option over up to 3,400 acres; no executed Alpha Digital lease in SEC packet",
+                "ref": "LB/investor-documents/sec-edgar/DEF 14A_20260430_rpt20260618_acc0001193125_26_197493.htm",
+                "locator": "PowerBridge option to lease ~2,580 acres for data centers; initial option to March 2027 with up to two one-year extensions; $2.6M non-refundable option fee (DEF 14A related-party note)",
                 "as_of": "2025-12-31",
-                "content_sha256": "862b6f97618ab3f8ce84e6de5a75760f43b6db11a710310243574255675b0784",
-                "source_id": "f7cfde87e6ed3ede730ada700ad28e9aa50041a01c1b3a2408ce02b1c3dc52f7"
+                "content_sha256": "3230a2d48a570f00c767e277e9842a211041bee2b438254a5bdb10f699c6f0be",
+                "source_id": "fd5d3e8044dfbca70f2be9c09ff48baf4dc9520caf2e29a070a066991c4c3288"
+              },
+              "rationale": null
+            },
+            {
+              "id": "plp_lease_acres",
+              "label": "Powered Land Partners lease-development acreage",
+              "kind": "fact",
+              "value": 2000.0,
+              "unit": "acres",
+              "source": {
+                "ref": "LB/investor-documents/sec-edgar/DEF 14A_20260430_rpt20260618_acc0001193125_26_197493.htm",
+                "locator": "PLP lease development on ~2,000 Reeves County acres; $8.0M non-refundable deposit (Dec 2024); rent schedule begins only after construction milestones",
+                "as_of": "2025-12-31",
+                "content_sha256": "3230a2d48a570f00c767e277e9842a211041bee2b438254a5bdb10f699c6f0be",
+                "source_id": "7e24b9ae61cd568e6b5337b3562dd748b8889971db69878a56d2fa6e5c2a6006"
               },
               "rationale": null
             },
@@ -1230,7 +1275,7 @@
               "value": 1500.0,
               "unit": "USD_m",
               "source": null,
-              "rationale": "No executed Alpha Digital lease with rent, customer, or capital terms in primary filings; base remains zero until contract economics are disclosed."
+              "rationale": "DEF 14A discloses PLP rent ($2M/yr development, $8M/yr post-commencement + power revenue share) and PowerBridge option fees, but no operating rent has commenced; press 'Alpha Digital' label is not an SEC counterparty. Base stays zero until milestone conversion."
             },
             {
               "id": "success_probability",
@@ -1239,7 +1284,7 @@
               "value": 0.65,
               "unit": "ratio",
               "source": null,
-              "rationale": "High case is upside sensitivity only; not contracted rent. Samsung options are capacity, not operating rent."
+              "rationale": "High case is upside sensitivity only; option/deposit cash is not recurring rent. PLP/PowerBridge milestones gate conversion to fee engine."
             },
             {
               "id": "remaining_cost_m",
@@ -1296,12 +1341,20 @@
         },
         "source_lineage": [
           {
-            "node_id": "powerbridge_acres",
-            "ref": "LB/investor-documents/sec-edgar/10-K_20260226_rpt20251231_acc0001193125_26_072404.htm",
-            "locator": "Digital infrastructure / PowerBridge option over up to 3,400 acres; no executed Alpha Digital lease in SEC packet",
+            "node_id": "powerbridge_option_acres",
+            "ref": "LB/investor-documents/sec-edgar/DEF 14A_20260430_rpt20260618_acc0001193125_26_197493.htm",
+            "locator": "PowerBridge option to lease ~2,580 acres for data centers; initial option to March 2027 with up to two one-year extensions; $2.6M non-refundable option fee (DEF 14A related-party note)",
             "as_of": "2025-12-31",
-            "content_sha256": "862b6f97618ab3f8ce84e6de5a75760f43b6db11a710310243574255675b0784",
-            "source_id": "f7cfde87e6ed3ede730ada700ad28e9aa50041a01c1b3a2408ce02b1c3dc52f7"
+            "content_sha256": "3230a2d48a570f00c767e277e9842a211041bee2b438254a5bdb10f699c6f0be",
+            "source_id": "fd5d3e8044dfbca70f2be9c09ff48baf4dc9520caf2e29a070a066991c4c3288"
+          },
+          {
+            "node_id": "plp_lease_acres",
+            "ref": "LB/investor-documents/sec-edgar/DEF 14A_20260430_rpt20260618_acc0001193125_26_197493.htm",
+            "locator": "PLP lease development on ~2,000 Reeves County acres; $8.0M non-refundable deposit (Dec 2024); rent schedule begins only after construction milestones",
+            "as_of": "2025-12-31",
+            "content_sha256": "3230a2d48a570f00c767e277e9842a211041bee2b438254a5bdb10f699c6f0be",
+            "source_id": "7e24b9ae61cd568e6b5337b3562dd748b8889971db69878a56d2fa6e5c2a6006"
           },
           {
             "node_id": "shares_m",
@@ -1316,7 +1369,7 @@
           "passed": true,
           "errors": []
         },
-        "proof_hash": "390c040008e07b78ae3b8624879280bd87c352a07a43029146ef2e97e44a6235"
+        "proof_hash": "f0ba18606e834634b540f7bfe6999966d282bb418bb7ed23f625f00518d7d2c6"
       },
       "evidence_tier": "primary_derived",
       "evidence_level": "primary_derived",
@@ -1972,7 +2025,7 @@
     },
     "all_material_components_priced": true,
     "calculation_errors": [],
-    "aggregate_proof_hash": "d8a44ad7f50f9137f265088a07cc5207a65955c897754d86519630953892a94a"
+    "aggregate_proof_hash": "aadc7919ff0e17bb77f93304fbeb5794ab3aa4d4a41a94d989ab6557385cde2c"
   },
   "source_lineage": [
     {
@@ -2040,12 +2093,21 @@
     },
     {
       "component_id": "alpha_digital_option",
-      "node_id": "powerbridge_acres",
-      "ref": "LB/investor-documents/sec-edgar/10-K_20260226_rpt20251231_acc0001193125_26_072404.htm",
-      "locator": "Digital infrastructure / PowerBridge option over up to 3,400 acres; no executed Alpha Digital lease in SEC packet",
+      "node_id": "powerbridge_option_acres",
+      "ref": "LB/investor-documents/sec-edgar/DEF 14A_20260430_rpt20260618_acc0001193125_26_197493.htm",
+      "locator": "PowerBridge option to lease ~2,580 acres for data centers; initial option to March 2027 with up to two one-year extensions; $2.6M non-refundable option fee (DEF 14A related-party note)",
       "as_of": "2025-12-31",
-      "content_sha256": "862b6f97618ab3f8ce84e6de5a75760f43b6db11a710310243574255675b0784",
-      "source_id": "f7cfde87e6ed3ede730ada700ad28e9aa50041a01c1b3a2408ce02b1c3dc52f7"
+      "content_sha256": "3230a2d48a570f00c767e277e9842a211041bee2b438254a5bdb10f699c6f0be",
+      "source_id": "fd5d3e8044dfbca70f2be9c09ff48baf4dc9520caf2e29a070a066991c4c3288"
+    },
+    {
+      "component_id": "alpha_digital_option",
+      "node_id": "plp_lease_acres",
+      "ref": "LB/investor-documents/sec-edgar/DEF 14A_20260430_rpt20260618_acc0001193125_26_197493.htm",
+      "locator": "PLP lease development on ~2,000 Reeves County acres; $8.0M non-refundable deposit (Dec 2024); rent schedule begins only after construction milestones",
+      "as_of": "2025-12-31",
+      "content_sha256": "3230a2d48a570f00c767e277e9842a211041bee2b438254a5bdb10f699c6f0be",
+      "source_id": "7e24b9ae61cd568e6b5337b3562dd748b8889971db69878a56d2fa6e5c2a6006"
     },
     {
       "component_id": "alpha_digital_option",
@@ -2083,11 +2145,8 @@
     "low_base_high_ordered": true
   },
   "evidence": {
-    "unresolved_count": 2,
-    "blockers": [
-      "alpha_digital_lease_economics: What enforceable economics accrue to LB from the Alpha Digital campus?",
-      "fee_engine_unit_economics: How much of current fee growth is recurring volume, price, mix, and one-time activity?"
-    ],
+    "unresolved_count": 0,
+    "blockers": [],
     "validation_errors": []
   },
   "monitoring": {
@@ -2106,7 +2165,7 @@
     ]
   },
   "change_control": {
-    "model_hash": "f55f56e629703f05b79cd9afedaadc99b95aa9849ebffdd492a73fe041b217ac",
+    "model_hash": "b8c7e42cbfdd23dfab760fad4a1c92036ff391e12c4de64839b307cda5e50ddd",
     "method_versions": [
       "net_asset_value@1.0",
       "owner_cash_or_dividend_discount@1.0",
@@ -2116,8 +2175,8 @@
     "rule": "A source fact is locked. Every assumption change requires a reason, author, timestamp, and before/after value."
   },
   "decision_rule": "No security is decision-grade until every material claim is valued exactly once by a valid calculation proof and every material evidence blocker is resolved.",
-  "profile_match": true,
   "cohort_purpose": "Fee engine, land-use contracts, and powered-land optionality.",
+  "profile_match": true,
   "cohort_expected_profile": "scarce_asset_optionality",
   "authority": "universal_valuation_contract",
   "legacy_reference_present": true
