@@ -190,7 +190,25 @@ def unique_dest(dest_dir: Path, name: str, drive_file_id: str) -> Path:
     return alt if not alt.exists() else dest_dir / f"{stem}-{drive_file_id}.pdf"
 
 
+def text_extract_path(pdf_path: Path) -> Path:
+    return pdf_path.with_suffix(".txt")
+
+
+def nontrivial_text_extract(path: Path, *, min_chars: int = 50) -> bool:
+    """True when a committed letter extract already exists (PDFs are gitignored)."""
+    if not path.exists():
+        return False
+    try:
+        text = path.read_text(encoding="utf-8", errors="ignore").strip()
+    except OSError:
+        return False
+    return len(text) >= min_chars
+
+
 def should_skip_download(local_pdf: Path, drive_size: int | None, manifest_entry: dict | None) -> bool:
+    # Vault commits .txt extracts only; treat a good extract as "already ingested".
+    if nontrivial_text_extract(text_extract_path(local_pdf)):
+        return True
     if not local_pdf.exists():
         return False
     if manifest_entry and manifest_entry.get("sha256"):
@@ -216,8 +234,10 @@ def resolve_local_pdf(
     """Return ``(path, skip_download)`` for a Drive letter PDF.
 
     Reuse an existing local file for this Drive id when content matches
-    (manifest sha256 or byte size). Only mint a file-id-suffixed name when
-    the basename is already occupied by a *different* file.
+    (manifest sha256 or byte size), or when a nontrivial ``.txt`` extract
+    already exists in the vault (PDFs are gitignored and not restored on
+    CI checkout). Only mint a file-id-suffixed name when the basename is
+    already occupied by a *different* file.
 
     Prior bug: ``unique_dest`` returned a fresh suffix path whenever the
     basename existed, so ``should_skip_download`` never saw the existing PDF
@@ -235,9 +255,9 @@ def resolve_local_pdf(
         if should_skip_download(existing, drive_size, manifest_entry):
             return existing, True
 
-    if not candidate.exists():
+    if not candidate.exists() and not nontrivial_text_extract(text_extract_path(candidate)):
         return candidate, False
-    if not alt_short.exists():
+    if not alt_short.exists() and not nontrivial_text_extract(text_extract_path(alt_short)):
         return alt_short, False
     return alt_full, False
 
@@ -540,17 +560,22 @@ def main() -> int:
             if skip:
                 skipped += 1
                 downloaded.append(dest)
-                # Refresh manifest path if we resolved via size match without an entry.
+                # Refresh manifest path if we resolved via size/text match without an entry.
                 if row["file_id"] not in manifest_files:
+                    txt_only = nontrivial_text_extract(text_extract_path(dest)) and not dest.exists()
+                    size_bytes = int(row.get("size_bytes") or 0)
+                    if dest.exists():
+                        size_bytes = int(dest.stat().st_size)
                     manifest_files[row["file_id"]] = {
                         "drive_file_id": row["file_id"],
                         "drive_path": row["drive_path"],
                         "local_pdf_path": path_to_letters_ref(dest) or str(dest).replace("\\", "/"),
                         "quarter": quarter,
-                        "size_bytes": int(row.get("size_bytes") or dest.stat().st_size),
+                        "size_bytes": size_bytes,
                         "webViewLink": row.get("webViewLink"),
                         "imported_at": now_iso(),
                         "skipped_existing": True,
+                        "skipped_existing_text": txt_only,
                     }
                 continue
             if new_downloads % 25 == 0 or i == len(candidates):
