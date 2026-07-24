@@ -16,7 +16,13 @@ runs:
     - name: Stage and push
       shell: bash
       run: |
-        git fetch origin main --depth=1 2>/dev/null || git fetch origin main
+        # Prefer a deepenable history over depth=1 so rebase onto a moving main
+        # still has a merge-base (letter-backfill publish failure mode).
+        if git rev-parse --is-shallow-repository 2>/dev/null | grep -qx true; then
+          git fetch --deepen=200 origin main 2>/dev/null || git fetch origin main
+        else
+          git fetch origin main
+        fi
         # --sparse allows staging paths written on disk that sit outside a
         # sparse-checkout cone (e.g. dashboard/data after a minimal checkout).
         git add --sparse ${{ inputs.git_add }}
