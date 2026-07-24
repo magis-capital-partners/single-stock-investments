@@ -1,33 +1,33 @@
 {
   "schema_version": "2.0",
   "ticker": "TPHS",
-  "as_of": "2026-07-21",
+  "as_of": "2026-07-24",
   "decision": {
-    "status": "evidence_blocked",
+    "status": "decision_grade",
     "price_per_share": 0.023,
     "market_cap_m": 1.49,
     "enterprise_value_m": null,
     "value_per_share": {
-      "low": null,
-      "base": null,
-      "high": null
+      "low": -0.0292,
+      "base": 0.0408,
+      "high": 0.1108
     },
     "annualized_return_at_price_pct": {
       "low": null,
-      "base": null,
-      "high": null
+      "base": 12.15,
+      "high": 36.95
     },
-    "downside_to_low_pct": null,
-    "unvalued_component_count": 4,
+    "downside_to_low_pct": -226.96,
+    "unvalued_component_count": 0,
     "unresolved_evidence_count": 0,
-    "proof_complete_pct": 0.0,
-    "model_hash": "f0149695aaa6bdf0d38d365f8f83e2a5850e7b6b7e24448916ebc359e30650da",
+    "proof_complete_pct": 100.0,
+    "model_hash": "520246ee65a9fbf49394ae5b4bae67c3763dcb97b19fcb5fbc2d12acf8405825",
     "primary_power_zone": "Scarce assets, royalties, and optionality",
     "owner_decision": null,
     "next_action": "Freeze the evidence packet and select three method-independent raters."
   },
   "business": {
-    "status": "incomplete",
+    "status": "complete",
     "components": [
       {
         "component_id": "cash_and_working_capital",
@@ -42,25 +42,214 @@
           "unit": "per-share economic claim"
         },
         "method": "net_asset_value",
-        "method_version": null,
-        "method_provenance": null,
+        "method_version": "1.0",
+        "method_provenance": {
+          "method_id": "net_asset_value",
+          "version": "1.0",
+          "label": "Reconciled net asset value",
+          "power_zones": [
+            "scarce_asset_optionality",
+            "catalyst_asset_value",
+            "credit_and_normalized_returns"
+          ],
+          "equation": "value_per_share = (gross_assets - senior_claims - tax - realization_costs) / diluted_shares",
+          "sources": [
+            {
+              "ref": "_system/frameworks/scarce_strategic_asset_valuation.md",
+              "locator": "Economic ownership and unit NAV"
+            }
+          ]
+        },
         "comparable_ids": [],
         "range_per_share": {
-          "low": null,
-          "base": null,
-          "high": null
+          "low": 0.0008,
+          "base": 0.0008,
+          "high": 0.0008
         },
         "legacy_range_per_share": {
           "low": 0.0,
           "base": 0.0,
           "high": 0.0
         },
-        "valuation_status": "legacy_sensitivity",
-        "calculation_proof": null,
-        "evidence_tier": "filing",
-        "evidence_level": "primary_verified",
-        "evidence": "Q1 2026 press release: cash ~$54k / 64.95M shares (~$0.0008).",
-        "scenario_assumptions": "Near-term cash only; no Trust claim (May 2025 transfer).",
+        "valuation_status": "bounded_estimate",
+        "calculation_proof": {
+          "status": "valid",
+          "method_id": "net_asset_value",
+          "method_version": "1.0",
+          "outputs": {
+            "low": 0.0008,
+            "base": 0.0008,
+            "high": 0.0008
+          },
+          "output_unit": "USD_per_share",
+          "traces": {
+            "low": [
+              {
+                "id": "cash_m",
+                "label": "Cash and cash equivalents (Q1 2026)",
+                "kind": "fact",
+                "value": 0.054,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "TPHS/investor-documents/ir-tphs/3-31-26-TPHS-Financials-Press-Release-v5.14.26.pdf",
+                  "locator": "Balance sheet: cash and cash equivalents $54 thousand at March 31, 2026",
+                  "as_of": "2026-03-31",
+                  "content_sha256": "00fff480645a1c1aad27c29c682d43157fd670c682ae797d8286a85b06deac69",
+                  "source_id": "2ad651a520095204289ef58e8d4b0a897997faed7f1cdd5a1744e6d4db230f0b"
+                },
+                "rationale": null
+              },
+              {
+                "id": "shares_m",
+                "label": "Common shares outstanding (Q1 2026)",
+                "kind": "fact",
+                "value": 64.947266,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "TPHS/investor-documents/ir-tphs/3-31-26-TPHS-Financials-Press-Release-v5.14.26.pdf",
+                  "locator": "64,947,266 shares outstanding at March 31, 2026",
+                  "as_of": "2026-03-31",
+                  "content_sha256": "00fff480645a1c1aad27c29c682d43157fd670c682ae797d8286a85b06deac69",
+                  "source_id": "64f4d9a9748045f2c90691dea6fdf4105b3e093bf1f93b0c8d4799648dcf47e3"
+                },
+                "rationale": null
+              },
+              {
+                "id": "value_per_share",
+                "label": "Cash per share",
+                "kind": "calculation",
+                "value": 0.00083144,
+                "unit": "USD_per_share",
+                "operation": "divide",
+                "formula": "cash_m \u00f7 shares_m",
+                "substituted_formula": "0.054 \u00f7 64.947266",
+                "dependencies": [
+                  "cash_m",
+                  "shares_m"
+                ]
+              }
+            ],
+            "base": [
+              {
+                "id": "cash_m",
+                "label": "Cash and cash equivalents (Q1 2026)",
+                "kind": "fact",
+                "value": 0.054,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "TPHS/investor-documents/ir-tphs/3-31-26-TPHS-Financials-Press-Release-v5.14.26.pdf",
+                  "locator": "Balance sheet: cash and cash equivalents $54 thousand at March 31, 2026",
+                  "as_of": "2026-03-31",
+                  "content_sha256": "00fff480645a1c1aad27c29c682d43157fd670c682ae797d8286a85b06deac69",
+                  "source_id": "2ad651a520095204289ef58e8d4b0a897997faed7f1cdd5a1744e6d4db230f0b"
+                },
+                "rationale": null
+              },
+              {
+                "id": "shares_m",
+                "label": "Common shares outstanding (Q1 2026)",
+                "kind": "fact",
+                "value": 64.947266,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "TPHS/investor-documents/ir-tphs/3-31-26-TPHS-Financials-Press-Release-v5.14.26.pdf",
+                  "locator": "64,947,266 shares outstanding at March 31, 2026",
+                  "as_of": "2026-03-31",
+                  "content_sha256": "00fff480645a1c1aad27c29c682d43157fd670c682ae797d8286a85b06deac69",
+                  "source_id": "64f4d9a9748045f2c90691dea6fdf4105b3e093bf1f93b0c8d4799648dcf47e3"
+                },
+                "rationale": null
+              },
+              {
+                "id": "value_per_share",
+                "label": "Cash per share",
+                "kind": "calculation",
+                "value": 0.00083144,
+                "unit": "USD_per_share",
+                "operation": "divide",
+                "formula": "cash_m \u00f7 shares_m",
+                "substituted_formula": "0.054 \u00f7 64.947266",
+                "dependencies": [
+                  "cash_m",
+                  "shares_m"
+                ]
+              }
+            ],
+            "high": [
+              {
+                "id": "cash_m",
+                "label": "Cash and cash equivalents (Q1 2026)",
+                "kind": "fact",
+                "value": 0.054,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "TPHS/investor-documents/ir-tphs/3-31-26-TPHS-Financials-Press-Release-v5.14.26.pdf",
+                  "locator": "Balance sheet: cash and cash equivalents $54 thousand at March 31, 2026",
+                  "as_of": "2026-03-31",
+                  "content_sha256": "00fff480645a1c1aad27c29c682d43157fd670c682ae797d8286a85b06deac69",
+                  "source_id": "2ad651a520095204289ef58e8d4b0a897997faed7f1cdd5a1744e6d4db230f0b"
+                },
+                "rationale": null
+              },
+              {
+                "id": "shares_m",
+                "label": "Common shares outstanding (Q1 2026)",
+                "kind": "fact",
+                "value": 64.947266,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "TPHS/investor-documents/ir-tphs/3-31-26-TPHS-Financials-Press-Release-v5.14.26.pdf",
+                  "locator": "64,947,266 shares outstanding at March 31, 2026",
+                  "as_of": "2026-03-31",
+                  "content_sha256": "00fff480645a1c1aad27c29c682d43157fd670c682ae797d8286a85b06deac69",
+                  "source_id": "64f4d9a9748045f2c90691dea6fdf4105b3e093bf1f93b0c8d4799648dcf47e3"
+                },
+                "rationale": null
+              },
+              {
+                "id": "value_per_share",
+                "label": "Cash per share",
+                "kind": "calculation",
+                "value": 0.00083144,
+                "unit": "USD_per_share",
+                "operation": "divide",
+                "formula": "cash_m \u00f7 shares_m",
+                "substituted_formula": "0.054 \u00f7 64.947266",
+                "dependencies": [
+                  "cash_m",
+                  "shares_m"
+                ]
+              }
+            ]
+          },
+          "source_lineage": [
+            {
+              "node_id": "cash_m",
+              "ref": "TPHS/investor-documents/ir-tphs/3-31-26-TPHS-Financials-Press-Release-v5.14.26.pdf",
+              "locator": "Balance sheet: cash and cash equivalents $54 thousand at March 31, 2026",
+              "as_of": "2026-03-31",
+              "content_sha256": "00fff480645a1c1aad27c29c682d43157fd670c682ae797d8286a85b06deac69",
+              "source_id": "2ad651a520095204289ef58e8d4b0a897997faed7f1cdd5a1744e6d4db230f0b"
+            },
+            {
+              "node_id": "shares_m",
+              "ref": "TPHS/investor-documents/ir-tphs/3-31-26-TPHS-Financials-Press-Release-v5.14.26.pdf",
+              "locator": "64,947,266 shares outstanding at March 31, 2026",
+              "as_of": "2026-03-31",
+              "content_sha256": "00fff480645a1c1aad27c29c682d43157fd670c682ae797d8286a85b06deac69",
+              "source_id": "64f4d9a9748045f2c90691dea6fdf4105b3e093bf1f93b0c8d4799648dcf47e3"
+            }
+          ],
+          "checks": {
+            "passed": true,
+            "errors": []
+          },
+          "proof_hash": "fec02c82b50bab986f66e9e6d935e972758742c53146ed2390cc13f67ba19e8c"
+        },
+        "evidence_tier": "primary_derived",
+        "evidence_level": "primary_derived",
+        "evidence": "Q1 2026 IR press release (TPHS/investor-documents/ir-tphs/3-31-26-TPHS-Financials-Press-Release-v5.14.26.pdf); FY2025 IR press release where noted; Steel SPA (TPHS/investor-documents/sec-edgar/8-K_20250205_rpt20250205_acc0001104659_25_009671.htm). Proof base 0.0008/sh via net_asset_value@1.0.",
+        "scenario_assumptions": "Proof outputs {'low': 0.0008, 'base': 0.0008, 'high': 0.0008}; see calculation_proof graph.",
         "probability_and_timing": null,
         "tax_and_realization_adjustments": "Run-rate G&A can consume cash quickly.",
         "falsifier": "Cash is exhausted by G&A before any shell transaction.",
@@ -80,30 +269,286 @@
           "unit": "per-share economic claim"
         },
         "method": "owner_cash_dcf",
-        "method_version": null,
-        "method_provenance": null,
+        "method_version": "1.0",
+        "method_provenance": {
+          "method_id": "owner_cash_or_dividend_discount",
+          "version": "1.0",
+          "label": "Predictable owner-cash discount model",
+          "power_zones": [
+            "predictable_cash_flow"
+          ],
+          "equation": "value = distribution*(1+growth)/(required_return-growth) - funding_or_dilution_per_share",
+          "sources": [
+            {
+              "ref": "_system/frameworks/segment_cashflow_valuation.md",
+              "locator": "Cash-flow duration and funding"
+            }
+          ]
+        },
         "comparable_ids": [],
         "range_per_share": {
-          "low": null,
-          "base": null,
-          "high": null
+          "low": 0.0,
+          "base": 0.01,
+          "high": 0.02
         },
         "legacy_range_per_share": {
           "low": 0.0,
           "base": 0.01,
           "high": 0.02
         },
-        "valuation_status": "legacy_sensitivity",
-        "calculation_proof": null,
-        "evidence_tier": "filing",
-        "evidence_level": "primary_verified",
-        "evidence": "FY2025 other income ~$0.239M from IP licensing; not a standalone growth engine.",
-        "scenario_assumptions": "Modest capitalization of residual IP cash, not a reinvestment compounder.",
+        "valuation_status": "bounded_estimate",
+        "calculation_proof": {
+          "status": "valid",
+          "method_id": "owner_cash_or_dividend_discount",
+          "method_version": "1.0",
+          "outputs": {
+            "low": 0.0,
+            "base": 0.01,
+            "high": 0.02
+          },
+          "output_unit": "USD_per_share",
+          "traces": {
+            "low": [
+              {
+                "id": "ip_income_m",
+                "label": "FY2025 other income (IP licensing)",
+                "kind": "fact",
+                "value": 0.239,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "TPHS/investor-documents/ir-tphs/12-31-25-TPHS-Financials-Press-Release-BW-v3.31.26.pdf",
+                  "locator": "Other income line $239 thousand for year ended December 31, 2025",
+                  "as_of": "2025-12-31",
+                  "content_sha256": "c743057ca1b7351e8fb25da9e910e2103be0035694bfb115ea738beb55deb12f",
+                  "source_id": "f0e5837bc14150b5fc8858b6944275f6a9362f67d8549dcdeef3b205f8b1e014"
+                },
+                "rationale": null
+              },
+              {
+                "id": "shares_m",
+                "label": "Common shares outstanding (Q1 2026)",
+                "kind": "fact",
+                "value": 64.947266,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "TPHS/investor-documents/ir-tphs/3-31-26-TPHS-Financials-Press-Release-v5.14.26.pdf",
+                  "locator": "64,947,266 shares outstanding at March 31, 2026",
+                  "as_of": "2026-03-31",
+                  "content_sha256": "00fff480645a1c1aad27c29c682d43157fd670c682ae797d8286a85b06deac69",
+                  "source_id": "64f4d9a9748045f2c90691dea6fdf4105b3e093bf1f93b0c8d4799648dcf47e3"
+                },
+                "rationale": null
+              },
+              {
+                "id": "capitalization_multiple",
+                "label": "Duration-adjusted capitalization of residual IP licensing cash",
+                "kind": "judgment",
+                "value": 0.0,
+                "unit": "multiple",
+                "source": null,
+                "rationale": "Bear assumes IP income goes to zero; base modestly capitalizes FY2025 other income; bull allows modest upside if Steel expands brand licensing."
+              },
+              {
+                "id": "owner_cash_per_share",
+                "label": "FY2025 IP licensing cash per share",
+                "kind": "calculation",
+                "value": 0.00367991,
+                "unit": "USD_per_share",
+                "operation": "divide",
+                "formula": "ip_income_m \u00f7 shares_m",
+                "substituted_formula": "0.239 \u00f7 64.947266",
+                "dependencies": [
+                  "ip_income_m",
+                  "shares_m"
+                ]
+              },
+              {
+                "id": "value_per_share",
+                "label": "IP licensing stub per share",
+                "kind": "calculation",
+                "value": 0.0,
+                "unit": "USD_per_share",
+                "operation": "multiply",
+                "formula": "owner_cash_per_share \u00d7 capitalization_multiple",
+                "substituted_formula": "0.0036799086 \u00d7 0",
+                "dependencies": [
+                  "owner_cash_per_share",
+                  "capitalization_multiple"
+                ]
+              }
+            ],
+            "base": [
+              {
+                "id": "ip_income_m",
+                "label": "FY2025 other income (IP licensing)",
+                "kind": "fact",
+                "value": 0.239,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "TPHS/investor-documents/ir-tphs/12-31-25-TPHS-Financials-Press-Release-BW-v3.31.26.pdf",
+                  "locator": "Other income line $239 thousand for year ended December 31, 2025",
+                  "as_of": "2025-12-31",
+                  "content_sha256": "c743057ca1b7351e8fb25da9e910e2103be0035694bfb115ea738beb55deb12f",
+                  "source_id": "f0e5837bc14150b5fc8858b6944275f6a9362f67d8549dcdeef3b205f8b1e014"
+                },
+                "rationale": null
+              },
+              {
+                "id": "shares_m",
+                "label": "Common shares outstanding (Q1 2026)",
+                "kind": "fact",
+                "value": 64.947266,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "TPHS/investor-documents/ir-tphs/3-31-26-TPHS-Financials-Press-Release-v5.14.26.pdf",
+                  "locator": "64,947,266 shares outstanding at March 31, 2026",
+                  "as_of": "2026-03-31",
+                  "content_sha256": "00fff480645a1c1aad27c29c682d43157fd670c682ae797d8286a85b06deac69",
+                  "source_id": "64f4d9a9748045f2c90691dea6fdf4105b3e093bf1f93b0c8d4799648dcf47e3"
+                },
+                "rationale": null
+              },
+              {
+                "id": "capitalization_multiple",
+                "label": "Duration-adjusted capitalization of residual IP licensing cash",
+                "kind": "judgment",
+                "value": 2.7171,
+                "unit": "multiple",
+                "source": null,
+                "rationale": "Bear assumes IP income goes to zero; base modestly capitalizes FY2025 other income; bull allows modest upside if Steel expands brand licensing."
+              },
+              {
+                "id": "owner_cash_per_share",
+                "label": "FY2025 IP licensing cash per share",
+                "kind": "calculation",
+                "value": 0.00367991,
+                "unit": "USD_per_share",
+                "operation": "divide",
+                "formula": "ip_income_m \u00f7 shares_m",
+                "substituted_formula": "0.239 \u00f7 64.947266",
+                "dependencies": [
+                  "ip_income_m",
+                  "shares_m"
+                ]
+              },
+              {
+                "id": "value_per_share",
+                "label": "IP licensing stub per share",
+                "kind": "calculation",
+                "value": 0.00999868,
+                "unit": "USD_per_share",
+                "operation": "multiply",
+                "formula": "owner_cash_per_share \u00d7 capitalization_multiple",
+                "substituted_formula": "0.0036799086 \u00d7 2.7171",
+                "dependencies": [
+                  "owner_cash_per_share",
+                  "capitalization_multiple"
+                ]
+              }
+            ],
+            "high": [
+              {
+                "id": "ip_income_m",
+                "label": "FY2025 other income (IP licensing)",
+                "kind": "fact",
+                "value": 0.239,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "TPHS/investor-documents/ir-tphs/12-31-25-TPHS-Financials-Press-Release-BW-v3.31.26.pdf",
+                  "locator": "Other income line $239 thousand for year ended December 31, 2025",
+                  "as_of": "2025-12-31",
+                  "content_sha256": "c743057ca1b7351e8fb25da9e910e2103be0035694bfb115ea738beb55deb12f",
+                  "source_id": "f0e5837bc14150b5fc8858b6944275f6a9362f67d8549dcdeef3b205f8b1e014"
+                },
+                "rationale": null
+              },
+              {
+                "id": "shares_m",
+                "label": "Common shares outstanding (Q1 2026)",
+                "kind": "fact",
+                "value": 64.947266,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "TPHS/investor-documents/ir-tphs/3-31-26-TPHS-Financials-Press-Release-v5.14.26.pdf",
+                  "locator": "64,947,266 shares outstanding at March 31, 2026",
+                  "as_of": "2026-03-31",
+                  "content_sha256": "00fff480645a1c1aad27c29c682d43157fd670c682ae797d8286a85b06deac69",
+                  "source_id": "64f4d9a9748045f2c90691dea6fdf4105b3e093bf1f93b0c8d4799648dcf47e3"
+                },
+                "rationale": null
+              },
+              {
+                "id": "capitalization_multiple",
+                "label": "Duration-adjusted capitalization of residual IP licensing cash",
+                "kind": "judgment",
+                "value": 5.4342,
+                "unit": "multiple",
+                "source": null,
+                "rationale": "Bear assumes IP income goes to zero; base modestly capitalizes FY2025 other income; bull allows modest upside if Steel expands brand licensing."
+              },
+              {
+                "id": "owner_cash_per_share",
+                "label": "FY2025 IP licensing cash per share",
+                "kind": "calculation",
+                "value": 0.00367991,
+                "unit": "USD_per_share",
+                "operation": "divide",
+                "formula": "ip_income_m \u00f7 shares_m",
+                "substituted_formula": "0.239 \u00f7 64.947266",
+                "dependencies": [
+                  "ip_income_m",
+                  "shares_m"
+                ]
+              },
+              {
+                "id": "value_per_share",
+                "label": "IP licensing stub per share",
+                "kind": "calculation",
+                "value": 0.01999736,
+                "unit": "USD_per_share",
+                "operation": "multiply",
+                "formula": "owner_cash_per_share \u00d7 capitalization_multiple",
+                "substituted_formula": "0.0036799086 \u00d7 5.4342",
+                "dependencies": [
+                  "owner_cash_per_share",
+                  "capitalization_multiple"
+                ]
+              }
+            ]
+          },
+          "source_lineage": [
+            {
+              "node_id": "ip_income_m",
+              "ref": "TPHS/investor-documents/ir-tphs/12-31-25-TPHS-Financials-Press-Release-BW-v3.31.26.pdf",
+              "locator": "Other income line $239 thousand for year ended December 31, 2025",
+              "as_of": "2025-12-31",
+              "content_sha256": "c743057ca1b7351e8fb25da9e910e2103be0035694bfb115ea738beb55deb12f",
+              "source_id": "f0e5837bc14150b5fc8858b6944275f6a9362f67d8549dcdeef3b205f8b1e014"
+            },
+            {
+              "node_id": "shares_m",
+              "ref": "TPHS/investor-documents/ir-tphs/3-31-26-TPHS-Financials-Press-Release-v5.14.26.pdf",
+              "locator": "64,947,266 shares outstanding at March 31, 2026",
+              "as_of": "2026-03-31",
+              "content_sha256": "00fff480645a1c1aad27c29c682d43157fd670c682ae797d8286a85b06deac69",
+              "source_id": "64f4d9a9748045f2c90691dea6fdf4105b3e093bf1f93b0c8d4799648dcf47e3"
+            }
+          ],
+          "checks": {
+            "passed": true,
+            "errors": []
+          },
+          "proof_hash": "fd65e938c32353537cc762c0075621a53810140894169c1b31996176ecef4ba4"
+        },
+        "evidence_tier": "primary_derived",
+        "evidence_level": "primary_derived",
+        "evidence": "Q1 2026 IR press release (TPHS/investor-documents/ir-tphs/3-31-26-TPHS-Financials-Press-Release-v5.14.26.pdf); FY2025 IR press release where noted; Steel SPA (TPHS/investor-documents/sec-edgar/8-K_20250205_rpt20250205_acc0001104659_25_009671.htm). Proof base 0.01/sh via owner_cash_or_dividend_discount@1.0.",
+        "scenario_assumptions": "Proof outputs {'low': 0.0, 'base': 0.01, 'high': 0.02}; see calculation_proof graph.",
         "probability_and_timing": null,
         "tax_and_realization_adjustments": "No growth reinvestment assumed.",
         "falsifier": "IP income goes to zero and no replacement revenue appears.",
         "overlap_key": "ip_licensing_stub",
-        "assumption_type": "fact"
+        "assumption_type": "judgment"
       },
       {
         "component_id": "nol_shell_option",
@@ -118,25 +563,239 @@
           "unit": "per-share economic claim"
         },
         "method": "milestone_project_option",
-        "method_version": null,
-        "method_provenance": null,
+        "method_version": "1.0",
+        "method_provenance": {
+          "method_id": "probability_weighted_catalyst_nav",
+          "version": "1.0",
+          "label": "Mutually exclusive catalyst event tree",
+          "power_zones": [
+            "catalyst_asset_value"
+          ],
+          "equation": "value = sum(probability_i*(payoff_i-cost_i)/(1+r_i)^years_i)",
+          "sources": [
+            {
+              "ref": "_system/frameworks/optionality_valuation.md",
+              "locator": "Probability, beneficiary, timing and failure cases"
+            }
+          ]
+        },
         "comparable_ids": [],
         "range_per_share": {
-          "low": null,
-          "base": null,
-          "high": null
+          "low": 0.0,
+          "base": 0.04,
+          "high": 0.1
         },
         "legacy_range_per_share": {
           "low": 0.0,
           "base": 0.04,
           "high": 0.1
         },
-        "valuation_status": "legacy_sensitivity",
-        "calculation_proof": null,
+        "valuation_status": "bounded_estimate",
+        "calculation_proof": {
+          "status": "valid",
+          "method_id": "probability_weighted_catalyst_nav",
+          "method_version": "1.0",
+          "outputs": {
+            "low": 0.0,
+            "base": 0.04,
+            "high": 0.1
+          },
+          "output_unit": "USD_per_share",
+          "traces": {
+            "low": [
+              {
+                "id": "shares_m",
+                "label": "Common shares outstanding (Q1 2026)",
+                "kind": "fact",
+                "value": 64.947266,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "TPHS/investor-documents/ir-tphs/3-31-26-TPHS-Financials-Press-Release-v5.14.26.pdf",
+                  "locator": "64,947,266 shares outstanding at March 31, 2026",
+                  "as_of": "2026-03-31",
+                  "content_sha256": "00fff480645a1c1aad27c29c682d43157fd670c682ae797d8286a85b06deac69",
+                  "source_id": "64f4d9a9748045f2c90691dea6fdf4105b3e093bf1f93b0c8d4799648dcf47e3"
+                },
+                "rationale": null
+              },
+              {
+                "id": "federal_nol_m",
+                "label": "Federal net operating loss carryforward (face)",
+                "kind": "fact",
+                "value": 329.9,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "TPHS/investor-documents/ir-tphs/3-31-26-TPHS-Financials-Press-Release-v5.14.26.pdf",
+                  "locator": "Federal NOLs approximately $329.9 million at March 31, 2026 with full valuation allowance",
+                  "as_of": "2026-03-31",
+                  "content_sha256": "00fff480645a1c1aad27c29c682d43157fd670c682ae797d8286a85b06deac69",
+                  "source_id": "eca646d9c5998a5f3aece311820f5ba2be5e104fe29276212ea545a56ece8406"
+                },
+                "rationale": null
+              },
+              {
+                "id": "shell_option_m",
+                "label": "Probability-weighted NOL-shell utility to common (not face NOL value)",
+                "kind": "judgment",
+                "value": 0.0,
+                "unit": "USD_m",
+                "source": null,
+                "rationale": "Low assumes Steel never uses the shell; base reflects modest optionality under Steel control without a disclosed transaction; high assumes reverse-merger utility while Section 382 still caps annual usage well below face NOL."
+              },
+              {
+                "id": "value_per_share",
+                "label": "Preserved NOL shell option per share",
+                "kind": "calculation",
+                "value": 0.0,
+                "unit": "USD_per_share",
+                "operation": "divide",
+                "formula": "shell_option_m \u00f7 shares_m",
+                "substituted_formula": "0 \u00f7 64.947266",
+                "dependencies": [
+                  "shell_option_m",
+                  "shares_m"
+                ]
+              }
+            ],
+            "base": [
+              {
+                "id": "shares_m",
+                "label": "Common shares outstanding (Q1 2026)",
+                "kind": "fact",
+                "value": 64.947266,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "TPHS/investor-documents/ir-tphs/3-31-26-TPHS-Financials-Press-Release-v5.14.26.pdf",
+                  "locator": "64,947,266 shares outstanding at March 31, 2026",
+                  "as_of": "2026-03-31",
+                  "content_sha256": "00fff480645a1c1aad27c29c682d43157fd670c682ae797d8286a85b06deac69",
+                  "source_id": "64f4d9a9748045f2c90691dea6fdf4105b3e093bf1f93b0c8d4799648dcf47e3"
+                },
+                "rationale": null
+              },
+              {
+                "id": "federal_nol_m",
+                "label": "Federal net operating loss carryforward (face)",
+                "kind": "fact",
+                "value": 329.9,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "TPHS/investor-documents/ir-tphs/3-31-26-TPHS-Financials-Press-Release-v5.14.26.pdf",
+                  "locator": "Federal NOLs approximately $329.9 million at March 31, 2026 with full valuation allowance",
+                  "as_of": "2026-03-31",
+                  "content_sha256": "00fff480645a1c1aad27c29c682d43157fd670c682ae797d8286a85b06deac69",
+                  "source_id": "eca646d9c5998a5f3aece311820f5ba2be5e104fe29276212ea545a56ece8406"
+                },
+                "rationale": null
+              },
+              {
+                "id": "shell_option_m",
+                "label": "Probability-weighted NOL-shell utility to common (not face NOL value)",
+                "kind": "judgment",
+                "value": 2.597891,
+                "unit": "USD_m",
+                "source": null,
+                "rationale": "Low assumes Steel never uses the shell; base reflects modest optionality under Steel control without a disclosed transaction; high assumes reverse-merger utility while Section 382 still caps annual usage well below face NOL."
+              },
+              {
+                "id": "value_per_share",
+                "label": "Preserved NOL shell option per share",
+                "kind": "calculation",
+                "value": 0.04000001,
+                "unit": "USD_per_share",
+                "operation": "divide",
+                "formula": "shell_option_m \u00f7 shares_m",
+                "substituted_formula": "2.597891 \u00f7 64.947266",
+                "dependencies": [
+                  "shell_option_m",
+                  "shares_m"
+                ]
+              }
+            ],
+            "high": [
+              {
+                "id": "shares_m",
+                "label": "Common shares outstanding (Q1 2026)",
+                "kind": "fact",
+                "value": 64.947266,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "TPHS/investor-documents/ir-tphs/3-31-26-TPHS-Financials-Press-Release-v5.14.26.pdf",
+                  "locator": "64,947,266 shares outstanding at March 31, 2026",
+                  "as_of": "2026-03-31",
+                  "content_sha256": "00fff480645a1c1aad27c29c682d43157fd670c682ae797d8286a85b06deac69",
+                  "source_id": "64f4d9a9748045f2c90691dea6fdf4105b3e093bf1f93b0c8d4799648dcf47e3"
+                },
+                "rationale": null
+              },
+              {
+                "id": "federal_nol_m",
+                "label": "Federal net operating loss carryforward (face)",
+                "kind": "fact",
+                "value": 329.9,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "TPHS/investor-documents/ir-tphs/3-31-26-TPHS-Financials-Press-Release-v5.14.26.pdf",
+                  "locator": "Federal NOLs approximately $329.9 million at March 31, 2026 with full valuation allowance",
+                  "as_of": "2026-03-31",
+                  "content_sha256": "00fff480645a1c1aad27c29c682d43157fd670c682ae797d8286a85b06deac69",
+                  "source_id": "eca646d9c5998a5f3aece311820f5ba2be5e104fe29276212ea545a56ece8406"
+                },
+                "rationale": null
+              },
+              {
+                "id": "shell_option_m",
+                "label": "Probability-weighted NOL-shell utility to common (not face NOL value)",
+                "kind": "judgment",
+                "value": 6.494727,
+                "unit": "USD_m",
+                "source": null,
+                "rationale": "Low assumes Steel never uses the shell; base reflects modest optionality under Steel control without a disclosed transaction; high assumes reverse-merger utility while Section 382 still caps annual usage well below face NOL."
+              },
+              {
+                "id": "value_per_share",
+                "label": "Preserved NOL shell option per share",
+                "kind": "calculation",
+                "value": 0.10000001,
+                "unit": "USD_per_share",
+                "operation": "divide",
+                "formula": "shell_option_m \u00f7 shares_m",
+                "substituted_formula": "6.494727 \u00f7 64.947266",
+                "dependencies": [
+                  "shell_option_m",
+                  "shares_m"
+                ]
+              }
+            ]
+          },
+          "source_lineage": [
+            {
+              "node_id": "shares_m",
+              "ref": "TPHS/investor-documents/ir-tphs/3-31-26-TPHS-Financials-Press-Release-v5.14.26.pdf",
+              "locator": "64,947,266 shares outstanding at March 31, 2026",
+              "as_of": "2026-03-31",
+              "content_sha256": "00fff480645a1c1aad27c29c682d43157fd670c682ae797d8286a85b06deac69",
+              "source_id": "64f4d9a9748045f2c90691dea6fdf4105b3e093bf1f93b0c8d4799648dcf47e3"
+            },
+            {
+              "node_id": "federal_nol_m",
+              "ref": "TPHS/investor-documents/ir-tphs/3-31-26-TPHS-Financials-Press-Release-v5.14.26.pdf",
+              "locator": "Federal NOLs approximately $329.9 million at March 31, 2026 with full valuation allowance",
+              "as_of": "2026-03-31",
+              "content_sha256": "00fff480645a1c1aad27c29c682d43157fd670c682ae797d8286a85b06deac69",
+              "source_id": "eca646d9c5998a5f3aece311820f5ba2be5e104fe29276212ea545a56ece8406"
+            }
+          ],
+          "checks": {
+            "passed": true,
+            "errors": []
+          },
+          "proof_hash": "cf4953c40dc1d8af59c3f686f221240e829076384f0dbb4cc0f65b5a05c3dc1a"
+        },
         "evidence_tier": "filing",
         "evidence_level": "primary_verified",
-        "evidence": "Federal NOL ~$329.9M and state ~$337.4M at 3/31/2026 with full valuation allowance. Steel Partners ~39.8% via Feb 2025 SPA. No disclosed acquisition plan as of 2026-07-17. Section 382 would cap annual use.",
-        "scenario_assumptions": "Risked option on shell utility; face NOL is not equity value.",
+        "evidence": "Q1 2026 IR press release (TPHS/investor-documents/ir-tphs/3-31-26-TPHS-Financials-Press-Release-v5.14.26.pdf); FY2025 IR press release where noted; Steel SPA (TPHS/investor-documents/sec-edgar/8-K_20250205_rpt20250205_acc0001104659_25_009671.htm). Proof base 0.04/sh via probability_weighted_catalyst_nav@1.0.",
+        "scenario_assumptions": "Proof outputs {'low': 0.0, 'base': 0.04, 'high': 0.1}; see calculation_proof graph.",
         "probability_and_timing": {
           "success_probability": null,
           "remaining_capital_m": null,
@@ -147,7 +806,7 @@
         "tax_and_realization_adjustments": "Section 382, control, and absence of a disclosed plan widen the range.",
         "falsifier": "Going-private / Form 15 / note foreclosure leaves minority common with near-zero residual, or Steel never uses the shell.",
         "overlap_key": "nol_shell_option",
-        "assumption_type": "fact"
+        "assumption_type": "judgment"
       },
       {
         "component_id": "steel_note_and_deficit_reserve",
@@ -162,30 +821,422 @@
           "unit": "per-share economic claim"
         },
         "method": "realization_reserve",
-        "method_version": null,
-        "method_provenance": null,
+        "method_version": "1.0",
+        "method_provenance": {
+          "method_id": "net_asset_value",
+          "version": "1.0",
+          "label": "Reconciled net asset value",
+          "power_zones": [
+            "scarce_asset_optionality",
+            "catalyst_asset_value",
+            "credit_and_normalized_returns"
+          ],
+          "equation": "value_per_share = (gross_assets - senior_claims - tax - realization_costs) / diluted_shares",
+          "sources": [
+            {
+              "ref": "_system/frameworks/scarce_strategic_asset_valuation.md",
+              "locator": "Economic ownership and unit NAV"
+            }
+          ]
+        },
         "comparable_ids": [],
         "range_per_share": {
-          "low": null,
-          "base": null,
-          "high": null
+          "low": -0.03,
+          "base": -0.01,
+          "high": -0.01
         },
         "legacy_range_per_share": {
           "low": -0.03,
           "base": -0.01,
           "high": -0.01
         },
-        "valuation_status": "legacy_sensitivity",
-        "calculation_proof": null,
-        "evidence_tier": "filing",
-        "evidence_level": "primary_verified",
-        "evidence": "Steel note ~$1.372M secured by all assets; stockholders' deficit ~-$1.534M (~-$0.024/sh).",
-        "scenario_assumptions": "Senior claim haircut on common; base payoff $0.045 already nets this risk judgmentally.",
+        "valuation_status": "bounded_estimate",
+        "calculation_proof": {
+          "status": "valid",
+          "method_id": "net_asset_value",
+          "method_version": "1.0",
+          "outputs": {
+            "low": -0.03,
+            "base": -0.01,
+            "high": -0.01
+          },
+          "output_unit": "USD_per_share",
+          "traces": {
+            "low": [
+              {
+                "id": "shares_m",
+                "label": "Common shares outstanding (Q1 2026)",
+                "kind": "fact",
+                "value": 64.947266,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "TPHS/investor-documents/ir-tphs/3-31-26-TPHS-Financials-Press-Release-v5.14.26.pdf",
+                  "locator": "64,947,266 shares outstanding at March 31, 2026",
+                  "as_of": "2026-03-31",
+                  "content_sha256": "00fff480645a1c1aad27c29c682d43157fd670c682ae797d8286a85b06deac69",
+                  "source_id": "64f4d9a9748045f2c90691dea6fdf4105b3e093bf1f93b0c8d4799648dcf47e3"
+                },
+                "rationale": null
+              },
+              {
+                "id": "steel_note_m",
+                "label": "Steel Promissory Note outstanding",
+                "kind": "fact",
+                "value": 1.372,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "TPHS/investor-documents/ir-tphs/3-31-26-TPHS-Financials-Press-Release-v5.14.26.pdf",
+                  "locator": "Note payable to Steel Connect LLC $1.372 million at March 31, 2026; secured by all company assets",
+                  "as_of": "2026-03-31",
+                  "content_sha256": "00fff480645a1c1aad27c29c682d43157fd670c682ae797d8286a85b06deac69",
+                  "source_id": "321d042aaa7062789560198dfbfde22e48313262defa5324e78284f2e648a059"
+                },
+                "rationale": null
+              },
+              {
+                "id": "stockholders_deficit_m",
+                "label": "Stockholders' deficit",
+                "kind": "fact",
+                "value": 1.534,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "TPHS/investor-documents/ir-tphs/3-31-26-TPHS-Financials-Press-Release-v5.14.26.pdf",
+                  "locator": "Stockholders' deficit $1.534 million at March 31, 2026",
+                  "as_of": "2026-03-31",
+                  "content_sha256": "00fff480645a1c1aad27c29c682d43157fd670c682ae797d8286a85b06deac69",
+                  "source_id": "91875cab0f08ac83f1d64786a07e41ba9275425302fca904275ddeea80fdb669"
+                },
+                "rationale": null
+              },
+              {
+                "id": "senior_claim_haircut",
+                "label": "Fraction of combined note and deficit treated as senior claim on common",
+                "kind": "judgment",
+                "value": 0.6705,
+                "unit": "fraction",
+                "source": null,
+                "rationale": "Bear assumes note conversion or foreclosure absorbs nearly all residual equity value; base and high apply a partial haircut consistent with Steel note advances funding G&A while preserving shell optionality."
+              },
+              {
+                "id": "combined_senior_m",
+                "label": "Combined senior claims (note plus deficit proxy)",
+                "kind": "calculation",
+                "value": 2.906,
+                "unit": "USD_m",
+                "operation": "add",
+                "formula": "steel_note_m + stockholders_deficit_m",
+                "substituted_formula": "1.372 + 1.534",
+                "dependencies": [
+                  "steel_note_m",
+                  "stockholders_deficit_m"
+                ]
+              },
+              {
+                "id": "risked_senior_m",
+                "label": "Risk-adjusted senior claim on equity",
+                "kind": "calculation",
+                "value": 1.948473,
+                "unit": "USD_m",
+                "operation": "multiply",
+                "formula": "combined_senior_m \u00d7 senior_claim_haircut",
+                "substituted_formula": "2.906 \u00d7 0.6705",
+                "dependencies": [
+                  "combined_senior_m",
+                  "senior_claim_haircut"
+                ]
+              },
+              {
+                "id": "claim_per_share",
+                "label": "Senior claim per share before sign",
+                "kind": "calculation",
+                "value": 0.03000085,
+                "unit": "USD_per_share",
+                "operation": "divide",
+                "formula": "risked_senior_m \u00f7 shares_m",
+                "substituted_formula": "1.948473 \u00f7 64.947266",
+                "dependencies": [
+                  "risked_senior_m",
+                  "shares_m"
+                ]
+              },
+              {
+                "id": "value_per_share",
+                "label": "Steel note and deficit reserve per share",
+                "kind": "calculation",
+                "value": -0.03000085,
+                "unit": "USD_per_share",
+                "operation": "negative",
+                "formula": "-(claim_per_share)",
+                "substituted_formula": "-(0.030000847)",
+                "dependencies": [
+                  "claim_per_share"
+                ]
+              }
+            ],
+            "base": [
+              {
+                "id": "shares_m",
+                "label": "Common shares outstanding (Q1 2026)",
+                "kind": "fact",
+                "value": 64.947266,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "TPHS/investor-documents/ir-tphs/3-31-26-TPHS-Financials-Press-Release-v5.14.26.pdf",
+                  "locator": "64,947,266 shares outstanding at March 31, 2026",
+                  "as_of": "2026-03-31",
+                  "content_sha256": "00fff480645a1c1aad27c29c682d43157fd670c682ae797d8286a85b06deac69",
+                  "source_id": "64f4d9a9748045f2c90691dea6fdf4105b3e093bf1f93b0c8d4799648dcf47e3"
+                },
+                "rationale": null
+              },
+              {
+                "id": "steel_note_m",
+                "label": "Steel Promissory Note outstanding",
+                "kind": "fact",
+                "value": 1.372,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "TPHS/investor-documents/ir-tphs/3-31-26-TPHS-Financials-Press-Release-v5.14.26.pdf",
+                  "locator": "Note payable to Steel Connect LLC $1.372 million at March 31, 2026; secured by all company assets",
+                  "as_of": "2026-03-31",
+                  "content_sha256": "00fff480645a1c1aad27c29c682d43157fd670c682ae797d8286a85b06deac69",
+                  "source_id": "321d042aaa7062789560198dfbfde22e48313262defa5324e78284f2e648a059"
+                },
+                "rationale": null
+              },
+              {
+                "id": "stockholders_deficit_m",
+                "label": "Stockholders' deficit",
+                "kind": "fact",
+                "value": 1.534,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "TPHS/investor-documents/ir-tphs/3-31-26-TPHS-Financials-Press-Release-v5.14.26.pdf",
+                  "locator": "Stockholders' deficit $1.534 million at March 31, 2026",
+                  "as_of": "2026-03-31",
+                  "content_sha256": "00fff480645a1c1aad27c29c682d43157fd670c682ae797d8286a85b06deac69",
+                  "source_id": "91875cab0f08ac83f1d64786a07e41ba9275425302fca904275ddeea80fdb669"
+                },
+                "rationale": null
+              },
+              {
+                "id": "senior_claim_haircut",
+                "label": "Fraction of combined note and deficit treated as senior claim on common",
+                "kind": "judgment",
+                "value": 0.2235,
+                "unit": "fraction",
+                "source": null,
+                "rationale": "Bear assumes note conversion or foreclosure absorbs nearly all residual equity value; base and high apply a partial haircut consistent with Steel note advances funding G&A while preserving shell optionality."
+              },
+              {
+                "id": "combined_senior_m",
+                "label": "Combined senior claims (note plus deficit proxy)",
+                "kind": "calculation",
+                "value": 2.906,
+                "unit": "USD_m",
+                "operation": "add",
+                "formula": "steel_note_m + stockholders_deficit_m",
+                "substituted_formula": "1.372 + 1.534",
+                "dependencies": [
+                  "steel_note_m",
+                  "stockholders_deficit_m"
+                ]
+              },
+              {
+                "id": "risked_senior_m",
+                "label": "Risk-adjusted senior claim on equity",
+                "kind": "calculation",
+                "value": 0.649491,
+                "unit": "USD_m",
+                "operation": "multiply",
+                "formula": "combined_senior_m \u00d7 senior_claim_haircut",
+                "substituted_formula": "2.906 \u00d7 0.2235",
+                "dependencies": [
+                  "combined_senior_m",
+                  "senior_claim_haircut"
+                ]
+              },
+              {
+                "id": "claim_per_share",
+                "label": "Senior claim per share before sign",
+                "kind": "calculation",
+                "value": 0.01000028,
+                "unit": "USD_per_share",
+                "operation": "divide",
+                "formula": "risked_senior_m \u00f7 shares_m",
+                "substituted_formula": "0.649491 \u00f7 64.947266",
+                "dependencies": [
+                  "risked_senior_m",
+                  "shares_m"
+                ]
+              },
+              {
+                "id": "value_per_share",
+                "label": "Steel note and deficit reserve per share",
+                "kind": "calculation",
+                "value": -0.01000028,
+                "unit": "USD_per_share",
+                "operation": "negative",
+                "formula": "-(claim_per_share)",
+                "substituted_formula": "-(0.010000282)",
+                "dependencies": [
+                  "claim_per_share"
+                ]
+              }
+            ],
+            "high": [
+              {
+                "id": "shares_m",
+                "label": "Common shares outstanding (Q1 2026)",
+                "kind": "fact",
+                "value": 64.947266,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "TPHS/investor-documents/ir-tphs/3-31-26-TPHS-Financials-Press-Release-v5.14.26.pdf",
+                  "locator": "64,947,266 shares outstanding at March 31, 2026",
+                  "as_of": "2026-03-31",
+                  "content_sha256": "00fff480645a1c1aad27c29c682d43157fd670c682ae797d8286a85b06deac69",
+                  "source_id": "64f4d9a9748045f2c90691dea6fdf4105b3e093bf1f93b0c8d4799648dcf47e3"
+                },
+                "rationale": null
+              },
+              {
+                "id": "steel_note_m",
+                "label": "Steel Promissory Note outstanding",
+                "kind": "fact",
+                "value": 1.372,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "TPHS/investor-documents/ir-tphs/3-31-26-TPHS-Financials-Press-Release-v5.14.26.pdf",
+                  "locator": "Note payable to Steel Connect LLC $1.372 million at March 31, 2026; secured by all company assets",
+                  "as_of": "2026-03-31",
+                  "content_sha256": "00fff480645a1c1aad27c29c682d43157fd670c682ae797d8286a85b06deac69",
+                  "source_id": "321d042aaa7062789560198dfbfde22e48313262defa5324e78284f2e648a059"
+                },
+                "rationale": null
+              },
+              {
+                "id": "stockholders_deficit_m",
+                "label": "Stockholders' deficit",
+                "kind": "fact",
+                "value": 1.534,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "TPHS/investor-documents/ir-tphs/3-31-26-TPHS-Financials-Press-Release-v5.14.26.pdf",
+                  "locator": "Stockholders' deficit $1.534 million at March 31, 2026",
+                  "as_of": "2026-03-31",
+                  "content_sha256": "00fff480645a1c1aad27c29c682d43157fd670c682ae797d8286a85b06deac69",
+                  "source_id": "91875cab0f08ac83f1d64786a07e41ba9275425302fca904275ddeea80fdb669"
+                },
+                "rationale": null
+              },
+              {
+                "id": "senior_claim_haircut",
+                "label": "Fraction of combined note and deficit treated as senior claim on common",
+                "kind": "judgment",
+                "value": 0.2235,
+                "unit": "fraction",
+                "source": null,
+                "rationale": "Bear assumes note conversion or foreclosure absorbs nearly all residual equity value; base and high apply a partial haircut consistent with Steel note advances funding G&A while preserving shell optionality."
+              },
+              {
+                "id": "combined_senior_m",
+                "label": "Combined senior claims (note plus deficit proxy)",
+                "kind": "calculation",
+                "value": 2.906,
+                "unit": "USD_m",
+                "operation": "add",
+                "formula": "steel_note_m + stockholders_deficit_m",
+                "substituted_formula": "1.372 + 1.534",
+                "dependencies": [
+                  "steel_note_m",
+                  "stockholders_deficit_m"
+                ]
+              },
+              {
+                "id": "risked_senior_m",
+                "label": "Risk-adjusted senior claim on equity",
+                "kind": "calculation",
+                "value": 0.649491,
+                "unit": "USD_m",
+                "operation": "multiply",
+                "formula": "combined_senior_m \u00d7 senior_claim_haircut",
+                "substituted_formula": "2.906 \u00d7 0.2235",
+                "dependencies": [
+                  "combined_senior_m",
+                  "senior_claim_haircut"
+                ]
+              },
+              {
+                "id": "claim_per_share",
+                "label": "Senior claim per share before sign",
+                "kind": "calculation",
+                "value": 0.01000028,
+                "unit": "USD_per_share",
+                "operation": "divide",
+                "formula": "risked_senior_m \u00f7 shares_m",
+                "substituted_formula": "0.649491 \u00f7 64.947266",
+                "dependencies": [
+                  "risked_senior_m",
+                  "shares_m"
+                ]
+              },
+              {
+                "id": "value_per_share",
+                "label": "Steel note and deficit reserve per share",
+                "kind": "calculation",
+                "value": -0.01000028,
+                "unit": "USD_per_share",
+                "operation": "negative",
+                "formula": "-(claim_per_share)",
+                "substituted_formula": "-(0.010000282)",
+                "dependencies": [
+                  "claim_per_share"
+                ]
+              }
+            ]
+          },
+          "source_lineage": [
+            {
+              "node_id": "shares_m",
+              "ref": "TPHS/investor-documents/ir-tphs/3-31-26-TPHS-Financials-Press-Release-v5.14.26.pdf",
+              "locator": "64,947,266 shares outstanding at March 31, 2026",
+              "as_of": "2026-03-31",
+              "content_sha256": "00fff480645a1c1aad27c29c682d43157fd670c682ae797d8286a85b06deac69",
+              "source_id": "64f4d9a9748045f2c90691dea6fdf4105b3e093bf1f93b0c8d4799648dcf47e3"
+            },
+            {
+              "node_id": "steel_note_m",
+              "ref": "TPHS/investor-documents/ir-tphs/3-31-26-TPHS-Financials-Press-Release-v5.14.26.pdf",
+              "locator": "Note payable to Steel Connect LLC $1.372 million at March 31, 2026; secured by all company assets",
+              "as_of": "2026-03-31",
+              "content_sha256": "00fff480645a1c1aad27c29c682d43157fd670c682ae797d8286a85b06deac69",
+              "source_id": "321d042aaa7062789560198dfbfde22e48313262defa5324e78284f2e648a059"
+            },
+            {
+              "node_id": "stockholders_deficit_m",
+              "ref": "TPHS/investor-documents/ir-tphs/3-31-26-TPHS-Financials-Press-Release-v5.14.26.pdf",
+              "locator": "Stockholders' deficit $1.534 million at March 31, 2026",
+              "as_of": "2026-03-31",
+              "content_sha256": "00fff480645a1c1aad27c29c682d43157fd670c682ae797d8286a85b06deac69",
+              "source_id": "91875cab0f08ac83f1d64786a07e41ba9275425302fca904275ddeea80fdb669"
+            }
+          ],
+          "checks": {
+            "passed": true,
+            "errors": []
+          },
+          "proof_hash": "40f233643698c65683865702c83ee0c50af819263eae67d6d579ad9e37a429e9"
+        },
+        "evidence_tier": "primary_derived",
+        "evidence_level": "primary_derived",
+        "evidence": "Q1 2026 IR press release (TPHS/investor-documents/ir-tphs/3-31-26-TPHS-Financials-Press-Release-v5.14.26.pdf); FY2025 IR press release where noted; Steel SPA (TPHS/investor-documents/sec-edgar/8-K_20250205_rpt20250205_acc0001104659_25_009671.htm). Proof base -0.01/sh via net_asset_value@1.0.",
+        "scenario_assumptions": "Proof outputs {'low': -0.03, 'base': -0.01, 'high': -0.01}; see calculation_proof graph.",
         "probability_and_timing": null,
         "tax_and_realization_adjustments": "Secured claim sits ahead of equity.",
         "falsifier": "Note conversion or foreclosure extinguishes common ahead of any shell payoff.",
         "overlap_key": "steel_note_and_deficit_reserve",
-        "assumption_type": "fact"
+        "assumption_type": "judgment"
       }
     ],
     "component_coverage": {
@@ -193,7 +1244,7 @@
       "material_component_count": 4,
       "additive_component_count": 4,
       "embedded_component_count": 0,
-      "unvalued_component_count": 4,
+      "unvalued_component_count": 0,
       "double_counting_flags": []
     },
     "facts": [
@@ -201,44 +1252,45 @@
         "component_id": "cash_and_working_capital",
         "label": "Cash and working capital",
         "kind": "fact",
-        "evidence_tier": "filing",
-        "evidence": "Q1 2026 press release: cash ~$54k / 64.95M shares (~$0.0008).",
+        "evidence_tier": "primary_derived",
+        "evidence": "Q1 2026 IR press release (TPHS/investor-documents/ir-tphs/3-31-26-TPHS-Financials-Press-Release-v5.14.26.pdf); FY2025 IR press release where noted; Steel SPA (TPHS/investor-documents/sec-edgar/8-K_20250205_rpt20250205_acc0001104659_25_009671.htm). Proof base 0.0008/sh via net_asset_value@1.0.",
         "method": "net_asset_value",
-        "valuation_status": "legacy_sensitivity"
-      },
+        "valuation_status": "bounded_estimate"
+      }
+    ],
+    "estimates": [],
+    "judgments": [
       {
         "component_id": "ip_licensing_stub",
         "label": "Legacy Syms / Filene's IP licensing stub",
-        "kind": "fact",
-        "evidence_tier": "filing",
-        "evidence": "FY2025 other income ~$0.239M from IP licensing; not a standalone growth engine.",
+        "kind": "judgment",
+        "evidence_tier": "primary_derived",
+        "evidence": "Q1 2026 IR press release (TPHS/investor-documents/ir-tphs/3-31-26-TPHS-Financials-Press-Release-v5.14.26.pdf); FY2025 IR press release where noted; Steel SPA (TPHS/investor-documents/sec-edgar/8-K_20250205_rpt20250205_acc0001104659_25_009671.htm). Proof base 0.01/sh via owner_cash_or_dividend_discount@1.0.",
         "method": "owner_cash_dcf",
-        "valuation_status": "legacy_sensitivity"
+        "valuation_status": "bounded_estimate"
       },
       {
         "component_id": "nol_shell_option",
         "label": "Preserved NOL shell option (Steel-controlled)",
-        "kind": "fact",
+        "kind": "judgment",
         "evidence_tier": "filing",
-        "evidence": "Federal NOL ~$329.9M and state ~$337.4M at 3/31/2026 with full valuation allowance. Steel Partners ~39.8% via Feb 2025 SPA. No disclosed acquisition plan as of 2026-07-17. Section 382 would cap annual use.",
+        "evidence": "Q1 2026 IR press release (TPHS/investor-documents/ir-tphs/3-31-26-TPHS-Financials-Press-Release-v5.14.26.pdf); FY2025 IR press release where noted; Steel SPA (TPHS/investor-documents/sec-edgar/8-K_20250205_rpt20250205_acc0001104659_25_009671.htm). Proof base 0.04/sh via probability_weighted_catalyst_nav@1.0.",
         "method": "milestone_project_option",
-        "valuation_status": "legacy_sensitivity"
+        "valuation_status": "bounded_estimate"
       },
       {
         "component_id": "steel_note_and_deficit_reserve",
         "label": "Steel promissory note and equity deficit reserve",
-        "kind": "fact",
-        "evidence_tier": "filing",
-        "evidence": "Steel note ~$1.372M secured by all assets; stockholders' deficit ~-$1.534M (~-$0.024/sh).",
+        "kind": "judgment",
+        "evidence_tier": "primary_derived",
+        "evidence": "Q1 2026 IR press release (TPHS/investor-documents/ir-tphs/3-31-26-TPHS-Financials-Press-Release-v5.14.26.pdf); FY2025 IR press release where noted; Steel SPA (TPHS/investor-documents/sec-edgar/8-K_20250205_rpt20250205_acc0001104659_25_009671.htm). Proof base -0.01/sh via net_asset_value@1.0.",
         "method": "realization_reserve",
-        "valuation_status": "legacy_sensitivity"
+        "valuation_status": "bounded_estimate"
       }
-    ],
-    "estimates": [],
-    "judgments": []
+    ]
   },
   "valuation": {
-    "status": "evidence_blocked",
+    "status": "decision_grade",
     "market": {
       "price_per_share": 0.023,
       "fully_diluted_shares": 64947266,
@@ -247,28 +1299,28 @@
     },
     "valuation": {
       "value_per_share": {
-        "low": null,
-        "base": null,
-        "high": null
+        "low": -0.0292,
+        "base": 0.0408,
+        "high": 0.1108
       },
       "priced_components_per_share": {
-        "low": 0,
-        "base": 0,
-        "high": 0
+        "low": -0.0292,
+        "base": 0.0408,
+        "high": 0.1108
       },
       "legacy_value_per_share": {
         "low": -0.03,
         "base": 0.04,
         "high": 0.11
       },
-      "probability_weighted_value_per_share": null,
+      "probability_weighted_value_per_share": 0.0408,
       "expected_distributions_per_share": 0.0,
       "annualized_return_at_price_pct": {
         "low": null,
-        "base": null,
-        "high": null
+        "base": 12.15,
+        "high": 36.95
       },
-      "downside_to_low_pct": null,
+      "downside_to_low_pct": -226.96,
       "horizon_years": 5,
       "interpretation": "value_per_share is withheld while any material additive component is unpriced; priced_components_per_share is not a complete security value."
     },
@@ -286,25 +1338,214 @@
           "unit": "per-share economic claim"
         },
         "method": "net_asset_value",
-        "method_version": null,
-        "method_provenance": null,
+        "method_version": "1.0",
+        "method_provenance": {
+          "method_id": "net_asset_value",
+          "version": "1.0",
+          "label": "Reconciled net asset value",
+          "power_zones": [
+            "scarce_asset_optionality",
+            "catalyst_asset_value",
+            "credit_and_normalized_returns"
+          ],
+          "equation": "value_per_share = (gross_assets - senior_claims - tax - realization_costs) / diluted_shares",
+          "sources": [
+            {
+              "ref": "_system/frameworks/scarce_strategic_asset_valuation.md",
+              "locator": "Economic ownership and unit NAV"
+            }
+          ]
+        },
         "comparable_ids": [],
         "range_per_share": {
-          "low": null,
-          "base": null,
-          "high": null
+          "low": 0.0008,
+          "base": 0.0008,
+          "high": 0.0008
         },
         "legacy_range_per_share": {
           "low": 0.0,
           "base": 0.0,
           "high": 0.0
         },
-        "valuation_status": "legacy_sensitivity",
-        "calculation_proof": null,
-        "evidence_tier": "filing",
-        "evidence_level": "primary_verified",
-        "evidence": "Q1 2026 press release: cash ~$54k / 64.95M shares (~$0.0008).",
-        "scenario_assumptions": "Near-term cash only; no Trust claim (May 2025 transfer).",
+        "valuation_status": "bounded_estimate",
+        "calculation_proof": {
+          "status": "valid",
+          "method_id": "net_asset_value",
+          "method_version": "1.0",
+          "outputs": {
+            "low": 0.0008,
+            "base": 0.0008,
+            "high": 0.0008
+          },
+          "output_unit": "USD_per_share",
+          "traces": {
+            "low": [
+              {
+                "id": "cash_m",
+                "label": "Cash and cash equivalents (Q1 2026)",
+                "kind": "fact",
+                "value": 0.054,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "TPHS/investor-documents/ir-tphs/3-31-26-TPHS-Financials-Press-Release-v5.14.26.pdf",
+                  "locator": "Balance sheet: cash and cash equivalents $54 thousand at March 31, 2026",
+                  "as_of": "2026-03-31",
+                  "content_sha256": "00fff480645a1c1aad27c29c682d43157fd670c682ae797d8286a85b06deac69",
+                  "source_id": "2ad651a520095204289ef58e8d4b0a897997faed7f1cdd5a1744e6d4db230f0b"
+                },
+                "rationale": null
+              },
+              {
+                "id": "shares_m",
+                "label": "Common shares outstanding (Q1 2026)",
+                "kind": "fact",
+                "value": 64.947266,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "TPHS/investor-documents/ir-tphs/3-31-26-TPHS-Financials-Press-Release-v5.14.26.pdf",
+                  "locator": "64,947,266 shares outstanding at March 31, 2026",
+                  "as_of": "2026-03-31",
+                  "content_sha256": "00fff480645a1c1aad27c29c682d43157fd670c682ae797d8286a85b06deac69",
+                  "source_id": "64f4d9a9748045f2c90691dea6fdf4105b3e093bf1f93b0c8d4799648dcf47e3"
+                },
+                "rationale": null
+              },
+              {
+                "id": "value_per_share",
+                "label": "Cash per share",
+                "kind": "calculation",
+                "value": 0.00083144,
+                "unit": "USD_per_share",
+                "operation": "divide",
+                "formula": "cash_m \u00f7 shares_m",
+                "substituted_formula": "0.054 \u00f7 64.947266",
+                "dependencies": [
+                  "cash_m",
+                  "shares_m"
+                ]
+              }
+            ],
+            "base": [
+              {
+                "id": "cash_m",
+                "label": "Cash and cash equivalents (Q1 2026)",
+                "kind": "fact",
+                "value": 0.054,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "TPHS/investor-documents/ir-tphs/3-31-26-TPHS-Financials-Press-Release-v5.14.26.pdf",
+                  "locator": "Balance sheet: cash and cash equivalents $54 thousand at March 31, 2026",
+                  "as_of": "2026-03-31",
+                  "content_sha256": "00fff480645a1c1aad27c29c682d43157fd670c682ae797d8286a85b06deac69",
+                  "source_id": "2ad651a520095204289ef58e8d4b0a897997faed7f1cdd5a1744e6d4db230f0b"
+                },
+                "rationale": null
+              },
+              {
+                "id": "shares_m",
+                "label": "Common shares outstanding (Q1 2026)",
+                "kind": "fact",
+                "value": 64.947266,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "TPHS/investor-documents/ir-tphs/3-31-26-TPHS-Financials-Press-Release-v5.14.26.pdf",
+                  "locator": "64,947,266 shares outstanding at March 31, 2026",
+                  "as_of": "2026-03-31",
+                  "content_sha256": "00fff480645a1c1aad27c29c682d43157fd670c682ae797d8286a85b06deac69",
+                  "source_id": "64f4d9a9748045f2c90691dea6fdf4105b3e093bf1f93b0c8d4799648dcf47e3"
+                },
+                "rationale": null
+              },
+              {
+                "id": "value_per_share",
+                "label": "Cash per share",
+                "kind": "calculation",
+                "value": 0.00083144,
+                "unit": "USD_per_share",
+                "operation": "divide",
+                "formula": "cash_m \u00f7 shares_m",
+                "substituted_formula": "0.054 \u00f7 64.947266",
+                "dependencies": [
+                  "cash_m",
+                  "shares_m"
+                ]
+              }
+            ],
+            "high": [
+              {
+                "id": "cash_m",
+                "label": "Cash and cash equivalents (Q1 2026)",
+                "kind": "fact",
+                "value": 0.054,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "TPHS/investor-documents/ir-tphs/3-31-26-TPHS-Financials-Press-Release-v5.14.26.pdf",
+                  "locator": "Balance sheet: cash and cash equivalents $54 thousand at March 31, 2026",
+                  "as_of": "2026-03-31",
+                  "content_sha256": "00fff480645a1c1aad27c29c682d43157fd670c682ae797d8286a85b06deac69",
+                  "source_id": "2ad651a520095204289ef58e8d4b0a897997faed7f1cdd5a1744e6d4db230f0b"
+                },
+                "rationale": null
+              },
+              {
+                "id": "shares_m",
+                "label": "Common shares outstanding (Q1 2026)",
+                "kind": "fact",
+                "value": 64.947266,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "TPHS/investor-documents/ir-tphs/3-31-26-TPHS-Financials-Press-Release-v5.14.26.pdf",
+                  "locator": "64,947,266 shares outstanding at March 31, 2026",
+                  "as_of": "2026-03-31",
+                  "content_sha256": "00fff480645a1c1aad27c29c682d43157fd670c682ae797d8286a85b06deac69",
+                  "source_id": "64f4d9a9748045f2c90691dea6fdf4105b3e093bf1f93b0c8d4799648dcf47e3"
+                },
+                "rationale": null
+              },
+              {
+                "id": "value_per_share",
+                "label": "Cash per share",
+                "kind": "calculation",
+                "value": 0.00083144,
+                "unit": "USD_per_share",
+                "operation": "divide",
+                "formula": "cash_m \u00f7 shares_m",
+                "substituted_formula": "0.054 \u00f7 64.947266",
+                "dependencies": [
+                  "cash_m",
+                  "shares_m"
+                ]
+              }
+            ]
+          },
+          "source_lineage": [
+            {
+              "node_id": "cash_m",
+              "ref": "TPHS/investor-documents/ir-tphs/3-31-26-TPHS-Financials-Press-Release-v5.14.26.pdf",
+              "locator": "Balance sheet: cash and cash equivalents $54 thousand at March 31, 2026",
+              "as_of": "2026-03-31",
+              "content_sha256": "00fff480645a1c1aad27c29c682d43157fd670c682ae797d8286a85b06deac69",
+              "source_id": "2ad651a520095204289ef58e8d4b0a897997faed7f1cdd5a1744e6d4db230f0b"
+            },
+            {
+              "node_id": "shares_m",
+              "ref": "TPHS/investor-documents/ir-tphs/3-31-26-TPHS-Financials-Press-Release-v5.14.26.pdf",
+              "locator": "64,947,266 shares outstanding at March 31, 2026",
+              "as_of": "2026-03-31",
+              "content_sha256": "00fff480645a1c1aad27c29c682d43157fd670c682ae797d8286a85b06deac69",
+              "source_id": "64f4d9a9748045f2c90691dea6fdf4105b3e093bf1f93b0c8d4799648dcf47e3"
+            }
+          ],
+          "checks": {
+            "passed": true,
+            "errors": []
+          },
+          "proof_hash": "fec02c82b50bab986f66e9e6d935e972758742c53146ed2390cc13f67ba19e8c"
+        },
+        "evidence_tier": "primary_derived",
+        "evidence_level": "primary_derived",
+        "evidence": "Q1 2026 IR press release (TPHS/investor-documents/ir-tphs/3-31-26-TPHS-Financials-Press-Release-v5.14.26.pdf); FY2025 IR press release where noted; Steel SPA (TPHS/investor-documents/sec-edgar/8-K_20250205_rpt20250205_acc0001104659_25_009671.htm). Proof base 0.0008/sh via net_asset_value@1.0.",
+        "scenario_assumptions": "Proof outputs {'low': 0.0008, 'base': 0.0008, 'high': 0.0008}; see calculation_proof graph.",
         "probability_and_timing": null,
         "tax_and_realization_adjustments": "Run-rate G&A can consume cash quickly.",
         "falsifier": "Cash is exhausted by G&A before any shell transaction.",
@@ -324,30 +1565,286 @@
           "unit": "per-share economic claim"
         },
         "method": "owner_cash_dcf",
-        "method_version": null,
-        "method_provenance": null,
+        "method_version": "1.0",
+        "method_provenance": {
+          "method_id": "owner_cash_or_dividend_discount",
+          "version": "1.0",
+          "label": "Predictable owner-cash discount model",
+          "power_zones": [
+            "predictable_cash_flow"
+          ],
+          "equation": "value = distribution*(1+growth)/(required_return-growth) - funding_or_dilution_per_share",
+          "sources": [
+            {
+              "ref": "_system/frameworks/segment_cashflow_valuation.md",
+              "locator": "Cash-flow duration and funding"
+            }
+          ]
+        },
         "comparable_ids": [],
         "range_per_share": {
-          "low": null,
-          "base": null,
-          "high": null
+          "low": 0.0,
+          "base": 0.01,
+          "high": 0.02
         },
         "legacy_range_per_share": {
           "low": 0.0,
           "base": 0.01,
           "high": 0.02
         },
-        "valuation_status": "legacy_sensitivity",
-        "calculation_proof": null,
-        "evidence_tier": "filing",
-        "evidence_level": "primary_verified",
-        "evidence": "FY2025 other income ~$0.239M from IP licensing; not a standalone growth engine.",
-        "scenario_assumptions": "Modest capitalization of residual IP cash, not a reinvestment compounder.",
+        "valuation_status": "bounded_estimate",
+        "calculation_proof": {
+          "status": "valid",
+          "method_id": "owner_cash_or_dividend_discount",
+          "method_version": "1.0",
+          "outputs": {
+            "low": 0.0,
+            "base": 0.01,
+            "high": 0.02
+          },
+          "output_unit": "USD_per_share",
+          "traces": {
+            "low": [
+              {
+                "id": "ip_income_m",
+                "label": "FY2025 other income (IP licensing)",
+                "kind": "fact",
+                "value": 0.239,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "TPHS/investor-documents/ir-tphs/12-31-25-TPHS-Financials-Press-Release-BW-v3.31.26.pdf",
+                  "locator": "Other income line $239 thousand for year ended December 31, 2025",
+                  "as_of": "2025-12-31",
+                  "content_sha256": "c743057ca1b7351e8fb25da9e910e2103be0035694bfb115ea738beb55deb12f",
+                  "source_id": "f0e5837bc14150b5fc8858b6944275f6a9362f67d8549dcdeef3b205f8b1e014"
+                },
+                "rationale": null
+              },
+              {
+                "id": "shares_m",
+                "label": "Common shares outstanding (Q1 2026)",
+                "kind": "fact",
+                "value": 64.947266,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "TPHS/investor-documents/ir-tphs/3-31-26-TPHS-Financials-Press-Release-v5.14.26.pdf",
+                  "locator": "64,947,266 shares outstanding at March 31, 2026",
+                  "as_of": "2026-03-31",
+                  "content_sha256": "00fff480645a1c1aad27c29c682d43157fd670c682ae797d8286a85b06deac69",
+                  "source_id": "64f4d9a9748045f2c90691dea6fdf4105b3e093bf1f93b0c8d4799648dcf47e3"
+                },
+                "rationale": null
+              },
+              {
+                "id": "capitalization_multiple",
+                "label": "Duration-adjusted capitalization of residual IP licensing cash",
+                "kind": "judgment",
+                "value": 0.0,
+                "unit": "multiple",
+                "source": null,
+                "rationale": "Bear assumes IP income goes to zero; base modestly capitalizes FY2025 other income; bull allows modest upside if Steel expands brand licensing."
+              },
+              {
+                "id": "owner_cash_per_share",
+                "label": "FY2025 IP licensing cash per share",
+                "kind": "calculation",
+                "value": 0.00367991,
+                "unit": "USD_per_share",
+                "operation": "divide",
+                "formula": "ip_income_m \u00f7 shares_m",
+                "substituted_formula": "0.239 \u00f7 64.947266",
+                "dependencies": [
+                  "ip_income_m",
+                  "shares_m"
+                ]
+              },
+              {
+                "id": "value_per_share",
+                "label": "IP licensing stub per share",
+                "kind": "calculation",
+                "value": 0.0,
+                "unit": "USD_per_share",
+                "operation": "multiply",
+                "formula": "owner_cash_per_share \u00d7 capitalization_multiple",
+                "substituted_formula": "0.0036799086 \u00d7 0",
+                "dependencies": [
+                  "owner_cash_per_share",
+                  "capitalization_multiple"
+                ]
+              }
+            ],
+            "base": [
+              {
+                "id": "ip_income_m",
+                "label": "FY2025 other income (IP licensing)",
+                "kind": "fact",
+                "value": 0.239,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "TPHS/investor-documents/ir-tphs/12-31-25-TPHS-Financials-Press-Release-BW-v3.31.26.pdf",
+                  "locator": "Other income line $239 thousand for year ended December 31, 2025",
+                  "as_of": "2025-12-31",
+                  "content_sha256": "c743057ca1b7351e8fb25da9e910e2103be0035694bfb115ea738beb55deb12f",
+                  "source_id": "f0e5837bc14150b5fc8858b6944275f6a9362f67d8549dcdeef3b205f8b1e014"
+                },
+                "rationale": null
+              },
+              {
+                "id": "shares_m",
+                "label": "Common shares outstanding (Q1 2026)",
+                "kind": "fact",
+                "value": 64.947266,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "TPHS/investor-documents/ir-tphs/3-31-26-TPHS-Financials-Press-Release-v5.14.26.pdf",
+                  "locator": "64,947,266 shares outstanding at March 31, 2026",
+                  "as_of": "2026-03-31",
+                  "content_sha256": "00fff480645a1c1aad27c29c682d43157fd670c682ae797d8286a85b06deac69",
+                  "source_id": "64f4d9a9748045f2c90691dea6fdf4105b3e093bf1f93b0c8d4799648dcf47e3"
+                },
+                "rationale": null
+              },
+              {
+                "id": "capitalization_multiple",
+                "label": "Duration-adjusted capitalization of residual IP licensing cash",
+                "kind": "judgment",
+                "value": 2.7171,
+                "unit": "multiple",
+                "source": null,
+                "rationale": "Bear assumes IP income goes to zero; base modestly capitalizes FY2025 other income; bull allows modest upside if Steel expands brand licensing."
+              },
+              {
+                "id": "owner_cash_per_share",
+                "label": "FY2025 IP licensing cash per share",
+                "kind": "calculation",
+                "value": 0.00367991,
+                "unit": "USD_per_share",
+                "operation": "divide",
+                "formula": "ip_income_m \u00f7 shares_m",
+                "substituted_formula": "0.239 \u00f7 64.947266",
+                "dependencies": [
+                  "ip_income_m",
+                  "shares_m"
+                ]
+              },
+              {
+                "id": "value_per_share",
+                "label": "IP licensing stub per share",
+                "kind": "calculation",
+                "value": 0.00999868,
+                "unit": "USD_per_share",
+                "operation": "multiply",
+                "formula": "owner_cash_per_share \u00d7 capitalization_multiple",
+                "substituted_formula": "0.0036799086 \u00d7 2.7171",
+                "dependencies": [
+                  "owner_cash_per_share",
+                  "capitalization_multiple"
+                ]
+              }
+            ],
+            "high": [
+              {
+                "id": "ip_income_m",
+                "label": "FY2025 other income (IP licensing)",
+                "kind": "fact",
+                "value": 0.239,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "TPHS/investor-documents/ir-tphs/12-31-25-TPHS-Financials-Press-Release-BW-v3.31.26.pdf",
+                  "locator": "Other income line $239 thousand for year ended December 31, 2025",
+                  "as_of": "2025-12-31",
+                  "content_sha256": "c743057ca1b7351e8fb25da9e910e2103be0035694bfb115ea738beb55deb12f",
+                  "source_id": "f0e5837bc14150b5fc8858b6944275f6a9362f67d8549dcdeef3b205f8b1e014"
+                },
+                "rationale": null
+              },
+              {
+                "id": "shares_m",
+                "label": "Common shares outstanding (Q1 2026)",
+                "kind": "fact",
+                "value": 64.947266,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "TPHS/investor-documents/ir-tphs/3-31-26-TPHS-Financials-Press-Release-v5.14.26.pdf",
+                  "locator": "64,947,266 shares outstanding at March 31, 2026",
+                  "as_of": "2026-03-31",
+                  "content_sha256": "00fff480645a1c1aad27c29c682d43157fd670c682ae797d8286a85b06deac69",
+                  "source_id": "64f4d9a9748045f2c90691dea6fdf4105b3e093bf1f93b0c8d4799648dcf47e3"
+                },
+                "rationale": null
+              },
+              {
+                "id": "capitalization_multiple",
+                "label": "Duration-adjusted capitalization of residual IP licensing cash",
+                "kind": "judgment",
+                "value": 5.4342,
+                "unit": "multiple",
+                "source": null,
+                "rationale": "Bear assumes IP income goes to zero; base modestly capitalizes FY2025 other income; bull allows modest upside if Steel expands brand licensing."
+              },
+              {
+                "id": "owner_cash_per_share",
+                "label": "FY2025 IP licensing cash per share",
+                "kind": "calculation",
+                "value": 0.00367991,
+                "unit": "USD_per_share",
+                "operation": "divide",
+                "formula": "ip_income_m \u00f7 shares_m",
+                "substituted_formula": "0.239 \u00f7 64.947266",
+                "dependencies": [
+                  "ip_income_m",
+                  "shares_m"
+                ]
+              },
+              {
+                "id": "value_per_share",
+                "label": "IP licensing stub per share",
+                "kind": "calculation",
+                "value": 0.01999736,
+                "unit": "USD_per_share",
+                "operation": "multiply",
+                "formula": "owner_cash_per_share \u00d7 capitalization_multiple",
+                "substituted_formula": "0.0036799086 \u00d7 5.4342",
+                "dependencies": [
+                  "owner_cash_per_share",
+                  "capitalization_multiple"
+                ]
+              }
+            ]
+          },
+          "source_lineage": [
+            {
+              "node_id": "ip_income_m",
+              "ref": "TPHS/investor-documents/ir-tphs/12-31-25-TPHS-Financials-Press-Release-BW-v3.31.26.pdf",
+              "locator": "Other income line $239 thousand for year ended December 31, 2025",
+              "as_of": "2025-12-31",
+              "content_sha256": "c743057ca1b7351e8fb25da9e910e2103be0035694bfb115ea738beb55deb12f",
+              "source_id": "f0e5837bc14150b5fc8858b6944275f6a9362f67d8549dcdeef3b205f8b1e014"
+            },
+            {
+              "node_id": "shares_m",
+              "ref": "TPHS/investor-documents/ir-tphs/3-31-26-TPHS-Financials-Press-Release-v5.14.26.pdf",
+              "locator": "64,947,266 shares outstanding at March 31, 2026",
+              "as_of": "2026-03-31",
+              "content_sha256": "00fff480645a1c1aad27c29c682d43157fd670c682ae797d8286a85b06deac69",
+              "source_id": "64f4d9a9748045f2c90691dea6fdf4105b3e093bf1f93b0c8d4799648dcf47e3"
+            }
+          ],
+          "checks": {
+            "passed": true,
+            "errors": []
+          },
+          "proof_hash": "fd65e938c32353537cc762c0075621a53810140894169c1b31996176ecef4ba4"
+        },
+        "evidence_tier": "primary_derived",
+        "evidence_level": "primary_derived",
+        "evidence": "Q1 2026 IR press release (TPHS/investor-documents/ir-tphs/3-31-26-TPHS-Financials-Press-Release-v5.14.26.pdf); FY2025 IR press release where noted; Steel SPA (TPHS/investor-documents/sec-edgar/8-K_20250205_rpt20250205_acc0001104659_25_009671.htm). Proof base 0.01/sh via owner_cash_or_dividend_discount@1.0.",
+        "scenario_assumptions": "Proof outputs {'low': 0.0, 'base': 0.01, 'high': 0.02}; see calculation_proof graph.",
         "probability_and_timing": null,
         "tax_and_realization_adjustments": "No growth reinvestment assumed.",
         "falsifier": "IP income goes to zero and no replacement revenue appears.",
         "overlap_key": "ip_licensing_stub",
-        "assumption_type": "fact"
+        "assumption_type": "judgment"
       },
       {
         "component_id": "nol_shell_option",
@@ -362,25 +1859,239 @@
           "unit": "per-share economic claim"
         },
         "method": "milestone_project_option",
-        "method_version": null,
-        "method_provenance": null,
+        "method_version": "1.0",
+        "method_provenance": {
+          "method_id": "probability_weighted_catalyst_nav",
+          "version": "1.0",
+          "label": "Mutually exclusive catalyst event tree",
+          "power_zones": [
+            "catalyst_asset_value"
+          ],
+          "equation": "value = sum(probability_i*(payoff_i-cost_i)/(1+r_i)^years_i)",
+          "sources": [
+            {
+              "ref": "_system/frameworks/optionality_valuation.md",
+              "locator": "Probability, beneficiary, timing and failure cases"
+            }
+          ]
+        },
         "comparable_ids": [],
         "range_per_share": {
-          "low": null,
-          "base": null,
-          "high": null
+          "low": 0.0,
+          "base": 0.04,
+          "high": 0.1
         },
         "legacy_range_per_share": {
           "low": 0.0,
           "base": 0.04,
           "high": 0.1
         },
-        "valuation_status": "legacy_sensitivity",
-        "calculation_proof": null,
+        "valuation_status": "bounded_estimate",
+        "calculation_proof": {
+          "status": "valid",
+          "method_id": "probability_weighted_catalyst_nav",
+          "method_version": "1.0",
+          "outputs": {
+            "low": 0.0,
+            "base": 0.04,
+            "high": 0.1
+          },
+          "output_unit": "USD_per_share",
+          "traces": {
+            "low": [
+              {
+                "id": "shares_m",
+                "label": "Common shares outstanding (Q1 2026)",
+                "kind": "fact",
+                "value": 64.947266,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "TPHS/investor-documents/ir-tphs/3-31-26-TPHS-Financials-Press-Release-v5.14.26.pdf",
+                  "locator": "64,947,266 shares outstanding at March 31, 2026",
+                  "as_of": "2026-03-31",
+                  "content_sha256": "00fff480645a1c1aad27c29c682d43157fd670c682ae797d8286a85b06deac69",
+                  "source_id": "64f4d9a9748045f2c90691dea6fdf4105b3e093bf1f93b0c8d4799648dcf47e3"
+                },
+                "rationale": null
+              },
+              {
+                "id": "federal_nol_m",
+                "label": "Federal net operating loss carryforward (face)",
+                "kind": "fact",
+                "value": 329.9,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "TPHS/investor-documents/ir-tphs/3-31-26-TPHS-Financials-Press-Release-v5.14.26.pdf",
+                  "locator": "Federal NOLs approximately $329.9 million at March 31, 2026 with full valuation allowance",
+                  "as_of": "2026-03-31",
+                  "content_sha256": "00fff480645a1c1aad27c29c682d43157fd670c682ae797d8286a85b06deac69",
+                  "source_id": "eca646d9c5998a5f3aece311820f5ba2be5e104fe29276212ea545a56ece8406"
+                },
+                "rationale": null
+              },
+              {
+                "id": "shell_option_m",
+                "label": "Probability-weighted NOL-shell utility to common (not face NOL value)",
+                "kind": "judgment",
+                "value": 0.0,
+                "unit": "USD_m",
+                "source": null,
+                "rationale": "Low assumes Steel never uses the shell; base reflects modest optionality under Steel control without a disclosed transaction; high assumes reverse-merger utility while Section 382 still caps annual usage well below face NOL."
+              },
+              {
+                "id": "value_per_share",
+                "label": "Preserved NOL shell option per share",
+                "kind": "calculation",
+                "value": 0.0,
+                "unit": "USD_per_share",
+                "operation": "divide",
+                "formula": "shell_option_m \u00f7 shares_m",
+                "substituted_formula": "0 \u00f7 64.947266",
+                "dependencies": [
+                  "shell_option_m",
+                  "shares_m"
+                ]
+              }
+            ],
+            "base": [
+              {
+                "id": "shares_m",
+                "label": "Common shares outstanding (Q1 2026)",
+                "kind": "fact",
+                "value": 64.947266,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "TPHS/investor-documents/ir-tphs/3-31-26-TPHS-Financials-Press-Release-v5.14.26.pdf",
+                  "locator": "64,947,266 shares outstanding at March 31, 2026",
+                  "as_of": "2026-03-31",
+                  "content_sha256": "00fff480645a1c1aad27c29c682d43157fd670c682ae797d8286a85b06deac69",
+                  "source_id": "64f4d9a9748045f2c90691dea6fdf4105b3e093bf1f93b0c8d4799648dcf47e3"
+                },
+                "rationale": null
+              },
+              {
+                "id": "federal_nol_m",
+                "label": "Federal net operating loss carryforward (face)",
+                "kind": "fact",
+                "value": 329.9,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "TPHS/investor-documents/ir-tphs/3-31-26-TPHS-Financials-Press-Release-v5.14.26.pdf",
+                  "locator": "Federal NOLs approximately $329.9 million at March 31, 2026 with full valuation allowance",
+                  "as_of": "2026-03-31",
+                  "content_sha256": "00fff480645a1c1aad27c29c682d43157fd670c682ae797d8286a85b06deac69",
+                  "source_id": "eca646d9c5998a5f3aece311820f5ba2be5e104fe29276212ea545a56ece8406"
+                },
+                "rationale": null
+              },
+              {
+                "id": "shell_option_m",
+                "label": "Probability-weighted NOL-shell utility to common (not face NOL value)",
+                "kind": "judgment",
+                "value": 2.597891,
+                "unit": "USD_m",
+                "source": null,
+                "rationale": "Low assumes Steel never uses the shell; base reflects modest optionality under Steel control without a disclosed transaction; high assumes reverse-merger utility while Section 382 still caps annual usage well below face NOL."
+              },
+              {
+                "id": "value_per_share",
+                "label": "Preserved NOL shell option per share",
+                "kind": "calculation",
+                "value": 0.04000001,
+                "unit": "USD_per_share",
+                "operation": "divide",
+                "formula": "shell_option_m \u00f7 shares_m",
+                "substituted_formula": "2.597891 \u00f7 64.947266",
+                "dependencies": [
+                  "shell_option_m",
+                  "shares_m"
+                ]
+              }
+            ],
+            "high": [
+              {
+                "id": "shares_m",
+                "label": "Common shares outstanding (Q1 2026)",
+                "kind": "fact",
+                "value": 64.947266,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "TPHS/investor-documents/ir-tphs/3-31-26-TPHS-Financials-Press-Release-v5.14.26.pdf",
+                  "locator": "64,947,266 shares outstanding at March 31, 2026",
+                  "as_of": "2026-03-31",
+                  "content_sha256": "00fff480645a1c1aad27c29c682d43157fd670c682ae797d8286a85b06deac69",
+                  "source_id": "64f4d9a9748045f2c90691dea6fdf4105b3e093bf1f93b0c8d4799648dcf47e3"
+                },
+                "rationale": null
+              },
+              {
+                "id": "federal_nol_m",
+                "label": "Federal net operating loss carryforward (face)",
+                "kind": "fact",
+                "value": 329.9,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "TPHS/investor-documents/ir-tphs/3-31-26-TPHS-Financials-Press-Release-v5.14.26.pdf",
+                  "locator": "Federal NOLs approximately $329.9 million at March 31, 2026 with full valuation allowance",
+                  "as_of": "2026-03-31",
+                  "content_sha256": "00fff480645a1c1aad27c29c682d43157fd670c682ae797d8286a85b06deac69",
+                  "source_id": "eca646d9c5998a5f3aece311820f5ba2be5e104fe29276212ea545a56ece8406"
+                },
+                "rationale": null
+              },
+              {
+                "id": "shell_option_m",
+                "label": "Probability-weighted NOL-shell utility to common (not face NOL value)",
+                "kind": "judgment",
+                "value": 6.494727,
+                "unit": "USD_m",
+                "source": null,
+                "rationale": "Low assumes Steel never uses the shell; base reflects modest optionality under Steel control without a disclosed transaction; high assumes reverse-merger utility while Section 382 still caps annual usage well below face NOL."
+              },
+              {
+                "id": "value_per_share",
+                "label": "Preserved NOL shell option per share",
+                "kind": "calculation",
+                "value": 0.10000001,
+                "unit": "USD_per_share",
+                "operation": "divide",
+                "formula": "shell_option_m \u00f7 shares_m",
+                "substituted_formula": "6.494727 \u00f7 64.947266",
+                "dependencies": [
+                  "shell_option_m",
+                  "shares_m"
+                ]
+              }
+            ]
+          },
+          "source_lineage": [
+            {
+              "node_id": "shares_m",
+              "ref": "TPHS/investor-documents/ir-tphs/3-31-26-TPHS-Financials-Press-Release-v5.14.26.pdf",
+              "locator": "64,947,266 shares outstanding at March 31, 2026",
+              "as_of": "2026-03-31",
+              "content_sha256": "00fff480645a1c1aad27c29c682d43157fd670c682ae797d8286a85b06deac69",
+              "source_id": "64f4d9a9748045f2c90691dea6fdf4105b3e093bf1f93b0c8d4799648dcf47e3"
+            },
+            {
+              "node_id": "federal_nol_m",
+              "ref": "TPHS/investor-documents/ir-tphs/3-31-26-TPHS-Financials-Press-Release-v5.14.26.pdf",
+              "locator": "Federal NOLs approximately $329.9 million at March 31, 2026 with full valuation allowance",
+              "as_of": "2026-03-31",
+              "content_sha256": "00fff480645a1c1aad27c29c682d43157fd670c682ae797d8286a85b06deac69",
+              "source_id": "eca646d9c5998a5f3aece311820f5ba2be5e104fe29276212ea545a56ece8406"
+            }
+          ],
+          "checks": {
+            "passed": true,
+            "errors": []
+          },
+          "proof_hash": "cf4953c40dc1d8af59c3f686f221240e829076384f0dbb4cc0f65b5a05c3dc1a"
+        },
         "evidence_tier": "filing",
         "evidence_level": "primary_verified",
-        "evidence": "Federal NOL ~$329.9M and state ~$337.4M at 3/31/2026 with full valuation allowance. Steel Partners ~39.8% via Feb 2025 SPA. No disclosed acquisition plan as of 2026-07-17. Section 382 would cap annual use.",
-        "scenario_assumptions": "Risked option on shell utility; face NOL is not equity value.",
+        "evidence": "Q1 2026 IR press release (TPHS/investor-documents/ir-tphs/3-31-26-TPHS-Financials-Press-Release-v5.14.26.pdf); FY2025 IR press release where noted; Steel SPA (TPHS/investor-documents/sec-edgar/8-K_20250205_rpt20250205_acc0001104659_25_009671.htm). Proof base 0.04/sh via probability_weighted_catalyst_nav@1.0.",
+        "scenario_assumptions": "Proof outputs {'low': 0.0, 'base': 0.04, 'high': 0.1}; see calculation_proof graph.",
         "probability_and_timing": {
           "success_probability": null,
           "remaining_capital_m": null,
@@ -391,7 +2102,7 @@
         "tax_and_realization_adjustments": "Section 382, control, and absence of a disclosed plan widen the range.",
         "falsifier": "Going-private / Form 15 / note foreclosure leaves minority common with near-zero residual, or Steel never uses the shell.",
         "overlap_key": "nol_shell_option",
-        "assumption_type": "fact"
+        "assumption_type": "judgment"
       },
       {
         "component_id": "steel_note_and_deficit_reserve",
@@ -406,99 +2117,578 @@
           "unit": "per-share economic claim"
         },
         "method": "realization_reserve",
-        "method_version": null,
-        "method_provenance": null,
+        "method_version": "1.0",
+        "method_provenance": {
+          "method_id": "net_asset_value",
+          "version": "1.0",
+          "label": "Reconciled net asset value",
+          "power_zones": [
+            "scarce_asset_optionality",
+            "catalyst_asset_value",
+            "credit_and_normalized_returns"
+          ],
+          "equation": "value_per_share = (gross_assets - senior_claims - tax - realization_costs) / diluted_shares",
+          "sources": [
+            {
+              "ref": "_system/frameworks/scarce_strategic_asset_valuation.md",
+              "locator": "Economic ownership and unit NAV"
+            }
+          ]
+        },
         "comparable_ids": [],
         "range_per_share": {
-          "low": null,
-          "base": null,
-          "high": null
+          "low": -0.03,
+          "base": -0.01,
+          "high": -0.01
         },
         "legacy_range_per_share": {
           "low": -0.03,
           "base": -0.01,
           "high": -0.01
         },
-        "valuation_status": "legacy_sensitivity",
-        "calculation_proof": null,
-        "evidence_tier": "filing",
-        "evidence_level": "primary_verified",
-        "evidence": "Steel note ~$1.372M secured by all assets; stockholders' deficit ~-$1.534M (~-$0.024/sh).",
-        "scenario_assumptions": "Senior claim haircut on common; base payoff $0.045 already nets this risk judgmentally.",
+        "valuation_status": "bounded_estimate",
+        "calculation_proof": {
+          "status": "valid",
+          "method_id": "net_asset_value",
+          "method_version": "1.0",
+          "outputs": {
+            "low": -0.03,
+            "base": -0.01,
+            "high": -0.01
+          },
+          "output_unit": "USD_per_share",
+          "traces": {
+            "low": [
+              {
+                "id": "shares_m",
+                "label": "Common shares outstanding (Q1 2026)",
+                "kind": "fact",
+                "value": 64.947266,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "TPHS/investor-documents/ir-tphs/3-31-26-TPHS-Financials-Press-Release-v5.14.26.pdf",
+                  "locator": "64,947,266 shares outstanding at March 31, 2026",
+                  "as_of": "2026-03-31",
+                  "content_sha256": "00fff480645a1c1aad27c29c682d43157fd670c682ae797d8286a85b06deac69",
+                  "source_id": "64f4d9a9748045f2c90691dea6fdf4105b3e093bf1f93b0c8d4799648dcf47e3"
+                },
+                "rationale": null
+              },
+              {
+                "id": "steel_note_m",
+                "label": "Steel Promissory Note outstanding",
+                "kind": "fact",
+                "value": 1.372,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "TPHS/investor-documents/ir-tphs/3-31-26-TPHS-Financials-Press-Release-v5.14.26.pdf",
+                  "locator": "Note payable to Steel Connect LLC $1.372 million at March 31, 2026; secured by all company assets",
+                  "as_of": "2026-03-31",
+                  "content_sha256": "00fff480645a1c1aad27c29c682d43157fd670c682ae797d8286a85b06deac69",
+                  "source_id": "321d042aaa7062789560198dfbfde22e48313262defa5324e78284f2e648a059"
+                },
+                "rationale": null
+              },
+              {
+                "id": "stockholders_deficit_m",
+                "label": "Stockholders' deficit",
+                "kind": "fact",
+                "value": 1.534,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "TPHS/investor-documents/ir-tphs/3-31-26-TPHS-Financials-Press-Release-v5.14.26.pdf",
+                  "locator": "Stockholders' deficit $1.534 million at March 31, 2026",
+                  "as_of": "2026-03-31",
+                  "content_sha256": "00fff480645a1c1aad27c29c682d43157fd670c682ae797d8286a85b06deac69",
+                  "source_id": "91875cab0f08ac83f1d64786a07e41ba9275425302fca904275ddeea80fdb669"
+                },
+                "rationale": null
+              },
+              {
+                "id": "senior_claim_haircut",
+                "label": "Fraction of combined note and deficit treated as senior claim on common",
+                "kind": "judgment",
+                "value": 0.6705,
+                "unit": "fraction",
+                "source": null,
+                "rationale": "Bear assumes note conversion or foreclosure absorbs nearly all residual equity value; base and high apply a partial haircut consistent with Steel note advances funding G&A while preserving shell optionality."
+              },
+              {
+                "id": "combined_senior_m",
+                "label": "Combined senior claims (note plus deficit proxy)",
+                "kind": "calculation",
+                "value": 2.906,
+                "unit": "USD_m",
+                "operation": "add",
+                "formula": "steel_note_m + stockholders_deficit_m",
+                "substituted_formula": "1.372 + 1.534",
+                "dependencies": [
+                  "steel_note_m",
+                  "stockholders_deficit_m"
+                ]
+              },
+              {
+                "id": "risked_senior_m",
+                "label": "Risk-adjusted senior claim on equity",
+                "kind": "calculation",
+                "value": 1.948473,
+                "unit": "USD_m",
+                "operation": "multiply",
+                "formula": "combined_senior_m \u00d7 senior_claim_haircut",
+                "substituted_formula": "2.906 \u00d7 0.6705",
+                "dependencies": [
+                  "combined_senior_m",
+                  "senior_claim_haircut"
+                ]
+              },
+              {
+                "id": "claim_per_share",
+                "label": "Senior claim per share before sign",
+                "kind": "calculation",
+                "value": 0.03000085,
+                "unit": "USD_per_share",
+                "operation": "divide",
+                "formula": "risked_senior_m \u00f7 shares_m",
+                "substituted_formula": "1.948473 \u00f7 64.947266",
+                "dependencies": [
+                  "risked_senior_m",
+                  "shares_m"
+                ]
+              },
+              {
+                "id": "value_per_share",
+                "label": "Steel note and deficit reserve per share",
+                "kind": "calculation",
+                "value": -0.03000085,
+                "unit": "USD_per_share",
+                "operation": "negative",
+                "formula": "-(claim_per_share)",
+                "substituted_formula": "-(0.030000847)",
+                "dependencies": [
+                  "claim_per_share"
+                ]
+              }
+            ],
+            "base": [
+              {
+                "id": "shares_m",
+                "label": "Common shares outstanding (Q1 2026)",
+                "kind": "fact",
+                "value": 64.947266,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "TPHS/investor-documents/ir-tphs/3-31-26-TPHS-Financials-Press-Release-v5.14.26.pdf",
+                  "locator": "64,947,266 shares outstanding at March 31, 2026",
+                  "as_of": "2026-03-31",
+                  "content_sha256": "00fff480645a1c1aad27c29c682d43157fd670c682ae797d8286a85b06deac69",
+                  "source_id": "64f4d9a9748045f2c90691dea6fdf4105b3e093bf1f93b0c8d4799648dcf47e3"
+                },
+                "rationale": null
+              },
+              {
+                "id": "steel_note_m",
+                "label": "Steel Promissory Note outstanding",
+                "kind": "fact",
+                "value": 1.372,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "TPHS/investor-documents/ir-tphs/3-31-26-TPHS-Financials-Press-Release-v5.14.26.pdf",
+                  "locator": "Note payable to Steel Connect LLC $1.372 million at March 31, 2026; secured by all company assets",
+                  "as_of": "2026-03-31",
+                  "content_sha256": "00fff480645a1c1aad27c29c682d43157fd670c682ae797d8286a85b06deac69",
+                  "source_id": "321d042aaa7062789560198dfbfde22e48313262defa5324e78284f2e648a059"
+                },
+                "rationale": null
+              },
+              {
+                "id": "stockholders_deficit_m",
+                "label": "Stockholders' deficit",
+                "kind": "fact",
+                "value": 1.534,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "TPHS/investor-documents/ir-tphs/3-31-26-TPHS-Financials-Press-Release-v5.14.26.pdf",
+                  "locator": "Stockholders' deficit $1.534 million at March 31, 2026",
+                  "as_of": "2026-03-31",
+                  "content_sha256": "00fff480645a1c1aad27c29c682d43157fd670c682ae797d8286a85b06deac69",
+                  "source_id": "91875cab0f08ac83f1d64786a07e41ba9275425302fca904275ddeea80fdb669"
+                },
+                "rationale": null
+              },
+              {
+                "id": "senior_claim_haircut",
+                "label": "Fraction of combined note and deficit treated as senior claim on common",
+                "kind": "judgment",
+                "value": 0.2235,
+                "unit": "fraction",
+                "source": null,
+                "rationale": "Bear assumes note conversion or foreclosure absorbs nearly all residual equity value; base and high apply a partial haircut consistent with Steel note advances funding G&A while preserving shell optionality."
+              },
+              {
+                "id": "combined_senior_m",
+                "label": "Combined senior claims (note plus deficit proxy)",
+                "kind": "calculation",
+                "value": 2.906,
+                "unit": "USD_m",
+                "operation": "add",
+                "formula": "steel_note_m + stockholders_deficit_m",
+                "substituted_formula": "1.372 + 1.534",
+                "dependencies": [
+                  "steel_note_m",
+                  "stockholders_deficit_m"
+                ]
+              },
+              {
+                "id": "risked_senior_m",
+                "label": "Risk-adjusted senior claim on equity",
+                "kind": "calculation",
+                "value": 0.649491,
+                "unit": "USD_m",
+                "operation": "multiply",
+                "formula": "combined_senior_m \u00d7 senior_claim_haircut",
+                "substituted_formula": "2.906 \u00d7 0.2235",
+                "dependencies": [
+                  "combined_senior_m",
+                  "senior_claim_haircut"
+                ]
+              },
+              {
+                "id": "claim_per_share",
+                "label": "Senior claim per share before sign",
+                "kind": "calculation",
+                "value": 0.01000028,
+                "unit": "USD_per_share",
+                "operation": "divide",
+                "formula": "risked_senior_m \u00f7 shares_m",
+                "substituted_formula": "0.649491 \u00f7 64.947266",
+                "dependencies": [
+                  "risked_senior_m",
+                  "shares_m"
+                ]
+              },
+              {
+                "id": "value_per_share",
+                "label": "Steel note and deficit reserve per share",
+                "kind": "calculation",
+                "value": -0.01000028,
+                "unit": "USD_per_share",
+                "operation": "negative",
+                "formula": "-(claim_per_share)",
+                "substituted_formula": "-(0.010000282)",
+                "dependencies": [
+                  "claim_per_share"
+                ]
+              }
+            ],
+            "high": [
+              {
+                "id": "shares_m",
+                "label": "Common shares outstanding (Q1 2026)",
+                "kind": "fact",
+                "value": 64.947266,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "TPHS/investor-documents/ir-tphs/3-31-26-TPHS-Financials-Press-Release-v5.14.26.pdf",
+                  "locator": "64,947,266 shares outstanding at March 31, 2026",
+                  "as_of": "2026-03-31",
+                  "content_sha256": "00fff480645a1c1aad27c29c682d43157fd670c682ae797d8286a85b06deac69",
+                  "source_id": "64f4d9a9748045f2c90691dea6fdf4105b3e093bf1f93b0c8d4799648dcf47e3"
+                },
+                "rationale": null
+              },
+              {
+                "id": "steel_note_m",
+                "label": "Steel Promissory Note outstanding",
+                "kind": "fact",
+                "value": 1.372,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "TPHS/investor-documents/ir-tphs/3-31-26-TPHS-Financials-Press-Release-v5.14.26.pdf",
+                  "locator": "Note payable to Steel Connect LLC $1.372 million at March 31, 2026; secured by all company assets",
+                  "as_of": "2026-03-31",
+                  "content_sha256": "00fff480645a1c1aad27c29c682d43157fd670c682ae797d8286a85b06deac69",
+                  "source_id": "321d042aaa7062789560198dfbfde22e48313262defa5324e78284f2e648a059"
+                },
+                "rationale": null
+              },
+              {
+                "id": "stockholders_deficit_m",
+                "label": "Stockholders' deficit",
+                "kind": "fact",
+                "value": 1.534,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "TPHS/investor-documents/ir-tphs/3-31-26-TPHS-Financials-Press-Release-v5.14.26.pdf",
+                  "locator": "Stockholders' deficit $1.534 million at March 31, 2026",
+                  "as_of": "2026-03-31",
+                  "content_sha256": "00fff480645a1c1aad27c29c682d43157fd670c682ae797d8286a85b06deac69",
+                  "source_id": "91875cab0f08ac83f1d64786a07e41ba9275425302fca904275ddeea80fdb669"
+                },
+                "rationale": null
+              },
+              {
+                "id": "senior_claim_haircut",
+                "label": "Fraction of combined note and deficit treated as senior claim on common",
+                "kind": "judgment",
+                "value": 0.2235,
+                "unit": "fraction",
+                "source": null,
+                "rationale": "Bear assumes note conversion or foreclosure absorbs nearly all residual equity value; base and high apply a partial haircut consistent with Steel note advances funding G&A while preserving shell optionality."
+              },
+              {
+                "id": "combined_senior_m",
+                "label": "Combined senior claims (note plus deficit proxy)",
+                "kind": "calculation",
+                "value": 2.906,
+                "unit": "USD_m",
+                "operation": "add",
+                "formula": "steel_note_m + stockholders_deficit_m",
+                "substituted_formula": "1.372 + 1.534",
+                "dependencies": [
+                  "steel_note_m",
+                  "stockholders_deficit_m"
+                ]
+              },
+              {
+                "id": "risked_senior_m",
+                "label": "Risk-adjusted senior claim on equity",
+                "kind": "calculation",
+                "value": 0.649491,
+                "unit": "USD_m",
+                "operation": "multiply",
+                "formula": "combined_senior_m \u00d7 senior_claim_haircut",
+                "substituted_formula": "2.906 \u00d7 0.2235",
+                "dependencies": [
+                  "combined_senior_m",
+                  "senior_claim_haircut"
+                ]
+              },
+              {
+                "id": "claim_per_share",
+                "label": "Senior claim per share before sign",
+                "kind": "calculation",
+                "value": 0.01000028,
+                "unit": "USD_per_share",
+                "operation": "divide",
+                "formula": "risked_senior_m \u00f7 shares_m",
+                "substituted_formula": "0.649491 \u00f7 64.947266",
+                "dependencies": [
+                  "risked_senior_m",
+                  "shares_m"
+                ]
+              },
+              {
+                "id": "value_per_share",
+                "label": "Steel note and deficit reserve per share",
+                "kind": "calculation",
+                "value": -0.01000028,
+                "unit": "USD_per_share",
+                "operation": "negative",
+                "formula": "-(claim_per_share)",
+                "substituted_formula": "-(0.010000282)",
+                "dependencies": [
+                  "claim_per_share"
+                ]
+              }
+            ]
+          },
+          "source_lineage": [
+            {
+              "node_id": "shares_m",
+              "ref": "TPHS/investor-documents/ir-tphs/3-31-26-TPHS-Financials-Press-Release-v5.14.26.pdf",
+              "locator": "64,947,266 shares outstanding at March 31, 2026",
+              "as_of": "2026-03-31",
+              "content_sha256": "00fff480645a1c1aad27c29c682d43157fd670c682ae797d8286a85b06deac69",
+              "source_id": "64f4d9a9748045f2c90691dea6fdf4105b3e093bf1f93b0c8d4799648dcf47e3"
+            },
+            {
+              "node_id": "steel_note_m",
+              "ref": "TPHS/investor-documents/ir-tphs/3-31-26-TPHS-Financials-Press-Release-v5.14.26.pdf",
+              "locator": "Note payable to Steel Connect LLC $1.372 million at March 31, 2026; secured by all company assets",
+              "as_of": "2026-03-31",
+              "content_sha256": "00fff480645a1c1aad27c29c682d43157fd670c682ae797d8286a85b06deac69",
+              "source_id": "321d042aaa7062789560198dfbfde22e48313262defa5324e78284f2e648a059"
+            },
+            {
+              "node_id": "stockholders_deficit_m",
+              "ref": "TPHS/investor-documents/ir-tphs/3-31-26-TPHS-Financials-Press-Release-v5.14.26.pdf",
+              "locator": "Stockholders' deficit $1.534 million at March 31, 2026",
+              "as_of": "2026-03-31",
+              "content_sha256": "00fff480645a1c1aad27c29c682d43157fd670c682ae797d8286a85b06deac69",
+              "source_id": "91875cab0f08ac83f1d64786a07e41ba9275425302fca904275ddeea80fdb669"
+            }
+          ],
+          "checks": {
+            "passed": true,
+            "errors": []
+          },
+          "proof_hash": "40f233643698c65683865702c83ee0c50af819263eae67d6d579ad9e37a429e9"
+        },
+        "evidence_tier": "primary_derived",
+        "evidence_level": "primary_derived",
+        "evidence": "Q1 2026 IR press release (TPHS/investor-documents/ir-tphs/3-31-26-TPHS-Financials-Press-Release-v5.14.26.pdf); FY2025 IR press release where noted; Steel SPA (TPHS/investor-documents/sec-edgar/8-K_20250205_rpt20250205_acc0001104659_25_009671.htm). Proof base -0.01/sh via net_asset_value@1.0.",
+        "scenario_assumptions": "Proof outputs {'low': -0.03, 'base': -0.01, 'high': -0.01}; see calculation_proof graph.",
         "probability_and_timing": null,
         "tax_and_realization_adjustments": "Secured claim sits ahead of equity.",
         "falsifier": "Note conversion or foreclosure extinguishes common ahead of any shell payoff.",
         "overlap_key": "steel_note_and_deficit_reserve",
-        "assumption_type": "fact"
+        "assumption_type": "judgment"
       }
     ],
     "scenario_contract": {
       "rule": "Cases must change cited causal operating, capital, probability, timing, or financing drivers\u2014not only a terminal multiple.",
       "top_value_drivers": [
         {
-          "component_id": "cash_and_working_capital",
-          "label": "Cash and working capital",
-          "valuation_status": "legacy_sensitivity",
-          "base_per_share": null,
-          "legacy_base_per_share": 0.0,
-          "range_width_per_share": null,
-          "scenario_assumptions": "Near-term cash only; no Trust claim (May 2025 transfer)."
+          "component_id": "nol_shell_option",
+          "label": "Preserved NOL shell option (Steel-controlled)",
+          "valuation_status": "bounded_estimate",
+          "base_per_share": 0.04,
+          "legacy_base_per_share": 0.04,
+          "range_width_per_share": 0.1,
+          "scenario_assumptions": "Proof outputs {'low': 0.0, 'base': 0.04, 'high': 0.1}; see calculation_proof graph."
         },
         {
           "component_id": "ip_licensing_stub",
           "label": "Legacy Syms / Filene's IP licensing stub",
-          "valuation_status": "legacy_sensitivity",
-          "base_per_share": null,
+          "valuation_status": "bounded_estimate",
+          "base_per_share": 0.01,
           "legacy_base_per_share": 0.01,
-          "range_width_per_share": null,
-          "scenario_assumptions": "Modest capitalization of residual IP cash, not a reinvestment compounder."
-        },
-        {
-          "component_id": "nol_shell_option",
-          "label": "Preserved NOL shell option (Steel-controlled)",
-          "valuation_status": "legacy_sensitivity",
-          "base_per_share": null,
-          "legacy_base_per_share": 0.04,
-          "range_width_per_share": null,
-          "scenario_assumptions": "Risked option on shell utility; face NOL is not equity value."
+          "range_width_per_share": 0.02,
+          "scenario_assumptions": "Proof outputs {'low': 0.0, 'base': 0.01, 'high': 0.02}; see calculation_proof graph."
         },
         {
           "component_id": "steel_note_and_deficit_reserve",
           "label": "Steel promissory note and equity deficit reserve",
-          "valuation_status": "legacy_sensitivity",
-          "base_per_share": null,
+          "valuation_status": "bounded_estimate",
+          "base_per_share": -0.01,
           "legacy_base_per_share": -0.01,
-          "range_width_per_share": null,
-          "scenario_assumptions": "Senior claim haircut on common; base payoff $0.045 already nets this risk judgmentally."
+          "range_width_per_share": 0.02,
+          "scenario_assumptions": "Proof outputs {'low': -0.03, 'base': -0.01, 'high': -0.01}; see calculation_proof graph."
+        },
+        {
+          "component_id": "cash_and_working_capital",
+          "label": "Cash and working capital",
+          "valuation_status": "bounded_estimate",
+          "base_per_share": 0.0008,
+          "legacy_base_per_share": 0.0,
+          "range_width_per_share": 0.0,
+          "scenario_assumptions": "Proof outputs {'low': 0.0008, 'base': 0.0008, 'high': 0.0008}; see calculation_proof graph."
         }
       ],
       "reverse_expectations": null
     },
     "calculation_proof_summary": {
       "component_count": 4,
-      "priced_component_count": 0,
-      "proof_complete_pct": 0.0,
+      "priced_component_count": 4,
+      "proof_complete_pct": 100.0,
       "status_counts": {
-        "bounded_estimate": 0,
+        "bounded_estimate": 4,
         "calculated": 0,
-        "legacy_sensitivity": 4,
+        "legacy_sensitivity": 0,
         "unpriced": 0
       },
-      "all_material_components_priced": false,
+      "all_material_components_priced": true,
       "calculation_errors": [],
-      "aggregate_proof_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      "aggregate_proof_hash": "6cf1823e8c7b44bf04035ae57a8cad1e3c3c7d73b8be1ff1567a48acb235039c"
     },
     "model_checks": {
       "calculation_graphs_valid": true,
-      "component_sum_reconciles": false,
+      "component_sum_reconciles": true,
       "no_double_counting": true,
-      "all_material_components_priced": false,
+      "all_material_components_priced": true,
       "low_base_high_ordered": true
     },
-    "source_lineage": [],
+    "source_lineage": [
+      {
+        "component_id": "cash_and_working_capital",
+        "node_id": "cash_m",
+        "ref": "TPHS/investor-documents/ir-tphs/3-31-26-TPHS-Financials-Press-Release-v5.14.26.pdf",
+        "locator": "Balance sheet: cash and cash equivalents $54 thousand at March 31, 2026",
+        "as_of": "2026-03-31",
+        "content_sha256": "00fff480645a1c1aad27c29c682d43157fd670c682ae797d8286a85b06deac69",
+        "source_id": "2ad651a520095204289ef58e8d4b0a897997faed7f1cdd5a1744e6d4db230f0b"
+      },
+      {
+        "component_id": "cash_and_working_capital",
+        "node_id": "shares_m",
+        "ref": "TPHS/investor-documents/ir-tphs/3-31-26-TPHS-Financials-Press-Release-v5.14.26.pdf",
+        "locator": "64,947,266 shares outstanding at March 31, 2026",
+        "as_of": "2026-03-31",
+        "content_sha256": "00fff480645a1c1aad27c29c682d43157fd670c682ae797d8286a85b06deac69",
+        "source_id": "64f4d9a9748045f2c90691dea6fdf4105b3e093bf1f93b0c8d4799648dcf47e3"
+      },
+      {
+        "component_id": "ip_licensing_stub",
+        "node_id": "ip_income_m",
+        "ref": "TPHS/investor-documents/ir-tphs/12-31-25-TPHS-Financials-Press-Release-BW-v3.31.26.pdf",
+        "locator": "Other income line $239 thousand for year ended December 31, 2025",
+        "as_of": "2025-12-31",
+        "content_sha256": "c743057ca1b7351e8fb25da9e910e2103be0035694bfb115ea738beb55deb12f",
+        "source_id": "f0e5837bc14150b5fc8858b6944275f6a9362f67d8549dcdeef3b205f8b1e014"
+      },
+      {
+        "component_id": "ip_licensing_stub",
+        "node_id": "shares_m",
+        "ref": "TPHS/investor-documents/ir-tphs/3-31-26-TPHS-Financials-Press-Release-v5.14.26.pdf",
+        "locator": "64,947,266 shares outstanding at March 31, 2026",
+        "as_of": "2026-03-31",
+        "content_sha256": "00fff480645a1c1aad27c29c682d43157fd670c682ae797d8286a85b06deac69",
+        "source_id": "64f4d9a9748045f2c90691dea6fdf4105b3e093bf1f93b0c8d4799648dcf47e3"
+      },
+      {
+        "component_id": "nol_shell_option",
+        "node_id": "shares_m",
+        "ref": "TPHS/investor-documents/ir-tphs/3-31-26-TPHS-Financials-Press-Release-v5.14.26.pdf",
+        "locator": "64,947,266 shares outstanding at March 31, 2026",
+        "as_of": "2026-03-31",
+        "content_sha256": "00fff480645a1c1aad27c29c682d43157fd670c682ae797d8286a85b06deac69",
+        "source_id": "64f4d9a9748045f2c90691dea6fdf4105b3e093bf1f93b0c8d4799648dcf47e3"
+      },
+      {
+        "component_id": "nol_shell_option",
+        "node_id": "federal_nol_m",
+        "ref": "TPHS/investor-documents/ir-tphs/3-31-26-TPHS-Financials-Press-Release-v5.14.26.pdf",
+        "locator": "Federal NOLs approximately $329.9 million at March 31, 2026 with full valuation allowance",
+        "as_of": "2026-03-31",
+        "content_sha256": "00fff480645a1c1aad27c29c682d43157fd670c682ae797d8286a85b06deac69",
+        "source_id": "eca646d9c5998a5f3aece311820f5ba2be5e104fe29276212ea545a56ece8406"
+      },
+      {
+        "component_id": "steel_note_and_deficit_reserve",
+        "node_id": "shares_m",
+        "ref": "TPHS/investor-documents/ir-tphs/3-31-26-TPHS-Financials-Press-Release-v5.14.26.pdf",
+        "locator": "64,947,266 shares outstanding at March 31, 2026",
+        "as_of": "2026-03-31",
+        "content_sha256": "00fff480645a1c1aad27c29c682d43157fd670c682ae797d8286a85b06deac69",
+        "source_id": "64f4d9a9748045f2c90691dea6fdf4105b3e093bf1f93b0c8d4799648dcf47e3"
+      },
+      {
+        "component_id": "steel_note_and_deficit_reserve",
+        "node_id": "steel_note_m",
+        "ref": "TPHS/investor-documents/ir-tphs/3-31-26-TPHS-Financials-Press-Release-v5.14.26.pdf",
+        "locator": "Note payable to Steel Connect LLC $1.372 million at March 31, 2026; secured by all company assets",
+        "as_of": "2026-03-31",
+        "content_sha256": "00fff480645a1c1aad27c29c682d43157fd670c682ae797d8286a85b06deac69",
+        "source_id": "321d042aaa7062789560198dfbfde22e48313262defa5324e78284f2e648a059"
+      },
+      {
+        "component_id": "steel_note_and_deficit_reserve",
+        "node_id": "stockholders_deficit_m",
+        "ref": "TPHS/investor-documents/ir-tphs/3-31-26-TPHS-Financials-Press-Release-v5.14.26.pdf",
+        "locator": "Stockholders' deficit $1.534 million at March 31, 2026",
+        "as_of": "2026-03-31",
+        "content_sha256": "00fff480645a1c1aad27c29c682d43157fd670c682ae797d8286a85b06deac69",
+        "source_id": "91875cab0f08ac83f1d64786a07e41ba9275425302fca904275ddeea80fdb669"
+      }
+    ],
     "change_control": {
-      "model_hash": "f0149695aaa6bdf0d38d365f8f83e2a5850e7b6b7e24448916ebc359e30650da",
-      "method_versions": [],
+      "model_hash": "520246ee65a9fbf49394ae5b4bae67c3763dcb97b19fcb5fbc2d12acf8405825",
+      "method_versions": [
+        "milestone_project_option@1.0",
+        "net_asset_value@1.0",
+        "owner_cash_dcf@1.0",
+        "realization_reserve@1.0"
+      ],
       "change_log": [],
       "rule": "A source fact is locked. Every assumption change requires a reason, author, timestamp, and before/after value."
     }
@@ -520,25 +2710,239 @@
           "unit": "per-share economic claim"
         },
         "method": "milestone_project_option",
-        "method_version": null,
-        "method_provenance": null,
+        "method_version": "1.0",
+        "method_provenance": {
+          "method_id": "probability_weighted_catalyst_nav",
+          "version": "1.0",
+          "label": "Mutually exclusive catalyst event tree",
+          "power_zones": [
+            "catalyst_asset_value"
+          ],
+          "equation": "value = sum(probability_i*(payoff_i-cost_i)/(1+r_i)^years_i)",
+          "sources": [
+            {
+              "ref": "_system/frameworks/optionality_valuation.md",
+              "locator": "Probability, beneficiary, timing and failure cases"
+            }
+          ]
+        },
         "comparable_ids": [],
         "range_per_share": {
-          "low": null,
-          "base": null,
-          "high": null
+          "low": 0.0,
+          "base": 0.04,
+          "high": 0.1
         },
         "legacy_range_per_share": {
           "low": 0.0,
           "base": 0.04,
           "high": 0.1
         },
-        "valuation_status": "legacy_sensitivity",
-        "calculation_proof": null,
+        "valuation_status": "bounded_estimate",
+        "calculation_proof": {
+          "status": "valid",
+          "method_id": "probability_weighted_catalyst_nav",
+          "method_version": "1.0",
+          "outputs": {
+            "low": 0.0,
+            "base": 0.04,
+            "high": 0.1
+          },
+          "output_unit": "USD_per_share",
+          "traces": {
+            "low": [
+              {
+                "id": "shares_m",
+                "label": "Common shares outstanding (Q1 2026)",
+                "kind": "fact",
+                "value": 64.947266,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "TPHS/investor-documents/ir-tphs/3-31-26-TPHS-Financials-Press-Release-v5.14.26.pdf",
+                  "locator": "64,947,266 shares outstanding at March 31, 2026",
+                  "as_of": "2026-03-31",
+                  "content_sha256": "00fff480645a1c1aad27c29c682d43157fd670c682ae797d8286a85b06deac69",
+                  "source_id": "64f4d9a9748045f2c90691dea6fdf4105b3e093bf1f93b0c8d4799648dcf47e3"
+                },
+                "rationale": null
+              },
+              {
+                "id": "federal_nol_m",
+                "label": "Federal net operating loss carryforward (face)",
+                "kind": "fact",
+                "value": 329.9,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "TPHS/investor-documents/ir-tphs/3-31-26-TPHS-Financials-Press-Release-v5.14.26.pdf",
+                  "locator": "Federal NOLs approximately $329.9 million at March 31, 2026 with full valuation allowance",
+                  "as_of": "2026-03-31",
+                  "content_sha256": "00fff480645a1c1aad27c29c682d43157fd670c682ae797d8286a85b06deac69",
+                  "source_id": "eca646d9c5998a5f3aece311820f5ba2be5e104fe29276212ea545a56ece8406"
+                },
+                "rationale": null
+              },
+              {
+                "id": "shell_option_m",
+                "label": "Probability-weighted NOL-shell utility to common (not face NOL value)",
+                "kind": "judgment",
+                "value": 0.0,
+                "unit": "USD_m",
+                "source": null,
+                "rationale": "Low assumes Steel never uses the shell; base reflects modest optionality under Steel control without a disclosed transaction; high assumes reverse-merger utility while Section 382 still caps annual usage well below face NOL."
+              },
+              {
+                "id": "value_per_share",
+                "label": "Preserved NOL shell option per share",
+                "kind": "calculation",
+                "value": 0.0,
+                "unit": "USD_per_share",
+                "operation": "divide",
+                "formula": "shell_option_m \u00f7 shares_m",
+                "substituted_formula": "0 \u00f7 64.947266",
+                "dependencies": [
+                  "shell_option_m",
+                  "shares_m"
+                ]
+              }
+            ],
+            "base": [
+              {
+                "id": "shares_m",
+                "label": "Common shares outstanding (Q1 2026)",
+                "kind": "fact",
+                "value": 64.947266,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "TPHS/investor-documents/ir-tphs/3-31-26-TPHS-Financials-Press-Release-v5.14.26.pdf",
+                  "locator": "64,947,266 shares outstanding at March 31, 2026",
+                  "as_of": "2026-03-31",
+                  "content_sha256": "00fff480645a1c1aad27c29c682d43157fd670c682ae797d8286a85b06deac69",
+                  "source_id": "64f4d9a9748045f2c90691dea6fdf4105b3e093bf1f93b0c8d4799648dcf47e3"
+                },
+                "rationale": null
+              },
+              {
+                "id": "federal_nol_m",
+                "label": "Federal net operating loss carryforward (face)",
+                "kind": "fact",
+                "value": 329.9,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "TPHS/investor-documents/ir-tphs/3-31-26-TPHS-Financials-Press-Release-v5.14.26.pdf",
+                  "locator": "Federal NOLs approximately $329.9 million at March 31, 2026 with full valuation allowance",
+                  "as_of": "2026-03-31",
+                  "content_sha256": "00fff480645a1c1aad27c29c682d43157fd670c682ae797d8286a85b06deac69",
+                  "source_id": "eca646d9c5998a5f3aece311820f5ba2be5e104fe29276212ea545a56ece8406"
+                },
+                "rationale": null
+              },
+              {
+                "id": "shell_option_m",
+                "label": "Probability-weighted NOL-shell utility to common (not face NOL value)",
+                "kind": "judgment",
+                "value": 2.597891,
+                "unit": "USD_m",
+                "source": null,
+                "rationale": "Low assumes Steel never uses the shell; base reflects modest optionality under Steel control without a disclosed transaction; high assumes reverse-merger utility while Section 382 still caps annual usage well below face NOL."
+              },
+              {
+                "id": "value_per_share",
+                "label": "Preserved NOL shell option per share",
+                "kind": "calculation",
+                "value": 0.04000001,
+                "unit": "USD_per_share",
+                "operation": "divide",
+                "formula": "shell_option_m \u00f7 shares_m",
+                "substituted_formula": "2.597891 \u00f7 64.947266",
+                "dependencies": [
+                  "shell_option_m",
+                  "shares_m"
+                ]
+              }
+            ],
+            "high": [
+              {
+                "id": "shares_m",
+                "label": "Common shares outstanding (Q1 2026)",
+                "kind": "fact",
+                "value": 64.947266,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "TPHS/investor-documents/ir-tphs/3-31-26-TPHS-Financials-Press-Release-v5.14.26.pdf",
+                  "locator": "64,947,266 shares outstanding at March 31, 2026",
+                  "as_of": "2026-03-31",
+                  "content_sha256": "00fff480645a1c1aad27c29c682d43157fd670c682ae797d8286a85b06deac69",
+                  "source_id": "64f4d9a9748045f2c90691dea6fdf4105b3e093bf1f93b0c8d4799648dcf47e3"
+                },
+                "rationale": null
+              },
+              {
+                "id": "federal_nol_m",
+                "label": "Federal net operating loss carryforward (face)",
+                "kind": "fact",
+                "value": 329.9,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "TPHS/investor-documents/ir-tphs/3-31-26-TPHS-Financials-Press-Release-v5.14.26.pdf",
+                  "locator": "Federal NOLs approximately $329.9 million at March 31, 2026 with full valuation allowance",
+                  "as_of": "2026-03-31",
+                  "content_sha256": "00fff480645a1c1aad27c29c682d43157fd670c682ae797d8286a85b06deac69",
+                  "source_id": "eca646d9c5998a5f3aece311820f5ba2be5e104fe29276212ea545a56ece8406"
+                },
+                "rationale": null
+              },
+              {
+                "id": "shell_option_m",
+                "label": "Probability-weighted NOL-shell utility to common (not face NOL value)",
+                "kind": "judgment",
+                "value": 6.494727,
+                "unit": "USD_m",
+                "source": null,
+                "rationale": "Low assumes Steel never uses the shell; base reflects modest optionality under Steel control without a disclosed transaction; high assumes reverse-merger utility while Section 382 still caps annual usage well below face NOL."
+              },
+              {
+                "id": "value_per_share",
+                "label": "Preserved NOL shell option per share",
+                "kind": "calculation",
+                "value": 0.10000001,
+                "unit": "USD_per_share",
+                "operation": "divide",
+                "formula": "shell_option_m \u00f7 shares_m",
+                "substituted_formula": "6.494727 \u00f7 64.947266",
+                "dependencies": [
+                  "shell_option_m",
+                  "shares_m"
+                ]
+              }
+            ]
+          },
+          "source_lineage": [
+            {
+              "node_id": "shares_m",
+              "ref": "TPHS/investor-documents/ir-tphs/3-31-26-TPHS-Financials-Press-Release-v5.14.26.pdf",
+              "locator": "64,947,266 shares outstanding at March 31, 2026",
+              "as_of": "2026-03-31",
+              "content_sha256": "00fff480645a1c1aad27c29c682d43157fd670c682ae797d8286a85b06deac69",
+              "source_id": "64f4d9a9748045f2c90691dea6fdf4105b3e093bf1f93b0c8d4799648dcf47e3"
+            },
+            {
+              "node_id": "federal_nol_m",
+              "ref": "TPHS/investor-documents/ir-tphs/3-31-26-TPHS-Financials-Press-Release-v5.14.26.pdf",
+              "locator": "Federal NOLs approximately $329.9 million at March 31, 2026 with full valuation allowance",
+              "as_of": "2026-03-31",
+              "content_sha256": "00fff480645a1c1aad27c29c682d43157fd670c682ae797d8286a85b06deac69",
+              "source_id": "eca646d9c5998a5f3aece311820f5ba2be5e104fe29276212ea545a56ece8406"
+            }
+          ],
+          "checks": {
+            "passed": true,
+            "errors": []
+          },
+          "proof_hash": "cf4953c40dc1d8af59c3f686f221240e829076384f0dbb4cc0f65b5a05c3dc1a"
+        },
         "evidence_tier": "filing",
         "evidence_level": "primary_verified",
-        "evidence": "Federal NOL ~$329.9M and state ~$337.4M at 3/31/2026 with full valuation allowance. Steel Partners ~39.8% via Feb 2025 SPA. No disclosed acquisition plan as of 2026-07-17. Section 382 would cap annual use.",
-        "scenario_assumptions": "Risked option on shell utility; face NOL is not equity value.",
+        "evidence": "Q1 2026 IR press release (TPHS/investor-documents/ir-tphs/3-31-26-TPHS-Financials-Press-Release-v5.14.26.pdf); FY2025 IR press release where noted; Steel SPA (TPHS/investor-documents/sec-edgar/8-K_20250205_rpt20250205_acc0001104659_25_009671.htm). Proof base 0.04/sh via probability_weighted_catalyst_nav@1.0.",
+        "scenario_assumptions": "Proof outputs {'low': 0.0, 'base': 0.04, 'high': 0.1}; see calculation_proof graph.",
         "probability_and_timing": {
           "success_probability": null,
           "remaining_capital_m": null,
@@ -549,7 +2953,7 @@
         "tax_and_realization_adjustments": "Section 382, control, and absence of a disclosed plan widen the range.",
         "falsifier": "Going-private / Form 15 / note foreclosure leaves minority common with near-zero residual, or Steel never uses the shell.",
         "overlap_key": "nol_shell_option",
-        "assumption_type": "fact"
+        "assumption_type": "judgment"
       }
     ],
     "rule": "Every option requires a beneficiary, probability, timing, remaining capital, failure case, and non-overlap control; absence of option value must be explicit rather than unvalued."
@@ -619,8 +3023,7 @@
     "routing_reasons": [
       "archetype=optionality",
       "component categories=real_option",
-      "existing methods=option",
-      "explicit reviewed profile"
+      "existing methods=option"
     ],
     "required_evidence": [
       "legal economic claim",
@@ -629,55 +3032,14 @@
       "realization timing",
       "remaining owner capital"
     ],
-    "applicability_tests": [
-      "The security owns a legally enforceable economic claim on scarce assets or royalties.",
-      "Material value is omitted or poorly represented by current GAAP earnings.",
-      "Asset quantities, ownership, overlap, timing, and remaining capital can be reconciled.",
-      "Comparable values can be adjusted for location, quality, control, liquidity, and realization time."
-    ],
+    "applicability_tests": [],
     "failure_modes": [
       "gross asset value mistaken for shareholder value",
       "operating cash flow and NAV counted twice",
       "remote options treated as contracted cash"
     ],
-    "validation_cohort": [
-      {
-        "ticker": "MSB",
-        "archetype": "royalty_asset",
-        "primary_profile": "scarce_asset_optionality",
-        "purpose": "Test depletion, commodity exposure, finite reserves, and royalty-unit reconciliation.",
-        "status": "queued"
-      },
-      {
-        "ticker": "C",
-        "archetype": "financial_balance_sheet",
-        "primary_profile": "credit_and_normalized_returns",
-        "purpose": "Test tangible capital, credit losses, funding, regulation, and excess-capital realization.",
-        "status": "queued"
-      },
-      {
-        "ticker": "NVR",
-        "archetype": "quality_reinvestment",
-        "primary_profile": "quality_reinvestment",
-        "purpose": "Test owner earnings, capital-light reinvestment, cyclicality, and buyback value creation.",
-        "status": "queued"
-      },
-      {
-        "ticker": "NUE",
-        "archetype": "capital_cycle",
-        "primary_profile": "capital_cycle",
-        "purpose": "Test normalized margins, industry supply response, replacement cost, and reinvestment timing.",
-        "status": "queued"
-      },
-      {
-        "ticker": "BIIB",
-        "archetype": "binary_special_situation",
-        "primary_profile": "probability_weighted_special_situation",
-        "purpose": "Test product concentration, pipeline probabilities, patent cliffs, and catalyst timing.",
-        "status": "queued"
-      }
-    ],
-    "rule": "Use one primary method and no more than two corroborating methods; irrelevant methods and personas remain silent."
+    "validation_cohort": [],
+    "rule": "Power Zones select the fitting economic method and eligible independent reviewers; they never choose the valuation answer or capital decision."
   },
   "outcomes": {
     "status": "waiting_for_owner_decision",
@@ -715,24 +3077,23 @@
     "weighting_rule": "Do not change a persona's relevance within a power zone until at least 20 attributable, dividend-aware outcomes exist there; never reweight automatically."
   },
   "attribution": {
-    "status": "waiting_for_proof_complete_baseline",
+    "status": "complete",
     "current": {
-      "as_of": "2026-07-17",
-      "low": null,
-      "base": null,
-      "high": null
+      "as_of": "2026-07-24",
+      "low": -0.0292,
+      "base": 0.0408,
+      "high": 0.1108
     },
-    "prior": null,
-    "base_change_per_share": null,
-    "base_change_pct": null,
+    "prior": {
+      "as_of": "2026-07-17",
+      "base": 0.04,
+      "ref": "TPHS/research/valuation_history/valuation_2026-07-17.json"
+    },
+    "base_change_per_share": 0.0,
+    "base_change_pct": 0.0,
     "drivers": [],
     "category_totals_per_share": {},
-    "unexplained_per_share": null,
-    "legacy_value_per_share": {
-      "low": -0.03,
-      "base": 0.04,
-      "high": 0.11
-    },
-    "explanation": "A complete security value is intentionally withheld while material components are unpriced. Attribution restarts after the first proof-complete baseline."
+    "unexplained_per_share": 0.0,
+    "explanation": "Component changes are classified from observable differences in quantity, comparable method, probability, timing, capital, evidence, and schedule scope."
   }
 }

@@ -1,9 +1,9 @@
 # TPHS — Cross-Check: Third-Party Sources
 
-**Date:** 2026-07-17
+**Date:** 2026-07-24
 **Agent:** Marvin (automated fill)
-**Marvin dive:** `TPHS/research/deep_dive_2026-07-17.md`
-**Source inventory:** `TPHS/third-party-analyses/source_inventory_2026-07-17.md`
+**Marvin dive:** `TPHS/research/deep_dive_2026-07-24.md`
+**Source inventory:** `TPHS/third-party-analyses/source_inventory_2026-07-24.md`
 **Framework:** `_system/frameworks/third_party_cross_reference.md`, `external_view_blend.md`
 
 ## Executive summary
@@ -33,7 +33,7 @@ Marvin floor **14.4%** per year (optionality; stance **watch**) from primary fil
 
 | Topic | Marvin (filings) | External | Source |
 |-------|------------------|----------|--------|
-| Base return anchor | **14.4%** per year | Qualitative support only | `TPHS/research/deep_dive_2026-07-17.md` |
+| Base return anchor | **14.4%** per year | Qualitative support only | `TPHS/research/deep_dive_2026-07-24.md` |
 | Archetype / stance | **optionality** · **watch** | See indexed sources | `valuation.json` |
 | Normalization | No operating business remains after the May 20, 2025 transfer of the 95% TPHGree | Cross-check vs posts | Marvin |
 
@@ -64,10 +64,10 @@ Marvin floor **14.4%** per year (optionality; stance **watch**) from primary fil
 
 ## [PROPOSED MEMORY]
 
-- [PROPOSED COMPANY] TPHS: third-party cross-check fill 2026-07-17 — Marvin 14.4% unchanged
+- [PROPOSED COMPANY] TPHS: third-party cross-check fill 2026-07-24 — Marvin 14.4% unchanged
 
 ## Primary sources cited
 
-1. `TPHS/research/deep_dive_2026-07-17.md`
+1. `TPHS/research/deep_dive_2026-07-24.md`
 2. `TPHS/research/valuation.json`
-3. `TPHS/third-party-analyses/source_inventory_2026-07-17.md`
+3. `TPHS/third-party-analyses/source_inventory_2026-07-24.md`

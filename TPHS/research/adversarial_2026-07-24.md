@@ -11,11 +11,11 @@ re_pass: false
 
 # TPHS — Adversarial review
 
-**Date:** 2026-07-17  
+**Date:** 2026-07-24  
 **Agent:** Milly (batch pass)  
-**Dive reviewed:** `TPHS/research/deep_dive_2026-07-17.md`  
+**Dive reviewed:** `TPHS/research/deep_dive_2026-07-24.md`  
 **Valuation reviewed:** `TPHS/research/valuation.json`  
-**Filings used:** `TPHS/research/evidence/filing_facts_2026-07-17.json`
+**Filings used:** `TPHS/research/evidence/filing_facts_2026-07-24.json`
 
 **Goal:** Truth-seeking QA. Not bearish for its own sake.
 
@@ -54,7 +54,7 @@ re_pass: false
 | Valuation bridge base | 14.4% | None% | — |
 
 **Lint notes:**
-- TPHS/research/deep_dive_2026-07-17.md: missing parseable Returns statement IRR
+- TPHS/research/deep_dive_2026-07-24.md: missing parseable Returns statement IRR
 
 ---
 
