@@ -58,7 +58,7 @@ No sources are in the approved registry for STHO. One **context-tier** reference
 
 ## Primary sources cited
 
-1. `STHO/research/deep_dive_2026-06-12.md`
+1. `STHO/research/deep_dive_2026-07-24.md`
 2. `STHO/third-party-analyses/source_inventory_2026-06-12.md`
 3. `_system/reference/superinvestor-letters/2026Q1/McIntyre_Partnerships_Q1_2026_Letter.txt`
 4. `STHO/investor-documents/sec-edgar/10-Q_20260508_rpt20260331_acc0001953366_26_000010.htm`
