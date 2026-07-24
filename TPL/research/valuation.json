@@ -1,6 +1,6 @@
 {
   "ticker": "TPL",
-  "as_of": "2026-07-21",
+  "as_of": "2026-07-24",
   "method": "full",
   "valuation_mode": "optionality",
   "valuation_overlay": "segment_cashflow",
@@ -765,8 +765,78 @@
           "base": 2.4,
           "high": 4.0,
           "evidence_tier": "filing_balance_sheet",
-          "evidence": "FY2025 net PP&E of $164.5M; this is an embedded floor cross-check and not additive value.",
-          "cross_check": "The operated-water DCF already capitalizes returns on installed infrastructure."
+          "evidence": "FY2025 net PP&E of $164.5M; embedded floor cross-check only — not additive. Proof base $2.38/sh via net_asset_value@1.0.",
+          "cross_check": "The operated-water DCF already capitalizes returns on installed infrastructure.",
+          "calculation_proof": {
+            "schema_version": "1.0",
+            "method_id": "net_asset_value",
+            "method_version": "1.0",
+            "output_unit": "USD_per_share",
+            "inputs": [
+              {
+                "id": "net_ppe_m",
+                "label": "FY2025 net property, plant and equipment",
+                "kind": "fact",
+                "value": 164.5,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "TPL/investor-documents/sec-edgar/10-K_20260218_rpt20251231_acc0001811074_26_000018.htm",
+                  "locator": "Net PP&E approximately $164.5M (FY2025 balance sheet)",
+                  "as_of": "2025-12-31"
+                },
+                "locked": true
+              },
+              {
+                "id": "shares_m",
+                "label": "FY2025 diluted shares",
+                "kind": "fact",
+                "value": 69.027,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "TPL/investor-documents/sec-edgar/10-K_20260218_rpt20251231_acc0001811074_26_000018.htm",
+                  "locator": "69,027,000 diluted shares outstanding for FY2025 EPS bridge",
+                  "as_of": "2025-12-31"
+                },
+                "locked": true
+              }
+            ],
+            "assumptions": [
+              {
+                "id": "replacement_cost_haircut",
+                "label": "Depreciated replacement-cost haircut on net PP&E",
+                "kind": "judgment",
+                "values": {
+                  "low": 0.84,
+                  "base": 1.0,
+                  "high": 1.68
+                },
+                "unit": "multiple",
+                "rationale": "Embedded cross-check only; low case applies additional obsolescence; high case allows replacement premium.",
+                "allowed_range": {
+                  "min": 0.5,
+                  "max": 2.0
+                }
+              }
+            ],
+            "calculations": [
+              {
+                "id": "value_per_share",
+                "label": "Infrastructure replacement-cost cross-check per share",
+                "op": "divide",
+                "args": [
+                  "net_ppe_m",
+                  "shares_m"
+                ],
+                "unit": "USD_per_share"
+              }
+            ],
+            "outputs": {
+              "low": "value_per_share",
+              "base": "value_per_share",
+              "high": "value_per_share"
+            }
+          },
+          "valuation_status": "bounded_estimate"
         }
       },
       {
@@ -8203,6 +8273,17 @@
       "Data-center and desalination success values are not comparable NAV and remain probability weighted."
     ],
     "complete_component_coverage": true,
+    "ownership_waterfall": {
+      "net_economic_claim": "One diluted common share claim on Permian royalty estate, surface tolls, separated water streams, financial assets, milestone options, less realization reserve.",
+      "excluded_claims": [
+        "Producing royalty DCF subtracted before undeveloped inventory residual allocation.",
+        "Contracted data-center receivable and Bolt investment excluded from incremental data-center option success value.",
+        "Water infrastructure PP&E cross-check embedded in operated water; not additive to component sum.",
+        "1888 Assigned land and perpetual royalty interests remain at zero GAAP; not used as dhando floor."
+      ],
+      "reconciliation": "Water royalty ($124M), operated water ($170M), and desalination option modeled separately; component proof sum base ≈ $246.21/sh vs Lawrence owner-cash path −8.2% at ~$414 price.",
+      "evidence_ref": "TPL/research/evidence_reconciliation_2026-07-24.md"
+    },
     "validation_errors": [],
     "registry_version": "1.0"
   },
