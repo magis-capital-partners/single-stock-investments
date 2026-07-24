@@ -1,57 +1,56 @@
 {
   "schema_version": "2.0",
   "status": "routed",
-  "profile_id": "catalyst_asset_value",
-  "label": "Catalyst-backed asset value",
-  "score": 17.0,
+  "profile_id": "scarce_asset_optionality",
+  "label": "Scarce assets, royalties, and optionality",
+  "score": 9.0,
   "reasons": [
     "archetype=holding_co",
-    "component categories=financial_asset",
-    "explicit reviewed profile"
+    "component categories=real_option",
+    "existing methods=land, option"
   ],
   "primary_methods": [
-    "probability_weighted_catalyst_nav"
+    "component_owner_cash_and_unit_nav"
   ],
   "corroborating_methods": [
-    "break_value",
-    "timing_adjusted_payoff"
+    "comparable_transactions",
+    "replacement_cost_or_reverse_nav"
   ],
   "primary_personas": [
-    "klarman_asset_value",
-    "greenblatt"
+    "hk",
+    "stahl"
   ],
   "cross_check_personas": [
-    "pabrai",
+    "klarman_asset_value",
     "marks_credit_cycle"
   ],
   "silent_personas": [
     "buffett_weschler",
-    "hk",
+    "greenblatt",
     "hohn",
     "marathon_capital_cycle",
     "munger",
-    "stahl"
+    "pabrai"
   ],
   "required_evidence": [
-    "finite event tree",
-    "catalyst control and timing",
-    "break value",
-    "tax and legal claims",
-    "financing through realization"
+    "legal economic claim",
+    "non-overlapping physical inventory",
+    "unit economics",
+    "realization timing",
+    "remaining owner capital"
   ],
   "failure_modes": [
-    "catalyst assumed rather than evidenced",
-    "delay and break cases omitted",
-    "gross proceeds used before tax and senior claims"
+    "gross asset value mistaken for shareholder value",
+    "operating cash flow and NAV counted twice",
+    "remote options treated as contracted cash"
   ],
   "secondary_profiles": [
     {
-      "profile_id": "scarce_asset_optionality",
-      "score": 9.0,
+      "profile_id": "catalyst_asset_value",
+      "score": 7.0,
       "reasons": [
         "archetype=holding_co",
-        "component categories=real_option",
-        "existing methods=land, option"
+        "component categories=financial_asset"
       ]
     },
     {
@@ -86,11 +85,10 @@
       ]
     },
     "catalyst_asset_value": {
-      "score": 17.0,
+      "score": 7.0,
       "reasons": [
         "archetype=holding_co",
-        "component categories=financial_asset",
-        "explicit reviewed profile"
+        "component categories=financial_asset"
       ]
     },
     "predictable_cash_flow": {
@@ -107,7 +105,7 @@
   },
   "decision_rule": "Power Zones select the fitting economic method and eligible independent reviewers; they never choose the valuation answer or capital decision.",
   "ticker": "STHO",
-  "as_of": "2026-07-20",
+  "as_of": "2026-07-24",
   "route_source": "canonical_power_zone_router",
   "config_path": "_system/frameworks/power_zones.json",
   "config_updated": "2026-07-14",
@@ -193,16 +191,16 @@
     "committee_seatable": true,
     "candidates": [
       {
+        "persona": "hk",
+        "independence_group": "scarce_assets"
+      },
+      {
+        "persona": "stahl",
+        "independence_group": "scarce_assets"
+      },
+      {
         "persona": "klarman_asset_value",
         "independence_group": "asset_realization"
-      },
-      {
-        "persona": "greenblatt",
-        "independence_group": "special_situations"
-      },
-      {
-        "persona": "pabrai",
-        "independence_group": "asymmetry_downside"
       },
       {
         "persona": "marks_credit_cycle",
@@ -214,6 +212,6 @@
       }
     ]
   },
-  "input_hash": "89798ebefa9bf12d98515c1fa467a2e3628b938c01fec5a11fc2912d84d18727",
-  "generated_at": "2026-07-20T17:13:56.349496+00:00"
+  "input_hash": "19abe433b170aba8b3fac9697f4d31f1d03cf19c347b8332dfbff2c16b5c3f28",
+  "generated_at": "2026-07-24T04:07:58.561752+00:00"
 }

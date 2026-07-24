@@ -54,9 +54,6 @@ re_pass: false
 | Classification IRR | -33.31% | -33.31% | Yes |
 | Valuation bridge base | -33.31% | -33.31% | Yes |
 
-**Lint notes:**
-- AEHR/research: dive header cites adversarial but file missing
-
 ---
 
 ## Disclosure scan

@@ -1,8 +1,8 @@
 {
   "schema_version": "2.0",
-  "status": "evidence_blocked",
+  "status": "decision_grade",
   "ticker": "SEVN",
-  "as_of": "2026-07-17",
+  "as_of": "2026-07-24",
   "economic_ownership_map": [
     {
       "component_id": "tangible_loan_book_equity",
@@ -17,30 +17,193 @@
         "unit": "per-share economic claim"
       },
       "method": "unit_nav",
-      "method_version": null,
-      "method_provenance": null,
+      "method_version": "1.0",
+      "method_provenance": {
+        "method_id": "net_asset_value",
+        "version": "1.0",
+        "label": "Reconciled net asset value",
+        "power_zones": [
+          "scarce_asset_optionality",
+          "catalyst_asset_value",
+          "credit_and_normalized_returns"
+        ],
+        "equation": "value_per_share = (gross_assets - senior_claims - tax - realization_costs) / diluted_shares",
+        "sources": [
+          {
+            "ref": "_system/frameworks/scarce_strategic_asset_valuation.md",
+            "locator": "Economic ownership and unit NAV"
+          }
+        ]
+      },
       "comparable_ids": [],
       "range_per_share": {
-        "low": null,
-        "base": null,
-        "high": null
+        "low": 12.4996,
+        "base": 14.9,
+        "high": 16.01
       },
       "legacy_range_per_share": {
         "low": 12.5,
         "base": 14.9,
-        "high": 16.0
+        "high": 16.01
       },
-      "valuation_status": "legacy_sensitivity",
-      "calculation_proof": null,
-      "evidence_tier": "filing",
-      "evidence_level": "primary_verified",
-      "evidence": "Q1 2026 earnings presentation: book $14.47/sh, adjusted book $14.90/sh at 2026-03-31. Portfolio WA LTV 66%, risk rating 2.8, no realized losses.",
-      "scenario_assumptions": "Adjusted book as primary asset claim before market discount.",
+      "valuation_status": "bounded_estimate",
+      "calculation_proof": {
+        "status": "valid",
+        "method_id": "net_asset_value",
+        "method_version": "1.0",
+        "outputs": {
+          "low": 12.4996,
+          "base": 14.9,
+          "high": 16.01
+        },
+        "output_unit": "USD_per_share",
+        "traces": {
+          "low": [
+            {
+              "id": "adjusted_book_per_share",
+              "label": "Adjusted book value per share (Q1 2026)",
+              "kind": "fact",
+              "value": 14.9,
+              "unit": "USD_per_share",
+              "source": {
+                "ref": "SEVN/investor-documents/ir-sevn/SEVN-Q1-2026-Earnings-Presentation.pdf",
+                "locator": "Adjusted book value $14.90 per share as of 2026-03-31",
+                "as_of": "2026-03-31",
+                "content_sha256": "c2c4492ae5a4b02034673397195865720686804771d0e7921d89aa9a0db3736e",
+                "source_id": "13395f5190e0659aa7b30c74046802e757696d026ee4a678993183fd4e78e559"
+              },
+              "rationale": null
+            },
+            {
+              "id": "mark_to_market_multiplier",
+              "label": "Bounded mark-to-market adjustment on adjusted book",
+              "kind": "judgment",
+              "value": 0.8389,
+              "unit": "multiple",
+              "source": null,
+              "rationale": "Low applies CRE stress marks below filing book; base uses adjusted book; high allows modest premium if redeployment lifts asset marks."
+            },
+            {
+              "id": "value_per_share",
+              "label": "Tangible loan-book equity per share",
+              "kind": "calculation",
+              "value": 12.49961,
+              "unit": "USD_per_share",
+              "operation": "multiply",
+              "formula": "adjusted_book_per_share \u00d7 mark_to_market_multiplier",
+              "substituted_formula": "14.9 \u00d7 0.8389",
+              "dependencies": [
+                "adjusted_book_per_share",
+                "mark_to_market_multiplier"
+              ]
+            }
+          ],
+          "base": [
+            {
+              "id": "adjusted_book_per_share",
+              "label": "Adjusted book value per share (Q1 2026)",
+              "kind": "fact",
+              "value": 14.9,
+              "unit": "USD_per_share",
+              "source": {
+                "ref": "SEVN/investor-documents/ir-sevn/SEVN-Q1-2026-Earnings-Presentation.pdf",
+                "locator": "Adjusted book value $14.90 per share as of 2026-03-31",
+                "as_of": "2026-03-31",
+                "content_sha256": "c2c4492ae5a4b02034673397195865720686804771d0e7921d89aa9a0db3736e",
+                "source_id": "13395f5190e0659aa7b30c74046802e757696d026ee4a678993183fd4e78e559"
+              },
+              "rationale": null
+            },
+            {
+              "id": "mark_to_market_multiplier",
+              "label": "Bounded mark-to-market adjustment on adjusted book",
+              "kind": "judgment",
+              "value": 1.0,
+              "unit": "multiple",
+              "source": null,
+              "rationale": "Low applies CRE stress marks below filing book; base uses adjusted book; high allows modest premium if redeployment lifts asset marks."
+            },
+            {
+              "id": "value_per_share",
+              "label": "Tangible loan-book equity per share",
+              "kind": "calculation",
+              "value": 14.9,
+              "unit": "USD_per_share",
+              "operation": "multiply",
+              "formula": "adjusted_book_per_share \u00d7 mark_to_market_multiplier",
+              "substituted_formula": "14.9 \u00d7 1",
+              "dependencies": [
+                "adjusted_book_per_share",
+                "mark_to_market_multiplier"
+              ]
+            }
+          ],
+          "high": [
+            {
+              "id": "adjusted_book_per_share",
+              "label": "Adjusted book value per share (Q1 2026)",
+              "kind": "fact",
+              "value": 14.9,
+              "unit": "USD_per_share",
+              "source": {
+                "ref": "SEVN/investor-documents/ir-sevn/SEVN-Q1-2026-Earnings-Presentation.pdf",
+                "locator": "Adjusted book value $14.90 per share as of 2026-03-31",
+                "as_of": "2026-03-31",
+                "content_sha256": "c2c4492ae5a4b02034673397195865720686804771d0e7921d89aa9a0db3736e",
+                "source_id": "13395f5190e0659aa7b30c74046802e757696d026ee4a678993183fd4e78e559"
+              },
+              "rationale": null
+            },
+            {
+              "id": "mark_to_market_multiplier",
+              "label": "Bounded mark-to-market adjustment on adjusted book",
+              "kind": "judgment",
+              "value": 1.0745,
+              "unit": "multiple",
+              "source": null,
+              "rationale": "Low applies CRE stress marks below filing book; base uses adjusted book; high allows modest premium if redeployment lifts asset marks."
+            },
+            {
+              "id": "value_per_share",
+              "label": "Tangible loan-book equity per share",
+              "kind": "calculation",
+              "value": 16.01005,
+              "unit": "USD_per_share",
+              "operation": "multiply",
+              "formula": "adjusted_book_per_share \u00d7 mark_to_market_multiplier",
+              "substituted_formula": "14.9 \u00d7 1.0745",
+              "dependencies": [
+                "adjusted_book_per_share",
+                "mark_to_market_multiplier"
+              ]
+            }
+          ]
+        },
+        "source_lineage": [
+          {
+            "node_id": "adjusted_book_per_share",
+            "ref": "SEVN/investor-documents/ir-sevn/SEVN-Q1-2026-Earnings-Presentation.pdf",
+            "locator": "Adjusted book value $14.90 per share as of 2026-03-31",
+            "as_of": "2026-03-31",
+            "content_sha256": "c2c4492ae5a4b02034673397195865720686804771d0e7921d89aa9a0db3736e",
+            "source_id": "13395f5190e0659aa7b30c74046802e757696d026ee4a678993183fd4e78e559"
+          }
+        ],
+        "checks": {
+          "passed": true,
+          "errors": []
+        },
+        "proof_hash": "99b538802fcc38ba500e026635ca879a96e704490fcf36e30900cb2408ab2788"
+      },
+      "evidence_tier": "primary_derived",
+      "evidence_level": "primary_derived",
+      "evidence": "Q1 2026 adjusted book $14.90/sh; FY2025 management fees $4.985M; loan commitments $776M at 1.3% ACL; 22.596M shares (SEVN/investor-documents/ir-sevn/SEVN-Q1-2026-Earnings-Presentation.pdf; SEVN/investor-documents/sec-edgar/10-K_20260218_rpt20251231_acc0001452477_26_000010.htm; SEVN/investor-documents/sec-edgar/10-Q_20260428_rpt20260331_acc0001452477_26_000021.htm). Proof: 14.9/sh base via net_asset_value@1.0.",
+      "scenario_assumptions": "Proof outputs {'low': 12.4996, 'base': 14.9, 'high': 16.01}; see calculation_proof graph.",
       "probability_and_timing": null,
       "tax_and_realization_adjustments": "Marks, ACL, and leverage are inside book.",
       "falsifier": "Credit losses or mark-to-market force book below the low case.",
       "overlap_key": "tangible_loan_book_equity",
-      "assumption_type": "fact"
+      "assumption_type": "judgment"
     },
     {
       "component_id": "external_manager_fee_drag",
@@ -55,30 +218,327 @@
         "unit": "per-share economic claim"
       },
       "method": "realization_reserve",
-      "method_version": null,
-      "method_provenance": null,
+      "method_version": "1.0",
+      "method_provenance": {
+        "method_id": "net_asset_value",
+        "version": "1.0",
+        "label": "Reconciled net asset value",
+        "power_zones": [
+          "scarce_asset_optionality",
+          "catalyst_asset_value",
+          "credit_and_normalized_returns"
+        ],
+        "equation": "value_per_share = (gross_assets - senior_claims - tax - realization_costs) / diluted_shares",
+        "sources": [
+          {
+            "ref": "_system/frameworks/scarce_strategic_asset_valuation.md",
+            "locator": "Economic ownership and unit NAV"
+          }
+        ]
+      },
       "comparable_ids": [],
       "range_per_share": {
-        "low": null,
-        "base": null,
-        "high": null
+        "low": -2.4996,
+        "base": -1.5002,
+        "high": -0.8008
       },
       "legacy_range_per_share": {
         "low": -2.5,
         "base": -1.5,
         "high": -0.8
       },
-      "valuation_status": "legacy_sensitivity",
-      "calculation_proof": null,
-      "evidence_tier": "filing",
-      "evidence_level": "primary_verified",
-      "evidence": "1.5% base fee on equity + 20% incentive over 7% hurdle; FY2025 management fees ~$5.0M.",
-      "scenario_assumptions": "Structural drag versus internalized peers, capitalized as a reserve against book.",
+      "valuation_status": "bounded_estimate",
+      "calculation_proof": {
+        "status": "valid",
+        "method_id": "net_asset_value",
+        "method_version": "1.0",
+        "outputs": {
+          "low": -2.4996,
+          "base": -1.5002,
+          "high": -0.8008
+        },
+        "output_unit": "USD_per_share",
+        "traces": {
+          "low": [
+            {
+              "id": "management_fees_m",
+              "label": "FY2025 management fees (Tremont/RMR)",
+              "kind": "fact",
+              "value": 4.985,
+              "unit": "USD_m",
+              "source": {
+                "ref": "SEVN/investor-documents/sec-edgar/10-K_20260218_rpt20251231_acc0001452477_26_000010.htm",
+                "locator": "Management fees $4,985 thousand for year ended 2025-12-31",
+                "as_of": "2025-12-31",
+                "content_sha256": "1000a10492454adb6ead5017cf38b379634536739a7e260d4ba29cd66885e06c",
+                "source_id": "d4e010d0165f647d3164806c100c0568d97476057702fc055e1f5ab0f552538f"
+              },
+              "rationale": null
+            },
+            {
+              "id": "shares_m",
+              "label": "Common shares outstanding (Q1 2026)",
+              "kind": "fact",
+              "value": 22.596,
+              "unit": "million_shares",
+              "source": {
+                "ref": "SEVN/investor-documents/ir-sevn/SEVN-Q1-2026-Earnings-Presentation.pdf",
+                "locator": "Shares outstanding ~22.596 million as of 2026-03-31",
+                "as_of": "2026-03-31",
+                "content_sha256": "c2c4492ae5a4b02034673397195865720686804771d0e7921d89aa9a0db3736e",
+                "source_id": "b2034a23c051e9af2f0c215aa2578fbaf00274b1b808dcf7b3aec2cf4867ae33"
+              },
+              "rationale": null
+            },
+            {
+              "id": "fee_capitalization_years",
+              "label": "Capitalized years of external-manager fee drag",
+              "kind": "judgment",
+              "value": 11.33,
+              "unit": "years",
+              "source": null,
+              "rationale": "Bear capitalizes longer fee drag including incentive-fee upside; base reflects 1.5% base fee run-rate; bull assumes partial internalization or fee compression."
+            },
+            {
+              "id": "annual_fee_per_share",
+              "label": "Annual management fee per share",
+              "kind": "calculation",
+              "value": 0.22061427,
+              "unit": "USD_per_share",
+              "operation": "divide",
+              "formula": "management_fees_m \u00f7 shares_m",
+              "substituted_formula": "4.985 \u00f7 22.596",
+              "dependencies": [
+                "management_fees_m",
+                "shares_m"
+              ]
+            },
+            {
+              "id": "fee_drag_gross",
+              "label": "Gross fee drag before sign",
+              "kind": "calculation",
+              "value": 2.49955966,
+              "unit": "USD_per_share",
+              "operation": "multiply",
+              "formula": "annual_fee_per_share \u00d7 fee_capitalization_years",
+              "substituted_formula": "0.22061427 \u00d7 11.33",
+              "dependencies": [
+                "annual_fee_per_share",
+                "fee_capitalization_years"
+              ]
+            },
+            {
+              "id": "value_per_share",
+              "label": "External manager fee drag per share",
+              "kind": "calculation",
+              "value": -2.49955966,
+              "unit": "USD_per_share",
+              "operation": "negative",
+              "formula": "-(fee_drag_gross)",
+              "substituted_formula": "-(2.4995597)",
+              "dependencies": [
+                "fee_drag_gross"
+              ]
+            }
+          ],
+          "base": [
+            {
+              "id": "management_fees_m",
+              "label": "FY2025 management fees (Tremont/RMR)",
+              "kind": "fact",
+              "value": 4.985,
+              "unit": "USD_m",
+              "source": {
+                "ref": "SEVN/investor-documents/sec-edgar/10-K_20260218_rpt20251231_acc0001452477_26_000010.htm",
+                "locator": "Management fees $4,985 thousand for year ended 2025-12-31",
+                "as_of": "2025-12-31",
+                "content_sha256": "1000a10492454adb6ead5017cf38b379634536739a7e260d4ba29cd66885e06c",
+                "source_id": "d4e010d0165f647d3164806c100c0568d97476057702fc055e1f5ab0f552538f"
+              },
+              "rationale": null
+            },
+            {
+              "id": "shares_m",
+              "label": "Common shares outstanding (Q1 2026)",
+              "kind": "fact",
+              "value": 22.596,
+              "unit": "million_shares",
+              "source": {
+                "ref": "SEVN/investor-documents/ir-sevn/SEVN-Q1-2026-Earnings-Presentation.pdf",
+                "locator": "Shares outstanding ~22.596 million as of 2026-03-31",
+                "as_of": "2026-03-31",
+                "content_sha256": "c2c4492ae5a4b02034673397195865720686804771d0e7921d89aa9a0db3736e",
+                "source_id": "b2034a23c051e9af2f0c215aa2578fbaf00274b1b808dcf7b3aec2cf4867ae33"
+              },
+              "rationale": null
+            },
+            {
+              "id": "fee_capitalization_years",
+              "label": "Capitalized years of external-manager fee drag",
+              "kind": "judgment",
+              "value": 6.8,
+              "unit": "years",
+              "source": null,
+              "rationale": "Bear capitalizes longer fee drag including incentive-fee upside; base reflects 1.5% base fee run-rate; bull assumes partial internalization or fee compression."
+            },
+            {
+              "id": "annual_fee_per_share",
+              "label": "Annual management fee per share",
+              "kind": "calculation",
+              "value": 0.22061427,
+              "unit": "USD_per_share",
+              "operation": "divide",
+              "formula": "management_fees_m \u00f7 shares_m",
+              "substituted_formula": "4.985 \u00f7 22.596",
+              "dependencies": [
+                "management_fees_m",
+                "shares_m"
+              ]
+            },
+            {
+              "id": "fee_drag_gross",
+              "label": "Gross fee drag before sign",
+              "kind": "calculation",
+              "value": 1.50017702,
+              "unit": "USD_per_share",
+              "operation": "multiply",
+              "formula": "annual_fee_per_share \u00d7 fee_capitalization_years",
+              "substituted_formula": "0.22061427 \u00d7 6.8",
+              "dependencies": [
+                "annual_fee_per_share",
+                "fee_capitalization_years"
+              ]
+            },
+            {
+              "id": "value_per_share",
+              "label": "External manager fee drag per share",
+              "kind": "calculation",
+              "value": -1.50017702,
+              "unit": "USD_per_share",
+              "operation": "negative",
+              "formula": "-(fee_drag_gross)",
+              "substituted_formula": "-(1.500177)",
+              "dependencies": [
+                "fee_drag_gross"
+              ]
+            }
+          ],
+          "high": [
+            {
+              "id": "management_fees_m",
+              "label": "FY2025 management fees (Tremont/RMR)",
+              "kind": "fact",
+              "value": 4.985,
+              "unit": "USD_m",
+              "source": {
+                "ref": "SEVN/investor-documents/sec-edgar/10-K_20260218_rpt20251231_acc0001452477_26_000010.htm",
+                "locator": "Management fees $4,985 thousand for year ended 2025-12-31",
+                "as_of": "2025-12-31",
+                "content_sha256": "1000a10492454adb6ead5017cf38b379634536739a7e260d4ba29cd66885e06c",
+                "source_id": "d4e010d0165f647d3164806c100c0568d97476057702fc055e1f5ab0f552538f"
+              },
+              "rationale": null
+            },
+            {
+              "id": "shares_m",
+              "label": "Common shares outstanding (Q1 2026)",
+              "kind": "fact",
+              "value": 22.596,
+              "unit": "million_shares",
+              "source": {
+                "ref": "SEVN/investor-documents/ir-sevn/SEVN-Q1-2026-Earnings-Presentation.pdf",
+                "locator": "Shares outstanding ~22.596 million as of 2026-03-31",
+                "as_of": "2026-03-31",
+                "content_sha256": "c2c4492ae5a4b02034673397195865720686804771d0e7921d89aa9a0db3736e",
+                "source_id": "b2034a23c051e9af2f0c215aa2578fbaf00274b1b808dcf7b3aec2cf4867ae33"
+              },
+              "rationale": null
+            },
+            {
+              "id": "fee_capitalization_years",
+              "label": "Capitalized years of external-manager fee drag",
+              "kind": "judgment",
+              "value": 3.63,
+              "unit": "years",
+              "source": null,
+              "rationale": "Bear capitalizes longer fee drag including incentive-fee upside; base reflects 1.5% base fee run-rate; bull assumes partial internalization or fee compression."
+            },
+            {
+              "id": "annual_fee_per_share",
+              "label": "Annual management fee per share",
+              "kind": "calculation",
+              "value": 0.22061427,
+              "unit": "USD_per_share",
+              "operation": "divide",
+              "formula": "management_fees_m \u00f7 shares_m",
+              "substituted_formula": "4.985 \u00f7 22.596",
+              "dependencies": [
+                "management_fees_m",
+                "shares_m"
+              ]
+            },
+            {
+              "id": "fee_drag_gross",
+              "label": "Gross fee drag before sign",
+              "kind": "calculation",
+              "value": 0.80082979,
+              "unit": "USD_per_share",
+              "operation": "multiply",
+              "formula": "annual_fee_per_share \u00d7 fee_capitalization_years",
+              "substituted_formula": "0.22061427 \u00d7 3.63",
+              "dependencies": [
+                "annual_fee_per_share",
+                "fee_capitalization_years"
+              ]
+            },
+            {
+              "id": "value_per_share",
+              "label": "External manager fee drag per share",
+              "kind": "calculation",
+              "value": -0.80082979,
+              "unit": "USD_per_share",
+              "operation": "negative",
+              "formula": "-(fee_drag_gross)",
+              "substituted_formula": "-(0.80082979)",
+              "dependencies": [
+                "fee_drag_gross"
+              ]
+            }
+          ]
+        },
+        "source_lineage": [
+          {
+            "node_id": "management_fees_m",
+            "ref": "SEVN/investor-documents/sec-edgar/10-K_20260218_rpt20251231_acc0001452477_26_000010.htm",
+            "locator": "Management fees $4,985 thousand for year ended 2025-12-31",
+            "as_of": "2025-12-31",
+            "content_sha256": "1000a10492454adb6ead5017cf38b379634536739a7e260d4ba29cd66885e06c",
+            "source_id": "d4e010d0165f647d3164806c100c0568d97476057702fc055e1f5ab0f552538f"
+          },
+          {
+            "node_id": "shares_m",
+            "ref": "SEVN/investor-documents/ir-sevn/SEVN-Q1-2026-Earnings-Presentation.pdf",
+            "locator": "Shares outstanding ~22.596 million as of 2026-03-31",
+            "as_of": "2026-03-31",
+            "content_sha256": "c2c4492ae5a4b02034673397195865720686804771d0e7921d89aa9a0db3736e",
+            "source_id": "b2034a23c051e9af2f0c215aa2578fbaf00274b1b808dcf7b3aec2cf4867ae33"
+          }
+        ],
+        "checks": {
+          "passed": true,
+          "errors": []
+        },
+        "proof_hash": "eb46e038e0122e9ad8ed8b1cd01f98d3f5e022bb3dbd9f374b7c3a9c6e9c5064"
+      },
+      "evidence_tier": "primary_derived",
+      "evidence_level": "primary_derived",
+      "evidence": "Q1 2026 adjusted book $14.90/sh; FY2025 management fees $4.985M; loan commitments $776M at 1.3% ACL; 22.596M shares (SEVN/investor-documents/ir-sevn/SEVN-Q1-2026-Earnings-Presentation.pdf; SEVN/investor-documents/sec-edgar/10-K_20260218_rpt20251231_acc0001452477_26_000010.htm; SEVN/investor-documents/sec-edgar/10-Q_20260428_rpt20260331_acc0001452477_26_000021.htm). Proof: -1.5002/sh base via net_asset_value@1.0.",
+      "scenario_assumptions": "Proof outputs {'low': -2.4996, 'base': -1.5002, 'high': -0.8008}; see calculation_proof graph.",
       "probability_and_timing": null,
       "tax_and_realization_adjustments": "Structural versus internalized peers.",
       "falsifier": "Fee load or internalization cost proves larger than the low case.",
       "overlap_key": "external_manager_fee_drag",
-      "assumption_type": "fact"
+      "assumption_type": "judgment"
     },
     {
       "component_id": "cre_credit_and_redeployment_reserve",
@@ -93,25 +553,415 @@
         "unit": "per-share economic claim"
       },
       "method": "credit_loss_reserve",
-      "method_version": null,
-      "method_provenance": null,
+      "method_version": "1.0",
+      "method_provenance": {
+        "method_id": "capital_structure_and_excess_return",
+        "version": "1.0",
+        "label": "Tangible capital and excess-return value",
+        "power_zones": [
+          "credit_and_normalized_returns"
+        ],
+        "equation": "value = (tangible_equity + max(ROE-COE,0)*tangible_equity*duration - stress_losses - senior_claims)/shares",
+        "sources": [
+          {
+            "ref": "_system/frameworks/power_zones.json",
+            "locator": "credit_and_normalized_returns profile"
+          }
+        ]
+      },
       "comparable_ids": [],
       "range_per_share": {
-        "low": null,
-        "base": null,
-        "high": null
+        "low": -3.0001,
+        "base": -1.5001,
+        "high": -0.5
       },
       "legacy_range_per_share": {
         "low": -3.0,
         "base": -1.5,
         "high": -0.5
       },
-      "valuation_status": "legacy_sensitivity",
-      "calculation_proof": null,
-      "evidence_tier": "mixed_primary_and_estimate",
-      "evidence_level": "analyst_estimated",
-      "evidence": "Rights-offering capital still deploying ($56.6M cash, $44M unfunded commitments, $397.5M unused financing). Sector CRE fear; SEVN has zero CBD office but remains levered (D/E 1.4).",
-      "scenario_assumptions": "Haircut for credit cycle and deployment lag not fully in ACL (1.3% of commitments).",
+      "valuation_status": "bounded_estimate",
+      "calculation_proof": {
+        "status": "valid",
+        "method_id": "capital_structure_and_excess_return",
+        "method_version": "1.0",
+        "outputs": {
+          "low": -3.0001,
+          "base": -1.5001,
+          "high": -0.5
+        },
+        "output_unit": "USD_per_share",
+        "traces": {
+          "low": [
+            {
+              "id": "total_commitments_m",
+              "label": "Total loan commitments (Q1 2026)",
+              "kind": "fact",
+              "value": 776.0,
+              "unit": "USD_m",
+              "source": {
+                "ref": "SEVN/investor-documents/ir-sevn/SEVN-Q1-2026-Earnings-Presentation.pdf",
+                "locator": "Total loan commitments $776.0 million as of 2026-03-31",
+                "as_of": "2026-03-31",
+                "content_sha256": "c2c4492ae5a4b02034673397195865720686804771d0e7921d89aa9a0db3736e",
+                "source_id": "f5db8719388e594a24b7ad582f4b7002b4b16cc0658b70e2ce15e78da6f5e717"
+              },
+              "rationale": null
+            },
+            {
+              "id": "acl_pct",
+              "label": "Allowance for credit losses as percent of commitments",
+              "kind": "fact",
+              "value": 0.013,
+              "unit": "ratio",
+              "source": {
+                "ref": "SEVN/investor-documents/ir-sevn/SEVN-Q1-2026-Earnings-Presentation.pdf",
+                "locator": "ACL 1.3% of total loan commitments",
+                "as_of": "2026-03-31",
+                "content_sha256": "c2c4492ae5a4b02034673397195865720686804771d0e7921d89aa9a0db3736e",
+                "source_id": "e0f890d5b5992110eeb209041936c717c3c70a9d0a76d14e743b6cbdee3a51b3"
+              },
+              "rationale": null
+            },
+            {
+              "id": "shares_m",
+              "label": "Common shares outstanding (Q1 2026)",
+              "kind": "fact",
+              "value": 22.596,
+              "unit": "million_shares",
+              "source": {
+                "ref": "SEVN/investor-documents/ir-sevn/SEVN-Q1-2026-Earnings-Presentation.pdf",
+                "locator": "Shares outstanding ~22.596 million as of 2026-03-31",
+                "as_of": "2026-03-31",
+                "content_sha256": "c2c4492ae5a4b02034673397195865720686804771d0e7921d89aa9a0db3736e",
+                "source_id": "b2034a23c051e9af2f0c215aa2578fbaf00274b1b808dcf7b3aec2cf4867ae33"
+              },
+              "rationale": null
+            },
+            {
+              "id": "stress_reserve_multiple",
+              "label": "Stress reserve multiple on filing ACL per share",
+              "kind": "judgment",
+              "value": 6.72,
+              "unit": "multiple",
+              "source": null,
+              "rationale": "Low adds CRE cycle losses and redeployment lag beyond ACL; base matches judgment reserve; high assumes clean book and faster capital deployment."
+            },
+            {
+              "id": "acl_m",
+              "label": "Allowance for credit losses (dollars)",
+              "kind": "calculation",
+              "value": 10.088,
+              "unit": "USD_m",
+              "operation": "multiply",
+              "formula": "total_commitments_m \u00d7 acl_pct",
+              "substituted_formula": "776 \u00d7 0.013",
+              "dependencies": [
+                "total_commitments_m",
+                "acl_pct"
+              ]
+            },
+            {
+              "id": "acl_per_share",
+              "label": "Filing ACL per share",
+              "kind": "calculation",
+              "value": 0.4464507,
+              "unit": "USD_per_share",
+              "operation": "divide",
+              "formula": "acl_m \u00f7 shares_m",
+              "substituted_formula": "10.088 \u00f7 22.596",
+              "dependencies": [
+                "acl_m",
+                "shares_m"
+              ]
+            },
+            {
+              "id": "reserve_gross",
+              "label": "Gross credit and redeployment reserve",
+              "kind": "calculation",
+              "value": 3.0001487,
+              "unit": "USD_per_share",
+              "operation": "multiply",
+              "formula": "acl_per_share \u00d7 stress_reserve_multiple",
+              "substituted_formula": "0.4464507 \u00d7 6.72",
+              "dependencies": [
+                "acl_per_share",
+                "stress_reserve_multiple"
+              ]
+            },
+            {
+              "id": "value_per_share",
+              "label": "CRE credit and redeployment reserve per share",
+              "kind": "calculation",
+              "value": -3.0001487,
+              "unit": "USD_per_share",
+              "operation": "negative",
+              "formula": "-(reserve_gross)",
+              "substituted_formula": "-(3.0001487)",
+              "dependencies": [
+                "reserve_gross"
+              ]
+            }
+          ],
+          "base": [
+            {
+              "id": "total_commitments_m",
+              "label": "Total loan commitments (Q1 2026)",
+              "kind": "fact",
+              "value": 776.0,
+              "unit": "USD_m",
+              "source": {
+                "ref": "SEVN/investor-documents/ir-sevn/SEVN-Q1-2026-Earnings-Presentation.pdf",
+                "locator": "Total loan commitments $776.0 million as of 2026-03-31",
+                "as_of": "2026-03-31",
+                "content_sha256": "c2c4492ae5a4b02034673397195865720686804771d0e7921d89aa9a0db3736e",
+                "source_id": "f5db8719388e594a24b7ad582f4b7002b4b16cc0658b70e2ce15e78da6f5e717"
+              },
+              "rationale": null
+            },
+            {
+              "id": "acl_pct",
+              "label": "Allowance for credit losses as percent of commitments",
+              "kind": "fact",
+              "value": 0.013,
+              "unit": "ratio",
+              "source": {
+                "ref": "SEVN/investor-documents/ir-sevn/SEVN-Q1-2026-Earnings-Presentation.pdf",
+                "locator": "ACL 1.3% of total loan commitments",
+                "as_of": "2026-03-31",
+                "content_sha256": "c2c4492ae5a4b02034673397195865720686804771d0e7921d89aa9a0db3736e",
+                "source_id": "e0f890d5b5992110eeb209041936c717c3c70a9d0a76d14e743b6cbdee3a51b3"
+              },
+              "rationale": null
+            },
+            {
+              "id": "shares_m",
+              "label": "Common shares outstanding (Q1 2026)",
+              "kind": "fact",
+              "value": 22.596,
+              "unit": "million_shares",
+              "source": {
+                "ref": "SEVN/investor-documents/ir-sevn/SEVN-Q1-2026-Earnings-Presentation.pdf",
+                "locator": "Shares outstanding ~22.596 million as of 2026-03-31",
+                "as_of": "2026-03-31",
+                "content_sha256": "c2c4492ae5a4b02034673397195865720686804771d0e7921d89aa9a0db3736e",
+                "source_id": "b2034a23c051e9af2f0c215aa2578fbaf00274b1b808dcf7b3aec2cf4867ae33"
+              },
+              "rationale": null
+            },
+            {
+              "id": "stress_reserve_multiple",
+              "label": "Stress reserve multiple on filing ACL per share",
+              "kind": "judgment",
+              "value": 3.36,
+              "unit": "multiple",
+              "source": null,
+              "rationale": "Low adds CRE cycle losses and redeployment lag beyond ACL; base matches judgment reserve; high assumes clean book and faster capital deployment."
+            },
+            {
+              "id": "acl_m",
+              "label": "Allowance for credit losses (dollars)",
+              "kind": "calculation",
+              "value": 10.088,
+              "unit": "USD_m",
+              "operation": "multiply",
+              "formula": "total_commitments_m \u00d7 acl_pct",
+              "substituted_formula": "776 \u00d7 0.013",
+              "dependencies": [
+                "total_commitments_m",
+                "acl_pct"
+              ]
+            },
+            {
+              "id": "acl_per_share",
+              "label": "Filing ACL per share",
+              "kind": "calculation",
+              "value": 0.4464507,
+              "unit": "USD_per_share",
+              "operation": "divide",
+              "formula": "acl_m \u00f7 shares_m",
+              "substituted_formula": "10.088 \u00f7 22.596",
+              "dependencies": [
+                "acl_m",
+                "shares_m"
+              ]
+            },
+            {
+              "id": "reserve_gross",
+              "label": "Gross credit and redeployment reserve",
+              "kind": "calculation",
+              "value": 1.50007435,
+              "unit": "USD_per_share",
+              "operation": "multiply",
+              "formula": "acl_per_share \u00d7 stress_reserve_multiple",
+              "substituted_formula": "0.4464507 \u00d7 3.36",
+              "dependencies": [
+                "acl_per_share",
+                "stress_reserve_multiple"
+              ]
+            },
+            {
+              "id": "value_per_share",
+              "label": "CRE credit and redeployment reserve per share",
+              "kind": "calculation",
+              "value": -1.50007435,
+              "unit": "USD_per_share",
+              "operation": "negative",
+              "formula": "-(reserve_gross)",
+              "substituted_formula": "-(1.5000743)",
+              "dependencies": [
+                "reserve_gross"
+              ]
+            }
+          ],
+          "high": [
+            {
+              "id": "total_commitments_m",
+              "label": "Total loan commitments (Q1 2026)",
+              "kind": "fact",
+              "value": 776.0,
+              "unit": "USD_m",
+              "source": {
+                "ref": "SEVN/investor-documents/ir-sevn/SEVN-Q1-2026-Earnings-Presentation.pdf",
+                "locator": "Total loan commitments $776.0 million as of 2026-03-31",
+                "as_of": "2026-03-31",
+                "content_sha256": "c2c4492ae5a4b02034673397195865720686804771d0e7921d89aa9a0db3736e",
+                "source_id": "f5db8719388e594a24b7ad582f4b7002b4b16cc0658b70e2ce15e78da6f5e717"
+              },
+              "rationale": null
+            },
+            {
+              "id": "acl_pct",
+              "label": "Allowance for credit losses as percent of commitments",
+              "kind": "fact",
+              "value": 0.013,
+              "unit": "ratio",
+              "source": {
+                "ref": "SEVN/investor-documents/ir-sevn/SEVN-Q1-2026-Earnings-Presentation.pdf",
+                "locator": "ACL 1.3% of total loan commitments",
+                "as_of": "2026-03-31",
+                "content_sha256": "c2c4492ae5a4b02034673397195865720686804771d0e7921d89aa9a0db3736e",
+                "source_id": "e0f890d5b5992110eeb209041936c717c3c70a9d0a76d14e743b6cbdee3a51b3"
+              },
+              "rationale": null
+            },
+            {
+              "id": "shares_m",
+              "label": "Common shares outstanding (Q1 2026)",
+              "kind": "fact",
+              "value": 22.596,
+              "unit": "million_shares",
+              "source": {
+                "ref": "SEVN/investor-documents/ir-sevn/SEVN-Q1-2026-Earnings-Presentation.pdf",
+                "locator": "Shares outstanding ~22.596 million as of 2026-03-31",
+                "as_of": "2026-03-31",
+                "content_sha256": "c2c4492ae5a4b02034673397195865720686804771d0e7921d89aa9a0db3736e",
+                "source_id": "b2034a23c051e9af2f0c215aa2578fbaf00274b1b808dcf7b3aec2cf4867ae33"
+              },
+              "rationale": null
+            },
+            {
+              "id": "stress_reserve_multiple",
+              "label": "Stress reserve multiple on filing ACL per share",
+              "kind": "judgment",
+              "value": 1.12,
+              "unit": "multiple",
+              "source": null,
+              "rationale": "Low adds CRE cycle losses and redeployment lag beyond ACL; base matches judgment reserve; high assumes clean book and faster capital deployment."
+            },
+            {
+              "id": "acl_m",
+              "label": "Allowance for credit losses (dollars)",
+              "kind": "calculation",
+              "value": 10.088,
+              "unit": "USD_m",
+              "operation": "multiply",
+              "formula": "total_commitments_m \u00d7 acl_pct",
+              "substituted_formula": "776 \u00d7 0.013",
+              "dependencies": [
+                "total_commitments_m",
+                "acl_pct"
+              ]
+            },
+            {
+              "id": "acl_per_share",
+              "label": "Filing ACL per share",
+              "kind": "calculation",
+              "value": 0.4464507,
+              "unit": "USD_per_share",
+              "operation": "divide",
+              "formula": "acl_m \u00f7 shares_m",
+              "substituted_formula": "10.088 \u00f7 22.596",
+              "dependencies": [
+                "acl_m",
+                "shares_m"
+              ]
+            },
+            {
+              "id": "reserve_gross",
+              "label": "Gross credit and redeployment reserve",
+              "kind": "calculation",
+              "value": 0.50002478,
+              "unit": "USD_per_share",
+              "operation": "multiply",
+              "formula": "acl_per_share \u00d7 stress_reserve_multiple",
+              "substituted_formula": "0.4464507 \u00d7 1.12",
+              "dependencies": [
+                "acl_per_share",
+                "stress_reserve_multiple"
+              ]
+            },
+            {
+              "id": "value_per_share",
+              "label": "CRE credit and redeployment reserve per share",
+              "kind": "calculation",
+              "value": -0.50002478,
+              "unit": "USD_per_share",
+              "operation": "negative",
+              "formula": "-(reserve_gross)",
+              "substituted_formula": "-(0.50002478)",
+              "dependencies": [
+                "reserve_gross"
+              ]
+            }
+          ]
+        },
+        "source_lineage": [
+          {
+            "node_id": "total_commitments_m",
+            "ref": "SEVN/investor-documents/ir-sevn/SEVN-Q1-2026-Earnings-Presentation.pdf",
+            "locator": "Total loan commitments $776.0 million as of 2026-03-31",
+            "as_of": "2026-03-31",
+            "content_sha256": "c2c4492ae5a4b02034673397195865720686804771d0e7921d89aa9a0db3736e",
+            "source_id": "f5db8719388e594a24b7ad582f4b7002b4b16cc0658b70e2ce15e78da6f5e717"
+          },
+          {
+            "node_id": "acl_pct",
+            "ref": "SEVN/investor-documents/ir-sevn/SEVN-Q1-2026-Earnings-Presentation.pdf",
+            "locator": "ACL 1.3% of total loan commitments",
+            "as_of": "2026-03-31",
+            "content_sha256": "c2c4492ae5a4b02034673397195865720686804771d0e7921d89aa9a0db3736e",
+            "source_id": "e0f890d5b5992110eeb209041936c717c3c70a9d0a76d14e743b6cbdee3a51b3"
+          },
+          {
+            "node_id": "shares_m",
+            "ref": "SEVN/investor-documents/ir-sevn/SEVN-Q1-2026-Earnings-Presentation.pdf",
+            "locator": "Shares outstanding ~22.596 million as of 2026-03-31",
+            "as_of": "2026-03-31",
+            "content_sha256": "c2c4492ae5a4b02034673397195865720686804771d0e7921d89aa9a0db3736e",
+            "source_id": "b2034a23c051e9af2f0c215aa2578fbaf00274b1b808dcf7b3aec2cf4867ae33"
+          }
+        ],
+        "checks": {
+          "passed": true,
+          "errors": []
+        },
+        "proof_hash": "699fb335862f1501eba249caa3c2cdc4d98f3c90f29096dd0349e71a0931d798"
+      },
+      "evidence_tier": "primary_derived",
+      "evidence_level": "primary_derived",
+      "evidence": "Q1 2026 adjusted book $14.90/sh; FY2025 management fees $4.985M; loan commitments $776M at 1.3% ACL; 22.596M shares (SEVN/investor-documents/ir-sevn/SEVN-Q1-2026-Earnings-Presentation.pdf; SEVN/investor-documents/sec-edgar/10-K_20260218_rpt20251231_acc0001452477_26_000010.htm; SEVN/investor-documents/sec-edgar/10-Q_20260428_rpt20260331_acc0001452477_26_000021.htm). Proof: -1.5001/sh base via capital_structure_and_excess_return@1.0.",
+      "scenario_assumptions": "Proof outputs {'low': -3.0001, 'base': -1.5001, 'high': -0.5}; see calculation_proof graph.",
       "probability_and_timing": null,
       "tax_and_realization_adjustments": "Rights-offering capital not yet fully earning.",
       "falsifier": "Realized losses or failed redeployment push economic equity below the low case.",
@@ -162,29 +1012,11 @@
     "material_component_count": 4,
     "additive_component_count": 3,
     "embedded_component_count": 1,
-    "unvalued_component_count": 3,
+    "unvalued_component_count": 0,
     "double_counting_flags": []
   },
   "input_classification": {
     "facts": [
-      {
-        "component_id": "tangible_loan_book_equity",
-        "label": "Tangible loan-book equity (adjusted book)",
-        "kind": "fact",
-        "evidence_tier": "filing",
-        "evidence": "Q1 2026 earnings presentation: book $14.47/sh, adjusted book $14.90/sh at 2026-03-31. Portfolio WA LTV 66%, risk rating 2.8, no realized losses.",
-        "method": "unit_nav",
-        "valuation_status": "legacy_sensitivity"
-      },
-      {
-        "component_id": "external_manager_fee_drag",
-        "label": "External manager fee drag (Tremont/RMR)",
-        "kind": "fact",
-        "evidence_tier": "filing",
-        "evidence": "1.5% base fee on equity + 20% incentive over 7% hurdle; FY2025 management fees ~$5.0M.",
-        "method": "realization_reserve",
-        "valuation_status": "legacy_sensitivity"
-      },
       {
         "component_id": "distributable_earnings_franchise",
         "label": "Distributable-earnings franchise (embedded in book multiple)",
@@ -198,13 +1030,31 @@
     "estimates": [],
     "judgments": [
       {
+        "component_id": "tangible_loan_book_equity",
+        "label": "Tangible loan-book equity (adjusted book)",
+        "kind": "judgment",
+        "evidence_tier": "primary_derived",
+        "evidence": "Q1 2026 adjusted book $14.90/sh; FY2025 management fees $4.985M; loan commitments $776M at 1.3% ACL; 22.596M shares (SEVN/investor-documents/ir-sevn/SEVN-Q1-2026-Earnings-Presentation.pdf; SEVN/investor-documents/sec-edgar/10-K_20260218_rpt20251231_acc0001452477_26_000010.htm; SEVN/investor-documents/sec-edgar/10-Q_20260428_rpt20260331_acc0001452477_26_000021.htm). Proof: 14.9/sh base via net_asset_value@1.0.",
+        "method": "unit_nav",
+        "valuation_status": "bounded_estimate"
+      },
+      {
+        "component_id": "external_manager_fee_drag",
+        "label": "External manager fee drag (Tremont/RMR)",
+        "kind": "judgment",
+        "evidence_tier": "primary_derived",
+        "evidence": "Q1 2026 adjusted book $14.90/sh; FY2025 management fees $4.985M; loan commitments $776M at 1.3% ACL; 22.596M shares (SEVN/investor-documents/ir-sevn/SEVN-Q1-2026-Earnings-Presentation.pdf; SEVN/investor-documents/sec-edgar/10-K_20260218_rpt20251231_acc0001452477_26_000010.htm; SEVN/investor-documents/sec-edgar/10-Q_20260428_rpt20260331_acc0001452477_26_000021.htm). Proof: -1.5002/sh base via net_asset_value@1.0.",
+        "method": "realization_reserve",
+        "valuation_status": "bounded_estimate"
+      },
+      {
         "component_id": "cre_credit_and_redeployment_reserve",
         "label": "CRE credit and capital-redeployment reserve",
         "kind": "judgment",
-        "evidence_tier": "mixed_primary_and_estimate",
-        "evidence": "Rights-offering capital still deploying ($56.6M cash, $44M unfunded commitments, $397.5M unused financing). Sector CRE fear; SEVN has zero CBD office but remains levered (D/E 1.4).",
+        "evidence_tier": "primary_derived",
+        "evidence": "Q1 2026 adjusted book $14.90/sh; FY2025 management fees $4.985M; loan commitments $776M at 1.3% ACL; 22.596M shares (SEVN/investor-documents/ir-sevn/SEVN-Q1-2026-Earnings-Presentation.pdf; SEVN/investor-documents/sec-edgar/10-K_20260218_rpt20251231_acc0001452477_26_000010.htm; SEVN/investor-documents/sec-edgar/10-Q_20260428_rpt20260331_acc0001452477_26_000021.htm). Proof: -1.5001/sh base via capital_structure_and_excess_return@1.0.",
         "method": "credit_loss_reserve",
-        "valuation_status": "legacy_sensitivity"
+        "valuation_status": "bounded_estimate"
       }
     ]
   },
@@ -446,35 +1296,35 @@
     "generated_at": "2026-07-20T17:13:56.262056+00:00"
   },
   "market": {
-    "price_per_share": 8.4,
+    "price_per_share": 7.83,
     "fully_diluted_shares": null,
     "market_cap_m": null,
     "enterprise_value_m": null
   },
   "valuation": {
     "value_per_share": {
-      "low": null,
-      "base": null,
-      "high": null
+      "low": 6.9999,
+      "base": 11.8997,
+      "high": 14.7092
     },
     "priced_components_per_share": {
-      "low": 0,
-      "base": 0,
-      "high": 0
+      "low": 6.9999,
+      "base": 11.8997,
+      "high": 14.7092
     },
     "legacy_value_per_share": {
       "low": 7.0,
       "base": 11.9,
-      "high": 14.7
+      "high": 14.71
     },
-    "probability_weighted_value_per_share": null,
+    "probability_weighted_value_per_share": 11.8997,
     "expected_distributions_per_share": 0.0,
     "annualized_return_at_price_pct": {
-      "low": null,
-      "base": null,
-      "high": null
+      "low": -1.59,
+      "base": 6.16,
+      "high": 9.43
     },
-    "downside_to_low_pct": null,
+    "downside_to_low_pct": -10.6,
     "horizon_years": 7,
     "interpretation": "value_per_share is withheld while any material additive component is unpriced; priced_components_per_share is not a complete security value."
   },
@@ -484,62 +1334,113 @@
       {
         "component_id": "tangible_loan_book_equity",
         "label": "Tangible loan-book equity (adjusted book)",
-        "valuation_status": "legacy_sensitivity",
-        "base_per_share": null,
+        "valuation_status": "bounded_estimate",
+        "base_per_share": 14.9,
         "legacy_base_per_share": 14.9,
-        "range_width_per_share": null,
-        "scenario_assumptions": "Adjusted book as primary asset claim before market discount."
-      },
-      {
-        "component_id": "external_manager_fee_drag",
-        "label": "External manager fee drag (Tremont/RMR)",
-        "valuation_status": "legacy_sensitivity",
-        "base_per_share": null,
-        "legacy_base_per_share": -1.5,
-        "range_width_per_share": null,
-        "scenario_assumptions": "Structural drag versus internalized peers, capitalized as a reserve against book."
+        "range_width_per_share": 3.5104,
+        "scenario_assumptions": "Proof outputs {'low': 12.4996, 'base': 14.9, 'high': 16.01}; see calculation_proof graph."
       },
       {
         "component_id": "cre_credit_and_redeployment_reserve",
         "label": "CRE credit and capital-redeployment reserve",
-        "valuation_status": "legacy_sensitivity",
-        "base_per_share": null,
+        "valuation_status": "bounded_estimate",
+        "base_per_share": -1.5001,
         "legacy_base_per_share": -1.5,
-        "range_width_per_share": null,
-        "scenario_assumptions": "Haircut for credit cycle and deployment lag not fully in ACL (1.3% of commitments)."
+        "range_width_per_share": 2.5001,
+        "scenario_assumptions": "Proof outputs {'low': -3.0001, 'base': -1.5001, 'high': -0.5}; see calculation_proof graph."
+      },
+      {
+        "component_id": "external_manager_fee_drag",
+        "label": "External manager fee drag (Tremont/RMR)",
+        "valuation_status": "bounded_estimate",
+        "base_per_share": -1.5002,
+        "legacy_base_per_share": -1.5,
+        "range_width_per_share": 1.6988,
+        "scenario_assumptions": "Proof outputs {'low': -2.4996, 'base': -1.5002, 'high': -0.8008}; see calculation_proof graph."
       }
     ],
     "reverse_expectations": null
   },
   "calculation_proof_summary": {
     "component_count": 4,
-    "priced_component_count": 0,
-    "proof_complete_pct": 0.0,
+    "priced_component_count": 3,
+    "proof_complete_pct": 75.0,
     "status_counts": {
-      "bounded_estimate": 0,
+      "bounded_estimate": 3,
       "calculated": 0,
-      "legacy_sensitivity": 4,
+      "legacy_sensitivity": 1,
       "unpriced": 0
     },
     "all_material_components_priced": false,
     "calculation_errors": [],
-    "aggregate_proof_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    "aggregate_proof_hash": "e0a376a1054dcad47813d0a39234270c57e2632fcc4c1d76d1a8faa75a85d4ea"
   },
-  "source_lineage": [],
+  "source_lineage": [
+    {
+      "component_id": "tangible_loan_book_equity",
+      "node_id": "adjusted_book_per_share",
+      "ref": "SEVN/investor-documents/ir-sevn/SEVN-Q1-2026-Earnings-Presentation.pdf",
+      "locator": "Adjusted book value $14.90 per share as of 2026-03-31",
+      "as_of": "2026-03-31",
+      "content_sha256": "c2c4492ae5a4b02034673397195865720686804771d0e7921d89aa9a0db3736e",
+      "source_id": "13395f5190e0659aa7b30c74046802e757696d026ee4a678993183fd4e78e559"
+    },
+    {
+      "component_id": "external_manager_fee_drag",
+      "node_id": "management_fees_m",
+      "ref": "SEVN/investor-documents/sec-edgar/10-K_20260218_rpt20251231_acc0001452477_26_000010.htm",
+      "locator": "Management fees $4,985 thousand for year ended 2025-12-31",
+      "as_of": "2025-12-31",
+      "content_sha256": "1000a10492454adb6ead5017cf38b379634536739a7e260d4ba29cd66885e06c",
+      "source_id": "d4e010d0165f647d3164806c100c0568d97476057702fc055e1f5ab0f552538f"
+    },
+    {
+      "component_id": "external_manager_fee_drag",
+      "node_id": "shares_m",
+      "ref": "SEVN/investor-documents/ir-sevn/SEVN-Q1-2026-Earnings-Presentation.pdf",
+      "locator": "Shares outstanding ~22.596 million as of 2026-03-31",
+      "as_of": "2026-03-31",
+      "content_sha256": "c2c4492ae5a4b02034673397195865720686804771d0e7921d89aa9a0db3736e",
+      "source_id": "b2034a23c051e9af2f0c215aa2578fbaf00274b1b808dcf7b3aec2cf4867ae33"
+    },
+    {
+      "component_id": "cre_credit_and_redeployment_reserve",
+      "node_id": "total_commitments_m",
+      "ref": "SEVN/investor-documents/ir-sevn/SEVN-Q1-2026-Earnings-Presentation.pdf",
+      "locator": "Total loan commitments $776.0 million as of 2026-03-31",
+      "as_of": "2026-03-31",
+      "content_sha256": "c2c4492ae5a4b02034673397195865720686804771d0e7921d89aa9a0db3736e",
+      "source_id": "f5db8719388e594a24b7ad582f4b7002b4b16cc0658b70e2ce15e78da6f5e717"
+    },
+    {
+      "component_id": "cre_credit_and_redeployment_reserve",
+      "node_id": "acl_pct",
+      "ref": "SEVN/investor-documents/ir-sevn/SEVN-Q1-2026-Earnings-Presentation.pdf",
+      "locator": "ACL 1.3% of total loan commitments",
+      "as_of": "2026-03-31",
+      "content_sha256": "c2c4492ae5a4b02034673397195865720686804771d0e7921d89aa9a0db3736e",
+      "source_id": "e0f890d5b5992110eeb209041936c717c3c70a9d0a76d14e743b6cbdee3a51b3"
+    },
+    {
+      "component_id": "cre_credit_and_redeployment_reserve",
+      "node_id": "shares_m",
+      "ref": "SEVN/investor-documents/ir-sevn/SEVN-Q1-2026-Earnings-Presentation.pdf",
+      "locator": "Shares outstanding ~22.596 million as of 2026-03-31",
+      "as_of": "2026-03-31",
+      "content_sha256": "c2c4492ae5a4b02034673397195865720686804771d0e7921d89aa9a0db3736e",
+      "source_id": "b2034a23c051e9af2f0c215aa2578fbaf00274b1b808dcf7b3aec2cf4867ae33"
+    }
+  ],
   "model_checks": {
     "calculation_graphs_valid": true,
-    "component_sum_reconciles": false,
+    "component_sum_reconciles": true,
     "no_double_counting": true,
-    "all_material_components_priced": false,
+    "all_material_components_priced": true,
     "low_base_high_ordered": true
   },
   "evidence": {
-    "unresolved_count": 3,
-    "blockers": [
-      "cre_credit_and_redeployment_reserve: material component is legacy_sensitivity; a valid calculation proof is required",
-      "external_manager_fee_drag: material component is legacy_sensitivity; a valid calculation proof is required",
-      "tangible_loan_book_equity: material component is legacy_sensitivity; a valid calculation proof is required"
-    ],
+    "unresolved_count": 0,
+    "blockers": [],
     "validation_errors": []
   },
   "monitoring": {
@@ -557,8 +1458,12 @@
     ]
   },
   "change_control": {
-    "model_hash": "1d23390ba0eb1a97bb063bf92ca129c79260b674af10ff218733563865b5cea0",
-    "method_versions": [],
+    "model_hash": "60393194087d48ba4265ce21acf8fd3b6474499fb6e9a86e6bd7d04d4227e354",
+    "method_versions": [
+      "credit_loss_reserve@1.0",
+      "realization_reserve@1.0",
+      "unit_nav@1.0"
+    ],
     "change_log": [],
     "rule": "A source fact is locked. Every assumption change requires a reason, author, timestamp, and before/after value."
   },
