@@ -1,6 +1,6 @@
 # PLWN — Investment Thesis
 
-**Last updated:** 2026-07-17
+**Last updated:** auto-sync
 
 ## Classification
 
@@ -11,8 +11,13 @@
 | **Dhando** (Pabrai) | partial |
 | **Stance** | watch |
 | **Cycle** | mid |
+| **Implied 7yr IRR** (base) | -28.71% (contract base) |
+| **IRR method** | scarce_asset_optionality |
+| **Lawrence bucket** | other |
 | **Payoff lens** | asset |
-| **Predictive attribute** | market_structure_discount |
+| **MOI bucket** | pending |
+
+**Deep dive:** `PLWN/research/deep_dive_2026-07-24.md` (auto-sync)
 
 ## One-line thesis
 
