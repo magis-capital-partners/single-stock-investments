@@ -11,13 +11,13 @@
 | **Dhando** (Pabrai) | partial |
 | **Stance** | watch |
 | **Cycle** | trough |
-| **Implied 7yr IRR** (base) | — |
+| **Implied 7yr IRR** (base) | -37.32% (contract base) |
 | **IRR method** | capital_cycle |
 | **Lawrence bucket** | low_cost |
 | **Payoff lens** | operating |
 | **MOI bucket** | pending |
 
-**Deep dive:** `AXTI/research/deep_dive_2026-07-21.md` (auto-sync)
+**Deep dive:** `AXTI/research/deep_dive_2026-07-24.md` (auto-sync)
 
 ## One-line thesis
 
