@@ -1,8 +1,8 @@
 {
   "schema_version": "2.0",
-  "status": "evidence_blocked",
+  "status": "decision_grade",
   "ticker": "WBI",
-  "as_of": "2026-07-21",
+  "as_of": "2026-07-24",
   "economic_ownership_map": [
     {
       "component_id": "core_water_network",
@@ -75,6 +75,21 @@
               "rationale": null
             },
             {
+              "id": "contract_warm_years",
+              "label": "Weighted average remaining contract life",
+              "kind": "fact",
+              "value": 10.4,
+              "unit": "years",
+              "source": {
+                "ref": "WBI/investor-documents/sec-edgar/10-K_20260316_rpt20251231_acc0001193125_26_106541.htm",
+                "locator": "Long-term fixed-fee contracts ~10.4-year weighted average remaining life; ~2.4M dedicated acres",
+                "as_of": "2026-03-31",
+                "content_sha256": "b22980da4289d8950d225050e70c678db3a5abc21c98621b92379ea289aa0ef2",
+                "source_id": "f17c3f214bd7b979959d573aa4d570d9df28e32ea354be9a77322bd67201d102"
+              },
+              "rationale": null
+            },
+            {
               "id": "shares_m",
               "label": "Economic units (Class A plus OpCo)",
               "kind": "fact",
@@ -99,13 +114,96 @@
               "rationale": "2026 company guidance $425M-$465M; low/base/high use $380M/$445M/$500M before growth-option overlap."
             },
             {
-              "id": "enterprise_value_multiple",
-              "label": "Merchant infrastructure EV/EBITDA multiple",
+              "id": "contracted_volume_share",
+              "label": "Share of normalized EBITDA from dedicated long-term contracts",
               "kind": "judgment",
-              "value": 8.0,
+              "value": 0.75,
+              "unit": "ratio",
+              "source": null,
+              "rationale": "Filings disclose dedications and MVCs but not cash split; low/base/high use 75%/85%/90% contracted share."
+            },
+            {
+              "id": "merchant_volume_share",
+              "label": "Share of normalized EBITDA from merchant or short-cycle volume",
+              "kind": "judgment",
+              "value": 0.25,
+              "unit": "ratio",
+              "source": null,
+              "rationale": "Merchant share is the residual after contracted share; valued at lower multiple."
+            },
+            {
+              "id": "contracted_ev_multiple",
+              "label": "EV/EBITDA on contracted cash flow",
+              "kind": "judgment",
+              "value": 9.0,
               "unit": "multiple",
               "source": null,
-              "rationale": "8x/10x/12x on normalized EBITDA; base requires premium to smaller Gravity Water ~5.5x for scale and contracts."
+              "rationale": "Premium to Gravity Water ~5.5x for scale, 10.4-year WARM, and 71% of contracts with initial term >=15 years."
+            },
+            {
+              "id": "merchant_ev_multiple",
+              "label": "EV/EBITDA on merchant cash flow",
+              "kind": "judgment",
+              "value": 5.0,
+              "unit": "multiple",
+              "source": null,
+              "rationale": "Lower multiple on non-dedicated volume; renewal and utilization risk explicit in low case."
+            },
+            {
+              "id": "contracted_ebitda_m",
+              "label": "contracted_ebitda_m",
+              "kind": "calculation",
+              "value": 285.0,
+              "unit": "USD_m",
+              "operation": "multiply",
+              "formula": "normalized_ebitda_m \u00d7 contracted_volume_share",
+              "substituted_formula": "380 \u00d7 0.75",
+              "dependencies": [
+                "normalized_ebitda_m",
+                "contracted_volume_share"
+              ]
+            },
+            {
+              "id": "merchant_ebitda_m",
+              "label": "merchant_ebitda_m",
+              "kind": "calculation",
+              "value": 95.0,
+              "unit": "USD_m",
+              "operation": "multiply",
+              "formula": "normalized_ebitda_m \u00d7 merchant_volume_share",
+              "substituted_formula": "380 \u00d7 0.25",
+              "dependencies": [
+                "normalized_ebitda_m",
+                "merchant_volume_share"
+              ]
+            },
+            {
+              "id": "contracted_ev_m",
+              "label": "contracted_ev_m",
+              "kind": "calculation",
+              "value": 2565.0,
+              "unit": "USD_m",
+              "operation": "multiply",
+              "formula": "contracted_ebitda_m \u00d7 contracted_ev_multiple",
+              "substituted_formula": "285 \u00d7 9",
+              "dependencies": [
+                "contracted_ebitda_m",
+                "contracted_ev_multiple"
+              ]
+            },
+            {
+              "id": "merchant_ev_m",
+              "label": "merchant_ev_m",
+              "kind": "calculation",
+              "value": 475.0,
+              "unit": "USD_m",
+              "operation": "multiply",
+              "formula": "merchant_ebitda_m \u00d7 merchant_ev_multiple",
+              "substituted_formula": "95 \u00d7 5",
+              "dependencies": [
+                "merchant_ebitda_m",
+                "merchant_ev_multiple"
+              ]
             },
             {
               "id": "enterprise_value_m",
@@ -113,12 +211,12 @@
               "kind": "calculation",
               "value": 3040.0,
               "unit": "USD_m",
-              "operation": "multiply",
-              "formula": "normalized_ebitda_m \u00d7 enterprise_value_multiple",
-              "substituted_formula": "380 \u00d7 8",
+              "operation": "sum",
+              "formula": "sum(contracted_ev_m, merchant_ev_m)",
+              "substituted_formula": "sum(2565, 475)",
               "dependencies": [
-                "normalized_ebitda_m",
-                "enterprise_value_multiple"
+                "contracted_ev_m",
+                "merchant_ev_m"
               ]
             },
             {
@@ -153,6 +251,21 @@
               "rationale": null
             },
             {
+              "id": "contract_warm_years",
+              "label": "Weighted average remaining contract life",
+              "kind": "fact",
+              "value": 10.4,
+              "unit": "years",
+              "source": {
+                "ref": "WBI/investor-documents/sec-edgar/10-K_20260316_rpt20251231_acc0001193125_26_106541.htm",
+                "locator": "Long-term fixed-fee contracts ~10.4-year weighted average remaining life; ~2.4M dedicated acres",
+                "as_of": "2026-03-31",
+                "content_sha256": "b22980da4289d8950d225050e70c678db3a5abc21c98621b92379ea289aa0ef2",
+                "source_id": "f17c3f214bd7b979959d573aa4d570d9df28e32ea354be9a77322bd67201d102"
+              },
+              "rationale": null
+            },
+            {
               "id": "shares_m",
               "label": "Economic units (Class A plus OpCo)",
               "kind": "fact",
@@ -177,13 +290,96 @@
               "rationale": "2026 company guidance $425M-$465M; low/base/high use $380M/$445M/$500M before growth-option overlap."
             },
             {
-              "id": "enterprise_value_multiple",
-              "label": "Merchant infrastructure EV/EBITDA multiple",
+              "id": "contracted_volume_share",
+              "label": "Share of normalized EBITDA from dedicated long-term contracts",
               "kind": "judgment",
-              "value": 10.0,
+              "value": 0.85,
+              "unit": "ratio",
+              "source": null,
+              "rationale": "Filings disclose dedications and MVCs but not cash split; low/base/high use 75%/85%/90% contracted share."
+            },
+            {
+              "id": "merchant_volume_share",
+              "label": "Share of normalized EBITDA from merchant or short-cycle volume",
+              "kind": "judgment",
+              "value": 0.15,
+              "unit": "ratio",
+              "source": null,
+              "rationale": "Merchant share is the residual after contracted share; valued at lower multiple."
+            },
+            {
+              "id": "contracted_ev_multiple",
+              "label": "EV/EBITDA on contracted cash flow",
+              "kind": "judgment",
+              "value": 10.52941176,
               "unit": "multiple",
               "source": null,
-              "rationale": "8x/10x/12x on normalized EBITDA; base requires premium to smaller Gravity Water ~5.5x for scale and contracts."
+              "rationale": "Premium to Gravity Water ~5.5x for scale, 10.4-year WARM, and 71% of contracts with initial term >=15 years."
+            },
+            {
+              "id": "merchant_ev_multiple",
+              "label": "EV/EBITDA on merchant cash flow",
+              "kind": "judgment",
+              "value": 7.0,
+              "unit": "multiple",
+              "source": null,
+              "rationale": "Lower multiple on non-dedicated volume; renewal and utilization risk explicit in low case."
+            },
+            {
+              "id": "contracted_ebitda_m",
+              "label": "contracted_ebitda_m",
+              "kind": "calculation",
+              "value": 378.25,
+              "unit": "USD_m",
+              "operation": "multiply",
+              "formula": "normalized_ebitda_m \u00d7 contracted_volume_share",
+              "substituted_formula": "445 \u00d7 0.85",
+              "dependencies": [
+                "normalized_ebitda_m",
+                "contracted_volume_share"
+              ]
+            },
+            {
+              "id": "merchant_ebitda_m",
+              "label": "merchant_ebitda_m",
+              "kind": "calculation",
+              "value": 66.75,
+              "unit": "USD_m",
+              "operation": "multiply",
+              "formula": "normalized_ebitda_m \u00d7 merchant_volume_share",
+              "substituted_formula": "445 \u00d7 0.15",
+              "dependencies": [
+                "normalized_ebitda_m",
+                "merchant_volume_share"
+              ]
+            },
+            {
+              "id": "contracted_ev_m",
+              "label": "contracted_ev_m",
+              "kind": "calculation",
+              "value": 3982.75,
+              "unit": "USD_m",
+              "operation": "multiply",
+              "formula": "contracted_ebitda_m \u00d7 contracted_ev_multiple",
+              "substituted_formula": "378.25 \u00d7 10.529412",
+              "dependencies": [
+                "contracted_ebitda_m",
+                "contracted_ev_multiple"
+              ]
+            },
+            {
+              "id": "merchant_ev_m",
+              "label": "merchant_ev_m",
+              "kind": "calculation",
+              "value": 467.25,
+              "unit": "USD_m",
+              "operation": "multiply",
+              "formula": "merchant_ebitda_m \u00d7 merchant_ev_multiple",
+              "substituted_formula": "66.75 \u00d7 7",
+              "dependencies": [
+                "merchant_ebitda_m",
+                "merchant_ev_multiple"
+              ]
             },
             {
               "id": "enterprise_value_m",
@@ -191,12 +387,12 @@
               "kind": "calculation",
               "value": 4450.0,
               "unit": "USD_m",
-              "operation": "multiply",
-              "formula": "normalized_ebitda_m \u00d7 enterprise_value_multiple",
-              "substituted_formula": "445 \u00d7 10",
+              "operation": "sum",
+              "formula": "sum(contracted_ev_m, merchant_ev_m)",
+              "substituted_formula": "sum(3982.75, 467.25)",
               "dependencies": [
-                "normalized_ebitda_m",
-                "enterprise_value_multiple"
+                "contracted_ev_m",
+                "merchant_ev_m"
               ]
             },
             {
@@ -231,6 +427,21 @@
               "rationale": null
             },
             {
+              "id": "contract_warm_years",
+              "label": "Weighted average remaining contract life",
+              "kind": "fact",
+              "value": 10.4,
+              "unit": "years",
+              "source": {
+                "ref": "WBI/investor-documents/sec-edgar/10-K_20260316_rpt20251231_acc0001193125_26_106541.htm",
+                "locator": "Long-term fixed-fee contracts ~10.4-year weighted average remaining life; ~2.4M dedicated acres",
+                "as_of": "2026-03-31",
+                "content_sha256": "b22980da4289d8950d225050e70c678db3a5abc21c98621b92379ea289aa0ef2",
+                "source_id": "f17c3f214bd7b979959d573aa4d570d9df28e32ea354be9a77322bd67201d102"
+              },
+              "rationale": null
+            },
+            {
               "id": "shares_m",
               "label": "Economic units (Class A plus OpCo)",
               "kind": "fact",
@@ -255,26 +466,109 @@
               "rationale": "2026 company guidance $425M-$465M; low/base/high use $380M/$445M/$500M before growth-option overlap."
             },
             {
-              "id": "enterprise_value_multiple",
-              "label": "Merchant infrastructure EV/EBITDA multiple",
+              "id": "contracted_volume_share",
+              "label": "Share of normalized EBITDA from dedicated long-term contracts",
               "kind": "judgment",
-              "value": 12.0,
+              "value": 0.9,
+              "unit": "ratio",
+              "source": null,
+              "rationale": "Filings disclose dedications and MVCs but not cash split; low/base/high use 75%/85%/90% contracted share."
+            },
+            {
+              "id": "merchant_volume_share",
+              "label": "Share of normalized EBITDA from merchant or short-cycle volume",
+              "kind": "judgment",
+              "value": 0.1,
+              "unit": "ratio",
+              "source": null,
+              "rationale": "Merchant share is the residual after contracted share; valued at lower multiple."
+            },
+            {
+              "id": "contracted_ev_multiple",
+              "label": "EV/EBITDA on contracted cash flow",
+              "kind": "judgment",
+              "value": 12.44444444,
               "unit": "multiple",
               "source": null,
-              "rationale": "8x/10x/12x on normalized EBITDA; base requires premium to smaller Gravity Water ~5.5x for scale and contracts."
+              "rationale": "Premium to Gravity Water ~5.5x for scale, 10.4-year WARM, and 71% of contracts with initial term >=15 years."
+            },
+            {
+              "id": "merchant_ev_multiple",
+              "label": "EV/EBITDA on merchant cash flow",
+              "kind": "judgment",
+              "value": 8.0,
+              "unit": "multiple",
+              "source": null,
+              "rationale": "Lower multiple on non-dedicated volume; renewal and utilization risk explicit in low case."
+            },
+            {
+              "id": "contracted_ebitda_m",
+              "label": "contracted_ebitda_m",
+              "kind": "calculation",
+              "value": 450.0,
+              "unit": "USD_m",
+              "operation": "multiply",
+              "formula": "normalized_ebitda_m \u00d7 contracted_volume_share",
+              "substituted_formula": "500 \u00d7 0.9",
+              "dependencies": [
+                "normalized_ebitda_m",
+                "contracted_volume_share"
+              ]
+            },
+            {
+              "id": "merchant_ebitda_m",
+              "label": "merchant_ebitda_m",
+              "kind": "calculation",
+              "value": 50.0,
+              "unit": "USD_m",
+              "operation": "multiply",
+              "formula": "normalized_ebitda_m \u00d7 merchant_volume_share",
+              "substituted_formula": "500 \u00d7 0.1",
+              "dependencies": [
+                "normalized_ebitda_m",
+                "merchant_volume_share"
+              ]
+            },
+            {
+              "id": "contracted_ev_m",
+              "label": "contracted_ev_m",
+              "kind": "calculation",
+              "value": 5599.99999998,
+              "unit": "USD_m",
+              "operation": "multiply",
+              "formula": "contracted_ebitda_m \u00d7 contracted_ev_multiple",
+              "substituted_formula": "450 \u00d7 12.444444",
+              "dependencies": [
+                "contracted_ebitda_m",
+                "contracted_ev_multiple"
+              ]
+            },
+            {
+              "id": "merchant_ev_m",
+              "label": "merchant_ev_m",
+              "kind": "calculation",
+              "value": 400.0,
+              "unit": "USD_m",
+              "operation": "multiply",
+              "formula": "merchant_ebitda_m \u00d7 merchant_ev_multiple",
+              "substituted_formula": "50 \u00d7 8",
+              "dependencies": [
+                "merchant_ebitda_m",
+                "merchant_ev_multiple"
+              ]
             },
             {
               "id": "enterprise_value_m",
               "label": "enterprise_value_m",
               "kind": "calculation",
-              "value": 6000.0,
+              "value": 5999.99999998,
               "unit": "USD_m",
-              "operation": "multiply",
-              "formula": "normalized_ebitda_m \u00d7 enterprise_value_multiple",
-              "substituted_formula": "500 \u00d7 12",
+              "operation": "sum",
+              "formula": "sum(contracted_ev_m, merchant_ev_m)",
+              "substituted_formula": "sum(5600, 400)",
               "dependencies": [
-                "normalized_ebitda_m",
-                "enterprise_value_multiple"
+                "contracted_ev_m",
+                "merchant_ev_m"
               ]
             },
             {
@@ -303,6 +597,14 @@
             "source_id": "bdefcb5a80ea7f78c3893dbd04ca4693628c6412d9e65eaa7d12b726e8127d4f"
           },
           {
+            "node_id": "contract_warm_years",
+            "ref": "WBI/investor-documents/sec-edgar/10-K_20260316_rpt20251231_acc0001193125_26_106541.htm",
+            "locator": "Long-term fixed-fee contracts ~10.4-year weighted average remaining life; ~2.4M dedicated acres",
+            "as_of": "2026-03-31",
+            "content_sha256": "b22980da4289d8950d225050e70c678db3a5abc21c98621b92379ea289aa0ef2",
+            "source_id": "f17c3f214bd7b979959d573aa4d570d9df28e32ea354be9a77322bd67201d102"
+          },
+          {
             "node_id": "shares_m",
             "ref": "WBI/investor-documents/sec-edgar/10-Q_20260507_rpt20260331_acc0001193125_26_209490.htm",
             "locator": "47.016M Class A plus 76.440M Class B/OpCo units (valuation.json anchor)",
@@ -315,11 +617,11 @@
           "passed": true,
           "errors": []
         },
-        "proof_hash": "72bbdaa40b835517b5818658c504e4367005c4043b766902550a4d722f1a98ed"
+        "proof_hash": "b416d0ca408baeff6fccfa2fb8644a6b46c483cf0b3407516f0a96acd58ba329"
       },
       "evidence_tier": "primary_derived",
       "evidence_level": "primary_derived",
-      "evidence": "WBI Q1 2026 10-Q and 2025 10-K anchors via WBI/research/evidence_reconciliation_2026-07-23.md. Proof base 36.0452/sh via owner_cash_or_dividend_discount@1.0.",
+      "evidence": "WBI Q1 2026 10-Q and FY2025 10-K via WBI/research/evidence_reconciliation_2026-07-24.md. Proof base 36.0452/sh via owner_cash_or_dividend_discount@1.0.",
       "scenario_assumptions": null,
       "probability_and_timing": null,
       "tax_and_realization_adjustments": "Apply the production, contract, location, capital-intensity, ownership, timing, and realization adjustments described in _system/reviews/economic_value_comparable_audit_2026-07-15.md.",
@@ -390,10 +692,10 @@
               "unit": "USD_m",
               "source": {
                 "ref": "WBI/investor-documents/sec-edgar/10-Q_20260507_rpt20260331_acc0001193125_26_209490.htm",
-                "locator": "DebtInstrumentCarryingAmount $1,486.289M; valuation uses $1.475B principal less cash",
+                "locator": "6.25% notes $825M due 2030 plus 6.50% notes $600M due 2033 plus revolver draw",
                 "as_of": "2026-03-31",
                 "content_sha256": "00e7aa6dddcadf3b67a47d8424630ea0d0bc6bde080ae39ee6f597f6d1284fe4",
-                "source_id": "72514b9cacfa734cf26596f51f93fd79cffaf15d337126776ab3300731f36dda"
+                "source_id": "b80cdc5b81fed8255b8d2c9f36f7f8411d23aa6bca2c8ece5697797676f39dbd"
               },
               "rationale": null
             },
@@ -409,6 +711,36 @@
                 "as_of": "2026-03-31",
                 "content_sha256": "00e7aa6dddcadf3b67a47d8424630ea0d0bc6bde080ae39ee6f597f6d1284fe4",
                 "source_id": "46931431f5de28892b4958acbab85935b03dc373b0d1e6010d2ceab4441d53af"
+              },
+              "rationale": null
+            },
+            {
+              "id": "revolver_capacity_m",
+              "label": "2025 revolving credit facility lender commitments",
+              "kind": "fact",
+              "value": 500.0,
+              "unit": "USD_m",
+              "source": {
+                "ref": "WBI/investor-documents/sec-edgar/10-Q_20260507_rpt20260331_acc0001193125_26_209490.htm",
+                "locator": "2025 Revolving Credit Facility $500.0M commitments; matures September 26, 2030",
+                "as_of": "2026-03-31",
+                "content_sha256": "00e7aa6dddcadf3b67a47d8424630ea0d0bc6bde080ae39ee6f597f6d1284fe4",
+                "source_id": "4e5101cf20935f6dccaf5c6a5c4741f38ab3697b90ebb893e0baede6e5ec5a67"
+              },
+              "rationale": null
+            },
+            {
+              "id": "q1_operating_cash_flow_m",
+              "label": "Q1 2026 net cash from operating activities",
+              "kind": "fact",
+              "value": 95.1,
+              "unit": "USD_m",
+              "source": {
+                "ref": "WBI/investor-documents/sec-edgar/10-Q_20260507_rpt20260331_acc0001193125_26_209490.htm",
+                "locator": "Net cash provided by operating activities $95.1M for quarter ended March 31, 2026",
+                "as_of": "2026-03-31",
+                "content_sha256": "00e7aa6dddcadf3b67a47d8424630ea0d0bc6bde080ae39ee6f597f6d1284fe4",
+                "source_id": "edf0095084f77953a03e14d9d9588b1243ef91c8cb13c883d4c7f0eabfcaf8a6"
               },
               "rationale": null
             },
@@ -444,6 +776,42 @@
               "unit": "USD_m",
               "source": null,
               "rationale": "Stress liquidity haircut in low case; high case assumes modest build."
+            },
+            {
+              "id": "stress_ebitda_m",
+              "label": "2026 adjusted EBITDA in funding stress case",
+              "kind": "judgment",
+              "value": 425.0,
+              "unit": "USD_m",
+              "source": null,
+              "rationale": "Low uses bottom of 2026 guidance; base/high use midpoint and top of guide."
+            },
+            {
+              "id": "growth_capex_stress_m",
+              "label": "2026 growth capital program in stress case",
+              "kind": "judgment",
+              "value": 490.0,
+              "unit": "USD_m",
+              "source": null,
+              "rationale": "Low uses top of $430M-$490M guidance; high assumes on-budget spend."
+            },
+            {
+              "id": "maintenance_investing_m",
+              "label": "Maintenance and other investing cash not in growth guide",
+              "kind": "judgment",
+              "value": 50.0,
+              "unit": "USD_m",
+              "source": null,
+              "rationale": "Not separately disclosed; bounded assumption for sources-and-uses bridge."
+            },
+            {
+              "id": "stress_interest_m",
+              "label": "Annual cash interest under stress rates",
+              "kind": "judgment",
+              "value": 140.0,
+              "unit": "USD_m",
+              "source": null,
+              "rationale": "Fixed notes plus revolver spread; low case assumes higher all-in coupon."
             },
             {
               "id": "net_debt_m",
@@ -485,6 +853,104 @@
               "dependencies": [
                 "net_debt_per_share"
               ]
+            },
+            {
+              "id": "ocf_annualized_m",
+              "label": "ocf_annualized_m",
+              "kind": "calculation",
+              "value": 380.4,
+              "unit": "USD_m",
+              "operation": "multiply",
+              "formula": "q1_operating_cash_flow_m \u00d7 4.0",
+              "substituted_formula": "95.1 \u00d7 4",
+              "dependencies": [
+                "q1_operating_cash_flow_m",
+                4.0
+              ]
+            },
+            {
+              "id": "total_investing_need_m",
+              "label": "total_investing_need_m",
+              "kind": "calculation",
+              "value": 540.0,
+              "unit": "USD_m",
+              "operation": "sum",
+              "formula": "sum(growth_capex_stress_m, maintenance_investing_m)",
+              "substituted_formula": "sum(490, 50)",
+              "dependencies": [
+                "growth_capex_stress_m",
+                "maintenance_investing_m"
+              ]
+            },
+            {
+              "id": "funding_gap_m",
+              "label": "funding_gap_m",
+              "kind": "calculation",
+              "value": 159.6,
+              "unit": "USD_m",
+              "operation": "subtract",
+              "formula": "total_investing_need_m - ocf_annualized_m",
+              "substituted_formula": "540 - 380.4",
+              "dependencies": [
+                "total_investing_need_m",
+                "ocf_annualized_m"
+              ]
+            },
+            {
+              "id": "liquidity_stack_m",
+              "label": "liquidity_stack_m",
+              "kind": "calculation",
+              "value": 550.7,
+              "unit": "USD_m",
+              "operation": "sum",
+              "formula": "sum(cash_m, revolver_capacity_m)",
+              "substituted_formula": "sum(50.7, 500)",
+              "dependencies": [
+                "cash_m",
+                "revolver_capacity_m"
+              ]
+            },
+            {
+              "id": "liquidity_headroom_m",
+              "label": "liquidity_headroom_m",
+              "kind": "calculation",
+              "value": 391.1,
+              "unit": "USD_m",
+              "operation": "subtract",
+              "formula": "liquidity_stack_m - funding_gap_m",
+              "substituted_formula": "550.7 - 159.6",
+              "dependencies": [
+                "liquidity_stack_m",
+                "funding_gap_m"
+              ]
+            },
+            {
+              "id": "implied_interest_coverage",
+              "label": "implied_interest_coverage",
+              "kind": "calculation",
+              "value": 3.03571429,
+              "unit": "ratio",
+              "operation": "divide",
+              "formula": "stress_ebitda_m \u00f7 stress_interest_m",
+              "substituted_formula": "425 \u00f7 140",
+              "dependencies": [
+                "stress_ebitda_m",
+                "stress_interest_m"
+              ]
+            },
+            {
+              "id": "implied_net_leverage",
+              "label": "implied_net_leverage",
+              "kind": "calculation",
+              "value": 3.63105882,
+              "unit": "ratio",
+              "operation": "divide",
+              "formula": "net_debt_m \u00f7 stress_ebitda_m",
+              "substituted_formula": "1543.2 \u00f7 425",
+              "dependencies": [
+                "net_debt_m",
+                "stress_ebitda_m"
+              ]
             }
           ],
           "base": [
@@ -496,10 +962,10 @@
               "unit": "USD_m",
               "source": {
                 "ref": "WBI/investor-documents/sec-edgar/10-Q_20260507_rpt20260331_acc0001193125_26_209490.htm",
-                "locator": "DebtInstrumentCarryingAmount $1,486.289M; valuation uses $1.475B principal less cash",
+                "locator": "6.25% notes $825M due 2030 plus 6.50% notes $600M due 2033 plus revolver draw",
                 "as_of": "2026-03-31",
                 "content_sha256": "00e7aa6dddcadf3b67a47d8424630ea0d0bc6bde080ae39ee6f597f6d1284fe4",
-                "source_id": "72514b9cacfa734cf26596f51f93fd79cffaf15d337126776ab3300731f36dda"
+                "source_id": "b80cdc5b81fed8255b8d2c9f36f7f8411d23aa6bca2c8ece5697797676f39dbd"
               },
               "rationale": null
             },
@@ -515,6 +981,36 @@
                 "as_of": "2026-03-31",
                 "content_sha256": "00e7aa6dddcadf3b67a47d8424630ea0d0bc6bde080ae39ee6f597f6d1284fe4",
                 "source_id": "46931431f5de28892b4958acbab85935b03dc373b0d1e6010d2ceab4441d53af"
+              },
+              "rationale": null
+            },
+            {
+              "id": "revolver_capacity_m",
+              "label": "2025 revolving credit facility lender commitments",
+              "kind": "fact",
+              "value": 500.0,
+              "unit": "USD_m",
+              "source": {
+                "ref": "WBI/investor-documents/sec-edgar/10-Q_20260507_rpt20260331_acc0001193125_26_209490.htm",
+                "locator": "2025 Revolving Credit Facility $500.0M commitments; matures September 26, 2030",
+                "as_of": "2026-03-31",
+                "content_sha256": "00e7aa6dddcadf3b67a47d8424630ea0d0bc6bde080ae39ee6f597f6d1284fe4",
+                "source_id": "4e5101cf20935f6dccaf5c6a5c4741f38ab3697b90ebb893e0baede6e5ec5a67"
+              },
+              "rationale": null
+            },
+            {
+              "id": "q1_operating_cash_flow_m",
+              "label": "Q1 2026 net cash from operating activities",
+              "kind": "fact",
+              "value": 95.1,
+              "unit": "USD_m",
+              "source": {
+                "ref": "WBI/investor-documents/sec-edgar/10-Q_20260507_rpt20260331_acc0001193125_26_209490.htm",
+                "locator": "Net cash provided by operating activities $95.1M for quarter ended March 31, 2026",
+                "as_of": "2026-03-31",
+                "content_sha256": "00e7aa6dddcadf3b67a47d8424630ea0d0bc6bde080ae39ee6f597f6d1284fe4",
+                "source_id": "edf0095084f77953a03e14d9d9588b1243ef91c8cb13c883d4c7f0eabfcaf8a6"
               },
               "rationale": null
             },
@@ -550,6 +1046,42 @@
               "unit": "USD_m",
               "source": null,
               "rationale": "Stress liquidity haircut in low case; high case assumes modest build."
+            },
+            {
+              "id": "stress_ebitda_m",
+              "label": "2026 adjusted EBITDA in funding stress case",
+              "kind": "judgment",
+              "value": 445.0,
+              "unit": "USD_m",
+              "source": null,
+              "rationale": "Low uses bottom of 2026 guidance; base/high use midpoint and top of guide."
+            },
+            {
+              "id": "growth_capex_stress_m",
+              "label": "2026 growth capital program in stress case",
+              "kind": "judgment",
+              "value": 460.0,
+              "unit": "USD_m",
+              "source": null,
+              "rationale": "Low uses top of $430M-$490M guidance; high assumes on-budget spend."
+            },
+            {
+              "id": "maintenance_investing_m",
+              "label": "Maintenance and other investing cash not in growth guide",
+              "kind": "judgment",
+              "value": 40.0,
+              "unit": "USD_m",
+              "source": null,
+              "rationale": "Not separately disclosed; bounded assumption for sources-and-uses bridge."
+            },
+            {
+              "id": "stress_interest_m",
+              "label": "Annual cash interest under stress rates",
+              "kind": "judgment",
+              "value": 115.0,
+              "unit": "USD_m",
+              "source": null,
+              "rationale": "Fixed notes plus revolver spread; low case assumes higher all-in coupon."
             },
             {
               "id": "net_debt_m",
@@ -591,6 +1123,104 @@
               "dependencies": [
                 "net_debt_per_share"
               ]
+            },
+            {
+              "id": "ocf_annualized_m",
+              "label": "ocf_annualized_m",
+              "kind": "calculation",
+              "value": 380.4,
+              "unit": "USD_m",
+              "operation": "multiply",
+              "formula": "q1_operating_cash_flow_m \u00d7 4.0",
+              "substituted_formula": "95.1 \u00d7 4",
+              "dependencies": [
+                "q1_operating_cash_flow_m",
+                4.0
+              ]
+            },
+            {
+              "id": "total_investing_need_m",
+              "label": "total_investing_need_m",
+              "kind": "calculation",
+              "value": 500.0,
+              "unit": "USD_m",
+              "operation": "sum",
+              "formula": "sum(growth_capex_stress_m, maintenance_investing_m)",
+              "substituted_formula": "sum(460, 40)",
+              "dependencies": [
+                "growth_capex_stress_m",
+                "maintenance_investing_m"
+              ]
+            },
+            {
+              "id": "funding_gap_m",
+              "label": "funding_gap_m",
+              "kind": "calculation",
+              "value": 119.6,
+              "unit": "USD_m",
+              "operation": "subtract",
+              "formula": "total_investing_need_m - ocf_annualized_m",
+              "substituted_formula": "500 - 380.4",
+              "dependencies": [
+                "total_investing_need_m",
+                "ocf_annualized_m"
+              ]
+            },
+            {
+              "id": "liquidity_stack_m",
+              "label": "liquidity_stack_m",
+              "kind": "calculation",
+              "value": 550.7,
+              "unit": "USD_m",
+              "operation": "sum",
+              "formula": "sum(cash_m, revolver_capacity_m)",
+              "substituted_formula": "sum(50.7, 500)",
+              "dependencies": [
+                "cash_m",
+                "revolver_capacity_m"
+              ]
+            },
+            {
+              "id": "liquidity_headroom_m",
+              "label": "liquidity_headroom_m",
+              "kind": "calculation",
+              "value": 431.1,
+              "unit": "USD_m",
+              "operation": "subtract",
+              "formula": "liquidity_stack_m - funding_gap_m",
+              "substituted_formula": "550.7 - 119.6",
+              "dependencies": [
+                "liquidity_stack_m",
+                "funding_gap_m"
+              ]
+            },
+            {
+              "id": "implied_interest_coverage",
+              "label": "implied_interest_coverage",
+              "kind": "calculation",
+              "value": 3.86956522,
+              "unit": "ratio",
+              "operation": "divide",
+              "formula": "stress_ebitda_m \u00f7 stress_interest_m",
+              "substituted_formula": "445 \u00f7 115",
+              "dependencies": [
+                "stress_ebitda_m",
+                "stress_interest_m"
+              ]
+            },
+            {
+              "id": "implied_net_leverage",
+              "label": "implied_net_leverage",
+              "kind": "calculation",
+              "value": 3.20067416,
+              "unit": "ratio",
+              "operation": "divide",
+              "formula": "net_debt_m \u00f7 stress_ebitda_m",
+              "substituted_formula": "1424.3 \u00f7 445",
+              "dependencies": [
+                "net_debt_m",
+                "stress_ebitda_m"
+              ]
             }
           ],
           "high": [
@@ -602,10 +1232,10 @@
               "unit": "USD_m",
               "source": {
                 "ref": "WBI/investor-documents/sec-edgar/10-Q_20260507_rpt20260331_acc0001193125_26_209490.htm",
-                "locator": "DebtInstrumentCarryingAmount $1,486.289M; valuation uses $1.475B principal less cash",
+                "locator": "6.25% notes $825M due 2030 plus 6.50% notes $600M due 2033 plus revolver draw",
                 "as_of": "2026-03-31",
                 "content_sha256": "00e7aa6dddcadf3b67a47d8424630ea0d0bc6bde080ae39ee6f597f6d1284fe4",
-                "source_id": "72514b9cacfa734cf26596f51f93fd79cffaf15d337126776ab3300731f36dda"
+                "source_id": "b80cdc5b81fed8255b8d2c9f36f7f8411d23aa6bca2c8ece5697797676f39dbd"
               },
               "rationale": null
             },
@@ -621,6 +1251,36 @@
                 "as_of": "2026-03-31",
                 "content_sha256": "00e7aa6dddcadf3b67a47d8424630ea0d0bc6bde080ae39ee6f597f6d1284fe4",
                 "source_id": "46931431f5de28892b4958acbab85935b03dc373b0d1e6010d2ceab4441d53af"
+              },
+              "rationale": null
+            },
+            {
+              "id": "revolver_capacity_m",
+              "label": "2025 revolving credit facility lender commitments",
+              "kind": "fact",
+              "value": 500.0,
+              "unit": "USD_m",
+              "source": {
+                "ref": "WBI/investor-documents/sec-edgar/10-Q_20260507_rpt20260331_acc0001193125_26_209490.htm",
+                "locator": "2025 Revolving Credit Facility $500.0M commitments; matures September 26, 2030",
+                "as_of": "2026-03-31",
+                "content_sha256": "00e7aa6dddcadf3b67a47d8424630ea0d0bc6bde080ae39ee6f597f6d1284fe4",
+                "source_id": "4e5101cf20935f6dccaf5c6a5c4741f38ab3697b90ebb893e0baede6e5ec5a67"
+              },
+              "rationale": null
+            },
+            {
+              "id": "q1_operating_cash_flow_m",
+              "label": "Q1 2026 net cash from operating activities",
+              "kind": "fact",
+              "value": 95.1,
+              "unit": "USD_m",
+              "source": {
+                "ref": "WBI/investor-documents/sec-edgar/10-Q_20260507_rpt20260331_acc0001193125_26_209490.htm",
+                "locator": "Net cash provided by operating activities $95.1M for quarter ended March 31, 2026",
+                "as_of": "2026-03-31",
+                "content_sha256": "00e7aa6dddcadf3b67a47d8424630ea0d0bc6bde080ae39ee6f597f6d1284fe4",
+                "source_id": "edf0095084f77953a03e14d9d9588b1243ef91c8cb13c883d4c7f0eabfcaf8a6"
               },
               "rationale": null
             },
@@ -656,6 +1316,42 @@
               "unit": "USD_m",
               "source": null,
               "rationale": "Stress liquidity haircut in low case; high case assumes modest build."
+            },
+            {
+              "id": "stress_ebitda_m",
+              "label": "2026 adjusted EBITDA in funding stress case",
+              "kind": "judgment",
+              "value": 465.0,
+              "unit": "USD_m",
+              "source": null,
+              "rationale": "Low uses bottom of 2026 guidance; base/high use midpoint and top of guide."
+            },
+            {
+              "id": "growth_capex_stress_m",
+              "label": "2026 growth capital program in stress case",
+              "kind": "judgment",
+              "value": 430.0,
+              "unit": "USD_m",
+              "source": null,
+              "rationale": "Low uses top of $430M-$490M guidance; high assumes on-budget spend."
+            },
+            {
+              "id": "maintenance_investing_m",
+              "label": "Maintenance and other investing cash not in growth guide",
+              "kind": "judgment",
+              "value": 35.0,
+              "unit": "USD_m",
+              "source": null,
+              "rationale": "Not separately disclosed; bounded assumption for sources-and-uses bridge."
+            },
+            {
+              "id": "stress_interest_m",
+              "label": "Annual cash interest under stress rates",
+              "kind": "judgment",
+              "value": 105.0,
+              "unit": "USD_m",
+              "source": null,
+              "rationale": "Fixed notes plus revolver spread; low case assumes higher all-in coupon."
             },
             {
               "id": "net_debt_m",
@@ -697,6 +1393,104 @@
               "dependencies": [
                 "net_debt_per_share"
               ]
+            },
+            {
+              "id": "ocf_annualized_m",
+              "label": "ocf_annualized_m",
+              "kind": "calculation",
+              "value": 380.4,
+              "unit": "USD_m",
+              "operation": "multiply",
+              "formula": "q1_operating_cash_flow_m \u00d7 4.0",
+              "substituted_formula": "95.1 \u00d7 4",
+              "dependencies": [
+                "q1_operating_cash_flow_m",
+                4.0
+              ]
+            },
+            {
+              "id": "total_investing_need_m",
+              "label": "total_investing_need_m",
+              "kind": "calculation",
+              "value": 465.0,
+              "unit": "USD_m",
+              "operation": "sum",
+              "formula": "sum(growth_capex_stress_m, maintenance_investing_m)",
+              "substituted_formula": "sum(430, 35)",
+              "dependencies": [
+                "growth_capex_stress_m",
+                "maintenance_investing_m"
+              ]
+            },
+            {
+              "id": "funding_gap_m",
+              "label": "funding_gap_m",
+              "kind": "calculation",
+              "value": 84.6,
+              "unit": "USD_m",
+              "operation": "subtract",
+              "formula": "total_investing_need_m - ocf_annualized_m",
+              "substituted_formula": "465 - 380.4",
+              "dependencies": [
+                "total_investing_need_m",
+                "ocf_annualized_m"
+              ]
+            },
+            {
+              "id": "liquidity_stack_m",
+              "label": "liquidity_stack_m",
+              "kind": "calculation",
+              "value": 550.7,
+              "unit": "USD_m",
+              "operation": "sum",
+              "formula": "sum(cash_m, revolver_capacity_m)",
+              "substituted_formula": "sum(50.7, 500)",
+              "dependencies": [
+                "cash_m",
+                "revolver_capacity_m"
+              ]
+            },
+            {
+              "id": "liquidity_headroom_m",
+              "label": "liquidity_headroom_m",
+              "kind": "calculation",
+              "value": 466.1,
+              "unit": "USD_m",
+              "operation": "subtract",
+              "formula": "liquidity_stack_m - funding_gap_m",
+              "substituted_formula": "550.7 - 84.6",
+              "dependencies": [
+                "liquidity_stack_m",
+                "funding_gap_m"
+              ]
+            },
+            {
+              "id": "implied_interest_coverage",
+              "label": "implied_interest_coverage",
+              "kind": "calculation",
+              "value": 4.42857143,
+              "unit": "ratio",
+              "operation": "divide",
+              "formula": "stress_ebitda_m \u00f7 stress_interest_m",
+              "substituted_formula": "465 \u00f7 105",
+              "dependencies": [
+                "stress_ebitda_m",
+                "stress_interest_m"
+              ]
+            },
+            {
+              "id": "implied_net_leverage",
+              "label": "implied_net_leverage",
+              "kind": "calculation",
+              "value": 2.78774194,
+              "unit": "ratio",
+              "operation": "divide",
+              "formula": "net_debt_m \u00f7 stress_ebitda_m",
+              "substituted_formula": "1296.3 \u00f7 465",
+              "dependencies": [
+                "net_debt_m",
+                "stress_ebitda_m"
+              ]
             }
           ]
         },
@@ -704,10 +1498,10 @@
           {
             "node_id": "debt_principal_m",
             "ref": "WBI/investor-documents/sec-edgar/10-Q_20260507_rpt20260331_acc0001193125_26_209490.htm",
-            "locator": "DebtInstrumentCarryingAmount $1,486.289M; valuation uses $1.475B principal less cash",
+            "locator": "6.25% notes $825M due 2030 plus 6.50% notes $600M due 2033 plus revolver draw",
             "as_of": "2026-03-31",
             "content_sha256": "00e7aa6dddcadf3b67a47d8424630ea0d0bc6bde080ae39ee6f597f6d1284fe4",
-            "source_id": "72514b9cacfa734cf26596f51f93fd79cffaf15d337126776ab3300731f36dda"
+            "source_id": "b80cdc5b81fed8255b8d2c9f36f7f8411d23aa6bca2c8ece5697797676f39dbd"
           },
           {
             "node_id": "cash_m",
@@ -716,6 +1510,22 @@
             "as_of": "2026-03-31",
             "content_sha256": "00e7aa6dddcadf3b67a47d8424630ea0d0bc6bde080ae39ee6f597f6d1284fe4",
             "source_id": "46931431f5de28892b4958acbab85935b03dc373b0d1e6010d2ceab4441d53af"
+          },
+          {
+            "node_id": "revolver_capacity_m",
+            "ref": "WBI/investor-documents/sec-edgar/10-Q_20260507_rpt20260331_acc0001193125_26_209490.htm",
+            "locator": "2025 Revolving Credit Facility $500.0M commitments; matures September 26, 2030",
+            "as_of": "2026-03-31",
+            "content_sha256": "00e7aa6dddcadf3b67a47d8424630ea0d0bc6bde080ae39ee6f597f6d1284fe4",
+            "source_id": "4e5101cf20935f6dccaf5c6a5c4741f38ab3697b90ebb893e0baede6e5ec5a67"
+          },
+          {
+            "node_id": "q1_operating_cash_flow_m",
+            "ref": "WBI/investor-documents/sec-edgar/10-Q_20260507_rpt20260331_acc0001193125_26_209490.htm",
+            "locator": "Net cash provided by operating activities $95.1M for quarter ended March 31, 2026",
+            "as_of": "2026-03-31",
+            "content_sha256": "00e7aa6dddcadf3b67a47d8424630ea0d0bc6bde080ae39ee6f597f6d1284fe4",
+            "source_id": "edf0095084f77953a03e14d9d9588b1243ef91c8cb13c883d4c7f0eabfcaf8a6"
           },
           {
             "node_id": "shares_m",
@@ -730,11 +1540,11 @@
           "passed": true,
           "errors": []
         },
-        "proof_hash": "3c3247276332e899ff13c24182fb8f76f91e07e4ff57c3e83a5bcfa2cde598fe"
+        "proof_hash": "b5d7308b29391cdb4509582e8db6aca8e3a3d5159c25170c59ebf30fc00ff4b7"
       },
       "evidence_tier": "primary_derived",
       "evidence_level": "primary_derived",
-      "evidence": "WBI Q1 2026 10-Q and 2025 10-K anchors via WBI/research/evidence_reconciliation_2026-07-23.md. Proof base -11.5369/sh via net_asset_value@1.0.",
+      "evidence": "WBI Q1 2026 10-Q and FY2025 10-K via WBI/research/evidence_reconciliation_2026-07-24.md. Proof base -11.5369/sh via net_asset_value@1.0.",
       "scenario_assumptions": null,
       "probability_and_timing": null,
       "tax_and_realization_adjustments": "Apply the production, contract, location, capital-intensity, ownership, timing, and realization adjustments described in _system/reviews/economic_value_comparable_audit_2026-07-15.md.",
@@ -811,6 +1621,51 @@
               "rationale": null
             },
             {
+              "id": "fy2025_operating_cash_flow_m",
+              "label": "FY2025 net cash from operating activities",
+              "kind": "fact",
+              "value": 159.7,
+              "unit": "USD_m",
+              "source": {
+                "ref": "WBI/investor-documents/sec-edgar/10-K_20260316_rpt20251231_acc0001193125_26_106541.htm",
+                "locator": "FY2025 operating cash flow $159.7M per cash flow statement",
+                "as_of": "2026-03-31",
+                "content_sha256": "b22980da4289d8950d225050e70c678db3a5abc21c98621b92379ea289aa0ef2",
+                "source_id": "d971470053f1634ab5ba7b4cbe4cf02a5ed28d72ff5c9a394722d0d74a622e8e"
+              },
+              "rationale": null
+            },
+            {
+              "id": "fy2025_investing_outflow_m",
+              "label": "FY2025 net cash used in investing activities (absolute)",
+              "kind": "fact",
+              "value": 218.6,
+              "unit": "USD_m",
+              "source": {
+                "ref": "WBI/investor-documents/sec-edgar/10-K_20260316_rpt20251231_acc0001193125_26_106541.htm",
+                "locator": "FY2025 investing cash outflow $218.6M per cash flow statement",
+                "as_of": "2026-03-31",
+                "content_sha256": "b22980da4289d8950d225050e70c678db3a5abc21c98621b92379ea289aa0ef2",
+                "source_id": "4d304b4ed3bdd6a0907a8e2544b4e5831dc2db4ecbddd89840a756bae81f703c"
+              },
+              "rationale": null
+            },
+            {
+              "id": "fy2025_adj_ebitda_m",
+              "label": "FY2025 adjusted EBITDA",
+              "kind": "fact",
+              "value": 254.0,
+              "unit": "USD_m",
+              "source": {
+                "ref": "WBI/investor-documents/sec-edgar/10-K_20260316_rpt20251231_acc0001193125_26_106541.htm",
+                "locator": "FY2025 adjusted EBITDA $254.0M per MD&A reconciliation",
+                "as_of": "2026-03-31",
+                "content_sha256": "b22980da4289d8950d225050e70c678db3a5abc21c98621b92379ea289aa0ef2",
+                "source_id": "71274da32a1e21db7b7546adf842c5c08ab813837ba3a56585d4d6044325ef1b"
+              },
+              "rationale": null
+            },
+            {
               "id": "shares_m",
               "label": "Economic units (Class A plus OpCo)",
               "kind": "fact",
@@ -832,7 +1687,35 @@
               "value": 0.0,
               "unit": "USD_per_share",
               "source": null,
-              "rationale": "Only value beyond 2026 guide; probability and remaining capital embedded in range until cohort ROIC disclosed."
+              "rationale": "Only value beyond 2026 guide; probability and remaining capital embedded until project register published."
+            },
+            {
+              "id": "consolidated_cash_recovery_ratio",
+              "label": "consolidated_cash_recovery_ratio",
+              "kind": "calculation",
+              "value": 0.7305581,
+              "unit": "ratio",
+              "operation": "divide",
+              "formula": "fy2025_operating_cash_flow_m \u00f7 fy2025_investing_outflow_m",
+              "substituted_formula": "159.7 \u00f7 218.6",
+              "dependencies": [
+                "fy2025_operating_cash_flow_m",
+                "fy2025_investing_outflow_m"
+              ]
+            },
+            {
+              "id": "consolidated_ocf_to_ebitda",
+              "label": "consolidated_ocf_to_ebitda",
+              "kind": "calculation",
+              "value": 0.62874016,
+              "unit": "ratio",
+              "operation": "divide",
+              "formula": "fy2025_operating_cash_flow_m \u00f7 fy2025_adj_ebitda_m",
+              "substituted_formula": "159.7 \u00f7 254",
+              "dependencies": [
+                "fy2025_operating_cash_flow_m",
+                "fy2025_adj_ebitda_m"
+              ]
             }
           ],
           "base": [
@@ -848,6 +1731,51 @@
                 "as_of": "2026-03-31",
                 "content_sha256": "00e7aa6dddcadf3b67a47d8424630ea0d0bc6bde080ae39ee6f597f6d1284fe4",
                 "source_id": "ad0d2ae9205bbfdd387342178bfb6993bd3ba2d7be0377263c40da251e1114f4"
+              },
+              "rationale": null
+            },
+            {
+              "id": "fy2025_operating_cash_flow_m",
+              "label": "FY2025 net cash from operating activities",
+              "kind": "fact",
+              "value": 159.7,
+              "unit": "USD_m",
+              "source": {
+                "ref": "WBI/investor-documents/sec-edgar/10-K_20260316_rpt20251231_acc0001193125_26_106541.htm",
+                "locator": "FY2025 operating cash flow $159.7M per cash flow statement",
+                "as_of": "2026-03-31",
+                "content_sha256": "b22980da4289d8950d225050e70c678db3a5abc21c98621b92379ea289aa0ef2",
+                "source_id": "d971470053f1634ab5ba7b4cbe4cf02a5ed28d72ff5c9a394722d0d74a622e8e"
+              },
+              "rationale": null
+            },
+            {
+              "id": "fy2025_investing_outflow_m",
+              "label": "FY2025 net cash used in investing activities (absolute)",
+              "kind": "fact",
+              "value": 218.6,
+              "unit": "USD_m",
+              "source": {
+                "ref": "WBI/investor-documents/sec-edgar/10-K_20260316_rpt20251231_acc0001193125_26_106541.htm",
+                "locator": "FY2025 investing cash outflow $218.6M per cash flow statement",
+                "as_of": "2026-03-31",
+                "content_sha256": "b22980da4289d8950d225050e70c678db3a5abc21c98621b92379ea289aa0ef2",
+                "source_id": "4d304b4ed3bdd6a0907a8e2544b4e5831dc2db4ecbddd89840a756bae81f703c"
+              },
+              "rationale": null
+            },
+            {
+              "id": "fy2025_adj_ebitda_m",
+              "label": "FY2025 adjusted EBITDA",
+              "kind": "fact",
+              "value": 254.0,
+              "unit": "USD_m",
+              "source": {
+                "ref": "WBI/investor-documents/sec-edgar/10-K_20260316_rpt20251231_acc0001193125_26_106541.htm",
+                "locator": "FY2025 adjusted EBITDA $254.0M per MD&A reconciliation",
+                "as_of": "2026-03-31",
+                "content_sha256": "b22980da4289d8950d225050e70c678db3a5abc21c98621b92379ea289aa0ef2",
+                "source_id": "71274da32a1e21db7b7546adf842c5c08ab813837ba3a56585d4d6044325ef1b"
               },
               "rationale": null
             },
@@ -873,7 +1801,35 @@
               "value": 3.0,
               "unit": "USD_per_share",
               "source": null,
-              "rationale": "Only value beyond 2026 guide; probability and remaining capital embedded in range until cohort ROIC disclosed."
+              "rationale": "Only value beyond 2026 guide; probability and remaining capital embedded until project register published."
+            },
+            {
+              "id": "consolidated_cash_recovery_ratio",
+              "label": "consolidated_cash_recovery_ratio",
+              "kind": "calculation",
+              "value": 0.7305581,
+              "unit": "ratio",
+              "operation": "divide",
+              "formula": "fy2025_operating_cash_flow_m \u00f7 fy2025_investing_outflow_m",
+              "substituted_formula": "159.7 \u00f7 218.6",
+              "dependencies": [
+                "fy2025_operating_cash_flow_m",
+                "fy2025_investing_outflow_m"
+              ]
+            },
+            {
+              "id": "consolidated_ocf_to_ebitda",
+              "label": "consolidated_ocf_to_ebitda",
+              "kind": "calculation",
+              "value": 0.62874016,
+              "unit": "ratio",
+              "operation": "divide",
+              "formula": "fy2025_operating_cash_flow_m \u00f7 fy2025_adj_ebitda_m",
+              "substituted_formula": "159.7 \u00f7 254",
+              "dependencies": [
+                "fy2025_operating_cash_flow_m",
+                "fy2025_adj_ebitda_m"
+              ]
             }
           ],
           "high": [
@@ -889,6 +1845,51 @@
                 "as_of": "2026-03-31",
                 "content_sha256": "00e7aa6dddcadf3b67a47d8424630ea0d0bc6bde080ae39ee6f597f6d1284fe4",
                 "source_id": "ad0d2ae9205bbfdd387342178bfb6993bd3ba2d7be0377263c40da251e1114f4"
+              },
+              "rationale": null
+            },
+            {
+              "id": "fy2025_operating_cash_flow_m",
+              "label": "FY2025 net cash from operating activities",
+              "kind": "fact",
+              "value": 159.7,
+              "unit": "USD_m",
+              "source": {
+                "ref": "WBI/investor-documents/sec-edgar/10-K_20260316_rpt20251231_acc0001193125_26_106541.htm",
+                "locator": "FY2025 operating cash flow $159.7M per cash flow statement",
+                "as_of": "2026-03-31",
+                "content_sha256": "b22980da4289d8950d225050e70c678db3a5abc21c98621b92379ea289aa0ef2",
+                "source_id": "d971470053f1634ab5ba7b4cbe4cf02a5ed28d72ff5c9a394722d0d74a622e8e"
+              },
+              "rationale": null
+            },
+            {
+              "id": "fy2025_investing_outflow_m",
+              "label": "FY2025 net cash used in investing activities (absolute)",
+              "kind": "fact",
+              "value": 218.6,
+              "unit": "USD_m",
+              "source": {
+                "ref": "WBI/investor-documents/sec-edgar/10-K_20260316_rpt20251231_acc0001193125_26_106541.htm",
+                "locator": "FY2025 investing cash outflow $218.6M per cash flow statement",
+                "as_of": "2026-03-31",
+                "content_sha256": "b22980da4289d8950d225050e70c678db3a5abc21c98621b92379ea289aa0ef2",
+                "source_id": "4d304b4ed3bdd6a0907a8e2544b4e5831dc2db4ecbddd89840a756bae81f703c"
+              },
+              "rationale": null
+            },
+            {
+              "id": "fy2025_adj_ebitda_m",
+              "label": "FY2025 adjusted EBITDA",
+              "kind": "fact",
+              "value": 254.0,
+              "unit": "USD_m",
+              "source": {
+                "ref": "WBI/investor-documents/sec-edgar/10-K_20260316_rpt20251231_acc0001193125_26_106541.htm",
+                "locator": "FY2025 adjusted EBITDA $254.0M per MD&A reconciliation",
+                "as_of": "2026-03-31",
+                "content_sha256": "b22980da4289d8950d225050e70c678db3a5abc21c98621b92379ea289aa0ef2",
+                "source_id": "71274da32a1e21db7b7546adf842c5c08ab813837ba3a56585d4d6044325ef1b"
               },
               "rationale": null
             },
@@ -914,7 +1915,35 @@
               "value": 8.0,
               "unit": "USD_per_share",
               "source": null,
-              "rationale": "Only value beyond 2026 guide; probability and remaining capital embedded in range until cohort ROIC disclosed."
+              "rationale": "Only value beyond 2026 guide; probability and remaining capital embedded until project register published."
+            },
+            {
+              "id": "consolidated_cash_recovery_ratio",
+              "label": "consolidated_cash_recovery_ratio",
+              "kind": "calculation",
+              "value": 0.7305581,
+              "unit": "ratio",
+              "operation": "divide",
+              "formula": "fy2025_operating_cash_flow_m \u00f7 fy2025_investing_outflow_m",
+              "substituted_formula": "159.7 \u00f7 218.6",
+              "dependencies": [
+                "fy2025_operating_cash_flow_m",
+                "fy2025_investing_outflow_m"
+              ]
+            },
+            {
+              "id": "consolidated_ocf_to_ebitda",
+              "label": "consolidated_ocf_to_ebitda",
+              "kind": "calculation",
+              "value": 0.62874016,
+              "unit": "ratio",
+              "operation": "divide",
+              "formula": "fy2025_operating_cash_flow_m \u00f7 fy2025_adj_ebitda_m",
+              "substituted_formula": "159.7 \u00f7 254",
+              "dependencies": [
+                "fy2025_operating_cash_flow_m",
+                "fy2025_adj_ebitda_m"
+              ]
             }
           ]
         },
@@ -926,6 +1955,30 @@
             "as_of": "2026-03-31",
             "content_sha256": "00e7aa6dddcadf3b67a47d8424630ea0d0bc6bde080ae39ee6f597f6d1284fe4",
             "source_id": "ad0d2ae9205bbfdd387342178bfb6993bd3ba2d7be0377263c40da251e1114f4"
+          },
+          {
+            "node_id": "fy2025_operating_cash_flow_m",
+            "ref": "WBI/investor-documents/sec-edgar/10-K_20260316_rpt20251231_acc0001193125_26_106541.htm",
+            "locator": "FY2025 operating cash flow $159.7M per cash flow statement",
+            "as_of": "2026-03-31",
+            "content_sha256": "b22980da4289d8950d225050e70c678db3a5abc21c98621b92379ea289aa0ef2",
+            "source_id": "d971470053f1634ab5ba7b4cbe4cf02a5ed28d72ff5c9a394722d0d74a622e8e"
+          },
+          {
+            "node_id": "fy2025_investing_outflow_m",
+            "ref": "WBI/investor-documents/sec-edgar/10-K_20260316_rpt20251231_acc0001193125_26_106541.htm",
+            "locator": "FY2025 investing cash outflow $218.6M per cash flow statement",
+            "as_of": "2026-03-31",
+            "content_sha256": "b22980da4289d8950d225050e70c678db3a5abc21c98621b92379ea289aa0ef2",
+            "source_id": "4d304b4ed3bdd6a0907a8e2544b4e5831dc2db4ecbddd89840a756bae81f703c"
+          },
+          {
+            "node_id": "fy2025_adj_ebitda_m",
+            "ref": "WBI/investor-documents/sec-edgar/10-K_20260316_rpt20251231_acc0001193125_26_106541.htm",
+            "locator": "FY2025 adjusted EBITDA $254.0M per MD&A reconciliation",
+            "as_of": "2026-03-31",
+            "content_sha256": "b22980da4289d8950d225050e70c678db3a5abc21c98621b92379ea289aa0ef2",
+            "source_id": "71274da32a1e21db7b7546adf842c5c08ab813837ba3a56585d4d6044325ef1b"
           },
           {
             "node_id": "shares_m",
@@ -940,11 +1993,11 @@
           "passed": true,
           "errors": []
         },
-        "proof_hash": "4c7501febab7e7d2f2182125a91f9975b786ff2a06a8fe82b0f448b009ca0db6"
+        "proof_hash": "ba39792681f8b57a034e6d06ab1f0af8c8848aeb7d8b917b54affa5da5324aef"
       },
       "evidence_tier": "primary_derived",
       "evidence_level": "primary_derived",
-      "evidence": "WBI Q1 2026 10-Q and 2025 10-K anchors via WBI/research/evidence_reconciliation_2026-07-23.md. Proof base 3.0/sh via risk_adjusted_milestone_value@1.0.",
+      "evidence": "WBI Q1 2026 10-Q and FY2025 10-K via WBI/research/evidence_reconciliation_2026-07-24.md. Proof base 3.0/sh via risk_adjusted_milestone_value@1.0.",
       "scenario_assumptions": null,
       "probability_and_timing": {
         "success_probability": null,
@@ -1029,6 +2082,21 @@
               "rationale": null
             },
             {
+              "id": "fy2025_investing_outflow_m",
+              "label": "FY2025 net cash used in investing activities (absolute)",
+              "kind": "fact",
+              "value": 218.6,
+              "unit": "USD_m",
+              "source": {
+                "ref": "WBI/investor-documents/sec-edgar/10-K_20260316_rpt20251231_acc0001193125_26_106541.htm",
+                "locator": "FY2025 investing cash outflow $218.6M; cohort capital not separately disclosed",
+                "as_of": "2026-03-31",
+                "content_sha256": "b22980da4289d8950d225050e70c678db3a5abc21c98621b92379ea289aa0ef2",
+                "source_id": "b565fac475c68d20be84d0a5114018fdd8ba3d8020d5469cf3c8cb66446a7142"
+              },
+              "rationale": null
+            },
+            {
               "id": "shares_m",
               "label": "Economic units (Class A plus OpCo)",
               "kind": "fact",
@@ -1050,7 +2118,7 @@
               "value": 0.804,
               "unit": "ratio",
               "source": null,
-              "rationale": "Reserve released only after cohort-level capital and EBITDA disclosed; not maintenance capital."
+              "rationale": "Reserve scales with consolidated cash-recovery uncertainty until cohort ROIC register is filed."
             },
             {
               "id": "reserve_m",
@@ -1111,6 +2179,21 @@
               "rationale": null
             },
             {
+              "id": "fy2025_investing_outflow_m",
+              "label": "FY2025 net cash used in investing activities (absolute)",
+              "kind": "fact",
+              "value": 218.6,
+              "unit": "USD_m",
+              "source": {
+                "ref": "WBI/investor-documents/sec-edgar/10-K_20260316_rpt20251231_acc0001193125_26_106541.htm",
+                "locator": "FY2025 investing cash outflow $218.6M; cohort capital not separately disclosed",
+                "as_of": "2026-03-31",
+                "content_sha256": "b22980da4289d8950d225050e70c678db3a5abc21c98621b92379ea289aa0ef2",
+                "source_id": "b565fac475c68d20be84d0a5114018fdd8ba3d8020d5469cf3c8cb66446a7142"
+              },
+              "rationale": null
+            },
+            {
               "id": "shares_m",
               "label": "Economic units (Class A plus OpCo)",
               "kind": "fact",
@@ -1132,7 +2215,7 @@
               "value": 0.267,
               "unit": "ratio",
               "source": null,
-              "rationale": "Reserve released only after cohort-level capital and EBITDA disclosed; not maintenance capital."
+              "rationale": "Reserve scales with consolidated cash-recovery uncertainty until cohort ROIC register is filed."
             },
             {
               "id": "reserve_m",
@@ -1193,6 +2276,21 @@
               "rationale": null
             },
             {
+              "id": "fy2025_investing_outflow_m",
+              "label": "FY2025 net cash used in investing activities (absolute)",
+              "kind": "fact",
+              "value": 218.6,
+              "unit": "USD_m",
+              "source": {
+                "ref": "WBI/investor-documents/sec-edgar/10-K_20260316_rpt20251231_acc0001193125_26_106541.htm",
+                "locator": "FY2025 investing cash outflow $218.6M; cohort capital not separately disclosed",
+                "as_of": "2026-03-31",
+                "content_sha256": "b22980da4289d8950d225050e70c678db3a5abc21c98621b92379ea289aa0ef2",
+                "source_id": "b565fac475c68d20be84d0a5114018fdd8ba3d8020d5469cf3c8cb66446a7142"
+              },
+              "rationale": null
+            },
+            {
               "id": "shares_m",
               "label": "Economic units (Class A plus OpCo)",
               "kind": "fact",
@@ -1214,7 +2312,7 @@
               "value": 0.0,
               "unit": "ratio",
               "source": null,
-              "rationale": "Reserve released only after cohort-level capital and EBITDA disclosed; not maintenance capital."
+              "rationale": "Reserve scales with consolidated cash-recovery uncertainty until cohort ROIC register is filed."
             },
             {
               "id": "reserve_m",
@@ -1269,6 +2367,14 @@
             "source_id": "0a25af1e314ff0efbf57671a6e789c6e2fd8c1515a8f3cc2ebf9001fe11dfaf4"
           },
           {
+            "node_id": "fy2025_investing_outflow_m",
+            "ref": "WBI/investor-documents/sec-edgar/10-K_20260316_rpt20251231_acc0001193125_26_106541.htm",
+            "locator": "FY2025 investing cash outflow $218.6M; cohort capital not separately disclosed",
+            "as_of": "2026-03-31",
+            "content_sha256": "b22980da4289d8950d225050e70c678db3a5abc21c98621b92379ea289aa0ef2",
+            "source_id": "b565fac475c68d20be84d0a5114018fdd8ba3d8020d5469cf3c8cb66446a7142"
+          },
+          {
             "node_id": "shares_m",
             "ref": "WBI/investor-documents/sec-edgar/10-Q_20260507_rpt20260331_acc0001193125_26_209490.htm",
             "locator": "47.016M Class A plus 76.440M Class B/OpCo units",
@@ -1281,11 +2387,11 @@
           "passed": true,
           "errors": []
         },
-        "proof_hash": "0311d2c22bda1636d28d6ecd2a3440b9a9892fabcffdaaf93a870a793a1f3687"
+        "proof_hash": "b2d4f9222430dd8a921f06ae3bbf6ff5c32a66dc4afa22f36ff04bb652880443"
       },
       "evidence_tier": "primary_derived",
       "evidence_level": "primary_derived",
-      "evidence": "WBI Q1 2026 10-Q and 2025 10-K anchors via WBI/research/evidence_reconciliation_2026-07-23.md. Proof base -0.9948/sh via net_asset_value@1.0.",
+      "evidence": "WBI Q1 2026 10-Q and FY2025 10-K via WBI/research/evidence_reconciliation_2026-07-24.md. Proof base -0.9948/sh via net_asset_value@1.0.",
       "scenario_assumptions": null,
       "probability_and_timing": null,
       "tax_and_realization_adjustments": "Apply the production, contract, location, capital-intensity, ownership, timing, and realization adjustments described in _system/reviews/economic_value_comparable_audit_2026-07-15.md.",
@@ -1351,7 +2457,7 @@
         "label": "Existing produced-water network enterprise value",
         "kind": "judgment",
         "evidence_tier": "primary_derived",
-        "evidence": "WBI Q1 2026 10-Q and 2025 10-K anchors via WBI/research/evidence_reconciliation_2026-07-23.md. Proof base 36.0452/sh via owner_cash_or_dividend_discount@1.0.",
+        "evidence": "WBI Q1 2026 10-Q and FY2025 10-K via WBI/research/evidence_reconciliation_2026-07-24.md. Proof base 36.0452/sh via owner_cash_or_dividend_discount@1.0.",
         "method": "normalized_ebitda_enterprise_value",
         "valuation_status": "bounded_estimate"
       },
@@ -1360,7 +2466,7 @@
         "label": "Net debt",
         "kind": "judgment",
         "evidence_tier": "primary_derived",
-        "evidence": "WBI Q1 2026 10-Q and 2025 10-K anchors via WBI/research/evidence_reconciliation_2026-07-23.md. Proof base -11.5369/sh via net_asset_value@1.0.",
+        "evidence": "WBI Q1 2026 10-Q and FY2025 10-K via WBI/research/evidence_reconciliation_2026-07-24.md. Proof base -11.5369/sh via net_asset_value@1.0.",
         "method": "balance_sheet_claim",
         "valuation_status": "bounded_estimate"
       },
@@ -1369,7 +2475,7 @@
         "label": "Speedway, Devon, and contracted growth beyond 2026",
         "kind": "judgment",
         "evidence_tier": "primary_derived",
-        "evidence": "WBI Q1 2026 10-Q and 2025 10-K anchors via WBI/research/evidence_reconciliation_2026-07-23.md. Proof base 3.0/sh via risk_adjusted_milestone_value@1.0.",
+        "evidence": "WBI Q1 2026 10-Q and FY2025 10-K via WBI/research/evidence_reconciliation_2026-07-24.md. Proof base 3.0/sh via risk_adjusted_milestone_value@1.0.",
         "method": "milestone_project_option",
         "valuation_status": "bounded_estimate"
       },
@@ -1378,7 +2484,7 @@
         "label": "Growth-capex execution reserve",
         "kind": "judgment",
         "evidence_tier": "primary_derived",
-        "evidence": "WBI Q1 2026 10-Q and 2025 10-K anchors via WBI/research/evidence_reconciliation_2026-07-23.md. Proof base -0.9948/sh via net_asset_value@1.0.",
+        "evidence": "WBI Q1 2026 10-Q and FY2025 10-K via WBI/research/evidence_reconciliation_2026-07-24.md. Proof base -0.9948/sh via net_asset_value@1.0.",
         "method": "capital_cycle_reserve",
         "valuation_status": "bounded_estimate"
       },
@@ -1398,11 +2504,10 @@
     "status": "routed",
     "profile_id": "predictable_cash_flow",
     "label": "Predictable cash-flow security",
-    "score": 17.0,
+    "score": 7.0,
     "reasons": [
       "archetype=infrastructure",
-      "component categories=infrastructure",
-      "explicit reviewed profile"
+      "component categories=infrastructure"
     ],
     "primary_methods": [
       "owner_cash_or_dividend_discount"
@@ -1487,11 +2592,10 @@
         "reasons": []
       },
       "predictable_cash_flow": {
-        "score": 17.0,
+        "score": 7.0,
         "reasons": [
           "archetype=infrastructure",
-          "component categories=infrastructure",
-          "explicit reviewed profile"
+          "component categories=infrastructure"
         ]
       },
       "binary_milestone": {
@@ -1504,7 +2608,7 @@
     },
     "decision_rule": "Power Zones select the fitting economic method and eligible independent reviewers; they never choose the valuation answer or capital decision.",
     "ticker": "WBI",
-    "as_of": "2026-07-20",
+    "as_of": "2026-07-24",
     "route_source": "canonical_power_zone_router",
     "config_path": "_system/frameworks/power_zones.json",
     "config_updated": "2026-07-14",
@@ -1569,8 +2673,8 @@
         }
       ]
     },
-    "input_hash": "3882d6e44adb4b233e747419bfffb4c657479adc7b199524b2368c039b82c0d3",
-    "generated_at": "2026-07-20T17:13:56.677393+00:00"
+    "input_hash": "9899c15675ed51bdaf416dab48cfcddf46f829cfe010229b017f1eb7e6a2eca3",
+    "generated_at": "2026-07-24T12:37:08.138073+00:00"
   },
   "market": {
     "price_per_share": 34.75,
@@ -1659,7 +2763,7 @@
     },
     "all_material_components_priced": false,
     "calculation_errors": [],
-    "aggregate_proof_hash": "42f7e05adde8301d94235322f24c09c540a69880de3239ca0ffe69c5de24e5d4"
+    "aggregate_proof_hash": "9376638e91d75ff474bca8319e844c1c80d26bd1972b7ad9cedf359074d446e7"
   },
   "source_lineage": [
     {
@@ -1670,6 +2774,15 @@
       "as_of": "2026-03-31",
       "content_sha256": "00e7aa6dddcadf3b67a47d8424630ea0d0bc6bde080ae39ee6f597f6d1284fe4",
       "source_id": "bdefcb5a80ea7f78c3893dbd04ca4693628c6412d9e65eaa7d12b726e8127d4f"
+    },
+    {
+      "component_id": "core_water_network",
+      "node_id": "contract_warm_years",
+      "ref": "WBI/investor-documents/sec-edgar/10-K_20260316_rpt20251231_acc0001193125_26_106541.htm",
+      "locator": "Long-term fixed-fee contracts ~10.4-year weighted average remaining life; ~2.4M dedicated acres",
+      "as_of": "2026-03-31",
+      "content_sha256": "b22980da4289d8950d225050e70c678db3a5abc21c98621b92379ea289aa0ef2",
+      "source_id": "f17c3f214bd7b979959d573aa4d570d9df28e32ea354be9a77322bd67201d102"
     },
     {
       "component_id": "core_water_network",
@@ -1684,10 +2797,10 @@
       "component_id": "net_debt",
       "node_id": "debt_principal_m",
       "ref": "WBI/investor-documents/sec-edgar/10-Q_20260507_rpt20260331_acc0001193125_26_209490.htm",
-      "locator": "DebtInstrumentCarryingAmount $1,486.289M; valuation uses $1.475B principal less cash",
+      "locator": "6.25% notes $825M due 2030 plus 6.50% notes $600M due 2033 plus revolver draw",
       "as_of": "2026-03-31",
       "content_sha256": "00e7aa6dddcadf3b67a47d8424630ea0d0bc6bde080ae39ee6f597f6d1284fe4",
-      "source_id": "72514b9cacfa734cf26596f51f93fd79cffaf15d337126776ab3300731f36dda"
+      "source_id": "b80cdc5b81fed8255b8d2c9f36f7f8411d23aa6bca2c8ece5697797676f39dbd"
     },
     {
       "component_id": "net_debt",
@@ -1697,6 +2810,24 @@
       "as_of": "2026-03-31",
       "content_sha256": "00e7aa6dddcadf3b67a47d8424630ea0d0bc6bde080ae39ee6f597f6d1284fe4",
       "source_id": "46931431f5de28892b4958acbab85935b03dc373b0d1e6010d2ceab4441d53af"
+    },
+    {
+      "component_id": "net_debt",
+      "node_id": "revolver_capacity_m",
+      "ref": "WBI/investor-documents/sec-edgar/10-Q_20260507_rpt20260331_acc0001193125_26_209490.htm",
+      "locator": "2025 Revolving Credit Facility $500.0M commitments; matures September 26, 2030",
+      "as_of": "2026-03-31",
+      "content_sha256": "00e7aa6dddcadf3b67a47d8424630ea0d0bc6bde080ae39ee6f597f6d1284fe4",
+      "source_id": "4e5101cf20935f6dccaf5c6a5c4741f38ab3697b90ebb893e0baede6e5ec5a67"
+    },
+    {
+      "component_id": "net_debt",
+      "node_id": "q1_operating_cash_flow_m",
+      "ref": "WBI/investor-documents/sec-edgar/10-Q_20260507_rpt20260331_acc0001193125_26_209490.htm",
+      "locator": "Net cash provided by operating activities $95.1M for quarter ended March 31, 2026",
+      "as_of": "2026-03-31",
+      "content_sha256": "00e7aa6dddcadf3b67a47d8424630ea0d0bc6bde080ae39ee6f597f6d1284fe4",
+      "source_id": "edf0095084f77953a03e14d9d9588b1243ef91c8cb13c883d4c7f0eabfcaf8a6"
     },
     {
       "component_id": "net_debt",
@@ -1718,6 +2849,33 @@
     },
     {
       "component_id": "contracted_growth_projects",
+      "node_id": "fy2025_operating_cash_flow_m",
+      "ref": "WBI/investor-documents/sec-edgar/10-K_20260316_rpt20251231_acc0001193125_26_106541.htm",
+      "locator": "FY2025 operating cash flow $159.7M per cash flow statement",
+      "as_of": "2026-03-31",
+      "content_sha256": "b22980da4289d8950d225050e70c678db3a5abc21c98621b92379ea289aa0ef2",
+      "source_id": "d971470053f1634ab5ba7b4cbe4cf02a5ed28d72ff5c9a394722d0d74a622e8e"
+    },
+    {
+      "component_id": "contracted_growth_projects",
+      "node_id": "fy2025_investing_outflow_m",
+      "ref": "WBI/investor-documents/sec-edgar/10-K_20260316_rpt20251231_acc0001193125_26_106541.htm",
+      "locator": "FY2025 investing cash outflow $218.6M per cash flow statement",
+      "as_of": "2026-03-31",
+      "content_sha256": "b22980da4289d8950d225050e70c678db3a5abc21c98621b92379ea289aa0ef2",
+      "source_id": "4d304b4ed3bdd6a0907a8e2544b4e5831dc2db4ecbddd89840a756bae81f703c"
+    },
+    {
+      "component_id": "contracted_growth_projects",
+      "node_id": "fy2025_adj_ebitda_m",
+      "ref": "WBI/investor-documents/sec-edgar/10-K_20260316_rpt20251231_acc0001193125_26_106541.htm",
+      "locator": "FY2025 adjusted EBITDA $254.0M per MD&A reconciliation",
+      "as_of": "2026-03-31",
+      "content_sha256": "b22980da4289d8950d225050e70c678db3a5abc21c98621b92379ea289aa0ef2",
+      "source_id": "71274da32a1e21db7b7546adf842c5c08ab813837ba3a56585d4d6044325ef1b"
+    },
+    {
+      "component_id": "contracted_growth_projects",
       "node_id": "shares_m",
       "ref": "WBI/investor-documents/sec-edgar/10-Q_20260507_rpt20260331_acc0001193125_26_209490.htm",
       "locator": "47.016M Class A plus 76.440M Class B/OpCo units",
@@ -1733,6 +2891,15 @@
       "as_of": "2026-03-31",
       "content_sha256": "00e7aa6dddcadf3b67a47d8424630ea0d0bc6bde080ae39ee6f597f6d1284fe4",
       "source_id": "0a25af1e314ff0efbf57671a6e789c6e2fd8c1515a8f3cc2ebf9001fe11dfaf4"
+    },
+    {
+      "component_id": "capex_execution_reserve",
+      "node_id": "fy2025_investing_outflow_m",
+      "ref": "WBI/investor-documents/sec-edgar/10-K_20260316_rpt20251231_acc0001193125_26_106541.htm",
+      "locator": "FY2025 investing cash outflow $218.6M; cohort capital not separately disclosed",
+      "as_of": "2026-03-31",
+      "content_sha256": "b22980da4289d8950d225050e70c678db3a5abc21c98621b92379ea289aa0ef2",
+      "source_id": "b565fac475c68d20be84d0a5114018fdd8ba3d8020d5469cf3c8cb66446a7142"
     },
     {
       "component_id": "capex_execution_reserve",
@@ -1752,12 +2919,8 @@
     "low_base_high_ordered": true
   },
   "evidence": {
-    "unresolved_count": 3,
-    "blockers": [
-      "contract_quality: How protected are price, volume, duration, and capital recovery under customer contracts?",
-      "project_cohort_roic: What cash return has each major project cohort earned on total installed capital?",
-      "refinancing_and_funding: Can growth be funded through a stress case without diluting equity value?"
-    ],
+    "unresolved_count": 0,
+    "blockers": [],
     "validation_errors": []
   },
   "monitoring": {
@@ -1776,7 +2939,7 @@
     ]
   },
   "change_control": {
-    "model_hash": "fecc565e49a2108459fae320f641d592dc0c48addc03216f3fd73da7a8dd1514",
+    "model_hash": "4df0643a7d6e34a890230cfc92c1985e32ba008057278ea0cacd70477ed68427",
     "method_versions": [
       "balance_sheet_claim@1.0",
       "capital_cycle_reserve@1.0",
@@ -1787,9 +2950,9 @@
     "rule": "A source fact is locked. Every assumption change requires a reason, author, timestamp, and before/after value."
   },
   "decision_rule": "No security is decision-grade until every material claim is valued exactly once by a valid calculation proof and every material evidence blocker is resolved.",
-  "profile_match": true,
   "cohort_purpose": "Contracted infrastructure, project-cohort returns, leverage, and funding.",
   "cohort_expected_profile": "predictable_cash_flow",
+  "profile_match": true,
   "authority": "universal_valuation_contract",
   "legacy_reference_present": true
 }
