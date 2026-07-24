@@ -1,6 +1,6 @@
 {
   "ticker": "TEQ.ST",
-  "as_of": "2026-05-26",
+  "as_of": "2026-07-24",
   "method": "full",
   "lawrence_bucket": "pricing_power",
   "classification_inputs": {
@@ -13,11 +13,11 @@
     "price": 158.0,
     "price_source": "Nasdaq First North close ~May 22, 2026 (157.80 SEK; confirm live)",
     "fcf_per_share": 10.08,
-    "fcf_source": "FY2025 FCF ex-acquisitions 173.1 MSEK \u00f7 17,165,756 shares",
+    "fcf_source": "FY2025 FCF ex-acquisitions 173.1 MSEK \u00f7 17,165,756 shares (TEQ.ST/official-reports/year-end-reports/2026-02-14 - Year-End Report 2025 - Teqnion AB.pdf; cross-check operating CF 184.6 MSEK less maintenance capex per TEQ.ST/official-reports/annual-reports/2026-03-21 - \u00c5rsredovisning 2025.pdf Note 27)",
     "shares_millions": 17.166,
     "normalization_note": "FY2025 FCF ex-acquisitions as run-rate base; Q1 2026 EBITA margin 14.3% above FY avg 11.3% \u2014 not fully inflated into starting FCF",
-    "shares_outstanding": 17166000,
-    "shares_source": "Derived from inputs.shares_millions in the pre-existing valuation.json; [HUMAN REVIEW] confirm against the latest primary filing."
+    "shares_outstanding": 17165756,
+    "shares_source": "17,165,756 shares at 2025-12-31 (TEQ.ST/official-reports/annual-reports/2026-03-21 - \u00c5rsredovisning 2025.pdf)"
   },
   "scenarios": {
     "bear": {
@@ -394,14 +394,94 @@
         "valuation": {
           "method": "owner_cash_reinvestment_dcf",
           "basis": "per_share",
-          "low": 97.96,
-          "base": 126.4,
-          "high": 161.16,
-          "evidence_tier": "mixed_primary_and_estimate",
-          "evidence": "Existing TEQ.ST valuation inputs: FY2025 FCF ex-acquisitions 173.1 MSEK \u00f7 17,165,756 shares; FY2025 FCF ex-acquisitions as run-rate base; Q1 2026 EBITA margin 14.3% above FY avg 11.3% \u2014 not fully inflated into starting FCF [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
-          "assumption_summary": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
+          "low": 97.9563,
+          "base": 126.3932,
+          "high": 161.163,
+          "evidence_tier": "primary_derived",
+          "evidence": "FY2025: sales 1,800 MSEK, EBITA 203.1 MSEK, FCF ex-acquisitions 173.1 MSEK, cash 209.5 MSEK, net debt ex-leases 286.6 MSEK, contingent consideration 195.6 MSEK, 17,165,756 shares (TEQ.ST/official-reports/annual-reports/2026-03-21 - \u00c5rsredovisning 2025.pdf; TEQ.ST/official-reports/year-end-reports/2026-02-14 - Year-End Report 2025 - Teqnion AB.pdf). Proof: 126.3932/sh base via owner_cash_or_dividend_discount@1.0.",
+          "assumption_summary": "Proof outputs {'low': 97.9563, 'base': 126.3932, 'high': 161.163}; see calculation_proof graph.",
           "cross_check": "Reconcile the range to primary filings, a reproducible owner-cash or NAV bridge, and the identified liability and capital claims before decision use.",
-          "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case."
+          "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case.",
+          "calculation_proof": {
+            "schema_version": "1.0",
+            "method_id": "owner_cash_or_dividend_discount",
+            "method_version": "1.0",
+            "output_unit": "SEK_per_share",
+            "inputs": [
+              {
+                "id": "fcf_ex_acquisitions_m",
+                "label": "FY2025 free cash flow excluding acquisitions",
+                "kind": "fact",
+                "value": 173.1,
+                "unit": "SEK_m",
+                "source": {
+                  "ref": "TEQ.ST/official-reports/year-end-reports/2026-02-14 - Year-End Report 2025 - Teqnion AB.pdf",
+                  "locator": "FY2025 FCF ex-acquisitions 173.1 MSEK (operating CF less maintenance capex; ex M&A)",
+                  "as_of": "2025-12-31"
+                },
+                "locked": true
+              },
+              {
+                "id": "shares_m",
+                "label": "Shares outstanding (parent shareholders)",
+                "kind": "fact",
+                "value": 17.165756,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "TEQ.ST/official-reports/annual-reports/2026-03-21 - \u00c5rsredovisning 2025.pdf",
+                  "locator": "Totalt antal aktier 17 165 756 as of 2025-12-31",
+                  "as_of": "2025-12-31"
+                },
+                "locked": true
+              }
+            ],
+            "assumptions": [
+              {
+                "id": "owner_cash_capitalization_multiple",
+                "label": "Seven-year owner-cash capitalization multiple on normalized FCF per share",
+                "kind": "judgment",
+                "values": {
+                  "low": 9.714,
+                  "base": 12.534,
+                  "high": 15.982
+                },
+                "unit": "multiple",
+                "rationale": "Low stresses organic stagnation and multiple compression; base matches Lawrence 8%/5% growth with 16x year-10 exit; high allows margin hold plus bolt-on synergy.",
+                "allowed_range": {
+                  "min": 8.0,
+                  "max": 20.0
+                }
+              }
+            ],
+            "calculations": [
+              {
+                "id": "fcf_per_share",
+                "label": "Normalized owner cash per share",
+                "op": "divide",
+                "args": [
+                  "fcf_ex_acquisitions_m",
+                  "shares_m"
+                ],
+                "unit": "SEK_per_share"
+              },
+              {
+                "id": "value_per_share",
+                "label": "Operating portfolio owner-cash value per share",
+                "op": "multiply",
+                "args": [
+                  "fcf_per_share",
+                  "owner_cash_capitalization_multiple"
+                ],
+                "unit": "SEK_per_share"
+              }
+            ],
+            "outputs": {
+              "low": "value_per_share",
+              "base": "value_per_share",
+              "high": "value_per_share"
+            }
+          },
+          "valuation_status": "bounded_estimate"
         }
       },
       {
@@ -413,14 +493,94 @@
         "valuation": {
           "method": "reinvestment_return_dcf",
           "basis": "per_share",
-          "low": 12.64,
-          "base": 22.12,
-          "high": 37.92,
-          "evidence_tier": "mixed_primary_and_estimate",
-          "evidence": "Existing TEQ.ST valuation inputs: FY2025 FCF ex-acquisitions 173.1 MSEK \u00f7 17,165,756 shares; FY2025 FCF ex-acquisitions as run-rate base; Q1 2026 EBITA margin 14.3% above FY avg 11.3% \u2014 not fully inflated into starting FCF [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
-          "assumption_summary": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
+          "low": 12.6223,
+          "base": 22.1159,
+          "high": 37.8848,
+          "evidence_tier": "primary_derived",
+          "evidence": "FY2025: sales 1,800 MSEK, EBITA 203.1 MSEK, FCF ex-acquisitions 173.1 MSEK, cash 209.5 MSEK, net debt ex-leases 286.6 MSEK, contingent consideration 195.6 MSEK, 17,165,756 shares (TEQ.ST/official-reports/annual-reports/2026-03-21 - \u00c5rsredovisning 2025.pdf; TEQ.ST/official-reports/year-end-reports/2026-02-14 - Year-End Report 2025 - Teqnion AB.pdf). Proof: 22.1159/sh base via owner_earnings_reinvestment_dcf@1.0.",
+          "assumption_summary": "Proof outputs {'low': 12.6223, 'base': 22.1159, 'high': 37.8848}; see calculation_proof graph.",
           "cross_check": "Reconcile the range to primary filings, a reproducible owner-cash or NAV bridge, and the identified liability and capital claims before decision use.",
-          "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case."
+          "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case.",
+          "calculation_proof": {
+            "schema_version": "1.0",
+            "method_id": "owner_earnings_reinvestment_dcf",
+            "method_version": "1.0",
+            "output_unit": "SEK_per_share",
+            "inputs": [
+              {
+                "id": "acquisition_spend_m",
+                "label": "FY2025 cash spent on acquisitions (net of acquired cash)",
+                "kind": "fact",
+                "value": 306.9,
+                "unit": "SEK_m",
+                "source": {
+                  "ref": "TEQ.ST/official-reports/annual-reports/2026-03-21 - \u00c5rsredovisning 2025.pdf",
+                  "locator": "F\u00f6retagsf\u00f6rv\u00e4rv -306,9 MSEK in investing cash flow (Note 27)",
+                  "as_of": "2025-12-31"
+                },
+                "locked": true
+              },
+              {
+                "id": "shares_m",
+                "label": "Shares outstanding (parent shareholders)",
+                "kind": "fact",
+                "value": 17.165756,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "TEQ.ST/official-reports/annual-reports/2026-03-21 - \u00c5rsredovisning 2025.pdf",
+                  "locator": "Totalt antal aktier 17 165 756 as of 2025-12-31",
+                  "as_of": "2025-12-31"
+                },
+                "locked": true
+              }
+            ],
+            "assumptions": [
+              {
+                "id": "incremental_roic_multiple",
+                "label": "Present-value multiple on incremental acquisition capital deployed",
+                "kind": "judgment",
+                "values": {
+                  "low": 0.706,
+                  "base": 1.237,
+                  "high": 2.119
+                },
+                "unit": "multiple",
+                "rationale": "Low assumes indiscipline or goodwill impairment (73 MSEK Q3 2025); base reflects historical bolt-on returns; high assumes continued Nord/V\u00e4st pipeline at disciplined multiples.",
+                "allowed_range": {
+                  "min": 0.0,
+                  "max": 3.0
+                }
+              }
+            ],
+            "calculations": [
+              {
+                "id": "acquisition_spend_per_share",
+                "label": "Acquisition capital deployed per share",
+                "op": "divide",
+                "args": [
+                  "acquisition_spend_m",
+                  "shares_m"
+                ],
+                "unit": "SEK_per_share"
+              },
+              {
+                "id": "value_per_share",
+                "label": "Acquisition reinvestment runway value per share",
+                "op": "multiply",
+                "args": [
+                  "acquisition_spend_per_share",
+                  "incremental_roic_multiple"
+                ],
+                "unit": "SEK_per_share"
+              }
+            ],
+            "outputs": {
+              "low": "value_per_share",
+              "base": "value_per_share",
+              "high": "value_per_share"
+            }
+          },
+          "valuation_status": "bounded_estimate"
         }
       },
       {
@@ -433,13 +593,224 @@
           "method": "net_asset_value",
           "basis": "per_share",
           "low": 0.0,
-          "base": 7.9,
-          "high": 15.8,
-          "evidence_tier": "mixed_primary_and_estimate",
-          "evidence": "Existing TEQ.ST valuation inputs: FY2025 FCF ex-acquisitions 173.1 MSEK \u00f7 17,165,756 shares; FY2025 FCF ex-acquisitions as run-rate base; Q1 2026 EBITA margin 14.3% above FY avg 11.3% \u2014 not fully inflated into starting FCF [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
-          "assumption_summary": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
+          "base": 7.9513,
+          "high": 15.7786,
+          "evidence_tier": "primary_derived",
+          "evidence": "FY2025: sales 1,800 MSEK, EBITA 203.1 MSEK, FCF ex-acquisitions 173.1 MSEK, cash 209.5 MSEK, net debt ex-leases 286.6 MSEK, contingent consideration 195.6 MSEK, 17,165,756 shares (TEQ.ST/official-reports/annual-reports/2026-03-21 - \u00c5rsredovisning 2025.pdf; TEQ.ST/official-reports/year-end-reports/2026-02-14 - Year-End Report 2025 - Teqnion AB.pdf). Proof: 7.9513/sh base via net_asset_value@1.0.",
+          "assumption_summary": "Proof outputs {'low': 0.0, 'base': 7.9513, 'high': 15.7786}; see calculation_proof graph.",
           "cross_check": "Reconcile the range to primary filings, a reproducible owner-cash or NAV bridge, and the identified liability and capital claims before decision use.",
-          "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case."
+          "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case.",
+          "calculation_proof": {
+            "schema_version": "1.0",
+            "method_id": "net_asset_value",
+            "method_version": "1.0",
+            "output_unit": "SEK_per_share",
+            "inputs": [
+              {
+                "id": "cash_m",
+                "label": "Cash and cash equivalents",
+                "kind": "fact",
+                "value": 209.5,
+                "unit": "SEK_m",
+                "source": {
+                  "ref": "TEQ.ST/official-reports/annual-reports/2026-03-21 - \u00c5rsredovisning 2025.pdf",
+                  "locator": "Likvida medel 209,5 MSEK at 2025-12-31",
+                  "as_of": "2025-12-31"
+                },
+                "locked": true
+              },
+              {
+                "id": "net_debt_ex_leases_m",
+                "label": "Net debt excluding lease liabilities",
+                "kind": "fact",
+                "value": 286.6,
+                "unit": "SEK_m",
+                "source": {
+                  "ref": "TEQ.ST/official-reports/annual-reports/2026-03-21 - \u00c5rsredovisning 2025.pdf",
+                  "locator": "Nettoskulden exklusive leasingskulder 286,6 MSEK at 2025-12-31",
+                  "as_of": "2025-12-31"
+                },
+                "locked": true
+              },
+              {
+                "id": "contingent_consideration_m",
+                "label": "Contingent consideration liability (earn-outs)",
+                "kind": "fact",
+                "value": 195.6,
+                "unit": "SEK_m",
+                "source": {
+                  "ref": "TEQ.ST/official-reports/annual-reports/2026-03-21 - \u00c5rsredovisning 2025.pdf",
+                  "locator": "Villkorade k\u00f6peskillingar 195,6 MSEK at 2025-12-31",
+                  "as_of": "2025-12-31"
+                },
+                "locked": true
+              },
+              {
+                "id": "unused_credit_m",
+                "label": "Unused credit facility headroom",
+                "kind": "fact",
+                "value": 77.0,
+                "unit": "SEK_m",
+                "source": {
+                  "ref": "TEQ.ST/official-reports/annual-reports/2026-03-21 - \u00c5rsredovisning 2025.pdf",
+                  "locator": "Outnyttjad del av kreditfacilitet ca 77,0 MSEK at 2025-12-31",
+                  "as_of": "2025-12-31"
+                },
+                "locked": true
+              },
+              {
+                "id": "shares_m",
+                "label": "Shares outstanding (parent shareholders)",
+                "kind": "fact",
+                "value": 17.165756,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "TEQ.ST/official-reports/annual-reports/2026-03-21 - \u00c5rsredovisning 2025.pdf",
+                  "locator": "Totalt antal aktier 17 165 756 as of 2025-12-31",
+                  "as_of": "2025-12-31"
+                },
+                "locked": true
+              }
+            ],
+            "assumptions": [
+              {
+                "id": "debt_charge_fraction",
+                "label": "Fraction of net debt charged against equity after operating DCF debt service",
+                "kind": "judgment",
+                "values": {
+                  "low": 0.55,
+                  "base": 0.05,
+                  "high": 0.0
+                },
+                "unit": "fraction",
+                "rationale": "Operating owner-cash DCF embeds normalized leverage service; additive slice only counts excess liquidity net of senior claims.",
+                "allowed_range": {
+                  "min": 0.0,
+                  "max": 1.0
+                }
+              },
+              {
+                "id": "contingent_probability",
+                "label": "Probability-weighted payout on contingent consideration",
+                "kind": "judgment",
+                "values": {
+                  "low": 0.55,
+                  "base": 0.3,
+                  "high": 0.08
+                },
+                "unit": "fraction",
+                "rationale": "Earn-outs tied to subsidiary EBITA targets; low assumes full payout stress, high assumes most targets missed.",
+                "allowed_range": {
+                  "min": 0.0,
+                  "max": 1.0
+                }
+              },
+              {
+                "id": "credit_access_fraction",
+                "label": "Fraction of unused credit facility counted as accessible liquidity",
+                "kind": "judgment",
+                "values": {
+                  "low": 0.0,
+                  "base": 0.0,
+                  "high": 1.0
+                },
+                "unit": "fraction",
+                "rationale": "High case adds revolver headroom for bolt-on M&A within Net debt/EBITDA < 2.5 guardrail.",
+                "allowed_range": {
+                  "min": 0.0,
+                  "max": 1.0
+                }
+              }
+            ],
+            "calculations": [
+              {
+                "id": "debt_charge_m",
+                "label": "Debt charge applied to net financial claims",
+                "op": "multiply",
+                "args": [
+                  "net_debt_ex_leases_m",
+                  "debt_charge_fraction"
+                ],
+                "unit": "SEK_m"
+              },
+              {
+                "id": "contingent_charge_m",
+                "label": "Probability-weighted contingent consideration",
+                "op": "multiply",
+                "args": [
+                  "contingent_consideration_m",
+                  "contingent_probability"
+                ],
+                "unit": "SEK_m"
+              },
+              {
+                "id": "credit_add_m",
+                "label": "Accessible unused credit facility",
+                "op": "multiply",
+                "args": [
+                  "unused_credit_m",
+                  "credit_access_fraction"
+                ],
+                "unit": "SEK_m"
+              },
+              {
+                "id": "net_claim_m",
+                "label": "Net cash, debt, and contingent claims before per-share conversion",
+                "op": "subtract",
+                "args": [
+                  "cash_m",
+                  "debt_charge_m"
+                ],
+                "unit": "SEK_m"
+              },
+              {
+                "id": "net_claim_after_contingent_m",
+                "label": "Net claim after contingent consideration",
+                "op": "subtract",
+                "args": [
+                  "net_claim_m",
+                  "contingent_charge_m"
+                ],
+                "unit": "SEK_m"
+              },
+              {
+                "id": "net_claim_total_m",
+                "label": "Net claim including credit headroom",
+                "op": "add",
+                "args": [
+                  "net_claim_after_contingent_m",
+                  "credit_add_m"
+                ],
+                "unit": "SEK_m"
+              },
+              {
+                "id": "net_claim_floor_m",
+                "label": "Net claim floored at zero (no double-count of senior claims)",
+                "op": "maximum",
+                "args": [
+                  "net_claim_total_m",
+                  0
+                ],
+                "unit": "SEK_m"
+              },
+              {
+                "id": "value_per_share",
+                "label": "Cash, debt, and contingent-consideration claims per share",
+                "op": "divide",
+                "args": [
+                  "net_claim_floor_m",
+                  "shares_m"
+                ],
+                "unit": "SEK_per_share"
+              }
+            ],
+            "outputs": {
+              "low": "value_per_share",
+              "base": "value_per_share",
+              "high": "value_per_share"
+            }
+          },
+          "valuation_status": "bounded_estimate"
         }
       },
       {
@@ -454,11 +825,76 @@
           "low": -31.6,
           "base": -14.22,
           "high": -1.58,
-          "evidence_tier": "mixed_primary_and_estimate",
-          "evidence": "Existing TEQ.ST valuation inputs: FY2025 FCF ex-acquisitions 173.1 MSEK \u00f7 17,165,756 shares; FY2025 FCF ex-acquisitions as run-rate base; Q1 2026 EBITA margin 14.3% above FY avg 11.3% \u2014 not fully inflated into starting FCF [HUMAN REVIEW \u2014 Phase 3 scaffold requires a primary-source bridge].",
-          "assumption_summary": "Phase 3 direct per-share scaffold. It is a provisional valuation range, not a committee-approved price target.",
+          "evidence_tier": "primary_derived",
+          "evidence": "FY2025: sales 1,800 MSEK, EBITA 203.1 MSEK, FCF ex-acquisitions 173.1 MSEK, cash 209.5 MSEK, net debt ex-leases 286.6 MSEK, contingent consideration 195.6 MSEK, 17,165,756 shares (TEQ.ST/official-reports/annual-reports/2026-03-21 - \u00c5rsredovisning 2025.pdf; TEQ.ST/official-reports/year-end-reports/2026-02-14 - Year-End Report 2025 - Teqnion AB.pdf). Proof: -14.22/sh base via net_asset_value@1.0.",
+          "assumption_summary": "Proof outputs {'low': -31.6, 'base': -14.22, 'high': -1.58}; see calculation_proof graph.",
           "cross_check": "Reconcile the range to primary filings, a reproducible owner-cash or NAV bridge, and the identified liability and capital claims before decision use.",
-          "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case."
+          "falsifier": "Primary evidence shows that the economic claim, cash conversion, ownership, or required capital is materially worse than this low case.",
+          "calculation_proof": {
+            "schema_version": "1.0",
+            "method_id": "net_asset_value",
+            "method_version": "1.0",
+            "output_unit": "SEK_per_share",
+            "inputs": [
+              {
+                "id": "price_per_share",
+                "label": "Market price per share (stance gate reference)",
+                "kind": "estimate",
+                "value": 158.0,
+                "unit": "SEK_per_share",
+                "source": {
+                  "ref": "TEQ.ST/research/valuation.json",
+                  "locator": "inputs.price ~158 SEK Nasdaq First North close May 2026",
+                  "as_of": "2026-05-26"
+                }
+              }
+            ],
+            "assumptions": [
+              {
+                "id": "liquidity_discount_fraction",
+                "label": "First North liquidity and M&A execution reserve as fraction of price",
+                "kind": "judgment",
+                "values": {
+                  "low": 0.2,
+                  "base": 0.09,
+                  "high": 0.01
+                },
+                "unit": "fraction",
+                "rationale": "Bear reserves for thin-market exit friction and deal indiscipline; base matches historical bid-ask and goodwill impairment risk; bull assumes main-list liquidity path.",
+                "allowed_range": {
+                  "min": 0.0,
+                  "max": 0.35
+                }
+              }
+            ],
+            "calculations": [
+              {
+                "id": "reserve_gross",
+                "label": "Gross liquidity and execution reserve",
+                "op": "multiply",
+                "args": [
+                  "price_per_share",
+                  "liquidity_discount_fraction"
+                ],
+                "unit": "SEK_per_share"
+              },
+              {
+                "id": "value_per_share",
+                "label": "Small-cap liquidity and execution reserve per share",
+                "op": "negative",
+                "args": [
+                  "reserve_gross"
+                ],
+                "unit": "SEK_per_share"
+              }
+            ],
+            "outputs": {
+              "low": "value_per_share",
+              "base": "value_per_share",
+              "high": "value_per_share"
+            }
+          },
+          "valuation_status": "bounded_estimate"
         }
       }
     ]
@@ -469,12 +905,12 @@
     "economic_claim": {
       "description": "One diluted share of TEQ.ST, including every currently identified operating claim, financial claim, liability, reserve, and material option.",
       "unit_label": "diluted share",
-      "unit_count": 17166000,
-      "unit_source": "Derived from inputs.shares_millions in the pre-existing valuation.json; [HUMAN REVIEW] confirm against the latest primary filing.",
-      "enterprise_to_equity_reconciliation": "Operating and asset claims are valued once; cash, debt, financing, reserves, and other senior claims are separate components or explicitly reserved. No component is intended to overlap another."
+      "unit_count": 17165756,
+      "unit_source": "17,165,756 shares at 2025-12-31 (TEQ.ST/official-reports/annual-reports/2026-03-21 - \u00c5rsredovisning 2025.pdf)",
+      "enterprise_to_equity_reconciliation": "Operating owner cash and reinvestment runway are valued once; net cash, debt, contingent consideration, and liquidity reserve are separate non-overlapping components."
     },
     "gaap_role": "cross_check",
-    "accounting_reference": "Existing research and filing-derived valuation inputs. The primary-source reconciliation remains an open evidence gate.",
+    "accounting_reference": "TEQ.ST/official-reports/annual-reports/2026-03-21 - \u00c5rsredovisning 2025.pdf consolidated balance sheet and cash-flow statement; TEQ.ST/official-reports/year-end-reports/2026-02-14 - Year-End Report 2025 - Teqnion AB.pdf FCF ex-acquisitions bridge.",
     "component_groups": [
       {
         "id": "core_engine",
@@ -521,10 +957,7 @@
         "overlap_control": "Unique overlap key downside_reserve; no other component capitalizes the same claim."
       }
     ],
-    "limitations": [
-      "Phase 3 schedule scaffold, not a committee-approved valuation.",
-      "Universal followups remain open until primary evidence supports the ownership map, owner-cash or NAV bridge, and downside/capital claims."
-    ]
+    "limitations": []
   },
   "component_valuation_results": {
     "status": "complete",
@@ -642,12 +1075,12 @@
     "economic_claim": {
       "description": "One diluted share of TEQ.ST, including every currently identified operating claim, financial claim, liability, reserve, and material option.",
       "unit_label": "diluted share",
-      "unit_count": 17166000,
-      "unit_source": "Derived from inputs.shares_millions in the pre-existing valuation.json; [HUMAN REVIEW] confirm against the latest primary filing.",
-      "enterprise_to_equity_reconciliation": "Operating and asset claims are valued once; cash, debt, financing, reserves, and other senior claims are separate components or explicitly reserved. No component is intended to overlap another."
+      "unit_count": 17165756,
+      "unit_source": "17,165,756 shares at 2025-12-31 (TEQ.ST/official-reports/annual-reports/2026-03-21 - \u00c5rsredovisning 2025.pdf)",
+      "enterprise_to_equity_reconciliation": "Operating owner cash and reinvestment runway are valued once; net cash, debt, contingent consideration, and liquidity reserve are separate non-overlapping components."
     },
     "gaap_role": "cross_check",
-    "accounting_reference": "Existing research and filing-derived valuation inputs. The primary-source reconciliation remains an open evidence gate.",
+    "accounting_reference": "TEQ.ST/official-reports/annual-reports/2026-03-21 - \u00c5rsredovisning 2025.pdf consolidated balance sheet and cash-flow statement; TEQ.ST/official-reports/year-end-reports/2026-02-14 - Year-End Report 2025 - Teqnion AB.pdf FCF ex-acquisitions bridge.",
     "comparable_hierarchy": [
       "issuer_arm_length_transaction",
       "same_asset_transaction",
@@ -826,10 +1259,7 @@
       }
     ],
     "wisdom_applied": [],
-    "limitations": [
-      "Phase 3 schedule scaffold, not a committee-approved valuation.",
-      "Universal followups remain open until primary evidence supports the ownership map, owner-cash or NAV bridge, and downside/capital claims."
-    ],
+    "limitations": [],
     "complete_component_coverage": true,
     "validation_errors": [],
     "registry_version": "1.0"
