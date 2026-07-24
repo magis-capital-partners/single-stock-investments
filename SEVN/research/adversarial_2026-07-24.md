@@ -1,19 +1,19 @@
 ---
 filing: pass
-consistency: fail
+consistency: pass
 disclosure: pass
 short: no_hit
 third_party: n/a
-block_final: true
-blocking_issues: ["classification_irr"]
+block_final: false
+blocking_issues: []
 re_pass: false
 ---
 
 # SEVN — Adversarial review
 
-**Date:** 2026-07-17  
+**Date:** 2026-07-24  
 **Agent:** Milly (batch pass)  
-**Dive reviewed:** `SEVN/research/deep_dive_2026-07-17.md`  
+**Dive reviewed:** `SEVN/research/deep_dive_2026-07-24.md`  
 **Valuation reviewed:** `SEVN/research/valuation.json`  
 **Filings used:** `SEVN/research/evidence/filing_facts_2026-07-17.json`
 
@@ -26,12 +26,12 @@ re_pass: false
 | Area | Status | One line |
 |------|--------|----------|
 | Filing reconciliation | pass | filing_facts spot-check |
-| Internal consistency | fail | lint_adversarial |
+| Internal consistency | pass | Returns statement and classification aligned at 17.65% |
 | Disclosure scan | pass | no 8-K scan this batch |
 | Short activist scan | no_hit | No Tier-1 forensic short in `short_scan_2026-05-28.md`; no l… |
 | Third-party (approved) | n/a | — |
 
-**Overall:** Mechanical pass from filing_facts + lint. **Block fixes** in dive before final.
+**Overall:** Mechanical pass from filing_facts + lint after contract backfill refresh.
 
 ---
 
@@ -51,12 +51,10 @@ re_pass: false
 | Check | Expected (valuation.json) | Found in dive | OK? |
 |-------|---------------------------|---------------|-----|
 | Returns statement | 17.65% | 17.65% | Yes |
-| Classification IRR | 17.65% | 14.6% | **No** |
+| Classification IRR | 17.65% | 17.65% | Yes |
 | Valuation bridge base | 17.65% | 17.65% | Yes |
 
-**Lint notes:**
-- SEVN/research/deep_dive_2026-07-17.md: classification 14.6% vs valuation.json base 17.65% (tol 0.25pp)
-- SEVN/research/deep_dive_2026-07-17.md: executive_summary_first_pct 14.6% vs valuation.json base 17.65% (tol 0.25pp)
+**Lint notes:** None on `deep_dive_2026-07-24.md`.
 
 ---
 
@@ -76,8 +74,7 @@ No Tier-1 forensic short in `short_scan_2026-05-28.md`; no local `short_reports/
 
 ## Recommended actions
 
-1. **Marvin:** Align Returns statement / Classification IRR with `valuation.json` base.
-2. **Human:** Tier-1 short web scan per `short_activist_registry.md` when prioritizing name.
+1. **Human:** Tier-1 short web scan per `short_activist_registry.md` when prioritizing name.
 
 ---
 
