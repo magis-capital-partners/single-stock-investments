@@ -1,27 +1,78 @@
 {
-  "ticker": "PLWN",
-  "as_of": "2026-07-24",
-  "one_liner": "Long Island cemetery franchise with ~$162M Form 990 net assets trades thinly on OTC; per-share economics blocked until share count and dividend cash are verified.",
-  "base_irr": "pending",
-  "base_irr_note": "Component economic value base ~$54/sh vs ~$575 quote on provisional 3.46M shares; Lawrence IRR pending verified denominator.",
-  "stance": "watch",
-  "archetype": "optionality",
-  "payoff_lens": "asset",
+  "base_irr_pct": -38.9,
+  "classification": {
+    "archetype": "optionality",
+    "cycle": "mid",
+    "dhando": "partial",
+    "lawrence_bucket": "other",
+    "moat": "narrow",
+    "payoff_lens": "asset",
+    "predictive_attribute": "market_structure_discount",
+    "stance": "watch"
+  },
+  "evidence_citations": [
+    "PLWN/research/deep_dive_2026-07-17.md",
+    "PLWN/research/evidence/filing_digest_2026-07-24.md",
+    "PLWN/research/shopbot/vicki_brief_plwn_2026-07-17.md",
+    "PLWN/research/cross_check_third_party_2026-07-24.md",
+    "PLWN/research/adversarial_2026-07-24.md"
+  ],
+  "filing_digest": "PLWN/research/evidence/filing_digest_2026-07-24.md",
+  "generated_at": "2026-07-24T02:31:48+00:00",
+  "irr_label": "7yr IRR",
   "key_assumptions": [
-    "FY2024 Form 990: ~$42.9M revenue, ~$5.3M net income, ~$161.9M net assets (ProPublica EIN 11-1190044)",
-    "Provisional share count ~3.46M conflicts with indicated $45.40 dividend vs $5.3M NI",
-    "Component sum base ~$53.8/sh: 990 NAV floor + operating franchise + land gap option less illiquidity reserve",
-    "OTC Pink illiquidity and 501(c)(13) governance constrain minority realization"
+    {
+      "input": "Price today",
+      "source": "Yahoo Finance PLWN 2026-07-17",
+      "value": "**$575.0**"
+    },
+    {
+      "input": "Starting free cash flow per share",
+      "source": "FY2024 net income $5.3M divided by provisional 3.46M shares [HUMAN REVIEW]",
+      "value": "**$1.54**"
+    },
+    {
+      "input": "Growth in years 1 through 5",
+      "source": "Placeholder Lawrence scenario pending verified share count; component economic value is the primary cross-check.",
+      "value": "**2.0%** per year"
+    },
+    {
+      "input": "Growth in years 6 through 7",
+      "source": "Scenario base",
+      "value": "**1.5%** per year"
+    },
+    {
+      "input": "Selling multiple in year 10",
+      "source": "Scenario base",
+      "value": "**8 times cash flow**"
+    },
+    {
+      "input": "Time horizon",
+      "source": "7-year owner-cash model",
+      "value": "**7 years**"
+    },
+    {
+      "input": "Blended owner cash",
+      "source": "Component economic value base sum from proof-backed schedule",
+      "value": "**$53.8**"
+    }
   ],
+  "last_verified": {
+    "deep_dive": "2026-07-24",
+    "human_approved": null,
+    "valuation_as_of": "2026-07-24"
+  },
   "open_questions": [
-    "True shares outstanding and economic unit definition",
-    "Whether $45.40 indicated dividend reflects actual cash paid",
-    "Form 990 PDF Schedule D land/building marks and perpetual-care trusts",
-    "Why OTC quote ~$575 vs provisional component base ~$54/sh"
+    "Pull Form 990 PDFs (see Vicki brief).",
+    "Verify shares outstanding and dividend cash history.",
+    "Reject 3.46M share figure unless proven."
   ],
-  "top_citations": [
-    "ProPublica Nonprofit Explorer EIN 11-1190044 FY2024 extract",
-    "PLWN/research/valuation.json",
-    "PLWN/research/deep_dive_2026-07-24.md"
-  ]
+  "scenarios": {
+    "base": -38.9
+  },
+  "schema_version": "1.0",
+  "stance": null,
+  "thesis": "Pinelawn Cemetery is a Long Island cemetery and memorial business based in Farmingdale, New York. **[Fact]** It is organized as a tax-exempt **501(c)(13) cemetery company** (EIN 11-1190044), not a normal SEC reporting corporation. **[Fact]** Common shares trade thinly on OTC Pink as **PLWN**. **[Fact]** FY2024 Form 990 extract shows about **$42.9 million** revenue, **$5.3 million** net income, and **$161.9 million** net assets with liabilities reported at zero on the extract. **[Fact]**",
+  "ticker": "PLWN",
+  "why_market_wrong": "The quote may ignore a **land-heavy cemetery franchise** because there is no 10-K and volume is tiny. **[Inference]** Predictive attribute: **market structure discount**. **[Inference]** Equally, aggregator share counts and the indicated **$45.40** dividend may be wrong, so apparent cheapness or richness can be a data error. **[Inference]**"
 }

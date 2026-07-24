@@ -1,8 +1,8 @@
 {
   "ticker": "PLWN",
   "as_of": "2026-07-24",
-  "method": "scenario",
-  "irr_method": "scenario",
+  "method": "pending",
+  "irr_method": "pending",
   "valuation_mode": "economic_value",
   "lawrence_bucket": "other",
   "classification_inputs": {
@@ -28,35 +28,18 @@
     "form990_fy2024_net_assets": 161903602,
     "form990_source": "ProPublica Nonprofit Explorer EIN 11-1190044 FY ending Dec 2024 extracted data (PDF not yet local)",
     "normalization_note": "IRR pending verified share count and Form 990 PDF. Economic case is cemetery land/operations vs OTC quote.",
-    "shares_outstanding_provisional": 3460000,
-    "book_per_share": 46.79,
-    "book_per_share_caveat": "Form 990 net assets per provisional share; not liquidation NAV",
-    "fcf_per_share": 1.54,
-    "fcf_source": "FY2024 net income $5.3M divided by provisional 3.46M shares [HUMAN REVIEW]"
+    "shares_outstanding_provisional": 3460000
   },
-  "scenarios": {
-    "base": {
-      "growth_y1_5": 0.02,
-      "growth_y6_10": 0.015,
-      "exit_pfcf_y10": 8,
-      "notes": "Placeholder Lawrence scenario pending verified share count; component economic value is the primary cross-check."
-    }
-  },
-  "estimates": {
-    "blended_best": {
-      "per_share": 53.8,
-      "weights": "Component economic value base sum from proof-backed schedule"
-    }
-  },
+  "scenarios": {},
   "optionality_gate": {
     "framework": "cemetery_nav_vs_illiquid_quote",
     "floor_pass": false,
     "floor_metric": "form990_net_assets",
     "floor_value": 161903602,
     "primary_metric": "lawrence_base",
-    "primary_return_pct": -38.9,
+    "primary_return_pct": null,
     "notes": "Net assets $162M are an accounting floor for the nonprofit entity, not a proven per-share NAV until share count and equity claims are verified.",
-    "primary_label": "7yr IRR"
+    "primary_label": "pending"
   },
   "nav_overlay": {
     "status": "illustrative",
@@ -83,8 +66,8 @@
     }
   ],
   "stance_proposal": {
-    "suggested": "watch",
-    "irr_band": "<15%",
+    "suggested": "pending",
+    "irr_band": "pending",
     "gates": {
       "moat_ok": true,
       "dhando_ok": true
@@ -101,9 +84,9 @@
     ]
   },
   "implied_return": {
-    "base_pct": -38.9,
-    "label": "7yr IRR",
-    "display": "-38.9% (base)"
+    "base_pct": null,
+    "label": "pending",
+    "display": "pending"
   },
   "method_profile": "scarce_land_nonprofit",
   "valuation_methodology": {
@@ -587,16 +570,8 @@
       "Market price $575 versus provisional NAV band is unexplained without correcting the denominator."
     ]
   },
-  "results_lawrence_legacy": {
-    "base": {
-      "return_pct": -38.9
-    }
-  },
-  "results": {
-    "base": {
-      "return_pct": -38.9
-    }
-  },
+  "results_lawrence_legacy": {},
+  "results": {},
   "overlay_results": [],
   "component_valuation_results": {
     "status": "complete",
@@ -1536,8 +1511,8 @@
                   "ref": "PLWN/research/valuation.json",
                   "locator": "ProPublica Nonprofit Explorer EIN 11-1190044 FY ending Dec 2024; net assets $161,903,602; liabilities $0 on extract",
                   "as_of": "2024-12-31",
-                  "content_sha256": "54e273f4d76bdf9659362971402e918c05290b57295e81dd84ec400d9f4fee6a",
-                  "source_id": "b84fb7a6c3364aabb3abeb73e8632ce425012691e471eab2caac5f6859caf0c5"
+                  "content_sha256": "09f9337da15681f0fef21858e3ce0833e585a0457d3caefb42bf527d540653a4",
+                  "source_id": "c74862ba021ceccea877f1651a2073edfda340e48cf2cd15173408b43ea4b675"
                 },
                 "rationale": null
               },
@@ -1551,8 +1526,8 @@
                   "ref": "PLWN/research/valuation.json",
                   "locator": "Aggregator ~3.46M shares; conflicts with dividend cash math vs FY2024 NI [HUMAN REVIEW]",
                   "as_of": "2026-07-17",
-                  "content_sha256": "54e273f4d76bdf9659362971402e918c05290b57295e81dd84ec400d9f4fee6a",
-                  "source_id": "95b89f65552afa4f11b5356bb196756b9fbf3a0f56379fc2357c67dd3f5fff98"
+                  "content_sha256": "09f9337da15681f0fef21858e3ce0833e585a0457d3caefb42bf527d540653a4",
+                  "source_id": "802fef64a488b6d6eca0be6ffe0f88cda882f125f7cf69ba1b493d3570b5d432"
                 },
                 "rationale": null
               },
@@ -1605,8 +1580,8 @@
                   "ref": "PLWN/research/valuation.json",
                   "locator": "ProPublica Nonprofit Explorer EIN 11-1190044 FY ending Dec 2024; net assets $161,903,602; liabilities $0 on extract",
                   "as_of": "2024-12-31",
-                  "content_sha256": "54e273f4d76bdf9659362971402e918c05290b57295e81dd84ec400d9f4fee6a",
-                  "source_id": "b84fb7a6c3364aabb3abeb73e8632ce425012691e471eab2caac5f6859caf0c5"
+                  "content_sha256": "09f9337da15681f0fef21858e3ce0833e585a0457d3caefb42bf527d540653a4",
+                  "source_id": "c74862ba021ceccea877f1651a2073edfda340e48cf2cd15173408b43ea4b675"
                 },
                 "rationale": null
               },
@@ -1620,8 +1595,8 @@
                   "ref": "PLWN/research/valuation.json",
                   "locator": "Aggregator ~3.46M shares; conflicts with dividend cash math vs FY2024 NI [HUMAN REVIEW]",
                   "as_of": "2026-07-17",
-                  "content_sha256": "54e273f4d76bdf9659362971402e918c05290b57295e81dd84ec400d9f4fee6a",
-                  "source_id": "95b89f65552afa4f11b5356bb196756b9fbf3a0f56379fc2357c67dd3f5fff98"
+                  "content_sha256": "09f9337da15681f0fef21858e3ce0833e585a0457d3caefb42bf527d540653a4",
+                  "source_id": "802fef64a488b6d6eca0be6ffe0f88cda882f125f7cf69ba1b493d3570b5d432"
                 },
                 "rationale": null
               },
@@ -1674,8 +1649,8 @@
                   "ref": "PLWN/research/valuation.json",
                   "locator": "ProPublica Nonprofit Explorer EIN 11-1190044 FY ending Dec 2024; net assets $161,903,602; liabilities $0 on extract",
                   "as_of": "2024-12-31",
-                  "content_sha256": "54e273f4d76bdf9659362971402e918c05290b57295e81dd84ec400d9f4fee6a",
-                  "source_id": "b84fb7a6c3364aabb3abeb73e8632ce425012691e471eab2caac5f6859caf0c5"
+                  "content_sha256": "09f9337da15681f0fef21858e3ce0833e585a0457d3caefb42bf527d540653a4",
+                  "source_id": "c74862ba021ceccea877f1651a2073edfda340e48cf2cd15173408b43ea4b675"
                 },
                 "rationale": null
               },
@@ -1689,8 +1664,8 @@
                   "ref": "PLWN/research/valuation.json",
                   "locator": "Aggregator ~3.46M shares; conflicts with dividend cash math vs FY2024 NI [HUMAN REVIEW]",
                   "as_of": "2026-07-17",
-                  "content_sha256": "54e273f4d76bdf9659362971402e918c05290b57295e81dd84ec400d9f4fee6a",
-                  "source_id": "95b89f65552afa4f11b5356bb196756b9fbf3a0f56379fc2357c67dd3f5fff98"
+                  "content_sha256": "09f9337da15681f0fef21858e3ce0833e585a0457d3caefb42bf527d540653a4",
+                  "source_id": "802fef64a488b6d6eca0be6ffe0f88cda882f125f7cf69ba1b493d3570b5d432"
                 },
                 "rationale": null
               },
@@ -1739,23 +1714,23 @@
               "ref": "PLWN/research/valuation.json",
               "locator": "ProPublica Nonprofit Explorer EIN 11-1190044 FY ending Dec 2024; net assets $161,903,602; liabilities $0 on extract",
               "as_of": "2024-12-31",
-              "content_sha256": "54e273f4d76bdf9659362971402e918c05290b57295e81dd84ec400d9f4fee6a",
-              "source_id": "b84fb7a6c3364aabb3abeb73e8632ce425012691e471eab2caac5f6859caf0c5"
+              "content_sha256": "09f9337da15681f0fef21858e3ce0833e585a0457d3caefb42bf527d540653a4",
+              "source_id": "c74862ba021ceccea877f1651a2073edfda340e48cf2cd15173408b43ea4b675"
             },
             {
               "node_id": "shares_m",
               "ref": "PLWN/research/valuation.json",
               "locator": "Aggregator ~3.46M shares; conflicts with dividend cash math vs FY2024 NI [HUMAN REVIEW]",
               "as_of": "2026-07-17",
-              "content_sha256": "54e273f4d76bdf9659362971402e918c05290b57295e81dd84ec400d9f4fee6a",
-              "source_id": "95b89f65552afa4f11b5356bb196756b9fbf3a0f56379fc2357c67dd3f5fff98"
+              "content_sha256": "09f9337da15681f0fef21858e3ce0833e585a0457d3caefb42bf527d540653a4",
+              "source_id": "802fef64a488b6d6eca0be6ffe0f88cda882f125f7cf69ba1b493d3570b5d432"
             }
           ],
           "checks": {
             "passed": true,
             "errors": []
           },
-          "proof_hash": "6c47ca58fe6b76bc63b034377d0d05012430534ae156af19fd4a5232f2ca96b3"
+          "proof_hash": "a85841dfcef791b07c72d4f603d82a0c6693e085b1a05d76d6eb48bf37e2549c"
         },
         "evidence_tier": "mixed_primary_and_estimate",
         "evidence_level": "analyst_estimated",
@@ -1830,8 +1805,8 @@
                   "ref": "PLWN/research/valuation.json",
                   "locator": "ProPublica Nonprofit Explorer EIN 11-1190044 FY ending Dec 2024; revenue $42,855,178; expenses $37,530,682; net income $5,324,496",
                   "as_of": "2024-12-31",
-                  "content_sha256": "54e273f4d76bdf9659362971402e918c05290b57295e81dd84ec400d9f4fee6a",
-                  "source_id": "b4c872153317cad21c8222336f2040d9e7f7c531ef72ce1965840efc572b27e6"
+                  "content_sha256": "09f9337da15681f0fef21858e3ce0833e585a0457d3caefb42bf527d540653a4",
+                  "source_id": "a914530f233793049ca0fec2b8aea0429e9e2f4844dd66a788f37b723d20c2d1"
                 },
                 "rationale": null
               },
@@ -1845,8 +1820,8 @@
                   "ref": "PLWN/research/valuation.json",
                   "locator": "Aggregator ~3.46M shares; conflicts with dividend cash math vs FY2024 NI [HUMAN REVIEW]",
                   "as_of": "2026-07-17",
-                  "content_sha256": "54e273f4d76bdf9659362971402e918c05290b57295e81dd84ec400d9f4fee6a",
-                  "source_id": "95b89f65552afa4f11b5356bb196756b9fbf3a0f56379fc2357c67dd3f5fff98"
+                  "content_sha256": "09f9337da15681f0fef21858e3ce0833e585a0457d3caefb42bf527d540653a4",
+                  "source_id": "802fef64a488b6d6eca0be6ffe0f88cda882f125f7cf69ba1b493d3570b5d432"
                 },
                 "rationale": null
               },
@@ -1899,8 +1874,8 @@
                   "ref": "PLWN/research/valuation.json",
                   "locator": "ProPublica Nonprofit Explorer EIN 11-1190044 FY ending Dec 2024; revenue $42,855,178; expenses $37,530,682; net income $5,324,496",
                   "as_of": "2024-12-31",
-                  "content_sha256": "54e273f4d76bdf9659362971402e918c05290b57295e81dd84ec400d9f4fee6a",
-                  "source_id": "b4c872153317cad21c8222336f2040d9e7f7c531ef72ce1965840efc572b27e6"
+                  "content_sha256": "09f9337da15681f0fef21858e3ce0833e585a0457d3caefb42bf527d540653a4",
+                  "source_id": "a914530f233793049ca0fec2b8aea0429e9e2f4844dd66a788f37b723d20c2d1"
                 },
                 "rationale": null
               },
@@ -1914,8 +1889,8 @@
                   "ref": "PLWN/research/valuation.json",
                   "locator": "Aggregator ~3.46M shares; conflicts with dividend cash math vs FY2024 NI [HUMAN REVIEW]",
                   "as_of": "2026-07-17",
-                  "content_sha256": "54e273f4d76bdf9659362971402e918c05290b57295e81dd84ec400d9f4fee6a",
-                  "source_id": "95b89f65552afa4f11b5356bb196756b9fbf3a0f56379fc2357c67dd3f5fff98"
+                  "content_sha256": "09f9337da15681f0fef21858e3ce0833e585a0457d3caefb42bf527d540653a4",
+                  "source_id": "802fef64a488b6d6eca0be6ffe0f88cda882f125f7cf69ba1b493d3570b5d432"
                 },
                 "rationale": null
               },
@@ -1968,8 +1943,8 @@
                   "ref": "PLWN/research/valuation.json",
                   "locator": "ProPublica Nonprofit Explorer EIN 11-1190044 FY ending Dec 2024; revenue $42,855,178; expenses $37,530,682; net income $5,324,496",
                   "as_of": "2024-12-31",
-                  "content_sha256": "54e273f4d76bdf9659362971402e918c05290b57295e81dd84ec400d9f4fee6a",
-                  "source_id": "b4c872153317cad21c8222336f2040d9e7f7c531ef72ce1965840efc572b27e6"
+                  "content_sha256": "09f9337da15681f0fef21858e3ce0833e585a0457d3caefb42bf527d540653a4",
+                  "source_id": "a914530f233793049ca0fec2b8aea0429e9e2f4844dd66a788f37b723d20c2d1"
                 },
                 "rationale": null
               },
@@ -1983,8 +1958,8 @@
                   "ref": "PLWN/research/valuation.json",
                   "locator": "Aggregator ~3.46M shares; conflicts with dividend cash math vs FY2024 NI [HUMAN REVIEW]",
                   "as_of": "2026-07-17",
-                  "content_sha256": "54e273f4d76bdf9659362971402e918c05290b57295e81dd84ec400d9f4fee6a",
-                  "source_id": "95b89f65552afa4f11b5356bb196756b9fbf3a0f56379fc2357c67dd3f5fff98"
+                  "content_sha256": "09f9337da15681f0fef21858e3ce0833e585a0457d3caefb42bf527d540653a4",
+                  "source_id": "802fef64a488b6d6eca0be6ffe0f88cda882f125f7cf69ba1b493d3570b5d432"
                 },
                 "rationale": null
               },
@@ -2033,23 +2008,23 @@
               "ref": "PLWN/research/valuation.json",
               "locator": "ProPublica Nonprofit Explorer EIN 11-1190044 FY ending Dec 2024; revenue $42,855,178; expenses $37,530,682; net income $5,324,496",
               "as_of": "2024-12-31",
-              "content_sha256": "54e273f4d76bdf9659362971402e918c05290b57295e81dd84ec400d9f4fee6a",
-              "source_id": "b4c872153317cad21c8222336f2040d9e7f7c531ef72ce1965840efc572b27e6"
+              "content_sha256": "09f9337da15681f0fef21858e3ce0833e585a0457d3caefb42bf527d540653a4",
+              "source_id": "a914530f233793049ca0fec2b8aea0429e9e2f4844dd66a788f37b723d20c2d1"
             },
             {
               "node_id": "shares_m",
               "ref": "PLWN/research/valuation.json",
               "locator": "Aggregator ~3.46M shares; conflicts with dividend cash math vs FY2024 NI [HUMAN REVIEW]",
               "as_of": "2026-07-17",
-              "content_sha256": "54e273f4d76bdf9659362971402e918c05290b57295e81dd84ec400d9f4fee6a",
-              "source_id": "95b89f65552afa4f11b5356bb196756b9fbf3a0f56379fc2357c67dd3f5fff98"
+              "content_sha256": "09f9337da15681f0fef21858e3ce0833e585a0457d3caefb42bf527d540653a4",
+              "source_id": "802fef64a488b6d6eca0be6ffe0f88cda882f125f7cf69ba1b493d3570b5d432"
             }
           ],
           "checks": {
             "passed": true,
             "errors": []
           },
-          "proof_hash": "8ac7fc8c6c9cb88d6e95f168b0d4886225e6e7e1fae189b3177e8ee072b580e8"
+          "proof_hash": "06335483c70b319b8ffb80acb6fd156ee19f7ae013c61811b68f69de08932a01"
         },
         "evidence_tier": "mixed_primary_and_estimate",
         "evidence_level": "analyst_estimated",
@@ -2124,8 +2099,8 @@
                   "ref": "PLWN/research/valuation.json",
                   "locator": "Long Island cemetery land often carried below market on Form 990; Schedule D marks pending [Assumption]",
                   "as_of": "2024-12-31",
-                  "content_sha256": "54e273f4d76bdf9659362971402e918c05290b57295e81dd84ec400d9f4fee6a",
-                  "source_id": "3612832eb0ef2ccaebbbf0f37c3d7f2a7e7ebd51bbb6721349f2ba852d93ba49"
+                  "content_sha256": "09f9337da15681f0fef21858e3ce0833e585a0457d3caefb42bf527d540653a4",
+                  "source_id": "46e5dfc8f5077179b4915eac3bf825ebedd681453787523f7d1c87d2091cc12a"
                 },
                 "rationale": null
               },
@@ -2139,8 +2114,8 @@
                   "ref": "PLWN/research/valuation.json",
                   "locator": "Aggregator ~3.46M shares; conflicts with dividend cash math vs FY2024 NI [HUMAN REVIEW]",
                   "as_of": "2026-07-17",
-                  "content_sha256": "54e273f4d76bdf9659362971402e918c05290b57295e81dd84ec400d9f4fee6a",
-                  "source_id": "95b89f65552afa4f11b5356bb196756b9fbf3a0f56379fc2357c67dd3f5fff98"
+                  "content_sha256": "09f9337da15681f0fef21858e3ce0833e585a0457d3caefb42bf527d540653a4",
+                  "source_id": "802fef64a488b6d6eca0be6ffe0f88cda882f125f7cf69ba1b493d3570b5d432"
                 },
                 "rationale": null
               },
@@ -2193,8 +2168,8 @@
                   "ref": "PLWN/research/valuation.json",
                   "locator": "Long Island cemetery land often carried below market on Form 990; Schedule D marks pending [Assumption]",
                   "as_of": "2024-12-31",
-                  "content_sha256": "54e273f4d76bdf9659362971402e918c05290b57295e81dd84ec400d9f4fee6a",
-                  "source_id": "3612832eb0ef2ccaebbbf0f37c3d7f2a7e7ebd51bbb6721349f2ba852d93ba49"
+                  "content_sha256": "09f9337da15681f0fef21858e3ce0833e585a0457d3caefb42bf527d540653a4",
+                  "source_id": "46e5dfc8f5077179b4915eac3bf825ebedd681453787523f7d1c87d2091cc12a"
                 },
                 "rationale": null
               },
@@ -2208,8 +2183,8 @@
                   "ref": "PLWN/research/valuation.json",
                   "locator": "Aggregator ~3.46M shares; conflicts with dividend cash math vs FY2024 NI [HUMAN REVIEW]",
                   "as_of": "2026-07-17",
-                  "content_sha256": "54e273f4d76bdf9659362971402e918c05290b57295e81dd84ec400d9f4fee6a",
-                  "source_id": "95b89f65552afa4f11b5356bb196756b9fbf3a0f56379fc2357c67dd3f5fff98"
+                  "content_sha256": "09f9337da15681f0fef21858e3ce0833e585a0457d3caefb42bf527d540653a4",
+                  "source_id": "802fef64a488b6d6eca0be6ffe0f88cda882f125f7cf69ba1b493d3570b5d432"
                 },
                 "rationale": null
               },
@@ -2262,8 +2237,8 @@
                   "ref": "PLWN/research/valuation.json",
                   "locator": "Long Island cemetery land often carried below market on Form 990; Schedule D marks pending [Assumption]",
                   "as_of": "2024-12-31",
-                  "content_sha256": "54e273f4d76bdf9659362971402e918c05290b57295e81dd84ec400d9f4fee6a",
-                  "source_id": "3612832eb0ef2ccaebbbf0f37c3d7f2a7e7ebd51bbb6721349f2ba852d93ba49"
+                  "content_sha256": "09f9337da15681f0fef21858e3ce0833e585a0457d3caefb42bf527d540653a4",
+                  "source_id": "46e5dfc8f5077179b4915eac3bf825ebedd681453787523f7d1c87d2091cc12a"
                 },
                 "rationale": null
               },
@@ -2277,8 +2252,8 @@
                   "ref": "PLWN/research/valuation.json",
                   "locator": "Aggregator ~3.46M shares; conflicts with dividend cash math vs FY2024 NI [HUMAN REVIEW]",
                   "as_of": "2026-07-17",
-                  "content_sha256": "54e273f4d76bdf9659362971402e918c05290b57295e81dd84ec400d9f4fee6a",
-                  "source_id": "95b89f65552afa4f11b5356bb196756b9fbf3a0f56379fc2357c67dd3f5fff98"
+                  "content_sha256": "09f9337da15681f0fef21858e3ce0833e585a0457d3caefb42bf527d540653a4",
+                  "source_id": "802fef64a488b6d6eca0be6ffe0f88cda882f125f7cf69ba1b493d3570b5d432"
                 },
                 "rationale": null
               },
@@ -2327,23 +2302,23 @@
               "ref": "PLWN/research/valuation.json",
               "locator": "Long Island cemetery land often carried below market on Form 990; Schedule D marks pending [Assumption]",
               "as_of": "2024-12-31",
-              "content_sha256": "54e273f4d76bdf9659362971402e918c05290b57295e81dd84ec400d9f4fee6a",
-              "source_id": "3612832eb0ef2ccaebbbf0f37c3d7f2a7e7ebd51bbb6721349f2ba852d93ba49"
+              "content_sha256": "09f9337da15681f0fef21858e3ce0833e585a0457d3caefb42bf527d540653a4",
+              "source_id": "46e5dfc8f5077179b4915eac3bf825ebedd681453787523f7d1c87d2091cc12a"
             },
             {
               "node_id": "shares_m",
               "ref": "PLWN/research/valuation.json",
               "locator": "Aggregator ~3.46M shares; conflicts with dividend cash math vs FY2024 NI [HUMAN REVIEW]",
               "as_of": "2026-07-17",
-              "content_sha256": "54e273f4d76bdf9659362971402e918c05290b57295e81dd84ec400d9f4fee6a",
-              "source_id": "95b89f65552afa4f11b5356bb196756b9fbf3a0f56379fc2357c67dd3f5fff98"
+              "content_sha256": "09f9337da15681f0fef21858e3ce0833e585a0457d3caefb42bf527d540653a4",
+              "source_id": "802fef64a488b6d6eca0be6ffe0f88cda882f125f7cf69ba1b493d3570b5d432"
             }
           ],
           "checks": {
             "passed": true,
             "errors": []
           },
-          "proof_hash": "dd65521e7ed7c1a20249409aa323dc6510ac843e28e6a8b2d5451417db77f247"
+          "proof_hash": "e08005467921d9c458bd86a4731227ae83f6e637567a311df53d9c69f7ce1267"
         },
         "evidence_tier": "mixed_primary_and_estimate",
         "evidence_level": "analyst_estimated",
@@ -2426,8 +2401,8 @@
                   "ref": "PLWN/research/valuation.json",
                   "locator": "ProPublica Nonprofit Explorer EIN 11-1190044 FY ending Dec 2024; net assets $161,903,602",
                   "as_of": "2024-12-31",
-                  "content_sha256": "54e273f4d76bdf9659362971402e918c05290b57295e81dd84ec400d9f4fee6a",
-                  "source_id": "2a011b397f49df44bafad585d72b98f18a7538bcfeedcabe9f74638eea731413"
+                  "content_sha256": "09f9337da15681f0fef21858e3ce0833e585a0457d3caefb42bf527d540653a4",
+                  "source_id": "ab869622dab5b7d40db018fd2f450bb515df9f4cc0a126e948d2542eeeca198c"
                 },
                 "rationale": null
               },
@@ -2441,8 +2416,8 @@
                   "ref": "PLWN/research/valuation.json",
                   "locator": "Aggregator ~3.46M shares; conflicts with dividend cash math vs FY2024 NI [HUMAN REVIEW]",
                   "as_of": "2026-07-17",
-                  "content_sha256": "54e273f4d76bdf9659362971402e918c05290b57295e81dd84ec400d9f4fee6a",
-                  "source_id": "95b89f65552afa4f11b5356bb196756b9fbf3a0f56379fc2357c67dd3f5fff98"
+                  "content_sha256": "09f9337da15681f0fef21858e3ce0833e585a0457d3caefb42bf527d540653a4",
+                  "source_id": "802fef64a488b6d6eca0be6ffe0f88cda882f125f7cf69ba1b493d3570b5d432"
                 },
                 "rationale": null
               },
@@ -2508,8 +2483,8 @@
                   "ref": "PLWN/research/valuation.json",
                   "locator": "ProPublica Nonprofit Explorer EIN 11-1190044 FY ending Dec 2024; net assets $161,903,602",
                   "as_of": "2024-12-31",
-                  "content_sha256": "54e273f4d76bdf9659362971402e918c05290b57295e81dd84ec400d9f4fee6a",
-                  "source_id": "2a011b397f49df44bafad585d72b98f18a7538bcfeedcabe9f74638eea731413"
+                  "content_sha256": "09f9337da15681f0fef21858e3ce0833e585a0457d3caefb42bf527d540653a4",
+                  "source_id": "ab869622dab5b7d40db018fd2f450bb515df9f4cc0a126e948d2542eeeca198c"
                 },
                 "rationale": null
               },
@@ -2523,8 +2498,8 @@
                   "ref": "PLWN/research/valuation.json",
                   "locator": "Aggregator ~3.46M shares; conflicts with dividend cash math vs FY2024 NI [HUMAN REVIEW]",
                   "as_of": "2026-07-17",
-                  "content_sha256": "54e273f4d76bdf9659362971402e918c05290b57295e81dd84ec400d9f4fee6a",
-                  "source_id": "95b89f65552afa4f11b5356bb196756b9fbf3a0f56379fc2357c67dd3f5fff98"
+                  "content_sha256": "09f9337da15681f0fef21858e3ce0833e585a0457d3caefb42bf527d540653a4",
+                  "source_id": "802fef64a488b6d6eca0be6ffe0f88cda882f125f7cf69ba1b493d3570b5d432"
                 },
                 "rationale": null
               },
@@ -2590,8 +2565,8 @@
                   "ref": "PLWN/research/valuation.json",
                   "locator": "ProPublica Nonprofit Explorer EIN 11-1190044 FY ending Dec 2024; net assets $161,903,602",
                   "as_of": "2024-12-31",
-                  "content_sha256": "54e273f4d76bdf9659362971402e918c05290b57295e81dd84ec400d9f4fee6a",
-                  "source_id": "2a011b397f49df44bafad585d72b98f18a7538bcfeedcabe9f74638eea731413"
+                  "content_sha256": "09f9337da15681f0fef21858e3ce0833e585a0457d3caefb42bf527d540653a4",
+                  "source_id": "ab869622dab5b7d40db018fd2f450bb515df9f4cc0a126e948d2542eeeca198c"
                 },
                 "rationale": null
               },
@@ -2605,8 +2580,8 @@
                   "ref": "PLWN/research/valuation.json",
                   "locator": "Aggregator ~3.46M shares; conflicts with dividend cash math vs FY2024 NI [HUMAN REVIEW]",
                   "as_of": "2026-07-17",
-                  "content_sha256": "54e273f4d76bdf9659362971402e918c05290b57295e81dd84ec400d9f4fee6a",
-                  "source_id": "95b89f65552afa4f11b5356bb196756b9fbf3a0f56379fc2357c67dd3f5fff98"
+                  "content_sha256": "09f9337da15681f0fef21858e3ce0833e585a0457d3caefb42bf527d540653a4",
+                  "source_id": "802fef64a488b6d6eca0be6ffe0f88cda882f125f7cf69ba1b493d3570b5d432"
                 },
                 "rationale": null
               },
@@ -2668,23 +2643,23 @@
               "ref": "PLWN/research/valuation.json",
               "locator": "ProPublica Nonprofit Explorer EIN 11-1190044 FY ending Dec 2024; net assets $161,903,602",
               "as_of": "2024-12-31",
-              "content_sha256": "54e273f4d76bdf9659362971402e918c05290b57295e81dd84ec400d9f4fee6a",
-              "source_id": "2a011b397f49df44bafad585d72b98f18a7538bcfeedcabe9f74638eea731413"
+              "content_sha256": "09f9337da15681f0fef21858e3ce0833e585a0457d3caefb42bf527d540653a4",
+              "source_id": "ab869622dab5b7d40db018fd2f450bb515df9f4cc0a126e948d2542eeeca198c"
             },
             {
               "node_id": "shares_m",
               "ref": "PLWN/research/valuation.json",
               "locator": "Aggregator ~3.46M shares; conflicts with dividend cash math vs FY2024 NI [HUMAN REVIEW]",
               "as_of": "2026-07-17",
-              "content_sha256": "54e273f4d76bdf9659362971402e918c05290b57295e81dd84ec400d9f4fee6a",
-              "source_id": "95b89f65552afa4f11b5356bb196756b9fbf3a0f56379fc2357c67dd3f5fff98"
+              "content_sha256": "09f9337da15681f0fef21858e3ce0833e585a0457d3caefb42bf527d540653a4",
+              "source_id": "802fef64a488b6d6eca0be6ffe0f88cda882f125f7cf69ba1b493d3570b5d432"
             }
           ],
           "checks": {
             "passed": true,
             "errors": []
           },
-          "proof_hash": "54abf8ecacd002733dfd1fe3b1212ba8a7d4444b5b4728c9a2d6901e1a018323"
+          "proof_hash": "26449c971b9dd66680984cde0849a3e4187ed1cb6bfd1a5d7386c5c8b53f9dc5"
         },
         "evidence_tier": "mixed_primary_and_estimate",
         "evidence_level": "analyst_estimated",
@@ -2947,7 +2922,7 @@
       },
       "all_material_components_priced": true,
       "calculation_errors": [],
-      "aggregate_proof_hash": "286c9f849d46247dcf2acfbf288e470da4f5e3f4980151cfd2415abcedca29b1"
+      "aggregate_proof_hash": "ecb27f670412bf665e6d437a0c6c88d3af72c12ae8f1dcbd7aec99fbfcacab78"
     },
     "source_lineage": [
       {
@@ -2956,8 +2931,8 @@
         "ref": "PLWN/research/valuation.json",
         "locator": "ProPublica Nonprofit Explorer EIN 11-1190044 FY ending Dec 2024; net assets $161,903,602; liabilities $0 on extract",
         "as_of": "2024-12-31",
-        "content_sha256": "54e273f4d76bdf9659362971402e918c05290b57295e81dd84ec400d9f4fee6a",
-        "source_id": "b84fb7a6c3364aabb3abeb73e8632ce425012691e471eab2caac5f6859caf0c5"
+        "content_sha256": "09f9337da15681f0fef21858e3ce0833e585a0457d3caefb42bf527d540653a4",
+        "source_id": "c74862ba021ceccea877f1651a2073edfda340e48cf2cd15173408b43ea4b675"
       },
       {
         "component_id": "form990_net_assets",
@@ -2965,8 +2940,8 @@
         "ref": "PLWN/research/valuation.json",
         "locator": "Aggregator ~3.46M shares; conflicts with dividend cash math vs FY2024 NI [HUMAN REVIEW]",
         "as_of": "2026-07-17",
-        "content_sha256": "54e273f4d76bdf9659362971402e918c05290b57295e81dd84ec400d9f4fee6a",
-        "source_id": "95b89f65552afa4f11b5356bb196756b9fbf3a0f56379fc2357c67dd3f5fff98"
+        "content_sha256": "09f9337da15681f0fef21858e3ce0833e585a0457d3caefb42bf527d540653a4",
+        "source_id": "802fef64a488b6d6eca0be6ffe0f88cda882f125f7cf69ba1b493d3570b5d432"
       },
       {
         "component_id": "cemetery_operations",
@@ -2974,8 +2949,8 @@
         "ref": "PLWN/research/valuation.json",
         "locator": "ProPublica Nonprofit Explorer EIN 11-1190044 FY ending Dec 2024; revenue $42,855,178; expenses $37,530,682; net income $5,324,496",
         "as_of": "2024-12-31",
-        "content_sha256": "54e273f4d76bdf9659362971402e918c05290b57295e81dd84ec400d9f4fee6a",
-        "source_id": "b4c872153317cad21c8222336f2040d9e7f7c531ef72ce1965840efc572b27e6"
+        "content_sha256": "09f9337da15681f0fef21858e3ce0833e585a0457d3caefb42bf527d540653a4",
+        "source_id": "a914530f233793049ca0fec2b8aea0429e9e2f4844dd66a788f37b723d20c2d1"
       },
       {
         "component_id": "cemetery_operations",
@@ -2983,8 +2958,8 @@
         "ref": "PLWN/research/valuation.json",
         "locator": "Aggregator ~3.46M shares; conflicts with dividend cash math vs FY2024 NI [HUMAN REVIEW]",
         "as_of": "2026-07-17",
-        "content_sha256": "54e273f4d76bdf9659362971402e918c05290b57295e81dd84ec400d9f4fee6a",
-        "source_id": "95b89f65552afa4f11b5356bb196756b9fbf3a0f56379fc2357c67dd3f5fff98"
+        "content_sha256": "09f9337da15681f0fef21858e3ce0833e585a0457d3caefb42bf527d540653a4",
+        "source_id": "802fef64a488b6d6eca0be6ffe0f88cda882f125f7cf69ba1b493d3570b5d432"
       },
       {
         "component_id": "land_market_to_990_gap",
@@ -2992,8 +2967,8 @@
         "ref": "PLWN/research/valuation.json",
         "locator": "Long Island cemetery land often carried below market on Form 990; Schedule D marks pending [Assumption]",
         "as_of": "2024-12-31",
-        "content_sha256": "54e273f4d76bdf9659362971402e918c05290b57295e81dd84ec400d9f4fee6a",
-        "source_id": "3612832eb0ef2ccaebbbf0f37c3d7f2a7e7ebd51bbb6721349f2ba852d93ba49"
+        "content_sha256": "09f9337da15681f0fef21858e3ce0833e585a0457d3caefb42bf527d540653a4",
+        "source_id": "46e5dfc8f5077179b4915eac3bf825ebedd681453787523f7d1c87d2091cc12a"
       },
       {
         "component_id": "land_market_to_990_gap",
@@ -3001,8 +2976,8 @@
         "ref": "PLWN/research/valuation.json",
         "locator": "Aggregator ~3.46M shares; conflicts with dividend cash math vs FY2024 NI [HUMAN REVIEW]",
         "as_of": "2026-07-17",
-        "content_sha256": "54e273f4d76bdf9659362971402e918c05290b57295e81dd84ec400d9f4fee6a",
-        "source_id": "95b89f65552afa4f11b5356bb196756b9fbf3a0f56379fc2357c67dd3f5fff98"
+        "content_sha256": "09f9337da15681f0fef21858e3ce0833e585a0457d3caefb42bf527d540653a4",
+        "source_id": "802fef64a488b6d6eca0be6ffe0f88cda882f125f7cf69ba1b493d3570b5d432"
       },
       {
         "component_id": "illiquidity_and_governance_reserve",
@@ -3010,8 +2985,8 @@
         "ref": "PLWN/research/valuation.json",
         "locator": "ProPublica Nonprofit Explorer EIN 11-1190044 FY ending Dec 2024; net assets $161,903,602",
         "as_of": "2024-12-31",
-        "content_sha256": "54e273f4d76bdf9659362971402e918c05290b57295e81dd84ec400d9f4fee6a",
-        "source_id": "2a011b397f49df44bafad585d72b98f18a7538bcfeedcabe9f74638eea731413"
+        "content_sha256": "09f9337da15681f0fef21858e3ce0833e585a0457d3caefb42bf527d540653a4",
+        "source_id": "ab869622dab5b7d40db018fd2f450bb515df9f4cc0a126e948d2542eeeca198c"
       },
       {
         "component_id": "illiquidity_and_governance_reserve",
@@ -3019,8 +2994,8 @@
         "ref": "PLWN/research/valuation.json",
         "locator": "Aggregator ~3.46M shares; conflicts with dividend cash math vs FY2024 NI [HUMAN REVIEW]",
         "as_of": "2026-07-17",
-        "content_sha256": "54e273f4d76bdf9659362971402e918c05290b57295e81dd84ec400d9f4fee6a",
-        "source_id": "95b89f65552afa4f11b5356bb196756b9fbf3a0f56379fc2357c67dd3f5fff98"
+        "content_sha256": "09f9337da15681f0fef21858e3ce0833e585a0457d3caefb42bf527d540653a4",
+        "source_id": "802fef64a488b6d6eca0be6ffe0f88cda882f125f7cf69ba1b493d3570b5d432"
       }
     ],
     "model_checks": {
@@ -3050,7 +3025,7 @@
       ]
     },
     "change_control": {
-      "model_hash": "f7e116957fb8e2c06c4a576e2662da997bc675371dd862d5db80f7020f6ef19f",
+      "model_hash": "2aabc2e51a49166580b89a1d76759da35ec6418d7631020f277ed3b22386341b",
       "method_versions": [
         "net_asset_value@1.0",
         "owner_cash_dcf@1.0",
@@ -3067,7 +3042,7 @@
     "reason": "no numeric paths"
   },
   "context_overlay": {
-    "as_of": "2026-07-24",
+    "as_of": "2026-07-22",
     "disclaimer": "Context only. Tailwinds inform stance and overlay sizing; they do not auto-inflate Lawrence base IRR. Promotion to base case requires [HUMAN REVIEW].",
     "themes": [
       {
@@ -3077,9 +3052,9 @@
           {
             "id": "hy_oas",
             "label": "High-yield OAS credit spread (%)",
-            "latest": 1.63,
-            "as_of": "2026-07-23",
-            "yoy_pct": 328.9,
+            "latest": 1.59,
+            "as_of": "2026-07-21",
+            "yoy_pct": 287.8,
             "direction": "up",
             "good_for": "risk_regime",
             "source": "spread:HYG-LQD:21d (HYG-LQD 1m spread proxy, not OAS)",
@@ -3089,9 +3064,9 @@
           {
             "id": "ust_10y",
             "label": "US Treasury 10Y yield (%)",
-            "latest": 4.703000068664551,
-            "as_of": "2026-07-23",
-            "yoy_pct": 7.2,
+            "latest": 4.627999782562256,
+            "as_of": "2026-07-21",
+            "yoy_pct": 5.9,
             "direction": "up",
             "good_for": "rates_regime",
             "source": "yahoo:^TNX",
@@ -3101,9 +3076,9 @@
           {
             "id": "ust_2y",
             "label": "US Treasury 2Y yield (%)",
-            "latest": 4.460999965667725,
-            "as_of": "2026-07-23",
-            "yoy_pct": 13.4,
+            "latest": 4.369999885559082,
+            "as_of": "2026-07-21",
+            "yoy_pct": 11.8,
             "direction": "up",
             "good_for": "rates_regime",
             "source": "yahoo:^FVX",
@@ -3113,9 +3088,9 @@
           {
             "id": "dxy_broad",
             "label": "Trade-weighted USD index (broad)",
-            "latest": 101.37899780273438,
-            "as_of": "2026-07-24",
-            "yoy_pct": 4.1,
+            "latest": 101.15299987792969,
+            "as_of": "2026-07-22",
+            "yoy_pct": 3.9,
             "direction": "up",
             "good_for": "dollar_regime",
             "source": "yahoo:DX-Y.NYB",
@@ -3125,9 +3100,9 @@
           {
             "id": "vix_level",
             "label": "VIX index level",
-            "latest": 18.700000762939453,
-            "as_of": "2026-07-23",
-            "yoy_pct": 21.7,
+            "latest": 17.65999984741211,
+            "as_of": "2026-07-22",
+            "yoy_pct": 7.0,
             "direction": "up",
             "good_for": "vol_regime",
             "source": "yahoo:^VIX",
@@ -3137,9 +3112,9 @@
           {
             "id": "credit_impulse_1m",
             "label": "HYG vs TLT 1-month return spread (%)",
-            "latest": 2.71,
-            "as_of": "2026-07-23",
-            "yoy_pct": 71.5,
+            "latest": 3.11,
+            "as_of": "2026-07-21",
+            "yoy_pct": 75.7,
             "direction": "up",
             "good_for": "credit_impulse",
             "source": "spread:HYG-TLT:21d",
@@ -3149,9 +3124,9 @@
           {
             "id": "spy_20d_realized_vol",
             "label": "SPY 20-day realized vol (annualized %)",
-            "latest": 11.37,
-            "as_of": "2026-07-23",
-            "yoy_pct": 51.2,
+            "latest": 11.69,
+            "as_of": "2026-07-21",
+            "yoy_pct": 35.0,
             "direction": "up",
             "good_for": "equity_vol",
             "source": "realized_vol:SPY:20d",
@@ -3213,26 +3188,5 @@
     "price_for_market_cap": 575.0,
     "chart": "PLWN/research/charts/total_return_2026-07-24.svg",
     "panel_json": "PLWN/research/total_return_panel.json"
-  },
-  "lens_consensus": {
-    "as_of": "2026-07-24",
-    "shared_inputs_ref": "valuation.json@2026-07-24",
-    "valuation_richness": 0.966,
-    "blended_return_pct": -38.25,
-    "band_pct": [
-      -38.9,
-      -33.06
-    ],
-    "weighted_median_pct": -38.9,
-    "median_mean_flag": false,
-    "stance": "pass",
-    "agreement_pct": 100,
-    "dissent_count": 0,
-    "lawrence_divergence": false,
-    "top_dissents": [],
-    "contributor_count": 8,
-    "in_base_irr": false,
-    "disclaimer": "Advisory lens blend only. Does not replace Lawrence total-synthesis stance gate without [HUMAN REVIEW]."
-  },
-  "lawrence_horizon_years": 7
+  }
 }
