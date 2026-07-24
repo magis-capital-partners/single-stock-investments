@@ -1,0 +1,61 @@
+{
+  "persona": "marks_credit_cycle",
+  "independence_group": "credit_cycle",
+  "evidence_status": "sufficient",
+  "scores": {
+    "explanatory_strength": {
+      "value": 3,
+      "rationale": "Filings support a levered equity-stub story: $3.1B operating cash flow versus ~$29B debt and $902M cash, with a separate cycle_leverage_reserve and net_financial_claims proof rows. The research distinguishes operating cash from GAAP net income and names refinancing as the equity failure mode. Lawrence 28.48% base versus contract base −$9.79/sh is not reconciled through a credit-survival path."
+    },
+    "evidence_sufficiency": {
+      "value": 2,
+      "rationale": "Balance-sheet facts reconcile in filing_facts and valuation_contract proofs (debt, cash, OCF, capex, shares). management_facts is empty. There is no year-by-year maturity ladder, covenant headroom, revolver capacity, or filing-sourced interest-coverage bridge in the packet, which are decision-critical for a credit-cycle vote."
+    },
+    "downside_control": {
+      "value": 2,
+      "rationale": "Net financial claims (−$42.67/sh base) and cycle reserve (−$9.00/sh) quantify filing-locked burden, but equity downside is explicitly unbounded in the dive (gate 3 fails). Contract low −$41.70/sh versus $15.14 price leaves permanent-loss paths from simultaneous earnings trough and credit tightening unquantified. Dhando is none."
+    },
+    "return_vs_alternatives": {
+      "value": 1,
+      "rationale": "Proof-first contract base annualized return at price is null with negative intrinsic (−$9.79/sh); high case only 8.12%. Lawrence bear/base/bull (15.2%/27.0%/35.0%) assume mid-cycle owner-cash recovery and do not stress refinancing cost or dilution. A 12% credit-cycle hurdle is not cleared on conservative, financing-first math."
+    }
+  },
+  "vote": "reject",
+  "expected_return_range_pct": [-40, 5],
+  "horizon_years": 5,
+  "claims": [
+    {
+      "claim": "FY2025 filing-locked net financial claims imply about −$42.67 per share after $902M cash against ~$29.0B total debt and leases, dominating the additive component schedule.",
+      "evidence_paths": [
+        "AAL/research/valuation_contract.json",
+        "AAL/research/evidence/filing_facts_2026-07-21.json",
+        "AAL/research/evidence_reconciliation_2026-07-21.md"
+      ]
+    },
+    {
+      "claim": "FY2025 operating cash flow of $3.1B was exceeded by $3.8B capital spending, limiting organic deleveraging after mandatory fleet renewal and debt service.",
+      "evidence_paths": [
+        "AAL/research/evidence/filing_facts_2026-07-21.json",
+        "AAL/research/deep_dive_2026-07-21.md",
+        "AAL/research/valuation_contract.json"
+      ]
+    },
+    {
+      "claim": "At $15.14 per share, the contract base component sum of −$9.79 per share implies the market prices deleveraging optionality beyond filing-locked credit-adjusted proofs; Lawrence 28.48% base is not a financing-cycle stress return.",
+      "evidence_paths": [
+        "AAL/research/valuation_contract.json",
+        "AAL/research/valuation.json",
+        "AAL/research/deep_dive_2026-07-21.md"
+      ]
+    }
+  ],
+  "strongest_counter_explanation": "Mid-cycle demand normalization and $3.1B annual operating cash flow can steadily pay down the post-pandemic debt stack; AAdvantage co-brand economics and premium-cabin mix support equity recovery before any refinancing stress, making the stub cheap relative to normalized enterprise cash generation.",
+  "most_important_missing_fact": "A filing-reconciled year-by-year debt and lease maturity schedule with covenant headroom, revolver availability, and all-in interest coverage under a 2026–2027 earnings-trough scenario.",
+  "falsifiers": [
+    "Total debt rises above $32B without proportional operating income recovery for two consecutive quarters",
+    "Trailing four-quarter operating cash flow falls below $2.5B while near-term maturities exceed cash plus undrawn liquidity",
+    "Operating income stays below $1.5B for four quarters while weighted-average refinancing cost exceeds 8% on maturing tranches"
+  ],
+  "specialist_findings": "Within the Howard Marks / credit-cycle power zone: leverage and fixed claims are material (payoff_lens levered, ~$28B net debt, equity $3.7B). Component audit: net_financial_claims and cycle_leverage_reserve overlap keys are clean; AAdvantage option is judgment-heavy but not double-counted against network OCF. Valuation-proof rows tie to 10-K/10-Q facts, but stress reserve and co-brand bands are judgment plugs without independent refinancing math. Bear Lawrence scenario (15.2%) is an operating-cash sensitivity, not a credit-stressed equity return with higher coupons or dilution. Base-case earnings cannot compensate for an unmodeled maturity wall; equity is a cheap-looking stub, not a robust claim that survives tightening credit. Reject pending maturity and covenant reconciliation.",
+  "confidence": "low"
+}
