@@ -97,6 +97,25 @@ class ResolveLocalPdfTests(unittest.TestCase):
             updated = imp.extract_texts([pdf])
             self.assertEqual(updated, 0)
 
+    def test_skips_download_when_vault_text_exists_without_pdf(self) -> None:
+        """PDFs are gitignored; committed .txt must count as already ingested."""
+        with tempfile.TemporaryDirectory() as tmp:
+            dest_dir = Path(tmp) / "2026Q2"
+            dest_dir.mkdir()
+            txt = dest_dir / "Engine_Capital_Q2_2026_FINAL.txt"
+            txt.write_text("Dear Partners,\n\n" + ("Thesis " * 40), encoding="utf-8")
+
+            path, skip = imp.resolve_local_pdf(
+                dest_dir,
+                "Engine_Capital_Q2_2026_FINAL.pdf",
+                "drivefileid123456",
+                drive_size=1104850,
+                manifest_entry=None,
+            )
+            self.assertTrue(skip)
+            self.assertEqual(path, dest_dir / "Engine_Capital_Q2_2026_FINAL.pdf")
+            self.assertFalse(path.exists())
+
 
 class ShardPartitionTests(unittest.TestCase):
     def test_shard_bucket_is_deterministic(self) -> None:

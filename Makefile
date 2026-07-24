@@ -43,6 +43,10 @@ letter-date-check:
 	$(PYTHON) -m unittest _system/scripts/test_letter_date_parser.py _system/scripts/test_fund_registry_date.py
 	@echo OK: letter-date-check
 
+letter-coverage-check:
+	$(PYTHON) $(SCRIPTS)/check_letter_drive_coverage.py --since-year $$(($$(date +%Y)-1))
+	@echo OK: letter-coverage-check
+
 letter-rebuild:
 	$(PYTHON) $(SCRIPTS)/build_security_master.py --refresh-sec
 	$(PYTHON) $(SCRIPTS)/build_superinvestor_insights.py

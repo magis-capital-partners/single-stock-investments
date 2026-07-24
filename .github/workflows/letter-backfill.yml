@@ -5,16 +5,26 @@ on:
     # Sunday 16:00 UTC — off the 06:00 activist slot and the 10:00 full
     # downloads run so heavy jobs do not queue behind each other.
     - cron: "0 16 * * 0"
+    # Wednesday mid-week catch-up for new quarter drops (recent years only).
+    - cron: "0 15 * * 3"
   workflow_dispatch:
     inputs:
       since_year:
-        description: "Optional lower bound year (e.g. 2024). Empty = all quarters."
+        description: "Lower bound year (e.g. 2026). Empty on manual = all; schedule defaults to prior year."
+        required: false
+        default: ""
+      quarter:
+        description: "Optional single quarter (e.g. 2026Q2). Overrides since_year when set."
         required: false
         default: ""
       shard_count:
         description: "Deterministic shard count (each shard is its own job/timeout)."
         required: false
         default: "8"
+      full_history:
+        description: "Set true to import all years (slow). Default false uses recent-year window on schedule."
+        required: false
+        default: "false"
 
 permissions:
   contents: write
@@ -31,6 +41,8 @@ jobs:
     outputs:
       shard_count: ${{ steps.matrix.outputs.shard_count }}
       shard_matrix: ${{ steps.matrix.outputs.shard_matrix }}
+      since_year: ${{ steps.window.outputs.since_year }}
+      quarter: ${{ steps.window.outputs.quarter }}
     steps:
       - id: matrix
         env:
@@ -47,11 +59,34 @@ jobs:
           echo "shard_matrix=$MATRIX" >> "$GITHUB_OUTPUT"
           echo "Using $COUNT deterministic letter shards"
 
-  # Cold Drive import of ~20k PDFs previously timed out as one job. Split into
-  # deterministic shards (stable sha256(file_id) % N). Each shard commits to the
-  # vault before the next starts (max-parallel: 1) so progress is checkpointed
-  # and skip-existing can resume after cancel/timeout.
-  download-letters:
+      - id: window
+        env:
+          INPUT_SINCE: ${{ github.event.inputs.since_year || '' }}
+          INPUT_QUARTER: ${{ github.event.inputs.quarter || '' }}
+          FULL_HISTORY: ${{ github.event.inputs.full_history || 'false' }}
+          EVENT_NAME: ${{ github.event_name }}
+        run: |
+          set -euo pipefail
+          QUARTER="$(echo "${INPUT_QUARTER:-}" | tr '[:lower:]' '[:upper:]')"
+          SINCE="${INPUT_SINCE:-}"
+          if [ -n "$QUARTER" ]; then
+            SINCE=""
+          elif [ "${FULL_HISTORY}" = "true" ]; then
+            SINCE=""
+          elif [ -z "$SINCE" ]; then
+            # Scheduled / default manual: recent window so new quarter drops finish.
+            # Prior calendar year catches late Q4 filings into the next year.
+            SINCE=$(( $(date -u +%Y) - 1 ))
+          fi
+          echo "quarter=$QUARTER" >> "$GITHUB_OUTPUT"
+          echo "since_year=$SINCE" >> "$GITHUB_OUTPUT"
+          echo "Import window: quarter=${QUARTER:-all} since_year=${SINCE:-all} event=$EVENT_NAME"
+
+  # Cold Drive import previously timed out as one job. Split into deterministic
+  # shards. Each shard downloads + extracts in the SAME job because research-vault
+  # gitignores PDFs (only .txt extracts are committed). A separate extract job
+  # cannot see PDFs from a prior runner.
+  ingest-letters:
     needs: prepare
     runs-on: ubuntu-latest
     timeout-minutes: 120
@@ -60,7 +95,7 @@ jobs:
       max-parallel: 1
       matrix: ${{ fromJson(needs.prepare.outputs.shard_matrix) }}
     concurrency:
-      group: letter-vault-download-${{ matrix.shard }}
+      group: letter-vault-ingest-${{ matrix.shard }}
       cancel-in-progress: false
     steps:
       - uses: jlumbroso/free-disk-space@54081f138730dfa15788a46383842cd2f914a1be # v1.3.1
@@ -110,79 +145,22 @@ jobs:
           printf '%s' "$GOOGLE_APPLICATION_CREDENTIALS_JSON" > "$RUNNER_TEMP/google-service-account.json"
           echo "GOOGLE_APPLICATION_CREDENTIALS=$RUNNER_TEMP/google-service-account.json" >> "$GITHUB_ENV"
 
-      - name: Import letter shard from Google Drive
+      - name: Import + extract letter shard from Google Drive
         env:
-          SINCE_YEAR: ${{ github.event.inputs.since_year || '' }}
+          SINCE_YEAR: ${{ needs.prepare.outputs.since_year }}
+          QUARTER: ${{ needs.prepare.outputs.quarter }}
           SHARD: ${{ matrix.shard }}
           SHARD_COUNT: ${{ needs.prepare.outputs.shard_count }}
         run: |
-          ARGS=(--all --skip-text --shard-index "$SHARD" --shard-count "$SHARD_COUNT")
-          if [ -n "$SINCE_YEAR" ]; then
-            ARGS+=(--since-year "$SINCE_YEAR")
-          fi
-          python _system/scripts/import_drive_letter_orphans.py "${ARGS[@]}"
-
-      - name: Commit downloaded letter PDFs to research vault
-        uses: ./.github/actions/commit-vault
-        with:
-          message: |
-            Download superinvestor letter PDFs (shard ${{ matrix.shard }}/${{ needs.prepare.outputs.shard_count }}).
-
-            Automated import from letter-backfill download-letters job.
-          git_add: superinvestor-letters/
-
-  extract-letters:
-    needs: [prepare, download-letters]
-    runs-on: ubuntu-latest
-    timeout-minutes: 120
-    strategy:
-      fail-fast: false
-      max-parallel: 1
-      matrix: ${{ fromJson(needs.prepare.outputs.shard_matrix) }}
-    concurrency:
-      group: letter-vault-extract-${{ matrix.shard }}
-      cancel-in-progress: false
-    steps:
-      - uses: jlumbroso/free-disk-space@54081f138730dfa15788a46383842cd2f914a1be # v1.3.1
-        with:
-          tool-cache: false
-          android: true
-          dotnet: true
-          haskell: true
-          docker-images: true
-          swap-storage: true
-
-      - uses: actions/checkout@v4
-        with:
-          sparse-checkout: |
-            _system/scripts/ci_checkout_workspace.sh
-            _system/scripts/ci_resolve_checkout_ref.sh
-            _system/scripts/ci_sparse_checkout_paths.py
-          sparse-checkout-cone-mode: false
-          fetch-depth: 1
-
-      - name: Checkout workspace (minimal + scripts)
-        run: bash _system/scripts/ci_checkout_workspace.sh minimal
-
-      - uses: actions/setup-python@v5
-        with:
-          python-version: "3.12"
-
-      - name: Install dependencies
-        run: pip install -r _system/scripts/requirements.txt
-
-      - name: Checkout research vault
-        uses: ./.github/actions/checkout-vault
-
-      - name: Extract text for letter shard
-        env:
-          SINCE_YEAR: ${{ github.event.inputs.since_year || '' }}
-          SHARD: ${{ matrix.shard }}
-          SHARD_COUNT: ${{ needs.prepare.outputs.shard_count }}
-        run: |
-          ARGS=(--skip-download --shard-index "$SHARD" --shard-count "$SHARD_COUNT")
-          if [ -n "$SINCE_YEAR" ]; then
-            ARGS+=(--since-year "$SINCE_YEAR")
+          set -euo pipefail
+          ARGS=(--shard-index "$SHARD" --shard-count "$SHARD_COUNT")
+          if [ -n "${QUARTER:-}" ]; then
+            ARGS+=(--quarter "$QUARTER")
+          else
+            ARGS+=(--all)
+            if [ -n "${SINCE_YEAR:-}" ]; then
+              ARGS+=(--since-year "$SINCE_YEAR")
+            fi
           fi
           python _system/scripts/import_drive_letter_orphans.py "${ARGS[@]}"
 
@@ -190,13 +168,13 @@ jobs:
         uses: ./.github/actions/commit-vault
         with:
           message: |
-            Extract text for superinvestor letters (shard ${{ matrix.shard }}/${{ needs.prepare.outputs.shard_count }}).
+            Ingest superinvestor letters (shard ${{ matrix.shard }}/${{ needs.prepare.outputs.shard_count }}).
 
-            Automated extract from letter-backfill extract-letters job.
+            Download + text extract in one job; PDFs remain gitignored.
           git_add: superinvestor-letters/
 
   publish-dashboard:
-    needs: extract-letters
+    needs: [prepare, ingest-letters]
     runs-on: ubuntu-latest
     timeout-minutes: 180
     concurrency:
@@ -232,8 +210,13 @@ jobs:
       - name: Checkout research vault
         uses: ./.github/actions/checkout-vault
 
+      - name: Assert Makefile present for make targets
+        run: test -f Makefile
+
       - name: Letter date parser gold gate
-        run: make letter-date-check
+        run: |
+          python _system/scripts/calibrate_letter_dates.py --gold
+          python -m unittest _system/scripts/test_letter_date_parser.py _system/scripts/test_fund_registry_date.py
 
       - name: Configure Google credentials
         env:
@@ -247,9 +230,15 @@ jobs:
           printf '%s' "$GOOGLE_APPLICATION_CREDENTIALS_JSON" > "$RUNNER_TEMP/google-service-account.json"
           echo "GOOGLE_APPLICATION_CREDENTIALS=$RUNNER_TEMP/google-service-account.json" >> "$GITHUB_ENV"
 
+      - name: Refresh Drive filename index (coverage source of truth)
+        if: env.SKIP_DRIVE_SYNC != '1'
+        run: python _system/scripts/build_drive_filename_index.py
+
       - name: Sync letter registry to Drive
         if: env.SKIP_DRIVE_SYNC != '1'
-        run: make document-sync-drive-letters
+        run: |
+          python _system/scripts/build_document_registry.py
+          python _system/scripts/sync_pdf_store_google_drive.py --root-key hedge_fund_letters
 
       - name: Rebuild ops dashboard payloads
         run: |
@@ -260,6 +249,22 @@ jobs:
           python _system/scripts/build_insights.py
           python _system/scripts/refresh_cvr_universe.py
           python _system/scripts/build_dashboard_data.py
+
+      - name: Letter Drive coverage gate
+        env:
+          SINCE_YEAR: ${{ needs.prepare.outputs.since_year }}
+          QUARTER: ${{ needs.prepare.outputs.quarter }}
+        run: |
+          set -euo pipefail
+          ARGS=(--fail-under 0.85 --max-missing 25)
+          if [ -n "${QUARTER:-}" ]; then
+            ARGS+=(--quarter "$QUARTER")
+          elif [ -n "${SINCE_YEAR:-}" ]; then
+            ARGS+=(--since-year "$SINCE_YEAR")
+          else
+            ARGS+=(--since-year "$(( $(date -u +%Y) - 1 ))")
+          fi
+          python _system/scripts/check_letter_drive_coverage.py "${ARGS[@]}"
 
       - name: Commit ops repo dashboard updates
         uses: ./.github/actions/commit-main

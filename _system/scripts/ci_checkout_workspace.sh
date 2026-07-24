@@ -70,20 +70,21 @@ case "$PROFILE" in
     ;;
   minimal|marvin-agent)
     git sparse-checkout init --no-cone
-    git sparse-checkout set _system .github
+    # Makefile is required for letter-date-check / document-sync make targets.
+    git sparse-checkout set _system .github Makefile
     git fetch --depth="$FETCH_DEPTH" --filter=blob:none origin "$REF"
     checkout_ref
     ;;
   pages)
     git sparse-checkout init --no-cone
-    git sparse-checkout set _system .github dashboard
+    git sparse-checkout set _system .github dashboard Makefile
     git fetch --depth="$FETCH_DEPTH" --filter=blob:none origin "$REF"
     checkout_ref
     ;;
   news|marvin-pick|darwin|dashboard)
     git sparse-checkout init --no-cone
     # Seed with base dirs so fetch can resolve scripts before path list runs.
-    git sparse-checkout set _system .github dashboard
+    git sparse-checkout set _system .github dashboard Makefile
     git fetch --depth="$FETCH_DEPTH" --filter=blob:none origin "$REF"
     checkout_ref
     apply_sparse_paths
