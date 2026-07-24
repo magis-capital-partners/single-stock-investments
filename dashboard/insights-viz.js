@@ -578,32 +578,65 @@
     return `<p class="subhead">No data for ${escapeHtml(period?.label || 'this period')}.</p>`;
   }
 
-  function renderLetterIndex(rows, escapeHtml, linkHtml, ghRepo, onFundClick, positionStats, period, timeModel) {
+  function uniqueTickers(list) {
+    const out = [];
+    const seen = new Set();
+    for (const raw of list || []) {
+      const t = String(raw || '').trim().toUpperCase();
+      if (!t || seen.has(t)) continue;
+      seen.add(t);
+      out.push(t);
+    }
+    return out;
+  }
+
+  function letterDocumentLabel(row) {
+    if (row?.document_label) return String(row.document_label);
+    const ref = row?.source_file || row?.source_document || '';
+    const stem = String(ref).replace(/\\/g, '/').split('/').pop() || '';
+    return stem.replace(/\.(txt|pdf|md)$/i, '').slice(0, 48);
+  }
+
+  function renderLetterIndex(rows, escapeHtml, linkHtml, ghRepo, onFundClick, positionStats, period, timeModel, bookOnly) {
     if (!rows?.length) {
       return renderPeriodEmptyState('letters', period, timeModel, escapeHtml);
     }
     const statsLine = positionStats
       ? `<p class="tier-sub" style="margin-bottom:8px">${positionStats}</p>`
       : '';
-    const fmtTickers = (list) => (list || []).slice(0, 5).join(', ') || '—';
+    const fmtTickers = (list) => uniqueTickers(list).slice(0, 5).join(', ') || '—';
+    const tickerHeader = bookOnly ? 'Other tickers' : 'Tickers';
     return `
       ${statsLine}
       <table class="darwin-table" id="insights-letter-table">
-        <thead><tr><th>Date</th><th>Fund</th><th>Quarter</th><th>Themes</th><th>Tickers</th><th>New / Add</th><th>Trim / Exit</th><th>Our overlap</th><th>Summary</th><th>Source</th></tr></thead>
+        <thead><tr><th>Date</th><th>Fund</th><th>Quarter</th><th>Themes</th><th>${tickerHeader}</th><th>New / Add</th><th>Trim / Exit</th><th>Our overlap</th><th>Summary</th><th>Source</th></tr></thead>
         <tbody>
-          ${rows.slice(0, 80).map(r => `
+          ${rows.slice(0, 80).map(r => {
+            const overlapSet = new Set(uniqueTickers(r.our_overlap));
+            const tickerList = bookOnly
+              ? uniqueTickers(r.tickers).filter(t => !overlapSet.has(t))
+              : uniqueTickers(r.tickers);
+            const fundCell = onFundClick
+              ? `<button type="button" class="linkish" data-fund-id="${escapeHtml(r.fund_id || '')}">${escapeHtml(r.fund)}</button>`
+              : escapeHtml(r.fund);
+            const docLabel = letterDocumentLabel(r);
+            const fundBlock = docLabel
+              ? `${fundCell}<div class="tier-sub" style="font-size:10px;margin-top:2px">${escapeHtml(docLabel)}</div>`
+              : fundCell;
+            return `
             <tr class="clickable-row" data-fund-id="${escapeHtml(r.fund_id || '')}">
               <td class="mono">${escapeHtml(r.letter_date || '—')}</td>
-              <td>${onFundClick ? `<button type="button" class="linkish" data-fund-id="${escapeHtml(r.fund_id || '')}">${escapeHtml(r.fund)}</button>` : escapeHtml(r.fund)}</td>
+              <td>${fundBlock}</td>
               <td class="mono">${escapeHtml(r.quarter || '—')}</td>
-              <td style="font-size:11px">${(r.themes || []).slice(0, 4).join(', ') || '—'}</td>
-              <td class="mono" style="font-size:11px">${(r.tickers || []).slice(0, 5).join(', ') || '—'}</td>
+              <td style="font-size:11px">${(r.themes || []).slice(0, 2).join(', ') || '—'}</td>
+              <td class="mono" style="font-size:11px">${fmtTickers(tickerList)}</td>
               <td class="mono" style="font-size:11px;color:var(--accent-green)">${fmtTickers(r.adds)}</td>
               <td class="mono" style="font-size:11px;color:var(--accent-amber)">${fmtTickers([...(r.trims || []), ...(r.exits || [])])}</td>
-              <td class="mono" style="font-size:11px;color:var(--accent-cyan)">${(r.our_overlap || []).join(', ') || '—'}</td>
+              <td class="mono" style="font-size:11px;color:var(--accent-cyan)">${fmtTickers(r.our_overlap)}</td>
               <td style="font-size:11px;max-width:240px">${escapeHtml((r.lead_summary || '').slice(0, 120))}</td>
               <td>${recordEvidenceLink(r, linkHtml, ghRepo)}</td>
-            </tr>`).join('')}
+            </tr>`;
+          }).join('')}
         </tbody>
       </table>
       ${rows.length > 80 ? `<p class="tier-sub">${rows.length - 80} more letters — use fund search</p>` : ''}`;
@@ -3734,7 +3767,7 @@
         : '';
       const positionStats = [posPct, `${letters.length} letter(s)`, escapeHtml(period.label), bookOnly ? 'overlap with our book only' : ''].filter(Boolean).join(' · ');
       body = `<p class="tier-sub" style="margin-bottom:8px">${escapeHtml(period.label)}${bookOnly ? ' · overlap with our book only' : ''}</p>`
-        + renderLetterIndex(letters, escapeHtml, linkHtml, ghRepo, true, positionStats, period, timeModel);
+        + renderLetterIndex(letters, escapeHtml, linkHtml, ghRepo, true, positionStats, period, timeModel, bookOnly);
     } else if (activeSection === 'funds') {
       body = renderFundRegistry(funds, escapeHtml, linkHtml, ghRepo, bookOnly);
     } else if (activeSection === 'documents') {
