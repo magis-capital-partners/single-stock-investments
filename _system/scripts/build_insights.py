@@ -150,6 +150,90 @@ def is_letter_meta_entry(letter: dict) -> bool:
     return False
 
 
+# Non-letter document_type values from build_superinvestor_insights.classify_document.
+NONLETTER_DOCUMENT_TYPES = frozenset(
+    {
+        "conference_idea",
+        "monitor",
+        "transcript",
+        "product_marketing",
+        "sell_side_research",
+        "other_research",
+    }
+)
+LETTERISH_DOCUMENT_TYPES = frozenset({"investor_letter", "fund_report"})
+NONLETTER_FILENAME_HINT = re.compile(
+    r"\b(conference|sohn|idea dinner|conference recap|monitors?|event driven trades|"
+    r"ed monitor|transcript|meeting notes?|presentation|factsheet|fact sheet|"
+    r"prospectus|tear sheet|deck|primer|playbook|white paper|blackbook|"
+    r"guide|survey|research report)\b",
+    re.I,
+)
+
+
+def is_letter_eligible_for_index(letter: dict) -> bool:
+    """Whether a vault letter row should appear in letter_index / fund aggregates.
+
+    Missing ``letter_eligible`` used to default to include, which let stale
+    conference/deck rows leak into the Letters table. Prefer an explicit flag,
+    then document_type, then a filename safety net.
+    """
+    if is_letter_meta_entry(letter):
+        return False
+    if "letter_eligible" in letter:
+        return bool(letter.get("letter_eligible"))
+    doc_type = str(letter.get("document_type") or "").strip().lower()
+    if doc_type in NONLETTER_DOCUMENT_TYPES:
+        return False
+    if doc_type in LETTERISH_DOCUMENT_TYPES:
+        return True
+    label_bits = [
+        str(letter.get("fund") or ""),
+        str(letter.get("fund_id") or ""),
+        Path(str(letter.get("source_file") or letter.get("source_document") or "")).stem,
+    ]
+    label = " ".join(label_bits)
+    if NONLETTER_FILENAME_HINT.search(label.replace("_", " ").replace("-", " ")):
+        return False
+    return True
+
+
+def unique_tickers(values: list) -> list[str]:
+    """Preserve first-seen order; drop empties and case-normalized duplicates."""
+    out: list[str] = []
+    seen: set[str] = set()
+    for raw in values or []:
+        ticker = str(raw or "").strip().upper()
+        if not ticker or ticker in seen:
+            continue
+        seen.add(ticker)
+        out.append(ticker)
+    return out
+
+
+def letter_document_label(letter: dict) -> str:
+    """Short stem label so multi-issue funds (HFA/KEDM) stay distinguishable."""
+    ref = str(letter.get("source_file") or letter.get("source_document") or "")
+    stem = Path(ref.replace("\\", "/")).stem.strip()
+    if not stem:
+        return ""
+    fund = str(letter.get("fund") or "").strip()
+    fund_id = str(letter.get("fund_id") or "").strip()
+    cleaned = stem
+    for prefix in (fund, fund_id, fund.replace(" ", "-"), fund_id.replace("_", "-")):
+        if not prefix:
+            continue
+        for sep in ("-", "_", " "):
+            needle = f"{prefix}{sep}"
+            if cleaned.lower().startswith(needle.lower()):
+                cleaned = cleaned[len(needle) :].lstrip("-_ ")
+                break
+    cleaned = re.sub(r"\s+", " ", cleaned).strip(" -_")
+    if len(cleaned) > 48:
+        cleaned = cleaned[:45].rstrip() + "…"
+    return cleaned
+
+
 def canonicalize_letter_fund(letter: dict) -> dict:
     """Return a letter with legacy quarter-specific fund aliases collapsed."""
     fund_id, fund = canonicalize_fund_identity(letter.get("fund_id"), letter.get("fund"))
@@ -362,7 +446,7 @@ def count_vault_letters() -> int:
     letters = [
         letter
         for letter in (letters_doc.get("letters") or [])
-        if not is_letter_meta_entry(letter) and letter.get("letter_eligible", True)
+        if is_letter_eligible_for_index(letter)
     ]
     return len(letters)
 
@@ -1699,13 +1783,26 @@ def fund_registry(letters: list[dict], our_tickers: set[str]) -> list[dict]:
 def letter_index(letters: list[dict], our_tickers: set[str]) -> list[dict]:
     rows: list[dict] = []
     for letter in letters:
-        tickers = [str(t).upper() for t in (letter.get("tickers") or [])]
+        tickers = unique_tickers([str(t).upper() for t in (letter.get("tickers") or [])])
         overlap = sorted(set(tickers) & our_tickers)
         positions = letter.get("positions") or []
-        adds = [p["ticker"] for p in positions if p.get("action") in {"add", "new", "buy"} and p.get("ticker")]
-        trims = [p["ticker"] for p in positions if p.get("action") in {"trim", "exit"} and p.get("ticker")]
-        shorts = [p["ticker"] for p in positions if p.get("action") == "short" and p.get("ticker")]
-        exits = [p["ticker"] for p in positions if p.get("action") == "exit" and p.get("ticker")]
+        adds = unique_tickers(
+            [
+                p["ticker"]
+                for p in positions
+                if p.get("action") in {"add", "new", "buy"} and p.get("ticker")
+            ]
+        )
+        # trim only — exits stay in exits so Trim/Exit UI concat cannot double-count
+        trims = unique_tickers(
+            [p["ticker"] for p in positions if p.get("action") == "trim" and p.get("ticker")]
+        )
+        shorts = unique_tickers(
+            [p["ticker"] for p in positions if p.get("action") == "short" and p.get("ticker")]
+        )
+        exits = unique_tickers(
+            [p["ticker"] for p in positions if p.get("action") == "exit" and p.get("ticker")]
+        )
         letter_ev = letter_evidence_fields(letter)
         rows.append(
             {
@@ -1714,6 +1811,7 @@ def letter_index(letters: list[dict], our_tickers: set[str]) -> list[dict]:
                 "manager": letter.get("manager") or "",
                 "quarter": letter.get("quarter"),
                 "letter_date": letter.get("letter_date"),
+                "document_label": letter_document_label(letter),
                 "themes": [t.get("theme") for t in (letter.get("themes") or []) if t.get("theme")],
                 "tickers": tickers[:20],
                 "our_overlap": overlap,
@@ -3067,7 +3165,7 @@ def main() -> int:
         letters = [
             canonicalize_letter_fund(letter)
             for letter in (letters_doc.get("letters") or [])
-            if not is_letter_meta_entry(letter) and letter.get("letter_eligible", True)
+            if is_letter_eligible_for_index(letter)
         ]
         letters, fund_identity_audit = consolidate_letter_funds_stable(letters)
         letters, downstream_duplicates_suppressed = dedupe_canonical_letters(letters)
