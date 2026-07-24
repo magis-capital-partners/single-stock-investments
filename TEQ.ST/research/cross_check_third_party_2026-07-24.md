@@ -3,51 +3,74 @@
 **Date:** 2026-07-24  
 **Agent:** Marvin (contract backfill refresh)  
 **Marvin dive:** `TEQ.ST/research/deep_dive_2026-07-24.md`  
-**Source inventory:** `TEQ.ST/third-party-analyses/source_inventory_2026-06-01.md` (unchanged)  
+**Source inventory:** `TEQ.ST/third-party-analyses/source_inventory_2026-06-01.md`  
 **Framework:** `_system/frameworks/third_party_cross_reference.md`, `external_view_blend.md`
 
 ## Executive summary
 
-Marvin base Lawrence return **14.4%** per year (stance gate) from primary filings; total synthesis **18.14%** includes context-tier weights. Proof-backed component economic value base **142.2 SEK/sh** vs **158 SEK** spot. **14** context-tier sources indexed; no new approved third-party IRR in base case.
+Marvin Lawrence base **13.8%** per year (serial_acquirer; stance **hold** per registry) from primary filings and `valuation.json`; total synthesis **17.54%**. Proof-backed component economic value base **142.2 SEK/sh** vs **163 SEK** spot (2026-07-22). **14** context-tier source(s) indexed; triangulation qualitative only. **[HUMAN REVIEW]** for approved-source numeric blend.
 
-**Synthesis (best estimate):** Marvin **14.4%** Lawrence base · stance **hold** (human); external sources adjust conviction on serial-acquirer quality, not primary IRR without human OK.
+**Synthesis (best estimate):** Marvin **13.8%** Lawrence base · stance **hold**; external sources adjust conviction on catalyst timing, not primary IRR without human OK.
 
 ## Sources in scope
 
-Same inventory as `cross_check_third_party_2026-06-01.md` (Redeye, Börsdata, DI, Slow Compounding, MicroCap Expert, Value Bridge, beQuoted podcast, Antheia/Vixar block). All remain **[PENDING APPROVAL]** or context tier per `third_party_sources.md`.
+| Source ID | Title | Path | Status | Cross-check status |
+|-----------|-------|------|--------|-------------------|
+| reference | **Redeye** | `https://www.redeye.se/company/teqnion-2` | context | [x] context |
+| reference | Redeye | `https://www.redeye.se/company/teqnion-2/financials` | context | [x] context |
+| reference | Redeye | `https://www.redeye.se/company/teqnion-2/estimates` | context | [x] context |
+| reference | Redeye | `https://www.redeye.se/company/teqnion-2/about-analyst` | context | [x] context |
+| reference | Redeye | `https://www.redeye.se/company/teqnion-2/updates` | context | [x] context |
+| reference | **Börsdata** | `https://borsdata.se/teqnion/analys` | context | [x] context |
+| reference | **Dagens Industri** | `https://www.di.se/amnen/teqnion/` | context | [x] context |
+| reference | DI Börsnack | `https://borssnack.di.se/bors/aktier/teq-4304716/rapporter/` | context | [x] context |
+| reference | Alexander (Slow Compounding) | `https://slowcompounding.substack.com/p/company-snapshot-teqnion-ab` | context | [x] context |
+| reference | Alexander (Slow Compounding) | `https://slowcompounding.substack.com/p/teqnion-2026-q1-confirmed-the-thesis` | context | [x] context |
+| reference | MicroCap Expert | `https://microcapexpert.substack.com/p/teqnion-a-small-serial-acquirer-from` | context | [x] context |
+| reference | Value Bridge | `https://value-bridge.co/p/teqnion-ab-questions-to-daniel-zhang` | context | [x] context |
+| reference | The Investors Podcast Network | `https://news.bequoted.com/newsroom/teqnion/presentations/teqnion-stock-explained-w-daniel-zhang-106005/` | context | [x] context |
+| reference | Antheia (Daniel Ek) acquires ~12% from Vixar for 3 | `https://news.cision.com/vixar-ab/r/vixar-agrees-to-sell-half-of-its-holdings-in-teqnion-to-antheia-for-msek-360,c4117529` | context | [x] context |
 
 ## Agreements (facts)
 
 | Topic | Marvin (filings) | External | Source |
 |-------|------------------|----------|--------|
-| Serial acquirer model | Decentralized portfolio; 38 subsidiaries FY2025 | Substack posts echo structure | Annual 2025; Slow Compounding |
-| Margin / FCF inflection | EBITA +36%; op CF +92% | Q1 2026 posts note record margin | Annual 2025; Alexander Substack |
-| Reinvestment policy | No dividend FY2025 | External notes capital allocation discipline | Year-end 2025 |
+| Base return anchor | **13.8%** per year Lawrence | Qualitative support only | `TEQ.ST/research/deep_dive_2026-07-24.md` |
+| Archetype / stance | **serial_acquirer** · **hold** | See indexed sources | `valuation.json` |
+| Normalization | FY2025 FCF ex-acquisitions as run-rate base; Q1 2026 EBITA margin 14.3% above FY | Cross-check vs posts | Marvin |
 
 ## Divergences (normalization / stance)
 
 | Topic | Marvin floor | External | Blend logic |
 |-------|--------------|----------|-------------|
-| Primary IRR | **14.4%** Lawrence base | No approved spot IRR | Marvin numeric; external qualitative only |
-| Component value | **142.2 SEK/sh** proof base | Sell-side targets subscription-only (Redeye) | Do not blend until human promotes |
-| Stance | **hold** (registry) | Bullish blog tone | Context only |
+| Primary IRR | **13.8%** (Lawrence / scenarios) | No single approved IRR unless promoted | Marvin **70%** numeric; external **30%** catalyst timing |
+| Third party | Filing-first | Context tier only | No numeric upgrade without human OK |
 
 ## Blended estimate (best judgment)
 
-| View | Return / value | Weight | Notes |
-|------|----------------|--------|-------|
-| Marvin Lawrence base | 14.4% per year | 100% numeric gate | Filing-backed FCF path |
-| Marvin synthesis | 18.14% per year | Context | Includes scenario + qualitative pp |
-| External numeric | n/a | 0% | No approved third-party IRR |
+| Lens | Owner cash / value | Return / horizon | Stance hint |
+|------|-------------------|------------------|-------------|
+| Marvin floor | Component base **142.2 SEK/sh** | **13.8%** | **hold** |
+| External (combined) | Narrative / catalyst | No change to base % | **hold** (conviction) |
+| **Blended best estimate** | **Filing anchor** | **13.8%** | **hold** |
 
-**Weighted middle:** **14.4%** per year for stance; synthesis **18.14%** for dashboard context only.
+**Weights:** Marvin **70%** on numbers; indexed third party **30%** on catalyst timing and narrative (approved Substacks/HK context only in qualitative layer until human promotes).
 
-## Missing data
+**Returns statement (blended):** We expect **13.8%** per year at today's price on the Marvin Lawrence base case; third-party sources may raise or lower conviction on timing but do not replace filing math without **[HUMAN REVIEW]**.
 
-- Redeye estimates behind paywall.
-- Q1 2026 interim not full-tier extracted.
+## [HUMAN REVIEW]
 
-## Falsifiers
+- [ ] Every **approved** source reviewed against filings
+- [ ] Every **pending** source cited with **[PENDING APPROVAL]** only
+- [ ] Blended estimate in `valuation.json` → `estimates.external[]` if material
 
-- External promotion of TEQ without addressing organic −5% and goodwill impairment would overstate quality.
-- Using bull scenario (21.1%) as third-party proxy when cross-check says no base IRR upgrade.
+## [PROPOSED MEMORY]
+
+- [PROPOSED COMPANY] TEQ.ST: third-party cross-check refresh 2026-07-24 — Lawrence **13.8%** unchanged; component proof base **142.2 SEK/sh**
+
+## Primary sources cited
+
+1. `TEQ.ST/research/deep_dive_2026-07-24.md`
+2. `TEQ.ST/research/valuation.json`
+3. `TEQ.ST/third-party-analyses/source_inventory_2026-06-01.md`
+4. `TEQ.ST/third-party-analyses/references.md`
