@@ -97,6 +97,36 @@ class ResolveLocalPdfTests(unittest.TestCase):
             updated = imp.extract_texts([pdf])
             self.assertEqual(updated, 0)
 
+    def test_skips_download_when_vault_text_exists_without_pdf(self) -> None:
+        """PDFs are gitignored; committed .txt must count as already ingested."""
+        with tempfile.TemporaryDirectory() as tmp:
+            dest_dir = Path(tmp) / "2026Q2"
+            dest_dir.mkdir()
+            txt = dest_dir / "Engine_Capital_Q2_2026_FINAL.txt"
+            txt.write_text("Dear Partners,\n\n" + ("Thesis " * 40), encoding="utf-8")
+
+            path, skip = imp.resolve_local_pdf(
+                dest_dir,
+                "Engine_Capital_Q2_2026_FINAL.pdf",
+                "drivefileid123456",
+                drive_size=1104850,
+                manifest_entry=None,
+            )
+            self.assertTrue(skip)
+            self.assertEqual(path, dest_dir / "Engine_Capital_Q2_2026_FINAL.pdf")
+            self.assertFalse(path.exists())
+
+    def test_extract_skips_text_only_without_statting_missing_pdf(self) -> None:
+        """Regression: pdf.stat() must not run when PDF is gitignored/absent."""
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            pdf = root / "Caius Capital Master Fund_Investor Letter_May 2026 (Prospect).pdf"
+            txt = root / "Caius Capital Master Fund_Investor Letter_May 2026 (Prospect).txt"
+            txt.write_text("Dear Partners,\n\n" + ("Alpha " * 40), encoding="utf-8")
+            self.assertFalse(pdf.exists())
+            updated = imp.extract_texts([pdf])
+            self.assertEqual(updated, 0)
+
 
 class ShardPartitionTests(unittest.TestCase):
     def test_shard_bucket_is_deterministic(self) -> None:

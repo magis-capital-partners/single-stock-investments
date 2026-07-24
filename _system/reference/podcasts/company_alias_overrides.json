@@ -1,0 +1,55 @@
+{
+  "schema_version": 1,
+  "updated": "2026-07-24",
+  "notes": "Manual company phrase ? ticker or near-universe key. Collision guards prevent Evotec false positives.",
+  "aliases": [
+    {
+      "company_key": "evolution_gaming",
+      "phrases": [
+        "Evolution Gaming",
+        "Evolution AB",
+        "Evolution Group",
+        "Evolution (publ)",
+        "NetEnt",
+        "Dialogue. Evolution",
+        "Company. Evolution",
+        "Evolution 1Q",
+        "Evolution 2Q",
+        "Evolution 3Q",
+        "Evolution 4Q"
+      ],
+      "ticker": "EVO.ST",
+      "in_book": true,
+      "near_universe": false,
+      "context_require_any": [
+        "gaming",
+        "casino",
+        "live casino",
+        "netent",
+        "b2b",
+        "dialogue",
+        "company.",
+        "earnings",
+        "asia",
+        "uk investigation"
+      ],
+      "context_reject_any": [],
+      "collision_tickers": [
+        "EVO"
+      ]
+    }
+  ],
+  "collision_guards": [
+    {
+      "ticker": "EVO",
+      "name_contains": "Evotec",
+      "reject_if_context_any": [
+        "gaming",
+        "casino",
+        "netent",
+        "live casino",
+        "evolution gaming"
+      ]
+    }
+  ]
+}

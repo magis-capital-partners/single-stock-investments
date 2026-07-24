@@ -1,0 +1,79 @@
+{
+  "base_irr_pct": 38.04,
+  "classification": {
+    "archetype": "croupier",
+    "cycle": "mid",
+    "dhando": "partial",
+    "lawrence_bucket": "multi_sided",
+    "moat": "partial",
+    "payoff_lens": "operating"
+  },
+  "evidence_citations": [
+    "7176.T/third-party-analyses/source_inventory_2026-06-04.md",
+    "7176.T/02_Quarterly/Earnings_Releases/20260528_2026\u5e743_\u6708\u671f_\u6c7a\u7b97\u77ed\u4fe1_\u65e5\u672c\u57fa\u6e96_\u9023\u7d50__finfo2026.pdf",
+    "7176.T/INDEX.csv",
+    "7176.T/research/evidence/filing_digest_2026-06-04.md",
+    "7176.T/research/adversarial_2026-06-04.md"
+  ],
+  "filing_digest": "7176.T/research/evidence/filing_digest_2026-07-24.md",
+  "generated_at": "2026-07-24T14:50:37+00:00",
+  "irr_label": "7yr IRR (total synthesis)",
+  "key_assumptions": [
+    {
+      "input": "Price today",
+      "source": "Yahoo 7176.T close 2026-07-23",
+      "value": "**$757.0**"
+    },
+    {
+      "input": "Starting free cash flow per share",
+      "source": "FY2025 split-adjusted parent PAT per share; FY2026 was 317.33 yen/sh (+131% YoY); use FY25 as mid-cycle croupier anchor",
+      "value": "**$137.14**"
+    },
+    {
+      "input": "Cycle adjustment (starting cash)",
+      "source": "Croupier mid-cycle: Lawrence gate uses FY2025 owner cash, not FY2026 peak success-fee earnings. Price is last thin print, not VWAP.",
+      "value": "**mid**"
+    },
+    {
+      "input": "Growth in years 1 through 5",
+      "source": "Base fees track AUM (+2.9% AUM, +17% base fees FY26); mid-cycle owner cash FY25",
+      "value": "**5.0%** per year"
+    },
+    {
+      "input": "Growth in years 6 through 7",
+      "source": "Scenario base",
+      "value": "**3.5%** per year"
+    },
+    {
+      "input": "Selling multiple in year 10",
+      "source": "Scenario base",
+      "value": "**16 times cash flow**"
+    },
+    {
+      "input": "Time horizon",
+      "source": "7-year owner-cash model",
+      "value": "**7 years**"
+    }
+  ],
+  "last_verified": {
+    "deep_dive": "2026-06-04",
+    "human_approved": null,
+    "valuation_as_of": "2026-07-24"
+  },
+  "open_questions": [
+    "Confirm **live TSE price** and depth; do not use Stooq/Yahoo alone.",
+    "Download **yuho** via EDINET E31267 when API key is available; verify segments and non-recurring items.",
+    "Reconcile **operating cash flow** vs net income for owner-cash normalization.",
+    "Old dive error:** ~\u00a523/sh on ~300M shares was pre-split / wrong share count; corrected to split-adjusted filing EPS."
+  ],
+  "scenarios": {
+    "base": 35.2,
+    "bear": 28.2,
+    "bull": 43.2
+  },
+  "schema_version": "1.0",
+  "stance": null,
+  "thesis": "Simplex Financial Holdings Co., Ltd. (7176.T) is a Tokyo-based independent asset manager and ETF sponsor on TSE Prime. **[Fact]** It runs three lines: institutional fund management, listed ETF creation and management (Nikkei, TOPIX, leveraged, inverse, thematic, and Japan-first active ETFs), and an open-innovation layer that connects investors and banks. **[Fact]** The group traces to Simplex Asset Management (founded 1999). **[Fact]** FY2026 (year ended March 2026) consolidated revenue was **\u00a522.5 billion**, parent net income **\u00a510.6 billion**, and split-adjusted basic earnings per share **\u00a5317.33** (`7176.T/02_Quarterly/Earnings_Releases/20260528_2026\u5e743_\u6708\u671f_\u6c7a\u7b97\u77ed\u4fe1_\u65e5\u672c\u57fa\u6e96_\u9023\u7d50__finfo2026.pdf`). IR materials: http://www.simplexasset.com/sfh/ (holding company site frames this feed).",
+  "ticker": "7176.T",
+  "why_market_wrong": "The market may treat 7176.T as an illiquid micro-float while underpricing a **croupier-like** fee stack on Japan ETF and institutional flows. **[Inference]** At the last exchange print (**\u00a5464**, 100 shares, January 2026), mechanical math on **mid-cycle** owner cash looks very cheap versus FY2025 earnings power. **[Inference]** That print is not a continuous liquid market: there is no reliable daily tape, so charts and portfolio backtests understate both risk and the uncertainty of \"market price.\" There is **no dated predictive attribute** in our base case."
+}

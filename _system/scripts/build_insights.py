@@ -27,7 +27,13 @@ from filing_facts import (  # noqa: E402
     filing_metadata_from_text_path,
     source_filing_ref_from_text_path,
 )
-from vault_paths import letters_ref, letters_root, path_to_letters_ref  # noqa: E402
+from vault_paths import (  # noqa: E402
+    letters_ref,
+    letters_root,
+    path_to_letters_ref,
+    path_to_podcasts_ref,
+    podcasts_root,
+)
 from fund_families import (  # noqa: E402
     collapse_display_label,
     commentary_hash,
@@ -49,6 +55,8 @@ from insider_materiality import score_form4_event  # noqa: E402
 OUTPUT = ROOT / "dashboard" / "data" / "insights.json"
 ARCHIVE_OUTPUT = ROOT / "_system" / "reference" / "data-sources" / "insights_record_archive.json"
 LETTERS_INSIGHTS = letters_root() / "insights.json"
+PODCASTS_INSIGHTS = podcasts_root() / "insights.json"
+PODCASTS_INSIGHTS_MIRROR = ROOT / "_system" / "reference" / "podcasts" / "insights_mirror.json"
 # Full letter corpus is built offline (letter-backfill) and committed in dashboard/data/.
 # CI vault clones often lag; never regress below this floor on deploy rebuilds.
 MIN_LETTER_CORPUS = 15000
@@ -84,6 +92,7 @@ SOURCE_META = {
     "specialist_13f": {"label": "Specialist 13F", "materiality": 0.88, "quality": 0.92, "axis": "ownership"},
     "tracked_fund_13f": {"label": "Tracked Fund 13F", "materiality": 0.84, "quality": 0.9, "axis": "ownership"},
     "superinvestor_letter": {"label": "Letter", "materiality": 0.8, "quality": 0.82, "axis": "ownership"},
+    "podcast_episode": {"label": "Podcast", "materiality": 0.72, "quality": 0.75, "axis": "variant_view"},
     "sumzero_research": {"label": "SumZero", "materiality": 0.64, "quality": 0.68, "axis": "variant_view"},
     "reddit_mention": {"label": "Reddit", "materiality": 0.42, "quality": 0.4, "axis": "context"},
     "news": {"label": "News", "materiality": 0.72, "quality": 0.7, "axis": "catalyst"},
@@ -148,6 +157,90 @@ def is_letter_meta_entry(letter: dict) -> bool:
     if fund_id == "readme" or fund == "readme":
         return True
     return False
+
+
+# Non-letter document_type values from build_superinvestor_insights.classify_document.
+NONLETTER_DOCUMENT_TYPES = frozenset(
+    {
+        "conference_idea",
+        "monitor",
+        "transcript",
+        "product_marketing",
+        "sell_side_research",
+        "other_research",
+    }
+)
+LETTERISH_DOCUMENT_TYPES = frozenset({"investor_letter", "fund_report"})
+NONLETTER_FILENAME_HINT = re.compile(
+    r"\b(conference|sohn|idea dinner|conference recap|monitors?|event driven trades|"
+    r"ed monitor|transcript|meeting notes?|presentation|factsheet|fact sheet|"
+    r"prospectus|tear sheet|deck|primer|playbook|white paper|blackbook|"
+    r"guide|survey|research report)\b",
+    re.I,
+)
+
+
+def is_letter_eligible_for_index(letter: dict) -> bool:
+    """Whether a vault letter row should appear in letter_index / fund aggregates.
+
+    Missing ``letter_eligible`` used to default to include, which let stale
+    conference/deck rows leak into the Letters table. Prefer an explicit flag,
+    then document_type, then a filename safety net.
+    """
+    if is_letter_meta_entry(letter):
+        return False
+    if "letter_eligible" in letter:
+        return bool(letter.get("letter_eligible"))
+    doc_type = str(letter.get("document_type") or "").strip().lower()
+    if doc_type in NONLETTER_DOCUMENT_TYPES:
+        return False
+    if doc_type in LETTERISH_DOCUMENT_TYPES:
+        return True
+    label_bits = [
+        str(letter.get("fund") or ""),
+        str(letter.get("fund_id") or ""),
+        Path(str(letter.get("source_file") or letter.get("source_document") or "")).stem,
+    ]
+    label = " ".join(label_bits)
+    if NONLETTER_FILENAME_HINT.search(label.replace("_", " ").replace("-", " ")):
+        return False
+    return True
+
+
+def unique_tickers(values: list) -> list[str]:
+    """Preserve first-seen order; drop empties and case-normalized duplicates."""
+    out: list[str] = []
+    seen: set[str] = set()
+    for raw in values or []:
+        ticker = str(raw or "").strip().upper()
+        if not ticker or ticker in seen:
+            continue
+        seen.add(ticker)
+        out.append(ticker)
+    return out
+
+
+def letter_document_label(letter: dict) -> str:
+    """Short stem label so multi-issue funds (HFA/KEDM) stay distinguishable."""
+    ref = str(letter.get("source_file") or letter.get("source_document") or "")
+    stem = Path(ref.replace("\\", "/")).stem.strip()
+    if not stem:
+        return ""
+    fund = str(letter.get("fund") or "").strip()
+    fund_id = str(letter.get("fund_id") or "").strip()
+    cleaned = stem
+    for prefix in (fund, fund_id, fund.replace(" ", "-"), fund_id.replace("_", "-")):
+        if not prefix:
+            continue
+        for sep in ("-", "_", " "):
+            needle = f"{prefix}{sep}"
+            if cleaned.lower().startswith(needle.lower()):
+                cleaned = cleaned[len(needle) :].lstrip("-_ ")
+                break
+    cleaned = re.sub(r"\s+", " ", cleaned).strip(" -_")
+    if len(cleaned) > 48:
+        cleaned = cleaned[:45].rstrip() + "…"
+    return cleaned
 
 
 def canonicalize_letter_fund(letter: dict) -> dict:
@@ -256,7 +349,7 @@ def relative_path(path: Path) -> str:
     try:
         return str(path.relative_to(ROOT)).replace("\\", "/")
     except ValueError:
-        ref = path_to_letters_ref(path)
+        ref = path_to_letters_ref(path) or path_to_podcasts_ref(path)
         if ref:
             return ref
         return str(path).replace("\\", "/")
@@ -273,6 +366,9 @@ def source_document_ref(ref: str | None) -> str | None:
         return clean
     base = clean.split("#", 1)[0].replace("\\", "/")
     suffix = f"#{clean.split('#', 1)[1]}" if "#" in clean else ""
+    # Podcast transcripts live in the vault; keep logical .txt/.meta refs (no PDF twin).
+    if base.startswith("_system/reference/podcasts/"):
+        return base + suffix
     path = ROOT / base
     if "superinvestor-letters" in base and path.suffix.lower() in {".txt", ".md"}:
         return relative_path(path.with_suffix(".pdf")) + suffix
@@ -362,7 +458,7 @@ def count_vault_letters() -> int:
     letters = [
         letter
         for letter in (letters_doc.get("letters") or [])
-        if not is_letter_meta_entry(letter) and letter.get("letter_eligible", True)
+        if is_letter_eligible_for_index(letter)
     ]
     return len(letters)
 
@@ -669,6 +765,176 @@ def from_superinvestor_letters(doc: dict) -> list[dict]:
                 )
             )
     return out
+
+
+def load_podcast_insights_doc() -> dict:
+    for path in (PODCASTS_INSIGHTS, PODCASTS_INSIGHTS_MIRROR):
+        doc = load_json(path)
+        if isinstance(doc, dict) and (doc.get("episodes") or doc.get("episode_count")):
+            return doc
+    return {"episodes": []}
+
+
+def from_podcast_episodes(doc: dict) -> list[dict]:
+    out: list[dict] = []
+    for ep in doc.get("episodes") or []:
+        show = ep.get("show_title") or ep.get("show_id") or "Podcast"
+        as_of = ep.get("published")
+        source_ref = source_document_ref(ep.get("source_document"))
+        guests = ep.get("guests") or []
+        guest_labels = ", ".join(
+            g.get("display") or g.get("guest_id") or "" for g in guests if g.get("display") or g.get("guest_id")
+        )
+        persona_ids = ep.get("persona_ids") or []
+        for th in ep.get("themes") or []:
+            out.append(
+                insight_record(
+                    source="podcast_episode",
+                    as_of=as_of,
+                    scope="theme",
+                    ref=th.get("theme"),
+                    claim=f"{show}: {th.get('theme')} — {th.get('stance', 'neutral')}",
+                    direction={"constructive": "bullish", "cautious": "bearish"}.get(
+                        th.get("stance"), "neutral"
+                    ),
+                    evidence_ref=source_ref,
+                    event_type="podcast_theme",
+                    impact_axis="macro",
+                    show=show,
+                    show_id=ep.get("show_id"),
+                    episode_id=ep.get("episode_id"),
+                    title=ep.get("title"),
+                    guests=guest_labels,
+                    persona_ids=persona_ids,
+                    has_pz_guest=bool(ep.get("has_pz_guest")),
+                    has_officer_hit=bool(ep.get("has_officer_hit")),
+                    near_universe=bool(ep.get("near_universe")),
+                    tickers=th.get("tickers") or ep.get("tickers") or [],
+                    in_base_irr=False,
+                )
+            )
+        for pos in ep.get("positions") or []:
+            tk = pos.get("ticker")
+            if not tk:
+                continue
+            commentary = pos.get("commentary") or ""
+            claim = f"{show} discussed {tk}"
+            if guest_labels:
+                claim += f" ({guest_labels})"
+            if commentary:
+                claim += f" — {commentary[:180]}"
+            out.append(
+                insight_record(
+                    source="podcast_episode",
+                    as_of=as_of,
+                    scope="ticker",
+                    ref=tk,
+                    claim=claim,
+                    direction="neutral",
+                    evidence_ref=source_ref,
+                    event_type="podcast_position",
+                    impact_axis="variant_view",
+                    show=show,
+                    show_id=ep.get("show_id"),
+                    episode_id=ep.get("episode_id"),
+                    title=ep.get("title"),
+                    guests=guest_labels,
+                    persona_ids=persona_ids,
+                    has_pz_guest=bool(ep.get("has_pz_guest")),
+                    has_officer_hit=bool(ep.get("has_officer_hit")),
+                    near_universe=bool(ep.get("near_universe")),
+                    action=pos.get("action") or "discussed",
+                    commentary=commentary,
+                    highlights=ep.get("highlights") or [],
+                    in_base_irr=False,
+                )
+            )
+        # Officer / near-universe company hits without positions still surface
+        if not (ep.get("positions") or []) and (
+            ep.get("has_officer_hit") or ep.get("has_pz_guest") or ep.get("near_universe")
+        ):
+            companies = ep.get("companies") or []
+            for c in companies:
+                tk = c.get("ticker") or c.get("company_key")
+                if not tk:
+                    continue
+                out.append(
+                    insight_record(
+                        source="podcast_episode",
+                        as_of=as_of,
+                        scope="ticker" if c.get("ticker") else "theme",
+                        ref=tk,
+                        claim=f"{show}: officer/company episode — {ep.get('title') or tk}",
+                        direction="neutral",
+                        evidence_ref=source_ref,
+                        event_type="podcast_officer",
+                        impact_axis="variant_view",
+                        show=show,
+                        show_id=ep.get("show_id"),
+                        episode_id=ep.get("episode_id"),
+                        title=ep.get("title"),
+                        guests=guest_labels,
+                        persona_ids=persona_ids,
+                        has_pz_guest=bool(ep.get("has_pz_guest")),
+                        has_officer_hit=True,
+                        near_universe=bool(c.get("near_universe") or ep.get("near_universe")),
+                        in_book=bool(c.get("in_book")),
+                        in_base_irr=False,
+                    )
+                )
+    return out
+
+
+def podcast_index_rows(doc: dict) -> list[dict]:
+    rows = []
+    for ep in doc.get("episodes") or []:
+        rows.append(
+            {
+                "episode_id": ep.get("episode_id"),
+                "show_id": ep.get("show_id"),
+                "show_title": ep.get("show_title"),
+                "title": ep.get("title"),
+                "published": ep.get("published"),
+                "tickers": ep.get("tickers") or [],
+                "guests": [g.get("display") or g.get("guest_id") for g in (ep.get("guests") or [])],
+                "persona_ids": ep.get("persona_ids") or [],
+                "has_pz_guest": bool(ep.get("has_pz_guest")),
+                "has_officer_hit": bool(ep.get("has_officer_hit")),
+                "near_universe": bool(ep.get("near_universe")),
+                "in_book": bool(ep.get("in_book")),
+                "highlight_count": len(ep.get("highlights") or []),
+                "source_document": ep.get("source_document"),
+                "link": ep.get("link"),
+            }
+        )
+    return rows
+
+
+def podcast_by_show(doc: dict) -> dict:
+    by: dict[str, dict] = {}
+    for ep in doc.get("episodes") or []:
+        sid = ep.get("show_id") or "unknown"
+        profile = by.setdefault(
+            sid,
+            {
+                "show_id": sid,
+                "show_title": ep.get("show_title") or sid,
+                "episode_count": 0,
+                "episodes": [],
+            },
+        )
+        profile["episode_count"] += 1
+        profile["episodes"].append(
+            {
+                "episode_id": ep.get("episode_id"),
+                "title": ep.get("title"),
+                "published": ep.get("published"),
+                "tickers": ep.get("tickers") or [],
+                "has_pz_guest": bool(ep.get("has_pz_guest")),
+                "has_officer_hit": bool(ep.get("has_officer_hit")),
+            }
+        )
+    return by
 
 
 def from_valuation_context(ticker: str, val: dict) -> list[dict]:
@@ -1699,13 +1965,26 @@ def fund_registry(letters: list[dict], our_tickers: set[str]) -> list[dict]:
 def letter_index(letters: list[dict], our_tickers: set[str]) -> list[dict]:
     rows: list[dict] = []
     for letter in letters:
-        tickers = [str(t).upper() for t in (letter.get("tickers") or [])]
+        tickers = unique_tickers([str(t).upper() for t in (letter.get("tickers") or [])])
         overlap = sorted(set(tickers) & our_tickers)
         positions = letter.get("positions") or []
-        adds = [p["ticker"] for p in positions if p.get("action") in {"add", "new", "buy"} and p.get("ticker")]
-        trims = [p["ticker"] for p in positions if p.get("action") in {"trim", "exit"} and p.get("ticker")]
-        shorts = [p["ticker"] for p in positions if p.get("action") == "short" and p.get("ticker")]
-        exits = [p["ticker"] for p in positions if p.get("action") == "exit" and p.get("ticker")]
+        adds = unique_tickers(
+            [
+                p["ticker"]
+                for p in positions
+                if p.get("action") in {"add", "new", "buy"} and p.get("ticker")
+            ]
+        )
+        # trim only — exits stay in exits so Trim/Exit UI concat cannot double-count
+        trims = unique_tickers(
+            [p["ticker"] for p in positions if p.get("action") == "trim" and p.get("ticker")]
+        )
+        shorts = unique_tickers(
+            [p["ticker"] for p in positions if p.get("action") == "short" and p.get("ticker")]
+        )
+        exits = unique_tickers(
+            [p["ticker"] for p in positions if p.get("action") == "exit" and p.get("ticker")]
+        )
         letter_ev = letter_evidence_fields(letter)
         rows.append(
             {
@@ -1714,6 +1993,7 @@ def letter_index(letters: list[dict], our_tickers: set[str]) -> list[dict]:
                 "manager": letter.get("manager") or "",
                 "quarter": letter.get("quarter"),
                 "letter_date": letter.get("letter_date"),
+                "document_label": letter_document_label(letter),
                 "themes": [t.get("theme") for t in (letter.get("themes") or []) if t.get("theme")],
                 "tickers": tickers[:20],
                 "our_overlap": overlap,
@@ -2796,6 +3076,27 @@ def build_source_health(
             "as_of": newest_as_of([l.get("letter_date") for l in letters]),
             "path": relative_path(LETTERS_INSIGHTS),
         },
+        "podcasts": (
+            lambda _pod: {
+                "status": (
+                    "ok"
+                    if (_pod.get("episodes") or [])
+                    else (
+                        "missing"
+                        if not PODCASTS_INSIGHTS.exists() and not PODCASTS_INSIGHTS_MIRROR.exists()
+                        else "empty"
+                    )
+                ),
+                "records": counts.get("podcast_episode", 0),
+                "items": len(_pod.get("episodes") or []),
+                "as_of": newest_as_of([e.get("published") for e in (_pod.get("episodes") or [])]),
+                "path": (
+                    relative_path(PODCASTS_INSIGHTS)
+                    if PODCASTS_INSIGHTS.exists()
+                    else relative_path(PODCASTS_INSIGHTS_MIRROR)
+                ),
+            }
+        )(load_podcast_insights_doc()),
         "portfolio_news": {
             "status": "ok" if news_doc else "missing",
             "records": counts.get("news", 0),
@@ -3067,12 +3368,15 @@ def main() -> int:
         letters = [
             canonicalize_letter_fund(letter)
             for letter in (letters_doc.get("letters") or [])
-            if not is_letter_meta_entry(letter) and letter.get("letter_eligible", True)
+            if is_letter_eligible_for_index(letter)
         ]
         letters, fund_identity_audit = consolidate_letter_funds_stable(letters)
         letters, downstream_duplicates_suppressed = dedupe_canonical_letters(letters)
         letters_doc = {**letters_doc, "letters": letters}
         records.extend(from_superinvestor_letters(letters_doc))
+
+    podcasts_doc = load_podcast_insights_doc()
+    records.extend(from_podcast_episodes(podcasts_doc))
 
     front_tickers = portfolio_tickers(include_watchlist=True)
     holdings_tickers = our_holdings_tickers()
@@ -3174,6 +3478,7 @@ def main() -> int:
         "archived_record_count": archive_meta.get("archived_record_count"),
         "event_count": len(events),
         "letter_count": letter_count_value,
+        "podcast_count": len(podcasts_doc.get("episodes") or []),
         "source_health": source_health,
         "data_source_candidates": terminalvalue_doc or {},
         "provenance": build_provenance(
@@ -3188,6 +3493,8 @@ def main() -> int:
         "theme_glossary": theme_glossary(),
         "time_periods": build_insights_time_periods(letters, theme_by_q),
         "letter_index": letter_index(letters, front_tickers),
+        "podcast_index": podcast_index_rows(podcasts_doc),
+        "podcast_by_show": podcast_by_show(podcasts_doc),
         "consensus": build_consensus(letters, front_tickers, security_names()),
         "fund_registry": fund_registry(letters, front_tickers),
         "fund_profiles": fund_profiles(letters, front_tickers),

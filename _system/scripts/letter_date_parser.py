@@ -22,6 +22,12 @@ OCR_YEAR_RE = re.compile(r"\b20\s+1\s+1\b")
 OCR_YEAR_RE2 = re.compile(r"\bfourth quarter of 201\s+1\b", re.I)
 
 NUMERIC_DATE_RE = re.compile(r"\b(\d{1,2})[._/\-](\d{1,2})[._/\-](\d{2,4})\b")
+# KEDM-style stems: 2026.06.14 or 2026_06_14
+YMD_SEPARATOR_RE = re.compile(r"(?<!\d)(20\d{2})[._/\-](\d{1,2})[._/\-](\d{1,2})(?!\d)")
+# HFA-style stems: HFA-061726 / HFA_061726 (MMDDYY after a fund token)
+MMDDYY_STEM_RE = re.compile(
+    r"(?:^|[^A-Za-z0-9])(?:[A-Za-z]{2,12})[-_ ]?(0[1-9]|1[0-2])(0[1-9]|[12]\d|3[01])(\d{2})(?:$|[^0-9])"
+)
 MONTH_DAY_YEAR_RE = re.compile(
     rf"\b({MONTH_ALT})[a-z]*\.?\s+(\d{{1,2}}),?\s+(20\d{{2}})\b",
     re.I,
@@ -224,6 +230,17 @@ def collect_date_candidates(
                 end = _month_end(int(m.group(1)), int(m.group(2)))
                 if end:
                     _add_candidate(out, end.isoformat(), "filename_compact_month", 92, folder_q)
+            for m in YMD_SEPARATOR_RE.finditer(blob):
+                d = _safe_date(int(m.group(1)), int(m.group(2)), int(m.group(3)))
+                if d:
+                    _add_candidate(out, d.isoformat(), "filename_ymd", 96, folder_q)
+            for m in MMDDYY_STEM_RE.finditer(blob):
+                yr = _coerce_year_token(m.group(3))
+                if yr is None:
+                    continue
+                d = _safe_date(yr, int(m.group(1)), int(m.group(2)))
+                if d:
+                    _add_candidate(out, d.isoformat(), "filename_mmddyy", 94, folder_q)
         for m in NUMERIC_DATE_RE.finditer(blob):
             yr = _coerce_year_token(m.group(3))
             if yr is None:

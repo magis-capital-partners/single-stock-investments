@@ -47,9 +47,12 @@ re_pass: false
 
 | Check | Expected (valuation.json) | Found in dive | OK? |
 |-------|---------------------------|---------------|-----|
-| Returns statement | 54.74% | 54.74% | Yes |
-| Classification IRR | 54.74% | 54.74% | Yes |
-| Valuation bridge base | 54.74% | 54.74% | Yes |
+| Returns statement | 38.04% | 38.04% | Yes |
+| Classification IRR | 38.04% | 38.04% | Yes |
+| Valuation bridge base | 38.04% | 38.04% | Yes |
+
+**Lint notes:**
+- 7176.T/research/deep_dive_2026-06-04.md: executive_summary_first_pct 53.33% vs valuation.json base 38.04% (tol 0.25pp)
 
 ---
 
