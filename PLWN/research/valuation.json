@@ -1,6 +1,6 @@
 {
   "ticker": "PLWN",
-  "as_of": "2026-07-17",
+  "as_of": "2026-07-24",
   "method": "pending",
   "irr_method": "pending",
   "valuation_mode": "economic_value",
@@ -19,7 +19,7 @@
     "price_source": "Yahoo Finance PLWN 2026-07-17",
     "price_as_of": "2026-07-17",
     "shares_outstanding": 3460000,
-    "shares_source": "Unresolved. Aggregators cite ~3.46M shares (implies ~$1.99B mcap and impossible ~$157M cash dividend at $45.40/sh). Form 990 FY2024 NI only $5.3M. [HUMAN REVIEW]",
+    "shares_source": "Provisional aggregator ~3.46M shares; conflicts with $45.40 indicated dividend vs FY2024 NI $5.3M [HUMAN REVIEW \u2014 do not size on this denominator]",
     "indicated_dividend": 45.4,
     "dividend_source": "Yahoo Finance indicated dividend / yield ~8% [HUMAN REVIEW \u2014 confirm cash actually paid]",
     "form990_fy2024_revenue": 42855178,
@@ -108,14 +108,92 @@
         "valuation": {
           "method": "net_asset_value",
           "basis": "per_share",
-          "low": 40.0,
-          "base": 46.8,
-          "high": 55.0,
-          "evidence_tier": "analyst_estimate",
-          "evidence": "ProPublica Nonprofit Explorer EIN 11-1190044 FY2024 net assets $161,903,602 / provisional 3.46M shares \u2248 $46.8. PDF not yet local [HUMAN REVIEW].",
-          "assumption_summary": "990 net assets as reference floor for the nonprofit entity, not proven liquidation NAV.",
+          "low": 39.994,
+          "base": 46.7929,
+          "high": 54.9918,
+          "evidence_tier": "mixed_primary_and_estimate",
+          "evidence": "FY2024 Form 990 extract: revenue ~$42.9M, net income ~$5.3M, net assets ~$161.9M. Proof base 46.7929/sh via net_asset_value@1.0. Share count and Schedule D remain [HUMAN REVIEW].",
+          "assumption_summary": "Proof outputs {'low': 39.994, 'base': 46.7929, 'high': 54.9918}; see calculation_proof graph.",
           "cross_check": "Range must reconcile to primary filings and realization path before IC approval.",
-          "falsifier": "Verified share count or Schedule D shows net assets per economic unit far from this band."
+          "falsifier": "Verified share count or Schedule D shows net assets per economic unit far from this band.",
+          "calculation_proof": {
+            "schema_version": "1.0",
+            "method_id": "net_asset_value",
+            "method_version": "1.0",
+            "output_unit": "USD_per_share",
+            "inputs": [
+              {
+                "id": "net_assets_m",
+                "label": "Form 990 net assets",
+                "kind": "estimate",
+                "value": 161.903602,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "PLWN/research/valuation.json",
+                  "locator": "ProPublica Nonprofit Explorer EIN 11-1190044 FY ending Dec 2024; net assets $161,903,602; liabilities $0 on extract",
+                  "as_of": "2024-12-31"
+                }
+              },
+              {
+                "id": "shares_m",
+                "label": "Provisional common shares outstanding",
+                "kind": "estimate",
+                "value": 3.46,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "PLWN/research/valuation.json",
+                  "locator": "Aggregator ~3.46M shares; conflicts with dividend cash math vs FY2024 NI [HUMAN REVIEW]",
+                  "as_of": "2026-07-17"
+                }
+              }
+            ],
+            "assumptions": [
+              {
+                "id": "equity_claim_fraction",
+                "label": "Fraction of filed net assets attributable to one provisional share",
+                "kind": "judgment",
+                "values": {
+                  "low": 0.854702,
+                  "base": 1.0,
+                  "high": 1.175216
+                },
+                "unit": "fraction",
+                "rationale": "Base uses full 990 net assets per provisional share; low/high bracket Schedule D uncertainty and share-count error.",
+                "allowed_range": {
+                  "min": 0.5,
+                  "max": 1.5
+                }
+              }
+            ],
+            "calculations": [
+              {
+                "id": "nav_per_share",
+                "label": "Form 990 net assets per provisional share",
+                "op": "divide",
+                "args": [
+                  "net_assets_m",
+                  "shares_m"
+                ],
+                "unit": "USD_per_share"
+              },
+              {
+                "id": "value_per_share",
+                "label": "Form 990 net assets per share",
+                "op": "multiply",
+                "args": [
+                  "nav_per_share",
+                  "equity_claim_fraction"
+                ],
+                "unit": "USD_per_share"
+              }
+            ],
+            "outputs": {
+              "low": "value_per_share",
+              "base": "value_per_share",
+              "high": "value_per_share"
+            }
+          },
+          "valuation_status": "bounded_estimate"
         }
       },
       {
@@ -127,14 +205,92 @@
         "valuation": {
           "method": "owner_cash_dcf",
           "basis": "per_share",
-          "low": 5.0,
-          "base": 12.0,
-          "high": 20.0,
-          "evidence_tier": "analyst_estimate",
-          "evidence": "FY2024 revenue ~$42.9M, expenses ~$37.5M, NI ~$5.3M. Capitalization of through-cycle owner cash pending audited statements.",
-          "assumption_summary": "Modest capitalization of cemetery cash earnings; land value is separate.",
+          "low": 4.9998,
+          "base": 12.0001,
+          "high": 19.9992,
+          "evidence_tier": "mixed_primary_and_estimate",
+          "evidence": "FY2024 Form 990 extract: revenue ~$42.9M, net income ~$5.3M, net assets ~$161.9M. Proof base 12.0001/sh via owner_cash_or_dividend_discount@1.0. Share count and Schedule D remain [HUMAN REVIEW].",
+          "assumption_summary": "Proof outputs {'low': 4.9998, 'base': 12.0001, 'high': 19.9992}; see calculation_proof graph.",
           "cross_check": "Range must reconcile to primary filings and realization path before IC approval.",
-          "falsifier": "Operations cannot sustain distributions anywhere near the indicated $45.40 dividend under the provisional share count."
+          "falsifier": "Operations cannot sustain distributions anywhere near the indicated $45.40 dividend under the provisional share count.",
+          "calculation_proof": {
+            "schema_version": "1.0",
+            "method_id": "owner_cash_or_dividend_discount",
+            "method_version": "1.0",
+            "output_unit": "USD_per_share",
+            "inputs": [
+              {
+                "id": "net_income_m",
+                "label": "FY2024 net income (program services surplus)",
+                "kind": "estimate",
+                "value": 5.324496,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "PLWN/research/valuation.json",
+                  "locator": "ProPublica Nonprofit Explorer EIN 11-1190044 FY ending Dec 2024; revenue $42,855,178; expenses $37,530,682; net income $5,324,496",
+                  "as_of": "2024-12-31"
+                }
+              },
+              {
+                "id": "shares_m",
+                "label": "Provisional common shares outstanding",
+                "kind": "estimate",
+                "value": 3.46,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "PLWN/research/valuation.json",
+                  "locator": "Aggregator ~3.46M shares; conflicts with dividend cash math vs FY2024 NI [HUMAN REVIEW]",
+                  "as_of": "2026-07-17"
+                }
+              }
+            ],
+            "assumptions": [
+              {
+                "id": "capitalization_multiple",
+                "label": "Duration-adjusted cemetery owner-cash capitalization multiple",
+                "kind": "judgment",
+                "values": {
+                  "low": 3.249,
+                  "base": 7.798,
+                  "high": 12.996
+                },
+                "unit": "multiple",
+                "rationale": "Bear stresses trough cemetery demand and nonprofit reinvestment; base modestly capitalizes FY2024 surplus; bull assumes sustained pricing on Long Island inventory.",
+                "allowed_range": {
+                  "min": 2.0,
+                  "max": 20.0
+                }
+              }
+            ],
+            "calculations": [
+              {
+                "id": "owner_cash_per_share",
+                "label": "FY2024 net income per provisional share",
+                "op": "divide",
+                "args": [
+                  "net_income_m",
+                  "shares_m"
+                ],
+                "unit": "USD_per_share"
+              },
+              {
+                "id": "value_per_share",
+                "label": "Cemetery operating franchise per share",
+                "op": "multiply",
+                "args": [
+                  "owner_cash_per_share",
+                  "capitalization_multiple"
+                ],
+                "unit": "USD_per_share"
+              }
+            ],
+            "outputs": {
+              "low": "value_per_share",
+              "base": "value_per_share",
+              "high": "value_per_share"
+            }
+          },
+          "valuation_status": "bounded_estimate"
         }
       },
       {
@@ -148,12 +304,90 @@
           "basis": "per_share",
           "low": 0.0,
           "base": 15.0,
-          "high": 80.0,
-          "evidence_tier": "analyst_estimate",
-          "evidence": "Long Island cemetery land often carried below market on Form 990; Schedule D marks required. Wide option range until appraisal evidence.",
-          "assumption_summary": "Option on land mark-up; not double-counted inside form990_net_assets.",
+          "high": 80.0289,
+          "evidence_tier": "mixed_primary_and_estimate",
+          "evidence": "FY2024 Form 990 extract: revenue ~$42.9M, net income ~$5.3M, net assets ~$161.9M. Proof base 15.0/sh via probability_weighted_catalyst_nav@1.0. Share count and Schedule D remain [HUMAN REVIEW].",
+          "assumption_summary": "Proof outputs {'low': 0.0, 'base': 15.0, 'high': 80.0289}; see calculation_proof graph.",
           "cross_check": "Range must reconcile to primary filings and realization path before IC approval.",
-          "falsifier": "Schedule D / appraisal shows no material gap above 990 carrying value."
+          "falsifier": "Schedule D / appraisal shows no material gap above 990 carrying value.",
+          "calculation_proof": {
+            "schema_version": "1.0",
+            "method_id": "probability_weighted_catalyst_nav",
+            "method_version": "1.0",
+            "output_unit": "USD_per_share",
+            "inputs": [
+              {
+                "id": "land_gap_reference_m",
+                "label": "Base-case incremental land fair-value above 990 carrying amounts",
+                "kind": "estimate",
+                "value": 51.9,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "PLWN/research/valuation.json",
+                  "locator": "Long Island cemetery land often carried below market on Form 990; Schedule D marks pending [Assumption]",
+                  "as_of": "2024-12-31"
+                }
+              },
+              {
+                "id": "shares_m",
+                "label": "Provisional common shares outstanding",
+                "kind": "estimate",
+                "value": 3.46,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "PLWN/research/valuation.json",
+                  "locator": "Aggregator ~3.46M shares; conflicts with dividend cash math vs FY2024 NI [HUMAN REVIEW]",
+                  "as_of": "2026-07-17"
+                }
+              }
+            ],
+            "assumptions": [
+              {
+                "id": "risk_fraction",
+                "label": "Probability-weighted fraction of land fair-value gap realized to owners",
+                "kind": "judgment",
+                "values": {
+                  "low": 0.0,
+                  "base": 1.0,
+                  "high": 5.33526
+                },
+                "unit": "fraction",
+                "rationale": "Low assumes no mark-up above 990 carrying value; base modest Long Island land gap; high assumes appraisal upside or control transaction.",
+                "allowed_range": {
+                  "min": 0.0,
+                  "max": 8.0
+                }
+              }
+            ],
+            "calculations": [
+              {
+                "id": "risked_land_gap_m",
+                "label": "Risk-adjusted land fair-value gap",
+                "op": "multiply",
+                "args": [
+                  "land_gap_reference_m",
+                  "risk_fraction"
+                ],
+                "unit": "USD_m"
+              },
+              {
+                "id": "value_per_share",
+                "label": "Land fair-value gap per share",
+                "op": "divide",
+                "args": [
+                  "risked_land_gap_m",
+                  "shares_m"
+                ],
+                "unit": "USD_per_share"
+              }
+            ],
+            "outputs": {
+              "low": "value_per_share",
+              "base": "value_per_share",
+              "high": "value_per_share"
+            }
+          },
+          "valuation_status": "bounded_estimate"
         }
       },
       {
@@ -165,14 +399,101 @@
         "valuation": {
           "method": "realization_reserve",
           "basis": "per_share",
-          "low": -40.0,
-          "base": -20.0,
-          "high": -5.0,
+          "low": -39.994,
+          "base": -19.997,
+          "high": -4.9993,
           "evidence_tier": "mixed_primary_and_estimate",
-          "evidence": "OTC Pink, tiny volume, 501(c)(13) constraints on distributions/control, unresolved share count that makes a $45.40 indicated dividend mathematically implausible at 3.46M shares versus $5.3M NI.",
-          "assumption_summary": "Large reserve until share count and dividend cash facts are verified.",
+          "evidence": "FY2024 Form 990 extract: revenue ~$42.9M, net income ~$5.3M, net assets ~$161.9M. Proof base -19.997/sh via net_asset_value@1.0. Share count and Schedule D remain [HUMAN REVIEW].",
+          "assumption_summary": "Proof outputs {'low': -39.994, 'base': -19.997, 'high': -4.9993}; see calculation_proof graph.",
           "cross_check": "Range must reconcile to primary filings and realization path before IC approval.",
-          "falsifier": "Verified float and governance show minority common can realize NAV without the haircut."
+          "falsifier": "Verified float and governance show minority common can realize NAV without the haircut.",
+          "calculation_proof": {
+            "schema_version": "1.0",
+            "method_id": "net_asset_value",
+            "method_version": "1.0",
+            "output_unit": "USD_per_share",
+            "inputs": [
+              {
+                "id": "net_assets_m",
+                "label": "Form 990 net assets",
+                "kind": "estimate",
+                "value": 161.903602,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "PLWN/research/valuation.json",
+                  "locator": "ProPublica Nonprofit Explorer EIN 11-1190044 FY ending Dec 2024; net assets $161,903,602",
+                  "as_of": "2024-12-31"
+                }
+              },
+              {
+                "id": "shares_m",
+                "label": "Provisional common shares outstanding",
+                "kind": "estimate",
+                "value": 3.46,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "PLWN/research/valuation.json",
+                  "locator": "Aggregator ~3.46M shares; conflicts with dividend cash math vs FY2024 NI [HUMAN REVIEW]",
+                  "as_of": "2026-07-17"
+                }
+              }
+            ],
+            "assumptions": [
+              {
+                "id": "realization_haircut_ratio",
+                "label": "OTC illiquidity and nonprofit-governance haircut on NAV per share",
+                "kind": "judgment",
+                "values": {
+                  "low": 0.854702,
+                  "base": 0.427351,
+                  "high": 0.106838
+                },
+                "unit": "ratio",
+                "rationale": "Reserve scales with filed NAV; bear assumes minority cannot realize book; bull assumes clearer share register and governance path.",
+                "allowed_range": {
+                  "min": 0.05,
+                  "max": 1.0
+                }
+              }
+            ],
+            "calculations": [
+              {
+                "id": "nav_per_share",
+                "label": "Form 990 net assets per provisional share",
+                "op": "divide",
+                "args": [
+                  "net_assets_m",
+                  "shares_m"
+                ],
+                "unit": "USD_per_share"
+              },
+              {
+                "id": "reserve_gross",
+                "label": "Gross illiquidity and governance reserve before sign",
+                "op": "multiply",
+                "args": [
+                  "nav_per_share",
+                  "realization_haircut_ratio"
+                ],
+                "unit": "USD_per_share"
+              },
+              {
+                "id": "value_per_share",
+                "label": "OTC illiquidity and nonprofit-governance reserve per share",
+                "op": "negative",
+                "args": [
+                  "reserve_gross"
+                ],
+                "unit": "USD_per_share"
+              }
+            ],
+            "outputs": {
+              "low": "value_per_share",
+              "base": "value_per_share",
+              "high": "value_per_share"
+            }
+          },
+          "valuation_status": "bounded_estimate"
         }
       }
     ]
@@ -186,7 +507,7 @@
       "description": "One provisional Pinelawn Cemetery equity unit using aggregator share count until the true economic unit count is verified.",
       "unit_label": "provisional common share",
       "unit_count": 3460000,
-      "unit_source": "Aggregator ~3.46M shares \u2014 CONFLICTS with dividend cash math versus FY2024 NI $5.3M [HUMAN REVIEW \u2014 do not size on this denominator]",
+      "unit_source": "Provisional aggregator ~3.46M shares; conflicts with $45.40 indicated dividend vs FY2024 NI $5.3M [HUMAN REVIEW \u2014 do not size on this denominator]",
       "enterprise_to_equity_reconciliation": "Nonprofit cemetery: 990 net assets + operations + land gap less illiquidity/governance reserve. Market price $575 is not reconciled until share count is fixed."
     },
     "component_groups": [
