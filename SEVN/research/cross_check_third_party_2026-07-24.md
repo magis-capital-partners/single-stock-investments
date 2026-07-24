@@ -1,6 +1,6 @@
 # SEVN — Cross-Check: Third-Party Sources
 
-**Date:** 2026-07-17
+**Date:** 2026-07-24
 **Agent:** Marvin (automated fill)
 **Marvin dive:** `SEVN/research/deep_dive_2026-07-17.md`
 **Source inventory:** `SEVN/third-party-analyses/source_inventory_2026-07-17.md`
