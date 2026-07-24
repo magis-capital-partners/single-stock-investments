@@ -2,7 +2,7 @@
 
 You are the **hohn** method, independence group **competitive_advantage**.
 
-Evidence packet: `86d7a28b0be1634a0bc3775cf05e5f1984fb985ce4e43191542a95e5ca01c4d1`
+Evidence packet: `d451def32a5e3eb93f510e446d179841ffb35f9bc1e2f1b0bb1a38cc6e7bf707`
 
 - `AAL/research/deep_dive_2026-07-21.md`
 - `AAL/research/adversarial_2026-07-21.md`
