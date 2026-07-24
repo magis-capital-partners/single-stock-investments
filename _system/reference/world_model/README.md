@@ -1,6 +1,10 @@
 # World Model (Courtenay foresight layer)
 
-Operative JSON for SSI’s append-only World Model. **Context only** — never auto-inflates Lawrence base IRR.
+Operative JSON for SSI’s append-only World Model. **Context only.**
+
+**Valuation boundary:** World Model does **not** set capital stance or security value. Production valuation is Power Zone → universal contract → IC → `human_decision.json` (`proof_first_valuation.md`, `decision_authority.py`). Do not treat Magis strip greens, KPI passes, or `world_model_context` as house valuation. Never rewrite contract components, committee packets, or legacy Lawrence fields from this layer.
+
+**Magis claim gate:** `_system/reference/world_model/predictability_classes.json` (P0–P4). Snapshot emits `strip.claim_ceiling` + `claim_boundaries`. Santa Fe stays wisdom-only — do **not** merge into a simulator. Plan: `_system/proposals/world_model_sfi_predictability_boundaries_2026-07-24.md`.
 
 ## What we count
 

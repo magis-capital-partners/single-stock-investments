@@ -1,6 +1,8 @@
 # World Model linkages
 
-Cross-ticker derivation graph for thesis KPIs. **Context only** — never auto-inflates Lawrence base IRR.
+Cross-ticker derivation graph for thesis KPIs. **Context only.**
+
+Does not author valuation. Never rewrite universal-contract components, Power Zone routes, IC packets, `human_decision.json`, or legacy Lawrence `inputs` / `scenarios` / `implied_return`. See `proof_first_valuation.md` § *Do not mix two valuation languages*.
 
 ## Layout
 

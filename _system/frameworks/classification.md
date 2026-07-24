@@ -2,7 +2,9 @@
 
 Unified labels from `_system/frameworks/decision_stack.md` — layers 1–5.
 
-Replace the old single **thesis status** (intact / weakening / strengthening / unclear) with independent axes plus Lawrence return fields.
+Replace the old single **thesis status** (intact / weakening / strengthening / unclear) with independent axes plus return/value fields.
+
+**Authority:** Actionable stance and production return come from Power Zone → universal contract → IC → `human_decision.json` (`proof_first_valuation.md`, `decision_authority.py`). Legacy Lawrence IRR fields below are display/migration unless no contract exists.
 
 ## Fields
 
@@ -11,11 +13,11 @@ Replace the old single **thesis status** (intact / weakening / strengthening / u
 | **Archetype** | Stahl | `croupier`, `compounder`, `serial_acquirer`, `platform`, `holding_co`, `optionality`, `turnaround`, `infrastructure` | What *is* this business in the pecuniary economy? |
 | **Moat** | Munger | `widening`, `stable`, `eroding`, `unproven`, `n/a` | Is competitive advantage durable? |
 | **Dhando** | Pabrai | `full`, `partial`, `none`, `pending` | Heads I win, tails I don't lose much? |
-| **Stance** | Pabrai | `core`, `accumulate`, `hold`, `watch`, `trim`, `exit` | What do we *do* with capital? |
+| **Stance** | Human (IC recommends) | `core`, `accumulate`, `hold`, `watch`, `trim`, `exit` | What do we *do* with capital? Only `human_decision.json` is actionable |
 | **Cycle** | Stahl (croupiers) | `peak`, `mid`, `trough`, `—` | Normalized earnings vs current activity |
-| **Implied 7yr IRR** | Lawrence | e.g. `17% (total synthesis)`, `pending` | Blended capstone return at today's price (`total_synthesis_irr.md`) |
-| **IRR method** | Lawrence | `full`, `yield_curve`, `scenario`, `pending` | How IRR was computed |
-| **Lawrence bucket** | Lawrence | `pricing_power`, `multi_sided`, `low_cost`, `other` | Oakcliff business taxonomy |
+| **Implied return / value** | Contract first | e.g. contract base % or `$/sh`; else legacy Lawrence display + `[legacy]` | Prefer contract `annualized_return_at_price_pct` / value per share |
+| **IRR method** | Legacy / routed specialist | `full`, `yield_curve`, `scenario`, `pending`, or Power Zone method id | How a return was computed; not automatically the authority |
+| **Lawrence bucket** | Lawrence taxonomy | `pricing_power`, `multi_sided`, `low_cost`, `other` | Oakcliff business taxonomy (label only) |
 | **Valuation overlay** | Speedwell / Hohn | `—`, `segment_cashflow` | Per-segment cash-flow sum + reverse DCF cross-check (`segment_cashflow_valuation.md`) |
 | **Payoff lens** | Decision stack Q5 | `operating`, `asset`, `event`, `levered`, `pending` | Which toolkit applies (`analysis_arsenal.md`) |
 | **MOI bucket** | Mihaljevic | optional legacy audit tag | Deprecated — map to `payoff_lens`; see `moi_lens.md` |

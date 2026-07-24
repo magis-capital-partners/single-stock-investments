@@ -17,9 +17,9 @@ Answer once. Do not duplicate in separate MOI / Lawrence subsections.
 | **1. What is it?** | You cannot value what you do not understand | Circle of competence | Archetype, cycle, Hohn operating snapshot |
 | **2. Will it last?** | Terminal value and multiple depend on durability | Moat gate | `moat` |
 | **3. Is the bear bounded?** | Position sizing and dhando need a floor | Asymmetric payoff | `dhando`, bear case in valuation |
-| **4. What return at this price?** | Capital has an opportunity cost | Lawrence bar | `implied_irr`, `irr_method` |
+| **4. What return at this price?** | Capital has an opportunity cost | Power Zone + universal contract (Lawrence only if routed) | Contract return/value; legacy `implied_irr` is reference |
 | **5. Why mispriced?** | Without an edge, you are the greater fool | HK + MOI | Predictive attribute; inefficiency; catalyst if asset/event |
-| **6. What do we do?** | Analysis must end in action | Stance gate | `stance` |
+| **6. What do we do?** | Analysis must end in action | Human decision (IC recommends) | Actionable `stance` only from `human_decision.json` |
 
 **Where in the report:** Q1–2 in Business & moat · Q3–4 in Payoff & return + Valuation · Q5 in Why the market might be wrong · Q6 in Payoff + Classification.
 
@@ -71,7 +71,7 @@ Legacy `moi_bucket` values map 1:1 → `payoff_lens` (see `moi_lens.md`).
 
 | Tool | Trigger | Doc |
 |------|---------|-----|
-| Lawrence 10yr IRR | `operating`, modelable FCF | `lawrence_irr.md`, `marvin_valuation.py` |
+| Lawrence owner-cash IRR (specialist / legacy) | `operating`, modelable FCF, when Power Zone routes it | `lawrence_irr.md`, `marvin_valuation.py` — not production stance authority; see `proof_first_valuation.md` |
 | HK equity yield curve | Dated contractual payoff | `mental_models.md` Tier 3 |
 | Segment cash-flow sum | Multi-segment compounder | `segment_cashflow_valuation.md` |
 | Optionality / NAV overlay | `asset` lens | `optionality_valuation.md` |

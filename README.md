@@ -107,7 +107,15 @@ python _system/scripts/marvin_cloud_refresh.py TICKER --date 2026-05-29
 
 The authoritative valuation close is `python _system/scripts/run_security_decision_pipeline.py --scope all`. Marvin remains the evidence/narrative coordinator; Power Zones route methods and reviewers, the universal contract controls readiness, and only `human_decision.json` authorizes capital.
 
-Valuation arithmetic is proof-first: source-locked facts and bounded assumptions flow through deterministic calculation graphs, while unsupported ranges are excluded as legacy sensitivities. See [`_system/frameworks/proof_first_valuation.md`](_system/frameworks/proof_first_valuation.md) and the approved [`valuation_method_registry.json`](_system/reference/valuation_method_registry.json).
+**Do not mix valuation languages:**
+
+| Canonical (production) | Legacy reference (not actionable) |
+|------------------------|-----------------------------------|
+| Power Zone route → proof-first components → `valuation_contract.json` → IC → `human_decision.json` | Marvin/Lawrence `implied_return`, `stance_proposal`, “Thesis IRR” fallbacks |
+
+Resolver: [`decision_authority.py`](_system/scripts/decision_authority.py). Detail: [`proof_first_valuation.md`](_system/frameworks/proof_first_valuation.md) § *Do not mix two valuation languages*.
+
+Valuation arithmetic is proof-first: source-locked facts and bounded assumptions flow through deterministic calculation graphs, while unsupported ranges are excluded as legacy sensitivities. See also the approved [`valuation_method_registry.json`](_system/reference/valuation_method_registry.json).
 
 **INDEX.csv:** prefer per-ticker regen: `python _system/scripts/build_folder_indexes.py --ticker SNOW` (avoid full-portfolio regen unless intentional).
 

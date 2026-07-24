@@ -21,6 +21,7 @@ from datetime import date
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
+import predictability as pred  # noqa: E402
 import world_model_common as wm  # noqa: E402
 
 TODAY = date.today().isoformat()
@@ -178,9 +179,26 @@ def build_context(ticker: str, strip: dict, existing: dict | None) -> dict:
     promotion = existing.get("promotion")
     in_base = bool(existing.get("in_base_irr"))
 
+    # Magis context never reaches P4 (house valuation). Horizons demote date claims to P0.
+    pred_class = "P3_oriented"
+    if horizon_convergence and not industries and not cards:
+        pred_class = "P0_ill_defined"
+    elif any(
+        (h or {}).get("predictability_class") == "P0_ill_defined"
+        for h in (horizon_convergence or {}).values()
+        if isinstance(h, dict)
+    ):
+        # Keep ticker context at P3 for thesis hygiene; horizon dates stay P0 in strip.
+        pred_class = "P3_oriented"
+    strip_ceiling = strip.get("claim_ceiling")
+    if strip_ceiling:
+        pred_class = pred.min_class(pred_class, strip_ceiling)
+
     return {
         "as_of": strip.get("as_of") or TODAY,
         "strip_label": strip.get("label"),
+        "predictability_class": pred_class,
+        "claim_ceiling": strip.get("claim_ceiling"),
         "industry_node_ids": [i.get("node_id") for i in industries],
         "industries": industries,
         "theme_ids": theme_ids,
@@ -192,8 +210,9 @@ def build_context(ticker: str, strip: dict, existing: dict | None) -> dict:
         "in_base_irr": in_base,
         "promotion": promotion,
         "disclaimer": (
-            "Context only. World Model fails and Superorg gaps flag [HUMAN REVIEW]; "
-            "they do not auto-rewrite Lawrence base IRR. Promotion requires "
+            "Context only. World Model fails and Superorg gaps open diligence; "
+            "they do not rewrite universal contracts, IC packets, or human_decision.json. "
+            f"Magis claim class: {pred_class}. Promotion template: "
             "_system/reviews/pending/world_model_promote_{TICKER}_{date}.md."
         ),
         "human_review_required": bool(kpi_fails or superorg_gaps),
@@ -209,7 +228,8 @@ def write_snippet(ticker: str, ctx: dict) -> Path:
         "",
         f"> {ctx.get('disclaimer', '')}",
         "",
-        f"**Strip label:** {ctx.get('strip_label')} · **In base IRR:** "
+        f"**Strip label:** {ctx.get('strip_label')} · **Magis class:** "
+        f"`{ctx.get('predictability_class') or 'P3_oriented'}` · **In base IRR:** "
         f"{'yes [HUMAN REVIEW]' if ctx.get('in_base_irr') else 'no (context)'}",
         "",
         "**Industries:** " + (", ".join(ctx.get("industry_node_ids") or []) or "none"),

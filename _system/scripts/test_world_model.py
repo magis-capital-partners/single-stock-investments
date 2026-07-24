@@ -99,6 +99,51 @@ def test_apply_world_model_context_ice():
     assert "exchange_markets" in (ctx.get("industry_node_ids") or [])
     assert ctx.get("in_base_irr") is False
     assert "implied_return" not in ctx
+    assert ctx.get("predictability_class") != "P4_allocation"
+    assert ctx.get("predictability_class") in (
+        None,
+        "P0_ill_defined",
+        "P1_ecology",
+        "P2_formation",
+        "P3_oriented",
+    )
+
+
+def test_predictability_classes_and_ceiling():
+    import predictability as pred  # noqa: WPS433
+
+    doc = pred.load_classes()
+    assert "P0_ill_defined" in doc["classes"]
+    assert "P4_allocation" in doc["classes"]
+    assert pred.class_for_horizon() == "P0_ill_defined"
+    assert pred.class_for_kpi_row({"prediction_role": "orientation"}) == "P3_oriented"
+    assert pred.infer_gameability("asx200_20d_realized_vol") == "high"
+    assert pred.min_class("P3_oriented", "P1_ecology") == "P1_ecology"
+
+    calm = pred.darwin_regime_stress({"regime": {"label": "calm", "research": "calm", "macro": "calm"}})
+    assert calm["stress"] is False
+    stressed = pred.darwin_regime_stress(
+        {"regime": {"label": "stressed", "research": "stress", "macro": "calm"}}
+    )
+    assert stressed["stress"] is True
+    bounds = pred.build_claim_boundaries(
+        cards=[{"theme_id": "x", "predictability_class": "P3_oriented"}],
+        horizons=[{"domain": "agi"}],
+        industry=[{"node_id": "exchange_markets", "formation_tag": "increasing_returns"}],
+        kpi_rows=[{
+            "ticker": "ASX.AX",
+            "kpi_id": "asx200_20d_realized_vol",
+            "status": "fail",
+            "gameability": "high",
+            "predictability_class": "P3_oriented",
+        }],
+        darwin=stressed,
+    )
+    assert bounds["market_path_ceiling"] == "P1_ecology"
+    assert bounds["claim_ceiling"] == "P1_ecology"
+    assert bounds["thesis_hygiene_ceiling"] == "P3_oriented"
+    assert any(d["artifact"].startswith("expert_horizon:") for d in bounds["demotions"])
+    assert pred.find_banned_phrases("This is a complexity IRR fantasy") == ["complexity irr"]
 
 
 def test_exchange_vol_map_regions():
@@ -141,5 +186,6 @@ if __name__ == "__main__":
     test_hyperscaler_edge_resolves()
     test_foresight_artifacts_exist()
     test_apply_world_model_context_ice()
+    test_predictability_classes_and_ceiling()
     test_exchange_vol_map_regions()
     print("test_world_model: ok")

@@ -390,7 +390,8 @@ Thin KPI graph over themes, industry nodes, Superorgs, and expert horizons. **Co
 - **Industries (13):** 11 thesis + 2 horizon (`agi`, `robotaxi`). Taxonomy: `_system/reference/world_model/README.md`.
 - **Strip:** Insights → Ticker insights (`dashboard/data/world_model.json`).
 - **Weekly CI:** Data Pipeline Sunday `0 16 * * 0` UTC → profile `world-model-weekly`.
-- **Hard rule:** fail → `[HUMAN REVIEW]`; never auto-edit IRR keys. Auto-link: `apply_world_model_context.py` + promotion template.
+- **Hard rule:** fail → open diligence / agent re-fetch; never rewrite universal-contract components, Power Zone routes, IC packets, `human_decision.json`, or legacy Lawrence keys. Auto-link: `apply_world_model_context.py` + promotion template. Production valuation authority: `proof_first_valuation.md`.
+- **Magis predictability class:** strip `claim_ceiling` / per-row `predictability_class` from `predictability_classes.json`. Horizon dates stay `P0_ill_defined`. Darwin stress caps market-path language at `P1_ecology`. Do not merge World Model with Santa Fe into one simulator; Santa Fe only forbids overclaim (Goodhart / ill-defined paths).
 
 ### Insider conviction layer (Form 4 cluster)
 

@@ -20,6 +20,7 @@ from datetime import date, datetime, timezone
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
+import predictability as pred  # noqa: E402
 import resolve_linkages  # noqa: E402
 import world_model_common as wm  # noqa: E402
 
@@ -63,7 +64,7 @@ def collect_kpi_state() -> dict:
             "path": str(path.relative_to(wm.ROOT)).replace("\\", "/"),
         })
         for kpi in ledger.get("kpis") or []:
-            row = {
+            row = pred.annotate_kpi_row({
                 "ticker": ticker,
                 "kpi_id": kpi.get("kpi_id"),
                 "label": kpi.get("label"),
@@ -75,7 +76,7 @@ def collect_kpi_state() -> dict:
                 "source": kpi.get("source"),
                 "prediction_role": kpi.get("prediction_role"),
                 "industry_node_ids": industry_ids,
-            }
+            }, kpi)
             st = kpi.get("status")
             if st == "fail":
                 broken.append(row)
@@ -118,7 +119,7 @@ def load_prediction_cards() -> list[dict]:
         card = wm.load_json(path)
         if not card:
             continue
-        cards.append({
+        digest = {
             "theme_id": card.get("theme_id"),
             "label": card.get("label"),
             "phase_transition": (card.get("orientation") or {}).get("phase_transition"),
@@ -128,8 +129,10 @@ def load_prediction_cards() -> list[dict]:
             "superorg_ids": (card.get("reinforcement") or {}).get("superorg_ids") or [],
             "tam_magnetism": (card.get("reinforcement") or {}).get("tam_magnetism"),
             "expected_value_note": card.get("expected_value_note"),
+            "predictability_class": pred.class_for_card(card),
             "path": str(path.relative_to(wm.ROOT)).replace("\\", "/"),
-        })
+        }
+        cards.append(digest)
     return cards
 
 
@@ -155,6 +158,7 @@ def load_superorg_digests() -> list[dict]:
             "summary": org.get("summary"),
             "pillars": traffic,
             "stance_implication": org.get("stance_implication"),
+            "predictability_class": "P2_formation",
             "path": str(path.relative_to(wm.ROOT)).replace("\\", "/"),
         })
     return out
@@ -209,6 +213,8 @@ def load_expert_horizons() -> list[dict]:
             "latest": rows[-1] if rows else None,
             "quote_count": len(rows),
             "in_base_irr": False,
+            "predictability_class": pred.class_for_horizon(),
+            "claim_note": "Public quote observation — not a Magis forecast",
             "path": str(path.relative_to(wm.ROOT)).replace("\\", "/"),
         })
     return domains
@@ -227,6 +233,7 @@ def load_industry_nodes() -> list[dict]:
             "node_id": node.get("node_id"),
             "label": node.get("label"),
             "kind": kind,
+            "formation_tag": node.get("formation_tag"),
             "checklist": node.get("checklist"),
             "linked_theme_ids": node.get("linked_theme_ids") or [],
             "linked_horizon_domains": node.get("linked_horizon_domains") or [],
@@ -291,16 +298,28 @@ def build_strip(state: dict, month: str, cards: list, superorgs: list, horizons:
     thesis_n = sum(1 for n in industry if (n.get("kind") or "thesis") != "horizon_industry")
     horizon_ind_n = sum(1 for n in industry if n.get("kind") == "horizon_industry")
 
+    kpi_pool = list(state["broken"]) + list(state["stale"]) + list(state["passes"])
+    boundaries = pred.build_claim_boundaries(
+        cards=cards,
+        horizons=horizons,
+        industry=industry,
+        kpi_rows=kpi_pool,
+    )
+    claim_ceiling = boundaries["claim_ceiling"]
+    ceiling_short = pred.short_label(claim_ceiling)
+
     summary = (
         f"World Model: {broken_n} failed, {stale_n} stale, {drift_n} drifted, "
         f"{unchecked_n} unchecked, {pass_n} passing. "
         f"{industry_scope} "
         f"Phase-likely themes: {', '.join(phase_likely) or 'none'}. "
-        f"Horizon converging: {', '.join(converging) or 'none'}."
+        f"Horizon converging: {', '.join(converging) or 'none'}. "
+        f"Steady means gates held, not path certainty."
     )
     ev_stance = (
-        "Buy dips when orientation+reinforcement hold and KPI gates pass; "
-        "do not when thesis KPIs fail. Context only; no auto IRR."
+        f"[{ceiling_short}] Buy dips when orientation+reinforcement hold and KPI gates pass; "
+        "do not when thesis KPIs fail. Context only; does not rewrite the universal contract "
+        "or human decision."
     )
 
     return {
@@ -309,9 +328,12 @@ def build_strip(state: dict, month: str, cards: list, superorgs: list, horizons:
         "month": month,
         "summary": summary,
         "ev_stance": ev_stance,
+        "claim_ceiling": claim_ceiling,
+        "claim_boundaries": boundaries,
         "disclaimer": (
-            "Context only. KPI breaks and Superorg pillar gaps flag [HUMAN REVIEW]; "
-            "they do not auto-rewrite Lawrence base IRR."
+            "Context only. KPI breaks and Superorg pillar gaps open diligence; "
+            "they do not rewrite Power Zone routes, universal contracts, IC packets, "
+            "or human_decision.json. Magis claim ceiling gates language, not capital."
         ),
         "counts": {
             "fail": broken_n,
@@ -326,6 +348,7 @@ def build_strip(state: dict, month: str, cards: list, superorgs: list, horizons:
             "industry_nodes": len(industry),
             "thesis_industries": thesis_n,
             "horizon_industries": horizon_ind_n,
+            "goodhart_watch": len(boundaries.get("goodhart_watch") or []),
         },
         "industry_scope": industry_scope,
         "headlines": headlines,
@@ -366,8 +389,8 @@ def main() -> int:
                 "generated_at": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
                 "as_of": date.today().isoformat(),
                 "disclaimer": (
-                    "Context only. Derived linkages inform stance and KPI ledgers; "
-                    "they never auto-inflate Lawrence base IRR."
+                    "Context only. Derived linkages inform KPI ledgers; "
+                    "they never rewrite universal contracts or human decisions."
                 ),
                 "edge_count": len(metrics),
                 "metrics": metrics,
@@ -383,7 +406,7 @@ def main() -> int:
 
     hot = {
         "generated_at": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
-        "schema_version": "2.0",
+        "schema_version": "2.1",
         "strip": strip,
     }
     wm.write_json(wm.DASHBOARD_WORLD_MODEL, hot)
@@ -411,6 +434,7 @@ def main() -> int:
     print(f"wrote {history_path.relative_to(wm.ROOT)}")
     print(
         f"world_model: label={strip['label']} "
+        f"claim_ceiling={strip.get('claim_ceiling')} "
         f"fail={strip['counts']['fail']} pass={strip['counts']['pass']} "
         f"cards={strip['counts']['prediction_cards']} "
         f"superorgs={strip['counts']['superorgs']}"

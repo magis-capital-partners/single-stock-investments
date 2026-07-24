@@ -123,6 +123,8 @@ PROFILES: dict[str, list[list[str]]] = {
             "--write",
             "--queue-reviews",
         ],
+        # Warn-only Magis claim lint (not --strict until prose corpus is clean).
+        ["_system/scripts/lint_predictability_claims.py"],
         ["_system/scripts/build_dashboard_data.py"],
     ],
 }

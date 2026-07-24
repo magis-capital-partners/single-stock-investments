@@ -60,6 +60,7 @@ make darwin-pit-check      # build + PIT checker
 - **Adaptation:** Regime merges research stress + macro (VIX, yields); turnover scales in stress.
 - **Continual improvement:** Scorecard JSONL + PIT history track audit/OOS/bias over time.
 - **Separation:** Marvin files are inputs; Darwin never writes `valuation.json` or `MEMORY.md`.
+- **Magis claim gate:** Magis uses `predictability_class` (not a second ecology engine). When Darwin regime is stressed/complex, Magis market-path claim ceiling demotes to `P1_ecology` while World Model thesis KPI diligence can remain `P3_oriented`.
 
 ## Dashboard
 

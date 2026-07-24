@@ -1,8 +1,11 @@
 # Lawrence IRR (Oakcliff / Bryan Lawrence)
 
+**Status (2026-07):** **Legacy / specialist appendix — not production authority.**  
+Canonical valuation is Power Zone → universal contract → IC → human decision (`proof_first_valuation.md`, `decision_authority.py`). Owner-cash IRR may still appear as a corroborating method inside fitting Power Zones. Do **not** treat `implied_return` / `stance_proposal` as the capital stance.
+
 **Workflow:** `_system/frameworks/decision_stack.md` — this file is **math appendix** only.
 
-**Purpose:** Quantitative expected-return discipline for Marvin deep dives. Complements Munger (quality), Pabrai (dhando / stance), Stahl (archetype / cycle), and Horizon Kinetics (equity yield curve for dated payoffs).
+**Purpose:** Owner-cash expected-return math (Oakcliff / Bryan Lawrence) for deep-dive ledgers and specialist cross-checks. Complements Munger (quality), Pabrai (dhando), Stahl (archetype / cycle), and Horizon Kinetics (equity yield curve for dated payoffs).
 
 **Reference:** [Bryan Lawrence, Oakcliff Capital](https://moiglobal.com/bryan-lawrence-oakcliff-capital/) — owner-cash IRR model (Marvin default **7-year** horizon; Lawrence original often cited as 10-year), five questions, three business buckets.
 

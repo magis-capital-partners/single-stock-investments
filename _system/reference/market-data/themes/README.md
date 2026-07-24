@@ -31,8 +31,9 @@ Live data: `_external/etf-dashboard` (see `.gitmodules`). Override path with `DA
 
 ## Rules
 
-- **Context only.** Every indicator carries `in_base_irr: false`. Tailwinds inform stance and overlay sizing; they never auto-inflate Lawrence base IRR.
-- Promotion to base case requires dual-agent promote to set `in_base_irr: true` (preserved across refreshes); live capital still human-gated. Residual gaps → **[OPEN DILIGENCE]** / **[Assumption]**.
+- **Context only.** Every indicator carries `in_base_irr: false`. Tailwinds may inform narrative and diligence; they never rewrite the universal valuation contract, Power Zone route, IC recommendation, or `human_decision.json`.
+- Legacy Lawrence fields (`implied_return`, scenario growth) are **not** production authority — do not “promote into IRR” as if that were the house method. See `proof_first_valuation.md`.
+- Any dual-agent promote that sets `in_base_irr: true` is a specialist/legacy annotation only; live capital remains human-gated. Residual gaps → **[OPEN DILIGENCE]** / **[Assumption]**.
 - Offline-safe: on network failure, cached CSV history is kept; Yahoo proxies used for WTI/VIX/GLD when FRED times out.
 - Deep dives: `#### Thematic context` in Business & moat (mechanical table + Marvin narrative preserved on refresh).
 

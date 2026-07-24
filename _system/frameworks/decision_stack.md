@@ -3,7 +3,8 @@
 **Purpose:** Single pipeline for Marvin deep dives. Six orthogonal questions → triggered tools from `analysis_arsenal.md`.
 
 **Report shape:** `deep_dive_structure.md`  
-**Appendix (triggered only):** `analysis_arsenal.md`, `mental_models.md`, `lawrence_irr.md` § F
+**Appendix (triggered only):** `analysis_arsenal.md`, `mental_models.md`, `lawrence_irr.md` § F  
+**Valuation authority:** `proof_first_valuation.md` + `decision_authority.py` (Power Zone / contract / IC / human). Lawrence IRR is legacy/specialist only.
 
 ---
 
@@ -14,11 +15,11 @@
 | 1 | **What is it?** | Stahl + Hohn | `archetype`, `cycle`, `lawrence_bucket`, operating snapshot |
 | 2 | **Will it last?** | Munger | `moat` |
 | 3 | **Is the bear bounded?** | Pabrai | `dhando`, bear case |
-| 4 | **What return at this price?** | Lawrence / HK | `implied_irr`, `irr_method` |
+| 4 | **What return at this price?** | Power Zone method + contract (HK/Lawrence only if routed) | Contract `annualized_return_at_price_pct` / value per share; legacy `implied_irr` is reference-only |
 | 5 | **Why mispriced?** | HK + MOI | Predictive attribute; inefficiency; catalyst if `asset`/`event` |
-| 6 | **What do we do?** | Pabrai + Lawrence | `stance` |
+| 6 | **What do we do?** | Pabrai + **human owner** (IC recommends) | Actionable stance only from `human_decision.json` |
 
-**Flow:** Q4 proposed from model · Q6 proposed from Q4 · **gated** by Q2–3 · **approved** by human.
+**Flow:** Q4 from routed proof-first contract · IC challenge · Q6 **approved by human**. Legacy Lawrence `stance_proposal` is not capital authority.
 
 **Payoff lens:** tag `payoff_lens` (`operating` | `asset` | `event` | `levered`) to pick toolkit — see `analysis_arsenal.md`.
 

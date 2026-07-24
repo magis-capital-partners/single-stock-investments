@@ -1,8 +1,28 @@
 # Proof-first valuation operating model
 
+## Do not mix two valuation languages
+
+| Language | What it is | Authority today |
+|----------|------------|-----------------|
+| **Canonical (use this)** | Power Zone route → proof-first economic-value components → universal contract → IC → `human_decision.json` | Sole production path. Resolver: `_system/scripts/decision_authority.py` |
+| **Legacy reference (do not size from this)** | Marvin/Lawrence owner-cash IRR, `implied_return`, `stance_proposal`, classification “Thesis IRR” fallbacks | Audit / migration / specialist cross-check only. Never actionable once a contract exists |
+
+Lawrence owner-cash math may still run as a **specialist module** inside a fitting Power Zone (predictable cash-flow names). It is **not** the universal stance gate and must not be labeled “house IRR” or Magis `P4` authority.
+
+Cutover detail: `_system/proposals/power_zone_committee_valuation_cutover_2026-07-18.md`.  
+Operator summary: root `README.md` § Marvin pipeline; agent rules in `_system/agents/MARVIN.md`.
+
 ## Authority
 
 The universal valuation contract is the only source of decision-grade security value. Marvin may collect evidence and write narrative research, but neither Marvin nor an Investment Committee persona may enter an unsupported component value.
+
+Production readers must resolve authority in this order (see `decision_authority.py`):
+
+```text
+human_decision → investment_committee → valuation_contract → legacy_reference
+```
+
+Only `human_decision` is capital-actionable. Contract and IC are research readiness / recommendation layers. Legacy Lawrence fields are never actionable.
 
 The production chain is:
 

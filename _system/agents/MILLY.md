@@ -42,9 +42,9 @@ Compare deep dive **numeric claims** to:
 | 3 | Latest period **revenue** + YoY % |
 | 4 | Net income (GAAP) + one-off labeled? |
 | 5 | Equity / debt / liquidity (if in exec summary) |
-| 6 | Owner cash $/sh (IRR starting point) |
-| 7 | Base / blended IRR in **three places** (exec, returns, classification) |
-| 8 | Stance vs `valuation.json` gates |
+| 6 | Economic claim + component $/sh (universal contract / proof) |
+| 7 | Contract or workbench return vs legacy Lawrence — do not treat legacy as authority (`proof_first_valuation.md`) |
+| 8 | Actionable stance only from `human_decision.json`; IC recommendation vs contract readiness |
 | 9 | **AI / capex** — if `ai_overlay` or hyperscaler: FCF₀ year, capex guide vs modeled capex, backlog $ |
 | 10 | **Option scan** — if business has segments, land, backlog, loss bets, or GAAP≠fair value: table present? zeros justified? |
 | 10b | **Fund shadow NAV** — if `fund_nav_overlay.edge` is `shadow` or `zero_marked_sleeves[]` non-empty: does Q5/exec lead with the zero mark (not a thin reported-NAV discount)? Three-NAV table present? |

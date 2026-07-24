@@ -1519,6 +1519,12 @@
     return rows;
   }
 
+  function wmClassShort(cls) {
+    if (!cls) return 'P?';
+    const m = String(cls).match(/^P(\d)/);
+    return m ? `P${m[1]}` : String(cls);
+  }
+
   function renderWorldModelStrip(worldModel, escapeHtml) {
     const strip = worldModel && worldModel.strip;
     if (!strip) {
@@ -1529,6 +1535,9 @@
     }
     const label = strip.label || 'steady';
     const labelCls = label === 'broken' ? 'badge-bad' : (label === 'attention' ? 'badge-warn' : 'badge-ok');
+    const bounds = strip.claim_boundaries || {};
+    const claimCeiling = strip.claim_ceiling || bounds.claim_ceiling || 'P3_oriented';
+    const ceilingShort = wmClassShort(claimCeiling);
     const counts = strip.counts || {};
     const countLine = [
       counts.fail != null ? `${counts.fail} failed` : '',
@@ -1543,7 +1552,8 @@
       <tr>
         <td class="mono">${escapeHtml(r.ticker || '')}</td>
         <td><span class="badge ${r.status === 'fail' ? 'badge-bad' : 'badge-warn'}">${escapeHtml(r.status || '')}</span></td>
-        <td style="font-size:12px">${escapeHtml(r.kpi_id || r.label || '')}</td>
+        <td style="font-size:12px">${escapeHtml(r.kpi_id || r.label || '')}${r.gameability ? ` <span class="badge badge-warn" title="Goodhart risk">g:${escapeHtml(r.gameability)}</span>` : ''}</td>
+        <td><span class="badge badge-us">${escapeHtml(wmClassShort(r.predictability_class))}</span></td>
       </tr>`).join('');
 
     const passRows = (strip.passes || []).slice(0, 80).map(r => {
@@ -1554,18 +1564,37 @@
       return `<tr>
         <td class="mono">${escapeHtml(r.ticker || '')}</td>
         <td class="tier-sub" style="font-size:11px">${escapeHtml(inds)}</td>
-        <td style="font-size:12px">${escapeHtml(r.kpi_id || '')}${role ? ` <span class="badge badge-us">${escapeHtml(role)}</span>` : ''}</td>
+        <td style="font-size:12px">${escapeHtml(r.kpi_id || '')}${role ? ` <span class="badge badge-us">${escapeHtml(role)}</span>` : ''}${r.gameability ? ` <span class="badge badge-warn">g:${escapeHtml(r.gameability)}</span>` : ''}</td>
         <td class="mono">${r.actual != null ? escapeHtml(String(r.actual)) : '—'}</td>
         <td class="mono tier-sub">${escapeHtml(gate)}</td>
+        <td><span class="badge badge-us">${escapeHtml(wmClassShort(r.predictability_class))}</span></td>
       </tr>`;
     }).join('');
 
     const cardRows = (strip.prediction_cards || []).map(c => `<tr>
       <td class="mono">${escapeHtml(c.theme_id || '')}</td>
+      <td><span class="badge badge-us">${escapeHtml(wmClassShort(c.predictability_class || 'P3_oriented'))}</span></td>
       <td>${escapeHtml(c.phase_transition || '')}</td>
       <td>${escapeHtml(c.regulatory || '')}</td>
       <td class="tier-sub">${c.recursive ? 'recursive' : '—'} · ${escapeHtml(c.tam_magnetism || '')}</td>
     </tr>`).join('');
+
+    const demotionRows = (bounds.demotions || []).map(d => `<tr>
+      <td class="mono">${escapeHtml(d.artifact || '')}</td>
+      <td><span class="badge badge-us">${escapeHtml(wmClassShort(d.predictability_class))}</span></td>
+      <td style="font-size:12px">${escapeHtml(d.reason || '')}</td>
+    </tr>`).join('');
+    const goodhartRows = (bounds.goodhart_watch || []).slice(0, 24).map(g => `<tr>
+      <td class="mono">${escapeHtml(g.ticker || '')}</td>
+      <td style="font-size:12px">${escapeHtml(g.kpi_id || '')}</td>
+      <td><span class="badge badge-warn">${escapeHtml(g.gameability || '')}</span></td>
+      <td><span class="badge ${g.status === 'fail' ? 'badge-bad' : 'badge-us'}">${escapeHtml(g.status || '')}</span></td>
+    </tr>`).join('');
+    const engineRows = (bounds.engines || []).map(e => `<tr>
+      <td class="mono">${escapeHtml(e.id || '')}</td>
+      <td style="font-size:12px">${escapeHtml(e.role || '')}</td>
+    </tr>`).join('');
+    const darwin = bounds.darwin || {};
 
     const superRows = (strip.superorgs || []).map(s => {
       const pillars = s.pillars || {};
@@ -1582,6 +1611,7 @@
       const convCls = h.convergence === 'converging' ? 'badge-ok' : (h.convergence === 'receding' ? 'badge-bad' : 'badge-us');
       return `<tr>
         <td class="mono">${escapeHtml(h.domain || '')}</td>
+        <td><span class="badge badge-us" title="Not a Magis forecast">${escapeHtml(wmClassShort(h.predictability_class || 'P0_ill_defined'))}</span></td>
         <td><span class="badge ${convCls}">${escapeHtml(h.convergence || '')}</span></td>
         <td class="mono">${latest.years_ahead != null ? escapeHtml(String(latest.years_ahead)) : '—'}y</td>
         <td style="font-size:12px">${escapeHtml(latest.speaker || '')}: ${escapeHtml(latest.quote_note || '')}</td>
@@ -1604,6 +1634,7 @@
         <td class="mono">${escapeHtml(n.node_id || '')}</td>
         <td><span class="badge ${kind === 'horizon_industry' ? 'badge-warn' : 'badge-ok'}">${escapeHtml(kind === 'horizon_industry' ? 'horizon' : 'thesis')}</span></td>
         <td style="font-size:12px">${escapeHtml(n.label || '')}</td>
+        <td class="tier-sub">${escapeHtml(n.formation_tag || '—')}</td>
         <td class="tier-sub">${escapeHtml(bits)}</td>
       </tr>`;
     }).join('');
@@ -1613,6 +1644,7 @@
         <div style="display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-bottom:8px">
           <h3 style="font-size:14px;margin:0">World Model</h3>
           <span class="badge ${labelCls}" style="font-size:13px;padding:4px 10px">${escapeHtml(label)}</span>
+          <span class="badge badge-us" style="font-size:13px;padding:4px 10px" title="${escapeHtml(bounds.reason || 'Magis claim ceiling')}">claim ceiling: ${escapeHtml(ceilingShort)}</span>
           ${strip.as_of ? `<span class="mono tier-sub">${escapeHtml(String(strip.as_of))}</span>` : ''}
           ${countLine ? `<span class="tier-sub">${escapeHtml(countLine)}</span>` : ''}
         </div>
@@ -1620,14 +1652,33 @@
         <p style="margin:0 0 8px;font-size:12px;max-width:900px;color:var(--text-secondary)">${escapeHtml(industryScope)}</p>
         ${strip.ev_stance ? `<p style="margin:0 0 10px;font-size:12px;max-width:900px;color:var(--text-secondary)">${escapeHtml(strip.ev_stance)}</p>` : ''}
         ${alertRows ? `
-        <table class="darwin-table" style="max-width:900px;margin-bottom:8px">
-          <thead><tr><th>Ticker</th><th>Status</th><th>KPI</th></tr></thead>
+        <table class="darwin-table" style="max-width:960px;margin-bottom:8px">
+          <thead><tr><th>Ticker</th><th>Status</th><th>KPI</th><th>Class</th></tr></thead>
           <tbody>${alertRows}</tbody>
-        </table>` : `<p class="tier-sub" style="margin-bottom:8px">No exceptions — expand panels below for passing KPIs across industry buckets.</p>`}
+        </table>` : `<p class="tier-sub" style="margin-bottom:8px">No exceptions — expand panels below for passing KPIs across industry buckets. Steady means gates held, not path certainty.</p>`}
+        <details class="world-model-panel" style="margin:6px 0" open>
+          <summary style="cursor:pointer;font-size:13px">Claim boundaries (Magis)</summary>
+          <p class="tier-sub" style="margin:8px 0;max-width:900px">${escapeHtml(bounds.reason || 'Thesis hygiene vs market-path language.')}</p>
+          <p class="tier-sub" style="margin:0 0 8px">Thesis hygiene: <strong>${escapeHtml(wmClassShort(bounds.thesis_hygiene_ceiling || 'P3_oriented'))}</strong>
+            · Market-path: <strong>${escapeHtml(wmClassShort(bounds.market_path_ceiling || claimCeiling))}</strong>
+            · Darwin: <strong>${escapeHtml(String(darwin.regime_label || 'n/a'))}</strong>${darwin.stress ? ' (stress → P1 cap)' : ''}</p>
+          ${demotionRows ? `<table class="darwin-table" style="max-width:960px;margin-top:8px">
+            <thead><tr><th>Demotion</th><th>Class</th><th>Why</th></tr></thead>
+            <tbody>${demotionRows}</tbody>
+          </table>` : ''}
+          ${goodhartRows ? `<table class="darwin-table" style="max-width:960px;margin-top:8px">
+            <thead><tr><th>Ticker</th><th>Goodhart KPI</th><th>Gameability</th><th>Status</th></tr></thead>
+            <tbody>${goodhartRows}</tbody>
+          </table>` : '<p class="tier-sub" style="margin-top:8px">No high-gameability KPI rows in watch list.</p>'}
+          ${engineRows ? `<table class="darwin-table" style="max-width:720px;margin-top:8px">
+            <thead><tr><th>Engine</th><th>Role</th></tr></thead>
+            <tbody>${engineRows}</tbody>
+          </table>` : ''}
+        </details>
         <details class="world-model-panel" style="margin:6px 0" ${label === 'steady' || label === 'attention' ? 'open' : ''}>
           <summary style="cursor:pointer;font-size:13px">Passing KPIs (${(strip.passes || []).length})</summary>
-          ${passRows ? `<table class="darwin-table" style="max-width:980px;margin-top:8px">
-            <thead><tr><th>Ticker</th><th>Industry</th><th>KPI</th><th>Actual</th><th>Gate</th></tr></thead>
+          ${passRows ? `<table class="darwin-table" style="max-width:1040px;margin-top:8px">
+            <thead><tr><th>Ticker</th><th>Industry</th><th>KPI</th><th>Actual</th><th>Gate</th><th>Class</th></tr></thead>
             <tbody>${passRows}</tbody>
           </table>` : '<p class="tier-sub">No pass rows.</p>'}
         </details>
@@ -1644,8 +1695,8 @@
         </details>
         <details class="world-model-panel" style="margin:6px 0">
           <summary style="cursor:pointer;font-size:13px">Theme prediction cards (${(strip.prediction_cards || []).length})</summary>
-          ${cardRows ? `<table class="darwin-table" style="max-width:900px;margin-top:8px">
-            <thead><tr><th>Theme</th><th>Phase</th><th>Regulatory</th><th>Reinforcement</th></tr></thead>
+          ${cardRows ? `<table class="darwin-table" style="max-width:960px;margin-top:8px">
+            <thead><tr><th>Theme</th><th>Class</th><th>Phase</th><th>Regulatory</th><th>Reinforcement</th></tr></thead>
             <tbody>${cardRows}</tbody>
           </table>` : '<p class="tier-sub">No prediction cards.</p>'}
         </details>
@@ -1657,20 +1708,20 @@
           </table>` : '<p class="tier-sub">No Superorg cards.</p>'}
         </details>
         <details class="world-model-panel" style="margin:6px 0">
-          <summary style="cursor:pointer;font-size:13px">Expert horizons (${(strip.expert_horizons || []).length}) · context only</summary>
-          ${horizonRows ? `<table class="darwin-table" style="max-width:900px;margin-top:8px">
-            <thead><tr><th>Domain</th><th>Convergence</th><th>Latest</th><th>Quote</th></tr></thead>
+          <summary style="cursor:pointer;font-size:13px">Expert horizons (${(strip.expert_horizons || []).length}) · P0 quotes only</summary>
+          ${horizonRows ? `<table class="darwin-table" style="max-width:980px;margin-top:8px">
+            <thead><tr><th>Domain</th><th>Class</th><th>Convergence</th><th>Latest</th><th>Quote</th></tr></thead>
             <tbody>${horizonRows}</tbody>
           </table>` : '<p class="tier-sub">No horizon series.</p>'}
         </details>
         <details class="world-model-panel" style="margin:6px 0">
           <summary style="cursor:pointer;font-size:13px">Industries (${industryNodes.length}: ${thesisInd.length} thesis + ${horizonInd.length} horizon)</summary>
-          ${industryRows ? `<table class="darwin-table" style="max-width:900px;margin-top:8px">
-            <thead><tr><th>Node</th><th>Kind</th><th>Label</th><th>Checklist</th></tr></thead>
+          ${industryRows ? `<table class="darwin-table" style="max-width:980px;margin-top:8px">
+            <thead><tr><th>Node</th><th>Kind</th><th>Label</th><th>Formation</th><th>Checklist</th></tr></thead>
             <tbody>${industryRows}</tbody>
           </table>` : '<p class="tier-sub">No industry nodes.</p>'}
         </details>
-        <p class="tier-sub" style="margin-top:8px">Courtenay foresight layer — fail/stale/Superorg gaps → [HUMAN REVIEW]; does not auto-rewrite base IRR.</p>
+        <p class="tier-sub" style="margin-top:8px">Courtenay foresight + Magis claim gate — fails open diligence; Santa Fe is wisdom-only (no merge/simulator). House value = Power Zone / contract / IC / human.</p>
       </div>`;
   }
 
