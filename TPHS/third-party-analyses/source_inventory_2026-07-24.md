@@ -1,6 +1,6 @@
 # TPHS — Third-party source inventory
 
-**Date:** 2026-07-17
+**Date:** 2026-07-24
 **Sources:** 12 total (0 approved, 0 pending, 12 context)
 
 | ID | Title | Path | Status | Use |
@@ -18,4 +18,4 @@
 | activist_long | MFP Partners, L.P. (1) — SC 13D/A | `TPHS/third-party-analyses/activist_reports/long/SC-13D/A_20190612_acc0001341004_19_000399.htm` | context | activist/long — sec_edgar |
 | activist_long | MFP Partners, L.P. (1) — SC 13D/A | `TPHS/third-party-analyses/activist_reports/long/SC-13D/A_20180220_acc0001341004_18_000138.htm` | context | activist/long — sec_edgar |
 
-Cross-check required: `TPHS/research/cross_check_third_party_2026-07-17.md`
+Cross-check required: `TPHS/research/cross_check_third_party_2026-07-24.md`
