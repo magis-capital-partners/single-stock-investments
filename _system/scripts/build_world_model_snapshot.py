@@ -256,25 +256,45 @@ def _industry_scope_line(industry: list) -> str:
     )
 
 
+def _is_soft_fail(row: dict) -> bool:
+    """High/med gameability fails are Goodhart/noise floors — diligence, not strip 'broken'."""
+    return str(row.get("gameability") or "") in {"med", "high"}
+
+
 def build_strip(state: dict, month: str, cards: list, superorgs: list, horizons: list, industry: list) -> dict:
+    hard_broken = [r for r in state["broken"] if not _is_soft_fail(r)]
+    soft_broken = [r for r in state["broken"] if _is_soft_fail(r)]
     broken_n = len(state["broken"])
+    hard_n = len(hard_broken)
+    soft_n = len(soft_broken)
     stale_n = len(state["stale"])
     drift_n = len(state["drifted_edges"])
     unchecked_n = len(state["unchecked"])
     pass_n = len(state["passes"])
-    if broken_n:
+    # Soft vol-floor / Goodhart fails open diligence but must not paint Magis "broken".
+    if hard_n:
         label = "broken"
-    elif stale_n or drift_n:
+    elif soft_n or stale_n or drift_n:
         label = "attention"
     else:
         label = "steady"
 
     headlines: list[dict] = []
-    for row in state["broken"][:6]:
+    for row in hard_broken[:6]:
         headlines.append({
             "kind": "fail",
             "ticker": row["ticker"],
             "text": f"{row['ticker']} {row['kpi_id']} failed gate",
+            "binds_to": row.get("binds_to"),
+        })
+    for row in soft_broken[:6]:
+        headlines.append({
+            "kind": "soft_fail",
+            "ticker": row["ticker"],
+            "text": (
+                f"{row['ticker']} {row['kpi_id']} soft floor miss "
+                f"(gameability={row.get('gameability')}; diligence, not thesis break)"
+            ),
             "binds_to": row.get("binds_to"),
         })
     for row in state["stale"][:4]:
@@ -309,17 +329,18 @@ def build_strip(state: dict, month: str, cards: list, superorgs: list, horizons:
     ceiling_short = pred.short_label(claim_ceiling)
 
     summary = (
-        f"World Model: {broken_n} failed, {stale_n} stale, {drift_n} drifted, "
-        f"{unchecked_n} unchecked, {pass_n} passing. "
+        f"World Model: {hard_n} hard-failed, {soft_n} soft-floor, {stale_n} stale, "
+        f"{drift_n} drifted, {unchecked_n} unchecked, {pass_n} passing. "
         f"{industry_scope} "
         f"Phase-likely themes: {', '.join(phase_likely) or 'none'}. "
         f"Horizon converging: {', '.join(converging) or 'none'}. "
-        f"Steady means gates held, not path certainty."
+        f"Steady means hard gates held, not path certainty. "
+        f"Soft vol floors (Goodhart) never alone mark the strip broken."
     )
     ev_stance = (
-        f"[{ceiling_short}] Buy dips when orientation+reinforcement hold and KPI gates pass; "
-        "do not when thesis KPIs fail. Context only; does not rewrite the universal contract "
-        "or human decision."
+        f"[{ceiling_short}] Buy dips when orientation+reinforcement hold and hard KPI gates pass; "
+        "pause when hard thesis KPIs fail. Soft vol-floor misses are diligence noise. "
+        "Context only; does not rewrite the universal contract or human decision."
     )
 
     return {
@@ -337,6 +358,8 @@ def build_strip(state: dict, month: str, cards: list, superorgs: list, horizons:
         ),
         "counts": {
             "fail": broken_n,
+            "fail_hard": hard_n,
+            "fail_soft": soft_n,
             "stale": stale_n,
             "unchecked": unchecked_n,
             "pass": pass_n,
@@ -352,7 +375,8 @@ def build_strip(state: dict, month: str, cards: list, superorgs: list, horizons:
         },
         "industry_scope": industry_scope,
         "headlines": headlines,
-        "broken": state["broken"],
+        "broken": hard_broken,
+        "soft_fails": soft_broken,
         "stale": state["stale"],
         "drifted_edges": state["drifted_edges"],
         "unchecked": state["unchecked"][:20],

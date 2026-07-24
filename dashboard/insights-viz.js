@@ -1540,7 +1540,8 @@
     const ceilingShort = wmClassShort(claimCeiling);
     const counts = strip.counts || {};
     const countLine = [
-      counts.fail != null ? `${counts.fail} failed` : '',
+      counts.fail_hard != null ? `${counts.fail_hard} hard-fail` : (counts.fail != null ? `${counts.fail} failed` : ''),
+      counts.fail_soft != null && counts.fail_soft ? `${counts.fail_soft} soft-floor` : '',
       counts.stale != null ? `${counts.stale} stale` : '',
       counts.drifted_edges != null ? `${counts.drifted_edges} drifted` : '',
       counts.pass != null ? `${counts.pass} passing` : '',
@@ -1548,11 +1549,15 @@
       counts.ledgers != null ? `${counts.ledgers} ledgers` : '',
     ].filter(Boolean).join(' · ');
 
-    const alertRows = [...(strip.broken || []), ...(strip.stale || [])].slice(0, 12).map(r => `
+    const alertRows = [
+      ...(strip.broken || []).map(r => ({ ...r, _kind: 'hard' })),
+      ...(strip.soft_fails || []).map(r => ({ ...r, _kind: 'soft' })),
+      ...(strip.stale || []).map(r => ({ ...r, _kind: 'stale' })),
+    ].slice(0, 12).map(r => `
       <tr>
         <td class="mono">${escapeHtml(r.ticker || '')}</td>
-        <td><span class="badge ${r.status === 'fail' ? 'badge-bad' : 'badge-warn'}">${escapeHtml(r.status || '')}</span></td>
-        <td style="font-size:12px">${escapeHtml(r.kpi_id || r.label || '')}${r.gameability ? ` <span class="badge badge-warn" title="Goodhart risk">g:${escapeHtml(r.gameability)}</span>` : ''}</td>
+        <td><span class="badge ${r._kind === 'hard' ? 'badge-bad' : 'badge-warn'}">${escapeHtml(r._kind === 'soft' ? 'soft-floor' : (r.status || r._kind || ''))}</span></td>
+        <td style="font-size:12px">${escapeHtml(r.kpi_id || r.label || '')}${r.gameability ? ` <span class="badge badge-warn" title="Goodhart risk — does not alone mark strip broken">g:${escapeHtml(r.gameability)}</span>` : ''}</td>
         <td><span class="badge badge-us">${escapeHtml(wmClassShort(r.predictability_class))}</span></td>
       </tr>`).join('');
 

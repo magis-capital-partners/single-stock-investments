@@ -59,7 +59,11 @@ def tickers_from_strip(strip: dict) -> set[str]:
     for n in strip.get("industry_nodes") or []:
         for t in n.get("linked_tickers") or []:
             out.add(str(t).upper())
-    for row in (strip.get("broken") or []) + (strip.get("stale") or []):
+    for row in (
+        (strip.get("broken") or [])
+        + (strip.get("soft_fails") or [])
+        + (strip.get("stale") or [])
+    ):
         if row.get("ticker"):
             out.add(str(row["ticker"]).upper())
     for path in wm.ROOT.glob("*/research/kpi_ledger.json"):
@@ -112,10 +116,24 @@ def build_context(ticker: str, strip: dict, existing: dict | None) -> dict:
             "status": r.get("status") or "fail",
             "binds_to": r.get("binds_to"),
             "label": r.get("label"),
+            "soft_floor": False,
         }
         for r in (strip.get("broken") or [])
         if str(r.get("ticker") or "").upper() == t
     ]
+    kpi_soft = [
+        {
+            "kpi_id": r.get("kpi_id"),
+            "status": "soft_floor",
+            "binds_to": r.get("binds_to"),
+            "label": r.get("label"),
+            "soft_floor": True,
+            "gameability": r.get("gameability"),
+        }
+        for r in (strip.get("soft_fails") or [])
+        if str(r.get("ticker") or "").upper() == t
+    ]
+    kpi_fails.extend(kpi_soft)
     kpi_stale = [
         {"kpi_id": r.get("kpi_id"), "binds_to": r.get("binds_to")}
         for r in (strip.get("stale") or [])
@@ -215,7 +233,10 @@ def build_context(ticker: str, strip: dict, existing: dict | None) -> dict:
             f"Magis claim class: {pred_class}. Promotion template: "
             "_system/reviews/pending/world_model_promote_{TICKER}_{date}.md."
         ),
-        "human_review_required": bool(kpi_fails or superorg_gaps),
+        # Soft vol-floor misses are diligence noise — do not open review inbox alone.
+        "human_review_required": bool(
+            any(not r.get("soft_floor") for r in kpi_fails) or superorg_gaps
+        ),
     }
 
 

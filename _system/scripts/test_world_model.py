@@ -146,6 +146,33 @@ def test_predictability_classes_and_ceiling():
     assert pred.find_banned_phrases("This is a complexity IRR fantasy") == ["complexity irr"]
 
 
+def test_soft_vol_floor_fail_is_attention_not_broken():
+    import build_world_model_snapshot as snap  # noqa: WPS433
+
+    state = {
+        "broken": [{
+            "ticker": "ASX.AX",
+            "kpi_id": "asx200_20d_realized_vol",
+            "status": "fail",
+            "gameability": "high",
+            "predictability_class": "P3_oriented",
+            "binds_to": {"on_fail": "open_diligence"},
+        }],
+        "stale": [],
+        "unchecked": [],
+        "passes": [],
+        "drifted_edges": [],
+        "ledgers": [],
+    }
+    strip = snap.build_strip(state, "2026-07", [], [], [], [])
+    assert strip["label"] == "attention"
+    assert strip["counts"]["fail_hard"] == 0
+    assert strip["counts"]["fail_soft"] == 1
+    assert strip["broken"] == []
+    assert len(strip["soft_fails"]) == 1
+    assert any(h.get("kind") == "soft_fail" for h in strip["headlines"])
+
+
 def test_exchange_vol_map_regions():
     import scaffold_industry_kpi_ledgers as sc  # noqa: WPS433
 
@@ -187,5 +214,6 @@ if __name__ == "__main__":
     test_foresight_artifacts_exist()
     test_apply_world_model_context_ice()
     test_predictability_classes_and_ceiling()
+    test_soft_vol_floor_fail_is_attention_not_broken()
     test_exchange_vol_map_regions()
     print("test_world_model: ok")
