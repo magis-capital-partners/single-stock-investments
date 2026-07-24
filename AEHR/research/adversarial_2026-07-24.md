@@ -11,11 +11,11 @@ re_pass: false
 
 # AEHR — Adversarial review
 
-**Date:** 2026-07-23  
+**Date:** 2026-07-24  
 **Agent:** Milly (batch pass)  
-**Dive reviewed:** `AEHR/research/deep_dive_2026-07-23.md`  
+**Dive reviewed:** `AEHR/research/deep_dive_2026-07-24.md`  
 **Valuation reviewed:** `AEHR/research/valuation.json`  
-**Filings used:** `AEHR/research/evidence/filing_facts_2026-07-23.json`
+**Filings used:** `AEHR/research/evidence/filing_facts_2026-07-24.json`
 
 **Goal:** Truth-seeking QA. Not bearish for its own sake.
 
