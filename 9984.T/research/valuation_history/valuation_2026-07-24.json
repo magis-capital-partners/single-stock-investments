@@ -1,0 +1,712 @@
+{
+  "ticker": "9984.T",
+  "as_of": "2026-07-24",
+  "method": "full",
+  "valuation_mode": "optionality",
+  "valuation_overlay": "segment_cashflow",
+  "lawrence_bucket": "holdco_nav",
+  "classification_inputs": {
+    "archetype": "holding_co",
+    "moat": "unproven",
+    "dhando": "partial",
+    "cycle": "mid",
+    "payoff_lens": "asset"
+  },
+  "inputs": {
+    "price": 5918.0,
+    "price_source": "Yahoo Finance 9984.T close 2026-07-24",
+    "fcf_per_share": 250.0,
+    "fcf_source": "FY2025 dividend 44.0 yen/sh plus conservative recurring investment income; excludes one-time Alibaba mark gains",
+    "shares_millions": 1452.982,
+    "shares_outstanding": 1452982000,
+    "shares_source": "9984.T/01_Official/IR/financial_report_q4fy2024_ja.pdf; 9984.T/01_Official/IR/annual_report_fy2025_en.pdf",
+    "normalization_note": "Holdco Lawrence gate uses normalized owner cash, not volatile investment gain EPS."
+  },
+  "scenarios": {
+    "bear": {
+      "growth_y1_5": 0.0,
+      "growth_y6_10": 0.0,
+      "exit_pfcf_y10": 12,
+      "notes": "Investment marks mean-revert; financing stress"
+    },
+    "base": {
+      "growth_y1_5": 0.02,
+      "growth_y6_10": 0.02,
+      "exit_pfcf_y10": 15,
+      "notes": "Dividend plus modest recurring investment income"
+    },
+    "bull": {
+      "growth_y1_5": 0.05,
+      "growth_y6_10": 0.03,
+      "exit_pfcf_y10": 18,
+      "notes": "Arm royalty ramp and AI optionality convert to owner cash"
+    }
+  },
+  "option_scan": [
+    {
+      "q": 1,
+      "question": "GAAP book misstates core assets?",
+      "answer": "Partial",
+      "treatment": "nav_floor",
+      "evidence": "Consolidated subsidiaries at book; listed stakes and SVF marks move through equity and P&L"
+    },
+    {
+      "q": 3,
+      "question": "In-business loss segment?",
+      "answer": "Yes",
+      "treatment": "probability_weighted",
+      "evidence": "SVF2 and holdco investment losses in filing; AI bets pre-profit"
+    },
+    {
+      "q": 5,
+      "question": "Private stakes below fair value?",
+      "answer": "Yes",
+      "treatment": "probability_weighted",
+      "evidence": "Vision Fund portfolio and OpenAI commitment per FY2025 results"
+    },
+    {
+      "q": 0,
+      "question": "Material options after scan?",
+      "answer": "Yes",
+      "treatment": "probability_weighted",
+      "evidence": "Arm, SVF, OpenAI/Stargate; base overlay $0 until filing-backed cash"
+    }
+  ],
+  "valuation_methodology": {
+    "version": "3.0",
+    "mode": "separated_views",
+    "profile": "catalyst_asset_value",
+    "security_type": "pure_holding_company",
+    "horizon_years": 7,
+    "owner_cash_definition": "Dividend plus normalized recurring investment income; excludes one-time mark gains",
+    "decision_rule": "Component sum is proof-first NAV stack; Lawrence owner cash is separate stance gate."
+  },
+  "component_valuation_results": {
+    "status": "inferred_minimal",
+    "decision_rule": "Operating-only fallback. Add an explicit component_valuation schedule before drawing asset-level conclusions.",
+    "all_material_components_identified": false,
+    "additive_components": [
+      {
+        "id": "operating_business_fallback",
+        "label": "Operating business (fallback)",
+        "category": "operating_business",
+        "treatment": "additive",
+        "method": "owner_cash_dcf",
+        "evidence_tier": "model_input",
+        "evidence": "inputs.fcf_per_share and scenarios.base",
+        "low_per_share": 3173.53,
+        "base_per_share": 3519.07,
+        "high_per_share": 3914.88
+      }
+    ],
+    "embedded_components": [],
+    "total_equity_value_per_share": {
+      "low": 3173.53,
+      "base": 3519.07,
+      "high": 3914.88
+    },
+    "material_component_count": 1,
+    "additive_component_count": 1,
+    "embedded_component_count": 0,
+    "market_price_per_share": 5918.0,
+    "upside_downside_pct": {
+      "low": -46.4,
+      "base": -40.5,
+      "high": -33.8
+    }
+  },
+  "evidence_refresh": {
+    "synthesis_in_dive": true
+  },
+  "estimates": {
+    "external": []
+  },
+  "lawrence_horizon_years": 7,
+  "results_lawrence_legacy": {
+    "bear": {
+      "return_pct": -3.6
+    },
+    "base": {
+      "return_pct": 0.8
+    },
+    "bull": {
+      "return_pct": 5.4
+    }
+  },
+  "results": {
+    "bear": {
+      "return_pct": -3.6
+    },
+    "base": {
+      "return_pct": 0.8
+    },
+    "bull": {
+      "return_pct": 5.4
+    }
+  },
+  "implied_return": {
+    "base_pct": 0.8,
+    "label": "7yr IRR",
+    "display": "0.8% (base)"
+  },
+  "stance_proposal": {
+    "suggested": "watch",
+    "irr_band": "<15%",
+    "gates": {
+      "moat_ok": false,
+      "dhando_ok": true
+    },
+    "override_reason": null
+  },
+  "overlay_results": [],
+  "economic_value_analysis": {
+    "schema_version": "1.0",
+    "status": "evidence_blocked",
+    "trigger": {
+      "required": true,
+      "reasons": [
+        "separated_valuation_views",
+        "optionality_or_nav_overlay"
+      ],
+      "policy": "A complete economic-value analysis is required when any trigger fires; otherwise it is recommended."
+    },
+    "method": "economic_claim_to_risked_present_value",
+    "economic_claim": {},
+    "gaap_role": null,
+    "accounting_reference": null,
+    "comparable_hierarchy": [
+      "issuer_arm_length_transaction",
+      "same_asset_transaction",
+      "public_peer",
+      "replacement_cost",
+      "approved_external_analysis"
+    ],
+    "gross_comparable_nav_per_share": null,
+    "risked_present_value_per_share": {
+      "low": 3173.53,
+      "base": 3519.07,
+      "high": 3914.88
+    },
+    "component_groups": [
+      {
+        "id": "operating_business_fallback",
+        "label": "Operating business (fallback)",
+        "component_ids": [
+          "operating_business_fallback"
+        ],
+        "economic_claim": "Operating business (fallback)",
+        "valuation_basis": "owner_cash_dcf",
+        "adjustments": "Risk and timing are reflected in the low/base/high range.",
+        "overlap_control": "Unique overlap key operating_business_fallback.",
+        "risked_present_value_per_share": {
+          "low": 3173.53,
+          "base": 3519.07,
+          "high": 3914.88
+        }
+      }
+    ],
+    "valuation_proof": [
+      {
+        "component_id": "operating_business_fallback",
+        "economic_claim": "Operating business (fallback)",
+        "quantity": {
+          "value": 1,
+          "unit": "per-share economic claim"
+        },
+        "method": "owner_cash_dcf",
+        "evidence_tier": "model_input",
+        "evidence": "inputs.fcf_per_share and scenarios.base",
+        "comparable_role": "not_applicable",
+        "comparable_ids": [],
+        "adjustment": "Risk and timing are reflected in the low/base/high range.",
+        "range_per_share": {
+          "low": 3173.53,
+          "base": 3519.07,
+          "high": 3914.88
+        },
+        "treatment": "additive",
+        "overlap_key": "operating_business_fallback",
+        "overlap_control": "Unique overlap key operating_business_fallback.",
+        "falsifier": "Owner cash, reinvestment economics, or competitive position remains below the low-case path for two reporting periods.",
+        "risk_and_timing": null
+      }
+    ],
+    "wisdom_applied": [],
+    "limitations": [],
+    "complete_component_coverage": true,
+    "validation_errors": [
+      "complete component schedule required",
+      "economic_claim.description required",
+      "economic_claim.enterprise_to_equity_reconciliation required",
+      "economic_claim.unit_count required",
+      "economic_claim.unit_label required",
+      "economic_claim.unit_source required",
+      "economic_value.schema_version 1.0 required",
+      "gaap_role required"
+    ],
+    "registry_version": "1.0"
+  },
+  "valuation_method_route": {
+    "schema_version": "1.0",
+    "status": "routed",
+    "profile_id": "scarce_asset_optionality",
+    "label": "Scarce assets, royalties, and optionality",
+    "score": 6.0,
+    "reasons": [
+      "archetype=holding_co"
+    ],
+    "primary_methods": [
+      "component_owner_cash_and_unit_nav"
+    ],
+    "corroborating_methods": [
+      "comparable_transactions",
+      "replacement_cost_or_reverse_nav"
+    ],
+    "primary_personas": [
+      "hk",
+      "stahl"
+    ],
+    "cross_check_personas": [
+      "klarman_asset_value",
+      "marks_credit_cycle"
+    ],
+    "silent_personas": [
+      "buffett_weschler",
+      "greenblatt",
+      "hohn",
+      "marathon_capital_cycle",
+      "munger",
+      "pabrai"
+    ],
+    "required_evidence": [
+      "legal economic claim",
+      "non-overlapping physical inventory",
+      "unit economics",
+      "realization timing",
+      "remaining owner capital"
+    ],
+    "failure_modes": [
+      "gross asset value mistaken for shareholder value",
+      "operating cash flow and NAV counted twice",
+      "remote options treated as contracted cash"
+    ],
+    "secondary_profiles": [
+      {
+        "profile_id": "catalyst_asset_value",
+        "score": 6.0,
+        "reasons": [
+          "archetype=holding_co"
+        ]
+      },
+      {
+        "profile_id": "quality_reinvestment",
+        "score": 3.0,
+        "reasons": [
+          "component categories=operating_business",
+          "existing methods=dcf, owner_cash"
+        ]
+      }
+    ],
+    "scorecard": {
+      "scarce_asset_optionality": {
+        "score": 6.0,
+        "reasons": [
+          "archetype=holding_co"
+        ]
+      },
+      "quality_reinvestment": {
+        "score": 3.0,
+        "reasons": [
+          "component categories=operating_business",
+          "existing methods=dcf, owner_cash"
+        ]
+      },
+      "capital_cycle": {
+        "score": 1.0,
+        "reasons": [
+          "component categories=operating_business"
+        ]
+      },
+      "credit_and_normalized_returns": {
+        "score": 0.0,
+        "reasons": []
+      },
+      "catalyst_asset_value": {
+        "score": 6.0,
+        "reasons": [
+          "archetype=holding_co"
+        ]
+      },
+      "predictable_cash_flow": {
+        "score": 2.0,
+        "reasons": [
+          "component categories=operating_business",
+          "existing methods=owner_cash"
+        ]
+      },
+      "binary_milestone": {
+        "score": 0.0,
+        "reasons": []
+      }
+    },
+    "decision_rule": "Use one primary method and no more than two corroborating methods; irrelevant methods and personas remain silent."
+  },
+  "universal_valuation_contract": {
+    "schema_version": "2.0",
+    "status": "evidence_blocked",
+    "ticker": "9984.T",
+    "as_of": "2026-07-24",
+    "economic_ownership_map": [
+      {
+        "component_id": "operating_business_fallback",
+        "label": "Operating business (fallback)",
+        "category": "operating_business",
+        "treatment": "additive",
+        "included_in_component_id": null,
+        "ownership_claim": "Operating business (fallback)",
+        "ownership_percentage": 1.0,
+        "quantity": {
+          "value": 1,
+          "unit": "per-share economic claim"
+        },
+        "method": "owner_cash_dcf",
+        "method_version": null,
+        "method_provenance": null,
+        "comparable_ids": [],
+        "range_per_share": {
+          "low": null,
+          "base": null,
+          "high": null
+        },
+        "legacy_range_per_share": {
+          "low": 3173.53,
+          "base": 3519.07,
+          "high": 3914.88
+        },
+        "valuation_status": "legacy_sensitivity",
+        "calculation_proof": null,
+        "evidence_tier": "model_input",
+        "evidence_level": "analyst_estimated",
+        "evidence": "inputs.fcf_per_share and scenarios.base",
+        "scenario_assumptions": null,
+        "probability_and_timing": null,
+        "tax_and_realization_adjustments": "Risk and timing are reflected in the low/base/high range.",
+        "falsifier": "Owner cash, reinvestment economics, or competitive position remains below the low-case path for two reporting periods.",
+        "overlap_key": "operating_business_fallback",
+        "assumption_type": "estimate"
+      }
+    ],
+    "component_coverage": {
+      "all_material_components_identified": false,
+      "material_component_count": 1,
+      "additive_component_count": 1,
+      "embedded_component_count": 0,
+      "unvalued_component_count": 1,
+      "double_counting_flags": []
+    },
+    "input_classification": {
+      "facts": [],
+      "estimates": [
+        {
+          "component_id": "operating_business_fallback",
+          "label": "Operating business (fallback)",
+          "kind": "estimate",
+          "evidence_tier": "model_input",
+          "evidence": "inputs.fcf_per_share and scenarios.base",
+          "method": "owner_cash_dcf",
+          "valuation_status": "legacy_sensitivity"
+        }
+      ],
+      "judgments": []
+    },
+    "method_route": {
+      "schema_version": "1.0",
+      "status": "routed",
+      "profile_id": "scarce_asset_optionality",
+      "label": "Scarce assets, royalties, and optionality",
+      "score": 6.0,
+      "reasons": [
+        "archetype=holding_co"
+      ],
+      "primary_methods": [
+        "component_owner_cash_and_unit_nav"
+      ],
+      "corroborating_methods": [
+        "comparable_transactions",
+        "replacement_cost_or_reverse_nav"
+      ],
+      "primary_personas": [
+        "hk",
+        "stahl"
+      ],
+      "cross_check_personas": [
+        "klarman_asset_value",
+        "marks_credit_cycle"
+      ],
+      "silent_personas": [
+        "buffett_weschler",
+        "greenblatt",
+        "hohn",
+        "marathon_capital_cycle",
+        "munger",
+        "pabrai"
+      ],
+      "required_evidence": [
+        "legal economic claim",
+        "non-overlapping physical inventory",
+        "unit economics",
+        "realization timing",
+        "remaining owner capital"
+      ],
+      "failure_modes": [
+        "gross asset value mistaken for shareholder value",
+        "operating cash flow and NAV counted twice",
+        "remote options treated as contracted cash"
+      ],
+      "secondary_profiles": [
+        {
+          "profile_id": "catalyst_asset_value",
+          "score": 6.0,
+          "reasons": [
+            "archetype=holding_co"
+          ]
+        },
+        {
+          "profile_id": "quality_reinvestment",
+          "score": 3.0,
+          "reasons": [
+            "component categories=operating_business",
+            "existing methods=dcf, owner_cash"
+          ]
+        }
+      ],
+      "scorecard": {
+        "scarce_asset_optionality": {
+          "score": 6.0,
+          "reasons": [
+            "archetype=holding_co"
+          ]
+        },
+        "quality_reinvestment": {
+          "score": 3.0,
+          "reasons": [
+            "component categories=operating_business",
+            "existing methods=dcf, owner_cash"
+          ]
+        },
+        "capital_cycle": {
+          "score": 1.0,
+          "reasons": [
+            "component categories=operating_business"
+          ]
+        },
+        "credit_and_normalized_returns": {
+          "score": 0.0,
+          "reasons": []
+        },
+        "catalyst_asset_value": {
+          "score": 6.0,
+          "reasons": [
+            "archetype=holding_co"
+          ]
+        },
+        "predictable_cash_flow": {
+          "score": 2.0,
+          "reasons": [
+            "component categories=operating_business",
+            "existing methods=owner_cash"
+          ]
+        },
+        "binary_milestone": {
+          "score": 0.0,
+          "reasons": []
+        }
+      },
+      "decision_rule": "Use one primary method and no more than two corroborating methods; irrelevant methods and personas remain silent."
+    },
+    "market": {
+      "price_per_share": 5918.0,
+      "fully_diluted_shares": 1452982000,
+      "market_cap_m": 8598747.48,
+      "enterprise_value_m": null
+    },
+    "valuation": {
+      "value_per_share": {
+        "low": null,
+        "base": null,
+        "high": null
+      },
+      "priced_components_per_share": {
+        "low": 0,
+        "base": 0,
+        "high": 0
+      },
+      "legacy_value_per_share": {
+        "low": 3173.53,
+        "base": 3519.07,
+        "high": 3914.88
+      },
+      "probability_weighted_value_per_share": null,
+      "expected_distributions_per_share": 0.0,
+      "annualized_return_at_price_pct": {
+        "low": null,
+        "base": null,
+        "high": null
+      },
+      "downside_to_low_pct": null,
+      "horizon_years": 7,
+      "interpretation": "value_per_share is withheld while any material additive component is unpriced; priced_components_per_share is not a complete security value."
+    },
+    "scenario_contract": {
+      "rule": "Cases must change cited causal operating, capital, probability, timing, or financing drivers\u2014not only a terminal multiple.",
+      "top_value_drivers": [
+        {
+          "component_id": "operating_business_fallback",
+          "label": "Operating business (fallback)",
+          "valuation_status": "legacy_sensitivity",
+          "base_per_share": null,
+          "legacy_base_per_share": 3519.07,
+          "range_width_per_share": null,
+          "scenario_assumptions": null
+        }
+      ],
+      "reverse_expectations": null
+    },
+    "calculation_proof_summary": {
+      "component_count": 1,
+      "priced_component_count": 0,
+      "proof_complete_pct": 0.0,
+      "status_counts": {
+        "bounded_estimate": 0,
+        "calculated": 0,
+        "legacy_sensitivity": 1,
+        "unpriced": 0
+      },
+      "all_material_components_priced": false,
+      "calculation_errors": [],
+      "aggregate_proof_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    "source_lineage": [],
+    "model_checks": {
+      "calculation_graphs_valid": true,
+      "component_sum_reconciles": false,
+      "no_double_counting": true,
+      "all_material_components_priced": false,
+      "low_base_high_ordered": true
+    },
+    "evidence": {
+      "unresolved_count": 9,
+      "blockers": [
+        "complete component schedule required",
+        "economic_claim.description required",
+        "economic_claim.enterprise_to_equity_reconciliation required",
+        "economic_claim.unit_count required",
+        "economic_claim.unit_label required",
+        "economic_claim.unit_source required",
+        "economic_value.schema_version 1.0 required",
+        "gaap_role required",
+        "operating_business_fallback: material component is legacy_sensitivity; a valid calculation proof is required"
+      ],
+      "validation_errors": [
+        "complete component schedule required",
+        "economic_claim.description required",
+        "economic_claim.enterprise_to_equity_reconciliation required",
+        "economic_claim.unit_count required",
+        "economic_claim.unit_label required",
+        "economic_claim.unit_source required",
+        "economic_value.schema_version 1.0 required",
+        "gaap_role required"
+      ]
+    },
+    "monitoring": {
+      "falsifiers": [
+        "Owner cash, reinvestment economics, or competitive position remains below the low-case path for two reporting periods."
+      ],
+      "required_refresh_triggers": [
+        "new filing or material operating update",
+        "capital-structure change",
+        "material price move",
+        "component milestone or falsifier"
+      ]
+    },
+    "change_control": {
+      "model_hash": "11236efada186f0f29ed950d4f1dc01c24d6977b47e5578c085db7b788c40df0",
+      "method_versions": [],
+      "change_log": [],
+      "rule": "A source fact is locked. Every assumption change requires a reason, author, timestamp, and before/after value."
+    },
+    "decision_rule": "No security is decision-grade until every material claim is valued exactly once by a valid calculation proof and every material evidence blocker is resolved."
+  },
+  "valuation_views": {
+    "decision_rule": "Do not average operating returns, component value, and reverse expectations.",
+    "operating": {
+      "owner_cash_per_share": 250.0,
+      "scenario_returns_pct": {
+        "bear": -3.6,
+        "base": 0.8,
+        "bull": 5.4
+      },
+      "segment_cross_check": null
+    },
+    "assets": {
+      "legacy_supported_decision_value_per_share": 0.0,
+      "ledger": [],
+      "legacy_non_supported_count": 0
+    },
+    "components": {
+      "status": "inferred_minimal",
+      "decision_rule": "Operating-only fallback. Add an explicit component_valuation schedule before drawing asset-level conclusions.",
+      "all_material_components_identified": false,
+      "additive_components": [
+        {
+          "id": "operating_business_fallback",
+          "label": "Operating business (fallback)",
+          "category": "operating_business",
+          "treatment": "additive",
+          "method": "owner_cash_dcf",
+          "evidence_tier": "model_input",
+          "evidence": "inputs.fcf_per_share and scenarios.base",
+          "low_per_share": 3173.53,
+          "base_per_share": 3519.07,
+          "high_per_share": 3914.88
+        }
+      ],
+      "embedded_components": [],
+      "total_equity_value_per_share": {
+        "low": 3173.53,
+        "base": 3519.07,
+        "high": 3914.88
+      },
+      "material_component_count": 1,
+      "additive_component_count": 1,
+      "embedded_component_count": 0,
+      "market_price_per_share": 5918.0,
+      "upside_downside_pct": {
+        "low": -46.4,
+        "base": -40.5,
+        "high": -33.8
+      }
+    },
+    "reverse_expectations": {
+      "price": 5918.0,
+      "exit_multiple": 15.0,
+      "constant_owner_cash_growth_required_pct": 1.2,
+      "warning": "Required growth is a diagnostic, not a forecast."
+    },
+    "entry_prices": {
+      "10%": 3519.07,
+      "12%": 3173.53,
+      "15%": 2733.86
+    }
+  },
+  "synthesis": {
+    "status": "disabled_separated_views",
+    "reason": "Correlated operating paths and unsupported asset options must not be averaged into a consensus return."
+  },
+  "legacy_output_policy": {
+    "results_lawrence_legacy": "compatibility alias of the current operating scenarios; not a separate valuation",
+    "growth_explanation": "qualitative scenario context only; legacy numerical paths do not enter the decision",
+    "nav_overlay": "audit history only when decision_use is false",
+    "option_scan": "inventory disclosure only; asset value enters only through valuation_views.assets"
+  }
+}

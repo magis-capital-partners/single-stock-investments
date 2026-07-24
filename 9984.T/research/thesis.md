@@ -1,18 +1,23 @@
 # 9984.T — Investment Thesis
 
-**Last updated:** 2026-07-23
+**Last updated:** auto-sync
 
 ## Classification
 
 | Field | Value |
 |-------|-------|
-| **Archetype** (Stahl) | unknown |
+| **Archetype** (Stahl) | holding_co |
 | **Moat** (Munger) | unproven |
-| **Dhando** (Pabrai) | pending |
+| **Dhando** (Pabrai) | partial |
 | **Stance** | watch |
-| **Cycle** | - |
-| **MOI bucket** (legacy) | pending |
-| **Payoff lens** | pending |
+| **Cycle** | mid |
+| **Implied 7yr IRR** (base) | — |
+| **IRR method** | quality_reinvestment |
+| **Lawrence bucket** | holdco_nav |
+| **Payoff lens** | asset |
+| **MOI bucket** | pending |
+
+**Deep dive:** `9984.T/research/deep_dive_2026-07-24.md` (auto-sync)
 
 ## One-line thesis
 
