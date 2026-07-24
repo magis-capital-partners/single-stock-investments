@@ -25,6 +25,29 @@ OPS = {
 }
 
 
+def floor_equity_value_range(
+    values: dict | None,
+    *,
+    ndigits: int | None = None,
+) -> dict:
+    """Limited-liability floor for security equity value per share.
+
+    Individual components (debt, reserves, funding gaps) may be negative.
+    The summed long-equity claim cannot. Returns a new low/base/high dict
+    with each present numeric case floored at 0.
+    """
+    out: dict[str, float | None] = {}
+    src = values or {}
+    for case in CASES:
+        raw = src.get(case)
+        if raw is None:
+            out[case] = None
+            continue
+        floored = max(0.0, float(raw))
+        out[case] = round(floored, ndigits) if ndigits is not None else floored
+    return out
+
+
 def canonical_hash(value: Any) -> str:
     payload = json.dumps(value, sort_keys=True, separators=(",", ":"), ensure_ascii=False)
     return hashlib.sha256(payload.encode("utf-8")).hexdigest()

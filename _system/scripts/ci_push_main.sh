@@ -228,6 +228,29 @@ sync_self_from_origin_main() {
   CI_PUSH_SOURCING=1 source "$dest"
 }
 
+ensure_main_rebase_history() {
+  # Depth-1 sparse checkouts often cannot compute origin/main...HEAD merge-base
+  # once main advances. Deepen (or unshallow) before rebase/push.
+  if [ "$(git rev-parse --is-shallow-repository 2>/dev/null || echo false)" = "true" ]; then
+    echo "Deepening shallow clone for rebase onto origin/main..."
+    git fetch --deepen=200 origin main 2>/dev/null \
+      || git fetch --unshallow origin 2>/dev/null \
+      || git fetch origin main
+  else
+    git fetch origin main
+  fi
+}
+
+clean_worktree_for_rebase() {
+  # Rebuild steps may dirty files outside the staged commit set; rebase refuses
+  # to start with unstaged changes. --keep-index preserves the commit payload.
+  git update-index -q --refresh || true
+  if ! git diff --quiet || [ -n "$(git ls-files --others --exclude-standard | head -n 1)" ]; then
+    echo "Stashing unstaged/untracked worktree dirt before rebase..."
+    git stash push -u --keep-index -m "ci_push_main-pre-rebase" || true
+  fi
+}
+
 ci_push_main() {
   local msg="${1:?commit message required}"
   sync_self_from_origin_main
@@ -242,11 +265,14 @@ ci_push_main() {
     echo "::error::Aborting commit: staged files exceed GitHub size limits."
     exit 1
   fi
+  # Drop unstaged noise so the post-commit rebase can start cleanly.
+  clean_worktree_for_rebase
   git commit -m "$msg"
 
   local attempt=1
   while [ "$attempt" -le "$MAX_ATTEMPTS" ]; do
-    git fetch origin main
+    ensure_main_rebase_history
+    clean_worktree_for_rebase
     if ! git rebase origin/main; then
       while rebase_in_progress && try_resolve_rebase_conflicts; do
         echo "Resolved regenerable rebase conflicts; continuing rebase (attempt $attempt/$MAX_ATTEMPTS)."

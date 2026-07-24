@@ -197,8 +197,11 @@ jobs:
             _system/scripts/ci_sparse_checkout_paths.py
           sparse-checkout-cone-mode: false
           fetch-depth: 1
-      - name: Checkout workspace (minimal + scripts)
-        run: bash _system/scripts/ci_checkout_workspace.sh minimal
+      # Always publish from main (not a workflow_dispatch feature-branch tip).
+      # Shallow feature-branch checkouts lack a merge-base with origin/main, so
+      # ci_push_main rebase/push fails. pages profile includes dashboard/.
+      - name: Checkout workspace (scripts + dashboard on main)
+        run: bash _system/scripts/ci_checkout_workspace.sh pages main
 
       - uses: actions/setup-python@v5
         with:
@@ -210,8 +213,10 @@ jobs:
       - name: Checkout research vault
         uses: ./.github/actions/checkout-vault
 
-      - name: Assert Makefile present for make targets
-        run: test -f Makefile
+      - name: Assert Makefile and dashboard present
+        run: |
+          test -f Makefile
+          test -d dashboard/data
 
       - name: Letter date parser gold gate
         run: |
@@ -274,6 +279,6 @@ jobs:
 
             Rebuild insights and document registry from research-vault letter corpus.
           git_add: >-
-            _system/reference/document-store/letter_drive_links.json
-            _system/reference/document-store/drive_filename_index.json
+            _system/reference/document-store/
+            _system/reference/data-sources/insights_record_archive.json
             dashboard/data/

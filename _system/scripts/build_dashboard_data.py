@@ -25,6 +25,7 @@ from insight_format import (  # noqa: E402
     split_insight_rows,
 )
 from valuation_synthesis import website_implied_irr  # noqa: E402
+from calculation_proof import floor_equity_value_range  # noqa: E402
 from decision_authority import contract_return_display, resolve_authority  # noqa: E402
 from macro_regime_panel import (  # noqa: E402
     build_portfolio_macro_regime,
@@ -1003,7 +1004,23 @@ def valuation_component_summary(ticker_dir: Path) -> dict | None:
     result = val.get("component_valuation_results") or {}
     if not result:
         return None
-    total = result.get("total_equity_value_per_share") or {}
+    raw_total = result.get("total_equity_value_per_share") or {}
+    total = floor_equity_value_range(raw_total, ndigits=4)
+    price = result.get("market_price_per_share")
+    upside = result.get("upside_downside_pct")
+    if price is not None and any(
+        isinstance(raw_total.get(k), (int, float)) and raw_total[k] < 0 for k in ("low", "base", "high")
+    ):
+        try:
+            px = float(price)
+            if px > 0:
+                upside = {
+                    key: round((float(total[key]) / px - 1) * 100, 1)
+                    for key in ("low", "base", "high")
+                    if total.get(key) is not None
+                }
+        except (TypeError, ValueError):
+            pass
     components = []
     for row in [*(result.get("additive_components") or []), *(result.get("embedded_components") or [])]:
         components.append({
@@ -1028,7 +1045,7 @@ def valuation_component_summary(ticker_dir: Path) -> dict | None:
         "decision_rule": result.get("decision_rule"),
         "market_price_per_share": result.get("market_price_per_share"),
         "total_equity_value_per_share": total,
-        "upside_downside_pct": result.get("upside_downside_pct"),
+        "upside_downside_pct": upside,
         "material_component_count": result.get("material_component_count", 0),
         "additive_component_count": result.get("additive_component_count", 0),
         "embedded_component_count": result.get("embedded_component_count", 0),
@@ -1081,11 +1098,17 @@ def valuation_workbench_summary(ticker_dir: Path) -> dict | None:
         data = json.loads(path.read_text(encoding="utf-8"))
     except (json.JSONDecodeError, OSError):
         return None
+    decision = dict(data.get("decision") or {})
+    if decision.get("value_per_share"):
+        decision["value_per_share"] = floor_equity_value_range(decision["value_per_share"], ndigits=4)
+    valuation = dict(data.get("valuation") or {})
+    if valuation.get("value_per_share"):
+        valuation["value_per_share"] = floor_equity_value_range(valuation["value_per_share"], ndigits=4)
     return {
         "as_of": data.get("as_of"),
-        "decision": data.get("decision") or {},
+        "decision": decision,
         "business": data.get("business") or {},
-        "valuation": data.get("valuation") or {},
+        "valuation": valuation,
         "optionality": data.get("optionality") or {},
         "committee": data.get("committee") or {},
         "evidence": data.get("evidence") or {},
@@ -1240,10 +1263,11 @@ def pricing_analysis_summary(ticker_dir: Path) -> dict | None:
         data = json.loads(path.read_text(encoding="utf-8"))
     except (json.JSONDecodeError, OSError):
         return None
+    values = floor_equity_value_range(data.get("component_value_per_share") or {}, ndigits=4)
     return {
         "as_of": data.get("as_of"),
         "price": data.get("price"),
-        "component_value_per_share": data.get("component_value_per_share"),
+        "component_value_per_share": values,
         "upside_downside_pct": data.get("upside_downside_pct"),
         "current_supported_value": data.get("base_value_supported_by_current_or_contracted_assets"),
         "market_price_above_supported_value": data.get("market_price_above_current_or_contracted_value"),

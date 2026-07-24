@@ -116,6 +116,35 @@ class SeparatedValuationTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "missing valuation.high"):
             compute_valuation(data)
 
+    def test_security_equity_value_floors_at_zero(self):
+        data = fixture()
+        data["component_valuation"] = {
+            "all_material_components_identified": True,
+            "components": [
+                {
+                    "id": "ops",
+                    "label": "Ops",
+                    "category": "operating_business",
+                    "overlap_key": "ops",
+                    "treatment": "additive",
+                    "valuation": {"method": "dcf", "evidence": "filing", "low": 100, "base": 200, "high": 300},
+                },
+                {
+                    "id": "reserve",
+                    "label": "Reserve",
+                    "category": "liability_or_reserve",
+                    "overlap_key": "reserve",
+                    "treatment": "additive",
+                    "valuation": {"method": "nav", "evidence": "filing", "low": -400, "base": -50, "high": 0},
+                },
+            ],
+        }
+        out = compute_valuation(data)["component_valuation_results"]
+        self.assertEqual(out["total_equity_value_per_share"], {"low": 0.0, "base": 150.0, "high": 300.0})
+        self.assertEqual(out["total_equity_value_per_share_pre_floor"]["low"], -300.0)
+        self.assertEqual(out["equity_liability_floor"], 0.0)
+        self.assertEqual(out["additive_components"][1]["low_per_share"], -400.0)
+
     def test_driver_models_calculate_ranges_instead_of_accepting_marks(self):
         data = fixture()
         data["inputs"]["shares_outstanding"] = 10_000_000

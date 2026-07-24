@@ -15,11 +15,13 @@ ROOT = Path(__file__).resolve().parents[2]
 LETTERS_REF_PREFIX = "_system/reference/superinvestor-letters"
 WISDOM_REF_PREFIX = "_system/reference/investment-wisdom"
 SUMZERO_REF_PREFIX = "_system/reference/sumzero-research"
+PODCASTS_REF_PREFIX = "_system/reference/podcasts"
 
 # Legacy in-repo locations (pre-split); used only when vault is unavailable.
 LEGACY_LETTERS = ROOT / "_system" / "reference" / "superinvestor-letters"
 LEGACY_WISDOM = ROOT / "_system" / "reference" / "investment-wisdom"
 LEGACY_SUMZERO = ROOT / "_system" / "reference" / "sumzero-research"
+LEGACY_PODCASTS = ROOT / "_system" / "reference" / "podcasts" / "_corpus"
 
 # Default clone target relative to ops repo root.
 DEFAULT_VAULT_REL = Path("_external") / "research-vault"
@@ -89,6 +91,11 @@ def sumzero_root(*, create: bool = False) -> Path:
     return _vault_subdir("sumzero-research", LEGACY_SUMZERO, create=create)
 
 
+def podcasts_root(*, create: bool = False) -> Path:
+    """Transcript corpus root (research-vault/podcasts or legacy _corpus)."""
+    return _vault_subdir("podcasts", LEGACY_PODCASTS, create=create)
+
+
 def dropbox_ingestion_root(*, create: bool = False) -> Path:
     legacy = ROOT / "_system" / "dropbox_ingestion"
     vault = research_vault_root(create=create)
@@ -112,6 +119,11 @@ def wisdom_ref(relative: str | Path = "") -> str:
     return f"{WISDOM_REF_PREFIX}/{rel}" if rel else WISDOM_REF_PREFIX
 
 
+def podcasts_ref(relative: str | Path = "") -> str:
+    rel = str(relative).replace("\\", "/").lstrip("/")
+    return f"{PODCASTS_REF_PREFIX}/{rel}" if rel else PODCASTS_REF_PREFIX
+
+
 def resolve_ref_to_path(ref: str | None) -> Path | None:
     """Map a logical repo ref to a filesystem path under vault or legacy tree."""
     if not ref:
@@ -129,6 +141,13 @@ def resolve_ref_to_path(ref: str | None) -> Path | None:
     if base.startswith(SUMZERO_REF_PREFIX + "/") or base == SUMZERO_REF_PREFIX:
         suffix = base[len(SUMZERO_REF_PREFIX) :].lstrip("/")
         return sumzero_root() / suffix if suffix else sumzero_root()
+    if base.startswith(PODCASTS_REF_PREFIX + "/") or base == PODCASTS_REF_PREFIX:
+        suffix = base[len(PODCASTS_REF_PREFIX) :].lstrip("/")
+        # Config JSON lives in-repo under PODCASTS_REF_PREFIX; episode corpus is vault.
+        config_candidate = ROOT / base
+        if config_candidate.exists():
+            return config_candidate
+        return podcasts_root() / suffix if suffix else podcasts_root()
     candidate = ROOT / base
     return candidate if candidate.exists() else None
 
@@ -158,16 +177,34 @@ def require_vault() -> Path:
     return root
 
 
+def path_to_podcasts_ref(path: Path) -> str | None:
+    """Best-effort map from a filesystem path to the stable podcasts ref prefix."""
+    try:
+        resolved = path.resolve()
+    except OSError:
+        resolved = path
+    for root in (podcasts_root(), LEGACY_PODCASTS):
+        try:
+            rel = resolved.relative_to(root.resolve())
+            return podcasts_ref(rel.as_posix())
+        except ValueError:
+            continue
+    return None
+
+
 def vault_status() -> dict:
     """Diagnostic summary for setup scripts and CI smoke tests."""
     vault = research_vault_root()
     letters = letters_root()
+    podcasts = podcasts_root()
     return {
         "research_vault_root": str(vault) if vault else None,
         "letters_root": str(letters),
         "letters_exists": letters.is_dir(),
         "wisdom_root": str(wisdom_root()),
         "wisdom_exists": wisdom_root().is_dir(),
+        "podcasts_root": str(podcasts),
+        "podcasts_exists": podcasts.is_dir(),
         "using_vault": vault is not None and str(letters).startswith(str(vault)),
         "env_research_vault_root": os.environ.get("RESEARCH_VAULT_ROOT"),
     }
