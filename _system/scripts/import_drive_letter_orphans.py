@@ -274,14 +274,19 @@ def extract_texts(pdfs: list[Path], *, max_pages: int = 40, max_files: int | Non
                 existing = txt.read_text(encoding="utf-8", errors="ignore").strip()
             except OSError:
                 existing = ""
-            # Skip when extract is fresh vs PDF, or when a non-trivial extract
-            # already exists (guards against checkout/download mtime churn
-            # forcing a full-corpus OCR pass inside the 5h job budget).
-            if existing and (
-                txt.stat().st_mtime >= pdf.stat().st_mtime or len(existing) >= 50
-            ):
+            # Skip when a non-trivial extract already exists (PDFs are gitignored
+            # in research-vault, so pdf.stat() is often unavailable on CI), or
+            # when the extract is newer than a present PDF.
+            if existing and len(existing) >= 50:
                 skipped += 1
                 continue
+            if existing and pdf.exists() and txt.stat().st_mtime >= pdf.stat().st_mtime:
+                skipped += 1
+                continue
+        if not pdf.exists():
+            print(f"  WARN: missing PDF for extract, skipping: {pdf}", flush=True)
+            skipped += 1
+            continue
         if extract_pdf_text is None:
             from pdf_ocr import extract_pdf_text as _extract_pdf_text  # noqa: WPS433
 
@@ -543,6 +548,7 @@ def main() -> int:
             return 0
 
         downloaded: list[Path] = []
+        to_extract: list[Path] = []
         skipped = 0
         errors = 0
         new_downloads = 0
@@ -599,6 +605,7 @@ def main() -> int:
                     "imported_at": now_iso(),
                 }
                 downloaded.append(dest)
+                to_extract.append(dest)
                 new_downloads += 1
                 log_event({"action": "download", "file_id": row["file_id"], "path": manifest_files[row["file_id"]]["local_pdf_path"]})
             except Exception as exc:
@@ -611,7 +618,9 @@ def main() -> int:
             f"  Downloaded/kept {len(downloaded)} PDFs "
             f"({new_downloads} new, {skipped} skipped, {errors} errors)"
         )
-        pdfs = downloaded
+        # Only extract freshly downloaded PDFs. Skipped rows often have .txt only
+        # (PDFs gitignored in research-vault).
+        pdfs = to_extract
 
     if not args.skip_text and pdfs:
         updated = extract_texts(pdfs, max_files=args.max_files)
