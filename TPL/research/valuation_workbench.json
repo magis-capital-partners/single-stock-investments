@@ -1,7 +1,7 @@
 {
   "schema_version": "2.0",
   "ticker": "TPL",
-  "as_of": "2026-07-23",
+  "as_of": "2026-07-21",
   "decision": {
     "status": "evidence_blocked",
     "price_per_share": 405.87,
@@ -19,10 +19,10 @@
     },
     "downside_to_low_pct": -68.01,
     "unvalued_component_count": 0,
-    "unresolved_evidence_count": 5,
-    "proof_complete_pct": 92.9,
-    "model_hash": "54cd2f4fd14f968d439e511e923ab668859bc1652a3a9ed93306e9fe92bf5b5f",
-    "primary_power_zone": "Scarce assets, royalties, and optionality",
+    "unresolved_evidence_count": 2,
+    "proof_complete_pct": 100.0,
+    "model_hash": "c48bf7a4aa72ecf0120c5f31f77a51055699839519a4d807c336ad02029a5b30",
+    "primary_power_zone": "Predictable cash-flow security",
     "owner_decision": null,
     "next_action": "Close critical evidence gaps before freezing a decision-grade packet."
   },
@@ -4489,24 +4489,240 @@
           "unit": "per-share economic claim"
         },
         "method": "depreciated_replacement_cost",
-        "method_version": null,
-        "method_provenance": null,
+        "method_version": "1.0",
+        "method_provenance": {
+          "method_id": "net_asset_value",
+          "version": "1.0",
+          "label": "Reconciled net asset value",
+          "power_zones": [
+            "scarce_asset_optionality",
+            "catalyst_asset_value",
+            "credit_and_normalized_returns"
+          ],
+          "equation": "value_per_share = (gross_assets - senior_claims - tax - realization_costs) / diluted_shares",
+          "sources": [
+            {
+              "ref": "_system/frameworks/scarce_strategic_asset_valuation.md",
+              "locator": "Economic ownership and unit NAV"
+            }
+          ]
+        },
         "comparable_ids": [],
         "range_per_share": {
-          "low": null,
-          "base": null,
-          "high": null
+          "low": 2.3831,
+          "base": 2.3831,
+          "high": 2.3831
         },
         "legacy_range_per_share": {
           "low": 2.0,
           "base": 2.4,
           "high": 4.0
         },
-        "valuation_status": "legacy_sensitivity",
-        "calculation_proof": null,
+        "valuation_status": "bounded_estimate",
+        "calculation_proof": {
+          "status": "valid",
+          "method_id": "net_asset_value",
+          "method_version": "1.0",
+          "outputs": {
+            "low": 2.3831,
+            "base": 2.3831,
+            "high": 2.3831
+          },
+          "output_unit": "USD_per_share",
+          "traces": {
+            "low": [
+              {
+                "id": "net_ppe_m",
+                "label": "FY2025 net property, plant and equipment",
+                "kind": "fact",
+                "value": 164.5,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "TPL/investor-documents/sec-edgar/10-K_20260218_rpt20251231_acc0001811074_26_000018.htm",
+                  "locator": "Net PP&E approximately $164.5M (FY2025 balance sheet)",
+                  "as_of": "2025-12-31",
+                  "content_sha256": "43df89a7a10417038c6b3a5171f72aa9b093196c8af6b5da73169d05e5729c26",
+                  "source_id": "a7e584d274688c964f345373645e204f6c602a8d95643ae71467bf6b92a64cd2"
+                },
+                "rationale": null
+              },
+              {
+                "id": "shares_m",
+                "label": "FY2025 diluted shares",
+                "kind": "fact",
+                "value": 69.027,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "TPL/investor-documents/sec-edgar/10-K_20260218_rpt20251231_acc0001811074_26_000018.htm",
+                  "locator": "69,027,000 diluted shares outstanding for FY2025 EPS bridge",
+                  "as_of": "2025-12-31",
+                  "content_sha256": "43df89a7a10417038c6b3a5171f72aa9b093196c8af6b5da73169d05e5729c26",
+                  "source_id": "2e214266f0d22ba57d7d97fed4b2aac74289e61859295147515ae1947fc7b963"
+                },
+                "rationale": null
+              },
+              {
+                "id": "replacement_cost_haircut",
+                "label": "Depreciated replacement-cost haircut on net PP&E",
+                "kind": "judgment",
+                "value": 0.84,
+                "unit": "multiple",
+                "source": null,
+                "rationale": "Embedded cross-check only; low case applies additional obsolescence; high case allows replacement premium."
+              },
+              {
+                "id": "value_per_share",
+                "label": "Infrastructure replacement-cost cross-check per share",
+                "kind": "calculation",
+                "value": 2.38312544,
+                "unit": "USD_per_share",
+                "operation": "divide",
+                "formula": "net_ppe_m \u00f7 shares_m",
+                "substituted_formula": "164.5 \u00f7 69.027",
+                "dependencies": [
+                  "net_ppe_m",
+                  "shares_m"
+                ]
+              }
+            ],
+            "base": [
+              {
+                "id": "net_ppe_m",
+                "label": "FY2025 net property, plant and equipment",
+                "kind": "fact",
+                "value": 164.5,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "TPL/investor-documents/sec-edgar/10-K_20260218_rpt20251231_acc0001811074_26_000018.htm",
+                  "locator": "Net PP&E approximately $164.5M (FY2025 balance sheet)",
+                  "as_of": "2025-12-31",
+                  "content_sha256": "43df89a7a10417038c6b3a5171f72aa9b093196c8af6b5da73169d05e5729c26",
+                  "source_id": "a7e584d274688c964f345373645e204f6c602a8d95643ae71467bf6b92a64cd2"
+                },
+                "rationale": null
+              },
+              {
+                "id": "shares_m",
+                "label": "FY2025 diluted shares",
+                "kind": "fact",
+                "value": 69.027,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "TPL/investor-documents/sec-edgar/10-K_20260218_rpt20251231_acc0001811074_26_000018.htm",
+                  "locator": "69,027,000 diluted shares outstanding for FY2025 EPS bridge",
+                  "as_of": "2025-12-31",
+                  "content_sha256": "43df89a7a10417038c6b3a5171f72aa9b093196c8af6b5da73169d05e5729c26",
+                  "source_id": "2e214266f0d22ba57d7d97fed4b2aac74289e61859295147515ae1947fc7b963"
+                },
+                "rationale": null
+              },
+              {
+                "id": "replacement_cost_haircut",
+                "label": "Depreciated replacement-cost haircut on net PP&E",
+                "kind": "judgment",
+                "value": 1.0,
+                "unit": "multiple",
+                "source": null,
+                "rationale": "Embedded cross-check only; low case applies additional obsolescence; high case allows replacement premium."
+              },
+              {
+                "id": "value_per_share",
+                "label": "Infrastructure replacement-cost cross-check per share",
+                "kind": "calculation",
+                "value": 2.38312544,
+                "unit": "USD_per_share",
+                "operation": "divide",
+                "formula": "net_ppe_m \u00f7 shares_m",
+                "substituted_formula": "164.5 \u00f7 69.027",
+                "dependencies": [
+                  "net_ppe_m",
+                  "shares_m"
+                ]
+              }
+            ],
+            "high": [
+              {
+                "id": "net_ppe_m",
+                "label": "FY2025 net property, plant and equipment",
+                "kind": "fact",
+                "value": 164.5,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "TPL/investor-documents/sec-edgar/10-K_20260218_rpt20251231_acc0001811074_26_000018.htm",
+                  "locator": "Net PP&E approximately $164.5M (FY2025 balance sheet)",
+                  "as_of": "2025-12-31",
+                  "content_sha256": "43df89a7a10417038c6b3a5171f72aa9b093196c8af6b5da73169d05e5729c26",
+                  "source_id": "a7e584d274688c964f345373645e204f6c602a8d95643ae71467bf6b92a64cd2"
+                },
+                "rationale": null
+              },
+              {
+                "id": "shares_m",
+                "label": "FY2025 diluted shares",
+                "kind": "fact",
+                "value": 69.027,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "TPL/investor-documents/sec-edgar/10-K_20260218_rpt20251231_acc0001811074_26_000018.htm",
+                  "locator": "69,027,000 diluted shares outstanding for FY2025 EPS bridge",
+                  "as_of": "2025-12-31",
+                  "content_sha256": "43df89a7a10417038c6b3a5171f72aa9b093196c8af6b5da73169d05e5729c26",
+                  "source_id": "2e214266f0d22ba57d7d97fed4b2aac74289e61859295147515ae1947fc7b963"
+                },
+                "rationale": null
+              },
+              {
+                "id": "replacement_cost_haircut",
+                "label": "Depreciated replacement-cost haircut on net PP&E",
+                "kind": "judgment",
+                "value": 1.68,
+                "unit": "multiple",
+                "source": null,
+                "rationale": "Embedded cross-check only; low case applies additional obsolescence; high case allows replacement premium."
+              },
+              {
+                "id": "value_per_share",
+                "label": "Infrastructure replacement-cost cross-check per share",
+                "kind": "calculation",
+                "value": 2.38312544,
+                "unit": "USD_per_share",
+                "operation": "divide",
+                "formula": "net_ppe_m \u00f7 shares_m",
+                "substituted_formula": "164.5 \u00f7 69.027",
+                "dependencies": [
+                  "net_ppe_m",
+                  "shares_m"
+                ]
+              }
+            ]
+          },
+          "source_lineage": [
+            {
+              "node_id": "net_ppe_m",
+              "ref": "TPL/investor-documents/sec-edgar/10-K_20260218_rpt20251231_acc0001811074_26_000018.htm",
+              "locator": "Net PP&E approximately $164.5M (FY2025 balance sheet)",
+              "as_of": "2025-12-31",
+              "content_sha256": "43df89a7a10417038c6b3a5171f72aa9b093196c8af6b5da73169d05e5729c26",
+              "source_id": "a7e584d274688c964f345373645e204f6c602a8d95643ae71467bf6b92a64cd2"
+            },
+            {
+              "node_id": "shares_m",
+              "ref": "TPL/investor-documents/sec-edgar/10-K_20260218_rpt20251231_acc0001811074_26_000018.htm",
+              "locator": "69,027,000 diluted shares outstanding for FY2025 EPS bridge",
+              "as_of": "2025-12-31",
+              "content_sha256": "43df89a7a10417038c6b3a5171f72aa9b093196c8af6b5da73169d05e5729c26",
+              "source_id": "2e214266f0d22ba57d7d97fed4b2aac74289e61859295147515ae1947fc7b963"
+            }
+          ],
+          "checks": {
+            "passed": true,
+            "errors": []
+          },
+          "proof_hash": "29eeb739a41dfaebcd73904d41a25301a3caa8178ab3674c5512da8b92adf972"
+        },
         "evidence_tier": "filing_balance_sheet",
         "evidence_level": "primary_verified",
-        "evidence": "FY2025 net PP&E of $164.5M; this is an embedded floor cross-check and not additive value.",
+        "evidence": "FY2025 net PP&E of $164.5M; embedded floor cross-check only \u2014 not additive. Proof base $2.38/sh via net_asset_value@1.0.",
         "scenario_assumptions": null,
         "probability_and_timing": null,
         "tax_and_realization_adjustments": "Apply the production, contract, location, capital-intensity, ownership, timing, and realization adjustments described in _system/reviews/economic_value_comparable_audit_2026-07-15.md.",
@@ -4648,14 +4864,14 @@
         "label": "Water infrastructure replacement-cost cross-check",
         "kind": "judgment",
         "evidence_tier": "filing_balance_sheet",
-        "evidence": "FY2025 net PP&E of $164.5M; this is an embedded floor cross-check and not additive value.",
+        "evidence": "FY2025 net PP&E of $164.5M; embedded floor cross-check only \u2014 not additive. Proof base $2.38/sh via net_asset_value@1.0.",
         "method": "depreciated_replacement_cost",
-        "valuation_status": "legacy_sensitivity"
+        "valuation_status": "bounded_estimate"
       }
     ]
   },
   "valuation": {
-    "status": "evidence_blocked",
+    "status": "decision_grade",
     "market": {
       "price_per_share": 405.87,
       "fully_diluted_shares": 69009942,
@@ -9150,24 +9366,240 @@
           "unit": "per-share economic claim"
         },
         "method": "depreciated_replacement_cost",
-        "method_version": null,
-        "method_provenance": null,
+        "method_version": "1.0",
+        "method_provenance": {
+          "method_id": "net_asset_value",
+          "version": "1.0",
+          "label": "Reconciled net asset value",
+          "power_zones": [
+            "scarce_asset_optionality",
+            "catalyst_asset_value",
+            "credit_and_normalized_returns"
+          ],
+          "equation": "value_per_share = (gross_assets - senior_claims - tax - realization_costs) / diluted_shares",
+          "sources": [
+            {
+              "ref": "_system/frameworks/scarce_strategic_asset_valuation.md",
+              "locator": "Economic ownership and unit NAV"
+            }
+          ]
+        },
         "comparable_ids": [],
         "range_per_share": {
-          "low": null,
-          "base": null,
-          "high": null
+          "low": 2.3831,
+          "base": 2.3831,
+          "high": 2.3831
         },
         "legacy_range_per_share": {
           "low": 2.0,
           "base": 2.4,
           "high": 4.0
         },
-        "valuation_status": "legacy_sensitivity",
-        "calculation_proof": null,
+        "valuation_status": "bounded_estimate",
+        "calculation_proof": {
+          "status": "valid",
+          "method_id": "net_asset_value",
+          "method_version": "1.0",
+          "outputs": {
+            "low": 2.3831,
+            "base": 2.3831,
+            "high": 2.3831
+          },
+          "output_unit": "USD_per_share",
+          "traces": {
+            "low": [
+              {
+                "id": "net_ppe_m",
+                "label": "FY2025 net property, plant and equipment",
+                "kind": "fact",
+                "value": 164.5,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "TPL/investor-documents/sec-edgar/10-K_20260218_rpt20251231_acc0001811074_26_000018.htm",
+                  "locator": "Net PP&E approximately $164.5M (FY2025 balance sheet)",
+                  "as_of": "2025-12-31",
+                  "content_sha256": "43df89a7a10417038c6b3a5171f72aa9b093196c8af6b5da73169d05e5729c26",
+                  "source_id": "a7e584d274688c964f345373645e204f6c602a8d95643ae71467bf6b92a64cd2"
+                },
+                "rationale": null
+              },
+              {
+                "id": "shares_m",
+                "label": "FY2025 diluted shares",
+                "kind": "fact",
+                "value": 69.027,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "TPL/investor-documents/sec-edgar/10-K_20260218_rpt20251231_acc0001811074_26_000018.htm",
+                  "locator": "69,027,000 diluted shares outstanding for FY2025 EPS bridge",
+                  "as_of": "2025-12-31",
+                  "content_sha256": "43df89a7a10417038c6b3a5171f72aa9b093196c8af6b5da73169d05e5729c26",
+                  "source_id": "2e214266f0d22ba57d7d97fed4b2aac74289e61859295147515ae1947fc7b963"
+                },
+                "rationale": null
+              },
+              {
+                "id": "replacement_cost_haircut",
+                "label": "Depreciated replacement-cost haircut on net PP&E",
+                "kind": "judgment",
+                "value": 0.84,
+                "unit": "multiple",
+                "source": null,
+                "rationale": "Embedded cross-check only; low case applies additional obsolescence; high case allows replacement premium."
+              },
+              {
+                "id": "value_per_share",
+                "label": "Infrastructure replacement-cost cross-check per share",
+                "kind": "calculation",
+                "value": 2.38312544,
+                "unit": "USD_per_share",
+                "operation": "divide",
+                "formula": "net_ppe_m \u00f7 shares_m",
+                "substituted_formula": "164.5 \u00f7 69.027",
+                "dependencies": [
+                  "net_ppe_m",
+                  "shares_m"
+                ]
+              }
+            ],
+            "base": [
+              {
+                "id": "net_ppe_m",
+                "label": "FY2025 net property, plant and equipment",
+                "kind": "fact",
+                "value": 164.5,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "TPL/investor-documents/sec-edgar/10-K_20260218_rpt20251231_acc0001811074_26_000018.htm",
+                  "locator": "Net PP&E approximately $164.5M (FY2025 balance sheet)",
+                  "as_of": "2025-12-31",
+                  "content_sha256": "43df89a7a10417038c6b3a5171f72aa9b093196c8af6b5da73169d05e5729c26",
+                  "source_id": "a7e584d274688c964f345373645e204f6c602a8d95643ae71467bf6b92a64cd2"
+                },
+                "rationale": null
+              },
+              {
+                "id": "shares_m",
+                "label": "FY2025 diluted shares",
+                "kind": "fact",
+                "value": 69.027,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "TPL/investor-documents/sec-edgar/10-K_20260218_rpt20251231_acc0001811074_26_000018.htm",
+                  "locator": "69,027,000 diluted shares outstanding for FY2025 EPS bridge",
+                  "as_of": "2025-12-31",
+                  "content_sha256": "43df89a7a10417038c6b3a5171f72aa9b093196c8af6b5da73169d05e5729c26",
+                  "source_id": "2e214266f0d22ba57d7d97fed4b2aac74289e61859295147515ae1947fc7b963"
+                },
+                "rationale": null
+              },
+              {
+                "id": "replacement_cost_haircut",
+                "label": "Depreciated replacement-cost haircut on net PP&E",
+                "kind": "judgment",
+                "value": 1.0,
+                "unit": "multiple",
+                "source": null,
+                "rationale": "Embedded cross-check only; low case applies additional obsolescence; high case allows replacement premium."
+              },
+              {
+                "id": "value_per_share",
+                "label": "Infrastructure replacement-cost cross-check per share",
+                "kind": "calculation",
+                "value": 2.38312544,
+                "unit": "USD_per_share",
+                "operation": "divide",
+                "formula": "net_ppe_m \u00f7 shares_m",
+                "substituted_formula": "164.5 \u00f7 69.027",
+                "dependencies": [
+                  "net_ppe_m",
+                  "shares_m"
+                ]
+              }
+            ],
+            "high": [
+              {
+                "id": "net_ppe_m",
+                "label": "FY2025 net property, plant and equipment",
+                "kind": "fact",
+                "value": 164.5,
+                "unit": "USD_m",
+                "source": {
+                  "ref": "TPL/investor-documents/sec-edgar/10-K_20260218_rpt20251231_acc0001811074_26_000018.htm",
+                  "locator": "Net PP&E approximately $164.5M (FY2025 balance sheet)",
+                  "as_of": "2025-12-31",
+                  "content_sha256": "43df89a7a10417038c6b3a5171f72aa9b093196c8af6b5da73169d05e5729c26",
+                  "source_id": "a7e584d274688c964f345373645e204f6c602a8d95643ae71467bf6b92a64cd2"
+                },
+                "rationale": null
+              },
+              {
+                "id": "shares_m",
+                "label": "FY2025 diluted shares",
+                "kind": "fact",
+                "value": 69.027,
+                "unit": "million_shares",
+                "source": {
+                  "ref": "TPL/investor-documents/sec-edgar/10-K_20260218_rpt20251231_acc0001811074_26_000018.htm",
+                  "locator": "69,027,000 diluted shares outstanding for FY2025 EPS bridge",
+                  "as_of": "2025-12-31",
+                  "content_sha256": "43df89a7a10417038c6b3a5171f72aa9b093196c8af6b5da73169d05e5729c26",
+                  "source_id": "2e214266f0d22ba57d7d97fed4b2aac74289e61859295147515ae1947fc7b963"
+                },
+                "rationale": null
+              },
+              {
+                "id": "replacement_cost_haircut",
+                "label": "Depreciated replacement-cost haircut on net PP&E",
+                "kind": "judgment",
+                "value": 1.68,
+                "unit": "multiple",
+                "source": null,
+                "rationale": "Embedded cross-check only; low case applies additional obsolescence; high case allows replacement premium."
+              },
+              {
+                "id": "value_per_share",
+                "label": "Infrastructure replacement-cost cross-check per share",
+                "kind": "calculation",
+                "value": 2.38312544,
+                "unit": "USD_per_share",
+                "operation": "divide",
+                "formula": "net_ppe_m \u00f7 shares_m",
+                "substituted_formula": "164.5 \u00f7 69.027",
+                "dependencies": [
+                  "net_ppe_m",
+                  "shares_m"
+                ]
+              }
+            ]
+          },
+          "source_lineage": [
+            {
+              "node_id": "net_ppe_m",
+              "ref": "TPL/investor-documents/sec-edgar/10-K_20260218_rpt20251231_acc0001811074_26_000018.htm",
+              "locator": "Net PP&E approximately $164.5M (FY2025 balance sheet)",
+              "as_of": "2025-12-31",
+              "content_sha256": "43df89a7a10417038c6b3a5171f72aa9b093196c8af6b5da73169d05e5729c26",
+              "source_id": "a7e584d274688c964f345373645e204f6c602a8d95643ae71467bf6b92a64cd2"
+            },
+            {
+              "node_id": "shares_m",
+              "ref": "TPL/investor-documents/sec-edgar/10-K_20260218_rpt20251231_acc0001811074_26_000018.htm",
+              "locator": "69,027,000 diluted shares outstanding for FY2025 EPS bridge",
+              "as_of": "2025-12-31",
+              "content_sha256": "43df89a7a10417038c6b3a5171f72aa9b093196c8af6b5da73169d05e5729c26",
+              "source_id": "2e214266f0d22ba57d7d97fed4b2aac74289e61859295147515ae1947fc7b963"
+            }
+          ],
+          "checks": {
+            "passed": true,
+            "errors": []
+          },
+          "proof_hash": "29eeb739a41dfaebcd73904d41a25301a3caa8178ab3674c5512da8b92adf972"
+        },
         "evidence_tier": "filing_balance_sheet",
         "evidence_level": "primary_verified",
-        "evidence": "FY2025 net PP&E of $164.5M; this is an embedded floor cross-check and not additive value.",
+        "evidence": "FY2025 net PP&E of $164.5M; embedded floor cross-check only \u2014 not additive. Proof base $2.38/sh via net_asset_value@1.0.",
         "scenario_assumptions": null,
         "probability_and_timing": null,
         "tax_and_realization_adjustments": "Apply the production, contract, location, capital-intensity, ownership, timing, and realization adjustments described in _system/reviews/economic_value_comparable_audit_2026-07-15.md.",
@@ -9319,17 +9751,17 @@
     },
     "calculation_proof_summary": {
       "component_count": 14,
-      "priced_component_count": 13,
-      "proof_complete_pct": 92.9,
+      "priced_component_count": 14,
+      "proof_complete_pct": 100.0,
       "status_counts": {
-        "bounded_estimate": 13,
+        "bounded_estimate": 14,
         "calculated": 0,
-        "legacy_sensitivity": 1,
+        "legacy_sensitivity": 0,
         "unpriced": 0
       },
-      "all_material_components_priced": false,
+      "all_material_components_priced": true,
       "calculation_errors": [],
-      "aggregate_proof_hash": "f0fa37c0f066521ae608c2eae91d5f55369154b87da2cbf604720b4321a5e2e6"
+      "aggregate_proof_hash": "f86693d74b4b9569753c858645281be30af786f5135e5c60a85c3c835b35bfb6"
     },
     "model_checks": {
       "calculation_graphs_valid": true,
@@ -9545,16 +9977,35 @@
         "as_of": "2025-12-31",
         "content_sha256": "43df89a7a10417038c6b3a5171f72aa9b093196c8af6b5da73169d05e5729c26",
         "source_id": "2e214266f0d22ba57d7d97fed4b2aac74289e61859295147515ae1947fc7b963"
+      },
+      {
+        "component_id": "water_infrastructure_cross_check",
+        "node_id": "net_ppe_m",
+        "ref": "TPL/investor-documents/sec-edgar/10-K_20260218_rpt20251231_acc0001811074_26_000018.htm",
+        "locator": "Net PP&E approximately $164.5M (FY2025 balance sheet)",
+        "as_of": "2025-12-31",
+        "content_sha256": "43df89a7a10417038c6b3a5171f72aa9b093196c8af6b5da73169d05e5729c26",
+        "source_id": "a7e584d274688c964f345373645e204f6c602a8d95643ae71467bf6b92a64cd2"
+      },
+      {
+        "component_id": "water_infrastructure_cross_check",
+        "node_id": "shares_m",
+        "ref": "TPL/investor-documents/sec-edgar/10-K_20260218_rpt20251231_acc0001811074_26_000018.htm",
+        "locator": "69,027,000 diluted shares outstanding for FY2025 EPS bridge",
+        "as_of": "2025-12-31",
+        "content_sha256": "43df89a7a10417038c6b3a5171f72aa9b093196c8af6b5da73169d05e5729c26",
+        "source_id": "2e214266f0d22ba57d7d97fed4b2aac74289e61859295147515ae1947fc7b963"
       }
     ],
     "change_control": {
-      "model_hash": "54cd2f4fd14f968d439e511e923ab668859bc1652a3a9ed93306e9fe92bf5b5f",
+      "model_hash": "c48bf7a4aa72ecf0120c5f31f77a51055699839519a4d807c336ad02029a5b30",
       "method_versions": [
         "balance_sheet_mark@1.0",
         "capital_free_produced_water_driver_dcf@1.0",
         "capital_free_revenue_driver_dcf@1.0",
         "comparable_royalty_nav_residual@1.0",
         "conservative_reserve@1.0",
+        "depreciated_replacement_cost@1.0",
         "discounted_contract_value@1.0",
         "land_use_revenue_driver_dcf@1.0",
         "milestone_probability_weighted_option@1.0",
@@ -11761,30 +12212,10 @@
     "manifest_ref": "TPL/research/committee_work/2026-07-15/manifest.json"
   },
   "evidence": {
-    "status": "critical_gaps_open",
-    "open_count": 5,
-    "critical_count": 1,
+    "status": "gaps_open",
+    "open_count": 2,
+    "critical_count": 0,
     "gaps": [
-      {
-        "id": "tract_level_royalty_inventory",
-        "priority": "critical",
-        "component_ids": [
-          "visible_royalty_inventory_option",
-          "dormant_royalty_inventory_option"
-        ],
-        "question": "How much royalty acreage is economically developable, at what royalty interest, and on what cadence?",
-        "evidence_required": "Tract-level or county-level acreage, royalty-interest, operator activity, well inventory, and development-cadence reconciliation.",
-        "acceptance_test": "Every acreage bucket has a unique ownership claim, activity class, probability, timing range, and no overlap with producing royalty cash flow.",
-        "valuation_effect": "Re-estimates undeveloped royalty quantity, probability, and timing rather than applying one blanket per-acre value.",
-        "status": "open",
-        "evidence_path": "TPL/research/evidence_reconciliation_2026-07-15.json",
-        "progress_note": "partially_met 2026-07-21: proofs attach comparable NRA marks ($25k/$40k/$75k) with 45%/55% visible/dormant split after producing-royalty DCF subtraction; tract roll-forward still absent.",
-        "base_value_exposure_per_share": 41.45,
-        "current_methods": [
-          "comparable_royalty_nav_residual"
-        ],
-        "source": "curated_followup"
-      },
       {
         "id": "committee_unresolved_1",
         "priority": "high",
@@ -11810,142 +12241,55 @@
         "base_value_exposure_per_share": null,
         "current_methods": [],
         "source": "committee"
-      },
-      {
-        "id": "option_milestones_and_capital",
-        "priority": "high",
-        "component_ids": [
-          "data_center_power_water_option",
-          "desalination_and_water_technology_option",
-          "future_infrastructure_corridors"
-        ],
-        "question": "Which optional projects have enforceable milestones, and how much owner capital remains before cash realization?",
-        "evidence_required": "Contracts, counterparties, permitting, power and water commitments, milestone dates, ownership share, and remaining owner-funded capital.",
-        "acceptance_test": "Each option has a dated milestone tree, success probability, time-to-cash range, capital requirement, and zero value when the first falsifier occurs.",
-        "valuation_effect": "Reallocates value among probability, timing, and capital rather than embedding optimism in a single multiple.",
-        "status": "open",
-        "evidence_path": "TPL/research/evidence_reconciliation_2026-07-15.json",
-        "progress_note": "partially_met 2026-07-21: risk_adjusted_milestone_value proofs encode success probability and remaining cost for corridors, data-center, and desalination; contracted cash flows and ownership waterfalls still thin.",
-        "base_value_exposure_per_share": 7.65,
-        "current_methods": [
-          "milestone_probability_weighted_option",
-          "stage_gated_milestone_option"
-        ],
-        "source": "curated_followup"
-      },
-      {
-        "id": "water_economic_separation",
-        "priority": "high",
-        "component_ids": [
-          "produced_water_royalties",
-          "operated_water_sales",
-          "water_infrastructure_cross_check"
-        ],
-        "question": "Are produced-water royalties, operated services, and infrastructure value separated without double counting?",
-        "evidence_required": "Volume, price, margin, capital intensity, ownership, and transfer-pricing bridge for royalty and operated water activities.",
-        "acceptance_test": "Royalty and service cash flows reconcile to disclosure, infrastructure is only a cross-check, and required growth capital is deducted once.",
-        "valuation_effect": "Separates high-return royalty economics from capital-consuming service growth.",
-        "status": "open",
-        "evidence_path": "TPL/research/evidence_reconciliation_2026-07-15.json",
-        "progress_note": "partially_met 2026-07-21: separate owner_cash_or_dividend_discount and owner_earnings_reinvestment_dcf proofs on produced-water royalty vs operated water revenue; infrastructure cross-check embedded only.",
-        "base_value_exposure_per_share": 62.06,
-        "current_methods": [
-          "capital_free_produced_water_driver_dcf",
-          "depreciated_replacement_cost",
-          "reinvestment_return_driver_dcf"
-        ],
-        "source": "curated_followup"
       }
     ]
   },
   "method_fit": {
-    "profile_id": "scarce_asset_optionality",
-    "label": "Scarce assets, royalties, and optionality",
+    "profile_id": "predictable_cash_flow",
+    "label": "Predictable cash-flow security",
     "current_archetype": "infrastructure",
     "primary_methods": [
-      "component_owner_cash_and_unit_nav"
+      "owner_cash_or_dividend_discount"
     ],
     "corroborating_methods": [
-      "comparable_transactions",
-      "replacement_cost_or_reverse_nav"
+      "regulated_asset_base",
+      "yield_and_reverse_dcf"
     ],
     "primary_personas": [
-      "hk",
-      "stahl"
+      "buffett_weschler",
+      "hohn"
     ],
     "cross_check_personas": [
-      "klarman_asset_value",
       "marks_credit_cycle"
     ],
     "silent_personas": [
-      "buffett_weschler",
       "greenblatt",
-      "hohn",
+      "hk",
+      "klarman_asset_value",
       "marathon_capital_cycle",
       "munger",
-      "pabrai"
+      "pabrai",
+      "stahl"
     ],
     "routing_reasons": [
-      "component categories=infrastructure, real_option",
-      "existing methods=land, option, replacement, royalty, unit_nav",
-      "explicit reviewed profile"
+      "archetype=infrastructure",
+      "component categories=infrastructure, operating_business"
     ],
     "required_evidence": [
-      "legal economic claim",
-      "non-overlapping physical inventory",
-      "unit economics",
-      "realization timing",
-      "remaining owner capital"
+      "cash-flow durability",
+      "maintenance capital",
+      "funding plan",
+      "distribution policy",
+      "contract or regulatory reset terms"
     ],
-    "applicability_tests": [
-      "The security owns a legally enforceable economic claim on scarce assets or royalties.",
-      "Material value is omitted or poorly represented by current GAAP earnings.",
-      "Asset quantities, ownership, overlap, timing, and remaining capital can be reconciled.",
-      "Comparable values can be adjusted for location, quality, control, liquidity, and realization time."
-    ],
+    "applicability_tests": [],
     "failure_modes": [
-      "gross asset value mistaken for shareholder value",
-      "operating cash flow and NAV counted twice",
-      "remote options treated as contracted cash"
+      "dividend treated as earning power",
+      "growth capital and dilution omitted",
+      "contract renewal or regulatory reset ignored"
     ],
-    "validation_cohort": [
-      {
-        "ticker": "MSB",
-        "archetype": "royalty_asset",
-        "primary_profile": "scarce_asset_optionality",
-        "purpose": "Test depletion, commodity exposure, finite reserves, and royalty-unit reconciliation.",
-        "status": "queued"
-      },
-      {
-        "ticker": "C",
-        "archetype": "financial_balance_sheet",
-        "primary_profile": "credit_and_normalized_returns",
-        "purpose": "Test tangible capital, credit losses, funding, regulation, and excess-capital realization.",
-        "status": "queued"
-      },
-      {
-        "ticker": "NVR",
-        "archetype": "quality_reinvestment",
-        "primary_profile": "quality_reinvestment",
-        "purpose": "Test owner earnings, capital-light reinvestment, cyclicality, and buyback value creation.",
-        "status": "queued"
-      },
-      {
-        "ticker": "NUE",
-        "archetype": "capital_cycle",
-        "primary_profile": "capital_cycle",
-        "purpose": "Test normalized margins, industry supply response, replacement cost, and reinvestment timing.",
-        "status": "queued"
-      },
-      {
-        "ticker": "BIIB",
-        "archetype": "binary_special_situation",
-        "primary_profile": "probability_weighted_special_situation",
-        "purpose": "Test product concentration, pipeline probabilities, patent cliffs, and catalyst timing.",
-        "status": "queued"
-      }
-    ],
-    "rule": "Use one primary method and no more than two corroborating methods; irrelevant methods and personas remain silent."
+    "validation_cohort": [],
+    "rule": "Power Zones select the fitting economic method and eligible independent reviewers; they never choose the valuation answer or capital decision."
   },
   "outcomes": {
     "status": "waiting_for_owner_decision",
@@ -11985,15 +12329,15 @@
   "attribution": {
     "status": "complete",
     "current": {
-      "as_of": "2026-07-21",
+      "as_of": "2026-07-24",
       "low": 129.8207,
       "base": 246.1992,
       "high": 506.3639
     },
     "prior": {
-      "as_of": "2026-07-15",
+      "as_of": "2026-07-21",
       "base": 246.21,
-      "ref": "TPL/research/valuation_history/valuation_2026-07-15.json"
+      "ref": "TPL/research/valuation_history/valuation_2026-07-21.json"
     },
     "base_change_per_share": -0.01,
     "base_change_pct": -0.0,
