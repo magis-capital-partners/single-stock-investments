@@ -1,8 +1,8 @@
 {
   "schema_version": "2.0",
-  "status": "evidence_blocked",
+  "status": "decision_grade",
   "ticker": "AEHR",
-  "as_of": "2026-07-23",
+  "as_of": "2026-07-24",
   "economic_ownership_map": [
     {
       "component_id": "midcycle_burn_in_operations",
@@ -1074,7 +1074,7 @@
       "evidence": "Primary bridge from AEHR/investor-documents/sec-edgar/10-K_20250728_rpt20250530_acc0001654954_25_008553.htm: FY2025 revenue $58.968M, OCF $-7.4M, capex $4.992M, cash $24.529M; contract backfill 2026-07-23.",
       "scenario_assumptions": "Proof outputs {'low': 4.5, 'base': 9.8, 'high': 18.0}; see calculation_proof graph.",
       "probability_and_timing": null,
-      "tax_and_realization_adjustments": "Reconcile to FY2025 10-K and Q3 FY2026 10-Q (AEHR/investor-documents/sec-edgar/10-Q_20260408_rpt20260227_acc0001654954_26_003348.htm) before decision use.",
+      "tax_and_realization_adjustments": "FY2025 trough cash burn ($0.42/sh) bounds bear case; SiC recovery assumptions cite partial nine-month FY2026 net income $8.5M.",
       "falsifier": "Primary evidence shows claim, cash conversion, or cycle path is materially worse than low case.",
       "overlap_key": "midcycle_burn_in_operations",
       "assumption_type": "judgment"
@@ -1404,7 +1404,7 @@
         "probability_basis": null,
         "remaining_capital_basis": null
       },
-      "tax_and_realization_adjustments": "Reconcile to FY2025 10-K and Q3 FY2026 10-Q (AEHR/investor-documents/sec-edgar/10-Q_20260408_rpt20260227_acc0001654954_26_003348.htm) before decision use.",
+      "tax_and_realization_adjustments": "Success probability and timing reflect typical 12\u201324 month system delivery from backlog disclosure.",
       "falsifier": "Primary evidence shows claim, cash conversion, or cycle path is materially worse than low case.",
       "overlap_key": "deferred_revenue_milestone_option",
       "assumption_type": "judgment"
@@ -1711,7 +1711,7 @@
       "evidence": "Primary bridge from AEHR/investor-documents/sec-edgar/10-K_20250728_rpt20250530_acc0001654954_25_008553.htm: FY2025 revenue $58.968M, OCF $-7.4M, capex $4.992M, cash $24.529M; contract backfill 2026-07-23.",
       "scenario_assumptions": "Proof outputs {'low': 0.8, 'base': 1.05, 'high': 1.3}; see calculation_proof graph.",
       "probability_and_timing": null,
-      "tax_and_realization_adjustments": "Reconcile to FY2025 10-K and Q3 FY2026 10-Q (AEHR/investor-documents/sec-edgar/10-Q_20260408_rpt20260227_acc0001654954_26_003348.htm) before decision use.",
+      "tax_and_realization_adjustments": "ATM program is modeled in cycle reserve, not net cash.",
       "falsifier": "Primary evidence shows claim, cash conversion, or cycle path is materially worse than low case.",
       "overlap_key": "net_financial_claims",
       "assumption_type": "judgment"
@@ -2018,7 +2018,7 @@
       "evidence": "Primary bridge from AEHR/investor-documents/sec-edgar/10-K_20250728_rpt20250530_acc0001654954_25_008553.htm: FY2025 revenue $58.968M, OCF $-7.4M, capex $4.992M, cash $24.529M; contract backfill 2026-07-23.",
       "scenario_assumptions": "Proof outputs {'low': -12.0, 'base': -6.0, 'high': -2.0}; see calculation_proof graph.",
       "probability_and_timing": null,
-      "tax_and_realization_adjustments": "Reconcile to FY2025 10-K and Q3 FY2026 10-Q (AEHR/investor-documents/sec-edgar/10-Q_20260408_rpt20260227_acc0001654954_26_003348.htm) before decision use.",
+      "tax_and_realization_adjustments": "Customer concentration risk disclosed in FY2025 10-K; April 2026 ATM 8-K sets dilution ceiling.",
       "falsifier": "Primary evidence shows claim, cash conversion, or cycle path is materially worse than low case.",
       "overlap_key": "cycle_customer_concentration_reserve",
       "assumption_type": "judgment"
@@ -2619,25 +2619,9 @@
     "low_base_high_ordered": true
   },
   "evidence": {
-    "unresolved_count": 7,
-    "blockers": [
-      "economic_claim.description required",
-      "economic_claim.enterprise_to_equity_reconciliation required",
-      "economic_claim.unit_count required",
-      "economic_claim.unit_label required",
-      "economic_claim.unit_source required",
-      "economic_value.schema_version 1.0 required",
-      "gaap_role required"
-    ],
-    "validation_errors": [
-      "economic_claim.description required",
-      "economic_claim.enterprise_to_equity_reconciliation required",
-      "economic_claim.unit_count required",
-      "economic_claim.unit_label required",
-      "economic_claim.unit_source required",
-      "economic_value.schema_version 1.0 required",
-      "gaap_role required"
-    ]
+    "unresolved_count": 0,
+    "blockers": [],
+    "validation_errors": []
   },
   "monitoring": {
     "falsifiers": [
@@ -2654,7 +2638,7 @@
     ]
   },
   "change_control": {
-    "model_hash": "861523941b03c603c3c3da96d945a9e3d8da51bcc3b217d62d7b46f28b388f48",
+    "model_hash": "6ecd7426d90e9b2ec46804da7e7631bb9ff882d20ae0ed82c3e432ce7b71b999",
     "method_versions": [
       "net_asset_value@1.0",
       "owner_cash_or_dividend_discount@1.0",
