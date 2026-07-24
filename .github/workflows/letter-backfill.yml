@@ -197,10 +197,11 @@ jobs:
             _system/scripts/ci_sparse_checkout_paths.py
           sparse-checkout-cone-mode: false
           fetch-depth: 1
-      # pages profile includes dashboard/ so commit-main can stage rebuilt payloads.
-      # minimal omits dashboard and git add then fails under sparse-checkout rules.
-      - name: Checkout workspace (scripts + dashboard)
-        run: bash _system/scripts/ci_checkout_workspace.sh pages
+      # Always publish from main (not a workflow_dispatch feature-branch tip).
+      # Shallow feature-branch checkouts lack a merge-base with origin/main, so
+      # ci_push_main rebase/push fails. pages profile includes dashboard/.
+      - name: Checkout workspace (scripts + dashboard on main)
+        run: bash _system/scripts/ci_checkout_workspace.sh pages main
 
       - uses: actions/setup-python@v5
         with:
@@ -278,6 +279,6 @@ jobs:
 
             Rebuild insights and document registry from research-vault letter corpus.
           git_add: >-
-            _system/reference/document-store/letter_drive_links.json
-            _system/reference/document-store/drive_filename_index.json
+            _system/reference/document-store/
+            _system/reference/data-sources/insights_record_archive.json
             dashboard/data/
