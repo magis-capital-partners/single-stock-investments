@@ -1,10 +1,10 @@
 {
   "schema_version": "2.0",
   "ticker": "GOOGL",
-  "updated_at": "2026-07-23T05:44:14Z",
+  "updated_at": "2026-07-24T05:40:51Z",
   "method_id": "owner_earnings_reinvestment_dcf",
   "ready_count": 3,
-  "task_count": 7,
+  "task_count": 4,
   "tasks": [
     {
       "id": "method_input:owner_earnings_reinvestment_dcf:normalized_owner_earnings_m",
@@ -67,42 +67,6 @@
       "evidence_refs": [
         "GOOGL/research/evidence/sec_companyfacts.json"
       ]
-    },
-    {
-      "id": "component_ownership_map",
-      "priority": "critical",
-      "question": "Map every material operating, asset, liability, financing, and option claim owned by one diluted share with non-overlapping overlap keys.",
-      "evidence_required": "Primary filings plus an independently reproducible component ownership map.",
-      "acceptance_test": "Every material claim is identified once, with provisional low/base/high if incomplete, and no double counting.",
-      "collector": "sec_primary_documents",
-      "status": "pending_collection",
-      "attempts": 0,
-      "last_attempt_at": null,
-      "evidence_refs": []
-    },
-    {
-      "id": "downside_and_capital_claims",
-      "priority": "critical",
-      "question": "Reconcile debt, cash, reserves, dilution, and material options including probability, timing, capital, failure value, and overlap control.",
-      "evidence_required": "Primary filings or contracts plus an independently reproducible calculation and relevant cross-check.",
-      "acceptance_test": "The evidence reproduces the low/base/high bridge, resolves overlap, and identifies a falsifier and monitoring source.",
-      "collector": "sec_primary_documents",
-      "status": "pending_collection",
-      "attempts": 0,
-      "last_attempt_at": null,
-      "evidence_refs": []
-    },
-    {
-      "id": "primary_cash_or_nav_bridge",
-      "priority": "critical",
-      "question": "Reconcile the primary owner-cash or NAV bridge to primary filings with causal low/base/high cases.",
-      "evidence_required": "Primary filings or contracts plus an independently reproducible calculation and relevant cross-check.",
-      "acceptance_test": "The evidence reproduces the low/base/high bridge, resolves overlap, and identifies a falsifier and monitoring source.",
-      "collector": "sec_primary_documents",
-      "status": "pending_collection",
-      "attempts": 0,
-      "last_attempt_at": null,
-      "evidence_refs": []
     }
   ]
 }

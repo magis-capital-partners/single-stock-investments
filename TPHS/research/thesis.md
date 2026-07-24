@@ -11,13 +11,13 @@
 | **Dhando** (Pabrai) | none |
 | **Stance** | watch |
 | **Cycle** | trough |
-| **Implied 7yr IRR** (base) | 14.4% (base) |
-| **IRR method** | yield_curve |
+| **Implied 7yr IRR** (base) | 12.15% (contract base) |
+| **IRR method** | scarce_asset_optionality |
 | **Lawrence bucket** | other |
 | **Payoff lens** | asset |
 | **MOI bucket** | pending |
 
-**Deep dive:** `TPHS/research/deep_dive_2026-07-17.md` (auto-sync)
+**Deep dive:** `TPHS/research/deep_dive_2026-07-24.md` (auto-sync)
 
 ## One-line thesis
 
@@ -34,7 +34,7 @@ Steel Partners-controlled, non-operating shell (Syms/Filene's Basement successor
 
 ## Deep dive
 
-`TPHS/research/deep_dive_2026-07-17.md`
+`TPHS/research/deep_dive_2026-07-24.md`
 
 ## [HUMAN REVIEW]
 
