@@ -1,9 +1,9 @@
 {
- "run_date": "2026-09-01",
- "git_head": "9c0c052305888a21bed4091c38bb6d617c5b1a8b",
- "nodes": 8104,
- "edges": 7541,
- "exit_code": 0,
+ "run_date": "2026-09-06",
+ "git_head": "1547c5631614209e1f5e171e99d162dd18869542",
+ "nodes": 8244,
+ "edges": 7660,
+ "exit_code": 1,
  "ratchet": {
   "armed": [
    "L1",
@@ -62,12 +62,15 @@
    "id": "P3",
    "severity": "hard",
    "base_severity": "hard",
-   "count": 0,
-   "delta": "-1",
-   "status": "OK",
-   "note": "15 lanes fresh",
-   "violations": [],
-   "violations_total": 0,
+   "count": 2,
+   "delta": "+2",
+   "status": "VIOLATIONS",
+   "note": "13 lanes fresh",
+   "violations": [
+    "falsifier: last commit 105.9h old (window 48h)",
+    "research-watchdog: last workflow success 143.5h old (window 48h)"
+   ],
+   "violations_total": 2,
    "waived": []
   },
   {
@@ -122,7 +125,7 @@
    "count": 0,
    "delta": "0",
    "status": "OK",
-   "note": "7/7 feeds fresh (criticality_summary 6h, market_risk_components_committed 12h, podcast_catalog 5h, spx_surface 6h, technical_summary 6h, vol_metrics 6h, warrant_monitor 5h)",
+   "note": "7/7 feeds fresh (criticality_summary 64h, market_risk_components_committed 48h, podcast_catalog 6h, spx_surface 64h, technical_summary 64h, vol_metrics 64h, warrant_monitor 6h)",
    "violations": [],
    "violations_total": 0,
    "waived": []
@@ -143,10 +146,10 @@
    "id": "E1",
    "severity": "report",
    "base_severity": "report",
-   "count": 502,
-   "delta": "0",
+   "count": 366,
+   "delta": "-136",
    "status": "VIOLATIONS",
-   "note": "typed coverage 15/517 (2.9%) -- net_asset_value 3/131; owner_cash_or_dividend_discount 3/72; owner_earnings_reinvestment_dcf 9/151; 58 methods 0/163",
+   "note": "typed coverage 25/391 (6.4%) -- net_asset_value 3/96; owner_cash_or_dividend_discount 4/43; owner_earnings_reinvestment_dcf 17/123; reinvestment_return_dcf 1/1; 57 methods 0/128",
    "violations": [
     "0388.HK:core_engine [owner_cash_or_dividend_discount]",
     "0388.HK:downside_reserve [midcycle_capacity_value]",
@@ -167,9 +170,9 @@
     "9984.T:asset_backed_financing_reserve [net_asset_value]",
     "9984.T:consolidated_book_equity [net_asset_value]",
     "9984.T:investment_portfolio_uplift [net_asset_value]",
-    "A:biopharma_cycle_reserve [midcycle_capacity_value]"
+    "AAL:aadvantage_co_brand_option [risk_adjusted_milestone_value]"
    ],
-   "violations_total": 502,
+   "violations_total": 366,
    "waived": []
   },
   {
@@ -179,7 +182,7 @@
    "count": 0,
    "delta": "0",
    "status": "OK",
-   "note": "19 typed, 9 matured",
+   "note": "41 typed, 11 matured",
    "violations": [],
    "violations_total": 0,
    "waived": []
@@ -226,8 +229,8 @@
    "id": "E6",
    "severity": "report",
    "base_severity": "report",
-   "count": 247,
-   "delta": "0",
+   "count": 250,
+   "delta": "+3",
    "status": "VIOLATIONS",
    "note": "",
    "violations": [
@@ -252,7 +255,7 @@
     "2026-05-21 For exchanges, analyze **handled volume** alongside market share ? share loss an",
     "2026-05-21 Invest only in simple, understandable businesses with durable economics and hone"
    ],
-   "violations_total": 247,
+   "violations_total": 250,
    "waived": []
   },
   {
@@ -274,7 +277,7 @@
    "count": 0,
    "delta": "0",
    "status": "OK",
-   "note": "2 v3 forecasts, 0 derived eligible",
+   "note": "56 v3 forecasts, 1 derived eligible",
    "violations": [],
    "violations_total": 0,
    "waived": []
@@ -298,7 +301,7 @@
    "count": 537,
    "delta": "0",
    "status": "VIOLATIONS",
-   "note": "187/724 tickers resolve (top-level 50, classification_inputs 136, registry 1)",
+   "note": "187/724 tickers resolve (top-level 50, classification_inputs 135, registry 2)",
    "violations": [
     "3905.T: no payoff_lens on any surface (top-level, classification_inputs, registry)",
     "8697.T: no payoff_lens on any surface (top-level, classification_inputs, registry)",
@@ -328,20 +331,19 @@
    "id": "L2",
    "severity": "report",
    "base_severity": "report",
-   "count": 7,
-   "delta": "0",
+   "count": 6,
+   "delta": "-1",
    "status": "VIOLATIONS",
-   "note": "7 tickers carry a conflict",
+   "note": "6 tickers carry a conflict",
    "violations": [
     "ICE: archetype classification_inputs='compounder' vs registry='croupier'",
     "MSB: archetype classification_inputs='resource' vs registry='optionality'",
     "PCH: payoff_lens classification_inputs='event' vs registry='asset'",
     "SJT: dhando classification_inputs='none' vs registry='partial'",
     "SPGI: archetype classification_inputs='compounder' vs registry='croupier'",
-    "TEQ.ST: archetype classification_inputs='compounder' vs registry='serial_acquirer'",
-    "VTRS: payoff_lens classification_inputs='event' vs registry='operating'"
+    "TEQ.ST: archetype classification_inputs='compounder' vs registry='serial_acquirer'"
    ],
-   "violations_total": 7,
+   "violations_total": 6,
    "waived": []
   },
   {
@@ -429,7 +431,7 @@
    "count": 0,
    "delta": "0",
    "status": "OK",
-   "note": "12 personas, 39 active manifests, 0 below quorum under the canonical map",
+   "note": "12 personas, 42 active manifests, 0 below quorum under the canonical map",
    "violations": [],
    "violations_total": 0,
    "waived": []
