@@ -62,6 +62,13 @@ jobs:
       #   .gitignore           read directly, to prove the report naming
       #                        positions is never committed
       #   this workflow file   read directly, to prove the lane is declared
+      #   _system/reviews      detect_pending_reviews globs reviews/pending/;
+      #                        absent, it raises and the run dies on
+      #                        "detector bit-rot", not on a test
+      #   _system/data         the dispatch-queue and stale-input detectors
+      # The detectors are the reason the list cannot be derived from imports
+      # alone: they read the tree at runtime, and a missing directory is an
+      # exception rather than an empty result.
       # Sparseness is not optional here: a full checkout is 188,365 files and
       # 46 GB. But #932 introduced it with only the first two entries below,
       # which broke all 33 tests at once and left the lane red for six days.
@@ -81,6 +88,8 @@ jobs:
             _system/__init__.py
             _system/trading
             _system/portfolio
+            _system/reviews
+            _system/data
             .gitignore
             .github/workflows/research-watchdog.yml
           sparse-checkout-cone-mode: false
