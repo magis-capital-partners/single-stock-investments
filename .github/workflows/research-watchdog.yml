@@ -54,6 +54,18 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
+      # The sparse list is exactly what the 33 tests touch, and each entry was
+      # added because its absence failed one of them:
+      #   _system/portfolio    registry.json -- without it resolve_ticker returns
+      #                        None and every holding drops as "unresolved",
+      #                        which is the [] != ['GTX'] assertion
+      #   .gitignore           read directly, to prove the report naming
+      #                        positions is never committed
+      #   this workflow file   read directly, to prove the lane is declared
+      # Sparseness is not optional here: a full checkout is 188,365 files and
+      # 46 GB. But #932 introduced it with only the first two entries below,
+      # which broke all 33 tests at once and left the lane red for six days.
+      #
       # _system/trading is the whole package, not just portfolio_hub:
       # build_research_scope imports flex_ingest, which reaches
       # allocation_policy and on into _system.trading.sleeves. Listing only the
@@ -68,6 +80,9 @@ jobs:
             _system/graph/graph_sources.json
             _system/__init__.py
             _system/trading
+            _system/portfolio
+            .gitignore
+            .github/workflows/research-watchdog.yml
           sparse-checkout-cone-mode: false
           fetch-depth: 1
       - uses: actions/setup-python@v5
