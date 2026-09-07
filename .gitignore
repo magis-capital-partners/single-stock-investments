@@ -106,3 +106,23 @@ _system/trading/portfolio_hub/.env
 # redacted receipt at _system/data/research_watchdog_receipt.json is committed.
 _system/data/research_watchdog.json
 _system/reviews/WATCHDOG.md
+
+# Raw SEC filings are a CACHE of a free, permanent, public archive (EDGAR), not
+# authored content. Measured 2026-09-07: 32.8 GB across 573 tickers / 36,470
+# .htm files -- ~95% of this repo's bytes and 0% of its analysis. Git stores
+# every version forever and 11 MB inline-XBRL documents barely delta-compress,
+# so this content is what drove .git to ~19 GB and is why large pushes 408.
+#
+# The committed artifact is the POINTER, never the payload: each ticker's
+# investor-documents/DOWNLOAD_MANIFEST.json records the form, accession, primary
+# document and sec.gov URL of every filing (11.7 MB for the entire corpus, vs
+# 32.8 GB of payload), and research/evidence/sec_companyfacts.json carries the
+# structured XBRL facts. Any ticker rehydrates in ~30s with
+# `python _system/scripts/download_us_investor_docs.py --ticker <T>`.
+#
+# Same rule already applied to _system/graph/graph.db and research/evidence/_text/.
+# NOTE: this stops future growth only. Filings committed before this rule remain
+# tracked; removing them from history needs a coordinated git-filter-repo pass.
+# IR PDFs (investor-documents/ir-*) are deliberately NOT ignored -- IR sites
+# rotate and 404, so those are not reliably re-fetchable.
+*/investor-documents/sec-edgar/
