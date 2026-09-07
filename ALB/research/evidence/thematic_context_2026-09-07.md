@@ -7,8 +7,8 @@
 | High-yield OAS credit spread (%) | 0.45 | 2026-09-04 | +66.7% | up | no (context) |
 | US Treasury 10Y yield (%) | 4.783999919891357 | 2026-09-04 | +14.6% | up | no (context) |
 | US Treasury 2Y yield (%) | 4.550000190734863 | 2026-09-04 | +24.6% | up | no (context) |
-| Trade-weighted USD index (broad) | 99.14199829101562 | 2026-09-07 | +1.7% | up | no (context) |
-| VIX index level | 14.529999732971191 | 2026-09-04 | -5.0% | down | no (context) |
+| Trade-weighted USD index (broad) | 98.90799713134766 | 2026-09-07 | +1.5% | up | no (context) |
+| VIX index level | 15.300000190734863 | 2026-09-07 | +1.3% | up | no (context) |
 | HYG vs TLT 1-month return spread (%) | -0.0 | 2026-09-04 | -100.0% | down | no (context) |
 | SPY 20-day realized vol (annualized %) | 7.9 | 2026-09-04 | -17.3% | down | no (context) |
 | AGI expert-horizon years ahead (public quotes) | 5.0 | 2026-06-01 | +0.0% | flat | no (context) |
