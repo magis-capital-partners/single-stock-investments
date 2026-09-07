@@ -5,7 +5,7 @@
   "input_sha": "28c5cf6e31725c798d62abae639e7aa9c31eb854",
   "component_fingerprint": "4080c692e2d41ed5e8c8bb19cc5abb21e04b5d945b4f3f58c4832093f0829480",
   "contract_hash": "0ec3ac0f426df4dd1fdd1b0b583bdfd1ab97a0d123de8a12d7862749cdd14d84",
-  "status": "awaiting_review",
+  "status": "rejected",
   "author_receipt": {
     "authored_at": "2026-09-02T17:15:00Z",
     "author": "marvin-cloud-agent",
@@ -45,8 +45,58 @@
       "published_input_sha": "28c5cf6e31725c798d62abae639e7aa9c31eb854"
     }
   },
-  "review_receipt": null,
-  "rejection_reasons": [],
+  "review_receipt": {
+    "reviewed_at": "2026-09-07T01:00:00Z",
+    "reviewer": "cursor-cloud-agent",
+    "author_independent": true,
+    "decision": "rejected",
+    "checks": {
+      "component_fingerprint_matches": true,
+      "target_unobservable_at_registration": true,
+      "threshold_economically_material": true,
+      "historical_replay_present": true,
+      "forward_source_recipe_current": false,
+      "probability_consistent_with_known_trailing_data": true
+    },
+    "evidence": {
+      "threshold_m": 13024.81611167,
+      "low_case_per_share": 382.0575,
+      "base_case_per_share": 644.26,
+      "replay_fy2025_owner_earnings_m": 13024.816111672502,
+      "adapter_replay_blocker": "ttm_period_inputs_missing",
+      "forecast_probability_fires": 0.22,
+      "source_ref": "ASML/research/evidence/sec_companyfacts.json",
+      "source_concepts": [
+        "us-gaap:NetCashProvidedByUsedInOperatingActivities",
+        "us-gaap:PaymentsToAcquirePropertyPlantAndEquipment"
+      ],
+      "companyfacts_unit": "EUR",
+      "accepted_forms_in_plan": [
+        "20-F",
+        "20-F/A"
+      ],
+      "adapter_form_filter": [
+        "10-Q",
+        "10-K"
+      ]
+    },
+    "review_work_id": "f705288ed11a8de6f2813751",
+    "calibration_release_hash": null,
+    "route": "quality_reinvestment",
+    "named_challenge": null,
+    "calibration_response": "not_applicable",
+    "epistemic_work_receipt": {
+      "work_id": "f705288ed11a8de6f2813751",
+      "task_type": "review_forecast",
+      "disposition": "success",
+      "published_input_sha": "1547c5631614209e1f5e171e99d162dd18869542"
+    }
+  },
+  "rejection_reasons": [
+    "source_recipe_incompatible: sec_companyfacts_ttm _duration_rows accepts only 10-Q/10-K forms; ASML files annual 20-F only, so independent resolve_spec for FY2025 and FY2026 both return ttm_period_inputs_missing (ocf_rows=0) despite observation_plan accepted_forms listing 20-F/20-F/A",
+    "unit_mismatch: observation_plan source_unit=USD but ASML companyfacts reports OCF and capex in EUR only; the resolvable path is fact_ledger with evidenced FX conversion (prior draft 757a61e81f740aade46766d0 pattern), not sec_companyfacts_ttm without EUR handling",
+    "historical_replay_not_adapter_verified: observation_plan historical_replay status=passed but registered adapter cannot reproduce FY2025; threshold anchor 13,024.8M is confirmed only via valuation_fact_ledger arithmetic (OCF EUR 12,658.5M minus capex EUR 1,573.6M at 2025-12-31 FX)"
+  ],
   "spec": {
     "spec_id": "asml-opbiz-oe-2026fy-v3",
     "spec_revision": 1,
@@ -109,9 +159,14 @@
       }
     },
     "review": {
-      "status": "pending",
-      "reviewer": null,
-      "reviewed_at": null
+      "status": "rejected",
+      "reviewer": "cursor-cloud-agent",
+      "reviewed_at": "2026-09-07T01:00:00Z",
+      "reason_codes": [
+        "source_recipe_incompatible",
+        "unit_mismatch",
+        "historical_replay_not_adapter_verified"
+      ]
     },
     "probability_fires": 0.22,
     "severity": 4,
