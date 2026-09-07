@@ -855,6 +855,57 @@ def main() -> int:
     else:
         warnings.append("missing dashboard/data/advantaged_banks_screener.json")
 
+    rock_path = ROOT / "dashboard" / "data" / "rock_aggregates_screener.json"
+    if rock_path.exists():
+        try:
+            rock = json.loads(rock_path.read_text(encoding="utf-8"))
+            rock_rows = rock.get("rows") or []
+            if not rock_rows:
+                warnings.append("rock_aggregates_screener has zero rows")
+            elif rock.get("row_count") not in (None, len(rock_rows)):
+                errors.append(
+                    f"rock_aggregates_screener row_count={rock.get('row_count')} "
+                    f"!= len(rows)={len(rock_rows)}"
+                )
+            missing_ticker = [i for i, r in enumerate(rock_rows) if not r.get("ticker")]
+            if missing_ticker:
+                errors.append(
+                    f"rock_aggregates_screener rows missing ticker at indices {missing_ticker[:5]}"
+                )
+            # A margin above 100% means a quarterly figure was paired with an annual
+            # one -- the failure that put MLM at 135% before the duration check went
+            # in. Warn rather than error so a bad row never blocks the deploy.
+            implausible = [
+                r.get("ticker")
+                for r in rock_rows
+                if isinstance(r.get("ebitda_margin_pct"), (int, float))
+                and not -100 <= r["ebitda_margin_pct"] <= 100
+            ]
+            if implausible:
+                warnings.append(
+                    "rock_aggregates_screener EBITDA margin outside +/-100% for "
+                    f"{implausible[:5]} — check for a quarter/annual mismatch"
+                )
+            built_at = rock.get("built_at")
+            if built_at:
+                try:
+                    built_dt = datetime.fromisoformat(str(built_at).replace("Z", "+00:00"))
+                    age_days = (datetime.now(timezone.utc) - built_dt).total_seconds() / 86400
+                    if age_days > 7:
+                        warnings.append(
+                            f"rock_aggregates_screener built_at is {age_days:.0f}d old — rebuild"
+                        )
+                except ValueError:
+                    warnings.append("rock_aggregates_screener built_at not parseable")
+            if "rock_aggregates_screener" not in payload and rock_rows:
+                warnings.append(
+                    "rock_aggregates_screener.json exists but not embedded in dashboard_data.json"
+                )
+        except json.JSONDecodeError:
+            errors.append("rock_aggregates_screener.json is invalid JSON")
+    else:
+        warnings.append("missing dashboard/data/rock_aggregates_screener.json")
+
     # --- Warrant monitor gates ------------------------------------------------
     warrant_path = ROOT / "dashboard" / "data" / "warrants.json"
     if warrant_path.exists():

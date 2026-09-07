@@ -3415,6 +3415,23 @@ def build_advantaged_banks_screener() -> dict | None:
     return _load_json(path)
 
 
+def build_rock_aggregates_screener() -> dict | None:
+    """Rebuild rock / aggregates screener (seed + SEC revenue/EBITDA/ROIC enrich)."""
+    path = DATA_DIR / "rock_aggregates_screener.json"
+    script = ROOT / "_system" / "scripts" / "build_rock_aggregates_screener.py"
+    if not script.exists():
+        return _load_json(path)
+    import subprocess
+
+    subprocess.run(
+        [sys.executable, str(script), "--write"],
+        cwd=str(ROOT),
+        check=False,
+        timeout=300,
+    )
+    return _load_json(path)
+
+
 def build_equity_models() -> dict:
     """Run equity model ingest and return payload for dashboard merge."""
     script = ROOT / "_system" / "scripts" / "build_equity_model_dashboard.py"
@@ -3608,6 +3625,12 @@ def main() -> None:
         payload["advantaged_banks_screener"] = banks
         payload["summary"]["advantaged_banks_count"] = banks.get("row_count") or len(
             banks.get("rows") or []
+        )
+    rock = build_rock_aggregates_screener()
+    if rock:
+        payload["rock_aggregates_screener"] = rock
+        payload["summary"]["rock_aggregates_count"] = rock.get("row_count") or len(
+            rock.get("rows") or []
         )
     index_membership = load_index_membership()
     if index_membership:

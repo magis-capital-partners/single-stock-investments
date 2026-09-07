@@ -84,6 +84,39 @@
         {"id": "ust_10y", "label": "US Treasury 10Y yield (%)", "source": "fred", "fred_id": "DGS10", "good_for": "mortgage_discount", "fallback": {"source": "yahoo_daily", "yahoo_symbol": "^TNX"}}
       ]
     },
+    "aggregates_infrastructure": {
+      "label": "Crushed stone -> local haul monopoly -> housing + public infrastructure demand",
+      "description": "Demand and cost chain behind aggregates/cement (VMC, MLM, CRH, AMRZ, EXP, KNF, ACA, USLM, GVA, ROAD, CX). Freight caps the economic haul radius near 25 miles, so each quarry is a local oligopoly and the thesis is price/ton compounding above cost/ton. Residential is the cyclical leg, public highway spend the counter-cyclical one. The mining PPIs are an independent third-party read on pricing: divergence from company-reported ASP is the tell. No fallbacks on the monthly series -- they have no daily equivalent and must be allowed to go visibly stale rather than be silently substituted.",
+      "series": [
+        {"id": "ppi_crushed_limestone", "label": "PPI: crushed and broken limestone mining (index)", "source": "fred", "fred_id": "PCU212312212312", "good_for": "aggregates_pricing", "staleness_max_days": 90, "note": "Independent read on crushed-stone pricing; cross-check against company freight-adjusted ASP"},
+        {"id": "ppi_sand_gravel_mining", "label": "PPI: construction sand and gravel mining (index)", "source": "fred", "fred_id": "PCU212321212321", "good_for": "aggregates_pricing", "staleness_max_days": 90},
+        {"id": "ppi_sand_gravel_stone", "label": "PPI: construction sand, gravel and crushed stone (index)", "source": "fred", "fred_id": "WPU1321", "good_for": "aggregates_pricing", "staleness_max_days": 90, "note": "Longer history than the industry PPIs; use for cycle work"},
+        {"id": "ppi_cement", "label": "PPI: hydraulic cement (index)", "source": "fred", "fred_id": "WPU1322", "good_for": "cement_pricing", "staleness_max_days": 90},
+        {"id": "ppi_ready_mix_concrete", "label": "PPI: ready-mix concrete manufacturing (index)", "source": "fred", "fred_id": "PCU327320327320", "good_for": "downstream_pricing", "staleness_max_days": 90},
+        {"id": "ppi_asphalt_paving", "label": "PPI: asphalt paving mixture and block manufacturing (index)", "source": "fred", "fred_id": "PCU324121324121", "good_for": "asphalt_spread", "staleness_max_days": 90},
+        {"id": "housing_starts", "label": "US housing starts (thousands, SAAR)", "source": "fred", "fred_id": "HOUST", "good_for": "residential_demand", "staleness_max_days": 85},
+        {"id": "housing_starts_sf", "label": "US single-family housing starts (thousands, SAAR)", "source": "fred", "fred_id": "HOUST1F", "good_for": "residential_demand", "staleness_max_days": 85, "note": "Single-family consumes far more aggregate per unit than multi-family"},
+        {"id": "building_permits", "label": "US building permits (thousands, SAAR)", "source": "fred", "fred_id": "PERMIT", "good_for": "residential_pipeline", "staleness_max_days": 85},
+        {"id": "building_permits_sf", "label": "US single-family building permits (thousands, SAAR)", "source": "fred", "fred_id": "PERMIT1", "good_for": "residential_pipeline", "staleness_max_days": 85},
+        {"id": "construction_spend_total", "label": "US total construction spending (USD m, SAAR)", "source": "fred", "fred_id": "TTLCONS", "good_for": "aggregate_demand", "staleness_max_days": 100},
+        {"id": "construction_spend_private_res", "label": "US private residential construction spending (USD m, SAAR)", "source": "fred", "fred_id": "PRRESCONS", "good_for": "residential_demand", "staleness_max_days": 100},
+        {"id": "construction_spend_private_nonres", "label": "US private nonresidential construction spending (USD m, SAAR)", "source": "fred", "fred_id": "PNRESCONS", "good_for": "nonres_demand", "staleness_max_days": 100},
+        {"id": "construction_spend_nonres_total", "label": "US total nonresidential construction spending (USD m, SAAR)", "source": "fred", "fred_id": "TLNRESCONS", "good_for": "nonres_demand", "staleness_max_days": 100},
+        {"id": "construction_spend_public", "label": "US total public construction spending (USD m, SAAR)", "source": "fred", "fred_id": "TLPBLCONS", "good_for": "public_infrastructure_demand", "staleness_max_days": 100, "note": "The counter-cyclical leg; sized against residential before assuming it cushions a housing downturn"},
+        {"id": "construction_spend_highway", "label": "US highway and street construction spending (USD m, SAAR)", "source": "fred", "fred_id": "TLHWYCONS", "good_for": "public_infrastructure_demand", "staleness_max_days": 100, "note": "Single most important public series for aggregates volume"},
+        {"id": "construction_spend_manufacturing", "label": "US manufacturing construction spending (USD m, SAAR)", "source": "fred", "fred_id": "TLMFGCONS", "good_for": "nonres_demand", "staleness_max_days": 100, "note": "Fab and megaproject build"},
+        {"id": "construction_spend_power", "label": "US power construction spending (USD m, SAAR)", "source": "fred", "fred_id": "TLPWRCONS", "good_for": "nonres_demand", "staleness_max_days": 100, "note": "Data centre and grid build"},
+        {"id": "mortgage_30y", "label": "US 30-year fixed mortgage rate (%)", "source": "fred", "fred_id": "MORTGAGE30US", "good_for": "rate_gate", "staleness_max_days": 21},
+        {"id": "ust_10y", "label": "US Treasury 10Y yield (%)", "source": "fred", "fred_id": "DGS10", "good_for": "rate_gate", "fallback": {"source": "yahoo_daily", "yahoo_symbol": "^TNX"}},
+        {"id": "construction_employment", "label": "US construction employment (thousands)", "source": "fred", "fred_id": "USCONS", "good_for": "labor_constraint", "staleness_max_days": 60},
+        {"id": "heavy_civil_employment", "label": "US heavy and civil engineering construction employment (thousands)", "source": "fred", "fred_id": "CES2023700001", "good_for": "labor_constraint", "staleness_max_days": 60, "note": "Labor is what converts funded backlog into shipped tons"},
+        {"id": "diesel_price", "label": "US retail diesel price (USD/gal)", "source": "fred", "fred_id": "GASDESW", "good_for": "input_cost", "staleness_max_days": 21, "note": "Cost side, and the source of unadjusted-ASP noise"},
+        {"id": "vmc_cash_gross_profit_per_ton", "label": "VMC aggregates cash gross profit per ton (USD)", "source": "filing_panel", "panel": "aggregates_unit_economics.csv", "metric": "vmc_cash_gross_profit_per_ton", "good_for": "unit_profitability", "staleness_max_days": 400, "note": "The metric the sector turns on. Curated from the 10-K; read_filing_panel does not filter by ticker, so every company needs its own metric column"},
+        {"id": "vmc_freight_adj_asp_per_ton", "label": "VMC freight-adjusted aggregates price per ton (USD)", "source": "filing_panel", "panel": "aggregates_unit_economics.csv", "metric": "vmc_freight_adj_asp_per_ton", "good_for": "aggregates_pricing", "staleness_max_days": 400, "optional": true, "note": "Freight-adjusted strips pass-through haulage; compare against the crushed-limestone PPI"},
+        {"id": "vmc_aggregates_tons_mm", "label": "VMC aggregates shipments (million tons, FY)", "source": "filing_panel", "panel": "aggregates_unit_economics.csv", "metric": "vmc_aggregates_tons_mm", "good_for": "aggregates_volume", "staleness_max_days": 400, "optional": true},
+        {"id": "crh_aggregates_tons_mm", "label": "CRH aggregates sales volumes (million tons, annualized)", "source": "filing_panel", "panel": "aggregates_unit_economics.csv", "metric": "crh_aggregates_tons_mm", "good_for": "aggregates_volume", "staleness_max_days": 400, "optional": true}
+      ]
+    },
     "btc_hash_power": {
       "label": "Bitcoin mining hashpower and power arbitrage",
       "description": "BTC price and power cost for miner / hosting cash; overlaps AI when sites re-purpose power.",

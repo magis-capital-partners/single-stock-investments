@@ -2176,7 +2176,7 @@ const MEMORY_VIEW_KEY = 'ssp_memory_view_v1';
 const MEMORY_TYPE_KEY = 'ssp_memory_type_v1';
 const BIOTECH_SCOPE_KEY = 'ssp_biotech_scope_v1';
 const WATCHLIST_VIEW_KEY = 'ssp_watchlist_view_v1';
-const WATCHLIST_VIEWS = new Set(['all', 'queue', 'nol', 'banks']);
+const WATCHLIST_VIEWS = new Set(['all', 'queue', 'nol', 'banks', 'rock']);
 
 function defaultWatchlistView() {
   try {
@@ -2250,7 +2250,7 @@ function parseRouteFromHashString(hash) {
   }
   const researchMatch = /^#\/research\/(coverage|valuation)(?:\/([^/?#]+))?$/i.exec(hash || '');
   if (researchMatch) return { view: researchMatch[1].toLowerCase() === 'valuation' ? 'valuation' : 'holdings', ticker: researchMatch[2] ? decodeURIComponent(researchMatch[2]).toUpperCase() : null, watchlistSub: null };
-  const ideasMatch = /^#\/ideas\/(all|queue|nol|banks|short-alpha|warrants)$/i.exec(hash || '');
+  const ideasMatch = /^#\/ideas\/(all|queue|nol|banks|rock|short-alpha|warrants)$/i.exec(hash || '');
   if (ideasMatch) {
     const sub = ideasMatch[1].toLowerCase();
     return { view: sub === 'short-alpha' || sub === 'warrants' ? sub : 'watchlist', ticker: null, watchlistSub: sub };
@@ -2273,7 +2273,7 @@ function parseRouteFromHashString(hash) {
       watchlistSub: null,
     };
   }
-  const watchlistMatch = /^#\/watchlist(?:\/(queue|nol|banks))?$/i.exec(hash || '');
+  const watchlistMatch = /^#\/watchlist(?:\/(queue|nol|banks|rock))?$/i.exec(hash || '');
   if (watchlistMatch) {
     return {
       view: 'watchlist',
@@ -4547,9 +4547,11 @@ function renderWatchlistSubNav(active) {
   if (active === 'all' || active === 'queue') return '';
   const nolCount = (data.nol_screener?.rows || []).length;
   const bankCount = (data.advantaged_banks_screener?.rows || []).length;
+  const rockCount = (data.rock_aggregates_screener?.rows || []).length;
   return `<div class="screen-switcher" aria-label="Idea screens">
     <button type="button" class="${active === 'nol' ? 'active' : ''}" data-watchlist-view="nol">NOL carryforwards · ${nolCount}</button>
     <button type="button" class="${active === 'banks' ? 'active' : ''}" data-watchlist-view="banks">Advantaged banks · ${bankCount}</button>
+    <button type="button" class="${active === 'rock' ? 'active' : ''}" data-watchlist-view="rock">Aggregates · ${rockCount}</button>
   </div>`;
 }
 
@@ -4794,6 +4796,51 @@ function renderWatchlistBanksBody() {
     </div>`;
 }
 
+function renderWatchlistRockBody() {
+  const rock = data.rock_aggregates_screener || {};
+  const rockRows = rock.rows || [];
+  const pureOnly = localStorage.getItem('rockPureOnly') === '1';
+  const visible = pureOnly ? rockRows.filter(r => r.is_pure_rock === true) : rockRows;
+  const pureCount = rock.pure_rock_count != null ? rock.pure_rock_count : rockRows.filter(r => r.is_pure_rock).length;
+  const cell = (v) => escapeHtml(v || '—');
+  const rowHtml = (r) => `
+          <tr>
+            <td class="mono">${escapeHtml(r.ticker)}${r.in_holdings ? ' <span class="badge badge-ok" title="Already a holding">H</span>' : ''}${r.in_watchlist ? ' <span class="badge badge-warn" title="On watchlist">W</span>' : ''}${r.screen_status === 'pending_sec' ? ` <span class="badge badge-warn" title="${escapeHtml(r.sec_error || 'SEC facts unavailable')}">!</span>` : ''}</td>
+            <td>${escapeHtml(r.company)}</td>
+            <td><span class="badge badge-sleeve">${cell(r.rock_type_label || r.rock_type)}</span></td>
+            <td class="mono" title="Latest full fiscal year${r.fiscal_year_end ? ' ending ' + escapeHtml(r.fiscal_year_end) : ''}">${cell(r.revenue_display)}</td>
+            <td class="mono" title="(Operating income + DD&amp;A) ÷ revenue, FY">${cell(r.ebitda_margin_display)}</td>
+            <td class="mono" title="(CFO − capex) ÷ EBITDA, FY">${cell(r.fcf_conversion_display)}</td>
+            <td class="mono" title="Capex ÷ revenue, FY. Maintenance vs growth split is not in XBRL">${cell(r.capex_pct_revenue_display)}</td>
+            <td class="mono" title="(Total debt − cash) ÷ EBITDA. Negative means net cash">${cell(r.net_debt_ebitda_display)}</td>
+            <td class="mono" title="Operating income × (1 − 21% flat statutory) ÷ (equity + total debt − cash)">${cell(r.roic_display)}</td>
+            <td class="mono" title="(Market cap + net debt) ÷ EBITDA">${cell(r.ev_ebitda_display)}</td>
+            <td class="mono" title="(Goodwill + intangibles) ÷ equity — roll-up quality check">${cell(r.goodwill_equity_display)}</td>
+            <td class="mono" title="Permitted reserve life is disclosed in 10-K Item 2 Properties, not XBRL. Fills in once the aggregates reserves filing panel is built.">${cell(r.reserve_life_display)}</td>
+            <td class="mono" style="font-size:11px">${cell(r.fiscal_year_end)}</td>
+            <td>${r.in_holdings ? '<span class="form-hint">holding</span>' : `<button type="button" class="btn-secondary btn-sm" data-rock-watch="${escapeHtml(r.ticker)}"
+              data-company="${escapeHtml(r.company)}" data-market="${escapeHtml(r.market)}">+ Watchlist</button>`}</td>
+          </tr>`;
+  const head = `<thead><tr>
+        <th>Ticker</th><th>Company</th><th>Type</th><th>Rev (FY)</th><th>EBITDA %</th><th>FCF conv</th><th>Capex % rev</th><th>ND/EBITDA</th><th>ROIC</th><th>EV/EBITDA</th><th>GW+Int / Eq</th><th>Reserve life</th><th>FY end</th><th></th>
+      </tr></thead>`;
+  const table = rockRows.length ? `
+    <label class="form-hint" style="display:inline-flex;align-items:center;gap:6px;margin-bottom:10px">
+      <input type="checkbox" id="rock-pure-only" ${pureOnly ? 'checked' : ''}>
+      Show aggregates only (hide cement, lime, asphalt)
+    </label>
+    ${visible.length ? `<table class="darwin-table">${head}<tbody>${visible.map(rowHtml).join('')}</tbody></table>` : '<div class="operator-empty"><strong>No producers match this filter</strong><span>Clear “Show aggregates only” to restore cement, lime and asphalt names.</span></div>'}`
+    : '<div class="operator-empty"><strong>Aggregates screen not built</strong><span>Run: <code>python _system/scripts/build_rock_aggregates_screener.py --write</code></span></div>';
+  return `
+    <div class="watchlist-section">
+      <h3>Aggregates screener (${rockRows.length}${pureCount != null ? ` · ${pureCount} aggregates` : ''})</h3>
+      <p class="form-hint" style="margin-bottom:10px">${escapeHtml(rock.criteria || 'US aggregates, cement and lime producers. Seed list plus SEC companyfacts.')}</p>
+      <p class="form-hint" style="margin-bottom:10px">Freight caps the economic haul radius near 25 miles, so each quarry is a local oligopoly and the thesis is price per ton compounding above cost per ton. The two metrics that decide it — freight-adjusted price per ton and cash gross profit per ton — are not in XBRL; they arrive with the aggregates unit-economics filing panel. Macro context: <code>aggregates_infrastructure</code> theme panel.</p>
+      ${table}
+      <p class="form-hint" style="margin-top:10px">Source · SEC company facts (latest full fiscal year for flows) plus Yahoo chart price. Holdings are kept in rank order rather than pushed to the bottom: VMC, MLM and CRH are the benchmark the rest is read against.</p>
+    </div>`;
+}
+
 function renderWatchlistTab() {
   const loading = document.getElementById('watchlist-loading');
   const content = document.getElementById('watchlist-content');
@@ -4818,6 +4865,7 @@ function renderWatchlistTab() {
   let body = '';
   if (watchlistViewMode === 'all') body = renderIdeasIndexBody();
   else if (watchlistViewMode === 'banks') body = renderWatchlistBanksBody();
+  else if (watchlistViewMode === 'rock') body = renderWatchlistRockBody();
   else body = renderWatchlistNolBody();
 
   content.innerHTML = watchlistViewMode === 'all' ? body : `<div class="ideas-shell"><header class="ideas-header"><div><h2>Research Screens</h2><p>Specialized screens share one decision grammar: actionable rows first, blockers explicit, methodology collapsed.</p></div><span class="ideas-asof">As of ${escapeHtml(window.DashboardFormat.date(data.generated_at || data.generatedAt))}</span></header>${renderWatchlistSubNav(watchlistViewMode)}${body}</div>`;
@@ -4878,6 +4926,22 @@ function renderWatchlistTab() {
   content.querySelectorAll('[data-nol-watch]').forEach(btn => {
     btn.addEventListener('click', () => openOnboardModal({
       ticker: btn.dataset.nolWatch,
+      company: btn.dataset.company,
+      market: btn.dataset.market,
+      watchlistOnly: true,
+    }));
+  });
+  const rockPureCb = content.querySelector('#rock-pure-only');
+  if (rockPureCb) {
+    rockPureCb.addEventListener('change', () => {
+      localStorage.setItem('rockPureOnly', rockPureCb.checked ? '1' : '0');
+      renderWatchlistTab();
+    });
+  }
+
+  content.querySelectorAll('[data-rock-watch]').forEach(btn => {
+    btn.addEventListener('click', () => openOnboardModal({
+      ticker: btn.dataset.rockWatch,
       company: btn.dataset.company,
       market: btn.dataset.market,
       watchlistOnly: true,
