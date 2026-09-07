@@ -12,6 +12,10 @@ from typing import Any, Iterator
 
 from .allocation_policy import POLICY_SOURCE_PREFIX, classify_policy_position, load_drew_symbols, load_ls_universe, residual_quantity
 
+# Stable namespace for content-derived projection ids. Fixed forever: changing it
+# would remint every projection id and cost one full delete-and-reinsert cycle.
+_PROJECTION_NAMESPACE = uuid.UUID("6f5c1d3e-9b2a-4c77-8f31-2a1c4d8e7b90")
+
 
 def utc_now() -> str:
     return datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
@@ -398,13 +402,34 @@ class PortfolioLedger:
         for row in order_events:
             row["payload"] = json.loads(row.pop("payload_json"))
             row["state"] = row.pop("next_state")
-        return {
-            "schema_version": "allocation_projection.v1", "projection_id": str(uuid.uuid4()),
+        body = {
+            "schema_version": "allocation_projection.v1",
             "source_run_id": snap["source_run_id"], "account_alias": account_alias,
             "as_of": snap["as_of"], "allocations": allocations,
             "cash_events": cash_events,
             "reconciliation_breaks": breaks, "order_events": order_events,
         }
+        # projection_id is derived from the content, never random.
+        #
+        # It used to be uuid4(), which meant every call looked brand new to the
+        # ingest Worker no matter what it contained. storeAllocationProjection
+        # dedupes on `SELECT ... WHERE projection_id=?`, so a fresh id every time
+        # skipped that check and took the write path: DELETE every row in
+        # portfolio_allocations and portfolio_cash_events for the account, DELETE
+        # the reconciliation breaks, then re-INSERT all of them plus every order
+        # event. D1 counts deletes as row writes, so one unchanged projection cost
+        # roughly twice the row count, and the 5-minute publisher timer paid it
+        # 288 times a day against a 100k free-tier budget -- exhausting it around
+        # 04:22 UTC every morning, which is what kept `d1 migrations apply` from
+        # ever landing 0014-0016 and stopped retention from running at all.
+        #
+        # A content hash restores the dedupe the Worker already implements: an
+        # unchanged projection now returns {duplicate: true} without writing a
+        # row, and any real change still mints a new id. The Worker's other guard
+        # -- same projection_id with a different digest is an error -- stays
+        # satisfied because the id IS the digest.
+        digest = hashlib.sha256(canonical_json(body).encode("utf-8")).hexdigest()
+        return {**body, "projection_id": str(uuid.uuid5(_PROJECTION_NAMESPACE, digest))}
 
     def latest_account_snapshot_payload(self, account_alias: str) -> dict[str, Any]:
         snap = self.connection.execute(

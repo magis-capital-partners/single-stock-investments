@@ -1,0 +1,18 @@
+# Publish the private portfolio projection to the dashboard ingest endpoint.
+#
+# Touches no IB Gateway: this is HTTPS to the Cloudflare Worker only, no client
+# ID and no TWS API socket. Driven by portfolio-hub-publisher.timer (hourly).
+#
+# Live layout: /home/spx/.config/systemd/user/ under the spx user's systemd,
+# alongside the managed drop-in 10-spx-coexistence.conf that nices and CPU-caps
+# it so the SPX 0DTE executor never waits behind it (CLAUDE.md rule 7).
+
+[Unit]
+Description=Publish private portfolio projection
+
+[Service]
+Type=oneshot
+WorkingDirectory=/home/spx/single-stock-investments
+EnvironmentFile=/home/spx/.config/portfolio-hub/secrets.env
+Environment=PYTHONPATH=/home/spx/single-stock-investments
+ExecStart=/home/spx/portfolio-hub-venv/bin/python -m _system.trading.portfolio_hub --db /home/spx/portfolio-hub/portfolio.db publish-latest --account U805366

@@ -182,3 +182,37 @@ def test_load_drew_symbols_reads_owner_tagged_tickers(tmp_path) -> None:
     ]), encoding="utf-8")
     assert load_drew_symbols(tags) == {"IBKR", "BRK-B"}
     assert load_drew_symbols(tmp_path / "missing.json") == set()
+
+
+def test_projection_id_is_content_derived_not_random(ledger: PortfolioLedger) -> None:
+    """An unchanged projection must keep its id, so the ingest Worker can dedupe it.
+
+    projection_id was uuid4(), so every publish looked new to
+    storeAllocationProjection, which dedupes on `WHERE projection_id=?`. Missing
+    that check took the write path: DELETE every portfolio_allocations and
+    portfolio_cash_events row for the account, DELETE the reconciliation breaks,
+    then re-INSERT all of them. D1 counts deletes as row writes, and the publisher
+    timer paid that twice-the-row-count cost every five minutes for a book that
+    had not changed in thirteen days -- which is what exhausted the 100k daily
+    write budget by 04:22 UTC and blocked `d1 migrations apply` for days running.
+    """
+    snapshot_id = ledger.ingest_account_snapshot(snapshot())
+    ledger.add_allocation(
+        account_alias="paper-primary", conid=101, owner="drew", strategy="single_stock",
+        quantity="60", effective_at="2026-08-17T13:00:00Z",
+    )
+    ledger.reconcile_allocations(snapshot_id)
+
+    first = ledger.allocation_projection("paper-primary")
+    second = ledger.allocation_projection("paper-primary")
+    assert first["projection_id"] == second["projection_id"], "unchanged content must reuse the id"
+    assert first == second
+
+    # A real change must still mint a new id, or the Worker's "same id, different
+    # digest" guard would reject the publish outright.
+    ledger.add_allocation(
+        account_alias="paper-primary", conid=101, owner="michael", strategy="single_stock",
+        quantity="40", effective_at="2026-08-17T13:00:00Z",
+    )
+    changed = ledger.allocation_projection("paper-primary")
+    assert changed["projection_id"] != first["projection_id"], "changed content must mint a new id"

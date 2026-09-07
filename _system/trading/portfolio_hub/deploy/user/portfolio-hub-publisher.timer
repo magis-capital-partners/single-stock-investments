@@ -1,0 +1,32 @@
+# Publishes the account snapshot and allocation projection to the dashboard.
+#
+# Hourly, not every five minutes. The source book is IBKR Flex, which lands once
+# a day, so a 5-minute cadence republished an unchanged projection 288 times a
+# day. Paired with a random projection_id (fixed in ledger.py) that meant the
+# ingest Worker could not dedupe it, and each publish deleted and re-inserted
+# every allocation, cash event and reconciliation break for the account. D1
+# counts deletes as row writes, so the free-tier 100k daily budget was gone by
+# ~04:22 UTC every morning -- which is what blocked `d1 migrations apply` from
+# landing 0014-0016 and stopped retention running at all.
+#
+# Even hourly is generous for a daily book; it exists so an allocation edited by
+# hand shows up without waiting for tomorrow. Do not lower this interval without
+# working out what it costs in D1 row writes first.
+#
+# Live layout: /home/spx/.config/systemd/user/ under the spx user's systemd.
+# The copy under deploy/ (the /opt + system-scope runbook) is deprecated; see
+# CLAUDE.md "Deployment layout".
+
+[Unit]
+Description=Publish private portfolio projection hourly
+
+[Timer]
+OnBootSec=5min
+OnUnitActiveSec=1h
+# 5s accuracy pinned a high-precision timer for a job whose input changes daily.
+AccuracySec=1min
+RandomizedDelaySec=5min
+Persistent=true
+
+[Install]
+WantedBy=timers.target

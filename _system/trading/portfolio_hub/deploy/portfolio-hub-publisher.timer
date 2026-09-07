@@ -1,10 +1,18 @@
+# DEPRECATED LAYOUT. The live units are deploy/user/*; see CLAUDE.md
+# "Deployment layout". Kept only so this runbook is not silently wrong.
+#
+# Cadence corrected from 5min to 1h: at 5 minutes this republished an unchanged
+# projection 288 times a day and exhausted the D1 free-tier write budget by
+# ~04:22 UTC. See deploy/user/portfolio-hub-publisher.timer for the full note.
+
 [Unit]
-Description=Publish private portfolio projection every 5 minutes
+Description=Publish private portfolio projection hourly
 
 [Timer]
-OnBootSec=45s
-OnUnitActiveSec=5min
-AccuracySec=5s
+OnBootSec=5min
+OnUnitActiveSec=1h
+AccuracySec=1min
+RandomizedDelaySec=5min
 Persistent=true
 
 [Install]
