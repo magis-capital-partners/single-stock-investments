@@ -28,15 +28,15 @@
     },
     {
       "kpi_id": "crushed_stone_ppi_yoy",
-      "label": "Crushed-stone PPI (YoY %)",
-      "unit": "pct_yoy",
+      "label": "Crushed-stone PPI (index)",
+      "unit": "index",
       "expected": {
         "op": "gte",
-        "value": 0,
+        "value": 498.536,
         "horizon": "2026"
       },
       "actual": {
-        "value": 6.0,
+        "value": 528.216,
         "as_of": "2026-07-01"
       },
       "status": "pass",
@@ -44,7 +44,7 @@
       "evidence_tier": "market",
       "last_checked": "2026-09-08",
       "binds_to": {
-        "note": "Third-party read on industry pricing, independent of company-reported ASP. The thesis is that price per ton compounds; an industry PPI turning negative falsifies that at the sector level, not just for one operator. Divergence between this and company ASP is the tell worth investigating either way.",
+        "note": "Third-party read on industry pricing, independent of company-reported ASP. The thesis is that price per ton compounds; an industry PPI falling below last year's level falsifies that at the sector level, not just for one operator. The floor is the July 2025 reading (498.536), which makes this exactly a 'no year-on-year decline' test while keeping the value on the same scale as the series the theme card plots -- a YoY-labelled row would have shown 6.0 in one place and 528.2 in the other. Divergence between this and company ASP is the tell worth investigating either way.",
         "on_fail": "human_review"
       },
       "in_base_irr": false,
@@ -52,15 +52,15 @@
     },
     {
       "kpi_id": "highway_construction_spend_yoy",
-      "label": "US highway & street construction spending (YoY %)",
-      "unit": "pct_yoy",
+      "label": "US highway & street construction spending (USD m, SAAR)",
+      "unit": "usd_millions_saar",
       "expected": {
         "op": "gte",
-        "value": 0,
+        "value": 145020.0,
         "horizon": "2026"
       },
       "actual": {
-        "value": 4.5,
+        "value": 151508.0,
         "as_of": "2026-07-01"
       },
       "status": "pass",
@@ -68,7 +68,7 @@
       "evidence_tier": "market",
       "last_checked": "2026-09-08",
       "binds_to": {
-        "note": "The counter-cyclical leg. Public infrastructure is what is supposed to cushion a residential downturn; if this turns negative while residential is also falling, the cushion is gone and the cycle claim fails. Federal surface-transportation reauthorisation is the swing factor behind it and has no automated source -- obligations lead outlays lead shipped tons by 2-4 years.",
+        "note": "The counter-cyclical leg. Public infrastructure is what is supposed to cushion a residential downturn; if this turns negative while residential is also falling, the cushion is gone and the cycle claim fails. Floor is the July 2025 level (145,020), i.e. no year-on-year decline. Federal surface-transportation reauthorisation is the swing factor behind it and has no automated source -- obligations lead outlays lead shipped tons by 2-4 years.",
         "on_fail": "human_review"
       },
       "in_base_irr": false,

@@ -1934,6 +1934,16 @@
     macro_regime: ['theme:hy_oas', 'theme:ust_10y', 'theme:vix_level'],
     water_surface: ['theme:tpl_water_revenue_m', 'theme:wti_crude', 'theme:permian_crude_production_mbbl_d'],
     timber_housing: ['theme:housing_starts', 'theme:building_permits'],
+    // Unit profitability first: it is the metric the aggregates thesis turns on.
+    // Then the industry PPI as a third-party check on company-reported pricing,
+    // then highway spend as the counter-cyclical demand leg. Without an entry
+    // here a theme falls through to the space_network fallback and claims it has
+    // no market series, which for this one is wrong by 27.
+    aggregates_infrastructure: [
+      'theme:vmc_cash_gross_profit_per_ton',
+      'theme:ppi_crushed_limestone',
+      'theme:construction_spend_highway',
+    ],
     btc_hash_power: ['theme:btc_usd', 'theme:henry_hub_gas'],
     energy_royalty: ['theme:wti_crude', 'theme:henry_hub_gas'],
     pharma_royalty: ['theme:xlv_etf', 'theme:xbi_etf', 'theme:ust_10y'],
