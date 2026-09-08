@@ -1,5 +1,5 @@
 {
-  "generated": "2026-09-08T09:16:14Z",
+  "generated": "2026-09-08T18:28:01Z",
   "rules_as_of": "2026-07-09",
   "as_of": "2026-09-08",
   "caption": "The average large-cap S&P 500 index effect has fallen to near zero since 2010; treat these as research triggers, weighted by demand-shock size, not mechanical trades. Migrations across the Russell 1000/2000 breakpoint are typically net-negative for the promoted stock (Horizon Kinetics 2013).",
@@ -1796,12 +1796,12 @@
               "pass": false,
               "value": "cvr",
               "threshold": [
-                "preferred",
-                "cvr",
-                "private",
                 "rights",
                 "otc_pink",
-                "debenture"
+                "cvr",
+                "private",
+                "debenture",
+                "preferred"
               ],
               "reason": "excluded security type"
             }
@@ -2678,6 +2678,276 @@
         "mcap_source": "rank_day_snapshot:2026-10-31"
       },
       "inputs_missing": [],
+      "security_type": null,
+      "float_impact": {
+        "events": [],
+        "primary": null,
+        "aum_as_of": "2026-07-15",
+        "aum_stale": false
+      }
+    },
+    "ACA": {
+      "ticker": "ACA",
+      "company": "Arcosa Inc",
+      "market": "US",
+      "exchange": "—",
+      "current_memberships": [],
+      "scorecards": [
+        {
+          "index": "russell_1000",
+          "status": "n_a",
+          "checks": {
+            "market_cap": {
+              "pass": null,
+              "value": null,
+              "threshold": "total_market_cap",
+              "reason": "missing market_cap"
+            },
+            "rank": {
+              "pass": null,
+              "value": null,
+              "threshold": "breakpoint",
+              "reason": "breakpoint unavailable"
+            }
+          },
+          "gating_check": null,
+          "distance_to_boundary_pct": null,
+          "confidence": "rules_only",
+          "rank_estimate": null,
+          "rank_method": "n_a"
+        },
+        {
+          "index": "russell_2000",
+          "status": "n_a",
+          "checks": {
+            "market_cap": {
+              "pass": null,
+              "value": null,
+              "threshold": "total_market_cap",
+              "reason": "missing market_cap"
+            },
+            "rank": {
+              "pass": null,
+              "value": null,
+              "threshold": "breakpoint",
+              "reason": "breakpoint unavailable"
+            }
+          },
+          "gating_check": null,
+          "distance_to_boundary_pct": null,
+          "confidence": "rules_only",
+          "rank_estimate": null,
+          "rank_method": "n_a"
+        },
+        {
+          "index": "msci_usa",
+          "status": "n_a",
+          "checks": {
+            "market_cap": {
+              "pass": null,
+              "value": null,
+              "threshold": 5000000000,
+              "reason": "missing market_cap"
+            }
+          },
+          "gating_check": null,
+          "distance_to_boundary_pct": null,
+          "confidence": "rules_only"
+        },
+        {
+          "index": "msci_acwi",
+          "status": "n_a",
+          "checks": {
+            "market_cap": {
+              "pass": null,
+              "value": null,
+              "threshold": 3000000000,
+              "reason": "missing market_cap"
+            }
+          },
+          "gating_check": null,
+          "distance_to_boundary_pct": null,
+          "confidence": "rules_only"
+        },
+        {
+          "index": "sp500",
+          "status": "n_a",
+          "checks": {
+            "market_cap": {
+              "pass": null,
+              "value": null,
+              "threshold": 22700000000,
+              "reason": "missing market_cap"
+            },
+            "float": {
+              "pass": null,
+              "value": null,
+              "threshold": 0.5,
+              "reason": "missing float_pct"
+            },
+            "earnings_positive": {
+              "pass": true,
+              "value": true,
+              "threshold": true,
+              "reason": "filing_facts net_income current=208.4 prior=93.7"
+            },
+            "exchange": {
+              "pass": false,
+              "value": "—",
+              "threshold": [
+                "NYSE",
+                "NYSE ARCA",
+                "NYSE AMERICAN",
+                "NASDAQ",
+                "CBOE",
+                "CME"
+              ],
+              "reason": null
+            },
+            "liquidity": {
+              "pass": null,
+              "value": null,
+              "threshold": 1.0,
+              "reason": "missing adv or float"
+            }
+          },
+          "gating_check": "exchange",
+          "distance_to_boundary_pct": null,
+          "confidence": "rules_only"
+        },
+        {
+          "index": "sp400",
+          "status": "n_a",
+          "checks": {
+            "market_cap": {
+              "pass": null,
+              "value": null,
+              "threshold": [
+                8000000000,
+                22700000000
+              ],
+              "reason": "missing market_cap"
+            },
+            "float": {
+              "pass": null,
+              "value": null,
+              "threshold": 0.5,
+              "reason": "missing float_pct"
+            },
+            "earnings_positive": {
+              "pass": true,
+              "value": true,
+              "threshold": true,
+              "reason": "filing_facts net_income current=208.4 prior=93.7"
+            },
+            "exchange": {
+              "pass": false,
+              "value": "—",
+              "threshold": [
+                "NYSE",
+                "NYSE ARCA",
+                "NYSE AMERICAN",
+                "NASDAQ",
+                "CBOE",
+                "CME"
+              ],
+              "reason": null
+            },
+            "liquidity": {
+              "pass": null,
+              "value": null,
+              "threshold": 1.0,
+              "reason": "missing adv or float"
+            }
+          },
+          "gating_check": "exchange",
+          "distance_to_boundary_pct": null,
+          "confidence": "rules_only"
+        },
+        {
+          "index": "sp600",
+          "status": "n_a",
+          "checks": {
+            "market_cap": {
+              "pass": null,
+              "value": null,
+              "threshold": [
+                1200000000,
+                8000000000
+              ],
+              "reason": "missing market_cap"
+            },
+            "float": {
+              "pass": null,
+              "value": null,
+              "threshold": 0.5,
+              "reason": "missing float_pct"
+            },
+            "earnings_positive": {
+              "pass": true,
+              "value": true,
+              "threshold": true,
+              "reason": "filing_facts net_income current=208.4 prior=93.7"
+            },
+            "exchange": {
+              "pass": false,
+              "value": "—",
+              "threshold": [
+                "NYSE",
+                "NYSE ARCA",
+                "NYSE AMERICAN",
+                "NASDAQ",
+                "CBOE",
+                "CME"
+              ],
+              "reason": null
+            },
+            "liquidity": {
+              "pass": null,
+              "value": null,
+              "threshold": 1.0,
+              "reason": "missing adv or float"
+            }
+          },
+          "gating_check": "exchange",
+          "distance_to_boundary_pct": null,
+          "confidence": "rules_only"
+        }
+      ],
+      "badge_status": "n_a",
+      "impact_proxy": {
+        "demand_shock_pct_of_adv": null,
+        "priority_score": 0.2747,
+        "demand_shock_source": "assumed_bps_fallback"
+      },
+      "confirmed_events": [],
+      "news_notes": [],
+      "prediction": {
+        "next_calendar_event": {
+          "id": "sp_share_update_2026q3",
+          "index_family": "sp_dji",
+          "indices": [
+            "sp500",
+            "sp400",
+            "sp600"
+          ],
+          "kind": "quarterly_share_update",
+          "effective": "2026-09-19",
+          "label": "S&P DJI quarterly share update",
+          "days_out": 11
+        },
+        "inclusion_probability_band": "n_a",
+        "recon_statuses": [],
+        "report_tier": null,
+        "recon_watch": [],
+        "mcap_source": null
+      },
+      "inputs_missing": [
+        "market_cap",
+        "shares",
+        "float_pct",
+        "adv"
+      ],
       "security_type": null,
       "float_impact": {
         "events": [],
@@ -12523,6 +12793,276 @@
         "aum_stale": false
       }
     },
+    "AMRZ": {
+      "ticker": "AMRZ",
+      "company": "Amrize Ltd",
+      "market": "US",
+      "exchange": "—",
+      "current_memberships": [],
+      "scorecards": [
+        {
+          "index": "russell_1000",
+          "status": "n_a",
+          "checks": {
+            "market_cap": {
+              "pass": null,
+              "value": null,
+              "threshold": "total_market_cap",
+              "reason": "missing market_cap"
+            },
+            "rank": {
+              "pass": null,
+              "value": null,
+              "threshold": "breakpoint",
+              "reason": "breakpoint unavailable"
+            }
+          },
+          "gating_check": null,
+          "distance_to_boundary_pct": null,
+          "confidence": "rules_only",
+          "rank_estimate": null,
+          "rank_method": "n_a"
+        },
+        {
+          "index": "russell_2000",
+          "status": "n_a",
+          "checks": {
+            "market_cap": {
+              "pass": null,
+              "value": null,
+              "threshold": "total_market_cap",
+              "reason": "missing market_cap"
+            },
+            "rank": {
+              "pass": null,
+              "value": null,
+              "threshold": "breakpoint",
+              "reason": "breakpoint unavailable"
+            }
+          },
+          "gating_check": null,
+          "distance_to_boundary_pct": null,
+          "confidence": "rules_only",
+          "rank_estimate": null,
+          "rank_method": "n_a"
+        },
+        {
+          "index": "msci_usa",
+          "status": "n_a",
+          "checks": {
+            "market_cap": {
+              "pass": null,
+              "value": null,
+              "threshold": 5000000000,
+              "reason": "missing market_cap"
+            }
+          },
+          "gating_check": null,
+          "distance_to_boundary_pct": null,
+          "confidence": "rules_only"
+        },
+        {
+          "index": "msci_acwi",
+          "status": "n_a",
+          "checks": {
+            "market_cap": {
+              "pass": null,
+              "value": null,
+              "threshold": 3000000000,
+              "reason": "missing market_cap"
+            }
+          },
+          "gating_check": null,
+          "distance_to_boundary_pct": null,
+          "confidence": "rules_only"
+        },
+        {
+          "index": "sp500",
+          "status": "n_a",
+          "checks": {
+            "market_cap": {
+              "pass": null,
+              "value": null,
+              "threshold": 22700000000,
+              "reason": "missing market_cap"
+            },
+            "float": {
+              "pass": null,
+              "value": null,
+              "threshold": 0.5,
+              "reason": "missing float_pct"
+            },
+            "earnings_positive": {
+              "pass": true,
+              "value": true,
+              "threshold": true,
+              "reason": "filing_facts net_income current=1185.0 prior=1274.0"
+            },
+            "exchange": {
+              "pass": false,
+              "value": "—",
+              "threshold": [
+                "NYSE",
+                "NYSE ARCA",
+                "NYSE AMERICAN",
+                "NASDAQ",
+                "CBOE",
+                "CME"
+              ],
+              "reason": null
+            },
+            "liquidity": {
+              "pass": null,
+              "value": null,
+              "threshold": 1.0,
+              "reason": "missing adv or float"
+            }
+          },
+          "gating_check": "exchange",
+          "distance_to_boundary_pct": null,
+          "confidence": "rules_only"
+        },
+        {
+          "index": "sp400",
+          "status": "n_a",
+          "checks": {
+            "market_cap": {
+              "pass": null,
+              "value": null,
+              "threshold": [
+                8000000000,
+                22700000000
+              ],
+              "reason": "missing market_cap"
+            },
+            "float": {
+              "pass": null,
+              "value": null,
+              "threshold": 0.5,
+              "reason": "missing float_pct"
+            },
+            "earnings_positive": {
+              "pass": true,
+              "value": true,
+              "threshold": true,
+              "reason": "filing_facts net_income current=1185.0 prior=1274.0"
+            },
+            "exchange": {
+              "pass": false,
+              "value": "—",
+              "threshold": [
+                "NYSE",
+                "NYSE ARCA",
+                "NYSE AMERICAN",
+                "NASDAQ",
+                "CBOE",
+                "CME"
+              ],
+              "reason": null
+            },
+            "liquidity": {
+              "pass": null,
+              "value": null,
+              "threshold": 1.0,
+              "reason": "missing adv or float"
+            }
+          },
+          "gating_check": "exchange",
+          "distance_to_boundary_pct": null,
+          "confidence": "rules_only"
+        },
+        {
+          "index": "sp600",
+          "status": "n_a",
+          "checks": {
+            "market_cap": {
+              "pass": null,
+              "value": null,
+              "threshold": [
+                1200000000,
+                8000000000
+              ],
+              "reason": "missing market_cap"
+            },
+            "float": {
+              "pass": null,
+              "value": null,
+              "threshold": 0.5,
+              "reason": "missing float_pct"
+            },
+            "earnings_positive": {
+              "pass": true,
+              "value": true,
+              "threshold": true,
+              "reason": "filing_facts net_income current=1185.0 prior=1274.0"
+            },
+            "exchange": {
+              "pass": false,
+              "value": "—",
+              "threshold": [
+                "NYSE",
+                "NYSE ARCA",
+                "NYSE AMERICAN",
+                "NASDAQ",
+                "CBOE",
+                "CME"
+              ],
+              "reason": null
+            },
+            "liquidity": {
+              "pass": null,
+              "value": null,
+              "threshold": 1.0,
+              "reason": "missing adv or float"
+            }
+          },
+          "gating_check": "exchange",
+          "distance_to_boundary_pct": null,
+          "confidence": "rules_only"
+        }
+      ],
+      "badge_status": "n_a",
+      "impact_proxy": {
+        "demand_shock_pct_of_adv": null,
+        "priority_score": 0.2747,
+        "demand_shock_source": "assumed_bps_fallback"
+      },
+      "confirmed_events": [],
+      "news_notes": [],
+      "prediction": {
+        "next_calendar_event": {
+          "id": "sp_share_update_2026q3",
+          "index_family": "sp_dji",
+          "indices": [
+            "sp500",
+            "sp400",
+            "sp600"
+          ],
+          "kind": "quarterly_share_update",
+          "effective": "2026-09-19",
+          "label": "S&P DJI quarterly share update",
+          "days_out": 11
+        },
+        "inclusion_probability_band": "n_a",
+        "recon_statuses": [],
+        "report_tier": null,
+        "recon_watch": [],
+        "mcap_source": null
+      },
+      "inputs_missing": [
+        "market_cap",
+        "shares",
+        "float_pct",
+        "adv"
+      ],
+      "security_type": null,
+      "float_impact": {
+        "events": [],
+        "primary": null,
+        "aum_as_of": "2026-07-15",
+        "aum_stale": false
+      }
+    },
     "AMT": {
       "ticker": "AMT",
       "company": "American Tower",
@@ -20762,12 +21302,12 @@
               "pass": false,
               "value": "otc_pink",
               "threshold": [
-                "preferred",
-                "cvr",
-                "private",
                 "rights",
                 "otc_pink",
-                "debenture"
+                "cvr",
+                "private",
+                "debenture",
+                "preferred"
               ],
               "reason": "excluded security type"
             }
@@ -29642,6 +30182,85 @@
         "aum_stale": false
       }
     },
+    "BRKN.SW": {
+      "ticker": "BRKN.SW",
+      "company": "Burkhalter Holding AG",
+      "market": "EU",
+      "exchange": "SIX",
+      "current_memberships": [],
+      "scorecards": [
+        {
+          "index": "msci_acwi",
+          "status": "n_a",
+          "checks": {
+            "market_cap": {
+              "pass": null,
+              "value": null,
+              "threshold": 3000000000,
+              "reason": "missing market_cap"
+            }
+          },
+          "gating_check": null,
+          "distance_to_boundary_pct": null,
+          "confidence": "rules_only"
+        },
+        {
+          "index": "stoxx_europe_600",
+          "status": "n_a",
+          "checks": {
+            "market_cap": {
+              "pass": null,
+              "value": null,
+              "threshold": 1000000000,
+              "reason": "missing market_cap"
+            }
+          },
+          "gating_check": null,
+          "distance_to_boundary_pct": null,
+          "confidence": "rules_only"
+        }
+      ],
+      "badge_status": "n_a",
+      "impact_proxy": {
+        "demand_shock_pct_of_adv": null,
+        "priority_score": 0.2706,
+        "demand_shock_source": "assumed_bps_fallback"
+      },
+      "confirmed_events": [],
+      "news_notes": [],
+      "prediction": {
+        "next_calendar_event": {
+          "id": "stoxx_sep_2026",
+          "index_family": "stoxx",
+          "indices": [
+            "stoxx_europe_600"
+          ],
+          "kind": "quarterly_review",
+          "effective": "2026-09-22",
+          "label": "STOXX Europe 600 quarterly review",
+          "days_out": 14
+        },
+        "inclusion_probability_band": "n_a",
+        "recon_statuses": [],
+        "report_tier": null,
+        "recon_watch": [],
+        "mcap_source": null
+      },
+      "inputs_missing": [
+        "market_cap",
+        "shares",
+        "float_pct",
+        "adv",
+        "earnings"
+      ],
+      "security_type": null,
+      "float_impact": {
+        "events": [],
+        "primary": null,
+        "aum_as_of": "2026-07-15",
+        "aum_stale": false
+      }
+    },
     "BRO": {
       "ticker": "BRO",
       "company": "Brown & Brown",
@@ -31273,12 +31892,12 @@
               "pass": false,
               "value": "otc_pink",
               "threshold": [
-                "preferred",
-                "cvr",
-                "private",
                 "rights",
                 "otc_pink",
-                "debenture"
+                "cvr",
+                "private",
+                "debenture",
+                "preferred"
               ],
               "reason": "excluded security type"
             }
@@ -31340,12 +31959,12 @@
               "pass": false,
               "value": "otc_pink",
               "threshold": [
-                "preferred",
-                "cvr",
-                "private",
                 "rights",
                 "otc_pink",
-                "debenture"
+                "cvr",
+                "private",
+                "debenture",
+                "preferred"
               ],
               "reason": "excluded security type"
             }
@@ -34689,12 +35308,12 @@
               "pass": false,
               "value": "private",
               "threshold": [
-                "preferred",
-                "cvr",
-                "private",
                 "rights",
                 "otc_pink",
-                "debenture"
+                "cvr",
+                "private",
+                "debenture",
+                "preferred"
               ],
               "reason": "excluded security type"
             }
@@ -50406,12 +51025,12 @@
               "pass": false,
               "value": "debenture",
               "threshold": [
-                "preferred",
-                "cvr",
-                "private",
                 "rights",
                 "otc_pink",
-                "debenture"
+                "cvr",
+                "private",
+                "debenture",
+                "preferred"
               ],
               "reason": "excluded security type"
             }
@@ -66352,12 +66971,12 @@
               "pass": false,
               "value": "private",
               "threshold": [
-                "preferred",
-                "cvr",
-                "private",
                 "rights",
                 "otc_pink",
-                "debenture"
+                "cvr",
+                "private",
+                "debenture",
+                "preferred"
               ],
               "reason": "excluded security type"
             }
@@ -70934,6 +71553,276 @@
       },
       "inputs_missing": [
         "market_cap"
+      ],
+      "security_type": null,
+      "float_impact": {
+        "events": [],
+        "primary": null,
+        "aum_as_of": "2026-07-15",
+        "aum_stale": false
+      }
+    },
+    "EXP": {
+      "ticker": "EXP",
+      "company": "Eagle Materials Inc",
+      "market": "US",
+      "exchange": "—",
+      "current_memberships": [],
+      "scorecards": [
+        {
+          "index": "russell_1000",
+          "status": "n_a",
+          "checks": {
+            "market_cap": {
+              "pass": null,
+              "value": null,
+              "threshold": "total_market_cap",
+              "reason": "missing market_cap"
+            },
+            "rank": {
+              "pass": null,
+              "value": null,
+              "threshold": "breakpoint",
+              "reason": "breakpoint unavailable"
+            }
+          },
+          "gating_check": null,
+          "distance_to_boundary_pct": null,
+          "confidence": "rules_only",
+          "rank_estimate": null,
+          "rank_method": "n_a"
+        },
+        {
+          "index": "russell_2000",
+          "status": "n_a",
+          "checks": {
+            "market_cap": {
+              "pass": null,
+              "value": null,
+              "threshold": "total_market_cap",
+              "reason": "missing market_cap"
+            },
+            "rank": {
+              "pass": null,
+              "value": null,
+              "threshold": "breakpoint",
+              "reason": "breakpoint unavailable"
+            }
+          },
+          "gating_check": null,
+          "distance_to_boundary_pct": null,
+          "confidence": "rules_only",
+          "rank_estimate": null,
+          "rank_method": "n_a"
+        },
+        {
+          "index": "msci_usa",
+          "status": "n_a",
+          "checks": {
+            "market_cap": {
+              "pass": null,
+              "value": null,
+              "threshold": 5000000000,
+              "reason": "missing market_cap"
+            }
+          },
+          "gating_check": null,
+          "distance_to_boundary_pct": null,
+          "confidence": "rules_only"
+        },
+        {
+          "index": "msci_acwi",
+          "status": "n_a",
+          "checks": {
+            "market_cap": {
+              "pass": null,
+              "value": null,
+              "threshold": 3000000000,
+              "reason": "missing market_cap"
+            }
+          },
+          "gating_check": null,
+          "distance_to_boundary_pct": null,
+          "confidence": "rules_only"
+        },
+        {
+          "index": "sp500",
+          "status": "n_a",
+          "checks": {
+            "market_cap": {
+              "pass": null,
+              "value": null,
+              "threshold": 22700000000,
+              "reason": "missing market_cap"
+            },
+            "float": {
+              "pass": null,
+              "value": null,
+              "threshold": 0.5,
+              "reason": "missing float_pct"
+            },
+            "earnings_positive": {
+              "pass": true,
+              "value": true,
+              "threshold": true,
+              "reason": "filing_facts net_income current=423809.0 prior=463416.0"
+            },
+            "exchange": {
+              "pass": false,
+              "value": "—",
+              "threshold": [
+                "NYSE",
+                "NYSE ARCA",
+                "NYSE AMERICAN",
+                "NASDAQ",
+                "CBOE",
+                "CME"
+              ],
+              "reason": null
+            },
+            "liquidity": {
+              "pass": null,
+              "value": null,
+              "threshold": 1.0,
+              "reason": "missing adv or float"
+            }
+          },
+          "gating_check": "exchange",
+          "distance_to_boundary_pct": null,
+          "confidence": "rules_only"
+        },
+        {
+          "index": "sp400",
+          "status": "n_a",
+          "checks": {
+            "market_cap": {
+              "pass": null,
+              "value": null,
+              "threshold": [
+                8000000000,
+                22700000000
+              ],
+              "reason": "missing market_cap"
+            },
+            "float": {
+              "pass": null,
+              "value": null,
+              "threshold": 0.5,
+              "reason": "missing float_pct"
+            },
+            "earnings_positive": {
+              "pass": true,
+              "value": true,
+              "threshold": true,
+              "reason": "filing_facts net_income current=423809.0 prior=463416.0"
+            },
+            "exchange": {
+              "pass": false,
+              "value": "—",
+              "threshold": [
+                "NYSE",
+                "NYSE ARCA",
+                "NYSE AMERICAN",
+                "NASDAQ",
+                "CBOE",
+                "CME"
+              ],
+              "reason": null
+            },
+            "liquidity": {
+              "pass": null,
+              "value": null,
+              "threshold": 1.0,
+              "reason": "missing adv or float"
+            }
+          },
+          "gating_check": "exchange",
+          "distance_to_boundary_pct": null,
+          "confidence": "rules_only"
+        },
+        {
+          "index": "sp600",
+          "status": "n_a",
+          "checks": {
+            "market_cap": {
+              "pass": null,
+              "value": null,
+              "threshold": [
+                1200000000,
+                8000000000
+              ],
+              "reason": "missing market_cap"
+            },
+            "float": {
+              "pass": null,
+              "value": null,
+              "threshold": 0.5,
+              "reason": "missing float_pct"
+            },
+            "earnings_positive": {
+              "pass": true,
+              "value": true,
+              "threshold": true,
+              "reason": "filing_facts net_income current=423809.0 prior=463416.0"
+            },
+            "exchange": {
+              "pass": false,
+              "value": "—",
+              "threshold": [
+                "NYSE",
+                "NYSE ARCA",
+                "NYSE AMERICAN",
+                "NASDAQ",
+                "CBOE",
+                "CME"
+              ],
+              "reason": null
+            },
+            "liquidity": {
+              "pass": null,
+              "value": null,
+              "threshold": 1.0,
+              "reason": "missing adv or float"
+            }
+          },
+          "gating_check": "exchange",
+          "distance_to_boundary_pct": null,
+          "confidence": "rules_only"
+        }
+      ],
+      "badge_status": "n_a",
+      "impact_proxy": {
+        "demand_shock_pct_of_adv": null,
+        "priority_score": 0.2747,
+        "demand_shock_source": "assumed_bps_fallback"
+      },
+      "confirmed_events": [],
+      "news_notes": [],
+      "prediction": {
+        "next_calendar_event": {
+          "id": "sp_share_update_2026q3",
+          "index_family": "sp_dji",
+          "indices": [
+            "sp500",
+            "sp400",
+            "sp600"
+          ],
+          "kind": "quarterly_share_update",
+          "effective": "2026-09-19",
+          "label": "S&P DJI quarterly share update",
+          "days_out": 11
+        },
+        "inclusion_probability_band": "n_a",
+        "recon_statuses": [],
+        "report_tier": null,
+        "recon_watch": [],
+        "mcap_source": null
+      },
+      "inputs_missing": [
+        "market_cap",
+        "shares",
+        "float_pct",
+        "adv"
       ],
       "security_type": null,
       "float_impact": {
@@ -77006,12 +77895,12 @@
               "pass": false,
               "value": "preferred",
               "threshold": [
-                "preferred",
-                "cvr",
-                "private",
                 "rights",
                 "otc_pink",
-                "debenture"
+                "cvr",
+                "private",
+                "debenture",
+                "preferred"
               ],
               "reason": "excluded security type"
             }
@@ -77075,12 +77964,12 @@
               "pass": false,
               "value": "preferred",
               "threshold": [
-                "preferred",
-                "cvr",
-                "private",
                 "rights",
                 "otc_pink",
-                "debenture"
+                "cvr",
+                "private",
+                "debenture",
+                "preferred"
               ],
               "reason": "excluded security type"
             }
@@ -77411,12 +78300,12 @@
               "pass": false,
               "value": "preferred",
               "threshold": [
-                "preferred",
-                "cvr",
-                "private",
                 "rights",
                 "otc_pink",
-                "debenture"
+                "cvr",
+                "private",
+                "debenture",
+                "preferred"
               ],
               "reason": "excluded security type"
             }
@@ -77480,12 +78369,12 @@
               "pass": false,
               "value": "preferred",
               "threshold": [
-                "preferred",
-                "cvr",
-                "private",
                 "rights",
                 "otc_pink",
-                "debenture"
+                "cvr",
+                "private",
+                "debenture",
+                "preferred"
               ],
               "reason": "excluded security type"
             }
@@ -81386,12 +82275,12 @@
               "pass": false,
               "value": "otc_pink",
               "threshold": [
-                "preferred",
-                "cvr",
-                "private",
                 "rights",
                 "otc_pink",
-                "debenture"
+                "cvr",
+                "private",
+                "debenture",
+                "preferred"
               ],
               "reason": "excluded security type"
             }
@@ -84789,12 +85678,12 @@
               "pass": false,
               "value": "preferred",
               "threshold": [
-                "preferred",
-                "cvr",
-                "private",
                 "rights",
                 "otc_pink",
-                "debenture"
+                "cvr",
+                "private",
+                "debenture",
+                "preferred"
               ],
               "reason": "excluded security type"
             }
@@ -84862,12 +85751,12 @@
               "pass": false,
               "value": "preferred",
               "threshold": [
-                "preferred",
-                "cvr",
-                "private",
                 "rights",
                 "otc_pink",
-                "debenture"
+                "cvr",
+                "private",
+                "debenture",
+                "preferred"
               ],
               "reason": "excluded security type"
             }
@@ -84935,12 +85824,12 @@
               "pass": false,
               "value": "preferred",
               "threshold": [
-                "preferred",
-                "cvr",
-                "private",
                 "rights",
                 "otc_pink",
-                "debenture"
+                "cvr",
+                "private",
+                "debenture",
+                "preferred"
               ],
               "reason": "excluded security type"
             }
@@ -94614,12 +95503,12 @@
               "pass": false,
               "value": "otc_pink",
               "threshold": [
-                "preferred",
-                "cvr",
-                "private",
                 "rights",
                 "otc_pink",
-                "debenture"
+                "cvr",
+                "private",
+                "debenture",
+                "preferred"
               ],
               "reason": "excluded security type"
             }
@@ -102416,12 +103305,12 @@
               "pass": false,
               "value": "rights",
               "threshold": [
-                "preferred",
-                "cvr",
-                "private",
                 "rights",
                 "otc_pink",
-                "debenture"
+                "cvr",
+                "private",
+                "debenture",
+                "preferred"
               ],
               "reason": "excluded security type"
             }
@@ -107934,12 +108823,12 @@
               "pass": false,
               "value": "otc_pink",
               "threshold": [
-                "preferred",
-                "cvr",
-                "private",
                 "rights",
                 "otc_pink",
-                "debenture"
+                "cvr",
+                "private",
+                "debenture",
+                "preferred"
               ],
               "reason": "excluded security type"
             }
@@ -110248,6 +111137,276 @@
       "inputs_missing": [
         "market_cap",
         "earnings"
+      ],
+      "security_type": null,
+      "float_impact": {
+        "events": [],
+        "primary": null,
+        "aum_as_of": "2026-07-15",
+        "aum_stale": false
+      }
+    },
+    "KNF": {
+      "ticker": "KNF",
+      "company": "Knife River Corp",
+      "market": "US",
+      "exchange": "—",
+      "current_memberships": [],
+      "scorecards": [
+        {
+          "index": "russell_1000",
+          "status": "n_a",
+          "checks": {
+            "market_cap": {
+              "pass": null,
+              "value": null,
+              "threshold": "total_market_cap",
+              "reason": "missing market_cap"
+            },
+            "rank": {
+              "pass": null,
+              "value": null,
+              "threshold": "breakpoint",
+              "reason": "breakpoint unavailable"
+            }
+          },
+          "gating_check": null,
+          "distance_to_boundary_pct": null,
+          "confidence": "rules_only",
+          "rank_estimate": null,
+          "rank_method": "n_a"
+        },
+        {
+          "index": "russell_2000",
+          "status": "n_a",
+          "checks": {
+            "market_cap": {
+              "pass": null,
+              "value": null,
+              "threshold": "total_market_cap",
+              "reason": "missing market_cap"
+            },
+            "rank": {
+              "pass": null,
+              "value": null,
+              "threshold": "breakpoint",
+              "reason": "breakpoint unavailable"
+            }
+          },
+          "gating_check": null,
+          "distance_to_boundary_pct": null,
+          "confidence": "rules_only",
+          "rank_estimate": null,
+          "rank_method": "n_a"
+        },
+        {
+          "index": "msci_usa",
+          "status": "n_a",
+          "checks": {
+            "market_cap": {
+              "pass": null,
+              "value": null,
+              "threshold": 5000000000,
+              "reason": "missing market_cap"
+            }
+          },
+          "gating_check": null,
+          "distance_to_boundary_pct": null,
+          "confidence": "rules_only"
+        },
+        {
+          "index": "msci_acwi",
+          "status": "n_a",
+          "checks": {
+            "market_cap": {
+              "pass": null,
+              "value": null,
+              "threshold": 3000000000,
+              "reason": "missing market_cap"
+            }
+          },
+          "gating_check": null,
+          "distance_to_boundary_pct": null,
+          "confidence": "rules_only"
+        },
+        {
+          "index": "sp500",
+          "status": "n_a",
+          "checks": {
+            "market_cap": {
+              "pass": null,
+              "value": null,
+              "threshold": 22700000000,
+              "reason": "missing market_cap"
+            },
+            "float": {
+              "pass": null,
+              "value": null,
+              "threshold": 0.5,
+              "reason": "missing float_pct"
+            },
+            "earnings_positive": {
+              "pass": true,
+              "value": true,
+              "threshold": true,
+              "reason": "filing_facts net_income current=157074.0 prior=201678.0"
+            },
+            "exchange": {
+              "pass": false,
+              "value": "—",
+              "threshold": [
+                "NYSE",
+                "NYSE ARCA",
+                "NYSE AMERICAN",
+                "NASDAQ",
+                "CBOE",
+                "CME"
+              ],
+              "reason": null
+            },
+            "liquidity": {
+              "pass": null,
+              "value": null,
+              "threshold": 1.0,
+              "reason": "missing adv or float"
+            }
+          },
+          "gating_check": "exchange",
+          "distance_to_boundary_pct": null,
+          "confidence": "rules_only"
+        },
+        {
+          "index": "sp400",
+          "status": "n_a",
+          "checks": {
+            "market_cap": {
+              "pass": null,
+              "value": null,
+              "threshold": [
+                8000000000,
+                22700000000
+              ],
+              "reason": "missing market_cap"
+            },
+            "float": {
+              "pass": null,
+              "value": null,
+              "threshold": 0.5,
+              "reason": "missing float_pct"
+            },
+            "earnings_positive": {
+              "pass": true,
+              "value": true,
+              "threshold": true,
+              "reason": "filing_facts net_income current=157074.0 prior=201678.0"
+            },
+            "exchange": {
+              "pass": false,
+              "value": "—",
+              "threshold": [
+                "NYSE",
+                "NYSE ARCA",
+                "NYSE AMERICAN",
+                "NASDAQ",
+                "CBOE",
+                "CME"
+              ],
+              "reason": null
+            },
+            "liquidity": {
+              "pass": null,
+              "value": null,
+              "threshold": 1.0,
+              "reason": "missing adv or float"
+            }
+          },
+          "gating_check": "exchange",
+          "distance_to_boundary_pct": null,
+          "confidence": "rules_only"
+        },
+        {
+          "index": "sp600",
+          "status": "n_a",
+          "checks": {
+            "market_cap": {
+              "pass": null,
+              "value": null,
+              "threshold": [
+                1200000000,
+                8000000000
+              ],
+              "reason": "missing market_cap"
+            },
+            "float": {
+              "pass": null,
+              "value": null,
+              "threshold": 0.5,
+              "reason": "missing float_pct"
+            },
+            "earnings_positive": {
+              "pass": true,
+              "value": true,
+              "threshold": true,
+              "reason": "filing_facts net_income current=157074.0 prior=201678.0"
+            },
+            "exchange": {
+              "pass": false,
+              "value": "—",
+              "threshold": [
+                "NYSE",
+                "NYSE ARCA",
+                "NYSE AMERICAN",
+                "NASDAQ",
+                "CBOE",
+                "CME"
+              ],
+              "reason": null
+            },
+            "liquidity": {
+              "pass": null,
+              "value": null,
+              "threshold": 1.0,
+              "reason": "missing adv or float"
+            }
+          },
+          "gating_check": "exchange",
+          "distance_to_boundary_pct": null,
+          "confidence": "rules_only"
+        }
+      ],
+      "badge_status": "n_a",
+      "impact_proxy": {
+        "demand_shock_pct_of_adv": null,
+        "priority_score": 0.2747,
+        "demand_shock_source": "assumed_bps_fallback"
+      },
+      "confirmed_events": [],
+      "news_notes": [],
+      "prediction": {
+        "next_calendar_event": {
+          "id": "sp_share_update_2026q3",
+          "index_family": "sp_dji",
+          "indices": [
+            "sp500",
+            "sp400",
+            "sp600"
+          ],
+          "kind": "quarterly_share_update",
+          "effective": "2026-09-19",
+          "label": "S&P DJI quarterly share update",
+          "days_out": 11
+        },
+        "inclusion_probability_band": "n_a",
+        "recon_statuses": [],
+        "report_tier": null,
+        "recon_watch": [],
+        "mcap_source": null
+      },
+      "inputs_missing": [
+        "market_cap",
+        "shares",
+        "float_pct",
+        "adv"
       ],
       "security_type": null,
       "float_impact": {
@@ -128400,12 +129559,12 @@
               "pass": false,
               "value": "cvr",
               "threshold": [
-                "preferred",
-                "cvr",
-                "private",
                 "rights",
                 "otc_pink",
-                "debenture"
+                "cvr",
+                "private",
+                "debenture",
+                "preferred"
               ],
               "reason": "excluded security type"
             }
@@ -147827,12 +148986,12 @@
               "pass": false,
               "value": "otc_pink",
               "threshold": [
-                "preferred",
-                "cvr",
-                "private",
                 "rights",
                 "otc_pink",
-                "debenture"
+                "cvr",
+                "private",
+                "debenture",
+                "preferred"
               ],
               "reason": "excluded security type"
             }
@@ -154453,12 +155612,12 @@
               "pass": false,
               "value": "cvr",
               "threshold": [
-                "preferred",
-                "cvr",
-                "private",
                 "rights",
                 "otc_pink",
-                "debenture"
+                "cvr",
+                "private",
+                "debenture",
+                "preferred"
               ],
               "reason": "excluded security type"
             }
@@ -164418,6 +165577,276 @@
             "event_source": "confirmed"
           }
         ],
+        "primary": null,
+        "aum_as_of": "2026-07-15",
+        "aum_stale": false
+      }
+    },
+    "ROAD": {
+      "ticker": "ROAD",
+      "company": "Construction Partners Inc",
+      "market": "US",
+      "exchange": "—",
+      "current_memberships": [],
+      "scorecards": [
+        {
+          "index": "russell_1000",
+          "status": "n_a",
+          "checks": {
+            "market_cap": {
+              "pass": null,
+              "value": null,
+              "threshold": "total_market_cap",
+              "reason": "missing market_cap"
+            },
+            "rank": {
+              "pass": null,
+              "value": null,
+              "threshold": "breakpoint",
+              "reason": "breakpoint unavailable"
+            }
+          },
+          "gating_check": null,
+          "distance_to_boundary_pct": null,
+          "confidence": "rules_only",
+          "rank_estimate": null,
+          "rank_method": "n_a"
+        },
+        {
+          "index": "russell_2000",
+          "status": "n_a",
+          "checks": {
+            "market_cap": {
+              "pass": null,
+              "value": null,
+              "threshold": "total_market_cap",
+              "reason": "missing market_cap"
+            },
+            "rank": {
+              "pass": null,
+              "value": null,
+              "threshold": "breakpoint",
+              "reason": "breakpoint unavailable"
+            }
+          },
+          "gating_check": null,
+          "distance_to_boundary_pct": null,
+          "confidence": "rules_only",
+          "rank_estimate": null,
+          "rank_method": "n_a"
+        },
+        {
+          "index": "msci_usa",
+          "status": "n_a",
+          "checks": {
+            "market_cap": {
+              "pass": null,
+              "value": null,
+              "threshold": 5000000000,
+              "reason": "missing market_cap"
+            }
+          },
+          "gating_check": null,
+          "distance_to_boundary_pct": null,
+          "confidence": "rules_only"
+        },
+        {
+          "index": "msci_acwi",
+          "status": "n_a",
+          "checks": {
+            "market_cap": {
+              "pass": null,
+              "value": null,
+              "threshold": 3000000000,
+              "reason": "missing market_cap"
+            }
+          },
+          "gating_check": null,
+          "distance_to_boundary_pct": null,
+          "confidence": "rules_only"
+        },
+        {
+          "index": "sp500",
+          "status": "n_a",
+          "checks": {
+            "market_cap": {
+              "pass": null,
+              "value": null,
+              "threshold": 22700000000,
+              "reason": "missing market_cap"
+            },
+            "float": {
+              "pass": null,
+              "value": null,
+              "threshold": 0.5,
+              "reason": "missing float_pct"
+            },
+            "earnings_positive": {
+              "pass": true,
+              "value": true,
+              "threshold": true,
+              "reason": "filing_facts net_income current=101781.0 prior=68935.0"
+            },
+            "exchange": {
+              "pass": false,
+              "value": "—",
+              "threshold": [
+                "NYSE",
+                "NYSE ARCA",
+                "NYSE AMERICAN",
+                "NASDAQ",
+                "CBOE",
+                "CME"
+              ],
+              "reason": null
+            },
+            "liquidity": {
+              "pass": null,
+              "value": null,
+              "threshold": 1.0,
+              "reason": "missing adv or float"
+            }
+          },
+          "gating_check": "exchange",
+          "distance_to_boundary_pct": null,
+          "confidence": "rules_only"
+        },
+        {
+          "index": "sp400",
+          "status": "n_a",
+          "checks": {
+            "market_cap": {
+              "pass": null,
+              "value": null,
+              "threshold": [
+                8000000000,
+                22700000000
+              ],
+              "reason": "missing market_cap"
+            },
+            "float": {
+              "pass": null,
+              "value": null,
+              "threshold": 0.5,
+              "reason": "missing float_pct"
+            },
+            "earnings_positive": {
+              "pass": true,
+              "value": true,
+              "threshold": true,
+              "reason": "filing_facts net_income current=101781.0 prior=68935.0"
+            },
+            "exchange": {
+              "pass": false,
+              "value": "—",
+              "threshold": [
+                "NYSE",
+                "NYSE ARCA",
+                "NYSE AMERICAN",
+                "NASDAQ",
+                "CBOE",
+                "CME"
+              ],
+              "reason": null
+            },
+            "liquidity": {
+              "pass": null,
+              "value": null,
+              "threshold": 1.0,
+              "reason": "missing adv or float"
+            }
+          },
+          "gating_check": "exchange",
+          "distance_to_boundary_pct": null,
+          "confidence": "rules_only"
+        },
+        {
+          "index": "sp600",
+          "status": "n_a",
+          "checks": {
+            "market_cap": {
+              "pass": null,
+              "value": null,
+              "threshold": [
+                1200000000,
+                8000000000
+              ],
+              "reason": "missing market_cap"
+            },
+            "float": {
+              "pass": null,
+              "value": null,
+              "threshold": 0.5,
+              "reason": "missing float_pct"
+            },
+            "earnings_positive": {
+              "pass": true,
+              "value": true,
+              "threshold": true,
+              "reason": "filing_facts net_income current=101781.0 prior=68935.0"
+            },
+            "exchange": {
+              "pass": false,
+              "value": "—",
+              "threshold": [
+                "NYSE",
+                "NYSE ARCA",
+                "NYSE AMERICAN",
+                "NASDAQ",
+                "CBOE",
+                "CME"
+              ],
+              "reason": null
+            },
+            "liquidity": {
+              "pass": null,
+              "value": null,
+              "threshold": 1.0,
+              "reason": "missing adv or float"
+            }
+          },
+          "gating_check": "exchange",
+          "distance_to_boundary_pct": null,
+          "confidence": "rules_only"
+        }
+      ],
+      "badge_status": "n_a",
+      "impact_proxy": {
+        "demand_shock_pct_of_adv": null,
+        "priority_score": 0.2747,
+        "demand_shock_source": "assumed_bps_fallback"
+      },
+      "confirmed_events": [],
+      "news_notes": [],
+      "prediction": {
+        "next_calendar_event": {
+          "id": "sp_share_update_2026q3",
+          "index_family": "sp_dji",
+          "indices": [
+            "sp500",
+            "sp400",
+            "sp600"
+          ],
+          "kind": "quarterly_share_update",
+          "effective": "2026-09-19",
+          "label": "S&P DJI quarterly share update",
+          "days_out": 11
+        },
+        "inclusion_probability_band": "n_a",
+        "recon_statuses": [],
+        "report_tier": null,
+        "recon_watch": [],
+        "mcap_source": null
+      },
+      "inputs_missing": [
+        "market_cap",
+        "shares",
+        "float_pct",
+        "adv"
+      ],
+      "security_type": null,
+      "float_impact": {
+        "events": [],
         "primary": null,
         "aum_as_of": "2026-07-15",
         "aum_stale": false
@@ -176660,6 +178089,85 @@
         "market_cap",
         "shares",
         "float_pct",
+        "earnings"
+      ],
+      "security_type": null,
+      "float_impact": {
+        "events": [],
+        "primary": null,
+        "aum_as_of": "2026-07-15",
+        "aum_stale": false
+      }
+    },
+    "SPIE.PA": {
+      "ticker": "SPIE.PA",
+      "company": "SPIE SA",
+      "market": "EU",
+      "exchange": "Euronext Paris",
+      "current_memberships": [],
+      "scorecards": [
+        {
+          "index": "msci_acwi",
+          "status": "n_a",
+          "checks": {
+            "market_cap": {
+              "pass": null,
+              "value": null,
+              "threshold": 3000000000,
+              "reason": "missing market_cap"
+            }
+          },
+          "gating_check": null,
+          "distance_to_boundary_pct": null,
+          "confidence": "rules_only"
+        },
+        {
+          "index": "stoxx_europe_600",
+          "status": "n_a",
+          "checks": {
+            "market_cap": {
+              "pass": null,
+              "value": null,
+              "threshold": 1000000000,
+              "reason": "missing market_cap"
+            }
+          },
+          "gating_check": null,
+          "distance_to_boundary_pct": null,
+          "confidence": "rules_only"
+        }
+      ],
+      "badge_status": "n_a",
+      "impact_proxy": {
+        "demand_shock_pct_of_adv": null,
+        "priority_score": 0.2706,
+        "demand_shock_source": "assumed_bps_fallback"
+      },
+      "confirmed_events": [],
+      "news_notes": [],
+      "prediction": {
+        "next_calendar_event": {
+          "id": "stoxx_sep_2026",
+          "index_family": "stoxx",
+          "indices": [
+            "stoxx_europe_600"
+          ],
+          "kind": "quarterly_review",
+          "effective": "2026-09-22",
+          "label": "STOXX Europe 600 quarterly review",
+          "days_out": 14
+        },
+        "inclusion_probability_band": "n_a",
+        "recon_statuses": [],
+        "report_tier": null,
+        "recon_watch": [],
+        "mcap_source": null
+      },
+      "inputs_missing": [
+        "market_cap",
+        "shares",
+        "float_pct",
+        "adv",
         "earnings"
       ],
       "security_type": null,
@@ -196147,6 +197655,85 @@
         "aum_stale": false
       }
     },
+    "UMG.AS": {
+      "ticker": "UMG.AS",
+      "company": "Universal Music Group N.V.",
+      "market": "EU",
+      "exchange": "Euronext Amsterdam",
+      "current_memberships": [],
+      "scorecards": [
+        {
+          "index": "msci_acwi",
+          "status": "n_a",
+          "checks": {
+            "market_cap": {
+              "pass": null,
+              "value": null,
+              "threshold": 3000000000,
+              "reason": "missing market_cap"
+            }
+          },
+          "gating_check": null,
+          "distance_to_boundary_pct": null,
+          "confidence": "rules_only"
+        },
+        {
+          "index": "stoxx_europe_600",
+          "status": "n_a",
+          "checks": {
+            "market_cap": {
+              "pass": null,
+              "value": null,
+              "threshold": 1000000000,
+              "reason": "missing market_cap"
+            }
+          },
+          "gating_check": null,
+          "distance_to_boundary_pct": null,
+          "confidence": "rules_only"
+        }
+      ],
+      "badge_status": "n_a",
+      "impact_proxy": {
+        "demand_shock_pct_of_adv": null,
+        "priority_score": 0.2706,
+        "demand_shock_source": "assumed_bps_fallback"
+      },
+      "confirmed_events": [],
+      "news_notes": [],
+      "prediction": {
+        "next_calendar_event": {
+          "id": "stoxx_sep_2026",
+          "index_family": "stoxx",
+          "indices": [
+            "stoxx_europe_600"
+          ],
+          "kind": "quarterly_review",
+          "effective": "2026-09-22",
+          "label": "STOXX Europe 600 quarterly review",
+          "days_out": 14
+        },
+        "inclusion_probability_band": "n_a",
+        "recon_statuses": [],
+        "report_tier": null,
+        "recon_watch": [],
+        "mcap_source": null
+      },
+      "inputs_missing": [
+        "market_cap",
+        "shares",
+        "float_pct",
+        "adv",
+        "earnings"
+      ],
+      "security_type": null,
+      "float_impact": {
+        "events": [],
+        "primary": null,
+        "aum_as_of": "2026-07-15",
+        "aum_stale": false
+      }
+    },
     "UNH": {
       "ticker": "UNH",
       "company": "UnitedHealth Group",
@@ -198665,6 +200252,276 @@
       "inputs_missing": [
         "market_cap",
         "earnings"
+      ],
+      "security_type": null,
+      "float_impact": {
+        "events": [],
+        "primary": null,
+        "aum_as_of": "2026-07-15",
+        "aum_stale": false
+      }
+    },
+    "USLM": {
+      "ticker": "USLM",
+      "company": "United States Lime & Minerals Inc",
+      "market": "US",
+      "exchange": "—",
+      "current_memberships": [],
+      "scorecards": [
+        {
+          "index": "russell_1000",
+          "status": "n_a",
+          "checks": {
+            "market_cap": {
+              "pass": null,
+              "value": null,
+              "threshold": "total_market_cap",
+              "reason": "missing market_cap"
+            },
+            "rank": {
+              "pass": null,
+              "value": null,
+              "threshold": "breakpoint",
+              "reason": "breakpoint unavailable"
+            }
+          },
+          "gating_check": null,
+          "distance_to_boundary_pct": null,
+          "confidence": "rules_only",
+          "rank_estimate": null,
+          "rank_method": "n_a"
+        },
+        {
+          "index": "russell_2000",
+          "status": "n_a",
+          "checks": {
+            "market_cap": {
+              "pass": null,
+              "value": null,
+              "threshold": "total_market_cap",
+              "reason": "missing market_cap"
+            },
+            "rank": {
+              "pass": null,
+              "value": null,
+              "threshold": "breakpoint",
+              "reason": "breakpoint unavailable"
+            }
+          },
+          "gating_check": null,
+          "distance_to_boundary_pct": null,
+          "confidence": "rules_only",
+          "rank_estimate": null,
+          "rank_method": "n_a"
+        },
+        {
+          "index": "msci_usa",
+          "status": "n_a",
+          "checks": {
+            "market_cap": {
+              "pass": null,
+              "value": null,
+              "threshold": 5000000000,
+              "reason": "missing market_cap"
+            }
+          },
+          "gating_check": null,
+          "distance_to_boundary_pct": null,
+          "confidence": "rules_only"
+        },
+        {
+          "index": "msci_acwi",
+          "status": "n_a",
+          "checks": {
+            "market_cap": {
+              "pass": null,
+              "value": null,
+              "threshold": 3000000000,
+              "reason": "missing market_cap"
+            }
+          },
+          "gating_check": null,
+          "distance_to_boundary_pct": null,
+          "confidence": "rules_only"
+        },
+        {
+          "index": "sp500",
+          "status": "n_a",
+          "checks": {
+            "market_cap": {
+              "pass": null,
+              "value": null,
+              "threshold": 22700000000,
+              "reason": "missing market_cap"
+            },
+            "float": {
+              "pass": null,
+              "value": null,
+              "threshold": 0.5,
+              "reason": "missing float_pct"
+            },
+            "earnings_positive": {
+              "pass": true,
+              "value": true,
+              "threshold": true,
+              "reason": "filing_facts net_income current=134275.0 prior=108839.0"
+            },
+            "exchange": {
+              "pass": false,
+              "value": "—",
+              "threshold": [
+                "NYSE",
+                "NYSE ARCA",
+                "NYSE AMERICAN",
+                "NASDAQ",
+                "CBOE",
+                "CME"
+              ],
+              "reason": null
+            },
+            "liquidity": {
+              "pass": null,
+              "value": null,
+              "threshold": 1.0,
+              "reason": "missing adv or float"
+            }
+          },
+          "gating_check": "exchange",
+          "distance_to_boundary_pct": null,
+          "confidence": "rules_only"
+        },
+        {
+          "index": "sp400",
+          "status": "n_a",
+          "checks": {
+            "market_cap": {
+              "pass": null,
+              "value": null,
+              "threshold": [
+                8000000000,
+                22700000000
+              ],
+              "reason": "missing market_cap"
+            },
+            "float": {
+              "pass": null,
+              "value": null,
+              "threshold": 0.5,
+              "reason": "missing float_pct"
+            },
+            "earnings_positive": {
+              "pass": true,
+              "value": true,
+              "threshold": true,
+              "reason": "filing_facts net_income current=134275.0 prior=108839.0"
+            },
+            "exchange": {
+              "pass": false,
+              "value": "—",
+              "threshold": [
+                "NYSE",
+                "NYSE ARCA",
+                "NYSE AMERICAN",
+                "NASDAQ",
+                "CBOE",
+                "CME"
+              ],
+              "reason": null
+            },
+            "liquidity": {
+              "pass": null,
+              "value": null,
+              "threshold": 1.0,
+              "reason": "missing adv or float"
+            }
+          },
+          "gating_check": "exchange",
+          "distance_to_boundary_pct": null,
+          "confidence": "rules_only"
+        },
+        {
+          "index": "sp600",
+          "status": "n_a",
+          "checks": {
+            "market_cap": {
+              "pass": null,
+              "value": null,
+              "threshold": [
+                1200000000,
+                8000000000
+              ],
+              "reason": "missing market_cap"
+            },
+            "float": {
+              "pass": null,
+              "value": null,
+              "threshold": 0.5,
+              "reason": "missing float_pct"
+            },
+            "earnings_positive": {
+              "pass": true,
+              "value": true,
+              "threshold": true,
+              "reason": "filing_facts net_income current=134275.0 prior=108839.0"
+            },
+            "exchange": {
+              "pass": false,
+              "value": "—",
+              "threshold": [
+                "NYSE",
+                "NYSE ARCA",
+                "NYSE AMERICAN",
+                "NASDAQ",
+                "CBOE",
+                "CME"
+              ],
+              "reason": null
+            },
+            "liquidity": {
+              "pass": null,
+              "value": null,
+              "threshold": 1.0,
+              "reason": "missing adv or float"
+            }
+          },
+          "gating_check": "exchange",
+          "distance_to_boundary_pct": null,
+          "confidence": "rules_only"
+        }
+      ],
+      "badge_status": "n_a",
+      "impact_proxy": {
+        "demand_shock_pct_of_adv": null,
+        "priority_score": 0.2747,
+        "demand_shock_source": "assumed_bps_fallback"
+      },
+      "confirmed_events": [],
+      "news_notes": [],
+      "prediction": {
+        "next_calendar_event": {
+          "id": "sp_share_update_2026q3",
+          "index_family": "sp_dji",
+          "indices": [
+            "sp500",
+            "sp400",
+            "sp600"
+          ],
+          "kind": "quarterly_share_update",
+          "effective": "2026-09-19",
+          "label": "S&P DJI quarterly share update",
+          "days_out": 11
+        },
+        "inclusion_probability_band": "n_a",
+        "recon_statuses": [],
+        "report_tier": null,
+        "recon_watch": [],
+        "mcap_source": null
+      },
+      "inputs_missing": [
+        "market_cap",
+        "shares",
+        "float_pct",
+        "adv"
       ],
       "security_type": null,
       "float_impact": {
@@ -208919,12 +210776,12 @@
               "pass": false,
               "value": "otc_pink",
               "threshold": [
-                "preferred",
-                "cvr",
-                "private",
                 "rights",
                 "otc_pink",
-                "debenture"
+                "cvr",
+                "private",
+                "debenture",
+                "preferred"
               ],
               "reason": "excluded security type"
             }
@@ -215975,7 +217832,7 @@
       "ACMR",
       "RIG"
     ],
-    "ticker_count": 834,
+    "ticker_count": 843,
     "quality_gated_events": 10,
     "provider_confirmed_events": 0,
     "news_notes": 43,
