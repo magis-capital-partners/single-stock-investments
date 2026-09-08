@@ -3,7 +3,7 @@
   "counts": {
     "V1": 21,
     "V2": 1,
-    "V3": 764,
+    "V3": 773,
     "V4": 57,
     "V5": 143,
     "V6": 181,
@@ -11,15 +11,30 @@
     "V8": 531
   },
   "trapped": 124,
-  "note": "Ratchet baseline. Counts may only fall; a rise fails CI.",
+  "note": "Ratchet baseline. Counts may only fall, except that UNIVERSE_SCALED checks (V3) may grow with the universe; a rise beyond that fails CI.",
   "revisions": [
     {
       "as_of": "2026-08-21",
-      "ids": ["V3"],
+      "ids": [
+        "V3"
+      ],
       "from": 124,
       "to": 764,
       "reason": "Definition change, NOT a bar-lowering. V3 used to fire only when queue_age >= STALE_QUEUE_DAYS, so its count tracked the collector's write schedule instead of the backlog. It was baselined 2026-08-11 -- the same day a bulk run stamped 637 evidence queues -- and returned 764 on 08-14 when those queues aged past the 3-day gate, with zero new defects. Re-recording 124 would have re-armed the same trap: the next bulk write resets every stamp and the cliff repeats. V3 now counts never-attempted tasks regardless of queue age and is invariant across --date (verified 2026-08-11 through 2027-01-01); staleness moved to totals.stale_queues as a cadence signal. 764 tickers / 2030 tasks is the true standing backlog and may only fall from here.",
       "not_rebaselined": "V6 (181->187: C, COHR, COP, CSX, DD, DVA) and V7 (81->82: C) are genuine regressions -- flat across every test date -- and are deliberately left failing."
+    },
+    {
+      "as_of": "2026-09-08",
+      "ids": [
+        "V3"
+      ],
+      "from": 764,
+      "to": 773,
+      "universe_from": 834,
+      "universe_to": 843,
+      "reason": "Definition change, NOT a bar-lowering -- the bar is numerically identical, re-expressed. V3 counts never-attempted evidence tasks, and a security is *created* in exactly that state: initialize_proof_first_valuation says 'New securities intentionally start evidence-blocked', so onboarding one raises V3 by one with no new defect. On 2026-09-07 V3 was 764 over 834 contracts and the ratchet was green with zero headroom. On 2026-09-08 nine securities were onboarded -- six aggregates producers in 595bcf28dc4 (ACA, AMRZ, EXP, KNF, ROAD, USLM) and three European listings in 25d4a3fdff4 (SPIE.PA, BRKN.SW, UMG.AS) -- and V3 became 773 over 843. Both rose by exactly nine. The ratchet now compares V3 against the universe it was recorded over and allows growth of at most (universe_now - universe_baseline), so 773/843 is the same bar as 764/834 and an evidence queue that rots on an existing security still fails. Without this, every onboarding reddened main and the only way to green it was to absorb the rise into the baseline, which is the bar-lowering this note exists to prevent. Absolute ceilings are unchanged for V1, V2 and V4-V8: none of them can fire on a newly onboarded security, because each requires either status=decision_grade or executed proofs it does not yet have.",
+      "not_rebaselined": "V1 (21->16), V2 (1->0), V4 (57->51), V5 (143->132), V6 (181->150), V7 (81->52) and V8 (531->60) are all currently BELOW baseline and were deliberately left at their recorded ceilings. Tightening seven bars in one commit, on a day nine securities were written, is the same 'baselined on a bulk-write day' error the 2026-08-21 revision documents. They should be re-recorded on a quiet day, each on its own evidence."
     }
-  ]
+  ],
+  "universe": 843
 }

@@ -296,5 +296,63 @@ class WorklistTests(unittest.TestCase):
         self.assertEqual(order[2], "ONE")
 
 
+class UniverseScaledRatchetTests(unittest.TestCase):
+    """V3 may grow with the universe; nothing else may grow at all."""
+
+    @staticmethod
+    def report(counts: dict, universe: int) -> dict:
+        full = {cid: 0 for cid in cei.CHECKS}
+        full.update(counts)
+        return {"counts": full, "universe": universe}
+
+    def test_v3_growth_matching_new_securities_is_not_a_regression(self):
+        # 2026-09-08 exactly: nine securities onboarded, V3 up by nine.
+        base = {"counts": {"V3": 764}, "universe": 834}
+        self.assertEqual(
+            cei.ratchet_regressions(self.report({"V3": 773}, 843), base), [])
+
+    def test_v3_growth_beyond_new_securities_still_fails(self):
+        base = {"counts": {"V3": 764}, "universe": 834}
+        found = cei.ratchet_regressions(self.report({"V3": 774}, 843), base)
+        self.assertEqual(len(found), 1)
+        self.assertIn("V3", found[0])
+        self.assertIn("allowed 773", found[0])
+
+    def test_v3_rot_on_a_static_universe_still_fails(self):
+        # The case the ratchet exists for: no new securities, backlog grew.
+        base = {"counts": {"V3": 764}, "universe": 834}
+        self.assertEqual(
+            len(cei.ratchet_regressions(self.report({"V3": 765}, 834), base)), 1)
+
+    def test_a_shrinking_universe_grants_no_headroom(self):
+        base = {"counts": {"V3": 764}, "universe": 834}
+        self.assertEqual(
+            len(cei.ratchet_regressions(self.report({"V3": 765}, 800), base)), 1)
+
+    def test_other_checks_never_scale(self):
+        base = {"counts": {"V6": 181}, "universe": 834}
+        found = cei.ratchet_regressions(self.report({"V6": 182}, 843), base)
+        self.assertEqual(len(found), 1)
+        self.assertIn("V6", found[0])
+        self.assertNotIn("allowed", found[0])
+
+    def test_baseline_without_universe_keeps_absolute_meaning(self):
+        # An older baseline file must not silently gain headroom.
+        base = {"counts": {"V3": 764}}
+        self.assertEqual(
+            len(cei.ratchet_regressions(self.report({"V3": 765}, 999), base)), 1)
+
+    def test_counts_at_or_below_baseline_pass(self):
+        base = {"counts": {"V3": 764, "V6": 181}, "universe": 834}
+        self.assertEqual(
+            cei.ratchet_regressions(self.report({"V3": 700, "V6": 181}, 843), base), [])
+
+    def test_committed_baseline_is_green_against_its_own_universe(self):
+        baseline = json.loads(
+            (Path(cei.BASELINE)).read_text(encoding="utf-8"))
+        current = self.report(baseline["counts"], baseline["universe"])
+        self.assertEqual(cei.ratchet_regressions(current, baseline), [])
+
+
 if __name__ == "__main__":
     unittest.main()

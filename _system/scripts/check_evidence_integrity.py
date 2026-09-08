@@ -82,6 +82,20 @@ if hasattr(sys.stdout, "reconfigure"):          # Windows cp1252 console
 
 ROOT = Path(__file__).resolve().parents[2]
 BASELINE = ROOT / "_system" / "data" / "evidence_integrity_baseline.json"
+
+# Checks whose population is one row per security, so onboarding a new name
+# necessarily raises the count with no new defect. A security is *created*
+# evidence_blocked with an uncollected queue -- initialize_proof_first_valuation
+# says so in as many words -- and V3 counts exactly that state, so every
+# onboarding regressed a ratchet that could not tell "nine new securities" from
+# "nine rotted queues". For these the baseline is compared against the universe
+# it was recorded over: the backlog may grow by at most the number of securities
+# added since. Everything else stays an absolute ceiling.
+#
+# Only V3 qualifies. V1, V2, V6 and V7 all require status == "decision_grade",
+# which a new security cannot reach, and V4, V5 and V8 need executed proofs or
+# downloaded filings it does not have yet.
+UNIVERSE_SCALED = {"V3"}
 REPORT = ROOT / "_system" / "data" / "evidence_integrity.json"
 BACKFILL = ROOT / "_system" / "data" / "contract_backfill_queue.json"
 REGISTRY = ROOT / "_system" / "portfolio" / "registry.json"
@@ -411,8 +425,38 @@ def sweep(root: Path, today: date, only: str | None = None) -> dict:
 
     return {"generated_at": datetime.now(timezone.utc).isoformat(),
             "as_of": today.isoformat(), "totals": totals,
+            # The population a UNIVERSE_SCALED check can fire on: tickers that
+            # have a contract at all, not every folder on disk.
+            "universe": totals["contracts"],
             "counts": {cid: len(rows) for cid, rows in findings.items()},
             "findings": findings, "per_ticker": per_ticker}
+
+
+def ratchet_regressions(report: dict, baseline: dict) -> list[str]:
+    """Checks that rose above what the baseline allows.
+
+    A UNIVERSE_SCALED check is allowed to grow by the number of securities added
+    since the baseline was taken; every other check may only fall. A baseline
+    recorded before `universe` existed scales nothing, so an old file keeps its
+    exact previous meaning rather than silently gaining headroom.
+    """
+    base_counts = baseline.get("counts") or {}
+    base_universe = baseline.get("universe")
+    growth = 0
+    if base_universe is not None:
+        growth = max(0, int(report.get("universe") or 0) - int(base_universe))
+    out = []
+    for cid in CHECKS:
+        count = report["counts"][cid]
+        allowed = base_counts.get(cid, 0)
+        if cid in UNIVERSE_SCALED and base_universe is not None:
+            allowed += growth
+        if count > allowed:
+            detail = f"{cid}: {count} > baseline {base_counts.get(cid, 0)}"
+            if cid in UNIVERSE_SCALED and growth:
+                detail += f" + {growth} securities added (allowed {allowed})"
+            out.append(detail)
+    return out
 
 
 def worklist(report: dict, limit: int) -> list[dict]:
@@ -502,9 +546,18 @@ def main(argv: list[str] | None = None) -> int:
         REPORT.write_text(json.dumps(report, indent=2) + "\n", encoding="utf-8")
 
     if args.update_baseline:
+        # Preserve `revisions`: it is the written record of why each bar moved,
+        # and re-recording counts without it destroys the only evidence that a
+        # given change was a definition change rather than a bar-lowering.
+        previous = read_json(BASELINE) or {}
         payload = {"as_of": report["as_of"], "counts": report["counts"],
+                   "universe": report["universe"],
                    "trapped": report["totals"]["trapped"],
-                   "note": "Ratchet baseline. Counts may only fall; a rise fails CI."}
+                   "note": "Ratchet baseline. Counts may only fall, except that"
+                           " UNIVERSE_SCALED checks may grow with the universe;"
+                           " a rise beyond that fails CI."}
+        if previous.get("revisions"):
+            payload["revisions"] = previous["revisions"]
         BASELINE.write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
         print(f"baseline written: {BASELINE.relative_to(ROOT)}")
 
@@ -517,17 +570,18 @@ def main(argv: list[str] | None = None) -> int:
     if not baseline:
         print("\nNOTE: no baseline recorded yet; run --update-baseline to arm the ratchet.")
         return 0
-    regressions = [
-        f"{cid}: {report['counts'][cid]} > baseline {baseline['counts'].get(cid, 0)}"
-        for cid in CHECKS
-        if report["counts"][cid] > baseline.get("counts", {}).get(cid, 0)
-    ]
+    regressions = ratchet_regressions(report, baseline)
     if regressions:
         print("\nREGRESSION against baseline "
               f"{baseline.get('as_of')}:\n  - " + "\n  - ".join(regressions))
         return 1
+    growth = max(0, int(report.get("universe") or 0)
+                 - int(baseline.get("universe") or report.get("universe") or 0))
+    allowance = (f"; V3 allowed +{growth} for securities added since"
+                 f" (universe {baseline.get('universe')} -> {report['universe']})"
+                 if growth else "")
     print(f"\nratchet OK against baseline {baseline.get('as_of')}"
-          " (no check rose above its recorded count)")
+          f" (no check rose above its recorded count{allowance})")
     return 0
 
 
