@@ -3,7 +3,7 @@
   "counts": {
     "V1": 21,
     "V2": 1,
-    "V3": 773,
+    "V3": 764,
     "V4": 57,
     "V5": 143,
     "V6": 181,
@@ -34,6 +34,18 @@
       "universe_to": 843,
       "reason": "Definition change, NOT a bar-lowering -- the bar is numerically identical, re-expressed. V3 counts never-attempted evidence tasks, and a security is *created* in exactly that state: initialize_proof_first_valuation says 'New securities intentionally start evidence-blocked', so onboarding one raises V3 by one with no new defect. On 2026-09-07 V3 was 764 over 834 contracts and the ratchet was green with zero headroom. On 2026-09-08 nine securities were onboarded -- six aggregates producers in 595bcf28dc4 (ACA, AMRZ, EXP, KNF, ROAD, USLM) and three European listings in 25d4a3fdff4 (SPIE.PA, BRKN.SW, UMG.AS) -- and V3 became 773 over 843. Both rose by exactly nine. The ratchet now compares V3 against the universe it was recorded over and allows growth of at most (universe_now - universe_baseline), so 773/843 is the same bar as 764/834 and an evidence queue that rots on an existing security still fails. Without this, every onboarding reddened main and the only way to green it was to absorb the rise into the baseline, which is the bar-lowering this note exists to prevent. Absolute ceilings are unchanged for V1, V2 and V4-V8: none of them can fire on a newly onboarded security, because each requires either status=decision_grade or executed proofs it does not yet have.",
       "not_rebaselined": "V1 (21->16), V2 (1->0), V4 (57->51), V5 (143->132), V6 (181->150), V7 (81->52) and V8 (531->60) are all currently BELOW baseline and were deliberately left at their recorded ceilings. Tightening seven bars in one commit, on a day nine securities were written, is the same 'baselined on a bulk-write day' error the 2026-08-21 revision documents. They should be re-recorded on a quiet day, each on its own evidence."
+    },
+    {
+      "as_of": "2026-09-08",
+      "ids": [
+        "V3"
+      ],
+      "from": 773,
+      "to": 764,
+      "universe_from": 843,
+      "universe_to": 843,
+      "reason": "Tightening, and it supersedes the 764->773 entry above within the same day. That entry granted the nine newly onboarded securities the headroom the universe scaling allows. The headroom was then not needed: their evidence queues were actually collected. The six US producers resolved 28 of 30 method inputs to locked fact-ledger rows from their SEC filings; the three European listings have no IR harvest script and therefore no primary documents, so their fifteen tasks were genuinely attempted, genuinely failed, and moved to retry_scheduled with attempts=1 and a recorded error. V3 counts tasks that are pending AND never attempted, so an honest failed attempt correctly leaves the count while the work stays visible in the retry queue. V3 is therefore back to 764 -- its 2026-09-07 value -- over a universe of 843 rather than 834, which is a strictly tighter bar than either previous state. Recording it is safe only because the universe scaling now absorbs the next onboarding automatically; without that, zero headroom at 764 is exactly what turned this morning's nine onboardings into a red main.",
+      "not_rebaselined": "V1, V2 and V4-V8 remain at their recorded ceilings for the reason given in the previous entry: they are all currently below baseline, and re-recording seven bars on a day nine securities were written repeats the baselined-on-a-bulk-write-day error."
     }
   ],
   "universe": 843

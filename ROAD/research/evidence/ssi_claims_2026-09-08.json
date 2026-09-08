@@ -2,7 +2,7 @@
   "schema_version": "1.0",
   "ticker": "ROAD",
   "as_of": "2026-09-08",
-  "pack_hash": "2fcefb9a5eaaf7a6d32305a395fb1c153855eb109c4ebe61c67c920d237650a6",
+  "pack_hash": "77851e53d5e060f5a13cc72323767b7ef30c9b95c983b9cf779460f6cafe5436",
   "pack_as_of": "2026-09-08",
   "claim_count": 215,
   "severity_histogram": {
@@ -19,13 +19,21 @@
   },
   "management_ledger": {
     "as_of": "2026-09-08",
-    "pack_hash": "2fcefb9a5eaaf7a6d32305a395fb1c153855eb109c4ebe61c67c920d237650a6",
+    "pack_hash": "77851e53d5e060f5a13cc72323767b7ef30c9b95c983b9cf779460f6cafe5436",
     "promise_count": 2,
     "statement_count": 0,
     "resolved_count": 0,
     "hit_rate": null,
     "unresolvable_count": 0,
-    "observed_buybacks": null,
+    "observed_buybacks": {
+      "window": "latest_fy",
+      "value": 23542000,
+      "periods": [
+        "2025-09-30"
+      ],
+      "tag": "us-gaap:PaymentsForRepurchaseOfCommonStock",
+      "accn": "0001628280-25-053871"
+    },
     "rows": [
       {
         "promise": "On April 12, 2024, the Company's Board of Directors authorized a stock repurchase program under which up to $ 40.0 million is available to purchase shares of the Company's outstanding Class A common stock through September 30, 2025. Shares ",
@@ -60,15 +68,59 @@
     ]
   },
   "spawner": {
-    "pack_hash": "2fcefb9a5eaaf7a6d32305a395fb1c153855eb109c4ebe61c67c920d237650a6",
-    "components": {},
+    "pack_hash": "77851e53d5e060f5a13cc72323767b7ef30c9b95c983b9cf779460f6cafe5436",
+    "components": {
+      "buyback_trajectory": {
+        "share_count_change_1y_pct": -51.39,
+        "share_count_cagr_pct": -22.8,
+        "years_observed": 4,
+        "read": "shrinking",
+        "evidence_ref": {
+          "tag": "us-gaap:CommonStockSharesOutstanding",
+          "first": {
+            "end": "2017-09-30",
+            "accn": "0001718227-18-000014"
+          },
+          "last": {
+            "end": "2019-09-30",
+            "accn": "0001718227-20-000093"
+          }
+        }
+      },
+      "capex_intensity": {
+        "capex_to_ocf": 0.473,
+        "capex_to_ocf_median": 0.622,
+        "years_observed": 9,
+        "period_end": "2025-09-30",
+        "read": "balanced",
+        "negative_ocf_years": 0,
+        "evidence_ref": {
+          "capex_tag": "us-gaap:PaymentsToAcquirePropertyPlantAndEquipment",
+          "ocf_tag": "us-gaap:NetCashProvidedByUsedInOperatingActivities"
+        }
+      },
+      "shareholder_returns": {
+        "buybacks_3y": [
+          139000,
+          11312000,
+          23542000
+        ],
+        "dividends_3y": [
+          31293000,
+          0
+        ],
+        "total_payout_ratio_latest": 0.231,
+        "evidence_ref": {
+          "buybacks_tag": "us-gaap:PaymentsForRepurchaseOfCommonStock",
+          "dividends_tag": "us-gaap:PaymentsOfDividendsCommonStock"
+        }
+      }
+    },
     "abstentions": [
-      "buyback_trajectory:missing_share_count_pair",
-      "capex_intensity:missing_capex_or_ocf",
       "small_bet_discipline:requires_segment_history",
       "kill_discipline:requires_segment_history"
     ],
-    "basis": "filing_facts"
+    "basis": "xbrl_series"
   },
   "dropped_modalities": {
     "unrouted_delta_rows": 78,

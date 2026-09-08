@@ -5,96 +5,88 @@
   "facts": [
     {
       "field_id": "operating_cash_flow_m",
-      "value": 291303.0,
+      "value": 291.303,
       "unit": "USD millions",
-      "source": {
-        "ref": "ROAD/research/evidence/filing_facts_2026-09-08.json",
-        "locator": "IX fact NetCashProvidedByUsedInOperatingActivities; extracted line 158",
-        "as_of": "2025-09-30",
-        "content_sha256": "30f2762a231ed190724ba6fc5523fd82493f9540af3857f95057ff89e8bdee85"
-      },
+      "locked": true,
       "confidence": "high",
-      "locked": true
+      "source": {
+        "ref": "ROAD/research/evidence/sec_companyfacts.json",
+        "locator": "us-gaap:NetCashProvidedByUsedInOperatingActivities; accession 0001628280-25-053871; form 10-K",
+        "as_of": "2025-09-30",
+        "content_sha256": "b4d8be02529336b5889bcd885ca0a640e5fbc5faaba86206f9542d67e768712e"
+      }
+    },
+    {
+      "field_id": "capital_expenditures_m",
+      "value": 137.93099999999998,
+      "unit": "USD millions",
+      "locked": true,
+      "confidence": "high",
+      "source": {
+        "ref": "ROAD/research/evidence/sec_companyfacts.json",
+        "locator": "us-gaap:PaymentsToAcquirePropertyPlantAndEquipment; accession 0001628280-25-053871; form 10-K",
+        "as_of": "2025-09-30",
+        "content_sha256": "b4d8be02529336b5889bcd885ca0a640e5fbc5faaba86206f9542d67e768712e"
+      }
     },
     {
       "field_id": "cash_m",
-      "value": 156062.0,
+      "value": 94.547,
       "unit": "USD millions",
-      "source": {
-        "ref": "ROAD/research/evidence/filing_facts_2026-09-08.json",
-        "locator": "IX fact CashAndCashEquivalentsAtCarryingValue; extracted line 2",
-        "as_of": "2025-09-30",
-        "content_sha256": "30f2762a231ed190724ba6fc5523fd82493f9540af3857f95057ff89e8bdee85"
-      },
+      "locked": true,
       "confidence": "high",
-      "locked": true
+      "source": {
+        "ref": "ROAD/research/evidence/sec_companyfacts.json",
+        "locator": "us-gaap:CashAndCashEquivalentsAtCarryingValue; accession 0001628280-26-054661; form 10-Q",
+        "as_of": "2026-06-30",
+        "content_sha256": "b4d8be02529336b5889bcd885ca0a640e5fbc5faaba86206f9542d67e768712e"
+      }
     },
     {
       "field_id": "debt_m",
-      "value": 1626125.0,
+      "value": 1803.25,
+      "unit": "USD millions",
+      "locked": true,
+      "confidence": "high",
+      "source": {
+        "ref": "ROAD/research/evidence/sec_companyfacts.json",
+        "locator": "us-gaap:DebtInstrumentCarryingAmount; accession 0001628280-26-054661; form 10-Q",
+        "as_of": "2026-06-30",
+        "content_sha256": "b4d8be02529336b5889bcd885ca0a640e5fbc5faaba86206f9542d67e768712e"
+      }
+    },
+    {
+      "field_id": "shares_outstanding",
+      "value": 56187735.0,
+      "unit": "shares",
+      "locked": true,
+      "confidence": "high",
+      "source": {
+        "ref": "ROAD/research/evidence/sec_companyfacts.json",
+        "locator": "us-gaap:WeightedAverageNumberOfDilutedSharesOutstanding; accession 0001628280-26-054661; form 10-Q",
+        "as_of": "2026-06-30",
+        "content_sha256": "b4d8be02529336b5889bcd885ca0a640e5fbc5faaba86206f9542d67e768712e"
+      }
+    },
+    {
+      "field_id": "normalized_owner_earnings_m",
+      "value": 153.372,
       "unit": "USD millions",
       "source": {
-        "ref": "ROAD/research/evidence/filing_facts_2026-09-08.json",
-        "locator": "IX fact LongTermDebt; extracted line 444",
+        "ref": "ROAD/research/evidence/sec_companyfacts.json",
+        "locator": "us-gaap:NetCashProvidedByUsedInOperatingActivities; accession 0001628280-25-053871; form 10-K",
         "as_of": "2025-09-30",
-        "content_sha256": "30f2762a231ed190724ba6fc5523fd82493f9540af3857f95057ff89e8bdee85"
+        "content_sha256": "b4d8be02529336b5889bcd885ca0a640e5fbc5faaba86206f9542d67e768712e"
       },
+      "derived_from": [
+        "operating_cash_flow_m",
+        "capital_expenditures_m"
+      ],
+      "formula": "operating_cash_flow_m - abs(capital_expenditures_m)",
       "confidence": "medium",
-      "locked": true
-    },
-    {
-      "field_id": "revenue_m",
-      "value": 2812356.0,
-      "unit": "USD millions",
-      "source": {
-        "ref": "ROAD/research/evidence/filing_facts_2026-09-08.json",
-        "locator": "IX fact RevenueFromContractWithCustomerExcludingAssessedTax; extracted line 48",
-        "as_of": "2025-09-30",
-        "content_sha256": "30f2762a231ed190724ba6fc5523fd82493f9540af3857f95057ff89e8bdee85"
-      },
-      "confidence": "high",
-      "locked": true
-    },
-    {
-      "field_id": "operating_income_m",
-      "value": 224811.0,
-      "unit": "USD millions",
-      "source": {
-        "ref": "ROAD/research/evidence/filing_facts_2026-09-08.json",
-        "locator": "IX fact OperatingIncomeLoss; extracted line 51",
-        "as_of": "2025-09-30",
-        "content_sha256": "30f2762a231ed190724ba6fc5523fd82493f9540af3857f95057ff89e8bdee85"
-      },
-      "confidence": "high",
-      "locked": true
-    },
-    {
-      "field_id": "net_income_m",
-      "value": 101781.0,
-      "unit": "USD millions",
-      "source": {
-        "ref": "ROAD/research/evidence/filing_facts_2026-09-08.json",
-        "locator": "IX fact NetIncomeLoss; extracted line 66",
-        "as_of": "2025-09-30",
-        "content_sha256": "30f2762a231ed190724ba6fc5523fd82493f9540af3857f95057ff89e8bdee85"
-      },
-      "confidence": "high",
-      "locked": true
-    },
-    {
-      "field_id": "stockholders_equity_m",
-      "value": 911963.0,
-      "unit": "USD millions",
-      "source": {
-        "ref": "ROAD/research/evidence/filing_facts_2026-09-08.json",
-        "locator": "IX fact StockholdersEquity; extracted line 44",
-        "as_of": "2025-09-30",
-        "content_sha256": "30f2762a231ed190724ba6fc5523fd82493f9540af3857f95057ff89e8bdee85"
-      },
-      "confidence": "high",
       "locked": true
     }
   ],
   "source_count": 1,
-  "generated_at": "2026-09-08T13:39:40.381863Z"
+  "generated_at": "2026-09-08T14:44:21.487268Z"
 }

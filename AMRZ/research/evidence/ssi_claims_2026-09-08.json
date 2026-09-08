@@ -2,7 +2,7 @@
   "schema_version": "1.0",
   "ticker": "AMRZ",
   "as_of": "2026-09-08",
-  "pack_hash": "29c3dfba8237d080e7cdcce83d456223d3cf24b1d651de487084aa89f5b2ef39",
+  "pack_hash": "722816626d5cb38999198e4858e828477982f65494f9a0f014c52455e8d87de7",
   "pack_as_of": "2026-09-08",
   "claim_count": 201,
   "severity_histogram": {
@@ -19,7 +19,7 @@
   },
   "management_ledger": {
     "as_of": "2026-09-08",
-    "pack_hash": "29c3dfba8237d080e7cdcce83d456223d3cf24b1d651de487084aa89f5b2ef39",
+    "pack_hash": "722816626d5cb38999198e4858e828477982f65494f9a0f014c52455e8d87de7",
     "promise_count": 0,
     "statement_count": 0,
     "resolved_count": 0,
@@ -29,15 +29,27 @@
     "rows": []
   },
   "spawner": {
-    "pack_hash": "29c3dfba8237d080e7cdcce83d456223d3cf24b1d651de487084aa89f5b2ef39",
-    "components": {},
+    "pack_hash": "722816626d5cb38999198e4858e828477982f65494f9a0f014c52455e8d87de7",
+    "components": {
+      "capex_intensity": {
+        "capex_to_ocf": 0.357,
+        "capex_to_ocf_median": 0.309,
+        "years_observed": 3,
+        "period_end": "2025-12-31",
+        "read": "balanced",
+        "negative_ocf_years": 0,
+        "evidence_ref": {
+          "capex_tag": "us-gaap:PaymentsToAcquirePropertyPlantAndEquipment",
+          "ocf_tag": "us-gaap:NetCashProvidedByUsedInOperatingActivities"
+        }
+      }
+    },
     "abstentions": [
       "buyback_trajectory:missing_share_count_pair",
-      "capex_intensity:missing_capex_or_ocf",
       "small_bet_discipline:requires_segment_history",
       "kill_discipline:requires_segment_history"
     ],
-    "basis": "filing_facts"
+    "basis": "xbrl_series"
   },
   "dropped_modalities": {
     "unrouted_delta_rows": 67,

@@ -2,7 +2,7 @@
   "schema_version": "1.0",
   "ticker": "USLM",
   "as_of": "2026-09-08",
-  "pack_hash": "1d85fcf8e55724e5cfe383d10c6e431c2458ece884062e9c2f72b0a149e08199",
+  "pack_hash": "41af52f0e9825fa1ece4dc4963e00f71ae534deca9e855a1c5725bf121b1d7f3",
   "pack_as_of": "2026-09-08",
   "claim_count": 91,
   "severity_histogram": {
@@ -19,25 +19,78 @@
   },
   "management_ledger": {
     "as_of": "2026-09-08",
-    "pack_hash": "1d85fcf8e55724e5cfe383d10c6e431c2458ece884062e9c2f72b0a149e08199",
+    "pack_hash": "41af52f0e9825fa1ece4dc4963e00f71ae534deca9e855a1c5725bf121b1d7f3",
     "promise_count": 0,
     "statement_count": 0,
     "resolved_count": 0,
     "hit_rate": null,
     "unresolvable_count": 0,
-    "observed_buybacks": null,
+    "observed_buybacks": {
+      "window": "latest_fy",
+      "value": 2681000,
+      "periods": [
+        "2025-12-31"
+      ],
+      "tag": "us-gaap:PaymentsForRepurchaseOfCommonStock",
+      "accn": "0001104659-26-020480"
+    },
     "rows": []
   },
   "spawner": {
-    "pack_hash": "1d85fcf8e55724e5cfe383d10c6e431c2458ece884062e9c2f72b0a149e08199",
-    "components": {},
+    "pack_hash": "41af52f0e9825fa1ece4dc4963e00f71ae534deca9e855a1c5725bf121b1d7f3",
+    "components": {
+      "buyback_trajectory": {
+        "share_count_change_1y_pct": 0.17,
+        "share_count_cagr_pct": 16.01,
+        "years_observed": 12,
+        "read": "flat",
+        "evidence_ref": {
+          "tag": "dei:EntityCommonStockSharesOutstanding",
+          "first": {
+            "end": "2015-03-05",
+            "accn": "0001047469-15-001768"
+          },
+          "last": {
+            "end": "2026-02-24",
+            "accn": "0001104659-26-020480"
+          }
+        }
+      },
+      "capex_intensity": {
+        "capex_to_ocf": 0.38,
+        "capex_to_ocf_median": 0.417,
+        "years_observed": 11,
+        "period_end": "2025-12-31",
+        "read": "balanced",
+        "negative_ocf_years": 0,
+        "evidence_ref": {
+          "capex_tag": "us-gaap:PaymentsToAcquirePropertyPlantAndEquipment",
+          "ocf_tag": "us-gaap:NetCashProvidedByUsedInOperatingActivities"
+        }
+      },
+      "shareholder_returns": {
+        "buybacks_3y": [
+          1274000,
+          3509000,
+          2681000
+        ],
+        "dividends_3y": [
+          4554000,
+          5716000,
+          6872000
+        ],
+        "total_payout_ratio_latest": 0.071,
+        "evidence_ref": {
+          "buybacks_tag": "us-gaap:PaymentsForRepurchaseOfCommonStock",
+          "dividends_tag": "us-gaap:PaymentsOfDividendsCommonStock"
+        }
+      }
+    },
     "abstentions": [
-      "buyback_trajectory:missing_share_count_pair",
-      "capex_intensity:missing_capex_or_ocf",
       "small_bet_discipline:requires_segment_history",
       "kill_discipline:requires_segment_history"
     ],
-    "basis": "filing_facts"
+    "basis": "xbrl_series"
   },
   "dropped_modalities": {
     "unrouted_delta_rows": 29,

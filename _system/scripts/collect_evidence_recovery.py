@@ -59,15 +59,26 @@ def _parse_time(value: str | None) -> datetime | None:
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--limit", type=int, default=3)
+    parser.add_argument("--tickers", default=None,
+                        help="Comma-separated tickers to collect instead of the"
+                             " highest-priority --limit rows. Newly onboarded"
+                             " securities sort last (no triggers, no attempts)"
+                             " and would never be reached otherwise.")
     args = parser.parse_args()
+    only = {t.strip().upper() for t in args.tickers.split(",") if t.strip()} if args.tickers else None
     aggregate = read(QUEUE)
     now_dt = datetime.now(timezone.utc)
     eligible = []
     for row in aggregate.get("items") or []:
+        if only is not None and str(row.get("ticker") or "").upper() not in only:
+            continue
         if int(row.get("pending_count") or 0) <= 0:
             continue
+        # An explicit --tickers request is a human asking for these now, so it
+        # overrides the backoff window; the retry clock still governs the
+        # unattended --limit path.
         next_attempt = _parse_time(row.get("next_attempt_at"))
-        if next_attempt and next_attempt > now_dt:
+        if only is None and next_attempt and next_attempt > now_dt:
             continue
         eligible.append(row)
     eligible.sort(key=lambda row: (
@@ -76,7 +87,11 @@ def main() -> int:
         int(row.get("min_attempts") or 0),
         str(row.get("ticker") or ""),
     ))
-    selected = eligible[: max(args.limit, 0)]
+    selected = eligible if only is not None else eligible[: max(args.limit, 0)]
+    if only is not None:
+        missing = sorted(only - {str(r.get("ticker") or "").upper() for r in eligible})
+        if missing:
+            print(f"not eligible (absent from queue or nothing pending): {', '.join(missing)}")
     now = now_dt.strftime("%Y-%m-%dT%H:%M:%SZ")
     for item in selected:
         ticker = item["ticker"]

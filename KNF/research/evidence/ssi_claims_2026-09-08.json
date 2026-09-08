@@ -2,7 +2,7 @@
   "schema_version": "1.0",
   "ticker": "KNF",
   "as_of": "2026-09-08",
-  "pack_hash": "27136451859cd2d62f27ed15fbb630d41e6d6b7e812cbb080f63c99b66cba7e7",
+  "pack_hash": "6dca2e8ddbc5eba9030196effb3338ae57050bd56c999f7f4138571259ac93ad",
   "pack_as_of": "2026-09-08",
   "claim_count": 211,
   "severity_histogram": {
@@ -19,7 +19,7 @@
   },
   "management_ledger": {
     "as_of": "2026-09-08",
-    "pack_hash": "27136451859cd2d62f27ed15fbb630d41e6d6b7e812cbb080f63c99b66cba7e7",
+    "pack_hash": "6dca2e8ddbc5eba9030196effb3338ae57050bd56c999f7f4138571259ac93ad",
     "promise_count": 0,
     "statement_count": 0,
     "resolved_count": 0,
@@ -29,23 +29,43 @@
     "rows": []
   },
   "spawner": {
-    "pack_hash": "27136451859cd2d62f27ed15fbb630d41e6d6b7e812cbb080f63c99b66cba7e7",
+    "pack_hash": "6dca2e8ddbc5eba9030196effb3338ae57050bd56c999f7f4138571259ac93ad",
     "components": {
+      "buyback_trajectory": {
+        "share_count_change_1y_pct": 0.09,
+        "share_count_cagr_pct": 0.08,
+        "years_observed": 3,
+        "read": "flat",
+        "evidence_ref": {
+          "tag": "dei:EntityCommonStockSharesOutstanding",
+          "first": {
+            "end": "2024-02-22",
+            "accn": "0001955520-24-000007"
+          },
+          "last": {
+            "end": "2026-02-12",
+            "accn": "0001955520-26-000003"
+          }
+        }
+      },
       "capex_intensity": {
         "capex_to_ocf": 1.25,
+        "capex_to_ocf_median": 0.859,
+        "years_observed": 5,
+        "period_end": "2025-12-31",
         "read": "reinvesting_heavily",
+        "negative_ocf_years": 0,
         "evidence_ref": {
-          "capex_tag": "PaymentsToAcquireProductiveAssets",
-          "ocf_tag": "NetCashProvidedByUsedInOperatingActivities"
+          "capex_tag": "us-gaap:PaymentsToAcquireProductiveAssets",
+          "ocf_tag": "us-gaap:NetCashProvidedByUsedInOperatingActivities"
         }
       }
     },
     "abstentions": [
-      "buyback_trajectory:missing_share_count_pair",
       "small_bet_discipline:requires_segment_history",
       "kill_discipline:requires_segment_history"
     ],
-    "basis": "filing_facts"
+    "basis": "xbrl_series"
   },
   "dropped_modalities": {
     "unrouted_delta_rows": 83,

@@ -2,7 +2,7 @@
   "schema_version": "1.0",
   "ticker": "ACA",
   "as_of": "2026-09-08",
-  "pack_hash": "13a30520446d12a69bb0591367989e5f8415f9b29f66f12cdab1b55375da2963",
+  "pack_hash": "6efffb892c618e2d35021ff4142ffadcacd8045c971ebb78f96fe75052c6c964",
   "pack_as_of": "2026-09-08",
   "claim_count": 201,
   "severity_histogram": {
@@ -19,13 +19,21 @@
   },
   "management_ledger": {
     "as_of": "2026-09-08",
-    "pack_hash": "13a30520446d12a69bb0591367989e5f8415f9b29f66f12cdab1b55375da2963",
+    "pack_hash": "6efffb892c618e2d35021ff4142ffadcacd8045c971ebb78f96fe75052c6c964",
     "promise_count": 1,
     "statement_count": 0,
     "resolved_count": 0,
     "hit_rate": null,
     "unresolvable_count": 0,
-    "observed_buybacks": null,
+    "observed_buybacks": {
+      "window": "latest_fy",
+      "value": 0,
+      "periods": [
+        "2025-12-31"
+      ],
+      "tag": "us-gaap:PaymentsForRepurchaseOfCommonStock",
+      "accn": "0001739445-26-000029"
+    },
     "rows": [
       {
         "promise": "(2) In December 2022, the Company's Board of Directors authorized a new $50.0 million share repurchase program effective January 1, 2023 through December 31, 2024 to replace a program of the same amount that expired on December 31, 2022. Du",
@@ -45,23 +53,60 @@
     ]
   },
   "spawner": {
-    "pack_hash": "13a30520446d12a69bb0591367989e5f8415f9b29f66f12cdab1b55375da2963",
+    "pack_hash": "6efffb892c618e2d35021ff4142ffadcacd8045c971ebb78f96fe75052c6c964",
     "components": {
-      "capex_intensity": {
-        "capex_to_ocf": 0.331,
-        "read": "balanced",
+      "buyback_trajectory": {
+        "share_count_change_1y_pct": 0.55,
+        "share_count_cagr_pct": 0.12,
+        "years_observed": 8,
+        "read": "diluting",
         "evidence_ref": {
-          "capex_tag": "PaymentsToAcquireProductiveAssets",
-          "ocf_tag": "NetCashProvidedByUsedInOperatingActivities"
+          "tag": "dei:EntityCommonStockSharesOutstanding",
+          "first": {
+            "end": "2019-01-31",
+            "accn": "0001739445-19-000020"
+          },
+          "last": {
+            "end": "2026-01-15",
+            "accn": "0001739445-26-000029"
+          }
+        }
+      },
+      "capex_intensity": {
+        "capex_to_ocf": 0.485,
+        "capex_to_ocf_median": 0.485,
+        "years_observed": 10,
+        "period_end": "2025-12-31",
+        "read": "balanced",
+        "negative_ocf_years": 0,
+        "evidence_ref": {
+          "capex_tag": "us-gaap:PaymentsToAcquirePropertyPlantAndEquipment",
+          "ocf_tag": "us-gaap:NetCashProvidedByUsedInOperatingActivities"
+        }
+      },
+      "shareholder_returns": {
+        "buybacks_3y": [
+          13800000,
+          0,
+          0
+        ],
+        "dividends_3y": [
+          9800000,
+          9700000,
+          10000000
+        ],
+        "total_payout_ratio_latest": 0.048,
+        "evidence_ref": {
+          "buybacks_tag": "us-gaap:PaymentsForRepurchaseOfCommonStock",
+          "dividends_tag": "us-gaap:PaymentsOfDividendsCommonStock"
         }
       }
     },
     "abstentions": [
-      "buyback_trajectory:missing_share_count_pair",
       "small_bet_discipline:requires_segment_history",
       "kill_discipline:requires_segment_history"
     ],
-    "basis": "filing_facts"
+    "basis": "xbrl_series"
   },
   "dropped_modalities": {
     "unrouted_delta_rows": 52,
