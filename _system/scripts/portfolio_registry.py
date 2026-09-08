@@ -38,6 +38,9 @@ EXCHANGE_META = {
     "SJT": "NYSE",
     "SPGI": "NYSE",
     "TEQ.ST": "Nasdaq First North",
+    "SPIE.PA": "Euronext Paris",
+    "UMG.AS": "Euronext Amsterdam",
+    "BRKN.SW": "SIX",
     "EVO.ST": "Nasdaq Stockholm",
     "WBI": "NYSE",
     "HE": "NYSE",
@@ -153,7 +156,7 @@ def infer_market_from_ticker(ticker: str) -> str | None:
         return "CA"
     if ticker.endswith(".HK"):
         return "EU"
-    if ticker.endswith((".DE", ".PA", ".WA", ".SA", ".MX", ".KL", ".SI")):
+    if ticker.endswith((".DE", ".PA", ".WA", ".SA", ".MX", ".KL", ".SI", ".AS", ".SW")):
         return "EU"
     if ticker.endswith(".L"):
         return "UK"
@@ -198,7 +201,7 @@ def infer_download_type(ticker: str, market: str, us_config: dict) -> str:
     if market == "CA":
         return "ca_csu"
     if market in {"SE", "EU"}:
-        return "eu_teq"
+        return "uk_ir"
     if market == "IN":
         return "in_ir"
     if market == "UK":

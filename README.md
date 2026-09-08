@@ -177,7 +177,7 @@ The Actions tab is intentionally automatic: repository workflows do not expose m
 | [`darwin-refresh.yml`](.github/workflows/darwin-refresh.yml) | Weekly + relevant push paths | Full Darwin rebuild → **chains Deploy Dashboard** |
 | [`dashboard-pages.yml`](.github/workflows/dashboard-pages.yml) | Relevant push + successful upstream run | Deploy committed dashboard data to Cloudflare Pages + D1 |
 | [`deploy-oauth-proxy.yml`](.github/workflows/deploy-oauth-proxy.yml) | OAuth proxy path change | Deploy the Cloudflare Worker when credentials exist |
-| [`marvin-onboard.yml`](.github/workflows/marvin-onboard.yml) | Authenticated dashboard event | Onboard deterministically, then request evidence-gated research |
+| [`ls-algo-universe.yml`](.github/workflows/ls-algo-universe.yml) | Weekly + LS-algo gap queue | Onboard a bounded batch deterministically, then rebuild registry derivatives |
 | [`marvin-deep-dive.yml`](.github/workflows/marvin-deep-dive.yml) | Research queue change | Process queued evidence changes serially through the shared dispatcher |
 | [`research-agent-dispatch.yml`](.github/workflows/research-agent-dispatch.yml) | Reusable only | Build a manifest, gate duplicates/budgets, and dispatch the research agent |
 | [`power-zone-universe.yml`](.github/workflows/power-zone-universe.yml) | Successful downloads + weekly fallback | Route every company → contract → Power Zone pricing → committee packet |

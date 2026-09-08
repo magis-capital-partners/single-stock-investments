@@ -2,12 +2,11 @@
 
 Use the **onboard orchestrator** (dashboard or CLI) — do not manually edit four files.
 
-## Dashboard (cloud)
+## Dashboard (cloud) — NOT WIRED UP
 
-1. Open portfolio dashboard → **Sign in with GitHub** (one-time OAuth — no PAT)
-2. **+ Add holding** → fill ticker, company, market
-3. **Run onboard on GitHub** — dispatches `marvin-onboard.yml`
-4. Workflow commits scaffold + downloads to `main`, then runs Marvin deep dive (PR)
+`marvin-onboard.yml` was deleted in `2fe5873e268` and no workflow dispatches
+`onboard_ticker.py`. The **+ Add holding** button has no backing workflow.
+Use the CLI below, or the CI batch path, until it is rebuilt.
 
 ### OAuth App setup (one time, repo admin)
 
@@ -23,8 +22,14 @@ python _system/scripts/onboard_ticker.py --ticker TICKER --company "Name" --mark
 
 ## GitHub Actions
 
+The only live automated path is `ls-algo-universe.yml`, which onboards a bounded
+batch off the LS-algo gap queue via `run_ls_algo_equity_onboard_all.py`. It takes
+no ticker input — to onboard a specific name, use the CLI.
+
+## Batch (local)
+
 ```powershell
-gh workflow run marvin-onboard.yml -f ticker=SJT -f company="San Juan Basin Royalty Trust" -f market=US
+python _system/scripts/batch_onboard_tickers.py _system/portfolio/onboard_batch_YYYY-MM-DD.json
 ```
 
 ## Watchlist only

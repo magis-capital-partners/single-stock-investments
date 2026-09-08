@@ -4,7 +4,7 @@
 
 ## Onboard
 
-Dashboard **+ Add holding** or manual `marvin-onboard.yml` scaffolds the ticker, downloads available filings and IR material, builds inventories/indexes, and refreshes dashboard data with deterministic Python. The onboard job does not invoke Cursor directly.
+`onboard_ticker.py` -- run directly, in a batch via `batch_onboard_tickers.py`, or from `ls-algo-universe.yml` -- scaffolds the ticker, downloads available filings and IR material, builds inventories/indexes, and refreshes dashboard data with deterministic Python. The onboard job does not invoke Cursor directly.
 
 After collection, onboard calls `research-agent-dispatch.yml`. The dispatcher selects the ticker only when research evidence exists and the ticker is pending or materially changed, builds a compact stable manifest, and applies the shared LLM gate. Missing evidence, a previously completed evidence hash, cooldown, or budget exhaustion produces a successful no-op rather than an API call.
 

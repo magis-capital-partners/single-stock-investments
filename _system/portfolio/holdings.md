@@ -1,6 +1,6 @@
 # Holdings
 
-Synced from `_system/portfolio/registry.json`. Last sync: 2026-09-07.
+Synced from `_system/portfolio/registry.json`. Last sync: 2026-09-08.
 
 **Classification schema:** `_system/frameworks/classification.md` · source map: `_system/portfolio/classification.json`
 
@@ -20,6 +20,7 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-09-07.
 | ABNB | ABNB/ | Airbnb | US | 2026-07-22 | 2026-09-07 | unknown | watch |
 | ABT | ABT/ | Abbott Laboratories | US | 2026-07-22 | 2026-09-07 | unknown | watch |
 | ABX | ABX/ | Abacus Life Inc. | US | 2026-07-22 | 2026-09-07 | unknown | watch |
+| ACA | ACA/ | Arcosa Inc | US | 2026-09-08 | 2026-09-08 | unknown | watch |
 | ACGL | ACGL/ | Arch Capital Group | US | 2026-07-22 | 2026-09-07 | unknown | watch |
 | ACHR | ACHR/ | ACHR | US | 2026-07-22 | 2026-09-07 | unknown | watch |
 | ACLS | ACLS/ | ACLS | US | 2026-07-26 | 2026-09-07 | unknown | watch |
@@ -57,6 +58,7 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-09-07.
 | AMP | AMP/ | Ameriprise Financial | US | 2026-08-09 | 2026-09-07 | unknown | watch |
 | AMPX | AMPX/ | AMPX | US | 2026-08-09 | 2026-09-07 | unknown | watch |
 | AMR | AMR/ | Alpha Metallurgical Resources, Inc. | US | 2026-08-09 | 2026-09-07 | commodity_cyclical | watch |
+| AMRZ | AMRZ/ | Amrize Ltd | US | 2026-09-08 | 2026-09-08 | unknown | watch |
 | AMT | AMT/ | American Tower | US | 2026-08-09 | 2026-09-07 | unknown | watch |
 | AMZN | AMZN/ | Amazon.com | US | 2026-08-09 | 2026-09-07 | compounder | hold |
 | ANET | ANET/ | Arista Networks | US | 2026-08-09 | 2026-09-07 | unknown | watch |
@@ -122,6 +124,7 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-09-07.
 | BRBR | BRBR/ | BellRing Brands, Inc. | US | 2026-09-06 | 2026-09-07 | unknown | watch |
 | BRK-B | BRK-B/ | BRK-B | US | 2026-09-06 | 2026-09-07 | unknown | watch |
 | BRK.B | BRK.B/ | Berkshire Hathaway | US | 2026-09-06 | 2026-09-07 | unknown | watch |
+| BRKN.SW | BRKN.SW/ | Burkhalter Holding AG | EU | — | 2026-09-08 | unknown | watch |
 | BRO | BRO/ | Brown & Brown | US | 2026-09-06 | 2026-09-07 | unknown | watch |
 | BSM | BSM/ | Black Stone Minerals LP | US | 2026-09-06 | 2026-09-07 | unknown | watch |
 | BSX | BSX/ | Boston Scientific | US | 2026-09-06 | 2026-09-07 | unknown | watch |
@@ -283,6 +286,7 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-09-07.
 | EWY | EWY/ | EWY | US | 2026-07-29 | 2026-09-07 | unknown | watch |
 | EXC | EXC/ | Exelon | US | 2026-07-29 | 2026-09-07 | unknown | watch |
 | EXE | EXE/ | Expand Energy | US | 2026-07-29 | 2026-09-07 | unknown | watch |
+| EXP | EXP/ | Eagle Materials Inc | US | 2026-09-08 | 2026-09-08 | unknown | watch |
 | EXPD | EXPD/ | Expeditors International | US | 2026-07-29 | 2026-09-07 | unknown | watch |
 | EXPE | EXPE/ | Expedia Group | US | 2026-07-29 | 2026-09-07 | unknown | watch |
 | EXR | EXR/ | Extra Space Storage | US | 2026-07-29 | 2026-09-07 | unknown | watch |
@@ -442,6 +446,7 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-09-07.
 | KLAC | KLAC/ | KLA Corporation | US | 2026-07-28 | 2026-09-07 | unknown | watch |
 | KMB | KMB/ | Kimberly-Clark | US | 2026-07-10 | 2026-09-07 | unknown | watch |
 | KMI | KMI/ | Kinder Morgan | US | 2026-07-10 | 2026-09-07 | unknown | watch |
+| KNF | KNF/ | Knife River Corp | US | 2026-09-08 | 2026-09-08 | unknown | watch |
 | KO | KO/ | Coca-Cola Company (The) | US | 2026-07-09 | 2026-09-07 | unknown | watch |
 | KR | KR/ | Kroger | US | 2026-07-10 | 2026-09-07 | unknown | watch |
 | KRP | KRP/ | Kimbell Royalty Partners LP | US | 2026-07-09 | 2026-09-07 | unknown | watch |
@@ -647,6 +652,7 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-09-07.
 | RMBS | RMBS/ | RMBS | US | 2026-07-29 | 2026-09-07 | unknown | watch |
 | RMD | RMD/ | ResMed | US | 2026-07-10 | 2026-09-07 | unknown | watch |
 | RMV.L | RMV.L/ | Rightmove PLC | UK | 2026-07-09 | 2026-09-07 | platform | watch |
+| ROAD | ROAD/ | Construction Partners Inc | US | 2026-09-08 | 2026-09-08 | unknown | watch |
 | ROK | ROK/ | Rockwell Automation | US | 2026-07-10 | 2026-09-07 | unknown | watch |
 | ROL | ROL/ | Rollins, Inc. | US | 2026-07-10 | 2026-09-07 | unknown | watch |
 | ROP | ROP/ | Roper Technologies | US | 2026-07-10 | 2026-09-07 | unknown | watch |
@@ -692,6 +698,7 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-09-07.
 | SPG | SPG/ | Simon Property Group | US | 2026-07-10 | 2026-09-07 | unknown | watch |
 | SPGI | SPGI/ | S&P Global | US | 2026-07-09 | 2026-09-07 | croupier | hold |
 | SPHB | SPHB/ | SPHB | US | 2026-07-29 | 2026-09-07 | unknown | watch |
+| SPIE.PA | SPIE.PA/ | SPIE SA | EU | — | 2026-09-08 | unknown | watch |
 | SPOT | SPOT/ | SPOT | US | 2026-07-29 | 2026-09-07 | unknown | watch |
 | SPY | SPY/ | SPY | US | 2026-07-29 | 2026-09-07 | unknown | watch |
 | SRE | SRE/ | Sempra | US | 2026-07-10 | 2026-09-07 | unknown | watch |
@@ -766,6 +773,7 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-09-07.
 | ULTA | ULTA/ | Ulta Beauty | US | 2026-07-10 | 2026-09-07 | unknown | watch |
 | UMAC | UMAC/ | UMAC | US | 2026-07-29 | 2026-09-07 | unknown | watch |
 | UMC | UMC/ | UMC | US | 2026-07-29 | 2026-09-07 | unknown | watch |
+| UMG.AS | UMG.AS/ | Universal Music Group N.V. | EU | — | 2026-09-08 | unknown | watch |
 | UNH | UNH/ | UnitedHealth Group | US | 2026-07-28 | 2026-09-07 | unknown | watch |
 | UNP | UNP/ | Union Pacific Corporation | US | 2026-07-10 | 2026-09-07 | unknown | watch |
 | UPS | UPS/ | United Parcel Service | US | 2026-07-29 | 2026-09-07 | unknown | watch |
@@ -776,6 +784,7 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-09-07.
 | UROY | UROY/ | Uranium Royalty Corp. | US | 2026-07-30 | 2026-09-07 | optionality | watch |
 | USAR | USAR/ | USAR | US | 2026-07-28 | 2026-09-07 | unknown | watch |
 | USB | USB/ | U.S. Bancorp | US | 2026-07-10 | 2026-09-07 | unknown | watch |
+| USLM | USLM/ | United States Lime & Minerals Inc | US | 2026-09-08 | 2026-09-08 | unknown | watch |
 | USO | USO/ | USO | US | 2026-07-29 | 2026-09-07 | unknown | watch |
 | UUUU | UUUU/ | UUUU | US | 2026-07-28 | 2026-09-07 | unknown | watch |
 | V | V/ | Visa Inc. | US | 2026-07-10 | 2026-09-07 | unknown | watch |
@@ -841,4 +850,4 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-09-07.
 | ZETA | ZETA/ | ZETA | US | 2026-07-28 | 2026-09-07 | unknown | watch |
 | ZTS | ZTS/ | Zoetis | US | 2026-07-10 | 2026-09-07 | unknown | watch |
 
-**834 holdings total.** Registry: `_system/portfolio/registry.json`
+**843 holdings total.** Registry: `_system/portfolio/registry.json`

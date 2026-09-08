@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0",
-  "as_of": "2026-09-07",
+  "as_of": "2026-09-08",
   "policy_id": "valuation_universe_tiers_v1",
   "policy_ref": "_system/portfolio/valuation_universe_policy.json",
   "universe_semantics": {
@@ -10,14 +10,14 @@
     "automated_and_generic_models": "screening only; never authorize capital"
   },
   "summary": {
-    "security_count": 834,
+    "security_count": 837,
     "tier_counts": {
       "tier_1": 40,
       "tier_2": 12,
-      "tier_3": 782
+      "tier_3": 785
     },
     "owner_override_count": 0,
-    "automatic_assignment_count": 834
+    "automatic_assignment_count": 837
   },
   "source_health": {
     "status": "healthy",
@@ -48,8 +48,8 @@
       },
       "committee_workbenches": {
         "required": false,
-        "files_seen": 834,
-        "valid_files": 834,
+        "files_seen": 837,
+        "valid_files": 837,
         "record_count": 40,
         "missing_files": [],
         "invalid_files": []
@@ -82,7 +82,7 @@
         "required": true,
         "files_seen": 1,
         "valid_files": 1,
-        "record_count": 834,
+        "record_count": 837,
         "missing_files": [],
         "invalid_files": []
       },
@@ -4405,6 +4405,41 @@
     },
     "BRK.B": {
       "ticker": "BRK.B",
+      "tier": 3,
+      "tier_id": "tier_3",
+      "label": "Broad screening universe",
+      "research_depth": "automated screening and lightweight monitoring only",
+      "actionability_cap": "screening_only",
+      "assignment_source": "automatic",
+      "automatic_tier": 3,
+      "override_reason": null,
+      "review_by": null,
+      "review_overdue": false,
+      "assignment_reasons": [
+        {
+          "qualifying_tier": 3,
+          "code": "research_universe_member",
+          "detail": "Registry membership establishes research coverage only; it is not evidence of ownership.",
+          "source_ref": "_system/portfolio/registry.json"
+        }
+      ],
+      "promotion_gates": [
+        "Promote to Tier 2 when a curated follow-up, watchlist entry, priority stance, or proposed target allocation appears.",
+        "Promote to Tier 1 only through a Tier 1 qualifying signal or documented owner override."
+      ],
+      "demotion_conditions": [
+        "Remove from the valuation universe only through an explicit universe-governance change; absence of a model is not a deletion signal."
+      ],
+      "workflow_policy": {
+        "committee_auto_start": false,
+        "committee_requires_stock_specific_model": true,
+        "automated_screen_can_authorize_capital": false,
+        "generic_screen_can_authorize_capital": false,
+        "capital_authority": "human_decision_only"
+      }
+    },
+    "BRKN.SW": {
+      "ticker": "BRKN.SW",
       "tier": 3,
       "tier_id": "tier_3",
       "label": "Broad screening universe",
@@ -25072,6 +25107,41 @@
         "capital_authority": "human_decision_only"
       }
     },
+    "SPIE.PA": {
+      "ticker": "SPIE.PA",
+      "tier": 3,
+      "tier_id": "tier_3",
+      "label": "Broad screening universe",
+      "research_depth": "automated screening and lightweight monitoring only",
+      "actionability_cap": "screening_only",
+      "assignment_source": "automatic",
+      "automatic_tier": 3,
+      "override_reason": null,
+      "review_by": null,
+      "review_overdue": false,
+      "assignment_reasons": [
+        {
+          "qualifying_tier": 3,
+          "code": "research_universe_member",
+          "detail": "Registry membership establishes research coverage only; it is not evidence of ownership.",
+          "source_ref": "_system/portfolio/registry.json"
+        }
+      ],
+      "promotion_gates": [
+        "Promote to Tier 2 when a curated follow-up, watchlist entry, priority stance, or proposed target allocation appears.",
+        "Promote to Tier 1 only through a Tier 1 qualifying signal or documented owner override."
+      ],
+      "demotion_conditions": [
+        "Remove from the valuation universe only through an explicit universe-governance change; absence of a model is not a deletion signal."
+      ],
+      "workflow_policy": {
+        "committee_auto_start": false,
+        "committee_requires_stock_specific_model": true,
+        "automated_screen_can_authorize_capital": false,
+        "generic_screen_can_authorize_capital": false,
+        "capital_authority": "human_decision_only"
+      }
+    },
     "SPOT": {
       "ticker": "SPOT",
       "tier": 3,
@@ -27700,6 +27770,41 @@
     },
     "UMC": {
       "ticker": "UMC",
+      "tier": 3,
+      "tier_id": "tier_3",
+      "label": "Broad screening universe",
+      "research_depth": "automated screening and lightweight monitoring only",
+      "actionability_cap": "screening_only",
+      "assignment_source": "automatic",
+      "automatic_tier": 3,
+      "override_reason": null,
+      "review_by": null,
+      "review_overdue": false,
+      "assignment_reasons": [
+        {
+          "qualifying_tier": 3,
+          "code": "research_universe_member",
+          "detail": "Registry membership establishes research coverage only; it is not evidence of ownership.",
+          "source_ref": "_system/portfolio/registry.json"
+        }
+      ],
+      "promotion_gates": [
+        "Promote to Tier 2 when a curated follow-up, watchlist entry, priority stance, or proposed target allocation appears.",
+        "Promote to Tier 1 only through a Tier 1 qualifying signal or documented owner override."
+      ],
+      "demotion_conditions": [
+        "Remove from the valuation universe only through an explicit universe-governance change; absence of a model is not a deletion signal."
+      ],
+      "workflow_policy": {
+        "committee_auto_start": false,
+        "committee_requires_stock_specific_model": true,
+        "automated_screen_can_authorize_capital": false,
+        "generic_screen_can_authorize_capital": false,
+        "capital_authority": "human_decision_only"
+      }
+    },
+    "UMG.AS": {
+      "ticker": "UMG.AS",
       "tier": 3,
       "tier_id": "tier_3",
       "label": "Broad screening universe",
