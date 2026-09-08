@@ -1,0 +1,73 @@
+{
+  "schema_version": "1.0",
+  "ticker": "ACA",
+  "as_of": "2026-09-08",
+  "pack_hash": "13a30520446d12a69bb0591367989e5f8415f9b29f66f12cdab1b55375da2963",
+  "pack_as_of": "2026-09-08",
+  "claim_count": 201,
+  "severity_histogram": {
+    "1": 0,
+    "2": 154,
+    "3": 20,
+    "4": 26,
+    "5": 1
+  },
+  "concept_tier_histogram": {
+    "primary": 33,
+    "secondary": 116,
+    "footnote_detail": 51
+  },
+  "management_ledger": {
+    "as_of": "2026-09-08",
+    "pack_hash": "13a30520446d12a69bb0591367989e5f8415f9b29f66f12cdab1b55375da2963",
+    "promise_count": 1,
+    "statement_count": 0,
+    "resolved_count": 0,
+    "hit_rate": null,
+    "unresolvable_count": 0,
+    "observed_buybacks": null,
+    "rows": [
+      {
+        "promise": "(2) In December 2022, the Company's Board of Directors authorized a new $50.0 million share repurchase program effective January 1, 2023 through December 31, 2024 to replace a program of the same amount that expired on December 31, 2022. Du",
+        "metric": "buyback_authorization",
+        "promised_value": 50000000.0,
+        "date_made": "2024-02-23",
+        "due": null,
+        "source_ref": {
+          "source_path": "ACA/research/evidence/_text/10-K_20240223_rpt20231231_acc0001739445_24_000012.htm.txt",
+          "source_sha256": "8ee12634835b869ccfb353fba70bac05e05d45c4eb30adec5f68921fef28ab32",
+          "line": 1211
+        },
+        "realized_value": null,
+        "delta": null,
+        "status": "open_authorization"
+      }
+    ]
+  },
+  "spawner": {
+    "pack_hash": "13a30520446d12a69bb0591367989e5f8415f9b29f66f12cdab1b55375da2963",
+    "components": {
+      "capex_intensity": {
+        "capex_to_ocf": 0.331,
+        "read": "balanced",
+        "evidence_ref": {
+          "capex_tag": "PaymentsToAcquireProductiveAssets",
+          "ocf_tag": "NetCashProvidedByUsedInOperatingActivities"
+        }
+      }
+    },
+    "abstentions": [
+      "buyback_trajectory:missing_share_count_pair",
+      "small_bet_discipline:requires_segment_history",
+      "kill_discipline:requires_segment_history"
+    ],
+    "basis": "filing_facts"
+  },
+  "dropped_modalities": {
+    "unrouted_delta_rows": 52,
+    "market_mechanics": "requires borrow/days-to-cover feed (see refresh_short_alpha_borrow.py)"
+  },
+  "claims_compacted": true,
+  "claims_verified_into": "ssi_verified_claims_2026-09-08.json",
+  "claims_compaction_note": "Claim bodies live in ssi_verified_claims (superset: adds `verification`). Re-run build_ssi_claims.py to rebuild this array."
+}

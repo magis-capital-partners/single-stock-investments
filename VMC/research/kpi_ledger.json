@@ -1,0 +1,170 @@
+{
+  "ticker": "VMC",
+  "as_of": "2026-09-08",
+  "theme_ids": [
+    "aggregates_infrastructure",
+    "macro_regime"
+  ],
+  "schema_version": "1.0",
+  "kpis": [
+    {
+      "kpi_id": "aggregates_cash_gross_profit_per_ton",
+      "label": "Aggregates cash gross profit per ton (USD)",
+      "unit": "usd_per_ton",
+      "expected": {
+        "op": "gte",
+        "value": 11.33,
+        "horizon": "2026"
+      },
+      "actual": {
+        "value": 11.33,
+        "as_of": "2025-12-31"
+      },
+      "status": "pass",
+      "source": "theme:vmc_cash_gross_profit_per_ton",
+      "evidence_tier": "filing",
+      "last_checked": "2026-09-08",
+      "binds_to": {
+        "note": "The single metric the sector thesis turns on. FY2025 $11.33 against FY2023 $9.46 (+19.8%) while shipments grew only 3% -- price carried it, not volume. The floor is the FY2025 level: if FY2026 comes in below it, unit profitability has stopped compounding and the thesis is broken regardless of what volumes do. Source: VMC/investor-documents/sec-edgar/10-K_20260219_rpt20251231_acc0001628280_26_009546.htm",
+        "on_fail": "human_review"
+      },
+      "in_base_irr": false,
+      "prediction_role": "orientation"
+    },
+    {
+      "kpi_id": "aggregates_freight_adj_price_per_ton",
+      "label": "Freight-adjusted aggregates price per ton (USD)",
+      "unit": "usd_per_ton",
+      "expected": {
+        "op": "gte",
+        "value": 21.98,
+        "horizon": "2026"
+      },
+      "actual": {
+        "value": 21.98,
+        "as_of": "2025-12-31"
+      },
+      "status": "pass",
+      "source": "theme:vmc_freight_adj_asp_per_ton",
+      "evidence_tier": "filing",
+      "last_checked": "2026-09-08",
+      "binds_to": {
+        "note": "Freight-adjusted is non-negotiable: haulage is a pass-through, so unadjusted ASP moves with diesel rather than with pricing power. FY2025 $21.98, +4.3% (+$0.90/ton). Read against the crushed-stone PPI: company price rising while the industry index falls would mean mix, not power. Source: VMC/investor-documents/sec-edgar/10-K_20260219_rpt20251231_acc0001628280_26_009546.htm",
+        "on_fail": "human_review"
+      },
+      "in_base_irr": false,
+      "prediction_role": "orientation"
+    },
+    {
+      "kpi_id": "aggregates_shipments_tons",
+      "label": "Aggregates shipments (million tons, FY)",
+      "unit": "million_tons",
+      "actual": {
+        "value": 226.8,
+        "as_of": "2025-12-31"
+      },
+      "status": "unchecked",
+      "source": "theme:vmc_aggregates_tons_mm",
+      "evidence_tier": "filing",
+      "last_checked": "2026-09-08",
+      "binds_to": {
+        "note": "Tracked without a gate on purpose. Volume is the cyclical variable and the thesis explicitly does not require it to grow -- gating it would fire every downturn and train everyone to ignore the ledger. It matters as context for the per-ton rows: volume down WITH price up is the case that needs market-level disaggregation, because pricing power and share loss look identical in consolidated numbers. FY2025 226.8Mt, +3%. Source: VMC/investor-documents/sec-edgar/10-K_20260219_rpt20251231_acc0001628280_26_009546.htm",
+        "on_fail": "stance_only"
+      },
+      "in_base_irr": false,
+      "prediction_role": "orientation"
+    },
+    {
+      "kpi_id": "crushed_stone_ppi_yoy",
+      "label": "Crushed-stone PPI (YoY %)",
+      "unit": "pct_yoy",
+      "expected": {
+        "op": "gte",
+        "value": 0,
+        "horizon": "2026"
+      },
+      "actual": {
+        "value": 6.0,
+        "as_of": "2026-07-01"
+      },
+      "status": "pass",
+      "source": "theme:ppi_crushed_limestone",
+      "evidence_tier": "market",
+      "last_checked": "2026-09-08",
+      "binds_to": {
+        "note": "Third-party read on industry pricing, independent of company-reported ASP. The thesis is that price per ton compounds; an industry PPI turning negative falsifies that at the sector level, not just for one operator. Divergence between this and company ASP is the tell worth investigating either way.",
+        "on_fail": "human_review"
+      },
+      "in_base_irr": false,
+      "prediction_role": "interference"
+    },
+    {
+      "kpi_id": "highway_construction_spend_yoy",
+      "label": "US highway & street construction spending (YoY %)",
+      "unit": "pct_yoy",
+      "expected": {
+        "op": "gte",
+        "value": 0,
+        "horizon": "2026"
+      },
+      "actual": {
+        "value": 4.5,
+        "as_of": "2026-07-01"
+      },
+      "status": "pass",
+      "source": "theme:construction_spend_highway",
+      "evidence_tier": "market",
+      "last_checked": "2026-09-08",
+      "binds_to": {
+        "note": "The counter-cyclical leg. Public infrastructure is what is supposed to cushion a residential downturn; if this turns negative while residential is also falling, the cushion is gone and the cycle claim fails. Federal surface-transportation reauthorisation is the swing factor behind it and has no automated source -- obligations lead outlays lead shipped tons by 2-4 years.",
+        "on_fail": "human_review"
+      },
+      "in_base_irr": false,
+      "prediction_role": "reinforcement"
+    },
+    {
+      "kpi_id": "single_family_starts_saar",
+      "label": "US single-family housing starts (thousands, SAAR)",
+      "unit": "thousands_saar",
+      "actual": {
+        "value": 808.0,
+        "as_of": "2026-07-01"
+      },
+      "status": "unchecked",
+      "source": "theme:housing_starts_sf",
+      "evidence_tier": "market",
+      "last_checked": "2026-09-08",
+      "binds_to": {
+        "note": "Tracked without a gate, and that is the point. Single-family is the right series (it consumes far more rock per unit than multi-family), and at 808 against a ~1.0M long-run normal it shows real residential stress -- but the thesis explicitly does not depend on residential, so a hard gate here would fire through every housing downturn and train everyone to ignore the ledger. It was gated at first and that was wrong: it painted the whole World Model strip 'broken' on a cyclical reading the thesis already expects. Read it against highway spend -- residential weak AND public weak is the real break.",
+        "on_fail": "stance_only"
+      },
+      "in_base_irr": false,
+      "prediction_role": "orientation"
+    },
+    {
+      "kpi_id": "permitted_reserve_life_years",
+      "label": "Permitted reserve life (years at current production)",
+      "unit": "years",
+      "actual": {
+        "value": null,
+        "as_of": null
+      },
+      "status": "unchecked",
+      "source": "filing:10-K Item 2 Properties",
+      "evidence_tier": "filing",
+      "last_checked": "2026-09-08",
+      "binds_to": {
+        "note": "The moat, quantified -- and not in XBRL. Disclosed in 10-K Item 2, so it lands via the aggregates reserves filing panel, which is not built yet. Left unchecked rather than estimated. When it does land, the company average is the wrong number to gate on: it hides a depleting quarry inside a critical metro, which is the one that matters. No floor is set until the top-market split exists.",
+        "on_fail": "open_diligence"
+      },
+      "in_base_irr": false,
+      "prediction_role": "interference"
+    }
+  ],
+  "summary": {
+    "pass": 4,
+    "fail": 0,
+    "stale": 0,
+    "unchecked": 3
+  }
+}

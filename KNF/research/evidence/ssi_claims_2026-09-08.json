@@ -1,0 +1,57 @@
+{
+  "schema_version": "1.0",
+  "ticker": "KNF",
+  "as_of": "2026-09-08",
+  "pack_hash": "27136451859cd2d62f27ed15fbb630d41e6d6b7e812cbb080f63c99b66cba7e7",
+  "pack_as_of": "2026-09-08",
+  "claim_count": 211,
+  "severity_histogram": {
+    "1": 0,
+    "2": 171,
+    "3": 21,
+    "4": 17,
+    "5": 2
+  },
+  "concept_tier_histogram": {
+    "primary": 28,
+    "secondary": 118,
+    "footnote_detail": 63
+  },
+  "management_ledger": {
+    "as_of": "2026-09-08",
+    "pack_hash": "27136451859cd2d62f27ed15fbb630d41e6d6b7e812cbb080f63c99b66cba7e7",
+    "promise_count": 0,
+    "statement_count": 0,
+    "resolved_count": 0,
+    "hit_rate": null,
+    "unresolvable_count": 0,
+    "observed_buybacks": null,
+    "rows": []
+  },
+  "spawner": {
+    "pack_hash": "27136451859cd2d62f27ed15fbb630d41e6d6b7e812cbb080f63c99b66cba7e7",
+    "components": {
+      "capex_intensity": {
+        "capex_to_ocf": 1.25,
+        "read": "reinvesting_heavily",
+        "evidence_ref": {
+          "capex_tag": "PaymentsToAcquireProductiveAssets",
+          "ocf_tag": "NetCashProvidedByUsedInOperatingActivities"
+        }
+      }
+    },
+    "abstentions": [
+      "buyback_trajectory:missing_share_count_pair",
+      "small_bet_discipline:requires_segment_history",
+      "kill_discipline:requires_segment_history"
+    ],
+    "basis": "filing_facts"
+  },
+  "dropped_modalities": {
+    "unrouted_delta_rows": 83,
+    "market_mechanics": "requires borrow/days-to-cover feed (see refresh_short_alpha_borrow.py)"
+  },
+  "claims_compacted": true,
+  "claims_verified_into": "ssi_verified_claims_2026-09-08.json",
+  "claims_compaction_note": "Claim bodies live in ssi_verified_claims (superset: adds `verification`). Re-run build_ssi_claims.py to rebuild this array."
+}
