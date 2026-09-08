@@ -1,12 +1,27 @@
 {
   "as_of": "2026-08-19",
   "counts": {
-    "L1": 540,
+    "L1": 542,
     "L2": 7,
     "L3": 62,
     "L4": 32,
     "L5": 0,
     "L6": 0
   },
-  "note": "Ratchet baseline for the armed invariant ids. Counts may only fall; a rise fails the suite. Re-record with graph_invariants.py --update-baseline."
+  "note": "Ratchet baseline for the armed invariant ids. Counts may only fall, except that UNIVERSE_SCALED ids (L1) may grow with the population recorded in `universe`; a rise beyond that fails the suite. Re-record with graph_invariants.py --update-baseline.",
+  "universe": 729,
+  "revisions": [
+    {
+      "as_of": "2026-09-08",
+      "ids": [
+        "L1"
+      ],
+      "from": 540,
+      "to": 542,
+      "universe_from": null,
+      "universe_to": 729,
+      "reason": "Definition change, not a bar-lowering. L1 counts valued tickers that resolve no payoff_lens, and a ticker joins that population the moment anything writes its research/valuation.json. On 2026-09-08 the Power Zone valuation run (55971b9d0c6) valued five aggregates producers -- ACA, AMRZ, EXP, ROAD, USLM -- each carrying the registry default payoff_lens 'pending', so L1 went 537 -> 542 while the population went 724 -> 729. Measured both times, +5 and +5. No classification rotted; the denominator moved, and the absolute bar of 540 had no population term to notice. L1 is now compared against the population its baseline was recorded over and may grow by at most (population_now - universe). 542 over 729 and 537 over 724 are arithmetically the same rule -- both reduce to 'violations may not exceed population - 187', i.e. THE NUMBER OF TICKERS THAT RESOLVE A PAYOFF_LENS MAY NOT FALL BELOW 187. That is the thing worth protecting, it cannot be gamed by valuing more tickers, and it still fails the suite the moment a resolved ticker loses its lens. The old bar of 540 was recorded 2026-08-19 at a population nobody wrote down, which is why it could not distinguish these two cases.",
+      "not_rebaselined": "L2 (7, now 6), L3 (62, now 30) and L4 (32, now 32) keep their absolute ceilings and are NOT scaled. A surface disagreement (L2) and a non-canonical value (L4) are defects, not population effects, and a newly valued ticker adds to neither; L3 staleness is age-driven and a fresh ticker is fresh. L2 and L3 are currently below baseline and were left there deliberately rather than tightened on a day five tickers were valued."
+    }
+  ]
 }

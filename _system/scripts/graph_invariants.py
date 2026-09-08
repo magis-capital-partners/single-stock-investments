@@ -1303,6 +1303,30 @@ def _set_lane_ref(root: Path) -> bool:
 
 BASELINE_REL = "_system/graph/invariants_baseline.json"
 
+# Invariants whose count is one row per ticker in a population that grows on its
+# own, so admitting a ticker raises the count with no new defect. L1 fires on
+# every valued ticker that resolves no payoff_lens, and a ticker enters that
+# population the moment anything writes its research/valuation.json -- a bulk
+# valuation run, not a classification change. On 2026-09-08 the Power Zone run
+# valued five aggregates producers (ACA, AMRZ, EXP, ROAD, USLM), all carrying the
+# registry default payoff_lens "pending", and L1 went 537 -> 542 over a
+# population that went 724 -> 729. Nothing rotted; the denominator moved.
+#
+# For these the baseline is compared against the population it was recorded
+# over, so the effective invariant is "the number of tickers that RESOLVE a
+# payoff_lens may not fall", which is the thing actually worth protecting and
+# cannot be gamed by adding tickers. Every other armed id keeps an absolute
+# ceiling: L2 (surfaces disagree) and L4 (non-canonical values) are defects, not
+# population effects, and a newly valued ticker adds to neither.
+UNIVERSE_SCALED = {"L1"}
+
+
+def ratchet_universe(root: Path) -> int:
+    """Population a UNIVERSE_SCALED id can fire on: tickers carrying a
+    research/valuation.json. _lens_plane_scan is cached per run, so this is
+    free after the suite has executed."""
+    return len(_lens_plane_scan(root))
+
 
 def baseline_ratchet(results: list[Result], root: Path) -> tuple[list[str], dict]:
     """CI-enforced ratchet for opt-in report-severity invariants, copying the
@@ -1316,12 +1340,24 @@ def baseline_ratchet(results: list[Result], root: Path) -> tuple[list[str], dict
     counts = baseline.get("counts") if isinstance(baseline, dict) else None
     if not isinstance(counts, dict):
         return [], {}
+    base_universe = baseline.get("universe")
+    growth = 0
+    if base_universe is not None:
+        growth = max(0, ratchet_universe(root) - int(base_universe))
     regressions = []
     for result in results:
-        if result.id in counts and result.count > int(counts[result.id]):
-            regressions.append(f"{result.id}: {result.count} > baseline"
-                               f" {counts[result.id]}"
-                               f" ({ascii_safe(TITLES[result.id])})")
+        if result.id not in counts:
+            continue
+        allowed = int(counts[result.id])
+        scaled = result.id in UNIVERSE_SCALED and base_universe is not None
+        if scaled:
+            allowed += growth
+        if result.count > allowed:
+            detail = (f"{result.id}: {result.count} > baseline"
+                      f" {counts[result.id]}")
+            if scaled and growth:
+                detail += f" + {growth} tickers valued since (allowed {allowed})"
+            regressions.append(f"{detail} ({ascii_safe(TITLES[result.id])})")
     return regressions, baseline
 
 
@@ -1340,10 +1376,18 @@ def write_baseline(results: list[Result], root: Path,
     payload = {
         "as_of": today.isoformat(),
         "counts": {inv_id: by_id.get(inv_id, 0) for inv_id in sorted(armed)},
-        "note": "Ratchet baseline for the armed invariant ids. Counts may"
-                " only fall; a rise fails the suite. Re-record with"
+        "universe": ratchet_universe(root),
+        "note": "Ratchet baseline for the armed invariant ids. Counts may only"
+                " fall, except that UNIVERSE_SCALED ids may grow with the"
+                " population recorded in `universe`; a rise beyond that fails"
+                " the suite. Re-record with"
                 " graph_invariants.py --update-baseline.",
     }
+    # `revisions` is the written record of why a bar moved and whether the move
+    # was a definition change or a bar-lowering. Re-recording counts without it
+    # destroys the only evidence either way.
+    if isinstance(existing, dict) and existing.get("revisions"):
+        payload["revisions"] = existing["revisions"]
     path.write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
     return path
 

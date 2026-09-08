@@ -624,10 +624,17 @@ class RealRepoTests(unittest.TestCase):
         cls._tmp.cleanup()
 
     def test_exit_matches_current_hard_health(self):
+        # run() sets exit_code from TWO terms -- hard violations OR ratchet
+        # regressions. Checking only the first made every ratchet regression
+        # fail here as "exit code disagrees with hard invariants: []", which
+        # names the one term that was fine and hides the one that was not.
         hard = [r.id for r in self.results
                 if r.severity == "hard" and r.count]
-        self.assertEqual(self.exit_code, 1 if hard else 0,
-                         f"exit code disagrees with hard invariants: {hard}")
+        regressions = (self.meta.get("ratchet") or {}).get("regressions") or []
+        self.assertEqual(
+            self.exit_code, 1 if (hard or regressions) else 0,
+            "exit code disagrees with what sets it -- "
+            f"hard invariants: {hard}; ratchet regressions: {regressions}")
 
     def test_all_eleven_ran(self):
         self.assertEqual(sorted(self.by_id),
@@ -913,6 +920,82 @@ class BaselineRatchetTests(unittest.TestCase):
         md = (self.root / "_system" / "graph" / "INVARIANTS.md").read_text(
             encoding="utf-8")
         self.assertIn("Ratchet disarmed", md)
+
+
+class UniverseScaledRatchetTests(unittest.TestCase):
+    """L1 may grow with the valued-ticker population; nothing else may grow."""
+
+    @staticmethod
+    def result(inv_id, count):
+        return graph_invariants.Result(inv_id, count, [])
+
+    def ratchet(self, counts, baseline, universe):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            (root / "_system" / "graph").mkdir(parents=True)
+            (root / graph_invariants.BASELINE_REL).write_text(
+                json.dumps(baseline), encoding="utf-8")
+            # Seed the population cache so no filesystem walk is needed.
+            graph_invariants._LENS_SCAN_CACHE.clear()
+            graph_invariants._LENS_SCAN_CACHE[root] = [
+                {"ticker": f"T{i}"} for i in range(universe)]
+            try:
+                regressions, _ = graph_invariants.baseline_ratchet(
+                    [self.result(k, v) for k, v in counts.items()], root)
+            finally:
+                graph_invariants._LENS_SCAN_CACHE.clear()
+        return regressions
+
+    def test_l1_growth_matching_newly_valued_tickers_is_not_a_regression(self):
+        # 2026-09-08 exactly: five tickers valued, L1 up by five.
+        base = {"counts": {"L1": 537}, "universe": 724}
+        self.assertEqual(self.ratchet({"L1": 542}, base, 729), [])
+
+    def test_l1_growth_beyond_the_population_still_fails(self):
+        base = {"counts": {"L1": 537}, "universe": 724}
+        found = self.ratchet({"L1": 543}, base, 729)
+        self.assertEqual(len(found), 1)
+        self.assertIn("allowed 542", found[0])
+
+    def test_a_lens_lost_on_a_static_population_still_fails(self):
+        # The case the ratchet exists for: nothing valued, a resolver rotted.
+        base = {"counts": {"L1": 537}, "universe": 724}
+        self.assertEqual(len(self.ratchet({"L1": 538}, base, 724)), 1)
+
+    def test_resolver_count_is_the_real_invariant(self):
+        # 537/724 and 542/729 both mean "187 resolve"; both must pass, and
+        # losing a single resolver at any population must fail.
+        for count, universe in ((537, 724), (542, 729), (600, 787)):
+            self.assertEqual(
+                self.ratchet({"L1": count}, {"counts": {"L1": 537},
+                                             "universe": 724}, universe), [],
+                f"{count}/{universe} should pass")
+        self.assertEqual(
+            len(self.ratchet({"L1": 601}, {"counts": {"L1": 537},
+                                           "universe": 724}, 787)), 1)
+
+    def test_a_shrinking_population_grants_no_headroom(self):
+        base = {"counts": {"L1": 537}, "universe": 724}
+        self.assertEqual(len(self.ratchet({"L1": 538}, base, 700)), 1)
+
+    def test_other_armed_ids_never_scale(self):
+        base = {"counts": {"L2": 7}, "universe": 724}
+        found = self.ratchet({"L2": 8}, base, 729)
+        self.assertEqual(len(found), 1)
+        self.assertIn("L2", found[0])
+        self.assertNotIn("allowed", found[0])
+
+    def test_baseline_without_universe_keeps_absolute_meaning(self):
+        base = {"counts": {"L1": 537}}
+        self.assertEqual(len(self.ratchet({"L1": 538}, base, 999)), 1)
+
+    def test_committed_baseline_is_green_against_its_own_population(self):
+        baseline = json.loads(
+            (REPO_ROOT / graph_invariants.BASELINE_REL).read_text(
+                encoding="utf-8"))
+        counts = baseline["counts"]
+        self.assertEqual(
+            self.ratchet(counts, baseline, baseline["universe"]), [])
 
 
 if __name__ == "__main__":
