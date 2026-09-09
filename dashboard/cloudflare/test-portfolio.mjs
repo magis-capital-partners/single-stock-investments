@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import { reserveNonce, validateAccountSnapshot, validateFlexEod, validateStrategySnapshot, verifyPortfolioHmac } from "../functions/_lib/portfolio.js";
+import { loadPortfolio, reserveNonce, validateAccountSnapshot, validateFlexEod, validateStrategySnapshot, verifyPortfolioHmac } from "../functions/_lib/portfolio.js";
 
 function accountSnapshot() {
   return {
@@ -159,4 +159,32 @@ test("a snapshot is dated so a stopped feed cannot read as a live one", async ()
 
   // An unparseable stamp is unknown, never assumed fresh.
   assert.deepEqual(snapshotAge({ as_of: "" }, now), { age_seconds: null, stale: null });
+});
+
+test("the allocation-status probe asks for existence, never a cross join", async () => {
+  // Regression for the 2026-09-09 free-tier read burn. allocation_count is only
+  // ever read as `> 0`, but the statement used to aggregate a LEFT JOIN of
+  // portfolio_allocation_projections against portfolio_allocations on
+  // account_alias -- the only column the two tables share -- so every projection
+  // row for the account was paired with every allocation row and LIMIT 1 was
+  // applied after the fact. One call read 3,458,448 rows; eight of them read
+  // 27.7M against an allowance of 5M a day.
+  const statements = [];
+  const run = { source_run_id: "run-1", account_alias: "paper-primary", as_of: "2026-09-09T00:00:00Z" };
+  const db = {
+    prepare(text) {
+      statements.push(text);
+      return { bind() { return this; }, async first() { return run; } };
+    },
+    async batch(prepared) { return prepared.map(() => ({ results: [] })); },
+  };
+
+  await loadPortfolio({ DB: db }, "all");
+  const probe = statements.find((text) => text.includes("allocation_count"));
+  assert.ok(probe, "the allocation-status statement is still issued");
+  assert.match(probe, /EXISTS \(SELECT 1 FROM portfolio_allocations a WHERE a\.account_alias=p\.account_alias\)/);
+  // The cross join and the aggregate that made it expensive must not come back.
+  assert.doesNotMatch(probe, /JOIN/i);
+  assert.doesNotMatch(probe, /COUNT\(/i);
+  assert.doesNotMatch(probe, /GROUP BY/i);
 });
