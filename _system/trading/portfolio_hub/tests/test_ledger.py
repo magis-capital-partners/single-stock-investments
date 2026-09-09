@@ -168,6 +168,39 @@ def test_ls_universe_membership_beats_a_drew_tag() -> None:
     assert (policy.owner, policy.strategy) == ("unallocated", "letf")
 
 
+def test_ls_algo_option_overlay_gets_its_own_strategy_label() -> None:
+    # Custody stays with Drew, but an overlay is written against a systematic
+    # pair leg, so it must not be folded into the discretionary single-stock
+    # book. The distinct strategy label is what keeps hub reporting honest.
+    from _system.trading.portfolio_hub.allocation_policy import classify_policy_position
+
+    option = {
+        "symbol": "NVDA",
+        "local_symbol": "NVDA  260821C00100000",
+        "sec_type": "OPT",
+        "underlying": "NVDA",
+    }
+    policy = classify_policy_position(option, ls_symbols={"NVDA"}, drew_symbols=set())
+    assert (policy.owner, policy.strategy) == ("drew", "letf_option_overlay")
+    assert policy.reason == "ls_algo_option_overlay"
+
+    # The share leg of the same ticker is untouched by the overlay branch.
+    shares = classify_policy_position(
+        {"symbol": "NVDA", "local_symbol": "NVDA", "sec_type": "STK"},
+        ls_symbols={"NVDA"},
+        drew_symbols=set(),
+    )
+    assert (shares.owner, shares.strategy) == ("unallocated", "letf")
+
+    # A genuine Drew sleeve holding keeps the single_stock label.
+    sleeve = classify_policy_position(
+        {"symbol": "IBKR", "local_symbol": "IBKR", "sec_type": "STK"},
+        ls_symbols=set(),
+        drew_symbols={"IBKR"},
+    )
+    assert (sleeve.owner, sleeve.strategy) == ("drew", "single_stock")
+
+
 def test_load_drew_symbols_reads_owner_tagged_tickers(tmp_path) -> None:
     import json as json_module
 

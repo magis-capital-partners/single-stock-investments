@@ -120,15 +120,71 @@ def test_equity_option_follows_underlying():
         etf_ls_symbols={"MSFT"},
     )
     assert csu.bucket == "michael" and csu.reason == "residual"
+
+
+def test_ls_algo_option_overlay_routes_to_drew():
+    # Options written against an LS-algo pair leg are discretionary overlays,
+    # not systematic inventory. They are Drew's, under a reason distinct from
+    # an ordinary sleeve holding so reporting can tell the two apart.
     nvda = classify_position(
         {"symbol": "NVDA  260821C00100000", "secType": "OPT", "underlyingSymbol": "NVDA"},
         blacklist_family=set(),
         etf_ls_symbols={"NVDA"},
     )
-    assert nvda.bucket == "etf_ls"
+    assert nvda.bucket == "drew"
+    assert nvda.reason == "ls_algo_option_overlay"
+    assert nvda.ticker == "NVDA"
+    # Blacklist-family membership does not pull the overlay back out.
     apld = classify_position(
         {"symbol": "APLD  260821C00030000", "secType": "OPT", "underlyingSymbol": "APLD"},
         blacklist_family={"APLD"},
         etf_ls_symbols={"APLD"},
     )
-    assert apld.bucket == "etf_ls" and apld.reason == "etf_ls_universe"
+    assert apld.bucket == "drew" and apld.reason == "ls_algo_option_overlay"
+
+
+def test_ls_algo_shares_stay_systematic_when_the_option_moves():
+    # The overlay branch is guarded on OPT/FOP. The share leg of the very same
+    # ticker must stay in the excluded systematic bucket.
+    shares = classify_position(
+        {"symbol": "NVDA", "secType": "STK"},
+        blacklist_family=set(),
+        etf_ls_symbols={"NVDA"},
+    )
+    assert shares.bucket == "etf_ls" and shares.reason == "etf_ls_universe"
+
+
+def test_ls_algo_option_overlay_matches_on_order_ref():
+    # Positions synced from Flex or the IB API carry no orderRef, so the
+    # universe check is what classifies a holding. Open orders do carry one,
+    # and this is the path that covers them -- note the ticker is absent from
+    # the universe set entirely, so only the ref can match.
+    for ref in ("ETF_LS|ESTABLISH|NVDA|SOXL", "B5P|HEDGE"):
+        cls = classify_position(
+            {
+                "symbol": "SOXL  260821P00020000",
+                "secType": "OPT",
+                "underlyingSymbol": "SOXL",
+                "orderRef": ref,
+            },
+            blacklist_family=set(),
+            etf_ls_symbols=set(),
+        )
+        assert cls.bucket == "drew", ref
+        assert cls.reason == "ls_algo_option_overlay", ref
+
+
+def test_spx_guard_still_precedes_the_overlay_branch():
+    # An index option must never be captured as an overlay, even if the index
+    # name somehow appears in the universe set.
+    spx = classify_position(
+        {
+            "symbol": "SPX",
+            "secType": "OPT",
+            "tradingClass": "SPXW",
+            "localSymbol": "SPXW  260813C05000000",
+        },
+        blacklist_family=set(),
+        etf_ls_symbols={"SPX"},
+    )
+    assert spx.bucket == "spx_0dte" and spx.reason == "spxw_option"

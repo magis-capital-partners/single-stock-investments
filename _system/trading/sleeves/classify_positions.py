@@ -89,12 +89,33 @@ def classify_position(
         if index_name in SPX_NAMES or "SPXW" in local or local.startswith("XSP"):
             return Classification(index_name or "SPX", "spx_0dte", "spxw_option", None)
 
-    # Strategy ownership precedes every owner override. Any LS-algo position
-    # (ETF, underlying, or option on either) remains in the systematic universe.
+    strategy_name = under or ticker if sec in {"OPT", "FOP"} else ticker
+
+    # Options on the LS-algo universe are the manual overlays written against
+    # its pair legs -- covered puts on the short ETF, covered calls on the long
+    # underlying. The shares are systematic and stay excluded, but the overlays
+    # are discretionary and need somewhere visible, so they route to Drew rather
+    # than vanishing into the excluded bucket with everything else LS-algo owns.
+    #
+    # Only OPT/FOP moves; share positions below are untouched. The SPX/XSP guard
+    # above still runs first, so an index option is never captured here.
+    #
+    # Both conditions are needed because they fire on different paths: positions
+    # synced from Flex or the IB API carry no orderRef (both writers hardcode
+    # ""), so the universe check is what classifies a real holding, while the
+    # ref check covers open *orders*, which do carry one.
+    if sec in {"OPT", "FOP"} and (
+        any(tag in ref for tag in ETF_LS_REFS) or strategy_name in letf
+    ):
+        return Classification(
+            strategy_name or ticker, "drew", "ls_algo_option_overlay", "drew"
+        )
+
+    # Strategy ownership precedes every owner override. Any LS-algo *share*
+    # position (ETF or underlying) remains in the systematic universe.
     if any(tag in ref for tag in ETF_LS_REFS):
         return Classification(under or ticker, "etf_ls", "order_ref", None)
 
-    strategy_name = under or ticker if sec in {"OPT", "FOP"} else ticker
     if strategy_name in letf:
         return Classification(strategy_name, "etf_ls", "etf_ls_universe", None)
 
