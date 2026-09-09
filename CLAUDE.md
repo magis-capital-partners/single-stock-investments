@@ -2,21 +2,21 @@
 
 ## IB Gateway coexistence (three systems, one Gateway) — DO NOT VIOLATE
 
-The NY4 Gateway is shared by **spx-0dte**, **ls-algo**, and **this repo's
-portfolio hub**. SPX 0DTE is the protected party: nothing on our side may
-disconnect it or block its reconnect. The identical contract lives in all
-three repos (spx-0dte `AGENTS.md`, ls-algo `CLAUDE.md`); a change here must
-be mirrored there in the same PR. The hub-side detail lives in
-`_system/trading/portfolio_hub/CLIENT_ID_REGISTRY.md`.
-
-**Client-ID map (verified 2026-08-20 against source):**
+The NY4 Gateway is shared by **spx-0dte**, **ls-algo**, this repo, and
+**etf-0dte** (SPY/QQQ 0DTE; yields to SPX). SPX 0DTE
+is the protected party. The allocation source of truth is
+`_system/trading/ib_gateway_client_registry.v1.json`, registry version
+`2026-09-09.1`, canonical SHA-256
+`3d2ba10bda3a577696e8e85ae5a6efd1a934e33341ade782506b79f0bad82abd`.
+The same version/hash is mirrored in the other two repos. Prose is explanatory,
+not an allocation authority.
 
 | System | IDs |
 |---|---|
-| spx-0dte | **17** (live executor), **18** (ibc_guard handshake probe — read-only connect/disconnect, never subscribes or transmits), **19** (market-data line probe — off-hours only, refuses 09:20–16:10 ET, cancels every subscription it opens), **87** (ES/SPX basis sampler — read-only, snapshot requests only, no streaming lines held) |
-| ls-algo | 0 (cancel coordinator, orderRef-filtered), 41 (rebalancer base), 77 (flow program), 90 (daily screener), 197/207 (bucket5 probes), workers 241–273, 341–373, 551, 1041+ |
-| this repo | 71/72/73 (sleeves drew/michael/sync), ~~81~~ (collector — **DISABLED INDEFINITELY 2026-08-25**, reconnect storm; see `deploy/portfolio-hub-collector.service`), 82 (master observer, reserved — **not 90**, which is ls-algo's screener), **91** (order bridge, sole hub transmitter — not yet deployed) |
-| Operator TWS | manual only |
+| spx-0dte | 17 live executor; 18 ibc_guard probe; 19 off-hours line probe; 87 basis sampler; 88 off-hours what-if; 97 emergency watchdog |
+| ls-algo | 0 disabled-reserved; 83 read-only stale-order interlock; 41 rebalance; 77 flow; 90 screener; 198 contract probe; leased pool 100–129 |
+| single-stock-investments | 71 Drew legacy sleeve; 72 Michael legacy sleeve; 73 legacy read-only sync; 81 disabled/reserved collector; 82 reserved/no-connect observer; **91 event-driven hub bridge and sole hub transmitter** |
+| etf-0dte | 50 SPY 0DTE live executor; 51 QQQ 0DTE live executor; 130 SPY dead-executor watchdog; 131 QQQ dead-executor watchdog |
 
 **Rule 0 — the one that governs the rest. During market hours on a market day
 (09:30–16:00 ET, Mon–Fri, US holidays excluded) no agent initiates anything that
@@ -32,18 +32,18 @@ Rules that keep SPX safe (test-enforced where noted):
 
 1. **Never `reqGlobalCancel`** — cancels every working order account-wide,
    including SPX's. No call site may exist (`test_ib_bridge.py` enforces).
-   Cancellation requires a `MAGIS|` orderRef submitted by client 91.
+   Cancellation requires a `MAGIS|` orderRef, the configured account, and
+   `clientId == 91`.
 2. **Never take another system's client ID** — the hazard is grabbing an ID
-   while its owner is mid-reconnect, locking it out. The reserved set is
-   pinned in `test_ib_bridge.py`; new IDs go in this table in all three repos
-   before first use.
+   while its owner is mid-reconnect. Every SSI socket path must call
+   `_system.trading.ib_gateway_registry.assert_ssi_client_id` immediately
+   before connecting. The CI scanner rejects unguarded connects and foreign,
+   retired, disabled, or role-mismatched defaults.
 3. **Connection slots:** the Gateway accepts ~32 API connections total; the
-   hub holds at most 2 (81 + 91) and never opens worker pools. ls-algo caps
-   itself at 26 for the same reason. **Counting concurrent sockets is not
-   sufficient** — the hub collector passed this rule while connecting and
-   disconnecting client 81 every 30 seconds, ~780 connects per session, and was
-   masked on 2026-08-25 for it. A long-lived session is required, not merely a
-   small number of simultaneous ones.
+   idle hub holds **zero** sessions. Client 91 opens only for a specific human
+   ticket, is released at the end of that work, and is rate-limited by the
+   persistent budget/circuit breaker. Client 81 stays disabled; client 82 may
+   not connect. Scheduled or recurring Gateway sessions are prohibited.
 4. **Market-data lines are one account-wide pool** shared with SPX's option
    NBBO stream. The bridge uses `snapshot=True` only, cancels in `finally`,
    and is leak-tested (50 quotes → 0 open lines, ≤1 concurrent). Keep it
@@ -51,16 +51,14 @@ Rules that keep SPX safe (test-enforced where noted):
 5. **`reqAutoOpenOrders` must never appear in this repo** (test-enforced) —
    binding TWS orders is how a hub session could end up owning SPX orders.
 6. **Never stop/restart the Gateway process** or flip its global Read-Only
-   API toggle. SPX rides through IBKR's daily restart window by design.
-   **Sole carve-out (2026-08-20):** spx-0dte's `ibc_guard` may issue ONE
-   remedial restart per day when the API handshake is provably wedged (port
-   accepts TCP, client-18 probe handshake fails ≥2 consecutive 5-min checks
-   during session hours). In that state every system on this Gateway is
-   equally disconnected, so the restart harms no one — it pages Slack when it
-   fires. Mirror this clause in spx-0dte `AGENTS.md` and ls-algo `CLAUDE.md`.
-7. **Background jobs deployed to NY4** (Whisper backfill, collectors) run
+   API toggle. A failed client-18 handshake alone does **not** prove all clients
+   are disconnected. spx-0dte's `ibc_guard` restart carve-out requires
+   independent evidence that the protected executor is dead, in addition to
+   its handshake checks and restart cap. SSI never invokes that carve-out.
+7. **Background jobs deployed to NY4** (Whisper backfill and other non-Gateway
+   batch work) run
    `Nice≥15` + `CPUQuota` + `IOSchedulingClass=idle` so the SPX executor never
-   waits on CPU. The box has **4 cores**. Enforced with systemd drop-ins at
+   waits on CPU. The host has **2 vCPUs**. Enforced with systemd drop-ins at
    `~/.config/systemd/user/<unit>.service.d/10-spx-coexistence.conf`. Retry loops
    need a real backoff: at the stock `RestartSec=5` the collector produced
    **6,785 restarts and ~315k journal lines in one day** against a Gateway that
@@ -81,9 +79,8 @@ Rules that keep SPX safe (test-enforced where noted):
    counted (concurrent sockets) was not the thing doing the harm.
 
    The three failures that combined, all of which any future design must avoid:
-   * **Churn.** A session opened and closed per poll. Any Gateway session must
-     be long-lived; a small number of concurrent connections is not the same as
-     a small number of connection *events*.
+   * **Churn.** A session opened and closed per poll. A human-triggered bounded
+     session is allowed; a timer-driven or repeating connection is not.
    * **Crash-to-restart.** A failed connect escaped and killed the process, so
      an upstream outage became a restart loop. Connection failure must be
      caught in-process with real backoff and a daily cap.
@@ -109,16 +106,16 @@ Rules that keep SPX safe (test-enforced where noted):
    **not a fault**. Never "fix" it by restarting anything, and never by touching
    `ibc.service` (see rule 6).
 
-**What is actually deployed on NY4 (verified 2026-08-22).** Do not re-derive this
-from `portfolio_hub/deploy/README.md`: that README installs to `/opt` + `/etc` +
-`/var/lib` under *system* systemd, but the real install is under **`/home/spx`
-with `spx`'s *user* systemd**, which is invisible to `systemctl list-units`. Use
-`sudo -u spx XDG_RUNTIME_DIR=/run/user/1000 systemctl --user list-units --all
-'portfolio-hub*'`. The repo there is `/home/spx/single-stock-investments`, a
-**file copy with no `.git`** — so changes merged to `main` do NOT reach it until
-someone copies them. That is how owner attribution broke silently: the copy
-predated the Michael split, `allocation_policy.py` was absent entirely, and every
-position fell through to Michael's residual book. Ledger is
-`/home/spx/portfolio-hub/portfolio.db`; account id `U805366` and
-`IBKR_ACCOUNT_ALIAS=U805366` (same string, different concept — the alias is a hub
-partition key, never read from IB).
+**Deployment layout.** The `/opt` + system-systemd runbook under
+`portfolio_hub/deploy/README.md` is deprecated and must not be used. The known
+NY4 layout is `/home/spx` under `spx` user systemd; its repo is an unversioned
+file copy, so a merge does not deploy it. Client 81's collector is disabled and
+must not be restored. Broker truth is Flex over HTTPS. The command process may
+poll D1, but an idle process holds no Gateway socket.
+
+Local checks that do not touch the Gateway:
+
+```bash
+python _system/scripts/check_ib_gateway_registry.py --skip-mirrors --scan-ssi
+python _system/scripts/check_ib_gateway_registry.py  # manual cross-repo mirror check
+```

@@ -1,0 +1,191 @@
+{
+  "schema_version": "ib_gateway_client_registry.v1",
+  "registry_version": "2026-09-09.1",
+  "verified_date": "2026-09-09",
+  "registry_hash_algorithm": "sha256-canonical-json-without-registry_hash",
+  "registry_hash": "3d2ba10bda3a577696e8e85ae5a6efd1a934e33341ade782506b79f0bad82abd",
+  "gateway": {
+    "name": "spx-ny4",
+    "live_port": 7496,
+    "approximate_connection_capacity": 32,
+    "host_vcpu": 2,
+    "protected_system": "spx-0dte"
+  },
+  "systems": {
+    "spx-0dte": {
+      "order_ref_prefixes": [
+        "SPX0DTE|"
+      ],
+      "clients": {
+        "17": {
+          "role": "live executor",
+          "access": "transmit",
+          "status": "active"
+        },
+        "18": {
+          "role": "ibc_guard handshake probe",
+          "access": "read_only",
+          "status": "active"
+        },
+        "19": {
+          "role": "market-data line probe",
+          "access": "off_hours_probe",
+          "status": "active"
+        },
+        "87": {
+          "role": "ES/SPX basis sampler",
+          "access": "snapshot_only",
+          "status": "active"
+        },
+        "88": {
+          "role": "manual off-hours what-if probes",
+          "access": "what_if_only",
+          "status": "active"
+        },
+        "97": {
+          "role": "dead-executor emergency watchdog",
+          "access": "transmit",
+          "status": "active"
+        }
+      }
+    },
+    "ls-algo": {
+      "order_ref_prefixes": [
+        "ETF_LS|",
+        "B5P|"
+      ],
+      "clients": {
+        "0": {
+          "role": "retired unsafe ib_insync client-zero auto-bind",
+          "access": "none",
+          "status": "disabled_reserved"
+        },
+        "41": {
+          "role": "rebalance coordinator and baseline snapshot",
+          "access": "transmit",
+          "status": "active"
+        },
+        "77": {
+          "role": "flow program",
+          "access": "transmit",
+          "status": "active"
+        },
+        "83": {
+          "role": "account-wide LS stale-order observer and interlock",
+          "access": "read_only",
+          "status": "active"
+        },
+        "90": {
+          "role": "daily screener IB check",
+          "access": "read_only",
+          "status": "active"
+        },
+        "198": {
+          "role": "bucket 5 contract probe",
+          "access": "read_only",
+          "status": "active"
+        }
+      },
+      "pools": [
+        {
+          "start": 100,
+          "end": 129,
+          "role": "leased worker sessions",
+          "access": "transmit",
+          "status": "active"
+        }
+      ]
+    },
+    "single-stock-investments": {
+      "order_ref_prefixes": [
+        "MAGIS|"
+      ],
+      "legacy_order_ref_prefixes": [
+        "DREW_SLEEVE",
+        "MICHAEL_SLEEVE"
+      ],
+      "clients": {
+        "71": {
+          "role": "legacy Drew sleeve",
+          "access": "transmit",
+          "status": "active"
+        },
+        "72": {
+          "role": "legacy Michael sleeve",
+          "access": "transmit",
+          "status": "active"
+        },
+        "73": {
+          "role": "legacy sleeve synchronization",
+          "access": "read_only",
+          "status": "active"
+        },
+        "81": {
+          "role": "retired portfolio collector",
+          "access": "none",
+          "status": "disabled_reserved"
+        },
+        "82": {
+          "role": "future master observer",
+          "access": "none",
+          "status": "reserved"
+        },
+        "91": {
+          "role": "portfolio hub order bridge",
+          "access": "transmit",
+          "status": "active"
+        }
+      }
+    },
+    "etf-0dte": {
+      "order_ref_prefixes": [
+        "SPY0DTE|",
+        "QQQ0DTE|"
+      ],
+      "clients": {
+        "50": {
+          "role": "SPY 0DTE live executor",
+          "access": "transmit",
+          "status": "active"
+        },
+        "51": {
+          "role": "QQQ 0DTE live executor",
+          "access": "transmit",
+          "status": "active"
+        },
+        "130": {
+          "role": "SPY dead-executor emergency watchdog",
+          "access": "transmit",
+          "status": "active"
+        },
+        "131": {
+          "role": "QQQ dead-executor emergency watchdog",
+          "access": "transmit",
+          "status": "active"
+        }
+      }
+    }
+  },
+  "retired_client_ids": {
+    "singles": [
+      92,
+      197,
+      207,
+      551
+    ],
+    "ranges": [
+      {
+        "start": 241,
+        "end": 273
+      },
+      {
+        "start": 341,
+        "end": 373
+      },
+      {
+        "start": 1041,
+        "end": 1568
+      }
+    ]
+  }
+}
