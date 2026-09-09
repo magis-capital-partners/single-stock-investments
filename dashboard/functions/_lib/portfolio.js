@@ -322,10 +322,26 @@ export async function loadPortfolio(env, owner = "all") {
     db.prepare("SELECT * FROM portfolio_cash_events WHERE account_alias=? AND effective_at<=? AND (?='all' OR owner=?) ORDER BY effective_at,event_id").bind(run.account_alias, run.as_of, owner, owner),
     db.prepare("SELECT COUNT(*) AS count FROM portfolio_broker_orders WHERE source_run_id=?").bind(run.source_run_id),
     db.prepare("SELECT COUNT(*) AS count FROM portfolio_positions WHERE source_run_id=?").bind(run.source_run_id),
-    db.prepare(`SELECT p.projection_id,p.as_of,COUNT(a.allocation_id) AS allocation_count
-      FROM portfolio_allocation_projections p LEFT JOIN portfolio_allocations a ON a.account_alias=p.account_alias
+    // Existence, not a total: allocation_count is only ever read as `> 0` (see
+    // allocationState below), and nothing downstream sees the number itself.
+    // It used to be an aggregate over a LEFT JOIN on account_alias -- the only
+    // column portfolio_allocations and portfolio_allocation_projections share --
+    // which is a cross product: every projection row for the account paired with
+    // every allocation row, aggregated, and only then cut to one row by LIMIT 1.
+    // D1 bills rows scanned, so that LIMIT bounded the output and nothing else.
+    // The publisher re-posts the same frozen snapshot on a timer and each post
+    // adds a projection row under the same source_run_id, so the left side grew
+    // every hour while the right side grew with every allocation ever written.
+    // On 2026-09-09 one call read 3,458,448 rows and eight calls read 27.7M
+    // against a 5,000,000/day allowance -- two page loads took the dashboard out
+    // for the rest of the UTC day. EXISTS stops at the first matching allocation,
+    // and migration 0017 makes the ORDER BY a one-row seek rather than a sort
+    // over every projection for the run.
+    db.prepare(`SELECT p.projection_id,p.as_of,
+        EXISTS (SELECT 1 FROM portfolio_allocations a WHERE a.account_alias=p.account_alias) AS allocation_count
+      FROM portfolio_allocation_projections p
       WHERE p.account_alias=? AND p.source_run_id=?
-      GROUP BY p.projection_id,p.as_of ORDER BY p.as_of DESC LIMIT 1`).bind(run.account_alias, run.source_run_id),
+      ORDER BY p.as_of DESC LIMIT 1`).bind(run.account_alias, run.source_run_id),
   ]);
   const positions = [];
   const keyed = new Map();
