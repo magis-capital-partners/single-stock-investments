@@ -663,10 +663,33 @@ def attach_pdf_store_rows(rows: list[dict], catalog: dict | None) -> None:
 
 
 def count_sec_filings(ticker_dir: Path) -> int:
-    sec = ticker_dir / "investor-documents" / "sec-edgar"
-    if sec.exists():
-        return sum(1 for f in sec.iterdir() if f.is_file())
-    return 0
+    """Filings held for this ticker: whichever of disk or manifest knows more.
+
+    sec-edgar/ is gitignored (it is a ~33GB local cache of EDGAR HTML), so a CI
+    checkout has the manifest and none of the files. Counting only the directory
+    therefore reported SEC=0 for any ticker whose cache was not committed --
+    VMC and MLM read 0 on the dashboard while holding 55 and 56 filings locally.
+
+    Counting only the manifest is not the fix either: it runs one or two short of
+    disk on ~435 tickers (8-K exhibits land on disk without a manifest row), and
+    20 tickers have files with an empty manifest, which a straight switch would
+    zero. max() takes disk as truth wherever the cache exists and falls back to
+    the manifest where it does not, so no ticker's count can regress.
+    """
+    inv = ticker_dir / "investor-documents"
+    sec = inv / "sec-edgar"
+    on_disk = sum(1 for f in sec.iterdir() if f.is_file()) if sec.exists() else 0
+
+    manifest = inv / "DOWNLOAD_MANIFEST.json"
+    in_manifest = 0
+    if manifest.exists():
+        try:
+            rows = json.loads(manifest.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError):
+            rows = None
+        if isinstance(rows, list):
+            in_manifest = len(rows)
+    return max(on_disk, in_manifest)
 
 
 def last_download(ticker_dir: Path) -> str | None:
