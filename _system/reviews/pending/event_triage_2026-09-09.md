@@ -1,7 +1,7 @@
 # Event triage — human review queue
 
 **Date:** 2026-09-09
-**Rows:** 2877
+**Rows:** 1810
 
 | Date | Ticker | Source | Tier | Materiality | Rules | Title |
 |------|--------|--------|------|-------------|-------|-------|
@@ -34,6 +34,11 @@
 | 2026-09-09 | MSFT | kpi_trend | context | 66 | rule_conflict, activist_cross_link, routine_governance_watch | Leadership / governance on watch |
 | 2026-09-09 | STX | kpi_trend | context | 66 | rule_conflict, activist_cross_link, routine_governance_watch | Leadership / governance on watch |
 | 2026-09-09 | SYK | kpi_trend | context | 66 | rule_conflict, activist_cross_link, routine_governance_watch | Leadership / governance on watch |
+| 2026-09-09 | JOE | third_party | context | 15 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | 01-Douglas-Dynamics |
+| 2026-09-09 | JOE | third_party | context | 15 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | 01-cleveland-cliffs |
+| 2026-09-09 | JOE | third_party | context | 15 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | 01-greencore-group |
+| 2026-09-09 | JOE | third_party | context | 15 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | 02-polypid |
+| 2026-09-09 | JOE | third_party | context | 15 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | 03-Malibu-Boats |
 | 2026-09-07 | MP | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | Sports Can Play Vital Role in Keeping Youth Away from Drugs, |
 | 2026-09-07 | MSFT | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | Microsoft (MSFT)’s Outlook and OpenAI’s ChatGPT Work Both Br |
 | 2026-09-07 | ZETA | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | MTG's Zeta Set Has an Insider Trading Scandal - Resell Calen |
@@ -51,11 +56,6 @@
 | 2026-08-31 | QDEL | third_party | context | 21 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | `jefferies_2026-08-06` |
 | 2026-08-31 | QDEL | third_party | context | 21 | rule_conflict, activist_cross_link, neutral_low_impact | McIntyre Partnerships |
 | 2026-08-31 | QDEL | third_party | context | 13 | rule_conflict, activist_cross_link, neutral_low_impact | VIC PDF intake - QDEL - QDEL VIC PDF |
-| 2026-08-30 | JOE | third_party | context | 13 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | 01-Douglas-Dynamics |
-| 2026-08-30 | JOE | third_party | context | 13 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | 01-greencore-group |
-| 2026-08-30 | JOE | third_party | context | 13 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | 03-Malibu-Boats |
-| 2026-08-30 | JOE | third_party | context | 13 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | 03-Mitani-Sekisan |
-| 2026-08-30 | JOE | third_party | context | 13 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | 03-babcock-wilcox |
 | 2026-08-28 | AOS | kpi_trend | context | 55 | rule_conflict, activist_cross_link, routine_governance_watch | Leadership / governance on watch |
 | 2026-08-28 | CSGP | third_party | context | 21 | rule_conflict, activist_cross_link, neutral_low_impact | Third Point Sends Letter to Board of Directors of CoStar Gro |
 | 2026-08-28 | CSGP | third_party | context | 21 | rule_conflict, activist_cross_link, neutral_low_impact | The D. E. Shaw Group Releases Open Letter and Presentation t |
