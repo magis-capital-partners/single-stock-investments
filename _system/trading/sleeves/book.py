@@ -24,7 +24,11 @@ def build_book(owner: str, store: SleeveStore, cfg: Mapping[str, Any] | None = N
         cls = pos.get("classification") or {}
         if cls.get("owner") != owner and cls.get("bucket") != owner:
             continue
-        ticker = norm_sym(pos.get("ticker") or pos.get("symbol") or "")
+        # The classifier already resolved the underlying; for an option the raw
+        # symbol is the OCC string, and norm_sym turns "APLZ  261016P00011000"
+        # into "APLZ--261016P00011000". That is not a ticker, and notes and ideas
+        # key on this field, so a thesis written against APLZ would never match.
+        ticker = norm_sym(cls.get("ticker") or pos.get("ticker") or pos.get("symbol") or "")
         qty = float(pos.get("qty") or pos.get("position") or 0)
         mark = float(pos.get("mark") or pos.get("avgCost") or 0)
         mv = float(pos.get("marketValue") or pos.get("market_value") or qty * mark)
@@ -56,6 +60,17 @@ def build_book(owner: str, store: SleeveStore, cfg: Mapping[str, Any] | None = N
             "plc_thesis": idea.get("plc_thesis"),
             "holding_period_years": years_held,
             "classifier_reason": reason,
+            # Contract identity travels with the row. secType was never emitted
+            # here, so every position reached D1 as "STK" no matter what it was,
+            # and the option coordinates had nowhere to go at all. The ingest
+            # keys on local_symbol, so an option must carry one.
+            "secType": str(pos.get("secType") or pos.get("sec_type") or "STK").upper(),
+            "conid": int(pos.get("conId") or pos.get("conid") or 0) or None,
+            "local_symbol": pos.get("localSymbol") or pos.get("local_symbol") or ticker,
+            "expiry": pos.get("expiry") or None,
+            "strike": pos.get("strike"),
+            "right": pos.get("right") or pos.get("right_code") or None,
+            "multiplier": pos.get("multiplier"),
             "notes": notes,
             "needs_thesis": not notes,
         })

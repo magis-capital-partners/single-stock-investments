@@ -120,15 +120,27 @@ def test_equity_option_follows_underlying():
         etf_ls_symbols={"MSFT"},
     )
     assert csu.bucket == "michael" and csu.reason == "residual"
+    # An option on the LS-algo universe is a hand-written overlay against a
+    # systematic pair leg, not a systematic holding. The shares stay excluded;
+    # the overlay routes to Drew so a discretionary trade has somewhere visible
+    # to live instead of disappearing into the etf_ls bucket. The shares assertion
+    # below is what pins that only OPT/FOP moves.
     nvda = classify_position(
         {"symbol": "NVDA  260821C00100000", "secType": "OPT", "underlyingSymbol": "NVDA"},
         blacklist_family=set(),
         etf_ls_symbols={"NVDA"},
     )
-    assert nvda.bucket == "etf_ls"
+    assert nvda.bucket == "drew" and nvda.reason == "ls_algo_option_overlay"
     apld = classify_position(
         {"symbol": "APLD  260821C00030000", "secType": "OPT", "underlyingSymbol": "APLD"},
         blacklist_family={"APLD"},
         etf_ls_symbols={"APLD"},
     )
-    assert apld.bucket == "etf_ls" and apld.reason == "etf_ls_universe"
+    assert apld.bucket == "drew" and apld.reason == "ls_algo_option_overlay"
+    # The underlying shares are systematic and must not follow the overlay.
+    shares = classify_position(
+        {"symbol": "APLD", "secType": "STK"},
+        blacklist_family={"APLD"},
+        etf_ls_symbols={"APLD"},
+    )
+    assert shares.bucket == "etf_ls" and shares.reason == "etf_ls_universe"

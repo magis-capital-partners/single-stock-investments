@@ -1,5 +1,5 @@
 import { failure, json, requestId, requireDatabase } from "../../../_lib/http.js";
-import { loadBook, verifySleeveHmac } from "../../../_lib/sleeves.js";
+import { foldPositions, loadBook, verifySleeveHmac } from "../../../_lib/sleeves.js";
 
 const MAX_BODY_BYTES = 512_000;
 
@@ -78,14 +78,23 @@ export async function onRequestPost(context) {
         JSON.stringify(book.header || {}),
       ));
       statements.push(db.prepare("DELETE FROM sleeve_positions WHERE owner = ?").bind(book.owner));
-      for (const pos of book.positions) {
+      for (const [key, pos] of foldPositions(book.positions)) {
+        const secType = pos.sec_type || pos.secType || "STK";
         statements.push(db.prepare(`
           INSERT INTO sleeve_positions (
-            owner, ticker, qty, mark, market_value, sec_type, classifier_reason, synced_at
-          ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+            owner, position_key, ticker, qty, mark, market_value, sec_type, classifier_reason,
+            conid, local_symbol, expiry, strike, right_code, multiplier, synced_at
+          ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         `).bind(
-          book.owner, pos.ticker, pos.qty, pos.mark, pos.market_value,
-          pos.secType || "STK", pos.classifier_reason || "residual", asOf,
+          book.owner, key, pos.ticker, pos.qty, pos.mark, pos.market_value,
+          secType, pos.classifier_reason || "residual",
+          pos.conid ?? pos.conId ?? null,
+          pos.local_symbol ?? pos.localSymbol ?? null,
+          pos.expiry || null,
+          pos.strike == null || pos.strike === "" ? null : Number(pos.strike),
+          pos.right_code || pos.right || null,
+          pos.multiplier == null || pos.multiplier === "" ? null : Number(pos.multiplier),
+          asOf,
         ));
       }
     }

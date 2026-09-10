@@ -96,6 +96,76 @@ export function emptyBook(owner) {
   };
 }
 
+const MONTHS = ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"];
+
+function isOption(secType) {
+  const sec = String(secType || "STK").trim().toUpperCase();
+  return sec === "OPT" || sec === "FOP";
+}
+
+/**
+ * The row's identity. `ticker` is the underlying -- classify_positions returns
+ * `under or ticker` for an option -- so it cannot separate the 38 call from the
+ * 40 put on one name. local_symbol is IBKR's own contract string, unique per
+ * conId, and is what keeps two overlays on one underlying from colliding on the
+ * primary key. Anything without one keys on its ticker, as before.
+ */
+export function positionKey(pos) {
+  const local = String(pos?.local_symbol ?? pos?.localSymbol ?? "").trim();
+  return local || String(pos?.ticker ?? "").trim();
+}
+
+/** "20261009" -> "09OCT26", matching how IBKR itself writes a contract. */
+export function formatExpiry(raw) {
+  const digits = String(raw ?? "").trim();
+  if (!/^\d{8}$/.test(digits)) return digits;
+  const month = MONTHS[Number(digits.slice(4, 6)) - 1];
+  if (!month) return digits;
+  return `${digits.slice(6, 8)}${month}${digits.slice(2, 4)}`;
+}
+
+/**
+ * What the page prints. A short call needs its strike and expiry on screen --
+ * "APLD" alone does not say what was sold, which is the whole point of writing a
+ * justification against it.
+ */
+export function contractLabel(pos) {
+  const ticker = String(pos?.ticker ?? "");
+  if (!isOption(pos?.sec_type ?? pos?.secType)) return ticker;
+  const expiry = String(pos?.expiry ?? "").trim();
+  const right = String(pos?.right_code ?? pos?.right ?? "").trim().toUpperCase();
+  const strike = pos?.strike ?? pos?.strike_decimal;
+  if (!expiry || !right || strike == null || strike === "") {
+    // Better a raw OCC symbol than a bare underlying: it is still unambiguous.
+    return String(pos?.local_symbol ?? "").trim() || ticker;
+  }
+  return `${ticker} ${formatExpiry(expiry)} ${Number(strike)} ${right}`;
+}
+
+/**
+ * Fold to one row per contract.
+ *
+ * Flex reports OPEN LOTS, not positions -- one XSP strike arrives as 68 + 12 --
+ * so the same contract legitimately appears more than once. Two rows would fail
+ * sleeve_positions' primary key and take the whole ingest POST down; keeping the
+ * last would silently report 12 contracts where 80 are held. Quantity and market
+ * value sum; mark is per-contract, so the first lot's is kept.
+ */
+export function foldPositions(positions) {
+  const byKey = new Map();
+  for (const pos of positions || []) {
+    const key = positionKey(pos);
+    const seen = byKey.get(key);
+    if (!seen) {
+      byKey.set(key, { ...pos });
+      continue;
+    }
+    seen.qty = Number(seen.qty || 0) + Number(pos.qty || 0);
+    seen.market_value = Number(seen.market_value || 0) + Number(pos.market_value || 0);
+  }
+  return byKey;
+}
+
 export async function loadBook(db, owner) {
   const book = emptyBook(owner);
   const [config, positions, notes, ideas, fills, cashflows] = await db.batch([
@@ -142,6 +212,18 @@ export async function loadBook(db, owner) {
       plc_thesis: idea.plc_thesis,
       holding_period_years: idea.holding_period_years,
       classifier_reason: row.classifier_reason,
+      // Contract identity. A thesis is about the name, so notes still key on
+      // ticker; the label is what the row prints so you can see which contract
+      // the thesis is being written against.
+      position_key: row.position_key || row.ticker,
+      sec_type: row.sec_type,
+      conid: row.conid,
+      local_symbol: row.local_symbol,
+      expiry: row.expiry,
+      strike: row.strike,
+      right_code: row.right_code,
+      multiplier: row.multiplier,
+      contract_label: contractLabel(row),
       notes: notesByTicker[row.ticker] || [],
       needs_thesis: !(notesByTicker[row.ticker] || []).length,
     };

@@ -211,13 +211,35 @@ export async function storeAccountSnapshot(env, payload, bytes) {
   // holdings are the contracts most likely to be traded again, and remembering
   // them here means the box still answers on a weekend, when `ibc.service` is
   // legitimately down and no live lookup can resolve.
-  await rememberContracts(db, normalizeMatches(payload.positions.map((row) => ({
-    conid: row.conid, symbol: row.symbol, local_symbol: row.local_symbol,
-    sec_type: row.sec_type, currency: row.currency, exchange: row.exchange,
-    trading_class: row.trading_class, expiry: row.expiry, strike: row.strike,
-    right: row.right, multiplier: row.multiplier, description: row.description,
-  })), payload.positions.length), "position");
-  return { duplicate: false, object_key: objectKey };
+  //
+  // It is seeded *after* the batch above has durably committed the source run
+  // and every position, and it is not broker truth -- the hub re-qualifies at
+  // preview time regardless, so a missing row costs a redundant qualify, not a
+  // wrong order. Throwing here therefore reports a fully successful ingest as
+  // HTTP 500, which is how the Flex publisher spent 2026-08-27..2026-09-09
+  // exiting 1 and failing its systemd unit every night while its rows landed
+  // correctly every night. Degrade the cache, never the snapshot; the count and
+  // any error ride back in the response so a silent cache stays impossible.
+  let contractsCached = 0;
+  let contractCacheError = null;
+  try {
+    contractsCached = await rememberContracts(db, normalizeMatches(payload.positions.map((row) => ({
+      conid: row.conid, symbol: row.symbol, local_symbol: row.local_symbol,
+      sec_type: row.sec_type, currency: row.currency, exchange: row.exchange,
+      trading_class: row.trading_class, expiry: row.expiry, strike: row.strike,
+      right: row.right, multiplier: row.multiplier, description: row.description,
+    })), payload.positions.length), "position");
+  } catch (error) {
+    contractCacheError = error instanceof Error ? error.message : String(error);
+    console.error(JSON.stringify({
+      message: "contract cache seeding failed; snapshot already committed",
+      source_run_id: payload.source_run_id, error: contractCacheError,
+    }));
+  }
+  return {
+    duplicate: false, object_key: objectKey, contracts_cached: contractsCached,
+    ...(contractCacheError ? { contract_cache_error: contractCacheError } : {}),
+  };
 }
 
 export async function storeStrategySnapshot(env, payload, bytes) {
