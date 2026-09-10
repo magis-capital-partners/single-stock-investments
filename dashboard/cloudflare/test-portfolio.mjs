@@ -188,3 +188,64 @@ test("the allocation-status probe asks for existence, never a cross join", async
   assert.doesNotMatch(probe, /COUNT\(/i);
   assert.doesNotMatch(probe, /GROUP BY/i);
 });
+
+// A minimal D1/R2 double. storeAccountSnapshot only needs prepare().bind().first(),
+// batch() and the archive's put(), so a stub keeps this suite dependency-free and
+// lets a single batch fail on demand.
+function fakeEnv({ failOn = null } = {}) {
+  const batches = [];
+  const stmt = (sql) => ({ sql, bind: (...args) => ({ sql, args, first: async () => null }) });
+  const db = {
+    prepare: stmt,
+    batch: async (statements) => {
+      const sql = statements[0]?.sql || "";
+      batches.push(sql);
+      if (failOn && sql.includes(failOn)) {
+        throw new Error(`D1_ERROR: ${failOn} write rejected: SQLITE_ERROR`);
+      }
+      return statements.map(() => ({ results: [] }));
+    },
+  };
+  const puts = [];
+  return { env: { DB: db, PRIVATE_ARTIFACTS: { put: async (key) => puts.push(key) } }, batches, puts };
+}
+
+function flexLikeSnapshot() {
+  return {
+    schema_version: "account_snapshot.v1", source_run_id: "flex-test", account_alias: "U805366",
+    as_of: "2026-09-09T22:15:14Z", complete: false, base_currency: "USD",
+    account_values: [], completeness: {},
+    positions: [{
+      conid: 918830607, symbol: "APLD  261009C00038000", sec_type: "OPT", currency: "USD",
+      native_currency: "USD", base_currency: "USD", quantity: "-21", quantity_unit: "contracts",
+      expiry: "20261009", strike: "38", right: "C", multiplier: "100", source: "ibkr_flex",
+    }],
+  };
+}
+
+test("a contract-cache failure degrades the cache, never the committed snapshot", async () => {
+  // Regression: rememberContracts runs *after* db.batch has durably written the
+  // source run and every position, so throwing there turned a fully successful
+  // ingest into HTTP 500. The Flex publisher exited 1 and failed its systemd unit
+  // nightly from 2026-08-27 to 2026-09-09 while its rows landed correctly.
+  const { storeAccountSnapshot, validateAccountSnapshot } = await import("../functions/_lib/portfolio.js");
+  const { env, batches } = fakeEnv({ failOn: "portfolio_contracts" });
+
+  const stored = await storeAccountSnapshot(env, validateAccountSnapshot(flexLikeSnapshot()), Buffer.from("{}"));
+
+  assert.equal(stored.duplicate, false);
+  assert.ok(stored.object_key.includes("flex-test"), "the snapshot is archived");
+  assert.equal(stored.contracts_cached, 0);
+  assert.match(stored.contract_cache_error, /portfolio_contracts/);
+  assert.ok(batches.some((sql) => sql.includes("portfolio_source_runs")), "the snapshot batch still ran");
+});
+
+test("a healthy ingest reports what it cached, so a silent cache is impossible", async () => {
+  const { storeAccountSnapshot, validateAccountSnapshot } = await import("../functions/_lib/portfolio.js");
+  const { env } = fakeEnv();
+
+  const stored = await storeAccountSnapshot(env, validateAccountSnapshot(flexLikeSnapshot()), Buffer.from("{}"));
+
+  assert.equal(stored.contracts_cached, 1);
+  assert.ok(!("contract_cache_error" in stored));
+});

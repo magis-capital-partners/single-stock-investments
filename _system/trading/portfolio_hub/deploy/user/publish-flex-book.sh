@@ -56,4 +56,20 @@ log "flex-publish exit=$rc"
 "$PY" _system/scripts/build_research_scope.py --flex "$POSITIONS" --account "$ACCOUNT"
 log "build_research_scope exit=$?"
 
+# Classify the SAME statement into the Michael / Drew sleeve books and publish
+# them. `--flex` is a Gateway-free path: load_positions() returns the parsed XML
+# and never imports ib_client, so this adds no IBKR request, no socket and no
+# client id (CLAUDE.md rule 9). Like build_research_scope above, its exit code is
+# logged and deliberately NOT propagated -- publishing broker truth is this
+# unit's job, and a sleeve failure must not report that job as failed.
+#
+# Guarded on the token so that deploying this ahead of the secret is a logged
+# no-op rather than a run of unauthenticated POSTs against the ingest.
+if [ -n "${SLEEVE_INGEST_TOKEN:-}" ]; then
+  "$PY" -m _system.trading.sleeves.sync_ib --flex "$POSITIONS"
+  log "sleeve-sync exit=$?"
+else
+  log "sleeve-sync skipped: SLEEVE_INGEST_TOKEN not set"
+fi
+
 exit $rc

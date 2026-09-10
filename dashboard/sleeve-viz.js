@@ -43,7 +43,21 @@
       drew_new: 'Drew fill',
       sleeve_tag: 'Sleeve fill',
       cash: 'Cash',
+      ls_algo_option_overlay: 'Overlay on LS book',
     }[reason] || '';
+  }
+  // An overlay is a dated trade, so how long it has left is part of reading the
+  // row. Expired and same-day are called out rather than shown as "0d".
+  function dteLabel(p) {
+    const raw = String(p && p.expiry || '');
+    if (!/^\d{8}$/.test(raw)) return '';
+    const expiry = Date.UTC(+raw.slice(0, 4), +raw.slice(4, 6) - 1, +raw.slice(6, 8));
+    const now = new Date();
+    const today = Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate());
+    const days = Math.round((expiry - today) / 86400000);
+    if (days < 0) return 'expired';
+    if (days === 0) return 'expires today';
+    return days + 'd to expiry';
   }
   function clusterLabel(cluster) {
     return String(cluster || 'idiosyncratic').split('_').join(' ');
@@ -116,10 +130,11 @@
       const fx = p.currency && p.currency !== 'USD' ? ` ${p.currency}` : '';
       return `<div class="sleeve-book-row">
         <div>
-          <div class="sleeve-ticker mono">${esc(p.ticker)}</div>
+          <div class="sleeve-ticker mono">${esc(p.contract_label || p.ticker)}</div>
           <div class="sleeve-name">${esc(p.name || p.ticker)}</div>
           <div class="sleeve-tags">
             ${reason ? `<span class="sleeve-mini">${esc(reason)}</span>` : ''}
+            ${dteLabel(p) ? `<span class="sleeve-mini">${esc(dteLabel(p))}</span>` : ''}
             ${p.cluster && p.cluster !== 'idiosyncratic' ? `<span class="sleeve-mini">${esc(clusterLabel(p.cluster))}</span>` : ''}
           </div>
         </div>
