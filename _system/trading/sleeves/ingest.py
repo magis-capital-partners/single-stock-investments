@@ -27,6 +27,14 @@ def post_ingest(url: str, token: str, payload: Mapping[str, Any], timeout: int =
     body = json.dumps(payload, separators=(",", ":")).encode()
     headers = {
         "content-type": "application/json",
+        # Name the client. Without this urllib sends "Python-urllib/3.12", which
+        # Cloudflare's managed bot rules answer with 403 before the request ever
+        # reaches the Function -- indistinguishable, from here, from an Access
+        # denial or a bad signature. Measured 2026-09-10 against the live
+        # endpoint: Python-urllib/3.12 -> 403, any other agent -> 401 from our
+        # own verifySleeveHmac. portfolio_hub/publisher.py already sets one for
+        # the same reason.
+        "user-agent": "MagisSleeveDesk/1.0",
         **sign_body(token, body),
     }
     req = urllib.request.Request(url, data=body, headers=headers, method="POST")
