@@ -14,6 +14,7 @@ import sys
 from datetime import datetime, timezone
 from pathlib import Path
 
+import transcript_segments
 from fetch_podcast_transcript import whisper_transcribe
 from fetch_video_transcript import quality_gate, slugify
 from vault_paths import videos_root
@@ -105,7 +106,7 @@ def _video_paths(item: dict) -> tuple[Path, Path]:
     return library / (stem + ".txt"), library / (stem + ".meta.json")
 
 
-def finalize_transcript(item: dict, text: str) -> dict:
+def finalize_transcript(item: dict, text: str, segments: list | None = None) -> dict:
     text = (text or "").strip()
     duration = item.get("duration_seconds")
     reasons = quality_gate(text, duration)
@@ -127,6 +128,7 @@ def finalize_transcript(item: dict, text: str) -> dict:
         "chars_per_minute": round(len(text) / (duration / 60.0), 1) if duration else None,
         "transcript_source": "local_whisper",
         "transcript_path": transcript_path,
+        "segment_count": len(segments or []),
         "relevance": None,
         "gate": "transcript_fetched",
         "fetched_at": now_stamp(),
@@ -205,14 +207,15 @@ def drain(*, batch: int = 4) -> dict:
         audio_path = None
         try:
             audio_path = download_audio(item, cache)
+            segments: list = []
             text = whisper_transcribe(audio_path, {
                 "title": item.get("title"),
                 "show_id": item.get("channel_id"),
                 "description": item.get("description"),
-            })
+            }, segments_out=segments)
             if not text:
                 raise RuntimeError("Whisper returned no transcript")
-            result = finalize_transcript(item, text)
+            result = finalize_transcript(item, text, segments)
             if result.get("status") == "transcribed":
                 item["status"] = "done"
                 item["completed_at"] = now_stamp()

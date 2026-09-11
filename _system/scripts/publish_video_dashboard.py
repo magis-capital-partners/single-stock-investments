@@ -5,6 +5,7 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
+import build_video_detail
 from build_video_insights import INDEX_MIRROR_PATH, build_catalog
 from vault_paths import videos_root
 
@@ -35,7 +36,11 @@ def write_json(path: Path, value: dict, *, compact: bool = True) -> None:
 
 
 def publish(root: Path | None = None) -> dict:
-    catalog = build_catalog(root or videos_root(create=True))
+    root = root or videos_root(create=True)
+    catalog = build_catalog(root)
+    # Detail shards are written from the same pass over the same metas, so the
+    # list and what a click opens can never describe different corpora.
+    details = build_video_detail.build_all(root)
     shard = {
         "generated_at": catalog.get("generated_at"),
         "video_index": catalog.get("video_index") or [],
@@ -49,6 +54,7 @@ def publish(root: Path | None = None) -> dict:
     manifest = load_json(MANIFEST_PATH)
     manifest["video_count"] = catalog.get("video_count", 0)
     manifest.setdefault("shards", {})["videos"] = "data/insights/videos.json"
+    manifest["shards"]["video_details"] = "data/insights/video_details/"
     health = manifest.setdefault("source_health", {})
     health["videos"] = {
         "status": "ok" if catalog.get("video_count") else "empty",
@@ -57,15 +63,27 @@ def publish(root: Path | None = None) -> dict:
         "generated_at": catalog.get("generated_at"),
         "status_counts": catalog.get("status_counts") or {},
         "path": "_system/reference/video/insights_index_mirror.json",
+        # Depth, not count. The admitted total moves with the collection lane
+        # and says nothing about whether the surface is worth reading; these do.
+        "detail_shards": details.get("shards", 0),
+        "with_analysis": details.get("with_analysis", 0),
+        "with_timestamps": details.get("with_timestamps", 0),
+        "claims": details.get("claims", 0),
+        "summary_sources": details.get("by_summary_source") or {},
     }
     write_json(MANIFEST_PATH, manifest)
+    catalog["details"] = details
     return catalog
 
 
 def main() -> int:
     catalog = publish()
+    details = catalog.get("details") or {}
     print(
         f"video dashboard: {catalog.get('video_count', 0)} admitted, "
+        f"{details.get('shards', 0)} detail shards, "
+        f"{details.get('with_analysis', 0)} analysed, "
+        f"{details.get('claims', 0)} claims, "
         f"newest={catalog.get('newest_published') or 'none'}"
     )
     return 0

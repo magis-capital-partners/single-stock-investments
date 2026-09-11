@@ -57,6 +57,7 @@ if hasattr(sys.stderr, "reconfigure"):
     sys.stderr.reconfigure(encoding="utf-8", errors="replace")
 
 import caption_rate_limit as rate  # noqa: E402
+import transcript_segments  # noqa: E402
 import youtube_api  # noqa: E402
 from vault_paths import videos_root  # noqa: E402
 
@@ -215,11 +216,17 @@ def fetch_captions(video_id: str) -> dict:
     except Exception as exc:  # noqa: BLE001
         return {"status": "error:" + type(exc).__name__, "detail": str(exc)[:200]}
 
-    text = " ".join((s.text or "").strip() for s in fetched)
-    text = re.sub(r"\s+", " ", text).strip()
+    # Every snippet carries .start and .duration. Flattening to text alone is
+    # what cost the lane its deep links; assemble() keeps both and returns the
+    # same string the old one-liner did.
+    text, segments = transcript_segments.assemble(
+        (getattr(s, "start", None), getattr(s, "duration", None), s.text or "")
+        for s in fetched
+    )
     return {
         "status": "ok" if text else "no_captions",
         "text": text,
+        "segments": segments,
         "language": getattr(fetched, "language_code", None),
         "is_generated": bool(getattr(fetched, "is_generated", True)),
         "track_count": len(listing),
@@ -396,6 +403,7 @@ def run(*, limit: int | None = None, only_video: str | None = None,
             "transcript_chars": len(text),
             "chars_per_minute": round(len(text) / (duration / 60.0), 1) if duration else None,
             "transcript_source": "youtube_captions",
+            "segment_count": len(result.get("segments") or []),
             "transcript_path": txt_path.relative_to(videos_root()).as_posix(),
             "resolve_preview": row.get("resolve_preview"),
             # Set by the Phase 3 transcript gate, which has not run yet.
@@ -409,6 +417,7 @@ def run(*, limit: int | None = None, only_video: str | None = None,
         meta_path.write_text(json.dumps(meta, indent=2, ensure_ascii=False) + "\n",
                              encoding="utf-8")
         txt_path.write_text(text + "\n", encoding="utf-8")
+        transcript_segments.write_sidecar(txt_path, result.get("segments") or [])
         state.update({"status": "done", "chars": len(text)})
         stats["fetched"] += 1
         kind = "auto" if result.get("is_generated") else "MANUAL"

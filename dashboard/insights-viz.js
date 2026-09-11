@@ -622,6 +622,165 @@
     return `data/insights/podcast_episodes/${safe}.json`;
   }
 
+  function videoDetailShardPath(videoId) {
+    const safe = String(videoId || '').replace(/[^A-Za-z0-9._-]+/g, '_').slice(0, 180);
+    return `data/insights/video_details/${safe}.json`;
+  }
+
+  function formatClock(seconds) {
+    const total = Math.max(0, Math.floor(Number(seconds) || 0));
+    const h = Math.floor(total / 3600);
+    const m = Math.floor((total % 3600) / 60);
+    const s = total % 60;
+    const mm = String(m).padStart(h ? 2 : 1, '0');
+    return `${h ? h + ':' : ''}${mm}:${String(s).padStart(2, '0')}`;
+  }
+
+  function videoStanceClass(stance) {
+    const s = String(stance || 'neutral').toLowerCase();
+    if (s === 'bullish') return 'badge-ok';
+    if (s === 'bearish') return 'badge-bad';
+    if (s === 'mixed') return 'badge-us';
+    return '';
+  }
+
+  // A ticker pill that carries the view, not just the symbol. A bare symbol
+  // could not distinguish a company argued about for ten minutes from one whose
+  // name occurred four times.
+  function videoTickerPill(ticker, stance, escapeHtml) {
+    const cls = videoStanceClass(stance);
+    const title = stance ? `${ticker} — ${stance}` : `${ticker} — mentioned, no view extracted`;
+    return `<button type="button" class="linkish mono video-ticker${cls ? ' ' + cls : ''}"
+      data-select-ticker="${escapeHtml(ticker)}" title="${escapeHtml(title)}">${escapeHtml(ticker)}</button>`;
+  }
+
+  function renderVideoDetail(row, escapeHtml, linkHtml, ghRepo, opts = {}) {
+    if (!row) return '';
+    const detail = opts.detail || null;
+    const loading = Boolean(opts.loading);
+    const v = detail ? { ...row, ...detail } : row;
+    const analysis = v.analysis || null;
+    const prov = v.provenance || {};
+    const claims = (v.claims || []).filter(c => c && c.claim);
+    const chapters = (v.chapters || []).filter(c => c && c.t_start != null);
+    const numbers = (v.numbers || []).filter(n => n && n.value);
+    const stances = v.stances || {};
+    const evidence = v.ticker_evidence || [];
+
+    const jump = (link, seconds) => (link
+      ? `<a href="${escapeHtml(link)}" target="_blank" rel="noopener" class="video-jump mono">${escapeHtml(formatClock(seconds))}</a>`
+      : '');
+
+    // Claims read better grouped by company than in transcript order: the
+    // question a reader arrives with is "what did they say about X".
+    const byTicker = new Map();
+    claims.forEach(c => {
+      const key = c.ticker || c.company || '—';
+      if (!byTicker.has(key)) byTicker.set(key, []);
+      byTicker.get(key).push(c);
+    });
+
+    const summarySource = {
+      thesis: 'Model summary, from quotes verified against the transcript',
+      description: "The channel's own description",
+      claim: 'One verified claim; no summary was produced',
+      transcript: 'Transcript opening — this video has not been analysed',
+    }[v.summary_source] || '';
+
+    return `
+      <div class="detail-section fund-detail" id="video-detail">
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px">
+          <button type="button" class="filter-btn" data-video-back>← Back</button>
+          <h3 style="margin:0;font-size:15px;line-height:1.35">${escapeHtml(v.title || 'Video')}</h3>
+        </div>
+        <p class="tier-sub">${escapeHtml(v.channel_title || v.channel_id || 'YouTube')} ·
+          ${escapeHtml((v.published || '—').slice(0, 10))}
+          ${v.duration_seconds ? ' · ' + escapeHtml(formatClock(v.duration_seconds)) : ''}
+          ${v.views ? ' · ' + escapeHtml(String(v.views)) + ' views' : ''}
+          ${v.link ? ' · ' + linkHtml(v.link, 'Watch ↗', 'source-open-link') : ''}</p>
+
+        ${loading ? '<p class="tier-sub">Loading claims and highlights…</p>' : ''}
+
+        ${v.summary ? `
+        <div class="video-thesis">
+          <p>${escapeHtml(v.summary)}</p>
+          ${summarySource ? `<span class="video-thesis-src">${escapeHtml(summarySource)}</span>` : ''}
+        </div>` : ''}
+
+        ${chapters.length ? `
+        <h4 class="video-detail-head">CHAPTERS</h4>
+        <ul class="video-chapters">
+          ${chapters.map(c => `<li>${jump(c.link, c.t_start)}<span>${escapeHtml(c.topic || '')}</span></li>`).join('')}
+        </ul>` : ''}
+
+        ${byTicker.size ? `
+        <h4 class="video-detail-head">WHAT WAS CLAIMED</h4>
+        <div class="video-claims">
+          ${[...byTicker.entries()].map(([key, rows]) => `
+            <section class="video-claim-group">
+              <header>
+                ${rows[0].ticker
+                  ? videoTickerPill(rows[0].ticker, stances[rows[0].ticker], escapeHtml)
+                  : `<span class="mono">${escapeHtml(key)}</span>`}
+                ${rows[0].company && rows[0].ticker ? `<span class="video-company">${escapeHtml(rows[0].company)}</span>` : ''}
+                ${rows.some(r => r.self_reported)
+                  ? '<span class="badge video-selfreported" title="The speaker runs this business; the claim is interested and forward-looking">self-reported</span>'
+                  : ''}
+              </header>
+              ${rows.map(c => `
+                <article class="video-claim">
+                  <p class="video-claim-text">
+                    <span class="badge ${videoStanceClass(c.stance)}">${escapeHtml(c.stance || 'neutral')}</span>
+                    ${escapeHtml(c.claim)}
+                  </p>
+                  ${c.quote ? `<blockquote class="video-quote">${jump(c.link, c.t_start)}“${escapeHtml(c.quote)}”${c.speaker ? `<cite>— ${escapeHtml(c.speaker)}</cite>` : ''}</blockquote>` : ''}
+                </article>`).join('')}
+            </section>`).join('')}
+        </div>` : ''}
+
+        ${numbers.length ? `
+        <h4 class="video-detail-head">FIGURES CITED</h4>
+        <ul class="video-numbers">
+          ${numbers.map(n => `<li>${jump(n.link, n.t_start)}<strong class="mono">${escapeHtml(n.value)}</strong><span>${escapeHtml(n.what || '')}</span></li>`).join('')}
+        </ul>` : ''}
+
+        ${(v.themes || []).length ? `
+        <h4 class="video-detail-head">THEMES</h4>
+        <p class="video-themes">${(v.themes || []).map(t => `<span class="badge ${videoStanceClass(t.stance)}">${escapeHtml(t.theme || '')}</span>`).join(' ')}</p>` : ''}
+
+        ${evidence.length ? `
+        <h4 class="video-detail-head">WHY THESE TICKERS</h4>
+        <table class="video-evidence">
+          <thead><tr><th>Ticker</th><th>Basis</th><th>Mentions</th><th>Windows</th><th>Matched on</th></tr></thead>
+          <tbody>
+            ${evidence.map(e => `<tr>
+              <td>${videoTickerPill(e.ticker, stances[e.ticker], escapeHtml)}</td>
+              <td>${e.kind === 'sustained' ? 'sustained — admitted the video' : 'mentioned once or twice'}</td>
+              <td class="mono">${escapeHtml(String(e.mentions ?? '—'))}</td>
+              <td class="mono">${escapeHtml(String(e.distinct_chunks ?? '—'))}</td>
+              <td class="mono">${escapeHtml((e.aliases || []).join(', ') || '—')}</td>
+            </tr>`).join('')}
+          </tbody>
+        </table>` : ''}
+
+        <h4 class="video-detail-head">PROVENANCE</h4>
+        <ul class="video-prov">
+          <li><span>Transcript</span><b>${escapeHtml(prov.transcript_source === 'local_whisper' ? 'Local Whisper' : 'Published captions')}${prov.caption_manual_available ? ', human track available' : ''}${prov.caption_is_generated ? ', auto-generated' : ''}</b></li>
+          ${prov.transcript_chars ? `<li><span>Length</span><b class="mono">${escapeHtml(String(prov.transcript_chars))} chars${prov.chars_per_minute ? ' · ' + escapeHtml(String(prov.chars_per_minute)) + '/min' : ''}</b></li>` : ''}
+          ${prov.segment_count ? `<li><span>Timings</span><b class="mono">${escapeHtml(String(prov.segment_count))} anchors${prov.segment_coverage != null ? ' · ' + Math.round(prov.segment_coverage * 100) + '% of the caption track matched' : ''}</b></li>` : '<li><span>Timings</span><b>none — captions predate the timing sidecar, so claims carry no jump link</b></li>'}
+          ${analysis ? `
+          <li><span>Analysis</span><b class="mono">${escapeHtml(analysis.role || '')} · ${escapeHtml(String(analysis.chunks_analyzed || 0))} of ${escapeHtml(String(analysis.chunks_total || 0))} windows</b></li>
+          <li><span>Quotes verified</span><b class="mono">${analysis.quote_verified_rate != null ? Math.round(analysis.quote_verified_rate * 100) + '%' : '—'} of ${escapeHtml(String(analysis.quotes_checked || 0))} checked${analysis.tickers_rejected ? ' · ' + escapeHtml(String(analysis.tickers_rejected)) + ' ticker(s) corrected or dropped' : ''}</b></li>
+          <li><span>Analysed</span><b class="mono">${escapeHtml(analysis.analyzed_at || '—')}</b></li>`
+          : '<li><span>Analysis</span><b>not yet analysed — tickers below come from keyword matching only</b></li>'}
+        </ul>
+
+        <p class="tier-sub" style="margin-top:12px">
+          ${v.source_document ? evidenceLink(v.source_document, linkHtml, ghRepo, 'Transcript') : ''}
+        </p>
+      </div>`;
+  }
+
   function normalizePodcastGuests(guests) {
     if (!Array.isArray(guests)) return [];
     return guests.map(g => {
@@ -838,7 +997,11 @@
   }
 
   function renderVideoIndex(rows, byChannel, escapeHtml, linkHtml, opts = {}) {
-    const { bookOnly = false, search = '', period = null, statusCounts = {} } = opts;
+    const {
+      bookOnly = false, search = '', period = null, statusCounts = {},
+      ghRepo = '', sort = 'date',
+      selectedVideoId = null, videoDetail = null, videoDetailLoading = false,
+    } = opts;
     let list = Array.isArray(rows) ? rows.slice() : [];
     if (period) list = list.filter(r => periodMatchesRecord(r, period, ['published']));
     if (bookOnly) list = list.filter(r => (r.tickers || []).length);
@@ -846,8 +1009,32 @@
       const query = String(search).toLowerCase();
       list = list.filter(r => [
         r.channel_title, r.title, (r.tickers || []).join(' '),
-        (r.people || []).join(' '), (r.routes || []).join(' '), r.transcript_preview,
+        (r.people || []).join(' '), (r.routes || []).join(' '),
+        r.summary, r.transcript_preview,
       ].join(' ').toLowerCase().includes(query));
+    }
+
+    // Reverse-chronological is the right default for a feed and the wrong one
+    // for research: the most useful video in a 63-item corpus is rarely the
+    // newest. "Substance" ranks by what survived verification.
+    if (sort === 'relevance') {
+      list.sort((a, b) => {
+        const score = r => (r.claim_count || 0) * 3 + (r.tickers || []).length
+          + (r.has_analysis ? 2 : 0) + (r.has_timings ? 1 : 0);
+        return score(b) - score(a)
+          || String(b.published || '').localeCompare(String(a.published || ''));
+      });
+    }
+
+    if (selectedVideoId) {
+      const selected = list.find(r => r.video_id === selectedVideoId)
+        || (rows || []).find(r => r.video_id === selectedVideoId);
+      if (selected) {
+        return renderVideoDetail(selected, escapeHtml, linkHtml, ghRepo, {
+          detail: videoDetail && videoDetail.video_id === selectedVideoId ? videoDetail : null,
+          loading: videoDetailLoading && !(videoDetail && videoDetail.video_id === selectedVideoId),
+        });
+      }
     }
 
     const channels = Object.keys(byChannel || {}).length;
@@ -857,6 +1044,10 @@
     );
     const openCaptions = Number(statusCounts.pending || 0);
     const openWhisper = Number(statusCounts.whisper_pending || 0);
+    // Depth, not volume. The admitted count moves with the collection lane and
+    // says nothing about whether any of it has been read.
+    const analysedCount = (rows || []).filter(r => r.has_analysis).length;
+    const claimCount = (rows || []).reduce((n, r) => n + (r.claim_count || 0), 0);
     const formatDuration = (seconds) => {
       const total = Number(seconds || 0);
       if (!total) return '—';
@@ -869,10 +1060,18 @@
       <section class="video-research" aria-labelledby="video-research-title">
         <div class="video-research-head">
           <div><strong id="video-research-title">Transcript-gated video research</strong><span>Only videos that pass the spoken-content relevance gate appear here.</span></div>
-          <span class="video-freshness">Latest ${escapeHtml(newest ? newest.slice(0, 10) : '—')}</span>
+          <div class="video-head-right">
+            <div class="video-sort" role="group" aria-label="Sort videos">
+              <button type="button" class="filter-btn${sort === 'date' ? ' active' : ''}" data-video-sort="date">Newest</button>
+              <button type="button" class="filter-btn${sort === 'relevance' ? ' active' : ''}" data-video-sort="relevance">Substance</button>
+            </div>
+            <span class="video-freshness">Latest ${escapeHtml(newest ? newest.slice(0, 10) : '—')}</span>
+          </div>
         </div>
         <div class="video-screening-tape" aria-label="Video research screening status">
           <div><strong>${(rows || []).length}</strong><span>admitted</span></div>
+          <div><strong>${analysedCount}</strong><span>analysed</span></div>
+          <div><strong>${claimCount}</strong><span>verified claims</span></div>
           <div><strong>${channels}</strong><span>channels</span></div>
           <div><strong>${openCaptions}</strong><span>caption queue</span></div>
           <div><strong>${openWhisper}</strong><span>Whisper queue</span></div>
@@ -880,9 +1079,20 @@
         ${list.length ? `<div class="video-research-list">
           ${list.slice(0, 80).map(r => {
             const tickers = (r.tickers || []).slice(0, 8);
+            const stances = r.stances || {};
             const people = (r.people || []).slice(0, 4);
             const source = r.transcript_source === 'local_whisper' ? 'Local Whisper' : 'Published captions';
-            return `<article class="video-research-row">
+            // The body used to be transcript[:260], which on a spoken corpus is
+            // applause and a host clearing their throat. `summary` is the best
+            // available sentence and `summary_source` says where it came from.
+            const body = r.summary || r.transcript_preview
+              || 'Transcript admitted; open the source video for the full discussion.';
+            const marks = [
+              r.claim_count ? `${r.claim_count} claim${r.claim_count === 1 ? '' : 's'}` : '',
+              r.chapter_count ? `${r.chapter_count} chapters` : '',
+              r.has_timings ? 'timestamped' : '',
+            ].filter(Boolean);
+            return `<article class="video-research-row" data-video-id="${escapeHtml(r.video_id || '')}" style="cursor:pointer">
               <div class="video-research-topline">
                 <span>${escapeHtml(r.channel_title || r.channel_id || 'YouTube')}</span>
                 <span class="video-source-mark">${escapeHtml(source)}</span>
@@ -890,13 +1100,13 @@
               </div>
               <h3>${escapeHtml(r.title || 'Untitled video')}</h3>
               <div class="video-research-tags">
-                ${tickers.map(t => `<button type="button" class="linkish mono" data-select-ticker="${escapeHtml(t)}">${escapeHtml(t)}</button>`).join('')}
+                ${tickers.map(t => videoTickerPill(t, stances[t], escapeHtml)).join('')}
                 ${people.map(person => `<span>${escapeHtml(person)}</span>`).join('')}
                 ${!tickers.length && !people.length ? '<span>research method</span>' : ''}
               </div>
-              <p>${escapeHtml(r.transcript_preview || 'Transcript admitted; open the source video for the full discussion.')}</p>
+              <p${r.summary_source === 'transcript' ? ' class="video-body-raw"' : ''}>${escapeHtml(body)}</p>
               <footer>
-                <span>${escapeHtml(formatDuration(r.duration_seconds))}${r.views ? ` · ${escapeHtml(String(r.views))} views` : ''}${(r.routes || []).length ? ` · ${escapeHtml((r.routes || []).join(', ').replace(/_/g, ' '))}` : ''}</span>
+                <span>${escapeHtml(formatDuration(r.duration_seconds))}${r.views ? ` · ${escapeHtml(String(r.views))} views` : ''}${marks.length ? ` · ${escapeHtml(marks.join(' · '))}` : ''}</span>
                 ${r.link ? linkHtml(r.link, 'Watch source ↗', 'source-open-link') : ''}
               </footer>
             </article>`;
@@ -5031,6 +5241,10 @@
       selectedPodcastEpisodeId = null,
       podcastEpisodeDetail = null,
       podcastEpisodeDetailLoading = false,
+      videoSort = 'date',
+      selectedVideoId = null,
+      videoDetail = null,
+      videoDetailLoading = false,
       kpiTrends = null,
       inflectionTier = 'displayed',
       eventTier = 'signal',
@@ -5203,6 +5417,11 @@
           search: fundSearch,
           period,
           statusCounts: insights?.video_status_counts || {},
+          ghRepo,
+          sort: videoSort,
+          selectedVideoId,
+          videoDetail,
+          videoDetailLoading,
         },
       );
 } else if (activeSection === 'funds') {
@@ -5341,6 +5560,7 @@
     buildConsensusCsv,
     buildTimeModel,
     podcastEpisodeShardPath,
+    videoDetailShardPath,
     STANCE_BADGE,
   };
 })(window);

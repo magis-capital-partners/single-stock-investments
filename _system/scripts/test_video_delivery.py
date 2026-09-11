@@ -163,6 +163,30 @@ class VideoWorkflowContractTests(unittest.TestCase):
         self.assertIn("Transcript-gated video research", viz)
         self.assertIn(".video-screening-tape", css)
 
+    def test_video_detail_is_fetched_on_click_not_bundled(self):
+        """Sixty-three shards inlined would be a payload downloaded to render a list."""
+        html = (ROOT / "dashboard" / "index.html").read_text(encoding="utf-8")
+        viz = (ROOT / "dashboard" / "insights-viz.js").read_text(encoding="utf-8")
+        css = (ROOT / "dashboard" / "insights-events.css").read_text(encoding="utf-8")
+        self.assertIn("videoDetailShardPath", viz)
+        self.assertIn("renderVideoDetail", viz)
+        self.assertIn("data-video-id", viz)
+        self.assertIn("data-video-back", viz)
+        self.assertIn("data/insights/video_details/", html)
+        self.assertIn("videoDetailCache", html)
+        self.assertIn("#video-detail", css)
+
+    def test_the_index_row_stays_lean(self):
+        """Evidence belongs in the shard fetched on click, not in the list payload."""
+        published = ROOT / "dashboard" / "data" / "insights" / "videos.json"
+        if not published.exists():
+            self.skipTest("no published catalog in this checkout")
+        rows = json.loads(published.read_text(encoding="utf-8")).get("video_index") or []
+        if not rows:
+            self.skipTest("empty catalog")
+        for heavy in ("ticker_evidence", "claims", "numbers", "chapters", "description"):
+            self.assertNotIn(heavy, rows[0], f"{heavy} belongs in the detail shard")
+
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)

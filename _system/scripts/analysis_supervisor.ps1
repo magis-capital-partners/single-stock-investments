@@ -1,6 +1,7 @@
 <#
 .SYNOPSIS
-    Keep the local-model podcast analysis draining, and keep its model server up.
+    Keep the local-model analysis draining -- podcasts and videos -- and keep its
+    model server up.
 
 .DESCRIPTION
     Companion to whisper_supervisor.ps1, and written after the same lesson: the
@@ -30,6 +31,20 @@
     night's transcription when two Whisper daemons ran on 2026-08-25. A global
     mutex makes it impossible on this host; the batch's own lock file is the
     second line, not the first.
+
+    **Two queues, one supervisor.** The video corpus needs the same local model
+    as the podcast one, and running both at once is the mistake this whole file
+    is shaped around -- Whisper beside llama-server measured 5.5x slower than
+    the two in sequence. A second supervisor with its own mutex would have
+    exactly that effect, and giving both supervisors the *same* mutex would be
+    worse: this one holds it while idling for an hour on an empty queue, so the
+    video lane would simply never run. One process draining both queues is the
+    only arrangement where the constraint holds by construction.
+
+    Videos go first while any remain. The corpus is 63 items against roughly
+    eight hundred episodes, so it drains in a night and is thereafter a trickle
+    of one or two a day -- after which this lane is almost always empty and the
+    podcast queue has the box to itself.
 
 .PARAMETER Model
     Identifier the batch asks the server for. Must match what -ModelPath is
@@ -93,6 +108,16 @@ function Rotate-Log {
 $lms    = Join-Path $env:USERPROFILE '.lmstudio\bin\lms.exe'
 $python = 'python'
 
+function Get-Remaining {
+    # -1 means "could not tell", which the caller must not confuse with zero:
+    # treating an unreadable status as an empty queue is how a lane goes quiet
+    # while reporting healthy.
+    param([string] $BatchPath)
+    $json = & $python $BatchPath '--status' | Out-String
+    try   { return [int]((ConvertFrom-Json $json).remaining) }
+    catch { return -1 }
+}
+
 function Test-ModelReady {
     & $python (Join-Path $repo '_system\scripts\llm_ready.py') '--model' $Model | Out-Null
     return ($LASTEXITCODE -eq 0)
@@ -129,7 +154,8 @@ if (-not $mutex.WaitOne(0)) {
     exit 0
 }
 
-$batch  = Join-Path $repo '_system\scripts\analyze_podcast_batch.py'
+$batch      = Join-Path $repo '_system\scripts\analyze_podcast_batch.py'
+$videoBatch = Join-Path $repo '_system\scripts\analyze_video_batch.py'
 $env:PYTHONUNBUFFERED = '1'
 
 Write-Log "supervisor start: model=$Model hours=$Hours push=${PushMins}m repo=$repo"
@@ -149,45 +175,57 @@ try {
             Write-Log "model ready ($Model)"
         }
 
-        # Ask the batch what is left. It is the only thing that knows what
-        # "eligible" means -- 25 KB of text that survives per-show boilerplate
-        # removal -- and it re-derives that from disk every time.
-        $statusJson = & $python $batch '--status' | Out-String
-        try   { $remaining = [int]((ConvertFrom-Json $statusJson).remaining) }
-        catch { $remaining = -1 }
+        # Ask each batch what is left. Each is the only thing that knows what
+        # "eligible" means for its own corpus -- 25 KB of text surviving
+        # per-show boilerplate removal for podcasts, an admitted relevance gate
+        # for videos -- and both re-derive it from disk every time.
+        $videoRemaining = Get-Remaining $videoBatch
+        $remaining      = Get-Remaining $batch
 
-        if ($remaining -lt 0) {
+        if ($remaining -lt 0 -and $videoRemaining -lt 0) {
             Write-Log "could not read analysis status; retrying in $backoff s"
             Start-Sleep -Seconds $backoff
             $backoff = [Math]::Min($backoff * 2, $MaxBackoff)
             continue
         }
 
-        if ($remaining -eq 0) {
+        # Videos first while any remain: a small corpus that finishes, ahead of
+        # a large one that is always refilling.
+        if ($videoRemaining -gt 0) {
+            $activeBatch = $videoBatch
+            $activeLane  = 'video'
+            $activeCount = $videoRemaining
+        } else {
+            $activeBatch = $batch
+            $activeLane  = 'podcast'
+            $activeCount = $remaining
+        }
+
+        if ($activeCount -le 0) {
             if ($ExitWhenEmpty) {
                 Write-Log 'queue empty; supervisor done'
                 break
             }
             # Whisper is still feeding this queue; idling is the working state,
             # not the finished one.
-            Write-Log "queue empty; re-checking in $IdleMins m"
+            Write-Log "both queues empty; re-checking in $IdleMins m"
             Start-Sleep -Seconds ($IdleMins * 60)
             continue
         }
 
-        Write-Log "starting batch ($remaining remaining)"
+        Write-Log "starting $activeLane batch ($activeCount remaining; video=$videoRemaining podcast=$remaining)"
         $started = Get-Date
         # Not Tee-Object: on 5.1 its -FilePath has no encoding parameter and
         # writes UTF-16LE, which interleaves with the UTF-8 Write-Log appends
         # and leaves the log unreadable. Echo and append explicitly.
-        & $python '-u' $batch '--model' $Model '--hours' "$Hours" '--push-every-minutes' "$PushMins" 2>&1 |
+        & $python '-u' $activeBatch '--model' $Model '--hours' "$Hours" '--push-every-minutes' "$PushMins" 2>&1 |
             ForEach-Object {
                 Write-Host $_
                 Add-Content -Path $log -Value $_ -Encoding utf8
             }
         $code = $LASTEXITCODE
         $ran  = [int]((Get-Date) - $started).TotalSeconds
-        Write-Log "batch exited code=$code after ${ran}s"
+        Write-Log "$activeLane batch exited code=$code after ${ran}s"
 
         # A run that did real work resets the backoff; one that died immediately
         # is a signal, not a blip. 600s is roughly one slow episode, so anything

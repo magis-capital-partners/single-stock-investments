@@ -16,6 +16,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "_system" / "scripts"))
 
+import transcript_segments  # noqa: E402
 from vault_paths import podcasts_root  # noqa: E402
 
 PODCASTS_CFG = ROOT / "_system" / "reference" / "podcasts"
@@ -248,13 +249,23 @@ def _whisper_model(size: str):
     return _WHISPER_CACHE[size]
 
 
-def whisper_transcribe(audio_path: Path, episode: dict | None = None) -> str | None:
+def whisper_transcribe(
+    audio_path: Path,
+    episode: dict | None = None,
+    segments_out: list | None = None,
+) -> str | None:
     """Transcribe with faster-whisper (preferred) or openai-whisper CLI.
 
     `episode` supplies the title/show used to build hotwords. Passing it is what
     recovers proper nouns -- without it the decoder has no reason to prefer
     "Murray Stahl" over "Murray stole the", and a mangled name never resolves to
     a ticker. See whisper_vocab.build_hotwords for the measured effect.
+
+    `segments_out`, when given, is extended with the timing index for the text
+    returned. It stays an out-parameter rather than a second return value
+    because every existing caller wants the string and only the video lane wants
+    the timings; the CLI fallback leaves it empty, since that path only ever
+    produces a finished .txt with no segment boundaries to recover.
     """
     hotwords = None
     if episode:
@@ -278,9 +289,20 @@ def whisper_transcribe(audio_path: Path, episode: dict | None = None) -> str | N
                 vad_filter=True,
                 hotwords=hotwords,
             )
+            segments = list(segments)
             parts = [seg.text.strip() for seg in segments if seg.text]
             text = "\n".join(parts).strip()
             if text:
+                # seg.start arrives free and used to be discarded here. Index it
+                # against the finished text so the joining rule above stays the
+                # single authority on what a transcript looks like.
+                if segments_out is not None:
+                    segments_out.extend(transcript_segments.index_parts(
+                        text,
+                        ((getattr(s, "start", None),
+                          (getattr(s, "end", None) or 0) - (getattr(s, "start", None) or 0),
+                          s.text) for s in segments),
+                    ))
                 return text
         except Exception:
             # A missing checkpoint, an OOM, or a corrupt download all land here.
