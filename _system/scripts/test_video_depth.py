@@ -302,6 +302,22 @@ class LocalModelConcurrencyTests(unittest.TestCase):
             "a second analysis supervisor is exactly the concurrency this prevents",
         )
 
+    def test_the_vault_push_stages_videos_not_podcasts(self):
+        """_push_locked stages one corpus directory and defaults to podcasts.
+
+        Reusing it unchanged staged the podcast lane's in-progress files,
+        committed them under a "chore(videos)" message, and left every video
+        result uncommitted.
+        """
+        import inspect
+
+        import analyze_podcast_batch as apb
+        import analyze_video_batch
+
+        self.assertIn("subdir", inspect.signature(apb._push_locked).parameters)
+        source = inspect.getsource(analyze_video_batch.vault_push)
+        self.assertIn('subdir="videos"', source)
+
     def test_the_batch_reports_remaining_for_the_supervisor(self):
         import analyze_video_batch
 

@@ -377,9 +377,17 @@ def vault_push(message: str) -> bool:
         return False
 
 
-def _push_locked(repo: Path, message: str) -> bool:
+def _push_locked(repo: Path, message: str, subdir: str = "podcasts") -> bool:
+    """Commit and push one corpus directory of the vault.
+
+    `subdir` exists because the video batch reuses this function. Hardcoding
+    "podcasts" here meant a video run staged the podcast lane's in-progress
+    files, committed them under a message that said "chore(videos)", and left
+    every video result uncommitted -- the one lane whose work was being pushed
+    was the one not being analysed. Stage only the corpus the caller is writing.
+    """
     try:
-        run_git(repo, "add", "-A", "podcasts", timeout=300)
+        run_git(repo, "add", "-A", subdir, timeout=300)
         staged = run_git(repo, "diff", "--cached", "--quiet", check=False, timeout=120)
         if staged.returncode == 0:
             return False

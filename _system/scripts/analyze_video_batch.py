@@ -191,7 +191,11 @@ def vault_push(message: str) -> bool:
         with vault_lock(repo, owner="analyze_video_batch",
                         log=lambda m: print(f"[{_stamp()}]{m}", flush=True)):
             clear_stale_git_state(repo, log=lambda m: print(f"[{_stamp()}]{m}", flush=True))
-            return apb._push_locked(repo, message)
+            # "videos", not the default: this function stages one corpus
+            # directory, and staging the podcast lane's in-progress files under
+            # a "chore(videos)" message would commit the wrong work and skip
+            # the right work.
+            return apb._push_locked(repo, message, subdir="videos")
     except TimeoutError as exc:
         print(f"[{_stamp()}] vault lock: {exc}; skipping this push", flush=True)
         return False
