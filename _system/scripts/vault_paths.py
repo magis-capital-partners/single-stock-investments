@@ -15,6 +15,7 @@ ROOT = Path(__file__).resolve().parents[2]
 LETTERS_REF_PREFIX = "_system/reference/superinvestor-letters"
 WISDOM_REF_PREFIX = "_system/reference/investment-wisdom"
 SUMZERO_REF_PREFIX = "_system/reference/sumzero-research"
+VIC_REF_PREFIX = "_system/reference/vic-research"
 PODCASTS_REF_PREFIX = "_system/reference/podcasts"
 VIDEOS_REF_PREFIX = "_system/reference/video"
 
@@ -22,6 +23,7 @@ VIDEOS_REF_PREFIX = "_system/reference/video"
 LEGACY_LETTERS = ROOT / "_system" / "reference" / "superinvestor-letters"
 LEGACY_WISDOM = ROOT / "_system" / "reference" / "investment-wisdom"
 LEGACY_SUMZERO = ROOT / "_system" / "reference" / "sumzero-research"
+LEGACY_VIC = ROOT / "_system" / "reference" / "vic-research"
 LEGACY_PODCASTS = ROOT / "_system" / "reference" / "podcasts" / "_corpus"
 LEGACY_VIDEOS = ROOT / "_system" / "reference" / "video" / "_corpus"
 
@@ -93,6 +95,10 @@ def sumzero_root(*, create: bool = False) -> Path:
     return _vault_subdir("sumzero-research", LEGACY_SUMZERO, create=create)
 
 
+def vic_root(*, create: bool = False) -> Path:
+    return _vault_subdir("vic-research", LEGACY_VIC, create=create)
+
+
 def podcasts_root(*, create: bool = False) -> Path:
     """Transcript corpus root (research-vault/podcasts or legacy _corpus)."""
     return _vault_subdir("podcasts", LEGACY_PODCASTS, create=create)
@@ -135,6 +141,11 @@ def podcasts_ref(relative: str | Path = "") -> str:
     return f"{PODCASTS_REF_PREFIX}/{rel}" if rel else PODCASTS_REF_PREFIX
 
 
+def vic_ref(relative: str | Path = "") -> str:
+    rel = str(relative).replace("\\", "/").lstrip("/")
+    return f"{VIC_REF_PREFIX}/{rel}" if rel else VIC_REF_PREFIX
+
+
 def videos_ref(relative: str | Path = "") -> str:
     rel = str(relative).replace("\\", "/").lstrip("/")
     return f"{VIDEOS_REF_PREFIX}/{rel}" if rel else VIDEOS_REF_PREFIX
@@ -157,6 +168,9 @@ def resolve_ref_to_path(ref: str | None) -> Path | None:
     if base.startswith(SUMZERO_REF_PREFIX + "/") or base == SUMZERO_REF_PREFIX:
         suffix = base[len(SUMZERO_REF_PREFIX) :].lstrip("/")
         return sumzero_root() / suffix if suffix else sumzero_root()
+    if base.startswith(VIC_REF_PREFIX + "/") or base == VIC_REF_PREFIX:
+        suffix = base[len(VIC_REF_PREFIX) :].lstrip("/")
+        return vic_root() / suffix if suffix else vic_root()
     if base.startswith(PODCASTS_REF_PREFIX + "/") or base == PODCASTS_REF_PREFIX:
         suffix = base[len(PODCASTS_REF_PREFIX) :].lstrip("/")
         # Config JSON lives in-repo under PODCASTS_REF_PREFIX; episode corpus is vault.
@@ -242,6 +256,8 @@ def vault_status() -> dict:
         "wisdom_exists": wisdom_root().is_dir(),
         "podcasts_root": str(podcasts),
         "podcasts_exists": podcasts.is_dir(),
+        "vic_root": str(vic_root()),
+        "vic_exists": vic_root().is_dir(),
         "using_vault": vault is not None and str(letters).startswith(str(vault)),
         "env_research_vault_root": os.environ.get("RESEARCH_VAULT_ROOT"),
     }

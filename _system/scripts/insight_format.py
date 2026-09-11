@@ -16,6 +16,7 @@ TICKER_SPECIFIC_SOURCES = frozenset(
         "news",
         "third_party",
         "sumzero_research",
+        "vic_research",
         "earnings",
     }
 )

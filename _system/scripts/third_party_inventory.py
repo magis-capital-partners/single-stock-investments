@@ -206,8 +206,8 @@ def _vic_sources(ticker: str) -> list[dict]:
                 "source_id": "vic",
                 "title": title[:120],
                 "path": _rel(f),
-                "status": "pending",
-                "use": "VIC local single-page intake; human approval required",
+                "status": "context",
+                "use": "Value Investors Club (licensed corpus; variant view, not base IRR)",
             }
         )
     return out

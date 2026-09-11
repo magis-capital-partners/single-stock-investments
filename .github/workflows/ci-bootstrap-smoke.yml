@@ -38,6 +38,8 @@ on:
       - "_system/scripts/third_party_inventory.py"
       - "_system/scripts/workflow_run_deploy_gate.py"
       - "_system/scripts/test_import_drive_intake.py"
+      - "_system/scripts/test_vic_vault.py"
+      - "_system/scripts/vic_vault.py"
       - "_system/scripts/test_materialize_drive_credentials.py"
       - "_system/scripts/test_workflow_run_deploy_gate.py"
       - "_system/reference/document-store/google_drive_config.json"
@@ -84,6 +86,8 @@ on:
       - "_system/scripts/third_party_inventory.py"
       - "_system/scripts/workflow_run_deploy_gate.py"
       - "_system/scripts/test_import_drive_intake.py"
+      - "_system/scripts/test_vic_vault.py"
+      - "_system/scripts/vic_vault.py"
       - "_system/scripts/test_materialize_drive_credentials.py"
       - "_system/scripts/test_workflow_run_deploy_gate.py"
       - "_system/reference/document-store/google_drive_config.json"
@@ -171,9 +175,11 @@ jobs:
             /_system/scripts/requirements.txt
             /_system/scripts/test_import_drive_intake.py
             /_system/scripts/test_materialize_drive_credentials.py
+            /_system/scripts/test_vic_vault.py
             /_system/scripts/test_workflow_run_deploy_gate.py
             /_system/scripts/third_party_inventory.py
             /_system/scripts/vault_paths.py
+            /_system/scripts/vic_vault.py
             /_system/scripts/workflow_run_deploy_gate.py
             /TPL/README.md
           sparse-checkout-cone-mode: false
@@ -187,6 +193,7 @@ jobs:
           python -m unittest \
             _system.scripts.test_import_drive_intake \
             _system.scripts.test_materialize_drive_credentials \
+            _system.scripts.test_vic_vault \
             _system.scripts.test_workflow_run_deploy_gate
 
   ci-push-rebase:

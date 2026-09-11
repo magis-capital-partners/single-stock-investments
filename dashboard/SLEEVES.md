@@ -22,4 +22,4 @@ Holdings-table **D** / **M** buttons open the matching tab with that ticker in t
 
 ## Letters and books
 
-Michael's Cursor bot files new PDFs per [`_system/agents/MICHAEL.md`](../_system/agents/MICHAEL.md). Letters go to Drive `Letters/{YYYY Qn}/` then the research vault. Books go to `Research Sources/Investment Wisdom/{author}/`. Ticker writeups use `Admin/Intake`. Do not mix those three.
+Michael's Cursor bot files new PDFs per [`_system/agents/MICHAEL.md`](../_system/agents/MICHAEL.md). Letters go to Drive `Letters/{YYYY Qn}/` then the research vault. Books go to `Research Sources/Investment Wisdom/{author}/`. VIC writeups use `Admin/Intake` then vault `vic-research/`. Other ticker writeups stay under `Admin/Intake`. Do not mix those paths.

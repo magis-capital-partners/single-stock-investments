@@ -207,7 +207,7 @@ def claim_type(row: dict) -> str:
         return "ownership"
     if source == "biotech_quant_library" or row.get("claim_type") == "methodology":
         return "methodology"
-    if source in {"superinvestor_letter", "sumzero_research", "third_party"}:
+    if source in {"superinvestor_letter", "sumzero_research", "vic_research", "third_party"}:
         return "thesis"
     if axis == "ownership" or "13f" in text or "insider" in text:
         return "ownership"
@@ -265,6 +265,7 @@ def confidence_score(row: dict) -> int:
         "news": 8,
         "third_party": 7,
         "sumzero_research": 7,
+        "vic_research": 7,
         "proposed_belief": 5,
     }.get(source, 4)
     final = score + bonus
@@ -282,6 +283,7 @@ def source_type(row: dict) -> str:
         "superinvestor_letter": "letter",
         "third_party": "third_party_research",
         "sumzero_research": "third_party_research",
+        "vic_research": "third_party_research",
         "news": "news",
         "filing": "filing",
         "earnings": "earnings",

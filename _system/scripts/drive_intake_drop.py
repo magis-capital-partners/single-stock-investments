@@ -2,8 +2,8 @@
 """Drop a local PDF onto Shared Drive Admin/Intake/{Kind}/{TICKER}/.
 
 Cloud Grok uses this after ``GOOGLE_APPLICATION_CREDENTIALS`` is materialized.
-Drive Intake Sync then imports into the ticker folder. VIC does not go in
-research-vault.
+Drive Intake Sync then imports into the ticker folder and research-vault
+`vic-research/{TICKER}/` (text extract committed; PDFs gitignored in the vault).
 """
 from __future__ import annotations
 

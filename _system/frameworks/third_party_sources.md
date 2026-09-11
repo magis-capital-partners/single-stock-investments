@@ -18,7 +18,7 @@
 
 **Horizon Kinetics** quarterly commentaries and Stahl shelf essays default to **context** until human adds an approved row. Workflow: `hk_cross_reference.md`.
 
-**Value Investors Club** intakes default to **pending**. Use `_system/agents/GROK.md` and `_system/scripts/drive_intake_drop.py`; `_system/frameworks/vic_local_intake.md` records the retired local-bookmarklet route. Do not automate VIC login, scheduled crawls, or bulk retrieval.
+**Value Investors Club** is a licensed idea corpus like SumZero. Intakes are **context** on arrival (no per-writeup approval). Use `_system/agents/GROK.md` and `_system/scripts/drive_intake_drop.py`; `_system/frameworks/vic_local_intake.md` records the retired local-bookmarklet route. Do not automate VIC login, scheduled crawls, or bulk retrieval. Cite VIC as variant perception. Do not put VIC numbers in base IRR.
 
 ---
 
@@ -86,7 +86,7 @@ Marvin scans `{TICKER}/investor-documents/research-notes/` and flags new files h
 | File | Purpose |
 |------|---------|
 | `{TICKER}/third-party-analyses/references.md` | Index of approved + pending URLs/PDFs + HK scan |
-| `{TICKER}/third-party-analyses/vic/*.md` | Local single-page VIC intakes; pending until human approval |
+| `{TICKER}/third-party-analyses/vic/*.md` | Local single-page VIC intakes; context (licensed corpus, no per-file approval) |
 | `{TICKER}/third-party-analyses/hk_scan_{date}.md` | Auto HK / Stahl source map (`scan_hk_sources.py`) |
 | `{TICKER}/third-party-analyses/pending.md` | Queue for human approval |
 | `{TICKER}/research/cross_check_*` | Agreements / divergences / synthesis |

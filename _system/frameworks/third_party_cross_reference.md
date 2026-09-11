@@ -14,6 +14,7 @@
 | **Approved Substacks** | `{TICKER}/third-party-analyses/references.md` | context (approved publisher) |
 | **Research notes PDFs** | `{TICKER}/investor-documents/research-notes/` | pending until approved |
 | **Horizon Kinetics / Stahl** | `hk_scan_*.md` when indexed | context |
+| **VIC** | `{TICKER}/third-party-analyses/vic/` + vault `vic-research/` | context (licensed corpus; no per-file approval) |
 | **Short / activist** | `{TICKER}/third-party-analyses/short_reports/` | context |
 | **Pending queue** | `{TICKER}/third-party-analyses/pending.md` | pending |
 

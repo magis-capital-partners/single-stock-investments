@@ -57,6 +57,10 @@ def source_type_for(path: Path) -> str:
         return "superinvestor_letter"
     if "_system" in parts and "sumzero-research" in parts:
         return "sumzero_research"
+    if "_system" in parts and "vic-research" in parts:
+        return "vic_research"
+    if "third-party-analyses" in parts and "vic" in parts:
+        return "vic_research"
     if "third-party-analyses" in parts:
         return "third_party"
     if "investor-documents" in parts:
@@ -82,7 +86,7 @@ def drive_roots(config: dict) -> dict:
         "general_pdfs": {
             "folder_id": DEFAULT_GENERAL_DRIVE_FOLDER_ID,
             "label": "General Investment PDFs Hub",
-            "source_types": ["third_party", "company_document", "research", "dropbox_ingestion", "sumzero_research", "activist_long", "activist_short", "activist_report", "pdf"],
+            "source_types": ["third_party", "company_document", "research", "dropbox_ingestion", "sumzero_research", "vic_research", "activist_long", "activist_short", "activist_report", "pdf"],
         },
     }
 
@@ -129,6 +133,11 @@ def drive_folder_path_for(path: Path) -> str:
         if rest[0] == "_unmatched":
             return "/".join(["Research Sources", "SumZero Unmatched", *rest[1:]])
         return "/".join(["Single Stocks", rest[0], "SumZero", *rest[1:]])
+    if parts[:3] == ["_system", "reference", "vic-research"]:
+        rest = parts[3:]
+        if rest:
+            return "/".join(["Single Stocks", rest[0], "VIC", *rest[1:]])
+        return "Research Sources/Uncategorized"
     if len(parts) >= 2 and parts[1] == "third-party-analyses":
         ticker, rest = parts[0], parts[2:]
         if rest and rest[0].lower() == "activist_reports":
