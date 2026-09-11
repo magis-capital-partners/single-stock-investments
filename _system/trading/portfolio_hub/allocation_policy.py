@@ -79,6 +79,12 @@ def classify_policy_position(
     if classification.bucket == "etf_ls":
         return PolicyAllocation("unallocated", "letf", "ls_algo_universe_exclusion")
     if classification.bucket == "drew":
+        # LS-algo option overlays are Drew's for custody, but they are not
+        # single-stock holdings -- they are written against a systematic pair
+        # leg. Keep the owner and correct the strategy label so hub reporting
+        # does not fold them into the discretionary book.
+        if classification.reason == "ls_algo_option_overlay":
+            return PolicyAllocation("drew", "letf_option_overlay", classification.reason)
         return PolicyAllocation("drew", "single_stock", "drew_sleeve_holding")
     if classification.bucket == "ignored":
         return PolicyAllocation("unallocated", "other", classification.reason)
