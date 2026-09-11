@@ -32,6 +32,7 @@ SOURCE_PRIORITY = {
     "company_document": 1,
     "third_party": 2,
     "sumzero_research": 3,
+    "vic_research": 3,
     "research": 4,
     "dropbox_ingestion": 5,
     "pdf": 6,

@@ -100,6 +100,7 @@ SOURCE_META = {
     "podcast_episode": {"label": "Podcast", "materiality": 0.72, "quality": 0.75, "axis": "variant_view"},
     "video_research": {"label": "Video", "materiality": 0.72, "quality": 0.75, "axis": "variant_view"},
     "sumzero_research": {"label": "SumZero", "materiality": 0.64, "quality": 0.68, "axis": "variant_view"},
+    "vic_research": {"label": "VIC", "materiality": 0.64, "quality": 0.68, "axis": "variant_view"},
     "reddit_mention": {"label": "Reddit", "materiality": 0.42, "quality": 0.4, "axis": "context"},
     "news": {"label": "News", "materiality": 0.72, "quality": 0.7, "axis": "catalyst"},
     "third_party": {"label": "Research", "materiality": 0.58, "quality": 0.58, "axis": "variant_view"},
@@ -1257,9 +1258,10 @@ def from_third_party(ticker_dir: Path, ticker: str) -> list[dict]:
         status = src.get("status") or "context"
         confidence = "med" if status in {"approved", "context"} else "low"
         use = src.get("use") or status
+        source_name = "vic_research" if (src.get("source_id") == "vic") else "third_party"
         out.append(
             insight_record(
-                source="third_party",
+                source=source_name,
                 as_of=src.get("date") or doc.get("as_of") or doc.get("scan_date"),
                 scope="ticker",
                 ref=ticker,

@@ -33,7 +33,7 @@ python _system/scripts/materialize_drive_credentials.py --require
 python _system/scripts/drive_intake_drop.py --kind VIC --ticker TPL path\to\writeup.pdf
 ```
 
-Requires `GOOGLE_APPLICATION_CREDENTIALS`, `GOOGLE_APPLICATION_CREDENTIALS_JSON` (Cloud Agent secret), or `_secrets/google-service-account.json`. Repeating the same file is safe: the uploader checks its content hash and returns `already_present` instead of creating another Drive object. VIC still does not go in research-vault. Prompt: `_system/agents/GROK.md`.
+Requires `GOOGLE_APPLICATION_CREDENTIALS`, `GOOGLE_APPLICATION_CREDENTIALS_JSON` (Cloud Agent secret), or `_secrets/google-service-account.json`. Repeating the same file is safe: the uploader checks its content hash and returns `already_present` instead of creating another Drive object. VIC also stages into research-vault `vic-research/{TICKER}/` on the daily import (PDF gitignored; text extract committed). Prompt: `_system/agents/GROK.md`.
 
 ## Where To Drop PDFs
 

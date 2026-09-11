@@ -21,6 +21,7 @@ under the configured intake root before scanning.
 
 Canonical repo destinations:
   {TICKER}/third-party-analyses/vic/*.pdf
+  research-vault/vic-research/{TICKER}/*.pdf  (VIC only; text extract committed)
   {TICKER}/third-party-analyses/drive-intake/*.pdf
   {TICKER}/investor-documents/drive-intake/*.pdf
 """
@@ -74,6 +75,7 @@ from drive_store_common import (  # noqa: E402
 )
 from intake_ticker_resolve import resolve_ticker_from_pdf  # noqa: E402
 from third_party_inventory import write_inventory  # noqa: E402
+from vic_vault import backfill_existing_vic, stage_vic_to_vault  # noqa: E402
 
 try:
     from activist_common import load_ticker_index, save_ticker_index, upsert_report  # noqa: E402
@@ -510,6 +512,36 @@ def import_intake(
             )
 
         write_sidecar(dest, item, parsed, digest)
+        if parsed["intake_kind"] == "vic":
+            try:
+                vault_info = stage_vic_to_vault(
+                    parsed["ticker"],
+                    pdf_path=dest,
+                    filename=dest.name,
+                )
+                parsed["vault_pdf_ref"] = vault_info.get("vault_ref")
+                parsed["vault_status"] = vault_info.get("status")
+                if vault_info.get("status") == "skipped_no_vault":
+                    warnings.append(
+                        {
+                            "drive_file_id": file_id,
+                            "path": path,
+                            "ticker": parsed.get("ticker"),
+                            "error": "vic_vault_unavailable",
+                            "local_pdf_path": rel(dest),
+                        }
+                    )
+            except Exception as exc:  # noqa: BLE001
+                warnings.append(
+                    {
+                        "drive_file_id": file_id,
+                        "path": path,
+                        "ticker": parsed.get("ticker"),
+                        "error": "vic_vault_stage_failed",
+                        "detail": str(exc),
+                        "local_pdf_path": rel(dest),
+                    }
+                )
         manifest["files"][file_id] = {
             "imported_at": now_iso(),
             "status": status,
@@ -525,6 +557,8 @@ def import_intake(
             "ticker_resolve_method": parsed.get("ticker_resolve_method"),
             "ticker_candidates": parsed.get("ticker_candidates"),
             "drive_moved_to": parsed.get("drive_moved_to"),
+            "vault_pdf_ref": parsed.get("vault_pdf_ref"),
+            "vault_status": parsed.get("vault_status"),
         }
         manifest_changed = True
         imported.append({**manifest["files"][file_id], "target": rel(dest), **move_info})
@@ -560,6 +594,10 @@ def import_intake(
             if extract_ticker_activist_text:
                 extract_ticker_activist_text(ticker)
 
+    vic_vault_backfill = {}
+    if not dry_run:
+        vic_vault_backfill = backfill_existing_vic()
+
     report = {
         "generated_at": now_iso(),
         "dry_run": dry_run,
@@ -568,6 +606,7 @@ def import_intake(
         "configured_root_folders": [web_folder_url(root_id) for root_id in root_ids],
         "intake_folder_paths": INTAKE_FOLDER_PATHS,
         "ensured_intake_folders": ensured_folders,
+        "vic_vault_backfill": vic_vault_backfill,
         "summary": {
             "imported_count": len(imported),
             "skipped_count": len(skipped),

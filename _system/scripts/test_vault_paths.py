@@ -21,6 +21,7 @@ class VaultPathsTests(unittest.TestCase):
         os.environ["RESEARCH_VAULT_ROOT"] = self._tmpdir.name
         (Path(self._tmpdir.name) / "superinvestor-letters").mkdir()
         (Path(self._tmpdir.name) / "investment-wisdom").mkdir()
+        (Path(self._tmpdir.name) / "vic-research").mkdir()
 
     def tearDown(self) -> None:
         if self._old_env is None:
@@ -49,6 +50,20 @@ class VaultPathsTests(unittest.TestCase):
         status = vp.vault_status()
         self.assertTrue(status["letters_exists"])
         self.assertTrue(status["using_vault"])
+        self.assertTrue(status["vic_exists"])
+
+    def test_vic_root_uses_vault(self) -> None:
+        root = vp.vic_root()
+        self.assertTrue(str(root).endswith("vic-research"))
+        self.assertEqual(root.parent, Path(self._tmpdir.name))
+
+    def test_vic_ref_prefix_stable(self) -> None:
+        ref = vp.vic_ref("TPL/idea.pdf")
+        self.assertTrue(ref.startswith("_system/reference/vic-research/"))
+        txt = vp.vic_root() / "TPL/idea.txt"
+        txt.parent.mkdir(parents=True, exist_ok=True)
+        txt.write_text("x", encoding="utf-8")
+        self.assertEqual(vp.resolve_ref_to_path(ref.replace(".pdf", ".txt")), txt)
 
 
 if __name__ == "__main__":

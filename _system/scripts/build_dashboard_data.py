@@ -467,6 +467,7 @@ def source_type_label(source_type: str | None) -> str:
         "activist_short": "Activist (short)",
         "activist_report": "Activist",
         "sumzero_research": "SumZero",
+        "vic_research": "VIC",
         "research": "Research",
         "dropbox_ingestion": "Dropbox ingestion",
         "pdf": "Other PDFs",
@@ -2183,6 +2184,7 @@ SOURCE_PRIORITY = {
     "superinvestor_letter": 3,
     "news": 4,
     "sumzero_research": 5,
+    "vic_research": 5,
     "third_party": 6,
     "macro": 7,
     "theme": 8,
@@ -2706,7 +2708,7 @@ def coverage_gap_reasons(row: dict) -> list[str]:
     freshness = essential.get("freshness_days")
     if isinstance(freshness, int) and freshness > 90:
         reasons.append("stale source")
-    outside_research_sources = {"third_party", "sumzero_research"}
+    outside_research_sources = {"third_party", "sumzero_research", "vic_research"}
     if not (outside_research_sources & set(essential.get("source_mix") or [])):
         reasons.append("no third-party check")
     dossier = row.get("dossier")
@@ -2932,6 +2934,10 @@ def build_ticker_row(
         sumzero_row = next((r for r in full_insights if r.get("source") == "sumzero_research"), None)
         if sumzero_row:
             display_insights = [*display_insights[:11], sumzero_row]
+    if not any(r.get("source") == "vic_research" for r in display_insights):
+        vic_row = next((r for r in full_insights if r.get("source") == "vic_research"), None)
+        if vic_row:
+            display_insights = [*display_insights[:11], vic_row]
     row["insights"] = display_insights
     row["insight_events"] = load_events_for_ticker(ticker, insights_doc)
     row["letter_discussants"] = load_letter_discussants(ticker, insights_doc)

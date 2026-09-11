@@ -401,6 +401,9 @@ jobs:
       - name: Install dependencies
         if: steps.google_creds.outputs.configured == 'true'
         run: pip install -r _system/scripts/requirements.txt
+      - name: Checkout research vault
+        if: steps.google_creds.outputs.configured == 'true'
+        uses: ./.github/actions/checkout-vault
       - name: Configure Google credentials
         if: steps.google_creds.outputs.configured == 'true'
         env:
@@ -501,6 +504,18 @@ jobs:
         with:
           message: "chore: update Drive intake triage $(date -u +%Y-%m-%d)"
           git_add: "_system/reference/document-store/drive_intake_latest.json"
+      - name: Commit VIC extracts to research vault
+        if: >
+          always() &&
+          steps.google_creds.outputs.configured == 'true' &&
+          steps.import.conclusion == 'success'
+        uses: ./.github/actions/commit-vault
+        with:
+          message: |
+            Ingest VIC writeups from Drive intake.
+
+            PDFs remain gitignored; text extracts are committed.
+          git_add: vic-research/README.md vic-research/*/*.txt vic-research/*/*.md
       - name: Skip note
         if: >
           steps.google_creds.outputs.configured == 'true' &&

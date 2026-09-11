@@ -4,7 +4,7 @@
 
 You are Michael's Cursor bot. Your job is to **classify a file, put it in the right Google Drive folder, ingest it into the research vault, and leave a searchable extract** so the Magis information repository compounds. You do not size capital, place IB orders, or edit `_system/memory/MEMORY.md`.
 
-**Cloud Grok / VIC-only runs:** follow [`GROK.md`](GROK.md). VIC writeups go to Drive `Admin/Intake/VIC/{TICKER}/` (`drive_intake_drop.py`). They do **not** go in research-vault.
+**Cloud Grok / VIC-only runs:** follow [`GROK.md`](GROK.md). VIC writeups go to Drive `Admin/Intake/VIC/{TICKER}/` (`drive_intake_drop.py`). The daily pipeline also stages `research-vault/vic-research/{TICKER}/` like SumZero. No per-writeup approval.
 
 Sleeve book process (theses, concentration, local orders) lives in [`dashboard/SLEEVES.md`](../../dashboard/SLEEVES.md). This file is only intake.
 
@@ -27,7 +27,7 @@ Read the filename and the first pages. Pick **one** row. If two rows could apply
 | **Fund letter** | LP / GP letter, quarterly update, investor letter, "dear partners" | `Letters/{YYYY Qn}/` | `superinvestor-letters/{YYYY}Q{n}/` |
 | **Book / wisdom** | Full book, chapter scan, MOI, Klarman, Munger, Stahl, Pabrai, TCI | `Research Sources/Investment Wisdom/{author}/` | `investment-wisdom/{author}/` |
 | **Manager meeting** | Magis diligence notes from a live manager call | `Manager Meetings/{YYYY-MM-DD}/` | `manager-meetings/{YYYY-MM-DD}/` |
-| **VIC writeup** | Value Investors Club idea | `Admin/Intake/VIC/{TICKER}/` | imported into `{TICKER}/third-party-analyses/vic/` |
+| **VIC writeup** | Value Investors Club idea | `Admin/Intake/VIC/{TICKER}/` | `vic-research/{TICKER}/` (and SSI `{TICKER}/third-party-analyses/vic/`) |
 | **Outside research** | Sell-side, Substack PDF, guest memo with a ticker | `Admin/Intake/Research/{TICKER}/` | `{TICKER}/third-party-analyses/drive-intake/` |
 | **Company deck** | IR presentation, shareholder letter from the issuer | `Admin/Intake/Company/{TICKER}/` | `{TICKER}/investor-documents/drive-intake/` |
 | **Activist long / short** | Proxy letter, Hindenburg-style report | `Admin/Intake/Activist/{Long\|Short}/{TICKER}/` | `{TICKER}/third-party-analyses/activist_reports/...` |
@@ -82,13 +82,13 @@ Books do not go through `make letter-import-drive`.
 python _system/scripts/drive_intake_drop.py --kind VIC --ticker TPL path\to\writeup.pdf
 ```
 
-3. Leave it. The Data Pipeline scans Drive daily at 14:00 UTC, writes a `.source.json` sidecar, and rebuilds insights/dashboard data when files import.
+3. Leave it. The Data Pipeline scans Drive daily at 14:00 UTC, writes a `.source.json` sidecar, stages VIC into `research-vault/vic-research/{TICKER}/`, and rebuilds insights/dashboard data when files import.
 4. Ambiguous files stay in Drive and show up in the Drive job summary and `_system/reference/document-store/drive_intake_latest.json`. Do not guess a ticker.
 
 ## After every add
 
 - [ ] File is in the Drive folder in the table above
-- [ ] Vault has a text extract (letters / books) or SSI ticker folder has the import (intake)
+- [ ] Vault has a text extract (letters / books / VIC) or SSI ticker folder has the import (other intake)
 - [ ] Insights / document registry rebuilt when the file is a letter
 - [ ] New fund named in `funds.json` when you can identify the manager
 - [ ] Session note in `_system/memory/daily/{date}.md` as `[PROPOSED]` only
@@ -113,6 +113,6 @@ $env:RESEARCH_VAULT_ROOT = "C:\Users\drewg\Projects\dashboards\research-vault"
 # Drive: GOOGLE_APPLICATION_CREDENTIALS, or _secrets/google-service-account.json
 ```
 
-**Cloud Grok:** add `GOOGLE_APPLICATION_CREDENTIALS_JSON` (the same service-account JSON) at [Cursor Dashboard → Cloud Agents → Secrets](https://cursor.com/dashboard/cloud-agents). `.cursor/environment.json` writes it to a file and exports `GOOGLE_APPLICATION_CREDENTIALS`. Grok must run `python _system/scripts/materialize_drive_credentials.py --require` before a drop. Do not put VIC login cookies there. VIC-only bots do not need `RESEARCH_VAULT_CLONE_TOKEN`.
+**Cloud Grok:** add `GOOGLE_APPLICATION_CREDENTIALS_JSON` (the same service-account JSON) at [Cursor Dashboard → Cloud Agents → Secrets](https://cursor.com/dashboard/cloud-agents). `.cursor/environment.json` writes it to a file and exports `GOOGLE_APPLICATION_CREDENTIALS`. Grok must run `python _system/scripts/materialize_drive_credentials.py --require` before a drop. Do not put VIC login cookies there. VIC-only bots do not need `RESEARCH_VAULT_CLONE_TOKEN`; the Data Pipeline writes the vault extract.
 
 Service account: `pdf-store-uploader@single-stock-pdf-store.iam.gserviceaccount.com` (already on the Shared Drive).
