@@ -1,5 +1,12 @@
 #!/usr/bin/env python3
-"""Build the admitted YouTube research catalog used by the dashboard."""
+"""Build the admitted YouTube research catalog used by the dashboard.
+
+The row is deliberately lean -- it renders a list of 63 -- so the evidence
+behind it lives in per-video shards built by `build_video_detail.py` and
+fetched on click. What changed at schema 2 is that the row no longer carries
+`transcript[:260]` as its body: `summary` is the best available sentence about
+the video and `summary_source` says which of four sources produced it.
+"""
 from __future__ import annotations
 
 import argparse
@@ -8,6 +15,7 @@ from collections import defaultdict
 from datetime import datetime, timezone
 from pathlib import Path
 
+import video_text
 from vault_paths import path_to_videos_ref, videos_ref, videos_root
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -30,7 +38,7 @@ def _transcript_for(meta_path: Path) -> Path:
     return meta_path.with_name(meta_path.name.replace(".meta.json", ".txt"))
 
 
-def _preview(path: Path, limit: int = 260) -> str:
+def _transcript_head(path: Path, limit: int = 600) -> str:
     try:
         text = " ".join(path.read_text(encoding="utf-8", errors="replace").split())
     except OSError:
@@ -38,11 +46,60 @@ def _preview(path: Path, limit: int = 260) -> str:
     return text[:limit].rstrip()
 
 
+def _preview(path: Path, limit: int = 260) -> str:
+    """The transcript opening, with the non-speech removed.
+
+    This used to be the card body outright, which is how the surface came to
+    read `[music] [music] [music] Thank you, man, for taking the time`. It is
+    now the last entry in `video_text.card_summary`'s chain and is reached only
+    when a video has no analysis and no description.
+    """
+    return video_text.clean_preview(_transcript_head(path), limit=limit)
+
+
 def index_row(meta_path: Path, doc: dict) -> dict:
     transcript = _transcript_for(meta_path)
     relevance = doc.get("relevance") or {}
     sustained = relevance.get("sustained_tickers") or []
     people = relevance.get("people") or []
+    analysis = doc.get("llm_analysis")
+    analysis = analysis if isinstance(analysis, dict) else {}
+    claims = [c for c in (analysis.get("claims") or []) if isinstance(c, dict)]
+
+    gate_tickers = sorted({
+        str(row.get("ticker")).upper()
+        for row in sustained
+        if isinstance(row, dict) and row.get("ticker")
+    })
+    # Symbols somebody argued about, ahead of symbols a keyword counted. The
+    # XPeng interview was admitted on BABA because "alibaba" occurred four
+    # times, while what it actually argues is that the company replaced Nvidia
+    # silicon with its own -- so a search for NVDA could not find it. Union,
+    # analysis first, keeps the gate's decision visible without letting a
+    # mention rank ahead of a view.
+    tickers: list[str] = []
+    for ticker in [*(analysis.get("tickers") or []), *gate_tickers]:
+        ticker = str(ticker or "").upper()
+        if ticker and ticker not in tickers:
+            tickers.append(ticker)
+
+    stances: dict[str, str] = {}
+    for claim in claims:
+        ticker = str(claim.get("ticker") or "").upper()
+        if not ticker:
+            continue
+        stance = str(claim.get("stance") or "neutral").lower()
+        if ticker in stances and stances[ticker] != stance:
+            stances[ticker] = "mixed"
+        else:
+            stances.setdefault(ticker, stance)
+
+    summary, summary_source = video_text.card_summary(
+        thesis=analysis.get("thesis") or "",
+        description=doc.get("description") or "",
+        claim=(claims[0].get("claim") if claims else "") or "",
+        transcript_preview=_transcript_head(transcript),
+    )
     source_ref = path_to_videos_ref(transcript)
     if not source_ref:
         try:
@@ -59,11 +116,9 @@ def index_row(meta_path: Path, doc: dict) -> dict:
         "views": doc.get("views"),
         "tier": doc.get("tier"),
         "trust": doc.get("trust"),
-        "tickers": sorted({
-            str(row.get("ticker")).upper()
-            for row in sustained
-            if isinstance(row, dict) and row.get("ticker")
-        }),
+        "tickers": tickers,
+        "gate_tickers": gate_tickers,
+        "stances": stances,
         "people": [
             row.get("guest_id")
             for row in people
@@ -71,6 +126,16 @@ def index_row(meta_path: Path, doc: dict) -> dict:
         ],
         "routes": relevance.get("routes") or [],
         "transcript_source": doc.get("transcript_source"),
+        "summary": summary,
+        # Which source answered "what is this about". A thesis drawn from
+        # verified quotes and a sentence lifted off the top of a transcript are
+        # different claims on the reader's attention.
+        "summary_source": summary_source,
+        "claim_count": len(claims),
+        "chapter_count": len(analysis.get("chapters") or []),
+        "quote_verified_rate": analysis.get("quote_verified_rate"),
+        "has_analysis": bool(analysis),
+        "has_timings": bool(doc.get("segment_count")),
         "transcript_preview": _preview(transcript),
         "source_document": source_ref,
         "link": doc.get("url") or (
@@ -121,7 +186,7 @@ def build_catalog(root: Path | None = None) -> dict:
     dates = [row["published"] for row in rows if row.get("published")]
     return {
         "generated_at": now_stamp(),
-        "schema_version": 1,
+        "schema_version": 2,
         "video_count": len(rows),
         "newest_published": max(dates) if dates else None,
         "status_counts": _status_counts(root),

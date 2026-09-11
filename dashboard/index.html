@@ -2148,6 +2148,11 @@ let podcastFlagFilter = 'all';
 let podcastEpisodeDetail = null;
 let podcastEpisodeDetailLoading = false;
 let podcastEpisodeDetailCache = {};
+let videoSort = 'date';
+let selectedVideoId = null;
+let videoDetail = null;
+let videoDetailLoading = false;
+let videoDetailCache = {};
 let consensusQuarter = (() => {
   try {
     const saved = localStorage.getItem(CONSENSUS_QUARTER_KEY);
@@ -3806,6 +3811,10 @@ function renderInsights(opts = {}) {
     selectedPodcastEpisodeId,
     podcastEpisodeDetail,
     podcastEpisodeDetailLoading,
+    videoSort,
+    selectedVideoId,
+    videoDetail,
+    videoDetailLoading,
     activeSection: insightsSection,
     tickers: data.tickers || [],
     memory: data.research_memory || null,
@@ -3881,9 +3890,15 @@ function renderInsights(opts = {}) {
       try { localStorage.setItem(INSIGHTS_SECTION_KEY, insightsSection); } catch (_) { /* ignore */ }
       selectedFundId = null;
       selectedPodcastEpisodeId = null;
+      selectedVideoId = null;
+      videoDetail = null;
+      videoDetailLoading = false;
       if (insightsSection !== 'podcasts') {
         podcastShowId = 'all';
         podcastFlagFilter = 'all';
+      }
+      if (insightsSection !== 'videos') {
+        videoSort = 'date';
       }
       if (insightsSection !== 'consensus') {
         consensusSelectedTicker = null;
@@ -4210,6 +4225,61 @@ function renderInsights(opts = {}) {
         });
     });
   });
+  content.querySelectorAll('[data-video-sort]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      videoSort = btn.dataset.videoSort || 'date';
+      selectedVideoId = null;
+      renderInsights();
+    });
+  });
+  content.querySelectorAll('[data-video-id]').forEach(el => {
+    el.addEventListener('click', (e) => {
+      // A ticker pill and the "Watch source" link are their own actions; only
+      // a click on the card body opens the detail view.
+      if (e.target.closest('a, [data-select-ticker]')) return;
+      e.stopPropagation();
+      const id = el.dataset.videoId;
+      if (!id) return;
+      selectedVideoId = id;
+      if (videoDetailCache[id]) {
+        videoDetail = videoDetailCache[id];
+        videoDetailLoading = false;
+        renderInsights();
+        return;
+      }
+      videoDetail = null;
+      videoDetailLoading = true;
+      renderInsights();
+      const shardPath = (window.InsightsViz && InsightsViz.videoDetailShardPath)
+        ? InsightsViz.videoDetailShardPath(id)
+        : `data/insights/video_details/${String(id).replace(/[^A-Za-z0-9._-]+/g, '_').slice(0, 180)}.json`;
+      fetch(`${shardPath}?${Date.now()}`)
+        .then(r => (r.ok ? r.json() : null))
+        .then(doc => {
+          if (selectedVideoId !== id) return;
+          if (doc && doc.video_id) {
+            videoDetailCache[id] = doc;
+            videoDetail = doc;
+          }
+          videoDetailLoading = false;
+          renderInsights();
+        })
+        .catch(() => {
+          if (selectedVideoId !== id) return;
+          videoDetailLoading = false;
+          renderInsights();
+        });
+    });
+  });
+  const videoBack = content.querySelector('[data-video-back]');
+  if (videoBack) {
+    videoBack.addEventListener('click', () => {
+      selectedVideoId = null;
+      videoDetail = null;
+      videoDetailLoading = false;
+      renderInsights();
+    });
+  }
   const podcastBack = content.querySelector('[data-podcast-back]');
   if (podcastBack) {
     podcastBack.addEventListener('click', () => {

@@ -2,7 +2,7 @@
   "schema_version": 1,
   "updated": "2026-09-03",
   "user_agent": "SSI-VideoAgent/1.0 (+research; contact=research@local)",
-  "notes": "YouTube channel registry, the video analogue of show_registry.json. Precision comes from this list, not from search. tier: duplicate=already in the podcast corpus; guest=a registered guest's own channel; native=video-only source. trust: high=on-topic by construction; broad=channel is only sometimes relevant and the transcript gate must carry the decision. ingest=false means discovered but never fetched. All feed_* fields are live probe results, not assertions -- refresh with resolve_youtube_channel.py --verify. playlists[] scopes ingestion inside a channel: `ingest` on the channel governs its RSS feed only, and each playlist carries its own, so a noisy channel can stay off while one playlist on it is read. Playlists are read through playlistItems.list (1 unit per 50 videos) rather than RSS, which caps at 15 entries and cannot see history.",
+  "notes": "YouTube channel registry, the video analogue of show_registry.json. Precision comes from this list, not from search. tier: duplicate=already in the podcast corpus; guest=a registered guest's own channel; native=video-only source. trust: high=on-topic by construction; broad=channel is only sometimes relevant and the transcript gate must carry the decision. ingest=false means discovered but never fetched. All feed_* fields are live probe results, not assertions -- refresh with resolve_youtube_channel.py --verify. playlists[] scopes ingestion inside a channel: `ingest` on the channel governs its RSS feed only, and each playlist carries its own, so a noisy channel can stay off while one playlist on it is read. Playlists are read through playlistItems.list (1 unit per 50 videos) rather than RSS, which caps at 15 entries and cannot see history. analysis_role selects the extraction prompt in analyze_video_episode.py: operator=the guest runs the business (claims are self-reported and marked as such), allocator=an outside investor discussing positions, pitch=a single-name pitch with a target and catalyst, broad=may carry no investable view at all. Unset falls back to allocator for tier=guest and broad otherwise.",
   "channels": [
     {
       "channel_id": "UCyFqFYfTW2VoIQKylJ04Rtw",
@@ -118,7 +118,8 @@
       "feed_entry_count": 15,
       "feed_last_published": "2026-08-27",
       "feed_days_stale": 5,
-      "rate_limit_seconds": 1.0
+      "rate_limit_seconds": 1.0,
+      "analysis_role": "allocator"
     },
     {
       "channel_id": "UCPKvc8JeWXDJz08n0DfF1Xg",
@@ -139,7 +140,8 @@
       "feed_entry_count": 15,
       "feed_last_published": "2026-06-22",
       "feed_days_stale": 71,
-      "rate_limit_seconds": 1.0
+      "rate_limit_seconds": 1.0,
+      "analysis_role": "allocator"
     },
     {
       "channel_id": "UCEW0yRVs0CbqT9CrP8i3mSQ",
@@ -160,7 +162,8 @@
       "feed_entry_count": 15,
       "feed_last_published": "2026-07-27",
       "feed_days_stale": 36,
-      "rate_limit_seconds": 1.0
+      "rate_limit_seconds": 1.0,
+      "analysis_role": "allocator"
     },
     {
       "channel_id": "UChiRFwMjX0lhkqFbBePCrDQ",
@@ -221,7 +224,8 @@
       "feed_entry_count": 15,
       "feed_last_published": "2026-05-27",
       "feed_days_stale": 97,
-      "rate_limit_seconds": 1.0
+      "rate_limit_seconds": 1.0,
+      "analysis_role": "pitch"
     },
     {
       "channel_id": "UCRhQsN8AVIfZuBNeRV1A37w",
@@ -240,7 +244,8 @@
       "feed_entry_count": 15,
       "feed_last_published": "2026-08-26",
       "feed_days_stale": 6,
-      "rate_limit_seconds": 1.0
+      "rate_limit_seconds": 1.0,
+      "analysis_role": "operator"
     },
     {
       "channel_id": "UCbmNph6atAoGfqLoCL_duAg",
@@ -282,7 +287,8 @@
           "verified_at": "2026-09-03",
           "notes": "Recorded, not enabled. Adjacent rather than on-topic, and 80 more videos would be most of a week of caption budget at 20/hour. Turn on once Investors at Google has been through the gate and the admit rate is known."
         }
-      ]
+      ],
+      "analysis_role": "broad"
     },
     {
       "channel_id": "UCwWeR7z1tDD-SFkWjQrUrQA",
