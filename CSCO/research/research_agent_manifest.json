@@ -1,36 +1,34 @@
 {
-  "schema_version": "3.0",
-  "status": "decision_grade",
-  "proof_status": "decision_grade",
-  "model_level": "screening_grade",
-  "model_level_reason": "The source-locked automated owner-earnings template uses generic assumption bounds; it is useful for triage but is not stock-specific underwriting.",
-  "decision_eligibility": {
-    "committee_eligible": false,
-    "capital_actionable": false,
-    "capital_authority_required": "human_decision",
-    "reason": "Model must be stock-specific and evidence-clear before committee review."
-  },
+  "schema_version": "2.0",
   "ticker": "CSCO",
-  "as_of": "2026-07-29",
-  "dates": {
-    "model_as_of": "2026-07-29",
-    "latest_fact_as_of": "2026-05-14",
-    "oldest_fact_as_of": "2025-07-26",
-    "price_as_of": "2026-09-11"
-  },
-  "legacy_audit": {
-    "actionable": false,
-    "status": "audit_only",
-    "annualized_return_at_price_pct": {
-      "low": -16.44,
-      "base": -8.98,
-      "high": -0.11
-    },
-    "formula": "((present_value_or_output + undated_distributions) / price) ** (1 / horizon_years) - 1",
-    "reason_non_actionable": "This legacy calculation treated a present value as a future payoff and cannot be used as a forward return, hurdle entry price, ranking signal, or capital decision."
-  },
-  "economic_ownership_map": [
+  "evidence": [
     {
+      "path": "CSCO/investor-documents/DOWNLOAD_MANIFEST.json",
+      "sha256": "4fc70afc19ccb0711f782516257ea98d441a6114d431de0097a7bf4b395ffd64",
+      "bytes": 19084
+    }
+  ],
+  "reason": "epistemic_author_forecast:03df290ce01c5b0678e15d5f:operating_business_and_net_assets", // pragma: allowlist secret
+  "evidence_hash": "02a5d31203201b1ccab10b84746a41234e11de4cc2faee1e4b72492708cf86c0", // pragma: allowlist secret
+  "primary_evidence_hash": "076f93b172d49f0dda2bccd12204ce9441ba90c70c875a501261ca53070e380a",
+  "artifact_count": 1,
+  "ready": true,
+  "primary_evidence_ready": true,
+  "epistemic_work_item": {
+    "work_id": "03df290ce01c5b0678e15d5f",
+    "task_type": "author_forecast",
+    "ticker": "CSCO",
+    "component_id": "operating_business_and_net_assets",
+    "component_fingerprint": "590c7e00aeae584c85e240358f7ff1060c1c9a5202d41acb0267751703ddbf44",
+    "contract_hash": "6164c87d91c1712852a7a4a0395d922140cf80fec67ab5cdd89fb24ca1a45ff5",
+    "method_id": "owner_earnings_reinvestment_dcf",
+    "power_zone": "quality_reinvestment",
+    "metric_definition_id": "normalized_owner_earnings_ttm_m_v2",
+    "priority": 75,
+    "source_preflight_candidate": true,
+    "reason": "first_route_cohort_deficit",
+    "source_ref": "CSCO/research/valuation_contract.json",
+    "frozen_component": {
       "component_id": "operating_business_and_net_assets",
       "label": "Operating business and net financial assets",
       "category": "operating_business",
@@ -1471,366 +1469,21 @@
       "falsifier": "Owner earnings, incremental returns, or reinvestment runway fall below the low-case bridge.",
       "overlap_key": "entire_security",
       "assumption_type": "judgment"
-    }
-  ],
-  "component_coverage": {
-    "all_material_components_identified": true,
-    "material_component_count": 1,
-    "additive_component_count": 1,
-    "embedded_component_count": 0,
-    "unvalued_component_count": 0,
-    "double_counting_flags": []
+    },
+    "acceptance_tests": [
+      "target period is not observable at registration",
+      "historical adapter replay passes",
+      "threshold is economically material",
+      "independent reviewer approves"
+    ],
+    "state": "queued",
+    "attempts": 0,
+    "lease_owner": null,
+    "lease_expires_at": null,
+    "input_sha": "7c6e9fe0e804a7353c578b4708d55830e49ae24d"
   },
-  "input_classification": {
-    "facts": [],
-    "estimates": [],
-    "judgments": [
-      {
-        "component_id": "operating_business_and_net_assets",
-        "label": "Operating business and net financial assets",
-        "kind": "judgment",
-        "evidence_tier": "primary_derived",
-        "evidence": "Source-locked filing facts plus explicitly bounded versioned judgments.",
-        "method": "owner_earnings_reinvestment_dcf",
-        "valuation_status": "bounded_estimate"
-      }
-    ]
-  },
-  "method_route": {
-    "schema_version": "2.0",
-    "status": "routed",
-    "profile_id": "quality_reinvestment",
-    "label": "High-return compounder",
-    "score": 19.0,
-    "reasons": [
-      "archetype=compounder",
-      "component categories=operating_business",
-      "existing methods=dcf, reinvestment",
-      "explicit reviewed profile"
-    ],
-    "primary_methods": [
-      "owner_earnings_reinvestment_dcf"
-    ],
-    "corroborating_methods": [
-      "reverse_dcf",
-      "incremental_roic_runway"
-    ],
-    "primary_personas": [
-      "buffett_weschler",
-      "hohn"
-    ],
-    "cross_check_personas": [
-      "munger",
-      "marathon_capital_cycle"
-    ],
-    "silent_personas": [
-      "greenblatt",
-      "hk",
-      "klarman_asset_value",
-      "marks_credit_cycle",
-      "pabrai",
-      "stahl"
-    ],
-    "required_evidence": [
-      "normalized owner earnings",
-      "incremental return on capital",
-      "reinvestment runway",
-      "diluted share count",
-      "competitive-advantage mechanism"
-    ],
-    "failure_modes": [
-      "growth projected without its capital cost",
-      "stock compensation or acquisitions omitted",
-      "terminal value unsupported by a durable mechanism"
-    ],
-    "secondary_profiles": [
-      {
-        "profile_id": "capital_cycle",
-        "score": 1.0,
-        "reasons": [
-          "component categories=operating_business"
-        ]
-      },
-      {
-        "profile_id": "predictable_cash_flow",
-        "score": 1.0,
-        "reasons": [
-          "component categories=operating_business"
-        ]
-      }
-    ],
-    "scorecard": {
-      "scarce_asset_optionality": {
-        "score": 0.0,
-        "reasons": []
-      },
-      "quality_reinvestment": {
-        "score": 19.0,
-        "reasons": [
-          "archetype=compounder",
-          "component categories=operating_business",
-          "existing methods=dcf, reinvestment",
-          "explicit reviewed profile"
-        ]
-      },
-      "capital_cycle": {
-        "score": 1.0,
-        "reasons": [
-          "component categories=operating_business"
-        ]
-      },
-      "credit_and_normalized_returns": {
-        "score": 0.0,
-        "reasons": []
-      },
-      "catalyst_asset_value": {
-        "score": 0.0,
-        "reasons": []
-      },
-      "predictable_cash_flow": {
-        "score": 1.0,
-        "reasons": [
-          "component categories=operating_business"
-        ]
-      },
-      "binary_milestone": {
-        "score": 0.0,
-        "reasons": []
-      }
-    },
-    "decision_rule": "Power Zones select the fitting economic method and eligible independent reviewers; they never choose the valuation answer or capital decision.",
-    "ticker": "CSCO",
-    "as_of": "2026-07-29",
-    "route_source": "canonical_power_zone_router",
-    "config_path": "_system/frameworks/power_zones.json",
-    "config_updated": "2026-07-14",
-    "classification": {
-      "archetype": "compounder",
-      "moat": "unproven",
-      "dhando": "pending",
-      "stance": "watch",
-      "cycle": "-",
-      "moi_bucket": "pending",
-      "payoff_lens": "pending",
-      "investment_sleeve": "ls_algo_underlying"
-    },
-    "specialist_power_zones": [],
-    "committee": {
-      "candidate_count": 4,
-      "independence_group_count": 3,
-      "committee_seatable": true,
-      "candidates": [
-        {
-          "persona": "buffett_weschler",
-          "independence_group": "quality_reinvestment"
-        },
-        {
-          "persona": "hohn",
-          "independence_group": "competitive_advantage"
-        },
-        {
-          "persona": "munger",
-          "independence_group": "quality_reinvestment"
-        },
-        {
-          "persona": "marathon_capital_cycle",
-          "independence_group": "capital_cycle"
-        }
-      ]
-    },
-    "input_hash": "cf363670424aaf8b4ae642b81126fe1bec2b8c1399758b767a21a6bfd700d23c",
-    "generated_at": "2026-07-29T21:06:45.463725+00:00"
-  },
-  "market": {
-    "price_per_share": 112.13,
-    "fully_diluted_shares": 3941434665.0,
-    "market_cap_m": 441953.07,
-    "enterprise_value_m": 454241.07,
-    "price_source": "Yahoo CSCO close 2026-09-11",
-    "price_as_of": "2026-09-11"
-  },
-  "valuation": {
-    "output_basis": "present_value_today",
-    "output_basis_status": "method_declared",
-    "output_range_per_share": {
-      "low": 31.8928,
-      "base": 58.051,
-      "high": 111.2473
-    },
-    "value_per_share": {
-      "low": 31.8928,
-      "base": 58.051,
-      "high": 111.2473
-    },
-    "present_value_today_per_share": {
-      "low": 31.8928,
-      "base": 58.051,
-      "high": 111.2473
-    },
-    "future_payoff_per_share": {
-      "low": null,
-      "base": null,
-      "high": null
-    },
-    "future_payoff_date": null,
-    "future_payoff_horizon_years": null,
-    "forward_cashflow_schedule": null,
-    "priced_components_per_share": {
-      "low": 31.8928,
-      "base": 58.051,
-      "high": 111.2473
-    },
-    "legacy_value_per_share": null,
-    "probability_weighted_value_per_share": 58.051,
-    "expected_distributions_per_share": 0.0,
-    "forward_return_at_price_pct": {
-      "low": null,
-      "base": null,
-      "high": null
-    },
-    "forward_return_status": "withheld",
-    "forward_return_reason": "present_value_today cannot be annualized as a future payoff",
-    "annualized_return_at_price_pct": {
-      "low": null,
-      "base": null,
-      "high": null
-    },
-    "annualized_return_field_status": "compatibility_alias_of_forward_return",
-    "required_return_pct": 10.0,
-    "margin_of_safety_pct": {
-      "low": -251.58,
-      "base": -93.16,
-      "high": -0.79
-    },
-    "margin_of_safety_definition": "(intrinsic_value_today - market_price) / intrinsic_value_today; positive means the quote is below intrinsic value",
-    "upside_to_value_pct": {
-      "low": -71.56,
-      "base": -48.23,
-      "high": -0.79
-    },
-    "downside_to_low_pct": -71.56,
-    "horizon_years": 7,
-    "equity_liability_floor": 0.0,
-    "interpretation": "output_basis states what the proof produced. value_per_share and present_value_today_per_share are intrinsic values today and are withheld while any material additive component is unpriced or dated future economics cannot be discounted at an explicit required return. priced_components_per_share is the raw proof-output sum. A present value is never annualized or discounted again."
-  },
-  "scenario_contract": {
-    "rule": "Cases must change cited causal operating, capital, probability, timing, or financing drivers\u2014not only a terminal multiple.",
-    "top_value_drivers": [
-      {
-        "component_id": "operating_business_and_net_assets",
-        "label": "Operating business and net financial assets",
-        "valuation_status": "bounded_estimate",
-        "base_per_share": 58.051,
-        "legacy_base_per_share": null,
-        "range_width_per_share": 79.3545,
-        "scenario_assumptions": null
-      }
-    ],
-    "reverse_expectations": null
-  },
-  "calculation_proof_summary": {
-    "component_count": 1,
-    "priced_component_count": 1,
-    "proof_complete_pct": 100.0,
-    "status_counts": {
-      "bounded_estimate": 1,
-      "calculated": 0,
-      "legacy_sensitivity": 0,
-      "unpriced": 0
-    },
-    "all_material_components_priced": true,
-    "calculation_errors": [],
-    "aggregate_proof_hash": "0821f2fc4455275a409609b47d3d6640db83b77409a8072bec6bf7de6941b6af"
-  },
-  "source_lineage": [
-    {
-      "component_id": "operating_business_and_net_assets",
-      "node_id": "owner_earnings",
-      "ref": "CSCO/research/evidence/sec_companyfacts.json",
-      "locator": "us-gaap:NetCashProvidedByUsedInOperatingActivities; accession 0000858877-25-000111; form 10-K",
-      "as_of": "2025-07-26",
-      "content_sha256": "7d45a349ddedf38636c5b2924026bf187c2f9749dbc2aae4b082b54f06d17d61",
-      "source_id": "635f10e8226fb60910c3e2c79bf018ebe00144044bee31f8ddbf2431367f1411"
-    },
-    {
-      "component_id": "operating_business_and_net_assets",
-      "node_id": "cash",
-      "ref": "CSCO/research/evidence/sec_companyfacts.json",
-      "locator": "us-gaap:CashCashEquivalentsRestrictedCashAndRestrictedCashEquivalents; accession 0000858877-26-000078; form 10-Q",
-      "as_of": "2026-04-25",
-      "content_sha256": "7d45a349ddedf38636c5b2924026bf187c2f9749dbc2aae4b082b54f06d17d61",
-      "source_id": "01a835638579a8983190446b6978fff3cd029f1e8d57a34976791318a4b22bbb"
-    },
-    {
-      "component_id": "operating_business_and_net_assets",
-      "node_id": "debt",
-      "ref": "CSCO/research/evidence/sec_companyfacts.json",
-      "locator": "us-gaap:LongTermDebtNoncurrent; accession 0000858877-26-000078; form 10-Q",
-      "as_of": "2026-04-25",
-      "content_sha256": "7d45a349ddedf38636c5b2924026bf187c2f9749dbc2aae4b082b54f06d17d61",
-      "source_id": "620bfbd35324b1beb26224346008ced1924161252ab7460f28abf6b84c92d1f2"
-    },
-    {
-      "component_id": "operating_business_and_net_assets",
-      "node_id": "shares_m",
-      "ref": "CSCO/research/evidence/sec_companyfacts.json",
-      "locator": "dei:EntityCommonStockSharesOutstanding; accession 0000858877-26-000078; form 10-Q",
-      "as_of": "2026-05-14",
-      "content_sha256": "7d45a349ddedf38636c5b2924026bf187c2f9749dbc2aae4b082b54f06d17d61",
-      "source_id": "e610e455c7fcb4125717b2a81efac23eaf0882128bf6098981cf6d15fc4ab6e5"
-    }
-  ],
-  "model_checks": {
-    "calculation_graphs_valid": true,
-    "component_sum_reconciles": true,
-    "no_double_counting": true,
-    "all_material_components_priced": true,
-    "positive_base_or_explicit_zero_value": true,
-    "low_base_high_ordered": true,
-    "source_identity_and_freshness_valid": true,
-    "extreme_return_validated": true,
-    "output_basis_valid": true,
-    "dated_forward_economics_valid": true,
-    "present_value_is_not_treated_as_future_payoff": true
-  },
-  "evidence": {
-    "unresolved_count": 0,
-    "blockers": [],
-    "validation_errors": []
-  },
-  "monitoring": {
-    "falsifiers": [
-      "Owner earnings, incremental returns, or reinvestment runway fall below the low-case bridge."
-    ],
-    "required_refresh_triggers": [
-      "new filing or material operating update",
-      "capital-structure change",
-      "material price move",
-      "component milestone or falsifier"
-    ]
-  },
-  "change_control": {
-    "model_hash": "8ab8e90be71027db633bce509b1c29f77bec7c11f1d09c9f1e3c658e4312a571",
-    "method_versions": [
-      "owner_earnings_reinvestment_dcf@1.0"
-    ],
-    "change_log": [],
-    "rule": "A source fact is locked. Every assumption change requires a reason, author, timestamp, and before/after value."
-  },
-  "decision_rule": "Proof status and investment readiness are separate. Every material claim must be valued exactly once by a valid calculation proof, every evidence blocker must be resolved, and the model must be stock-specific before committee review. Only a human decision can authorize capital.",
-  "authority": "universal_valuation_contract",
-  "legacy_reference_present": false,
-  "falsifier_coverage": {
-    "typed": 0,
-    "prose_only": 1,
-    "untestable": 0,
-    "invalid": 0,
-    "unanchored": 0,
-    "resolvable": 0,
-    "unresolvable": 0,
-    "calibration_eligible": 0,
-    "diagnostic_only": 0,
-    "spec_ref": null,
-    "enforcement_enabled": false
-  }
+  "epistemic_input_sha": "7c6e9fe0e804a7353c578b4708d55830e49ae24d",
+  "calibration_release_hash": null,
+  "routed_memory_observations": [],
+  "routed_memory_warning": null
 }
