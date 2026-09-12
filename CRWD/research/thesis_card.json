@@ -3,21 +3,72 @@
   "classification": {
     "archetype": "compounder"
   },
-  "evidence_citations": [],
-  "filing_digest": "CRWD/research/evidence/filing_digest_2026-08-06.md",
-  "generated_at": "2026-09-09T08:59:41+00:00",
+  "evidence_citations": [
+    "CRWD/third-party-analyses/references.md",
+    "CRWD/investor-documents/sec-edgar/10-K_20260305_rpt20260131_acc0001535527_26_000010.htm",
+    "CRWD/investor-documents/sec-edgar/10-Q_20260604_rpt20260430_acc0001535527_26_000025.htm",
+    "CRWD/investor-documents/sec-edgar/10-Q_20251203_rpt20251031_acc0001535527_25_000033.htm",
+    "CRWD/investor-documents/sec-edgar/DEF 14A_20260505_rpt20260617_acc0001104659_26_055599.htm"
+  ],
+  "filing_digest": "CRWD/research/evidence/filing_digest_2026-09-12.md",
+  "generated_at": "2026-09-12T01:44:49+00:00",
   "irr_label": "",
-  "key_assumptions": [],
+  "key_assumptions": [
+    {
+      "input": "Price today",
+      "source": "Yahoo CRWD close 2026-09-10",
+      "value": "**$208.86**"
+    },
+    {
+      "input": "Normalized owner earnings",
+      "source": "us-gaap:NetCashProvidedByUsedInOperatingActivities; accession 0001535527-26-000010; form 10-K",
+      "value": "**$1,310M**"
+    },
+    {
+      "input": "Cash",
+      "source": "us-gaap:CashCashEquivalentsRestrictedCashAndRestrictedCashEquivalents; accession 0001535527-26-000025; form 10-Q",
+      "value": "**$4,716M**"
+    },
+    {
+      "input": "Debt",
+      "source": "us-gaap:LongTermDebtNoncurrent; accession 0001535527-26-000025; form 10-Q",
+      "value": "**$746M**"
+    },
+    {
+      "input": "Diluted shares",
+      "source": "dei:EntityCommonStockSharesOutstanding; accession 0001535527-26-000025; form 10-Q",
+      "value": "**254.6M**"
+    },
+    {
+      "input": "Reinvestment rate",
+      "source": "Versioned initial bounds; refresh from the issuer reinvestment ledger.",
+      "value": "**35.0%**"
+    },
+    {
+      "input": "Incremental after-tax ROIC",
+      "source": "Conservative bounded starting cases pending a longer primary-source capital bridge.",
+      "value": "**18.0%**"
+    },
+    {
+      "input": "Discount rate",
+      "source": "Approved risk bounds for the automated first pass.",
+      "value": "**10.0%**"
+    }
+  ],
   "last_verified": {
-    "deep_dive": null,
+    "deep_dive": "2026-09-12",
     "human_approved": null,
     "valuation_as_of": "2026-07-29"
   },
-  "open_questions": [],
+  "open_questions": [
+    "Stock-specific reinvestment rate and incremental ROIC bridge from 10-K MD&A and capex allocation.",
+    "Post-July 2024 net retention trend and whether incident effects are fully in owner cash run-rate.",
+    "Independent review of falsifier draft `02ac4e724d95c942f9030caa` before promotion."
+  ],
   "scenarios": {},
   "schema_version": "1.0",
   "stance": null,
-  "thesis": "",
+  "thesis": "CrowdStrike Holdings sells cloud-native endpoint and identity security software on a subscription model. Customers pay recurring fees for the Falcon platform, which consolidates threat detection, response, and adjacent modules (identity, cloud workload, log management). Revenue reached $4.81 billion in fiscal 2026 (year ended January 31, 2026) per `CRWD/investor-documents/sec-edgar/10-K_20260305_rpt20260131_acc0001535527_26_000010.htm`. The company generates substantial cash from operations ($1.61 billion in fiscal 2026) while reporting a GAAP net loss ($162.5 million) because stock-based compensation and acquisition-related costs remain large relative to reported earnings.",
   "ticker": "CRWD",
-  "why_market_wrong": ""
+  "why_market_wrong": "The market prices CrowdStrike as a premium-growth compounder after the July 2024 Falcon content-update incident, yet filing cash economics already support more than $1.3 billion of normalized owner earnings. Investors may overweight GAAP losses and headline churn fears while underweighting operating cash flow that grew 29% compounded over five years and net cash of roughly $4.0 billion against modest long-term debt. If module adoption and net retention stabilize post-incident, owner cash can grow faster than the screening-grade reinvestment template assumes; conversely, if incident-related churn or elevated sales and marketing persist, owner cash could compress toward the low-case bridge typed in the prospective falsifier."
 }
