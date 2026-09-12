@@ -3,21 +3,73 @@
   "classification": {
     "archetype": "compounder"
   },
-  "evidence_citations": [],
-  "filing_digest": "CRM/research/evidence/filing_digest_2026-08-06.md",
-  "generated_at": "2026-09-09T08:59:41+00:00",
+  "evidence_citations": [
+    "CRM/third-party-analyses/source_inventory_2026-07-10.md",
+    "investor-documents/sec-edgar/10-K_20260302_rpt20260131_acc0001108524_26_000060.htm",
+    "CRM/INDEX.csv",
+    "investor-documents/sec-edgar/10-Q_20260528_rpt20260430_acc0001108524_26_000127.htm",
+    "investor-documents/sec-edgar/DEF 14A_20260416_rpt20260528_acc0001108524_26_000085.htm"
+  ],
+  "filing_digest": "CRM/research/evidence/filing_digest_2026-09-12.md",
+  "generated_at": "2026-09-12T01:21:35+00:00",
   "irr_label": "",
-  "key_assumptions": [],
+  "key_assumptions": [
+    {
+      "input": "Price today",
+      "source": "Yahoo CRM close 2026-09-10",
+      "value": "**$243.0**"
+    },
+    {
+      "input": "Normalized owner earnings",
+      "source": "us-gaap:NetCashProvidedByUsedInOperatingActivities; accession 0001108524-26-000060; form 10-K",
+      "value": "**$14,402M**"
+    },
+    {
+      "input": "Cash",
+      "source": "us-gaap:CashCashEquivalentsRestrictedCashAndRestrictedCashEquivalents; accession 0001108524-26-000127; form 10-Q",
+      "value": "**$8,935M**"
+    },
+    {
+      "input": "Debt",
+      "source": "us-gaap:LongTermDebtNoncurrent; accession 0001108524-26-000127; form 10-Q",
+      "value": "**$39,280M**"
+    },
+    {
+      "input": "Diluted shares",
+      "source": "dei:EntityCommonStockSharesOutstanding; accession 0001108524-26-000127; form 10-Q",
+      "value": "**819.0M**"
+    },
+    {
+      "input": "Reinvestment rate",
+      "source": "Versioned initial bounds; refresh from the issuer reinvestment ledger.",
+      "value": "**35.0%**"
+    },
+    {
+      "input": "Incremental after-tax ROIC",
+      "source": "Conservative bounded starting cases pending a longer primary-source capital bridge.",
+      "value": "**18.0%**"
+    },
+    {
+      "input": "Discount rate",
+      "source": "Approved risk bounds for the automated first pass.",
+      "value": "**10.0%**"
+    }
+  ],
   "last_verified": {
-    "deep_dive": null,
+    "deep_dive": "2026-09-12",
     "human_approved": null,
     "valuation_as_of": "2026-07-29"
   },
-  "open_questions": [],
+  "open_questions": [
+    "Contract is **decision_grade** mechanically but **screening_grade** for stock-specific underwriting; committee not eligible until assumptions are filing-grounded.",
+    "Prospective falsifier draft `01d9e3c381ada1ca50dc1fe5` awaits independent review before promotion.",
+    "Incremental ROIC and reinvestment-rate legs of the prose falsifier remain untyped.",
+    "Debt funded buybacks: reconcile net-debt trajectory with owner-cash bridge."
+  ],
   "scenarios": {},
   "schema_version": "1.0",
   "stance": null,
-  "thesis": "",
+  "thesis": "Salesforce, Inc. sells cloud software that helps enterprises manage customer relationships, sales pipelines, marketing campaigns, and service operations. **[Fact]** FY2026 revenue (year ended January 31, 2026) was **$41.5 billion**, up from **$34.9 billion** in FY2025 per `investor-documents/sec-edgar/10-K_20260302_rpt20260131_acc0001108524_26_000060.htm`. **[Fact]** The company reports subscription and support revenue as the dominant stream and discloses three clouds (Sales, Service, Platform and Other) plus Marketing and Commerce. **[Fact]** Customers are large and mid-market enterprises globally; the model is recurring subscription fees with professional services attach. **[Fact]** Marc Benioff remains chair and CEO; capital allocation emphasizes share repurchases and selective acquisitions.",
   "ticker": "CRM",
-  "why_market_wrong": ""
+  "why_market_wrong": "The market may be treating Salesforce as a mature, low-growth CRM vendor while Agentforce and data-cloud cross-sell still have a long reinvestment runway. **[Fact]** FY2026 operating cash flow was **$15.0 billion** and capital spending was **$594 million**, leaving normalized owner earnings near **$14.4 billion** per the locked fact ledger. **[Inference]** Generalists may overweight competitive fear from Microsoft Dynamics and underweight switching costs in enterprise workflows and the installed base of custom integrations. At **$173.79** (July 2026), the stock trades below the contract base present value of **$282** per share, which may embed skepticism on incremental returns after a debt-funded buyback wave."
 }
