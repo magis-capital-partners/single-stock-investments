@@ -1,0 +1,26 @@
+# CPNG — Insider conviction (2026-09-12)
+
+> Context only. Insider activity informs scenario confidence and stance discussion; it does not auto-inflate Lawrence base IRR. Promotion requires [HUMAN REVIEW].
+
+**ICS:** 6.24 (strong) · **Bull case support:** moderate
+
+| Scenario | Prior weight | Tilted weight |
+|----------|--------------|---------------|
+| Bear | 20% | 20% |
+| Base | 55% | 49% |
+| Bull | 25% | 31% |
+
+| Insider | Date | Shares | Price | Value | Contrib |
+|---------|------|--------|-------|-------|---------|
+| MEHTA NEIL | 2026-03-12 | 3000000 | $18.6787 | $56036100.0 | 1.882 |
+| MEHTA NEIL | 2026-03-13 | 2332863 | $18.3994 | $42923279.48 | 1.818 |
+| MEHTA NEIL | 2026-03-11 | 2017241 | $18.6411 | $37603591.21 | 1.809 |
+
+**Routine / planned sales (context):**
+
+- Lee Jonathan D.: 2679 @ $23.62 on 2026-01-02
+- Kolari Pranam: 11653 @ $31.9753 on 2025-11-03
+- Anand Gaurav: 75350 @ $29.0195 on 2025-11-10 (10b5-1)
+
+Source: `_system/reference/market-data/insider/CPNG_transactions.csv`.
+Lawrence base IRR unchanged (`in_base_irr: False`).

@@ -1,0 +1,28 @@
+# MA — Insider conviction (2026-09-12)
+
+> Context only. Insider activity informs scenario confidence and stance discussion; it does not auto-inflate Lawrence base IRR. Promotion requires [HUMAN REVIEW].
+
+**ICS:** 9.5 (exceptional) · **Bull case support:** moderate
+
+| Scenario | Prior weight | Tilted weight |
+|----------|--------------|---------------|
+| Bear | 20% | 20% |
+| Base | 55% | 41% |
+| Bull | 25% | 39% |
+
+| Insider | Date | Shares | Price | Value | Contrib |
+|---------|------|--------|-------|-------|---------|
+| McLaughlin Edward Grunde | 2026-07-15 | 19800 | $227.25 | $4499550.0 | 1.973 |
+| McLaughlin Edward Grunde | 2026-07-01 | 14260 | $173.49 | $2473967.4 | 1.698 |
+| Seshadri Raj | 2026-07-02 | 1977 | $290.25 | $573824.25 | 1.518 |
+| Seshadri Raj | 2026-07-01 | 2000 | $290.25 | $580500.0 | 1.481 |
+| Ling Hai | 2026-02-24 | 4485 | $90.1 | $404098.5 | 1.297 |
+
+**Routine / planned sales (context):**
+
+- Huntsman Jon M Jr: 652 @ $512.76 on 2026-03-01
+- Matsumoto Oki: 98 @ $492.45 on 2026-06-21
+- Qureshi Rima: 1641 @ $495.51 on 2026-06-16
+
+Source: `_system/reference/market-data/insider/MA_transactions.csv`.
+Lawrence base IRR unchanged (`in_base_irr: False`).
