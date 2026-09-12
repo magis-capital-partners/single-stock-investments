@@ -54,9 +54,6 @@ re_pass: false
 | Classification IRR | n/a | 8.8% | — |
 | Valuation bridge base | n/a | None% | — |
 
-**Lint notes:**
-- CSCO/research: dive header cites adversarial but file missing
-
 ---
 
 ## Disclosure scan
