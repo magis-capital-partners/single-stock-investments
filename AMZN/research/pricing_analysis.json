@@ -1,14 +1,14 @@
 {
   "schema_version": "3.0",
   "ticker": "AMZN",
-  "as_of": "2026-09-11",
+  "as_of": "2026-07-25",
   "authority": "valuation_contract",
   "contract_source": "valuation_contract.json",
-  "contract_status": "evidence_blocked",
-  "proof_status": "evidence_blocked",
-  "model_level": "evidence_blocked",
-  "price": 259.77,
-  "price_source": "Yahoo AMZN close 2026-08-31",
+  "contract_status": "decision_grade",
+  "proof_status": "decision_grade",
+  "model_level": "stock_specific",
+  "price": 251.89,
+  "price_source": "Yahoo AMZN close 2026-09-10",
   "component_value_per_share": {
     "low": 35.3092,
     "base": 187.4188,
@@ -39,9 +39,9 @@
   },
   "required_return_pct": 8.0,
   "margin_of_safety_pct": {
-    "low": -635.7,
-    "base": -38.6,
-    "high": 27.08
+    "low": -613.38,
+    "base": -34.4,
+    "high": 29.29
   },
   "entry_prices_by_hurdle_and_case": {
     "low": {
@@ -66,19 +66,19 @@
   "primary_entry_price_15pct_base": null,
   "entry_price_status": "unavailable",
   "entry_price_method": null,
-  "entry_price_unavailable_reason": "The valuation workbench is evidence-blocked; hurdle prices are withheld until proof is decision-grade.",
+  "entry_price_unavailable_reason": "A present value today has no dated future payoff or cash-flow schedule and cannot be discounted again.",
   "legacy_audit": {
     "actionable": false,
     "status": "audit_only",
     "annualized_return_at_price_pct": {
-      "low": -24.81,
-      "base": -4.56,
-      "high": 4.61
+      "low": -24.47,
+      "base": -4.14,
+      "high": 5.08
     },
     "formula": "((present_value_or_output + undated_distributions) / price) ** (1 / horizon_years) - 1",
     "reason_non_actionable": "This legacy calculation treated a present value as a future payoff and cannot be used as a forward return, hurdle entry price, ranking signal, or capital decision."
   },
-  "decision": "screening_only",
+  "decision": "owner_review_required",
   "pricing_conclusion": "No hurdle entry price is published because this contract does not contain usable dated forward economics.",
   "falsifiers": [
     "Primary evidence shows owner cash or capital structure materially worse than low case."
