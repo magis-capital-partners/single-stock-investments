@@ -1,0 +1,126 @@
+{
+  "schema_version": "1.0",
+  "draft_id": "01d9e3c381ada1ca50dc1fe5",
+  "work_id": "01d9e3c381ada1ca50dc1fe5",
+  "input_sha": "7c6e9fe0e804a7353c578b4708d55830e49ae24d", // pragma: allowlist secret
+  "component_fingerprint": "fa4138ee5767973d83a77e9c447898995514163bc8f91f59b4e0e8e6e709e86e", // pragma: allowlist secret
+  "contract_hash": "883a30b99a149f810c6b2f12a40587c0bce697de0572bcdbba9285946b047e74", // pragma: allowlist secret
+  "status": "awaiting_review",
+  "author_receipt": {
+    "authored_at": "2026-09-12T01:15:00Z",
+    "author": "marvin-cloud-agent",
+    "model_id": "composer-2.5",
+    "prompt_version": "cloud_marvin_runbook_2026-09-12",
+    "analysis_run_id": "epistemic_author_forecast:01d9e3c381ada1ca50dc1fe5",
+    "evidence_hash": "8175fc72c419b877a07b04ac90e645665a5be3c985f74a5589ae8c0dff7bf8ae", // pragma: allowlist secret
+    "epistemic_input_sha": "7c6e9fe0e804a7353c578b4708d55830e49ae24d", // pragma: allowlist secret
+    "contract_hash": "883a30b99a149f810c6b2f12a40587c0bce697de0572bcdbba9285946b047e74", // pragma: allowlist secret
+    "component_fingerprint": "fa4138ee5767973d83a77e9c447898995514163bc8f91f59b4e0e8e6e709e86e", // pragma: allowlist secret
+    "source_preflight": {
+      "ok": true,
+      "reason": "source_preflight_passed",
+      "metric_definition_id": "normalized_owner_earnings_ttm_m_v2",
+      "adapter": "sec_companyfacts_ttm"
+    },
+    "historical_replay": {
+      "value": 12895.0,
+      "unit": "USD millions",
+      "as_of": "2025-10-31",
+      "evidence_ref": "CRM/research/evidence/sec_companyfacts.json#normalized_owner_earnings_ttm_m@2025-10-31",
+      "adapter": "sec_companyfacts_ttm",
+      "blocker_reason": null,
+      "replay_measurement_period_end": "2025-10-31",
+      "replay_fiscal_period": "Q3",
+      "replay_fiscal_year": 2026
+    },
+    "calibration_release_hash": null,
+    "route": "quality_reinvestment",
+    "named_challenge": null,
+    "calibration_response": "not_applicable",
+    "calibration_note": "Epistemic loop health_state=COLLECTING; calibration global_status=insufficient_outcomes; eligible_scored_outcomes=0. release_hash is null. Calibration cannot change this analysis.",
+    "epistemic_work_receipt": {
+      "work_id": "01d9e3c381ada1ca50dc1fe5",
+      "task_type": "author_forecast",
+      "disposition": "success",
+      "published_input_sha": "7c6e9fe0e804a7353c578b4708d55830e49ae24d"
+    }
+  },
+  "review_receipt": null,
+  "rejection_reasons": [],
+  "spec": {
+    "spec_id": "crm-operating-business-oe-2026q3-v1",
+    "spec_revision": 1,
+    "spec_schema_version": "3.0",
+    "forecast_class": "ex_ante",
+    "forecast_role": "primary",
+    "authored_at": "2026-09-12T01:15:00Z",
+    "information_cutoff_at": "2026-09-12T01:15:00Z",
+    "registered_at": "2026-09-12T01:15:00Z",
+    "registration_commit": "pending",
+    "analysis_run_id": "epistemic_author_forecast:01d9e3c381ada1ca50dc1fe5",
+    "author": "marvin-cloud-agent",
+    "model_id": "composer-2.5",
+    "prompt_version": "cloud_marvin_runbook_2026-09-12",
+    "contract_hash": "883a30b99a149f810c6b2f12a40587c0bce697de0572bcdbba9285946b047e74",
+    "component_fingerprint": "fa4138ee5767973d83a77e9c447898995514163bc8f91f59b4e0e8e6e709e86e",
+    "method_id": "owner_earnings_reinvestment_dcf",
+    "power_zone": "quality_reinvestment",
+    "component_id": "operating_business_and_net_assets",
+    "correlation_group": "CRM|operating_business|normalized_owner_earnings|2026Q3",
+    "industry": "enterprise_software",
+    "metric": "normalized_owner_earnings",
+    "comparator": "lt",
+    "threshold": 14402.0,
+    "threshold_basis": {
+      "source_ref": "CRM/research/valuation_contract.json#operating_business_and_net_assets",
+      "rule": "Fire when Q3 FY2027 TTM normalized owner earnings fall below 14,402 USD millions, the low-case owner-earnings anchor locked in the contract proof trace (OCF less capital spending per CRM/research/valuation_fact_ledger.json)."
+    },
+    "unit": "USD millions",
+    "measurement_period_end": "2026-10-31",
+    "observable_after": "2026-12-04",
+    "resolution_deadline": "2027-01-31",
+    "source_hint": "normalized_owner_earnings_ttm_m",
+    "observation_plan": {
+      "metric_definition_id": "normalized_owner_earnings_ttm_m_v2",
+      "metric_definition_version": "1.0",
+      "source_adapter": "sec_companyfacts_ttm",
+      "fiscal_period": "Q3",
+      "fiscal_year": 2027,
+      "observation_type": "duration",
+      "duration_basis": "TTM",
+      "canonical_unit": "USD millions",
+      "source_unit": "USD",
+      "accepted_forms": [
+        "10-Q",
+        "10-K"
+      ],
+      "end_date_tolerance_days": 7,
+      "expected_publication_date": "2026-12-04",
+      "maximum_source_lag_days": 45,
+      "outcome_unavailable_at_registration": true,
+      "historical_replay": {
+        "status": "passed",
+        "evidence_ref": "CRM/research/evidence/sec_companyfacts.json#normalized_owner_earnings_ttm_m@2025-10-31",
+        "replay_measurement_period_end": "2025-10-31",
+        "replay_fiscal_period": "Q3",
+        "replay_fiscal_year": 2026,
+        "replay_value": 12895.0,
+        "replay_as_of": "2025-10-31"
+      }
+    },
+    "review": {
+      "status": "pending",
+      "reviewer": null,
+      "reviewed_at": null
+    },
+    "probability_fires": 0.3,
+    "severity": 4,
+    "component_value_impact_pct": 48.4,
+    "total_equity_value_impact_pct": 48.4,
+    "derived_from": "Owner earnings, incremental returns, or reinvestment runway fall below the low-case bridge.",
+    "rationale": "Types the owner-earnings leg of the operating_business_and_net_assets prose falsifier for the quality_reinvestment DCF ($145.56 low / $282.00 base / $559.47 high per share). **[Fact]** The contract locks normalized owner earnings at 14,402 USD millions from FY2026 operating cash flow less capital spending (CRM/research/valuation_fact_ledger.json; accession 0001108524-26-000060). **[Fact]** Q3 FY2026 TTM normalized owner earnings replay at 12,895 USD millions via sec_companyfacts_ttm (OCF TTM minus absolute capex TTM for period ending 2025-10-31, filed 2025-12-04). **[Inference]** If Q3 FY2027 TTM resolves below the 14,402 anchor, the low-case reinvestment bridge is unsupported and per-share value should compress from the $282 base toward the $145.56 low case (roughly 48% component gap). A 30% fire probability reflects that the prior-year Q3 replay already sat below the anchor while CRM continues heavy AI and integration spending, but also that subscription revenue and margin discipline could stabilize owner cash. Incremental after-tax ROIC and reinvestment-rate inputs remain judgment-only and are not typed here.",
+    "untestable": false,
+    "calibration_eligible": true,
+    "supersedes_spec_id": null
+  }
+}
