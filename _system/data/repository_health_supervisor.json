@@ -1,24 +1,24 @@
 {
   "schema_version": "1.0",
-  "checked_at": "2026-09-14T20:25:33.430867+00:00",
-  "git_head": "40aba7b527c86b24c80d13e9f926b0c91b74ec95",
+  "checked_at": "2026-09-14T23:20:13.173663+00:00",
+  "git_head": "e9b63fed6cd85864f5800fd2c5e71d48268dda2e",
   "hard_violation_count": 4,
   "failures": {
     "P3|falsifier: successful workflow receipt is stale": {
-      "consecutive_runs": 24,
-      "last_seen_at": "2026-09-14T20:25:33.430797+00:00"
+      "consecutive_runs": 25,
+      "last_seen_at": "2026-09-14T23:20:13.173590+00:00"
     },
     "P6|warrant_monitor: health.stale_active_quotes exceeds its limit of 0 -- an active warrant with no delayed mark for more than five days cannot be silently presented as current -- heal: python _system/scripts/refresh_warrant_universe.py --refresh-market --capture-cohort && python _syst": {
-      "consecutive_runs": 2,
-      "last_seen_at": "2026-09-14T20:25:33.430814+00:00"
+      "consecutive_runs": 3,
+      "last_seen_at": "2026-09-14T23:20:13.173606+00:00"
     },
     "P6|warrant_monitor: health.status holds a disallowed value -- repeated SEC failures, stale last-successful market refreshes, and stale active marks must be loud -- heal: python _system/scripts/refresh_warrant_universe.py --refresh-market --capture-cohort && python _syst": {
-      "consecutive_runs": 3,
-      "last_seen_at": "2026-09-14T20:25:33.430817+00:00"
+      "consecutive_runs": 4,
+      "last_seen_at": "2026-09-14T23:20:13.173609+00:00"
     },
     "P6|warrant_monitor: health.structural_errors exceeds its limit of 0 -- contract identity, immutable versions, and gate ordering must remain structurally valid -- heal: python _system/scripts/refresh_warrant_universe.py --refresh-market --capture-cohort && python _syst": {
-      "consecutive_runs": 3,
-      "last_seen_at": "2026-09-14T20:25:33.430819+00:00"
+      "consecutive_runs": 4,
+      "last_seen_at": "2026-09-14T23:20:13.173612+00:00"
     }
   },
   "dispatches": [
@@ -31,6 +31,7 @@
   ],
   "escalate": [
     "P3|falsifier: successful workflow receipt is stale",
+    "P6|warrant_monitor: health.stale_active_quotes exceeds its limit of 0 -- an active warrant with no delayed mark for more than five days cannot be silently presented as current -- heal: python _system/scripts/refresh_warrant_universe.py --refresh-market --capture-cohort && python _syst",
     "P6|warrant_monitor: health.status holds a disallowed value -- repeated SEC failures, stale last-successful market refreshes, and stale active marks must be loud -- heal: python _system/scripts/refresh_warrant_universe.py --refresh-market --capture-cohort && python _syst",
     "P6|warrant_monitor: health.structural_errors exceeds its limit of 0 -- contract identity, immutable versions, and gate ordering must remain structurally valid -- heal: python _system/scripts/refresh_warrant_universe.py --refresh-market --capture-cohort && python _syst"
   ]
