@@ -1,6 +1,6 @@
-# BROWN & BROWN, INC.  (BRO)  (CIK 0000079282) contingent / CVR candidate (BRO)
+# InMed Pharmaceuticals Inc.  (INM)  (CIK 0001728328) contingent / CVR candidate (INM)
 
-**Ticker:** BRO | **Market:** US  
+**Ticker:** INM | **Market:** US  
 **Last updated:** 2026-09-14  
 **Stage:** pre-close stub (discovery)
 

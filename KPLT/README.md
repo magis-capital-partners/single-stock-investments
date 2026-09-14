@@ -1,6 +1,6 @@
-# BROWN & BROWN, INC.  (BRO)  (CIK 0000079282) contingent / CVR candidate (BRO)
+# Katapult Holdings, Inc.  (KPLT)  (CIK 0001785424) contingent / CVR candidate (KPLT)
 
-**Ticker:** BRO | **Market:** US  
+**Ticker:** KPLT | **Market:** US  
 **Last updated:** 2026-09-14  
 **Stage:** pre-close stub (discovery)
 

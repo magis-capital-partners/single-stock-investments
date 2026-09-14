@@ -1,6 +1,6 @@
-# BROWN & BROWN, INC.  (BRO)  (CIK 0000079282) contingent / CVR candidate (BRO)
+# LIGHTPATH TECHNOLOGIES INC  (LPTH)  (CIK 0000889971) contingent / CVR candidate (LPTH)
 
-**Ticker:** BRO | **Market:** US  
+**Ticker:** LPTH | **Market:** US  
 **Last updated:** 2026-09-14  
 **Stage:** pre-close stub (discovery)
 

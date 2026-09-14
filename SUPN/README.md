@@ -1,6 +1,6 @@
-# BROWN & BROWN, INC.  (BRO)  (CIK 0000079282) contingent / CVR candidate (BRO)
+# SUPERNUS PHARMACEUTICALS, INC.  (SUPN)  (CIK 0001356576) contingent / CVR candidate (SUPN)
 
-**Ticker:** BRO | **Market:** US  
+**Ticker:** SUPN | **Market:** US  
 **Last updated:** 2026-09-14  
 **Stage:** pre-close stub (discovery)
 

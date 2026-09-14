@@ -1,6 +1,6 @@
-# BROWN & BROWN, INC.  (BRO)  (CIK 0000079282) contingent / CVR candidate (BRO)
+# Baldwin Insurance Group, Inc.  (BWIN)  (CIK 0001781755) contingent / CVR candidate (BWIN)
 
-**Ticker:** BRO | **Market:** US  
+**Ticker:** BWIN | **Market:** US  
 **Last updated:** 2026-09-14  
 **Stage:** pre-close stub (discovery)
 

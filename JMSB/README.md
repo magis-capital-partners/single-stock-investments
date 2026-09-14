@@ -1,6 +1,6 @@
-# BROWN & BROWN, INC.  (BRO)  (CIK 0000079282) contingent / CVR candidate (BRO)
+# John Marshall Bancorp, Inc.  (JMSB)  (CIK 0001710482) contingent / CVR candidate (JMSB)
 
-**Ticker:** BRO | **Market:** US  
+**Ticker:** JMSB | **Market:** US  
 **Last updated:** 2026-09-14  
 **Stage:** pre-close stub (discovery)
 

@@ -1,6 +1,6 @@
-# BROWN & BROWN, INC.  (BRO)  (CIK 0000079282) contingent / CVR candidate (BRO)
+# PERDOCEO EDUCATION Corp  (PRDO)  (CIK 0001046568) contingent / CVR candidate (PRDO)
 
-**Ticker:** BRO | **Market:** US  
+**Ticker:** PRDO | **Market:** US  
 **Last updated:** 2026-09-14  
 **Stage:** pre-close stub (discovery)
 

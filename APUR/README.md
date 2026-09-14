@@ -1,6 +1,6 @@
-# BROWN & BROWN, INC.  (BRO)  (CIK 0000079282) contingent / CVR candidate (BRO)
+# Aperture AC  (APUR, APURR)  (CIK 0002093524) contingent / CVR candidate (APUR)
 
-**Ticker:** BRO | **Market:** US  
+**Ticker:** APUR | **Market:** US  
 **Last updated:** 2026-09-14  
 **Stage:** pre-close stub (discovery)
 

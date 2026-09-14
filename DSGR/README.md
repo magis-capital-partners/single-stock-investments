@@ -1,6 +1,6 @@
-# BROWN & BROWN, INC.  (BRO)  (CIK 0000079282) contingent / CVR candidate (BRO)
+# Distribution Solutions Group, Inc.  (DSGR)  (CIK 0000703604) contingent / CVR candidate (DSGR)
 
-**Ticker:** BRO | **Market:** US  
+**Ticker:** DSGR | **Market:** US  
 **Last updated:** 2026-09-14  
 **Stage:** pre-close stub (discovery)
 

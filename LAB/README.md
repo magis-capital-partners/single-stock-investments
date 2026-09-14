@@ -1,6 +1,6 @@
-# BROWN & BROWN, INC.  (BRO)  (CIK 0000079282) contingent / CVR candidate (BRO)
+# STANDARD BIOTOOLS INC.  (LAB)  (CIK 0001162194) contingent / CVR candidate (LAB)
 
-**Ticker:** BRO | **Market:** US  
+**Ticker:** LAB | **Market:** US  
 **Last updated:** 2026-09-14  
 **Stage:** pre-close stub (discovery)
 

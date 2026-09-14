@@ -1,6 +1,6 @@
-# BROWN & BROWN, INC.  (BRO)  (CIK 0000079282) contingent / CVR candidate (BRO)
+# INDEPENDENCE REALTY TRUST, INC.  (IRT)  (CIK 0001466085) contingent / CVR candidate (IRT)
 
-**Ticker:** BRO | **Market:** US  
+**Ticker:** IRT | **Market:** US  
 **Last updated:** 2026-09-14  
 **Stage:** pre-close stub (discovery)
 

@@ -1,6 +1,6 @@
-# BROWN & BROWN, INC.  (BRO)  (CIK 0000079282) contingent / CVR candidate (BRO)
+# AirJoule Technologies Corp.  (AIRJ, AIRJW)  (CIK 0001855474) contingent / CVR candidate (AIRJ)
 
-**Ticker:** BRO | **Market:** US  
+**Ticker:** AIRJ | **Market:** US  
 **Last updated:** 2026-09-14  
 **Stage:** pre-close stub (discovery)
 

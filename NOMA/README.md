@@ -1,6 +1,6 @@
-# BROWN & BROWN, INC.  (BRO)  (CIK 0000079282) contingent / CVR candidate (BRO)
+# Nomadar Corp.  (NOMA)  (CIK 0001994214) contingent / CVR candidate (NOMA)
 
-**Ticker:** BRO | **Market:** US  
+**Ticker:** NOMA | **Market:** US  
 **Last updated:** 2026-09-14  
 **Stage:** pre-close stub (discovery)
 

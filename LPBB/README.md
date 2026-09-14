@@ -1,6 +1,6 @@
-# BROWN & BROWN, INC.  (BRO)  (CIK 0000079282) contingent / CVR candidate (BRO)
+# Launch Two Acquisition Corp.  (LPBB, LPBBU, LPBBW)  (CIK 0002023676) contingent / CVR candidate (LPBB)
 
-**Ticker:** BRO | **Market:** US  
+**Ticker:** LPBB | **Market:** US  
 **Last updated:** 2026-09-14  
 **Stage:** pre-close stub (discovery)
 

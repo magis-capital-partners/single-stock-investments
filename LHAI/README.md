@@ -1,6 +1,6 @@
-# BROWN & BROWN, INC.  (BRO)  (CIK 0000079282) contingent / CVR candidate (BRO)
+# Linkhome Holdings Inc.  (LHAI)  (CIK 0002017758) contingent / CVR candidate (LHAI)
 
-**Ticker:** BRO | **Market:** US  
+**Ticker:** LHAI | **Market:** US  
 **Last updated:** 2026-09-14  
 **Stage:** pre-close stub (discovery)
 

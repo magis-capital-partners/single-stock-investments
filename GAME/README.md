@@ -1,6 +1,6 @@
-# BROWN & BROWN, INC.  (BRO)  (CIK 0000079282) contingent / CVR candidate (BRO)
+# GameSquare Holdings, Inc.  (GAME)  (CIK 0001714562) contingent / CVR candidate (GAME)
 
-**Ticker:** BRO | **Market:** US  
+**Ticker:** GAME | **Market:** US  
 **Last updated:** 2026-09-14  
 **Stage:** pre-close stub (discovery)
 

@@ -1,6 +1,6 @@
-# BROWN & BROWN, INC.  (BRO)  (CIK 0000079282) contingent / CVR candidate (BRO)
+# Research Solutions, Inc.  (RSSS)  (CIK 0001386301) contingent / CVR candidate (RSSS)
 
-**Ticker:** BRO | **Market:** US  
+**Ticker:** RSSS | **Market:** US  
 **Last updated:** 2026-09-14  
 **Stage:** pre-close stub (discovery)
 

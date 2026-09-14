@@ -1,6 +1,6 @@
-# BROWN & BROWN, INC.  (BRO)  (CIK 0000079282) contingent / CVR candidate (BRO)
+# EAGLE FINANCIAL SERVICES INC  (EFSI)  (CIK 0000880641) contingent / CVR candidate (EFSI)
 
-**Ticker:** BRO | **Market:** US  
+**Ticker:** EFSI | **Market:** US  
 **Last updated:** 2026-09-14  
 **Stage:** pre-close stub (discovery)
 

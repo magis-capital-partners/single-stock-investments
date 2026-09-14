@@ -1,6 +1,6 @@
-# BROWN & BROWN, INC.  (BRO)  (CIK 0000079282) contingent / CVR candidate (BRO)
+# IPG PHOTONICS CORP  (IPGP)  (CIK 0001111928) contingent / CVR candidate (IPGP)
 
-**Ticker:** BRO | **Market:** US  
+**Ticker:** IPGP | **Market:** US  
 **Last updated:** 2026-09-14  
 **Stage:** pre-close stub (discovery)
 

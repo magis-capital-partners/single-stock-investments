@@ -1,6 +1,6 @@
-# BROWN & BROWN, INC.  (BRO)  (CIK 0000079282) contingent / CVR candidate (BRO)
+# Reliance Global Group, Inc.  (EZRA)  (CIK 0001812727) contingent / CVR candidate (EZRA)
 
-**Ticker:** BRO | **Market:** US  
+**Ticker:** EZRA | **Market:** US  
 **Last updated:** 2026-09-14  
 **Stage:** pre-close stub (discovery)
 
