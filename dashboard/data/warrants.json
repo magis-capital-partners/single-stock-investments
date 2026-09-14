@@ -7,8 +7,15 @@
     },
     {
       "kind": "contract_clock",
-      "message": "-4 days to contractual expiry; verify exchange cutoff and settlement mechanics.",
+      "message": "-5 days to contractual expiry; verify exchange cutoff and settlement mechanics.",
       "severity": "high",
+      "ticker": "BKSY.W",
+      "warrant_id": "0001753539:0001753539-21-000084:public"
+    },
+    {
+      "kind": "stale_market",
+      "message": "Delayed warrant mark is missing or stale; last-known-good terms remain intact.",
+      "severity": "medium",
       "ticker": "BKSY.W",
       "warrant_id": "0001753539:0001753539-21-000084:public"
     }
@@ -1054,17 +1061,17 @@
       "terms_status": "unparsed"
     }
   ],
-  "generated_at": "2026-09-13T22:33:57Z",
+  "generated_at": "2026-09-14T06:02:59Z",
   "health": {
     "discovery": {
       "consecutive_failures": 0,
       "healer": "python _system/scripts/refresh_warrant_universe.py --discover --refresh-market --capture-cohort",
-      "last_added_count": 6,
+      "last_added_count": 0,
       "last_error": null,
-      "last_success_at": "2026-09-13T22:33:57Z",
+      "last_success_at": "2026-09-14T06:02:59Z",
       "schema_version": "1.0",
       "unhealthy": false,
-      "updated_at": "2026-09-13T22:33:57Z"
+      "updated_at": "2026-09-14T06:02:59Z"
     },
     "healers": [
       "python _system/scripts/refresh_warrant_universe.py --refresh-market --capture-cohort",
@@ -1074,9 +1081,11 @@
     "last_known_good_preserved": true,
     "market_age_days": 0,
     "market_freshness_state": "ready",
-    "market_generated_at": "2026-09-13T22:33:57Z",
-    "market_last_successful_refresh": "2026-09-13T22:33:57Z",
-    "stale_active_quotes": [],
+    "market_generated_at": "2026-09-14T06:02:58Z",
+    "market_last_successful_refresh": "2026-09-14T06:02:58Z",
+    "stale_active_quotes": [
+      "BKSY.W"
+    ],
     "status": "unhealthy",
     "structural_errors": [
       "row 4: active security is past contractual expiry",
@@ -1087,7 +1096,7 @@
     "automatic_weight_changes": false,
     "calibration": {
       "buckets": [],
-      "generated_at": "2026-09-13T22:33:57Z",
+      "generated_at": "2026-09-14T06:02:59Z",
       "outcome_count": 0,
       "policy": "descriptive_only_no_automatic_weight_changes",
       "schema_version": "1.0"
@@ -1115,7 +1124,7 @@
           "window": "20 of 30 trading days"
         },
         "callable": true,
-        "days_to_expiry": -4,
+        "days_to_expiry": -5,
         "elapsed_pct": 100.0,
         "expiry": "2026-09-09",
         "issue_date": "2019-09-09",
@@ -1170,7 +1179,7 @@
           "close": 20.610001,
           "currency": "USD",
           "exchange": "NYQ",
-          "fetched_at": "2026-09-13T22:33:55Z",
+          "fetched_at": "2026-09-14T06:02:58Z",
           "previous_close": 20.75,
           "quote_date": "2026-09-11",
           "role": "common",
@@ -1180,7 +1189,7 @@
           "warrant_id": "0001753539:0001753539-21-000084:public"
         },
         "executable": false,
-        "quote_age_days": 5,
+        "quote_age_days": 6,
         "warrant": {
           "adv20": 27180.0,
           "ask": null,
@@ -1201,7 +1210,7 @@
       "next_action": "Treat as an expiry/corporate-action clock, not a long-duration option; verify exchange handling before September 9.",
       "priority": "urgent",
       "priority_reasons": [
-        "Only -4 days remain on the contract clock.",
+        "Only -5 days remain on the contract clock.",
         "Contract verified; issuer survival packet is the next decision gate."
       ],
       "source": {
@@ -1251,8 +1260,8 @@
       "contract_clock": {
         "call": null,
         "callable": false,
-        "days_to_expiry": 132,
-        "elapsed_pct": 87.96,
+        "days_to_expiry": 131,
+        "elapsed_pct": 88.05,
         "expiry": "2027-01-23",
         "issue_date": "2024-01-23",
         "threshold": null
@@ -1306,7 +1315,7 @@
           "close": 17.940001,
           "currency": "USD",
           "exchange": "NMS",
-          "fetched_at": "2026-09-13T22:33:56Z",
+          "fetched_at": "2026-09-14T06:02:58Z",
           "previous_close": 17.370001,
           "quote_date": "2026-09-11",
           "role": "common",
@@ -1324,7 +1333,7 @@
           "close": 11.15,
           "currency": "USD",
           "exchange": "NMS",
-          "fetched_at": "2026-09-13T22:33:55Z",
+          "fetched_at": "2026-09-14T06:02:58Z",
           "previous_close": null,
           "quote_date": "2026-09-11",
           "role": "warrant",
@@ -1379,8 +1388,8 @@
       "contract_clock": {
         "call": null,
         "callable": false,
-        "days_to_expiry": 863,
-        "elapsed_pct": 52.76,
+        "days_to_expiry": 862,
+        "elapsed_pct": 52.82,
         "expiry": "2029-01-23",
         "issue_date": "2024-01-23",
         "threshold": {
@@ -1439,7 +1448,7 @@
           "close": 17.940001,
           "currency": "USD",
           "exchange": "NMS",
-          "fetched_at": "2026-09-13T22:33:56Z",
+          "fetched_at": "2026-09-14T06:02:58Z",
           "previous_close": 17.370001,
           "quote_date": "2026-09-11",
           "role": "common",
@@ -1457,7 +1466,7 @@
           "close": 17.59,
           "currency": "USD",
           "exchange": "NMS",
-          "fetched_at": "2026-09-13T22:33:56Z",
+          "fetched_at": "2026-09-14T06:02:58Z",
           "previous_close": null,
           "quote_date": "2026-09-11",
           "role": "warrant",
@@ -1518,8 +1527,8 @@
       "contract_clock": {
         "call": null,
         "callable": false,
-        "days_to_expiry": 9056,
-        "elapsed_pct": 17.35,
+        "days_to_expiry": 9055,
+        "elapsed_pct": 17.36,
         "expiry": "2051-06-30",
         "issue_date": "2021-06-30",
         "threshold": null
@@ -1573,7 +1582,7 @@
           "close": 2.04,
           "currency": "USD",
           "exchange": "NMS",
-          "fetched_at": "2026-09-13T22:33:57Z",
+          "fetched_at": "2026-09-14T06:02:58Z",
           "previous_close": 2.05,
           "quote_date": "2026-09-11",
           "role": "common",
@@ -1591,7 +1600,7 @@
           "close": 0.966,
           "currency": "USD",
           "exchange": "NMS",
-          "fetched_at": "2026-09-13T22:33:56Z",
+          "fetched_at": "2026-09-14T06:02:58Z",
           "previous_close": null,
           "quote_date": "2026-09-11",
           "role": "warrant",
@@ -1651,7 +1660,7 @@
           "window": "20 of 30 trading days"
         },
         "callable": true,
-        "days_to_expiry": -1696,
+        "days_to_expiry": -1697,
         "elapsed_pct": 100.0,
         "expiry": "2022-01-21",
         "issue_date": "2020-09-24",
@@ -1751,7 +1760,7 @@
           "window": "20 of 30 trading days"
         },
         "callable": true,
-        "days_to_expiry": -716,
+        "days_to_expiry": -717,
         "elapsed_pct": 100.0,
         "expiry": "2024-09-27",
         "issue_date": "2019-09-13",
@@ -1852,7 +1861,7 @@
           "window": "20 of 30 trading days"
         },
         "callable": true,
-        "days_to_expiry": -556,
+        "days_to_expiry": -557,
         "elapsed_pct": 100.0,
         "expiry": "2025-03-06",
         "issue_date": "2021-09-21",
@@ -1955,7 +1964,7 @@
           "window": "20 of 30 trading days"
         },
         "callable": true,
-        "days_to_expiry": -538,
+        "days_to_expiry": -539,
         "elapsed_pct": 100.0,
         "expiry": "2025-03-24",
         "issue_date": "2020-11-24",
@@ -2048,7 +2057,7 @@
   "schema_version": "1.0",
   "summary": {
     "active_series": 4,
-    "alerts": 2,
+    "alerts": 3,
     "market_blocked": 0,
     "near_expiry": 1,
     "registry_series": 8,
