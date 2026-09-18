@@ -3700,5 +3700,116 @@
   },
   "human_review": {
     "live_price_confirmed": false
+  },
+  "btc_overlay": {
+    "as_of": "2026-09-17",
+    "crypto_exposure": "holdco",
+    "status": "partial",
+    "disclaimer": "Context only. Crypto and mining metrics inform stance and overlays; they do not auto-inflate Lawrence base IRR. Promotion to base case requires [HUMAN REVIEW].",
+    "in_base_irr": false,
+    "themes": [
+      {
+        "theme_id": "btc_network_economics",
+        "label": "Bitcoin network and mining economics",
+        "indicators": [
+          {
+            "id": "btc_spot_usd",
+            "label": "Bitcoin spot (USD)",
+            "latest": 76209.859375,
+            "as_of": "2026-09-17",
+            "yoy_pct": -34.6,
+            "direction": "down",
+            "source": "yahoo_daily",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "btc_hash_rate_eh",
+            "label": "Network hash rate (EH/s)",
+            "latest": 873.9874431305159,
+            "as_of": "2026-09-17",
+            "yoy_pct": -19.7,
+            "direction": "down",
+            "source": "mempool_hashrate",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "btc_difficulty",
+            "label": "Mining difficulty (index)",
+            "latest": 127450789715843.1,
+            "as_of": "2026-09-17",
+            "yoy_pct": null,
+            "direction": "flat",
+            "source": "mempool_difficulty",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "btc_avg_fee_per_block_usd",
+            "label": "Avg transaction fees per block (USD)",
+            "latest": 349.7329,
+            "as_of": "2026-09-17",
+            "yoy_pct": null,
+            "direction": "flat",
+            "source": "mempool_fees",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "btc_hashprice_usd_ph_day",
+            "label": "Hashprice (USD/PH/day)",
+            "latest": 0.039297,
+            "as_of": "2026-09-17",
+            "yoy_pct": null,
+            "direction": "flat",
+            "source": "computed_hashprice",
+            "stale": false,
+            "in_base_irr": false
+          },
+          {
+            "id": "btc_breakeven_power_30jth",
+            "label": "Breakeven power cost at 30 J/TH ($/kWh)",
+            "latest": 0.0546,
+            "as_of": "2026-09-17",
+            "yoy_pct": null,
+            "direction": "flat",
+            "source": "computed_breakeven",
+            "stale": false,
+            "in_base_irr": false
+          }
+        ]
+      }
+    ],
+    "mining_economics_context": {
+      "spot_usd": 76209.859375,
+      "hash_rate_eh": 873.9874431305159,
+      "difficulty": 127450789715843.1,
+      "avg_fee_per_block_usd": 349.7329,
+      "hashprice_usd_ph_day": 0.039297,
+      "breakeven_power_usd_kwh_30jth": 0.0546,
+      "spot_as_of": "2026-09-17",
+      "hauck_all_in_usd": 57101.03,
+      "hauck_all_in_as_of": "2026-09-17",
+      "fleet_jth": 14.700133,
+      "electricity_only_usd": 34260.62,
+      "sota_cash_usd": 42728.27,
+      "sota_roic_usd": 89287.73,
+      "premium_usd": 99926.8,
+      "mixed_2028_all_in_usd": 138184.49,
+      "mixed_2032_all_in_usd": 342606.18,
+      "naive_2028_all_in_usd": 114202.06,
+      "miner_stance": "above_fleet_floor_below_sota_roic",
+      "miner_stance_plain_english": "Average fleet is cash-profitable at this spot. New state-of-the-art machines with a 25 percent ROIC hurdle are not earning that return.",
+      "in_base_irr": false,
+      "source": "asic vintage mix + $0.05/kWh HK-comparable case"
+    },
+    "in_model": {},
+    "not_in_model_requires_refresh": [
+      "live_btc_spot_in_price_input",
+      "hashprice_vs_fleet_breakeven",
+      "post_halving_subsidy_schedule",
+      "hauck_cost_floor_not_in_lawrence_base"
+    ]
   }
 }
