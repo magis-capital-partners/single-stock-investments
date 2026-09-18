@@ -56,7 +56,7 @@
     }
   },
   "btc_overlay": {
-    "as_of": "2026-06-08",
+    "as_of": "2026-09-17",
     "crypto_exposure": "stablecoin",
     "status": "partial",
     "disclaimer": "Context only. Crypto and mining metrics inform stance and overlays; they do not auto-inflate Lawrence base IRR. Promotion to base case requires [HUMAN REVIEW].",
@@ -69,33 +69,33 @@
           {
             "id": "usdc_market_cap_bn",
             "label": "USDC market cap (USD bn)",
-            "latest": 75.64,
-            "as_of": "2026-06-08",
+            "latest": 73.857,
+            "as_of": "2026-09-17",
             "yoy_pct": null,
             "direction": "flat",
-            "source": "coingecko:usd-coin:market_cap",
+            "source": "coingecko",
             "stale": false,
             "in_base_irr": false
           },
           {
             "id": "usdc_circulating_bn",
             "label": "USDC circulating supply (USD bn)",
-            "latest": 75.647,
-            "as_of": "2026-06-08",
+            "latest": 73.856,
+            "as_of": "2026-09-17",
             "yoy_pct": null,
             "direction": "flat",
-            "source": "coingecko:usd-coin:circulating_supply",
+            "source": "coingecko",
             "stale": false,
             "in_base_irr": false
           },
           {
             "id": "btc_spot_usd",
             "label": "Bitcoin spot (USD, cross-asset context)",
-            "latest": 62745.83984375,
-            "as_of": "2026-06-08",
-            "yoy_pct": -40.7,
+            "latest": 76209.859375,
+            "as_of": "2026-09-17",
+            "yoy_pct": -34.6,
             "direction": "down",
-            "source": "yahoo:BTC-USD",
+            "source": "yahoo_daily",
             "stale": false,
             "in_base_irr": false
           }
@@ -103,13 +103,14 @@
       }
     ],
     "mining_economics_context": {
-      "source": "mempool.space + computed"
+      "spot_usd": 76209.859375
     },
     "in_model": {},
     "not_in_model_requires_refresh": [
       "live_btc_spot_in_price_input",
       "hashprice_vs_fleet_breakeven",
-      "post_halving_subsidy_schedule"
+      "post_halving_subsidy_schedule",
+      "hauck_cost_floor_not_in_lawrence_base"
     ]
   },
   "implied_return": {
