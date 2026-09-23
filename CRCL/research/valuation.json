@@ -56,7 +56,7 @@
     }
   },
   "btc_overlay": {
-    "as_of": "2026-06-08",
+    "as_of": "2026-09-17",
     "crypto_exposure": "stablecoin",
     "status": "partial",
     "disclaimer": "Context only. Crypto and mining metrics inform stance and overlays; they do not auto-inflate Lawrence base IRR. Promotion to base case requires [HUMAN REVIEW].",
@@ -69,33 +69,33 @@
           {
             "id": "usdc_market_cap_bn",
             "label": "USDC market cap (USD bn)",
-            "latest": 75.64,
-            "as_of": "2026-06-08",
+            "latest": 73.857,
+            "as_of": "2026-09-17",
             "yoy_pct": null,
             "direction": "flat",
-            "source": "coingecko:usd-coin:market_cap",
+            "source": "coingecko",
             "stale": false,
             "in_base_irr": false
           },
           {
             "id": "usdc_circulating_bn",
             "label": "USDC circulating supply (USD bn)",
-            "latest": 75.647,
-            "as_of": "2026-06-08",
+            "latest": 73.856,
+            "as_of": "2026-09-17",
             "yoy_pct": null,
             "direction": "flat",
-            "source": "coingecko:usd-coin:circulating_supply",
+            "source": "coingecko",
             "stale": false,
             "in_base_irr": false
           },
           {
             "id": "btc_spot_usd",
             "label": "Bitcoin spot (USD, cross-asset context)",
-            "latest": 62745.83984375,
-            "as_of": "2026-06-08",
-            "yoy_pct": -40.7,
+            "latest": 76209.859375,
+            "as_of": "2026-09-17",
+            "yoy_pct": -34.6,
             "direction": "down",
-            "source": "yahoo:BTC-USD",
+            "source": "yahoo_daily",
             "stale": false,
             "in_base_irr": false
           }
@@ -103,13 +103,14 @@
       }
     ],
     "mining_economics_context": {
-      "source": "mempool.space + computed"
+      "spot_usd": 76209.859375
     },
     "in_model": {},
     "not_in_model_requires_refresh": [
       "live_btc_spot_in_price_input",
       "hashprice_vs_fleet_breakeven",
-      "post_halving_subsidy_schedule"
+      "post_halving_subsidy_schedule",
+      "hauck_cost_floor_not_in_lawrence_base"
     ]
   },
   "implied_return": {
@@ -238,7 +239,7 @@
     }
   ],
   "context_overlay": {
-    "as_of": "2026-09-11",
+    "as_of": "2026-09-23",
     "disclaimer": "Context only. Tailwinds inform stance and overlay sizing; they do not auto-inflate Lawrence base IRR. Promotion to base case requires [HUMAN REVIEW].",
     "themes": [
       {
@@ -248,9 +249,9 @@
           {
             "id": "hy_oas",
             "label": "High-yield OAS credit spread (%)",
-            "latest": 0.38,
-            "as_of": "2026-09-11",
-            "yoy_pct": 125.2,
+            "latest": -0.01,
+            "as_of": "2026-09-23",
+            "yoy_pct": 98.8,
             "direction": "up",
             "good_for": "risk_regime",
             "source": "spread:HYG-LQD:21d (HYG-LQD 1m spread proxy, not OAS)",
@@ -260,9 +261,9 @@
           {
             "id": "ust_10y",
             "label": "US Treasury 10Y yield (%)",
-            "latest": 4.953000068664551,
-            "as_of": "2026-09-11",
-            "yoy_pct": 23.5,
+            "latest": 5.065999984741211,
+            "as_of": "2026-09-23",
+            "yoy_pct": 23.0,
             "direction": "up",
             "good_for": "rates_regime",
             "source": "yahoo:^TNX",
@@ -272,9 +273,9 @@
           {
             "id": "ust_2y",
             "label": "US Treasury 2Y yield (%)",
-            "latest": 4.765999794006348,
-            "as_of": "2026-09-11",
-            "yoy_pct": 33.2,
+            "latest": 4.952000141143799,
+            "as_of": "2026-09-23",
+            "yoy_pct": 34.7,
             "direction": "up",
             "good_for": "rates_regime",
             "source": "yahoo:^FVX",
@@ -284,9 +285,9 @@
           {
             "id": "dxy_broad",
             "label": "Trade-weighted USD index (broad)",
-            "latest": 99.06600189208984,
-            "as_of": "2026-09-11",
-            "yoy_pct": 1.6,
+            "latest": 101.02799987792969,
+            "as_of": "2026-09-23",
+            "yoy_pct": 3.9,
             "direction": "up",
             "good_for": "dollar_regime",
             "source": "yahoo:DX-Y.NYB",
@@ -296,10 +297,10 @@
           {
             "id": "vix_level",
             "label": "VIX index level",
-            "latest": 15.720000267028809,
-            "as_of": "2026-09-11",
-            "yoy_pct": 6.9,
-            "direction": "up",
+            "latest": 14.65999984741211,
+            "as_of": "2026-09-23",
+            "yoy_pct": -11.9,
+            "direction": "down",
             "good_for": "vol_regime",
             "source": "yahoo:^VIX",
             "stale": false,
@@ -308,9 +309,9 @@
           {
             "id": "credit_impulse_1m",
             "label": "HYG vs TLT 1-month return spread (%)",
-            "latest": 0.22,
-            "as_of": "2026-09-11",
-            "yoy_pct": 107.1,
+            "latest": -0.08,
+            "as_of": "2026-09-23",
+            "yoy_pct": 96.2,
             "direction": "up",
             "good_for": "credit_impulse",
             "source": "spread:HYG-TLT:21d",
@@ -320,10 +321,10 @@
           {
             "id": "spy_20d_realized_vol",
             "label": "SPY 20-day realized vol (annualized %)",
-            "latest": 8.85,
-            "as_of": "2026-09-11",
-            "yoy_pct": -0.8,
-            "direction": "flat",
+            "latest": 10.44,
+            "as_of": "2026-09-23",
+            "yoy_pct": 41.7,
+            "direction": "up",
             "good_for": "equity_vol",
             "source": "realized_vol:SPY:20d",
             "stale": false,
@@ -358,7 +359,7 @@
     ]
   },
   "insider_signal": {
-    "as_of": "2026-09-11",
+    "as_of": "2026-09-23",
     "disclaimer": "Context only. Insider activity informs scenario confidence and stance discussion; it does not auto-inflate Lawrence base IRR. Promotion requires [HUMAN REVIEW].",
     "in_base_irr": false,
     "window_days": 365,
@@ -381,7 +382,7 @@
       "note": "Scenario weights are qualitative confidence only; Lawrence base IRR unchanged."
     },
     "factors": {
-      "buy_score": 24.204,
+      "buy_score": 23.635,
       "sell_score": -1.0,
       "cluster_bonus": 0.0,
       "net_buy_usd": 23662071.95,
@@ -396,7 +397,7 @@
         "price": 25.81,
         "value_usd": 11872780.67,
         "shares_owned_after": 981816,
-        "contrib": 1.762
+        "contrib": 1.595
       },
       {
         "insider": "Chandhok Nikhil",
@@ -405,7 +406,7 @@
         "price": 25.81,
         "value_usd": 5161819.33,
         "shares_owned_after": 721802,
-        "contrib": 1.635
+        "contrib": 1.48
       },
       {
         "insider": "Tarbert Heath",
@@ -417,15 +418,6 @@
         "contrib": 1.24
       },
       {
-        "insider": "Chandhok Nikhil",
-        "date": "2026-06-24",
-        "shares": 29730,
-        "price": 32.95,
-        "value_usd": 979603.5,
-        "shares_owned_after": 1011546,
-        "contrib": 1.23
-      },
-      {
         "insider": "Tarbert Heath",
         "date": "2026-03-10",
         "shares": 43694,
@@ -433,18 +425,18 @@
         "value_usd": 1096282.46,
         "shares_owned_after": 642850,
         "contrib": 1.177
+      },
+      {
+        "insider": "Chandhok Nikhil",
+        "date": "2026-02-26",
+        "shares": 20000,
+        "price": 25.81,
+        "value_usd": 516200.0,
+        "shares_owned_after": 445295,
+        "contrib": 1.121
       }
     ],
     "top_sells": [
-      {
-        "insider": "Fox-Geen Jeremy",
-        "date": "2026-07-01",
-        "shares": 3877,
-        "price": 62.63,
-        "value_usd": 242816.51,
-        "is_10b5_1": false,
-        "contrib": -0.117
-      },
       {
         "insider": "Ostling Danita K",
         "date": "2026-05-12",
@@ -478,6 +470,15 @@
         "shares": 10000,
         "price": 100.0,
         "value_usd": 1000000.0,
+        "is_10b5_1": false,
+        "contrib": -0.113
+      },
+      {
+        "insider": "BURNS M MICHELE",
+        "date": "2026-03-03",
+        "shares": 25000,
+        "price": 103.09,
+        "value_usd": 2577250.0,
         "is_10b5_1": false,
         "contrib": -0.113
       }

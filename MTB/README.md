@@ -1,10 +1,11 @@
-# M&T Bank (MTB)
+# M&T BANK CORP  (MTB, MTB-PH, MTB-PJ, MTB-PK, MTB-PL)  (CIK 0000036270) contingent / CVR candidate (MTB)
 
-**Ticker:** MTB | **Market:** US
-**Last updated:** 2026-07-10
+**Ticker:** MTB | **Market:** US  
+**Last updated:** 2026-09-21  
+**Stage:** pre-close stub (discovery)
 
-## Download
+## Next actions
 
-```powershell
-python MTB/investor-documents/download_mtb_investor_docs.py
-```
+1. Pull merger 8-K / DEFM14A / CVR agreement into `investor-documents/sec/`.
+2. Fill `research/cvr_terms.json` (set `stub=false`, `terms_complete=true`).
+3. Nightly sync will sleeve onto the CVRs filter.

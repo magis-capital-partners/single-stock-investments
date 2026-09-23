@@ -41,6 +41,7 @@ jobs:
             test_epistemic_loop_integration test_epistemic_integrity \
             test_epistemic_loop_controller test_committee_forecast_loop)
           python _system/scripts/validate_calibration_consumption.py
+          python _system/scripts/build_memory_triage.py --expire-human-sla --by memory-triage-bot
           python _system/scripts/graph_invariants.py || true
           python _system/scripts/validate_invariant_subset.py E2 E3 E4 E5 E7 E8 E9
       - name: Publish loop status
