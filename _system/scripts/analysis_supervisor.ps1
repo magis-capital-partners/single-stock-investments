@@ -54,6 +54,15 @@
     Length of one batch run before the supervisor re-checks the endpoint and the
     queue. Not a limit on total work -- the loop restarts it.
 
+.PARAMETER SyncMain
+    Bring this worktree up to origin/main between batches, at most every
+    -SyncMins. The scheduled task passes it and runs the script from the
+    ssi-local-lanes worktree, never the primary checkout: on 2026-09-11 a
+    branch switch there deleted llm_ready.py and this script from under the
+    running lane, which then did no work for eleven days. lane_worktree.ps1
+    has the details. Syncing between batches is also what lets a fix that
+    lands on main reach a lane that otherwise runs until the next reboot.
+
 .EXAMPLE
     powershell -ExecutionPolicy Bypass -File _system\scripts\analysis_supervisor.ps1
 #>
@@ -72,7 +81,9 @@ param(
     [int]    $MinBackoff = 120,
     [int]    $MaxBackoff = 1800,
     [int]    $MaxLogMB   = 32,
-    [switch] $ExitWhenEmpty
+    [switch] $ExitWhenEmpty,
+    [switch] $SyncMain,
+    [int]    $SyncMins   = 30
 )
 
 $ErrorActionPreference = 'Stop'
@@ -119,7 +130,15 @@ function Get-Remaining {
 }
 
 function Test-ModelReady {
-    & $python (Join-Path $repo '_system\scripts\llm_ready.py') '--model' $Model | Out-Null
+    $probe = Join-Path $repo '_system\scripts\llm_ready.py'
+    if (-not (Test-Path $probe)) {
+        # Judged by exit code alone, an absent probe reads exactly like a dead
+        # model. Both the 2026-09-09 and the 2026-09-12 outages logged "model
+        # not ready" for days while the model was fine and the script was gone.
+        Write-Log "readiness probe missing at $probe; this checkout cannot run the lane"
+        return $false
+    }
+    & $python $probe '--model' $Model | Out-Null
     return ($LASTEXITCODE -eq 0)
 }
 
@@ -160,10 +179,27 @@ $env:PYTHONUNBUFFERED = '1'
 
 Write-Log "supervisor start: model=$Model hours=$Hours push=${PushMins}m repo=$repo"
 
-$backoff = $MinBackoff
+$backoff  = $MinBackoff
+$lastSync = [datetime]::MinValue
 try {
     while ($true) {
         Rotate-Log
+
+        # Between batches, never during one: nothing from this lane is running
+        # here, and the sync itself defers while the Whisper supervisor is.
+        if ($SyncMain -and ((Get-Date) - $lastSync).TotalMinutes -ge $SyncMins) {
+            $lastSync = Get-Date
+            try {
+                if (-not (Get-Command Sync-LaneWorktree -ErrorAction SilentlyContinue)) {
+                    . (Join-Path $PSScriptRoot 'lane_worktree.ps1')
+                }
+                $null = Sync-LaneWorktree -Repo $repo -Logger { param($m) Write-Log $m } `
+                    -BusyMutexes @('Global\ssi-whisper-backfill')
+            }
+            catch {
+                Write-Log "sync error, running this checkout as it is: $_"
+            }
+        }
 
         if (-not (Test-ModelReady)) {
             if (-not (Start-ModelServer)) {
