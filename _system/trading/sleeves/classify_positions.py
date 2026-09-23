@@ -7,7 +7,7 @@ from typing import Any, Iterable, Mapping
 
 CASH_SEC_TYPES = {"CASH", "BILL"}
 CASH_SYMBOLS = {"USD", "EUR", "GBP", "CAD", "JPY", "BIL", "SGOV", "SHV", "TBIL", "TFLO", "VMFXX"}
-SPX_NAMES = {"SPX", "SPXW", "XSP"}
+SPX_NAMES = {"SPX", "SPXW"}
 ETF_LS_REFS = ("ETF_LS", "B5P")
 DREW_REF = "DREW_SLEEVE"
 MICHAEL_REF = "MICHAEL_SLEEVE"
@@ -47,7 +47,7 @@ def expand_blacklist_symbols(
 @dataclass(frozen=True)
 class Classification:
     ticker: str
-    bucket: str  # michael | drew | etf_ls | spx_0dte | ignored
+    bucket: str  # michael | drew | etf_ls | spx_0dte | index_put_hedge | ignored
     reason: str
     owner: str | None
 
@@ -86,7 +86,12 @@ def classify_position(
 
     if sec in {"OPT", "FOP"}:
         local = str(pos.get("localSymbol") or pos.get("symbol") or "").upper()
-        if index_name in SPX_NAMES or "SPXW" in local or local.startswith("XSP"):
+        # XSP puts are the ls-algo bucket-5 hedge ladder, not the SPX 0DTE book.
+        # SPX and SPXW stay with 0DTE. This check has to run before the overlay
+        # rule, or a later universe match could pull an index contract onto Drew.
+        if index_name == "XSP" or local.startswith("XSP"):
+            return Classification("XSP", "index_put_hedge", "index_put_hedge", None)
+        if index_name in SPX_NAMES or "SPXW" in local:
             return Classification(index_name or "SPX", "spx_0dte", "spxw_option", None)
 
     strategy_name = under or ticker if sec in {"OPT", "FOP"} else ticker
@@ -97,8 +102,8 @@ def classify_position(
     # are discretionary and need somewhere visible, so they route to Drew rather
     # than vanishing into the excluded bucket with everything else LS-algo owns.
     #
-    # Only OPT/FOP moves; share positions below are untouched. The SPX/XSP guard
-    # above still runs first, so an index option is never captured here.
+    # Only OPT/FOP moves; share positions below are untouched. The SPX and XSP
+    # guards above still run first, so an index option is never captured here.
     #
     # Both conditions are needed because they fire on different paths: positions
     # synced from Flex or the IB API carry no orderRef (both writers hardcode

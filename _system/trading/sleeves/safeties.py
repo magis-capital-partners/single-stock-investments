@@ -130,11 +130,15 @@ def check_safeties(
             failures.append(f"{gate_name} is a blacklist-family name; it belongs on Michael's sleeve")
         if cls.bucket == "spx_0dte":
             failures.append("SPX 0DTE is out of scope")
+        if cls.bucket == "index_put_hedge":
+            failures.append("XSP index put hedge belongs to ls-algo")
     if owner == "michael":
         if cls.bucket == "etf_ls":
             failures.append(f"{gate_name} is a systematic LETF plan name; Michael cannot submit it here")
         if cls.bucket == "spx_0dte":
             failures.append("SPX 0DTE is out of scope")
+        if cls.bucket == "index_put_hedge":
+            failures.append("XSP index put hedge belongs to ls-algo")
 
     last = quote_px(quote)
     quote_ts = quote.get("as_of")

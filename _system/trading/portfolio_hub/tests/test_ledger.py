@@ -184,6 +184,31 @@ def test_ls_algo_option_overlay_gets_its_own_strategy_label() -> None:
     assert (policy.owner, policy.strategy) == ("drew", "letf_option_overlay")
     assert policy.reason == "ls_algo_option_overlay"
 
+    xsp = classify_policy_position(
+        {
+            "symbol": "XSP",
+            "local_symbol": "XSP   270129P00540000",
+            "sec_type": "OPT",
+            "underlying": "XSP",
+        },
+        ls_symbols=set(),
+        drew_symbols=set(),
+    )
+    assert (xsp.owner, xsp.strategy, xsp.bucket, xsp.reason) == (
+        "unallocated", "ls_algo", "index_put_hedge", "index_put_hedge",
+    )
+    spxw = classify_policy_position(
+        {
+            "symbol": "SPX",
+            "local_symbol": "SPXW  260817P05000000",
+            "sec_type": "OPT",
+            "underlying": "SPX",
+        },
+        ls_symbols=set(),
+        drew_symbols=set(),
+    )
+    assert (spxw.owner, spxw.strategy) == ("unallocated", "spx_0dte")
+
     # The share leg of the same ticker is untouched by the overlay branch.
     shares = classify_policy_position(
         {"symbol": "NVDA", "local_symbol": "NVDA", "sec_type": "STK"},

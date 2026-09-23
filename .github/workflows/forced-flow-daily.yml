@@ -40,6 +40,8 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
+      - name: Install criticality model dependencies
+        run: pip install -r _system/scripts/requirements-criticality.txt
       - name: Refresh daily forced-flow / capitulation snapshot
         run: python _system/scripts/build_capitulation_daily.py --workers 6
       - name: Commit daily capitulation snapshot

@@ -2,6 +2,7 @@
 """Unit tests for HK snowball / power-law model helpers."""
 from __future__ import annotations
 
+import json
 import math
 import sys
 from datetime import date, timedelta
@@ -54,7 +55,7 @@ def test_halving_doubles_cost():
     assert by_date["2028-04-15"] == 130000.0
 
 
-def test_live_cost_doubles_at_halving_projection():
+def test_live_cost_path_does_not_auto_double():
     hash_eh = [
         (date(2026, 8, 1), 900.0),
         (date(2026, 8, 4), 940.0),
@@ -66,18 +67,40 @@ def test_live_cost_doubles_at_halving_projection():
         power_share=0.60,
         premium_multiple=1.75,
     )
-    assert len(path) >= 3
-    as_of_cost = path[-2]["v"]
-    halving_cost = path[-1]["v"]
-    assert abs(halving_cost / as_of_cost - 2.0) < 1e-6
-    live = hk.all_in_cost_usd(
-        940.0,
-        subsidy_btc=3.125,
+    assert all(p.get("event") != "halving_projection" for p in path)
+    assert path[-1]["d"] == "2026-08-04"
+    naive = hk.live_cost_path(
+        hash_eh,
         efficiency_j_th=30.0,
         electricity_usd_kwh=0.05,
         power_share=0.60,
+        premium_multiple=1.75,
+        append_naive_double=True,
     )
-    assert live is not None and live > 10000
+    assert naive[-1].get("event") == "halving_projection_naive"
+    assert abs(naive[-1]["v"] / naive[-2]["v"] - 2.0) < 1e-6
+
+
+def test_varying_jth_is_not_hashrate_scalar():
+    hash_eh = [
+        (date(2024, 8, 1), 400.0),
+        (date(2026, 8, 1), 800.0),
+    ]
+    jth = [
+        (date(2024, 8, 1), 32.0),
+        (date(2026, 8, 1), 16.0),
+    ]
+    path = hk.live_cost_path(
+        hash_eh,
+        efficiency_j_th=32.0,
+        electricity_usd_kwh=0.05,
+        power_share=0.60,
+        premium_multiple=1.75,
+        jth_series=jth,
+    )
+    assert len(path) == 2
+    # Same watts, same subsidy era (both post-2024 halving) → same all-in
+    assert abs(path[0]["v"] - path[1]["v"]) < 1.0
 
 
 def test_seed_merge_extends_history():
@@ -120,15 +143,30 @@ def test_disclaimer_short():
     assert "Context only" in hk.DISCLAIMER
 
 
+def test_live_snowball_json_has_fan_and_sensitivities():
+    p = hk.OUT_DASHBOARD
+    if not p.exists():
+        return
+    doc = json.loads(p.read_text(encoding="utf-8"))
+    supply = doc["supply"]
+    assert "mixed_base" in supply["scenarios"]
+    assert "naive_hk" in supply["scenarios"]
+    assert "0.05" in (supply.get("sensitivities") or {}).get("kwh_usd", {})
+    assert supply["bands"]["all_in_usd"] > 15000
+    assert supply["assumptions"]["current_all_in_source"] == "hauck_reconstructed"
+
+
 def main() -> int:
     test_milestones_half_time_low_value()
     test_power_law_fit_recovers_t6()
     test_halving_doubles_cost()
-    test_live_cost_doubles_at_halving_projection()
+    test_live_cost_path_does_not_auto_double()
+    test_varying_jth_is_not_hashrate_scalar()
     test_seed_merge_extends_history()
     test_dial_labels()
     test_model_2028_order_of_magnitude_vs_hk()
     test_disclaimer_short()
+    test_live_snowball_json_has_fan_and_sensitivities()
     print("test_hk_snowball_model: ok")
     return 0
 

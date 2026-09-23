@@ -1154,7 +1154,8 @@
         const allocations = row.allocations || [];
         const strategies = allocations.map((lot) => String(lot.strategy || '').toLowerCase());
         let reason = `Assigned to ${allocations.map((lot) => lot.owner).filter(Boolean).join(', ') || 'another scope'}`;
-        if (strategies.some((strategy) => strategy.includes('spx'))) reason = 'SPX option · assigned to SPX 0DTE';
+        if (strategies.some((strategy) => strategy.includes('index_put')) || allocations.some((lot) => lot.bucket === 'index_put_hedge')) reason = 'LS-algo index put hedge';
+        else if (strategies.some((strategy) => strategy.includes('spx'))) reason = 'SPX option · assigned to SPX 0DTE';
         else if (strategies.some((strategy) => strategy.includes('ls') || strategy.includes('letf') || strategy.includes('bucket'))) reason = 'LS-algo ETF / underlying universe';
         return { ...row, exclusion_reason: reason };
       });

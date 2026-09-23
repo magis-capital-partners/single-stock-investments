@@ -156,6 +156,12 @@ def validate_registry(rows: list[dict] | None = None) -> list[str]:
     )
     errors: list[str] = []
     versions: set[tuple[str, int]] = set()
+    latest_version: dict[str, int] = {}
+    for row in rows:
+        warrant_id = str(row.get("warrant_id") or "")
+        version = int(row.get("version") or 0)
+        if warrant_id and version > latest_version.get(warrant_id, 0):
+            latest_version[warrant_id] = version
     for index, row in enumerate(rows, 1):
         prefix = f"row {index}"
         warrant_id = str(row.get("warrant_id") or "")
@@ -180,9 +186,19 @@ def validate_registry(rows: list[dict] | None = None) -> list[str]:
             for field in ("strike", "currency", "share_ratio", "expiry"):
                 if terms.get(field) in (None, ""):
                     errors.append(f"{prefix}: terms_complete but {field} missing")
-        if row.get("lifecycle") == "active" and parse_date(terms.get("expiry")):
-            if parse_date(terms.get("expiry")) < date.today():
-                errors.append(f"{prefix}: active security is past contractual expiry")
+        # The registry is append-only. An older version that was active on the
+        # day it was recorded stays in the file after a later version marks the
+        # series expired. Only the latest version can still be "active" past
+        # its contractual expiry.
+        expiry = parse_date(terms.get("expiry"))
+        if (
+            warrant_id
+            and version == latest_version.get(warrant_id)
+            and row.get("lifecycle") == "active"
+            and expiry is not None
+            and expiry < date.today()
+        ):
+            errors.append(f"{prefix}: active security is past contractual expiry")
     return errors
 
 

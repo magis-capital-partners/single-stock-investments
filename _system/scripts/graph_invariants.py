@@ -466,13 +466,10 @@ def inv_e7(conn, root, today) -> Result:
             violations.append(
                 f"{item['day']} {triage.fingerprint(item)} {kind}: must be routed/dropped, not belief-reviewed")
             continue
-        try:
+        if triage.human_sla_expired(item, today):
             age = (today - date.fromisoformat(item["day"])).days
-        except ValueError:
-            age = 0
-        if item["day"] >= "2026-08-12" and age > 30:
             violations.append(
-                f"{item['day']} {triage.fingerprint(item)} {kind}: undecided {age} days (prospective SLA 30)")
+                f"{item['day']} {triage.fingerprint(item)} {kind}: undecided {age} days (prospective SLA {triage.HUMAN_SLA_DAYS})")
     return Result("E7", len(violations), violations,
                   note="deterministic routing is immediate; 30-day gate applies prospectively from 2026-08-12")
 
