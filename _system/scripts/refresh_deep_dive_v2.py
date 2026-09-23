@@ -1053,6 +1053,25 @@ def crypto_context_business_block(val: dict) -> str:
                 f"| {ind.get('label', ind.get('id', ''))} | {latest_s} | "
                 f"{ind.get('as_of') or 'n/a'} | {yoy} | {ind.get('direction', 'flat')} | no (context) |"
             )
+    ctx = overlay.get("mining_economics_context") or {}
+    if ctx.get("hauck_all_in_usd") is not None:
+        def _usd(v):
+            try:
+                return f"${float(v):,.0f}"
+            except (TypeError, ValueError):
+                return "n/a"
+
+        lines += [
+            "",
+            "Hauck reconstructed floor (ASIC mix, $0.05/kWh, 60% power share). Context only.",
+            "",
+            f"Spot {_usd(ctx.get('spot_usd'))} versus average-fleet all-in {_usd(ctx.get('hauck_all_in_usd'))} "
+            f"and SOTA + 25% ROIC {_usd(ctx.get('sota_roic_usd'))}. "
+            f"Mixed 2028 floor {_usd(ctx.get('mixed_2028_all_in_usd'))}.",
+            "",
+        ]
+        if ctx.get("miner_stance_plain_english"):
+            lines += [ctx["miner_stance_plain_english"], ""]
     lines.append("")
     return "\n".join(lines)
 

@@ -42,5 +42,5 @@ def test_sync_from_flex_fills_michael_and_leaves_drew_empty(tmp_path):
     assert "TQQQ" not in michael_tickers
     assert result["drew"]["positions"] == []
     assert result["drew"]["header"]["open_names"] == 0
-    assert result["buckets"].get("spx_0dte", 0) >= 1
+    assert result["buckets"].get("index_put_hedge", 0) >= 1
     assert result["buckets"].get("etf_ls", 0) >= 2

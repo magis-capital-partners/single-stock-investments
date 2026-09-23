@@ -60,7 +60,7 @@ PRIOR_SOURCES = (
     ROOT / "_system/trading/sleeves/data/local/research_scope.json",
     ROOT / "_system/trading/sleeves/data/local/positions.json",
 )
-SPX_NAMES = {"SPX", "SPXW", "XSP"}
+SPX_NAMES = {"SPX", "SPXW"}
 
 
 def _dec(value) -> Decimal | None:
@@ -96,6 +96,8 @@ def prior_buckets() -> tuple[dict[str, str], str | None]:
 def classify_fresh(symbol: str, name: str, sec_type: str) -> tuple[str, str]:
     """Only for symbols with no prior bucket. Conservative and always flagged."""
     upper = symbol.upper()
+    if upper.startswith("XSP"):
+        return "index_put_hedge", "index_put_hedge"
     if sec_type in {"OPT", "FOP"} or any(n in upper for n in SPX_NAMES):
         if any(n in upper for n in SPX_NAMES):
             return "spx_0dte", "spx_symbol"

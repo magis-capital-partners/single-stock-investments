@@ -89,13 +89,18 @@ def parse_flex_xml(xml: bytes | str, *, account_alias: str, source_run_id: str |
             "description": row.get("description"),
         })
     nav_rows = [{
-        "currency": row.get("currency"), "net_liquidation": _pick(row, "total", "netLiquidation"),
+        "currency": row.get("currency"),
+        "net_liquidation": _pick(row, "total", "endingValue", "netLiquidation"),
         "cash": _pick(row, "cash", "cashBalance"), "stock": row.get("stock"), "options": row.get("options"),
     } for row in _rows(root, "ChangeInNAV")]
+    # EquitySummaryByReportDateInBase is the dated row. The parent
+    # EquitySummaryInBase element is only a container and has no amounts.
+    equity_summaries = [dict(element.attrib) for element in root.iter("EquitySummaryByReportDateInBase")]
     return {
         "schema_version": "flex_eod.v1", "source_run_id": source_run_id or f"flex-{hashlib.sha256(raw).hexdigest()[:20]}",
         "account_alias": account_alias, "session_date": session_date, "as_of": now,
         "positions": positions, "trades": trades, "cash_transactions": cash, "nav_rows": nav_rows,
+        "equity_summaries": equity_summaries,
     }
 
 

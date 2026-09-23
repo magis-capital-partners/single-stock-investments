@@ -212,7 +212,7 @@ class PortfolioLedger:
         ).fetchall()
         for position in positions:
             policy = classify_policy_position(dict(position), ls_symbols=ls_symbols, drew_symbols=drew_symbols)
-            if policy.strategy in {"letf", "spx_0dte"}:
+            if policy.strategy in {"letf", "spx_0dte", "ls_algo"}:
                 db.execute(
                     """UPDATE allocation_lots SET ended_at=?
                     WHERE account_alias=? AND conid=? AND model_code=? AND owner IN ('drew','michael')
@@ -239,7 +239,7 @@ class PortfolioLedger:
                 VALUES (?,?,?,?,?,?,?,?,?,NULL,'authoritative',?,?,?)""",
                 (
                     allocation_id, account_alias, position["conid"], position["model_code"], policy.owner,
-                    policy.strategy, None, decimal_text(remainder), as_of, source_event_id, policy.reason, now,
+                    policy.strategy, policy.bucket, decimal_text(remainder), as_of, source_event_id, policy.reason, now,
                 ),
             )
             self._put_outbox(db, "allocation.changed.v1", f"{allocation_id}:{snapshot_id}", {
