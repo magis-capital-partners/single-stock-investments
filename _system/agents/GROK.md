@@ -23,6 +23,23 @@ The command is idempotent. Treat JSON status `uploaded` and `already_present` as
 
 That writes `Admin/Intake/VIC/{TICKER}/` on Shared Drive [Admin/Intake](https://drive.google.com/drive/folders/1OBaWt7SF-OME8hmXkl7tzdFLAfjBrp_C). The Data Pipeline scans Drive daily at 14:00 UTC, imports to `{TICKER}/third-party-analyses/vic/`, and stages `research-vault/vic-research/{TICKER}/` (PDF gitignored; `.txt` extract committed). GitHub Actions can start later than the nominal cron time.
 
+## Drive target
+
+Use only this intake root. Do not look up or create another one.
+
+| What | Id |
+|---|---|
+| Admin/Intake (the only root `drive_intake_drop.py` may use) | `1OBaWt7SF-OME8hmXkl7tzdFLAfjBrp_C` |
+| VIC child of that root | `1wWZpAvlH5AANn76nRoklTK8IXf5gyPnR` |
+
+A second Admin/Intake/VIC tree was created on 2026-09-18. It is not scanned. Never upload there, and never create another:
+
+| Wrong tree | Id |
+|---|---|
+| Admin | `1zxGUgu6LXvAMj5hzMG49bmM3X-19AZWq` |
+| Intake | `1wLNyyVQh7Z-BGRD5MpBQpO_7ScPqfYKV` |
+| VIC | `1HtIs_B-agRDDg3vDI99Ki1cS8MTyGm0W` |
+
 4. **Text only:** write `{TICKER}/third-party-analyses/vic/vic_{date}_{slug}_{hash}.md`, then refresh the inventory:
 
 ```bash
@@ -42,9 +59,12 @@ Local: `_secrets/google-service-account.json` is enough.
 ## Never
 
 - Create ticker folders, README stubs, or a “minimal onboard” so drop.py will accept a name
+- Upload a PDF under a different ticker (including JOE) when `unknown_ticker` is returned
+- Create a Shared Drive, an Admin folder, an Intake folder, or a VIC folder yourself
+- Call the Drive API to create folders. `drive_intake_drop.py` is the only uploader
 - Clone research-vault or drop into `Letters/` / `Admin/Intake/Research` (unless it is not VIC)
 - VIC login cookies or passwords in secrets, chat, or git
-- New Drive roots
+- New Drive roots, including any folder other than `1OBaWt7SF-OME8hmXkl7tzdFLAfjBrp_C`
 - Base IRR / stance from a VIC note (cite as variant view only)
 
 Full intake map: `_system/agents/MICHAEL.md`.

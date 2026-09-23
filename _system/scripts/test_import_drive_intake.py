@@ -58,6 +58,16 @@ class ParseIntakePathTests(unittest.TestCase):
         self.assertEqual(parsed["error"], "missing_or_unknown_ticker")
         self.assertEqual(parsed["intake_kind"], "vic")
 
+    def test_unknown_folder_ticker_is_not_guessed(self):
+        parsed = self.mod.parse_intake_path("VIC/NOTAREALTICKERXYZ/note.pdf")
+        self.assertEqual(parsed["error"], "unknown_ticker")
+        self.assertEqual(parsed["path_ticker"], "NOTAREALTICKERXYZ")
+
+    def test_unknown_filename_ticker_is_not_guessed(self):
+        parsed = self.mod.parse_intake_path("VIC/NOTAREALTICKERXYZ.pdf")
+        self.assertEqual(parsed["error"], "unknown_ticker")
+        self.assertEqual(parsed["path_ticker"], "NOTAREALTICKERXYZ")
+
     def test_admin_intake_vic_path(self):
         tickers = _ticker_dirs()
         t = tickers[0]

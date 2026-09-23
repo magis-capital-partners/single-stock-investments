@@ -4,7 +4,8 @@ Read `_system/agents/GROK.md` and follow it. Short form:
 
 - Preflight: `python _system/scripts/materialize_drive_credentials.py --require`. Stop if it fails.
 - VIC → Drive `Admin/Intake/VIC/{TICKER}/` via `python _system/scripts/drive_intake_drop.py --kind VIC --ticker TICKER file.pdf`
-- Skip `unknown_ticker`. Never create ticker folders. Numeric names need the exchange suffix already used in this repo (`0388.HK`, not `9909`).
+- The only intake root is folder `1OBaWt7SF-OME8hmXkl7tzdFLAfjBrp_C`. Never create a Shared Drive, Admin, Intake, or VIC folder. Never upload to `1HtIs_B-agRDDg3vDI99Ki1cS8MTyGm0W`.
+- Skip `unknown_ticker`. Do not file that PDF under another ticker. Never create ticker folders. Numeric names need the exchange suffix already used in this repo (`0388.HK`, not `9909`).
 - JSON status `uploaded` or `already_present` means the Drive handoff succeeded. List every other result as skipped/failed.
 - Daily 14:00 UTC Data Pipeline → SSI `{TICKER}/third-party-analyses/vic/` and vault `vic-research/{TICKER}/`. Do not claim the scheduled import already happened.
 - Text-only → `{TICKER}/third-party-analyses/vic/vic_{date}_{slug}_{hash}.md`, then `python _system/scripts/third_party_inventory.py TICKER` (context, not pending).

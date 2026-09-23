@@ -225,7 +225,8 @@
         ${isDrew ? '' : `<div class="sleeve-chips">
           <span class="sleeve-chip sleeve-chip-in">${header.open_names ?? 0} names in this book</span>
           <span class="sleeve-chip">${excluded.etf_ls || 0} omitted (ls-algo universe)</span>
-          <span class="sleeve-chip">${excluded.spx_0dte || 0} SPX / XSP option lines omitted</span>
+          <span class="sleeve-chip">${excluded.spx_0dte || 0} SPX 0DTE lines omitted</span>
+          <span class="sleeve-chip">${excluded.index_put_hedge || 0} XSP index put hedges omitted</span>
         </div>`}
       </header>
 

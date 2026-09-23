@@ -2430,7 +2430,7 @@
     let tMax = Math.max(...rawA.concat(rawM).map((p) => parse(p.d)));
     if (Number.isFinite(halvingT)) tMax = Math.max(tMax, halvingT);
     const mixed2032d = (((supply.scenarios || {}).mixed_base || {})['2032'] || {}).date;
-    if (mixed2032d) {
+    if (zoom === 'full' && mixed2032d) {
       const t2032 = parse(mixed2032d);
       if (Number.isFinite(t2032)) tMax = Math.max(tMax, t2032);
     }
@@ -2445,27 +2445,42 @@
     const ptsA = hkDownsample(rawA, zoom === 'full' ? 360 : 280);
     const ptsM = hkDownsample(rawM, zoom === 'full' ? 240 : 200);
 
-    const rawFloor = (costPath.length
-      ? costPath.map((p) => ({ d: p.d || p.date, v: Number(p.v || p.all_in_cost_usd) }))
-      : supplyCurve.map((p) => ({ d: p.date, v: Number(p.all_in_cost_usd) }))
-    ).filter((p) => p.d && p.v >= 1000);
     const premMult = Number((supply.assumptions || {}).premium_multiple) || 1.75;
-    const rawPrem = (costPath.length
+    const mappedFloor = (costPath.length
       ? costPath.map((p) => ({
         d: p.d || p.date,
-        v: Number(p.v || p.all_in_cost_usd) * premMult,
+        v: Number(p.v || p.all_in_cost_usd),
+        event: p.event,
       }))
-      : supplyCurve.map((p) => ({ d: p.date, v: Number(p.premium_band_usd || p.all_in_cost_usd) }))
+      : supplyCurve.map((p) => ({ d: p.date, v: Number(p.all_in_cost_usd), event: p.event }))
     ).filter((p) => p.d && p.v >= 1000);
+    const mappedPrem = mappedFloor.map((p) => ({
+      d: p.d,
+      v: Number(p.v) * premMult,
+      event: p.event,
+    }));
+    const hkIsForward = (p) => String(p.event || '').indexOf('forward_') === 0;
+    const histFloorRaw = mappedFloor.filter((p) => !hkIsForward(p));
+    const fwdFloorRaw = mappedFloor.filter(hkIsForward);
+    const histPremRaw = mappedPrem.filter((p) => !hkIsForward(p));
+    const fwdPremRaw = mappedPrem.filter(hkIsForward);
 
     const floorSeries = hkDownsample(
-      hkSmoothSeries(hkFilterByTime(rawFloor, tMin, tMax, parse), 14),
+      hkSmoothSeries(hkFilterByTime(histFloorRaw, tMin, tMax, parse), 14),
       90,
     );
     const premSeries = hkDownsample(
-      hkSmoothSeries(hkFilterByTime(rawPrem, tMin, tMax, parse), 14),
+      hkSmoothSeries(hkFilterByTime(histPremRaw, tMin, tMax, parse), 14),
       90,
     );
+    const fwdFloor = hkFilterByTime(fwdFloorRaw, tMin, tMax, parse);
+    const fwdPrem = hkFilterByTime(fwdPremRaw, tMin, tMax, parse);
+    const floorProj = (floorSeries.length && fwdFloor.length)
+      ? [floorSeries[floorSeries.length - 1]].concat(fwdFloor)
+      : fwdFloor;
+    const premProj = (premSeries.length && fwdPrem.length)
+      ? [premSeries[premSeries.length - 1]].concat(fwdPrem)
+      : fwdPrem;
     const rawElec = costPath
       .map((p) => ({ d: p.d || p.date, v: Number(p.electricity_only_usd) }))
       .filter((p) => p.d && Number.isFinite(p.v) && p.v >= 1000);
@@ -2481,7 +2496,7 @@
       90,
     );
 
-    const allVals = ptsA.concat(ptsM).concat(floorSeries).concat(premSeries).concat(elecSeries).concat(sotaSeries).map((p) => p.v);
+    const allVals = ptsA.concat(ptsM).concat(floorSeries).concat(premSeries).concat(elecSeries).concat(sotaSeries).concat(floorProj).concat(premProj).map((p) => p.v);
     let vMin = allVals.length ? Math.min(...allVals) : Y_FLOOR;
     let vMax = allVals.length ? Math.max(...allVals) : Y_FLOOR * 10;
     if (hkRef.model_2028) vMax = Math.max(vMax, Number(hkRef.model_2028));
@@ -2538,15 +2553,19 @@
     const residualTxt = residual != null && Number.isFinite(Number(residual))
       ? `${Number(residual) > 0 ? '+' : ''}${Number(residual).toFixed(0)}% vs model`
       : '';
-    const floorNow = floorSeries.length ? floorSeries[floorSeries.length - 1].v : supply.halving_2028_cost_usd;
-    const premNow = premSeries.length ? premSeries[premSeries.length - 1].v : supply.halving_2028_premium_band_usd;
+    const bands = supply.bands || {};
+    const floorNow = bands.all_in_usd || supply.as_of_cost_usd;
+    const premNow = bands.premium_usd || (floorNow ? Number(floorNow) * premMult : supply.halving_2028_premium_band_usd);
     const modelNow = demand.model_price_as_of;
+    const floorMark = floorNow && Number.isFinite(asOfT)
+      ? `<circle cx="${spotX.toFixed(1)}" cy="${yScale(Number(floorNow)).toFixed(1)}" r="4.5" fill="#f87171" stroke="#0b1220" stroke-width="1.5" />`
+      : '';
 
     const rail = `<aside class="hk-callout-rail" aria-label="Key levels">
       <div class="hk-callout"><span class="hk-callout-swatch" style="background:#60a5fa"></span><div><div class="hk-callout-label">Spot now</div><div class="hk-callout-value">${hkFmtUsd(spot)}</div><div class="hk-callout-sub">${residualTxt || '—'}</div></div></div>
       <div class="hk-callout"><span class="hk-callout-swatch" style="background:#fbbf24"></span><div><div class="hk-callout-label">Demand model</div><div class="hk-callout-value">${hkFmtUsd(modelNow)}</div><div class="hk-callout-sub">as of ${String(doc.as_of || '—')}</div></div></div>
-      <div class="hk-callout"><span class="hk-callout-swatch" style="background:#f87171"></span><div><div class="hk-callout-label">Hauck all-in</div><div class="hk-callout-value">${hkFmtUsd(floorNow)}</div><div class="hk-callout-sub">fleet average</div></div></div>
-      <div class="hk-callout"><span class="hk-callout-swatch" style="background:#34d399"></span><div><div class="hk-callout-label">Cost +75%</div><div class="hk-callout-value">${hkFmtUsd(premNow)}</div><div class="hk-callout-sub">premium band</div></div></div>
+      <div class="hk-callout"><span class="hk-callout-swatch" style="background:#f87171"></span><div><div class="hk-callout-label">Hauck all-in</div><div class="hk-callout-value">${hkFmtUsd(floorNow)}</div><div class="hk-callout-sub">today, fleet average</div></div></div>
+      <div class="hk-callout"><span class="hk-callout-swatch" style="background:#34d399"></span><div><div class="hk-callout-label">Cost +75%</div><div class="hk-callout-value">${hkFmtUsd(premNow)}</div><div class="hk-callout-sub">today, 1.75× all-in</div></div></div>
       <div class="hk-callout"><span class="hk-callout-swatch" style="background:#f472b6"></span><div><div class="hk-callout-label">HK 2028</div><div class="hk-callout-value">${hkFmtUsd(hkRef.model_2028)}</div><div class="hk-callout-sub">quote target</div></div></div>
       <div class="hk-callout"><span class="hk-callout-swatch" style="background:linear-gradient(180deg,#34d399,#f87171)"></span><div><div class="hk-callout-label">2028 supply band</div><div class="hk-callout-value">${hkFmtUsd(hkRef.supply_low)}–${hkFmtUsd(hkRef.supply_high)}</div><div class="hk-callout-sub">HK reference</div></div></div>
     </aside>`;
@@ -2577,9 +2596,12 @@
       ${poly(sotaSeries, '#c084fc', 1.5, '4 3', 0.85)}
       ${poly(floorSeries, '#f87171', 1.75, null, 0.7)}
       ${poly(premSeries, '#34d399', 1.75, '5 4', 0.75)}
+      ${poly(floorProj, '#f87171', 1.6, '6 5', 0.55)}
+      ${poly(premProj, '#34d399', 1.6, '6 5', 0.5)}
       ${poly(ptsM, '#fbbf24', 3.25, '9 5', 0.98)}
       ${poly(ptsA, '#60a5fa', 3.4)}
       ${spotMark}
+      ${floorMark}
       ${hkDot}
       ${bandLoDot}
       ${bandHiDot}
@@ -2592,11 +2614,13 @@
     <div class="hk-legend">
       <span><i class="actual"></i>BTC spot</span>
       <span><i class="model"></i>Demand model</span>
-      <span><i class="floor"></i>All-in floor → +75%</span>
+      <span><i class="floor"></i>All-in floor (history) → +75%</span>
       <span><i class="hkref"></i>HK 2028 refs</span>
+      <span>Mixed projection (dashed)</span>
       <span>Electricity-only (dashed orange)</span>
       <span>SOTA+25% ROIC (dashed purple)</span>
-    </div>`;
+    </div>
+    <p class="tier-sub">Red is reconstructed all-in through today. Dashed red after today is the mixed scenario, not history. Pink is HK's published 2028 quote, not our model.</p>`;
   }
 
   function renderHkSnowballPanel(doc, escapeHtml) {

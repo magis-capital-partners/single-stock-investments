@@ -132,6 +132,44 @@ def intake_path_parts(path: str) -> tuple[str, list[str], str] | None:
     return None
 
 
+def _parsed_ticker(
+    intake_kind: str,
+    intake_prefix: str,
+    ticker: str,
+    filename: str,
+    path: str,
+    method: str,
+) -> dict:
+    return {
+        "intake_kind": intake_kind,
+        "intake_prefix": intake_prefix,
+        "ticker": ticker,
+        "filename": filename,
+        "path": path,
+        "ticker_resolve_method": method,
+    }
+
+
+def _unresolved(
+    intake_kind: str,
+    intake_prefix: str,
+    path: str,
+    filename: str,
+    error: str,
+    path_ticker: str,
+) -> dict:
+    payload = {
+        "error": error,
+        "intake_kind": intake_kind,
+        "intake_prefix": intake_prefix,
+        "path": path,
+        "filename": filename,
+    }
+    if path_ticker:
+        payload["path_ticker"] = path_ticker
+    return payload
+
+
 def parse_intake_path(path: str) -> dict | None:
     parsed_parts = intake_path_parts(path)
     if not parsed_parts:
@@ -140,17 +178,34 @@ def parse_intake_path(path: str) -> dict | None:
     filename = rest[-1]
     if not filename.lower().endswith(".pdf"):
         return None
-    ticker = normalize_ticker(rest[0]) if len(rest) >= 2 else None
+    # A folder or filename that already names a ticker is authoritative.
+    # If that ticker is not a repo folder, do not guess another ticker from
+    # the PDF body. Guessing is how Cleveland-Cliffs landed under JOE.
+    path_token = rest[0].strip().upper() if len(rest) >= 2 else ""
+    if path_token and TICKER_RE.match(path_token):
+        ticker = normalize_ticker(path_token)
+        if ticker:
+            return _parsed_ticker(
+                intake_kind, intake_prefix, ticker, filename, path, "path_or_filename"
+            )
+        return _unresolved(
+            intake_kind, intake_prefix, path, filename, "unknown_ticker", path_token
+        )
+    stem = Path(filename).stem.strip().upper()
+    if stem and not stem.isdigit() and TICKER_RE.match(stem):
+        ticker = normalize_ticker(stem)
+        if ticker:
+            return _parsed_ticker(
+                intake_kind, intake_prefix, ticker, filename, path, "path_or_filename"
+            )
+        return _unresolved(
+            intake_kind, intake_prefix, path, filename, "unknown_ticker", stem
+        )
+    ticker = infer_ticker_from_name(filename)
     if not ticker:
-        ticker = infer_ticker_from_name(filename)
-    if not ticker:
-        return {
-            "error": "missing_or_unknown_ticker",
-            "intake_kind": intake_kind,
-            "intake_prefix": intake_prefix,
-            "path": path,
-            "filename": filename,
-        }
+        return _unresolved(
+            intake_kind, intake_prefix, path, filename, "missing_or_unknown_ticker", ""
+        )
     return {
         "intake_kind": intake_kind,
         "intake_prefix": intake_prefix,
@@ -384,6 +439,18 @@ def import_intake(
             continue
 
         resolve_meta: dict = {}
+        if parsed.get("error") == "unknown_ticker":
+            warnings.append(
+                {
+                    "drive_file_id": file_id,
+                    "path": path,
+                    "filename": parsed.get("filename"),
+                    "intake_kind": parsed.get("intake_kind"),
+                    "error": "unknown_ticker",
+                    "path_ticker": parsed.get("path_ticker"),
+                }
+            )
+            continue
         if parsed.get("error") == "missing_or_unknown_ticker":
             # Download and resolve ticker from PDF content.
             try:
