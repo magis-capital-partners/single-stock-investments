@@ -5,7 +5,7 @@
   "input_sha": "15215c66f341d7542d4f24cc43e6daf99833842e",
   "component_fingerprint": "ae63837cb5c36ab11c3d8aa05997586730aa340d5b9d2aa52947a3f9125ea40d",
   "contract_hash": "ca47c99ecfe2f96d187af40e6015994d166260242b2ee1e1d096e0e580abdbc9",
-  "status": "awaiting_review",
+  "status": "approved",
   "author_receipt": {
     "authored_at": "2026-09-02T12:24:22Z",
     "author": "codex-gpt-5.6-sol",
@@ -45,7 +45,47 @@
       "published_input_sha": "15215c66f341d7542d4f24cc43e6daf99833842e"
     }
   },
-  "review_receipt": null,
+  "review_receipt": {
+    "reviewed_at": "2026-09-12T00:50:00Z",
+    "reviewer": "cursor-cloud-agent",
+    "author_independent": true,
+    "decision": "approved",
+    "checks": {
+      "component_fingerprint_matches": true,
+      "target_unobservable_at_registration": true,
+      "threshold_economically_material": true,
+      "historical_replay_present": true,
+      "forward_source_recipe_current": true,
+      "probability_consistent_with_known_trailing_data": true,
+      "partial_leg_scope_acknowledged": true
+    },
+    "evidence": {
+      "threshold_usd": 65000000000,
+      "low_case_per_share": 2.1486,
+      "base_case_per_share": 2.3889,
+      "stressed_net_claim_per_share_at_threshold": 1.13,
+      "replay_q3_fy2025_cash_usd": 66922000000,
+      "known_q1_fy2026_cash_usd": 101816000000,
+      "contract_cash_m": 78779.0,
+      "contract_long_term_debt_m": 52623.0,
+      "forecast_probability_fires": 0.25,
+      "source_ref": "AMZN/research/evidence/sec_companyfacts.json",
+      "source_concepts": [
+        "us-gaap:CashAndCashEquivalentsAtCarryingValue"
+      ]
+    },
+    "review_work_id": "8a58c4a3d9836dc95d4fb8f8",
+    "calibration_release_hash": null,
+    "route": "quality_reinvestment",
+    "named_challenge": null,
+    "calibration_response": "not_applicable",
+    "epistemic_work_receipt": {
+      "work_id": "8a58c4a3d9836dc95d4fb8f8",
+      "task_type": "review_forecast",
+      "disposition": "success",
+      "published_input_sha": "7c6e9fe0e804a7353c578b4708d55830e49ae24d"
+    }
+  },
   "rejection_reasons": [],
   "spec": {
     "spec_id": "amzn-net-financial-claims-cash-2026q3-v1",
@@ -109,9 +149,10 @@
       }
     },
     "review": {
-      "status": "pending",
-      "reviewer": null,
-      "reviewed_at": null
+      "status": "approved",
+      "reviewer": "cursor-cloud-agent",
+      "reviewed_at": "2026-09-12T00:50:00Z",
+      "reason_codes": []
     },
     "probability_fires": 0.25,
     "severity": 2,
