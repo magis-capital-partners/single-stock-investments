@@ -1,0 +1,125 @@
+{
+  "schema_version": "1.0",
+  "draft_id": "02ac4e724d95c942f9030caa",
+  "work_id": "02ac4e724d95c942f9030caa",
+  "input_sha": "7c6e9fe0e804a7353c578b4708d55830e49ae24d",
+  "component_fingerprint": "7a98164fa9b6628c79e084acf62e6f53b327dbd7e06354785780736714433938",
+  "status": "awaiting_review",
+  "author_receipt": {
+    "authored_at": "2026-09-12T01:30:00Z",
+    "author": "marvin-cloud-agent",
+    "model_id": "composer-2.5",
+    "prompt_version": "cloud_marvin_runbook_2026-09-12",
+    "analysis_run_id": "epistemic_author_forecast:02ac4e724d95c942f9030caa",
+    "evidence_hash": "b146aa20a782eb1fe3b0c3a7467db76d602104ef8c4e0801a9bcbc4771f32f92", // pragma: allowlist secret
+    "epistemic_input_sha": "7c6e9fe0e804a7353c578b4708d55830e49ae24d",
+    "contract_hash": "82fd1e20ffbfbc3f0d3a72b250a32fd0f367db9b5017e37b8ccff2f81a1a3917",
+    "component_fingerprint": "7a98164fa9b6628c79e084acf62e6f53b327dbd7e06354785780736714433938",
+    "source_preflight": {
+      "ok": true,
+      "reason": "source_preflight_passed",
+      "metric_definition_id": "normalized_owner_earnings_ttm_m_v2",
+      "adapter": "sec_companyfacts_ttm"
+    },
+    "historical_replay": {
+      "value": 1173.348,
+      "unit": "USD millions",
+      "as_of": "2025-10-31",
+      "evidence_ref": "CRWD/research/evidence/sec_companyfacts.json#normalized_owner_earnings_ttm_m@2025-10-31",
+      "adapter": "sec_companyfacts_ttm",
+      "blocker_reason": null,
+      "replay_measurement_period_end": "2025-10-31",
+      "replay_fiscal_period": "Q3",
+      "replay_fiscal_year": 2026
+    },
+    "calibration_release_hash": null,
+    "route": "quality_reinvestment",
+    "named_challenge": null,
+    "calibration_response": "not_applicable",
+    "calibration_note": "Epistemic loop health_state=COLLECTING; calibration_status=insufficient_outcomes; eligible_scored_outcomes=0; release_hash=null. Calibration cannot change this analysis.",
+    "epistemic_work_receipt": {
+      "work_id": "02ac4e724d95c942f9030caa",
+      "task_type": "author_forecast",
+      "disposition": "success",
+      "published_input_sha": "7c6e9fe0e804a7353c578b4708d55830e49ae24d"
+    }
+  },
+  "review_receipt": null,
+  "rejection_reasons": [],
+  "spec": {
+    "spec_id": "crwd-operating-owner-earnings-2027q3",
+    "spec_revision": 1,
+    "spec_schema_version": "3.0",
+    "forecast_class": "ex_ante",
+    "forecast_role": "primary",
+    "authored_at": "2026-09-12T01:30:00Z",
+    "information_cutoff_at": "2026-09-12T01:30:00Z",
+    "registered_at": "2026-09-12T01:30:00Z",
+    "registration_commit": "923e38facd4f36cff45a1db024a357d01c5b3fae",
+    "analysis_run_id": "epistemic_author_forecast:02ac4e724d95c942f9030caa",
+    "author": "marvin-cloud-agent",
+    "model_id": "composer-2.5",
+    "prompt_version": "cloud_marvin_runbook_2026-09-12",
+    "contract_hash": "82fd1e20ffbfbc3f0d3a72b250a32fd0f367db9b5017e37b8ccff2f81a1a3917",
+    "component_fingerprint": "7a98164fa9b6628c79e084acf62e6f53b327dbd7e06354785780736714433938",
+    "method_id": "owner_earnings_reinvestment_dcf",
+    "power_zone": "quality_reinvestment",
+    "component_id": "operating_business_and_net_assets",
+    "correlation_group": "CRWD|operating_business_and_net_assets|normalized_owner_earnings_ttm|2027Q3",
+    "industry": "endpoint_cybersecurity_saas",
+    "metric": "normalized_owner_earnings_ttm",
+    "comparator": "lt",
+    "threshold": 1310.241,
+    "threshold_basis": {
+      "source_ref": "CRWD/research/valuation_contract.json#operating_business_and_net_assets.calculation_proof.traces.low.owner_earnings",
+      "rule": "Low-case trace node owner_earnings equals 1,310.241 USD millions: FY2026 operating cash flow of 1,612.349M minus capital spending of 302.108M per CRWD/research/valuation_fact_ledger.json normalized_owner_earnings_m and CRWD/investor-documents/sec-edgar/10-K_20260305_rpt20260131_acc0001535527_26_000010.htm."
+    },
+    "unit": "USD millions",
+    "measurement_period_end": "2026-10-31",
+    "observable_after": "2026-12-03",
+    "resolution_deadline": "2026-12-31",
+    "source_hint": "normalized_owner_earnings_ttm_m_v2",
+    "observation_plan": {
+      "metric_definition_id": "normalized_owner_earnings_ttm_m_v2",
+      "metric_definition_version": "1.0",
+      "source_adapter": "sec_companyfacts_ttm",
+      "fiscal_period": "Q3",
+      "fiscal_year": 2027,
+      "observation_type": "duration",
+      "duration_basis": "TTM",
+      "canonical_unit": "USD millions",
+      "source_unit": "USD",
+      "accepted_forms": [
+        "10-Q",
+        "10-K"
+      ],
+      "end_date_tolerance_days": 7,
+      "expected_publication_date": "2026-12-03",
+      "maximum_source_lag_days": 45,
+      "outcome_unavailable_at_registration": true,
+      "historical_replay": {
+        "status": "passed",
+        "evidence_ref": "CRWD/research/evidence/sec_companyfacts.json#normalized_owner_earnings_ttm_m@2025-10-31",
+        "replay_measurement_period_end": "2025-10-31",
+        "replay_fiscal_period": "Q3",
+        "replay_fiscal_year": 2026,
+        "replay_value": 1173.348,
+        "replay_as_of": "2025-10-31"
+      }
+    },
+    "review": {
+      "status": "pending",
+      "reviewer": null,
+      "reviewed_at": null
+    },
+    "probability_fires": 0.26,
+    "severity": 4,
+    "component_value_impact_pct": 36.6,
+    "total_equity_value_impact_pct": 36.6,
+    "derived_from": "Owner earnings, incremental returns, or reinvestment runway fall below the low-case bridge.",
+    "rationale": "Types the owner-earnings leg of the operating_business_and_net_assets prose falsifier for CrowdStrike. The low-case owner_earnings_reinvestment_dcf proof trace locks normalized owner earnings at 1,310.241 USD millions (FY2026 operating cash flow of 1,612.349M minus capital spending of 302.108M per CRWD/research/valuation_fact_ledger.json and CRWD/investor-documents/sec-edgar/10-K_20260305_rpt20260131_acc0001535527_26_000010.htm). If trailing-twelve-month normalized owner earnings at 2026-10-31 resolve below that anchor, distributable owner cash has fallen below the low-case bridge and the bounded per-share range should compress toward the low case (69.04 USD per share vs 108.98 base). Incremental after-tax ROIC and reinvestment-rate legs remain judgment inputs without a resolvable SEC metric and are not typed here. Historical adapter replay on Q3 FY2026 (measurement end 2025-10-31) resolved 1,173.348 USD millions via sec_companyfacts_ttm. Known Q1 FY2027 TTM at 2026-04-30 resolved 1,505.198 USD millions, above the threshold. Target Q3 FY2027 is not observable at registration (2026-09-12); expected 10-Q filing ~2026-12-03 per prior-year cadence (CRWD/investor-documents/DOWNLOAD_MANIFEST.json Q3 FY2026 filed 2025-12-03).",
+    "untestable": false,
+    "calibration_eligible": true,
+    "supersedes_spec_id": null
+  }
+}

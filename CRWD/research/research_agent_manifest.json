@@ -1,0 +1,121 @@
+{
+  "schema_version": "2.0",
+  "ticker": "CRWD",
+  "evidence": [
+    {
+      "path": "CRWD/investor-documents/DOWNLOAD_MANIFEST.json",
+      "sha256": "75b5f9ea14faa9ec33c36b8de30a064f7e7d259997a9215002b8757d15004b45",
+      "bytes": 19974
+    }
+  ],
+  "reason": "epistemic_author_forecast:02ac4e724d95c942f9030caa:operating_business_and_net_assets", // pragma: allowlist secret
+  "evidence_hash": "b146aa20a782eb1fe3b0c3a7467db76d602104ef8c4e0801a9bcbc4771f32f92", // pragma: allowlist secret
+  "primary_evidence_hash": "864b1bce1ede2cdfac2d6a78f71052c2a60edc7782eee0eae774ccda229d1119",
+  "artifact_count": 1,
+  "ready": true,
+  "primary_evidence_ready": true,
+  "epistemic_work_item": {
+    "work_id": "02ac4e724d95c942f9030caa",
+    "task_type": "author_forecast",
+    "ticker": "CRWD",
+    "component_id": "operating_business_and_net_assets",
+    "component_fingerprint": "7a98164fa9b6628c79e084acf62e6f53b327dbd7e06354785780736714433938",
+    "contract_hash": "82fd1e20ffbfbc3f0d3a72b250a32fd0f367db9b5017e37b8ccff2f81a1a3917",
+    "method_id": "owner_earnings_reinvestment_dcf",
+    "power_zone": "quality_reinvestment",
+    "metric_definition_id": "normalized_owner_earnings_ttm_m_v2",
+    "priority": 75,
+    "source_preflight_candidate": true,
+    "reason": "first_route_cohort_deficit",
+    "source_ref": "CRWD/research/valuation_contract.json",
+    "frozen_component": {
+      "component_id": "operating_business_and_net_assets",
+      "label": "Operating business and net financial assets",
+      "category": "operating_business",
+      "treatment": "additive",
+      "included_in_component_id": null,
+      "ownership_claim": "Operating business and net financial assets",
+      "ownership_percentage": 1.0,
+      "quantity": null,
+      "method": "owner_earnings_reinvestment_dcf",
+      "method_version": "1.0",
+      "method_provenance": {
+        "method_id": "owner_earnings_reinvestment_dcf",
+        "version": "1.0",
+        "label": "Owner earnings and reinvestment-return DCF",
+        "output_basis": "present_value_today",
+        "power_zones": [
+          "quality_reinvestment"
+        ],
+        "equation": "cash_t = cash_(t-1)*(1+reinvestment*incremental_ROIC); value = PV(distributable cash + terminal owner earnings)",
+        "sources": [
+          {
+            "ref": "_system/frameworks/segment_cashflow_valuation.md",
+            "locator": "Owner cash, reinvestment and reverse expectations"
+          }
+        ]
+      },
+      "comparable_ids": [],
+      "range_per_share": {
+        "low": 69.0445,
+        "base": 108.9797,
+        "high": 190.1932
+      },
+      "output_basis": "present_value_today",
+      "legacy_range_per_share": null,
+      "valuation_status": "bounded_estimate",
+      "calculation_proof": {
+        "status": "valid",
+        "method_id": "owner_earnings_reinvestment_dcf",
+        "method_version": "1.0",
+        "outputs": {
+          "low": 69.0445,
+          "base": 108.9797,
+          "high": 190.1932
+        },
+        "output_unit": "USD per share",
+        "traces": {
+          "low": [
+            {
+              "id": "owner_earnings",
+              "label": "Normalized owner earnings",
+              "kind": "fact",
+              "value": 1310.241,
+              "unit": "USD millions",
+              "source": {
+                "ref": "CRWD/research/evidence/sec_companyfacts.json",
+                "locator": "us-gaap:NetCashProvidedByUsedInOperatingActivities; accession 0001535527-26-000010; form 10-K",
+                "as_of": "2026-01-31",
+                "content_sha256": "3deef70cc849e70954e6b21dd46f38cb5c6ca887a9a49443d831ea6a568bbdec",
+                "source_id": "1a630df37491356b7a30fdeea8e12d9ea4fe55669b229399aa4ef2017bb6d96a"
+              },
+              "rationale": null
+            }
+          ]
+        },
+        "proof_hash": "bc4cc17336047b6a4511ed5466e32585fbc6ee53b7cb0fad5d3a0180d2565754"
+      },
+      "evidence_tier": "primary_derived",
+      "evidence_level": "primary_derived",
+      "evidence": "Source-locked filing facts plus explicitly bounded versioned judgments.",
+      "falsifier": "Owner earnings, incremental returns, or reinvestment runway fall below the low-case bridge.",
+      "overlap_key": "entire_security",
+      "assumption_type": "judgment"
+    },
+    "acceptance_tests": [
+      "target period is not observable at registration",
+      "historical adapter replay passes",
+      "threshold is economically material",
+      "independent reviewer approves"
+    ],
+    "state": "queued",
+    "attempts": 0,
+    "lease_owner": null,
+    "lease_expires_at": null,
+    "input_sha": "7c6e9fe0e804a7353c578b4708d55830e49ae24d"
+  },
+  "epistemic_input_sha": "7c6e9fe0e804a7353c578b4708d55830e49ae24d",
+  "calibration_release_hash": null,
+  "routed_memory_observations": [],
+  "routed_memory_warning": null
+}
