@@ -1097,7 +1097,7 @@
       "terms_status": "unparsed"
     }
   ],
-  "generated_at": "2026-09-23T02:08:52Z",
+  "generated_at": "2026-09-23T09:18:20Z",
   "health": {
     "discovery": {
       "consecutive_failures": 0,
@@ -1114,11 +1114,11 @@
       "python _system/scripts/refresh_warrant_universe.py --discover --discover-days 14",
       "python _system/scripts/check_warrant_universe.py --strict"
     ],
-    "last_known_good_preserved": true,
+    "last_known_good_preserved": false,
     "market_age_days": 0,
     "market_freshness_state": "ready",
-    "market_generated_at": "2026-09-22T23:11:37Z",
-    "market_last_successful_refresh": "2026-09-22T23:11:37Z",
+    "market_generated_at": "2026-09-23T09:18:20Z",
+    "market_last_successful_refresh": "2026-09-23T09:18:20Z",
     "stale_active_quotes": [],
     "status": "healthy",
     "structural_errors": []
@@ -1126,15 +1126,34 @@
   "learning_loop": {
     "automatic_weight_changes": false,
     "calibration": {
-      "buckets": [],
-      "generated_at": "2026-09-22T23:11:38Z",
-      "outcome_count": 0,
+      "buckets": [
+        {
+          "horizon_days": 90,
+          "lane": "despac",
+          "max_return_pct": -100.0,
+          "mean_return_pct": -100.0,
+          "min_return_pct": -100.0,
+          "positive_rate_pct": 0.0,
+          "sample_size": 2
+        },
+        {
+          "horizon_days": 365,
+          "lane": "despac",
+          "max_return_pct": -100.0,
+          "mean_return_pct": -100.0,
+          "min_return_pct": -100.0,
+          "positive_rate_pct": 0.0,
+          "sample_size": 2
+        }
+      ],
+      "generated_at": "2026-09-23T09:18:20Z",
+      "outcome_count": 4,
       "policy": "descriptive_only_no_automatic_weight_changes",
       "schema_version": "1.0"
     },
     "cohort_count": 8,
     "next_resolution": "90- and 365-day outcomes resolve from append-only market history.",
-    "resolved_outcome_count": 0
+    "resolved_outcome_count": 4
   },
   "policy": {
     "collateral_rule": "A long warrant is not treated as covered-call collateral without account-specific broker confirmation.",
@@ -1150,8 +1169,8 @@
       "contract_clock": {
         "call": null,
         "callable": false,
-        "days_to_expiry": 123,
-        "elapsed_pct": 88.78,
+        "days_to_expiry": 122,
+        "elapsed_pct": 88.87,
         "expiry": "2027-01-23",
         "issue_date": "2024-01-23",
         "threshold": null
@@ -1159,16 +1178,16 @@
       "corporate_action": null,
       "diagnostics": {
         "breakeven_common": 18.86,
-        "cagr_to_breakeven_pct": 1.11,
+        "cagr_to_breakeven_pct": 8.37,
         "diluted_overhang_pct": null,
         "exercise_cost_per_warrant": 6.81,
         "fair_value": null,
-        "intrinsic_value": 11.98,
+        "intrinsic_value": 11.55,
         "model_route": "dilution_aware_pending",
-        "moneyness_pct": 175.92,
-        "move_to_breakeven_pct": 0.37,
+        "moneyness_pct": 169.6,
+        "move_to_breakeven_pct": 2.72,
         "opportunity_score": null,
-        "parity_premium": 0.07,
+        "parity_premium": 0.5,
         "warning": "Delayed closes are diagnostics, not executable prices or fair values."
       },
       "exchange": "Nasdaq",
@@ -1199,19 +1218,19 @@
       "lifecycle": "active",
       "market": {
         "common": {
-          "adv20": 11355646.4,
+          "adv20": 11375110.0,
           "ask": null,
           "bid": null,
-          "close": 18.790001,
+          "close": 18.360001,
           "currency": "USD",
           "exchange": "NMS",
-          "fetched_at": "2026-09-22T23:11:37Z",
-          "previous_close": 18.360001,
-          "quote_date": "2026-09-22",
+          "fetched_at": "2026-09-23T09:18:20Z",
+          "previous_close": 17.99,
+          "quote_date": "2026-09-21",
           "role": "common",
           "source": "yahoo_chart_v8_delayed_close",
           "symbol": "CORZ",
-          "volume": 10019628,
+          "volume": 11364800,
           "warrant_id": "0001839341:0001628280-24-010682:tranche-1"
         },
         "executable": false,
@@ -1223,7 +1242,7 @@
           "close": 12.05,
           "currency": "USD",
           "exchange": "NMS",
-          "fetched_at": "2026-09-22T23:11:37Z",
+          "fetched_at": "2026-09-23T09:18:20Z",
           "previous_close": null,
           "quote_date": "2026-09-22",
           "role": "warrant",
@@ -1278,8 +1297,8 @@
       "contract_clock": {
         "call": null,
         "callable": false,
-        "days_to_expiry": 854,
-        "elapsed_pct": 53.26,
+        "days_to_expiry": 853,
+        "elapsed_pct": 53.31,
         "expiry": "2029-01-23",
         "issue_date": "2024-01-23",
         "threshold": {
@@ -1292,16 +1311,16 @@
       "corporate_action": null,
       "diagnostics": {
         "breakeven_common": 18.75,
-        "cagr_to_breakeven_pct": -0.09,
+        "cagr_to_breakeven_pct": 0.9,
         "diluted_overhang_pct": null,
         "exercise_cost_per_warrant": 0.01,
         "fair_value": null,
-        "intrinsic_value": 18.78,
+        "intrinsic_value": 18.35,
         "model_route": "clause_aware_pending",
-        "moneyness_pct": 187800.01,
-        "move_to_breakeven_pct": -0.21,
+        "moneyness_pct": 183500.01,
+        "move_to_breakeven_pct": 2.12,
         "opportunity_score": null,
-        "parity_premium": -0.04,
+        "parity_premium": 0.39,
         "warning": "Delayed closes are diagnostics, not executable prices or fair values."
       },
       "exchange": "Nasdaq",
@@ -1332,19 +1351,19 @@
       "lifecycle": "active",
       "market": {
         "common": {
-          "adv20": 11355646.4,
+          "adv20": 11375110.0,
           "ask": null,
           "bid": null,
-          "close": 18.790001,
+          "close": 18.360001,
           "currency": "USD",
           "exchange": "NMS",
-          "fetched_at": "2026-09-22T23:11:37Z",
-          "previous_close": 18.360001,
-          "quote_date": "2026-09-22",
+          "fetched_at": "2026-09-23T09:18:20Z",
+          "previous_close": 17.99,
+          "quote_date": "2026-09-21",
           "role": "common",
           "source": "yahoo_chart_v8_delayed_close",
           "symbol": "CORZ",
-          "volume": 10019628,
+          "volume": 11364800,
           "warrant_id": "0001839341:0001628280-24-010682:tranche-2"
         },
         "executable": false,
@@ -1356,7 +1375,7 @@
           "close": 18.74,
           "currency": "USD",
           "exchange": "NMS",
-          "fetched_at": "2026-09-22T23:11:37Z",
+          "fetched_at": "2026-09-23T09:18:20Z",
           "previous_close": null,
           "quote_date": "2026-09-22",
           "role": "warrant",
@@ -1417,8 +1436,8 @@
       "contract_clock": {
         "call": null,
         "callable": false,
-        "days_to_expiry": 9047,
-        "elapsed_pct": 17.43,
+        "days_to_expiry": 9046,
+        "elapsed_pct": 17.44,
         "expiry": "2051-06-30",
         "issue_date": "2021-06-30",
         "threshold": null
@@ -1466,19 +1485,19 @@
       "lifecycle": "active",
       "market": {
         "common": {
-          "adv20": 14466594.65,
+          "adv20": 14793790.0,
           "ask": null,
           "bid": null,
           "close": 1.85,
           "currency": "USD",
           "exchange": "NMS",
-          "fetched_at": "2026-09-22T23:11:37Z",
-          "previous_close": 1.85,
-          "quote_date": "2026-09-22",
+          "fetched_at": "2026-09-23T09:18:20Z",
+          "previous_close": 1.82,
+          "quote_date": "2026-09-21",
           "role": "common",
           "source": "yahoo_chart_v8_delayed_close",
           "symbol": "HTZ",
-          "volume": 11731193,
+          "volume": 9988600,
           "warrant_id": "0001657853:0001104659-21-089858:public"
         },
         "executable": false,
@@ -1490,7 +1509,7 @@
           "close": 0.8986,
           "currency": "USD",
           "exchange": "NMS",
-          "fetched_at": "2026-09-22T23:11:37Z",
+          "fetched_at": "2026-09-23T09:18:20Z",
           "previous_close": null,
           "quote_date": "2026-09-22",
           "role": "warrant",
@@ -1550,7 +1569,7 @@
           "window": "20 of 30 trading days"
         },
         "callable": true,
-        "days_to_expiry": -1705,
+        "days_to_expiry": -1706,
         "elapsed_pct": 100.0,
         "expiry": "2022-01-21",
         "issue_date": "2020-09-24",
@@ -1650,7 +1669,7 @@
           "window": "20 of 30 trading days"
         },
         "callable": true,
-        "days_to_expiry": -725,
+        "days_to_expiry": -726,
         "elapsed_pct": 100.0,
         "expiry": "2024-09-27",
         "issue_date": "2019-09-13",
@@ -1751,7 +1770,7 @@
           "window": "20 of 30 trading days"
         },
         "callable": true,
-        "days_to_expiry": -565,
+        "days_to_expiry": -566,
         "elapsed_pct": 100.0,
         "expiry": "2025-03-06",
         "issue_date": "2021-09-21",
@@ -1854,7 +1873,7 @@
           "window": "20 of 30 trading days"
         },
         "callable": true,
-        "days_to_expiry": -547,
+        "days_to_expiry": -548,
         "elapsed_pct": 100.0,
         "expiry": "2025-03-24",
         "issue_date": "2020-11-24",
@@ -1955,7 +1974,7 @@
           "window": "20 of 30 trading days"
         },
         "callable": true,
-        "days_to_expiry": -13,
+        "days_to_expiry": -14,
         "elapsed_pct": 100.0,
         "expiry": "2026-09-09",
         "issue_date": "2019-09-09",
@@ -2020,7 +2039,7 @@
           "warrant_id": "0001753539:0001753539-21-000084:public"
         },
         "executable": false,
-        "quote_age_days": 14,
+        "quote_age_days": 15,
         "warrant": {
           "adv20": 27180.0,
           "ask": null,
