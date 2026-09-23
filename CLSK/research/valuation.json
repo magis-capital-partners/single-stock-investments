@@ -107,7 +107,7 @@
     }
   ],
   "btc_overlay": {
-    "as_of": "2026-07-17",
+    "as_of": "2026-09-17",
     "crypto_exposure": "miner",
     "status": "partial",
     "disclaimer": "Context only. Crypto and mining metrics inform stance and overlays; they do not auto-inflate Lawrence base IRR. Promotion to base case requires [HUMAN REVIEW].",
@@ -120,66 +120,66 @@
           {
             "id": "btc_spot_usd",
             "label": "Bitcoin spot (USD)",
-            "latest": 63906.87890625,
-            "as_of": "2026-07-17",
-            "yoy_pct": -46.4,
+            "latest": 76209.859375,
+            "as_of": "2026-09-17",
+            "yoy_pct": -34.6,
             "direction": "down",
-            "source": "yahoo:BTC-USD",
+            "source": "yahoo_daily",
             "stale": false,
             "in_base_irr": false
           },
           {
             "id": "btc_hash_rate_eh",
-            "label": "Network hash rate (EH/s, 7d avg)",
-            "latest": 781.1916791865629,
-            "as_of": "2026-07-17",
-            "yoy_pct": null,
-            "direction": "flat",
-            "source": "mempool.space:hashrate",
+            "label": "Network hash rate (EH/s)",
+            "latest": 873.9874431305159,
+            "as_of": "2026-09-17",
+            "yoy_pct": -19.7,
+            "direction": "down",
+            "source": "mempool_hashrate",
             "stale": false,
             "in_base_irr": false
           },
           {
             "id": "btc_difficulty",
             "label": "Mining difficulty (index)",
-            "latest": 127170500429035.2,
-            "as_of": "2026-07-17",
+            "latest": 127450789715843.1,
+            "as_of": "2026-09-17",
             "yoy_pct": null,
             "direction": "flat",
-            "source": "mempool.space:difficulty",
+            "source": "mempool_difficulty",
             "stale": false,
             "in_base_irr": false
           },
           {
             "id": "btc_avg_fee_per_block_usd",
             "label": "Avg transaction fees per block (USD)",
-            "latest": 835.5309,
-            "as_of": "2026-07-17",
+            "latest": 349.7329,
+            "as_of": "2026-09-17",
             "yoy_pct": null,
             "direction": "flat",
-            "source": "mempool.space:fees",
+            "source": "mempool_fees",
             "stale": false,
             "in_base_irr": false
           },
           {
             "id": "btc_hashprice_usd_ph_day",
             "label": "Hashprice (USD/PH/day)",
-            "latest": 0.036967,
-            "as_of": "2026-07-17",
+            "latest": 0.039297,
+            "as_of": "2026-09-17",
             "yoy_pct": null,
             "direction": "flat",
-            "source": "computed:hashprice",
+            "source": "computed_hashprice",
             "stale": false,
             "in_base_irr": false
           },
           {
             "id": "btc_breakeven_power_30jth",
             "label": "Breakeven power cost at 30 J/TH ($/kWh)",
-            "latest": 0.0513,
-            "as_of": "2026-07-17",
+            "latest": 0.0546,
+            "as_of": "2026-09-17",
             "yoy_pct": null,
             "direction": "flat",
-            "source": "computed:breakeven_30.0jth",
+            "source": "computed_breakeven",
             "stale": false,
             "in_base_irr": false
           }
@@ -187,18 +187,34 @@
       }
     ],
     "mining_economics_context": {
-      "hash_rate_eh": 781.1916791865629,
-      "difficulty": 127170500429035.2,
-      "avg_fee_per_block_usd": 835.5309,
-      "hashprice_usd_ph_day": 0.036967,
-      "breakeven_power_usd_kwh_30jth": 0.0513,
-      "source": "mempool.space + computed"
+      "spot_usd": 76209.859375,
+      "hash_rate_eh": 873.9874431305159,
+      "difficulty": 127450789715843.1,
+      "avg_fee_per_block_usd": 349.7329,
+      "hashprice_usd_ph_day": 0.039297,
+      "breakeven_power_usd_kwh_30jth": 0.0546,
+      "spot_as_of": "2026-09-17",
+      "hauck_all_in_usd": 57101.03,
+      "hauck_all_in_as_of": "2026-09-17",
+      "fleet_jth": 14.700133,
+      "electricity_only_usd": 34260.62,
+      "sota_cash_usd": 42728.27,
+      "sota_roic_usd": 89287.73,
+      "premium_usd": 99926.8,
+      "mixed_2028_all_in_usd": 138184.49,
+      "mixed_2032_all_in_usd": 342606.18,
+      "naive_2028_all_in_usd": 114202.06,
+      "miner_stance": "above_fleet_floor_below_sota_roic",
+      "miner_stance_plain_english": "Average fleet is cash-profitable at this spot. New state-of-the-art machines with a 25 percent ROIC hurdle are not earning that return.",
+      "in_base_irr": false,
+      "source": "asic vintage mix + $0.05/kWh HK-comparable case"
     },
     "in_model": {},
     "not_in_model_requires_refresh": [
       "live_btc_spot_in_price_input",
       "hashprice_vs_fleet_breakeven",
-      "post_halving_subsidy_schedule"
+      "post_halving_subsidy_schedule",
+      "hauck_cost_floor_not_in_lawrence_base"
     ]
   },
   "optionality_gate": {
@@ -267,7 +283,7 @@
     "panel_json": "CLSK/research/total_return_panel.json"
   },
   "context_overlay": {
-    "as_of": "2026-09-11",
+    "as_of": "2026-09-23",
     "disclaimer": "Context only. Tailwinds inform stance and overlay sizing; they do not auto-inflate Lawrence base IRR. Promotion to base case requires [HUMAN REVIEW].",
     "themes": [
       {
@@ -277,9 +293,9 @@
           {
             "id": "hy_oas",
             "label": "High-yield OAS credit spread (%)",
-            "latest": 0.38,
-            "as_of": "2026-09-11",
-            "yoy_pct": 125.2,
+            "latest": -0.01,
+            "as_of": "2026-09-23",
+            "yoy_pct": 98.8,
             "direction": "up",
             "good_for": "risk_regime",
             "source": "spread:HYG-LQD:21d (HYG-LQD 1m spread proxy, not OAS)",
@@ -289,9 +305,9 @@
           {
             "id": "ust_10y",
             "label": "US Treasury 10Y yield (%)",
-            "latest": 4.953000068664551,
-            "as_of": "2026-09-11",
-            "yoy_pct": 23.5,
+            "latest": 5.065999984741211,
+            "as_of": "2026-09-23",
+            "yoy_pct": 23.0,
             "direction": "up",
             "good_for": "rates_regime",
             "source": "yahoo:^TNX",
@@ -301,9 +317,9 @@
           {
             "id": "ust_2y",
             "label": "US Treasury 2Y yield (%)",
-            "latest": 4.765999794006348,
-            "as_of": "2026-09-11",
-            "yoy_pct": 33.2,
+            "latest": 4.952000141143799,
+            "as_of": "2026-09-23",
+            "yoy_pct": 34.7,
             "direction": "up",
             "good_for": "rates_regime",
             "source": "yahoo:^FVX",
@@ -313,9 +329,9 @@
           {
             "id": "dxy_broad",
             "label": "Trade-weighted USD index (broad)",
-            "latest": 99.06600189208984,
-            "as_of": "2026-09-11",
-            "yoy_pct": 1.6,
+            "latest": 101.02799987792969,
+            "as_of": "2026-09-23",
+            "yoy_pct": 3.9,
             "direction": "up",
             "good_for": "dollar_regime",
             "source": "yahoo:DX-Y.NYB",
@@ -325,10 +341,10 @@
           {
             "id": "vix_level",
             "label": "VIX index level",
-            "latest": 15.720000267028809,
-            "as_of": "2026-09-11",
-            "yoy_pct": 6.9,
-            "direction": "up",
+            "latest": 14.65999984741211,
+            "as_of": "2026-09-23",
+            "yoy_pct": -11.9,
+            "direction": "down",
             "good_for": "vol_regime",
             "source": "yahoo:^VIX",
             "stale": false,
@@ -337,9 +353,9 @@
           {
             "id": "credit_impulse_1m",
             "label": "HYG vs TLT 1-month return spread (%)",
-            "latest": 0.22,
-            "as_of": "2026-09-11",
-            "yoy_pct": 107.1,
+            "latest": -0.08,
+            "as_of": "2026-09-23",
+            "yoy_pct": 96.2,
             "direction": "up",
             "good_for": "credit_impulse",
             "source": "spread:HYG-TLT:21d",
@@ -349,10 +365,10 @@
           {
             "id": "spy_20d_realized_vol",
             "label": "SPY 20-day realized vol (annualized %)",
-            "latest": 8.85,
-            "as_of": "2026-09-11",
-            "yoy_pct": -0.8,
-            "direction": "flat",
+            "latest": 10.44,
+            "as_of": "2026-09-23",
+            "yoy_pct": 41.7,
+            "direction": "up",
             "good_for": "equity_vol",
             "source": "realized_vol:SPY:20d",
             "stale": false,
@@ -391,9 +407,9 @@
           {
             "id": "btc_usd",
             "label": "Bitcoin spot (USD)",
-            "latest": 77632.71875,
-            "as_of": "2026-09-11",
-            "yoy_pct": -32.8,
+            "latest": 84645.28125,
+            "as_of": "2026-09-23",
+            "yoy_pct": -24.4,
             "direction": "down",
             "good_for": "miner_revenue",
             "source": "yahoo:BTC-USD",
@@ -403,10 +419,10 @@
           {
             "id": "henry_hub_gas",
             "label": "Henry Hub natural gas spot (USD/MMBtu)",
-            "latest": 2.815000057220459,
-            "as_of": "2026-09-11",
-            "yoy_pct": -4.1,
-            "direction": "down",
+            "latest": 3.1449999809265137,
+            "as_of": "2026-09-23",
+            "yoy_pct": 10.2,
+            "direction": "up",
             "good_for": "power_cost",
             "source": "yahoo:NG=F",
             "stale": false,
@@ -428,7 +444,7 @@
             "id": "hyperscaler_capex_ttm_usd_bn",
             "label": "Hyperscaler capex guide (USD bn, latest)",
             "latest": 467.3,
-            "as_of": "2026-09-11",
+            "as_of": "2026-09-23",
             "yoy_pct": null,
             "direction": "flat",
             "good_for": "site_repurpose_demand",
@@ -441,7 +457,7 @@
     ]
   },
   "insider_signal": {
-    "as_of": "2026-09-11",
+    "as_of": "2026-09-23",
     "disclaimer": "Context only. Insider activity informs scenario confidence and stance discussion; it does not auto-inflate Lawrence base IRR. Promotion requires [HUMAN REVIEW].",
     "in_base_irr": false,
     "window_days": 365,
@@ -510,17 +526,17 @@
         "contrib": -0.129
       },
       {
-        "insider": "Schultz S. Matthew",
-        "date": "2025-09-12",
-        "shares": 178200,
-        "price": 0.0,
-        "value_usd": 0.0,
+        "insider": "Vecchiarelli Gary Anthony",
+        "date": "2026-05-14",
+        "shares": 632,
+        "price": 13.9807,
+        "value_usd": 8835.8,
         "is_10b5_1": false,
-        "contrib": -0.129
+        "contrib": -0.101
       }
     ],
     "narrative_hooks": [],
-    "transaction_count": 56
+    "transaction_count": 52
   },
   "lens_consensus": {
     "as_of": "2026-07-17",

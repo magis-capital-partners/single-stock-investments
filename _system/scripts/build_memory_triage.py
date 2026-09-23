@@ -38,6 +38,7 @@ Usage:
   python _system/scripts/build_memory_triage.py --mark promoted --ids a1b2,c3d4 \
       --reason "2026-08-09 promotion pass"
   python _system/scripts/build_memory_triage.py --auto-reject-mechanical
+  python _system/scripts/build_memory_triage.py --expire-human-sla --by memory-triage-bot
   python _system/scripts/build_memory_triage.py --sync-promoted-from-memory
 
   # reverse a decision without deleting history
@@ -100,6 +101,12 @@ ROW_ID = re.compile(r"`([0-9a-f]{12})`\s*$")
 DECISIONS = ("promoted", "routed", "rejected", "dropped")
 KINDS = ("durable_belief", "company_observation", "process_learning",
          "ephemeral_output", "parse_artifact")
+# Matches graph invariant E7. Proposals dated before this day are the legacy
+# backlog (E6, report-only). Newer durable and process proposals must be
+# closed within HUMAN_SLA_DAYS; this script closes them as dropped, not promoted.
+HUMAN_SLA_START = "2026-08-12"
+HUMAN_SLA_DAYS = 30
+HUMAN_SLA_KINDS = frozenset({"durable_belief", "process_learning"})
 TICKER_PREFIX = re.compile(r"^(?:\*\*)?([A-Z0-9][A-Z0-9.\-]{0,11})(?:\*\*)?\s*[:\-]")
 TICKER_CITATION = re.compile(r"`([A-Z0-9][A-Z0-9.\-]{0,11})/")
 # Leading markdown list/bullet marker on a daily-log line: "- ", "* ", "1. ".
@@ -230,6 +237,40 @@ def proposal_kind(item: dict) -> str:
     if lens in {"MEMORY", "SYSTEM", "PROCESS", "OPS", "WORKFLOW"}:
         return "process_learning"
     return "durable_belief"
+
+
+def human_sla_expired(item: dict, today: date) -> bool:
+    """True when E7 requires a recorded decision and none exists yet."""
+    if item.get("day", "") < HUMAN_SLA_START:
+        return False
+    try:
+        age = (today - date.fromisoformat(item["day"])).days
+    except ValueError:
+        return False
+    return age > HUMAN_SLA_DAYS
+
+
+def expire_human_sla(items: list[dict], ledger: dict, today: date, by: str) -> int:
+    """Close overdue durable and process proposals without promoting them.
+
+    The text stays in the source daily log. A later ``--mark --reverse`` can
+    still promote one. Company observations and artifacts are not touched;
+    those have their own immediate route-or-drop pass.
+    """
+    reason = (
+        f"human review window of {HUMAN_SLA_DAYS} days elapsed; text stays in "
+        "the source daily log and was not promoted into MEMORY.md"
+    )
+    written = 0
+    for item in items:
+        if proposal_kind(item) not in HUMAN_SLA_KINDS:
+            continue
+        if not human_sla_expired(item, today):
+            continue
+        if record(ledger, item, "dropped", reason, by, today.isoformat(),
+                  quiet=True, reason_code="human_sla_elapsed"):
+            written += 1
+    return written
 
 
 def route_destination(item: dict, kind: str) -> str | None:
@@ -691,6 +732,10 @@ def main(argv: list[str] | None = None) -> int:
                     help="reject one-line per-ticker stance readouts as a class")
     ap.add_argument("--auto-dispose-nondurable", action="store_true",
                     help="drop parse/ephemeral artifacts and route company observations")
+    ap.add_argument("--expire-human-sla", action="store_true",
+                    help="drop durable and process proposals older than the "
+                         f"{HUMAN_SLA_DAYS}-day human window (from {HUMAN_SLA_START}); "
+                         "does not promote them")
     ap.add_argument("--repair-routes", action="store_true",
                     help="repair routed destination metadata without changing decisions")
     ap.add_argument("--ack-delivery", action="store_true",
@@ -839,6 +884,13 @@ def main(argv: list[str] | None = None) -> int:
         save_ledger(ledger)
         print(f"[ok] nondurable backfill: {counts['routed']} routed, "
               f"{counts['dropped']} dropped; durable/process proposals untouched")
+        return 0
+
+    if args.expire_human_sla:
+        written = expire_human_sla(items, ledger, date.fromisoformat(today), args.by)
+        save_ledger(ledger)
+        print(f"[ok] human SLA: {written} overdue durable/process proposal(s) "
+              "dropped; source logs and MEMORY.md unchanged")
         return 0
 
     if args.repair_routes:

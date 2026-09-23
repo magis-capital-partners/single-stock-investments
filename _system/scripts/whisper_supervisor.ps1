@@ -29,6 +29,11 @@
 .PARAMETER Threads
     CPU threads for CTranslate2. Left at 12 of 16 so the machine stays usable.
 
+.PARAMETER SyncMain
+    Bring this worktree up to origin/main before any Python runs. The
+    scheduled task passes it and runs the script from the ssi-local-lanes
+    worktree, never the primary checkout; lane_worktree.ps1 has the reasons.
+
 .EXAMPLE
     powershell -ExecutionPolicy Bypass -File _system\scripts\whisper_supervisor.ps1
 #>
@@ -45,7 +50,8 @@ param(
     [int]    $PushMins   = 15,
     [int]    $MinBackoff = 120,
     [int]    $MaxBackoff = 1800,
-    [int]    $MaxLogMB   = 32
+    [int]    $MaxLogMB   = 32,
+    [switch] $SyncMain
 )
 
 $ErrorActionPreference = 'Stop'
@@ -89,6 +95,21 @@ Write-Log ("supervisor start: model=$Model threads=$Threads chunk=$Chunk push=${
 
 $backoff = $MinBackoff
 try {
+    # Once, before anything runs from the tree. The analysis supervisor keeps
+    # this worktree current between its batches; while it is running, this
+    # sync defers to it rather than rewriting files under a live batch.
+    if ($SyncMain) {
+        $helper = Join-Path $PSScriptRoot 'lane_worktree.ps1'
+        try {
+            . $helper
+            $null = Sync-LaneWorktree -Repo $repo -Logger { param($m) Write-Log $m } `
+                -BusyMutexes @('Global\ssi-podcast-analysis')
+        }
+        catch {
+            Write-Log "sync error, running this checkout as it is: $_"
+        }
+    }
+
     while ($true) {
         Rotate-Log
 

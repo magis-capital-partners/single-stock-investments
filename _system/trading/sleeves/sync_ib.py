@@ -14,7 +14,7 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from _system.trading.sleeves.book import build_book, export_static_books
-from _system.trading.sleeves.classify_positions import classify_positions, expand_blacklist_symbols
+from _system.trading.sleeves.classify_positions import classify_positions, expand_blacklist_symbols, norm_sym
 from _system.trading.sleeves.config_loader import (
     load_blacklist,
     load_config,
@@ -115,12 +115,21 @@ def sync_holdings(
     rows, source = load_positions(cfg, supplied=positions, flex_path=flex_path, flex_marks=flex_marks)
     family = expand_blacklist_symbols(load_blacklist(cfg), load_etf_to_under(cfg))
     letf = load_etf_ls_universe(cfg)
-    classified = classify_positions(rows, blacklist_family=family, etf_ls_symbols=letf)
+    drew_symbols = [
+        norm_sym(symbol)
+        for symbol in ((cfg.get("operators") or {}).get("drew") or {}).get("symbols") or []
+    ]
+    classified = classify_positions(
+        rows,
+        blacklist_family=family,
+        etf_ls_symbols=letf,
+        drew_symbols=drew_symbols,
+    )
     tags = {int(t["con_id"]): t for t in store.sleeve_tags() if t.get("con_id")}
     tags_by_ticker = {(t.get("owner"), str(t.get("ticker") or "").upper()): t for t in store.sleeve_tags()}
     for row in classified:
         cls = row.get("classification") or {}
-        if cls.get("bucket") in {"spx_0dte", "etf_ls"}:
+        if cls.get("bucket") in {"spx_0dte", "etf_ls", "index_put_hedge"}:
             continue
         con_id = int(row.get("conId") or 0)
         tag = tags.get(con_id)

@@ -145,6 +145,54 @@ def test_a_positions_only_snapshot_is_never_marked_complete(flex_file):
     assert "equity summary" in payload["completeness"]["note"]
 
 
+def _with_section(xml: str, section: str) -> str:
+    return xml.replace("</OpenPositions>", "</OpenPositions>" + section, 1)
+
+
+def test_an_equity_summary_states_nav_and_leaves_margin_absent(tmp_path):
+    xml = _with_section(
+        FLEX_XML,
+        """<EquitySummaryInBase>
+          <EquitySummaryByReportDateInBase currency="USD" cash="1000000.50" total="2500000.75"
+            stockLong="2000000" stockShort="-100000" optionsLong="50000" optionsShort="-20000" />
+        </EquitySummaryInBase>""",
+    )
+    path = tmp_path / "flex_positions.xml"
+    path.write_text(xml, encoding="utf-8")
+    payload = build_account_snapshot(path, account_alias="U805366")
+    tags = {row["tag"]: row["value"] for row in payload["account_values"]}
+    assert payload["complete"] is True
+    assert tags["NetLiquidation"] == "2500000.75"
+    assert tags["TotalCashValue"] == "1000000.50"
+    assert Decimal(tags["GrossPositionValue"]) == Decimal("2170000")
+    assert "MaintMarginReq" not in tags
+    assert "ExcessLiquidity" not in tags
+    assert all(row["source"] == "ibkr_flex" for row in payload["account_values"])
+
+
+def test_change_in_nav_ending_value_is_enough_when_no_equity_summary_exists(tmp_path):
+    xml = _with_section(FLEX_XML, '<ChangeInNAV currency="USD" endingValue="111.25" cash="10" />')
+    path = tmp_path / "flex_positions.xml"
+    path.write_text(xml, encoding="utf-8")
+    payload = build_account_snapshot(path, account_alias="U805366")
+    tags = {row["tag"]: row["value"] for row in payload["account_values"]}
+    assert payload["complete"] is True
+    assert tags["NetLiquidation"] == "111.25"
+    assert "MaintMarginReq" not in tags
+
+
+def test_a_foreign_currency_summary_is_not_treated_as_base_nav(tmp_path):
+    xml = _with_section(
+        FLEX_XML,
+        '<EquitySummaryInBase><EquitySummaryByReportDateInBase currency="CAD" total="9" cash="1" /></EquitySummaryInBase>',
+    )
+    path = tmp_path / "flex_positions.xml"
+    path.write_text(xml, encoding="utf-8")
+    payload = build_account_snapshot(path, account_alias="U805366")
+    assert payload["complete"] is False
+    assert payload["account_values"] == []
+
+
 def test_the_snapshot_declares_flex_as_its_source(flex_file):
     payload = snapshot(flex_file)
     assert payload["gateway_session_id"] is None

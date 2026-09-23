@@ -430,3 +430,34 @@ def test_route_strips_the_markdown_list_marker_before_reading_the_ticker(tmp_pat
     # rather than inventing a directory from whatever word came first.
     assert triage.route_destination(_item(lens="COMPANY", body=("- broad macro note",)),
                                     "company_observation") == "_system/memory/triage_ledger.json"
+
+
+def test_human_sla_drops_only_overdue_durable_proposals_and_does_not_promote():
+    """E7 fails the triage job once a post-2026-08-12 belief is older than 30 days.
+
+    Closing it is a drop, not a promotion. Younger beliefs, the legacy backlog,
+    and company observations stay untouched.
+    """
+    from datetime import date
+
+    today = date(2026, 9, 23)
+    overdue = _item(day="2026-08-13", body=("Sleeve quality uses four levers.",))
+    in_window = _item(day="2026-09-01", body=("A belief still inside the window.",))
+    legacy = _item(day="2026-08-01", body=("Legacy backlog stays on the report lane.",))
+    observation = _item(lens="COMPANY", day="2026-08-13",
+                        body=("QDEL: guidance was cut.",))
+    ledger = _ledger()
+    written = triage.expire_human_sla(
+        [overdue, in_window, legacy, observation], ledger, today, "memory-triage-bot")
+    assert written == 1
+    entry = ledger["decisions"][triage.fingerprint(overdue)]
+    assert entry["decision"] == "dropped"
+    assert entry["reason_code"] == "human_sla_elapsed"
+    assert "MEMORY.md" in entry["reason"]
+    assert triage.fingerprint(in_window) not in ledger["decisions"]
+    assert triage.fingerprint(legacy) not in ledger["decisions"]
+    assert triage.fingerprint(observation) not in ledger["decisions"]
+    assert not triage.human_sla_expired(in_window, today)
+    exactly_30 = _item(day="2026-08-24", body=("Still on day 30.",))
+    assert (today - date.fromisoformat("2026-08-24")).days == 30
+    assert not triage.human_sla_expired(exactly_30, today)

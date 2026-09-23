@@ -1154,7 +1154,8 @@
         const allocations = row.allocations || [];
         const strategies = allocations.map((lot) => String(lot.strategy || '').toLowerCase());
         let reason = `Assigned to ${allocations.map((lot) => lot.owner).filter(Boolean).join(', ') || 'another scope'}`;
-        if (strategies.some((strategy) => strategy.includes('spx'))) reason = 'SPX option · assigned to SPX 0DTE';
+        if (strategies.some((strategy) => strategy.includes('index_put')) || allocations.some((lot) => lot.bucket === 'index_put_hedge')) reason = 'LS-algo index put hedge';
+        else if (strategies.some((strategy) => strategy.includes('spx'))) reason = 'SPX option · assigned to SPX 0DTE';
         else if (strategies.some((strategy) => strategy.includes('ls') || strategy.includes('letf') || strategy.includes('bucket'))) reason = 'LS-algo ETF / underlying universe';
         return { ...row, exclusion_reason: reason };
       });
@@ -1227,6 +1228,65 @@
     }));
   }
 
+  function sleeveAsPortfolioRow(pos, asOf) {
+    const sec = String(pos.sec_type || pos.secType || 'STK').toUpperCase();
+    const qty = num(pos.qty) || 0;
+    const currency = pos.currency || 'USD';
+    const mv = num(pos.market_value);
+    const pnl = num(pos.pnl_usd);
+    const nativeMv = currency === 'USD' ? mv : (num(pos.mark) == null ? null : qty * num(pos.mark));
+    return {
+      symbol: pos.ticker,
+      local_symbol: pos.local_symbol || pos.ticker,
+      description: pos.name || pos.ticker,
+      sec_type: sec,
+      conid: pos.conid || 0,
+      model_code: 'sleeve',
+      quantity_decimal: String(qty),
+      quantity_unit: sec === 'OPT' || sec === 'FOP' ? 'contracts' : 'shares',
+      average_cost_native_decimal: pos.entry_price,
+      average_cost_decimal: pos.entry_price,
+      mark_native_decimal: pos.mark,
+      mark_decimal: pos.mark,
+      market_value_native_decimal: nativeMv,
+      market_value_decimal: mv,
+      market_value_base_decimal: mv,
+      unrealized_pnl_decimal: pnl,
+      unrealized_pnl_base_decimal: pnl,
+      currency,
+      native_currency: currency,
+      base_currency: 'USD',
+      fx_source: 'flex_stated',
+      quality: 'flex',
+      source: 'Drew sleeve · Flex close',
+      as_of: asOf || null,
+      allocations: [{
+        owner: 'drew',
+        strategy: pos.classifier_reason || 'drew',
+        bucket: pos.classifier_reason || 'drew',
+        quantity_decimal: String(qty),
+        confidence: 'stated',
+      }],
+    };
+  }
+
+  async function overlayDrewSleeve(book) {
+    if (state.scope !== 'drew' || !book) return book;
+    let sleeve;
+    try {
+      sleeve = await getJson('/api/v1/sleeves/book?owner=drew');
+    } catch (_) {
+      return book;
+    }
+    const rows = (sleeve.positions || []).map((pos) => sleeveAsPortfolioRow(pos, sleeve.as_of));
+    if (!rows.length) return book;
+    const seen = new Set(rows.map((row) => `${row.local_symbol}|${row.sec_type}`));
+    const kept = (book.positions || []).filter((row) => !seen.has(`${row.local_symbol || row.symbol}|${String(row.sec_type || '').toUpperCase()}`));
+    book.positions = [...rows, ...kept];
+    if (book.status !== 'complete') book.status = 'complete';
+    return book;
+  }
+
   async function loadBook() {
     const root = document.getElementById('portfolio-content'); if (root) root.innerHTML = '<div class="ph-empty"><div><b>Reconciling broker book…</b>Loading the latest complete snapshot.</div></div>';
     try {
@@ -1236,6 +1296,7 @@
       const responses = await Promise.all(requests); state.book = responses[0];
       state.allBook = allBookIndex == null ? state.book : responses[allBookIndex];
       if (performanceIndex != null) state.accountPerformance = responses[performanceIndex];
+      state.book = await overlayDrewSleeve(state.book);
     }
     catch (error) { state.book = { status: 'unknown', reason: error.message, positions: [], account_values: [], reconciliation_breaks: [] }; }
     await loadActiveSectionData();

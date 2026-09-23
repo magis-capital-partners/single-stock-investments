@@ -1,30 +1,30 @@
 {
   "schema_version": "3.0",
-  "status": "decision_grade",
-  "proof_status": "decision_grade",
-  "model_level": "stock_specific",
-  "model_level_reason": "The proof-complete model uses stock-specific components and assumptions.",
+  "status": "evidence_blocked",
+  "proof_status": "evidence_blocked",
+  "model_level": "evidence_blocked",
+  "model_level_reason": "Prospective falsifier coverage is incomplete.",
   "decision_eligibility": {
-    "committee_eligible": true,
+    "committee_eligible": false,
     "capital_actionable": false,
     "capital_authority_required": "human_decision",
-    "reason": "Stock-specific proof is eligible for independent committee review."
+    "reason": "Close prospective falsifier coverage before committee review."
   },
   "ticker": "BN",
-  "as_of": "2026-07-21",
+  "as_of": "2026-09-17",
   "dates": {
-    "model_as_of": "2026-07-21",
+    "model_as_of": "2026-09-17",
     "latest_fact_as_of": "2026-03-31",
     "oldest_fact_as_of": "2025-12-31",
-    "price_as_of": "2026-08-31"
+    "price_as_of": "2026-09-17"
   },
   "legacy_audit": {
     "actionable": false,
     "status": "audit_only",
     "annualized_return_at_price_pct": {
-      "low": -11.2,
-      "base": -1.4,
-      "high": 6.27
+      "low": -9.93,
+      "base": 0.02,
+      "high": 7.8
     },
     "formula": "((present_value_or_output + undated_distributions) / price) ** (1 / horizon_years) - 1",
     "reason_non_actionable": "This legacy calculation treated a present value as a future payoff and cannot be used as a forward return, hurdle entry price, ranking signal, or capital decision."
@@ -2146,7 +2146,7 @@
     },
     "decision_rule": "Power Zones select the fitting economic method and eligible independent reviewers; they never choose the valuation answer or capital decision.",
     "ticker": "BN",
-    "as_of": "2026-08-25",
+    "as_of": "2026-09-17",
     "route_source": "canonical_power_zone_router",
     "config_path": "_system/frameworks/power_zones.json",
     "config_updated": "2026-07-14",
@@ -2156,7 +2156,8 @@
       "dhando": "partial",
       "stance": "hold",
       "cycle": "-",
-      "investment_sleeve": "holding_conglomerates"
+      "investment_sleeve": "holding_conglomerates",
+      "payoff_lens": "operating"
     },
     "specialist_power_zones": [
       {
@@ -2249,16 +2250,16 @@
         }
       ]
     },
-    "input_hash": "21dbde1572fca77e401dfb3b9229e537073fde87c00da8fe00a13df756fcd0e0",
-    "generated_at": "2026-08-25T01:59:56.820957+00:00"
+    "input_hash": "58c2e788e250f877c0b7ab2e45caa8085d8a8fe49b91637cb03c96dba36ab2d1",
+    "generated_at": "2026-09-17T18:31:50.829264+00:00"
   },
   "market": {
-    "price_per_share": 41.22,
-    "fully_diluted_shares": 2367800000.0,
-    "market_cap_m": 97600.72,
+    "price_per_share": 37.31,
+    "fully_diluted_shares": 2366000000.0,
+    "market_cap_m": 88275.46,
     "enterprise_value_m": null,
-    "price_source": "Yahoo BN close 2026-08-31",
-    "price_as_of": "2026-08-31"
+    "price_source": "Yahoo BN 2026-09-17",
+    "price_as_of": "2026-09-17"
   },
   "valuation": {
     "output_basis": "present_value_today",
@@ -2313,17 +2314,17 @@
     "annualized_return_field_status": "compatibility_alias_of_forward_return",
     "required_return_pct": 9.5,
     "margin_of_safety_pct": {
-      "low": -129.75,
-      "base": -10.35,
-      "high": 34.69
+      "low": -107.96,
+      "base": 0.12,
+      "high": 40.88
     },
     "margin_of_safety_definition": "(intrinsic_value_today - market_price) / intrinsic_value_today; positive means the quote is below intrinsic value",
     "upside_to_value_pct": {
-      "low": -56.47,
-      "base": -9.38,
-      "high": 53.11
+      "low": -51.91,
+      "base": 0.12,
+      "high": 69.15
     },
-    "downside_to_low_pct": -56.47,
+    "downside_to_low_pct": -51.91,
     "horizon_years": 7,
     "equity_liability_floor": 0.0,
     "interpretation": "output_basis states what the proof produced. value_per_share and present_value_today_per_share are intrinsic values today and are withheld while any material additive component is unpriced or dated future economics cannot be discounted at an explicit required return. priced_components_per_share is the raw proof-output sum. A present value is never annualized or discounted again."
@@ -2452,8 +2453,10 @@
     "present_value_is_not_treated_as_future_payoff": true
   },
   "evidence": {
-    "unresolved_count": 0,
-    "blockers": [],
+    "unresolved_count": 1,
+    "blockers": [
+      "prospective_falsifier_gate: new/materially changed components lack eligible, source-preflighted v3 forecasts or typed v3 untestable dispositions: core_engine, reinvestment_or_assets"
+    ],
     "validation_errors": []
   },
   "monitoring": {
@@ -2471,7 +2474,7 @@
     ]
   },
   "change_control": {
-    "model_hash": "7420621ae45182b749af48959a9f4f27cb0441b13ecb2c437bd520036f5745e6",
+    "model_hash": "eea6f515444af888f8d946a6a1bfdd8dc4dc4a4b143b4c0985f8d6dfc2918d42",
     "method_versions": [
       "net_asset_value@1.0",
       "owner_earnings_reinvestment_dcf@1.0"
@@ -2493,6 +2496,20 @@
     "calibration_eligible": 0,
     "diagnostic_only": 0,
     "spec_ref": "BN/research/falsifier_specs.json",
-    "enforcement_enabled": false
+    "enforcement_enabled": false,
+    "prospective_gate": {
+      "since": "2026-08-12",
+      "changed_components": [
+        "core_engine",
+        "reinvestment_or_assets"
+      ],
+      "covered_components": [],
+      "eligible_components": [],
+      "untestable_dispositions": [],
+      "missing_components": [
+        "core_engine",
+        "reinvestment_or_assets"
+      ]
+    }
   }
 }

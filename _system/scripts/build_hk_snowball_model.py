@@ -12,8 +12,14 @@ import argparse
 import csv
 import json
 import math
+import sys
 from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
+
+SCRIPTS_DIR = Path(__file__).resolve().parent
+if str(SCRIPTS_DIR) not in sys.path:
+    sys.path.insert(0, str(SCRIPTS_DIR))
+import btc_cost_of_production as cop  # noqa: E402
 
 ROOT = Path(__file__).resolve().parents[2]
 CRYPTO_DIR = ROOT / "_system" / "reference" / "market-data" / "crypto"
@@ -24,7 +30,8 @@ OUT_REF = CRYPTO_DIR / "hk_snowball_model.json"
 # HK commentary anchors
 BTC_ORIGIN = date(2011, 1, 1)  # demand-model origin used in commentary examples
 AMZN_ORIGIN = date(1997, 5, 15)
-NEXT_HALVING = date(2028, 4, 15)
+NEXT_HALVING = cop.HALVING_2028
+HALVING_2032 = cop.HALVING_2032
 HK_MODEL_2028 = 270438.05  # commentary quote (illustrative)
 DEFAULT_KWH = 0.05  # HK illustrative electricity cost
 DEFAULT_CURRENT_ALL_IN = 65000.0  # HK illustrative current all-in cost
@@ -34,13 +41,7 @@ K_LO, K_HI = 4.0, 6.5
 MILESTONE_FRACS = (0.25, 0.50, 0.75, 0.90, 1.00)
 
 # Known subsidy halvings (UTC calendar dates, approximate)
-HALVINGS = [
-    date(2012, 11, 28),
-    date(2016, 7, 9),
-    date(2020, 5, 11),
-    date(2024, 4, 20),
-    NEXT_HALVING,
-]
+HALVINGS = list(cop.HALVINGS)
 
 DISCLAIMER = "Context only. Not a trade signal. Not in base IRR."
 
@@ -69,12 +70,7 @@ def load_snowball_cfg() -> dict:
 
 
 def block_subsidy_on(d: date) -> float:
-    n = halvings_before(d)
-    if n <= 0:
-        return SUBSIDY_BY_HALVING_INDEX[0]
-    if n >= 5:
-        return SUBSIDY_BY_HALVING_INDEX[5]
-    return SUBSIDY_BY_HALVING_INDEX.get(n, 3.125)
+    return cop.block_subsidy_on(d)
 
 
 def all_in_cost_usd(
@@ -103,14 +99,28 @@ def live_cost_path(
     electricity_usd_kwh: float,
     power_share: float,
     premium_multiple: float,
+    jth_series: list[tuple[date, float]] | None = None,
+    kwh_series: list[tuple[date, float]] | None = None,
+    append_naive_double: bool = False,
 ) -> list[dict]:
+    """Cost path. Prefer time-varying J/TH; constant efficiency is the test fallback."""
+    jth_map = {d: v for d, v in (jth_series or [])}
+    kwh_map = {d: v for d, v in (kwh_series or [])}
+    last_jth = efficiency_j_th
+    last_kwh = electricity_usd_kwh
     out: list[dict] = []
     for d, h in hash_eh:
+        if d in jth_map:
+            last_jth = jth_map[d]
+        if d in kwh_map:
+            last_kwh = kwh_map[d]
+        jth = last_jth
+        kwh = last_kwh
         cost = all_in_cost_usd(
             h,
             subsidy_btc=block_subsidy_on(d),
-            efficiency_j_th=efficiency_j_th,
-            electricity_usd_kwh=electricity_usd_kwh,
+            efficiency_j_th=jth,
+            electricity_usd_kwh=kwh,
             power_share=power_share,
         )
         if cost is None or cost <= 0:
@@ -121,9 +131,10 @@ def live_cost_path(
                 "v": round(cost, 2),
                 "all_in_cost_usd": round(cost, 2),
                 "premium_band_usd": round(cost * premium_multiple, 2),
+                "fleet_jth": round(jth, 4),
             }
         )
-    if out:
+    if append_naive_double and out:
         last_v = out[-1]["v"]
         out.append(
             {
@@ -131,9 +142,38 @@ def live_cost_path(
                 "v": round(last_v * 2.0, 2),
                 "all_in_cost_usd": round(last_v * 2.0, 2),
                 "premium_band_usd": round(last_v * 2.0 * premium_multiple, 2),
-                "event": "halving_projection",
+                "event": "halving_projection_naive",
             }
         )
+    return out
+
+
+def csv_cost_path(
+    all_in: list[tuple[date, float]],
+    *,
+    premium_multiple: float,
+    elec: list[tuple[date, float]] | None = None,
+    sota_roic: list[tuple[date, float]] | None = None,
+    fleet_jth: list[tuple[date, float]] | None = None,
+) -> list[dict]:
+    elec_map = {d: v for d, v in (elec or [])}
+    roic_map = {d: v for d, v in (sota_roic or [])}
+    jth_map = {d: v for d, v in (fleet_jth or [])}
+    out: list[dict] = []
+    for d, cost in all_in:
+        row = {
+            "d": d.isoformat(),
+            "v": round(cost, 2),
+            "all_in_cost_usd": round(cost, 2),
+            "premium_band_usd": round(cost * premium_multiple, 2),
+        }
+        if d in elec_map:
+            row["electricity_only_usd"] = round(elec_map[d], 2)
+        if d in roic_map:
+            row["sota_roic_usd"] = round(roic_map[d], 2)
+        if d in jth_map:
+            row["fleet_jth"] = round(jth_map[d], 4)
+        out.append(row)
     return out
 
 
@@ -335,8 +375,10 @@ def cost_curve(
             "premium_multiple": premium_multiple,
             "next_halving": NEXT_HALVING.isoformat(),
             "note": (
-                "Live path uses hashrate x efficiency x $/kWh / power_share. "
-                "Halving projection doubles cost. HK $65k step used when live inputs missing."
+                "Reconstructed path uses ASIC vintage mix (Hauck). CBECI TWh/J/TH is stored "
+                "as a comparison series. $0.05/kWh is the HK-comparable miner power case. "
+                "Halving step curve is the HK commentary marker, not reconstructed history. "
+                "Forward fan is mixed_base; naive 2x is a labeled scenario."
             ),
         },
         "as_of_cost_usd": round(current_all_in, 2),
@@ -368,7 +410,10 @@ def resolve_current_all_in(
     electricity_usd_kwh: float,
     power_share: float,
     hk_fallback: float,
+    reconstructed: list[tuple[date, float]] | None = None,
 ) -> tuple[float, str]:
+    if reconstructed:
+        return float(reconstructed[-1][1]), "hauck_reconstructed"
     if not hash_eh:
         return hk_fallback, "hk_step_fallback"
     live = all_in_cost_usd(
@@ -383,6 +428,29 @@ def resolve_current_all_in(
     return float(live), "live_hashrate_energy"
 
 
+def _append_forward_points(path: list[dict], fan: dict, *, premium_multiple: float) -> list[dict]:
+    mixed = fan.get("mixed_base") or {}
+    out = list(path)
+    seen = {p.get("d") for p in out}
+    for key in ("2028", "2032"):
+        pt = mixed.get(key) or {}
+        d = pt.get("date")
+        if not d or d in seen:
+            continue
+        all_in = float(pt.get("all_in_usd") or 0)
+        out.append(
+            {
+                "d": d,
+                "v": round(all_in, 2),
+                "all_in_cost_usd": round(all_in, 2),
+                "premium_band_usd": round(all_in * premium_multiple, 2),
+                "event": f"forward_mixed_{key}",
+            }
+        )
+        seen.add(d)
+    return out
+
+
 def build(*, as_of: date | None = None) -> Path:
     btc = _read_csv(CRYPTO_DIR / "btc_spot_usd.csv")
     # Merge committed pre-Yahoo seed even if fetch has not re-run yet
@@ -393,12 +461,22 @@ def build(*, as_of: date | None = None) -> Path:
         btc = sorted(merged.items())
     amzn = _read_csv(EQUITY_DIR / "amzn_weekly_usd.csv")
     hash_eh = _read_csv(CRYPTO_DIR / "btc_hash_rate_eh.csv")
+    fleet_jth_series = _read_csv(CRYPTO_DIR / "btc_fleet_jth.csv")
+    all_in_series = _read_csv(CRYPTO_DIR / "btc_all_in_cost_usd.csv")
+    elec_series = _read_csv(CRYPTO_DIR / "btc_electricity_only_cost_usd.csv")
+    sota_roic_series = _read_csv(CRYPTO_DIR / "btc_sota_roic_cost_usd.csv")
+    sota_cash_series = _read_csv(CRYPTO_DIR / "btc_sota_cash_cost_usd.csv")
+    sota_jth_series = _read_csv(CRYPTO_DIR / "btc_sota_jth.csv")
     snow = load_snowball_cfg()
-    efficiency_j_th = float(snow.get("efficiency_j_th") or 30)
     electricity_usd_kwh = float(snow.get("electricity_usd_kwh") or DEFAULT_KWH)
     power_share = float(snow.get("power_share") or POWER_SHARE)
     premium_multiple = float(snow.get("premium_multiple") or PREMIUM_ABOVE_COST)
     hk_fallback = float(snow.get("hk_current_all_in_usd") or DEFAULT_CURRENT_ALL_IN)
+    efficiency_j_th = (
+        float(fleet_jth_series[-1][1])
+        if fleet_jth_series
+        else float(snow.get("efficiency_j_th") or 30)
+    )
 
     if not btc:
         raise SystemExit("missing btc_spot_usd.csv — run fetch_crypto_panel.py first")
@@ -457,21 +535,46 @@ def build(*, as_of: date | None = None) -> Path:
         electricity_usd_kwh=electricity_usd_kwh,
         power_share=power_share,
         hk_fallback=hk_fallback,
+        reconstructed=all_in_series,
     )
-    path = live_cost_path(
-        hash_eh,
-        efficiency_j_th=efficiency_j_th,
-        electricity_usd_kwh=electricity_usd_kwh,
-        power_share=power_share,
-        premium_multiple=premium_multiple,
-    )
+    if all_in_series:
+        path = csv_cost_path(
+            all_in_series,
+            premium_multiple=premium_multiple,
+            elec=elec_series,
+            sota_roic=sota_roic_series,
+            fleet_jth=fleet_jth_series,
+        )
+    else:
+        path = live_cost_path(
+            hash_eh,
+            efficiency_j_th=efficiency_j_th,
+            electricity_usd_kwh=electricity_usd_kwh,
+            power_share=power_share,
+            premium_multiple=premium_multiple,
+            jth_series=fleet_jth_series,
+        )
+    fan = cop.forward_scenarios(
+        cop.CostState(
+            as_of=as_of,
+            hash_eh=hash_eh[-1][1] if hash_eh else 0.0,
+            fleet_jth=efficiency_j_th,
+            electricity_usd_kwh=electricity_usd_kwh,
+            subsidy_btc=block_subsidy_on(as_of),
+            power_share=power_share,
+            premium_multiple=premium_multiple,
+        )
+    ) if hash_eh else {}
+    path = _append_forward_points(path, fan, premium_multiple=premium_multiple)
     # Downsample dense cost path for JSON size
     if len(path) > 400:
-        step = max(len(path) // 350, 1)
-        kept = path[::step]
-        if path[-1] not in kept:
-            kept.append(path[-1])
-        path = kept
+        hist = [p for p in path if not str(p.get("event") or "").startswith("forward_")]
+        fwd = [p for p in path if str(p.get("event") or "").startswith("forward_")]
+        step = max(len(hist) // 350, 1) if hist else 1
+        kept = hist[::step] if hist else []
+        if hist and hist[-1] not in kept:
+            kept.append(hist[-1])
+        path = kept + fwd
     supply = cost_curve(
         as_of,
         current_all_in=current_all_in,
@@ -482,6 +585,35 @@ def build(*, as_of: date | None = None) -> Path:
         cost_path=path,
         source=cost_source,
     )
+    supply["scenarios"] = fan
+    supply["bands"] = {
+        "electricity_only_usd": round(elec_series[-1][1], 2) if elec_series else None,
+        "all_in_usd": round(current_all_in, 2),
+        "sota_cash_usd": round(sota_cash_series[-1][1], 2) if sota_cash_series else None,
+        "sota_roic_usd": round(sota_roic_series[-1][1], 2) if sota_roic_series else None,
+        "premium_usd": round(current_all_in * premium_multiple, 2),
+    }
+    catalog = cop.load_asic_catalog()
+    supply["sensitivities"] = cop.live_sensitivities(
+        hash_eh=hash_eh[-1][1] if hash_eh else 0.0,
+        fleet_jth=efficiency_j_th,
+        subsidy_btc=block_subsidy_on(as_of),
+        sota_jth=sota_jth_series[-1][1] if sota_jth_series else None,
+        usd_per_th=cop.sota_usd_per_th(as_of, catalog),
+        roic=float(catalog.get("roic") or 0.25),
+    )
+    supply["miner_stance"] = cop.miner_stance(
+        spot,
+        current_all_in,
+        supply["bands"].get("sota_roic_usd"),
+    )
+    mixed_2028 = ((fan.get("mixed_base") or {}).get("2028") or {})
+    mixed_2032 = ((fan.get("mixed_base") or {}).get("2032") or {})
+    if mixed_2028:
+        supply["halving_2028_cost_usd"] = mixed_2028.get("all_in_usd")
+        supply["halving_2028_premium_band_usd"] = mixed_2028.get("premium_usd")
+    supply["halving_2032_cost_usd"] = mixed_2032.get("all_in_usd")
+    supply["halving_2032_premium_band_usd"] = mixed_2032.get("premium_usd")
 
     residual_pct = None
     if model_now and model_now > 0:
@@ -493,7 +625,7 @@ def build(*, as_of: date | None = None) -> Path:
     hash_points = downsample(hash_eh, max_points=200) if hash_eh else []
 
     payload = {
-        "schema_version": "1.1",
+        "schema_version": "1.2",
         "generated_at": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
         "as_of": as_of.isoformat(),
         "disclaimer": DISCLAIMER,
@@ -573,9 +705,11 @@ def build(*, as_of: date | None = None) -> Path:
             "history_start_btc": fit_series[0][0].isoformat() if fit_series else None,
             "cost_source": cost_source,
             "live_cost_as_of": round(current_all_in, 2),
+            "live_fleet_jth": round(efficiency_j_th, 4),
             "note": (
                 "Demand fit uses Yahoo BTC-USD plus pre-Yahoo seed/blockchain backfill. "
-                "Origin 2011-01-01. Live cost from hashrate energy model; HK markers are reference only."
+                "Origin 2011-01-01. Supply is Hauck/CBECI reconstructed all-in; HK $65k/$130k/$225k "
+                "are commentary markers only. Demand k is unchanged."
             ),
         },
     }
