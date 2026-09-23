@@ -4,20 +4,6 @@
       "kind": "unresolved_sec_events",
       "message": "57 SEC warrant filing(s) await identity and terms review.",
       "severity": "medium"
-    },
-    {
-      "kind": "contract_clock",
-      "message": "-13 days to contractual expiry; verify exchange cutoff and settlement mechanics.",
-      "severity": "high",
-      "ticker": "BKSY.W",
-      "warrant_id": "0001753539:0001753539-21-000084:public"
-    },
-    {
-      "kind": "stale_market",
-      "message": "Delayed warrant mark is missing or stale; last-known-good terms remain intact.",
-      "severity": "medium",
-      "ticker": "BKSY.W",
-      "warrant_id": "0001753539:0001753539-21-000084:public"
     }
   ],
   "events": [
@@ -1111,7 +1097,7 @@
       "terms_status": "unparsed"
     }
   ],
-  "generated_at": "2026-09-22T23:11:38Z",
+  "generated_at": "2026-09-23T02:08:52Z",
   "health": {
     "discovery": {
       "consecutive_failures": 0,
@@ -1133,14 +1119,9 @@
     "market_freshness_state": "ready",
     "market_generated_at": "2026-09-22T23:11:37Z",
     "market_last_successful_refresh": "2026-09-22T23:11:37Z",
-    "stale_active_quotes": [
-      "BKSY.W"
-    ],
-    "status": "unhealthy",
-    "structural_errors": [
-      "row 4: active security is past contractual expiry",
-      "row 10: active security is past contractual expiry"
-    ]
+    "stale_active_quotes": [],
+    "status": "healthy",
+    "structural_errors": []
   },
   "learning_loop": {
     "automatic_weight_changes": false,
@@ -1162,147 +1143,6 @@
     "trade_authority": false
   },
   "rows": [
-    {
-      "cik": "0001753539",
-      "classification": "public",
-      "common_ticker": "BKSY",
-      "contract_clock": {
-        "call": {
-          "cash_per_warrant": 0.01,
-          "notice_days": 30,
-          "stock_trigger": 144.0,
-          "window": "20 of 30 trading days"
-        },
-        "callable": true,
-        "days_to_expiry": -13,
-        "elapsed_pct": 100.0,
-        "expiry": "2026-09-09",
-        "issue_date": "2019-09-09",
-        "threshold": null
-      },
-      "corporate_action": null,
-      "diagnostics": {
-        "breakeven_common": 92.0168,
-        "cagr_to_breakeven_pct": null,
-        "diluted_overhang_pct": null,
-        "exercise_cost_per_warrant": 11.5,
-        "fair_value": null,
-        "intrinsic_value": 0.0,
-        "model_route": "clause_aware_pending",
-        "moneyness_pct": -74.79,
-        "move_to_breakeven_pct": 296.8,
-        "opportunity_score": null,
-        "parity_premium": 0.0021,
-        "warning": "Delayed closes are diagnostics, not executable prices or fair values."
-      },
-      "exchange": "NYSE",
-      "gates": {
-        "identity": {
-          "missing": [],
-          "pass": true
-        },
-        "market": {
-          "missing": [
-            "warrant bid",
-            "warrant ask"
-          ],
-          "pass": false
-        },
-        "status": "survival_blocked",
-        "survival": {
-          "missing": [
-            "current liquidity runway",
-            "cash burn and maturity wall",
-            "exact remaining public warrant count"
-          ],
-          "pass": false
-        }
-      },
-      "issuer": "BlackSky Technology Inc.",
-      "lane": "despac",
-      "lifecycle": "active",
-      "market": {
-        "common": {
-          "adv20": 934486.55,
-          "ask": null,
-          "bid": null,
-          "close": 23.190001,
-          "currency": "USD",
-          "exchange": "NYQ",
-          "fetched_at": "2026-09-22T23:11:37Z",
-          "previous_close": 23.17,
-          "quote_date": "2026-09-22",
-          "role": "common",
-          "source": "yahoo_chart_v8_delayed_close",
-          "symbol": "BKSY",
-          "volume": 743031,
-          "warrant_id": "0001753539:0001753539-21-000084:public"
-        },
-        "executable": false,
-        "quote_age_days": 14,
-        "warrant": {
-          "adv20": 27180.0,
-          "ask": null,
-          "bid": null,
-          "close": 0.0021,
-          "currency": "USD",
-          "exchange": "NYQ",
-          "fetched_at": "2026-09-08T18:30:57Z",
-          "previous_close": null,
-          "quote_date": "2026-08-07",
-          "role": "warrant",
-          "source": "yahoo_chart_v8_delayed_close",
-          "symbol": "BKSY-WT",
-          "volume": 27180,
-          "warrant_id": "0001753539:0001753539-21-000084:public"
-        }
-      },
-      "next_action": "Treat as an expiry/corporate-action clock, not a long-duration option; verify exchange handling before September 9.",
-      "priority": "urgent",
-      "priority_reasons": [
-        "Only -13 days remain on the contract clock.",
-        "Contract verified; issuer survival packet is the next decision gate."
-      ],
-      "source": {
-        "accession": "0001753539-24-000112",
-        "as_of": "2024-09-04",
-        "form": "8-K exhibit 99.1",
-        "latest_terms_as_of": "2026-03-31",
-        "latest_terms_url": "https://www.sec.gov/Archives/edgar/data/1753539/000175353926000064/bksy-20260331.htm",
-        "url": "https://www.sec.gov/Archives/edgar/data/1753539/000175353924000112/blacksky-reversestocksplit.htm"
-      },
-      "status": "survival_blocked",
-      "survival": {
-        "missing_inputs": [
-          "current liquidity runway",
-          "cash burn and maturity wall",
-          "exact remaining public warrant count"
-        ],
-        "status": "review_required"
-      },
-      "terms": {
-        "anti_dilution": "one-for-eight reverse split; each warrant purchases one-eighth share at $92 per whole share",
-        "call": {
-          "cash_per_warrant": 0.01,
-          "notice_days": 30,
-          "stock_trigger": 144.0,
-          "window": "20 of 30 trading days"
-        },
-        "callable": true,
-        "currency": "USD",
-        "exercise_start": "2021-10-09",
-        "expiry": "2026-09-09",
-        "issue_date": "2019-09-09",
-        "max_incremental_shares": 1976563,
-        "settlement": "cash_or_issuer_elected_cashless",
-        "share_ratio": 0.125,
-        "strike": 92.0,
-        "strike_basis": "per_share",
-        "warrants_outstanding": 15812500
-      },
-      "warrant_id": "0001753539:0001753539-21-000084:public",
-      "warrant_ticker": "BKSY.W"
-    },
     {
       "cik": "0001839341",
       "classification": "public",
@@ -2102,17 +1942,157 @@
       },
       "warrant_id": "0001819810:0001819810-25-000215:public",
       "warrant_ticker": "RDW.W"
+    },
+    {
+      "cik": "0001753539",
+      "classification": "public",
+      "common_ticker": "BKSY",
+      "contract_clock": {
+        "call": {
+          "cash_per_warrant": 0.01,
+          "notice_days": 30,
+          "stock_trigger": 144.0,
+          "window": "20 of 30 trading days"
+        },
+        "callable": true,
+        "days_to_expiry": -13,
+        "elapsed_pct": 100.0,
+        "expiry": "2026-09-09",
+        "issue_date": "2019-09-09",
+        "threshold": null
+      },
+      "corporate_action": null,
+      "diagnostics": {
+        "breakeven_common": 92.0168,
+        "cagr_to_breakeven_pct": null,
+        "diluted_overhang_pct": null,
+        "exercise_cost_per_warrant": 11.5,
+        "fair_value": null,
+        "intrinsic_value": 0.0,
+        "model_route": "clause_aware_pending",
+        "moneyness_pct": -74.79,
+        "move_to_breakeven_pct": 296.8,
+        "opportunity_score": null,
+        "parity_premium": 0.0021,
+        "warning": "Delayed closes are diagnostics, not executable prices or fair values."
+      },
+      "exchange": "NYSE",
+      "gates": {
+        "identity": {
+          "missing": [],
+          "pass": true
+        },
+        "market": {
+          "missing": [
+            "warrant bid",
+            "warrant ask"
+          ],
+          "pass": false
+        },
+        "status": "expired",
+        "survival": {
+          "missing": [
+            "current liquidity runway",
+            "cash burn and maturity wall",
+            "exact remaining public warrant count"
+          ],
+          "pass": false
+        }
+      },
+      "issuer": "BlackSky Technology Inc.",
+      "lane": "despac",
+      "lifecycle": "expired",
+      "market": {
+        "common": {
+          "adv20": 934486.55,
+          "ask": null,
+          "bid": null,
+          "close": 23.190001,
+          "currency": "USD",
+          "exchange": "NYQ",
+          "fetched_at": "2026-09-22T23:11:37Z",
+          "previous_close": 23.17,
+          "quote_date": "2026-09-22",
+          "role": "common",
+          "source": "yahoo_chart_v8_delayed_close",
+          "symbol": "BKSY",
+          "volume": 743031,
+          "warrant_id": "0001753539:0001753539-21-000084:public"
+        },
+        "executable": false,
+        "quote_age_days": 14,
+        "warrant": {
+          "adv20": 27180.0,
+          "ask": null,
+          "bid": null,
+          "close": 0.0021,
+          "currency": "USD",
+          "exchange": "NYQ",
+          "fetched_at": "2026-09-08T18:30:57Z",
+          "previous_close": null,
+          "quote_date": "2026-08-07",
+          "role": "warrant",
+          "source": "yahoo_chart_v8_delayed_close",
+          "symbol": "BKSY-WT",
+          "volume": 27180,
+          "warrant_id": "0001753539:0001753539-21-000084:public"
+        }
+      },
+      "next_action": "Retain for history. Do not treat the delayed mark as a live warrant.",
+      "priority": "closed",
+      "priority_reasons": [
+        "Lifecycle is expired; retained for survivorship-free history."
+      ],
+      "source": {
+        "accession": "0001753539-24-000112",
+        "as_of": "2024-09-04",
+        "form": "8-K exhibit 99.1",
+        "latest_terms_as_of": "2026-03-31",
+        "latest_terms_url": "https://www.sec.gov/Archives/edgar/data/1753539/000175353926000064/bksy-20260331.htm",
+        "url": "https://www.sec.gov/Archives/edgar/data/1753539/000175353924000112/blacksky-reversestocksplit.htm"
+      },
+      "status": "expired",
+      "survival": {
+        "missing_inputs": [
+          "current liquidity runway",
+          "cash burn and maturity wall",
+          "exact remaining public warrant count"
+        ],
+        "status": "review_required"
+      },
+      "terms": {
+        "anti_dilution": "one-for-eight reverse split; each warrant purchases one-eighth share at $92 per whole share",
+        "call": {
+          "cash_per_warrant": 0.01,
+          "notice_days": 30,
+          "stock_trigger": 144.0,
+          "window": "20 of 30 trading days"
+        },
+        "callable": true,
+        "currency": "USD",
+        "exercise_start": "2021-10-09",
+        "expiry": "2026-09-09",
+        "issue_date": "2019-09-09",
+        "max_incremental_shares": 1976563,
+        "settlement": "cash_or_issuer_elected_cashless",
+        "share_ratio": 0.125,
+        "strike": 92.0,
+        "strike_basis": "per_share",
+        "warrants_outstanding": 15812500
+      },
+      "warrant_id": "0001753539:0001753539-21-000084:public",
+      "warrant_ticker": "BKSY.W"
     }
   ],
   "schema_version": "1.0",
   "summary": {
-    "active_series": 4,
-    "alerts": 3,
+    "active_series": 3,
+    "alerts": 1,
     "market_blocked": 0,
-    "near_expiry": 1,
+    "near_expiry": 0,
     "registry_series": 8,
     "review_ready": 0,
-    "survival_blocked": 4,
+    "survival_blocked": 3,
     "terms_blocked": 0,
     "unresolved_events": 57
   },

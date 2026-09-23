@@ -120,7 +120,7 @@ def sync_holdings(
     tags_by_ticker = {(t.get("owner"), str(t.get("ticker") or "").upper()): t for t in store.sleeve_tags()}
     for row in classified:
         cls = row.get("classification") or {}
-        if cls.get("bucket") in {"spx_0dte", "etf_ls"}:
+        if cls.get("bucket") in {"spx_0dte", "etf_ls", "index_put_hedge"}:
             continue
         con_id = int(row.get("conId") or 0)
         tag = tags.get(con_id)

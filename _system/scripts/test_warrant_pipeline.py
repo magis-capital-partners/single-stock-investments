@@ -69,6 +69,18 @@ class WarrantPipelineTests(unittest.TestCase):
         errors = validate_registry([first, second])
         self.assertTrue(any("duplicate warrant_id/version" in error for error in errors))
 
+    def test_past_expiry_is_checked_on_the_latest_version_only(self) -> None:
+        older = record()
+        older["terms"]["expiry"] = "2020-01-01"
+        expired = copy.deepcopy(older)
+        expired["version"] = 2
+        expired["lifecycle"] = "expired"
+        self.assertFalse(any("past contractual expiry" in error for error in validate_registry([older, expired])))
+        still_active = copy.deepcopy(expired)
+        still_active["lifecycle"] = "active"
+        errors = validate_registry([older, still_active])
+        self.assertEqual(sum("past contractual expiry" in error for error in errors), 1)
+
     def test_registry_rejects_incomplete_verified_terms(self) -> None:
         candidate = record()
         candidate["terms"].pop("expiry")

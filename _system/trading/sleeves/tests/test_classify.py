@@ -37,7 +37,8 @@ def test_xsp_option_excluded():
         blacklist_family=set(),
         etf_ls_symbols=set(),
     )
-    assert cls.bucket == "spx_0dte"
+    assert cls.bucket == "index_put_hedge"
+    assert cls.reason == "index_put_hedge"
     cls = classify_position(
         {"symbol": "SPX", "secType": "OPT", "tradingClass": "SPXW", "localSymbol": "SPXW  260813C05000000"},
         blacklist_family={"APLD"},
