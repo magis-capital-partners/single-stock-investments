@@ -20,9 +20,9 @@
 
 **Routine / planned sales (context):**
 
-- Robbins Charles: 15655 @ $121.43 on 2026-08-10
-- Patterson Mark: 4065 @ $121.43 on 2026-08-10
 - Robbins Charles: 15746 @ $96.57 on 2026-05-10
+- Robbins Charles: 11381 @ $86.78 on 2026-02-10
+- Robbins Charles: 6013 @ $76.1 on 2025-11-21
 
 Source: `_system/reference/market-data/insider/CSCO_transactions.csv`.
 Lawrence base IRR unchanged (`in_base_irr: False`).

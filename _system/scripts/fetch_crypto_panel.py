@@ -212,6 +212,28 @@ def write_amzn_weekly(offline: bool = False) -> Path:
     return path
 
 
+def fetch_blockchain_hashrate() -> tuple[list[tuple[str, float]], str | None]:
+    """Full-history network hashrate from blockchain.info (TH/s → EH/s)."""
+    data = _get_json(f"{BLOCKCHAIN_CHARTS}/hash-rate?timespan=all&format=json")
+    if not data or not isinstance(data, dict):
+        return [], "network"
+    rows: list[tuple[str, float]] = []
+    for rec in data.get("values") or []:
+        if not isinstance(rec, dict):
+            continue
+        try:
+            ts = int(rec["x"])
+            ths = float(rec["y"])
+        except (KeyError, TypeError, ValueError):
+            continue
+        if ths <= 0:
+            continue
+        d = datetime.fromtimestamp(ts, tz=timezone.utc).strftime("%Y-%m-%d")
+        rows.append((d, ths / 1e6))
+    rows.sort()
+    return rows, (None if rows else "empty")
+
+
 def fetch_mempool_hashrate(period: str = "1w") -> tuple[list[tuple[str, float]], str | None]:
     data = _get_json(f"{MEMPOOL}/v1/mining/hashrate/{period}")
     if not data or not isinstance(data, dict):
@@ -230,6 +252,23 @@ def fetch_mempool_hashrate(period: str = "1w") -> tuple[list[tuple[str, float]],
         rows = [(TODAY, float(data["currentHashrate"]) / 1e18)]
     rows.sort()
     return rows, (None if rows else "empty")
+
+
+def merge_hashrate_history(
+    mempool_rows: list[tuple[str, float]],
+) -> tuple[list[tuple[str, float]], str]:
+    """Blockchain.info full history, overwritten by denser recent mempool points."""
+    merged: dict[str, float] = {}
+    tags: list[str] = []
+    bc, _err = fetch_blockchain_hashrate()
+    if bc:
+        merged.update(bc)
+        tags.append("blockchain.info")
+    if mempool_rows:
+        merged.update(mempool_rows)
+        tags.append("mempool.space")
+    label = "+".join(tags) if tags else "none"
+    return sorted(merged.items()), label
 
 
 def fetch_mempool_difficulty() -> tuple[list[tuple[str, float]], str | None]:
@@ -366,7 +405,12 @@ def process_series(spec: dict, ctx: dict, offline: bool) -> dict:
                 err = err or cg_err
     elif src == "mempool_hashrate":
         rows, err = fetch_mempool_hashrate(spec.get("period", "1w"))
-        source_label = "mempool.space:hashrate"
+        if spec.get("backfill") == "blockchain_hashrate" and not offline:
+            rows, bf_tag = merge_hashrate_history(rows)
+            source_label = f"mempool.space+blockchain.info"
+            err = None if rows else (err or "empty")
+        else:
+            source_label = "mempool.space:hashrate"
     elif src == "mempool_difficulty":
         rows, err = fetch_mempool_difficulty()
         source_label = "mempool.space:difficulty"
@@ -478,13 +522,20 @@ def build(theme_filter: str | None = None, offline: bool = False) -> dict:
             "series": series_out,
         }
     CRYPTO_DIR.mkdir(parents=True, exist_ok=True)
-    (CRYPTO_DIR / "manifest.json").write_text(json.dumps(manifest, indent=2) + "\n", encoding="utf-8")
     # AMZN weekly companion series for HK snowball milestones
     try:
         amzn_path = write_amzn_weekly(offline=offline)
         manifest["amzn_weekly_path"] = str(amzn_path.relative_to(ROOT)).replace("\\", "/")
     except Exception as exc:  # noqa: BLE001 — companion series must not fail crypto panel
         manifest["amzn_weekly_error"] = str(exc)
+    try:
+        import btc_cost_of_production as cop  # noqa: WPS433
+
+        cost_out = cop.build_and_write(offline=offline)
+        manifest["btc_cost_of_production"] = cost_out
+    except Exception as exc:  # noqa: BLE001
+        manifest["btc_cost_of_production_error"] = str(exc)
+    (CRYPTO_DIR / "manifest.json").write_text(json.dumps(manifest, indent=2) + "\n", encoding="utf-8")
     return manifest
 
 

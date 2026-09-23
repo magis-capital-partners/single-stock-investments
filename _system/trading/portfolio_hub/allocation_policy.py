@@ -17,6 +17,7 @@ class PolicyAllocation:
     owner: str
     strategy: str
     reason: str
+    bucket: str | None = None
 
 
 def _default_universe_path() -> Path:
@@ -74,6 +75,8 @@ def classify_policy_position(
         etf_ls_symbols=set(ls_symbols),
         drew_symbols=set(drew_symbols),
     )
+    if classification.bucket == "index_put_hedge":
+        return PolicyAllocation("unallocated", "ls_algo", "index_put_hedge", "index_put_hedge")
     if classification.bucket == "spx_0dte":
         return PolicyAllocation("unallocated", "spx_0dte", "spx_option_strategy_exclusion")
     if classification.bucket == "etf_ls":

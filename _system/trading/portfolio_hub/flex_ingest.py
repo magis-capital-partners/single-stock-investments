@@ -17,13 +17,17 @@ It also removes the FX problem rather than fixing it. Flex states
 to derive a rate from marketValue / (position x price) and got ~1.0 for every
 foreign holding, publishing yen at dollar magnitudes.
 
-What Flex does not give us, and must be said out loud: this query carries only
-`OpenPosition`. There are no account values in it -- no NetLiquidation, no
-margin, no buying power -- so a snapshot built from it is deliberately
-`complete: false` and the read model will not serve it as the account book
-until an equity-summary section is added to the Flex query in Client Portal.
-Publishing it as complete would put a positions-only snapshot behind a cockpit
-that shows margin and NAV, which would then be silently stale forever.
+A positions-only file stays `complete: false`. The read model serves only
+complete runs, so publishing positions without a stated net liquidation would
+put a positions book behind a cockpit that shows NAV and margin, and those
+tiles would then be silently empty forever.
+
+When the same file contains `EquitySummaryByReportDateInBase` (or a
+`ChangeInNAV` row that states ending value), those stated amounts become
+account values and the snapshot is complete. Margin tags stay absent until a
+Flex section actually states them. Adding that equity-summary section is a
+Client Portal change to the positions query; this path only reads the XML
+already on disk.
 """
 from __future__ import annotations
 
@@ -138,23 +142,28 @@ def build_account_snapshot(
             "quality": "estimated" if fx_source == "fx_unavailable" and quantity else "settled",
         })
 
+    account_values = _account_values(parsed, base_currency=base_currency)
+    has_nav = any(row["tag"] == "NetLiquidation" for row in account_values)
     return {
         "schema_version": "account_snapshot.v1",
         "source_run_id": source_run_id or parsed["source_run_id"],
         "account_alias": account_alias,
         "gateway_session_id": None,
         "as_of": parsed["as_of"], "base_currency": base_currency,
-        # Not complete, and not pretending to be. This query has no equity
-        # summary, so there is no NetLiquidation, margin or buying power in it.
-        # The read model serves only complete runs, which is the correct outcome
-        # until the Flex query grows an equity-summary section.
-        "complete": False,
+        # Complete only when the file states a net liquidation. A positions-only
+        # file has no NAV to put in the cockpit, and inventing one from marked
+        # positions would hide that the equity summary is still missing.
+        "complete": has_nav,
         "completeness": {
-            "positions": True, "account_summary": False, "open_orders": False, "pnl": False,
+            "positions": True, "account_summary": has_nav, "open_orders": False, "pnl": False,
             "session_date": parsed["session_date"],
-            "note": "Flex positions query carries no equity summary; add one in Client Portal for account values.",
+            "note": (
+                "Flex equity summary states net liquidation. Margin tags are absent until a Flex section states them."
+                if has_nav else
+                "Flex positions query carries no equity summary; add one in Client Portal for account values."
+            ),
         },
-        "account_values": [],
+        "account_values": account_values,
         "positions": rows,
         "open_orders": [],
         "flex": {
@@ -208,6 +217,73 @@ def publish_flex_snapshot(
     result["published"] = True
     result["response"] = response
     return result
+
+
+_GROSS_LEGS = (
+    "stockLong", "stockShort", "optionsLong", "optionsShort",
+    "bondsLong", "bondsShort", "commoditiesLong", "commoditiesShort",
+)
+
+
+def _in_base(currency: str | None, base_currency: str) -> bool:
+    code = str(currency or "").upper()
+    return code in {base_currency.upper(), "BASE", ""}
+
+
+def _value_row(tag: str, amount: Decimal, *, currency: str, as_of: str) -> dict[str, Any]:
+    return {
+        "tag": tag,
+        "value": _text(amount),
+        "currency": currency,
+        "segment": None,
+        "model_code": None,
+        "source": "ibkr_flex",
+        "as_of": as_of,
+    }
+
+
+def _account_values(parsed: dict[str, Any], *, base_currency: str) -> list[dict[str, Any]]:
+    """Map a stated equity summary onto the account-value tags the cockpit reads.
+
+    Margin tags are not invented. Flex states them only when the query includes
+    a section that carries them, and this query does not.
+    """
+    as_of = parsed["as_of"]
+    summaries = [
+        row for row in parsed.get("equity_summaries") or []
+        if _in_base(row.get("currency"), base_currency) and _decimal(_pick_amount(row, "total")) is not None
+    ]
+    if summaries:
+        row = summaries[0]
+        currency = base_currency
+        values = [_value_row("NetLiquidation", _decimal(_pick_amount(row, "total")), currency=currency, as_of=as_of)]
+        cash = _decimal(_pick_amount(row, "cash"))
+        if cash is not None:
+            values.append(_value_row("TotalCashValue", cash, currency=currency, as_of=as_of))
+        legs = [_decimal(row.get(name)) for name in _GROSS_LEGS]
+        stated = [abs(amount) for amount in legs if amount is not None]
+        if stated:
+            values.append(_value_row("GrossPositionValue", sum(stated, Decimal(0)), currency=currency, as_of=as_of))
+        return values
+
+    for row in parsed.get("nav_rows") or []:
+        amount = _decimal(row.get("net_liquidation"))
+        if amount is None or not _in_base(row.get("currency"), base_currency):
+            continue
+        values = [_value_row("NetLiquidation", amount, currency=base_currency, as_of=as_of)]
+        cash = _decimal(row.get("cash"))
+        if cash is not None:
+            values.append(_value_row("TotalCashValue", cash, currency=base_currency, as_of=as_of))
+        return values
+    return []
+
+
+def _pick_amount(row: dict[str, Any], *keys: str) -> Any:
+    for key in keys:
+        value = row.get(key)
+        if value not in (None, ""):
+            return value
+    return None
 
 
 def _fold_lots(lots: list[dict[str, Any]]) -> list[dict[str, Any]]:
