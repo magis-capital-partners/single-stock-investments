@@ -1,0 +1,131 @@
+{
+  "schema_version": "1.0",
+  "draft_id": "290e1242482eb2878775b1a4",
+  "work_id": "290e1242482eb2878775b1a4",
+  "input_sha": "7c6e9fe0e804a7353c578b4708d55830e49ae24d",
+  "component_fingerprint": "4080c692e2d41ed5e8c8bb19cc5abb21e04b5d945b4f3f58c4832093f0829480",
+  "contract_hash": "de604b303ec62b1ca0dce4fefe6bf6bc20089600fb78109b4b4b39320d6282d5",
+  "status": "awaiting_review",
+  "author_receipt": {
+    "authored_at": "2026-09-12T00:36:00Z",
+    "author": "marvin-cloud-agent",
+    "model_id": "composer-2.5",
+    "prompt_version": "cloud_marvin_runbook_2026-09-12",
+    "analysis_run_id": "epistemic_author_forecast:290e1242482eb2878775b1a4",
+    "evidence_hash": "becc2823ab61608c12bf74747ba5941aa0e1b73b49e4fa69ba8c677d70301384", // pragma: allowlist secret
+    "epistemic_input_sha": "7c6e9fe0e804a7353c578b4708d55830e49ae24d",
+    "contract_hash": "de604b303ec62b1ca0dce4fefe6bf6bc20089600fb78109b4b4b39320d6282d5",
+    "component_fingerprint": "4080c692e2d41ed5e8c8bb19cc5abb21e04b5d945b4f3f58c4832093f0829480",
+    "source_preflight": {
+      "ok": true,
+      "reason": "source_preflight_passed",
+      "metric_definition_id": "normalized_owner_earnings_ttm_m_v2",
+      "adapter": "fact_ledger"
+    },
+    "historical_replay": {
+      "value": 13024.816111672502,
+      "unit": "USD millions",
+      "as_of": "2025-12-31",
+      "evidence_ref": "ASML/research/valuation_fact_ledger.json#normalized_owner_earnings_m",
+      "adapter": "fact_ledger",
+      "blocker_reason": null,
+      "replay_measurement_period_end": "2025-12-31",
+      "replay_fiscal_period": "FY",
+      "replay_fiscal_year": 2025
+    },
+    "calibration_release_hash": null,
+    "route": "quality_reinvestment",
+    "named_challenge": null,
+    "calibration_response": "not_applicable",
+    "calibration_note": "Epistemic loop health_state=COLLECTING; calibration_status=insufficient_outcomes; eligible_scored_outcomes=0. Calibration cannot change this analysis.",
+    "rejection_remediation": [
+      "source_recipe_incompatible: observation_plan.source_adapter changed from sec_companyfacts_ttm to fact_ledger; ASML files annual 20-F only and companyfacts duration rows are EUR-denominated.",
+      "unit_mismatch: observation_plan.source_unit set to USD millions matching locked fact_ledger field normalized_owner_earnings_m with evidenced EUR/USD fx_conversion.",
+      "historical_replay_not_adapter_verified: historical_replay.evidence_ref points to valuation_fact_ledger.json; resolve_spec(FY2025) reproduces 13,024.816 USD millions via fact_ledger adapter."
+    ],
+    "epistemic_work_receipt": {
+      "work_id": "290e1242482eb2878775b1a4",
+      "task_type": "author_forecast",
+      "disposition": "success",
+      "published_input_sha": "7c6e9fe0e804a7353c578b4708d55830e49ae24d"
+    }
+  },
+  "review_receipt": null,
+  "rejection_reasons": [],
+  "spec": {
+    "spec_id": "asml-opbiz-oe-2026fy-v4",
+    "spec_revision": 1,
+    "spec_schema_version": "3.0",
+    "forecast_class": "ex_ante",
+    "forecast_role": "primary",
+    "authored_at": "2026-09-12T00:36:00Z",
+    "information_cutoff_at": "2026-09-12T00:36:00Z",
+    "registered_at": "2026-09-12T00:36:00Z",
+    "registration_commit": "pending",
+    "analysis_run_id": "epistemic_author_forecast:290e1242482eb2878775b1a4",
+    "author": "marvin-cloud-agent",
+    "model_id": "composer-2.5",
+    "prompt_version": "cloud_marvin_runbook_2026-09-12",
+    "contract_hash": "de604b303ec62b1ca0dce4fefe6bf6bc20089600fb78109b4b4b39320d6282d5",
+    "component_fingerprint": "4080c692e2d41ed5e8c8bb19cc5abb21e04b5d945b4f3f58c4832093f0829480",
+    "method_id": "owner_earnings_reinvestment_dcf",
+    "power_zone": "quality_reinvestment",
+    "component_id": "operating_business_and_net_assets",
+    "correlation_group": "ASML|operating_business_and_net_assets|normalized_owner_earnings_fy|2026FY",
+    "industry": "semiconductor_equipment",
+    "metric": "normalized_owner_earnings",
+    "comparator": "lt",
+    "threshold": 13024.81611167,
+    "threshold_basis": {
+      "source_ref": "ASML/research/valuation_contract.json#operating_business_and_net_assets.calculation_proof.traces.low.owner_earnings",
+      "rule": "Low-case proof-trace anchor for normalized owner earnings (USD millions): FY2025 operating cash flow minus capital expenditures with evidenced EUR/USD conversion per ASML/research/valuation_fact_ledger.json field normalized_owner_earnings_m."
+    },
+    "unit": "USD millions",
+    "measurement_period_end": "2026-12-31",
+    "observable_after": "2027-02-28",
+    "resolution_deadline": "2027-04-29",
+    "source_hint": "normalized_owner_earnings_m",
+    "observation_plan": {
+      "metric_definition_id": "normalized_owner_earnings_ttm_m_v2",
+      "metric_definition_version": "1.0",
+      "source_adapter": "fact_ledger",
+      "fiscal_period": "ANY",
+      "fiscal_year": 2026,
+      "observation_type": "duration",
+      "duration_basis": "FY",
+      "canonical_unit": "USD millions",
+      "source_unit": "USD millions",
+      "accepted_forms": [
+        "20-F",
+        "20-F/A"
+      ],
+      "end_date_tolerance_days": 7,
+      "expected_publication_date": "2027-02-28",
+      "maximum_source_lag_days": 90,
+      "outcome_unavailable_at_registration": true,
+      "historical_replay": {
+        "status": "passed",
+        "evidence_ref": "ASML/research/valuation_fact_ledger.json#normalized_owner_earnings_m",
+        "replay_measurement_period_end": "2025-12-31",
+        "replay_fiscal_period": "FY",
+        "replay_fiscal_year": 2025,
+        "replay_value": 13024.816111672502,
+        "replay_as_of": "2025-12-31"
+      }
+    },
+    "review": {
+      "status": "pending",
+      "reviewer": null,
+      "reviewed_at": null
+    },
+    "probability_fires": 0.22,
+    "severity": 4,
+    "component_value_impact_pct": 41.0,
+    "total_equity_value_impact_pct": 41.0,
+    "derived_from": "Owner earnings, incremental returns, or reinvestment runway fall below the low-case bridge.",
+    "rationale": "Types the owner-earnings leg of the operating_business_and_net_assets prose falsifier. **[Fact]** The low-case owner_earnings_reinvestment_dcf proof trace locks normalized owner earnings at 13,024.8 USD millions (FY2025 operating cash flow EUR 12,658.5M minus capital spending EUR 1,573.6M per ASML/investor-documents/sec-edgar/20-F_20260225_rpt20251231_acc0001628280_26_011378.htm, converted at the evidenced 2025-12-31 EUR/USD rate in ASML/research/valuation_fact_ledger.json field normalized_owner_earnings_m). **[Inference]** If FY2026 normalized owner earnings resolve below that anchor, distributable owner cash has fallen below the low-case bridge and the bounded per-share range should compress toward the low case (382.06 USD per share vs 644.26 base per contract_hash de604b303). Incremental after-tax ROIC and reinvestment-rate legs remain judgment inputs without a resolvable SEC metric and are not typed here. **[Fact]** ASML files annual 20-F only (no interim 10-Q), so resolution uses FY duration with accepted forms 20-F/20-F/A and the fact_ledger adapter (not sec_companyfacts_ttm, which accepts only 10-Q/10-K and cannot read EUR-denominated 20-F duration rows). Historical adapter replay on FY2025 (measurement end 2025-12-31) resolves 13,024.8 USD millions via fact_ledger. Target FY2026 is not observable at registration (2026-09-12); expected 20-F filing ~2027-02-28 per prior-year cadence (FY2025 20-F filed 2026-02-25). Routed memory observation 77414d5a matches the same ledger anchor and was verified against primary filings; it does not change the threshold.",
+    "untestable": false,
+    "calibration_eligible": true,
+    "supersedes_spec_id": "asml-opbiz-oe-2026fy-v3"
+  }
+}

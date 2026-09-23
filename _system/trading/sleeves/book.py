@@ -53,7 +53,7 @@ def build_book(owner: str, store: SleeveStore, cfg: Mapping[str, Any] | None = N
             "market_value": mv,
             "entry_price": entry,
             "cost_usd": cost,
-            "pnl_usd": mv - cost if cost else None,
+            "pnl_usd": None if cost is None else mv - cost,
             "cluster": idea.get("cluster") or "idiosyncratic",
             "conviction": idea.get("conviction"),
             "plc_score": idea.get("plc_score"),
@@ -100,7 +100,7 @@ def build_book(owner: str, store: SleeveStore, cfg: Mapping[str, Any] | None = N
         )
     else:
         blurb = (
-            "Starts empty. New buys tagged DREW_SLEEVE on the local desk show up here. "
+            "Names listed on Drew, plus option overlays written against the ls-algo book. "
             "Does not inherit Michael's book. $100k equity plus $100k extra margin."
         )
     return {

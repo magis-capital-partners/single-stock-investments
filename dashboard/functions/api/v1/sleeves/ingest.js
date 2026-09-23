@@ -96,6 +96,27 @@ export async function onRequestPost(context) {
           pos.multiplier == null || pos.multiplier === "" ? null : Number(pos.multiplier),
           asOf,
         ));
+        const cost = pos.cost_usd == null || pos.cost_usd === "" ? null : Number(pos.cost_usd);
+        if (Number.isFinite(cost)) {
+          statements.push(db.prepare(`
+            INSERT INTO sleeve_ideas (owner, ticker, side, status, entry_price, shares, cost_usd, updated_at)
+            VALUES (?, ?, ?, 'filled', ?, ?, ?, ?)
+            ON CONFLICT(owner, ticker) DO UPDATE SET
+              side = excluded.side,
+              entry_price = excluded.entry_price,
+              shares = excluded.shares,
+              cost_usd = excluded.cost_usd,
+              updated_at = excluded.updated_at
+          `).bind(
+            book.owner,
+            pos.ticker,
+            Number(pos.qty) >= 0 ? "BUY" : "SELL",
+            pos.entry_price == null || pos.entry_price === "" ? null : Number(pos.entry_price),
+            pos.qty,
+            cost,
+            asOf,
+          ));
+        }
       }
     }
 

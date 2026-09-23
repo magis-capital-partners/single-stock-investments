@@ -504,7 +504,9 @@ jobs:
     # often as with PRs.
     if: needs.changes.outputs.graph_invariants == 'true'
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    # Full-tree checkout of this repo is about 200k files. 30 minutes was
+    # cancelling the job before invariants finished, which failed the merge gate.
+    timeout-minutes: 90
     steps:
       - uses: jlumbroso/free-disk-space@54081f138730dfa15788a46383842cd2f914a1be # v1.3.1
         with:

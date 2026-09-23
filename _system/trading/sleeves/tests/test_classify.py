@@ -145,3 +145,24 @@ def test_equity_option_follows_underlying():
         etf_ls_symbols={"APLD"},
     )
     assert shares.bucket == "etf_ls" and shares.reason == "etf_ls_universe"
+
+
+def test_datasection_only_the_september_lots_are_drew():
+    september = classify_position(
+        {"symbol": "3905.T", "secType": "STK", "openDateTime": "20260913;211246"},
+        blacklist_family=set(),
+        etf_ls_symbols=set(),
+    )
+    assert september.bucket == "drew" and september.owner == "drew"
+    january = classify_position(
+        {"symbol": "3905.T", "secType": "STK", "openDateTime": "20260115;204429"},
+        blacklist_family=set(),
+        etf_ls_symbols=set(),
+    )
+    assert january.bucket == "michael" and january.owner == "michael"
+    undated = classify_position(
+        {"symbol": "3905.T", "secType": "STK"},
+        blacklist_family=set(),
+        etf_ls_symbols=set(),
+    )
+    assert undated.bucket == "michael"
