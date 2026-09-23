@@ -8,33 +8,127 @@
       "bytes": 1151
     }
   ],
-  "reason": "epistemic_review_forecast:f705288ed11a8de6f2813751:operating_business_and_net_assets", // pragma: allowlist secret
-  "evidence_hash": "495966f4ea769d47479ab6f9f026a8efdf922ca3b345863a0cb38f59a8a202e3", // pragma: allowlist secret
+  "reason": "epistemic_author_forecast:290e1242482eb2878775b1a4:operating_business_and_net_assets", // pragma: allowlist secret
+  "evidence_hash": "becc2823ab61608c12bf74747ba5941aa0e1b73b49e4fa69ba8c677d70301384", // pragma: allowlist secret
   "primary_evidence_hash": "ae4dd8aa3695c70cfbfe8a4e7a62106b778832d296c40cbf85c295b63bfe26b9",
   "artifact_count": 1,
   "ready": true,
   "primary_evidence_ready": true,
   "epistemic_work_item": {
-    "work_id": "f705288ed11a8de6f2813751",
-    "task_type": "review_forecast",
+    "work_id": "290e1242482eb2878775b1a4",
+    "task_type": "author_forecast",
     "ticker": "ASML",
     "component_id": "operating_business_and_net_assets",
     "component_fingerprint": "4080c692e2d41ed5e8c8bb19cc5abb21e04b5d945b4f3f58c4832093f0829480",
+    "contract_hash": "de604b303ec62b1ca0dce4fefe6bf6bc20089600fb78109b4b4b39320d6282d5",
+    "method_id": "owner_earnings_reinvestment_dcf",
+    "power_zone": "quality_reinvestment",
+    "metric_definition_id": "normalized_owner_earnings_ttm_m_v2",
+    "source_preflight_candidate": true,
     "draft_ref": "ASML/research/falsifier_drafts/2750cd7278c04903d8dacb51.json",
-    "priority": 85,
-    "reason": "forecast_draft_awaiting_review",
+    "rejection_reasons": [
+      "source_recipe_incompatible: sec_companyfacts_ttm _duration_rows accepts only 10-Q/10-K forms; ASML files annual 20-F only, so independent resolve_spec for FY2025 and FY2026 both return ttm_period_inputs_missing (ocf_rows=0) despite observation_plan accepted_forms listing 20-F/20-F/A",
+      "unit_mismatch: observation_plan source_unit=USD but ASML companyfacts reports OCF and capex in EUR only; the resolvable path is fact_ledger with evidenced FX conversion (prior draft 757a61e81f740aade46766d0 pattern), not sec_companyfacts_ttm without EUR handling",
+      "historical_replay_not_adapter_verified: observation_plan historical_replay status=passed but registered adapter cannot reproduce FY2025; threshold anchor 13,024.8M is confirmed only via valuation_fact_ledger arithmetic (OCF EUR 12,658.5M minus capex EUR 1,573.6M at 2025-12-31 FX)"
+    ],
+    "frozen_component": {
+      "component_id": "operating_business_and_net_assets",
+      "label": "Operating business and net financial assets",
+      "category": "operating_business",
+      "treatment": "additive",
+      "included_in_component_id": null,
+      "ownership_claim": "Operating business and net financial assets",
+      "ownership_percentage": 1.0,
+      "quantity": null,
+      "method": "owner_earnings_reinvestment_dcf",
+      "method_version": "1.0",
+      "method_provenance": {
+        "method_id": "owner_earnings_reinvestment_dcf",
+        "version": "1.0",
+        "label": "Owner earnings and reinvestment-return DCF",
+        "output_basis": "present_value_today",
+        "power_zones": [
+          "quality_reinvestment"
+        ],
+        "equation": "cash_t = cash_(t-1)*(1+reinvestment*incremental_ROIC); value = PV(distributable cash + terminal owner earnings)",
+        "sources": [
+          {
+            "ref": "_system/frameworks/segment_cashflow_valuation.md",
+            "locator": "Owner cash, reinvestment and reverse expectations"
+          }
+        ]
+      },
+      "comparable_ids": [],
+      "range_per_share": {
+        "low": 382.0575,
+        "base": 644.2636,
+        "high": 1177.4946
+      },
+      "output_basis": "present_value_today",
+      "legacy_range_per_share": null,
+      "valuation_status": "bounded_estimate",
+      "calculation_proof": {
+        "status": "valid",
+        "method_id": "owner_earnings_reinvestment_dcf",
+        "method_version": "1.0",
+        "outputs": {
+          "low": 382.0575,
+          "base": 644.2636,
+          "high": 1177.4946
+        },
+        "output_unit": "USD per share",
+        "traces": {
+          "low": [
+            {
+              "id": "owner_earnings",
+              "label": "Normalized owner earnings",
+              "kind": "fact",
+              "value": 13024.81611167,
+              "unit": "USD millions",
+              "source": {
+                "ref": "ASML/research/evidence/sec_companyfacts.json",
+                "locator": "us-gaap:NetCashProvidedByUsedInOperatingActivities; accession 0001628280-26-011378; form 20-F",
+                "as_of": "2025-12-31",
+                "content_sha256": "28be6fd0f5608350ec396ae5d5097e45da95f4f29ad3fbd19aac328a15cce3d4",
+                "source_id": "1f9a76e57f7008f98893b2f669acccd1545817324b7f3c8738abec3c9841badf"
+              },
+              "rationale": null,
+              "fx_conversion": {
+                "from_currency": "EUR",
+                "to_currency": "USD",
+                "rate_per_usd": 0.85106,
+                "rate_as_of": "2025-12-31",
+                "evidence_ref": "_system/reference/market-data/fx_rates.json",
+                "rate_source": "Single provider: api.frankfurter.dev, which republishes the ECB EXR daily reference series. api.frankfurter.dev/v1/2025-12-31?from=EUR&to=USD gives 1.1750 USD/EUR, inverted to 0.85106 EUR/USD; the ?base=USD&symbols=EUR query returning 0.85106 is the same service asked the other way round, so it is an arithmetic self-check, not independent corroboration. No second provider: data-api.ecb.europa.eu returned HTTP 503 at retrieval time."
+              }
+            }
+          ]
+        },
+        "proof_hash": "999930111b654200da693becf608684e583b05986cd44a649576cb7cf04cb40f"
+      },
+      "evidence_tier": "primary_derived",
+      "evidence_level": "primary_derived",
+      "evidence": "Source-locked filing facts plus explicitly bounded versioned judgments.",
+      "falsifier": "Owner earnings, incremental returns, or reinvestment runway fall below the low-case bridge.",
+      "overlap_key": "entire_security",
+      "assumption_type": "judgment"
+    },
+    "priority": 92,
+    "reason": "forecast_draft_rejected",
     "acceptance_tests": [
-      "reviewer differs from author and authoring run",
-      "threshold materiality and source replay are challenged",
-      "approve or reject with a typed reason"
+      "author addresses every independent-review reason",
+      "target period remains unobservable at registration",
+      "current metric-definition replay passes",
+      "threshold and probability reconcile to cutoff evidence",
+      "a separate reviewer approves the revision"
     ],
     "state": "queued",
     "attempts": 0,
     "lease_owner": null,
     "lease_expires_at": null,
-    "input_sha": "1547c5631614209e1f5e171e99d162dd18869542"
+    "input_sha": "7c6e9fe0e804a7353c578b4708d55830e49ae24d"
   },
-  "epistemic_input_sha": "1547c5631614209e1f5e171e99d162dd18869542",
+  "epistemic_input_sha": "7c6e9fe0e804a7353c578b4708d55830e49ae24d",
   "calibration_release_hash": null,
   "routed_memory_observations": [
     {
