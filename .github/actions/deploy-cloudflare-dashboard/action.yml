@@ -215,6 +215,14 @@ runs:
         run_stage "Apply pending migrations" \
           "$WRANGLER" d1 migrations apply DB --remote \
           --config _cf_project/wrangler.jsonc
+        # The Drew tab reads D1, not the static JSON (that file is kept off the
+        # public site). Publish the committed sleeve book in the same deploy
+        # that ships the page, or the push looks green and the tab stays empty.
+        python _system/scripts/export_sleeve_d1.py --out "$RUNNER_TEMP/sleeve_book.sql"
+        run_stage "Publish Drew sleeve book" \
+          "$WRANGLER" d1 execute DB --remote --yes \
+          --file "$RUNNER_TEMP/sleeve_book.sql" \
+          --config _cf_project/wrangler.jsonc
         run_stage "Bound history (retention)" \
           python _system/scripts/prune_cloudflare_d1.py \
           --wrangler "$WRANGLER" \

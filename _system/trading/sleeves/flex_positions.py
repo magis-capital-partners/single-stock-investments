@@ -51,6 +51,7 @@ def parse_flex_positions(path: Path | str, *, account_id: str = "") -> list[dict
             "name": node.attrib.get("description") or node.attrib.get("symbol") or "",
             "orderRef": "",
             "reportDate": node.attrib.get("reportDate") or "",
+            "openDateTime": (node.attrib.get("openDateTime") or "").strip(),
             # Option coordinates. Flex carries these on every OpenPosition and
             # they were being dropped here, which is why an overlay could only
             # ever reach the page as its bare underlying.
