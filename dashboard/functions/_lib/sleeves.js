@@ -72,7 +72,7 @@ export function emptyBook(owner) {
       open_names: 0,
       blurb: michael
         ? "Live Magis account after taking out the ls-algo universe and SPX 0DTE. Blacklist names Michael trades by hand stay here."
-        : "Starts empty. New buys tagged DREW_SLEEVE on the local desk show up here. $100k equity plus $100k extra margin.",
+        : "Names listed on Drew, plus option overlays written against the ls-algo book. $100k equity plus $100k extra margin.",
     },
     positions: [],
     ideas: [],
@@ -162,6 +162,9 @@ export function foldPositions(positions) {
     }
     seen.qty = Number(seen.qty || 0) + Number(pos.qty || 0);
     seen.market_value = Number(seen.market_value || 0) + Number(pos.market_value || 0);
+    if (seen.cost_usd != null || pos.cost_usd != null) {
+      seen.cost_usd = Number(seen.cost_usd || 0) + Number(pos.cost_usd || 0);
+    }
   }
   return byKey;
 }
@@ -192,6 +195,8 @@ export async function loadBook(db, owner) {
   book.positions = (positions.results || []).map((row) => {
     const idea = ideaMap[row.ticker] || {};
     const mv = Number(row.market_value || 0);
+    const costRaw = idea.cost_usd;
+    const cost = costRaw == null || costRaw === "" ? null : Number(costRaw);
     if (row.classifier_reason === "cash") {
       cash += Math.abs(mv);
       return null;
@@ -205,7 +210,8 @@ export async function loadBook(db, owner) {
       mark: row.mark,
       market_value: mv,
       entry_price: idea.entry_price,
-      cost_usd: idea.cost_usd,
+      cost_usd: Number.isFinite(cost) ? cost : null,
+      pnl_usd: Number.isFinite(cost) ? mv - cost : null,
       cluster: idea.cluster || "idiosyncratic",
       conviction: idea.conviction,
       plc_score: idea.plc_score,

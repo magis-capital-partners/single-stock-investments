@@ -10,6 +10,10 @@ CASH_SYMBOLS = {"USD", "EUR", "GBP", "CAD", "JPY", "BIL", "SGOV", "SHV", "TBIL",
 SPX_NAMES = {"SPX", "SPXW"}
 ETF_LS_REFS = ("ETF_LS", "B5P")
 DREW_REF = "DREW_SLEEVE"
+# IBKR stamps a Tokyo session on the prior New York evening. The 14 Sep 2026
+# DataSection buy opens 20260913; the 15 Sep buy opens 20260914. Lots opened
+# before that cutoff are the January position and stay on Michael.
+DREW_LOTS_OPENED_ON_OR_AFTER = {"3905.T": "20260913"}
 MICHAEL_REF = "MICHAEL_SLEEVE"
 
 
@@ -123,6 +127,11 @@ def classify_position(
 
     if strategy_name in letf:
         return Classification(strategy_name, "etf_ls", "etf_ls_universe", None)
+
+    opened = str(pos.get("openDateTime") or pos.get("open_date_time") or "")
+    cutoff = DREW_LOTS_OPENED_ON_OR_AFTER.get(ticker)
+    if cutoff and sec not in {"OPT", "FOP"} and opened >= cutoff:
+        return Classification(ticker, "drew", "drew_new", "drew")
 
     if DREW_REF in ref or ticker in drew:
         return Classification(ticker, "drew", "drew_new", "drew")

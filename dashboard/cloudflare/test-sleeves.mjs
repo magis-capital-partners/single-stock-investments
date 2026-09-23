@@ -71,6 +71,12 @@ test("lots fold into one contract instead of overwriting each other", async () =
   assert.equal(row.qty, 80);
   assert.equal(row.market_value, 16304);
   assert.equal(row.mark, 2.0381, "mark is per-contract, not summed");
+
+  const priced = foldPositions([
+    { ...lot(68, 13858), cost_usd: -4000 },
+    { ...lot(12, 2446), cost_usd: -700 },
+  ]);
+  assert.equal(priced.get("XSP   270129P00540000").cost_usd, -4700);
 });
 
 test("different contracts on one underlying stay separate rows", async () => {
