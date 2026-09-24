@@ -109,7 +109,7 @@ import json
 import sys
 import urllib.parse
 from concurrent.futures import ThreadPoolExecutor, as_completed
-from datetime import datetime, timedelta, timezone
+from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -118,11 +118,34 @@ if str(SCRIPTS) not in sys.path:
     sys.path.insert(0, str(SCRIPTS))
 
 from build_technical_signals import _finite, _request  # noqa: E402
-from criticality.flow_stress import (  # noqa: E402
-    STATE_RANK,
-    apply_state_hysteresis,
-    calculate_flow_snapshot,
-)
+
+# The criticality model (criticality.flow_stress -> numpy/scipy) is imported
+# lazily, inside main()'s try. A module-level import turned a missing
+# dependency into a traceback before main() ran, so the "always exits 0"
+# contract never held: Forced Flow Daily failed 13 runs in a row on
+# "ModuleNotFoundError: No module named 'numpy'" (2026-09-04..22).
+_FLOW_STRESS = None
+
+
+def _flow_stress():
+    """criticality.flow_stress, imported on first use (numpy/scipy)."""
+    global _FLOW_STRESS
+    if _FLOW_STRESS is None:
+        from criticality import flow_stress  # noqa: PLC0415
+
+        _FLOW_STRESS = flow_stress
+    return _FLOW_STRESS
+
+
+def __getattr__(name: str):
+    # Module attributes derived from the imported ladder, resolved lazily so
+    # ``bcd.STATE_RANK`` / ``bcd.MEANINGFUL_MIN_RANK`` keep working.
+    if name == "STATE_RANK":
+        return _flow_stress().STATE_RANK
+    if name == "MEANINGFUL_MIN_RANK":
+        return _meaningful_min_rank()
+    raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
+
 
 SCHEMA_VERSION = 1
 MODEL_VERSION = "capitulation-daily-v1"
@@ -146,8 +169,106 @@ MIN_BARS = 120
 DRAWDOWN_WINDOW = 252
 IN_DRAWDOWN_THRESHOLD_PCT = -5.0
 # Exhaustion is only readable as capitulation once the ladder itself calls the
-# tape stressed. Derived from the imported ladder, never from a copied number.
-MEANINGFUL_MIN_RANK = STATE_RANK["stress"]
+# tape stressed. Derived from the imported ladder, never from a copied number
+# (exposed as the lazy module attribute MEANINGFUL_MIN_RANK).
+def _meaningful_min_rank() -> int:
+    return _flow_stress().STATE_RANK["stress"]
+
+
+# --- Expected NYSE session ---------------------------------------------------
+# A daily bar is "expected" once the session has closed and the vendor has had
+# time to publish it; before that the previous session is the expected one.
+# Same cutoff as build_vol_metrics.completed_session_cutoff.
+SESSION_PUBLISHED_HOUR_ET = 18
+LAGGING = "lagging"
+
+
+def _easter(year: int) -> date:
+    """Gregorian Easter Sunday (anonymous Gregorian algorithm)."""
+    a = year % 19
+    b, c = divmod(year, 100)
+    d, e = divmod(b, 4)
+    f = (b + 8) // 25
+    g = (b - f + 1) // 3
+    h = (19 * a + b - d - g + 15) % 30
+    i, k = divmod(c, 4)
+    ell = (32 + 2 * e + 2 * i - h - k) % 7
+    m = (a + 11 * h + 22 * ell) // 451
+    month, day = divmod(h + ell - 7 * m + 114, 31)
+    return date(year, month, day + 1)
+
+
+def _nth_weekday(year: int, month: int, weekday: int, n: int) -> date:
+    first = date(year, month, 1)
+    return first + timedelta(days=(weekday - first.weekday()) % 7 + 7 * (n - 1))
+
+
+def _last_weekday(year: int, month: int, weekday: int) -> date:
+    last = date(year + (month == 12), month % 12 + 1, 1) - timedelta(days=1)
+    return last - timedelta(days=(last.weekday() - weekday) % 7)
+
+
+def _observed(day: date) -> date:
+    """NYSE observance: Saturday -> Friday, Sunday -> Monday."""
+    if day.weekday() == 5:
+        return day - timedelta(days=1)
+    if day.weekday() == 6:
+        return day + timedelta(days=1)
+    return day
+
+
+def nyse_holidays(year: int) -> set[date]:
+    """Full-day NYSE closures by rule (unscheduled closures are not knowable)."""
+    days = {
+        _nth_weekday(year, 1, 0, 3),   # Martin Luther King Jr. Day
+        _nth_weekday(year, 2, 0, 3),   # Washington's Birthday
+        _easter(year) - timedelta(days=2),  # Good Friday
+        _last_weekday(year, 5, 0),     # Memorial Day
+        _nth_weekday(year, 9, 0, 1),   # Labor Day
+        _nth_weekday(year, 11, 3, 4),  # Thanksgiving
+    }
+    # A Saturday New Year's Day is NOT moved to the prior Friday (NYSE rule).
+    new_year = date(year, 1, 1)
+    if new_year.weekday() != 5:
+        days.add(_observed(new_year))
+    if year >= 2022:
+        days.add(_observed(date(year, 6, 19)))  # Juneteenth
+    days.add(_observed(date(year, 7, 4)))       # Independence Day
+    days.add(_observed(date(year, 12, 25)))     # Christmas
+    return days
+
+
+def is_nyse_session(day: date) -> bool:
+    return day.weekday() < 5 and day not in nyse_holidays(day.year)
+
+
+def _new_york(now: datetime) -> datetime:
+    try:
+        from zoneinfo import ZoneInfo
+
+        return now.astimezone(ZoneInfo("America/New_York"))
+    except Exception:  # noqa: BLE001 - no tz database: apply the US DST rule
+        year = now.year
+        dst_start = datetime.combine(_nth_weekday(year, 3, 6, 2), datetime.min.time(),
+                                     tzinfo=timezone.utc) + timedelta(hours=7)
+        dst_end = datetime.combine(_nth_weekday(year, 11, 6, 1), datetime.min.time(),
+                                   tzinfo=timezone.utc) + timedelta(hours=6)
+        offset = -4 if dst_start <= now < dst_end else -5
+        return now.astimezone(timezone(timedelta(hours=offset)))
+
+
+def expected_session(now: datetime | None = None) -> str:
+    """The latest NYSE session whose daily bar should be published by ``now``."""
+    current = now or datetime.now(timezone.utc)
+    if current.tzinfo is None:
+        current = current.replace(tzinfo=timezone.utc)
+    local = _new_york(current)
+    candidate = local.date()
+    if not is_nyse_session(candidate) or local.hour < SESSION_PUBLISHED_HOUR_ET:
+        candidate -= timedelta(days=1)
+    while not is_nyse_session(candidate):
+        candidate -= timedelta(days=1)
+    return candidate.isoformat()
 
 UNIVERSE = {
     "SPY": {"name": "S&P 500", "scope": "market"},
@@ -304,9 +425,9 @@ def exhaustion_meaning(
 
     Gate 2 is drawdown: there is nothing to capitulate out of at the highs.
     """
-    rank = STATE_RANK.get(raw_state, 0)
+    rank = _flow_stress().STATE_RANK.get(raw_state, 0)
     panic_text = "n/a" if panic is None else f"{panic:.1f}"
-    if rank < MEANINGFUL_MIN_RANK:
+    if rank < _meaningful_min_rank():
         return False, (
             f"panic {panic_text} did not reach the ladder's stress threshold "
             f"(raw state '{raw_state}'); these confirmations describe routine "
@@ -329,7 +450,7 @@ def calculate_symbol(symbol: str, bars: list[dict], prior_state: dict | None) ->
     """One published row: flow_stress scores + drawdown context + dwell state."""
     ordered = sorted(bars, key=lambda row: str(row.get("date") or ""))
     meta = UNIVERSE.get(symbol, {"name": symbol, "scope": "market"})
-    snapshot = calculate_flow_snapshot(
+    snapshot = _flow_stress().calculate_flow_snapshot(
         symbol,
         ordered,
         scope="sector" if symbol in SECTORS else meta["scope"],
@@ -341,7 +462,7 @@ def calculate_symbol(symbol: str, bars: list[dict], prior_state: dict | None) ->
     as_of = snapshot["as_of"]
 
     prior_state = dict(prior_state or {})
-    if prior_state.get("as_of") == as_of and prior_state.get("state") in STATE_RANK:
+    if prior_state.get("as_of") == as_of and prior_state.get("state") in _flow_stress().STATE_RANK:
         # Same trading date as the last advance: dwell is counted in sessions,
         # so a re-run must not walk the ladder a second time.
         state = str(prior_state["state"])
@@ -351,7 +472,7 @@ def calculate_symbol(symbol: str, bars: list[dict], prior_state: dict | None) ->
             "count": int(prior_state.get("count") or 0),
         }
     else:
-        state, memory = apply_state_hysteresis(raw_state, prior_state)
+        state, memory = _flow_stress().apply_state_hysteresis(raw_state, prior_state)
     memory = dict(memory)
     memory["as_of"] = as_of
 
@@ -369,9 +490,9 @@ def calculate_symbol(symbol: str, bars: list[dict], prior_state: dict | None) ->
         "scope": "sector" if symbol in SECTORS else meta["scope"],
         "as_of": as_of,
         "state": state,
-        "state_rank": STATE_RANK[state],
+        "state_rank": _flow_stress().STATE_RANK[state],
         "raw_state": raw_state,
-        "raw_state_rank": STATE_RANK[raw_state],
+        "raw_state_rank": _flow_stress().STATE_RANK[raw_state],
         "pressure": scores["pressure"],
         "panic": scores["panic"],
         "exhaustion": scores["exhaustion"],
@@ -477,6 +598,7 @@ def build(
     workers: int = 4,
     symbols: set[str] | None = None,
     dry_run: bool = False,
+    now: datetime | None = None,
 ) -> dict:
     output_dir = Path(output_dir) if output_dir else DEFAULT_OUTPUT_DIR
     fetcher = fetcher or fetch_daily_history
@@ -519,7 +641,8 @@ def build(
             rows[symbol] = result["row"]
             state_memory[symbol] = result["state_memory"]
 
-    generated_at = datetime.now(timezone.utc).isoformat()
+    clock = now or datetime.now(timezone.utc)
+    generated_at = clock.isoformat()
     market_row = rows.get(MARKET_SYMBOL)
     as_of = (market_row or {}).get("as_of") or max(
         (row.get("as_of") or "" for row in rows.values()), default=""
@@ -536,6 +659,13 @@ def build(
         quality_state = "limited"
     else:
         quality_state = "ready"
+    # A fresh fetch can still be a session behind: on 2026-09-24T00:04Z, four
+    # hours after the 09-23 close, Yahoo's latest SPY bar was 09-22, and on
+    # 2026-09-23T07:54Z it was 09-21 (bar_count 520 -> 519). Both published
+    # "ready". Say what the reader is looking at instead.
+    expected = expected_session(clock)
+    if quality_state in ("ready", "limited") and as_of and str(as_of)[:10] < expected:
+        quality_state = LAGGING
 
     payload = {
         "schema_version": SCHEMA_VERSION,
@@ -543,6 +673,7 @@ def build(
         "model_version": MODEL_VERSION,
         "research_only": True,
         "as_of": as_of or None,
+        "expected_session": expected,
         "cadence": "daily",
         "basis": BASIS,
         "drawdown": {
@@ -601,6 +732,37 @@ def build(
     }
 
 
+def check_rebuilt(output_dir: Path | None, since: datetime) -> tuple[int, str]:
+    """Exit status and message: did a build at/after ``since`` write the snapshot?
+
+    The builder exits 0 on purpose, so a crash that writes nothing (the numpy
+    import failure, 13 Forced Flow runs) is only visible as an old
+    generated_at. A vendor hiccup still rewrites the file, stale-stamped, so it
+    passes here and is judged by quality_state instead.
+    """
+    path = (Path(output_dir) if output_dir else DEFAULT_OUTPUT_DIR) / OUTPUT_NAME
+    payload = _read_json(path)
+    generated = payload.get("generated_at")
+    try:
+        stamp = datetime.fromisoformat(str(generated))
+    except ValueError:
+        stamp = None
+    if since.tzinfo is None:
+        since = since.replace(tzinfo=timezone.utc)
+    if stamp is None or stamp.tzinfo is None or stamp < since:
+        return 1, (
+            f"::error title=capitulation-daily::{OUTPUT_NAME} was not rebuilt by this run "
+            f"(generated_at={generated}, run started {since.isoformat()})"
+        )
+    line = (
+        f"as_of={payload.get('as_of')} expected_session={payload.get('expected_session')} "
+        f"quality_state={payload.get('quality_state')}"
+    )
+    if payload.get("quality_state") == LAGGING:
+        return 0, f"::warning title=capitulation lagging::{line}"
+    return 0, f"capitulation snapshot rebuilt: {line}"
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description="Build the daily capitulation model")
     parser.add_argument("--output-dir", default=None)
@@ -610,18 +772,41 @@ def main() -> int:
         "--symbols",
         help="Optional comma-separated subset, for example SPY,QQQ,XLK",
     )
+    parser.add_argument(
+        "--check-rebuilt-since",
+        metavar="ISO_TIME",
+        help="Do not build: exit 1 unless the snapshot was written at/after ISO_TIME",
+    )
     args = parser.parse_args()
+    if args.check_rebuilt_since:
+        status, message = check_rebuilt(
+            args.output_dir, datetime.fromisoformat(args.check_rebuilt_since)
+        )
+        print(message)
+        return status
     subset = (
         {item.strip().upper() for item in args.symbols.split(",") if item.strip()}
         if args.symbols else None
     )
     try:
+        # Import the criticality model here, inside the try, so a missing
+        # dependency is reported instead of crashing before main() runs.
+        _flow_stress()
         result = build(
             output_dir=args.output_dir,
             workers=args.workers,
             symbols=subset,
             dry_run=args.dry_run,
         )
+    except ImportError as exc:
+        # Loud but non-fatal (the lane also commits other artifacts). Nothing
+        # was written, so the committed snapshot keeps its old generated_at;
+        # forced-flow-daily.yml asserts the snapshot was rebuilt.
+        print(
+            "::error title=capitulation-daily::criticality model unavailable "
+            f"({str(exc)[:200]}); install _system/scripts/requirements-criticality.txt"
+        )
+        return 0
     except Exception as exc:  # noqa: BLE001 - this lane also commits other artifacts
         print(f"[warn] capitulation-daily: build failed: {str(exc)[:240]}")
         return 0

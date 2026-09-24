@@ -193,7 +193,17 @@ jobs:
         run: |
           python _system/scripts/build_spx_surface.py
           python _system/scripts/build_vol_metrics.py
+          date -u +%Y-%m-%dT%H:%M:%S+00:00 > "$RUNNER_TEMP/capitulation_started_at"
           python _system/scripts/build_capitulation_daily.py --workers 6
+      # The capitulation builder exits 0 even when it writes nothing (a missing
+      # model dependency), so judge it by its artifact, after the commit.
+      - id: capitulation_rebuilt
+        name: Check the capitulation snapshot was rebuilt
+        if: always()
+        continue-on-error: true
+        run: |
+          python _system/scripts/build_capitulation_daily.py \
+            --check-rebuilt-since "$(cat "$RUNNER_TEMP/capitulation_started_at")"
       - name: Commit technical snapshots
         if: always()
         uses: ./.github/actions/commit-main
@@ -211,9 +221,9 @@ jobs:
             dashboard/data/capitulation_daily_history.jsonl
             dashboard/data/capitulation_daily_state.json
       - name: Keep unresolved technical failures loud after preserving progress
-        if: steps.technical_health.outcome == 'failure'
+        if: always() && (steps.technical_health.outcome == 'failure' || steps.capitulation_rebuilt.outcome == 'failure')
         run: |
-          echo "::error::Technical snapshots were preserved, but their refresh or validation remains degraded."
+          echo "::error::Technical snapshots were preserved, but their refresh or validation remains degraded (technical_health=${{ steps.technical_health.outcome }}, capitulation_rebuilt=${{ steps.capitulation_rebuilt.outcome }})."
           exit 1
 
   activist:
