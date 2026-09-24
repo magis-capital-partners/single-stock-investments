@@ -232,12 +232,13 @@ jobs:
     needs: decide
     if: needs.decide.outputs.activist == 'true'
     runs-on: ubuntu-latest
-    # Must exceed the sum of the phase step timeouts below plus ~20 minutes of
-    # disk cleanup, full checkout and commits, so the JOB limit never fires:
-    # GitHub reports a job timeout as "cancelled", and that is how this job
-    # failed silently on every run from 2026-08-03 to 2026-09-24 (last
-    # "activist scan sync" commit: 2026-08-02).
-    timeout-minutes: 200
+    # Every step below carries its own limit (they sum to 261 minutes), and
+    # this job limit sits above that sum, so the JOB limit can never be what
+    # stops the run: GitHub reports a job timeout as "cancelled", and that is
+    # how this job failed silently on every run from 2026-08-03 to 2026-09-24
+    # (last "activist scan sync" commit: 2026-08-02). A step that hits its own
+    # limit fails red instead. Typical runs take well under half of this.
+    timeout-minutes: 280
     concurrency:
       # Per-job queue - see the concurrency note at the top of this file.
       group: data-commit-main-${{ github.job }}
@@ -248,6 +249,7 @@ jobs:
       RESEARCH_VAULT_ROOT: _external/research-vault
     steps:
       - uses: jlumbroso/free-disk-space@54081f138730dfa15788a46383842cd2f914a1be # v1.3.1
+        timeout-minutes: 8
         with:
           tool-cache: false
           android: true
@@ -256,6 +258,7 @@ jobs:
           docker-images: true
           swap-storage: true
       - uses: actions/checkout@v4
+        timeout-minutes: 5
         with:
           sparse-checkout: |
             _system/scripts/ci_checkout_workspace.sh
@@ -263,12 +266,16 @@ jobs:
             _system/scripts/ci_sparse_checkout_paths.py
           sparse-checkout-cone-mode: false
           fetch-depth: 1
-      - name: Checkout workspace (full)
+      - id: checkout_full
+        name: Checkout workspace (full)
+        timeout-minutes: 20
         run: bash _system/scripts/ci_checkout_workspace.sh full
       - uses: actions/setup-python@v5
+        timeout-minutes: 5
         with:
           python-version: "3.12"
       - name: Install dependencies
+        timeout-minutes: 8
         run: pip install -r _system/scripts/requirements.txt
       # Each phase has an in-process budget (it stops STARTING work and the
       # next run resumes with the stalest names) inside a `timeout` backstop,
@@ -277,32 +284,43 @@ jobs:
       # the freshness check always runs; the last step turns any phase
       # failure red.
       - id: phase_sec
+        timeout-minutes: 37
         name: "Activist scan: SEC filings (rotating, 30-minute budget)"
         continue-on-error: true
         run: timeout --kill-after=60s 35m python _system/scripts/scan_activist_sources.py --phase sec --budget-min 30
       - name: Commit SEC phase progress
-        if: always()
+        timeout-minutes: 8
+        # Never on a failed/partial checkout: `git add -A` there could stage
+        # files that simply were not checked out.
+        if: always() && steps.checkout_full.outcome == 'success'
         uses: ./.github/actions/commit-main
         with:
           message: "chore: activist scan sync $(date -u +%Y-%m-%d) (sec phase)"
       - id: phase_sites
+        timeout-minutes: 17
         name: "Activist scan: publisher sites (rotating, 12-minute budget)"
         continue-on-error: true
         run: timeout --kill-after=60s 15m python _system/scripts/scan_activist_sources.py --phase sites --budget-min 12
       - id: phase_wires
+        timeout-minutes: 17
         name: "Activist scan: press wires"
         continue-on-error: true
         run: timeout --kill-after=60s 15m python _system/scripts/scan_activist_sources.py --phase wires
       - id: phase_discovery
+        timeout-minutes: 27
         name: "Activist scan: filer discovery (weekly)"
         continue-on-error: true
         run: timeout --kill-after=60s 25m python _system/scripts/scan_activist_sources.py --phase discovery --min-interval-days 6.5
       - name: Commit fetch-phase progress
-        if: always()
+        timeout-minutes: 8
+        # Never on a failed/partial checkout: `git add -A` there could stage
+        # files that simply were not checked out.
+        if: always() && steps.checkout_full.outcome == 'success'
         uses: ./.github/actions/commit-main
         with:
           message: "chore: activist scan sync $(date -u +%Y-%m-%d) (sites, wires, discovery)"
       - id: phase_finalize
+        timeout-minutes: 49
         name: "Activist scan: triage, feed and reconcile"
         continue-on-error: true
         run: |
@@ -310,6 +328,7 @@ jobs:
           timeout --kill-after=60s 10m python _system/scripts/short_scan_batch.py
           timeout --kill-after=60s 5m python _system/scripts/activist_registry_audit.py
       - name: Japan large-shareholding reports (EDINET)
+        timeout-minutes: 12
         # Exits 0 and prints "not configured" until EDINET_API_KEY exists, so
         # the lane can ship before the credential does. See
         # _system/reference/activist-reports/COVERAGE_DECISIONS.md
@@ -317,6 +336,7 @@ jobs:
           EDINET_API_KEY: ${{ secrets.EDINET_API_KEY }}
         run: timeout --kill-after=60s 10m python _system/scripts/edinet_activist_scan.py
       - name: Activist coverage guards
+        timeout-minutes: 5
         run: python -m unittest _system/scripts/test_activist_coverage.py _system/scripts/test_activist_taxonomy.py
       - name: Rebuild activist dashboard slice
         timeout-minutes: 20
@@ -328,6 +348,7 @@ jobs:
           profile: activist
           validate: "true"
       - name: Commit artifacts
+        timeout-minutes: 8
         uses: ./.github/actions/commit-main
         with:
           message: "chore: activist scan sync $(date -u +%Y-%m-%d)"
@@ -336,9 +357,11 @@ jobs:
       # is the point: the NEXT run then sees a stale feed and goes red, so the
       # silence that hid three weeks of evictions cannot repeat.
       - name: Assert the activist feed actually moved
+        timeout-minutes: 5
         if: always()
         run: python _system/scripts/check_activist_freshness.py
       - name: Keep activist phase failures loud after committing progress
+        timeout-minutes: 2
         if: >
           always() && (
             steps.phase_sec.outcome == 'failure' ||
@@ -560,10 +583,14 @@ jobs:
         # sidecars and manifest rows. Gating that commit on the rebuild lost
         # them on every failed rebuild, so the same backlog re-imported daily
         # (6 -> 61 documents, 2026-09-10..22). Stage ONLY the import's own
-        # outputs -- never half-rebuilt derived artifacts.
+        # outputs -- never half-rebuilt derived artifacts, and never a
+        # deletion: new files and modified tracked files only. It runs only
+        # when the import step actually reported (imported is '' when it was
+        # skipped, e.g. after a failed checkout).
         if: >
           always() &&
           steps.google_creds.outputs.configured == 'true' &&
+          steps.import.outputs.imported != '' &&
           steps.import.outputs.imported != '0' &&
           steps.rebuild.conclusion != 'success'
         run: |
@@ -572,12 +599,16 @@ jobs:
           else
             git fetch origin main
           fi
-          git ls-files -z --others --modified --exclude-standard -- \
-            _system/data/drive_intake_manifest.json \
-            _system/reference/document-store/drive_intake_latest.json \
-            ':(glob)*/third-party-analyses/**' \
-            ':(glob)*/investor-documents/drive-intake/**' \
-            | xargs -0 -r git add --sparse --
+          IMPORT_PATHS=(
+            _system/data/drive_intake_manifest.json
+            _system/reference/document-store/drive_intake_latest.json
+            ':(glob)*/third-party-analyses/**'
+            ':(glob)*/investor-documents/drive-intake/**'
+          )
+          {
+            git ls-files -z --others --exclude-standard -- "${IMPORT_PATHS[@]}"
+            git diff -z --name-only --diff-filter=M -- "${IMPORT_PATHS[@]}"
+          } | xargs -0 -r git add --sparse --
           git diff --cached --stat | tail -n 1
           # The job is already red from the failed rebuild; this only keeps the import.
           bash _system/scripts/ci_push_main.sh \

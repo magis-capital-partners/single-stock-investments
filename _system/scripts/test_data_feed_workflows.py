@@ -168,9 +168,12 @@ class DriveImportCommitTests(unittest.TestCase):
         condition = str(step.get("if"))
         self.assertIn("always()", condition)
         self.assertIn("steps.import.outputs.imported != '0'", condition)
+        # A skipped import (e.g. after a failed checkout) reports '' -- never commit then.
+        self.assertIn("steps.import.outputs.imported != ''", condition)
         run = step_text(step)
         self.assertIn("ci_push_main.sh", run)
         self.assertNotRegex(run, r"git add\s+(--sparse\s+)?-A\b", "must not stage derived artifacts")
+        self.assertNotIn("--modified", run, "--modified also lists deletions")
         self.assertNotIn("uses", step)
 
     def test_success_path_still_commits_everything_after_a_good_rebuild(self) -> None:
@@ -178,11 +181,16 @@ class DriveImportCommitTests(unittest.TestCase):
         index = step_index(steps, lambda s: s.get("name") == "Commit imported documents")
         self.assertIn("steps.rebuild.conclusion == 'success'", str(steps[index].get("if")))
 
-    def test_fallback_pathspecs_stage_only_import_outputs(self) -> None:
+    def _import_paths(self) -> list[str]:
         run = step_text(self._fallback())
-        command = run[run.index("git ls-files"):run.index("| xargs")].replace("\\\n", " ")
-        args = shlex.split(command)
-        pathspecs = args[args.index("--") + 1:]
+        block = run[run.index("IMPORT_PATHS=(") + len("IMPORT_PATHS=("):]
+        return shlex.split(block[:block.index(")\n")])
+
+    def test_fallback_stages_only_new_or_modified_import_outputs(self) -> None:
+        paths = self._import_paths()
+        run = step_text(self._fallback())
+        self.assertIn('git ls-files -z --others --exclude-standard -- "${IMPORT_PATHS[@]}"', run)
+        self.assertIn('git diff -z --name-only --diff-filter=M -- "${IMPORT_PATHS[@]}"', run)
         with tempfile.TemporaryDirectory() as tmp:
             repo = Path(tmp)
             _git(repo, "init", "-q")
@@ -194,6 +202,7 @@ class DriveImportCommitTests(unittest.TestCase):
                 "_system/reference/document-store/drive_intake_latest.json": "{}",
                 "dashboard/data/research_memory.json": '{"claims": 12000}',
                 "AAPL/third-party-analyses/vic/old.source.json": "{}",
+                "AAPL/third-party-analyses/vic/kept.source.json": "{}",
             }
             for rel, text in files.items():
                 (repo / rel).parent.mkdir(parents=True, exist_ok=True)
@@ -210,11 +219,12 @@ class DriveImportCommitTests(unittest.TestCase):
             for rel, text in changed.items():
                 (repo / rel).parent.mkdir(parents=True, exist_ok=True)
                 (repo / rel).write_text(text, encoding="utf-8")
-            listed = _git(
-                repo, "ls-files", "-z", "--others", "--modified", "--exclude-standard", "--", *pathspecs
-            ).split("\0")
+            (repo / "AAPL/third-party-analyses/vic/old.source.json").unlink()  # not checked out
+            new = _git(repo, "ls-files", "-z", "--others", "--exclude-standard", "--", *paths)
+            modified = _git(repo, "diff", "-z", "--name-only", "--diff-filter=M", "--", *paths)
+            staged = sorted(path for path in (new + modified).split("\0") if path)
             self.assertEqual(
-                sorted(path for path in listed if path),
+                staged,
                 [
                     "MSFT/investor-documents/drive-intake/deck.source.json",
                     "MSFT/third-party-analyses/vic/new.source.json",
@@ -285,23 +295,38 @@ class ActivistPhaseTests(unittest.TestCase):
         self.assertIn("--budget-min", step_text(steps["phase_sec"]))
         self.assertIn("--min-interval-days", step_text(steps["phase_discovery"]))
 
-    def test_the_job_limit_can_never_fire_before_the_steps(self) -> None:
+    def test_every_step_has_a_limit_and_they_fit_inside_the_job_limit(self) -> None:
+        # Not vacuous: a step with no limit of its own fails this test, so the
+        # sum below is a real upper bound on the steps, and the job limit sits
+        # above it -- a job timeout (reported "cancelled") cannot be what ends
+        # the run. Runner overhead outside the steps gets 10 minutes.
         job = self._job()
-        bounded = 0.0
+        total = 0.0
         for step in job["steps"]:
-            for line in step_text(step).splitlines():
-                minutes = shell_timeout_minutes(line)
-                if minutes:
-                    bounded += minutes
-            bounded += float(step.get("timeout-minutes") or 0)
-        # ~20 minutes of disk cleanup, full checkout, installs and commits.
-        self.assertLess(bounded + 20, float(job["timeout-minutes"]))
+            label = step.get("id") or step.get("name") or step.get("uses")
+            limit = step.get("timeout-minutes")
+            self.assertIsNotNone(limit, f"activist step without timeout-minutes: {label}")
+            total += float(limit)
+            # inner `timeout`s (plus their 1-minute kill grace) fire before the step limit
+            inner = [shell_timeout_minutes(line) for line in step_text(step).splitlines()]
+            inner_total = sum(minutes + 1 for minutes in inner if minutes is not None)
+            self.assertLessEqual(inner_total, float(limit), label)
+        self.assertLessEqual(total + 10, float(job["timeout-minutes"]))
+        self.assertLessEqual(float(job["timeout-minutes"]), 300)  # governance cap
+
+    def test_coverage_guards_are_bounded(self) -> None:
+        steps = self._job()["steps"]
+        guards = steps[step_index(steps, lambda s: s.get("name") == "Activist coverage guards")]
+        self.assertLessEqual(float(guards["timeout-minutes"]), 10)
 
     def test_progress_is_committed_and_failures_stay_red(self) -> None:
         steps = self._job()["steps"]
         sec = step_index(steps, lambda s: s.get("id") == "phase_sec")
         commit = step_index(
-            steps, lambda s: str(s.get("uses", "")).endswith("commit-main") and s.get("if") == "always()"
+            steps,
+            lambda s: str(s.get("uses", "")).endswith("commit-main")
+            and "always()" in str(s.get("if"))
+            and "steps.checkout_full.outcome == 'success'" in str(s.get("if")),
         )
         self.assertGreater(commit, sec, "commit the SEC phase's progress right after it")
         fresh = steps[step_index(steps, lambda s: "check_activist_freshness.py" in step_text(s))]
