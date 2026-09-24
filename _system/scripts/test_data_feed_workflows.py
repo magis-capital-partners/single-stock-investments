@@ -241,5 +241,53 @@ class NewsBudgetTests(unittest.TestCase):
         self.assertGreaterEqual(int(job["env"]["PORTFOLIO_NEWS_GOOGLE_WORKERS"]), 2)
 
 
+@unittest.skipIf(yaml is None, "PyYAML not installed")
+class ActivistPhaseTests(unittest.TestCase):
+    """The activist job hit its 90-minute limit on every run from 2026-08-03,
+    and a job timeout is reported as "cancelled", which hid it for 53 days."""
+
+    PHASES = ("phase_sec", "phase_sites", "phase_wires", "phase_discovery", "phase_finalize")
+
+    def _job(self) -> dict:
+        return load_workflow("data-pipeline.yml")["jobs"]["activist"]
+
+    def test_every_phase_is_bounded_and_keeps_going(self) -> None:
+        steps = {step.get("id"): step for step in self._job()["steps"] if step.get("id")}
+        for phase in self.PHASES:
+            self.assertIn(phase, steps)
+            step = steps[phase]
+            self.assertTrue(step.get("continue-on-error"), phase)
+            for line in (l for l in step_text(step).splitlines() if "python" in l):
+                self.assertIsNotNone(shell_timeout_minutes(line), f"{phase}: {line}")
+        self.assertIn("--budget-min", step_text(steps["phase_sec"]))
+        self.assertIn("--min-interval-days", step_text(steps["phase_discovery"]))
+
+    def test_the_job_limit_can_never_fire_before_the_steps(self) -> None:
+        job = self._job()
+        bounded = 0.0
+        for step in job["steps"]:
+            for line in step_text(step).splitlines():
+                minutes = shell_timeout_minutes(line)
+                if minutes:
+                    bounded += minutes
+            bounded += float(step.get("timeout-minutes") or 0)
+        # ~20 minutes of disk cleanup, full checkout, installs and commits.
+        self.assertLess(bounded + 20, float(job["timeout-minutes"]))
+
+    def test_progress_is_committed_and_failures_stay_red(self) -> None:
+        steps = self._job()["steps"]
+        sec = step_index(steps, lambda s: s.get("id") == "phase_sec")
+        commit = step_index(
+            steps, lambda s: str(s.get("uses", "")).endswith("commit-main") and s.get("if") == "always()"
+        )
+        self.assertGreater(commit, sec, "commit the SEC phase's progress right after it")
+        fresh = steps[step_index(steps, lambda s: "check_activist_freshness.py" in step_text(s))]
+        self.assertEqual(fresh.get("if"), "always()")
+        loud = steps[-1]
+        self.assertIn("exit 1", step_text(loud))
+        for phase in self.PHASES:
+            self.assertIn(f"steps.{phase}.outcome == 'failure'", str(loud.get("if")))
+
+
 if __name__ == "__main__":
     raise SystemExit(unittest.main())

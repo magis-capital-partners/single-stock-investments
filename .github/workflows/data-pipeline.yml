@@ -230,7 +230,12 @@ jobs:
     needs: decide
     if: needs.decide.outputs.activist == 'true'
     runs-on: ubuntu-latest
-    timeout-minutes: 90
+    # Must exceed the sum of the phase step timeouts below plus ~20 minutes of
+    # disk cleanup, full checkout and commits, so the JOB limit never fires:
+    # GitHub reports a job timeout as "cancelled", and that is how this job
+    # failed silently on every run from 2026-08-03 to 2026-09-24 (last
+    # "activist scan sync" commit: 2026-08-02).
+    timeout-minutes: 200
     concurrency:
       # Per-job queue - see the concurrency note at the top of this file.
       group: data-commit-main-${{ github.job }}
@@ -263,24 +268,56 @@ jobs:
           python-version: "3.12"
       - name: Install dependencies
         run: pip install -r _system/scripts/requirements.txt
-      - name: Run activist scan
-        env:
-          TICKER: ""
-          SEC_ONLY: "false"
+      # Each phase has an in-process budget (it stops STARTING work and the
+      # next run resumes with the stalest names) inside a `timeout` backstop,
+      # so an overrun fails that step instead of the job limit cancelling the
+      # whole run. Steps continue on error so progress is always committed and
+      # the freshness check always runs; the last step turns any phase
+      # failure red.
+      - id: phase_sec
+        name: "Activist scan: SEC filings (rotating, 30-minute budget)"
+        continue-on-error: true
+        run: timeout --kill-after=60s 35m python _system/scripts/scan_activist_sources.py --phase sec --budget-min 30
+      - name: Commit SEC phase progress
+        if: always()
+        uses: ./.github/actions/commit-main
+        with:
+          message: "chore: activist scan sync $(date -u +%Y-%m-%d) (sec phase)"
+      - id: phase_sites
+        name: "Activist scan: publisher sites (rotating, 12-minute budget)"
+        continue-on-error: true
+        run: timeout --kill-after=60s 15m python _system/scripts/scan_activist_sources.py --phase sites --budget-min 12
+      - id: phase_wires
+        name: "Activist scan: press wires"
+        continue-on-error: true
+        run: timeout --kill-after=60s 15m python _system/scripts/scan_activist_sources.py --phase wires
+      - id: phase_discovery
+        name: "Activist scan: filer discovery (weekly)"
+        continue-on-error: true
+        run: timeout --kill-after=60s 25m python _system/scripts/scan_activist_sources.py --phase discovery --min-interval-days 6.5
+      - name: Commit fetch-phase progress
+        if: always()
+        uses: ./.github/actions/commit-main
+        with:
+          message: "chore: activist scan sync $(date -u +%Y-%m-%d) (sites, wires, discovery)"
+      - id: phase_finalize
+        name: "Activist scan: triage, feed and reconcile"
+        continue-on-error: true
         run: |
-          python _system/scripts/scan_activist_sources.py --reconcile --fetch-sec --discover-filers
-          python _system/scripts/short_scan_batch.py
-          python _system/scripts/activist_registry_audit.py
+          timeout --kill-after=60s 30m python _system/scripts/scan_activist_sources.py --phase finalize --reconcile --fetch-sec
+          timeout --kill-after=60s 10m python _system/scripts/short_scan_batch.py
+          timeout --kill-after=60s 5m python _system/scripts/activist_registry_audit.py
       - name: Japan large-shareholding reports (EDINET)
         # Exits 0 and prints "not configured" until EDINET_API_KEY exists, so
         # the lane can ship before the credential does. See
         # _system/reference/activist-reports/COVERAGE_DECISIONS.md
         env:
           EDINET_API_KEY: ${{ secrets.EDINET_API_KEY }}
-        run: python _system/scripts/edinet_activist_scan.py
+        run: timeout --kill-after=60s 10m python _system/scripts/edinet_activist_scan.py
       - name: Activist coverage guards
         run: python -m unittest _system/scripts/test_activist_coverage.py _system/scripts/test_activist_taxonomy.py
       - name: Rebuild activist dashboard slice
+        timeout-minutes: 20
         uses: ./.github/actions/rebuild-data
         env:
           OAUTH_CLIENT_ID: ${{ vars.OAUTH_CLIENT_ID }}
@@ -299,6 +336,18 @@ jobs:
       - name: Assert the activist feed actually moved
         if: always()
         run: python _system/scripts/check_activist_freshness.py
+      - name: Keep activist phase failures loud after committing progress
+        if: >
+          always() && (
+            steps.phase_sec.outcome == 'failure' ||
+            steps.phase_sites.outcome == 'failure' ||
+            steps.phase_wires.outcome == 'failure' ||
+            steps.phase_discovery.outcome == 'failure' ||
+            steps.phase_finalize.outcome == 'failure'
+          )
+        run: |
+          echo "::error::Activist phase failed or hit its timeout (sec=${{ steps.phase_sec.outcome }} sites=${{ steps.phase_sites.outcome }} wires=${{ steps.phase_wires.outcome }} discovery=${{ steps.phase_discovery.outcome }} finalize=${{ steps.phase_finalize.outcome }}); progress up to that point was committed."
+          exit 1
 
   downloads:
     needs: decide
