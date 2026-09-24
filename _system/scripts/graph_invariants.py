@@ -337,20 +337,23 @@ def inv_e2(conn, root, today) -> Result:
         deadline = (explicit_deadline or
                     (due_date + timedelta(days=E2_GRACE_DAYS))).isoformat()
         outcome = conn.execute(
-            "SELECT n.as_of, n.status FROM edges e JOIN nodes n ON n.id=e.dst"
+            "SELECT n.as_of FROM edges e JOIN nodes n ON n.id=e.dst"
             " WHERE e.src=? AND e.type='RESOLVED_BY' LIMIT 1",
             (row["id"],)).fetchone()
-        # resolve_falsifiers.py declares `unresolvable` only once the deadline
-        # has passed (evidence dated on the deadline still counts), so that
-        # terminal verdict is on time on the day after the deadline. Before
-        # this, every unresolvable verdict counted as "resolved late" forever
-        # and would have wedged E2 (and every PR) from its deadline + 1.
+        # The falsifier lane runs once a day, so the first run that can see
+        # deadline-day evidence may be the one on deadline + 1: resolve_
+        # falsifiers.py only declares `unresolvable` once the deadline has
+        # passed, and a hit/miss whose evidence landed after that day's run is
+        # recorded the next day too. Any verdict dated deadline + 1 is therefore
+        # on time; counting it late made a one-day processing lag a PERMANENT
+        # hard violation (DOC would have tripped on 2026-10-15, DG on 10-28).
+        # A missing outcome is flagged from deadline + 2, and any verdict dated
+        # later than deadline + 1 is still late.
         terminal_by = (date.fromisoformat(deadline) + timedelta(days=1)).isoformat()
         if outcome is None:
             if today.isoformat() > terminal_by:
                 violations.append(f"{fid}: due {due}, no outcome by {deadline}")
-        elif outcome["as_of"] and str(outcome["as_of"])[:10] > (
-                terminal_by if outcome["status"] == "unresolvable" else deadline):
+        elif outcome["as_of"] and str(outcome["as_of"])[:10] > terminal_by:
             violations.append(f"{fid}: due {due}, resolved late"
                               f" ({outcome['as_of']})")
     return Result("E2", len(violations), violations,

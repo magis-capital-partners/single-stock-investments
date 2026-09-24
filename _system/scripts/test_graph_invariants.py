@@ -460,10 +460,21 @@ class PlantedViolationTests(unittest.TestCase):
         self.assertEqual(len(results["E2"].violations), 1)
         self.assertIn("no outcome by 2026-07-15", results["E2"].violations[0])
 
+    def test_e2_a_hit_or_miss_recorded_the_day_after_the_deadline_is_on_time(self):
+        # Evidence dated on the deadline that lands after that day's 09:20 run
+        # is only recorded on deadline + 1 -- the same one-day processing lag
+        # as `unresolvable`, and it must not become a permanent violation.
+        plant_spec(self.root, "hit_m", "2026-07-01", rationale="deadline 2026-07-15")
+        plant_spec(self.root, "miss_m", "2026-07-01", rationale="deadline 2026-07-15")
+        self.add_outcome("hit_m", "hit", "2026-07-16")
+        self.add_outcome("miss_m", "miss", "2026-07-16")
+        results, _ = run_invariants(self.root)
+        self.assertEqual(results["E2"].violations, [])
+
     def test_e2_genuinely_late_outcomes_are_still_flagged(self):
         plant_spec(self.root, "late_m", "2026-07-01", rationale="deadline 2026-07-15")
         plant_spec(self.root, "later_m", "2026-07-01", rationale="deadline 2026-07-15")
-        self.add_outcome("late_m", "hit", "2026-07-16")            # a hit gets no extra day
+        self.add_outcome("late_m", "hit", "2026-07-17")            # two days late
         self.add_outcome("later_m", "unresolvable", "2026-07-17")  # two days late
         results, _ = run_invariants(self.root)
         joined = " | ".join(results["E2"].violations)
