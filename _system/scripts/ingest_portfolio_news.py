@@ -18,10 +18,13 @@ import json
 import logging
 import os
 import re
+import threading
 import time
 import urllib.parse
 import xml.etree.ElementTree as ET
 from collections import deque
+from concurrent.futures import FIRST_COMPLETED, ThreadPoolExecutor, wait
+from dataclasses import fields as dataclass_fields
 from datetime import UTC, datetime, timedelta
 from email.utils import parsedate_to_datetime
 from pathlib import Path
@@ -63,8 +66,33 @@ POLYGON_REQS_PER_MIN = int(os.getenv("PORTFOLIO_NEWS_POLYGON_REQS_PER_MIN", "5")
 ENABLE_POLYGON = os.getenv("PORTFOLIO_NEWS_ENABLE_POLYGON", "1") not in {"0", "false", "False", ""}
 ENABLE_GOOGLE = os.getenv("PORTFOLIO_NEWS_ENABLE_GOOGLE", "1") not in {"0", "false", "False", ""}
 GOOGLE_MAX_PER_QUERY = int(os.getenv("PORTFOLIO_NEWS_GOOGLE_MAX_PER_QUERY", "50"))
+# The Google phase was one request per holding, serially: ~1.9 s x 843 tickers
+# = 26 minutes, on top of an 11-16 minute Polygon phase, inside a 45-minute
+# job. 58 of 65 runs from 2026-09-08 to 09-24 hit the job timeout, which
+# GitHub reports as "cancelled", and a cancelled run writes nothing at all.
+GOOGLE_WORKERS = max(1, int(os.getenv("PORTFOLIO_NEWS_GOOGLE_WORKERS", "8")))
+GOOGLE_RETRY_STATUS = {429, 500, 502, 503, 504}
+# Whole-run budget. When it runs out, no new request is started and the feed
+# is written with what was fetched, previous items kept for every holding
+# that was not refreshed, and the gap recorded under "coverage".
+DEADLINE_SEC = float(os.getenv("PORTFOLIO_NEWS_DEADLINE_SEC", str(35 * 60)))
 
 _REQUEST_TIMESTAMPS: deque[float] = deque()
+
+
+class Deadline:
+    """A monotonic run budget; ``None`` seconds means no deadline."""
+
+    def __init__(self, seconds: float | None, clock=time.monotonic) -> None:
+        self._clock = clock
+        self.seconds = seconds
+        self.start = clock()
+
+    def elapsed(self) -> float:
+        return self._clock() - self.start
+
+    def expired(self) -> bool:
+        return self.seconds is not None and self.elapsed() >= self.seconds
 
 
 def build_session() -> requests.Session:
@@ -121,23 +149,35 @@ def _bulk_paginate(
     params: dict,
     *,
     max_pages: int,
+    deadline: Deadline | None = None,
+    status: dict | None = None,
 ) -> list[dict]:
+    """Follow next_url pages. ``status`` records pages and why paging stopped."""
     out: list[dict] = []
     next_url: str | None = url
     next_params: dict | None = params
+    pages = 0
+    stop = "complete"
     for _ in range(max_pages):
         if not next_url:
+            break
+        if deadline is not None and deadline.expired():
+            stop = "deadline"
             break
         payload = _polygon_get(session, next_url, next_params)
         next_params = None
         if not payload:
+            stop = "failed"
             break
+        pages += 1
         results = payload.get("results") or []
         out.extend(results)
         next_url = payload.get("next_url")
         if next_url and POLYGON_API_KEY and "apiKey=" not in next_url:
             sep = "&" if "?" in next_url else "?"
             next_url = f"{next_url}{sep}apiKey={POLYGON_API_KEY}"
+    if status is not None:
+        status.update({"pages": pages, "stop": stop})
     return out
 
 
@@ -159,7 +199,14 @@ def _norm_poly(sym: str) -> str:
 def phase_polygon_news(
     session: requests.Session,
     configs: dict[str, HoldingNewsConfig],
+    *,
+    deadline: Deadline | None = None,
+    coverage: dict | None = None,
 ) -> list[NewsItem]:
+    """Polygon bulk news. ``coverage["polygon"]["status"]`` is complete/partial/failed/skipped."""
+    polygon_coverage: dict = {"status": "skipped", "pages": 0, "raw": 0}
+    if coverage is not None:
+        coverage["polygon"] = polygon_coverage
     if not ENABLE_POLYGON or not POLYGON_API_KEY:
         LOGGER.info("polygon phase skipped (disabled or missing API key)")
         return []
@@ -169,6 +216,7 @@ def phase_polygon_news(
         return []
 
     since = (datetime.now(UTC) - timedelta(days=NEWS_WINDOW_DAYS)).date().isoformat()
+    paging: dict = {}
     raw = _bulk_paginate(
         session,
         "https://api.polygon.io/v2/reference/news",
@@ -179,6 +227,18 @@ def phase_polygon_news(
             "sort": "published_utc",
         },
         max_pages=NEWS_MAX_PAGES,
+        deadline=deadline,
+        status=paging,
+    )
+    stop = paging.get("stop", "complete")
+    if stop == "complete":
+        polygon_status = "complete"
+    elif paging.get("pages"):
+        polygon_status = "partial"
+    else:
+        polygon_status = "failed"
+    polygon_coverage.update(
+        {"status": polygon_status, "stop": stop, "pages": paging.get("pages", 0), "raw": len(raw)}
     )
 
     items: list[NewsItem] = []
@@ -253,7 +313,14 @@ def _google_query(cfg: HoldingNewsConfig) -> str:
     return f"({names}) OR ({tokens})"
 
 
-def _fetch_google_news_rss(session: requests.Session, query: str, locale: dict[str, str]) -> list[dict]:
+def _fetch_google_news_rss(
+    session: requests.Session, query: str, locale: dict[str, str]
+) -> list[dict] | None:
+    """RSS items for one query; ``None`` when the fetch FAILED (vs ``[]`` for no news).
+
+    The distinction matters: a failed holding keeps its previous items in the
+    feed, an empty one is genuinely quiet.
+    """
     params = {
         "q": query,
         "hl": locale.get("hl", "en-US"),
@@ -261,17 +328,25 @@ def _fetch_google_news_rss(session: requests.Session, query: str, locale: dict[s
         "ceid": locale.get("ceid", "US:en"),
     }
     url = "https://news.google.com/rss/search?" + urllib.parse.urlencode(params)
-    try:
-        resp = session.get(url, timeout=HTTP_TIMEOUT_SEC)
-    except Exception as exc:  # noqa: BLE001
-        LOGGER.warning("google RSS failed: %s", exc)
-        return []
-    if resp.status_code != 200 or not resp.content:
+    resp = None
+    for attempt in range(2):
+        try:
+            resp = session.get(url, timeout=HTTP_TIMEOUT_SEC)
+        except Exception as exc:  # noqa: BLE001
+            LOGGER.warning("google RSS failed: %s", exc)
+            resp = None
+        if resp is not None and resp.status_code not in GOOGLE_RETRY_STATUS:
+            break
+        if attempt == 0:
+            time.sleep(2.0)
+    if resp is None or resp.status_code != 200:
+        return None
+    if not resp.content:
         return []
     try:
         root = ET.fromstring(resp.content)
     except ET.ParseError:
-        return []
+        return None
 
     items: list[dict] = []
     for node in root.iter("item"):
@@ -310,26 +385,101 @@ def _parse_rfc822(raw: str | None) -> str | None:
         return None
 
 
+def _fetch_google_rows_bounded(
+    session: requests.Session,
+    configs: dict[str, HoldingNewsConfig],
+    selected: list[str],
+    *,
+    workers: int,
+    deadline: Deadline | None,
+) -> tuple[dict[str, list[dict] | None], list[str]]:
+    """Fetch RSS rows per ticker on a bounded pool; stop STARTING requests at the deadline.
+
+    Returns ({ticker: rows or None-on-failure}, [tickers never attempted]).
+    Requests already in flight finish (bounded by the HTTP timeout).
+    """
+    results: dict[str, list[dict] | None] = {}
+    not_attempted: list[str] = []
+    local = threading.local()
+
+    def fetch(ticker: str) -> list[dict] | None:
+        if workers <= 1:
+            worker_session = session
+        else:
+            worker_session = getattr(local, "session", None)
+            if worker_session is None:
+                worker_session = local.session = build_session()
+        cfg = configs[ticker]
+        return _fetch_google_news_rss(worker_session, _google_query(cfg), cfg.google_locale)
+
+    queue = iter(selected)
+    with ThreadPoolExecutor(max_workers=workers) as pool:
+        pending: dict = {}
+
+        def submit_next() -> None:
+            for ticker in queue:
+                if deadline is not None and deadline.expired():
+                    not_attempted.append(ticker)
+                    not_attempted.extend(queue)
+                    return
+                pending[pool.submit(fetch, ticker)] = ticker
+                return
+
+        for _ in range(workers * 2):
+            submit_next()
+        while pending:
+            done, _ = wait(list(pending), return_when=FIRST_COMPLETED)
+            for future in done:
+                ticker = pending.pop(future)
+                try:
+                    results[ticker] = future.result()
+                except Exception as exc:  # noqa: BLE001 - one holding never sinks the phase
+                    LOGGER.warning("google RSS %s failed: %s", ticker, exc)
+                    results[ticker] = None
+                submit_next()
+    return results, not_attempted
+
+
 def phase_google_news(
     session: requests.Session,
     configs: dict[str, HoldingNewsConfig],
     *,
     tickers: list[str] | None = None,
+    workers: int | None = None,
+    deadline: Deadline | None = None,
+    coverage: dict | None = None,
 ) -> list[NewsItem]:
+    """Google News per holding, on ``workers`` threads, until ``deadline``.
+
+    ``coverage["google"]`` records which holdings were refreshed, which failed
+    and which were never attempted, so the caller can keep their prior items.
+    """
     if not ENABLE_GOOGLE:
         LOGGER.info("google phase skipped (disabled)")
         return []
 
     cutoff = datetime.now(UTC) - timedelta(days=NEWS_WINDOW_DAYS)
     items: list[NewsItem] = []
-    selected = tickers or sorted(configs.keys())
+    selected = [ticker for ticker in (tickers or sorted(configs.keys())) if ticker in configs]
+    fetched, not_attempted = _fetch_google_rows_bounded(
+        session, configs, selected, workers=max(1, workers or GOOGLE_WORKERS), deadline=deadline
+    )
+    refreshed = [ticker for ticker in selected if fetched.get(ticker) is not None]
+    failed = [ticker for ticker in selected if ticker in fetched and fetched[ticker] is None]
+    if coverage is not None:
+        coverage["google"] = {
+            "tickers_total": len(selected),
+            "refreshed": len(refreshed),
+            "failed": len(failed),
+            "not_attempted": len(not_attempted),
+            "failed_tickers": failed[:50],
+            "not_attempted_tickers": not_attempted[:50],
+            "refreshed_tickers": refreshed,
+        }
 
-    for ticker in selected:
-        cfg = configs.get(ticker)
-        if not cfg:
-            continue
-        query = _google_query(cfg)
-        rows = _fetch_google_news_rss(session, query, cfg.google_locale)
+    for ticker in refreshed:
+        cfg = configs[ticker]
+        rows = fetched[ticker] or []
         for row in rows:
             title = row.get("title") or ""
             description = row.get("description") or ""
@@ -383,7 +533,10 @@ def phase_google_news(
             if passes_feed_gate(item, cfg):
                 items.append(item)
 
-    LOGGER.info("google: kept=%d tickers=%d", len(items), len(selected))
+    LOGGER.info(
+        "google: kept=%d tickers=%d refreshed=%d failed=%d not_attempted=%d",
+        len(items), len(selected), len(refreshed), len(failed), len(not_attempted),
+    )
     return items
 
 
@@ -401,7 +554,7 @@ def phase_two_phase_theme_news(session: requests.Session) -> list[NewsItem]:
     cutoff = datetime.now(UTC) - timedelta(days=NEWS_WINDOW_DAYS)
     items: list[NewsItem] = []
     for kind, query in THEME_NEWS_QUERIES:
-        rows = _fetch_google_news_rss(session, query, locale)
+        rows = _fetch_google_news_rss(session, query, locale) or []
         for row in rows:
             title = row.get("title") or ""
             description = row.get("description") or ""
@@ -522,7 +675,74 @@ def published_dt_or_min(item: NewsItem) -> datetime:
     return datetime.min.replace(tzinfo=UTC)
 
 
-def persist(items: list[NewsItem], configs: dict[str, HoldingNewsConfig]) -> None:
+def _load_previous_feed() -> dict:
+    if not PORTFOLIO_NEWS_PATH.exists():
+        return {}
+    try:
+        payload = json.loads(PORTFOLIO_NEWS_PATH.read_text(encoding="utf-8"))
+    except (json.JSONDecodeError, OSError):
+        return {}
+    return payload if isinstance(payload, dict) else {}
+
+
+def _news_item_from_dict(row: dict) -> NewsItem | None:
+    known = {field.name for field in dataclass_fields(NewsItem)}
+    try:
+        return NewsItem(**{key: value for key, value in row.items() if key in known})
+    except TypeError:
+        return None
+
+
+def carry_over_previous(
+    previous_items: list[dict],
+    *,
+    known_tickers: set[str],
+    google_refreshed: set[str],
+    polygon_universe: set[str],
+    polygon_complete: bool,
+    cutoff: datetime,
+) -> list[NewsItem]:
+    """Previous feed items for holdings this run did not refresh.
+
+    A Google item is kept when its holding was not refreshed (deadline, fetch
+    failure, or outside a --tickers subset). A Polygon item is kept when the
+    Polygon phase did not complete or its holding was outside this run. Items
+    older than the window, or for names no longer held, are dropped.
+    """
+    kept: list[NewsItem] = []
+    for row in previous_items:
+        tickers = row.get("tickers") or []
+        ticker = tickers[0] if tickers else None
+        if not ticker or ticker not in known_tickers:
+            continue
+        source = row.get("source")
+        if source == "google_news":
+            carry = ticker not in google_refreshed
+        elif source == "polygon":
+            carry = not polygon_complete or ticker not in polygon_universe
+        else:
+            carry = False
+        if not carry:
+            continue
+        published = parse_published_iso(row.get("published_utc"))
+        if published:
+            try:
+                if datetime.fromisoformat(published) < cutoff:
+                    continue
+            except ValueError:
+                pass
+        item = _news_item_from_dict(row)
+        if item is not None:
+            kept.append(item)
+    return kept
+
+
+def persist(
+    items: list[NewsItem],
+    configs: dict[str, HoldingNewsConfig],
+    *,
+    coverage: dict | None = None,
+) -> None:
     PORTFOLIO_NEWS_PATH.parent.mkdir(parents=True, exist_ok=True)
     payload = {
         "build_time": datetime.now(UTC).isoformat(),
@@ -531,6 +751,8 @@ def persist(items: list[NewsItem], configs: dict[str, HoldingNewsConfig]) -> Non
         "feed_min_confidence": FEED_MIN_CONFIDENCE,
         "items": [it.to_dict() for it in items],
     }
+    if coverage is not None:
+        payload["coverage"] = coverage
     news_json = json.dumps(payload, indent=2) + "\n"
     PORTFOLIO_NEWS_PATH.write_text(news_json, encoding="utf-8")
 
@@ -742,22 +964,67 @@ def main() -> None:
     if args.skip_google:
         ENABLE_GOOGLE = False
 
+    known_tickers = set(configs)
     subset = [t.strip() for t in args.tickers.split(",") if t.strip()] or None
     if subset:
         configs = {k: v for k, v in configs.items() if k in subset}
 
+    deadline = Deadline(DEADLINE_SEC if DEADLINE_SEC > 0 else None)
+    coverage: dict = {}
+    previous = _load_previous_feed()
     session = build_session()
     items: list[NewsItem] = []
-    items.extend(phase_polygon_news(session, configs))
-    items.extend(phase_google_news(session, configs, tickers=subset or sorted(configs.keys())))
-    if not subset or "INV" in subset:
+    items.extend(phase_polygon_news(session, configs, deadline=deadline, coverage=coverage))
+    items.extend(
+        phase_google_news(
+            session,
+            configs,
+            tickers=subset or sorted(configs.keys()),
+            deadline=deadline,
+            coverage=coverage,
+        )
+    )
+    if (not subset or "INV" in subset) and not deadline.expired():
         items.extend(phase_two_phase_theme_news(session))
+
+    google = coverage.get("google") or {}
+    polygon = coverage.get("polygon") or {}
+    carried = carry_over_previous(
+        previous.get("items") or [],
+        known_tickers=known_tickers,
+        google_refreshed=set(google.pop("refreshed_tickers", []) or []),
+        polygon_universe=set(configs),
+        polygon_complete=polygon.get("status") == "complete",
+        cutoff=datetime.now(UTC) - timedelta(days=NEWS_WINDOW_DAYS),
+    )
+    # New items first: dedupe keeps the first of equal-confidence duplicates.
+    items.extend(carried)
+    coverage.update(
+        {
+            "deadline_sec": deadline.seconds,
+            "elapsed_sec": round(deadline.elapsed(), 1),
+            "deadline_hit": deadline.expired(),
+            "carried_over_items": len(carried),
+            "complete": (
+                polygon.get("status") in ("complete", "skipped", None)
+                and not google.get("failed")
+                and not google.get("not_attempted")
+            ),
+        }
+    )
+    if not coverage["complete"]:
+        print(
+            "::warning title=portfolio news::partial run -- "
+            f"polygon={polygon.get('status')} google refreshed={google.get('refreshed')}"
+            f"/{google.get('tickers_total')} failed={google.get('failed')} "
+            f"not_attempted={google.get('not_attempted')}; kept {len(carried)} prior items"
+        )
 
     filing_urls = _load_filing_urls()
     link_filings(items, filing_urls)
     items = dedupe_items(items)
 
-    persist(items, configs)
+    persist(items, configs, coverage=coverage)
     if not args.no_review:
         review_path = write_review_markdown(items)
         LOGGER.info("review: %s", review_path)

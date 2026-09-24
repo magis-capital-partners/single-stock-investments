@@ -214,5 +214,32 @@ class DriveImportCommitTests(unittest.TestCase):
             )
 
 
+def shell_timeout_minutes(run: str) -> float | None:
+    """Minutes from a coreutils `timeout [opts] <N>[smh] cmd` prefix, if any."""
+    match = re.search(r"\btimeout\s+(?:--?\S+\s+)*(\d+(?:\.\d+)?)([smh]?)\s", run)
+    if not match:
+        return None
+    value, unit = float(match.group(1)), match.group(2) or "s"
+    return value * {"s": 1 / 60, "m": 1, "h": 60}[unit]
+
+
+@unittest.skipIf(yaml is None, "PyYAML not installed")
+class NewsBudgetTests(unittest.TestCase):
+    """58 of 65 news runs (2026-09-08..24) ended as a job-timeout "cancelled"."""
+
+    def test_news_overrun_is_a_failure_not_a_cancel(self) -> None:
+        job = load_workflow("data-pipeline.yml")["jobs"]["news"]
+        steps = job["steps"]
+        ingest = steps[step_index(steps, lambda s: "ingest_portfolio_news.py" in step_text(s))]
+        step_minutes = shell_timeout_minutes(step_text(ingest))
+        self.assertIsNotNone(step_minutes, "wrap the ingester in `timeout`")
+        deadline_minutes = float(job["env"]["PORTFOLIO_NEWS_DEADLINE_SEC"]) / 60
+        job_minutes = float(job["timeout-minutes"])
+        # in-process deadline < shell timeout < job timeout, with room for the commit
+        self.assertLess(deadline_minutes, step_minutes)
+        self.assertLessEqual(step_minutes + 5, job_minutes)
+        self.assertGreaterEqual(int(job["env"]["PORTFOLIO_NEWS_GOOGLE_WORKERS"]), 2)
+
+
 if __name__ == "__main__":
     raise SystemExit(unittest.main())

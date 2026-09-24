@@ -564,7 +564,13 @@ jobs:
     needs: decide
     if: needs.decide.outputs.news == 'true'
     runs-on: ubuntu-latest
-    timeout-minutes: 45
+    # Budget, innermost first: the ingester stops starting requests at 35 min
+    # and writes a partial feed (coverage recorded, prior items kept); the
+    # step's `timeout 40m` turns a hang into a red failure; the job limit sits
+    # above both, so the job itself is never what stops the run. Before this,
+    # 58 of 65 runs (2026-09-08..24) died on the 45-minute job timeout, which
+    # GitHub reports as "cancelled" -- no red X, and nothing was written.
+    timeout-minutes: 50
     concurrency:
       # Per-job queue - see the concurrency note at the top of this file.
       group: data-commit-main-${{ github.job }}
@@ -575,6 +581,8 @@ jobs:
       PORTFOLIO_NEWS_POLYGON_REQS_PER_MIN: "5"
       PORTFOLIO_NEWS_MAX_PAGES: "15"
       PORTFOLIO_NEWS_GOOGLE_MAX_PER_QUERY: "50"
+      PORTFOLIO_NEWS_GOOGLE_WORKERS: "8"
+      PORTFOLIO_NEWS_DEADLINE_SEC: "2100"
     steps:
       - uses: actions/checkout@v4
         with:
@@ -593,7 +601,7 @@ jobs:
         run: pip install -r _system/scripts/requirements-news.txt
       - name: Ingest portfolio news
         working-directory: _system/scripts
-        run: python ingest_portfolio_news.py
+        run: timeout --kill-after=60s 40m python ingest_portfolio_news.py
       - name: Commit news artifacts
         run: |
           git add dashboard/data/portfolio_news.json _system/data/news_seen.json _system/reviews/pending/news_*.md
