@@ -681,7 +681,12 @@ jobs:
           python-version: "3.12"
       - name: Install dependencies
         run: pip install -r _system/scripts/requirements-news.txt
-      - name: Ingest portfolio news
+      # The ingester exits 1 AFTER writing its partial feed when under half the
+      # holdings were refreshed (or the `timeout` backstop fires). The step
+      # continues so that feed is still committed; the last step turns red.
+      - id: ingest
+        name: Ingest portfolio news
+        continue-on-error: true
         working-directory: _system/scripts
         run: timeout --kill-after=60s 40m python ingest_portfolio_news.py
       - name: Commit news artifacts
@@ -689,6 +694,11 @@ jobs:
           git add dashboard/data/portfolio_news.json _system/data/news_seen.json _system/reviews/pending/news_*.md
           git add '*/research/news/news_index.json' 2>/dev/null || true
           bash _system/scripts/ci_push_main.sh "chore: refresh portfolio news $(date -u +%Y-%m-%d)"
+      - name: Keep a mostly-failed news run red after committing its partial feed
+        if: always() && steps.ingest.outcome == 'failure'
+        run: |
+          echo "::error::Portfolio news ingest failed or refreshed under half the holdings; the partial feed (prior items kept) was committed. See the Ingest step."
+          exit 1
 
   cvr-discover:
     needs: decide

@@ -259,6 +259,17 @@ class NewsBudgetTests(unittest.TestCase):
         self.assertLessEqual(step_minutes + 5, job_minutes)
         self.assertGreaterEqual(int(job["env"]["PORTFOLIO_NEWS_GOOGLE_WORKERS"]), 2)
 
+    def test_a_mostly_failed_run_commits_its_partial_feed_and_goes_red(self) -> None:
+        steps = load_workflow("data-pipeline.yml")["jobs"]["news"]["steps"]
+        ingest = step_index(steps, lambda s: s.get("id") == "ingest")
+        self.assertGreaterEqual(ingest, 0)
+        self.assertTrue(steps[ingest].get("continue-on-error"))
+        commit = step_index(steps, lambda s: "chore: refresh portfolio news" in step_text(s))
+        self.assertGreater(commit, ingest)
+        loud = steps[-1]
+        self.assertIn("steps.ingest.outcome == 'failure'", str(loud.get("if")))
+        self.assertIn("exit 1", step_text(loud))
+
 
 @unittest.skipIf(yaml is None, "PyYAML not installed")
 class DecideMatchesTriggersTests(unittest.TestCase):

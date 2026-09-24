@@ -76,6 +76,9 @@ GOOGLE_RETRY_STATUS = {429, 500, 502, 503, 504}
 # is written with what was fetched, previous items kept for every holding
 # that was not refreshed, and the gap recorded under "coverage".
 DEADLINE_SEC = float(os.getenv("PORTFOLIO_NEWS_DEADLINE_SEC", str(35 * 60)))
+# Below this share of holdings refreshed, the run writes its partial feed and
+# then exits 1: a run that mostly failed must not be green.
+MIN_GOOGLE_COVERAGE = float(os.getenv("PORTFOLIO_NEWS_MIN_COVERAGE", "0.5"))
 
 _REQUEST_TIMESTAMPS: deque[float] = deque()
 
@@ -928,7 +931,7 @@ def sanitize_existing_news(
     return len(items), reassigned, dropped
 
 
-def main() -> None:
+def main() -> int:
     logging.basicConfig(level=logging.INFO, format="%(levelname)s %(message)s")
     parser = argparse.ArgumentParser(description="Ingest portfolio news")
     parser.add_argument(
@@ -956,7 +959,7 @@ def main() -> None:
             dropped,
             POLICY_VERSION,
         )
-        return
+        return 0
 
     global ENABLE_POLYGON, ENABLE_GOOGLE  # noqa: PLW0603
     if args.skip_polygon:
@@ -1031,7 +1034,30 @@ def main() -> None:
 
     refresh_n = sum(1 for it in items if it.refresh_eligible)
     LOGGER.info("done: items=%d refresh_eligible=%d -> %s", len(items), refresh_n, PORTFOLIO_NEWS_PATH)
+    return coverage_exit_status(coverage)
+
+
+def coverage_exit_status(coverage: dict) -> int:
+    """1 when under MIN_GOOGLE_COVERAGE of the holdings were refreshed.
+
+    The partial feed has already been written (prior items kept), so the
+    caller commits it -- but a run that refreshed less than half the book is
+    not green.
+    """
+    google = coverage.get("google") or {}
+    total = int(google.get("tickers_total") or 0)
+    if not total:
+        return 0
+    refreshed = int(google.get("refreshed") or 0)
+    if refreshed / total < MIN_GOOGLE_COVERAGE:
+        print(
+            f"::error title=portfolio news::only {refreshed}/{total} holdings refreshed "
+            f"(minimum {MIN_GOOGLE_COVERAGE:.0%}; failed={google.get('failed')}, "
+            f"not_attempted={google.get('not_attempted')}); the partial feed was written"
+        )
+        return 1
+    return 0
 
 
 if __name__ == "__main__":
-    main()
+    raise SystemExit(main())

@@ -8,6 +8,7 @@ minute Polygon phase. No test here touches the network.
 """
 from __future__ import annotations
 
+import io
 import json
 import sys
 import tempfile
@@ -164,25 +165,15 @@ class CarryOverTests(unittest.TestCase):
 
 
 class MainPartialWriteTests(unittest.TestCase):
-    def test_a_partial_run_keeps_prior_items_and_records_coverage(self) -> None:
-        holdings = {"T1": config("T1"), "T2": config("T2")}
-
+    def _run_main(self, holdings: dict, failing: set[str], prior_items: list[dict]):
         def fake_fetch(_session, query, _locale):
-            return None if "T2" in query else []  # T2's fetch fails
+            return None if any(ticker in query for ticker in failing) else []
 
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
             feed = root / "dashboard" / "data" / "portfolio_news.json"
             feed.parent.mkdir(parents=True)
-            prior = {
-                "items": [
-                    {"id": "gnews:t1", "tickers": ["T1"], "source": "google_news",
-                     "published_utc": recent(), "url": "https://example.test/t1", "confidence": 0.8},
-                    {"id": "gnews:t2", "tickers": ["T2"], "source": "google_news",
-                     "published_utc": recent(), "url": "https://example.test/t2", "confidence": 0.8},
-                ]
-            }
-            feed.write_text(json.dumps(prior), encoding="utf-8")
+            feed.write_text(json.dumps({"items": prior_items}), encoding="utf-8")
             with mock.patch.object(ingest, "ROOT", root), \
                     mock.patch.object(ingest, "PORTFOLIO_NEWS_PATH", feed), \
                     mock.patch.object(ingest, "NEWS_SEEN_PATH", root / "news_seen.json"), \
@@ -190,9 +181,21 @@ class MainPartialWriteTests(unittest.TestCase):
                     mock.patch.object(ingest, "_fetch_google_news_rss", side_effect=fake_fetch), \
                     mock.patch.object(ingest, "phase_two_phase_theme_news", return_value=[]), \
                     mock.patch.object(ingest, "_load_filing_urls", return_value={}), \
-                    mock.patch.object(sys, "argv", ["ingest", "--skip-polygon", "--no-review"]):
-                ingest.main()
+                    mock.patch.object(sys, "argv", ["ingest", "--skip-polygon", "--no-review"]), \
+                    mock.patch("sys.stdout", new_callable=io.StringIO) as out:
+                status = ingest.main()
             payload = json.loads(feed.read_text(encoding="utf-8"))
+        return status, payload, out.getvalue()
+
+    @staticmethod
+    def _prior(ticker: str) -> dict:
+        return {"id": f"gnews:{ticker.lower()}", "tickers": [ticker], "source": "google_news",
+                "published_utc": recent(), "url": f"https://example.test/{ticker}", "confidence": 0.8}
+
+    def test_a_partial_run_keeps_prior_items_and_records_coverage(self) -> None:
+        holdings = {"T1": config("T1"), "T2": config("T2")}
+        status, payload, _ = self._run_main(holdings, {"T2"}, [self._prior("T1"), self._prior("T2")])
+        self.assertEqual(status, 0)  # half the book refreshed: partial, not failed
         ids = [item["id"] for item in payload["items"]]
         self.assertEqual(ids, ["gnews:t2"])  # T1 refreshed (no news now); T2 kept
         coverage = payload["coverage"]
@@ -200,6 +203,18 @@ class MainPartialWriteTests(unittest.TestCase):
         self.assertEqual(coverage["google"]["failed_tickers"], ["T2"])
         self.assertEqual(coverage["carried_over_items"], 1)
         self.assertNotIn("refreshed_tickers", coverage["google"])
+
+    def test_a_mostly_failed_run_writes_its_feed_then_fails(self) -> None:
+        holdings = {ticker: config(ticker) for ticker in ("T1", "T2", "T3", "T4")}
+        status, payload, out = self._run_main(
+            holdings, {"T2", "T3", "T4"}, [self._prior(t) for t in ("T2", "T3")]
+        )
+        self.assertEqual(status, 1)
+        self.assertIn("::error", out)
+        self.assertIn("1/4 holdings refreshed", out)
+        # ...but only after the partial feed, with prior items, was written.
+        self.assertEqual(sorted(item["id"] for item in payload["items"]), ["gnews:t2", "gnews:t3"])
+        self.assertEqual(payload["coverage"]["google"]["refreshed"], 1)
 
 
 if __name__ == "__main__":
