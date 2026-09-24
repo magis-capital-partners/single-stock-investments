@@ -86,6 +86,41 @@ export function parseComponent(row) {
   };
 }
 
+// The alert ordering, spelled exactly as migration 0020 indexes it. SQLite
+// matches an index on an expression only when the query uses the same
+// expression, so the route and the migration must not drift apart
+// (test-market-risk-alerts.mjs checks both).
+export const ALERT_SEVERITY_RANK_SQL = "CASE severity WHEN 'critical' THEN 0 WHEN 'high' THEN 1 WHEN 'medium' THEN 2 ELSE 3 END";
+
+const ALERT_COLUMNS = `alert_id, scope, symbol, opened_at, updated_at, closed_at,
+         state, severity, model_version, reason_codes_json, payload_json`;
+
+// Two statements rather than one with `(? = 0 OR closed_at IS NULL)`: a
+// parameterised OR hides the filter from the planner, so neither variant could
+// use an index. The open view seeks idx_market_risk_alerts_open_rank
+// (closed_at, rank, updated_at) and the full view scans
+// idx_market_risk_alerts_rank (rank, updated_at); both read rows already in
+// order and stop after LIMIT entries.
+export const OPEN_ALERTS_SQL = `
+  SELECT ${ALERT_COLUMNS}
+  FROM market_risk_alerts
+  WHERE closed_at IS NULL
+  ORDER BY ${ALERT_SEVERITY_RANK_SQL}, updated_at DESC
+  LIMIT ?
+`;
+
+export const ALL_ALERTS_SQL = `
+  SELECT ${ALERT_COLUMNS}
+  FROM market_risk_alerts
+  ORDER BY ${ALERT_SEVERITY_RANK_SQL}, updated_at DESC
+  LIMIT ?
+`;
+
+// A covering seek on closed_at IS NULL, so closed alerts are never read.
+export const OPEN_ALERT_COUNT_SQL = `
+  SELECT COUNT(*) AS open_count FROM market_risk_alerts WHERE closed_at IS NULL
+`;
+
 export const LATEST_CRITICALITY_SQL = `
   SELECT c.*
   FROM market_risk_latest_refs latest

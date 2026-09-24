@@ -12,17 +12,15 @@
 
 import { failure, json, requestId, requireDatabase } from "../../../../../_lib/http.js";
 import { reserveNonce, verifyPortfolioHmac } from "../../../../../_lib/portfolio.js";
+import { ORDER_LEASE_SECONDS, ORDER_OPEN_STATES, claimPurposeError, expireStalePreviewsStatement, leaseFloor } from "../../../../../_lib/command-channel.js";
 
-// States where a human or the broker still owes us something. Mirrors
-// OPEN_STATES in command_poller.py; the hub acts on `requested` and `approved`
-// and uses the rest to decide whether the desk is busy enough to poll fast.
-const OPEN_STATES = ["requested", "drafting", "previewed", "approved", "submitting"];
-
-// Long enough that a slow preview (live NBBO + whatIf, inside the hub's own
-// 10s quote freshness budget) never loses its lease mid-flight; short enough
-// that a bridge killed between claim and preview frees the ticket well within
-// the 120s approval TTL.
-const LEASE_SECONDS = 90;
+// States where a human or the broker still owes us something, and the lease.
+// Shared with the peek route (_lib/command-channel.js) so "claimable" cannot
+// mean one thing to the peek and another here. The hub acts on `requested` and
+// `approved` and uses the rest to decide whether the desk is busy enough to
+// poll fast.
+const OPEN_STATES = ORDER_OPEN_STATES;
+const LEASE_SECONDS = ORDER_LEASE_SECONDS;
 
 const MAX_BODY_BYTES = 16_384;
 const noStore = () => ({ "cache-control": "no-store" });
@@ -36,14 +34,19 @@ export async function onRequestPost(context) {
     }
     const authorization = await verifyPortfolioHmac(context.request, context.env, bytes);
     if (!authorization) return json({ error: "Unauthorized or expired signature.", request_id: id }, 401, noStore());
+
+    // Read the body before reserving the nonce, so a body that is not a claim is
+    // refused without writing anything (see claimPurposeError).
+    let payload;
+    try { payload = JSON.parse(new TextDecoder().decode(bytes) || "{}"); }
+    catch (_) { return json({ error: "Invalid JSON.", request_id: id }, 400, noStore()); }
+    const notClaim = claimPurposeError(payload);
+    if (notClaim) return json({ error: notClaim, request_id: id }, 422, noStore());
+
     const db = requireDatabase(context.env);
     if (!await reserveNonce(db, authorization.nonce)) {
       return json({ error: "Replay rejected.", request_id: id }, 409, noStore());
     }
-
-    let payload;
-    try { payload = JSON.parse(new TextDecoder().decode(bytes) || "{}"); }
-    catch (_) { return json({ error: "Invalid JSON.", request_id: id }, 400, noStore()); }
 
     const accountAlias = String(payload?.account_alias || "").trim();
     if (!accountAlias) return json({ error: "account_alias is required.", request_id: id }, 422, noStore());
@@ -51,7 +54,7 @@ export async function onRequestPost(context) {
 
     const now = new Date();
     const stamp = now.toISOString();
-    const leaseFloor = new Date(now.getTime() - LEASE_SECONDS * 1000).toISOString();
+    const floor = leaseFloor(now, LEASE_SECONDS);
     const placeholders = OPEN_STATES.map(() => "?").join(",");
 
     // Take the lease in SQL, not in JS. Reading then writing would let two
@@ -62,11 +65,29 @@ export async function onRequestPost(context) {
     // transmission, and for `approved` the hub ledger is the real serialisation
     // point -- GuardedOrderService.submit() refuses an intent that is no longer
     // Approved, so a duplicated claim produces a refusal, never a second order.
+    //
+    // Long-dead previews are expired first. Nothing advances a `previewed`
+    // ticket except a human approval inside its window, so one that was never
+    // approved used to stay open forever: re-leased here every 90s (a nonce and
+    // a lease write each time) and holding the browser's ticket poll. It can no
+    // longer be approved by then -- the window and the hub's token are both
+    // long gone -- so marking it `expired` closes nothing that was open.
+    //
+    // Housekeeping, so it runs on its own and may fail on its own: a refused
+    // expiry must never cost the bridge its claim.
+    try {
+      await expireStalePreviewsStatement(db, { accountAlias, now }).run();
+    } catch (error) {
+      console.error(JSON.stringify({
+        message: "stale preview expiry failed; claiming anyway",
+        request_id: id, error: error instanceof Error ? error.message : String(error),
+      }));
+    }
     await db.prepare(`UPDATE portfolio_order_requests
       SET claimed_at=?, claimed_by=?, updated_at=?
       WHERE account_alias=? AND state IN (${placeholders})
         AND (claimed_at IS NULL OR claimed_at < ?)`).bind(
-      stamp, claimant, stamp, accountAlias, ...OPEN_STATES, leaseFloor,
+      stamp, claimant, stamp, accountAlias, ...OPEN_STATES, floor,
     ).run();
 
     const rows = await db.prepare(`SELECT * FROM portfolio_order_requests

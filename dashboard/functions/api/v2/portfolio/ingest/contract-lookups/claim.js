@@ -10,10 +10,12 @@
 
 import { failure, json, requestId, requireDatabase } from "../../../../../_lib/http.js";
 import { reserveNonce, verifyPortfolioHmac } from "../../../../../_lib/portfolio.js";
+import { LOOKUP_BATCH, LOOKUP_CLAIMABLE_STATES, LOOKUP_LEASE_SECONDS, claimPurposeError, leaseFloor } from "../../../../../_lib/command-channel.js";
 
-const CLAIMABLE_STATES = ["requested", "resolving"];
-const LEASE_SECONDS = 60;
-const BATCH = 5;
+// Shared with the peek route so both agree on what is claimable.
+const CLAIMABLE_STATES = LOOKUP_CLAIMABLE_STATES;
+const LEASE_SECONDS = LOOKUP_LEASE_SECONDS;
+const BATCH = LOOKUP_BATCH;
 
 const MAX_BODY_BYTES = 16_384;
 const noStore = () => ({ "cache-control": "no-store" });
@@ -27,14 +29,19 @@ export async function onRequestPost(context) {
     }
     const authorization = await verifyPortfolioHmac(context.request, context.env, bytes);
     if (!authorization) return json({ error: "Unauthorized or expired signature.", request_id: id }, 401, noStore());
+
+    // Read the body before reserving the nonce, so a body that is not a claim is
+    // refused without writing anything (see claimPurposeError).
+    let payload;
+    try { payload = JSON.parse(new TextDecoder().decode(bytes) || "{}"); }
+    catch (_) { return json({ error: "Invalid JSON.", request_id: id }, 400, noStore()); }
+    const notClaim = claimPurposeError(payload);
+    if (notClaim) return json({ error: notClaim, request_id: id }, 422, noStore());
+
     const db = requireDatabase(context.env);
     if (!await reserveNonce(db, authorization.nonce)) {
       return json({ error: "Replay rejected.", request_id: id }, 409, noStore());
     }
-
-    let payload;
-    try { payload = JSON.parse(new TextDecoder().decode(bytes) || "{}"); }
-    catch (_) { return json({ error: "Invalid JSON.", request_id: id }, 400, noStore()); }
 
     const accountAlias = String(payload?.account_alias || "").trim();
     if (!accountAlias) return json({ error: "account_alias is required.", request_id: id }, 422, noStore());
@@ -42,7 +49,7 @@ export async function onRequestPost(context) {
 
     const now = new Date();
     const stamp = now.toISOString();
-    const leaseFloor = new Date(now.getTime() - LEASE_SECONDS * 1000).toISOString();
+    const floor = leaseFloor(now, LEASE_SECONDS);
     const placeholders = CLAIMABLE_STATES.map(() => "?").join(",");
 
     // Lease in SQL for the same reason as the order channel: read-then-write
@@ -51,7 +58,7 @@ export async function onRequestPost(context) {
     const claimable = await db.prepare(`SELECT lookup_id FROM portfolio_contract_lookups
       WHERE account_alias=? AND state IN (${placeholders})
         AND (claimed_at IS NULL OR claimed_at < ?)
-      ORDER BY created_at LIMIT ?`).bind(accountAlias, ...CLAIMABLE_STATES, leaseFloor, BATCH).all();
+      ORDER BY created_at LIMIT ?`).bind(accountAlias, ...CLAIMABLE_STATES, floor, BATCH).all();
     const ids = (claimable.results || []).map((row) => row.lookup_id);
     if (!ids.length) {
       return json({
