@@ -169,3 +169,96 @@ def test_the_workflow_learns_what_was_pushed(tmp_path, resolver, monkeypatch):
     origin_tip = git(tmp_path, "--git-dir", str(tmp_path / "origin.git"), "rev-parse", BRANCH)
     assert "pushed=true" in lines
     assert f"pushed_sha={origin_tip}" in lines
+    assert "head_moved=false" in lines
+
+
+def origin_tip(tmp_path: Path) -> str:
+    return git(tmp_path, "--git-dir", str(tmp_path / "origin.git"), "rev-parse", BRANCH)
+
+
+def test_an_agent_commit_pushed_during_resolution_is_never_overwritten(tmp_path, resolver, monkeypatch):
+    # The old fallback re-fetched the branch and pushed --force-with-lease with
+    # no expected value, i.e. "whatever I just fetched": the agent's commit.
+    refs = build_origin(tmp_path)
+    clone = tmp_path / "clone"
+    git(tmp_path, "clone", "-q", "--no-local", refs["origin"], str(clone))
+    point_resolver_at(resolver, monkeypatch, clone)
+    agent = tmp_path / "agent"
+    git(tmp_path, "clone", "-q", "--no-local", "--branch", BRANCH, refs["origin"], str(agent))
+    real_restore = resolver.restore_ticker_logs
+
+    def agent_pushes_mid_resolution(*args, **kwargs):
+        write(agent, "ABC/research/late.md", "agent work\n")
+        commit_all(agent, "agent: late commit")
+        git(agent, "push", "-q", "origin", BRANCH)
+        return real_restore(*args, **kwargs)
+
+    monkeypatch.setattr(resolver, "restore_ticker_logs", agent_pushes_mid_resolution)
+    # No expected SHA: the lease defaults to the tip the merge was built on.
+    with pytest.raises(Exception, match="moved away"):
+        resolver.resolve("1014", "ABC")
+    late = git(agent, "rev-parse", "HEAD")
+    assert origin_tip(tmp_path) == late, "the agent's commit was overwritten"
+
+
+def test_a_head_that_moved_since_the_gate_is_not_resolved(tmp_path, resolver, monkeypatch):
+    refs = build_origin(tmp_path)
+    clone = tmp_path / "clone"
+    git(tmp_path, "clone", "-q", "--no-local", refs["origin"], str(clone))
+    point_resolver_at(resolver, monkeypatch, clone)
+    output = tmp_path / "github_output"
+    monkeypatch.setattr(sys, "argv", ["resolve", "1014", "--ticker", "ABC",
+                                      "--expected-sha", refs["B"], "--github-output", str(output)])
+
+    resolver.main()
+
+    assert origin_tip(tmp_path) == refs["F"]
+    lines = output.read_text(encoding="utf-8").splitlines()
+    assert "head_moved=true" in lines and "pushed=false" in lines
+
+
+def test_a_long_lived_shallow_clone_is_never_shortened(tmp_path, resolver, monkeypatch):
+    # `git fetch --depth=N` can SHORTEN history. It is only for the merge job's
+    # near-empty checkout; a deeper clone (a workstation checkout) gets a plain
+    # fetch. Scaled down: history of 3 commits against start_depth=2.
+    refs = build_origin(tmp_path)
+    clone = tmp_path / "clone"
+    git(tmp_path, "clone", "-q", "--no-local", "--depth", "3", "--branch", "main", refs["origin"], str(clone))
+    assert git(clone, "rev-list", "--count", "HEAD") == "3"
+    point_resolver_at(resolver, monkeypatch, clone)
+    commands: list[list[str]] = []
+    real_run = resolver.run
+
+    def recording_run(cmd, **kwargs):
+        commands.append(list(cmd))
+        return real_run(cmd, **kwargs)
+
+    monkeypatch.setattr(resolver, "run", recording_run)
+
+    base = resolver.fetch_with_merge_base(BRANCH, start_depth=2)
+
+    assert base == refs["B"]
+    fetches = [cmd for cmd in commands if cmd[:2] == ["git", "fetch"]]
+    assert fetches, commands
+    assert not [cmd for cmd in fetches if any(arg.startswith("--depth") for arg in cmd)], fetches
+    assert int(git(clone, "rev-list", "--count", "origin/main")) >= 3
+
+
+def test_the_resolver_works_in_the_merge_jobs_checkout(tmp_path, resolver, monkeypatch):
+    # The merge job's checkout: depth 1, blobless (a promisor remote), sparse,
+    # with the conflicting file outside the sparse set.
+    refs = build_origin(tmp_path)
+    git(Path(refs["origin"]), "config", "uploadpack.allowFilter", "true")
+    git(Path(refs["origin"]), "config", "uploadpack.allowAnySHA1InWant", "true")
+    clone = tmp_path / "clone"
+    git(tmp_path, "clone", "-q", "--no-local", "--depth", "1", "--filter=blob:none", "--sparse",
+        "--branch", "main", refs["origin"], str(clone))
+    git(clone, "sparse-checkout", "set", "--no-cone", "/_system/scripts/", "/_system/memory/daily/",
+        "/_system/portfolio/research_events.jsonl", "/_system/research/milly_log.md")
+    point_resolver_at(resolver, monkeypatch, clone)
+
+    pushed = resolver.resolve("1014", "ABC")
+
+    assert pushed and origin_tip(tmp_path) == pushed
+    assert git(clone, "show", f"{pushed}:ABC/research/note.md") == "main rewrites the note"
+    assert git(clone, "show", f"{pushed}:ABC/research/other.md") == "b"

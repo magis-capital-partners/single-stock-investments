@@ -23,15 +23,32 @@ def run(cmd: list[str], *, check: bool = True) -> subprocess.CompletedProcess[st
     return proc
 
 
-def push_branch(head_ref: str) -> None:
-    push = run(["git", "push", "origin", f"HEAD:{head_ref}"], check=False)
+class HeadMoved(Exception):
+    """The PR branch is no longer at the SHA the resolution was built on."""
+
+
+def push_branch(head_ref: str, expected_sha: str) -> None:
+    """Push HEAD to the PR branch only while the branch is still at ``expected_sha``.
+
+    The lease is pinned to the SHA the merge was built on (in automerge, the
+    SHA the gate saw). The old fallback fetched the branch and pushed with a
+    bare --force-with-lease, whose expected value is the tip it had just
+    fetched: an agent commit pushed while the resolver ran was overwritten.
+    """
+    push = run(
+        ["git", "push", f"--force-with-lease=refs/heads/{head_ref}:{expected_sha}",
+         "origin", f"HEAD:refs/heads/{head_ref}"],
+        check=False,
+    )
     if push.returncode == 0:
         return
     combined = (push.stderr or "") + (push.stdout or "")
-    if "non-fast-forward" not in combined and "stale info" not in combined:
-        raise subprocess.CalledProcessError(push.returncode, push.args, push.stdout, push.stderr)
-    run(["git", "fetch", "origin", head_ref])
-    run(["git", "push", "origin", f"HEAD:{head_ref}", "--force-with-lease"])
+    if "stale info" in combined or "non-fast-forward" in combined or "fetch first" in combined:
+        raise HeadMoved(
+            f"{head_ref} moved away from {expected_sha[:12]} while its conflicts were being "
+            "resolved; not overwriting it."
+        )
+    raise subprocess.CalledProcessError(push.returncode, push.args, push.stdout, push.stderr)
 
 
 def gh_json(args: list[str]) -> dict:
@@ -122,6 +139,14 @@ def is_shallow() -> bool:
     return proc.stdout.strip() == "true"
 
 
+def local_commit_count() -> int:
+    proc = run(["git", "rev-list", "--count", "--all"], check=False)
+    try:
+        return int(proc.stdout.strip())
+    except ValueError:
+        return 0
+
+
 def merge_base(left: str, right: str) -> str | None:
     proc = run(["git", "merge-base", left, right], check=False)
     if proc.returncode != 0:
@@ -139,16 +164,20 @@ def fetch_with_merge_base(head_ref: str, *, start_depth: int = 64, max_depth: in
     of the branch into that clone is also the expensive kind: git walks the
     branch all the way to the root commit.
 
-    So in a shallow clone both refs are fetched to a bounded depth and deepened
-    until the fork point is local, with ``--unshallow`` as the last resort. A
-    full clone just fetches. Returns the merge-base; exits if there is none.
+    So in a nearly empty shallow clone -- the merge job's depth-1 checkout --
+    both refs are fetched to a bounded depth and deepened until the fork point
+    is local, with ``--unshallow`` as the last resort. ``--depth`` can also
+    SHORTEN history, so it is used only while the whole local history is
+    shorter than ``start_depth`` (nothing there to shorten); any other clone,
+    such as a long-lived workstation checkout, gets a plain fetch. Returns the
+    merge-base; exits if there is none.
     """
     refspecs = [
         "+refs/heads/main:refs/remotes/origin/main",
         f"+refs/heads/{head_ref}:refs/remotes/origin/{head_ref}",
     ]
     branch_ref = f"origin/{head_ref}"
-    if not is_shallow():
+    if not is_shallow() or local_commit_count() > start_depth:
         run(["git", "fetch", "origin", *refspecs])
     else:
         depth = start_depth
@@ -170,7 +199,7 @@ def unmerged_paths() -> list[str]:
     return [line.strip() for line in proc.stdout.splitlines() if line.strip()]
 
 
-def resolve(pr_number: str, ticker: str | None = None) -> str | None:
+def resolve(pr_number: str, ticker: str | None = None, expected_sha: str | None = None) -> str | None:
     """Merge main into the PR branch and push it.
 
     Returns the pushed head SHA, or None when there was nothing to push. The
@@ -178,6 +207,10 @@ def resolve(pr_number: str, ticker: str | None = None) -> str | None:
     through CI, and a squash of it would land untested content on main (PRs
     #1017 and #1021 were squashed seconds after this push, with zero check runs
     on the merged head).
+
+    ``expected_sha`` is the head the caller vetted (automerge passes the gated
+    SHA). The resolution is built only on that head and pushed only while the
+    branch is still there; otherwise HeadMoved is raised and nothing is pushed.
     """
     ticker = ticker or infer_ticker(pr_number)
     data = gh_json(["pr", "view", pr_number, "--json", "headRefName,mergeable"])
@@ -194,6 +227,8 @@ def resolve(pr_number: str, ticker: str | None = None) -> str | None:
 
     branch_ref = f"origin/{head_ref}"
     original_tip = run(["git", "rev-parse", "--verify", branch_ref]).stdout.strip()
+    if expected_sha and original_tip != expected_sha:
+        raise HeadMoved(f"{head_ref} is at {original_tip[:12]}, not the vetted {expected_sha[:12]}.")
     daily_path = latest_daily_log()
     daily_rel = str(daily_path.relative_to(ROOT)).replace("\\", "/") if daily_path else None
     daily_section = None
@@ -234,15 +269,16 @@ def resolve(pr_number: str, ticker: str | None = None) -> str | None:
     if new_tip == original_tip:
         print(f"PR #{pr_number}: merging main changed nothing; nothing to push.")
         return None
-    push_branch(head_ref)
+    push_branch(head_ref, expected_sha or original_tip)
     print(f"Pushed conflict resolution for PR #{pr_number} ({ticker}) at {new_tip}")
     return new_tip
 
 
-def write_github_output(path: str, pushed_sha: str | None) -> None:
+def write_github_output(path: str, pushed_sha: str | None, *, head_moved: bool = False) -> None:
     with open(path, "a", encoding="utf-8") as handle:
         handle.write(f"pushed={'true' if pushed_sha else 'false'}\n")
         handle.write(f"pushed_sha={pushed_sha or ''}\n")
+        handle.write(f"head_moved={'true' if head_moved else 'false'}\n")
 
 
 def main() -> None:
@@ -252,10 +288,21 @@ def main() -> None:
     parser.add_argument(
         "--github-output",
         default="",
-        help="Append pushed=true|false and pushed_sha=<sha> to this file (a step's $GITHUB_OUTPUT).",
+        help="Append pushed, pushed_sha and head_moved to this file (a step's $GITHUB_OUTPUT).",
+    )
+    parser.add_argument(
+        "--expected-sha",
+        default="",
+        help="Only resolve and push while the PR branch is at this SHA (automerge passes the gated SHA).",
     )
     args = parser.parse_args()
-    pushed_sha = resolve(args.pr_number, args.ticker)
+    try:
+        pushed_sha = resolve(args.pr_number, args.ticker, args.expected_sha or None)
+    except HeadMoved as moved:
+        print(f"PR #{args.pr_number}: {moved} Its own run gates the new head.")
+        if args.github_output:
+            write_github_output(args.github_output, None, head_moved=True)
+        return
     if args.github_output:
         write_github_output(args.github_output, pushed_sha)
 
