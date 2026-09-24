@@ -9,10 +9,10 @@
 
 | Field | Value |
 |-------|-------|
-| evidence_hash | `ee86404add4ae31fc219c44a5f9c91516cf7ad9103eb3058f24ce3f8691be2b1` | <!-- pragma: allowlist secret -->
-| input_sha | `bcd068dd9613ef819a2c0433b3fcca83c18c427a` |
+| evidence_hash | `c9f744ffd5408bf7e45536edc9be602f518210262d45305ccc1b96e26ea6d4c2` | <!-- pragma: allowlist secret -->
+| input_sha | `9a0b24251e11002a3891821eefc71e4b1945481d` |
 | component_fingerprint | `4080c692e2d41ed5e8c8bb19cc5abb21e04b5d945b4f3f58c4832093f0829480` |
-| contract_hash | `de604b303ec62b1ca0dce4fefe6bf6bc20089600fb78109b4b4b39320d6282d5` |
+| contract_hash | `d434edd8a9cef1c4169933554387a22a0e323c1ac0f65d88f3f0e75d50eb7931` |
 
 ## Epistemic loop
 
@@ -45,7 +45,7 @@ Observation `77414d5a` verified against `ASML/research/valuation_fact_ledger.jso
 ## Draft
 
 - **Path:** `ASML/research/falsifier_drafts/290e1242482eb2878775b1a4.json`
-- **Spec ID:** `asml-opbiz-oe-2026fy-v4` (revision 2)
+- **Spec ID:** `asml-opbiz-oe-2026fy-v4` (revision 3)
 - **Status:** `awaiting_review`
 - **Metric:** normalized_owner_earnings FY2026 vs low-case anchor 13,024.816 USD millions
 - **Adapter:** fact_ledger / normalized_owner_earnings_m
