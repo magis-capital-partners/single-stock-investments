@@ -322,6 +322,17 @@ def test_quota_error_defers_the_remaining_pending_stages(tmp_path):
     assert not sync.failed()
 
 
+def test_quota_json_on_stdout_defers_despite_a_stderr_notice(tmp_path):
+    notice = "[WARNING] The version of Wrangler you are using is now out-of-date.\n"
+    quota_on_stdout = done(1, stdout=WRANGLER_QUOTA_ERROR, stderr=notice)
+    cloud = FakeCloud(seed_report=PENDING_SEED, executes={"sleeve_book.sql": quota_on_stdout})
+    sync = sync_with(cloud, tmp_path)
+    sync.run()
+    assert statuses(sync)["sleeve book"] == "deferred"
+    assert statuses(sync)["dashboard seed"] == "deferred"
+    assert not sync.failed()
+
+
 def test_after_the_quota_a_stage_with_nothing_pending_stays_green(tmp_path):
     cloud = FakeCloud(executes={"sleeve_book.sql": QUOTA_ERROR})  # seed export: unchanged
     sync = sync_with(cloud, tmp_path)

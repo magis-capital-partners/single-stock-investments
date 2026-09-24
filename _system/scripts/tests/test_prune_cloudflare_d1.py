@@ -346,6 +346,22 @@ def test_quota_exhaustion_exits_75_with_metrics(monkeypatch, capsys):
     assert json.loads(last.split(" ", 1)[1])["status"] == "quota"
 
 
+def test_quota_json_on_stdout_defers_despite_a_stderr_notice(monkeypatch, capsys):
+    # wrangler --json prints its error on STDOUT; an update notice on stderr
+    # used to be the only text classified, so the quota read as a failure.
+    notice = (
+        "[WARNING] The version of Wrangler you are using is now out-of-date.\n"
+        "Please update to the latest version to prevent critical errors.\n"
+    )
+    monkeypatch.setattr(
+        pruner.subprocess, "run",
+        lambda *a, **k: _completed(stdout=WRANGLER_QUOTA_ERROR, stderr=notice, code=1),
+    )
+    assert pruner.main(["--config", "cfg.jsonc"]) == pruner.QUOTA_EXIT_CODE
+    last = capsys.readouterr().out.strip().splitlines()[-1]
+    assert json.loads(last.split(" ", 1)[1])["status"] == "quota"
+
+
 def test_a_sql_error_labelled_7500_fails_instead_of_deferring(monkeypatch, capsys):
     # D1 reports every SQL error as code 7500. Read as "quota", a retention
     # bug would exit 75, defer the seed, and repeat every day unnoticed.

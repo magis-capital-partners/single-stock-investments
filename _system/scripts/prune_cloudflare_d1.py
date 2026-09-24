@@ -300,7 +300,10 @@ class WranglerD1:
         ]
         result = subprocess.run(command, capture_output=True, text=True, check=False)
         if result.returncode:
-            detail = (result.stderr or result.stdout).strip()[-2_000:]
+            # Both streams: --json errors (the quota among them) go to STDOUT,
+            # and a wrangler update/deprecation notice on stderr must not
+            # hide them.
+            detail = ((result.stderr or "") + "\n" + (result.stdout or "")).strip()[-4_000:]
             raise RuntimeError(f"Wrangler D1 command failed: {detail}")
         statements = _statements(_decode_json(result.stdout))
         self.metrics.record(sql, statements)
