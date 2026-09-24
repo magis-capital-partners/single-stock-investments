@@ -22,6 +22,16 @@ cannot be precomputed or cached, and the whole preview -> human -> submit round
 trip has to fit inside two minutes *including* both poll latencies. A cron would
 miss every time. While a ticket is *recently* open the loop runs at
 ACTIVE_POLL_SECONDS; otherwise it backs off to IDLE_POLL_SECONDS.
+
+Every tick peeks before it claims. A claim is a signed POST that reserves a nonce
+row in D1 before it looks for work, so claiming both queues on every idle tick
+wrote two rows every 15 seconds -- ~34k billed row writes a day plus ~10k more
+when retention deleted them, most of the free tier's 100k, to learn that there
+was nothing to do. The peek is signed but read-only and reserves no nonce (see
+dashboard/functions/api/v2/portfolio/ingest/peek.js for why a replay is
+harmless), so an idle tick now writes nothing. A queue is claimed only when the
+peek says it has claimable work, which is exactly when the claim would have
+returned something, so the loop's behaviour with work in hand is unchanged.
 """
 from __future__ import annotations
 
@@ -41,6 +51,13 @@ from .publisher import signed_headers
 
 ACTIVE_POLL_SECONDS = 1.0
 IDLE_POLL_SECONDS = 15.0
+
+PEEK_PATH = "/api/v2/portfolio/ingest/peek"
+# How long to stop asking once the edge says it has no peek route (404/405, or
+# a Pages fallback page instead of JSON). Until the edge half deploys, the loop
+# claims directly -- exactly its old behaviour -- and re-probes this often, so
+# the two halves can ship in either order and the saving starts on its own.
+PEEK_RETRY_SECONDS = 600.0
 # States where a human or the broker still owes us something, so the desk is
 # "open" and the loop must stay responsive.
 OPEN_STATES = {"requested", "drafting", "previewed", "approved", "submitting"}
@@ -91,6 +108,10 @@ def is_live_work(row: dict[str, Any], now: datetime) -> bool:
     return age is not None and age <= LIVE_REQUEST_SECONDS
 
 
+class PeekUnavailable(RuntimeError):
+    """The edge has no peek route yet, or answered with something that is not a peek."""
+
+
 @dataclass(frozen=True)
 class ChannelConfig:
     base_url: str
@@ -120,6 +141,30 @@ class OrderCommandChannel:
         with urllib.request.urlopen(request, timeout=self.config.timeout) as response:
             return json.loads(response.read() or b"{}")
 
+    def peek(self) -> dict[str, int]:
+        """Ask whether a claim would find work, without reserving a nonce.
+
+        Raises PeekUnavailable when the edge predates the route: Pages answers a
+        POST to a path with no Function 405 (404 is treated the same), and a GET
+        would get the SPA's index.html with 200, which is why this is a POST and
+        why a non-JSON answer also counts as "not deployed".
+        """
+        try:
+            payload = self._call(PEEK_PATH, {"account_alias": self.config.account_alias})
+        except urllib.error.HTTPError as exc:
+            if exc.code in (404, 405):
+                raise PeekUnavailable(f"peek route answered HTTP {exc.code}") from exc
+            raise
+        except ValueError as exc:  # json.JSONDecodeError: a page, not a peek
+            raise PeekUnavailable("peek route answered with a non-JSON body") from exc
+        claimable = payload.get("claimable") if isinstance(payload, dict) else None
+        if not isinstance(claimable, dict):
+            raise PeekUnavailable("peek response carried no claimable counts")
+        return {
+            "order_requests": int(claimable.get("order_requests") or 0),
+            "contract_lookups": int(claimable.get("contract_lookups") or 0),
+        }
+
     def claim(self) -> list[dict[str, Any]]:
         """Take pending requests for this account. Claiming is idempotent."""
         payload = self._call("/api/v2/portfolio/ingest/order-requests/claim",
@@ -144,7 +189,7 @@ class OrderCommandChannel:
 class OrderCommandLoop:
     def __init__(self, service: GuardedOrderService, channel: OrderCommandChannel, *,
                  account_alias: str, live_enabled: bool = False, options_enabled: bool = False,
-                 sessions: Any = None):
+                 sessions: Any = None, clock=time.monotonic):
         # `sessions` is a GatewaySessionFactory. When present the loop holds NO
         # standing IB connection: it polls D1 over HTTPS, and opens a Gateway
         # session only around the broker work a claimed ticket actually needs
@@ -160,6 +205,10 @@ class OrderCommandLoop:
         # different instrument with different failure modes, and one flag for
         # both would mean the second decision got made by accident.
         self.options_enabled = options_enabled
+        # Monotonic time before which the peek is not tried again, after the
+        # edge said it has no peek route. 0 means "try it".
+        self._clock = clock
+        self._peek_retry_at = 0.0
 
     # ------------------------------------------------------------------ loop
 
@@ -187,8 +236,18 @@ class OrderCommandLoop:
         fast window is not abandoned -- it is served at IDLE_POLL_SECONDS, which
         is still well inside the 120s approval TTL.
         """
-        requests = self.channel.claim()
-        lookups = self._claim_lookups()
+        work = self._peek()
+        if work is None:
+            # No peek available (edge not deployed yet, or it failed this tick):
+            # claim both queues, which is what every tick used to do.
+            requests = self.channel.claim()
+            lookups = self._claim_lookups()
+        else:
+            # Claim only a queue the peek says has claimable work. When it says
+            # zero, the claim would have returned nothing, so skipping it changes
+            # no outcome -- it only skips the nonce row the claim would write.
+            requests = self.channel.claim() if work["order_requests"] > 0 else []
+            lookups = self._claim_lookups() if work["contract_lookups"] > 0 else []
         actionable = [row for row in requests if row.get("state") in ACTIONABLE_STATES]
         now = datetime.now(timezone.utc)
         live_desk = any(
@@ -241,6 +300,24 @@ class OrderCommandLoop:
                 yield broker
             finally:
                 self.service.broker = previous
+
+    def _peek(self) -> dict[str, int] | None:
+        """The peek's claimable counts, or None to fall back to claiming both queues."""
+        peek = getattr(self.channel, "peek", None)
+        if peek is None or self._clock() < self._peek_retry_at:
+            return None
+        try:
+            return peek()
+        except PeekUnavailable as exc:
+            self._peek_retry_at = self._clock() + PEEK_RETRY_SECONDS
+            print(f"order command peek unavailable ({exc}); claiming directly for "
+                  f"{PEEK_RETRY_SECONDS:.0f}s", flush=True)
+            return None
+        except Exception as exc:
+            # Anything else (a 5xx, a timeout): this tick claims directly, which is
+            # never worse than the loop before the peek existed.
+            print(f"order command peek failed: {exc}; claiming directly this tick", flush=True)
+            return None
 
     def _claim_lookups(self) -> list[dict[str, Any]]:
         try:

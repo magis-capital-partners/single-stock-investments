@@ -12,17 +12,15 @@
 
 import { failure, json, requestId, requireDatabase } from "../../../../../_lib/http.js";
 import { reserveNonce, verifyPortfolioHmac } from "../../../../../_lib/portfolio.js";
+import { ORDER_LEASE_SECONDS, ORDER_OPEN_STATES, leaseFloor } from "../../../../../_lib/command-channel.js";
 
-// States where a human or the broker still owes us something. Mirrors
-// OPEN_STATES in command_poller.py; the hub acts on `requested` and `approved`
-// and uses the rest to decide whether the desk is busy enough to poll fast.
-const OPEN_STATES = ["requested", "drafting", "previewed", "approved", "submitting"];
-
-// Long enough that a slow preview (live NBBO + whatIf, inside the hub's own
-// 10s quote freshness budget) never loses its lease mid-flight; short enough
-// that a bridge killed between claim and preview frees the ticket well within
-// the 120s approval TTL.
-const LEASE_SECONDS = 90;
+// States where a human or the broker still owes us something, and the lease.
+// Shared with the peek route (_lib/command-channel.js) so "claimable" cannot
+// mean one thing to the peek and another here. The hub acts on `requested` and
+// `approved` and uses the rest to decide whether the desk is busy enough to
+// poll fast.
+const OPEN_STATES = ORDER_OPEN_STATES;
+const LEASE_SECONDS = ORDER_LEASE_SECONDS;
 
 const MAX_BODY_BYTES = 16_384;
 const noStore = () => ({ "cache-control": "no-store" });
@@ -51,7 +49,7 @@ export async function onRequestPost(context) {
 
     const now = new Date();
     const stamp = now.toISOString();
-    const leaseFloor = new Date(now.getTime() - LEASE_SECONDS * 1000).toISOString();
+    const floor = leaseFloor(now, LEASE_SECONDS);
     const placeholders = OPEN_STATES.map(() => "?").join(",");
 
     // Take the lease in SQL, not in JS. Reading then writing would let two
@@ -66,7 +64,7 @@ export async function onRequestPost(context) {
       SET claimed_at=?, claimed_by=?, updated_at=?
       WHERE account_alias=? AND state IN (${placeholders})
         AND (claimed_at IS NULL OR claimed_at < ?)`).bind(
-      stamp, claimant, stamp, accountAlias, ...OPEN_STATES, leaseFloor,
+      stamp, claimant, stamp, accountAlias, ...OPEN_STATES, floor,
     ).run();
 
     const rows = await db.prepare(`SELECT * FROM portfolio_order_requests

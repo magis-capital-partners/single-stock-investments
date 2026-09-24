@@ -10,10 +10,12 @@
 
 import { failure, json, requestId, requireDatabase } from "../../../../../_lib/http.js";
 import { reserveNonce, verifyPortfolioHmac } from "../../../../../_lib/portfolio.js";
+import { LOOKUP_BATCH, LOOKUP_CLAIMABLE_STATES, LOOKUP_LEASE_SECONDS, leaseFloor } from "../../../../../_lib/command-channel.js";
 
-const CLAIMABLE_STATES = ["requested", "resolving"];
-const LEASE_SECONDS = 60;
-const BATCH = 5;
+// Shared with the peek route so both agree on what is claimable.
+const CLAIMABLE_STATES = LOOKUP_CLAIMABLE_STATES;
+const LEASE_SECONDS = LOOKUP_LEASE_SECONDS;
+const BATCH = LOOKUP_BATCH;
 
 const MAX_BODY_BYTES = 16_384;
 const noStore = () => ({ "cache-control": "no-store" });
@@ -42,7 +44,7 @@ export async function onRequestPost(context) {
 
     const now = new Date();
     const stamp = now.toISOString();
-    const leaseFloor = new Date(now.getTime() - LEASE_SECONDS * 1000).toISOString();
+    const floor = leaseFloor(now, LEASE_SECONDS);
     const placeholders = CLAIMABLE_STATES.map(() => "?").join(",");
 
     // Lease in SQL for the same reason as the order channel: read-then-write
@@ -51,7 +53,7 @@ export async function onRequestPost(context) {
     const claimable = await db.prepare(`SELECT lookup_id FROM portfolio_contract_lookups
       WHERE account_alias=? AND state IN (${placeholders})
         AND (claimed_at IS NULL OR claimed_at < ?)
-      ORDER BY created_at LIMIT ?`).bind(accountAlias, ...CLAIMABLE_STATES, leaseFloor, BATCH).all();
+      ORDER BY created_at LIMIT ?`).bind(accountAlias, ...CLAIMABLE_STATES, floor, BATCH).all();
     const ids = (claimable.results || []).map((row) => row.lookup_id);
     if (!ids.length) {
       return json({
