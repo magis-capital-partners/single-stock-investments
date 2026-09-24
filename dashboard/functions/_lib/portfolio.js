@@ -326,7 +326,7 @@ export function ownerScope(url) {
   return owner;
 }
 
-export async function loadPortfolio(env, owner = "all") {
+export async function loadPortfolio(env, owner = "all", { now = Date.now() } = {}) {
   const db = requireDatabase(env);
   const run = await db.prepare(`SELECT * FROM portfolio_source_runs
     WHERE source='ibkr' AND complete=1 ORDER BY as_of DESC LIMIT 1`).first();
@@ -389,7 +389,7 @@ export async function loadPortfolio(env, owner = "all") {
     // query keeps returning the same run forever and every figure on the page
     // would present as current. Age is stated so the page can say otherwise --
     // a feed that has stopped must not look identical to one that is live.
-    status: "complete", scope: owner, snapshot: { ...run, ...snapshotAge(run) },
+    status: "complete", scope: owner, snapshot: { ...run, ...snapshotFreshness(run, now) },
     account_values: values.results || [], positions, cash_events: cash.results || [],
     broker_position_count: brokerPositionCount, owner_position_count: positions.length,
     allocation_status: allocationState,
@@ -442,6 +442,66 @@ function snapshotAge(run, now = Date.now()) {
   if (!Number.isFinite(asOf)) return { age_seconds: null, stale: null };
   const age = Math.max(0, Math.round((now - asOf) / 1000));
   return { age_seconds: age, stale: age > STALE_AFTER_SECONDS };
+}
+
+// An end-of-day statement is judged against the session calendar instead.
+//
+// Once Flex carries NetLiquidation, each weekday's statement is published once,
+// ~18:15 ET (22:15-23:15 UTC), and nothing newer can exist until the next
+// session's statement. Measured with the collector's two-hour clock it would
+// read "stopped" about 22 hours of every day and all weekend -- a feed working
+// exactly as designed presented as a dead one. So an EOD snapshot is fresh
+// until the next weekday session's statement is due, plus grace: through 05:00
+// UTC on the day after that next session. From a Thursday statement that is
+// ~31h; from a Friday statement, across the weekend, ~79h. A market holiday is
+// not modelled -- the snapshot reads stale for that day, which is true.
+const EOD_DEADLINE_HOUR_UTC = 5;
+const DAY_MS = 86_400_000;
+
+function parseCompleteness(raw) {
+  if (raw && typeof raw === "object") return raw;
+  try { return JSON.parse(raw || "{}") || {}; } catch (_) { return {}; }
+}
+
+function nextWeekdayUtc(dayStartMs) {
+  let next = dayStartMs + DAY_MS;
+  while ([0, 6].includes(new Date(next).getUTCDay())) next += DAY_MS;
+  return next;
+}
+
+/**
+ * How stale this snapshot is, by the clock its own feed runs on.
+ *
+ * `feed` is "flex_eod" for a statement flex_ingest published (it declares
+ * completeness.feed, and older Flex runs carry a session_date), else "live" --
+ * the dead collector's cadence, which keeps its two-hour rule.
+ */
+export function snapshotFreshness(run, now = Date.now()) {
+  const asOf = Date.parse(run?.as_of || "");
+  const completeness = parseCompleteness(run?.completeness_json ?? run?.completeness);
+  const sessionDate = /^\d{4}-\d{2}-\d{2}$/.test(String(completeness.session_date || ""))
+    ? completeness.session_date : null;
+  const eod = completeness.feed === "flex_eod" || sessionDate !== null;
+  if (!Number.isFinite(asOf)) {
+    return { feed: eod ? "flex_eod" : "live", session_date: sessionDate, age_seconds: null, stale: null, stale_after: null };
+  }
+  const age = Math.max(0, Math.round((now - asOf) / 1000));
+  if (!eod) {
+    return {
+      feed: "live", session_date: null, age_seconds: age, stale: age > STALE_AFTER_SECONDS,
+      stale_after: new Date(asOf + STALE_AFTER_SECONDS * 1000).toISOString(),
+    };
+  }
+  const sessionStart = sessionDate ? Date.parse(`${sessionDate}T00:00:00Z`) : Date.UTC(
+    new Date(asOf).getUTCFullYear(), new Date(asOf).getUTCMonth(), new Date(asOf).getUTCDate());
+  const deadline = nextWeekdayUtc(sessionStart) + DAY_MS + EOD_DEADLINE_HOUR_UTC * 3_600_000;
+  return {
+    feed: "flex_eod",
+    session_date: sessionDate || new Date(sessionStart).toISOString().slice(0, 10),
+    age_seconds: age,
+    stale: now > deadline,
+    stale_after: new Date(deadline).toISOString(),
+  };
 }
 
 export { snapshotAge, STALE_AFTER_SECONDS };

@@ -28,6 +28,15 @@ account values and the snapshot is complete. Margin tags stay absent until a
 Flex section actually states them. Adding that equity-summary section is a
 Client Portal change to the positions query; this path only reads the XML
 already on disk.
+
+An equity summary is one row *per report date*, and a query whose period spans
+more than one day carries several. The NAV is the one at the latest report
+date -- not the first row in the file, which is the oldest when IBKR lists them
+in ascending order. The same holds for several ChangeInNAV rows.
+
+The snapshot declares itself `completeness.feed = "flex_eod"` with the
+statement's session date, so the read model can judge its age against the
+next expected session close instead of the dead collector's two-hour clock.
 """
 from __future__ import annotations
 
@@ -156,6 +165,10 @@ def build_account_snapshot(
         "complete": has_nav,
         "completeness": {
             "positions": True, "account_summary": has_nav, "open_orders": False, "pnl": False,
+            # Read by the edge (snapshotFreshness in _lib/portfolio.js): an
+            # end-of-day statement is fresh until the next session's statement
+            # is due, not for two hours.
+            "feed": "flex_eod",
             "session_date": parsed["session_date"],
             "note": (
                 "Flex equity summary states net liquidation. Margin tags are absent until a Flex section states them."
@@ -254,7 +267,9 @@ def _account_values(parsed: dict[str, Any], *, base_currency: str) -> list[dict[
         if _in_base(row.get("currency"), base_currency) and _decimal(_pick_amount(row, "total")) is not None
     ]
     if summaries:
-        row = summaries[0]
+        # The latest report date, not the first row: a multi-day period lists
+        # every date, oldest first.
+        row = _latest(summaries, "reportDate", "toDate", "date")
         currency = base_currency
         values = [_value_row("NetLiquidation", _decimal(_pick_amount(row, "total")), currency=currency, as_of=as_of)]
         cash = _decimal(_pick_amount(row, "cash"))
@@ -266,16 +281,47 @@ def _account_values(parsed: dict[str, Any], *, base_currency: str) -> list[dict[
             values.append(_value_row("GrossPositionValue", sum(stated, Decimal(0)), currency=currency, as_of=as_of))
         return values
 
-    for row in parsed.get("nav_rows") or []:
-        amount = _decimal(row.get("net_liquidation"))
-        if amount is None or not _in_base(row.get("currency"), base_currency):
-            continue
-        values = [_value_row("NetLiquidation", amount, currency=base_currency, as_of=as_of)]
+    navs = [
+        row for row in parsed.get("nav_rows") or []
+        if _decimal(row.get("net_liquidation")) is not None and _in_base(row.get("currency"), base_currency)
+    ]
+    if navs:
+        row = _latest(navs, "to_date")
+        values = [_value_row("NetLiquidation", _decimal(row.get("net_liquidation")), currency=base_currency, as_of=as_of)]
         cash = _decimal(row.get("cash"))
         if cash is not None:
             values.append(_value_row("TotalCashValue", cash, currency=base_currency, as_of=as_of))
         return values
     return []
+
+
+def _report_date_key(raw: Any) -> str:
+    """A sortable YYYYMMDD for the date formats a Flex query can be set to emit.
+
+    yyyyMMdd and yyyy-MM-dd (optionally with a time) sort as-is once the
+    separators go; MM/dd/yyyy is re-ordered. Anything unrecognised sorts before
+    every real date, so a row that states its date always beats one that does
+    not.
+    """
+    text = str(raw or "").strip()
+    if not text:
+        return ""
+    head = text.split(";")[0].split(" ")[0].split("T")[0]
+    if "/" in head:
+        parts = head.split("/")
+        if len(parts) == 3 and len(parts[2]) == 4 and all(part.isdigit() for part in parts):
+            return f"{parts[2]}{int(parts[0]):02d}{int(parts[1]):02d}"
+        return ""
+    digits = head.replace("-", "")
+    return digits if len(digits) == 8 and digits.isdigit() else ""
+
+
+def _latest(rows: list[dict[str, Any]], *date_keys: str) -> dict[str, Any]:
+    """The row with the latest stated date; later in the file wins a tie."""
+    def key(item: tuple[int, dict[str, Any]]) -> tuple[str, int]:
+        index, row = item
+        return (_report_date_key(_pick_amount(row, *date_keys)), index)
+    return max(enumerate(rows), key=key)[1]
 
 
 def _pick_amount(row: dict[str, Any], *keys: str) -> Any:

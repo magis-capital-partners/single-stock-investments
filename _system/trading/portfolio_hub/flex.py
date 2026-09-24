@@ -92,6 +92,9 @@ def parse_flex_xml(xml: bytes | str, *, account_alias: str, source_run_id: str |
         "currency": row.get("currency"),
         "net_liquidation": _pick(row, "total", "endingValue", "netLiquidation"),
         "cash": _pick(row, "cash", "cashBalance"), "stock": row.get("stock"), "options": row.get("options"),
+        # The period end the ending value is stated at, so a statement carrying
+        # more than one ChangeInNAV row can be read at its latest date.
+        "to_date": _pick(row, "toDate", "reportDate"),
     } for row in _rows(root, "ChangeInNAV")]
     # EquitySummaryByReportDateInBase is the dated row. The parent
     # EquitySummaryInBase element is only a container and has no amounts.
