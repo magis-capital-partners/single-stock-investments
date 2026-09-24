@@ -32,7 +32,13 @@
 -- The route's SQL works with or without these indexes -- it is only the row
 -- count that changes -- so a deploy that ships the code before this migration
 -- lands (a quota-deferred migration stage) degrades to the old cost, not to an
--- error. Retention for this table is added separately (0019).
+-- error.
+--
+-- This migration adds indexes only. It does not bound the table: retention for
+-- market_risk_alerts belongs to the deploy-time retention script
+-- (_system/scripts/prune_cloudflare_d1.py) and is changed separately from this
+-- file. Nothing here depends on that change or on any other migration landing
+-- first.
 
 CREATE INDEX IF NOT EXISTS idx_market_risk_alerts_rank
   ON market_risk_alerts(
