@@ -58,8 +58,16 @@ runs:
       run: |
         set -euo pipefail
         npm --prefix dashboard/cloudflare run check
-        python -m pip install --disable-pip-version-check pytest jsonschema
-        python -m pytest -q _system/scripts/test_build_cloudflare_pages_site.py _system/trading/portfolio_hub/tests \n          _system/scripts/tests/test_dashboard_d1_seed_budget.py \n          _system/scripts/tests/test_prune_cloudflare_d1.py \n          _system/scripts/tests/test_deploy_d1_sync.py
+        # pyyaml: test_dashboard_deploy_workflow.py parses this action and the
+        # workflow; without it those structural checks would silently skip.
+        python -m pip install --disable-pip-version-check pytest jsonschema pyyaml
+        python -m pytest -q \
+          _system/scripts/test_build_cloudflare_pages_site.py \
+          _system/trading/portfolio_hub/tests \
+          _system/scripts/tests/test_dashboard_d1_seed_budget.py \
+          _system/scripts/tests/test_prune_cloudflare_d1.py \
+          _system/scripts/tests/test_deploy_d1_sync.py \
+          _system/scripts/tests/test_dashboard_deploy_workflow.py
 
     - name: Build Cloudflare-safe dashboard artifact
       shell: bash

@@ -7,6 +7,7 @@ mis-wired output cannot pass on a lucky substring.
 from __future__ import annotations
 
 import re
+import shlex
 from pathlib import Path
 
 import pytest
@@ -17,6 +18,11 @@ ROOT = Path(__file__).resolve().parents[3]
 WORKFLOW = ROOT / ".github" / "workflows" / "dashboard-pages.yml"
 ACTION = ROOT / ".github" / "actions" / "deploy-cloudflare-dashboard" / "action.yml"
 
+# A repo path as a shell word: not the tail of another path ("../dashboard",
+# "$RUNNER_TEMP/..."), and not something the job itself creates at runtime.
+REPO_PATH = re.compile(r"(?<![\w$./-])((?:_system|\.github|dashboard)/[A-Za-z0-9_.\-/\[\]]+)")
+CREATED_AT_RUNTIME = ("node_modules", "/generated", "_cf_project")
+
 
 def load(path: Path) -> dict:
     return yaml.safe_load(path.read_text(encoding="utf-8"))
@@ -24,6 +30,69 @@ def load(path: Path) -> dict:
 
 def shape(key: str) -> str:
     return re.sub(r"\$\{\{.*?\}\}", "*", key)
+
+
+def steps_of(path: Path) -> list[tuple[str, dict]]:
+    data = load(path)
+    if path == ACTION:
+        return [("action", step) for step in data["runs"]["steps"]]
+    return [(name, step) for name, job in data["jobs"].items() for step in job.get("steps") or []]
+
+
+def run_blocks() -> list[tuple[str, str]]:
+    blocks = []
+    for path in (ACTION, WORKFLOW):
+        for where, step in steps_of(path):
+            if "run" in step:
+                blocks.append((f"{path.name} {where}: {step.get('name') or step.get('id') or '?'}", step["run"]))
+    assert len(blocks) > 10
+    return blocks
+
+
+def test_no_run_block_contains_a_literal_backslash_n():
+    # 2026-09-25: "tests \n          _system/..." reached action.yml where a
+    # line continuation was meant; bash passed "n" to pytest and every deploy
+    # died at the Verify step, before D1 and Pages.
+    for where, script in run_blocks():
+        assert "\\n" not in script, f"{where}: literal backslash-n in a run block"
+
+
+def test_every_repo_path_a_run_block_names_exists():
+    checked = 0
+    for where, script in run_blocks():
+        for token in REPO_PATH.findall(script):
+            token = token.rstrip("/.")
+            if any(marker in token for marker in CREATED_AT_RUNTIME):
+                continue
+            assert (ROOT / token).exists(), f"{where}: {token} does not exist"
+            checked += 1
+    assert checked >= 10
+
+
+def test_every_local_action_exists():
+    for path in (ACTION, WORKFLOW):
+        for where, step in steps_of(path):
+            uses = str(step.get("uses", ""))
+            if uses.startswith("./"):
+                assert (ROOT / uses[2:] / "action.yml").is_file(), f"{path.name} {where}: {uses}"
+
+
+def test_verify_step_runs_pytest_on_real_targets():
+    verify = next(
+        step for _where, step in steps_of(ACTION)
+        if str(step.get("name", "")).startswith("Verify Cloudflare boundary")
+    )
+    # Word-split the way bash will: continuations join, quotes and escapes
+    # resolve. A stray "\n" becomes the target "n" here, as it did in CI.
+    script = verify["run"].replace("\\\n", " ")
+    commands = [shlex.split(line, comments=True) for line in script.splitlines()]
+    pytest_words = next(words for words in commands if words[:3] == ["python", "-m", "pytest"])
+    targets = [word for word in pytest_words[3:] if not word.startswith("-")]
+    assert "_system/scripts/tests/test_dashboard_deploy_workflow.py" in targets
+    for target in targets:
+        assert (ROOT / target).exists(), f"pytest target {target!r} does not exist"
+    pip_words = next(words for words in commands if words[:4] == ["python", "-m", "pip", "install"])
+    assert "pyyaml" in pip_words, "without PyYAML this file's checks would skip in CI"
 
 
 def test_no_job_uses_always():
