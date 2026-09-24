@@ -171,6 +171,7 @@ class HealerTests(SupervisorFixture):
         self.assertEqual(self.github.assignees[number], ["GoldmanDrew"])
         self.assertIn("falsifier", result["persistent_lanes"])
         self.assertTrue(any("[NEW FAILURE ISSUE]" in m for m in self.slack.messages))
+        self.assertEqual(self.github.comments, [], "a new issue gets no 'now stale' comment")
         # Next supervisor run: same state, so no second issue, no repeat alert,
         # and still no dispatch.
         self.slack.messages.clear()
@@ -194,6 +195,15 @@ class HealerTests(SupervisorFixture):
         # A new UTC day restores the budget.
         self.run_plan(datetime(2026, 9, 26, 0, 41, tzinfo=timezone.utc))
         self.assertEqual(len(self.github.events), 4)
+
+    def test_an_unreadable_failure_is_retried_never_filed(self):
+        # Two failures whose logs cannot be read must not collapse into one
+        # "no error line" fingerprint and open an issue about an API outage.
+        self.falsifier_failing()
+        self.github.logs.clear()
+        self.run_plan(T0)
+        self.assertEqual(self.github.issues, {})
+        self.assertEqual(self.github.events, ["falsifier-resolution-run"])
 
     def test_no_dispatch_while_a_run_is_in_flight(self):
         self.configure([lane("memory-digest", job="triage", workflow="memory-digest.yml")])

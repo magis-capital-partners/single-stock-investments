@@ -614,6 +614,8 @@ class Supervisor:
             if annotations is None and not log_text:
                 return None     # nothing to read: never fingerprint an API outage
             kind, raw = extract_error(annotations, log_text)
+        if raw.startswith("no error line"):
+            return None         # unreadable failure: retry it, never file an issue about it
         step = failure.get("failed_step")
         normalized = normalize_error(raw) if kind != "timeout" else \
             f"timeout while running step '{step or 'unknown'}'"
@@ -736,7 +738,9 @@ class Supervisor:
             self.notes.append(f"could not open an issue for {entry['lane']} [fp:{fp}]")
             return
         self.github.assign(number, [ISSUE_ASSIGNEE])
-        entry.update({"issue": number, "issue_state": "open",
+        # The new issue already says the lane is failing; the stale-transition
+        # comment below would only repeat it.
+        entry.update({"issue": number, "issue_state": "open", "stale_noted": True,
                       "issue_runs": [r["run_id"] for r in entry["runs"]]})
         self.issue_actions.append(f"opened #{number} for {entry['lane']} [fp:{fp}]")
         self.alert(None, f"[NEW FAILURE ISSUE] #{number} `{entry['lane']}` ({entry['kind']}):"
