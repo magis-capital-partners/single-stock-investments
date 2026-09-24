@@ -10,7 +10,6 @@ import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
-DAILY = ROOT / "_system" / "memory" / "daily"
 JSONL = "_system/portfolio/research_events.jsonl"
 MILLY = "_system/research/milly_log.md"
 
@@ -49,9 +48,10 @@ def infer_ticker(pr_number: str) -> str:
 
 
 def latest_daily_log() -> Path | None:
-    if not DAILY.is_dir():
+    daily = ROOT / "_system" / "memory" / "daily"
+    if not daily.is_dir():
         return None
-    logs = sorted(DAILY.glob("*.md"), reverse=True)
+    logs = sorted(daily.glob("*.md"), reverse=True)
     return logs[0] if logs else None
 
 
@@ -117,26 +117,83 @@ def restore_ticker_logs(
             milly_path.write_text(body.rstrip() + "\n" + "\n".join(missing) + "\n", encoding="utf-8")
 
 
-def resolve(pr_number: str, ticker: str | None = None) -> None:
+def is_shallow() -> bool:
+    proc = run(["git", "rev-parse", "--is-shallow-repository"], check=False)
+    return proc.stdout.strip() == "true"
+
+
+def merge_base(left: str, right: str) -> str | None:
+    proc = run(["git", "merge-base", left, right], check=False)
+    if proc.returncode != 0:
+        return None
+    return proc.stdout.strip() or None
+
+
+def fetch_with_merge_base(head_ref: str, *, start_depth: int = 64, max_depth: int = 4096) -> str:
+    """Fetch main and the PR branch with enough history to share a merge-base.
+
+    A shallow checkout (``actions/checkout`` with ``fetch-depth: 1``) truncates
+    origin/main at the checked-out tip. A PR forked before that tip then shares
+    no local ancestor with it, and ``git merge`` stops with "refusing to merge
+    unrelated histories" (automerge run 35944388953, PR #1014). A plain fetch
+    of the branch into that clone is also the expensive kind: git walks the
+    branch all the way to the root commit.
+
+    So in a shallow clone both refs are fetched to a bounded depth and deepened
+    until the fork point is local, with ``--unshallow`` as the last resort. A
+    full clone just fetches. Returns the merge-base; exits if there is none.
+    """
+    refspecs = [
+        "+refs/heads/main:refs/remotes/origin/main",
+        f"+refs/heads/{head_ref}:refs/remotes/origin/{head_ref}",
+    ]
+    branch_ref = f"origin/{head_ref}"
+    if not is_shallow():
+        run(["git", "fetch", "origin", *refspecs])
+    else:
+        depth = start_depth
+        run(["git", "fetch", f"--depth={depth}", "origin", *refspecs])
+        while merge_base("origin/main", branch_ref) is None and is_shallow():
+            if depth >= max_depth:
+                run(["git", "fetch", "--unshallow", "origin", *refspecs])
+                break
+            run(["git", "fetch", f"--deepen={depth}", "origin", *refspecs])
+            depth *= 2
+    base = merge_base("origin/main", branch_ref)
+    if base is None:
+        raise SystemExit(f"No merge-base between origin/main and {branch_ref}, even with full history.")
+    return base
+
+
+def unmerged_paths() -> list[str]:
+    proc = run(["git", "diff", "--name-only", "--diff-filter=U"], check=False)
+    return [line.strip() for line in proc.stdout.splitlines() if line.strip()]
+
+
+def resolve(pr_number: str, ticker: str | None = None) -> str | None:
+    """Merge main into the PR branch and push it.
+
+    Returns the pushed head SHA, or None when there was nothing to push. The
+    caller must NOT merge in the same run: the pushed commit has never been
+    through CI, and a squash of it would land untested content on main (PRs
+    #1017 and #1021 were squashed seconds after this push, with zero check runs
+    on the merged head).
+    """
     ticker = ticker or infer_ticker(pr_number)
     data = gh_json(["pr", "view", pr_number, "--json", "headRefName,mergeable"])
     head_ref = data["headRefName"]
     if data.get("mergeable") != "CONFLICTING":
         print(f"PR #{pr_number} mergeable={data.get('mergeable')} — nothing to resolve.")
-        return
+        return None
 
     print(f"Resolving conflicts for PR #{pr_number} ({ticker}) on {head_ref}")
 
     run(["git", "config", "user.name", "github-actions[bot]"])
     run(["git", "config", "user.email", "41898282+github-actions[bot]@users.noreply.github.com"])
-    # Fetch the PR head explicitly; sparse/local clones often lack origin/<branch> refs.
-    run(["git", "fetch", "origin", "main", head_ref])
-    run(["git", "fetch", "origin", f"+{head_ref}:refs/remotes/origin/{head_ref}"], check=False)
+    fetch_with_merge_base(head_ref)
 
     branch_ref = f"origin/{head_ref}"
-    tip = run(["git", "rev-parse", "--verify", branch_ref], check=False)
-    if tip.returncode != 0:
-        branch_ref = "FETCH_HEAD"
+    original_tip = run(["git", "rev-parse", "--verify", branch_ref]).stdout.strip()
     daily_path = latest_daily_log()
     daily_rel = str(daily_path.relative_to(ROOT)).replace("\\", "/") if daily_path else None
     daily_section = None
@@ -153,9 +210,19 @@ def resolve(pr_number: str, ticker: str | None = None) -> None:
         ["git", "merge", "origin/main", "-X", "theirs", "-m", f"merge main into {ticker} deep dive PR"],
         check=False,
     )
-    if merge.returncode != 0 and not (ROOT / ".git" / "MERGE_HEAD").exists():
+    in_merge = run(["git", "rev-parse", "-q", "--verify", "MERGE_HEAD"], check=False).returncode == 0
+    if merge.returncode != 0 and not in_merge:
         print(merge.stderr or merge.stdout, file=sys.stderr)
         raise SystemExit(merge.returncode)
+    # -X theirs settles content conflicts. A modify/delete or rename conflict is
+    # left unmerged, and `git add -A` would quietly resurrect a file main
+    # deleted. That needs a human, not a bot commit.
+    stuck = unmerged_paths()
+    if stuck:
+        run(["git", "merge", "--abort"], check=False)
+        raise SystemExit(
+            f"PR #{pr_number}: conflicts -X theirs cannot settle; resolve by hand: " + ", ".join(stuck[:20])
+        )
 
     restore_ticker_logs(ticker, daily_section=daily_section, jsonl_lines=jsonl_lines, milly_lines=milly_lines)
 
@@ -163,16 +230,34 @@ def resolve(pr_number: str, ticker: str | None = None) -> None:
     status = run(["git", "status", "--porcelain"], check=False)
     if status.stdout.strip():
         run(["git", "commit", "-m", f"fix: resolve {ticker} deep dive conflicts with main"])
+    new_tip = run(["git", "rev-parse", "HEAD"]).stdout.strip()
+    if new_tip == original_tip:
+        print(f"PR #{pr_number}: merging main changed nothing; nothing to push.")
+        return None
     push_branch(head_ref)
-    print(f"Pushed conflict resolution for PR #{pr_number} ({ticker})")
+    print(f"Pushed conflict resolution for PR #{pr_number} ({ticker}) at {new_tip}")
+    return new_tip
+
+
+def write_github_output(path: str, pushed_sha: str | None) -> None:
+    with open(path, "a", encoding="utf-8") as handle:
+        handle.write(f"pushed={'true' if pushed_sha else 'false'}\n")
+        handle.write(f"pushed_sha={pushed_sha or ''}\n")
 
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="Resolve Marvin deep-dive PR merge conflicts")
     parser.add_argument("pr_number", help="GitHub pull request number")
     parser.add_argument("--ticker", help="Ticker symbol (optional; inferred from PR title)")
+    parser.add_argument(
+        "--github-output",
+        default="",
+        help="Append pushed=true|false and pushed_sha=<sha> to this file (a step's $GITHUB_OUTPUT).",
+    )
     args = parser.parse_args()
-    resolve(args.pr_number, args.ticker)
+    pushed_sha = resolve(args.pr_number, args.ticker)
+    if args.github_output:
+        write_github_output(args.github_output, pushed_sha)
 
 
 if __name__ == "__main__":
