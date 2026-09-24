@@ -30,6 +30,13 @@ pitch measured 10,359 characters on 2026-09-01 -- a genuine single-name pitch
 that the podcast threshold would have thrown away. Podcast episodes run 45-90
 minutes; conference pitches are short and dense.
 
+**A fetch's answer is kept.** Discovery re-marks every video `pending_transcript`
+from metadata alone on each run and never reads the backlog, so the backlog is
+the only record of what a fetch already found. A transcript that failed the
+gate, or a video with no caption tracks, is settled there and not fetched again
+(see `settled()`). Re-reading a known answer spends a slot from a 20/hour
+budget and is one more chance of an IP block. `--refetch` overrides it.
+
     python _system/scripts/fetch_video_transcript.py --limit 10
     python _system/scripts/fetch_video_transcript.py --video QoDbkHOsslg
     python _system/scripts/fetch_video_transcript.py --report
@@ -42,7 +49,7 @@ import os
 import re
 import sys
 import time
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -81,6 +88,17 @@ MIN_CHARS_PER_MINUTE = int(os.environ.get("VIDEO_MIN_CPM", "350"))
 # Give up on an item after this many distinct failures rather than retrying it
 # forever; one dead video must not consume the run. Mirrors the whisper backlog.
 MAX_ATTEMPTS = 4
+# The one rejection reached without a caption fetch (quality_gate's duration
+# reason shares the prefix). Every other reason came from reading a transcript.
+DURATION_REJECT = "too_short_duration"
+# A "no captions" answer about a fresh upload is not an answer yet. The
+# transcript library raises TranscriptsDisabled whenever the player response has
+# no caption tracks, and a new upload has none until YouTube's speech
+# recognition has run. Of 117 stored transcripts on 2026-09-24, three were
+# fetched 4.6-8.5 hours after upload, so the lane does meet videos that young.
+# A video checked inside this window gets one more look once it is older than
+# the window; a video checked after it is settled.
+NO_CAPTIONS_GRACE = timedelta(hours=48)
 
 # Failures that say nothing about the video, only about the moment. YouTube
 # rate-limits caption fetches by IP and returns IpBlocked for every subsequent
@@ -250,6 +268,100 @@ def quality_gate(text: str, duration_seconds: int | None) -> list[str]:
     return reasons
 
 
+def _parse_when(value: str | None) -> datetime | None:
+    """RSS stamps end in +00:00 and Data API stamps in Z; accept both."""
+    if not value:
+        return None
+    try:
+        when = datetime.fromisoformat(str(value).replace("Z", "+00:00"))
+    except ValueError:
+        return None
+    return when if when.tzinfo else when.replace(tzinfo=timezone.utc)
+
+
+def settled(state: dict, *, duration: int | None, published: str | None,
+            now: datetime) -> str | None:
+    """Why fetching this item again would only repeat a known answer, or None.
+
+    `run()` once honoured just one of the verdicts it writes, `parked`, and
+    re-fetched every `rejected` and `no_captions` item on every pass. On
+    2026-09-23 the captions stage made 21 fetches and 20 of them re-asked seven
+    videos it had already answered -- four RVCapital holiday cards were on 43
+    attempts each -- and hit the hourly cap to store one new transcript.
+
+    Returns "settled" for a known answer, "awaiting_captions" for a fresh
+    upload whose second look is not due yet, and None when a fetch could still
+    learn something.
+    """
+    status = state.get("status")
+    if status == "rejected":
+        reasons = [str(r) for r in state.get("reasons") or []]
+        if reasons and all(r.startswith(DURATION_REJECT) for r in reasons):
+            # Decided on duration before any fetch, which triage() re-derives
+            # for free. Only a measured duration that now clears the floor
+            # reopens it; a missing one (the Data API down) must not turn
+            # every short clip into a caption fetch.
+            if duration is not None and duration >= MIN_DURATION_SECONDS:
+                return None
+            return "settled"
+        # A transcript was read and failed the gate. Tomorrow it will be the
+        # same transcript.
+        return "settled"
+    if status == "no_captions":
+        checked = _parse_when(state.get("last_attempt_at"))
+        born = _parse_when(published)
+        if checked is None or born is None or checked - born >= NO_CAPTIONS_GRACE:
+            return "settled"
+        # Asked while YouTube may still have been generating captions. Look
+        # again once the video is past the window -- not before, and not on
+        # every pass until then.
+        return "awaiting_captions" if now - born < NO_CAPTIONS_GRACE else None
+    return None
+
+
+def triage(row: dict, state: dict, duration: int | None, *,
+           refetch: bool = False, now: datetime | None = None) -> str:
+    """Decide one discovered video without a network call.
+
+    Returns "fetch", or the reason no fetch is needed. The daemon's stop test
+    counts the rows that come back "fetch", so what a pass fetches and what the
+    daemon waits for are one decision rather than two that can drift apart.
+    """
+    if state.get("status") == "parked":
+        return "parked"
+    txt_path, meta_path = video_paths(row["video_id"], row.get("title") or "",
+                                      row.get("published"))
+    # Both files, not just one. A run killed between the two writes leaves a
+    # meta with no transcript; requiring both makes that state self-healing
+    # rather than a permanent skip over a video we never actually stored.
+    if txt_path.exists() and meta_path.exists() and not refetch:
+        return "existing"
+    if not refetch:
+        known = settled(state, duration=duration, published=row.get("published"),
+                        now=now or _dt_now())
+        if known:
+            return known
+    # Cheapest possible reject: a short video never needs a caption fetch.
+    if duration is not None and duration < MIN_DURATION_SECONDS:
+        return DURATION_REJECT
+    return "fetch"
+
+
+def _duration(meta_by_id: dict, video_id: str) -> int | None:
+    api_item = meta_by_id.get(video_id) or {}
+    return youtube_api.parse_duration((api_item.get("contentDetails") or {}).get("duration"))
+
+
+def count_fetchable(rows: list[dict], items: dict, meta_by_id: dict) -> int:
+    """Rows the next pass would spend a caption fetch on."""
+    now = _dt_now()
+    return sum(
+        1 for row in rows
+        if triage(row, items.get(row["video_id"]) or {"status": "pending"},
+                  _duration(meta_by_id, row["video_id"]), now=now) == "fetch"
+    )
+
+
 def load_pending(limit: int | None, only_video: str | None) -> list[dict]:
     disc = videos_root() / "discovery_latest.json"
     if not disc.exists():
@@ -266,7 +378,7 @@ def run(*, limit: int | None = None, only_video: str | None = None,
         wait_for_slot: bool = False) -> dict:
     rows = load_pending(limit, only_video)
     if not rows:
-        return {"considered": 0, "note": "nothing pending"}
+        return {"considered": 0, "note": "nothing pending", "fetchable": 0}
 
     backlog = load_backlog()
     items = backlog.setdefault("items", {})
@@ -279,36 +391,32 @@ def run(*, limit: int | None = None, only_video: str | None = None,
         print("api unavailable ({0}); proceeding without duration".format(exc), flush=True)
 
     stats = {"considered": len(rows), "fetched": 0, "no_captions": 0,
-             "rejected_quality": 0, "skipped_existing": 0, "errors": 0, "parked": 0}
+             "rejected_quality": 0, "skipped_existing": 0, "errors": 0, "parked": 0,
+             "settled": 0, "awaiting_captions": 0}
 
     for row in rows:
         vid = row["video_id"]
         state = items.setdefault(vid, {"attempts": 0, "status": "pending"})
-        if state.get("status") == "parked":
-            stats["parked"] += 1
-            continue
-
-        txt_path, meta_path = video_paths(vid, row.get("title") or "", row.get("published"))
-        # Both files, not just one. A run killed between the two writes leaves a
-        # meta with no transcript; requiring both makes that state self-healing
-        # rather than a permanent skip over a video we never actually stored.
-        if txt_path.exists() and meta_path.exists() and not refetch:
+        duration = _duration(meta_by_id, vid)
+        action = triage(row, state, duration, refetch=refetch)
+        if action == "existing":
             stats["skipped_existing"] += 1
             state["status"] = "done"
             continue
-
-        api_item = meta_by_id.get(vid) or {}
-        duration = youtube_api.parse_duration(
-            (api_item.get("contentDetails") or {}).get("duration"))
-
-        # Cheapest possible reject: a short video never needs a caption fetch.
-        if duration is not None and duration < MIN_DURATION_SECONDS:
-            state.update({"status": "rejected", "reasons": ["too_short_duration"],
+        if action == DURATION_REJECT:
+            state.update({"status": "rejected", "reasons": [DURATION_REJECT],
                           "checked_at": now_stamp()})
             stats["rejected_quality"] += 1
             print("skip  {0} {1}s  {2}".format(vid, duration, (row.get("title") or "")[:44]),
                   flush=True)
             continue
+        if action != "fetch":
+            # parked, settled or awaiting_captions: nothing to ask YouTube.
+            stats[action] += 1
+            continue
+
+        txt_path, meta_path = video_paths(vid, row.get("title") or "", row.get("published"))
+        api_item = meta_by_id.get(vid) or {}
 
         # Pacing is checked immediately before the network call, never at the
         # top of the loop: skips and duration rejects cost nothing and must not
@@ -318,9 +426,10 @@ def run(*, limit: int | None = None, only_video: str | None = None,
         while not decision["allowed"]:
             if not wait_for_slot:
                 stats["stopped_on"] = "rate_budget:" + decision["reason"]
+                stats["fetchable"] = count_fetchable(rows, items, meta_by_id)
                 print("hold  {0}  {1}, {2}s -- {3} left for the next run".format(
                     vid, decision["reason"], decision["wait_seconds"],
-                    len(rows) - rows.index(row)), flush=True)
+                    stats["fetchable"]), flush=True)
                 save_backlog(backlog)
                 return stats
             nap = min(decision["wait_seconds"], 300)
@@ -344,6 +453,11 @@ def run(*, limit: int | None = None, only_video: str | None = None,
             state.update({"status": "no_captions", "detail": result.get("detail")})
             stats["no_captions"] += 1
             print("none  {0}  {1}".format(vid, (row.get("title") or "")[:50]), flush=True)
+            # Saved per verdict, not per pass. youtube_lane bounds this stage
+            # with a wall-clock kill, and a kill used to discard the backlog
+            # updates of the whole pass, so the next run paid again for
+            # answers it already had.
+            save_backlog(backlog)
             time.sleep(sleep_seconds)
             continue
 
@@ -360,7 +474,7 @@ def run(*, limit: int | None = None, only_video: str | None = None,
                 stats["aborted_on"] = result["status"]
                 print("stop  {0}  {1} -- backing off until {2}, {3} left".format(
                     vid, result["status"], blocked.get("blocked_until"),
-                    len(rows) - rows.index(row) - 1), flush=True)
+                    count_fetchable(rows, items, meta_by_id)), flush=True)
                 break
             if is_permanent(result["status"]):
                 state["status"] = "parked"
@@ -369,6 +483,7 @@ def run(*, limit: int | None = None, only_video: str | None = None,
                                    else "pending")
             print("err   {0}  {1}  ({2})".format(vid, result["status"],
                                                  state["status"]), flush=True)
+            save_backlog(backlog)
             time.sleep(sleep_seconds)
             continue
 
@@ -380,6 +495,7 @@ def run(*, limit: int | None = None, only_video: str | None = None,
             stats["rejected_quality"] += 1
             print("drop  {0}  {1}  {2}".format(vid, ",".join(reasons),
                                                (row.get("title") or "")[:36]), flush=True)
+            save_backlog(backlog)
             time.sleep(sleep_seconds)
             continue
 
@@ -423,9 +539,11 @@ def run(*, limit: int | None = None, only_video: str | None = None,
         kind = "auto" if result.get("is_generated") else "MANUAL"
         print("ok    {0}  {1:>6}c  {2:>4}s  {3:6s} {4}".format(
             vid, len(text), duration or 0, kind, (row.get("title") or "")[:38]), flush=True)
+        save_backlog(backlog)
         time.sleep(sleep_seconds)
 
     save_backlog(backlog)
+    stats["fetchable"] = count_fetchable(rows, items, meta_by_id)
     return stats
 
 
@@ -436,7 +554,9 @@ def daemon(*, max_hours: float | None = None, sleep_seconds: float = 1.0) -> dic
     fail identically. The daemon exists so that ending a pass is not the same as
     giving up: it waits out the persisted backoff and starts another. This is the
     whisper backfill's `--until-empty` shape, with the budget rather than the CPU
-    as the thing being yielded to.
+    as the thing being yielded to. It stops as soon as a pass leaves nothing a
+    fetch could answer; waiting out the pacing budget with nothing to spend it
+    on is how the caption stage used to fill its whole window.
     """
     started = _dt_now()
     totals = {"passes": 0, "fetched": 0, "no_captions": 0, "rejected_quality": 0,
@@ -455,10 +575,17 @@ def daemon(*, max_hours: float | None = None, sleep_seconds: float = 1.0) -> dic
         if stats.get("aborted_on"):
             totals["blocks"] += 1
 
-        remaining = sum(1 for v in (load_backlog().get("items") or {}).values()
-                        if v.get("status") == "pending")
-        print("[pass {0}] fetched={1} remaining_pending={2}".format(
-            totals["passes"], stats.get("fetched"), remaining), flush=True)
+        # Counted by the same triage the pass fetches by. This used to be every
+        # `pending` item in the backlog, which on 2026-09-23 included two
+        # videos discovery no longer lists. No pass can settle those, so the
+        # count never reached zero and the daemon kept starting passes -- each
+        # re-fetching seven answered videos -- until youtube_lane's wall clock
+        # killed it at 65 minutes.
+        remaining = int(stats.get("fetchable") or 0)
+        totals["fetchable"] = remaining
+        print("[pass {0}] fetched={1} settled={2} fetchable={3}".format(
+            totals["passes"], stats.get("fetched", 0), stats.get("settled", 0),
+            remaining), flush=True)
         if remaining == 0 and not stats.get("aborted_on"):
             totals["stopped"] = "backlog_empty"
             return totals
