@@ -127,6 +127,38 @@ def test_a_new_failure_blocks_even_when_main_also_fails(lint, monkeypatch, tmp_p
     assert f"NEW AMZN lint_deep_dive.py: {introduced}" in out
 
 
+def test_more_of_an_inherited_finding_is_new(lint, monkeypatch, tmp_path, capsys):
+    """Verifier repro: main has one id-less qualitative_adjustments row, the PR
+    adds three more. Each row prints the same line, so the PR prints it four
+    times against main's once; as a set that read "fails identically on main"."""
+    files = ["AMZN/research/valuation.json"]
+    row = "LINT: AMZN/research/valuation.json: qualitative_adjustments row has no id"
+    answers = {
+        ("head", "check_evidence_completeness.py"): (1, f"{row}\n" * 4),
+        ("base", "check_evidence_completeness.py"): (1, f"{row}\n"),
+    }
+    monkeypatch.setattr(lint, "has_evidence_refresh_config", lambda val: True)
+    code, calls = run_main(lint, monkeypatch, tmp_path, files, answers)
+    out = capsys.readouterr().out
+    assert ("base", "check_evidence_completeness.py") in calls
+    assert code == 1, out
+    assert f"NEW AMZN check_evidence_completeness.py: {row} (x3 more than on origin/main)" in out
+    assert "INHERITED AMZN check_evidence_completeness.py" not in out
+
+
+def test_the_same_count_as_main_is_still_inherited(lint, monkeypatch, tmp_path, capsys):
+    files = ["AMZN/research/valuation.json"]
+    row = "LINT: AMZN/research/valuation.json: qualitative_adjustments row has no id"
+    answers = {
+        ("head", "check_evidence_completeness.py"): (1, f"{row}\n" * 2),
+        ("base", "check_evidence_completeness.py"): (1, f"{row}\n" * 2),
+    }
+    monkeypatch.setattr(lint, "has_evidence_refresh_config", lambda val: True)
+    code, _ = run_main(lint, monkeypatch, tmp_path, files, answers)
+    assert code == 0
+    assert "INHERITED AMZN check_evidence_completeness.py: all 2 failure line(s)" in capsys.readouterr().out
+
+
 def test_a_failure_without_a_base_copy_blocks(lint, monkeypatch, tmp_path):
     files = ["AMZN/research/deep_dive_2026-07-25.md"]
     code, _ = run_main(lint, monkeypatch, tmp_path, files, {("head", "lint_deep_dive.py"): (1, DRIFT)}, base_tree=None)

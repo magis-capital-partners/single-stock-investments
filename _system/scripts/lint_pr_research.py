@@ -24,6 +24,7 @@ from __future__ import annotations
 import argparse
 import io
 import json
+from collections import Counter
 import re
 import shutil
 import subprocess
@@ -225,13 +226,20 @@ def touched_consistency_surfaces(ticker: str, paths: list[str]) -> list[str]:
     )
 
 
-def failure_lines(output: str) -> set[str]:
-    """The finding lines of a lint run, normalised; run-description lines dropped."""
-    lines = set()
+def failure_lines(output: str) -> Counter[str]:
+    """The finding lines of a lint run, normalised and counted.
+
+    Counted, not a set: a lint prints one line per finding, and identical
+    findings print identical lines. A PR that adds three more id-less
+    qualitative_adjustments rows to a valuation that already had one prints
+    the same line four times; as a set that was "one line, already on main",
+    i.e. INHERITED, and the PR's three new findings went through.
+    """
+    lines: Counter[str] = Counter()
     for raw in output.splitlines():
         line = raw.strip().replace("\\", "/")
         if line and not line.startswith(INFORMATIONAL):
-            lines.add(line)
+            lines[line] += 1
     return lines
 
 
@@ -300,10 +308,11 @@ def run_lint(ticker: str, script: str, args: list[str], base_trees: BaseTrees) -
         return "failed"
     base = _run_script(tree, script, args)
     already = failure_lines((base.stdout or "") + (base.stderr or ""))
-    new = sorted(found - already)
+    # A line is inherited only as many times as main prints it.
+    new = found - already
     if base.returncode != 0 and not new:
         print(
-            f"INHERITED {ticker} {script}: all {len(found)} failure line(s) are already on "
+            f"INHERITED {ticker} {script}: all {sum(found.values())} failure line(s) are already on "
             f"{base_trees.base}; this PR did not introduce them."
         )
         print(
@@ -311,8 +320,9 @@ def run_lint(ticker: str, script: str, args: list[str], base_trees: BaseTrees) -
             f"{base_trees.base}; not blocking this PR."
         )
         return "inherited"
-    for line in new:
-        print(f"NEW {ticker} {script}: {line}")
+    for line, count in sorted(new.items()):
+        times = f" (x{count} more than on {base_trees.base})" if line in already else ""
+        print(f"NEW {ticker} {script}: {line}{times}")
     return "failed"
 
 
