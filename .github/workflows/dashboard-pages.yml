@@ -1,11 +1,13 @@
 name: Deploy Dashboard (Cloudflare Pages)
 
 on:
-  # Free-tier D1 quotas reset at 00:00 UTC. A shortly-after-reset deployment
-  # guarantees retention and pending efficiency migrations still run even if a
-  # daytime deployment was blocked by that day's quota.
+  # Recovery path after the 00:00 UTC D1 quota reset: retries D1 stages that a
+  # deploy deferred, and guarantees one retention pass per UTC day. Cheap when
+  # there is nothing to do: the deploy gate skips it unless the deploy inputs
+  # changed, a D1 stage is owed, or today's retention has not run. An off-peak
+  # minute, because top-of-hour crons queue for hours here (00:15 fired ~04:45).
   schedule:
-    - cron: "15 0 * * *"
+    - cron: "37 1 * * *"
   push:
     branches: [main]
     paths:
@@ -17,6 +19,10 @@ on:
       - "_system/scripts/build_technical_signals.py"
       - "_system/scripts/build_cloudflare_pages_site.py"
       - "_system/scripts/export_dashboard_d1_seed.py"
+      - "_system/scripts/export_sleeve_d1.py"
+      - "_system/scripts/prune_cloudflare_d1.py"
+      - "_system/scripts/validate_portfolio_private_boundary.py"
+      - "_system/scripts/workflow_run_deploy_gate.py"
       - "_system/scripts/validate_dashboard_data.py"
       - "_system/scripts/ci_dashboard_deploy_mode.sh"
       - "_system/scripts/ci_rebuild_profile.py"
@@ -30,6 +36,11 @@ on:
         description: "Why this manual dashboard deploy is needed"
         required: false
         default: "manual republish of committed dashboard/"
+      d1_full_resync:
+        description: "Re-emit every D1 seed row, ignoring the stored per-ticker hashes (repair only)"
+        type: boolean
+        required: false
+        default: false
   workflow_run:
     workflows:
       - Data Pipeline
@@ -44,15 +55,15 @@ permissions:
   contents: read
   actions: read
 
-concurrency:
-  group: dashboard-deploy
-  cancel-in-progress: true
+# No workflow-level concurrency. It used to cancel in-progress runs, which let
+# a run that only reports an upstream failure cancel a deploy mid-flight --
+# and, because `build` used always(), the "cancelled" deploy ran anyway.
+# Deploys are serialized on the build job instead (see there).
 
 jobs:
-  # When an upstream workflow_run failed, the build job's `if` makes it skip and
-  # the deploy run still concludes green (observed: run 31319060163, green in 7s
-  # with build skipped, site left stale). This job turns that window red.
-  # Cancelled upstreams are concurrency dedupe noise and stay quiet.
+  # A failed upstream turns this run red so the failure is visible next to
+  # the deploys. The deploy itself no longer depends on the upstream's result:
+  # the gate below publishes whatever changed on main.
   upstream-failed:
     if: |
       github.event_name == 'workflow_run' &&
@@ -61,36 +72,64 @@ jobs:
     timeout-minutes: 5
     steps:
       - run: |
-          echo "Upstream '${{ github.event.workflow_run.name }}' concluded 'failure'; dashboard build was skipped and the site keeps serving the previous artifacts." >&2
+          echo "Upstream '${{ github.event.workflow_run.name }}' concluded 'failure'. The dashboard deploys only what that run committed before failing, if anything." >&2
           exit 1
 
-  upstream-change-gate:
-    if: |
-      github.event_name == 'workflow_run' &&
-      github.event.workflow_run.conclusion == 'success'
+  # workflow_run and schedule deploy only when what a deploy publishes changed
+  # since the last fully synced deploy. 2026-09-18..24: 73 of 98 D1 syncs came
+  # from Power Zone / LS-algo runs whose main job was skipped and which
+  # committed nothing. See _system/scripts/workflow_run_deploy_gate.py.
+  deploy-gate:
+    if: github.event_name == 'workflow_run' || github.event_name == 'schedule'
     runs-on: ubuntu-latest
     timeout-minutes: 5
     outputs:
-      should_deploy: ${{ steps.gate.outputs.should_deploy }}
+      should_deploy: ${{ steps.decide.outputs.should_deploy }}
     steps:
       - uses: actions/checkout@v4
         with:
+          # The build deploys the tip of main, so fingerprint the tip of main.
+          ref: main
           sparse-checkout: |
             _system/scripts/workflow_run_deploy_gate.py
           sparse-checkout-cone-mode: false
           fetch-depth: 1
-      - name: Detect upstream dashboard work
-        id: gate
+          filter: blob:none
+      - name: Fingerprint the deploy inputs on main
+        id: fp
+        run: python _system/scripts/workflow_run_deploy_gate.py fingerprint
+      - name: Look up a fully synced deploy of these inputs
+        id: synced
+        uses: actions/cache/restore@v4
+        with:
+          path: .deploy-gate-marker
+          key: dashboard-deploy-synced-v1-${{ steps.fp.outputs.hash }}
+          lookup-only: true
+      - name: Look up a D1 deferral of these inputs today
+        id: deferred
+        uses: actions/cache/restore@v4
+        with:
+          path: .deploy-gate-marker
+          key: dashboard-deploy-deferred-v1-${{ steps.fp.outputs.hash }}-${{ steps.fp.outputs.utc_date }}
+          lookup-only: true
+      - name: Look up today's D1 retention
+        id: pruned
+        if: github.event_name == 'schedule'
+        uses: actions/cache/restore@v4
+        with:
+          path: .deploy-gate-marker
+          key: dashboard-d1-pruned-v1-${{ steps.fp.outputs.utc_date }}
+          lookup-only: true
+      - name: Decide
+        id: decide
         env:
-          GH_TOKEN: ${{ github.token }}
-          UPSTREAM_NAME: ${{ github.event.workflow_run.name }}
-          UPSTREAM_RUN_ID: ${{ github.event.workflow_run.id }}
+          EVENT: ${{ github.event_name }}
+          SYNCED: ${{ steps.synced.outputs.cache-hit }}
+          DEFERRED: ${{ steps.deferred.outputs.cache-hit }}
+          PRUNED: ${{ steps.pruned.outputs.cache-hit }}
         run: |
-          gh api "repos/${GITHUB_REPOSITORY}/actions/runs/${UPSTREAM_RUN_ID}/jobs?per_page=100" > "$RUNNER_TEMP/upstream-jobs.json"
-          python _system/scripts/workflow_run_deploy_gate.py \
-            --workflow-name "$UPSTREAM_NAME" \
-            --jobs-json "$RUNNER_TEMP/upstream-jobs.json" \
-            --github-output "$GITHUB_OUTPUT"
+          python _system/scripts/workflow_run_deploy_gate.py decide \
+            --event "$EVENT" --synced-hit "$SYNCED" --deferred-hit "$DEFERRED" --pruned-hit "$PRUNED"
 
   oauth-secrets:
     runs-on: ubuntu-latest
@@ -153,12 +192,15 @@ jobs:
   oauth-proxy:
     needs: [oauth-secrets, oauth-changed]
     if: |
-      always() &&
+      !cancelled() &&
       needs.oauth-secrets.result == 'success' &&
       needs.oauth-secrets.outputs.configured == 'true' &&
       (
         (github.event_name == 'push' && needs.oauth-changed.outputs.changed == 'true')
       )
+    concurrency:
+      group: dashboard-oauth-proxy
+      cancel-in-progress: false
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
@@ -182,19 +224,25 @@ jobs:
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
 
   build:
-    needs: [oauth-secrets, oauth-proxy, upstream-change-gate]
+    needs: [oauth-secrets, oauth-proxy, deploy-gate]
+    # !cancelled(), never always(): always() started this job even after the
+    # run was cancelled or superseded, so "cancelled" runs still deployed and
+    # still spent D1 rows (69 of 218 D1 syncs, 2026-09-10..24).
     if: |
-      always() &&
+      !cancelled() &&
       needs.oauth-secrets.result == 'success' &&
       (needs.oauth-proxy.result == 'success' || needs.oauth-proxy.result == 'skipped') &&
       (
-        github.event_name != 'workflow_run' ||
-        needs.upstream-change-gate.outputs.should_deploy == 'true'
-      ) &&
-      (
-        github.event_name != 'workflow_run' ||
-        github.event.workflow_run.conclusion == 'success'
+        github.event_name == 'push' ||
+        github.event_name == 'workflow_dispatch' ||
+        needs.deploy-gate.outputs.should_deploy == 'true'
       )
+    # One deploy at a time, never killed mid-flight (a D1 import or Pages
+    # upload cut in half helps nobody). A newer queued build replaces an older
+    # queued one, which is cancelled and never deploys.
+    concurrency:
+      group: dashboard-deploy
+      cancel-in-progress: false
     runs-on: ubuntu-latest
     timeout-minutes: 60
     env:
@@ -230,8 +278,48 @@ jobs:
           swap-storage: true
       - name: Checkout workspace (deploy mode)
         run: bash _system/scripts/ci_checkout_workspace.sh "${{ steps.mode.outputs.checkout_profile }}"
+      # Re-check after queueing behind another deploy: when that deploy
+      # already shipped exactly this content, there is nothing left to do.
+      - name: Fingerprint what this job would deploy
+        id: fingerprint
+        run: python _system/scripts/workflow_run_deploy_gate.py fingerprint
+      - name: Re-check for a fully synced deploy of these inputs
+        id: synced
+        if: github.event_name == 'workflow_run' || github.event_name == 'schedule'
+        uses: actions/cache/restore@v4
+        with:
+          path: .deploy-gate-marker
+          key: dashboard-deploy-synced-v1-${{ steps.fingerprint.outputs.hash }}
+          lookup-only: true
+      - name: Re-check for a D1 deferral of these inputs today
+        id: deferred
+        if: github.event_name == 'workflow_run' || github.event_name == 'schedule'
+        uses: actions/cache/restore@v4
+        with:
+          path: .deploy-gate-marker
+          key: dashboard-deploy-deferred-v1-${{ steps.fingerprint.outputs.hash }}-${{ steps.fingerprint.outputs.utc_date }}
+          lookup-only: true
+      - name: Re-check today's D1 retention
+        id: pruned
+        if: github.event_name == 'schedule'
+        uses: actions/cache/restore@v4
+        with:
+          path: .deploy-gate-marker
+          key: dashboard-d1-pruned-v1-${{ steps.fingerprint.outputs.utc_date }}
+          lookup-only: true
+      - name: Decide whether this job still has work
+        id: proceed
+        env:
+          EVENT: ${{ github.event_name }}
+          SYNCED: ${{ steps.synced.outputs.cache-hit }}
+          DEFERRED: ${{ steps.deferred.outputs.cache-hit }}
+          PRUNED: ${{ steps.pruned.outputs.cache-hit }}
+        run: |
+          python _system/scripts/workflow_run_deploy_gate.py decide \
+            --event "$EVENT" --synced-hit "$SYNCED" --deferred-hit "$DEFERRED" --pruned-hit "$PRUNED"
       - name: Rebuild and validate dashboard
         id: publish
+        if: steps.proceed.outputs.should_deploy == 'true'
         uses: ./.github/actions/publish-dashboard
         with:
           skip_rebuild: ${{ steps.mode.outputs.skip_rebuild }}
@@ -243,10 +331,12 @@ jobs:
           OAUTH_PROXY_URL: ${{ vars.OAUTH_PROXY_URL }}
       - name: Deploy dashboard to Cloudflare Pages and D1
         id: cloudflare
+        if: steps.proceed.outputs.should_deploy == 'true'
         uses: ./.github/actions/deploy-cloudflare-dashboard
         with:
           project-name: ${{ vars.CLOUDFLARE_PAGES_PROJECT || 'single-stock-investments' }}
           database-name: ${{ vars.CLOUDFLARE_D1_DATABASE || 'single-stock-investments' }}
+          full-resync: ${{ github.event_name == 'workflow_dispatch' && inputs.d1_full_resync || false }}
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
@@ -258,3 +348,46 @@ jobs:
           PORTFOLIO_DREW_ACCESS_EMAILS: ${{ secrets.PORTFOLIO_DREW_ACCESS_EMAILS }}
           PORTFOLIO_MICHAEL_ACCESS_EMAILS: ${{ secrets.PORTFOLIO_MICHAEL_ACCESS_EMAILS }}
           IBKR_ACCOUNT_IDS_FOR_SCAN: ${{ secrets.IBKR_ACCOUNT_IDS_FOR_SCAN }}
+      # Gate bookkeeping (Actions cache keys; nothing is downloaded on lookup).
+      # "synced" only when Pages shipped AND every D1 stage completed, so a
+      # deferred stage keeps the inputs eligible for the post-reset retry.
+      - name: Prepare gate markers
+        if: steps.proceed.outputs.should_deploy == 'true'
+        run: |
+          mkdir -p .deploy-gate-marker
+          echo "${{ steps.fingerprint.outputs.hash }}" > .deploy-gate-marker/fingerprint
+      - name: Mark these deploy inputs fully synced
+        if: steps.proceed.outputs.should_deploy == 'true' && steps.cloudflare.outputs.d1_deferred != 'true'
+        uses: actions/cache/save@v4
+        with:
+          path: .deploy-gate-marker
+          key: dashboard-deploy-synced-v1-${{ steps.fingerprint.outputs.hash }}
+      - name: Mark today's D1 retention done
+        if: steps.proceed.outputs.should_deploy == 'true' && steps.cloudflare.outputs.d1_pruned_today == 'true'
+        uses: actions/cache/save@v4
+        with:
+          path: .deploy-gate-marker
+          key: dashboard-d1-pruned-v1-${{ steps.cloudflare.outputs.d1_utc_date }}
+      - name: Mark today's D1 deferral for these inputs
+        if: steps.proceed.outputs.should_deploy == 'true' && steps.cloudflare.outputs.d1_deferred == 'true'
+        uses: actions/cache/save@v4
+        with:
+          path: .deploy-gate-marker
+          key: dashboard-deploy-deferred-v1-${{ steps.fingerprint.outputs.hash }}-${{ steps.cloudflare.outputs.d1_utc_date }}
+      # Last, after Pages shipped: a deferred D1 stage used to be a ::warning::
+      # on a green run. It is a failure now, and Slack hears about it.
+      - name: Fail visibly when D1 work was deferred
+        if: steps.proceed.outputs.should_deploy == 'true' && steps.cloudflare.outputs.d1_deferred == 'true'
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          STAGES: ${{ steps.cloudflare.outputs.d1_deferred_stages }}
+          REASON: ${{ steps.cloudflare.outputs.d1_deferred_reason }}
+          UTC_DATE: ${{ steps.cloudflare.outputs.d1_utc_date }}
+          ROWS_READ: ${{ steps.cloudflare.outputs.d1_rows_read }}
+          ROWS_WRITTEN: ${{ steps.cloudflare.outputs.d1_rows_written }}
+        run: |
+          python .github/actions/deploy-cloudflare-dashboard/d1_alert.py \
+            --stages "$STAGES" --reason "$REASON" --utc-date "$UTC_DATE" \
+            --rows-read "$ROWS_READ" --rows-written "$ROWS_WRITTEN"
+          echo "::error::The static site deployed, but D1 stage(s) were deferred: ${STAGES}. ${REASON}. The first deploy after 00:00 UTC retries them."
+          exit 1
