@@ -16,7 +16,9 @@ name: Two-phase cooling watch
 
 on:
   schedule:
-    - cron: "0 17 * * 0"   # Sunday 17:00 UTC, after World Model
+    # Sunday 17:23 UTC, after World Model (16:00). Off :00/:15/:30, the
+    # minutes every other scheduled workflow queues on.
+    - cron: "23 17 * * 0"
 
 permissions:
   contents: write
@@ -51,8 +53,14 @@ jobs:
         uses: ./.github/actions/commit-main
         with:
           message: "chore: INV two-phase cooling watch $(date -u +%Y-%m-%d)"
+          # The pending review is written only in a week with a rank 1-3 hit.
+          # A bare INV_two_phase_watch_*.md glob that matches nothing reaches
+          # git as a literal pathspec and fails the commit, so stage the
+          # directory: -A with directories cannot fail on an absent file, and
+          # the whole of _system/ is inside this workspace's sparse set.
           git_add: >-
+            -A
             INV/research/evidence/
             INV/investor-documents/competitive/
-            _system/reviews/pending/INV_two_phase_watch_*.md
+            _system/reviews/pending/
             dashboard/data/tickers/INV.json
