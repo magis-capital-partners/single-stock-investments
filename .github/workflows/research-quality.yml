@@ -60,6 +60,7 @@ on:
       # judged surface never triggers the suite.
       - "**/research/valuation_contract.json"
       - "**/research/falsifier_specs.json"
+      - "**/research/falsifier_drafts/**"
       - "_system/research/**"
       - "_system/data/runs/**"
       - "_system/data/epistemic_work_queue.json"
@@ -286,7 +287,7 @@ jobs:
               /(^|\/)research\/(valuation_contract|falsifier_specs)\.json$/.test(name) ||
               // A PR touching only a falsifier draft must still run the
               // history check's promotion simulation (the CEG / #988 failure).
-              /(^|\/)research\/falsifier_drafts\/[^/]+\.json$/.test(name) ||
+              /(^|\/)research\/falsifier_drafts\//.test(name) ||
               /^_system\/research\//.test(name) ||
               /^_system\/data\/runs\//.test(name) ||
               /^_system\/data\/warrants\//.test(name) ||
@@ -583,8 +584,15 @@ jobs:
             HISTORY_BASE="HEAD"
           fi
           python _system/scripts/check_falsifier_history.py --base-ref "$HISTORY_BASE"
+          # The promotion gate's suite arrives with WS1's falsifier branch;
+          # run it whenever it is present.
+          PROMOTION_GATE=""
+          if [ -f _system/scripts/tests/test_falsifier_promotion_gate.py ]; then
+            PROMOTION_GATE="tests.test_falsifier_promotion_gate"
+          fi
+          # shellcheck disable=SC2086
           (cd _system/scripts && python -m unittest -v \
-            test_falsifier_specs test_resolve_falsifiers \
+            test_falsifier_specs test_resolve_falsifiers $PROMOTION_GATE \
             test_calibration_brief test_epistemic_integrity \
             test_epistemic_loop_controller test_memory_delivery \
             test_validate_invariant_subset test_repository_health_supervisor)

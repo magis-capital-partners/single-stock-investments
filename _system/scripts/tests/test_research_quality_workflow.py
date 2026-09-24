@@ -84,8 +84,26 @@ def test_a_scheduled_run_checks_main_like_a_push(tmp_path):
 def test_a_pr_touching_only_a_falsifier_draft_runs_graph_invariants(tmp_path):
     """The CEG / #988 failure: a draft-only PR skipped the job that runs the
     history check's promotion simulation."""
-    outputs = classify(tmp_path, "pull_request", ["CEG/research/falsifier_drafts/abc123.json"])
-    assert outputs["graph_invariants"] == "true"
+    for draft in (
+        "CEG/research/falsifier_drafts/f8685f88d1aff5b6b56d0eba.json",
+        "CEG/research/falsifier_drafts/archive/old.json",
+        "CEG/research/falsifier_drafts/README.md",
+    ):
+        outputs = classify(tmp_path, "pull_request", [draft])
+        assert outputs["graph_invariants"] == "true", draft
+
+
+def test_a_push_touching_only_a_falsifier_draft_triggers_the_workflow():
+    assert "**/research/falsifier_drafts/**" in triggers()["push"]["paths"]
+
+
+def test_the_history_job_runs_the_promotion_gate_suite_when_present():
+    steps = load()["jobs"]["graph-invariants"]["steps"]
+    history = next(s for s in steps if "immutable history" in str(s.get("name", "")))
+    run = history["run"]
+    assert "[ -f _system/scripts/tests/test_falsifier_promotion_gate.py ]" in run
+    assert 'PROMOTION_GATE="tests.test_falsifier_promotion_gate"' in run
+    assert "test_resolve_falsifiers $PROMOTION_GATE" in run
 
 
 def test_a_pr_touching_only_a_deep_dive_skips_graph_invariants(tmp_path):
