@@ -1001,11 +1001,16 @@ class Supervisor:
                     if self.github.comment(issue["number"], f"`{name}` is now stale: {detail}"
                                                             f" (window {row['window']:.0f}h)."):
                         issue.setdefault("stale_noted", []).append(name)
-            if not row["stale"]:
+            # "Not stale" only means recovered when the lane is JUDGED fresh. A
+            # lane whose receipt scan was cut this build is merely unknown, and
+            # announcing it as recovered produced "[RECOVERED] `ls-algo`:
+            # work-done success at None" followed by [STALE] again.
+            recovered = row["judged"] and not row["stale"] and bool(row["last_success_at"])
+            if recovered:
                 for issue in self.state["issues"].values():
                     if name in issue.get("stale_noted", []):
                         issue["stale_noted"].remove(name)
-            if not row["stale"] and key in self.state["alerts"]:
+            if recovered and key in self.state["alerts"]:
                 self.alert(key, f"[RECOVERED] `{name}`: work-done success at"
                                 f" {row['last_success_at']}", clear=True)
 

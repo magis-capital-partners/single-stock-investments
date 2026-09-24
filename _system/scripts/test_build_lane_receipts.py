@@ -322,6 +322,79 @@ class ReceiptTests(unittest.TestCase):
         receipt = self.receipt("world-model")
         self.assertEqual(receipt["last_success_at"], "2026-09-18T16:40:00Z")
 
+    def test_a_cut_on_a_new_run_keeps_a_judged_lanes_verdict(self):
+        # Verifier flap probe: one 502 on the jobs call for one new ls-algo run
+        # reset the history walk, the supervisor announced "[RECOVERED] ls-algo:
+        # work-done success at None", then "[STALE]" again on the next build.
+        self.configure([{"name": "ls-algo", "workflow_file": "ls.yml", "job": "intake",
+                         "freshness_hours": 54}])
+        old = [run(n, f"2026-09-24T0{n}:00:00Z",
+                   [job(10 * n, "intake", "failure", f"2026-09-24T0{n}:30:00Z",
+                        [("Identity, onboard", "failure")])], conclusion="failure")
+               for n in range(1, 4)]
+        self.build(FakeGh({"ls.yml": old}))
+        judged = self.receipt("ls-algo")
+        self.assertTrue(judged["history_complete"])
+        newer = run(4, "2026-09-24T12:00:00Z",
+                    [job(40, "intake", "failure", "2026-09-24T12:30:00Z",
+                         [("Identity, onboard", "failure")])], conclusion="failure")
+        fake = FakeGh({"ls.yml": [newer] + old})
+        fake.respond_original = fake.respond
+        fake.respond = lambda cmd: None if (cmd[:2] == ["gh", "api"] and "/runs/4/jobs" in cmd[2]) \
+            else fake.respond_original(cmd)
+        self.build(fake)
+        receipt = self.receipt("ls-algo")
+        self.assertTrue(receipt["history_complete"], "a cut new run must not un-judge the lane")
+        self.assertEqual(receipt["scanned_through"], 3, "run 4 is rescanned next build")
+        self.build(FakeGh({"ls.yml": [newer] + old}))
+        self.assertEqual(self.receipt("ls-algo")["latest"]["run_id"], 4)
+
+    def test_an_in_flight_run_is_rescanned_when_a_newer_run_is_cut(self):
+        # Verifier pending probe: run 100 in flight, 101 and 102 done, the jobs
+        # call for 102 fails. The watermark used to jump to 101, past 100, so
+        # run 100's eventual success was never seen.
+        self.configure([{"name": "act", "workflow_file": "dp.yml", "job": "activist",
+                         "freshness_hours": 54}])
+        base = [run(90, "2026-09-24T05:00:00Z",
+                    [job(900, "activist", "success", "2026-09-24T06:00:00Z")])]
+        self.build(FakeGh({"dp.yml": base}))
+        pending = run(100, "2026-09-24T09:00:00Z", [], status="in_progress", conclusion=None)
+        later = [run(101, "2026-09-24T09:30:00Z", [job(1010, "news", "success",
+                                                        "2026-09-24T09:50:00Z")]),
+                 run(102, "2026-09-24T10:00:00Z", [job(1020, "news", "success",
+                                                        "2026-09-24T10:20:00Z")])]
+        fake = FakeGh({"dp.yml": [pending] + later + base})
+        fake.respond_original = fake.respond
+        fake.respond = lambda cmd: None if (cmd[:2] == ["gh", "api"] and "/runs/102/jobs" in cmd[2]) \
+            else fake.respond_original(cmd)
+        self.build(fake)
+        self.assertLess(self.receipt("act")["scanned_through"], 100)
+        done = run(100, "2026-09-24T09:00:00Z",
+                   [job(1000, "activist", "success", "2026-09-24T10:30:00Z")])
+        self.build(FakeGh({"dp.yml": [done] + later + base}))
+        self.assertEqual(self.receipt("act")["last_success_at"], "2026-09-24T10:30:00Z")
+
+    def test_a_partial_listing_is_no_listing(self):
+        # Verifier partial-listing probe: page 2 of a paged listing failing
+        # used to leave page 1 looking complete, so a weekly lane whose success
+        # was on page 2 was judged "never succeeded".
+        self.configure([{"name": "world-model", "workflow_file": "dp.yml",
+                         "job": "world-model", "freshness_hours": 342}])
+        runs = [run(1, "2026-09-18T16:00:00Z",
+                    [job(11, "world-model", "success", "2026-09-18T16:40:00Z")])]
+        runs += [run(n, f"2026-09-{19 + (n - 2) // 25:02d}T{(n - 2) % 24:02d}:10:00Z",
+                     [job(10 * n, "news", "success", "2026-09-24T00:00:00Z")])
+                 for n in range(2, 142)]
+        fake = FakeGh({"dp.yml": runs})
+        fake.respond_original = fake.respond
+        fake.respond = lambda cmd: None if (cmd[:2] == ["gh", "api"] and "/runs?" in cmd[2]
+                                            and "page=2" in cmd[2]) \
+            else fake.respond_original(cmd)
+        result = self.build(fake)
+        self.assertIn("world-model", result["unavailable"])
+        self.assertFalse((self.root / "_system/data/lane_receipts/world-model.json").exists(),
+                         "no receipt is better than one judged on half a listing")
+
     def test_an_in_flight_run_holds_the_watermark(self):
         self.configure([{"name": "memory", "workflow_file": "m.yml", "job": "triage",
                          "freshness_hours": 54}])

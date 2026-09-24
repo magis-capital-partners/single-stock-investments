@@ -414,6 +414,26 @@ class AlertTests(SupervisorFixture):
         self.assertTrue(any("no complete job-level receipt for 343h" in m
                             for m in self.slack.messages))
 
+    def test_an_unjudged_build_is_not_a_recovery(self):
+        # Verifier flap probe: a stale lane whose receipt was briefly un-judged
+        # (a cut scan) got "[RECOVERED] ... at None", then "[STALE]" again and a
+        # "now stale" comment on its issue.
+        self.configure([lane("ls-algo", job="intake", workflow="ls-algo-universe.yml")])
+        self.receipt("ls-algo", None, job="intake", workflow="ls-algo-universe.yml")
+        self.run_plan(MORNING)
+        self.assertTrue(any("[STALE] `ls-algo`" in m for m in self.slack.messages))
+        path = self.root / "_system/data/lane_receipts/ls-algo.json"
+        unjudged = json.loads(path.read_text(encoding="utf-8"))
+        unjudged["history_complete"] = False
+        path.write_text(json.dumps(unjudged), encoding="utf-8")
+        self.slack.messages.clear()
+        self.run_plan(MORNING + timedelta(hours=2))
+        self.receipt("ls-algo", None, job="intake", workflow="ls-algo-universe.yml")
+        self.run_plan(MORNING + timedelta(hours=4))
+        joined = "\n".join(self.slack.messages)
+        self.assertNotIn("[RECOVERED]", joined)
+        self.assertNotIn("[STALE]", joined, "still the same stale episode: nothing to repeat")
+
     def test_a_failed_send_is_retried_on_the_next_run(self):
         self.configure([lane("ls-algo", job="intake", workflow="ls-algo-universe.yml")])
         self.receipt("ls-algo", None, job="intake", workflow="ls-algo-universe.yml")

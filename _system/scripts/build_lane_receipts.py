@@ -95,7 +95,12 @@ class GhApi:
         return self._get(path)
 
     def workflow_runs(self, workflow_file: str, since: datetime):
-        """Runs on main created since ``since``, newest first (paged)."""
+        """Runs on main created since ``since``, newest first (paged).
+
+        All or nothing: if any page fails the listing is None and the lanes on
+        this workflow are "unavailable" for this build. A partial listing looks
+        complete and would judge a lane whose success sat on the missing page
+        as never having succeeded."""
         stamp = since.astimezone(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
         rows: list[dict] = []
         for page in range(1, MAX_PAGES + 1):
@@ -103,7 +108,7 @@ class GhApi:
                                 f"/runs?branch=main&per_page={RUNS_PER_PAGE}"
                                 f"&created={quote('>=' + stamp)}&page={page}")
             if not isinstance(payload, dict):
-                return None if page == 1 else rows
+                return None
             batch = payload.get("workflow_runs") or []
             rows.extend(run for run in batch if run.get("event") != "pull_request")
             if len(batch) < RUNS_PER_PAGE:
@@ -240,12 +245,16 @@ def refresh_lane(root: Path, lane: dict, api, runs: list[dict],
             # Walked the whole lookback without a success: the lane is judged.
             receipt["history_complete"] = True
             receipt["scan_low"] = lowest if lowest is not None else low
-    elif success_known and cut_at > high:
-        # Steady state: new runs were cut short -- rescan them next time.
-        receipt["scanned_through"] = max(high, cut_at - 1)
+    elif history_done:
+        # The lane is already judged and only NEW runs were candidates, so
+        # the cut is on a new run. Keep the verdict (resetting it made the
+        # supervisor announce a false recovery, then the stale lane again), and
+        # rescan from just below the cut -- never past an in-flight run.
+        receipt["scanned_through"] = min(top, max(high, cut_at - 1))
         notes.append(f"scan cut at run {cut_at}; resumes next build")
     else:
-        # History mode: keep the top, resume the walk just below the cut.
+        # History mode (not judged yet): keep the top, resume the walk just
+        # below the cut. top already sits below any in-flight run.
         receipt["scanned_through"] = top
         receipt["scan_low"] = cut_at + 1
         receipt["history_complete"] = False
