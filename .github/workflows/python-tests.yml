@@ -10,16 +10,25 @@ name: Python tests
 # a handful of dashboard files.
 
 on:
+  # Everything the suites read, so a change to any of it runs them: several
+  # tests parse the workflows and actions, and the D1 tests read the edge
+  # functions and migrations.
   pull_request:
     branches: [main]
     paths:
       - "_system/**"
-      - ".github/workflows/python-tests.yml"
+      - ".github/**"
+      - "dashboard/cloudflare/**"
+      - "dashboard/functions/**"
+      - "ops-watchdog/**"
   push:
     branches: [main]
     paths:
       - "_system/**"
-      - ".github/workflows/python-tests.yml"
+      - ".github/**"
+      - "dashboard/cloudflare/**"
+      - "dashboard/functions/**"
+      - "ops-watchdog/**"
   # Bot pushes (GITHUB_TOKEN) start no workflow, so main is also tested daily.
   schedule:
     - cron: "23 5 * * *"
@@ -93,6 +102,12 @@ jobs:
       KNOWN_FAILURES: >-
         _system/scripts/tests/test_d1_read_efficiency.py::test_hot_routes_do_not_scan_full_history
         _system/scripts/tests/test_prune_cloudflare_d1.py::test_deploy_defers_only_the_known_free_tier_quota_failure
+      # Suites that live beside the scripts rather than under tests/. Missing
+      # files are skipped, so a list entry can land before its file does.
+      EXTRA_TEST_FILES: >-
+        _system/scripts/test_lane_registry.py
+        _system/scripts/test_build_lane_receipts.py
+        _system/scripts/test_supervisor_workflows.py
     steps:
       - uses: actions/checkout@v4
         with:
@@ -101,8 +116,9 @@ jobs:
           filter: blob:none
           # What the suites read: _system without the reference corpus (its
           # top-level registries stay), the workflows some tests parse, the D1
-          # migrations and edge functions, one criticality summary, and one
-          # ticker download script for the payload-path test.
+          # migrations and edge functions, the ops-watchdog worker config, one
+          # criticality summary, and one ticker download script for the
+          # payload-path test.
           sparse-checkout: |
             /_system/
             !/_system/reference/*/
@@ -110,6 +126,7 @@ jobs:
             /dashboard/cloudflare/
             /dashboard/functions/
             /dashboard/data/criticality_summary.json
+            /ops-watchdog/
             /AMZN/investor-documents/download_amzn_investor_docs.py
           sparse-checkout-cone-mode: false
       - uses: actions/setup-python@v5
@@ -127,7 +144,12 @@ jobs:
           set -euo pipefail
           DESELECT=()
           for test_id in $KNOWN_FAILURES; do DESELECT+=(--deselect "$test_id"); done
-          python -m pytest -q -p no:cacheprovider "${DESELECT[@]}" _system/trading _system/scripts/tests
+          EXTRA=()
+          for test_file in $EXTRA_TEST_FILES; do
+            if [ -f "$test_file" ]; then EXTRA+=("$test_file"); else echo "not present yet: $test_file"; fi
+          done
+          python -m pytest -q -p no:cacheprovider "${DESELECT[@]}" \
+            _system/trading _system/scripts/tests "${EXTRA[@]}"
       - name: Known failures (reported, not gating)
         run: |
           set +e
