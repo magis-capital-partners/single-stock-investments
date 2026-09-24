@@ -41,6 +41,7 @@ from __future__ import annotations
 import argparse
 import os
 import re
+import shlex
 import subprocess
 import sys
 from datetime import datetime, timezone
@@ -67,6 +68,11 @@ MAIN_PATHS = (
     "_system/reference/video/insights_index_mirror.json",
 )
 
+# Lines of git's own output kept per stream when a command fails. A failed
+# `pull --rebase` opens with a fetch preamble ("From <remote>", a ref update)
+# and ends with the reason, so it is the tail that explains, never the head.
+GIT_TAIL_LINES = 12
+
 
 def stamp() -> str:
     return datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
@@ -74,6 +80,30 @@ def stamp() -> str:
 
 def log(message: str) -> None:
     print(f"[{stamp()}] {message}", flush=True)
+
+
+def describe_failure(exc: BaseException) -> str:
+    """The command that failed and, in git's own words, why.
+
+    `str()` of a CalledProcessError is the command alone. From 2026-09-21 to
+    09-23 that was all the log kept of "untracked working tree files would be
+    overwritten by checkout", the one line that said what to fix. stderr
+    carries git's verdict; stdout is where a rebase names the file it
+    conflicted on, so both tails are kept.
+    """
+    if not isinstance(exc, (subprocess.CalledProcessError, subprocess.TimeoutExpired)):
+        return f"{type(exc).__name__}: {exc}"
+    command = shlex.join(str(part) for part in exc.cmd)
+    if isinstance(exc, subprocess.TimeoutExpired):
+        detail = [f"`{command}` timed out after {exc.timeout}s"]
+    else:
+        detail = [f"`{command}` exited {exc.returncode}"]
+    for stream in (exc.stderr, exc.output):
+        if isinstance(stream, bytes):
+            stream = stream.decode("utf-8", "replace")
+        lines = [line.rstrip() for line in (stream or "").splitlines() if line.strip()]
+        detail += [f"    {line}" for line in lines[-GIT_TAIL_LINES:]]
+    return "\n".join(detail)
 
 
 def load_env_file(path: Path) -> int:
@@ -154,44 +184,62 @@ def self_update() -> None:
         log("worktree updated from origin/main")
     except (subprocess.CalledProcessError, subprocess.TimeoutExpired, OSError) as exc:
         # Running slightly stale beats not running. Say so rather than dying.
-        log(f"self-update skipped: {type(exc).__name__} {str(exc)[:160]}")
+        log(f"self-update skipped: {describe_failure(exc)}")
         run_git(ROOT, "rebase", "--abort", check=False, timeout=120)
 
 
-def push_vault(message: str) -> bool:
+def push_vault(message: str) -> bool | None:
     """Commit the videos/ subtree of the shared vault.
 
     The Whisper backfill and the analysis batch commit to this same clone every
     few minutes. Two git processes in one repository collide on .git/index.lock,
     and that collision wedged the vault for fourteen hours on 2026-08-31, so the
     same advisory lock those two take is taken here.
+
+    Returns what push_main returns: True on a completed push, None when there
+    was nothing to commit, False when a push was needed and did not happen.
+    Waiting out the lock is the last kind. The corpus this run wrote is still
+    uncommitted, which is a failed push rather than a skipped one.
     """
     repo = videos_root().parent
     try:
         with vault_lock(repo, owner="youtube_lane", log=lambda m: log(m.strip())):
-            clear_stale_git_state(repo, log=lambda m: log(m.strip()))
-            run_git(repo, "add", "-A", "videos", timeout=300)
-            staged = run_git(repo, "diff", "--cached", "--quiet", check=False, timeout=120)
-            if staged.returncode == 0:
-                log("vault: nothing to commit")
-                return False
-            run_git(repo, "commit", "-m", message, timeout=300)
-            run_git(repo, "-c", "rebase.autoStash=true", "pull", "--rebase",
-                    "origin", "main", timeout=900)
-            run_git(repo, "push", "origin", "main", timeout=600)
-            log("vault: pushed")
-            return True
-    except TimeoutError as exc:
-        log(f"vault lock: {exc}; skipping this push")
+            return _push_vault_locked(repo, message)
+    except OSError as exc:  # TimeoutError, in practice: the lock was never ours
+        log(f"vault push failed: {describe_failure(exc)}")
         return False
-    except (subprocess.CalledProcessError, subprocess.TimeoutExpired, OSError) as exc:
-        log(f"vault push failed: {str(exc)[:200]}")
-        run_git(repo, "rebase", "--abort", check=False, timeout=120)
+
+
+def _push_vault_locked(repo: Path, message: str) -> bool | None:
+    try:
         clear_stale_git_state(repo, log=lambda m: log(m.strip()))
+        run_git(repo, "add", "-A", "videos", timeout=300)
+        staged = run_git(repo, "diff", "--cached", "--quiet", check=False, timeout=120)
+        if staged.returncode == 0:
+            log("vault: nothing to commit")
+            return None
+        run_git(repo, "commit", "-m", message, timeout=300)
+        run_git(repo, "-c", "rebase.autoStash=true", "pull", "--rebase",
+                "origin", "main", timeout=900)
+        run_git(repo, "push", "origin", "main", timeout=600)
+        log("vault: pushed")
+        return True
+    except (subprocess.CalledProcessError, subprocess.TimeoutExpired, OSError) as exc:
+        log(f"vault push failed: {describe_failure(exc)}")
+        # Unwound while the lock is still held, so no other writer can be
+        # mid-rebase when this aborts one. Guarded because the dashboard publish
+        # has not run yet: on 2026-09-17 a plain `git commit` in this vault
+        # outlived its 300-second timeout, and an abort that did the same must
+        # not take the publish down with it.
+        try:
+            run_git(repo, "rebase", "--abort", check=False, timeout=120)
+            clear_stale_git_state(repo, log=lambda m: log(m.strip()))
+        except (subprocess.CalledProcessError, subprocess.TimeoutExpired, OSError) as undo:
+            log(f"vault unwind failed: {describe_failure(undo)}")
         return False
 
 
-def push_main(message: str) -> bool:
+def push_main(message: str) -> bool | None:
     """Commit the published video shard to this repository's main.
 
     True on a completed push, None when there was nothing to push, False when
@@ -216,7 +264,7 @@ def push_main(message: str) -> bool:
         log("main: pushed")
         return True
     except (subprocess.CalledProcessError, subprocess.TimeoutExpired, OSError) as exc:
-        log(f"main push failed: {str(exc)[:200]}")
+        log(f"main push failed: {describe_failure(exc)}")
         run_git(ROOT, "rebase", "--abort", check=False, timeout=120)
         return False
 
@@ -269,8 +317,9 @@ def main() -> int:
     if not step("build", [str(scripts / "build_video_insights.py")], required=True):
         return 1
 
+    vault_pushed = None
     if not args.no_push:
-        push_vault(f"chore(videos): transcript refresh {stamp()}")
+        vault_pushed = push_vault(f"chore(videos): transcript refresh {stamp()}")
 
     # The shard is what the dashboard actually reads. A stage that writes must
     # name its reader, so publishing runs even under --no-push: skipping it
@@ -282,6 +331,7 @@ def main() -> int:
     if args.no_push:
         log("--no-push: ran the chain, committed nothing")
         return 0 if published else 1
+    code = 0 if published else 1
     if published:
         # A failed push must reach the exit code. On 2026-09-08 the vault push
         # succeeded, `git pull --rebase origin main` exited 1, and the lane still
@@ -291,8 +341,16 @@ def main() -> int:
         # half of its publish path had failed.
         if push_main(f"chore(videos): publish admitted research {stamp()}") is False:
             log("main push failed; exiting non-zero so the scheduler sees it")
-            return 1
-    return 0 if published else 1
+            code = 1
+    # The vault push is judged here rather than where it failed, so a vault
+    # failure never costs the dashboard its publish. From 2026-09-21 to 09-23
+    # four untracked letters in the vault blocked every `pull --rebase`, each
+    # run logged "vault push failed" and exited 0, and the task read green
+    # while three days of corpus commits sat unpushed on this disk.
+    if vault_pushed is False:
+        log("vault push failed earlier in this run; exiting non-zero so the scheduler sees it")
+        code = 1
+    return code
 
 
 if __name__ == "__main__":
