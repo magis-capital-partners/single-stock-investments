@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
-"""Fail CI when an immutable falsifier revision is edited or deleted."""
+"""Fail CI when an immutable falsifier revision is edited or deleted, or when
+an approved draft could not be promoted without breaking that history."""
 from __future__ import annotations
 
 import argparse
@@ -58,6 +59,21 @@ def history_errors(base_docs: dict[str, dict], current_docs: dict[str, dict]) ->
     return errors
 
 
+def promotion_errors(ticker: str, committed: dict, working: dict, spec: dict) -> list[str]:
+    """History violations that appending ``spec`` to ``working`` would add.
+
+    ``committed`` is the ticker's sidecar as found on disk; ``working`` is that
+    sidecar plus anything promoted earlier in the same pass. Only violations
+    the new spec introduces are returned, so a problem already sitting in the
+    sidecar never blocks every draft for the ticker. The promoter and the
+    simulation below share this function so they cannot disagree.
+    """
+    base = {ticker: committed}
+    before = set(history_errors(base, {ticker: working}))
+    candidate = {**working, "specs": [*(working.get("specs") or []), spec]}
+    return [error for error in history_errors(base, {ticker: candidate}) if error not in before]
+
+
 def _git(root: Path, *args: str) -> str:
     # Git object payloads are UTF-8. Pin the decoder so immutable hashes are
     # identical on Windows hosts whose process locale is otherwise cp1252.
@@ -85,12 +101,75 @@ def _base_docs(root: Path, base_ref: str) -> dict[str, dict]:
     return docs
 
 
+def _read_draft(text: str) -> dict | None:
+    # The promoter's own tolerance for the secret-scanner pragma, imported
+    # here rather than at module top because the promoter imports this module.
+    from promote_falsifier_drafts import _strip_secret_pragma
+    try:
+        draft = json.loads(_strip_secret_pragma(text))
+    except json.JSONDecodeError:
+        return None
+    return draft if isinstance(draft, dict) else None
+
+
+def _base_draft(root: Path, base_ref: str, relative: str) -> dict | None:
+    try:
+        return _read_draft(_git(root, "show", f"{base_ref}:{relative}"))
+    except RuntimeError:
+        return None  # not on the base: a new draft
+
+
+def simulated_promotion_errors(root: Path, base_ref: str,
+                               current_docs: dict[str, dict]) -> list[str]:
+    """Promote, in memory, every approved draft this tree newly approves.
+
+    The promoter only runs in the falsifier lane, on main, after merge, and
+    this check used to read sidecars alone -- so a PR could approve a draft
+    that the promoter would append and this very check would then reject.
+    CEG did exactly that on 2026-09-07: a draft stamped revision 1 while
+    superseding a revision 1 passed its PR, then failed every lane run for
+    more than two weeks.
+
+    A draft counts as newly approved when it was not approved, or carried a
+    different spec, at ``base_ref``. A draft already approved on the base is
+    the lane's to hold back and report; turning every unrelated PR red over it
+    would repeat the trap this check exists to close.
+    """
+    errors: list[str] = []
+    working = {ticker: {**doc, "specs": list(doc.get("specs") or [])}
+               for ticker, doc in current_docs.items()}
+    for path in sorted(root.glob("*/research/falsifier_drafts/*.json")):
+        draft = _read_draft(path.read_text(encoding="utf-8"))
+        if not draft or draft.get("status") != "approved":
+            continue
+        spec = draft.get("spec") or {}
+        relative = path.relative_to(root).as_posix()
+        prior = _base_draft(root, base_ref, relative)
+        if prior and prior.get("status") == "approved" and prior.get("spec") == spec:
+            continue
+        ticker = path.parents[2].name
+        sidecar = working.setdefault(ticker, {"specs": []})
+        identity = _identity(ticker, spec)
+        if identity and identity in {_identity(ticker, row) for row in sidecar["specs"]}:
+            continue
+        problems = promotion_errors(ticker, current_docs.get(ticker) or {"specs": []},
+                                    sidecar, spec)
+        if problems:
+            errors.extend(f"approved draft {relative} would not promote: {problem}"
+                          for problem in problems)
+        else:
+            sidecar["specs"].append(spec)
+    return errors
+
+
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--root", type=Path, default=ROOT)
     parser.add_argument("--base-ref", default="origin/main")
     args = parser.parse_args()
-    errors = history_errors(_base_docs(args.root, args.base_ref), _current_docs(args.root))
+    current = _current_docs(args.root)
+    errors = history_errors(_base_docs(args.root, args.base_ref), current)
+    errors += simulated_promotion_errors(args.root, args.base_ref, current)
     for error in errors:
         print(f"ERROR: {error}")
     print(f"falsifier history: {len(errors)} violation(s)")
