@@ -23,9 +23,46 @@
 
   const isMinorUnit = (units) => Boolean(units) && Number(units.minor_unit_factor || 1) !== 1;
 
+  // How old each feed may get before the page says so. Each is the producer's
+  // own cadence plus a grace period, so a feed that is merely between runs
+  // stays quiet and one that has stopped does not.
+  //   darwin           weekday refresh (darwin-refresh.yml, 01:20 UTC Mon-Fri) + a weekend
+  //   activist         daily scan (data-pipeline.yml, 06:00 UTC) + a day
+  //   two_phase_watch  weekly (two-phase-watch.yml, Sunday 17:00 UTC) + three days,
+  //                    matching two_phase_watch.py's own >10-day stale rule
+  const FEED_MAX_AGE_HOURS = Object.freeze({ darwin: 96, activist: 48, two_phase_watch: 240 });
+
+  // A timestamp or a bare calendar date, as epoch ms (UTC), or null.
+  const stampMs = (value) => {
+    if (value == null || value === '') return null;
+    const text = String(value).trim();
+    const dateOnly = /^(\d{4})-(\d{2})-(\d{2})$/.exec(text);
+    const ms = dateOnly ? Date.UTC(Number(dateOnly[1]), Number(dateOnly[2]) - 1, Number(dateOnly[3])) : Date.parse(text);
+    return Number.isFinite(ms) ? ms : null;
+  };
+
   window.DashboardFormat = Object.freeze({
     finite,
     isMinorUnit,
+    FEED_MAX_AGE_HOURS,
+
+    /**
+     * A visible "STALE since <date>" badge when a feed's stamp is older than
+     * its expected cadence, or '' when it is fresh or the stamp is unreadable.
+     *
+     * A feed that stops leaves a well-formed file behind, and a page that
+     * prints only its date reads the same on the day it stopped as a month
+     * later. The date shown is the stamp's own UTC date: the last time the
+     * data moved, which is what "since" means here.
+     */
+    staleBadge(stamp, maxAgeHours, { now = Date.now() } = {}) {
+      const at = stampMs(stamp);
+      const limit = Number(maxAgeHours);
+      if (at == null || !Number.isFinite(limit) || limit <= 0) return '';
+      if (now - at <= limit * 3_600_000) return '';
+      const day = new Date(at).toISOString().slice(0, 10);
+      return `<span class="badge badge-bad stale-badge" title="Expected to refresh at least every ${limit} hours; unchanged since ${day}.">STALE since ${day}</span>`;
+    },
 
     number(value, options = {}) {
       const number = finite(value);

@@ -2509,6 +2509,14 @@ function renderHumanReviewBanner(t) {
   </div>`;
 }
 
+// One place that turns a feed's stamp into a visible STALE badge, using the
+// cadence table in ui-format.js. Returns '' (nothing rendered) when fresh.
+function feedStaleBadge(stamp, feed) {
+  const format = window.DashboardFormat;
+  const badge = format?.staleBadge ? format.staleBadge(stamp, format.FEED_MAX_AGE_HOURS[feed]) : '';
+  return badge ? ` ${badge}` : '';
+}
+
 function twoPhaseRankBadge(rank) {
   const n = Number(rank);
   if (n <= 3) return 'badge-bad';
@@ -2555,7 +2563,7 @@ function renderTwoPhaseWatch(t) {
       <p class="tier-sub" style="margin-top:8px">Rank 1–3 go to review. Rank 5–6 never enter base return. Falsifiers (Vertiv/Boyd GA without Accelsius, DarkNX-class reversals) stay in red.</p>`;
   }
   return `<details class="detail-section" id="two-phase-watch"${open ? ' open' : ''}>
-    <summary>Two-phase cooling watch${w.as_of ? ` · ${escapeHtml(w.as_of)}` : ''}${rank != null ? ` · rank ${escapeHtml(String(rank))}` : ''}</summary>
+    <summary>Two-phase cooling watch${w.as_of ? ` · ${escapeHtml(w.as_of)}` : ''}${feedStaleBadge(w.as_of, 'two_phase_watch')}${rank != null ? ` · rank ${escapeHtml(String(rank))}` : ''}</summary>
     <div style="margin-top:10px">${body}</div>
   </details>`;
 }
@@ -2570,7 +2578,7 @@ function renderTwoPhaseHeaderChip(t) {
     const days = Math.round((Date.now() - Date.parse(asOf + 'T00:00:00')) / 86400000);
     if (Number.isFinite(days) && days >= 0) age = days === 0 ? 'today' : `${days}d ago`;
   }
-  return `<button type="button" class="two-phase-chip" data-open-two-phase>Two-phase · rank ${escapeHtml(String(rank))} · ${escapeHtml(age || asOf)}</button>`;
+  return `<button type="button" class="two-phase-chip" data-open-two-phase>Two-phase · rank ${escapeHtml(String(rank))} · ${escapeHtml(age || asOf)}${feedStaleBadge(asOf, 'two_phase_watch')}</button>`;
 }
 
 function renderReadNextCard(t) {
@@ -4388,7 +4396,7 @@ function renderDarwin() {
   content.innerHTML = `
     <h2 style="font-size:18px;margin-bottom:6px">Darwin · ${escapeHtml(acctLabel)} paper book</h2>
     <p class="subhead" style="margin-bottom:14px">
-      Tier ${escapeHtml(String(d.tier ?? '0'))} · ${escapeHtml(d.generated_at || '')} · phase ${escapeHtml(d.phase || '—')}
+      Tier ${escapeHtml(String(d.tier ?? '0'))} · ${escapeHtml(d.generated_at || '')}${feedStaleBadge(d.generated_at, 'darwin')} · phase ${escapeHtml(d.phase || '—')}
       · <span class="badge badge-purple">${escapeHtml(d.account_profile || activeDarwinAccount)}</span>
       · policy <span class="mono">${escapeHtml(d.policy_id || '—')}</span>
       · universe <span class="mono">${escapeHtml(univSpec)}</span>${univSpecEff && univSpecEff !== univSpec ? ` → <span class="mono">${escapeHtml(univSpecEff)}</span>` : ''}${univCount != null ? ` · ${univCount} eligible` : ''}
