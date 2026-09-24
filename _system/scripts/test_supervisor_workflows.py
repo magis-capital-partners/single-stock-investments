@@ -50,10 +50,32 @@ class SupervisorWorkflow(unittest.TestCase):
         self.assertNotIn("gh issue comment", self.text)
         self.assertNotIn("dispatches.jsonl", self.text)
 
-    def test_the_checkout_carries_what_the_supervisor_reads(self):
-        for path in (".github/workflows", "_system/data/epistemic_work_queue.json",
-                     "_system/data/lane_receipts", "_system/graph/graph_sources.json"):
-            self.assertIn(f"            {path}\n", self.text)
+    def sparse_patterns(self) -> list[str]:
+        block = self.text.split("sparse-checkout: |", 1)[1].split("sparse-checkout-cone-mode", 1)[0]
+        return [line.strip() for line in block.splitlines() if line.strip()]
+
+    def test_the_checkout_carries_everything_the_supervisor_reads(self):
+        # A feed outside the sparse checkout reads "file missing" forever, and
+        # its healer is then dispatched three times a day against nothing
+        # (capitulation_daily.json, caught by the verifier).
+        import json
+        import supervise_repository_health as supervisor
+        patterns = self.sparse_patterns()
+
+        def covered(path: str) -> bool:
+            return any(path == p or path.startswith(p.rstrip("/") + "/") for p in patterns)
+
+        config = json.loads((ROOT / "_system/graph/graph_sources.json").read_text(encoding="utf-8"))
+        feeds = [feed["path"] for name, feed in config["data_feeds"].items()
+                 if not name.startswith("_") and isinstance(feed, dict)]
+        self.assertGreaterEqual(len(feeds), 8)
+        reads = [Path(p).as_posix() for p in (
+            lr.CONFIG_REL, lr.RECEIPTS_REL, lr.WORKFLOWS_REL, supervisor.STATE_REL,
+            supervisor.WORK_QUEUE_REL)]
+        reads += ["_system/scripts/supervise_repository_health.py",
+                  "_system/scripts/build_lane_receipts.py", ".github/actions/commit-main"]
+        for path in feeds + reads:
+            self.assertTrue(covered(path), f"{path} is not in the supervisor's sparse checkout")
 
 
 class RetiredAutofix(unittest.TestCase):
