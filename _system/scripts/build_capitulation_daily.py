@@ -778,10 +778,21 @@ def main() -> int:
         help="Do not build: exit 1 unless the snapshot was written at/after ISO_TIME",
     )
     args = parser.parse_args()
-    if args.check_rebuilt_since:
-        status, message = check_rebuilt(
-            args.output_dir, datetime.fromisoformat(args.check_rebuilt_since)
-        )
+    # `is not None`, not truthiness: an empty value (the step never recorded
+    # its start time) fell through to a FULL build instead of the check.
+    if args.check_rebuilt_since is not None:
+        value = args.check_rebuilt_since.strip()
+        try:
+            since = datetime.fromisoformat(value) if value else None
+        except ValueError:
+            since = None
+        if since is None:
+            print(
+                "::error title=capitulation-daily::--check-rebuilt-since needs the run's "
+                f"start time, got {args.check_rebuilt_since!r}; the snapshot cannot be judged"
+            )
+            return 1
+        status, message = check_rebuilt(args.output_dir, since)
         print(message)
         return status
     subset = (

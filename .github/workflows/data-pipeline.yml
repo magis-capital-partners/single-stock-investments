@@ -191,9 +191,11 @@ jobs:
         # print, so running it first made the fallback read yesterday's chain.
         # build_spx_surface has no dependency on vol metrics, so this is free.
         run: |
+          # Recorded FIRST: if an earlier builder fails, the check below still
+          # has a start time and reports capitulation as not rebuilt.
+          date -u +%Y-%m-%dT%H:%M:%S+00:00 > "$RUNNER_TEMP/capitulation_started_at"
           python _system/scripts/build_spx_surface.py
           python _system/scripts/build_vol_metrics.py
-          date -u +%Y-%m-%dT%H:%M:%S+00:00 > "$RUNNER_TEMP/capitulation_started_at"
           python _system/scripts/build_capitulation_daily.py --workers 6
       # The capitulation builder exits 0 even when it writes nothing (a missing
       # model dependency), so judge it by its artifact, after the commit.

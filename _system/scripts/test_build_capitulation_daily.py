@@ -9,6 +9,7 @@ copy of a weight or a threshold.
 """
 from __future__ import annotations
 
+import io
 import json
 import math
 import subprocess
@@ -16,6 +17,7 @@ import sys
 import tempfile
 import textwrap
 import unittest
+import unittest.mock
 from datetime import date, datetime, timedelta
 from pathlib import Path
 
@@ -521,6 +523,25 @@ class CheckRebuiltTest(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             status, _ = bcd.check_rebuilt(Path(tmp), datetime.fromisoformat("2026-09-23T00:00:00+00:00"))
             self.assertEqual(status, 1)
+
+    def _main_with_argv(self, *argv):
+        with unittest.mock.patch.object(sys, "argv", ["build_capitulation_daily.py", *argv]), \
+                unittest.mock.patch.object(bcd, "build") as build, \
+                unittest.mock.patch("sys.stdout", new_callable=io.StringIO) as out:
+            status = bcd.main()
+        return status, build, out.getvalue()
+
+    def test_an_empty_start_time_is_rejected_not_built(self):
+        # The step's timestamp file was missing, so the shell passed "".
+        status, build, out = self._main_with_argv("--check-rebuilt-since", "")
+        self.assertEqual(status, 1)
+        build.assert_not_called()
+        self.assertIn("::error", out)
+
+    def test_an_unparseable_start_time_is_rejected(self):
+        status, build, _ = self._main_with_argv("--check-rebuilt-since", "yesterday")
+        self.assertEqual(status, 1)
+        build.assert_not_called()
 
     def test_lagging_snapshot_passes_with_a_warning(self):
         with tempfile.TemporaryDirectory() as tmp:

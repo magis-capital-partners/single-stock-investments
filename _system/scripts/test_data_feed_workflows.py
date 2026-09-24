@@ -123,6 +123,15 @@ class CapitulationRebuiltGateTests(unittest.TestCase):
         self.assertTrue(0 <= build < check < commit, (build, check, commit))
         self.assertIn("capitulation_started_at", step_text(steps[build]))
 
+    def test_run_start_is_recorded_before_any_builder_can_fail(self) -> None:
+        steps = load_workflow("data-pipeline.yml")["jobs"]["technicals"]["steps"]
+        build = steps[step_index(steps, lambda s: "build_capitulation_daily.py --workers" in step_text(s))]
+        commands = [
+            line.strip() for line in step_text(build).splitlines()
+            if line.strip() and not line.strip().startswith("#")
+        ]
+        self.assertIn("capitulation_started_at", commands[0])
+
     def test_technicals_job_fails_loud_when_capitulation_was_not_rebuilt(self) -> None:
         steps = load_workflow("data-pipeline.yml")["jobs"]["technicals"]["steps"]
         check = step_index(steps, lambda s: s.get("id") == "capitulation_rebuilt")
