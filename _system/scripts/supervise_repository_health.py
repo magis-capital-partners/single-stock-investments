@@ -847,8 +847,11 @@ class Supervisor:
             key = f"stale:{name}"
             if row["stale"] and key not in self.state["alerts"]:
                 latest = row["latest"] or {}
+                floor = (row["receipt"] or {}).get("scan_floor_at")
                 detail = (f"last work-done success {_fmt_age(row['age_hours'])} ago"
-                          if row["last_success_at"] else "no work-done success on record")
+                          if row["last_success_at"] else
+                          f"no work-done success since at least {floor}" if floor else
+                          "no work-done success on record")
                 why = []
                 if latest.get("outcome"):
                     why.append(f"latest run: {latest['outcome']}"
