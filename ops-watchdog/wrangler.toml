@@ -1,0 +1,39 @@
+# ops-watchdog: external dead-man's switch for the repository-health supervisor.
+#
+# Every 30 minutes on Cloudflare's cron (not GitHub's) it alerts Slack when
+#   (a) the supervisor's committed state is older than 8h (read from
+#       raw.githubusercontent.com; the repository is public),
+#   (b) today's D1 rows read / written pass 60% or 80% of the free daily
+#       limits (GraphQL analytics; an unauthorized token degrades quietly),
+#   (c) the committed dashboard/data/core.json is older than 36h (the Pages
+#       site itself sits behind Cloudflare Access, so the Worker reads the
+#       committed artifact the deploy serves).
+# It binds no D1 database and writes nothing to D1.
+#
+# Secrets, set by .github/workflows/deploy-ops-watchdog.yml on every deploy:
+#   SLACK_WEBHOOK_URL, CF_API_TOKEN, CF_ACCOUNT_ID
+#
+# Alert dedupe uses a KV namespace bound as DEDUPE when one exists (exact,
+# a handful of writes a day against the 1,000/day free limit). Without it the
+# Worker tries the Cache API (a no-op on *.workers.dev) and then falls back to
+# fixed slots: a persisting condition alerts at most four times a day. To bind
+# KV once:  npx wrangler kv namespace create ops-watchdog-dedupe
+# then uncomment the block below with the printed id.
+name = "ops-watchdog"
+main = "src/index.js"
+compatibility_date = "2026-09-01"
+
+[triggers]
+crons = ["*/30 * * * *"]
+
+[vars]
+REPO = "magis-capital-partners/single-stock-investments"
+BRANCH = "main"
+SUPERVISOR_STATE_PATH = "_system/data/repository_health_supervisor.json"
+CORE_PATH = "dashboard/data/core.json"
+SUPERVISOR_MAX_AGE_HOURS = "8"
+CORE_MAX_AGE_HOURS = "36"
+
+# [[kv_namespaces]]
+# binding = "DEDUPE"
+# id = "<namespace id from wrangler kv namespace create>"

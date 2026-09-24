@@ -542,6 +542,21 @@
           "why": "an active warrant with no delayed mark for more than five days cannot be silently presented as current"
         }
       }
+    },
+    "capitulation_daily": {
+      "path": "dashboard/data/capitulation_daily.json",
+      "stamp_field": "generated_at",
+      "max_age_hours": 100,
+      "healer": "python _system/scripts/build_capitulation_daily.py --workers 6 (forced-flow-daily weekdays 22:00 UTC; data-pipeline technicals lane, heal-technicals)",
+      "assert_fields": {
+        "quality_state": {
+          "not_in": [
+            "stale",
+            "unavailable"
+          ],
+          "why": "'unavailable' means no symbol could be fetched and 'stale' means the market (SPY) row is a preserved copy after a fetch failure; either way the ladder is not today's. 'lagging' (Yahoo behind the expected NYSE session) and 'limited' are deliberately NOT violations: they clear on their own, and flagging them would only make the healer dispatch against a vendor delay."
+        }
+      }
     }
   },
   "classification_vocab": {

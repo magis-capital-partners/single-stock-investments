@@ -82,7 +82,12 @@ P3_LANE_HEALERS = {
     "valuation": {"event_type": "refresh-power-zones"},
     "deploy": {"workflow": "dashboard-pages.yml",
                "fields": {"reason": "repository-health supervisor: deploy lane stale"}},
+    # WS1 adds this repository_dispatch type to two-phase-watch.yml; until that
+    # lands, healer_wired() holds the dispatch instead of burning the budget.
+    "two-phase-watch": {"event_type": "two-phase-watch-run"},
 }
+
+WORK_QUEUE_REL = Path("_system/data/epistemic_work_queue.json")
 
 # P6 feeds heal through a lane, so they share its budget and its
 # persistent-failure stop (heal-warrants ran 51 times against one error).
@@ -94,6 +99,9 @@ P6_FEED_LANES = {
     "warrant_monitor": "data-pipeline-warrant-discover",
     "market_risk_components_committed": "market-risk",
     "podcast_catalog": "podcasts",
+    # Rebuilt by forced-flow-daily and by the technicals job; only the latter
+    # has an on-demand trigger (heal-technicals).
+    "capitulation_daily": "data-pipeline-technicals",
 }
 
 
@@ -141,7 +149,7 @@ def _fmt_age(hours: float | None) -> str:
 # --------------------------------------------------------------------------- #
 
 _ANSI = re.compile(r"\x1b\[[0-9;]*[A-Za-z]|\^\[\[[0-9;]*m")
-_TS_PREFIX = re.compile(r"^﻿?\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?Z\s?")
+_TS_PREFIX = re.compile(r"^\ufeff?\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?Z\s?")
 _ISO = re.compile(r"\d{4}-\d{2}-\d{2}(?:[T ]\d{2}:\d{2}(?::\d{2}(?:\.\d+)?)?"
                   r"(?:Z|[+-]\d{2}:?\d{2})?)?")
 _UUID = re.compile(r"\b[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\b", re.I)
@@ -462,6 +470,56 @@ def _feed_name(violation: str) -> str:
     return violation.split(":", 1)[0].strip()
 
 
+def healer_wired(root: Path, lane: dict | None, healer: dict) -> tuple[bool, str]:
+    """A healer only helps if the lane's workflow listens for it: a
+    repository_dispatch type nobody declares starts nothing and still spends
+    the lane's daily budget. With no workflow tree checked out (unit fixtures)
+    the registry is trusted; the supervisor job checks out .github/workflows."""
+    workflows = root / lr.WORKFLOWS_REL
+    if lane is None or not workflows.is_dir():
+        return True, ""
+    name = str(lane.get("workflow_file") or "")
+    try:
+        text = (workflows / name).read_text(encoding="utf-8")
+    except OSError:
+        return False, f"{name} is missing"
+    event = healer.get("event_type")
+    if event:
+        token = re.compile(r"(?m)(?:^\s*-\s*|[\[,]\s*)[\"']?" + re.escape(event)
+                           + r"[\"']?\s*(?:[,\]]|$)")
+        if "repository_dispatch" not in text or not token.search(text):
+            return False, f"{name} does not listen for repository_dispatch {event}"
+        return True, ""
+    if healer.get("workflow") != name or not re.search(r"(?m)^  workflow_dispatch:", text):
+        return False, f"{healer.get('workflow')} has no workflow_dispatch trigger"
+    return True, ""
+
+
+def held_back_work(root: Path) -> list[dict]:
+    """Work items parked in needs_semantic_review. The falsifier promoter
+    (WS1, 2026-09-24) parks a draft it cannot promote there with its
+    promotion_blockers instead of failing the lane, so the lane stays green
+    and the quarantined draft would otherwise sit unseen."""
+    try:
+        payload = json.loads((root / WORK_QUEUE_REL).read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return []
+    items = payload.get("items") if isinstance(payload, dict) else None
+    held = []
+    for item in items or []:
+        if not isinstance(item, dict) or item.get("state") != "needs_semantic_review":
+            continue
+        blockers = item.get("promotion_blockers") or []
+        if isinstance(blockers, str):
+            blockers = [blockers]
+        held.append({"work_id": str(item.get("work_id") or ""),
+                     "ticker": item.get("ticker"), "task_type": item.get("task_type"),
+                     "spec_id": item.get("spec_id"), "reason": item.get("reason"),
+                     "promotion_blockers": [str(b) for b in blockers],
+                     "draft": bool(blockers)})
+    return held
+
+
 # --------------------------------------------------------------------------- #
 # state
 # --------------------------------------------------------------------------- #
@@ -510,6 +568,7 @@ class Supervisor:
         self.dispatches: list[dict] = []
         self.issue_actions: list[str] = []
         self.notes: list[str] = []
+        self.held_for_review: list[dict] = []
         self.today = now.strftime("%Y-%m-%d")
 
     # -- alert bookkeeping -------------------------------------------------- #
@@ -718,6 +777,9 @@ class Supervisor:
         healer = P3_LANE_HEALERS.get(name)
         if not healer:
             return False, "no healer registered"
+        wired, why = healer_wired(self.root, (row or {}).get("lane"), healer)
+        if not wired:
+            return False, why
         if row is not None:
             if row["in_flight"]:
                 return False, "a run is already queued or in progress"
@@ -846,6 +908,22 @@ class Supervisor:
             elif name in P3_LANE_HEALERS:
                 held[name] = why
 
+        # Work parked for semantic review: a held-back draft keeps its lane
+        # green, so it is announced once here and listed in every digest.
+        review = held_back_work(self.root)
+        self.held_for_review = review
+        current = {f"held:{item['work_id']}" for item in review if item["draft"]}
+        for item in review:
+            key = f"held:{item['work_id']}"
+            if item["draft"] and key not in self.state["alerts"]:
+                blockers = "; ".join(item["promotion_blockers"])[:200]
+                self.alert(key, f"[HELD DRAFT] {item['ticker']} {item.get('spec_id') or ''}"
+                                f" parked in needs_semantic_review by the promoter: {blockers}",
+                           value=item.get("ticker"))
+        for key in [k for k in self.state["alerts"] if k.startswith("held:")]:
+            if key not in current:
+                self.state["alerts"].pop(key, None)      # released; nothing to announce
+
         d1_status = self.check_d1()
         digest = self.maybe_digest(lanes, violated, d1_status, gap)
         sent = self.deliver(digest)
@@ -912,6 +990,13 @@ class Supervisor:
                   if l.get("date") == self.today and int(l.get("count") or 0)}
         lines.append("Healer dispatches today: " + (", ".join(f"{n} x{c}" for n, c in
                                                              sorted(todays.items())) or "none"))
+        review = getattr(self, "held_for_review", [])
+        drafts = [item for item in review if item["draft"]]
+        lines.append(f"Held for semantic review: {len(review)} work item(s),"
+                     f" {len(drafts)} draft(s) the promoter could not promote")
+        for item in (drafts + [i for i in review if not i["draft"]])[:8]:
+            why = "; ".join(item["promotion_blockers"]) or item.get("reason") or "no reason recorded"
+            lines.append(f"  - {item['ticker']} {item.get('task_type') or ''}: {why[:100]}")
         lines.append(f"Registered feeds (P6): {len(violated)} stale"
                      + (": " + ", ".join(sorted(violated)) if violated else ""))
         if d1_status.get("status") == "ok":
@@ -1007,8 +1092,11 @@ class Supervisor:
         self._written = payload
 
     def payload(self, lanes, violated, held, sent, d1_status) -> dict:
+        review = getattr(self, "held_for_review", [])
         return {
             "checked_at": iso(self.now),
+            "held_for_review": {"items": len(review),
+                                "drafts": sum(1 for item in review if item["draft"])},
             "stale_lanes": sorted(n for n, r in lanes.items() if r["stale"]),
             "persistent_lanes": sorted(n for n, r in lanes.items() if r.get("persistent")),
             "feeds_stale": sorted(violated),

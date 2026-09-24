@@ -351,6 +351,38 @@ class AlertTests(SupervisorFixture):
         self.assertEqual(len(digests), 2)
 
 
+class HeldWorkTests(SupervisorFixture):
+    def queue(self, items):
+        path = self.root / supervisor.WORK_QUEUE_REL
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(json.dumps({"items": items}), encoding="utf-8")
+
+    def test_a_held_back_draft_is_announced_once_and_listed_in_the_digest(self):
+        # The promoter now parks a draft it cannot promote in
+        # needs_semantic_review instead of failing the lane, so the lane stays
+        # green and nothing else would ever mention the draft.
+        self.configure([])
+        self.queue([
+            {"work_id": "w1", "ticker": "CRM", "task_type": "author_falsifier",
+             "state": "needs_semantic_review",
+             "promotion_blockers": ["metric_definition_id missing from the registry"]},
+            {"work_id": "w2", "ticker": "SPGI", "task_type": "resolve_falsifier",
+             "state": "needs_semantic_review", "reason": "ttm_period_inputs_missing"},
+            {"work_id": "w3", "ticker": "ASML", "state": "queued"}])
+        result = self.run_plan(MORNING)
+        joined = "\n".join(self.slack.messages)
+        self.assertIn("[HELD DRAFT] CRM", joined)
+        self.assertIn("metric_definition_id missing", joined)
+        self.assertNotIn("SPGI", joined, "only promoter drafts page; the rest go to the digest")
+        self.assertEqual(result["held_for_review"], {"items": 2, "drafts": 1})
+        self.slack.messages.clear()
+        self.run_plan(MORNING.replace(hour=14))
+        joined = "\n".join(self.slack.messages)
+        self.assertNotIn("[HELD DRAFT]", joined)
+        self.assertIn("Held for semantic review: 2 work item(s), 1 draft(s)", joined)
+        self.assertIn("SPGI", joined)
+
+
 class ExtractionTests(unittest.TestCase):
     def test_specific_annotation_beats_the_generic_exit_code(self):
         kind, line = supervisor.extract_error([
@@ -488,6 +520,10 @@ class CompatibilityTests(unittest.TestCase):
         publish_block = market.split("name: Publish signed component snapshot", 1)[1]
         self.assertIn("continue-on-error: true", publish_block)
 
+    # Healers whose trigger another workstream is adding to the lane's workflow.
+    # Until it lands, healer_wired() holds their dispatch (tested below).
+    AWAITING_WIRING = {"two-phase-watch"}
+
     def test_every_healer_event_is_one_its_workflow_listens_for(self):
         # A repository_dispatch type nobody listens to burns the lane's budget.
         import lane_registry as lr
@@ -495,15 +531,36 @@ class CompatibilityTests(unittest.TestCase):
         by_lane = {l["name"]: l for l in lr.declared_lanes(config)}
         for name, healer in supervisor.P3_LANE_HEALERS.items():
             self.assertIn(name, by_lane, name)
-            text = (ROOT / ".github/workflows" / by_lane[name]["workflow_file"]).read_text(
-                encoding="utf-8")
-            if healer.get("event_type"):
-                self.assertIn(healer["event_type"], text, name)
-            else:
-                self.assertEqual(healer["workflow"], by_lane[name]["workflow_file"], name)
-                self.assertRegex(text, r"(?m)^  workflow_dispatch:", name)
+            wired, why = supervisor.healer_wired(ROOT, by_lane[name], healer)
+            if name in self.AWAITING_WIRING and not wired:
+                continue
+            self.assertTrue(wired, f"{name}: {why}")
         for feed, lane_name in supervisor.P6_FEED_LANES.items():
             self.assertIn(lane_name, by_lane, feed)
+
+    def test_an_unwired_healer_is_held_not_dispatched(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            (root / "_system/graph").mkdir(parents=True)
+            (root / "_system/graph/graph_sources.json").write_text(json.dumps({
+                "lanes": [lane("two-phase-watch", job="watch", workflow="two-phase-watch.yml",
+                               hours=342)], "data_feeds": {}}), encoding="utf-8")
+            flow = root / ".github/workflows/two-phase-watch.yml"
+            flow.parent.mkdir(parents=True)
+            flow.write_text("on:\n  schedule:\n    - cron: \"0 17 * * 0\"\njobs:\n  watch:\n",
+                            encoding="utf-8")
+            github = FakeGitHub()
+            with mock.patch.object(supervisor, "_head", return_value="abc"):
+                result = supervisor.plan(root, now=T0, github=github, slack=FakeSlack(), act=True)
+            self.assertEqual(github.events, [])
+            self.assertIn("does not listen for repository_dispatch two-phase-watch-run",
+                          result["held"]["two-phase-watch"])
+            flow.write_text("on:\n  schedule:\n    - cron: \"0 17 * * 0\"\n  repository_dispatch:\n"
+                            "    types: [two-phase-watch-run]\njobs:\n  watch:\n", encoding="utf-8")
+            with mock.patch.object(supervisor, "_head", return_value="abc"):
+                supervisor.plan(root, now=T0 + timedelta(hours=3), github=github,
+                                slack=FakeSlack(), act=True)
+            self.assertEqual(github.events, ["two-phase-watch-run"])
 
 
 if __name__ == "__main__":
