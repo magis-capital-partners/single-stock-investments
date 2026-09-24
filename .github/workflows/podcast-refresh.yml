@@ -26,7 +26,7 @@ on:
   # workflow's schedule. The concurrency change below is the real fix; this is
   # belt-and-braces so the fetch also is not competing for runners.
   schedule:
-    - cron: "0 21 * * 1"
+    - cron: "7 21 * * 1"  # moved off the quarter-hour, where GitHub drops and delays scheduled runs
   workflow_dispatch:
     inputs:
       backfill:
