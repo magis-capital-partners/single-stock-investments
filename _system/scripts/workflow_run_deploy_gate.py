@@ -12,18 +12,24 @@ The gate is now content-addressed:
 * ``fingerprint`` hashes the git object ids of everything a deploy publishes or
   runs (the dashboard tree, the deploy scripts, the seed's inputs) at a commit.
   Identical content gives an identical fingerprint, whichever workflow ran.
-* A fully successful deploy (Pages shipped and D1 synced) saves an Actions
-  cache key for that fingerprint; the workflow looks the key up without
-  downloading anything.
-* ``decide`` turns the lookups into a verdict. Pushes and manual dispatches
-  always deploy. A workflow_run deploys only when the fingerprint was never
-  fully synced. The daily schedule -- the recovery path after the 00:00 UTC
-  quota reset -- also deploys when that day's D1 retention has not run.
-  Neither retries on the day a D1 stage was deferred: the budget is spent
-  until 00:00 UTC.
+* A fully successful deploy (Pages shipped and D1 synced) records its
+  fingerprint as the LAST deployed one: a tiny Actions cache entry under the
+  prefix ``dashboard-deploy-last-v1-``. The gate restores the newest entry of
+  that prefix (actions/cache returns the most recently created match) and
+  compares. "Deployed once" is not "deployed now": a revert to content that
+  was synced last week differs from the last deploy, so it deploys again.
+* ``decide`` turns that into a verdict. Pushes and manual dispatches always
+  deploy. A workflow_run deploys only when the fingerprint differs from the
+  last deployed one. The daily schedule -- the recovery path after the 00:00
+  UTC quota reset -- also deploys when that day's D1 retention has not run.
+  Neither retries on the day a D1 stage was deferred for these inputs: the
+  budget is spent until 00:00 UTC.
 
-A lost cache key (eviction after 7 idle days) costs one redundant deploy, and
-that deploy's D1 stages skip on their own content checks.
+A lost cache entry costs one redundant deploy, whose D1 stages skip on their
+own content checks. One race remains, and heals itself: a revert that lands
+while the reverted-from content is still deploying can be judged "already
+deployed" by its gate; the next trigger of any kind compares against the
+finished deploy and ships it.
 """
 from __future__ import annotations
 
@@ -117,6 +123,28 @@ def decide(
     return True, f"unrecognized event {event!r}; deploying to be safe"
 
 
+def last_deployed(path: str | None) -> str | None:
+    """The fingerprint restored from the newest ``dashboard-deploy-last-v1-``
+    cache entry, or None when nothing was restored."""
+    if not path:
+        return None
+    try:
+        text = Path(path).read_text(encoding="utf-8").strip()
+    except OSError:
+        return None
+    return text or None
+
+
+def is_synced(fingerprint: str, last: str | None) -> bool:
+    """True only when the LAST fully synced deploy shipped exactly these inputs.
+
+    Having synced these inputs at some earlier point is not enough: after a
+    revert, main can match a fingerprint deployed last week while the site
+    and D1 hold newer content.
+    """
+    return bool(fingerprint) and last == fingerprint
+
+
 def _flag(value: str | None) -> bool:
     return str(value or "").strip().lower() == "true"
 
@@ -139,7 +167,13 @@ def main(argv: list[str] | None = None) -> int:
 
     dc = sub.add_parser("decide", help="turn cache lookups into should_deploy")
     dc.add_argument("--event", required=True)
-    dc.add_argument("--synced-hit", default="false")
+    dc.add_argument("--fingerprint", default="", help="this run's deploy-input fingerprint")
+    dc.add_argument(
+        "--last-file",
+        default="",
+        help="file holding the last fully synced deploy's fingerprint (restored from "
+             "the newest dashboard-deploy-last-v1- cache entry); missing means unknown",
+    )
     dc.add_argument("--deferred-hit", default="false")
     dc.add_argument("--pruned-hit", default="false")
     dc.add_argument("--github-output", default=os.environ.get("GITHUB_OUTPUT"))
@@ -151,15 +185,17 @@ def main(argv: list[str] | None = None) -> int:
             "utc_date": datetime.now(timezone.utc).strftime("%Y-%m-%d"),
         })
         return 0
+    last = last_deployed(args.last_file)
     deploy, reason = decide(
         args.event,
-        synced=_flag(args.synced_hit),
+        synced=is_synced(args.fingerprint, last),
         deferred_today=_flag(args.deferred_hit),
         pruned_today=_flag(args.pruned_hit),
     )
     _write_outputs(args.github_output, {
         "should_deploy": "true" if deploy else "false",
         "reason": reason,
+        "last_deployed": last or "none",
     })
     return 0
 

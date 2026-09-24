@@ -104,18 +104,27 @@ def test_no_job_uses_always():
 
 def test_every_gate_lookup_has_a_matching_save():
     jobs = load(WORKFLOW)["jobs"]
-    restores, saves = set(), set()
+    lookups, prefixes, saves = set(), set(), set()
     for job in jobs.values():
         for step in job.get("steps") or []:
             uses = str(step.get("uses", ""))
+            with_ = step.get("with") or {}
             if uses.startswith("actions/cache/restore"):
-                assert step["with"]["lookup-only"] is True
-                restores.add((step["with"]["path"], shape(step["with"]["key"])))
+                if with_.get("restore-keys"):
+                    # "Newest entry under a prefix": never an exact hit.
+                    assert "github.run_id" in with_["key"]
+                    prefixes.add((with_["path"], str(with_["restore-keys"]).strip()))
+                else:
+                    assert with_["lookup-only"] is True
+                    lookups.add((with_["path"], shape(with_["key"])))
             elif uses.startswith("actions/cache/save"):
-                saves.add((step["with"]["path"], shape(step["with"]["key"])))
+                saves.add((with_["path"], shape(with_["key"])))
     # Same path string on both sides: it is part of the cache version.
-    assert restores == saves
-    assert {path for path, _ in restores} == {".deploy-gate-marker"}
+    exact_saves = {(path, key) for path, key in saves if not key.startswith("dashboard-deploy-last-v1-")}
+    assert lookups == exact_saves
+    assert prefixes == {(".deploy-gate-last", "dashboard-deploy-last-v1-")}
+    assert any(path == ".deploy-gate-last" and key.startswith("dashboard-deploy-last-v1-") for path, key in saves)
+    assert {path for path, _ in lookups} == {".deploy-gate-marker"}
 
 
 def test_build_steps_after_the_recheck_are_gated():

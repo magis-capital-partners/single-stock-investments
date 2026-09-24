@@ -63,15 +63,38 @@ class DecideTests(unittest.TestCase):
     def test_unknown_events_fail_open(self) -> None:
         self.assertTrue(gate.decide("repository_dispatch", synced=True, deferred_today=False, pruned_today=True)[0])
 
-    def test_cli_writes_github_outputs(self) -> None:
+    def cli(self, event: str, fingerprint: str, last: str | None) -> dict[str, str]:
+        """Run ``decide`` as the workflow does; ``last`` is what the newest
+        dashboard-deploy-last-v1- cache entry restored (None: nothing)."""
         with tempfile.TemporaryDirectory() as tmp:
             out = Path(tmp) / "out.txt"
+            last_file = Path(tmp) / ".deploy-gate-last" / "fingerprint"
+            if last is not None:
+                last_file.parent.mkdir()
+                last_file.write_text(last, encoding="utf-8")
             self.assertEqual(gate.main([
-                "decide", "--event", "workflow_run", "--synced-hit", "true",
-                "--deferred-hit", "", "--pruned-hit", "", "--github-output", str(out),
+                "decide", "--event", event, "--fingerprint", fingerprint,
+                "--last-file", str(last_file), "--deferred-hit", "", "--pruned-hit", "",
+                "--github-output", str(out),
             ]), 0)
-            written = dict(line.split("=", 1) for line in out.read_text(encoding="utf-8").splitlines())
-            self.assertEqual(written["should_deploy"], "false")
+            return dict(line.split("=", 1) for line in out.read_text(encoding="utf-8").splitlines())
+
+    def test_cli_compares_against_the_last_deployed_fingerprint(self) -> None:
+        self.assertEqual(self.cli("workflow_run", "aaa", "aaa")["should_deploy"], "false")
+        self.assertEqual(self.cli("workflow_run", "aaa", "bbb")["should_deploy"], "true")
+        self.assertEqual(self.cli("workflow_run", "aaa", None)["should_deploy"], "true")
+        self.assertEqual(self.cli("workflow_run", "aaa", "aaa\n")["last_deployed"], "aaa")
+
+    def test_a_revert_to_earlier_content_redeploys(self) -> None:
+        # Deploys shipped A, then B. main reverts to A. "A was synced once"
+        # said skip, leaving the site and D1 on B; the last deploy was B.
+        for event in ("workflow_run", "schedule"):
+            self.assertEqual(self.cli(event, "fingerprint-A", "fingerprint-B")["should_deploy"], "true", event)
+
+    def test_is_synced_needs_a_fingerprint(self) -> None:
+        self.assertFalse(gate.is_synced("", ""))
+        self.assertFalse(gate.is_synced("", None))
+        self.assertTrue(gate.is_synced("abc", "abc"))
 
 
 class FingerprintTests(unittest.TestCase):
@@ -153,6 +176,24 @@ class WorkflowWiringTests(unittest.TestCase):
         self.assertIn("lookup-only: true", gate_job)
         self.assertIn("needs.deploy-gate.outputs.should_deploy == 'true'", self.job("build"))
 
+    def test_gate_and_recheck_compare_against_the_last_deploy(self) -> None:
+        # Restore the NEWEST last-deployed entry (prefix match), then compare.
+        for name in ("deploy-gate", "build"):
+            body = self.job(name)
+            self.assertRegex(
+                body,
+                r"path: \.deploy-gate-last\n\s+key: dashboard-deploy-last-v1-\$\{\{ github\.run_id \}\}"
+                r"-\$\{\{ github\.run_attempt \}\}\n\s+restore-keys: dashboard-deploy-last-v1-\n",
+                name,
+            )
+            self.assertIn("--last-file .deploy-gate-last/fingerprint", body, name)
+            self.assertNotIn("--synced-hit", body, name)
+            self.assertNotIn("dashboard-deploy-synced-v1-", body, name)
+
+    def test_darwin_is_not_a_trigger(self) -> None:
+        # WS7 deleted the Darwin Portfolio Refresh workflow.
+        self.assertNotIn("Darwin Portfolio Refresh", self.workflow)
+
     def test_cancelled_runs_do_not_deploy(self) -> None:
         for name in ("build", "oauth-proxy"):
             body = self.code(self.job(name))
@@ -165,13 +206,18 @@ class WorkflowWiringTests(unittest.TestCase):
         build = self.job("build")
         self.assertRegex(build, r"concurrency:\n\s+group: dashboard-deploy\n\s+cancel-in-progress: false")
 
-    def test_synced_marker_is_saved_only_when_d1_was_not_deferred(self) -> None:
+    def test_last_deploy_is_recorded_only_when_d1_was_not_deferred(self) -> None:
         build = self.job("build")
         saved = re.search(
-            r"if: (.*)\n\s+uses: actions/cache/save@v4\n\s+with:\n\s+path: \.deploy-gate-marker\n"
-            r"\s+key: dashboard-deploy-synced-v1-", build)
+            r"if: (.*)\n\s+uses: actions/cache/save@v4\n\s+with:\n\s+path: \.deploy-gate-last\n"
+            r"\s+key: dashboard-deploy-last-v1-\$\{\{ github\.run_id \}\}-\$\{\{ github\.run_attempt \}\}\n",
+            build)
         self.assertIsNotNone(saved)
         self.assertIn("steps.cloudflare.outputs.d1_deferred != 'true'", saved.group(1))
+        # Every deploy that ships records it, pushes included (the re-check
+        # restore is skipped for them, so the directory must be created).
+        self.assertIn("mkdir -p .deploy-gate-marker .deploy-gate-last", build)
+        self.assertIn('printf \'%s\' "$FINGERPRINT" > .deploy-gate-last/fingerprint', build)
 
     def test_deferral_fails_the_job_after_pages_and_alerts_slack(self) -> None:
         build = self.job("build")

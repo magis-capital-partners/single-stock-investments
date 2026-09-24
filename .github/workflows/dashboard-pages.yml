@@ -45,7 +45,6 @@ on:
     workflows:
       - Data Pipeline
       - Forced Flow Daily
-      - Darwin Portfolio Refresh
       - Power Zone Universe
       - LS-algo Universe Intake
     types: [completed]
@@ -75,10 +74,11 @@ jobs:
           echo "Upstream '${{ github.event.workflow_run.name }}' concluded 'failure'. The dashboard deploys only what that run committed before failing, if anything." >&2
           exit 1
 
-  # workflow_run and schedule deploy only when what a deploy publishes changed
-  # since the last fully synced deploy. 2026-09-18..24: 73 of 98 D1 syncs came
-  # from Power Zone / LS-algo runs whose main job was skipped and which
-  # committed nothing. See _system/scripts/workflow_run_deploy_gate.py.
+  # workflow_run and schedule deploy only when what a deploy publishes differs
+  # from what the LAST fully synced deploy shipped (not "was ever shipped": a
+  # revert must redeploy). 2026-09-18..24: 73 of 98 D1 syncs came from Power
+  # Zone / LS-algo runs whose main job was skipped and which committed
+  # nothing. See _system/scripts/workflow_run_deploy_gate.py.
   deploy-gate:
     if: github.event_name == 'workflow_run' || github.event_name == 'schedule'
     runs-on: ubuntu-latest
@@ -98,13 +98,15 @@ jobs:
       - name: Fingerprint the deploy inputs on main
         id: fp
         run: python _system/scripts/workflow_run_deploy_gate.py fingerprint
-      - name: Look up a fully synced deploy of these inputs
-        id: synced
+      # The primary key never exists; the prefix match returns the most
+      # recently created entry, i.e. the last fully synced deploy.
+      - name: Restore the last fully synced deploy's fingerprint
+        id: last
         uses: actions/cache/restore@v4
         with:
-          path: .deploy-gate-marker
-          key: dashboard-deploy-synced-v1-${{ steps.fp.outputs.hash }}
-          lookup-only: true
+          path: .deploy-gate-last
+          key: dashboard-deploy-last-v1-${{ github.run_id }}-${{ github.run_attempt }}
+          restore-keys: dashboard-deploy-last-v1-
       - name: Look up a D1 deferral of these inputs today
         id: deferred
         uses: actions/cache/restore@v4
@@ -124,12 +126,13 @@ jobs:
         id: decide
         env:
           EVENT: ${{ github.event_name }}
-          SYNCED: ${{ steps.synced.outputs.cache-hit }}
+          FINGERPRINT: ${{ steps.fp.outputs.hash }}
           DEFERRED: ${{ steps.deferred.outputs.cache-hit }}
           PRUNED: ${{ steps.pruned.outputs.cache-hit }}
         run: |
           python _system/scripts/workflow_run_deploy_gate.py decide \
-            --event "$EVENT" --synced-hit "$SYNCED" --deferred-hit "$DEFERRED" --pruned-hit "$PRUNED"
+            --event "$EVENT" --fingerprint "$FINGERPRINT" --last-file .deploy-gate-last/fingerprint \
+            --deferred-hit "$DEFERRED" --pruned-hit "$PRUNED"
 
   oauth-secrets:
     runs-on: ubuntu-latest
@@ -283,14 +286,14 @@ jobs:
       - name: Fingerprint what this job would deploy
         id: fingerprint
         run: python _system/scripts/workflow_run_deploy_gate.py fingerprint
-      - name: Re-check for a fully synced deploy of these inputs
-        id: synced
+      - name: Re-check the last fully synced deploy's fingerprint
+        id: last
         if: github.event_name == 'workflow_run' || github.event_name == 'schedule'
         uses: actions/cache/restore@v4
         with:
-          path: .deploy-gate-marker
-          key: dashboard-deploy-synced-v1-${{ steps.fingerprint.outputs.hash }}
-          lookup-only: true
+          path: .deploy-gate-last
+          key: dashboard-deploy-last-v1-${{ github.run_id }}-${{ github.run_attempt }}
+          restore-keys: dashboard-deploy-last-v1-
       - name: Re-check for a D1 deferral of these inputs today
         id: deferred
         if: github.event_name == 'workflow_run' || github.event_name == 'schedule'
@@ -311,12 +314,13 @@ jobs:
         id: proceed
         env:
           EVENT: ${{ github.event_name }}
-          SYNCED: ${{ steps.synced.outputs.cache-hit }}
+          FINGERPRINT: ${{ steps.fingerprint.outputs.hash }}
           DEFERRED: ${{ steps.deferred.outputs.cache-hit }}
           PRUNED: ${{ steps.pruned.outputs.cache-hit }}
         run: |
           python _system/scripts/workflow_run_deploy_gate.py decide \
-            --event "$EVENT" --synced-hit "$SYNCED" --deferred-hit "$DEFERRED" --pruned-hit "$PRUNED"
+            --event "$EVENT" --fingerprint "$FINGERPRINT" --last-file .deploy-gate-last/fingerprint \
+            --deferred-hit "$DEFERRED" --pruned-hit "$PRUNED"
       - name: Rebuild and validate dashboard
         id: publish
         if: steps.proceed.outputs.should_deploy == 'true'
@@ -348,20 +352,23 @@ jobs:
           PORTFOLIO_DREW_ACCESS_EMAILS: ${{ secrets.PORTFOLIO_DREW_ACCESS_EMAILS }}
           PORTFOLIO_MICHAEL_ACCESS_EMAILS: ${{ secrets.PORTFOLIO_MICHAEL_ACCESS_EMAILS }}
           IBKR_ACCOUNT_IDS_FOR_SCAN: ${{ secrets.IBKR_ACCOUNT_IDS_FOR_SCAN }}
-      # Gate bookkeeping (Actions cache keys; nothing is downloaded on lookup).
-      # "synced" only when Pages shipped AND every D1 stage completed, so a
-      # deferred stage keeps the inputs eligible for the post-reset retry.
+      # Gate bookkeeping (Actions cache entries). The "last deployed" record is
+      # written only when Pages shipped AND every D1 stage completed, so a
+      # deferred stage keeps these inputs eligible for the post-reset retry.
       - name: Prepare gate markers
         if: steps.proceed.outputs.should_deploy == 'true'
+        env:
+          FINGERPRINT: ${{ steps.fingerprint.outputs.hash }}
         run: |
-          mkdir -p .deploy-gate-marker
-          echo "${{ steps.fingerprint.outputs.hash }}" > .deploy-gate-marker/fingerprint
-      - name: Mark these deploy inputs fully synced
+          mkdir -p .deploy-gate-marker .deploy-gate-last
+          printf '%s' "$FINGERPRINT" > .deploy-gate-marker/fingerprint
+          printf '%s' "$FINGERPRINT" > .deploy-gate-last/fingerprint
+      - name: Record these inputs as the last fully synced deploy
         if: steps.proceed.outputs.should_deploy == 'true' && steps.cloudflare.outputs.d1_deferred != 'true'
         uses: actions/cache/save@v4
         with:
-          path: .deploy-gate-marker
-          key: dashboard-deploy-synced-v1-${{ steps.fingerprint.outputs.hash }}
+          path: .deploy-gate-last
+          key: dashboard-deploy-last-v1-${{ github.run_id }}-${{ github.run_attempt }}
       - name: Mark today's D1 retention done
         if: steps.proceed.outputs.should_deploy == 'true' && steps.cloudflare.outputs.d1_pruned_today == 'true'
         uses: actions/cache/save@v4
