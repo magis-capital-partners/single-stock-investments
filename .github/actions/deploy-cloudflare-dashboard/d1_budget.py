@@ -86,8 +86,15 @@ def check(account_id: str, token: str, date: str, post: Poster | None = None) ->
     headers = {"Authorization": f"Bearer {token}", "Content-Type": "application/json"}
     try:
         status, text = (post or _post)(GRAPHQL_URL, headers, body)
-    except (OSError, ValueError) as error:  # network, TLS, timeout
+    except Exception as error:  # noqa: BLE001 - network, TLS, timeout, IncompleteRead, ...
         return Budget(False, reason=f"analytics request failed ({type(error).__name__})")
+    try:
+        return _parse(status, text)
+    except Exception as error:  # noqa: BLE001 - any unexpected shape means "unavailable"
+        return Budget(False, reason=f"unexpected analytics response ({type(error).__name__})")
+
+
+def _parse(status: int, text: str) -> Budget:
     if status in (401, 403):
         return Budget(False, reason=f"HTTP {status}: the API token cannot read Account Analytics")
     try:

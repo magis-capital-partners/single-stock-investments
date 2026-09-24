@@ -1,21 +1,24 @@
 #!/usr/bin/env python3
 """The D1 half of a dashboard deploy: measured, gated, and deferrable.
 
-Stages, in order (every stage runs whatever the one before it did, except
-that write stages stop once the daily quota is known to be spent):
+Stages, in order (every stage runs whatever the one before it did):
 
   budget guard   today's account-wide usage (d1_budget.py); above 70k rows
-                 written or 3.5M rows read, the write stages are DEFERRED
+                 written or 3.5M rows read, write stages may not write
   migrations     always -- the code this deploy ships may need them
   ops state      one read of ops_state (a handful of rows)
-  sleeve book    applied only when the committed book's SQL changed
-  retention      once per UTC day (prune_cloudflare_d1.py)
-  dashboard seed incremental export; skipped when the content hash matches
+  sleeve book    pending only when the committed book's SQL changed
+  retention      pending once per UTC day (prune_cloudflare_d1.py)
+  dashboard seed pending only when the export's content hash changed
 
-A stage stopped by the daily quota (code 7500) is DEFERRED too. Deferral is not
-a failure here: the static Pages deploy still has to ship, so this step exits 0
-and the workflow fails the job afterwards, with a Slack alert. Anything else
-that goes wrong is a real failure and exits 1.
+A write stage with nothing pending is skipped -- green -- even on a day the
+budget is spent. A stage WITH pending work is DEFERRED when the guard is over
+budget or an earlier stage hit the free-tier quota (its own message, "exceeded
+D1's free tier daily row ... limit"; D1 labels every SQL error code 7500, so
+the code alone means nothing). Deferral is not a failure here: the static
+Pages deploy still has to ship, so this step exits 0 and the workflow fails
+the job afterwards, with a Slack alert. Anything else that goes wrong is a
+real failure and exits 1.
 
 Every stage reports rows_read / rows_written (from D1's own counters) to the
 job summary; the retention stage reports them per statement in its log.
@@ -47,9 +50,10 @@ PRUNER = ROOT / "_system" / "scripts" / "prune_cloudflare_d1.py"
 SLEEVE_KEY = "sleeve:sql_sha256"
 PRUNE_KEY = "prune:last_date"
 QUOTA_EXIT_CODE = 75
-QUOTA_PATTERN = re.compile(
-    r"exceeded D1's free tier daily row (read|write) limit|\"code\"\s*:\s*7500\b", re.IGNORECASE
-)
+# The quota's own words only. D1 reports every query error as code 7500
+# ("no such table: ...: SQLITE_ERROR [code: 7500]"); treating the code as the
+# quota would defer a real SQL bug every day instead of failing it.
+QUOTA_PATTERN = re.compile(r"exceeded D1's free tier daily row (read|write) limit", re.IGNORECASE)
 EXECUTED_PATTERN = re.compile(
     r"Executed\s+(\d+)\s+quer(?:y|ies)\s+in\s+[^(]*\((\d+)\s+rows?\s+read,\s*(\d+)\s+rows?\s+written\)",
     re.IGNORECASE,
@@ -129,10 +133,9 @@ class D1Sync:
     def _wrangler(self, *args: str) -> subprocess.CompletedProcess:
         return self.runner([self.wrangler, "d1", *args])
 
-    def _is_quota(self, proc: subprocess.CompletedProcess) -> bool:
-        return proc.returncode == QUOTA_EXIT_CODE or bool(
-            QUOTA_PATTERN.search((proc.stdout or "") + (proc.stderr or ""))
-        )
+    @staticmethod
+    def _is_quota(proc: subprocess.CompletedProcess) -> bool:
+        return bool(QUOTA_PATTERN.search((proc.stdout or "") + (proc.stderr or "")))
 
     def _record(self, stage: Stage, started: float) -> Stage:
         stage.seconds = round(time.monotonic() - started, 1)
@@ -171,11 +174,14 @@ class D1Sync:
         started = time.monotonic()
         budget = self.budget
         if budget is None:
-            budget = d1_budget.check(
-                os.environ.get("CLOUDFLARE_ACCOUNT_ID", ""),
-                os.environ.get("CLOUDFLARE_API_TOKEN", ""),
-                self.today,
-            )
+            try:
+                budget = d1_budget.check(
+                    os.environ.get("CLOUDFLARE_ACCOUNT_ID", ""),
+                    os.environ.get("CLOUDFLARE_API_TOKEN", ""),
+                    self.today,
+                )
+            except Exception as error:  # noqa: BLE001 - a guard crash must never block Pages
+                budget = d1_budget.Budget(False, reason=f"guard crashed ({type(error).__name__})")
             self.budget = budget
         if not budget.available:
             # Warn once and carry on: the 7500 quota error stays the backstop.
@@ -183,7 +189,7 @@ class D1Sync:
             self._record(Stage("budget guard", "skipped", budget.describe()), started)
             return
         status = "deferred" if budget.over else "ok"
-        detail = budget.describe() + ("; write stages deferred" if budget.over else "")
+        detail = budget.describe() + ("; pending write stages defer" if budget.over else "")
         stage = Stage("budget guard", status, detail, budget.rows_read, budget.rows_written)
         stage.seconds = round(time.monotonic() - started, 1)
         self.stages.append(stage)
@@ -236,12 +242,13 @@ class D1Sync:
         self.ops_state = {str(row.get("key")): str(row.get("value")) for row in rows if row.get("key")}
         self._record(Stage("ops state", "ok", f"{len(self.ops_state)} keys", rows_read, 0), started)
 
+    # Every write stage first works out whether it has anything to write --
+    # locally, or from the ops_state rows already read -- and only then asks
+    # whether it may write. On a day the budget is spent, a deploy with
+    # nothing pending is a green no-op; only real pending work is deferred
+    # (and alerted on).
     def stage_sleeve(self) -> None:
         started = time.monotonic()
-        blocked = self._write_blocked()
-        if blocked:
-            self._record(Stage("sleeve book", "deferred", blocked), started)
-            return
         sql_path = self.workdir / "sleeve_book.sql"
         proc = self.runner([self.python, str(SLEEVE_EXPORTER), "--out", str(sql_path)])
         if proc.returncode != 0:
@@ -250,6 +257,10 @@ class D1Sync:
         digest = hashlib.sha256(sql_path.read_bytes()).hexdigest()
         if self.ops_state is not None and self.ops_state.get(SLEEVE_KEY) == digest:
             self._record(Stage("sleeve book", "skipped", "committed book unchanged", 0, 0), started)
+            return
+        blocked = self._write_blocked()
+        if blocked:
+            self._record(Stage("sleeve book", "deferred", "book changed; " + blocked), started)
             return
         with sql_path.open("a", encoding="utf-8") as handle:
             handle.write(
@@ -269,13 +280,13 @@ class D1Sync:
 
     def stage_retention(self) -> None:
         started = time.monotonic()
-        blocked = self._write_blocked()
-        if blocked:
-            self._record(Stage("retention", "deferred", blocked), started)
-            return
         if self.ops_state is not None and self.ops_state.get(PRUNE_KEY) == self.today:
             self.pruned_today = True
             self._record(Stage("retention", "skipped", f"already ran today ({self.today} UTC)", 0, 0), started)
+            return
+        blocked = self._write_blocked()
+        if blocked:
+            self._record(Stage("retention", "deferred", "today's pass is due; " + blocked), started)
             return
         proc = self.runner([
             self.python, str(PRUNER),
@@ -298,7 +309,8 @@ class D1Sync:
                 if status == "ok" else str(metrics.get("reason") or "already ran today")
             )
             self._record(Stage("retention", status, detail, rows_read, rows_written), started)
-        elif proc.returncode == QUOTA_EXIT_CODE or self._is_quota(proc):
+        elif proc.returncode == QUOTA_EXIT_CODE:
+            # prune_cloudflare_d1.py exits 75 only on the quota's own message.
             self.quota_hit = True
             self._record(Stage("retention", "deferred", "daily quota (7500); retried after 00:00 UTC",
                                rows_read, rows_written), started)
@@ -307,10 +319,6 @@ class D1Sync:
 
     def stage_seed(self) -> None:
         started = time.monotonic()
-        blocked = self._write_blocked()
-        if blocked:
-            self._record(Stage("dashboard seed", "deferred", blocked), started)
-            return
         seed_path = self.workdir / "dashboard_seed.sql"
         report_path = self.workdir / "dashboard_seed_report.json"
         command = [self.python, str(SEED_EXPORTER), "--output", str(seed_path), "--report", str(report_path)]
@@ -336,6 +344,10 @@ class D1Sync:
             f"{report.get('mode')}: {report.get('changed_ticker_count')} tickers changed, "
             f"{report.get('removed_ticker_count')} removed, {report.get('statement_count')} statements"
         )
+        blocked = self._write_blocked()
+        if blocked:
+            self._record(Stage("dashboard seed", "deferred", f"{detail} pending; {blocked}"), started)
+            return
         proc = self.execute_file(seed_path)
         rows_read, rows_written = self.executed_rows(proc)
         if proc.returncode == 0:
@@ -350,8 +362,9 @@ class D1Sync:
     def run(self) -> list[Stage]:
         self.stage_budget()
         self.stage_migrations()
-        if self._write_blocked() is None:
-            self.stage_ops_state()
+        # Read even over budget: it is one small query, and it is what tells
+        # the write stages whether they have anything to defer at all.
+        self.stage_ops_state()
         self.stage_sleeve()
         self.stage_retention()
         self.stage_seed()

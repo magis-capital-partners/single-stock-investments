@@ -6,6 +6,7 @@ by a scripted runner, the GraphQL API by a scripted poster, Slack by an opener.
 from __future__ import annotations
 
 import hashlib
+import http.client
 import importlib.util
 import json
 import subprocess
@@ -41,10 +42,35 @@ def done(code: int = 0, stdout: str = "", stderr: str = "") -> subprocess.Comple
     return subprocess.CompletedProcess(args=[], returncode=code, stdout=stdout, stderr=stderr)
 
 
-QUOTA_ERROR = done(1, stderr=(
-    '{"error": {"text": "A request to the Cloudflare API failed.", "notes": [{"text": '
-    '"Your account has exceeded D1\'s free tier daily row write limit."}], "code": 7500}}'
-))
+# Verbatim wrangler stderr from deploy run 36046368603 (2026-09-24), when the
+# free-tier write quota was spent.
+WRANGLER_QUOTA_ERROR = """{
+  "error": {
+    "text": "A request to the Cloudflare API (/accounts/***/d1/database/e8982743-9502-47f2-981b-9a4975c36a7e/query) failed.",
+    "notes": [
+      {
+        "text": "Your account has exceeded D1's free tier daily row write limit. Upgrade to a paid plan or wait until tomorrow (midnight UTC) to continue. See https://developers.cloudflare.com/d1/platform/limits/ for more details. [code: 7500]"
+      }
+    ],
+    "kind": "error",
+    "name": "APIError",
+    "code": 7500,
+    "accountTag": "***"
+  }
+}"""
+# The same envelope around an ordinary SQL error: D1 labels those 7500 too.
+WRANGLER_SQL_ERROR = WRANGLER_QUOTA_ERROR.replace(
+    "Your account has exceeded D1's free tier daily row write limit. Upgrade to a paid plan or "
+    "wait until tomorrow (midnight UTC) to continue. See "
+    "https://developers.cloudflare.com/d1/platform/limits/ for more details. [code: 7500]",
+    "no such table: portfolio_strategy_snapshots: SQLITE_ERROR [code: 7500]",
+)
+assert "no such table" in WRANGLER_SQL_ERROR and "free tier" not in WRANGLER_SQL_ERROR
+
+QUOTA_ERROR = done(1, stderr=WRANGLER_QUOTA_ERROR)
+SQL_ERROR = done(1, stderr=WRANGLER_SQL_ERROR)
+PENDING_SEED = {"skip": False, "mode": "incremental", "changed_ticker_count": 3,
+                "removed_ticker_count": 0, "statement_count": 40}
 
 
 class FakeCloud:
@@ -164,18 +190,48 @@ def test_budget_thresholds(read, written, over):
     assert d1_budget.Budget(True, rows_read=read, rows_written=written).over is over
 
 
+def _raises(error: BaseException):
+    def post(url, headers, body):
+        raise error
+    return post
+
+
 @pytest.mark.parametrize("post", [
     lambda url, headers, body: (403, '{"success": false}'),
     lambda url, headers, body: (200, json.dumps({"data": None, "errors": [
         {"message": "not authorized for that account"}]})),
     lambda url, headers, body: (200, json.dumps({"data": {"viewer": {"accounts": []}}})),
-    lambda url, headers, body: (_ for _ in ()).throw(urllib.error.URLError("dns")),
+    _raises(urllib.error.URLError("dns")),
+    # Shapes nobody planned for: JSON that is not an object, a non-object
+    # error item, a truncated body.
+    lambda url, headers, body: (200, "[]"),
+    lambda url, headers, body: (200, '"maintenance"'),
+    lambda url, headers, body: (200, json.dumps({"errors": ["plain string"]})),
+    _raises(http.client.IncompleteRead(b"{", 10)),
 ])
 def test_guard_is_unavailable_not_fatal(post):
     result = d1_budget.check("acct", "token", TODAY, post=post)
     assert result.available is False
     assert result.over is False
     assert "unavailable" in result.describe()
+
+
+def test_a_crashing_guard_never_blocks_the_deploy(tmp_path, monkeypatch, capsys):
+    def crash(*_args, **_kwargs):
+        raise AttributeError("'list' object has no attribute 'get'")
+
+    monkeypatch.setattr(d1_sync.d1_budget, "check", crash)
+    cloud = FakeCloud()
+    sync = d1_sync.D1Sync(
+        wrangler="wrangler", config="cfg.jsonc", database="DB", workdir=tmp_path,
+        today=TODAY, now=f"{TODAY}T01:00:00Z", runner=cloud, python="python",
+    )
+    sync.run()
+    assert statuses(sync)["budget guard"] == "skipped"
+    assert "guard crashed (AttributeError)" in sync.stages[0].detail
+    assert "prune_cloudflare_d1.py" in cloud.kinds()  # the stages still ran
+    assert not sync.failed()
+    assert capsys.readouterr().out.count("::warning::budget guard unavailable") == 1
 
 
 def test_guard_without_credentials_is_unavailable():
@@ -223,11 +279,13 @@ def test_changes_are_applied_and_measured(tmp_path):
     assert "115 tickers changed" in summary
 
 
-def test_over_budget_defers_writes_but_still_migrates(tmp_path):
-    cloud = FakeCloud()
+def test_over_budget_defers_pending_writes_but_still_migrates(tmp_path):
+    cloud = FakeCloud(seed_report=PENDING_SEED)
     sync = sync_with(cloud, tmp_path, budget=budget(written=82_504))
     sync.run()
-    assert cloud.kinds() == ["migrations"]
+    # Pending work is worked out locally (exports) or from ops_state; nothing
+    # is written, and retention does not start.
+    assert cloud.kinds() == ["migrations", "query", "export_sleeve_d1.py", "export_dashboard_d1_seed.py"]
     assert [s.name for s in sync.deferred()] == ["sleeve book", "retention", "dashboard seed"]
     outputs = sync.outputs()
     assert outputs["d1_deferred"] == "true"
@@ -236,26 +294,74 @@ def test_over_budget_defers_writes_but_still_migrates(tmp_path):
     assert not sync.failed()
 
 
-def test_quota_error_defers_the_remaining_write_stages(tmp_path):
-    cloud = FakeCloud(executes={"sleeve_book.sql": QUOTA_ERROR})
+def test_over_budget_with_nothing_pending_is_a_green_no_op(tmp_path):
+    # The budget is spent, but this deploy has nothing to write: no red run,
+    # no Slack alert, no deferral.
+    cloud = FakeCloud(ops_state={"sleeve:sql_sha256": SLEEVE_HASH, "prune:last_date": TODAY})
+    sync = sync_with(cloud, tmp_path, budget=budget(written=99_000))
+    sync.run()
+    assert statuses(sync) == {
+        "budget guard": "deferred", "migrations": "skipped", "ops state": "ok",
+        "sleeve book": "skipped", "retention": "skipped", "dashboard seed": "skipped",
+    }
+    assert sync.deferred() == []
+    assert sync.outputs()["d1_deferred"] == "false"
+    assert not [kind for kind in cloud.kinds() if kind.startswith("file:")]
+
+
+def test_quota_error_defers_the_remaining_pending_stages(tmp_path):
+    cloud = FakeCloud(seed_report=PENDING_SEED, executes={"sleeve_book.sql": QUOTA_ERROR})
     sync = sync_with(cloud, tmp_path)
     sync.run()
     assert statuses(sync)["sleeve book"] == "deferred"
     assert statuses(sync)["retention"] == "deferred"
     assert statuses(sync)["dashboard seed"] == "deferred"
     assert "prune_cloudflare_d1.py" not in cloud.kinds()
-    assert "export_dashboard_d1_seed.py" not in cloud.kinds()
-    assert "7500" in sync.outputs()["d1_deferred_reason"]
+    assert "file:dashboard_seed.sql" not in cloud.kinds()
+    assert "quota" in sync.outputs()["d1_deferred_reason"]
     assert not sync.failed()
 
 
-def test_retention_quota_exit_code_defers_the_seed(tmp_path):
-    cloud = FakeCloud(prune=done(75, 'D1_METRICS {"status": "quota", "rows_read": 5, "rows_written": 0}\n'))
+def test_after_the_quota_a_stage_with_nothing_pending_stays_green(tmp_path):
+    cloud = FakeCloud(executes={"sleeve_book.sql": QUOTA_ERROR})  # seed export: unchanged
+    sync = sync_with(cloud, tmp_path)
+    sync.run()
+    assert statuses(sync)["dashboard seed"] == "skipped"
+    assert [s.name for s in sync.deferred()] == ["sleeve book", "retention"]
+
+
+def test_retention_quota_exit_code_defers_the_pending_seed(tmp_path):
+    cloud = FakeCloud(
+        seed_report=PENDING_SEED,
+        prune=done(75, 'D1_METRICS {"status": "quota", "rows_read": 5, "rows_written": 0}\n'),
+    )
     sync = sync_with(cloud, tmp_path)
     sync.run()
     assert statuses(sync)["retention"] == "deferred"
     assert statuses(sync)["dashboard seed"] == "deferred"
     assert sync.outputs()["d1_pruned_today"] == "false"
+
+
+def test_a_sql_error_labelled_7500_fails_instead_of_deferring(tmp_path):
+    # D1 labels every SQL error code 7500; only the quota's own words defer.
+    cloud = FakeCloud(seed_report=PENDING_SEED, executes={"sleeve_book.sql": SQL_ERROR})
+    sync = sync_with(cloud, tmp_path)
+    sync.run()
+    assert statuses(sync)["sleeve book"] == "failed"
+    assert statuses(sync)["retention"] == "ok"          # later stages still run
+    assert statuses(sync)["dashboard seed"] == "ok"
+    outputs = sync.outputs()
+    assert (outputs["d1_failed"], outputs["d1_deferred"]) == ("true", "false")
+
+
+def test_a_retention_sql_error_fails_instead_of_deferring(tmp_path):
+    # prune_cloudflare_d1.py exits 1 for it (see test_prune_cloudflare_d1.py).
+    cloud = FakeCloud(seed_report=PENDING_SEED, prune=done(1, 'D1_METRICS {"status": "failed"}\n', WRANGLER_SQL_ERROR))
+    sync = sync_with(cloud, tmp_path)
+    sync.run()
+    assert statuses(sync)["retention"] == "failed"
+    assert statuses(sync)["dashboard seed"] == "ok"
+    assert sync.outputs()["d1_deferred"] == "false"
 
 
 def test_a_real_failure_is_not_a_deferral(tmp_path):
