@@ -34,6 +34,8 @@
 
 **Approved** — spec `ceg-operating-owner-earnings-2026q3-v2` (v3, revision 1). Fires if Q3 FY2026 TTM normalized owner earnings resolve below 1,288 USD millions (FY2025 low-case proof anchor). Scheduled promoter may append after review gate.
 
+**Amendment (2026-09-24):** `spec_revision` bumped from 1 to 2 for supersession ordering only. The spec supersedes `ceg-489fb0c3c058a5a16d22` (revision 1), and `check_falsifier_history.py` requires a superseding revision to exceed the one it replaces; at revision 1 the promoter could not append it. No economic term changed (metric, threshold, comparator, probability, dates, observation plan), so the approval above stands.
+
 ## Facts
 
 - FY2025 normalized owner earnings: **$1,288M** (OCF $4,237M minus capex $2,949M) — `CEG/research/valuation_fact_ledger.json`; `CEG/investor-documents/sec-edgar/10-K_20260224_rpt20251231_acc0001868275_26_000032.htm`
