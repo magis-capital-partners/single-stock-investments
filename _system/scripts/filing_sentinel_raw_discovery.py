@@ -15,7 +15,7 @@ from collections import Counter, defaultdict
 from datetime import date
 from pathlib import Path
 
-from filing_sentinel_gold import ROOT, _iso, _portfolio_tickers, _sha256, load_taxonomy, read_jsonl, write_jsonl
+from filing_sentinel_gold import ROOT, _iso, _portfolio_tickers, _sha256, filing_file_sha256, load_taxonomy, read_jsonl, write_jsonl
 from filing_sentinel_workflow import SECTION_PATTERNS, _normalise_excerpt, create_label_packets, lock_split, quota_sample
 
 RAW_FILING_RE = re.compile(
@@ -311,8 +311,8 @@ def raw_candidates(*, universe: str, tickers: set[str], since: str, per_ticker: 
                 "ticker": ticker,
                 "filing": {
                     "form": current["form"], "filed_at": current["filed_at"], "period_end": current["period_end"], "accession": current["accession"],
-                    "source_ref": source_ref, "source_sha256": _sha256(current["path"].read_bytes()), "extract_ref": None, "extract_sha256": None,
-                    "comparison_source_ref": prior_ref, "comparison_period_end": prior["period_end"], "comparison_sha256": _sha256(prior["path"].read_bytes()),
+                    "source_ref": source_ref, "source_sha256": filing_file_sha256(current["path"]), "extract_ref": None, "extract_sha256": None,
+                    "comparison_source_ref": prior_ref, "comparison_period_end": prior["period_end"], "comparison_sha256": filing_file_sha256(prior["path"]),
                 },
                 "evidence": evidence,
                 "proposals": proposals,

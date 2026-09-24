@@ -26,6 +26,7 @@ from filing_sentinel_gold import (
     _metric_proposal,
     _sha256,
     _source_text_path,
+    filing_file_sha256,
     load_taxonomy,
     read_jsonl,
     validate_case,
@@ -225,7 +226,7 @@ def enrich_candidates(*, universe: str, tickers: set[str], as_of: str) -> list[d
             signals.extend(prior_signals)
             comparison_source_ref = str(previous.get("source_filing_ref") or f"{ticker}/research/{previous_text}").replace("\\", "/")
             comparison_path = ROOT / comparison_source_ref
-            comparison_hash = _sha256(comparison_path.read_bytes()) if comparison_path.exists() else None
+            comparison_hash = filing_file_sha256(comparison_path) if comparison_path.exists() else None
             comparison_period_end = (_filing_meta(previous) or {}).get("period_end")
         if signals:
             reasons.append("section_signal:" + ",".join(sorted(set(signals))))
@@ -236,7 +237,7 @@ def enrich_candidates(*, universe: str, tickers: set[str], as_of: str) -> list[d
         extract_ref = f"{ticker}/research/{source_text}" if source_text else None
         source_ref = str(doc.get("source_filing_ref") or extract_ref or fact_path.relative_to(ROOT)).replace("\\", "/")
         source_path = ROOT / source_ref
-        source_hash = _sha256(source_path.read_bytes()) if source_path.exists() else None
+        source_hash = filing_file_sha256(source_path) if source_path.exists() else None
         raw_id = f"{ticker}|{meta['filing_form']}|{meta['filing_date']}|{source_ref}"
         case = {
             "schema_version": 1,
