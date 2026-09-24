@@ -8,7 +8,7 @@ import json
 import subprocess
 from pathlib import Path
 
-from falsifier_specs import spec_payload_hash
+from falsifier_specs import spec_errors, spec_payload_hash
 
 ROOT = Path(__file__).resolve().parents[2]
 
@@ -101,20 +101,20 @@ def _base_docs(root: Path, base_ref: str) -> dict[str, dict]:
     return docs
 
 
-def _read_draft(text: str) -> dict | None:
+def _parse_draft(text: str) -> tuple[dict | None, str]:
     # The promoter's own tolerance for the secret-scanner pragma, imported
     # here rather than at module top because the promoter imports this module.
     from promote_falsifier_drafts import _strip_secret_pragma
     try:
         draft = json.loads(_strip_secret_pragma(text))
-    except json.JSONDecodeError:
-        return None
-    return draft if isinstance(draft, dict) else None
+    except json.JSONDecodeError as exc:
+        return None, str(exc)
+    return (draft, "") if isinstance(draft, dict) else (None, "not a JSON object")
 
 
-def _base_draft(root: Path, base_ref: str, relative: str) -> dict | None:
+def _base_text(root: Path, base_ref: str, relative: str) -> str | None:
     try:
-        return _read_draft(_git(root, "show", f"{base_ref}:{relative}"))
+        return _git(root, "show", f"{base_ref}:{relative}")
     except RuntimeError:
         return None  # not on the base: a new draft
 
@@ -133,19 +133,33 @@ def simulated_promotion_errors(root: Path, base_ref: str,
     A draft counts as newly approved when it was not approved, or carried a
     different spec, at ``base_ref``. A draft already approved on the base is
     the lane's to hold back and report; turning every unrelated PR red over it
-    would repeat the trap this check exists to close.
+    would repeat the trap this check exists to close. The same goes for a draft
+    that does not parse: the promoter holds it back, so it is an error only in
+    the tree that introduces or changes it.
     """
     errors: list[str] = []
     working = {ticker: {**doc, "specs": list(doc.get("specs") or [])}
                for ticker, doc in current_docs.items()}
     for path in sorted(root.glob("*/research/falsifier_drafts/*.json")):
-        draft = _read_draft(path.read_text(encoding="utf-8"))
-        if not draft or draft.get("status") != "approved":
+        relative = path.relative_to(root).as_posix()
+        text = path.read_text(encoding="utf-8")
+        draft, unparseable = _parse_draft(text)
+        if draft is None:
+            if _base_text(root, base_ref, relative) != text:
+                errors.append(f"draft {relative} is not valid JSON: {unparseable}")
+            continue
+        if draft.get("status") != "approved":
             continue
         spec = draft.get("spec") or {}
-        relative = path.relative_to(root).as_posix()
-        prior = _base_draft(root, base_ref, relative)
+        base_text = _base_text(root, base_ref, relative)
+        prior = _parse_draft(base_text)[0] if base_text is not None else None
         if prior and prior.get("status") == "approved" and prior.get("spec") == spec:
+            continue
+        # The promoter's first gate. It also keeps a malformed spec_revision
+        # ("v2") away from _identity's int(), which would otherwise crash here.
+        invalid = spec_errors(spec)
+        if invalid:
+            errors.append(f"approved draft {relative} would not promote: {invalid[0]}")
             continue
         ticker = path.parents[2].name
         sidecar = working.setdefault(ticker, {"specs": []})

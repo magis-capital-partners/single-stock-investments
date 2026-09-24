@@ -129,18 +129,22 @@ def promote(root: Path = ROOT, write: bool = True) -> dict:
         review = spec.get("review") or {}
         if review.get("reviewer") == spec.get("author"):
             reasons.append("reviewer must differ from author")
-        sidecar_path = root / ticker / "research/falsifier_specs.json"
-        if ticker not in working:
-            working[ticker] = (read_json(sidecar_path)
-                               or {"schema_version": "3.0", "ticker": ticker, "specs": []})
-            committed[ticker] = json.loads(json.dumps(working[ticker]))
-        sidecar = working[ticker]
-        identities = {(str(row.get("spec_id")), int(row.get("spec_revision") or 1))
-                      for row in sidecar.get("specs") or []}
-        identity = (str(spec.get("spec_id")), int(spec.get("spec_revision") or 1))
-        if identity not in identities:
-            reasons.extend(f"immutable history: {error}" for error in
-                           promotion_errors(ticker, committed[ticker], sidecar, spec))
+        # Identity and history only for a draft every check above passed: they
+        # key on int(spec_revision), which spec_errors has only then vouched for
+        # ("v2" would otherwise be a traceback that ends the whole lane run).
+        if not reasons:
+            sidecar_path = root / ticker / "research/falsifier_specs.json"
+            if ticker not in working:
+                working[ticker] = (read_json(sidecar_path)
+                                   or {"schema_version": "3.0", "ticker": ticker, "specs": []})
+                committed[ticker] = json.loads(json.dumps(working[ticker]))
+            sidecar = working[ticker]
+            identities = {(str(row.get("spec_id")), int(row.get("spec_revision") or 1))
+                          for row in sidecar.get("specs") or []}
+            identity = (str(spec.get("spec_id")), int(spec.get("spec_revision") or 1))
+            if identity not in identities:
+                reasons.extend(f"immutable history: {error}" for error in
+                               promotion_errors(ticker, committed[ticker], sidecar, spec))
         if reasons:
             blocked.append({"draft": str(path.relative_to(root)).replace("\\", "/"),
                             "reasons": reasons})

@@ -162,6 +162,22 @@ class PromoterGateTests(unittest.TestCase):
         second = promoter.promote(self.root)
         self.assertEqual([row["spec_id"] for row in second["promoted"]], ["tst-core-v3"])
 
+    def test_a_malformed_revision_holds_back_its_draft_without_crashing_the_lane(self):
+        # The history check keys on int(spec_revision), so it may only ever see
+        # drafts that already passed spec_errors; otherwise "v2" is a traceback
+        # that kills the whole run, which the old promoter never allowed.
+        for revision in ("v2", "2.0", [2]):
+            with self.subTest(revision=revision), tempfile.TemporaryDirectory() as tmp:
+                root = Path(tmp)
+                _draft(_seed(root, specs=[LEGACY]), "a-bad", _superseding(revision=revision))
+                _draft(_seed(root, "OTH"), "b-good", v3_spec(
+                    spec_id="oth-core", component_fingerprint=FINGERPRINT))
+                result = promoter.promote(root)
+                self.assertEqual([row["draft"] for row in result["blocked"]], [BAD])
+                self.assertIn("spec_revision: positive integer required",
+                              result["blocked"][0]["reasons"][0])
+                self.assertEqual([row["ticker"] for row in result["promoted"]], ["OTH"])
+
     def test_a_problem_already_in_the_sidecar_blocks_no_new_draft(self):
         duplicated = {"specs": [LEGACY, dict(LEGACY)]}
         self.assertEqual(promotion_errors("TST", duplicated, duplicated,
@@ -214,6 +230,31 @@ class PullRequestSimulationTests(unittest.TestCase):
         self.assertIn(f"approved draft {BAD} would not promote: "
                       "superseding revision must increase", run.stdout)
         _draft(research, "a-bad", _superseding(revision=2))  # the fix
+        self.assertEqual(self._check().returncode, 0)
+
+    def test_approving_a_malformed_draft_is_reported_not_a_traceback(self):
+        research = _seed(self.root, specs=[LEGACY])
+        self._commit()
+        _draft(research, "a-bad", _superseding(revision="v2"))
+        run = self._check()
+        self.assertEqual(run.returncode, 1, run.stderr)
+        self.assertIn(f"approved draft {BAD} would not promote: "
+                      "specs[0].spec_revision: positive integer required", run.stdout)
+        self.assertNotIn("Traceback", run.stderr)
+
+    def test_a_pr_that_adds_an_unparseable_draft_fails(self):
+        # The promoter holds an unparseable draft back, so the lane survives
+        # it; the PR that introduces one must not pass in silence.
+        research = _seed(self.root, specs=[LEGACY])
+        self._commit()
+        broken = research / "falsifier_drafts/c-broken.json"
+        broken.parent.mkdir(parents=True, exist_ok=True)
+        broken.write_text('{"status": "approved", "spec": {', encoding="utf-8")
+        run = self._check()
+        self.assertEqual(run.returncode, 1, run.stdout)
+        self.assertIn("draft TST/research/falsifier_drafts/c-broken.json is not valid JSON",
+                      run.stdout)
+        self._commit()  # already broken on the base: an unrelated PR stays green
         self.assertEqual(self._check().returncode, 0)
 
     def test_a_draft_already_approved_on_the_base_reddens_no_unrelated_pr(self):
