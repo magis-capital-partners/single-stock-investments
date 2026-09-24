@@ -61,8 +61,12 @@ export function expireStalePreviewsStatement(db, { accountAlias = null, owner = 
   const binds = [stamp, "approval_expired", "previewed", cutoff];
   if (accountAlias != null) binds.push(accountAlias);
   else if (owner != null) binds.push(owner);
+  // datetime() on both sides: the hub writes approval_expires_at with Python's
+  // isoformat() ("...+00:00") while the edge writes "...Z", and an unparseable
+  // stamp becomes NULL, which never compares true -- so a malformed row stays
+  // put rather than being expired early.
   return db.prepare(`UPDATE portfolio_order_requests
     SET state='expired', updated_at=?, reject_reason=COALESCE(reject_reason, ?),
         claimed_at=NULL, claimed_by=NULL
-    WHERE state=? AND COALESCE(approval_expires_at, updated_at) < ? ${scope}`).bind(...binds);
+    WHERE state=? AND datetime(COALESCE(approval_expires_at, updated_at)) < datetime(?) ${scope}`).bind(...binds);
 }

@@ -13,6 +13,7 @@ import { failure, json, requestId, requireDatabase } from "../../../_lib/http.js
 import { requirePortfolioViewer } from "../../../_lib/auth.js";
 import { portfolioOrderOwner } from "../../../_lib/paper-orders.js";
 import { validateOrderRequest } from "../../../_lib/order-requests.js";
+import { expireStalePreviewsStatement } from "../../../_lib/command-channel.js";
 
 const PUBLIC_COLUMNS = `request_id,owner,strategy,conid,symbol,sec_type,action,quantity_decimal,
   limit_price_decimal,currency,tif,outside_rth,mode,rationale,state,intent_uuid,contract_fingerprint,
@@ -33,6 +34,11 @@ export async function onRequestGet(context) {
     if (!viewer) return json({ error: "Authentication required.", request_id: id }, 401, privateHeaders());
     const owner = portfolioOrderOwner(viewer, context.env);
     const db = requireDatabase(context.env);
+    // Expire this owner's long-dead previews before reading, so a ticket the
+    // bridge will never advance (bridge down, or a human walked away) cannot
+    // keep the desk's ticket poll running. Writes nothing when there is nothing
+    // to expire; see expireStalePreviewsStatement for why no guard is weakened.
+    if (owner) await expireStalePreviewsStatement(db, { owner }).run();
     const rows = owner
       ? await db.prepare(`SELECT ${PUBLIC_COLUMNS} FROM portfolio_order_requests
           WHERE owner=? ORDER BY created_at DESC LIMIT 100`).bind(owner).all()

@@ -12,7 +12,7 @@
 
 import { failure, json, requestId, requireDatabase } from "../../../../../_lib/http.js";
 import { reserveNonce, verifyPortfolioHmac } from "../../../../../_lib/portfolio.js";
-import { ORDER_LEASE_SECONDS, ORDER_OPEN_STATES, leaseFloor } from "../../../../../_lib/command-channel.js";
+import { ORDER_LEASE_SECONDS, ORDER_OPEN_STATES, expireStalePreviewsStatement, leaseFloor } from "../../../../../_lib/command-channel.js";
 
 // States where a human or the broker still owes us something, and the lease.
 // Shared with the peek route (_lib/command-channel.js) so "claimable" cannot
@@ -60,12 +60,22 @@ export async function onRequestPost(context) {
     // transmission, and for `approved` the hub ledger is the real serialisation
     // point -- GuardedOrderService.submit() refuses an intent that is no longer
     // Approved, so a duplicated claim produces a refusal, never a second order.
-    await db.prepare(`UPDATE portfolio_order_requests
+    //
+    // Long-dead previews are expired first. Nothing advances a `previewed`
+    // ticket except a human approval inside its window, so one that was never
+    // approved used to stay open forever: re-leased here every 90s (a nonce and
+    // a lease write each time) and holding the browser's ticket poll. It can no
+    // longer be approved by then -- the window and the hub's token are both
+    // long gone -- so marking it `expired` closes nothing that was open.
+    await db.batch([
+      expireStalePreviewsStatement(db, { accountAlias, now }),
+      db.prepare(`UPDATE portfolio_order_requests
       SET claimed_at=?, claimed_by=?, updated_at=?
       WHERE account_alias=? AND state IN (${placeholders})
         AND (claimed_at IS NULL OR claimed_at < ?)`).bind(
-      stamp, claimant, stamp, accountAlias, ...OPEN_STATES, floor,
-    ).run();
+        stamp, claimant, stamp, accountAlias, ...OPEN_STATES, floor,
+      ),
+    ]);
 
     const rows = await db.prepare(`SELECT * FROM portfolio_order_requests
       WHERE account_alias=? AND state IN (${placeholders}) AND claimed_by=? AND claimed_at=?
