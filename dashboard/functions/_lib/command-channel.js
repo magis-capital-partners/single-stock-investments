@@ -32,6 +32,28 @@ export const LOOKUP_BATCH = 5;
 // deliberately many multiples of it.
 export const PREVIEW_EXPIRY_GRACE_SECONDS = 15 * 60;
 
+// The peek is signed under its own domain and names itself in the body.
+// Mirrors PEEK_SIGNATURE_DOMAIN / PEEK_PURPOSE / CLAIM_PURPOSE in command_poller.py.
+export const PEEK_SIGNATURE_DOMAIN = "peek";
+export const PEEK_PURPOSE = "peek";
+export const CLAIM_PURPOSE = "claim";
+
+/**
+ * Why this body may not be used as a claim, or null if it may.
+ *
+ * A body with no `purpose` is a claim: that is what every bridge sent before
+ * purposes existed, and the one deployed on NY4 still does. A body that names
+ * any other purpose -- above all "peek", which reserves no nonce -- is refused
+ * before anything is written. The peek's signing domain already stops a peek
+ * signature from verifying on a claim route; this is the second, independent
+ * lock, and it holds even for a body signed the claim way.
+ */
+export function claimPurposeError(payload) {
+  const purpose = payload?.purpose;
+  if (purpose === undefined || purpose === null || purpose === CLAIM_PURPOSE) return null;
+  return `A '${String(purpose).slice(0, 32)}' body is not a claim.`;
+}
+
 export function leaseFloor(now, seconds) {
   return new Date(now.getTime() - seconds * 1000).toISOString();
 }

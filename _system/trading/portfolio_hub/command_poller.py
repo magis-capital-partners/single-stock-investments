@@ -53,6 +53,13 @@ ACTIVE_POLL_SECONDS = 1.0
 IDLE_POLL_SECONDS = 15.0
 
 PEEK_PATH = "/api/v2/portfolio/ingest/peek"
+# The peek reserves no nonce, so it must never be a valid request anywhere else.
+# It signs under its own domain (the edge verifies "peek\n<ts>\n<nonce>\n<body>"
+# only on the peek route) and says what it is in the signed body; the claim
+# routes refuse a "peek" body even if it were somehow signed the claim way.
+PEEK_SIGNATURE_DOMAIN = "peek"
+PEEK_PURPOSE = "peek"
+CLAIM_PURPOSE = "claim"
 # How long to stop asking once the edge says it has no peek route (404/405, or
 # a Pages fallback page instead of JSON). Until the edge half deploys, the loop
 # claims directly -- exactly its old behaviour -- and re-probes this often, so
@@ -130,13 +137,14 @@ class OrderCommandChannel:
             raise ValueError("command channel token must be at least 32 characters")
         self.config = config
 
-    def _call(self, path: str, payload: dict[str, Any] | None = None, method: str = "POST") -> dict[str, Any]:
+    def _call(self, path: str, payload: dict[str, Any] | None = None, method: str = "POST",
+              domain: str | None = None) -> dict[str, Any]:
         body = json.dumps(payload or {}, sort_keys=True, separators=(",", ":")).encode()
         request = urllib.request.Request(
             f"{self.config.base_url.rstrip('/')}{path}",
             data=body if method != "GET" else None,
             method=method,
-            headers=signed_headers(self.config.token, body),
+            headers=signed_headers(self.config.token, body, domain=domain),
         )
         with urllib.request.urlopen(request, timeout=self.config.timeout) as response:
             return json.loads(response.read() or b"{}")
@@ -150,7 +158,8 @@ class OrderCommandChannel:
         why a non-JSON answer also counts as "not deployed".
         """
         try:
-            payload = self._call(PEEK_PATH, {"account_alias": self.config.account_alias})
+            payload = self._call(PEEK_PATH, {"account_alias": self.config.account_alias, "purpose": PEEK_PURPOSE},
+                                 domain=PEEK_SIGNATURE_DOMAIN)
         except urllib.error.HTTPError as exc:
             if exc.code in (404, 405):
                 raise PeekUnavailable(f"peek route answered HTTP {exc.code}") from exc
@@ -168,7 +177,7 @@ class OrderCommandChannel:
     def claim(self) -> list[dict[str, Any]]:
         """Take pending requests for this account. Claiming is idempotent."""
         payload = self._call("/api/v2/portfolio/ingest/order-requests/claim",
-                             {"account_alias": self.config.account_alias})
+                             {"account_alias": self.config.account_alias, "purpose": CLAIM_PURPOSE})
         return payload.get("requests") or []
 
     def publish(self, request_id: str, update: dict[str, Any]) -> None:
@@ -178,7 +187,7 @@ class OrderCommandChannel:
     def claim_lookups(self) -> list[dict[str, Any]]:
         """Take pending contract questions. Same pull-only direction as orders."""
         payload = self._call("/api/v2/portfolio/ingest/contract-lookups/claim",
-                             {"account_alias": self.config.account_alias})
+                             {"account_alias": self.config.account_alias, "purpose": CLAIM_PURPOSE})
         return payload.get("lookups") or []
 
     def publish_lookup(self, lookup_id: str, update: dict[str, Any]) -> None:

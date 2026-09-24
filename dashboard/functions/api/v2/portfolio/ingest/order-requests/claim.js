@@ -12,7 +12,7 @@
 
 import { failure, json, requestId, requireDatabase } from "../../../../../_lib/http.js";
 import { reserveNonce, verifyPortfolioHmac } from "../../../../../_lib/portfolio.js";
-import { ORDER_LEASE_SECONDS, ORDER_OPEN_STATES, expireStalePreviewsStatement, leaseFloor } from "../../../../../_lib/command-channel.js";
+import { ORDER_LEASE_SECONDS, ORDER_OPEN_STATES, claimPurposeError, expireStalePreviewsStatement, leaseFloor } from "../../../../../_lib/command-channel.js";
 
 // States where a human or the broker still owes us something, and the lease.
 // Shared with the peek route (_lib/command-channel.js) so "claimable" cannot
@@ -34,14 +34,19 @@ export async function onRequestPost(context) {
     }
     const authorization = await verifyPortfolioHmac(context.request, context.env, bytes);
     if (!authorization) return json({ error: "Unauthorized or expired signature.", request_id: id }, 401, noStore());
+
+    // Read the body before reserving the nonce, so a body that is not a claim is
+    // refused without writing anything (see claimPurposeError).
+    let payload;
+    try { payload = JSON.parse(new TextDecoder().decode(bytes) || "{}"); }
+    catch (_) { return json({ error: "Invalid JSON.", request_id: id }, 400, noStore()); }
+    const notClaim = claimPurposeError(payload);
+    if (notClaim) return json({ error: notClaim, request_id: id }, 422, noStore());
+
     const db = requireDatabase(context.env);
     if (!await reserveNonce(db, authorization.nonce)) {
       return json({ error: "Replay rejected.", request_id: id }, 409, noStore());
     }
-
-    let payload;
-    try { payload = JSON.parse(new TextDecoder().decode(bytes) || "{}"); }
-    catch (_) { return json({ error: "Invalid JSON.", request_id: id }, 400, noStore()); }
 
     const accountAlias = String(payload?.account_alias || "").trim();
     if (!accountAlias) return json({ error: "account_alias is required.", request_id: id }, 422, noStore());

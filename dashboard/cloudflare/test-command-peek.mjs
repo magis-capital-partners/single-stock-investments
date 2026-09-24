@@ -1,11 +1,15 @@
 // The command-channel peek, against real SQL.
 //
-// The property that matters is the one D1 bills for: an idle bridge tick must
-// write nothing. Before the peek, every 15s tick called both claim routes, and
-// each reserved a nonce row first -- ~34k billed row writes a day, plus ~10k
-// more when retention deleted them, to say "nothing to do". These tests pin
-// that the peek writes no row, answers a replay, agrees with the claim routes
-// about what is claimable, and reads through an index rather than a scan.
+// Two properties, and D1 bills for the first while the second is security:
+//
+//   * An idle bridge tick writes nothing. Before the peek, every 15s tick called
+//     both claim routes, and each reserved a nonce row first -- ~34k billed row
+//     writes a day, plus ~10k more when retention deleted them.
+//   * A peek authenticates as a peek and as nothing else. It reserves no nonce,
+//     so a peek that verified on any other route would be a fresh, unused
+//     signature there for its whole 300s window. The first version shipped
+//     exactly that: a captured peek replayed to a claim route leased the desk's
+//     tickets away from the real bridge.
 
 import assert from "node:assert/strict";
 import test from "node:test";
@@ -18,6 +22,9 @@ import { dirname, join } from "node:path";
 import { onRequestPost as peek, PEEK_CONTRACT_LOOKUPS_SQL, PEEK_ORDER_REQUESTS_SQL } from "../functions/api/v2/portfolio/ingest/peek.js";
 import { onRequestPost as claimOrders } from "../functions/api/v2/portfolio/ingest/order-requests/claim.js";
 import { onRequestPost as claimLookups } from "../functions/api/v2/portfolio/ingest/contract-lookups/claim.js";
+import { onRequestPost as publishOrder } from "../functions/api/v2/portfolio/ingest/order-requests/publish.js";
+import { onRequestPost as publishLookup } from "../functions/api/v2/portfolio/ingest/contract-lookups/publish.js";
+import { onRequestPost as ingest } from "../functions/api/v2/portfolio/ingest.js";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const TOKEN = "x".repeat(48);
@@ -54,11 +61,16 @@ function freshDatabase() {
   return database;
 }
 
-function signed(url, payload) {
-  const body = JSON.stringify(payload);
+/**
+ * A signed request exactly as publisher.signed_headers builds it: the body is
+ * the canonical JSON (sorted keys, no spaces) and, with a domain, the signed
+ * message is "<domain>\n<ts>\n<nonce>\n<body>".
+ */
+function signed(payload, { domain = null, url = "https://dash.example/x" } = {}) {
+  const body = JSON.stringify(Object.fromEntries(Object.entries(payload).sort(([a], [b]) => a.localeCompare(b))));
   const timestamp = String(Math.floor(Date.now() / 1000));
   const nonce = randomUUID().replace(/-/g, "");
-  const signature = createHmac("sha256", TOKEN).update(`${timestamp}\n${nonce}\n${body}`).digest("hex");
+  const signature = createHmac("sha256", TOKEN).update(`${domain ? `${domain}\n` : ""}${timestamp}\n${nonce}\n${body}`).digest("hex");
   return new Request(url, {
     method: "POST", body,
     headers: {
@@ -68,14 +80,18 @@ function signed(url, payload) {
   });
 }
 
-const env = (database) => ({ DB: d1(database), PORTFOLIO_INGEST_TOKEN: TOKEN });
+// What the new bridge sends (command_poller.py): a peek-domain signature over a
+// body that names its purpose, and claims that say purpose "claim".
+const peekRequest = () => signed({ account_alias: ACCOUNT, purpose: "peek" }, { domain: "peek" });
+const env = (database) => ({ DB: d1(database), PORTFOLIO_INGEST_TOKEN: TOKEN, PRIVATE_ARTIFACTS: { put: async () => {} } });
 
-async function call(handler, database, payload = { account_alias: ACCOUNT }) {
-  const response = await handler({ request: signed("https://dash.example/x", payload), env: env(database) });
+async function send(handler, database, request) {
+  const response = await handler({ request, env: env(database) });
   return { status: response.status, body: await response.json() };
 }
 
 const totalChanges = (database) => database.prepare("SELECT total_changes() AS n").get().n;
+const nonces = (database) => database.prepare("SELECT COUNT(*) AS n FROM portfolio_ingest_nonces").get().n;
 const ago = (seconds) => new Date(Date.now() - seconds * 1000).toISOString();
 
 function seedRequest(database, overrides = {}) {
@@ -100,48 +116,125 @@ function seedLookup(database, overrides = {}) {
   return row.lookup_id;
 }
 
+const leased = (database) => ({
+  orders: database.prepare("SELECT COUNT(*) AS n FROM portfolio_order_requests WHERE claimed_at IS NOT NULL").get().n,
+  lookups: database.prepare("SELECT COUNT(*) AS n FROM portfolio_contract_lookups WHERE claimed_at IS NOT NULL").get().n,
+});
+
+// ------------------------------------------------------------- idle cost
+
 test("an idle peek writes no row at all -- no nonce, no lease", async () => {
   const database = freshDatabase();
   const before = totalChanges(database);
-  const { status, body } = await call(peek, database);
+  const { status, body } = await send(peek, database, peekRequest());
   assert.equal(status, 200);
   assert.deepEqual(body.claimable, { order_requests: 0, contract_lookups: 0 });
   assert.equal(totalChanges(database) - before, 0, "the idle peek must not write");
-  assert.equal(database.prepare("SELECT COUNT(*) AS n FROM portfolio_ingest_nonces").get().n, 0);
+  assert.equal(nonces(database), 0);
 });
 
 test("for contrast: the claims it replaces write a nonce row each, idle or not", async () => {
-  // This is the cost the peek removes. Two signed claims per 15s tick, each a
-  // nonce insert, on a desk with nothing to do.
   const database = freshDatabase();
-  await call(claimOrders, database);
-  await call(claimLookups, database);
-  assert.equal(database.prepare("SELECT COUNT(*) AS n FROM portfolio_ingest_nonces").get().n, 2);
+  await send(claimOrders, database, signed({ account_alias: ACCOUNT, purpose: "claim" }));
+  await send(claimLookups, database, signed({ account_alias: ACCOUNT, purpose: "claim" }));
+  assert.equal(nonces(database), 2);
 });
 
-test("a replayed peek is answered and still changes nothing", async () => {
+test("a replayed peek is answered as a peek and still changes nothing", async () => {
   const database = freshDatabase();
   const key = seedRequest(database);
-  const request = signed("https://dash.example/x", { account_alias: ACCOUNT });
+  const request = peekRequest();
   const before = totalChanges(database);
-  const first = await peek({ request: request.clone(), env: env(database) });
-  const second = await peek({ request, env: env(database) });
-  assert.equal(first.status, 200);
-  assert.equal(second.status, 200, "no nonce: a replay inside the signature window is answered");
+  assert.equal((await peek({ request: request.clone(), env: env(database) })).status, 200);
+  assert.equal((await peek({ request, env: env(database) })).status, 200, "no nonce: a replay inside the window is answered");
   assert.equal(totalChanges(database) - before, 0);
   const row = database.prepare("SELECT state, claimed_at FROM portfolio_order_requests WHERE request_id=?").get(key);
   assert.equal(row.state, "requested");
   assert.equal(row.claimed_at, null, "a peek, replayed or not, never takes a lease");
 });
 
+// --------------------------------------------- a peek is never anything else
+
+test("no request the peek accepts is accepted by any other signed route", async () => {
+  // Every shape a bridge has ever sent to the peek route. Whichever of them the
+  // peek accepts, replaying that exact request anywhere else must be refused
+  // and must lease, move or write nothing. (The first shape is what the first
+  // version of the bridge sent; against that edge this test fails.)
+  const candidates = {
+    "legacy signature, bare account body": () => signed({ account_alias: ACCOUNT }),
+    "legacy signature, peek-purpose body": () => signed({ account_alias: ACCOUNT, purpose: "peek" }),
+    "peek-domain signature, peek-purpose body": peekRequest,
+  };
+  const elsewhere = { claimOrders, claimLookups, publishOrder, publishLookup, ingest };
+  let accepted = 0;
+  for (const [shape, build] of Object.entries(candidates)) {
+    const database = freshDatabase();
+    const ticket = seedRequest(database);
+    seedLookup(database);
+    const request = build();
+    const answer = await peek({ request: request.clone(), env: env(database) });
+    if (answer.status !== 200) continue;
+    accepted += 1;
+    const before = totalChanges(database);
+    for (const [route, handler] of Object.entries(elsewhere)) {
+      const replay = await handler({ request: request.clone(), env: env(database) });
+      assert.ok(replay.status >= 400 && replay.status < 500, `${shape} replayed to ${route} answered ${replay.status}`);
+    }
+    assert.deepEqual(leased(database), { orders: 0, lookups: 0 }, `${shape}: a replay leased work away from the bridge`);
+    assert.equal(totalChanges(database) - before, 0, `${shape}: a replay wrote to D1`);
+    assert.equal(database.prepare("SELECT state FROM portfolio_order_requests WHERE request_id=?").get(ticket).state, "requested");
+  }
+  assert.ok(accepted >= 1, "the peek must accept the bridge's own peek, or this test proves nothing");
+});
+
+test("both claim routes refuse a peek-purpose body even when signed the claim way, before any write", async () => {
+  // The second, independent lock: a body that says it is a peek is never a
+  // claim, whatever signature it carries.
+  const database = freshDatabase();
+  seedRequest(database);
+  seedLookup(database);
+  const before = totalChanges(database);
+  for (const handler of [claimOrders, claimLookups]) {
+    const { status, body } = await send(handler, database, signed({ account_alias: ACCOUNT, purpose: "peek" }));
+    assert.equal(status, 422);
+    assert.match(body.error, /not a claim/);
+  }
+  assert.deepEqual(leased(database), { orders: 0, lookups: 0 });
+  assert.equal(totalChanges(database) - before, 0, "refused before the nonce was reserved");
+});
+
+test("the deployed bridge's legacy claim body (no purpose) still claims, as does purpose: claim", async () => {
+  for (const payload of [{ account_alias: ACCOUNT }, { account_alias: ACCOUNT, purpose: "claim" }]) {
+    const database = freshDatabase();
+    const ticket = seedRequest(database);
+    seedLookup(database);
+    const orders = await send(claimOrders, database, signed(payload));
+    const lookups = await send(claimLookups, database, signed(payload));
+    assert.equal(orders.status, 200);
+    assert.equal(orders.body.requests[0].request_id, ticket);
+    assert.equal(lookups.status, 200);
+    assert.equal(lookups.body.lookups.length, 1);
+  }
+});
+
+test("the peek refuses a claim-style signature and a body without its purpose", async () => {
+  const database = freshDatabase();
+  const claimSigned = await send(peek, database, signed({ account_alias: ACCOUNT, purpose: "peek" }));
+  assert.equal(claimSigned.status, 401, "a claim or ingest signature is not a peek signature");
+  const unlabelled = await send(peek, database, signed({ account_alias: ACCOUNT }, { domain: "peek" }));
+  assert.equal(unlabelled.status, 422, "the signed body must say what it is");
+});
+
 test("an unsigned or tampered peek is refused", async () => {
   const database = freshDatabase();
   const unsigned = await peek({ request: new Request("https://dash.example/x", { method: "POST", body: "{}" }), env: env(database) });
   assert.equal(unsigned.status, 401);
-  const request = signed("https://dash.example/x", { account_alias: ACCOUNT });
-  const tampered = new Request(request.url, { method: "POST", headers: request.headers, body: JSON.stringify({ account_alias: "U999" }) });
+  const request = peekRequest();
+  const tampered = new Request(request.url, { method: "POST", headers: request.headers, body: JSON.stringify({ account_alias: "U999", purpose: "peek" }) });
   assert.equal((await peek({ request: tampered, env: env(database) })).status, 401);
 });
+
+// ------------------------------------------------------------- semantics
 
 test("the peek counts exactly what a claim would take", async () => {
   const database = freshDatabase();
@@ -154,16 +247,16 @@ test("the peek counts exactly what a claim would take", async () => {
   seedLookup(database, { state: "resolving", claimed_at: ago(5), claimed_by: "b" });   // lease live
   seedLookup(database, { state: "resolved" });                             // done
 
-  const { body } = await call(peek, database);
+  const { body } = await send(peek, database, peekRequest());
   assert.deepEqual(body.claimable, { order_requests: 2, contract_lookups: 1 });
 
-  const orders = await call(claimOrders, database);
-  const lookups = await call(claimLookups, database);
+  const orders = await send(claimOrders, database, signed({ account_alias: ACCOUNT, purpose: "claim" }));
+  const lookups = await send(claimLookups, database, signed({ account_alias: ACCOUNT, purpose: "claim" }));
   assert.equal(orders.body.requests.length, body.claimable.order_requests);
   assert.equal(lookups.body.lookups.length, body.claimable.contract_lookups);
 
   // And once claimed, the peek goes quiet for the length of the lease.
-  const after = await call(peek, database);
+  const after = await send(peek, database, peekRequest());
   assert.deepEqual(after.body.claimable, { order_requests: 0, contract_lookups: 0 });
 });
 
@@ -177,7 +270,7 @@ test("both peek statements seek an index instead of scanning the table", () => {
   assert.doesNotMatch(`${orders} ${lookups}`, /SCAN portfolio_/);
 });
 
-test("the peek requires an account and a well-formed body", async () => {
+test("the peek requires an account", async () => {
   const database = freshDatabase();
-  assert.equal((await call(peek, database, {})).status, 422);
+  assert.equal((await send(peek, database, signed({ purpose: "peek" }, { domain: "peek" }))).status, 422);
 });

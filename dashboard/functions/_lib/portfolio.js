@@ -22,7 +22,15 @@ function hex(bytes) {
   return [...bytes].map((value) => value.toString(16).padStart(2, "0")).join("");
 }
 
-export async function verifyPortfolioHmac(request, env, body) {
+// Signing domains. An undomained signature covers "<ts>\n<nonce>\n<body>"
+// (every existing route). A domained one covers "<domain>\n<ts>\n<nonce>\n<body>".
+// Because the timestamp must be exactly ten digits and a domain must start with
+// a letter, the two message shapes can never coincide: a domained signature
+// fails every undomained check and vice versa, whatever body is attached.
+const SIGNING_DOMAIN = /^[a-z][a-z_]{0,31}$/;
+
+export async function verifyPortfolioHmac(request, env, body, { domain = null } = {}) {
+  if (domain !== null && !SIGNING_DOMAIN.test(String(domain))) throw new Error("Invalid signing domain");
   const expected = String(env?.PORTFOLIO_INGEST_TOKEN || "");
   const timestamp = request.headers.get("x-portfolio-timestamp") || "";
   const nonce = request.headers.get("x-portfolio-nonce") || "";
@@ -33,7 +41,7 @@ export async function verifyPortfolioHmac(request, env, body) {
       || Math.abs(Date.now() / 1000 - seconds) > 300) return false;
   const encoder = new TextEncoder();
   const key = await crypto.subtle.importKey("raw", encoder.encode(expected), { name: "HMAC", hash: "SHA-256" }, false, ["sign"]);
-  const prefix = encoder.encode(`${timestamp}\n${nonce}\n`);
+  const prefix = encoder.encode(`${domain ? `${domain}\n` : ""}${timestamp}\n${nonce}\n`);
   const message = new Uint8Array(prefix.byteLength + body.byteLength);
   message.set(prefix);
   message.set(new Uint8Array(body), prefix.byteLength);

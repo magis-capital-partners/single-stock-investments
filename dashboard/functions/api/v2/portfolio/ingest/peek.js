@@ -9,26 +9,33 @@
 // "nothing to do". The bridge now peeks first and claims only the queue that has
 // work, so an idle tick writes nothing at all.
 //
-// Why a replayed peek is harmless, which is what lets it skip the nonce:
+// Skipping the nonce is only safe if a peek request can be replayed as a peek
+// and as nothing else. An earlier version of this route got that wrong: it was
+// signed exactly like a claim, with a byte-identical body, and never used up its
+// nonce -- so a captured peek was a valid, unused claim signature for its whole
+// 300s window, and replaying it to a claim route leased the desk's tickets away
+// from the real bridge. Two independent locks now close that:
 //
-//   * It is read-only. Two COUNTs; no lease, no state change, no nonce row. A
-//     replay cannot claim a ticket, move one, or deny one to the real bridge --
-//     the thing the claim routes' nonce actually protects against.
-//   * It is still signed. The HMAC covers the timestamp and the body, and the
-//     timestamp must be within 300s (verifyPortfolioHmac), so only a request the
-//     hub itself signed recently is answered at all.
-//   * It discloses two integers: how many order tickets and contract lookups are
-//     claimable for the account named in the signed body. Replaying a captured
-//     peek inside its 300s window tells the replayer whether the desk has work,
-//     nothing about what the work is.
-//   * Its cost is bounded by index seeks over open rows, so replaying it is no
-//     more useful for burning quota than any public read route.
+//   * Signing domain. The peek is verified over "peek\n<ts>\n<nonce>\n<body>";
+//     every other route verifies "<ts>\n<nonce>\n<body>". The timestamp must be
+//     ten digits and the domain starts with a letter, so the two messages can
+//     never coincide: a peek signature fails every other route's check (401)
+//     and a claim or ingest signature fails here, whatever body is attached.
+//   * Purpose. The signed body says {"purpose":"peek"} and this route requires
+//     it; both claim routes refuse any body whose purpose is not "claim" (a
+//     missing purpose is still a claim, which is what the deployed bridge
+//     sends), and do so before reserving a nonce.
+//
+// With those, replaying a captured peek can only repeat the peek: two COUNTs
+// over open rows, no lease, no state change, no row written. What it discloses
+// is two integers -- how many order tickets and contract lookups are claimable
+// for the account in the signed body -- for up to 300s after capture.
 
 import { failure, json, requestId, requireDatabase } from "../../../../_lib/http.js";
 import { verifyPortfolioHmac } from "../../../../_lib/portfolio.js";
 import {
   LOOKUP_CLAIMABLE_STATES, LOOKUP_LEASE_SECONDS, ORDER_LEASE_SECONDS, ORDER_OPEN_STATES,
-  leaseFloor, placeholders,
+  PEEK_PURPOSE, PEEK_SIGNATURE_DOMAIN, leaseFloor, placeholders,
 } from "../../../../_lib/command-channel.js";
 
 const MAX_BODY_BYTES = 16_384;
@@ -50,7 +57,9 @@ export async function onRequestPost(context) {
     if (bytes.byteLength > MAX_BODY_BYTES) {
       return json({ error: "Payload too large.", request_id: id }, 413, noStore());
     }
-    const authorization = await verifyPortfolioHmac(context.request, context.env, bytes);
+    // Only a peek-domain signature is accepted here, and a peek-domain
+    // signature is accepted nowhere else (see the header).
+    const authorization = await verifyPortfolioHmac(context.request, context.env, bytes, { domain: PEEK_SIGNATURE_DOMAIN });
     if (!authorization) return json({ error: "Unauthorized or expired signature.", request_id: id }, 401, noStore());
     // Deliberately no reserveNonce(): see the header. This route must stay
     // read-only for that to remain true -- anything that writes belongs in a
@@ -59,6 +68,9 @@ export async function onRequestPost(context) {
     let payload;
     try { payload = JSON.parse(new TextDecoder().decode(bytes) || "{}"); }
     catch (_) { return json({ error: "Invalid JSON.", request_id: id }, 400, noStore()); }
+    if (payload?.purpose !== PEEK_PURPOSE) {
+      return json({ error: "A peek body must say purpose: peek.", request_id: id }, 422, noStore());
+    }
 
     const accountAlias = String(payload?.account_alias || "").trim();
     if (!accountAlias) return json({ error: "account_alias is required.", request_id: id }, 422, noStore());

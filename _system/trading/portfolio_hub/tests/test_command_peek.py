@@ -199,24 +199,56 @@ def _channel():
                                              account_alias="U123"))
 
 
-def test_peek_is_a_signed_post_to_the_peek_route(monkeypatch):
-    seen = {}
+def _capture(monkeypatch, answer):
+    seen: list[dict] = []
 
     def urlopen(request, timeout):
-        seen["url"], seen["method"], seen["body"] = request.full_url, request.get_method(), request.data
-        seen["headers"] = {key.lower(): value for key, value in request.header_items()}
-        return _Response(json.dumps({"claimable": {"order_requests": 3, "contract_lookups": 0}}).encode())
+        seen.append({
+            "url": request.full_url, "method": request.get_method(), "body": request.data,
+            "headers": {key.lower(): value for key, value in request.header_items()},
+        })
+        return _Response(json.dumps(answer).encode())
 
     monkeypatch.setattr(command_poller.urllib.request, "urlopen", urlopen)
+    return seen
+
+
+def _hmac(body: bytes, headers: dict, domain: str | None = None) -> str:
+    prefix = f"{domain}\n" if domain else ""
+    message = f"{prefix}{headers['x-portfolio-timestamp']}\n{headers['x-portfolio-nonce']}\n".encode() + body
+    return hmac.new(("t" * 40).encode(), message, hashlib.sha256).hexdigest()
+
+
+def test_peek_is_a_peek_domain_signed_post_that_names_its_purpose(monkeypatch):
+    """A peek must never be a valid request anywhere else.
+
+    It reserves no nonce at the edge, so the first version -- signed exactly
+    like a claim over a byte-identical {"account_alias": ...} body -- was a
+    fresh claim signature for 300s after anyone captured it. Now the body names
+    its purpose and the signature is over "peek\\n<ts>\\n<nonce>\\n<body>", which
+    the undomained claim routes can never verify.
+    """
+    seen = _capture(monkeypatch, {"claimable": {"order_requests": 3, "contract_lookups": 0}})
     assert _channel().peek() == {"order_requests": 3, "contract_lookups": 0}
-    assert seen["url"] == f"https://dash.example{PEEK_PATH}"
-    assert seen["method"] == "POST", "a GET would be answered by the SPA fallback page before deploy"
-    assert json.loads(seen["body"]) == {"account_alias": "U123"}
-    headers = seen["headers"]
-    expected = hmac.new(("t" * 40).encode(),
-                        f"{headers['x-portfolio-timestamp']}\n{headers['x-portfolio-nonce']}\n".encode() + seen["body"],
-                        hashlib.sha256).hexdigest()
-    assert headers["x-portfolio-signature"] == expected
+    call = seen[0]
+    assert call["url"] == f"https://dash.example{PEEK_PATH}"
+    assert call["method"] == "POST", "a GET would be answered by the SPA fallback page before deploy"
+    assert json.loads(call["body"]) == {"account_alias": "U123", "purpose": "peek"}
+    assert call["headers"]["x-portfolio-signature"] == _hmac(call["body"], call["headers"], domain="peek")
+    assert call["headers"]["x-portfolio-signature"] != _hmac(call["body"], call["headers"]), \
+        "a peek signature must not verify the way a claim signature does"
+
+
+def test_claims_say_they_are_claims_and_keep_the_claim_signature(monkeypatch):
+    """The edge still accepts claims without a purpose (the deployed bridge); ours say "claim"."""
+    seen = _capture(monkeypatch, {"requests": [], "lookups": []})
+    channel = _channel()
+    channel.claim()
+    channel.claim_lookups()
+    assert len(seen) == 2
+    for call in seen:
+        assert json.loads(call["body"]) == {"account_alias": "U123", "purpose": "claim"}
+        assert call["headers"]["x-portfolio-signature"] == _hmac(call["body"], call["headers"])
 
 
 @pytest.mark.parametrize("code", [404, 405])
