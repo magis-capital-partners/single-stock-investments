@@ -102,24 +102,34 @@ def fingerprint(rev: str = "HEAD", paths: tuple[str, ...] = DEPLOY_INPUTS, cwd: 
 def decide(
     event: str,
     *,
+    shipped: bool,
     synced: bool,
     deferred_today: bool,
     pruned_today: bool,
 ) -> tuple[bool, str]:
-    """(should_deploy, reason) for one run of the dashboard deploy workflow."""
+    """(should_deploy, reason) for one run of the dashboard deploy workflow.
+
+    ``shipped``: the last deploy that shipped Pages shipped these inputs.
+    ``synced``: the last deploy that also completed D1 synced these inputs.
+    Tracked apart because a deploy can ship Pages with its D1 work deferred:
+    if main then reverts, the site must follow even though D1 last synced
+    the reverted-to content.
+    """
     if event in ALWAYS_DEPLOY_EVENTS:
         return True, f"{event} always deploys"
-    if deferred_today:
-        return False, (
-            "these inputs already shipped today with a D1 stage deferred by the daily "
-            "budget; the first deploy after 00:00 UTC retries it"
-        )
+    if not shipped:
+        return True, "deploy inputs differ from what the site last shipped"
     if not synced:
-        return True, "deploy inputs changed since the last fully synced deploy"
+        if deferred_today:
+            return False, (
+                "these inputs already shipped today with a D1 stage deferred by the daily "
+                "budget; the first deploy after 00:00 UTC retries it"
+            )
+        return True, "the site has these inputs but D1 is not yet synced for them"
     if event == "schedule" and not pruned_today:
         return True, "inputs unchanged, but today's D1 retention has not run"
     if event in {"workflow_run", "schedule"}:
-        return False, "deploy inputs unchanged since the last fully synced deploy"
+        return False, "deploy inputs unchanged: the last deploy shipped and synced exactly these"
     return True, f"unrecognized event {event!r}; deploying to be safe"
 
 
@@ -174,6 +184,12 @@ def main(argv: list[str] | None = None) -> int:
         help="file holding the last fully synced deploy's fingerprint (restored from "
              "the newest dashboard-deploy-last-v1- cache entry); missing means unknown",
     )
+    dc.add_argument(
+        "--shipped-file",
+        default="",
+        help="file holding the last deploy's fingerprint that shipped Pages, D1 synced or "
+             "not (restored from the newest dashboard-deploy-shipped-v1- cache entry)",
+    )
     dc.add_argument("--deferred-hit", default="false")
     dc.add_argument("--pruned-hit", default="false")
     dc.add_argument("--github-output", default=os.environ.get("GITHUB_OUTPUT"))
@@ -186,8 +202,10 @@ def main(argv: list[str] | None = None) -> int:
         })
         return 0
     last = last_deployed(args.last_file)
+    shipped = last_deployed(args.shipped_file)
     deploy, reason = decide(
         args.event,
+        shipped=is_synced(args.fingerprint, shipped),
         synced=is_synced(args.fingerprint, last),
         deferred_today=_flag(args.deferred_hit),
         pruned_today=_flag(args.pruned_hit),
@@ -196,6 +214,7 @@ def main(argv: list[str] | None = None) -> int:
         "should_deploy": "true" if deploy else "false",
         "reason": reason,
         "last_deployed": last or "none",
+        "last_shipped": shipped or "none",
     })
     return 0
 

@@ -32,52 +32,80 @@ def _git(repo: Path, *args: str) -> str:
 class DecideTests(unittest.TestCase):
     def test_push_and_dispatch_always_deploy(self) -> None:
         for event in ("push", "workflow_dispatch"):
-            deploy, _ = gate.decide(event, synced=True, deferred_today=True, pruned_today=True)
+            deploy, _ = gate.decide(event, shipped=True, synced=True, deferred_today=True, pruned_today=True)
             self.assertTrue(deploy, event)
 
     def test_upstream_run_with_unchanged_inputs_does_not_deploy(self) -> None:
         # A Power Zone / LS-algo run whose main job was skipped commits nothing,
         # so the fingerprint is one a previous deploy already synced.
-        deploy, reason = gate.decide("workflow_run", synced=True, deferred_today=False, pruned_today=False)
+        deploy, reason = gate.decide("workflow_run", shipped=True, synced=True, deferred_today=False, pruned_today=False)
         self.assertFalse(deploy)
         self.assertIn("unchanged", reason)
 
     def test_upstream_run_with_changed_inputs_deploys(self) -> None:
-        deploy, _ = gate.decide("workflow_run", synced=False, deferred_today=False, pruned_today=False)
+        deploy, _ = gate.decide("workflow_run", shipped=True, synced=False, deferred_today=False, pruned_today=False)
         self.assertTrue(deploy)
 
     def test_no_same_day_retry_after_a_d1_deferral(self) -> None:
         for event in ("workflow_run", "schedule"):
-            deploy, reason = gate.decide(event, synced=False, deferred_today=True, pruned_today=False)
+            deploy, reason = gate.decide(event, shipped=True, synced=False, deferred_today=True, pruned_today=False)
             self.assertFalse(deploy, event)
             self.assertIn("00:00 UTC", reason)
 
     def test_schedule_is_the_post_reset_recovery_path(self) -> None:
         # Yesterday's deferral left the inputs unsynced; today has no deferral yet.
-        self.assertTrue(gate.decide("schedule", synced=False, deferred_today=False, pruned_today=True)[0])
+        self.assertTrue(gate.decide("schedule", shipped=True, synced=False, deferred_today=False, pruned_today=True)[0])
         # Nothing changed, but today's retention has not run.
-        self.assertTrue(gate.decide("schedule", synced=True, deferred_today=False, pruned_today=False)[0])
+        self.assertTrue(gate.decide("schedule", shipped=True, synced=True, deferred_today=False, pruned_today=False)[0])
         # Nothing changed, nothing owed: cheap no-op.
-        self.assertFalse(gate.decide("schedule", synced=True, deferred_today=False, pruned_today=True)[0])
+        self.assertFalse(gate.decide("schedule", shipped=True, synced=True, deferred_today=False, pruned_today=True)[0])
 
     def test_unknown_events_fail_open(self) -> None:
-        self.assertTrue(gate.decide("repository_dispatch", synced=True, deferred_today=False, pruned_today=True)[0])
+        self.assertTrue(gate.decide("repository_dispatch", shipped=True, synced=True, deferred_today=False, pruned_today=True)[0])
 
-    def cli(self, event: str, fingerprint: str, last: str | None) -> dict[str, str]:
-        """Run ``decide`` as the workflow does; ``last`` is what the newest
-        dashboard-deploy-last-v1- cache entry restored (None: nothing)."""
+    _SAME = object()
+
+    def cli(self, event: str, fingerprint: str, last: str | None, shipped=_SAME,
+            deferred: str = "") -> dict[str, str]:
+        """Run ``decide`` as the workflow does. ``last`` / ``shipped`` are what
+        the newest dashboard-deploy-last-v1- / -shipped-v1- entries restored
+        (None: nothing); ``shipped`` defaults to ``last`` (D1 kept up)."""
+        shipped = last if shipped is self._SAME else shipped
         with tempfile.TemporaryDirectory() as tmp:
             out = Path(tmp) / "out.txt"
-            last_file = Path(tmp) / ".deploy-gate-last" / "fingerprint"
-            if last is not None:
-                last_file.parent.mkdir()
-                last_file.write_text(last, encoding="utf-8")
+            files = {}
+            for name, value in (("last", last), ("shipped", shipped)):
+                files[name] = Path(tmp) / f".deploy-gate-{name}" / "fingerprint"
+                if value is not None:
+                    files[name].parent.mkdir()
+                    files[name].write_text(value, encoding="utf-8")
             self.assertEqual(gate.main([
                 "decide", "--event", event, "--fingerprint", fingerprint,
-                "--last-file", str(last_file), "--deferred-hit", "", "--pruned-hit", "",
-                "--github-output", str(out),
+                "--last-file", str(files["last"]), "--shipped-file", str(files["shipped"]),
+                "--deferred-hit", deferred, "--pruned-hit", "", "--github-output", str(out),
             ]), 0)
             return dict(line.split("=", 1) for line in out.read_text(encoding="utf-8").splitlines())
+
+    def test_a_same_day_revert_after_a_deferred_deploy_redeploys(self) -> None:
+        # A shipped and synced. B shipped Pages but its D1 work was deferred
+        # (last synced still A; a deferral marker exists for B, not A). main
+        # reverts to A the same day: D1 already holds A, but the site shows B.
+        for event in ("workflow_run", "schedule"):
+            verdict = self.cli(event, "fingerprint-A", last="fingerprint-A", shipped="fingerprint-B")
+            self.assertEqual(verdict["should_deploy"], "true", event)
+            self.assertEqual(verdict["last_shipped"], "fingerprint-B")
+
+    def test_deferred_inputs_wait_for_the_reset_then_retry(self) -> None:
+        # B shipped with D1 deferred today: no same-day retry for B...
+        self.assertEqual(
+            self.cli("workflow_run", "fp-B", last="fp-A", shipped="fp-B", deferred="true")["should_deploy"],
+            "false",
+        )
+        # ...but after 00:00 UTC (no deferral marker for the new date) it retries.
+        self.assertEqual(
+            self.cli("schedule", "fp-B", last="fp-A", shipped="fp-B", deferred="false")["should_deploy"],
+            "true",
+        )
 
     def test_cli_compares_against_the_last_deployed_fingerprint(self) -> None:
         self.assertEqual(self.cli("workflow_run", "aaa", "aaa")["should_deploy"], "false")
@@ -189,6 +217,24 @@ class WorkflowWiringTests(unittest.TestCase):
             self.assertIn("--last-file .deploy-gate-last/fingerprint", body, name)
             self.assertNotIn("--synced-hit", body, name)
             self.assertNotIn("dashboard-deploy-synced-v1-", body, name)
+            # And, separately, what the site last SHIPPED.
+            self.assertRegex(
+                body,
+                r"path: \.deploy-gate-shipped\n\s+key: dashboard-deploy-shipped-v1-\$\{\{ github\.run_id \}\}"
+                r"-\$\{\{ github\.run_attempt \}\}\n\s+restore-keys: dashboard-deploy-shipped-v1-\n",
+                name,
+            )
+            self.assertIn("--shipped-file .deploy-gate-shipped/fingerprint", body, name)
+
+    def test_shipped_is_recorded_even_when_d1_was_deferred(self) -> None:
+        build = self.job("build")
+        saved = re.search(
+            r"if: (.*)\n\s+uses: actions/cache/save@v4\n\s+with:\n\s+path: \.deploy-gate-shipped\n"
+            r"\s+key: dashboard-deploy-shipped-v1-", build)
+        self.assertIsNotNone(saved)
+        self.assertIn("steps.proceed.outputs.should_deploy == 'true'", saved.group(1))
+        self.assertNotIn("d1_deferred", saved.group(1))
+        self.assertIn('printf \'%s\' "$FINGERPRINT" > .deploy-gate-shipped/fingerprint', build)
 
     def test_darwin_is_not_a_trigger(self) -> None:
         # WS7 deleted the Darwin Portfolio Refresh workflow.
@@ -216,7 +262,7 @@ class WorkflowWiringTests(unittest.TestCase):
         self.assertIn("steps.cloudflare.outputs.d1_deferred != 'true'", saved.group(1))
         # Every deploy that ships records it, pushes included (the re-check
         # restore is skipped for them, so the directory must be created).
-        self.assertIn("mkdir -p .deploy-gate-marker .deploy-gate-last", build)
+        self.assertIn("mkdir -p .deploy-gate-marker .deploy-gate-last .deploy-gate-shipped", build)
         self.assertIn('printf \'%s\' "$FINGERPRINT" > .deploy-gate-last/fingerprint', build)
 
     def test_deferral_fails_the_job_after_pages_and_alerts_slack(self) -> None:

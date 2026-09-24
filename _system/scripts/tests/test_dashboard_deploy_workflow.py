@@ -120,10 +120,15 @@ def test_every_gate_lookup_has_a_matching_save():
             elif uses.startswith("actions/cache/save"):
                 saves.add((with_["path"], shape(with_["key"])))
     # Same path string on both sides: it is part of the cache version.
-    exact_saves = {(path, key) for path, key in saves if not key.startswith("dashboard-deploy-last-v1-")}
+    prefixed = ("dashboard-deploy-last-v1-", "dashboard-deploy-shipped-v1-")
+    exact_saves = {(path, key) for path, key in saves if not key.startswith(prefixed)}
     assert lookups == exact_saves
-    assert prefixes == {(".deploy-gate-last", "dashboard-deploy-last-v1-")}
-    assert any(path == ".deploy-gate-last" and key.startswith("dashboard-deploy-last-v1-") for path, key in saves)
+    assert prefixes == {
+        (".deploy-gate-last", "dashboard-deploy-last-v1-"),
+        (".deploy-gate-shipped", "dashboard-deploy-shipped-v1-"),
+    }
+    for path, prefix in prefixes:
+        assert any(p == path and key.startswith(prefix) for p, key in saves), prefix
     assert {path for path, _ in lookups} == {".deploy-gate-marker"}
 
 

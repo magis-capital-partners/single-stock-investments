@@ -107,6 +107,15 @@ jobs:
           path: .deploy-gate-last
           key: dashboard-deploy-last-v1-${{ github.run_id }}-${{ github.run_attempt }}
           restore-keys: dashboard-deploy-last-v1-
+      # What the site shows can be newer than what D1 last synced (Pages
+      # ships even when D1 is deferred), so it is tracked on its own.
+      - name: Restore the last shipped deploy's fingerprint
+        id: shipped
+        uses: actions/cache/restore@v4
+        with:
+          path: .deploy-gate-shipped
+          key: dashboard-deploy-shipped-v1-${{ github.run_id }}-${{ github.run_attempt }}
+          restore-keys: dashboard-deploy-shipped-v1-
       - name: Look up a D1 deferral of these inputs today
         id: deferred
         uses: actions/cache/restore@v4
@@ -132,6 +141,7 @@ jobs:
         run: |
           python _system/scripts/workflow_run_deploy_gate.py decide \
             --event "$EVENT" --fingerprint "$FINGERPRINT" --last-file .deploy-gate-last/fingerprint \
+            --shipped-file .deploy-gate-shipped/fingerprint \
             --deferred-hit "$DEFERRED" --pruned-hit "$PRUNED"
 
   oauth-secrets:
@@ -294,6 +304,14 @@ jobs:
           path: .deploy-gate-last
           key: dashboard-deploy-last-v1-${{ github.run_id }}-${{ github.run_attempt }}
           restore-keys: dashboard-deploy-last-v1-
+      - name: Re-check the last shipped deploy's fingerprint
+        id: shipped
+        if: github.event_name == 'workflow_run' || github.event_name == 'schedule'
+        uses: actions/cache/restore@v4
+        with:
+          path: .deploy-gate-shipped
+          key: dashboard-deploy-shipped-v1-${{ github.run_id }}-${{ github.run_attempt }}
+          restore-keys: dashboard-deploy-shipped-v1-
       - name: Re-check for a D1 deferral of these inputs today
         id: deferred
         if: github.event_name == 'workflow_run' || github.event_name == 'schedule'
@@ -320,6 +338,7 @@ jobs:
         run: |
           python _system/scripts/workflow_run_deploy_gate.py decide \
             --event "$EVENT" --fingerprint "$FINGERPRINT" --last-file .deploy-gate-last/fingerprint \
+            --shipped-file .deploy-gate-shipped/fingerprint \
             --deferred-hit "$DEFERRED" --pruned-hit "$PRUNED"
       - name: Rebuild and validate dashboard
         id: publish
@@ -360,9 +379,18 @@ jobs:
         env:
           FINGERPRINT: ${{ steps.fingerprint.outputs.hash }}
         run: |
-          mkdir -p .deploy-gate-marker .deploy-gate-last
+          mkdir -p .deploy-gate-marker .deploy-gate-last .deploy-gate-shipped
           printf '%s' "$FINGERPRINT" > .deploy-gate-marker/fingerprint
           printf '%s' "$FINGERPRINT" > .deploy-gate-last/fingerprint
+          printf '%s' "$FINGERPRINT" > .deploy-gate-shipped/fingerprint
+      # Reached only when the deploy action succeeded, i.e. Pages shipped --
+      # with or without deferred D1 work.
+      - name: Record these inputs as the last shipped deploy
+        if: steps.proceed.outputs.should_deploy == 'true'
+        uses: actions/cache/save@v4
+        with:
+          path: .deploy-gate-shipped
+          key: dashboard-deploy-shipped-v1-${{ github.run_id }}-${{ github.run_attempt }}
       - name: Record these inputs as the last fully synced deploy
         if: steps.proceed.outputs.should_deploy == 'true' && steps.cloudflare.outputs.d1_deferred != 'true'
         uses: actions/cache/save@v4
