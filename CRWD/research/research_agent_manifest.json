@@ -9,7 +9,7 @@
     }
   ],
   "reason": "epistemic_author_forecast:02ac4e724d95c942f9030caa:operating_business_and_net_assets", // pragma: allowlist secret
-  "evidence_hash": "b146aa20a782eb1fe3b0c3a7467db76d602104ef8c4e0801a9bcbc4771f32f92", // pragma: allowlist secret
+  "evidence_hash": "74891bf8c491c7d9128c18ab85d17a457e4e0db8c035bff0b4c7d093becbff4f", // pragma: allowlist secret
   "primary_evidence_hash": "864b1bce1ede2cdfac2d6a78f71052c2a60edc7782eee0eae774ccda229d1119",
   "artifact_count": 1,
   "ready": true,
@@ -20,13 +20,13 @@
     "ticker": "CRWD",
     "component_id": "operating_business_and_net_assets",
     "component_fingerprint": "7a98164fa9b6628c79e084acf62e6f53b327dbd7e06354785780736714433938",
-    "contract_hash": "82fd1e20ffbfbc3f0d3a72b250a32fd0f367db9b5017e37b8ccff2f81a1a3917",
+    "contract_hash": "16ff1f43607c60258a11bd362368c743bf9ccfd3b840d3f6e2a75050d0121d9a",
     "method_id": "owner_earnings_reinvestment_dcf",
     "power_zone": "quality_reinvestment",
     "metric_definition_id": "normalized_owner_earnings_ttm_m_v2",
     "priority": 75,
     "source_preflight_candidate": true,
-    "reason": "first_route_cohort_deficit",
+    "reason": "first_route_cohort_deficit", // pragma: allowlist secret
     "source_ref": "CRWD/research/valuation_contract.json",
     "frozen_component": {
       "component_id": "operating_business_and_net_assets",
@@ -90,14 +90,1382 @@
                 "source_id": "1a630df37491356b7a30fdeea8e12d9ea4fe55669b229399aa4ef2017bb6d96a"
               },
               "rationale": null
+            },
+            {
+              "id": "cash",
+              "label": "Cash",
+              "kind": "fact",
+              "value": 4715.726,
+              "unit": "USD millions",
+              "source": {
+                "ref": "CRWD/research/evidence/sec_companyfacts.json",
+                "locator": "us-gaap:CashCashEquivalentsRestrictedCashAndRestrictedCashEquivalents; accession 0001535527-26-000025; form 10-Q",
+                "as_of": "2026-04-30",
+                "content_sha256": "3deef70cc849e70954e6b21dd46f38cb5c6ca887a9a49443d831ea6a568bbdec",
+                "source_id": "515cda92de615141a9d0683016df613eadfa00f3a6dccd1963d9d56960db8cd7"
+              },
+              "rationale": null
+            },
+            {
+              "id": "debt",
+              "label": "Debt",
+              "kind": "fact",
+              "value": 745.843,
+              "unit": "USD millions",
+              "source": {
+                "ref": "CRWD/research/evidence/sec_companyfacts.json",
+                "locator": "us-gaap:LongTermDebtNoncurrent; accession 0001535527-26-000025; form 10-Q",
+                "as_of": "2026-04-30",
+                "content_sha256": "3deef70cc849e70954e6b21dd46f38cb5c6ca887a9a49443d831ea6a568bbdec",
+                "source_id": "142498f5b8d928fe720db5e5aa57760be4561e54f2c74c2610e7a48d065d7908"
+              },
+              "rationale": null
+            },
+            {
+              "id": "shares_m",
+              "label": "Diluted shares",
+              "kind": "fact",
+              "value": 254.56482,
+              "unit": "million shares",
+              "source": {
+                "ref": "CRWD/research/evidence/sec_companyfacts.json",
+                "locator": "dei:EntityCommonStockSharesOutstanding; accession 0001535527-26-000025; form 10-Q",
+                "as_of": "2026-05-28",
+                "content_sha256": "3deef70cc849e70954e6b21dd46f38cb5c6ca887a9a49443d831ea6a568bbdec",
+                "source_id": "bae37c88e15d42a8af63295c3b33c3e367a3c83ac1f4e8fcce4ffd434bc6fde8"
+              },
+              "rationale": null
+            },
+            {
+              "id": "reinvestment",
+              "label": "Reinvestment rate",
+              "kind": "judgment",
+              "value": 0.2,
+              "unit": "ratio",
+              "source": null,
+              "rationale": "Versioned initial bounds; refresh from the issuer reinvestment ledger."
+            },
+            {
+              "id": "incremental_roic",
+              "label": "Incremental after-tax ROIC",
+              "kind": "judgment",
+              "value": 0.12,
+              "unit": "ratio",
+              "source": null,
+              "rationale": "Conservative bounded starting cases pending a longer primary-source capital bridge."
+            },
+            {
+              "id": "discount_rate",
+              "label": "Discount rate",
+              "kind": "judgment",
+              "value": 0.12,
+              "unit": "ratio",
+              "source": null,
+              "rationale": "Approved risk bounds for the automated first pass."
+            },
+            {
+              "id": "terminal_multiple",
+              "label": "Terminal owner-earnings multiple",
+              "kind": "judgment",
+              "value": 12.0,
+              "unit": "multiple",
+              "source": null,
+              "rationale": "Bounded terminal economics; high case remains below a perpetual high-growth assumption."
+            },
+            {
+              "id": "growth",
+              "label": "Growth from reinvestment",
+              "kind": "calculation",
+              "value": 0.024,
+              "unit": "ratio",
+              "operation": "multiply",
+              "formula": "reinvestment \u00d7 incremental_roic",
+              "substituted_formula": "0.2 \u00d7 0.12",
+              "dependencies": [
+                "reinvestment",
+                "incremental_roic"
+              ]
+            },
+            {
+              "id": "growth_factor",
+              "label": "growth_factor",
+              "kind": "calculation",
+              "value": 1.024,
+              "unit": "ratio",
+              "operation": "add",
+              "formula": "1 + growth",
+              "substituted_formula": "1 + 0.024",
+              "dependencies": [
+                1,
+                "growth"
+              ]
+            },
+            {
+              "id": "distribution_rate",
+              "label": "distribution_rate",
+              "kind": "calculation",
+              "value": 0.8,
+              "unit": "ratio",
+              "operation": "subtract",
+              "formula": "1 - reinvestment",
+              "substituted_formula": "1 - 0.2",
+              "dependencies": [
+                1,
+                "reinvestment"
+              ]
+            },
+            {
+              "id": "owner_earnings_y1",
+              "label": "owner_earnings_y1",
+              "kind": "calculation",
+              "value": 1341.686784,
+              "unit": "USD millions",
+              "operation": "multiply",
+              "formula": "owner_earnings \u00d7 growth_factor",
+              "substituted_formula": "1310.241 \u00d7 1.024",
+              "dependencies": [
+                "owner_earnings",
+                "growth_factor"
+              ]
+            },
+            {
+              "id": "owner_cash_y1",
+              "label": "owner_cash_y1",
+              "kind": "calculation",
+              "value": 1073.3494272,
+              "unit": "USD millions",
+              "operation": "multiply",
+              "formula": "owner_earnings_y1 \u00d7 distribution_rate",
+              "substituted_formula": "1341.6868 \u00d7 0.8",
+              "dependencies": [
+                "owner_earnings_y1",
+                "distribution_rate"
+              ]
+            },
+            {
+              "id": "owner_earnings_y2",
+              "label": "owner_earnings_y2",
+              "kind": "calculation",
+              "value": 1373.88726682,
+              "unit": "USD millions",
+              "operation": "multiply",
+              "formula": "owner_earnings_y1 \u00d7 growth_factor",
+              "substituted_formula": "1341.6868 \u00d7 1.024",
+              "dependencies": [
+                "owner_earnings_y1",
+                "growth_factor"
+              ]
+            },
+            {
+              "id": "owner_cash_y2",
+              "label": "owner_cash_y2",
+              "kind": "calculation",
+              "value": 1099.10981345,
+              "unit": "USD millions",
+              "operation": "multiply",
+              "formula": "owner_earnings_y2 \u00d7 distribution_rate",
+              "substituted_formula": "1373.8873 \u00d7 0.8",
+              "dependencies": [
+                "owner_earnings_y2",
+                "distribution_rate"
+              ]
+            },
+            {
+              "id": "owner_earnings_y3",
+              "label": "owner_earnings_y3",
+              "kind": "calculation",
+              "value": 1406.86056122,
+              "unit": "USD millions",
+              "operation": "multiply",
+              "formula": "owner_earnings_y2 \u00d7 growth_factor",
+              "substituted_formula": "1373.8873 \u00d7 1.024",
+              "dependencies": [
+                "owner_earnings_y2",
+                "growth_factor"
+              ]
+            },
+            {
+              "id": "owner_cash_y3",
+              "label": "owner_cash_y3",
+              "kind": "calculation",
+              "value": 1125.48844898,
+              "unit": "USD millions",
+              "operation": "multiply",
+              "formula": "owner_earnings_y3 \u00d7 distribution_rate",
+              "substituted_formula": "1406.8606 \u00d7 0.8",
+              "dependencies": [
+                "owner_earnings_y3",
+                "distribution_rate"
+              ]
+            },
+            {
+              "id": "owner_earnings_y4",
+              "label": "owner_earnings_y4",
+              "kind": "calculation",
+              "value": 1440.62521469,
+              "unit": "USD millions",
+              "operation": "multiply",
+              "formula": "owner_earnings_y3 \u00d7 growth_factor",
+              "substituted_formula": "1406.8606 \u00d7 1.024",
+              "dependencies": [
+                "owner_earnings_y3",
+                "growth_factor"
+              ]
+            },
+            {
+              "id": "owner_cash_y4",
+              "label": "owner_cash_y4",
+              "kind": "calculation",
+              "value": 1152.50017175,
+              "unit": "USD millions",
+              "operation": "multiply",
+              "formula": "owner_earnings_y4 \u00d7 distribution_rate",
+              "substituted_formula": "1440.6252 \u00d7 0.8",
+              "dependencies": [
+                "owner_earnings_y4",
+                "distribution_rate"
+              ]
+            },
+            {
+              "id": "owner_earnings_y5",
+              "label": "owner_earnings_y5",
+              "kind": "calculation",
+              "value": 1475.20021984,
+              "unit": "USD millions",
+              "operation": "multiply",
+              "formula": "owner_earnings_y4 \u00d7 growth_factor",
+              "substituted_formula": "1440.6252 \u00d7 1.024",
+              "dependencies": [
+                "owner_earnings_y4",
+                "growth_factor"
+              ]
+            },
+            {
+              "id": "owner_cash_y5",
+              "label": "owner_cash_y5",
+              "kind": "calculation",
+              "value": 1180.16017587,
+              "unit": "USD millions",
+              "operation": "multiply",
+              "formula": "owner_earnings_y5 \u00d7 distribution_rate",
+              "substituted_formula": "1475.2002 \u00d7 0.8",
+              "dependencies": [
+                "owner_earnings_y5",
+                "distribution_rate"
+              ]
+            },
+            {
+              "id": "owner_earnings_y6",
+              "label": "owner_earnings_y6",
+              "kind": "calculation",
+              "value": 1510.60502512,
+              "unit": "USD millions",
+              "operation": "multiply",
+              "formula": "owner_earnings_y5 \u00d7 growth_factor",
+              "substituted_formula": "1475.2002 \u00d7 1.024",
+              "dependencies": [
+                "owner_earnings_y5",
+                "growth_factor"
+              ]
+            },
+            {
+              "id": "owner_cash_y6",
+              "label": "owner_cash_y6",
+              "kind": "calculation",
+              "value": 1208.48402009,
+              "unit": "USD millions",
+              "operation": "multiply",
+              "formula": "owner_earnings_y6 \u00d7 distribution_rate",
+              "substituted_formula": "1510.605 \u00d7 0.8",
+              "dependencies": [
+                "owner_earnings_y6",
+                "distribution_rate"
+              ]
+            },
+            {
+              "id": "owner_earnings_y7",
+              "label": "owner_earnings_y7",
+              "kind": "calculation",
+              "value": 1546.85954572,
+              "unit": "USD millions",
+              "operation": "multiply",
+              "formula": "owner_earnings_y6 \u00d7 growth_factor",
+              "substituted_formula": "1510.605 \u00d7 1.024",
+              "dependencies": [
+                "owner_earnings_y6",
+                "growth_factor"
+              ]
+            },
+            {
+              "id": "owner_cash_y7",
+              "label": "owner_cash_y7",
+              "kind": "calculation",
+              "value": 1237.48763658,
+              "unit": "USD millions",
+              "operation": "multiply",
+              "formula": "owner_earnings_y7 \u00d7 distribution_rate",
+              "substituted_formula": "1546.8595 \u00d7 0.8",
+              "dependencies": [
+                "owner_earnings_y7",
+                "distribution_rate"
+              ]
+            },
+            {
+              "id": "cash_pv",
+              "label": "cash_pv",
+              "kind": "calculation",
+              "value": 5209.77321179,
+              "unit": "USD millions",
+              "operation": "present_value",
+              "formula": "present_value(owner_cash_y1, 1, owner_cash_y2, 2, owner_cash_y3, 3, owner_cash_y4, 4, owner_cash_y5, 5, owner_cash_y6, 6, owner_cash_y7, 7, discount_rate)",
+              "substituted_formula": "present_value(1073.3494, 1, 1099.1098, 2, 1125.4884, 3, 1152.5002, 4, 1180.1602, 5, 1208.484, 6, 1237.4876, 7, 0.12)",
+              "dependencies": [
+                "owner_cash_y1",
+                1,
+                "owner_cash_y2",
+                2,
+                "owner_cash_y3",
+                3,
+                "owner_cash_y4",
+                4,
+                "owner_cash_y5",
+                5,
+                "owner_cash_y6",
+                6,
+                "owner_cash_y7",
+                7,
+                "discount_rate"
+              ]
+            },
+            {
+              "id": "terminal_value",
+              "label": "terminal_value",
+              "kind": "calculation",
+              "value": 18562.31454864,
+              "unit": "USD millions",
+              "operation": "multiply",
+              "formula": "owner_earnings_y7 \u00d7 terminal_multiple",
+              "substituted_formula": "1546.8595 \u00d7 12",
+              "dependencies": [
+                "owner_earnings_y7",
+                "terminal_multiple"
+              ]
+            },
+            {
+              "id": "terminal_pv",
+              "label": "terminal_pv",
+              "kind": "calculation",
+              "value": 8396.64842092,
+              "unit": "USD millions",
+              "operation": "discount",
+              "formula": "discount(terminal_value, discount_rate, 7)",
+              "substituted_formula": "discount(18562.315, 0.12, 7)",
+              "dependencies": [
+                "terminal_value",
+                "discount_rate",
+                7
+              ]
+            },
+            {
+              "id": "enterprise_value",
+              "label": "enterprise_value",
+              "kind": "calculation",
+              "value": 13606.42163271,
+              "unit": "USD millions",
+              "operation": "add",
+              "formula": "cash_pv + terminal_pv",
+              "substituted_formula": "5209.7732 + 8396.6484",
+              "dependencies": [
+                "cash_pv",
+                "terminal_pv"
+              ]
+            },
+            {
+              "id": "plus_cash",
+              "label": "plus_cash",
+              "kind": "calculation",
+              "value": 18322.14763271,
+              "unit": "USD millions",
+              "operation": "add",
+              "formula": "enterprise_value + cash",
+              "substituted_formula": "13606.422 + 4715.726",
+              "dependencies": [
+                "enterprise_value",
+                "cash"
+              ]
+            },
+            {
+              "id": "equity_value",
+              "label": "equity_value",
+              "kind": "calculation",
+              "value": 17576.30463271,
+              "unit": "USD millions",
+              "operation": "subtract",
+              "formula": "plus_cash - debt",
+              "substituted_formula": "18322.148 - 745.843",
+              "dependencies": [
+                "plus_cash",
+                "debt"
+              ]
+            },
+            {
+              "id": "value_per_share",
+              "label": "value_per_share",
+              "kind": "calculation",
+              "value": 69.04451539,
+              "unit": "USD per share",
+              "operation": "divide",
+              "formula": "equity_value \u00f7 shares_m",
+              "substituted_formula": "17576.305 \u00f7 254.56482",
+              "dependencies": [
+                "equity_value",
+                "shares_m"
+              ]
+            }
+          ],
+          "base": [
+            {
+              "id": "owner_earnings",
+              "label": "Normalized owner earnings",
+              "kind": "fact",
+              "value": 1310.241,
+              "unit": "USD millions",
+              "source": {
+                "ref": "CRWD/research/evidence/sec_companyfacts.json",
+                "locator": "us-gaap:NetCashProvidedByUsedInOperatingActivities; accession 0001535527-26-000010; form 10-K",
+                "as_of": "2026-01-31",
+                "content_sha256": "3deef70cc849e70954e6b21dd46f38cb5c6ca887a9a49443d831ea6a568bbdec",
+                "source_id": "1a630df37491356b7a30fdeea8e12d9ea4fe55669b229399aa4ef2017bb6d96a"
+              },
+              "rationale": null
+            },
+            {
+              "id": "cash",
+              "label": "Cash",
+              "kind": "fact",
+              "value": 4715.726,
+              "unit": "USD millions",
+              "source": {
+                "ref": "CRWD/research/evidence/sec_companyfacts.json",
+                "locator": "us-gaap:CashCashEquivalentsRestrictedCashAndRestrictedCashEquivalents; accession 0001535527-26-000025; form 10-Q",
+                "as_of": "2026-04-30",
+                "content_sha256": "3deef70cc849e70954e6b21dd46f38cb5c6ca887a9a49443d831ea6a568bbdec",
+                "source_id": "515cda92de615141a9d0683016df613eadfa00f3a6dccd1963d9d56960db8cd7"
+              },
+              "rationale": null
+            },
+            {
+              "id": "debt",
+              "label": "Debt",
+              "kind": "fact",
+              "value": 745.843,
+              "unit": "USD millions",
+              "source": {
+                "ref": "CRWD/research/evidence/sec_companyfacts.json",
+                "locator": "us-gaap:LongTermDebtNoncurrent; accession 0001535527-26-000025; form 10-Q",
+                "as_of": "2026-04-30",
+                "content_sha256": "3deef70cc849e70954e6b21dd46f38cb5c6ca887a9a49443d831ea6a568bbdec",
+                "source_id": "142498f5b8d928fe720db5e5aa57760be4561e54f2c74c2610e7a48d065d7908"
+              },
+              "rationale": null
+            },
+            {
+              "id": "shares_m",
+              "label": "Diluted shares",
+              "kind": "fact",
+              "value": 254.56482,
+              "unit": "million shares",
+              "source": {
+                "ref": "CRWD/research/evidence/sec_companyfacts.json",
+                "locator": "dei:EntityCommonStockSharesOutstanding; accession 0001535527-26-000025; form 10-Q",
+                "as_of": "2026-05-28",
+                "content_sha256": "3deef70cc849e70954e6b21dd46f38cb5c6ca887a9a49443d831ea6a568bbdec",
+                "source_id": "bae37c88e15d42a8af63295c3b33c3e367a3c83ac1f4e8fcce4ffd434bc6fde8"
+              },
+              "rationale": null
+            },
+            {
+              "id": "reinvestment",
+              "label": "Reinvestment rate",
+              "kind": "judgment",
+              "value": 0.35,
+              "unit": "ratio",
+              "source": null,
+              "rationale": "Versioned initial bounds; refresh from the issuer reinvestment ledger."
+            },
+            {
+              "id": "incremental_roic",
+              "label": "Incremental after-tax ROIC",
+              "kind": "judgment",
+              "value": 0.18,
+              "unit": "ratio",
+              "source": null,
+              "rationale": "Conservative bounded starting cases pending a longer primary-source capital bridge."
+            },
+            {
+              "id": "discount_rate",
+              "label": "Discount rate",
+              "kind": "judgment",
+              "value": 0.1,
+              "unit": "ratio",
+              "source": null,
+              "rationale": "Approved risk bounds for the automated first pass."
+            },
+            {
+              "id": "terminal_multiple",
+              "label": "Terminal owner-earnings multiple",
+              "kind": "judgment",
+              "value": 18.0,
+              "unit": "multiple",
+              "source": null,
+              "rationale": "Bounded terminal economics; high case remains below a perpetual high-growth assumption."
+            },
+            {
+              "id": "growth",
+              "label": "Growth from reinvestment",
+              "kind": "calculation",
+              "value": 0.063,
+              "unit": "ratio",
+              "operation": "multiply",
+              "formula": "reinvestment \u00d7 incremental_roic",
+              "substituted_formula": "0.35 \u00d7 0.18",
+              "dependencies": [
+                "reinvestment",
+                "incremental_roic"
+              ]
+            },
+            {
+              "id": "growth_factor",
+              "label": "growth_factor",
+              "kind": "calculation",
+              "value": 1.063,
+              "unit": "ratio",
+              "operation": "add",
+              "formula": "1 + growth",
+              "substituted_formula": "1 + 0.063",
+              "dependencies": [
+                1,
+                "growth"
+              ]
+            },
+            {
+              "id": "distribution_rate",
+              "label": "distribution_rate",
+              "kind": "calculation",
+              "value": 0.65,
+              "unit": "ratio",
+              "operation": "subtract",
+              "formula": "1 - reinvestment",
+              "substituted_formula": "1 - 0.35",
+              "dependencies": [
+                1,
+                "reinvestment"
+              ]
+            },
+            {
+              "id": "owner_earnings_y1",
+              "label": "owner_earnings_y1",
+              "kind": "calculation",
+              "value": 1392.786183,
+              "unit": "USD millions",
+              "operation": "multiply",
+              "formula": "owner_earnings \u00d7 growth_factor",
+              "substituted_formula": "1310.241 \u00d7 1.063",
+              "dependencies": [
+                "owner_earnings",
+                "growth_factor"
+              ]
+            },
+            {
+              "id": "owner_cash_y1",
+              "label": "owner_cash_y1",
+              "kind": "calculation",
+              "value": 905.31101895,
+              "unit": "USD millions",
+              "operation": "multiply",
+              "formula": "owner_earnings_y1 \u00d7 distribution_rate",
+              "substituted_formula": "1392.7862 \u00d7 0.65",
+              "dependencies": [
+                "owner_earnings_y1",
+                "distribution_rate"
+              ]
+            },
+            {
+              "id": "owner_earnings_y2",
+              "label": "owner_earnings_y2",
+              "kind": "calculation",
+              "value": 1480.53171253,
+              "unit": "USD millions",
+              "operation": "multiply",
+              "formula": "owner_earnings_y1 \u00d7 growth_factor",
+              "substituted_formula": "1392.7862 \u00d7 1.063",
+              "dependencies": [
+                "owner_earnings_y1",
+                "growth_factor"
+              ]
+            },
+            {
+              "id": "owner_cash_y2",
+              "label": "owner_cash_y2",
+              "kind": "calculation",
+              "value": 962.34561314,
+              "unit": "USD millions",
+              "operation": "multiply",
+              "formula": "owner_earnings_y2 \u00d7 distribution_rate",
+              "substituted_formula": "1480.5317 \u00d7 0.65",
+              "dependencies": [
+                "owner_earnings_y2",
+                "distribution_rate"
+              ]
+            },
+            {
+              "id": "owner_earnings_y3",
+              "label": "owner_earnings_y3",
+              "kind": "calculation",
+              "value": 1573.80521042,
+              "unit": "USD millions",
+              "operation": "multiply",
+              "formula": "owner_earnings_y2 \u00d7 growth_factor",
+              "substituted_formula": "1480.5317 \u00d7 1.063",
+              "dependencies": [
+                "owner_earnings_y2",
+                "growth_factor"
+              ]
+            },
+            {
+              "id": "owner_cash_y3",
+              "label": "owner_cash_y3",
+              "kind": "calculation",
+              "value": 1022.97338677,
+              "unit": "USD millions",
+              "operation": "multiply",
+              "formula": "owner_earnings_y3 \u00d7 distribution_rate",
+              "substituted_formula": "1573.8052 \u00d7 0.65",
+              "dependencies": [
+                "owner_earnings_y3",
+                "distribution_rate"
+              ]
+            },
+            {
+              "id": "owner_earnings_y4",
+              "label": "owner_earnings_y4",
+              "kind": "calculation",
+              "value": 1672.95493867,
+              "unit": "USD millions",
+              "operation": "multiply",
+              "formula": "owner_earnings_y3 \u00d7 growth_factor",
+              "substituted_formula": "1573.8052 \u00d7 1.063",
+              "dependencies": [
+                "owner_earnings_y3",
+                "growth_factor"
+              ]
+            },
+            {
+              "id": "owner_cash_y4",
+              "label": "owner_cash_y4",
+              "kind": "calculation",
+              "value": 1087.42071014,
+              "unit": "USD millions",
+              "operation": "multiply",
+              "formula": "owner_earnings_y4 \u00d7 distribution_rate",
+              "substituted_formula": "1672.9549 \u00d7 0.65",
+              "dependencies": [
+                "owner_earnings_y4",
+                "distribution_rate"
+              ]
+            },
+            {
+              "id": "owner_earnings_y5",
+              "label": "owner_earnings_y5",
+              "kind": "calculation",
+              "value": 1778.35109981,
+              "unit": "USD millions",
+              "operation": "multiply",
+              "formula": "owner_earnings_y4 \u00d7 growth_factor",
+              "substituted_formula": "1672.9549 \u00d7 1.063",
+              "dependencies": [
+                "owner_earnings_y4",
+                "growth_factor"
+              ]
+            },
+            {
+              "id": "owner_cash_y5",
+              "label": "owner_cash_y5",
+              "kind": "calculation",
+              "value": 1155.92821488,
+              "unit": "USD millions",
+              "operation": "multiply",
+              "formula": "owner_earnings_y5 \u00d7 distribution_rate",
+              "substituted_formula": "1778.3511 \u00d7 0.65",
+              "dependencies": [
+                "owner_earnings_y5",
+                "distribution_rate"
+              ]
+            },
+            {
+              "id": "owner_earnings_y6",
+              "label": "owner_earnings_y6",
+              "kind": "calculation",
+              "value": 1890.3872191,
+              "unit": "USD millions",
+              "operation": "multiply",
+              "formula": "owner_earnings_y5 \u00d7 growth_factor",
+              "substituted_formula": "1778.3511 \u00d7 1.063",
+              "dependencies": [
+                "owner_earnings_y5",
+                "growth_factor"
+              ]
+            },
+            {
+              "id": "owner_cash_y6",
+              "label": "owner_cash_y6",
+              "kind": "calculation",
+              "value": 1228.75169241,
+              "unit": "USD millions",
+              "operation": "multiply",
+              "formula": "owner_earnings_y6 \u00d7 distribution_rate",
+              "substituted_formula": "1890.3872 \u00d7 0.65",
+              "dependencies": [
+                "owner_earnings_y6",
+                "distribution_rate"
+              ]
+            },
+            {
+              "id": "owner_earnings_y7",
+              "label": "owner_earnings_y7",
+              "kind": "calculation",
+              "value": 2009.4816139,
+              "unit": "USD millions",
+              "operation": "multiply",
+              "formula": "owner_earnings_y6 \u00d7 growth_factor",
+              "substituted_formula": "1890.3872 \u00d7 1.063",
+              "dependencies": [
+                "owner_earnings_y6",
+                "growth_factor"
+              ]
+            },
+            {
+              "id": "owner_cash_y7",
+              "label": "owner_cash_y7",
+              "kind": "calculation",
+              "value": 1306.16304904,
+              "unit": "USD millions",
+              "operation": "multiply",
+              "formula": "owner_earnings_y7 \u00d7 distribution_rate",
+              "substituted_formula": "2009.4816 \u00d7 0.65",
+              "dependencies": [
+                "owner_earnings_y7",
+                "distribution_rate"
+              ]
+            },
+            {
+              "id": "cash_pv",
+              "label": "cash_pv",
+              "kind": "calculation",
+              "value": 5211.24193908,
+              "unit": "USD millions",
+              "operation": "present_value",
+              "formula": "present_value(owner_cash_y1, 1, owner_cash_y2, 2, owner_cash_y3, 3, owner_cash_y4, 4, owner_cash_y5, 5, owner_cash_y6, 6, owner_cash_y7, 7, discount_rate)",
+              "substituted_formula": "present_value(905.31102, 1, 962.34561, 2, 1022.9734, 3, 1087.4207, 4, 1155.9282, 5, 1228.7517, 6, 1306.163, 7, 0.1)",
+              "dependencies": [
+                "owner_cash_y1",
+                1,
+                "owner_cash_y2",
+                2,
+                "owner_cash_y3",
+                3,
+                "owner_cash_y4",
+                4,
+                "owner_cash_y5",
+                5,
+                "owner_cash_y6",
+                6,
+                "owner_cash_y7",
+                7,
+                "discount_rate"
+              ]
+            },
+            {
+              "id": "terminal_value",
+              "label": "terminal_value",
+              "kind": "calculation",
+              "value": 36170.66905025,
+              "unit": "USD millions",
+              "operation": "multiply",
+              "formula": "owner_earnings_y7 \u00d7 terminal_multiple",
+              "substituted_formula": "2009.4816 \u00d7 18",
+              "dependencies": [
+                "owner_earnings_y7",
+                "terminal_multiple"
+              ]
+            },
+            {
+              "id": "terminal_pv",
+              "label": "terminal_pv",
+              "kind": "calculation",
+              "value": 18561.27246497,
+              "unit": "USD millions",
+              "operation": "discount",
+              "formula": "discount(terminal_value, discount_rate, 7)",
+              "substituted_formula": "discount(36170.669, 0.1, 7)",
+              "dependencies": [
+                "terminal_value",
+                "discount_rate",
+                7
+              ]
+            },
+            {
+              "id": "enterprise_value",
+              "label": "enterprise_value",
+              "kind": "calculation",
+              "value": 23772.51440405,
+              "unit": "USD millions",
+              "operation": "add",
+              "formula": "cash_pv + terminal_pv",
+              "substituted_formula": "5211.2419 + 18561.272",
+              "dependencies": [
+                "cash_pv",
+                "terminal_pv"
+              ]
+            },
+            {
+              "id": "plus_cash",
+              "label": "plus_cash",
+              "kind": "calculation",
+              "value": 28488.24040405,
+              "unit": "USD millions",
+              "operation": "add",
+              "formula": "enterprise_value + cash",
+              "substituted_formula": "23772.514 + 4715.726",
+              "dependencies": [
+                "enterprise_value",
+                "cash"
+              ]
+            },
+            {
+              "id": "equity_value",
+              "label": "equity_value",
+              "kind": "calculation",
+              "value": 27742.39740405,
+              "unit": "USD millions",
+              "operation": "subtract",
+              "formula": "plus_cash - debt",
+              "substituted_formula": "28488.24 - 745.843",
+              "dependencies": [
+                "plus_cash",
+                "debt"
+              ]
+            },
+            {
+              "id": "value_per_share",
+              "label": "value_per_share",
+              "kind": "calculation",
+              "value": 108.97969878,
+              "unit": "USD per share",
+              "operation": "divide",
+              "formula": "equity_value \u00f7 shares_m",
+              "substituted_formula": "27742.397 \u00f7 254.56482",
+              "dependencies": [
+                "equity_value",
+                "shares_m"
+              ]
+            }
+          ],
+          "high": [
+            {
+              "id": "owner_earnings",
+              "label": "Normalized owner earnings",
+              "kind": "fact",
+              "value": 1310.241,
+              "unit": "USD millions",
+              "source": {
+                "ref": "CRWD/research/evidence/sec_companyfacts.json",
+                "locator": "us-gaap:NetCashProvidedByUsedInOperatingActivities; accession 0001535527-26-000010; form 10-K",
+                "as_of": "2026-01-31",
+                "content_sha256": "3deef70cc849e70954e6b21dd46f38cb5c6ca887a9a49443d831ea6a568bbdec",
+                "source_id": "1a630df37491356b7a30fdeea8e12d9ea4fe55669b229399aa4ef2017bb6d96a"
+              },
+              "rationale": null
+            },
+            {
+              "id": "cash",
+              "label": "Cash",
+              "kind": "fact",
+              "value": 4715.726,
+              "unit": "USD millions",
+              "source": {
+                "ref": "CRWD/research/evidence/sec_companyfacts.json",
+                "locator": "us-gaap:CashCashEquivalentsRestrictedCashAndRestrictedCashEquivalents; accession 0001535527-26-000025; form 10-Q",
+                "as_of": "2026-04-30",
+                "content_sha256": "3deef70cc849e70954e6b21dd46f38cb5c6ca887a9a49443d831ea6a568bbdec",
+                "source_id": "515cda92de615141a9d0683016df613eadfa00f3a6dccd1963d9d56960db8cd7"
+              },
+              "rationale": null
+            },
+            {
+              "id": "debt",
+              "label": "Debt",
+              "kind": "fact",
+              "value": 745.843,
+              "unit": "USD millions",
+              "source": {
+                "ref": "CRWD/research/evidence/sec_companyfacts.json",
+                "locator": "us-gaap:LongTermDebtNoncurrent; accession 0001535527-26-000025; form 10-Q",
+                "as_of": "2026-04-30",
+                "content_sha256": "3deef70cc849e70954e6b21dd46f38cb5c6ca887a9a49443d831ea6a568bbdec",
+                "source_id": "142498f5b8d928fe720db5e5aa57760be4561e54f2c74c2610e7a48d065d7908"
+              },
+              "rationale": null
+            },
+            {
+              "id": "shares_m",
+              "label": "Diluted shares",
+              "kind": "fact",
+              "value": 254.56482,
+              "unit": "million shares",
+              "source": {
+                "ref": "CRWD/research/evidence/sec_companyfacts.json",
+                "locator": "dei:EntityCommonStockSharesOutstanding; accession 0001535527-26-000025; form 10-Q",
+                "as_of": "2026-05-28",
+                "content_sha256": "3deef70cc849e70954e6b21dd46f38cb5c6ca887a9a49443d831ea6a568bbdec",
+                "source_id": "bae37c88e15d42a8af63295c3b33c3e367a3c83ac1f4e8fcce4ffd434bc6fde8"
+              },
+              "rationale": null
+            },
+            {
+              "id": "reinvestment",
+              "label": "Reinvestment rate",
+              "kind": "judgment",
+              "value": 0.5,
+              "unit": "ratio",
+              "source": null,
+              "rationale": "Versioned initial bounds; refresh from the issuer reinvestment ledger."
+            },
+            {
+              "id": "incremental_roic",
+              "label": "Incremental after-tax ROIC",
+              "kind": "judgment",
+              "value": 0.25,
+              "unit": "ratio",
+              "source": null,
+              "rationale": "Conservative bounded starting cases pending a longer primary-source capital bridge."
+            },
+            {
+              "id": "discount_rate",
+              "label": "Discount rate",
+              "kind": "judgment",
+              "value": 0.09,
+              "unit": "ratio",
+              "source": null,
+              "rationale": "Approved risk bounds for the automated first pass."
+            },
+            {
+              "id": "terminal_multiple",
+              "label": "Terminal owner-earnings multiple",
+              "kind": "judgment",
+              "value": 24.0,
+              "unit": "multiple",
+              "source": null,
+              "rationale": "Bounded terminal economics; high case remains below a perpetual high-growth assumption."
+            },
+            {
+              "id": "growth",
+              "label": "Growth from reinvestment",
+              "kind": "calculation",
+              "value": 0.125,
+              "unit": "ratio",
+              "operation": "multiply",
+              "formula": "reinvestment \u00d7 incremental_roic",
+              "substituted_formula": "0.5 \u00d7 0.25",
+              "dependencies": [
+                "reinvestment",
+                "incremental_roic"
+              ]
+            },
+            {
+              "id": "growth_factor",
+              "label": "growth_factor",
+              "kind": "calculation",
+              "value": 1.125,
+              "unit": "ratio",
+              "operation": "add",
+              "formula": "1 + growth",
+              "substituted_formula": "1 + 0.125",
+              "dependencies": [
+                1,
+                "growth"
+              ]
+            },
+            {
+              "id": "distribution_rate",
+              "label": "distribution_rate",
+              "kind": "calculation",
+              "value": 0.5,
+              "unit": "ratio",
+              "operation": "subtract",
+              "formula": "1 - reinvestment",
+              "substituted_formula": "1 - 0.5",
+              "dependencies": [
+                1,
+                "reinvestment"
+              ]
+            },
+            {
+              "id": "owner_earnings_y1",
+              "label": "owner_earnings_y1",
+              "kind": "calculation",
+              "value": 1474.021125,
+              "unit": "USD millions",
+              "operation": "multiply",
+              "formula": "owner_earnings \u00d7 growth_factor",
+              "substituted_formula": "1310.241 \u00d7 1.125",
+              "dependencies": [
+                "owner_earnings",
+                "growth_factor"
+              ]
+            },
+            {
+              "id": "owner_cash_y1",
+              "label": "owner_cash_y1",
+              "kind": "calculation",
+              "value": 737.0105625,
+              "unit": "USD millions",
+              "operation": "multiply",
+              "formula": "owner_earnings_y1 \u00d7 distribution_rate",
+              "substituted_formula": "1474.0211 \u00d7 0.5",
+              "dependencies": [
+                "owner_earnings_y1",
+                "distribution_rate"
+              ]
+            },
+            {
+              "id": "owner_earnings_y2",
+              "label": "owner_earnings_y2",
+              "kind": "calculation",
+              "value": 1658.27376562,
+              "unit": "USD millions",
+              "operation": "multiply",
+              "formula": "owner_earnings_y1 \u00d7 growth_factor",
+              "substituted_formula": "1474.0211 \u00d7 1.125",
+              "dependencies": [
+                "owner_earnings_y1",
+                "growth_factor"
+              ]
+            },
+            {
+              "id": "owner_cash_y2",
+              "label": "owner_cash_y2",
+              "kind": "calculation",
+              "value": 829.13688281,
+              "unit": "USD millions",
+              "operation": "multiply",
+              "formula": "owner_earnings_y2 \u00d7 distribution_rate",
+              "substituted_formula": "1658.2738 \u00d7 0.5",
+              "dependencies": [
+                "owner_earnings_y2",
+                "distribution_rate"
+              ]
+            },
+            {
+              "id": "owner_earnings_y3",
+              "label": "owner_earnings_y3",
+              "kind": "calculation",
+              "value": 1865.55798633,
+              "unit": "USD millions",
+              "operation": "multiply",
+              "formula": "owner_earnings_y2 \u00d7 growth_factor",
+              "substituted_formula": "1658.2738 \u00d7 1.125",
+              "dependencies": [
+                "owner_earnings_y2",
+                "growth_factor"
+              ]
+            },
+            {
+              "id": "owner_cash_y3",
+              "label": "owner_cash_y3",
+              "kind": "calculation",
+              "value": 932.77899316,
+              "unit": "USD millions",
+              "operation": "multiply",
+              "formula": "owner_earnings_y3 \u00d7 distribution_rate",
+              "substituted_formula": "1865.558 \u00d7 0.5",
+              "dependencies": [
+                "owner_earnings_y3",
+                "distribution_rate"
+              ]
+            },
+            {
+              "id": "owner_earnings_y4",
+              "label": "owner_earnings_y4",
+              "kind": "calculation",
+              "value": 2098.75273462,
+              "unit": "USD millions",
+              "operation": "multiply",
+              "formula": "owner_earnings_y3 \u00d7 growth_factor",
+              "substituted_formula": "1865.558 \u00d7 1.125",
+              "dependencies": [
+                "owner_earnings_y3",
+                "growth_factor"
+              ]
+            },
+            {
+              "id": "owner_cash_y4",
+              "label": "owner_cash_y4",
+              "kind": "calculation",
+              "value": 1049.37636731,
+              "unit": "USD millions",
+              "operation": "multiply",
+              "formula": "owner_earnings_y4 \u00d7 distribution_rate",
+              "substituted_formula": "2098.7527 \u00d7 0.5",
+              "dependencies": [
+                "owner_earnings_y4",
+                "distribution_rate"
+              ]
+            },
+            {
+              "id": "owner_earnings_y5",
+              "label": "owner_earnings_y5",
+              "kind": "calculation",
+              "value": 2361.09682645,
+              "unit": "USD millions",
+              "operation": "multiply",
+              "formula": "owner_earnings_y4 \u00d7 growth_factor",
+              "substituted_formula": "2098.7527 \u00d7 1.125",
+              "dependencies": [
+                "owner_earnings_y4",
+                "growth_factor"
+              ]
+            },
+            {
+              "id": "owner_cash_y5",
+              "label": "owner_cash_y5",
+              "kind": "calculation",
+              "value": 1180.54841322,
+              "unit": "USD millions",
+              "operation": "multiply",
+              "formula": "owner_earnings_y5 \u00d7 distribution_rate",
+              "substituted_formula": "2361.0968 \u00d7 0.5",
+              "dependencies": [
+                "owner_earnings_y5",
+                "distribution_rate"
+              ]
+            },
+            {
+              "id": "owner_earnings_y6",
+              "label": "owner_earnings_y6",
+              "kind": "calculation",
+              "value": 2656.23392975,
+              "unit": "USD millions",
+              "operation": "multiply",
+              "formula": "owner_earnings_y5 \u00d7 growth_factor",
+              "substituted_formula": "2361.0968 \u00d7 1.125",
+              "dependencies": [
+                "owner_earnings_y5",
+                "growth_factor"
+              ]
+            },
+            {
+              "id": "owner_cash_y6",
+              "label": "owner_cash_y6",
+              "kind": "calculation",
+              "value": 1328.11696488,
+              "unit": "USD millions",
+              "operation": "multiply",
+              "formula": "owner_earnings_y6 \u00d7 distribution_rate",
+              "substituted_formula": "2656.2339 \u00d7 0.5",
+              "dependencies": [
+                "owner_earnings_y6",
+                "distribution_rate"
+              ]
+            },
+            {
+              "id": "owner_earnings_y7",
+              "label": "owner_earnings_y7",
+              "kind": "calculation",
+              "value": 2988.26317097,
+              "unit": "USD millions",
+              "operation": "multiply",
+              "formula": "owner_earnings_y6 \u00d7 growth_factor",
+              "substituted_formula": "2656.2339 \u00d7 1.125",
+              "dependencies": [
+                "owner_earnings_y6",
+                "growth_factor"
+              ]
+            },
+            {
+              "id": "owner_cash_y7",
+              "label": "owner_cash_y7",
+              "kind": "calculation",
+              "value": 1494.13158549,
+              "unit": "USD millions",
+              "operation": "multiply",
+              "formula": "owner_earnings_y7 \u00d7 distribution_rate",
+              "substituted_formula": "2988.2632 \u00d7 0.5",
+              "dependencies": [
+                "owner_earnings_y7",
+                "distribution_rate"
+              ]
+            },
+            {
+              "id": "cash_pv",
+              "label": "cash_pv",
+              "kind": "calculation",
+              "value": 5214.23497166,
+              "unit": "USD millions",
+              "operation": "present_value",
+              "formula": "present_value(owner_cash_y1, 1, owner_cash_y2, 2, owner_cash_y3, 3, owner_cash_y4, 4, owner_cash_y5, 5, owner_cash_y6, 6, owner_cash_y7, 7, discount_rate)",
+              "substituted_formula": "present_value(737.01056, 1, 829.13688, 2, 932.77899, 3, 1049.3764, 4, 1180.5484, 5, 1328.117, 6, 1494.1316, 7, 0.09)",
+              "dependencies": [
+                "owner_cash_y1",
+                1,
+                "owner_cash_y2",
+                2,
+                "owner_cash_y3",
+                3,
+                "owner_cash_y4",
+                4,
+                "owner_cash_y5",
+                5,
+                "owner_cash_y6",
+                6,
+                "owner_cash_y7",
+                7,
+                "discount_rate"
+              ]
+            },
+            {
+              "id": "terminal_value",
+              "label": "terminal_value",
+              "kind": "calculation",
+              "value": 71718.31610331,
+              "unit": "USD millions",
+              "operation": "multiply",
+              "formula": "owner_earnings_y7 \u00d7 terminal_multiple",
+              "substituted_formula": "2988.2632 \u00d7 24",
+              "dependencies": [
+                "owner_earnings_y7",
+                "terminal_multiple"
+              ]
+            },
+            {
+              "id": "terminal_pv",
+              "label": "terminal_pv",
+              "kind": "calculation",
+              "value": 39232.37489101,
+              "unit": "USD millions",
+              "operation": "discount",
+              "formula": "discount(terminal_value, discount_rate, 7)",
+              "substituted_formula": "discount(71718.316, 0.09, 7)",
+              "dependencies": [
+                "terminal_value",
+                "discount_rate",
+                7
+              ]
+            },
+            {
+              "id": "enterprise_value",
+              "label": "enterprise_value",
+              "kind": "calculation",
+              "value": 44446.60986267,
+              "unit": "USD millions",
+              "operation": "add",
+              "formula": "cash_pv + terminal_pv",
+              "substituted_formula": "5214.235 + 39232.375",
+              "dependencies": [
+                "cash_pv",
+                "terminal_pv"
+              ]
+            },
+            {
+              "id": "plus_cash",
+              "label": "plus_cash",
+              "kind": "calculation",
+              "value": 49162.33586267,
+              "unit": "USD millions",
+              "operation": "add",
+              "formula": "enterprise_value + cash",
+              "substituted_formula": "44446.61 + 4715.726",
+              "dependencies": [
+                "enterprise_value",
+                "cash"
+              ]
+            },
+            {
+              "id": "equity_value",
+              "label": "equity_value",
+              "kind": "calculation",
+              "value": 48416.49286267,
+              "unit": "USD millions",
+              "operation": "subtract",
+              "formula": "plus_cash - debt",
+              "substituted_formula": "49162.336 - 745.843",
+              "dependencies": [
+                "plus_cash",
+                "debt"
+              ]
+            },
+            {
+              "id": "value_per_share",
+              "label": "value_per_share",
+              "kind": "calculation",
+              "value": 190.19318091,
+              "unit": "USD per share",
+              "operation": "divide",
+              "formula": "equity_value \u00f7 shares_m",
+              "substituted_formula": "48416.493 \u00f7 254.56482",
+              "dependencies": [
+                "equity_value",
+                "shares_m"
+              ]
             }
           ]
+        },
+        "source_lineage": [
+          {
+            "node_id": "owner_earnings",
+            "ref": "CRWD/research/evidence/sec_companyfacts.json",
+            "locator": "us-gaap:NetCashProvidedByUsedInOperatingActivities; accession 0001535527-26-000010; form 10-K",
+            "as_of": "2026-01-31",
+            "content_sha256": "3deef70cc849e70954e6b21dd46f38cb5c6ca887a9a49443d831ea6a568bbdec",
+            "source_id": "1a630df37491356b7a30fdeea8e12d9ea4fe55669b229399aa4ef2017bb6d96a"
+          },
+          {
+            "node_id": "cash",
+            "ref": "CRWD/research/evidence/sec_companyfacts.json",
+            "locator": "us-gaap:CashCashEquivalentsRestrictedCashAndRestrictedCashEquivalents; accession 0001535527-26-000025; form 10-Q",
+            "as_of": "2026-04-30",
+            "content_sha256": "3deef70cc849e70954e6b21dd46f38cb5c6ca887a9a49443d831ea6a568bbdec",
+            "source_id": "515cda92de615141a9d0683016df613eadfa00f3a6dccd1963d9d56960db8cd7"
+          },
+          {
+            "node_id": "debt",
+            "ref": "CRWD/research/evidence/sec_companyfacts.json",
+            "locator": "us-gaap:LongTermDebtNoncurrent; accession 0001535527-26-000025; form 10-Q",
+            "as_of": "2026-04-30",
+            "content_sha256": "3deef70cc849e70954e6b21dd46f38cb5c6ca887a9a49443d831ea6a568bbdec",
+            "source_id": "142498f5b8d928fe720db5e5aa57760be4561e54f2c74c2610e7a48d065d7908"
+          },
+          {
+            "node_id": "shares_m",
+            "ref": "CRWD/research/evidence/sec_companyfacts.json",
+            "locator": "dei:EntityCommonStockSharesOutstanding; accession 0001535527-26-000025; form 10-Q",
+            "as_of": "2026-05-28",
+            "content_sha256": "3deef70cc849e70954e6b21dd46f38cb5c6ca887a9a49443d831ea6a568bbdec",
+            "source_id": "bae37c88e15d42a8af63295c3b33c3e367a3c83ac1f4e8fcce4ffd434bc6fde8"
+          }
+        ],
+        "checks": {
+          "passed": true,
+          "errors": []
         },
         "proof_hash": "bc4cc17336047b6a4511ed5466e32585fbc6ee53b7cb0fad5d3a0180d2565754"
       },
       "evidence_tier": "primary_derived",
       "evidence_level": "primary_derived",
       "evidence": "Source-locked filing facts plus explicitly bounded versioned judgments.",
+      "scenario_assumptions": null,
+      "probability_and_timing": null,
+      "tax_and_realization_adjustments": null,
       "falsifier": "Owner earnings, incremental returns, or reinvestment runway fall below the low-case bridge.",
       "overlap_key": "entire_security",
       "assumption_type": "judgment"
@@ -112,9 +1480,9 @@
     "attempts": 0,
     "lease_owner": null,
     "lease_expires_at": null,
-    "input_sha": "7c6e9fe0e804a7353c578b4708d55830e49ae24d"
+    "input_sha": "bcd068dd9613ef819a2c0433b3fcca83c18c427a"
   },
-  "epistemic_input_sha": "7c6e9fe0e804a7353c578b4708d55830e49ae24d",
+  "epistemic_input_sha": "bcd068dd9613ef819a2c0433b3fcca83c18c427a",
   "calibration_release_hash": null,
   "routed_memory_observations": [],
   "routed_memory_warning": null
