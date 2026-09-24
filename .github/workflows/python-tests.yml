@@ -1,0 +1,143 @@
+name: Python tests
+
+# The pytest suites under _system/trading and _system/scripts/tests had no CI
+# at all: a green PR touching them proved nothing. This runs them, plus a
+# check for undefined names (ruff F821), which is the class of bug that shipped
+# `fetch_ir` and `today` undefined in two_phase_watch.py.
+#
+# Sparse and blobless on purpose: the full tree is ~200k files and 30 minutes
+# to check out; the suites need _system (minus the 600 MB reference corpus) and
+# a handful of dashboard files.
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - "_system/**"
+      - ".github/workflows/python-tests.yml"
+  push:
+    branches: [main]
+    paths:
+      - "_system/**"
+      - ".github/workflows/python-tests.yml"
+  # Bot pushes (GITHUB_TOKEN) start no workflow, so main is also tested daily.
+  schedule:
+    - cron: "23 5 * * *"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: python-tests-${{ github.event.pull_request.number || format('{0}-{1}', github.event_name, github.sha) }}
+  cancel-in-progress: true
+
+jobs:
+  undefined-names:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      # Known debt, fixed on fix/research-lanes-falsifier-twophase (WS1). It may
+      # only shrink: any F821 elsewhere, or more than this many here, fails.
+      # Delete these two lines once that branch is on main.
+      KNOWN_F821_FILE: _system/scripts/two_phase_watch.py
+      KNOWN_F821_MAX: "9"
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          fetch-depth: 1
+          filter: blob:none
+          sparse-checkout: |
+            /_system/scripts/
+            /_system/trading/
+          sparse-checkout-cone-mode: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Undefined names (ruff F821)
+        run: |
+          set -euo pipefail
+          python -m pip install --disable-pip-version-check --quiet "ruff==0.16.0"
+          # sed: the same step also works where ruff prints Windows separators.
+          ruff check --no-cache --select F821 --output-format=concise --exit-zero \
+            _system/scripts _system/trading | sed 's|\\|/|g' > "$RUNNER_TEMP/f821.txt"
+          cat "$RUNNER_TEMP/f821.txt"
+          grep -E ": F821 " "$RUNNER_TEMP/f821.txt" > "$RUNNER_TEMP/f821-hits.txt" || true
+          KNOWN=0
+          if [ -n "${KNOWN_F821_FILE:-}" ]; then
+            KNOWN=$(grep -c "^${KNOWN_F821_FILE}:" "$RUNNER_TEMP/f821-hits.txt" || true)
+          fi
+          NEW=$(( $(wc -l < "$RUNNER_TEMP/f821-hits.txt") - KNOWN ))
+          if [ "$NEW" -gt 0 ]; then
+            echo "::error::$NEW undefined name(s) outside the known-debt file."
+            exit 1
+          fi
+          if [ "$KNOWN" -gt "${KNOWN_F821_MAX:-0}" ]; then
+            echo "::error::$KNOWN_F821_FILE has $KNOWN undefined names; the known debt is $KNOWN_F821_MAX."
+            exit 1
+          fi
+          if [ -n "${KNOWN_F821_FILE:-}" ] && [ "$KNOWN" -eq 0 ]; then
+            echo "::warning title=Known F821 debt is gone::$KNOWN_F821_FILE is clean; delete KNOWN_F821_FILE and KNOWN_F821_MAX from python-tests.yml."
+          fi
+          echo "OK: no new undefined names ($KNOWN known in ${KNOWN_F821_FILE:-nothing})."
+
+  unit-tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      # Tests that fail on main for reasons outside this workflow. They are
+      # deselected from the gate and run separately below, which says so when
+      # one starts passing. Owners: the D1/portfolio-hub and deploy lanes.
+      #   timer expectation (5min) vs portfolio-hub-publisher.timer (1h)
+      #   deploy action text "D1 synchronization deferred" no longer present
+      KNOWN_FAILURES: >-
+        _system/scripts/tests/test_d1_read_efficiency.py::test_hot_routes_do_not_scan_full_history
+        _system/scripts/tests/test_prune_cloudflare_d1.py::test_deploy_defers_only_the_known_free_tier_quota_failure
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          fetch-depth: 1
+          filter: blob:none
+          # What the suites read: _system without the reference corpus (its
+          # top-level registries stay), the workflows some tests parse, the D1
+          # migrations and edge functions, one criticality summary, and one
+          # ticker download script for the payload-path test.
+          sparse-checkout: |
+            /_system/
+            !/_system/reference/*/
+            /.github/
+            /dashboard/cloudflare/
+            /dashboard/functions/
+            /dashboard/data/criticality_summary.json
+            /AMZN/investor-documents/download_amzn_investor_docs.py
+          sparse-checkout-cone-mode: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install test dependencies
+        # Deliberately not the trading requirements files: those pull in
+        # ib_async / ib_insync, and the tests are written for their absence
+        # (the bridge imports them lazily and the tests stub them).
+        run: |
+          python -m pip install --disable-pip-version-check --quiet \
+            "pytest==9.1.1" "PyYAML==6.0.3" "jsonschema==4.26.0" "numpy==2.3.3" "scipy==1.16.2"
+      - name: Trading and script test suites
+        run: |
+          set -euo pipefail
+          DESELECT=()
+          for test_id in $KNOWN_FAILURES; do DESELECT+=(--deselect "$test_id"); done
+          python -m pytest -q -p no:cacheprovider "${DESELECT[@]}" _system/trading _system/scripts/tests
+      - name: Known failures (reported, not gating)
+        run: |
+          set +e
+          # shellcheck disable=SC2086
+          python -m pytest -q -p no:cacheprovider $KNOWN_FAILURES > "$RUNNER_TEMP/known.txt" 2>&1
+          code=$?
+          set -e
+          tail -n 20 "$RUNNER_TEMP/known.txt"
+          if [ "$code" -eq 0 ]; then
+            echo "::warning title=Known failures now pass::Remove them from KNOWN_FAILURES in python-tests.yml so they gate again."
+          else
+            echo "Known failures still fail (exit $code); they stay deselected from the gate."
+          fi

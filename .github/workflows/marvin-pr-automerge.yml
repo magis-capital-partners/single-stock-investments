@@ -412,7 +412,7 @@ jobs:
         run: |
           set -euo pipefail
           MERGEABLE=UNKNOWN
-          for attempt in 1 2 3 4 5 6; do
+          for _ in 1 2 3 4 5 6; do
             MERGEABLE=$(gh pr view "$PR" --repo "$REPO" --json mergeable -q .mergeable)
             [ "$MERGEABLE" != "UNKNOWN" ] && break
             sleep 5
@@ -451,7 +451,7 @@ jobs:
         if: steps.state.outputs.merge == 'true' && steps.resolve.outputs.pushed != 'true'
         run: |
           set -euo pipefail
-          for attempt in 1 2 3 4 5; do
+          for _ in 1 2 3 4 5; do
             MERGEABLE=$(gh pr view "$PR" --repo "$REPO" --json mergeable -q .mergeable)
             if [ "$MERGEABLE" = "MERGEABLE" ]; then
               exit 0
