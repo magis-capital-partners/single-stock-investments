@@ -504,6 +504,33 @@ jobs:
         uses: ./.github/actions/commit-main
         with:
           message: "chore: sync Drive intake documents $(date -u +%Y-%m-%d)"
+      - name: Commit imported documents when the rebuild failed
+        # The import has already moved these files in Drive and written their
+        # sidecars and manifest rows. Gating that commit on the rebuild lost
+        # them on every failed rebuild, so the same backlog re-imported daily
+        # (6 -> 61 documents, 2026-09-10..22). Stage ONLY the import's own
+        # outputs -- never half-rebuilt derived artifacts.
+        if: >
+          always() &&
+          steps.google_creds.outputs.configured == 'true' &&
+          steps.import.outputs.imported != '0' &&
+          steps.rebuild.conclusion != 'success'
+        run: |
+          if git rev-parse --is-shallow-repository 2>/dev/null | grep -qx true; then
+            git fetch --deepen=200 origin main 2>/dev/null || git fetch origin main
+          else
+            git fetch origin main
+          fi
+          git ls-files -z --others --modified --exclude-standard -- \
+            _system/data/drive_intake_manifest.json \
+            _system/reference/document-store/drive_intake_latest.json \
+            ':(glob)*/third-party-analyses/**' \
+            ':(glob)*/investor-documents/drive-intake/**' \
+            | xargs -0 -r git add --sparse --
+          git diff --cached --stat | tail -n 1
+          # The job is already red from the failed rebuild; this only keeps the import.
+          bash _system/scripts/ci_push_main.sh \
+            "chore: sync Drive intake documents $(date -u +%Y-%m-%d) (import only; rebuild failed)"
       - name: Commit updated intake report
         if: >
           always() &&

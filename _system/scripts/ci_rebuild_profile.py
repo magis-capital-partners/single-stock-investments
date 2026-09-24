@@ -49,10 +49,15 @@ PROFILES: dict[str, list[list[str]]] = {
         ["_system/scripts/build_biotech_insider_scores.py"],
         ["_system/scripts/build_biotech_peer_short_stub.py"],
         ["_system/scripts/build_biotech_composite.py"],
-        ["_system/scripts/build_research_memory.py"],
         ["_system/scripts/repair_letter_dates.py", "--apply"],
         ["_system/scripts/build_index_membership.py"],
         ["_system/scripts/build_insights.py"],
+        # AFTER build_insights: research memory is built from insights.json,
+        # which is gitignored and so absent in a fresh CI checkout until
+        # build_insights writes it. Built first, it saw no insights and the
+        # drive lane committed ~1,100 claims over the ~12,000 intake-full had
+        # written that morning, every evening (15.4MB -> 1.4MB evidence).
+        ["_system/scripts/build_research_memory.py"],
         ["_system/scripts/build_dashboard_data.py"],
         ["_system/scripts/validate_research_memory.py"],
     ],
