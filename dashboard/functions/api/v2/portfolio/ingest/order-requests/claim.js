@@ -72,15 +72,23 @@ export async function onRequestPost(context) {
     // a lease write each time) and holding the browser's ticket poll. It can no
     // longer be approved by then -- the window and the hub's token are both
     // long gone -- so marking it `expired` closes nothing that was open.
-    await db.batch([
-      expireStalePreviewsStatement(db, { accountAlias, now }),
-      db.prepare(`UPDATE portfolio_order_requests
+    //
+    // Housekeeping, so it runs on its own and may fail on its own: a refused
+    // expiry must never cost the bridge its claim.
+    try {
+      await expireStalePreviewsStatement(db, { accountAlias, now }).run();
+    } catch (error) {
+      console.error(JSON.stringify({
+        message: "stale preview expiry failed; claiming anyway",
+        request_id: id, error: error instanceof Error ? error.message : String(error),
+      }));
+    }
+    await db.prepare(`UPDATE portfolio_order_requests
       SET claimed_at=?, claimed_by=?, updated_at=?
       WHERE account_alias=? AND state IN (${placeholders})
         AND (claimed_at IS NULL OR claimed_at < ?)`).bind(
-        stamp, claimant, stamp, accountAlias, ...OPEN_STATES, floor,
-      ),
-    ]);
+      stamp, claimant, stamp, accountAlias, ...OPEN_STATES, floor,
+    ).run();
 
     const rows = await db.prepare(`SELECT * FROM portfolio_order_requests
       WHERE account_alias=? AND state IN (${placeholders}) AND claimed_by=? AND claimed_at=?

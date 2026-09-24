@@ -54,6 +54,17 @@ export function claimPurposeError(payload) {
   return `A '${String(purpose).slice(0, 32)}' body is not a claim.`;
 }
 
+/**
+ * The same test as expireStalePreviewsStatement, on a row already in hand, so a
+ * reader can skip the UPDATE entirely when none of its rows could be expired.
+ * An unparseable stamp is never stale, exactly as datetime() NULL never is.
+ */
+export function isStalePreview(row, now = new Date()) {
+  if (row?.state !== "previewed") return false;
+  const stamp = Date.parse(row.approval_expires_at ?? row.updated_at ?? "");
+  return Number.isFinite(stamp) && stamp < now.getTime() - PREVIEW_EXPIRY_GRACE_SECONDS * 1000;
+}
+
 export function leaseFloor(now, seconds) {
   return new Date(now.getTime() - seconds * 1000).toISOString();
 }
@@ -73,13 +84,19 @@ export const placeholders = (values) => values.map(() => "?").join(",");
  * `approved` and `submitting` are never touched: those belong to the hub, and a
  * submitting ticket may already be at the broker.
  *
- * Seeks on idx_order_requests_state (state, created_at) and writes nothing when
- * there is nothing to expire.
+ * Reads only `previewed` rows, through idx_order_requests_state. The scope
+ * column is written `+owner` / `+account_alias` on purpose: a bare `owner=?`
+ * lets the planner pick idx_order_requests_owner instead -- it does without
+ * ANALYZE statistics -- and walk the owner's entire, never-pruned ticket
+ * history on every call (2,503 rows a call in a 5,000-row test). The unary
+ * plus takes that index off the table; the plan is pinned by
+ * test-order-expiry.mjs with and without ANALYZE. Writes nothing when there is
+ * nothing to expire.
  */
 export function expireStalePreviewsStatement(db, { accountAlias = null, owner = null, now = new Date() } = {}) {
   const cutoff = leaseFloor(now, PREVIEW_EXPIRY_GRACE_SECONDS);
   const stamp = now.toISOString();
-  const scope = accountAlias != null ? "AND account_alias=?" : owner != null ? "AND owner=?" : "";
+  const scope = accountAlias != null ? "AND +account_alias=?" : owner != null ? "AND +owner=?" : "";
   const binds = [stamp, "approval_expired", "previewed", cutoff];
   if (accountAlias != null) binds.push(accountAlias);
   else if (owner != null) binds.push(owner);
