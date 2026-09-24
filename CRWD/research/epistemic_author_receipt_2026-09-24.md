@@ -9,10 +9,10 @@
 
 | Field | Value |
 |-------|-------|
-| evidence_hash | `74891bf8c491c7d9128c18ab85d17a457e4e0db8c035bff0b4c7d093becbff4f` | <!-- pragma: allowlist secret -->
-| input_sha | `bcd068dd9613ef819a2c0433b3fcca83c18c427a` |
+| evidence_hash | `6c78e24e555410b658291b4cef1622b36dd351f8ece25a77f37acae794caa3d5` | <!-- pragma: allowlist secret -->
+| input_sha | `9a0b24251e11002a3891821eefc71e4b1945481d` |
 | component_fingerprint | `7a98164fa9b6628c79e084acf62e6f53b327dbd7e06354785780736714433938` |
-| contract_hash | `16ff1f43607c60258a11bd362368c743bf9ccfd3b840d3f6e2a75050d0121d9a` |
+| contract_hash | `e4d69722ad9f65326e7098b3850633523dce3da8019362830811421e5505380e` |
 
 ## Epistemic loop
 
