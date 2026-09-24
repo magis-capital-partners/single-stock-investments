@@ -15,9 +15,9 @@
 
 **Routine / planned sales (context):**
 
-- OLEARY DENIS: 14500 @ $187.87 on 2026-07-13
-- OLEARY DENIS: 49500 @ $0.0 on 2026-07-06
-- Podbere Burt W.: 1890 @ $0.0 on 2026-06-15
+- Podbere Burt W.: 31101 @ $238.09 on 2026-09-21
+- Podbere Burt W.: 1899 @ $238.77 on 2026-09-21
+- Podbere Burt W.: 800 @ $239.94 on 2026-09-21
 
 Source: `_system/reference/market-data/insider/CRWD_transactions.csv`.
 Lawrence base IRR unchanged (`in_base_irr: False`).
