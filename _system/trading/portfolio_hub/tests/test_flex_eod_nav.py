@@ -80,17 +80,79 @@ def test_a_positions_only_statement_stays_incomplete():
     assert payload["completeness"]["feed"] == "flex_eod"
 
 
-@pytest.mark.parametrize("raw,expected", [
-    ("20260924", "20260924"),
-    ("2026-09-24", "20260924"),
-    ("2026-09-24T18:10:02", "20260924"),
-    ("20260924;181002", "20260924"),
-    ("09/24/2026", "20260924"),
-    ("", ""),
-    ("not a date", ""),
+@pytest.mark.parametrize("raw,order,expected", [
+    ("20260924", None, "2026-09-24"),
+    ("2026-09-24", None, "2026-09-24"),
+    ("2026-09-24T18:10:02", None, "2026-09-24"),
+    ("20260924;181002", None, "2026-09-24"),
+    ("09/24/2026", None, "2026-09-24"),    # second field over 12: MM/dd
+    ("24/09/2026", None, "2026-09-24"),    # first field over 12: dd/MM
+    ("09/10/2026", "mdy", "2026-09-10"),   # the statement settled MM/dd
+    ("09/10/2026", "dmy", "2026-10-09"),   # the statement settled dd/MM
+    ("09/10/2026", None, ""),              # never settled: unread, not guessed
+    ("05/05/2026", None, "2026-05-05"),    # reads the same either way
+    ("20261340", None, ""),                # not a calendar date
+    ("", None, ""),
+    ("not a date", None, ""),
 ])
-def test_report_dates_sort_in_every_format_a_query_can_emit(raw, expected):
-    assert _report_date_key(raw) == expected
+def test_report_dates_read_in_every_format_a_query_can_emit(raw, order, expected):
+    assert _report_date_key(raw, order) == expected
+
+
+def _statement(tmp_path, statement_attrs: str, sections: str):
+    xml = (FIXTURES / "flex_eod_positions_only.xml").read_text(encoding="utf-8")
+    start = xml.index("<FlexStatement ")
+    end = xml.index(">", start) + 1
+    xml = xml[:start] + f'<FlexStatement accountId="U805366" {statement_attrs}>' + xml[end:]
+    xml = xml.replace("</OpenPositions>", "</OpenPositions>\n" + sections, 1)
+    path = tmp_path / "statement.xml"
+    path.write_text(xml, encoding="utf-8")
+    return build_account_snapshot(path, account_alias="U805366")
+
+
+def _summary(report_date: str, total: str) -> str:
+    return (f'<EquitySummaryByReportDateInBase currency="USD" reportDate="{report_date}" '
+            f'cash="1" total="{total}"/>')
+
+
+def test_day_first_dates_across_a_month_end_pick_the_true_latest(tmp_path):
+    """dd/MM/yyyy read as MM/dd made 30/09 sort after 01/10 -- the older NAV won."""
+    payload = _statement(
+        tmp_path, 'fromDate="29/09/2026" toDate="01/10/2026" period="LastBusinessDay"',
+        "<EquitySummaryInBase>" + _summary("29/09/2026", "100.00") + _summary("01/10/2026", "300.00")
+        + _summary("30/09/2026", "200.00") + "</EquitySummaryInBase>",
+    )
+    assert _nav(payload) == Decimal("300.00")
+    assert payload["completeness"]["session_date"] == "2026-10-01"
+    assert "warnings" not in payload["completeness"]
+
+
+def test_a_statement_dated_only_by_its_generation_stamp_reads_the_date(tmp_path):
+    payload = _statement(tmp_path, 'whenGenerated="20260924;181002"', "")
+    assert payload["completeness"]["session_date"] == "2026-09-24", "not the raw '20260924;1'"
+
+
+def test_an_unreadable_session_date_is_flagged_never_replaced(tmp_path):
+    payload = _statement(
+        tmp_path, 'toDate="sometime"',
+        "<EquitySummaryInBase>" + _summary("20260924", "11867165.25") + "</EquitySummaryInBase>",
+    )
+    assert payload["complete"] is True, "the NAV is still stated"
+    assert payload["completeness"]["session_date"] is None
+    assert any("session date unreadable: 'sometime'" in warning for warning in payload["completeness"]["warnings"])
+
+
+def test_day_month_order_the_statement_never_settles_falls_back_to_file_order(tmp_path):
+    payload = _statement(
+        tmp_path, 'fromDate="09/10/2026" toDate="10/09/2026"',
+        "<EquitySummaryInBase>" + _summary("09/10/2026", "100.00") + _summary("10/09/2026", "200.00")
+        + "</EquitySummaryInBase>",
+    )
+    assert _nav(payload) == Decimal("200.00"), "IBKR lists report dates ascending: the last row"
+    warnings = payload["completeness"]["warnings"]
+    assert any("report dates not readable" in warning for warning in warnings)
+    assert payload["completeness"]["session_date"] is None
+    assert any("session date unreadable" in warning for warning in warnings)
 
 
 def test_a_us_formatted_multi_date_summary_still_picks_the_latest(tmp_path):

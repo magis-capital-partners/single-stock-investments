@@ -181,3 +181,9 @@ test("a ticket that finishes stops the poll for good", async () => {
   await clock.advance(10_000);
   assert.equal(intentPolls(page), done, "a filled ticket is never polled again, focus or not");
 });
+
+test("an EOD snapshot without a readable session date is labelled with where its date came from", async () => {
+  const page = loadScripts(SCRIPTS, { routes: routesFor({ bookBody: eodBook({ session_date: null, session_date_source: "ingest_time" }) }) });
+  const html = await openPortfolio(page);
+  assert.match(html, /EOD snapshot as of 2026-09-24 \(statement date unreadable; ingest date used\)/);
+});

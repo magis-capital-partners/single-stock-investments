@@ -46,7 +46,7 @@ from decimal import Decimal, InvalidOperation
 from pathlib import Path
 from typing import Any
 
-from .flex import parse_flex_file
+from .flex import flex_date, parse_flex_file
 from .publisher import publish_payload
 
 
@@ -151,8 +151,13 @@ def build_account_snapshot(
             "quality": "estimated" if fx_source == "fx_unavailable" and quantity else "settled",
         })
 
-    account_values = _account_values(parsed, base_currency=base_currency)
+    warnings: list[str] = []
+    account_values = _account_values(parsed, base_currency=base_currency, warnings=warnings)
     has_nav = any(row["tag"] == "NetLiquidation" for row in account_values)
+    if parsed.get("session_date") is None:
+        # Flagged, never papered over: without a readable session date the edge
+        # can only judge freshness from ingest time, and says so.
+        warnings.append(f"session date unreadable: {parsed.get('session_date_raw')!r}")
     return {
         "schema_version": "account_snapshot.v1",
         "source_run_id": source_run_id or parsed["source_run_id"],
@@ -175,6 +180,7 @@ def build_account_snapshot(
                 if has_nav else
                 "Flex positions query carries no equity summary; add one in Client Portal for account values."
             ),
+            **({"warnings": warnings} if warnings else {}),
         },
         "account_values": account_values,
         "positions": rows,
@@ -255,7 +261,8 @@ def _value_row(tag: str, amount: Decimal, *, currency: str, as_of: str) -> dict[
     }
 
 
-def _account_values(parsed: dict[str, Any], *, base_currency: str) -> list[dict[str, Any]]:
+def _account_values(parsed: dict[str, Any], *, base_currency: str,
+                    warnings: list[str] | None = None) -> list[dict[str, Any]]:
     """Map a stated equity summary onto the account-value tags the cockpit reads.
 
     Margin tags are not invented. Flex states them only when the query includes
@@ -269,7 +276,7 @@ def _account_values(parsed: dict[str, Any], *, base_currency: str) -> list[dict[
     if summaries:
         # The latest report date, not the first row: a multi-day period lists
         # every date, oldest first.
-        row = _latest(summaries, "reportDate", "toDate", "date")
+        row = _latest(summaries, ("reportDate", "toDate", "date"), parsed.get("date_order"), warnings)
         currency = base_currency
         values = [_value_row("NetLiquidation", _decimal(_pick_amount(row, "total")), currency=currency, as_of=as_of)]
         cash = _decimal(_pick_amount(row, "cash"))
@@ -286,7 +293,7 @@ def _account_values(parsed: dict[str, Any], *, base_currency: str) -> list[dict[
         if _decimal(row.get("net_liquidation")) is not None and _in_base(row.get("currency"), base_currency)
     ]
     if navs:
-        row = _latest(navs, "to_date")
+        row = _latest(navs, ("to_date",), parsed.get("date_order"), warnings)
         values = [_value_row("NetLiquidation", _decimal(row.get("net_liquidation")), currency=base_currency, as_of=as_of)]
         cash = _decimal(row.get("cash"))
         if cash is not None:
@@ -295,33 +302,34 @@ def _account_values(parsed: dict[str, Any], *, base_currency: str) -> list[dict[
     return []
 
 
-def _report_date_key(raw: Any) -> str:
-    """A sortable YYYYMMDD for the date formats a Flex query can be set to emit.
+def _report_date_key(raw: Any, order: str | None = None) -> str:
+    """A sortable ISO date for any Flex date format (see flex.flex_date), or ''.
 
-    yyyyMMdd and yyyy-MM-dd (optionally with a time) sort as-is once the
-    separators go; MM/dd/yyyy is re-ordered. Anything unrecognised sorts before
-    every real date, so a row that states its date always beats one that does
-    not.
+    '' sorts before every real date, so a row that states its date always beats
+    one that does not.
     """
-    text = str(raw or "").strip()
-    if not text:
-        return ""
-    head = text.split(";")[0].split(" ")[0].split("T")[0]
-    if "/" in head:
-        parts = head.split("/")
-        if len(parts) == 3 and len(parts[2]) == 4 and all(part.isdigit() for part in parts):
-            return f"{parts[2]}{int(parts[0]):02d}{int(parts[1]):02d}"
-        return ""
-    digits = head.replace("-", "")
-    return digits if len(digits) == 8 and digits.isdigit() else ""
+    return flex_date(raw, order) or ""
 
 
-def _latest(rows: list[dict[str, Any]], *date_keys: str) -> dict[str, Any]:
-    """The row with the latest stated date; later in the file wins a tie."""
-    def key(item: tuple[int, dict[str, Any]]) -> tuple[str, int]:
-        index, row = item
-        return (_report_date_key(_pick_amount(row, *date_keys)), index)
-    return max(enumerate(rows), key=key)[1]
+def _latest(rows: list[dict[str, Any]], date_keys: tuple[str, ...], order: str | None = None,
+            warnings: list[str] | None = None) -> dict[str, Any]:
+    """The row with the latest stated date; later in the file wins a tie.
+
+    When some rows state a date that cannot be read -- above all a dd/MM vs
+    MM/dd question the statement never settles -- sorting on the readable ones
+    alone could pick an older row, so the file's own order decides (IBKR lists
+    report dates ascending) and a warning says so.
+    """
+    raw = [_pick_amount(row, *date_keys) for row in rows]
+    keys = [_report_date_key(value, order) for value in raw]
+    unreadable = [value for value, key in zip(raw, keys) if value not in (None, "") and not key]
+    if unreadable:
+        if warnings is not None:
+            warnings.append(
+                f"report dates not readable ({', '.join(map(str, unreadable[:3]))}); took the last row in file order"
+            )
+        return rows[-1]
+    return max(enumerate(rows), key=lambda item: (keys[item[0]], item[0]))[1]
 
 
 def _pick_amount(row: dict[str, Any], *keys: str) -> Any:

@@ -279,7 +279,15 @@
   // and never as a zero.
   const NOT_IN_FLEX = 'not in Flex EOD';
   const isEodFeed = (book) => book?.snapshot?.feed === 'flex_eod';
-  const eodDate = (book) => book?.snapshot?.session_date || String(book?.snapshot?.as_of || '').slice(0, 10) || 'an unknown date';
+  // The statement's own session date; when the edge could not read one it
+  // judged the snapshot by its ingest date instead, and the label says so
+  // rather than passing that date off as the session's.
+  const eodDate = (book) => {
+    const snapshot = book?.snapshot || {};
+    if (snapshot.session_date) return snapshot.session_date;
+    const ingested = String(snapshot.as_of || '').slice(0, 10);
+    return ingested ? `${ingested} (statement date unreadable; ingest date used)` : 'an unknown date';
+  };
 
   /**
    * The one-line feed state under the NAV.

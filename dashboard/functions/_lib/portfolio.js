@@ -483,6 +483,11 @@ function nextWeekdayUtc(dayStartMs) {
  * `feed` is "flex_eod" for a statement flex_ingest published (it declares
  * completeness.feed, and older Flex runs carry a session_date), else "live" --
  * the dead collector's cadence, which keeps its two-hour rule.
+ *
+ * An EOD statement whose session date could not be read (flex_ingest leaves it
+ * null and says why in completeness.warnings) is still judged -- by the UTC date
+ * it was ingested -- but never silently: session_date stays null and
+ * session_date_source says "ingest_time" instead of "statement".
  */
 export function snapshotFreshness(run, now = Date.now()) {
   const asOf = Date.parse(run?.as_of || "");
@@ -490,8 +495,12 @@ export function snapshotFreshness(run, now = Date.now()) {
   const sessionDate = /^\d{4}-\d{2}-\d{2}$/.test(String(completeness.session_date || ""))
     ? completeness.session_date : null;
   const eod = completeness.feed === "flex_eod" || sessionDate !== null;
+  const sessionSource = eod ? (sessionDate ? "statement" : "ingest_time") : null;
   if (!Number.isFinite(asOf)) {
-    return { feed: eod ? "flex_eod" : "live", session_date: sessionDate, age_seconds: null, stale: null, stale_after: null };
+    return {
+      feed: eod ? "flex_eod" : "live", session_date: sessionDate, session_date_source: sessionSource,
+      age_seconds: null, stale: null, stale_after: null,
+    };
   }
   const age = Math.max(0, Math.round((now - asOf) / 1000));
   if (!eod) {
@@ -505,7 +514,8 @@ export function snapshotFreshness(run, now = Date.now()) {
   const deadline = nextWeekdayUtc(sessionStart) + DAY_MS + EOD_DEADLINE_HOUR_UTC * 3_600_000;
   return {
     feed: "flex_eod",
-    session_date: sessionDate || new Date(sessionStart).toISOString().slice(0, 10),
+    session_date: sessionDate,
+    session_date_source: sessionSource,
     age_seconds: age,
     stale: now > deadline,
     stale_after: new Date(deadline).toISOString(),

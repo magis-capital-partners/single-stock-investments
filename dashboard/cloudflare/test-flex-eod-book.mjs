@@ -141,3 +141,22 @@ test("the NAV history gains the EOD observation", async () => {
   const body = await response.json();
   assert.deepEqual(body.nav_series.map((row) => row.nav_decimal), ["11870000", "11867165.25"]);
 });
+
+test("an EOD statement with an unreadable session date says so instead of borrowing one", () => {
+  // flex_ingest leaves session_date null (and warns) when the statement's date
+  // cannot be read. The book still judges freshness -- by the ingest date --
+  // but must not present that date as the session's.
+  const unreadable = {
+    as_of: "2026-09-24T22:15:14Z",
+    completeness_json: JSON.stringify({ feed: "flex_eod", session_date: null, warnings: ["session date unreadable: 'sometime'"] }),
+  };
+  const fresh = snapshotFreshness(unreadable, Date.parse("2026-09-25T10:00:00Z"));
+  assert.equal(fresh.feed, "flex_eod");
+  assert.equal(fresh.session_date, null, "no date is invented");
+  assert.equal(fresh.session_date_source, "ingest_time");
+  assert.equal(fresh.stale, false);
+  assert.equal(fresh.stale_after, "2026-09-26T05:00:00.000Z", "judged from the ingest date's calendar");
+
+  const read = snapshotFreshness({ as_of: "2026-09-24T22:15:14Z", completeness_json: JSON.stringify({ feed: "flex_eod", session_date: "2026-09-24" }) }, Date.parse("2026-09-25T10:00:00Z"));
+  assert.equal(read.session_date_source, "statement");
+});
