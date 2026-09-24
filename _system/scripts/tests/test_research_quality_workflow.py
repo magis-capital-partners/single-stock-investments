@@ -111,6 +111,16 @@ def test_every_job_tests_the_exact_commit():
                 assert step["with"]["ref"] == "${{ env.CHECKOUT_SHA }}", name
 
 
+def test_warrant_problems_do_not_red_unrelated_research_prs():
+    """9/11-9/18: "warrants.json reports structural contract errors" failed
+    every research PR's dashboard-integrity job. The warrant lane enforces;
+    the PR gate reports. Checkers that predate --warn-only keep the old run."""
+    steps = load()["jobs"]["dashboard-integrity"]["steps"]
+    run = next(s["run"] for s in steps if "check_warrant_universe.py" in str(s.get("run", "")))
+    assert 'check_warrant_universe.py --help | grep -q -- "--warn-only"' in run
+    assert "check_warrant_universe.py --warn-only" in run
+
+
 def test_a_scheduled_run_judges_history_against_itself():
     steps = load()["jobs"]["graph-invariants"]["steps"]
     history = next(s for s in steps if "immutable history" in str(s.get("name", "")))
