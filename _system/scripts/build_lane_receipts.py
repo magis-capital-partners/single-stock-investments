@@ -35,15 +35,22 @@ import lane_registry as lr  # noqa: E402
 ROOT = Path(__file__).resolve().parents[2]
 RUNS_PER_WORKFLOW = 50
 MAX_FAILURES = 10
+# GITHUB_TOKEN allows 1,000 REST calls an hour per repository and the
+# supervisor also reads annotations and logs. A first build walks at most the
+# 50-run listing of each workflow whose lanes have not succeeded in it; past
+# this budget the unscanned runs are simply picked up by the next build.
+MAX_JOB_CALLS = 450
 
 
 class GhApi:
     """Read-only Actions API through the gh CLI, with per-build caches."""
 
-    def __init__(self, repository: str):
+    def __init__(self, repository: str, max_job_calls: int = MAX_JOB_CALLS):
         self.repository = repository
         self.errors: list[str] = []
         self._cache: dict[str, object] = {}
+        self.job_calls = 0
+        self.max_job_calls = max_job_calls
 
     def _get(self, path: str):
         if path in self._cache:
@@ -78,7 +85,15 @@ class GhApi:
         return payload.get("state") if isinstance(payload, dict) else None
 
     def run_jobs(self, run_id: int):
-        payload = self._get(f"repos/{self.repository}/actions/runs/{run_id}/jobs?per_page=100")
+        path = f"repos/{self.repository}/actions/runs/{run_id}/jobs?per_page=100"
+        if path not in self._cache:
+            if self.job_calls >= self.max_job_calls:
+                if not any(e.startswith("job-call budget") for e in self.errors):
+                    self.errors.append(f"job-call budget of {self.max_job_calls} reached;"
+                                       " the rest is scanned next run")
+                return None
+            self.job_calls += 1
+        payload = self._get(path)
         return payload.get("jobs") if isinstance(payload, dict) else None
 
     def job_annotations(self, job_id: int):
@@ -139,14 +154,19 @@ def refresh_lane(root: Path, lane: dict, api, runs: list[dict]) -> tuple[dict, l
                 if isinstance(f, dict) and f.get("run_id")}
     latest = receipt.get("latest") if isinstance(receipt.get("latest"), dict) else None
 
-    for run in sorted(runs, key=lambda r: int(r["id"])):
+    # Newest first, stopping at the first work-done success: nothing older can
+    # produce a newer success or a failure that happened after it. Steady state
+    # costs one jobs call per new run; only a lane that has not succeeded in
+    # the whole listing (the dead ones) walks all of it, and jobs are cached
+    # per run, so the Data Pipeline's nine lanes share one walk.
+    for run in sorted(runs, key=lambda r: int(r["id"]), reverse=True):
         run_id = int(run["id"])
         if run_id <= scanned_through or run.get("status") != "completed":
             continue
         if lane.get("job"):
             jobs = api.run_jobs(run_id)
             if jobs is None:
-                watermark = min(watermark, run_id - 1)
+                watermark = min(watermark, run_id - 1)   # rescan it next time
                 continue
             result = lr.classify_lane_run(jobs, lane, is_timeout)
         else:
@@ -157,16 +177,17 @@ def refresh_lane(root: Path, lane: dict, api, runs: list[dict]) -> tuple[dict, l
         entry = {"run_id": run_id, "at": at, "outcome": outcome,
                  "url": run.get("html_url"), "event": run.get("event"),
                  "job_id": result.get("job_id"), "failed_step": result.get("failed_step")}
-        if outcome == lr.SUCCESS:
-            if str(at or "") > str(receipt.get("last_success_at") or ""):
-                receipt.update({"last_success_at": at, "run_id": run_id,
-                                "head_sha": run.get("head_sha"), "url": run.get("html_url"),
-                                "conclusion": "success"})
         if outcome in (lr.SUCCESS, lr.FAILURE, lr.TIMEOUT):
             if latest is None or run_id > int(latest.get("run_id") or 0):
                 latest = entry
         if outcome in lr.FAILING_OUTCOMES:
             failures[run_id] = entry
+        if outcome == lr.SUCCESS:
+            if str(at or "") > str(receipt.get("last_success_at") or ""):
+                receipt.update({"last_success_at": at, "run_id": run_id,
+                                "head_sha": run.get("head_sha"), "url": run.get("html_url"),
+                                "conclusion": "success"})
+            break
 
     cutoff = str(receipt.get("last_success_at") or "")
     kept = sorted((f for f in failures.values() if str(f.get("at") or "") > cutoff),

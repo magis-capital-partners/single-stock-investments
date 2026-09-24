@@ -230,6 +230,39 @@ class ReceiptTests(unittest.TestCase):
         self.assertEqual(jobs_calls, [], "completed runs below the watermark are not refetched")
         self.assertEqual(self.receipt("memory")["last_success_at"], "2026-09-24T15:22:22Z")
 
+    def test_a_first_build_stops_at_the_newest_success(self):
+        # 26 lanes x a 50-run listing, walked oldest-first, would spend the
+        # token's whole hourly REST budget on the first supervisor run.
+        self.configure([{"name": "backfill", "workflow_file": "b.yml", "job": "refill",
+                         "freshness_hours": 24}])
+        runs = [run(n, f"2026-09-2{n % 5}T0{n % 9}:33:00Z",
+                    [job(100 + n, "refill", "success", f"2026-09-24T0{n % 9}:40:00Z")])
+                for n in range(1, 11)]
+        fake = FakeGh({"b.yml": runs})
+        self.build(fake)
+        jobs_calls = [c for c in fake.calls if c[:2] == ["gh", "api"] and "/jobs" in c[2]]
+        self.assertEqual(len(jobs_calls), 1)
+        self.assertEqual(self.receipt("backfill")["run_id"], 10)
+
+    def test_the_job_call_budget_defers_the_rest_to_the_next_build(self):
+        self.configure([{"name": "activist", "workflow_file": "dp.yml", "job": "activist",
+                         "freshness_hours": 54}])
+        runs = [run(n, f"2026-09-2{n}T11:03:54Z",
+                    [job(100 + n, "activist", "failure", f"2026-09-2{n}T12:34:19Z",
+                         [("Run activist scan", "failure")])], conclusion="failure")
+                for n in range(1, 6)]
+        fake = FakeGh({"dp.yml": runs})
+        with mock.patch.object(builder.subprocess, "run", fake):
+            result = builder.build(self.root, REPO, api=builder.GhApi(REPO, max_job_calls=2))
+        receipt = self.receipt("activist")
+        self.assertEqual([f["run_id"] for f in receipt["failures"]], [5, 4])
+        self.assertEqual(receipt["scanned_through"], 0, "the unscanned runs are rescanned next time")
+        self.assertTrue(any("budget" in e for e in result["api_errors"]))
+        with mock.patch.object(builder.subprocess, "run", fake):
+            builder.build(self.root, REPO, api=builder.GhApi(REPO, max_job_calls=10))
+        self.assertEqual([f["run_id"] for f in self.receipt("activist")["failures"]],
+                         [5, 4, 3, 2, 1])
+
     def test_an_in_flight_run_holds_the_watermark(self):
         self.configure([{"name": "memory", "workflow_file": "m.yml", "job": "triage",
                          "freshness_hours": 54}])
