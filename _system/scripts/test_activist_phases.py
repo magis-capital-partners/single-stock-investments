@@ -12,6 +12,7 @@ import json
 import sys
 import tempfile
 import unittest
+import urllib.error
 from contextlib import redirect_stdout
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
@@ -30,44 +31,129 @@ class RotationTests(unittest.TestCase):
 
 
 class SecPhaseBudgetTests(unittest.TestCase):
-    def test_budget_stops_the_phase_and_the_next_run_resumes(self) -> None:
+    TICKERS = ["A", "B", "C", "D"]
+
+    def _state(self) -> dict:
+        return {"sec": {"last_scanned": {"A": "2026-09-20T00:00:00Z", "B": "2026-09-10T00:00:00Z"}}}
+
+    def _run(self, state: dict, fake, *, minutes: float | None = 2.0, checkpoint=None):
         clock = {"t": 0.0}
+
+        def timed(ticker, **kwargs):
+            clock["t"] += 60.0  # one "minute" per ticker
+            return fake(ticker, **kwargs)
+
+        budget = scan.Budget(minutes, clock=lambda: clock["t"])
+        with mock.patch.object(scan, "scan_ticker_sec", side_effect=timed), \
+                redirect_stdout(io.StringIO()) as out:
+            hits = scan.run_sec_phase(self.TICKERS, state, budget, checkpoint=checkpoint)
+        return hits, out.getvalue()
+
+    def test_budget_stops_the_phase_and_the_next_run_resumes(self) -> None:
         seen: list[str] = []
 
-        def fake_scan(ticker, **_kwargs):
+        def fake(ticker, **_kwargs):
             seen.append(ticker)
-            clock["t"] += 60.0  # one "minute" per ticker
             return [{"form": "SC 13D"}]
 
-        state = {"sec": {"last_scanned": {"A": "2026-09-20T00:00:00Z", "B": "2026-09-10T00:00:00Z"}}}
-        budget = scan.Budget(2.0, clock=lambda: clock["t"])
-        with mock.patch.object(scan, "scan_ticker_sec", side_effect=fake_scan), \
-                redirect_stdout(io.StringIO()) as out:
-            hits = scan.run_sec_phase(["A", "B", "C", "D"], state, budget)
-        self.assertEqual(seen, ["C", "D"])
+        state = self._state()
+        hits, out = self._run(state, fake)
+        self.assertEqual(seen, ["C", "D"])  # never-scanned first
         self.assertEqual([hit["ticker"] for hit in hits], ["C", "D"])
         run = state["sec"]["last_run"]
         self.assertTrue(run["budget_hit"])
         self.assertEqual((run["scanned"], run["remaining"]), (2, 2))
-        self.assertIn("[activist:sec] 2/4 done", out.getvalue())
-        # The next run starts with the names this one did not reach.
-        self.assertEqual(scan.rotation_order(["A", "B", "C", "D"], state["sec"]["last_scanned"])[:2], ["B", "A"])
+        self.assertIn("[activist:sec] 2/4 done", out)
+        self._run(state, fake)  # the next run picks up the names this one did not reach
+        self.assertEqual(seen, ["C", "D", "B", "A"])
+
+    def test_one_failing_ticker_does_not_stall_the_rotation(self) -> None:
+        seen: list[str] = []
+
+        def fake(ticker, **_kwargs):
+            seen.append(ticker)
+            if ticker == "C":
+                raise ValueError("unparseable submissions")
+            return []
+
+        state = self._state()
+        self._run(state, fake, minutes=None)
+        self.assertEqual(seen, ["C", "D", "B", "A"])  # C failed, the phase went on
+        sec = state["sec"]
+        self.assertNotIn("C", sec["last_scanned"])
+        self.assertEqual(sec["failures"]["C"]["count"], 1)
+        self.assertEqual(sec["last_run"]["failed"], 1)
+
+    def test_a_ticker_that_just_failed_waits_its_turn(self) -> None:
+        # C failed on the last run (attempted, never scanned); D has not been
+        # tried this cycle. Ordering by last success alone put C first on
+        # every run, so a permanently failing ticker ate the budget forever.
+        seen: list[str] = []
+        state = {
+            "sec": {
+                "last_scanned": {"A": "2026-09-20T00:00:00Z", "B": "2026-09-10T00:00:00Z"},
+                "last_attempted": {"C": "2026-09-24T06:00:00Z"},
+            }
+        }
+        self._run(state, lambda ticker, **_k: seen.append(ticker) or [], minutes=1.0)
+        self.assertEqual(seen, ["D"])
+
+    def test_a_failed_fetch_is_not_recorded_as_scanned(self) -> None:
+        import sec_activist_scan
+
+        forbidden = urllib.error.HTTPError("https://data.sec.gov/x", 403, "Forbidden", None, None)
+        state: dict = {}
+        with mock.patch.object(sec_activist_scan, "ticker_meta", return_value={"cik": "1"}), \
+                mock.patch.object(sec_activist_scan, "fetch_submissions", side_effect=forbidden), \
+                mock.patch.object(sec_activist_scan, "append_scan_log") as scan_log, \
+                redirect_stdout(io.StringIO()):
+            scan.run_sec_phase(["AAA"], state, scan.Budget(None))
+        self.assertEqual(state["sec"]["last_scanned"], {})
+        self.assertIn("HTTPError", state["sec"]["failures"]["AAA"]["error"])
+        scan_log.assert_called_once()  # still logged, as before
+
+    def test_state_is_checkpointed_after_every_ticker(self) -> None:
+        checkpoint = mock.Mock()
+        self._run(self._state(), lambda ticker, **_k: [], minutes=None, checkpoint=checkpoint)
+        self.assertGreaterEqual(checkpoint.call_count, len(self.TICKERS))
+
+
+class MainPhaseStateTests(unittest.TestCase):
+    def _main(self, state_path: Path, fake) -> int:
+        with mock.patch.object(scan, "scan_ticker_sec", side_effect=fake), \
+                mock.patch.object(scan, "save_global_scan") as global_scan, \
+                mock.patch.object(scan.signal, "signal"), \
+                redirect_stdout(io.StringIO()):
+            try:
+                return scan.main(
+                    ["--phase", "sec", "--ticker", "AAA", "--ticker", "BBB", "--ticker", "CCC",
+                     "--state", str(state_path)]
+                )
+            finally:
+                global_scan.assert_not_called()  # a fetch phase does not finalize
 
     def test_main_runs_one_phase_and_saves_its_state(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             state_path = Path(tmp) / "state.json"
-            with mock.patch.object(scan, "scan_ticker_sec", return_value=[]) as fake, \
-                    mock.patch.object(scan, "save_global_scan") as global_scan, \
-                    redirect_stdout(io.StringIO()):
-                code = scan.main(
-                    ["--phase", "sec", "--ticker", "AAA", "--ticker", "BBB", "--state", str(state_path)]
-                )
-            self.assertEqual(code, 0)
-            self.assertEqual(fake.call_count, 2)
-            global_scan.assert_not_called()  # a fetch phase does not finalize
+            code = self._main(state_path, lambda ticker, **_k: [])
+            state = json.loads(state_path.read_text(encoding="utf-8"))
+        self.assertEqual(code, 0)
+        self.assertEqual(sorted(state["sec"]["last_scanned"]), ["AAA", "BBB", "CCC"])
+        self.assertFalse(state["sec"]["last_run"]["budget_hit"])
+
+    def test_progress_survives_a_sigterm(self) -> None:
+        # `timeout` sends SIGTERM; the handler turns it into SystemExit(143).
+        def fake(ticker, **_kwargs):
+            if ticker == "CCC":
+                raise SystemExit(143)
+            return []
+
+        with tempfile.TemporaryDirectory() as tmp:
+            state_path = Path(tmp) / "state.json"
+            with self.assertRaises(SystemExit):
+                self._main(state_path, fake)
             state = json.loads(state_path.read_text(encoding="utf-8"))
         self.assertEqual(sorted(state["sec"]["last_scanned"]), ["AAA", "BBB"])
-        self.assertFalse(state["sec"]["last_run"]["budget_hit"])
 
 
 class DiscoveryIntervalTests(unittest.TestCase):

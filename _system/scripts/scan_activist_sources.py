@@ -11,6 +11,8 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
+import signal
 import time
 from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
@@ -158,6 +160,10 @@ class Budget:
         return self.minutes is not None and self.elapsed() >= self.minutes * 60.0
 
 
+def _exit_on_sigterm(signum, _frame) -> None:
+    raise SystemExit(128 + signum)
+
+
 def load_state(path: Path = STATE_PATH) -> dict:
     try:
         state = json.loads(path.read_text(encoding="utf-8"))
@@ -170,85 +176,122 @@ def load_state(path: Path = STATE_PATH) -> dict:
 
 
 def save_state(state: dict, path: Path = STATE_PATH) -> None:
+    """Atomic (temp file + replace): a SIGTERM from `timeout` mid-write must not
+    leave a truncated file that throws the whole rotation history away."""
     state["updated_at"] = now_iso()
-    write_json(path, state)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    tmp = path.with_name(f".{path.name}.tmp")
+    tmp.write_text(json.dumps(state, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    os.replace(tmp, path)
 
 
-def rotation_order(keys: list[str], last_done: dict[str, str]) -> list[str]:
-    """Never-scanned first, then the stalest scan first (ties by name)."""
-    return sorted(dict.fromkeys(keys), key=lambda key: (last_done.get(key) or "", key))
+def rotation_order(keys: list[str], last_attempted: dict[str, str]) -> list[str]:
+    """Never-attempted first, then the least recently attempted (ties by name)."""
+    return sorted(dict.fromkeys(keys), key=lambda key: (last_attempted.get(key) or "", key))
 
 
 def _progress(phase: str, done: int, total: int, hits: int, budget: Budget) -> None:
     print(f"[activist:{phase}] {done}/{total} done, {hits} hits, {budget.elapsed():.0f}s", flush=True)
 
 
-def _rotation_summary(scanned: int, total: int, hits: int, budget: Budget) -> dict:
-    return {
+def _run_rotation(phase_name: str, keys: list[str], state: dict, budget: Budget, work,
+                  *, checkpoint=None) -> list[dict]:
+    """Attempt ``keys`` stalest-first until the budget runs out (sec and sites phases).
+
+    * ``last_attempted`` orders the rotation, so a key that keeps failing goes
+      to the back instead of starving everything behind it.
+    * ``last_scanned`` records SUCCESS only -- it is what the coverage check
+      reads, so a 403 can never count as a scan.
+    * One key's exception is recorded in ``failures`` and the phase moves on;
+      before, one bad ticker aborted the phase before its state was saved, so
+      every run died on the same ticker.
+    * ``checkpoint()`` persists the state after every key, so a SIGTERM from
+      the step's `timeout` keeps the progress already made.
+    """
+    phase = state.setdefault(phase_name, {})
+    last_scanned = phase.setdefault("last_scanned", {})
+    last_attempted = phase.setdefault("last_attempted", {})
+    failures = phase.setdefault("failures", {})
+    order = rotation_order(
+        keys, {key: last_attempted.get(key) or last_scanned.get(key) or "" for key in keys}
+    )
+    hits: list[dict] = []
+    attempted = scanned = failed = 0
+    for key in order:
+        if budget.exhausted():
+            break
+        attempted += 1
+        stamp = now_iso()
+        last_attempted[key] = stamp
+        try:
+            found = work(key)
+        except Exception as exc:  # noqa: BLE001 - one ticker/firm never stalls the rotation
+            failed += 1
+            prior = failures.get(key) or {}
+            failures[key] = {
+                "at": stamp,
+                "count": int(prior.get("count") or 0) + 1,
+                "error": f"{type(exc).__name__}: {str(exc)[:200]}",
+            }
+            print(f"[activist:{phase_name}] {key} failed: {failures[key]['error']}", flush=True)
+        else:
+            failures.pop(key, None)
+            hits.extend(found)
+            last_scanned[key] = stamp
+            scanned += 1
+        if checkpoint is not None:
+            checkpoint()
+        if attempted % PROGRESS_EVERY == 0:
+            _progress(phase_name, attempted, len(order), len(hits), budget)
+    _progress(phase_name, attempted, len(order), len(hits), budget)
+    phase["last_run"] = {
         "at": now_iso(),
+        "attempted": attempted,
         "scanned": scanned,
-        "total": total,
-        "remaining": total - scanned,
-        "budget_hit": scanned < total,
-        "hits": hits,
+        "failed": failed,
+        "total": len(order),
+        "remaining": len(order) - attempted,
+        "budget_hit": attempted < len(order),
+        "hits": len(hits),
         "elapsed_sec": round(budget.elapsed(), 1),
     }
+    if checkpoint is not None:
+        checkpoint()
+    return hits
 
 
 def run_sec_phase(tickers: list[str], state: dict, budget: Budget, *, dry_run: bool = False,
                   include_passive: bool = False, reindex_local: bool = False,
-                  fetch_xml: bool = False) -> list[dict]:
+                  fetch_xml: bool = False, checkpoint=None) -> list[dict]:
     """SEC activist filings per ticker, stalest first, until the budget runs out."""
-    phase = state.setdefault("sec", {})
-    last = phase.setdefault("last_scanned", {})
-    order = rotation_order(tickers, last)
-    hits: list[dict] = []
-    scanned = 0
-    for ticker in order:
-        if budget.exhausted():
-            break
-        ticker_hits = scan_ticker_sec(
+
+    def work(ticker: str) -> list[dict]:
+        found = scan_ticker_sec(
             ticker,
             dry_run=dry_run,
             include_passive=include_passive,
             reindex_local=reindex_local,
             fetch_xml=fetch_xml,
+            raise_on_fetch_error=True,
         )
-        for hit in ticker_hits:
+        for hit in found:
             hit["ticker"] = ticker
-        hits.extend(ticker_hits)
-        last[ticker] = now_iso()
-        scanned += 1
-        if scanned % PROGRESS_EVERY == 0:
-            _progress("sec", scanned, len(order), len(hits), budget)
-    _progress("sec", scanned, len(order), len(hits), budget)
-    phase["last_run"] = _rotation_summary(scanned, len(order), len(hits), budget)
-    return hits
+        return found
+
+    return _run_rotation("sec", tickers, state, budget, work, checkpoint=checkpoint)
 
 
 def run_sites_phase(tickers: list[str], state: dict, budget: Budget, *,
-                    dry_run: bool = False) -> list[dict]:
+                    dry_run: bool = False, checkpoint=None) -> list[dict]:
     """Publisher-site scrape per firm, stalest firm first, until the budget runs out."""
     firms = {str(firm.get("id") or ""): firm for firm in firms_for_ingest("site_index")}
-    phase = state.setdefault("sites", {})
-    last = phase.setdefault("last_scanned", {})
-    order = rotation_order([key for key in firms if key], last)
-    hits: list[dict] = []
-    scanned = 0
-    for firm_id in order:
-        if budget.exhausted():
-            break
-        try:
-            hits.extend(scan_firm_site(firms[firm_id], tickers, dry_run=dry_run))
-        except Exception as exc:  # noqa: BLE001 - one publisher never sinks the phase
-            print(f"[activist:sites] {firm_id} failed: {type(exc).__name__}: {str(exc)[:160]}")
-        last[firm_id] = now_iso()
-        scanned += 1
-        if scanned % PROGRESS_EVERY == 0:
-            _progress("sites", scanned, len(order), len(hits), budget)
-    _progress("sites", scanned, len(order), len(hits), budget)
-    phase["last_run"] = _rotation_summary(scanned, len(order), len(hits), budget)
-    return hits
+
+    def work(firm_id: str) -> list[dict]:
+        return scan_firm_site(firms[firm_id], tickers, dry_run=dry_run)
+
+    return _run_rotation(
+        "sites", [key for key in firms if key], state, budget, work, checkpoint=checkpoint
+    )
 
 
 def run_wires_phase(tickers: list[str], state: dict, budget: Budget, *, dry_run: bool = False,
@@ -483,17 +526,29 @@ def main(argv: list[str] | None = None) -> int:
         if not args.dry_run:
             save_state(state, state_path)
 
+    # `timeout` stops a phase with SIGTERM; turn it into SystemExit so the
+    # finally blocks below still persist the rotation state.
+    if hasattr(signal, "SIGTERM"):
+        signal.signal(signal.SIGTERM, _exit_on_sigterm)
+
     if args.phase == "sec":
-        run_sec_phase(
-            tickers, state, Budget(args.budget_min), dry_run=args.dry_run,
-            include_passive=args.include_passive, reindex_local=args.reindex_local,
-            fetch_xml=args.reindex_fetch_xml,
-        )
-        persist_state()
+        try:
+            run_sec_phase(
+                tickers, state, Budget(args.budget_min), dry_run=args.dry_run,
+                include_passive=args.include_passive, reindex_local=args.reindex_local,
+                fetch_xml=args.reindex_fetch_xml, checkpoint=persist_state,
+            )
+        finally:
+            persist_state()
         return 0
     if args.phase == "sites":
-        run_sites_phase(tickers, state, Budget(args.budget_min), dry_run=args.dry_run)
-        persist_state()
+        try:
+            run_sites_phase(
+                tickers, state, Budget(args.budget_min), dry_run=args.dry_run,
+                checkpoint=persist_state,
+            )
+        finally:
+            persist_state()
         return 0
     if args.phase == "wires":
         run_wires_phase(
