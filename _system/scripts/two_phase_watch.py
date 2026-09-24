@@ -512,6 +512,12 @@ def _ir_downloadable(url: str) -> bool:
         # slug article, not the index
         return path.startswith("news/") and path.count("/") == 1 and len(path) > 8
     return False
+
+
+def fetch_ir(today: str, seen: set[str]) -> tuple[list[dict[str, Any]], list[str]]:
+    # This def line was missing from the file's first commit: the body below
+    # sat unreachable after _ir_downloadable's return, and every scheduled run
+    # (the workflow always passes --ir) died on "NameError: fetch_ir".
     hits: list[dict[str, Any]] = []
     notes: list[str] = []
     dest = COMPETITIVE_DIR / "ir"
