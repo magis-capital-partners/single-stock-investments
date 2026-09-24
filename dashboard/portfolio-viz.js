@@ -28,6 +28,9 @@
     // Guarded order desk. `orderRequests` is the owner's recent tickets from the
     // command channel; `activeRequest` is the one being worked right now.
     orderRequests: null, activeRequestId: null, orderPollTimer: null,
+    // Ticket poll bookkeeping: whether an open ticket wants polling, when the
+    // current fast window began, and whether the bound paused it.
+    orderPollWanted: false, orderPollStartedAt: null, orderPollPaused: false,
     // Contract resolution. `contractDraft` is what the picker has settled on so
     // far; a ticket cannot be submitted until it holds a conId the hub resolved,
     // because a hand-typed option id is something nobody can check.
@@ -269,33 +272,72 @@
     return `${Math.round(seconds / 86_400)} days`;
   }
 
-  function accountCockpit(book) {
-    const values = valueMap(book);
-    const nav = num(values.NetLiquidation); const daily = num(values.DailyPnL || values.DailyPnl);
-    const maintenance = num(values.MaintMarginReq); const excess = num(values.ExcessLiquidity);
-    const cushion = num(values.Cushion); const marginLoad = nav > 0 && maintenance != null ? Math.max(0, Math.min(1, maintenance / nav)) : null;
-    // A stopped feed must not read the same as a live one. The collector was
-    // disabled on 2026-08-25, so "complete" now means "this snapshot was whole
-    // when it was taken", which can be days ago.
+  // Which feed a snapshot came from decides what its numbers can mean. A Flex
+  // end-of-day statement states NAV and cash for one completed session; margin,
+  // buying power and daily P&L exist only on the live account summary, which no
+  // longer runs. Those are shown as absent and say why -- never as "IBKR live",
+  // and never as a zero.
+  const NOT_IN_FLEX = 'not in Flex EOD';
+  const isEodFeed = (book) => book?.snapshot?.feed === 'flex_eod';
+  const eodDate = (book) => book?.snapshot?.session_date || String(book?.snapshot?.as_of || '').slice(0, 10) || 'an unknown date';
+
+  /**
+   * The one-line feed state under the NAV.
+   *
+   * A stopped feed must not read the same as a live one: "complete" describes a
+   * snapshot's contents, not its age. The edge judges an EOD snapshot against
+   * the session calendar (snapshotFreshness), so a statement that is simply
+   * waiting for tonight's close reads as what it is.
+   */
+  function feedStateLabel(book) {
+    if (book?.status !== 'complete') return 'Broker feed unavailable';
     const stale = book?.snapshot?.stale === true;
     const ageSeconds = num(book?.snapshot?.age_seconds);
-    const dataState = book?.status !== 'complete'
-      ? 'Broker feed unavailable'
-      : stale ? `Broker feed stopped · last snapshot ${describeAge(ageSeconds)} ago` : 'Broker feed complete';
-    return `<section class="ph-cockpit" aria-label="Account overview"><div class="ph-cockpit-value"><button type="button" class="ph-lineage-target" data-ph-lineage="Net liquidation" data-ph-source="IBKR live" data-ph-detail="Account tag NetLiquidation"><div class="ph-kicker">Net liquidation value</div><div class="ph-hero-value">${money(nav)}</div></button><div class="ph-daily ${daily < 0 ? 'ph-negative' : 'ph-positive'}"><span>${signed(daily)}</span><small>today</small></div><div class="ph-feed-state ${stale ? 'stale' : ''}"><i class="${book?.status === 'complete' && !stale ? 'live' : ''}"></i>${esc(dataState)}</div></div><div class="ph-cockpit-chart"><div class="ph-chart-head"><span>Account value</span><b>${state.accountPerformance?.nav_series?.length || 0} observations</b></div>${portfolioSparkline(state.accountPerformance?.nav_series, state.accountPerformance?.benchmark)}</div><div class="ph-cockpit-safety"><div class="ph-kicker">Liquidity runway</div><div class="ph-safety-line"><span>Excess liquidity</span><b>${money(excess, true)}</b></div><div class="ph-safety-line"><span>Margin load</span><b>${pct(marginLoad)}</b></div><div class="ph-meter"><i style="width:${marginLoad == null ? 0 : (marginLoad * 100).toFixed(1)}%"></i></div><div class="ph-safety-line"><span>Broker cushion</span><b>${cushion == null ? '—' : pct(cushion)}</b></div><div class="ph-readonly"><span>BROKER READ ONLY</span> Paper tickets never route to IBKR.</div></div></section>`;
+    if (isEodFeed(book)) {
+      return stale
+        ? `EOD feed stale · last snapshot ${eodDate(book)} (${describeAge(ageSeconds)} ago)`
+        : `EOD snapshot as of ${eodDate(book)}`;
+    }
+    return stale ? `Broker feed stopped · last snapshot ${describeAge(ageSeconds)} ago` : 'Broker feed complete';
+  }
+
+  function accountCockpit(book) {
+    const values = valueMap(book);
+    const eod = isEodFeed(book);
+    const nav = num(values.NetLiquidation); const daily = eod ? null : num(values.DailyPnL || values.DailyPnl);
+    const maintenance = eod ? null : num(values.MaintMarginReq); const excess = eod ? null : num(values.ExcessLiquidity);
+    const cushion = eod ? null : num(values.Cushion); const marginLoad = nav > 0 && maintenance != null ? Math.max(0, Math.min(1, maintenance / nav)) : null;
+    const stale = book?.snapshot?.stale === true;
+    const dataState = feedStateLabel(book);
+    const navSource = eod ? 'IBKR Flex EOD' : 'IBKR live';
+    const navDetail = eod ? `Flex equity summary, session ${eodDate(book)}` : 'Account tag NetLiquidation';
+    // On an EOD statement the caption under NAV is the statement's date, and
+    // daily P&L -- a live reset-series -- is absent rather than zero.
+    const dailyCell = eod
+      ? `<span class="ph-na" title="Daily P&amp;L is ${NOT_IN_FLEX}">—</span><small>as of ${esc(eodDate(book))} · daily P&amp;L ${NOT_IN_FLEX}</small>`
+      : `<span>${signed(daily)}</span><small>today</small>`;
+    const runway = (value) => (eod ? `<b title="${NOT_IN_FLEX}">— <small class="ph-dim">${NOT_IN_FLEX}</small></b>` : `<b>${value}</b>`);
+    return `<section class="ph-cockpit" aria-label="Account overview"><div class="ph-cockpit-value"><button type="button" class="ph-lineage-target" data-ph-lineage="Net liquidation" data-ph-source="${esc(navSource)}" data-ph-detail="${esc(navDetail)}"><div class="ph-kicker">Net liquidation value</div><div class="ph-hero-value">${money(nav)}</div></button><div class="ph-daily ${daily < 0 ? 'ph-negative' : 'ph-positive'}">${dailyCell}</div><div class="ph-feed-state ${stale ? 'stale' : ''}"><i class="${book?.status === 'complete' && !stale && !eod ? 'live' : ''}"></i>${esc(dataState)}</div></div><div class="ph-cockpit-chart"><div class="ph-chart-head"><span>Account value</span><b>${state.accountPerformance?.nav_series?.length || 0} observations</b></div>${portfolioSparkline(state.accountPerformance?.nav_series, state.accountPerformance?.benchmark)}</div><div class="ph-cockpit-safety"><div class="ph-kicker">Liquidity runway</div><div class="ph-safety-line"><span>Excess liquidity</span>${runway(money(excess, true))}</div><div class="ph-safety-line"><span>Margin load</span>${runway(pct(marginLoad))}</div><div class="ph-meter"><i style="width:${marginLoad == null ? 0 : (marginLoad * 100).toFixed(1)}%"></i></div><div class="ph-safety-line"><span>Broker cushion</span>${runway(cushion == null ? '—' : pct(cushion))}</div><div class="ph-readonly"><span>BROKER READ ONLY</span> Paper tickets never route to IBKR.</div></div></section>`;
   }
 
   function accountFacts(book) {
     const values = valueMap(book);
+    const eod = isEodFeed(book);
+    // [label, value, source, lineage detail]. On an EOD snapshot every figure
+    // the statement does not carry is withheld and labelled, whatever stale
+    // tag might be lying around in account_values.
+    const liveOnly = (label, value, source, detail) => (eod
+      ? [label, null, NOT_IN_FLEX, `${label} is only on the live IBKR account summary`]
+      : [label, value, source, detail]);
     const facts = [
-      ['Net liquidation', values.NetLiquidation, 'IBKR live', 'Account tag NetLiquidation'],
-      ['Daily P&L', values.DailyPnL || values.DailyPnl, 'IBKR P&L', 'IBKR reset-series, not Flex session P&L'],
-      ['Buying power', values.BuyingPower, 'IBKR live', 'Account tag BuyingPower'],
-      ['Initial margin', values.InitMarginReq, 'IBKR live', 'Broker-reported, not additive by owner'],
-      ['Maintenance margin', values.MaintMarginReq, 'IBKR live', 'Broker-reported, not additive by owner'],
-      ['Excess liquidity', values.ExcessLiquidity, 'IBKR live', 'Liquidity runway source'],
+      ['Net liquidation', values.NetLiquidation, eod ? 'IBKR Flex EOD' : 'IBKR live', eod ? `Flex equity summary, session ${eodDate(book)}` : 'Account tag NetLiquidation'],
+      liveOnly('Daily P&L', values.DailyPnL || values.DailyPnl, 'IBKR P&L', 'IBKR reset-series, not Flex session P&L'),
+      liveOnly('Buying power', values.BuyingPower, 'IBKR live', 'Account tag BuyingPower'),
+      liveOnly('Initial margin', values.InitMarginReq, 'IBKR live', 'Broker-reported, not additive by owner'),
+      liveOnly('Maintenance margin', values.MaintMarginReq, 'IBKR live', 'Broker-reported, not additive by owner'),
+      liveOnly('Excess liquidity', values.ExcessLiquidity, 'IBKR live', 'Liquidity runway source'),
     ];
-    return `<div class="ph-ledger"><div class="ph-facts">${facts.map(([label, value, source, detail]) => `<button type="button" class="ph-fact ph-lineage-target" data-ph-lineage="${esc(label)}" data-ph-source="${esc(source)}" data-ph-detail="${esc(detail)}"><div class="ph-fact-label">${label}</div><div class="ph-fact-value">${money(value, true)}</div><div class="ph-fact-source">${source}</div></button>`).join('')}</div>${scopeStrip(book)}</div>`;
+    return `<div class="ph-ledger"><div class="ph-facts">${facts.map(([label, value, source, detail]) => `<button type="button" class="ph-fact ph-lineage-target" data-ph-lineage="${esc(label)}" data-ph-source="${esc(source)}" data-ph-detail="${esc(detail)}"><div class="ph-fact-label">${esc(label)}</div><div class="ph-fact-value">${money(value, true)}</div><div class="ph-fact-source">${esc(source)}</div></button>`).join('')}</div>${scopeStrip(book)}</div>`;
   }
 
   function scopeStrip(book) {
@@ -408,6 +450,12 @@
   }
 
   function marginView(book) {
+    if (isEodFeed(book)) {
+      // Nothing on this tab is in a Flex EOD statement. Saying so beats five
+      // dashes and a chart that "needs another observation" forever.
+      const absent = (label) => [label, `— ${NOT_IN_FLEX}`];
+      return `<div class="ph-alert"><strong>Margin is ${NOT_IN_FLEX}.</strong> Initial and maintenance requirements, available funds, excess liquidity and cushion come only from the live IBKR account summary. This book is the end-of-day statement for ${esc(eodDate(book))}.</div><div class="ph-grid">${panelLines('Broker-reported margin', [absent('Initial requirement · USD'), absent('Maintenance requirement · USD'), absent('Available funds · USD'), absent('Excess liquidity · USD'), absent('Cushion · %')])}${panelLines('Risk boundary', [['Selected owner', state.scope], ['Order shock', 'IBKR what-if when previewed'], ['Source', 'IBKR Flex EOD']])}</div>${lineageDrawer()}`;
+    }
     const values = valueMap(book);
     const byTime = new Map();
     for (const row of state.margin?.rows || []) {
@@ -594,6 +642,9 @@
         <button type="button" class="ph-order-cancel" data-ph-dismiss-ticket>${
           OPEN_TICKET_STATES.has(row.state) ? 'Work a different ticket' : 'Close'}</button>
         <span class="ph-dim">Requested ${esc(row.created_at || '')}</span>
+        ${state.orderPollPaused && OPEN_TICKET_STATES.has(row.state)
+          ? '<span class="ph-dim" data-ph-poll-paused>Live updates paused after five minutes without a change. Switch away and back, or reopen the ticket, to resume.</span>'
+          : ''}
       </footer>
     </section>`;
   }
@@ -622,8 +673,33 @@
     }
   }
 
+  // Ticket poll cadence: fast while a human is plausibly mid-ticket, then slow,
+  // then stopped; paused while the tab is hidden. It used to be a bare 1 Hz
+  // setInterval with no end, so a ticket nothing would ever advance (a preview
+  // nobody approved, a bridge that was down) kept every open tab reading D1 once
+  // a second for as long as the tab stayed open.
+  const TICKET_POLL_FAST_MS = 1000;
+  const TICKET_POLL_FAST_WINDOW_MS = 60_000;
+  const TICKET_POLL_SLOW_MS = 5000;
+  const TICKET_POLL_MAX_MS = 5 * 60_000;
+
+  /** Delay before the next poll, or null once the bounded window is spent. */
+  function ticketPollDelay(elapsedMs) {
+    if (elapsedMs < TICKET_POLL_FAST_WINDOW_MS) return TICKET_POLL_FAST_MS;
+    if (elapsedMs < TICKET_POLL_MAX_MS) return TICKET_POLL_SLOW_MS;
+    return null;
+  }
+
+  function clearTicketTimer() {
+    if (state.orderPollTimer) { clearTimeout(state.orderPollTimer); state.orderPollTimer = null; }
+  }
+
+  /** The ticket is closed or finished: stop and forget. */
   function stopTicketPolling() {
-    if (state.orderPollTimer) { clearInterval(state.orderPollTimer); state.orderPollTimer = null; }
+    clearTicketTimer();
+    state.orderPollWanted = false;
+    state.orderPollStartedAt = null;
+    state.orderPollPaused = false;
   }
 
   /**
@@ -631,20 +707,54 @@
    *
    * The hub enforces a 10s quote-freshness rule and a 120s approval window, so a
    * preview cannot be waited on lazily -- by the time a slow poll noticed it,
-   * the window would be gone. One second while a ticket is live, nothing at all
-   * when the desk is idle.
+   * the window would be gone. So: once a second for the first minute after a
+   * ticket opens or changes state, every five seconds after that, and not at
+   * all once five minutes pass with no change -- by then the ticket is stuck,
+   * and the server expires an abandoned preview on its own. A hidden tab does
+   * not poll; showing or focusing it again starts a fresh fast minute.
    */
   function startTicketPolling() {
-    stopTicketPolling();
-    state.orderPollTimer = setInterval(async () => {
+    clearTicketTimer();
+    state.orderPollWanted = true;
+    state.orderPollPaused = false;
+    state.orderPollStartedAt = Date.now();
+    scheduleTicketPoll();
+  }
+
+  function scheduleTicketPoll() {
+    clearTicketTimer();
+    if (!state.orderPollWanted || document.hidden) return;
+    const delay = ticketPollDelay(Date.now() - state.orderPollStartedAt);
+    if (delay == null) {
+      state.orderPollPaused = true;
+      if (state.section === 'orders') renderPortfolio();
+      return;
+    }
+    state.orderPollTimer = setTimeout(async () => {
+      state.orderPollTimer = null;
       const before = activeRequest()?.state;
       await refreshOrderRequests();
       const row = activeRequest();
       if (!row || !OPEN_TICKET_STATES.has(row.state)) stopTicketPolling();
+      // Movement means the hub is working the ticket: a fresh fast minute.
+      else if (row.state !== before) state.orderPollStartedAt = Date.now();
       if (state.section === 'orders' && (row?.state !== before || !row)) renderPortfolio();
       else if (row?.state === 'previewed') tickCountdown();
-    }, 1000);
+      scheduleTicketPoll();
+    }, delay);
   }
+
+  /** A returning human gets a fresh fast minute; nothing happens if no ticket is open. */
+  function resumeTicketPolling() {
+    if (!state.orderPollWanted || state.orderPollTimer || document.hidden) return;
+    startTicketPolling();
+  }
+
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) clearTicketTimer();
+    else resumeTicketPolling();
+  });
+  window.addEventListener('focus', resumeTicketPolling);
 
   // Repaint only the clock between renders, so the countdown stays honest
   // without re-rendering the ticket underneath the user's cursor.
