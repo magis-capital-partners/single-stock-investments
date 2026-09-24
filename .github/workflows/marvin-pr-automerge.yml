@@ -2,13 +2,27 @@ name: Auto - Agent PR Merge
 
 # Squash-merge Cursor cloud-agent PRs (Marvin research or Investment Committee
 # task artifacts) after research-quality CI passes. Resolves shared-file
-# conflicts with main before merge when needed.
+# conflicts with main when needed, but never merges in the run that resolved
+# them.
 #
 # Consistency guardrails:
-# 1. Wait for the Research quality workflow run (does not fail if checks have
-#    not appeared yet). Also re-trigger when that workflow completes.
-# 2. Serialize squash merges with a global concurrency group so parallel agent
-#    PRs do not race conflict resolution against main.
+# 1. The gate pins ONE head SHA. Provenance is read at that SHA, the Research
+#    quality run for that SHA must succeed, and the SHA is handed to the merge
+#    job. Nothing is read by branch name: the branch is deleted when the PR
+#    merges, and a twin run still reading it failed with HTTP 404 (AM2).
+# 2. The merge job re-verifies every check on the gated SHA
+#    (verify_pr_checks.py) and squashes with `sha=<gated SHA>`, so GitHub
+#    refuses the merge if the head moved after the gate.
+# 3. A conflict-resolver push is never merged in the same run. The new head
+#    has never been through CI; its own pull_request runs gate it. (PRs #1017
+#    and #1021 were squashed seconds after that push, with zero check runs on
+#    the merged head.)
+# 4. Squash merges are serialized across all agent PRs (agent-automerge-main).
+# 5. PR state is re-read before every side effect. A pull_request run and a
+#    workflow_run run fire for the same head; the second one finds the PR
+#    merged and stops quietly instead of commenting "blocked" on it.
+# 6. The gate's validators and the resolver run from the base branch, never
+#    from the PR under review.
 
 on:
   pull_request:
@@ -26,9 +40,12 @@ permissions:
 
 jobs:
   resolve-pr:
+    # Research quality also runs on push and on a schedule against main. Only a
+    # pull_request run can make a PR mergeable.
     if: >
       github.event_name == 'pull_request' ||
-      github.event.workflow_run.conclusion == 'success'
+      (github.event.workflow_run.conclusion == 'success' &&
+       github.event.workflow_run.event == 'pull_request')
     runs-on: ubuntu-latest
     timeout-minutes: 5
     outputs:
@@ -113,43 +130,71 @@ jobs:
     outputs:
       number: ${{ needs.resolve-pr.outputs.number }}
       head_ref: ${{ needs.resolve-pr.outputs.head_ref }}
-      head_sha: ${{ steps.head.outputs.sha }}
+      # Empty unless every check below passed on this exact SHA.
+      head_sha: ${{ steps.validated.outputs.sha }}
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      PR: ${{ needs.resolve-pr.outputs.number }}
+      REPO: ${{ github.repository }}
     steps:
-      - name: Mark draft PR ready (Cursor cloud agent opens drafts)
-        if: needs.resolve-pr.outputs.is_draft == 'true'
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Stop if the PR is no longer open
+        id: open
         run: |
-          gh pr ready "${{ needs.resolve-pr.outputs.number }}" \
-            --repo "${{ github.repository }}"
+          set -euo pipefail
+          STATE=$(gh pr view "$PR" --repo "$REPO" --json state --jq '.state')
+          if [ "$STATE" = "OPEN" ]; then
+            echo "open=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "open=false" >> "$GITHUB_OUTPUT"
+            echo "PR #$PR is $STATE; nothing to gate."
+          fi
+
+      - name: Mark draft PR ready (Cursor cloud agent opens drafts)
+        if: steps.open.outputs.open == 'true' && needs.resolve-pr.outputs.is_draft == 'true'
+        run: |
+          gh pr ready "$PR" --repo "$REPO"
 
       - name: Confirm PR is ready
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        if: steps.open.outputs.open == 'true'
         run: |
-          PR="${{ needs.resolve-pr.outputs.number }}"
           sleep 3
-          IS_DRAFT=$(gh pr view "$PR" --repo "${{ github.repository }}" --json isDraft --jq '.isDraft')
+          IS_DRAFT=$(gh pr view "$PR" --repo "$REPO" --json isDraft --jq '.isDraft')
           if [ "$IS_DRAFT" = "true" ]; then
             echo "::error::PR #$PR is still a draft after ready promotion."
             exit 1
           fi
 
+      - name: Pin the head SHA under review
+        id: head
+        if: steps.open.outputs.open == 'true'
+        run: |
+          set -euo pipefail
+          SHA=$(gh pr view "$PR" --repo "$REPO" --json headRefOid -q .headRefOid)
+          echo "sha=$SHA" >> "$GITHUB_OUTPUT"
+          echo "Gating PR #$PR at $SHA"
+
       - uses: actions/checkout@v4
+        if: steps.open.outputs.open == 'true'
         with:
+          # Validators come from the base branch, not from the PR under review.
+          ref: ${{ github.event.repository.default_branch }}
           fetch-depth: 1
+          filter: blob:none
+          sparse-checkout: |
+            /_system/scripts/
+          sparse-checkout-cone-mode: false
 
       - uses: actions/setup-python@v5
+        if: steps.open.outputs.open == 'true'
         with:
           python-version: "3.12"
 
       - name: Verify immutable agent provenance
+        if: steps.open.outputs.open == 'true'
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          PR: ${{ needs.resolve-pr.outputs.number }}
-          REPO: ${{ github.repository }}
-          HEAD_REF: ${{ needs.resolve-pr.outputs.head_ref }}
+          SHA: ${{ steps.head.outputs.sha }}
         run: |
+          set -euo pipefail
           mapfile -t FILES < <(gh api --paginate "repos/$REPO/pulls/$PR/files" --jq '.[].filename')
           mapfile -t RESEARCH_TICKERS < <(printf '%s\n' "${FILES[@]}" | sed -nE 's|^([^/]+)/research/research_agent_manifest\.json$|\1|p' | sort -u)
           mapfile -t COMMITTEE_FILES < <(printf '%s\n' "${FILES[@]}" | grep -E '^[^/]+/research/committee_work/' || true)
@@ -158,8 +203,10 @@ jobs:
             for TICKER in "${RESEARCH_TICKERS[@]}"; do
               MANIFEST="$(mktemp)"
               STATE="$(mktemp)"
-              gh api "repos/$REPO/contents/$TICKER/research/research_agent_manifest.json?ref=$HEAD_REF" --jq .content | base64 --decode > "$MANIFEST"
-              gh api "repos/$REPO/contents/$TICKER/research/agent_run_state.json?ref=$HEAD_REF" --jq .content | base64 --decode > "$STATE"
+              # Read at the pinned SHA, never the branch name: the branch is
+              # deleted when the PR merges (AM2, run 36045846504).
+              gh api "repos/$REPO/contents/$TICKER/research/research_agent_manifest.json?ref=$SHA" --jq .content | base64 --decode > "$MANIFEST"
+              gh api "repos/$REPO/contents/$TICKER/research/agent_run_state.json?ref=$SHA" --jq .content | base64 --decode > "$STATE"
               python _system/scripts/validate_research_pr_provenance.py --ticker "$TICKER" --manifest "$MANIFEST" --state "$STATE"
             done
             exit 0
@@ -170,27 +217,50 @@ jobs:
             exit 1
           fi
 
-          # Workspace is the PR merge commit: main packet + this task's artifact.
-          printf '%s\n' "${COMMITTEE_FILES[@]}" | python _system/scripts/validate_committee_pr_artifacts.py
-
-      - name: Refresh head SHA
-        id: head
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          SHA=$(gh pr view "${{ needs.resolve-pr.outputs.number }}" --repo "${{ github.repository }}" --json headRefOid -q .headRefOid)
-          echo "sha=$SHA" >> "$GITHUB_OUTPUT"
+          # Validation root = main's committee packet + this PR's artifacts at
+          # the pinned SHA (a chair synthesis is checked against votes that may
+          # have landed on main after the PR forked).
+          ROOT_DIR="$RUNNER_TEMP/committee-root"
+          mkdir -p "$ROOT_DIR"
+          git fetch --depth=1 origin "$SHA"
+          mapfile -t PACKETS < <(printf '%s\n' "${COMMITTEE_FILES[@]}" | sed -nE 's|^([^/]+/research/committee_work/[^/]+)/.*$|\1|p' | sort -u)
+          for PACKET in "${PACKETS[@]}"; do
+            if [ -n "$(git ls-tree -d HEAD -- "$PACKET")" ]; then
+              git archive --format=tar HEAD -- "$PACKET" | tar -x -C "$ROOT_DIR"
+            fi
+          done
+          for FILE in "${COMMITTEE_FILES[@]}"; do
+            # A file the PR deletes is absent here; the validator reports it.
+            if git cat-file -e "$SHA:$FILE" 2>/dev/null; then
+              mkdir -p "$ROOT_DIR/$(dirname "$FILE")"
+              git cat-file blob "$SHA:$FILE" > "$ROOT_DIR/$FILE"
+            fi
+          done
+          printf '%s\n' "${COMMITTEE_FILES[@]}" | python _system/scripts/validate_committee_pr_artifacts.py --root "$ROOT_DIR"
 
       - name: Wait for Research quality workflow
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        if: steps.open.outputs.open == 'true'
         run: |
           python _system/scripts/wait_for_workflow_run.py \
-            --repo "${{ github.repository }}" \
+            --repo "$REPO" \
             --sha "${{ steps.head.outputs.sha }}" \
             --workflow "Research quality" \
             --timeout-seconds 2700 \
             --poll-seconds 15
+
+      - name: Hand the gated SHA to the merge job
+        id: validated
+        if: steps.open.outputs.open == 'true'
+        env:
+          SHA: ${{ steps.head.outputs.sha }}
+        run: |
+          set -euo pipefail
+          CURRENT=$(gh pr view "$PR" --repo "$REPO" --json headRefOid -q .headRefOid)
+          if [ "$CURRENT" != "$SHA" ]; then
+            echo "Head moved from $SHA to $CURRENT during the gate; the new head is gated by its own run."
+            exit 0
+          fi
+          echo "sha=$SHA" >> "$GITHUB_OUTPUT"
 
   code-gate:
     # codex/* and claude/* PRs carry code, not research artifacts, so their
@@ -204,15 +274,19 @@ jobs:
     concurrency:
       group: agent-automerge-gate-${{ needs.resolve-pr.outputs.number }}
       cancel-in-progress: true
+    outputs:
+      # Empty unless every check passed on this exact SHA.
+      head_sha: ${{ steps.checks.outputs.sha }}
     steps:
       - name: Mark draft PR ready
         if: needs.resolve-pr.outputs.is_draft == 'true'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          gh pr ready "${{ needs.resolve-pr.outputs.number }}"             --repo "${{ github.repository }}" || true
+          gh pr ready "${{ needs.resolve-pr.outputs.number }}" --repo "${{ github.repository }}" || true
 
       - name: Wait for every check on the head SHA to pass
+        id: checks
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           REPO: ${{ github.repository }}
@@ -229,8 +303,19 @@ jobs:
           # than merging them -- the path filters ARE the policy, and PR #876
           # sat unmergeable for 45 minutes proving the point.
           NO_CHECK_GRACE=$(( $(date +%s) + 300 ))
+          # Pin ONE SHA: checks are judged on it and the merge is pinned to it.
+          SHA=$(gh pr view "$PR" --repo "$REPO" --json headRefOid -q .headRefOid)
+          echo "Gating PR #$PR at $SHA"
           while :; do
-            SHA=$(gh pr view "$PR" --repo "$REPO" --json headRefOid -q .headRefOid)
+            STATE=$(gh pr view "$PR" --repo "$REPO" --json state,headRefOid -q '.state + " " + .headRefOid')
+            if [ "${STATE%% *}" != "OPEN" ]; then
+              echo "PR #$PR is ${STATE%% *}; nothing to gate."
+              exit 0
+            fi
+            if [ "${STATE#* }" != "$SHA" ]; then
+              echo "Head moved from $SHA to ${STATE#* }; the new head is gated by its own run."
+              exit 0
+            fi
             RUNS=$(gh api --paginate "repos/$REPO/commits/$SHA/check-runs" --jq '.check_runs[] | [.name, .status, (.conclusion // "pending")] | @tsv')
             TOTAL=0; PENDING=0; FAILED=""
             while IFS=$'	' read -r NAME STATUS CONCLUSION; do
@@ -249,10 +334,12 @@ jobs:
             fi
             if [ "$TOTAL" -gt 0 ] && [ "$PENDING" -eq 0 ]; then
               echo "All $TOTAL checks green for $SHA."
+              echo "sha=$SHA" >> "$GITHUB_OUTPUT"
               exit 0
             fi
             if [ "$TOTAL" -eq 0 ] && [ "$(date +%s)" -ge "$NO_CHECK_GRACE" ]; then
               echo "No CI check applies to $SHA after the grace period; the repo's path filters select nothing for this change. Nothing to verify, so merging."
+              echo "sha=$SHA" >> "$GITHUB_OUTPUT"
               exit 0
             fi
             if [ "$(date +%s)" -ge "$DEADLINE" ]; then
@@ -265,110 +352,158 @@ jobs:
 
   merge:
     needs: [resolve-pr, gate, code-gate]
-    # Exactly one lane gate runs per PR; merge when that one succeeded.
+    # Exactly one lane gate runs per PR; merge only the SHA that gate passed.
     if: >-
       !cancelled() &&
-      (needs.gate.result == 'success' || needs.code-gate.result == 'success')
+      ((needs.gate.result == 'success' && needs.gate.outputs.head_sha != '') ||
+       (needs.code-gate.result == 'success' && needs.code-gate.outputs.head_sha != ''))
     runs-on: ubuntu-latest
     timeout-minutes: 30
     # Serialize squash merges across all agent PRs to avoid main-tip races.
     concurrency:
       group: agent-automerge-main
       cancel-in-progress: false
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      PR: ${{ needs.resolve-pr.outputs.number }}
+      REPO: ${{ github.repository }}
+      LANE: ${{ needs.resolve-pr.outputs.lane }}
+      HEAD_REF: ${{ needs.resolve-pr.outputs.head_ref }}
+      GATED_SHA: ${{ needs.gate.outputs.head_sha || needs.code-gate.outputs.head_sha }}
     steps:
       - uses: actions/checkout@v4
         with:
+          # The resolver runs from the base branch. It deepens this shallow,
+          # blobless clone only until main and the PR branch share a
+          # merge-base (a bare fetch-depth 1 broke it: AM3, run 35944388953).
+          ref: ${{ github.event.repository.default_branch }}
           fetch-depth: 1
+          filter: blob:none
+          sparse-checkout: |
+            /_system/scripts/
+            /_system/memory/daily/
+            /_system/portfolio/research_events.jsonl
+            /_system/research/milly_log.md
+          sparse-checkout-cone-mode: false
 
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
 
-      - name: Skip if already merged
+      - name: Skip unless the PR is still open at the gated SHA
         id: state
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          PR="${{ needs.resolve-pr.outputs.number }}"
-          STATE=$(gh pr view "$PR" --repo "${{ github.repository }}" --json state --jq '.state')
+          set -euo pipefail
+          STATE=$(gh pr view "$PR" --repo "$REPO" --json state -q .state)
+          HEAD=$(gh pr view "$PR" --repo "$REPO" --json headRefOid -q .headRefOid)
           if [ "$STATE" != "OPEN" ]; then
             echo "PR #$PR already $STATE; nothing to merge."
             echo "merge=false" >> "$GITHUB_OUTPUT"
+          elif [ "$HEAD" != "$GATED_SHA" ]; then
+            echo "PR #$PR head moved from $GATED_SHA to $HEAD after the gate; its own run gates the new head."
+            echo "merge=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "merge=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Resolve merge conflicts with main, then stop
+        id: resolve
+        if: steps.state.outputs.merge == 'true'
+        run: |
+          set -euo pipefail
+          MERGEABLE=UNKNOWN
+          for attempt in 1 2 3 4 5 6; do
+            MERGEABLE=$(gh pr view "$PR" --repo "$REPO" --json mergeable -q .mergeable)
+            [ "$MERGEABLE" != "UNKNOWN" ] && break
+            sleep 5
+          done
+          if [ "$MERGEABLE" != "CONFLICTING" ]; then
+            echo "pushed=false" >> "$GITHUB_OUTPUT"
             exit 0
           fi
-          echo "merge=true" >> "$GITHUB_OUTPUT"
-
-      - name: Resolve merge conflicts with main
-        if: steps.state.outputs.merge == 'true'
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          PR="${{ needs.resolve-pr.outputs.number }}"
-          MERGEABLE=$(gh pr view "$PR" --repo "${{ github.repository }}" --json mergeable -q .mergeable)
-          if [ "$MERGEABLE" = "CONFLICTING" ]; then
-            if [ "${{ needs.resolve-pr.outputs.lane }}" = "research" ]; then
-              python _system/scripts/resolve_marvin_pr_conflicts.py "$PR"
-            else
-              echo "::error::Code-lane PR #$PR conflicts with main; automerge never auto-resolves code conflicts. Rebase the branch."
-              exit 1
-            fi
+          if [ "$LANE" != "research" ]; then
+            echo "::error::Code-lane PR #$PR conflicts with main; automerge never auto-resolves code conflicts. Rebase the branch."
+            exit 1
           fi
+          # The resolver's push is a new, untested head. It is never merged in
+          # this run: its own pull_request runs gate it.
+          python _system/scripts/resolve_marvin_pr_conflicts.py "$PR" --github-output "$GITHUB_OUTPUT"
+
+      - name: Report the conflict-resolution push
+        if: steps.resolve.outputs.pushed == 'true'
+        run: |
+          echo "::notice::PR #$PR: pushed a conflict resolution at ${{ steps.resolve.outputs.pushed_sha }}. Not merging in this run; the new head is gated by its own checks."
+
+      - name: Verify every check on the gated SHA is green
+        if: steps.state.outputs.merge == 'true' && steps.resolve.outputs.pushed != 'true'
+        run: |
+          set -euo pipefail
+          ARGS=(--repo "$REPO" --sha "$GATED_SHA" --exclude-workflow "Auto - Agent PR Merge")
+          if [ "$LANE" = "research" ]; then
+            ARGS+=(--require-workflow "Research quality")
+          else
+            # The code gate already accepted a change no path filter selects.
+            ARGS+=(--allow-no-checks)
+          fi
+          python _system/scripts/verify_pr_checks.py "${ARGS[@]}"
 
       - name: Ensure mergeable before squash
-        if: steps.state.outputs.merge == 'true'
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        if: steps.state.outputs.merge == 'true' && steps.resolve.outputs.pushed != 'true'
         run: |
-          PR="${{ needs.resolve-pr.outputs.number }}"
-          REPO="${{ github.repository }}"
+          set -euo pipefail
           for attempt in 1 2 3 4 5; do
             MERGEABLE=$(gh pr view "$PR" --repo "$REPO" --json mergeable -q .mergeable)
             if [ "$MERGEABLE" = "MERGEABLE" ]; then
               exit 0
             fi
             if [ "$MERGEABLE" = "CONFLICTING" ]; then
-              if [ "${{ needs.resolve-pr.outputs.lane }}" != "research" ]; then
-                echo "::error::Code-lane PR #$PR conflicts with main; rebase required."
-                exit 1
-              fi
-              python _system/scripts/resolve_marvin_pr_conflicts.py "$PR"
-              sleep 10
-            else
-              sleep 5
+              # Main moved after the conflict check above. The next run resolves
+              # it; this one does not merge a head it has not gated.
+              echo "::error::PR #$PR became CONFLICTING before the squash."
+              exit 1
             fi
+            sleep 5
           done
-          MERGEABLE=$(gh pr view "$PR" --repo "$REPO" --json mergeable -q .mergeable)
-          if [ "$MERGEABLE" != "MERGEABLE" ]; then
-            echo "::error::PR #$PR still not mergeable ($MERGEABLE) after retries."
+          echo "::error::PR #$PR still not mergeable ($MERGEABLE) after retries."
+          exit 1
+
+      - name: Squash merge and delete branch (pinned to the gated SHA)
+        id: squash
+        if: steps.state.outputs.merge == 'true' && steps.resolve.outputs.pushed != 'true'
+        run: |
+          set -euo pipefail
+          # Re-read state right before the side effect: the twin run for this
+          # head may have merged it while this job waited for the merge lock.
+          STATE=$(gh pr view "$PR" --repo "$REPO" --json state -q .state)
+          if [ "$STATE" != "OPEN" ]; then
+            echo "PR #$PR is $STATE; nothing to merge."
+            exit 0
+          fi
+          # sha= makes GitHub refuse the merge if the head is no longer the one
+          # the gate passed.
+          if ! gh api --method PUT "repos/${REPO}/pulls/${PR}/merge" \
+                 -f merge_method=squash -f sha="$GATED_SHA" > "$RUNNER_TEMP/merge.json" 2> "$RUNNER_TEMP/merge.err"; then
+            cat "$RUNNER_TEMP/merge.err" >&2
+            if grep -q "Head branch was modified" "$RUNNER_TEMP/merge.err"; then
+              echo "PR #$PR head moved after the gate; not merging. Its own run gates the new head."
+              exit 0
+            fi
             exit 1
           fi
-
-      - name: Squash merge and delete branch
-        if: steps.state.outputs.merge == 'true'
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          PR="${{ needs.resolve-pr.outputs.number }}"
-          REPO="${{ github.repository }}"
-          HEAD_REF="${{ needs.resolve-pr.outputs.head_ref }}"
-
-          gh api --method PUT "repos/${REPO}/pulls/${PR}/merge" \
-            -f merge_method=squash
-
+          cat "$RUNNER_TEMP/merge.json"
+          echo "merged=true" >> "$GITHUB_OUTPUT"
           gh api --method DELETE "repos/${REPO}/git/refs/heads/${HEAD_REF}" \
             || echo "Branch ${HEAD_REF} already deleted."
 
       - name: Summary
-        if: steps.state.outputs.merge == 'true'
+        if: steps.squash.outputs.merged == 'true'
         run: |
-          echo "Merged PR #${{ needs.resolve-pr.outputs.number }} (${{ needs.resolve-pr.outputs.head_ref }}) into main."
+          echo "Merged PR #$PR ($HEAD_REF) at $GATED_SHA into main."
 
       - name: Advance any committee task merged by this PR
-        if: steps.state.outputs.merge == 'true'
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        if: steps.squash.outputs.merged == 'true'
         run: |
-          gh api --method POST "repos/${{ github.repository }}/dispatches" \
+          gh api --method POST "repos/$REPO/dispatches" \
             -f event_type=advance-investment-committee
 
   notify:
@@ -394,9 +529,16 @@ jobs:
           RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
         run: |
           set -euo pipefail
+          # The twin run for this head may have merged the PR since the gate
+          # failed here. "Blocked" on a merged or closed PR is noise.
+          STATE=$(gh pr view "$PR" --repo "$REPO" --json state -q .state)
+          if [ "$STATE" != "OPEN" ]; then
+            echo "PR #$PR is $STATE; not commenting."
+            exit 0
+          fi
           MARKER="<!-- automerge-blocked -->"
           if [ "$MERGE" = "failure" ]; then
-            REASON="the merge step failed (conflict with main, or the squash was rejected)"
+            REASON="the merge step failed (a check on the gated commit is not green, a conflict with main, or the squash was rejected)"
           elif [ "$LANE" = "research" ]; then
             REASON="the research gate failed: provenance validation or the Research quality workflow is red"
           else
@@ -416,4 +558,3 @@ jobs:
             gh api --method POST "repos/$REPO/issues/$PR/comments" -F body=@body.md > /dev/null
           fi
           echo "Blocked comment posted on PR #$PR."
-
