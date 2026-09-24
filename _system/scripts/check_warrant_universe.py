@@ -17,8 +17,17 @@ from warrant_common import (
 )
 
 
-def check(*, strict: bool) -> tuple[list[str], list[str]]:
-    errors = validate_registry()
+def check_split(*, strict: bool) -> tuple[list[str], list[str], list[str]]:
+    """(registry_errors, other_errors, warnings).
+
+    registry_errors are problems in the append-only registry itself -- invalid
+    or duplicate versions, incomplete verified terms, a series still "active"
+    past its contractual expiry -- plus the dashboard's copy of them. They are
+    the ONLY errors --warn-only may downgrade. Everything else (the event
+    ledger, what the page would show) stays fatal in every lane.
+    """
+    registry_errors = list(validate_registry())
+    errors: list[str] = []
     warnings: list[str] = []
     event_ids: set[str] = set()
     for row in load_jsonl(EVENTS_PATH):
@@ -65,10 +74,15 @@ def check(*, strict: bool) -> tuple[list[str], list[str]]:
         if row.get("lifecycle") != "active" and row.get("status") == "review_ready":
             errors.append(f"{row.get('warrant_ticker')}: inactive security marked review_ready")
     if health.get("structural_errors"):
-        errors.append("dashboard health carries structural registry errors")
+        registry_errors.append("dashboard health carries structural registry errors")
     if strict:
         errors.extend(warnings)
-    return errors, warnings
+    return registry_errors, errors, warnings
+
+
+def check(*, strict: bool) -> tuple[list[str], list[str]]:
+    registry_errors, errors, warnings = check_split(strict=strict)
+    return registry_errors + errors, warnings
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -78,21 +92,31 @@ def main(argv: list[str] | None = None) -> int:
         "--warn-only",
         action="store_true",
         help=(
-            "Report every issue as a warning and exit 0. For lanes that merely "
-            "rebuild the warrant artifact (every ci_rebuild_profile dashboard "
-            "build): the warrant lane itself runs --strict and stays red. One "
-            "expired warrant (BKSY.W, 2026-09-10..22) must never fail every lane."
+            "Downgrade REGISTRY-structure errors (invalid/duplicate versions, "
+            "incomplete terms, active past expiry) to warnings; event-ledger and "
+            "publishing errors still fail. For lanes that merely rebuild the "
+            "warrant artifact (every ci_rebuild_profile dashboard build): the "
+            "warrant lane itself runs --strict. One expired warrant (BKSY.W, "
+            "2026-09-10..22) must never fail every lane."
         ),
     )
     args = parser.parse_args(argv)
-    errors, warnings = check(strict=args.strict)
+    registry_errors, other_errors, warnings = check_split(strict=args.strict)
     for warning in warnings:
         print(f"WARN: {warning}")
-    if errors and args.warn_only:
-        print(f"check_warrant_universe: {len(errors)} issue(s) (warn-only; the warrant lane enforces)")
-        for error in errors:
+    if args.warn_only:
+        # Only the registry's own structure is downgraded here; the event
+        # ledger and what the page would show still fail every lane.
+        for error in registry_errors:
             print(f"::warning title=warrant registry::{error}")
-        return 0
+        if registry_errors:
+            print(
+                f"check_warrant_universe: {len(registry_errors)} registry issue(s) "
+                "(warn-only; the warrant lane enforces)"
+            )
+        errors = other_errors
+    else:
+        errors = registry_errors + other_errors
     if errors:
         print(f"check_warrant_universe: {len(errors)} issue(s)")
         for error in errors:

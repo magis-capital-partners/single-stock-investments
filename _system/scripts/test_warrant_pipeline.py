@@ -180,23 +180,78 @@ class WarrantExpirySweepTests(unittest.TestCase):
 
 
 class WarrantCheckWarnOnlyTests(unittest.TestCase):
-    ISSUES = (["row 4: active security is past contractual expiry"], [])
+    """--warn-only downgrades the registry's own structure errors and nothing else."""
 
-    def test_warn_only_reports_and_exits_zero(self) -> None:
-        import check_warrant_universe
+    EXPIRED = "row 4: active security is past contractual expiry"
+    GOOD_EVENT = {
+        "event_id": "0000000001-26-000001:doc.htm",
+        "source_url": "https://www.sec.gov/Archives/edgar/data/1/000000000126000001/doc.htm",
+    }
 
-        with mock.patch.object(check_warrant_universe, "check", return_value=self.ISSUES), \
+    def setUp(self) -> None:
+        self._tmp = tempfile.TemporaryDirectory()
+        base = Path(self._tmp.name)
+        self.events = base / "warrant_events.jsonl"
+        self.dashboard = base / "warrants.json"
+        self.market = base / "warrant_market.json"
+        self.discovery = base / "discovery_state.json"
+        self.market.write_text(json.dumps({"last_successful_refresh": date.today().isoformat()}), encoding="utf-8")
+        self.discovery.write_text("{}", encoding="utf-8")
+        self._write_events([self.GOOD_EVENT])
+        self._write_dashboard([])
+
+    def tearDown(self) -> None:
+        self._tmp.cleanup()
+
+    def _write_events(self, rows: list[dict]) -> None:
+        self.events.write_text("".join(json.dumps(row) + "\n" for row in rows), encoding="utf-8")
+
+    def _write_dashboard(self, rows: list[dict], structural: list[str] | None = None) -> None:
+        payload = {"rows": rows, "health": {"status": "healthy", "structural_errors": structural or []}}
+        self.dashboard.write_text(json.dumps(payload), encoding="utf-8")
+
+    def _main(self, *argv: str, registry_errors: list[str] | None = None) -> tuple[int, str]:
+        import check_warrant_universe as cwu
+
+        with mock.patch.object(cwu, "EVENTS_PATH", self.events), \
+                mock.patch.object(cwu, "DASHBOARD_PATH", self.dashboard), \
+                mock.patch.object(cwu, "MARKET_PATH", self.market), \
+                mock.patch.object(cwu, "DISCOVERY_STATE_PATH", self.discovery), \
+                mock.patch.object(cwu, "validate_registry", return_value=list(registry_errors or [])), \
                 redirect_stdout(io.StringIO()) as out:
-            self.assertEqual(check_warrant_universe.main(["--warn-only"]), 0)
-        self.assertIn("::warning", out.getvalue())
-        self.assertIn("past contractual expiry", out.getvalue())
+            status = cwu.main(list(argv))
+        return status, out.getvalue()
 
-    def test_default_mode_still_fails(self) -> None:
-        import check_warrant_universe
+    def test_registry_expiry_error_is_a_warning(self) -> None:
+        self._write_dashboard([], structural=[self.EXPIRED])
+        status, out = self._main("--warn-only", registry_errors=[self.EXPIRED])
+        self.assertEqual(status, 0)
+        self.assertIn("::warning", out)
+        self.assertIn("past contractual expiry", out)
 
-        with mock.patch.object(check_warrant_universe, "check", return_value=self.ISSUES), \
-                redirect_stdout(io.StringIO()):
-            self.assertEqual(check_warrant_universe.main([]), 1)
+    def test_default_mode_still_fails_on_the_registry(self) -> None:
+        status, _ = self._main(registry_errors=[self.EXPIRED])
+        self.assertEqual(status, 1)
+
+    def test_duplicate_event_still_fails_under_warn_only(self) -> None:
+        self._write_events([self.GOOD_EVENT, self.GOOD_EVENT])
+        status, out = self._main("--warn-only", registry_errors=[self.EXPIRED])
+        self.assertEqual(status, 1)
+        self.assertIn("duplicate event_id", out)
+
+    def test_non_sec_event_url_still_fails_under_warn_only(self) -> None:
+        self._write_events([{**self.GOOD_EVENT, "source_url": "https://example.test/pr.htm"}])
+        status, out = self._main("--warn-only")
+        self.assertEqual(status, 1)
+        self.assertIn("not accession-locked", out)
+
+    def test_inactive_review_ready_still_fails_under_warn_only(self) -> None:
+        self._write_dashboard(
+            [{"warrant_ticker": "OLDW", "lifecycle": "expired", "status": "review_ready"}]
+        )
+        status, out = self._main("--warn-only")
+        self.assertEqual(status, 1)
+        self.assertIn("inactive security marked review_ready", out)
 
 
 if __name__ == "__main__":
