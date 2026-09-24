@@ -3,6 +3,7 @@ import sys
 import tempfile
 import unittest
 from pathlib import Path
+from unittest import mock
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
@@ -208,6 +209,71 @@ class LsAlgoValuationPipelineTests(unittest.TestCase):
         text = path.read_text(encoding="utf-8")
         self.assertIn("GGG", text)
         self.assertIn("owner_decision_pending", text)
+
+
+class StagePricingContractRouteTests(unittest.TestCase):
+    """AXTI, 2026-09-24: a contract-authority valuation has no owner-cash
+    scenarios, and the legacy hurdle model raised KeyError: 'scenarios'."""
+
+    def setUp(self):
+        self._tmp = tempfile.TemporaryDirectory()
+        self._old_root = pipeline.ROOT
+        pipeline.ROOT = Path(self._tmp.name)
+
+    def tearDown(self):
+        pipeline.ROOT = self._old_root
+        self._tmp.cleanup()
+
+    def _write(self, relative: str, payload: dict) -> None:
+        path = pipeline.ROOT / relative
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(json.dumps(payload), encoding="utf-8")
+
+    def _decision_grade(self, ticker: str, valuation: dict) -> None:
+        self._write(f"{ticker}/research/valuation_workbench.json", {"decision": {"status": "decision_grade"}})
+        self._write(f"{ticker}/research/valuation.json", valuation)
+        self._write(
+            f"{ticker}/research/pricing_model.json",
+            {"as_of": "2026-07-21", "decision": "watch_pending_owner_review"},
+        )
+
+    def test_scenario_less_valuation_is_priced_through_the_contract(self):
+        import build_power_zone_pricing
+
+        self._decision_grade(
+            "AXTI",
+            {
+                "ticker": "AXTI",
+                "method": "proof_first_automated",
+                "inputs": {"price": 5.0, "fcf_per_share": 0.1},
+            },
+        )
+        # The real legacy builder runs against the temp tree (only the heavy
+        # valuation recompute is stubbed), so the old code reproduces the
+        # production error instead of a mocked one.
+        with mock.patch.object(build_power_zone_pricing, "ROOT", pipeline.ROOT), \
+                mock.patch.object(build_power_zone_pricing, "compute_valuation", lambda data: data), \
+                mock.patch.object(build_power_zone_pricing, "build_contract_pricing") as contract:
+            result = pipeline.stage_pricing(["AXTI"], dry_run=False)
+        self.assertEqual(result["errors"], [])
+        self.assertEqual(result.get("contract_priced"), ["AXTI"])
+        contract.assert_called_once_with("AXTI")
+
+    def test_scenario_valuation_keeps_the_legacy_hurdle_model(self):
+        import build_power_zone_pricing
+
+        self._decision_grade(
+            "LEG",
+            {"inputs": {"price": 5.0}, "scenarios": {"base": {"growth_y1_5": 0.05}}},
+        )
+        config = pipeline.ROOT / "LEG" / "research" / "pricing_model.json"
+        with mock.patch.object(build_power_zone_pricing, "build_contract_pricing") as contract, \
+                mock.patch.object(build_power_zone_pricing, "build") as legacy, \
+                mock.patch.object(build_power_zone_pricing, "seed_default_config", return_value=config):
+            result = pipeline.stage_pricing(["LEG"], dry_run=False)
+        self.assertEqual(result["priced"], ["LEG"])
+        legacy.assert_called_once_with("LEG")
+        contract.assert_not_called()
 
 
 if __name__ == "__main__":
