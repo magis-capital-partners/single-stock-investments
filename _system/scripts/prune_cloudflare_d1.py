@@ -40,9 +40,10 @@ Execute = Callable[[str], int]
 
 LAST_PRUNE_KEY = "prune:last_date"
 QUOTA_EXIT_CODE = 75  # EX_TEMPFAIL: the daily free-tier quota, retried after 00:00 UTC
-QUOTA_PATTERN = re.compile(
-    r"exceeded D1's free tier daily row (read|write) limit|\"code\"\s*:\s*7500\b", re.IGNORECASE
-)
+# The quota's own words, and nothing else. D1 reports EVERY query error as
+# code 7500 ("no such table: ...: SQLITE_ERROR [code: 7500]"), so matching the
+# code would turn a retention SQL bug into a daily "deferral" forever.
+QUOTA_PATTERN = re.compile(r"exceeded D1's free tier daily row (read|write) limit", re.IGNORECASE)
 
 PORTFOLIO_REFERENCES = (
     "portfolio_reconciliation_breaks",

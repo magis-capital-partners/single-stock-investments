@@ -11,6 +11,40 @@ import pytest
 ROOT = Path(__file__).resolve().parents[3]
 MIGRATIONS = ROOT / "dashboard/cloudflare/migrations"
 
+# Verbatim wrangler --json stderr from deploy run 36046368603 (2026-09-24),
+# when the free-tier write quota was spent.
+WRANGLER_QUOTA_ERROR = """{
+  "error": {
+    "text": "A request to the Cloudflare API (/accounts/***/d1/database/e8982743-9502-47f2-981b-9a4975c36a7e/query) failed.",
+    "notes": [
+      {
+        "text": "Your account has exceeded D1's free tier daily row write limit. Upgrade to a paid plan or wait until tomorrow (midnight UTC) to continue. See https://developers.cloudflare.com/d1/platform/limits/ for more details. [code: 7500]"
+      }
+    ],
+    "kind": "error",
+    "name": "APIError",
+    "code": 7500,
+    "accountTag": "***"
+  }
+}"""
+
+# The same envelope for an ordinary SQL error. D1 labels those code 7500 too,
+# which is why "code": 7500 alone must never read as the quota.
+WRANGLER_SQL_ERROR = """{
+  "error": {
+    "text": "A request to the Cloudflare API (/accounts/***/d1/database/e8982743-9502-47f2-981b-9a4975c36a7e/query) failed.",
+    "notes": [
+      {
+        "text": "no such table: portfolio_strategy_snapshots: SQLITE_ERROR [code: 7500]"
+      }
+    ],
+    "kind": "error",
+    "name": "APIError",
+    "code": 7500,
+    "accountTag": "***"
+  }
+}"""
+
 
 def load_module(name: str, path: Path):
     spec = importlib.util.spec_from_file_location(name, path)
@@ -178,10 +212,8 @@ class SqliteD1:
     def execute(self, sql: str) -> int:
         self.executed.append(sql)
         if self.fail_on and self.fail_on in sql:
-            raise RuntimeError(
-                "Wrangler D1 command failed: Your account has exceeded D1's free tier "
-                'daily row write limit. {"code": 7500}'
-            )
+            # What WranglerD1.query raises for the recorded quota response.
+            raise RuntimeError(f"Wrangler D1 command failed: {WRANGLER_QUOTA_ERROR}")
         self.connection.execute(sql)
         return self.connection.execute("SELECT changes()").fetchone()[0]
 
@@ -237,7 +269,7 @@ def test_retention_runs_once_per_utc_day():
 def test_a_pass_stopped_by_the_quota_is_retried_by_the_next_deploy():
     connection = _database()
     client = SqliteD1(connection, fail_on="DELETE FROM portfolio_ingest_nonces")
-    with pytest.raises(RuntimeError, match="7500"):
+    with pytest.raises(RuntimeError, match="free tier daily row write limit"):
         pruner.run_retention(client, today="2026-09-25", now="2026-09-25T04:00:00Z")
     assert connection.execute(
         "SELECT COUNT(*) FROM ops_state WHERE key = 'prune:last_date'"
@@ -305,15 +337,26 @@ def test_statement_metrics_come_from_d1_meta(monkeypatch, capsys):
 
 
 def test_quota_exhaustion_exits_75_with_metrics(monkeypatch, capsys):
-    message = (
-        '{"error": {"text": "Your account has exceeded D1\'s free tier daily row write limit.", '
-        '"code": 7500}}'
+    monkeypatch.setattr(
+        pruner.subprocess, "run", lambda *a, **k: _completed(stderr=WRANGLER_QUOTA_ERROR, code=1)
     )
-    monkeypatch.setattr(pruner.subprocess, "run", lambda *a, **k: _completed(stderr=message, code=1))
     assert pruner.main(["--config", "cfg.jsonc"]) == pruner.QUOTA_EXIT_CODE
     last = capsys.readouterr().out.strip().splitlines()[-1]
     assert last.startswith("D1_METRICS ")
     assert json.loads(last.split(" ", 1)[1])["status"] == "quota"
+
+
+def test_a_sql_error_labelled_7500_fails_instead_of_deferring(monkeypatch, capsys):
+    # D1 reports every SQL error as code 7500. Read as "quota", a retention
+    # bug would exit 75, defer the seed, and repeat every day unnoticed.
+    monkeypatch.setattr(
+        pruner.subprocess, "run", lambda *a, **k: _completed(stderr=WRANGLER_SQL_ERROR, code=1)
+    )
+    assert pruner.main(["--config", "cfg.jsonc"]) == 1
+    last = capsys.readouterr().out.strip().splitlines()[-1]
+    assert json.loads(last.split(" ", 1)[1])["status"] == "failed"
+    assert not pruner.QUOTA_PATTERN.search(WRANGLER_SQL_ERROR)
+    assert pruner.QUOTA_PATTERN.search(WRANGLER_QUOTA_ERROR)
 
 
 def test_other_failures_exit_1(monkeypatch, capsys):
