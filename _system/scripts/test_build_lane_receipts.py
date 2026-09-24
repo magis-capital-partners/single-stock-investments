@@ -12,13 +12,16 @@ import subprocess
 import sys
 import tempfile
 import unittest
+from datetime import datetime, timezone
 from pathlib import Path
 from unittest import mock
+from urllib.parse import parse_qs, unquote, urlsplit
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import build_lane_receipts as builder  # noqa: E402
 
 REPO = "owner/repo"
+NOW = datetime(2026, 9, 24, 21, 0, tzinfo=timezone.utc)
 
 
 def run(run_id, created, jobs, conclusion="success", event="schedule", status="completed"):
@@ -38,9 +41,10 @@ def job(job_id, name, conclusion, completed, steps=()):
 class FakeGh:
     """Answers the gh invocations both receipt builders make."""
 
-    def __init__(self, runs_by_workflow, annotations=None):
+    def __init__(self, runs_by_workflow, annotations=None, annotation_errors=()):
         self.runs = runs_by_workflow
         self.annotations = annotations or {}
+        self.annotation_errors = set(annotation_errors)
         self.calls: list[list[str]] = []
 
     def __call__(self, cmd, *args, **kwargs):
@@ -67,8 +71,17 @@ class FakeGh:
             return None
         path = path[len(prefix):]
         if path.startswith("actions/workflows/") and "/runs" in path:
+            # Behaves like the real endpoint: newest first, per_page / page,
+            # and the created>= filter.
             workflow = path.split("/")[2]
+            query = parse_qs(urlsplit(path).query)
+            per_page = int(query.get("per_page", ["30"])[0])
+            page = int(query.get("page", ["1"])[0])
             rows = sorted(self.runs.get(workflow, []), key=lambda r: r["id"], reverse=True)
+            created = unquote(query.get("created", [""])[0])
+            if created.startswith(">="):
+                rows = [r for r in rows if r["created_at"] >= created[2:]]
+            rows = rows[(page - 1) * per_page:page * per_page]
             return {"workflow_runs": [{k: v for k, v in r.items() if k != "_jobs"}
                                       for r in rows]}
         if path.startswith("actions/workflows/"):
@@ -81,7 +94,10 @@ class FakeGh:
                         return {"jobs": r["_jobs"]}
             return None
         if path.startswith("check-runs/") and path.endswith("/annotations"):
-            return self.annotations.get(int(path.split("/")[1]), [])
+            job_id = int(path.split("/")[1])
+            if job_id in self.annotation_errors:
+                return None
+            return self.annotations.get(job_id, [])
         return None
 
 
@@ -98,9 +114,12 @@ class ReceiptTests(unittest.TestCase):
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_text(json.dumps({"lanes": lanes}), encoding="utf-8")
 
-    def build(self, fake):
+    def build(self, fake, now=NOW, api=None):
         with mock.patch.object(builder.subprocess, "run", fake):
-            return builder.build(self.root, REPO)
+            try:
+                return builder.build(self.root, REPO, api=api, now=now)
+            except TypeError:          # the schema-1 builder had no clock
+                return builder.build(self.root, REPO)
 
     def receipt(self, lane):
         path = self.root / f"_system/data/lane_receipts/{lane}.json"
@@ -123,15 +142,17 @@ class ReceiptTests(unittest.TestCase):
         ]})
         self.build(fake)
         receipt = self.receipt("ls-algo")
-        self.assertEqual(receipt["last_success_at"], "2026-08-11T04:14:38Z")
+        self.assertNotEqual(receipt["last_success_at"], "2026-09-24T19:10:58Z")
+        self.assertIsNone(receipt["last_success_at"], "08-11 is outside the 2x54h lookback")
+        self.assertTrue(receipt["history_complete"])
         self.assertEqual(receipt["latest"]["outcome"], "failure")
 
     def test_a_timed_out_job_is_a_failure_not_a_cancel(self):
         self.configure([{"name": "news", "workflow_file": "dp.yml", "job": "news",
                          "freshness_hours": 18}])
         fake = FakeGh({"dp.yml": [
-            run(1, "2026-09-21T22:06:43Z",
-                [job(11, "news", "success", "2026-09-21T22:45:33Z")]),
+            run(1, "2026-09-24T05:16:00Z",
+                [job(11, "news", "success", "2026-09-24T05:55:00Z")]),
             run(2, "2026-09-24T17:26:29Z",
                 [job(21, "news", "cancelled", "2026-09-24T18:33:48Z",
                      [("Ingest portfolio news", "cancelled")])], conclusion="cancelled"),
@@ -140,7 +161,7 @@ class ReceiptTests(unittest.TestCase):
                                           " time of 45m0s"}]})
         self.build(fake)
         receipt = self.receipt("news")
-        self.assertEqual(receipt["last_success_at"], "2026-09-21T22:45:33Z")
+        self.assertEqual(receipt["last_success_at"], "2026-09-24T05:55:00Z")
         self.assertEqual(receipt["latest"]["outcome"], "timeout")
         self.assertEqual(receipt["failures"][0]["failed_step"], "Ingest portfolio news")
 
@@ -235,8 +256,8 @@ class ReceiptTests(unittest.TestCase):
         # token's whole hourly REST budget on the first supervisor run.
         self.configure([{"name": "backfill", "workflow_file": "b.yml", "job": "refill",
                          "freshness_hours": 24}])
-        runs = [run(n, f"2026-09-2{n % 5}T0{n % 9}:33:00Z",
-                    [job(100 + n, "refill", "success", f"2026-09-24T0{n % 9}:40:00Z")])
+        runs = [run(n, f"2026-09-24T{n:02d}:33:00Z",
+                    [job(100 + n, "refill", "success", f"2026-09-24T{n:02d}:40:00Z")])
                 for n in range(1, 11)]
         fake = FakeGh({"b.yml": runs})
         self.build(fake)
@@ -252,16 +273,54 @@ class ReceiptTests(unittest.TestCase):
                          [("Run activist scan", "failure")])], conclusion="failure")
                 for n in range(1, 6)]
         fake = FakeGh({"dp.yml": runs})
-        with mock.patch.object(builder.subprocess, "run", fake):
-            result = builder.build(self.root, REPO, api=builder.GhApi(REPO, max_job_calls=2))
+        result = self.build(fake, api=builder.GhApi(REPO, max_job_calls=2))
         receipt = self.receipt("activist")
         self.assertEqual([f["run_id"] for f in receipt["failures"]], [5, 4])
-        self.assertEqual(receipt["scanned_through"], 0, "the unscanned runs are rescanned next time")
+        self.assertEqual((receipt["scanned_through"], receipt["scan_low"]), (5, 4))
+        self.assertFalse(receipt["history_complete"], "not judged until the walk finishes")
         self.assertTrue(any("budget" in e for e in result["api_errors"]))
-        with mock.patch.object(builder.subprocess, "run", fake):
-            builder.build(self.root, REPO, api=builder.GhApi(REPO, max_job_calls=10))
-        self.assertEqual([f["run_id"] for f in self.receipt("activist")["failures"]],
-                         [5, 4, 3, 2, 1])
+        fake.calls.clear()
+        self.build(fake, api=builder.GhApi(REPO, max_job_calls=10))
+        receipt = self.receipt("activist")
+        self.assertEqual([f["run_id"] for f in receipt["failures"]], [5, 4, 3, 2, 1])
+        self.assertTrue(receipt["history_complete"])
+        jobs_calls = [c[2] for c in fake.calls if c[:2] == ["gh", "api"] and "/jobs" in c[2]]
+        self.assertEqual(len(jobs_calls), 3, "the walk resumes below the cut, not from the top")
+
+    def test_an_unreadable_annotation_leaves_the_cancel_unresolved(self):
+        # A cancelled job whose annotations cannot be read might have been a
+        # timeout. Recording it as a harmless cancel buried it for good.
+        self.configure([{"name": "news", "workflow_file": "dp.yml", "job": "news",
+                         "freshness_hours": 18}])
+        runs = [run(1, "2026-09-24T05:10:00Z",
+                    [job(11, "news", "success", "2026-09-24T05:50:00Z")]),
+                run(2, "2026-09-24T17:26:29Z",
+                    [job(21, "news", "cancelled", "2026-09-24T18:11:29Z",
+                         [("Ingest portfolio news", "cancelled")])], conclusion="cancelled")]
+        timeout = [{"message": "The job has exceeded the maximum execution time of 45m0s"}]
+        self.build(FakeGh({"dp.yml": runs}, annotations={21: timeout}, annotation_errors={21}))
+        receipt = self.receipt("news")
+        self.assertFalse(receipt["history_complete"], "run 2 is unresolved: not judged yet")
+        self.assertEqual(receipt["scan_low"], 3, "run 2 is rescanned on the next build")
+        self.build(FakeGh({"dp.yml": runs}, annotations={21: timeout}))
+        receipt = self.receipt("news")
+        self.assertEqual(receipt["latest"]["outcome"], "timeout")
+        self.assertEqual(receipt["last_success_at"], "2026-09-24T05:50:00Z")
+
+    def test_a_weekly_job_in_a_busy_workflow_is_found_on_the_first_build(self):
+        # 50 Data Pipeline runs are about three days; the weekly world-model
+        # job's last success is six days back, so a 50-run listing read it as
+        # stale on the very first run.
+        self.configure([{"name": "world-model", "workflow_file": "dp.yml",
+                         "job": "world-model", "freshness_hours": 342}])
+        runs = [run(1, "2026-09-18T16:00:00Z",
+                    [job(11, "world-model", "success", "2026-09-18T16:40:00Z")])]
+        runs += [run(n, f"2026-09-{19 + (n - 2) // 25:02d}T{(n - 2) % 24:02d}:10:00Z",
+                     [job(10 * n, "news", "success", "2026-09-24T00:00:00Z")])
+                 for n in range(2, 142)]
+        self.build(FakeGh({"dp.yml": runs}))
+        receipt = self.receipt("world-model")
+        self.assertEqual(receipt["last_success_at"], "2026-09-18T16:40:00Z")
 
     def test_an_in_flight_run_holds_the_watermark(self):
         self.configure([{"name": "memory", "workflow_file": "m.yml", "job": "triage",

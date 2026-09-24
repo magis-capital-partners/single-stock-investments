@@ -62,6 +62,8 @@ TIMEOUT = "timeout"
 CANCELLED = "cancelled"   # superseded / evicted / manually cancelled: neutral
 SKIPPED = "skipped"       # the lane's job did not run in this run
 NOOP = "noop"             # job succeeded but its declared work step did not run
+UNRESOLVED = "unresolved"  # cancelled, and whether it was a timeout could not be read:
+                           # never recorded, the run is rescanned on the next build
 FAILING_OUTCOMES = frozenset({FAILURE, TIMEOUT})
 
 TIMEOUT_MARKER = "exceeded the maximum execution time"
@@ -316,7 +318,7 @@ def lane_contract(root: Path, config: dict) -> tuple[list[str], list[str]]:
                               f" named '{step}'")
     exempt = config.get("unmonitored_workflows") or {}
     workflows_dir = root / WORKFLOWS_REL
-    for path in sorted(workflows_dir.glob("*.yml")):
+    for path in sorted([*workflows_dir.glob("*.yml"), *workflows_dir.glob("*.yaml")]):
         spec = parse_workflow(path.read_text(encoding="utf-8"))
         if "schedule" not in spec["triggers"] or not spec["crons"]:
             continue
@@ -416,9 +418,11 @@ def classify_lane_run(jobs: list[dict], lane: dict, is_timeout) -> dict | None:
     """Classify one completed run for one lane.
 
     ``jobs`` is the Actions API ``jobs`` array; ``is_timeout(job)`` decides
-    whether a cancelled job was killed by its timeout (it reads annotations).
-    Returns None when the lane's job is absent from the run (a different cron
-    of the same workflow), else {"outcome", "at", "job_id", "failed_step"}."""
+    whether a cancelled job was killed by its timeout (it reads annotations)
+    and returns None when it cannot tell, which yields UNRESOLVED rather than
+    a neutral cancel that would be forgotten. Returns None when the lane's job
+    is absent from the run (a different cron of the same workflow), else
+    {"outcome", "at", "job_id", "failed_step"}."""
     matched = lane_jobs(jobs, lane["job"])
     if not matched:
         return None
@@ -438,7 +442,11 @@ def classify_lane_run(jobs: list[dict], lane: dict, is_timeout) -> dict | None:
                     "failed_step": first_step(job, ("failure", "timed_out", "cancelled"))}
     for job in matched:
         if job.get("conclusion") == "cancelled":
-            if is_timeout(job):
+            verdict = is_timeout(job)
+            if verdict is None:
+                return {"outcome": UNRESOLVED, "at": at, "job_id": job.get("id"),
+                        "failed_step": None}
+            if verdict:
                 return {"outcome": TIMEOUT, "at": at, "job_id": job.get("id"),
                         "failed_step": first_step(job, ("cancelled", "failure"))}
     if any(j.get("conclusion") == "cancelled" for j in matched):

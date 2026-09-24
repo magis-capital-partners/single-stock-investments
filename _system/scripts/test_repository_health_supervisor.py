@@ -264,6 +264,8 @@ class HealerTests(SupervisorFixture):
 
     def test_plan_only_mode_writes_nothing_and_sends_nothing(self):
         self.configure([lane("memory-digest", job="triage", workflow="memory-digest.yml")])
+        self.receipt("memory-digest", "2026-09-20T15:00:00Z", job="triage",
+                     workflow="memory-digest.yml")
         with mock.patch.object(supervisor, "_head", return_value="abc"):
             result = supervisor.plan(self.root, now=T0)
         self.assertFalse((self.root / supervisor.STATE_REL).exists())
@@ -298,6 +300,26 @@ class AlertTests(SupervisorFixture):
         self.slack.messages.clear()
         self.run_plan(T0 + timedelta(hours=6))
         self.assertEqual(self.slack.messages, [])
+
+    def test_an_unfinished_scan_is_not_judged_stale_until_a_window_passes(self):
+        # A receipt whose history walk was cut by the API budget knows
+        # nothing yet; calling the lane stale would be a false alarm on the
+        # first run after the job-level receipts land.
+        self.configure([lane("world-model", job="world-model", workflow="data-pipeline.yml",
+                             hours=342)])
+        path = self.root / "_system/data/lane_receipts/world-model.json"
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(json.dumps({
+            "schema_version": "2.0", "lane": "world-model", "workflow_file": "data-pipeline.yml",
+            "job": "world-model", "work_step": None, "last_success_at": None,
+            "history_complete": False, "failures": [], "latest": None}), encoding="utf-8")
+        result = self.run_plan(MORNING)
+        self.assertEqual(result["stale_lanes"], [])
+        self.assertFalse(any("[STALE]" in m for m in self.slack.messages))
+        result = self.run_plan(MORNING + timedelta(hours=343))
+        self.assertEqual(result["stale_lanes"], ["world-model"])
+        self.assertTrue(any("no complete job-level receipt for 343h" in m
+                            for m in self.slack.messages))
 
     def test_a_failed_send_is_retried_on_the_next_run(self):
         self.configure([lane("ls-algo", job="intake", workflow="ls-algo-universe.yml")])
@@ -555,6 +577,12 @@ class CompatibilityTests(unittest.TestCase):
             (root / "_system/graph/graph_sources.json").write_text(json.dumps({
                 "lanes": [lane("two-phase-watch", job="watch", workflow="two-phase-watch.yml",
                                hours=342)], "data_feeds": {}}), encoding="utf-8")
+            stale = root / "_system/data/lane_receipts/two-phase-watch.json"
+            stale.parent.mkdir(parents=True)
+            stale.write_text(json.dumps({
+                "schema_version": "2.0", "workflow_file": "two-phase-watch.yml", "job": "watch",
+                "work_step": None, "last_success_at": None, "history_complete": True}),
+                encoding="utf-8")
             flow = root / ".github/workflows/two-phase-watch.yml"
             flow.parent.mkdir(parents=True)
             flow.write_text("on:\n  schedule:\n    - cron: \"0 17 * * 0\"\njobs:\n  watch:\n",

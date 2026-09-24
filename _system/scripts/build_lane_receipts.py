@@ -10,15 +10,25 @@ run on main and, if the lane declares a ``work_step``, that step concluded
 kept the ls-algo intake "fresh" for six weeks while every real run failed.
 
 Each receipt also records the newest meaningful outcome and the failures since
-the last success, which the supervisor fingerprints. Runs are classified
-incrementally: ``scanned_through`` is the highest run id below which every
-listed run had completed when last scanned, so steady state costs one runs
-listing per workflow plus one jobs call per new run.
+the last success, which the supervisor fingerprints.
+
+How runs are scanned (the part that has to fit GITHUB_TOKEN's 1,000 REST
+calls an hour, shared with every other workflow in the repository):
+
+* Each lane looks back ``2 x freshness_hours`` (so a weekly job inside the
+  busy Data Pipeline is still found on the first build), newest first,
+  stopping at its first work-done success: nothing older can change it.
+* ``scanned_through`` is the high watermark: runs above it are new next time.
+  While a lane has no success on record its history is walked downwards and
+  ``scan_low`` / ``history_complete`` remember how far, so a scan cut short by
+  the call budget resumes where it stopped instead of rescanning the top.
+  A lane whose history is incomplete is "not yet judged", never "stale".
+* A cancelled job whose annotations cannot be read is left unresolved and
+  rescanned, never filed as a harmless cancel (it may have been a timeout).
 
 This script never exits non-zero because a lane has no success: that is a
 finding for the supervisor, not a reason to kill the supervisor before it can
-report it. (The old version exited 1, which would have failed the supervisor
-job before it planned anything the first time any lane never succeeded.)
+report it.
 """
 from __future__ import annotations
 
@@ -27,19 +37,21 @@ import json
 import os
 import subprocess
 import sys
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
+from urllib.parse import quote
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import lane_registry as lr  # noqa: E402
 
 ROOT = Path(__file__).resolve().parents[2]
-RUNS_PER_WORKFLOW = 50
+RUNS_PER_PAGE = 100
+MAX_PAGES = 6
 MAX_FAILURES = 10
-# GITHUB_TOKEN allows 1,000 REST calls an hour per repository and the
-# supervisor also reads annotations and logs. A first build walks at most the
-# 50-run listing of each workflow whose lanes have not succeeded in it; past
-# this budget the unscanned runs are simply picked up by the next build.
-MAX_JOB_CALLS = 450
+# Jobs and annotation reads per build. The first build after the job-level
+# receipts land walks each lane's lookback; past this budget the rest is
+# resumed on the next build (two hours later) rather than skipped.
+MAX_JOB_CALLS = 350
 
 
 class GhApi:
@@ -72,20 +84,7 @@ class GhApi:
         self._cache[path] = payload
         return payload
 
-    def workflow_runs(self, workflow_file: str, per_page: int = RUNS_PER_WORKFLOW):
-        payload = self._get(f"repos/{self.repository}/actions/workflows/{workflow_file}"
-                            f"/runs?branch=main&per_page={per_page}")
-        if not isinstance(payload, dict):
-            return None
-        return [run for run in payload.get("workflow_runs") or []
-                if run.get("event") != "pull_request"]
-
-    def workflow_state(self, workflow_file: str):
-        payload = self._get(f"repos/{self.repository}/actions/workflows/{workflow_file}")
-        return payload.get("state") if isinstance(payload, dict) else None
-
-    def run_jobs(self, run_id: int):
-        path = f"repos/{self.repository}/actions/runs/{run_id}/jobs?per_page=100"
+    def _budgeted(self, path: str):
         if path not in self._cache:
             if self.job_calls >= self.max_job_calls:
                 if not any(e.startswith("job-call budget") for e in self.errors):
@@ -93,17 +92,43 @@ class GhApi:
                                        " the rest is scanned next run")
                 return None
             self.job_calls += 1
-        payload = self._get(path)
+        return self._get(path)
+
+    def workflow_runs(self, workflow_file: str, since: datetime):
+        """Runs on main created since ``since``, newest first (paged)."""
+        stamp = since.astimezone(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+        rows: list[dict] = []
+        for page in range(1, MAX_PAGES + 1):
+            payload = self._get(f"repos/{self.repository}/actions/workflows/{workflow_file}"
+                                f"/runs?branch=main&per_page={RUNS_PER_PAGE}"
+                                f"&created={quote('>=' + stamp)}&page={page}")
+            if not isinstance(payload, dict):
+                return None if page == 1 else rows
+            batch = payload.get("workflow_runs") or []
+            rows.extend(run for run in batch if run.get("event") != "pull_request")
+            if len(batch) < RUNS_PER_PAGE:
+                break
+        return rows
+
+    def workflow_state(self, workflow_file: str):
+        payload = self._get(f"repos/{self.repository}/actions/workflows/{workflow_file}")
+        return payload.get("state") if isinstance(payload, dict) else None
+
+    def run_jobs(self, run_id: int):
+        payload = self._budgeted(f"repos/{self.repository}/actions/runs/{run_id}/jobs"
+                                 "?per_page=100")
         return payload.get("jobs") if isinstance(payload, dict) else None
 
     def job_annotations(self, job_id: int):
-        payload = self._get(f"repos/{self.repository}/check-runs/{job_id}/annotations")
+        payload = self._budgeted(f"repos/{self.repository}/check-runs/{job_id}/annotations")
         return payload if isinstance(payload, list) else None
 
 
-def _is_timeout(api) -> callable:
-    def check(job: dict) -> bool:
-        annotations = api.job_annotations(job.get("id")) or []
+def _is_timeout(api):
+    def check(job: dict):
+        annotations = api.job_annotations(job.get("id"))
+        if annotations is None:
+            return None            # unknown: the caller leaves the run unresolved
         return any(lr.TIMEOUT_MARKER in str(item.get("message") or "")
                    for item in annotations)
     return check
@@ -119,7 +144,12 @@ def _legacy_outcome(run: dict) -> dict | None:
             "job_id": None, "failed_step": None}
 
 
-def refresh_lane(root: Path, lane: dict, api, runs: list[dict]) -> tuple[dict, list[str]]:
+def lookback_hours(lane: dict) -> float:
+    return 2 * float(lane.get("freshness_hours") or 96)
+
+
+def refresh_lane(root: Path, lane: dict, api, runs: list[dict],
+                 now: datetime) -> tuple[dict, list[str]]:
     """Return (receipt, notes) for one lane given its workflow's recent runs."""
     notes: list[str] = []
     existing = lr.load_receipt(root, lane["name"])
@@ -134,43 +164,55 @@ def refresh_lane(root: Path, lane: dict, api, runs: list[dict]) -> tuple[dict, l
         "work_step": lane.get("work_step"),
         "last_success_at": None, "run_id": None, "head_sha": None, "url": None,
         "conclusion": None, "latest": None, "failures": [],
-        "scanned_through": 0, "scan_floor_at": None,
+        "scanned_through": 0, "scan_low": None, "history_complete": False,
+        "scan_floor_at": None,
     }
     if base:
         for key in receipt:
             if key in base:
                 receipt[key] = base[key]
         receipt["schema_version"] = lr.RECEIPT_SCHEMA
-    scanned_through = int(receipt.get("scanned_through") or 0)
-    if receipt.get("scan_floor_at") is None and runs:
-        receipt["scan_floor_at"] = min(str(r.get("created_at") or "") for r in runs) or None
+    floor = now - timedelta(hours=lookback_hours(lane))
+    window = [r for r in runs
+              if (lr.parse_iso(r.get("created_at")) or now) >= floor]
+    receipt["scan_floor_at"] = floor.strftime("%Y-%m-%dT%H:%M:%SZ")
 
-    pending = [int(r["id"]) for r in runs if r.get("status") != "completed"]
-    watermark = (min(pending) - 1) if pending else max((int(r["id"]) for r in runs),
-                                                       default=scanned_through)
-    watermark = max(watermark, scanned_through)
+    high = int(receipt.get("scanned_through") or 0)
+    low = receipt.get("scan_low")
+    success_known = bool(receipt.get("last_success_at"))
+    history_done = bool(receipt.get("history_complete")) or success_known
+    pending = [int(r["id"]) for r in window if r.get("status") != "completed"]
+    top = (min(pending) - 1) if pending else max((int(r["id"]) for r in window), default=high)
+    top = max(top, high)
+
     is_timeout = _is_timeout(api)
     failures = {int(f["run_id"]): f for f in receipt.get("failures") or []
                 if isinstance(f, dict) and f.get("run_id")}
     latest = receipt.get("latest") if isinstance(receipt.get("latest"), dict) else None
 
-    # Newest first, stopping at the first work-done success: nothing older can
-    # produce a newer success or a failure that happened after it. Steady state
-    # costs one jobs call per new run; only a lane that has not succeeded in
-    # the whole listing (the dead ones) walks all of it, and jobs are cached
-    # per run, so the Data Pipeline's nine lanes share one walk.
-    for run in sorted(runs, key=lambda r: int(r["id"]), reverse=True):
+    def in_scope(run_id: int) -> bool:
+        if run_id > high:
+            return True                                    # new since the last build
+        return not history_done and (low is None or run_id < int(low))
+
+    candidates = sorted((r for r in window if r.get("status") == "completed"
+                         and in_scope(int(r["id"]))),
+                        key=lambda r: int(r["id"]), reverse=True)
+    cut_at = None          # first run that could not be classified (budget / API)
+    lowest = None          # lowest run classified in this build
+    found_success = False
+    for run in candidates:
         run_id = int(run["id"])
-        if run_id <= scanned_through or run.get("status") != "completed":
-            continue
         if lane.get("job"):
             jobs = api.run_jobs(run_id)
-            if jobs is None:
-                watermark = min(watermark, run_id - 1)   # rescan it next time
-                continue
-            result = lr.classify_lane_run(jobs, lane, is_timeout)
+            result = lr.classify_lane_run(jobs, lane, is_timeout) if jobs is not None else \
+                {"outcome": lr.UNRESOLVED}
         else:
             result = _legacy_outcome(run)
+        if result is not None and result["outcome"] == lr.UNRESOLVED:
+            cut_at = run_id
+            break
+        lowest = run_id
         if result is None:
             continue
         outcome, at = result["outcome"], result["at"]
@@ -183,51 +225,81 @@ def refresh_lane(root: Path, lane: dict, api, runs: list[dict]) -> tuple[dict, l
         if outcome in lr.FAILING_OUTCOMES:
             failures[run_id] = entry
         if outcome == lr.SUCCESS:
+            found_success = True
             if str(at or "") > str(receipt.get("last_success_at") or ""):
                 receipt.update({"last_success_at": at, "run_id": run_id,
                                 "head_sha": run.get("head_sha"), "url": run.get("html_url"),
                                 "conclusion": "success"})
             break
 
+    if cut_at is None:
+        receipt["scanned_through"] = top
+        if found_success or success_known:
+            receipt["history_complete"] = True
+        elif not history_done:
+            # Walked the whole lookback without a success: the lane is judged.
+            receipt["history_complete"] = True
+            receipt["scan_low"] = lowest if lowest is not None else low
+    elif success_known and cut_at > high:
+        # Steady state: new runs were cut short -- rescan them next time.
+        receipt["scanned_through"] = max(high, cut_at - 1)
+        notes.append(f"scan cut at run {cut_at}; resumes next build")
+    else:
+        # History mode: keep the top, resume the walk just below the cut.
+        receipt["scanned_through"] = top
+        receipt["scan_low"] = cut_at + 1
+        receipt["history_complete"] = False
+        notes.append(f"history scan cut at run {cut_at}; resumes next build")
+
     cutoff = str(receipt.get("last_success_at") or "")
     kept = sorted((f for f in failures.values() if str(f.get("at") or "") > cutoff),
                   key=lambda f: int(f["run_id"]), reverse=True)[:MAX_FAILURES]
     receipt["failures"] = kept
     receipt["latest"] = latest
-    receipt["scanned_through"] = watermark
     receipt["in_flight"] = bool(pending)
     receipt["workflow_state"] = api.workflow_state(lane["workflow_file"])
     return receipt, notes
 
 
-def build(root: Path = ROOT, repository: str | None = None, api=None) -> dict:
+def build(root: Path = ROOT, repository: str | None = None, api=None,
+          now: datetime | None = None) -> dict:
     config = lr.load_config(root)
     repository = repository or os.environ.get("GITHUB_REPOSITORY") or ""
     api = api or GhApi(repository)
+    now = now or datetime.now(timezone.utc)
+    lanes = [lane for lane in lr.declared_lanes(config) if lane.get("workflow_file")]
+    by_workflow: dict[str, list[dict]] = {}
+    for lane in lanes:
+        by_workflow.setdefault(lane["workflow_file"], []).append(lane)
+    listings = {}
+    for workflow, members in by_workflow.items():
+        since = now - timedelta(hours=max(lookback_hours(l) for l in members))
+        listings[workflow] = api.workflow_runs(workflow, since)
+    # Cheapest workflows first, so a budget cut lands on the busiest history
+    # (the Data Pipeline) and every other lane is judged on the first build.
+    order = sorted(by_workflow, key=lambda wf: len(listings[wf] or []))
     written, unchanged, unavailable, notes = [], [], [], {}
-    for lane in lr.declared_lanes(config):
-        workflow = lane.get("workflow_file")
-        if not workflow:
-            continue
-        runs = api.workflow_runs(workflow)
-        if runs is None:
-            unavailable.append(lane["name"])
-            continue
-        receipt, lane_notes = refresh_lane(root, lane, api, runs)
-        if lane_notes:
-            notes[lane["name"]] = lane_notes
-        path = lr.receipt_path(root, lane["name"])
-        path.parent.mkdir(parents=True, exist_ok=True)
-        text = json.dumps(receipt, indent=2, sort_keys=False) + "\n"
-        try:
-            previous = path.read_text(encoding="utf-8")
-        except OSError:
-            previous = None
-        if previous != text:
-            path.write_text(text, encoding="utf-8")
-            written.append(lane["name"])
-        else:
-            unchanged.append(lane["name"])
+    for workflow in order:
+        runs = listings[workflow]
+        for lane in by_workflow[workflow]:
+            if runs is None:
+                unavailable.append(lane["name"])
+                continue
+            receipt, lane_notes = refresh_lane(root, lane, api, runs, now)
+            if lane_notes:
+                notes[lane["name"]] = lane_notes
+            path = lr.receipt_path(root, lane["name"])
+            path.parent.mkdir(parents=True, exist_ok=True)
+            text = json.dumps(receipt, indent=2, sort_keys=False) + "\n"
+            try:
+                previous = path.read_text(encoding="utf-8")
+            except OSError:
+                previous = None
+            if previous != text:
+                path.write_text(text, encoding="utf-8")
+                written.append(lane["name"])
+            else:
+                unchanged.append(lane["name"])
     return {"written": written, "unchanged": unchanged, "unavailable": unavailable,
             "notes": notes, "api_errors": list(getattr(api, "errors", []))[:20]}
 

@@ -434,11 +434,20 @@ def evaluate_lanes(root: Path, config: dict, now: datetime) -> dict:
         window = float(lane.get("freshness_hours") or 96)
         latest = (usable or {}).get("latest") if isinstance((usable or {}).get("latest"), dict) \
             else None
+        # A lane is judged once it has a job-level receipt that either records
+        # a success or has walked its whole lookback (build_lane_receipts). A
+        # scan cut short by the API budget is "not yet judged", never stale.
+        if lane.get("job"):
+            judged = usable is not None and (success_at is not None
+                                             or usable.get("history_complete", True) is not False)
+        else:
+            judged = True      # legacy whole-run lane: a missing receipt is simply stale
         lanes[name] = {
             "lane": lane, "receipt": usable, "window": window,
             "last_success_at": iso(success_at) if success_at else None,
             "age_hours": age,
-            "stale": success_at is None or age > window,
+            "judged": judged,
+            "stale": judged and (success_at is None or age > window),
             "receipt_problem": None if current else ("missing" if receipt is None
                                                      else "predates the job-level contract"),
             "latest_outcome": (latest or {}).get("outcome"),
@@ -456,7 +465,7 @@ def operational_failures(root: Path, now: datetime | None = None) -> list[str]:
     config = lr.load_config(root)
     hard = []
     for name, row in evaluate_lanes(root, config, now).items():
-        if row["stale"]:
+        if row["stale"] or not row["judged"]:
             reason = ("successful workflow receipt is missing or invalid"
                       if row["last_success_at"] is None else
                       "successful workflow receipt is stale")
@@ -544,6 +553,7 @@ def _fresh_state(prior: dict) -> dict:
         "digest": dict(carry("digest", {})),
         "d1": dict(carry("d1", {})),
         "runs": list(carry("runs", [])),
+        "unjudged_since": dict(carry("unjudged_since", {})),
         "first_v2_run": not v2,
     }
 
@@ -595,6 +605,25 @@ class Supervisor:
         runs.append(iso(self.now))
         self.state["runs"] = runs[-40:]
         return gap
+
+    def age_unjudged(self, lanes: dict) -> None:
+        """A lane with no readable job-level receipt is not judged -- but only
+        for one freshness window. After that it is stale, so a receipt builder
+        that keeps failing cannot hide a lane indefinitely."""
+        since = self.state["unjudged_since"]
+        for name, row in lanes.items():
+            if row["judged"]:
+                since.pop(name, None)
+                continue
+            first = lr.parse_iso(since.get(name)) or self.now
+            since.setdefault(name, iso(first))
+            hours = hours_between(self.now, first) or 0.0
+            if hours > row["window"]:
+                row["stale"] = True
+                row["receipt_problem"] = (f"no complete job-level receipt for {hours:.0f}h"
+                                          f" ({row['receipt_problem'] or 'scan unfinished'})")
+        for name in [n for n in since if n not in lanes]:
+            since.pop(name, None)
 
     # -- fingerprints ------------------------------------------------------- #
     def fingerprint_failure(self, name: str, lane: dict, failure: dict) -> dict | None:
@@ -819,6 +848,7 @@ class Supervisor:
     def run(self) -> dict:
         gap = self.check_gap()
         lanes = evaluate_lanes(self.root, self.config, self.now)
+        self.age_unjudged(lanes)
         open_issues = self.github.open_issues(ISSUE_LABEL) \
             if (self.github is not None and self.act) else None
         blocked: set[str] = set()      # lanes whose latest failure is persistent
@@ -981,9 +1011,11 @@ class Supervisor:
         if self.now.hour < DIGEST_HOUR_UTC or self.state["digest"].get("last_sent_date") == self.today:
             return None
         stale = [(n, r) for n, r in lanes.items() if r["stale"]]
+        unjudged = [n for n, r in lanes.items() if not r["judged"] and not r["stale"]]
         lines = [f"*Repository health digest {self.today}*",
-                 f"Lanes: {len(lanes)} declared, {len(lanes) - len(stale)} fresh,"
-                 f" {len(stale)} stale."]
+                 f"Lanes: {len(lanes)} declared, {len(lanes) - len(stale) - len(unjudged)} fresh,"
+                 f" {len(stale)} stale, {len(unjudged)} not yet judged"
+                 + (f" ({', '.join(sorted(unjudged))})" if unjudged else "") + "."]
         for name, row in sorted(stale, key=lambda item: -(item[1]["age_hours"] or 1e9)):
             latest = row["latest_outcome"] or "no run on record"
             lines.append(f"  - `{name}`: {_fmt_age(row['age_hours'])} since a work-done success"
@@ -1092,6 +1124,7 @@ class Supervisor:
             "digest": self.state["digest"],
             "d1": self.state["d1"],
             "runs": self.state["runs"],
+            "unjudged_since": self.state["unjudged_since"],
         }
         path = self.root / STATE_REL
         path.parent.mkdir(parents=True, exist_ok=True)

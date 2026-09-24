@@ -140,6 +140,13 @@ class ContractFixture(unittest.TestCase):
         violations, _ = self.contract([], exempt={"nightly.yml": ""})
         self.assertTrue(any("needs a reason" in v for v in violations), violations)
 
+    def test_a_scheduled_yaml_workflow_is_seen_too(self):
+        write(self.root / ".github/workflows/weekly.yaml",
+              SCHEDULED.replace('"7 3 * * *"', '"9 4 * * 1"'))
+        violations, _ = self.contract([self.lane()])
+        self.assertTrue(any(v.startswith("weekly.yaml: scheduled workflow is not declared")
+                            for v in violations), violations)
+
     def test_exemption_for_a_deleted_workflow_is_only_a_warning(self):
         # So the lane registry and a PR deleting the workflow can land in either order.
         violations, warnings = self.contract([self.lane()], exempt={"deleted.yml": "retired"})
@@ -261,6 +268,8 @@ class Classify(unittest.TestCase):
                          (lr.TIMEOUT, "Ingest"))
         self.assertIn(lr.TIMEOUT, lr.FAILING_OUTCOMES)
         self.assertEqual(self.classify(jobs, timeout=False)["outcome"], lr.CANCELLED)
+        # Unknown (annotations unreadable) is neither: the run stays unresolved.
+        self.assertEqual(self.classify(jobs, timeout=None)["outcome"], lr.UNRESOLVED)
 
     def test_skipped_work_step_is_a_noop_not_a_success(self):
         lane = {"name": "drive", "workflow_file": "w.yml", "job": "drive",
