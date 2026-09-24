@@ -1,7 +1,8 @@
 import { boundedLimit, failure, json, requestId, requireDatabase } from "../../../_lib/http.js";
 import { ALL_ALERTS_SQL, OPEN_ALERTS_SQL } from "../../../_lib/market-risk.js";
+import { MARKET_RISK_TTL_SECONDS, withEdgeCache } from "../../../_lib/edge-cache.js";
 
-export async function onRequestGet(context) {
+async function produce(context) {
   const id = requestId(context.request);
   try {
     const db = requireDatabase(context.env);
@@ -22,4 +23,10 @@ export async function onRequestGet(context) {
   } catch (error) {
     return failure(error, id);
   }
+}
+
+// Public and identical for every caller, so served through the edge cache
+// (market risk TTL; see _lib/edge-cache.js).
+export async function onRequestGet(context) {
+  return withEdgeCache(context, MARKET_RISK_TTL_SECONDS, () => produce(context));
 }
