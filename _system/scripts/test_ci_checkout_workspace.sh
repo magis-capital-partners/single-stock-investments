@@ -12,7 +12,7 @@ assert_ref() {
   local actual
   actual=$(resolve_checkout_ref "${3:-}")
   if [ "$actual" != "$expected" ]; then
-    echo "FAIL: $name � expected '$expected', got '$actual'" >&2
+    echo "FAIL: $name -- expected '$expected', got '$actual'" >&2
     exit 1
   fi
   echo "OK: $name"

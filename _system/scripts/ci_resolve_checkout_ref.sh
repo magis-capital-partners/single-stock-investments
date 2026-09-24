@@ -2,8 +2,9 @@
 # Resolve the git ref ci_checkout_workspace.sh should fetch.
 #
 # GitHub sets GITHUB_REF_NAME=228/merge on pull_request events, but
-# `git fetch origin 228/merge` fails � the fetchable ref is either the PR
-# head branch (GITHUB_HEAD_REF) or pull/N/merge (from GITHUB_REF).
+# `git fetch origin 228/merge` fails -- the fetchable refs are pull/N/head,
+# pull/N/merge (both from GITHUB_REF) and the head branch (GITHUB_HEAD_REF).
+# pull/N/head is preferred: see the pull_request case below.
 resolve_checkout_ref() {
   local ref_input="${1:-}"
 
