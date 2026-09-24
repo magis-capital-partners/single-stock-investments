@@ -167,20 +167,21 @@ class WorkflowGovernanceTests(unittest.TestCase):
         self.assertIn('bash _system/scripts/ci_push_main.sh "chore(valuation): process Power Zone universe"', workflow)
         self.assertNotIn('git push origin "HEAD:${GITHUB_REF_NAME}"', workflow)
 
-    def test_research_quality_checks_use_persistent_pr_head_ref(self):
+    def test_research_quality_checks_out_the_exact_commit(self):
         workflow = (ROOT / ".github" / "workflows" / "research-quality.yml").read_text(encoding="utf-8")
-        persistent_ref = '"pull/${{ github.event.pull_request.number }}/head"'
-        # Every PR-ref checkout must use the persistent pull/N/head ref, which
-        # survives a force-push, rather than the branch name. Assert the
-        # property, not a count: jobs get added.
-        checkouts = re.findall(r"ci_checkout_workspace\.sh \w+ (.+)$", workflow, re.MULTILINE)
-        pr_checkouts = [ref for ref in checkouts if "pull_request" in ref]
-        self.assertTrue(pr_checkouts)
-        for ref in pr_checkouts:
-            # Every PR-ref checkout must use the persistent pull/N/head form
-            # (survives force-push); other persistent-ref uses (e.g. a git
-            # fetch deepening history) are fine and not counted.
-            self.assertTrue(ref.startswith(persistent_ref), ref)
+        # Every checkout tests the exact commit the run is for: the PR head SHA
+        # on pull_request, github.sha on push and schedule. A ref moves under a
+        # queued run (a push run for d43005e86d tested 26422889c646) and a
+        # branch can be deleted under it. Assert the property, not a count:
+        # jobs get added.
+        self.assertRegex(
+            workflow,
+            r"(?m)^  CHECKOUT_SHA: \$\{\{ github\.event\.pull_request\.head\.sha \|\| github\.sha \}\}$",
+        )
+        checkouts = re.findall(r"ci_checkout_workspace\.sh \w+(.*)$", workflow, re.MULTILINE)
+        self.assertTrue(checkouts)
+        for rest in checkouts:
+            self.assertTrue(rest.strip().startswith('"$CHECKOUT_SHA"'), rest)
         self.assertNotIn("github.event.pull_request.head.ref", workflow)
 
     def test_model_ladder_defaults_cheap_and_escalates_frontier(self):
