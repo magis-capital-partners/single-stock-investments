@@ -244,11 +244,26 @@ def fingerprint(workflow: str, job: str, step: str | None, normalized: str) -> s
     return hashlib.sha256(key.encode("utf-8")).hexdigest()[:12]
 
 
-def issue_key(kind: str, normalized: str) -> str:
-    """Issue identity: the normalised error alone, WITHOUT the lane, so the
-    drive, intake-full and world-model jobs failing on the same
-    check_warrant_universe.py error share one issue listing all three."""
-    return hashlib.sha256(f"{kind}|{normalized}".encode("utf-8")).hexdigest()[:12]
+def issue_key(kind: str, normalized: str, workflow: str | None = None,
+              job: str | None = None) -> str:
+    """Issue identity. An error is keyed by its normalised text alone, WITHOUT
+    the lane, so the drive, intake-full and world-model jobs failing on the
+    same check_warrant_universe.py error share one issue listing all three.
+    A timeout is keyed by workflow + job as well: "timeout while running step
+    'Install dependencies'" in the technicals job is not the activist job's
+    defect, and joining its issue silently stopped technicals' retries."""
+    parts = [kind, normalized] if kind != "timeout" else [kind, workflow or "", job or "",
+                                                          normalized]
+    return hashlib.sha256("|".join(parts).encode("utf-8")).hexdigest()[:12]
+
+
+def issue_quiet_hours(window: float, episode: int) -> float:
+    """Quiet period before an issue auto-closes, doubling with every reopen
+    (capped at two weeks): a lane that fails every third day used to close
+    and reopen its issue every cycle -- 16 Slack lines and 14 comments in 21
+    days. Now it settles open after the second reopen."""
+    base = quiet_hours(window)
+    return min(base * 2 ** max(0, int(episode or 1) - 1), max(base, 14 * 24.0))
 
 
 # --------------------------------------------------------------------------- #
@@ -320,6 +335,10 @@ class GhCli:
     def comment(self, number: int, body: str) -> bool:
         return self._call("POST", self._repo(f"issues/{number}/comments"),
                           {"body": body}) is not None
+
+    def list_comments(self, number: int):
+        payload = self._call("GET", self._repo(f"issues/{number}/comments?per_page=100"))
+        return payload if isinstance(payload, list) else None
 
     def dispatch_event(self, event_type: str) -> bool:
         return self._call("POST", self._repo("dispatches"),
@@ -687,7 +706,8 @@ class Supervisor:
                 "error": result["normalized"], "raw": result["raw"],
                 "first_seen_at": failure.get("at"), "last_seen_at": failure.get("at"),
                 "runs": []})
-            entry["issue_key"] = issue_key(result["kind"], result["normalized"])
+            entry["issue_key"] = issue_key(result["kind"], result["normalized"],
+                                           lane.get("workflow_file"), lane.get("job"))
             seen = {int(r["run_id"]) for r in entry["runs"]}
             if int(failure["run_id"]) not in seen:
                 entry["runs"].append({"run_id": int(failure["run_id"]), "at": failure.get("at"),
@@ -708,11 +728,13 @@ class Supervisor:
                    if (hours_between(self.now, lr.parse_iso(r.get("at"))) or 0) <= horizon)
 
     # -- issues --------------------------------------------------------------- #
-    # One issue per normalised error (issue_key), listing every lane that hits
-    # it. Every GitHub write is checked before state moves: a failed create,
-    # reopen or close changes nothing and is retried on the next run. Slack
-    # lines about issues are derived from that state afterwards and keyed, so
-    # a failed send is retried without being duplicated.
+    # One issue per normalised error (issue_key; timeouts per workflow + job),
+    # listing every lane that hits it. Every GitHub write is checked before
+    # state moves: a failed create, reopen, close, title/body refresh or
+    # assignment changes nothing and is retried on the next run. Comments are
+    # keyed and carry a hidden marker, so one that posted but reported failure
+    # is found and not posted again. Slack lines about issues are derived from
+    # issue state after the writes and keyed, so a failed send is retried once.
 
     def _can_write(self) -> bool:
         return self.github is not None and self.act
@@ -727,6 +749,7 @@ class Supervisor:
         return f"[lane-failure] {who}: {short} [fp:{key}]"
 
     def issue_body(self, key: str, issue: dict) -> str:
+        episode = int(issue.get("episode") or 1)
         lines = [
             f"The repository-health supervisor saw the same failure at least twice on"
             f" {len(issue['lanes'])} lane(s) and has **stopped re-dispatching them**: a retry"
@@ -745,15 +768,16 @@ class Supervisor:
             "Affected lanes:",
         ]
         for name, member in sorted(issue["lanes"].items()):
+            quiet = issue_quiet_hours(member["window"], episode)
             lines.append(f"- `{name}`: `{member['workflow']}` / job `{member['job']}` / step"
                          f" `{member.get('step') or 'unknown'}` (fingerprint `{member['fp']}`,"
-                         f" closes {quiet_hours(member['window']):.0f}h after its last failure)")
+                         f" clear after {quiet:.0f}h without this failure)")
             for run in member["runs"][-5:]:
                 lines.append(f"  - {run.get('at')}: {run.get('url')}")
         lines += ["",
                   "This issue closes itself once every lane above has a work-done success and"
-                  " has not hit this failure for one cadence period. State:"
-                  " `_system/data/repository_health_supervisor.json`.",
+                  " has not hit this failure for the period shown (it doubles with each"
+                  " reopen). State: `_system/data/repository_health_supervisor.json`.",
                   f"<!-- lane-failure fp:{key} -->"]
         return "\n".join(lines)
 
@@ -763,25 +787,83 @@ class Supervisor:
                 return int(row["number"])
         return None
 
-    def sync_issue(self, key: str, members: list, open_issues) -> None:
+    def post_comment(self, key: str, issue: dict, comment_key: str, body: str) -> bool:
+        """Post a comment once per key. The hidden marker lets a retry find a
+        comment that was posted although the API reported a failure."""
+        done = issue.setdefault("comments_done", [])
+        if comment_key in done:
+            return True
+        marker = f"<!-- supervisor-comment:{key}:{comment_key} -->"
+        pending = issue.setdefault("comments_pending", [])
+        if comment_key in pending:
+            existing = self.github.list_comments(issue["number"])
+            if existing is not None and any(marker in str(c.get("body") or "") for c in existing):
+                pending.remove(comment_key)
+                done.append(comment_key)
+                return True
+        if self.github.comment(issue["number"], f"{body}\n\n{marker}"):
+            if comment_key in pending:
+                pending.remove(comment_key)
+            done.append(comment_key)
+            del done[:-60]
+            return True
+        if comment_key not in pending:
+            pending.append(comment_key)
+        self.notes.append(f"comment {comment_key} on #{issue['number']} failed; retrying")
+        return False
+
+    def mark_stale_seen(self, issue: dict, lanes: dict) -> None:
+        """A new or reopened issue already says its lanes are failing; do not
+        follow it with a "now stale" comment for a lane that is stale now."""
+        done = issue.setdefault("comments_done", [])
+        for name in issue["lanes"]:
+            row = lanes.get(name)
+            if row is not None and row["stale"]:
+                ckey = f"stale:{name}:{row['last_success_at'] or 'never'}"
+                if ckey not in done:
+                    done.append(ckey)
+
+    def ensure_assigned(self, issue: dict) -> None:
+        if issue.get("assigned") or not issue.get("number"):
+            return
+        if self.github.assign(issue["number"], [ISSUE_ASSIGNEE]):
+            issue["assigned"] = True
+        else:
+            self.notes.append(f"could not assign #{issue['number']} to {ISSUE_ASSIGNEE}; retrying")
+
+    def refresh_issue(self, key: str, issue: dict) -> None:
+        """Silent title/body edit when the lane list or runs changed."""
+        body = self.issue_body(key, issue)
+        title = self.issue_title(key, issue)
+        signature = hashlib.sha256(f"{title}\n{body}".encode("utf-8")).hexdigest()[:16]
+        if signature == issue.get("body_sig"):
+            return
+        if self.github.update_issue(issue["number"], title=title, body=body):
+            issue["body_sig"] = signature
+        else:
+            self.notes.append(f"could not refresh #{issue['number']}; retrying next run")
+
+    def sync_issue(self, key: str, members: list, open_issues, lanes: dict) -> None:
         """Open, refresh or reopen the issue for one normalised error."""
         first = members[0][2]
         issue = self.state["issues"].setdefault(key, {
             "number": None, "state": None, "episode": 0, "kind": first["kind"],
             "error": first["error"], "raw": first["raw"], "lanes": {},
             "first_seen_at": None, "last_seen_at": None, "body_sig": None,
-            "stale_noted": [], "superseded_noted": {}, "closing_commented": False})
+            "comments_done": [], "comments_pending": []})
+        already = set(issue["lanes"])
         for name, fp, entry, window in members:
+            joined = issue["lanes"].get(name, {}).get("joined_episode")
             issue["lanes"][name] = {"fp": fp, "workflow": entry["workflow"], "job": entry["job"],
                                     "step": entry.get("step"),
                                     "first_seen_at": entry["first_seen_at"],
                                     "last_seen_at": entry["last_seen_at"],
                                     "runs": entry["runs"][-5:], "window": window}
-        seen = [m for m in issue["lanes"].values()]
+            if joined:
+                issue["lanes"][name]["joined_episode"] = joined
+        seen = list(issue["lanes"].values())
         issue["first_seen_at"] = min(str(m["first_seen_at"] or "") for m in seen) or None
         issue["last_seen_at"] = max(str(m["last_seen_at"] or "") for m in seen) or None
-        body = self.issue_body(key, issue)
-        signature = hashlib.sha256(body.encode("utf-8")).hexdigest()[:16]
         if not self._can_write():
             self.issue_actions.append(f"would open or keep issue [fp:{key}] for"
                                       f" {', '.join(sorted(issue['lanes']))}")
@@ -789,76 +871,85 @@ class Supervisor:
         number = issue["number"] or self.find_open_issue(key, open_issues)
         if number and issue["state"] != "closed":
             if issue["state"] is None:
-                # Found on GitHub after the state file lost it: it was announced
-                # when it was opened, so do not announce it again.
-                issue.update(number=number, state="open", episode=max(1, issue["episode"]))
-                self.state["alerts"].setdefault(f"issue:{key}:open:{issue['episode']}",
-                                                {"sent_at": iso(self.now), "value": number})
-            if signature != issue["body_sig"]:
-                if self.github.update_issue(number, body=body):   # silent: edits notify nobody
-                    issue["body_sig"] = signature
-                else:
-                    self.notes.append(f"could not refresh #{number}; retrying next run")
+                # Adopted from GitHub: an earlier create reported failure but
+                # did open it (or the state file lost it). Assign it and let
+                # issue_alerts announce it once.
+                issue.update(number=number, state="open", episode=max(1, issue["episode"]),
+                             adopted_at=iso(self.now))
+                self.mark_stale_seen(issue, lanes)
+            elif issue["state"] == "open":
+                for name in issue["lanes"]:
+                    if name not in already:
+                        # A new lane now hits an open issue: announce it (keyed)
+                        # and retitle -- joining silently hid the spread.
+                        issue["lanes"][name]["joined_episode"] = issue["episode"]
+            self.ensure_assigned(issue)
+            self.refresh_issue(key, issue)
             return
         if number and issue["state"] == "closed":
-            if not self.github.update_issue(number, state="open", body=body):
+            episode = issue["episode"] + 1
+            issue["episode"] = episode
+            if not self.github.update_issue(number, state="open", title=self.issue_title(key, issue),
+                                            body=self.issue_body(key, issue)):
+                issue["episode"] = episode - 1
                 self.notes.append(f"could not reopen #{number} [fp:{key}]; retrying next run")
                 return
-            issue.update(state="open", episode=issue["episode"] + 1, body_sig=signature,
-                         closing_commented=False, stale_noted=sorted(issue["lanes"]),
-                         reopened_at=iso(self.now))
-            if not self.github.comment(number, f"Recurred at {issue['last_seen_at']} on"
-                                               f" {', '.join(sorted(issue['lanes']))}; reopened"
-                                               " by the repository-health supervisor."):
-                self.notes.append(f"reopened #{number} but could not comment")
+            issue.update(state="open", body_sig=None, reopened_at=iso(self.now))
+            self.mark_stale_seen(issue, lanes)
+            self.post_comment(key, issue, f"reopen:{episode}",
+                              f"Recurred at {issue['last_seen_at']} on"
+                              f" {', '.join(sorted(issue['lanes']))}; reopened by the"
+                              " repository-health supervisor. It now closes only after"
+                              " a longer quiet period (it doubles with every reopen).")
             self.issue_actions.append(f"reopened #{number} [fp:{key}]")
+            self.ensure_assigned(issue)
             return
         self.github.ensure_label(ISSUE_LABEL, "b60205",
                                  "A lane failed the same way twice; the supervisor stopped retrying")
-        number = self.github.create_issue(self.issue_title(key, issue), body, [ISSUE_LABEL])
+        issue["episode"] = 1
+        title, body = self.issue_title(key, issue), self.issue_body(key, issue)
+        number = self.github.create_issue(title, body, [ISSUE_LABEL])
         if not number:
+            issue["episode"] = 0
             self.notes.append(f"could not open an issue [fp:{key}]; retrying next run")
             return
-        # The new issue already says the lanes are failing; the stale-transition
-        # comment would only repeat it.
-        issue.update(number=number, state="open", episode=1, body_sig=signature,
-                     opened_at=iso(self.now), stale_noted=sorted(issue["lanes"]),
-                     closing_commented=False)
-        if not self.github.assign(number, [ISSUE_ASSIGNEE]):
-            self.notes.append(f"opened #{number} but could not assign {ISSUE_ASSIGNEE}")
+        issue.update(number=number, state="open", opened_at=iso(self.now),
+                     body_sig=hashlib.sha256(f"{title}\n{body}".encode("utf-8")).hexdigest()[:16])
+        self.mark_stale_seen(issue, lanes)
+        self.ensure_assigned(issue)
         self.issue_actions.append(f"opened #{number} [fp:{key}] for"
                                   f" {', '.join(sorted(issue['lanes']))}")
 
-    def member_recovered(self, key: str, name: str, member: dict, lanes: dict) -> bool:
+    def member_recovered(self, key: str, name: str, member: dict, lanes: dict,
+                         episode: int) -> bool:
         row = lanes.get(name)
         if row is None:
             return True                  # lane no longer declared
         since = hours_between(self.now, lr.parse_iso(member.get("last_seen_at")))
-        if since is None or since < quiet_hours(row["window"]):
+        if since is None or since < issue_quiet_hours(row["window"], episode):
             return False
         if row.get("issue_key") and row["issue_key"] != key:
             return True                  # still failing, but with a different error now
-        return not row["stale"] and row["latest_outcome"] == lr.SUCCESS
+        return row["judged"] and not row["stale"] and row["latest_outcome"] == lr.SUCCESS
 
     def close_recovered_issues(self, lanes: dict) -> None:
         for key, issue in self.state["issues"].items():
             if issue.get("state") != "open" or not issue.get("number"):
                 continue
-            if not all(self.member_recovered(key, name, member, lanes)
+            episode = int(issue.get("episode") or 1)
+            if not all(self.member_recovered(key, name, member, lanes, episode)
                        for name, member in issue["lanes"].items()):
                 continue
             number = issue["number"]
             if not self._can_write():
                 self.issue_actions.append(f"would close #{number} [fp:{key}]")
                 continue
-            if not issue.get("closing_commented"):
-                successes = ", ".join(f"`{n}` {lanes[n]['last_success_at']}"
-                                      for n in sorted(issue["lanes"]) if n in lanes)
-                if self.github.comment(number, "Recovered: every affected lane has a work-done"
-                                               f" success ({successes or 'lanes retired'}) and"
-                                               " has not hit this failure for a full cadence"
-                                               " period. Closing automatically."):
-                    issue["closing_commented"] = True
+            successes = ", ".join(f"`{n}` {lanes[n]['last_success_at']}"
+                                  for n in sorted(issue["lanes"]) if n in lanes)
+            self.post_comment(key, issue, f"close:{episode}",
+                              "Recovered: every affected lane has a work-done success"
+                              f" ({successes or 'lanes retired'}) and has not hit this failure"
+                              " for its quiet period. Closing automatically.")
             if not self.github.update_issue(number, state="closed", state_reason="completed"):
                 self.notes.append(f"could not close #{number}; retrying next run")
                 continue
@@ -866,7 +957,8 @@ class Supervisor:
             self.issue_actions.append(f"closed #{number} [fp:{key}]")
 
     def issue_alerts(self) -> None:
-        """Slack lines for issue state, keyed per issue episode."""
+        """Slack lines for issue state, keyed per issue episode (and per
+        joining lane), so a failed send is retried once and never repeated."""
         repo = getattr(self.github, "repository", "") or ""
         for key, issue in self.state["issues"].items():
             number, episode = issue.get("number"), int(issue.get("episode") or 0)
@@ -880,6 +972,15 @@ class Supervisor:
                     tag = "[NEW FAILURE ISSUE]" if episode == 1 else "[FAILING AGAIN]"
                     self.alert(alert_key, f"{tag} #{number} {lanes} ({issue['kind']}):"
                                           f" {issue['raw'][:200]} -- {link}", value=number)
+                    continue          # the opening line already lists every lane
+                for name, member in sorted(issue["lanes"].items()):
+                    if member.get("joined_episode") != episode:
+                        continue
+                    join_key = f"issue:{key}:joined:{name}:{episode}"
+                    if join_key not in self.state["alerts"]:
+                        self.alert(join_key, f"[FAILURE SPREADS] `{name}` now hits the same"
+                                             f" failure as #{number}: {issue['raw'][:160]}"
+                                             f" -- {link}", value=number)
             elif issue.get("state") == "closed":
                 closed = lr.parse_iso(issue.get("closed_at"))
                 recent = closed is not None and \
@@ -952,7 +1053,7 @@ class Supervisor:
                 persistent.setdefault(entry["issue_key"], []).append(
                     (name, fp, entry, row["window"]))
         for key, members in persistent.items():
-            self.sync_issue(key, members, open_issues)
+            self.sync_issue(key, members, open_issues, lanes)
         # A lane now failing with a different persistent error: say so once on
         # its older issue (a state change), which then closes on its own once
         # its error has stayed away for a cadence period.
@@ -961,26 +1062,35 @@ class Supervisor:
             for name, *_ in members:
                 for old_key, old in self.state["issues"].items():
                     if (old_key == key or old.get("state") != "open" or name not in old["lanes"]
-                            or old.get("superseded_noted", {}).get(name) == key
-                            or not self._can_write()):
+                            or not old.get("number") or not self._can_write()):
                         continue
                     target = f"#{new_number}" if new_number else f"[fp:{key}]"
-                    if self.github.comment(old["number"], f"`{name}` now fails with a different"
-                                                          f" error; see {target}."):
-                        old.setdefault("superseded_noted", {})[name] = key
+                    self.post_comment(old_key, old, f"superseded:{name}:{key}",
+                                      f"`{name}` now fails with a different error; see {target}.")
         self.close_recovered_issues(lanes)
         self.issue_alerts()
 
         # stale / recovered transitions
         for name, row in lanes.items():
             key = f"stale:{name}"
+            latest = row["latest"] or {}
+            floor = (row["receipt"] or {}).get("scan_floor_at")
+            detail = (f"last work-done success {_fmt_age(row['age_hours'])} ago"
+                      if row["last_success_at"] else
+                      f"no work-done success since at least {floor}" if floor else
+                      "no work-done success on record")
+            if row["stale"]:
+                # Keyed per (lane, stale episode) and idempotent, so this is
+                # independent of whether the Slack line went out.
+                for issue_key_, issue in self.state["issues"].items():
+                    if (issue.get("state") != "open" or name not in issue["lanes"]
+                            or not issue.get("number") or not self._can_write()):
+                        continue
+                    self.post_comment(issue_key_, issue,
+                                      f"stale:{name}:{row['last_success_at'] or 'never'}",
+                                      f"`{name}` is now stale: {detail}"
+                                      f" (window {row['window']:.0f}h).")
             if row["stale"] and key not in self.state["alerts"]:
-                latest = row["latest"] or {}
-                floor = (row["receipt"] or {}).get("scan_floor_at")
-                detail = (f"last work-done success {_fmt_age(row['age_hours'])} ago"
-                          if row["last_success_at"] else
-                          f"no work-done success since at least {floor}" if floor else
-                          "no work-done success on record")
                 why = []
                 if latest.get("outcome"):
                     why.append(f"latest run: {latest['outcome']}"
@@ -994,22 +1104,11 @@ class Supervisor:
                                 + (f"; {'; '.join(why)}" if why else "")
                                 + (f" -- {latest.get('url')}" if latest.get("url") else ""),
                            value=row["last_success_at"] or "never")
-                for issue in self.state["issues"].values():
-                    if (issue.get("state") != "open" or name not in issue["lanes"]
-                            or name in issue.get("stale_noted", []) or not self._can_write()):
-                        continue
-                    if self.github.comment(issue["number"], f"`{name}` is now stale: {detail}"
-                                                            f" (window {row['window']:.0f}h)."):
-                        issue.setdefault("stale_noted", []).append(name)
             # "Not stale" only means recovered when the lane is JUDGED fresh. A
             # lane whose receipt scan was cut this build is merely unknown, and
             # announcing it as recovered produced "[RECOVERED] `ls-algo`:
             # work-done success at None" followed by [STALE] again.
             recovered = row["judged"] and not row["stale"] and bool(row["last_success_at"])
-            if recovered:
-                for issue in self.state["issues"].values():
-                    if name in issue.get("stale_noted", []):
-                        issue["stale_noted"].remove(name)
             if recovered and key in self.state["alerts"]:
                 self.alert(key, f"[RECOVERED] `{name}`: work-done success at"
                                 f" {row['last_success_at']}", clear=True)

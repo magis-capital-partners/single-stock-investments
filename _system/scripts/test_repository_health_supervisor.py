@@ -51,7 +51,7 @@ class FakeGitHub:
         number = self._next
         self._next += 1
         self.issues[number] = {"title": title, "body": body, "labels": labels, "state": "open"}
-        return number
+        return None if "create_lies" in self.fail else number   # opened, but reports failure
 
     def assign(self, number, assignees):
         if "assign" in self.fail:
@@ -69,7 +69,10 @@ class FakeGitHub:
         if "comment" in self.fail:
             return False
         self.comments.append((number, body))
-        return True
+        return "comment_lies" not in self.fail      # posted, but reports failure
+
+    def list_comments(self, number):
+        return [{"body": body} for n, body in self.comments if n == number]
 
     def dispatch_event(self, event_type):
         self.events.append(event_type)
@@ -288,6 +291,131 @@ class HealerTests(SupervisorFixture):
         for name in names:
             self.assertIn(f"`{name}`", issue["body"])
         self.assertIn("+2", issue["title"])
+
+    def timing_out(self, name, job, job_ids, run_ids, hours=54):
+        fails = [failure(run_ids[1], "2026-09-25T06:00:00Z", job_ids[1],
+                         step="Install dependencies", outcome="timeout"),
+                 failure(run_ids[0], "2026-09-25T02:00:00Z", job_ids[0],
+                         step="Install dependencies", outcome="timeout")]
+        self.receipt(name, "2026-09-24T12:00:00Z", latest=fails[0], failures=fails, job=job,
+                     workflow="data-pipeline.yml")
+        for job_id in job_ids:
+            self.github.annotations[job_id] = [
+                {"annotation_level": "failure",
+                 "message": "The job has exceeded the maximum execution time of 45m0s"}]
+
+    def test_timeouts_in_same_named_steps_of_different_jobs_are_separate_issues(self):
+        # Verifier join probe: technicals timing out in "Install dependencies"
+        # silently joined the activist job's open timeout issue.
+        self.configure([lane("activist", job="activist", workflow="data-pipeline.yml"),
+                        lane("technicals", job="technicals", workflow="data-pipeline.yml",
+                             hours=102)])
+        self.timing_out("activist", "activist", (200, 300), (20, 30))
+        self.run_plan(datetime(2026, 9, 25, 8, 41, tzinfo=timezone.utc))
+        self.timing_out("technicals", "technicals", (600, 700), (60, 70), hours=102)
+        self.run_plan(datetime(2026, 9, 25, 10, 41, tzinfo=timezone.utc))
+        self.assertEqual(len(self.github.issues), 2)
+        announced = [m for m in self.slack.messages if "[NEW FAILURE ISSUE]" in m]
+        self.assertEqual(len(announced), 2)
+
+    def test_a_lane_joining_an_open_issue_is_announced_and_retitled(self):
+        error = "ERROR: registry.json missing required key 'holdings'"
+        self.configure([lane("committee", job="prepare", workflow="investment-committee.yml"),
+                        lane("backfill", job="refill", workflow="contract-backfill-continue.yml")])
+
+        def failing(name, job, workflow, ids):
+            fails = [failure(ids[1], "2026-09-25T06:00:00Z", ids[1], step="Select"),
+                     failure(ids[0], "2026-09-25T02:00:00Z", ids[0], step="Select")]
+            self.receipt(name, "2026-09-24T12:00:00Z", latest=fails[0], failures=fails,
+                         job=job, workflow=workflow)
+            for job_id in ids:
+                self.github.annotations[job_id] = [{"annotation_level": "failure",
+                                                    "message": error}]
+
+        failing("committee", "prepare", "investment-committee.yml", (40, 41))
+        self.run_plan(MORNING.replace(day=25))
+        number = next(iter(self.github.issues))
+        self.assertNotIn("+1", self.github.issues[number]["title"])
+        failing("backfill", "refill", "contract-backfill-continue.yml", (50, 51))
+        self.slack.messages.clear()
+        self.run_plan(MORNING.replace(day=25, hour=10))
+        self.assertEqual(len(self.github.issues), 1)
+        self.assertIn("+1", self.github.issues[number]["title"])
+        self.assertIn("`backfill`", self.github.issues[number]["body"])
+        spreads = [m for m in self.slack.messages if "[FAILURE SPREADS] `backfill`" in m]
+        self.assertEqual(len(spreads), 1)
+        self.slack.messages.clear()
+        self.run_plan(MORNING.replace(day=25, hour=12))
+        self.assertFalse(any("[FAILURE SPREADS]" in m for m in self.slack.messages))
+
+    def test_a_flaky_lane_settles_instead_of_churning_its_issue(self):
+        # Verifier churn probe: failing every third day closed and reopened the
+        # issue each cycle -- 16 Slack lines and 14 comments in 21 days.
+        self.configure([lane("memory-digest", job="triage", workflow="memory-digest.yml")])
+        start = datetime(2026, 10, 1, 0, 41, tzinfo=timezone.utc)
+        history, run_id = [], 100
+        for day in range(21):
+            run_id += 1
+            at = (start + timedelta(days=day, hours=10)).strftime("%Y-%m-%dT%H:%M:%SZ")
+            ok = not (day % 3 == 0 or day == 1)
+            history.append({"run_id": run_id, "at": at, "ok": ok, "job_id": 1000 + run_id})
+            self.github.annotations[1000 + run_id] = [{"annotation_level": "failure",
+                                                       "message": "ERROR: flaky upstream feed"}]
+            last_ok = max((h["at"] for h in history if h["ok"]), default="2026-09-30T10:00:00Z")
+            fails = [failure(h["run_id"], h["at"], h["job_id"], step="S")
+                     for h in reversed(history) if not h["ok"] and h["at"] > last_ok]
+            latest = (fails[0] if not history[-1]["ok"] else
+                      {"run_id": run_id, "at": at, "outcome": "success", "job_id": 1, "url": "u"})
+            self.receipt("memory-digest", last_ok, latest=latest, failures=fails,
+                         job="triage", workflow="memory-digest.yml")
+            for k in range(12):
+                self.run_plan(start + timedelta(days=day, hours=11 + 2 * k))
+        tags = ("[NEW FAILURE ISSUE]", "[FAILING AGAIN]", "[RECOVERED] issue")
+        lines = [line for m in self.slack.messages for line in m.splitlines()
+                 if line.startswith(tags)]
+        self.assertLessEqual(len(lines), 5, lines)
+        # one genuine "now stale" (days 0-1 fail before any success), then two
+        # close/reopen pairs while the quiet period doubles; then it stays open
+        self.assertLessEqual(len(self.github.comments), 5)
+        self.assertEqual(len(self.github.issues), 1)
+        self.assertEqual(next(iter(self.github.issues.values()))["state"], "open",
+                         "a lane still failing every third day keeps its issue open")
+
+    def test_an_issue_adopted_from_github_is_assigned_and_announced_once(self):
+        # An ambiguous create: GitHub opened the issue but the API reported a
+        # failure. The next run finds it by its [fp:] title and must treat it
+        # as new -- assign it and announce it -- exactly once.
+        self.falsifier_failing()
+        self.github.fail = {"create_lies"}
+        self.run_plan(T0)
+        self.assertEqual(len(self.github.issues), 1)
+        number = next(iter(self.github.issues))
+        self.assertFalse(any("[NEW FAILURE ISSUE]" in m for m in self.slack.messages))
+        self.github.fail = set()
+        self.run_plan(T0 + timedelta(hours=2))
+        self.run_plan(T0 + timedelta(hours=4))
+        self.assertEqual(len(self.github.issues), 1)
+        self.assertEqual(self.github.assignees.get(number), ["GoldmanDrew"])
+        announced = [m for m in self.slack.messages if f"[NEW FAILURE ISSUE] #{number}" in m]
+        self.assertEqual(len(announced), 1)
+
+    def test_a_comment_that_posted_but_reported_failure_is_not_reposted(self):
+        self.falsifier_failing()
+        self.run_plan(T0)
+        first = next(iter(self.github.issues))
+        second_error = "ERROR: calibration store is locked by another writer"
+        fails = [failure(6, "2026-09-25T13:58:00Z", 66), failure(5, "2026-09-25T09:58:00Z", 55)]
+        for job_id in (55, 66):
+            self.github.annotations[job_id] = [{"annotation_level": "failure",
+                                                "message": second_error}]
+        self.receipt("falsifier", "2026-09-06T23:45:28Z", latest=fails[0], failures=fails,
+                     job="resolve-and-validate", workflow="falsifier-resolution.yml")
+        self.github.fail = {"comment_lies"}
+        for hours in (18, 20, 22):
+            self.run_plan(T0 + timedelta(hours=hours))
+        superseded = [body for n, body in self.github.comments
+                      if n == first and "now fails with a different error" in body]
+        self.assertEqual(len(superseded), 1, "found by its marker, not posted again")
 
     def test_an_unreadable_failure_is_retried_never_filed(self):
         # Two failures whose logs cannot be read must not collapse into one
