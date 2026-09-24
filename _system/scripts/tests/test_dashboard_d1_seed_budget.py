@@ -138,6 +138,19 @@ def statements(seed: str) -> list[str]:
     return [line for line in seed.split("\n") if line.strip() and not line.startswith("--")]
 
 
+DATA_TABLES = (
+    "securities", "valuation_current", "evidence_tasks", "source_documents",
+    "valuation_runs", "valuation_components", "facts",
+)
+
+
+def snapshot(connection: sqlite3.Connection, tables) -> dict[str, list[tuple]]:
+    return {
+        table: sorted(connection.execute(f"SELECT * FROM {table}").fetchall(), key=repr)
+        for table in tables
+    }
+
+
 def delete_plan(connection: sqlite3.Connection, sql: str) -> str:
     """A DELETE's plan, including the child-key lookups its foreign keys run
     for every deleted row. (INSERT plans also list child-table scans, but
@@ -173,12 +186,16 @@ class IncrementalSeedTests(unittest.TestCase):
     def count(self, table: str, where: str = "1=1") -> int:
         return self.db.execute(f"SELECT COUNT(*) FROM {table} WHERE {where}").fetchone()[0]
 
-    def test_timestamp_only_rebuild_writes_nothing_even_without_state(self):
+    def test_timestamp_only_rebuild_writes_no_data_rows_even_without_state(self):
         # A FULL export of identical content with a new rebuild time: the old
         # exporter re-keyed facts and valuation runs by generated_at and
         # restamped latest_run_id everywhere, so this re-wrote every row.
+        # Now the only writes are the import's own bookkeeping: its
+        # pipeline_runs row and the state row that names it.
+        before = snapshot(self.db, DATA_TABLES)
         _report, seed = self.fx.export(base_core("2026-09-24T17:45:00Z"), full=True)
-        self.assertEqual(apply(self.db, seed), 0)
+        self.assertEqual(apply(self.db, seed), 2)
+        self.assertEqual(snapshot(self.db, DATA_TABLES), before)
 
     def test_timestamp_only_rebuild_skips_the_seed(self):
         report, seed = self.fx.export(base_core("2026-09-24T17:45:00Z"), self.db)
@@ -186,9 +203,7 @@ class IncrementalSeedTests(unittest.TestCase):
         self.assertEqual(report["statement_count"], 0)
         self.assertEqual(statements(seed), [])
 
-    def test_identities_carry_no_timestamp(self):
-        run_id, = self.db.execute("SELECT run_id FROM pipeline_runs").fetchone()
-        self.assertNotIn("2026-09-24", run_id)
+    def test_data_identities_carry_no_timestamp(self):
         for table, column in (("facts", "fact_id"), ("valuation_runs", "valuation_run_id")):
             before = {row[0] for row in self.db.execute(f"SELECT {column} FROM {table}")}
             _report, seed = self.fx.export(base_core("2031-01-01T00:00:00Z"), full=True)
@@ -196,6 +211,42 @@ class IncrementalSeedTests(unittest.TestCase):
             apply(fresh, seed)
             after = {row[0] for row in fresh.execute(f"SELECT {column} FROM {table}")}
             self.assertEqual(before, after, table)
+
+    def test_a_revert_records_a_new_latest_pipeline_run(self):
+        # /api/v1/summary shows the newest pipeline_runs row by generated_at.
+        # With a content-only run id, reverting to earlier content hit
+        # ON CONFLICT DO NOTHING and "latest" kept naming the reverted-from run.
+        changed = base_core("2026-09-24T12:00:00Z")
+        changed["tickers"][1]["valuation_decision"]["price_per_share"] = 51.5
+        _report, seed = self.fx.export(changed, self.db)
+        apply(self.db, seed)
+        _report, seed = self.fx.export(base_core("2026-09-24T18:00:00Z"), self.db)  # the revert
+        apply(self.db, seed)
+        latest_run, latest_at = self.db.execute(
+            "SELECT run_id, generated_at FROM pipeline_runs ORDER BY generated_at DESC LIMIT 1"
+        ).fetchone()
+        self.assertEqual(latest_at, "2026-09-24T18:00:00Z")
+        self.assertEqual(
+            self.db.execute("SELECT latest_run_id FROM valuation_current WHERE ticker='BBB'").fetchone()[0],
+            latest_run,
+        )
+        self.assertEqual(self.count("pipeline_runs"), 3)
+
+    def test_ops_state_is_written_last(self):
+        # The seed state vouches for everything before it in the import. Written
+        # any earlier, a partial import could record hashes for rows it never
+        # wrote, and the next export would skip them for good.
+        changed = base_core("2026-09-24T12:00:00Z")
+        changed["tickers"][0]["valuation_decision"]["price_per_share"] = 44.0
+        cases = [self.fx.export(changed, self.db)[1], self.fx.export(changed, full=True)[1]]
+        for seed in cases:
+            sql = statements(seed)
+            touches_state = ["ops_state" in line for line in sql]
+            self.assertIn(True, touches_state)
+            first = touches_state.index(True)
+            self.assertGreater(first, 1)
+            self.assertTrue(all(touches_state[first:]), "a statement after the state writes")
+            self.assertFalse(any(touches_state[:first]))
 
     def test_real_change_writes_only_the_changed_rows(self):
         core = base_core("2026-09-24T18:00:00Z")

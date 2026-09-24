@@ -13,9 +13,12 @@ restamped ``latest_run_id`` on every security, valuation and task. That was
 
 The seed is now incremental:
 
-* Row identities are content-stable. ``run_id`` is derived from the content
-  hash; ``valuation_run_id`` from the ticker and model hash; ``fact_id`` from
-  the ticker, component, node and source. No identity contains a timestamp.
+* Data identities are content-stable: ``valuation_run_id`` comes from the
+  ticker and model hash, ``fact_id`` from the ticker, component, node and
+  source. No data identity contains a timestamp. The one exception is the
+  pipeline_runs row an APPLIED seed records (``dashboard:<generated_at>:<content
+  hash>``): it names an import, so a revert to earlier content still records
+  a new latest run. A skipped seed records nothing.
 * Change detection compares content. ``updated_at``, ``imported_at``,
   ``latest_run_id`` and ``run_id`` are bookkeeping: they are written when a
   row's content changes but never cause a write on their own.
@@ -727,7 +730,11 @@ def render(
     """SQL statements for everything that changed since ``previous``."""
     imported_at = imported_at or datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
     per_ticker, globals_hash, content_sha256 = content_hashes(model)
-    run_id = f"dashboard:{content_sha256[:16]}"
+    # Names this import, not the content: reverting to earlier content must
+    # still record a NEW latest pipeline run (/api/v1/summary reads the
+    # newest by generated_at). Data rows only take it when their content
+    # changes, and the skip decision below uses content_sha256, not this.
+    run_id = f"dashboard:{model['generated_at']}:{content_sha256[:16]}"
     previous = None if full else previous
     info = {
         "run_id": run_id,
@@ -756,8 +763,8 @@ def render(
         "globals_changed": globals_changed,
     })
 
-    # run_id is derived from the content hash, so an existing row describes
-    # identical content: DO NOTHING. (A DO UPDATE branch would also plan
+    # A conflict means this exact import (same rebuild, same content) was
+    # already recorded: DO NOTHING. (A DO UPDATE branch would also plan
     # foreign-key scans of every table that references pipeline_runs.)
     pipeline_columns = [
         "run_id", "generated_at", "source_sha256", "status", "ticker_count", "summary_json", "imported_at",
