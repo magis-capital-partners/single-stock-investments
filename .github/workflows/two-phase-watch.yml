@@ -3,7 +3,7 @@ name: Two-phase cooling watch
 # Weekly INV Accelsius monitor. Event PDF indexes in Mar/Aug/Oct via --auto-events.
 # Does not scrape LinkedIn. Does not edit valuation.json.
 #
-# Schedule only. `workflow_dispatch` with inputs is what
+# No workflow_dispatch. `workflow_dispatch` with inputs is what
 # test_llm_workflow_governance.test_actions_surface_has_no_manual_run_choices
 # forbids -- the manual run *choices* are the thing it guards. This file was
 # merged in #907 two days after that test landed, so it has been failing
@@ -19,6 +19,11 @@ on:
     # Sunday 17:23 UTC, after World Model (16:00). Off :00/:15/:30, the
     # minutes every other scheduled workflow queues on.
     - cron: "23 17 * * 0"
+  # The on-demand trigger, and the one a supervisor healer can fire, without
+  # the manual run surface the governance test forbids (as research-watchdog):
+  #   gh api --method POST repos/:owner/:repo/dispatches -f event_type=two-phase-watch-run
+  repository_dispatch:
+    types: [two-phase-watch-run]
 
 permissions:
   contents: write

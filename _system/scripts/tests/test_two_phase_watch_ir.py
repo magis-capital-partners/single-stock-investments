@@ -155,3 +155,10 @@ def test_commit_step_survives_a_week_without_a_pending_review(tmp_path):
 def test_schedule_avoids_the_congested_minutes():
     minutes = re.findall(r'cron:\s*"(\S+)\s', WORKFLOW.read_text(encoding="utf-8"))
     assert minutes and all(int(minute) not in {0, 15, 30} for minute in minutes)
+
+
+def test_the_lane_can_be_woken_without_a_manual_run_surface():
+    # Proving a fix, or healing a stale lane, should not wait for Sunday.
+    text = WORKFLOW.read_text(encoding="utf-8")
+    assert re.search(r"(?m)^  repository_dispatch:\n    types: \[two-phase-watch-run\]$", text)
+    assert not re.search(r"(?m)^\s{2}workflow_dispatch:\s*$", text)
