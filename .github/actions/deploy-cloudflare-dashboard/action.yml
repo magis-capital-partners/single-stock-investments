@@ -17,10 +17,35 @@ inputs:
     description: Public edge Worker used only for signed market-risk ingestion
     required: false
     default: single-stock-market-risk-ingest
+  full-resync:
+    description: Re-emit every dashboard seed row (ignores the persisted per-ticker hashes)
+    required: false
+    default: "false"
 outputs:
   page_url:
     description: URL reported by the Cloudflare Pages deployment
     value: ${{ steps.deploy.outputs.page_url }}
+  d1_deferred:
+    description: true when a D1 stage was deferred by the daily budget guard or the quota
+    value: ${{ steps.d1.outputs.d1_deferred }}
+  d1_deferred_stages:
+    description: Comma-separated names of the deferred D1 stages
+    value: ${{ steps.d1.outputs.d1_deferred_stages }}
+  d1_deferred_reason:
+    description: Why the D1 stages were deferred
+    value: ${{ steps.d1.outputs.d1_deferred_reason }}
+  d1_utc_date:
+    description: UTC date the D1 stage ran (the quota day)
+    value: ${{ steps.d1.outputs.d1_utc_date }}
+  d1_pruned_today:
+    description: true when today's D1 retention pass has completed
+    value: ${{ steps.d1.outputs.d1_pruned_today }}
+  d1_rows_read:
+    description: Rows read by this deploy's D1 stages
+    value: ${{ steps.d1.outputs.d1_rows_read }}
+  d1_rows_written:
+    description: Rows written by this deploy's D1 stages
+    value: ${{ steps.d1.outputs.d1_rows_written }}
 runs:
   using: composite
   steps:
@@ -34,7 +59,7 @@ runs:
         set -euo pipefail
         npm --prefix dashboard/cloudflare run check
         python -m pip install --disable-pip-version-check pytest jsonschema
-        python -m pytest -q _system/scripts/test_build_cloudflare_pages_site.py _system/trading/portfolio_hub/tests
+        python -m pytest -q _system/scripts/test_build_cloudflare_pages_site.py _system/trading/portfolio_hub/tests \n          _system/scripts/tests/test_dashboard_d1_seed_budget.py \n          _system/scripts/tests/test_prune_cloudflare_d1.py \n          _system/scripts/tests/test_deploy_d1_sync.py
 
     - name: Build Cloudflare-safe dashboard artifact
       shell: bash
@@ -156,96 +181,25 @@ runs:
           }' > _cf_project/wrangler.market-risk.jsonc
         echo "database_id=$DATABASE_ID" >> "$GITHUB_OUTPUT"
 
+    # Budget guard, migrations, then the three write stages -- each gated so a
+    # deploy with nothing new writes nothing: the sleeve book only when its SQL
+    # changed, retention once per UTC day, the dashboard seed incrementally
+    # (skipped when its content hash is unchanged). See d1_sync.py.
+    #
+    # A stage stopped by the daily budget guard (>70k rows written or >3.5M
+    # read today) or by the free-tier quota (code 7500) is DEFERRED: this step
+    # still succeeds so the static Pages deploy below ships, and the workflow
+    # fails the job afterwards with a Slack alert. Any other D1 failure exits
+    # 1 here. Rows read/written per stage go to the job summary.
     - name: Apply D1 schema and synchronize current dashboard state
+      id: d1
       shell: bash
       env:
         DATABASE_NAME: ${{ inputs.database-name }}
+        FULL_RESYNC: ${{ inputs.full-resync }}
       run: |
         set -euo pipefail
-        WRANGLER="dashboard/cloudflare/node_modules/.bin/wrangler"
-        D1_LOG="$RUNNER_TEMP/single-stock-d1-sync.log"
-        : >"$D1_LOG"
-        D1_FAILED=0
-        D1_DEFERRED=0
-        STAGE_STATUS=0
-
-        # Every stage runs, whatever the stage before it did.
-        #
-        # This used to be a single `set -e` subshell, so a failed `migrations
-        # apply` skipped retention entirely -- and retention is exactly the thing
-        # that makes the next attempt cheap enough to succeed. Between 2026-09-04
-        # and 2026-09-06 that cost three days: 0014-0016 were re-listed as pending
-        # on every deploy, prune_cloudflare_d1.py never ran once, and the tables
-        # it bounds grew the whole time.
-        #
-        # Order still matters -- migrations first, so retention can seek on the
-        # received_at / as_of indexes 0016 adds instead of full-scanning
-        # (0016_bound_remaining_row_scans.sql) -- but an order is not a
-        # dependency. The seed pair is the only real one: a failed export must
-        # not re-apply a stale seed file.
-        #
-        # A stage stopped by the daily free-tier quota is deferred, not failed:
-        # that is weather, the next post-reset deploy retries it, and the static
-        # Pages deploy below still has to ship. Anything else is a real fault and
-        # stays red. Classification is per stage, so a quota warning in one
-        # cannot mask a genuine bug in another.
-        run_stage() {
-          local label="$1"
-          shift
-          local stage_log
-          stage_log="$(mktemp)"
-          printf '\n=== %s ===\n' "$label" | tee -a "$D1_LOG"
-          set +e
-          "$@" 2>&1 | tee -a "$D1_LOG" "$stage_log"
-          STAGE_STATUS=${PIPESTATUS[0]}
-          set -e
-          if [ "$STAGE_STATUS" -ne 0 ]; then
-            if grep -Eqi "exceeded D1's free tier daily row (read|write) limit" "$stage_log"; then
-              D1_DEFERRED=1
-              echo "::warning::D1 stage deferred, free daily row quota is exhausted: ${label}."
-            else
-              D1_FAILED=1
-              echo "::error::D1 stage failed with exit ${STAGE_STATUS}: ${label}."
-            fi
-          fi
-          rm -f "$stage_log"
-        }
-
-        # Raw portfolio payloads stay immutable in R2 regardless of any of this.
-        run_stage "Apply pending migrations" \
-          "$WRANGLER" d1 migrations apply DB --remote \
-          --config _cf_project/wrangler.jsonc
-        # The Drew tab reads D1, not the static JSON (that file is kept off the
-        # public site). Publish the committed sleeve book in the same deploy
-        # that ships the page, or the push looks green and the tab stays empty.
-        python _system/scripts/export_sleeve_d1.py --out "$RUNNER_TEMP/sleeve_book.sql"
-        run_stage "Publish Drew sleeve book" \
-          "$WRANGLER" d1 execute DB --remote --yes \
-          --file "$RUNNER_TEMP/sleeve_book.sql" \
-          --config _cf_project/wrangler.jsonc
-        run_stage "Bound history (retention)" \
-          python _system/scripts/prune_cloudflare_d1.py \
-          --wrangler "$WRANGLER" \
-          --database DB \
-          --config _cf_project/wrangler.jsonc
-        run_stage "Export dashboard seed" \
-          python _system/scripts/export_dashboard_d1_seed.py
-        if [ "$STAGE_STATUS" -eq 0 ]; then
-          run_stage "Apply dashboard seed" \
-            "$WRANGLER" d1 execute DB --remote --yes \
-            --file dashboard/cloudflare/generated/dashboard_seed.sql \
-            --config _cf_project/wrangler.jsonc
-        else
-          echo "::warning::Seed export failed; the previous seed file is not re-applied."
-        fi
-
-        if [ "$D1_FAILED" -ne 0 ]; then
-          echo "A D1 stage failed for a reason other than the daily row quota." >&2
-          exit 1
-        fi
-        if [ "$D1_DEFERRED" -ne 0 ]; then
-          echo "::warning::D1 synchronization partially deferred because the free daily row quota is exhausted. Static Pages and optimized API code still deploy; the next post-reset deployment retries the deferred stages."
-        fi
+        python .github/actions/deploy-cloudflare-dashboard/d1_sync.py           --wrangler dashboard/cloudflare/node_modules/.bin/wrangler           --config _cf_project/wrangler.jsonc           --database DB           --workdir "$RUNNER_TEMP/d1-sync"           --full-resync "$FULL_RESYNC"
 
     - name: Configure private Pages secrets and deploy signed market-risk ingest Worker
       shell: bash
