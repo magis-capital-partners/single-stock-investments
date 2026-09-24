@@ -434,6 +434,43 @@ class PlantedViolationTests(unittest.TestCase):
         self.assertIn("revenue-m", results["E2"].violations[0])
         self.assertEqual(exit_code, 1)
 
+    def add_outcome(self, metric, verdict, resolved_on):
+        path = self.root / "_system" / "research" / "falsifier_outcomes.jsonl"
+        path.write_text(path.read_text(encoding="utf-8") + json.dumps(
+            {"ticker": "TST", "component_id": "core", "metric": metric,
+             "verdict": verdict, "resolved_on": resolved_on,
+             "method_id": "owner_earnings_reinvestment_dcf",
+             "power_zone": "quality_reinvestment"}) + "\n", encoding="utf-8")
+
+    def test_e2_unresolvable_written_the_day_after_the_deadline_is_on_time(self):
+        # resolve_falsifiers.py can only declare `unresolvable` once the
+        # deadline has passed, so its verdict is dated deadline + 1. E2 used
+        # to call that "resolved late" permanently: DOC would have tripped on
+        # 2026-10-15 and DG on 2026-10-28, wedging the falsifier lane again.
+        plant_spec(self.root, "late_m", "2026-07-01", rationale="deadline 2026-07-15")
+        self.add_outcome("late_m", "unresolvable", "2026-07-16")
+        results, _ = run_invariants(self.root)
+        self.assertEqual(results["E2"].violations, [])
+
+    def test_e2_no_outcome_is_not_flagged_before_the_resolver_can_run(self):
+        plant_spec(self.root, "late_m", "2026-07-01", rationale="deadline 2026-07-15")
+        results, _ = run_invariants(self.root, today=date(2026, 7, 16))
+        self.assertEqual(results["E2"].violations, [])
+        results, _ = run_invariants(self.root, today=date(2026, 7, 17))
+        self.assertEqual(len(results["E2"].violations), 1)
+        self.assertIn("no outcome by 2026-07-15", results["E2"].violations[0])
+
+    def test_e2_genuinely_late_outcomes_are_still_flagged(self):
+        plant_spec(self.root, "late_m", "2026-07-01", rationale="deadline 2026-07-15")
+        plant_spec(self.root, "later_m", "2026-07-01", rationale="deadline 2026-07-15")
+        self.add_outcome("late_m", "hit", "2026-07-16")            # a hit gets no extra day
+        self.add_outcome("later_m", "unresolvable", "2026-07-17")  # two days late
+        results, _ = run_invariants(self.root)
+        joined = " | ".join(results["E2"].violations)
+        self.assertEqual(len(results["E2"].violations), 2, joined)
+        self.assertIn("late-m: due 2026-07-01, resolved late", joined)
+        self.assertIn("later-m: due 2026-07-01, resolved late", joined)
+
     def test_e2_typed_without_due_fires(self):
         plant_spec(self.root, "dueless_m", None, rationale="planted dueless")
         results, exit_code = run_invariants(self.root)

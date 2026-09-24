@@ -337,13 +337,20 @@ def inv_e2(conn, root, today) -> Result:
         deadline = (explicit_deadline or
                     (due_date + timedelta(days=E2_GRACE_DAYS))).isoformat()
         outcome = conn.execute(
-            "SELECT n.as_of FROM edges e JOIN nodes n ON n.id=e.dst"
+            "SELECT n.as_of, n.status FROM edges e JOIN nodes n ON n.id=e.dst"
             " WHERE e.src=? AND e.type='RESOLVED_BY' LIMIT 1",
             (row["id"],)).fetchone()
+        # resolve_falsifiers.py declares `unresolvable` only once the deadline
+        # has passed (evidence dated on the deadline still counts), so that
+        # terminal verdict is on time on the day after the deadline. Before
+        # this, every unresolvable verdict counted as "resolved late" forever
+        # and would have wedged E2 (and every PR) from its deadline + 1.
+        terminal_by = (date.fromisoformat(deadline) + timedelta(days=1)).isoformat()
         if outcome is None:
-            if today.isoformat() > deadline:
+            if today.isoformat() > terminal_by:
                 violations.append(f"{fid}: due {due}, no outcome by {deadline}")
-        elif outcome["as_of"] and str(outcome["as_of"])[:10] > deadline:
+        elif outcome["as_of"] and str(outcome["as_of"])[:10] > (
+                terminal_by if outcome["status"] == "unresolvable" else deadline):
             violations.append(f"{fid}: due {due}, resolved late"
                               f" ({outcome['as_of']})")
     return Result("E2", len(violations), violations,
