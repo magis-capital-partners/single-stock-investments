@@ -676,7 +676,13 @@ jobs:
       - name: Discover, refresh, and resolve warrants
         # SEC and delayed-market failures preserve the last-known-good files;
         # discovery_state and the P6 feed invariant make repeated failure loud.
+        # The expiry sweep runs first and only here (single writer of registry
+        # amendments): it appends an `expired` version for any series whose
+        # latest terms have passed their contractual expiry, so the strict
+        # check below cannot be failed by the calendar alone (BKSY.W,
+        # 2026-09-10..22).
         run: |
+          python _system/scripts/sweep_warrant_expiry.py
           python _system/scripts/refresh_warrant_universe.py \
             --discover \
             --discover-days 14 \

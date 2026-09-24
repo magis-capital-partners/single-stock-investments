@@ -3,10 +3,19 @@
 from __future__ import annotations
 
 import copy
+import io
+import json
+import sys
+import tempfile
 import unittest
+from contextlib import redirect_stdout
 from datetime import date, timedelta
+from pathlib import Path
+from unittest import mock
 
-from warrant_common import gate_state, quote_age_days, validate_registry
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+
+from warrant_common import gate_state, load_jsonl, quote_age_days, validate_registry
 from resolve_warrant_outcomes import corporate_action_terminal
 
 
@@ -103,6 +112,91 @@ class WarrantPipelineTests(unittest.TestCase):
         fresh_fetch = date.today().isoformat() + "T20:51:54Z"
         age = quote_age_days({"quote_date": old_print, "fetched_at": fresh_fetch, "close": 0.002})
         self.assertEqual(age, 0)
+
+
+class WarrantExpirySweepTests(unittest.TestCase):
+    """BKSY.W expired 2026-09-09 and stayed "active" until a human amended it."""
+
+    def setUp(self) -> None:
+        self._tmp = tempfile.TemporaryDirectory()
+        base = Path(self._tmp.name)
+        self.registry = base / "warrant_registry.jsonl"
+        self.amendments = base / "warrant_registry_amendments.jsonl"
+
+    def tearDown(self) -> None:
+        self._tmp.cleanup()
+
+    def _write(self, path: Path, rows: list[dict]) -> None:
+        path.write_text("".join(json.dumps(row) + "\n" for row in rows), encoding="utf-8")
+
+    def _sweep(self, as_of: date) -> list[dict]:
+        import sweep_warrant_expiry
+
+        return sweep_warrant_expiry.sweep(
+            as_of=as_of, registry_path=self.registry, amendments_path=self.amendments
+        )
+
+    def _all_rows(self) -> list[dict]:
+        return load_jsonl(self.registry) + load_jsonl(self.amendments)
+
+    def test_sweep_retires_a_series_past_its_expiry(self) -> None:
+        bksy = record()
+        bksy["terms"]["expiry"] = "2026-09-09"
+        self._write(self.registry, [bksy])
+        self.assertTrue(any("past contractual expiry" in e for e in validate_registry(self._all_rows())))
+
+        added = self._sweep(date(2026, 9, 10))
+
+        self.assertEqual(len(added), 1)
+        self.assertEqual(added[0]["version"], 2)
+        self.assertEqual(added[0]["supersedes_version"], 1)
+        self.assertEqual(added[0]["lifecycle"], "expired")
+        self.assertEqual(added[0]["terms"], bksy["terms"])  # contract terms untouched
+        self.assertEqual(validate_registry(self._all_rows()), [])
+        self.assertEqual(self._sweep(date(2026, 9, 11)), [])  # idempotent
+
+    def test_sweep_honours_a_recorded_extension(self) -> None:
+        original = record()
+        original["terms"]["expiry"] = "2026-09-09"
+        extended = copy.deepcopy(original)
+        extended["version"] = 2
+        extended["terms"]["expiry"] = "2027-09-09"
+        self._write(self.registry, [original])
+        self._write(self.amendments, [extended])
+        self.assertEqual(self._sweep(date(2026, 9, 10)), [])
+
+    def test_sweep_leaves_live_and_terminal_series_alone(self) -> None:
+        live = record()  # expiry 2030
+        on_the_day = record()
+        on_the_day["warrant_id"] = "0000000002:test:public"
+        on_the_day["terms"]["expiry"] = "2026-09-10"
+        redeemed = record()
+        redeemed["warrant_id"] = "0000000003:test:public"
+        redeemed["lifecycle"] = "redeemed"
+        redeemed["terms"]["expiry"] = "2022-01-21"
+        self._write(self.registry, [live, on_the_day, redeemed])
+        self.assertEqual(self._sweep(date(2026, 9, 10)), [])
+        self.assertFalse(self.amendments.exists())
+
+
+class WarrantCheckWarnOnlyTests(unittest.TestCase):
+    ISSUES = (["row 4: active security is past contractual expiry"], [])
+
+    def test_warn_only_reports_and_exits_zero(self) -> None:
+        import check_warrant_universe
+
+        with mock.patch.object(check_warrant_universe, "check", return_value=self.ISSUES), \
+                redirect_stdout(io.StringIO()) as out:
+            self.assertEqual(check_warrant_universe.main(["--warn-only"]), 0)
+        self.assertIn("::warning", out.getvalue())
+        self.assertIn("past contractual expiry", out.getvalue())
+
+    def test_default_mode_still_fails(self) -> None:
+        import check_warrant_universe
+
+        with mock.patch.object(check_warrant_universe, "check", return_value=self.ISSUES), \
+                redirect_stdout(io.StringIO()):
+            self.assertEqual(check_warrant_universe.main([]), 1)
 
 
 if __name__ == "__main__":

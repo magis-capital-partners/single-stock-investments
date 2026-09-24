@@ -71,13 +71,28 @@ def check(*, strict: bool) -> tuple[list[str], list[str]]:
     return errors, warnings
 
 
-def main() -> int:
+def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--strict", action="store_true")
-    args = parser.parse_args()
+    parser.add_argument(
+        "--warn-only",
+        action="store_true",
+        help=(
+            "Report every issue as a warning and exit 0. For lanes that merely "
+            "rebuild the warrant artifact (every ci_rebuild_profile dashboard "
+            "build): the warrant lane itself runs --strict and stays red. One "
+            "expired warrant (BKSY.W, 2026-09-10..22) must never fail every lane."
+        ),
+    )
+    args = parser.parse_args(argv)
     errors, warnings = check(strict=args.strict)
     for warning in warnings:
         print(f"WARN: {warning}")
+    if errors and args.warn_only:
+        print(f"check_warrant_universe: {len(errors)} issue(s) (warn-only; the warrant lane enforces)")
+        for error in errors:
+            print(f"::warning title=warrant registry::{error}")
+        return 0
     if errors:
         print(f"check_warrant_universe: {len(errors)} issue(s)")
         for error in errors:

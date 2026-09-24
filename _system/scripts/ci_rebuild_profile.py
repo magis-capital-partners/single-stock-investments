@@ -179,7 +179,12 @@ def expand_steps(steps: list[list[str]]) -> list[list[str]]:
             )
             out.append(["_system/scripts/resolve_warrant_outcomes.py"])
             out.append(["_system/scripts/build_warrant_dashboard.py"])
-            out.append(["_system/scripts/check_warrant_universe.py"])
+            # Warn-only here: this lane rebuilds the warrant artifact, it does
+            # not own the registry. The warrant-discover job sweeps expiries
+            # and runs the strict check. A blocking check here let one expired
+            # series (BKSY.W) fail intake-full, drive and world-model for 13
+            # days (2026-09-10..22).
+            out.append(["_system/scripts/check_warrant_universe.py", "--warn-only"])
         out.append(step)
     return out
 
