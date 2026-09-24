@@ -299,9 +299,17 @@ _VALUATION_PRESERVE_KEYS = (
 
 
 def load_prior_dashboard_rows() -> dict[str, dict]:
-    prior = _load_json(OUTPUT) or {}
-    rows = prior.get("tickers") or []
-    return {str(r.get("ticker")): r for r in rows if r.get("ticker")}
+    """Prior rows for the sparse infra restore -- the SAME source the guards use.
+
+    This used to read only the gitignored dashboard_data.json monolith, which
+    never exists in a fresh CI checkout. The restore in build() therefore saw
+    no prior and never ran, while main()'s guards (fed by the shard-aware
+    load_prior_rows) still saw a full prior -- so every sparse CI rebuild
+    tripped "total_pdfs 8763->88 (floor 100)" (ls-algo intake, e.g. run
+    35971686547, every real run since mid-August). One loader for both keeps
+    the restore and the guard judging against the same rows.
+    """
+    return load_prior_rows()
 
 
 def merge_sparse_payload(current: dict, prior: dict) -> dict:
@@ -3143,7 +3151,7 @@ def activist_summary_for_ticker(ticker: str) -> dict:
     }
 
 
-def build() -> dict:
+def build(prior_by_ticker: dict[str, dict] | None = None) -> dict:
     reg = load_registry()
     holdings = parse_holdings()
     portfolio_class = load_classification()
@@ -3164,7 +3172,8 @@ def build() -> dict:
         )
         for t in tickers
     ]
-    prior_by_ticker = load_prior_dashboard_rows()
+    if prior_by_ticker is None:
+        prior_by_ticker = load_prior_dashboard_rows()
     preserve_sparse_infra = (
         workspace_is_sparse(tickers)
         or os.environ.get("DASHBOARD_PRESERVE_DOCUMENT_REGISTRY") == "1"
@@ -3579,7 +3588,8 @@ def main() -> None:
         memory_doc["learning_loop"] = learning_loop
         RESEARCH_MEMORY_PATH.write_text(
             json.dumps(memory_doc, separators=(",", ":")), encoding="utf-8")
-    payload = build()
+    # Restore and guards must judge against the same prior (shard-aware).
+    payload = build(prior_by_ticker)
     if short_alpha:
         payload["short_alpha_ref"] = {
             "path": "dashboard/data/short_alpha.json",
