@@ -1,6 +1,19 @@
 #!/usr/bin/env python3
 """Lint deep dives for tickers touched in a PR diff.
 
+Two rules keep a PR from being blocked by what it did not change:
+
+* The deep-dive and adversarial consistency lints run only when the PR touches
+  one of the surfaces they compare: a deep dive, an adversarial review, or
+  valuation.json. A PR that only adds a falsifier draft or a review receipt no
+  longer inherits a deep dive whose stated return drifted from a valuation the
+  daily sync rewrote (PR #1019: "Returns statement (synthesis) 3.11% vs
+  valuation.json base 2.64%" on a deep dive it never opened).
+* A lint that fails is re-run on the base branch's copy of the ticker. If every
+  failure line is already there, the failure is labelled INHERITED and does not
+  block; any new line blocks. When the base copy cannot be built, the failure
+  blocks (fail closed).
+
 Usage:
   python _system/scripts/lint_pr_research.py
   python _system/scripts/lint_pr_research.py --base origin/main
@@ -9,10 +22,14 @@ Usage:
 from __future__ import annotations
 
 import argparse
+import io
 import json
 import re
+import shutil
 import subprocess
 import sys
+import tarfile
+import tempfile
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -23,6 +40,19 @@ TICKER_RE = re.compile(r"^([^/]+)/research/")
 MECHANICAL_EVIDENCE = re.compile(r"^[^/]+/research/evidence/thematic_context_\d{4}-\d{2}-\d{2}\.md$")
 MECHANICAL_INSIDER = re.compile(r"^[^/]+/research/evidence/insider_signal_\d{4}-\d{2}-\d{2}\.md$")
 MECHANICAL_MI = re.compile(r"^[^/]+/research/market_inputs\.json$")
+# What lint_deep_dive.py and lint_adversarial.py --consistency-only compare.
+CONSISTENCY_SURFACE = re.compile(
+    r"^(?P<ticker>[^/]+)/research/(?:deep_dive_[^/]*\.md|adversarial_[^/]*\.md|valuation\.json)$"
+)
+# Output lines that describe a run rather than a finding.
+INFORMATIONAL = ("WARN", "OK:", "OK ", "SKIP", "INFO", "---", "No deep dives found")
+# What the lint scripts read, for building the base branch's copy of a ticker.
+BASE_SHARED_PATHS = (
+    "_system/scripts",
+    "_system/portfolio",
+    "_system/reference/market-data/themes/manifest.json",
+    "_system/reference/market-data/insider/manifest.json",
+)
 
 sys.path.insert(0, str(SCRIPTS))
 from marvin_pipeline_common import has_evidence_refresh_config  # noqa: E402
@@ -187,6 +217,105 @@ def research_diff_kind(ticker: str, paths: list[str], base: str) -> str:
     return "mixed"
 
 
+def touched_consistency_surfaces(ticker: str, paths: list[str]) -> list[str]:
+    """The deep dives, adversarial reviews and valuation.json this PR changed for ``ticker``."""
+    return sorted(
+        path for path in paths
+        if (match := CONSISTENCY_SURFACE.match(path)) and match.group("ticker") == ticker
+    )
+
+
+def failure_lines(output: str) -> set[str]:
+    """The finding lines of a lint run, normalised; run-description lines dropped."""
+    lines = set()
+    for raw in output.splitlines():
+        line = raw.strip().replace("\\", "/")
+        if line and not line.startswith(INFORMATIONAL):
+            lines.add(line)
+    return lines
+
+
+class BaseTrees:
+    """The base branch's copy of what the lint scripts read, one tree per ticker.
+
+    Built with ``git archive``, so it needs no worktree and leaves the checkout
+    alone. Paths absent on the base (a ticker new in this PR) are skipped.
+    """
+
+    def __init__(self, base: str) -> None:
+        self.base = base
+        self._trees: dict[str, Path | None] = {}
+
+    def _exists(self, path: str) -> bool:
+        proc = subprocess.run(
+            ["git", "cat-file", "-e", f"{self.base}:{path}"], cwd=ROOT, capture_output=True
+        )
+        return proc.returncode == 0
+
+    def tree(self, ticker: str) -> Path | None:
+        if ticker not in self._trees:
+            self._trees[ticker] = self._build(ticker)
+        return self._trees[ticker]
+
+    def _build(self, ticker: str) -> Path | None:
+        wanted = [*BASE_SHARED_PATHS, f"{ticker}/research", f"{ticker}/third-party-analyses"]
+        present = [path for path in wanted if self._exists(path)]
+        if f"{ticker}/research" not in present or "_system/scripts" not in present:
+            return None
+        proc = subprocess.run(
+            ["git", "archive", "--format=tar", self.base, "--", *present],
+            cwd=ROOT, capture_output=True,
+        )
+        if proc.returncode != 0:
+            return None
+        dest = Path(tempfile.mkdtemp(prefix="lint-base-"))
+        with tarfile.open(fileobj=io.BytesIO(proc.stdout)) as archive:
+            archive.extractall(dest, filter="data")
+        return dest
+
+    def cleanup(self) -> None:
+        for tree in self._trees.values():
+            if tree is not None:
+                shutil.rmtree(tree, ignore_errors=True)
+
+
+def _run_script(root: Path, script: str, args: list[str]) -> subprocess.CompletedProcess[str]:
+    return subprocess.run(
+        [PY, str(root / "_system" / "scripts" / script), *args],
+        cwd=root, capture_output=True, text=True, encoding="utf-8", errors="replace",
+    )
+
+
+def run_lint(ticker: str, script: str, args: list[str], base_trees: BaseTrees) -> str:
+    """Run one lint; return "ok", "inherited" or "failed"."""
+    head = _run_script(ROOT, script, args)
+    output = (head.stdout or "") + (head.stderr or "")
+    if output:
+        print(output, end="" if output.endswith("\n") else "\n")
+    if head.returncode == 0:
+        return "ok"
+    found = failure_lines(output)
+    tree = base_trees.tree(ticker)
+    if tree is None or not found:
+        return "failed"
+    base = _run_script(tree, script, args)
+    already = failure_lines((base.stdout or "") + (base.stderr or ""))
+    new = sorted(found - already)
+    if base.returncode != 0 and not new:
+        print(
+            f"INHERITED {ticker} {script}: all {len(found)} failure line(s) are already on "
+            f"{base_trees.base}; this PR did not introduce them."
+        )
+        print(
+            f"::warning title=Inherited research lint ({ticker})::{script} fails identically on "
+            f"{base_trees.base}; not blocking this PR."
+        )
+        return "inherited"
+    for line in new:
+        print(f"NEW {ticker} {script}: {line}")
+    return "failed"
+
+
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--base", default="origin/main", help="Git base ref for diff")
@@ -207,12 +336,30 @@ def main() -> int:
         print("SKIP: no ticker research paths in diff")
         return 0
 
+    base_trees = BaseTrees(args.base)
+    try:
+        return _lint_tickers(tickers, paths, args.base, base_trees)
+    finally:
+        base_trees.cleanup()
+
+
+def _lint_tickers(tickers: list[str], paths: list[str], base: str, base_trees: BaseTrees) -> int:
     failed = 0
+    inherited = 0
+
+    def lint(ticker: str, script: str, args: list[str]) -> None:
+        nonlocal failed, inherited
+        outcome = run_lint(ticker, script, args, base_trees)
+        if outcome == "failed":
+            failed += 1
+        elif outcome == "inherited":
+            inherited += 1
+
     for ticker in tickers:
         dive = ROOT / ticker / "research"
         if not dive.is_dir():
             continue
-        kind = research_diff_kind(ticker, paths, args.base)
+        kind = research_diff_kind(ticker, paths, base)
         print(f"\n=== lint {ticker} ({kind}) ===")
         if kind == "derived_only":
             lenses_path = dive / "lenses.json"
@@ -252,28 +399,20 @@ def main() -> int:
                 except json.JSONDecodeError:
                     val = {}
             if val.get("context_overlay"):
-                r = subprocess.run(
-                    [PY, str(SCRIPTS / "lint_context_overlay.py"), ticker],
-                    cwd=ROOT,
-                )
-                if r.returncode != 0:
-                    failed += 1
+                lint(ticker, "lint_context_overlay.py", [ticker])
             if val.get("insider_signal"):
-                r = subprocess.run(
-                    [PY, str(SCRIPTS / "lint_insider_signal.py"), ticker],
-                    cwd=ROOT,
-                )
-                if r.returncode != 0:
-                    failed += 1
+                lint(ticker, "lint_insider_signal.py", [ticker])
             continue
-        for script, extra in (
-            ("lint_deep_dive.py", ["--milly"]),
-            ("lint_adversarial.py", ["--consistency-only"]),
-        ):
-            cmd = [PY, str(SCRIPTS / script), ticker, *extra]
-            r = subprocess.run(cmd, cwd=ROOT)
-            if r.returncode != 0:
-                failed += 1
+        surfaces = touched_consistency_surfaces(ticker, paths)
+        if surfaces:
+            print(f"{ticker}: consistency lint for {', '.join(surfaces)}")
+            lint(ticker, "lint_deep_dive.py", [ticker, "--milly"])
+            lint(ticker, "lint_adversarial.py", [ticker, "--consistency-only"])
+        else:
+            print(
+                f"SKIP {ticker}: deep-dive consistency lint; this PR touches no deep dive, "
+                "adversarial review or valuation.json"
+            )
         val_path = ROOT / ticker / "research" / "valuation.json"
         if val_path.exists():
             try:
@@ -281,17 +420,13 @@ def main() -> int:
             except json.JSONDecodeError:
                 val = {}
             if has_evidence_refresh_config(val) or val.get("valuation_mode") == "optionality":
-                r = subprocess.run(
-                    [PY, str(SCRIPTS / "check_evidence_completeness.py"), ticker],
-                    cwd=ROOT,
-                )
-                if r.returncode != 0:
-                    failed += 1
+                lint(ticker, "check_evidence_completeness.py", [ticker])
 
     if failed:
-        print(f"\nFAIL: {failed} lint invocation(s)")
+        print(f"\nFAIL: {failed} lint invocation(s)" + (f"; {inherited} inherited" if inherited else ""))
         return 1
-    print(f"\nOK: {len(tickers)} ticker(s)")
+    suffix = f"; {inherited} inherited failure(s) not blocking (see INHERITED)" if inherited else ""
+    print(f"\nOK: {len(tickers)} ticker(s){suffix}")
     return 0
 
 
