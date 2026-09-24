@@ -87,7 +87,10 @@ def build_origin(tmp_path: Path, *, main_deletes_note: bool = False) -> dict[str
     origin = tmp_path / "origin.git"
     git(tmp_path, "init", "-q", "--bare", str(origin))
     git(seed, "push", "-q", str(origin), "main", BRANCH)
-    return {"A": a, "B": b, "C": c, "D": d, "F": f, "origin": origin.as_uri()}
+    # A plain path, cloned with --no-local: the real transport runs (so --depth
+    # makes a genuinely shallow clone) without file:// URL parsing, which
+    # differs across Git for Windows environments.
+    return {"A": a, "B": b, "C": c, "D": d, "F": f, "origin": str(origin)}
 
 
 def point_resolver_at(module, monkeypatch, clone: Path, mergeable: str = "CONFLICTING") -> None:
@@ -107,7 +110,7 @@ def test_a_shallow_checkout_behind_the_fork_point_still_merges(tmp_path, resolve
     # further back, and git refused to merge "unrelated histories".
     refs = build_origin(tmp_path)
     clone = tmp_path / "clone"
-    git(tmp_path, "clone", "-q", "--depth", "1", "--branch", "main", refs["origin"], str(clone))
+    git(tmp_path, "clone", "-q", "--no-local", "--depth", "1", "--branch", "main", refs["origin"], str(clone))
     assert git(clone, "rev-parse", "--is-shallow-repository") == "true"
     point_resolver_at(resolver, monkeypatch, clone)
 
@@ -128,7 +131,7 @@ def test_a_conflict_theirs_cannot_settle_is_never_committed(tmp_path, resolver, 
     # copy, silently resurrecting a file main had removed.
     refs = build_origin(tmp_path, main_deletes_note=True)
     clone = tmp_path / "clone"
-    git(tmp_path, "clone", "-q", refs["origin"], str(clone))
+    git(tmp_path, "clone", "-q", "--no-local", refs["origin"], str(clone))
     point_resolver_at(resolver, monkeypatch, clone)
 
     with pytest.raises(SystemExit) as excinfo:
@@ -142,7 +145,7 @@ def test_a_conflict_theirs_cannot_settle_is_never_committed(tmp_path, resolver, 
 def test_a_mergeable_pr_is_left_alone(tmp_path, resolver, monkeypatch):
     refs = build_origin(tmp_path)
     clone = tmp_path / "clone"
-    git(tmp_path, "clone", "-q", refs["origin"], str(clone))
+    git(tmp_path, "clone", "-q", "--no-local", refs["origin"], str(clone))
     point_resolver_at(resolver, monkeypatch, clone, mergeable="MERGEABLE")
 
     assert resolver.resolve("1014", "ABC") is None
@@ -155,7 +158,7 @@ def test_the_workflow_learns_what_was_pushed(tmp_path, resolver, monkeypatch):
     # the new head, so it needs to know a push happened and at which SHA.
     refs = build_origin(tmp_path)
     clone = tmp_path / "clone"
-    git(tmp_path, "clone", "-q", refs["origin"], str(clone))
+    git(tmp_path, "clone", "-q", "--no-local", refs["origin"], str(clone))
     point_resolver_at(resolver, monkeypatch, clone)
     output = tmp_path / "github_output"
     monkeypatch.setattr(sys, "argv", ["resolve", "1014", "--ticker", "ABC", "--github-output", str(output)])
