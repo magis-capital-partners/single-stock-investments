@@ -12,19 +12,12 @@ ROOT = Path(__file__).resolve().parents[2]
 class WorkflowGovernanceTests(unittest.TestCase):
     def test_actions_surface_has_no_manual_run_choices(self):
         # Existing schedule+manual ops surfaces; everything else is schedule/push only.
-        # Existing schedule+manual ops surfaces, plus one disabled lane.
-        # darwin-refresh.yml was switched off indefinitely on 2026-08-23 by
-        # commenting out its cron and push triggers. A workflow must keep at
-        # least one trigger or the file is invalid, so `workflow_dispatch`
-        # is what remains -- and it is disabled in the GitHub UI as well, so
-        # the manual surface this test guards against does not actually exist.
-        # Listing it here is the honest encoding of that; the alternative is a
-        # permanently red check that says nothing.
+        # (darwin-refresh.yml, disabled since 2026-08-23 and kept only as a
+        # workflow_dispatch stub, was deleted on 2026-09-24.)
         allow_manual = {
             "dashboard-pages.yml",
             "letter-backfill.yml",
             "podcast-refresh.yml",
-            "darwin-refresh.yml",
         }
         for path in (ROOT / ".github" / "workflows").glob("*.yml"):
             if path.name in allow_manual:
@@ -63,6 +56,15 @@ class WorkflowGovernanceTests(unittest.TestCase):
             "portfolio-news.yml",
             "batch-onboard-pdfs.yml",
             "ci-autofix-reusable.yml",
+            # Deleted 2026-09-24. darwin-refresh and youtube-refresh were
+            # disabled in the UI; vicki-ir-harvest last ran 2026-06-17 (every
+            # run failed) and nothing has written its trigger queue since
+            # 2026-06-11. The YouTube lane runs on the workstation
+            # (youtube_lane.py): a self-hosted runner on a public repo would
+            # run fork PRs there.
+            "darwin-refresh.yml",
+            "youtube-refresh.yml",
+            "vicki-ir-harvest.yml",
         }
         active = {path.name for path in (ROOT / ".github" / "workflows").glob("*.yml")}
         self.assertTrue(retired.isdisjoint(active))

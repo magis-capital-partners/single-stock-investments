@@ -93,8 +93,8 @@ def test_no_ticker_less_checkout_runs_a_ticker_tree_builder():
         if not profiles or any(provides_ticker_trees(p) for p in profiles):
             continue
 
-        # Manual-only workflows are effectively parked (darwin-refresh.yml is
-        # disabled this way). Exempt — and re-adding a schedule or push trigger
+        # Manual-only workflows are effectively parked (darwin-refresh.yml was
+        # parked this way until it was deleted). Exempt — and re-adding a schedule or push trigger
         # brings them straight back under this test, which is the point: you
         # cannot quietly resume a lane that still carries the mismatch.
         if set(triggers) <= {"workflow_dispatch", "repository_dispatch"}:

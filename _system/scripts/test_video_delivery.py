@@ -144,14 +144,15 @@ class VideoCatalogTests(unittest.TestCase):
 
 
 class VideoWorkflowContractTests(unittest.TestCase):
-    def test_scheduled_lane_is_local_and_conflict_safe(self):
-        workflow = ROOT / ".github" / "workflows" / "youtube-refresh.yml"
-        text = workflow.read_text(encoding="utf-8")
-        self.assertIn("schedule:", text)
-        self.assertIn("self-hosted", text)
-        self.assertIn("commit-vault", text)
-        self.assertIn('git_add: "videos"', text)
-        self.assertNotIn("CAPTION_MAX_PER_DAY: 480", text)
+    def test_the_lane_has_no_ci_workflow(self):
+        # The YouTube lane runs on the workstation (youtube_lane.py, driven by
+        # a local scheduled task). Its CI workflow needed a self-hosted runner,
+        # which on a public repo would run fork PRs on that workstation; it
+        # was disabled, then deleted on 2026-09-24. Nothing may bring it back.
+        workflows = ROOT / ".github" / "workflows"
+        self.assertFalse((workflows / "youtube-refresh.yml").exists())
+        for path in workflows.glob("*.yml"):
+            self.assertNotIn("self-hosted", path.read_text(encoding="utf-8"), path.name)
 
     def test_dashboard_routes_and_lazy_loads_the_video_lane(self):
         html = (ROOT / "dashboard" / "index.html").read_text(encoding="utf-8")

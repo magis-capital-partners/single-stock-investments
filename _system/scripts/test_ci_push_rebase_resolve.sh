@@ -353,7 +353,6 @@ test_mixed_returns_and_dashboard_conflict() {
 test_main_writer_workflows_share_lock() {
   local workflow
   local -a writer_workflows=(
-    darwin-refresh.yml
     letter-backfill.yml
     ls-algo-universe.yml
     memory-digest.yml
