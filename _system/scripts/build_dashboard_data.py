@@ -307,9 +307,27 @@ def load_prior_dashboard_rows() -> dict[str, dict]:
     load_prior_rows) still saw a full prior -- so every sparse CI rebuild
     tripped "total_pdfs 8763->88 (floor 100)" (ls-algo intake, e.g. run
     35971686547, every real run since mid-August). One loader for both keeps
-    the restore and the guard judging against the same rows.
+    the restore and the guard judging against the same rows. WHEN the restore
+    may run at all is decided by infra_restore_allowed().
     """
     return load_prior_rows()
+
+
+def infra_restore_allowed(tickers: list[str]) -> bool:
+    """Only a lane that opts in AND has the ticker research trees may restore.
+
+    The restore refills infra/valuation columns from the prior, which is what
+    the clobber guard inspects. Run on a checkout with no ticker trees (Darwin,
+    pages), it made a rebuild that had emptied every research-derived field --
+    deep_dive, dossier, pricing_analysis, human_review, lenses, onboard, ... --
+    pass the guard, and write_shards would publish that for every ticker. So:
+    an explicit DASHBOARD_PRESERVE_DOCUMENT_REGISTRY=1 (set by the ls-algo
+    intake, whose marvin-pick checkout carries every holding's research/ tree
+    but not its PDFs, README or download scripts), and the trees must be here.
+    """
+    if os.environ.get("DASHBOARD_PRESERVE_DOCUMENT_REGISTRY") != "1":
+        return False
+    return not workspace_is_sparse(tickers)
 
 
 def merge_sparse_payload(current: dict, prior: dict) -> dict:
@@ -436,6 +454,44 @@ def refuse_infra_collapse(payload: dict, prior_by_ticker: dict[str, dict]) -> No
             "Refusing to write dashboard_data.json: sparse/empty ticker checkout would "
             f"clobber infra stats over {ticker_count} tickers -- " + "; ".join(failures) + ". "
             "Rebuild with ticker trees present, or deploy committed dashboard/ as-is."
+        )
+
+
+# Fields computed from each ticker's research/ tree that the infra restore
+# never refills. They are what a rebuild without the trees actually destroys,
+# and nothing in _INFRA_PRESERVE_KEYS can stand in for them: a restore can make
+# the infra columns look whole while these are empty for every ticker.
+_RESEARCH_DERIVED_KEYS = (
+    "deep_dive",
+    "one_line_thesis",
+    "onboard",
+    "dossier",
+    "developments",
+    "pricing_analysis",
+    "human_review",
+    "ssi_report",
+    "lenses",
+    "active_lenses",
+)
+
+
+def refuse_research_collapse(payload: dict, prior_by_ticker: dict[str, dict]) -> None:
+    """Abort write when research-derived fields collapse against the prior."""
+    rows = payload.get("tickers") or []
+    if len(rows) < 50 or len(prior_by_ticker) < 50:
+        return
+    failures = []
+    for key in _RESEARCH_DERIVED_KEYS:
+        prior_n = sum(1 for r in prior_by_ticker.values() if r.get(key))
+        now_n = sum(1 for r in rows if r.get(key))
+        if prior_n >= _INFRA_PRIOR_MIN and now_n < prior_n * _INFRA_COLLAPSE_RATIO:
+            failures.append(f"{key} {prior_n}->{now_n}")
+    if failures:
+        raise SystemExit(
+            "Refusing to write dashboard_data.json: the ticker research trees are missing "
+            f"from this checkout, so research-derived fields would be emptied over {len(rows)} "
+            "tickers -- " + "; ".join(failures) + ". Rebuild on a checkout with the "
+            "research trees, or deploy committed dashboard/ as-is."
         )
 
 
@@ -3174,18 +3230,20 @@ def build(prior_by_ticker: dict[str, dict] | None = None) -> dict:
     ]
     if prior_by_ticker is None:
         prior_by_ticker = load_prior_dashboard_rows()
-    preserve_sparse_infra = (
-        workspace_is_sparse(tickers)
-        or os.environ.get("DASHBOARD_PRESERVE_DOCUMENT_REGISTRY") == "1"
-    )
-    if preserve_sparse_infra and prior_by_ticker:
+    if infra_restore_allowed(tickers) and prior_by_ticker:
         restored = preserve_infra_from_prior(rows, prior_by_ticker)
         if restored:
             print(
-                f"WARN: sparse checkout ({ticker_dirs_present(tickers)}/{len(tickers)} "
-                f"ticker dirs); preserved infra stats for {restored} tickers from prior "
-                f"{OUTPUT.relative_to(ROOT)}"
+                f"WARN: partial checkout ({ticker_dirs_present(tickers)}/{len(tickers)} "
+                f"ticker dirs, DASHBOARD_PRESERVE_DOCUMENT_REGISTRY=1); preserved infra "
+                f"stats for {restored} tickers from the prior {PRIOR_ROWS_SOURCE}"
             )
+    elif os.environ.get("DASHBOARD_PRESERVE_DOCUMENT_REGISTRY") == "1":
+        print(
+            "WARN: DASHBOARD_PRESERVE_DOCUMENT_REGISTRY=1 but only "
+            f"{ticker_dirs_present(tickers)}/{len(tickers)} ticker dirs are present; not "
+            "restoring from the prior -- the clobber guards decide."
+        )
     watchlist = build_watchlist_rows(reg.get("watchlist") or {})
     portfolio_macro_regime = build_portfolio_macro_regime()
     portfolio_macro = build_portfolio_macro(insights_doc)
@@ -3530,6 +3588,9 @@ def build_learning_loop_summary() -> dict | None:
                       "memory_triage_summary.json")
 
 
+PRIOR_ROWS_SOURCE = "prior payload"  # set by load_prior_rows(); named in the restore warning
+
+
 def load_prior_rows() -> dict[str, dict]:
     """Prior per-ticker rows for the anti-clobber guards and infra restore.
 
@@ -3545,11 +3606,14 @@ def load_prior_rows() -> dict[str, dict]:
     Fall back to the committed shards, which carry the same rows: core.json for
     the summary fields, per-ticker shards for everything else.
     """
+    global PRIOR_ROWS_SOURCE
     payload = _load_json(OUTPUT) or {}
     rows = payload.get("tickers") or []
     if rows:
+        PRIOR_ROWS_SOURCE = OUTPUT.name
         return {str(r.get("ticker")): r for r in rows if r.get("ticker")}
 
+    PRIOR_ROWS_SOURCE = "committed shards (core.json + tickers/)"
     merged: dict[str, dict] = {}
     core = _load_json(DATA_DIR / "core.json") or {}
     for row in core.get("tickers") or []:
@@ -3600,6 +3664,7 @@ def main() -> None:
             "position_count", 0
         )
     refuse_infra_collapse(payload, prior_by_ticker)
+    refuse_research_collapse(payload, prior_by_ticker)
     refuse_valuation_collapse(payload, prior_by_ticker)
     attach_pdf_store_rows(payload["tickers"], document_catalog)
     merge_equity_model_rows(payload["tickers"], equity_payload)
