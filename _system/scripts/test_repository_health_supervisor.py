@@ -28,6 +28,7 @@ class FakeGitHub:
         self.comments: list[tuple] = []
         self.assignees: dict[int, list] = {}
         self.labels: list[str] = []
+        self.fail: set[str] = set()      # method names that fail, to test retries
         self._next = 1100
 
     def job_annotations(self, job_id):
@@ -45,20 +46,28 @@ class FakeGitHub:
         return True
 
     def create_issue(self, title, body, labels):
+        if "create_issue" in self.fail:
+            return None
         number = self._next
         self._next += 1
         self.issues[number] = {"title": title, "body": body, "labels": labels, "state": "open"}
         return number
 
     def assign(self, number, assignees):
+        if "assign" in self.fail:
+            return False
         self.assignees[number] = assignees
         return True
 
     def update_issue(self, number, **fields):
+        if "update_issue" in self.fail:
+            return False
         self.issues[number].update(fields)
         return True
 
     def comment(self, number, body):
+        if "comment" in self.fail:
+            return False
         self.comments.append((number, body))
         return True
 
@@ -195,6 +204,90 @@ class HealerTests(SupervisorFixture):
         # A new UTC day restores the budget.
         self.run_plan(datetime(2026, 9, 26, 0, 41, tzinfo=timezone.utc))
         self.assertEqual(len(self.github.events), 4)
+
+    def recover_falsifier(self, at="2026-09-26T10:00:00Z"):
+        fixed = failure(9, at, 99)
+        fixed["outcome"] = "success"
+        self.receipt("falsifier", at, latest=fixed, failures=[],
+                     job="resolve-and-validate", workflow="falsifier-resolution.yml")
+
+    def test_a_failed_close_records_nothing_and_is_retried(self):
+        self.falsifier_failing()
+        self.run_plan(T0)
+        number = next(iter(self.github.issues))
+        self.recover_falsifier()
+        self.github.fail = {"update_issue"}
+        self.slack.messages.clear()
+        self.run_plan(datetime(2026, 9, 26, 12, 0, tzinfo=timezone.utc))
+        self.assertEqual(self.github.issues[number]["state"], "open")
+        issue = next(iter(self.state()["issues"].values()))
+        self.assertEqual(issue["state"], "open", "a failed close must not be recorded as closed")
+        self.assertFalse(any("[RECOVERED] issue" in m for m in self.slack.messages))
+        self.github.fail = set()
+        self.run_plan(datetime(2026, 9, 26, 14, 0, tzinfo=timezone.utc))
+        self.assertEqual(self.github.issues[number]["state"], "closed")
+        self.assertTrue(any("[RECOVERED] issue" in m for m in self.slack.messages))
+        recovered = [body for n, body in self.github.comments if "Recovered" in body]
+        self.assertEqual(len(recovered), 1, "the closing comment is not repeated on the retry")
+
+    def test_a_failed_reopen_records_nothing_and_is_retried(self):
+        self.falsifier_failing()
+        self.run_plan(T0)
+        number = next(iter(self.github.issues))
+        self.recover_falsifier()
+        self.run_plan(datetime(2026, 9, 26, 12, 0, tzinfo=timezone.utc))
+        self.assertEqual(self.github.issues[number]["state"], "closed")
+        again = [failure(12, "2026-09-28T13:58:00Z", 122), failure(11, "2026-09-27T13:58:00Z", 112)]
+        for job_id in (112, 122):
+            self.github.annotations[job_id] = self.github.annotations[33]
+            self.github.logs[job_id] = self.github.logs[33]
+        self.receipt("falsifier", "2026-09-26T10:00:00Z", latest=again[0], failures=again,
+                     job="resolve-and-validate", workflow="falsifier-resolution.yml")
+        self.github.fail = {"update_issue"}
+        self.slack.messages.clear()
+        self.run_plan(datetime(2026, 9, 28, 16, 0, tzinfo=timezone.utc))
+        self.assertEqual(self.github.issues[number]["state"], "closed")
+        self.assertEqual(next(iter(self.state()["issues"].values()))["state"], "closed")
+        self.assertFalse(any("[FAILING AGAIN]" in m for m in self.slack.messages))
+        self.github.fail = set()
+        self.run_plan(datetime(2026, 9, 28, 18, 0, tzinfo=timezone.utc))
+        self.assertEqual(self.github.issues[number]["state"], "open")
+        self.assertEqual(len(self.github.issues), 1, "the same issue is reopened, not a new one")
+        self.assertTrue(any(f"[FAILING AGAIN] #{number}" in m for m in self.slack.messages))
+
+    def test_an_issue_alert_lost_to_a_failed_send_is_sent_once_later(self):
+        self.falsifier_failing()
+        self.run_plan(T0, slack=FakeSlack(ok=False))
+        self.assertEqual(len(self.github.issues), 1)
+        self.run_plan(T0 + timedelta(hours=2))
+        self.run_plan(T0 + timedelta(hours=4))
+        announced = [m for m in self.slack.messages if "[NEW FAILURE ISSUE]" in m]
+        self.assertEqual(len(announced), 1)
+        self.assertEqual(len(self.github.issues), 1)
+
+    def test_one_issue_for_the_same_error_on_several_lanes(self):
+        # drive, intake-full and world-model failing on one check_warrant_universe
+        # error are one defect, so one issue that lists all three.
+        names = ("data-pipeline-drive", "data-pipeline-intake-full", "data-pipeline-world-model")
+        self.configure([lane(n, job=n.split("data-pipeline-")[1], workflow="data-pipeline.yml")
+                        for n in names])
+        error = ("check_warrant_universe.py: health.status unhealthy: 3 active warrants without"
+                 " a mark for 6 days")
+        for index, name in enumerate(names):
+            base = 300 + 10 * index
+            fails = [failure(base + 2, "2026-09-24T18:00:00Z", base + 2, step="Validate"),
+                     failure(base + 1, "2026-09-23T18:00:00Z", base + 1, step="Validate")]
+            self.receipt(name, "2026-09-10T00:00:00Z", latest=fails[0], failures=fails,
+                         job=name.split("data-pipeline-")[1], workflow="data-pipeline.yml")
+            for job_id in (base + 1, base + 2):
+                self.github.annotations[job_id] = [{"annotation_level": "failure",
+                                                    "message": error}]
+        self.run_plan(T0)
+        self.assertEqual(len(self.github.issues), 1)
+        issue = next(iter(self.github.issues.values()))
+        for name in names:
+            self.assertIn(f"`{name}`", issue["body"])
+        self.assertIn("+2", issue["title"])
 
     def test_an_unreadable_failure_is_retried_never_filed(self):
         # Two failures whose logs cannot be read must not collapse into one
