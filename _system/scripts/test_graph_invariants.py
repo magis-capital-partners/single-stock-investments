@@ -238,18 +238,43 @@ class PlantedViolationTests(unittest.TestCase):
         self.assertIn("can never be judged fresh", joined)
         self.assertIn("file missing", joined)
 
-    def test_p3_lane_with_no_commit_fires(self):
+    # -- P3 (hard): the lane contract. P8 (report): lane freshness. ---------- #
+
+    NIGHTLY_WORKFLOW = "\n".join([
+        "name: Nightly", "on:", "  schedule:", '    - cron: "7 3 * * *"', "jobs:",
+        "  work:", "    runs-on: ubuntu-latest", "    timeout-minutes: 10", "    steps:",
+        "      - name: Do the work", "        run: echo work", ""])
+
+    def add_nightly_lane(self, **extra):
+        test_graph_build.write_text(self.root / ".github/workflows/nightly.yml",
+                                    self.NIGHTLY_WORKFLOW)
+        config = load_config(self.root)
+        lane = {"name": "nightly", "workflow_file": "nightly.yml", "job": "work",
+                "subject_regex": "^chore\\(nightly\\)", "freshness_hours": 48}
+        lane.update(extra)
+        config["lanes"].append(lane)
+        save_config(self.root, config)
+
+    def write_receipt(self, lane, last_success_at, **extra):
+        payload = {"schema_version": "2.0", "lane": lane, "workflow_file": "nightly.yml",
+                   "job": "work", "work_step": None, "last_success_at": last_success_at}
+        payload.update(extra)
+        test_graph_build.write_json(
+            self.root / f"_system/data/lane_receipts/{lane}.json", payload)
+
+    def test_p8_legacy_lane_with_no_commit_is_reported_not_gated(self):
         config = load_config(self.root)
         config["lanes"].append({"name": "dead-lane",
                                 "subject_regex": "^never-matches-anything",
                                 "freshness_hours": 48})
         save_config(self.root, config)
         results, exit_code = run_invariants(self.root)
-        self.assertEqual(results["P3"].count, 1)
-        self.assertIn("dead-lane", results["P3"].violations[0])
-        self.assertEqual(exit_code, 1)
+        self.assertEqual(results["P8"].count, 1)
+        self.assertIn("dead-lane", results["P8"].violations[0])
+        self.assertEqual(results["P3"].count, 0)
+        self.assertEqual(exit_code, 0)
 
-    def test_p3_stale_lane_fires(self):
+    def test_p8_stale_commit_lane_is_reported_not_gated(self):
         git = ["git", "-C", str(self.root), "-c", "user.email=fixture@test",
                "-c", "user.name=fixture"]
         env = dict(os.environ, GIT_COMMITTER_DATE="2026-01-01T00:00:00Z")
@@ -263,31 +288,78 @@ class PlantedViolationTests(unittest.TestCase):
                                 "freshness_hours": 48})
         save_config(self.root, config)
         results, exit_code = run_invariants(self.root)
-        self.assertEqual(results["P3"].count, 1)
-        self.assertIn("old-lane", results["P3"].violations[0])
-        self.assertEqual(exit_code, 1)
+        self.assertEqual(results["P8"].count, 1)
+        self.assertIn("old-lane", results["P8"].violations[0])
+        self.assertEqual(exit_code, 0)
 
-    def test_p3_fresh_workflow_receipt_heals_noop_lane(self):
-        config = load_config(self.root)
-        config["lanes"].append({"name": "noop-lane",
-                                "subject_regex": "^never-commits",
-                                "workflow_file": "noop.yml",
-                                "freshness_hours": 48})
-        save_config(self.root, config)
-        test_graph_build.write_json(
-            self.root / "_system/data/lane_receipts/noop-lane.json",
-            {"last_success_at": datetime.now(timezone.utc).isoformat(),
-             "run_id": 123, "workflow_file": "noop.yml"})
+    def test_p8_fresh_work_done_receipt_keeps_a_noop_lane_fresh(self):
+        self.add_nightly_lane(subject_regex="^never-commits")
+        self.write_receipt("nightly", datetime.now(timezone.utc).isoformat())
         results, exit_code = run_invariants(self.root)
         self.assertEqual(results["P3"].count, 0, results["P3"].violations)
+        self.assertEqual(results["P8"].count, 0, results["P8"].violations)
         self.assertEqual(exit_code, 0)
+
+    def test_p8_a_matching_commit_cannot_refresh_a_receipt_lane(self):
+        # 2026-09-24: agent PR titles containing "falsifier" kept the falsifier
+        # lane fresh in the PR gate while its workflow had not succeeded since
+        # 2026-09-06, and the warrant job committed on each of 51 failed runs.
+        self.add_nightly_lane()
+        self.write_receipt("nightly", "2026-09-06T23:45:28Z")
+        git_commit_all(self.root, "chore(nightly): an agent PR that mentions the lane")
+        results, exit_code = run_invariants(self.root)
+        self.assertEqual(results["P8"].count, 1, results["P8"].violations)
+        self.assertIn("work-done receipt", results["P8"].violations[0])
+        self.assertEqual(exit_code, 0, "a stale lane must never fail a PR or a push")
+
+    def test_a_stale_lane_never_fails_a_pr_or_a_push(self):
+        # The falsifier lane has had no success since 2026-09-06 and stays
+        # stale until its fix merges and the lane runs; that must not turn
+        # every PR and every push to main red in the meantime.
+        self.add_nightly_lane()
+        self.write_receipt("nightly", "2026-09-06T23:45:28Z")
+        results, exit_code = run_invariants(self.root)
+        hard = [r.id for r in results.values() if r.severity == "hard" and r.count]
+        self.assertEqual(hard, [])
+        self.assertEqual(exit_code, 0)
+
+    def test_p8_schema_one_receipt_does_not_count_for_a_job_lane(self):
+        self.add_nightly_lane(subject_regex="^never-commits")
+        test_graph_build.write_json(
+            self.root / "_system/data/lane_receipts/nightly.json",
+            {"schema_version": "1.0", "workflow_file": "nightly.yml",
+             "last_success_at": datetime.now(timezone.utc).isoformat()})
+        results, _ = run_invariants(self.root)
+        self.assertEqual(results["P8"].count, 1, results["P8"].violations)
+        self.assertIn("no work-done receipt", results["P8"].violations[0])
+
+    def test_p3_a_lane_wired_to_nothing_fails_the_gate(self):
+        pristine = load_config(self.root)
+        for extra, needle in (({"workflow_file": "gone.yml"}, "does not exist"),
+                              ({"job": "nope"}, "no job named 'nope'"),
+                              ({"work_step": "Not a step"}, "no step named")):
+            with self.subTest(extra=extra):
+                save_config(self.root, pristine)
+                self.add_nightly_lane(**extra)
+                results, exit_code = run_invariants(self.root)
+                self.assertTrue(any(needle in v for v in results["P3"].violations),
+                                results["P3"].violations)
+                self.assertEqual(exit_code, 1)
+
+    def test_p3_an_undeclared_scheduled_workflow_fails_the_gate(self):
+        test_graph_build.write_text(self.root / ".github/workflows/nightly.yml",
+                                    self.NIGHTLY_WORKFLOW)
+        results, exit_code = run_invariants(self.root)
+        self.assertEqual(results["P3"].count, 1)
+        self.assertIn("nightly.yml: scheduled workflow is not declared",
+                      results["P3"].violations[0])
+        self.assertEqual(exit_code, 1)
 
     def test_p3_lane_projection_prefers_origin_main_when_ref_exists(self):
         # PR-checkout shape: a lane's commits landed on main AFTER the PR
         # branch point, so they are absent from HEAD's history but present
-        # on origin/main. Old behavior read only HEAD and fired P3
-        # spuriously; run() must set GRAPH_LANE_REF=origin/main (and unset
-        # it afterwards) so graph_build projects lanes from origin/main.
+        # on origin/main. run() must set GRAPH_LANE_REF=origin/main (and unset
+        # it afterwards) so graph_build projects lane commits from origin/main.
         config = load_config(self.root)
         config["lanes"].append({"name": "nightly",
                                 "subject_regex": "^chore\\(nightly\\)",
@@ -306,8 +378,8 @@ class PlantedViolationTests(unittest.TestCase):
         subprocess.run(git + ["update-ref", "refs/remotes/origin/main", fresh],
                        check=True)
         results, exit_code = run_invariants(self.root)
-        self.assertEqual(results["P3"].count, 0,
-                         results["P3"].violations)
+        self.assertEqual(results["P8"].count, 0,
+                         results["P8"].violations)
         self.assertEqual(exit_code, 0)
         # The preference must not leak into later builds against other roots.
         self.assertNotIn(graph_invariants.LANE_REF_ENV, os.environ)

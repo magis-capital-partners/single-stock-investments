@@ -8,8 +8,11 @@ never drift from reality. Agents change the repo; the graph follows.
 
 Sources projected (see the spec's node table):
 
-  * Lanes + Commits  -- one ``git log`` call parsed against the lane regexes in
-    ``_system/graph/graph_sources.json``.
+  * Lanes + Commits  -- lanes from ``_system/graph/graph_sources.json``; a
+    job-anchored lane's freshness comes only from its job-level receipt in
+    ``_system/data/lane_receipts/`` (see ``lane_registry.py``). One ``git log``
+    call parsed against the optional lane ``subject_regex`` projects Commit
+    nodes, which are informational.
   * Runs             -- ``_system/data/runs/*.json`` receipts.
   * Wave             -- ``_system/data/contract_backfill_queue.json``.
   * Tickers/Contracts/Components/Facts -- registry + streamed per-ticker
@@ -55,6 +58,7 @@ ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import build_memory_triage  # noqa: E402  (parse_file/dedupe/fingerprint reuse)
 import falsifier_specs  # noqa: E402  (shared forecast schema/identity)
+import lane_registry  # noqa: E402  (job-level lane receipts)
 
 GIT_WINDOW = 400
 VALIDATOR_PREFIXES = ("scan_", "check_", "validate_", "audit_", "calibrate_")
@@ -186,26 +190,42 @@ class GraphBuilder:
                 commits.append(parts)
         for lane in lanes:
             name = lane["name"]
-            pattern = re.compile(lane["subject_regex"])
+            # subject_regex is informational since lanes became job-anchored
+            # (2026-09-24): it projects Commit nodes, never freshness. A commit
+            # proves a push, not that the job's work succeeded, and agent PR
+            # titles containing a lane's keyword made a dead lane read fresh.
+            pattern = re.compile(lane["subject_regex"]) if lane.get("subject_regex") else None
             matched = [(sha, ciso, subj) for sha, ciso, subj in commits
-                       if pattern.search(subj)]
-            receipt_path = self.root / "_system/data/lane_receipts" / f"{name}.json"
-            receipt = load_json(receipt_path) if receipt_path.exists() else {}
-            receipt_iso = str((receipt or {}).get("last_success_at") or "")
+                       if pattern and pattern.search(subj)]
+            receipt = lane_registry.load_receipt(self.root, name) or {}
+            receipt_anchored = bool(lane.get("workflow_file") and lane.get("job"))
+            if receipt_anchored and not lane_registry.receipt_is_current(receipt, lane):
+                receipt = {}      # a schema-1 whole-run receipt proves nothing here
+            receipt_iso = str(receipt.get("last_success_at") or "")
             commit_iso = matched[0][1] if matched else ""
-            freshest_iso = max(commit_iso, receipt_iso)
+            if receipt_anchored:
+                freshest_iso, anchor = receipt_iso, "receipt"
+            elif lane.get("workflow_file"):
+                freshest_iso, anchor = max(commit_iso, receipt_iso), "commit-or-receipt"
+            else:
+                freshest_iso, anchor = commit_iso, "commit"
+            latest = receipt.get("latest") if isinstance(receipt.get("latest"), dict) else {}
             self.node(f"lane:{name}", "work", "Lane", label=name, status="active",
                       as_of=freshest_iso,
                       data={
-                          "subject_regex": lane["subject_regex"],
+                          "subject_regex": lane.get("subject_regex"),
                           "freshness_hours": lane.get("freshness_hours", 48),
+                          "freshness_anchor": anchor,
                           "commit_count_in_window": len(matched),
                           "last_commit_sha": matched[0][0] if matched else None,
                           "last_commit_iso": matched[0][1] if matched else None,
                           "workflow_file": lane.get("workflow_file"),
+                          "job": lane.get("job"),
+                          "work_step": lane.get("work_step"),
                           "last_success_at": receipt_iso or None,
-                          "last_workflow_run_id": (receipt or {}).get("run_id"),
-                          "last_workflow_url": (receipt or {}).get("url"),
+                          "last_workflow_run_id": receipt.get("run_id"),
+                          "last_workflow_url": receipt.get("url"),
+                          "latest_outcome": latest.get("outcome"),
                       })
             for sha, ciso, subj in matched:
                 self.node(f"commit:{sha[:12]}", "work", "Commit", label=subj,
