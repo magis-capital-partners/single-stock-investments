@@ -242,6 +242,20 @@ class NewsBudgetTests(unittest.TestCase):
 
 
 @unittest.skipIf(yaml is None, "PyYAML not installed")
+class DecideMatchesTriggersTests(unittest.TestCase):
+    """decide case-matches exact cron strings and hard-errors on anything else."""
+
+    def test_every_cron_and_dispatch_type_has_a_case(self) -> None:
+        workflow = load_workflow("data-pipeline.yml")
+        triggers = workflow.get("on") or workflow.get(True)  # PyYAML reads `on:` as True
+        crons = {entry["cron"] for entry in triggers["schedule"]}
+        dispatch = {f"dispatch:{kind}" for kind in triggers["repository_dispatch"]["types"]}
+        run = step_text(workflow["jobs"]["decide"]["steps"][0])
+        cases = set(re.findall(r'(?m)^\s*"([^"]+)"\)', run))
+        self.assertEqual(cases, crons | dispatch)
+
+
+@unittest.skipIf(yaml is None, "PyYAML not installed")
 class ActivistPhaseTests(unittest.TestCase):
     """The activist job hit its 90-minute limit on every run from 2026-08-03,
     and a job timeout is reported as "cancelled", which hid it for 53 days."""
