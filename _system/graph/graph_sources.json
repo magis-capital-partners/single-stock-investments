@@ -1,104 +1,283 @@
 {
-  "schema_version": "1.0",
-  "updated": "2026-08-12",
+  "schema_version": "2.0",
+  "updated": "2026-09-24",
   "notes": [
-    "Config for _system/scripts/graph_build.py. Lane regexes match git commit subjects (one git log call, bounded window).",
+    "Config for _system/scripts/graph_build.py, graph_invariants.py (P3 lane contract, P8 lane freshness), build_lane_receipts.py and supervise_repository_health.py.",
+    "Lanes (schema 2.0, 2026-09-24): each lane is one workflow JOB. build_lane_receipts.py advances a lane's receipt only when that job concluded success on main and, if work_step is set, that step concluded success too; a job killed by timeout-minutes counts as a failure; skipped and no-op runs never refresh a receipt. job is the Actions display name (the job name: if set, else its id; 'caller / callee' for a reusable-workflow job; fnmatch patterns for matrix jobs). work_step is only needed where an if: can skip the real work while the job still succeeds.",
+    "freshness_hours = the longest gap between two scheduled runs when exactly one run in between is skipped (lane_registry.one_skip_span_hours over cadence_cron) + JITTER_HOURS (6h: scheduled runs here start 1.5-6.6h late since 2026-08-27). The */2 and */4 lanes carry 24h because GitHub drops a third to a half of those slots. test_lane_registry pins every window against its cadence. cadence_cron is documentation for that check; the workflow file stays the source of truth.",
+    "Freshness is judged from receipts only (P8, report severity; the supervisor alerts on it). subject_regex is informational -- it projects Commit nodes and nothing else: a commit proves a push happened, not that the job's work succeeded (the warrant job committed on each of 51 failed runs), and agent PR titles containing 'falsifier' kept that lane 'fresh' in the PR gate while it had not succeeded since 2026-09-06.",
+    "unmonitored_workflows: scheduled workflows deliberately left without a lane, each with its reason. P3 fails on any scheduled workflow that is neither a lane nor listed there.",
     "The guard registry maps correction row ids (date + first-40-chars-of-error slug, computed by graph_build.correction_slug) to the executable asserts that guard them and the scripts that enforce those asserts.",
     "Populated honestly from corrections.md's Source column and .github/workflows: a correction whose recorded fix is prose procedure (read the definition, grep before renaming, reconcile before adjudicating) has NO entry here. Surfacing those as unguarded is invariant P1's job, not this file's.",
     "enforced_by entries may be validator scripts (five-prefix) or test suites; whether any CI job actually invokes them is projected separately (INVOKED_BY) and judged by invariant P2."
   ],
   "lanes": [
     {
+      "name": "supervisor",
+      "workflow_file": "repository-health-supervisor.yml",
+      "job": "supervise",
+      "cadence_cron": [
+        "41 */2 * * *"
+      ],
+      "freshness_hours": 12,
+      "subject_regex": "^chore\\(health\\): refresh workflow receipts"
+    },
+    {
+      "name": "data-pipeline-intake-full",
+      "workflow_file": "data-pipeline.yml",
+      "job": "intake-full",
+      "cadence_cron": [
+        "0 3 * * *"
+      ],
+      "freshness_hours": 54,
+      "subject_regex": "^chore: nightly intake-full"
+    },
+    {
+      "name": "data-pipeline-technicals",
+      "workflow_file": "data-pipeline.yml",
+      "job": "technicals",
+      "cadence_cron": [
+        "15 2 * * 1-5"
+      ],
+      "freshness_hours": 102,
+      "subject_regex": "^chore: refresh technical fear signals"
+    },
+    {
+      "name": "data-pipeline-activist",
+      "workflow_file": "data-pipeline.yml",
+      "job": "activist",
+      "cadence_cron": [
+        "0 6 * * *"
+      ],
+      "freshness_hours": 54,
+      "subject_regex": "^chore: activist scan sync"
+    },
+    {
+      "name": "data-pipeline-downloads",
+      "workflow_file": "data-pipeline.yml",
+      "job": "downloads",
+      "cadence_cron": [
+        "0 12 * * 1,2,4,5,6",
+        "0 10 * * 0,3"
+      ],
+      "freshness_hours": 56,
+      "subject_regex": "^chore: daily download sync"
+    },
+    {
+      "name": "data-pipeline-drive",
+      "workflow_file": "data-pipeline.yml",
+      "job": "drive",
+      "work_step": "Import Drive intake PDFs",
+      "cadence_cron": [
+        "0 14 * * *"
+      ],
+      "freshness_hours": 54,
+      "subject_regex": "^chore: (sync Drive intake documents|update Drive intake triage)"
+    },
+    {
+      "name": "data-pipeline-news",
+      "workflow_file": "data-pipeline.yml",
+      "job": "news",
+      "cadence_cron": [
+        "30 */6 * * *"
+      ],
+      "freshness_hours": 18,
+      "subject_regex": "^chore: refresh portfolio news"
+    },
+    {
+      "name": "data-pipeline-cvr-discover",
+      "workflow_file": "data-pipeline.yml",
+      "job": "cvr-discover",
+      "cadence_cron": [
+        "0 15 * * 1"
+      ],
+      "freshness_hours": 342,
+      "subject_regex": "^chore: CVR weekly discovery"
+    },
+    {
+      "name": "data-pipeline-warrant-discover",
+      "workflow_file": "data-pipeline.yml",
+      "job": "warrant-discover",
+      "cadence_cron": [
+        "0 15 * * 1"
+      ],
+      "freshness_hours": 342,
+      "subject_regex": "^chore: warrant weekly discovery"
+    },
+    {
+      "name": "data-pipeline-world-model",
+      "workflow_file": "data-pipeline.yml",
+      "job": "world-model",
+      "cadence_cron": [
+        "0 16 * * 0"
+      ],
+      "freshness_hours": 342,
+      "subject_regex": "^chore: world-model weekly"
+    },
+    {
       "name": "ls-algo",
       "workflow_file": "ls-algo-universe.yml",
-      "subject_regex": "^(chore|feat|fix)\\(ls-algo\\)",
-      "freshness_hours": 96
+      "job": "intake",
+      "cadence_cron": [
+        "45 2 * * *"
+      ],
+      "freshness_hours": 54,
+      "subject_regex": "^(chore|feat|fix)\\(ls-algo\\)"
     },
     {
       "name": "valuation",
       "workflow_file": "power-zone-universe.yml",
-      "subject_regex": "^(chore|feat|fix)\\(valuation\\)",
-      "freshness_hours": 96
-    },
-    {
-      "name": "backfill",
-      "workflow_file": "contract-backfill-continue.yml",
-      "subject_regex": "^(chore|feat|fix)\\((queue|contract)\\)|contract backfill",
-      "freshness_hours": 96
-    },
-    {
-      "name": "committee",
-      "workflow_file": "investment-committee.yml",
-      "subject_regex": "^(chore|feat|fix)\\(ic\\)|^IC[- ]",
-      "freshness_hours": 96
-    },
-    {
-      "name": "deploy",
-      "workflow_file": "dashboard-pages.yml",
-      "subject_regex": "^(chore|feat|fix)\\(dashboard\\)|^(Rebuild|Refresh) dashboard",
-      "freshness_hours": 96
-    },
-    {
-      "name": "memory-digest",
-      "workflow_file": "memory-digest.yml",
-      "subject_regex": "^(Weekly memory digest|chore\\(memory\\): daily canonical triage)",
-      "freshness_hours": 192
+      "job": "route-value-gate",
+      "cadence_cron": [
+        "0 12 * * 1,2,4,5,6",
+        "0 10 * * 0,3"
+      ],
+      "freshness_hours": 56,
+      "subject_regex": "^(chore|feat|fix)\\(valuation\\)"
     },
     {
       "name": "daily-sync",
       "workflow_file": "daily-sync.yml",
-      "subject_regex": "^chore: daily download sync",
-      "freshness_hours": 48
+      "job": "research / select",
+      "cadence_cron": [
+        "0 12 * * 1,2,4,5,6",
+        "0 10 * * 0,3"
+      ],
+      "freshness_hours": 56
     },
     {
-      "name": "letters",
-      "workflow_file": "letter-backfill.yml",
-      "subject_regex": "^(chore|feat|fix)\\((letters|letter)\\)|letter backfill|Refresh dashboard payloads after letter backfill",
-      "freshness_hours": 120
+      "name": "deploy",
+      "workflow_file": "dashboard-pages.yml",
+      "job": "build",
+      "cadence_cron": [
+        "15 0 * * *"
+      ],
+      "freshness_hours": 54,
+      "subject_regex": "^(chore|feat|fix)\\(dashboard\\)|^(Rebuild|Refresh) dashboard"
     },
     {
-      "name": "data-pipeline",
-      "workflow_file": "data-pipeline.yml",
-      "subject_regex": "^chore: (nightly intake-full|daily download sync)",
-      "freshness_hours": 48
+      "name": "backfill",
+      "workflow_file": "contract-backfill-continue.yml",
+      "job": "refill",
+      "cadence_cron": [
+        "33 */2 * * *"
+      ],
+      "freshness_hours": 24,
+      "subject_regex": "^(chore|feat|fix)\\((queue|contract)\\)|contract backfill"
     },
     {
-      "name": "market-risk",
-      "workflow_file": "market-risk-components.yml",
-      "subject_regex": "^chore\\(risk\\)",
-      "freshness_hours": 96
-    },
-    {
-      "name": "podcasts",
-      "workflow_file": "podcast-refresh.yml",
-      "subject_regex": "^chore\\(podcasts\\)",
-      "freshness_hours": 192
+      "name": "committee",
+      "workflow_file": "investment-committee.yml",
+      "job": "prepare",
+      "cadence_cron": [
+        "17 */4 * * *"
+      ],
+      "freshness_hours": 24,
+      "subject_regex": "^(chore|feat|fix)\\(ic\\)|^IC[- ]"
     },
     {
       "name": "committee-outcomes",
       "workflow_file": "committee-outcomes.yml",
-      "subject_regex": "committee outcome",
-      "freshness_hours": 48
+      "job": "observe",
+      "cadence_cron": [
+        "50 9 * * *"
+      ],
+      "freshness_hours": 54,
+      "subject_regex": "^chore\\(epistemic\\): refresh committee outcome loop"
+    },
+    {
+      "name": "memory-digest",
+      "workflow_file": "memory-digest.yml",
+      "job": "triage",
+      "cadence_cron": [
+        "20 10 * * *"
+      ],
+      "freshness_hours": 54,
+      "subject_regex": "^chore\\(memory\\): daily canonical triage"
     },
     {
       "name": "falsifier",
       "workflow_file": "falsifier-resolution.yml",
-      "subject_regex": "falsifier",
-      "freshness_hours": 48
-    },
-    {
-      "name": "security-scan",
-      "workflow_file": "security-weekly.yml",
-      "subject_regex": "security",
-      "freshness_hours": 192
+      "job": "resolve-and-validate",
+      "cadence_cron": [
+        "20 9 * * *"
+      ],
+      "freshness_hours": 54,
+      "subject_regex": "^chore\\(epistemic\\): daily evidence resolution"
     },
     {
       "name": "research-watchdog",
       "workflow_file": "research-watchdog.yml",
-      "subject_regex": "^chore\\(watchdog\\)",
-      "freshness_hours": 48
+      "job": "verify",
+      "cadence_cron": [
+        "23 11 * * *"
+      ],
+      "freshness_hours": 54
+    },
+    {
+      "name": "market-risk",
+      "workflow_file": "market-risk-components.yml",
+      "job": "build-and-publish",
+      "cadence_cron": [
+        "19 22 * * 1-5"
+      ],
+      "freshness_hours": 102,
+      "subject_regex": "^chore\\(risk\\)"
+    },
+    {
+      "name": "forced-flow",
+      "workflow_file": "forced-flow-daily.yml",
+      "job": "refresh",
+      "cadence_cron": [
+        "0 22 * * 1-5"
+      ],
+      "freshness_hours": 102,
+      "subject_regex": "^chore: refresh daily capitulation"
+    },
+    {
+      "name": "letters",
+      "workflow_file": "letter-backfill.yml",
+      "job": "publish-dashboard",
+      "cadence_cron": [
+        "13 16 * * 0",
+        "11 15 * * 3"
+      ],
+      "freshness_hours": 174,
+      "subject_regex": "^(chore|feat|fix)\\((letters|letter)\\)|letter backfill|Refresh dashboard payloads after letter backfill"
+    },
+    {
+      "name": "podcasts",
+      "workflow_file": "podcast-refresh.yml",
+      "job": "refresh",
+      "cadence_cron": [
+        "7 21 * * 1"
+      ],
+      "freshness_hours": 342,
+      "subject_regex": "^chore\\(podcasts\\)"
+    },
+    {
+      "name": "security-scan",
+      "workflow_file": "security-weekly.yml",
+      "job": "analyze-*",
+      "cadence_cron": [
+        "47 2 * * 0"
+      ],
+      "freshness_hours": 342
+    },
+    {
+      "name": "two-phase-watch",
+      "workflow_file": "two-phase-watch.yml",
+      "job": "watch",
+      "cadence_cron": [
+        "23 17 * * 0"
+      ],
+      "freshness_hours": 342,
+      "subject_regex": "^chore: INV two-phase cooling watch"
     }
   ],
+  "unmonitored_workflows": {
+    "youtube-refresh.yml": "Disabled in the Actions UI since 2026-09-06: it needs a self-hosted runner and none is registered (every run queued 24h, then was cancelled). Captions are published by a local scheduled task; the file is being retired."
+  },
   "guards": {
     "2026-08-07-added-a-validator-check-that-read-tick": [
       {
@@ -361,6 +540,21 @@
         "health.stale_active_quotes": {
           "max_count": 0,
           "why": "an active warrant with no delayed mark for more than five days cannot be silently presented as current"
+        }
+      }
+    },
+    "capitulation_daily": {
+      "path": "dashboard/data/capitulation_daily.json",
+      "stamp_field": "generated_at",
+      "max_age_hours": 100,
+      "healer": "python _system/scripts/build_capitulation_daily.py --workers 6 (forced-flow-daily weekdays 22:00 UTC; data-pipeline technicals lane, heal-technicals)",
+      "assert_fields": {
+        "quality_state": {
+          "not_in": [
+            "stale",
+            "unavailable"
+          ],
+          "why": "'unavailable' means no symbol could be fetched and 'stale' means the market (SPY) row is a preserved copy after a fetch failure; either way the ladder is not today's. 'lagging' (Yahoo behind the expected NYSE session) and 'limited' are deliberately NOT violations: they clear on their own, and flagging them would only make the healer dispatch against a vendor delay."
         }
       }
     }

@@ -1,0 +1,78 @@
+name: Deploy Ops Watchdog (Cloudflare)
+
+# Deploys ops-watchdog/, the Cloudflare Worker that watches the repository
+# health supervisor from outside GitHub (see ops-watchdog/wrangler.toml).
+# Push to ops-watchdog/** on main only: no manual trigger (the governance test
+# bans manual run buttons outside its allowlist) and no schedule -- the Worker
+# carries its own cron. Same wrangler-action pattern as the OAuth proxy.
+on:
+  push:
+    branches: [main]
+    paths:
+      - "ops-watchdog/**"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: deploy-ops-watchdog
+  cancel-in-progress: false
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            ops-watchdog
+          sparse-checkout-cone-mode: false
+          fetch-depth: 1
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Worker unit tests
+        run: node --test ops-watchdog/test/watchdog.test.mjs
+
+  deploy:
+    needs: test
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Require deploy and alert secrets
+        env:
+          CF_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CF_ACCOUNT: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          SLACK: ${{ secrets.SLACK_WEBHOOK_URL }}
+        run: |
+          # A watchdog that cannot alert is worse than none: it reads as
+          # coverage. Fail loudly instead of skipping.
+          missing=""
+          [ -n "$CF_TOKEN" ] || missing="$missing CLOUDFLARE_API_TOKEN"
+          [ -n "$CF_ACCOUNT" ] || missing="$missing CLOUDFLARE_ACCOUNT_ID"
+          [ -n "$SLACK" ] || missing="$missing SLACK_WEBHOOK_URL"
+          if [ -n "$missing" ]; then
+            echo "::error::Missing repository secret(s):$missing"
+            exit 1
+          fi
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            ops-watchdog
+          sparse-checkout-cone-mode: false
+          fetch-depth: 1
+      - name: Deploy the Worker and set its secrets
+        uses: cloudflare/wrangler-action@v3
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          CF_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CF_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          workingDirectory: ops-watchdog
+          secrets: |
+            SLACK_WEBHOOK_URL
+            CF_API_TOKEN
+            CF_ACCOUNT_ID

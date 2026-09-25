@@ -21,12 +21,13 @@ Honesty rules baked in (a validator must never look green on data it never saw):
 
 Output is ASCII-only (Windows cp1252 console; the recorded trap).
 
-Environment: ``GRAPH_LANE_REF`` -- git ref that ``graph_build`` projects lanes
-and commits from (default HEAD). ``run()`` sets it to ``origin/main`` for the
+Environment: ``GRAPH_LANE_REF`` -- git ref that ``graph_build`` projects lane
+commits from (default HEAD). ``run()`` sets it to ``origin/main`` for the
 duration of the build whenever that ref exists and the variable is not already
-set, because P3 fires spuriously on PR checkouts whose branch point is older
-than a lane's freshness window: the nightly lane commits land on main and are
-absent from the PR head's own history. An explicitly set value is respected
+set, because on a PR checkout whose branch point is older than a lane's window
+the nightly lane commits are absent from the PR head's own history. (Since
+2026-09-24 that only affects legacy commit-anchored lanes and the report: lane
+freshness is P8, report severity, judged from job-level receipts.) An explicitly set value is respected
 untouched; the variable is unset again after the build so nothing leaks into
 later builds against other roots.
 """
@@ -46,6 +47,7 @@ ROOT = Path(__file__).resolve().parents[2]
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import graph_build  # noqa: E402  (build(), norm_text, STATUS_TAG reuse)
+import lane_registry  # noqa: E402  (P3 lane contract)
 
 VIOLATION_CAP = 20          # rows listed per invariant in both reports
 E2_GRACE_DAYS = 14          # spec: outcome required within 14 days of due
@@ -58,6 +60,12 @@ TABLE_STATUS = re.compile(r"^`?(active|superseded|disproven)\s+\d{4}-\d{2}-\d{2}
 BASE_SEVERITY = {
     "P1": "report", "P2": "hard", "P3": "hard", "P4": "hard", "P5": "report",
     "P6": "hard", "P7": "report",
+    # P8 is lane freshness. It was P3's second half until 2026-09-24 and gated
+    # every PR and push on main; a PR cannot make a lane stale or fresh, so
+    # the gate only taught people to ignore red. Operational staleness now
+    # reaches a human through the repository-health supervisor (Slack plus a
+    # lane-failure issue per persistent failure); here it is reported.
+    "P8": "report",
     "E1": "report", "E2": "hard", "E3": "hard", "E4": "hard", "E5": "hard",
     "E6": "report", "E7": "hard", "E8": "hard", "E9": "hard",
     # L-series: the classification/lens plane (spec in _system/graph/README.md).
@@ -72,7 +80,8 @@ BASE_SEVERITY = {
 TITLES = {
     "P1": "every Correction has a GUARDED_BY path",
     "P2": "every Guard reaches a CIJob via ENFORCED_BY -> INVOKED_BY",
-    "P3": "every active Lane has a Commit inside its freshness window",
+    "P3": "every declared Lane is wired to a real workflow job (and work"
+          " step), and every scheduled workflow is a Lane",
     "P4": "no run receipts outside _system/data/runs/",
     "P5": "validator scripts with zero CI references",
     "E1": "decision-grade components carrying a typed falsifier",
@@ -87,6 +96,8 @@ TITLES = {
     "E9": "only eligible verified outcomes can activate calibration or agent challenges",
     "P6": "every registered data feed is fresher than its window",
     "P7": "every registered live feed has published inside its window",
+    "P8": "every Lane's work-done receipt is inside its freshness window"
+          " (operational; never a gate -- the supervisor alerts)",
     "L1": "every valued ticker resolves a payoff_lens through the"
           " classification chain",
     "L2": "classification surfaces agree (no shadowed classification)",
@@ -157,29 +168,56 @@ def inv_p2(conn, root, today) -> Result:
 
 
 def inv_p3(conn, root, today) -> Result:
+    """Structural lane contract (hard): the things a change under review can
+    break -- a lane naming a workflow, job or work step that does not exist
+    (its receipt could never advance again), or a scheduled workflow no lane
+    watches. Freshness is P8's, and is never a gate."""
+    config = graph_build.load_json(root / "_system" / "graph" / "graph_sources.json") or {}
+    violations, warnings = lane_registry.lane_contract(root, config)
+    wired = sum(1 for lane in lane_registry.declared_lanes(config)
+                if lane.get("workflow_file") and lane.get("job"))
+    note = f"{wired} job-anchored lanes wired"
+    if warnings:
+        note += "; " + "; ".join(warnings)
+    return Result("P3", len(violations), violations, note=note)
+
+
+def inv_p8(conn, root, today) -> Result:
+    """Lane freshness (report). A job-anchored lane is fresh only on its
+    work-done receipt; a commit or an agent PR title that happens to match
+    the lane's subject_regex no longer counts. Stale lanes are operational
+    state on main: they are listed here and alerted on by the supervisor,
+    and they never fail a PR or a push (a PR cannot fix a lane by being
+    merged, and a red gate everyone learns to ignore hides the next one)."""
     now = datetime.now(timezone.utc)
     violations = []
     fresh = 0
     for lane in conn.execute("SELECT * FROM nodes WHERE type='Lane' ORDER BY id"):
         data = json.loads(lane["data_json"])
         window = data.get("freshness_hours", 48)
-        commit_iso = data.get("last_commit_iso")
-        workflow_iso = data.get("last_success_at")
-        last = max(str(commit_iso or ""), str(workflow_iso or ""))
-        source = "workflow success" if workflow_iso and last == workflow_iso else "commit"
+        last = str(lane["as_of"] or "")
+        anchor = data.get("freshness_anchor") or "commit"
         if not last:
-            violations.append(f"{lane['label']}: NO commit in the"
-                              f" {graph_build.GIT_WINDOW}-commit window")
+            what = ("no work-done receipt" if anchor == "receipt" else
+                    f"NO commit in the {graph_build.GIT_WINDOW}-commit window")
+            outcome = data.get("latest_outcome")
+            violations.append(f"{lane['label']}: {what}"
+                              + (f" (latest run: {outcome})" if outcome else ""))
             continue
-        age_h = (now - datetime.fromisoformat(last)).total_seconds() / 3600.0
+        stamp = lane_registry.parse_iso(last)
+        if stamp is None:
+            violations.append(f"{lane['label']}: unparseable freshness stamp '{last[:40]}'")
+            continue
+        age_h = (now - stamp).total_seconds() / 3600.0
         if age_h > window:
-            violations.append(
-                f"{lane['label']}: last {source} {age_h:.1f}h old"
-                f" (window {window}h)")
+            source = "work-done receipt" if anchor != "commit" else "commit"
+            violations.append(f"{lane['label']}: last {source} {age_h:.1f}h old"
+                              f" (window {window}h)")
         else:
             fresh += 1
-    return Result("P3", len(violations), violations,
-                  note=f"{fresh} lanes fresh")
+    return Result("P8", len(violations), violations,
+                  note=f"{fresh} lanes fresh; stale lanes alert through the"
+                       " repository-health supervisor, never through this gate")
 
 
 def inv_p4(conn, root, today) -> Result:
@@ -302,10 +340,20 @@ def inv_e2(conn, root, today) -> Result:
             "SELECT n.as_of FROM edges e JOIN nodes n ON n.id=e.dst"
             " WHERE e.src=? AND e.type='RESOLVED_BY' LIMIT 1",
             (row["id"],)).fetchone()
+        # The falsifier lane runs once a day, so the first run that can see
+        # deadline-day evidence may be the one on deadline + 1: resolve_
+        # falsifiers.py only declares `unresolvable` once the deadline has
+        # passed, and a hit/miss whose evidence landed after that day's run is
+        # recorded the next day too. Any verdict dated deadline + 1 is therefore
+        # on time; counting it late made a one-day processing lag a PERMANENT
+        # hard violation (DOC would have tripped on 2026-10-15, DG on 10-28).
+        # A missing outcome is flagged from deadline + 2, and any verdict dated
+        # later than deadline + 1 is still late.
+        terminal_by = (date.fromisoformat(deadline) + timedelta(days=1)).isoformat()
         if outcome is None:
-            if today.isoformat() > deadline:
+            if today.isoformat() > terminal_by:
                 violations.append(f"{fid}: due {due}, no outcome by {deadline}")
-        elif outcome["as_of"] and str(outcome["as_of"])[:10] > deadline:
+        elif outcome["as_of"] and str(outcome["as_of"])[:10] > terminal_by:
             violations.append(f"{fid}: due {due}, resolved late"
                               f" ({outcome['as_of']})")
     return Result("E2", len(violations), violations,
@@ -1233,7 +1281,7 @@ def inv_l6(conn, root, today) -> Result:
     return Result("L6", len(violations), violations, note=note)
 
 
-INVARIANTS = [inv_p1, inv_p2, inv_p3, inv_p4, inv_p5, inv_p6, inv_p7,
+INVARIANTS = [inv_p1, inv_p2, inv_p3, inv_p4, inv_p5, inv_p6, inv_p7, inv_p8,
               inv_e1, inv_e2, inv_e3, inv_e4, inv_e5, inv_e6, inv_e7, inv_e8, inv_e9,
               inv_l1, inv_l2, inv_l3, inv_l4, inv_l5, inv_l6]
 

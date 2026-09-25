@@ -40,7 +40,12 @@ jobs:
         run: |
           set -euo pipefail
           python -m pytest -q _system/scripts/tests/test_memory_triage.py
-          python _system/scripts/graph_invariants.py || true
+          # Fail closed. `graph_invariants.py || true` swallowed a crash, and the
+          # subset check below then read the stale committed report and passed.
+          # Delete the report first; a non-zero exit (other lanes' hard
+          # invariants may be red) is tolerated only if a fresh report exists.
+          rm -f _system/graph/invariants.json
+          python _system/scripts/graph_invariants.py || test -s _system/graph/invariants.json
           python _system/scripts/validate_invariant_subset.py E4 E5 E7
       - name: Publish triage summary
         if: always()
