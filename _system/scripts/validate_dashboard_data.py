@@ -13,6 +13,7 @@ ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "_system" / "scripts"))
 from vault_paths import letters_root  # noqa: E402
 from activist_common import classify_publisher_page  # noqa: E402
+import check_media_analysis_freshness  # noqa: E402
 DATA_PATH = ROOT / "dashboard" / "data" / "dashboard_data.json"
 CORE_PATH = ROOT / "dashboard" / "data" / "core.json"
 REGISTRY_PATH = ROOT / "_system" / "portfolio" / "registry.json"
@@ -997,6 +998,15 @@ def main() -> int:
             errors.append("core.json exists but dashboard/data/tickers/ missing")
         if not (insights_dir / "manifest.json").exists():
             warnings.append("dashboard/data/insights/manifest.json missing - insights tab will not lazy-load")
+        else:
+            # Warning, never an error: a stalled analyser must not also cost the
+            # dashboard its deploy. The point is that it gets *said* -- the
+            # 2026-09-11..25 outage was silent for fourteen days.
+            try:
+                _, media_problems, _ = check_media_analysis_freshness.check()
+                warnings.extend(media_problems)
+            except Exception as exc:  # noqa: BLE001 - a monitor may not break the gate
+                warnings.append(f"media analysis freshness check failed: {exc}")
     else:
         warnings.append("dashboard/data/core.json missing - SPA falls back to monolithic payload")
 

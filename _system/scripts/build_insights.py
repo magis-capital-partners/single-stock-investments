@@ -3253,6 +3253,17 @@ def newest_as_of(values) -> str | None:
     return max(dates) if dates else None
 
 
+def analysis_depth(rows) -> int:
+    """How many rows a model has actually read, not how many were collected.
+
+    Every other number on a media source_health row is a count of things
+    gathered, and all of them kept rising through the fourteen days the local
+    analysis lane was dead. Counted here so the committed manifest carries the
+    one figure that can fall while the corpus grows.
+    """
+    return sum(1 for row in (rows or []) if row.get("has_analysis"))
+
+
 def latest_filing_fact_files() -> list[Path]:
     latest: list[Path] = []
     for ticker_dir in ROOT.iterdir():
@@ -3342,11 +3353,16 @@ def build_source_health(
                 "episode_count": _pod.get("episode_count") or len(_pod.get("episodes") or []),
                 "transcript_count": _pod.get("transcript_count"),
                 "whisper_pending": _pod.get("whisper_pending"),
+                # Depth, not count. Episodes and transcripts both grew every day
+                # of the fourteen this number did not move, and every count on
+                # this row rose while the corpus got less readable.
+                "with_analysis": analysis_depth(_pod.get("episodes")),
                 "as_of": newest_as_of([e.get("published") for e in (_pod.get("episodes") or [])]),
                 "notes": (
                     f"episodes={_pod.get('episode_count') or len(_pod.get('episodes') or [])}"
                     f" transcripts={_pod.get('transcript_count') or 0}"
                     f" whisper_pending={_pod.get('whisper_pending') or 0}"
+                    f" analysed={analysis_depth(_pod.get('episodes'))}"
                 ),
                 "path": (
                     relative_path(PODCASTS_INSIGHTS)
@@ -3369,6 +3385,15 @@ def build_source_health(
                 "records": counts.get("video_research", 0),
                 "items": len(_video.get("video_index") or []),
                 "video_count": _video.get("video_count") or len(_video.get("video_index") or []),
+                # publish_video_dashboard.py writes these, and this rebuild used
+                # to drop them: the committed manifest carried five ways to say
+                # how many videos there were and none to say how many had been
+                # read. 16 of 95, unchanged since 09-12, was invisible.
+                "with_analysis": analysis_depth(_video.get("video_index")),
+                "claims": sum(
+                    int(row.get("claim_count") or 0)
+                    for row in (_video.get("video_index") or [])
+                ),
                 "as_of": newest_as_of([
                     row.get("published") for row in (_video.get("video_index") or [])
                 ]),
