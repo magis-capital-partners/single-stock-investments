@@ -7,6 +7,7 @@ what the job decides, not how the source looks.
 from __future__ import annotations
 
 import json
+import os
 import shutil
 import subprocess
 from pathlib import Path
@@ -139,8 +140,71 @@ def test_warrant_problems_do_not_red_unrelated_research_prs():
     assert "check_warrant_universe.py --warn-only" in run
 
 
-def test_a_scheduled_run_judges_history_against_itself():
+def history_step() -> dict:
     steps = load()["jobs"]["graph-invariants"]["steps"]
-    history = next(s for s in steps if "immutable history" in str(s.get("name", "")))
-    assert '"${{ github.event_name }}" = "schedule"' in history["run"]
-    assert 'HISTORY_BASE="HEAD"' in history["run"]
+    return next(s for s in steps if "immutable history" in str(s.get("name", "")))
+
+
+def test_a_scheduled_run_judges_everything_since_the_previous_scheduled_run():
+    """HISTORY_BASE="HEAD" compared HEAD with itself and checked nothing."""
+    step = history_step()
+    run = step["run"]
+    assert 'HISTORY_BASE="HEAD"\n' not in run
+    assert "actions/workflows/research-quality.yml/runs?event=schedule&status=completed" in run
+    assert "select(.id != ${{ github.run_id }})" in run
+    assert 'HISTORY_BASE="HEAD~1"' in run
+    assert step["env"]["GH_TOKEN"] == "${{ github.token }}"
+    assert load()["permissions"]["actions"] == "read"
+
+
+def run_history_selection(tmp_path: Path, gh_says: str) -> tuple[str, dict[str, str]]:
+    """Run the step's base-selection lines for a schedule event, with a fake gh."""
+    bash = shutil.which("bash")
+    git = shutil.which("git")
+    if not bash or not git:
+        pytest.skip("needs bash and git")
+    repo = tmp_path / "repo"
+    repo.mkdir(parents=True)
+    env = {**os.environ, "GIT_AUTHOR_NAME": "t", "GIT_AUTHOR_EMAIL": "t@x",
+           "GIT_COMMITTER_NAME": "t", "GIT_COMMITTER_EMAIL": "t@x"}
+    shas = {}
+    subprocess.run([git, "init", "-q", "-b", "main"], cwd=repo, env=env, check=True)
+    for name in ("c1", "c2", "c3"):
+        (repo / name).write_text(name, encoding="utf-8")
+        subprocess.run([git, "add", "-A"], cwd=repo, env=env, check=True)
+        subprocess.run([git, "commit", "-q", "-m", name], cwd=repo, env=env, check=True)
+        shas[name] = subprocess.run([git, "rev-parse", "HEAD"], cwd=repo, env=env, check=True,
+                                    capture_output=True, text=True).stdout.strip()
+    lines = history_step()["run"].splitlines()
+    start = next(i for i, line in enumerate(lines) if line.startswith('HISTORY_BASE="origin/main"'))
+    end = next(i for i in range(start, len(lines)) if lines[i] == "fi")
+    snippet = "\n".join(lines[start:end + 1]) + '\necho "BASE=$HISTORY_BASE"\n'
+    for expr, value in (("${{ github.event_name }}", "schedule"),
+                        ("${{ github.event.before }}", "0" * 40),
+                        ("${{ github.repository }}", "o/r"),
+                        ("${{ github.run_id }}", "999")):
+        snippet = snippet.replace(expr, value)
+    fake = tmp_path / "bin"
+    fake.mkdir(parents=True)
+    (fake / "gh").write_text(f"#!/usr/bin/env bash\necho '{shas.get(gh_says, gh_says)}'\n", encoding="utf-8",
+                             newline="\n")
+    (fake / "gh").chmod(0o755)
+    (tmp_path / "snippet.sh").write_text(snippet, encoding="utf-8", newline="\n")
+    env["PATH"] = str(fake) + os.pathsep + env["PATH"]
+    proc = subprocess.run([bash, str(tmp_path / "snippet.sh")], cwd=repo, env=env,
+                          capture_output=True, text=True, check=False)
+    assert proc.returncode == 0, proc.stderr
+    base = next(line[5:] for line in proc.stdout.splitlines() if line.startswith("BASE="))
+    return base, shas
+
+
+def test_the_previous_scheduled_runs_sha_is_the_base(tmp_path):
+    base, shas = run_history_selection(tmp_path, "c1")
+    assert base == shas["c1"]
+
+
+def test_no_usable_previous_run_falls_back_to_the_last_commit(tmp_path):
+    base, _ = run_history_selection(tmp_path, "")
+    assert base == "HEAD~1"
+    base, _ = run_history_selection(tmp_path / "unknown", "f" * 40)
+    assert base == "HEAD~1"

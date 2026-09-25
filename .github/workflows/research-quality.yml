@@ -1,13 +1,13 @@
 name: Research quality
 
 on:
-  # The SSI pipeline and fact-ledger currency jobs are self-contained and must
-  # also validate direct pushes to main, which bypass pull_request entirely --
-  # and batch valuation writes land on main by direct push, which is exactly how
-  # a mislabeled-currency fact would arrive. Those bot pushes use GITHUB_TOKEN
-  # and start no workflow, so the schedule below is what actually covers them.
-  # The other jobs in this file need a PR base ref and stay gated to
-  # pull_request below.
+  # push: the SSI pipeline, fact-ledger currency and graph-invariants jobs
+  # also run on direct pushes to main, which bypass pull_request entirely. In
+  # practice that is only human pushes: the batch lanes (where a mislabeled-
+  # currency fact would arrive) and automerge push with GITHUB_TOKEN, which
+  # starts no workflow run at all. Their commits are checked by the schedule
+  # below, which tests main HEAD every six hours, not each push. The other jobs
+  # need a PR base ref and stay gated to pull_request.
   push:
     branches: [main]
     paths:
@@ -172,6 +172,8 @@ on:
 permissions:
   contents: read
   pull-requests: read
+  # The scheduled history check looks up the previous scheduled run.
+  actions: read
 
 concurrency:
   # On push there is no PR number; keying on the sha gives each push its own
@@ -572,6 +574,8 @@ jobs:
         working-directory: _system/scripts
         run: python -m unittest -v test_graph_build test_graph_invariants
       - name: Epistemic integrity, immutable history, and source preflight
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
           python _system/scripts/lint_falsifier_specs.py
@@ -579,9 +583,18 @@ jobs:
           if [ "${{ github.event_name }}" = "push" ] && [ "${{ github.event.before }}" != "0000000000000000000000000000000000000000" ]; then
             HISTORY_BASE="${{ github.event.before }}"
           elif [ "${{ github.event_name }}" = "schedule" ]; then
-            # A scheduled run has no change to judge, and origin/main may be
-            # ahead of the commit under test: compare HEAD with itself.
-            HISTORY_BASE="HEAD"
+            # Judge everything that landed since the previous scheduled run:
+            # bot pushes start no push run, so this is the only history check
+            # their commits get. Fall back to the last commit when that run's
+            # SHA is not in the fetched history (or there is none).
+            PREV=$(gh api "repos/${{ github.repository }}/actions/workflows/research-quality.yml/runs?event=schedule&status=completed&per_page=10" \
+              --jq '[.workflow_runs[] | select(.id != ${{ github.run_id }}) | .head_sha][0] // empty' || true)
+            if [ -n "$PREV" ] && git cat-file -e "${PREV}^{commit}" 2>/dev/null; then
+              HISTORY_BASE="$PREV"
+            else
+              HISTORY_BASE="HEAD~1"
+            fi
+            echo "Scheduled history check since ${HISTORY_BASE}"
           fi
           python _system/scripts/check_falsifier_history.py --base-ref "$HISTORY_BASE"
           # The promotion gate's suite arrives with WS1's falsifier branch;
