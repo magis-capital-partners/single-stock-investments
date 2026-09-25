@@ -236,12 +236,22 @@ class PushMainTests(unittest.TestCase):
 
     def test_publishing_from_another_branch_is_refused(self):
         """2026-09-24/25. Committing to HEAD and pushing `main` are only the
-        same thing on main, so anywhere else the lane must decline loudly."""
+        same thing on main, so a named branch elsewhere must decline loudly."""
         _git(self.repo, "checkout", "-q", "-b", "wip/youtube-video-details")
         _write(self.repo / self.SHARDS / "brand-new.json", "{}\n")
         self.assertIs(lane.push_main(MESSAGE), False)
         self.assertTrue(any("not 'main'" in line for line in self.lines), self.lines)
         self.assertEqual(_git(self.origin, "log", "-1", "--format=%s", "main"), "seed")
+
+    def test_a_detached_lane_worktree_publishes_normally(self):
+        """lane_worktree.ps1 keeps lane worktrees on a detached FETCH_HEAD so no
+        agent's branch switch can move them -- ssi-local-lanes runs that way
+        today. Detached is the expected state, not a fault to refuse."""
+        _git(self.repo, "checkout", "-q", "--detach")
+        _write(self.repo / self.SHARDS / "brand-new.json", "{}\n")
+        self.assertIs(lane.push_main(MESSAGE), True)
+        self.assertEqual(_git(self.origin, "log", "-1", "--format=%s", "main"), MESSAGE)
+        self.assertTrue(self._pushed(f"{self.SHARDS}/brand-new.json"))
 
     def test_the_commit_just_made_is_the_one_that_lands(self):
         """`push origin main` resolves the local ref by name. Push HEAD so the

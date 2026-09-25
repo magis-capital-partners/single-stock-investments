@@ -76,9 +76,13 @@ MAIN_PATHS = (
 # holds: nothing outside it is ever staged by this lane.
 MAIN_DIRS = ("dashboard/data/insights/video_details",)
 
-# The branch this lane publishes from. It commits to HEAD and then pushes, so
-# running it on any other branch pushed a ref that had nothing to do with the
-# commit it had just made. Checked rather than assumed.
+# The branch this lane publishes to. It commits to HEAD and then pushes, so
+# `git push origin main` -- which resolves the *local* ref of that name --
+# published whatever main happened to point at rather than the commit just
+# made. Pushed as HEAD:main instead, which is correct detached as well as on a
+# branch. lane_worktree.ps1 keeps lane worktrees on a detached FETCH_HEAD
+# precisely so nobody's branch switch can move them, so detached is the
+# expected state here and must not be refused.
 MAIN_BRANCH = "main"
 
 # Lines of git's own output kept per stream when a command fails. A failed
@@ -270,14 +274,16 @@ def push_main(message: str) -> bool | None:
     a failed push exit 0.
     """
     try:
-        branch = run_git(ROOT, "rev-parse", "--abbrev-ref", "HEAD",
-                         timeout=120).stdout.strip()
-        if branch != MAIN_BRANCH:
-            # The commit lands on HEAD, so publishing from anywhere else pushed
-            # whatever `main` happened to point at instead of the work just
-            # done. That is how 2026-09-24 and -09-25 built 95 videos, pushed
-            # the vault, and left the dashboard frozen at the 23rd.
-            log(f"main: worktree is on '{branch}', not '{MAIN_BRANCH}'; "
+        # Detached (the lane worktree's normal state) reports no branch and is
+        # fine. A *named* branch that is not main is not: on 2026-09-24 and -25
+        # this worktree sat on wip/youtube-video-details, where a commit to HEAD
+        # and a push of `main` were two unrelated things, and two days of work
+        # went nowhere while the vault push succeeded and the lane logged green.
+        head = run_git(ROOT, "symbolic-ref", "-q", "--short", "HEAD",
+                       check=False, timeout=120)
+        branch = head.stdout.strip() if head.returncode == 0 else ""
+        if branch and branch != MAIN_BRANCH:
+            log(f"main: worktree is on '{branch}', not '{MAIN_BRANCH}' or detached; "
                 "refusing to publish from a branch this lane does not track")
             return False
         present = [p for p in MAIN_PATHS if (ROOT / p).is_file()]
