@@ -12,20 +12,38 @@ so D1 does not have to rewrite a large table in one statement.
 
 Nonce tables (portfolio / sleeve / market-risk) are pruned here only — ingest
 handlers must not DELETE on the hot path.
+
+Retention runs ONCE per UTC day. It used to run on every deploy (up to 20 a
+day), which re-ran the portfolio ranking scans each time for a few dozen rows.
+The date of the last completed pass lives in ops_state (``prune:last_date``,
+migration 0019); a pass that fails or hits the daily quota does not record it,
+so the next deploy retries. Every statement's rows_read / rows_written come
+from D1's own result meta and are printed, with a machine-readable total on
+the last line (``D1_METRICS {...}``) for the deploy summary.
 """
 
 from __future__ import annotations
 
 import argparse
 import json
+import re
 import sqlite3
 import subprocess
+import sys
 from collections.abc import Callable, Iterable
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
 
 Execute = Callable[[str], int]
+
+LAST_PRUNE_KEY = "prune:last_date"
+QUOTA_EXIT_CODE = 75  # EX_TEMPFAIL: the daily free-tier quota, retried after 00:00 UTC
+# The quota's own words, and nothing else. D1 reports EVERY query error as
+# code 7500 ("no such table: ...: SQLITE_ERROR [code: 7500]"), so matching the
+# code would turn a retention SQL bug into a daily "deferral" forever.
+QUOTA_PATTERN = re.compile(r"exceeded D1's free tier daily row (read|write) limit", re.IGNORECASE)
 
 PORTFOLIO_REFERENCES = (
     "portfolio_reconciliation_breaks",
@@ -44,6 +62,10 @@ DEFAULT_TIME_POLICIES = (
     ("market_risk_ingest_nonces", "received_at", 2),
     ("portfolio_ingest_nonces", "received_at", 2),
     ("sleeve_ingest_nonces", "received_at", 2),
+    # Resolved alerts only: open alerts have closed_at NULL, which never
+    # compares below the cutoff. Seeks on idx_market_risk_alerts_open, which
+    # leads with closed_at (0005).
+    ("market_risk_alerts", "closed_at", 30),
     ("sleeve_classifier_audit", "as_of", 90),
     ("sleeve_marks", "as_of", 400),
     ("price_observations", "observed_on", 3650),
@@ -215,11 +237,52 @@ def _statements(payload: Any) -> list[dict[str, Any]]:
     return []
 
 
+def _statement_label(sql: str) -> str:
+    match = re.search(r"\b(DELETE FROM|INSERT INTO|UPDATE|FROM)\s+(\w+)", sql)
+    return match.group(2) if match else "query"
+
+
+class StatementMetrics:
+    """rows_read / rows_written per statement, as D1 reports them."""
+
+    def __init__(self, stream=None):
+        self.stream = stream if stream is not None else sys.stdout
+        self.statements = 0
+        self.rows_read = 0
+        self.rows_written = 0
+        self.changes = 0
+
+    def record(self, sql: str, results: list[dict[str, Any]]) -> None:
+        for statement in results:
+            meta = statement.get("meta") or {}
+            rows_read = int(meta.get("rows_read") or 0)
+            rows_written = int(meta.get("rows_written") or 0)
+            changes = int(meta.get("changes") or 0)
+            self.statements += 1
+            self.rows_read += rows_read
+            self.rows_written += rows_written
+            self.changes += changes
+            print(
+                f"D1 statement {self.statements}: {_statement_label(sql)} "
+                f"rows_read={rows_read} rows_written={rows_written} changes={changes}",
+                file=self.stream,
+            )
+
+    def as_dict(self) -> dict[str, int]:
+        return {
+            "statements": self.statements,
+            "rows_read": self.rows_read,
+            "rows_written": self.rows_written,
+            "changes": self.changes,
+        }
+
+
 class WranglerD1:
-    def __init__(self, wrangler: Path, database: str, config: Path):
+    def __init__(self, wrangler: Path, database: str, config: Path, metrics: StatementMetrics | None = None):
         self.wrangler = str(wrangler)
         self.database = database
         self.config = str(config)
+        self.metrics = metrics if metrics is not None else StatementMetrics()
 
     def query(self, sql: str) -> list[dict[str, Any]]:
         command = [
@@ -237,25 +300,84 @@ class WranglerD1:
         ]
         result = subprocess.run(command, capture_output=True, text=True, check=False)
         if result.returncode:
-            detail = (result.stderr or result.stdout).strip()[-2_000:]
+            # Both streams: --json errors (the quota among them) go to STDOUT,
+            # and a wrangler update/deprecation notice on stderr must not
+            # hide them.
+            detail = ((result.stderr or "") + "\n" + (result.stdout or "")).strip()[-4_000:]
             raise RuntimeError(f"Wrangler D1 command failed: {detail}")
-        return _statements(_decode_json(result.stdout))
+        statements = _statements(_decode_json(result.stdout))
+        self.metrics.record(sql, statements)
+        return statements
 
     def execute(self, sql: str) -> int:
         return sum(int(row.get("meta", {}).get("changes", 0)) for row in self.query(sql))
 
-    def tables(self) -> set[str]:
-        rows: list[dict[str, Any]] = []
-        for statement in self.query(
-            "SELECT name FROM sqlite_master WHERE type='table'"
-        ):
+    def rows(self, sql: str) -> list[dict[str, Any]]:
+        out: list[dict[str, Any]] = []
+        for statement in self.query(sql):
             result = statement.get("results", [])
             if isinstance(result, list):
-                rows.extend(row for row in result if isinstance(row, dict))
-        return {str(row["name"]) for row in rows if row.get("name")}
+                out.extend(row for row in result if isinstance(row, dict))
+        return out
+
+    def tables(self) -> set[str]:
+        return {
+            str(row["name"])
+            for row in self.rows("SELECT name FROM sqlite_master WHERE type='table'")
+            if row.get("name")
+        }
 
 
-def main() -> int:
+def last_prune_date(rows: Callable[[str], list[dict[str, Any]]]) -> str | None:
+    """The UTC date of the last completed pass, or None (no row / no table)."""
+    try:
+        found = rows(f"SELECT value FROM ops_state WHERE key = '{LAST_PRUNE_KEY}'")
+    except RuntimeError as error:
+        if "no such table" in str(error).lower():
+            return None
+        raise
+    return str(found[0].get("value")) if found else None
+
+
+def record_prune_date(execute: Execute, today: str, now: str) -> None:
+    execute(
+        "INSERT INTO ops_state (key, value, updated_at) "
+        f"VALUES ('{LAST_PRUNE_KEY}', '{today}', '{now}') "
+        "ON CONFLICT (key) DO UPDATE SET value=excluded.value, updated_at=excluded.updated_at"
+    )
+
+
+def run_retention(
+    client: Any,
+    *,
+    today: str,
+    now: str,
+    force: bool = False,
+    batch_size: int = 1_000,
+) -> dict[str, Any]:
+    """One daily pass. Returns what it did; raises on a D1 failure."""
+    if not force and last_prune_date(client.rows) == today:
+        return {"status": "skipped", "reason": f"already ran on {today} (UTC)", "deleted": 0}
+    tables = client.tables()
+    if not tables:
+        return {"status": "skipped", "reason": "new database; nothing to prune", "deleted": 0}
+    portfolio_deleted = prune_portfolio_history(
+        client.execute,
+        tables,
+        batch_size=max(1, min(batch_size, 250)),
+    )
+    time_deleted = prune_time_series(client.execute, tables, batch_size=max(1, batch_size))
+    if "ops_state" in tables:
+        record_prune_date(client.execute, today, now)
+    return {
+        "status": "ran",
+        "deleted": portfolio_deleted + sum(time_deleted.values()),
+        "portfolio_source_runs": portfolio_deleted,
+        "tables": {table: count for table, count in time_deleted.items() if count},
+    }
+
+
+def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument(
         "--wrangler",
@@ -265,29 +387,43 @@ def main() -> int:
     parser.add_argument("--database", default="DB")
     parser.add_argument("--config", type=Path, required=True)
     parser.add_argument("--batch-size", type=int, default=1_000)
-    args = parser.parse_args()
+    parser.add_argument(
+        "--force",
+        action="store_true",
+        help="run even when today's pass is already recorded in ops_state",
+    )
+    args = parser.parse_args(argv)
 
+    moment = datetime.now(timezone.utc)
     client = WranglerD1(args.wrangler, args.database, args.config)
-    tables = client.tables()
-    if not tables:
-        print("D1 retention: new database; nothing to prune.")
-        return 0
-
-    portfolio_deleted = prune_portfolio_history(
-        client.execute,
-        tables,
-        batch_size=max(1, min(args.batch_size, 250)),
-    )
-    time_deleted = prune_time_series(
-        client.execute, tables, batch_size=max(1, args.batch_size)
-    )
-    total = portfolio_deleted + sum(time_deleted.values())
-    details = ", ".join(
-        f"{table}={count}" for table, count in time_deleted.items() if count
-    )
-    suffix = f" ({details})" if details else ""
-    print(f"D1 retention removed {total} rows; portfolio_source_runs={portfolio_deleted}{suffix}.")
-    return 0
+    outcome: dict[str, Any] = {"status": "failed"}
+    code = 0
+    try:
+        outcome = run_retention(
+            client,
+            today=moment.strftime("%Y-%m-%d"),
+            now=moment.strftime("%Y-%m-%dT%H:%M:%SZ"),
+            force=args.force,
+            batch_size=args.batch_size,
+        )
+    except RuntimeError as error:
+        print(str(error), file=sys.stderr)
+        quota = bool(QUOTA_PATTERN.search(str(error)))
+        outcome = {"status": "quota" if quota else "failed", "error": str(error)[-300:]}
+        code = QUOTA_EXIT_CODE if quota else 1
+    if outcome.get("status") == "ran":
+        details = ", ".join(f"{table}={count}" for table, count in outcome["tables"].items())
+        suffix = f" ({details})" if details else ""
+        print(
+            f"D1 retention removed {outcome['deleted']} rows; "
+            f"portfolio_source_runs={outcome['portfolio_source_runs']}{suffix}."
+        )
+    elif outcome.get("status") == "skipped":
+        print(f"D1 retention skipped: {outcome['reason']}.")
+    metrics = {"stage": "retention", **outcome, **client.metrics.as_dict()}
+    metrics.pop("error", None)
+    print("D1_METRICS " + json.dumps(metrics, sort_keys=True))
+    return code
 
 
 if __name__ == "__main__":

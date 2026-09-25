@@ -1,73 +1,188 @@
 #!/usr/bin/env python3
-"""Tests for suppressing no-op Data Pipeline dashboard deploys."""
+"""Tests for the content-addressed dashboard deploy gate.
+
+Runs in ci-bootstrap-smoke (drive-intake job) from a sparse checkout that has
+this file, the gate script and three workflow files -- so no PyYAML and no
+other repo files here. Git is used only in throwaway repositories.
+"""
 from __future__ import annotations
 
+import re
+import subprocess
 import sys
+import tempfile
 import unittest
 from pathlib import Path
 
 SCRIPTS = Path(__file__).resolve().parent
 ROOT = SCRIPTS.parents[1]
 sys.path.insert(0, str(SCRIPTS))
-from workflow_run_deploy_gate import should_deploy
+import workflow_run_deploy_gate as gate  # noqa: E402
 
 
-def _job(name: str, *, conclusion: str = "success", steps: list[dict] | None = None) -> dict:
-    return {
-        "name": name,
-        "conclusion": conclusion,
-        "steps": steps or [],
-    }
+def _git(repo: Path, *args: str) -> str:
+    result = subprocess.run(
+        ["git", "-c", "user.name=gate-test", "-c", "user.email=gate@test.invalid",
+         "-c", "commit.gpgsign=false", *args],
+        cwd=repo, capture_output=True, text=True, check=True,
+    )
+    return result.stdout.strip()
 
 
-class WorkflowRunDeployGateTests(unittest.TestCase):
-    def test_no_import_drive_run_does_not_deploy(self) -> None:
-        jobs = [
-            _job("decide"),
-            _job(
-                "drive",
-                steps=[
-                    {"name": "Import Drive intake PDFs", "conclusion": "success"},
-                    {"name": "Commit imported documents", "conclusion": "skipped"},
-                    {"name": "Commit updated intake report", "conclusion": "success"},
-                ],
-            ),
-            _job("downloads", conclusion="skipped"),
-            _job("pipeline-summary"),
-        ]
-        self.assertFalse(should_deploy("Data Pipeline", jobs))
+class DecideTests(unittest.TestCase):
+    def test_push_and_dispatch_always_deploy(self) -> None:
+        for event in ("push", "workflow_dispatch"):
+            deploy, _ = gate.decide(event, shipped=True, synced=True, deferred_today=True, pruned_today=True)
+            self.assertTrue(deploy, event)
 
-    def test_imported_drive_documents_do_deploy(self) -> None:
-        jobs = [
-            _job("decide"),
-            _job(
-                "drive",
-                steps=[
-                    {"name": "Rebuild insights (only when files imported)", "conclusion": "success"},
-                    {"name": "Commit imported documents", "conclusion": "success"},
-                ],
-            ),
-            _job("pipeline-summary"),
-        ]
-        self.assertTrue(should_deploy("Data Pipeline", jobs))
+    def test_upstream_run_with_unchanged_inputs_does_not_deploy(self) -> None:
+        # A Power Zone / LS-algo run whose main job was skipped commits nothing,
+        # so the fingerprint is one a previous deploy already synced.
+        deploy, reason = gate.decide("workflow_run", shipped=True, synced=True, deferred_today=False, pruned_today=False)
+        self.assertFalse(deploy)
+        self.assertIn("unchanged", reason)
 
-    def test_other_data_pipeline_lane_preserves_deploy(self) -> None:
-        jobs = [
-            _job("decide"),
-            _job("downloads", steps=[{"name": "Commit downloaded filings", "conclusion": "success"}]),
-            _job("drive", conclusion="skipped"),
-            _job("pipeline-summary"),
-        ]
-        self.assertTrue(should_deploy("Data Pipeline", jobs))
+    def test_upstream_run_with_changed_inputs_deploys(self) -> None:
+        deploy, _ = gate.decide("workflow_run", shipped=True, synced=False, deferred_today=False, pruned_today=False)
+        self.assertTrue(deploy)
 
-    def test_other_upstream_workflow_preserves_deploy(self) -> None:
-        self.assertTrue(should_deploy("Darwin Portfolio Refresh", [_job("build")]))
+    def test_no_same_day_retry_after_a_d1_deferral(self) -> None:
+        for event in ("workflow_run", "schedule"):
+            deploy, reason = gate.decide(event, shipped=True, synced=False, deferred_today=True, pruned_today=False)
+            self.assertFalse(deploy, event)
+            self.assertIn("00:00 UTC", reason)
 
-    def test_unknown_data_pipeline_shape_fails_open(self) -> None:
-        self.assertTrue(should_deploy("Data Pipeline", [_job("decide"), _job("pipeline-summary")]))
+    def test_schedule_is_the_post_reset_recovery_path(self) -> None:
+        # Yesterday's deferral left the inputs unsynced; today has no deferral yet.
+        self.assertTrue(gate.decide("schedule", shipped=True, synced=False, deferred_today=False, pruned_today=True)[0])
+        # Nothing changed, but today's retention has not run.
+        self.assertTrue(gate.decide("schedule", shipped=True, synced=True, deferred_today=False, pruned_today=False)[0])
+        # Nothing changed, nothing owed: cheap no-op.
+        self.assertFalse(gate.decide("schedule", shipped=True, synced=True, deferred_today=False, pruned_today=True)[0])
+
+    def test_unknown_events_fail_open(self) -> None:
+        self.assertTrue(gate.decide("repository_dispatch", shipped=True, synced=True, deferred_today=False, pruned_today=True)[0])
+
+    _SAME = object()
+
+    def cli(self, event: str, fingerprint: str, last: str | None, shipped=_SAME,
+            deferred: str = "") -> dict[str, str]:
+        """Run ``decide`` as the workflow does. ``last`` / ``shipped`` are what
+        the newest dashboard-deploy-last-v1- / -shipped-v1- entries restored
+        (None: nothing); ``shipped`` defaults to ``last`` (D1 kept up)."""
+        shipped = last if shipped is self._SAME else shipped
+        with tempfile.TemporaryDirectory() as tmp:
+            out = Path(tmp) / "out.txt"
+            files = {}
+            for name, value in (("last", last), ("shipped", shipped)):
+                files[name] = Path(tmp) / f".deploy-gate-{name}" / "fingerprint"
+                if value is not None:
+                    files[name].parent.mkdir()
+                    files[name].write_text(value, encoding="utf-8")
+            self.assertEqual(gate.main([
+                "decide", "--event", event, "--fingerprint", fingerprint,
+                "--last-file", str(files["last"]), "--shipped-file", str(files["shipped"]),
+                "--deferred-hit", deferred, "--pruned-hit", "", "--github-output", str(out),
+            ]), 0)
+            return dict(line.split("=", 1) for line in out.read_text(encoding="utf-8").splitlines())
+
+    def test_a_same_day_revert_after_a_deferred_deploy_redeploys(self) -> None:
+        # A shipped and synced. B shipped Pages but its D1 work was deferred
+        # (last synced still A; a deferral marker exists for B, not A). main
+        # reverts to A the same day: D1 already holds A, but the site shows B.
+        for event in ("workflow_run", "schedule"):
+            verdict = self.cli(event, "fingerprint-A", last="fingerprint-A", shipped="fingerprint-B")
+            self.assertEqual(verdict["should_deploy"], "true", event)
+            self.assertEqual(verdict["last_shipped"], "fingerprint-B")
+
+    def test_deferred_inputs_wait_for_the_reset_then_retry(self) -> None:
+        # B shipped with D1 deferred today: no same-day retry for B...
+        self.assertEqual(
+            self.cli("workflow_run", "fp-B", last="fp-A", shipped="fp-B", deferred="true")["should_deploy"],
+            "false",
+        )
+        # ...but after 00:00 UTC (no deferral marker for the new date) it retries.
+        self.assertEqual(
+            self.cli("schedule", "fp-B", last="fp-A", shipped="fp-B", deferred="false")["should_deploy"],
+            "true",
+        )
+
+    def test_cli_compares_against_the_last_deployed_fingerprint(self) -> None:
+        self.assertEqual(self.cli("workflow_run", "aaa", "aaa")["should_deploy"], "false")
+        self.assertEqual(self.cli("workflow_run", "aaa", "bbb")["should_deploy"], "true")
+        self.assertEqual(self.cli("workflow_run", "aaa", None)["should_deploy"], "true")
+        self.assertEqual(self.cli("workflow_run", "aaa", "aaa\n")["last_deployed"], "aaa")
+
+    def test_a_revert_to_earlier_content_redeploys(self) -> None:
+        # Deploys shipped A, then B. main reverts to A. "A was synced once"
+        # said skip, leaving the site and D1 on B; the last deploy was B.
+        for event in ("workflow_run", "schedule"):
+            self.assertEqual(self.cli(event, "fingerprint-A", "fingerprint-B")["should_deploy"], "true", event)
+
+    def test_is_synced_needs_a_fingerprint(self) -> None:
+        self.assertFalse(gate.is_synced("", ""))
+        self.assertFalse(gate.is_synced("", None))
+        self.assertTrue(gate.is_synced("abc", "abc"))
+
+
+class FingerprintTests(unittest.TestCase):
+    def setUp(self) -> None:
+        self._tmp = tempfile.TemporaryDirectory()
+        self.repo = Path(self._tmp.name)
+        _git(self.repo, "init", "-q")
+        for path in ("dashboard/index.html", "_system/scripts/export_dashboard_d1_seed.py", "notes/research.md"):
+            target = self.repo / path
+            target.parent.mkdir(parents=True, exist_ok=True)
+            target.write_text(f"v1 {path}\n", encoding="utf-8")
+        _git(self.repo, "add", "-A")
+        _git(self.repo, "commit", "-q", "-m", "one")
+
+    def tearDown(self) -> None:
+        self._tmp.cleanup()
+
+    def commit(self, path: str, text: str) -> None:
+        (self.repo / path).write_text(text, encoding="utf-8")
+        _git(self.repo, "add", "-A")
+        _git(self.repo, "commit", "-q", "-m", f"touch {path}")
+
+    def test_unrelated_commit_keeps_the_fingerprint(self) -> None:
+        before = gate.fingerprint(cwd=self.repo)
+        self.commit("notes/research.md", "v2\n")
+        self.assertEqual(gate.fingerprint(cwd=self.repo), before)
+
+    def test_deploy_input_change_moves_the_fingerprint(self) -> None:
+        before = gate.fingerprint(cwd=self.repo)
+        self.commit("dashboard/index.html", "v2\n")
+        after = gate.fingerprint(cwd=self.repo)
+        self.assertNotEqual(after, before)
+        self.commit("_system/scripts/export_dashboard_d1_seed.py", "v2\n")
+        self.assertNotEqual(gate.fingerprint(cwd=self.repo), after)
+
+    def test_fingerprint_is_the_content_not_the_commit(self) -> None:
+        before = gate.fingerprint(cwd=self.repo)
+        self.commit("dashboard/index.html", "v2\n")
+        self.commit("dashboard/index.html", "v1 dashboard/index.html\n")
+        self.assertEqual(gate.fingerprint(cwd=self.repo), before)
+
+    def test_absent_inputs_are_stable(self) -> None:
+        ids = gate.object_ids(cwd=self.repo)
+        self.assertEqual(ids[".github/workflows/dashboard-pages.yml"], "absent")
+        self.assertRegex(ids["dashboard"], r"^[0-9a-f]{40}$")
 
 
 class WorkflowWiringTests(unittest.TestCase):
+    def setUp(self) -> None:
+        self.workflow = (ROOT / ".github" / "workflows" / "dashboard-pages.yml").read_text(encoding="utf-8")
+
+    def job(self, name: str) -> str:
+        match = re.search(rf"\n  {re.escape(name)}:\n(.*?)(?=\n  [a-z][a-z0-9-]*:\n|\Z)", self.workflow, re.S)
+        self.assertIsNotNone(match, name)
+        return match.group(1)
+
+    @staticmethod
+    def code(text: str) -> str:
+        return "\n".join(line for line in text.splitlines() if not line.strip().startswith("#"))
+
     def test_data_pipeline_persists_changed_warning_state(self) -> None:
         workflow = (ROOT / ".github" / "workflows" / "data-pipeline.yml").read_text(encoding="utf-8")
         drive_block = workflow.split("\n  drive:\n", 1)[1].split("\n  news:\n", 1)[0]
@@ -81,11 +196,89 @@ class WorkflowWiringTests(unittest.TestCase):
         self.assertIn("steps.rebuild.conclusion == 'success'", workflow)
         self.assertGreaterEqual(workflow.count("always() &&"), 3)
 
-    def test_dashboard_uses_upstream_change_gate(self) -> None:
-        workflow = (ROOT / ".github" / "workflows" / "dashboard-pages.yml").read_text(encoding="utf-8")
-        self.assertIn("upstream-change-gate:", workflow)
-        self.assertIn("workflow_run_deploy_gate.py", workflow)
-        self.assertIn("needs.upstream-change-gate.outputs.should_deploy == 'true'", workflow)
+    def test_gate_covers_workflow_run_and_schedule(self) -> None:
+        gate_job = self.job("deploy-gate")
+        self.assertIn("github.event_name == 'workflow_run' || github.event_name == 'schedule'", gate_job)
+        self.assertIn("workflow_run_deploy_gate.py fingerprint", gate_job)
+        self.assertIn("workflow_run_deploy_gate.py decide", gate_job)
+        self.assertIn("lookup-only: true", gate_job)
+        self.assertIn("needs.deploy-gate.outputs.should_deploy == 'true'", self.job("build"))
+
+    def test_gate_and_recheck_compare_against_the_last_deploy(self) -> None:
+        # Restore the NEWEST last-deployed entry (prefix match), then compare.
+        for name in ("deploy-gate", "build"):
+            body = self.job(name)
+            self.assertRegex(
+                body,
+                r"path: \.deploy-gate-last\n\s+key: dashboard-deploy-last-v1-\$\{\{ github\.run_id \}\}"
+                r"-\$\{\{ github\.run_attempt \}\}\n\s+restore-keys: dashboard-deploy-last-v1-\n",
+                name,
+            )
+            self.assertIn("--last-file .deploy-gate-last/fingerprint", body, name)
+            self.assertNotIn("--synced-hit", body, name)
+            self.assertNotIn("dashboard-deploy-synced-v1-", body, name)
+            # And, separately, what the site last SHIPPED.
+            self.assertRegex(
+                body,
+                r"path: \.deploy-gate-shipped\n\s+key: dashboard-deploy-shipped-v1-\$\{\{ github\.run_id \}\}"
+                r"-\$\{\{ github\.run_attempt \}\}\n\s+restore-keys: dashboard-deploy-shipped-v1-\n",
+                name,
+            )
+            self.assertIn("--shipped-file .deploy-gate-shipped/fingerprint", body, name)
+
+    def test_shipped_is_recorded_even_when_d1_was_deferred(self) -> None:
+        build = self.job("build")
+        saved = re.search(
+            r"if: (.*)\n\s+uses: actions/cache/save@v4\n\s+with:\n\s+path: \.deploy-gate-shipped\n"
+            r"\s+key: dashboard-deploy-shipped-v1-", build)
+        self.assertIsNotNone(saved)
+        self.assertIn("steps.proceed.outputs.should_deploy == 'true'", saved.group(1))
+        self.assertNotIn("d1_deferred", saved.group(1))
+        self.assertIn('printf \'%s\' "$FINGERPRINT" > .deploy-gate-shipped/fingerprint', build)
+
+    def test_darwin_is_not_a_trigger(self) -> None:
+        # WS7 deleted the Darwin Portfolio Refresh workflow.
+        self.assertNotIn("Darwin Portfolio Refresh", self.workflow)
+
+    def test_cancelled_runs_do_not_deploy(self) -> None:
+        for name in ("build", "oauth-proxy"):
+            body = self.code(self.job(name))
+            self.assertIn("!cancelled() &&", body, name)
+            self.assertNotIn("always()", body, name)
+
+    def test_deploys_serialize_without_killing_one_mid_flight(self) -> None:
+        header = self.code(self.workflow.split("\njobs:\n", 1)[0])
+        self.assertNotRegex(header, r"(?m)^concurrency:")
+        build = self.job("build")
+        self.assertRegex(build, r"concurrency:\n\s+group: dashboard-deploy\n\s+cancel-in-progress: false")
+
+    def test_last_deploy_is_recorded_only_when_d1_was_not_deferred(self) -> None:
+        build = self.job("build")
+        saved = re.search(
+            r"if: (.*)\n\s+uses: actions/cache/save@v4\n\s+with:\n\s+path: \.deploy-gate-last\n"
+            r"\s+key: dashboard-deploy-last-v1-\$\{\{ github\.run_id \}\}-\$\{\{ github\.run_attempt \}\}\n",
+            build)
+        self.assertIsNotNone(saved)
+        self.assertIn("steps.cloudflare.outputs.d1_deferred != 'true'", saved.group(1))
+        # Every deploy that ships records it, pushes included (the re-check
+        # restore is skipped for them, so the directory must be created).
+        self.assertIn("mkdir -p .deploy-gate-marker .deploy-gate-last .deploy-gate-shipped", build)
+        self.assertIn('printf \'%s\' "$FINGERPRINT" > .deploy-gate-last/fingerprint', build)
+
+    def test_deferral_fails_the_job_after_pages_and_alerts_slack(self) -> None:
+        build = self.job("build")
+        deploy_at = build.index("uses: ./.github/actions/deploy-cloudflare-dashboard")
+        alert_at = build.index("d1_alert.py")
+        self.assertLess(deploy_at, alert_at)
+        tail = build[alert_at:]
+        self.assertIn("SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}", build[deploy_at:])
+        self.assertIn("exit 1", tail)
+
+    def test_schedule_moved_off_the_quarter_hour(self) -> None:
+        cron = re.search(r'cron: "([^"]+)"', self.workflow).group(1)
+        minute, hour = cron.split()[:2]
+        self.assertNotIn(int(minute), (0, 15, 30, 45))
+        self.assertLessEqual(int(hour), 3)  # still soon after the 00:00 UTC reset
 
     def test_drive_intake_tests_are_wired_into_ci(self) -> None:
         workflow = (ROOT / ".github" / "workflows" / "ci-bootstrap-smoke.yml").read_text(encoding="utf-8")

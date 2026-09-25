@@ -22,6 +22,11 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[2]
 FEED_PATH = ROOT / "dashboard" / "data" / "activist_feed.json"
 DISCOVERY_PATH = ROOT / "_system" / "data" / "activist_filer_discovery.json"
+# Written by scan_activist_sources.py --phase ...: which holdings the rotating
+# SEC phase has reached, and when. A feed that is rebuilt every day can still
+# be built from a scan that never gets through the book; this is that check.
+STATE_PATH = ROOT / "_system" / "data" / "activist_scan_state.json"
+DEFAULT_MAX_SCAN_AGE_DAYS = 7
 
 # Weekday scan, so a Friday run is still fresh on Monday. Three days tolerates a
 # weekend plus one bad day before it complains.
@@ -43,16 +48,65 @@ def _parse_iso(value: str | None) -> datetime | None:
             return None
 
 
+def scan_coverage_problems(
+    state: dict,
+    tickers: list[str],
+    *,
+    now: datetime,
+    max_scan_age_days: int = DEFAULT_MAX_SCAN_AGE_DAYS,
+) -> list[str]:
+    """Holdings the rotating SEC phase has not reached within the window.
+
+    Quiet until the state itself is older than the window, so the first
+    rotation after the phases ship is not reported as a failure.
+    """
+    if not state or not tickers:
+        return []
+    created = _parse_iso(state.get("created_at"))
+    window = timedelta(days=max_scan_age_days)
+    if created is None or now - created < window:
+        return []
+    last = (state.get("sec") or {}).get("last_scanned") or {}
+    stale = []
+    for ticker in tickers:
+        stamp = _parse_iso(last.get(ticker))
+        if stamp is None or now - stamp > window:
+            stale.append(ticker)
+    if not stale:
+        return []
+    return [
+        f"{len(stale)} of {len(tickers)} holdings have had no SEC activist scan in "
+        f"{max_scan_age_days} days (e.g. {', '.join(stale[:5])}) -- the rotating SEC "
+        "phase is not getting through the book; raise its --budget-min"
+    ]
+
+
 def check(
     *,
     max_age_days: int = DEFAULT_MAX_AGE_DAYS,
     min_rows: int = DEFAULT_MIN_ROWS,
     now: datetime | None = None,
     feed_path: Path | None = None,
+    state_path: Path | None = None,
+    tickers: list[str] | None = None,
+    max_scan_age_days: int = DEFAULT_MAX_SCAN_AGE_DAYS,
 ) -> tuple[bool, list[str]]:
     now = now or datetime.now(timezone.utc)
     path = feed_path or FEED_PATH
     problems: list[str] = []
+    if state_path is not None and state_path.is_file():
+        try:
+            state = json.loads(state_path.read_text(encoding="utf-8"))
+        except json.JSONDecodeError:
+            state = {}
+        problems.extend(
+            scan_coverage_problems(
+                state if isinstance(state, dict) else {},
+                tickers or [],
+                now=now,
+                max_scan_age_days=max_scan_age_days,
+            )
+        )
 
     if not path.is_file():
         return False, [f"{path.name} does not exist -- the activist feed has never been built"]
@@ -101,9 +155,18 @@ def main() -> int:
         action="store_true",
         help="Report problems without a non-zero exit (for the first days after a rebuild)",
     )
+    parser.add_argument("--max-scan-age-days", type=int, default=DEFAULT_MAX_SCAN_AGE_DAYS)
     args = parser.parse_args()
 
-    ok, problems = check(max_age_days=args.max_age_days, min_rows=args.min_rows)
+    from activist_common import portfolio_tickers
+
+    ok, problems = check(
+        max_age_days=args.max_age_days,
+        min_rows=args.min_rows,
+        state_path=STATE_PATH,
+        tickers=portfolio_tickers(),
+        max_scan_age_days=args.max_scan_age_days,
+    )
     if ok:
         print("OK: activist feed is fresh and populated")
         return 0

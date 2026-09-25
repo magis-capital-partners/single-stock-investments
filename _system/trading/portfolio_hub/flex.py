@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import hashlib
+import re
 import xml.etree.ElementTree as ET
 from datetime import datetime, timezone
 from pathlib import Path
@@ -17,6 +18,71 @@ def _pick(attrs: dict[str, str], *keys: str) -> str | None:
 
 def _rows(root: ET.Element, tag: str) -> list[dict[str, str]]:
     return [dict(element.attrib) for element in root.iter(tag)]
+
+
+# --------------------------------------------------------------------- dates
+#
+# A Flex query's "Date Format" setting decides how every date in the file is
+# written: yyyyMMdd (the default), yyyy-MM-dd, MM/dd/yyyy or dd/MM/yyyy, with a
+# ";HHmmss" or time part on stamps. The two slash forms cannot be told apart from
+# one value like 09/10/2026, so the order is settled from every date in the
+# statement at once: any first field over 12 means dd/MM, any second field over
+# 12 means MM/dd. If nothing settles it, an ambiguous date is left unread rather
+# than guessed.
+
+_SLASH_DATE = re.compile(r"^(\d{1,2})/(\d{1,2})/(\d{4})$")
+
+
+def _date_head(raw: object) -> str:
+    text = str(raw or "").strip()
+    return text.split(";")[0].split(" ")[0].split("T")[0]
+
+
+def slash_date_order(values: list[object]) -> str | None:
+    """'dmy' or 'mdy' when the slash-formatted dates among `values` settle it, else None."""
+    day_first = month_first = False
+    for raw in values:
+        match = _SLASH_DATE.match(_date_head(raw))
+        if not match:
+            continue
+        first, second = int(match.group(1)), int(match.group(2))
+        day_first |= first > 12
+        month_first |= second > 12
+    if day_first != month_first:
+        return "dmy" if day_first else "mdy"
+    return None
+
+
+def flex_date(raw: object, order: str | None = None) -> str | None:
+    """ISO YYYY-MM-DD for a date in any format a Flex query can emit, or None.
+
+    None means unreadable -- including a slash date whose day/month order the
+    statement never settles. Callers flag that; they must not quietly substitute
+    another date.
+    """
+    head = _date_head(raw)
+    if not head:
+        return None
+    digits = head.replace("-", "")
+    if len(digits) == 8 and digits.isdigit():
+        year, month, day = int(digits[:4]), int(digits[4:6]), int(digits[6:])
+    else:
+        match = _SLASH_DATE.match(head)
+        if not match:
+            return None
+        first, second, year = int(match.group(1)), int(match.group(2)), int(match.group(3))
+        if order == "dmy" or (order is None and first > 12):
+            day, month = first, second
+        elif order == "mdy" or (order is None and second > 12):
+            month, day = first, second
+        elif first == second:
+            month = day = first
+        else:
+            return None
+    try:
+        return datetime(year, month, day).date().isoformat()
+    except ValueError:
+        return None
 
 
 # Flex reports an asset *category*; the rest of the hub speaks IB secType. STK
@@ -39,12 +105,21 @@ def parse_flex_xml(xml: bytes | str, *, account_alias: str, source_run_id: str |
     if not statements:
         raise ValueError("Flex payload has no FlexStatement")
     statement = statements[0].attrib
-    session_date = _pick(statement, "toDate", "periodEnd", "whenGenerated")
-    if not session_date:
+    raw_session_date = _pick(statement, "toDate", "periodEnd", "whenGenerated")
+    if not raw_session_date:
         raise ValueError("Flex payload has no completed-session date")
-    session_date = session_date[:10].replace("-", "")
-    if len(session_date) == 8:
-        session_date = f"{session_date[:4]}-{session_date[4:6]}-{session_date[6:]}"
+    # Every date in the statement is written in the query's one date format, so
+    # all of them together decide a dd/MM vs MM/dd question none can alone.
+    date_values: list[object] = [statement.get(key) for key in ("fromDate", "toDate", "periodEnd", "whenGenerated")]
+    for tag, keys in (("EquitySummaryByReportDateInBase", ("reportDate",)), ("ChangeInNAV", ("fromDate", "toDate")),
+                      ("OpenPosition", ("reportDate",)), ("CashTransaction", ("reportDate", "settleDate"))):
+        for element in root.iter(tag):
+            date_values.extend(element.attrib.get(key) for key in keys)
+    date_order = slash_date_order(date_values)
+    # None when unreadable: the snapshot then says so (completeness flags it)
+    # instead of carrying a raw string, or a date borrowed from ingest time,
+    # that looks like a session date.
+    session_date = flex_date(raw_session_date, date_order)
     now = datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
     positions = []
     for row in _rows(root, "OpenPosition"):
@@ -92,6 +167,9 @@ def parse_flex_xml(xml: bytes | str, *, account_alias: str, source_run_id: str |
         "currency": row.get("currency"),
         "net_liquidation": _pick(row, "total", "endingValue", "netLiquidation"),
         "cash": _pick(row, "cash", "cashBalance"), "stock": row.get("stock"), "options": row.get("options"),
+        # The period end the ending value is stated at, so a statement carrying
+        # more than one ChangeInNAV row can be read at its latest date.
+        "to_date": _pick(row, "toDate", "reportDate"),
     } for row in _rows(root, "ChangeInNAV")]
     # EquitySummaryByReportDateInBase is the dated row. The parent
     # EquitySummaryInBase element is only a container and has no amounts.
@@ -99,6 +177,7 @@ def parse_flex_xml(xml: bytes | str, *, account_alias: str, source_run_id: str |
     return {
         "schema_version": "flex_eod.v1", "source_run_id": source_run_id or f"flex-{hashlib.sha256(raw).hexdigest()[:20]}",
         "account_alias": account_alias, "session_date": session_date, "as_of": now,
+        "session_date_raw": raw_session_date, "date_order": date_order,
         "positions": positions, "trades": trades, "cash_transactions": cash, "nav_rows": nav_rows,
         "equity_summaries": equity_summaries,
     }

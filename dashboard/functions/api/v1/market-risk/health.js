@@ -1,6 +1,8 @@
 import { failure, json, requestId, requireDatabase } from "../../../_lib/http.js";
+import { OPEN_ALERT_COUNT_SQL } from "../../../_lib/market-risk.js";
+import { MARKET_RISK_TTL_SECONDS, withEdgeCache } from "../../../_lib/edge-cache.js";
 
-export async function onRequestGet(context) {
+async function produce(context) {
   const id = requestId(context.request);
   try {
     const db = requireDatabase(context.env);
@@ -22,12 +24,9 @@ export async function onRequestGet(context) {
           MAX(CASE WHEN series='component' THEN as_of END) AS latest_component_at
         FROM market_risk_latest_refs
       `),
-      db.prepare(`
-        SELECT
-          SUM(CASE WHEN closed_at IS NULL THEN 1 ELSE 0 END) AS open_count,
-          COUNT(*) AS total_count
-        FROM market_risk_alerts
-      `),
+      // Open alerts only, through the partial index. The old total_count read
+      // every alert ever written on every page load, and nothing displays it.
+      db.prepare(OPEN_ALERT_COUNT_SQL),
     ]);
     const ingest = latestIngest.results?.[0] || null;
     if (ingest?.symbols_json) {
@@ -45,4 +44,10 @@ export async function onRequestGet(context) {
   } catch (error) {
     return failure(error, id);
   }
+}
+
+// Public and identical for every caller, so served through the edge cache
+// (market risk TTL; see _lib/edge-cache.js).
+export async function onRequestGet(context) {
+  return withEdgeCache(context, MARKET_RISK_TTL_SECONDS, () => produce(context));
 }

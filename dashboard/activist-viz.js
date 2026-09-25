@@ -403,6 +403,14 @@
       ${shown.length > 200 ? `<p class="tier-sub">${shown.length - 200} more &mdash; refine the filter</p>` : ''}`;
   }
 
+  // The scan runs daily; a feed that stopped must not keep a quiet "Last scan".
+  function lastScanBadge(feedDoc) {
+    const format = global.DashboardFormat;
+    if (!format?.staleBadge) return '';
+    const badge = format.staleBadge(feedDoc.last_scan || feedDoc.generated_at, format.FEED_MAX_AGE_HOURS.activist);
+    return badge ? ` ${badge}` : '';
+  }
+
   function renderActivistPanel(feedDoc, state) {
     if (!feedDoc) {
       return '<div class="empty">Activist feed not built. Run: python _system/scripts/build_activist_feed.py</div>';
@@ -415,7 +423,7 @@
       ${(state.view || 'active') === 'discovery'
         ? renderDiscovery(state.discovery, state)
         : renderFeed([...(feedDoc.feed || []), ...(feedDoc.review_queue || [])], state)}
-      <div class="tier-sub" style="margin-top:12px">Last scan: ${state.escapeHtml(feedDoc.last_scan || feedDoc.generated_at || '—')}</div>`;
+      <div class="tier-sub" style="margin-top:12px">Last scan: ${state.escapeHtml(feedDoc.last_scan || feedDoc.generated_at || '—')}${lastScanBadge(feedDoc)}</div>`;
   }
 
   global.ActivistViz = {

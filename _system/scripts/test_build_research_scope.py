@@ -205,6 +205,22 @@ class RewindGuard(unittest.TestCase):
         self.assertIn("refusing to rewind", output)
         self.assertFalse(out.exists())
 
+    def test_an_unreadable_session_date_is_refused_not_written_as_null(self):
+        """str(None) sorts above every ISO date, so an unreadable date used to
+        pass the rewind check and blank the floor for every later run."""
+        with tempfile.TemporaryDirectory() as td:
+            out = Path(td) / "research_scope.json"
+            (out.parent / "research_scope_meta.json").write_text(
+                json.dumps({"session_date": "2026-08-13"}), encoding="utf-8")
+            xml = Path(td) / "flex.xml"
+            xml.write_bytes(_flex(_pos("GTX", conid=9), to_date="notadate"))
+            code, output = self._run(["--flex", str(xml), "--out", str(out)])
+            meta_after = json.loads((out.parent / "research_scope_meta.json").read_text(encoding="utf-8"))
+        self.assertEqual(code, 1)
+        self.assertIn("session date is unreadable", output)
+        self.assertFalse(out.exists())
+        self.assertEqual(meta_after, {"session_date": "2026-08-13"})
+
     def test_force_overrides_the_guard(self):
         with tempfile.TemporaryDirectory() as td:
             out = Path(td) / "research_scope.json"

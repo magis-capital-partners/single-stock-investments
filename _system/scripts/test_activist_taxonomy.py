@@ -544,15 +544,32 @@ class EdinetLaneTests(unittest.TestCase):
                 edinet_activist_scan.fetch_documents("2026-08-25", key="bogus")
 
     def test_scan_surfaces_the_failure_rather_than_a_silent_zero(self) -> None:
+        # The scan log is patched: this test used to append a fake "api_error"
+        # to the REAL _system/data/activist_scan_log.json, and the data-pipeline
+        # activist job (which runs this module as its coverage guard) then
+        # committed it with `git add -A`.
         with mock.patch.object(
             edinet_activist_scan,
             "fetch_documents",
             side_effect=edinet_activist_scan.EdinetApiError("StatusCode 401"),
-        ):
+        ), mock.patch.object(edinet_activist_scan, "append_scan_log") as scan_log:
             result = edinet_activist_scan.scan(lookback_days=5, key="bogus")
         self.assertEqual(result["row_count"], 0)
         self.assertEqual(result["days_scanned"], 0)
         self.assertTrue(result["failures"], "a dark feed must not look like a quiet one")
+        # The failure is still logged -- to the (patched) log, not the repo.
+        self.assertTrue(scan_log.called)
+        self.assertEqual(scan_log.call_args_list[0].args[0]["status"], "api_error")
+
+    def test_guard_tests_leave_the_repository_scan_log_alone(self) -> None:
+        import activist_common
+
+        log_path = activist_common.SCAN_LOG_PATH
+        self.assertTrue(str(log_path).startswith(str(ROOT)))
+        before = log_path.read_bytes() if log_path.exists() else None
+        self.test_scan_surfaces_the_failure_rather_than_a_silent_zero()
+        after = log_path.read_bytes() if log_path.exists() else None
+        self.assertEqual(before, after)
 
     def test_securities_code_maps_onto_the_book(self) -> None:
         self.assertEqual(edinet_activist_scan.sec_code_to_ticker("39050"), "3905.T")

@@ -62,5 +62,23 @@ class InsightsRebuildStepsTests(unittest.TestCase):
         self.assertNotIn("+ _system/scripts/sync_pdf_store_google_drive.py", out)
 
 
+class WarrantCheckIsAdvisoryOutsideTheWarrantLaneTests(unittest.TestCase):
+    """One expired warrant (BKSY.W) failed intake-full, drive and world-model
+    for 13 days through the check expand_steps inserts before every build."""
+
+    def test_every_profile_runs_the_warrant_check_warn_only(self) -> None:
+        sys.path.insert(0, str(REBUILD.parent))
+        import ci_rebuild_profile
+
+        for name, steps in ci_rebuild_profile.PROFILES.items():
+            checks = [
+                step for step in ci_rebuild_profile.expand_steps(steps)
+                if step and step[0].endswith("check_warrant_universe.py")
+            ]
+            for step in checks:
+                self.assertIn("--warn-only", step, name)
+                self.assertNotIn("--strict", step, name)
+
+
 if __name__ == "__main__":
     raise SystemExit(unittest.main())

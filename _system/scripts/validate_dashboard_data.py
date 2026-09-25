@@ -176,6 +176,51 @@ def letter_drive_links_issue(
     return "error", msg
 
 
+def warrant_monitor_issues(warrant_path: Path) -> tuple[list[str], list[str]]:
+    """Publishing gates for warrants.json, split into (errors, warnings).
+
+    What the page would SHOW stays an error: a missing or unreadable artifact,
+    a summary that disagrees with its rows, a score emitted before its gates.
+    Registry data problems (``health.structural_errors``, e.g. a series still
+    "active" past its contractual expiry) are a warning here: this validator
+    runs in every lane, and from 2026-09-10 to 09-22 one expired BKSY.W row
+    failed technicals and 21 dashboard deploys through this check. The warrant
+    lane owns the registry, sweeps expiries and runs its own strict check.
+    """
+    errors: list[str] = []
+    warnings: list[str] = []
+    if not warrant_path.exists():
+        return ["missing dashboard/data/warrants.json"], warnings
+    try:
+        warrants = json.loads(warrant_path.read_text(encoding="utf-8"))
+    except json.JSONDecodeError:
+        return ["dashboard/data/warrants.json is invalid JSON"], warnings
+    warrant_rows = warrants.get("rows") or []
+    warrant_summary = warrants.get("summary") or {}
+    active_count = sum(r.get("lifecycle") == "active" for r in warrant_rows)
+    if warrant_summary.get("active_series") != active_count:
+        errors.append("warrants.json summary.active_series does not match active rows")
+    for row in warrant_rows:
+        gates = row.get("gates") or {}
+        all_pass = all(
+            (gates.get(name) or {}).get("pass")
+            for name in ("identity", "survival", "market")
+        )
+        score = (row.get("diagnostics") or {}).get("opportunity_score")
+        if score is not None and not all_pass:
+            errors.append(
+                f"warrant {row.get('warrant_ticker')}: score emitted before all gates pass"
+            )
+    structural = (warrants.get("health") or {}).get("structural_errors") or []
+    if structural:
+        detail = "; ".join(str(item) for item in structural[:5])
+        warnings.append(
+            "warrants.json reports structural contract errors (warrant lane enforces): "
+            + detail
+        )
+    return errors, warnings
+
+
 def _check_merge_conflict_markers(path: Path) -> str | None:
     if not path.exists():
         return None
@@ -907,34 +952,11 @@ def main() -> int:
         warnings.append("missing dashboard/data/rock_aggregates_screener.json")
 
     # --- Warrant monitor gates ------------------------------------------------
-    warrant_path = ROOT / "dashboard" / "data" / "warrants.json"
-    if warrant_path.exists():
-        try:
-            warrants = json.loads(warrant_path.read_text(encoding="utf-8"))
-            warrant_rows = warrants.get("rows") or []
-            warrant_summary = warrants.get("summary") or {}
-            active_count = sum(r.get("lifecycle") == "active" for r in warrant_rows)
-            if warrant_summary.get("active_series") != active_count:
-                errors.append(
-                    "warrants.json summary.active_series does not match active rows"
-                )
-            for row in warrant_rows:
-                gates = row.get("gates") or {}
-                all_pass = all(
-                    (gates.get(name) or {}).get("pass")
-                    for name in ("identity", "survival", "market")
-                )
-                score = (row.get("diagnostics") or {}).get("opportunity_score")
-                if score is not None and not all_pass:
-                    errors.append(
-                        f"warrant {row.get('warrant_ticker')}: score emitted before all gates pass"
-                    )
-            if (warrants.get("health") or {}).get("structural_errors"):
-                errors.append("warrants.json reports structural contract errors")
-        except json.JSONDecodeError:
-            errors.append("dashboard/data/warrants.json is invalid JSON")
-    else:
-        errors.append("missing dashboard/data/warrants.json")
+    warrant_errors, warrant_warnings = warrant_monitor_issues(
+        ROOT / "dashboard" / "data" / "warrants.json"
+    )
+    errors.extend(warrant_errors)
+    warnings.extend(warrant_warnings)
 
     # --- Sharded payload gates (speed budget) --------------------------------
     # core.json is the SPA boot payload; keep it small so first paint stays
