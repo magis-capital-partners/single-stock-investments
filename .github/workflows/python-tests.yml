@@ -2,17 +2,17 @@ name: Python tests
 
 # The pytest suites under _system/trading and _system/scripts/tests had no CI
 # at all: a green PR touching them proved nothing. This runs them, plus a
-# check for undefined names (ruff F821), which is the class of bug that shipped
-# `fetch_ir` and `today` undefined in two_phase_watch.py.
+# check for undefined names (ruff F821) and parse errors, the class of bug
+# that shipped `fetch_ir` and `today` undefined in two_phase_watch.py.
 #
 # Sparse and blobless on purpose: the full tree is ~200k files and 30 minutes
 # to check out; the suites need _system (minus the 600 MB reference corpus) and
 # a handful of dashboard files.
 
 on:
-  # Everything the suites read, so a change to any of it runs them: several
-  # tests parse the workflows and actions, and the D1 tests read the edge
-  # functions and migrations.
+  # Everything the suites read -- the unit-tests sparse set below -- so a
+  # change to any of it runs them. test_python_tests_workflow.py keeps the two
+  # lists in step.
   pull_request:
     branches: [main]
     paths:
@@ -20,7 +20,9 @@ on:
       - ".github/**"
       - "dashboard/cloudflare/**"
       - "dashboard/functions/**"
+      - "dashboard/data/criticality_summary.json"
       - "ops-watchdog/**"
+      - "AMZN/investor-documents/download_amzn_investor_docs.py"
   push:
     branches: [main]
     paths:
@@ -28,7 +30,9 @@ on:
       - ".github/**"
       - "dashboard/cloudflare/**"
       - "dashboard/functions/**"
+      - "dashboard/data/criticality_summary.json"
       - "ops-watchdog/**"
+      - "AMZN/investor-documents/download_amzn_investor_docs.py"
   # Bot pushes (GITHUB_TOKEN) start no workflow, so main is also tested daily.
   schedule:
     - cron: "23 5 * * *"
@@ -44,12 +48,6 @@ jobs:
   undefined-names:
     runs-on: ubuntu-latest
     timeout-minutes: 10
-    env:
-      # Known debt, fixed on fix/research-lanes-falsifier-twophase (WS1). It may
-      # only shrink: any F821 elsewhere, or more than this many here, fails.
-      # Delete these two lines once that branch is on main.
-      KNOWN_F821_FILE: _system/scripts/two_phase_watch.py
-      KNOWN_F821_MAX: "9"
     steps:
       - uses: actions/checkout@v4
         with:
@@ -63,32 +61,13 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-      - name: Undefined names (ruff F821)
+      - name: Undefined names and parse errors (ruff F821)
+        # No allowance: main has no undefined names. A file ruff cannot parse
+        # fails too, because a syntax error hides every F821 in that file.
         run: |
           set -euo pipefail
           python -m pip install --disable-pip-version-check --quiet "ruff==0.16.0"
-          # sed: the same step also works where ruff prints Windows separators.
-          ruff check --no-cache --select F821 --output-format=concise --exit-zero \
-            _system/scripts _system/trading | sed 's|\\|/|g' > "$RUNNER_TEMP/f821.txt"
-          cat "$RUNNER_TEMP/f821.txt"
-          grep -E ": F821 " "$RUNNER_TEMP/f821.txt" > "$RUNNER_TEMP/f821-hits.txt" || true
-          KNOWN=0
-          if [ -n "${KNOWN_F821_FILE:-}" ]; then
-            KNOWN=$(grep -c "^${KNOWN_F821_FILE}:" "$RUNNER_TEMP/f821-hits.txt" || true)
-          fi
-          NEW=$(( $(wc -l < "$RUNNER_TEMP/f821-hits.txt") - KNOWN ))
-          if [ "$NEW" -gt 0 ]; then
-            echo "::error::$NEW undefined name(s) outside the known-debt file."
-            exit 1
-          fi
-          if [ "$KNOWN" -gt "${KNOWN_F821_MAX:-0}" ]; then
-            echo "::error::$KNOWN_F821_FILE has $KNOWN undefined names; the known debt is $KNOWN_F821_MAX."
-            exit 1
-          fi
-          if [ -n "${KNOWN_F821_FILE:-}" ] && [ "$KNOWN" -eq 0 ]; then
-            echo "::warning title=Known F821 debt is gone::$KNOWN_F821_FILE is clean; delete KNOWN_F821_FILE and KNOWN_F821_MAX from python-tests.yml."
-          fi
-          echo "OK: no new undefined names ($KNOWN known in ${KNOWN_F821_FILE:-nothing})."
+          python _system/scripts/check_undefined_names.py _system/scripts _system/trading
 
   unit-tests:
     runs-on: ubuntu-latest
@@ -138,7 +117,8 @@ jobs:
         # (the bridge imports them lazily and the tests stub them).
         run: |
           python -m pip install --disable-pip-version-check --quiet \
-            "pytest==9.1.1" "PyYAML==6.0.3" "jsonschema==4.26.0" "numpy==2.3.3" "scipy==1.16.2"
+            "pytest==9.1.1" "PyYAML==6.0.3" "jsonschema==4.26.0" "numpy==2.3.3" "scipy==1.16.2" \
+            "ruff==0.16.0"
       - name: Trading and script test suites
         run: |
           set -euo pipefail
