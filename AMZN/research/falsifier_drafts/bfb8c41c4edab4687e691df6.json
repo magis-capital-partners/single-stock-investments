@@ -5,7 +5,7 @@
   "input_sha": "15215c66f341d7542d4f24cc43e6daf99833842e",
   "component_fingerprint": "1fb112a7b9fa6e120c3a7d8193b809b0b229c4003bb5cf47b504f031f21f8c6d",
   "contract_hash": "ca47c99ecfe2f96d187af40e6015994d166260242b2ee1e1d096e0e580abdbc9",
-  "status": "awaiting_review",
+  "status": "approved",
   "author_receipt": {
     "authored_at": "2026-09-02T12:24:22Z",
     "author": "codex-gpt-5.6-sol",
@@ -45,7 +45,46 @@
       "published_input_sha": "15215c66f341d7542d4f24cc43e6daf99833842e"
     }
   },
-  "review_receipt": null,
+  "review_receipt": {
+    "reviewed_at": "2026-09-25T15:30:00Z",
+    "reviewer": "cursor-cloud-agent",
+    "author_independent": true,
+    "decision": "approved",
+    "checks": {
+      "component_fingerprint_matches": true,
+      "target_unobservable_at_registration": true,
+      "threshold_economically_material": true,
+      "historical_replay_present": true,
+      "forward_source_recipe_current": true,
+      "probability_consistent_with_known_trailing_data": true
+    },
+    "evidence": {
+      "threshold_m": -25000.0,
+      "low_case_per_share": 83.1606,
+      "base_case_per_share": 165.0299,
+      "normalized_owner_cash_per_share": 5.35,
+      "replay_q3_fy2025_ttm_m": 10560.0,
+      "known_q1_fy2026_ttm_m": -2472.0,
+      "forecast_probability_fires": 0.2,
+      "source_ref": "AMZN/research/evidence/sec_companyfacts.json",
+      "source_concepts": [
+        "us-gaap:NetCashProvidedByUsedInOperatingActivities",
+        "us-gaap:PaymentsToAcquireProductiveAssets"
+      ]
+    },
+    "review_work_id": "b6366760af62fc74e361554d",
+    "calibration_release_hash": null,
+    "route": "quality_reinvestment",
+    "named_challenge": null,
+    "calibration_response": "not_applicable",
+    "calibration_note": "Epistemic loop health_state=COLLECTING; calibration global_status=insufficient_outcomes; eligible_scored_outcomes=1 on route. Calibration cannot change this analysis.",
+    "epistemic_work_receipt": {
+      "work_id": "b6366760af62fc74e361554d",
+      "task_type": "review_forecast",
+      "disposition": "success",
+      "published_input_sha": "7f0dee83d7d6983c069919b20938abbce60e9c40"
+    }
+  },
   "rejection_reasons": [],
   "spec": {
     "spec_id": "amzn-core-engine-owner-earnings-2026q3-v1",
@@ -109,9 +148,10 @@
       }
     },
     "review": {
-      "status": "pending",
-      "reviewer": null,
-      "reviewed_at": null
+      "status": "approved",
+      "reviewer": "cursor-cloud-agent",
+      "reviewed_at": "2026-09-25T15:30:00Z",
+      "reason_codes": []
     },
     "probability_fires": 0.2,
     "severity": 5,
