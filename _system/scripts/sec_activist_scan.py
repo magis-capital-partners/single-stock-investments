@@ -301,7 +301,15 @@ def scan_ticker_sec(
     include_passive: bool = False,
     reindex_local: bool = False,
     fetch_xml: bool = False,
+    raise_on_fetch_error: bool = False,
 ) -> list[dict]:
+    """Activist filings for one ticker.
+
+    A failed submissions fetch (a 403, a timeout) is logged and, by default,
+    returns [] -- indistinguishable from "no filings". The rotating SEC phase
+    passes ``raise_on_fetch_error=True`` so a failed ticker is not recorded as
+    scanned.
+    """
     if reindex_local:
         return reindex_local_sec(
             ticker, include_passive=include_passive, fetch_xml=fetch_xml
@@ -315,6 +323,8 @@ def scan_ticker_sec(
         submissions = fetch_submissions(cik)
     except Exception as exc:
         append_scan_log({"source": "sec", "ticker": ticker, "status": "submissions_fail", "error": str(exc)})
+        if raise_on_fetch_error:
+            raise
         return []
     time.sleep(SLEEP_SEC)
 

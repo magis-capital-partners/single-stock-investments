@@ -252,6 +252,14 @@ def main() -> int:
         as_of = datetime.fromtimestamp(fallback.stat().st_mtime).date().isoformat()
         if as_of > floor:
             floor, floor_label = as_of, fallback.name
+    # A statement whose session date cannot be read cannot be ordered against
+    # the floor: str(None) sorts above every ISO date, so the guard below would
+    # wave it through and write session_date null, which also blanks the floor
+    # for every later run.
+    if not meta.get("session_date") and not args.force:
+        print("refusing to write scope: the statement's session date is unreadable, "
+              "so it cannot be ordered against the existing scope. Pass --force to override.")
+        return 1
     if floor and str(meta["session_date"]) < floor and not args.force:
         print(f"refusing to rewind scope: statement is {meta['session_date']}, "
               f"{floor_label} is {floor}. Pass --force to override.")

@@ -13,6 +13,7 @@ import { failure, json, requestId, requireDatabase } from "../../../_lib/http.js
 import { requirePortfolioViewer } from "../../../_lib/auth.js";
 import { portfolioOrderOwner } from "../../../_lib/paper-orders.js";
 import { validateOrderRequest } from "../../../_lib/order-requests.js";
+import { expireStalePreviewsStatement, isStalePreview } from "../../../_lib/command-channel.js";
 
 const PUBLIC_COLUMNS = `request_id,owner,strategy,conid,symbol,sec_type,action,quantity_decimal,
   limit_price_decimal,currency,tif,outside_rth,mode,rationale,state,intent_uuid,contract_fingerprint,
@@ -33,10 +34,29 @@ export async function onRequestGet(context) {
     if (!viewer) return json({ error: "Authentication required.", request_id: id }, 401, privateHeaders());
     const owner = portfolioOrderOwner(viewer, context.env);
     const db = requireDatabase(context.env);
-    const rows = owner
-      ? await db.prepare(`SELECT ${PUBLIC_COLUMNS} FROM portfolio_order_requests
-          WHERE owner=? ORDER BY created_at DESC LIMIT 100`).bind(owner).all()
-      : { results: [] };
+    const list = () => db.prepare(`SELECT ${PUBLIC_COLUMNS} FROM portfolio_order_requests
+          WHERE owner=? ORDER BY created_at DESC LIMIT 100`).bind(owner).all();
+    let rows = owner ? await list() : { results: [] };
+    // Expire this owner's long-dead previews, so a ticket the bridge will never
+    // advance (bridge down, or a human walked away) cannot keep the desk's
+    // ticket poll running -- but only when a listed row actually is one. This
+    // route is polled (1s, then 5s) while a ticket is open; an UPDATE on every
+    // poll would be a read of the owner's previews each time for nothing. And a
+    // refused write (the daily D1 quota) must never fail the read or stop the
+    // poll: the list is served as it stands. See expireStalePreviewsStatement
+    // for why no approval or transmit guard is weakened.
+    const now = new Date();
+    if (owner && (rows.results || []).some((row) => isStalePreview(row, now))) {
+      try {
+        const expired = await expireStalePreviewsStatement(db, { owner, now }).run();
+        if (Number(expired?.meta?.changes || 0) > 0) rows = await list();
+      } catch (error) {
+        console.error(JSON.stringify({
+          message: "stale preview expiry failed; serving the ticket list unchanged",
+          request_id: id, error: error instanceof Error ? error.message : String(error),
+        }));
+      }
+    }
     return json({
       schema_version: "portfolio_order_requests.v1",
       command_plane: "python_private_only",

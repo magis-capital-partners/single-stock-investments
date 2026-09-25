@@ -26,7 +26,15 @@ jobs:
       - name: Refresh, resolve, and rebuild the control plane
         run: |
           set -euo pipefail
-          python _system/scripts/promote_falsifier_drafts.py
+          # A draft that cannot promote is held back, recorded on the draft and
+          # in the work queue, and annotated here; it no longer fails the lane.
+          python _system/scripts/promote_falsifier_drafts.py | tee "$RUNNER_TEMP/promotion.json"
+          python - "$RUNNER_TEMP/promotion.json" <<'PY' || true
+          import json, sys
+          for row in json.load(open(sys.argv[1], encoding="utf-8")).get("blocked_details") or []:
+              print(f"::warning title=Falsifier draft held back::{row['draft']}: "
+                    + "; ".join(row["reasons"]))
+          PY
           python _system/scripts/refresh_falsifier_evidence.py
           python _system/scripts/resolve_falsifiers.py --apply
           python _system/scripts/epistemic_loop_controller.py
@@ -40,9 +48,18 @@ jobs:
             test_refresh_falsifier_evidence test_calibration_brief \
             test_epistemic_loop_integration test_epistemic_integrity \
             test_epistemic_loop_controller test_committee_forecast_loop)
+          python -m unittest discover -s _system/scripts/tests -p 'test_falsifier_promotion_gate.py'
           python _system/scripts/validate_calibration_consumption.py
           python _system/scripts/build_memory_triage.py --expire-human-sla --by memory-triage-bot
-          python _system/scripts/graph_invariants.py || true
+          # graph_invariants.py exits 1 on any hard violation in the repo --
+          # another lane's P3, a feed's P6, a ratchet row -- none of which this
+          # lane owns, so its exit code must not gate the lane; the subset check
+          # below gates on the ids this lane does own. A bare `|| true` also
+          # swallowed a crash, though, and the subset check then passed on the
+          # report committed with the checkout. Deleting it first means a crash
+          # leaves no report, and the lane fails closed.
+          rm -f _system/graph/invariants.json
+          python _system/scripts/graph_invariants.py || test -s _system/graph/invariants.json
           python _system/scripts/validate_invariant_subset.py E2 E3 E4 E5 E7 E8 E9
       - name: Publish loop status
         if: always()
@@ -51,6 +68,10 @@ jobs:
             echo "### Epistemic loop"
             echo '```json'
             cat _system/research/epistemic_loop_status.json 2>/dev/null || true
+            echo '```'
+            echo "### Draft promotion"
+            echo '```json'
+            cat "$RUNNER_TEMP/promotion.json" 2>/dev/null || true
             echo '```'
             cat _system/graph/INVARIANTS.md 2>/dev/null || true
           } >> "$GITHUB_STEP_SUMMARY"

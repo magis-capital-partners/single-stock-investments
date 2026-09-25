@@ -1,22 +1,48 @@
 {
   "schema_version": "1.0",
   "ticker": "WHK",
-  "as_of": "2026-08-11",
+  "as_of": "2026-09-24",
   "facts": [
     {
-      "field_id": "net_income_m",
-      "value": -32.33,
+      "field_id": "cash_m",
+      "value": 13.229,
       "unit": "USD millions",
+      "locked": true,
+      "confidence": "high",
+      "source": {
+        "ref": "WHK/research/evidence/sec_companyfacts.json",
+        "locator": "us-gaap:CashAndCashEquivalentsAtCarryingValue; accession 0001193125-26-349344; form 10-Q",
+        "as_of": "2026-06-30",
+        "content_sha256": "f6353627902bd064ec0f5ac320ddcd3a4e426fcea4b91ef75f8a7f19e509925c"
+      }
+    },
+    {
+      "field_id": "debt_m",
+      "value": 68.07,
+      "unit": "USD millions",
+      "locked": true,
+      "confidence": "high",
+      "source": {
+        "ref": "WHK/research/evidence/sec_companyfacts.json",
+        "locator": "us-gaap:LongTermDebt; accession 0001193125-26-349344; form 10-Q",
+        "as_of": "2026-06-30",
+        "content_sha256": "f6353627902bd064ec0f5ac320ddcd3a4e426fcea4b91ef75f8a7f19e509925c"
+      }
+    },
+    {
+      "field_id": "shares_outstanding",
+      "value": 22996579.0,
+      "unit": "shares",
       "source": {
         "ref": "WHK/investor-documents/sec-edgar/424B4_20260609_rpt_acc0001193125_26_264014.htm",
-        "locator": "Reconciliation of Adjusted EBITDA, Net income (loss), Pro Forma Year Ended December 31, 2025: $(32,330) thousand",
-        "as_of": "2025-12-31",
+        "locator": "Dilution: 15,296,579 Class A outstanding before the offering plus 7,700,000 offered = 22,996,579",
+        "as_of": "2026-06-09",
         "content_sha256": "c22443a93de65c12d559a35726ce722318af5e8cf1ebd40932e6ad78cfe98506"
       },
       "confidence": "high",
       "locked": true,
       "origin": "curated_primary_source",
-      "rationale": "Corrects a sign error. The extracted ledger carried net_income_m = +32.0 from an otc_prose regex over the S-1/A at medium confidence. Pro forma FY2025 net income is a LOSS of $32.330m; historical FY2025 as restated is a loss of $3.585m. Pro forma depletion, depreciation and accretion of $36.451m is essentially equal to pro forma CAFD of $36.317m, which is why a company generating $36m of CAFD still reports a loss."
+      "rationale": "Class A common shares outstanding after the Transactions, held one-for-one against the Company's OpCo Interests. Class B (3,750,000) carries no economic rights and is excluded."
     },
     {
       "field_id": "economic_ownership_map",
@@ -120,19 +146,19 @@
       "rationale": "PV-10 of $293.690m less the standardized measure of discounted future net cash flows of $266.326m. The difference is the SEC-computed present value of future income taxes on the proved reserves, i.e. a 9.32% tax drag on reserve value."
     },
     {
-      "field_id": "shares_outstanding",
-      "value": 22996579.0,
-      "unit": "shares",
+      "field_id": "net_income_m",
+      "value": -32.33,
+      "unit": "USD millions",
       "source": {
         "ref": "WHK/investor-documents/sec-edgar/424B4_20260609_rpt_acc0001193125_26_264014.htm",
-        "locator": "Dilution: 15,296,579 Class A outstanding before the offering plus 7,700,000 offered = 22,996,579",
-        "as_of": "2026-06-09",
+        "locator": "Reconciliation of Adjusted EBITDA, Net income (loss), Pro Forma Year Ended December 31, 2025: $(32,330) thousand",
+        "as_of": "2025-12-31",
         "content_sha256": "c22443a93de65c12d559a35726ce722318af5e8cf1ebd40932e6ad78cfe98506"
       },
       "confidence": "high",
       "locked": true,
       "origin": "curated_primary_source",
-      "rationale": "Class A common shares outstanding after the Transactions, held one-for-one against the Company's OpCo Interests. Class B (3,750,000) carries no economic rights and is excluded."
+      "rationale": "Corrects a sign error. The extracted ledger carried net_income_m = +32.0 from an otc_prose regex over the S-1/A at medium confidence. Pro forma FY2025 net income is a LOSS of $32.330m; historical FY2025 as restated is a loss of $3.585m. Pro forma depletion, depreciation and accretion of $36.451m is essentially equal to pro forma CAFD of $36.317m, which is why a company generating $36m of CAFD still reports a loss."
     },
     {
       "field_id": "undeveloped_locations_gross",
@@ -195,6 +221,6 @@
       "rationale": "The Note Purchase Agreement REQUIRES fixed-price swaps on at least 75% of reasonably anticipated PDP production for the 36 months following closing, and at least 50% for the 36 months following each subsequent fiscal quarter. Royalty revenue is therefore NOT the unhedged commodity pass-through the deep dive describes: 50-75% of producing volumes are contractually locked on a rolling three-year basis. This dampens both the downside and the gas-price upside the market appears to be pricing."
     }
   ],
-  "source_count": 1,
-  "generated_at": "2026-08-11T14:29:01.120461Z"
+  "source_count": 2,
+  "generated_at": "2026-09-24T23:13:41.714631Z"
 }

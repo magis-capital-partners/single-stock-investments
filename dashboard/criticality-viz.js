@@ -247,9 +247,14 @@
     return Math.abs(number) >= 100 ? Math.round(number).toLocaleString() : number.toFixed(2);
   }
 
+  // 'lagging' is a feed that is running but behind the session it should
+  // cover -- the daily capitulation run can say so. It is late, not missing,
+  // so it reads amber like 'delayed' rather than falling through to the red
+  // 'unavailable' style reserved for sources with no data at all.
   function qualityMeta(state) {
     return {
       ready: ['Current', 'is-ready'], delayed: ['Delayed', 'is-delayed'],
+      lagging: ['Lagging: behind the expected session', 'is-lagging'],
       stale: ['Stale', 'is-stale'], unavailable: ['Unavailable', 'is-unavailable'],
     }[String(state || '').toLowerCase()] || [String(state || 'Unknown').replace(/_/g, ' '), 'is-unavailable'];
   }
@@ -440,7 +445,7 @@
       : '';
     return `<section class="risk-data-stack"><header><div><span class="criticality-kicker">Independent inputs · never silently blended</span><h3>Mechanical-flow data stack</h3>
       <p>Each tile retains its source cadence and quality. Only connected sources are drawn.</p></div>
-      <div class="risk-coverage"><strong>${counts.ready || 0} current</strong><span>${counts.delayed || 0} delayed · ${counts.stale || 0} stale · ${dead.length} not connected</span></div></header>
+      <div class="risk-coverage"><strong>${counts.ready || 0} current</strong><span>${counts.delayed || 0} delayed · ${counts.lagging ? `${counts.lagging} lagging · ` : ''}${counts.stale || 0} stale · ${dead.length} not connected</span></div></header>
       ${deadNote}
       ${letfReconciliation(live, escapeHtml)}
       <div class="risk-component-grid">${market.map((item) => { const q = componentQuality(item); return `<article class="risk-component-card">

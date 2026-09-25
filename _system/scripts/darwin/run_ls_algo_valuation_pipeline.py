@@ -135,11 +135,21 @@ def workbench_committee_status(ticker: str) -> str:
     return str(((doc.get("committee") or {}).get("status")) or "not_started")
 
 
+def has_owner_cash_scenarios(research: Path) -> bool:
+    """Legacy hurdle pricing discounts valuation.scenarios.base (after the config patch)."""
+    valuation = read_json(research / "valuation.json")
+    patch = read_json(research / "pricing_model.json").get("valuation_patch") or {}
+    return bool(
+        (valuation.get("scenarios") or {}).get("base")
+        or (patch.get("scenarios") or {}).get("base")
+    )
+
+
 def stage_pricing(tickers: list[str], dry_run: bool) -> dict:
     from build_power_zone_pricing import build as build_pricing
-    from build_power_zone_pricing import seed_default_config
+    from build_power_zone_pricing import build_contract_pricing, seed_default_config
 
-    priced, seeded, skipped, errors = [], [], [], []
+    priced, seeded, skipped, errors, contract_priced = [], [], [], [], []
     for ticker in tickers:
         if workbench_decision_status(ticker) != "decision_grade":
             skipped.append(ticker)
@@ -148,6 +158,18 @@ def stage_pricing(tickers: list[str], dry_run: bool) -> dict:
             priced.append(ticker)
             continue
         research = ROOT / ticker / "research"
+        if not has_owner_cash_scenarios(research):
+            # A contract-authority valuation (e.g. method proof_first_automated)
+            # has no owner-cash scenarios, so the legacy hurdle model raised
+            # KeyError: 'scenarios' (AXTI, 2026-09-24) and left the
+            # scenario-era pricing file in place. Price it through the
+            # valuation contract, which also replaces that stale file.
+            try:
+                build_contract_pricing(ticker)
+                contract_priced.append(ticker)
+            except Exception as exc:
+                errors.append((ticker, f"{type(exc).__name__}: {exc}"))
+            continue
         had_config = (research / "pricing_model.json").exists()
         try:
             config_path = seed_default_config(ticker)
@@ -160,7 +182,13 @@ def stage_pricing(tickers: list[str], dry_run: bool) -> dict:
             priced.append(ticker)
         except Exception as exc:
             errors.append((ticker, f"{type(exc).__name__}: {exc}"))
-    return {"priced": priced, "seeded_config": seeded, "skipped": skipped, "errors": errors}
+    return {
+        "priced": priced,
+        "seeded_config": seeded,
+        "skipped": skipped,
+        "errors": errors,
+        "contract_priced": contract_priced,
+    }
 
 
 def live_material_underlyings() -> set[str]:
@@ -361,6 +389,7 @@ def main() -> int:
     print(
         f"[4/6] pricing: {len(pricing['priced'])} priced "
         f"({len(pricing['seeded_config'])} configs seeded), "
+        f"{len(pricing['contract_priced'])} via valuation contract, "
         f"{len(pricing['skipped'])} not decision-grade, {len(pricing['errors'])} errors"
     )
     for ticker, error in pricing["errors"]:

@@ -4,9 +4,9 @@ on:
   schedule:
     # Sunday 16:00 UTC — off the 06:00 activist slot and the 10:00 full
     # downloads run so heavy jobs do not queue behind each other.
-    - cron: "0 16 * * 0"
+    - cron: "13 16 * * 0"  # moved off the quarter-hour, where GitHub drops and delays scheduled runs
     # Wednesday mid-week catch-up for new quarter drops (recent years only).
-    - cron: "0 15 * * 3"
+    - cron: "11 15 * * 3"  # moved off the quarter-hour, where GitHub drops and delays scheduled runs
   workflow_dispatch:
     inputs:
       since_year:

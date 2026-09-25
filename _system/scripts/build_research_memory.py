@@ -243,14 +243,22 @@ def build() -> tuple[dict, dict]:
     entities = build_entity_map(registry, classification, insights, biotech_funds)
 
     rows = all_insight_rows(insights)
+    insight_row_count = len(rows)
     rows.extend(ownership_claim_rows(ownership_records))
     methodology_rows = from_biotech_methodology()
     factor_spec = load_biotech_factor_spec()
 
+    ticker_dirs_present = 0
     for ticker in entities["tickers"]:
         ticker_dir = ROOT / ticker
         if ticker_dir.is_dir():
+            ticker_dirs_present += 1
             rows.extend(supplemental_claim_rows(ticker, ticker_dir))
+    build_inputs = {
+        "insight_rows": insight_row_count,
+        "tickers": len(entities["tickers"]),
+        "ticker_dirs_present": ticker_dirs_present,
+    }
 
     source_registry: dict[str, dict] = {}
     claim_ledger: list[dict] = []
@@ -528,6 +536,7 @@ def build() -> tuple[dict, dict]:
         "generated_at": now_iso(),
         "schema_version": 2,
         "summary": summary,
+        "build_inputs": build_inputs,
         "source_registry": source_registry_list,
         "entity_map": entities,
         "claim_ledger": claim_ledger,
@@ -564,9 +573,63 @@ def build() -> tuple[dict, dict]:
     return memory_doc, evidence_doc
 
 
+# A rebuild from incomplete inputs may not shrink the committed memory by more
+# than this. The drive lane's insights profile built memory before
+# build_insights had written the gitignored insights.json, and committed ~1,100
+# claims over the ~12,000 intake-full had written that morning -- every evening
+# (research_memory_evidence.json 15.4MB -> 1.4MB, e.g. 376a075ba45, 04d2d41986f).
+SPARSE_SHRINK_FLOOR = 0.8
+SHRINK_JUDGE_MIN_PRIOR = 100
+
+
+def inputs_are_sparse(memory_doc: dict) -> bool:
+    """True when the build could not see the corpus it summarizes."""
+    inputs = memory_doc.get("build_inputs") or {}
+    tickers = int(inputs.get("tickers") or 0)
+    present = int(inputs.get("ticker_dirs_present") or 0)
+    no_insights = int(inputs.get("insight_rows") or 0) == 0
+    thin_tree = tickers >= 50 and present < tickers * 0.5
+    return no_insights or thin_tree
+
+
+def sparse_shrink_reason(memory_doc: dict, evidence_doc: dict,
+                         prior_memory: dict, prior_evidence: dict) -> str | None:
+    """Why this sparse rebuild must not overwrite the prior memory, or None."""
+    if not inputs_are_sparse(memory_doc):
+        return None
+    checks = (
+        (
+            "claims",
+            int((memory_doc.get("summary") or {}).get("claim_count") or 0),
+            int((prior_memory.get("summary") or {}).get("claim_count") or 0),
+        ),
+        (
+            "evidence",
+            len(evidence_doc.get("evidence_ledger") or []),
+            len(prior_evidence.get("evidence_ledger") or []),
+        ),
+    )
+    for label, new, old in checks:
+        if old >= SHRINK_JUDGE_MIN_PRIOR and new < old * SPARSE_SHRINK_FLOOR:
+            return f"{label} {old}->{new}"
+    return None
+
+
 def main() -> None:
     DATA_DIR.mkdir(parents=True, exist_ok=True)
     memory_doc, evidence_doc = build()
+    reason = sparse_shrink_reason(
+        memory_doc, evidence_doc, load_json(OUTPUT, {}) or {}, load_json(EVIDENCE_OUTPUT, {}) or {}
+    )
+    if reason and os.environ.get("RESEARCH_MEMORY_ALLOW_SHRINK") != "1":
+        inputs = memory_doc.get("build_inputs") or {}
+        print(
+            "::warning title=research memory::sparse rebuild would shrink research memory "
+            f"({reason}; insight_rows={inputs.get('insight_rows')}, ticker dirs "
+            f"{inputs.get('ticker_dirs_present')}/{inputs.get('tickers')}); keeping the "
+            "committed files. Set RESEARCH_MEMORY_ALLOW_SHRINK=1 to override."
+        )
+        return
     save_json(OUTPUT, memory_doc)
     save_json(EVIDENCE_OUTPUT, evidence_doc)
     print(

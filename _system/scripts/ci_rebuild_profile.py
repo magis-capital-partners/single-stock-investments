@@ -49,10 +49,15 @@ PROFILES: dict[str, list[list[str]]] = {
         ["_system/scripts/build_biotech_insider_scores.py"],
         ["_system/scripts/build_biotech_peer_short_stub.py"],
         ["_system/scripts/build_biotech_composite.py"],
-        ["_system/scripts/build_research_memory.py"],
         ["_system/scripts/repair_letter_dates.py", "--apply"],
         ["_system/scripts/build_index_membership.py"],
         ["_system/scripts/build_insights.py"],
+        # AFTER build_insights: research memory is built from insights.json,
+        # which is gitignored and so absent in a fresh CI checkout until
+        # build_insights writes it. Built first, it saw no insights and the
+        # drive lane committed ~1,100 claims over the ~12,000 intake-full had
+        # written that morning, every evening (15.4MB -> 1.4MB evidence).
+        ["_system/scripts/build_research_memory.py"],
         ["_system/scripts/build_dashboard_data.py"],
         ["_system/scripts/validate_research_memory.py"],
     ],
@@ -179,7 +184,12 @@ def expand_steps(steps: list[list[str]]) -> list[list[str]]:
             )
             out.append(["_system/scripts/resolve_warrant_outcomes.py"])
             out.append(["_system/scripts/build_warrant_dashboard.py"])
-            out.append(["_system/scripts/check_warrant_universe.py"])
+            # Warn-only here: this lane rebuilds the warrant artifact, it does
+            # not own the registry. The warrant-discover job sweeps expiries
+            # and runs the strict check. A blocking check here let one expired
+            # series (BKSY.W) fail intake-full, drive and world-model for 13
+            # days (2026-09-10..22).
+            out.append(["_system/scripts/check_warrant_universe.py", "--warn-only"])
         out.append(step)
     return out
 

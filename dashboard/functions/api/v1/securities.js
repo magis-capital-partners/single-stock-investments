@@ -5,10 +5,11 @@ import {
   requestId,
   requireDatabase,
 } from "../../_lib/http.js";
+import { RESEARCH_TTL_SECONDS, withEdgeCache } from "../../_lib/edge-cache.js";
 
 const ALLOWED_STATUSES = new Set(["decision_grade", "evidence_blocked", "insufficient_data"]);
 
-export async function onRequestGet(context) {
+async function produce(context) {
   const id = requestId(context.request);
   try {
     const db = requireDatabase(context.env);
@@ -70,4 +71,10 @@ export async function onRequestGet(context) {
   } catch (error) {
     return failure(error, id);
   }
+}
+
+// Public and identical for every caller, so served through the edge cache
+// (research TTL; see _lib/edge-cache.js).
+export async function onRequestGet(context) {
+  return withEdgeCache(context, RESEARCH_TTL_SECONDS, () => produce(context));
 }
