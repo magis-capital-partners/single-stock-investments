@@ -1,9 +1,633 @@
 {
-  "schema_version": "1.0",
-  "checked_at": "2026-09-24T23:18:51.670689+00:00",
-  "git_head": "8b653aa72d228e4e2d8dcf833e9ef6fb7a22da5c",
-  "hard_violation_count": 0,
-  "failures": {},
-  "dispatches": [],
-  "escalate": []
+  "schema_version": "2.0",
+  "checked_at": "2026-09-25T00:56:37Z",
+  "previous_checked_at": "2026-09-24T23:18:51.670689+00:00",
+  "git_head": "321109d60a91e85e820cc6c7006313a6f688292a",
+  "hard_violation_count": 5,
+  "lanes": {
+    "supervisor": {
+      "stale": false,
+      "last_success_at": "2026-09-24T23:19:05Z",
+      "age_hours": 1.6,
+      "window_hours": 12.0,
+      "latest_outcome": "success",
+      "fingerprint": null,
+      "persistent": false,
+      "held": null
+    },
+    "data-pipeline-intake-full": {
+      "stale": false,
+      "last_success_at": "2026-09-24T09:25:29Z",
+      "age_hours": 15.5,
+      "window_hours": 54.0,
+      "latest_outcome": "success",
+      "fingerprint": null,
+      "persistent": false,
+      "held": null
+    },
+    "data-pipeline-technicals": {
+      "stale": false,
+      "last_success_at": "2026-09-24T07:47:54Z",
+      "age_hours": 17.1,
+      "window_hours": 102.0,
+      "latest_outcome": "success",
+      "fingerprint": null,
+      "persistent": false,
+      "held": null
+    },
+    "data-pipeline-activist": {
+      "stale": true,
+      "last_success_at": null,
+      "age_hours": null,
+      "window_hours": 54.0,
+      "latest_outcome": "timeout",
+      "fingerprint": "57533027c0f2",
+      "persistent": true,
+      "held": "persistent failure: dispatching stopped, see the lane-failure issue"
+    },
+    "data-pipeline-downloads": {
+      "stale": false,
+      "last_success_at": "2026-09-24T17:48:29Z",
+      "age_hours": 7.1,
+      "window_hours": 56.0,
+      "latest_outcome": "success",
+      "fingerprint": null,
+      "persistent": false,
+      "held": null
+    },
+    "data-pipeline-drive": {
+      "stale": false,
+      "last_success_at": "2026-09-24T19:10:38Z",
+      "age_hours": 5.8,
+      "window_hours": 54.0,
+      "latest_outcome": "success",
+      "fingerprint": null,
+      "persistent": false,
+      "held": null
+    },
+    "data-pipeline-news": {
+      "stale": true,
+      "last_success_at": null,
+      "age_hours": null,
+      "window_hours": 18.0,
+      "latest_outcome": "timeout",
+      "fingerprint": "8ec5b6c2c565",
+      "persistent": true,
+      "held": "persistent failure: dispatching stopped, see the lane-failure issue"
+    },
+    "data-pipeline-cvr-discover": {
+      "stale": false,
+      "last_success_at": "2026-09-21T19:54:08Z",
+      "age_hours": 77.0,
+      "window_hours": 342.0,
+      "latest_outcome": "success",
+      "fingerprint": null,
+      "persistent": false,
+      "held": null
+    },
+    "data-pipeline-warrant-discover": {
+      "stale": true,
+      "last_success_at": "2026-09-07T19:03:03Z",
+      "age_hours": 413.9,
+      "window_hours": 342.0,
+      "latest_outcome": "failure",
+      "fingerprint": "bedc3e9024ef",
+      "persistent": true,
+      "held": "persistent failure: dispatching stopped, see the lane-failure issue"
+    },
+    "data-pipeline-world-model": {
+      "stale": true,
+      "last_success_at": "2026-09-06T18:13:21Z",
+      "age_hours": 438.7,
+      "window_hours": 342.0,
+      "latest_outcome": "failure",
+      "fingerprint": null,
+      "persistent": false,
+      "held": null
+    },
+    "ls-algo": {
+      "stale": true,
+      "last_success_at": null,
+      "age_hours": null,
+      "window_hours": 54.0,
+      "latest_outcome": "failure",
+      "fingerprint": null,
+      "persistent": false,
+      "held": null
+    },
+    "valuation": {
+      "stale": false,
+      "last_success_at": "2026-09-24T17:51:22Z",
+      "age_hours": 7.1,
+      "window_hours": 56.0,
+      "latest_outcome": "success",
+      "fingerprint": null,
+      "persistent": false,
+      "held": null
+    },
+    "daily-sync": {
+      "stale": false,
+      "last_success_at": "2026-09-24T17:51:07Z",
+      "age_hours": 7.1,
+      "window_hours": 56.0,
+      "latest_outcome": "success",
+      "fingerprint": null,
+      "persistent": false,
+      "held": null
+    },
+    "deploy": {
+      "stale": false,
+      "last_success_at": "2026-09-25T00:19:58Z",
+      "age_hours": 0.6,
+      "window_hours": 54.0,
+      "latest_outcome": "success",
+      "fingerprint": null,
+      "persistent": false,
+      "held": null
+    },
+    "backfill": {
+      "stale": false,
+      "last_success_at": "2026-09-25T00:40:30Z",
+      "age_hours": 0.3,
+      "window_hours": 24.0,
+      "latest_outcome": "success",
+      "fingerprint": null,
+      "persistent": false,
+      "held": null
+    },
+    "committee": {
+      "stale": false,
+      "last_success_at": "2026-09-24T23:14:06Z",
+      "age_hours": 1.7,
+      "window_hours": 24.0,
+      "latest_outcome": "success",
+      "fingerprint": null,
+      "persistent": false,
+      "held": null
+    },
+    "committee-outcomes": {
+      "stale": false,
+      "last_success_at": "2026-09-24T14:42:26Z",
+      "age_hours": 10.2,
+      "window_hours": 54.0,
+      "latest_outcome": "success",
+      "fingerprint": null,
+      "persistent": false,
+      "held": null
+    },
+    "memory-digest": {
+      "stale": false,
+      "last_success_at": "2026-09-24T15:22:20Z",
+      "age_hours": 9.6,
+      "window_hours": 54.0,
+      "latest_outcome": "success",
+      "fingerprint": null,
+      "persistent": false,
+      "held": null
+    },
+    "falsifier": {
+      "stale": false,
+      "last_success_at": "2026-09-24T23:14:01Z",
+      "age_hours": 1.7,
+      "window_hours": 54.0,
+      "latest_outcome": "success",
+      "fingerprint": null,
+      "persistent": false,
+      "held": null
+    },
+    "research-watchdog": {
+      "stale": false,
+      "last_success_at": "2026-09-25T00:49:09Z",
+      "age_hours": 0.1,
+      "window_hours": 54.0,
+      "latest_outcome": "success",
+      "fingerprint": null,
+      "persistent": false,
+      "held": null
+    },
+    "market-risk": {
+      "stale": false,
+      "last_success_at": "2026-09-25T00:33:16Z",
+      "age_hours": 0.4,
+      "window_hours": 102.0,
+      "latest_outcome": "success",
+      "fingerprint": null,
+      "persistent": false,
+      "held": null
+    },
+    "forced-flow": {
+      "stale": false,
+      "last_success_at": "2026-09-25T00:07:23Z",
+      "age_hours": 0.8,
+      "window_hours": 102.0,
+      "latest_outcome": "success",
+      "fingerprint": null,
+      "persistent": false,
+      "held": null
+    },
+    "letters": {
+      "stale": false,
+      "last_success_at": "2026-09-23T20:26:39Z",
+      "age_hours": 28.5,
+      "window_hours": 174.0,
+      "latest_outcome": "success",
+      "fingerprint": null,
+      "persistent": false,
+      "held": null
+    },
+    "podcasts": {
+      "stale": false,
+      "last_success_at": "2026-09-22T00:10:10Z",
+      "age_hours": 72.8,
+      "window_hours": 342.0,
+      "latest_outcome": "success",
+      "fingerprint": null,
+      "persistent": false,
+      "held": null
+    },
+    "security-scan": {
+      "stale": false,
+      "last_success_at": "2026-09-20T07:48:27Z",
+      "age_hours": 113.1,
+      "window_hours": 342.0,
+      "latest_outcome": "success",
+      "fingerprint": null,
+      "persistent": false,
+      "held": null
+    },
+    "two-phase-watch": {
+      "stale": false,
+      "last_success_at": "2026-09-24T23:03:45Z",
+      "age_hours": 1.9,
+      "window_hours": 342.0,
+      "latest_outcome": "success",
+      "fingerprint": null,
+      "persistent": false,
+      "held": null
+    }
+  },
+  "feeds_stale": [],
+  "dispatches": [
+    {
+      "event_type": "sync-ls-algo-universe",
+      "lane": "ls-algo",
+      "reason": "stale",
+      "sent": true
+    }
+  ],
+  "issue_actions": [
+    "opened #1029 [fp:fc06215bd0b1] for data-pipeline-activist",
+    "opened #1030 [fp:edd78f043468] for data-pipeline-news",
+    "opened #1031 [fp:4b1f00a51515] for data-pipeline-warrant-discover"
+  ],
+  "slack": {
+    "alerts": true,
+    "digest": false
+  },
+  "alerts": {
+    "issue:fc06215bd0b1:open:1": {
+      "sent_at": "2026-09-25T00:56:37Z",
+      "value": 1029
+    },
+    "issue:edd78f043468:open:1": {
+      "sent_at": "2026-09-25T00:56:37Z",
+      "value": 1030
+    },
+    "issue:4b1f00a51515:open:1": {
+      "sent_at": "2026-09-25T00:56:37Z",
+      "value": 1031
+    },
+    "stale:data-pipeline-activist": {
+      "sent_at": "2026-09-25T00:56:37Z",
+      "value": "never"
+    },
+    "stale:data-pipeline-news": {
+      "sent_at": "2026-09-25T00:56:37Z",
+      "value": "never"
+    },
+    "stale:data-pipeline-warrant-discover": {
+      "sent_at": "2026-09-25T00:56:37Z",
+      "value": "2026-09-07T19:03:03Z"
+    },
+    "stale:data-pipeline-world-model": {
+      "sent_at": "2026-09-25T00:56:37Z",
+      "value": "2026-09-06T18:13:21Z"
+    },
+    "stale:ls-algo": {
+      "sent_at": "2026-09-25T00:56:37Z",
+      "value": "never"
+    }
+  },
+  "fingerprints": {
+    "57533027c0f2": {
+      "lane": "data-pipeline-activist",
+      "workflow": "data-pipeline.yml",
+      "job": "activist",
+      "step": "Run activist scan",
+      "kind": "timeout",
+      "error": "timeout while running step 'Run activist scan'",
+      "raw": "The job has exceeded the maximum execution time of 1h30m0s",
+      "first_seen_at": "2026-09-22T12:25:53Z",
+      "last_seen_at": "2026-09-24T12:34:19Z",
+      "runs": [
+        {
+          "run_id": 35718603925,
+          "at": "2026-09-22T12:25:53Z",
+          "url": "https://github.com/magis-capital-partners/single-stock-investments/actions/runs/35718603925"
+        },
+        {
+          "run_id": 35850412817,
+          "at": "2026-09-23T12:13:44Z",
+          "url": "https://github.com/magis-capital-partners/single-stock-investments/actions/runs/35850412817"
+        },
+        {
+          "run_id": 35990836980,
+          "at": "2026-09-24T12:34:19Z",
+          "url": "https://github.com/magis-capital-partners/single-stock-investments/actions/runs/35990836980"
+        }
+      ],
+      "issue_key": "fc06215bd0b1"
+    },
+    "8ec5b6c2c565": {
+      "lane": "data-pipeline-news",
+      "workflow": "data-pipeline.yml",
+      "job": "news",
+      "step": "Ingest portfolio news",
+      "kind": "timeout",
+      "error": "timeout while running step 'Ingest portfolio news'",
+      "raw": "The job has exceeded the maximum execution time of 45m0s",
+      "first_seen_at": "2026-09-24T13:19:37Z",
+      "last_seen_at": "2026-09-24T22:26:49Z",
+      "runs": [
+        {
+          "run_id": 35996714841,
+          "at": "2026-09-24T13:19:37Z",
+          "url": "https://github.com/magis-capital-partners/single-stock-investments/actions/runs/35996714841"
+        },
+        {
+          "run_id": 36034313298,
+          "at": "2026-09-24T18:33:48Z",
+          "url": "https://github.com/magis-capital-partners/single-stock-investments/actions/runs/36034313298"
+        },
+        {
+          "run_id": 36063046740,
+          "at": "2026-09-24T22:26:49Z",
+          "url": "https://github.com/magis-capital-partners/single-stock-investments/actions/runs/36063046740"
+        }
+      ],
+      "issue_key": "edd78f043468"
+    },
+    "bedc3e9024ef": {
+      "lane": "data-pipeline-warrant-discover",
+      "workflow": "data-pipeline.yml",
+      "job": "warrant-discover",
+      "step": "Keep unresolved source failures loud after preserving progress",
+      "kind": "error",
+      "error": "Warrant snapshot was preserved, but strict health remains degraded.",
+      "raw": "Warrant snapshot was preserved, but strict health remains degraded.",
+      "first_seen_at": "2026-09-22T13:36:51Z",
+      "last_seen_at": "2026-09-22T23:11:55Z",
+      "runs": [
+        {
+          "run_id": 35734508377,
+          "at": "2026-09-22T13:36:51Z",
+          "url": "https://github.com/magis-capital-partners/single-stock-investments/actions/runs/35734508377"
+        },
+        {
+          "run_id": 35776316464,
+          "at": "2026-09-22T19:51:02Z",
+          "url": "https://github.com/magis-capital-partners/single-stock-investments/actions/runs/35776316464"
+        },
+        {
+          "run_id": 35796160490,
+          "at": "2026-09-22T23:11:55Z",
+          "url": "https://github.com/magis-capital-partners/single-stock-investments/actions/runs/35796160490"
+        }
+      ],
+      "issue_key": "4b1f00a51515"
+    }
+  },
+  "issues": {
+    "fc06215bd0b1": {
+      "number": 1029,
+      "state": "open",
+      "episode": 1,
+      "kind": "timeout",
+      "error": "timeout while running step 'Run activist scan'",
+      "raw": "The job has exceeded the maximum execution time of 1h30m0s",
+      "lanes": {
+        "data-pipeline-activist": {
+          "fp": "57533027c0f2",
+          "workflow": "data-pipeline.yml",
+          "job": "activist",
+          "step": "Run activist scan",
+          "first_seen_at": "2026-09-22T12:25:53Z",
+          "last_seen_at": "2026-09-24T12:34:19Z",
+          "runs": [
+            {
+              "run_id": 35718603925,
+              "at": "2026-09-22T12:25:53Z",
+              "url": "https://github.com/magis-capital-partners/single-stock-investments/actions/runs/35718603925"
+            },
+            {
+              "run_id": 35850412817,
+              "at": "2026-09-23T12:13:44Z",
+              "url": "https://github.com/magis-capital-partners/single-stock-investments/actions/runs/35850412817"
+            },
+            {
+              "run_id": 35990836980,
+              "at": "2026-09-24T12:34:19Z",
+              "url": "https://github.com/magis-capital-partners/single-stock-investments/actions/runs/35990836980"
+            }
+          ],
+          "window": 54.0
+        }
+      },
+      "first_seen_at": "2026-09-22T12:25:53Z",
+      "last_seen_at": "2026-09-24T12:34:19Z",
+      "body_sig": "19531ce93f4dbe17",
+      "comments_done": [
+        "stale:data-pipeline-activist:never"
+      ],
+      "comments_pending": [],
+      "opened_at": "2026-09-25T00:56:37Z",
+      "assigned": true
+    },
+    "edd78f043468": {
+      "number": 1030,
+      "state": "open",
+      "episode": 1,
+      "kind": "timeout",
+      "error": "timeout while running step 'Ingest portfolio news'",
+      "raw": "The job has exceeded the maximum execution time of 45m0s",
+      "lanes": {
+        "data-pipeline-news": {
+          "fp": "8ec5b6c2c565",
+          "workflow": "data-pipeline.yml",
+          "job": "news",
+          "step": "Ingest portfolio news",
+          "first_seen_at": "2026-09-24T13:19:37Z",
+          "last_seen_at": "2026-09-24T22:26:49Z",
+          "runs": [
+            {
+              "run_id": 35996714841,
+              "at": "2026-09-24T13:19:37Z",
+              "url": "https://github.com/magis-capital-partners/single-stock-investments/actions/runs/35996714841"
+            },
+            {
+              "run_id": 36034313298,
+              "at": "2026-09-24T18:33:48Z",
+              "url": "https://github.com/magis-capital-partners/single-stock-investments/actions/runs/36034313298"
+            },
+            {
+              "run_id": 36063046740,
+              "at": "2026-09-24T22:26:49Z",
+              "url": "https://github.com/magis-capital-partners/single-stock-investments/actions/runs/36063046740"
+            }
+          ],
+          "window": 18.0
+        }
+      },
+      "first_seen_at": "2026-09-24T13:19:37Z",
+      "last_seen_at": "2026-09-24T22:26:49Z",
+      "body_sig": "9eb04b703ca173b1",
+      "comments_done": [
+        "stale:data-pipeline-news:never"
+      ],
+      "comments_pending": [],
+      "opened_at": "2026-09-25T00:56:37Z",
+      "assigned": true
+    },
+    "4b1f00a51515": {
+      "number": 1031,
+      "state": "open",
+      "episode": 1,
+      "kind": "error",
+      "error": "Warrant snapshot was preserved, but strict health remains degraded.",
+      "raw": "Warrant snapshot was preserved, but strict health remains degraded.",
+      "lanes": {
+        "data-pipeline-warrant-discover": {
+          "fp": "bedc3e9024ef",
+          "workflow": "data-pipeline.yml",
+          "job": "warrant-discover",
+          "step": "Keep unresolved source failures loud after preserving progress",
+          "first_seen_at": "2026-09-22T13:36:51Z",
+          "last_seen_at": "2026-09-22T23:11:55Z",
+          "runs": [
+            {
+              "run_id": 35734508377,
+              "at": "2026-09-22T13:36:51Z",
+              "url": "https://github.com/magis-capital-partners/single-stock-investments/actions/runs/35734508377"
+            },
+            {
+              "run_id": 35776316464,
+              "at": "2026-09-22T19:51:02Z",
+              "url": "https://github.com/magis-capital-partners/single-stock-investments/actions/runs/35776316464"
+            },
+            {
+              "run_id": 35796160490,
+              "at": "2026-09-22T23:11:55Z",
+              "url": "https://github.com/magis-capital-partners/single-stock-investments/actions/runs/35796160490"
+            }
+          ],
+          "window": 342.0
+        }
+      },
+      "first_seen_at": "2026-09-22T13:36:51Z",
+      "last_seen_at": "2026-09-22T23:11:55Z",
+      "body_sig": "02956dbb28501628",
+      "comments_done": [
+        "stale:data-pipeline-warrant-discover:2026-09-07T19:03:03Z"
+      ],
+      "comments_pending": [],
+      "opened_at": "2026-09-25T00:56:37Z",
+      "assigned": true
+    }
+  },
+  "fingerprint_cache": {
+    "107604298407": {
+      "fp": "57533027c0f2",
+      "kind": "timeout",
+      "step": "Run activist scan",
+      "normalized": "timeout while running step 'Run activist scan'",
+      "raw": "The job has exceeded the maximum execution time of 1h30m0s"
+    },
+    "107146513698": {
+      "fp": "57533027c0f2",
+      "kind": "timeout",
+      "step": "Run activist scan",
+      "normalized": "timeout while running step 'Run activist scan'",
+      "raw": "The job has exceeded the maximum execution time of 1h30m0s"
+    },
+    "106715922572": {
+      "fp": "57533027c0f2",
+      "kind": "timeout",
+      "step": "Run activist scan",
+      "normalized": "timeout while running step 'Run activist scan'",
+      "raw": "The job has exceeded the maximum execution time of 1h30m0s"
+    },
+    "107846318218": {
+      "fp": "8ec5b6c2c565",
+      "kind": "timeout",
+      "step": "Ingest portfolio news",
+      "normalized": "timeout while running step 'Ingest portfolio news'",
+      "raw": "The job has exceeded the maximum execution time of 45m0s"
+    },
+    "107750762664": {
+      "fp": "8ec5b6c2c565",
+      "kind": "timeout",
+      "step": "Ingest portfolio news",
+      "normalized": "timeout while running step 'Ingest portfolio news'",
+      "raw": "The job has exceeded the maximum execution time of 45m0s"
+    },
+    "107623294237": {
+      "fp": "8ec5b6c2c565",
+      "kind": "timeout",
+      "step": "Ingest portfolio news",
+      "normalized": "timeout while running step 'Ingest portfolio news'",
+      "raw": "The job has exceeded the maximum execution time of 45m0s"
+    },
+    "106975844151": {
+      "fp": "bedc3e9024ef",
+      "kind": "error",
+      "step": "Keep unresolved source failures loud after preserving progress",
+      "normalized": "Warrant snapshot was preserved, but strict health remains degraded.",
+      "raw": "Warrant snapshot was preserved, but strict health remains degraded."
+    },
+    "106910347286": {
+      "fp": "bedc3e9024ef",
+      "kind": "error",
+      "step": "Keep unresolved source failures loud after preserving progress",
+      "normalized": "Warrant snapshot was preserved, but strict health remains degraded.",
+      "raw": "Warrant snapshot was preserved, but strict health remains degraded."
+    },
+    "106768216050": {
+      "fp": "bedc3e9024ef",
+      "kind": "error",
+      "step": "Keep unresolved source failures loud after preserving progress",
+      "normalized": "Warrant snapshot was preserved, but strict health remains degraded.",
+      "raw": "Warrant snapshot was preserved, but strict health remains degraded."
+    }
+  },
+  "dispatch_log": {
+    "ls-algo": {
+      "date": "2026-09-25",
+      "count": 1,
+      "last_at": "2026-09-25T00:56:37Z"
+    }
+  },
+  "digest": {},
+  "d1": {
+    "status": "ok",
+    "date": "2026-09-25",
+    "checked_at": "2026-09-25T00:56:37Z",
+    "rows_read": 72589,
+    "rows_read_pct": 1.5,
+    "rows_written": 25047,
+    "rows_written_pct": 25.0
+  },
+  "runs": [
+    "2026-09-25T00:56:37Z"
+  ],
+  "unjudged_since": {}
 }
