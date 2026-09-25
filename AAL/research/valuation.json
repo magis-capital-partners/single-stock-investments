@@ -1,6 +1,6 @@
 {
   "ticker": "AAL",
-  "as_of": "2026-08-04",
+  "as_of": "2026-07-21",
   "method": "full",
   "irr_method": "full",
   "lawrence_bucket": "capital_intensive",
@@ -849,41 +849,41 @@
   },
   "results_lawrence_legacy": {
     "bear": {
-      "return_pct": 12.9
+      "return_pct": 18.5
     },
     "base": {
-      "return_pct": 24.5
+      "return_pct": 30.5
     },
     "bull": {
-      "return_pct": 32.4
+      "return_pct": 38.7
     }
   },
   "results": {
     "bear": {
-      "return_pct": 12.9
+      "return_pct": 18.5
     },
     "base": {
-      "return_pct": 24.5
+      "return_pct": 30.5
     },
     "bull": {
-      "return_pct": 32.4
+      "return_pct": 38.7
     }
   },
   "results_growth_theory": {
     "theory_implied": {
-      "return_pct": 24.5
+      "return_pct": 30.5
     },
     "falsifier_adjusted": {
-      "return_pct": 24.5
+      "return_pct": 30.5
     }
   },
   "implied_return": {
-    "base_pct": 25.97,
+    "base_pct": 32.04,
     "label": "7yr IRR (total synthesis)",
-    "display": "25.97% (total synthesis)",
-    "lawrence_stance_gate_pct": 24.5,
-    "falsifier_adjusted_pct": 24.5,
-    "synthesis_pct": 25.97
+    "display": "32.04% (total synthesis)",
+    "lawrence_stance_gate_pct": 30.5,
+    "falsifier_adjusted_pct": 30.5,
+    "synthesis_pct": 32.04
   },
   "overlay_results": [],
   "component_valuation_results": {
@@ -1335,11 +1335,11 @@
       "high": 26.15
     },
     "equity_liability_floor": 0.0,
-    "market_price_per_share": 16.56,
+    "market_price_per_share": 13.43,
     "upside_downside_pct": {
       "low": -100.0,
       "base": -100.0,
-      "high": 57.9
+      "high": 94.7
     }
   },
   "component_review_queue": {
@@ -1480,7 +1480,9 @@
       "greenblatt",
       "hk",
       "klarman_asset_value",
+      "lawrence",
       "marathon_capital_cycle",
+      "moi",
       "munger",
       "pabrai",
       "stahl"
@@ -1563,10 +1565,36 @@
     "decision_rule": "Use one primary method and no more than two corroborating methods; irrelevant methods and personas remain silent."
   },
   "universal_valuation_contract": {
-    "schema_version": "2.0",
+    "schema_version": "3.0",
     "status": "decision_grade",
+    "proof_status": "decision_grade",
+    "model_level": "stock_specific",
+    "model_level_reason": "The proof-complete model uses stock-specific components and assumptions.",
+    "decision_eligibility": {
+      "committee_eligible": true,
+      "capital_actionable": false,
+      "capital_authority_required": "human_decision",
+      "reason": "Stock-specific proof is eligible for independent committee review."
+    },
     "ticker": "AAL",
-    "as_of": "2026-08-04",
+    "as_of": "2026-07-21",
+    "dates": {
+      "model_as_of": "2026-07-21",
+      "latest_fact_as_of": "2026-03-31",
+      "oldest_fact_as_of": "2025-12-31",
+      "price_as_of": "2026-08-31"
+    },
+    "legacy_audit": {
+      "actionable": false,
+      "status": "audit_only",
+      "annualized_return_at_price_pct": {
+        "low": null,
+        "base": null,
+        "high": 9.98
+      },
+      "formula": "((present_value_or_output + undated_distributions) / price) ** (1 / horizon_years) - 1",
+      "reason_non_actionable": "This legacy calculation treated a present value as a future payoff and cannot be used as a forward return, hurdle entry price, ranking signal, or capital decision."
+    },
     "economic_ownership_map": [
       {
         "component_id": "midcycle_passenger_network",
@@ -1586,6 +1614,7 @@
           "method_id": "owner_cash_or_dividend_discount",
           "version": "1.0",
           "label": "Predictable owner-cash discount model",
+          "output_basis": "present_value_today",
           "power_zones": [
             "predictable_cash_flow"
           ],
@@ -1603,6 +1632,7 @@
           "base": 33.88,
           "high": 49.4099
         },
+        "output_basis": "present_value_today",
         "legacy_range_per_share": {
           "low": 21.17,
           "base": 33.88,
@@ -1631,8 +1661,7 @@
                   "ref": "AAL/investor-documents/sec-edgar/10-K_20260218_rpt20251231_acc0000006201_26_000014.htm",
                   "locator": "NetCashProvidedByUsedInOperatingActivities $3,099M (FY2025)",
                   "as_of": "2025-12-31",
-                  "content_sha256": "64f561f129dc4b8149d5fc9e2dbc5b9eaeeb9353963b96c32fbc6b1eaf988092",
-                  "source_id": "9d5056c56a7af789bb564e262eede4803b4d66a474257dedddb29f641c5333c6"
+                  "source_id": "b797118a95e0a2c20bd57d6d59996ce0d35f5e98b101d35d44ddd84565d702ae"
                 },
                 "rationale": null
               },
@@ -1646,8 +1675,7 @@
                   "ref": "AAL/investor-documents/sec-edgar/10-K_20260218_rpt20251231_acc0000006201_26_000014.htm",
                   "locator": "OperatingIncomeLoss $1467.0M (2025) and $2614.0M (2024); midpoint normalization",
                   "as_of": "2025-12-31",
-                  "content_sha256": "64f561f129dc4b8149d5fc9e2dbc5b9eaeeb9353963b96c32fbc6b1eaf988092",
-                  "source_id": "a38d13725cc22d80af56338b79abe8cb2d4f55b2b305beda8c3fdbb082b92772"
+                  "source_id": "c2fcfccd8004bda6ad281e0f099e626b2f5e017bdb1fa9b8516dc2089186c1b0"
                 },
                 "rationale": null
               },
@@ -1661,8 +1689,7 @@
                   "ref": "AAL/investor-documents/sec-edgar/10-Q_20260423_rpt20260331_acc0000006201_26_000032.htm",
                   "locator": "Q1 2026 net income $382M / diluted EPS $0.58",
                   "as_of": "2026-03-31",
-                  "content_sha256": "b2d1c900837059b8f8a88f7f368c8383fa2d05fbe909c41589429773dde8c160",
-                  "source_id": "3ccaeccd0d82ce4e35da59051a9633c6d99243ccc2056ea4adc69417e3b0055a"
+                  "source_id": "1f189f58f3e84aa0f5fcb6236b03784536f60778ca02c17cb695630152cbd2c5"
                 },
                 "rationale": null
               },
@@ -1710,8 +1737,7 @@
                   "ref": "AAL/investor-documents/sec-edgar/10-K_20260218_rpt20251231_acc0000006201_26_000014.htm",
                   "locator": "NetCashProvidedByUsedInOperatingActivities $3,099M (FY2025)",
                   "as_of": "2025-12-31",
-                  "content_sha256": "64f561f129dc4b8149d5fc9e2dbc5b9eaeeb9353963b96c32fbc6b1eaf988092",
-                  "source_id": "9d5056c56a7af789bb564e262eede4803b4d66a474257dedddb29f641c5333c6"
+                  "source_id": "b797118a95e0a2c20bd57d6d59996ce0d35f5e98b101d35d44ddd84565d702ae"
                 },
                 "rationale": null
               },
@@ -1725,8 +1751,7 @@
                   "ref": "AAL/investor-documents/sec-edgar/10-K_20260218_rpt20251231_acc0000006201_26_000014.htm",
                   "locator": "OperatingIncomeLoss $1467.0M (2025) and $2614.0M (2024); midpoint normalization",
                   "as_of": "2025-12-31",
-                  "content_sha256": "64f561f129dc4b8149d5fc9e2dbc5b9eaeeb9353963b96c32fbc6b1eaf988092",
-                  "source_id": "a38d13725cc22d80af56338b79abe8cb2d4f55b2b305beda8c3fdbb082b92772"
+                  "source_id": "c2fcfccd8004bda6ad281e0f099e626b2f5e017bdb1fa9b8516dc2089186c1b0"
                 },
                 "rationale": null
               },
@@ -1740,8 +1765,7 @@
                   "ref": "AAL/investor-documents/sec-edgar/10-Q_20260423_rpt20260331_acc0000006201_26_000032.htm",
                   "locator": "Q1 2026 net income $382M / diluted EPS $0.58",
                   "as_of": "2026-03-31",
-                  "content_sha256": "b2d1c900837059b8f8a88f7f368c8383fa2d05fbe909c41589429773dde8c160",
-                  "source_id": "3ccaeccd0d82ce4e35da59051a9633c6d99243ccc2056ea4adc69417e3b0055a"
+                  "source_id": "1f189f58f3e84aa0f5fcb6236b03784536f60778ca02c17cb695630152cbd2c5"
                 },
                 "rationale": null
               },
@@ -1789,8 +1813,7 @@
                   "ref": "AAL/investor-documents/sec-edgar/10-K_20260218_rpt20251231_acc0000006201_26_000014.htm",
                   "locator": "NetCashProvidedByUsedInOperatingActivities $3,099M (FY2025)",
                   "as_of": "2025-12-31",
-                  "content_sha256": "64f561f129dc4b8149d5fc9e2dbc5b9eaeeb9353963b96c32fbc6b1eaf988092",
-                  "source_id": "9d5056c56a7af789bb564e262eede4803b4d66a474257dedddb29f641c5333c6"
+                  "source_id": "b797118a95e0a2c20bd57d6d59996ce0d35f5e98b101d35d44ddd84565d702ae"
                 },
                 "rationale": null
               },
@@ -1804,8 +1827,7 @@
                   "ref": "AAL/investor-documents/sec-edgar/10-K_20260218_rpt20251231_acc0000006201_26_000014.htm",
                   "locator": "OperatingIncomeLoss $1467.0M (2025) and $2614.0M (2024); midpoint normalization",
                   "as_of": "2025-12-31",
-                  "content_sha256": "64f561f129dc4b8149d5fc9e2dbc5b9eaeeb9353963b96c32fbc6b1eaf988092",
-                  "source_id": "a38d13725cc22d80af56338b79abe8cb2d4f55b2b305beda8c3fdbb082b92772"
+                  "source_id": "c2fcfccd8004bda6ad281e0f099e626b2f5e017bdb1fa9b8516dc2089186c1b0"
                 },
                 "rationale": null
               },
@@ -1819,8 +1841,7 @@
                   "ref": "AAL/investor-documents/sec-edgar/10-Q_20260423_rpt20260331_acc0000006201_26_000032.htm",
                   "locator": "Q1 2026 net income $382M / diluted EPS $0.58",
                   "as_of": "2026-03-31",
-                  "content_sha256": "b2d1c900837059b8f8a88f7f368c8383fa2d05fbe909c41589429773dde8c160",
-                  "source_id": "3ccaeccd0d82ce4e35da59051a9633c6d99243ccc2056ea4adc69417e3b0055a"
+                  "source_id": "1f189f58f3e84aa0f5fcb6236b03784536f60778ca02c17cb695630152cbd2c5"
                 },
                 "rationale": null
               },
@@ -1864,31 +1885,28 @@
               "ref": "AAL/investor-documents/sec-edgar/10-K_20260218_rpt20251231_acc0000006201_26_000014.htm",
               "locator": "NetCashProvidedByUsedInOperatingActivities $3,099M (FY2025)",
               "as_of": "2025-12-31",
-              "content_sha256": "64f561f129dc4b8149d5fc9e2dbc5b9eaeeb9353963b96c32fbc6b1eaf988092",
-              "source_id": "9d5056c56a7af789bb564e262eede4803b4d66a474257dedddb29f641c5333c6"
+              "source_id": "b797118a95e0a2c20bd57d6d59996ce0d35f5e98b101d35d44ddd84565d702ae"
             },
             {
               "node_id": "midcycle_operating_income_m",
               "ref": "AAL/investor-documents/sec-edgar/10-K_20260218_rpt20251231_acc0000006201_26_000014.htm",
               "locator": "OperatingIncomeLoss $1467.0M (2025) and $2614.0M (2024); midpoint normalization",
               "as_of": "2025-12-31",
-              "content_sha256": "64f561f129dc4b8149d5fc9e2dbc5b9eaeeb9353963b96c32fbc6b1eaf988092",
-              "source_id": "a38d13725cc22d80af56338b79abe8cb2d4f55b2b305beda8c3fdbb082b92772"
+              "source_id": "c2fcfccd8004bda6ad281e0f099e626b2f5e017bdb1fa9b8516dc2089186c1b0"
             },
             {
               "node_id": "shares_m",
               "ref": "AAL/investor-documents/sec-edgar/10-Q_20260423_rpt20260331_acc0000006201_26_000032.htm",
               "locator": "Q1 2026 net income $382M / diluted EPS $0.58",
               "as_of": "2026-03-31",
-              "content_sha256": "b2d1c900837059b8f8a88f7f368c8383fa2d05fbe909c41589429773dde8c160",
-              "source_id": "3ccaeccd0d82ce4e35da59051a9633c6d99243ccc2056ea4adc69417e3b0055a"
+              "source_id": "1f189f58f3e84aa0f5fcb6236b03784536f60778ca02c17cb695630152cbd2c5"
             }
           ],
           "checks": {
             "passed": true,
             "errors": []
           },
-          "proof_hash": "b77ab6e5e56499dfd1d26d99f6898e001a6f3a089a539bd5a6d611a7602cd04c"
+          "proof_hash": "e97320f38a82e43a6110c27d37ad3c05512c44d80d8c83cd47bc290e9b98fddf"
         },
         "evidence_tier": "primary_derived",
         "evidence_level": "primary_derived",
@@ -1918,6 +1936,7 @@
           "method_id": "risk_adjusted_milestone_value",
           "version": "1.0",
           "label": "Milestone risk-adjusted present value",
+          "output_basis": "present_value_today",
           "power_zones": [
             "binary_milestone"
           ],
@@ -1935,6 +1954,7 @@
           "base": 8.0,
           "high": 20.0
         },
+        "output_basis": "present_value_today",
         "legacy_range_per_share": {
           "low": 0.0,
           "base": 8.0,
@@ -1963,8 +1983,7 @@
                   "ref": "AAL/investor-documents/sec-edgar/10-K_20260218_rpt20251231_acc0000006201_26_000014.htm",
                   "locator": "RevenueFromContractWithCustomerExcludingAssessedTax $54,633M (FY2025)",
                   "as_of": "2025-12-31",
-                  "content_sha256": "64f561f129dc4b8149d5fc9e2dbc5b9eaeeb9353963b96c32fbc6b1eaf988092",
-                  "source_id": "9bcb3369429d4395160afa27b623824c575d2c9c41fa615512d9897162122ddb"
+                  "source_id": "f755a21ca4ce438ac3c00287b873ca4d5277c85a0bbc17ba44aa247b8a2b1523"
                 },
                 "rationale": null
               },
@@ -1978,8 +1997,7 @@
                   "ref": "AAL/investor-documents/sec-edgar/10-Q_20260423_rpt20260331_acc0000006201_26_000032.htm",
                   "locator": "Q1 2026 net income $382M / diluted EPS $0.58",
                   "as_of": "2026-03-31",
-                  "content_sha256": "b2d1c900837059b8f8a88f7f368c8383fa2d05fbe909c41589429773dde8c160",
-                  "source_id": "3ccaeccd0d82ce4e35da59051a9633c6d99243ccc2056ea4adc69417e3b0055a"
+                  "source_id": "1f189f58f3e84aa0f5fcb6236b03784536f60778ca02c17cb695630152cbd2c5"
                 },
                 "rationale": null
               },
@@ -2018,8 +2036,7 @@
                   "ref": "AAL/investor-documents/sec-edgar/10-K_20260218_rpt20251231_acc0000006201_26_000014.htm",
                   "locator": "RevenueFromContractWithCustomerExcludingAssessedTax $54,633M (FY2025)",
                   "as_of": "2025-12-31",
-                  "content_sha256": "64f561f129dc4b8149d5fc9e2dbc5b9eaeeb9353963b96c32fbc6b1eaf988092",
-                  "source_id": "9bcb3369429d4395160afa27b623824c575d2c9c41fa615512d9897162122ddb"
+                  "source_id": "f755a21ca4ce438ac3c00287b873ca4d5277c85a0bbc17ba44aa247b8a2b1523"
                 },
                 "rationale": null
               },
@@ -2033,8 +2050,7 @@
                   "ref": "AAL/investor-documents/sec-edgar/10-Q_20260423_rpt20260331_acc0000006201_26_000032.htm",
                   "locator": "Q1 2026 net income $382M / diluted EPS $0.58",
                   "as_of": "2026-03-31",
-                  "content_sha256": "b2d1c900837059b8f8a88f7f368c8383fa2d05fbe909c41589429773dde8c160",
-                  "source_id": "3ccaeccd0d82ce4e35da59051a9633c6d99243ccc2056ea4adc69417e3b0055a"
+                  "source_id": "1f189f58f3e84aa0f5fcb6236b03784536f60778ca02c17cb695630152cbd2c5"
                 },
                 "rationale": null
               },
@@ -2073,8 +2089,7 @@
                   "ref": "AAL/investor-documents/sec-edgar/10-K_20260218_rpt20251231_acc0000006201_26_000014.htm",
                   "locator": "RevenueFromContractWithCustomerExcludingAssessedTax $54,633M (FY2025)",
                   "as_of": "2025-12-31",
-                  "content_sha256": "64f561f129dc4b8149d5fc9e2dbc5b9eaeeb9353963b96c32fbc6b1eaf988092",
-                  "source_id": "9bcb3369429d4395160afa27b623824c575d2c9c41fa615512d9897162122ddb"
+                  "source_id": "f755a21ca4ce438ac3c00287b873ca4d5277c85a0bbc17ba44aa247b8a2b1523"
                 },
                 "rationale": null
               },
@@ -2088,8 +2103,7 @@
                   "ref": "AAL/investor-documents/sec-edgar/10-Q_20260423_rpt20260331_acc0000006201_26_000032.htm",
                   "locator": "Q1 2026 net income $382M / diluted EPS $0.58",
                   "as_of": "2026-03-31",
-                  "content_sha256": "b2d1c900837059b8f8a88f7f368c8383fa2d05fbe909c41589429773dde8c160",
-                  "source_id": "3ccaeccd0d82ce4e35da59051a9633c6d99243ccc2056ea4adc69417e3b0055a"
+                  "source_id": "1f189f58f3e84aa0f5fcb6236b03784536f60778ca02c17cb695630152cbd2c5"
                 },
                 "rationale": null
               },
@@ -2124,23 +2138,21 @@
               "ref": "AAL/investor-documents/sec-edgar/10-K_20260218_rpt20251231_acc0000006201_26_000014.htm",
               "locator": "RevenueFromContractWithCustomerExcludingAssessedTax $54,633M (FY2025)",
               "as_of": "2025-12-31",
-              "content_sha256": "64f561f129dc4b8149d5fc9e2dbc5b9eaeeb9353963b96c32fbc6b1eaf988092",
-              "source_id": "9bcb3369429d4395160afa27b623824c575d2c9c41fa615512d9897162122ddb"
+              "source_id": "f755a21ca4ce438ac3c00287b873ca4d5277c85a0bbc17ba44aa247b8a2b1523"
             },
             {
               "node_id": "shares_m",
               "ref": "AAL/investor-documents/sec-edgar/10-Q_20260423_rpt20260331_acc0000006201_26_000032.htm",
               "locator": "Q1 2026 net income $382M / diluted EPS $0.58",
               "as_of": "2026-03-31",
-              "content_sha256": "b2d1c900837059b8f8a88f7f368c8383fa2d05fbe909c41589429773dde8c160",
-              "source_id": "3ccaeccd0d82ce4e35da59051a9633c6d99243ccc2056ea4adc69417e3b0055a"
+              "source_id": "1f189f58f3e84aa0f5fcb6236b03784536f60778ca02c17cb695630152cbd2c5"
             }
           ],
           "checks": {
             "passed": true,
             "errors": []
           },
-          "proof_hash": "df7840cbf2be68bbdc716d12938f502bbde8bf491eb8fdeb803e1f02db2a2a36"
+          "proof_hash": "605a58c19388d05135a6269a85c79c2002060245837e76430608af8a7d728c48"
         },
         "evidence_tier": "primary_derived",
         "evidence_level": "primary_derived",
@@ -2176,6 +2188,7 @@
           "method_id": "net_asset_value",
           "version": "1.0",
           "label": "Reconciled net asset value",
+          "output_basis": "present_value_today",
           "power_zones": [
             "scarce_asset_optionality",
             "catalyst_asset_value",
@@ -2195,6 +2208,7 @@
           "base": -42.6725,
           "high": -40.2649
         },
+        "output_basis": "present_value_today",
         "legacy_range_per_share": {
           "low": -44.87,
           "base": -42.67,
@@ -2223,8 +2237,7 @@
                   "ref": "AAL/investor-documents/sec-edgar/10-K_20260218_rpt20251231_acc0000006201_26_000014.htm",
                   "locator": "CashCashEquivalentsRestrictedCashAndRestrictedCashEquivalents $902M at December 31, 2025",
                   "as_of": "2025-12-31",
-                  "content_sha256": "64f561f129dc4b8149d5fc9e2dbc5b9eaeeb9353963b96c32fbc6b1eaf988092",
-                  "source_id": "8c6a105877248f99e48390d2efd39e64b26758f83ea7165ed94e1a306a7c46c0"
+                  "source_id": "875f09dd55555dee57d23a5b4217ec2bade052f969a2a2894905bbf42a3e3aa9"
                 },
                 "rationale": null
               },
@@ -2238,8 +2251,7 @@
                   "ref": "AAL/investor-documents/sec-edgar/10-K_20260218_rpt20251231_acc0000006201_26_000014.htm",
                   "locator": "LongTermDebtAndCapitalLeaseObligations $25,254M at December 31, 2025",
                   "as_of": "2025-12-31",
-                  "content_sha256": "64f561f129dc4b8149d5fc9e2dbc5b9eaeeb9353963b96c32fbc6b1eaf988092",
-                  "source_id": "78688405c84c268cd092e41eb8aa9875536b199f5dacd6d24739ee2b28e65103"
+                  "source_id": "0ca5e63d2e53d03cfab8d8679f223012fe268a0f6ea07c600f57b798f84967c2"
                 },
                 "rationale": null
               },
@@ -2253,8 +2265,7 @@
                   "ref": "AAL/investor-documents/sec-edgar/10-K_20260218_rpt20251231_acc0000006201_26_000014.htm",
                   "locator": "LongTermDebtAndCapitalLeaseObligationsCurrent $3,753M at December 31, 2025",
                   "as_of": "2025-12-31",
-                  "content_sha256": "64f561f129dc4b8149d5fc9e2dbc5b9eaeeb9353963b96c32fbc6b1eaf988092",
-                  "source_id": "eed2bc57b0bdd503b4b10b83791ea756f6feda5efb247a981b20e50350344b73"
+                  "source_id": "b095a9994d614e51fc180d78ca83aa025536a5c899a7a4d0a6e4309d7129479a"
                 },
                 "rationale": null
               },
@@ -2268,8 +2279,7 @@
                   "ref": "AAL/investor-documents/sec-edgar/10-Q_20260423_rpt20260331_acc0000006201_26_000032.htm",
                   "locator": "Q1 2026 net income $382M / diluted EPS $0.58",
                   "as_of": "2026-03-31",
-                  "content_sha256": "b2d1c900837059b8f8a88f7f368c8383fa2d05fbe909c41589429773dde8c160",
-                  "source_id": "3ccaeccd0d82ce4e35da59051a9633c6d99243ccc2056ea4adc69417e3b0055a"
+                  "source_id": "1f189f58f3e84aa0f5fcb6236b03784536f60778ca02c17cb695630152cbd2c5"
                 },
                 "rationale": null
               },
@@ -2308,8 +2318,7 @@
                   "ref": "AAL/investor-documents/sec-edgar/10-K_20260218_rpt20251231_acc0000006201_26_000014.htm",
                   "locator": "CashCashEquivalentsRestrictedCashAndRestrictedCashEquivalents $902M at December 31, 2025",
                   "as_of": "2025-12-31",
-                  "content_sha256": "64f561f129dc4b8149d5fc9e2dbc5b9eaeeb9353963b96c32fbc6b1eaf988092",
-                  "source_id": "8c6a105877248f99e48390d2efd39e64b26758f83ea7165ed94e1a306a7c46c0"
+                  "source_id": "875f09dd55555dee57d23a5b4217ec2bade052f969a2a2894905bbf42a3e3aa9"
                 },
                 "rationale": null
               },
@@ -2323,8 +2332,7 @@
                   "ref": "AAL/investor-documents/sec-edgar/10-K_20260218_rpt20251231_acc0000006201_26_000014.htm",
                   "locator": "LongTermDebtAndCapitalLeaseObligations $25,254M at December 31, 2025",
                   "as_of": "2025-12-31",
-                  "content_sha256": "64f561f129dc4b8149d5fc9e2dbc5b9eaeeb9353963b96c32fbc6b1eaf988092",
-                  "source_id": "78688405c84c268cd092e41eb8aa9875536b199f5dacd6d24739ee2b28e65103"
+                  "source_id": "0ca5e63d2e53d03cfab8d8679f223012fe268a0f6ea07c600f57b798f84967c2"
                 },
                 "rationale": null
               },
@@ -2338,8 +2346,7 @@
                   "ref": "AAL/investor-documents/sec-edgar/10-K_20260218_rpt20251231_acc0000006201_26_000014.htm",
                   "locator": "LongTermDebtAndCapitalLeaseObligationsCurrent $3,753M at December 31, 2025",
                   "as_of": "2025-12-31",
-                  "content_sha256": "64f561f129dc4b8149d5fc9e2dbc5b9eaeeb9353963b96c32fbc6b1eaf988092",
-                  "source_id": "eed2bc57b0bdd503b4b10b83791ea756f6feda5efb247a981b20e50350344b73"
+                  "source_id": "b095a9994d614e51fc180d78ca83aa025536a5c899a7a4d0a6e4309d7129479a"
                 },
                 "rationale": null
               },
@@ -2353,8 +2360,7 @@
                   "ref": "AAL/investor-documents/sec-edgar/10-Q_20260423_rpt20260331_acc0000006201_26_000032.htm",
                   "locator": "Q1 2026 net income $382M / diluted EPS $0.58",
                   "as_of": "2026-03-31",
-                  "content_sha256": "b2d1c900837059b8f8a88f7f368c8383fa2d05fbe909c41589429773dde8c160",
-                  "source_id": "3ccaeccd0d82ce4e35da59051a9633c6d99243ccc2056ea4adc69417e3b0055a"
+                  "source_id": "1f189f58f3e84aa0f5fcb6236b03784536f60778ca02c17cb695630152cbd2c5"
                 },
                 "rationale": null
               },
@@ -2393,8 +2399,7 @@
                   "ref": "AAL/investor-documents/sec-edgar/10-K_20260218_rpt20251231_acc0000006201_26_000014.htm",
                   "locator": "CashCashEquivalentsRestrictedCashAndRestrictedCashEquivalents $902M at December 31, 2025",
                   "as_of": "2025-12-31",
-                  "content_sha256": "64f561f129dc4b8149d5fc9e2dbc5b9eaeeb9353963b96c32fbc6b1eaf988092",
-                  "source_id": "8c6a105877248f99e48390d2efd39e64b26758f83ea7165ed94e1a306a7c46c0"
+                  "source_id": "875f09dd55555dee57d23a5b4217ec2bade052f969a2a2894905bbf42a3e3aa9"
                 },
                 "rationale": null
               },
@@ -2408,8 +2413,7 @@
                   "ref": "AAL/investor-documents/sec-edgar/10-K_20260218_rpt20251231_acc0000006201_26_000014.htm",
                   "locator": "LongTermDebtAndCapitalLeaseObligations $25,254M at December 31, 2025",
                   "as_of": "2025-12-31",
-                  "content_sha256": "64f561f129dc4b8149d5fc9e2dbc5b9eaeeb9353963b96c32fbc6b1eaf988092",
-                  "source_id": "78688405c84c268cd092e41eb8aa9875536b199f5dacd6d24739ee2b28e65103"
+                  "source_id": "0ca5e63d2e53d03cfab8d8679f223012fe268a0f6ea07c600f57b798f84967c2"
                 },
                 "rationale": null
               },
@@ -2423,8 +2427,7 @@
                   "ref": "AAL/investor-documents/sec-edgar/10-K_20260218_rpt20251231_acc0000006201_26_000014.htm",
                   "locator": "LongTermDebtAndCapitalLeaseObligationsCurrent $3,753M at December 31, 2025",
                   "as_of": "2025-12-31",
-                  "content_sha256": "64f561f129dc4b8149d5fc9e2dbc5b9eaeeb9353963b96c32fbc6b1eaf988092",
-                  "source_id": "eed2bc57b0bdd503b4b10b83791ea756f6feda5efb247a981b20e50350344b73"
+                  "source_id": "b095a9994d614e51fc180d78ca83aa025536a5c899a7a4d0a6e4309d7129479a"
                 },
                 "rationale": null
               },
@@ -2438,8 +2441,7 @@
                   "ref": "AAL/investor-documents/sec-edgar/10-Q_20260423_rpt20260331_acc0000006201_26_000032.htm",
                   "locator": "Q1 2026 net income $382M / diluted EPS $0.58",
                   "as_of": "2026-03-31",
-                  "content_sha256": "b2d1c900837059b8f8a88f7f368c8383fa2d05fbe909c41589429773dde8c160",
-                  "source_id": "3ccaeccd0d82ce4e35da59051a9633c6d99243ccc2056ea4adc69417e3b0055a"
+                  "source_id": "1f189f58f3e84aa0f5fcb6236b03784536f60778ca02c17cb695630152cbd2c5"
                 },
                 "rationale": null
               },
@@ -2474,39 +2476,35 @@
               "ref": "AAL/investor-documents/sec-edgar/10-K_20260218_rpt20251231_acc0000006201_26_000014.htm",
               "locator": "CashCashEquivalentsRestrictedCashAndRestrictedCashEquivalents $902M at December 31, 2025",
               "as_of": "2025-12-31",
-              "content_sha256": "64f561f129dc4b8149d5fc9e2dbc5b9eaeeb9353963b96c32fbc6b1eaf988092",
-              "source_id": "8c6a105877248f99e48390d2efd39e64b26758f83ea7165ed94e1a306a7c46c0"
+              "source_id": "875f09dd55555dee57d23a5b4217ec2bade052f969a2a2894905bbf42a3e3aa9"
             },
             {
               "node_id": "debt_lt_m",
               "ref": "AAL/investor-documents/sec-edgar/10-K_20260218_rpt20251231_acc0000006201_26_000014.htm",
               "locator": "LongTermDebtAndCapitalLeaseObligations $25,254M at December 31, 2025",
               "as_of": "2025-12-31",
-              "content_sha256": "64f561f129dc4b8149d5fc9e2dbc5b9eaeeb9353963b96c32fbc6b1eaf988092",
-              "source_id": "78688405c84c268cd092e41eb8aa9875536b199f5dacd6d24739ee2b28e65103"
+              "source_id": "0ca5e63d2e53d03cfab8d8679f223012fe268a0f6ea07c600f57b798f84967c2"
             },
             {
               "node_id": "debt_cur_m",
               "ref": "AAL/investor-documents/sec-edgar/10-K_20260218_rpt20251231_acc0000006201_26_000014.htm",
               "locator": "LongTermDebtAndCapitalLeaseObligationsCurrent $3,753M at December 31, 2025",
               "as_of": "2025-12-31",
-              "content_sha256": "64f561f129dc4b8149d5fc9e2dbc5b9eaeeb9353963b96c32fbc6b1eaf988092",
-              "source_id": "eed2bc57b0bdd503b4b10b83791ea756f6feda5efb247a981b20e50350344b73"
+              "source_id": "b095a9994d614e51fc180d78ca83aa025536a5c899a7a4d0a6e4309d7129479a"
             },
             {
               "node_id": "shares_m",
               "ref": "AAL/investor-documents/sec-edgar/10-Q_20260423_rpt20260331_acc0000006201_26_000032.htm",
               "locator": "Q1 2026 net income $382M / diluted EPS $0.58",
               "as_of": "2026-03-31",
-              "content_sha256": "b2d1c900837059b8f8a88f7f368c8383fa2d05fbe909c41589429773dde8c160",
-              "source_id": "3ccaeccd0d82ce4e35da59051a9633c6d99243ccc2056ea4adc69417e3b0055a"
+              "source_id": "1f189f58f3e84aa0f5fcb6236b03784536f60778ca02c17cb695630152cbd2c5"
             }
           ],
           "checks": {
             "passed": true,
             "errors": []
           },
-          "proof_hash": "f1fa20de670afaf70fa4fa3c7d60873c536ebdbbfcf94b8749e33c2344772584"
+          "proof_hash": "fb8509b915317edde4f8e5a791a8e72836d5e8672cad394d39afae33824450a6"
         },
         "evidence_tier": "primary_derived",
         "evidence_level": "primary_derived",
@@ -2536,6 +2534,7 @@
           "method_id": "net_asset_value",
           "version": "1.0",
           "label": "Reconciled net asset value",
+          "output_basis": "present_value_today",
           "power_zones": [
             "scarce_asset_optionality",
             "catalyst_asset_value",
@@ -2555,6 +2554,7 @@
           "base": -9.0,
           "high": -3.0001
         },
+        "output_basis": "present_value_today",
         "legacy_range_per_share": {
           "low": -18.0,
           "base": -9.0,
@@ -2583,8 +2583,7 @@
                   "ref": "AAL/investor-documents/sec-edgar/10-K_20260218_rpt20251231_acc0000006201_26_000014.htm",
                   "locator": "OperatingIncomeLoss $1467.0M (FY2025, down from $2614.0M prior year)",
                   "as_of": "2025-12-31",
-                  "content_sha256": "64f561f129dc4b8149d5fc9e2dbc5b9eaeeb9353963b96c32fbc6b1eaf988092",
-                  "source_id": "858cad9d13b24897fd05be6b2d6662e82e6981ab8c740d5f94e5ac465a779a7c"
+                  "source_id": "42d3dd867e89dd2218344aea89417bae28f3751e5e2178faa558e13bc1ab828f"
                 },
                 "rationale": null
               },
@@ -2598,8 +2597,7 @@
                   "ref": "AAL/investor-documents/sec-edgar/10-K_20260218_rpt20251231_acc0000006201_26_000014.htm",
                   "locator": "PaymentsToAcquireProductiveAssets $3,779M (FY2025)",
                   "as_of": "2025-12-31",
-                  "content_sha256": "64f561f129dc4b8149d5fc9e2dbc5b9eaeeb9353963b96c32fbc6b1eaf988092",
-                  "source_id": "5d1e1cde9a6a81341fbbb5f396ae372850e1edf3207e7e083e57065e28a6a5fc"
+                  "source_id": "ede70fadaab98fd93f54690bb626a339492be8c752fb1808923267c062b16013"
                 },
                 "rationale": null
               },
@@ -2613,8 +2611,7 @@
                   "ref": "AAL/investor-documents/sec-edgar/10-Q_20260423_rpt20260331_acc0000006201_26_000032.htm",
                   "locator": "Q1 2026 net income $382M / diluted EPS $0.58",
                   "as_of": "2026-03-31",
-                  "content_sha256": "b2d1c900837059b8f8a88f7f368c8383fa2d05fbe909c41589429773dde8c160",
-                  "source_id": "3ccaeccd0d82ce4e35da59051a9633c6d99243ccc2056ea4adc69417e3b0055a"
+                  "source_id": "1f189f58f3e84aa0f5fcb6236b03784536f60778ca02c17cb695630152cbd2c5"
                 },
                 "rationale": null
               },
@@ -2653,8 +2650,7 @@
                   "ref": "AAL/investor-documents/sec-edgar/10-K_20260218_rpt20251231_acc0000006201_26_000014.htm",
                   "locator": "OperatingIncomeLoss $1467.0M (FY2025, down from $2614.0M prior year)",
                   "as_of": "2025-12-31",
-                  "content_sha256": "64f561f129dc4b8149d5fc9e2dbc5b9eaeeb9353963b96c32fbc6b1eaf988092",
-                  "source_id": "858cad9d13b24897fd05be6b2d6662e82e6981ab8c740d5f94e5ac465a779a7c"
+                  "source_id": "42d3dd867e89dd2218344aea89417bae28f3751e5e2178faa558e13bc1ab828f"
                 },
                 "rationale": null
               },
@@ -2668,8 +2664,7 @@
                   "ref": "AAL/investor-documents/sec-edgar/10-K_20260218_rpt20251231_acc0000006201_26_000014.htm",
                   "locator": "PaymentsToAcquireProductiveAssets $3,779M (FY2025)",
                   "as_of": "2025-12-31",
-                  "content_sha256": "64f561f129dc4b8149d5fc9e2dbc5b9eaeeb9353963b96c32fbc6b1eaf988092",
-                  "source_id": "5d1e1cde9a6a81341fbbb5f396ae372850e1edf3207e7e083e57065e28a6a5fc"
+                  "source_id": "ede70fadaab98fd93f54690bb626a339492be8c752fb1808923267c062b16013"
                 },
                 "rationale": null
               },
@@ -2683,8 +2678,7 @@
                   "ref": "AAL/investor-documents/sec-edgar/10-Q_20260423_rpt20260331_acc0000006201_26_000032.htm",
                   "locator": "Q1 2026 net income $382M / diluted EPS $0.58",
                   "as_of": "2026-03-31",
-                  "content_sha256": "b2d1c900837059b8f8a88f7f368c8383fa2d05fbe909c41589429773dde8c160",
-                  "source_id": "3ccaeccd0d82ce4e35da59051a9633c6d99243ccc2056ea4adc69417e3b0055a"
+                  "source_id": "1f189f58f3e84aa0f5fcb6236b03784536f60778ca02c17cb695630152cbd2c5"
                 },
                 "rationale": null
               },
@@ -2723,8 +2717,7 @@
                   "ref": "AAL/investor-documents/sec-edgar/10-K_20260218_rpt20251231_acc0000006201_26_000014.htm",
                   "locator": "OperatingIncomeLoss $1467.0M (FY2025, down from $2614.0M prior year)",
                   "as_of": "2025-12-31",
-                  "content_sha256": "64f561f129dc4b8149d5fc9e2dbc5b9eaeeb9353963b96c32fbc6b1eaf988092",
-                  "source_id": "858cad9d13b24897fd05be6b2d6662e82e6981ab8c740d5f94e5ac465a779a7c"
+                  "source_id": "42d3dd867e89dd2218344aea89417bae28f3751e5e2178faa558e13bc1ab828f"
                 },
                 "rationale": null
               },
@@ -2738,8 +2731,7 @@
                   "ref": "AAL/investor-documents/sec-edgar/10-K_20260218_rpt20251231_acc0000006201_26_000014.htm",
                   "locator": "PaymentsToAcquireProductiveAssets $3,779M (FY2025)",
                   "as_of": "2025-12-31",
-                  "content_sha256": "64f561f129dc4b8149d5fc9e2dbc5b9eaeeb9353963b96c32fbc6b1eaf988092",
-                  "source_id": "5d1e1cde9a6a81341fbbb5f396ae372850e1edf3207e7e083e57065e28a6a5fc"
+                  "source_id": "ede70fadaab98fd93f54690bb626a339492be8c752fb1808923267c062b16013"
                 },
                 "rationale": null
               },
@@ -2753,8 +2745,7 @@
                   "ref": "AAL/investor-documents/sec-edgar/10-Q_20260423_rpt20260331_acc0000006201_26_000032.htm",
                   "locator": "Q1 2026 net income $382M / diluted EPS $0.58",
                   "as_of": "2026-03-31",
-                  "content_sha256": "b2d1c900837059b8f8a88f7f368c8383fa2d05fbe909c41589429773dde8c160",
-                  "source_id": "3ccaeccd0d82ce4e35da59051a9633c6d99243ccc2056ea4adc69417e3b0055a"
+                  "source_id": "1f189f58f3e84aa0f5fcb6236b03784536f60778ca02c17cb695630152cbd2c5"
                 },
                 "rationale": null
               },
@@ -2789,31 +2780,28 @@
               "ref": "AAL/investor-documents/sec-edgar/10-K_20260218_rpt20251231_acc0000006201_26_000014.htm",
               "locator": "OperatingIncomeLoss $1467.0M (FY2025, down from $2614.0M prior year)",
               "as_of": "2025-12-31",
-              "content_sha256": "64f561f129dc4b8149d5fc9e2dbc5b9eaeeb9353963b96c32fbc6b1eaf988092",
-              "source_id": "858cad9d13b24897fd05be6b2d6662e82e6981ab8c740d5f94e5ac465a779a7c"
+              "source_id": "42d3dd867e89dd2218344aea89417bae28f3751e5e2178faa558e13bc1ab828f"
             },
             {
               "node_id": "capex_m",
               "ref": "AAL/investor-documents/sec-edgar/10-K_20260218_rpt20251231_acc0000006201_26_000014.htm",
               "locator": "PaymentsToAcquireProductiveAssets $3,779M (FY2025)",
               "as_of": "2025-12-31",
-              "content_sha256": "64f561f129dc4b8149d5fc9e2dbc5b9eaeeb9353963b96c32fbc6b1eaf988092",
-              "source_id": "5d1e1cde9a6a81341fbbb5f396ae372850e1edf3207e7e083e57065e28a6a5fc"
+              "source_id": "ede70fadaab98fd93f54690bb626a339492be8c752fb1808923267c062b16013"
             },
             {
               "node_id": "shares_m",
               "ref": "AAL/investor-documents/sec-edgar/10-Q_20260423_rpt20260331_acc0000006201_26_000032.htm",
               "locator": "Q1 2026 net income $382M / diluted EPS $0.58",
               "as_of": "2026-03-31",
-              "content_sha256": "b2d1c900837059b8f8a88f7f368c8383fa2d05fbe909c41589429773dde8c160",
-              "source_id": "3ccaeccd0d82ce4e35da59051a9633c6d99243ccc2056ea4adc69417e3b0055a"
+              "source_id": "1f189f58f3e84aa0f5fcb6236b03784536f60778ca02c17cb695630152cbd2c5"
             }
           ],
           "checks": {
             "passed": true,
             "errors": []
           },
-          "proof_hash": "ba466f7781b53338ef7cab1884fc448dd4ec6c1f4c9c718333496ee25e9750ba"
+          "proof_hash": "55fb50d2a04ba27d6e06b59c16d3aa5199411d0f694ed6b4822ea4970630fd9b"
         },
         "evidence_tier": "primary_derived",
         "evidence_level": "primary_derived",
@@ -2904,7 +2892,9 @@
         "greenblatt",
         "hk",
         "klarman_asset_value",
+        "lawrence",
         "marathon_capital_cycle",
+        "moi",
         "munger",
         "pabrai",
         "stahl"
@@ -2987,17 +2977,39 @@
       "decision_rule": "Use one primary method and no more than two corroborating methods; irrelevant methods and personas remain silent."
     },
     "market": {
-      "price_per_share": 16.56,
+      "price_per_share": 13.43,
       "fully_diluted_shares": 658621000,
-      "market_cap_m": 10906.76,
-      "enterprise_value_m": 39011.76
+      "market_cap_m": 8845.28,
+      "enterprise_value_m": 36950.28,
+      "price_source": "Yahoo AAL close 2026-08-31",
+      "price_as_of": "2026-08-31"
     },
     "valuation": {
+      "output_basis": "present_value_today",
+      "output_basis_status": "method_declared",
+      "output_range_per_share": {
+        "low": 0.0,
+        "base": 0.0,
+        "high": 26.1449
+      },
       "value_per_share": {
         "low": 0.0,
         "base": 0.0,
         "high": 26.1449
       },
+      "present_value_today_per_share": {
+        "low": 0.0,
+        "base": 0.0,
+        "high": 26.1449
+      },
+      "future_payoff_per_share": {
+        "low": null,
+        "base": null,
+        "high": null
+      },
+      "future_payoff_date": null,
+      "future_payoff_horizon_years": null,
+      "forward_cashflow_schedule": null,
       "priced_components_per_share": {
         "low": -41.7046,
         "base": -9.7925,
@@ -3010,15 +3022,35 @@
       },
       "probability_weighted_value_per_share": 0.0,
       "expected_distributions_per_share": 0.0,
+      "forward_return_at_price_pct": {
+        "low": null,
+        "base": null,
+        "high": null
+      },
+      "forward_return_status": "withheld",
+      "forward_return_reason": "present_value_today cannot be annualized as a future payoff",
       "annualized_return_at_price_pct": {
         "low": null,
         "base": null,
-        "high": 6.74
+        "high": null
+      },
+      "annualized_return_field_status": "compatibility_alias_of_forward_return",
+      "required_return_pct": null,
+      "margin_of_safety_pct": {
+        "low": null,
+        "base": null,
+        "high": 48.63
+      },
+      "margin_of_safety_definition": "(intrinsic_value_today - market_price) / intrinsic_value_today; positive means the quote is below intrinsic value",
+      "upside_to_value_pct": {
+        "low": -100.0,
+        "base": -100.0,
+        "high": 94.68
       },
       "downside_to_low_pct": -100.0,
       "horizon_years": 7,
       "equity_liability_floor": 0.0,
-      "interpretation": "value_per_share is withheld while any material additive component is unpriced; priced_components_per_share is the raw additive sum (may be negative). When complete, value_per_share applies a 0 floor (limited liability)."
+      "interpretation": "output_basis states what the proof produced. value_per_share and present_value_today_per_share are intrinsic values today and are withheld while any material additive component is unpriced or dated future economics cannot be discounted at an explicit required return. priced_components_per_share is the raw proof-output sum. A present value is never annualized or discounted again."
     },
     "scenario_contract": {
       "rule": "Cases must change cited causal operating, capital, probability, timing, or financing drivers\u2014not only a terminal multiple.",
@@ -3074,7 +3106,7 @@
       },
       "all_material_components_priced": true,
       "calculation_errors": [],
-      "aggregate_proof_hash": "96e0ad0845a231463c0477dc3ece54d3f7599914bd3f2a18524b5b0580ff9ca7"
+      "aggregate_proof_hash": "8492349ee6b87fba32e455c5fcab00fba0e7caf61af77bd822a9a5cff020d800"
     },
     "source_lineage": [
       {
@@ -3083,8 +3115,7 @@
         "ref": "AAL/investor-documents/sec-edgar/10-K_20260218_rpt20251231_acc0000006201_26_000014.htm",
         "locator": "NetCashProvidedByUsedInOperatingActivities $3,099M (FY2025)",
         "as_of": "2025-12-31",
-        "content_sha256": "64f561f129dc4b8149d5fc9e2dbc5b9eaeeb9353963b96c32fbc6b1eaf988092",
-        "source_id": "9d5056c56a7af789bb564e262eede4803b4d66a474257dedddb29f641c5333c6"
+        "source_id": "b797118a95e0a2c20bd57d6d59996ce0d35f5e98b101d35d44ddd84565d702ae"
       },
       {
         "component_id": "midcycle_passenger_network",
@@ -3092,8 +3123,7 @@
         "ref": "AAL/investor-documents/sec-edgar/10-K_20260218_rpt20251231_acc0000006201_26_000014.htm",
         "locator": "OperatingIncomeLoss $1467.0M (2025) and $2614.0M (2024); midpoint normalization",
         "as_of": "2025-12-31",
-        "content_sha256": "64f561f129dc4b8149d5fc9e2dbc5b9eaeeb9353963b96c32fbc6b1eaf988092",
-        "source_id": "a38d13725cc22d80af56338b79abe8cb2d4f55b2b305beda8c3fdbb082b92772"
+        "source_id": "c2fcfccd8004bda6ad281e0f099e626b2f5e017bdb1fa9b8516dc2089186c1b0"
       },
       {
         "component_id": "midcycle_passenger_network",
@@ -3101,8 +3131,7 @@
         "ref": "AAL/investor-documents/sec-edgar/10-Q_20260423_rpt20260331_acc0000006201_26_000032.htm",
         "locator": "Q1 2026 net income $382M / diluted EPS $0.58",
         "as_of": "2026-03-31",
-        "content_sha256": "b2d1c900837059b8f8a88f7f368c8383fa2d05fbe909c41589429773dde8c160",
-        "source_id": "3ccaeccd0d82ce4e35da59051a9633c6d99243ccc2056ea4adc69417e3b0055a"
+        "source_id": "1f189f58f3e84aa0f5fcb6236b03784536f60778ca02c17cb695630152cbd2c5"
       },
       {
         "component_id": "aadvantage_co_brand_option",
@@ -3110,8 +3139,7 @@
         "ref": "AAL/investor-documents/sec-edgar/10-K_20260218_rpt20251231_acc0000006201_26_000014.htm",
         "locator": "RevenueFromContractWithCustomerExcludingAssessedTax $54,633M (FY2025)",
         "as_of": "2025-12-31",
-        "content_sha256": "64f561f129dc4b8149d5fc9e2dbc5b9eaeeb9353963b96c32fbc6b1eaf988092",
-        "source_id": "9bcb3369429d4395160afa27b623824c575d2c9c41fa615512d9897162122ddb"
+        "source_id": "f755a21ca4ce438ac3c00287b873ca4d5277c85a0bbc17ba44aa247b8a2b1523"
       },
       {
         "component_id": "aadvantage_co_brand_option",
@@ -3119,8 +3147,7 @@
         "ref": "AAL/investor-documents/sec-edgar/10-Q_20260423_rpt20260331_acc0000006201_26_000032.htm",
         "locator": "Q1 2026 net income $382M / diluted EPS $0.58",
         "as_of": "2026-03-31",
-        "content_sha256": "b2d1c900837059b8f8a88f7f368c8383fa2d05fbe909c41589429773dde8c160",
-        "source_id": "3ccaeccd0d82ce4e35da59051a9633c6d99243ccc2056ea4adc69417e3b0055a"
+        "source_id": "1f189f58f3e84aa0f5fcb6236b03784536f60778ca02c17cb695630152cbd2c5"
       },
       {
         "component_id": "net_financial_claims",
@@ -3128,8 +3155,7 @@
         "ref": "AAL/investor-documents/sec-edgar/10-K_20260218_rpt20251231_acc0000006201_26_000014.htm",
         "locator": "CashCashEquivalentsRestrictedCashAndRestrictedCashEquivalents $902M at December 31, 2025",
         "as_of": "2025-12-31",
-        "content_sha256": "64f561f129dc4b8149d5fc9e2dbc5b9eaeeb9353963b96c32fbc6b1eaf988092",
-        "source_id": "8c6a105877248f99e48390d2efd39e64b26758f83ea7165ed94e1a306a7c46c0"
+        "source_id": "875f09dd55555dee57d23a5b4217ec2bade052f969a2a2894905bbf42a3e3aa9"
       },
       {
         "component_id": "net_financial_claims",
@@ -3137,8 +3163,7 @@
         "ref": "AAL/investor-documents/sec-edgar/10-K_20260218_rpt20251231_acc0000006201_26_000014.htm",
         "locator": "LongTermDebtAndCapitalLeaseObligations $25,254M at December 31, 2025",
         "as_of": "2025-12-31",
-        "content_sha256": "64f561f129dc4b8149d5fc9e2dbc5b9eaeeb9353963b96c32fbc6b1eaf988092",
-        "source_id": "78688405c84c268cd092e41eb8aa9875536b199f5dacd6d24739ee2b28e65103"
+        "source_id": "0ca5e63d2e53d03cfab8d8679f223012fe268a0f6ea07c600f57b798f84967c2"
       },
       {
         "component_id": "net_financial_claims",
@@ -3146,8 +3171,7 @@
         "ref": "AAL/investor-documents/sec-edgar/10-K_20260218_rpt20251231_acc0000006201_26_000014.htm",
         "locator": "LongTermDebtAndCapitalLeaseObligationsCurrent $3,753M at December 31, 2025",
         "as_of": "2025-12-31",
-        "content_sha256": "64f561f129dc4b8149d5fc9e2dbc5b9eaeeb9353963b96c32fbc6b1eaf988092",
-        "source_id": "eed2bc57b0bdd503b4b10b83791ea756f6feda5efb247a981b20e50350344b73"
+        "source_id": "b095a9994d614e51fc180d78ca83aa025536a5c899a7a4d0a6e4309d7129479a"
       },
       {
         "component_id": "net_financial_claims",
@@ -3155,8 +3179,7 @@
         "ref": "AAL/investor-documents/sec-edgar/10-Q_20260423_rpt20260331_acc0000006201_26_000032.htm",
         "locator": "Q1 2026 net income $382M / diluted EPS $0.58",
         "as_of": "2026-03-31",
-        "content_sha256": "b2d1c900837059b8f8a88f7f368c8383fa2d05fbe909c41589429773dde8c160",
-        "source_id": "3ccaeccd0d82ce4e35da59051a9633c6d99243ccc2056ea4adc69417e3b0055a"
+        "source_id": "1f189f58f3e84aa0f5fcb6236b03784536f60778ca02c17cb695630152cbd2c5"
       },
       {
         "component_id": "cycle_leverage_reserve",
@@ -3164,8 +3187,7 @@
         "ref": "AAL/investor-documents/sec-edgar/10-K_20260218_rpt20251231_acc0000006201_26_000014.htm",
         "locator": "OperatingIncomeLoss $1467.0M (FY2025, down from $2614.0M prior year)",
         "as_of": "2025-12-31",
-        "content_sha256": "64f561f129dc4b8149d5fc9e2dbc5b9eaeeb9353963b96c32fbc6b1eaf988092",
-        "source_id": "858cad9d13b24897fd05be6b2d6662e82e6981ab8c740d5f94e5ac465a779a7c"
+        "source_id": "42d3dd867e89dd2218344aea89417bae28f3751e5e2178faa558e13bc1ab828f"
       },
       {
         "component_id": "cycle_leverage_reserve",
@@ -3173,8 +3195,7 @@
         "ref": "AAL/investor-documents/sec-edgar/10-K_20260218_rpt20251231_acc0000006201_26_000014.htm",
         "locator": "PaymentsToAcquireProductiveAssets $3,779M (FY2025)",
         "as_of": "2025-12-31",
-        "content_sha256": "64f561f129dc4b8149d5fc9e2dbc5b9eaeeb9353963b96c32fbc6b1eaf988092",
-        "source_id": "5d1e1cde9a6a81341fbbb5f396ae372850e1edf3207e7e083e57065e28a6a5fc"
+        "source_id": "ede70fadaab98fd93f54690bb626a339492be8c752fb1808923267c062b16013"
       },
       {
         "component_id": "cycle_leverage_reserve",
@@ -3182,8 +3203,7 @@
         "ref": "AAL/investor-documents/sec-edgar/10-Q_20260423_rpt20260331_acc0000006201_26_000032.htm",
         "locator": "Q1 2026 net income $382M / diluted EPS $0.58",
         "as_of": "2026-03-31",
-        "content_sha256": "b2d1c900837059b8f8a88f7f368c8383fa2d05fbe909c41589429773dde8c160",
-        "source_id": "3ccaeccd0d82ce4e35da59051a9633c6d99243ccc2056ea4adc69417e3b0055a"
+        "source_id": "1f189f58f3e84aa0f5fcb6236b03784536f60778ca02c17cb695630152cbd2c5"
       }
     ],
     "model_checks": {
@@ -3194,7 +3214,10 @@
       "positive_base_or_explicit_zero_value": true,
       "low_base_high_ordered": true,
       "source_identity_and_freshness_valid": true,
-      "extreme_return_validated": true
+      "extreme_return_validated": true,
+      "output_basis_valid": true,
+      "dated_forward_economics_valid": true,
+      "present_value_is_not_treated_as_future_payoff": true
     },
     "evidence": {
       "unresolved_count": 0,
@@ -3216,7 +3239,7 @@
       ]
     },
     "change_control": {
-      "model_hash": "cb6d032b18c366ba43e25b3913dd0a7eeefb2c9002a455bb7125750331c64be1",
+      "model_hash": "1d1971e29404a35d301080dd12f943efe481c657e8004006e5d12190882f1a80",
       "method_versions": [
         "net_asset_value@1.0",
         "owner_cash_or_dividend_discount@1.0",
@@ -3225,7 +3248,7 @@
       "change_log": [],
       "rule": "A source fact is locked. Every assumption change requires a reason, author, timestamp, and before/after value."
     },
-    "decision_rule": "No security is decision-grade until every material claim is valued exactly once by a valid calculation proof and every material evidence blocker is resolved."
+    "decision_rule": "Proof status and investment readiness are separate. Every material claim must be valued exactly once by a valid calculation proof, every evidence blocker must be resolved, and the model must be stock-specific before committee review. Only a human decision can authorize capital."
   },
   "synthesis": {
     "status": "complete",
@@ -3234,7 +3257,7 @@
         "id": "theory_implied",
         "label": "Growth theory (pre-falsifier)",
         "source": "growth_explanation + filing revenue YoY",
-        "return_pct": 24.5,
+        "return_pct": 30.5,
         "weight": 0.08,
         "type": "numeric",
         "epistemic_tier": "B (pre-falsifier derivation)",
@@ -3248,7 +3271,7 @@
         "id": "scenario_bear",
         "label": "Bear scenario (Lawrence)",
         "source": "scenarios.bear",
-        "return_pct": 12.9,
+        "return_pct": 18.5,
         "weight": 0.05,
         "type": "numeric",
         "epistemic_tier": "C (scenario envelope)",
@@ -3262,7 +3285,7 @@
         "id": "scenario_bull",
         "label": "Bull scenario (Lawrence)",
         "source": "scenarios.bull",
-        "return_pct": 32.4,
+        "return_pct": 38.7,
         "weight": 0.12,
         "type": "numeric",
         "epistemic_tier": "C (scenario envelope)",
@@ -3276,9 +3299,9 @@
     "qualitative_adjustments": [],
     "qualitative_manual": false,
     "qualitative_pp_cap_applied": false,
-    "numeric_weighted_pct": 25.97,
+    "numeric_weighted_pct": 32.04,
     "qualitative_pp": 0,
-    "total_synthesis_pct": 25.97,
+    "total_synthesis_pct": 32.04,
     "human_approval": "pending",
     "weight_audit": {
       "flags": [],
@@ -3616,8 +3639,8 @@
   "pricing_analysis": {
     "schema_version": "1.0",
     "as_of": "2026-07-21",
-    "price": 15.14,
-    "price_source": "Yahoo AAL close 2026-07-20",
+    "price": 13.43,
+    "price_source": "Yahoo AAL close 2026-08-31",
     "economic_units": 658621000,
     "economic_claim_note": "Per-share claims use fully diluted shares from valuation.inputs.",
     "component_value_per_share": {
@@ -3628,11 +3651,11 @@
     "upside_downside_pct": {
       "low": -100.0,
       "base": -100.0,
-      "high": 72.7
+      "high": 94.7
     },
     "base_value_supported_by_current_or_contracted_assets": -17.79,
-    "market_price_above_current_or_contracted_value": 32.93,
-    "market_implied_constant_owner_cash_growth_pct": -19.0,
+    "market_price_above_current_or_contracted_value": 31.22,
+    "market_implied_constant_owner_cash_growth_pct": -21.2,
     "implied_growth_contract": "Constant 7-year owner-cash growth with a 7x terminal owner-cash multiple; diagnostic, not forecast.",
     "entry_prices_by_hurdle_and_case": {
       "bear": {
@@ -3883,8 +3906,8 @@
       "registry_version": "1.0"
     },
     "committee_routing": {
-      "stage": "ready_to_assemble",
-      "packet_hash": "d451def32a5e3eb93f510e446d179841ffb35f9bc1e2f1b0bb1a38cc6e7bf707",
+      "stage": "round_one_open",
+      "packet_hash": "61eb67e221112d9154f5a98cb4d4395eda06ddc5fb615ae54c3352f6a264b74b",
       "selected_raters": [
         "buffett_weschler",
         "hohn",

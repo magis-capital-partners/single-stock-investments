@@ -2,7 +2,7 @@
 
 **As of:** 2026-07-22
 
-**Price:** $234.74
+**Price:** $292.79
 
 **Decision:** watch_pending_owner_review
 
@@ -17,7 +17,7 @@
 | Generative-AI competition and stock-based compensation reserve | net_asset_value | $-45.00 | $-18.00 | $-5.00 |
 | **Total** |  | **$350.00** | **$656.00** | **$996.00** |
 
-Base value versus price: **179.5%**. Current or contracted operating and financial assets support approximately **$606.00** per share; the market asks investors to pay another **$-371.26** for growth, inventory, projects, or scarcity.
+Base value versus price: **124.1%**. Current or contracted operating and financial assets support approximately **$606.00** per share; the market asks investors to pay another **$-313.21** for growth, inventory, projects, or scarcity.
 
 
 ## Economic value versus accounting value
@@ -59,7 +59,7 @@ A complete comparable NAV is not asserted; comparable marks are used only where 
 
 ## What the price implies
 
-At the stated terminal multiple, the price requires approximately **-17.2%** constant annual owner-cash growth for seven years. Constant 7-year owner-cash growth with a 25x terminal owner-cash multiple; diagnostic, not forecast.
+At the stated terminal multiple, the price requires approximately **-14.0%** constant annual owner-cash growth for seven years. Constant 7-year owner-cash growth with a 25x terminal owner-cash multiple; diagnostic, not forecast.
 
 ## Entry prices by required return
 

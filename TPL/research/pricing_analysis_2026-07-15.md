@@ -16,14 +16,14 @@
 | Cash and equity-method investment | balance_sheet_mark | $3.60 | $4.32 | $4.32 |
 | Operated water sales and services | reinvestment_return_driver_dcf | $6.38 | $16.41 | $39.57 |
 | Contracted data-center land-financing receivable | discounted_contract_value | $0.27 | $0.30 | $0.32 |
-| Visible undeveloped royalty inventory | comparable_royalty_nav_residual | $17.35 | $18.65 | $40.70 |
-| Dormant and long-dated royalty inventory | comparable_royalty_nav_residual | $21.21 | $22.80 | $49.77 |
+| Visible undeveloped royalty inventory | comparable_royalty_nav_residual | $17.34 | $18.65 | $40.70 |
+| Dormant and long-dated royalty inventory | comparable_royalty_nav_residual | $21.20 | $22.80 | $49.75 |
 | Residual uncontracted surface land | portfolio_discounted_unit_nav | $15.34 | $32.59 | $65.77 |
 | Future infrastructure corridors and easements | milestone_probability_weighted_option | $0.80 | $4.46 | $13.48 |
 | Data-center, power, and water co-location option | milestone_probability_weighted_option | $0.22 | $2.03 | $12.75 |
 | Desalination and water-technology platform | stage_gated_milestone_option | $-0.30 | $1.16 | $10.51 |
 | Corporate, tax, and realization reserve | conservative_reserve | $-5.00 | $-3.00 | $-1.00 |
-| **Total** |  | **$129.86** | **$246.21** | **$506.41** |
+| **Total** |  | **$129.84** | **$246.21** | **$506.39** |
 
 Base value versus price: **-40.6%**. Current or contracted operating and financial assets support approximately **$164.52** per share; the market asks investors to pay another **$249.70** for growth, inventory, projects, or scarcity.
 
@@ -55,8 +55,8 @@ A complete comparable NAV is not asserted; comparable marks are used only where 
 | Cash, investments, and contracted receivable | balance_sheet_mark | not_applicable | $3.60 / $4.32 / $4.32 | n/a | The Bolt investment is excluded from the incremental project success value. | Owner cash, reinvestment economics, or competitive position remains below the low-case path for two reporting periods. |
 | Produced-water royalty, operated water, and technology | reinvestment_return_driver_dcf | not_applicable | $6.38 / $16.41 / $39.57 | n/a | Royalty volume, operated margin, and technology licensing are modeled separately; infrastructure replacement cost remains embedded. | Utilization, incremental after-tax return on capital, or contract economics fall below the low-case assumptions. |
 | Cash, investments, and contracted receivable | discounted_contract_value | not_applicable | $0.27 / $0.30 / $0.32 | n/a | The Bolt investment is excluded from the incremental project success value. | Owner cash, reinvestment economics, or competitive position remains below the low-case path for two reporting periods. |
-| Producing plus undeveloped royalty estate | comparable_royalty_nav_residual | tpl_royalty_acquisitions_2024_2025, viper_sitio_2025 | $17.35 / $18.65 / $40.70 | risked range; Discounting, realization friction, and the component assumptions reflect the time required to contract, develop, or monetize the claim. | The producing DCF is subtracted from total royalty NAV before visible and dormant residual values are added. | The next decision milestone fails, remaining capital rises materially, or the stated success probability no longer fits observable progress. |
-| Producing plus undeveloped royalty estate | comparable_royalty_nav_residual | tpl_royalty_acquisitions_2024_2025, viper_sitio_2025 | $21.21 / $22.80 / $49.77 | risked range; Discounting, realization friction, and the component assumptions reflect the time required to contract, develop, or monetize the claim. | The producing DCF is subtracted from total royalty NAV before visible and dormant residual values are added. | The next decision milestone fails, remaining capital rises materially, or the stated success probability no longer fits observable progress. |
+| Producing plus undeveloped royalty estate | comparable_royalty_nav_residual | tpl_royalty_acquisitions_2024_2025, viper_sitio_2025 | $17.34 / $18.65 / $40.70 | risked range; Discounting, realization friction, and the component assumptions reflect the time required to contract, develop, or monetize the claim. | The producing DCF is subtracted from total royalty NAV before visible and dormant residual values are added. | The next decision milestone fails, remaining capital rises materially, or the stated success probability no longer fits observable progress. |
+| Producing plus undeveloped royalty estate | comparable_royalty_nav_residual | tpl_royalty_acquisitions_2024_2025, viper_sitio_2025 | $21.20 / $22.80 / $49.75 | risked range; Discounting, realization friction, and the component assumptions reflect the time required to contract, develop, or monetize the claim. | The producing DCF is subtracted from total royalty NAV before visible and dormant residual values are added. | The next decision milestone fails, remaining capital rises materially, or the stated success probability no longer fits observable progress. |
 | Surface land, existing uses, and future corridors | portfolio_discounted_unit_nav | tpl_surface_sale_2025, lb_reeves_800_2025, lb_lea_3000_2025, intrepid_south_ranch_2026 | $15.34 / $32.59 / $65.77 | p=100.0%; Discounting, realization friction, and the component assumptions reflect the time required to contract, develop, or monetize the claim. | Existing contracted uses, residual land, and uncontracted corridors are separate economic claims. | The next decision milestone fails, remaining capital rises materially, or the stated success probability no longer fits observable progress. |
 | Surface land, existing uses, and future corridors | milestone_probability_weighted_option | tpl_surface_sale_2025, lb_reeves_800_2025, lb_lea_3000_2025, intrepid_south_ranch_2026 | $0.80 / $4.46 / $13.48 | p=45.0%; Discounting, realization friction, and the component assumptions reflect the time required to contract, develop, or monetize the claim. | Existing contracted uses, residual land, and uncontracted corridors are separate economic claims. | The next decision milestone fails, remaining capital rises materially, or the stated success probability no longer fits observable progress. |
 | Data-center, power, and water co-location option | milestone_probability_weighted_option | not_applicable | $0.22 / $2.03 / $12.75 | p=6.0%; Discounting, realization friction, and the component assumptions reflect the time required to contract, develop, or monetize the claim. | Only uncontracted incremental project economics are included. | The next decision milestone fails, remaining capital rises materially, or the stated success probability no longer fits observable progress. |
@@ -99,7 +99,7 @@ TPL is an exceptional asset system. After marking its complete royalty acreage t
 
 **Strongest counter-explanation:** The component model may still understate repeated monetization of the same acreage, increasing water intensity, and data-center or power demand that converts faster than the milestone probabilities assume.
 
-**Committee routing:** round_one_open — klarman_asset_value, hk, hohn
+**Committee routing:** round_one_open — hk, klarman_asset_value, marks_credit_cycle
 
 **Falsifiers:**
 

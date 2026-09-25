@@ -2,7 +2,7 @@
 
 **As of:** 2026-07-24
 
-**Price:** $549.86
+**Price:** $470.72
 
 **Decision:** watch_pending_owner_review
 
@@ -17,7 +17,7 @@
 | AI competition, custom ASIC, and foundry capex stress reserve | net_asset_value | $-8.00 | $-2.00 | $0.00 |
 | **Total** |  | **$69.48** | **$96.45** | **$121.43** |
 
-Base value versus price: **-82.5%**. Current or contracted operating and financial assets support approximately **$96.45** per share; the market asks investors to pay another **$453.41** for growth, inventory, projects, or scarcity.
+Base value versus price: **-79.5%**. Current or contracted operating and financial assets support approximately **$96.45** per share; the market asks investors to pay another **$374.27** for growth, inventory, projects, or scarcity.
 
 
 ## Economic value versus accounting value
@@ -59,7 +59,7 @@ A complete comparable NAV is not asserted; comparable marks are used only where 
 
 ## What the price implies
 
-At the stated terminal multiple, the price requires approximately **31.9%** constant annual owner-cash growth for seven years. Constant 7-year owner-cash growth with a 20x terminal owner-cash multiple; diagnostic, not forecast.
+At the stated terminal multiple, the price requires approximately **28.8%** constant annual owner-cash growth for seven years. Constant 7-year owner-cash growth with a 20x terminal owner-cash multiple; diagnostic, not forecast.
 
 ## Entry prices by required return
 
@@ -77,7 +77,7 @@ Entry prices were computed mechanically from the routed power-zone profile (High
 
 **Strongest counter-explanation:** growth projected without its capital cost
 
-**Committee routing:** round_one_open — buffett_weschler, hohn, munger
+**Committee routing:** round_one_open — buffett_weschler, hohn, marathon_capital_cycle
 
 **Falsifiers:**
 

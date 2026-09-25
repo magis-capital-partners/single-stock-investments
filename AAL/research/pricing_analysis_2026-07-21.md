@@ -2,7 +2,7 @@
 
 **As of:** 2026-07-21
 
-**Price:** $15.14
+**Price:** $13.43
 
 **Decision:** watch_pending_owner_review
 
@@ -16,7 +16,7 @@
 | Fuel, recession, and leverage stress reserve | net_asset_value | $-18.00 | $-9.00 | $-3.00 |
 | **Total** |  | **$0.00** | **$0.00** | **$26.15** |
 
-Base value versus price: **-100.0%**. Current or contracted operating and financial assets support approximately **$-17.79** per share; the market asks investors to pay another **$32.93** for growth, inventory, projects, or scarcity.
+Base value versus price: **-100.0%**. Current or contracted operating and financial assets support approximately **$-17.79** per share; the market asks investors to pay another **$31.22** for growth, inventory, projects, or scarcity.
 
 
 ## Economic value versus accounting value
@@ -56,7 +56,7 @@ A complete comparable NAV is not asserted; comparable marks are used only where 
 
 ## What the price implies
 
-At the stated terminal multiple, the price requires approximately **-19.0%** constant annual owner-cash growth for seven years. Constant 7-year owner-cash growth with a 7x terminal owner-cash multiple; diagnostic, not forecast.
+At the stated terminal multiple, the price requires approximately **-21.2%** constant annual owner-cash growth for seven years. Constant 7-year owner-cash growth with a 7x terminal owner-cash multiple; diagnostic, not forecast.
 
 ## Entry prices by required return
 
@@ -74,7 +74,7 @@ Entry prices were computed mechanically from the routed power-zone profile (Pred
 
 **Strongest counter-explanation:** dividend treated as earning power
 
-**Committee routing:** ready_to_assemble — buffett_weschler, hohn, marks_credit_cycle
+**Committee routing:** round_one_open — buffett_weschler, hohn, marks_credit_cycle
 
 **Falsifiers:**
 

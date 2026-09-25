@@ -1491,7 +1491,9 @@
       "greenblatt",
       "hk",
       "klarman_asset_value",
+      "lawrence",
       "marks_credit_cycle",
+      "moi",
       "pabrai",
       "stahl"
     ],
@@ -1572,10 +1574,36 @@
     "decision_rule": "Use one primary method and no more than two corroborating methods; irrelevant methods and personas remain silent."
   },
   "universal_valuation_contract": {
-    "schema_version": "2.0",
+    "schema_version": "3.0",
     "status": "decision_grade",
+    "proof_status": "decision_grade",
+    "model_level": "stock_specific",
+    "model_level_reason": "The proof-complete model uses stock-specific components and assumptions.",
+    "decision_eligibility": {
+      "committee_eligible": true,
+      "capital_actionable": false,
+      "capital_authority_required": "human_decision",
+      "reason": "Stock-specific proof is eligible for independent committee review."
+    },
     "ticker": "AAPL",
     "as_of": "2026-07-22",
+    "dates": {
+      "model_as_of": "2026-07-22",
+      "latest_fact_as_of": "2025-09-27",
+      "oldest_fact_as_of": "2025-09-27",
+      "price_as_of": "2026-07-20"
+    },
+    "legacy_audit": {
+      "actionable": false,
+      "status": "audit_only",
+      "annualized_return_at_price_pct": {
+        "low": -18.12,
+        "base": -7.65,
+        "high": -1.32
+      },
+      "formula": "((present_value_or_output + undated_distributions) / price) ** (1 / horizon_years) - 1",
+      "reason_non_actionable": "This legacy calculation treated a present value as a future payoff and cannot be used as a forward return, hurdle entry price, ranking signal, or capital decision."
+    },
     "economic_ownership_map": [
       {
         "component_id": "core_products_services_engine",
@@ -1595,6 +1623,7 @@
           "method_id": "owner_earnings_reinvestment_dcf",
           "version": "1.0",
           "label": "Owner earnings and reinvestment-return DCF",
+          "output_basis": "present_value_today",
           "power_zones": [
             "quality_reinvestment"
           ],
@@ -1612,6 +1641,7 @@
           "base": 171.03,
           "high": 210.4999
         },
+        "output_basis": "present_value_today",
         "legacy_range_per_share": {
           "low": 131.56,
           "base": 171.03,
@@ -1964,6 +1994,7 @@
           "method_id": "risk_adjusted_milestone_value",
           "version": "1.0",
           "label": "Milestone risk-adjusted present value",
+          "output_basis": "present_value_today",
           "power_zones": [
             "binary_milestone"
           ],
@@ -1981,6 +2012,7 @@
           "base": 35.0,
           "high": 85.0
         },
+        "output_basis": "present_value_today",
         "legacy_range_per_share": {
           "low": 0.0,
           "base": 35.0,
@@ -2263,6 +2295,7 @@
           "method_id": "net_asset_value",
           "version": "1.0",
           "label": "Reconciled net asset value",
+          "output_basis": "present_value_today",
           "power_zones": [
             "scarce_asset_optionality",
             "catalyst_asset_value",
@@ -2282,6 +2315,7 @@
           "base": 3.0,
           "high": 10.0
         },
+        "output_basis": "present_value_today",
         "legacy_range_per_share": {
           "low": -6.0,
           "base": 3.0,
@@ -2558,6 +2592,7 @@
           "method_id": "net_asset_value",
           "version": "1.0",
           "label": "Reconciled net asset value",
+          "output_basis": "present_value_today",
           "power_zones": [
             "scarce_asset_optionality",
             "catalyst_asset_value",
@@ -2577,6 +2612,7 @@
           "base": -22.0,
           "high": -8.0
         },
+        "output_basis": "present_value_today",
         "legacy_range_per_share": {
           "low": -45.0,
           "base": -22.0,
@@ -2916,7 +2952,9 @@
         "greenblatt",
         "hk",
         "klarman_asset_value",
+        "lawrence",
         "marks_credit_cycle",
+        "moi",
         "pabrai",
         "stahl"
       ],
@@ -3000,14 +3038,36 @@
       "price_per_share": 326.59,
       "fully_diluted_shares": 15014745000,
       "market_cap_m": 4903665.57,
-      "enterprise_value_m": 4861923.57
+      "enterprise_value_m": 4861923.57,
+      "price_source": "Yahoo AAPL close 2026-07-20",
+      "price_as_of": "2026-07-20"
     },
     "valuation": {
+      "output_basis": "present_value_today",
+      "output_basis_status": "method_declared",
+      "output_range_per_share": {
+        "low": 80.56,
+        "base": 187.03,
+        "high": 297.4999
+      },
       "value_per_share": {
         "low": 80.56,
         "base": 187.03,
         "high": 297.4999
       },
+      "present_value_today_per_share": {
+        "low": 80.56,
+        "base": 187.03,
+        "high": 297.4999
+      },
+      "future_payoff_per_share": {
+        "low": null,
+        "base": null,
+        "high": null
+      },
+      "future_payoff_date": null,
+      "future_payoff_horizon_years": null,
+      "forward_cashflow_schedule": null,
       "priced_components_per_share": {
         "low": 80.56,
         "base": 187.03,
@@ -3020,15 +3080,35 @@
       },
       "probability_weighted_value_per_share": 187.03,
       "expected_distributions_per_share": 0.0,
+      "forward_return_at_price_pct": {
+        "low": null,
+        "base": null,
+        "high": null
+      },
+      "forward_return_status": "withheld",
+      "forward_return_reason": "present_value_today cannot be annualized as a future payoff",
       "annualized_return_at_price_pct": {
-        "low": -18.12,
-        "base": -7.65,
-        "high": -1.32
+        "low": null,
+        "base": null,
+        "high": null
+      },
+      "annualized_return_field_status": "compatibility_alias_of_forward_return",
+      "required_return_pct": null,
+      "margin_of_safety_pct": {
+        "low": -305.4,
+        "base": -74.62,
+        "high": -9.78
+      },
+      "margin_of_safety_definition": "(intrinsic_value_today - market_price) / intrinsic_value_today; positive means the quote is below intrinsic value",
+      "upside_to_value_pct": {
+        "low": -75.33,
+        "base": -42.73,
+        "high": -8.91
       },
       "downside_to_low_pct": -75.33,
       "horizon_years": 7,
       "equity_liability_floor": 0.0,
-      "interpretation": "value_per_share is withheld while any material additive component is unpriced; priced_components_per_share is the raw additive sum (may be negative). When complete, value_per_share applies a 0 floor (limited liability)."
+      "interpretation": "output_basis states what the proof produced. value_per_share and present_value_today_per_share are intrinsic values today and are withheld while any material additive component is unpriced or dated future economics cannot be discounted at an explicit required return. priced_components_per_share is the raw proof-output sum. A present value is never annualized or discounted again."
     },
     "scenario_contract": {
       "rule": "Cases must change cited causal operating, capital, probability, timing, or financing drivers\u2014not only a terminal multiple.",
@@ -3200,7 +3280,10 @@
       "positive_base_or_explicit_zero_value": true,
       "low_base_high_ordered": true,
       "source_identity_and_freshness_valid": true,
-      "extreme_return_validated": true
+      "extreme_return_validated": true,
+      "output_basis_valid": true,
+      "dated_forward_economics_valid": true,
+      "present_value_is_not_treated_as_future_payoff": true
     },
     "evidence": {
       "unresolved_count": 0,
@@ -3222,7 +3305,7 @@
       ]
     },
     "change_control": {
-      "model_hash": "1e0a2e87b76d56675fcfb9361622d2e9f0fea0d604d31986adfd4cdf9765deea",
+      "model_hash": "12049690bbf313745a215010a715ebe9e48c93158926c672bff7d867fb0e05ab",
       "method_versions": [
         "net_asset_value@1.0",
         "owner_earnings_reinvestment_dcf@1.0",
@@ -3231,7 +3314,7 @@
       "change_log": [],
       "rule": "A source fact is locked. Every assumption change requires a reason, author, timestamp, and before/after value."
     },
-    "decision_rule": "No security is decision-grade until every material claim is valued exactly once by a valid calculation proof and every material evidence blocker is resolved."
+    "decision_rule": "Proof status and investment readiness are separate. Every material claim must be valued exactly once by a valid calculation proof, every evidence blocker must be resolved, and the model must be stock-specific before committee review. Only a human decision can authorize capital."
   },
   "synthesis": {
     "status": "complete",

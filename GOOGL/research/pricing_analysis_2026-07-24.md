@@ -2,7 +2,7 @@
 
 **As of:** 2026-07-24
 
-**Price:** $386.00
+**Price:** $339.35
 
 **Decision:** watch_pending_owner_review
 
@@ -16,7 +16,7 @@
 | Net cash, regulatory, and AI-capital reserve | net_asset_value | $-57.90 | $30.88 | $61.75 |
 | **Total** |  | **$137.99** | **$348.04** | **$546.27** |
 
-Base value versus price: **-9.8%**. Current or contracted operating and financial assets support approximately **$331.89** per share; the market asks investors to pay another **$54.11** for growth, inventory, projects, or scarcity.
+Base value versus price: **2.6%**. Current or contracted operating and financial assets support approximately **$331.89** per share; the market asks investors to pay another **$7.46** for growth, inventory, projects, or scarcity.
 
 
 ## Economic value versus accounting value
@@ -56,7 +56,7 @@ A complete comparable NAV is not asserted; comparable marks are used only where 
 
 ## What the price implies
 
-At the stated terminal multiple, the price requires approximately **11.8%** constant annual owner-cash growth for seven years. Constant 7-year owner-cash growth with a 25x terminal owner-cash multiple; diagnostic, not forecast.
+At the stated terminal multiple, the price requires approximately **9.7%** constant annual owner-cash growth for seven years. Constant 7-year owner-cash growth with a 25x terminal owner-cash multiple; diagnostic, not forecast.
 
 ## Entry prices by required return
 

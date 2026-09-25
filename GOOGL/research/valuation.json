@@ -53,7 +53,7 @@
       "growth_y6_10": 0.1,
       "exit_pfcf_y10": 28,
       "drivers": "Cloud backlog, TPU external sales, Search AI yield, Cloud margin expansion",
-      "computed_return_pct": 10.2
+      "computed_return_pct": 12.4
     }
   },
   "segment_build": {
@@ -136,22 +136,22 @@
   },
   "results": {
     "bear": {
-      "return_pct": -9.5
+      "return_pct": -7.7
     },
     "base": {
-      "return_pct": -1.5
+      "return_pct": 0.5
     },
     "bull": {
-      "return_pct": 2.4
+      "return_pct": 4.4
     }
   },
   "implied_return": {
-    "base_pct": -0.97,
+    "base_pct": 0.12,
     "label": "7yr IRR (total synthesis)",
-    "display": "-0.97% (total synthesis)",
-    "lawrence_stance_gate_pct": -1.5,
-    "falsifier_adjusted_pct": -1.5,
-    "synthesis_pct": -0.97
+    "display": "0.12% (total synthesis)",
+    "lawrence_stance_gate_pct": 0.5,
+    "falsifier_adjusted_pct": 0.5,
+    "synthesis_pct": 0.12
   },
   "stance_proposal": {
     "suggested": "watch",
@@ -286,7 +286,7 @@
       "case": "AI inflection",
       "method": "full (normalized FCF)",
       "key_inputs": "FCF\u2080=$8.0 g1=18% g2=10% exit=28\u00d7",
-      "return_pct": 10.2,
+      "return_pct": 12.4,
       "stance_gate": false,
       "notes": "[Assumption] normalized ~2028 post-capex; needs filing bridge"
     },
@@ -301,21 +301,21 @@
   ],
   "results_lawrence_legacy": {
     "bear": {
-      "return_pct": -9.5
+      "return_pct": -7.7
     },
     "base": {
-      "return_pct": -1.5
+      "return_pct": 0.5
     },
     "bull": {
-      "return_pct": 2.4
+      "return_pct": 4.4
     }
   },
   "results_growth_theory": {
     "theory_implied": {
-      "return_pct": -2.0
+      "return_pct": -0.0
     },
     "falsifier_adjusted": {
-      "return_pct": -2.0
+      "return_pct": -0.0
     }
   },
   "option_scan": [
@@ -341,7 +341,7 @@
         "id": "theory_implied",
         "label": "Segment-derived growth (pre-falsifier)",
         "source": "segment_build weighted blend",
-        "return_pct": -2.0,
+        "return_pct": -0.0,
         "weight": 0.08,
         "type": "numeric",
         "epistemic_tier": "B (pre-falsifier derivation)",
@@ -355,7 +355,7 @@
         "id": "scenario_bear",
         "label": "Bear scenario (Lawrence)",
         "source": "scenarios.bear",
-        "return_pct": -9.5,
+        "return_pct": -7.7,
         "weight": 0.05,
         "type": "numeric",
         "epistemic_tier": "C (scenario envelope)",
@@ -369,7 +369,7 @@
         "id": "scenario_bull",
         "label": "Bull scenario (Lawrence)",
         "source": "scenarios.bull",
-        "return_pct": 2.4,
+        "return_pct": 4.4,
         "weight": 0.12,
         "type": "numeric",
         "epistemic_tier": "C (scenario envelope)",
@@ -407,9 +407,9 @@
     ],
     "qualitative_manual": false,
     "qualitative_pp_cap_applied": false,
-    "numeric_weighted_pct": -0.77,
+    "numeric_weighted_pct": 0.32,
     "qualitative_pp": -0.2,
-    "total_synthesis_pct": -0.97,
+    "total_synthesis_pct": 0.12,
     "human_approval": "pending",
     "weight_audit": {
       "flags": [],
@@ -2041,11 +2041,11 @@
     "material_component_count": 4,
     "additive_component_count": 4,
     "embedded_component_count": 0,
-    "market_price_per_share": 386.0,
+    "market_price_per_share": 339.35,
     "upside_downside_pct": {
-      "low": -64.3,
-      "base": -9.8,
-      "high": 41.5
+      "low": -59.3,
+      "base": 2.6,
+      "high": 61.0
     }
   },
   "economic_value_analysis": {
@@ -2405,7 +2405,9 @@
       "greenblatt",
       "hk",
       "klarman_asset_value",
+      "lawrence",
       "marks_credit_cycle",
+      "moi",
       "pabrai",
       "stahl"
     ],
@@ -2488,10 +2490,36 @@
     "decision_rule": "Use one primary method and no more than two corroborating methods; irrelevant methods and personas remain silent."
   },
   "universal_valuation_contract": {
-    "schema_version": "2.0",
+    "schema_version": "3.0",
     "status": "decision_grade",
+    "proof_status": "decision_grade",
+    "model_level": "stock_specific",
+    "model_level_reason": "The proof-complete model uses stock-specific components and assumptions.",
+    "decision_eligibility": {
+      "committee_eligible": true,
+      "capital_actionable": false,
+      "capital_authority_required": "human_decision",
+      "reason": "Stock-specific proof is eligible for independent committee review."
+    },
     "ticker": "GOOGL",
     "as_of": "2026-07-24",
+    "dates": {
+      "model_as_of": "2026-07-24",
+      "latest_fact_as_of": "2025-12-31",
+      "oldest_fact_as_of": "2025-12-31",
+      "price_as_of": "2026-08-31"
+    },
+    "legacy_audit": {
+      "actionable": false,
+      "status": "audit_only",
+      "annualized_return_at_price_pct": {
+        "low": -12.06,
+        "base": 0.36,
+        "high": 7.04
+      },
+      "formula": "((present_value_or_output + undated_distributions) / price) ** (1 / horizon_years) - 1",
+      "reason_non_actionable": "This legacy calculation treated a present value as a future payoff and cannot be used as a forward return, hurdle entry price, ranking signal, or capital decision."
+    },
     "economic_ownership_map": [
       {
         "component_id": "primary_operating_segment",
@@ -2511,6 +2539,7 @@
           "method_id": "owner_cash_or_dividend_discount",
           "version": "1.0",
           "label": "Predictable owner-cash discount model",
+          "output_basis": "present_value_today",
           "power_zones": [
             "predictable_cash_flow"
           ],
@@ -2528,6 +2557,7 @@
           "base": 200.6634,
           "high": 270.2055
         },
+        "output_basis": "present_value_today",
         "legacy_range_per_share": {
           "low": 138.91,
           "base": 200.66,
@@ -2866,6 +2896,7 @@
           "method_id": "owner_cash_or_dividend_discount",
           "version": "1.0",
           "label": "Predictable owner-cash discount model",
+          "output_basis": "present_value_today",
           "power_zones": [
             "predictable_cash_flow"
           ],
@@ -2883,6 +2914,7 @@
           "base": 100.3526,
           "high": 146.8192
         },
+        "output_basis": "present_value_today",
         "legacy_range_per_share": {
           "low": 61.8,
           "base": 100.35,
@@ -3221,6 +3253,7 @@
           "method_id": "risk_adjusted_milestone_value",
           "version": "1.0",
           "label": "Milestone risk-adjusted present value",
+          "output_basis": "present_value_today",
           "power_zones": [
             "binary_milestone"
           ],
@@ -3238,6 +3271,7 @@
           "base": 16.1485,
           "high": 67.4861
         },
+        "output_basis": "present_value_today",
         "legacy_range_per_share": {
           "low": -4.82,
           "base": 16.15,
@@ -3651,6 +3685,7 @@
           "method_id": "net_asset_value",
           "version": "1.0",
           "label": "Reconciled net asset value",
+          "output_basis": "present_value_today",
           "power_zones": [
             "scarce_asset_optionality",
             "catalyst_asset_value",
@@ -3670,6 +3705,7 @@
           "base": 30.8799,
           "high": 61.7468
         },
+        "output_basis": "present_value_today",
         "legacy_range_per_share": {
           "low": -57.9,
           "base": 30.88,
@@ -4191,7 +4227,9 @@
         "greenblatt",
         "hk",
         "klarman_asset_value",
+        "lawrence",
         "marks_credit_cycle",
+        "moi",
         "pabrai",
         "stahl"
       ],
@@ -4274,17 +4312,39 @@
       "decision_rule": "Use one primary method and no more than two corroborating methods; irrelevant methods and personas remain silent."
     },
     "market": {
-      "price_per_share": 386.0,
+      "price_per_share": 339.35,
       "fully_diluted_shares": 12447000000.0,
-      "market_cap_m": 4804542.0,
-      "enterprise_value_m": null
+      "market_cap_m": 4223889.45,
+      "enterprise_value_m": null,
+      "price_source": "Yahoo GOOGL close 2026-08-31",
+      "price_as_of": "2026-08-31"
     },
     "valuation": {
+      "output_basis": "present_value_today",
+      "output_basis_status": "method_declared",
+      "output_range_per_share": {
+        "low": 137.9867,
+        "base": 348.0444,
+        "high": 546.2576
+      },
       "value_per_share": {
         "low": 137.9867,
         "base": 348.0444,
         "high": 546.2576
       },
+      "present_value_today_per_share": {
+        "low": 137.9867,
+        "base": 348.0444,
+        "high": 546.2576
+      },
+      "future_payoff_per_share": {
+        "low": null,
+        "base": null,
+        "high": null
+      },
+      "future_payoff_date": null,
+      "future_payoff_horizon_years": null,
+      "forward_cashflow_schedule": null,
       "priced_components_per_share": {
         "low": 137.9867,
         "base": 348.0444,
@@ -4297,15 +4357,35 @@
       },
       "probability_weighted_value_per_share": 348.0444,
       "expected_distributions_per_share": 0.0,
-      "annualized_return_at_price_pct": {
-        "low": -13.67,
-        "base": -1.47,
-        "high": 5.09
+      "forward_return_at_price_pct": {
+        "low": null,
+        "base": null,
+        "high": null
       },
-      "downside_to_low_pct": -64.25,
+      "forward_return_status": "withheld",
+      "forward_return_reason": "present_value_today cannot be annualized as a future payoff",
+      "annualized_return_at_price_pct": {
+        "low": null,
+        "base": null,
+        "high": null
+      },
+      "annualized_return_field_status": "compatibility_alias_of_forward_return",
+      "required_return_pct": null,
+      "margin_of_safety_pct": {
+        "low": -145.93,
+        "base": 2.5,
+        "high": 37.88
+      },
+      "margin_of_safety_definition": "(intrinsic_value_today - market_price) / intrinsic_value_today; positive means the quote is below intrinsic value",
+      "upside_to_value_pct": {
+        "low": -59.34,
+        "base": 2.56,
+        "high": 60.97
+      },
+      "downside_to_low_pct": -59.34,
       "horizon_years": 7,
       "equity_liability_floor": 0.0,
-      "interpretation": "value_per_share is withheld while any material additive component is unpriced; priced_components_per_share is the raw additive sum (may be negative). When complete, value_per_share applies a 0 floor (limited liability)."
+      "interpretation": "output_basis states what the proof produced. value_per_share and present_value_today_per_share are intrinsic values today and are withheld while any material additive component is unpriced or dated future economics cannot be discounted at an explicit required return. priced_components_per_share is the raw proof-output sum. A present value is never annualized or discounted again."
     },
     "scenario_contract": {
       "rule": "Cases must change cited causal operating, capital, probability, timing, or financing drivers\u2014not only a terminal multiple.",
@@ -4461,7 +4541,10 @@
       "positive_base_or_explicit_zero_value": true,
       "low_base_high_ordered": true,
       "source_identity_and_freshness_valid": true,
-      "extreme_return_validated": true
+      "extreme_return_validated": true,
+      "output_basis_valid": true,
+      "dated_forward_economics_valid": true,
+      "present_value_is_not_treated_as_future_payoff": true
     },
     "evidence": {
       "unresolved_count": 0,
@@ -4483,7 +4566,7 @@
       ]
     },
     "change_control": {
-      "model_hash": "089f356b827c3a4e92cd5c840bebdd15ce400a7e8c2206013df7d7c62c5949d3",
+      "model_hash": "fe1042b4df2d84bdbd4a1158a26a116833f25d66ffbff91fee60d694ee30c217",
       "method_versions": [
         "net_asset_value@1.0",
         "owner_cash_or_dividend_discount@1.0",
@@ -4492,7 +4575,7 @@
       "change_log": [],
       "rule": "A source fact is locked. Every assumption change requires a reason, author, timestamp, and before/after value."
     },
-    "decision_rule": "No security is decision-grade until every material claim is valued exactly once by a valid calculation proof and every material evidence blocker is resolved."
+    "decision_rule": "Proof status and investment readiness are separate. Every material claim must be valued exactly once by a valid calculation proof, every evidence blocker must be resolved, and the model must be stock-specific before committee review. Only a human decision can authorize capital."
   },
   "world_model_context": {
     "as_of": "2026-09-06",
@@ -4567,8 +4650,8 @@
   "pricing_analysis": {
     "schema_version": "1.0",
     "as_of": "2026-07-24",
-    "price": 386.0,
-    "price_source": "NASDAQ ~May 26, 2026 (CNBC quote; confirm live)",
+    "price": 339.35,
+    "price_source": "Yahoo GOOGL close 2026-08-31",
     "economic_units": 12447000000.0,
     "economic_claim_note": "Per-share claims use fully diluted shares from valuation.inputs.",
     "component_value_per_share": {
@@ -4577,13 +4660,13 @@
       "high": 546.27
     },
     "upside_downside_pct": {
-      "low": -64.3,
-      "base": -9.8,
-      "high": 41.5
+      "low": -59.3,
+      "base": 2.6,
+      "high": 61.0
     },
     "base_value_supported_by_current_or_contracted_assets": 331.89,
-    "market_price_above_current_or_contracted_value": 54.11,
-    "market_implied_constant_owner_cash_growth_pct": 11.8,
+    "market_price_above_current_or_contracted_value": 7.46,
+    "market_implied_constant_owner_cash_growth_pct": 9.7,
     "implied_growth_contract": "Constant 7-year owner-cash growth with a 25x terminal owner-cash multiple; diagnostic, not forecast.",
     "entry_prices_by_hurdle_and_case": {
       "bear": {

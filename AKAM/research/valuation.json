@@ -1,6 +1,6 @@
 {
   "ticker": "AKAM",
-  "as_of": "2026-07-21",
+  "as_of": "2026-09-25",
   "method": "full",
   "irr_method": "full",
   "valuation_mode": "economic_value",
@@ -1458,7 +1458,7 @@
   "overlay_results": [],
   "component_valuation_results": {
     "status": "complete",
-    "decision_rule": "Use the complete low/base/high component schedule. Embedded components are estimated but not added twice.",
+    "decision_rule": "Use the complete low/base/high component schedule. Embedded components are estimated but not added twice. Security equity value per share is floored at 0 (limited liability).",
     "all_material_components_identified": true,
     "additive_components": [
       {
@@ -2254,7 +2254,9 @@
       "greenblatt",
       "hk",
       "klarman_asset_value",
+      "lawrence",
       "marks_credit_cycle",
+      "moi",
       "pabrai",
       "stahl"
     ],
@@ -2337,10 +2339,36 @@
     "decision_rule": "Use one primary method and no more than two corroborating methods; irrelevant methods and personas remain silent."
   },
   "universal_valuation_contract": {
-    "schema_version": "2.0",
+    "schema_version": "3.0",
     "status": "decision_grade",
+    "proof_status": "decision_grade",
+    "model_level": "stock_specific",
+    "model_level_reason": "The proof-complete model uses stock-specific components and assumptions.",
+    "decision_eligibility": {
+      "committee_eligible": true,
+      "capital_actionable": false,
+      "capital_authority_required": "human_decision",
+      "reason": "Stock-specific proof is eligible for independent committee review."
+    },
     "ticker": "AKAM",
-    "as_of": "2026-07-21",
+    "as_of": "2026-09-25",
+    "dates": {
+      "model_as_of": "2026-09-25",
+      "latest_fact_as_of": "2026-03-31",
+      "oldest_fact_as_of": "2025-12-31",
+      "price_as_of": "2026-07-21"
+    },
+    "legacy_audit": {
+      "actionable": false,
+      "status": "audit_only",
+      "annualized_return_at_price_pct": {
+        "low": -12.19,
+        "base": 0.11,
+        "high": 9.4
+      },
+      "formula": "((present_value_or_output + undated_distributions) / price) ** (1 / horizon_years) - 1",
+      "reason_non_actionable": "This legacy calculation treated a present value as a future payoff and cannot be used as a forward return, hurdle entry price, ranking signal, or capital decision."
+    },
     "economic_ownership_map": [
       {
         "component_id": "edge_platform_owner_cash_engine",
@@ -2360,6 +2388,7 @@
           "method_id": "owner_cash_or_dividend_discount",
           "version": "1.0",
           "label": "Predictable owner-cash discount model",
+          "output_basis": "present_value_today",
           "power_zones": [
             "predictable_cash_flow"
           ],
@@ -2377,6 +2406,7 @@
           "base": 145.0,
           "high": 215.0
         },
+        "output_basis": "present_value_today",
         "legacy_range_per_share": {
           "low": 98.0,
           "base": 145.0,
@@ -2405,8 +2435,7 @@
                   "ref": "AKAM/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0001086222_26_000022.htm",
                   "locator": "NetCashProvidedByUsedInOperatingActivities $1,519M (FY2025)",
                   "as_of": "2025-12-31",
-                  "content_sha256": "15cd9a6c6621a09df7de8fdf6f6e520cef21094d9769d4a5d0cda26e1a3085b9",
-                  "source_id": "563afa6587259ee5b37ba1bf09898f19eb57cbd16eead1546fffac5b51163a03"
+                  "source_id": "2a48b5392d445fbcec6d66a4d77f106647a6a9007f84fe0816792b939ae9eeac"
                 },
                 "rationale": null
               },
@@ -2420,8 +2449,7 @@
                   "ref": "AKAM/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0001086222_26_000022.htm",
                   "locator": "PaymentsToAcquirePropertyPlantAndEquipment $508M (FY2025)",
                   "as_of": "2025-12-31",
-                  "content_sha256": "15cd9a6c6621a09df7de8fdf6f6e520cef21094d9769d4a5d0cda26e1a3085b9",
-                  "source_id": "28a2a677c4ce133c91d3e1c3c81b5ea1edebbf3040ddceef0fc43adc6521c19c"
+                  "source_id": "f3a0920d8003ec6f8c2d8fd85d270d109575b703b1a061a50775b1e7a857cfdb"
                 },
                 "rationale": null
               },
@@ -2435,8 +2463,7 @@
                   "ref": "AKAM/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0001086222_26_000022.htm",
                   "locator": "WeightedAverageNumberOfDilutedSharesOutstanding 147.0M (FY2025)",
                   "as_of": "2025-12-31",
-                  "content_sha256": "15cd9a6c6621a09df7de8fdf6f6e520cef21094d9769d4a5d0cda26e1a3085b9",
-                  "source_id": "5e1ab36ef4d55b8413cb0db40f186d16cb2f384b67ac326de30366941a21e5f4"
+                  "source_id": "578003ed91c7978c227ea5b8c42015ae51fa31be43fcff7b202159fe7989c5f8"
                 },
                 "rationale": null
               },
@@ -2714,8 +2741,7 @@
                   "ref": "AKAM/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0001086222_26_000022.htm",
                   "locator": "NetCashProvidedByUsedInOperatingActivities $1,519M (FY2025)",
                   "as_of": "2025-12-31",
-                  "content_sha256": "15cd9a6c6621a09df7de8fdf6f6e520cef21094d9769d4a5d0cda26e1a3085b9",
-                  "source_id": "563afa6587259ee5b37ba1bf09898f19eb57cbd16eead1546fffac5b51163a03"
+                  "source_id": "2a48b5392d445fbcec6d66a4d77f106647a6a9007f84fe0816792b939ae9eeac"
                 },
                 "rationale": null
               },
@@ -2729,8 +2755,7 @@
                   "ref": "AKAM/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0001086222_26_000022.htm",
                   "locator": "PaymentsToAcquirePropertyPlantAndEquipment $508M (FY2025)",
                   "as_of": "2025-12-31",
-                  "content_sha256": "15cd9a6c6621a09df7de8fdf6f6e520cef21094d9769d4a5d0cda26e1a3085b9",
-                  "source_id": "28a2a677c4ce133c91d3e1c3c81b5ea1edebbf3040ddceef0fc43adc6521c19c"
+                  "source_id": "f3a0920d8003ec6f8c2d8fd85d270d109575b703b1a061a50775b1e7a857cfdb"
                 },
                 "rationale": null
               },
@@ -2744,8 +2769,7 @@
                   "ref": "AKAM/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0001086222_26_000022.htm",
                   "locator": "WeightedAverageNumberOfDilutedSharesOutstanding 147.0M (FY2025)",
                   "as_of": "2025-12-31",
-                  "content_sha256": "15cd9a6c6621a09df7de8fdf6f6e520cef21094d9769d4a5d0cda26e1a3085b9",
-                  "source_id": "5e1ab36ef4d55b8413cb0db40f186d16cb2f384b67ac326de30366941a21e5f4"
+                  "source_id": "578003ed91c7978c227ea5b8c42015ae51fa31be43fcff7b202159fe7989c5f8"
                 },
                 "rationale": null
               },
@@ -3023,8 +3047,7 @@
                   "ref": "AKAM/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0001086222_26_000022.htm",
                   "locator": "NetCashProvidedByUsedInOperatingActivities $1,519M (FY2025)",
                   "as_of": "2025-12-31",
-                  "content_sha256": "15cd9a6c6621a09df7de8fdf6f6e520cef21094d9769d4a5d0cda26e1a3085b9",
-                  "source_id": "563afa6587259ee5b37ba1bf09898f19eb57cbd16eead1546fffac5b51163a03"
+                  "source_id": "2a48b5392d445fbcec6d66a4d77f106647a6a9007f84fe0816792b939ae9eeac"
                 },
                 "rationale": null
               },
@@ -3038,8 +3061,7 @@
                   "ref": "AKAM/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0001086222_26_000022.htm",
                   "locator": "PaymentsToAcquirePropertyPlantAndEquipment $508M (FY2025)",
                   "as_of": "2025-12-31",
-                  "content_sha256": "15cd9a6c6621a09df7de8fdf6f6e520cef21094d9769d4a5d0cda26e1a3085b9",
-                  "source_id": "28a2a677c4ce133c91d3e1c3c81b5ea1edebbf3040ddceef0fc43adc6521c19c"
+                  "source_id": "f3a0920d8003ec6f8c2d8fd85d270d109575b703b1a061a50775b1e7a857cfdb"
                 },
                 "rationale": null
               },
@@ -3053,8 +3075,7 @@
                   "ref": "AKAM/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0001086222_26_000022.htm",
                   "locator": "WeightedAverageNumberOfDilutedSharesOutstanding 147.0M (FY2025)",
                   "as_of": "2025-12-31",
-                  "content_sha256": "15cd9a6c6621a09df7de8fdf6f6e520cef21094d9769d4a5d0cda26e1a3085b9",
-                  "source_id": "5e1ab36ef4d55b8413cb0db40f186d16cb2f384b67ac326de30366941a21e5f4"
+                  "source_id": "578003ed91c7978c227ea5b8c42015ae51fa31be43fcff7b202159fe7989c5f8"
                 },
                 "rationale": null
               },
@@ -3328,31 +3349,28 @@
               "ref": "AKAM/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0001086222_26_000022.htm",
               "locator": "NetCashProvidedByUsedInOperatingActivities $1,519M (FY2025)",
               "as_of": "2025-12-31",
-              "content_sha256": "15cd9a6c6621a09df7de8fdf6f6e520cef21094d9769d4a5d0cda26e1a3085b9",
-              "source_id": "563afa6587259ee5b37ba1bf09898f19eb57cbd16eead1546fffac5b51163a03"
+              "source_id": "2a48b5392d445fbcec6d66a4d77f106647a6a9007f84fe0816792b939ae9eeac"
             },
             {
               "node_id": "capex_m",
               "ref": "AKAM/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0001086222_26_000022.htm",
               "locator": "PaymentsToAcquirePropertyPlantAndEquipment $508M (FY2025)",
               "as_of": "2025-12-31",
-              "content_sha256": "15cd9a6c6621a09df7de8fdf6f6e520cef21094d9769d4a5d0cda26e1a3085b9",
-              "source_id": "28a2a677c4ce133c91d3e1c3c81b5ea1edebbf3040ddceef0fc43adc6521c19c"
+              "source_id": "f3a0920d8003ec6f8c2d8fd85d270d109575b703b1a061a50775b1e7a857cfdb"
             },
             {
               "node_id": "shares_m",
               "ref": "AKAM/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0001086222_26_000022.htm",
               "locator": "WeightedAverageNumberOfDilutedSharesOutstanding 147.0M (FY2025)",
               "as_of": "2025-12-31",
-              "content_sha256": "15cd9a6c6621a09df7de8fdf6f6e520cef21094d9769d4a5d0cda26e1a3085b9",
-              "source_id": "5e1ab36ef4d55b8413cb0db40f186d16cb2f384b67ac326de30366941a21e5f4"
+              "source_id": "578003ed91c7978c227ea5b8c42015ae51fa31be43fcff7b202159fe7989c5f8"
             }
           ],
           "checks": {
             "passed": true,
             "errors": []
           },
-          "proof_hash": "81d67ba88b2f1604695788209efd6580e009c0d04bd9e2b31874561765fcf1dc"
+          "proof_hash": "e581336d21030964b5c07035bd708ff3c07d09fb8cb38c3520ff6a38fe1749e8"
         },
         "evidence_tier": "primary_derived",
         "evidence_level": "primary_derived",
@@ -3382,6 +3400,7 @@
           "method_id": "risk_adjusted_milestone_value",
           "version": "1.0",
           "label": "Milestone risk-adjusted present value",
+          "output_basis": "present_value_today",
           "power_zones": [
             "binary_milestone"
           ],
@@ -3399,6 +3418,7 @@
           "base": 10.0,
           "high": 28.0
         },
+        "output_basis": "present_value_today",
         "legacy_range_per_share": {
           "low": 0.0,
           "base": 10.0,
@@ -3427,8 +3447,7 @@
                   "ref": "AKAM/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0001086222_26_000022.htm",
                   "locator": "Compute $2.24B FY2025 (+10% YoY); largest solution line",
                   "as_of": "2025-12-31",
-                  "content_sha256": "15cd9a6c6621a09df7de8fdf6f6e520cef21094d9769d4a5d0cda26e1a3085b9",
-                  "source_id": "ffd690bb2f210794a0af94dabcc2a6eac0376af4ce3196cac024a2683e2bf51d"
+                  "source_id": "2c5bd804ecaef5ac6e46eec34842939db4ad700eaf90989bde548d44367d4623"
                 },
                 "rationale": null
               },
@@ -3442,8 +3461,7 @@
                   "ref": "AKAM/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0001086222_26_000022.htm",
                   "locator": "Remaining performance obligation ~$5.2B at FY2025",
                   "as_of": "2025-12-31",
-                  "content_sha256": "15cd9a6c6621a09df7de8fdf6f6e520cef21094d9769d4a5d0cda26e1a3085b9",
-                  "source_id": "e3cdaebdd0ce3a0054446c7fad455100141be47171d4ba99bb8a0fd7fa36c711"
+                  "source_id": "bd27c76d6a99f583f25e40f01605e44548cb32835d2a87ad662ddca76ec48e6f"
                 },
                 "rationale": null
               },
@@ -3457,8 +3475,7 @@
                   "ref": "AKAM/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0001086222_26_000022.htm",
                   "locator": "WeightedAverageNumberOfDilutedSharesOutstanding 147.0M (FY2025)",
                   "as_of": "2025-12-31",
-                  "content_sha256": "15cd9a6c6621a09df7de8fdf6f6e520cef21094d9769d4a5d0cda26e1a3085b9",
-                  "source_id": "5e1ab36ef4d55b8413cb0db40f186d16cb2f384b67ac326de30366941a21e5f4"
+                  "source_id": "578003ed91c7978c227ea5b8c42015ae51fa31be43fcff7b202159fe7989c5f8"
                 },
                 "rationale": null
               },
@@ -3497,8 +3514,7 @@
                   "ref": "AKAM/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0001086222_26_000022.htm",
                   "locator": "Compute $2.24B FY2025 (+10% YoY); largest solution line",
                   "as_of": "2025-12-31",
-                  "content_sha256": "15cd9a6c6621a09df7de8fdf6f6e520cef21094d9769d4a5d0cda26e1a3085b9",
-                  "source_id": "ffd690bb2f210794a0af94dabcc2a6eac0376af4ce3196cac024a2683e2bf51d"
+                  "source_id": "2c5bd804ecaef5ac6e46eec34842939db4ad700eaf90989bde548d44367d4623"
                 },
                 "rationale": null
               },
@@ -3512,8 +3528,7 @@
                   "ref": "AKAM/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0001086222_26_000022.htm",
                   "locator": "Remaining performance obligation ~$5.2B at FY2025",
                   "as_of": "2025-12-31",
-                  "content_sha256": "15cd9a6c6621a09df7de8fdf6f6e520cef21094d9769d4a5d0cda26e1a3085b9",
-                  "source_id": "e3cdaebdd0ce3a0054446c7fad455100141be47171d4ba99bb8a0fd7fa36c711"
+                  "source_id": "bd27c76d6a99f583f25e40f01605e44548cb32835d2a87ad662ddca76ec48e6f"
                 },
                 "rationale": null
               },
@@ -3527,8 +3542,7 @@
                   "ref": "AKAM/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0001086222_26_000022.htm",
                   "locator": "WeightedAverageNumberOfDilutedSharesOutstanding 147.0M (FY2025)",
                   "as_of": "2025-12-31",
-                  "content_sha256": "15cd9a6c6621a09df7de8fdf6f6e520cef21094d9769d4a5d0cda26e1a3085b9",
-                  "source_id": "5e1ab36ef4d55b8413cb0db40f186d16cb2f384b67ac326de30366941a21e5f4"
+                  "source_id": "578003ed91c7978c227ea5b8c42015ae51fa31be43fcff7b202159fe7989c5f8"
                 },
                 "rationale": null
               },
@@ -3567,8 +3581,7 @@
                   "ref": "AKAM/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0001086222_26_000022.htm",
                   "locator": "Compute $2.24B FY2025 (+10% YoY); largest solution line",
                   "as_of": "2025-12-31",
-                  "content_sha256": "15cd9a6c6621a09df7de8fdf6f6e520cef21094d9769d4a5d0cda26e1a3085b9",
-                  "source_id": "ffd690bb2f210794a0af94dabcc2a6eac0376af4ce3196cac024a2683e2bf51d"
+                  "source_id": "2c5bd804ecaef5ac6e46eec34842939db4ad700eaf90989bde548d44367d4623"
                 },
                 "rationale": null
               },
@@ -3582,8 +3595,7 @@
                   "ref": "AKAM/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0001086222_26_000022.htm",
                   "locator": "Remaining performance obligation ~$5.2B at FY2025",
                   "as_of": "2025-12-31",
-                  "content_sha256": "15cd9a6c6621a09df7de8fdf6f6e520cef21094d9769d4a5d0cda26e1a3085b9",
-                  "source_id": "e3cdaebdd0ce3a0054446c7fad455100141be47171d4ba99bb8a0fd7fa36c711"
+                  "source_id": "bd27c76d6a99f583f25e40f01605e44548cb32835d2a87ad662ddca76ec48e6f"
                 },
                 "rationale": null
               },
@@ -3597,8 +3609,7 @@
                   "ref": "AKAM/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0001086222_26_000022.htm",
                   "locator": "WeightedAverageNumberOfDilutedSharesOutstanding 147.0M (FY2025)",
                   "as_of": "2025-12-31",
-                  "content_sha256": "15cd9a6c6621a09df7de8fdf6f6e520cef21094d9769d4a5d0cda26e1a3085b9",
-                  "source_id": "5e1ab36ef4d55b8413cb0db40f186d16cb2f384b67ac326de30366941a21e5f4"
+                  "source_id": "578003ed91c7978c227ea5b8c42015ae51fa31be43fcff7b202159fe7989c5f8"
                 },
                 "rationale": null
               },
@@ -3633,31 +3644,28 @@
               "ref": "AKAM/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0001086222_26_000022.htm",
               "locator": "Compute $2.24B FY2025 (+10% YoY); largest solution line",
               "as_of": "2025-12-31",
-              "content_sha256": "15cd9a6c6621a09df7de8fdf6f6e520cef21094d9769d4a5d0cda26e1a3085b9",
-              "source_id": "ffd690bb2f210794a0af94dabcc2a6eac0376af4ce3196cac024a2683e2bf51d"
+              "source_id": "2c5bd804ecaef5ac6e46eec34842939db4ad700eaf90989bde548d44367d4623"
             },
             {
               "node_id": "remaining_performance_obligation_b",
               "ref": "AKAM/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0001086222_26_000022.htm",
               "locator": "Remaining performance obligation ~$5.2B at FY2025",
               "as_of": "2025-12-31",
-              "content_sha256": "15cd9a6c6621a09df7de8fdf6f6e520cef21094d9769d4a5d0cda26e1a3085b9",
-              "source_id": "e3cdaebdd0ce3a0054446c7fad455100141be47171d4ba99bb8a0fd7fa36c711"
+              "source_id": "bd27c76d6a99f583f25e40f01605e44548cb32835d2a87ad662ddca76ec48e6f"
             },
             {
               "node_id": "shares_m",
               "ref": "AKAM/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0001086222_26_000022.htm",
               "locator": "WeightedAverageNumberOfDilutedSharesOutstanding 147.0M (FY2025)",
               "as_of": "2025-12-31",
-              "content_sha256": "15cd9a6c6621a09df7de8fdf6f6e520cef21094d9769d4a5d0cda26e1a3085b9",
-              "source_id": "5e1ab36ef4d55b8413cb0db40f186d16cb2f384b67ac326de30366941a21e5f4"
+              "source_id": "578003ed91c7978c227ea5b8c42015ae51fa31be43fcff7b202159fe7989c5f8"
             }
           ],
           "checks": {
             "passed": true,
             "errors": []
           },
-          "proof_hash": "7869c8622932f847f3ef346266f68f41e2c615bce5967c8ff5b1b6e12c04090a"
+          "proof_hash": "5b2bdd540a0c247572d7460f6d53256f86f384d4fdc71333b5dad47c78a28f81"
         },
         "evidence_tier": "primary_derived",
         "evidence_level": "primary_derived",
@@ -3693,6 +3701,7 @@
           "method_id": "net_asset_value",
           "version": "1.0",
           "label": "Reconciled net asset value",
+          "output_basis": "present_value_today",
           "power_zones": [
             "scarce_asset_optionality",
             "catalyst_asset_value",
@@ -3712,6 +3721,7 @@
           "base": -21.8354,
           "high": -8.0
         },
+        "output_basis": "present_value_today",
         "legacy_range_per_share": {
           "low": -28.0,
           "base": -21.84,
@@ -3740,8 +3750,7 @@
                   "ref": "AKAM/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0001086222_26_000022.htm",
                   "locator": "CashAndCashEquivalentsAtCarryingValue $930.2M at December 31, 2025",
                   "as_of": "2025-12-31",
-                  "content_sha256": "15cd9a6c6621a09df7de8fdf6f6e520cef21094d9769d4a5d0cda26e1a3085b9",
-                  "source_id": "63bcacfe89d401d9118dba8fe9cf49c77eae20333e9c1409082a92b429f70bec"
+                  "source_id": "82b3718a28aeb24bd6a4c01497a674afc87996ec0d5a59ad16676df19a43a222"
                 },
                 "rationale": null
               },
@@ -3755,8 +3764,7 @@
                   "ref": "AKAM/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0001086222_26_000022.htm",
                   "locator": "$1.15B due 2027 + $1.27B due 2029 + $1.73B due 2033 convertible notes",
                   "as_of": "2025-12-31",
-                  "content_sha256": "15cd9a6c6621a09df7de8fdf6f6e520cef21094d9769d4a5d0cda26e1a3085b9",
-                  "source_id": "e5fc0462493786d0e2b28ad62d3b5412be4f36101509d19d72024fd5370bf0a5"
+                  "source_id": "54f4bbd60fe1707240e89c6159d1619c98ebab973d8139e4bb9f5e83c187cf6e"
                 },
                 "rationale": null
               },
@@ -3770,8 +3778,7 @@
                   "ref": "AKAM/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0001086222_26_000022.htm",
                   "locator": "WeightedAverageNumberOfDilutedSharesOutstanding 147.0M (FY2025)",
                   "as_of": "2025-12-31",
-                  "content_sha256": "15cd9a6c6621a09df7de8fdf6f6e520cef21094d9769d4a5d0cda26e1a3085b9",
-                  "source_id": "5e1ab36ef4d55b8413cb0db40f186d16cb2f384b67ac326de30366941a21e5f4"
+                  "source_id": "578003ed91c7978c227ea5b8c42015ae51fa31be43fcff7b202159fe7989c5f8"
                 },
                 "rationale": null
               },
@@ -3819,8 +3826,7 @@
                   "ref": "AKAM/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0001086222_26_000022.htm",
                   "locator": "CashAndCashEquivalentsAtCarryingValue $930.2M at December 31, 2025",
                   "as_of": "2025-12-31",
-                  "content_sha256": "15cd9a6c6621a09df7de8fdf6f6e520cef21094d9769d4a5d0cda26e1a3085b9",
-                  "source_id": "63bcacfe89d401d9118dba8fe9cf49c77eae20333e9c1409082a92b429f70bec"
+                  "source_id": "82b3718a28aeb24bd6a4c01497a674afc87996ec0d5a59ad16676df19a43a222"
                 },
                 "rationale": null
               },
@@ -3834,8 +3840,7 @@
                   "ref": "AKAM/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0001086222_26_000022.htm",
                   "locator": "$1.15B due 2027 + $1.27B due 2029 + $1.73B due 2033 convertible notes",
                   "as_of": "2025-12-31",
-                  "content_sha256": "15cd9a6c6621a09df7de8fdf6f6e520cef21094d9769d4a5d0cda26e1a3085b9",
-                  "source_id": "e5fc0462493786d0e2b28ad62d3b5412be4f36101509d19d72024fd5370bf0a5"
+                  "source_id": "54f4bbd60fe1707240e89c6159d1619c98ebab973d8139e4bb9f5e83c187cf6e"
                 },
                 "rationale": null
               },
@@ -3849,8 +3854,7 @@
                   "ref": "AKAM/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0001086222_26_000022.htm",
                   "locator": "WeightedAverageNumberOfDilutedSharesOutstanding 147.0M (FY2025)",
                   "as_of": "2025-12-31",
-                  "content_sha256": "15cd9a6c6621a09df7de8fdf6f6e520cef21094d9769d4a5d0cda26e1a3085b9",
-                  "source_id": "5e1ab36ef4d55b8413cb0db40f186d16cb2f384b67ac326de30366941a21e5f4"
+                  "source_id": "578003ed91c7978c227ea5b8c42015ae51fa31be43fcff7b202159fe7989c5f8"
                 },
                 "rationale": null
               },
@@ -3898,8 +3902,7 @@
                   "ref": "AKAM/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0001086222_26_000022.htm",
                   "locator": "CashAndCashEquivalentsAtCarryingValue $930.2M at December 31, 2025",
                   "as_of": "2025-12-31",
-                  "content_sha256": "15cd9a6c6621a09df7de8fdf6f6e520cef21094d9769d4a5d0cda26e1a3085b9",
-                  "source_id": "63bcacfe89d401d9118dba8fe9cf49c77eae20333e9c1409082a92b429f70bec"
+                  "source_id": "82b3718a28aeb24bd6a4c01497a674afc87996ec0d5a59ad16676df19a43a222"
                 },
                 "rationale": null
               },
@@ -3913,8 +3916,7 @@
                   "ref": "AKAM/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0001086222_26_000022.htm",
                   "locator": "$1.15B due 2027 + $1.27B due 2029 + $1.73B due 2033 convertible notes",
                   "as_of": "2025-12-31",
-                  "content_sha256": "15cd9a6c6621a09df7de8fdf6f6e520cef21094d9769d4a5d0cda26e1a3085b9",
-                  "source_id": "e5fc0462493786d0e2b28ad62d3b5412be4f36101509d19d72024fd5370bf0a5"
+                  "source_id": "54f4bbd60fe1707240e89c6159d1619c98ebab973d8139e4bb9f5e83c187cf6e"
                 },
                 "rationale": null
               },
@@ -3928,8 +3930,7 @@
                   "ref": "AKAM/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0001086222_26_000022.htm",
                   "locator": "WeightedAverageNumberOfDilutedSharesOutstanding 147.0M (FY2025)",
                   "as_of": "2025-12-31",
-                  "content_sha256": "15cd9a6c6621a09df7de8fdf6f6e520cef21094d9769d4a5d0cda26e1a3085b9",
-                  "source_id": "5e1ab36ef4d55b8413cb0db40f186d16cb2f384b67ac326de30366941a21e5f4"
+                  "source_id": "578003ed91c7978c227ea5b8c42015ae51fa31be43fcff7b202159fe7989c5f8"
                 },
                 "rationale": null
               },
@@ -3973,31 +3974,28 @@
               "ref": "AKAM/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0001086222_26_000022.htm",
               "locator": "CashAndCashEquivalentsAtCarryingValue $930.2M at December 31, 2025",
               "as_of": "2025-12-31",
-              "content_sha256": "15cd9a6c6621a09df7de8fdf6f6e520cef21094d9769d4a5d0cda26e1a3085b9",
-              "source_id": "63bcacfe89d401d9118dba8fe9cf49c77eae20333e9c1409082a92b429f70bec"
+              "source_id": "82b3718a28aeb24bd6a4c01497a674afc87996ec0d5a59ad16676df19a43a222"
             },
             {
               "node_id": "convertible_debt_m",
               "ref": "AKAM/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0001086222_26_000022.htm",
               "locator": "$1.15B due 2027 + $1.27B due 2029 + $1.73B due 2033 convertible notes",
               "as_of": "2025-12-31",
-              "content_sha256": "15cd9a6c6621a09df7de8fdf6f6e520cef21094d9769d4a5d0cda26e1a3085b9",
-              "source_id": "e5fc0462493786d0e2b28ad62d3b5412be4f36101509d19d72024fd5370bf0a5"
+              "source_id": "54f4bbd60fe1707240e89c6159d1619c98ebab973d8139e4bb9f5e83c187cf6e"
             },
             {
               "node_id": "shares_m",
               "ref": "AKAM/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0001086222_26_000022.htm",
               "locator": "WeightedAverageNumberOfDilutedSharesOutstanding 147.0M (FY2025)",
               "as_of": "2025-12-31",
-              "content_sha256": "15cd9a6c6621a09df7de8fdf6f6e520cef21094d9769d4a5d0cda26e1a3085b9",
-              "source_id": "5e1ab36ef4d55b8413cb0db40f186d16cb2f384b67ac326de30366941a21e5f4"
+              "source_id": "578003ed91c7978c227ea5b8c42015ae51fa31be43fcff7b202159fe7989c5f8"
             }
           ],
           "checks": {
             "passed": true,
             "errors": []
           },
-          "proof_hash": "5822d9315871059513742330676981640881d3e81286de4a40d9ca1ef9147643"
+          "proof_hash": "94e76bc2559d8dc0138bc24658e73532c24ec9006dc79f975e9d17b2345802a5"
         },
         "evidence_tier": "primary_derived",
         "evidence_level": "primary_derived",
@@ -4027,6 +4025,7 @@
           "method_id": "net_asset_value",
           "version": "1.0",
           "label": "Reconciled net asset value",
+          "output_basis": "present_value_today",
           "power_zones": [
             "scarce_asset_optionality",
             "catalyst_asset_value",
@@ -4046,6 +4045,7 @@
           "base": -8.0,
           "high": -2.0
         },
+        "output_basis": "present_value_today",
         "legacy_range_per_share": {
           "low": -20.0,
           "base": -8.0,
@@ -4074,8 +4074,7 @@
                   "ref": "AKAM/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0001086222_26_000022.htm",
                   "locator": "OperatingIncomeLoss $567M FY2025",
                   "as_of": "2025-12-31",
-                  "content_sha256": "15cd9a6c6621a09df7de8fdf6f6e520cef21094d9769d4a5d0cda26e1a3085b9",
-                  "source_id": "506e5fc18d33cc90ec27e8d506b58116519683516b485a3e6cf96e33bef853f9"
+                  "source_id": "73915dc6e651df0c0cede9114da9e7e7756f90f64d4b07854d5c4cc3743adf6a"
                 },
                 "rationale": null
               },
@@ -4089,8 +4088,7 @@
                   "ref": "AKAM/investor-documents/sec-edgar/10-Q_20260508_rpt20260331_acc0001086222_26_000058.htm",
                   "locator": "Operating income $114M Q1 2026 (-26% YoY) on higher cost of revenue",
                   "as_of": "2026-03-31",
-                  "content_sha256": "d75567066fc7c2a1674f585b16627668a1902dede971f570ca6797250d151395",
-                  "source_id": "e6dd2084e2ee1bde11d941eafbaccff3f7631d1075af1f19d52bc9df0b2dac1f"
+                  "source_id": "bec91b50e9b16c0237ecdb6a88bf1f18702f36e4c93562a2e05fd131e93b1a5e"
                 },
                 "rationale": null
               },
@@ -4104,8 +4102,7 @@
                   "ref": "AKAM/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0001086222_26_000022.htm",
                   "locator": "WeightedAverageNumberOfDilutedSharesOutstanding 147.0M (FY2025)",
                   "as_of": "2025-12-31",
-                  "content_sha256": "15cd9a6c6621a09df7de8fdf6f6e520cef21094d9769d4a5d0cda26e1a3085b9",
-                  "source_id": "5e1ab36ef4d55b8413cb0db40f186d16cb2f384b67ac326de30366941a21e5f4"
+                  "source_id": "578003ed91c7978c227ea5b8c42015ae51fa31be43fcff7b202159fe7989c5f8"
                 },
                 "rationale": null
               },
@@ -4144,8 +4141,7 @@
                   "ref": "AKAM/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0001086222_26_000022.htm",
                   "locator": "OperatingIncomeLoss $567M FY2025",
                   "as_of": "2025-12-31",
-                  "content_sha256": "15cd9a6c6621a09df7de8fdf6f6e520cef21094d9769d4a5d0cda26e1a3085b9",
-                  "source_id": "506e5fc18d33cc90ec27e8d506b58116519683516b485a3e6cf96e33bef853f9"
+                  "source_id": "73915dc6e651df0c0cede9114da9e7e7756f90f64d4b07854d5c4cc3743adf6a"
                 },
                 "rationale": null
               },
@@ -4159,8 +4155,7 @@
                   "ref": "AKAM/investor-documents/sec-edgar/10-Q_20260508_rpt20260331_acc0001086222_26_000058.htm",
                   "locator": "Operating income $114M Q1 2026 (-26% YoY) on higher cost of revenue",
                   "as_of": "2026-03-31",
-                  "content_sha256": "d75567066fc7c2a1674f585b16627668a1902dede971f570ca6797250d151395",
-                  "source_id": "e6dd2084e2ee1bde11d941eafbaccff3f7631d1075af1f19d52bc9df0b2dac1f"
+                  "source_id": "bec91b50e9b16c0237ecdb6a88bf1f18702f36e4c93562a2e05fd131e93b1a5e"
                 },
                 "rationale": null
               },
@@ -4174,8 +4169,7 @@
                   "ref": "AKAM/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0001086222_26_000022.htm",
                   "locator": "WeightedAverageNumberOfDilutedSharesOutstanding 147.0M (FY2025)",
                   "as_of": "2025-12-31",
-                  "content_sha256": "15cd9a6c6621a09df7de8fdf6f6e520cef21094d9769d4a5d0cda26e1a3085b9",
-                  "source_id": "5e1ab36ef4d55b8413cb0db40f186d16cb2f384b67ac326de30366941a21e5f4"
+                  "source_id": "578003ed91c7978c227ea5b8c42015ae51fa31be43fcff7b202159fe7989c5f8"
                 },
                 "rationale": null
               },
@@ -4214,8 +4208,7 @@
                   "ref": "AKAM/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0001086222_26_000022.htm",
                   "locator": "OperatingIncomeLoss $567M FY2025",
                   "as_of": "2025-12-31",
-                  "content_sha256": "15cd9a6c6621a09df7de8fdf6f6e520cef21094d9769d4a5d0cda26e1a3085b9",
-                  "source_id": "506e5fc18d33cc90ec27e8d506b58116519683516b485a3e6cf96e33bef853f9"
+                  "source_id": "73915dc6e651df0c0cede9114da9e7e7756f90f64d4b07854d5c4cc3743adf6a"
                 },
                 "rationale": null
               },
@@ -4229,8 +4222,7 @@
                   "ref": "AKAM/investor-documents/sec-edgar/10-Q_20260508_rpt20260331_acc0001086222_26_000058.htm",
                   "locator": "Operating income $114M Q1 2026 (-26% YoY) on higher cost of revenue",
                   "as_of": "2026-03-31",
-                  "content_sha256": "d75567066fc7c2a1674f585b16627668a1902dede971f570ca6797250d151395",
-                  "source_id": "e6dd2084e2ee1bde11d941eafbaccff3f7631d1075af1f19d52bc9df0b2dac1f"
+                  "source_id": "bec91b50e9b16c0237ecdb6a88bf1f18702f36e4c93562a2e05fd131e93b1a5e"
                 },
                 "rationale": null
               },
@@ -4244,8 +4236,7 @@
                   "ref": "AKAM/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0001086222_26_000022.htm",
                   "locator": "WeightedAverageNumberOfDilutedSharesOutstanding 147.0M (FY2025)",
                   "as_of": "2025-12-31",
-                  "content_sha256": "15cd9a6c6621a09df7de8fdf6f6e520cef21094d9769d4a5d0cda26e1a3085b9",
-                  "source_id": "5e1ab36ef4d55b8413cb0db40f186d16cb2f384b67ac326de30366941a21e5f4"
+                  "source_id": "578003ed91c7978c227ea5b8c42015ae51fa31be43fcff7b202159fe7989c5f8"
                 },
                 "rationale": null
               },
@@ -4280,31 +4271,28 @@
               "ref": "AKAM/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0001086222_26_000022.htm",
               "locator": "OperatingIncomeLoss $567M FY2025",
               "as_of": "2025-12-31",
-              "content_sha256": "15cd9a6c6621a09df7de8fdf6f6e520cef21094d9769d4a5d0cda26e1a3085b9",
-              "source_id": "506e5fc18d33cc90ec27e8d506b58116519683516b485a3e6cf96e33bef853f9"
+              "source_id": "73915dc6e651df0c0cede9114da9e7e7756f90f64d4b07854d5c4cc3743adf6a"
             },
             {
               "node_id": "q1_operating_income_m",
               "ref": "AKAM/investor-documents/sec-edgar/10-Q_20260508_rpt20260331_acc0001086222_26_000058.htm",
               "locator": "Operating income $114M Q1 2026 (-26% YoY) on higher cost of revenue",
               "as_of": "2026-03-31",
-              "content_sha256": "d75567066fc7c2a1674f585b16627668a1902dede971f570ca6797250d151395",
-              "source_id": "e6dd2084e2ee1bde11d941eafbaccff3f7631d1075af1f19d52bc9df0b2dac1f"
+              "source_id": "bec91b50e9b16c0237ecdb6a88bf1f18702f36e4c93562a2e05fd131e93b1a5e"
             },
             {
               "node_id": "shares_m",
               "ref": "AKAM/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0001086222_26_000022.htm",
               "locator": "WeightedAverageNumberOfDilutedSharesOutstanding 147.0M (FY2025)",
               "as_of": "2025-12-31",
-              "content_sha256": "15cd9a6c6621a09df7de8fdf6f6e520cef21094d9769d4a5d0cda26e1a3085b9",
-              "source_id": "5e1ab36ef4d55b8413cb0db40f186d16cb2f384b67ac326de30366941a21e5f4"
+              "source_id": "578003ed91c7978c227ea5b8c42015ae51fa31be43fcff7b202159fe7989c5f8"
             }
           ],
           "checks": {
             "passed": true,
             "errors": []
           },
-          "proof_hash": "5688ac2e6d23b53d188423da86d1cc9c281f72272cffe068a6a8b61f55b976c7"
+          "proof_hash": "634a43a52d71707fd0d4794481c2dfcbfc635c5e3582d9cd59c04c062b45e7e9"
         },
         "evidence_tier": "primary_derived",
         "evidence_level": "primary_derived",
@@ -4397,7 +4385,9 @@
         "greenblatt",
         "hk",
         "klarman_asset_value",
+        "lawrence",
         "marks_credit_cycle",
+        "moi",
         "pabrai",
         "stahl"
       ],
@@ -4483,14 +4473,36 @@
       "price_per_share": 124.215,
       "fully_diluted_shares": 147000000,
       "market_cap_m": 18259.6,
-      "enterprise_value_m": 21469.4
+      "enterprise_value_m": 21469.4,
+      "price_source": "Yahoo AKAM close 2026-07-21",
+      "price_as_of": "2026-07-21"
     },
     "valuation": {
+      "output_basis": "present_value_today",
+      "output_basis_status": "method_declared",
+      "output_range_per_share": {
+        "low": 50.0,
+        "base": 125.1646,
+        "high": 233.0
+      },
       "value_per_share": {
         "low": 50.0,
         "base": 125.1646,
         "high": 233.0
       },
+      "present_value_today_per_share": {
+        "low": 50.0,
+        "base": 125.1646,
+        "high": 233.0
+      },
+      "future_payoff_per_share": {
+        "low": null,
+        "base": null,
+        "high": null
+      },
+      "future_payoff_date": null,
+      "future_payoff_horizon_years": null,
+      "forward_cashflow_schedule": null,
       "priced_components_per_share": {
         "low": 50.0,
         "base": 125.1646,
@@ -4503,14 +4515,35 @@
       },
       "probability_weighted_value_per_share": 125.1646,
       "expected_distributions_per_share": 0.0,
+      "forward_return_at_price_pct": {
+        "low": null,
+        "base": null,
+        "high": null
+      },
+      "forward_return_status": "withheld",
+      "forward_return_reason": "present_value_today cannot be annualized as a future payoff",
       "annualized_return_at_price_pct": {
-        "low": -12.19,
-        "base": 0.11,
-        "high": 9.4
+        "low": null,
+        "base": null,
+        "high": null
+      },
+      "annualized_return_field_status": "compatibility_alias_of_forward_return",
+      "required_return_pct": 9.5,
+      "margin_of_safety_pct": {
+        "low": -148.43,
+        "base": 0.76,
+        "high": 46.69
+      },
+      "margin_of_safety_definition": "(intrinsic_value_today - market_price) / intrinsic_value_today; positive means the quote is below intrinsic value",
+      "upside_to_value_pct": {
+        "low": -59.75,
+        "base": 0.76,
+        "high": 87.58
       },
       "downside_to_low_pct": -59.75,
       "horizon_years": 7,
-      "interpretation": "value_per_share is withheld while any material additive component is unpriced; priced_components_per_share is not a complete security value."
+      "equity_liability_floor": 0.0,
+      "interpretation": "output_basis states what the proof produced. value_per_share and present_value_today_per_share are intrinsic values today and are withheld while any material additive component is unpriced or dated future economics cannot be discounted at an explicit required return. priced_components_per_share is the raw proof-output sum. A present value is never annualized or discounted again."
     },
     "scenario_contract": {
       "rule": "Cases must change cited causal operating, capital, probability, timing, or financing drivers\u2014not only a terminal multiple.",
@@ -4566,7 +4599,7 @@
       },
       "all_material_components_priced": true,
       "calculation_errors": [],
-      "aggregate_proof_hash": "4bc0238ad29d67dcc229cc04fdb77d1d10b0c386f807c5e30a32ba26d96340db"
+      "aggregate_proof_hash": "c4727fbca1e584197f017701765aabcc5e57a66d5b0a03e8f6990f736f72f8c0"
     },
     "source_lineage": [
       {
@@ -4575,8 +4608,7 @@
         "ref": "AKAM/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0001086222_26_000022.htm",
         "locator": "NetCashProvidedByUsedInOperatingActivities $1,519M (FY2025)",
         "as_of": "2025-12-31",
-        "content_sha256": "15cd9a6c6621a09df7de8fdf6f6e520cef21094d9769d4a5d0cda26e1a3085b9",
-        "source_id": "563afa6587259ee5b37ba1bf09898f19eb57cbd16eead1546fffac5b51163a03"
+        "source_id": "2a48b5392d445fbcec6d66a4d77f106647a6a9007f84fe0816792b939ae9eeac"
       },
       {
         "component_id": "edge_platform_owner_cash_engine",
@@ -4584,8 +4616,7 @@
         "ref": "AKAM/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0001086222_26_000022.htm",
         "locator": "PaymentsToAcquirePropertyPlantAndEquipment $508M (FY2025)",
         "as_of": "2025-12-31",
-        "content_sha256": "15cd9a6c6621a09df7de8fdf6f6e520cef21094d9769d4a5d0cda26e1a3085b9",
-        "source_id": "28a2a677c4ce133c91d3e1c3c81b5ea1edebbf3040ddceef0fc43adc6521c19c"
+        "source_id": "f3a0920d8003ec6f8c2d8fd85d270d109575b703b1a061a50775b1e7a857cfdb"
       },
       {
         "component_id": "edge_platform_owner_cash_engine",
@@ -4593,8 +4624,7 @@
         "ref": "AKAM/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0001086222_26_000022.htm",
         "locator": "WeightedAverageNumberOfDilutedSharesOutstanding 147.0M (FY2025)",
         "as_of": "2025-12-31",
-        "content_sha256": "15cd9a6c6621a09df7de8fdf6f6e520cef21094d9769d4a5d0cda26e1a3085b9",
-        "source_id": "5e1ab36ef4d55b8413cb0db40f186d16cb2f384b67ac326de30366941a21e5f4"
+        "source_id": "578003ed91c7978c227ea5b8c42015ae51fa31be43fcff7b202159fe7989c5f8"
       },
       {
         "component_id": "compute_gpu_platform_option",
@@ -4602,8 +4632,7 @@
         "ref": "AKAM/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0001086222_26_000022.htm",
         "locator": "Compute $2.24B FY2025 (+10% YoY); largest solution line",
         "as_of": "2025-12-31",
-        "content_sha256": "15cd9a6c6621a09df7de8fdf6f6e520cef21094d9769d4a5d0cda26e1a3085b9",
-        "source_id": "ffd690bb2f210794a0af94dabcc2a6eac0376af4ce3196cac024a2683e2bf51d"
+        "source_id": "2c5bd804ecaef5ac6e46eec34842939db4ad700eaf90989bde548d44367d4623"
       },
       {
         "component_id": "compute_gpu_platform_option",
@@ -4611,8 +4640,7 @@
         "ref": "AKAM/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0001086222_26_000022.htm",
         "locator": "Remaining performance obligation ~$5.2B at FY2025",
         "as_of": "2025-12-31",
-        "content_sha256": "15cd9a6c6621a09df7de8fdf6f6e520cef21094d9769d4a5d0cda26e1a3085b9",
-        "source_id": "e3cdaebdd0ce3a0054446c7fad455100141be47171d4ba99bb8a0fd7fa36c711"
+        "source_id": "bd27c76d6a99f583f25e40f01605e44548cb32835d2a87ad662ddca76ec48e6f"
       },
       {
         "component_id": "compute_gpu_platform_option",
@@ -4620,8 +4648,7 @@
         "ref": "AKAM/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0001086222_26_000022.htm",
         "locator": "WeightedAverageNumberOfDilutedSharesOutstanding 147.0M (FY2025)",
         "as_of": "2025-12-31",
-        "content_sha256": "15cd9a6c6621a09df7de8fdf6f6e520cef21094d9769d4a5d0cda26e1a3085b9",
-        "source_id": "5e1ab36ef4d55b8413cb0db40f186d16cb2f384b67ac326de30366941a21e5f4"
+        "source_id": "578003ed91c7978c227ea5b8c42015ae51fa31be43fcff7b202159fe7989c5f8"
       },
       {
         "component_id": "net_financial_claims",
@@ -4629,8 +4656,7 @@
         "ref": "AKAM/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0001086222_26_000022.htm",
         "locator": "CashAndCashEquivalentsAtCarryingValue $930.2M at December 31, 2025",
         "as_of": "2025-12-31",
-        "content_sha256": "15cd9a6c6621a09df7de8fdf6f6e520cef21094d9769d4a5d0cda26e1a3085b9",
-        "source_id": "63bcacfe89d401d9118dba8fe9cf49c77eae20333e9c1409082a92b429f70bec"
+        "source_id": "82b3718a28aeb24bd6a4c01497a674afc87996ec0d5a59ad16676df19a43a222"
       },
       {
         "component_id": "net_financial_claims",
@@ -4638,8 +4664,7 @@
         "ref": "AKAM/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0001086222_26_000022.htm",
         "locator": "$1.15B due 2027 + $1.27B due 2029 + $1.73B due 2033 convertible notes",
         "as_of": "2025-12-31",
-        "content_sha256": "15cd9a6c6621a09df7de8fdf6f6e520cef21094d9769d4a5d0cda26e1a3085b9",
-        "source_id": "e5fc0462493786d0e2b28ad62d3b5412be4f36101509d19d72024fd5370bf0a5"
+        "source_id": "54f4bbd60fe1707240e89c6159d1619c98ebab973d8139e4bb9f5e83c187cf6e"
       },
       {
         "component_id": "net_financial_claims",
@@ -4647,8 +4672,7 @@
         "ref": "AKAM/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0001086222_26_000022.htm",
         "locator": "WeightedAverageNumberOfDilutedSharesOutstanding 147.0M (FY2025)",
         "as_of": "2025-12-31",
-        "content_sha256": "15cd9a6c6621a09df7de8fdf6f6e520cef21094d9769d4a5d0cda26e1a3085b9",
-        "source_id": "5e1ab36ef4d55b8413cb0db40f186d16cb2f384b67ac326de30366941a21e5f4"
+        "source_id": "578003ed91c7978c227ea5b8c42015ae51fa31be43fcff7b202159fe7989c5f8"
       },
       {
         "component_id": "cloud_competition_reserve",
@@ -4656,8 +4680,7 @@
         "ref": "AKAM/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0001086222_26_000022.htm",
         "locator": "OperatingIncomeLoss $567M FY2025",
         "as_of": "2025-12-31",
-        "content_sha256": "15cd9a6c6621a09df7de8fdf6f6e520cef21094d9769d4a5d0cda26e1a3085b9",
-        "source_id": "506e5fc18d33cc90ec27e8d506b58116519683516b485a3e6cf96e33bef853f9"
+        "source_id": "73915dc6e651df0c0cede9114da9e7e7756f90f64d4b07854d5c4cc3743adf6a"
       },
       {
         "component_id": "cloud_competition_reserve",
@@ -4665,8 +4688,7 @@
         "ref": "AKAM/investor-documents/sec-edgar/10-Q_20260508_rpt20260331_acc0001086222_26_000058.htm",
         "locator": "Operating income $114M Q1 2026 (-26% YoY) on higher cost of revenue",
         "as_of": "2026-03-31",
-        "content_sha256": "d75567066fc7c2a1674f585b16627668a1902dede971f570ca6797250d151395",
-        "source_id": "e6dd2084e2ee1bde11d941eafbaccff3f7631d1075af1f19d52bc9df0b2dac1f"
+        "source_id": "bec91b50e9b16c0237ecdb6a88bf1f18702f36e4c93562a2e05fd131e93b1a5e"
       },
       {
         "component_id": "cloud_competition_reserve",
@@ -4674,8 +4696,7 @@
         "ref": "AKAM/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0001086222_26_000022.htm",
         "locator": "WeightedAverageNumberOfDilutedSharesOutstanding 147.0M (FY2025)",
         "as_of": "2025-12-31",
-        "content_sha256": "15cd9a6c6621a09df7de8fdf6f6e520cef21094d9769d4a5d0cda26e1a3085b9",
-        "source_id": "5e1ab36ef4d55b8413cb0db40f186d16cb2f384b67ac326de30366941a21e5f4"
+        "source_id": "578003ed91c7978c227ea5b8c42015ae51fa31be43fcff7b202159fe7989c5f8"
       }
     ],
     "model_checks": {
@@ -4683,7 +4704,13 @@
       "component_sum_reconciles": true,
       "no_double_counting": true,
       "all_material_components_priced": true,
-      "low_base_high_ordered": true
+      "positive_base_or_explicit_zero_value": true,
+      "low_base_high_ordered": true,
+      "source_identity_and_freshness_valid": true,
+      "extreme_return_validated": true,
+      "output_basis_valid": true,
+      "dated_forward_economics_valid": true,
+      "present_value_is_not_treated_as_future_payoff": true
     },
     "evidence": {
       "unresolved_count": 0,
@@ -4705,7 +4732,7 @@
       ]
     },
     "change_control": {
-      "model_hash": "b9d14982481546a2cf7b641b2b21dbc2f6202ec9101c9cc3c847a2967f332664",
+      "model_hash": "3f73baa221461eb0fc1e88dddf37e64ac8bc902bf95462c7c98ab73e6858e653",
       "method_versions": [
         "net_asset_value@1.0",
         "owner_cash_or_dividend_discount@1.0",
@@ -4714,6 +4741,280 @@
       "change_log": [],
       "rule": "A source fact is locked. Every assumption change requires a reason, author, timestamp, and before/after value."
     },
-    "decision_rule": "No security is decision-grade until every material claim is valued exactly once by a valid calculation proof and every material evidence blocker is resolved."
+    "decision_rule": "Proof status and investment readiness are separate. Every material claim must be valued exactly once by a valid calculation proof, every evidence blocker must be resolved, and the model must be stock-specific before committee review. Only a human decision can authorize capital."
+  },
+  "pricing_analysis": {
+    "schema_version": "1.0",
+    "as_of": "2026-09-25",
+    "price": 124.215,
+    "price_source": "Yahoo AKAM close 2026-07-21",
+    "economic_units": 147000000,
+    "economic_claim_note": "Per-share claims use fully diluted shares from valuation.inputs.",
+    "component_value_per_share": {
+      "low": 50.0,
+      "base": 125.16,
+      "high": 233.0
+    },
+    "upside_downside_pct": {
+      "low": -59.7,
+      "base": 0.8,
+      "high": 87.6
+    },
+    "base_value_supported_by_current_or_contracted_assets": 115.16,
+    "market_price_above_current_or_contracted_value": 9.06,
+    "market_implied_constant_owner_cash_growth_pct": -7.4,
+    "implied_growth_contract": "Constant 7-year owner-cash growth with a 22x terminal owner-cash multiple; diagnostic, not forecast.",
+    "entry_prices_by_hurdle_and_case": {
+      "bear": {
+        "10pct": 113.84,
+        "12pct": 102.37,
+        "15pct": 87.79,
+        "20pct": 68.98
+      },
+      "base": {
+        "10pct": 153.74,
+        "12pct": 137.69,
+        "15pct": 117.34,
+        "20pct": 91.19
+      },
+      "bull": {
+        "10pct": 216.78,
+        "12pct": 193.42,
+        "15pct": 163.87,
+        "20pct": 126.02
+      }
+    },
+    "primary_entry_price_15pct_base": 117.34,
+    "decision": "watch_pending_owner_review",
+    "strongest_counter_explanation": "growth projected without its capital cost",
+    "falsifiers": [
+      "growth projected without its capital cost",
+      "stock compensation or acquisitions omitted",
+      "terminal value unsupported by a durable mechanism"
+    ],
+    "pricing_conclusion": "Entry prices were computed mechanically from the routed power-zone profile (High-return compounder). They are decision inputs, not a decision; the owner must review the scenarios before acting.",
+    "economic_value_bridge": {
+      "schema_version": "1.0",
+      "status": "complete",
+      "trigger": {
+        "required": true,
+        "reasons": [
+          "explicit_component_schedule"
+        ],
+        "policy": "A complete economic-value analysis is required when any trigger fires; otherwise it is recommended."
+      },
+      "method": "component_economic_value",
+      "economic_claim": {
+        "description": "One diluted share of AKAM, including edge platform owner cash, Compute/GPU upside, net financial claims, and cloud competition reserve.",
+        "unit_label": "diluted share",
+        "unit_count": 147000000,
+        "unit_source": "FY2025 weighted average diluted shares 147.0M (AKAM/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0001086222_26_000022.htm).",
+        "enterprise_to_equity_reconciliation": "Consolidated platform engine valued through owner-cash discount on FY2025 FCF per share; Compute option, net liquidity, and competition reserve are separate overlap keys."
+      },
+      "gaap_role": "cross_check",
+      "accounting_reference": "FY2025 10-K: stockholders' equity ~$4.98B; economic value in normalized owner cash ($6.8789/sh), not GAAP book alone.",
+      "comparable_hierarchy": [
+        "issuer_arm_length_transaction",
+        "same_asset_transaction",
+        "public_peer",
+        "replacement_cost",
+        "approved_external_analysis"
+      ],
+      "gross_comparable_nav_per_share": null,
+      "risked_present_value_per_share": {
+        "low": 50.0,
+        "base": 125.16,
+        "high": 233.0
+      },
+      "component_groups": [
+        {
+          "id": "edge_platform_owner_cash_engine",
+          "label": "Edge platform owner-cash engine",
+          "component_ids": [
+            "edge_platform_owner_cash_engine"
+          ],
+          "economic_claim": "Compute, Security, and Delivery normalized free cash flow",
+          "valuation_basis": "Owner-cash discount on FY2025 FCF per diluted share.",
+          "adjustments": "Q1 2026 margin compression noted; not normalized out of base.",
+          "overlap_control": "Unique overlap key edge_platform_owner_cash_engine.",
+          "risked_present_value_per_share": {
+            "low": 98.0,
+            "base": 145.0,
+            "high": 215.0
+          }
+        },
+        {
+          "id": "compute_gpu_platform_option",
+          "label": "Compute and GPU/cloud platform upside option",
+          "component_ids": [
+            "compute_gpu_platform_option"
+          ],
+          "economic_claim": "Incremental GPU/cloud monetization beyond normalized FCF",
+          "valuation_basis": "Risk-adjusted milestone value on Compute mix shift and RPO.",
+          "adjustments": "Not in Lawrence base FCF path; Compute +10% FY2025 supports base band.",
+          "overlap_control": "Unique overlap key compute_gpu_platform_option.",
+          "risk_and_timing": {
+            "probability_basis": "Base ~40% that Compute sustains high-single-digit growth with margin recovery.",
+            "timing_basis": "RPO ~$5.2B converts over multi-year contracts per FY2025 10-K.",
+            "remaining_capital_basis": "Operating-lease and capex wave for compute build-out in proof judgment band."
+          },
+          "risked_present_value_per_share": {
+            "low": 0.0,
+            "base": 10.0,
+            "high": 28.0
+          }
+        },
+        {
+          "id": "net_financial_claims",
+          "label": "Net cash and convertible debt claims on common equity",
+          "component_ids": [
+            "net_financial_claims"
+          ],
+          "economic_claim": "Net corporate liquidity after convertible notes and operating minimum",
+          "valuation_basis": "Net asset value on filing-locked cash less convertible debt.",
+          "adjustments": "Convertible notes at principal; no equity credit in base case.",
+          "overlap_control": "Unique overlap key net_financial_claims.",
+          "risked_present_value_per_share": {
+            "low": -28.0,
+            "base": -21.84,
+            "high": -8.0
+          }
+        },
+        {
+          "id": "cloud_competition_reserve",
+          "label": "Cloud price competition and Security share-loss stress reserve",
+          "component_ids": [
+            "cloud_competition_reserve"
+          ],
+          "economic_claim": "Hyperscaler/Cloudflare pricing and Security erosion stress",
+          "valuation_basis": "Bounded negative reserve; not full enterprise value haircut.",
+          "adjustments": "Partial dhando: cloud price war could compress FCF faster than low growth scenario.",
+          "overlap_control": "Unique overlap key cloud_competition_reserve.",
+          "risked_present_value_per_share": {
+            "low": -20.0,
+            "base": -8.0,
+            "high": -2.0
+          }
+        }
+      ],
+      "valuation_proof": [
+        {
+          "component_id": "edge_platform_owner_cash_engine",
+          "economic_claim": "Compute, Security, and Delivery normalized free cash flow",
+          "quantity": {
+            "value": 1,
+            "unit": "per-share economic claim"
+          },
+          "method": "owner_cash_or_dividend_discount",
+          "evidence_tier": "primary_derived",
+          "evidence": "Primary bridge from AKAM/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0001086222_26_000022.htm: FY2025 revenue $4208.2B, OCF $1519.0M, FCF $1011.2M, cash $930.2M, convertible debt $4140.0M; contract backfill 2026-07-21.",
+          "comparable_role": "not_applicable",
+          "comparable_ids": [],
+          "adjustment": "Q1 2026 margin compression noted; not normalized out of base.",
+          "range_per_share": {
+            "low": 98.0,
+            "base": 145.0,
+            "high": 215.0
+          },
+          "treatment": "additive",
+          "overlap_key": "edge_platform_owner_cash_engine",
+          "overlap_control": "Unique overlap key edge_platform_owner_cash_engine.",
+          "falsifier": "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
+          "risk_and_timing": null
+        },
+        {
+          "component_id": "compute_gpu_platform_option",
+          "economic_claim": "Incremental GPU/cloud monetization beyond normalized FCF",
+          "quantity": {
+            "value": 1,
+            "unit": "per-share economic claim"
+          },
+          "method": "risk_adjusted_milestone_value",
+          "evidence_tier": "primary_derived",
+          "evidence": "Primary bridge from AKAM/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0001086222_26_000022.htm: FY2025 revenue $4208.2B, OCF $1519.0M, FCF $1011.2M, cash $930.2M, convertible debt $4140.0M; contract backfill 2026-07-21.",
+          "comparable_role": "not_applicable",
+          "comparable_ids": [],
+          "adjustment": "Not in Lawrence base FCF path; Compute +10% FY2025 supports base band.",
+          "range_per_share": {
+            "low": 0.0,
+            "base": 10.0,
+            "high": 28.0
+          },
+          "treatment": "additive",
+          "overlap_key": "compute_gpu_platform_option",
+          "overlap_control": "Unique overlap key compute_gpu_platform_option.",
+          "falsifier": "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
+          "risk_and_timing": {
+            "success_probability": null,
+            "remaining_capital_m": null,
+            "timing_basis": "RPO ~$5.2B converts over multi-year contracts per FY2025 10-K.",
+            "probability_basis": "Base ~40% that Compute sustains high-single-digit growth with margin recovery.",
+            "remaining_capital_basis": "Operating-lease and capex wave for compute build-out in proof judgment band."
+          }
+        },
+        {
+          "component_id": "net_financial_claims",
+          "economic_claim": "Net corporate liquidity after convertible notes and operating minimum",
+          "quantity": {
+            "value": 1,
+            "unit": "per-share economic claim"
+          },
+          "method": "net_asset_value",
+          "evidence_tier": "primary_derived",
+          "evidence": "Primary bridge from AKAM/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0001086222_26_000022.htm: FY2025 revenue $4208.2B, OCF $1519.0M, FCF $1011.2M, cash $930.2M, convertible debt $4140.0M; contract backfill 2026-07-21.",
+          "comparable_role": "not_applicable",
+          "comparable_ids": [],
+          "adjustment": "Convertible notes at principal; no equity credit in base case.",
+          "range_per_share": {
+            "low": -28.0,
+            "base": -21.84,
+            "high": -8.0
+          },
+          "treatment": "additive",
+          "overlap_key": "net_financial_claims",
+          "overlap_control": "Unique overlap key net_financial_claims.",
+          "falsifier": "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
+          "risk_and_timing": null
+        },
+        {
+          "component_id": "cloud_competition_reserve",
+          "economic_claim": "Hyperscaler/Cloudflare pricing and Security erosion stress",
+          "quantity": {
+            "value": 1,
+            "unit": "per-share economic claim"
+          },
+          "method": "net_asset_value",
+          "evidence_tier": "primary_derived",
+          "evidence": "Primary bridge from AKAM/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0001086222_26_000022.htm: FY2025 revenue $4208.2B, OCF $1519.0M, FCF $1011.2M, cash $930.2M, convertible debt $4140.0M; contract backfill 2026-07-21.",
+          "comparable_role": "not_applicable",
+          "comparable_ids": [],
+          "adjustment": "Partial dhando: cloud price war could compress FCF faster than low growth scenario.",
+          "range_per_share": {
+            "low": -20.0,
+            "base": -8.0,
+            "high": -2.0
+          },
+          "treatment": "additive",
+          "overlap_key": "cloud_competition_reserve",
+          "overlap_control": "Unique overlap key cloud_competition_reserve.",
+          "falsifier": "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
+          "risk_and_timing": null
+        }
+      ],
+      "wisdom_applied": [],
+      "limitations": [
+        "Segment-level FCF not separately disclosed; consolidated engine with Compute option overlay.",
+        "Convertible note equity conversion and competition reserve bands are judgment."
+      ],
+      "complete_component_coverage": true,
+      "validation_errors": [],
+      "registry_version": "1.0"
+    },
+    "committee_routing": {
+      "stage": "not_initialized",
+      "packet_hash": null,
+      "selected_raters": [],
+      "independence_groups": []
+    }
   }
 }
