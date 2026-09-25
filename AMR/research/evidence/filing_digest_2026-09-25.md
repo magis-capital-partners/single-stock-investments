@@ -30,7 +30,7 @@ Documents in folder: **128** (all listed below; Tier 1–3 extracted or keyword-
 | partial | 10-K | 2020-04-13 | `investor-documents/sec-edgar/10-K-A_20200413_rpt20191231_acc0001704715_20_000016.htm` | 30058 |
 | partial | 10-K | 2022-03-07 | `investor-documents/sec-edgar/10-K_20220307_rpt20211231_acc0001704715_22_000012.htm` | 30057 |
 | partial | 10-K | 2023-02-23 | `investor-documents/sec-edgar/10-K_20230223_rpt20221231_acc0001704715_23_000010.htm` | 30057 |
-| full | 10-K | 2024-02-26 | `investor-documents/sec-edgar/10-K_20240226_rpt20231231_acc0001704715_24_000028.htm` | 636863 |
+| full | 10-K | 2024-02-26 | `investor-documents/sec-edgar/10-K_20240226_rpt20231231_acc0001704715_24_000028.htm` | 384221 |
 | full | 10-K | 2025-02-28 | `investor-documents/sec-edgar/10-K_20250228_rpt20241231_acc0001704715_25_000010.htm` | 605374 |
 | full | 10-K | 2026-02-27 | `investor-documents/sec-edgar/10-K_20260227_rpt20251231_acc0001704715_26_000010.htm` | 608008 |
 | scan | 10-Q | — | `investor-documents/ir-amr/10-Q-Contura.pdf` | 0 |
@@ -219,41 +219,41 @@ Documents in folder: **128** (all listed below; Tier 1–3 extracted or keyword-
 
 ### `investor-documents/sec-edgar/10-K_20240226_rpt20231231_acc0001704715_24_000028.htm`
 **Keyword snippets (related party, financials, segments):**
-- RevenueFromContractWithCustomerExcludingAssessedTax: 3,456,630
-- RevenueFromContractWithCustomerExcludingAssessedTax: 4,092,987
-- RevenueFromContractWithCustomerExcludingAssessedTax: 2,252,624
-- Revenues: 3,471,417
-- Revenues: 4,101,592
-- Revenues: 2,258,686
-- LongTermDebtAndCapitalLeaseObligationsCurrent: 3,582
-- LongTermDebtAndCapitalLeaseObligationsCurrent: 3,078
-- LongTermDebtAndCapitalLeaseObligations: 6,792
-- LongTermDebtAndCapitalLeaseObligations: 7,897
-- StockholdersEquity: 1,573,928
-- StockholdersEquity: 1,429,755
-- LiabilitiesAndStockholdersEquity: 2,406,057
-- LiabilitiesAndStockholdersEquity: 2,312,479
-- StockholdersEquity: 206
-- StockholdersEquity: 779,424
-- StockholdersEquity: 111,985
-- StockholdersEquity: 107,014
-- StockholdersEquity: 360,529
-- StockholdersEquity: 200,102
-- StockholdersEquity: 208
-- StockholdersEquity: 784,743
-- StockholdersEquity: 58,503
-- StockholdersEquity: 107,800
-- StockholdersEquity: 71,739
-- StockholdersEquity: 546,909
-- StockholdersEquity: 217
-- StockholdersEquity: 815,442
-- StockholdersEquity: 12,162
-- StockholdersEquity: 649,061
-- StockholdersEquity: 1,275,319
-- StockholdersEquity: 221
-- StockholdersEquity: 834,482
-- StockholdersEquity: 40,587
-- StockholdersEquity: 1,189,715
+- (Address of principal executive offices, zip code)
+- Risk Factors
+- (5) Net Income per Share
+- (16) Fair Value of Financial Instruments and Fair Value Measurements
+- (19) Stock-Based Compensation Awards
+- (20) Related Party Transactions
+- (23) Segment Information
+- Directors, Executive Officers and Corporate Governance
+- Executive Compensation
+- Certain Relationships and Related Transactions, and Director Independence
+- (5) Net book value of property, plant and equipment and owned and leased mineral rights as of December 31, 2023.
+- Financial Information About Reportable Segments and Geographic Areas
+- Distribution and Transportation
+- Employee Compensation and Benefits
+- Comprehensive Environmental Response, Compensation and Liability Act
+- Initial assessment. A preliminary technical and economic study of the economic potential of all or parts of mineralization to support the disclosure of mineral resources.
+- Operating Margin. Coal revenues less cost of coal sales.
+- Probable mineral reserve. The economically mineable part of an indicated and, in some cases, a measured coal resource.
+- Proven mineral reserve. The economically mineable part of a measured coal resource.
+- Qualified person. A mineral industry professional as defined in subpart 1300 of Regulation S-K.
+- Roof. The stratum of rock or other mineral above a coal seam; the overhead surface of a coal working place.
+- Item 1A. Risk Factors
+- Investment in our common stock is subject to various risks, including risks and uncertainties inherent in our business. As detailed in the following pages, these risks include, but are not limited to, the following:
+- Declines in coal prices would adversely affect our revenues, operating results, cash flows, financial condition, stock price and the value of our coal reserves.
+- The concurrent loss of, or significant reduction in, purchases by several of our largest customers could materially and adversely affect our revenues and profitability.
+- or a significant reduction in our sales volume to such customers were to happen, our revenues and profitability could be materially and adversely affected.
+- Continuing low demand for thermal coal, or further declines in demand, by North American electric power generators could reduce the price of our thermal coal, which would reduce our revenues.
+- We may be unable to obtain and renew permits, mine plan modifications and approvals, leases or other rights necessary for our operations, which would reduce our production, cash flows and profitability.
+- &#8226; accidental mine water discharges, coal slurry releases and failures of an impoundment or refuse area, including inadvertent environmental impacts to the local community;
+- Conflicts with competing holders of mineral rights and rights to use adjacent, overlying or underlying lands could materially and adversely affect our ability to mine coal or do so on a cost-effective basis.
+- Provisions in our lease agreements, defects in title in our mine properties or loss of leasehold rights could limit our ability to recover coal from our properties or result in significant unanticipated costs.
+- Our business requires substantial capital investment and maintenance expenditures, which we may be unable to provide.
+- Failure to obtain or renew surety bonds on acceptable terms could affect our ability to secure reclamation and coal lease obligations, which could adversely affect our ability to mine or lease coal.
+- &#8226; quarterly variations in the rate of growth of our financial indicators, such as net income per share, net income and revenues;
+- &#8226; the public reaction to our press releases, our other public announcements and our filings with the SEC;
 
 ### `investor-documents/ir-amr/q3-2017-ytd-results-11-27-17.pdf`
 - *(no keyword hits; see cached full text in `research/evidence/_text/` if tier=full)*
