@@ -37,8 +37,42 @@ jobs:
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          fetch-depth: 1
+          filter: blob:none
+          # A full checkout (~200k files) outran the 10-minute timeout: the
+          # 2026-08-26 runs were cancelled mid-checkout. The check needs the
+          # scripts, the benchmark data, and the filings the gold cases cite
+          # (added in the next step).
+          sparse-checkout: |
+            /Makefile
+            /_system/scripts/
+            /_system/data/filing_sentinel_*
+            /_system/frameworks/filing_sentinel_gold_set.md
+          sparse-checkout-cone-mode: false
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
+      - name: Add the filings the gold cases cite
+        # The validator checks a lock only when the cited file is present, so
+        # without these the source hashes would pass unverified.
+        run: |
+          set -euo pipefail
+          python - > "$RUNNER_TEMP/gold-sources.txt" <<'PY'
+          import json
+
+          with open("_system/scripts/_eval/filing_sentinel_gold.jsonl", encoding="utf-8") as handle:
+              for line in handle:
+                  if not line.strip():
+                      continue
+                  filing = json.loads(line).get("filing") or {}
+                  for key in ("source_ref", "extract_ref", "comparison_source_ref"):
+                      ref = str(filing.get(key) or "")
+                      if ref and not ref.startswith(("http://", "https://")):
+                          print("/" + ref)
+          PY
+          cat "$RUNNER_TEMP/gold-sources.txt"
+          git sparse-checkout add --stdin < "$RUNNER_TEMP/gold-sources.txt"
       - name: Validate benchmark and evaluator
         run: make filing-sentinel-gold-check filing-sentinel-workflow-check PYTHON=python

@@ -3,9 +3,12 @@
 from __future__ import annotations
 
 import copy
+import hashlib
 import sys
+import tempfile
 import unittest
 from pathlib import Path
+from unittest import mock
 
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "_system" / "scripts"))
@@ -30,6 +33,41 @@ class FilingSentinelGoldTests(unittest.TestCase):
 
     def test_locked_gold_set_validates(self) -> None:
         self.assertEqual(validate_dataset(self.gold, self.taxonomy, require_gold=True), [])
+
+    def test_source_lock_does_not_depend_on_checkout_line_endings(self) -> None:
+        # Run 32165718813: locks taken on a Windows checkout (autocrlf, CRLF)
+        # failed on Linux CI (LF) for all four cases, filings untouched.
+        import filing_sentinel_gold as fsg
+
+        lf = b"<html>\nItem 7. Liquidity\n</html>\n"
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            (root / "ABC").mkdir()
+            (root / "ABC" / "lf.htm").write_bytes(lf)
+            (root / "ABC" / "crlf.htm").write_bytes(lf.replace(b"\n", b"\r\n"))
+            case = copy.deepcopy(self.gold[0])
+            case["filing"]["source_sha256"] = hashlib.sha256(lf).hexdigest()
+            case["filing"]["extract_ref"] = None
+            case["filing"]["extract_sha256"] = None
+            with mock.patch.object(fsg, "ROOT", root):
+                for name in ("lf.htm", "crlf.htm"):
+                    case["filing"]["source_ref"] = f"ABC/{name}"
+                    errors = fsg.validate_case(case, self.taxonomy, require_gold=True)
+                    self.assertEqual([e for e in errors if "source_sha256" in e], [], name)
+                # A real change to the filing is still caught.
+                (root / "ABC" / "crlf.htm").write_bytes(lf.replace(b"Liquidity", b"Solvency"))
+                errors = fsg.validate_case(case, self.taxonomy, require_gold=True)
+                self.assertTrue(any("source_sha256 does not match" in e for e in errors), errors)
+
+    def test_miners_lock_the_same_hash_on_every_platform(self) -> None:
+        import filing_sentinel_gold as fsg
+
+        with tempfile.TemporaryDirectory() as tmp:
+            lf, crlf = Path(tmp) / "lf.htm", Path(tmp) / "crlf.htm"
+            lf.write_bytes(b"a\nb\n")
+            crlf.write_bytes(b"a\r\nb\r\n")
+            self.assertEqual(fsg.filing_file_sha256(lf), fsg.filing_file_sha256(crlf))
+            self.assertEqual(fsg.filing_file_sha256(lf), hashlib.sha256(b"a\nb\n").hexdigest())
 
     def test_excerpt_tampering_is_detected(self) -> None:
         rows = copy.deepcopy(self.gold)

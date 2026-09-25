@@ -34,6 +34,18 @@ def _sha256(value: str | bytes) -> str:
     return hashlib.sha256(raw).hexdigest()
 
 
+def filing_file_sha256(path: Path) -> str:
+    """Hash of a filing on disk that does not depend on the checkout's line endings.
+
+    A Windows checkout with core.autocrlf=true holds CRLF; git and every Linux
+    checkout hold LF. The gold locks were taken on Windows, so CI reported
+    "filing.source_sha256 does not match local source_ref" for all four cases
+    (run 32165718813) with the filings untouched. CRLF is folded to LF first,
+    which makes the lock equal to the hash of the committed blob.
+    """
+    return _sha256(path.read_bytes().replace(b"\r\n", b"\n"))
+
+
 def _iso(raw: str) -> str:
     return f"{raw[:4]}-{raw[4:6]}-{raw[6:8]}"
 
@@ -119,12 +131,12 @@ def validate_case(case: dict, taxonomy: dict, *, require_gold: bool = False) -> 
             local = ROOT / str(ref)
             # Extracts are tracked text and may be checked out with CRLF on
             # Windows. Hash their logical UTF-8 text so the locked benchmark is
-            # invariant across checkout platforms; raw source filings retain
-            # byte-exact hashing.
+            # invariant across checkout platforms; raw source filings are
+            # hashed byte-exact apart from line endings (filing_file_sha256).
             actual_hash = (
                 _sha256(local.read_text(encoding="utf-8", errors="ignore"))
                 if local.exists() and hash_field == "extract_sha256"
-                else _sha256(local.read_bytes()) if local.exists() else None
+                else filing_file_sha256(local) if local.exists() else None
             )
             if actual_hash is not None and actual_hash != expected_hash:
                 errors.append(f"{case_id}: filing.{hash_field} does not match local {ref_field}")
@@ -381,7 +393,7 @@ def mine_candidates(*, universe: str, tickers: set[str], as_of: str, limit: int)
         extract_ref = f"{ticker}/research/{source_text}" if source_text else None
         source_ref = str(doc.get("source_filing_ref") or extract_ref or fact_path.relative_to(ROOT)).replace("\\", "/")
         source_path = ROOT / source_ref
-        source_hash = _sha256(source_path.read_bytes()) if source_path.exists() else None
+        source_hash = filing_file_sha256(source_path) if source_path.exists() else None
         extract_hash = _sha256(extract_path.read_bytes()) if extract_path else None
         raw_id = f"{ticker}|{meta['filing_form']}|{meta['filing_date']}|{source_ref}"
         case_id = f"fs-{ticker.lower().replace('.', '-')}-{meta['filing_date']}-{_sha256(raw_id)[:8]}"

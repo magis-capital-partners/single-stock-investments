@@ -12,7 +12,7 @@ assert_ref() {
   local actual
   actual=$(resolve_checkout_ref "${3:-}")
   if [ "$actual" != "$expected" ]; then
-    echo "FAIL: $name  expected '$expected', got '$actual'" >&2
+    echo "FAIL: $name -- expected '$expected', got '$actual'" >&2
     exit 1
   fi
   echo "OK: $name"
@@ -33,11 +33,20 @@ run_case() {
 
 run_case "explicit ref wins" "feature/foo" "feature/foo" \
   "GITHUB_EVENT_NAME=pull_request" "GITHUB_HEAD_REF=cursor/x" "GITHUB_REF_NAME=99/merge"
-run_case "PR uses head branch" "cursor/tbbk-onboard-deep-dive-d8c4" "" \
+# The PR's persistent head ref, not the branch name: automerge deletes the
+# branch seconds after merging, and `git fetch origin <branch>` then fails.
+run_case "PR uses the persistent pull/N/head ref" "pull/228/head" "" \
   "GITHUB_EVENT_NAME=pull_request" \
   "GITHUB_HEAD_REF=cursor/tbbk-onboard-deep-dive-d8c4" \
   "GITHUB_REF=refs/pull/228/merge" \
   "GITHUB_REF_NAME=228/merge"
+run_case "PR head ref ignores a (possibly deleted) branch name" "pull/1021/head" "" \
+  "GITHUB_EVENT_NAME=pull_request" \
+  "GITHUB_HEAD_REF=cursor/crwd-epistemic-forecast-8702" \
+  "GITHUB_REF=refs/pull/1021/merge"
+run_case "PR without a pull ref falls back to the head branch" "cursor/x" "" \
+  "GITHUB_EVENT_NAME=pull_request" \
+  "GITHUB_HEAD_REF=cursor/x"
 run_case "pull ref without head" "pull/228/merge" "" \
   "GITHUB_REF=refs/pull/228/merge" \
   "GITHUB_REF_NAME=228/merge"

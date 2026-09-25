@@ -12,19 +12,12 @@ ROOT = Path(__file__).resolve().parents[2]
 class WorkflowGovernanceTests(unittest.TestCase):
     def test_actions_surface_has_no_manual_run_choices(self):
         # Existing schedule+manual ops surfaces; everything else is schedule/push only.
-        # Existing schedule+manual ops surfaces, plus one disabled lane.
-        # darwin-refresh.yml was switched off indefinitely on 2026-08-23 by
-        # commenting out its cron and push triggers. A workflow must keep at
-        # least one trigger or the file is invalid, so `workflow_dispatch`
-        # is what remains -- and it is disabled in the GitHub UI as well, so
-        # the manual surface this test guards against does not actually exist.
-        # Listing it here is the honest encoding of that; the alternative is a
-        # permanently red check that says nothing.
+        # (darwin-refresh.yml, disabled since 2026-08-23 and kept only as a
+        # workflow_dispatch stub, was deleted on 2026-09-24.)
         allow_manual = {
             "dashboard-pages.yml",
             "letter-backfill.yml",
             "podcast-refresh.yml",
-            "darwin-refresh.yml",
         }
         for path in (ROOT / ".github" / "workflows").glob("*.yml"):
             if path.name in allow_manual:
@@ -63,6 +56,15 @@ class WorkflowGovernanceTests(unittest.TestCase):
             "portfolio-news.yml",
             "batch-onboard-pdfs.yml",
             "ci-autofix-reusable.yml",
+            # Deleted 2026-09-24. darwin-refresh and youtube-refresh were
+            # disabled in the UI; vicki-ir-harvest last ran 2026-06-17 (every
+            # run failed) and nothing has written its trigger queue since
+            # 2026-06-11. The YouTube lane runs on the workstation
+            # (youtube_lane.py): a self-hosted runner on a public repo would
+            # run fork PRs there.
+            "darwin-refresh.yml",
+            "youtube-refresh.yml",
+            "vicki-ir-harvest.yml",
         }
         active = {path.name for path in (ROOT / ".github" / "workflows").glob("*.yml")}
         self.assertTrue(retired.isdisjoint(active))
@@ -112,12 +114,19 @@ class WorkflowGovernanceTests(unittest.TestCase):
     def test_agent_pr_merge_waits_for_research_quality_without_race(self):
         workflow = (ROOT / ".github" / "workflows" / "marvin-pr-automerge.yml").read_text(encoding="utf-8")
         self.assertIn("wait_for_workflow_run.py", workflow)
-        # Must match research-quality.yml's `name:` exactly: workflow_run and
-        # `gh run list --workflow` resolve by name string, so a rename that
-        # misses this line silently disables the wait.
-        quality = (ROOT / ".github" / "workflows" / "research-quality.yml").read_text(encoding="utf-8")
-        name = re.search(r"^name:\s*(.+)$", quality, re.MULTILINE).group(1).strip()
-        self.assertIn(f'workflows: ["{name}"]', workflow)
+        # Every workflow_run name must match a workflow's `name:` exactly:
+        # workflow_run and `gh run list --workflow` resolve by name string, so
+        # a rename that misses this list silently disables the trigger.
+        names = set()
+        for path in (ROOT / ".github" / "workflows").glob("*.yml"):
+            match = re.search(r"^name:\s*(.+)$", path.read_text(encoding="utf-8"), re.MULTILINE)
+            if match:
+                names.add(match.group(1).strip())
+        listed = re.search(r"^    workflows: \[(.+)\]$", workflow, re.MULTILINE).group(1)
+        triggers = [item.strip().strip('"') for item in listed.split(",")]
+        self.assertIn("Research quality", triggers)
+        for trigger in triggers:
+            self.assertIn(trigger, names, f"workflow_run names {trigger!r}, which no workflow is called")
         self.assertNotIn("lewagon/wait-on-check-action", workflow)
 
     def test_agent_pr_merge_serializes_squash_on_main(self):
@@ -167,20 +176,21 @@ class WorkflowGovernanceTests(unittest.TestCase):
         self.assertIn('bash _system/scripts/ci_push_main.sh "chore(valuation): process Power Zone universe"', workflow)
         self.assertNotIn('git push origin "HEAD:${GITHUB_REF_NAME}"', workflow)
 
-    def test_research_quality_checks_use_persistent_pr_head_ref(self):
+    def test_research_quality_checks_out_the_exact_commit(self):
         workflow = (ROOT / ".github" / "workflows" / "research-quality.yml").read_text(encoding="utf-8")
-        persistent_ref = '"pull/${{ github.event.pull_request.number }}/head"'
-        # Every PR-ref checkout must use the persistent pull/N/head ref, which
-        # survives a force-push, rather than the branch name. Assert the
-        # property, not a count: jobs get added.
-        checkouts = re.findall(r"ci_checkout_workspace\.sh \w+ (.+)$", workflow, re.MULTILINE)
-        pr_checkouts = [ref for ref in checkouts if "pull_request" in ref]
-        self.assertTrue(pr_checkouts)
-        for ref in pr_checkouts:
-            # Every PR-ref checkout must use the persistent pull/N/head form
-            # (survives force-push); other persistent-ref uses (e.g. a git
-            # fetch deepening history) are fine and not counted.
-            self.assertTrue(ref.startswith(persistent_ref), ref)
+        # Every checkout tests the exact commit the run is for: the PR head SHA
+        # on pull_request, github.sha on push and schedule. A ref moves under a
+        # queued run (a push run for d43005e86d tested 26422889c646) and a
+        # branch can be deleted under it. Assert the property, not a count:
+        # jobs get added.
+        self.assertRegex(
+            workflow,
+            r"(?m)^  CHECKOUT_SHA: \$\{\{ github\.event\.pull_request\.head\.sha \|\| github\.sha \}\}$",
+        )
+        checkouts = re.findall(r"ci_checkout_workspace\.sh \w+(.*)$", workflow, re.MULTILINE)
+        self.assertTrue(checkouts)
+        for rest in checkouts:
+            self.assertTrue(rest.strip().startswith('"$CHECKOUT_SHA"'), rest)
         self.assertNotIn("github.event.pull_request.head.ref", workflow)
 
     def test_model_ladder_defaults_cheap_and_escalates_frontier(self):

@@ -1,11 +1,13 @@
 name: Research quality
 
 on:
-  # The SSI pipeline and fact-ledger currency jobs are self-contained and must
-  # also validate direct pushes to main, which bypass pull_request entirely --
-  # and batch valuation writes land on main by direct push, which is exactly how
-  # a mislabeled-currency fact would arrive. The other jobs in this file need a
-  # PR base ref and stay gated to pull_request below.
+  # push: the SSI pipeline, fact-ledger currency and graph-invariants jobs
+  # also run on direct pushes to main, which bypass pull_request entirely. In
+  # practice that is only human pushes: the batch lanes (where a mislabeled-
+  # currency fact would arrive) and automerge push with GITHUB_TOKEN, which
+  # starts no workflow run at all. Their commits are checked by the schedule
+  # below, which tests main HEAD every six hours, not each push. The other jobs
+  # need a PR base ref and stay gated to pull_request.
   push:
     branches: [main]
     paths:
@@ -58,6 +60,7 @@ on:
       # judged surface never triggers the suite.
       - "**/research/valuation_contract.json"
       - "**/research/falsifier_specs.json"
+      - "**/research/falsifier_drafts/**"
       - "_system/research/**"
       - "_system/data/runs/**"
       - "_system/data/epistemic_work_queue.json"
@@ -78,6 +81,13 @@ on:
       - "_system/portfolio/registry.json"
       - "_system/scripts/persona_groups.py"
       - "_system/scripts/persona_lens_common.py"
+  # Main HEAD is otherwise almost never tested. Pushes made with GITHUB_TOKEN
+  # (automerge squashes, every batch lane) start no workflow, so `on: push`
+  # fires only for human pushes: the last push run before this was 2026-09-23
+  # 22:46, and nothing checked main for the day after. Off the hour, four
+  # times a day.
+  schedule:
+    - cron: "37 1,7,13,19 * * *"
   pull_request:
     branches: [main]
     paths:
@@ -162,12 +172,23 @@ on:
 permissions:
   contents: read
   pull-requests: read
+  # The scheduled history check looks up the previous scheduled run.
+  actions: read
 
 concurrency:
   # On push there is no PR number; keying on the sha gives each push its own
   # group so frequent automated commits to main don't cancel each other's run.
-  group: research-quality-${{ github.event.pull_request.number || github.sha }}
+  # The event name keeps a scheduled run from cancelling a push run on the
+  # same sha, and the other way round.
+  group: research-quality-${{ github.event.pull_request.number || format('{0}-{1}', github.event_name, github.sha) }}
   cancel-in-progress: true
+
+env:
+  # Every job tests this exact commit: the PR head the run was triggered for,
+  # or the pushed / scheduled main commit. A branch name moves (a push run for
+  # d43005e86d tested 26422889c646, run 35927546486) and can vanish (automerge
+  # deletes the head branch on merge).
+  CHECKOUT_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
 
 jobs:
   changes:
@@ -185,7 +206,8 @@ jobs:
         uses: actions/github-script@v7
         with:
           script: |
-            const isPush = context.eventName === 'push';
+            // A scheduled run tests main HEAD exactly like a push does.
+            const isPush = context.eventName === 'push' || context.eventName === 'schedule';
             let names = [];
             if (!isPush) {
               const files = await github.paginate(github.rest.pulls.listFiles, {
@@ -265,6 +287,9 @@ jobs:
               /(^|\/)research\/(valuation_route|valuation_fact_ledger|evidence_task_queue|valuation_automation_state)\.json$/.test(name) ||
               /^_system\/memory\//.test(name) ||
               /(^|\/)research\/(valuation_contract|falsifier_specs)\.json$/.test(name) ||
+              // A PR touching only a falsifier draft must still run the
+              // history check's promotion simulation (the CEG / #988 failure).
+              /(^|\/)research\/falsifier_drafts\//.test(name) ||
               /^_system\/research\//.test(name) ||
               /^_system\/data\/runs\//.test(name) ||
               /^_system\/data\/warrants\//.test(name) ||
@@ -324,7 +349,7 @@ jobs:
           sparse-checkout-cone-mode: false
           fetch-depth: 1
       - name: Checkout workspace (minimal)
-        run: bash _system/scripts/ci_checkout_workspace.sh minimal "pull/${{ github.event.pull_request.number }}/head"
+        run: bash _system/scripts/ci_checkout_workspace.sh minimal "$CHECKOUT_SHA"
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
@@ -360,7 +385,7 @@ jobs:
           # Depth only needs enough history for overlay/insider valuation.json
           # comparisons against base tip. Ticker scope comes from the GitHub PR
           # file list below — never from a shallow two-dot git fallback.
-          bash _system/scripts/ci_checkout_workspace.sh history "pull/${{ github.event.pull_request.number }}/head" 2
+          bash _system/scripts/ci_checkout_workspace.sh history "$CHECKOUT_SHA" 2
           git fetch --depth=1 origin "+refs/heads/${{ github.base_ref }}:refs/remotes/origin/${{ github.base_ref }}"
       - uses: actions/setup-python@v5
         with:
@@ -409,6 +434,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
+          ref: ${{ env.CHECKOUT_SHA }}
           sparse-checkout: |
             _system/scripts
             _eval
@@ -463,12 +489,7 @@ jobs:
         # Full tree: the scan resolves each row's `source.ref` to the evidence file
         # it names (`{TICKER}/research/evidence/sec_companyfacts.json`), so a sparse
         # profile would turn real rows into silent "locator does not resolve".
-        run: |
-          if [ "${{ github.event_name }}" = "pull_request" ]; then
-            bash _system/scripts/ci_checkout_workspace.sh full "pull/${{ github.event.pull_request.number }}/head"
-          else
-            bash _system/scripts/ci_checkout_workspace.sh full
-          fi
+        run: bash _system/scripts/ci_checkout_workspace.sh full "$CHECKOUT_SHA"
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
@@ -528,19 +549,14 @@ jobs:
         # Full tree: graph_build streams every ticker's contract and fact
         # ledger, and E5 existence-checks the source paths beliefs cite, so a
         # sparse profile would turn real beliefs into silent "source missing".
-        run: |
-          if [ "${{ github.event_name }}" = "pull_request" ]; then
-            bash _system/scripts/ci_checkout_workspace.sh full "pull/${{ github.event.pull_request.number }}/head"
-          else
-            bash _system/scripts/ci_checkout_workspace.sh full
-          fi
+        run: bash _system/scripts/ci_checkout_workspace.sh full "$CHECKOUT_SHA"
       - name: Deepen commit history for lane freshness (commits only, no blobs)
         # graph_build projects Lane/Commit from `git log -n 400`; on the
         # depth-1 checkout above every lane would read NO-COMMIT and fail P3
         # for a reason that has nothing to do with the lanes.
         run: |
           if [ "${{ github.event_name }}" = "pull_request" ]; then
-            git fetch --filter=blob:none --deepen=400 origin "pull/${{ github.event.pull_request.number }}/head"
+            git fetch --filter=blob:none --deepen=400 origin "$CHECKOUT_SHA"
             # P3 spurious-fire fix: a PR whose branch point is >48h old is
             # missing the nightly lane commits that landed on main since, so
             # every lane would read stale from the PR head's history alone.
@@ -558,16 +574,38 @@ jobs:
         working-directory: _system/scripts
         run: python -m unittest -v test_graph_build test_graph_invariants
       - name: Epistemic integrity, immutable history, and source preflight
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
           python _system/scripts/lint_falsifier_specs.py
           HISTORY_BASE="origin/main"
           if [ "${{ github.event_name }}" = "push" ] && [ "${{ github.event.before }}" != "0000000000000000000000000000000000000000" ]; then
             HISTORY_BASE="${{ github.event.before }}"
+          elif [ "${{ github.event_name }}" = "schedule" ]; then
+            # Judge everything that landed since the previous scheduled run:
+            # bot pushes start no push run, so this is the only history check
+            # their commits get. Fall back to the last commit when that run's
+            # SHA is not in the fetched history (or there is none).
+            PREV=$(gh api "repos/${{ github.repository }}/actions/workflows/research-quality.yml/runs?event=schedule&status=completed&per_page=10" \
+              --jq '[.workflow_runs[] | select(.id != ${{ github.run_id }}) | .head_sha][0] // empty' || true)
+            if [ -n "$PREV" ] && git cat-file -e "${PREV}^{commit}" 2>/dev/null; then
+              HISTORY_BASE="$PREV"
+            else
+              HISTORY_BASE="HEAD~1"
+            fi
+            echo "Scheduled history check since ${HISTORY_BASE}"
           fi
           python _system/scripts/check_falsifier_history.py --base-ref "$HISTORY_BASE"
+          # The promotion gate's suite arrives with WS1's falsifier branch;
+          # run it whenever it is present.
+          PROMOTION_GATE=""
+          if [ -f _system/scripts/tests/test_falsifier_promotion_gate.py ]; then
+            PROMOTION_GATE="tests.test_falsifier_promotion_gate"
+          fi
+          # shellcheck disable=SC2086
           (cd _system/scripts && python -m unittest -v \
-            test_falsifier_specs test_resolve_falsifiers \
+            test_falsifier_specs test_resolve_falsifiers $PROMOTION_GATE \
             test_calibration_brief test_epistemic_integrity \
             test_epistemic_loop_controller test_memory_delivery \
             test_validate_invariant_subset test_repository_health_supervisor)
@@ -640,7 +678,7 @@ jobs:
           sparse-checkout-cone-mode: false
           fetch-depth: 1
       - name: Checkout dashboard validation workspace
-        run: bash _system/scripts/ci_checkout_workspace.sh dashboard "pull/${{ github.event.pull_request.number }}/head"
+        run: bash _system/scripts/ci_checkout_workspace.sh dashboard "$CHECKOUT_SHA"
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
@@ -651,9 +689,15 @@ jobs:
           CI_PAGES_DEPLOY_ONLY: "true"
         run: |
           python _system/scripts/validate_dashboard_data.py
-          # Research PRs must still catch structural warrant errors. Stale
-          # delayed marks (heal-warrants) stay warnings so a ticker deep dive
-          # is not blocked by an unrelated Yahoo quote gap.
-          python _system/scripts/check_warrant_universe.py
+          # Warrant problems are the warrant lane's to enforce: here they are
+          # reported, not blocking, so an expiring warrant cannot red an
+          # unrelated research PR before the expiry sweeper runs (9/11-9/18:
+          # "warrants.json reports structural contract errors" on every PR).
+          # Older checkers without --warn-only keep the previous behaviour.
+          if python _system/scripts/check_warrant_universe.py --help | grep -q -- "--warn-only"; then
+            python _system/scripts/check_warrant_universe.py --warn-only
+          else
+            python _system/scripts/check_warrant_universe.py
+          fi
           (cd _system/scripts && python -m unittest -v test_warrant_pipeline)
           node --check dashboard/warrant-viz.js

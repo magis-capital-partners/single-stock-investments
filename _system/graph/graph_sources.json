@@ -273,11 +273,36 @@
       ],
       "freshness_hours": 342,
       "subject_regex": "^chore: INV two-phase cooling watch"
+    },
+    {
+      "name": "research-quality-main",
+      "workflow_file": "research-quality.yml",
+      "job": "graph-invariants",
+      "cadence_cron": [
+        "37 1,7,13,19 * * *"
+      ],
+      "freshness_hours": 18
+    },
+    {
+      "name": "python-tests",
+      "workflow_file": "python-tests.yml",
+      "job": "unit-tests",
+      "cadence_cron": [
+        "23 5 * * *"
+      ],
+      "freshness_hours": 54
+    },
+    {
+      "name": "python-undefined-names",
+      "workflow_file": "python-tests.yml",
+      "job": "undefined-names",
+      "cadence_cron": [
+        "23 5 * * *"
+      ],
+      "freshness_hours": 54
     }
   ],
-  "unmonitored_workflows": {
-    "youtube-refresh.yml": "Disabled in the Actions UI since 2026-09-06: it needs a self-hosted runner and none is registered (every run queued 24h, then was cancelled). Captions are published by a local scheduled task; the file is being retired."
-  },
+  "unmonitored_workflows": {},
   "guards": {
     "2026-08-07-added-a-validator-check-that-read-tick": [
       {

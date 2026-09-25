@@ -10,7 +10,6 @@ import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
-DAILY = ROOT / "_system" / "memory" / "daily"
 JSONL = "_system/portfolio/research_events.jsonl"
 MILLY = "_system/research/milly_log.md"
 
@@ -24,15 +23,32 @@ def run(cmd: list[str], *, check: bool = True) -> subprocess.CompletedProcess[st
     return proc
 
 
-def push_branch(head_ref: str) -> None:
-    push = run(["git", "push", "origin", f"HEAD:{head_ref}"], check=False)
+class HeadMoved(Exception):
+    """The PR branch is no longer at the SHA the resolution was built on."""
+
+
+def push_branch(head_ref: str, expected_sha: str) -> None:
+    """Push HEAD to the PR branch only while the branch is still at ``expected_sha``.
+
+    The lease is pinned to the SHA the merge was built on (in automerge, the
+    SHA the gate saw). The old fallback fetched the branch and pushed with a
+    bare --force-with-lease, whose expected value is the tip it had just
+    fetched: an agent commit pushed while the resolver ran was overwritten.
+    """
+    push = run(
+        ["git", "push", f"--force-with-lease=refs/heads/{head_ref}:{expected_sha}",
+         "origin", f"HEAD:refs/heads/{head_ref}"],
+        check=False,
+    )
     if push.returncode == 0:
         return
     combined = (push.stderr or "") + (push.stdout or "")
-    if "non-fast-forward" not in combined and "stale info" not in combined:
-        raise subprocess.CalledProcessError(push.returncode, push.args, push.stdout, push.stderr)
-    run(["git", "fetch", "origin", head_ref])
-    run(["git", "push", "origin", f"HEAD:{head_ref}", "--force-with-lease"])
+    if "stale info" in combined or "non-fast-forward" in combined or "fetch first" in combined:
+        raise HeadMoved(
+            f"{head_ref} moved away from {expected_sha[:12]} while its conflicts were being "
+            "resolved; not overwriting it."
+        )
+    raise subprocess.CalledProcessError(push.returncode, push.args, push.stdout, push.stderr)
 
 
 def gh_json(args: list[str]) -> dict:
@@ -49,9 +65,10 @@ def infer_ticker(pr_number: str) -> str:
 
 
 def latest_daily_log() -> Path | None:
-    if not DAILY.is_dir():
+    daily = ROOT / "_system" / "memory" / "daily"
+    if not daily.is_dir():
         return None
-    logs = sorted(DAILY.glob("*.md"), reverse=True)
+    logs = sorted(daily.glob("*.md"), reverse=True)
     return logs[0] if logs else None
 
 
@@ -117,26 +134,101 @@ def restore_ticker_logs(
             milly_path.write_text(body.rstrip() + "\n" + "\n".join(missing) + "\n", encoding="utf-8")
 
 
-def resolve(pr_number: str, ticker: str | None = None) -> None:
+def is_shallow() -> bool:
+    proc = run(["git", "rev-parse", "--is-shallow-repository"], check=False)
+    return proc.stdout.strip() == "true"
+
+
+def local_commit_count() -> int:
+    proc = run(["git", "rev-list", "--count", "--all"], check=False)
+    try:
+        return int(proc.stdout.strip())
+    except ValueError:
+        return 0
+
+
+def merge_base(left: str, right: str) -> str | None:
+    proc = run(["git", "merge-base", left, right], check=False)
+    if proc.returncode != 0:
+        return None
+    return proc.stdout.strip() or None
+
+
+def fetch_with_merge_base(head_ref: str, *, start_depth: int = 64, max_depth: int = 4096) -> str:
+    """Fetch main and the PR branch with enough history to share a merge-base.
+
+    A shallow checkout (``actions/checkout`` with ``fetch-depth: 1``) truncates
+    origin/main at the checked-out tip. A PR forked before that tip then shares
+    no local ancestor with it, and ``git merge`` stops with "refusing to merge
+    unrelated histories" (automerge run 35944388953, PR #1014). A plain fetch
+    of the branch into that clone is also the expensive kind: git walks the
+    branch all the way to the root commit.
+
+    So in a nearly empty shallow clone -- the merge job's depth-1 checkout --
+    both refs are fetched to a bounded depth and deepened until the fork point
+    is local, with ``--unshallow`` as the last resort. ``--depth`` can also
+    SHORTEN history, so it is used only while the whole local history is
+    shorter than ``start_depth`` (nothing there to shorten); any other clone,
+    such as a long-lived workstation checkout, gets a plain fetch. Returns the
+    merge-base; exits if there is none.
+    """
+    refspecs = [
+        "+refs/heads/main:refs/remotes/origin/main",
+        f"+refs/heads/{head_ref}:refs/remotes/origin/{head_ref}",
+    ]
+    branch_ref = f"origin/{head_ref}"
+    if not is_shallow() or local_commit_count() > start_depth:
+        run(["git", "fetch", "origin", *refspecs])
+    else:
+        depth = start_depth
+        run(["git", "fetch", f"--depth={depth}", "origin", *refspecs])
+        while merge_base("origin/main", branch_ref) is None and is_shallow():
+            if depth >= max_depth:
+                run(["git", "fetch", "--unshallow", "origin", *refspecs])
+                break
+            run(["git", "fetch", f"--deepen={depth}", "origin", *refspecs])
+            depth *= 2
+    base = merge_base("origin/main", branch_ref)
+    if base is None:
+        raise SystemExit(f"No merge-base between origin/main and {branch_ref}, even with full history.")
+    return base
+
+
+def unmerged_paths() -> list[str]:
+    proc = run(["git", "diff", "--name-only", "--diff-filter=U"], check=False)
+    return [line.strip() for line in proc.stdout.splitlines() if line.strip()]
+
+
+def resolve(pr_number: str, ticker: str | None = None, expected_sha: str | None = None) -> str | None:
+    """Merge main into the PR branch and push it.
+
+    Returns the pushed head SHA, or None when there was nothing to push. The
+    caller must NOT merge in the same run: the pushed commit has never been
+    through CI, and a squash of it would land untested content on main (PRs
+    #1017 and #1021 were squashed seconds after this push, with zero check runs
+    on the merged head).
+
+    ``expected_sha`` is the head the caller vetted (automerge passes the gated
+    SHA). The resolution is built only on that head and pushed only while the
+    branch is still there; otherwise HeadMoved is raised and nothing is pushed.
+    """
     ticker = ticker or infer_ticker(pr_number)
     data = gh_json(["pr", "view", pr_number, "--json", "headRefName,mergeable"])
     head_ref = data["headRefName"]
     if data.get("mergeable") != "CONFLICTING":
         print(f"PR #{pr_number} mergeable={data.get('mergeable')} — nothing to resolve.")
-        return
+        return None
 
     print(f"Resolving conflicts for PR #{pr_number} ({ticker}) on {head_ref}")
 
     run(["git", "config", "user.name", "github-actions[bot]"])
     run(["git", "config", "user.email", "41898282+github-actions[bot]@users.noreply.github.com"])
-    # Fetch the PR head explicitly; sparse/local clones often lack origin/<branch> refs.
-    run(["git", "fetch", "origin", "main", head_ref])
-    run(["git", "fetch", "origin", f"+{head_ref}:refs/remotes/origin/{head_ref}"], check=False)
+    fetch_with_merge_base(head_ref)
 
     branch_ref = f"origin/{head_ref}"
-    tip = run(["git", "rev-parse", "--verify", branch_ref], check=False)
-    if tip.returncode != 0:
-        branch_ref = "FETCH_HEAD"
+    original_tip = run(["git", "rev-parse", "--verify", branch_ref]).stdout.strip()
+    if expected_sha and original_tip != expected_sha:
+        raise HeadMoved(f"{head_ref} is at {original_tip[:12]}, not the vetted {expected_sha[:12]}.")
     daily_path = latest_daily_log()
     daily_rel = str(daily_path.relative_to(ROOT)).replace("\\", "/") if daily_path else None
     daily_section = None
@@ -153,9 +245,19 @@ def resolve(pr_number: str, ticker: str | None = None) -> None:
         ["git", "merge", "origin/main", "-X", "theirs", "-m", f"merge main into {ticker} deep dive PR"],
         check=False,
     )
-    if merge.returncode != 0 and not (ROOT / ".git" / "MERGE_HEAD").exists():
+    in_merge = run(["git", "rev-parse", "-q", "--verify", "MERGE_HEAD"], check=False).returncode == 0
+    if merge.returncode != 0 and not in_merge:
         print(merge.stderr or merge.stdout, file=sys.stderr)
         raise SystemExit(merge.returncode)
+    # -X theirs settles content conflicts. A modify/delete or rename conflict is
+    # left unmerged, and `git add -A` would quietly resurrect a file main
+    # deleted. That needs a human, not a bot commit.
+    stuck = unmerged_paths()
+    if stuck:
+        run(["git", "merge", "--abort"], check=False)
+        raise SystemExit(
+            f"PR #{pr_number}: conflicts -X theirs cannot settle; resolve by hand: " + ", ".join(stuck[:20])
+        )
 
     restore_ticker_logs(ticker, daily_section=daily_section, jsonl_lines=jsonl_lines, milly_lines=milly_lines)
 
@@ -163,16 +265,46 @@ def resolve(pr_number: str, ticker: str | None = None) -> None:
     status = run(["git", "status", "--porcelain"], check=False)
     if status.stdout.strip():
         run(["git", "commit", "-m", f"fix: resolve {ticker} deep dive conflicts with main"])
-    push_branch(head_ref)
-    print(f"Pushed conflict resolution for PR #{pr_number} ({ticker})")
+    new_tip = run(["git", "rev-parse", "HEAD"]).stdout.strip()
+    if new_tip == original_tip:
+        print(f"PR #{pr_number}: merging main changed nothing; nothing to push.")
+        return None
+    push_branch(head_ref, expected_sha or original_tip)
+    print(f"Pushed conflict resolution for PR #{pr_number} ({ticker}) at {new_tip}")
+    return new_tip
+
+
+def write_github_output(path: str, pushed_sha: str | None, *, head_moved: bool = False) -> None:
+    with open(path, "a", encoding="utf-8") as handle:
+        handle.write(f"pushed={'true' if pushed_sha else 'false'}\n")
+        handle.write(f"pushed_sha={pushed_sha or ''}\n")
+        handle.write(f"head_moved={'true' if head_moved else 'false'}\n")
 
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="Resolve Marvin deep-dive PR merge conflicts")
     parser.add_argument("pr_number", help="GitHub pull request number")
     parser.add_argument("--ticker", help="Ticker symbol (optional; inferred from PR title)")
+    parser.add_argument(
+        "--github-output",
+        default="",
+        help="Append pushed, pushed_sha and head_moved to this file (a step's $GITHUB_OUTPUT).",
+    )
+    parser.add_argument(
+        "--expected-sha",
+        default="",
+        help="Only resolve and push while the PR branch is at this SHA (automerge passes the gated SHA).",
+    )
     args = parser.parse_args()
-    resolve(args.pr_number, args.ticker)
+    try:
+        pushed_sha = resolve(args.pr_number, args.ticker, args.expected_sha or None)
+    except HeadMoved as moved:
+        print(f"PR #{args.pr_number}: {moved} Its own run gates the new head.")
+        if args.github_output:
+            write_github_output(args.github_output, None, head_moved=True)
+        return
+    if args.github_output:
+        write_github_output(args.github_output, pushed_sha)
 
 
 if __name__ == "__main__":

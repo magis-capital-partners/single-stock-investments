@@ -1,0 +1,148 @@
+name: Python tests
+
+# The pytest suites under _system/trading and _system/scripts/tests had no CI
+# at all: a green PR touching them proved nothing. This runs them, plus a
+# check for undefined names (ruff F821) and parse errors, the class of bug
+# that shipped `fetch_ir` and `today` undefined in two_phase_watch.py.
+#
+# Sparse and blobless on purpose: the full tree is ~200k files and 30 minutes
+# to check out; the suites need _system (minus the 600 MB reference corpus) and
+# a handful of dashboard files.
+
+on:
+  # Everything the suites read -- the unit-tests sparse set below -- so a
+  # change to any of it runs them. test_python_tests_workflow.py keeps the two
+  # lists in step.
+  pull_request:
+    branches: [main]
+    paths:
+      - "_system/**"
+      - ".github/**"
+      - "dashboard/cloudflare/**"
+      - "dashboard/functions/**"
+      - "dashboard/oauth-proxy/**"
+      - "dashboard/data/criticality_summary.json"
+      - "ops-watchdog/**"
+      - "AMZN/investor-documents/download_amzn_investor_docs.py"
+  push:
+    branches: [main]
+    paths:
+      - "_system/**"
+      - ".github/**"
+      - "dashboard/cloudflare/**"
+      - "dashboard/functions/**"
+      - "dashboard/oauth-proxy/**"
+      - "dashboard/data/criticality_summary.json"
+      - "ops-watchdog/**"
+      - "AMZN/investor-documents/download_amzn_investor_docs.py"
+  # Bot pushes (GITHUB_TOKEN) start no workflow, so main is also tested daily.
+  schedule:
+    - cron: "23 5 * * *"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: python-tests-${{ github.event.pull_request.number || format('{0}-{1}', github.event_name, github.sha) }}
+  cancel-in-progress: true
+
+jobs:
+  undefined-names:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          fetch-depth: 1
+          filter: blob:none
+          sparse-checkout: |
+            /_system/scripts/
+            /_system/trading/
+          sparse-checkout-cone-mode: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Undefined names and parse errors (ruff F821)
+        # No allowance: main has no undefined names. A file ruff cannot parse
+        # fails too, because a syntax error hides every F821 in that file.
+        run: |
+          set -euo pipefail
+          python -m pip install --disable-pip-version-check --quiet "ruff==0.16.0"
+          python _system/scripts/check_undefined_names.py _system/scripts _system/trading
+
+  unit-tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      # Tests that fail on main for reasons outside this workflow. They are
+      # deselected from the gate and run separately below, which says so when
+      # one starts passing. Owners: the D1/portfolio-hub and deploy lanes.
+      #   timer expectation (5min) vs portfolio-hub-publisher.timer (1h)
+      KNOWN_FAILURES: >-
+        _system/scripts/tests/test_d1_read_efficiency.py::test_hot_routes_do_not_scan_full_history
+      # Suites that live beside the scripts rather than under tests/. Missing
+      # files are skipped, so a list entry can land before its file does.
+      EXTRA_TEST_FILES: >-
+        _system/scripts/test_lane_registry.py
+        _system/scripts/test_build_lane_receipts.py
+        _system/scripts/test_supervisor_workflows.py
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          fetch-depth: 1
+          filter: blob:none
+          # What the suites read: _system without the reference corpus (its
+          # top-level registries stay), the workflows some tests parse, the D1
+          # migrations, edge functions and oauth proxy, the ops-watchdog worker
+          # config, one criticality summary, and one ticker download script for
+          # the payload-path test.
+          sparse-checkout: |
+            /_system/
+            !/_system/reference/*/
+            /.github/
+            /dashboard/cloudflare/
+            /dashboard/functions/
+            /dashboard/oauth-proxy/
+            /dashboard/data/criticality_summary.json
+            /ops-watchdog/
+            /AMZN/investor-documents/download_amzn_investor_docs.py
+          sparse-checkout-cone-mode: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install test dependencies
+        # Deliberately not the trading requirements files: those pull in
+        # ib_async / ib_insync, and the tests are written for their absence
+        # (the bridge imports them lazily and the tests stub them).
+        run: |
+          python -m pip install --disable-pip-version-check --quiet \
+            "pytest==9.1.1" "PyYAML==6.0.3" "jsonschema==4.26.0" "numpy==2.3.3" "scipy==1.16.2" \
+            "ruff==0.16.0"
+      - name: Trading and script test suites
+        run: |
+          set -euo pipefail
+          DESELECT=()
+          for test_id in $KNOWN_FAILURES; do DESELECT+=(--deselect "$test_id"); done
+          EXTRA=()
+          for test_file in $EXTRA_TEST_FILES; do
+            if [ -f "$test_file" ]; then EXTRA+=("$test_file"); else echo "not present yet: $test_file"; fi
+          done
+          python -m pytest -q -p no:cacheprovider "${DESELECT[@]}" \
+            _system/trading _system/scripts/tests "${EXTRA[@]}"
+      - name: Known failures (reported, not gating)
+        # One at a time: run together, one that still fails would hide one
+        # that has started passing.
+        run: |
+          STILL=0
+          for test_id in $KNOWN_FAILURES; do
+            if python -m pytest -q -p no:cacheprovider "$test_id" > "$RUNNER_TEMP/known.txt" 2>&1; then
+              echo "::warning title=Known failure now passes::${test_id} passes; remove it from KNOWN_FAILURES in python-tests.yml so it gates again."
+            else
+              STILL=$((STILL + 1))
+              echo "still failing: ${test_id}"
+              tail -n 5 "$RUNNER_TEMP/known.txt"
+            fi
+          done
+          echo "${STILL} known failure(s) still fail; they stay deselected from the gate."
