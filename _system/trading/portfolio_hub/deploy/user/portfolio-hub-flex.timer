@@ -1,12 +1,19 @@
 [Unit]
-Description=Publish the Flex book after the close
+Description=Publish the Flex book after ls-algo's morning Flex fetch
 
 [Timer]
-# 18:15 ET on weekdays: after the close, and after ls-algo's own Flex fetch has
-# had time to land. Deliberately not intraday -- nothing on this dashboard needs
-# sub-daily broker truth, and pretending otherwise is what produced the
-# collector. A missed run waits for tomorrow rather than catching up in a burst.
-OnCalendar=Mon..Fri 18:15 America/New_York
+# 07:15 ET, Tuesday to Saturday: ls-algo fetches each session's Flex statement
+# the NEXT morning (~04:20 ET, retried by ls-algo-eod-retry at 06:00 ET), so
+# the statement for session D lands on D+1 and is published here ~3h later.
+# Saturday carries Friday's session. The old 18:15 ET weekday slot published
+# a file ~14h after it landed, never ran on Saturday, and refused Friday's
+# file as stale on Monday -- so Friday's session never reached the book.
+# The edge judges an EOD snapshot stale at 14:00 UTC (10:00 ET) the day after
+# the next weekday session, which leaves ~3h of grace after this run.
+# Deliberately not intraday -- nothing on this dashboard needs sub-daily broker
+# truth, and pretending otherwise is what produced the collector. A missed run
+# waits for tomorrow rather than catching up in a burst.
+OnCalendar=Tue..Sat 07:15 America/New_York
 Persistent=false
 AccuracySec=1min
 

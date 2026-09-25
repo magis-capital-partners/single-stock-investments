@@ -454,16 +454,21 @@ function snapshotAge(run, now = Date.now()) {
 
 // An end-of-day statement is judged against the session calendar instead.
 //
-// Once Flex carries NetLiquidation, each weekday's statement is published once,
-// ~18:15 ET (22:15-23:15 UTC), and nothing newer can exist until the next
-// session's statement. Measured with the collector's two-hour clock it would
-// read "stopped" about 22 hours of every day and all weekend -- a feed working
-// exactly as designed presented as a dead one. So an EOD snapshot is fresh
-// until the next weekday session's statement is due, plus grace: through 05:00
-// UTC on the day after that next session. From a Thursday statement that is
-// ~31h; from a Friday statement, across the weekend, ~79h. A market holiday is
-// not modelled -- the snapshot reads stale for that day, which is true.
-const EOD_DEADLINE_HOUR_UTC = 5;
+// Once Flex carries NetLiquidation, each session's statement is published once,
+// the next morning: ls-algo fetches session D's statement ~04:20 ET on D+1
+// (retried 06:00 ET) and the hub publishes it at 07:15 ET (11:15 UTC), Tuesday
+// to Saturday. Nothing newer can exist until the next session's statement.
+// Measured with the collector's two-hour clock it would read "stopped" about 22
+// hours of every day and all weekend -- a feed working exactly as designed
+// presented as a dead one. So an EOD snapshot is fresh until the next weekday
+// session's statement is due, plus grace: through 14:00 UTC (10:00 ET) on the
+// day after that next session, ~3h after the publish that should replace it.
+// A Thursday statement is current until Saturday 14:00 UTC; a Friday statement,
+// across the weekend, until Tuesday 14:00 UTC. (At the old 05:00 UTC deadline
+// every snapshot read stale for the ~6h before the next morning's publish.) A
+// market holiday is not modelled -- the snapshot reads stale for that day,
+// which is true.
+const EOD_DEADLINE_HOUR_UTC = 14;
 const DAY_MS = 86_400_000;
 
 function parseCompleteness(raw) {

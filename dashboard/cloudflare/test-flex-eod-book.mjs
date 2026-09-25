@@ -103,16 +103,38 @@ test("a complete Flex EOD run replaces the frozen collector run in the book", as
 });
 
 test("an EOD snapshot is fresh through the next session plus grace, weekend-aware", () => {
-  const thursday = { as_of: "2026-09-24T22:15:14Z", completeness_json: JSON.stringify({ feed: "flex_eod", session_date: "2026-09-24" }) };
+  // Session D's statement is fetched ~04:20 ET on D+1 and published 07:15 ET
+  // (11:15 UTC), Tuesday to Saturday.
+  const thursday = { as_of: "2026-09-25T11:15:14Z", completeness_json: JSON.stringify({ feed: "flex_eod", session_date: "2026-09-24" }) };
   assert.equal(snapshotFreshness(thursday, Date.parse("2026-09-25T20:00:00Z")).stale, false, "Friday, before Friday's statement");
-  assert.equal(snapshotFreshness(thursday, Date.parse("2026-09-26T04:59:00Z")).stale, false, "~30.7h: still inside the grace");
-  assert.equal(snapshotFreshness(thursday, Date.parse("2026-09-26T05:01:00Z")).stale, true, "Friday's statement never came");
+  assert.equal(snapshotFreshness(thursday, Date.parse("2026-09-26T13:59:00Z")).stale, false, "Saturday 09:59 ET: inside the grace");
+  assert.equal(snapshotFreshness(thursday, Date.parse("2026-09-26T14:01:00Z")).stale, true, "Friday's statement never came");
 
-  const friday = { as_of: "2026-09-25T22:15:14Z", completeness_json: JSON.stringify({ feed: "flex_eod", session_date: "2026-09-25" }) };
+  const friday = { as_of: "2026-09-26T11:15:14Z", completeness_json: JSON.stringify({ feed: "flex_eod", session_date: "2026-09-25" }) };
   assert.equal(snapshotFreshness(friday, Date.parse("2026-09-27T12:00:00Z")).stale, false, "Sunday: no session since Friday");
-  assert.equal(snapshotFreshness(friday, Date.parse("2026-09-28T23:59:00Z")).stale, false, "Monday evening, statement due");
-  assert.equal(snapshotFreshness(friday, Date.parse("2026-09-29T05:01:00Z")).stale, true, "~79h: Monday's statement is late");
-  assert.equal(snapshotFreshness(friday, Date.parse("2026-09-29T05:01:00Z")).stale_after, "2026-09-29T05:00:00.000Z");
+  assert.equal(snapshotFreshness(friday, Date.parse("2026-09-28T23:59:00Z")).stale, false, "Monday evening: Monday's statement lands Tuesday");
+  assert.equal(snapshotFreshness(friday, Date.parse("2026-09-29T13:59:00Z")).stale, false, "Tuesday 09:59 ET: inside the grace");
+  assert.equal(snapshotFreshness(friday, Date.parse("2026-09-29T14:01:00Z")).stale, true, "Monday's statement is late");
+  assert.equal(snapshotFreshness(friday, Date.parse("2026-09-29T14:01:00Z")).stale_after, "2026-09-29T14:00:00.000Z");
+});
+
+test("no false stale between one morning publish and the next", () => {
+  // At the 05:00 UTC deadline each statement went stale ~6h before the next
+  // morning's publish replaced it, every day. Walk a week of 07:15 ET publishes
+  // (Tue-Sat, sessions Mon-Fri) and require each statement to still be fresh
+  // one minute before its successor is published.
+  const publishes = [
+    ["2026-09-21", "2026-09-22T11:15:00Z"], ["2026-09-22", "2026-09-23T11:15:00Z"],
+    ["2026-09-23", "2026-09-24T11:15:00Z"], ["2026-09-24", "2026-09-25T11:15:00Z"],
+    ["2026-09-25", "2026-09-26T11:15:00Z"], ["2026-09-28", "2026-09-29T11:15:00Z"],
+  ];
+  for (let i = 0; i + 1 < publishes.length; i += 1) {
+    const [session, publishedAt] = publishes[i];
+    const nextPublish = Date.parse(publishes[i + 1][1]);
+    const run = { as_of: publishedAt, completeness_json: JSON.stringify({ feed: "flex_eod", session_date: session }) };
+    assert.equal(snapshotFreshness(run, nextPublish - 60_000).stale, false,
+      `session ${session} must stay fresh until ${publishes[i + 1][1]}`);
+  }
 });
 
 test("the live feed keeps its two-hour rule", async () => {
@@ -155,7 +177,7 @@ test("an EOD statement with an unreadable session date says so instead of borrow
   assert.equal(fresh.session_date, null, "no date is invented");
   assert.equal(fresh.session_date_source, "ingest_time");
   assert.equal(fresh.stale, false);
-  assert.equal(fresh.stale_after, "2026-09-26T05:00:00.000Z", "judged from the ingest date's calendar");
+  assert.equal(fresh.stale_after, "2026-09-26T14:00:00.000Z", "judged from the ingest date's calendar");
 
   const read = snapshotFreshness({ as_of: "2026-09-24T22:15:14Z", completeness_json: JSON.stringify({ feed: "flex_eod", session_date: "2026-09-24" }) }, Date.parse("2026-09-25T10:00:00Z"));
   assert.equal(read.session_date_source, "statement");
