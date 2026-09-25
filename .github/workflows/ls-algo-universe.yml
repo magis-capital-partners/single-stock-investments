@@ -45,6 +45,11 @@ jobs:
     if: always() && (github.event_name != 'workflow_run' || (github.event.workflow_run.conclusion == 'success' && needs.gate.outputs.downloads_ready == 'true'))
     runs-on: ubuntu-latest
     timeout-minutes: 90
+    env:
+      # Job-wide, not on one command: ci_push_main.sh rebuilds the dashboard
+      # when the push hits a rebase conflict on dashboard/data, and that
+      # rebuild refuses without the opt-in (marvin-pick carries every tree).
+      DASHBOARD_PRESERVE_DOCUMENT_REGISTRY: "1"
     steps:
       - uses: actions/checkout@v4
         with:
@@ -90,7 +95,7 @@ jobs:
           python _system/scripts/validate_evidence_recovery.py --scope all-blocked
           python _system/scripts/build_index_membership.py
           python _system/scripts/refresh_cvr_universe.py
-          DASHBOARD_PRESERVE_DOCUMENT_REGISTRY=1 python _system/scripts/build_dashboard_data.py
+          python _system/scripts/build_dashboard_data.py
           python _system/scripts/validate_dashboard_data.py
       - name: Commit the complete onboarding transaction
         run: |

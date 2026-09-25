@@ -9,12 +9,16 @@ copy of a weight or a threshold.
 """
 from __future__ import annotations
 
+import io
 import json
 import math
+import subprocess
 import sys
 import tempfile
+import textwrap
 import unittest
-from datetime import date, timedelta
+import unittest.mock
+from datetime import date, datetime, timedelta
 from pathlib import Path
 
 SCRIPTS = Path(__file__).resolve().parent
@@ -435,6 +439,149 @@ class PayloadShapeTest(unittest.TestCase):
         }
         self.assertEqual(set(bcd.UNIVERSE), expected)
         self.assertEqual(len(bcd.SECTORS), 11)
+
+
+def _bars_ending(last: date, count: int = 200) -> list[dict]:
+    first = date(2025, 9, 1)
+    return bars(count, offset_days=(last - first).days - (count - 1))
+
+
+class ExpectedSessionTest(unittest.TestCase):
+    """A fresh fetch can still be a session behind, and must not say "ready"."""
+
+    def _when(self, iso: str) -> datetime:
+        return datetime.fromisoformat(iso)
+
+    def test_expected_session_follows_the_nyse_calendar(self):
+        cases = {
+            "2026-09-24T00:04:00+00:00": "2026-09-23",  # Wed 20:04 EDT: today closed
+            "2026-09-23T07:54:00+00:00": "2026-09-22",  # Wed 03:54 EDT: yesterday
+            "2026-09-23T21:30:00+00:00": "2026-09-22",  # Wed 17:30 EDT: not yet published
+            "2026-09-26T15:00:00+00:00": "2026-09-25",  # Saturday
+            "2026-09-08T00:30:00+00:00": "2026-09-04",  # Labor Day evening
+            "2026-11-27T01:00:00+00:00": "2026-11-25",  # Thanksgiving evening
+            "2026-04-03T23:00:00+00:00": "2026-04-02",  # Good Friday
+            "2026-07-03T23:00:00+00:00": "2026-07-02",  # July 4th on a Saturday
+        }
+        for when, expected in cases.items():
+            with self.subTest(when=when):
+                self.assertEqual(bcd.expected_session(self._when(when)), expected)
+        # A Saturday New Year's Day is not observed on the prior Friday.
+        self.assertTrue(bcd.is_nyse_session(date(2021, 12, 31)))
+        self.assertFalse(bcd.is_nyse_session(date(2027, 1, 1)))
+
+    def test_one_session_behind_is_lagging_not_ready(self):
+        series = _bars_ending(date(2026, 9, 22))
+        with tempfile.TemporaryDirectory() as tmp:
+            # 2026-09-24T00:04Z: the one successful Forced Flow Daily run,
+            # which published as_of 2026-09-22 as "ready".
+            result = bcd.build(
+                output_dir=Path(tmp), fetcher=lambda symbol: series, symbols={"SPY"},
+                workers=1, now=self._when("2026-09-24T00:04:00+00:00"),
+            )
+        payload = result["payload"]
+        self.assertEqual(payload["as_of"], "2026-09-22")
+        self.assertEqual(payload["expected_session"], "2026-09-23")
+        self.assertEqual(payload["quality_state"], "lagging")
+
+    def test_current_session_stays_ready(self):
+        series = _bars_ending(date(2026, 9, 22))
+        with tempfile.TemporaryDirectory() as tmp:
+            result = bcd.build(
+                output_dir=Path(tmp), fetcher=lambda symbol: series, symbols={"SPY"},
+                workers=1, now=self._when("2026-09-23T00:04:00+00:00"),
+            )
+        self.assertEqual(result["payload"]["quality_state"], "ready")
+
+    def test_wall_clock_default_flags_an_old_series(self):
+        # No clock injected: a series that ends in March is behind any
+        # expected session today, whatever day the suite runs.
+        with tempfile.TemporaryDirectory() as tmp:
+            result = bcd.build(
+                output_dir=Path(tmp), fetcher=lambda symbol: bars(), symbols={"SPY"}, workers=1
+            )
+        self.assertEqual(result["payload"]["quality_state"], "lagging")
+
+
+class CheckRebuiltTest(unittest.TestCase):
+    """The workflow gate for a builder that exits 0 even when it wrote nothing."""
+
+    def _write(self, out: Path, **payload) -> None:
+        (out / bcd.OUTPUT_NAME).write_text(json.dumps(payload), encoding="utf-8")
+
+    def test_snapshot_older_than_the_run_fails(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            out = Path(tmp)
+            self._write(out, generated_at="2026-09-22T23:54:00+00:00", quality_state="ready")
+            status, message = bcd.check_rebuilt(out, datetime.fromisoformat("2026-09-22T23:53:59+00:00"))
+            self.assertEqual(status, 0)
+            status, message = bcd.check_rebuilt(out, datetime.fromisoformat("2026-09-23T23:53:00+00:00"))
+            self.assertEqual(status, 1)
+            self.assertIn("::error", message)
+
+    def test_missing_snapshot_fails(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            status, _ = bcd.check_rebuilt(Path(tmp), datetime.fromisoformat("2026-09-23T00:00:00+00:00"))
+            self.assertEqual(status, 1)
+
+    def _main_with_argv(self, *argv):
+        with unittest.mock.patch.object(sys, "argv", ["build_capitulation_daily.py", *argv]), \
+                unittest.mock.patch.object(bcd, "build") as build, \
+                unittest.mock.patch("sys.stdout", new_callable=io.StringIO) as out:
+            status = bcd.main()
+        return status, build, out.getvalue()
+
+    def test_an_empty_start_time_is_rejected_not_built(self):
+        # The step's timestamp file was missing, so the shell passed "".
+        status, build, out = self._main_with_argv("--check-rebuilt-since", "")
+        self.assertEqual(status, 1)
+        build.assert_not_called()
+        self.assertIn("::error", out)
+
+    def test_an_unparseable_start_time_is_rejected(self):
+        status, build, _ = self._main_with_argv("--check-rebuilt-since", "yesterday")
+        self.assertEqual(status, 1)
+        build.assert_not_called()
+
+    def test_lagging_snapshot_passes_with_a_warning(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            out = Path(tmp)
+            self._write(
+                out, generated_at="2026-09-24T00:04:19.354878+00:00", quality_state="lagging",
+                as_of="2026-09-22", expected_session="2026-09-23",
+            )
+            status, message = bcd.check_rebuilt(out, datetime.fromisoformat("2026-09-24T00:04:10+00:00"))
+            self.assertEqual(status, 0)
+            self.assertIn("::warning", message)
+            self.assertIn("expected_session=2026-09-23", message)
+
+
+class MissingModelDependencyTest(unittest.TestCase):
+    """Forced Flow Daily failed 13 runs on ModuleNotFoundError: numpy."""
+
+    def test_missing_numpy_is_reported_and_exits_zero(self):
+        script = SCRIPTS / "build_capitulation_daily.py"
+        probe = textwrap.dedent(
+            f"""
+            import runpy, sys
+
+            class BlockNumpy:
+                def find_spec(self, name, path=None, target=None):
+                    if name == "numpy" or name.startswith("numpy."):
+                        raise ModuleNotFoundError("No module named 'numpy'")
+                    return None
+
+            sys.meta_path.insert(0, BlockNumpy())
+            sys.argv = [{str(script)!r}, "--dry-run", "--symbols", "SPY"]
+            runpy.run_path({str(script)!r}, run_name="__main__")
+            """
+        )
+        proc = subprocess.run(
+            [sys.executable, "-c", probe], capture_output=True, text=True, timeout=120
+        )
+        self.assertEqual(proc.returncode, 0, proc.stderr[-800:])
+        self.assertIn("::error", proc.stdout)
+        self.assertIn("requirements-criticality.txt", proc.stdout)
 
 
 if __name__ == "__main__":

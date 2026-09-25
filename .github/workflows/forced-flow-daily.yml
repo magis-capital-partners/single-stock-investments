@@ -43,7 +43,17 @@ jobs:
       - name: Install criticality model dependencies
         run: pip install -r _system/scripts/requirements-criticality.txt
       - name: Refresh daily forced-flow / capitulation snapshot
-        run: python _system/scripts/build_capitulation_daily.py --workers 6
+        run: |
+          date -u +%Y-%m-%dT%H:%M:%S+00:00 > "$RUNNER_TEMP/capitulation_started_at"
+          python _system/scripts/build_capitulation_daily.py --workers 6
+      # The builder exits 0 on purpose (a vendor hiccup still writes a stale-
+      # stamped snapshot). A crash writes nothing at all -- the numpy import
+      # failure did exactly that for 13 runs -- so prove this run rewrote the
+      # file, and report whether it is current or a session behind.
+      - name: Assert the snapshot was rebuilt by this run
+        run: |
+          python _system/scripts/build_capitulation_daily.py \
+            --check-rebuilt-since "$(cat "$RUNNER_TEMP/capitulation_started_at")"
       - name: Commit daily capitulation snapshot
         uses: ./.github/actions/commit-main
         with:
