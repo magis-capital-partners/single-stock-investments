@@ -20,6 +20,7 @@ on:
       - ".github/**"
       - "dashboard/cloudflare/**"
       - "dashboard/functions/**"
+      - "dashboard/oauth-proxy/**"
       - "dashboard/data/criticality_summary.json"
       - "ops-watchdog/**"
       - "AMZN/investor-documents/download_amzn_investor_docs.py"
@@ -30,6 +31,7 @@ on:
       - ".github/**"
       - "dashboard/cloudflare/**"
       - "dashboard/functions/**"
+      - "dashboard/oauth-proxy/**"
       - "dashboard/data/criticality_summary.json"
       - "ops-watchdog/**"
       - "AMZN/investor-documents/download_amzn_investor_docs.py"
@@ -77,10 +79,8 @@ jobs:
       # deselected from the gate and run separately below, which says so when
       # one starts passing. Owners: the D1/portfolio-hub and deploy lanes.
       #   timer expectation (5min) vs portfolio-hub-publisher.timer (1h)
-      #   deploy action text "D1 synchronization deferred" no longer present
       KNOWN_FAILURES: >-
         _system/scripts/tests/test_d1_read_efficiency.py::test_hot_routes_do_not_scan_full_history
-        _system/scripts/tests/test_prune_cloudflare_d1.py::test_deploy_defers_only_the_known_free_tier_quota_failure
       # Suites that live beside the scripts rather than under tests/. Missing
       # files are skipped, so a list entry can land before its file does.
       EXTRA_TEST_FILES: >-
@@ -95,15 +95,16 @@ jobs:
           filter: blob:none
           # What the suites read: _system without the reference corpus (its
           # top-level registries stay), the workflows some tests parse, the D1
-          # migrations and edge functions, the ops-watchdog worker config, one
-          # criticality summary, and one ticker download script for the
-          # payload-path test.
+          # migrations, edge functions and oauth proxy, the ops-watchdog worker
+          # config, one criticality summary, and one ticker download script for
+          # the payload-path test.
           sparse-checkout: |
             /_system/
             !/_system/reference/*/
             /.github/
             /dashboard/cloudflare/
             /dashboard/functions/
+            /dashboard/oauth-proxy/
             /dashboard/data/criticality_summary.json
             /ops-watchdog/
             /AMZN/investor-documents/download_amzn_investor_docs.py
