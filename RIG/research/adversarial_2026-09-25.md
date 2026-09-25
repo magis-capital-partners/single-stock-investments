@@ -1,0 +1,85 @@
+---
+filing: pass
+consistency: pass
+disclosure: pass
+short: no_hit
+third_party: n/a
+block_final: false
+blocking_issues: []
+re_pass: false
+---
+
+# RIG — Adversarial review
+
+**Date:** 2026-09-25  
+**Agent:** Milly (batch pass)  
+**Dive reviewed:** `RIG/research/deep_dive_2026-09-25.md`  
+**Valuation reviewed:** `RIG/research/valuation.json`  
+**Filings used:** `RIG/research/evidence/filing_facts_2026-09-25.json`
+
+**Goal:** Truth-seeking QA. Not bearish for its own sake.
+
+---
+
+## Summary verdict
+
+| Area | Status | One line |
+|------|--------|----------|
+| Filing reconciliation | pass | filing_facts spot-check |
+| Internal consistency | pass | lint_adversarial |
+| Disclosure scan | pass | no 8-K scan this batch |
+| Short activist scan | no_hit | No Tier-1 forensic short in `short_scan_2026-05-28.md`; no l… |
+| Third-party (approved) | n/a | — |
+
+**Overall:** Mechanical pass from filing_facts + lint. No blocking factual errors.
+
+---
+
+## Filing reconciliation
+
+| # | Claim in dive | Dive cites | Filing value | Match? | Severity |
+|---|---------------|------------|--------------|--------|----------|
+| 1 | Latest revenue (filing) | — | **$3.96B** vs prior $3.52B (+12.5% YoY) | spot-check dive | — |
+| — | Stockholders' equity (filing) | — | **8108.0** | spot-check dive | — |
+| — | Net income (filing) | — | **2915.0** | spot-check dive | — |
+| — | EPS basic (filing) | — | **3.04** | spot-check dive | — |
+
+---
+
+## Internal consistency
+
+| Check | Expected (valuation.json) | Found in dive | OK? |
+|-------|---------------------------|---------------|-----|
+| Returns statement | 4.86% | 4.86% | Yes |
+| Classification IRR | 4.86% | 4.86% | Yes |
+| Valuation bridge base | 4.86% | 4.86% | Yes |
+
+**Lint notes:**
+- RIG/research: adversarial date adversarial_2026-08-18.md != dive 2026-09-25
+
+---
+
+## Disclosure scan
+
+| Event | Date | Source | In dive? | Action |
+|-------|------|--------|----------|--------|
+| (batch) | — | not scanned | — | full pass on next refresh |
+
+---
+
+## Short activist scan
+
+No Tier-1 forensic short in `short_scan_2026-05-28.md`; no local `short_reports/`.
+
+---
+
+## Recommended actions
+
+1. None blocking — optional exec-summary IRR wording vs floor/bull.
+2. **Human:** Tier-1 short web scan per `short_activist_registry.md` when prioritizing name.
+
+---
+
+## [HUMAN REVIEW]
+
+- Batch pass — not a substitute for targeted disclosure / short research on high-risk names.
