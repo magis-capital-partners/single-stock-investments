@@ -1,274 +1,91 @@
 {
-  "schema_version": "1.0",
+  "schema_version": "3.0",
+  "ticker": "AKAM",
   "as_of": "2026-09-25",
+  "authority": "valuation_contract",
+  "contract_source": "valuation_contract.json",
+  "contract_status": "decision_grade",
+  "proof_status": "decision_grade",
+  "model_level": "stock_specific",
   "price": 124.215,
   "price_source": "Yahoo AKAM close 2026-07-21",
-  "economic_units": 147000000,
-  "economic_claim_note": "Per-share claims use fully diluted shares from valuation.inputs.",
   "component_value_per_share": {
     "low": 50.0,
-    "base": 125.16,
+    "base": 125.1646,
     "high": 233.0
   },
-  "upside_downside_pct": {
-    "low": -59.7,
-    "base": 0.8,
-    "high": 87.6
+  "output_basis": "present_value_today",
+  "present_value_today_per_share": {
+    "low": 50.0,
+    "base": 125.1646,
+    "high": 233.0
   },
-  "base_value_supported_by_current_or_contracted_assets": 115.16,
-  "market_price_above_current_or_contracted_value": 9.06,
-  "market_implied_constant_owner_cash_growth_pct": -7.4,
-  "implied_growth_contract": "Constant 7-year owner-cash growth with a 22x terminal owner-cash multiple; diagnostic, not forecast.",
+  "future_payoff_per_share": {
+    "low": null,
+    "base": null,
+    "high": null
+  },
+  "forward_cashflow_schedule": null,
+  "forward_return_at_price_pct": {
+    "low": null,
+    "base": null,
+    "high": null
+  },
+  "forward_return_status": "withheld",
+  "annualized_return_at_price_pct": {
+    "low": null,
+    "base": null,
+    "high": null
+  },
+  "required_return_pct": 9.5,
+  "margin_of_safety_pct": {
+    "low": -148.43,
+    "base": 0.76,
+    "high": 46.69
+  },
   "entry_prices_by_hurdle_and_case": {
-    "bear": {
-      "10pct": 113.84,
-      "12pct": 102.37,
-      "15pct": 87.79,
-      "20pct": 68.98
+    "low": {
+      "10pct": null,
+      "12pct": null,
+      "15pct": null,
+      "20pct": null
     },
     "base": {
-      "10pct": 153.74,
-      "12pct": 137.69,
-      "15pct": 117.34,
-      "20pct": 91.19
+      "10pct": null,
+      "12pct": null,
+      "15pct": null,
+      "20pct": null
     },
-    "bull": {
-      "10pct": 216.78,
-      "12pct": 193.42,
-      "15pct": 163.87,
-      "20pct": 126.02
+    "high": {
+      "10pct": null,
+      "12pct": null,
+      "15pct": null,
+      "20pct": null
     }
   },
-  "primary_entry_price_15pct_base": 117.34,
-  "decision": "watch_pending_owner_review",
-  "strongest_counter_explanation": "growth projected without its capital cost",
-  "falsifiers": [
-    "growth projected without its capital cost",
-    "stock compensation or acquisitions omitted",
-    "terminal value unsupported by a durable mechanism"
-  ],
-  "pricing_conclusion": "Entry prices were computed mechanically from the routed power-zone profile (High-return compounder). They are decision inputs, not a decision; the owner must review the scenarios before acting.",
-  "economic_value_bridge": {
-    "schema_version": "1.0",
-    "status": "complete",
-    "trigger": {
-      "required": true,
-      "reasons": [
-        "explicit_component_schedule"
-      ],
-      "policy": "A complete economic-value analysis is required when any trigger fires; otherwise it is recommended."
+  "primary_entry_price_15pct_base": null,
+  "entry_price_status": "unavailable",
+  "entry_price_method": null,
+  "entry_price_unavailable_reason": "A present value today has no dated future payoff or cash-flow schedule and cannot be discounted again.",
+  "legacy_audit": {
+    "actionable": false,
+    "status": "audit_only",
+    "annualized_return_at_price_pct": {
+      "low": -12.19,
+      "base": 0.11,
+      "high": 9.4
     },
-    "method": "component_economic_value",
-    "economic_claim": {
-      "description": "One diluted share of AKAM, including edge platform owner cash, Compute/GPU upside, net financial claims, and cloud competition reserve.",
-      "unit_label": "diluted share",
-      "unit_count": 147000000,
-      "unit_source": "FY2025 weighted average diluted shares 147.0M (AKAM/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0001086222_26_000022.htm).",
-      "enterprise_to_equity_reconciliation": "Consolidated platform engine valued through owner-cash discount on FY2025 FCF per share; Compute option, net liquidity, and competition reserve are separate overlap keys."
-    },
-    "gaap_role": "cross_check",
-    "accounting_reference": "FY2025 10-K: stockholders' equity ~$4.98B; economic value in normalized owner cash ($6.8789/sh), not GAAP book alone.",
-    "comparable_hierarchy": [
-      "issuer_arm_length_transaction",
-      "same_asset_transaction",
-      "public_peer",
-      "replacement_cost",
-      "approved_external_analysis"
-    ],
-    "gross_comparable_nav_per_share": null,
-    "risked_present_value_per_share": {
-      "low": 50.0,
-      "base": 125.16,
-      "high": 233.0
-    },
-    "component_groups": [
-      {
-        "id": "edge_platform_owner_cash_engine",
-        "label": "Edge platform owner-cash engine",
-        "component_ids": [
-          "edge_platform_owner_cash_engine"
-        ],
-        "economic_claim": "Compute, Security, and Delivery normalized free cash flow",
-        "valuation_basis": "Owner-cash discount on FY2025 FCF per diluted share.",
-        "adjustments": "Q1 2026 margin compression noted; not normalized out of base.",
-        "overlap_control": "Unique overlap key edge_platform_owner_cash_engine.",
-        "risked_present_value_per_share": {
-          "low": 98.0,
-          "base": 145.0,
-          "high": 215.0
-        }
-      },
-      {
-        "id": "compute_gpu_platform_option",
-        "label": "Compute and GPU/cloud platform upside option",
-        "component_ids": [
-          "compute_gpu_platform_option"
-        ],
-        "economic_claim": "Incremental GPU/cloud monetization beyond normalized FCF",
-        "valuation_basis": "Risk-adjusted milestone value on Compute mix shift and RPO.",
-        "adjustments": "Not in Lawrence base FCF path; Compute +10% FY2025 supports base band.",
-        "overlap_control": "Unique overlap key compute_gpu_platform_option.",
-        "risk_and_timing": {
-          "probability_basis": "Base ~40% that Compute sustains high-single-digit growth with margin recovery.",
-          "timing_basis": "RPO ~$5.2B converts over multi-year contracts per FY2025 10-K.",
-          "remaining_capital_basis": "Operating-lease and capex wave for compute build-out in proof judgment band."
-        },
-        "risked_present_value_per_share": {
-          "low": 0.0,
-          "base": 10.0,
-          "high": 28.0
-        }
-      },
-      {
-        "id": "net_financial_claims",
-        "label": "Net cash and convertible debt claims on common equity",
-        "component_ids": [
-          "net_financial_claims"
-        ],
-        "economic_claim": "Net corporate liquidity after convertible notes and operating minimum",
-        "valuation_basis": "Net asset value on filing-locked cash less convertible debt.",
-        "adjustments": "Convertible notes at principal; no equity credit in base case.",
-        "overlap_control": "Unique overlap key net_financial_claims.",
-        "risked_present_value_per_share": {
-          "low": -28.0,
-          "base": -21.84,
-          "high": -8.0
-        }
-      },
-      {
-        "id": "cloud_competition_reserve",
-        "label": "Cloud price competition and Security share-loss stress reserve",
-        "component_ids": [
-          "cloud_competition_reserve"
-        ],
-        "economic_claim": "Hyperscaler/Cloudflare pricing and Security erosion stress",
-        "valuation_basis": "Bounded negative reserve; not full enterprise value haircut.",
-        "adjustments": "Partial dhando: cloud price war could compress FCF faster than low growth scenario.",
-        "overlap_control": "Unique overlap key cloud_competition_reserve.",
-        "risked_present_value_per_share": {
-          "low": -20.0,
-          "base": -8.0,
-          "high": -2.0
-        }
-      }
-    ],
-    "valuation_proof": [
-      {
-        "component_id": "edge_platform_owner_cash_engine",
-        "economic_claim": "Compute, Security, and Delivery normalized free cash flow",
-        "quantity": {
-          "value": 1,
-          "unit": "per-share economic claim"
-        },
-        "method": "owner_cash_or_dividend_discount",
-        "evidence_tier": "primary_derived",
-        "evidence": "Primary bridge from AKAM/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0001086222_26_000022.htm: FY2025 revenue $4208.2B, OCF $1519.0M, FCF $1011.2M, cash $930.2M, convertible debt $4140.0M; contract backfill 2026-07-21.",
-        "comparable_role": "not_applicable",
-        "comparable_ids": [],
-        "adjustment": "Q1 2026 margin compression noted; not normalized out of base.",
-        "range_per_share": {
-          "low": 98.0,
-          "base": 145.0,
-          "high": 215.0
-        },
-        "treatment": "additive",
-        "overlap_key": "edge_platform_owner_cash_engine",
-        "overlap_control": "Unique overlap key edge_platform_owner_cash_engine.",
-        "falsifier": "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
-        "risk_and_timing": null
-      },
-      {
-        "component_id": "compute_gpu_platform_option",
-        "economic_claim": "Incremental GPU/cloud monetization beyond normalized FCF",
-        "quantity": {
-          "value": 1,
-          "unit": "per-share economic claim"
-        },
-        "method": "risk_adjusted_milestone_value",
-        "evidence_tier": "primary_derived",
-        "evidence": "Primary bridge from AKAM/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0001086222_26_000022.htm: FY2025 revenue $4208.2B, OCF $1519.0M, FCF $1011.2M, cash $930.2M, convertible debt $4140.0M; contract backfill 2026-07-21.",
-        "comparable_role": "not_applicable",
-        "comparable_ids": [],
-        "adjustment": "Not in Lawrence base FCF path; Compute +10% FY2025 supports base band.",
-        "range_per_share": {
-          "low": 0.0,
-          "base": 10.0,
-          "high": 28.0
-        },
-        "treatment": "additive",
-        "overlap_key": "compute_gpu_platform_option",
-        "overlap_control": "Unique overlap key compute_gpu_platform_option.",
-        "falsifier": "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
-        "risk_and_timing": {
-          "success_probability": null,
-          "remaining_capital_m": null,
-          "timing_basis": "RPO ~$5.2B converts over multi-year contracts per FY2025 10-K.",
-          "probability_basis": "Base ~40% that Compute sustains high-single-digit growth with margin recovery.",
-          "remaining_capital_basis": "Operating-lease and capex wave for compute build-out in proof judgment band."
-        }
-      },
-      {
-        "component_id": "net_financial_claims",
-        "economic_claim": "Net corporate liquidity after convertible notes and operating minimum",
-        "quantity": {
-          "value": 1,
-          "unit": "per-share economic claim"
-        },
-        "method": "net_asset_value",
-        "evidence_tier": "primary_derived",
-        "evidence": "Primary bridge from AKAM/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0001086222_26_000022.htm: FY2025 revenue $4208.2B, OCF $1519.0M, FCF $1011.2M, cash $930.2M, convertible debt $4140.0M; contract backfill 2026-07-21.",
-        "comparable_role": "not_applicable",
-        "comparable_ids": [],
-        "adjustment": "Convertible notes at principal; no equity credit in base case.",
-        "range_per_share": {
-          "low": -28.0,
-          "base": -21.84,
-          "high": -8.0
-        },
-        "treatment": "additive",
-        "overlap_key": "net_financial_claims",
-        "overlap_control": "Unique overlap key net_financial_claims.",
-        "falsifier": "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
-        "risk_and_timing": null
-      },
-      {
-        "component_id": "cloud_competition_reserve",
-        "economic_claim": "Hyperscaler/Cloudflare pricing and Security erosion stress",
-        "quantity": {
-          "value": 1,
-          "unit": "per-share economic claim"
-        },
-        "method": "net_asset_value",
-        "evidence_tier": "primary_derived",
-        "evidence": "Primary bridge from AKAM/investor-documents/sec-edgar/10-K_20260220_rpt20251231_acc0001086222_26_000022.htm: FY2025 revenue $4208.2B, OCF $1519.0M, FCF $1011.2M, cash $930.2M, convertible debt $4140.0M; contract backfill 2026-07-21.",
-        "comparable_role": "not_applicable",
-        "comparable_ids": [],
-        "adjustment": "Partial dhando: cloud price war could compress FCF faster than low growth scenario.",
-        "range_per_share": {
-          "low": -20.0,
-          "base": -8.0,
-          "high": -2.0
-        },
-        "treatment": "additive",
-        "overlap_key": "cloud_competition_reserve",
-        "overlap_control": "Unique overlap key cloud_competition_reserve.",
-        "falsifier": "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case.",
-        "risk_and_timing": null
-      }
-    ],
-    "wisdom_applied": [],
-    "limitations": [
-      "Segment-level FCF not separately disclosed; consolidated engine with Compute option overlay.",
-      "Convertible note equity conversion and competition reserve bands are judgment."
-    ],
-    "complete_component_coverage": true,
-    "validation_errors": [],
-    "registry_version": "1.0"
+    "formula": "((present_value_or_output + undated_distributions) / price) ** (1 / horizon_years) - 1",
+    "reason_non_actionable": "This legacy calculation treated a present value as a future payoff and cannot be used as a forward return, hurdle entry price, ranking signal, or capital decision."
   },
-  "committee_routing": {
-    "stage": "not_initialized",
-    "packet_hash": null,
-    "selected_raters": [],
-    "independence_groups": []
+  "decision": "owner_review_required",
+  "pricing_conclusion": "No hurdle entry price is published because this contract does not contain usable dated forward economics.",
+  "falsifiers": [
+    "Primary evidence shows claim, cash conversion, or capital structure is materially worse than low case."
+  ],
+  "power_zone": {
+    "profile_id": "quality_reinvestment",
+    "label": "High-return compounder",
+    "input_hash": "fa6935b841c4e109cbd88a936b34193c0d4f7fe1752eea20daaf20313cf1eb04"
   }
 }
