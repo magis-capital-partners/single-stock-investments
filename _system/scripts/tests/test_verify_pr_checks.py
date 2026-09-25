@@ -19,13 +19,16 @@ spec.loader.exec_module(vpc)
 
 QUALITY = "Research quality"
 AUTOMERGE = "Auto - Agent PR Merge"
+QUALITY_ID, AUTOMERGE_ID = 101, 202
 
 
-def run(name, suite, *, number, status="completed", conclusion="success", created="2026-09-24T19:37:43Z"):
+def run(name, suite, *, number, status="completed", conclusion="success",
+        created="2026-09-24T19:37:43Z", workflow_id=None):
+    ids = {QUALITY: QUALITY_ID, AUTOMERGE: AUTOMERGE_ID}
     return {
         "name": name, "check_suite_id": suite, "run_number": number, "run_attempt": 1,
         "status": status, "conclusion": conclusion if status == "completed" else None,
-        "created_at": created,
+        "created_at": created, "workflow_id": workflow_id or ids.get(name, 900 + suite % 97),
     }
 
 
@@ -58,41 +61,43 @@ UNTESTED_1021 = [
 ]
 
 
-def verdict(checks, runs, **kwargs):
+def verdict(checks, runs, statuses=None, **kwargs):
     kwargs.setdefault("require_workflows", [QUALITY])
     kwargs.setdefault("exclude_workflows", [AUTOMERGE])
-    return vpc.evaluate(checks, runs, **kwargs)
+    return vpc.assess(checks, runs, statuses, **kwargs)
 
 
 def test_a_fully_green_head_passes_while_automerge_itself_is_still_running():
-    assert verdict(GREEN_CHECKS, GREEN_RUNS) == []
+    assert verdict(GREEN_CHECKS, GREEN_RUNS) == ([], [])
 
 
 def test_the_untested_resolver_heads_that_were_squashed_are_refused():
-    problems = verdict([], UNTESTED_1021)
-    assert any("failure: workflow 'Research quality'" in p for p in problems), problems
-    assert any("required workflow 'Research quality' is failure" in p for p in problems), problems
+    red, _ = verdict([], UNTESTED_1021)
+    assert "failure: workflow 'Research quality'" in red, red
+    assert "required workflow 'Research quality' did not succeed" in red, red
 
 
-def test_a_head_with_no_research_quality_run_is_refused():
-    problems = verdict([check("changes", 1)], [run("Something else", 1, number=5)])
-    assert any("missing: required workflow 'Research quality'" in p for p in problems), problems
+def test_a_head_with_no_research_quality_run_waits_for_it():
+    red, pending = verdict([check("changes", 1)], [run("Something else", 1, number=5)])
+    assert not red
+    assert any("missing: required workflow 'Research quality'" in p for p in pending), pending
 
 
 def test_any_red_check_blocks_even_outside_the_required_workflow():
     runs = GREEN_RUNS + [run("LLM Workflow Governance", 555, number=77, conclusion="failure")]
     checks = GREEN_CHECKS + [check("validate", 555, conclusion="failure")]
-    problems = verdict(checks, runs)
-    assert "failure: LLM Workflow Governance / validate" in problems
+    red, _ = verdict(checks, runs)
+    assert "failure: LLM Workflow Governance / validate" in red
 
 
-def test_a_pending_check_blocks():
+def test_a_pending_check_is_pending_not_red():
     checks = [c if c["name"] != "graph-invariants" else check("graph-invariants", 97623145407, status="in_progress")
               for c in GREEN_CHECKS]
     runs = [run(QUALITY, 97623145407, number=1080, status="in_progress"), GREEN_RUNS[1]]
-    problems = verdict(checks, runs)
-    assert "pending: Research quality / graph-invariants" in problems
-    assert any("still in_progress" in p for p in problems)
+    red, pending = verdict(checks, runs)
+    assert not red
+    assert "in_progress: Research quality / graph-invariants" in pending
+    assert "in_progress: workflow 'Research quality'" in pending
 
 
 def test_a_superseded_run_of_the_same_workflow_does_not_count():
@@ -101,23 +106,94 @@ def test_a_superseded_run_of_the_same_workflow_does_not_count():
     older = run(QUALITY, 111, number=1079, conclusion="cancelled", created="2026-09-24T19:30:00Z")
     runs = GREEN_RUNS + [older]
     checks = GREEN_CHECKS + [check("graph-invariants", 111, conclusion="cancelled")]
-    assert verdict(checks, runs) == []
+    assert verdict(checks, runs) == ([], [])
+
+
+def test_two_workflows_with_one_name_cannot_hide_a_red_run():
+    """Keyed by name, a newer green run of one workflow hid a red run of another."""
+    red_one = run("Checks", 301, number=10, conclusion="failure", workflow_id=7, created="2026-09-24T19:00:00Z")
+    green_other = run("Checks", 302, number=11, conclusion="success", workflow_id=8, created="2026-09-24T19:05:00Z")
+    red, _ = verdict([check("test", 301, conclusion="failure"), check("test", 302)],
+                     GREEN_RUNS + [red_one, green_other])
+    assert "failure: workflow 'Checks'" in red
+    assert "failure: Checks / test" in red
+
+
+def test_commit_statuses_count():
+    statuses = [
+        {"context": "ci/legacy", "state": "failure"},
+        {"context": "ci/other", "state": "error"},
+        {"context": "ci/slow", "state": "pending"},
+        {"context": "ci/ok", "state": "success"},
+    ]
+    red, pending = verdict(GREEN_CHECKS, GREEN_RUNS, statuses)
+    assert "failure: status 'ci/legacy'" in red
+    assert "error: status 'ci/other'" in red
+    assert pending == ["pending: status 'ci/slow'"]
 
 
 def test_zero_checks_is_allowed_only_when_asked():
-    assert verdict([], [], require_workflows=[]) == ["no checks reported on this commit"]
-    assert verdict([], [], require_workflows=[], allow_no_checks=True) == []
+    assert verdict([], [], require_workflows=[]) == ([], ["no checks reported on this commit yet"])
+    assert verdict([], [], require_workflows=[], allow_no_checks=True) == ([], [])
 
 
-def test_cli_reads_github_and_exits_nonzero_for_the_1021_head(tmp_path, monkeypatch, capsys):
-    pages = {
-        "check-runs": [],
-        "actions/runs": UNTESTED_1021,
-    }
+class Clock:
+    def __init__(self):
+        self.now = 0.0
+        self.sleeps = []
+
+    def sleep(self, seconds):
+        self.sleeps.append(seconds)
+        self.now += seconds
+
+
+def pending_then(green_after: int):
+    calls = {"n": 0}
+    slow = [run(QUALITY, 97623145407, number=1080, status="in_progress"), GREEN_RUNS[1]]
+
+    def fetch(repo, sha):
+        calls["n"] += 1
+        runs = GREEN_RUNS if calls["n"] > green_after else slow
+        return GREEN_CHECKS, runs, []
+
+    return fetch, calls
+
+
+def test_pending_checks_are_polled_until_green():
+    clock = Clock()
+    fetch, calls = pending_then(green_after=2)
+    code = vpc.verify("o/r", "abc", require_workflows=[QUALITY], exclude_workflows=[AUTOMERGE],
+                      wait_seconds=600, poll_seconds=30, fetch_fn=fetch,
+                      sleep_fn=clock.sleep, now_fn=lambda: clock.now)
+    assert code == vpc.EXIT_GREEN
+    assert calls["n"] == 3 and clock.sleeps == [30, 30]
+
+
+def test_still_pending_after_the_wait_is_blocked_will_retry(capsys):
+    clock = Clock()
+    fetch, _ = pending_then(green_after=10**6)
+    code = vpc.verify("o/r", "abc", require_workflows=[QUALITY], exclude_workflows=[AUTOMERGE],
+                      wait_seconds=600, poll_seconds=30, fetch_fn=fetch,
+                      sleep_fn=clock.sleep, now_fn=lambda: clock.now)
+    assert code == vpc.EXIT_PENDING
+    assert sum(clock.sleeps) == 600
+    assert "BLOCKED, WILL RETRY" in capsys.readouterr().out
+
+
+def test_red_fails_at_once_without_waiting():
+    clock = Clock()
+    code = vpc.verify("o/r", "abc", require_workflows=[QUALITY], exclude_workflows=[AUTOMERGE],
+                      fetch_fn=lambda repo, sha: ([], UNTESTED_1021, []),
+                      sleep_fn=clock.sleep, now_fn=lambda: clock.now)
+    assert code == vpc.EXIT_RED and clock.sleeps == []
+
+
+def test_cli_reads_github_and_exits_nonzero_for_the_1021_head(monkeypatch, capsys):
+    pages = {"check-runs": [], "actions/runs": UNTESTED_1021, "/status": []}
 
     def fake_run(cmd, capture_output, text, check):
         assert cmd[:3] == ["gh", "api", "--paginate"]
-        key = "check-runs" if "check-runs" in cmd[3] else "actions/runs"
+        key = next(k for k in pages if k in cmd[3])
         out = "\n".join(json.dumps(row) for row in pages[key])
         return subprocess.CompletedProcess(cmd, 0, stdout=out, stderr="")
 
@@ -126,7 +202,7 @@ def test_cli_reads_github_and_exits_nonzero_for_the_1021_head(tmp_path, monkeypa
         "--repo", "o/r", "--sha", "6231144a5b8d713646312ad72287ac0a49538793",
         "--require-workflow", QUALITY, "--exclude-workflow", AUTOMERGE,
     ])
-    assert code == 1
+    assert code == vpc.EXIT_RED
     assert "NOT GREEN" in capsys.readouterr().out
 
 
@@ -135,4 +211,4 @@ def test_cli_reports_api_errors_as_usage_errors(monkeypatch):
         return subprocess.CompletedProcess(cmd, 1, stdout="", stderr="HTTP 502")
 
     monkeypatch.setattr(vpc.subprocess, "run", failing_run)
-    assert vpc.main(["--repo", "o/r", "--sha", "abc"]) == 2
+    assert vpc.main(["--repo", "o/r", "--sha", "abc"]) == vpc.EXIT_API
