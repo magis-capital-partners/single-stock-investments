@@ -164,6 +164,99 @@ class PushVaultTests(unittest.TestCase):
         self.assertTrue(any(line.startswith("vault unwind failed") for line in self.lines))
 
 
+class PushMainTests(unittest.TestCase):
+    """push_main against a real ops-repo clone and the origin it publishes to.
+
+    On 2026-09-25 videos.json on main advertised 95 videos while 63 stale detail
+    shards were committed and 32 had never been added at all: every one of those
+    a 404 when clicked. The staging list named three index files and no shard
+    directory, so the files a click actually opens were never staged. Separately,
+    the worktree had been moved to a wip branch, and `git push origin main`
+    pushes the *local branch called main* -- not the commit the lane had just
+    made on HEAD -- so two days of work went nowhere while the vault push
+    succeeded.
+    """
+
+    SHARDS = "dashboard/data/insights/video_details"
+
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory()
+        self.base = Path(self.tmp.name)
+        self.origin = self.base / "origin.git"
+        self.repo = self.base / "ops"
+        subprocess.run(["git", "init", "-q", "--bare", "-b", "main", str(self.origin)], check=True)
+        _git(self.origin, "config", "core.longpaths", "true")
+        subprocess.run(["git", "init", "-q", "-b", "main", str(self.repo)], check=True)
+        _configure(self.repo)
+        _git(self.repo, "remote", "add", "origin", str(self.origin))
+        for rel in lane.MAIN_PATHS:
+            _write(self.repo / rel, "{}\n")
+        _write(self.repo / self.SHARDS / "kept.json", '{"video_id":"kept"}\n')
+        _write(self.repo / self.SHARDS / "dropped.json", '{"video_id":"dropped"}\n')
+        _git(self.repo, "add", "-A")
+        _git(self.repo, "commit", "-qm", "seed")
+        _git(self.repo, "push", "-q", "origin", "main")
+
+        self.lines: list[str] = []
+        for patch in (mock.patch.object(lane, "ROOT", self.repo),
+                      mock.patch.object(lane, "log", side_effect=self.lines.append)):
+            patch.start()
+            self.addCleanup(patch.stop)
+
+    def tearDown(self):
+        self.tmp.cleanup()
+
+    def _pushed(self, path: str) -> bool:
+        return subprocess.run(["git", "cat-file", "-e", f"main:{path}"],
+                              cwd=self.origin, capture_output=True).returncode == 0
+
+    def test_a_new_detail_shard_reaches_main(self):
+        """The 32 that never got added. A shard the publish step invents must be
+        committed, or videos.json names a file the site cannot serve."""
+        _write(self.repo / self.SHARDS / "brand-new.json", '{"video_id":"brand-new"}\n')
+        self.assertIs(lane.push_main(MESSAGE), True)
+        self.assertTrue(self._pushed(f"{self.SHARDS}/brand-new.json"))
+
+    def test_a_shard_that_left_the_corpus_is_removed(self):
+        """-A, not a bare add: a rejected video's shard must stop being served."""
+        (self.repo / self.SHARDS / "dropped.json").unlink()
+        self.assertIs(lane.push_main(MESSAGE), True)
+        self.assertFalse(self._pushed(f"{self.SHARDS}/dropped.json"))
+        self.assertTrue(self._pushed(f"{self.SHARDS}/kept.json"))
+
+    def test_nothing_outside_the_published_paths_is_staged(self):
+        """The reason the list was explicit in the first place: a pull can leave
+        anything in this worktree, and none of it is this lane's to publish."""
+        _write(self.repo / "_secrets" / "token.env", "SECRET=1\n")
+        _write(self.repo / "dashboard" / "data" / "insights" / "letters.json", "[]\n")
+        _write(self.repo / self.SHARDS / "brand-new.json", "{}\n")
+        self.assertIs(lane.push_main(MESSAGE), True)
+        self.assertFalse(self._pushed("_secrets/token.env"))
+        self.assertFalse(self._pushed("dashboard/data/insights/letters.json"))
+
+    def test_publishing_from_another_branch_is_refused(self):
+        """2026-09-24/25. Committing to HEAD and pushing `main` are only the
+        same thing on main, so anywhere else the lane must decline loudly."""
+        _git(self.repo, "checkout", "-q", "-b", "wip/youtube-video-details")
+        _write(self.repo / self.SHARDS / "brand-new.json", "{}\n")
+        self.assertIs(lane.push_main(MESSAGE), False)
+        self.assertTrue(any("not 'main'" in line for line in self.lines), self.lines)
+        self.assertEqual(_git(self.origin, "log", "-1", "--format=%s", "main"), "seed")
+
+    def test_the_commit_just_made_is_the_one_that_lands(self):
+        """`push origin main` resolves the local ref by name. Push HEAD so the
+        thing published is the thing built, even if a stale local main exists."""
+        _write(self.repo / self.SHARDS / "brand-new.json", "{}\n")
+        self.assertIs(lane.push_main(MESSAGE), True)
+        self.assertEqual(_git(self.origin, "log", "-1", "--format=%s", "main"), MESSAGE)
+        self.assertEqual(_git(self.origin, "rev-parse", "main"),
+                         _git(self.repo, "rev-parse", "HEAD"))
+
+    def test_nothing_to_commit_is_none_not_a_failure(self):
+        self.assertIsNone(lane.push_main(MESSAGE))
+        self.assertIn("main: nothing to commit", self.lines)
+
+
 class DescribeFailureTests(unittest.TestCase):
     def test_the_reason_survives_a_long_preamble(self):
         preamble = [f" * branch main -> FETCH_HEAD ({i})" for i in range(30)]
