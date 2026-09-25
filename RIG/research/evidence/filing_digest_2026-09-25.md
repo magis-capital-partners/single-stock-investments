@@ -4,7 +4,7 @@
 **Agent:** Marvin (`build_filing_evidence.py`)  
 **Inventory:** `RIG/research/evidence/document_inventory.json`  
 
-Documents in folder: **55** (all listed below; Tier 1–3 extracted or keyword-scanned).
+Documents in folder: **58** (all listed below; Tier 1–3 extracted or keyword-scanned).
 
 ## Document inventory
 
@@ -19,6 +19,7 @@ Documents in folder: **55** (all listed below; Tier 1–3 extracted or keyword-s
 | full | 10-K | 2024-02-21 | `investor-documents/sec-edgar/10-K_20240221_rpt20231231_acc0001451505_24_000015.htm` | 505935 |
 | full | 10-K | 2025-02-18 | `investor-documents/sec-edgar/10-K_20250218_rpt20241231_acc0001451505_25_000018.htm` | 494540 |
 | full | 10-K | 2026-02-23 | `investor-documents/sec-edgar/10-K_20260223_rpt20251231_acc0001451505_26_000018.htm` | 493742 |
+| scan | 10-Q | 2021-11-02 | `investor-documents/sec-edgar/10-Q_20211102_rpt20210930_acc0001451505_21_000086.htm` | 8056 |
 | scan | 10-Q | 2022-05-03 | `investor-documents/sec-edgar/10-Q_20220503_rpt20220331_acc0001451505_22_000044.htm` | 8056 |
 | scan | 10-Q | 2022-08-03 | `investor-documents/sec-edgar/10-Q_20220803_rpt20220630_acc0001451505_22_000068.htm` | 8056 |
 | scan | 10-Q | 2022-11-04 | `investor-documents/sec-edgar/10-Q_20221104_rpt20220930_acc0001451505_22_000101.htm` | 8056 |
@@ -36,6 +37,8 @@ Documents in folder: **55** (all listed below; Tier 1–3 extracted or keyword-s
 | scan | proxy | 2024-03-26 | `investor-documents/sec-edgar/DEF 14A_20240326_rpt20240516_acc0001451505_24_000029.htm` | 8056 |
 | scan | proxy | 2025-04-01 | `investor-documents/sec-edgar/DEF 14A_20250401_rpt20250530_acc0001451505_25_000029.htm` | 8056 |
 | full | proxy | 2026-03-31 | `investor-documents/sec-edgar/DEF 14A_20260331_rpt20260522_acc0001104659_26_037805.htm` | 406451 |
+| scan | 8-K | 2025-09-25 | `investor-documents/sec-edgar/8-K_20250925_rpt20250924_acc0001451505_25_000099.htm` | 3458 |
+| scan | 8-K | 2025-09-26 | `investor-documents/sec-edgar/8-K_20250926_rpt20250925_acc0001451505_25_000104.htm` | 5882 |
 | scan | 8-K | 2025-09-30 | `investor-documents/sec-edgar/8-K_20250930_rpt20250930_acc0001451505_25_000106.htm` | 3442 |
 | scan | 8-K | 2025-10-01 | `investor-documents/sec-edgar/8-K_20251001_rpt20251001_acc0001451505_25_000108.htm` | 3451 |
 | scan | 8-K | 2025-10-15 | `investor-documents/sec-edgar/8-K_20251015_rpt20251015_acc0001451505_25_000111.htm` | 3562 |

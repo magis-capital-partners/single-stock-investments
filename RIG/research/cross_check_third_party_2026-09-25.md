@@ -8,9 +8,9 @@
 
 ## Executive summary
 
-Marvin base case remains **3.6% per year** over seven years on mid-cycle normalized owner cash, with **watch** as stance proposal (legacy field; not capital authority). No approved third-party sources are indexed for RIG; filings and `valuation.json` anchor all numeric paths. **[HUMAN REVIEW]** before any external source enters base IRR.
+Marvin base case remains **4.9% per year** over seven years on mid-cycle normalized owner cash, with **watch** as stance proposal (legacy field; not capital authority). No approved third-party sources are indexed for RIG; filings and `valuation.json` anchor all numeric paths. **[HUMAN REVIEW]** before any external source enters base IRR.
 
-**Synthesis (best estimate):** Marvin **3.6%** base · stance **watch**; external sources would adjust catalyst timing and cycle narrative only until promoted in `third_party_sources.md`.
+**Synthesis (best estimate):** Marvin **4.9%** base · stance **watch**; external sources would adjust catalyst timing and cycle narrative only until promoted in `third_party_sources.md`.
 
 ## Sources in scope
 
@@ -32,18 +32,18 @@ Marvin base case remains **3.6% per year** over seven years on mid-cycle normali
 
 | Topic | Marvin floor | External | Blend logic |
 |-------|--------------|----------|-------------|
-| Primary IRR | **3.6%** (mid-cycle owner cash) | No approved external IRR | Marvin **100%** numeric until human promotes a source |
+| Primary IRR | **4.9%** (mid-cycle owner cash) | No approved external IRR | Marvin **100%** numeric until human promotes a source |
 | Cycle vs leverage | Partial dhando; net debt ~**$4.3B** | n/a | Context tier only if HK/VIC added later |
 
 ## Blended estimate (best judgment)
 
 | Lens | Owner cash / value | Return / horizon | Stance hint |
 |------|-------------------|------------------|-------------|
-| Marvin floor | **$0.36** normalized owner cash per share | **3.6%** / 7 years | **watch** |
+| Marvin floor | **$0.36** normalized owner cash per share | **4.9%** / 7 years | **watch** |
 | External (combined) | — | No numeric change | **watch** |
-| **Blended best estimate** | Filing anchor | **3.6%** | **watch** |
+| **Blended best estimate** | Filing anchor | **4.9%** | **watch** |
 
-**Returns statement (blended):** We expect **3.6% per year** at today's price on the Marvin base case; no indexed third party overrides filing math.
+**Returns statement (blended):** We expect **4.9% per year** at today's price on the Marvin base case; no indexed third party overrides filing math.
 
 ## [HUMAN REVIEW]
 
