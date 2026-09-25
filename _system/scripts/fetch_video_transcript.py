@@ -33,9 +33,11 @@ minutes; conference pitches are short and dense.
 **A fetch's answer is kept.** Discovery re-marks every video `pending_transcript`
 from metadata alone on each run and never reads the backlog, so the backlog is
 the only record of what a fetch already found. A transcript that failed the
-gate, or a video with no caption tracks, is settled there and not fetched again
-(see `settled()`). Re-reading a known answer spends a slot from a 20/hour
-budget and is one more chance of an IP block. `--refetch` overrides it.
+gate is settled there (re-judged against the current thresholds from its
+recorded length, never re-fetched unless it would now pass); a video with no
+caption tracks is asked again when it reaches NO_CAPTIONS_YOUNG if it was first
+asked younger, and monthly after that (see `settled()`). Re-reading a known answer spends a slot from a
+20/hour budget and is one more chance of an IP block. `--refetch` overrides it.
 
     python _system/scripts/fetch_video_transcript.py --limit 10
     python _system/scripts/fetch_video_transcript.py --video QoDbkHOsslg
@@ -91,36 +93,71 @@ MAX_ATTEMPTS = 4
 # The one rejection reached without a caption fetch (quality_gate's duration
 # reason shares the prefix). Every other reason came from reading a transcript.
 DURATION_REJECT = "too_short_duration"
-# A "no captions" answer about a fresh upload is not an answer yet. The
-# transcript library raises TranscriptsDisabled whenever the player response has
-# no caption tracks, and a new upload has none until YouTube's speech
-# recognition has run. Of 117 stored transcripts on 2026-09-24, three were
-# fetched 4.6-8.5 hours after upload, so the lane does meet videos that young.
-# A video checked inside this window gets one more look once it is older than
-# the window; a video checked after it is settled.
-NO_CAPTIONS_GRACE = timedelta(hours=48)
-
-# Failures that say nothing about the video, only about the moment. YouTube
-# rate-limits caption fetches by IP and returns IpBlocked for every subsequent
-# request regardless of which video it names, so counting these against an
-# item's retry budget buries good videos for an environmental reason.
+# A "no captions" answer is a description of YouTube's reply, not of the video.
+# The transcript library raises TranscriptsDisabled whenever the player response
+# has no caption tracks: for a fresh upload whose speech recognition has not run
+# yet, and for every video on a day YouTube changes what it serves the client
+# the library impersonates. So the answer is never final, only trusted for a
+# while:
 #
-# The podcast lane learned this exact lesson the expensive way: DNS failures
-# resolve in milliseconds, so a brief outage burned each item's whole retry
-# budget in under a second and marked 696 perfectly good episodes permanently
-# failed on 2026-08-20. Same failure mode, same fix -- attempts are not
-# incremented, and the run stops rather than marching through the backlog
-# converting a rate limit into hundreds of parked items.
-TRANSIENT_ERROR_MARKERS = (
+#   * asked within NO_CAPTIONS_YOUNG of upload, it is asked again once the video
+#     is past that age -- the next daily run, while RSS still lists it (the feed
+#     keeps 15 entries and these channels upload in bursts of 11-13);
+#   * otherwise it is asked again after NO_CAPTIONS_RECHECK.
+#
+# Of 117 stored transcripts on 2026-09-24, three were fetched 4.6-8.5 hours after
+# upload, and all three already had captions.
+NO_CAPTIONS_YOUNG = timedelta(hours=12)
+NO_CAPTIONS_RECHECK = timedelta(days=30)
+
+# Failures that say nothing about the video, only about the moment. None of
+# them spends an item's retry budget, and each one ends the pass, because once
+# the cause is the environment every remaining item fails identically.
+#
+# The podcast lane learned this the expensive way: DNS failures resolve in
+# milliseconds, so a brief outage burned each item's whole retry budget in under
+# a second and marked 696 perfectly good episodes permanently failed on
+# 2026-08-20.
+#
+# BLOCK markers are YouTube saying, by IP, "not you, not now". They are never
+# held against a video.
+BLOCK_ERROR_MARKERS = (
     "IpBlocked",
     "RequestBlocked",
     "TooManyRequests",
+)
+# Network, client and systemic failures. youtube-transcript-api uses `requests`,
+# so a DNS failure, a reset or a TLS error arrives as ConnectionError/SSLError --
+# the urllib names alone never matched. PoTokenRequired, YouTubeDataUnparsable
+# and a consent-cookie failure describe the client, not the video; so does
+# VideoUnplayable, which is also how the library reports a bot check worded
+# slightly differently from the one it recognises, and an upcoming premiere.
+# ParseError and AttributeError are what an empty or reshaped reply produces.
+ENVIRONMENT_ERROR_MARKERS = (
     "YouTubeRequestFailed",
     "URLError",
     "TimeoutError",
+    "Timeout",
     "RemoteDisconnected",
     "ConnectionResetError",
+    "ConnectionError",
+    "SSLError",
+    "ChunkedEncodingError",
+    "ProxyError",
+    "PoTokenRequired",
+    "YouTubeDataUnparsable",
+    "FailedToCreateConsentCookie",
+    "VideoUnplayable",
+    "ParseError",
+    "AttributeError",
 )
+TRANSIENT_ERROR_MARKERS = BLOCK_ERROR_MARKERS + ENVIRONMENT_ERROR_MARKERS
+# An environmental failure that keeps landing on one video, in passes where
+# another video had just succeeded, is about the video after all -- a URL that
+# always 404s would otherwise abort every pass forever. Only then is it counted,
+# as a strike rather than an attempt, and a video is parked after this many.
+# A block is never a strike.
+MAX_STRIKES = 3
 
 # The mirror image of the transient set: conditions that will never resolve by
 # waiting. An age-restricted video needs an authenticated session this lane does
@@ -129,7 +166,6 @@ TRANSIENT_ERROR_MARKERS = (
 PERMANENT_ERROR_MARKERS = (
     "AgeRestricted",
     "VideoUnavailable",
-    "VideoUnplayable",
     "NotTranslatable",
     "InvalidVideoId",
 )
@@ -139,6 +175,10 @@ PREFERRED_LANGS = ["en", "en-US", "en-GB"]
 
 def is_transient(status: str) -> bool:
     return any(marker in (status or "") for marker in TRANSIENT_ERROR_MARKERS)
+
+
+def is_block(status: str) -> bool:
+    return any(marker in (status or "") for marker in BLOCK_ERROR_MARKERS)
 
 
 def is_permanent(status: str) -> bool:
@@ -177,24 +217,42 @@ def backlog_path() -> Path:
     return videos_root(create=True) / BACKLOG_NAME
 
 
+class BacklogUnreadable(RuntimeError):
+    """The backlog exists but is not JSON. Refuse rather than start empty."""
+
+
 def load_backlog() -> dict:
     path = backlog_path()
     if not path.exists():
         return {"items": {}}
     try:
         doc = json.loads(path.read_text(encoding="utf-8"))
-        return doc if isinstance(doc, dict) else {"items": {}}
-    except json.JSONDecodeError:
-        return {"items": {}}
+    except json.JSONDecodeError as exc:
+        # Reading it as empty would be written back at the end of the pass and
+        # erase every verdict in it -- the one record of what fetches found.
+        raise BacklogUnreadable("{0}: {1}".format(path, exc)) from exc
+    return doc if isinstance(doc, dict) else {"items": {}}
 
 
 def save_backlog(doc: dict) -> None:
     doc["updated_at"] = now_stamp()
     items = doc.get("items") or {}
     doc["pending_count"] = sum(1 for v in items.values() if v.get("status") == "pending")
-    tmp = backlog_path().with_suffix(".json.tmp")
+    # A per-process temp name: video_whisper_backfill writes this same file
+    # through `caption_backlog.json.tmp`, and two writers sharing one temp file
+    # can publish a half-written mix of both.
+    tmp = backlog_path().with_name("{0}.{1}.tmp".format(BACKLOG_NAME, os.getpid()))
     tmp.write_text(json.dumps(doc, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
-    tmp.replace(backlog_path())
+    # Windows refuses to replace a file another process has open (WinError 5),
+    # and a reader holds it for milliseconds. Retry briefly before giving up.
+    for attempt in range(5):
+        try:
+            tmp.replace(backlog_path())
+            return
+        except PermissionError:
+            if attempt == 4:
+                raise
+            time.sleep(0.2)
 
 
 def fetch_captions(video_id: str) -> dict:
@@ -243,6 +301,8 @@ def fetch_captions(video_id: str) -> dict:
     )
     return {
         "status": "ok" if text else "no_captions",
+        # A listed track that fetched empty is not TranscriptsDisabled; say so.
+        "detail": None if text else "empty transcript",
         "text": text,
         "segments": segments,
         "language": getattr(fetched, "language_code", None),
@@ -254,8 +314,13 @@ def fetch_captions(video_id: str) -> dict:
 
 def quality_gate(text: str, duration_seconds: int | None) -> list[str]:
     """Mechanical rejects only. Relevance is decided later, on this same text."""
+    return gate_reasons(len(text or ""), duration_seconds)
+
+
+def gate_reasons(chars: int, duration_seconds: int | None) -> list[str]:
+    """quality_gate on the measurements alone, so a recorded reject can be
+    re-judged against today's thresholds without fetching the text again."""
     reasons: list[str] = []
-    chars = len(text or "")
     if duration_seconds is not None and duration_seconds < MIN_DURATION_SECONDS:
         reasons.append("too_short_duration_{0}s".format(duration_seconds))
     if chars < MIN_TRANSCRIPT_CHARS:
@@ -305,17 +370,44 @@ def settled(state: dict, *, duration: int | None, published: str | None,
                 return None
             return "settled"
         # A transcript was read and failed the gate. Tomorrow it will be the
-        # same transcript.
-        return "settled"
+        # same transcript -- but the thresholds may have moved, and the
+        # measurement is on record, so re-judge it rather than trust the old
+        # verdict. Only a verdict that would now pass costs a fetch.
+        chars = _recorded_chars(state, reasons)
+        if chars is None:
+            return "settled"
+        recorded = state.get("duration_seconds")
+        if gate_reasons(chars, recorded if recorded is not None else duration):
+            return "settled"
+        return None
     if status == "no_captions":
         checked = _parse_when(state.get("last_attempt_at"))
+        if checked is None:
+            return None
         born = _parse_when(published)
-        if checked is None or born is None or checked - born >= NO_CAPTIONS_GRACE:
-            return "settled"
-        # Asked while YouTube may still have been generating captions. Look
-        # again once the video is past the window -- not before, and not on
-        # every pass until then.
-        return "awaiting_captions" if now - born < NO_CAPTIONS_GRACE else None
+        if born is not None and checked - born < NO_CAPTIONS_YOUNG:
+            # Asked while YouTube may still have been generating captions.
+            # Look again once the video is past that age -- not before, and
+            # not on every pass until then.
+            return "awaiting_captions" if now - born < NO_CAPTIONS_YOUNG else None
+        # Trusted for a month, then asked again: cheap insurance against a
+        # day when YouTube served every video without its caption tracks.
+        return "settled" if now - checked < NO_CAPTIONS_RECHECK else None
+    return None
+
+
+_CHARS_REASON = re.compile(r"^transcript_too_short_(\d+)c$")
+
+
+def _recorded_chars(state: dict, reasons: list[str]) -> int | None:
+    """The transcript length a reject was judged on: recorded since 2026-09-25,
+    and carried in the reason string (`transcript_too_short_2412c`) before."""
+    if isinstance(state.get("chars"), int):
+        return state["chars"]
+    for reason in reasons:
+        match = _CHARS_REASON.match(reason)
+        if match:
+            return int(match.group(1))
     return None
 
 
@@ -375,7 +467,7 @@ def load_pending(limit: int | None, only_video: str | None) -> list[dict]:
 
 def run(*, limit: int | None = None, only_video: str | None = None,
         refetch: bool = False, sleep_seconds: float = 1.0,
-        wait_for_slot: bool = False) -> dict:
+        wait_for_slot: bool = False, deadline: datetime | None = None) -> dict:
     rows = load_pending(limit, only_video)
     if not rows:
         return {"considered": 0, "note": "nothing pending", "fetchable": 0}
@@ -393,6 +485,15 @@ def run(*, limit: int | None = None, only_video: str | None = None,
     stats = {"considered": len(rows), "fetched": 0, "no_captions": 0,
              "rejected_quality": 0, "skipped_existing": 0, "errors": 0, "parked": 0,
              "settled": 0, "awaiting_captions": 0}
+
+    # Videos that last failed transiently go to the back. A pass stops at its
+    # first environmental failure, so a video that fails that way every time
+    # would otherwise stop every pass before anything behind it is asked.
+    rows = sorted(rows, key=lambda r: int(
+        (items.get(r["video_id"]) or {}).get("transient_failures") or 0))
+    # Set by the first fetch YouTube answers in this pass: proof that, just
+    # now, the environment was fine.
+    healthy_this_pass = False
 
     for row in rows:
         vid = row["video_id"]
@@ -424,8 +525,13 @@ def run(*, limit: int | None = None, only_video: str | None = None,
         # daemon mode it waits, which is the whole point of running a daemon.
         decision = rate.check()
         while not decision["allowed"]:
-            if not wait_for_slot:
-                stats["stopped_on"] = "rate_budget:" + decision["reason"]
+            # A daemon whose next slot lies past its deadline stops now rather
+            # than sleeping until youtube_lane's wall clock kills it.
+            past_deadline = deadline is not None and (
+                _dt_now() + timedelta(seconds=decision["wait_seconds"]) > deadline)
+            if not wait_for_slot or past_deadline:
+                stats["stopped_on"] = (("deadline:" if past_deadline else "rate_budget:")
+                                       + decision["reason"])
                 stats["fetchable"] = count_fetchable(rows, items, meta_by_id)
                 print("hold  {0}  {1}, {2}s -- {3} left for the next run".format(
                     vid, decision["reason"], decision["wait_seconds"],
@@ -449,6 +555,7 @@ def run(*, limit: int | None = None, only_video: str | None = None,
             # The request itself succeeded, so the IP is evidently not blocked;
             # that is as much evidence of health as a transcript would be.
             rate.record_success()
+            healthy_this_pass = True
             # No fallback by design: audio transcription is not part of this lane.
             state.update({"status": "no_captions", "detail": result.get("detail")})
             stats["no_captions"] += 1
@@ -465,6 +572,19 @@ def run(*, limit: int | None = None, only_video: str | None = None,
             state["last_error"] = result["status"]
             stats["errors"] += 1
             if is_transient(result["status"]):
+                state["transient_failures"] = int(state.get("transient_failures") or 0) + 1
+                if healthy_this_pass and not is_block(result["status"]):
+                    # Another video was answered moments ago, so this one
+                    # failing is at least partly about this one. A strike, not
+                    # an attempt; see MAX_STRIKES. An IP block never strikes.
+                    state["strikes"] = int(state.get("strikes") or 0) + 1
+                    if state["strikes"] >= MAX_STRIKES:
+                        state["status"] = "parked"
+                        print("err   {0}  {1}  (parked after {2} strikes)".format(
+                            vid, result["status"], state["strikes"]), flush=True)
+                        save_backlog(backlog)
+                        time.sleep(sleep_seconds)
+                        continue
                 # Persist the backoff before doing anything else: a restart must
                 # not read as "we waited". Then stop -- once the IP is limited
                 # every remaining item fails identically, and continuing would
@@ -488,10 +608,14 @@ def run(*, limit: int | None = None, only_video: str | None = None,
             continue
 
         rate.record_success()
+        healthy_this_pass = True
         text = result.get("text") or ""
         reasons = quality_gate(text, duration)
         if reasons:
-            state.update({"status": "rejected", "reasons": reasons, "checked_at": now_stamp()})
+            # The measurement goes on record so settled() can re-judge it
+            # if the thresholds move, without fetching the text again.
+            state.update({"status": "rejected", "reasons": reasons, "checked_at": now_stamp(),
+                          "chars": len(text), "duration_seconds": duration})
             stats["rejected_quality"] += 1
             print("drop  {0}  {1}  {2}".format(vid, ",".join(reasons),
                                                (row.get("title") or "")[:36]), flush=True)
@@ -559,16 +683,15 @@ def daemon(*, max_hours: float | None = None, sleep_seconds: float = 1.0) -> dic
     on is how the caption stage used to fill its whole window.
     """
     started = _dt_now()
+    deadline = started + timedelta(hours=max_hours) if max_hours is not None else None
     totals = {"passes": 0, "fetched": 0, "no_captions": 0, "rejected_quality": 0,
               "errors": 0, "blocks": 0}
     while True:
-        if max_hours is not None:
-            elapsed = (_dt_now() - started).total_seconds() / 3600.0
-            if elapsed >= max_hours:
-                totals["stopped"] = "max_hours"
-                return totals
+        if deadline is not None and _dt_now() >= deadline:
+            totals["stopped"] = "max_hours"
+            return totals
 
-        stats = run(sleep_seconds=sleep_seconds, wait_for_slot=True)
+        stats = run(sleep_seconds=sleep_seconds, wait_for_slot=True, deadline=deadline)
         totals["passes"] += 1
         for key in ("fetched", "no_captions", "rejected_quality", "errors"):
             totals[key] += int(stats.get(key) or 0)
@@ -589,10 +712,21 @@ def daemon(*, max_hours: float | None = None, sleep_seconds: float = 1.0) -> dic
         if remaining == 0 and not stats.get("aborted_on"):
             totals["stopped"] = "backlog_empty"
             return totals
+        if str(stats.get("stopped_on") or "").startswith("deadline:"):
+            totals["stopped"] = stats["stopped_on"]
+            return totals
 
         # The next pass will block on the pacing check anyway; sleeping here
-        # keeps the log from filling with wait lines.
+        # keeps the log from filling with wait lines. A wait that would outlast
+        # the window ends the daemon instead: sleeping into the wall-clock kill
+        # buys nothing.
         decision = rate.check()
+        if not decision["allowed"] and deadline is not None and (
+                _dt_now() + timedelta(seconds=decision["wait_seconds"]) > deadline):
+            totals["stopped"] = "deadline:" + decision["reason"]
+            print("stop  next slot is past the window ({0})".format(decision["reason"]),
+                  flush=True)
+            return totals
         if not decision["allowed"]:
             nap = min(decision["wait_seconds"], 900)
             print("idle  {0}s ({1})".format(nap, decision["reason"]), flush=True)

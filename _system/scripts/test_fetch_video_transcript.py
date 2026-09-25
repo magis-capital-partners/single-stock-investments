@@ -278,7 +278,18 @@ class CaptionLaneHarness(unittest.TestCase):
         self.rate.record_block.return_value = {"blocked_until": "2026-09-25T09:48:10Z"}
         self.clock = mock.MagicMock()  # replaces the `time` module: sleeps are recorded, not slept
         self.out = io.StringIO()
+        # The clock is frozen, so a daemon that never stops would hang the
+        # suite. Fail it instead: no test here needs more than a few passes.
+        real_run, self.passes = fvt.run, 0
+
+        def bounded_run(*args, **kwargs):
+            self.passes += 1
+            if self.passes > 25:
+                raise AssertionError("run() called 25 times: the daemon is not stopping")
+            return real_run(*args, **kwargs)
+
         for patcher in (
+            mock.patch.object(fvt, "run", side_effect=bounded_run),
             mock.patch.object(fvt, "videos_root", return_value=self.root),
             mock.patch.object(fvt, "rate", self.rate),
             mock.patch.object(fvt, "time", self.clock),
@@ -400,7 +411,7 @@ class FreshUploadTests(CaptionLaneHarness):
         self.discover(_row("freshpitch1", "A new Sohn pitch", self.born.isoformat()))
         self.durations["freshpitch1"] = 900
 
-    def test_captions_that_appear_later_are_collected_on_one_more_look(self):
+    def test_captions_that_appear_later_are_collected_on_the_next_daily_run(self):
         self.answers["freshpitch1"] = [NO_CAPTIONS, _captions(12000)]
         first = self.run_pass()
         self.assertEqual(first["fetchable"], 0, "an unripe video must not hold the daemon open")
@@ -408,20 +419,27 @@ class FreshUploadTests(CaptionLaneHarness):
         self.assertEqual(waiting["awaiting_captions"], 1)
         self.assertEqual(self.fetched, ["freshpitch1"])
 
-        self.now = self.born + fvt.NO_CAPTIONS_GRACE + timedelta(minutes=1)
+        # Tomorrow's 05:17 run: RSS still lists it (15 entries), captions exist.
+        self.now = NOW + timedelta(days=1)
         self.run_pass()
         self.assertEqual(self.fetched, ["freshpitch1", "freshpitch1"])
         self.assertEqual(self.backlog()["freshpitch1"]["status"], "done")
 
-    def test_a_second_no_captions_answer_is_final(self):
+    def test_a_mature_no_captions_answer_is_trusted_for_a_month_then_asked_again(self):
         self.answers["freshpitch1"] = [NO_CAPTIONS]
         self.run_pass()
-        self.now = self.born + fvt.NO_CAPTIONS_GRACE + timedelta(hours=1)
+        second_look = NOW + timedelta(days=1)
+        self.now = second_look
         self.run_pass()
-        self.now += timedelta(days=30)
-        final = self.run_pass()
+        self.now = second_look + fvt.NO_CAPTIONS_RECHECK - timedelta(hours=1)
+        trusted = self.run_pass()
+        self.assertEqual(trusted["settled"], 1)
         self.assertEqual(self.fetched, ["freshpitch1", "freshpitch1"])
-        self.assertEqual(final["settled"], 1)
+        # A day YouTube served every video without its tracks must not be
+        # permanent: after a month the answer is asked for again.
+        self.now = second_look + fvt.NO_CAPTIONS_RECHECK + timedelta(hours=1)
+        self.run_pass()
+        self.assertEqual(self.fetched, ["freshpitch1"] * 3)
 
 
 class DurationRejectTests(CaptionLaneHarness):
@@ -460,23 +478,49 @@ class DurationRejectTests(CaptionLaneHarness):
 class BlocksAreNeverChargedTests(CaptionLaneHarness):
     """An IP block says nothing about the video: the 696-episode lesson."""
 
-    def test_repeated_blocks_neither_spend_attempts_nor_settle_the_video(self):
+    def test_the_first_block_stops_the_pass_before_the_rest_of_the_backlog(self):
         self.discover(_row("goodvid01"), _row("goodvid02"))
         self.durations.update({"goodvid01": 1200, "goodvid02": 1200})
         self.answers["goodvid01"] = [IP_BLOCKED]
-        for _ in range(fvt.MAX_ATTEMPTS + 2):
+        stats = self.run_pass()
+        self.assertEqual(stats["aborted_on"], "error:IpBlocked")
+        self.assertEqual(stats["fetchable"], 2)
+        self.assertEqual(self.fetched, ["goodvid01"])
+
+    def test_repeated_blocks_never_spend_attempts_strikes_or_settle_the_video(self):
+        # Even when another video was answered just before -- a block is by IP.
+        self.discover(_row("goodvid01"), _row("goodvid02"))
+        self.durations.update({"goodvid01": 1200, "goodvid02": 1200})
+        self.answers["goodvid01"] = [IP_BLOCKED]
+        for _ in range(fvt.MAX_ATTEMPTS + fvt.MAX_STRIKES + 2):
             stats = self.run_pass()
             self.assertEqual(stats["aborted_on"], "error:IpBlocked")
-            self.assertEqual(stats["fetchable"], 2)
         state = self.backlog()["goodvid01"]
         self.assertEqual((state["attempts"], state["status"]), (0, "pending"))
-        # Each pass stops at the block rather than marching through the rest.
-        self.assertNotIn("goodvid02", self.fetched)
-        self.assertEqual(self.rate.record_block.call_count, fvt.MAX_ATTEMPTS + 2)
+        self.assertNotIn("strikes", state)
+        self.assertEqual(stats["fetchable"], 1)
+
+    def test_network_failures_through_requests_are_never_charged(self):
+        # youtube-transcript-api uses `requests`: DNS failures, resets and TLS
+        # errors arrive as ConnectionError / SSLError, not the urllib names.
+        for status in ("error:ConnectionError", "error:SSLError", "error:ReadTimeout",
+                       "error:PoTokenRequired", "error:YouTubeDataUnparsable",
+                       "error:VideoUnplayable"):
+            with self.subTest(status=status):
+                self.fetched.clear()
+                self.passes = 0
+                self.discover(_row("goodvid01"))
+                self.durations["goodvid01"] = 1200
+                self.seed({})
+                self.answers["goodvid01"] = [{"status": status, "detail": "x"}]
+                for _ in range(fvt.MAX_ATTEMPTS + 1):
+                    self.run_pass()
+                state = self.backlog()["goodvid01"]
+                self.assertEqual((state["attempts"], state["status"]), (0, "pending"))
 
     def test_a_blocked_second_look_is_retried_not_settled(self):
         # First asked an hour after upload; the second look is now due.
-        born = NOW - fvt.NO_CAPTIONS_GRACE - timedelta(hours=3)
+        born = NOW - fvt.NO_CAPTIONS_YOUNG - timedelta(hours=3)
         first_look = (born + timedelta(hours=1)).strftime("%Y-%m-%dT%H:%M:%SZ")
         self.discover(_row("freshpitch1", "A new Sohn pitch", born.isoformat()))
         self.durations["freshpitch1"] = 900
@@ -499,6 +543,153 @@ class BlocksAreNeverChargedTests(CaptionLaneHarness):
         self.assertEqual(totals["stopped"], "backlog_empty")
         # Only the fetch that YouTube actually answered was charged.
         self.assertEqual(self.backlog()["goodvid01"]["attempts"], 1)
+
+
+class StrikeTests(CaptionLaneHarness):
+    """A video that fails "environmentally" every time must not stall the lane."""
+
+    POISON = {"status": "error:YouTubeRequestFailed", "detail": "404 for this URL"}
+
+    def test_a_poison_video_first_in_order_no_longer_starves_the_rest(self):
+        self.discover(_row("poison0001"), _row("goodvid01"), _row("goodvid02"))
+        self.durations.update({"poison0001": 900, "goodvid01": 900, "goodvid02": 900})
+        self.answers["poison0001"] = [self.POISON]
+        self.run_pass()
+        self.assertEqual(self.fetched, ["poison0001"])
+        self.run_pass()
+        self.assertEqual(self.fetched, ["poison0001", "goodvid01", "goodvid02", "poison0001"])
+        state = self.backlog()["poison0001"]
+        # Struck once (others had just been answered), never charged an attempt.
+        self.assertEqual((state["attempts"], state["strikes"], state["status"]),
+                         (0, 1, "pending"))
+
+    def test_the_third_strike_parks_it_without_ending_the_pass(self):
+        self.discover(_row("goodvid01"), _row("poison0001"), _row("goodvid02"))
+        self.durations.update({"poison0001": 900, "goodvid01": 900, "goodvid02": 900})
+        self.seed({"poison0001": {"attempts": 0, "status": "pending",
+                                  "transient_failures": 2, "strikes": 2}})
+        self.answers["poison0001"] = [self.POISON]
+        stats = self.run_pass()
+        self.assertEqual(self.backlog()["poison0001"]["status"], "parked")
+        self.assertNotIn("aborted_on", stats)
+        self.rate.record_block.assert_not_called()
+        self.assertEqual(self.backlog()["goodvid02"]["status"], "done")
+
+    def test_a_failure_with_no_proof_of_health_is_not_a_strike(self):
+        self.discover(_row("poison0001"))
+        self.durations["poison0001"] = 900
+        self.answers["poison0001"] = [self.POISON]
+        for _ in range(fvt.MAX_STRIKES + 2):
+            self.run_pass()
+        state = self.backlog()["poison0001"]
+        self.assertEqual((state["status"], state.get("strikes")), ("pending", None))
+
+
+class RejudgedRejectTests(CaptionLaneHarness):
+    """A transcript reject is re-judged from its recorded length, not re-fetched."""
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.discover(_row("MRwajxeMfWg", "Holiday 2023"))
+        self.durations["MRwajxeMfWg"] = 330
+        # The legacy record: the length lives only in the reason string.
+        self.seed({"MRwajxeMfWg": {"attempts": 30, "status": "rejected",
+                                   "reasons": ["transcript_too_short_2412c"]}})
+
+    def test_unchanged_thresholds_keep_it_settled(self):
+        self.assertEqual(self.run_pass()["settled"], 1)
+        self.assertEqual(self.fetched, [])
+
+    def test_a_lowered_char_floor_reopens_it(self):
+        with mock.patch.object(fvt, "MIN_TRANSCRIPT_CHARS", 2000):
+            self.run_pass()
+        self.assertEqual(self.fetched, ["MRwajxeMfWg"])
+
+    def test_a_new_reject_records_what_it_was_judged_on(self):
+        self.seed({})
+        self.answers["MRwajxeMfWg"] = [_captions(2412)]
+        self.run_pass()
+        state = self.backlog()["MRwajxeMfWg"]
+        self.assertEqual((state["chars"], state["duration_seconds"]), (2412, 330))
+
+
+class DeadlineTests(CaptionLaneHarness):
+    def test_a_slot_past_the_window_ends_the_daemon_instead_of_sleeping(self):
+        self.discover(_row("goodvid01"))
+        self.durations["goodvid01"] = 900
+        self.rate.check.return_value = {"allowed": False, "wait_seconds": 7200,
+                                        "reason": "backoff_until_2026-09-25T11:18:10Z"}
+        totals = fvt.daemon(max_hours=1, sleep_seconds=0)
+        self.assertTrue(totals["stopped"].startswith("deadline:"), totals)
+        self.assertEqual(self.fetched, [])
+        self.assert_never_slept()
+        self.assertEqual(self.backlog()["goodvid01"]["status"], "pending")
+
+    def test_a_slot_inside_the_window_is_waited_for(self):
+        self.discover(_row("goodvid01"))
+        self.durations["goodvid01"] = 900
+        allowed = {"allowed": True, "wait_seconds": 0, "reason": "ok"}
+        self.rate.check.side_effect = [
+            {"allowed": False, "wait_seconds": 160, "reason": "spacing"}, allowed, allowed]
+        totals = fvt.daemon(max_hours=1, sleep_seconds=0)
+        self.assertEqual(totals["stopped"], "backlog_empty")
+        self.assertEqual(self.fetched, ["goodvid01"])
+        self.clock.sleep.assert_any_call(160)
+
+
+class UnreadableBacklogTests(CaptionLaneHarness):
+    def test_a_corrupt_backlog_is_refused_not_overwritten_as_empty(self):
+        self.discover(_row("goodvid01"))
+        path = self.root / "caption_backlog.json"
+        path.write_text('{"items": {"MRwajxeMfWg": {"status": "rejec', encoding="utf-8")
+        with self.assertRaises(fvt.BacklogUnreadable):
+            self.run_pass()
+        self.assertEqual(path.read_text(encoding="utf-8"),
+                         '{"items": {"MRwajxeMfWg": {"status": "rejec')
+        self.assertEqual(self.fetched, [])
+
+
+try:
+    import requests
+    from youtube_transcript_api import _errors as yta_errors
+except ImportError:  # CI does not install the transcript library
+    yta_errors = None
+
+
+@unittest.skipIf(yta_errors is None, "youtube-transcript-api not installed")
+class LibraryClassificationTests(unittest.TestCase):
+    """fetch_captions() against the real exception classes, not pre-classified answers."""
+
+    def classify(self, exc: BaseException) -> dict:
+        api = mock.MagicMock()
+        api.return_value.list.side_effect = exc
+        with mock.patch("youtube_transcript_api.YouTubeTranscriptApi", api):
+            return fvt.fetch_captions("abcdefghijk")
+
+    def test_network_failures_are_transient_not_verdicts(self):
+        for exc in (requests.exceptions.ConnectionError("dns"),
+                    requests.exceptions.SSLError("tls"),
+                    requests.exceptions.ReadTimeout("slow"),
+                    yta_errors.PoTokenRequired("abcdefghijk"),
+                    yta_errors.YouTubeDataUnparsable("abcdefghijk"),
+                    yta_errors.VideoUnplayable("abcdefghijk", "Sign in to confirm you're not a bot", [])):
+            with self.subTest(exc=type(exc).__name__):
+                result = self.classify(exc)
+                self.assertTrue(fvt.is_transient(result["status"]), result)
+                self.assertFalse(fvt.is_permanent(result["status"]), result)
+
+    def test_blocks_are_blocks(self):
+        for exc in (yta_errors.IpBlocked("abcdefghijk"), yta_errors.RequestBlocked("abcdefghijk")):
+            with self.subTest(exc=type(exc).__name__):
+                self.assertTrue(fvt.is_block(self.classify(exc)["status"]))
+
+    def test_transcripts_disabled_is_a_no_captions_answer(self):
+        self.assertEqual(self.classify(yta_errors.TranscriptsDisabled("abcdefghijk"))["status"],
+                         "no_captions")
+
+    def test_age_restriction_is_still_permanent(self):
+        self.assertTrue(fvt.is_permanent(
+            self.classify(yta_errors.AgeRestricted("abcdefghijk"))["status"]))
 
 
 class PerVerdictPersistenceTests(CaptionLaneHarness):
@@ -604,13 +795,17 @@ class SettledPredicateTests(unittest.TestCase):
         self.assertEqual(fvt._parse_when("2026-09-23T05:00:25+00:00"),
                          fvt._parse_when("2026-09-23T05:00:25Z"))
 
-    def test_unknown_age_is_settled_rather_than_guessed(self):
-        # A guess would cost a slot; discovery always carries `published`.
+    def test_unknown_age_falls_back_to_the_monthly_recheck(self):
+        # No `published` means no "young" window, not a guess either way.
         checked = {"status": "no_captions", "last_attempt_at": "2026-09-24T10:00:00Z"}
         self.assertEqual(fvt.settled(checked, duration=600, published=None, now=NOW), "settled")
         self.assertEqual(fvt.settled(checked, duration=600, published="soon", now=NOW), "settled")
-        self.assertEqual(fvt.settled({"status": "no_captions"}, duration=600,
-                                     published="2026-09-25T08:00:00Z", now=NOW), "settled")
+        later = NOW + fvt.NO_CAPTIONS_RECHECK
+        self.assertIsNone(fvt.settled(checked, duration=600, published=None, now=later))
+
+    def test_a_no_captions_record_without_a_check_time_is_asked(self):
+        self.assertIsNone(fvt.settled({"status": "no_captions"}, duration=600,
+                                      published="2026-09-25T08:00:00Z", now=NOW))
 
     def test_a_rejection_without_recorded_reasons_is_settled(self):
         self.assertEqual(fvt.settled({"status": "rejected"}, duration=None,
