@@ -43,11 +43,46 @@ def test_the_squash_is_pinned_to_the_sha_the_gate_passed():
 def test_a_resolver_push_is_never_merged_in_the_same_run():
     """Run 35948543025 pushed a resolution at 03:07:46 and squashed it at 03:08:00."""
     merge = load()["jobs"]["merge"]
-    resolve = step(merge, "Resolve merge conflicts")
-    assert "--github-output" in resolve["run"]
+    resolve = step(merge, "Resolve merge conflicts")["run"]
+    assert '--expected-sha "$GATED_SHA"' in resolve
+    assert "--github-output" in resolve
+    # proceed=true only when the resolver pushed nothing and the head held.
+    assert 'grep -qx "pushed=false"' in resolve and 'grep -qx "head_moved=false"' in resolve
+    assert "steps.resolve.outputs.proceed == 'true'" in step(merge, "Verify every check")["if"]
+    for later in ("Ensure mergeable", "Squash merge"):
+        assert step(merge, later)["if"] == "steps.verify.outputs.green == 'true'", later
     for later in ("Verify every check", "Ensure mergeable", "Squash merge"):
-        assert "steps.resolve.outputs.pushed != 'true'" in step(merge, later)["if"], later
         assert "resolve_marvin_pr_conflicts.py" not in step(merge, later)["run"], later
+
+
+def test_a_resolver_push_is_announced_because_it_starts_no_ci():
+    """A GITHUB_TOKEN push starts no CI run (#989, #1017, #1021): without a
+    note, the resolved PR stalls with no checks and nothing says why."""
+    merge = load()["jobs"]["merge"]
+    note = step(merge, "needs CI re-triggered")
+    assert note["if"] == "steps.resolve.outputs.pushed == 'true'"
+    assert "steps.resolve.outputs.pushed_sha" in note["env"]["PUSHED_SHA"]
+    assert "::warning title=Automerge needs CI re-triggered" in note["run"]
+    assert "automerge_comment.py" in note["run"] and "${PUSHED_SHA}" in note["run"]
+    assert "push any commit to this branch, or close and reopen the PR" in note["run"]
+    assert "--method PUT" not in note["run"]
+
+
+def test_checks_still_pending_leave_a_note_instead_of_failing():
+    merge = load()["jobs"]["merge"]
+    verify = step(merge, "Verify every check")["run"]
+    assert "--wait-seconds 600 --poll-seconds 30 || CODE=$?" in verify
+    assert '0) echo "green=true"' in verify and '3) echo "pending=true"' in verify
+    assert '*) exit "$CODE"' in verify
+    note = step(merge, "still pending")
+    assert note["if"] == "steps.verify.outputs.pending == 'true'"
+    assert "::warning title=Automerge is waiting" in note["run"]
+    assert "automerge_comment.py" in note["run"]
+
+
+def test_python_tests_completing_is_a_retry():
+    on = load().get("on") or load().get(True)
+    assert on["workflow_run"]["workflows"] == ["Research quality", "Python tests"]
 
 
 def test_every_check_on_the_gated_sha_is_verified_before_the_squash():
@@ -79,8 +114,10 @@ def test_pr_state_is_rechecked_before_every_side_effect():
     jobs = load()["jobs"]
     first_gate_step = jobs["gate"]["steps"][0]
     assert "--json state" in first_gate_step["run"]
-    notify = jobs["notify"]["steps"][0]["run"]
-    assert notify.index("--json state") < notify.index("--method POST")
+    # notify comments through automerge_comment.py, which skips a PR that is
+    # no longer open (test_automerge_comment.py).
+    notify = step(jobs["notify"], "Comment the blocking reason")["run"]
+    assert "automerge_comment.py" in notify and "--method" not in notify
     squash = step(jobs["merge"], "Squash merge")["run"]
     assert squash.index("--json state") < squash.index("--method PUT")
     assert "merge=false" in step(jobs["merge"], "Skip unless the PR is still open")["run"]

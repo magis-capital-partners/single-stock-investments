@@ -13,10 +13,11 @@ name: Auto - Agent PR Merge
 # 2. The merge job re-verifies every check on the gated SHA
 #    (verify_pr_checks.py) and squashes with `sha=<gated SHA>`, so GitHub
 #    refuses the merge if the head moved after the gate.
-# 3. A conflict-resolver push is never merged in the same run. The new head
-#    has never been through CI; its own pull_request runs gate it. (PRs #1017
-#    and #1021 were squashed seconds after that push, with zero check runs on
-#    the merged head.)
+# 3. A conflict-resolver push is never merged in the same run: the new head
+#    has never been through CI (PRs #1017 and #1021 were squashed seconds after
+#    that push, with zero check runs on the merged head). The push is made with
+#    GITHUB_TOKEN, which starts no CI run, so the job says so on the PR and in
+#    a warning: someone has to push a commit or close/reopen the PR.
 # 4. Squash merges are serialized across all agent PRs (agent-automerge-main).
 # 5. PR state is re-read before every side effect. A pull_request run and a
 #    workflow_run run fire for the same head; the second one finds the PR
@@ -28,8 +29,11 @@ on:
   pull_request:
     types: [opened, synchronize, reopened, ready_for_review]
     branches: [main]
+  # Research quality gates research PRs. Python tests is the other check most
+  # agent PRs run; when it finishes after the merge job gave up waiting on it,
+  # its completion is the retry.
   workflow_run:
-    workflows: ["Research quality"]
+    workflows: ["Research quality", "Python tests"]
     types: [completed]
 
 permissions:
@@ -418,24 +422,43 @@ jobs:
             sleep 5
           done
           if [ "$MERGEABLE" != "CONFLICTING" ]; then
-            echo "pushed=false" >> "$GITHUB_OUTPUT"
+            echo "proceed=true" >> "$GITHUB_OUTPUT"
             exit 0
           fi
           if [ "$LANE" != "research" ]; then
             echo "::error::Code-lane PR #$PR conflicts with main; automerge never auto-resolves code conflicts. Rebase the branch."
             exit 1
           fi
-          # The resolver's push is a new, untested head. It is never merged in
-          # this run: its own pull_request runs gate it.
-          python _system/scripts/resolve_marvin_pr_conflicts.py "$PR" --github-output "$GITHUB_OUTPUT"
+          # The resolver's push is a new, untested head and is never merged in
+          # this run. It builds only on the gated SHA and pushes only while the
+          # branch is still there (lease pinned to it).
+          python _system/scripts/resolve_marvin_pr_conflicts.py "$PR" \
+            --expected-sha "$GATED_SHA" --github-output "$RUNNER_TEMP/resolver.out"
+          cat "$RUNNER_TEMP/resolver.out" >> "$GITHUB_OUTPUT"
+          if grep -qx "pushed=false" "$RUNNER_TEMP/resolver.out" && grep -qx "head_moved=false" "$RUNNER_TEMP/resolver.out"; then
+            echo "proceed=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "proceed=false" >> "$GITHUB_OUTPUT"
+          fi
 
-      - name: Report the conflict-resolution push
+      - name: Say on the PR that the resolved head needs CI re-triggered
+        # A push made with GITHUB_TOKEN starts no CI run (GitHub documents it,
+        # and #989, #1017 and #1021 show it), so nothing will test or merge the
+        # resolved head until a person pushes or reopens. Say so where it shows.
         if: steps.resolve.outputs.pushed == 'true'
+        env:
+          PUSHED_SHA: ${{ steps.resolve.outputs.pushed_sha }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
         run: |
-          echo "::notice::PR #$PR: pushed a conflict resolution at ${{ steps.resolve.outputs.pushed_sha }}. Not merging in this run; the new head is gated by its own checks."
+          set -euo pipefail
+          MESSAGE="conflicts with main were resolved at ${PUSHED_SHA}. That commit was pushed with GITHUB_TOKEN, which starts no CI run, so nothing will test or merge it on its own. Re-trigger CI: push any commit to this branch, or close and reopen the PR."
+          echo "::warning title=Automerge needs CI re-triggered on PR #${PR}::${MESSAGE}"
+          python _system/scripts/automerge_comment.py --repo "$REPO" --pr "$PR" \
+            --headline "Automerge needs CI re-triggered" --message "$MESSAGE" --run-url "$RUN_URL"
 
       - name: Verify every check on the gated SHA is green
-        if: steps.state.outputs.merge == 'true' && steps.resolve.outputs.pushed != 'true'
+        id: verify
+        if: steps.state.outputs.merge == 'true' && steps.resolve.outputs.proceed == 'true'
         run: |
           set -euo pipefail
           ARGS=(--repo "$REPO" --sha "$GATED_SHA" --exclude-workflow "Auto - Agent PR Merge")
@@ -445,10 +468,28 @@ jobs:
             # The code gate already accepted a change no path filter selects.
             ARGS+=(--allow-no-checks)
           fi
-          python _system/scripts/verify_pr_checks.py "${ARGS[@]}"
+          # Red fails at once; pending is polled for up to 10 minutes (exit 3).
+          CODE=0
+          python _system/scripts/verify_pr_checks.py "${ARGS[@]}" --wait-seconds 600 --poll-seconds 30 || CODE=$?
+          case "$CODE" in
+            0) echo "green=true" >> "$GITHUB_OUTPUT" ;;
+            3) echo "pending=true" >> "$GITHUB_OUTPUT" ;;
+            *) exit "$CODE" ;;
+          esac
+
+      - name: Say on the PR that checks are still pending (blocked, will retry)
+        if: steps.verify.outputs.pending == 'true'
+        env:
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          set -euo pipefail
+          MESSAGE="checks on ${GATED_SHA} were still pending after 10 minutes, so this run did not merge. Automerge retries when Research quality or Python tests next completes for this PR, or on the next push; a check from any other workflow needs a push or a re-run."
+          echo "::warning title=Automerge is waiting on PR #${PR}::${MESSAGE}"
+          python _system/scripts/automerge_comment.py --repo "$REPO" --pr "$PR" \
+            --headline "Automerge is waiting" --message "$MESSAGE" --run-url "$RUN_URL"
 
       - name: Ensure mergeable before squash
-        if: steps.state.outputs.merge == 'true' && steps.resolve.outputs.pushed != 'true'
+        if: steps.verify.outputs.green == 'true'
         run: |
           set -euo pipefail
           for _ in 1 2 3 4 5; do
@@ -469,7 +510,7 @@ jobs:
 
       - name: Squash merge and delete branch (pinned to the gated SHA)
         id: squash
-        if: steps.state.outputs.merge == 'true' && steps.resolve.outputs.pushed != 'true'
+        if: steps.verify.outputs.green == 'true'
         run: |
           set -euo pipefail
           # Re-read state right before the side effect: the twin run for this
@@ -519,6 +560,19 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.repository.default_branch }}
+          fetch-depth: 1
+          filter: blob:none
+          sparse-checkout: |
+            /_system/scripts/automerge_comment.py
+          sparse-checkout-cone-mode: false
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
       - name: Comment the blocking reason on the PR
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -529,32 +583,15 @@ jobs:
           RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
         run: |
           set -euo pipefail
-          # The twin run for this head may have merged the PR since the gate
-          # failed here. "Blocked" on a merged or closed PR is noise.
-          STATE=$(gh pr view "$PR" --repo "$REPO" --json state -q .state)
-          if [ "$STATE" != "OPEN" ]; then
-            echo "PR #$PR is $STATE; not commenting."
-            exit 0
-          fi
-          MARKER="<!-- automerge-blocked -->"
           if [ "$MERGE" = "failure" ]; then
-            REASON="the merge step failed (a check on the gated commit is not green, a conflict with main, or the squash was rejected)"
+            REASON="the merge step failed (a check on the gated commit is red, a conflict with main, or the squash was rejected)"
           elif [ "$LANE" = "research" ]; then
             REASON="the research gate failed: provenance validation or the Research quality workflow is red"
           else
             REASON="one or more CI checks on the head commit failed or never completed"
           fi
-          {
-            echo "$MARKER"
-            echo "**Automerge is blocked**: ${REASON}."
-            echo ""
-            echo "Nothing merges while this stands. Fix the cause and push; automerge re-runs on every sync. [Gate run](${RUN_URL})."
-          } > body.md
-          EXISTING=$(gh api "repos/$REPO/issues/$PR/comments" --paginate \
-            --jq "[.[] | select(.body | startswith(\"$MARKER\"))][0].id // empty")
-          if [ -n "$EXISTING" ]; then
-            gh api --method PATCH "repos/$REPO/issues/comments/$EXISTING" -F body=@body.md > /dev/null
-          else
-            gh api --method POST "repos/$REPO/issues/$PR/comments" -F body=@body.md > /dev/null
-          fi
-          echo "Blocked comment posted on PR #$PR."
+          # automerge_comment.py skips a PR that is no longer open: the twin
+          # run for this head may have merged it since this one failed.
+          python _system/scripts/automerge_comment.py --repo "$REPO" --pr "$PR" \
+            --message "${REASON}. Nothing merges while this stands; fix the cause and push, and automerge re-runs on every sync." \
+            --run-url "$RUN_URL"

@@ -114,12 +114,19 @@ class WorkflowGovernanceTests(unittest.TestCase):
     def test_agent_pr_merge_waits_for_research_quality_without_race(self):
         workflow = (ROOT / ".github" / "workflows" / "marvin-pr-automerge.yml").read_text(encoding="utf-8")
         self.assertIn("wait_for_workflow_run.py", workflow)
-        # Must match research-quality.yml's `name:` exactly: workflow_run and
-        # `gh run list --workflow` resolve by name string, so a rename that
-        # misses this line silently disables the wait.
-        quality = (ROOT / ".github" / "workflows" / "research-quality.yml").read_text(encoding="utf-8")
-        name = re.search(r"^name:\s*(.+)$", quality, re.MULTILINE).group(1).strip()
-        self.assertIn(f'workflows: ["{name}"]', workflow)
+        # Every workflow_run name must match a workflow's `name:` exactly:
+        # workflow_run and `gh run list --workflow` resolve by name string, so
+        # a rename that misses this list silently disables the trigger.
+        names = set()
+        for path in (ROOT / ".github" / "workflows").glob("*.yml"):
+            match = re.search(r"^name:\s*(.+)$", path.read_text(encoding="utf-8"), re.MULTILINE)
+            if match:
+                names.add(match.group(1).strip())
+        listed = re.search(r"^    workflows: \[(.+)\]$", workflow, re.MULTILINE).group(1)
+        triggers = [item.strip().strip('"') for item in listed.split(",")]
+        self.assertIn("Research quality", triggers)
+        for trigger in triggers:
+            self.assertIn(trigger, names, f"workflow_run names {trigger!r}, which no workflow is called")
         self.assertNotIn("lewagon/wait-on-check-action", workflow)
 
     def test_agent_pr_merge_serializes_squash_on_main(self):
