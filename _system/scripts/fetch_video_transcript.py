@@ -150,6 +150,8 @@ ENVIRONMENT_ERROR_MARKERS = (
     "VideoUnplayable",
     "ParseError",
     "AttributeError",
+    # An srv3 body with stray whitespace, or a track entry missing a field.
+    "KeyError",
 )
 TRANSIENT_ERROR_MARKERS = BLOCK_ERROR_MARKERS + ENVIRONMENT_ERROR_MARKERS
 # An environmental failure that keeps landing on one video, in passes where
@@ -158,6 +160,10 @@ TRANSIENT_ERROR_MARKERS = BLOCK_ERROR_MARKERS + ENVIRONMENT_ERROR_MARKERS
 # as a strike rather than an attempt, and a video is parked after this many.
 # A block is never a strike.
 MAX_STRIKES = 3
+# Strikes are evidence about a video only while they are recent; an old strike
+# says more about an old outage. A strike older than this is forgotten, and any
+# fetch YouTube answers for the video clears them all.
+STRIKE_WINDOW = timedelta(days=7)
 
 # The mirror image of the transient set: conditions that will never resolve by
 # waiting. An age-restricted video needs an authenticated session this lane does
@@ -373,11 +379,12 @@ def settled(state: dict, *, duration: int | None, published: str | None,
         # same transcript -- but the thresholds may have moved, and the
         # measurement is on record, so re-judge it rather than trust the old
         # verdict. Only a verdict that would now pass costs a fetch.
-        chars = _recorded_chars(state, reasons)
+        recorded = state.get("duration_seconds")
+        judged_on = recorded if recorded is not None else duration
+        chars = _recorded_chars(state, reasons, judged_on)
         if chars is None:
             return "settled"
-        recorded = state.get("duration_seconds")
-        if gate_reasons(chars, recorded if recorded is not None else duration):
+        if gate_reasons(chars, judged_on):
             return "settled"
         return None
     if status == "no_captions":
@@ -397,22 +404,30 @@ def settled(state: dict, *, duration: int | None, published: str | None,
 
 
 _CHARS_REASON = re.compile(r"^transcript_too_short_(\d+)c$")
+_CPM_REASON = re.compile(r"^caption_coverage_(\d+)cpm$")
 
 
-def _recorded_chars(state: dict, reasons: list[str]) -> int | None:
+def _recorded_chars(state: dict, reasons: list[str], duration: int | None) -> int | None:
     """The transcript length a reject was judged on: recorded since 2026-09-25,
-    and carried in the reason string (`transcript_too_short_2412c`) before."""
+    and carried in the reason string before -- directly
+    (`transcript_too_short_2412c`) or as a rate (`caption_coverage_117cpm`),
+    which the video's duration turns back into a length."""
     if isinstance(state.get("chars"), int):
         return state["chars"]
     for reason in reasons:
         match = _CHARS_REASON.match(reason)
         if match:
             return int(match.group(1))
+    for reason in reasons:
+        match = _CPM_REASON.match(reason)
+        if match and duration:
+            return int(int(match.group(1)) * duration / 60.0)
     return None
 
 
 def triage(row: dict, state: dict, duration: int | None, *,
-           refetch: bool = False, now: datetime | None = None) -> str:
+           refetch: bool = False, now: datetime | None = None,
+           broadcast: str | None = None) -> str:
     """Decide one discovered video without a network call.
 
     Returns "fetch", or the reason no fetch is needed. The daemon's stop test
@@ -421,6 +436,12 @@ def triage(row: dict, state: dict, duration: int | None, *,
     """
     if state.get("status") == "parked":
         return "parked"
+    if broadcast in ("upcoming", "live"):
+        # A scheduled premiere or a stream still on air has no captions yet,
+        # and asking anyway returns VideoUnplayable -- an environmental error
+        # that ends the pass and backs the whole lane off. The Data API's
+        # snippet already says so, at no caption-slot cost.
+        return "awaiting_broadcast"
     txt_path, meta_path = video_paths(row["video_id"], row.get("title") or "",
                                       row.get("published"))
     # Both files, not just one. A run killed between the two writes leaves a
@@ -444,13 +465,20 @@ def _duration(meta_by_id: dict, video_id: str) -> int | None:
     return youtube_api.parse_duration((api_item.get("contentDetails") or {}).get("duration"))
 
 
+def _broadcast(meta_by_id: dict, video_id: str) -> str | None:
+    """`upcoming` / `live` / `none` from the Data API snippet, if we have it."""
+    snippet = (meta_by_id.get(video_id) or {}).get("snippet") or {}
+    return snippet.get("liveBroadcastContent")
+
+
 def count_fetchable(rows: list[dict], items: dict, meta_by_id: dict) -> int:
     """Rows the next pass would spend a caption fetch on."""
     now = _dt_now()
     return sum(
         1 for row in rows
         if triage(row, items.get(row["video_id"]) or {"status": "pending"},
-                  _duration(meta_by_id, row["video_id"]), now=now) == "fetch"
+                  _duration(meta_by_id, row["video_id"]), now=now,
+                  broadcast=_broadcast(meta_by_id, row["video_id"])) == "fetch"
     )
 
 
@@ -471,6 +499,8 @@ def run(*, limit: int | None = None, only_video: str | None = None,
     rows = load_pending(limit, only_video)
     if not rows:
         return {"considered": 0, "note": "nothing pending", "fetchable": 0}
+    if deadline is not None and deadline.tzinfo is None:
+        deadline = deadline.replace(tzinfo=timezone.utc)
 
     backlog = load_backlog()
     items = backlog.setdefault("items", {})
@@ -484,7 +514,7 @@ def run(*, limit: int | None = None, only_video: str | None = None,
 
     stats = {"considered": len(rows), "fetched": 0, "no_captions": 0,
              "rejected_quality": 0, "skipped_existing": 0, "errors": 0, "parked": 0,
-             "settled": 0, "awaiting_captions": 0}
+             "settled": 0, "awaiting_captions": 0, "awaiting_broadcast": 0}
 
     # Videos that last failed transiently go to the back. A pass stops at its
     # first environmental failure, so a video that fails that way every time
@@ -499,7 +529,8 @@ def run(*, limit: int | None = None, only_video: str | None = None,
         vid = row["video_id"]
         state = items.setdefault(vid, {"attempts": 0, "status": "pending"})
         duration = _duration(meta_by_id, vid)
-        action = triage(row, state, duration, refetch=refetch)
+        action = triage(row, state, duration, refetch=refetch,
+                        broadcast=_broadcast(meta_by_id, vid))
         if action == "existing":
             stats["skipped_existing"] += 1
             state["status"] = "done"
@@ -512,7 +543,7 @@ def run(*, limit: int | None = None, only_video: str | None = None,
                   flush=True)
             continue
         if action != "fetch":
-            # parked, settled or awaiting_captions: nothing to ask YouTube.
+            # parked, settled or awaiting_*: nothing to ask YouTube.
             stats[action] += 1
             continue
 
@@ -550,6 +581,10 @@ def run(*, limit: int | None = None, only_video: str | None = None,
             # A transient failure is not this video's fault; see
             # TRANSIENT_ERROR_MARKERS. Only real failures spend retry budget.
             state["attempts"] = int(state.get("attempts", 0)) + 1
+            # YouTube answered for this video, so earlier strikes were not
+            # about it.
+            state.pop("strikes", None)
+            state.pop("last_strike_at", None)
 
         if result["status"] == "no_captions":
             # The request itself succeeded, so the IP is evidently not blocked;
@@ -573,24 +608,27 @@ def run(*, limit: int | None = None, only_video: str | None = None,
             stats["errors"] += 1
             if is_transient(result["status"]):
                 state["transient_failures"] = int(state.get("transient_failures") or 0) + 1
+                state["status"] = "pending"
                 if healthy_this_pass and not is_block(result["status"]):
                     # Another video was answered moments ago, so this one
                     # failing is at least partly about this one. A strike, not
                     # an attempt; see MAX_STRIKES. An IP block never strikes.
+                    last = _parse_when(state.get("last_strike_at"))
+                    if last is None or _dt_now() - last > STRIKE_WINDOW:
+                        state["strikes"] = 0
                     state["strikes"] = int(state.get("strikes") or 0) + 1
+                    state["last_strike_at"] = now_stamp()
                     if state["strikes"] >= MAX_STRIKES:
                         state["status"] = "parked"
                         print("err   {0}  {1}  (parked after {2} strikes)".format(
                             vid, result["status"], state["strikes"]), flush=True)
-                        save_backlog(backlog)
-                        time.sleep(sleep_seconds)
-                        continue
                 # Persist the backoff before doing anything else: a restart must
                 # not read as "we waited". Then stop -- once the IP is limited
                 # every remaining item fails identically, and continuing would
-                # convert one rate limit into a backlog of false failures.
+                # convert one rate limit into a backlog of false failures. That
+                # holds after a strike too: an outage that began mid-pass must
+                # not get the chance to park a second video.
                 blocked = rate.record_block()
-                state["status"] = "pending"
                 stats["aborted_on"] = result["status"]
                 print("stop  {0}  {1} -- backing off until {2}, {3} left".format(
                     vid, result["status"], blocked.get("blocked_until"),

@@ -503,7 +503,7 @@ class BlocksAreNeverChargedTests(CaptionLaneHarness):
     def test_network_failures_through_requests_are_never_charged(self):
         # youtube-transcript-api uses `requests`: DNS failures, resets and TLS
         # errors arrive as ConnectionError / SSLError, not the urllib names.
-        for status in ("error:ConnectionError", "error:SSLError", "error:ReadTimeout",
+        for status in ("error:ConnectionError", "error:SSLError", "error:ReadTimeout", "error:KeyError",
                        "error:PoTokenRequired", "error:YouTubeDataUnparsable",
                        "error:VideoUnplayable"):
             with self.subTest(status=status):
@@ -563,17 +563,54 @@ class StrikeTests(CaptionLaneHarness):
         self.assertEqual((state["attempts"], state["strikes"], state["status"]),
                          (0, 1, "pending"))
 
-    def test_the_third_strike_parks_it_without_ending_the_pass(self):
+    RECENT = "2026-09-24T09:30:00Z"
+
+    def _struck_twice(self, vid: str) -> dict:
+        return {"attempts": 0, "status": "pending", "transient_failures": 2,
+                "strikes": 2, "last_strike_at": self.RECENT}
+
+    def test_the_third_strike_parks_it_and_still_ends_the_pass(self):
         self.discover(_row("goodvid01"), _row("poison0001"), _row("goodvid02"))
         self.durations.update({"poison0001": 900, "goodvid01": 900, "goodvid02": 900})
-        self.seed({"poison0001": {"attempts": 0, "status": "pending",
-                                  "transient_failures": 2, "strikes": 2}})
+        self.seed({"poison0001": self._struck_twice("poison0001")})
         self.answers["poison0001"] = [self.POISON]
         stats = self.run_pass()
         self.assertEqual(self.backlog()["poison0001"]["status"], "parked")
-        self.assertNotIn("aborted_on", stats)
-        self.rate.record_block.assert_not_called()
-        self.assertEqual(self.backlog()["goodvid02"]["status"], "done")
+        self.assertEqual(stats["aborted_on"], "error:YouTubeRequestFailed")
+        # Struck videos sort last, so the good ones were asked first.
+        self.assertEqual(self.fetched, ["goodvid01", "goodvid02", "poison0001"])
+        self.assertEqual(self.rate.record_block.call_count, 1)
+
+    def test_an_outage_mid_pass_parks_at_most_one_video(self):
+        # The reviewer's case: one success, then the network drops, and the
+        # videos left each carry two recent strikes.
+        self.discover(_row("goodvid01"), _row("struck001"), _row("struck002"))
+        self.durations.update({"goodvid01": 900, "struck001": 900, "struck002": 900})
+        self.seed({"struck001": self._struck_twice("struck001"),
+                   "struck002": self._struck_twice("struck002")})
+        outage = {"status": "error:ConnectionError", "detail": "reset"}
+        self.answers.update({"struck001": [outage], "struck002": [outage]})
+        self.run_pass()
+        statuses = sorted(self.backlog()[v]["status"] for v in ("struck001", "struck002"))
+        self.assertEqual(statuses, ["parked", "pending"])
+
+    def test_old_strikes_are_forgotten(self):
+        self.discover(_row("goodvid01"), _row("poison0001"))
+        self.durations.update({"poison0001": 900, "goodvid01": 900})
+        stale = dict(self._struck_twice("poison0001"), last_strike_at="2026-09-01T09:30:00Z")
+        self.seed({"poison0001": stale})
+        self.answers["poison0001"] = [self.POISON]
+        self.run_pass()
+        state = self.backlog()["poison0001"]
+        self.assertEqual((state["status"], state["strikes"]), ("pending", 1))
+
+    def test_an_answer_for_the_video_clears_its_strikes(self):
+        self.discover(_row("poison0001"))
+        self.durations["poison0001"] = 900
+        self.seed({"poison0001": self._struck_twice("poison0001")})
+        self.answers["poison0001"] = [NO_CAPTIONS]
+        self.run_pass()
+        self.assertNotIn("strikes", self.backlog()["poison0001"])
 
     def test_a_failure_with_no_proof_of_health_is_not_a_strike(self):
         self.discover(_row("poison0001"))
@@ -605,6 +642,17 @@ class RejudgedRejectTests(CaptionLaneHarness):
             self.run_pass()
         self.assertEqual(self.fetched, ["MRwajxeMfWg"])
 
+    def test_a_legacy_coverage_reject_is_rejudged_from_its_rate(self):
+        # 117 cpm over an hour: ~7,000 chars, recorded only as a rate.
+        self.discover(_row("partial001"))
+        self.durations["partial001"] = 3600
+        self.seed({"partial001": {"attempts": 3, "status": "rejected",
+                                  "reasons": ["caption_coverage_117cpm"]}})
+        self.assertEqual(self.run_pass()["settled"], 1)
+        with mock.patch.object(fvt, "MIN_CHARS_PER_MINUTE", 100):
+            self.run_pass()
+        self.assertEqual(self.fetched, ["partial001"])
+
     def test_a_new_reject_records_what_it_was_judged_on(self):
         self.seed({})
         self.answers["MRwajxeMfWg"] = [_captions(2412)]
@@ -635,6 +683,34 @@ class DeadlineTests(CaptionLaneHarness):
         self.assertEqual(totals["stopped"], "backlog_empty")
         self.assertEqual(self.fetched, ["goodvid01"])
         self.clock.sleep.assert_any_call(160)
+
+
+    def test_a_naive_deadline_is_read_as_utc(self):
+        self.discover(_row("goodvid01"))
+        self.durations["goodvid01"] = 900
+        self.rate.check.return_value = {"allowed": False, "wait_seconds": 7200, "reason": "x"}
+        stats = self.run_pass(deadline=(NOW + timedelta(hours=1)).replace(tzinfo=None))
+        self.assertEqual(stats["stopped_on"], "deadline:x")
+
+
+class PremiereTests(CaptionLaneHarness):
+    """A scheduled premiere has no captions yet and must not cost a slot or a strike."""
+
+    def test_upcoming_and_live_broadcasts_are_not_asked(self):
+        self.discover(_row("premiere01"), _row("livenow001"), _row("goodvid01"))
+        self.durations.update({"premiere01": 0, "livenow001": 0, "goodvid01": 900})
+        real_api = self._api
+
+        def api(ids):
+            meta = real_api(ids)
+            meta["premiere01"]["snippet"] = {"liveBroadcastContent": "upcoming"}
+            meta["livenow001"]["snippet"] = {"liveBroadcastContent": "live"}
+            return meta
+
+        with mock.patch.object(fvt.youtube_api, "videos", side_effect=api):
+            stats = self.run_pass()
+        self.assertEqual(self.fetched, ["goodvid01"])
+        self.assertEqual((stats["awaiting_broadcast"], stats["fetchable"]), (2, 0))
 
 
 class UnreadableBacklogTests(CaptionLaneHarness):
