@@ -285,6 +285,19 @@ class SparseCiCheckoutTests(unittest.TestCase):
         with self.assertRaises(SystemExit):
             bdd.refuse_infra_collapse(payload, bdd.load_prior_rows())
 
+    def test_partial_research_trees_do_not_unlock_the_restore(self):
+        # Trees for only half the holdings clear workspace_is_sparse's 20% floor,
+        # and the other half's emptied research fields stay above the research
+        # guard's 25% floor -- so the restore itself must refuse to run.
+        for ticker in self.TICKERS[: len(self.TICKERS) // 2]:
+            (self.root / ticker / "research").mkdir(parents=True, exist_ok=True)
+        os.environ["DASHBOARD_PRESERVE_DOCUMENT_REGISTRY"] = "1"
+        self.assertFalse(bdd.infra_restore_allowed(list(self.TICKERS)))
+        with mock.patch("sys.stdout", new_callable=io.StringIO):
+            payload = bdd.build()
+        with self.assertRaises(SystemExit):
+            bdd.refuse_infra_collapse(payload, bdd.load_prior_rows())
+
     def test_restored_infra_cannot_hide_emptied_research_fields(self):
         # The verifier's bypass: infra columns look whole (restored), while
         # every research-derived field is empty. The research guard refuses.

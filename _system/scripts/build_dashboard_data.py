@@ -327,7 +327,21 @@ def infra_restore_allowed(tickers: list[str]) -> bool:
     """
     if os.environ.get("DASHBOARD_PRESERVE_DOCUMENT_REGISTRY") != "1":
         return False
-    return not workspace_is_sparse(tickers)
+    if not tickers:
+        return False
+    # Nearly every tree, not a quorum: at workspace_is_sparse's 20% floor the
+    # restore made the other 80% of rows -- research fields emptied -- look
+    # whole to the infra guard, and the research guard's 25% floor let them by.
+    return research_trees_present(tickers) >= RESTORE_MIN_RESEARCH_TREE_SHARE * len(tickers)
+
+
+# Share of holdings whose research/ tree must be checked out before the
+# restore may refill infra columns from the prior.
+RESTORE_MIN_RESEARCH_TREE_SHARE = 0.95
+
+
+def research_trees_present(tickers: list[str]) -> int:
+    return sum(1 for t in tickers if (ROOT / t / "research").is_dir())
 
 
 def merge_sparse_payload(current: dict, prior: dict) -> dict:
