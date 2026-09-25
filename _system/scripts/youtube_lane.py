@@ -68,6 +68,23 @@ MAIN_PATHS = (
     "_system/reference/video/insights_index_mirror.json",
 )
 
+# Per-video detail shards, one file per admitted video, created and deleted as
+# the corpus moves. A fixed file list cannot express that, and listing only the
+# index files meant videos.json advertised 95 videos while 63 stale shards were
+# committed and 32 had never been added at all -- every one of those a 404 on
+# click. Scoped to this one directory so the `git add -A` discipline above still
+# holds: nothing outside it is ever staged by this lane.
+MAIN_DIRS = ("dashboard/data/insights/video_details",)
+
+# The branch this lane publishes to. It commits to HEAD and then pushes, so
+# `git push origin main` -- which resolves the *local* ref of that name --
+# published whatever main happened to point at rather than the commit just
+# made. Pushed as HEAD:main instead, which is correct detached as well as on a
+# branch. lane_worktree.ps1 keeps lane worktrees on a detached FETCH_HEAD
+# precisely so nobody's branch switch can move them, so detached is the
+# expected state here and must not be refused.
+MAIN_BRANCH = "main"
+
 # Lines of git's own output kept per stream when a command fails. A failed
 # `pull --rebase` opens with a fetch preamble ("From <remote>", a ref update)
 # and ends with the reason, so it is the tail that explains, never the head.
@@ -174,10 +191,19 @@ def self_update() -> None:
     an autostash pop turns into a conflict, and a conflict here would strand
     the worktree rather than merely skip an update. Discarding costs nothing:
     the corpus they are derived from is committed in the vault.
+
+    The detail-shard directory is reset the same way and for the same reason,
+    with a `clean` as well as a `checkout`: most of its drift is *untracked*
+    files, which a checkout leaves in place and an autostash then carries into
+    the rebase.
     """
     for rel in MAIN_PATHS:
         if (ROOT / rel).is_file():
             run_git(ROOT, "checkout", "--", rel, check=False, timeout=120)
+    for rel in MAIN_DIRS:
+        if (ROOT / rel).is_dir():
+            run_git(ROOT, "checkout", "--", rel, check=False, timeout=120)
+            run_git(ROOT, "clean", "-fdq", "--", rel, check=False, timeout=120)
     try:
         run_git(ROOT, "-c", "rebase.autoStash=true", "pull", "--rebase",
                 "origin", "main", timeout=900)
@@ -248,19 +274,40 @@ def push_main(message: str) -> bool | None:
     a failed push exit 0.
     """
     try:
+        # Detached (the lane worktree's normal state) reports no branch and is
+        # fine. A *named* branch that is not main is not: on 2026-09-24 and -25
+        # this worktree sat on wip/youtube-video-details, where a commit to HEAD
+        # and a push of `main` were two unrelated things, and two days of work
+        # went nowhere while the vault push succeeded and the lane logged green.
+        head = run_git(ROOT, "symbolic-ref", "-q", "--short", "HEAD",
+                       check=False, timeout=120)
+        branch = head.stdout.strip() if head.returncode == 0 else ""
+        if branch and branch != MAIN_BRANCH:
+            log(f"main: worktree is on '{branch}', not '{MAIN_BRANCH}' or detached; "
+                "refusing to publish from a branch this lane does not track")
+            return False
         present = [p for p in MAIN_PATHS if (ROOT / p).is_file()]
-        if not present:
+        dirs = [d for d in MAIN_DIRS if (ROOT / d).is_dir()]
+        if not present and not dirs:
             log("main: no published shard to commit")
             return None
-        run_git(ROOT, "add", "--sparse", *present, timeout=300)
+        if present:
+            run_git(ROOT, "add", "--sparse", *present, timeout=300)
+        for rel in dirs:
+            # -A so a shard that disappeared from the corpus is staged as a
+            # deletion; without it the index keeps advertising a dead video.
+            run_git(ROOT, "add", "--sparse", "-A", rel, timeout=300)
         staged = run_git(ROOT, "diff", "--cached", "--quiet", check=False, timeout=120)
         if staged.returncode == 0:
             log("main: nothing to commit")
             return None
         run_git(ROOT, "commit", "-m", message, timeout=300)
         run_git(ROOT, "-c", "rebase.autoStash=true", "pull", "--rebase",
-                "origin", "main", timeout=900)
-        run_git(ROOT, "push", "origin", "main", timeout=600)
+                "origin", MAIN_BRANCH, timeout=900)
+        # HEAD:main, not main. The bare refspec pushes the local branch of that
+        # name, which on a detached or renamed checkout is not the commit this
+        # run just made.
+        run_git(ROOT, "push", "origin", f"HEAD:{MAIN_BRANCH}", timeout=600)
         log("main: pushed")
         return True
     except (subprocess.CalledProcessError, subprocess.TimeoutExpired, OSError) as exc:

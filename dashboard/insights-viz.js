@@ -94,10 +94,39 @@
     return 'Open';
   }
 
+  // Refs keep the stable `_system/reference/...` prefix for backward
+  // compatibility (see vault_paths.py), but the bodies they name live in the
+  // private research-vault repo, not in this one. Blob-linking them against
+  // ghRepo produced a 404 on every transcript link the dashboard has ever
+  // rendered -- 95 videos and 4,627 podcasts -- because nothing under these
+  // prefixes is committed here. Mapped on the sub-path, not the prefix: the
+  // registries and config JSON directly under `video/` and `podcasts/` *are*
+  // in this repo and must keep pointing at it.
+  const VAULT_REPO = 'magis-capital-partners/research-vault';
+  const VAULT_PREFIXES = [
+    ['_system/reference/video/library/', 'videos/library/'],
+    ['_system/reference/podcasts/episodes/', 'podcasts/episodes/'],
+    ['_system/reference/superinvestor-letters/', 'superinvestor-letters/'],
+    ['_system/reference/investment-wisdom/', 'investment-wisdom/'],
+  ];
+
+  function vaultBlobUrl(ref) {
+    const clean = String(ref || '').replace(/\\/g, '/').replace(/^\/+/, '');
+    for (const [from, to] of VAULT_PREFIXES) {
+      if (clean.startsWith(from)) {
+        const rest = clean.slice(from.length).split('/').map(encodeURIComponent).join('/');
+        return `https://github.com/${VAULT_REPO}/blob/main/${to}${rest}`;
+      }
+    }
+    return '';
+  }
+
   function evidenceLink(ref, linkHtml, ghRepo, label) {
     if (!ref) return '—';
     const text = evidenceLabel(ref, label);
     if (String(ref).startsWith('http')) return linkHtml(ref, text, 'source-open-link');
+    const vault = vaultBlobUrl(ref);
+    if (vault) return linkHtml(vault, text, 'source-open-link');
     return linkHtml(`https://github.com/${ghRepo}/blob/main/${ref}`, text, 'source-open-link');
   }
 
