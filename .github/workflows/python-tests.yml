@@ -131,15 +131,17 @@ jobs:
           python -m pytest -q -p no:cacheprovider "${DESELECT[@]}" \
             _system/trading _system/scripts/tests "${EXTRA[@]}"
       - name: Known failures (reported, not gating)
+        # One at a time: run together, one that still fails would hide one
+        # that has started passing.
         run: |
-          set +e
-          # shellcheck disable=SC2086
-          python -m pytest -q -p no:cacheprovider $KNOWN_FAILURES > "$RUNNER_TEMP/known.txt" 2>&1
-          code=$?
-          set -e
-          tail -n 20 "$RUNNER_TEMP/known.txt"
-          if [ "$code" -eq 0 ]; then
-            echo "::warning title=Known failures now pass::Remove them from KNOWN_FAILURES in python-tests.yml so they gate again."
-          else
-            echo "Known failures still fail (exit $code); they stay deselected from the gate."
-          fi
+          STILL=0
+          for test_id in $KNOWN_FAILURES; do
+            if python -m pytest -q -p no:cacheprovider "$test_id" > "$RUNNER_TEMP/known.txt" 2>&1; then
+              echo "::warning title=Known failure now passes::${test_id} passes; remove it from KNOWN_FAILURES in python-tests.yml so it gates again."
+            else
+              STILL=$((STILL + 1))
+              echo "still failing: ${test_id}"
+              tail -n 5 "$RUNNER_TEMP/known.txt"
+            fi
+          done
+          echo "${STILL} known failure(s) still fail; they stay deselected from the gate."
