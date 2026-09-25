@@ -725,6 +725,69 @@ class ClientTests(unittest.TestCase):
                                        "data": None})
 
 
+class JobLogTests(unittest.TestCase):
+    """On the runner `gh api` refuses a body with terminal escape sequences, so
+    every log read failed and no failure could be fingerprinted (2026-09-25)."""
+
+    GH_REFUSAL = mock.Mock(returncode=1, stdout="",
+                           stderr="the response contains terminal escape sequences")
+    LOG = "2026-09-25T00:10:00.0000000Z \x1b[36;1mpython x.py\x1b[0m\n##[error]boom\n"
+
+    class _Redirecting:
+        def __init__(self, location):
+            self.location, self.requests = location, []
+
+        def open(self, request, timeout=None):
+            self.requests.append(request)
+            raise supervisor.urllib.error.HTTPError(
+                request.full_url, 302, "Found", {"Location": self.location}, None)
+
+    def _urlopen(self, seen):
+        test = self
+
+        class _Body:
+            def __enter__(self):
+                return self
+
+            def __exit__(self, *exc):
+                return False
+
+            def read(self):
+                return test.LOG.encode()
+
+        def fake(request, timeout=None):
+            seen.append(request)
+            return _Body()
+        return fake
+
+    def test_follows_the_redirect_without_sending_the_token(self):
+        opener, seen = self._Redirecting("https://blob.example/log?sig=1"), []
+        with mock.patch.object(supervisor.urllib.request, "urlopen", self._urlopen(seen)):
+            text = supervisor.download_job_log("o/r", 7, "tok", opener=opener)
+        self.assertEqual(text, self.LOG)
+        self.assertEqual(opener.requests[0].get_header("Authorization"), "Bearer tok")
+        self.assertEqual(seen[0].full_url, "https://blob.example/log?sig=1")
+        self.assertIsNone(seen[0].get_header("Authorization"))
+
+    def test_job_log_reads_over_https_when_gh_refuses_escape_sequences(self):
+        seen = []
+        with mock.patch.dict(supervisor.os.environ, {"GH_TOKEN": "tok"}), \
+                mock.patch.object(supervisor.subprocess, "run", return_value=self.GH_REFUSAL), \
+                mock.patch.object(supervisor.urllib.request, "build_opener",
+                                  return_value=self._Redirecting("https://blob.example/l")), \
+                mock.patch.object(supervisor.urllib.request, "urlopen", self._urlopen(seen)):
+            text = supervisor.GhCli("o/r").job_log(7)
+        self.assertEqual(text, self.LOG)
+        self.assertEqual(supervisor.normalize_error("##[error]boom"),
+                         supervisor.normalize_error("\x1b[31m##[error]boom\x1b[0m"))
+
+    def test_an_unreachable_log_is_none_not_an_exception(self):
+        class _Down:
+            def open(self, request, timeout=None):
+                raise supervisor.urllib.error.URLError("down")
+        self.assertIsNone(supervisor.download_job_log("o/r", 7, "tok", opener=_Down()))
+
+
 class CompatibilityTests(unittest.TestCase):
     def test_receipt_and_feed_health_are_evaluated_without_graph_database(self):
         with tempfile.TemporaryDirectory() as tmp:

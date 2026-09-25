@@ -270,6 +270,40 @@ def issue_quiet_hours(window: float, episode: int) -> float:
 # clients (network); every one is optional and injectable
 # --------------------------------------------------------------------------- #
 
+class _NoRedirect(urllib.request.HTTPRedirectHandler):
+    def redirect_request(self, req, fp, code, msg, headers, newurl):
+        return None
+
+
+_LOG_AGENT = "ssi-repository-health-supervisor"
+
+
+def download_job_log(repository: str, job_id, token: str, *, opener=None,
+                     timeout: int = 60) -> str | None:
+    """A job's raw log, or None. The API answers with a redirect to a short-lived
+    signed URL, which is fetched WITHOUT the token (blob storage rejects it)."""
+    request = urllib.request.Request(
+        f"https://api.github.com/repos/{repository}/actions/jobs/{job_id}/logs",
+        headers={"Authorization": f"Bearer {token}", "Accept": "application/vnd.github+json",
+                 "User-Agent": _LOG_AGENT})
+    opener = opener or urllib.request.build_opener(_NoRedirect)
+    try:
+        with opener.open(request, timeout=timeout) as response:
+            return response.read().decode("utf-8", "replace")
+    except urllib.error.HTTPError as error:
+        location = error.headers.get("Location") if error.code in (301, 302, 303, 307, 308) else None
+    except (OSError, ValueError):
+        return None
+    if not location:
+        return None
+    try:
+        with urllib.request.urlopen(urllib.request.Request(location, headers={"User-Agent": _LOG_AGENT}),
+                                    timeout=timeout) as response:
+            return response.read().decode("utf-8", "replace")
+    except (OSError, ValueError):
+        return None
+
+
 class GhCli:
     """GitHub REST through the gh CLI (GH_TOKEN in the workflow)."""
 
@@ -306,6 +340,15 @@ class GhCli:
         return payload if isinstance(payload, list) else None
 
     def job_log(self, job_id):
+        # `gh api` refuses to print a body that contains terminal escape
+        # sequences, and Actions logs are full of them, so on the runner every
+        # log read failed and no failure could be fingerprinted. Fetch it over
+        # plain HTTPS first; gh stays as the fallback.
+        token = os.environ.get("GH_TOKEN") or os.environ.get("GITHUB_TOKEN")
+        if token:
+            text = download_job_log(self.repository, job_id, token)
+            if text is not None:
+                return text
         return self._call("GET", self._repo(f"actions/jobs/{job_id}/logs"), raw=True)
 
     def open_issues(self, label: str):
