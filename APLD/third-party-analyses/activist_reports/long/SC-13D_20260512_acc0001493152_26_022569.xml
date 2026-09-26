@@ -1,0 +1,411 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns:p="http://www.sec.gov/edgar/schedule13D" xmlns:p1="http://www.sec.gov/edgar/common"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><link rel="stylesheet" type="text/css" href="/css/SDR_print.css"><style type="text/css">
+					.fakeTextBox {
+					border-top: 2px solid #999;
+					border-right: 1px solid #ccc;
+					border-bottom: 1px solid #ccc;
+					border-left: 2px solid #999;
+					padding: 2px;
+					_width: 800px;
+					height: auto;
+					min-width: 200px;
+					min-height: 50px;
+					word-wrap: break-word;
+					font-size: 0.9em;
+					color: blue;
+					}
+					table.tableClass { border: solid black;
+					border-top-width: 1;
+					border-right-width: 1;
+					border-bottom-width: 1;
+					border-left-width: 1;
+					table-layout:fixed;
+					}
+					table.innerTableClass { border: solid black;
+					border-top-width: 0;
+					border-right-width: 0;
+					border-bottom-width: 0;
+					border-left-width: 0;
+					table-layout:fixed;
+					}
+					th.tableClassLeft { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					padding: 2px;
+					}
+					th.tableClassRight { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 0;
+					padding: 2px;
+					}
+					th.tableClass { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					padding: 2px;
+					}
+					td.tableClassLeft { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					font-size: 0.9em;
+					color: blue;
+					word-wrap: break-word;
+					}
+					td.tableClassRight { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 0;
+					font-size: 0.9em;
+					color: blue;
+					word-wrap: break-word;
+					}
+					td.tableClass { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					font-size: 0.9em;
+					font-weight:bold;
+					color: black;
+					word-wrap: break-word;
+					}
+					td.tableClassNoBorder { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 0px;
+					font-size: 0.9em;
+					font-weight:bold;
+					color: black;
+					word-wrap: break-word;
+					}
+
+					td.tableClassNoBorderBlue { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 0px;
+					font-size: 0.9em;
+					font-weight:bold;
+					color: blue;
+					word-wrap: break-word;
+					}
+
+					td.tableClassInnerNoBorderBlue { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 0px;
+					font-size: 1.4em;
+					font-weight:bold;
+					color: blue;
+					word-wrap: break-word;
+					}
+
+					td.tableClassNoBorderAlignLeft { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 0px;
+					font-size: 0.9em;
+					font-weight:bold;
+					text-align: left;
+					color: black;
+					word-wrap: break-word;
+					}
+
+					td.signature {
+					padding: 4px 8px;
+					}
+
+					td.tableClassInner { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					font-size: 1em;
+					font-weight:bold;
+					color: black;
+					word-wrap: break-word;
+					}
+
+					td.tableClassValign { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					font-size: 0.9em;
+					font-weight:bold;
+					color: black;
+					vertical-align: middle;
+					text-align: center;
+					word-wrap: break-word;
+					}
+
+					td.tableClassValignNoBorder { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 0px;
+					font-size: 0.9em;
+					font-weight:bold;
+					color: black;
+					vertical-align: middle;
+					text-align: center;
+					word-wrap: break-word;
+					}
+
+					td.tableClassValignInner { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					font-size: 1em;
+					font-weight:bold;
+					color: black;
+					vertical-align: middle;
+					text-align: center;
+					word-wrap: break-word;
+					}
+
+					td.innerTableClassRightValign { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 0;
+					font-size: 1em;
+					font-weight:bold;
+					color: black;
+					vertical-align: middle;
+					text-align: center;
+					word-wrap: break-word;
+					}
+
+					td.innerTableClassRightValignBottomLess { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 0px;
+					border-left-width: 0;
+					font-size: 1em;
+					font-weight:bold;
+					color: black;
+					vertical-align: middle;
+					text-align: center;
+					word-wrap: break-word;
+					}
+
+					td.tableClassInnerLeft { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					font-size: 1em;
+					font-weight:bold;
+					color: black;
+					word-wrap: break-word;
+					}
+
+					td.tableClassInnerLeftBottomLess { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 1px;
+					font-size: 1em;
+					font-weight:bold;
+					color: black;
+					word-wrap: break-word;
+					}
+
+					td.tableClassNoBorderAlignCenter { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 0px;
+					font-size: 0.9em;
+					font-weight:bold;
+					color: black;
+					text-align: center;
+					word-wrap: break-word;
+					}
+
+					tr.tableClass { border: solid black;
+					border-top-width: 1px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					}
+					tr.tableClassWithBg { border: solid black;
+					border-top-width: 0;
+					border-right-width: 1;
+					border-bottom-width: 1;
+					border-left-width: 0;
+					background-color: #e0e0ff
+					}
+
+					tr.tableClassWithBgBlack { border: solid black;
+					border-top-width: 0;
+					border-right-width: 1;
+					border-bottom-width: 1;
+					border-left-width: 0;
+					background-color: #D3D3D3
+					}
+
+					hr.header {
+					position: relative;
+					top: 20px;
+					border: none;
+					height: 6px;
+					background: black;
+					margin-bottom: 10px;
+					}
+
+					hr.separatorThin {
+					position: relative;
+					top: 2px;
+					border: none;
+					height: 2px;
+					background: black;
+					margin-bottom: 2px;
+					}
+
+					hr.headerThin {
+					position: relative;
+					top: 10px;
+					border: none;
+					height: 2px;
+					background: black;
+					margin-bottom: 10px;
+					}
+
+					hr.separator {
+					position: relative;
+					top: 20px;
+					border: none;
+					height: 4px;
+					background: black;
+					margin-bottom: 5px;
+					}
+
+					div.text {
+					background-color: #ffffff;
+					color: blue;
+					font-size: 1em;
+					font-weight:normal;
+					text-align:justify;
+					}
+
+
+					div.information {
+					background-color: #ffffff;
+					color: black;
+					font-size: 1em;
+					font-weight:normal;
+					text-align:justify;
+					}
+
+					#scheader {
+					font-size: 0.9em;
+					border: 0px solid #404040;
+					border-spacing: 2px;
+					}
+
+					div.largetext {
+					background-color: #ffffff;
+					color: blue;
+					font-size: 1em;
+					font-weight:normal;
+					text-align:justify;
+					white-space: pre-wrap;
+					word-break: normal;
+					}
+
+				</style></head><body lang="en-US" text="#000000" bgcolor="#ffffff"><hr class="header"><br><hr class="headerThin"><div class="contentwrapper"><table role="presentation" id="scheader"><tr><td class="tableClassNoBorderAlignCenter" style="font-size:2em;">
+						SECURITIES AND EXCHANGE COMMISSION
+						<br>
+						Washington, D.C. 20549
+					</td></tr><tr><td class="tableClassNoBorderAlignCenter"><br><br><div style="font-size:1.5em;">
+									SCHEDULE 13D
+								</div><br><div style="font-size:1.2em;">
+							Under the Securities Exchange Act of 1934
+						</div><br></td></tr><tr><td class="center"><div class="information" style="text-align:center; font-weight:bold; color:blue;">ChronoScale Corporation</div><div class="information" style="text-align:center; font-weight:bold;"><hr class="separatorThin">(Name of Issuer)</div><br><br></td></tr><tr><td class="center"><div class="information" style="text-align:center; font-weight:bold; color:blue;">Common Stock, $0.001 par value per share</div><div class="information" style="text-align:center; font-weight:bold;"><hr class="separatorThin">(Title of Class of Securities)</div><br><br></td></tr><table border="1"><tr><td><div class="information" style="text-align:center; font-weight:bold; color:blue;">170924104</div><div class="information" style="text-align:center; font-weight:bold;"><hr class="separatorThin">(CUSIP Number)</div></td></tr><br><br></table><tr><td class="center"><div class="information" style="text-align:center; font-weight:bold; color:blue;">Wesley Cummins<br>2811 Turtle Creek Blvd., Suite 2100,
+								<br>Dallas,
+								TX,
+								75219<br>(214) 556-2465</div><br><br><div class="information" style="text-align:center; font-weight:bold; color:blue;">Steven E. Siesser, Esq.<br>Lowenstein Sandler LLP,
+								1251 Avenue of the Americas<br>New York,
+								NY,
+								10020<br>(212) 204-8688</div><div class="information" style="text-align:center; font-weight:bold;"><hr class="separatorThin">(Name, Address and Telephone Number of Person Authorized to
+									Receive Notices and Communications)</div></td></tr><tr><td class="center"><div class="information" style="text-align:center; font-weight:bold; color:blue;">05/05/2026</div><div class="information" style="text-align:center; font-weight:bold;"><hr class="separatorThin">(Date of Event Which Requires Filing of This Statement)</div></td></tr></table><br><br><div class="information" style="text-align:justify">
+				If the filing person has previously filed a statement on Schedule 13G to report the acquisition that is the subject of this Schedule 13D, and is filing this schedule because of §§ 240.13d-1(e), 240.13d-1(f) or 240.13d-1(g), check the following box.
+				<img src="/Images/box-unchecked.jpg" alt="Checkbox not checked"></div><br><div class="information" style="text-align:justify">
+				The information required on the remainder of this cover page shall not be deemed to be “filed” for the purpose of Section 18 of the
+				Securities Exchange Act of 1934 (“Act”) or otherwise subject to the liabilities of that section of the Act but shall be subject to all other
+				provisions of the Act (however, see the Notes).
+			</div></div><hr class="headerThin"><hr class="header"><br><br>
+  <div style="display:none">
+			schemaVersion:
+			</div>
+<div class="content"><div class="form1"></div></div>
+  <div class="content"><div class="form1"><table><tr><td class="center"><br><br><p><div align="center" style="font-size:1.2em;">
+									SCHEDULE 13D
+								</div></p></td></tr></table><table role="presentation" class="tableClass" id="cusipNumber"><tr class="tableClass"><td width="7%" style="font-weight:bold;">CUSIP Number(s):</td><td width="75%"><div style="font-size:.9em; color:#000000">170924104</div></td></tr></table><br><br><table role="presentation" class="tableClass" id="reportingPersonDetails"><tr class="tableClass"><td width="8%" class="tableClassValign">1</td><td width="92%" class="tableClass">
+					Name of reporting person
+					<br><br><div class="text">Applied Digital Corporation</div></td></tr><tr><td width="8%" class="tableClassValign">2</td><td width="92%" class="tableClass">Check the appropriate box if a member of a Group (See Instructions)
+				<br><br><div class="text"><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked">  (a)
+					<br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked">  (b)	
+				</div></td></tr><tr class="tableClassWithBgBlack"><td width="8%" class="tableClassValign">3</td><td width="92%" class="tableClass">SEC use only</td></tr><tr><td width="8%" class="tableClassValign">4</td><td width="92%" class="tableClass">
+					Source of funds (See Instructions)
+					<br><br><div class="text">AF, WC</div></td></tr><tr><td width="8%" class="tableClassValign">5</td><td width="92%" class="tableClass">
+					Check if disclosure of legal proceedings is required pursuant to Items 2(d) or 2(e)
+					<br><br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked"></td></tr><tr><td width="8%" class="tableClassValign">6</td><td width="92%" class="tableClass">Citizenship or place of organization
+				<br><br><div class="text">
+				NEVADA
+			</div></td></tr><tr><td width="8%" class="tableClassValign">Number of Shares Beneficially Owned by Each Reporting Person With:</td><td width="92%" class="tableClass"><table class="innerTableClass"><tr><td width="8%" class="innerTableClassRightValign">7</td><td width="92%" class="tableClassInnerLeft">Sole Voting Power
+							<br><br><div class="text">139,528,227.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">8</td><td width="92%" class="tableClassInnerLeft">Shared Voting Power
+							<br><br><div class="text">0.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">9</td><td width="92%" class="tableClassInnerLeft">Sole Dispositive Power
+							<br><br><div class="text">139,528,227.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValignBottomLess">10</td><td width="92%" class="tableClassInnerLeftBottomLess">Shared Dispositive Power
+							<br><br><div class="text">0.00</div></td></tr></table></td></tr><tr><td width="8%" class="tableClassValign">11</td><td width="92%" class="tableClass">Aggregate amount beneficially owned by each reporting person
+				<br><br><div class="text">139,528,227.00</div></td></tr><tr><td width="8%" class="tableClassValign">12</td><td width="92%" class="tableClass">Check if the aggregate amount in Row (11) excludes certain shares (See Instructions)
+				<br><br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked"></td></tr><tr><td width="8%" class="tableClassValign">13</td><td width="92%" class="tableClass">Percent of class represented by amount in Row (11)
+				<br><br><div class="text">97.5 % </div></td></tr><tr><td width="8%" class="tableClassValign">14</td><td width="92%" class="tableClass">Type of Reporting Person (See Instructions)
+				<br><br><div class="text">CO</div></td></tr></table><br><div style="display: flex;"><div style="font-size: 0.9em; font-weight: bold; margin-right: 5px;">
+					Comment for Type of Reporting Person:
+				</div><div class="largetext" style="text-align:justify">See Item 5 for additional information.</div></div></div><div class="form1"><table><tr><td class="center"><br><br><p><div align="center" style="font-size:1.2em;">
+									SCHEDULE 13D
+								</div></p></td></tr></table><table role="presentation" id="item1to7"><tr><td width="8%" class="tableClassValignNoBorder">Item 1.</td><td width="92%" class="tableClassNoBorder">Security and Issuer</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignCenter">(a)</td><td width="92%" class="tableClassNoBorder">Title of Class of Securities:
+							<br><br><div class="text">Common Stock, $0.001 par value per share</div></td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignCenter">(b)</td><td width="92%" class="tableClassNoBorder">Name of Issuer:
+							<br><br><div class="text">ChronoScale Corporation</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(c)</td><td width="92%" class="tableClassNoBorder">Address of Issuer's Principal Executive Offices:
+							<br><br><div class="text">3811 Turtle Creek Blvd. Suite 2100, Dallas, 
+				TEXAS
+			, 75219.</div></td></tr><tr><td width="8%" class="tableClassValignNoBorder">Item 2.</td><td width="92%" class="tableClassNoBorder">Identity and Background</td></tr><tr></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignCenter">(a)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">This Schedule 13D is filed by Applied Digital Corporation, a Delaware corporation (the "Reporting Person"). APLD Intermediate HoldCo LLC, a Delaware limited liability company ("APLD Intermediate") is a wholly owned subsidiary of the Reporting Person. APLD ChronoScale HoldCo LLC, a Delaware limited liability company ("APLD ChronoScale") is a wholly-owned subsidiary of APLD Intermediate. Set forth on Appendix A are the names of the members of the board of directors and executive officers of the Reporting Person and certain other persons associated with the Reporting Person (collectively, the "Covered Persons"). Appendix A is incorporated by reference herein as Exhibit 1. Information given in response to each item shall be deemed incorporated by reference in all other items, as applicable.</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(b)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">The business address for the Reporting Person and the Covered Persons is 3811 Turtle Creek Blvd., Suite 2100, Dallas, TX, 75219.</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(c)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">The principal business of the Reporting Person is the design, development and operation of digital infrastructure solutions for the high-performance computing, artificial intelligence and blockchain industries. The principal occupation of each of the Covered Persons is set forth on Appendix A.</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(d)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">During the last five years, neither the Reporting Person nor the Covered Persons have been convicted in a criminal proceeding (excluding traffic violations or similar misdemeanors).</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(e)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">During the last five years, neither the Reporting Person nor the Covered Persons were a party to a civil proceeding of a judicial or administrative body of competent jurisdiction or was subject to a judgment, decree or final order enjoining future violations of, or prohibiting or mandating activities subject to, federal or state securities laws or finding any violation with respect to such laws.</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(f)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">The Reporting Person is a Nevada corporation. Each of the Covered Persons is a citizen of the United States.</div></td></tr><tr><td width="8%" class="tableClassValignNoBorder">Item 3.</td><td width="92%" class="tableClassNoBorder">Source and Amount of Funds or Other Consideration</td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter"> </td><td width="92%" class="tableClassNoBorder"><div class="largetext">The securities of ChronoScale Corporation (f/k/a Ekso Bionics Holdings, Inc.) (the "Issuer") reported herein were acquired by the Reporting Person through (i) the exchange by APLD ChronoScale, an indirect wholly owned subsidiary of the Reporting Person, of 1,200 shares, constituting all of the issued and outstanding equity of Applied Digital Cloud Corporation ("Cloud") for 138,216,820 shares of common stock, par value $0.001 per share (the "Common Stock") of the Issuer (the "Exchanged Shares"), at the closing (the "Closing") of the business combination (the "Business Combination") on May 5, 2026 (the "Event Date") pursuant to the Contribution and Exchange Agreement, dated February 15, 2026, by and among the Issuer, APLD ChronoScale, APLD Intermediate and Cloud (the "Contribution and Exchange Agreement"), and (ii) the purchase by the Reporting Person, for cash, of 1,311,407 shares of Common Stock (the "Private Placement Shares") in a private placement (the "Private Placement" and, together with the Business Combination, the "Transactions") completed immediately prior to the Closing pursuant to the Securities Purchase Agreement, dated May 1, 2026, by and between the Issuer and the Reporting Person (the "Securities Purchase Agreement").
+
+The purchase price for the Private Placement Shares was $12.01 per share, the closing price of the Common Stock on April 30, 2026, the date immediately preceding the date of execution of the Securities Purchase Agreement, for an aggregate purchase price of approximately $15.75 million, which was funded from the Reporting Person's working capital.</div></td></tr><tr><td width="8%" class="tableClassValignNoBorder">Item 4.</td><td width="92%" class="tableClassNoBorder">Purpose of Transaction</td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter"> </td><td width="92%" class="tableClassNoBorder"><div class="largetext">The Reporting Person acquired the securities of the Issuer in connection with (i) the Business Combination contemplated by the Contribution and Exchange Agreement, pursuant to which Cloud became a wholly owned subsidiary of the Issuer and Ekso Bionics Holdings, Inc. changed its name to ChronoScale Corporation, and (ii) the Private Placement contemplated by the Securities Purchase Agreement. As a result of the Transactions, the Reporting Person is deemed to beneficially own a majority of the voting power of all outstanding shares of the Issuer's Common Stock and the Issuer is a "controlled company" within the meaning of Nasdaq's corporate governance standards. In connection with, and effective upon, the Closing, the Issuer and APLD ChronoScale entered into an Investor Rights Agreement (the "Investor Rights Agreement") that, among other things, provides the Reporting Person and its affiliates, with board designation rights, certain consent rights, preemptive rights and registration rights with respect to the Exchanged Shares and the Private Placement Shares. The Reporting Person acquired beneficial ownership of the securities reported herein of the Issuer for investment purposes.
+
+Pursuant to the Investor Rights Agreement, the APLD Designator (as defined therein) has the right to designate four (4) of the seven (7) directors on the Issuer's board of directors, including the Chairman (each such director, an "APLD Designee"). The initial APLD Designees are Wesley Cummins (Chairman), Ella Benson, Douglas Miller and Richard Nottenburg. At the Closing, the Issuer and the Reporting Person also entered into a Management Advisory and Corporate Services Agreement (the "Services Agreement"), pursuant to which the Reporting Person agreed to provide management advisory services and certain corporate services to the Issuer in exchange for the fees described therein. For the avoidance of doubt, the Services Agreement does not relate to the acquisition, disposition, voting or transfer of Issuer securities.
+
+Although the Reporting Person and the Covered Persons are considering, or may consider in the future, plans or proposals with respect to their investment in the Issuer that could relate or would result in any of the matters set forth in subparagraphs (a) - (j) of Item 4 of Schedule 13D, except as set forth in this Schedule 13D, neither the Reporting Person nor the Covered Persons have any present plan or proposal which would relate to or result in any such matters. The Reporting Person and Covered Persons have had discussions with management of the Issuer, other members of the Board, other representatives of the Issuer and other investors regarding the Issuer, including but not limited to its operations, strategy, management, capital structure, their investment in the Issuer and strategic alternatives that may be available to the Issuer. Such discussions may concern ideas, plans or proposals that, if effected, may result in one or more of the events described in subparagraphs (a) - (j) of Item 4 of Schedule 13D.
+
+The Reporting Person and the Covered Persons intend to review their investment in the Issuer on a continuing basis. Depending on various factors, including the Issuer's financial position and strategic direction, price levels of the securities of the Issuer, other investment opportunities available to the Reporting Person and the Covered Persons, conditions in the securities market and general economic and industry conditions, the Reporting Person and the Covered Persons may in the future take such actions with respect to their investment in the Issuer as they deem appropriate, including, without limitation, acquiring additional securities of the Issuer and/or retaining, converting and/or selling all or a portion of the securities of the Issuer held by the Reporting Person or the Covered Persons, if any, in the open market or in privately negotiated transactions, and/or may distribute securities of the Issuer to be acquired or held by the Reporting Person or the Covered Persons to  shareholders of the Reporting Person, other entities engaging in communications with other directors and officers of the Issuer, other stockholders of the Issuer or other third parties or taking steps to implement a course of action, including, without limitation, engaging advisors, including legal, financial, regulatory, technical and/or industry advisors, to assist in any review. Such discussions and other actions may relate to various alternative courses of action, including, without limitation, those related to an extraordinary corporate transaction (including, but not limited to a merger, reorganization or liquidation) involving the Issuer or any of its subsidiaries; business combinations involving the Issuer or its subsidiaries; a sale or transfer of a material amount of assets of the Issuer or any of its subsidiaries; material asset purchases; the formation of joint ventures with the Issuer or its subsidiaries or the entry into other material projects; changes in the present business, operations, strategy, future plans or prospects of the Issuer, financial or governance matters; changes to the board of directors (including composition of the board of directors) or management of the Issuer; acting as a participant in debt financings of the Issuer or its subsidiaries, changes to the capitalization, ownership structure, dividend policy, business or corporate structure or governance documents of the Issuer; de-listing or de-registration of the Issuer's securities; any of the matters set forth in subparagraphs (a) - (j) of Item 4 of Schedule 13D or any action similar to those enumerated above.</div></td></tr><tr><td width="8%" class="tableClassValignNoBorder">Item 5.</td><td width="92%" class="tableClassNoBorder">Interest in Securities of the Issuer</td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(a)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">As of the Event Date and the date of this Schedule 13D (the "Filing Date"), the Reporting Person may be deemed to beneficially own 97.5% of the outstanding shares of the Issuer, or 139,528,227 shares, consisting of 1,311,407 shares held directly and 138,216,820 shares held indirectly through its wholly owned subsidiaries. As of the Event Date and the Filing Date, the Issuer had 143,093,381 shares of Common Stock outstanding, based on information reported by the Issuer in its Current Report on Form 8-K/A filed with the Securities and Exchange Commission (the "SEC") on May 5, 2026.</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(b)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">The information contained on the cover page to this Schedule 13D is incorporated by reference into this Item 5.</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(c)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">Except as set forth in this Schedule 13D, no transactions in the Common Stock have been effected by the Reporting Person or the Covered Persons during the past sixty days prior to (i) the Event Date and (ii) the Filing Date.</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(d)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">None.</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(e)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">Not applicable.</div></td></tr><tr><td width="8%" class="tableClassValignNoBorder">Item 6.</td><td width="92%" class="tableClassNoBorder">Contracts, Arrangements, Understandings or Relationships With Respect to Securities of the Issuer</td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter"> </td><td width="92%" class="tableClassNoBorder"><div class="largetext">In connection with the transactions described in Item 3 and Item 4, the Reporting Person and the Covered Persons are parties to, or beneficiaries of, the following agreements, as applicable, with the Issuer relating to the Issuer's securities, each of which is incorporated by reference herein:
+
+The Contribution and Exchange Agreement by and among the Issuer, APLD Intermediate, APLD ChronoScale and Cloud, pursuant to which APLD ChronoScale received 138,216,820 shares of Common Stock in exchange for all of the outstanding equity of Cloud at Closing.
+
+The Investor Rights Agreement which, among other things, provides board designation rights, specified consent rights while the APLD Investors (as defined therein) beneficially own certain thresholds of voting power, preemptive rights and resale registration rights for registrable securities (including the Private Placement Shares).
+
+The Securities Purchase Agreement by and between the Issuer and the Reporting Person, pursuant to which the Reporting Person purchased 1,311,407 shares of Common Stock at a price of $12.01 per share for aggregate consideration of approximately $15.75 million.
+
+In addition, on April 9, 2026, APLD ChronoScale Management LLC ("APLD Management") granted to certain of the Covered Persons certain profits interests in the form of Management Incentive Plan Units (the "MIP Units") pursuant to the APLD ChronoScale Management LLC Equity Incentive Plan. The MIP Units were fully vested upon grant and are designed to track the appreciation of the equity of the Issuer and are held by each recipient personally, not by the Reporting Person. The MIP Units do not confer on the recipients any present power to dispose of, or to direct the disposition of, any securities of the Issuer as any such sale is subject to the discretionary approval of APLD Management and, if approved, would be effected by such entity, and the recipients do not have a unilateral right to cause a sale within 60 days. In the aggregate, the awards to the recipients represent approximately 5.25% of the Issuer's shares of common stock issued to APLD ChronoScale pursuant to the Contribution and Exchange Agreement.
+
+Except as set forth in this Schedule 13D, neither the Reporting Person nor, to its knowledge, any of the Covered Persons are a party to any contract, arrangement, understanding or relationship with respect to any securities of the issuer, including but not limited to transfer or voting of any of the securities, finders' fees, joint ventures, loan or option arrangements, puts or calls, guarantees of profits, division of profits or loss, or the giving or withholding of proxies.</div></td></tr><tr><td width="8%" class="tableClassValignNoBorder">Item 7.</td><td width="92%" class="tableClassNoBorder">Material to be Filed as Exhibits.</td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter"> </td><td width="92%" class="tableClassNoBorder"><div class="largetext">Exhibit 1 - Appendix A
+Exhibit 2 - Contribution and Exchange Agreement, dated February 15, 2026, by and among ChronoScale Corporation (f/k/a Ekso Bionics Holdings, Inc.), APLD ChronoScale HoldCo LLC, APLD Intermediate HoldCo LLC, and Applied Digital Cloud Corporation (incorporated by reference to Exhibit 10.1 to Applied Digital Corporation's Current Report on Form 8-K filed with the SEC on February 17, 2026).
+Exhibit 3 - Investor Rights Agreement by and between ChronoScale Corporation and APLD ChronoScale Holdco LLC, dated May 5, 2026 (incorporated by reference to Exhibit 10.4 to Applied Digital Corporation's Current Report on Form 8-K/A filed with the SEC on May 5, 2026).</div></td></tr></table><br></div><div class="form1"><table role="presentation" id="signatureInfo"><tr><td width="8%" class="tableClassValignNoBorder">    SIGNATURE</td><td width="92%" class="tableClassNoBorder"> </td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter"> </td><td width="92%" class="tableClassNoBorder"><div class="information" style="text-align:justify">
+						After reasonable inquiry and to the best of my knowledge and belief, I certify that the information set forth in this statement is true, complete and correct.
+						<br><br></div></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="100%" class="tableClassInnerNoBorderBlue"><div class="text">Applied Digital Corporation</div></td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Signature:</td><td width="92%" class="tableClassNoBorderBlue signature">/s/ Saidal Mohmand</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Name/Title:</td><td width="92%" class="tableClassNoBorderBlue signature">Saidal Mohmand / Chief Financial Officer</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Date:</td><td width="92%" class="tableClassNoBorderBlue signature">05/12/2026</td></tr></table></td></tr></table></div></div>
+
+<script type="text/javascript"  src="/QQpw/SBxk/Vaws3/_e/ukQ/ahaE2chLLGzQfS/Ji1MAQ/Zg9QCV/p9Knc"></script></body></html>

@@ -1,0 +1,433 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns:p="http://www.sec.gov/edgar/schedule13D" xmlns:p1="http://www.sec.gov/edgar/common"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><link rel="stylesheet" type="text/css" href="/css/SDR_print.css"><style type="text/css">
+					.fakeTextBox {
+					border-top: 2px solid #999;
+					border-right: 1px solid #ccc;
+					border-bottom: 1px solid #ccc;
+					border-left: 2px solid #999;
+					padding: 2px;
+					_width: 800px;
+					height: auto;
+					min-width: 200px;
+					min-height: 50px;
+					word-wrap: break-word;
+					font-size: 0.9em;
+					color: blue;
+					}
+					table.tableClass { border: solid black;
+					border-top-width: 1;
+					border-right-width: 1;
+					border-bottom-width: 1;
+					border-left-width: 1;
+					table-layout:fixed;
+					}
+					table.innerTableClass { border: solid black;
+					border-top-width: 0;
+					border-right-width: 0;
+					border-bottom-width: 0;
+					border-left-width: 0;
+					table-layout:fixed;
+					}
+					th.tableClassLeft { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					padding: 2px;
+					}
+					th.tableClassRight { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 0;
+					padding: 2px;
+					}
+					th.tableClass { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					padding: 2px;
+					}
+					td.tableClassLeft { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					font-size: 0.9em;
+					color: blue;
+					word-wrap: break-word;
+					}
+					td.tableClassRight { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 0;
+					font-size: 0.9em;
+					color: blue;
+					word-wrap: break-word;
+					}
+					td.tableClass { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					font-size: 0.9em;
+					font-weight:bold;
+					color: black;
+					word-wrap: break-word;
+					}
+					td.tableClassNoBorder { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 0px;
+					font-size: 0.9em;
+					font-weight:bold;
+					color: black;
+					word-wrap: break-word;
+					}
+
+					td.tableClassNoBorderBlue { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 0px;
+					font-size: 0.9em;
+					font-weight:bold;
+					color: blue;
+					word-wrap: break-word;
+					}
+
+					td.tableClassInnerNoBorderBlue { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 0px;
+					font-size: 1.4em;
+					font-weight:bold;
+					color: blue;
+					word-wrap: break-word;
+					}
+
+					td.tableClassNoBorderAlignLeft { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 0px;
+					font-size: 0.9em;
+					font-weight:bold;
+					text-align: left;
+					color: black;
+					word-wrap: break-word;
+					}
+
+					td.signature {
+					padding: 4px 8px;
+					}
+
+					td.tableClassInner { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					font-size: 1em;
+					font-weight:bold;
+					color: black;
+					word-wrap: break-word;
+					}
+
+					td.tableClassValign { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					font-size: 0.9em;
+					font-weight:bold;
+					color: black;
+					vertical-align: middle;
+					text-align: center;
+					word-wrap: break-word;
+					}
+
+					td.tableClassValignNoBorder { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 0px;
+					font-size: 0.9em;
+					font-weight:bold;
+					color: black;
+					vertical-align: middle;
+					text-align: center;
+					word-wrap: break-word;
+					}
+
+					td.tableClassValignInner { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					font-size: 1em;
+					font-weight:bold;
+					color: black;
+					vertical-align: middle;
+					text-align: center;
+					word-wrap: break-word;
+					}
+
+					td.innerTableClassRightValign { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 0;
+					font-size: 1em;
+					font-weight:bold;
+					color: black;
+					vertical-align: middle;
+					text-align: center;
+					word-wrap: break-word;
+					}
+
+					td.innerTableClassRightValignBottomLess { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 0px;
+					border-left-width: 0;
+					font-size: 1em;
+					font-weight:bold;
+					color: black;
+					vertical-align: middle;
+					text-align: center;
+					word-wrap: break-word;
+					}
+
+					td.tableClassInnerLeft { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					font-size: 1em;
+					font-weight:bold;
+					color: black;
+					word-wrap: break-word;
+					}
+
+					td.tableClassInnerLeftBottomLess { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 1px;
+					font-size: 1em;
+					font-weight:bold;
+					color: black;
+					word-wrap: break-word;
+					}
+
+					td.tableClassNoBorderAlignCenter { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 0px;
+					font-size: 0.9em;
+					font-weight:bold;
+					color: black;
+					text-align: center;
+					word-wrap: break-word;
+					}
+
+					tr.tableClass { border: solid black;
+					border-top-width: 1px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					}
+					tr.tableClassWithBg { border: solid black;
+					border-top-width: 0;
+					border-right-width: 1;
+					border-bottom-width: 1;
+					border-left-width: 0;
+					background-color: #e0e0ff
+					}
+
+					tr.tableClassWithBgBlack { border: solid black;
+					border-top-width: 0;
+					border-right-width: 1;
+					border-bottom-width: 1;
+					border-left-width: 0;
+					background-color: #D3D3D3
+					}
+
+					hr.header {
+					position: relative;
+					top: 20px;
+					border: none;
+					height: 6px;
+					background: black;
+					margin-bottom: 10px;
+					}
+
+					hr.separatorThin {
+					position: relative;
+					top: 2px;
+					border: none;
+					height: 2px;
+					background: black;
+					margin-bottom: 2px;
+					}
+
+					hr.headerThin {
+					position: relative;
+					top: 10px;
+					border: none;
+					height: 2px;
+					background: black;
+					margin-bottom: 10px;
+					}
+
+					hr.separator {
+					position: relative;
+					top: 20px;
+					border: none;
+					height: 4px;
+					background: black;
+					margin-bottom: 5px;
+					}
+
+					div.text {
+					background-color: #ffffff;
+					color: blue;
+					font-size: 1em;
+					font-weight:normal;
+					text-align:justify;
+					}
+
+
+					div.information {
+					background-color: #ffffff;
+					color: black;
+					font-size: 1em;
+					font-weight:normal;
+					text-align:justify;
+					}
+
+					#scheader {
+					font-size: 0.9em;
+					border: 0px solid #404040;
+					border-spacing: 2px;
+					}
+
+					div.largetext {
+					background-color: #ffffff;
+					color: blue;
+					font-size: 1em;
+					font-weight:normal;
+					text-align:justify;
+					white-space: pre-wrap;
+					word-break: normal;
+					}
+
+				</style></head><body lang="en-US" text="#000000" bgcolor="#ffffff"><hr class="header"><br><hr class="headerThin"><div class="contentwrapper"><table role="presentation" id="scheader"><tr><td class="tableClassNoBorderAlignCenter" style="font-size:2em;">
+						SECURITIES AND EXCHANGE COMMISSION
+						<br>
+						Washington, D.C. 20549
+					</td></tr><tr><td class="tableClassNoBorderAlignCenter"><br><br><div style="font-size:1.5em;">
+									SCHEDULE 13D
+								</div><br><div style="font-size:1.2em;">
+							Under the Securities Exchange Act of 1934
+						</div><br></td></tr><tr><td class="center"><div class="information" style="text-align:center; font-weight:bold; color:blue;">APELLIS PHARMACEUTICALS, INC.</div><div class="information" style="text-align:center; font-weight:bold;"><hr class="separatorThin">(Name of Issuer)</div><br><br></td></tr><tr><td class="center"><div class="information" style="text-align:center; font-weight:bold; color:blue;">Common Stock, par value $0.0001 per share</div><div class="information" style="text-align:center; font-weight:bold;"><hr class="separatorThin">(Title of Class of Securities)</div><br><br></td></tr><table border="1"><tr><td><div class="information" style="text-align:center; font-weight:bold; color:blue;">03753U106</div><div class="information" style="text-align:center; font-weight:bold;"><hr class="separatorThin">(CUSIP Number)</div></td></tr><br><br></table><tr><td class="center"><div class="information" style="text-align:center; font-weight:bold; color:blue;">Wendell Taylor, Secretary<br>Biogen Inc., 225 Binney Street,
+								<br>Cambridge,
+								MA,
+								02142<br>(781) 464-2000</div><div class="information" style="text-align:center; font-weight:bold;"><hr class="separatorThin">(Name, Address and Telephone Number of Person Authorized to
+									Receive Notices and Communications)</div></td></tr><tr><td class="center"><div class="information" style="text-align:center; font-weight:bold; color:blue;">03/31/2026</div><div class="information" style="text-align:center; font-weight:bold;"><hr class="separatorThin">(Date of Event Which Requires Filing of This Statement)</div></td></tr></table><br><br><div class="information" style="text-align:justify">
+				If the filing person has previously filed a statement on Schedule 13G to report the acquisition that is the subject of this Schedule 13D, and is filing this schedule because of §§ 240.13d-1(e), 240.13d-1(f) or 240.13d-1(g), check the following box.
+				<img src="/Images/box-unchecked.jpg" alt="Checkbox not checked"></div><br><div class="information" style="text-align:justify">
+				The information required on the remainder of this cover page shall not be deemed to be “filed” for the purpose of Section 18 of the
+				Securities Exchange Act of 1934 (“Act”) or otherwise subject to the liabilities of that section of the Act but shall be subject to all other
+				provisions of the Act (however, see the Notes).
+			</div></div><hr class="headerThin"><hr class="header"><br><br>
+<div style="display:none">
+			schemaVersion:
+			</div>
+<div class="content"><div class="form1"></div></div>
+<div class="content"><div class="form1"><table><tr><td class="center"><br><br><p><div align="center" style="font-size:1.2em;">
+									SCHEDULE 13D
+								</div></p></td></tr></table><table role="presentation" class="tableClass" id="cusipNumber"><tr class="tableClass"><td width="7%" style="font-weight:bold;">CUSIP Number(s):</td><td width="75%"><div style="font-size:.9em; color:#000000">03753U106</div></td></tr></table><br><br><table role="presentation" class="tableClass" id="reportingPersonDetails"><tr class="tableClass"><td width="8%" class="tableClassValign">1</td><td width="92%" class="tableClass">
+					Name of reporting person
+					<br><br><div class="text">BIOGEN INC.</div></td></tr><tr><td width="8%" class="tableClassValign">2</td><td width="92%" class="tableClass">Check the appropriate box if a member of a Group (See Instructions)
+				<br><br><div class="text"><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked">  (a)
+					<br><img src="/Images/box-checked.jpg" alt="Checkbox checked">  (b)	
+				</div></td></tr><tr class="tableClassWithBgBlack"><td width="8%" class="tableClassValign">3</td><td width="92%" class="tableClass">SEC use only</td></tr><tr><td width="8%" class="tableClassValign">4</td><td width="92%" class="tableClass">
+					Source of funds (See Instructions)
+					<br><br><div class="text">BK, WC</div></td></tr><tr><td width="8%" class="tableClassValign">5</td><td width="92%" class="tableClass">
+					Check if disclosure of legal proceedings is required pursuant to Items 2(d) or 2(e)
+					<br><br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked"></td></tr><tr><td width="8%" class="tableClassValign">6</td><td width="92%" class="tableClass">Citizenship or place of organization
+				<br><br><div class="text">
+				DELAWARE
+			</div></td></tr><tr><td width="8%" class="tableClassValign">Number of Shares Beneficially Owned by Each Reporting Person With:</td><td width="92%" class="tableClass"><table class="innerTableClass"><tr><td width="8%" class="innerTableClassRightValign">7</td><td width="92%" class="tableClassInnerLeft">Sole Voting Power
+							<br><br><div class="text">0.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">8</td><td width="92%" class="tableClassInnerLeft">Shared Voting Power
+							<br><br><div class="text">18,469,475.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">9</td><td width="92%" class="tableClassInnerLeft">Sole Dispositive Power
+							<br><br><div class="text">0.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValignBottomLess">10</td><td width="92%" class="tableClassInnerLeftBottomLess">Shared Dispositive Power
+							<br><br><div class="text">0.00</div></td></tr></table></td></tr><tr><td width="8%" class="tableClassValign">11</td><td width="92%" class="tableClass">Aggregate amount beneficially owned by each reporting person
+				<br><br><div class="text">18,469,475.00</div></td></tr><tr><td width="8%" class="tableClassValign">12</td><td width="92%" class="tableClass">Check if the aggregate amount in Row (11) excludes certain shares (See Instructions)
+				<br><br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked"></td></tr><tr><td width="8%" class="tableClassValign">13</td><td width="92%" class="tableClass">Percent of class represented by amount in Row (11)
+				<br><br><div class="text">14.2 % </div></td></tr><tr><td width="8%" class="tableClassValign">14</td><td width="92%" class="tableClass">Type of Reporting Person (See Instructions)
+				<br><br><div class="text">CO</div></td></tr></table><br><div style="display: flex;"><div style="font-size: 0.9em; font-weight: bold; margin-right: 5px;">
+					Comment for Type of Reporting Person:
+				</div><div class="largetext" style="text-align:justify">(1) This amount consists of (i) 16,199,243 outstanding shares of Apellis Common Stock (as defined below) held by the Support Stockholders (as defined below) and (ii) 18,866 shares of Apellis Common Stock that certain of the Support Stockholders have the right to acquire within 60 days upon exercise of options or restricted stock units ("RSUs") granted to such Support Stockholders plus options to acquire 2,251,366 shares of Apellis Common Stock that are currently exercisable, in each case as of March 31, 2026.  
+
+(2) Calculation is based on the sum of (i) 127,922,588 outstanding shares of Apellis Common Stock, as represented by Apellis to Biogen (each as defined below) on March 31, 2026, plus (ii) 18,866 shares of Apellis Common Stock that certain of the Support Stockholders have the right to acquire within 60 days upon exercise of options or RSUs granted to such Support Stockholders and options to acquire 2,251,366 shares of Apellis Common Stock that are currently exercisable, in each case as of March 31, 2026.
+
+(3) The beneficial ownership of the shares of Apellis Common Stock is being reported hereunder solely as a result of the Tender and Support Agreement (as defined below). 
+
+Neither the filing of this Schedule 13D nor any of its contents shall be deemed to constitute an admission by Biogen that it is the beneficial owner of any of the Apellis Common Stock referred to herein for purposes of Section 13(d) of the Exchange Act, or for any other purpose, and such beneficial ownership is expressly disclaimed.</div></div></div><div class="form1"><table><tr><td class="center"><br><br><p><div align="center" style="font-size:1.2em;">
+									SCHEDULE 13D
+								</div></p></td></tr></table><table role="presentation" id="item1to7"><tr><td width="8%" class="tableClassValignNoBorder">Item 1.</td><td width="92%" class="tableClassNoBorder">Security and Issuer</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignCenter">(a)</td><td width="92%" class="tableClassNoBorder">Title of Class of Securities:
+							<br><br><div class="text">Common Stock, par value $0.0001 per share</div></td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignCenter">(b)</td><td width="92%" class="tableClassNoBorder">Name of Issuer:
+							<br><br><div class="text">APELLIS PHARMACEUTICALS, INC.</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(c)</td><td width="92%" class="tableClassNoBorder">Address of Issuer's Principal Executive Offices:
+							<br><br><div class="text">Wendell Taylor, Secretary, Biogen Inc., 225 Binney Street, Cambridge, 
+				MASSACHUSETTS
+			, 02142.</div></td></tr><tr><td colspan="3"><div style="display: flex;"><div style="font-size: 0.9em; font-weight: bold; margin-right: 5px;">
+									Item 1 Comment:
+								</div><div class="largetext" style="text-align:justify">This statement on Schedule 13D relates to Apellis Common Stock.  The principal executive office address of Apellis Pharmaceuticals, Inc. ("Apellis") is 100 Fifth Avenue, Waltham, Massachusetts 02451.</div></div></td></tr><tr><td width="8%" class="tableClassValignNoBorder">Item 2.</td><td width="92%" class="tableClassNoBorder">Identity and Background</td></tr><tr></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignCenter">(a)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">The name of the person filing this statement is Biogen Inc., a Delaware corporation ("Biogen").</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(b)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">The principal business address of Biogen is 225 Binney Street, Cambridge, Massachusetts 02142.</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(c)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">Biogen is a global biopharmaceutical company focused on discovering, developing and delivering innovative therapies for people living with serious and complex diseases. Biogen has a broad portfolio of medicines to treat multiple sclerosis, has introduced the first approved treatment for spinal muscular atrophy, co-developed treatments to address a defining pathology of Alzheimer's disease and launched the first approved treatment to target a genetic cause of ALS. Biogen markets the first and only drug approved in the U.S., the E.U. and certain international markets for the treatment of FA in adults and adolescents aged 16 years and older. Biogen is focused on advancing its pipeline in neurology, specialized immunology and rare diseases. Biogen supports its drug discovery and development efforts through internal research and development programs, external collaborations and acquisitions.</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(d)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">During the last five years, none of Biogen, Apellis or the Support Stockholders (as defined below) have been convicted in a criminal proceeding of the type specified in Item 2(d) of Schedule 13D.</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(e)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">During the last five years, none of Biogen, Apellis or the Support Stockholders have been a party to a civil proceeding of a judicial or administrative body of competent jurisdiction and as a result of such proceeding was or is subject to a judgment, decree or final order enjoining future violations of, or prohibiting or mandating activities subject to, federal or state securities laws or finding any violation with respect to such laws.</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(f)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">Not applicable.</div></td></tr><tr><td width="8%" class="tableClassValignNoBorder">Item 3.</td><td width="92%" class="tableClassNoBorder">Source and Amount of Funds or Other Consideration</td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter"> </td><td width="92%" class="tableClassNoBorder"><div class="largetext">The description of the Merger Agreement, the Tender and Support Agreement and the CVR Agreement (each as defined below) included below in response to Item 4 are incorporated by reference in this Item 3.
+
+Biogen expects to finance the Merger (as defined below) with a combination of cash on hand and term loan proceeds.
+
+The foregoing summaries of the Merger Agreement, the Tender and Support Agreement and the CVR Agreement do not purport to be complete and are qualified in their entirety by reference to the full text of the Merger Agreement, the Tender and Support Agreement and the CVR Agreement, copies of which are filed as Exhibit 1, Exhibit 2 and Exhibit B to Exhibit 1, respectively, and are incorporated herein by reference.</div></td></tr><tr><td width="8%" class="tableClassValignNoBorder">Item 4.</td><td width="92%" class="tableClassNoBorder">Purpose of Transaction</td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter"> </td><td width="92%" class="tableClassNoBorder"><div class="largetext">On March 31, 2026, Biogen, Aspen Purchaser Sub, Inc. ("Purchaser"), a Delaware corporation and a wholly owned subsidiary of Biogen, and Apellis, entered into an Agreement and Plan of Merger (the "Merger Agreement").
+
+Pursuant to the Merger Agreement, and upon the terms and subject to the conditions therein, Purchaser will commence a tender offer (the "Offer") to acquire any and all outstanding shares of common stock, par value $0.0001 per share, of Apellis (the "Apellis Common Stock"), in exchange for (i) $41.00 per share of Apellis Common Stock, net to the seller in cash, without interest and subject to reduction for any applicable tax withholding (such amount, or any higher amount per share paid pursuant to the Offer, the "Upfront Consideration"), plus (ii) one contractual, non-transferable contingent value right per share of Apellis Common Stock (each, a "CVR"), which shall entitle the holder to receive potential payments of up to an aggregate of $4.00 in cash, without interest and subject to reduction for any applicable tax withholding, upon the achievement of certain specified milestones described below in accordance with the terms and conditions of a contingent value rights agreement (the "CVR Agreement") included as Exhibit B to the Merger Agreement, to be entered into with a rights agent (the "Rights Agent") mutually acceptable to Biogen and Apellis (the Upfront Consideration plus one CVR, together, the "Offer Price"). The Offer will remain open for 20 business days, subject to extension under certain circumstances.
+
+Promptly following the consummation of the Offer, subject to the terms and conditions set forth in the Merger Agreement, Purchaser will merge with and into Apellis, with Apellis continuing as the surviving corporation and a wholly owned subsidiary of Biogen (the "Merger"). The Merger Agreement contemplates that the Merger will be effected pursuant to Section 251(h) of the General Corporation Law of the State of Delaware (the "DGCL"), with no stockholder vote required to consummate the Merger. At the effective time of the Merger (the "Effective Time"), each share of Apellis Common Stock (other than shares of Apellis Common Stock that are (i) held in the treasury of Apellis, (ii) irrevocably accepted for purchase in the Offer by Purchaser and "received" (as such term is defined by Section 251(h)(6)(f) of the DGCL) by Purchaser, (iii) held by Biogen, Purchaser or any other wholly owned subsidiary of Biogen as of both the commencement of the Offer and immediately prior to the Effective Time and (iv) held by stockholders who are entitled to, and properly demand, appraisal for such shares of Apellis Common Stock in accordance with Section 262 of the DGCL) will be cancelled and converted into the right to receive the Offer Price without interest, subject to reduction for any applicable withholding taxes (the "Merger Consideration").
+
+On March 31, 2026, concurrently with the execution of the Merger Agreement, Biogen and Purchaser entered into a tender and support agreement (the "Tender and Support Agreement") with certain of Apellis' current directors and executive officers, Cedric Francois, Gerald Chan, Alec Machiels and Pascal Deschatelets, and Morningside Venture Investments, Ltd., a stockholder of Apellis (collectively, the "Support Stockholders"), solely in their respective capacities as stockholders of Apellis, pursuant to which each Support Stockholder agreed, among other things, (i) to tender all of the shares of Apellis Common Stock held by such Support Stockholder in the Offer, (ii) to, if applicable, vote all of such Support Stockholder's shares of Apellis Common Stock in favor of the Merger and (iii) to certain other restrictions on its ability to take actions with respect to Apellis and its shares of Apellis Common Stock.
+
+At or prior to the time at which Purchaser irrevocably accepts for purchase all shares of Apellis Common Stock validly tendered (and not validly withdrawn) pursuant to the Offer, Biogen, Apellis and the Rights Agent will enter into the CVR Agreement.  Each CVR represents a non-transferable contractual contingent right to receive the following cash payments, without interest and subject to reduction for any applicable tax withholding (the "Milestone Payments") if the following milestones (the "Milestones") are achieved:
+
+	$2.00 per CVR, upon the achievement of Annual Net Sales, as defined in the CVR Agreement, of at least $1,500,000,000 attributable to SYFOVRE(R) and related products in the aggregate during the 2027, 2028, 2029 or 2030 calendar years (the "Net Sales Milestone 1"); or
+
+	$2.00 per CVR, upon the achievement of Annual Net Sales, as defined in the CVR Agreement, of at least $2,000,000,000 attributable to SYFOVRE(R) and related products in the aggregate during the 2027, 2028, 2029, 2030 or 2031 calendar years (the "Net Sales Milestone 2"), provided that if the Net Sales Milestone 1 is not met prior to December 31, 2030 but the Net Sales Milestone 2 is achieved during the 2031 calendar year, then the Net Sales Milestone 2 shall be worth $4.00 per CVR.
+
+Each Milestone may only be achieved one time; if the Annual Net Sales threshold is met in multiple calendar years, only the first achievement triggers payment.  There can be no assurance that any Milestone will be achieved prior to the expiration or termination of the CVR Agreement, or that payment will be required of Biogen with respect to any Milestone.
+The Merger is expected to close in the second quarter of 2026.  Upon completion of the Merger, Apellis will become a privately held company and Apellis Common Stock will no longer be listed on any public market. 
+
+The foregoing descriptions of the Merger Agreement, the Tender and Support Agreement and the CVR Agreement do not purport to be complete and are qualified in their entirety by reference to the full text of such agreements, copies of which are filed as Exhibit 1, Exhibit 2 and Exhibit B to Exhibit 1, respectively, hereto and are incorporated herein by reference. The foregoing summaries and the copies of the Merger Agreement, the Tender and Support Agreement and the CVR Agreement are intended to provide information regarding the terms of the Merger Agreement, the Tender and Support Agreement and the CVR Agreement and are not intended to modify or supplement any factual disclosures about Biogen in its public reports filed with the U.S. Securities and Exchange Commission (the "SEC"). The assertions embodied in the representations and warranties included in the Merger Agreement, the Tender and Support Agreement and the CVR Agreement were made solely for purposes of such agreement and are subject to important qualifications and limitations agreed to by Biogen, Apellis and Purchaser in connection with the negotiated terms, including being qualified by confidential disclosures made for the purposes of allocating contractual risk between the parties thereto. Moreover, certain representations and warranties were made as of a specified date, may be subject to a contractual standard of materiality different from those generally applicable to Biogen's SEC filings or may have been used for purposes of allocating risk among Biogen, Apellis and Purchaser rather than establishing matters as facts. Investors should not rely on the representations and warranties or any description of them as characterizations of the actual state of facts of Biogen, Apellis, Purchaser or any of their respective subsidiaries or affiliates. Moreover, information concerning the subject matter of the representations and warranties may change after the date of the Merger Agreement, the Tender and Support Agreement and the CVR Agreement and, unless required by applicable law, Biogen undertakes no obligation to update such information.  
+
+Important Information for Investors and Stockholders and Where to Find It
+
+The tender offer referenced herein has not yet commenced. This filing is for informational purposes only and is neither an offer to purchase nor a solicitation of an offer to sell any Apellis Common Stock or any other securities, nor is it a substitute for the tender offer materials that Biogen or Purchaser will file with the SEC. The terms and conditions of the tender offer will be published in, and the offer to purchase Apellis Common Stock will be made only pursuant to, the offer document and related offer materials prepared by Biogen and Purchaser and filed with the SEC in a tender offer statement on Schedule TO at the time the tender offer is commenced.
+
+THE TENDER OFFER MATERIALS (INCLUDING AN OFFER TO PURCHASE, A RELATED LETTER OF TRANSMITTAL AND CERTAIN OTHER TENDER OFFER DOCUMENTS) AND THE SOLICITATION/RECOMMENDATION STATEMENT ON SCHEDULE 14D-9, AS THEY MAY BE AMENDED FROM TIME TO TIME, WILL CONTAIN IMPORTANT INFORMATION. INVESTORS AND APELLIS SECURITYHOLDERS ARE URGED TO READ THESE DOCUMENTS CAREFULLY WHEN THEY BECOME AVAILABLE BECAUSE THEY WILL CONTAIN IMPORTANT INFORMATION THAT SUCH PERSONS SHOULD CONSIDER BEFORE MAKING ANY DECISION REGARDING TENDERING THEIR APELLIS COMMON STOCK.
+
+The tender offer materials, including the offer to purchase and the related letter of transmittal and certain other tender offer documents, and the solicitation/recommendation statement (when they become available) and other documents filed with the SEC by Biogen or Apellis, may be obtained free of charge at the SEC's website at www.sec.gov or at Biogen's website at https://www.biogen.com/ or at Apellis' website at https://investors.apellis.com/news-releases. In addition, Biogen's tender offer statement and other documents it will file with the SEC will be available at https://investors.biogen.com/.</div></td></tr><tr><td width="8%" class="tableClassValignNoBorder">Item 5.</td><td width="92%" class="tableClassNoBorder">Interest in Securities of the Issuer</td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(a)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">The information set forth on the cover pages to this Schedule 13D are incorporated by reference into this Item 5.</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(b)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">The information set forth on the cover pages to this Schedule 13D are incorporated by reference into this Item 5.</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(c)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">Other than as described herein, Biogen has not effected any transaction in Apellis Common Stock during the past sixty days.</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(d)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">Each of the Support Stockholders have the right to receive dividends from, and proceeds from the sale of, Apellis Common Stock held of record and/or beneficially owned by each such Support Stockholder in the amount and on the terms as reported on each respective Support Stockholder's Form 4 filings.</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(e)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">Not applicable.</div></td></tr><tr><td width="8%" class="tableClassValignNoBorder">Item 6.</td><td width="92%" class="tableClassNoBorder">Contracts, Arrangements, Understandings or Relationships With Respect to Securities of the Issuer</td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter"> </td><td width="92%" class="tableClassNoBorder"><div class="largetext">Item 4 above summarizes certain provisions of the Merger Agreement, the Tender and Support Agreement and the CVR Agreement and is incorporated herein by reference.  The foregoing summaries of the Merger Agreement, the Tender and Support Agreement and the CVR Agreement do not purport to be complete and are qualified in their entirety by reference to the full text of the Merger Agreement, the Tender and Support Agreement and the CVR Agreement, copies of which are filed as Exhibit 1, Exhibit 2 and Exhibit B to Exhibit 1, respectively, hereto and are incorporated herein by reference.
+
+Except as set forth herein, Biogen does not have any contracts, arrangements, understandings or relationships (legal or otherwise) with any person with respect to any securities of Apellis, including but not limited to any contracts, arrangements, understandings or relationships concerning the transfer or voting of such securities, finder's fees, joint ventures, loan or option arrangements, puts or calls, guarantees of profits, division of profits or losses, or the giving or withholding of proxies.</div></td></tr><tr><td width="8%" class="tableClassValignNoBorder">Item 7.</td><td width="92%" class="tableClassNoBorder">Material to be Filed as Exhibits.</td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter"> </td><td width="92%" class="tableClassNoBorder"><div class="largetext">---------------
+
+Exhibit 1 - Agreement and Plan of Merger, dated as of March 31, 2026, by and among Apellis Pharmaceuticals, Inc., Biogen Inc. and Aspen Purchaser Sub, Inc. (incorporated by reference to Exhibit 2.1 to Biogen's Current Report on Form 8-K filed with the Securities and Exchange Commission on March 31, 2026)
+
+----------------
+
+Exhibit 2 - Tender and Support Agreement, dated as of March 31, 2026, by and among Biogen Inc., Aspen Purchaser Sub, Inc. and certain stockholders of Apellis Pharmaceuticals, Inc. (incorporated by reference to Exhibit 99.1 to Biogen's Current Report on Form 8-K filed with the Securities and Exchange Commission on March 31, 2026)</div></td></tr></table><br></div><div class="form1"><table role="presentation" id="signatureInfo"><tr><td width="8%" class="tableClassValignNoBorder">    SIGNATURE</td><td width="92%" class="tableClassNoBorder"> </td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter"> </td><td width="92%" class="tableClassNoBorder"><div class="information" style="text-align:justify">
+						After reasonable inquiry and to the best of my knowledge and belief, I certify that the information set forth in this statement is true, complete and correct.
+						<br><br></div></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="100%" class="tableClassInnerNoBorderBlue"><div class="text">BIOGEN INC.</div></td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Signature:</td><td width="92%" class="tableClassNoBorderBlue signature">/s/ Wendell Taylor</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Name/Title:</td><td width="92%" class="tableClassNoBorderBlue signature">Wendell Taylor / Secretary</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Date:</td><td width="92%" class="tableClassNoBorderBlue signature">04/06/2026</td></tr></table></td></tr></table></div></div>
+
+<script type="text/javascript"  src="/QQpw/SBxk/Vaws3/_e/ukQ/ahaE2chLLGzQfS/Ji1MAQ/Zg9QCV/p9Knc"></script></body></html>

@@ -1,0 +1,415 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns:p="http://www.sec.gov/edgar/schedule13D" xmlns:p1="http://www.sec.gov/edgar/common"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><link rel="stylesheet" type="text/css" href="/css/SDR_print.css"><style type="text/css">
+					.fakeTextBox {
+					border-top: 2px solid #999;
+					border-right: 1px solid #ccc;
+					border-bottom: 1px solid #ccc;
+					border-left: 2px solid #999;
+					padding: 2px;
+					_width: 800px;
+					height: auto;
+					min-width: 200px;
+					min-height: 50px;
+					word-wrap: break-word;
+					font-size: 0.9em;
+					color: blue;
+					}
+					table.tableClass { border: solid black;
+					border-top-width: 1;
+					border-right-width: 1;
+					border-bottom-width: 1;
+					border-left-width: 1;
+					table-layout:fixed;
+					}
+					table.innerTableClass { border: solid black;
+					border-top-width: 0;
+					border-right-width: 0;
+					border-bottom-width: 0;
+					border-left-width: 0;
+					table-layout:fixed;
+					}
+					th.tableClassLeft { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					padding: 2px;
+					}
+					th.tableClassRight { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 0;
+					padding: 2px;
+					}
+					th.tableClass { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					padding: 2px;
+					}
+					td.tableClassLeft { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					font-size: 0.9em;
+					color: blue;
+					word-wrap: break-word;
+					}
+					td.tableClassRight { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 0;
+					font-size: 0.9em;
+					color: blue;
+					word-wrap: break-word;
+					}
+					td.tableClass { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					font-size: 0.9em;
+					font-weight:bold;
+					color: black;
+					word-wrap: break-word;
+					}
+					td.tableClassNoBorder { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 0px;
+					font-size: 0.9em;
+					font-weight:bold;
+					color: black;
+					word-wrap: break-word;
+					}
+
+					td.tableClassNoBorderBlue { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 0px;
+					font-size: 0.9em;
+					font-weight:bold;
+					color: blue;
+					word-wrap: break-word;
+					}
+
+					td.tableClassInnerNoBorderBlue { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 0px;
+					font-size: 1.4em;
+					font-weight:bold;
+					color: blue;
+					word-wrap: break-word;
+					}
+
+					td.tableClassNoBorderAlignLeft { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 0px;
+					font-size: 0.9em;
+					font-weight:bold;
+					text-align: left;
+					color: black;
+					word-wrap: break-word;
+					}
+
+					td.signature {
+					padding: 4px 8px;
+					}
+
+					td.tableClassInner { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					font-size: 1em;
+					font-weight:bold;
+					color: black;
+					word-wrap: break-word;
+					}
+
+					td.tableClassValign { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					font-size: 0.9em;
+					font-weight:bold;
+					color: black;
+					vertical-align: middle;
+					text-align: center;
+					word-wrap: break-word;
+					}
+
+					td.tableClassValignNoBorder { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 0px;
+					font-size: 0.9em;
+					font-weight:bold;
+					color: black;
+					vertical-align: middle;
+					text-align: center;
+					word-wrap: break-word;
+					}
+
+					td.tableClassValignInner { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					font-size: 1em;
+					font-weight:bold;
+					color: black;
+					vertical-align: middle;
+					text-align: center;
+					word-wrap: break-word;
+					}
+
+					td.innerTableClassRightValign { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 0;
+					font-size: 1em;
+					font-weight:bold;
+					color: black;
+					vertical-align: middle;
+					text-align: center;
+					word-wrap: break-word;
+					}
+
+					td.innerTableClassRightValignBottomLess { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 0px;
+					border-left-width: 0;
+					font-size: 1em;
+					font-weight:bold;
+					color: black;
+					vertical-align: middle;
+					text-align: center;
+					word-wrap: break-word;
+					}
+
+					td.tableClassInnerLeft { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					font-size: 1em;
+					font-weight:bold;
+					color: black;
+					word-wrap: break-word;
+					}
+
+					td.tableClassInnerLeftBottomLess { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 1px;
+					font-size: 1em;
+					font-weight:bold;
+					color: black;
+					word-wrap: break-word;
+					}
+
+					td.tableClassNoBorderAlignCenter { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 0px;
+					font-size: 0.9em;
+					font-weight:bold;
+					color: black;
+					text-align: center;
+					word-wrap: break-word;
+					}
+
+					tr.tableClass { border: solid black;
+					border-top-width: 1px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					}
+					tr.tableClassWithBg { border: solid black;
+					border-top-width: 0;
+					border-right-width: 1;
+					border-bottom-width: 1;
+					border-left-width: 0;
+					background-color: #e0e0ff
+					}
+
+					tr.tableClassWithBgBlack { border: solid black;
+					border-top-width: 0;
+					border-right-width: 1;
+					border-bottom-width: 1;
+					border-left-width: 0;
+					background-color: #D3D3D3
+					}
+
+					hr.header {
+					position: relative;
+					top: 20px;
+					border: none;
+					height: 6px;
+					background: black;
+					margin-bottom: 10px;
+					}
+
+					hr.separatorThin {
+					position: relative;
+					top: 2px;
+					border: none;
+					height: 2px;
+					background: black;
+					margin-bottom: 2px;
+					}
+
+					hr.headerThin {
+					position: relative;
+					top: 10px;
+					border: none;
+					height: 2px;
+					background: black;
+					margin-bottom: 10px;
+					}
+
+					hr.separator {
+					position: relative;
+					top: 20px;
+					border: none;
+					height: 4px;
+					background: black;
+					margin-bottom: 5px;
+					}
+
+					div.text {
+					background-color: #ffffff;
+					color: blue;
+					font-size: 1em;
+					font-weight:normal;
+					text-align:justify;
+					}
+
+
+					div.information {
+					background-color: #ffffff;
+					color: black;
+					font-size: 1em;
+					font-weight:normal;
+					text-align:justify;
+					}
+
+					#scheader {
+					font-size: 0.9em;
+					border: 0px solid #404040;
+					border-spacing: 2px;
+					}
+
+					div.largetext {
+					background-color: #ffffff;
+					color: blue;
+					font-size: 1em;
+					font-weight:normal;
+					text-align:justify;
+					white-space: pre-wrap;
+					word-break: normal;
+					}
+
+				</style></head><body lang="en-US" text="#000000" bgcolor="#ffffff"><hr class="header"><br><hr class="headerThin"><div class="contentwrapper"><table role="presentation" id="scheader"><tr><td class="tableClassNoBorderAlignCenter" style="font-size:2em;">
+						SECURITIES AND EXCHANGE COMMISSION
+						<br>
+						Washington, D.C. 20549
+					</td></tr><tr><td class="tableClassNoBorderAlignCenter"><br><br><div style="font-size:1.5em;">
+									SCHEDULE 13D
+								</div><br><div style="font-size:1.2em;">
+							Under the Securities Exchange Act of 1934
+						</div><br></td></tr><tr><td class="center"><div class="information" style="text-align:center; font-weight:bold; color:blue;">Apollo Global Management, Inc.</div><div class="information" style="text-align:center; font-weight:bold;"><hr class="separatorThin">(Name of Issuer)</div><br><br></td></tr><tr><td class="center"><div class="information" style="text-align:center; font-weight:bold; color:blue;">Common stock, par value $0.00001 per share</div><div class="information" style="text-align:center; font-weight:bold;"><hr class="separatorThin">(Title of Class of Securities)</div><br><br></td></tr><table border="1"><tr><td><div class="information" style="text-align:center; font-weight:bold; color:blue;">03769M106</div><div class="information" style="text-align:center; font-weight:bold;"><hr class="separatorThin">(CUSIP Number)</div></td></tr><br><br></table><tr><td class="center"><div class="information" style="text-align:center; font-weight:bold; color:blue;">Heather Gray<br>c/o Elysium Management LLC,
+								445 Park Avenue, Suite 1401<br>New York,
+								NY,
+								10022<br>646-589-8607</div><div class="information" style="text-align:center; font-weight:bold;"><hr class="separatorThin">(Name, Address and Telephone Number of Person Authorized to
+									Receive Notices and Communications)</div></td></tr><tr><td class="center"><div class="information" style="text-align:center; font-weight:bold; color:blue;">08/13/2026</div><div class="information" style="text-align:center; font-weight:bold;"><hr class="separatorThin">(Date of Event Which Requires Filing of This Statement)</div></td></tr></table><br><br><div class="information" style="text-align:justify">
+				If the filing person has previously filed a statement on Schedule 13G to report the acquisition that is the subject of this Schedule 13D, and is filing this schedule because of §§ 240.13d-1(e), 240.13d-1(f) or 240.13d-1(g), check the following box.
+				<img src="/Images/box-unchecked.jpg" alt="Checkbox not checked"></div><br><div class="information" style="text-align:justify">
+				The information required on the remainder of this cover page shall not be deemed to be “filed” for the purpose of Section 18 of the
+				Securities Exchange Act of 1934 (“Act”) or otherwise subject to the liabilities of that section of the Act but shall be subject to all other
+				provisions of the Act (however, see the Notes).
+			</div></div><hr class="headerThin"><hr class="header"><br><br>
+  <div style="display:none">
+			schemaVersion:
+			</div>
+<div class="content"><div class="form1"></div></div>
+  <div class="content"><div class="form1"><table><tr><td class="center"><br><br><p><div align="center" style="font-size:1.2em;">
+									SCHEDULE 13D
+								</div></p></td></tr></table><table role="presentation" class="tableClass" id="cusipNumber"><tr class="tableClass"><td width="7%" style="font-weight:bold;">CUSIP Number(s):</td><td width="75%"><div style="font-size:.9em; color:#000000">03769M106</div></td></tr></table><br><br><table role="presentation" class="tableClass" id="reportingPersonDetails"><tr class="tableClass"><td width="8%" class="tableClassValign">1</td><td width="92%" class="tableClass">
+					Name of reporting person
+					<br><br><div class="text">LDB 2025 LLC</div></td></tr><tr><td width="8%" class="tableClassValign">2</td><td width="92%" class="tableClass">Check the appropriate box if a member of a Group (See Instructions)
+				<br><br><div class="text"><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked">  (a)
+					<br><img src="/Images/box-checked.jpg" alt="Checkbox checked">  (b)	
+				</div></td></tr><tr class="tableClassWithBgBlack"><td width="8%" class="tableClassValign">3</td><td width="92%" class="tableClass">SEC use only</td></tr><tr><td width="8%" class="tableClassValign">4</td><td width="92%" class="tableClass">
+					Source of funds (See Instructions)
+					<br><br><div class="text">OO</div></td></tr><tr><td width="8%" class="tableClassValign">5</td><td width="92%" class="tableClass">
+					Check if disclosure of legal proceedings is required pursuant to Items 2(d) or 2(e)
+					<br><br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked"></td></tr><tr><td width="8%" class="tableClassValign">6</td><td width="92%" class="tableClass">Citizenship or place of organization
+				<br><br><div class="text">
+				DELAWARE
+			</div></td></tr><tr><td width="8%" class="tableClassValign">Number of Shares Beneficially Owned by Each Reporting Person With:</td><td width="92%" class="tableClass"><table class="innerTableClass"><tr><td width="8%" class="innerTableClassRightValign">7</td><td width="92%" class="tableClassInnerLeft">Sole Voting Power
+							<br><br><div class="text">3,000,000.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">8</td><td width="92%" class="tableClassInnerLeft">Shared Voting Power
+							<br><br><div class="text">0.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">9</td><td width="92%" class="tableClassInnerLeft">Sole Dispositive Power
+							<br><br><div class="text">3,000,000.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValignBottomLess">10</td><td width="92%" class="tableClassInnerLeftBottomLess">Shared Dispositive Power
+							<br><br><div class="text">0.00</div></td></tr></table></td></tr><tr><td width="8%" class="tableClassValign">11</td><td width="92%" class="tableClass">Aggregate amount beneficially owned by each reporting person
+				<br><br><div class="text">3,000,000.00</div></td></tr><tr><td width="8%" class="tableClassValign">12</td><td width="92%" class="tableClass">Check if the aggregate amount in Row (11) excludes certain shares (See Instructions)
+				<br><br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked"></td></tr><tr><td width="8%" class="tableClassValign">13</td><td width="92%" class="tableClass">Percent of class represented by amount in Row (11)
+				<br><br><div class="text">0.51 % </div></td></tr><tr><td width="8%" class="tableClassValign">14</td><td width="92%" class="tableClass">Type of Reporting Person (See Instructions)
+				<br><br><div class="text">OO</div></td></tr></table><br><div style="display: flex;"><div style="font-size: 0.9em; font-weight: bold; margin-right: 5px;">
+					Comment for Type of Reporting Person:
+				</div><div class="largetext" style="text-align:justify">Row 13: Based on 590,543,159 shares of common stock, par value $0.00001 per share, of Apollo Global Management, Inc. (the "Issuer") issued and outstanding as of August 5, 2026, reported by the Issuer in its Quarterly Report on Form 10-Q filed on August 10, 2026.</div></div></div><div class="form1"><table><tr><td class="center"><br><br><p><div align="center" style="font-size:1.2em;">
+									SCHEDULE 13D
+								</div></p></td></tr></table><table role="presentation" id="item1to7"><tr><td width="8%" class="tableClassValignNoBorder">Item 1.</td><td width="92%" class="tableClassNoBorder">Security and Issuer</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignCenter">(a)</td><td width="92%" class="tableClassNoBorder">Title of Class of Securities:
+							<br><br><div class="text">Common stock, par value $0.00001 per share</div></td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignCenter">(b)</td><td width="92%" class="tableClassNoBorder">Name of Issuer:
+							<br><br><div class="text">Apollo Global Management, Inc.</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(c)</td><td width="92%" class="tableClassNoBorder">Address of Issuer's Principal Executive Offices:
+							<br><br><div class="text">9 WEST 57TH STREET, 42ND FLOOR, NEW YORK, 
+				NEW YORK
+			, 10019.</div></td></tr><tr><td width="8%" class="tableClassValignNoBorder">Item 2.</td><td width="92%" class="tableClassNoBorder">Identity and Background</td></tr><tr></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignCenter">(a)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">LDB 2025 LLC</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(b)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">The principal business address for the Reporting Person is c/o Elysium Management LLC, 445 Park Avenue, Suite 1401, New York, NY 10022.</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(c)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">LDB 2025 LLC is an investment vehicle for trusts for the benefit of the Mr. Leon D. Black's family members. Heather Gray is the manager of LDB 2025 LLC.</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(d)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">The Reporting Person has not during the last five years, been convicted in a criminal proceeding (excluding traffic violations or similar misdemeanors).</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(e)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">The Reporting Person has not during the last five years, been a party to a civil proceeding of a judicial or administrative body of competent jurisdiction and, as a result of such proceeding, was or is subject to a judgment, decree or final order enjoining future violations of, or prohibiting or mandating activities subject to, federal or state securities laws or finding any violation with respect to such laws.</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(f)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">DE</div></td></tr><tr><td width="8%" class="tableClassValignNoBorder">Item 3.</td><td width="92%" class="tableClassNoBorder">Source and Amount of Funds or Other Consideration</td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter"> </td><td width="92%" class="tableClassNoBorder"><div class="largetext">On July 29, 2026, LDC 2025 LLC received a contribution of 3,000,000 shares of Common Stock from the members of LDB 2014 LLC</div></td></tr><tr><td width="8%" class="tableClassValignNoBorder">Item 4.</td><td width="92%" class="tableClassNoBorder">Purpose of Transaction</td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter"> </td><td width="92%" class="tableClassNoBorder"><div class="largetext">The information set forth under Item 3 above is incorporated by reference herein.
+
+Stockholders Agreement
+
+On August 13, 2026, the Reporting Person became a party to the Stockholders Agreement among the Issuer, Leon D. Black, Marc J. Rowan, Joshua J. Harris (each, a "Principal") and the other persons party thereto, dated as of January 1, 2022 (the "Stockholders Agreement"). The Stockholders Agreement provides that:
+
+o the Issuer will nominate each Principal (or his designee, as applicable) as part of the director slate of the Issuer's board of directors (the "Board"), for so long as such Principal, together with the members of his family group, beneficially owns at least $400 million in value or 10 million in number of shares of Common Stock (the "Ownership Threshold");
+o each Principal (or his designee, as applicable), will, if requested by the Board, resign from the Board in the event that such Principal no longer meets the Ownership Threshold;
+o each Principal, together with the members of his family group, agrees to vote all of his or their respective shares of Common Stock in favor of the election of the other Principals (or their designees, as applicable);
+o the Issuer will recommend that its stockholders vote in favor of the Principals (or their designees, as applicable) and the Issuer will otherwise take all reasonable action to support their nomination and election (including by filling vacancies on the Board, if necessary);
+o each Principal (but not his designee) will be entitled to a seat on the executive committee of the Board so long as such Principal serves on the Board and the Ownership Threshold is satisfied with respect to such Principal;
+o the Issuer will not make any non-pro rata distributions or payments to any Principals without the consent of the other Principals;
+o each Principal and the Issuer agree not to take actions inconsistent with the terms of the Stockholders Agreement or in a manner that is discriminatory as to one or more of the Principals, and will agree to oppose any such actions if proposed by others
+o each Principal will have customary information rights regarding the Issuer's business, so long as such Principal, together with the members of his family group, meets an ownership threshold equal to 50% of the Ownership Threshold;
+o each Principal will be entitled to the use of office space at the Issuer's offices and administrative and logistics support provided by the Issuer; provided, that such Principal continues to (a) provide services to the Issuer (other than as a member of the Board), (b) serve on the executive committee of the Board or (c) serve as the chairman of the Board or of any committee of the Board.
+
+The Stockholders Agreement also grants to the parties thereto (and their permitted transferees) the right, under certain circumstances and subject to certain restrictions, to require the Issuer to register under the Securities Act of 1933, as amended (the "Securities Act"), shares of Common Stock held or acquired by them. Under the Stockholders Agreement, each party thereto (and its permitted transferees) (i) has "demand" registration rights that require the Issuer to register under the Securities Act the shares of Common Stock held or acquired, (ii) may require the Issuer to make available registration statements permitting sales of shares of Common Stock held or acquired in the market from time to time over an extended period and (iii) has the ability to exercise certain piggyback registration rights in connection with registered offerings requested by other registration rights holders or initiated by the Issuer. The Issuer has agreed to indemnify each party thereto (and its permitted transferees, together with certain related parties) against any losses or damages resulting from any untrue statement or omission of material fact in any registration statement or prospectus pursuant to which such holder sells shares of Common Stock, unless such liability arose from the holder's misstatement or omission, and each party thereto (and its permitted transferees) has agreed to indemnify the Issuer against all losses caused by his (or their) misstatements or omissions. References to and descriptions of the Stockholders Agreement set forth above are not intended to be complete and are qualified in their entirety by reference to the full text of such agreement, which is filed as Exhibit 1 hereto and is incorporated by reference herein.
+
+Variable Forward Transaction
+
+On August 7, 2026 the Reporting Person (the "Counterparty"), entered into a Variable Share Forward Transaction (the "Transaction") with Wells Fargo Bank, National Association (the "Bank") pursuant to a Master Confirmation entered into between the Counterparty and the Bank (the "Forward Contract") on June 18, 2026. The Forward Contract obligates the Counterparty to deliver to the Bank, on specified dates (each, a "Settlement Date"), at the Counterparty's option, up to an aggregate number of shares of the Issuer's Common Stock equal to the number of shares of Common Stock pledged by the Counterparty or, at Counterparty's election and subject to satisfaction of certain conditions, an equivalent amount of cash. The Counterparty pledged an aggregate of 2,000,000 shares of the Issuer's Common Stock (the "Pledged Shares") to secure its obligations under the Transaction. The Counterparty retains ownership and voting and ordinary dividend rights in the Pledged Shares during the term of the pledge (for so long as no event of default or similar event occurs under the Forward Contract as to which the Bank exercises its right to foreclose on such Pledged Shares) (and thereafter if the Counterparty settles the Transaction in cash), subject to certain payments the Counterparty may need to make to the Bank with respect to dividends under the terms of the Forward Contract. Under the terms of the Forward Contract, the Counterparty will receive a prepayment from the Bank equal to the product of (i) the aggregate number of shares underlying the Transaction and (ii) a percentage of the initial share price, which will be determined following a hedging period. For each of the components of the Transaction, the number of shares of the Issuer's Common Stock to be delivered to the Bank on each Settlement Date (or on which to base the amount of cash to be delivered to the Bank on the Cash Settlement Date) is to be determined as follows: (a) if the per-share volume weighted average price of the Issuer's Common Stock on the related valuation date (the "Settlement Price") is less than or equal to a floor price that will be determined following a hedging period (the "Floor Price"), the Counterparty will deliver to the Bank the ratable portion of the Pledged Shares to be delivered with respect to each Settlement Date (such number of shares, the "Number of Shares"), (b) if the Settlement Price is between the Floor Price and a cap price that will be determined following a hedging period (the "Cap Price"), the Counterparty will deliver to the Bank a number of shares of the Issuer's Common Stock equal to the Number of Shares multiplied by a fraction, the numerator of which is the Floor Price and the denominator of which is the Settlement Price, and (c) if the Settlement Price is greater than the Cap Price, the Counterparty will deliver to the Bank a number of shares of the Issuer's Common Stock equal to the product of (i) the Number of Shares and (ii) a fraction (a) the numerator of which is the sum of (x) the Floor Price and (y) the Settlement Price minus the Cap Price, and (b) the denominator of which is the Settlement Price.
+
+General
+
+The Reporting Person acquired the shares of the Common Stock reported in this Schedule 13D for investment purposes and intends to review such investment in the Issuer on a continuing basis. Consistent with such purposes, the Reporting Person may engage in communications with, without limitation, one or more stockholders of the Issuer, management of the Issuer and/or one or more members of the board of directors of the Issuer and may make suggestions concerning the Issuer's operations, prospects, business and financial strategies, strategic transactions, assets and liabilities, business and financing alternatives, the composition of the board of directors of the Issuer and such other matters as the Reporting Person may deem relevant to its investment in the Issuer. The Reporting Person expects that it will, from time to time, review its investment position in the shares of the Common Stock of the Issuer and may, depending on the Issuer's performance and other market conditions, increase or decrease their investment position in the Common Stock. The Reporting Person may, from time to time, make additional purchases of shares of the Common Stock either in the open market or in privately negotiated transactions, depending upon its evaluation of the Issuer's business, prospects, financial condition and results of operations, the market for the Common Stock, other opportunities available to the Reporting Person, general economic conditions, stock market conditions and other factors. Depending upon the factors noted above, the Reporting Person may also decide to hold or dispose of all or part of its investments in the Common Stock and/or enter into derivative transactions with institutional counterparties with respect to the Issuer's securities, including the Common Stock. Any actions the Reporting Person might undertake may be made at any time and from time to time without prior notice and will be dependent upon the Reporting Person's review of numerous factors, including, but not limited to: an ongoing evaluation of the Issuer's business, financial condition, operations and prospects; price levels of the Issuer's securities; general market, industry and economic conditions; the relative attractiveness of alternative business and investment opportunities; and other future developments. Except as set forth in this Item 4 or Item 6 below, the Reporting Person has no present plans or proposals that relate to, or that would result in, any of the actions specified in clauses (a) through (j) of Item 4 of Schedule 13D under the Securities Exchange Act of 1934, as amended (the "Exchange Act").</div></td></tr><tr><td width="8%" class="tableClassValignNoBorder">Item 5.</td><td width="92%" class="tableClassNoBorder">Interest in Securities of the Issuer</td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(a)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">Reference to percentage ownership of the Common Stock in this Schedule 13D are based on 590,543,159 shares of Common Stock, issued and outstanding as of August 5, 2026, as reported by the Issuer in its Quarterly Report on Form 10-Q filed on August 10, 2026. As of the date of this Schedule 13D, LDB 2025 LLC is the beneficial owner of 3,000,000 shares of Common Stock (approximately 0.51% of the Common Stock), which it holds directly. LDB 2025 LLC has sole voting and sole dispositive power with respect to such shares. By virtue of the agreements made pursuant to the Stockholders Agreement, the parties thereto, including the Reporting Person, may be deemed to be acting as a group for purposes of Rule 13d-3 under the Exchange Act. Based on public filings, the parties to the Stockholders Agreement, as a group, may be deemed to beneficially own an aggregate of 146,753,672 shares of Common Stock (approximately 24.9% of the Common Stock). The Reporting Person disclaims beneficial ownership of any securities owned by such other parties. Only the shares of Common Stock beneficially owned by the Reporting Person are the subject of this Schedule 13D. For a description of the relationship between the Reporting Person and the other parties to the Stockholders Agreement, see Item 4.</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(b)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">See Row (11)</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(c)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">The information set forth in Items 3 and 4 above is hereby incorporated into this Item 5(c) by reference, as applicable.</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(d)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">Not applicable.</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(e)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">Not applicable.</div></td></tr><tr><td width="8%" class="tableClassValignNoBorder">Item 6.</td><td width="92%" class="tableClassNoBorder">Contracts, Arrangements, Understandings or Relationships With Respect to Securities of the Issuer</td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter"> </td><td width="92%" class="tableClassNoBorder"><div class="largetext">Item 4 above summarizes certain provisions of the Stockholders Agreement and the terms of the Variable Forward Transaction and is incorporated herein by reference.</div></td></tr><tr><td width="8%" class="tableClassValignNoBorder">Item 7.</td><td width="92%" class="tableClassNoBorder">Material to be Filed as Exhibits.</td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter"> </td><td width="92%" class="tableClassNoBorder"><div class="largetext">Exhibit 1: Apollo Global Management, Inc. Stockholders Agreement, dated as of January 1, 2022, among the Issuer, Leon D. Black, Marc J. Rowan, Joshua J. Harris and the other persons party thereto, incorporated by reference to Exhibit 10.68 to the Issuer's Annual Report on Form 10-K for the year ended December 31, 2024, filed with the SEC on February 24, 2025.
+(https://www.sec.gov/Archives/edgar/data/1858681/000185868122000029/exhibit1027q12022agm.htm)
+
+Exhibit 2: Form of Variable Share Forward Contract.</div></td></tr></table><br></div><div class="form1"><table role="presentation" id="signatureInfo"><tr><td width="8%" class="tableClassValignNoBorder">    SIGNATURE</td><td width="92%" class="tableClassNoBorder"> </td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter"> </td><td width="92%" class="tableClassNoBorder"><div class="information" style="text-align:justify">
+						After reasonable inquiry and to the best of my knowledge and belief, I certify that the information set forth in this statement is true, complete and correct.
+						<br><br></div></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="100%" class="tableClassInnerNoBorderBlue"><div class="text">LDB 2025 LLC</div></td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Signature:</td><td width="92%" class="tableClassNoBorderBlue signature">/s/ Heather Gray</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Name/Title:</td><td width="92%" class="tableClassNoBorderBlue signature">Heather Gray, Manager</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Date:</td><td width="92%" class="tableClassNoBorderBlue signature">08/14/2026</td></tr></table></td></tr></table></div></div>
+
+<script type="text/javascript"  src="/QQpw/SBxk/Vaws3/_e/ukQ/ahaE2chLLGzQfS/Ji1MAQ/Zg9QCV/p9Knc"></script></body></html>

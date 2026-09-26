@@ -1,0 +1,475 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns:p="http://www.sec.gov/edgar/schedule13D" xmlns:p1="http://www.sec.gov/edgar/common"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><link rel="stylesheet" type="text/css" href="/css/SDR_print.css"><style type="text/css">
+					.fakeTextBox {
+					border-top: 2px solid #999;
+					border-right: 1px solid #ccc;
+					border-bottom: 1px solid #ccc;
+					border-left: 2px solid #999;
+					padding: 2px;
+					_width: 800px;
+					height: auto;
+					min-width: 200px;
+					min-height: 50px;
+					word-wrap: break-word;
+					font-size: 0.9em;
+					color: blue;
+					}
+					table.tableClass { border: solid black;
+					border-top-width: 1;
+					border-right-width: 1;
+					border-bottom-width: 1;
+					border-left-width: 1;
+					table-layout:fixed;
+					}
+					table.innerTableClass { border: solid black;
+					border-top-width: 0;
+					border-right-width: 0;
+					border-bottom-width: 0;
+					border-left-width: 0;
+					table-layout:fixed;
+					}
+					th.tableClassLeft { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					padding: 2px;
+					}
+					th.tableClassRight { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 0;
+					padding: 2px;
+					}
+					th.tableClass { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					padding: 2px;
+					}
+					td.tableClassLeft { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					font-size: 0.9em;
+					color: blue;
+					word-wrap: break-word;
+					}
+					td.tableClassRight { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 0;
+					font-size: 0.9em;
+					color: blue;
+					word-wrap: break-word;
+					}
+					td.tableClass { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					font-size: 0.9em;
+					font-weight:bold;
+					color: black;
+					word-wrap: break-word;
+					}
+					td.tableClassNoBorder { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 0px;
+					font-size: 0.9em;
+					font-weight:bold;
+					color: black;
+					word-wrap: break-word;
+					}
+
+					td.tableClassNoBorderBlue { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 0px;
+					font-size: 0.9em;
+					font-weight:bold;
+					color: blue;
+					word-wrap: break-word;
+					}
+
+					td.tableClassInnerNoBorderBlue { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 0px;
+					font-size: 1.4em;
+					font-weight:bold;
+					color: blue;
+					word-wrap: break-word;
+					}
+
+					td.tableClassNoBorderAlignLeft { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 0px;
+					font-size: 0.9em;
+					font-weight:bold;
+					text-align: left;
+					color: black;
+					word-wrap: break-word;
+					}
+
+					td.signature {
+					padding: 4px 8px;
+					}
+
+					td.tableClassInner { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					font-size: 1em;
+					font-weight:bold;
+					color: black;
+					word-wrap: break-word;
+					}
+
+					td.tableClassValign { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					font-size: 0.9em;
+					font-weight:bold;
+					color: black;
+					vertical-align: middle;
+					text-align: center;
+					word-wrap: break-word;
+					}
+
+					td.tableClassValignNoBorder { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 0px;
+					font-size: 0.9em;
+					font-weight:bold;
+					color: black;
+					vertical-align: middle;
+					text-align: center;
+					word-wrap: break-word;
+					}
+
+					td.tableClassValignInner { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					font-size: 1em;
+					font-weight:bold;
+					color: black;
+					vertical-align: middle;
+					text-align: center;
+					word-wrap: break-word;
+					}
+
+					td.innerTableClassRightValign { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 0;
+					font-size: 1em;
+					font-weight:bold;
+					color: black;
+					vertical-align: middle;
+					text-align: center;
+					word-wrap: break-word;
+					}
+
+					td.innerTableClassRightValignBottomLess { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 0px;
+					border-left-width: 0;
+					font-size: 1em;
+					font-weight:bold;
+					color: black;
+					vertical-align: middle;
+					text-align: center;
+					word-wrap: break-word;
+					}
+
+					td.tableClassInnerLeft { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					font-size: 1em;
+					font-weight:bold;
+					color: black;
+					word-wrap: break-word;
+					}
+
+					td.tableClassInnerLeftBottomLess { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 1px;
+					font-size: 1em;
+					font-weight:bold;
+					color: black;
+					word-wrap: break-word;
+					}
+
+					td.tableClassNoBorderAlignCenter { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 0px;
+					font-size: 0.9em;
+					font-weight:bold;
+					color: black;
+					text-align: center;
+					word-wrap: break-word;
+					}
+
+					tr.tableClass { border: solid black;
+					border-top-width: 1px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					}
+					tr.tableClassWithBg { border: solid black;
+					border-top-width: 0;
+					border-right-width: 1;
+					border-bottom-width: 1;
+					border-left-width: 0;
+					background-color: #e0e0ff
+					}
+
+					tr.tableClassWithBgBlack { border: solid black;
+					border-top-width: 0;
+					border-right-width: 1;
+					border-bottom-width: 1;
+					border-left-width: 0;
+					background-color: #D3D3D3
+					}
+
+					hr.header {
+					position: relative;
+					top: 20px;
+					border: none;
+					height: 6px;
+					background: black;
+					margin-bottom: 10px;
+					}
+
+					hr.separatorThin {
+					position: relative;
+					top: 2px;
+					border: none;
+					height: 2px;
+					background: black;
+					margin-bottom: 2px;
+					}
+
+					hr.headerThin {
+					position: relative;
+					top: 10px;
+					border: none;
+					height: 2px;
+					background: black;
+					margin-bottom: 10px;
+					}
+
+					hr.separator {
+					position: relative;
+					top: 20px;
+					border: none;
+					height: 4px;
+					background: black;
+					margin-bottom: 5px;
+					}
+
+					div.text {
+					background-color: #ffffff;
+					color: blue;
+					font-size: 1em;
+					font-weight:normal;
+					text-align:justify;
+					}
+
+
+					div.information {
+					background-color: #ffffff;
+					color: black;
+					font-size: 1em;
+					font-weight:normal;
+					text-align:justify;
+					}
+
+					#scheader {
+					font-size: 0.9em;
+					border: 0px solid #404040;
+					border-spacing: 2px;
+					}
+
+					div.largetext {
+					background-color: #ffffff;
+					color: blue;
+					font-size: 1em;
+					font-weight:normal;
+					text-align:justify;
+					white-space: pre-wrap;
+					word-break: normal;
+					}
+
+				</style></head><body lang="en-US" text="#000000" bgcolor="#ffffff"><hr class="header"><br><hr class="headerThin"><div class="contentwrapper"><table role="presentation" id="scheader"><tr><td class="tableClassNoBorderAlignCenter" style="font-size:2em;">
+						SECURITIES AND EXCHANGE COMMISSION
+						<br>
+						Washington, D.C. 20549
+					</td></tr><tr><td class="tableClassNoBorderAlignCenter"><br><br><div style="font-size:1.5em;">
+									SCHEDULE 13D
+								</div><br><div style="font-size:1.2em;">
+							Under the Securities Exchange Act of 1934
+						</div><br></td></tr><tr><td class="center"><div class="information" style="text-align:center; font-weight:bold; color:blue;">AST SpaceMobile, Inc.</div><div class="information" style="text-align:center; font-weight:bold;"><hr class="separatorThin">(Name of Issuer)</div><br><br></td></tr><tr><td class="center"><div class="information" style="text-align:center; font-weight:bold; color:blue;">Class A Common Stock, par value $0.0001 per share</div><div class="information" style="text-align:center; font-weight:bold;"><hr class="separatorThin">(Title of Class of Securities)</div><br><br></td></tr><tr><td class="center"><div class="information" style="text-align:center; font-weight:bold; color:blue;">00217D100</div><div class="information" style="text-align:center; font-weight:bold;"><hr class="separatorThin">(CUSIP Number)</div><br><br></td></tr><tr><td class="center"><div class="information" style="text-align:center; font-weight:bold; color:blue;">Stacey Maris<br>AT&amp;T Inc.,
+								208 South Akard Street<br>Dallas,
+								TX,
+								75202<br>210-821-4105</div><div class="information" style="text-align:center; font-weight:bold;"><hr class="separatorThin">(Name, Address and Telephone Number of Person Authorized to
+									Receive Notices and Communications)</div></td></tr><tr><td class="center"><div class="information" style="text-align:center; font-weight:bold; color:blue;">02/03/2025</div><div class="information" style="text-align:center; font-weight:bold;"><hr class="separatorThin">(Date of Event Which Requires Filing of This Statement)</div></td></tr></table><br><br><div class="information" style="text-align:justify">
+				If the filing person has previously filed a statement on Schedule 13G to report the acquisition that is the subject of this Schedule 13D, and is filing this schedule because of §§ 240.13d-1(e), 240.13d-1(f) or 240.13d-1(g), check the following box.
+				<img src="/Images/box-unchecked.jpg" alt="Checkbox not checked"></div><br><div class="information" style="text-align:justify">
+				The information required on the remainder of this cover page shall not be deemed to be “filed” for the purpose of Section 18 of the
+				Securities Exchange Act of 1934 (“Act”) or otherwise subject to the liabilities of that section of the Act but shall be subject to all other
+				provisions of the Act (however, see the Notes).
+			</div></div><hr class="headerThin"><hr class="header"><br><br>
+  <div class="content"><div class="form1"></div></div>
+  <div class="content"><div class="form1"><table><tr><td class="center"><br><br><p><div align="center" style="font-size:1.2em;">
+									SCHEDULE 13D
+								</div></p></td></tr></table><table role="presentation" class="tableClass" id="cusipNumber"><tr class="tableClass"><td width="25%" style="font-weight:bold;">CUSIP No.</td><td width="75%"><div style="font-size:.9em; color:#000000">00217D100</div></td></tr></table><br><br><table role="presentation" class="tableClass" id="reportingPersonDetails"><tr class="tableClass"><td width="8%" class="tableClassValign">1</td><td width="92%" class="tableClass">
+					Name of reporting person
+					<br><br><div class="text">AT&amp;T Inc.</div></td></tr><tr><td width="8%" class="tableClassValign">2</td><td width="92%" class="tableClass">Check the appropriate box if a member of a Group (See Instructions)
+					<br><br><div class="text"><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked">  (a)
+						<br><img src="/Images/box-checked.jpg" alt="Checkbox checked">  (b)
+					</div></td></tr><tr class="tableClassWithBgBlack"><td width="8%" class="tableClassValign">3</td><td width="92%" class="tableClass">SEC use only</td></tr><tr><td width="8%" class="tableClassValign">4</td><td width="92%" class="tableClass">
+					Source of funds (See Instructions)
+					<br><br><div class="text">WC</div></td></tr><tr><td width="8%" class="tableClassValign">5</td><td width="92%" class="tableClass">
+					Check if disclosure of legal proceedings is required pursuant to Items 2(d) or 2(e)
+					<br><br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked"></td></tr><tr><td width="8%" class="tableClassValign">6</td><td width="92%" class="tableClass">Citizenship or place of organization
+					<br><br><div class="text">
+				DELAWARE
+			</div></td></tr><tr><td width="8%" class="tableClassValign">Number of Shares Beneficially Owned by Each Reporting Person With:</td><td width="92%" class="tableClass"><table class="innerTableClass"><tr><td width="8%" class="innerTableClassRightValign">7</td><td width="92%" class="tableClassInnerLeft">Sole Voting Power
+								<br><br><div class="text">0.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">8</td><td width="92%" class="tableClassInnerLeft">Shared Voting Power
+								<br><br><div class="text">6,260,440.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">9</td><td width="92%" class="tableClassInnerLeft">Sole Dispositive Power
+								<br><br><div class="text">0.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValignBottomLess">10</td><td width="92%" class="tableClassInnerLeftBottomLess">Shared Dispositive Power
+								<br><br><div class="text">6,260,440.00</div></td></tr></table></td></tr><tr><td width="8%" class="tableClassValign">11</td><td width="92%" class="tableClass">Aggregate amount beneficially owned by each reporting person
+					<br><br><div class="text">6,260,440.00</div></td></tr><tr><td width="8%" class="tableClassValign">12</td><td width="92%" class="tableClass">Check if the aggregate amount in Row (11) excludes certain shares (See Instructions)
+					<br><br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked"></td></tr><tr><td width="8%" class="tableClassValign">13</td><td width="92%" class="tableClass">Percent of class represented by amount in Row (11)
+					<br><br><div class="text">2.7 % </div></td></tr><tr><td width="8%" class="tableClassValign">14</td><td width="92%" class="tableClass">Type of Reporting Person (See Instructions)
+					<br><br><div class="text">CO</div></td></tr></table><br><table><tr><td class="center"><br><br><p><div align="center" style="font-size:1.2em;">
+									SCHEDULE 13D
+								</div></p></td></tr></table><table role="presentation" class="tableClass" id="cusipNumber"><tr class="tableClass"><td width="25%" style="font-weight:bold;">CUSIP No.</td><td width="75%"><div style="font-size:.9em; color:#000000">00217D100</div></td></tr></table><br><br><table role="presentation" class="tableClass" id="reportingPersonDetails"><tr class="tableClass"><td width="8%" class="tableClassValign">1</td><td width="92%" class="tableClass">
+					Name of reporting person
+					<br><br><div class="text">AT&amp;T Venture Investments, LLC</div></td></tr><tr><td width="8%" class="tableClassValign">2</td><td width="92%" class="tableClass">Check the appropriate box if a member of a Group (See Instructions)
+					<br><br><div class="text"><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked">  (a)
+						<br><img src="/Images/box-checked.jpg" alt="Checkbox checked">  (b)
+					</div></td></tr><tr class="tableClassWithBgBlack"><td width="8%" class="tableClassValign">3</td><td width="92%" class="tableClass">SEC use only</td></tr><tr><td width="8%" class="tableClassValign">4</td><td width="92%" class="tableClass">
+					Source of funds (See Instructions)
+					<br><br><div class="text">AF</div></td></tr><tr><td width="8%" class="tableClassValign">5</td><td width="92%" class="tableClass">
+					Check if disclosure of legal proceedings is required pursuant to Items 2(d) or 2(e)
+					<br><br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked"></td></tr><tr><td width="8%" class="tableClassValign">6</td><td width="92%" class="tableClass">Citizenship or place of organization
+					<br><br><div class="text">
+				DELAWARE
+			</div></td></tr><tr><td width="8%" class="tableClassValign">Number of Shares Beneficially Owned by Each Reporting Person With:</td><td width="92%" class="tableClass"><table class="innerTableClass"><tr><td width="8%" class="innerTableClassRightValign">7</td><td width="92%" class="tableClassInnerLeft">Sole Voting Power
+								<br><br><div class="text">0.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">8</td><td width="92%" class="tableClassInnerLeft">Shared Voting Power
+								<br><br><div class="text">6,260,440.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">9</td><td width="92%" class="tableClassInnerLeft">Sole Dispositive Power
+								<br><br><div class="text">0.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValignBottomLess">10</td><td width="92%" class="tableClassInnerLeftBottomLess">Shared Dispositive Power
+								<br><br><div class="text">6,260,440.00</div></td></tr></table></td></tr><tr><td width="8%" class="tableClassValign">11</td><td width="92%" class="tableClass">Aggregate amount beneficially owned by each reporting person
+					<br><br><div class="text">6,260,440.00</div></td></tr><tr><td width="8%" class="tableClassValign">12</td><td width="92%" class="tableClass">Check if the aggregate amount in Row (11) excludes certain shares (See Instructions)
+					<br><br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked"></td></tr><tr><td width="8%" class="tableClassValign">13</td><td width="92%" class="tableClass">Percent of class represented by amount in Row (11)
+					<br><br><div class="text">2.7 % </div></td></tr><tr><td width="8%" class="tableClassValign">14</td><td width="92%" class="tableClass">Type of Reporting Person (See Instructions)
+					<br><br><div class="text">OO</div></td></tr></table><br><div style="display: flex;"><div style="font-size: 0.9em; font-weight: bold; margin-right: 5px;">
+					Comment for Type of Reporting Person:
+				</div><div class="largetext" style="text-align:justify">Limited Liability Company</div></div></div><div class="form1"><table><tr><td class="center"><br><br><p><div align="center" style="font-size:1.2em;">
+									SCHEDULE 13D
+								</div></p></td></tr></table><table role="presentation" id="item1to7"><tr><td width="8%" class="tableClassValignNoBorder">Item 1.</td><td width="92%" class="tableClassNoBorder">Security and Issuer</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignCenter">(a)</td><td width="92%" class="tableClassNoBorder">Title of Class of Securities:
+							<br><br><div class="text">Class A Common Stock, par value $0.0001 per share</div></td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignCenter">(b)</td><td width="92%" class="tableClassNoBorder">Name of Issuer:
+							<br><br><div class="text">AST SpaceMobile, Inc.</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(c)</td><td width="92%" class="tableClassNoBorder">Address of Issuer's Principal Executive Offices:
+							<br><br><div class="text">Midland International Air &amp; Space Port, 2901 Enterprise Lane, Midland, 
+				TEXAS
+			, 79706.</div></td></tr><tr><td colspan="3"><div style="display: flex;"><div style="font-size: 0.9em; font-weight: bold; margin-right: 5px;">
+									Item 1 Comment:
+								</div><div class="largetext" style="text-align:justify">       This statement on Schedule 13D (the "Schedule 13D") relates to the shares of Class A Common Stock, par value  $0.0001 per share (the "Class A Common Stock"), of AST SpaceMobile, Inc., a
+       Delaware corporation (the "Issuer"), whose principal executive office is located at Midland Intl. Air &amp; Space Port, 2901 Enterprise Lane, Midland, Texas 79706.</div></div></td></tr><tr><td width="8%" class="tableClassValignNoBorder">Item 2.</td><td width="92%" class="tableClassNoBorder">Identity and Background</td></tr><tr></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignCenter">(a)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">This Schedule 13D is being filed by AT&amp;T Inc., a Delaware corporation ("AT&amp;T"), and AT&amp;T Venture Investments, LLC, a Delaware limited liability company ("AT&amp;T Investments", and together with AT&amp;T, the "Reporting Persons"). The name, business address, present principal occupation or employment, and the name and principal business of any corporation or other organization in which such employment is conducted of each of the directors and executive officers of AT&amp;T (collectively, the "Directors and Officers") is set forth in Schedule I hereto.</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(b)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">The principal business address of the Reporting Persons is 208 S. Akard St., Dallas, Texas 75202. The business address of each of the Directors and Officers is set forth in Schedule I hereto.</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(c)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">AT&amp;T is a holding company whose subsidiaries and affiliates operate worldwide in the telecommunications and technology industries, providing wireless and wireline telecom and broadband services and equipment. AT&amp;T Investments is primarily in the business of investing in securities. The present principal occupation or employment, and the name and principal business of any corporation or other organization in which such employment is conducted of each of the Directors and Officers is set forth in Schedule I hereto.</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(d)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">During the last five years, neither the Reporting Persons nor, to the knowledge of the Reporting Persons, any of the persons listed on Schedule I hereto, have been (i) convicted in any criminal proceeding (excluding traffic violations or similar misdemeanors) or (ii) a party to a civil proceeding of a judicial or administrative body of competent jurisdiction and as a result of such proceeding was or is subject to a judgment, decree or final order enjoining future violations of, or prohibiting or mandating activities subject to, federal or state securities laws or finding any violation with respect to such laws.</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(e)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">During the last five years, neither the Reporting Persons nor, to the knowledge of the Reporting Persons, any of the persons listed on Schedule I hereto, have been (i) convicted in any criminal proceeding (excluding traffic violations or similar misdemeanors) or (ii) a party to a civil proceeding of a judicial or administrative body of competent jurisdiction and as a result of such proceeding was or is subject to a judgment, decree or final order enjoining future violations of, or prohibiting or mandating activities subject to, federal or state securities laws or finding any violation with respect to such laws.</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(f)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">Each of the Reporting Persons is organized under the laws of Delaware. Except as otherwise indicated in Schedule I, each Director and Officer is a citizen of the United States.</div></td></tr><tr><td width="8%" class="tableClassValignNoBorder">Item 3.</td><td width="92%" class="tableClassNoBorder">Source and Amount of Funds or Other Consideration</td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter"> </td><td width="92%" class="tableClassNoBorder"><div class="largetext">The information set forth in Items 4, 5, and 6 of this Schedule 13D is incorporated by reference into this Item 3.
+
+Convertible Security Investment Agreement
+
+On January 16, 2024, AT&amp;T Investments, together with Google LLC and Vodafone, as investors, entered into a Convertible Security Investment Agreement (the "Investment Agreement") with the Issuer. Pursuant to the Investment Agreement, AT&amp;T Investments purchased a subordinated convertible note of the Issuer for a principal amount of $35.0 million (such note, the "Note"). The funds used to purchase the Note were sourced from AT&amp;T's working capital.
+
+The Note bore interest at a rate of 5.50% per year, payable semi-annually in arrears on June 30 and December 30 of each year, beginning on June 30, 2024. The Issuer had the option to pay interest on the Note in cash or in kind. If the Issuer elected to pay interest on the Note in kind, the principal amount of the Note would have been increased by the amount of the interest payment, and interest will accrue on such increased principal amount in subsequent interest periods. The Note would have a ten-year term unless earlier converted.
+
+AT&amp;T Investments may have converted the Note (subject to certain exceptions) at an initial conversion rate of 173.9130 shares of Class A Common Stock per $1,000 principal amount of Note (equivalent to an initial conversion price of $5.75 per share of Class A Common Stock). Upon conversion of the Note, the Issuer would have delivered shares of Class A Common Stock to AT&amp;T Investments. AT&amp;T Investments could have converted its Note at its option at any time on or after January 22, 2025. The conversion rate is also subject to customary anti-dilution adjustments if certain events occur.
+
+On or after January 22, 2025, the Issuer could have required AT&amp;T Investments to convert the Note (subject to certain exceptions), at an initial conversion rate of 173.9130 shares of Class A Common Stock per $1,000 principal amount of Note (equivalent to an initial conversion price of $5.75 per share of Class A Common Stock) at its option, if the VWAP of the Class A Common Stock has been at least 130% of the conversion price then in effect for 30 consecutive trading days, on the immediately succeeding trading day after the last trading day of such 30 day period.
+
+The Note could have been accelerated upon the occurrence of certain events of default. In the case of an event of default with respect to the Note arising from specified events of bankruptcy or insolvency of the Issuer, 100% of the principal of, and accrued and unpaid interest on, the Note would have automatically become due and payable. If any other event of default with respect to the Note occurred or was continuing (which include customary events of default, including the failure to pay principal or interest when due and the failure to comply with other covenants contained in the Investment Agreement), the holders of at least 60% in aggregate principal amount of the then outstanding Subordinated Obligations (as defined in the Investment Agreement to include the obligations under the Note) may declare the principal amount of the Note to be immediately due and payable.
+
+Upon the occurrence of a "fundamental change" prior to the conversion or maturity of the Note, the Issuer was required to repay the Note immediately prior to the consummation of such fundamental change in an amount equal to the aggregate principal amount of such Note, plus any accrued and unpaid interest thereon.
+On January 22, 2025, the Issuer delivered a notice of conversion to AT&amp;T Investments, and on February 3, 2025, 6,260,440 shares of Class A Common Stock were issued to AT&amp;T Investments, representing the entirety of the shares of Class A Common Stock underlying the Note.
+
+The descriptions of the Investment Agreement and the Note are summaries and are qualified in their entirety by reference to the complete text of the Investment Agreement, a copy of which is filed as Exhibit II hereto and is incorporated by reference, and to the Form of Note, a copy of which is filed as Exhibit B to the Investment Agreement filed as Exhibit II hereto and is incorporated herein by reference.
+
+Investor and Registration Rights Agreement
+
+On January 22, 2024, AT&amp;T Investments entered into an Investor and Registration Rights Agreement (the "Registration Rights Agreement") with the Issuer.
+
+Under the terms of the Registration Rights Agreement, the Issuer granted AT&amp;T Investments certain registration rights with respect to their Registrable Securities (as defined in the Registration Rights Agreement). Among other things, the Registration Rights Agreement will require the Issuer to register the shares of Class A Common Stock issued upon conversion of the Note. AT&amp;T Investments will be entitled to (i) make a written demand for registration under the Securities Act of all or part of their shares of Class A Common Stock (up to a maximum of three demands) and only if the offering will include Registrable Securities with a total offering price reasonably expected to exceed, in the aggregate, $50 million, and (ii) "piggy-back" registration rights to registration statements filed in the future. The Issuer will bear all of the expenses incurred in connection with the filing of any such registration statement.
+
+In addition, AT&amp;T Investments agreed to vote its Registrable Securities in accordance with the recommendation of the Issuer's board of directors in the event of any change of control transaction.
+
+The description of the Registration Rights Agreement is a summary and is qualified in its entirety by reference to the complete text of the form of Registration Rights Agreement, a copy of which is filed as Exhibit III hereto and is incorporated herein by reference.</div></td></tr><tr><td width="8%" class="tableClassValignNoBorder">Item 4.</td><td width="92%" class="tableClassNoBorder">Purpose of Transaction</td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter"> </td><td width="92%" class="tableClassNoBorder"><div class="largetext">The Reporting Persons acquired the securities of the Issuer for investment purposes. Reporting Persons or their affiliates may purchase additional securities or dispose of securities in varying amounts and at varying times depending upon Reporting Persons' continuing assessments of pertinent factors, including the availability of shares of Class A Common Stock or other securities for purchase at particular price levels, the business prospects of the Issuer, other business investment opportunities, economic conditions, stock market conditions, money market conditions, the attitudes and actions of the board of directors (the "Board") and management of the Issuer, the availability and nature of opportunities to dispose of shares of the Issuer and other plans and requirements of the particular entities. The Reporting Persons may discuss items of mutual interest with the Issuer, which could include items in subparagraphs (a) through (j) of Item 4 of Schedule 13D.
+
+Depending upon their assessments of the above factors, the Reporting Persons or their affiliates may change their present intentions as stated above and they may assess whether to make suggestions to the management of the Issuer regarding financing, and whether to acquire additional securities of the Issuer, including shares of Class A Common Stock (by means of open market purchases, privately negotiated purchases, or otherwise) or to dispose of some or all of the securities of the Issuer, including shares of Class A Common Stock, under their control. The Reporting Persons or their affiliates may seek to acquire other securities of the Issuer, including other equity, debt, notes or other financial instruments related to the Issuer or the Class A Common Stock (which may include rights or securities exercisable or convertible into securities of the Issuer), and/or sell or otherwise dispose of some or all of such Issuer securities or financial instruments (which may include distributing some or all of such securities to such Reporting Person's respective partners or beneficiaries, as applicable) from time to time, in each case, in open market or private transactions, block sales or otherwise. Any transaction that any of the Reporting Persons or their affiliates may pursue may be made at any time and from time to time without prior notice and will depend on a variety of factors, including, without limitation, the price and availability of the Issuer's securities or other financial instruments, the Reporting Persons' or such affiliates' trading and investment strategies, subsequent developments affecting the Issuer, the Issuer's business and the Issuer's prospects, other investment and business opportunities available to such Reporting Persons and their affiliates, general industry and economic conditions, the securities markets in general, tax considerations and other factors deemed relevant by such Reporting Persons and such affiliates.
+
+The Reporting Persons intend to review their investment in the Issuer on an ongoing basis and, in the course of their review, may take actions (including through their affiliates) with respect to their investment or the Issuer, including communicating from time to time with the Board, members of management, other securityholders of the Issuer, or other third parties, advisors, such as legal, financial, regulatory, or other advisors, to assist in the review and evaluation of strategic alternatives. Such discussions and other actions may relate to various alternative courses of action, including, without limitation, those related to an extraordinary corporate transaction (including, but not limited to a merger, reorganization or liquidation) involving the Issuer or any of its subsidiaries; a sale or transfer of a material portion of the assets of the Issuer or any of its subsidiaries or the acquisition of material assets; the formation of joint ventures or other strategic alliances with the Issuer or any of its subsidiaries; changes in the present business, operations, strategy, future plans or prospects of the Issuer, financial or governance matters; changes to the Board or management of the Issuer; changes to the capitalization, ownership structure, dividend policy, business or corporate structure or governance documents of the Issuer; de-listing or de-registration of the Issuer's securities; or any action similar to the foregoing. Such discussions and actions may be exploratory in nature, and not rise to the level of a plan or proposal.
+
+Stockholders' Agreement
+
+On June 5, 2024, the Issuer, AT&amp;T Investments and ATC TRS II LLC ("TRS II"), Abel Avellan, Invesat LLC ("Invesat"), Vodafone Ventures Limited ("Vodafone"), and Rakuten Mobile USA Service Inc. ("Rakuten" and together with TRS II, Mr. Avellan, Invesat, and Vodafone, the "Stockholder Parties"), entered into an amended and restated stockholders' agreement (the "Stockholders' Agreement"). Pursuant to the Stockholders' Agreement, among other things, AT&amp;T Investments and the Stockholder Parties agreed to vote all securities of the Issuer that may be voted in the election of the Board held by each in accordance with the provisions of the Stockholders' Agreement. The Board consists of 13 directors, with two director seats being vacant, which Mr. Avellan may fill at any time. AT&amp;T Investments and the Stockholder Parties have the right to nominate directors as follows: (a) Mr. Avellan may nominate seven members to the Board, including the two initial vacancies which Mr. Avellan has the right to fill, (b) Invesat, Vodafone, TRS II and AT&amp;T Investments each may nominate one member to the Board (or, in the case of AT&amp;T Investments, the option to appoint an observer in lieu of a Board member), and (c) Rakuten may nominate two members to the Board. AT&amp;T Investments and the Stockholder Parties respectively agreed to vote for each of the foregoing nominees. AT&amp;T Investments and the Stockholder Parties agreed to take all necessary action to cause Mr. Avellan to be the chairperson of the Board.
+
+AT&amp;T Investments and its permitted transferees will no longer be entitled to nominate a director  or observer to the Board if they (i) (a) do not hold the Note and (b) do not hold at least eighty percent of the outstanding Class A Common Stock underlying the Note, (ii) all AT&amp;T Commercial Agreements (as defined in the Stockholders' Agreement) are terminated (and such termination is not caused by a breach of such agreement by AST &amp; Science, LLC, an affiliate of the Issuer) (iii) become a Competitor (as defined in the Stockholders' Agreement) of the Issuer, (iv) initiate a legal proceeding against the Issuer or any member of the Board or (v) obtain the right to designate or appoint a member of or observer to the board of directors (or similar governing body) of any Competitor of the Issuer.
+
+Moreover, each of the Stockholder Parties and AT&amp;T Investments agreed, until the Sunset Date (as defined in the Stockholders' Agreement), (i) to take all necessary action reasonably available within their power, including casting all votes to which such Stockholder Party is entitled in respect of its Voting Shares (as defined in the Stockholders' Agreement), whether at any annual or special meeting, by written consent or otherwise, so as to vote its Voting Shares on all matters submitted to the stockholders of the Issuer in accordance with the recommendation of the Board and (ii) not to grant, or enter into a binding agreement with respect to, any proxy to any person in respect of such party's equity securities of the Issuer that would prohibit such party from casting such votes in accordance with clause (i) of this paragraph.
+
+The Stockholder Parties, together with the Reporting Persons, may be deemed to constitute a group for purposes of Rule 13d-3 under the Securities and Exchange Act of 1934, as amended (the "Exchange Act"). Shares beneficially owned by the Stockholder Parties, other than the Reporting Persons, are not the subject of this Schedule 13D and accordingly, none of the Stockholder Parties is included as a reporting person.
+
+The description of the Stockholders' Agreement is a summary and is qualified in its entirety by reference to the complete text of the form of Stockholders' Agreement, a copy of which is filed as Exhibit IV hereto and is incorporated herein by reference.
+
+AT&amp;T Investments has designated Keith Larson to serve on the Board and, in such capacity, Mr. Larson may have influence over the corporate activities of the Issuer, including activities which may relate to items described in subparagraphs (a) through (j) of Item 4 of Schedule 13D.
+
+Except as described in this Schedule 13D, the Reporting Persons do not have any present plans or proposals that relate to or would result in any of the actions described in subparagraphs (a) through (j) of Item 4 of Schedule 13D, although, subject to the agreements described herein, the Reporting Persons, at any time and from time to time, may review, reconsider and change their position and/or change their purpose and/or develop such plans and may seek to influence management of the Issuer or the Board with respect to the business and affairs of the Issuer and may from time to time consider pursuing or proposing such matters with advisors, the Issuer or other persons.</div></td></tr><tr><td width="8%" class="tableClassValignNoBorder">Item 5.</td><td width="92%" class="tableClassNoBorder">Interest in Securities of the Issuer</td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(a)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">The responses of the Reporting Persons with respect to Rows 7 through 13 of the respective cover pages of the individual Reporting Persons to this Schedule 13D are incorporated herein by reference.
+
+The Reporting Persons' aggregate percentage of beneficial ownership is approximately 2.7% of the outstanding shares of the Class A Common Stock. Calculations of the percentage of the shares of Class A Common Stock beneficially owned is based on 234,518,083 shares of Class A Common Stock outstanding as of January 22, 2025, as reported in Mr. Avellan's Schedule 13D filed on January 27, 2025.
+
+As discussed in Item 4 above, the Stockholder Parties are not included as reporting persons in this Schedule 13D, and the Reporting Persons expressly disclaim beneficial ownership of the shares of Class A Common Stock held by the Stockholder Parties.</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(b)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">The responses of the Reporting Persons with respect to Rows 7 through 13 of the respective cover pages of the individual Reporting Persons to this Schedule 13D are incorporated herein by reference.
+
+AT&amp;T and AT&amp;T Investments may be deemed to be the beneficial owner of 6,260,440 shares of Class A Common Stock.
+
+The Reporting Persons' aggregate percentage of beneficial ownership is approximately 2.7% of the outstanding shares of the Class A Common Stock. Calculations of the percentage of the shares of Class A Common Stock beneficially owned is based on 234,518,083 shares of Class A Common Stock outstanding as of January 22, 2025, as reported in Mr. Avellan's Schedule 13D filed on January 27, 2025.
+
+As discussed in Item 4 above, the Stockholder Parties are not included as reporting persons in this Schedule 13D, and the Reporting Persons expressly disclaim beneficial ownership of the shares of Class A Common Stock held by the Stockholder Parties.</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(c)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">Except as described in this Schedule 13D, during the past 60 days, neither the Reporting Persons nor, to the knowledge of the Reporting Persons, any person named in Item 2 hereof, have effected any transactions with respect to the Class A Common Stock.</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(d)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">To the best knowledge of the Reporting Persons, no one other than the Reporting Persons, or the partners, members, affiliates or shareholders of the Reporting Persons, is known to have the right to receive, or the power to direct the receipt of, dividends from, or proceeds from the sale of, the shares of Class A Common Stock reported herein as beneficially owned by the Reporting Persons.</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(e)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">Not applicable.</div></td></tr><tr><td width="8%" class="tableClassValignNoBorder">Item 6.</td><td width="92%" class="tableClassNoBorder">Contracts, Arrangements, Understandings or Relationships With Respect to Securities of the Issuer</td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter"> </td><td width="92%" class="tableClassNoBorder"><div class="largetext">The information set forth in Items 2, 3, 4 and 5 of this Schedule 13D is incorporated by reference into this Item 6.
+
+Except as set forth herein, the Reporting Persons do not have any contracts, arrangements, understandings or relationships (legal or otherwise) with any person with respect to any securities of the Issuer, including but not limited to any contracts, arrangements, understandings or relationships concerning the transfer or voting of such securities, finder's fees, joint ventures, loan or option arrangements, puts or calls, guarantees of profits, division of profits or losses, or the giving or withholding of proxies.</div></td></tr><tr><td width="8%" class="tableClassValignNoBorder">Item 7.</td><td width="92%" class="tableClassNoBorder">Material to be Filed as Exhibits.</td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter"> </td><td width="92%" class="tableClassNoBorder"><div class="largetext">Exhibit I - Joint Filing Agreement
+
+Exhibit II - Convertible Security Investment Agreement, dated as of January 16, 2024, by and among AST SpaceMobile, Inc. and the parties named therein (incorporated by reference to Exhibit 10.1 of the Issuer's Form 8-K filed on January 18, 2024).
+
+Exhibit III - Form of Investor and Registration Rights Agreement (incorporated by reference to Exhibit 10.2 of the Issuer's Form 8-K filed on January 18, 2024).
+
+Exhibit IV - Amended and Restated Stockholders' Agreement, dated as of June 5, 2024, among the Issuer, AT&amp;T Investments, LLC, and the Stockholder Parties (incorporated by reference to Exhibit 10.1 of the Issuer's Form 8-K filed on June 7, 2024).</div></td></tr></table><br></div><div class="form1"><table role="presentation" id="signatureInfo"><tr><td width="8%" class="tableClassValignNoBorder">    SIGNATURE</td><td width="92%" class="tableClassNoBorder"> </td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter"> </td><td width="92%" class="tableClassNoBorder"><div class="information" style="text-align:justify">
+						After reasonable inquiry and to the best of my knowledge and belief, I certify that the information set forth in this statement is true, complete and correct.
+						<br><br></div></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="100%" class="tableClassInnerNoBorderBlue"><div class="text">AT&amp;T Inc.</div></td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Signature:</td><td width="92%" class="tableClassNoBorderBlue signature">/s/ Robert LaGrone</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Name/Title:</td><td width="92%" class="tableClassNoBorderBlue signature">Robert LaGrone/Senior Vice President - Corporate Development</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Date:</td><td width="92%" class="tableClassNoBorderBlue signature">02/10/2025</td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="100%" class="tableClassInnerNoBorderBlue"><div class="text">AT&amp;T Venture Investments, LLC</div></td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Signature:</td><td width="92%" class="tableClassNoBorderBlue signature">/s/ Robert LaGrone</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Name/Title:</td><td width="92%" class="tableClassNoBorderBlue signature">Robert LaGrone/Senior Vice President - Corporate Development</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Date:</td><td width="92%" class="tableClassNoBorderBlue signature">02/10/2025</td></tr></table></td></tr></table></div></div>
+
+<script type="text/javascript"  src="/QQpw/SBxk/Vaws3/_e/ukQ/ahaE2chLLGzQfS/Ji1MAQ/Zg9QCV/p9Knc"></script></body></html>
