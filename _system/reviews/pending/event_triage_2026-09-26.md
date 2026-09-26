@@ -1,7 +1,7 @@
 # Event triage — human review queue
 
 **Date:** 2026-09-26
-**Rows:** 2936
+**Rows:** 1869
 
 | Date | Ticker | Source | Tier | Materiality | Rules | Title |
 |------|--------|--------|------|-------------|-------|-------|
@@ -32,6 +32,9 @@
 | 2026-09-26 | MSCI | kpi_trend | context | 66 | rule_conflict, activist_cross_link, routine_governance_watch | Leadership / governance on watch |
 | 2026-09-26 | SMCI | kpi_trend | context | 66 | rule_conflict, activist_cross_link, routine_governance_watch | Leadership / governance on watch |
 | 2026-09-26 | FRMI | kpi_trend | context | 66 | rule_conflict, activist_cross_link, routine_governance_watch | Leadership / governance on watch |
+| 2026-09-26 | BUR | vic_research | context | 33 | rule_conflict, activist_cross_link, neutral_low_impact | 07-BURFORD-CAPITAL-BUR-4694552095_151e |
+| 2026-09-26 | BUR | vic_research | context | 33 | rule_conflict, activist_cross_link, neutral_low_impact | VIC PDF intake - BUR - BUR VIC PDF |
+| 2026-09-26 | BUR | third_party | context | 25 | rule_conflict, activist_cross_link, neutral_low_impact | Block on Bloomberg Markets Discussing Latest Short, Burford  |
 | 2026-09-25 | LLY | vic_research | context | 33 | rule_conflict, activist_cross_link, neutral_low_impact | 05-Eli-Lilly-LLY-9821723250_1e07 |
 | 2026-09-25 | LLY | third_party | context | 25 | rule_conflict, activist_cross_link, neutral_low_impact | SC 13D/A · LLY · 2022-12-01 |
 | 2026-09-25 | LLY | third_party | context | 25 | rule_conflict, activist_cross_link, neutral_low_impact | ELI LILLY AND COMPANY — DFAN14A (proxy solicitation) |
@@ -108,7 +111,6 @@
 | 2026-08-26 | HLT | third_party | context | 16 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | HoldCo Asset Management — SC 13D/A |
 | 2026-08-26 | AOS | third_party | context | 16 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | May 16, 2019 |
 | 2026-08-26 | AOS | third_party | context | 16 | rule_conflict, activist_cross_link, neutral_low_impact | Smith Family Voting Trust 26-6901000 — SC 13D/A |
-| 2026-08-26 | BUR | third_party | context | 16 | rule_conflict, activist_cross_link, neutral_low_impact | Block on Bloomberg Markets Discussing Latest Short, Burford  |
 | 2026-08-26 | TRC | third_party | context | 16 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | Bulldog (+4) — DEFC14A (proxy solicitation) |
 | 2026-08-26 | TRC | third_party | context | 16 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | Bulldog Investors — DEFC14A (proxy solicitation) |
 | 2026-08-26 | TRC | third_party | context | 16 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | Bulldog Investors — DFAN14A (proxy solicitation) |
@@ -203,5 +205,3 @@
 | 2026-08-26 | INTU | third_party | context | 16 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | Sep 20, 2024 |
 | 2026-08-26 | SYK | third_party | context | 16 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | Apr 6, 2022 |
 | 2026-08-26 | MNST | third_party | context | 16 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | Apr 8, 2025 |
-| 2026-08-26 | AXON | third_party | context | 16 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | Jun 19, 2019 |
-| 2026-08-26 | BB | third_party | context | 16 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | HoldCo Asset Management — SC 13D/A |
