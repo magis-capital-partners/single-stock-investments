@@ -1,6 +1,6 @@
 # CRWD — Pending third-party sources
 
-**Updated:** 2026-09-24
+**Updated:** 2026-09-26
 
 Approve in `_system/frameworks/third_party_sources.md` before using in base IRR.
 
