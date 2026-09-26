@@ -1,0 +1,26 @@
+# CBOE - Thematic context (2026-09-26)
+
+> Context only. Tailwinds inform stance and overlay sizing; they do not auto-inflate Lawrence base IRR. Promotion to base case requires [HUMAN REVIEW].
+
+| Indicator | Latest | As of | YoY | Direction | In base IRR? |
+|-----------|--------|-------|-----|-----------|--------------|
+| High-yield OAS credit spread (%) | 0.79 | 2026-09-25 | +186.8% | up | no (context) |
+| US Treasury 10Y yield (%) | 5.184000015258789 | 2026-09-25 | +24.3% | up | no (context) |
+| US Treasury 2Y yield (%) | 5.006999969482422 | 2026-09-25 | +32.9% | up | no (context) |
+| Trade-weighted USD index (broad) | 100.97000122070312 | 2026-09-25 | +2.5% | up | no (context) |
+| VIX index level | 14.869999885559082 | 2026-09-25 | -11.2% | down | no (context) |
+| HYG vs TLT 1-month return spread (%) | 2.22 | 2026-09-25 | +188.4% | up | no (context) |
+| SPY 20-day realized vol (annualized %) | 10.49 | 2026-09-25 | +40.8% | up | no (context) |
+| AGI expert-horizon years ahead (public quotes) | 5.0 | 2026-06-01 | +0.0% | flat | no (context) |
+| Robotaxi expert-horizon years ahead (public quotes) | 2.0 | 2026-06-01 | +0.0% | flat | no (context) |
+| VIX index level | 14.869999885559082 | 2026-09-25 | -11.2% | down | no (context) |
+| SPY 20-day realized vol (annualized %) | 10.49 | 2026-09-25 | +40.8% | up | no (context) |
+| Nikkei 225 20-day realized vol (annualized %) | 18.51 | 2026-09-25 | +36.3% | up | no (context) |
+| Hang Seng 20-day realized vol (annualized %) | 12.49 | 2026-09-25 | -23.4% | down | no (context) |
+| ASX 200 20-day realized vol (annualized %) | 8.68 | 2026-09-25 | -16.1% | down | no (context) |
+| FTSE 100 20-day realized vol (annualized %) | 9.84 | 2026-09-25 | +51.4% | up | no (context) |
+| Euro Stoxx 50 20-day realized vol (annualized %) | 12.35 | 2026-09-25 | +8.9% | up | no (context) |
+| VRP health score (etf-dashboard derived 0-100) | 87.77 (stale) | 2026-07-28 | n/a | flat | no (context) |
+| Vol term-structure slope (VIX3M - VIX) | 3.06 | 2026-09-25 | +12.5% | up | no (context) |
+
+Source panels: `_system/reference/market-data/themes/manifest.json`.
