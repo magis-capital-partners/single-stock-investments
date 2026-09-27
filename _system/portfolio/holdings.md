@@ -166,14 +166,14 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-09-27.
 | CINF | CINF/ | Cincinnati Financial | US | 2026-09-23 | 2026-09-27 | unknown | watch |
 | CKX | CKX/ | CKX Lands, Inc. | US | 2026-09-23 | 2026-09-27 | optionality | watch |
 | CL | CL/ | Colgate-Palmolive | US | 2026-09-23 | 2026-09-27 | unknown | watch |
-| CLS | CLS/ | CLS | US | 2026-07-28 | 2026-09-27 | unknown | watch |
-| CLSK | CLSK/ | CleanSpark, Inc. | US | 2026-07-17 | 2026-09-27 | optionality | watch |
-| CLX | CLX/ | Clorox | US | 2026-07-29 | 2026-09-27 | unknown | watch |
-| CMCSA | CMCSA/ | Comcast | US | 2026-07-29 | 2026-09-27 | unknown | watch |
-| CME | CME/ | CME Group Inc. | US | 2026-07-09 | 2026-09-27 | unknown | watch |
-| CMG | CMG/ | Chipotle Mexican Grill | US | 2026-07-29 | 2026-09-27 | unknown | watch |
-| CMI | CMI/ | Cummins | US | 2026-07-29 | 2026-09-27 | unknown | watch |
-| CMS | CMS/ | CMS Energy | US | 2026-07-29 | 2026-09-27 | unknown | watch |
+| CLS | CLS/ | CLS | US | 2026-09-27 | 2026-09-27 | unknown | watch |
+| CLSK | CLSK/ | CleanSpark, Inc. | US | 2026-09-27 | 2026-09-27 | optionality | watch |
+| CLX | CLX/ | Clorox | US | 2026-09-27 | 2026-09-27 | unknown | watch |
+| CMCSA | CMCSA/ | Comcast | US | 2026-09-27 | 2026-09-27 | unknown | watch |
+| CME | CME/ | CME Group Inc. | US | 2026-09-27 | 2026-09-27 | unknown | watch |
+| CMG | CMG/ | Chipotle Mexican Grill | US | 2026-09-27 | 2026-09-27 | unknown | watch |
+| CMI | CMI/ | Cummins | US | 2026-09-27 | 2026-09-27 | unknown | watch |
+| CMS | CMS/ | CMS Energy | US | 2026-09-27 | 2026-09-27 | unknown | watch |
 | CMSG | CMSG/ | Consensus Mining & Seigniorage Corp | US | 2026-07-09 | 2026-09-27 | optionality | watch |
 | CNC | CNC/ | Centene Corporation | US | 2026-07-29 | 2026-09-27 | unknown | watch |
 | CNP | CNP/ | CenterPoint Energy | US | 2026-07-09 | 2026-09-27 | unknown | watch |
