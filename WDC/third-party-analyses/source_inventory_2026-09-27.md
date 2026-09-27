@@ -1,10 +1,10 @@
 # WDC — Third-party source inventory
 
 **Date:** 2026-09-27
-**Sources:** 0 total (0 approved, 0 pending, 0 context)
+**Sources:** 1 total (0 approved, 0 pending, 1 context)
 
 | ID | Title | Path | Status | Use |
 |----|-------|------|--------|-----|
-| (none) | — | — | — | Primary filings only |
+| vic | 08-WESTERN-DIGITAL-WDC-6150758067 | `WDC/third-party-analyses/vic/08-WESTERN-DIGITAL-WDC-6150758067.pdf` | context | Value Investors Club (licensed corpus; variant view, not base IRR) |
 
 Cross-check required: `WDC/research/cross_check_third_party_2026-09-27.md`
