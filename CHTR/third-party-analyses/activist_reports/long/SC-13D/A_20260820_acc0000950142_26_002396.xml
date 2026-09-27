@@ -1,0 +1,567 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns:p="http://www.sec.gov/edgar/schedule13D" xmlns:p1="http://www.sec.gov/edgar/common"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><link rel="stylesheet" type="text/css" href="/css/SDR_print.css"><style type="text/css">
+					.fakeTextBox {
+					border-top: 2px solid #999;
+					border-right: 1px solid #ccc;
+					border-bottom: 1px solid #ccc;
+					border-left: 2px solid #999;
+					padding: 2px;
+					_width: 800px;
+					height: auto;
+					min-width: 200px;
+					min-height: 50px;
+					word-wrap: break-word;
+					font-size: 0.9em;
+					color: blue;
+					}
+					table.tableClass { border: solid black;
+					border-top-width: 1;
+					border-right-width: 1;
+					border-bottom-width: 1;
+					border-left-width: 1;
+					table-layout:fixed;
+					}
+					table.innerTableClass { border: solid black;
+					border-top-width: 0;
+					border-right-width: 0;
+					border-bottom-width: 0;
+					border-left-width: 0;
+					table-layout:fixed;
+					}
+					th.tableClassLeft { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					padding: 2px;
+					}
+					th.tableClassRight { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 0;
+					padding: 2px;
+					}
+					th.tableClass { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					padding: 2px;
+					}
+					td.tableClassLeft { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					font-size: 0.9em;
+					color: blue;
+					word-wrap: break-word;
+					}
+					td.tableClassRight { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 0;
+					font-size: 0.9em;
+					color: blue;
+					word-wrap: break-word;
+					}
+					td.tableClass { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					font-size: 0.9em;
+					font-weight:bold;
+					color: black;
+					word-wrap: break-word;
+					}
+					td.tableClassNoBorder { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 0px;
+					font-size: 0.9em;
+					font-weight:bold;
+					color: black;
+					word-wrap: break-word;
+					}
+
+					td.tableClassNoBorderBlue { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 0px;
+					font-size: 0.9em;
+					font-weight:bold;
+					color: blue;
+					word-wrap: break-word;
+					}
+
+					td.tableClassInnerNoBorderBlue { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 0px;
+					font-size: 1.4em;
+					font-weight:bold;
+					color: blue;
+					word-wrap: break-word;
+					}
+
+					td.tableClassNoBorderAlignLeft { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 0px;
+					font-size: 0.9em;
+					font-weight:bold;
+					text-align: left;
+					color: black;
+					word-wrap: break-word;
+					}
+
+					td.signature {
+					padding: 4px 8px;
+					}
+
+					td.tableClassInner { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					font-size: 1em;
+					font-weight:bold;
+					color: black;
+					word-wrap: break-word;
+					}
+
+					td.tableClassValign { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					font-size: 0.9em;
+					font-weight:bold;
+					color: black;
+					vertical-align: middle;
+					text-align: center;
+					word-wrap: break-word;
+					}
+
+					td.tableClassValignNoBorder { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 0px;
+					font-size: 0.9em;
+					font-weight:bold;
+					color: black;
+					vertical-align: middle;
+					text-align: center;
+					word-wrap: break-word;
+					}
+
+					td.tableClassValignInner { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					font-size: 1em;
+					font-weight:bold;
+					color: black;
+					vertical-align: middle;
+					text-align: center;
+					word-wrap: break-word;
+					}
+
+					td.innerTableClassRightValign { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 0;
+					font-size: 1em;
+					font-weight:bold;
+					color: black;
+					vertical-align: middle;
+					text-align: center;
+					word-wrap: break-word;
+					}
+
+					td.innerTableClassRightValignBottomLess { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 0px;
+					border-left-width: 0;
+					font-size: 1em;
+					font-weight:bold;
+					color: black;
+					vertical-align: middle;
+					text-align: center;
+					word-wrap: break-word;
+					}
+
+					td.tableClassInnerLeft { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					font-size: 1em;
+					font-weight:bold;
+					color: black;
+					word-wrap: break-word;
+					}
+
+					td.tableClassInnerLeftBottomLess { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 1px;
+					font-size: 1em;
+					font-weight:bold;
+					color: black;
+					word-wrap: break-word;
+					}
+
+					td.tableClassNoBorderAlignCenter { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 0px;
+					font-size: 0.9em;
+					font-weight:bold;
+					color: black;
+					text-align: center;
+					word-wrap: break-word;
+					}
+
+					tr.tableClass { border: solid black;
+					border-top-width: 1px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					}
+					tr.tableClassWithBg { border: solid black;
+					border-top-width: 0;
+					border-right-width: 1;
+					border-bottom-width: 1;
+					border-left-width: 0;
+					background-color: #e0e0ff
+					}
+
+					tr.tableClassWithBgBlack { border: solid black;
+					border-top-width: 0;
+					border-right-width: 1;
+					border-bottom-width: 1;
+					border-left-width: 0;
+					background-color: #D3D3D3
+					}
+
+					hr.header {
+					position: relative;
+					top: 20px;
+					border: none;
+					height: 6px;
+					background: black;
+					margin-bottom: 10px;
+					}
+
+					hr.separatorThin {
+					position: relative;
+					top: 2px;
+					border: none;
+					height: 2px;
+					background: black;
+					margin-bottom: 2px;
+					}
+
+					hr.headerThin {
+					position: relative;
+					top: 10px;
+					border: none;
+					height: 2px;
+					background: black;
+					margin-bottom: 10px;
+					}
+
+					hr.separator {
+					position: relative;
+					top: 20px;
+					border: none;
+					height: 4px;
+					background: black;
+					margin-bottom: 5px;
+					}
+
+					div.text {
+					background-color: #ffffff;
+					color: blue;
+					font-size: 1em;
+					font-weight:normal;
+					text-align:justify;
+					}
+
+
+					div.information {
+					background-color: #ffffff;
+					color: black;
+					font-size: 1em;
+					font-weight:normal;
+					text-align:justify;
+					}
+
+					#scheader {
+					font-size: 0.9em;
+					border: 0px solid #404040;
+					border-spacing: 2px;
+					}
+
+					div.largetext {
+					background-color: #ffffff;
+					color: blue;
+					font-size: 1em;
+					font-weight:normal;
+					text-align:justify;
+					white-space: pre-wrap;
+					word-break: normal;
+					}
+
+				</style></head><body lang="en-US" text="#000000" bgcolor="#ffffff"><hr class="header"><br><hr class="headerThin"><div class="contentwrapper"><table role="presentation" id="scheader"><tr><td class="tableClassNoBorderAlignCenter" style="font-size:2em;">
+						SECURITIES AND EXCHANGE COMMISSION
+						<br>
+						Washington, D.C. 20549
+					</td></tr><tr><td class="tableClassNoBorderAlignCenter"><br><br><div style="font-size:1.5em;">
+									SCHEDULE 13D
+								</div><br><div style="font-size:1.2em;">
+							Under the Securities Exchange Act of 1934
+						</div><br><div class="information" style="text-align:center; font-weight:bold;">
+									(Amendment No. <span style="color:blue;">20</span>)
+								</div><br><br></td></tr><tr><td class="center"><div class="information" style="text-align:center; font-weight:bold; color:blue;">CHARTER COMMUNICATIONS, INC. /MO/</div><div class="information" style="text-align:center; font-weight:bold;"><hr class="separatorThin">(Name of Issuer)</div><br><br></td></tr><tr><td class="center"><div class="information" style="text-align:center; font-weight:bold; color:blue;">Class A Common Stock, $0.001 Par Value</div><div class="information" style="text-align:center; font-weight:bold;"><hr class="separatorThin">(Title of Class of Securities)</div><br><br></td></tr><table border="1"><tr><td><div class="information" style="text-align:center; font-weight:bold; color:blue;">16119P108</div><div class="information" style="text-align:center; font-weight:bold;"><hr class="separatorThin">(CUSIP Number)</div></td></tr><br><br></table><tr><td class="center"><div class="information" style="text-align:center; font-weight:bold; color:blue;">Michael D. Fricklas<br>Advance/Newhouse Partnership,
+								One World Trade Center<br>New York,
+								NY,
+								10007<br>(212) 286-6900</div><br><br><div class="information" style="text-align:center; font-weight:bold; color:blue;">Robert B. Schumer, Esq.<br>Paul, Weiss, Rifkind, Wharton &amp; Garrison,
+								1285 Avenue of the Americas<br>New York,
+								NY,
+								10019<br>(212) 373-3000</div><br><br><div class="information" style="text-align:center; font-weight:bold; color:blue;">Michael Vogel, Esq.<br>Paul, Weiss, Rifkind, Wharton &amp; Garrison,
+								1285 Avenue of the Americas<br>New York,
+								NY,
+								10019<br>(212) 373-3000</div><br><br><div class="information" style="text-align:center; font-weight:bold; color:blue;">Lara Solomons, Esq.<br>Paul, Weiss, Rifkind, Wharton &amp; Garrison,
+								1285 Avenue of the Americas<br>New York,
+								NY,
+								10019<br>(212) 373-3000</div><div class="information" style="text-align:center; font-weight:bold;"><hr class="separatorThin">(Name, Address and Telephone Number of Person Authorized to
+									Receive Notices and Communications)</div></td></tr><tr><td class="center"><div class="information" style="text-align:center; font-weight:bold; color:blue;">08/19/2026</div><div class="information" style="text-align:center; font-weight:bold;"><hr class="separatorThin">(Date of Event Which Requires Filing of This Statement)</div></td></tr></table><br><br><div class="information" style="text-align:justify">
+				If the filing person has previously filed a statement on Schedule 13G to report the acquisition that is the subject of this Schedule 13D, and is filing this schedule because of §§ 240.13d-1(e), 240.13d-1(f) or 240.13d-1(g), check the following box.
+				<img src="/Images/box-unchecked.jpg" alt="Checkbox not checked"></div><br><div class="information" style="text-align:justify">
+				The information required on the remainder of this cover page shall not be deemed to be “filed” for the purpose of Section 18 of the
+				Securities Exchange Act of 1934 (“Act”) or otherwise subject to the liabilities of that section of the Act but shall be subject to all other
+				provisions of the Act (however, see the Notes).
+			</div></div><hr class="headerThin"><hr class="header"><br><br>
+  <div style="display:none">
+			schemaVersion:
+			</div>
+<div class="content"><div class="form1"></div></div>
+  <div class="content"><div class="form1"><table><tr><td class="center"><br><br><p><div align="center" style="font-size:1.2em;">
+									SCHEDULE 13D
+								</div></p></td></tr></table><table role="presentation" class="tableClass" id="cusipNumber"><tr class="tableClass"><td width="7%" style="font-weight:bold;">CUSIP Number(s):</td><td width="75%"><div style="font-size:.9em; color:#000000">16119P108</div></td></tr></table><br><br><table role="presentation" class="tableClass" id="reportingPersonDetails"><tr class="tableClass"><td width="8%" class="tableClassValign">1</td><td width="92%" class="tableClass">
+					Name of reporting person
+					<br><br><div class="text">Advance/Newhouse Partnership</div></td></tr><tr><td width="8%" class="tableClassValign">2</td><td width="92%" class="tableClass">Check the appropriate box if a member of a Group (See Instructions)
+				<br><br><div class="text"><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked">  (a)
+					<br><img src="/Images/box-checked.jpg" alt="Checkbox checked">  (b)	
+				</div></td></tr><tr class="tableClassWithBgBlack"><td width="8%" class="tableClassValign">3</td><td width="92%" class="tableClass">SEC use only</td></tr><tr><td width="8%" class="tableClassValign">4</td><td width="92%" class="tableClass">
+					Source of funds (See Instructions)
+					<br><br><div class="text">OO</div></td></tr><tr><td width="8%" class="tableClassValign">5</td><td width="92%" class="tableClass">
+					Check if disclosure of legal proceedings is required pursuant to Items 2(d) or 2(e)
+					<br><br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked"></td></tr><tr><td width="8%" class="tableClassValign">6</td><td width="92%" class="tableClass">Citizenship or place of organization
+				<br><br><div class="text">
+				NEW YORK
+			</div></td></tr><tr><td width="8%" class="tableClassValign">Number of Shares Beneficially Owned by Each Reporting Person With:</td><td width="92%" class="tableClass"><table class="innerTableClass"><tr><td width="8%" class="innerTableClassRightValign">7</td><td width="92%" class="tableClassInnerLeft">Sole Voting Power
+							<br><br><div class="text">18,647,794.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">8</td><td width="92%" class="tableClassInnerLeft">Shared Voting Power
+							<br><br><div class="text">0.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">9</td><td width="92%" class="tableClassInnerLeft">Sole Dispositive Power
+							<br><br><div class="text">18,647,794.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValignBottomLess">10</td><td width="92%" class="tableClassInnerLeftBottomLess">Shared Dispositive Power
+							<br><br><div class="text">0.00</div></td></tr></table></td></tr><tr><td width="8%" class="tableClassValign">11</td><td width="92%" class="tableClass">Aggregate amount beneficially owned by each reporting person
+				<br><br><div class="text">18,647,794.00</div></td></tr><tr><td width="8%" class="tableClassValign">12</td><td width="92%" class="tableClass">Check if the aggregate amount in Row (11) excludes certain shares (See Instructions)
+				<br><br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked"></td></tr><tr><td width="8%" class="tableClassValign">13</td><td width="92%" class="tableClass">Percent of class represented by amount in Row (11)
+				<br><br><div class="text">14.35 % </div></td></tr><tr><td width="8%" class="tableClassValign">14</td><td width="92%" class="tableClass">Type of Reporting Person (See Instructions)
+				<br><br><div class="text">PN</div></td></tr></table><br><div style="display: flex;"><div style="font-size: 0.9em; font-weight: bold; margin-right: 5px;">
+					Comment for Type of Reporting Person:
+				</div><div class="largetext" style="text-align:justify">Row (2): The Amended and Restated Stockholders Agreement, dated as of May 23, 2015, by and among the Issuer, former Charter Communications, Inc., Liberty Broadband Corporation ("Liberty") and Advance/Newhouse Partnership ("A/N"), as amended on May 18, 2016 (the "Second Amended and Restated Stockholders Agreement"), and as further amended by the Third Amended and Restated Stockholders Agreement, dated as of August 19, 2026, by and among the Issuer, Cox Enterprises, Inc. ("Cox Parent"), Cox Communications Equity Holdings, Inc. ("Cox NewCo") and A/N (the "Third Amended and Restated Stockholders Agreement") (as further described in Item 6 to this Schedule 13D/A) contains provisions relating to the ownership and voting by the Reporting Persons in respect of their A/N Notional Shares (as defined below). The Reporting Persons expressly disclaim the existence of and membership in a group with each of Liberty and Cox Parent. See Item 6 of the Schedule 13D.
+
+Row (2): Michael A. Newhouse, who beneficially owns 6,181 shares of Class A Common Stock, is a Trustee of Advance Long-Term Management Trust, Director and Executive Vice President of Newhouse Broadcasting Corporation, Director and Co-President of Advance Publications, Inc. and Executive Vice President of Advance/Newhouse Partnership. Samuel I. Newhouse, III, who beneficially owns 593 shares of Class A Common Stock, is a Trustee of Advance Long-Term Management Trust, a Director and Executive Vice President of Newhouse Broadcasting Corporation, a Director and Co-President of Advance Publications, Inc. and Executive Vice President of Advance/Newhouse Partnership. The Reporting Persons expressly disclaim the existence of and membership in a group with Michael A. Newhouse and Samuel I. Newhouse, III.
+
+Rows (7), (9) and (11): Consists of (i) 3,136,511 shares of Class A Common Stock, par value $0.001 per share ("Class A Common Stock") of the Issuer and (ii) 15,511,283 shares of Class A Common Stock issuable upon conversion of the Class B Common Units ("Class B Common Units") of Charter Communications Holdings, LLC ("Charter Holdings"), in each case, held by A/N. Upon request by A/N, the 15,511,283 Class B Common Units owned by A/N will be converted, at the Issuer's option, into either (x) shares of Class A Common Stock of the Issuer on a one-for-one basis or (y) cash based on the volume-weighted average price of the Class A Common Stock for the two consecutive trading days immediately prior to the date of delivery of an exchange notice by A/N. A/N also owns one share of Class B Common Stock of the Issuer, which entitles A/N to vote on any matter submitted for a vote of the holders of Class A Common Stock of the Issuer such number of votes equal to the number of shares of Class A Common Stock into which the Class B Common Units held by A/N and its affiliates are convertible or exchangeable, as applicable, in each case, assuming only shares of Class A Common Stock of the Issuer are delivered upon conversion or exchange (the "A/N Notional Shares"). Does not include the 6,181 shares of Class A Common Stock beneficially owned by Michael A. Newhouse or the 593 shares of Class A Common Stock beneficially owned by Samuel I. Newhouse, III.
+
+Row (13): For purposes of calculating beneficial ownership in this statement on Schedule 13D (this "Statement"), the total number of shares of Class A Common Stock outstanding as of August 20, 2026 (as provided by the Issuer on such date), is approximately 129.94 million. The percentage provided represents the number of shares of Class A Common Stock beneficially owned by the applicable Reporting Person on an as-converted, as-exchanged basis divided by the sum of (i) the amount of Class A Common Stock outstanding as of August 20, 2026, plus (ii) the amount of Class A Common Stock issuable upon exchange or conversion, as applicable, of the Class B Common Units held by A/N.</div></div><table><tr><td class="center"><br><br><p><div align="center" style="font-size:1.2em;">
+									SCHEDULE 13D
+								</div></p></td></tr></table><table role="presentation" class="tableClass" id="cusipNumber"><tr class="tableClass"><td width="7%" style="font-weight:bold;">CUSIP Number(s):</td><td width="75%"><div style="font-size:.9em; color:#000000">16119P108</div></td></tr></table><br><br><table role="presentation" class="tableClass" id="reportingPersonDetails"><tr class="tableClass"><td width="8%" class="tableClassValign">1</td><td width="92%" class="tableClass">
+					Name of reporting person
+					<br><br><div class="text">Newhouse Broadcasting Corporation</div></td></tr><tr><td width="8%" class="tableClassValign">2</td><td width="92%" class="tableClass">Check the appropriate box if a member of a Group (See Instructions)
+				<br><br><div class="text"><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked">  (a)
+					<br><img src="/Images/box-checked.jpg" alt="Checkbox checked">  (b)	
+				</div></td></tr><tr class="tableClassWithBgBlack"><td width="8%" class="tableClassValign">3</td><td width="92%" class="tableClass">SEC use only</td></tr><tr><td width="8%" class="tableClassValign">4</td><td width="92%" class="tableClass">
+					Source of funds (See Instructions)
+					<br><br><div class="text">OO</div></td></tr><tr><td width="8%" class="tableClassValign">5</td><td width="92%" class="tableClass">
+					Check if disclosure of legal proceedings is required pursuant to Items 2(d) or 2(e)
+					<br><br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked"></td></tr><tr><td width="8%" class="tableClassValign">6</td><td width="92%" class="tableClass">Citizenship or place of organization
+				<br><br><div class="text">
+				NEW YORK
+			</div></td></tr><tr><td width="8%" class="tableClassValign">Number of Shares Beneficially Owned by Each Reporting Person With:</td><td width="92%" class="tableClass"><table class="innerTableClass"><tr><td width="8%" class="innerTableClassRightValign">7</td><td width="92%" class="tableClassInnerLeft">Sole Voting Power
+							<br><br><div class="text">18,647,794.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">8</td><td width="92%" class="tableClassInnerLeft">Shared Voting Power
+							<br><br><div class="text">0.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">9</td><td width="92%" class="tableClassInnerLeft">Sole Dispositive Power
+							<br><br><div class="text">18,647,794.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValignBottomLess">10</td><td width="92%" class="tableClassInnerLeftBottomLess">Shared Dispositive Power
+							<br><br><div class="text">0.00</div></td></tr></table></td></tr><tr><td width="8%" class="tableClassValign">11</td><td width="92%" class="tableClass">Aggregate amount beneficially owned by each reporting person
+				<br><br><div class="text">18,647,794.00</div></td></tr><tr><td width="8%" class="tableClassValign">12</td><td width="92%" class="tableClass">Check if the aggregate amount in Row (11) excludes certain shares (See Instructions)
+				<br><br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked"></td></tr><tr><td width="8%" class="tableClassValign">13</td><td width="92%" class="tableClass">Percent of class represented by amount in Row (11)
+				<br><br><div class="text">14.35 % </div></td></tr><tr><td width="8%" class="tableClassValign">14</td><td width="92%" class="tableClass">Type of Reporting Person (See Instructions)
+				<br><br><div class="text">CO</div></td></tr></table><br><div style="display: flex;"><div style="font-size: 0.9em; font-weight: bold; margin-right: 5px;">
+					Comment for Type of Reporting Person:
+				</div><div class="largetext" style="text-align:justify">Sole voting power and dispositive power is held indirectly through control of Advance/Newhouse Partnership.</div></div><table><tr><td class="center"><br><br><p><div align="center" style="font-size:1.2em;">
+									SCHEDULE 13D
+								</div></p></td></tr></table><table role="presentation" class="tableClass" id="cusipNumber"><tr class="tableClass"><td width="7%" style="font-weight:bold;">CUSIP Number(s):</td><td width="75%"><div style="font-size:.9em; color:#000000">16119P108</div></td></tr></table><br><br><table role="presentation" class="tableClass" id="reportingPersonDetails"><tr class="tableClass"><td width="8%" class="tableClassValign">1</td><td width="92%" class="tableClass">
+					Name of reporting person
+					<br><br><div class="text">Advance Publications, Inc.</div></td></tr><tr><td width="8%" class="tableClassValign">2</td><td width="92%" class="tableClass">Check the appropriate box if a member of a Group (See Instructions)
+				<br><br><div class="text"><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked">  (a)
+					<br><img src="/Images/box-checked.jpg" alt="Checkbox checked">  (b)	
+				</div></td></tr><tr class="tableClassWithBgBlack"><td width="8%" class="tableClassValign">3</td><td width="92%" class="tableClass">SEC use only</td></tr><tr><td width="8%" class="tableClassValign">4</td><td width="92%" class="tableClass">
+					Source of funds (See Instructions)
+					<br><br><div class="text">OO</div></td></tr><tr><td width="8%" class="tableClassValign">5</td><td width="92%" class="tableClass">
+					Check if disclosure of legal proceedings is required pursuant to Items 2(d) or 2(e)
+					<br><br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked"></td></tr><tr><td width="8%" class="tableClassValign">6</td><td width="92%" class="tableClass">Citizenship or place of organization
+				<br><br><div class="text">
+				NEW YORK
+			</div></td></tr><tr><td width="8%" class="tableClassValign">Number of Shares Beneficially Owned by Each Reporting Person With:</td><td width="92%" class="tableClass"><table class="innerTableClass"><tr><td width="8%" class="innerTableClassRightValign">7</td><td width="92%" class="tableClassInnerLeft">Sole Voting Power
+							<br><br><div class="text">18,647,794.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">8</td><td width="92%" class="tableClassInnerLeft">Shared Voting Power
+							<br><br><div class="text">0.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">9</td><td width="92%" class="tableClassInnerLeft">Sole Dispositive Power
+							<br><br><div class="text">18,647,794.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValignBottomLess">10</td><td width="92%" class="tableClassInnerLeftBottomLess">Shared Dispositive Power
+							<br><br><div class="text">0.00</div></td></tr></table></td></tr><tr><td width="8%" class="tableClassValign">11</td><td width="92%" class="tableClass">Aggregate amount beneficially owned by each reporting person
+				<br><br><div class="text">18,647,794.00</div></td></tr><tr><td width="8%" class="tableClassValign">12</td><td width="92%" class="tableClass">Check if the aggregate amount in Row (11) excludes certain shares (See Instructions)
+				<br><br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked"></td></tr><tr><td width="8%" class="tableClassValign">13</td><td width="92%" class="tableClass">Percent of class represented by amount in Row (11)
+				<br><br><div class="text">14.35 % </div></td></tr><tr><td width="8%" class="tableClassValign">14</td><td width="92%" class="tableClass">Type of Reporting Person (See Instructions)
+				<br><br><div class="text">CO</div></td></tr></table><br><div style="display: flex;"><div style="font-size: 0.9em; font-weight: bold; margin-right: 5px;">
+					Comment for Type of Reporting Person:
+				</div><div class="largetext" style="text-align:justify">Sole voting power and dispositive power is held indirectly through control of Advance/Newhouse Partnership.</div></div><table><tr><td class="center"><br><br><p><div align="center" style="font-size:1.2em;">
+									SCHEDULE 13D
+								</div></p></td></tr></table><table role="presentation" class="tableClass" id="cusipNumber"><tr class="tableClass"><td width="7%" style="font-weight:bold;">CUSIP Number(s):</td><td width="75%"><div style="font-size:.9em; color:#000000">16119P108</div></td></tr></table><br><br><table role="presentation" class="tableClass" id="reportingPersonDetails"><tr class="tableClass"><td width="8%" class="tableClassValign">1</td><td width="92%" class="tableClass">
+					Name of reporting person
+					<br><br><div class="text">Newhouse Family Holdings, L.P.</div></td></tr><tr><td width="8%" class="tableClassValign">2</td><td width="92%" class="tableClass">Check the appropriate box if a member of a Group (See Instructions)
+				<br><br><div class="text"><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked">  (a)
+					<br><img src="/Images/box-checked.jpg" alt="Checkbox checked">  (b)	
+				</div></td></tr><tr class="tableClassWithBgBlack"><td width="8%" class="tableClassValign">3</td><td width="92%" class="tableClass">SEC use only</td></tr><tr><td width="8%" class="tableClassValign">4</td><td width="92%" class="tableClass">
+					Source of funds (See Instructions)
+					<br><br><div class="text">OO</div></td></tr><tr><td width="8%" class="tableClassValign">5</td><td width="92%" class="tableClass">
+					Check if disclosure of legal proceedings is required pursuant to Items 2(d) or 2(e)
+					<br><br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked"></td></tr><tr><td width="8%" class="tableClassValign">6</td><td width="92%" class="tableClass">Citizenship or place of organization
+				<br><br><div class="text">
+				DELAWARE
+			</div></td></tr><tr><td width="8%" class="tableClassValign">Number of Shares Beneficially Owned by Each Reporting Person With:</td><td width="92%" class="tableClass"><table class="innerTableClass"><tr><td width="8%" class="innerTableClassRightValign">7</td><td width="92%" class="tableClassInnerLeft">Sole Voting Power
+							<br><br><div class="text">18,647,794.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">8</td><td width="92%" class="tableClassInnerLeft">Shared Voting Power
+							<br><br><div class="text">0.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">9</td><td width="92%" class="tableClassInnerLeft">Sole Dispositive Power
+							<br><br><div class="text">18,647,794.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValignBottomLess">10</td><td width="92%" class="tableClassInnerLeftBottomLess">Shared Dispositive Power
+							<br><br><div class="text">0.00</div></td></tr></table></td></tr><tr><td width="8%" class="tableClassValign">11</td><td width="92%" class="tableClass">Aggregate amount beneficially owned by each reporting person
+				<br><br><div class="text">18,647,794.00</div></td></tr><tr><td width="8%" class="tableClassValign">12</td><td width="92%" class="tableClass">Check if the aggregate amount in Row (11) excludes certain shares (See Instructions)
+				<br><br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked"></td></tr><tr><td width="8%" class="tableClassValign">13</td><td width="92%" class="tableClass">Percent of class represented by amount in Row (11)
+				<br><br><div class="text">14.35 % </div></td></tr><tr><td width="8%" class="tableClassValign">14</td><td width="92%" class="tableClass">Type of Reporting Person (See Instructions)
+				<br><br><div class="text">PN</div></td></tr></table><br><div style="display: flex;"><div style="font-size: 0.9em; font-weight: bold; margin-right: 5px;">
+					Comment for Type of Reporting Person:
+				</div><div class="largetext" style="text-align:justify">Sole voting power and dispositive power is held indirectly through control of Advance/Newhouse Partnership.</div></div><table><tr><td class="center"><br><br><p><div align="center" style="font-size:1.2em;">
+									SCHEDULE 13D
+								</div></p></td></tr></table><table role="presentation" class="tableClass" id="cusipNumber"><tr class="tableClass"><td width="7%" style="font-weight:bold;">CUSIP Number(s):</td><td width="75%"><div style="font-size:.9em; color:#000000">16119P108</div></td></tr></table><br><br><table role="presentation" class="tableClass" id="reportingPersonDetails"><tr class="tableClass"><td width="8%" class="tableClassValign">1</td><td width="92%" class="tableClass">
+					Name of reporting person
+					<br><br><div class="text">Advance Long-Term Management Trust</div></td></tr><tr><td width="8%" class="tableClassValign">2</td><td width="92%" class="tableClass">Check the appropriate box if a member of a Group (See Instructions)
+				<br><br><div class="text"><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked">  (a)
+					<br><img src="/Images/box-checked.jpg" alt="Checkbox checked">  (b)	
+				</div></td></tr><tr class="tableClassWithBgBlack"><td width="8%" class="tableClassValign">3</td><td width="92%" class="tableClass">SEC use only</td></tr><tr><td width="8%" class="tableClassValign">4</td><td width="92%" class="tableClass">
+					Source of funds (See Instructions)
+					<br><br><div class="text">OO</div></td></tr><tr><td width="8%" class="tableClassValign">5</td><td width="92%" class="tableClass">
+					Check if disclosure of legal proceedings is required pursuant to Items 2(d) or 2(e)
+					<br><br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked"></td></tr><tr><td width="8%" class="tableClassValign">6</td><td width="92%" class="tableClass">Citizenship or place of organization
+				<br><br><div class="text">
+				NEW JERSEY
+			</div></td></tr><tr><td width="8%" class="tableClassValign">Number of Shares Beneficially Owned by Each Reporting Person With:</td><td width="92%" class="tableClass"><table class="innerTableClass"><tr><td width="8%" class="innerTableClassRightValign">7</td><td width="92%" class="tableClassInnerLeft">Sole Voting Power
+							<br><br><div class="text">18,647,794.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">8</td><td width="92%" class="tableClassInnerLeft">Shared Voting Power
+							<br><br><div class="text">0.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">9</td><td width="92%" class="tableClassInnerLeft">Sole Dispositive Power
+							<br><br><div class="text">18,647,794.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValignBottomLess">10</td><td width="92%" class="tableClassInnerLeftBottomLess">Shared Dispositive Power
+							<br><br><div class="text">0.00</div></td></tr></table></td></tr><tr><td width="8%" class="tableClassValign">11</td><td width="92%" class="tableClass">Aggregate amount beneficially owned by each reporting person
+				<br><br><div class="text">18,647,794.00</div></td></tr><tr><td width="8%" class="tableClassValign">12</td><td width="92%" class="tableClass">Check if the aggregate amount in Row (11) excludes certain shares (See Instructions)
+				<br><br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked"></td></tr><tr><td width="8%" class="tableClassValign">13</td><td width="92%" class="tableClass">Percent of class represented by amount in Row (11)
+				<br><br><div class="text">14.35 % </div></td></tr><tr><td width="8%" class="tableClassValign">14</td><td width="92%" class="tableClass">Type of Reporting Person (See Instructions)
+				<br><br><div class="text">OO</div></td></tr></table><br><div style="display: flex;"><div style="font-size: 0.9em; font-weight: bold; margin-right: 5px;">
+					Comment for Type of Reporting Person:
+				</div><div class="largetext" style="text-align:justify">Sole voting power and dispositive power is held indirectly through control of Advance/Newhouse Partnership.</div></div></div><div class="form1"><table><tr><td class="center"><br><br><p><div align="center" style="font-size:1.2em;">
+									SCHEDULE 13D
+								</div></p></td></tr></table><table role="presentation" id="item1to7"><tr><td width="8%" class="tableClassValignNoBorder">Item 1.</td><td width="92%" class="tableClassNoBorder">Security and Issuer</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignCenter">(a)</td><td width="92%" class="tableClassNoBorder">Title of Class of Securities:
+							<br><br><div class="text">Class A Common Stock, $0.001 Par Value</div></td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignCenter">(b)</td><td width="92%" class="tableClassNoBorder">Name of Issuer:
+							<br><br><div class="text">CHARTER COMMUNICATIONS, INC. /MO/</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(c)</td><td width="92%" class="tableClassNoBorder">Address of Issuer's Principal Executive Offices:
+							<br><br><div class="text">400 Washington Blvd., Stamford, 
+				CONNECTICUT
+			, 06902.</div></td></tr><tr><td colspan="3"><div style="display: flex;"><div style="font-size: 0.9em; font-weight: bold; margin-right: 5px;">
+									Item 1 Comment:
+								</div><div class="largetext" style="text-align:justify">This Amendment No. 20 (this "Amendment") amends and supplements the Statement on Schedule 13D (the "Schedule 13D"), which was jointly filed on May 27, 2016, the amended Statement on Schedule 13D, which was jointly filed on December 28, 2016, the amended Statement on Schedule 13D, which was jointly filed on December 21, 2017, the amended Statement on Schedule 13D, which was jointly filed on August 6, 2018, the amended Statement on Schedule 13D, which was jointly filed on July 30, 2019, the amended Statement on Schedule 13D, which was jointly filed on February 5, 2020, the amended Statement on Schedule 13D, which was jointly filed on March 2, 2021, the amended Statement on Schedule 13D, which was jointly filed on March 30, 2021, the amended Statement on Schedule 13D, which was jointly filed on February 8, 2022, the amended Statement on Schedule 13D, which was jointly filed on February 15, 2022, the amended Statement on Schedule 13D, which was jointly filed on February 23, 2022, the amended Statement on Schedule 13D, which was jointly filed on March 1, 2022, the amended Statement on Schedule 13D, which was jointly filed on March 3, 2022, the amended Statement on Schedule 13D, which was jointly filed on March 21, 2023, the amended Statement on Schedule 13D, which was jointly filed on July 25, 2023, the amended Statement on Schedule 13D, which was jointly filed on October 5, 2023, the amended Statement on Schedule 13D, which was jointly filed on October 17, 2023, the amended Statement on Schedule 13D, which was jointly filed on November 2, 2023, the amended Statement on Schedule 13D, which was jointly filed on May 20, 2025, and the amended Statement on Schedule 13D, which was jointly filed on August 4, 2025, and is filed on behalf of Advance/Newhouse Partnership, a New York general partnership ("A/N"), Newhouse Broadcasting Corporation, a New York Corporation ("NBCo"), Advance Publications, Inc., a New York corporation ("API"), Newhouse Family Holdings, L.P., a Delaware limited partnership ("NFH") and Advance Long-Term Management Trust, a New Jersey trust ("Advance Long-Term Trust" and, together with A/N, NBCo, API and NFH, the "Reporting Persons" and each, a "Reporting Person") with respect to (i) the shares of Class A Common Stock, par value $0.001 per share ("Class A Common Stock"), of Charter Communications, Inc., a Delaware corporation (the "Issuer" or "Charter") that are directly or indirectly held by the Reporting Persons and (ii) the shares of Class A Common Stock into which the Class B Common Units ("Class B Common Units") of Charter Holdings that are directly or indirectly held by the Reporting Persons are exchangeable or convertible, as applicable.
+
+On August 19, 2026 (the "Closing Date"), the transactions (the "Transactions") contemplated by the Transaction Agreement, dated May 16, 2025 (the "Transaction Agreement"), by and among the Issuer, Charter Holdings, and Cox Parent (as previously disclosed by the Issuer) closed and, in connection therewith, A/N entered into the following agreements:
+
+-the Third Amended and Restated Stockholders Agreement, which amends and restates the Second Amended and Restated Stockholders Agreement;
+-a letter agreement (the "A/N Letter Agreement"), by and among the Issuer, Charter Holdings and A/N, regarding A/N's participation in share repurchases by the Issuer;
+-the Second Amended and Restated Limited Liability Company Agreement of Charter Holdings (the "Amended LLC Agreement"), by and among the Issuer, Cox NewCo, A/N and the other parties thereto, which amends and restates the Amended and Restated Limited Liability Company Agreement of Charter Holdings, dated as of May 18, 2016, by and among the Issuer, Charter Holdings, A/N and the other parties thereto;
+-the Amended and Restated Tax Receivables Agreement (the "Amended TRA"), by and among the Issuer, Cox NewCo, A/N and the other parties thereto, which amends and restates the Tax Receivables Agreement, dated as of May 18, 2016, by and among the Issuer, A/N and the other parties thereto;
+-the Amended and Restated Exchange Agreement (the "Amended Exchange Agreement"), by and among the Issuer, Cox Parent, Cox NewCo, A/N and the other parties thereto, which amends and restates the Exchange Agreement, dated as of May 18, 2016, by and among the Issuer, A/N and the other parties thereto; and
+-the Amended and Restated Registration Rights Agreement, by and among Charter, Cox Parent, Cox NewCo and A/N (the "Amended RRA" and, collectively with the Third Amended and Restated Stockholders Agreement, the A/N Letter Agreement, the Amended LLC Agreement, the Amended TRA, and the Amended Exchange Agreement, the "Ancillary Agreements"), which amends and restates the Registration Rights Agreement, dated as of May 18, 2016, by and among Charter, A/N, Liberty and the other parties thereto.
+
+As previously reported, on August 4, 2025, pursuant to the terms of the Share Repurchase Agreement, A/N delivered to the Issuer a suspension notice (the "Suspension Notice") which suspended the share repurchase program under the Share Repurchase Agreement (such suspension, the "Suspension of the Share Repurchases"). In the Suspension Notice, A/N informed the Issuer that A/N presently intends for the suspension to continue through the consummation of the closing of the transactions contemplated by the Transaction Agreement or the termination thereof, but reserves the right to end such suspension before or after such time. Following the execution of the A/N Letter Agreement, A/N intends that the Suspension of the Share Repurchases shall continue until such time as A/N delivers a notice to the Issuer terminating the Suspension of the Share Repurchases.
+
+This Amendment is being filed for purposes of disclosing (i) the Ancillary Agreements and (ii) the continued Suspension of the Share Repurchases.</div></div></td></tr><tr><td width="8%" class="tableClassValignNoBorder">Item 4.</td><td width="92%" class="tableClassNoBorder">Purpose of Transaction</td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter"> </td><td width="92%" class="tableClassNoBorder"><div class="largetext">The information with respect to the consummation of the Transactions and the Ancillary Agreements entered into in connection therewith, as well as the continued Suspension of the Share Repurchases set forth in Items 5(c) and 6 is incorporated herein by reference to the extent responsive to this Item 4.</div></td></tr><tr><td width="8%" class="tableClassValignNoBorder">Item 5.</td><td width="92%" class="tableClassNoBorder">Interest in Securities of the Issuer</td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(a)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">Item 5(a) of the Schedule 13D is amended and supplemented to read as follows:
+
+(a) The Reporting Persons are the beneficial owner of 18,647,794 shares of Class A Common Stock (including Class B Common Units on an as-converted, as-exchanged basis). The 18,647,794 shares of Class A Common Stock constitute approximately 14.35% of the outstanding shares of Class A Common Stock, based on approximately 129.94 million shares of Class A Common Stock outstanding as of August 20, 2026 (as provided by the Issuer on such date). In addition, Michael A. Newhouse is the beneficial owner of 6,181 shares of restricted Class A Common Stock received by him in connection with his services as a director of the Issuer and Samuel I. Newhouse, III, is the beneficial owner of 593 shares of Class A Common Stock.</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(b)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">Item 5(b) of the Schedule 13D is amended and supplemented to read as follows:
+
+(b) The Reporting Persons have the sole power to (i) vote or direct the voting of 18,647,794 shares of Class A Common Stock beneficially owned by them as described in the Schedule 13D (including Class B Common Units on an as-converted, as-exchanged basis) and (ii) dispose or direct the disposition of such shares, in each case, subject to the terms of the Amended LLC Agreement, Amended Exchange Agreement and Third Amended and Restated Stockholders Agreement, as described in the Schedule 13D (as amended). Michael A. Newhouse has sole voting and dispositive power over 6,181 shares of restricted Class A Common Stock beneficially owned by him. Samuel I. Newhouse, III, has sole voting and dispositive power over the 593 shares of Class A Common Stock beneficially owned by him.</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(c)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">On August 4, 2025, pursuant to the terms of the Share Repurchase Agreement, A/N delivered to the Issuer the Suspension Notice which suspended the share repurchase program under the Share Repurchase Agreement. In the Suspension Notice, A/N has informed the Issuer that A/N presently intends for the suspension to continue through the consummation of the closing of the transactions contemplated by the Transaction Agreement or the termination thereof, but reserves the right to end such suspension before or after such time. Following the execution of the A/N Letter Agreement, A/N intends that the Suspension of the Share Repurchases shall continue until such time as A/N delivers a notice to the Issuer terminating the Suspension of the Share Repurchases.</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(d)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">Not applicable.</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(e)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">Not applicable.</div></td></tr><tr><td width="8%" class="tableClassValignNoBorder">Item 6.</td><td width="92%" class="tableClassNoBorder">Contracts, Arrangements, Understandings or Relationships With Respect to Securities of the Issuer</td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter"> </td><td width="92%" class="tableClassNoBorder"><div class="largetext">Item 6 of the Schedule 13D is supplemented as follows:
+
+Third Amended and Restated Stockholders Agreement
+
+The Third Amended and Restated Stockholders Agreement provides, among other things, that on the Closing Date, the size of the board of directors of Charter (the "Board") will be thirteen directors, the Liberty director designees will resign from the Board, A/N's director designees will continue to serve on the Board and Cox Parent's three designees will be appointed to the Board. From and after the closing of the Transactions, each of Cox Parent and A/N are entitled to designate up to three nominees to be elected to the Board, provided that each maintains certain specified voting or equity ownership thresholds. Cox Parent and A/N also have certain committee designation rights, subject to applicable stock exchange rules and certain specified voting or equity ownership thresholds, and other governance rights. Additionally, the Third Amended and Restated Stockholders Agreement provides that each of Cox Parent and A/N are subject to certain limits on acquisitions of equity securities of Charter (30% in the case of Cox Parent; 19% in the case of A/N). In addition, any shares owned by Cox Parent or A/N in excess of its applicable voting cap (30% in the case of Cox Parent; 15% in the case of A/N) must be voted in proportion to the public stockholders of Charter, other than with respect to certain specified matters.  Pursuant to the Third Amended and Restated Stockholders Agreement, each of Cox Parent and A/N are subject to certain standstill provisions and are not permitted to form a group, within the meaning of Regulation 13D, with each other or otherwise have arrangements or understandings concerning Charter except as otherwise permitted by the Third Amended and Restated Stockholders Agreement. Pursuant to the Third Amended and Restated Stockholders Agreement, each of Cox Parent and A/N are entitled to preemptive rights to maintain their respective percentage equity ownership of Charter in certain specified circumstances and to the extent that each maintains certain specified thresholds of equity ownership in Charter.  Each of Cox Parent and A/N are subject to certain restrictions on their ability to sell, transfer or dispose of their Charter securities.  The rights of each of Cox Parent and A/N under the Third Amended and Restated Stockholders Agreement will generally terminate as such party falls below certain equity ownership thresholds, subject to certain grace periods during which such party can return its ownership or voting interest to the applicable threshold.
+
+The Third Amended and Restated Stockholders Agreement also provides that, on the Closing Date, (i) Alexander C. Taylor, Chairman and Chief Executive Officer of Cox Parent, will serve as the Chairman of the Board for an initial three-year term (unless Mr. Taylor ceases to serve as a member of the Board prior thereto) and (ii) the lead independent director of the Board will be Eric L. Zinterhofer. Following Mr. Taylor's term as Chairman, the Board will return to its normal annual process. Additionally, following Mr. Taylor's term as Chairman, Christopher L. Winfrey, the Chief Executive Officer of Charter, will serve as Chairman of the Board; provided that if Mr. Winfrey is no longer a member of the Board or is unwilling to serve as Chairman, then Mr. Zinterhofer instead will serve as Chairman (subject to his continued membership on the Board and willingness to serve).
+
+The foregoing description of the Third Amended and Restated Stockholders Agreement does not purport to be complete and is subject to, and qualified in its entirety by, the Third Amended and Restated Stockholders Agreement, a copy of which is attached as Exhibit 10.1 hereto and incorporated herein by reference.
+
+A/N Letter Agreement
+
+On August 19, 2026, the Issuer, Charter Holdings and A/N entered the A/N Letter Agreement, which, among other things, terminates the Share Repurchase Agreement and sets forth the updated terms of A/N's participation in the Issuer's share repurchases going forward. Under the A/N Letter Agreement, A/N will sell to the Issuer or to Charter Holdings, generally on a monthly basis, a number of shares of the Issuer's Class A Common Stock or Charter Holdings common units that represents a pro rata participation by A/N and its affiliates in any repurchases of shares of the Issuer's Class A Common Stock from persons other than A/N or Cox Parent effected by the Issuer during the immediately preceding calendar month, at a purchase price equal to the average price paid by the Issuer for the shares repurchased from persons other than A/N or Cox Parent during such immediately preceding calendar month and excluding repurchases in privately negotiated transactions or deemed repurchases due to cashless exercise of or payment of withholding taxes with respect to director, officer or employee equity awards of the Issuer. The Issuer has the right to terminate this arrangement (i) prior to August 19, 2032, if an unforeseen circumstance arises that would cause the continued repurchases to result in any significant adverse impact to the Issuer as determined by the Issuer in good faith or (ii) at any time after August 19, 2032. A/N has the right to terminate or suspend the repurchase arrangement at any time. A/N has exercised its right to suspend its participation in the repurchase arrangement until such time as A/N chooses to end the suspension by providing a written notice to the Issuer in accordance with the terms of the A/N Letter Agreement.
+
+The foregoing description of the A/N Letter Agreement does not purport to be complete and is subject to, and qualified in its entirety by, the A/N Letter Agreement, a copy of which is attached as Exhibit 10.2 hereto and incorporated herein by reference.
+
+Amended LLC Agreement
+
+The Amended LLC Agreement amends and restates the amended and restated limited liability company agreement of Charter Holdings, dated as of May 18, 2016, by and among Charter, Charter Holdings, A/N and the other parties thereto. The Amended LLC Agreement, among other things, specifies the terms of the Charter Holdings common units and Charter Holdings convertible preferred units, consistent with the preferred term sheet filed as Exhibit C to the Transaction Agreement.
+
+The foregoing description of the Amended LLC Agreement does not purport to be complete and is subject to, and qualified in its entirety by, the Amended LLC Agreement, a copy of which is attached as Exhibit 10.3 hereto and incorporated herein by reference.
+
+Amended TRA
+
+The Amended TRA amends and restates the tax receivables agreement, dated as of May 18, 2016, by and among Charter, A/N and the other parties thereto. The Amended TRA sets forth the terms pursuant to which Charter will pay A/N and Cox NewCo, as applicable, for tax benefits arising from A/N's or Cox NewCo's potential future exchanges of their respective Charter Holdings common units and Charter Holdings convertible preferred units, as applicable, into cash or Charter Class A common stock pursuant to the Amended Exchange Agreement.
+
+The foregoing description of the Amended TRA does not purport to be complete and is subject to, and qualified in its entirety by, the Amended TRA, a copy of which is attached as Exhibit 10.4 hereto and incorporated herein by reference.
+
+Amended Exchange Agreement
+
+The Amended Exchange Agreement amends and restates the exchange agreement, dated as of May 18, 2016, by and among Charter, A/N and the other parties thereto. The Amended Exchange Agreement specifies the terms pursuant to which Cox Parent and A/N may exchange their respective Charter Holdings common units into Charter Class A common stock, cash or a combination thereof.
+
+The foregoing description of the Amended Exchange Agreement does not purport to be complete and is subject to, and qualified in its entirety by, the Amended Exchange Agreement, a copy of which is attached as Exhibit 10.5 hereto and incorporated herein by reference.
+
+Amended RRA
+
+The Amended RRA amends and restates the registration rights agreement, dated as of May 18, 2016, by and among Charter, A/N and Liberty. The Amended RRA provides, among other things, that A/N and Cox Parent may require that Charter register for resale the Charter Class A common stock issuable upon the conversion or exchange of Charter Holdings common units and Charter Holdings convertible preferred units in certain circumstances and subject to certain thresholds and exceptions.
+
+The foregoing description of the Amended RRA does not purport to be complete and is subject to, and qualified in its entirety by, the Amended RRA, a copy of which is attached as Exhibit 10.6 hereto and incorporated herein by reference.</div></td></tr><tr><td width="8%" class="tableClassValignNoBorder">Item 7.</td><td width="92%" class="tableClassNoBorder">Material to be Filed as Exhibits.</td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter"> </td><td width="92%" class="tableClassNoBorder"><div class="largetext">Exhibit 10.1 - Third Amended and Restated Stockholders Agreement, dated as of August 19, 2026, by and among Charter Communications, Inc., Cox Enterprises, Inc., Cox Communications Equity Holdings, Inc. and Advance/Newhouse Partnership (incorporated by reference to Exhibit 10.1 to the Form 8-K filed by the Issuer on August 20, 2026).
+
+Exhibit 10.2 - Letter Agreement, dated as of August 19, 2026, by and among Charter Communications, Inc., Charter Communications Holdings, LLC and Advance/Newhouse Partnership (incorporated by reference to Exhibit 10.3 to the Form 8-K filed by the Issuer on August 20, 2026).
+
+Exhibit 10.3 - Second Amended and Restated Limited Liability Company Agreement of Charter Communications Holdings, LLC, dated as of August 19, 2026, by and among Charter Communications, Inc., Cox Communications Equity Holdings, Inc., Advance/Newhouse Partnership and the other parties thereto (incorporated by reference to Exhibit 10.4 to the Form 8-K filed by the Issuer on August 20, 2026).
+
+Exhibit 10.4 - Amended and Restated Tax Receivables Agreement, dated as of August 19, 2026, by and among Charter Communications, Inc., Cox Communications Equity Holdings, Inc., Advance/Newhouse Partnership and the other parties thereto (incorporated by reference to Exhibit 10.5 to the Form 8-K filed by the Issuer on August 20, 2026).
+
+Exhibit 10.5 - Amended and Restated Exchange Agreement, dated as of August 19, 2026, by and among Charter Communications, Inc., Cox Enterprises, Inc., Cox Communications Equity Holdings, Inc., Advance/Newhouse Partnership and the other parties thereto (incorporated by reference to Exhibit 10.6 to the Form 8-K filed by the Issuer on August 20, 2026).
+
+Exhibit 10.6 - Amended and Restated Registration Rights Agreement, dated as of August 19, 2026, by and among Charter Communications, Inc., Cox Enterprises, Inc., Cox Communications Equity Holdings, Inc. and Advance/Newhouse Partnership (incorporated by reference to Exhibit 10.7 to the Form 8-K filed by the Issuer on August 20, 2026).</div></td></tr></table><br></div><div class="form1"><table role="presentation" id="signatureInfo"><tr><td width="8%" class="tableClassValignNoBorder">    SIGNATURE</td><td width="92%" class="tableClassNoBorder"> </td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter"> </td><td width="92%" class="tableClassNoBorder"><div class="information" style="text-align:justify">
+						After reasonable inquiry and to the best of my knowledge and belief, I certify that the information set forth in this statement is true, complete and correct.
+						<br><br></div></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="100%" class="tableClassInnerNoBorderBlue"><div class="text">Advance/Newhouse Partnership</div></td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Signature:</td><td width="92%" class="tableClassNoBorderBlue signature">/s/ Oren Klein</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Name/Title:</td><td width="92%" class="tableClassNoBorderBlue signature">Oren Klein, Chief Financial Officer</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Date:</td><td width="92%" class="tableClassNoBorderBlue signature">08/20/2026</td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="100%" class="tableClassInnerNoBorderBlue"><div class="text">Newhouse Broadcasting Corporation</div></td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Signature:</td><td width="92%" class="tableClassNoBorderBlue signature">/s/ Oren Klein</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Name/Title:</td><td width="92%" class="tableClassNoBorderBlue signature">Oren Klein, Chief Financial Officer</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Date:</td><td width="92%" class="tableClassNoBorderBlue signature">08/20/2026</td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="100%" class="tableClassInnerNoBorderBlue"><div class="text">Advance Publications, Inc.</div></td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Signature:</td><td width="92%" class="tableClassNoBorderBlue signature">/s/ Oren Klein</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Name/Title:</td><td width="92%" class="tableClassNoBorderBlue signature">Oren Klein, Chief Financial Officer</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Date:</td><td width="92%" class="tableClassNoBorderBlue signature">08/20/2026</td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="100%" class="tableClassInnerNoBorderBlue"><div class="text">Newhouse Family Holdings, L.P.</div></td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Signature:</td><td width="92%" class="tableClassNoBorderBlue signature">/s/ Michael A. Newhouse</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Name/Title:</td><td width="92%" class="tableClassNoBorderBlue signature">Michael A. Newhouse, Trustee, Advance Long-Term Management Trust as General Partner</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Date:</td><td width="92%" class="tableClassNoBorderBlue signature">08/20/2026</td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="100%" class="tableClassInnerNoBorderBlue"><div class="text">Advance Long-Term Management Trust</div></td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Signature:</td><td width="92%" class="tableClassNoBorderBlue signature">/s/ Michael A. Newhouse</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Name/Title:</td><td width="92%" class="tableClassNoBorderBlue signature">Michael A. Newhouse, Trustee</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Date:</td><td width="92%" class="tableClassNoBorderBlue signature">08/20/2026</td></tr></table></td></tr></table></div></div>
+<script type="text/javascript"  src="/N3AEOPt9/dJoipWz/rYwIB5c/dg/YEaQGVVmDJktp27Xmu/SixucGdeLAQ/KXhNJ/AQsW1I"></script></body></html>

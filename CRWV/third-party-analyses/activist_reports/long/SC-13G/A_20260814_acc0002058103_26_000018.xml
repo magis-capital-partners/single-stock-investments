@@ -1,0 +1,695 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns:p="http://www.sec.gov/edgar/schedule13g" xmlns:p1="http://www.sec.gov/edgar/common"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><link rel="stylesheet" type="text/css" href="/css/SDR_print.css"><style type="text/css">
+					.fakeTextBox {
+					border-top: 2px solid #999;
+					border-right: 1px solid #ccc;
+					border-bottom: 1px solid #ccc;
+					border-left: 2px solid #999;
+					padding: 2px;
+					_width: 800px;
+					height: auto;
+					min-width: 200px;
+					min-height: 50px;
+					word-wrap: break-word;
+					font-size: 0.9em;
+					color: blue;
+					}
+				</style><style type="text/css">
+					table.tableClass { border: solid black;
+					border-top-width: 1;
+					border-right-width: 1;
+					border-bottom-width: 1;
+					border-left-width: 1;
+					table-layout:fixed;
+					}
+					table.innerTableClass { border: solid black;
+					border-top-width: 0;
+					border-right-width: 0;
+					border-bottom-width: 0;
+					border-left-width: 0;
+					table-layout:fixed;
+					}
+					table.collapsabletableClass { 
+					border-collapse:collapse; 
+					border-top-width: 0;
+					border-right-width: 0;
+					border-bottom-width: 0;
+					border-left-width: 0;
+					table-layout:fixed;
+					}
+					th.tableClassLeft { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					padding: 2px;
+					}
+					th.tableClassRight { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 0;
+					padding: 2px;
+					}
+					th.tableClass { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					padding: 2px;
+					}
+					td.tableClassLeft { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					font-size: 0.9em;
+					color: blue;
+					word-wrap: break-word;
+					}
+					td.tableClassRight { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 0;
+					font-size: 0.9em;
+					color: blue;
+					word-wrap: break-word;
+					}
+					td.tableClass { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					font-size: 0.9em;
+					font-weight:bold;
+					color: black;
+					word-wrap: break-word;
+					}
+					td.tableClassNoBorder { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 0px;
+					font-size: 0.9em;
+					font-weight:bold;
+					color: black;
+					word-wrap: break-word;
+					}
+					
+					td.tableClassNoBorderBlue { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 0px;
+					font-size: 0.9em;
+					font-weight:bold;
+					color: blue;
+					word-wrap: break-word;
+					}
+					
+					td.tableClassInnerNoBorderBlue { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 0px;
+					font-size: 1.4em;
+					font-weight:bold;
+					color: blue;
+					word-wrap: break-word;
+					}
+					
+					td.tableClassNoBorderAlignLeft { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 0px;
+					font-size: 0.9em;
+					font-weight:bold;
+					text-align: left;
+					color: black;
+					word-wrap: break-word;
+					}
+					
+					td.signature {
+					padding: 4px 8px;
+					}
+					
+					td.tableClassInner { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					font-size: 1em;
+					font-weight:bold;
+					color: black;
+					word-wrap: break-word;
+					}
+					
+					td.tableClassValign { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					font-size: 0.9em;
+					font-weight:bold;
+					color: black;
+					vertical-align: middle;
+					text-align: center;
+					word-wrap: break-word;
+					}
+					
+					td.tableClassValignNoBorder { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 0px;
+					font-size: 0.9em;
+					font-weight:bold;
+					color: black;
+					vertical-align: middle;
+					text-align: center;
+					word-wrap: break-word;
+					}
+					
+					td.tableClassValignInner { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					font-size: 1em;
+					font-weight:bold;
+					color: black;
+					vertical-align: middle;
+					text-align: center;
+					word-wrap: break-word;
+					}
+					
+					td.innerTableClassRightValign { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 0;
+					font-size: 1em;
+					font-weight:bold;
+					color: black;
+					vertical-align: middle;
+					text-align: center;
+					word-wrap: break-word;
+					}
+					
+					td.innerTableClassRightValignBottomLess { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 0px;
+					border-left-width: 0;
+					font-size: 1em;
+					font-weight:bold;
+					color: black;
+					vertical-align: middle;
+					text-align: center;
+					word-wrap: break-word;
+					}
+					
+					td.tableClassInnerLeft { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					font-size: 1em;
+					font-weight:bold;
+					color: black;
+					word-wrap: break-word;
+					}
+					
+					td.tableClassInnerLeftBottomLess { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 1px;
+					font-size: 1em;
+					font-weight:bold;
+					color: black;
+					word-wrap: break-word;
+					}
+					
+					td.tableClassNoBorderAlignCenter { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 0px;
+					font-size: 0.9em;
+					font-weight:bold;
+					color: black;
+					text-align: center;
+					word-wrap: break-word;
+					}
+					
+					tr.tableClass { border: solid black;
+					border-top-width: 1px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					}
+					tr.tableClassWithBg { border: solid black;
+					border-top-width: 0;
+					border-right-width: 1;
+					border-bottom-width: 1;
+					border-left-width: 0;
+					background-color: #e0e0ff
+					}
+					
+					tr.tableClassWithBgBlack { border: solid black;
+					border-top-width: 0;
+					border-right-width: 1;
+					border-bottom-width: 1;
+					border-left-width: 0;
+					background-color: #D3D3D3
+					}
+					
+					hr.header {
+        			position: relative;
+        			top: 20px;
+        			border: none;
+        			height: 6px;
+        			background: black;
+        			margin-bottom: 10px;
+    				}
+    				
+    				hr.separatorThin {
+        			position: relative;
+        			top: 2px;
+        			border: none;
+        			height: 2px;
+        			background: black;
+        			margin-bottom: 2px;
+    				}
+					
+					hr.headerThin {
+        			position: relative;
+        			top: 10px;
+        			border: none;
+        			height: 2px;
+        			background: black;
+        			margin-bottom: 10px;
+    				}
+    				
+					hr.separator {
+        			position: relative;
+        			top: 20px;
+        			border: none;
+        			height: 4px;
+        			background: black;
+        			margin-bottom: 5px;
+    				}
+    				
+    				div.text {
+  						background-color: #ffffff;
+  						color: blue;
+  						font-size: 1em;
+  						font-weight:normal;
+  						text-align:justify;
+					}
+					
+					div.largetext {
+  						background-color: #ffffff;
+  						color: blue;
+  						font-size: 1em;
+  						font-weight:normal;
+  						text-align:justify;
+  						white-space: pre-wrap;
+					}
+					
+					
+					div.information {
+  						background-color: #ffffff;
+  						color: black;
+  						font-size: 1em;
+  						font-weight:normal;
+  						text-align:justify;
+					}
+					
+					#scheader {
+						font-size: 0.9em;
+						border: 0px solid #404040;
+						border-spacing: 2px;
+					}
+					
+				</style></head><body lang="en-US" text="#000000" bgcolor="#ffffff"><hr class="header"><br><hr class="headerThin"><div class="contentwrapper"><table role="presentation" id="scheader"><tr><td class="tableClassNoBorderAlignCenter" style="font-size:2em;">
+						SECURITIES AND EXCHANGE COMMISSION
+						<br>
+						Washington, D.C. 20549
+					</td></tr><tr><td class="tableClassNoBorderAlignCenter"><br><br><div style="font-size:1.5em;">
+									SCHEDULE 13G
+								</div><br><br></td></tr><tr><td class="tableClassNoBorderAlignCenter"><div style="font-size:1.2em;">
+							UNDER THE SECURITIES EXCHANGE ACT OF 1934
+					</div></td></tr><tr><td class="center"><div class="information" style="text-align:center; font-weight:bold;">
+									(Amendment No. <span style="color:blue;">2</span>)
+								</div><br><br></td></tr><tr><td class="center"><div class="information" style="text-align:center; font-weight:bold; color:blue;">COREWEAVE, INC.</div><div class="information" style="text-align:center; font-weight:bold;"><hr class="separatorThin">(Name of Issuer)</div><br><br></td></tr><tr><td class="center"><div class="information" style="text-align:center; font-weight:bold; color:blue;">Class A Common Stock, par value $0.000005 per share</div><div class="information" style="text-align:center; font-weight:bold;"><hr class="separatorThin">(Title of Class of Securities)</div><br><br></td></tr><table border="1"><tr><td><div class="information" style="text-align:center; font-weight:bold; color:blue;">21873S108</div><div class="information" style="text-align:center; font-weight:bold;"><hr class="separatorThin">(CUSIP Number)</div></td></tr><br><br></table><tr><td class="center"><div class="information" style="text-align:center; font-weight:bold; color:blue;">06/30/2026</div><div class="information" style="text-align:center; font-weight:bold;"><hr class="separatorThin">(Date of Event Which Requires Filing of this Statement)</div></td></tr></table><br><br><table><tr><td class="label"> Check the appropriate box to designate the rule pursuant to which this Schedule is filed:</td></tr><tr><td><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked">   Rule 13d-1(b)
+					</td></tr><tr><td><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked">   Rule 13d-1(c)
+					</td></tr><tr><td><img src="/Images/box-checked.jpg" alt="Checkbox checked">   Rule 13d-1(d)
+				</td></tr></table></div><hr class="headerThin"><hr class="header"><br><br>
+  <div style="display:none">
+			schemaVersion:
+			</div>
+<div class="content"><div class="form1"></div></div>
+
+  <div class="content"><div class="form1"><table><tr><td class="center"><br><br><p><div align="center" style="font-size:1.2em;">
+								SCHEDULE 13G
+							</div></p></td></tr></table><table role="presentation" class="tableClass" id="cusipNumber"><tr class="tableClass"><td width="7%" style="font-weight:bold;">CUSIP Number(s):</td><td width="75%"><div style="font-size:.9em; color:#000000">21873S108</div></td></tr></table><br><br><table role="presentation" class="tableClass" id="reportingPersonDetails"><tr class="tableClass"><td width="8%" class="tableClassValign">1</td><td width="92%" class="tableClass">Names of Reporting Persons
+				<br><br><div class="text">Brannin McBee</div></td></tr><tr><td width="8%" class="tableClassValign">2</td><td width="92%" class="tableClass">Check the appropriate box if a member of a Group (see instructions)
+				<br><br><div class="text"><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked">  (a)
+					<br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked">  (b)	
+				</div></td></tr><tr class="tableClassWithBgBlack"><td width="8%" class="tableClassValign">3</td><td width="92%" class="tableClass">Sec Use Only</td></tr><tr><td width="8%" class="tableClassValign">4</td><td width="92%" class="tableClass">Citizenship or Place of Organization
+				<br><br><div class="text">
+				UNITED STATES
+			</div></td></tr><tr><td width="8%" class="tableClassValign">Number of Shares Beneficially Owned by Each Reporting Person With:</td><td width="92%" class="tableClass"><table class="innerTableClass"><tr><td width="8%" class="innerTableClassRightValign">5</td><td width="92%" class="tableClassInnerLeft">Sole Voting Power
+							<br><br><div class="text">7,764,495.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">6</td><td width="92%" class="tableClassInnerLeft">Shared Voting Power
+							<br><br><div class="text">5,934,600.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">7</td><td width="92%" class="tableClassInnerLeft">Sole Dispositive Power
+							<br><br><div class="text">7,764,495.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValignBottomLess">8</td><td width="92%" class="tableClassInnerLeftBottomLess">Shared Dispositive Power
+							<br><br><div class="text">5,934,600.00</div></td></tr></table></td></tr><tr><td width="8%" class="tableClassValign">9</td><td width="92%" class="tableClass">Aggregate Amount Beneficially Owned by Each Reporting Person
+				<br><br><div class="text">13,699,095.00</div></td></tr><tr><td width="8%" class="tableClassValign">10</td><td width="92%" class="tableClass">Check box if the aggregate amount in row (9) excludes certain shares (See Instructions)
+				<br><br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked"></td></tr><tr><td width="8%" class="tableClassValign">11</td><td width="92%" class="tableClass">Percent of class represented by amount in row (9)
+				<br><br><div class="text">2.9 % </div></td></tr><tr><td width="8%" class="tableClassValign">12</td><td width="92%" class="tableClass">Type of Reporting Person (See Instructions)
+				<br><br><div class="text">IN</div></td></tr></table><br><div class="largetext"><span style="color:black;font-weight:bold;">Comment for Type of Reporting Person:</span>  This Amendment No. 2 (this "Amendment") amends, in its entirety, the statement on Schedule 13G originally filed with the SEC on May 15, 2025, and subsequently amended on February 13, 2026, by the Reporting Persons.  This Amendment is the final amendment to the Schedule 13G and constitutes an exit filing for the Reporting Persons.
+
+The total reported in Rows 5 and 7 includes:  (i) 323,263 shares of Class A common stock of CoreWeave, Inc. (the "Issuer") directly held by Mr. McBee; (ii) 6,474,894 shares of the Issuer's Class B common stock directly held by Mr. McBee; (iii) 1,800 shares of the Issuer's Class A common stock directly held of record by Mr. McBee's child; (iv) 956,500 shares issuable upon the exercise of stock options which are vested and exercisable within 60 days of June 30, 2026, and (v) 8,038 shares of Class A common stock underlying restricted stock units that will vest and settle within 60 days of June 30, 2026.  The aforementioned stock options are exercisable for shares of Class A common stock and thereupon may be exchanged on a one-for-one basis for shares of the Issuer's Class B common stock pursuant to an agreement between Mr. McBee and the Issuer.
+
+The reported total in Rows 6 and 8 includes:  (i) 108,600 shares of Class B common stock held directly by Canis Major 2025 Family Trust LLC ("Canis Major LLC"); (ii) 122,000 shares of Class B common stock held directly by Canis Minor 2025 Family Trust LLC (the "Canis Minor LLC"); (iii) 3,757,227 shares of Class B common stock held directly by the Canis Major 2025 GRAT; (iv) 1,582,773 shares of Class B common stock held directly by the Canis Major 2026 GRAT; (v) 312,000 shares of Class B common stock held directly by Canis Major 2024 Irrevocable Trust LLC ("Canis Irrevocable Trust LLC"); and (vi) 52,000 shares of Class A common stock held directly by the Canis Major SM Trust (the "SM Trust").  Mr. McBee serves as the manager of Canis Major LLC, Canis Minor LLC and Canis Irrevocable Trust LLC, and as trustee of the Canis Major 2025 GRAT and the Canis Major 2026 GRAT, and he may be deemed to exercise voting and investment discretion over securities held by those entities in such capacities.  Mr. McBee also has the power to remove and replace the trustee of the SM Trust.
+
+The percentage reported in Row 11 was calculated in accordance with Rule 13(d)-3(d)(1)(i) promulgated under the Securities Exchange Act of 1934, as amended (the "Exchange Act") based on an aggregate total of 447,573,939 shares of the Issuer's Class A common stock outstanding as of April 30, 2026, as reported by the Issuer in its Quarterly Report on Form 10-Q for the period ended March 31, 2026, filed with the U.S. Securities and Exchange Commission (the "SEC") on May 8, 2026.</div><table><tr><td class="center"><br><br><p><div align="center" style="font-size:1.2em;">
+								SCHEDULE 13G
+							</div></p></td></tr></table><table role="presentation" class="tableClass" id="cusipNumber"><tr class="tableClass"><td width="7%" style="font-weight:bold;">CUSIP Number(s):</td><td width="75%"><div style="font-size:.9em; color:#000000">21873S108</div></td></tr></table><br><br><table role="presentation" class="tableClass" id="reportingPersonDetails"><tr class="tableClass"><td width="8%" class="tableClassValign">1</td><td width="92%" class="tableClass">Names of Reporting Persons
+				<br><br><div class="text">Meghan Q. Bennett</div></td></tr><tr><td width="8%" class="tableClassValign">2</td><td width="92%" class="tableClass">Check the appropriate box if a member of a Group (see instructions)
+				<br><br><div class="text"><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked">  (a)
+					<br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked">  (b)	
+				</div></td></tr><tr class="tableClassWithBgBlack"><td width="8%" class="tableClassValign">3</td><td width="92%" class="tableClass">Sec Use Only</td></tr><tr><td width="8%" class="tableClassValign">4</td><td width="92%" class="tableClass">Citizenship or Place of Organization
+				<br><br><div class="text">
+				UNITED STATES
+			</div></td></tr><tr><td width="8%" class="tableClassValign">Number of Shares Beneficially Owned by Each Reporting Person With:</td><td width="92%" class="tableClass"><table class="innerTableClass"><tr><td width="8%" class="innerTableClassRightValign">5</td><td width="92%" class="tableClassInnerLeft">Sole Voting Power
+							<br><br><div class="text">1,980,300.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">6</td><td width="92%" class="tableClassInnerLeft">Shared Voting Power
+							<br><br><div class="text">4,316,020.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">7</td><td width="92%" class="tableClassInnerLeft">Sole Dispositive Power
+							<br><br><div class="text">1,980,300.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValignBottomLess">8</td><td width="92%" class="tableClassInnerLeftBottomLess">Shared Dispositive Power
+							<br><br><div class="text">4,316,020.00</div></td></tr></table></td></tr><tr><td width="8%" class="tableClassValign">9</td><td width="92%" class="tableClass">Aggregate Amount Beneficially Owned by Each Reporting Person
+				<br><br><div class="text">6,296,320.00</div></td></tr><tr><td width="8%" class="tableClassValign">10</td><td width="92%" class="tableClass">Check box if the aggregate amount in row (9) excludes certain shares (See Instructions)
+				<br><br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked"></td></tr><tr><td width="8%" class="tableClassValign">11</td><td width="92%" class="tableClass">Percent of class represented by amount in row (9)
+				<br><br><div class="text">1.3 % </div></td></tr><tr><td width="8%" class="tableClassValign">12</td><td width="92%" class="tableClass">Type of Reporting Person (See Instructions)
+				<br><br><div class="text">IN</div></td></tr></table><br><div class="largetext"><span style="color:black;font-weight:bold;">Comment for Type of Reporting Person:</span>  The total reported in Rows 5 and 7 includes:  (i) 1,980,300 shares of Class B common stock held directly by Ms. Bennett, Mr. McBee's spouse.  The reported total in Rows 6 and 8 includes:  (i) 3,541,020 shares of Class B common stock held directly by the Brannin J. McBee 2022 Irrevocable Trust (the "McBee Trust"); (ii) 511,205 shares of Class B common stock held directly by the Canis Minor 2025 GRAT; and (iii) 263,795 shares of Class B common stock held directly by the Canis Minor 2026 GRAT.  Ms. Bennett serves as trustee of the McBee Trust, the Canis Minor 2025 GRAT, and the Canis Minor 2026 GRAT and may be deemed to exercise voting and investment discretion over the reported securities in such capacities.
+
+The percentage reported in Row 11 was calculated in accordance with Rule 13(d)-3(d)(1)(i) promulgated under the Exchange Act based on an aggregate total of 447,573,939 shares of the Issuer's Class A common stock outstanding as of April 30, 2026, as reported by the Issuer in its Quarterly Report on Form 10-Q for the period ended March 31, 2026, filed with the SEC on May 8, 2026.</div><table><tr><td class="center"><br><br><p><div align="center" style="font-size:1.2em;">
+								SCHEDULE 13G
+							</div></p></td></tr></table><table role="presentation" class="tableClass" id="cusipNumber"><tr class="tableClass"><td width="7%" style="font-weight:bold;">CUSIP Number(s):</td><td width="75%"><div style="font-size:.9em; color:#000000">21873S108</div></td></tr></table><br><br><table role="presentation" class="tableClass" id="reportingPersonDetails"><tr class="tableClass"><td width="8%" class="tableClassValign">1</td><td width="92%" class="tableClass">Names of Reporting Persons
+				<br><br><div class="text">Canis Major 2025 Family Trust LLC</div></td></tr><tr><td width="8%" class="tableClassValign">2</td><td width="92%" class="tableClass">Check the appropriate box if a member of a Group (see instructions)
+				<br><br><div class="text"><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked">  (a)
+					<br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked">  (b)	
+				</div></td></tr><tr class="tableClassWithBgBlack"><td width="8%" class="tableClassValign">3</td><td width="92%" class="tableClass">Sec Use Only</td></tr><tr><td width="8%" class="tableClassValign">4</td><td width="92%" class="tableClass">Citizenship or Place of Organization
+				<br><br><div class="text">
+				DELAWARE
+			</div></td></tr><tr><td width="8%" class="tableClassValign">Number of Shares Beneficially Owned by Each Reporting Person With:</td><td width="92%" class="tableClass"><table class="innerTableClass"><tr><td width="8%" class="innerTableClassRightValign">5</td><td width="92%" class="tableClassInnerLeft">Sole Voting Power
+							<br><br><div class="text">0.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">6</td><td width="92%" class="tableClassInnerLeft">Shared Voting Power
+							<br><br><div class="text">108,600.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">7</td><td width="92%" class="tableClassInnerLeft">Sole Dispositive Power
+							<br><br><div class="text">0.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValignBottomLess">8</td><td width="92%" class="tableClassInnerLeftBottomLess">Shared Dispositive Power
+							<br><br><div class="text">108,600.00</div></td></tr></table></td></tr><tr><td width="8%" class="tableClassValign">9</td><td width="92%" class="tableClass">Aggregate Amount Beneficially Owned by Each Reporting Person
+				<br><br><div class="text">108,600.00</div></td></tr><tr><td width="8%" class="tableClassValign">10</td><td width="92%" class="tableClass">Check box if the aggregate amount in row (9) excludes certain shares (See Instructions)
+				<br><br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked"></td></tr><tr><td width="8%" class="tableClassValign">11</td><td width="92%" class="tableClass">Percent of class represented by amount in row (9)
+				<br><br><div class="text">0.0 % </div></td></tr><tr><td width="8%" class="tableClassValign">12</td><td width="92%" class="tableClass">Type of Reporting Person (See Instructions)
+				<br><br><div class="text">OO</div></td></tr></table><br><div class="largetext"><span style="color:black;font-weight:bold;">Comment for Type of Reporting Person:</span>  The reported total in Rows 6 and 8 includes 108,600 shares of Class B common stock held directly by Canis Major LLC, of which Mr. McBee serves as manager.
+
+The percentage reported in Row 11 represents direct beneficial ownership of less than one-tenth of one percent of the Issuer's Class A common stock and was calculated in accordance with Rule 13(d)-3(d)(1)(i) promulgated under the Exchange Act based on an aggregate total of 447,573,939 shares of the Issuer's Class A common stock outstanding as of April 30, 2026, as reported by the Issuer in its Quarterly Report on Form 10-Q for the period ended March 31, 2026, filed with the SEC on May 8, 2026.</div><table><tr><td class="center"><br><br><p><div align="center" style="font-size:1.2em;">
+								SCHEDULE 13G
+							</div></p></td></tr></table><table role="presentation" class="tableClass" id="cusipNumber"><tr class="tableClass"><td width="7%" style="font-weight:bold;">CUSIP Number(s):</td><td width="75%"><div style="font-size:.9em; color:#000000">21873S108</div></td></tr></table><br><br><table role="presentation" class="tableClass" id="reportingPersonDetails"><tr class="tableClass"><td width="8%" class="tableClassValign">1</td><td width="92%" class="tableClass">Names of Reporting Persons
+				<br><br><div class="text">Canis Minor 2025 Family Trust LLC</div></td></tr><tr><td width="8%" class="tableClassValign">2</td><td width="92%" class="tableClass">Check the appropriate box if a member of a Group (see instructions)
+				<br><br><div class="text"><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked">  (a)
+					<br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked">  (b)	
+				</div></td></tr><tr class="tableClassWithBgBlack"><td width="8%" class="tableClassValign">3</td><td width="92%" class="tableClass">Sec Use Only</td></tr><tr><td width="8%" class="tableClassValign">4</td><td width="92%" class="tableClass">Citizenship or Place of Organization
+				<br><br><div class="text">
+				DELAWARE
+			</div></td></tr><tr><td width="8%" class="tableClassValign">Number of Shares Beneficially Owned by Each Reporting Person With:</td><td width="92%" class="tableClass"><table class="innerTableClass"><tr><td width="8%" class="innerTableClassRightValign">5</td><td width="92%" class="tableClassInnerLeft">Sole Voting Power
+							<br><br><div class="text">0.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">6</td><td width="92%" class="tableClassInnerLeft">Shared Voting Power
+							<br><br><div class="text">122,000.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">7</td><td width="92%" class="tableClassInnerLeft">Sole Dispositive Power
+							<br><br><div class="text">0.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValignBottomLess">8</td><td width="92%" class="tableClassInnerLeftBottomLess">Shared Dispositive Power
+							<br><br><div class="text">122,000.00</div></td></tr></table></td></tr><tr><td width="8%" class="tableClassValign">9</td><td width="92%" class="tableClass">Aggregate Amount Beneficially Owned by Each Reporting Person
+				<br><br><div class="text">122,000.00</div></td></tr><tr><td width="8%" class="tableClassValign">10</td><td width="92%" class="tableClass">Check box if the aggregate amount in row (9) excludes certain shares (See Instructions)
+				<br><br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked"></td></tr><tr><td width="8%" class="tableClassValign">11</td><td width="92%" class="tableClass">Percent of class represented by amount in row (9)
+				<br><br><div class="text">0.0 % </div></td></tr><tr><td width="8%" class="tableClassValign">12</td><td width="92%" class="tableClass">Type of Reporting Person (See Instructions)
+				<br><br><div class="text">OO</div></td></tr></table><br><div class="largetext"><span style="color:black;font-weight:bold;">Comment for Type of Reporting Person:</span>  The reported total in Rows 6 and 8 includes 122,000 shares of Class B common stock held directly by Canis Minor LLC, of which Mr. McBee serves as manager.
+
+The percentage reported in Row 11 represents direct beneficial ownership of less than one-tenth of one percent of the Issuer's Class A common stock and was calculated in accordance with Rule 13(d)-3(d)(1)(i) promulgated under the Exchange Act based on an aggregate total of 447,573,939 shares of the Issuer's Class A common stock outstanding as of April 30, 2026, as reported by the Issuer in its Quarterly Report on Form 10-Q for the period ended March 31, 2026, filed with the SEC on May 8, 2026.</div><table><tr><td class="center"><br><br><p><div align="center" style="font-size:1.2em;">
+								SCHEDULE 13G
+							</div></p></td></tr></table><table role="presentation" class="tableClass" id="cusipNumber"><tr class="tableClass"><td width="7%" style="font-weight:bold;">CUSIP Number(s):</td><td width="75%"><div style="font-size:.9em; color:#000000">21873S108</div></td></tr></table><br><br><table role="presentation" class="tableClass" id="reportingPersonDetails"><tr class="tableClass"><td width="8%" class="tableClassValign">1</td><td width="92%" class="tableClass">Names of Reporting Persons
+				<br><br><div class="text">Canis Major 2025 GRAT</div></td></tr><tr><td width="8%" class="tableClassValign">2</td><td width="92%" class="tableClass">Check the appropriate box if a member of a Group (see instructions)
+				<br><br><div class="text"><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked">  (a)
+					<br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked">  (b)	
+				</div></td></tr><tr class="tableClassWithBgBlack"><td width="8%" class="tableClassValign">3</td><td width="92%" class="tableClass">Sec Use Only</td></tr><tr><td width="8%" class="tableClassValign">4</td><td width="92%" class="tableClass">Citizenship or Place of Organization
+				<br><br><div class="text">
+				DELAWARE
+			</div></td></tr><tr><td width="8%" class="tableClassValign">Number of Shares Beneficially Owned by Each Reporting Person With:</td><td width="92%" class="tableClass"><table class="innerTableClass"><tr><td width="8%" class="innerTableClassRightValign">5</td><td width="92%" class="tableClassInnerLeft">Sole Voting Power
+							<br><br><div class="text">0.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">6</td><td width="92%" class="tableClassInnerLeft">Shared Voting Power
+							<br><br><div class="text">3,757,227.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">7</td><td width="92%" class="tableClassInnerLeft">Sole Dispositive Power
+							<br><br><div class="text">0.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValignBottomLess">8</td><td width="92%" class="tableClassInnerLeftBottomLess">Shared Dispositive Power
+							<br><br><div class="text">3,757,227.00</div></td></tr></table></td></tr><tr><td width="8%" class="tableClassValign">9</td><td width="92%" class="tableClass">Aggregate Amount Beneficially Owned by Each Reporting Person
+				<br><br><div class="text">3,757,227.00</div></td></tr><tr><td width="8%" class="tableClassValign">10</td><td width="92%" class="tableClass">Check box if the aggregate amount in row (9) excludes certain shares (See Instructions)
+				<br><br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked"></td></tr><tr><td width="8%" class="tableClassValign">11</td><td width="92%" class="tableClass">Percent of class represented by amount in row (9)
+				<br><br><div class="text">0.8 % </div></td></tr><tr><td width="8%" class="tableClassValign">12</td><td width="92%" class="tableClass">Type of Reporting Person (See Instructions)
+				<br><br><div class="text">OO</div></td></tr></table><br><div class="largetext"><span style="color:black;font-weight:bold;">Comment for Type of Reporting Person:</span>  The reported total in Rows 6 and 8 includes 3,757,227 shares of Class B common stock held directly by the Canis Major 2025 GRAT, for which Mr. McBee serves as trustee.
+
+The percentage reported in Row 11 was calculated in accordance with Rule 13(d)-3(d)(1)(i) promulgated under the Exchange Act based on an aggregate total of 447,573,939 shares of the Issuer's Class A common stock outstanding as of April 30, 2026, as reported by the Issuer in its Quarterly Report on Form 10-Q for the period ended March 31, 2026, filed with the SEC on May 8, 2026.</div><table><tr><td class="center"><br><br><p><div align="center" style="font-size:1.2em;">
+								SCHEDULE 13G
+							</div></p></td></tr></table><table role="presentation" class="tableClass" id="cusipNumber"><tr class="tableClass"><td width="7%" style="font-weight:bold;">CUSIP Number(s):</td><td width="75%"><div style="font-size:.9em; color:#000000">21873S108</div></td></tr></table><br><br><table role="presentation" class="tableClass" id="reportingPersonDetails"><tr class="tableClass"><td width="8%" class="tableClassValign">1</td><td width="92%" class="tableClass">Names of Reporting Persons
+				<br><br><div class="text">Canis Major 2024 Irrevocable Trust LLC</div></td></tr><tr><td width="8%" class="tableClassValign">2</td><td width="92%" class="tableClass">Check the appropriate box if a member of a Group (see instructions)
+				<br><br><div class="text"><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked">  (a)
+					<br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked">  (b)	
+				</div></td></tr><tr class="tableClassWithBgBlack"><td width="8%" class="tableClassValign">3</td><td width="92%" class="tableClass">Sec Use Only</td></tr><tr><td width="8%" class="tableClassValign">4</td><td width="92%" class="tableClass">Citizenship or Place of Organization
+				<br><br><div class="text">
+				DELAWARE
+			</div></td></tr><tr><td width="8%" class="tableClassValign">Number of Shares Beneficially Owned by Each Reporting Person With:</td><td width="92%" class="tableClass"><table class="innerTableClass"><tr><td width="8%" class="innerTableClassRightValign">5</td><td width="92%" class="tableClassInnerLeft">Sole Voting Power
+							<br><br><div class="text">0.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">6</td><td width="92%" class="tableClassInnerLeft">Shared Voting Power
+							<br><br><div class="text">312,000.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">7</td><td width="92%" class="tableClassInnerLeft">Sole Dispositive Power
+							<br><br><div class="text">0.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValignBottomLess">8</td><td width="92%" class="tableClassInnerLeftBottomLess">Shared Dispositive Power
+							<br><br><div class="text">312,000.00</div></td></tr></table></td></tr><tr><td width="8%" class="tableClassValign">9</td><td width="92%" class="tableClass">Aggregate Amount Beneficially Owned by Each Reporting Person
+				<br><br><div class="text">312,000.00</div></td></tr><tr><td width="8%" class="tableClassValign">10</td><td width="92%" class="tableClass">Check box if the aggregate amount in row (9) excludes certain shares (See Instructions)
+				<br><br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked"></td></tr><tr><td width="8%" class="tableClassValign">11</td><td width="92%" class="tableClass">Percent of class represented by amount in row (9)
+				<br><br><div class="text">0.1 % </div></td></tr><tr><td width="8%" class="tableClassValign">12</td><td width="92%" class="tableClass">Type of Reporting Person (See Instructions)
+				<br><br><div class="text">OO</div></td></tr></table><br><div class="largetext"><span style="color:black;font-weight:bold;">Comment for Type of Reporting Person:</span>  The reported total in Rows 6 and 8 includes 312,000 shares of Class B common stock held directly by Canis Irrevocable Trust LLC, for which Mr. McBee serves as manager.
+
+The percentage reported in Row 11 was calculated in accordance with Rule 13(d)-3(d)(1)(i) promulgated under the Exchange Act based on an aggregate total of 447,573,939 shares of the Issuer's Class A common stock outstanding as of April 30, 2026, as reported by the Issuer in its Quarterly Report on Form 10-Q for the period ended March 31, 2026, filed with the SEC on May 8, 2026.</div><table><tr><td class="center"><br><br><p><div align="center" style="font-size:1.2em;">
+								SCHEDULE 13G
+							</div></p></td></tr></table><table role="presentation" class="tableClass" id="cusipNumber"><tr class="tableClass"><td width="7%" style="font-weight:bold;">CUSIP Number(s):</td><td width="75%"><div style="font-size:.9em; color:#000000">21873S108</div></td></tr></table><br><br><table role="presentation" class="tableClass" id="reportingPersonDetails"><tr class="tableClass"><td width="8%" class="tableClassValign">1</td><td width="92%" class="tableClass">Names of Reporting Persons
+				<br><br><div class="text">Brannin J. McBee 2022 Irrevocable Trust</div></td></tr><tr><td width="8%" class="tableClassValign">2</td><td width="92%" class="tableClass">Check the appropriate box if a member of a Group (see instructions)
+				<br><br><div class="text"><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked">  (a)
+					<br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked">  (b)	
+				</div></td></tr><tr class="tableClassWithBgBlack"><td width="8%" class="tableClassValign">3</td><td width="92%" class="tableClass">Sec Use Only</td></tr><tr><td width="8%" class="tableClassValign">4</td><td width="92%" class="tableClass">Citizenship or Place of Organization
+				<br><br><div class="text">
+				MONTANA
+			</div></td></tr><tr><td width="8%" class="tableClassValign">Number of Shares Beneficially Owned by Each Reporting Person With:</td><td width="92%" class="tableClass"><table class="innerTableClass"><tr><td width="8%" class="innerTableClassRightValign">5</td><td width="92%" class="tableClassInnerLeft">Sole Voting Power
+							<br><br><div class="text">0.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">6</td><td width="92%" class="tableClassInnerLeft">Shared Voting Power
+							<br><br><div class="text">3,541,020.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">7</td><td width="92%" class="tableClassInnerLeft">Sole Dispositive Power
+							<br><br><div class="text">0.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValignBottomLess">8</td><td width="92%" class="tableClassInnerLeftBottomLess">Shared Dispositive Power
+							<br><br><div class="text">3,541,020.00</div></td></tr></table></td></tr><tr><td width="8%" class="tableClassValign">9</td><td width="92%" class="tableClass">Aggregate Amount Beneficially Owned by Each Reporting Person
+				<br><br><div class="text">3,541,020.00</div></td></tr><tr><td width="8%" class="tableClassValign">10</td><td width="92%" class="tableClass">Check box if the aggregate amount in row (9) excludes certain shares (See Instructions)
+				<br><br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked"></td></tr><tr><td width="8%" class="tableClassValign">11</td><td width="92%" class="tableClass">Percent of class represented by amount in row (9)
+				<br><br><div class="text">0.8 % </div></td></tr><tr><td width="8%" class="tableClassValign">12</td><td width="92%" class="tableClass">Type of Reporting Person (See Instructions)
+				<br><br><div class="text">OO</div></td></tr></table><br><div class="largetext"><span style="color:black;font-weight:bold;">Comment for Type of Reporting Person:</span>  The reported total in Rows 6 and 8 includes 3,541,020 shares of Class B common stock held directly by the McBee Trust, for which Mr. McBee's spouse serves as trustee.
+
+The percentage reported in Row 11 was calculated in accordance with Rule 13(d)-3(d)(1)(i) promulgated under the Exchange Act based on an aggregate total of 447,573,939 shares of the Issuer's Class A common stock outstanding as of April 30, 2026, as reported by the Issuer in its Quarterly Report on Form 10-Q for the period ended March 31, 2026, filed with the SEC on May 8, 2026.</div><table><tr><td class="center"><br><br><p><div align="center" style="font-size:1.2em;">
+								SCHEDULE 13G
+							</div></p></td></tr></table><table role="presentation" class="tableClass" id="cusipNumber"><tr class="tableClass"><td width="7%" style="font-weight:bold;">CUSIP Number(s):</td><td width="75%"><div style="font-size:.9em; color:#000000">21873S108</div></td></tr></table><br><br><table role="presentation" class="tableClass" id="reportingPersonDetails"><tr class="tableClass"><td width="8%" class="tableClassValign">1</td><td width="92%" class="tableClass">Names of Reporting Persons
+				<br><br><div class="text">Canis Minor 2025 GRAT</div></td></tr><tr><td width="8%" class="tableClassValign">2</td><td width="92%" class="tableClass">Check the appropriate box if a member of a Group (see instructions)
+				<br><br><div class="text"><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked">  (a)
+					<br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked">  (b)	
+				</div></td></tr><tr class="tableClassWithBgBlack"><td width="8%" class="tableClassValign">3</td><td width="92%" class="tableClass">Sec Use Only</td></tr><tr><td width="8%" class="tableClassValign">4</td><td width="92%" class="tableClass">Citizenship or Place of Organization
+				<br><br><div class="text">
+				DELAWARE
+			</div></td></tr><tr><td width="8%" class="tableClassValign">Number of Shares Beneficially Owned by Each Reporting Person With:</td><td width="92%" class="tableClass"><table class="innerTableClass"><tr><td width="8%" class="innerTableClassRightValign">5</td><td width="92%" class="tableClassInnerLeft">Sole Voting Power
+							<br><br><div class="text">0.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">6</td><td width="92%" class="tableClassInnerLeft">Shared Voting Power
+							<br><br><div class="text">511,205.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">7</td><td width="92%" class="tableClassInnerLeft">Sole Dispositive Power
+							<br><br><div class="text">0.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValignBottomLess">8</td><td width="92%" class="tableClassInnerLeftBottomLess">Shared Dispositive Power
+							<br><br><div class="text">511,205.00</div></td></tr></table></td></tr><tr><td width="8%" class="tableClassValign">9</td><td width="92%" class="tableClass">Aggregate Amount Beneficially Owned by Each Reporting Person
+				<br><br><div class="text">511,205.00</div></td></tr><tr><td width="8%" class="tableClassValign">10</td><td width="92%" class="tableClass">Check box if the aggregate amount in row (9) excludes certain shares (See Instructions)
+				<br><br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked"></td></tr><tr><td width="8%" class="tableClassValign">11</td><td width="92%" class="tableClass">Percent of class represented by amount in row (9)
+				<br><br><div class="text">0.1 % </div></td></tr><tr><td width="8%" class="tableClassValign">12</td><td width="92%" class="tableClass">Type of Reporting Person (See Instructions)
+				<br><br><div class="text">OO</div></td></tr></table><br><div class="largetext"><span style="color:black;font-weight:bold;">Comment for Type of Reporting Person:</span>  The reported total in Rows 6 and 8 includes 511,205 shares of Class B common stock held directly by the Canis Minor 2025 GRAT, for which Mr. McBee's spouse serves as trustee.
+
+The percentage reported in Row 11 was calculated in accordance with Rule 13(d)-3(d)(1)(i) promulgated under the Exchange Act based on an aggregate total of 447,573,939 shares of the Issuer's Class A common stock outstanding as of April 30, 2026, as reported by the Issuer in its Quarterly Report on Form 10-Q for the period ended March 31, 2026, filed with the SEC on May 8, 2026.</div><table><tr><td class="center"><br><br><p><div align="center" style="font-size:1.2em;">
+								SCHEDULE 13G
+							</div></p></td></tr></table><table role="presentation" class="tableClass" id="cusipNumber"><tr class="tableClass"><td width="7%" style="font-weight:bold;">CUSIP Number(s):</td><td width="75%"><div style="font-size:.9em; color:#000000">21873S108</div></td></tr></table><br><br><table role="presentation" class="tableClass" id="reportingPersonDetails"><tr class="tableClass"><td width="8%" class="tableClassValign">1</td><td width="92%" class="tableClass">Names of Reporting Persons
+				<br><br><div class="text">Canis Major SM Trust</div></td></tr><tr><td width="8%" class="tableClassValign">2</td><td width="92%" class="tableClass">Check the appropriate box if a member of a Group (see instructions)
+				<br><br><div class="text"><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked">  (a)
+					<br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked">  (b)	
+				</div></td></tr><tr class="tableClassWithBgBlack"><td width="8%" class="tableClassValign">3</td><td width="92%" class="tableClass">Sec Use Only</td></tr><tr><td width="8%" class="tableClassValign">4</td><td width="92%" class="tableClass">Citizenship or Place of Organization
+				<br><br><div class="text">
+				TEXAS
+			</div></td></tr><tr><td width="8%" class="tableClassValign">Number of Shares Beneficially Owned by Each Reporting Person With:</td><td width="92%" class="tableClass"><table class="innerTableClass"><tr><td width="8%" class="innerTableClassRightValign">5</td><td width="92%" class="tableClassInnerLeft">Sole Voting Power
+							<br><br><div class="text">0.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">6</td><td width="92%" class="tableClassInnerLeft">Shared Voting Power
+							<br><br><div class="text">52,000.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">7</td><td width="92%" class="tableClassInnerLeft">Sole Dispositive Power
+							<br><br><div class="text">0.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValignBottomLess">8</td><td width="92%" class="tableClassInnerLeftBottomLess">Shared Dispositive Power
+							<br><br><div class="text">52,000.00</div></td></tr></table></td></tr><tr><td width="8%" class="tableClassValign">9</td><td width="92%" class="tableClass">Aggregate Amount Beneficially Owned by Each Reporting Person
+				<br><br><div class="text">52,000.00</div></td></tr><tr><td width="8%" class="tableClassValign">10</td><td width="92%" class="tableClass">Check box if the aggregate amount in row (9) excludes certain shares (See Instructions)
+				<br><br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked"></td></tr><tr><td width="8%" class="tableClassValign">11</td><td width="92%" class="tableClass">Percent of class represented by amount in row (9)
+				<br><br><div class="text">0.0 % </div></td></tr><tr><td width="8%" class="tableClassValign">12</td><td width="92%" class="tableClass">Type of Reporting Person (See Instructions)
+				<br><br><div class="text">OO</div></td></tr></table><br><div class="largetext"><span style="color:black;font-weight:bold;">Comment for Type of Reporting Person:</span>  The reported total in Rows 6 and 8 includes 52,000 shares of Class A common stock held directly by the SM Trust.  Mr. McBee has the power to remove and replace the SM Trust's third-party trustee.
+
+The percentage reported in Row 11 represents direct beneficial ownership of less than one-tenth of one percent of the Issuer's Class A common stock and was calculated in accordance with Rule 13(d)-3(d)(1)(i) promulgated under the Exchange Act based on an aggregate total of 447,573,939 shares of the Issuer's Class A common stock outstanding as of April 30, 2026, as reported by the Issuer in its Quarterly Report on Form 10-Q for the period ended March 31, 2026, filed with the SEC on May 8, 2026.</div><table><tr><td class="center"><br><br><p><div align="center" style="font-size:1.2em;">
+								SCHEDULE 13G
+							</div></p></td></tr></table><table role="presentation" class="tableClass" id="cusipNumber"><tr class="tableClass"><td width="7%" style="font-weight:bold;">CUSIP Number(s):</td><td width="75%"><div style="font-size:.9em; color:#000000">21873S108</div></td></tr></table><br><br><table role="presentation" class="tableClass" id="reportingPersonDetails"><tr class="tableClass"><td width="8%" class="tableClassValign">1</td><td width="92%" class="tableClass">Names of Reporting Persons
+				<br><br><div class="text">Canis Major 2026 GRAT</div></td></tr><tr><td width="8%" class="tableClassValign">2</td><td width="92%" class="tableClass">Check the appropriate box if a member of a Group (see instructions)
+				<br><br><div class="text"><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked">  (a)
+					<br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked">  (b)	
+				</div></td></tr><tr class="tableClassWithBgBlack"><td width="8%" class="tableClassValign">3</td><td width="92%" class="tableClass">Sec Use Only</td></tr><tr><td width="8%" class="tableClassValign">4</td><td width="92%" class="tableClass">Citizenship or Place of Organization
+				<br><br><div class="text">
+				DELAWARE
+			</div></td></tr><tr><td width="8%" class="tableClassValign">Number of Shares Beneficially Owned by Each Reporting Person With:</td><td width="92%" class="tableClass"><table class="innerTableClass"><tr><td width="8%" class="innerTableClassRightValign">5</td><td width="92%" class="tableClassInnerLeft">Sole Voting Power
+							<br><br><div class="text">0.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">6</td><td width="92%" class="tableClassInnerLeft">Shared Voting Power
+							<br><br><div class="text">1,582,773.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">7</td><td width="92%" class="tableClassInnerLeft">Sole Dispositive Power
+							<br><br><div class="text">0.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValignBottomLess">8</td><td width="92%" class="tableClassInnerLeftBottomLess">Shared Dispositive Power
+							<br><br><div class="text">1,582,773.00</div></td></tr></table></td></tr><tr><td width="8%" class="tableClassValign">9</td><td width="92%" class="tableClass">Aggregate Amount Beneficially Owned by Each Reporting Person
+				<br><br><div class="text">1,582,773.00</div></td></tr><tr><td width="8%" class="tableClassValign">10</td><td width="92%" class="tableClass">Check box if the aggregate amount in row (9) excludes certain shares (See Instructions)
+				<br><br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked"></td></tr><tr><td width="8%" class="tableClassValign">11</td><td width="92%" class="tableClass">Percent of class represented by amount in row (9)
+				<br><br><div class="text">0.3 % </div></td></tr><tr><td width="8%" class="tableClassValign">12</td><td width="92%" class="tableClass">Type of Reporting Person (See Instructions)
+				<br><br><div class="text">OO</div></td></tr></table><br><div class="largetext"><span style="color:black;font-weight:bold;">Comment for Type of Reporting Person:</span>  The reported total in Rows 6 and 8 includes 1,582,773 shares of Class B common stock held directly by the Canis Major 2026 GRAT, for which Mr. McBee serves as trustee.
+
+The percentage reported in Row 11 was calculated in accordance with Rule 13(d)-3(d)(1)(i) promulgated under the Exchange Act based on an aggregate total of 447,573,939 shares of the Issuer's Class A common stock outstanding as of April 30, 2026, as reported by the Issuer in its Quarterly Report on Form 10-Q for the period ended March 31, 2026, filed with the SEC on May 8, 2026.</div><table><tr><td class="center"><br><br><p><div align="center" style="font-size:1.2em;">
+								SCHEDULE 13G
+							</div></p></td></tr></table><table role="presentation" class="tableClass" id="cusipNumber"><tr class="tableClass"><td width="7%" style="font-weight:bold;">CUSIP Number(s):</td><td width="75%"><div style="font-size:.9em; color:#000000">21873S108</div></td></tr></table><br><br><table role="presentation" class="tableClass" id="reportingPersonDetails"><tr class="tableClass"><td width="8%" class="tableClassValign">1</td><td width="92%" class="tableClass">Names of Reporting Persons
+				<br><br><div class="text">Canis Minor 2026 GRAT</div></td></tr><tr><td width="8%" class="tableClassValign">2</td><td width="92%" class="tableClass">Check the appropriate box if a member of a Group (see instructions)
+				<br><br><div class="text"><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked">  (a)
+					<br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked">  (b)	
+				</div></td></tr><tr class="tableClassWithBgBlack"><td width="8%" class="tableClassValign">3</td><td width="92%" class="tableClass">Sec Use Only</td></tr><tr><td width="8%" class="tableClassValign">4</td><td width="92%" class="tableClass">Citizenship or Place of Organization
+				<br><br><div class="text">
+				DELAWARE
+			</div></td></tr><tr><td width="8%" class="tableClassValign">Number of Shares Beneficially Owned by Each Reporting Person With:</td><td width="92%" class="tableClass"><table class="innerTableClass"><tr><td width="8%" class="innerTableClassRightValign">5</td><td width="92%" class="tableClassInnerLeft">Sole Voting Power
+							<br><br><div class="text">0.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">6</td><td width="92%" class="tableClassInnerLeft">Shared Voting Power
+							<br><br><div class="text">263,795.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">7</td><td width="92%" class="tableClassInnerLeft">Sole Dispositive Power
+							<br><br><div class="text">0.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValignBottomLess">8</td><td width="92%" class="tableClassInnerLeftBottomLess">Shared Dispositive Power
+							<br><br><div class="text">263,795.00</div></td></tr></table></td></tr><tr><td width="8%" class="tableClassValign">9</td><td width="92%" class="tableClass">Aggregate Amount Beneficially Owned by Each Reporting Person
+				<br><br><div class="text">263,795.00</div></td></tr><tr><td width="8%" class="tableClassValign">10</td><td width="92%" class="tableClass">Check box if the aggregate amount in row (9) excludes certain shares (See Instructions)
+				<br><br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked"></td></tr><tr><td width="8%" class="tableClassValign">11</td><td width="92%" class="tableClass">Percent of class represented by amount in row (9)
+				<br><br><div class="text">0.1 % </div></td></tr><tr><td width="8%" class="tableClassValign">12</td><td width="92%" class="tableClass">Type of Reporting Person (See Instructions)
+				<br><br><div class="text">OO</div></td></tr></table><br><div class="largetext"><span style="color:black;font-weight:bold;">Comment for Type of Reporting Person:</span>  The reported total in Rows 6 and 8 includes 263,795 shares of Class B common stock held directly by the Canis Minor 2026 GRAT, for which Mr. McBee's spouse serves as trustee.
+
+The percentage reported in Row 11 was calculated in accordance with Rule 13(d)-3(d)(1)(i) promulgated under the Exchange Act based on an aggregate total of 447,573,939 shares of the Issuer's Class A common stock outstanding as of April 30, 2026, as reported by the Issuer in its Quarterly Report on Form 10-Q for the period ended March 31, 2026, filed with the SEC on May 8, 2026.</div></div><div class="form1"><table><tr><td class="center"><br><br><p><div align="center" style="font-size:1.2em;">
+								SCHEDULE 13G
+							</div></p></td></tr></table><table role="presentation" id="item1to9"><tr><td width="8%" class="tableClassValignNoBorder">Item 1.</td><td width="92%" class="tableClassNoBorder"> </td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignCenter">(a)</td><td width="92%" class="tableClassNoBorder">Name of issuer:
+					<br><br><div class="text">COREWEAVE, INC.</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(b)</td><td width="92%" class="tableClassNoBorder">Address of issuer's principal executive offices:
+					<br><br><div class="text">290 West Mt. Pleasant Avenue, Suite 4100, Livingston, NJ, 07039.</div></td></tr><tr><td width="8%" class="tableClassValignNoBorder">Item 2.</td><td width="92%" class="tableClassNoBorder"> </td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignCenter">(a)</td><td width="92%" class="tableClassNoBorder">Name of person filing:
+					<br><br><div class="largetext">Brannin J. McBee, an Individual ("Mr. McBee");
+Meghan Q. Bennett, an Individual ("Ms. Bennett");
+Canis Major 2025 Family Trust LLC, a Delaware limited liability company ("Canis Major LLC");
+Canis Minor 2025 Family Trust LLC, a Delaware limited liability company ("Canis Minor LLC");
+Canis Major 2025 GRAT, a trust formed under the laws of the state of Delaware;
+Canis Major 2026 GRAT, a trust formed under the laws of the state of Delaware;
+Canis Major 2024 Irrevocable Trust LLC, a Delaware limited liability company ("Canis Irrevocable Trust LLC");
+Brannin J. McBee 2022 Irrevocable Trust, a trust formed under the laws of the state of Montana (the "McBee Trust");
+Canis Minor 2025 GRAT, a trust formed under the laws of the state of Delaware;
+Canis Minor 2026 GRAT a trust formed under the laws of the state of Delaware; and
+Canis Major SM Trust, a trust formed under the laws of the state of Texas (the "SM Trust" and, together with Mr. McBee, Ms. Bennett, Canis Major LLC, Canis Minor LLC, the Canis Major 2025 GRAT, the Canis Major 2026 GRAT, Canis Irrevocable Trust LLC, the McBee Trust, the Canis Minor 2025 GRAT, and the Canis Minor 2026 GRAT, the "Reporting Persons").</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(b)</td><td width="92%" class="tableClassNoBorder">Address or principal business office or, if none, residence:
+					<br><br><div class="largetext">The address of the principal business office of each of the Reporting Persons is:
+
+290 West Mt. Pleasant Avenue, Suite 4100
+Livingston, NJ 07039</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(c)</td><td width="92%" class="tableClassNoBorder">Citizenship:
+					<br><br><div class="largetext">Mr. McBee and Ms. Bennett are citizens of the United States of America.  Each of Canis Major LLC, Canis Minor LLC, the Canis Major 2025 GRAT, the Canis Major 2026 GRAT, Canis Irrevocable Trust LLC, the Canis Minor 2025 GRAT, and the Canis Minor 2026 GRAT are formed, organized, or established in the state of Delaware.  The McBee Trust is formed and established in the state of Montana and the SM Trust is formed and established in the state of Texas.</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(d)</td><td width="92%" class="tableClassNoBorder">Title of class of securities:
+					<br><br><div class="text">Class A Common Stock, par value $0.000005 per share</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(e)</td><td width="92%" class="tableClassNoBorder">CUSIP No.:
+					<br><br><div class="text">21873S108</div></td></tr><tr><td width="8%" class="tableClassValignNoBorder">Item 3.</td><td width="92%" class="tableClassNoBorder">If this statement is filed pursuant to §§ 240.13d-1(b) or 240.13d-2(b) or (c), check whether the person filing is a:</td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(a)</td><td width="92%" class="tableClassNoBorder"><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked">   Broker or dealer registered under section 15 of the Act (15 U.S.C. 78o);
+					</td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(b)</td><td width="92%" class="tableClassNoBorder"><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked">   Bank as defined in section 3(a)(6) of the Act (15 U.S.C. 78c);
+					</td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(c)</td><td width="92%" class="tableClassNoBorder"><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked">   Insurance company as defined in section 3(a)(19) of the Act (15 U.S.C. 78c);
+					</td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(d)</td><td width="92%" class="tableClassNoBorder"><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked">   Investment company registered under section 8 of the Investment Company Act of 1940 (15 U.S.C. 80a-8);
+					</td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(e)</td><td width="92%" class="tableClassNoBorder"><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked">   An investment adviser in accordance with § 240.13d-1(b)(1)(ii)(E);
+					</td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(f)</td><td width="92%" class="tableClassNoBorder"><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked">   An employee benefit plan or endowment fund in accordance with § 240.13d-1(b)(1)(ii)(F);
+					</td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(g)</td><td width="92%" class="tableClassNoBorder"><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked">   A parent holding company or control person in accordance with § 240.13d-1(b)(1)(ii)(G);
+					</td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(h)</td><td width="92%" class="tableClassNoBorder"><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked">   A savings associations as defined in Section 3(b) of the Federal Deposit Insurance Act (12 U.S.C. 1813);
+					</td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(i)</td><td width="92%" class="tableClassNoBorder"><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked">   A church plan that is excluded from the definition of an investment company under section 3(c)(14) of the Investment Company Act of 1940 (15 U.S.C. 80a-3);
+					</td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(j)</td><td width="92%" class="tableClassNoBorder"><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked">   A non-U.S. institution in accordance with § 240.13d-1(b)(1)(ii)(J). If filing as a non-U.S. institution in accordance with § 240.13d-1(b)(1)(ii)(J), 
+						<br>       please specify the type of institution:
+					</td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(k)</td><td width="92%" class="tableClassNoBorder"><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked">   Group, in accordance with Rule 240.13d-1(b)(1)(ii)(K).
+					</td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter"> </td><td width="100%" colspan="2" class="tableClassNoBorder"><div class="largetext"></div></td></tr><tr><td width="8%" class="tableClassValignNoBorder">Item 4.</td><td width="92%" class="tableClassNoBorder">Ownership</td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(a)</td><td width="92%" class="tableClassNoBorder">Amount beneficially owned:
+					<br><br><div class="largetext">Reference to "beneficial ownership" of securities for purposes of this statement (this "Statement") shall be understood to refer to beneficial ownership as that term is defined in Rule 13d-3 of the Securities Exchange Act of 1934, as amended (the "Exchange Act").
+
+As of June 30, 2026, the Reporting Persons may be deemed to beneficially own an aggregate 19,995,415 shares of the Issuer's capital stock.
+
+As of June 30, 2026, Mr. McBee was the direct beneficial owner of 7,764,495 of the shares of the Issuer's securities described in the preceding paragraph, which consist of:  (i) 323,263 shares of the Issuer's Class A common stock; (ii) 6,474,894 shares of the Issuer's Class B common stock; (ii) 1,800 shares of the Issuer's Class A common stock held of record in the name of Mr. McBee's child; (iii) 956,500 shares issuable upon the exercise of stock options which are vested and exercisable within 60 days of June 30, 2026; and (iv) 8,038 shares of the Issuer's Class A common stock underlying restricted stock units which shall vest and settle within 60 days of June 30, 2026.  The aforementioned stock options are exercisable for shares of Class A common stock and thereupon may be exchanged on a one-for-one basis for shares of the Issuer's Class B common stock pursuant to an agreement between Mr. McBee and the Issuer.  All shares of the Issuer's Class B common stock are convertible on a one-for-one basis into shares of the Issuer's Class A common stock at any time, at the election of the holder or automatically upon certain transfers, whether or not for value, and may be subject to mandatory conversion upon the occurrence of certain events described in the Issuer's amended and restated certificate of incorporation.
+
+As of June 30, 2026, Mr. McBee was the indirect beneficial owner of 5,934,600 of the shares of the Issuer's securities described in the second paragraph of this Item 4(a), which consist of:  (i) 108,600 shares of Class B common stock directly held by Canis Major LLC; (ii) 122,000 shares of Class B common stock directly held by Canis Minor LLC; (iii) 3,757,227 shares of Class B common stock directly held by the Canis Major 2025 GRAT; (iv) 1,582,773 shares of Class B common stock directly held by the Canis Major 2026 GRAT; (v) 312,000 shares of Class B common stock directly held by Canis Irrevocable Trust LLC; and (vi) 52,000 shares of Class A common stock directly held by the SM Trust.  Mr. McBee serves as the manager of Canis Major LLC, Canis Minor LLC, and Canis Irrevocable Trust LLC, and the trustee of the Canis Major 2025 GRAT and Canis Major 2026 GRAT, and he may be deemed to exercise voting and investment discretion over securities held by them in such capacities.  Mr. McBee also has the power to remove and replace the trustee of the SM Trust and beneficial ownership may be imputed to him by virtue of such power.
+
+As of June 30, 2026, Ms. Bennett, Mr. McBee's spouse, was the direct beneficial owner of 1,980,300 of the securities described in the second paragraph of this Item 4(a) and the indirect beneficial owner of:  (i) 3,541,020 shares of Class B common stock directly held by the McBee Trust; (ii) 511,205 shares of Class B common stock directly held by the Canis Minor 2025 GRAT; and (iii) 263,795 shares of Class B common stock directly held by the Canis Minor 2026 GRAT.  Ms. Bennett serves as trustee of the McBee Trust, the Canis Minor 2025 GRAT, and the Canis Minor 2026 GRAT, and she may be deemed to exercise voting and investment discretion over securities held by them in such capacity.
+
+Additionally, as of June 30, 2026, each of the following Reporting Persons may also be deemed to share beneficial ownership with Mr. McBee or Ms. Bennett over the following portions of the aggregate number of securities described in the second paragraph of this Item 4(a):  (i) Canis Major LLC directly beneficially owns 108,600 shares of Class B common stock; (ii) Canis Minor LLC directly beneficially owns 122,000 shares of Class B common stock; (iii) the Canis Major 2025 GRAT directly beneficially own 3,757,227 shares of Class B common stock; (iv) the Canis Major 2026 GRAT directly beneficially owns 1,582,773 shares of Class B common stock; (v) Canis Irrevocable Trust LLC directly beneficially owns 312,000 shares of Class B common stock; (vi) the McBee Trust directly beneficially owns 3,541,020 shares of Class B common stock; (vii) the Canis Minor 2025 GRAT directly beneficially owns 511,205 shares of Class B common stock; (viii) the Canis Minor 2026 GRAT directly beneficially owns 263,795 shares of Class B common stock; and (ix) the SM Trust directly beneficially owns 52,000 shares of Class A common stock.</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(b)</td><td width="92%" class="tableClassNoBorder">Percent of class:
+					<br><br><div class="largetext">As of June 30, 2026, the Reporting Persons were deemed to directly or indirectly beneficially own an aggregate 4.3% of the Issuer's outstanding Class A common stock.  Of that total, beneficial ownership was attributable as follows:
+
+Mr. McBee:			                  2.9%
+Ms. Bennett:			                  1.3%
+Canis Major LLC:		                  0.0% (Less than one tenth of 1%)
+Canis Minor LLC:		                  0.0% (Less than one tenth of 1%)
+Canis Major 2025 GRAT:		  0.8%
+Canis Major 2026 GRAT: 		  0.3%
+Canis Irrevocable Trust LLC:	          0.1%
+McBee Trust:			                  0.8%
+Canis Minor 2025 GRAT:		  0.1%
+Canis Minor 2026 GRAT: 		  0.1%
+SM Trust:			                          0.0% (Less than one tenth of 1%)
+
+The aforementioned percentages were calculated in accordance with Rule 13(d)-3(d)(1)(i) promulgated under the Exchange Act based on an aggregate total of 447,573,939 shares of the Issuer's Class A common stock outstanding as of April 30, 2026, as reported by the Issuer in its Quarterly Report on Form 10-Q for the period ended March 31, 2026, filed with the U.S. Securities and Exchange Commission (the "SEC") on May 8, 2026.</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(c)</td><td width="92%" class="tableClassNoBorder">Number of shares as to which the person has:
+					<br></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter"> </td><td width="92%" class="tableClassNoBorder">(i) Sole power to vote or to direct the vote:
+					<br><br><div class="largetext">Mr. McBee:	                          7,764,495
+Ms. Bennett:	                          1,980,300
+Canis Major LLC:	                                0
+Canis Minor LLC:	                                0
+Canis Major 2025 GRAT:	                0
+Canis Major 2026 GRAT:	                0
+Canis Irrevocable Trust LLC:	                0
+McBee Trust:	                                        0
+Canis Minor 2025 GRAT:	                0
+Canis Minor 2026 GRAT: 	                0
+SM Trust:	                                                0
+</div><br></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter"> </td><td width="92%" class="tableClassNoBorder">(ii) Shared power to vote or to direct the vote:
+					<br><br><div class="largetext">Mr. McBee:	                          5,934,600
+Ms. Bennett:	                          4,316,020
+Canis Major LLC:	                     108,600
+Canis Minor LLC:	                     122,000
+Canis Major 2025 GRAT:	  3,757,227
+Canis Major 2026 GRAT:	  1,582,773
+Canis Irrevocable Trust LLC:	     312,000
+McBee Trust:	                          3,541,020
+Canis Minor 2025 GRAT:	      511,205
+Canis Minor 2026 GRAT:	      263,795
+SM Trust:	                                        52,000</div><br></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter"> </td><td width="92%" class="tableClassNoBorder">(iii) Sole power to dispose or to direct the disposition of:
+					<br><br><div class="largetext">Mr. McBee:	                          7,764,495
+Ms. Bennett:	                          1,980,300
+Canis Major LLC:	                                0
+Canis Minor LLC:	                                0
+Canis Major 2025 GRAT:	                0
+Canis Major 2026 GRAT:	                0
+Canis Irrevocable Trust LLC:	                0
+McBee Trust:	                                        0
+Canis Minor 2025 GRAT:	                0
+Canis Minor 2026 GRAT: 	                0
+SM Trust:	                                                0</div><br></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter"> </td><td width="92%" class="tableClassNoBorder">(iv) Shared power to dispose or to direct the disposition of:
+					<br><br><div class="largetext">Mr. McBee:	                          5,934,600
+Ms. Bennett:	                          4,316,020
+Canis Major LLC:	                     108,600
+Canis Minor LLC:	                     122,000
+Canis Major 2025 GRAT:	  3,757,227
+Canis Major 2026 GRAT:	  1,582,773
+Canis Irrevocable Trust LLC:	     312,000
+McBee Trust:	                          3,541,020
+Canis Minor 2025 GRAT:	      511,205
+Canis Minor 2026 GRAT:	      263,795
+SM Trust:	                                        52,000</div><br></td></tr><tr><td width="8%" class="tableClassValignNoBorder">Item 5.</td><td width="92%" class="tableClassNoBorder">Ownership of 5 Percent or Less of a Class.</td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter"> </td><td width="92%" class="tableClassNoBorder"><div class="text"><img src="/Images/box-checked.jpg" alt="Checkbox checked">
+									   Ownership of 5 percent or less of a class
+							</div></td></tr><tr><td width="8%" class="tableClassValignNoBorder">Item 6.</td><td width="92%" class="tableClassNoBorder">Ownership of more than 5 Percent on Behalf of Another Person.</td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter"> </td><td width="92%" class="tableClassNoBorder"><div class="text">
+							Not Applicable
+						</div></td></tr><tr><td width="8%" class="tableClassValignNoBorder">Item 7.</td><td width="92%" class="tableClassNoBorder">Identification and Classification of the Subsidiary Which Acquired the Security Being Reported on by the Parent Holding Company or Control Person.</td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter"> </td><td width="92%" class="tableClassNoBorder"><div class="text">
+								Not Applicable
+							</div></td></tr><tr><td width="8%" class="tableClassValignNoBorder">Item 8.</td><td width="92%" class="tableClassNoBorder">Identification and Classification of Members of the Group.</td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter"> </td><td width="92%" class="tableClassNoBorder"><div class="text">
+									Not Applicable
+								</div></td></tr><tr><td width="8%" class="tableClassValignNoBorder">Item 9.</td><td width="92%" class="tableClassNoBorder">Notice of Dissolution of Group.</td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter"> </td><td width="92%" class="tableClassNoBorder"><div class="text">
+									Not Applicable
+								</div></td></tr></table><br></div><div class="form1"><table role="presentation" id="certifications"><tr><td width="8%" class="tableClassValignNoBorder">Item 10.</td><td width="92%" class="tableClassNoBorder">Certifications:</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignCenter"> </td><td width="92%" class="tableClassNoBorder"><div class="text">
+									Not Applicable
+							</div></td></tr></table><br></div><div class="form1"><table role="presentation" id="signatureInfo"><tr><td width="8%" class="tableClassValignNoBorder">    SIGNATURE</td><td width="92%" class="tableClassNoBorder"> </td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter"> </td><td width="92%" class="tableClassNoBorder"><div class="information" style="text-align:justify">
+						After reasonable inquiry and to the best of my knowledge and belief, I certify that the information set forth in this statement is true, complete and correct.
+						<br><br></div></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="100%" class="tableClassInnerNoBorderBlue"><div class="text">Brannin McBee</div></td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Signature:</td><td width="92%" class="tableClassNoBorderBlue signature">/s/ Brannin J. McBee</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Name/Title:</td><td width="92%" class="tableClassNoBorderBlue signature">Brannin J. McBee/an Individual</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Date:</td><td width="92%" class="tableClassNoBorderBlue signature">08/14/2026</td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="100%" class="tableClassInnerNoBorderBlue"><div class="text">Meghan Q. Bennett</div></td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Signature:</td><td width="92%" class="tableClassNoBorderBlue signature">/s/ Meghan Q. Bennett</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Name/Title:</td><td width="92%" class="tableClassNoBorderBlue signature">Meghan Q. Bennett/an Individual</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Date:</td><td width="92%" class="tableClassNoBorderBlue signature">08/14/2026</td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="100%" class="tableClassInnerNoBorderBlue"><div class="text">Canis Major 2025 Family Trust LLC</div></td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Signature:</td><td width="92%" class="tableClassNoBorderBlue signature">/s/ Brannin J. McBee</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Name/Title:</td><td width="92%" class="tableClassNoBorderBlue signature">Brannin J. McBee/its Manager</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Date:</td><td width="92%" class="tableClassNoBorderBlue signature">08/14/2026</td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="100%" class="tableClassInnerNoBorderBlue"><div class="text">Canis Minor 2025 Family Trust LLC</div></td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Signature:</td><td width="92%" class="tableClassNoBorderBlue signature">/s/ Brannin J. McBee</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Name/Title:</td><td width="92%" class="tableClassNoBorderBlue signature">Brannin J. McBee/its Manager</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Date:</td><td width="92%" class="tableClassNoBorderBlue signature">08/14/2026</td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="100%" class="tableClassInnerNoBorderBlue"><div class="text">Canis Major 2025 GRAT</div></td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Signature:</td><td width="92%" class="tableClassNoBorderBlue signature">/s/ Brannin J. McBee</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Name/Title:</td><td width="92%" class="tableClassNoBorderBlue signature">Brannin J. McBee/its Trustee</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Date:</td><td width="92%" class="tableClassNoBorderBlue signature">08/14/2026</td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="100%" class="tableClassInnerNoBorderBlue"><div class="text">Canis Major 2024 Irrevocable Trust LLC</div></td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Signature:</td><td width="92%" class="tableClassNoBorderBlue signature">/s/ Brannin J. McBee</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Name/Title:</td><td width="92%" class="tableClassNoBorderBlue signature">Brannin J. McBee/its Manager</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Date:</td><td width="92%" class="tableClassNoBorderBlue signature">08/14/2026</td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="100%" class="tableClassInnerNoBorderBlue"><div class="text">Brannin J. McBee 2022 Irrevocable Trust</div></td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Signature:</td><td width="92%" class="tableClassNoBorderBlue signature">/s/ Meghan Q. Bennett</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Name/Title:</td><td width="92%" class="tableClassNoBorderBlue signature">Meghan Q. Bennett/its Trustee</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Date:</td><td width="92%" class="tableClassNoBorderBlue signature">08/14/2026</td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="100%" class="tableClassInnerNoBorderBlue"><div class="text">Canis Minor 2025 GRAT</div></td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Signature:</td><td width="92%" class="tableClassNoBorderBlue signature">/s/ Meghan Q. Bennett</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Name/Title:</td><td width="92%" class="tableClassNoBorderBlue signature">Meghan Q. Bennett/its Trustee</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Date:</td><td width="92%" class="tableClassNoBorderBlue signature">08/14/2026</td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="100%" class="tableClassInnerNoBorderBlue"><div class="text">Canis Major SM Trust</div></td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Signature:</td><td width="92%" class="tableClassNoBorderBlue signature">/s/ Alexander Elsik</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Name/Title:</td><td width="92%" class="tableClassNoBorderBlue signature">Alexander Elsik/its Trustee</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Date:</td><td width="92%" class="tableClassNoBorderBlue signature">08/14/2026</td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="100%" class="tableClassInnerNoBorderBlue"><div class="text">Canis Major 2026 GRAT</div></td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Signature:</td><td width="92%" class="tableClassNoBorderBlue signature">/s/ Brannin J. McBee</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Name/Title:</td><td width="92%" class="tableClassNoBorderBlue signature">Brannin J. McBee/its Trustee</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Date:</td><td width="92%" class="tableClassNoBorderBlue signature">08/14/2026</td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="100%" class="tableClassInnerNoBorderBlue"><div class="text">Canis Minor 2026 GRAT</div></td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Signature:</td><td width="92%" class="tableClassNoBorderBlue signature">/s/ Meghan Q. Bennett</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Name/Title:</td><td width="92%" class="tableClassNoBorderBlue signature">Meghan Q. Bennett/its Trustee</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Date:</td><td width="92%" class="tableClassNoBorderBlue signature">08/14/2026</td></tr></table></td></tr></table><table><tr class="tableClass" colspan="2"><td width="100%" class="tableClassNoBorder"><div class="information" style="text-align:center;font-weight:bold;">
+					 Exhibit Information
+					<br><br></div></td></tr><tr class="tableClass" colspan="2"><td width="100%" class="tableClassNoBorder"><div class="largetext">Exhibit 99.1 2026 McBee Joint Filing Agreement<br><br></div></td></tr></table></div></div>
+
+
+    <script type="text/javascript"  src="/N3AEOPt9/dJoipWz/rYwIB5c/dg/YEaQGVVmDJktp27Xmu/SixucGdeLAQ/KXhNJ/AQsW1I"></script></body></html>

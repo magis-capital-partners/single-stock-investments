@@ -1,0 +1,464 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns:p="http://www.sec.gov/edgar/schedule13D" xmlns:p1="http://www.sec.gov/edgar/common"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><link rel="stylesheet" type="text/css" href="/css/SDR_print.css"><style type="text/css">
+					.fakeTextBox {
+					border-top: 2px solid #999;
+					border-right: 1px solid #ccc;
+					border-bottom: 1px solid #ccc;
+					border-left: 2px solid #999;
+					padding: 2px;
+					_width: 800px;
+					height: auto;
+					min-width: 200px;
+					min-height: 50px;
+					word-wrap: break-word;
+					font-size: 0.9em;
+					color: blue;
+					}
+					table.tableClass { border: solid black;
+					border-top-width: 1;
+					border-right-width: 1;
+					border-bottom-width: 1;
+					border-left-width: 1;
+					table-layout:fixed;
+					}
+					table.innerTableClass { border: solid black;
+					border-top-width: 0;
+					border-right-width: 0;
+					border-bottom-width: 0;
+					border-left-width: 0;
+					table-layout:fixed;
+					}
+					th.tableClassLeft { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					padding: 2px;
+					}
+					th.tableClassRight { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 0;
+					padding: 2px;
+					}
+					th.tableClass { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					padding: 2px;
+					}
+					td.tableClassLeft { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					font-size: 0.9em;
+					color: blue;
+					word-wrap: break-word;
+					}
+					td.tableClassRight { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 0;
+					font-size: 0.9em;
+					color: blue;
+					word-wrap: break-word;
+					}
+					td.tableClass { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					font-size: 0.9em;
+					font-weight:bold;
+					color: black;
+					word-wrap: break-word;
+					}
+					td.tableClassNoBorder { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 0px;
+					font-size: 0.9em;
+					font-weight:bold;
+					color: black;
+					word-wrap: break-word;
+					}
+
+					td.tableClassNoBorderBlue { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 0px;
+					font-size: 0.9em;
+					font-weight:bold;
+					color: blue;
+					word-wrap: break-word;
+					}
+
+					td.tableClassInnerNoBorderBlue { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 0px;
+					font-size: 1.4em;
+					font-weight:bold;
+					color: blue;
+					word-wrap: break-word;
+					}
+
+					td.tableClassNoBorderAlignLeft { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 0px;
+					font-size: 0.9em;
+					font-weight:bold;
+					text-align: left;
+					color: black;
+					word-wrap: break-word;
+					}
+
+					td.signature {
+					padding: 4px 8px;
+					}
+
+					td.tableClassInner { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					font-size: 1em;
+					font-weight:bold;
+					color: black;
+					word-wrap: break-word;
+					}
+
+					td.tableClassValign { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					font-size: 0.9em;
+					font-weight:bold;
+					color: black;
+					vertical-align: middle;
+					text-align: center;
+					word-wrap: break-word;
+					}
+
+					td.tableClassValignNoBorder { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 0px;
+					font-size: 0.9em;
+					font-weight:bold;
+					color: black;
+					vertical-align: middle;
+					text-align: center;
+					word-wrap: break-word;
+					}
+
+					td.tableClassValignInner { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					font-size: 1em;
+					font-weight:bold;
+					color: black;
+					vertical-align: middle;
+					text-align: center;
+					word-wrap: break-word;
+					}
+
+					td.innerTableClassRightValign { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 0;
+					font-size: 1em;
+					font-weight:bold;
+					color: black;
+					vertical-align: middle;
+					text-align: center;
+					word-wrap: break-word;
+					}
+
+					td.innerTableClassRightValignBottomLess { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 0px;
+					border-left-width: 0;
+					font-size: 1em;
+					font-weight:bold;
+					color: black;
+					vertical-align: middle;
+					text-align: center;
+					word-wrap: break-word;
+					}
+
+					td.tableClassInnerLeft { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					font-size: 1em;
+					font-weight:bold;
+					color: black;
+					word-wrap: break-word;
+					}
+
+					td.tableClassInnerLeftBottomLess { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 1px;
+					font-size: 1em;
+					font-weight:bold;
+					color: black;
+					word-wrap: break-word;
+					}
+
+					td.tableClassNoBorderAlignCenter { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 0px;
+					font-size: 0.9em;
+					font-weight:bold;
+					color: black;
+					text-align: center;
+					word-wrap: break-word;
+					}
+
+					tr.tableClass { border: solid black;
+					border-top-width: 1px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					}
+					tr.tableClassWithBg { border: solid black;
+					border-top-width: 0;
+					border-right-width: 1;
+					border-bottom-width: 1;
+					border-left-width: 0;
+					background-color: #e0e0ff
+					}
+
+					tr.tableClassWithBgBlack { border: solid black;
+					border-top-width: 0;
+					border-right-width: 1;
+					border-bottom-width: 1;
+					border-left-width: 0;
+					background-color: #D3D3D3
+					}
+
+					hr.header {
+					position: relative;
+					top: 20px;
+					border: none;
+					height: 6px;
+					background: black;
+					margin-bottom: 10px;
+					}
+
+					hr.separatorThin {
+					position: relative;
+					top: 2px;
+					border: none;
+					height: 2px;
+					background: black;
+					margin-bottom: 2px;
+					}
+
+					hr.headerThin {
+					position: relative;
+					top: 10px;
+					border: none;
+					height: 2px;
+					background: black;
+					margin-bottom: 10px;
+					}
+
+					hr.separator {
+					position: relative;
+					top: 20px;
+					border: none;
+					height: 4px;
+					background: black;
+					margin-bottom: 5px;
+					}
+
+					div.text {
+					background-color: #ffffff;
+					color: blue;
+					font-size: 1em;
+					font-weight:normal;
+					text-align:justify;
+					}
+
+
+					div.information {
+					background-color: #ffffff;
+					color: black;
+					font-size: 1em;
+					font-weight:normal;
+					text-align:justify;
+					}
+
+					#scheader {
+					font-size: 0.9em;
+					border: 0px solid #404040;
+					border-spacing: 2px;
+					}
+
+					div.largetext {
+					background-color: #ffffff;
+					color: blue;
+					font-size: 1em;
+					font-weight:normal;
+					text-align:justify;
+					white-space: pre-wrap;
+					word-break: normal;
+					}
+
+				</style></head><body lang="en-US" text="#000000" bgcolor="#ffffff"><hr class="header"><br><hr class="headerThin"><div class="contentwrapper"><table role="presentation" id="scheader"><tr><td class="tableClassNoBorderAlignCenter" style="font-size:2em;">
+						SECURITIES AND EXCHANGE COMMISSION
+						<br>
+						Washington, D.C. 20549
+					</td></tr><tr><td class="tableClassNoBorderAlignCenter"><br><br><div style="font-size:1.5em;">
+									SCHEDULE 13D
+								</div><br><div style="font-size:1.2em;">
+							Under the Securities Exchange Act of 1934
+						</div><br></td></tr><tr><td class="center"><div class="information" style="text-align:center; font-weight:bold; color:blue;">EquipmentShare.com Inc</div><div class="information" style="text-align:center; font-weight:bold;"><hr class="separatorThin">(Name of Issuer)</div><br><br></td></tr><tr><td class="center"><div class="information" style="text-align:center; font-weight:bold; color:blue;">Class A Common Stock</div><div class="information" style="text-align:center; font-weight:bold;"><hr class="separatorThin">(Title of Class of Securities)</div><br><br></td></tr><table border="1"><tr><td><div class="information" style="text-align:center; font-weight:bold; color:blue;">29445S100</div><div class="information" style="text-align:center; font-weight:bold;"><hr class="separatorThin">(CUSIP Number)</div></td></tr><br><br></table><tr><td class="center"><div class="information" style="text-align:center; font-weight:bold; color:blue;">John Griffin<br>5710 Bull Run Drive,
+								<br>Columbia,
+								MO,
+								65201<br>(573) 299-5222</div><div class="information" style="text-align:center; font-weight:bold;"><hr class="separatorThin">(Name, Address and Telephone Number of Person Authorized to
+									Receive Notices and Communications)</div></td></tr><tr><td class="center"><div class="information" style="text-align:center; font-weight:bold; color:blue;">06/15/2026</div><div class="information" style="text-align:center; font-weight:bold;"><hr class="separatorThin">(Date of Event Which Requires Filing of This Statement)</div></td></tr></table><br><br><div class="information" style="text-align:justify">
+				If the filing person has previously filed a statement on Schedule 13G to report the acquisition that is the subject of this Schedule 13D, and is filing this schedule because of §§ 240.13d-1(e), 240.13d-1(f) or 240.13d-1(g), check the following box.
+				<img src="/Images/box-unchecked.jpg" alt="Checkbox not checked"></div><br><div class="information" style="text-align:justify">
+				The information required on the remainder of this cover page shall not be deemed to be “filed” for the purpose of Section 18 of the
+				Securities Exchange Act of 1934 (“Act”) or otherwise subject to the liabilities of that section of the Act but shall be subject to all other
+				provisions of the Act (however, see the Notes).
+			</div></div><hr class="headerThin"><hr class="header"><br><br>
+  <div style="display:none">
+			schemaVersion:
+			</div>
+<div class="content"><div class="form1"></div></div>
+  <div class="content"><div class="form1"><table><tr><td class="center"><br><br><p><div align="center" style="font-size:1.2em;">
+									SCHEDULE 13D
+								</div></p></td></tr></table><table role="presentation" class="tableClass" id="cusipNumber"><tr class="tableClass"><td width="7%" style="font-weight:bold;">CUSIP Number(s):</td><td width="75%"><div style="font-size:.9em; color:#000000">29445S100</div></td></tr></table><br><br><table role="presentation" class="tableClass" id="reportingPersonDetails"><tr class="tableClass"><td width="8%" class="tableClassValign">1</td><td width="92%" class="tableClass">
+					Name of reporting person
+					<br><br><div class="text">Jabbok Schlacks</div></td></tr><tr><td width="8%" class="tableClassValign">2</td><td width="92%" class="tableClass">Check the appropriate box if a member of a Group (See Instructions)
+				<br><br><div class="text"><img src="/Images/box-checked.jpg" alt="Checkbox checked">  (a)
+					<br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked">  (b)	
+				</div></td></tr><tr class="tableClassWithBgBlack"><td width="8%" class="tableClassValign">3</td><td width="92%" class="tableClass">SEC use only</td></tr><tr><td width="8%" class="tableClassValign">4</td><td width="92%" class="tableClass">
+					Source of funds (See Instructions)
+					<br><br><div class="text">PF</div></td></tr><tr><td width="8%" class="tableClassValign">5</td><td width="92%" class="tableClass">
+					Check if disclosure of legal proceedings is required pursuant to Items 2(d) or 2(e)
+					<br><br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked"></td></tr><tr><td width="8%" class="tableClassValign">6</td><td width="92%" class="tableClass">Citizenship or place of organization
+				<br><br><div class="text">
+				UNITED STATES
+			</div></td></tr><tr><td width="8%" class="tableClassValign">Number of Shares Beneficially Owned by Each Reporting Person With:</td><td width="92%" class="tableClass"><table class="innerTableClass"><tr><td width="8%" class="innerTableClassRightValign">7</td><td width="92%" class="tableClassInnerLeft">Sole Voting Power
+							<br><br><div class="text">0.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">8</td><td width="92%" class="tableClassInnerLeft">Shared Voting Power
+							<br><br><div class="text">34,828,852.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">9</td><td width="92%" class="tableClassInnerLeft">Sole Dispositive Power
+							<br><br><div class="text">21,236,589.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValignBottomLess">10</td><td width="92%" class="tableClassInnerLeftBottomLess">Shared Dispositive Power
+							<br><br><div class="text">13,592,263.00</div></td></tr></table></td></tr><tr><td width="8%" class="tableClassValign">11</td><td width="92%" class="tableClass">Aggregate amount beneficially owned by each reporting person
+				<br><br><div class="text">34,828,852.00</div></td></tr><tr><td width="8%" class="tableClassValign">12</td><td width="92%" class="tableClass">Check if the aggregate amount in Row (11) excludes certain shares (See Instructions)
+				<br><br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked"></td></tr><tr><td width="8%" class="tableClassValign">13</td><td width="92%" class="tableClass">Percent of class represented by amount in Row (11)
+				<br><br><div class="text">14.9 % </div></td></tr><tr><td width="8%" class="tableClassValign">14</td><td width="92%" class="tableClass">Type of Reporting Person (See Instructions)
+				<br><br><div class="text">IN</div></td></tr></table><br><div style="display: flex;"><div style="font-size: 0.9em; font-weight: bold; margin-right: 5px;">
+					Comment for Type of Reporting Person:
+				</div><div class="largetext" style="text-align:justify">Note to rows 8 and 11:
+
+(1) Consists of (i) 50,000 shares of Class A common stock, (ii) 13,592,263 shares of Class A common stock held by EQS Heritage Holdings LLC, (iii) 714,285 shares of Class A common stock held by EQS Legacy Holdings LLC, (iv) 18,784,472 shares of Class B Common Stock and (v) 1,687,832 shares of Class B Common Stock underlying options that are currently exercisable. Each of Jabbok Schlacks and William J. Schlacks IV is a Managing Member of EQS Heritage Holdings LLC and EQS Legacy Holdings LLC and has controlling voting and dispositive power with regard to the shares held by such entities. Each share of Class B Common Stock is convertible into one share of the Issuer's Class A Common Stock at any time at the option of the holder thereof. Jabbok Schlacks and William J. Schlacks IV are parties to a voting agreement whereby each has agreed to vote their shares together as a group.  Accordingly, each of Jabbok Schlacks and William J. Schlacks IV may be deemed to beneficially own each other's stock with shared voting power, currently consisting in the aggregate of 100,000 shares of Class A Common Stock and 37,568,944 shares of Class B Common Stock.
+
+Notes to row 13:
+
+(2) Based on the quotient obtained by dividing (a) the aggregate number of Class A Common Stock and Class B Common Stock, together, beneficially owned by the Reporting Person as set forth in Row 11 by (b) the sum of (i) 214,806,153 shares of Class A Common Stock outstanding as of May 10, 2026 and (ii) the aggregate number of shares of Class B Common Stock beneficially owned by the Reporting Person. The aggregate number of shares of Class B Common Stock beneficially owned by the Reporting Person as set forth in clauses "(a)" and "(b)" of this footnote are treated as converted into shares of Class A Common Stock solely for the purpose of computing the percentage ownership of the Reporting Person.
+
+(3) Each share of Class A Common Stock is entitled to one vote and each share of Class B Common Stock is entitled to 20 votes. Accordingly, each of Jabbok Schlacks and William J. Schlacks IV own 42.5% of the total outstanding voting power, and based on their voting agreement, their interests collectively represent 81% of the aggregate voting power of the Issuer's issued and outstanding share capital.</div></div><table><tr><td class="center"><br><br><p><div align="center" style="font-size:1.2em;">
+									SCHEDULE 13D
+								</div></p></td></tr></table><table role="presentation" class="tableClass" id="cusipNumber"><tr class="tableClass"><td width="7%" style="font-weight:bold;">CUSIP Number(s):</td><td width="75%"><div style="font-size:.9em; color:#000000">29445S100</div></td></tr></table><br><br><table role="presentation" class="tableClass" id="reportingPersonDetails"><tr class="tableClass"><td width="8%" class="tableClassValign">1</td><td width="92%" class="tableClass">
+					Name of reporting person
+					<br><br><div class="text">William J. Schlacks IV</div></td></tr><tr><td width="8%" class="tableClassValign">2</td><td width="92%" class="tableClass">Check the appropriate box if a member of a Group (See Instructions)
+				<br><br><div class="text"><img src="/Images/box-checked.jpg" alt="Checkbox checked">  (a)
+					<br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked">  (b)	
+				</div></td></tr><tr class="tableClassWithBgBlack"><td width="8%" class="tableClassValign">3</td><td width="92%" class="tableClass">SEC use only</td></tr><tr><td width="8%" class="tableClassValign">4</td><td width="92%" class="tableClass">
+					Source of funds (See Instructions)
+					<br><br><div class="text">PF</div></td></tr><tr><td width="8%" class="tableClassValign">5</td><td width="92%" class="tableClass">
+					Check if disclosure of legal proceedings is required pursuant to Items 2(d) or 2(e)
+					<br><br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked"></td></tr><tr><td width="8%" class="tableClassValign">6</td><td width="92%" class="tableClass">Citizenship or place of organization
+				<br><br><div class="text">
+				UNITED STATES
+			</div></td></tr><tr><td width="8%" class="tableClassValign">Number of Shares Beneficially Owned by Each Reporting Person With:</td><td width="92%" class="tableClass"><table class="innerTableClass"><tr><td width="8%" class="innerTableClassRightValign">7</td><td width="92%" class="tableClassInnerLeft">Sole Voting Power
+							<br><br><div class="text">0.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">8</td><td width="92%" class="tableClassInnerLeft">Shared Voting Power
+							<br><br><div class="text">34,828,852.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">9</td><td width="92%" class="tableClassInnerLeft">Sole Dispositive Power
+							<br><br><div class="text">21,236,589.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValignBottomLess">10</td><td width="92%" class="tableClassInnerLeftBottomLess">Shared Dispositive Power
+							<br><br><div class="text">13,592,263.00</div></td></tr></table></td></tr><tr><td width="8%" class="tableClassValign">11</td><td width="92%" class="tableClass">Aggregate amount beneficially owned by each reporting person
+				<br><br><div class="text">34,828,852.00</div></td></tr><tr><td width="8%" class="tableClassValign">12</td><td width="92%" class="tableClass">Check if the aggregate amount in Row (11) excludes certain shares (See Instructions)
+				<br><br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked"></td></tr><tr><td width="8%" class="tableClassValign">13</td><td width="92%" class="tableClass">Percent of class represented by amount in Row (11)
+				<br><br><div class="text">14.9 % </div></td></tr><tr><td width="8%" class="tableClassValign">14</td><td width="92%" class="tableClass">Type of Reporting Person (See Instructions)
+				<br><br><div class="text">IN</div></td></tr></table><br><div style="display: flex;"><div style="font-size: 0.9em; font-weight: bold; margin-right: 5px;">
+					Comment for Type of Reporting Person:
+				</div><div class="largetext" style="text-align:justify">Note to rows 8 and 11:
+
+(1) Consists of (i) 50,000 shares of Class A common stock, (ii) 13,592,263 shares of Class A common stock held by EQS Heritage Holdings LLC, (iii) 714,285 shares of Class A common stock held by EQS Legacy Holdings LLC, (iv) 18,784,472 shares of Class B Common Stock and (v) 1,687,832 shares of Class B Common Stock underlying options that are currently exercisable. Each of William J. Schlacks IV and Jabbok Schlacks is a Managing Member of EQS Heritage Holdings LLC and EQS Legacy Holdings LLC and has controlling voting and dispositive power with regard to the shares held by such entities. Each share of Class B Common Stock is convertible into one share of the Issuer's Class A Common Stock at any time at the option of the holder thereof. William J. Schlacks IV and Jabbok Schlacks are parties to a voting agreement whereby each has agreed to vote their shares together as a group. Accordingly, each of William J. Schlacks IV and Jabbok Schlacks may be deemed to beneficially own each other's stock with shared voting power, currently consisting in the aggregate of 100,000 shares of Class A Common Stock and 37,568,944 shares of Class B Common Stock.
+
+Notes to row 13:
+
+(2) Based on the quotient obtained by dividing (a) the aggregate number of Class A Common Stock and Class B Common Stock, together, beneficially owned by the Reporting Person as set forth in Row 11 by (b) the sum of (i) 214,806,153 shares of Class A Common Stock outstanding as of May 10, 2026 and (ii) the aggregate number of shares of Class B Common Stock beneficially owned by the Reporting Person. The aggregate number of shares of Class B Common Stock beneficially owned by the Reporting Person as set forth in clauses "(a)" and "(b)" of this footnote are treated as converted into shares of Class A Common Stock solely for the purpose of computing the percentage ownership of the Reporting Person.
+
+(3) Each share of Class A Common Stock is entitled to one vote and each share of Class B Common Stock is entitled to 20 votes. Accordingly, each of William J. Schlacks IV and Jabbok Schlacks own 42.5% of the total outstanding voting power, and based on their voting agreement, their interests collectively represent 81% of the aggregate voting power of the Issuer's issued and outstanding share capital.</div></div></div><div class="form1"><table><tr><td class="center"><br><br><p><div align="center" style="font-size:1.2em;">
+									SCHEDULE 13D
+								</div></p></td></tr></table><table role="presentation" id="item1to7"><tr><td width="8%" class="tableClassValignNoBorder">Item 1.</td><td width="92%" class="tableClassNoBorder">Security and Issuer</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignCenter">(a)</td><td width="92%" class="tableClassNoBorder">Title of Class of Securities:
+							<br><br><div class="text">Class A Common Stock</div></td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignCenter">(b)</td><td width="92%" class="tableClassNoBorder">Name of Issuer:
+							<br><br><div class="text">EquipmentShare.com Inc</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(c)</td><td width="92%" class="tableClassNoBorder">Address of Issuer's Principal Executive Offices:
+							<br><br><div class="text">5710 Bull Run Drive, Columbia, 
+				MISSOURI
+			, 65201.</div></td></tr><tr><td colspan="3"><div style="display: flex;"><div style="font-size: 0.9em; font-weight: bold; margin-right: 5px;">
+									Item 1 Comment:
+								</div><div class="largetext" style="text-align:justify">This statement of beneficial ownership on Schedule 13D (this "Statement") relates to the shares of Class A common stock, par value $0.00000125 per share, and shares of Class B common stock, par value $0.00000125 per share, of EquipmentShare.com Inc, a Texas corporation (the "Issuer"). The Issuer's principal executive office is located at 5710 Bull Run Drive, Columbia, Missouri, 65201.</div></div></td></tr><tr><td width="8%" class="tableClassValignNoBorder">Item 2.</td><td width="92%" class="tableClassNoBorder">Identity and Background</td></tr><tr></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignCenter">(a)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">This Statement is being filed jointly by the following persons (each, a "Reporting Person," and, collectively, the "Reporting Persons"): (i) Jabbok Schlacks, the Co-Founder, Chief Executive Officer and Director of the Issuer and (ii) William J. Schlacks IV, Co-Founder, President, Director and Secretary of the Board of Directors (the "Board").
+Each of the Reporting Persons may be deemed to have acquired beneficial ownership over each other's shares pursuant to the Voting Agreement (defined below) described further in Item 6 below. In accordance with Rule 13d-1(k)(1)(iii) of the Securities Exchange Act of 1934, as amended (the "Exchange Act"), the Reporting Persons have executed a Joint Filing Agreement (as defined below), a copy of which is filed as Exhibit 1 to this Statement.</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(b)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">5710 Bull Run Drive, Columbia, Missouri, 65201</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(c)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">Jabbok Schlacks and William J. Schlacks IV are the co-founders of the Issuer (the "Co-Founders"). Jabbok Schlacks has served as Chief Executive Officer and a member of the Board since 2015. William J. Schlacks IV has served as President and a member of the Board since 2015. The business address for each of the Reporting Persons is 5710 Bull Run Drive, Columbia, Missouri, 65201.</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(d)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">During the last five years, no Reporting Person has been convicted in a criminal proceeding (excluding traffic violations or similar misdemeanors).</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(e)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">During the last five years, no Reporting Person has been party to a civil proceeding of a judicial or administrative body of competent jurisdiction and as a result of such proceeding was or is subject to a judgment, decree or final order enjoining further violations of, or prohibiting or mandating activities subject to, federal or state securities laws or finding any violation with respect to such laws.</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(f)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">Jabbok Schlacks and William J. Schlacks IV are each citizens of the United States.</div></td></tr><tr><td width="8%" class="tableClassValignNoBorder">Item 3.</td><td width="92%" class="tableClassNoBorder">Source and Amount of Funds or Other Consideration</td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter"> </td><td width="92%" class="tableClassNoBorder"><div class="largetext">The responses to Items 4 and 6 of this Statement are incorporated herein by reference. The Reporting Persons each acquired the Class A common stock and Class B common stock beneficially owned by each of them respectively using personal funds and/or as compensation for serving as an executive officer and member of Board of the Issuer, including the vesting of various equity compensation awards in connection with each of their respective service as an executive officer and director of the Issuer.  In addition, each of the Reporting Persons may be deemed to have acquired beneficial ownership over each other's shares of common stock pursuant to the Voting Agreement described further in Item 6 below.</div></td></tr><tr><td width="8%" class="tableClassValignNoBorder">Item 4.</td><td width="92%" class="tableClassNoBorder">Purpose of Transaction</td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter"> </td><td width="92%" class="tableClassNoBorder"><div class="largetext">The information set forth in Items 3 and 6 of this Statement is hereby incorporated by reference into this Item 4. The Reporting Persons acquired all of their securities for investment purposes and are being held as a long-term investment. The Reporting Persons intend to continuously review their investment in the Issuer and may in the future determine to acquire additional securities of the Issuer or dispose of the securities of the Issuer owned by them or take any other available course of action, including surrendering or selling shares back to the Issuer for tax withholding obligations. Any actions the Reporting Persons might each undertake may be made at any time and from time to time without prior notice and will be dependent upon each of their respective review of numerous factors, including, but not limited to: an ongoing evaluation of the Issuer's business, financial condition, operations and prospects; price levels of the Issuer's securities; general market, industry and economic conditions; the relative attractiveness of alternative business and investment opportunities; and other future developments.
+
+Any transactions in common stock of the Issuer by either of the Reporting Persons pursuant to the Voting Agreement with respect to shares of Class A common stock and Class B common stock that they each hold may be taken at any time. The Reporting Persons, subject to certain provisions of the law, may each acquire additional securities of the Issuer, or retain or sell all or a portion of the securities then held, in the open market or in privately negotiated transactions. In addition, each of Jabbok Schlacks, including in his positions as Chief Executive Officer and member of the Board, and William J. Schlacks IV, including in his positions as President, member of the Board and Board Secretary, may engage in discussions with other members of management, the Board, and stockholders of the Issuer and other relevant parties or encourage, cause or seek to cause the Issuer or such persons to consider or explore extraordinary corporate transactions, such as: a merger, reorganization or take-private transaction that could result in the de-listing or de-registration of the Class A Common Stock; security offerings and/or stock repurchases by the Issuer; sales or acquisitions of assets or businesses; changes to the capitalization or dividend policy of the Issuer; or other material changes to the Issuer's business or corporate structure, including changes in management or the composition of the Board.
+
+Other than as described above, each of the Reporting Persons do not currently have any plans or proposals that relate to, or would result in, any of the matters listed in Items 4(a)-(j) of Schedule 13D, although, depending on the factors discussed herein, the Reporting Persons may change each of their respective purpose or formulate different plans or proposals with respect thereto at any time. Jabbok Schlacks, including in his positions as Chief Executive Officer, member of the Board, and William J. Schlacks IV, including in his positions as President, member of the Board and Board Secretary, each participate in deliberations of the Issuer's senior management in the normal course of the Issuer's business that could involve any of the matters set forth in Items 4(a)-(j) of Schedule 13D from time to time, and, in keeping with each of their respective fiduciary duties as an officer and director, may make proposals or recommendations to the Board that could involve such matters from time to time. In addition, as members of the Issuer's senior management, each of the Reporting Persons participates in Issuer compensatory plans, including plans pursuant to which awards of equity securities are made (including to each of the Reporting Persons), in the ordinary course of business. As a result of the Voting Agreement, the Reporting Persons may be deemed a group for purposes of Section 13(d)(3) of the Exchange Act.</div></td></tr><tr><td width="8%" class="tableClassValignNoBorder">Item 5.</td><td width="92%" class="tableClassNoBorder">Interest in Securities of the Issuer</td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(a)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">(a)-(b) The aggregate number and percentage of shares of Class A common stock beneficially owned by each Reporting Person and, for each Reporting Person, the number of shares as to which there is sole power to vote or to direct the vote, shared power to vote or to direct the vote, sole power to dispose or to direct the disposition, or shared power to dispose or to direct the disposition are set forth on rows 7 through 11 and row 13 of the cover pages of this Statement and are incorporated herein by reference.
+
+Beneficial ownership of shares of Class A common stock, par value $0.00000125 per share, includes shares of Class A common stock which may be acquired upon the conversion of shares of the Issuer's Class B common stock, par value $0.00000125 per share (together with the Class A common stock, the "Common Stock").
+
+Each share of Class A common stock is entitled to one vote per share on all matters presented for a vote. Each share of Class B common stock is entitled to 20 votes per share on all matters on which shareholders generally are entitled to vote. Holders of shares of Class A common stock and Class B common stock will vote together as a single class on all matters submitted to a vote of shareholders, except as otherwise required by applicable law or as specified in the Issuer's amended and restated certificate of formation.
+
+As of the date hereof, the Reporting Persons each beneficially own 34,828,852 shares of Class A common stock, representing beneficial ownership of approximately 16.2% of the outstanding Class A common stock, and approximately 13.8% of the total outstanding Common Stock, consisting of: (i) 18,784,472 shares of Class B common stock held by each of the Reporting Persons individually, (ii) 1,687,832 shares of Class B common stock issuable upon the exercise of stock options held by each of the Reporting Persons individually that are currently exercisable, (iii) 50,000 shares of Class A common stock held by each of the Reporting Persons individually, (iv) 13,592,263 shares of Class A common stock held by EQS Heritage Holdings LLC and (v) 714,285 shares of Class A common stock held by EQS Legacy Holdings LLC. Each of the Reporting Persons is the Managing Member of EQS Heritage Holdings LLC and EQS Legacy Holdings LLC, and has controlling voting and dispositive power with regard to the shares held by such entities. The Reporting Persons have agreed to vote together as a group and accordingly may be deemed to have beneficial ownership of each other's stock.
+
+The percentages used in this Statement are calculated based upon a total of 252,375,097 shares of Class A common stock and Class B common stock outstanding as of May 10, 2026, as reported in the Issuer's Form 10-Q for the quarter ended March 31, 2026, filed on May 14, 2026.</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(b)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">The information set forth in Item 5(a) of this Schedule 13D is hereby incorporated by reference.</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(c)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">Immediately prior to the completion of the Issuer's initial public offering (the "IPO") but following the conversion of all shares of Class A common stock then held by Jabbok Schlacks and William J. Schlacks IV into shares of Class B common stock, there were 213,713,950 shares of Class A common stock and 37,568,944 shares of Class B common stock outstanding.
+
+In connection with the Issuer's IPO, as described further in Item 6 below, Jabbok Schlacks and William J. Schlacks IV entered into a Voting Agreement pursuant to which each may be deemed to have acquired beneficial ownership over the other's shares of Common Stock through the Voting Proxies.
+
+On January 26, 2026, the Issuer completed its IPO of an aggregate of 35,075,000 shares of its Class A common stock, par value $0.00000125 per share, including 4,575,000 shares of Class A common stock purchased from certain selling shareholders.
+
+On June 15, 2026, Jabbok Schlacks and William J. Schlacks IV each purchased 50,000 shares of Class A common stock in open market and/or brokerage transactions.
+
+Other than the transactions disclosed in this Item 5(c), the Reporting Persons have not effected any transactions in the securities of the Issuer during the past 60 days.</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(d)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">To the best knowledge of the Reporting Persons, no one other than the Reporting Persons has the right to receive or the power to direct the receipt of dividends from, or the proceeds from the sale of, the Class A common stock and Class B common stock reported herein as beneficially owned by the Reporting Persons.</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(e)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">Not applicable</div></td></tr><tr><td width="8%" class="tableClassValignNoBorder">Item 6.</td><td width="92%" class="tableClassNoBorder">Contracts, Arrangements, Understandings or Relationships With Respect to Securities of the Issuer</td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter"> </td><td width="92%" class="tableClassNoBorder"><div class="largetext">Executive and Director Compensation: Each of Jabbok Schlacks, including in his positions as Chief Executive Officer, member of the Board, and William J. Schlacks IV, including in his positions as President, member of the Board and Board Secretary has in the past and may in the future receive compensation in the form of common stock, restricted stock units, stock options or other securities convertible into common stock of the Issuer. 0
+
+Voting Agreement: In connection with the Issuer's IPO, the Reporting Persons entered into a voting agreement (the "Voting Agreement"). The Voting Agreement provides that, with respect to any matter submitted to our shareholders for a vote, each Co-Founder will agree to vote or exercise his rights to consent with respect to all shares beneficially owned by him together with, and in the same manner as, the other Co-Founder as mutually agreed by the Co-Founders. In addition, each Founder agreed that he will not, without the consent of the other Co-Founder, grant any proxies or enter into any voting trust or other agreement or arrangement with respect to shares beneficially owned by him to the extent such voting trust, agreement or arrangement would be inconsistent with the Voting Agreement. The Voting Agreement may be terminated at any time by either Co-Founder upon written notice to the other Co-Founder with a copy to the Issuer. The foregoing description of the Voting Agreement does not purport to be complete and is qualified in its entirety by reference to the full text of the Voting Agreement, which is filed as Exhibit 2 hereto and is incorporated by reference herein.
+
+Lock-Up Agreement: In connection with the IPO, each Reporting Person, subject to limited exceptions, for a period of 180 days after the date of the final prospectus relating to the IPO, not to (1) offer, pledge, sell, contract to sell, sell any option or contract to purchase, purchase any option or contract to sell, grant any option, right or warrant to purchase, lend or otherwise transfer or dispose of, directly or indirectly, any shares of common stock or any securities convertible into or exercisable or exchangeable for shares of common stock (collectively with the shares of common stock, the "lock-up securities"), (2) enter into any hedging, swap or other agreement or transaction that transfers, in whole or in part, any of the economic consequences of ownership of the lock-up securities, whether any such transaction described in clause (1) or (2) above is to be settled by delivery of lock-up securities, in cash or otherwise, (3) make any demand for, or exercise any right with respect to, the registration of any lock-up securities, or (4) publicly disclose the intention to do any of the foregoing, in each case, without the prior written consent of Goldman Sachs &amp; Co. LLC may waive the requirements of these lock-up agreements at any time in its sole discretion. The foregoing description of the Lockup Agreement does not purport to be complete and is qualified in its entirety by reference to the full text of the Lockup Agreement, which is filed as Exhibit 3 hereto and is incorporated by reference herein.
+
+Division of Profits: The Reporting Persons have an arrangement with Naveen Bhatia ("Mr. Bhatia") under which Mr. Bhatia will receive one-third of the carried interest of EQS Heritage Holdings LLC, which holds 13,592,263 shares of Class A common stock.
+
+Joint Filing Agreement: Pursuant to Rule 13d-1(k) promulgated under the Exchange Act, the Reporting Persons have entered into an agreement, attached hereto as Exhibit 1, with respect to the joint filing of this Schedule 13D and any amendment or amendments hereto (the "Joint Filing Agreement").</div></td></tr><tr><td width="8%" class="tableClassValignNoBorder">Item 7.</td><td width="92%" class="tableClassNoBorder">Material to be Filed as Exhibits.</td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter"> </td><td width="92%" class="tableClassNoBorder"><div class="largetext">Exhibit 1. Joint Filing Agreement, dated as of June 23, 2026, by and among the Reporting Persons
+
+Exhibit 2. Voting Agreement, dated as of January 22, 2026, by and among the Reporting Persons
+
+Exhibit 3. Form of Lock-Up Agreement (incorporated herein by reference to Schedule IV to the Form of Underwriting Agreement, filed as Exhibit 1.1 to the Issuer's pre-effective Amendment No. 1 to the Issuer's Registration Statement on Form S-1/A filed on January 13, 2026)
+https://www.sec.gov/Archives/edgar/data/1693736/000162828026001903/exhibit11-sx1a.htm</div></td></tr></table><br></div><div class="form1"><table role="presentation" id="signatureInfo"><tr><td width="8%" class="tableClassValignNoBorder">    SIGNATURE</td><td width="92%" class="tableClassNoBorder"> </td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter"> </td><td width="92%" class="tableClassNoBorder"><div class="information" style="text-align:justify">
+						After reasonable inquiry and to the best of my knowledge and belief, I certify that the information set forth in this statement is true, complete and correct.
+						<br><br></div></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="100%" class="tableClassInnerNoBorderBlue"><div class="text">Jabbok Schlacks</div></td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Signature:</td><td width="92%" class="tableClassNoBorderBlue signature">/s/ Jabbok Schlacks</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Name/Title:</td><td width="92%" class="tableClassNoBorderBlue signature">Jabbok Schlacks</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Date:</td><td width="92%" class="tableClassNoBorderBlue signature">06/23/2026</td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="100%" class="tableClassInnerNoBorderBlue"><div class="text">William J. Schlacks IV</div></td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Signature:</td><td width="92%" class="tableClassNoBorderBlue signature">/s/ William J. Schlacks IV</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Name/Title:</td><td width="92%" class="tableClassNoBorderBlue signature">William J. Schlacks IV</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Date:</td><td width="92%" class="tableClassNoBorderBlue signature">06/23/2026</td></tr></table></td></tr></table></div></div>
+
+<script type="text/javascript"  src="/N3AEOPt9/dJoipWz/rYwIB5c/dg/YEaQGVVmDJktp27Xmu/SixucGdeLAQ/KXhNJ/AQsW1I"></script></body></html>

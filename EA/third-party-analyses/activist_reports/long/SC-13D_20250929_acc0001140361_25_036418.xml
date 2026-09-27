@@ -1,0 +1,428 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns:p="http://www.sec.gov/edgar/schedule13D" xmlns:p1="http://www.sec.gov/edgar/common"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><link rel="stylesheet" type="text/css" href="/css/SDR_print.css"><style type="text/css">
+					.fakeTextBox {
+					border-top: 2px solid #999;
+					border-right: 1px solid #ccc;
+					border-bottom: 1px solid #ccc;
+					border-left: 2px solid #999;
+					padding: 2px;
+					_width: 800px;
+					height: auto;
+					min-width: 200px;
+					min-height: 50px;
+					word-wrap: break-word;
+					font-size: 0.9em;
+					color: blue;
+					}
+					table.tableClass { border: solid black;
+					border-top-width: 1;
+					border-right-width: 1;
+					border-bottom-width: 1;
+					border-left-width: 1;
+					table-layout:fixed;
+					}
+					table.innerTableClass { border: solid black;
+					border-top-width: 0;
+					border-right-width: 0;
+					border-bottom-width: 0;
+					border-left-width: 0;
+					table-layout:fixed;
+					}
+					th.tableClassLeft { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					padding: 2px;
+					}
+					th.tableClassRight { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 0;
+					padding: 2px;
+					}
+					th.tableClass { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					padding: 2px;
+					}
+					td.tableClassLeft { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					font-size: 0.9em;
+					color: blue;
+					word-wrap: break-word;
+					}
+					td.tableClassRight { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 0;
+					font-size: 0.9em;
+					color: blue;
+					word-wrap: break-word;
+					}
+					td.tableClass { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					font-size: 0.9em;
+					font-weight:bold;
+					color: black;
+					word-wrap: break-word;
+					}
+					td.tableClassNoBorder { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 0px;
+					font-size: 0.9em;
+					font-weight:bold;
+					color: black;
+					word-wrap: break-word;
+					}
+
+					td.tableClassNoBorderBlue { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 0px;
+					font-size: 0.9em;
+					font-weight:bold;
+					color: blue;
+					word-wrap: break-word;
+					}
+
+					td.tableClassInnerNoBorderBlue { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 0px;
+					font-size: 1.4em;
+					font-weight:bold;
+					color: blue;
+					word-wrap: break-word;
+					}
+
+					td.tableClassNoBorderAlignLeft { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 0px;
+					font-size: 0.9em;
+					font-weight:bold;
+					text-align: left;
+					color: black;
+					word-wrap: break-word;
+					}
+
+					td.signature {
+					padding: 4px 8px;
+					}
+
+					td.tableClassInner { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					font-size: 1em;
+					font-weight:bold;
+					color: black;
+					word-wrap: break-word;
+					}
+
+					td.tableClassValign { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					font-size: 0.9em;
+					font-weight:bold;
+					color: black;
+					vertical-align: middle;
+					text-align: center;
+					word-wrap: break-word;
+					}
+
+					td.tableClassValignNoBorder { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 0px;
+					font-size: 0.9em;
+					font-weight:bold;
+					color: black;
+					vertical-align: middle;
+					text-align: center;
+					word-wrap: break-word;
+					}
+
+					td.tableClassValignInner { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					font-size: 1em;
+					font-weight:bold;
+					color: black;
+					vertical-align: middle;
+					text-align: center;
+					word-wrap: break-word;
+					}
+
+					td.innerTableClassRightValign { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 0;
+					font-size: 1em;
+					font-weight:bold;
+					color: black;
+					vertical-align: middle;
+					text-align: center;
+					word-wrap: break-word;
+					}
+
+					td.innerTableClassRightValignBottomLess { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 0px;
+					border-left-width: 0;
+					font-size: 1em;
+					font-weight:bold;
+					color: black;
+					vertical-align: middle;
+					text-align: center;
+					word-wrap: break-word;
+					}
+
+					td.tableClassInnerLeft { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					font-size: 1em;
+					font-weight:bold;
+					color: black;
+					word-wrap: break-word;
+					}
+
+					td.tableClassInnerLeftBottomLess { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 1px;
+					font-size: 1em;
+					font-weight:bold;
+					color: black;
+					word-wrap: break-word;
+					}
+
+					td.tableClassNoBorderAlignCenter { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 0px;
+					font-size: 0.9em;
+					font-weight:bold;
+					color: black;
+					text-align: center;
+					word-wrap: break-word;
+					}
+
+					tr.tableClass { border: solid black;
+					border-top-width: 1px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					}
+					tr.tableClassWithBg { border: solid black;
+					border-top-width: 0;
+					border-right-width: 1;
+					border-bottom-width: 1;
+					border-left-width: 0;
+					background-color: #e0e0ff
+					}
+
+					tr.tableClassWithBgBlack { border: solid black;
+					border-top-width: 0;
+					border-right-width: 1;
+					border-bottom-width: 1;
+					border-left-width: 0;
+					background-color: #D3D3D3
+					}
+
+					hr.header {
+					position: relative;
+					top: 20px;
+					border: none;
+					height: 6px;
+					background: black;
+					margin-bottom: 10px;
+					}
+
+					hr.separatorThin {
+					position: relative;
+					top: 2px;
+					border: none;
+					height: 2px;
+					background: black;
+					margin-bottom: 2px;
+					}
+
+					hr.headerThin {
+					position: relative;
+					top: 10px;
+					border: none;
+					height: 2px;
+					background: black;
+					margin-bottom: 10px;
+					}
+
+					hr.separator {
+					position: relative;
+					top: 20px;
+					border: none;
+					height: 4px;
+					background: black;
+					margin-bottom: 5px;
+					}
+
+					div.text {
+					background-color: #ffffff;
+					color: blue;
+					font-size: 1em;
+					font-weight:normal;
+					text-align:justify;
+					}
+
+
+					div.information {
+					background-color: #ffffff;
+					color: black;
+					font-size: 1em;
+					font-weight:normal;
+					text-align:justify;
+					}
+
+					#scheader {
+					font-size: 0.9em;
+					border: 0px solid #404040;
+					border-spacing: 2px;
+					}
+
+					div.largetext {
+					background-color: #ffffff;
+					color: blue;
+					font-size: 1em;
+					font-weight:normal;
+					text-align:justify;
+					white-space: pre-wrap;
+					word-break: normal;
+					}
+
+				</style></head><body lang="en-US" text="#000000" bgcolor="#ffffff"><hr class="header"><br><hr class="headerThin"><div class="contentwrapper"><table role="presentation" id="scheader"><tr><td class="tableClassNoBorderAlignCenter" style="font-size:2em;">
+						SECURITIES AND EXCHANGE COMMISSION
+						<br>
+						Washington, D.C. 20549
+					</td></tr><tr><td class="tableClassNoBorderAlignCenter"><br><br><div style="font-size:1.5em;">
+									SCHEDULE 13D
+								</div><br><div style="font-size:1.2em;">
+							Under the Securities Exchange Act of 1934
+						</div><br></td></tr><tr><td class="center"><div class="information" style="text-align:center; font-weight:bold; color:blue;">ELECTRONIC ARTS INC.</div><div class="information" style="text-align:center; font-weight:bold;"><hr class="separatorThin">(Name of Issuer)</div><br><br></td></tr><tr><td class="center"><div class="information" style="text-align:center; font-weight:bold; color:blue;">Common Stock, par value $0.01 per share</div><div class="information" style="text-align:center; font-weight:bold;"><hr class="separatorThin">(Title of Class of Securities)</div><br><br></td></tr><tr><td class="center"><div class="information" style="text-align:center; font-weight:bold; color:blue;">285512109</div><div class="information" style="text-align:center; font-weight:bold;"><hr class="separatorThin">(CUSIP Number)</div><br><br></td></tr><tr><td class="center"><div class="information" style="text-align:center; font-weight:bold; color:blue;">Turqi Alnowaiser<br>The Public Investment Fund Tower,
+								King Abdullah Financial District (KAFD)<br>Al Aqiq District, Riyadh,
+								T0,
+								13519<br>966 118135 001</div><br><br><div class="information" style="text-align:center; font-weight:bold; color:blue;">With copies to Joshua N. Korff<br>Kirkland &amp; Ellis LLP,
+								601 Lexington Avenue<br>New York,
+								NY,
+								10022<br>(212) 446-4943</div><div class="information" style="text-align:center; font-weight:bold;"><hr class="separatorThin">(Name, Address and Telephone Number of Person Authorized to
+									Receive Notices and Communications)</div></td></tr><tr><td class="center"><div class="information" style="text-align:center; font-weight:bold; color:blue;">09/25/2025</div><div class="information" style="text-align:center; font-weight:bold;"><hr class="separatorThin">(Date of Event Which Requires Filing of This Statement)</div></td></tr></table><br><br><div class="information" style="text-align:justify">
+				If the filing person has previously filed a statement on Schedule 13G to report the acquisition that is the subject of this Schedule 13D, and is filing this schedule because of §§ 240.13d-1(e), 240.13d-1(f) or 240.13d-1(g), check the following box.
+				<img src="/Images/box-unchecked.jpg" alt="Checkbox not checked"></div><br><div class="information" style="text-align:justify">
+				The information required on the remainder of this cover page shall not be deemed to be “filed” for the purpose of Section 18 of the
+				Securities Exchange Act of 1934 (“Act”) or otherwise subject to the liabilities of that section of the Act but shall be subject to all other
+				provisions of the Act (however, see the Notes).
+			</div></div><hr class="headerThin"><hr class="header"><br><br>
+<div class="content"><div class="form1"></div></div>
+<div class="content"><div class="form1"><table><tr><td class="center"><br><br><p><div align="center" style="font-size:1.2em;">
+									SCHEDULE 13D
+								</div></p></td></tr></table><table role="presentation" class="tableClass" id="cusipNumber"><tr class="tableClass"><td width="25%" style="font-weight:bold;">CUSIP No.</td><td width="75%"><div style="font-size:.9em; color:#000000">285512109</div></td></tr></table><br><br><table role="presentation" class="tableClass" id="reportingPersonDetails"><tr class="tableClass"><td width="8%" class="tableClassValign">1</td><td width="92%" class="tableClass">
+					Name of reporting person
+					<br><br><div class="text">PUBLIC INVESTMENT FUND</div></td></tr><tr><td width="8%" class="tableClassValign">2</td><td width="92%" class="tableClass">Check the appropriate box if a member of a Group (See Instructions)
+					<br><br><div class="text"><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked">  (a)
+						<br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked">  (b)
+					</div></td></tr><tr class="tableClassWithBgBlack"><td width="8%" class="tableClassValign">3</td><td width="92%" class="tableClass">SEC use only</td></tr><tr><td width="8%" class="tableClassValign">4</td><td width="92%" class="tableClass">
+					Source of funds (See Instructions)
+					<br><br><div class="text">OO</div></td></tr><tr><td width="8%" class="tableClassValign">5</td><td width="92%" class="tableClass">
+					Check if disclosure of legal proceedings is required pursuant to Items 2(d) or 2(e)
+					<br><br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked"></td></tr><tr><td width="8%" class="tableClassValign">6</td><td width="92%" class="tableClass">Citizenship or place of organization
+					<br><br><div class="text">
+				SAUDI ARABIA
+			</div></td></tr><tr><td width="8%" class="tableClassValign">Number of Shares Beneficially Owned by Each Reporting Person With:</td><td width="92%" class="tableClass"><table class="innerTableClass"><tr><td width="8%" class="innerTableClassRightValign">7</td><td width="92%" class="tableClassInnerLeft">Sole Voting Power
+								<br><br><div class="text">24,807,932.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">8</td><td width="92%" class="tableClassInnerLeft">Shared Voting Power
+								<br><br><div class="text">0.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">9</td><td width="92%" class="tableClassInnerLeft">Sole Dispositive Power
+								<br><br><div class="text">24,807,932.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValignBottomLess">10</td><td width="92%" class="tableClassInnerLeftBottomLess">Shared Dispositive Power
+								<br><br><div class="text">0.00</div></td></tr></table></td></tr><tr><td width="8%" class="tableClassValign">11</td><td width="92%" class="tableClass">Aggregate amount beneficially owned by each reporting person
+					<br><br><div class="text">24,807,932.00</div></td></tr><tr><td width="8%" class="tableClassValign">12</td><td width="92%" class="tableClass">Check if the aggregate amount in Row (11) excludes certain shares (See Instructions)
+					<br><br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked"></td></tr><tr><td width="8%" class="tableClassValign">13</td><td width="92%" class="tableClass">Percent of class represented by amount in Row (11)
+					<br><br><div class="text">9.9 % </div></td></tr><tr><td width="8%" class="tableClassValign">14</td><td width="92%" class="tableClass">Type of Reporting Person (See Instructions)
+					<br><br><div class="text">OO</div></td></tr></table><br></div><div class="form1"><table><tr><td class="center"><br><br><p><div align="center" style="font-size:1.2em;">
+									SCHEDULE 13D
+								</div></p></td></tr></table><table role="presentation" id="item1to7"><tr><td width="8%" class="tableClassValignNoBorder">Item 1.</td><td width="92%" class="tableClassNoBorder">Security and Issuer</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignCenter">(a)</td><td width="92%" class="tableClassNoBorder">Title of Class of Securities:
+							<br><br><div class="text">Common Stock, par value $0.01 per share</div></td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignCenter">(b)</td><td width="92%" class="tableClassNoBorder">Name of Issuer:
+							<br><br><div class="text">ELECTRONIC ARTS INC.</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(c)</td><td width="92%" class="tableClassNoBorder">Address of Issuer's Principal Executive Offices:
+							<br><br><div class="text">209 Redwood Shores Parkway, Redwood City, 
+				CALIFORNIA
+			, 94065.</div></td></tr><tr><td colspan="3"><div style="display: flex;"><div style="font-size: 0.9em; font-weight: bold; margin-right: 5px;">
+									Item 1 Comment:
+								</div><div class="largetext" style="text-align:justify">The Public Investment Fund (the "Reporting Person") previously reported beneficial ownership of shares of the Issuer described herein on the Schedule 13G, filed on February 14, 2022 (as subsequently amended from time to time, the "Schedule 13G"). This Schedule 13D represents the initial statement on Schedule 13D filed by the Reporting Person with the Securities and Exchange Commission with respect to shares of Common Stock of the Issuer and amends and supersedes the Schedule 13G.</div></div></td></tr><tr><td width="8%" class="tableClassValignNoBorder">Item 2.</td><td width="92%" class="tableClassNoBorder">Identity and Background</td></tr><tr></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignCenter">(a)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">The Public Investment Fund</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(b)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">The Public Investment Fund
+The Public Investment Fund Tower
+King Abdullah Financial District (KAFD)
+Al Aqiq District, Riyadh, T0 13519, Saudi Arabia</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(c)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">The Reporting Person is the sovereign wealth fund of Saudi Arabia.</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(d)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">During the last five years, the Reporting Person has not been convicted in any criminal proceeding (excluding traffic violations and other similar misdemeanors).</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(e)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">During the last five years, the Reporting Person has not been a party to any civil proceeding of a judicial or administrative body of competent jurisdiction as a result of which such person was or is subject to any judgment, decree or final order enjoining future violations of, or prohibiting or mandating activities subject to, federal or state securities laws or finding any violation with respect to such laws.</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(f)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">Saudi Arabia</div></td></tr><tr><td width="8%" class="tableClassValignNoBorder">Item 3.</td><td width="92%" class="tableClassNoBorder">Source and Amount of Funds or Other Consideration</td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter"> </td><td width="92%" class="tableClassNoBorder"><div class="largetext">The Reporting Person made no purchases of shares of Common Stock in connection with the circumstances giving rise to the filing of this Schedule 13D.</div></td></tr><tr><td width="8%" class="tableClassValignNoBorder">Item 4.</td><td width="92%" class="tableClassNoBorder">Purpose of Transaction</td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter"> </td><td width="92%" class="tableClassNoBorder"><div class="largetext">The Reporting Person initially acquired the shares of Common Stock for investment purposes. From time to time since the date of the original investment in the Issuer, the Reporting Person has engaged in evaluations of the Issuer and its business, including engaging in discussions with management of the Issuer, other shareholders, advisors and other persons to facilitate such evaluations. 
+
+In connection with this review of its investment in the Issuer, and based on current market conditions and other factors, on September 25, 2025, the board of directors of the Reporting Person approved the delegation of authority to the executive management of the Reporting Person to pursue and enter into a transaction with the Issuer, if the executive management determined to do so, subject to certain limitations. Subsequently, executive management of the Reporting Person formed an intention to seek to acquire the outstanding shares of Common Stock not currently held by the Reporting Person.
+
+Merger Agreement 
+
+On September 28, 2025, Oak-Eagle AcquireCo, Inc., a Delaware corporation and an affiliate of the Reporting Person ("Parent"), Oak-Eagle MergerCo, Inc., a wholly owned subsidiary of Parent ("Merger Sub" and, together with Parent, the "Parent Parties"), and the Issuer, entered into an Agreement and Plan of Merger (the "Merger Agreement"). The Merger Agreement provides that, upon the terms and subject to the conditions set forth therein, Merger Sub will be merged with and into the Issuer (the "Merger"). Upon completion of the Merger, the Issuer will survive as a wholly owned subsidiary of Parent (the "Surviving Corporation"), the separate corporate existence of Merger Sub will cease and the shares of Common Stock will be delisted from the Nasdaq Global Select Market. In connection with consummation of the Merger, each issued and outstanding share of Common Stock owned by Parent will be converted into one share of common stock, par value $210 per share of the Surviving Corporation. 
+
+The Merger Agreement contains customary representations, warranties and covenants. The consummation of the Merger is subject to customary closing conditions.
+
+Pursuant to the Merger Agreement, the Issuer has agreed to immediately cease and terminate all discussions, negotiations and solicitations regarding any Acquisition Proposal (as defined in the Merger Agreement).  The Issuer is prohibited from initiating, encouraging, or facilitating any Acquisition Proposals, providing nonpublic information or entering into any alternative acquisition agreements; however, before Company Stockholder Approval (as defined in the Merger Agreement) is obtained, the Issuer may engage with a bona fide written Acquisition Proposal if it could reasonably lead to a Superior Proposal (as defined in the Merger Agreement).
+
+The foregoing description of the Merger Agreement does not purport to be complete and is qualified in its entirety by reference to the full text of the Merger Agreement, which is filed as Exhibit A hereto and is incorporated herein by reference. 
+
+Support and Rollover Agreement
+
+Concurrently with the execution of the Merger Agreement, the Reporting Person entered into a voting, support and rollover agreement (the "Support and Rollover Agreement") with the Issuer and Parent, pursuant to which the Reporting Person agreed that, until the earlier of the Effective Time (as defined in the Merger Agreement) and the termination of the Merger Agreement, (a) it will not transfer the shares of Common Stock owned of record or beneficially by it as of the date of the Merger Agreement (the "Covered Shares") subject to certain exceptions, and (b) it will vote all of its Covered Shares (i) in favor of the adoption of the Merger Agreement, (ii) in favor of the adoption of any amended and restated Merger Agreement or amendment to the Merger Agreement that is agreed to by Parent, (iii) in favor of the approval of any proposal to adjourn or postpone the meeting to a later date if there are not sufficient votes present for there to be a quorum or for the adoption of the Merger Agreement, or any amendments thereto, on the date on which such meeting is held, or if the Issuer or Parent proposes or requests such adjournment or proposal, in each case, in accordance with the Merger Agreement, (iv) against any action, proposal, transaction or agreement that would reasonably be expected to result in a breach of any covenant, representation or warranty thereof, or any other obligation or agreement of the Issuer, under the Merger Agreement or of the Reporting Person under the Support and Rollover Agreement, (v) against any acquisition proposal, including any Superior Proposal, (vi) against any action, proposal, transaction or agreement that would change in any manner the voting rights of any shares of the Issuer and (vii) any other action or proposal which would reasonably be expected to prevent or materially impede or materially delay the consummation of the Merger or any of the other transactions. The Reporting Person has also agreed to waive all appraisal rights under Section 262 of the Delaware General Corporation Law with respect to the Covered Shares and not to commence or participate in (A) any class actions with respect to Parent, Merger Sub or the Issuer, or (B) certain other legal actions against Parent, Merger Sub or the Issuer in connection with the transactions.
+
+In addition, pursuant to the Support and Rollover Agreement, immediately prior to the Effective Time, the Reporting Person will contribute to a direct or indirect parent company of Parent its shares of Common Stock (the "Rollover Shares") with an aggregate value (based on the Merger Consideration (as defined in the Merger Agreement)) of $5.2 billion in exchange for equity interests in a direct or indirect parent company of Parent. 
+
+The foregoing description of the Support and Rollover Agreement does not purport to be complete and is qualified in its entirety by reference to the full text of the Support and Rollover Agreement, which is filed as Exhibit B hereto and incorporated herein by reference.
+
+Financing 
+
+Equity Commitment Letters 
+
+The Reporting Person and the other sources of equity financing for the Merger Consideration (the "Equity Investors") have each committed to fund a portion of the Merger Consideration and other amounts to be paid under the Merger Agreement, prior to or substantially concurrently with the closing of the Merger, with aggregate equity contributions in an amount equal to approximately $36.4 billion (the "Equity Financing"), pursuant to the equity commitment letters, dated as of September 28, 2025 (such equity commitment letter provided by the Reporting Person, the "Equity Commitment Letter" and, together with the equity commitment letters provided by the other Equity Investors, the "Equity Commitment Letters"). The Equity Commitment Letters include customary conditions to funding of the Equity Financing, including (i) the satisfaction or waiver of Parent Parties' closing conditions under the Merger Agreement, (ii) the substantially concurrent funding of the Debt Financing (as defined below) and the equity financing under the other Equity Commitment Letters, and (iii) the substantially concurrent closing of the Merger.
+
+To the best of the Reporting Person's knowledge and belief, the other Equity Investors do not beneficially own any shares of Common Stock of the Issuer as of the date hereof. 
+
+Debt Commitment 
+
+In addition, JPMorgan Chase Bank, N.A. ("J.P. Morgan") has committed (the "Debt Commitment") to provide Parent, on customary terms and conditions, certain debt financing in an amount equal to $20 billion to fund a portion of the Merger Consideration and other amounts to be paid under the Merger Agreement (the "Debt Financing" and, together with the Equity Financing, the "Financing"). A portion of the commitments are for customary bridge financings and are expected to be replaced with permanent financing, which may include senior secured and/or unsecured notes. A portion of J.P. Morgan's commitments are expected to be syndicated to other financial institutions.
+
+The Financing, when funded in full in accordance with the Equity Commitment Letters and the agreements governing the Debt Commitment, as applicable, will provide an aggregate amount that is sufficient to fund the Merger Consideration and any other amounts required to be paid by Parent, Merger Sub or the Surviving Corporation at or prior to the consummation of the transactions contemplated by the Merger Agreement and all related fees and expenses.
+
+The Merger and the other transactions contemplated by the Merger Agreement were approved and declared advisable by the Issuer's board of directors. If the Merger is consummated, one or more of the transactions, events or actions specified in clauses (a) through (j) of Item 4 of Schedule 13D will result. If the Merger is not consummated, the Reporting Person may, at any time and from time to time, review, reconsider and/or change its position or purpose or formulate different plans or proposals with respect thereto.</div></td></tr><tr><td width="8%" class="tableClassValignNoBorder">Item 5.</td><td width="92%" class="tableClassNoBorder">Interest in Securities of the Issuer</td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(a)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">The Reporting Person may be deemed to beneficially own an aggregate of 24,807,932 shares of Common Stock, representing approximately 9.9% of the issued and outstanding shares of Common Stock. Ownership percentages set forth in this Schedule 13D are based upon a total of 250,207,303 shares of Common Stock outstanding as of July 30, 2025, as reported in the Issuer's Quarterly Report on Form 10-Q for the period ended June 30, 2025, filed on August 1, 2025.</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(b)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">The information included in part (a) of Item 5 above is incorporated by reference herein.</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(c)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">During the past 60 days, the Reporting Person has not effected any transactions with respect to the Common Stock.</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(d)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">To the knowledge of the Reporting Person, only the Reporting Person has the right to receive, or the power to direct the receipt of, dividends from, or proceeds from the sale of, any of the shares of Common Stock beneficially owned by the Reporting Person as described in this Item 5.</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(e)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">Not applicable.</div></td></tr><tr><td width="8%" class="tableClassValignNoBorder">Item 6.</td><td width="92%" class="tableClassNoBorder">Contracts, Arrangements, Understandings or Relationships With Respect to Securities of the Issuer</td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter"> </td><td width="92%" class="tableClassNoBorder"><div class="largetext">The information provided in Item 4 of this Schedule 13D is incorporated by reference herein.</div></td></tr><tr><td width="8%" class="tableClassValignNoBorder">Item 7.</td><td width="92%" class="tableClassNoBorder">Material to be Filed as Exhibits.</td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter"> </td><td width="92%" class="tableClassNoBorder"><div class="largetext">A.  Agreement and Plan of Merger, dated September 28, 2025, by and among Parent, MergerSub and the Issuer (incorporated by reference to Exhibit 2.1 to the Current Report on Form 8-K filed by the Issuer with the Securities and Exchange Commission on September 29, 2025).
+
+B.  Voting, Support and Rollover Agreement, dated September 28, 2025, by and among Reporting Person, Parent and the Issuer (incorporated by reference to Exhibit 10.1 to the Current Report on Form 8-K filed by the Issuer with the Securities and Exchange Commission on September 29, 2025).</div></td></tr></table><br></div><div class="form1"><table role="presentation" id="signatureInfo"><tr><td width="8%" class="tableClassValignNoBorder">    SIGNATURE</td><td width="92%" class="tableClassNoBorder"> </td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter"> </td><td width="92%" class="tableClassNoBorder"><div class="information" style="text-align:justify">
+						After reasonable inquiry and to the best of my knowledge and belief, I certify that the information set forth in this statement is true, complete and correct.
+						<br><br></div></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="100%" class="tableClassInnerNoBorderBlue"><div class="text">PUBLIC INVESTMENT FUND</div></td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Signature:</td><td width="92%" class="tableClassNoBorderBlue signature">/s/ Turqi Alnowaiser</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Name/Title:</td><td width="92%" class="tableClassNoBorderBlue signature">Turqi Alnowaiser / Deputy Governor and Head of International Investments Division</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Date:</td><td width="92%" class="tableClassNoBorderBlue signature">09/29/2025</td></tr></table></td></tr></table></div></div>
+<script type="text/javascript"  src="/N3AEOPt9/dJoipWz/rYwIB5c/dg/YEaQGVVmDJktp27Xmu/SixucGdeLAQ/KXhNJ/AQsW1I"></script></body></html>

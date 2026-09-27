@@ -1,0 +1,502 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns:p="http://www.sec.gov/edgar/schedule13D" xmlns:p1="http://www.sec.gov/edgar/common"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><link rel="stylesheet" type="text/css" href="/css/SDR_print.css"><style type="text/css">
+					.fakeTextBox {
+					border-top: 2px solid #999;
+					border-right: 1px solid #ccc;
+					border-bottom: 1px solid #ccc;
+					border-left: 2px solid #999;
+					padding: 2px;
+					_width: 800px;
+					height: auto;
+					min-width: 200px;
+					min-height: 50px;
+					word-wrap: break-word;
+					font-size: 0.9em;
+					color: blue;
+					}
+					table.tableClass { border: solid black;
+					border-top-width: 1;
+					border-right-width: 1;
+					border-bottom-width: 1;
+					border-left-width: 1;
+					table-layout:fixed;
+					}
+					table.innerTableClass { border: solid black;
+					border-top-width: 0;
+					border-right-width: 0;
+					border-bottom-width: 0;
+					border-left-width: 0;
+					table-layout:fixed;
+					}
+					th.tableClassLeft { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					padding: 2px;
+					}
+					th.tableClassRight { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 0;
+					padding: 2px;
+					}
+					th.tableClass { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					padding: 2px;
+					}
+					td.tableClassLeft { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					font-size: 0.9em;
+					color: blue;
+					word-wrap: break-word;
+					}
+					td.tableClassRight { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 0;
+					font-size: 0.9em;
+					color: blue;
+					word-wrap: break-word;
+					}
+					td.tableClass { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					font-size: 0.9em;
+					font-weight:bold;
+					color: black;
+					word-wrap: break-word;
+					}
+					td.tableClassNoBorder { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 0px;
+					font-size: 0.9em;
+					font-weight:bold;
+					color: black;
+					word-wrap: break-word;
+					}
+
+					td.tableClassNoBorderBlue { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 0px;
+					font-size: 0.9em;
+					font-weight:bold;
+					color: blue;
+					word-wrap: break-word;
+					}
+
+					td.tableClassInnerNoBorderBlue { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 0px;
+					font-size: 1.4em;
+					font-weight:bold;
+					color: blue;
+					word-wrap: break-word;
+					}
+
+					td.tableClassNoBorderAlignLeft { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 0px;
+					font-size: 0.9em;
+					font-weight:bold;
+					text-align: left;
+					color: black;
+					word-wrap: break-word;
+					}
+
+					td.signature {
+					padding: 4px 8px;
+					}
+
+					td.tableClassInner { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					font-size: 1em;
+					font-weight:bold;
+					color: black;
+					word-wrap: break-word;
+					}
+
+					td.tableClassValign { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					font-size: 0.9em;
+					font-weight:bold;
+					color: black;
+					vertical-align: middle;
+					text-align: center;
+					word-wrap: break-word;
+					}
+
+					td.tableClassValignNoBorder { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 0px;
+					font-size: 0.9em;
+					font-weight:bold;
+					color: black;
+					vertical-align: middle;
+					text-align: center;
+					word-wrap: break-word;
+					}
+
+					td.tableClassValignInner { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					font-size: 1em;
+					font-weight:bold;
+					color: black;
+					vertical-align: middle;
+					text-align: center;
+					word-wrap: break-word;
+					}
+
+					td.innerTableClassRightValign { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 0;
+					font-size: 1em;
+					font-weight:bold;
+					color: black;
+					vertical-align: middle;
+					text-align: center;
+					word-wrap: break-word;
+					}
+
+					td.innerTableClassRightValignBottomLess { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 0px;
+					border-left-width: 0;
+					font-size: 1em;
+					font-weight:bold;
+					color: black;
+					vertical-align: middle;
+					text-align: center;
+					word-wrap: break-word;
+					}
+
+					td.tableClassInnerLeft { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					font-size: 1em;
+					font-weight:bold;
+					color: black;
+					word-wrap: break-word;
+					}
+
+					td.tableClassInnerLeftBottomLess { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 1px;
+					font-size: 1em;
+					font-weight:bold;
+					color: black;
+					word-wrap: break-word;
+					}
+
+					td.tableClassNoBorderAlignCenter { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 0px;
+					font-size: 0.9em;
+					font-weight:bold;
+					color: black;
+					text-align: center;
+					word-wrap: break-word;
+					}
+
+					tr.tableClass { border: solid black;
+					border-top-width: 1px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					}
+					tr.tableClassWithBg { border: solid black;
+					border-top-width: 0;
+					border-right-width: 1;
+					border-bottom-width: 1;
+					border-left-width: 0;
+					background-color: #e0e0ff
+					}
+
+					tr.tableClassWithBgBlack { border: solid black;
+					border-top-width: 0;
+					border-right-width: 1;
+					border-bottom-width: 1;
+					border-left-width: 0;
+					background-color: #D3D3D3
+					}
+
+					hr.header {
+					position: relative;
+					top: 20px;
+					border: none;
+					height: 6px;
+					background: black;
+					margin-bottom: 10px;
+					}
+
+					hr.separatorThin {
+					position: relative;
+					top: 2px;
+					border: none;
+					height: 2px;
+					background: black;
+					margin-bottom: 2px;
+					}
+
+					hr.headerThin {
+					position: relative;
+					top: 10px;
+					border: none;
+					height: 2px;
+					background: black;
+					margin-bottom: 10px;
+					}
+
+					hr.separator {
+					position: relative;
+					top: 20px;
+					border: none;
+					height: 4px;
+					background: black;
+					margin-bottom: 5px;
+					}
+
+					div.text {
+					background-color: #ffffff;
+					color: blue;
+					font-size: 1em;
+					font-weight:normal;
+					text-align:justify;
+					}
+
+
+					div.information {
+					background-color: #ffffff;
+					color: black;
+					font-size: 1em;
+					font-weight:normal;
+					text-align:justify;
+					}
+
+					#scheader {
+					font-size: 0.9em;
+					border: 0px solid #404040;
+					border-spacing: 2px;
+					}
+
+					div.largetext {
+					background-color: #ffffff;
+					color: blue;
+					font-size: 1em;
+					font-weight:normal;
+					text-align:justify;
+					white-space: pre-wrap;
+					word-break: normal;
+					}
+
+				</style></head><body lang="en-US" text="#000000" bgcolor="#ffffff"><hr class="header"><br><hr class="headerThin"><div class="contentwrapper"><table role="presentation" id="scheader"><tr><td class="tableClassNoBorderAlignCenter" style="font-size:2em;">
+						SECURITIES AND EXCHANGE COMMISSION
+						<br>
+						Washington, D.C. 20549
+					</td></tr><tr><td class="tableClassNoBorderAlignCenter"><br><br><div style="font-size:1.5em;">
+									SCHEDULE 13D
+								</div><br><div style="font-size:1.2em;">
+							Under the Securities Exchange Act of 1934
+						</div><br><div class="information" style="text-align:center; font-weight:bold;">
+									(Amendment No. <span style="color:blue;">2</span>)
+								</div><br><br></td></tr><tr><td class="center"><div class="information" style="text-align:center; font-weight:bold; color:blue;">Trump Media &amp; Technology Group Corp.</div><div class="information" style="text-align:center; font-weight:bold;"><hr class="separatorThin">(Name of Issuer)</div><br><br></td></tr><tr><td class="center"><div class="information" style="text-align:center; font-weight:bold; color:blue;">Common Stock, par value $0.0001 per share</div><div class="information" style="text-align:center; font-weight:bold;"><hr class="separatorThin">(Title of Class of Securities)</div><br><br></td></tr><tr><td class="center"><div class="information" style="text-align:center; font-weight:bold; color:blue;">25400Q105</div><div class="information" style="text-align:center; font-weight:bold;"><hr class="separatorThin">(CUSIP Number)</div><br><br></td></tr><tr><td class="center"><div class="information" style="text-align:center; font-weight:bold; color:blue;">Trump Media &amp; Technology Group<br>401 N. Cattlemen Rd., Ste. 200,
+								<br>Sarasota,
+								FL,
+								34232<br>(941) 735-7346</div><div class="information" style="text-align:center; font-weight:bold;"><hr class="separatorThin">(Name, Address and Telephone Number of Person Authorized to
+									Receive Notices and Communications)</div></td></tr><tr><td class="center"><div class="information" style="text-align:center; font-weight:bold; color:blue;">12/17/2024</div><div class="information" style="text-align:center; font-weight:bold;"><hr class="separatorThin">(Date of Event Which Requires Filing of This Statement)</div></td></tr></table><br><br><div class="information" style="text-align:justify">
+				If the filing person has previously filed a statement on Schedule 13G to report the acquisition that is the subject of this Schedule 13D, and is filing this schedule because of §§ 240.13d-1(e), 240.13d-1(f) or 240.13d-1(g), check the following box.
+				<img src="/Images/box-unchecked.jpg" alt="Checkbox not checked"></div><br><div class="information" style="text-align:justify">
+				The information required on the remainder of this cover page shall not be deemed to be “filed” for the purpose of Section 18 of the
+				Securities Exchange Act of 1934 (“Act”) or otherwise subject to the liabilities of that section of the Act but shall be subject to all other
+				provisions of the Act (however, see the Notes).
+			</div></div><hr class="headerThin"><hr class="header"><br><br>
+<div class="content"><div class="form1"></div></div>
+<div class="content"><div class="form1"><table><tr><td class="center"><br><br><p><div align="center" style="font-size:1.2em;">
+									SCHEDULE 13D
+								</div></p></td></tr></table><table role="presentation" class="tableClass" id="cusipNumber"><tr class="tableClass"><td width="25%" style="font-weight:bold;">CUSIP No.</td><td width="75%"><div style="font-size:.9em; color:#000000">25400Q105</div></td></tr></table><br><br><table role="presentation" class="tableClass" id="reportingPersonDetails"><tr class="tableClass"><td width="8%" class="tableClassValign">1</td><td width="92%" class="tableClass">
+					Name of reporting person
+					<br><br><div class="text">TRUMP DONALD J</div></td></tr><tr><td width="8%" class="tableClassValign">2</td><td width="92%" class="tableClass">Check the appropriate box if a member of a Group (See Instructions)
+					<br><br><div class="text"><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked">  (a)
+						<br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked">  (b)
+					</div></td></tr><tr class="tableClassWithBgBlack"><td width="8%" class="tableClassValign">3</td><td width="92%" class="tableClass">SEC use only</td></tr><tr><td width="8%" class="tableClassValign">4</td><td width="92%" class="tableClass">
+					Source of funds (See Instructions)
+					<br><br><div class="text">OO</div></td></tr><tr><td width="8%" class="tableClassValign">5</td><td width="92%" class="tableClass">
+					Check if disclosure of legal proceedings is required pursuant to Items 2(d) or 2(e)
+					<br><br><img src="/Images/box-checked.jpg" alt="Checkbox checked"></td></tr><tr><td width="8%" class="tableClassValign">6</td><td width="92%" class="tableClass">Citizenship or place of organization
+					<br><br><div class="text">
+				UNITED STATES
+			</div></td></tr><tr><td width="8%" class="tableClassValign">Number of Shares Beneficially Owned by Each Reporting Person With:</td><td width="92%" class="tableClass"><table class="innerTableClass"><tr><td width="8%" class="innerTableClassRightValign">7</td><td width="92%" class="tableClassInnerLeft">Sole Voting Power
+								<br><br><div class="text">0.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">8</td><td width="92%" class="tableClassInnerLeft">Shared Voting Power
+								<br><br><div class="text">114,750,000.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">9</td><td width="92%" class="tableClassInnerLeft">Sole Dispositive Power
+								<br><br><div class="text">0.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValignBottomLess">10</td><td width="92%" class="tableClassInnerLeftBottomLess">Shared Dispositive Power
+								<br><br><div class="text">114,750,000.00</div></td></tr></table></td></tr><tr><td width="8%" class="tableClassValign">11</td><td width="92%" class="tableClass">Aggregate amount beneficially owned by each reporting person
+					<br><br><div class="text">114,750,000.00</div></td></tr><tr><td width="8%" class="tableClassValign">12</td><td width="92%" class="tableClass">Check if the aggregate amount in Row (11) excludes certain shares (See Instructions)
+					<br><br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked"></td></tr><tr><td width="8%" class="tableClassValign">13</td><td width="92%" class="tableClass">Percent of class represented by amount in Row (11)
+					<br><br><div class="text">52.9 % </div></td></tr><tr><td width="8%" class="tableClassValign">14</td><td width="92%" class="tableClass">Type of Reporting Person (See Instructions)
+					<br><br><div class="text">IN, OO</div></td></tr></table><br><div style="display: flex;"><div style="font-size: 0.9em; font-weight: bold; margin-right: 5px;">
+					Comment for Type of Reporting Person:
+				</div><div class="largetext" style="text-align:justify">(1) The figures in Rows 8 and 10 include 114,750,000 shares of Common Stock owned by the Donald J. Trump Revocable Trust dated April 7, 2014 (the ''Trust''), of which President Donald J. Trump is the settlor and is presently the sole current beneficiary. Donald J. Trump Jr. is the trustee and has sole voting and investment power over all securities owned by the Trust.
+
+(2) The percentage in Row 13 is calculated based on 216,924,448 shares of Common Stock outstanding as of October 29, 2024, as reported in the Issuer's quarterly report on Form 10-Q filed with the SEC on November 5, 2024.</div></div><table><tr><td class="center"><br><br><p><div align="center" style="font-size:1.2em;">
+									SCHEDULE 13D
+								</div></p></td></tr></table><table role="presentation" class="tableClass" id="cusipNumber"><tr class="tableClass"><td width="25%" style="font-weight:bold;">CUSIP No.</td><td width="75%"><div style="font-size:.9em; color:#000000">25400Q105</div></td></tr></table><br><br><table role="presentation" class="tableClass" id="reportingPersonDetails"><tr class="tableClass"><td width="8%" class="tableClassValign">1</td><td width="92%" class="tableClass">
+					Name of reporting person
+					<br><br><div class="text">Donald J. Trump Jr.</div></td></tr><tr><td width="8%" class="tableClassValign">2</td><td width="92%" class="tableClass">Check the appropriate box if a member of a Group (See Instructions)
+					<br><br><div class="text"><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked">  (a)
+						<br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked">  (b)
+					</div></td></tr><tr class="tableClassWithBgBlack"><td width="8%" class="tableClassValign">3</td><td width="92%" class="tableClass">SEC use only</td></tr><tr><td width="8%" class="tableClassValign">4</td><td width="92%" class="tableClass">
+					Source of funds (See Instructions)
+					<br><br><div class="text">OO</div></td></tr><tr><td width="8%" class="tableClassValign">5</td><td width="92%" class="tableClass">
+					Check if disclosure of legal proceedings is required pursuant to Items 2(d) or 2(e)
+					<br><br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked"></td></tr><tr><td width="8%" class="tableClassValign">6</td><td width="92%" class="tableClass">Citizenship or place of organization
+					<br><br><div class="text">
+				UNITED STATES
+			</div></td></tr><tr><td width="8%" class="tableClassValign">Number of Shares Beneficially Owned by Each Reporting Person With:</td><td width="92%" class="tableClass"><table class="innerTableClass"><tr><td width="8%" class="innerTableClassRightValign">7</td><td width="92%" class="tableClassInnerLeft">Sole Voting Power
+								<br><br><div class="text">0.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">8</td><td width="92%" class="tableClassInnerLeft">Shared Voting Power
+								<br><br><div class="text">114,750,000.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">9</td><td width="92%" class="tableClassInnerLeft">Sole Dispositive Power
+								<br><br><div class="text">0.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValignBottomLess">10</td><td width="92%" class="tableClassInnerLeftBottomLess">Shared Dispositive Power
+								<br><br><div class="text">114,750,000.00</div></td></tr></table></td></tr><tr><td width="8%" class="tableClassValign">11</td><td width="92%" class="tableClass">Aggregate amount beneficially owned by each reporting person
+					<br><br><div class="text">114,750,000.00</div></td></tr><tr><td width="8%" class="tableClassValign">12</td><td width="92%" class="tableClass">Check if the aggregate amount in Row (11) excludes certain shares (See Instructions)
+					<br><br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked"></td></tr><tr><td width="8%" class="tableClassValign">13</td><td width="92%" class="tableClass">Percent of class represented by amount in Row (11)
+					<br><br><div class="text">52.9 % </div></td></tr><tr><td width="8%" class="tableClassValign">14</td><td width="92%" class="tableClass">Type of Reporting Person (See Instructions)
+					<br><br><div class="text">IN</div></td></tr></table><br><div style="display: flex;"><div style="font-size: 0.9em; font-weight: bold; margin-right: 5px;">
+					Comment for Type of Reporting Person:
+				</div><div class="largetext" style="text-align:justify">(1) The figures in Rows 8 and 10 include 114,750,000 shares of Common Stock owned by the Donald J. Trump Revocable Trust dated April 7, 2014 (the ''Trust''), of which President Donald J. Trump is the settlor and is presently the sole current beneficiary. Donald J. Trump Jr. is the trustee and has sole voting and investment power over all securities owned by the Trust, and disclaims beneficial ownership of the shares held by the Trust except to the extent of his pecuniary interest therein.
+
+(2) The percentage in Row 13 is calculated based on 216,924,448 shares of Common Stock outstanding as of October 29, 2024, as reported in the Issuer's quarterly report on Form 10-Q filed with the SEC on November 5, 2024.</div></div><table><tr><td class="center"><br><br><p><div align="center" style="font-size:1.2em;">
+									SCHEDULE 13D
+								</div></p></td></tr></table><table role="presentation" class="tableClass" id="cusipNumber"><tr class="tableClass"><td width="25%" style="font-weight:bold;">CUSIP No.</td><td width="75%"><div style="font-size:.9em; color:#000000">25400Q105</div></td></tr></table><br><br><table role="presentation" class="tableClass" id="reportingPersonDetails"><tr class="tableClass"><td width="8%" class="tableClassValign">1</td><td width="92%" class="tableClass">
+					Name of reporting person
+					<br><br><div class="text">Donald J. Trump Revocable Trust dated April 7, 2014</div></td></tr><tr><td width="8%" class="tableClassValign">2</td><td width="92%" class="tableClass">Check the appropriate box if a member of a Group (See Instructions)
+					<br><br><div class="text"><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked">  (a)
+						<br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked">  (b)
+					</div></td></tr><tr class="tableClassWithBgBlack"><td width="8%" class="tableClassValign">3</td><td width="92%" class="tableClass">SEC use only</td></tr><tr><td width="8%" class="tableClassValign">4</td><td width="92%" class="tableClass">
+					Source of funds (See Instructions)
+					<br><br><div class="text">OO</div></td></tr><tr><td width="8%" class="tableClassValign">5</td><td width="92%" class="tableClass">
+					Check if disclosure of legal proceedings is required pursuant to Items 2(d) or 2(e)
+					<br><br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked"></td></tr><tr><td width="8%" class="tableClassValign">6</td><td width="92%" class="tableClass">Citizenship or place of organization
+					<br><br><div class="text">
+				FLORIDA
+			</div></td></tr><tr><td width="8%" class="tableClassValign">Number of Shares Beneficially Owned by Each Reporting Person With:</td><td width="92%" class="tableClass"><table class="innerTableClass"><tr><td width="8%" class="innerTableClassRightValign">7</td><td width="92%" class="tableClassInnerLeft">Sole Voting Power
+								<br><br><div class="text">0.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">8</td><td width="92%" class="tableClassInnerLeft">Shared Voting Power
+								<br><br><div class="text">114,750,000.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">9</td><td width="92%" class="tableClassInnerLeft">Sole Dispositive Power
+								<br><br><div class="text">0.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValignBottomLess">10</td><td width="92%" class="tableClassInnerLeftBottomLess">Shared Dispositive Power
+								<br><br><div class="text">114,750,000.00</div></td></tr></table></td></tr><tr><td width="8%" class="tableClassValign">11</td><td width="92%" class="tableClass">Aggregate amount beneficially owned by each reporting person
+					<br><br><div class="text">114,750,000.00</div></td></tr><tr><td width="8%" class="tableClassValign">12</td><td width="92%" class="tableClass">Check if the aggregate amount in Row (11) excludes certain shares (See Instructions)
+					<br><br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked"></td></tr><tr><td width="8%" class="tableClassValign">13</td><td width="92%" class="tableClass">Percent of class represented by amount in Row (11)
+					<br><br><div class="text">52.9 % </div></td></tr><tr><td width="8%" class="tableClassValign">14</td><td width="92%" class="tableClass">Type of Reporting Person (See Instructions)
+					<br><br><div class="text">OO</div></td></tr></table><br><div style="display: flex;"><div style="font-size: 0.9em; font-weight: bold; margin-right: 5px;">
+					Comment for Type of Reporting Person:
+				</div><div class="largetext" style="text-align:justify">(1) The figures in Rows 8 and 10 include 114,750,000 shares of Common Stock owned by the Donald J. Trump Revocable Trust dated April 7, 2014 (the ''Trust''), of which President Donald J. Trump is the settlor and is presently the sole current beneficiary. Donald J. Trump Jr. is the trustee and has sole voting and investment power over all securities owned by the Trust.
+
+(2) The percentage in Row 13 is calculated based on 216,924,448 shares of Common Stock outstanding as of October 29, 2024, as reported in the Issuer's quarterly report on Form 10-Q filed with the SEC on November 5, 2024.</div></div></div><div class="form1"><table><tr><td class="center"><br><br><p><div align="center" style="font-size:1.2em;">
+									SCHEDULE 13D
+								</div></p></td></tr></table><table role="presentation" id="item1to7"><tr><td width="8%" class="tableClassValignNoBorder">Item 1.</td><td width="92%" class="tableClassNoBorder">Security and Issuer</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignCenter">(a)</td><td width="92%" class="tableClassNoBorder">Title of Class of Securities:
+							<br><br><div class="text">Common Stock, par value $0.0001 per share</div></td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignCenter">(b)</td><td width="92%" class="tableClassNoBorder">Name of Issuer:
+							<br><br><div class="text">Trump Media &amp; Technology Group Corp.</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(c)</td><td width="92%" class="tableClassNoBorder">Address of Issuer's Principal Executive Offices:
+							<br><br><div class="text">401 N. Cattlemen Rd., Ste. 200, Sarasota, 
+				FLORIDA
+			, 34232.</div></td></tr><tr><td colspan="3"><div style="display: flex;"><div style="font-size: 0.9em; font-weight: bold; margin-right: 5px;">
+									Item 1 Comment:
+								</div><div class="largetext" style="text-align:justify">Explanatory Note
+
+Pursuant to Rule 13d-2 promulgated under the Securities Exchange Act of 1934, as amended, this Amendment No. 2 to Schedule 13D (this ''Amendment'') amends and supplements the Schedule 13D originally filed with the SEC by President Donald J. Trump (the ''Reporting Person'') on April 1, 2024, as amended and supplemented by Amendment No. 1 filed on April 30, 2024 (together, the ''Original Schedule 13D'') regarding the common stock, par value $0.0001 per share (the ''Common Stock''), of Trump Media &amp; Technology Group Corp. a Delaware corporation (the ''Issuer''). Except as specifically amended by this Amendment, items in the Original Schedule 13D are unchanged.</div></div></td></tr><tr><td width="8%" class="tableClassValignNoBorder">Item 2.</td><td width="92%" class="tableClassNoBorder">Identity and Background</td></tr><tr></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignCenter">(a)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">Item 2 of the Original Schedule 13D is hereby amended and restated as follows:
+
+This Amendment is jointly filed by:
+(i)	President Donald J. Trump, individually;
+(ii)	Donald J. Trump Revocable Trust dated April 7, 2014, a revocable trust established under the laws of Florida (the "Trust"); and
+(iii)	Donald J. Trump Jr., as trustee of the Trust.
+ 
+Each of the foregoing is referred to herein as a "Reporting Person" and together as the "Reporting Persons."
+
+President Donald J. Trump is an individual and citizen of the United States of America; his principal address is 1100 S. Ocean Blvd. Palm Beach, FL 33480. Donald J. Trump Jr. is an individual and citizen of the United States of America; his principal address is 115 Eagle Tree Terrace, Jupiter, FL 33477.
+
+The address of the principal business and office of the Trust is 115 Eagle Tree Terrace, Jupiter, FL 33477.
+
+During the last five years, (i) neither the Trust nor Donald J. Trump Jr. have been (A) convicted in a criminal proceeding (excluding traffic violations or similar misdemeanors) or (B) a party to a civil proceeding of a judicial or administrative body of competent jurisdiction and as a result of such proceeding was or is subject to a judgment, decree or final order enjoining future violations of, or prohibiting or mandating activities subject to, federal or state securities laws or finding any violation with respect to such laws, and (ii) on May 30, 2024, President Donald J. Trump was convicted in New York State Supreme Court in Manhattan of falsifying business records. As of the date of this Amendment, sentencing has not occurred or been scheduled and no penalty has been imposed; a motion to dismiss filed by President Trump has not yet been decided.</div></td></tr><tr><td width="8%" class="tableClassValignNoBorder">Item 3.</td><td width="92%" class="tableClassNoBorder">Source and Amount of Funds or Other Consideration</td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter"> </td><td width="92%" class="tableClassNoBorder"><div class="largetext">Item 3 of the Original Schedule 13D is hereby amended and restated as follows:
+
+All of the securities reported herein as beneficially owned by the Reporting Persons were acquired pursuant to the transactions contemplated by that certain Agreement and Plan of Merger, dated as of October 20, 2021 (as amended by the First Amendment to Agreement and Plan of Merger, dated May 11, 2022, the Second Amendment to Agreement and Plan of Merger, dated August 9, 2023, the Third Amendment to Agreement and Plan of Merger, dated September 29, 2023, the "Merger Agreement") by and among Digital World Acquisition Corp., a Delaware corporation ("Digital World"), DWAC Merger Sub Inc., a Delaware corporation ("Merger Sub") and a wholly owned subsidiary of DWAC, and Trump Media &amp; Technology Group Corp., a Delaware corporation ("TMTG"). On March 25, 2024 (the "Closing Date"), pursuant to the Merger Agreement, Merger Sub merged with and into TMTG, with TMTG being the surviving company and a wholly owned subsidiary of Digital World (the "Merger," and together with the other transactions contemplated by the Merger Agreement, the "Business Combination"). Upon the consummation of the Business Combination (the "Effective Time"), Digital World changed its name to "Trump Media &amp; Technology Group Corp." ("Public TMTG").
+
+Pursuant to the Merger Agreement, at the Effective Time, (a) all of the issued and outstanding TMTG common stock of TMTG immediately prior to the Effective Time (other than those properly exercising any applicable appraisal rights under Delaware law or any shares of TMTG common stock issued upon the conversion of TMTG Convertible Notes immediately prior to the Effective Time pursuant to the terms of the Merger Agreement) were automatically cancelled, in exchange for the right to receive their pro rata portion of the Merger Consideration and the Earnout Shares, if any, (b) all of the outstanding TMTG common stock that was issued upon the conversion of TMTG Convertible Notes immediately prior to the Effective Time pursuant to the terms of the Merger Agreement was automatically cancelled, in exchange for shares of Common Stock, upon the terms set forth in the Merger Agreement, (c) each outstanding option to acquire shares of TMTG common stock (whether vested or unvested) was assumed by the Issuer and automatically converted into an option to acquire shares of Common Stock, with its price and number of shares equitably adjusted based on the conversion ratio of the shares of TMTG common stock into the Merger Consideration, and (d) each outstanding restricted stock unit of TMTG was converted into a restricted stock unit relating to shares of Common Stock.
+
+As a result of the Business Combination, the Reporting Person received 78,750,000 shares of Common Stock of the Issuer.
+
+In connection with the Business Combination, the Reporting Person was eligible to receive 36,000,000 shares of Common Stock of the Issuer (the "Earnout Shares") pursuant to an "earnout" provision in the Merger Agreement based on the price per performance of the Common Stock of the Issuer during the three (3) year period following the Closing (the "Earnout Period"). The Earnout Shares shall be earned and payable during the Earnout Period as follows:
+
+In the event that the dollar volume-weighted average price ("VWAP") of the Common Stock equals or exceeds $12.50 per share for twenty (20) out of any thirty (30) trading days during the period beginning on the Closing Date and ending on the 18-month anniversary of the Closing Date, the Reporting Person will be entitled to receive an additional 13,500,000 Earnout Shares ("Performance Criterion I").
+
+In the event that the VWAP of the Common Stock equals or exceeds $15.00 per share for twenty (20) out of any thirty (30) trading days during the period beginning on the Closing Date and ending on the second anniversary of the Closing Date, the Reporting Person will be entitled to receive an additional 13,500,000 Earnout Shares ("Performance Criterion II").
+
+In the event that the VWAP of the Common Stock equals or exceeds $17.50 per share for twenty (20) out of any thirty (30) trading days during the period beginning on the Closing Date and ending on the third anniversary of the Closing Date, the Reporting Person will be entitled to receive an additional 9,000,000 Earnout Shares ("Performance Criterion III," and together with Performance Criterion I and Performance Criterion II, the "Performance Criteria")).
+
+On April 26, 2024, in accordance with the terms of the Merger Agreement, the Issuer officially determined that the Performance Criteria had been satisfied, and the Reporting Person was subsequently issued the Earnout Shares.
+
+On December 17, 2024, President Donald J. Trump transferred 114,750,000 shares of Common Stock of the Issuer to the Trust, of which he is the sole beneficiary. Such transfer did not involve a purchase or sale. Donald J. Trump Jr. is the sole trustee of the Trust and has sole voting and investment power over all securities owned by the Trust.
+
+The foregoing description of the Merger Agreement does not purport to be complete and is qualified in its entirety by reference to the full text of such agreement, which is attached as an exhibit to the Original Schedule 13D and is incorporated herein by reference.
+
+The information in Item 6 of this Amendment is incorporated herein by reference.</div></td></tr><tr><td width="8%" class="tableClassValignNoBorder">Item 4.</td><td width="92%" class="tableClassNoBorder">Purpose of Transaction</td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter"> </td><td width="92%" class="tableClassNoBorder"><div class="largetext">Item 4 of the Original Schedule 13D is hereby amended and restated as follows:
+
+The information set forth in Item 3 of this Amendment is incorporated herein by reference.
+
+This Amendment is being filed to report the transfer of 114,750,000 shares of Common Stock of the Issuer from President Donald J. Trump to the Trust, of which he is presently the sole current beneficiary. Such transfer did not involve a purchase or sale. Donald J. Trump Jr. is the sole trustee of the Trust and has sole voting and investment power over all securities owned by the Trust.
+
+The Reporting Persons beneficially own a majority of the voting power of the Common Stock of the Issuer and therefore may have influence over the corporate activities of the Issuer, including activities that may relate to items described in subparagraphs (a) through (j) of Item 4 of Schedule 13D. Except as described herein, the Reporting Persons have no present plans or proposals that relate to or would result in any of the transactions described in subparagraphs (a) through (j) of Item 4 of Schedule 13D. However, the Reporting Persons reserve the right to formulate future plans or proposals which may relate to or result in the transactions described in subparagraphs (a) through (j) of this Item 4. In addition to the foregoing, the Reporting Persons may engage in discussions from time to time with other members of the Issuer's management and/or Board of Directors and/or with other stockholders of the Issuer and/or other third parties. Such discussions may include, without limitation, discussions with respect to the governance, board composition, management, operations, business, assets, capitalization, financial condition, strategic plans, and future of the Issuer, as well as other matters related to the Issuer. These discussions may also include a review of options for enhancing stockholder value through, among other things, various strategic alternatives (including acquisitions and divestitures) or operational or management initiatives.
+
+The Reporting Persons hold the securities of the Issuer for general investment purposes. The Reporting Persons intend to review the investment in the Issuer on a continuing basis and may take from time to time and at any time in the future, depending on various factors (including, without limitation, the outcome of any discussions referenced above), such actions as deemed appropriate in respect thereof, including proposing or considering, or changing their intention with respect to, one or more of the actions described above or otherwise referred to in subparagraphs (a) though (j), inclusive, of Item 4 of Schedule 13D. The Reporting Persons may also take steps to explore and prepare for various plans and actions, and propose transactions, regarding the foregoing matters, before forming an intention to engage in such plans or actions or proceed with such transactions. The Reporting Persons reserve the right, based on all relevant factors and subject to applicable law and contractual and other restrictions, at any time and from time to time, to acquire additional shares of Common Stock or other securities of the Issuer, dispose of some or all of the shares of Common Stock or other securities of the Issuer that may be owned by the Reporting Persons from time to time, in each case in open market or private transactions, block sales, or otherwise or pursuant to ordinary stock exchange transactions effected through one or more broker-dealers whether individually or utilizing specific pricing or other instructions, subject, as applicable, to the conditions and restrictions set forth in the Issuer's insider trading policy.</div></td></tr><tr><td width="8%" class="tableClassValignNoBorder">Item 5.</td><td width="92%" class="tableClassNoBorder">Interest in Securities of the Issuer</td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(a)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">Item 5 of the Original Schedule 13D is hereby amended and restated as follows:
+
+See each row (11) and (13) of the cover pages to this filing for the aggregate number of shares of Common Stock and percentage of the shares of Common Stock beneficially owned by each Reporting Person.</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(b)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">See each row (7) through (10) of the cover pages to this filing for the aggregate number of shares of Common Stock as to which each Reporting Person has the sole or shared power to vote or direct the vote and the sole or shared power to dispose or to direct the disposition.</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(c)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">Except as set forth in this Schedule 13D, the Reporting Person has not effected any transactions in the Common Stock in the 60 days prior to the date of this Schedule 13D.</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(d)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">Not applicable.</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(e)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">Not applicable.</div></td></tr><tr><td width="8%" class="tableClassValignNoBorder">Item 6.</td><td width="92%" class="tableClassNoBorder">Contracts, Arrangements, Understandings or Relationships With Respect to Securities of the Issuer</td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter"> </td><td width="92%" class="tableClassNoBorder"><div class="largetext">Item 6 of the Original Schedule 13D is hereby amended and restated as follows:
+
+On the Closing Date, in connection with the consummation of the Business Combination, the Reporting Person entered into a Lock-Up Agreement with Digital World and Eric Swider, acting as the Issuer's CEO Representative (the "Lock-Up Agreement"), under which President Trump agreed not to, during the period commencing from the Closing Date and ending on the earliest of (x) the six months after the Closing Date, (y) the date on which the closing price of the Common Stock equals or exceeds $12.00 per share (as adjusted for stock splits, stock dividends, reorganizations, recapitalizations and the like) for any twenty (20) trading days within any thirty (30) trading day period commencing at least one-hundred fifty (150) days after the Closing Date, and (z) the date after the Closing Date on which Digital World consummates a liquidation, merger, share exchange or other similar transaction with an unaffiliated third party that results in all of Digital World's stockholders having the right to exchange their equity holdings in Digital World for cash, securities or other property. The Lock-Up Agreement expired pursuant to its terms on September 25, 2024.
+
+The foregoing description of the Lock-Up Agreement does not purport to be complete and is qualified in its entirety by reference to the full text of such agreement, which is attached as an exhibit to this Schedule 13D and is incorporated herein by reference.
+
+Donald J. Trump Jr. is a director of the Issuer and the sole trustee of the Trust and has sole voting and investment power over all securities owned by the Trust.</div></td></tr><tr><td width="8%" class="tableClassValignNoBorder">Item 7.</td><td width="92%" class="tableClassNoBorder">Material to be Filed as Exhibits.</td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter"> </td><td width="92%" class="tableClassNoBorder"><div class="largetext">Exhibit 99.1 : Agreement and Plan of Merger, dated as of October 20, 2021, as amended on May 11, 2022, August 8, 2023, and September 29, 2023 by and among Digital World Acquisition Corp., DWAC Merger Sub Inc. and Trump Media &amp; Technology Group Corp. (incorporated by reference to Exhibit 2.1 to the Current Report on Form 8-K filed with the SEC on April 1, 2024).
+https://www.sec.gov/Archives/edgar/data/1849635/000119312524036093/d408563ds4a.htm#rom408563_46
+
+Exhibit 99.2 : Lock-Up Agreement, dated as of March 25, 2024, by and among Digital World Acquisition Corp., Eric Swider, and President Trump (incorporated by reference to Exhibit 99.2 to the Original Schedule 13D filed with the SEC on April 1, 2024).
+https://www.sec.gov/Archives/edgar/data/947033/000114036124017051/ef20025668_ex99-2.htm
+
+Exhibit 99.3 :  Joint Filing Agreement (included as Exhibit A below).</div></td></tr></table><br></div><div class="form1"><table role="presentation" id="signatureInfo"><tr><td width="8%" class="tableClassValignNoBorder">    SIGNATURE</td><td width="92%" class="tableClassNoBorder"> </td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter"> </td><td width="92%" class="tableClassNoBorder"><div class="information" style="text-align:justify">
+						After reasonable inquiry and to the best of my knowledge and belief, I certify that the information set forth in this statement is true, complete and correct.
+						<br><br></div></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="100%" class="tableClassInnerNoBorderBlue"><div class="text">TRUMP DONALD J</div></td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Signature:</td><td width="92%" class="tableClassNoBorderBlue signature">/s/ Donald J. Trump, by Jonathan Talcott pursuant to Power of Attorney</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Name/Title:</td><td width="92%" class="tableClassNoBorderBlue signature">Donald J. Trump</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Date:</td><td width="92%" class="tableClassNoBorderBlue signature">12/30/2024</td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="100%" class="tableClassInnerNoBorderBlue"><div class="text">Donald J. Trump Jr.</div></td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Signature:</td><td width="92%" class="tableClassNoBorderBlue signature">/s/ Donald J. Trump Jr., by Jonathan Talcott pursuant to Power of Attorney</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Name/Title:</td><td width="92%" class="tableClassNoBorderBlue signature">Donald J. Trump Jr.</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Date:</td><td width="92%" class="tableClassNoBorderBlue signature">12/30/2024</td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="100%" class="tableClassInnerNoBorderBlue"><div class="text">Donald J. Trump Revocable Trust dated April 7, 2014</div></td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Signature:</td><td width="92%" class="tableClassNoBorderBlue signature">/s/ Scott Glabe</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Name/Title:</td><td width="92%" class="tableClassNoBorderBlue signature">Attorney-in-Fact</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Date:</td><td width="92%" class="tableClassNoBorderBlue signature">12/30/2024</td></tr></table></td></tr></table></div></div>
+
+<script type="text/javascript"  src="/N3AEOPt9/dJoipWz/rYwIB5c/dg/YEaQGVVmDJktp27Xmu/SixucGdeLAQ/KXhNJ/AQsW1I"></script></body></html>

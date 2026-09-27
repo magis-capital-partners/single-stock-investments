@@ -1,0 +1,681 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns:p="http://www.sec.gov/edgar/schedule13g" xmlns:p1="http://www.sec.gov/edgar/common"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><link rel="stylesheet" type="text/css" href="/css/SDR_print.css"><style type="text/css">
+					.fakeTextBox {
+					border-top: 2px solid #999;
+					border-right: 1px solid #ccc;
+					border-bottom: 1px solid #ccc;
+					border-left: 2px solid #999;
+					padding: 2px;
+					_width: 800px;
+					height: auto;
+					min-width: 200px;
+					min-height: 50px;
+					word-wrap: break-word;
+					font-size: 0.9em;
+					color: blue;
+					}
+				</style><style type="text/css">
+					table.tableClass { border: solid black;
+					border-top-width: 1;
+					border-right-width: 1;
+					border-bottom-width: 1;
+					border-left-width: 1;
+					table-layout:fixed;
+					}
+					table.innerTableClass { border: solid black;
+					border-top-width: 0;
+					border-right-width: 0;
+					border-bottom-width: 0;
+					border-left-width: 0;
+					table-layout:fixed;
+					}
+					table.collapsabletableClass {
+					border-collapse:collapse;
+					border-top-width: 0;
+					border-right-width: 0;
+					border-bottom-width: 0;
+					border-left-width: 0;
+					table-layout:fixed;
+					}
+					th.tableClassLeft { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					padding: 2px;
+					}
+					th.tableClassRight { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 0;
+					padding: 2px;
+					}
+					th.tableClass { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					padding: 2px;
+					}
+					td.tableClassLeft { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					font-size: 0.9em;
+					color: blue;
+					word-wrap: break-word;
+					}
+					td.tableClassRight { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 0;
+					font-size: 0.9em;
+					color: blue;
+					word-wrap: break-word;
+					}
+					td.tableClass { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					font-size: 0.9em;
+					font-weight:bold;
+					color: black;
+					word-wrap: break-word;
+					}
+					td.tableClassNoBorder { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 0px;
+					font-size: 0.9em;
+					font-weight:bold;
+					color: black;
+					word-wrap: break-word;
+					}
+
+					td.tableClassNoBorderBlue { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 0px;
+					font-size: 0.9em;
+					font-weight:bold;
+					color: blue;
+					word-wrap: break-word;
+					}
+
+					td.tableClassInnerNoBorderBlue { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 0px;
+					font-size: 1.4em;
+					font-weight:bold;
+					color: blue;
+					word-wrap: break-word;
+					}
+
+					td.tableClassNoBorderAlignLeft { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 0px;
+					font-size: 0.9em;
+					font-weight:bold;
+					text-align: left;
+					color: black;
+					word-wrap: break-word;
+					}
+
+					td.signature {
+					padding: 4px 8px;
+					}
+
+					td.tableClassInner { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					font-size: 1em;
+					font-weight:bold;
+					color: black;
+					word-wrap: break-word;
+					}
+
+					td.tableClassValign { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					font-size: 0.9em;
+					font-weight:bold;
+					color: black;
+					vertical-align: middle;
+					text-align: center;
+					word-wrap: break-word;
+					}
+
+					td.tableClassValignNoBorder { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 0px;
+					font-size: 0.9em;
+					font-weight:bold;
+					color: black;
+					vertical-align: middle;
+					text-align: center;
+					word-wrap: break-word;
+					}
+
+					td.tableClassValignInner { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					font-size: 1em;
+					font-weight:bold;
+					color: black;
+					vertical-align: middle;
+					text-align: center;
+					word-wrap: break-word;
+					}
+
+					td.innerTableClassRightValign { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 0;
+					font-size: 1em;
+					font-weight:bold;
+					color: black;
+					vertical-align: middle;
+					text-align: center;
+					word-wrap: break-word;
+					}
+
+					td.innerTableClassRightValignBottomLess { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 0px;
+					border-left-width: 0;
+					font-size: 1em;
+					font-weight:bold;
+					color: black;
+					vertical-align: middle;
+					text-align: center;
+					word-wrap: break-word;
+					}
+
+					td.tableClassInnerLeft { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					font-size: 1em;
+					font-weight:bold;
+					color: black;
+					word-wrap: break-word;
+					}
+
+					td.tableClassInnerLeftBottomLess { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 1px;
+					font-size: 1em;
+					font-weight:bold;
+					color: black;
+					word-wrap: break-word;
+					}
+
+					td.tableClassNoBorderAlignCenter { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 0px;
+					font-size: 0.9em;
+					font-weight:bold;
+					color: black;
+					text-align: center;
+					word-wrap: break-word;
+					}
+
+					tr.tableClass { border: solid black;
+					border-top-width: 1px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					}
+					tr.tableClassWithBg { border: solid black;
+					border-top-width: 0;
+					border-right-width: 1;
+					border-bottom-width: 1;
+					border-left-width: 0;
+					background-color: #e0e0ff
+					}
+
+					tr.tableClassWithBgBlack { border: solid black;
+					border-top-width: 0;
+					border-right-width: 1;
+					border-bottom-width: 1;
+					border-left-width: 0;
+					background-color: #D3D3D3
+					}
+
+					hr.header {
+					position: relative;
+					top: 20px;
+					border: none;
+					height: 6px;
+					background: black;
+					margin-bottom: 10px;
+					}
+
+					hr.separatorThin {
+					position: relative;
+					top: 2px;
+					border: none;
+					height: 2px;
+					background: black;
+					margin-bottom: 2px;
+					}
+
+					hr.headerThin {
+					position: relative;
+					top: 10px;
+					border: none;
+					height: 2px;
+					background: black;
+					margin-bottom: 10px;
+					}
+
+					hr.separator {
+					position: relative;
+					top: 20px;
+					border: none;
+					height: 4px;
+					background: black;
+					margin-bottom: 5px;
+					}
+
+					div.text {
+					background-color: #ffffff;
+					color: blue;
+					font-size: 1em;
+					font-weight:normal;
+					text-align:justify;
+					}
+
+					div.largetext {
+					background-color: #ffffff;
+					color: blue;
+					font-size: 1em;
+					font-weight:normal;
+					text-align:justify;
+					white-space: pre-wrap;
+					}
+
+
+					div.information {
+					background-color: #ffffff;
+					color: black;
+					font-size: 1em;
+					font-weight:normal;
+					text-align:justify;
+					}
+
+					#scheader {
+					font-size: 0.9em;
+					border: 0px solid #404040;
+					border-spacing: 2px;
+					}
+
+				</style></head><body lang="en-US" text="#000000" bgcolor="#ffffff"><hr class="header"><br><hr class="headerThin"><div class="contentwrapper"><table role="presentation" id="scheader"><tr><td class="tableClassNoBorderAlignCenter" style="font-size:2em;">
+						SECURITIES AND EXCHANGE COMMISSION
+						<br>
+						Washington, D.C. 20549
+					</td></tr><tr><td class="tableClassNoBorderAlignCenter"><br><br><div style="font-size:1.5em;">
+								SCHEDULE 13G
+							</div><br><br></td></tr><tr><td class="tableClassNoBorderAlignCenter"><div style="font-size:1.2em;">
+							UNDER THE SECURITIES EXCHANGE ACT OF 1934
+						</div></td></tr><tr><td class="center"><div class="information" style="text-align:center; font-weight:bold;">
+									(Amendment No. <span style="color:blue;">1</span>)
+								</div><br><br></td></tr><tr><td class="center"><div class="information" style="text-align:center; font-weight:bold; color:blue;">Figma, Inc.</div><div class="information" style="text-align:center; font-weight:bold;"><hr class="separatorThin">(Name of Issuer)</div><br><br></td></tr><tr><td class="center"><div class="information" style="text-align:center; font-weight:bold; color:blue;">CLASS A COMMON STOCK, PAR VALUE $0.00001</div><div class="information" style="text-align:center; font-weight:bold;"><hr class="separatorThin">(Title of Class of Securities)</div><br><br></td></tr><tr><td class="center"><div class="information" style="text-align:center; font-weight:bold; color:blue;">316841105</div><div class="information" style="text-align:center; font-weight:bold;"><hr class="separatorThin">(CUSIP Number)</div><br><br></td></tr><tr><td class="center"><div class="information" style="text-align:center; font-weight:bold; color:blue;">12/31/2025</div><div class="information" style="text-align:center; font-weight:bold;"><hr class="separatorThin">(Date of Event Which Requires Filing of this Statement)</div></td></tr></table><br><br><table><tr><td class="label"> Check the appropriate box to designate the rule pursuant to which this Schedule is filed:</td></tr><tr><td><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked">   Rule 13d-1(b)
+					</td></tr><tr><td><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked">   Rule 13d-1(c)
+					</td></tr><tr><td><img src="/Images/box-checked.jpg" alt="Checkbox checked">   Rule 13d-1(d)
+					</td></tr></table></div><hr class="headerThin"><hr class="header"><br><br>
+  <div class="content"><div class="form1"></div></div>
+  <div class="content"><div class="form1"><table><tr><td class="center"><br><br><p><div align="center" style="font-size:1.2em;">
+									SCHEDULE 13G
+								</div></p></td></tr></table><table role="presentation" class="tableClass" id="cusipNumber"><tr class="tableClass"><td width="25%" style="font-weight:bold;">CUSIP No.</td><td width="75%"><div style="font-size:.9em; color:#000000">316841105</div></td></tr></table><br><br><table role="presentation" class="tableClass" id="reportingPersonDetails"><tr class="tableClass"><td width="8%" class="tableClassValign">1</td><td width="92%" class="tableClass">Names of Reporting Persons
+					<br><br><div class="text">ICONIQ Strategic Partners VII, L.P.</div></td></tr><tr><td width="8%" class="tableClassValign">2</td><td width="92%" class="tableClass">Check the appropriate box if a member of a Group (see instructions)
+					<br><br><div class="text"><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked">  (a)
+						<br><img src="/Images/box-checked.jpg" alt="Checkbox checked">  (b)
+					</div></td></tr><tr class="tableClassWithBgBlack"><td width="8%" class="tableClassValign">3</td><td width="92%" class="tableClass">Sec Use Only</td></tr><tr><td width="8%" class="tableClassValign">4</td><td width="92%" class="tableClass">Citizenship or Place of Organization
+					<br><br><div class="text">
+				CAYMAN ISLANDS
+			</div></td></tr><tr><td width="8%" class="tableClassValign">Number of Shares Beneficially Owned by Each Reporting Person With:</td><td width="92%" class="tableClass"><table class="innerTableClass"><tr><td width="8%" class="innerTableClassRightValign">5</td><td width="92%" class="tableClassInnerLeft">Sole Voting Power
+								<br><br><div class="text">1,660,199.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">6</td><td width="92%" class="tableClassInnerLeft">Shared Voting Power
+								<br><br><div class="text">0.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">7</td><td width="92%" class="tableClassInnerLeft">Sole Dispositive Power
+								<br><br><div class="text">1,660,199.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValignBottomLess">8</td><td width="92%" class="tableClassInnerLeftBottomLess">Shared Dispositive Power
+								<br><br><div class="text">0.00</div></td></tr></table></td></tr><tr><td width="8%" class="tableClassValign">9</td><td width="92%" class="tableClass">Aggregate Amount Beneficially Owned by Each Reporting Person
+					<br><br><div class="text">1,660,199.00</div></td></tr><tr><td width="8%" class="tableClassValign">10</td><td width="92%" class="tableClass">Check box if the aggregate amount in row (9) excludes certain shares (See Instructions)
+					<br><br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked"></td></tr><tr><td width="8%" class="tableClassValign">11</td><td width="92%" class="tableClass">Percent of class represented by amount in row (9)
+					<br><br><div class="text">0.4 % </div></td></tr><tr><td width="8%" class="tableClassValign">12</td><td width="92%" class="tableClass">Type of Reporting Person (See Instructions)
+					<br><br><div class="text">PN</div></td></tr></table><br><div class="largetext"><span style="color:black;font-weight:bold;">Comment for Type of Reporting Person:</span>  The percent of class is based upon 415,909,379 shares of Class A Common Stock outstanding as of October 31, 2025, as reported by the Issuer in its Quarterly Report on Form 10-Q filed with the Securities and Exchange Commission on November 5, 2025.</div><table><tr><td class="center"><br><br><p><div align="center" style="font-size:1.2em;">
+									SCHEDULE 13G
+								</div></p></td></tr></table><table role="presentation" class="tableClass" id="cusipNumber"><tr class="tableClass"><td width="25%" style="font-weight:bold;">CUSIP No.</td><td width="75%"><div style="font-size:.9em; color:#000000">316841105</div></td></tr></table><br><br><table role="presentation" class="tableClass" id="reportingPersonDetails"><tr class="tableClass"><td width="8%" class="tableClassValign">1</td><td width="92%" class="tableClass">Names of Reporting Persons
+					<br><br><div class="text">ICONIQ Strategic Partners VII-B, L.P.</div></td></tr><tr><td width="8%" class="tableClassValign">2</td><td width="92%" class="tableClass">Check the appropriate box if a member of a Group (see instructions)
+					<br><br><div class="text"><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked">  (a)
+						<br><img src="/Images/box-checked.jpg" alt="Checkbox checked">  (b)
+					</div></td></tr><tr class="tableClassWithBgBlack"><td width="8%" class="tableClassValign">3</td><td width="92%" class="tableClass">Sec Use Only</td></tr><tr><td width="8%" class="tableClassValign">4</td><td width="92%" class="tableClass">Citizenship or Place of Organization
+					<br><br><div class="text">
+				CAYMAN ISLANDS
+			</div></td></tr><tr><td width="8%" class="tableClassValign">Number of Shares Beneficially Owned by Each Reporting Person With:</td><td width="92%" class="tableClass"><table class="innerTableClass"><tr><td width="8%" class="innerTableClassRightValign">5</td><td width="92%" class="tableClassInnerLeft">Sole Voting Power
+								<br><br><div class="text">4,133,370.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">6</td><td width="92%" class="tableClassInnerLeft">Shared Voting Power
+								<br><br><div class="text">0.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">7</td><td width="92%" class="tableClassInnerLeft">Sole Dispositive Power
+								<br><br><div class="text">4,133,370.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValignBottomLess">8</td><td width="92%" class="tableClassInnerLeftBottomLess">Shared Dispositive Power
+								<br><br><div class="text">0.00</div></td></tr></table></td></tr><tr><td width="8%" class="tableClassValign">9</td><td width="92%" class="tableClass">Aggregate Amount Beneficially Owned by Each Reporting Person
+					<br><br><div class="text">4,133,370.00</div></td></tr><tr><td width="8%" class="tableClassValign">10</td><td width="92%" class="tableClass">Check box if the aggregate amount in row (9) excludes certain shares (See Instructions)
+					<br><br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked"></td></tr><tr><td width="8%" class="tableClassValign">11</td><td width="92%" class="tableClass">Percent of class represented by amount in row (9)
+					<br><br><div class="text">1.0 % </div></td></tr><tr><td width="8%" class="tableClassValign">12</td><td width="92%" class="tableClass">Type of Reporting Person (See Instructions)
+					<br><br><div class="text">PN</div></td></tr></table><br><div class="largetext"><span style="color:black;font-weight:bold;">Comment for Type of Reporting Person:</span>  The percent of class is based upon 415,909,379 shares of Class A Common Stock outstanding as of October 31, 2025, as reported by the Issuer in its Quarterly Report on Form 10-Q filed with the Securities and Exchange Commission on November 5, 2025.</div><table><tr><td class="center"><br><br><p><div align="center" style="font-size:1.2em;">
+									SCHEDULE 13G
+								</div></p></td></tr></table><table role="presentation" class="tableClass" id="cusipNumber"><tr class="tableClass"><td width="25%" style="font-weight:bold;">CUSIP No.</td><td width="75%"><div style="font-size:.9em; color:#000000">316841105</div></td></tr></table><br><br><table role="presentation" class="tableClass" id="reportingPersonDetails"><tr class="tableClass"><td width="8%" class="tableClassValign">1</td><td width="92%" class="tableClass">Names of Reporting Persons
+					<br><br><div class="text">ICONIQ Strategic Partners VII GP, L.P.</div></td></tr><tr><td width="8%" class="tableClassValign">2</td><td width="92%" class="tableClass">Check the appropriate box if a member of a Group (see instructions)
+					<br><br><div class="text"><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked">  (a)
+						<br><img src="/Images/box-checked.jpg" alt="Checkbox checked">  (b)
+					</div></td></tr><tr class="tableClassWithBgBlack"><td width="8%" class="tableClassValign">3</td><td width="92%" class="tableClass">Sec Use Only</td></tr><tr><td width="8%" class="tableClassValign">4</td><td width="92%" class="tableClass">Citizenship or Place of Organization
+					<br><br><div class="text">
+				CAYMAN ISLANDS
+			</div></td></tr><tr><td width="8%" class="tableClassValign">Number of Shares Beneficially Owned by Each Reporting Person With:</td><td width="92%" class="tableClass"><table class="innerTableClass"><tr><td width="8%" class="innerTableClassRightValign">5</td><td width="92%" class="tableClassInnerLeft">Sole Voting Power
+								<br><br><div class="text">5,793,569.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">6</td><td width="92%" class="tableClassInnerLeft">Shared Voting Power
+								<br><br><div class="text">0.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">7</td><td width="92%" class="tableClassInnerLeft">Sole Dispositive Power
+								<br><br><div class="text">5,793,569.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValignBottomLess">8</td><td width="92%" class="tableClassInnerLeftBottomLess">Shared Dispositive Power
+								<br><br><div class="text">0.00</div></td></tr></table></td></tr><tr><td width="8%" class="tableClassValign">9</td><td width="92%" class="tableClass">Aggregate Amount Beneficially Owned by Each Reporting Person
+					<br><br><div class="text">5,793,569.00</div></td></tr><tr><td width="8%" class="tableClassValign">10</td><td width="92%" class="tableClass">Check box if the aggregate amount in row (9) excludes certain shares (See Instructions)
+					<br><br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked"></td></tr><tr><td width="8%" class="tableClassValign">11</td><td width="92%" class="tableClass">Percent of class represented by amount in row (9)
+					<br><br><div class="text">1.4 % </div></td></tr><tr><td width="8%" class="tableClassValign">12</td><td width="92%" class="tableClass">Type of Reporting Person (See Instructions)
+					<br><br><div class="text">PN</div></td></tr></table><br><div class="largetext"><span style="color:black;font-weight:bold;">Comment for Type of Reporting Person:</span>  The reported share amounts represent shares of Class A Common Stock held by ICONIQ Strategic Partners VII, L.P. and ICONIQ Strategic Partners VII-B, L.P. ICONIQ Strategic Partners VII GP, L.P. is the general partner of ICONIQ Strategic Partners VII, L.P. and ICONIQ Strategic Partners VII-B, L.P. and may be deemed to beneficially own the shares held by such funds.
+
+The percent of class is based upon 415,909,379 shares of Class A Common Stock outstanding as of October 31, 2025, as reported by the Issuer in its Quarterly Report on Form 10-Q filed with the Securities and Exchange Commission on November 5, 2025.</div><table><tr><td class="center"><br><br><p><div align="center" style="font-size:1.2em;">
+									SCHEDULE 13G
+								</div></p></td></tr></table><table role="presentation" class="tableClass" id="cusipNumber"><tr class="tableClass"><td width="25%" style="font-weight:bold;">CUSIP No.</td><td width="75%"><div style="font-size:.9em; color:#000000">316841105</div></td></tr></table><br><br><table role="presentation" class="tableClass" id="reportingPersonDetails"><tr class="tableClass"><td width="8%" class="tableClassValign">1</td><td width="92%" class="tableClass">Names of Reporting Persons
+					<br><br><div class="text">ICONIQ Strategic Partners VII TT GP, Ltd.</div></td></tr><tr><td width="8%" class="tableClassValign">2</td><td width="92%" class="tableClass">Check the appropriate box if a member of a Group (see instructions)
+					<br><br><div class="text"><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked">  (a)
+						<br><img src="/Images/box-checked.jpg" alt="Checkbox checked">  (b)
+					</div></td></tr><tr class="tableClassWithBgBlack"><td width="8%" class="tableClassValign">3</td><td width="92%" class="tableClass">Sec Use Only</td></tr><tr><td width="8%" class="tableClassValign">4</td><td width="92%" class="tableClass">Citizenship or Place of Organization
+					<br><br><div class="text">
+				CAYMAN ISLANDS
+			</div></td></tr><tr><td width="8%" class="tableClassValign">Number of Shares Beneficially Owned by Each Reporting Person With:</td><td width="92%" class="tableClass"><table class="innerTableClass"><tr><td width="8%" class="innerTableClassRightValign">5</td><td width="92%" class="tableClassInnerLeft">Sole Voting Power
+								<br><br><div class="text">5,793,569.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">6</td><td width="92%" class="tableClassInnerLeft">Shared Voting Power
+								<br><br><div class="text">0.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">7</td><td width="92%" class="tableClassInnerLeft">Sole Dispositive Power
+								<br><br><div class="text">5,793,569.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValignBottomLess">8</td><td width="92%" class="tableClassInnerLeftBottomLess">Shared Dispositive Power
+								<br><br><div class="text">0.00</div></td></tr></table></td></tr><tr><td width="8%" class="tableClassValign">9</td><td width="92%" class="tableClass">Aggregate Amount Beneficially Owned by Each Reporting Person
+					<br><br><div class="text">5,793,569.00</div></td></tr><tr><td width="8%" class="tableClassValign">10</td><td width="92%" class="tableClass">Check box if the aggregate amount in row (9) excludes certain shares (See Instructions)
+					<br><br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked"></td></tr><tr><td width="8%" class="tableClassValign">11</td><td width="92%" class="tableClass">Percent of class represented by amount in row (9)
+					<br><br><div class="text">1.4 % </div></td></tr><tr><td width="8%" class="tableClassValign">12</td><td width="92%" class="tableClass">Type of Reporting Person (See Instructions)
+					<br><br><div class="text">CO</div></td></tr></table><br><div class="largetext"><span style="color:black;font-weight:bold;">Comment for Type of Reporting Person:</span>  The reported share amounts represent shares of Class A Common Stock held by ICONIQ Strategic Partners VII, L.P. and ICONIQ Strategic Partners VII-B, L.P. ICONIQ Strategic Partners VII GP, L.P. is the general partner of ICONIQ Strategic Partners VII, L.P. and ICONIQ Strategic Partners VII-B, L.P. and may be deemed to beneficially own the shares held by such funds. ICONIQ Strategic Partners VII TT GP, Ltd. is the general partner if ICONIQ Strategic Partners GP, L.P.
+
+The percent of class is based upon 415,909,379 shares of Class A Common Stock outstanding as of October 31, 2025, as reported by the Issuer in its Quarterly Report on Form 10-Q filed with the Securities and Exchange Commission on November 5, 2025.</div><table><tr><td class="center"><br><br><p><div align="center" style="font-size:1.2em;">
+									SCHEDULE 13G
+								</div></p></td></tr></table><table role="presentation" class="tableClass" id="cusipNumber"><tr class="tableClass"><td width="25%" style="font-weight:bold;">CUSIP No.</td><td width="75%"><div style="font-size:.9em; color:#000000">316841105</div></td></tr></table><br><br><table role="presentation" class="tableClass" id="reportingPersonDetails"><tr class="tableClass"><td width="8%" class="tableClassValign">1</td><td width="92%" class="tableClass">Names of Reporting Persons
+					<br><br><div class="text">ICQ INVESTMENTS, LP (SERIES IX)</div></td></tr><tr><td width="8%" class="tableClassValign">2</td><td width="92%" class="tableClass">Check the appropriate box if a member of a Group (see instructions)
+					<br><br><div class="text"><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked">  (a)
+						<br><img src="/Images/box-checked.jpg" alt="Checkbox checked">  (b)
+					</div></td></tr><tr class="tableClassWithBgBlack"><td width="8%" class="tableClassValign">3</td><td width="92%" class="tableClass">Sec Use Only</td></tr><tr><td width="8%" class="tableClassValign">4</td><td width="92%" class="tableClass">Citizenship or Place of Organization
+					<br><br><div class="text">
+				DELAWARE
+			</div></td></tr><tr><td width="8%" class="tableClassValign">Number of Shares Beneficially Owned by Each Reporting Person With:</td><td width="92%" class="tableClass"><table class="innerTableClass"><tr><td width="8%" class="innerTableClassRightValign">5</td><td width="92%" class="tableClassInnerLeft">Sole Voting Power
+								<br><br><div class="text">0.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">6</td><td width="92%" class="tableClassInnerLeft">Shared Voting Power
+								<br><br><div class="text">0.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">7</td><td width="92%" class="tableClassInnerLeft">Sole Dispositive Power
+								<br><br><div class="text">0.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValignBottomLess">8</td><td width="92%" class="tableClassInnerLeftBottomLess">Shared Dispositive Power
+								<br><br><div class="text">0.00</div></td></tr></table></td></tr><tr><td width="8%" class="tableClassValign">9</td><td width="92%" class="tableClass">Aggregate Amount Beneficially Owned by Each Reporting Person
+					<br><br><div class="text">0.00</div></td></tr><tr><td width="8%" class="tableClassValign">10</td><td width="92%" class="tableClass">Check box if the aggregate amount in row (9) excludes certain shares (See Instructions)
+					<br><br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked"></td></tr><tr><td width="8%" class="tableClassValign">11</td><td width="92%" class="tableClass">Percent of class represented by amount in row (9)
+					<br><br><div class="text">0.0 % </div></td></tr><tr><td width="8%" class="tableClassValign">12</td><td width="92%" class="tableClass">Type of Reporting Person (See Instructions)
+					<br><br><div class="text">PN</div></td></tr></table><table><tr><td class="center"><br><br><p><div align="center" style="font-size:1.2em;">
+									SCHEDULE 13G
+								</div></p></td></tr></table><table role="presentation" class="tableClass" id="cusipNumber"><tr class="tableClass"><td width="25%" style="font-weight:bold;">CUSIP No.</td><td width="75%"><div style="font-size:.9em; color:#000000">316841105</div></td></tr></table><br><br><table role="presentation" class="tableClass" id="reportingPersonDetails"><tr class="tableClass"><td width="8%" class="tableClassValign">1</td><td width="92%" class="tableClass">Names of Reporting Persons
+					<br><br><div class="text">ICQ INVESTMENTS, LP (SERIES XXII)</div></td></tr><tr><td width="8%" class="tableClassValign">2</td><td width="92%" class="tableClass">Check the appropriate box if a member of a Group (see instructions)
+					<br><br><div class="text"><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked">  (a)
+						<br><img src="/Images/box-checked.jpg" alt="Checkbox checked">  (b)
+					</div></td></tr><tr class="tableClassWithBgBlack"><td width="8%" class="tableClassValign">3</td><td width="92%" class="tableClass">Sec Use Only</td></tr><tr><td width="8%" class="tableClassValign">4</td><td width="92%" class="tableClass">Citizenship or Place of Organization
+					<br><br><div class="text">
+				DELAWARE
+			</div></td></tr><tr><td width="8%" class="tableClassValign">Number of Shares Beneficially Owned by Each Reporting Person With:</td><td width="92%" class="tableClass"><table class="innerTableClass"><tr><td width="8%" class="innerTableClassRightValign">5</td><td width="92%" class="tableClassInnerLeft">Sole Voting Power
+								<br><br><div class="text">0.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">6</td><td width="92%" class="tableClassInnerLeft">Shared Voting Power
+								<br><br><div class="text">0.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">7</td><td width="92%" class="tableClassInnerLeft">Sole Dispositive Power
+								<br><br><div class="text">0.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValignBottomLess">8</td><td width="92%" class="tableClassInnerLeftBottomLess">Shared Dispositive Power
+								<br><br><div class="text">0.00</div></td></tr></table></td></tr><tr><td width="8%" class="tableClassValign">9</td><td width="92%" class="tableClass">Aggregate Amount Beneficially Owned by Each Reporting Person
+					<br><br><div class="text">0.00</div></td></tr><tr><td width="8%" class="tableClassValign">10</td><td width="92%" class="tableClass">Check box if the aggregate amount in row (9) excludes certain shares (See Instructions)
+					<br><br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked"></td></tr><tr><td width="8%" class="tableClassValign">11</td><td width="92%" class="tableClass">Percent of class represented by amount in row (9)
+					<br><br><div class="text">0.0 % </div></td></tr><tr><td width="8%" class="tableClassValign">12</td><td width="92%" class="tableClass">Type of Reporting Person (See Instructions)
+					<br><br><div class="text">PN</div></td></tr></table><table><tr><td class="center"><br><br><p><div align="center" style="font-size:1.2em;">
+									SCHEDULE 13G
+								</div></p></td></tr></table><table role="presentation" class="tableClass" id="cusipNumber"><tr class="tableClass"><td width="25%" style="font-weight:bold;">CUSIP No.</td><td width="75%"><div style="font-size:.9em; color:#000000">316841105</div></td></tr></table><br><br><table role="presentation" class="tableClass" id="reportingPersonDetails"><tr class="tableClass"><td width="8%" class="tableClassValign">1</td><td width="92%" class="tableClass">Names of Reporting Persons
+					<br><br><div class="text">ICQ MANAGEMENT, LLC</div></td></tr><tr><td width="8%" class="tableClassValign">2</td><td width="92%" class="tableClass">Check the appropriate box if a member of a Group (see instructions)
+					<br><br><div class="text"><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked">  (a)
+						<br><img src="/Images/box-checked.jpg" alt="Checkbox checked">  (b)
+					</div></td></tr><tr class="tableClassWithBgBlack"><td width="8%" class="tableClassValign">3</td><td width="92%" class="tableClass">Sec Use Only</td></tr><tr><td width="8%" class="tableClassValign">4</td><td width="92%" class="tableClass">Citizenship or Place of Organization
+					<br><br><div class="text">
+				DELAWARE
+			</div></td></tr><tr><td width="8%" class="tableClassValign">Number of Shares Beneficially Owned by Each Reporting Person With:</td><td width="92%" class="tableClass"><table class="innerTableClass"><tr><td width="8%" class="innerTableClassRightValign">5</td><td width="92%" class="tableClassInnerLeft">Sole Voting Power
+								<br><br><div class="text">0.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">6</td><td width="92%" class="tableClassInnerLeft">Shared Voting Power
+								<br><br><div class="text">0.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">7</td><td width="92%" class="tableClassInnerLeft">Sole Dispositive Power
+								<br><br><div class="text">0.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValignBottomLess">8</td><td width="92%" class="tableClassInnerLeftBottomLess">Shared Dispositive Power
+								<br><br><div class="text">0.00</div></td></tr></table></td></tr><tr><td width="8%" class="tableClassValign">9</td><td width="92%" class="tableClass">Aggregate Amount Beneficially Owned by Each Reporting Person
+					<br><br><div class="text">0.00</div></td></tr><tr><td width="8%" class="tableClassValign">10</td><td width="92%" class="tableClass">Check box if the aggregate amount in row (9) excludes certain shares (See Instructions)
+					<br><br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked"></td></tr><tr><td width="8%" class="tableClassValign">11</td><td width="92%" class="tableClass">Percent of class represented by amount in row (9)
+					<br><br><div class="text">0.0 % </div></td></tr><tr><td width="8%" class="tableClassValign">12</td><td width="92%" class="tableClass">Type of Reporting Person (See Instructions)
+					<br><br><div class="text">OO</div></td></tr></table><table><tr><td class="center"><br><br><p><div align="center" style="font-size:1.2em;">
+									SCHEDULE 13G
+								</div></p></td></tr></table><table role="presentation" class="tableClass" id="cusipNumber"><tr class="tableClass"><td width="25%" style="font-weight:bold;">CUSIP No.</td><td width="75%"><div style="font-size:.9em; color:#000000">316841105</div></td></tr></table><br><br><table role="presentation" class="tableClass" id="reportingPersonDetails"><tr class="tableClass"><td width="8%" class="tableClassValign">1</td><td width="92%" class="tableClass">Names of Reporting Persons
+					<br><br><div class="text">ICONIQ CAPITAL, LLC</div></td></tr><tr><td width="8%" class="tableClassValign">2</td><td width="92%" class="tableClass">Check the appropriate box if a member of a Group (see instructions)
+					<br><br><div class="text"><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked">  (a)
+						<br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked">  (b)
+					</div></td></tr><tr class="tableClassWithBgBlack"><td width="8%" class="tableClassValign">3</td><td width="92%" class="tableClass">Sec Use Only</td></tr><tr><td width="8%" class="tableClassValign">4</td><td width="92%" class="tableClass">Citizenship or Place of Organization
+					<br><br><div class="text">
+				DELAWARE
+			</div></td></tr><tr><td width="8%" class="tableClassValign">Number of Shares Beneficially Owned by Each Reporting Person With:</td><td width="92%" class="tableClass"><table class="innerTableClass"><tr><td width="8%" class="innerTableClassRightValign">5</td><td width="92%" class="tableClassInnerLeft">Sole Voting Power
+								<br><br><div class="text">15,151.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">6</td><td width="92%" class="tableClassInnerLeft">Shared Voting Power
+								<br><br><div class="text">0.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">7</td><td width="92%" class="tableClassInnerLeft">Sole Dispositive Power
+								<br><br><div class="text">15,151.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValignBottomLess">8</td><td width="92%" class="tableClassInnerLeftBottomLess">Shared Dispositive Power
+								<br><br><div class="text">0.00</div></td></tr></table></td></tr><tr><td width="8%" class="tableClassValign">9</td><td width="92%" class="tableClass">Aggregate Amount Beneficially Owned by Each Reporting Person
+					<br><br><div class="text">15,151.00</div></td></tr><tr><td width="8%" class="tableClassValign">10</td><td width="92%" class="tableClass">Check box if the aggregate amount in row (9) excludes certain shares (See Instructions)
+					<br><br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked"></td></tr><tr><td width="8%" class="tableClassValign">11</td><td width="92%" class="tableClass">Percent of class represented by amount in row (9)
+					<br><br><div class="text">0.0 % </div></td></tr><tr><td width="8%" class="tableClassValign">12</td><td width="92%" class="tableClass">Type of Reporting Person (See Instructions)
+					<br><br><div class="text">OO</div></td></tr></table><br><div class="largetext"><span style="color:black;font-weight:bold;">Comment for Type of Reporting Person:</span>  Represents shares of Class A Common Stock held by separately managed accounts (the "Managed Accounts") for which ICONIQ Capital, LLC serves as investment adviser. In its capacity as investment adviser, ICONIQ Capital, LLC has the right to exercise voting and investment power over the shares held in the Managed Accounts and therefore may be deemed to beneficially own the shares held in the Managed Accounts. ICONIQ Capital, LLC receives asset-based fees for its investment management services and as such does not have a pecuniary interest in the shares held in the Managed Accounts.
+
+The percent of class is based upon 415,909,379 shares of Class A Common Stock outstanding as of October 31, 2025, as reported by the Issuer in its Quarterly Report on Form 10-Q filed with the Securities and Exchange Commission on November 5, 2025.</div><table><tr><td class="center"><br><br><p><div align="center" style="font-size:1.2em;">
+									SCHEDULE 13G
+								</div></p></td></tr></table><table role="presentation" class="tableClass" id="cusipNumber"><tr class="tableClass"><td width="25%" style="font-weight:bold;">CUSIP No.</td><td width="75%"><div style="font-size:.9em; color:#000000">316841105</div></td></tr></table><br><br><table role="presentation" class="tableClass" id="reportingPersonDetails"><tr class="tableClass"><td width="8%" class="tableClassValign">1</td><td width="92%" class="tableClass">Names of Reporting Persons
+					<br><br><div class="text">ICONIQ CAPITAL GROUP, L.P.</div></td></tr><tr><td width="8%" class="tableClassValign">2</td><td width="92%" class="tableClass">Check the appropriate box if a member of a Group (see instructions)
+					<br><br><div class="text"><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked">  (a)
+						<br><img src="/Images/box-checked.jpg" alt="Checkbox checked">  (b)
+					</div></td></tr><tr class="tableClassWithBgBlack"><td width="8%" class="tableClassValign">3</td><td width="92%" class="tableClass">Sec Use Only</td></tr><tr><td width="8%" class="tableClassValign">4</td><td width="92%" class="tableClass">Citizenship or Place of Organization
+					<br><br><div class="text">
+				DELAWARE
+			</div></td></tr><tr><td width="8%" class="tableClassValign">Number of Shares Beneficially Owned by Each Reporting Person With:</td><td width="92%" class="tableClass"><table class="innerTableClass"><tr><td width="8%" class="innerTableClassRightValign">5</td><td width="92%" class="tableClassInnerLeft">Sole Voting Power
+								<br><br><div class="text">15,151.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">6</td><td width="92%" class="tableClassInnerLeft">Shared Voting Power
+								<br><br><div class="text">0.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">7</td><td width="92%" class="tableClassInnerLeft">Sole Dispositive Power
+								<br><br><div class="text">15,151.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValignBottomLess">8</td><td width="92%" class="tableClassInnerLeftBottomLess">Shared Dispositive Power
+								<br><br><div class="text">0.00</div></td></tr></table></td></tr><tr><td width="8%" class="tableClassValign">9</td><td width="92%" class="tableClass">Aggregate Amount Beneficially Owned by Each Reporting Person
+					<br><br><div class="text">15,151.00</div></td></tr><tr><td width="8%" class="tableClassValign">10</td><td width="92%" class="tableClass">Check box if the aggregate amount in row (9) excludes certain shares (See Instructions)
+					<br><br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked"></td></tr><tr><td width="8%" class="tableClassValign">11</td><td width="92%" class="tableClass">Percent of class represented by amount in row (9)
+					<br><br><div class="text">0.0 % </div></td></tr><tr><td width="8%" class="tableClassValign">12</td><td width="92%" class="tableClass">Type of Reporting Person (See Instructions)
+					<br><br><div class="text">PN</div></td></tr></table><br><div class="largetext"><span style="color:black;font-weight:bold;">Comment for Type of Reporting Person:</span>  Represents shares of Class A Common Stock held by separately Managed Accounts for which ICONIQ Capital, LLC serves as investment adviser. In its capacity as investment adviser, ICONIQ Capital, LLC has the right to exercise voting and investment power over the shares held in the Managed Accounts and therefore may be deemed to beneficially own the shares held in the Managed Accounts. ICONIQ Capital, LLC receives asset-based fees for its investment management services and as such does not have a pecuniary interest in the shares held in the Managed Accounts. ICONIQ Capital Group, L.P. is the sole member of ICONIQ Capital, LLC.
+
+The percent of class is based upon 415,909,379 shares of Class A Common Stock outstanding as of October 31, 2025, as reported by the Issuer in its Quarterly Report on Form 10-Q filed with the Securities and Exchange Commission on November 5, 2025.</div><table><tr><td class="center"><br><br><p><div align="center" style="font-size:1.2em;">
+									SCHEDULE 13G
+								</div></p></td></tr></table><table role="presentation" class="tableClass" id="cusipNumber"><tr class="tableClass"><td width="25%" style="font-weight:bold;">CUSIP No.</td><td width="75%"><div style="font-size:.9em; color:#000000">316841105</div></td></tr></table><br><br><table role="presentation" class="tableClass" id="reportingPersonDetails"><tr class="tableClass"><td width="8%" class="tableClassValign">1</td><td width="92%" class="tableClass">Names of Reporting Persons
+					<br><br><div class="text">ICONIQ CAPITAL GROUP GP, LLC</div></td></tr><tr><td width="8%" class="tableClassValign">2</td><td width="92%" class="tableClass">Check the appropriate box if a member of a Group (see instructions)
+					<br><br><div class="text"><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked">  (a)
+						<br><img src="/Images/box-checked.jpg" alt="Checkbox checked">  (b)
+					</div></td></tr><tr class="tableClassWithBgBlack"><td width="8%" class="tableClassValign">3</td><td width="92%" class="tableClass">Sec Use Only</td></tr><tr><td width="8%" class="tableClassValign">4</td><td width="92%" class="tableClass">Citizenship or Place of Organization
+					<br><br><div class="text">
+				DELAWARE
+			</div></td></tr><tr><td width="8%" class="tableClassValign">Number of Shares Beneficially Owned by Each Reporting Person With:</td><td width="92%" class="tableClass"><table class="innerTableClass"><tr><td width="8%" class="innerTableClassRightValign">5</td><td width="92%" class="tableClassInnerLeft">Sole Voting Power
+								<br><br><div class="text">15,151.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">6</td><td width="92%" class="tableClassInnerLeft">Shared Voting Power
+								<br><br><div class="text">0.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">7</td><td width="92%" class="tableClassInnerLeft">Sole Dispositive Power
+								<br><br><div class="text">15,151.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValignBottomLess">8</td><td width="92%" class="tableClassInnerLeftBottomLess">Shared Dispositive Power
+								<br><br><div class="text">0.00</div></td></tr></table></td></tr><tr><td width="8%" class="tableClassValign">9</td><td width="92%" class="tableClass">Aggregate Amount Beneficially Owned by Each Reporting Person
+					<br><br><div class="text">15,151.00</div></td></tr><tr><td width="8%" class="tableClassValign">10</td><td width="92%" class="tableClass">Check box if the aggregate amount in row (9) excludes certain shares (See Instructions)
+					<br><br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked"></td></tr><tr><td width="8%" class="tableClassValign">11</td><td width="92%" class="tableClass">Percent of class represented by amount in row (9)
+					<br><br><div class="text">0.0 % </div></td></tr><tr><td width="8%" class="tableClassValign">12</td><td width="92%" class="tableClass">Type of Reporting Person (See Instructions)
+					<br><br><div class="text">OO</div></td></tr></table><br><div class="largetext"><span style="color:black;font-weight:bold;">Comment for Type of Reporting Person:</span>  Represents shares of Class A Common Stock held by Managed Accounts for which ICONIQ Capital, LLC serves as investment adviser. In its capacity as investment adviser, ICONIQ Capital, LLC has the right to exercise voting and investment power over the shares held in the Managed Accounts and therefore may be deemed to beneficially own the shares held in the Managed Accounts. ICONIQ Capital, LLC receives asset-based fees for its investment management services and as such does not have a pecuniary interest in the shares held in the Managed Accounts. ICONIQ Capital Group, L.P. is the sole member of ICONIQ Capital, LLC. ICONIQ Capital Group GP, LLC is the general partner of ICONIQ Capital Group, L.P.
+
+The percent of class is based upon 415,909,379 shares of Class A Common Stock outstanding as of October 31, 2025, as reported by the Issuer in its Quarterly Report on Form 10-Q filed with the Securities and Exchange Commission on November 5, 2025.</div><table><tr><td class="center"><br><br><p><div align="center" style="font-size:1.2em;">
+									SCHEDULE 13G
+								</div></p></td></tr></table><table role="presentation" class="tableClass" id="cusipNumber"><tr class="tableClass"><td width="25%" style="font-weight:bold;">CUSIP No.</td><td width="75%"><div style="font-size:.9em; color:#000000">316841105</div></td></tr></table><br><br><table role="presentation" class="tableClass" id="reportingPersonDetails"><tr class="tableClass"><td width="8%" class="tableClassValign">1</td><td width="92%" class="tableClass">Names of Reporting Persons
+					<br><br><div class="text">Divesh Makan</div></td></tr><tr><td width="8%" class="tableClassValign">2</td><td width="92%" class="tableClass">Check the appropriate box if a member of a Group (see instructions)
+					<br><br><div class="text"><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked">  (a)
+						<br><img src="/Images/box-checked.jpg" alt="Checkbox checked">  (b)
+					</div></td></tr><tr class="tableClassWithBgBlack"><td width="8%" class="tableClassValign">3</td><td width="92%" class="tableClass">Sec Use Only</td></tr><tr><td width="8%" class="tableClassValign">4</td><td width="92%" class="tableClass">Citizenship or Place of Organization
+					<br><br><div class="text">
+				UNITED STATES
+			</div></td></tr><tr><td width="8%" class="tableClassValign">Number of Shares Beneficially Owned by Each Reporting Person With:</td><td width="92%" class="tableClass"><table class="innerTableClass"><tr><td width="8%" class="innerTableClassRightValign">5</td><td width="92%" class="tableClassInnerLeft">Sole Voting Power
+								<br><br><div class="text">6,623,222.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">6</td><td width="92%" class="tableClassInnerLeft">Shared Voting Power
+								<br><br><div class="text">0.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">7</td><td width="92%" class="tableClassInnerLeft">Sole Dispositive Power
+								<br><br><div class="text">6,623,222.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValignBottomLess">8</td><td width="92%" class="tableClassInnerLeftBottomLess">Shared Dispositive Power
+								<br><br><div class="text">0.00</div></td></tr></table></td></tr><tr><td width="8%" class="tableClassValign">9</td><td width="92%" class="tableClass">Aggregate Amount Beneficially Owned by Each Reporting Person
+					<br><br><div class="text">6,623,222.00</div></td></tr><tr><td width="8%" class="tableClassValign">10</td><td width="92%" class="tableClass">Check box if the aggregate amount in row (9) excludes certain shares (See Instructions)
+					<br><br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked"></td></tr><tr><td width="8%" class="tableClassValign">11</td><td width="92%" class="tableClass">Percent of class represented by amount in row (9)
+					<br><br><div class="text">1.6 % </div></td></tr><tr><td width="8%" class="tableClassValign">12</td><td width="92%" class="tableClass">Type of Reporting Person (See Instructions)
+					<br><br><div class="text">IN</div></td></tr></table><br><div class="largetext"><span style="color:black;font-weight:bold;">Comment for Type of Reporting Person:</span>  The reported share amounts represent (i) 814,502 shares of Class A Common Stock held by Makan through his family trust of which he is a trustee and (ii) 5,808,720 shares of Class A Common Stock held by ICONIQ Strategic Partners VII, L.P., ICONIQ Strategic Partners VII-B, L.P. and ICONIQ Capital, LLC. ICONIQ Strategic Partners VII GP, L.P. is the general partner of ICONIQ Strategic Partners VII, L.P. and ICONIQ Strategic Partners VII-B, L.P. and may be deemed to beneficially own the shares held by such funds. ICONIQ Strategic Partners VII TT GP, Ltd. is the general partner of ICONIQ Strategic Partners GP, L.P. Divesh Makan is the sole member of ICONIQ Capital Group GP, LLC. Divesh Makan, William J.G. Griffith and Matthew Jacobson are the sole equity holders of ICONIQ Strategic Partners VII TT GP, Ltd.
+
+The percent of class is based upon 415,909,379 shares of Class A Common Stock outstanding as of October 31, 2025, as reported by the Issuer in its Quarterly Report on Form 10-Q filed with the Securities and Exchange Commission on November 5, 2025.</div><table><tr><td class="center"><br><br><p><div align="center" style="font-size:1.2em;">
+									SCHEDULE 13G
+								</div></p></td></tr></table><table role="presentation" class="tableClass" id="cusipNumber"><tr class="tableClass"><td width="25%" style="font-weight:bold;">CUSIP No.</td><td width="75%"><div style="font-size:.9em; color:#000000">316841105</div></td></tr></table><br><br><table role="presentation" class="tableClass" id="reportingPersonDetails"><tr class="tableClass"><td width="8%" class="tableClassValign">1</td><td width="92%" class="tableClass">Names of Reporting Persons
+					<br><br><div class="text">William J.G. Griffith</div></td></tr><tr><td width="8%" class="tableClassValign">2</td><td width="92%" class="tableClass">Check the appropriate box if a member of a Group (see instructions)
+					<br><br><div class="text"><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked">  (a)
+						<br><img src="/Images/box-checked.jpg" alt="Checkbox checked">  (b)
+					</div></td></tr><tr class="tableClassWithBgBlack"><td width="8%" class="tableClassValign">3</td><td width="92%" class="tableClass">Sec Use Only</td></tr><tr><td width="8%" class="tableClassValign">4</td><td width="92%" class="tableClass">Citizenship or Place of Organization
+					<br><br><div class="text">
+				UNITED STATES
+			</div></td></tr><tr><td width="8%" class="tableClassValign">Number of Shares Beneficially Owned by Each Reporting Person With:</td><td width="92%" class="tableClass"><table class="innerTableClass"><tr><td width="8%" class="innerTableClassRightValign">5</td><td width="92%" class="tableClassInnerLeft">Sole Voting Power
+								<br><br><div class="text">6,607,726.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">6</td><td width="92%" class="tableClassInnerLeft">Shared Voting Power
+								<br><br><div class="text">0.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">7</td><td width="92%" class="tableClassInnerLeft">Sole Dispositive Power
+								<br><br><div class="text">6,607,726.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValignBottomLess">8</td><td width="92%" class="tableClassInnerLeftBottomLess">Shared Dispositive Power
+								<br><br><div class="text">0.00</div></td></tr></table></td></tr><tr><td width="8%" class="tableClassValign">9</td><td width="92%" class="tableClass">Aggregate Amount Beneficially Owned by Each Reporting Person
+					<br><br><div class="text">6,607,726.00</div></td></tr><tr><td width="8%" class="tableClassValign">10</td><td width="92%" class="tableClass">Check box if the aggregate amount in row (9) excludes certain shares (See Instructions)
+					<br><br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked"></td></tr><tr><td width="8%" class="tableClassValign">11</td><td width="92%" class="tableClass">Percent of class represented by amount in row (9)
+					<br><br><div class="text">1.6 % </div></td></tr><tr><td width="8%" class="tableClassValign">12</td><td width="92%" class="tableClass">Type of Reporting Person (See Instructions)
+					<br><br><div class="text">IN</div></td></tr></table><br><div class="largetext"><span style="color:black;font-weight:bold;">Comment for Type of Reporting Person:</span>  The reported share amounts represent (i) 814,157 shares of Class A Common Stock held by Griffith through his family trust of which he is trustee and (ii) 5,793,569 shares of Class A Common Stock held by ICONIQ Strategic Partners VII, L.P. and ICONIQ Strategic Partners VII-B, L.P. ICONIQ Strategic Partners VII GP, L.P. is the general partner of ICONIQ Strategic Partners VII, L.P. and ICONIQ Strategic Partners VII-B, L.P. and may be deemed to beneficially own the shares held by such funds. ICONIQ Strategic Partners VII TT GP, Ltd. is the general partner if ICONIQ Strategic Partners GP, L.P. Divesh Makan, William J.G. Griffith and Matthew Jacobson are the sole equity holders of ICONIQ Strategic Partners VII TT GP, Ltd.
+
+The percent of class is based upon 415,909,379 shares of Class A Common Stock outstanding as of October 31, 2025, as reported by the Issuer in its Quarterly Report on Form 10-Q filed with the Securities and Exchange Commission on November 5, 2025.</div><table><tr><td class="center"><br><br><p><div align="center" style="font-size:1.2em;">
+									SCHEDULE 13G
+								</div></p></td></tr></table><table role="presentation" class="tableClass" id="cusipNumber"><tr class="tableClass"><td width="25%" style="font-weight:bold;">CUSIP No.</td><td width="75%"><div style="font-size:.9em; color:#000000">316841105</div></td></tr></table><br><br><table role="presentation" class="tableClass" id="reportingPersonDetails"><tr class="tableClass"><td width="8%" class="tableClassValign">1</td><td width="92%" class="tableClass">Names of Reporting Persons
+					<br><br><div class="text">Matthew Jacobson</div></td></tr><tr><td width="8%" class="tableClassValign">2</td><td width="92%" class="tableClass">Check the appropriate box if a member of a Group (see instructions)
+					<br><br><div class="text"><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked">  (a)
+						<br><img src="/Images/box-checked.jpg" alt="Checkbox checked">  (b)
+					</div></td></tr><tr class="tableClassWithBgBlack"><td width="8%" class="tableClassValign">3</td><td width="92%" class="tableClass">Sec Use Only</td></tr><tr><td width="8%" class="tableClassValign">4</td><td width="92%" class="tableClass">Citizenship or Place of Organization
+					<br><br><div class="text">
+				UNITED STATES
+			</div></td></tr><tr><td width="8%" class="tableClassValign">Number of Shares Beneficially Owned by Each Reporting Person With:</td><td width="92%" class="tableClass"><table class="innerTableClass"><tr><td width="8%" class="innerTableClassRightValign">5</td><td width="92%" class="tableClassInnerLeft">Sole Voting Power
+								<br><br><div class="text">5,793,569.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">6</td><td width="92%" class="tableClassInnerLeft">Shared Voting Power
+								<br><br><div class="text">0.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">7</td><td width="92%" class="tableClassInnerLeft">Sole Dispositive Power
+								<br><br><div class="text">5,793,569.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValignBottomLess">8</td><td width="92%" class="tableClassInnerLeftBottomLess">Shared Dispositive Power
+								<br><br><div class="text">0.00</div></td></tr></table></td></tr><tr><td width="8%" class="tableClassValign">9</td><td width="92%" class="tableClass">Aggregate Amount Beneficially Owned by Each Reporting Person
+					<br><br><div class="text">5,793,569.00</div></td></tr><tr><td width="8%" class="tableClassValign">10</td><td width="92%" class="tableClass">Check box if the aggregate amount in row (9) excludes certain shares (See Instructions)
+					<br><br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked"></td></tr><tr><td width="8%" class="tableClassValign">11</td><td width="92%" class="tableClass">Percent of class represented by amount in row (9)
+					<br><br><div class="text">1.4 % </div></td></tr><tr><td width="8%" class="tableClassValign">12</td><td width="92%" class="tableClass">Type of Reporting Person (See Instructions)
+					<br><br><div class="text">IN</div></td></tr></table><br><div class="largetext"><span style="color:black;font-weight:bold;">Comment for Type of Reporting Person:</span>  The reported share amounts represent shares of Class A Common Stock held by ICONIQ Strategic Partners VII, L.P. and ICONIQ Strategic Partners VII-B, L.P. ICONIQ Strategic Partners VII GP, L.P. is the general partner of ICONIQ Strategic Partners VII, L.P. and ICONIQ Strategic Partners VII-B, L.P. and may be deemed to beneficially own the shares held by such funds. ICONIQ Strategic Partners VII TT GP, Ltd. is the general partner if ICONIQ Strategic Partners GP, L.P. Divesh Makan, William J.G. Griffith and Matthew Jacobson are the sole equity holders of ICONIQ Strategic Partners VII TT GP, Ltd.
+
+The percent of class is based upon 415,909,379 shares of Class A Common Stock outstanding as of October 31, 2025, as reported by the Issuer in its Quarterly Report on Form 10-Q filed with the Securities and Exchange Commission on November 5, 2025.</div></div><div class="form1"><table><tr><td class="center"><br><br><p><div align="center" style="font-size:1.2em;">
+								SCHEDULE 13G
+							</div></p></td></tr></table><table role="presentation" id="item1to9"><tr><td width="8%" class="tableClassValignNoBorder">Item 1.</td><td width="92%" class="tableClassNoBorder"> </td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignCenter">(a)</td><td width="92%" class="tableClassNoBorder">Name of issuer:
+					<br><br><div class="text">Figma, Inc.</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(b)</td><td width="92%" class="tableClassNoBorder">Address of issuer's principal executive offices:
+					<br><br><div class="text">760 Market Street, Floor 10, San Francisco, CA 94102</div></td></tr><tr><td width="8%" class="tableClassValignNoBorder">Item 2.</td><td width="92%" class="tableClassNoBorder"> </td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignCenter">(a)</td><td width="92%" class="tableClassNoBorder">Name of person filing:
+					<br><br><div class="largetext">(i) ICONIQ Strategic Partners VII, L.P., a Cayman Islands exempted limited partnership ("ICONIQ VII").
+(ii) ICONIQ Strategic Partners VII-B, L.P., a Cayman Islands exempted limited partnership ("ICONIQ VII-B" and together with ICONIQ VII, the "ICONIQ VII Funds").
+(iii) ICONIQ Strategic Partners VII GP, L.P., a Cayman Islands exempted limited partnership ("ICONIQ VII GP"), the sole general partner of the ICONIQ VII Funds.
+(iv) ICONIQ Strategic Partners VII TT GP, Ltd., a Cayman Islands exempted company ("ICONIQ VII Parent GP"), the sole general partner of ICONIQ VII GP.
+(v) ICQ Investments, LP (Series IX), a Delaware limited partnership ("ICQ IX").
+(vi) ICQ Investments, LP (Series XXII), a Delaware limited partnership ("ICQ XXII" and together with ICQ IX, the "ICQ Funds").
+(vii) ICQ Management, LLC, a Delaware limited liability company ("ICQ Management"), the sole general partner of the ICQ Funds.
+(viii) ICONIQ Capital, LLC, a Delaware limited liability company ("ICONIQ Capital").
+(ix) ICONIQ Capital Group, L.P., a Delaware limited partnership ("ICONIQ Capital Group"), the sole member of ICONIQ Capital.
+(x) ICONIQ Capital Group GP, LLC, a Delaware limited liability company ("ICONIQ Capital GP"), the general partner of ICONIQ Capital Group.
+(xi) Divesh Makan, a citizen of the United States ("Makan"), the sole managing member of ICQ Management and the sole member of ICONIQ Capital GP.
+(xii) William J.G. Griffith, a citizen of the United States ("Griffith").
+(xiii) Matthew Jacobson, a citizen of the United States ("Jacobson"), together with Makan and Griffith, are the sole equity holders of ICONIQ VII Parent GP.</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(b)</td><td width="92%" class="tableClassNoBorder">Address or principal business office or, if none, residence:
+					<br><br><div class="largetext">The address of the principal business office of each of the reporting persons is c/o ICONIQ Capital, 50 Beale St., Ste. 2300, San Francisco, CA 94105.</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(c)</td><td width="92%" class="tableClassNoBorder">Citizenship:
+					<br><br><div class="largetext">See Item 2(a) above.</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(d)</td><td width="92%" class="tableClassNoBorder">Title of class of securities:
+					<br><br><div class="text">CLASS A COMMON STOCK, PAR VALUE $0.00001</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(e)</td><td width="92%" class="tableClassNoBorder">CUSIP No.:
+					<br><br><div class="text">316841105</div></td></tr><tr><td width="8%" class="tableClassValignNoBorder">Item 3.</td><td width="92%" class="tableClassNoBorder">If this statement is filed pursuant to §§ 240.13d-1(b) or 240.13d-2(b) or (c), check whether the person filing is a:</td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(a)</td><td width="92%" class="tableClassNoBorder"><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked">   Broker or dealer registered under section 15 of the Act (15 U.S.C. 78o);
+					</td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(b)</td><td width="92%" class="tableClassNoBorder"><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked">   Bank as defined in section 3(a)(6) of the Act (15 U.S.C. 78c);
+					</td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(c)</td><td width="92%" class="tableClassNoBorder"><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked">   Insurance company as defined in section 3(a)(19) of the Act (15 U.S.C. 78c);
+					</td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(d)</td><td width="92%" class="tableClassNoBorder"><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked">   Investment company registered under section 8 of the Investment Company Act of 1940 (15 U.S.C. 80a-8);
+					</td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(e)</td><td width="92%" class="tableClassNoBorder"><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked">   An investment adviser in accordance with § 240.13d-1(b)(1)(ii)(E);
+					</td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(f)</td><td width="92%" class="tableClassNoBorder"><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked">   An employee benefit plan or endowment fund in accordance with § 240.13d-1(b)(1)(ii)(F);
+					</td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(g)</td><td width="92%" class="tableClassNoBorder"><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked">   A parent holding company or control person in accordance with § 240.13d-1(b)(1)(ii)(G);
+					</td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(h)</td><td width="92%" class="tableClassNoBorder"><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked">   A savings associations as defined in Section 3(b) of the Federal Deposit Insurance Act (12 U.S.C. 1813);
+					</td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(i)</td><td width="92%" class="tableClassNoBorder"><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked">   A church plan that is excluded from the definition of an investment company under section 3(c)(14) of the Investment Company Act of 1940 (15 U.S.C. 80a-3);
+					</td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(j)</td><td width="92%" class="tableClassNoBorder"><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked">   A non-U.S. institution in accordance with § 240.13d-1(b)(1)(ii)(J). If filing as a non-U.S. institution in accordance with § 240.13d-1(b)(1)(ii)(J), 
+						<br>       please specify the type of institution:
+					</td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(k)</td><td width="92%" class="tableClassNoBorder"><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked">   Group, in accordance with Rule 240.13d-1(b)(1)(ii)(K).
+					</td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter"> </td><td width="100%" colspan="2" class="tableClassNoBorder"><div class="largetext"></div></td></tr><tr><td width="8%" class="tableClassValignNoBorder">Item 4.</td><td width="92%" class="tableClassNoBorder">Ownership</td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(a)</td><td width="92%" class="tableClassNoBorder">Amount beneficially owned:
+					<br><br><div class="largetext">(i) ICONIQ VII directly owns 1,660,199 shares of Class A Common Stock, which represents approximately 0.4% of the outstanding Class A Common Stock.
+(ii) ICONIQ VII-B directly owns 4,133,370 shares of Class A Common Stock, which represents approximately 1.0% of the outstanding Class A Common Stock.
+(iii) ICONIQ VII GP may be deemed to beneficially own an aggregate of 5,793,569 shares of Class A Common Stock held by the ICONIQ VII Funds, which represents approximately 1.4% of the outstanding Class A Common Stock.
+(iv) ICONIQ VII Parent GP may be deemed to beneficially own an aggregate of 5,793,569 shares of Class A Common Stock held by the ICONIQ VII Funds, which represents approximately 1.4% of the outstanding Class A Common Stock.
+(v) ICQ IX directly owns 0 shares of Class A Common Stock, which represents 0.0% of the outstanding Class A Common Stock.
+(vi) ICQ XXII directly owns 0 shares of Class A Common Stock, which represents 0.0% of the outstanding Class A Common Stock.
+(vii) ICQ Management may be deemed to beneficially own 0 shares of Class A Common Stock, which represents 0.0% of the outstanding Class A Common Stock.
+(viii) ICONIQ Capital may be deemed to beneficially own 15,151 shares of Class A Common Stock held by Managed Accounts for which ICONIQ Capital serves as investment adviser, which represents less than 0.1% of the outstanding Class A Common Stock. In its capacity as investment adviser, ICONIQ Capital has the right to exercise voting and investment power over the shares held in the Managed Accounts and therefore may be deemed to beneficially own the shares held in the Managed Accounts. ICONIQ Capital receives asset-based fees for its investment management services and as such does not have a pecuniary interest in the shares held in the Managed Accounts.
+(ix) ICONIQ Capital Group may be deemed to beneficially own 15,151 shares of Class A Common Stock beneficially owned by ICONIQ Capital, which represents less than 0.1% of the outstanding Class A Common Stock.
+(x) ICONIQ Capital GP may be deemed to beneficially own 15,151 shares of Class A Common Stock beneficially owned by ICONIQ Capital, which represents less than 0.1% of the outstanding Class A Common Stock.
+(xi) Makan may be deemed to beneficially own an aggregate of 6,623,222 shares of Class A Common Stock held by the ICONIQ VII Funds, ICONIQ Capital and Makan, which represents approximately 1.6% of the outstanding Class A Common Stock.
+(xii) Griffith may be deemed to beneficially own an aggregate of 6,607,726 shares of Class A Common Stock held by the ICONIQ VII Funds and Griffith, which represents approximately 1.6% of the outstanding Class A Common Stock.
+(xiii) Jacobson may be deemed to beneficially own an aggregate of 5,793,569 shares of Class A Common Stock held by the ICONIQ VII Funds, which represents approximately 1.4% of the outstanding Class A Common Stock.</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(b)</td><td width="92%" class="tableClassNoBorder">Percent of class:
+					<br><br><div class="largetext">See Item 4(a) above.</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(c)</td><td width="92%" class="tableClassNoBorder">Number of shares as to which the person has:
+					<br></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter"> </td><td width="92%" class="tableClassNoBorder">(i) Sole power to vote or to direct the vote:
+					<br><br><div class="largetext">ICONIQ VII: 1,660,199 shares of Class A Common Stock
+ICONIQ VII-B: 4,133,370 shares of Class A Common Stock
+ICONIQ VII GP: 5,793,569 shares of Class A Common Stock
+ICONIQ VII Parent GP: 5,793,569 shares of Class A Common Stock
+ICQ IX: 0 shares of Class A Common Stock
+ICQ XXII: 0 shares of Class A Common Stock
+ICQ Management: 0 shares of Class A Common Stock
+ICONIQ Capital: 15,151 shares of Class A Common Stock
+ICONIQ Capital Group: 15,151 shares of Class A Common Stock
+ICONIQ Capital GP: 15,151 shares of Class A Common Stock
+Makan: 6,623,222 shares of Class A Common Stock
+Griffith: 6,607,726 shares of Class A Common Stock
+Jacobson: 5,793,569 shares of Class A Common Stock</div><br></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter"> </td><td width="92%" class="tableClassNoBorder">(ii) Shared power to vote or to direct the vote:
+					<br><br><div class="largetext">N/A</div><br></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter"> </td><td width="92%" class="tableClassNoBorder">(iii) Sole power to dispose or to direct the disposition of:
+					<br><br><div class="largetext">ICONIQ VII: 1,660,199 shares of Class A Common Stock
+ICONIQ VII-B: 4,133,370 shares of Class A Common Stock
+ICONIQ VII GP: 5,793,569 shares of Class A Common Stock
+ICONIQ VII Parent GP: 5,793,569 shares of Class A Common Stock
+ICQ IX: 0 shares of Class A Common Stock
+ICQ XXII: 0 shares of Class A Common Stock
+ICQ Management: 0 shares of Class A Common Stock
+ICONIQ Capital: 15,151 shares of Class A Common Stock
+ICONIQ Capital Group: 15,151 shares of Class A Common Stock
+ICONIQ Capital GP: 15,151 shares of Class A Common Stock
+Makan: 6,623,222 shares of Class A Common Stock
+Griffith: 6,607,726 shares of Class A Common Stock
+Jacobson: 5,793,569 shares of Class A Common Stock</div><br></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter"> </td><td width="92%" class="tableClassNoBorder">(iv) Shared power to dispose or to direct the disposition of:
+					<br><br><div class="largetext">N/A</div><br></td></tr><tr><td width="8%" class="tableClassValignNoBorder">Item 5.</td><td width="92%" class="tableClassNoBorder">Ownership of 5 Percent or Less of a Class.</td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter"> </td><td width="92%" class="tableClassNoBorder"><div class="text"><img src="/Images/box-checked.jpg" alt="Checkbox checked">
+									   Ownership of 5 percent or less of a class
+							</div></td></tr><tr><td width="8%" class="tableClassValignNoBorder">Item 6.</td><td width="92%" class="tableClassNoBorder">Ownership of more than 5 Percent on Behalf of Another Person.</td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter"> </td><td width="92%" class="tableClassNoBorder"><div class="text">
+							Not Applicable
+						</div></td></tr><tr><td width="8%" class="tableClassValignNoBorder">Item 7.</td><td width="92%" class="tableClassNoBorder">Identification and Classification of the Subsidiary Which Acquired the Security Being Reported on by the Parent Holding Company or Control Person.</td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter"> </td><td width="92%" class="tableClassNoBorder"><div class="text">
+								Not Applicable
+							</div></td></tr><tr><td width="8%" class="tableClassValignNoBorder">Item 8.</td><td width="92%" class="tableClassNoBorder">Identification and Classification of Members of the Group.</td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter"> </td><td width="92%" class="tableClassNoBorder"><div class="information" style="text-align:justify">
+								If a group has filed this schedule pursuant to §240.13d-1(b)(1)(ii)(J), so indicate under Item 3(j) and attach an exhibit stating the identity and Item 3 classification of each member of the group. If a group has filed this schedule pursuant to §240.13d-1(c) or §240.13d-1(d), attach an exhibit stating the identity of each member of the group.
+							</div><br><br><div class="largetext">The Reporting Persons expressly disclaim membership in a "group" as used in Rule 13d-5(b)(1).</div></td></tr><tr><td width="8%" class="tableClassValignNoBorder">Item 9.</td><td width="92%" class="tableClassNoBorder">Notice of Dissolution of Group.</td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter"> </td><td width="92%" class="tableClassNoBorder"><div class="text">
+									Not Applicable
+								</div></td></tr></table><br></div><div class="form1"><table role="presentation" id="certifications"><tr><td width="8%" class="tableClassValignNoBorder">Item 10.</td><td width="92%" class="tableClassNoBorder">Certifications:</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignCenter"> </td><td width="92%" class="tableClassNoBorder"><div class="text">
+									Not Applicable
+							</div></td></tr></table><br></div><div class="form1"><table role="presentation" id="signatureInfo"><tr><td width="8%" class="tableClassValignNoBorder">    SIGNATURE</td><td width="92%" class="tableClassNoBorder"> </td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter"> </td><td width="92%" class="tableClassNoBorder"><div class="information" style="text-align:justify">
+						After reasonable inquiry and to the best of my knowledge and belief, I certify that the information set forth in this statement is true, complete and correct.
+						<br><br></div></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="100%" class="tableClassInnerNoBorderBlue"><div class="text">ICONIQ Strategic Partners VII, L.P.</div></td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Signature:</td><td width="92%" class="tableClassNoBorderBlue signature">/s/ Kevin Foster</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Name/Title:</td><td width="92%" class="tableClassNoBorderBlue signature">Kevin Foster, Head of Strategy of General Partner of General Partner</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Date:</td><td width="92%" class="tableClassNoBorderBlue signature">02/17/2026</td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="100%" class="tableClassInnerNoBorderBlue"><div class="text">ICONIQ Strategic Partners VII-B, L.P.</div></td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Signature:</td><td width="92%" class="tableClassNoBorderBlue signature">/s/ Kevin Foster</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Name/Title:</td><td width="92%" class="tableClassNoBorderBlue signature">Kevin Foster, Head of Strategy of General Partner of General Partner</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Date:</td><td width="92%" class="tableClassNoBorderBlue signature">02/17/2026</td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="100%" class="tableClassInnerNoBorderBlue"><div class="text">ICONIQ Strategic Partners VII GP, L.P.</div></td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Signature:</td><td width="92%" class="tableClassNoBorderBlue signature">/s/ Kevin Foster</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Name/Title:</td><td width="92%" class="tableClassNoBorderBlue signature">Kevin Foster, Head of Strategy of General Partner</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Date:</td><td width="92%" class="tableClassNoBorderBlue signature">02/17/2026</td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="100%" class="tableClassInnerNoBorderBlue"><div class="text">ICONIQ Strategic Partners VII TT GP, Ltd.</div></td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Signature:</td><td width="92%" class="tableClassNoBorderBlue signature">/s/ Kevin Foster</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Name/Title:</td><td width="92%" class="tableClassNoBorderBlue signature">Kevin Foster, Head of Strategy</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Date:</td><td width="92%" class="tableClassNoBorderBlue signature">02/17/2026</td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="100%" class="tableClassInnerNoBorderBlue"><div class="text">ICQ INVESTMENTS, LP (SERIES IX)</div></td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Signature:</td><td width="92%" class="tableClassNoBorderBlue signature">/s/ Kevin Foster</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Name/Title:</td><td width="92%" class="tableClassNoBorderBlue signature">Kevin Foster, Head of Strategy of General Partner</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Date:</td><td width="92%" class="tableClassNoBorderBlue signature">02/17/2026</td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="100%" class="tableClassInnerNoBorderBlue"><div class="text">ICQ INVESTMENTS, LP (SERIES XXII)</div></td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Signature:</td><td width="92%" class="tableClassNoBorderBlue signature">/s/ Kevin Foster</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Name/Title:</td><td width="92%" class="tableClassNoBorderBlue signature">Kevin Foster, Head of Strategy of General Partner</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Date:</td><td width="92%" class="tableClassNoBorderBlue signature">02/17/2026</td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="100%" class="tableClassInnerNoBorderBlue"><div class="text">ICQ MANAGEMENT, LLC</div></td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Signature:</td><td width="92%" class="tableClassNoBorderBlue signature">/s/ Kevin Foster</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Name/Title:</td><td width="92%" class="tableClassNoBorderBlue signature">Kevin Foster, Head of Strategy</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Date:</td><td width="92%" class="tableClassNoBorderBlue signature">02/17/2026</td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="100%" class="tableClassInnerNoBorderBlue"><div class="text">ICONIQ CAPITAL, LLC</div></td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Signature:</td><td width="92%" class="tableClassNoBorderBlue signature">/s/ Kevin Foster</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Name/Title:</td><td width="92%" class="tableClassNoBorderBlue signature">Kevin Foster, Head of Strategy of General Partner of Sole Member</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Date:</td><td width="92%" class="tableClassNoBorderBlue signature">02/17/2026</td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="100%" class="tableClassInnerNoBorderBlue"><div class="text">ICONIQ CAPITAL GROUP, L.P.</div></td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Signature:</td><td width="92%" class="tableClassNoBorderBlue signature">/s/ Kevin Foster</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Name/Title:</td><td width="92%" class="tableClassNoBorderBlue signature">Kevin Foster, Head of Strategy of General Partner</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Date:</td><td width="92%" class="tableClassNoBorderBlue signature">02/17/2026</td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="100%" class="tableClassInnerNoBorderBlue"><div class="text">ICONIQ CAPITAL GROUP GP, LLC</div></td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Signature:</td><td width="92%" class="tableClassNoBorderBlue signature">/s/ Kevin Foster</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Name/Title:</td><td width="92%" class="tableClassNoBorderBlue signature">Kevin Foster, Head of Strategy</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Date:</td><td width="92%" class="tableClassNoBorderBlue signature">02/17/2026</td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="100%" class="tableClassInnerNoBorderBlue"><div class="text">Divesh Makan</div></td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Signature:</td><td width="92%" class="tableClassNoBorderBlue signature">/s/ Divesh Makan</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Name/Title:</td><td width="92%" class="tableClassNoBorderBlue signature">Divesh Makan</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Date:</td><td width="92%" class="tableClassNoBorderBlue signature">02/17/2026</td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="100%" class="tableClassInnerNoBorderBlue"><div class="text">William J.G. Griffith</div></td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Signature:</td><td width="92%" class="tableClassNoBorderBlue signature">/s/ William J.G. Griffith</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Name/Title:</td><td width="92%" class="tableClassNoBorderBlue signature">William J.G. Griffith</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Date:</td><td width="92%" class="tableClassNoBorderBlue signature">02/17/2026</td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="100%" class="tableClassInnerNoBorderBlue"><div class="text">Matthew Jacobson</div></td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Signature:</td><td width="92%" class="tableClassNoBorderBlue signature">/s/ Matthew Jacobson</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Name/Title:</td><td width="92%" class="tableClassNoBorderBlue signature">Matthew Jacobson</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Date:</td><td width="92%" class="tableClassNoBorderBlue signature">02/17/2026</td></tr></table></td></tr></table></div></div>
+<script type="text/javascript"  src="/N3AEOPt9/dJoipWz/rYwIB5c/dg/YEaQGVVmDJktp27Xmu/SixucGdeLAQ/KXhNJ/AQsW1I"></script></body></html>

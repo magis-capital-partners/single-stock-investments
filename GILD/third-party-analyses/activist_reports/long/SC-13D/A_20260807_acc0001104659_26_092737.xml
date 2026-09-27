@@ -1,0 +1,464 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns:p="http://www.sec.gov/edgar/schedule13D" xmlns:p1="http://www.sec.gov/edgar/common"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><link rel="stylesheet" type="text/css" href="/css/SDR_print.css"><style type="text/css">
+					.fakeTextBox {
+					border-top: 2px solid #999;
+					border-right: 1px solid #ccc;
+					border-bottom: 1px solid #ccc;
+					border-left: 2px solid #999;
+					padding: 2px;
+					_width: 800px;
+					height: auto;
+					min-width: 200px;
+					min-height: 50px;
+					word-wrap: break-word;
+					font-size: 0.9em;
+					color: blue;
+					}
+					table.tableClass { border: solid black;
+					border-top-width: 1;
+					border-right-width: 1;
+					border-bottom-width: 1;
+					border-left-width: 1;
+					table-layout:fixed;
+					}
+					table.innerTableClass { border: solid black;
+					border-top-width: 0;
+					border-right-width: 0;
+					border-bottom-width: 0;
+					border-left-width: 0;
+					table-layout:fixed;
+					}
+					th.tableClassLeft { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					padding: 2px;
+					}
+					th.tableClassRight { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 0;
+					padding: 2px;
+					}
+					th.tableClass { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					padding: 2px;
+					}
+					td.tableClassLeft { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					font-size: 0.9em;
+					color: blue;
+					word-wrap: break-word;
+					}
+					td.tableClassRight { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 0;
+					font-size: 0.9em;
+					color: blue;
+					word-wrap: break-word;
+					}
+					td.tableClass { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					font-size: 0.9em;
+					font-weight:bold;
+					color: black;
+					word-wrap: break-word;
+					}
+					td.tableClassNoBorder { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 0px;
+					font-size: 0.9em;
+					font-weight:bold;
+					color: black;
+					word-wrap: break-word;
+					}
+
+					td.tableClassNoBorderBlue { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 0px;
+					font-size: 0.9em;
+					font-weight:bold;
+					color: blue;
+					word-wrap: break-word;
+					}
+
+					td.tableClassInnerNoBorderBlue { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 0px;
+					font-size: 1.4em;
+					font-weight:bold;
+					color: blue;
+					word-wrap: break-word;
+					}
+
+					td.tableClassNoBorderAlignLeft { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 0px;
+					font-size: 0.9em;
+					font-weight:bold;
+					text-align: left;
+					color: black;
+					word-wrap: break-word;
+					}
+
+					td.signature {
+					padding: 4px 8px;
+					}
+
+					td.tableClassInner { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					font-size: 1em;
+					font-weight:bold;
+					color: black;
+					word-wrap: break-word;
+					}
+
+					td.tableClassValign { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					font-size: 0.9em;
+					font-weight:bold;
+					color: black;
+					vertical-align: middle;
+					text-align: center;
+					word-wrap: break-word;
+					}
+
+					td.tableClassValignNoBorder { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 0px;
+					font-size: 0.9em;
+					font-weight:bold;
+					color: black;
+					vertical-align: middle;
+					text-align: center;
+					word-wrap: break-word;
+					}
+
+					td.tableClassValignInner { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					font-size: 1em;
+					font-weight:bold;
+					color: black;
+					vertical-align: middle;
+					text-align: center;
+					word-wrap: break-word;
+					}
+
+					td.innerTableClassRightValign { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 0;
+					font-size: 1em;
+					font-weight:bold;
+					color: black;
+					vertical-align: middle;
+					text-align: center;
+					word-wrap: break-word;
+					}
+
+					td.innerTableClassRightValignBottomLess { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 0px;
+					border-left-width: 0;
+					font-size: 1em;
+					font-weight:bold;
+					color: black;
+					vertical-align: middle;
+					text-align: center;
+					word-wrap: break-word;
+					}
+
+					td.tableClassInnerLeft { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					font-size: 1em;
+					font-weight:bold;
+					color: black;
+					word-wrap: break-word;
+					}
+
+					td.tableClassInnerLeftBottomLess { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 1px;
+					font-size: 1em;
+					font-weight:bold;
+					color: black;
+					word-wrap: break-word;
+					}
+
+					td.tableClassNoBorderAlignCenter { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 0px;
+					font-size: 0.9em;
+					font-weight:bold;
+					color: black;
+					text-align: center;
+					word-wrap: break-word;
+					}
+
+					tr.tableClass { border: solid black;
+					border-top-width: 1px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					}
+					tr.tableClassWithBg { border: solid black;
+					border-top-width: 0;
+					border-right-width: 1;
+					border-bottom-width: 1;
+					border-left-width: 0;
+					background-color: #e0e0ff
+					}
+
+					tr.tableClassWithBgBlack { border: solid black;
+					border-top-width: 0;
+					border-right-width: 1;
+					border-bottom-width: 1;
+					border-left-width: 0;
+					background-color: #D3D3D3
+					}
+
+					hr.header {
+					position: relative;
+					top: 20px;
+					border: none;
+					height: 6px;
+					background: black;
+					margin-bottom: 10px;
+					}
+
+					hr.separatorThin {
+					position: relative;
+					top: 2px;
+					border: none;
+					height: 2px;
+					background: black;
+					margin-bottom: 2px;
+					}
+
+					hr.headerThin {
+					position: relative;
+					top: 10px;
+					border: none;
+					height: 2px;
+					background: black;
+					margin-bottom: 10px;
+					}
+
+					hr.separator {
+					position: relative;
+					top: 20px;
+					border: none;
+					height: 4px;
+					background: black;
+					margin-bottom: 5px;
+					}
+
+					div.text {
+					background-color: #ffffff;
+					color: blue;
+					font-size: 1em;
+					font-weight:normal;
+					text-align:justify;
+					}
+
+
+					div.information {
+					background-color: #ffffff;
+					color: black;
+					font-size: 1em;
+					font-weight:normal;
+					text-align:justify;
+					}
+
+					#scheader {
+					font-size: 0.9em;
+					border: 0px solid #404040;
+					border-spacing: 2px;
+					}
+
+					div.largetext {
+					background-color: #ffffff;
+					color: blue;
+					font-size: 1em;
+					font-weight:normal;
+					text-align:justify;
+					white-space: pre-wrap;
+					word-break: normal;
+					}
+
+				</style></head><body lang="en-US" text="#000000" bgcolor="#ffffff"><hr class="header"><br><hr class="headerThin"><div class="contentwrapper"><table role="presentation" id="scheader"><tr><td class="tableClassNoBorderAlignCenter" style="font-size:2em;">
+						SECURITIES AND EXCHANGE COMMISSION
+						<br>
+						Washington, D.C. 20549
+					</td></tr><tr><td class="tableClassNoBorderAlignCenter"><br><br><div style="font-size:1.5em;">
+									SCHEDULE 13D
+								</div><br><div style="font-size:1.2em;">
+							Under the Securities Exchange Act of 1934
+						</div><br><div class="information" style="text-align:center; font-weight:bold;">
+									(Amendment No. <span style="color:blue;">7</span>)
+								</div><br><br></td></tr><tr><td class="center"><div class="information" style="text-align:center; font-weight:bold; color:blue;">Arcus Biosciences, Inc.</div><div class="information" style="text-align:center; font-weight:bold;"><hr class="separatorThin">(Name of Issuer)</div><br><br></td></tr><tr><td class="center"><div class="information" style="text-align:center; font-weight:bold; color:blue;">Common Stock, par value $0.0001</div><div class="information" style="text-align:center; font-weight:bold;"><hr class="separatorThin">(Title of Class of Securities)</div><br><br></td></tr><table border="1"><tr><td><div class="information" style="text-align:center; font-weight:bold; color:blue;">03969F109</div><div class="information" style="text-align:center; font-weight:bold;"><hr class="separatorThin">(CUSIP Number)</div></td></tr><br><br></table><tr><td class="center"><div class="information" style="text-align:center; font-weight:bold; color:blue;">Gilead Sciences, Inc.<br>333 Lakeside Drive,
+								<br>Foster City,
+								CA,
+								94404<br>650-574-3000</div><div class="information" style="text-align:center; font-weight:bold;"><hr class="separatorThin">(Name, Address and Telephone Number of Person Authorized to
+									Receive Notices and Communications)</div></td></tr><tr><td class="center"><div class="information" style="text-align:center; font-weight:bold; color:blue;">08/05/2026</div><div class="information" style="text-align:center; font-weight:bold;"><hr class="separatorThin">(Date of Event Which Requires Filing of This Statement)</div></td></tr></table><br><br><div class="information" style="text-align:justify">
+				If the filing person has previously filed a statement on Schedule 13G to report the acquisition that is the subject of this Schedule 13D, and is filing this schedule because of §§ 240.13d-1(e), 240.13d-1(f) or 240.13d-1(g), check the following box.
+				<img src="/Images/box-unchecked.jpg" alt="Checkbox not checked"></div><br><div class="information" style="text-align:justify">
+				The information required on the remainder of this cover page shall not be deemed to be “filed” for the purpose of Section 18 of the
+				Securities Exchange Act of 1934 (“Act”) or otherwise subject to the liabilities of that section of the Act but shall be subject to all other
+				provisions of the Act (however, see the Notes).
+			</div></div><hr class="headerThin"><hr class="header"><br><br>
+  <div style="display:none">
+			schemaVersion:
+			</div>
+<div class="content"><div class="form1"></div></div>
+  <div class="content"><div class="form1"><table><tr><td class="center"><br><br><p><div align="center" style="font-size:1.2em;">
+									SCHEDULE 13D
+								</div></p></td></tr></table><table role="presentation" class="tableClass" id="cusipNumber"><tr class="tableClass"><td width="7%" style="font-weight:bold;">CUSIP Number(s):</td><td width="75%"><div style="font-size:.9em; color:#000000">03969F109</div></td></tr></table><br><br><table role="presentation" class="tableClass" id="reportingPersonDetails"><tr class="tableClass"><td width="8%" class="tableClassValign">1</td><td width="92%" class="tableClass">
+					Name of reporting person
+					<br><br><div class="text">Gilead Sciences, Inc.</div></td></tr><tr><td width="8%" class="tableClassValign">2</td><td width="92%" class="tableClass">Check the appropriate box if a member of a Group (See Instructions)
+				<br><br><div class="text"><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked">  (a)
+					<br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked">  (b)	
+				</div></td></tr><tr class="tableClassWithBgBlack"><td width="8%" class="tableClassValign">3</td><td width="92%" class="tableClass">SEC use only</td></tr><tr><td width="8%" class="tableClassValign">4</td><td width="92%" class="tableClass">
+					Source of funds (See Instructions)
+					<br><br><div class="text">OO</div></td></tr><tr><td width="8%" class="tableClassValign">5</td><td width="92%" class="tableClass">
+					Check if disclosure of legal proceedings is required pursuant to Items 2(d) or 2(e)
+					<br><br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked"></td></tr><tr><td width="8%" class="tableClassValign">6</td><td width="92%" class="tableClass">Citizenship or place of organization
+				<br><br><div class="text">
+				DELAWARE
+			</div></td></tr><tr><td width="8%" class="tableClassValign">Number of Shares Beneficially Owned by Each Reporting Person With:</td><td width="92%" class="tableClass"><table class="innerTableClass"><tr><td width="8%" class="innerTableClassRightValign">7</td><td width="92%" class="tableClassInnerLeft">Sole Voting Power
+							<br><br><div class="text">31,424,760.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">8</td><td width="92%" class="tableClassInnerLeft">Shared Voting Power
+							<br><br><div class="text">0.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">9</td><td width="92%" class="tableClassInnerLeft">Sole Dispositive Power
+							<br><br><div class="text">31,424,760.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValignBottomLess">10</td><td width="92%" class="tableClassInnerLeftBottomLess">Shared Dispositive Power
+							<br><br><div class="text">0.00</div></td></tr></table></td></tr><tr><td width="8%" class="tableClassValign">11</td><td width="92%" class="tableClass">Aggregate amount beneficially owned by each reporting person
+				<br><br><div class="text">31,424,760.00</div></td></tr><tr><td width="8%" class="tableClassValign">12</td><td width="92%" class="tableClass">Check if the aggregate amount in Row (11) excludes certain shares (See Instructions)
+				<br><br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked"></td></tr><tr><td width="8%" class="tableClassValign">13</td><td width="92%" class="tableClass">Percent of class represented by amount in Row (11)
+				<br><br><div class="text">24.7 % </div></td></tr><tr><td width="8%" class="tableClassValign">14</td><td width="92%" class="tableClass">Type of Reporting Person (See Instructions)
+				<br><br><div class="text">CO</div></td></tr></table><br><div style="display: flex;"><div style="font-size: 0.9em; font-weight: bold; margin-right: 5px;">
+					Comment for Type of Reporting Person:
+				</div><div class="largetext" style="text-align:justify">The number of shares reported in rows 7, 9, and 11 consists of (i) 2,200,000 shares of the common stock, par value $0.0001 per share (the "Common Stock"), of Arcus Biosciences, Inc. (the "Issuer") purchased in the 2020 Public Offering (as defined below), (ii) the initial purchase of 5,963,029 shares of Common Stock pursuant to the Purchase Agreement (as defined below), (iii) the subsequent purchase of 5,650,000 shares of Common Stock pursuant to the Amended and Restated Purchase Agreement (as defined below), (iv) the subsequent purchase of 1,010,000 shares of Common Stock pursuant to the Second Amended and Restated Purchase Agreement (as defined below), (v) the subsequent purchase of 15,238,095 shares of Common Stock of the Issuer pursuant to the Third Amended and Restated Purchase Agreement (as defined below), and (vi) the subsequent purchase of 1,363,636 shares of Common Stock pursuant to the Public Offering (as defined below).
+
+The percent reported in row 13 is calculated based upon 127,333,376 shares of Common Stock issued and outstanding, as reported in the Quarterly Report on Form 10-Q filed by the Issuer with the Securities and Exchange Commission (the "SEC") on August 5, 2026.</div></div></div><div class="form1"><table><tr><td class="center"><br><br><p><div align="center" style="font-size:1.2em;">
+									SCHEDULE 13D
+								</div></p></td></tr></table><table role="presentation" id="item1to7"><tr><td width="8%" class="tableClassValignNoBorder">Item 1.</td><td width="92%" class="tableClassNoBorder">Security and Issuer</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignCenter">(a)</td><td width="92%" class="tableClassNoBorder">Title of Class of Securities:
+							<br><br><div class="text">Common Stock, par value $0.0001</div></td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignCenter">(b)</td><td width="92%" class="tableClassNoBorder">Name of Issuer:
+							<br><br><div class="text">Arcus Biosciences, Inc.</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(c)</td><td width="92%" class="tableClassNoBorder">Address of Issuer's Principal Executive Offices:
+							<br><br><div class="text">3928 Point Eden Way, Hayward, 
+				CALIFORNIA
+			, 94545.</div></td></tr><tr><td colspan="3"><div style="display: flex;"><div style="font-size: 0.9em; font-weight: bold; margin-right: 5px;">
+									Item 1 Comment:
+								</div><div class="largetext" style="text-align:justify">This Amendment No. 7 (the "Amendment") amends the initial Schedule 13D filed by the Reporting Person on July 17, 2020, as amended by Amendment No. 1 to Schedule 13D filed with the SEC by the Reporting Person on February 2, 2021, Amendment No. 2 to Schedule 13D filed with the SEC by the Reporting Person on July 6, 2023, Amendment No. 3 to Schedule 13D filed with the SEC by the Reporting Person on January 31, 2024, Amendment No. 4 to Schedule 13D filed with the SEC by the Reporting Person on March 5, 2025, Amendment No. 5 to Schedule 13D filed with the SEC by the Reporting Person on July 15, 2025 and Amendment No. 6 to Schedule 13D filed with the SEC by the Reporting Person on November 3, 2025 (the "Original Schedule 13D," and as amended by Amendment No. 7, the "Schedule 13D").</div></div></td></tr><tr><td width="8%" class="tableClassValignNoBorder">Item 2.</td><td width="92%" class="tableClassNoBorder">Identity and Background</td></tr><tr></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignCenter">(a)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">This Schedule 13D is being filed by Gilead Sciences, Inc., a Delaware corporation ("Gilead" or the "Reporting Person").</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(b)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">The principal business address of the Reporting Person is 333 Lakeside Drive, Foster City, California 94404.</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(c)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">The principal business of the Reporting Person is to develop and commercialize innovative medicines in areas of unmet medical need and engage in any other activity or business lawfully carried on by a corporation organized under the laws of the State of Delaware.
+
+The directors and executive officers of the Reporting Person are set forth on Schedule I, attached hereto. Schedule I sets forth the following information with respect to each such person:
+
+(i) name;
+
+(ii) business address;
+
+(iii) position with the Reporting Person and present principal occupation or employment and, for persons not employed by the Reporting Person, the name, principal business and address of any corporation or other organization in which such employment is conducted; and
+
+(iv) citizenship.</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(d)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">During the last five years, neither the Reporting Person nor any person named in Schedule I has been (i) convicted in a criminal proceeding (excluding traffic violations or similar misdemeanors) or (ii) a party to a civil proceeding of a judicial or administrative body of competent jurisdiction and as a result of such proceeding was or is subject to a judgment, decree or final order enjoining future violations of, or prohibiting or mandating activities subject to, federal or state securities laws or finding any violation with respect to such laws.</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(e)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">See Item 2(d).</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(f)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">The jurisdiction of organization of the Reporting Person is set forth in subsection (a) above. The citizenship of each of the individuals referred to in Schedule I is set forth on Schedule I.</div></td></tr><tr><td width="8%" class="tableClassValignNoBorder">Item 3.</td><td width="92%" class="tableClassNoBorder">Source and Amount of Funds or Other Consideration</td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter"> </td><td width="92%" class="tableClassNoBorder"><div class="largetext">Gilead acquired from the Issuer 2,200,000 shares of Common Stock in the Issuer's public offering (the "2020 Public Offering") at the public offering price of $27.50 per share. The 2020 Public Offering was completed on June 2, 2020. The total consideration paid by Gilead for these shares of Common Stock was $60,500,000, and such consideration was obtained from the available cash resources of Gilead.
+
+On May 27, 2020, Gilead entered into the Purchase Agreement (as defined below) pursuant to which Gilead agreed to purchase an initial 5,963,029 shares of the Issuer's Common Stock (the "Initial Purchase") at a purchase price of $33.54 per share (the "Initial Purchase Price"), which purchase occurred on July 13, 2020. The total consideration for the Initial Purchase was $199,999,992.66, and such consideration was obtained from the available cash resources of Gilead.
+
+On January 31, 2021, Gilead entered into the Amended and Restated Purchase Agreement (as defined below) pursuant to which Gilead agreed to purchase an additional 5,650,000 shares of the Issuer's Common Stock (the "Second Purchase") at a purchase price of $39.00 per share (the "Second Purchase Price"), which purchase occurred on February 1, 2021. The total consideration for the Second Purchase was $230,350,000.00, and such consideration was obtained from the available cash resources of Gilead.
+
+On June 27, 2023, Gilead entered into the Second Amended and Restated Purchase Agreement (as defined below) pursuant to which Gilead agreed to purchase an additional 1,010,000 shares of the Issuer's Common Stock (the "Third Purchase") at a purchase price of $19.26 per share (the "Third Purchase Price"), which purchase occurred on June 28, 2023. The total consideration for the Third Purchase was $19,452,600, and such consideration was obtained from the available cash resources of Gilead.
+
+On January 29, 2024, Gilead entered into the Third Amended and Restated Purchase Agreement (as defined below) pursuant to which Gilead agreed to purchase an additional 15,238,095 shares of the Issuer's Common Stock (the "Fourth Purchase") at a purchase price of $21.00 per share (the "Fourth Purchase Price"), which purchase occurred on January 29, 2024. The total consideration for the Fourth Purchase was $320,000,000, and such consideration was obtained from the available cash resources of Gilead. Under the Third Amended and Restated Purchase Agreement, Gilead also has the right, at its option, to purchase additional shares from the Issuer, up to a maximum of 35% of the Issuer's then-outstanding Common Stock, from time to time for a period of five years from the closing of the Initial Purchase, at a purchase price equal to the greater of a 20% premium to market (based on a trailing five-day average closing price) at the time Gilead exercises such option and the Initial Purchase Price. It is expected that the total consideration paid in connection with any exercise of such option will be obtained from the available cash resources of Gilead. On July 13, 2025, Gilead's option to purchase additional shares from the Issuer, up to a maximum of 35% of the Issuer's then-outstanding Common Stock, expired.
+
+On February 18, 2025, Gilead acquired from the Issuer 1,363,636 shares of Common Stock in the Issuer's most recent public offering (the "Public Offering") at the public offering price of $11.00 per share. The Public Offering was completed on February 19, 2025. The total consideration paid by Gilead for these shares of Common Stock was $14,999,996, and such consideration was obtained from the available cash resources of Gilead.</div></td></tr><tr><td width="8%" class="tableClassValignNoBorder">Item 4.</td><td width="92%" class="tableClassNoBorder">Purpose of Transaction</td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter"> </td><td width="92%" class="tableClassNoBorder"><div class="largetext">On May 27, 2020, Gilead and the Issuer entered into an Option, License and Collaboration Agreement (the "Collaboration Agreement") pursuant to with Gilead obtained an exclusive option to acquire an exclusive license to all of the Issuer's current and future clinical programs during the 10-year collaboration term and, for those programs that enter clinical development prior to the end of the collaboration term, for up to an additional three years thereafter.
+
+In addition to the Collaboration Agreement, Gilead and the Issuer entered into a Common Stock Purchase Agreement (the "Purchase Agreement"), which was amended and restated on January 31, 2021 to account for the Second Purchase (the "Amended and Restated Purchase Agreement"), on June 27, 2023 to account for the Third Purchase (the "Second Amended and Restated Purchase Agreement"), and on January 29, 2024 to account for the Fourth Purchase (the "Third Amended and Restated Purchase Agreement") and an Investor Rights Agreement (as amended by Amendment No. 1 thereto, which was subsequently amended and restated on January 29, 2024 and August 5, 2026, the "Third Amended and Restated Investor Rights Agreement" and, together with the Third Amended and Restated Purchase Agreement, the "Equity Agreements"), pursuant to which Gilead made the Initial Purchase at the Initial Purchase Price, the Second Purchase at the Second Purchase Price, the Third Purchase at the Third Purchase Price and the Fourth Purchase at the Fourth Purchase Price. Gilead also has the right, at its option, to purchase additional shares from the Issuer, up to a maximum of 35% of the Issuer's then-outstanding Common Stock, from time to time for a period of five years from the closing of the Initial Purchase, at a purchase price equal to the greater of a 20% premium to market (based on a trailing five-day average closing price) at the time Gilead exercises such option and the Initial Purchase Price. On July 13, 2025, Gilead's option to purchase additional shares from the Issuer, up to a maximum of 35% of the Issuer's then-outstanding Common Stock, expired. The Equity Agreements also include lock-up provisions and provide Gilead with certain registration rights.
+
+The acquisitions by the Reporting Person of the Issuer's securities as described herein were effected in connection with entry into the Collaboration Agreement and the Equity Agreements, and because of the belief that the securities of the Issuer represent an attractive investment. The foregoing description of the Equity Agreements is not complete and is subject to and qualified in its entirety by reference to the full text of such agreements. The Third Amended and Restated Purchase Agreement was filed previously as Exhibits 99.1 to the Amendment No. 3 to Schedule 13D filed by the Reporting Person with the SEC on January 31, 2024. The Third Amended and Restated Investor Rights Agreement is filed herewith as Exhibits 99.2 and is incorporated herein by reference.
+
+Except as otherwise described herein, the Reporting Person currently has no plan(s) or proposal(s) that relate to, or would result in, any of the events or transactions described in Item 4(a) through (j) of Schedule 13D, although the Reporting Person reserves the right, at any time and from time to time, to review or reconsider such position and/or change such purpose and/or formulate plans or proposals with respect thereto.
+
+The Reporting Person intends to review from time to time its investment in the Issuer and the Issuer's business affairs, financial position, performance and other investments considerations. The Reporting Person may from time to time engage in discussions with the Issuer, its directors and officers, other stockholders of the Issuer and other persons on matters that relate to the management, operations, business, assets, capitalization, financial condition, strategic plans, governance and the future of the Issuer and/or its subsidiaries. Based upon such review and discussions, as well as general economic, market and industry conditions and prospects and the Reporting Person's liquidity requirements and investment considerations, and subject to the limitations in the agreements described above, the Reporting Person may consider additional courses of action, which may include, in the future, formulating plans or proposals regarding the Issuer and/or its subsidiaries, including possible future plans or proposals concerning events or transactions of the kind described in Item 4(a) through (j) of Schedule 13D.</div></td></tr><tr><td width="8%" class="tableClassValignNoBorder">Item 5.</td><td width="92%" class="tableClassNoBorder">Interest in Securities of the Issuer</td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(a)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">Number of shares of Common Stock beneficially owned:
+
+Gilead - 31,424,760 shares
+
+Jeffrey A. Bluestone - 13,563 shares
+
+Percent of class:
+
+Gilead - 24.7%
+
+Jeffrey A. Bluestone - 0.01%
+
+The number of shares of Common Stock beneficially owned by Gilead consists of (i) 2,200,000 shares of Common Stock purchased in the 2020 Public Offering, (ii) the initial purchase of 5,963,029 shares of Common Stock pursuant to the Purchase Agreement, (iii) the subsequent purchase of 5,650,000 shares of Common Stock pursuant to the Amended and Restated Purchase Agreement, (iv) the subsequent purchase of 1,010,000 shares of Common Stock pursuant to the Second Amended and Restated Purchase Agreement, (v) the subsequent purchase of 15,238,095 shares of Common Stock pursuant to the Third Amended and Restated Purchase Agreement, and (vi) the subsequent purchase of 1,363,636 shares of Common Stock pursuant to the Public Offering. The number of shares of Common Stock beneficially owned by Mr. Bluestone consists of options to purchase 13,563 shares of Common Stock exercisable within 60 days.
+
+The percentage ownership for Gilead was calculated based upon 127,333,376 shares of common stock of the Issuer issued and outstanding, as reported in the Quarterly Report on Form 10-Q filed by the Issuer with the SEC on August 5, 2026. The percentage ownership for Mr. Bluestone was calculated based upon 127,346,939 shares of Common Stock issued and outstanding, based on 127,333,376 shares of Common Stock issued and outstanding and assuming the immediate exercise in full by Mr. Bluestone of his options.
+
+To the best knowledge of the Reporting Person, none of the individuals listed on Schedule I beneficially owns any of the Issuer's Common Stock, except Mr. Bluestone, who has received options to purchase shares of Common Stock in partial payment for his service on the Issuer's Scientific Advisory Board.</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(b)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">Number of shares as to which such person has:
+
+(i) Sole power to vote or to direct the vote:
+
+Gilead - 31,424,760 shares
+
+Jeffrey A. Bluestone - 13,563 shares
+
+(ii) Shared power to vote or to direct the vote:
+
+Gilead - 0 shares
+
+Jeffrey A. Bluestone - 0 shares
+
+(iii) Sole power to dispose or to direct the disposition of:
+
+Gilead - 31,424,760 shares
+
+Jeffrey A. Bluestone - 13,563 shares
+
+(iv) Shared power to dispose or to direct the disposition of:
+
+Gilead - 0 shares
+
+Jeffrey A. Bluestone - 0 shares</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(c)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">Except as reported in this Schedule 13D, neither the Reporting Person nor, to the best knowledge of the Reporting Person, any of the individuals listed on Schedule I have effected any transactions in the Common Stock during the past sixty (60) days.</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(d)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">Not applicable.</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(e)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">Not applicable.</div></td></tr><tr><td width="8%" class="tableClassValignNoBorder">Item 6.</td><td width="92%" class="tableClassNoBorder">Contracts, Arrangements, Understandings or Relationships With Respect to Securities of the Issuer</td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter"> </td><td width="92%" class="tableClassNoBorder"><div class="largetext">Except as disclosed in Items 3 and 4 of this Schedule 13D, there are no contracts, arrangements, understandings or relationships (legal or otherwise) to which the Reporting Person is a party with respect to the securities of the Issuer.</div></td></tr><tr><td width="8%" class="tableClassValignNoBorder">Item 7.</td><td width="92%" class="tableClassNoBorder">Material to be Filed as Exhibits.</td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter"> </td><td width="92%" class="tableClassNoBorder"><div class="largetext">Exhibit 99.1 Schedule I.
+
+Exhibit 99.2 Third Amended and Restated Investor Rights Agreement, dated August 5, 2026, between Arcus Biosciences, Inc. and Gilead Sciences, Inc.</div></td></tr></table><br></div><div class="form1"><table role="presentation" id="signatureInfo"><tr><td width="8%" class="tableClassValignNoBorder">    SIGNATURE</td><td width="92%" class="tableClassNoBorder"> </td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter"> </td><td width="92%" class="tableClassNoBorder"><div class="information" style="text-align:justify">
+						After reasonable inquiry and to the best of my knowledge and belief, I certify that the information set forth in this statement is true, complete and correct.
+						<br><br></div></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="100%" class="tableClassInnerNoBorderBlue"><div class="text">Gilead Sciences, Inc.</div></td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Signature:</td><td width="92%" class="tableClassNoBorderBlue signature">/s/ Andrew D. Dickinson</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Name/Title:</td><td width="92%" class="tableClassNoBorderBlue signature">Andrew D. Dickinson, Executive Vice President and Chief Financial Officer</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Date:</td><td width="92%" class="tableClassNoBorderBlue signature">08/07/2026</td></tr></table></td></tr></table></div></div>
+
+<script type="text/javascript"  src="/N3AEOPt9/dJoipWz/rYwIB5c/dg/YEaQGVVmDJktp27Xmu/SixucGdeLAQ/KXhNJ/AQsW1I"></script></body></html>

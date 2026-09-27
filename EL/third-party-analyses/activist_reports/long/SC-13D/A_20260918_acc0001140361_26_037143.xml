@@ -1,0 +1,471 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns:p="http://www.sec.gov/edgar/schedule13D" xmlns:p1="http://www.sec.gov/edgar/common"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><link rel="stylesheet" type="text/css" href="/css/SDR_print.css"><style type="text/css">
+					.fakeTextBox {
+					border-top: 2px solid #999;
+					border-right: 1px solid #ccc;
+					border-bottom: 1px solid #ccc;
+					border-left: 2px solid #999;
+					padding: 2px;
+					_width: 800px;
+					height: auto;
+					min-width: 200px;
+					min-height: 50px;
+					word-wrap: break-word;
+					font-size: 0.9em;
+					color: blue;
+					}
+					table.tableClass { border: solid black;
+					border-top-width: 1;
+					border-right-width: 1;
+					border-bottom-width: 1;
+					border-left-width: 1;
+					table-layout:fixed;
+					}
+					table.innerTableClass { border: solid black;
+					border-top-width: 0;
+					border-right-width: 0;
+					border-bottom-width: 0;
+					border-left-width: 0;
+					table-layout:fixed;
+					}
+					th.tableClassLeft { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					padding: 2px;
+					}
+					th.tableClassRight { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 0;
+					padding: 2px;
+					}
+					th.tableClass { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					padding: 2px;
+					}
+					td.tableClassLeft { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					font-size: 0.9em;
+					color: blue;
+					word-wrap: break-word;
+					}
+					td.tableClassRight { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 0;
+					font-size: 0.9em;
+					color: blue;
+					word-wrap: break-word;
+					}
+					td.tableClass { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					font-size: 0.9em;
+					font-weight:bold;
+					color: black;
+					word-wrap: break-word;
+					}
+					td.tableClassNoBorder { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 0px;
+					font-size: 0.9em;
+					font-weight:bold;
+					color: black;
+					word-wrap: break-word;
+					}
+
+					td.tableClassNoBorderBlue { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 0px;
+					font-size: 0.9em;
+					font-weight:bold;
+					color: blue;
+					word-wrap: break-word;
+					}
+
+					td.tableClassInnerNoBorderBlue { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 0px;
+					font-size: 1.4em;
+					font-weight:bold;
+					color: blue;
+					word-wrap: break-word;
+					}
+
+					td.tableClassNoBorderAlignLeft { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 0px;
+					font-size: 0.9em;
+					font-weight:bold;
+					text-align: left;
+					color: black;
+					word-wrap: break-word;
+					}
+
+					td.signature {
+					padding: 4px 8px;
+					}
+
+					td.tableClassInner { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					font-size: 1em;
+					font-weight:bold;
+					color: black;
+					word-wrap: break-word;
+					}
+
+					td.tableClassValign { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					font-size: 0.9em;
+					font-weight:bold;
+					color: black;
+					vertical-align: middle;
+					text-align: center;
+					word-wrap: break-word;
+					}
+
+					td.tableClassValignNoBorder { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 0px;
+					font-size: 0.9em;
+					font-weight:bold;
+					color: black;
+					vertical-align: middle;
+					text-align: center;
+					word-wrap: break-word;
+					}
+
+					td.tableClassValignInner { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					font-size: 1em;
+					font-weight:bold;
+					color: black;
+					vertical-align: middle;
+					text-align: center;
+					word-wrap: break-word;
+					}
+
+					td.innerTableClassRightValign { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 0;
+					font-size: 1em;
+					font-weight:bold;
+					color: black;
+					vertical-align: middle;
+					text-align: center;
+					word-wrap: break-word;
+					}
+
+					td.innerTableClassRightValignBottomLess { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 0px;
+					border-left-width: 0;
+					font-size: 1em;
+					font-weight:bold;
+					color: black;
+					vertical-align: middle;
+					text-align: center;
+					word-wrap: break-word;
+					}
+
+					td.tableClassInnerLeft { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					font-size: 1em;
+					font-weight:bold;
+					color: black;
+					word-wrap: break-word;
+					}
+
+					td.tableClassInnerLeftBottomLess { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 1px;
+					font-size: 1em;
+					font-weight:bold;
+					color: black;
+					word-wrap: break-word;
+					}
+
+					td.tableClassNoBorderAlignCenter { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 0px;
+					font-size: 0.9em;
+					font-weight:bold;
+					color: black;
+					text-align: center;
+					word-wrap: break-word;
+					}
+
+					tr.tableClass { border: solid black;
+					border-top-width: 1px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					}
+					tr.tableClassWithBg { border: solid black;
+					border-top-width: 0;
+					border-right-width: 1;
+					border-bottom-width: 1;
+					border-left-width: 0;
+					background-color: #e0e0ff
+					}
+
+					tr.tableClassWithBgBlack { border: solid black;
+					border-top-width: 0;
+					border-right-width: 1;
+					border-bottom-width: 1;
+					border-left-width: 0;
+					background-color: #D3D3D3
+					}
+
+					hr.header {
+					position: relative;
+					top: 20px;
+					border: none;
+					height: 6px;
+					background: black;
+					margin-bottom: 10px;
+					}
+
+					hr.separatorThin {
+					position: relative;
+					top: 2px;
+					border: none;
+					height: 2px;
+					background: black;
+					margin-bottom: 2px;
+					}
+
+					hr.headerThin {
+					position: relative;
+					top: 10px;
+					border: none;
+					height: 2px;
+					background: black;
+					margin-bottom: 10px;
+					}
+
+					hr.separator {
+					position: relative;
+					top: 20px;
+					border: none;
+					height: 4px;
+					background: black;
+					margin-bottom: 5px;
+					}
+
+					div.text {
+					background-color: #ffffff;
+					color: blue;
+					font-size: 1em;
+					font-weight:normal;
+					text-align:justify;
+					}
+
+
+					div.information {
+					background-color: #ffffff;
+					color: black;
+					font-size: 1em;
+					font-weight:normal;
+					text-align:justify;
+					}
+
+					#scheader {
+					font-size: 0.9em;
+					border: 0px solid #404040;
+					border-spacing: 2px;
+					}
+
+					div.largetext {
+					background-color: #ffffff;
+					color: blue;
+					font-size: 1em;
+					font-weight:normal;
+					text-align:justify;
+					white-space: pre-wrap;
+					word-break: normal;
+					}
+
+				</style></head><body lang="en-US" text="#000000" bgcolor="#ffffff"><hr class="header"><br><hr class="headerThin"><div class="contentwrapper"><table role="presentation" id="scheader"><tr><td class="tableClassNoBorderAlignCenter" style="font-size:2em;">
+						SECURITIES AND EXCHANGE COMMISSION
+						<br>
+						Washington, D.C. 20549
+					</td></tr><tr><td class="tableClassNoBorderAlignCenter"><br><br><div style="font-size:1.5em;">
+									SCHEDULE 13D
+								</div><br><div style="font-size:1.2em;">
+							Under the Securities Exchange Act of 1934
+						</div><br><div class="information" style="text-align:center; font-weight:bold;">
+									(Amendment No. <span style="color:blue;">1</span>)
+								</div><br><br></td></tr><tr><td class="center"><div class="information" style="text-align:center; font-weight:bold; color:blue;">THE ESTEE LAUDER COMPANIES INC.</div><div class="information" style="text-align:center; font-weight:bold;"><hr class="separatorThin">(Name of Issuer)</div><br><br></td></tr><tr><td class="center"><div class="information" style="text-align:center; font-weight:bold; color:blue;">CLASS A COMMON STOCK PAR VALUE $.01 PER SHARE</div><div class="information" style="text-align:center; font-weight:bold;"><hr class="separatorThin">(Title of Class of Securities)</div><br><br></td></tr><table border="1"><tr><td><div class="information" style="text-align:center; font-weight:bold; color:blue;">518439104</div><div class="information" style="text-align:center; font-weight:bold;"><hr class="separatorThin">(CUSIP Number)</div></td></tr><br><br></table><tr><td class="center"><div class="information" style="text-align:center; font-weight:bold; color:blue;">PAULA A. RYAN, ESQ.<br>DAVIS POLK &amp; WARDWELL LLP,
+								450 LEXINGTON AVENUE<br>New York,
+								NY,
+								10017<br>212-450-4000</div><div class="information" style="text-align:center; font-weight:bold;"><hr class="separatorThin">(Name, Address and Telephone Number of Person Authorized to
+									Receive Notices and Communications)</div></td></tr><tr><td class="center"><div class="information" style="text-align:center; font-weight:bold; color:blue;">09/16/2026</div><div class="information" style="text-align:center; font-weight:bold;"><hr class="separatorThin">(Date of Event Which Requires Filing of This Statement)</div></td></tr></table><br><br><div class="information" style="text-align:justify">
+				If the filing person has previously filed a statement on Schedule 13G to report the acquisition that is the subject of this Schedule 13D, and is filing this schedule because of §§ 240.13d-1(e), 240.13d-1(f) or 240.13d-1(g), check the following box.
+				<img src="/Images/box-unchecked.jpg" alt="Checkbox not checked"></div><br><div class="information" style="text-align:justify">
+				The information required on the remainder of this cover page shall not be deemed to be “filed” for the purpose of Section 18 of the
+				Securities Exchange Act of 1934 (“Act”) or otherwise subject to the liabilities of that section of the Act but shall be subject to all other
+				provisions of the Act (however, see the Notes).
+			</div></div><hr class="headerThin"><hr class="header"><br><br>
+  <div style="display:none">
+			schemaVersion:
+			</div>
+<div class="content"><div class="form1"></div></div>
+  <div class="content"><div class="form1"><table><tr><td class="center"><br><br><p><div align="center" style="font-size:1.2em;">
+									SCHEDULE 13D
+								</div></p></td></tr></table><table role="presentation" class="tableClass" id="cusipNumber"><tr class="tableClass"><td width="7%" style="font-weight:bold;">CUSIP Number(s):</td><td width="75%"><div style="font-size:.9em; color:#000000">518439104</div></td></tr></table><br><br><table role="presentation" class="tableClass" id="reportingPersonDetails"><tr class="tableClass"><td width="8%" class="tableClassValign">1</td><td width="92%" class="tableClass">
+					Name of reporting person
+					<br><br><div class="text">Trust Under Article 2 of The Zinterhofer 2008 Descendants Trust Agreement</div></td></tr><tr><td width="8%" class="tableClassValign">2</td><td width="92%" class="tableClass">Check the appropriate box if a member of a Group (See Instructions)
+				<br><br><div class="text"><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked">  (a)
+					<br><img src="/Images/box-checked.jpg" alt="Checkbox checked">  (b)	
+				</div></td></tr><tr class="tableClassWithBgBlack"><td width="8%" class="tableClassValign">3</td><td width="92%" class="tableClass">SEC use only</td></tr><tr><td width="8%" class="tableClassValign">4</td><td width="92%" class="tableClass">
+					Source of funds (See Instructions)
+					<br><br><div class="text">OO</div></td></tr><tr><td width="8%" class="tableClassValign">5</td><td width="92%" class="tableClass">
+					Check if disclosure of legal proceedings is required pursuant to Items 2(d) or 2(e)
+					<br><br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked"></td></tr><tr><td width="8%" class="tableClassValign">6</td><td width="92%" class="tableClass">Citizenship or place of organization
+				<br><br><div class="text">
+				NEW YORK
+			</div></td></tr><tr><td width="8%" class="tableClassValign">Number of Shares Beneficially Owned by Each Reporting Person With:</td><td width="92%" class="tableClass"><table class="innerTableClass"><tr><td width="8%" class="innerTableClassRightValign">7</td><td width="92%" class="tableClassInnerLeft">Sole Voting Power
+							<br><br><div class="text">4,910,594.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">8</td><td width="92%" class="tableClassInnerLeft">Shared Voting Power
+							<br><br><div class="text">0.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">9</td><td width="92%" class="tableClassInnerLeft">Sole Dispositive Power
+							<br><br><div class="text">4,910,594.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValignBottomLess">10</td><td width="92%" class="tableClassInnerLeftBottomLess">Shared Dispositive Power
+							<br><br><div class="text">0.00</div></td></tr></table></td></tr><tr><td width="8%" class="tableClassValign">11</td><td width="92%" class="tableClass">Aggregate amount beneficially owned by each reporting person
+				<br><br><div class="text">4,910,594.00</div></td></tr><tr><td width="8%" class="tableClassValign">12</td><td width="92%" class="tableClass">Check if the aggregate amount in Row (11) excludes certain shares (See Instructions)
+				<br><br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked"></td></tr><tr><td width="8%" class="tableClassValign">13</td><td width="92%" class="tableClass">Percent of class represented by amount in Row (11)
+				<br><br><div class="text">1.9 % </div></td></tr><tr><td width="8%" class="tableClassValign">14</td><td width="92%" class="tableClass">Type of Reporting Person (See Instructions)
+				<br><br><div class="text">OO</div></td></tr></table><br><div style="display: flex;"><div style="font-size: 0.9em; font-weight: bold; margin-right: 5px;">
+					Comment for Type of Reporting Person:
+				</div><div class="largetext" style="text-align:justify">Rows 7, 8, 9, 10, 11 and 13:  See Item 5 of this Amendment.
+
+This Amendment No. 1 (this "Amendment") is the first amendment to the Statement on Schedule 13D (the "Schedule 13D") initially filed with the Securities and Exchange Commission (the "SEC") on June 3, 2010 by the Trust Under Article 2 of The Zinterhofer 2008 Descendants Trust Agreement (the "2008 Descendants Trust").  Capitalized terms used in this Amendment and not defined herein have the respective meanings ascribed to such terms in the Schedule 13D.</div></div><table><tr><td class="center"><br><br><p><div align="center" style="font-size:1.2em;">
+									SCHEDULE 13D
+								</div></p></td></tr></table><table role="presentation" class="tableClass" id="cusipNumber"><tr class="tableClass"><td width="7%" style="font-weight:bold;">CUSIP Number(s):</td><td width="75%"><div style="font-size:.9em; color:#000000">518439104</div></td></tr></table><br><br><table role="presentation" class="tableClass" id="reportingPersonDetails"><tr class="tableClass"><td width="8%" class="tableClassValign">1</td><td width="92%" class="tableClass">
+					Name of reporting person
+					<br><br><div class="text">Eric Louis Zinterhofer</div></td></tr><tr><td width="8%" class="tableClassValign">2</td><td width="92%" class="tableClass">Check the appropriate box if a member of a Group (See Instructions)
+				<br><br><div class="text"><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked">  (a)
+					<br><img src="/Images/box-checked.jpg" alt="Checkbox checked">  (b)	
+				</div></td></tr><tr class="tableClassWithBgBlack"><td width="8%" class="tableClassValign">3</td><td width="92%" class="tableClass">SEC use only</td></tr><tr><td width="8%" class="tableClassValign">4</td><td width="92%" class="tableClass">
+					Source of funds (See Instructions)
+					<br><br><div class="text">OO</div></td></tr><tr><td width="8%" class="tableClassValign">5</td><td width="92%" class="tableClass">
+					Check if disclosure of legal proceedings is required pursuant to Items 2(d) or 2(e)
+					<br><br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked"></td></tr><tr><td width="8%" class="tableClassValign">6</td><td width="92%" class="tableClass">Citizenship or place of organization
+				<br><br><div class="text">
+				UNITED STATES
+			</div></td></tr><tr><td width="8%" class="tableClassValign">Number of Shares Beneficially Owned by Each Reporting Person With:</td><td width="92%" class="tableClass"><table class="innerTableClass"><tr><td width="8%" class="innerTableClassRightValign">7</td><td width="92%" class="tableClassInnerLeft">Sole Voting Power
+							<br><br><div class="text">2,780.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">8</td><td width="92%" class="tableClassInnerLeft">Shared Voting Power
+							<br><br><div class="text">4,910,594.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">9</td><td width="92%" class="tableClassInnerLeft">Sole Dispositive Power
+							<br><br><div class="text">2,780.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValignBottomLess">10</td><td width="92%" class="tableClassInnerLeftBottomLess">Shared Dispositive Power
+							<br><br><div class="text">4,910,594.00</div></td></tr></table></td></tr><tr><td width="8%" class="tableClassValign">11</td><td width="92%" class="tableClass">Aggregate amount beneficially owned by each reporting person
+				<br><br><div class="text">4,913,374.00</div></td></tr><tr><td width="8%" class="tableClassValign">12</td><td width="92%" class="tableClass">Check if the aggregate amount in Row (11) excludes certain shares (See Instructions)
+				<br><br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked"></td></tr><tr><td width="8%" class="tableClassValign">13</td><td width="92%" class="tableClass">Percent of class represented by amount in Row (11)
+				<br><br><div class="text">1.9 % </div></td></tr><tr><td width="8%" class="tableClassValign">14</td><td width="92%" class="tableClass">Type of Reporting Person (See Instructions)
+				<br><br><div class="text">IN</div></td></tr></table><br><div style="display: flex;"><div style="font-size: 0.9em; font-weight: bold; margin-right: 5px;">
+					Comment for Type of Reporting Person:
+				</div><div class="largetext" style="text-align:justify">Rows 7, 8, 9, 10, 11 and 13: See Item 5 of this Amendment.
+
+This Amendment constitutes the initial filing on Schedule 13D of Eric Louis Zinterhofer ("ELZ"), who is hereby added as a Reporting Person.</div></div></div><div class="form1"><table><tr><td class="center"><br><br><p><div align="center" style="font-size:1.2em;">
+									SCHEDULE 13D
+								</div></p></td></tr></table><table role="presentation" id="item1to7"><tr><td width="8%" class="tableClassValignNoBorder">Item 1.</td><td width="92%" class="tableClassNoBorder">Security and Issuer</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignCenter">(a)</td><td width="92%" class="tableClassNoBorder">Title of Class of Securities:
+							<br><br><div class="text">CLASS A COMMON STOCK PAR VALUE $.01 PER SHARE</div></td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignCenter">(b)</td><td width="92%" class="tableClassNoBorder">Name of Issuer:
+							<br><br><div class="text">THE ESTEE LAUDER COMPANIES INC.</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(c)</td><td width="92%" class="tableClassNoBorder">Address of Issuer's Principal Executive Offices:
+							<br><br><div class="text">767 FIFTH AVENUE, NEW YORK, 
+				NEW YORK
+			, 10153.</div></td></tr><tr><td width="8%" class="tableClassValignNoBorder">Item 2.</td><td width="92%" class="tableClassNoBorder">Identity and Background</td></tr><tr></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignCenter">(a)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">This Schedule 13D is being filed by the 2008 Descendants Trust and ELZ, as co-trustee of the 2008 Descendants Trust (each, a "Reporting Person" and, together, the "Reporting Persons").
+
+The 2008 Descendants Trust is an irrevocable trust created under an agreement dated December 24, 2008.  The current trustees of the 2008 Descendants Trust are Aerin Lauder Zinterhofer and ELZ (the "Trustees").  Jane Lauder no longer acts as trustee of the 2008 Descendants Trust.  The principal business address of the 2008 Descendants Trust is 767 Fifth Avenue, New York, New York 10153.
+
+ELZ's principal business address is Searchlight Capital Partners, L.P. ("Searchlight"), 745 Fifth Avenue, 26th Floor, New York, New York 10151.  The present principal occupation of ELZ is as Founding Partner of Searchlight.  ELZ is also a member of the Board of Directors of the Issuer.  The principal business of Searchlight is sponsoring and managing private investment funds that invest across the capital structure, and its principal business address is 745 Fifth Avenue, 26th Floor, New York, New York 10151.
+
+During the last five years, none of the Reporting Persons or the Trustees has been convicted in a criminal proceeding (excluding traffic violations or similar misdemeanors).
+
+During the last five years, none of the Reporting Persons or the Trustees has been a party to a civil proceeding of a judicial or administrative body of competent jurisdiction as a result of which, he, she or it was or is subject to a judgment, decree or final order enjoining future violations of, or prohibiting or mandating activities subject to, federal or state securities laws or finding any violation with respect to such laws.
+
+Both Trustees are citizens of the United States of America.</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(b)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">The information set forth in Item 2(a) of this Schedule 13D is hereby incorporated herein by reference.</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(c)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">The information set forth in Item 2(a) of this Schedule 13D is hereby incorporated herein by reference.</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(d)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">The information set forth in Item 2(a) of this Schedule 13D is hereby incorporated herein by reference.</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(e)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">The information set forth in Item 2(a) of this Schedule 13D is hereby incorporated herein by reference.</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(f)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">The information set forth in Item 2(a) of this Schedule 13D is hereby incorporated herein by reference.</div></td></tr><tr><td width="8%" class="tableClassValignNoBorder">Item 3.</td><td width="92%" class="tableClassNoBorder">Source and Amount of Funds or Other Consideration</td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter"> </td><td width="92%" class="tableClassNoBorder"><div class="largetext">The information set forth in Item 3 of the Schedule 13D is incorporated herein by reference.
+
+The stock options held directly by ELZ to acquire 2,780 shares of Class A Common Stock were granted to ELZ as part of his compensation for service on the Board of Directors of the Issuer.  No funds were used by ELZ to acquire such stock options.</div></td></tr><tr><td width="8%" class="tableClassValignNoBorder">Item 4.</td><td width="92%" class="tableClassNoBorder">Purpose of Transaction</td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter"> </td><td width="92%" class="tableClassNoBorder"><div class="largetext">The Share Transaction was for investment purposes.  In compliance with the requirements of the Stockholders' Agreement, in connection with the Share Transaction, Aerin Lauder Zinterhofer, in her capacity as trustee of the 2008 Descendants Trust, became party to the Stockholders' Agreement.  On September 16, 2026, ELZ became a trustee of the 2008 Descendants Trust (the "Trustee Appointment"), and, in compliance with the requirements of the Stockholders' Agreement, became party to the Stockholders' Agreement, in his capacity as trustee of the 2008 Descendants Trust.  By virtue of the Trustees, in their capacity as trustees of the 2008 Descendants Trust, becoming party to the Stockholders' Agreement, the Reporting Persons and the Trustees may be deemed members of a group for purposes of Section 13(d)(3) of the Securities Exchange Act of 1934.
+
+The Reporting Persons do not currently have any plans or proposals of the type set forth in paragraphs (a) through (j) of Item 4 of Schedule 13D.  However, each Reporting Person reserves the right to change his or its plans at any time, as such Reporting Person deems appropriate, and accordingly the Reporting Persons may acquire additional shares of Class B Common Stock in private transactions or additional shares of Class A Common Stock in open market transactions, in each case for investment purposes, and may dispose of shares of Class B Common Stock in private or open market transactions or shares of Class A Common Stock (or Class B Common Stock, after conversion into Class A Common Stock) in private or open market transactions or otherwise.  Any decision by the Reporting Persons to purchase additional shares of Class A Common Stock or Class B Common Stock or to dispose of any such shares will take into account various factors, including general economic and stock market considerations.</div></td></tr><tr><td width="8%" class="tableClassValignNoBorder">Item 5.</td><td width="92%" class="tableClassNoBorder">Interest in Securities of the Issuer</td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(a)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">The responses of the Reporting Persons to Rows (11) through (13) of the cover pages of this Amendment are incorporated herein by reference.  As of September 16, 2026, the 2008 Descendants Trust beneficially owned 4,910,594 shares of Class A Common Stock via its holding of the same number of shares of Class B Common Stock.  As of September 16, 2026, ELZ beneficially owned an aggregate of 4,913,374 shares of Class A Common Stock, consisting of (i) 4,910,594 shares of Class A Common Stock issuable upon conversion of the same number of shares of Class B Common Stock held by the 2008 Descendants Trust, with respect to which ELZ, as co-trustee, shares voting and dispositive power, and (ii) 2,780 shares of Class A Common Stock issuable upon the exercise of stock options held directly by ELZ that will become exercisable within 60 days of September 16, 2026.
+
+Each share of Class B Common Stock is convertible at the option of the holder into one share of Class A Common Stock and is automatically converted into one share of Class A Common Stock (i) upon transfer to a person who is not a Permitted Transferee, as that term is defined in the Issuer's Certificate of Incorporation, or (ii) as of any record date for a meeting of stockholders where the outstanding Class B Common Stock constitutes less than 10% of the outstanding shares of common stock of the Issuer.  Assuming conversion of all such shares of Class B Common Stock beneficially owned by the 2008 Descendants Trust, the 2008 Descendants Trust would beneficially own 4,910,594 shares of Class A Common Stock, which would constitute 1.9% of the number of shares of Class A Common Stock outstanding (based on the number of shares of Class A Common Stock outstanding as of August 12, 2026, as reported in the Issuer's Annual Report on Form 10-K for the fiscal year ended June 30, 2026 (the "Annual Report")).  Assuming conversion of all shares of Class B Common Stock beneficially owned by ELZ and the exercise in full of the stock options held directly by ELZ that will become exercisable within 60 days of September 16, 2026, ELZ would beneficially own 4,913,374 shares of Class A Common Stock, which would constitute 1.9% of the number of shares of Class A Common Stock outstanding (based on the number of shares of Class A Common Stock outstanding as of August 12, 2026, as reported in the Annual Report).
+
+Each share of Class A Common Stock entitles the holder to one vote on each matter submitted to a vote of the Issuer's stockholders, and each share of Class B Common Stock entitles the holder to ten votes on each such matter, including the election of directors of the Issuer.  Assuming no conversion of any of the outstanding shares of Class B Common Stock, the 4,910,594 shares of Class B Common Stock beneficially owned by the 2008 Descendants Trust constitute 3.5% of the aggregate voting power of the Issuer (based on the number of shares of Class A Common Stock and Class B Common Stock outstanding as of August 12, 2026, as reported in the Annual Report).  Assuming no conversion of any of the outstanding shares of Class B Common Stock, the 4,910,594 shares of Class B Common Stock beneficially owned by ELZ constitute 3.5% of the aggregate voting power of the Issuer (based on the number of shares of Class A Common Stock and Class B Common Stock outstanding as of August 12, 2026, as reported in the Annual Report).  The 2,780 shares of Class A Common Stock underlying the stock options held directly by ELZ are not included in this calculation because such shares were not outstanding as of September 16, 2026.</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(b)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">The responses of the Reporting Persons to (i) Rows (7) through (10) of the cover pages of this Amendment and (ii) Item 5(a) hereof are incorporated herein by reference.  The Trustees (including ELZ), as co-trustees of the 2008 Descendants Trust, share voting and dispositive power with respect to the 4,910,594 shares of Class B Common Stock owned by the 2008 Descendants Trust.  ELZ has sole voting and dispositive power with respect to the 2,780 shares of Class A Common Stock issuable upon exercise of the stock options held directly by ELZ that will become exercisable within 60 days of September 16, 2026.</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(c)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">None of the Reporting Persons effected any transactions in the Class A Common Stock during the past sixty days.</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(d)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">The 2008 Descendants Trust has the right to receive or the power to direct the receipt of dividends from, or the proceeds from the sale of, the 4,910,594 shares of Class B Common Stock owned by the 2008 Descendants Trust.  ELZ, as trustee of the 2008 Descendants Trust, has the right to receive or the power to direct the receipt of dividends from, or the proceeds from the sale of, the 4,910,594 shares of Class B Common Stock owned by the 2008 Descendants Trust.  Upon exercise of the stock options held directly by ELZ, ELZ would have the right to receive or the power to direct the receipt of dividends from, or the proceeds from the sale of, the 2,780 shares of Class A Common Stock issuable upon such exercise.</div></td></tr><tr><td width="8%" class="tableClassValignNoBorder">Item 6.</td><td width="92%" class="tableClassNoBorder">Contracts, Arrangements, Understandings or Relationships With Respect to Securities of the Issuer</td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter"> </td><td width="92%" class="tableClassNoBorder"><div class="largetext">The information set forth in Items 2, 4 and 5 hereof is incorporated by reference herein.
+
+Effective as of May 25, 2010, in connection with the Share Transaction, Aerin Lauder Zinterhofer, in her capacity as trustee of the 2008 Descendants Trust, became party to the stockholders' agreement (the "Stockholders' Agreement"), dated November 22, 1995, as amended, among the parties listed on Exhibit 9 attached hereto.  On September 16, 2026, in connection with the Trustee Appointment, ELZ, in his capacity as trustee of the 2008 Descendants Trust, became party to the Stockholders' Agreement.  The Stockholders' Agreement contains certain limitations on the transfer of shares of Class A Common Stock.  Each stockholder who is a party to the Stockholders' Agreement has agreed to grant to the other parties a right of first offer to purchase shares of Class A Common Stock of the stockholder in the event that the stockholder intends to sell to a person (or group of persons) who is not a Lauder Family Member, as defined therein, except in certain circumstances, such as sales in a widely distributed underwritten public offering or sales made in compliance with Rule 144.</div></td></tr><tr><td width="8%" class="tableClassValignNoBorder">Item 7.</td><td width="92%" class="tableClassNoBorder">Material to be Filed as Exhibits.</td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter"> </td><td width="92%" class="tableClassNoBorder"><div class="largetext">Exhibit 1: Stockholders' Agreement, dated November 22, 1995 (filed as Exhibit 10.1 to the Issuer's Annual Report on Form 10-K for the fiscal year ended June 30, 2003).**
+
+Exhibit 2: Amendment No. 1 to Stockholders' Agreement (filed as Exhibit 10.1 to the Issuer's Quarterly Report on Form 10-Q for the quarter ended September 30, 1996).**
+
+Exhibit 3: Amendment No. 2 to Stockholders' Agreement (filed as Exhibit 10.2 to the Issuer's Quarterly Report on Form 10-Q for the quarter ended December 31, 1996).**
+
+Exhibit 4: Amendment No. 3 to Stockholders' Agreement (filed as Exhibit 10.2 to the Issuer's Quarterly Report on Form 10-Q for the quarter ended March 31, 1997 (the "FY 1997 Q3 10-Q")).**
+
+Exhibit 5: Amendment No. 4 to Stockholders' Agreement (filed as Exhibit 10.1d to the Issuer's Annual Report on Form 10-K for the fiscal year ended June 30, 2000).**
+
+Exhibit 6: Amendment No. 5 to Stockholders' Agreement (filed as Exhibit 10.1e to the Issuer's Annual Report on Form 10-K for the fiscal year ended June 30, 2002).**
+
+Exhibit 7: Amendment No. 6 to Stockholders' Agreement (filed as Exhibit 10.2 to the Issuer's Quarterly Report on Form 10-Q for the quarter ended December 31, 2004).**
+
+Exhibit 8: Amendment No. 7 to Stockholders' Agreement (filed as Exhibit 10.7 to the Issuer's Quarterly Report on Form 10-Q for the quarter ended September 30, 2009).**
+
+Exhibit 9: List of Parties to the Stockholders' Agreement.*
+
+Exhibit 10: Registration Rights Agreement, dated November 22, 1995 (filed as Exhibit 10.2 to the Issuer's Annual Report on Form 10-K for the fiscal year ended June 30, 2003).**
+
+Exhibit 11: First Amendment to Registration Rights Agreement (filed as Exhibit 10.3 to the Issuer's Annual Report on Form 10-K for the fiscal year ended June 30, 1996).**
+
+Exhibit 12: Second Amendment to Registration Rights Agreement (filed as Exhibit 10.1 to the FY 1997 Q3 10-Q).**
+
+Exhibit 13: Third Amendment to Registration Rights Agreement (filed as Exhibit 10.2c to the Issuer's Annual Report on Form 10-K for the fiscal year ended June 30, 2001).**
+
+Exhibit 14: Fourth Amendment to Registration Rights Agreement (filed as Exhibit 10.2 to the Issuer's Quarterly Report on Form 10-Q for the quarter ended December 31, 2003).**
+
+Exhibit 15: Transfer Agreement**
+
+Exhibit 99.1: Joint Filing Agreement between the Reporting Persons*
+
+* Filed herewith
+** Incorporated by reference</div></td></tr></table><br></div><div class="form1"><table role="presentation" id="signatureInfo"><tr><td width="8%" class="tableClassValignNoBorder">    SIGNATURE</td><td width="92%" class="tableClassNoBorder"> </td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter"> </td><td width="92%" class="tableClassNoBorder"><div class="information" style="text-align:justify">
+						After reasonable inquiry and to the best of my knowledge and belief, I certify that the information set forth in this statement is true, complete and correct.
+						<br><br></div></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="100%" class="tableClassInnerNoBorderBlue"><div class="text">Trust Under Article 2 of The Zinterhofer 2008 Descendants Trust Agreement</div></td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Signature:</td><td width="92%" class="tableClassNoBorderBlue signature">/s/ Aerin Lauder Zinterhofer</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Name/Title:</td><td width="92%" class="tableClassNoBorderBlue signature">Aerin Lauder Zinterhofer, Trustee and not in her individual capacity</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Date:</td><td width="92%" class="tableClassNoBorderBlue signature">09/18/2026</td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Signature:</td><td width="92%" class="tableClassNoBorderBlue signature">/s/ Eric Louis Zinterhofer</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Name/Title:</td><td width="92%" class="tableClassNoBorderBlue signature">Eric Louis Zinterhofer, Trustee and not in his individual capacity</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Date:</td><td width="92%" class="tableClassNoBorderBlue signature">09/18/2026</td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="100%" class="tableClassInnerNoBorderBlue"><div class="text">Eric Louis Zinterhofer</div></td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Signature:</td><td width="92%" class="tableClassNoBorderBlue signature">/s/ Eric Louis Zinterhofer</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Name/Title:</td><td width="92%" class="tableClassNoBorderBlue signature">Eric Louis Zinterhofer</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Date:</td><td width="92%" class="tableClassNoBorderBlue signature">09/18/2026</td></tr></table></td></tr></table></div></div>
+
+<script type="text/javascript"  src="/N3AEOPt9/dJoipWz/rYwIB5c/dg/YEaQGVVmDJktp27Xmu/SixucGdeLAQ/KXhNJ/AQsW1I"></script></body></html>

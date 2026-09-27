@@ -1,0 +1,457 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns:p="http://www.sec.gov/edgar/schedule13D" xmlns:p1="http://www.sec.gov/edgar/common"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><link rel="stylesheet" type="text/css" href="/css/SDR_print.css"><style type="text/css">
+					.fakeTextBox {
+					border-top: 2px solid #999;
+					border-right: 1px solid #ccc;
+					border-bottom: 1px solid #ccc;
+					border-left: 2px solid #999;
+					padding: 2px;
+					_width: 800px;
+					height: auto;
+					min-width: 200px;
+					min-height: 50px;
+					word-wrap: break-word;
+					font-size: 0.9em;
+					color: blue;
+					}
+					table.tableClass { border: solid black;
+					border-top-width: 1;
+					border-right-width: 1;
+					border-bottom-width: 1;
+					border-left-width: 1;
+					table-layout:fixed;
+					}
+					table.innerTableClass { border: solid black;
+					border-top-width: 0;
+					border-right-width: 0;
+					border-bottom-width: 0;
+					border-left-width: 0;
+					table-layout:fixed;
+					}
+					th.tableClassLeft { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					padding: 2px;
+					}
+					th.tableClassRight { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 0;
+					padding: 2px;
+					}
+					th.tableClass { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					padding: 2px;
+					}
+					td.tableClassLeft { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					font-size: 0.9em;
+					color: blue;
+					word-wrap: break-word;
+					}
+					td.tableClassRight { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 0;
+					font-size: 0.9em;
+					color: blue;
+					word-wrap: break-word;
+					}
+					td.tableClass { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					font-size: 0.9em;
+					font-weight:bold;
+					color: black;
+					word-wrap: break-word;
+					}
+					td.tableClassNoBorder { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 0px;
+					font-size: 0.9em;
+					font-weight:bold;
+					color: black;
+					word-wrap: break-word;
+					}
+
+					td.tableClassNoBorderBlue { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 0px;
+					font-size: 0.9em;
+					font-weight:bold;
+					color: blue;
+					word-wrap: break-word;
+					}
+
+					td.tableClassInnerNoBorderBlue { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 0px;
+					font-size: 1.4em;
+					font-weight:bold;
+					color: blue;
+					word-wrap: break-word;
+					}
+
+					td.tableClassNoBorderAlignLeft { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 0px;
+					font-size: 0.9em;
+					font-weight:bold;
+					text-align: left;
+					color: black;
+					word-wrap: break-word;
+					}
+
+					td.signature {
+					padding: 4px 8px;
+					}
+
+					td.tableClassInner { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					font-size: 1em;
+					font-weight:bold;
+					color: black;
+					word-wrap: break-word;
+					}
+
+					td.tableClassValign { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					font-size: 0.9em;
+					font-weight:bold;
+					color: black;
+					vertical-align: middle;
+					text-align: center;
+					word-wrap: break-word;
+					}
+
+					td.tableClassValignNoBorder { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 0px;
+					font-size: 0.9em;
+					font-weight:bold;
+					color: black;
+					vertical-align: middle;
+					text-align: center;
+					word-wrap: break-word;
+					}
+
+					td.tableClassValignInner { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					font-size: 1em;
+					font-weight:bold;
+					color: black;
+					vertical-align: middle;
+					text-align: center;
+					word-wrap: break-word;
+					}
+
+					td.innerTableClassRightValign { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 0;
+					font-size: 1em;
+					font-weight:bold;
+					color: black;
+					vertical-align: middle;
+					text-align: center;
+					word-wrap: break-word;
+					}
+
+					td.innerTableClassRightValignBottomLess { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 0px;
+					border-left-width: 0;
+					font-size: 1em;
+					font-weight:bold;
+					color: black;
+					vertical-align: middle;
+					text-align: center;
+					word-wrap: break-word;
+					}
+
+					td.tableClassInnerLeft { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					font-size: 1em;
+					font-weight:bold;
+					color: black;
+					word-wrap: break-word;
+					}
+
+					td.tableClassInnerLeftBottomLess { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 1px;
+					font-size: 1em;
+					font-weight:bold;
+					color: black;
+					word-wrap: break-word;
+					}
+
+					td.tableClassNoBorderAlignCenter { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 0px;
+					font-size: 0.9em;
+					font-weight:bold;
+					color: black;
+					text-align: center;
+					word-wrap: break-word;
+					}
+
+					tr.tableClass { border: solid black;
+					border-top-width: 1px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					}
+					tr.tableClassWithBg { border: solid black;
+					border-top-width: 0;
+					border-right-width: 1;
+					border-bottom-width: 1;
+					border-left-width: 0;
+					background-color: #e0e0ff
+					}
+
+					tr.tableClassWithBgBlack { border: solid black;
+					border-top-width: 0;
+					border-right-width: 1;
+					border-bottom-width: 1;
+					border-left-width: 0;
+					background-color: #D3D3D3
+					}
+
+					hr.header {
+					position: relative;
+					top: 20px;
+					border: none;
+					height: 6px;
+					background: black;
+					margin-bottom: 10px;
+					}
+
+					hr.separatorThin {
+					position: relative;
+					top: 2px;
+					border: none;
+					height: 2px;
+					background: black;
+					margin-bottom: 2px;
+					}
+
+					hr.headerThin {
+					position: relative;
+					top: 10px;
+					border: none;
+					height: 2px;
+					background: black;
+					margin-bottom: 10px;
+					}
+
+					hr.separator {
+					position: relative;
+					top: 20px;
+					border: none;
+					height: 4px;
+					background: black;
+					margin-bottom: 5px;
+					}
+
+					div.text {
+					background-color: #ffffff;
+					color: blue;
+					font-size: 1em;
+					font-weight:normal;
+					text-align:justify;
+					}
+
+
+					div.information {
+					background-color: #ffffff;
+					color: black;
+					font-size: 1em;
+					font-weight:normal;
+					text-align:justify;
+					}
+
+					#scheader {
+					font-size: 0.9em;
+					border: 0px solid #404040;
+					border-spacing: 2px;
+					}
+
+					div.largetext {
+					background-color: #ffffff;
+					color: blue;
+					font-size: 1em;
+					font-weight:normal;
+					text-align:justify;
+					white-space: pre-wrap;
+					word-break: normal;
+					}
+
+				</style></head><body lang="en-US" text="#000000" bgcolor="#ffffff"><hr class="header"><br><hr class="headerThin"><div class="contentwrapper"><table role="presentation" id="scheader"><tr><td class="tableClassNoBorderAlignCenter" style="font-size:2em;">
+						SECURITIES AND EXCHANGE COMMISSION
+						<br>
+						Washington, D.C. 20549
+					</td></tr><tr><td class="tableClassNoBorderAlignCenter"><br><br><div style="font-size:1.5em;">
+									SCHEDULE 13D
+								</div><br><div style="font-size:1.2em;">
+							Under the Securities Exchange Act of 1934
+						</div><br></td></tr><tr><td class="center"><div class="information" style="text-align:center; font-weight:bold; color:blue;">Arcellx, Inc.</div><div class="information" style="text-align:center; font-weight:bold;"><hr class="separatorThin">(Name of Issuer)</div><br><br></td></tr><tr><td class="center"><div class="information" style="text-align:center; font-weight:bold; color:blue;">Common Stock, par value $0.001</div><div class="information" style="text-align:center; font-weight:bold;"><hr class="separatorThin">(Title of Class of Securities)</div><br><br></td></tr><tr><td class="center"><div class="information" style="text-align:center; font-weight:bold; color:blue;">03940C100</div><div class="information" style="text-align:center; font-weight:bold;"><hr class="separatorThin">(CUSIP Number)</div><br><br></td></tr><tr><td class="center"><div class="information" style="text-align:center; font-weight:bold; color:blue;">Gilead Sciences, Inc.<br>333 Lakeside Drive,
+								<br>Foster City,
+								CA,
+								94404<br>650-574-3000</div><div class="information" style="text-align:center; font-weight:bold;"><hr class="separatorThin">(Name, Address and Telephone Number of Person Authorized to
+									Receive Notices and Communications)</div></td></tr><tr><td class="center"><div class="information" style="text-align:center; font-weight:bold; color:blue;">02/23/2026</div><div class="information" style="text-align:center; font-weight:bold;"><hr class="separatorThin">(Date of Event Which Requires Filing of This Statement)</div></td></tr></table><br><br><div class="information" style="text-align:justify">
+				If the filing person has previously filed a statement on Schedule 13G to report the acquisition that is the subject of this Schedule 13D, and is filing this schedule because of §§ 240.13d-1(e), 240.13d-1(f) or 240.13d-1(g), check the following box.
+				<img src="/Images/box-checked.jpg" alt="Checkbox checked"></div><br><div class="information" style="text-align:justify">
+				The information required on the remainder of this cover page shall not be deemed to be “filed” for the purpose of Section 18 of the
+				Securities Exchange Act of 1934 (“Act”) or otherwise subject to the liabilities of that section of the Act but shall be subject to all other
+				provisions of the Act (however, see the Notes).
+			</div></div><hr class="headerThin"><hr class="header"><br><br>
+  <div class="content"><div class="form1"></div></div>
+  <div class="content"><div class="form1"><table><tr><td class="center"><br><br><p><div align="center" style="font-size:1.2em;">
+									SCHEDULE 13D
+								</div></p></td></tr></table><table role="presentation" class="tableClass" id="cusipNumber"><tr class="tableClass"><td width="25%" style="font-weight:bold;">CUSIP No.</td><td width="75%"><div style="font-size:.9em; color:#000000">03940C100</div></td></tr></table><br><br><table role="presentation" class="tableClass" id="reportingPersonDetails"><tr class="tableClass"><td width="8%" class="tableClassValign">1</td><td width="92%" class="tableClass">
+					Name of reporting person
+					<br><br><div class="text">Gilead Sciences, Inc.</div></td></tr><tr><td width="8%" class="tableClassValign">2</td><td width="92%" class="tableClass">Check the appropriate box if a member of a Group (See Instructions)
+					<br><br><div class="text"><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked">  (a)
+						<br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked">  (b)
+					</div></td></tr><tr class="tableClassWithBgBlack"><td width="8%" class="tableClassValign">3</td><td width="92%" class="tableClass">SEC use only</td></tr><tr><td width="8%" class="tableClassValign">4</td><td width="92%" class="tableClass">
+					Source of funds (See Instructions)
+					<br><br><div class="text">WC</div></td></tr><tr><td width="8%" class="tableClassValign">5</td><td width="92%" class="tableClass">
+					Check if disclosure of legal proceedings is required pursuant to Items 2(d) or 2(e)
+					<br><br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked"></td></tr><tr><td width="8%" class="tableClassValign">6</td><td width="92%" class="tableClass">Citizenship or place of organization
+					<br><br><div class="text">
+				DELAWARE
+			</div></td></tr><tr><td width="8%" class="tableClassValign">Number of Shares Beneficially Owned by Each Reporting Person With:</td><td width="92%" class="tableClass"><table class="innerTableClass"><tr><td width="8%" class="innerTableClassRightValign">7</td><td width="92%" class="tableClassInnerLeft">Sole Voting Power
+								<br><br><div class="text">6,720,803.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">8</td><td width="92%" class="tableClassInnerLeft">Shared Voting Power
+								<br><br><div class="text">0.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">9</td><td width="92%" class="tableClassInnerLeft">Sole Dispositive Power
+								<br><br><div class="text">6,720,803.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValignBottomLess">10</td><td width="92%" class="tableClassInnerLeftBottomLess">Shared Dispositive Power
+								<br><br><div class="text">0.00</div></td></tr></table></td></tr><tr><td width="8%" class="tableClassValign">11</td><td width="92%" class="tableClass">Aggregate amount beneficially owned by each reporting person
+					<br><br><div class="text">6,720,803.00</div></td></tr><tr><td width="8%" class="tableClassValign">12</td><td width="92%" class="tableClass">Check if the aggregate amount in Row (11) excludes certain shares (See Instructions)
+					<br><br><img src="/Images/box-checked.jpg" alt="Checkbox checked"></td></tr><tr><td width="8%" class="tableClassValign">13</td><td width="92%" class="tableClass">Percent of class represented by amount in Row (11)
+					<br><br><div class="text">11.5 % </div></td></tr><tr><td width="8%" class="tableClassValign">14</td><td width="92%" class="tableClass">Type of Reporting Person (See Instructions)
+					<br><br><div class="text">CO</div></td></tr></table><br><div style="display: flex;"><div style="font-size: 0.9em; font-weight: bold; margin-right: 5px;">
+					Comment for Type of Reporting Person:
+				</div><div class="largetext" style="text-align:justify">This percentage is calculated based on 58,464,222 shares of common stock ("Common Stock") of Arcellx, Inc. ("Arcellx") outstanding as of February 19, 2026, as represented by Arcellx to Gilead Sciences, Inc. ("Gilead") on February 22, 2026.</div></div></div><div class="form1"><table><tr><td class="center"><br><br><p><div align="center" style="font-size:1.2em;">
+									SCHEDULE 13D
+								</div></p></td></tr></table><table role="presentation" id="item1to7"><tr><td width="8%" class="tableClassValignNoBorder">Item 1.</td><td width="92%" class="tableClassNoBorder">Security and Issuer</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignCenter">(a)</td><td width="92%" class="tableClassNoBorder">Title of Class of Securities:
+							<br><br><div class="text">Common Stock, par value $0.001</div></td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignCenter">(b)</td><td width="92%" class="tableClassNoBorder">Name of Issuer:
+							<br><br><div class="text">Arcellx, Inc.</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(c)</td><td width="92%" class="tableClassNoBorder">Address of Issuer's Principal Executive Offices:
+							<br><br><div class="text">800 Bridge Parkway, Redwood City, 
+				CALIFORNIA
+			, 94065.</div></td></tr><tr><td colspan="3"><div style="display: flex;"><div style="font-size: 0.9em; font-weight: bold; margin-right: 5px;">
+									Item 1 Comment:
+								</div><div class="largetext" style="text-align:justify">This Schedule 13D (the "Schedule 13D") relates to the common stock, par value $0.001 per share ("Common Stock"), of Arcellx, Inc., a Delaware corporation ("Arcellx"). Arcellx's principal executive offices are located at 800 Bridge Parkway, Redwood City, California 94065.</div></div></td></tr><tr><td width="8%" class="tableClassValignNoBorder">Item 2.</td><td width="92%" class="tableClassNoBorder">Identity and Background</td></tr><tr></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignCenter">(a)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">This Schedule 13D is being filed by Gilead Sciences, Inc., a Delaware corporation ("Gilead").</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(b)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">The principal business address of Gilead is 333 Lakeside Drive, Foster City, California 94404.</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(c)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">The principal business of Gilead is to develop and commercialize innovative medicines in areas of unmet medical need and engage in any other activity or business lawfully carried on by a corporation organized under the laws of the State of Delaware.
+
+The directors and executive officers of the Gilead are set forth on Schedule I, attached hereto. Schedule I sets forth the following information with respect to each such person:
+
+(i) name;
+
+(ii) business address;
+
+(iii) position with Gilead and present principal occupation or employment and, for persons not employed by Gilead, the name, principal business and address of any corporation or other organization in which such employment is conducted; and
+
+(iv) citizenship.</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(d)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">During the last five years, neither Gilead nor any person named in Schedule I has been (i) convicted in a criminal proceeding (excluding traffic violations or similar misdemeanors) or (ii) a party to a civil proceeding of a judicial or administrative body of competent jurisdiction and as a result of such proceeding was or is subject to a judgment, decree or final order enjoining future violations of, or prohibiting or mandating activities subject to, federal or state securities laws or finding any violation with respect to such laws.</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(e)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">During the last five years, neither Gilead nor any person named in Schedule I has been (i) convicted in a criminal proceeding (excluding traffic violations or similar misdemeanors) or (ii) a party to a civil proceeding of a judicial or administrative body of competent jurisdiction and as a result of such proceeding was or is subject to a judgment, decree or final order enjoining future violations of, or prohibiting or mandating activities subject to, federal or state securities laws or finding any violation with respect to such laws.</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(f)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">The jurisdiction of organization of Gilead is set forth in subsection (a) above. The citizenship of each of the individuals referred to in Schedule I is set forth on Schedule I.</div></td></tr><tr><td width="8%" class="tableClassValignNoBorder">Item 3.</td><td width="92%" class="tableClassNoBorder">Source and Amount of Funds or Other Consideration</td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter"> </td><td width="92%" class="tableClassNoBorder"><div class="largetext">On December 8, 2022, Gilead entered into a Common Stock Purchase Agreement (the "Stock Purchase Agreement"), pursuant to which Gilead agreed to purchase 3,478,261 shares of Arcellx's Common Stock (the "Initial Purchase") at a purchase price of $28.75 per share, which purchase occurred on January 26, 2023. The total consideration for the Initial Purchase was $100.0 million, and such consideration was obtained from the available cash resources of Gilead.
+
+On November 15, 2023, Gilead entered into a Common Stock Purchase Agreement (the "Second Stock Purchase Agreement"), pursuant to which Gilead agreed to purchase 3,242,542 shares of Arcellx's Common Stock (the "Additional Purchase") at a purchase price of $61.68 per share, which purchase occurred on December 28, 2023. The total consideration for the Additional Purchase was $200.0 million, and such consideration was obtained from the available cash resources of Gilead.
+
+The Tender and Support Agreements described in Item 4 of this Schedule 13D (the terms of which are hereby incorporated by reference) were entered into by the Supporting Stockholders (as defined in Item 4) as an inducement for Gilead and Ravens Sub, Inc., a Delaware corporation and a wholly owned subsidiary of Gilead ("Purchaser"), to enter into the Merger Agreement described in Item 4 of this Schedule 13D (the terms of which are hereby incorporated by reference). The Supporting Stockholder Shares (as defined in Item 4) have not yet been purchased by Purchaser and no payments were made by or on behalf of Gilead to the Supporting Stockholders in connection with the execution of the Tender and Support Agreements.
+
+The total amount of funds required by Gilead to pay the Closing Amount (as defined below) and to consummate the Offer (as defined below) and purchase all of the outstanding Shares in the Offer and provide funding in connection with the Merger (as defined below) is approximately $7.8 billion, plus related fees and expenses. In addition, Gilead will need approximately $0.3 billion to pay the maximum aggregate amount that holders of CVRs (as defined below) may be entitled to receive if the milestone contemplated by the CVRs is achieved. Gilead expects to fund these payments out of cash on hand.
+
+The information set forth or incorporated by reference in Item 4 is incorporated by reference in this Item 3.</div></td></tr><tr><td width="8%" class="tableClassValignNoBorder">Item 4.</td><td width="92%" class="tableClassNoBorder">Purpose of Transaction</td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter"> </td><td width="92%" class="tableClassNoBorder"><div class="largetext">Stock Purchase Agreements; Standstill Agreements
+
+On December 8, 2022, Kite Pharma, Inc. ("Kite"), a subsidiary of Gilead, and Arcellx entered into a Collaboration and License Agreement (the "Collaboration Agreement") pursuant to which (1) Arcellx and Kite agreed to co-develop and co-commercialize CART-ddBCMA and next-generation autologous and non-autologous Chimeric Antigen Receptor T-cell (CAR-T) cell therapy products that use the same D-domain BCMA binder used in CART-ddBCMA, in each case for the treatment of multiple myeloma, and (2) Arcellx granted to Kite an option to include autologous CAR-T-cell therapy products that both utilize Arcellx's ARC-SparX platform and are directed to BCMA, such as ACLX-001, as well as ARC-SparX products directed to CS1.
+
+In connection with the Collaboration Agreement, on December 8, 2022, Gilead and Arcellx entered into the Stock Purchase Agreement, pursuant to which Gilead made the Initial Purchase, and a Standstill and Stock Restriction Agreement (the "Standstill Agreement"), pursuant to which Gilead agreed to certain transfer and standstill restrictions and received certain registration rights.
+
+On November 15, 2023, in connection with an amendment to the Collaboration Agreement, Gilead and Arcellx entered into the Second Stock Purchase Agreement, pursuant to which Gilead made the Additional Purchase, and amended and restated the Standstill Agreement (as amended, the "Amended and Restated Standstill Agreement"), pursuant to which Gilead agreed to certain additional standstill restrictions and received certain registration rights. On June 28, 2025, the standstill restrictions under the Amended and Restated Standstill Agreement expired.
+
+The foregoing descriptions of the Stock Purchase Agreement, the Second Stock Purchase Agreement and the Amended and Restated Standstill Agreement are not complete and are subject to and qualified in their entirety by reference to the full text of such agreements, which are attached as Exhibits 99.1, 99.2 and 99.3, hereto and incorporated herein by reference.
+
+Merger Agreement
+
+On February 13, 2026, Gilead submitted to the chief executive officer of Arcellx a non-binding proposal to acquire all of the outstanding shares of Common Stock that are not owned by Gilead or its subsidiaries for a purchase price of $98.00 per share in cash (the "Proposal"). The Proposal was approved by Gilead's board of directors earlier on the same day. The Proposal and board approval followed assessment of alternatives for the collaboration and relationship between Gilead and Arcellx, including maintaining the status quo. From February 13, 2026 through February 22, 2026, representatives of Gilead and Arcellx negotiated the terms of the transaction reflected in the Merger Agreement (defined below). On February 18, 2026, Gilead and Arcellx executed a non-disclosure agreement containing a standstill provision, and the standstill provision terminated upon the execution of the Merger Agreement.
+
+On February 22, 2026, Gilead, Arcellx and Purchaser entered into an Agreement and Plan of Merger (the "Merger Agreement"). Pursuant to the Merger Agreement, and upon the terms and subject to the conditions therein, Purchaser will commence a tender offer (the "Offer") to acquire all of the issued and outstanding shares of Common Stock in exchange for (x) $115.00 per share (the "Closing Amount"), net to the seller in cash, without interest, subject to any applicable withholding tax, and (y) one contractual contingent value right (a "CVR"), which represents the right to receive one contingent payment of $5.00 per CVR, in cash, without interest, upon the achievement of a specified milestone in accordance with the terms and subject to the conditions of a contingent value rights agreement, to be entered into with a rights agent selected by Parent and reasonably acceptable to the Company. The Offer will remain open for a minimum of 20 business days, subject to possible extension pursuant to the terms of the Merger Agreement.
+
+The obligation of Purchaser to consummate the Offer is subject to the satisfaction or waiver of customary conditions, including, among others, (i) there being validly tendered, and not validly withdrawn, in the Offer a number of Shares that, considered together with all other Shares owned by Purchaser and its affiliates, represent one more Share than 50% of the total number of Shares outstanding at the expiration of the Offer, (ii) the expiration or termination of the waiting period applicable to the Offer under the Hart-Scott-Rodino Antitrust Improvements Act of 1976, as amended, and other specified notices, approvals or clearances in accordance with foreign antitrust laws having been given and obtained, (iii) the absence of any law or order prohibiting the consummation of the Offer or the Merger in any jurisdiction in which Parent or the Company has material business operations and (iv) other customary conditions set forth in Annex I to the Merger Agreement.
+
+Following the consummation of the Offer and subject to the terms and conditions of the Merger Agreement, Purchaser will merge with and into the Company pursuant to Section 251(h) of the General Corporation Law of the State of Delaware (the "DGCL"), with the Company being the surviving corporation (the "Merger"). At the effective time of the Merger, each Share (other than (i) Shares owned by the Company (including shares held in the Company's treasury), (ii) Shares owned both as of the date of the commencement of the Offer and immediately prior to the effective time of the Merger by Parent, Purchaser, or any other direct or indirect wholly owned subsidiary of Parent, (iii) Shares irrevocably accepted for purchase pursuant to the Offer and (iv) Shares held by stockholders who have properly exercised and perfected their demands for appraisal of such Shares in accordance with the DGCL and have neither withdrawn nor lost such rights prior to the effective time of the Merger) will be converted into the right to receive (A) the Closing Amount in cash, in each case without any interest thereon, subject to any withholding of taxes, plus (B) one (1) CVR.
+
+Tender and Support Agreements
+
+In connection with execution of the Merger Agreement, Gilead and Purchaser entered into Tender and Support Agreements (each, a "Tender and Support Agreement"), dated as of February 22, 2026 with each of (i) entities affiliated with SR One Capital, (ii) entities affiliated with New Enterprise Associates and (iii) each director and officer and certain other members of management of Arcellx (each, a "Supporting Stockholder" and, collectively, the "Supporting Stockholders"), which collectively own 6,033,683 Shares (collectively the "Supporting Stockholder Shares") (not including an additional 5,966,526 stock options and 3,016,601 restricted stock units that are subject to the Tender and Support Agreements), which represented approximately 10.3% of the outstanding Shares as of February 19, 2026, based on information provided by the Supporting Stockholders and Arcellx. Each Tender and Support Agreement provides that the Supporting Stockholder will, among other things, (i) tender all of its or his or her Supporting Stockholder Shares, (ii) vote against other proposals to acquire Arcellx and for any proposal for the Merger and (iii) agree to certain other restrictions on its or his respective ability to take actions with respect to Arcellx and its or his or her Supporting Stockholder Shares.
+
+The form of Tender and Support Agreement has been included to provide information regarding its terms. It is not intended to modify or supplement any factual disclosures about the applicable Supporting Stockholder or Arcellx, Gilead or Purchaser in any public reports filed with the Securities and Exchange Commission (the "SEC") by Arcellx, Gilead or Purchaser.
+
+The foregoing descriptions of the Merger Agreement and the Tender and Support Agreements, and the respective transactions contemplated thereby, do not purport to be complete and are qualified in their entirety by reference to such agreements. A copy of the Merger Agreement, listed as Exhibit 99.4 hereto, is incorporated by reference to Exhibit 2.1 to Gilead's Current Report on Form 8-K filed with the SEC on February 23, 2026. A copy of the form of Tender and Support Agreement, listed as Exhibit 99.5 hereto, is incorporated by reference to Exhibit 10.1 to Gilead's Current Report on Form 8-K filed with the SEC on February 23, 2026.
+
+Additional Information
+
+The purpose of the Offer is for Gilead, through Purchaser, to acquire control of Arcellx. The Offer would be the first step in Gilead's acquisition of Arcellx. The Offer is intended to facilitate the acquisition of all issued and outstanding Shares. The purpose of the Merger is to acquire all issued and outstanding Shares not tendered and purchased pursuant to the Offer. If the Offer is consummated, Purchaser intends to complete the Merger as soon as practicable thereafter.
+
+Following the Merger, Arcellx will become a wholly owned subsidiary of Gilead. In addition, Gilead will cause the Shares to be delisted from the Nasdaq Global Select Market and deregistered under the Act.
+
+The tender offer described in this document has not yet commenced. This communication is for informational purposes only and is neither an offer to purchase nor a solicitation of an offer to sell securities of Arcellx, nor is it a substitute for any tender offer materials that Gilead, Purchaser or Arcellx will file with the SEC. A solicitation and an offer to buy securities of Arcellx will be made only pursuant to an offer to purchase and related materials that Gilead intends to file with the SEC. At the time the tender offer is commenced, Gilead will file a Tender Offer Statement on Schedule TO with the SEC, and Arcellx will file a Solicitation/Recommendation Statement on Schedule 14D-9 with the SEC with respect to the tender offer. ARCELLX'S STOCKHOLDERS AND OTHER INVESTORS ARE URGED TO READ THE TENDER OFFER MATERIALS (INCLUDING AN OFFER TO PURCHASE, A RELATED LETTER OF TRANSMITTAL AND CERTAIN OTHER TENDER OFFER DOCUMENTS) AND THE SOLICITATION/RECOMMENDATION STATEMENT ON SCHEDULE 14D-9 BECAUSE THEY WILL CONTAIN IMPORTANT INFORMATION THAT SHOULD BE READ CAREFULLY BEFORE ANY DECISION IS MADE WITH RESPECT TO THE TENDER OFFER. The Offer to Purchase, the related letter of transmittal and certain other tender offer documents, as well as the Solicitation/Recommendation Statement on Schedule 14D-9, will be sent to all stockholders of Arcellx at no expense to them. The Tender Offer Statement on Schedule TO, the Solicitation/Recommendation Statement on Schedule 14D-9 and other related documents will be made available for free at the SEC's web site at www.sec.gov. Additional copies may be obtained for free by contacting Gilead or Arcellx. Free copies of these materials and certain other offering documents will be made available by Gilead by mail to Gilead Sciences, Inc., 333 Lakeside Drive, Foster City, CA 94404, attention: Investor Relations, by phone at 1-800-GILEAD-5 or 1-650-574-3000, or by directing requests for such materials to the information agent for the offer, which will be named in the Tender Offer Statement on Schedule TO. Investors and security holders of Arcellx may also obtain, free of charge, the Solicitation/Recommendation Statement on Schedule 14D-9 and other related documents that Arcellx has filed with or furnished to the SEC under "SEC Filings" in the "Financials" section of Arcellx's website at https://ir.arcellx.com/financials/sec-filings/default.aspx.
+
+In addition to the Offer to Purchase, the related Letter of Transmittal and certain other tender offer documents, as well as the Solicitation/Recommendation Statement, Gilead and Arcellx file annual, quarterly and current reports, proxy statements and other information with the SEC. Gilead's and Arcellx's filings with the SEC are also available for free to the public from commercial document-retrieval services and at the website maintained by the SEC at www.sec.gov.</div></td></tr><tr><td width="8%" class="tableClassValignNoBorder">Item 5.</td><td width="92%" class="tableClassNoBorder">Interest in Securities of the Issuer</td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(a)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">The information relating to the beneficial ownership of the Shares by Gilead set forth in Rows 7 through 13 on each of the cover pages hereto is incorporated by reference herein and is as of the date hereof. Such information is based on 58,464,222 Shares outstanding as of February 19, 2026, as provided by Arcellx.
+
+Gilead has sole beneficial ownership of the Owned Shares.
+
+As a result of entering into the Tender and Support Agreements, Gilead and the Supporting Stockholders may be deemed to constitute a "group" within the meaning of Section 13(d)(3) of the Exchange Act and Rule 13d-5 under the Exchange Act. Each of Gilead and Purchaser expressly disclaims that it beneficially owns any of the Supporting Stockholder Shares (or the Shares underlying the stock options and restricted stock units that are subject to the Tender and Support Agreements), or that it is a member of a "group" within the meaning of Section 13(d)(3) of the Act or Rule 13d-5 under the Act with the Supporting Stockholders. Neither the filing of this Schedule 13D nor any of its contents shall be deemed to constitute an admission by Gilead or Purchaser that it is the beneficial owner of any of the Shares beneficially owned by any of the Supporting Stockholders, or that it is member of a group with the Supporting Stockholders, for purposes of Section 13(d) of the Act or for any other purpose, and Gilead and Purchaser expressly disclaim beneficial ownership of such Shares and existence of a group.</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(b)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">The information relating to the beneficial ownership of the Shares by Gilead set forth in Rows 7 through 13 on each of the cover pages hereto is incorporated by reference herein and is as of the date hereof. Such information is based on 58,464,222 Shares outstanding as of February 19, 2026, as provided by Arcellx.
+
+Gilead has sole beneficial ownership of the Owned Shares.
+
+As a result of entering into the Tender and Support Agreements, Gilead and the Supporting Stockholders may be deemed to constitute a "group" within the meaning of Section 13(d)(3) of the Exchange Act and Rule 13d-5 under the Exchange Act. Each of Gilead and Purchaser expressly disclaims that it beneficially owns any of the Supporting Stockholder Shares (or the Shares underlying the stock options and restricted stock units that are subject to the Tender and Support Agreements), or that it is a member of a "group" within the meaning of Section 13(d)(3) of the Act or Rule 13d-5 under the Act with the Supporting Stockholders. Neither the filing of this Schedule 13D nor any of its contents shall be deemed to constitute an admission by Gilead or Purchaser that it is the beneficial owner of any of the Shares beneficially owned by any of the Supporting Stockholders, or that it is member of a group with the Supporting Stockholders, for purposes of Section 13(d) of the Act or for any other purpose, and Gilead and Purchaser expressly disclaim beneficial ownership of such Shares and existence of a group.</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(c)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">Except as reported in this Schedule 13D, neither Gilead nor, to the best knowledge of Gilead, any of the individuals listed on Schedule I have effected any transactions in Common Stock during the past sixty (60) days.</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(d)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">Not applicable.</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(e)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">Not applicable.</div></td></tr><tr><td width="8%" class="tableClassValignNoBorder">Item 6.</td><td width="92%" class="tableClassNoBorder">Contracts, Arrangements, Understandings or Relationships With Respect to Securities of the Issuer</td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter"> </td><td width="92%" class="tableClassNoBorder"><div class="largetext">Except as disclosed in Items 3 and 4 of this Schedule 13D, there are no contracts, arrangements, understandings or relationships (legal or otherwise) to which Gilead is a party with respect to the securities of Arcellx.</div></td></tr><tr><td width="8%" class="tableClassValignNoBorder">Item 7.</td><td width="92%" class="tableClassNoBorder">Material to be Filed as Exhibits.</td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter"> </td><td width="92%" class="tableClassNoBorder"><div class="largetext">Exhibit 99.1:  Common Stock Purchase Agreement, dated December 8, 2022, by and between Arcellx and Gilead (incorporated by reference to Exhibit 10.23 of Arcellx's Annual Report on Form 10-K filed with the SEC on March 29, 2023)
+
+Exhibit 99.2:  Common Stock Purchase Agreement, dated November 15, 2023, by and between Arcellx and Gilead (incorporated by reference to Exhibit 10.19 of Arcellx's Annual Report on Form 10-K filed with the SEC on February 28, 2024)
+
+Exhibit 99.3:  Amended and Restated Standstill Agreement, dated November 15, 2023, by and between Arcellx and Gilead (incorporated by reference to Exhibit 10.20 of Arcellx's Annual Report on Form 10-K filed with the SEC on February 28, 2024)
+
+Exhibit 99.4:  Agreement and Plan of Merger, dated as of February 22, 2026, by and among Arcellx, Gilead, and Purchaser (incorporated by reference to Exhibit 2.1 to the Form 8-K filed by Gilead with the SEC on February 23, 2026).
+
+Exhibit 99.5:  Form of Tender and Support Agreement, by and among Gilead, Purchaser and certain Stockholders of Arcellx (incorporated by reference to Exhibit 10.1 to the Form 8-K filed by Gilead with the SEC on February 23, 2026).</div></td></tr></table><br></div><div class="form1"><table role="presentation" id="signatureInfo"><tr><td width="8%" class="tableClassValignNoBorder">    SIGNATURE</td><td width="92%" class="tableClassNoBorder"> </td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter"> </td><td width="92%" class="tableClassNoBorder"><div class="information" style="text-align:justify">
+						After reasonable inquiry and to the best of my knowledge and belief, I certify that the information set forth in this statement is true, complete and correct.
+						<br><br></div></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="100%" class="tableClassInnerNoBorderBlue"><div class="text">Gilead Sciences, Inc.</div></td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Signature:</td><td width="92%" class="tableClassNoBorderBlue signature">/s/ Andrew D. Dickinson</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Name/Title:</td><td width="92%" class="tableClassNoBorderBlue signature">Andrew D. Dickinson/Chief Financial Officer</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Date:</td><td width="92%" class="tableClassNoBorderBlue signature">02/23/2026</td></tr></table></td></tr></table></div></div>
+
+<script type="text/javascript"  src="/N3AEOPt9/dJoipWz/rYwIB5c/dg/YEaQGVVmDJktp27Xmu/SixucGdeLAQ/KXhNJ/AQsW1I"></script></body></html>

@@ -1,0 +1,569 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns:p="http://www.sec.gov/edgar/schedule13D" xmlns:p1="http://www.sec.gov/edgar/common"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><link rel="stylesheet" type="text/css" href="/css/SDR_print.css"><style type="text/css">
+					.fakeTextBox {
+					border-top: 2px solid #999;
+					border-right: 1px solid #ccc;
+					border-bottom: 1px solid #ccc;
+					border-left: 2px solid #999;
+					padding: 2px;
+					_width: 800px;
+					height: auto;
+					min-width: 200px;
+					min-height: 50px;
+					word-wrap: break-word;
+					font-size: 0.9em;
+					color: blue;
+					}
+					table.tableClass { border: solid black;
+					border-top-width: 1;
+					border-right-width: 1;
+					border-bottom-width: 1;
+					border-left-width: 1;
+					table-layout:fixed;
+					}
+					table.innerTableClass { border: solid black;
+					border-top-width: 0;
+					border-right-width: 0;
+					border-bottom-width: 0;
+					border-left-width: 0;
+					table-layout:fixed;
+					}
+					th.tableClassLeft { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					padding: 2px;
+					}
+					th.tableClassRight { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 0;
+					padding: 2px;
+					}
+					th.tableClass { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					padding: 2px;
+					}
+					td.tableClassLeft { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					font-size: 0.9em;
+					color: blue;
+					word-wrap: break-word;
+					}
+					td.tableClassRight { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 0;
+					font-size: 0.9em;
+					color: blue;
+					word-wrap: break-word;
+					}
+					td.tableClass { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					font-size: 0.9em;
+					font-weight:bold;
+					color: black;
+					word-wrap: break-word;
+					}
+					td.tableClassNoBorder { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 0px;
+					font-size: 0.9em;
+					font-weight:bold;
+					color: black;
+					word-wrap: break-word;
+					}
+
+					td.tableClassNoBorderBlue { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 0px;
+					font-size: 0.9em;
+					font-weight:bold;
+					color: blue;
+					word-wrap: break-word;
+					}
+
+					td.tableClassInnerNoBorderBlue { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 0px;
+					font-size: 1.4em;
+					font-weight:bold;
+					color: blue;
+					word-wrap: break-word;
+					}
+
+					td.tableClassNoBorderAlignLeft { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 0px;
+					font-size: 0.9em;
+					font-weight:bold;
+					text-align: left;
+					color: black;
+					word-wrap: break-word;
+					}
+
+					td.signature {
+					padding: 4px 8px;
+					}
+
+					td.tableClassInner { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					font-size: 1em;
+					font-weight:bold;
+					color: black;
+					word-wrap: break-word;
+					}
+
+					td.tableClassValign { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					font-size: 0.9em;
+					font-weight:bold;
+					color: black;
+					vertical-align: middle;
+					text-align: center;
+					word-wrap: break-word;
+					}
+
+					td.tableClassValignNoBorder { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 0px;
+					font-size: 0.9em;
+					font-weight:bold;
+					color: black;
+					vertical-align: middle;
+					text-align: center;
+					word-wrap: break-word;
+					}
+
+					td.tableClassValignInner { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					font-size: 1em;
+					font-weight:bold;
+					color: black;
+					vertical-align: middle;
+					text-align: center;
+					word-wrap: break-word;
+					}
+
+					td.innerTableClassRightValign { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 0;
+					font-size: 1em;
+					font-weight:bold;
+					color: black;
+					vertical-align: middle;
+					text-align: center;
+					word-wrap: break-word;
+					}
+
+					td.innerTableClassRightValignBottomLess { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 0px;
+					border-left-width: 0;
+					font-size: 1em;
+					font-weight:bold;
+					color: black;
+					vertical-align: middle;
+					text-align: center;
+					word-wrap: break-word;
+					}
+
+					td.tableClassInnerLeft { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					font-size: 1em;
+					font-weight:bold;
+					color: black;
+					word-wrap: break-word;
+					}
+
+					td.tableClassInnerLeftBottomLess { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 1px;
+					font-size: 1em;
+					font-weight:bold;
+					color: black;
+					word-wrap: break-word;
+					}
+
+					td.tableClassNoBorderAlignCenter { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 0px;
+					font-size: 0.9em;
+					font-weight:bold;
+					color: black;
+					text-align: center;
+					word-wrap: break-word;
+					}
+
+					tr.tableClass { border: solid black;
+					border-top-width: 1px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					}
+					tr.tableClassWithBg { border: solid black;
+					border-top-width: 0;
+					border-right-width: 1;
+					border-bottom-width: 1;
+					border-left-width: 0;
+					background-color: #e0e0ff
+					}
+
+					tr.tableClassWithBgBlack { border: solid black;
+					border-top-width: 0;
+					border-right-width: 1;
+					border-bottom-width: 1;
+					border-left-width: 0;
+					background-color: #D3D3D3
+					}
+
+					hr.header {
+					position: relative;
+					top: 20px;
+					border: none;
+					height: 6px;
+					background: black;
+					margin-bottom: 10px;
+					}
+
+					hr.separatorThin {
+					position: relative;
+					top: 2px;
+					border: none;
+					height: 2px;
+					background: black;
+					margin-bottom: 2px;
+					}
+
+					hr.headerThin {
+					position: relative;
+					top: 10px;
+					border: none;
+					height: 2px;
+					background: black;
+					margin-bottom: 10px;
+					}
+
+					hr.separator {
+					position: relative;
+					top: 20px;
+					border: none;
+					height: 4px;
+					background: black;
+					margin-bottom: 5px;
+					}
+
+					div.text {
+					background-color: #ffffff;
+					color: blue;
+					font-size: 1em;
+					font-weight:normal;
+					text-align:justify;
+					}
+
+
+					div.information {
+					background-color: #ffffff;
+					color: black;
+					font-size: 1em;
+					font-weight:normal;
+					text-align:justify;
+					}
+
+					#scheader {
+					font-size: 0.9em;
+					border: 0px solid #404040;
+					border-spacing: 2px;
+					}
+
+					div.largetext {
+					background-color: #ffffff;
+					color: blue;
+					font-size: 1em;
+					font-weight:normal;
+					text-align:justify;
+					white-space: pre-wrap;
+					word-break: normal;
+					}
+
+				</style></head><body lang="en-US" text="#000000" bgcolor="#ffffff"><hr class="header"><br><hr class="headerThin"><div class="contentwrapper"><table role="presentation" id="scheader"><tr><td class="tableClassNoBorderAlignCenter" style="font-size:2em;">
+						SECURITIES AND EXCHANGE COMMISSION
+						<br>
+						Washington, D.C. 20549
+					</td></tr><tr><td class="tableClassNoBorderAlignCenter"><br><br><div style="font-size:1.5em;">
+									SCHEDULE 13D
+								</div><br><div style="font-size:1.2em;">
+							Under the Securities Exchange Act of 1934
+						</div><br><div class="information" style="text-align:center; font-weight:bold;">
+									(Amendment No. <span style="color:blue;">7</span>)
+								</div><br><br></td></tr><tr><td class="center"><div class="information" style="text-align:center; font-weight:bold; color:blue;">BROOKFIELD RENEWABLE CORPORATION</div><div class="information" style="text-align:center; font-weight:bold;"><hr class="separatorThin">(Name of Issuer)</div><br><br></td></tr><tr><td class="center"><div class="information" style="text-align:center; font-weight:bold; color:blue;">Class A exchangeable subordinate voting shares, no par value</div><div class="information" style="text-align:center; font-weight:bold;"><hr class="separatorThin">(Title of Class of Securities)</div><br><br></td></tr><tr><td class="center"><div class="information" style="text-align:center; font-weight:bold; color:blue;">11285B108</div><div class="information" style="text-align:center; font-weight:bold;"><hr class="separatorThin">(CUSIP Number)</div><br><br></td></tr><tr><td class="center"><div class="information" style="text-align:center; font-weight:bold; color:blue;">Swati Mandava, Brookfield Corp<br>Brookfield Place, 181 Bay St, Suite 100,
+								<br>Toronto,
+								A6,
+								M5J 2T3<br>(416) 363-9491</div><div class="information" style="text-align:center; font-weight:bold;"><hr class="separatorThin">(Name, Address and Telephone Number of Person Authorized to
+									Receive Notices and Communications)</div></td></tr><tr><td class="center"><div class="information" style="text-align:center; font-weight:bold; color:blue;">12/24/2024</div><div class="information" style="text-align:center; font-weight:bold;"><hr class="separatorThin">(Date of Event Which Requires Filing of This Statement)</div></td></tr></table><br><br><div class="information" style="text-align:justify">
+				If the filing person has previously filed a statement on Schedule 13G to report the acquisition that is the subject of this Schedule 13D, and is filing this schedule because of §§ 240.13d-1(e), 240.13d-1(f) or 240.13d-1(g), check the following box.
+				<img src="/Images/box-unchecked.jpg" alt="Checkbox not checked"></div><br><div class="information" style="text-align:justify">
+				The information required on the remainder of this cover page shall not be deemed to be “filed” for the purpose of Section 18 of the
+				Securities Exchange Act of 1934 (“Act”) or otherwise subject to the liabilities of that section of the Act but shall be subject to all other
+				provisions of the Act (however, see the Notes).
+			</div></div><hr class="headerThin"><hr class="header"><br><br>
+<div class="content"><div class="form1"></div></div>
+<div class="content"><div class="form1"><table><tr><td class="center"><br><br><p><div align="center" style="font-size:1.2em;">
+									SCHEDULE 13D
+								</div></p></td></tr></table><table role="presentation" class="tableClass" id="cusipNumber"><tr class="tableClass"><td width="25%" style="font-weight:bold;">CUSIP No.</td><td width="75%"><div style="font-size:.9em; color:#000000">11285B108</div></td></tr></table><br><br><table role="presentation" class="tableClass" id="reportingPersonDetails"><tr class="tableClass"><td width="8%" class="tableClassValign">1</td><td width="92%" class="tableClass">
+					Name of reporting person
+					<br><br><div class="text">BROOKFIELD CORPORATION</div></td></tr><tr><td width="8%" class="tableClassValign">2</td><td width="92%" class="tableClass">Check the appropriate box if a member of a Group (See Instructions)
+					<br><br><div class="text"><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked">  (a)
+						<br><img src="/Images/box-checked.jpg" alt="Checkbox checked">  (b)
+					</div></td></tr><tr class="tableClassWithBgBlack"><td width="8%" class="tableClassValign">3</td><td width="92%" class="tableClass">SEC use only</td></tr><tr><td width="8%" class="tableClassValign">4</td><td width="92%" class="tableClass">
+					Source of funds (See Instructions)
+					<br><br><div class="text">OO</div></td></tr><tr><td width="8%" class="tableClassValign">5</td><td width="92%" class="tableClass">
+					Check if disclosure of legal proceedings is required pursuant to Items 2(d) or 2(e)
+					<br><br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked"></td></tr><tr><td width="8%" class="tableClassValign">6</td><td width="92%" class="tableClass">Citizenship or place of organization
+					<br><br><div class="text">
+				ONTARIO, CANADA
+			</div></td></tr><tr><td width="8%" class="tableClassValign">Number of Shares Beneficially Owned by Each Reporting Person With:</td><td width="92%" class="tableClass"><table class="innerTableClass"><tr><td width="8%" class="innerTableClassRightValign">7</td><td width="92%" class="tableClassInnerLeft">Sole Voting Power
+								<br><br><div class="text">0.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">8</td><td width="92%" class="tableClassInnerLeft">Shared Voting Power
+								<br><br><div class="text">44,813,835.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">9</td><td width="92%" class="tableClassInnerLeft">Sole Dispositive Power
+								<br><br><div class="text">0.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValignBottomLess">10</td><td width="92%" class="tableClassInnerLeftBottomLess">Shared Dispositive Power
+								<br><br><div class="text">44,813,835.00</div></td></tr></table></td></tr><tr><td width="8%" class="tableClassValign">11</td><td width="92%" class="tableClass">Aggregate amount beneficially owned by each reporting person
+					<br><br><div class="text">44,813,835.00</div></td></tr><tr><td width="8%" class="tableClassValign">12</td><td width="92%" class="tableClass">Check if the aggregate amount in Row (11) excludes certain shares (See Instructions)
+					<br><br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked"></td></tr><tr><td width="8%" class="tableClassValign">13</td><td width="92%" class="tableClass">Percent of class represented by amount in Row (11)
+					<br><br><div class="text">24.9 % </div></td></tr><tr><td width="8%" class="tableClassValign">14</td><td width="92%" class="tableClass">Type of Reporting Person (See Instructions)
+					<br><br><div class="text">CO</div></td></tr></table><br><div style="display: flex;"><div style="font-size: 0.9em; font-weight: bold; margin-right: 5px;">
+					Comment for Type of Reporting Person:
+				</div><div class="largetext" style="text-align:justify">In reference to Rows 8, 10 and 11 above, Brookfield Corporation (Brookfield) beneficially owns (i) Class A.2 Shares (as defined in Item 4) held as follows and that are subject to the Ownership Cap described in Item 4: 2,758,183 Class A.2 Shares held by Brookfield Renewable Power Inc. (BRPI), 3,000,000 Class A.2 Shares held by BRPI Holdings Inc. (BRPIH), and 28,961,500 Class A.2 Shares held by Brookfield Investments Corporation (BIC), each of which is a subsidiary of Brookfield and (ii) 10,094,152 class A exchangeable subordinate voting shares, no par value (the Class A Shares) of Brookfield Renewable Corporation (the Issuer or BEPC) held by subsidiaries of Brookfield Wealth Solutions Ltd., a paired entity to Brookfield (BNT), that are subject to the terms of the Voting Agreement (as described in Item 6). As of the date of this Amendment No. 7 to Schedule 13D, the total number of Class A.2 Shares that may be exchanged into Class A Shares due to the Ownership Cap is 15,212,719.
+
+In reference to Row 13 above, percentage ownership is based on an aggregate number of outstanding Class A Shares of 144,921,168 as of December 27, 2024. Percentage ownership would be 15.8 percent assuming only 15,212,719 Class A.2 Shares are exchanged into 15,212,719 Class A Shares due to the Ownership Cap and the Voting Agreement.  Brookfield Renewable Partners L.P. and its affiliates beneficially own all of the issued and outstanding class B multiple voting shares of the Issuer (Class B Shares), which represent a 75 percent voting interest in the Issuer.</div></div><table><tr><td class="center"><br><br><p><div align="center" style="font-size:1.2em;">
+									SCHEDULE 13D
+								</div></p></td></tr></table><table role="presentation" class="tableClass" id="cusipNumber"><tr class="tableClass"><td width="25%" style="font-weight:bold;">CUSIP No.</td><td width="75%"><div style="font-size:.9em; color:#000000">11285B108</div></td></tr></table><br><br><table role="presentation" class="tableClass" id="reportingPersonDetails"><tr class="tableClass"><td width="8%" class="tableClassValign">1</td><td width="92%" class="tableClass">
+					Name of reporting person
+					<br><br><div class="text">BAM PARTNERS TRUST</div></td></tr><tr><td width="8%" class="tableClassValign">2</td><td width="92%" class="tableClass">Check the appropriate box if a member of a Group (See Instructions)
+					<br><br><div class="text"><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked">  (a)
+						<br><img src="/Images/box-checked.jpg" alt="Checkbox checked">  (b)
+					</div></td></tr><tr class="tableClassWithBgBlack"><td width="8%" class="tableClassValign">3</td><td width="92%" class="tableClass">SEC use only</td></tr><tr><td width="8%" class="tableClassValign">4</td><td width="92%" class="tableClass">
+					Source of funds (See Instructions)
+					<br><br><div class="text">OO</div></td></tr><tr><td width="8%" class="tableClassValign">5</td><td width="92%" class="tableClass">
+					Check if disclosure of legal proceedings is required pursuant to Items 2(d) or 2(e)
+					<br><br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked"></td></tr><tr><td width="8%" class="tableClassValign">6</td><td width="92%" class="tableClass">Citizenship or place of organization
+					<br><br><div class="text">
+				ONTARIO, CANADA
+			</div></td></tr><tr><td width="8%" class="tableClassValign">Number of Shares Beneficially Owned by Each Reporting Person With:</td><td width="92%" class="tableClass"><table class="innerTableClass"><tr><td width="8%" class="innerTableClassRightValign">7</td><td width="92%" class="tableClassInnerLeft">Sole Voting Power
+								<br><br><div class="text">0.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">8</td><td width="92%" class="tableClassInnerLeft">Shared Voting Power
+								<br><br><div class="text">44,813,835.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">9</td><td width="92%" class="tableClassInnerLeft">Sole Dispositive Power
+								<br><br><div class="text">0.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValignBottomLess">10</td><td width="92%" class="tableClassInnerLeftBottomLess">Shared Dispositive Power
+								<br><br><div class="text">44,813,835.00</div></td></tr></table></td></tr><tr><td width="8%" class="tableClassValign">11</td><td width="92%" class="tableClass">Aggregate amount beneficially owned by each reporting person
+					<br><br><div class="text">44,813,835.00</div></td></tr><tr><td width="8%" class="tableClassValign">12</td><td width="92%" class="tableClass">Check if the aggregate amount in Row (11) excludes certain shares (See Instructions)
+					<br><br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked"></td></tr><tr><td width="8%" class="tableClassValign">13</td><td width="92%" class="tableClass">Percent of class represented by amount in Row (11)
+					<br><br><div class="text">24.9 % </div></td></tr><tr><td width="8%" class="tableClassValign">14</td><td width="92%" class="tableClass">Type of Reporting Person (See Instructions)
+					<br><br><div class="text">CO</div></td></tr></table><br><div style="display: flex;"><div style="font-size: 0.9em; font-weight: bold; margin-right: 5px;">
+					Comment for Type of Reporting Person:
+				</div><div class="largetext" style="text-align:justify">In reference to Rows 8, 10 and 11 above, includes (i) Class A Shares that may be issued to Brookfield upon exchange of Class A.2 Shares without giving effect to the Ownership Cap described in Item 4 and (ii) Class A Shares held by subsidiaries of BNT.
+
+In reference to Row 13 above, percentage ownership is based on an aggregate number of outstanding Class A Shares of 144,921,168 as of December 27, 2024.</div></div><table><tr><td class="center"><br><br><p><div align="center" style="font-size:1.2em;">
+									SCHEDULE 13D
+								</div></p></td></tr></table><table role="presentation" class="tableClass" id="cusipNumber"><tr class="tableClass"><td width="25%" style="font-weight:bold;">CUSIP No.</td><td width="75%"><div style="font-size:.9em; color:#000000">11285B108</div></td></tr></table><br><br><table role="presentation" class="tableClass" id="reportingPersonDetails"><tr class="tableClass"><td width="8%" class="tableClassValign">1</td><td width="92%" class="tableClass">
+					Name of reporting person
+					<br><br><div class="text">BROOKFIELD RENEWABLE POWER INC.</div></td></tr><tr><td width="8%" class="tableClassValign">2</td><td width="92%" class="tableClass">Check the appropriate box if a member of a Group (See Instructions)
+					<br><br><div class="text"><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked">  (a)
+						<br><img src="/Images/box-checked.jpg" alt="Checkbox checked">  (b)
+					</div></td></tr><tr class="tableClassWithBgBlack"><td width="8%" class="tableClassValign">3</td><td width="92%" class="tableClass">SEC use only</td></tr><tr><td width="8%" class="tableClassValign">4</td><td width="92%" class="tableClass">
+					Source of funds (See Instructions)
+					<br><br><div class="text">OO</div></td></tr><tr><td width="8%" class="tableClassValign">5</td><td width="92%" class="tableClass">
+					Check if disclosure of legal proceedings is required pursuant to Items 2(d) or 2(e)
+					<br><br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked"></td></tr><tr><td width="8%" class="tableClassValign">6</td><td width="92%" class="tableClass">Citizenship or place of organization
+					<br><br><div class="text">
+				ONTARIO, CANADA
+			</div></td></tr><tr><td width="8%" class="tableClassValign">Number of Shares Beneficially Owned by Each Reporting Person With:</td><td width="92%" class="tableClass"><table class="innerTableClass"><tr><td width="8%" class="innerTableClassRightValign">7</td><td width="92%" class="tableClassInnerLeft">Sole Voting Power
+								<br><br><div class="text">0.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">8</td><td width="92%" class="tableClassInnerLeft">Shared Voting Power
+								<br><br><div class="text">5,758,183.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">9</td><td width="92%" class="tableClassInnerLeft">Sole Dispositive Power
+								<br><br><div class="text">0.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValignBottomLess">10</td><td width="92%" class="tableClassInnerLeftBottomLess">Shared Dispositive Power
+								<br><br><div class="text">5,758,183.00</div></td></tr></table></td></tr><tr><td width="8%" class="tableClassValign">11</td><td width="92%" class="tableClass">Aggregate amount beneficially owned by each reporting person
+					<br><br><div class="text">5,758,183.00</div></td></tr><tr><td width="8%" class="tableClassValign">12</td><td width="92%" class="tableClass">Check if the aggregate amount in Row (11) excludes certain shares (See Instructions)
+					<br><br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked"></td></tr><tr><td width="8%" class="tableClassValign">13</td><td width="92%" class="tableClass">Percent of class represented by amount in Row (11)
+					<br><br><div class="text">3.2 % </div></td></tr><tr><td width="8%" class="tableClassValign">14</td><td width="92%" class="tableClass">Type of Reporting Person (See Instructions)
+					<br><br><div class="text">CO</div></td></tr></table><br><div style="display: flex;"><div style="font-size: 0.9em; font-weight: bold; margin-right: 5px;">
+					Comment for Type of Reporting Person:
+				</div><div class="largetext" style="text-align:justify">In reference to Rows 8, 10 and 11 above, represents Class A Shares that may be issued to BRPI and its subsidiary, BRPIH, upon exchange of Class A.2 Shares.
+
+In reference to Row 13 above, percentage ownership is based on an aggregate number of outstanding Class A Shares of 144,921,168 as of December 27, 2024.</div></div><table><tr><td class="center"><br><br><p><div align="center" style="font-size:1.2em;">
+									SCHEDULE 13D
+								</div></p></td></tr></table><table role="presentation" class="tableClass" id="cusipNumber"><tr class="tableClass"><td width="25%" style="font-weight:bold;">CUSIP No.</td><td width="75%"><div style="font-size:.9em; color:#000000">11285B108</div></td></tr></table><br><br><table role="presentation" class="tableClass" id="reportingPersonDetails"><tr class="tableClass"><td width="8%" class="tableClassValign">1</td><td width="92%" class="tableClass">
+					Name of reporting person
+					<br><br><div class="text">BROOKFIELD INVESTMENTS CORPORATION</div></td></tr><tr><td width="8%" class="tableClassValign">2</td><td width="92%" class="tableClass">Check the appropriate box if a member of a Group (See Instructions)
+					<br><br><div class="text"><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked">  (a)
+						<br><img src="/Images/box-checked.jpg" alt="Checkbox checked">  (b)
+					</div></td></tr><tr class="tableClassWithBgBlack"><td width="8%" class="tableClassValign">3</td><td width="92%" class="tableClass">SEC use only</td></tr><tr><td width="8%" class="tableClassValign">4</td><td width="92%" class="tableClass">
+					Source of funds (See Instructions)
+					<br><br><div class="text">OO</div></td></tr><tr><td width="8%" class="tableClassValign">5</td><td width="92%" class="tableClass">
+					Check if disclosure of legal proceedings is required pursuant to Items 2(d) or 2(e)
+					<br><br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked"></td></tr><tr><td width="8%" class="tableClassValign">6</td><td width="92%" class="tableClass">Citizenship or place of organization
+					<br><br><div class="text">
+				ONTARIO, CANADA
+			</div></td></tr><tr><td width="8%" class="tableClassValign">Number of Shares Beneficially Owned by Each Reporting Person With:</td><td width="92%" class="tableClass"><table class="innerTableClass"><tr><td width="8%" class="innerTableClassRightValign">7</td><td width="92%" class="tableClassInnerLeft">Sole Voting Power
+								<br><br><div class="text">0.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">8</td><td width="92%" class="tableClassInnerLeft">Shared Voting Power
+								<br><br><div class="text">28,961,500.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">9</td><td width="92%" class="tableClassInnerLeft">Sole Dispositive Power
+								<br><br><div class="text">0.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValignBottomLess">10</td><td width="92%" class="tableClassInnerLeftBottomLess">Shared Dispositive Power
+								<br><br><div class="text">28,961,500.00</div></td></tr></table></td></tr><tr><td width="8%" class="tableClassValign">11</td><td width="92%" class="tableClass">Aggregate amount beneficially owned by each reporting person
+					<br><br><div class="text">28,961,500.00</div></td></tr><tr><td width="8%" class="tableClassValign">12</td><td width="92%" class="tableClass">Check if the aggregate amount in Row (11) excludes certain shares (See Instructions)
+					<br><br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked"></td></tr><tr><td width="8%" class="tableClassValign">13</td><td width="92%" class="tableClass">Percent of class represented by amount in Row (11)
+					<br><br><div class="text">16.1 % </div></td></tr><tr><td width="8%" class="tableClassValign">14</td><td width="92%" class="tableClass">Type of Reporting Person (See Instructions)
+					<br><br><div class="text">CO</div></td></tr></table><br><div style="display: flex;"><div style="font-size: 0.9em; font-weight: bold; margin-right: 5px;">
+					Comment for Type of Reporting Person:
+				</div><div class="largetext" style="text-align:justify">In reference to Rows 8, 10 and 11 above, represents Class A Shares that may be issued to BIC Holdings LP, a subsidiary of BIC, upon exchange of Class A.2 Shares.
+
+In reference to Row 13 above, percentage ownership is based on an aggregate number of outstanding Class A Shares of 144,921,168 as of December 27, 2024.</div></div><table><tr><td class="center"><br><br><p><div align="center" style="font-size:1.2em;">
+									SCHEDULE 13D
+								</div></p></td></tr></table><table role="presentation" class="tableClass" id="cusipNumber"><tr class="tableClass"><td width="25%" style="font-weight:bold;">CUSIP No.</td><td width="75%"><div style="font-size:.9em; color:#000000">11285B108</div></td></tr></table><br><br><table role="presentation" class="tableClass" id="reportingPersonDetails"><tr class="tableClass"><td width="8%" class="tableClassValign">1</td><td width="92%" class="tableClass">
+					Name of reporting person
+					<br><br><div class="text">BROOKFIELD RENEWABLE PARTNERS LIMITED</div></td></tr><tr><td width="8%" class="tableClassValign">2</td><td width="92%" class="tableClass">Check the appropriate box if a member of a Group (See Instructions)
+					<br><br><div class="text"><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked">  (a)
+						<br><img src="/Images/box-checked.jpg" alt="Checkbox checked">  (b)
+					</div></td></tr><tr class="tableClassWithBgBlack"><td width="8%" class="tableClassValign">3</td><td width="92%" class="tableClass">SEC use only</td></tr><tr><td width="8%" class="tableClassValign">4</td><td width="92%" class="tableClass">
+					Source of funds (See Instructions)
+					<br><br><div class="text">OO</div></td></tr><tr><td width="8%" class="tableClassValign">5</td><td width="92%" class="tableClass">
+					Check if disclosure of legal proceedings is required pursuant to Items 2(d) or 2(e)
+					<br><br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked"></td></tr><tr><td width="8%" class="tableClassValign">6</td><td width="92%" class="tableClass">Citizenship or place of organization
+					<br><br><div class="text">
+				BERMUDA
+			</div></td></tr><tr><td width="8%" class="tableClassValign">Number of Shares Beneficially Owned by Each Reporting Person With:</td><td width="92%" class="tableClass"><table class="innerTableClass"><tr><td width="8%" class="innerTableClassRightValign">7</td><td width="92%" class="tableClassInnerLeft">Sole Voting Power
+								<br><br><div class="text">0.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">8</td><td width="92%" class="tableClassInnerLeft">Shared Voting Power
+								<br><br><div class="text">0.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">9</td><td width="92%" class="tableClassInnerLeft">Sole Dispositive Power
+								<br><br><div class="text">0.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValignBottomLess">10</td><td width="92%" class="tableClassInnerLeftBottomLess">Shared Dispositive Power
+								<br><br><div class="text">0.00</div></td></tr></table></td></tr><tr><td width="8%" class="tableClassValign">11</td><td width="92%" class="tableClass">Aggregate amount beneficially owned by each reporting person
+					<br><br><div class="text">0.00</div></td></tr><tr><td width="8%" class="tableClassValign">12</td><td width="92%" class="tableClass">Check if the aggregate amount in Row (11) excludes certain shares (See Instructions)
+					<br><br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked"></td></tr><tr><td width="8%" class="tableClassValign">13</td><td width="92%" class="tableClass">Percent of class represented by amount in Row (11)
+					<br><br><div class="text">0 % </div></td></tr><tr><td width="8%" class="tableClassValign">14</td><td width="92%" class="tableClass">Type of Reporting Person (See Instructions)
+					<br><br><div class="text">CO</div></td></tr></table><br><table><tr><td class="center"><br><br><p><div align="center" style="font-size:1.2em;">
+									SCHEDULE 13D
+								</div></p></td></tr></table><table role="presentation" class="tableClass" id="cusipNumber"><tr class="tableClass"><td width="25%" style="font-weight:bold;">CUSIP No.</td><td width="75%"><div style="font-size:.9em; color:#000000">11285B108</div></td></tr></table><br><br><table role="presentation" class="tableClass" id="reportingPersonDetails"><tr class="tableClass"><td width="8%" class="tableClassValign">1</td><td width="92%" class="tableClass">
+					Name of reporting person
+					<br><br><div class="text">BROOKFIELD RENEWABLE PARTNERS L.P.</div></td></tr><tr><td width="8%" class="tableClassValign">2</td><td width="92%" class="tableClass">Check the appropriate box if a member of a Group (See Instructions)
+					<br><br><div class="text"><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked">  (a)
+						<br><img src="/Images/box-checked.jpg" alt="Checkbox checked">  (b)
+					</div></td></tr><tr class="tableClassWithBgBlack"><td width="8%" class="tableClassValign">3</td><td width="92%" class="tableClass">SEC use only</td></tr><tr><td width="8%" class="tableClassValign">4</td><td width="92%" class="tableClass">
+					Source of funds (See Instructions)
+					<br><br><div class="text">OO</div></td></tr><tr><td width="8%" class="tableClassValign">5</td><td width="92%" class="tableClass">
+					Check if disclosure of legal proceedings is required pursuant to Items 2(d) or 2(e)
+					<br><br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked"></td></tr><tr><td width="8%" class="tableClassValign">6</td><td width="92%" class="tableClass">Citizenship or place of organization
+					<br><br><div class="text">
+				BERMUDA
+			</div></td></tr><tr><td width="8%" class="tableClassValign">Number of Shares Beneficially Owned by Each Reporting Person With:</td><td width="92%" class="tableClass"><table class="innerTableClass"><tr><td width="8%" class="innerTableClassRightValign">7</td><td width="92%" class="tableClassInnerLeft">Sole Voting Power
+								<br><br><div class="text">0.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">8</td><td width="92%" class="tableClassInnerLeft">Shared Voting Power
+								<br><br><div class="text">0.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">9</td><td width="92%" class="tableClassInnerLeft">Sole Dispositive Power
+								<br><br><div class="text">0.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValignBottomLess">10</td><td width="92%" class="tableClassInnerLeftBottomLess">Shared Dispositive Power
+								<br><br><div class="text">0.00</div></td></tr></table></td></tr><tr><td width="8%" class="tableClassValign">11</td><td width="92%" class="tableClass">Aggregate amount beneficially owned by each reporting person
+					<br><br><div class="text">0.00</div></td></tr><tr><td width="8%" class="tableClassValign">12</td><td width="92%" class="tableClass">Check if the aggregate amount in Row (11) excludes certain shares (See Instructions)
+					<br><br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked"></td></tr><tr><td width="8%" class="tableClassValign">13</td><td width="92%" class="tableClass">Percent of class represented by amount in Row (11)
+					<br><br><div class="text">0 % </div></td></tr><tr><td width="8%" class="tableClassValign">14</td><td width="92%" class="tableClass">Type of Reporting Person (See Instructions)
+					<br><br><div class="text">PN</div></td></tr></table><br><div style="display: flex;"><div style="font-size: 0.9em; font-weight: bold; margin-right: 5px;">
+					Comment for Type of Reporting Person:
+				</div><div class="largetext" style="text-align:justify">In reference to Rows 8, 10 and 13 above, Brookfield Renewable Partners L.P. and its affiliates beneficially owns all of the issued and outstanding Class B Shares, which represent a 75 percent voting interest in the Issuer.</div></div></div><div class="form1"><table><tr><td class="center"><br><br><p><div align="center" style="font-size:1.2em;">
+									SCHEDULE 13D
+								</div></p></td></tr></table><table role="presentation" id="item1to7"><tr><td width="8%" class="tableClassValignNoBorder">Item 1.</td><td width="92%" class="tableClassNoBorder">Security and Issuer</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignCenter">(a)</td><td width="92%" class="tableClassNoBorder">Title of Class of Securities:
+							<br><br><div class="text">Class A exchangeable subordinate voting shares, no par value</div></td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignCenter">(b)</td><td width="92%" class="tableClassNoBorder">Name of Issuer:
+							<br><br><div class="text">BROOKFIELD RENEWABLE CORPORATION</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(c)</td><td width="92%" class="tableClassNoBorder">Address of Issuer's Principal Executive Offices:
+							<br><br><div class="text">250 Vesey Street, 15th Floor, New York, 
+				NEW YORK
+			, 10281.</div></td></tr><tr><td colspan="3"><div style="display: flex;"><div style="font-size: 0.9em; font-weight: bold; margin-right: 5px;">
+									Item 1 Comment:
+								</div><div class="largetext" style="text-align:justify">Explanatory Note
+
+This Amendment No. 7 (this "Amendment No. 7") to Schedule 13D is being filed by Brookfield, BAM Partners Trust (the "BAM Partnership"), BRPI, BIC, Brookfield Renewable Partners Limited ("BRPL") and Brookfield Renewable Partners L.P. ("BEP", and collectively with Brookfield, the BAM Partnership, BRPI, BIC and BRPL, the "Reporting Persons") to amend the original Schedule 13D, as amended through Amendment No. 6 thereto (the "Schedule 13D").
+
+Information and defined terms reported in the Schedule 13D remain in effect except to the extent that it is amended or superseded by information or defined terms contained in this Amendment No. 7.</div></div></td></tr><tr><td width="8%" class="tableClassValignNoBorder">Item 4.</td><td width="92%" class="tableClassNoBorder">Purpose of Transaction</td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter"> </td><td width="92%" class="tableClassNoBorder"><div class="largetext">Item 4 of the original Schedule 13D is hereby supplemented as follows:
+
+This Amendment No. 7 is being filed in connection with the completion on December 24, 2024 of the previously announced plan of arrangement (the "Arrangement") contemplated by an arrangement agreement dated as of October 9, 2024 among Brookfield Renewable Corporation, BEP, Brookfield and 1505127 B.C. Ltd. This Amendment No. 7 relates to the class A exchangeable subordinate voting shares (the "Class A Shares") of 1505127 B.C. Ltd. (which, upon closing of the Arrangement, was renamed "Brookfield Renewable Corporation" ("BEPC" or the "Issuer")) that were issued in the Arrangement, rather than the class A exchangeable subordinate voting shares (the "Old Class A Shares") of Brookfield Renewable Corporation (which, upon closing of the Arrangement, was renamed "Brookfield Renewable Holdings Corporation" ("Old BEPC")), which was the predecessor registrant in the Schedule 13D. The CUSIP of the Class A Shares is 11285B108.
+
+As a result of the Arrangement, which was consummated on December 24, 2024, among other things, (i) the public holders of Old Class A Shares (i.e., those holders other than Brookfield and its subsidiaries) exchanged their Old Class A Shares on a one-for-one basis for Class A Shares; (ii) Brookfield and its subsidiaries exchanged their Old Class A Shares on a one-for-one basis for class A.2 exchangeable non-voting shares of Old BEPC ("Class A.2 Shares"), which are exchangeable for Class A Shares on a one for one basis, subject to the Ownership Cap (as defined below); (iii) Old BEPC was renamed Brookfield Renewable Holdings Corporation and was delisted and will cease to be a reporting issuer; (iv) the Old Class A Shares were delisted from the Toronto Stock Exchange ("TSX") and the New York Stock Exchange ("NYSE"); (v) 1505127 B.C. Ltd. was renamed Brookfield Renewable Corporation (the name of Old BEPC prior to consummation of the Arrangement); (vi) the Class A Shares were listed on the TSX and the NYSE under the symbol "BEPC" (the ticker symbol previously used for the Old Class A Shares); and (vii) BEPC became a reporting issuer in Canada; and (viii) BEPC became a successor issuer to Old BEPC by operation of Rule 12g-3(a) promulgated under the Exchange Act.
+
+As a result of the Arrangement, Brookfield and its subsidiaries own or exercise control or direction over approximately 34,719,683 Class A.2 Shares and BEP beneficially owns all of the issued and outstanding Class B Shares, which represent a 75% voting interest in the Issuer. In addition, subsidiaries of BNT own or exercise control or direction over approximately 10,094,152 Class A Shares and are subject to the Voting Agreement described in Item 6. The Class A.2 Shares held by Brookfield and its subsidiaries will be subject to a restriction that limits the exchange by Brookfield and its subsidiaries of Class A.2 Shares such that exchanges by Brookfield and its subsidiaries may not result in Brookfield and its subsidiaries owning 9.5% or more of the aggregate fair market value of all issued and outstanding shares of BEPC (the "Ownership Cap").</div></td></tr><tr><td width="8%" class="tableClassValignNoBorder">Item 5.</td><td width="92%" class="tableClassNoBorder">Interest in Securities of the Issuer</td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(a)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">Item 5(a)-(c) of the original Schedule 13D is hereby amended and restated as follows:
+
+(a)-(b) The information relating to the beneficial ownership of the Class A Shares by each of the Reporting Persons set forth in Rows 7 through 13 of the cover pages hereto (including the footnotes thereto) is incorporated by reference herein.  The percentage of Class A Shares of the Issuer is based on an aggregate of 144,921,168 Class A Shares outstanding upon completion of the Arrangement as of December 24, 2024. The percentage ownership of Brookfield is based on an aggregate of 144,921,168 Class A Shares outstanding upon completion of the Arrangement on December 24, 2024. Upon completion of the Arrangement, Brookfield holds 34,719,683 Class A.2 Shares that are subject to the Ownership Cap and BNT and its subsidiaries hold 10,094,152 Class A Shares that are subject to the Voting Agreement. As of the date of this Amendment No. 7, the total number of Class A.2 Shares that may be exchanged into Class A Shares due to the Ownership Cap is 15,212,719, assuming that the Class B Shares at the time of conversion have nominal value. Together, Brookfield and BEP hold an approximate 79.0% voting interest in the Issuer on as exchanged basis and after giving effect to the Ownership Cap and the Voting Agreement.</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(c)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">(c) Except as described herein, there have been no transactions by the Reporting Persons in the Class A Shares or Old Class A Shares during the past 60 days.</div></td></tr><tr><td width="8%" class="tableClassValignNoBorder">Item 6.</td><td width="92%" class="tableClassNoBorder">Contracts, Arrangements, Understandings or Relationships With Respect to Securities of the Issuer</td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter"> </td><td width="92%" class="tableClassNoBorder"><div class="largetext">Item 6 of the original Schedule 13D is hereby amended and supplemented as follows:
+
+The information set forth in Item 4 of this Amendment No. 7 is hereby incorporated by reference.
+
+Brookfield, BEP and the Issuer have entered into a registration rights agreement, dated as of December 24, 2024 (the "Registration Rights Agreement") pursuant to which the Issuer has agreed that, upon the request of Brookfield, the Issuer will file one or more registration statements to register for sale under the United States Securities Act of 1933, or one or more prospectuses to qualify the distribution in Canada of, any Class A Shares held by Brookfield, any subsidiary of Brookfield or any direct or indirect transferee of Brookfield (the "Demanding Holder"). Under the Registration Rights Agreement, the Issuer is not required to file a registration statement or a prospectus unless the Demanding Holder requests that Class A Shares having a value of at least US$50,000,000 be registered or qualified. In the Registration Rights Agreement, the Issuer agreed to pay expenses in connection with such registration and sales, except for any underwriting discounts or commissions which will be borne by the Demanding Holder, and will indemnify the Demanding Holder for material misstatements or omissions in the registration statement and/or prospectus.
+
+On December 24, 2024, the Issuer entered into an amended and restated equity commitment agreement with Old BEPC, BEP and Brookfield BRP Holdings (Canada) Inc. ("Canada Holdco") (the "Amended and Restated Equity Commitment Agreement") pursuant to which Canada Holdco agreed to provide an equity commitment to Old BEPC in the amount of $1 billion. The equity commitment may be called by Old BEPC in exchange for the issuance of a number of class C shares of Old BEPC to Canada Holdco or certain of its affiliates, corresponding to the amount of the equity commitment called divided by the fair market value of a class C share of Old BEPC. The equity commitment is available in minimum amounts of $10 million and the amount available under the equity commitment will be reduced permanently by the amount so called. Pursuant to the terms of the Amended and Restated Equity Commitment Agreement, before the equity commitment may be called on, a number of conditions precedent must be met, including that Canada Holdco or another member of the BEP Group (as defined in the Amended and Restated Equity Commitment Agreement) continues to control Old BEPC and has the ability to elect a majority of the board of directors of Old BEPC. Pursuant to the Amended and Restated Equity Commitment Agreement, BEP has also agreed not to declare or pay any distribution on the units if on such date BEPC does not have sufficient funds or other assets to enable the declaration and payment of an equivalent dividend on the Class A Shares.
+
+Further, pursuant to the terms of the Issuer's articles and notice of articles (the "Articles"), BEP may in certain circumstances elect, in its sole and absolute discretion, to satisfy the Issuer's obligation to deliver the consideration payable to holders of Class A Shares upon an exchange or redemption of the Class A Shares or a liquidation of the Issuer, and acquire, in the case of an exchange of Class A Shares, all but not less than all of the Class A Shares subject to such exchange or, in the case of a redemption of Class A Shares or a liquidation of the Issuer, all but not less than all of the issued and outstanding Class A Shares. In addition, BEP or a person controlled by BEP, to the extent BEP or such other person holds Class A Shares, is entitled, at any time, to have any or all of their Class A Shares converted into Class B Shares at a conversion rate equal to one Class B Share for each Class A Share in respect of which the conversion right is exercised.
+
+Pursuant to the terms of Old BEPC's articles and notice of articles (the "Old BEPC Articles"), BEP may in certain circumstances elect, in its sole and absolute discretion, to satisfy Old BEPC's obligation to deliver the consideration payable to holders of Class A.2 Shares upon an exchange or redemption of the Class A.2 Shares or a liquidation of Old BEPC, and acquire, in the case of an exchange of Class A.2 Shares, all but not less than all of the Class A.2 Shares subject to such exchange or, in the case of a redemption of Class A.2 Shares or a liquidation of Old BEPC, all but not less than all of the issued and outstanding Class A.2 Shares. BEP also has the right to purchase all but not less than all of the Class A.1 Shares upon a liquidation of Old BEPC and Old BEPC will have no obligation to pay the consideration for the Class A.1 Shares so purchased by BEP.
+
+In addition, BEP or a person controlled by BEP, to the extent BEP or such other person holds Class A.2 Shares, is entitled, at any time, to have any or all of their Class A.2 Shares converted into class A.1 exchangeable subordinate voting share of Old BEPC (a "Class A.1 Share") or class C shares of Old BEPC at a conversion rate equal to one Class A.1 Share or class C of Old BEPC share for each Class A.2 Share in respect of which the conversion right is exercised.
+
+On December 24, 2024, Brookfield entered into a rights agreement (the "Rights Agreement") with Wilmington Trust, National Association, as rights agent, which replaces the existing rights agreement dated July 30, 2020, pursuant to which Brookfield agreed that, until July 30, 2027, in the event that, on the applicable specified exchange date with respect to any Class A Shares submitted for exchange, (i) the Issuer has not satisfied its obligation under the Articles by delivering the consideration payable to such exchanging shareholder (the "Exchange Obligations") and (ii) BEP has not, upon its election in its sole and absolute discretion, acquired such Class A Shares from the holder thereof in satisfaction of the Issuer's Exchange Obligations, Brookfield will satisfy, or cause to be satisfied, the Exchange Obligations. The amended and restated master services agreement dated as of May 5, 2023, among Brookfield, BEP, and others, was amended to provide that, so long as Brookfield is a party to the Rights Agreement, Brookfield shall have a consent right prior to the issuance by the Issuer of any Class A Shares, subject to certain exceptions.
+
+On December 24, 2024, the Issuer, Old BEPC and BEP entered into a pairing agreement (the "Pairing Agreement") pursuant to which the parties agreed that the Issuer will at all times hold such number of Class A.1 Shares equal to the number of Class A Shares that are outstanding in order to support the duties and obligations of the Issuer to holders of Class A Shares. In connection therewith, the Pairing Agreement provides, amongst other things, that (i) if and to the extent the Issuer raises funds from time to time by way of issuance of Class A Shares for cash, the Issuer will utilize such funds to subscribe for an equivalent number of Class A.1 Shares; (ii) if and to the extent the Issuer from time to time repurchases any Class A Shares, Old BEPC shall redeem (or otherwise repurchase from the Issuer) an equivalent number of Class A.1 Shares; (iii) Old BEPC will not, unless substantially concurrent with the redemption of Class A Shares by the Issuer, redeem any Class A.1 Shares held by the Issuer; (iv) if and to the extent any holders of Class A Shares from time to time exercise their exchange right in respect of such Class A Shares, and in connection therewith the partnership does not exercise its overriding call right to acquire such Class A Shares, the Issuer will, in connection therewith, exercise the exchange right in respect of an equivalent number of Class A.1 Shares held by the Issuer; (v) the Issuer will not exercise the exchange right in respect of any Class A.1 Shares held by the Issuer except as contemplated in (iv) above; and (vi) if and to the extent a holder of Class A.2 Shares exchanges its Class A.2 Shares for Class A Shares, Old BEPC will, upon receipt of such Class A.2 Shares, exercise its right to convert such Class A.2 Shares into Class A.1 Shares.
+
+On December 24, 2024, the Issuer entered into option agreements (the "Option Agreements") with Canada Holdco, and with Brookfield BRP Canada Corp. pursuant to which the Issuer will have the option to purchase all or any portion of the class B shares or class C shares of Old BEPC held by Canada Holdco and Brookfield BRP Canada Corp. The purchase price payable by the Issuer to Canada Holdco or Brookfield BRP Canada Corp. in respect of any class B share or class C share of Old BEPC purchased by the Issuer will be the fair market value of such class B share or class C share of Old BEPC, as applicable. The Issuer will satisfy the purchase price payable to Canada Holdco or Brookfield BRP Canada Corp. by issuing such number of Class B Shares to Canada Holdco or Brookfield BRP Canada Corp. with an aggregate fair market value equal to the purchase price.
+Brookfield and BNT have agreed (the "Voting Agreement") that all decisions to be made by subsidiaries of BNT with respect to the voting of the Class A Shares held by subsidiaries of BNT will be made jointly by mutual agreement of the applicable BNT subsidiary and Brookfield.
+
+As of December 27, 2024, Brookfield and BEP hold an approximate 79.0% voting interest in the Issuer on an as exchanged basis and after giving effect to the Ownership Cap due to Brookfield's ownership of  Class A.2 Shares and BEP's ownership of the Class B Shares. In addition, BEP may acquire up to 144,921,168 Class A Shares in accordance with the terms of the Class A Shares and Brookfield may deliver up to approximately 100,107,333 Class A Shares in accordance with the terms of the Class A Shares and the Rights Agreement.
+
+The foregoing summaries of the Registration Rights Agreement, the Amended and Restated Equity Commitment Agreement, the Rights Agreement, the Articles, the Old BEPC Articles, the Option Agreements, the Pairing Agreement and the Voting Agreement described in this Item 6 do not purport to be complete and, as such, are qualified in their entirety by the Registration Rights Agreement, the Amended and Restated Equity Commitment Agreement, the Rights Agreement, the Articles, the Old BEPC Articles, the Option Agreements, the Pairing Agreement and the Voting Agreement set forth in Exhibits 99.12, 99.13, 99.14, 99.15, 99.16, 99.17, 99.18, 99.19 and 99.20 incorporated in this Item 6 by reference.</div></td></tr><tr><td width="8%" class="tableClassValignNoBorder">Item 7.</td><td width="92%" class="tableClassNoBorder">Material to be Filed as Exhibits.</td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter"> </td><td width="92%" class="tableClassNoBorder"><div class="largetext">Item 7 of the original Schedule 13D is hereby amended and supplemented as follows:
+
+Exhibit 99.11 Joint Filing Agreement.
+
+Exhibit 99.12 Registration Rights Agreement, dated December 24, 2024, among Brookfield Corporation, Brookfield Renewable Corporation and Brookfield Renewable Partners L.P. (incorporated by reference to Exhibit 99.3 of the Issuer's Form 6-K filed with the Securities and Exchange Commission ("SEC") on December 27, 2024).
+
+Exhibit 99.13 Amended and Restated Equity Commitment Agreement, dated December 24, 2024 among Brookfield BRP Holdings (Canada) Inc., Brookfield Renewable Corporation and Brookfield Renewable Holdings Corporation (incorporated by reference to Exhibit 99.7 of the Issuer's Form 6-K filed with the SEC on December 27, 2024).
+
+Exhibit 99.14 Rights Agreement, dated December 24, 2024, by and between Brookfield Corporation and Wilmington National Trust, N.A. (incorporated by reference to Exhibit 99.2 of the Issuer's Form 6-K filed with the SEC on December 27, 2024).
+
+Exhibit 99.15 Articles of Brookfield Renewable Corporation (incorporated by reference to Exhibit 99.12 of the Issuer's Form 6-K filed with the SEC on December 27, 2024).
+
+Exhibit 99.16 Form of Articles of Brookfield Renewable Holdings Corporation (incorporated by reference to Exhibit 99.13 of the Issuer's Form 6-K filed with the SEC on December 27, 2024).
+
+Exhibit 99.17 Option Agreement, dated December 24, 2024, by and between Brookfield BRP Canada Corp. and Brookfield Renewable Corporation (incorporated by reference to Exhibit 99.5 of the Issuer's Form 6-K filed with the SEC on December 27, 2024).
+
+Exhibit 99.18 Option Agreement, dated December 24, 2024, by and between Brookfield BRP Holdings (Canada) Inc. and Brookfield Renewable Corporation (incorporated by reference to Exhibit 99.6 of the Issuer's Form 6-K filed with the SEC on December 27, 2024).
+
+Exhibit 99.19 Pairing Agreement, dated December 24, 2024, among Brookfield Renewable Corporation, Brookfield Renewable Holdings Corporation and Brookfield Renewable Partners L.P. (incorporated by reference to Exhibit 99.4 of the Issuer's Form 6-K filed with the SEC on December 27, 2024).
+
+Exhibit 99.20 Voting Agreement, dated December 24, 2024, between Brookfield Corporation and Brookfield Wealth Solutions Ltd. (incorporated by reference to Exhibit 99.11 of the Issuer's Form 6-K filed with the SEC on December 27, 2024).</div></td></tr></table><br></div><div class="form1"><table role="presentation" id="signatureInfo"><tr><td width="8%" class="tableClassValignNoBorder">    SIGNATURE</td><td width="92%" class="tableClassNoBorder"> </td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter"> </td><td width="92%" class="tableClassNoBorder"><div class="information" style="text-align:justify">
+						After reasonable inquiry and to the best of my knowledge and belief, I certify that the information set forth in this statement is true, complete and correct.
+						<br><br></div></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="100%" class="tableClassInnerNoBorderBlue"><div class="text">BROOKFIELD CORPORATION</div></td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Signature:</td><td width="92%" class="tableClassNoBorderBlue signature">/s/ Swati Mandava</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Name/Title:</td><td width="92%" class="tableClassNoBorderBlue signature">Swati Mandava, Managing Director, Legal and Regulatory</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Date:</td><td width="92%" class="tableClassNoBorderBlue signature">12/27/2024</td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="100%" class="tableClassInnerNoBorderBlue"><div class="text">BAM PARTNERS TRUST</div></td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Signature:</td><td width="92%" class="tableClassNoBorderBlue signature">by its trustee, BAM CLASS B PARTNERS INC., /s/ Kathy Sarpash</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Name/Title:</td><td width="92%" class="tableClassNoBorderBlue signature">Kathy Sarpash, Secretary</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Date:</td><td width="92%" class="tableClassNoBorderBlue signature">12/27/2024</td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="100%" class="tableClassInnerNoBorderBlue"><div class="text">BROOKFIELD RENEWABLE POWER INC.</div></td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Signature:</td><td width="92%" class="tableClassNoBorderBlue signature">/s/ Jennifer Mazin</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Name/Title:</td><td width="92%" class="tableClassNoBorderBlue signature">Jennifer Mazin, General Counsel and Corporate Secretary</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Date:</td><td width="92%" class="tableClassNoBorderBlue signature">12/27/2024</td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="100%" class="tableClassInnerNoBorderBlue"><div class="text">BROOKFIELD INVESTMENTS CORPORATION</div></td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Signature:</td><td width="92%" class="tableClassNoBorderBlue signature">/s/ Kathy Sarpash</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Name/Title:</td><td width="92%" class="tableClassNoBorderBlue signature">Kathy Sarpash, Senior Vice President, General Counsel and Secretary</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Date:</td><td width="92%" class="tableClassNoBorderBlue signature">12/27/2024</td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="100%" class="tableClassInnerNoBorderBlue"><div class="text">BROOKFIELD RENEWABLE PARTNERS LIMITED</div></td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Signature:</td><td width="92%" class="tableClassNoBorderBlue signature">/s/ James Bodi</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Name/Title:</td><td width="92%" class="tableClassNoBorderBlue signature">James Bodi, President</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Date:</td><td width="92%" class="tableClassNoBorderBlue signature">12/27/2024</td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="100%" class="tableClassInnerNoBorderBlue"><div class="text">BROOKFIELD RENEWABLE PARTNERS L.P.</div></td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Signature:</td><td width="92%" class="tableClassNoBorderBlue signature">by its general partner, BROOKFIELD RENEWABLE PARTNERS LIMITED, /s/ James Bodi</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Name/Title:</td><td width="92%" class="tableClassNoBorderBlue signature">James Bodi, President</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Date:</td><td width="92%" class="tableClassNoBorderBlue signature">12/27/2024</td></tr></table></td></tr></table></div></div>
+<script type="text/javascript"  src="/N3AEOPt9/dJoipWz/rYwIB5c/dg/YEaQGVVmDJktp27Xmu/SixucGdeLAQ/KXhNJ/AQsW1I"></script></body></html>

@@ -1,0 +1,504 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns:p="http://www.sec.gov/edgar/schedule13D" xmlns:p1="http://www.sec.gov/edgar/common"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><link rel="stylesheet" type="text/css" href="/css/SDR_print.css"><style type="text/css">
+					.fakeTextBox {
+					border-top: 2px solid #999;
+					border-right: 1px solid #ccc;
+					border-bottom: 1px solid #ccc;
+					border-left: 2px solid #999;
+					padding: 2px;
+					_width: 800px;
+					height: auto;
+					min-width: 200px;
+					min-height: 50px;
+					word-wrap: break-word;
+					font-size: 0.9em;
+					color: blue;
+					}
+					table.tableClass { border: solid black;
+					border-top-width: 1;
+					border-right-width: 1;
+					border-bottom-width: 1;
+					border-left-width: 1;
+					table-layout:fixed;
+					}
+					table.innerTableClass { border: solid black;
+					border-top-width: 0;
+					border-right-width: 0;
+					border-bottom-width: 0;
+					border-left-width: 0;
+					table-layout:fixed;
+					}
+					th.tableClassLeft { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					padding: 2px;
+					}
+					th.tableClassRight { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 0;
+					padding: 2px;
+					}
+					th.tableClass { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					padding: 2px;
+					}
+					td.tableClassLeft { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					font-size: 0.9em;
+					color: blue;
+					word-wrap: break-word;
+					}
+					td.tableClassRight { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 0;
+					font-size: 0.9em;
+					color: blue;
+					word-wrap: break-word;
+					}
+					td.tableClass { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					font-size: 0.9em;
+					font-weight:bold;
+					color: black;
+					word-wrap: break-word;
+					}
+					td.tableClassNoBorder { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 0px;
+					font-size: 0.9em;
+					font-weight:bold;
+					color: black;
+					word-wrap: break-word;
+					}
+
+					td.tableClassNoBorderBlue { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 0px;
+					font-size: 0.9em;
+					font-weight:bold;
+					color: blue;
+					word-wrap: break-word;
+					}
+
+					td.tableClassInnerNoBorderBlue { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 0px;
+					font-size: 1.4em;
+					font-weight:bold;
+					color: blue;
+					word-wrap: break-word;
+					}
+
+					td.tableClassNoBorderAlignLeft { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 0px;
+					font-size: 0.9em;
+					font-weight:bold;
+					text-align: left;
+					color: black;
+					word-wrap: break-word;
+					}
+
+					td.signature {
+					padding: 4px 8px;
+					}
+
+					td.tableClassInner { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					font-size: 1em;
+					font-weight:bold;
+					color: black;
+					word-wrap: break-word;
+					}
+
+					td.tableClassValign { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					font-size: 0.9em;
+					font-weight:bold;
+					color: black;
+					vertical-align: middle;
+					text-align: center;
+					word-wrap: break-word;
+					}
+
+					td.tableClassValignNoBorder { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 0px;
+					font-size: 0.9em;
+					font-weight:bold;
+					color: black;
+					vertical-align: middle;
+					text-align: center;
+					word-wrap: break-word;
+					}
+
+					td.tableClassValignInner { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					font-size: 1em;
+					font-weight:bold;
+					color: black;
+					vertical-align: middle;
+					text-align: center;
+					word-wrap: break-word;
+					}
+
+					td.innerTableClassRightValign { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 0;
+					font-size: 1em;
+					font-weight:bold;
+					color: black;
+					vertical-align: middle;
+					text-align: center;
+					word-wrap: break-word;
+					}
+
+					td.innerTableClassRightValignBottomLess { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 0px;
+					border-left-width: 0;
+					font-size: 1em;
+					font-weight:bold;
+					color: black;
+					vertical-align: middle;
+					text-align: center;
+					word-wrap: break-word;
+					}
+
+					td.tableClassInnerLeft { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					font-size: 1em;
+					font-weight:bold;
+					color: black;
+					word-wrap: break-word;
+					}
+
+					td.tableClassInnerLeftBottomLess { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 1px;
+					font-size: 1em;
+					font-weight:bold;
+					color: black;
+					word-wrap: break-word;
+					}
+
+					td.tableClassNoBorderAlignCenter { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 0px;
+					font-size: 0.9em;
+					font-weight:bold;
+					color: black;
+					text-align: center;
+					word-wrap: break-word;
+					}
+
+					tr.tableClass { border: solid black;
+					border-top-width: 1px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					}
+					tr.tableClassWithBg { border: solid black;
+					border-top-width: 0;
+					border-right-width: 1;
+					border-bottom-width: 1;
+					border-left-width: 0;
+					background-color: #e0e0ff
+					}
+
+					tr.tableClassWithBgBlack { border: solid black;
+					border-top-width: 0;
+					border-right-width: 1;
+					border-bottom-width: 1;
+					border-left-width: 0;
+					background-color: #D3D3D3
+					}
+
+					hr.header {
+					position: relative;
+					top: 20px;
+					border: none;
+					height: 6px;
+					background: black;
+					margin-bottom: 10px;
+					}
+
+					hr.separatorThin {
+					position: relative;
+					top: 2px;
+					border: none;
+					height: 2px;
+					background: black;
+					margin-bottom: 2px;
+					}
+
+					hr.headerThin {
+					position: relative;
+					top: 10px;
+					border: none;
+					height: 2px;
+					background: black;
+					margin-bottom: 10px;
+					}
+
+					hr.separator {
+					position: relative;
+					top: 20px;
+					border: none;
+					height: 4px;
+					background: black;
+					margin-bottom: 5px;
+					}
+
+					div.text {
+					background-color: #ffffff;
+					color: blue;
+					font-size: 1em;
+					font-weight:normal;
+					text-align:justify;
+					}
+
+
+					div.information {
+					background-color: #ffffff;
+					color: black;
+					font-size: 1em;
+					font-weight:normal;
+					text-align:justify;
+					}
+
+					#scheader {
+					font-size: 0.9em;
+					border: 0px solid #404040;
+					border-spacing: 2px;
+					}
+
+					div.largetext {
+					background-color: #ffffff;
+					color: blue;
+					font-size: 1em;
+					font-weight:normal;
+					text-align:justify;
+					white-space: pre-wrap;
+					word-break: normal;
+					}
+
+				</style></head><body lang="en-US" text="#000000" bgcolor="#ffffff"><hr class="header"><br><hr class="headerThin"><div class="contentwrapper"><table role="presentation" id="scheader"><tr><td class="tableClassNoBorderAlignCenter" style="font-size:2em;">
+						SECURITIES AND EXCHANGE COMMISSION
+						<br>
+						Washington, D.C. 20549
+					</td></tr><tr><td class="tableClassNoBorderAlignCenter"><br><br><div style="font-size:1.5em;">
+									SCHEDULE 13D
+								</div><br><div style="font-size:1.2em;">
+							Under the Securities Exchange Act of 1934
+						</div><br></td></tr><tr><td class="center"><div class="information" style="text-align:center; font-weight:bold; color:blue;">FuboTV Inc.</div><div class="information" style="text-align:center; font-weight:bold;"><hr class="separatorThin">(Name of Issuer)</div><br><br></td></tr><tr><td class="center"><div class="information" style="text-align:center; font-weight:bold; color:blue;">Class A common stock, par value $0.0001 per share</div><div class="information" style="text-align:center; font-weight:bold;"><hr class="separatorThin">(Title of Class of Securities)</div><br><br></td></tr><tr><td class="center"><div class="information" style="text-align:center; font-weight:bold; color:blue;">35953D104</div><div class="information" style="text-align:center; font-weight:bold;"><hr class="separatorThin">(CUSIP Number)</div><br><br></td></tr><tr><td class="center"><div class="information" style="text-align:center; font-weight:bold; color:blue;">Jolene E. Negre<br>The Walt Disney Company,
+								500 South Buena Vista Street<br>Burbank,
+								CA,
+								91521<br>(818) 560-1000</div><br><br><div class="information" style="text-align:center; font-weight:bold; color:blue;">Copy to: Cole DuMond<br>Two Manhattan West,
+								375 Ninth Avenue<br>New York,
+								NY,
+								10001<br>(212) 474-1000</div><br><br><div class="information" style="text-align:center; font-weight:bold; color:blue;">Copy to: Alexander Greenberg<br>Two Manhattan West,
+								375 Ninth Avenue<br>New York,
+								NY,
+								10001<br>(212) 474-1000</div><div class="information" style="text-align:center; font-weight:bold;"><hr class="separatorThin">(Name, Address and Telephone Number of Person Authorized to
+									Receive Notices and Communications)</div></td></tr><tr><td class="center"><div class="information" style="text-align:center; font-weight:bold; color:blue;">10/29/2025</div><div class="information" style="text-align:center; font-weight:bold;"><hr class="separatorThin">(Date of Event Which Requires Filing of This Statement)</div></td></tr></table><br><br><div class="information" style="text-align:justify">
+				If the filing person has previously filed a statement on Schedule 13G to report the acquisition that is the subject of this Schedule 13D, and is filing this schedule because of §§ 240.13d-1(e), 240.13d-1(f) or 240.13d-1(g), check the following box.
+				<img src="/Images/box-unchecked.jpg" alt="Checkbox not checked"></div><br><div class="information" style="text-align:justify">
+				The information required on the remainder of this cover page shall not be deemed to be “filed” for the purpose of Section 18 of the
+				Securities Exchange Act of 1934 (“Act”) or otherwise subject to the liabilities of that section of the Act but shall be subject to all other
+				provisions of the Act (however, see the Notes).
+			</div></div><hr class="headerThin"><hr class="header"><br><br>
+<div class="content"><div class="form1"></div></div>
+<div class="content"><div class="form1"><table><tr><td class="center"><br><br><p><div align="center" style="font-size:1.2em;">
+									SCHEDULE 13D
+								</div></p></td></tr></table><table role="presentation" class="tableClass" id="cusipNumber"><tr class="tableClass"><td width="25%" style="font-weight:bold;">CUSIP No.</td><td width="75%"><div style="font-size:.9em; color:#000000">35953D104</div></td></tr></table><br><br><table role="presentation" class="tableClass" id="reportingPersonDetails"><tr class="tableClass"><td width="8%" class="tableClassValign">1</td><td width="92%" class="tableClass">
+					Name of reporting person
+					<br><br><div class="text">Walt Disney Co</div></td></tr><tr><td width="8%" class="tableClassValign">2</td><td width="92%" class="tableClass">Check the appropriate box if a member of a Group (See Instructions)
+					<br><br><div class="text"><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked">  (a)
+						<br><img src="/Images/box-checked.jpg" alt="Checkbox checked">  (b)
+					</div></td></tr><tr class="tableClassWithBgBlack"><td width="8%" class="tableClassValign">3</td><td width="92%" class="tableClass">SEC use only</td></tr><tr><td width="8%" class="tableClassValign">4</td><td width="92%" class="tableClass">
+					Source of funds (See Instructions)
+					<br><br><div class="text">WC</div></td></tr><tr><td width="8%" class="tableClassValign">5</td><td width="92%" class="tableClass">
+					Check if disclosure of legal proceedings is required pursuant to Items 2(d) or 2(e)
+					<br><br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked"></td></tr><tr><td width="8%" class="tableClassValign">6</td><td width="92%" class="tableClass">Citizenship or place of organization
+					<br><br><div class="text">
+				DELAWARE
+			</div></td></tr><tr><td width="8%" class="tableClassValign">Number of Shares Beneficially Owned by Each Reporting Person With:</td><td width="92%" class="tableClass"><table class="innerTableClass"><tr><td width="8%" class="innerTableClassRightValign">7</td><td width="92%" class="tableClassInnerLeft">Sole Voting Power
+								<br><br><div class="text">0.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">8</td><td width="92%" class="tableClassInnerLeft">Shared Voting Power
+								<br><br><div class="text">947,910,220.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">9</td><td width="92%" class="tableClassInnerLeft">Sole Dispositive Power
+								<br><br><div class="text">0.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValignBottomLess">10</td><td width="92%" class="tableClassInnerLeftBottomLess">Shared Dispositive Power
+								<br><br><div class="text">947,910,220.00</div></td></tr></table></td></tr><tr><td width="8%" class="tableClassValign">11</td><td width="92%" class="tableClass">Aggregate amount beneficially owned by each reporting person
+					<br><br><div class="text">947,910,220.00</div></td></tr><tr><td width="8%" class="tableClassValign">12</td><td width="92%" class="tableClass">Check if the aggregate amount in Row (11) excludes certain shares (See Instructions)
+					<br><br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked"></td></tr><tr><td width="8%" class="tableClassValign">13</td><td width="92%" class="tableClass">Percent of class represented by amount in Row (11)
+					<br><br><div class="text">70 % </div></td></tr><tr><td width="8%" class="tableClassValign">14</td><td width="92%" class="tableClass">Type of Reporting Person (See Instructions)
+					<br><br><div class="text">CO, HC</div></td></tr></table><br><div style="display: flex;"><div style="font-size: 0.9em; font-weight: bold; margin-right: 5px;">
+					Comment for Type of Reporting Person:
+				</div><div class="largetext" style="text-align:justify">Row 13: This calculation is based on 406,247,237 shares of Class A Common Stock (as defined below) outstanding (on a fully-diluted basis) as of the close of markets on October 28, 2025, the trading day immediately preceding the closing of the Transactions (as defined below).</div></div><table><tr><td class="center"><br><br><p><div align="center" style="font-size:1.2em;">
+									SCHEDULE 13D
+								</div></p></td></tr></table><table role="presentation" class="tableClass" id="cusipNumber"><tr class="tableClass"><td width="25%" style="font-weight:bold;">CUSIP No.</td><td width="75%"><div style="font-size:.9em; color:#000000">35953D104</div></td></tr></table><br><br><table role="presentation" class="tableClass" id="reportingPersonDetails"><tr class="tableClass"><td width="8%" class="tableClassValign">1</td><td width="92%" class="tableClass">
+					Name of reporting person
+					<br><br><div class="text">Hulu, LLC</div></td></tr><tr><td width="8%" class="tableClassValign">2</td><td width="92%" class="tableClass">Check the appropriate box if a member of a Group (See Instructions)
+					<br><br><div class="text"><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked">  (a)
+						<br><img src="/Images/box-checked.jpg" alt="Checkbox checked">  (b)
+					</div></td></tr><tr class="tableClassWithBgBlack"><td width="8%" class="tableClassValign">3</td><td width="92%" class="tableClass">SEC use only</td></tr><tr><td width="8%" class="tableClassValign">4</td><td width="92%" class="tableClass">
+					Source of funds (See Instructions)
+					<br><br><div class="text">WC</div></td></tr><tr><td width="8%" class="tableClassValign">5</td><td width="92%" class="tableClass">
+					Check if disclosure of legal proceedings is required pursuant to Items 2(d) or 2(e)
+					<br><br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked"></td></tr><tr><td width="8%" class="tableClassValign">6</td><td width="92%" class="tableClass">Citizenship or place of organization
+					<br><br><div class="text">
+				DELAWARE
+			</div></td></tr><tr><td width="8%" class="tableClassValign">Number of Shares Beneficially Owned by Each Reporting Person With:</td><td width="92%" class="tableClass"><table class="innerTableClass"><tr><td width="8%" class="innerTableClassRightValign">7</td><td width="92%" class="tableClassInnerLeft">Sole Voting Power
+								<br><br><div class="text">0.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">8</td><td width="92%" class="tableClassInnerLeft">Shared Voting Power
+								<br><br><div class="text">947,910,220.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">9</td><td width="92%" class="tableClassInnerLeft">Sole Dispositive Power
+								<br><br><div class="text">0.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValignBottomLess">10</td><td width="92%" class="tableClassInnerLeftBottomLess">Shared Dispositive Power
+								<br><br><div class="text">947,910,220.00</div></td></tr></table></td></tr><tr><td width="8%" class="tableClassValign">11</td><td width="92%" class="tableClass">Aggregate amount beneficially owned by each reporting person
+					<br><br><div class="text">947,910,220.00</div></td></tr><tr><td width="8%" class="tableClassValign">12</td><td width="92%" class="tableClass">Check if the aggregate amount in Row (11) excludes certain shares (See Instructions)
+					<br><br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked"></td></tr><tr><td width="8%" class="tableClassValign">13</td><td width="92%" class="tableClass">Percent of class represented by amount in Row (11)
+					<br><br><div class="text">70 % </div></td></tr><tr><td width="8%" class="tableClassValign">14</td><td width="92%" class="tableClass">Type of Reporting Person (See Instructions)
+					<br><br><div class="text">OO</div></td></tr></table><br><div style="display: flex;"><div style="font-size: 0.9em; font-weight: bold; margin-right: 5px;">
+					Comment for Type of Reporting Person:
+				</div><div class="largetext" style="text-align:justify">Row 13: This calculation is based on 406,247,237 shares of Class A Common Stock (as defined below) outstanding (on a fully-diluted basis) as of the close of markets on October 28, 2025, the trading day immediately preceding the closing of the Transactions (as defined below).</div></div></div><div class="form1"><table><tr><td class="center"><br><br><p><div align="center" style="font-size:1.2em;">
+									SCHEDULE 13D
+								</div></p></td></tr></table><table role="presentation" id="item1to7"><tr><td width="8%" class="tableClassValignNoBorder">Item 1.</td><td width="92%" class="tableClassNoBorder">Security and Issuer</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignCenter">(a)</td><td width="92%" class="tableClassNoBorder">Title of Class of Securities:
+							<br><br><div class="text">Class A common stock, par value $0.0001 per share</div></td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignCenter">(b)</td><td width="92%" class="tableClassNoBorder">Name of Issuer:
+							<br><br><div class="text">FuboTV Inc.</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(c)</td><td width="92%" class="tableClassNoBorder">Address of Issuer's Principal Executive Offices:
+							<br><br><div class="text">1290 Avenue of the Americas, New York, 
+				NEW YORK
+			, 10104.</div></td></tr><tr><td colspan="3"><div style="display: flex;"><div style="font-size: 0.9em; font-weight: bold; margin-right: 5px;">
+									Item 1 Comment:
+								</div><div class="largetext" style="text-align:justify">Each share of Class B common stock, par value $0.0001 per share (the "Class B Common Stock" and, together with the Class A common stock, par value $0.0001 per share (the "Class A Common Stock"), the "Common Stock"), of FuboTV Inc., a Delaware corporation (the "Issuer" or "Fubo"), together with one membership unit in Newco (as defined below) (a "Newco Unit" and, together with one share of Class B Common Stock, a "Paired Interest") of Fubo Operations LLC, a Delaware limited liability company ("Newco"), may be (i) exchanged for a share of Class A Common Stock or (ii), at Fubo's option, redeemed for cash, subject to Fubo's right to elect to effect, in lieu of such a redemption, a direct exchange between Fubo and Hulu of cash or a share of Class A Common Stock for such Paired Interest, in each case, pursuant to the Amended and Restated Limited Liability Company Agreement of Newco, dated as of October 29, 2025 (the "Closing Date"), by and among Newco, Hulu, Fubo and each other Member (as defined therein) (the "Newco LLCA").</div></div></td></tr><tr><td width="8%" class="tableClassValignNoBorder">Item 2.</td><td width="92%" class="tableClassNoBorder">Identity and Background</td></tr><tr></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignCenter">(a)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">This Statement on Schedule 13D (this "Schedule 13D") is being jointly filed by: (i) Hulu, LLC, a Delaware limited liability company ("Hulu") and (ii) The Walt Disney Company, a Delaware corporation ("Disney"). Hulu and Disney are collectively referred to as the "Reporting Persons".
+
+All of the shares of the Class A Common Stock reported as beneficially owned by any Reporting Person in this Schedule 13D are held by Hulu. Hulu is a wholly owned subsidiary of Disney. Disney, together with its subsidiaries, including Hulu, is a diversified worldwide entertainment company.
+
+The principal business office of Hulu is 2500 Broadway Street, 2nd Floor, Santa Monica, California 90404. The principal business office of Disney is 500 South Buena Vista Street, Burbank, California 91521. Attached as Schedules I and II hereto, and incorporated herein by reference, is a list containing the (i) name, (ii) residence or business address, (iii) present principal occupation or employment and the name, principal business address of any corporation or other organization in which such employment is conducted, and (iv) citizenship, in each case, of each director and executive officer of each Reporting Person, as applicable.
+
+Pursuant to Rule 13d-1(k) under the Securities Exchange Act of 1934, as amended (the "Exchange Act"), the Reporting Persons have agreed to file jointly one statement with respect to their beneficial ownership of the shares of Class A Common Stock. 
+
+During the last five years, each Reporting Person and, to the knowledge of such Reporting Person, each person listed in Schedules I or II with respect to such Reporting Person, has not been convicted in any criminal proceeding (excluding traffic violations or similar misdemeanors) and has not been a party to a civil proceeding of any judicial or administrative body of competent jurisdiction as a result of which such person was or is subject to a judgment, decree or final order enjoining future violations of, or prohibiting or mandating activities subject to, federal or state securities laws or finding of any violation with respect to such laws.</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(b)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">See Item 2(a).</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(c)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">See Item 2(a).</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(d)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">See Item 2(a).</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(e)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">See Item 2(a).</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(f)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">See Item 2(a).</div></td></tr><tr><td width="8%" class="tableClassValignNoBorder">Item 3.</td><td width="92%" class="tableClassNoBorder">Source and Amount of Funds or Other Consideration</td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter"> </td><td width="92%" class="tableClassNoBorder"><div class="largetext">The aggregate purchase price of the shares of Class B Common Stock held by the Reporting Persons (which, together with corresponding Newco Units, as Paired Interests, are exchangeable for the shares of Class A Common Stock beneficially owned by the Reporting Persons) was $94,791.02, an amount equal to the aggregate par value of such shares of Class B Common Stock. The source of funds for such purchase price was the Reporting Persons' working capital.</div></td></tr><tr><td width="8%" class="tableClassValignNoBorder">Item 4.</td><td width="92%" class="tableClassNoBorder">Purpose of Transaction</td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter"> </td><td width="92%" class="tableClassNoBorder"><div class="largetext">Purpose of the Transaction 
+
+The Reporting Persons acquired the shares of Class B Common Stock pursuant to the terms of the Business Combination Agreement, dated as of January 6, 2025, by and among Fubo, Disney and Hulu (the "BCA"). The BCA is attached hereto as Exhibit 99.2 and incorporated herein by reference. Each share of Class B Common Stock, together with a corresponding Newco Unit, as a Paired Interest, may be (i) exchanged for a share of Class A Common Stock or (ii) at Fubo's option, redeemed for cash, subject to Fubo's right to elect to effect, in lieu of such a redemption, a direct exchange between Fubo and Hulu of cash or a share of Class A Common Stock for such Paired Interest, pursuant to the Newco LLCA. The purpose of the Transactions (as defined in the BCA) was to form a combined virtual MVPD company and enhance consumer choice by making available a broad set of programming offerings. Pursuant to the BCA, (i) (a) the Reporting Persons contributed to Newco certain assets related to the business of negotiating and administering carriage agreements and similar contracts relating to and for the purpose of the retransmission, distribution, carriage, display or broadcast of any programming service, channel or network on the linear multi-channel subscription video programming distribution service component of the offering known as "Hulu + Live TV" as of the date of the BCA and operated by Hulu and (b) Fubo underwent an "Up-C" reorganization and contributed the entirety of its business to Newco in exchange for Newco Units such that, after giving effect to such contribution, Hulu held a number of Newco Units representing, in the aggregate, a 70% economic interest in Newco and Fubo held a number of Newco Units representing, in the aggregate, a 30% economic interest in Newco and (ii) Fubo issued shares of Class B Common Stock to Hulu equal to 70.0% of the outstanding shares of capital stock of Fubo (calculated on a fully-diluted basis) as of immediately following the closing of the Transactions. 
+
+Plans or Proposals
+
+The Reporting Persons, as investors in the Issuer, intend to review from time to time their investment in the Issuer, the Issuer's business affairs and general industry and economic conditions, and the Reporting Persons' other business opportunities and liquidity considerations. Based on such review, the Reporting Persons may at any time and from time to time determine (subject to applicable law and the terms of (i) the Newco LLCA, (ii) the Registration Rights Agreement, dated as of the Closing Date, by and between Fubo and Hulu (the "Registration Rights Agreement") and (iii) the Stockholders Agreement, dated as of the Closing Date, by and between Fubo and Hulu (the "Stockholders Agreement")) to take an action which could involve one or more of the types of transactions contemplated in clauses (a) through (j) of Item 4 of Schedule 13D, including the Reporting Persons or other persons acquiring securities or additional securities of the Issuer, through open market purchases, private agreements or otherwise; disposing of all or a portion of the securities of the Issuer owned by them through open market sales, private agreements, exchanges or redemptions of Paired Interests for shares of Class A Common Stock or cash, as applicable, pursuant to the Newco LLCA; and, subject to the Issuer's certificate of incorporation (the "Fubo Charter") and the Issuer's bylaws (the "Fubo Bylaws"), business combinations or other extraordinary corporate transactions, sales or purchases of material assets, changes in the board of directors or management of the Issuer (Hulu has the right under the Fubo Charter to designate a majority of the directors on the Issuer's board of directors and intends to do so for so long as it has such right), changes in the present capitalization or dividend policy of the Issuer, changes to the Issuer's business or corporate structure, changes in the Fubo Charter or the Fubo Bylaws, shared service agreements, collaborations, joint ventures and other business arrangements between or involving the Reporting Persons and the Issuer. Any action or actions the Reporting Persons might undertake in respect of the Issuer's securities will be dependent upon the Reporting Persons' review of numerous factors, including, among other things, the price level and liquidity of the Class A Common Stock; any transfer restrictions applicable to the Reporting Persons; general market and economic conditions; ongoing evaluation of the Issuer's and the Reporting Persons' business, financial condition, operations, prospects and strategic alternatives; the relative attractiveness of alternative business and investment opportunities; tax considerations; and other factors and future developments. Notwithstanding anything to the contrary herein, the Reporting Persons specifically reserve the right to change their intentions with respect to any or all of the foregoing.
+
+The information set forth in Item 6 of this Schedule 13D, including without limitation as to the rights and obligations of the Reporting Persons (as applicable) pursuant to the terms of the Registration Rights Agreement, the Tax Receivables Agreement, the Newco LLCA, the Stockholders Agreement and the other matters described therein, is hereby incorporated by reference.</div></td></tr><tr><td width="8%" class="tableClassValignNoBorder">Item 5.</td><td width="92%" class="tableClassNoBorder">Interest in Securities of the Issuer</td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(a)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">Based on the most recent information available, the aggregate number and percentage of the shares of Class A Common Stock (the securities identified pursuant to Item 1 of this Schedule 13D) that are beneficially owned by each of the Reporting Persons is set forth in boxes (11) and (13) of the cover pages to this Schedule 13D for each of the Reporting Persons, and such information is incorporated herein by reference. The percentages reported herein are calculated based upon 947,910,220 shares of Class B Common Stock issued in connection with the Transactions and assume the exchange of all shares of Class B Common Stock into shares of Class A Common Stock (for a total of 1,354,157,457 shares (on a fully-diluted basis) of Class A Common Stock on a fully exchanged basis).
+
+To the best knowledge of the Reporting Persons, none of the persons listed in Schedules I or II beneficially owns any shares of Class A Common Stock.</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(b)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">Except as described below, the numbers of shares of Class A Common Stock as to which each of the Reporting Persons has sole voting power, shared voting power, sole dispositive power and shared dispositive power is set forth in boxes (7), (8), (9) and (10), respectively, on the cover page to this Schedule 13D for each of the Reporting Persons, and such information is incorporated herein by reference.</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(c)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">Other than as disclosed in this Schedule 13D, no transactions by the Reporting Persons involving shares of Class A Common Stock were effected during the past sixty days.</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(d)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">No person is known to have the right to receive or the power to direct the receipt of dividends from, or the proceeds from the sale of shares of Class A Common Stock beneficially owned by the Reporting Persons other than each of the Reporting Persons.</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(e)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">Not applicable.</div></td></tr><tr><td width="8%" class="tableClassValignNoBorder">Item 6.</td><td width="92%" class="tableClassNoBorder">Contracts, Arrangements, Understandings or Relationships With Respect to Securities of the Issuer</td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter"> </td><td width="92%" class="tableClassNoBorder"><div class="largetext">Registration Rights Agreement
+
+On the Closing Date, Fubo and Hulu entered into the Registration Rights Agreement in respect of the Registrable Securities (as defined in the Registration Rights Agreement) received by Hulu in exchange for the Class B Common Stock that Hulu received in connection with the Transactions. Pursuant to the Registration Rights Agreement, Fubo is required, on the terms set forth therein, to file with the Securities and Exchange Commission (the "SEC"), a registration statement (the "Resale Shelf") registering for resale the shares of Class A Common Stock, including any shares thereof issuable upon or issued upon the exercise, conversion or exchange of other securities of Fubo or any of its subsidiaries (including Class B Common Stock and Newco Units owned by Hulu). Fubo is required to (i) file the Resale Shelf with the SEC as soon as reasonably practicable after the Closing Date, but in any event no later than the date on which Fubo files with the SEC the financial statements and pro forma financial information required by Item 9.01 of Form 8-K in connection with the consummation of the Transactions (or such later date as may be determined by Hulu, subject to the consent of Fubo, which consent shall not be unreasonably withheld, conditioned or delayed) and (ii) use its commercially reasonable efforts to cause the Resale Shelf to become and remain effective, and to be supplemented and amended to the extent necessary, so long as any Registrable Securities remain outstanding. Furthermore, under the Registration Rights Agreement, Hulu has certain customary underwritten offering demand rights and piggyback registration rights. The Registration Rights Agreement contains customary indemnification and contribution obligations of Fubo for the benefit of Hulu and vice versa, in each case, subject to certain qualifications and exceptions.
+
+Tax Receivables Agreement
+
+On the Closing Date, Fubo, Newco and Hulu entered into the Tax Receivables Agreement, which sets forth the agreement among the parties regarding the sharing of certain tax benefits realized (or, in connection with an acceleration upon Fubo's election to terminate the Tax Receivables Agreement, deemed realized) by Fubo. Fubo is generally obligated to pay Hulu a percentage of the benefit realized by Fubo from the use of certain historic net operating loss carryforwards ("NOLs") of Fubo in an amount equal to the lesser of (i) 70% and (ii) Hulu's ownership percentage of Newco as of the date the NOLs are utilized. Fubo is also generally obligated to pay Hulu 70% of (a) the total tax benefit that Fubo realizes as a result of increases in tax basis in Newco's assets resulting from the exchange of Newco Units for Class A Common Stock (or cash) pursuant to the Newco LLCA and (b) other tax benefits attributable to payments under the Tax Receivables Agreement.
+
+The term of the Tax Receivables Agreement will continue until all such tax benefits have been utilized or expired unless Fubo elects to terminate the Tax Receivables Agreement early. Upon such an early termination, Fubo is required to make a payment equal to the present value of the anticipated future payments to be made by it under the Tax Receivables Agreement, based upon certain assumptions and deemed events.
+
+Newco LLCA
+
+On the Closing Date, Hulu, Fubo and Newco entered into, and Newco is governed by, the Newco LLCA.
+
+Redemption Right
+
+The Newco LLCA provides, among other things, Hulu with a redemption right pursuant to which Hulu may cause Newco to redeem all or a portion of its Newco Units, together with an equivalent number of shares of Class B Common Stock, in exchange for an equivalent number of shares of Class A Common Stock or, at Fubo's option, cash, subject to Fubo's right to elect to effect, in lieu of such a redemption, a direct exchange between Fubo and Hulu of cash or an equivalent number of shares of Class A Common Stock for such Newco Units and Class B Common Stock (provided that, in each case, Hulu may retract the exercise of its redemption or exchange right upon notice that Fubo intends to settle such redemption or exchange in cash). Initially, Hulu and Fubo hold a single class of Newco Units (the "Common Units").
+
+Managing Member
+
+Fubo is the initial sole managing member of Newco (the "Manager"). Fubo may not be removed as the Manager except by Fubo's own election and will not, subject to certain exceptions, receive any compensation for its role as the Manager.
+
+Required Ratio
+
+The Newco LLCA requires that the ratio of Common Units to Class A Common Stock always be maintained.
+
+Distributions
+
+Newco may make distributions to its members from time to time at the discretion of the Manager generally on a pro rata basis in accordance with each member's respective ownership interest in Newco. Newco is also required to make distributions to members generally on a pro rata basis in accordance with each member's respective ownership interest in Newco held by each member to enable Fubo to meet its tax obligations and obligations under the Tax Receivables Agreement.
+
+Amendments; Termination
+
+The holders of a majority of voting Common Units must provide their consent in order to amend the Newco LLCA and amendments must be made in accordance with the Fubo Charter; provided that certain amendments may be made by the Manager. The voluntary dissolution of Newco will require the decision of the Manager, together with the approval of the holders of a majority of voting Common Units.
+
+Stockholders Agreement 
+
+On the Closing Date, Fubo and Hulu entered into the Stockholders Agreement governing Hulu's ownership of Class B Common Stock (or, as thereafter exchanged, Class A Common Stock). 
+
+Hulu Agreement to Vote
+
+The Stockholders Agreement provides, among other things, that until the first date on which Hulu and its affiliates cease to collectively own at least 50% of the then-outstanding shares of Class A Common Stock and Class B Common Stock, Hulu has agreed to vote its shares of Class A Common Stock and Class B Common Stock (i) in favor of directors that are nominated by the board of directors of Fubo (the "Fubo Board") (whether at an annual or special meeting) in accordance with the Fubo Charter, including, until the second anniversary of the Closing Date, the independent directors designated by Fubo prior to the Closing Date (the "Unaffiliated Independent Designees") and (ii) in accordance with the Fubo Board's recommendation with respect to any proposal presented at an annual or special meeting, subject to certain exceptions. Hulu has further agreed, until the second anniversary of the Closing Date, to take all actions necessary and within its control to cause each initial Unaffiliated Independent Designee (or a replacement of any such initial Unaffiliated Independent Designee who has died, resigned, been disqualified or removed from the Fubo Board) to continue to serve on the Fubo Board until the second anniversary of the Closing Date. 
+
+Lockup
+
+For 24 months following the completion of the Transactions, Hulu and its affiliates are prohibited from transferring the shares of Class B Common Stock (or, as thereafter exchanged, Class A Common Stock) that it receives in connection with the Transactions other than to its affiliates or pursuant to certain other exceptions. Following such 24-month lock-up period, Hulu and its affiliates are permitted to transfer shares of Class B Common Stock (or, as thereafter exchanged, Class A Common Stock) to any Person.
+
+Reporting Obligations
+
+Fubo is subject to certain financial and other reporting obligations to Hulu and its affiliates.
+
+Termination
+
+The Stockholders Agreement automatically terminates in the event that Hulu and its affiliates (i) no longer consolidate the results of operations and financial position of Fubo or (ii) collectively own 100% of the outstanding shares of Class A Common Stock and Class B Common Stock, subject to certain survival provisions.</div></td></tr><tr><td width="8%" class="tableClassValignNoBorder">Item 7.</td><td width="92%" class="tableClassNoBorder">Material to be Filed as Exhibits.</td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter"> </td><td width="92%" class="tableClassNoBorder"><div class="largetext">Exhibit 99.1  Joint Filing Agreement by and among the Reporting Persons
+
+Exhibit 99.2  Business Combination Agreement, dated as of January 6, 2025, by and among fuboTV Inc., The Walt Disney Company and Hulu, LLC (incorporated by reference to Exhibit 2.1 to the Issuer's Form 8-K/A filed on January 10, 2025)
+
+Exhibit 99.3  Registration Rights Agreement, dated as of October 29, 2025, by and between FuboTV Inc. and Hulu, LLC. (incorporated by reference to Exhibit 10.1 to the Issuer's Form 8-K filed on October 30, 2025)
+
+Exhibit 99.4  Tax Receivables Agreement, dated as of October 29, 2025, by and among FuboTV Inc., Fubo Operations LLC and Hulu, LLC (incorporated by reference to Exhibit 10.2 to the Issuer's Form 8-K filed on October 30, 2025) 
+
+Exhibit 99.5  Amended and Restated Limited Liability Company Agreement of Fubo Operations LLC, dated as of October 29, 2025, by and between FuboTV Inc., Fubo Operations LLC and Hulu, LLC (incorporated by reference to Exhibit 10.3 to the Issuer's Form 8-K filed on October 30, 2025)
+
+Exhibit 99.6  Stockholders Agreement, dated as of October 29, 2025, by and between FuboTV Inc. and Hulu, LLC (incorporated by
+reference to Exhibit 10.4 to the Issuer's Form 8-K filed on October 30, 2025)
+
+Exhibit 99.7  Power of Attorney for Hulu, LLC and The Walt Disney Company, dated as of November 3, 2025
+
+Exhibit 99.8  Schedule I
+
+Exhibit 99.9  Schedule II</div></td></tr></table><br></div><div class="form1"><table role="presentation" id="signatureInfo"><tr><td width="8%" class="tableClassValignNoBorder">    SIGNATURE</td><td width="92%" class="tableClassNoBorder"> </td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter"> </td><td width="92%" class="tableClassNoBorder"><div class="information" style="text-align:justify">
+						After reasonable inquiry and to the best of my knowledge and belief, I certify that the information set forth in this statement is true, complete and correct.
+						<br><br></div></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="100%" class="tableClassInnerNoBorderBlue"><div class="text">Walt Disney Co</div></td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Signature:</td><td width="92%" class="tableClassNoBorderBlue signature">/s/ James M. Kapenstein</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Name/Title:</td><td width="92%" class="tableClassNoBorderBlue signature">James M. Kapenstein, Attorney-in-Fact</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Date:</td><td width="92%" class="tableClassNoBorderBlue signature">11/05/2025</td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="100%" class="tableClassInnerNoBorderBlue"><div class="text">Hulu, LLC</div></td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Signature:</td><td width="92%" class="tableClassNoBorderBlue signature">/s/ James M. Kapenstein</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Name/Title:</td><td width="92%" class="tableClassNoBorderBlue signature">James M. Kapenstein, Attorney-in-Fact</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Date:</td><td width="92%" class="tableClassNoBorderBlue signature">11/05/2025</td></tr></table></td></tr></table></div></div>
+
+<script type="text/javascript"  src="/N3AEOPt9/dJoipWz/rYwIB5c/dg/YEaQGVVmDJktp27Xmu/SixucGdeLAQ/KXhNJ/AQsW1I"></script></body></html>

@@ -1,0 +1,516 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns:p="http://www.sec.gov/edgar/schedule13D" xmlns:p1="http://www.sec.gov/edgar/common"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><link rel="stylesheet" type="text/css" href="/css/SDR_print.css"><style type="text/css">
+					.fakeTextBox {
+					border-top: 2px solid #999;
+					border-right: 1px solid #ccc;
+					border-bottom: 1px solid #ccc;
+					border-left: 2px solid #999;
+					padding: 2px;
+					_width: 800px;
+					height: auto;
+					min-width: 200px;
+					min-height: 50px;
+					word-wrap: break-word;
+					font-size: 0.9em;
+					color: blue;
+					}
+					table.tableClass { border: solid black;
+					border-top-width: 1;
+					border-right-width: 1;
+					border-bottom-width: 1;
+					border-left-width: 1;
+					table-layout:fixed;
+					}
+					table.innerTableClass { border: solid black;
+					border-top-width: 0;
+					border-right-width: 0;
+					border-bottom-width: 0;
+					border-left-width: 0;
+					table-layout:fixed;
+					}
+					th.tableClassLeft { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					padding: 2px;
+					}
+					th.tableClassRight { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 0;
+					padding: 2px;
+					}
+					th.tableClass { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					padding: 2px;
+					}
+					td.tableClassLeft { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					font-size: 0.9em;
+					color: blue;
+					word-wrap: break-word;
+					}
+					td.tableClassRight { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 0;
+					font-size: 0.9em;
+					color: blue;
+					word-wrap: break-word;
+					}
+					td.tableClass { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					font-size: 0.9em;
+					font-weight:bold;
+					color: black;
+					word-wrap: break-word;
+					}
+					td.tableClassNoBorder { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 0px;
+					font-size: 0.9em;
+					font-weight:bold;
+					color: black;
+					word-wrap: break-word;
+					}
+
+					td.tableClassNoBorderBlue { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 0px;
+					font-size: 0.9em;
+					font-weight:bold;
+					color: blue;
+					word-wrap: break-word;
+					}
+
+					td.tableClassInnerNoBorderBlue { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 0px;
+					font-size: 1.4em;
+					font-weight:bold;
+					color: blue;
+					word-wrap: break-word;
+					}
+
+					td.tableClassNoBorderAlignLeft { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 0px;
+					font-size: 0.9em;
+					font-weight:bold;
+					text-align: left;
+					color: black;
+					word-wrap: break-word;
+					}
+
+					td.signature {
+					padding: 4px 8px;
+					}
+
+					td.tableClassInner { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					font-size: 1em;
+					font-weight:bold;
+					color: black;
+					word-wrap: break-word;
+					}
+
+					td.tableClassValign { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					font-size: 0.9em;
+					font-weight:bold;
+					color: black;
+					vertical-align: middle;
+					text-align: center;
+					word-wrap: break-word;
+					}
+
+					td.tableClassValignNoBorder { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 0px;
+					font-size: 0.9em;
+					font-weight:bold;
+					color: black;
+					vertical-align: middle;
+					text-align: center;
+					word-wrap: break-word;
+					}
+
+					td.tableClassValignInner { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					font-size: 1em;
+					font-weight:bold;
+					color: black;
+					vertical-align: middle;
+					text-align: center;
+					word-wrap: break-word;
+					}
+
+					td.innerTableClassRightValign { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 0;
+					font-size: 1em;
+					font-weight:bold;
+					color: black;
+					vertical-align: middle;
+					text-align: center;
+					word-wrap: break-word;
+					}
+
+					td.innerTableClassRightValignBottomLess { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 0px;
+					border-left-width: 0;
+					font-size: 1em;
+					font-weight:bold;
+					color: black;
+					vertical-align: middle;
+					text-align: center;
+					word-wrap: break-word;
+					}
+
+					td.tableClassInnerLeft { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					font-size: 1em;
+					font-weight:bold;
+					color: black;
+					word-wrap: break-word;
+					}
+
+					td.tableClassInnerLeftBottomLess { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 1px;
+					font-size: 1em;
+					font-weight:bold;
+					color: black;
+					word-wrap: break-word;
+					}
+
+					td.tableClassNoBorderAlignCenter { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 0px;
+					font-size: 0.9em;
+					font-weight:bold;
+					color: black;
+					text-align: center;
+					word-wrap: break-word;
+					}
+
+					tr.tableClass { border: solid black;
+					border-top-width: 1px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					}
+					tr.tableClassWithBg { border: solid black;
+					border-top-width: 0;
+					border-right-width: 1;
+					border-bottom-width: 1;
+					border-left-width: 0;
+					background-color: #e0e0ff
+					}
+
+					tr.tableClassWithBgBlack { border: solid black;
+					border-top-width: 0;
+					border-right-width: 1;
+					border-bottom-width: 1;
+					border-left-width: 0;
+					background-color: #D3D3D3
+					}
+
+					hr.header {
+					position: relative;
+					top: 20px;
+					border: none;
+					height: 6px;
+					background: black;
+					margin-bottom: 10px;
+					}
+
+					hr.separatorThin {
+					position: relative;
+					top: 2px;
+					border: none;
+					height: 2px;
+					background: black;
+					margin-bottom: 2px;
+					}
+
+					hr.headerThin {
+					position: relative;
+					top: 10px;
+					border: none;
+					height: 2px;
+					background: black;
+					margin-bottom: 10px;
+					}
+
+					hr.separator {
+					position: relative;
+					top: 20px;
+					border: none;
+					height: 4px;
+					background: black;
+					margin-bottom: 5px;
+					}
+
+					div.text {
+					background-color: #ffffff;
+					color: blue;
+					font-size: 1em;
+					font-weight:normal;
+					text-align:justify;
+					}
+
+
+					div.information {
+					background-color: #ffffff;
+					color: black;
+					font-size: 1em;
+					font-weight:normal;
+					text-align:justify;
+					}
+
+					#scheader {
+					font-size: 0.9em;
+					border: 0px solid #404040;
+					border-spacing: 2px;
+					}
+
+					div.largetext {
+					background-color: #ffffff;
+					color: blue;
+					font-size: 1em;
+					font-weight:normal;
+					text-align:justify;
+					white-space: pre-wrap;
+					word-break: normal;
+					}
+
+				</style></head><body lang="en-US" text="#000000" bgcolor="#ffffff"><hr class="header"><br><hr class="headerThin"><div class="contentwrapper"><table role="presentation" id="scheader"><tr><td class="tableClassNoBorderAlignCenter" style="font-size:2em;">
+						SECURITIES AND EXCHANGE COMMISSION
+						<br>
+						Washington, D.C. 20549
+					</td></tr><tr><td class="tableClassNoBorderAlignCenter"><br><br><div style="font-size:1.5em;">
+									SCHEDULE 13D
+								</div><br><div style="font-size:1.2em;">
+							Under the Securities Exchange Act of 1934
+						</div><br></td></tr><tr><td class="center"><div class="information" style="text-align:center; font-weight:bold; color:blue;">Viper Energy, Inc. (f/k/a New Cobra Pubco, Inc.)</div><div class="information" style="text-align:center; font-weight:bold;"><hr class="separatorThin">(Name of Issuer)</div><br><br></td></tr><tr><td class="center"><div class="information" style="text-align:center; font-weight:bold; color:blue;">Class A Common Stock, par value $0.000001 per share</div><div class="information" style="text-align:center; font-weight:bold;"><hr class="separatorThin">(Title of Class of Securities)</div><br><br></td></tr><tr><td class="center"><div class="information" style="text-align:center; font-weight:bold; color:blue;">64361Q101</div><div class="information" style="text-align:center; font-weight:bold;"><hr class="separatorThin">(CUSIP Number)</div><br><br></td></tr><tr><td class="center"><div class="information" style="text-align:center; font-weight:bold; color:blue;">Teresa L. Dick<br>Diamondback Energy, Inc.,
+								900 NW 63rd Street, Suite 200<br>Oklahoma City,
+								OK,
+								73116<br>(405) 463-6900</div><div class="information" style="text-align:center; font-weight:bold;"><hr class="separatorThin">(Name, Address and Telephone Number of Person Authorized to
+									Receive Notices and Communications)</div></td></tr><tr><td class="center"><div class="information" style="text-align:center; font-weight:bold; color:blue;">08/19/2025</div><div class="information" style="text-align:center; font-weight:bold;"><hr class="separatorThin">(Date of Event Which Requires Filing of This Statement)</div></td></tr></table><br><br><div class="information" style="text-align:justify">
+				If the filing person has previously filed a statement on Schedule 13G to report the acquisition that is the subject of this Schedule 13D, and is filing this schedule because of §§ 240.13d-1(e), 240.13d-1(f) or 240.13d-1(g), check the following box.
+				<img src="/Images/box-unchecked.jpg" alt="Checkbox not checked"></div><br><div class="information" style="text-align:justify">
+				The information required on the remainder of this cover page shall not be deemed to be “filed” for the purpose of Section 18 of the
+				Securities Exchange Act of 1934 (“Act”) or otherwise subject to the liabilities of that section of the Act but shall be subject to all other
+				provisions of the Act (however, see the Notes).
+			</div></div><hr class="headerThin"><hr class="header"><br><br>
+  <div class="content"><div class="form1"></div></div>
+  <div class="content"><div class="form1"><table><tr><td class="center"><br><br><p><div align="center" style="font-size:1.2em;">
+									SCHEDULE 13D
+								</div></p></td></tr></table><table role="presentation" class="tableClass" id="cusipNumber"><tr class="tableClass"><td width="25%" style="font-weight:bold;">CUSIP No.</td><td width="75%"><div style="font-size:.9em; color:#000000">64361Q101</div></td></tr></table><br><br><table role="presentation" class="tableClass" id="reportingPersonDetails"><tr class="tableClass"><td width="8%" class="tableClassValign">1</td><td width="92%" class="tableClass">
+					Name of reporting person
+					<br><br><div class="text">Diamondback Energy, Inc.</div></td></tr><tr><td width="8%" class="tableClassValign">2</td><td width="92%" class="tableClass">Check the appropriate box if a member of a Group (See Instructions)
+					<br><br><div class="text"><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked">  (a)
+						<br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked">  (b)
+					</div></td></tr><tr class="tableClassWithBgBlack"><td width="8%" class="tableClassValign">3</td><td width="92%" class="tableClass">SEC use only</td></tr><tr><td width="8%" class="tableClassValign">4</td><td width="92%" class="tableClass">
+					Source of funds (See Instructions)
+					<br><br><div class="text">OO</div></td></tr><tr><td width="8%" class="tableClassValign">5</td><td width="92%" class="tableClass">
+					Check if disclosure of legal proceedings is required pursuant to Items 2(d) or 2(e)
+					<br><br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked"></td></tr><tr><td width="8%" class="tableClassValign">6</td><td width="92%" class="tableClass">Citizenship or place of organization
+					<br><br><div class="text">
+				DELAWARE
+			</div></td></tr><tr><td width="8%" class="tableClassValign">Number of Shares Beneficially Owned by Each Reporting Person With:</td><td width="92%" class="tableClass"><table class="innerTableClass"><tr><td width="8%" class="innerTableClassRightValign">7</td><td width="92%" class="tableClassInnerLeft">Sole Voting Power
+								<br><br><div class="text">155,058,093.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">8</td><td width="92%" class="tableClassInnerLeft">Shared Voting Power
+								<br><br><div class="text">0.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">9</td><td width="92%" class="tableClassInnerLeft">Sole Dispositive Power
+								<br><br><div class="text">155,058,093.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValignBottomLess">10</td><td width="92%" class="tableClassInnerLeftBottomLess">Shared Dispositive Power
+								<br><br><div class="text">0.00</div></td></tr></table></td></tr><tr><td width="8%" class="tableClassValign">11</td><td width="92%" class="tableClass">Aggregate amount beneficially owned by each reporting person
+					<br><br><div class="text">155,058,093.00</div></td></tr><tr><td width="8%" class="tableClassValign">12</td><td width="92%" class="tableClass">Check if the aggregate amount in Row (11) excludes certain shares (See Instructions)
+					<br><br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked"></td></tr><tr><td width="8%" class="tableClassValign">13</td><td width="92%" class="tableClass">Percent of class represented by amount in Row (11)
+					<br><br><div class="text">47.8 % </div></td></tr><tr><td width="8%" class="tableClassValign">14</td><td width="92%" class="tableClass">Type of Reporting Person (See Instructions)
+					<br><br><div class="text">CO</div></td></tr></table><br><table><tr><td class="center"><br><br><p><div align="center" style="font-size:1.2em;">
+									SCHEDULE 13D
+								</div></p></td></tr></table><table role="presentation" class="tableClass" id="cusipNumber"><tr class="tableClass"><td width="25%" style="font-weight:bold;">CUSIP No.</td><td width="75%"><div style="font-size:.9em; color:#000000">64361Q101</div></td></tr></table><br><br><table role="presentation" class="tableClass" id="reportingPersonDetails"><tr class="tableClass"><td width="8%" class="tableClassValign">1</td><td width="92%" class="tableClass">
+					Name of reporting person
+					<br><br><div class="text">Diamondback E&amp;P LLC</div></td></tr><tr><td width="8%" class="tableClassValign">2</td><td width="92%" class="tableClass">Check the appropriate box if a member of a Group (See Instructions)
+					<br><br><div class="text"><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked">  (a)
+						<br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked">  (b)
+					</div></td></tr><tr class="tableClassWithBgBlack"><td width="8%" class="tableClassValign">3</td><td width="92%" class="tableClass">SEC use only</td></tr><tr><td width="8%" class="tableClassValign">4</td><td width="92%" class="tableClass">
+					Source of funds (See Instructions)
+					<br><br><div class="text">OO</div></td></tr><tr><td width="8%" class="tableClassValign">5</td><td width="92%" class="tableClass">
+					Check if disclosure of legal proceedings is required pursuant to Items 2(d) or 2(e)
+					<br><br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked"></td></tr><tr><td width="8%" class="tableClassValign">6</td><td width="92%" class="tableClass">Citizenship or place of organization
+					<br><br><div class="text">
+				DELAWARE
+			</div></td></tr><tr><td width="8%" class="tableClassValign">Number of Shares Beneficially Owned by Each Reporting Person With:</td><td width="92%" class="tableClass"><table class="innerTableClass"><tr><td width="8%" class="innerTableClassRightValign">7</td><td width="92%" class="tableClassInnerLeft">Sole Voting Power
+								<br><br><div class="text">8,066,528.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">8</td><td width="92%" class="tableClassInnerLeft">Shared Voting Power
+								<br><br><div class="text">0.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">9</td><td width="92%" class="tableClassInnerLeft">Sole Dispositive Power
+								<br><br><div class="text">8,066,528.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValignBottomLess">10</td><td width="92%" class="tableClassInnerLeftBottomLess">Shared Dispositive Power
+								<br><br><div class="text">0.00</div></td></tr></table></td></tr><tr><td width="8%" class="tableClassValign">11</td><td width="92%" class="tableClass">Aggregate amount beneficially owned by each reporting person
+					<br><br><div class="text">8,066,528.00</div></td></tr><tr><td width="8%" class="tableClassValign">12</td><td width="92%" class="tableClass">Check if the aggregate amount in Row (11) excludes certain shares (See Instructions)
+					<br><br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked"></td></tr><tr><td width="8%" class="tableClassValign">13</td><td width="92%" class="tableClass">Percent of class represented by amount in Row (11)
+					<br><br><div class="text">4.5 % </div></td></tr><tr><td width="8%" class="tableClassValign">14</td><td width="92%" class="tableClass">Type of Reporting Person (See Instructions)
+					<br><br><div class="text">OO</div></td></tr></table><br><table><tr><td class="center"><br><br><p><div align="center" style="font-size:1.2em;">
+									SCHEDULE 13D
+								</div></p></td></tr></table><table role="presentation" class="tableClass" id="cusipNumber"><tr class="tableClass"><td width="25%" style="font-weight:bold;">CUSIP No.</td><td width="75%"><div style="font-size:.9em; color:#000000">64361Q101</div></td></tr></table><br><br><table role="presentation" class="tableClass" id="reportingPersonDetails"><tr class="tableClass"><td width="8%" class="tableClassValign">1</td><td width="92%" class="tableClass">
+					Name of reporting person
+					<br><br><div class="text">Endeavor Energy Resources, L.P.</div></td></tr><tr><td width="8%" class="tableClassValign">2</td><td width="92%" class="tableClass">Check the appropriate box if a member of a Group (See Instructions)
+					<br><br><div class="text"><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked">  (a)
+						<br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked">  (b)
+					</div></td></tr><tr class="tableClassWithBgBlack"><td width="8%" class="tableClassValign">3</td><td width="92%" class="tableClass">SEC use only</td></tr><tr><td width="8%" class="tableClassValign">4</td><td width="92%" class="tableClass">
+					Source of funds (See Instructions)
+					<br><br><div class="text">OO</div></td></tr><tr><td width="8%" class="tableClassValign">5</td><td width="92%" class="tableClass">
+					Check if disclosure of legal proceedings is required pursuant to Items 2(d) or 2(e)
+					<br><br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked"></td></tr><tr><td width="8%" class="tableClassValign">6</td><td width="92%" class="tableClass">Citizenship or place of organization
+					<br><br><div class="text">
+				TEXAS
+			</div></td></tr><tr><td width="8%" class="tableClassValign">Number of Shares Beneficially Owned by Each Reporting Person With:</td><td width="92%" class="tableClass"><table class="innerTableClass"><tr><td width="8%" class="innerTableClassRightValign">7</td><td width="92%" class="tableClassInnerLeft">Sole Voting Power
+								<br><br><div class="text">69,626,640.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">8</td><td width="92%" class="tableClassInnerLeft">Shared Voting Power
+								<br><br><div class="text">0.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">9</td><td width="92%" class="tableClassInnerLeft">Sole Dispositive Power
+								<br><br><div class="text">69,626,640.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValignBottomLess">10</td><td width="92%" class="tableClassInnerLeftBottomLess">Shared Dispositive Power
+								<br><br><div class="text">0.00</div></td></tr></table></td></tr><tr><td width="8%" class="tableClassValign">11</td><td width="92%" class="tableClass">Aggregate amount beneficially owned by each reporting person
+					<br><br><div class="text">69,626,640.00</div></td></tr><tr><td width="8%" class="tableClassValign">12</td><td width="92%" class="tableClass">Check if the aggregate amount in Row (11) excludes certain shares (See Instructions)
+					<br><br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked"></td></tr><tr><td width="8%" class="tableClassValign">13</td><td width="92%" class="tableClass">Percent of class represented by amount in Row (11)
+					<br><br><div class="text">29.1 % </div></td></tr><tr><td width="8%" class="tableClassValign">14</td><td width="92%" class="tableClass">Type of Reporting Person (See Instructions)
+					<br><br><div class="text">PN</div></td></tr></table><br></div><div class="form1"><table><tr><td class="center"><br><br><p><div align="center" style="font-size:1.2em;">
+									SCHEDULE 13D
+								</div></p></td></tr></table><table role="presentation" id="item1to7"><tr><td width="8%" class="tableClassValignNoBorder">Item 1.</td><td width="92%" class="tableClassNoBorder">Security and Issuer</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignCenter">(a)</td><td width="92%" class="tableClassNoBorder">Title of Class of Securities:
+							<br><br><div class="text">Class A Common Stock, par value $0.000001 per share</div></td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignCenter">(b)</td><td width="92%" class="tableClassNoBorder">Name of Issuer:
+							<br><br><div class="text">Viper Energy, Inc. (f/k/a New Cobra Pubco, Inc.)</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(c)</td><td width="92%" class="tableClassNoBorder">Address of Issuer's Principal Executive Offices:
+							<br><br><div class="text">500 West Texas Ave., Suite 100, Midland, 
+				TEXAS
+			, 79701.</div></td></tr><tr><td width="8%" class="tableClassValignNoBorder">Item 2.</td><td width="92%" class="tableClassNoBorder">Identity and Background</td></tr><tr></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignCenter">(a)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">This Statement is filed by Diamondback Energy, Inc., a Delaware corporation ("Diamondback"), Diamondback E&amp;P LLC, a Delaware limited liability company ("Diamondback E&amp;P"), and Endeavor Energy Resources, L.P., a Texas limited partnership ("Endeavor").
+
+Diamondback is hereinafter sometimes referred to together with Diamondback E&amp;P and Endeavor each as a "Reporting Person" and collectively as the "Reporting Persons." All disclosures herein with respect to a Reporting Person are made by such Reporting Person. Any disclosures herein with respect to persons other than the Reporting Persons are made on information and belief after making inquiry to such party.</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(b)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">The address of the principal business and principal office of the Reporting Persons is c/o Diamondback Energy, Inc., 500 West Texas, Suite 100, Midland, Texas 79701.</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(c)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">Diamondback is a publicly traded independent oil and natural gas company focused on the acquisition, development, exploration and exploitation of unconventional, onshore oil and natural gas reserves in the Permian Basin in West Texas. Diamondback is the parent company of Viper Energy, Inc. (f/k/a New Cobra Pubco, Inc.), a Delaware corporation (the "Issuer"). Diamondback E&amp;P and Endeavor are wholly owned subsidiaries of Diamondback. The name and present principal occupation of each director and executive officer of the Reporting Persons (collectively, the "Listed Persons") are set forth on Exhibit 99.1 to this Schedule 13D, which is incorporated herein by reference.</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(d)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">During the last five years, none of the Reporting Persons has been and, to the applicable Reporting Person's knowledge, none of the Listed Persons has been, convicted in a criminal proceeding (excluding traffic violations or similar misdemeanors).</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(e)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">During the last five years, none of the Reporting Persons has been and, to the applicable Reporting Persons' knowledge, none of the Listed Persons has been, a party to a civil proceeding of a judicial or administrative body of competent jurisdiction and, as a result of such proceeding, was, or is subject to, a judgment, decree or final order enjoining future violations of, or prohibiting or mandating activities subject to, Federal or state securities laws or finding any violation with respect to such laws.</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(f)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">Diamondback is a Delaware corporation. Diamondback E&amp;P is a Delaware limited liability company. Endeavor is a Texas limited partnership. All Listed Persons are citizens of the United States of America.</div></td></tr><tr><td width="8%" class="tableClassValignNoBorder">Item 3.</td><td width="92%" class="tableClassNoBorder">Source and Amount of Funds or Other Consideration</td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter"> </td><td width="92%" class="tableClassNoBorder"><div class="largetext">Sitio Acquisition
+
+On August 19, 2025, pursuant to the terms of the Agreement and Plan of Merger, dated as of June 2, 2025 (the "Merger Agreement"), by and among the Issuer, Viper Energy Partners LLC, a Delaware limited liability company ("Opco"), Sitio Royalties Corp., a Delaware corporation ("Sitio"), Sitio Royalties Operating Partnership, LP, a Delaware limited partnership and a subsidiary of Sitio ("Sitio Opco"), VNOM Sub, Inc. (formerly Viper Energy, Inc.), a Delaware corporation ("Old Viper"), Cobra Merger Sub, Inc., a Delaware corporation and a wholly owned subsidiary of the Issuer ("Viper Merger Sub"), and Scorpion Merger Sub, Inc., a Delaware corporation and a wholly owned subsidiary of Issuer ("Sitio Merger Sub"), the Issuer acquired Sitio and Old Viper in an all-equity transaction (the "Sitio Acquisition") through: (i) the merger of Sitio Merger Sub with and into Sitio, with Sitio continuing as the surviving corporation and a wholly owned subsidiary of the Issuer, (ii) the merger (the "Viper Pubco Merger") of Viper Merger Sub with and into Old Viper, with Old Viper continuing as the surviving corporation and a wholly owned subsidiary of the Issuer, and (iii) the merger of Sitio Opco with and into Opco, with Opco continuing as the surviving entity, in each case on the terms set forth in the Merger Agreement.
+
+Pursuant to the terms of the Merger Agreement, effective as of the effective time of the Viper Pubco Merger, and in connection with the closing of the Sitio Acquisition, each share of Old Viper Class B common stock, par value $0.000001 per share, was automatically converted into one share of Class B common stock, par value $0.000001 per share, of the Issuer ("Class B Common Stock").  In connection with the closing of the Sitio Acquisition, the Reporting Persons, who immediately prior to the effectiveness of the Viper Pubco Merger held 155,058,093 shares of Class B common stock of Old Viper, received 155,058,093 shares of Class B Common Stock and retained the 155,058,093 units of Opco (the "OpCo Units") that the Reporting Persons owned prior to the closing of the Sitio Acquisition.</div></td></tr><tr><td width="8%" class="tableClassValignNoBorder">Item 4.</td><td width="92%" class="tableClassNoBorder">Purpose of Transaction</td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter"> </td><td width="92%" class="tableClassNoBorder"><div class="largetext">The information in Items 3 and 6 is incorporated herein by reference.
+
+All of the shares of Class A common stock, par value 0.000001 per share ("Class A Common Stock") of the Issuer that may be deemed to be beneficially owned by the Reporting Persons, as reported herein, were acquired for investment purposes. The Reporting Persons retain the right to change their investment intent, from time to time, to acquire additional shares of Class A Common Stock or other securities of the Issuer, or to sell or otherwise dispose of all or part of the Class A Common Stock or other securities of the Issuer, if any, beneficially owned by them, in each case depending upon an ongoing evaluation of the investment in the Class A Common Stock, the Reporting Persons' businesses, prospects and financial condition, the market for the Class A Common Stock, general economic and prevailing market conditions, future developments and/or other factors.
+
+Except as described above, none of the Reporting Persons currently has any other plans or proposals that would be related to or would result in any of the matters described in Items 4(a)-(j) of the Instructions to Schedule 13D. However, as part of the ongoing evaluation of investment and investment alternatives, the Reporting Persons may consider such matters and, subject to applicable law, may formulate a plan with respect to such matters, and, from time to time, may hold discussions with or make formal proposals to management or the board of directors of the Issuer or other third parties regarding such matters.</div></td></tr><tr><td width="8%" class="tableClassValignNoBorder">Item 5.</td><td width="92%" class="tableClassNoBorder">Interest in Securities of the Issuer</td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(a)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">As of the close of business on August 19, 2025, Diamondback beneficially owned 47.8% of the outstanding shares of common stock of the Issuer ("Common Stock"), Diamondback E&amp;P beneficially owned 4.5% of the outstanding shares of Common Stock and Endeavor beneficially owned 29.1% of the outstanding shares of Common Stock.
+
+The aggregate number and percentage of Common Stock beneficially owned by Diamondback, Diamondback E&amp;P and Endeavor is based on 169,518,801 shares of Class A Common Stock of the Issuer outstanding as of August 19, 2025. The aggregate percentage of Common Stock beneficially owned by Diamondback does not reflect 10,093,670 OpCo Units and an option to purchase 10,093,670 shares of Class B Common Stock (which securities together are exchangeable for the same number of shares of Class A Common Stock), in each case granted to Tumbleweed Royalty IV, LLC ("TWR IV"), a third-party seller, in connection with Old Viper's acquisition of certain mineral and royalty-owning subsidiaries of TWR IV on October 1, 2024, as reported in Old Viper's Current Report on Form 8-K filed with the SEC on October 2, 2024, the obligations of which were assigned to and assumed by the Issuer, as reported in the Issuer's Current Report on Form 8-K12B filed with the U.S. Securities and Exchange Commission (the "SEC") on August 19, 2025.
+
+The beneficial ownership percentage of the Listed Persons is set forth on Exhibit 99.1.</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(b)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">Diamondback:
+
+Sole Voting Power: 155,058,093
+Shared Voting Power: 0
+Sole Dispositive Power: 155,058,093
+Shared Dispositive Power: 0
+
+Includes (i) 77,364,925 shares of Class B Common Stock and 77,364,925 OpCo Units held by Diamondback, (ii) 8,066,528 shares of Class B Common Stock and 8,066,528 OpCo Units held by Diamondback's wholly owned subsidiary, Diamondback E&amp;P and (iii) 69,626,640 shares of Class B Common Stock and 69,626,640 OpCo Units held by Diamondback's wholly owned subsidiary, Endeavor. Diamondback, Diamondback E&amp;P and Endeavor have the right to exchange their shares of Class B Common Stock and an equal number of OpCo Units on a one-for-one basis for shares of Class A Common Stock.
+
+Diamondback E&amp;P:
+
+Sole Voting Power: 8,066,528
+Shared Voting Power: 0
+Sole Dispositive Power: 8,066,528
+Shared Dispositive Power: 0
+
+Includes 8,066,528 shares of Class B Common Stock and 8,066,528 OpCo Units held by Diamondback E&amp;P. Diamondback E&amp;P has the right to exchange its shares of Class B Common Stock and an equal number of OpCo Units on a one-for-one basis for shares of Class A Common Stock.
+
+Endeavor:
+
+Sole Voting Power: 69,626,640
+Shared Voting Power: 0
+Sole Dispositive Power: 69,626,640
+Shared Dispositive Power: 0
+
+Includes 69,626,640 shares of Class B Common Stock and 69,626,640 OpCo Units held by Endeavor. Endeavor has the right to exchange its shares of Class B Common Stock and an equal number of OpCo Units on a one-for-one basis for shares of Class A Common Stock.
+
+The beneficial ownership of the Listed Persons is set forth in Exhibit 99.1.</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(c)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">The information contained in Items 3 and 6 is incorporated herein by reference. Except as otherwise described herein with respect to the Sitio Acquisition, none of the Reporting Persons nor, to the Reporting Persons' knowledge, the Listed Persons has effected any transactions in the shares of Class A Common Stock during the past 60 days.</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(d)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">The Reporting Persons have the right to receive distributions from, and the proceeds from the sale of, the shares of Class A Common Stock reported for the Reporting Persons on the cover pages of this Schedule 13D and in this Item 5. No other person is known by the Reporting Persons to have the right to receive or the power to direct the receipt of distributions from, or the proceeds from the sale of, the shares of Class A Common Stock beneficially owned by the Reporting Persons.</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(e)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">Not applicable.</div></td></tr><tr><td width="8%" class="tableClassValignNoBorder">Item 6.</td><td width="92%" class="tableClassNoBorder">Contracts, Arrangements, Understandings or Relationships With Respect to Securities of the Issuer</td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter"> </td><td width="92%" class="tableClassNoBorder"><div class="largetext">Services and Secondment Agreement
+
+On November 2, 2023, Diamondback E&amp;P, Old Viper, Viper Energy Partners GP LLC and Opco entered into a Services and Secondment Agreement (the "Services Agreement").  In connection with the Sitio Acquisition, on August 19, 2025, the parties to the Services Agreement entered into an Assignment and Assumption Agreement with the Issuer, pursuant to which Old Viper assigned to the Issuer, and the Issuer assumed from Old Viper, all of Old Viper's rights and obligations arising under the Services Agreement.  Under the terms of the Services Agreement, Diamondback and Diamondback E&amp;P provide personnel and general and administrative services to the Issuer, including the services of the Issuer's executive officers and other employees.
+
+The foregoing description of the Services Agreement does not purport to be complete and is qualified in its entirety by reference to the Services Agreement, which is included as Exhibit 99.2 to this Schedule 13D and incorporated herein by reference.
+
+Certificate of Incorporation Provisions
+
+Under the Issuer's amended and restated certificate of incorporation, for so long as the Reporting Persons and any of their respective subsidiaries collectively beneficially own at least 25% of the outstanding common stock of the Issuer, (i) the Reporting Persons have the right to designate up to three persons to serve as directors of the Issuer and (ii) the board of directors of the Issuer may not appoint any person other than a Reporting Person's seconded employee as an executive officer of the Issuer unless such appointment is approved, in advance, by either (x) the Reporting Persons (which approval may not be unreasonably withheld or conditioned) or (y) the affirmative vote of the holders of at least 80% of the voting power of the capital stock of the Issuer. There are currently two Reporting Persons designees to the board of directors of the Issuer, Travis Stice and Kaes Van't Hof.
+
+The foregoing description of the Issuer's amended and restated certificate of incorporation, as amended, does not purport to be complete and is qualified in its entirety by reference to the Issuer's amended and restated certificate of incorporation, which is included as Exhibit 99.3 to this Schedule 13D and incorporated herein by reference.
+
+Exchange Agreement
+
+Prior to the closing of the Sitio Acquisition, the OpCo Units and Old Viper Class B Common Stock owned by the Reporting Persons were exchangeable from time to time for shares of Class A common stock of Old Viper under the terms and conditions of the Second Amended and Restated Exchange Agreement, dated as of October 1, 2024, by and among Old Viper, Opco, Diamondback, Diamondback E&amp;P and TWR IV (the "Exchange Agreement"). In connection with the Sitio Acquisition, on August 19, 2025, the parties to the Exchange Agreement entered into an Assignment and Assumption Agreement with the Issuer, pursuant to which Old Viper assigned to the Issuer, and the Issuer assumed from Old Viper, all of Old Viper's rights and obligations arising under the Exchange Agreement, such that one OpCo Unit and one share of Class B Common Stock, together, are exchangeable for one share of Class A Common Stock under the terms of the Exchange Agreement.
+
+The foregoing description of the Exchange Agreement does not purport to be complete and is qualified in its entirety by reference to the Exchange Agreement, which is included as Exhibit 99.4 to this Schedule 13D and incorporated herein by reference.
+
+Registration Rights Agreement
+
+Prior to the closing of the Sitio Acquisition, the shares of Class A Common Stock that were to be issued to the Reporting Persons in connection with the Exchange Agreement were subject to that certain Second Amended and Restated Registration Rights Agreement, effective as of November 13, 2023, by and between the Issuer and Diamondback (the "Registration Rights Agreement"). In connection with the Sitio Acquisition, on August 19, 2025, Old Viper and Diamondback entered into an Assignment and Assumption Agreement with the Issuer, pursuant to which Old Viper assigned to the Issuer, and the Issuer assumed from Old Viper, all of Old Viper's rights and obligations arising under the Registration Rights Agreement. Under the Registration Rights Agreement, as assigned to and assumed by the Issuer, (i) Diamondback has certain demand registration rights with respect to Common Stock held by it or its subsidiaries and (ii) the Issuer shall (A) file with the SEC, as soon as reasonably practicable, but in no event more than 90 days following the receipt of a demand notice by Diamondback, a shelf registration statement registering for resale the shares of Class A Common Stock issuable upon the exchange of Diamondback's shares of Class B Common Stock, together with the equal number of their OpCo Units, (B) cause such shelf registration statement to be declared effective promptly thereafter and (C) cause such securities to be listed on Nasdaq.
+
+The foregoing description of the Registration Rights Agreement does not purport to be complete and is qualified in its entirety by reference to the Registration Rights Agreement, which is included as Exhibit 99.5 to this Schedule 13D and incorporated herein by reference.
+
+Opco LLCA
+
+In connection with the Sitio Acquisition, Old Viper, the Issuer, Diamondback, Diamondback E&amp;P, TWR IV, former holders of Sitio Opco Units and certain other parties thereto entered into a Fourth Amended and Restated Limited Liability Company Agreement of Opco (the "Opco LLCA").  The Opco LLCA also provides that members of Opco ("Opco Members"), other than the Issuer, as the managing member, or each of the Issuer's wholly owned subsidiaries that owns one or more Opco Units, may require the Issuer to redeem (each, a "Redemption") all or a portion of the shares of Class B Common Stock held by such Opco Member, together with an equal number of Opco Units (one share of Class B Common Stock and one Opco Unit, together, a "Paired Unit", and a Paired Unit that has in fact been tendered for Redemption, a "Tendered Unit"), in exchange for a number of shares of Class A Common Stock equal to the number of Tendered Units.  The Opco LLCA also provides that, in lieu of any Redemption, the Issuer will be entitled, subject to the redeeming Opco Member's acceptance in writing, to purchase some or all of the Tendered Units from such redeeming Opco Member for an amount of cash equal to the product of (x) (A) the number of Tendered Units, multiplied by (B) the average of the daily closing prices per share of Class A Common Stock for the 20 consecutive trading days immediately prior to the date of determination, multiplied by (y) the percentage of such Tendered Units being settled in cash, expressed as a percentage of the total number of Tendered Units rounded up to the nearest Tendered Unit (with the remainder of any Tendered Units not settled in cash to be redeemed for shares of Class A Common Stock). Subject to certain exceptions, without the Issuer's consent, no Opco Member may (i) effect a Redemption for less than 2,000 Paired Units, if such Opco Member holds at least 2,000 Paired Units, (ii) effect a Redemption for less than all of the Paired Units held by such Opco Member, if such Opco Member holds less than 2,000 Paired Units or (iii) effect a Redemption more than one time in any calendar month.
+
+The foregoing description of the Opco LLCA does not purport to be complete and is qualified in its entirety by reference to the Opco LLCA, a copy of which is included as Exhibit 99.6 to this Schedule 13D and is incorporated herein by reference.
+
+Support Agreement:
+
+Concurrently with the execution and delivery of the Merger Agreement, Sitio, Old Viper, the Issuer, and the Reporting Persons entered into the Parent Support Agreement, dated June 2, 2025 (the "Support Agreement"), which provided, among other things, that the Reporting Persons would not transfer or otherwise dispose of any common stock of the Issuer or OpCo Units held by them or engage in any short sales with respect to securities of the Issuer from the date of the Merger Agreement to 90 days following the closing of the Sitio Acquisition (the "Restricted Period"), subject to certain exceptions. The Support Agreement will terminate at the earlier of (i) the expiration of the Restricted Period and (ii) the mutual consent of the parties to the Support Agreement.
+
+The foregoing description of the Support Agreement does not purport to be complete and is qualified in its entirety by reference to the Support Agreement, which is included as Exhibit 99.7 to this Schedule 13D and is incorporated herein by reference.</div></td></tr><tr><td width="8%" class="tableClassValignNoBorder">Item 7.</td><td width="92%" class="tableClassNoBorder">Material to be Filed as Exhibits.</td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter"> </td><td width="92%" class="tableClassNoBorder"><div class="largetext">Exhibit 99.1. Executive Officers and Directors of Diamondback, Diamondback E&amp;P and Endeavor (filed herewith).
+
+Exhibit 99.2. Services and Secondment Agreement, dated as of November 2, 2023, by and among Diamondback E&amp;P, Viper Energy Partners LP, Viper Energy Partners GP LLC and Opco (incorporated by reference to Exhibit 10.1 to the Current Report on Form 8-K, filed by Viper Energy Partners LP with the SEC on November 2, 2023).
+
+Exhibit 99.3.  Amended and Restated Certificate of Incorporation of the Issuer (incorporated by reference to Exhibit 3.1 to the Issuer's Current Report on Form 8-K12B, filed with the SEC on August 19, 2025).
+
+Exhibit 99.4.  Second Amended and Restated Exchange Agreement, dated as of October 1, 2024, by and among Old Viper, Opco, Diamondback E&amp;P, Diamondback and TWR IV (incorporated by reference to Exhibit 4.2 to Old Viper's Current Report on Form 8-K, filed with the SEC on October 2, 2024).
+
+Exhibit 99.5.  Second Amended and Restated Registration Rights Agreement, dated as of November 10, 2023, effective as of November 13, 2023, by and between Viper Energy Partners LP and Diamondback (incorporated by reference to Exhibit 10.3 of Old Viper's Current Report on Form 8-K, filed with the SEC on November 13, 2023).
+
+Exhibit 99.6.  Fourth Amended and Restated Limited Liability Company Agreement of Opco (incorporated by reference to Exhibit 3.4 to the Issuer's Current Report on Form 8-K12B, filed with the SEC on August 19, 2025).
+
+Exhibit 99.7. Parent Support Agreement, dated as of June 2, 2025, by and among Old Viper, Sitio, the Issuer, Diamondback, Diamondback E&amp;P and Endeavor (incorporated by reference to Exhibit 10.4 to Old Viper's Current Report on Form 8-K (Film No. 251021797), filed with the SEC on June 4, 2025).</div></td></tr></table><br></div><div class="form1"><table role="presentation" id="signatureInfo"><tr><td width="8%" class="tableClassValignNoBorder">    SIGNATURE</td><td width="92%" class="tableClassNoBorder"> </td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter"> </td><td width="92%" class="tableClassNoBorder"><div class="information" style="text-align:justify">
+						After reasonable inquiry and to the best of my knowledge and belief, I certify that the information set forth in this statement is true, complete and correct.
+						<br><br></div></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="100%" class="tableClassInnerNoBorderBlue"><div class="text">Diamondback Energy, Inc.</div></td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Signature:</td><td width="92%" class="tableClassNoBorderBlue signature">/s/ Teresa L. Dick</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Name/Title:</td><td width="92%" class="tableClassNoBorderBlue signature">Teresa L. Dick/Executive Vice President, Chief Accounting Officer and Assistant Secretary</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Date:</td><td width="92%" class="tableClassNoBorderBlue signature">08/26/2025</td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="100%" class="tableClassInnerNoBorderBlue"><div class="text">Diamondback E&amp;P LLC</div></td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Signature:</td><td width="92%" class="tableClassNoBorderBlue signature">/s/ Teresa L. Dick</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Name/Title:</td><td width="92%" class="tableClassNoBorderBlue signature">Teresa L. Dick/Executive Vice President, Chief Accounting Officer and Assistant Secretary</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Date:</td><td width="92%" class="tableClassNoBorderBlue signature">08/26/2025</td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="100%" class="tableClassInnerNoBorderBlue"><div class="text">Endeavor Energy Resources, L.P.</div></td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Signature:</td><td width="92%" class="tableClassNoBorderBlue signature">/s/ Teresa L. Dick</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Name/Title:</td><td width="92%" class="tableClassNoBorderBlue signature">Teresa L. Dick/Executive Vice President, Chief Accounting Officer and Assistant Secretary</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Date:</td><td width="92%" class="tableClassNoBorderBlue signature">08/26/2025</td></tr></table></td></tr></table><table><tr class="tableClass" colspan="2"><td width="100%" class="tableClassNoBorder"><div style="display: flex;"><div style="font-size: 0.9em; font-weight: bold; margin-right: 5px;">
+							Comments accompanying signature:
+						</div><div class="text" style="text-align:justify;">Diamondback E&amp;P LLC By: Diamondback Energy, Inc., its sole member</div></div></td></tr></table></div></div>
+
+<script type="text/javascript"  src="/N3AEOPt9/dJoipWz/rYwIB5c/dg/YEaQGVVmDJktp27Xmu/SixucGdeLAQ/KXhNJ/AQsW1I"></script></body></html>
