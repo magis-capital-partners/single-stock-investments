@@ -16,6 +16,7 @@ from __future__ import annotations
 
 import json
 import re
+import sys
 from pathlib import Path
 
 CORE_VERSION = 1
@@ -295,6 +296,11 @@ def write_insights_shards(insights_doc: dict | None, data_dir: Path) -> int:
         return 0
     sharded_keys = {k for keys in INSIGHTS_SHARDS.values() for k in keys}
     manifest = {k: v for k, v in insights_doc.items() if k not in sharded_keys}
+    try:
+        from check_media_analysis_freshness import note_observed_counts
+        note_observed_counts(manifest)
+    except Exception as exc:  # noqa: BLE001 - the shard must still publish if the clock cannot
+        print(f"media analysis clock not updated: {exc}", file=sys.stderr)
     manifest["shards"] = {
         name: f"data/insights/{name}.json" for name in INSIGHTS_SHARDS
     }

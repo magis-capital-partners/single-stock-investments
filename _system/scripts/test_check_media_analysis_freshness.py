@@ -119,5 +119,39 @@ class StallTests(unittest.TestCase):
         self.assertEqual(problems, [])
 
 
+class ReceiptTests(unittest.TestCase):
+    def test_a_missing_receipt_starts_a_clock_instead_of_firing(self):
+        problems, nxt = chk.evaluate_receipt(None, {}, today=DAY, count_stalled=True)
+        self.assertEqual(problems, [])
+        self.assertEqual(nxt["absent_since"], "2026-09-25")
+
+    def test_a_missing_receipt_and_a_stuck_count_is_a_stall(self):
+        state = {"receipt": {"absent_since": "2026-09-14", "model_ready": False}}
+        problems, nxt = chk.evaluate_receipt(
+            None, state, today=DAY, count_stalled=True,
+        )
+        self.assertEqual(len(problems), 1, problems)
+        self.assertIn("since 2026-09-14", problems[0])
+        self.assertEqual(nxt["absent_since"], "2026-09-14")
+
+    def test_a_moving_count_keeps_a_missing_receipt_quiet(self):
+        state = {"receipt": {"absent_since": "2026-09-14", "model_ready": False}}
+        problems, nxt = chk.evaluate_receipt(
+            None, state, today=DAY, count_stalled=False,
+        )
+        self.assertEqual(problems, [])
+        self.assertEqual(nxt["absent_since"], "2026-09-14")
+
+    def test_a_ready_model_clears_the_clock(self):
+        state = {"receipt": {"absent_since": "2026-09-14", "model_ready": False}}
+        problems, nxt = chk.evaluate_receipt(
+            {"model_ready": True, "probed_at": "2026-09-25T12:00:00Z"},
+            state, today=DAY, count_stalled=True,
+        )
+        self.assertEqual(problems, [])
+        self.assertIsNone(nxt["absent_since"])
+        self.assertTrue(nxt["model_ready"])
+
+
 if __name__ == "__main__":
     unittest.main()

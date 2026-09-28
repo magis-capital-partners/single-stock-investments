@@ -361,56 +361,98 @@ def run_discovery_phase(state: dict, budget: Budget, *, scan_date: str, dry_run:
 
 def run_finalize_phase(tickers: list[str], state: dict, fetched_hits: list[dict], *,
                        scan_date: str, dry_run: bool = False, fetch_sec: bool = False,
-                       skip_feed: bool = False, reconcile: bool = False) -> list[dict]:
-    """Local collection, triage, the feed and reconcile -- no new reports are fetched."""
-    budget = Budget(None)
+                       skip_feed: bool = False, reconcile: bool = False,
+                       budget: Budget | None = None, checkpoint=None) -> list[dict]:
+    """Local collection, triage, the feed and reconcile -- no new reports are fetched.
+
+    A budget stops the phase between tickers and leaves ``finalize.stage`` where
+    it stopped. The next run continues there instead of walking the book again
+    from the first ticker. ``--budget-min`` unset is unlimited, which is how a
+    one-shot ``--phase all`` still finishes in a single process.
+    """
+    budget = budget if budget is not None else Budget(None)
+    phase = state.setdefault("finalize", {})
+    stage = str(phase.get("stage") or "collect")
+    did_collect = stage == "collect"
     all_hits = list(fetched_hits)
-    for done, ticker in enumerate(tickers, 1):
-        local = collect_local_reports(ticker)
-        short_md = collect_short_markdown_reports(ticker)
-        if not dry_run:
-            index = load_ticker_index(ticker)
-            changed = False
-            for hit in local + short_md:
-                entry = {k: v for k, v in hit.items() if k != "ticker"}
-                entry.setdefault("status", "cached")
-                entry.setdefault("tier", "context")
-                if upsert_report(index, entry):
-                    changed = True
-            if changed:
-                save_ticker_index(ticker, index)
-        all_hits.extend(local)
-        all_hits.extend(short_md)
-        if not dry_run:
-            extract_ticker_activist_text(ticker)
-            verify_ticker(ticker)
-            write_inventory(ticker)
-        if done % (PROGRESS_EVERY * 4) == 0:
-            _progress("finalize:collect", done, len(tickers), len(all_hits), budget)
-    _progress("finalize:collect", len(tickers), len(tickers), len(all_hits), budget)
 
-    payload = {
-        "generated_at": now_iso(),
-        "scan_date": scan_date,
-        "dry_run": dry_run,
-        "ticker_count": len(tickers),
-        "hit_count": len(all_hits),
-        "hits": all_hits,
-        "phases": {name: (state.get(name) or {}).get("last_run") for name in FETCH_PHASES},
-    }
-    if not dry_run:
-        save_global_scan(payload)
+    def stop_for_budget() -> bool:
+        if not budget.exhausted():
+            return False
+        run = phase.setdefault("last_run", {})
+        run["budget_hit"] = True
+        run["stage"] = stage
+        run["at"] = now_iso()
+        print(
+            f"[activist:finalize] budget exhausted during {stage}; next run resumes",
+            flush=True,
+        )
+        if checkpoint is not None:
+            checkpoint()
+        return True
 
-    write_portfolio_scan_md(all_hits, scan_date, tickers)
+    if stage == "collect":
+        def collect_one(ticker: str) -> list[dict]:
+            local = collect_local_reports(ticker)
+            short_md = collect_short_markdown_reports(ticker)
+            if not dry_run:
+                index = load_ticker_index(ticker)
+                changed = False
+                for hit in local + short_md:
+                    entry = {k: v for k, v in hit.items() if k != "ticker"}
+                    entry.setdefault("status", "cached")
+                    entry.setdefault("tier", "context")
+                    if upsert_report(index, entry):
+                        changed = True
+                if changed:
+                    save_ticker_index(ticker, index)
+                extract_ticker_activist_text(ticker)
+                verify_ticker(ticker)
+                write_inventory(ticker)
+            return local + short_md
+
+        all_hits.extend(_run_rotation(
+            "finalize", tickers, state, budget, collect_one, checkpoint=checkpoint,
+        ))
+        # A slice that does not reach every ticker still made progress. Stay on
+        # collect until each ticker has been attempted once, then move on. The
+        # next slice starts at the names this one did not reach.
+        attempted_map = phase.get("last_attempted") or {}
+        if not all(ticker in attempted_map for ticker in tickers):
+            return all_hits
+        stage = "cleanup"
+        phase["stage"] = stage
+        if checkpoint is not None:
+            checkpoint()
+
+    if did_collect:
+        payload = {
+            "generated_at": now_iso(),
+            "scan_date": scan_date,
+            "dry_run": dry_run,
+            "ticker_count": len(tickers),
+            "hit_count": len(all_hits),
+            "hits": all_hits,
+            "phases": {name: (state.get(name) or {}).get("last_run") for name in FETCH_PHASES},
+        }
+        if not dry_run:
+            save_global_scan(payload)
+        write_portfolio_scan_md(all_hits, scan_date, tickers)
 
     if not dry_run:
         from cleanup_activist_false_positives import cleanup_ticker
 
         for ticker in tickers:
+            if stop_for_budget():
+                return all_hits
             index_path = activist_index_path(ticker)
             if index_path.exists():
                 cleanup_ticker(ticker, apply=True)
         print(f"[activist:finalize] cleanup done at {budget.elapsed():.0f}s", flush=True)
+        if stop_for_budget():
+            return all_hits
+        stage = "triage"
+        phase["stage"] = stage
 
         triage_summary = triage_portfolio(
             tickers=tickers,
@@ -428,11 +470,17 @@ def run_finalize_phase(tickers: list[str], state: dict, fetched_hits: list[dict]
     write_review_queue(all_hits, scan_date)
 
     if not skip_feed and not dry_run:
+        if stop_for_budget():
+            return all_hits
         build_feed()
         print(f"[activist:finalize] feed rebuilt at {budget.elapsed():.0f}s", flush=True)
+        stage = "reconcile"
+        phase["stage"] = stage
 
     if reconcile and not dry_run:
         for ticker in tickers:
+            if stop_for_budget():
+                return all_hits
             index = load_ticker_index(ticker)
             pending = [
                 r
@@ -448,12 +496,17 @@ def run_finalize_phase(tickers: list[str], state: dict, fetched_hits: list[dict]
                 reconcile_ticker(ticker, scan_date, write=True)
         print(f"[activist:finalize] reconcile done at {budget.elapsed():.0f}s", flush=True)
 
-    state.setdefault("finalize", {})["last_run"] = {
+    phase["stage"] = "collect"
+    phase["last_run"] = {
         "at": now_iso(),
         "tickers": len(tickers),
         "hits": len(all_hits),
         "elapsed_sec": round(budget.elapsed(), 1),
+        "budget_hit": False,
+        "stage": "done",
     }
+    if checkpoint is not None:
+        checkpoint()
     return all_hits
 
 
@@ -507,7 +560,7 @@ def main(argv: list[str] | None = None) -> int:
         "--budget-min",
         type=float,
         default=None,
-        help="sec/sites: stop starting new tickers/firms after N minutes; the next run resumes",
+        help="sec/sites/finalize: stop starting new tickers after N minutes; the next run resumes",
     )
     parser.add_argument(
         "--min-interval-days",
@@ -592,6 +645,7 @@ def main(argv: list[str] | None = None) -> int:
     all_hits = run_finalize_phase(
         tickers, state, fetched, scan_date=args.date, dry_run=args.dry_run,
         fetch_sec=args.fetch_sec, skip_feed=args.skip_feed, reconcile=args.reconcile,
+        budget=Budget(args.budget_min), checkpoint=persist_state,
     )
     persist_state()
 

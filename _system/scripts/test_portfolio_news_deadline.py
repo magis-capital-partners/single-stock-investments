@@ -283,5 +283,25 @@ class MainPartialWriteTests(unittest.TestCase):
         self.assertEqual(payload["coverage"]["google"]["refreshed"], 1)
 
 
+class CoverageExitTests(unittest.TestCase):
+    def test_a_short_of_full_run_stays_green_and_says_how_many(self) -> None:
+        buf = io.StringIO()
+        with mock.patch("sys.stdout", buf):
+            status = ingest.coverage_exit_status({
+                "google": {"tickers_total": 10, "refreshed": 8, "failed": 0, "not_attempted": 2},
+            })
+        self.assertEqual(status, 0)
+        self.assertIn("8/10 holdings refreshed", buf.getvalue())
+
+    def test_under_half_still_fails(self) -> None:
+        buf = io.StringIO()
+        with mock.patch("sys.stdout", buf):
+            status = ingest.coverage_exit_status({
+                "google": {"tickers_total": 10, "refreshed": 4, "failed": 6, "not_attempted": 0},
+            })
+        self.assertEqual(status, 1)
+        self.assertIn("::error", buf.getvalue())
+
+
 if __name__ == "__main__":
     raise SystemExit(unittest.main())

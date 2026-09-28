@@ -45,6 +45,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[2]
 MANIFEST = ROOT / "dashboard" / "data" / "insights" / "manifest.json"
 STATE = ROOT / "_system" / "data" / "media_analysis_ratchet.json"
+RECEIPT = ROOT / "_system" / "data" / "lane_receipts" / "media-analysis.json"
 
 # Generous on purpose. The analyser has managed ~23 items on a bad day and 115
 # on a good one; either resets the clock. Four days of no movement at all means
@@ -148,12 +149,94 @@ def evaluate(
                       "sources": nxt}
 
 
+def _day(value: str | None) -> date | None:
+    if not value:
+        return None
+    try:
+        return date.fromisoformat(str(value)[:10])
+    except ValueError:
+        return None
+
+
+def evaluate_receipt(
+    receipt: dict | None,
+    state: dict,
+    *,
+    today: date,
+    stall_days: int = STALL_DAYS,
+    count_stalled: bool = False,
+) -> tuple[list[str], dict]:
+    """The local analyser writes a receipt. A missing one starts a clock.
+
+    The clock is not a failure by itself. It becomes one when the analysed
+    count is also stuck, so a lane that starts reading again goes quiet even
+    if this machine has not committed a receipt yet. A receipt that says the
+    model is ready clears the clock.
+    """
+    prior = state.get("receipt") if isinstance(state.get("receipt"), dict) else {}
+    if receipt and receipt.get("model_ready") is True:
+        return [], {
+            "model_ready": True,
+            "probed_at": receipt.get("probed_at"),
+            "absent_since": None,
+        }
+
+    absent_since = prior.get("absent_since")
+    if receipt and receipt.get("model_ready") is False:
+        probed = _day(str(receipt.get("probed_at") or ""))
+        # A failing probe is the same fact as no probe: the lane is not reading.
+        if probed is not None and not absent_since:
+            absent_since = probed.isoformat()
+
+    if not absent_since:
+        return [], {"model_ready": False, "absent_since": today.isoformat()}
+
+    nxt = {"model_ready": False, "absent_since": absent_since, "probed_at": (receipt or {}).get("probed_at")}
+    started = _day(str(absent_since))
+    if started is None or not count_stalled:
+        return [], nxt
+    stalled = (today - started).days
+    if stalled < stall_days:
+        return [], nxt
+    return [
+        f"media-analysis: no ready model receipt since {absent_since} "
+        f"({stalled} days) and the analysed count is stuck - the local "
+        "analyser is not reporting (SSI Podcast Analysis / lms)"
+    ], nxt
+
+
+def note_observed_counts(manifest: dict, *, today: date | None = None) -> bool:
+    """Move the stall clock when a rebuild changes how many items were read.
+
+    The insights shard writer calls this and commits the file with the
+    manifest. The watchdog only reads it. A rebuild that does not change the
+    analysed count leaves the clock where it is, so a stuck lane stays stuck.
+    """
+    observed = observe(manifest if isinstance(manifest, dict) else {})
+    if not observed:
+        return False
+    state = load_json(STATE)
+    _, nxt = evaluate(observed, state, today=today or date.today())
+    nxt["receipt"] = state.get("receipt") if isinstance(state.get("receipt"), dict) else {}
+    if state.get("sources") == nxt.get("sources") and state.get("receipt") == nxt.get("receipt"):
+        return False
+    STATE.parent.mkdir(parents=True, exist_ok=True)
+    STATE.write_text(json.dumps(nxt, indent=2) + "\n", encoding="utf-8")
+    return True
+
+
 def check(*, today: date | None = None, stall_days: int = STALL_DAYS):
     manifest = load_json(MANIFEST)
     observed = observe(manifest)
-    problems, nxt = evaluate(
-        observed, load_json(STATE), today=today or date.today(), stall_days=stall_days
+    state = load_json(STATE)
+    today = today or date.today()
+    problems, nxt = evaluate(observed, state, today=today, stall_days=stall_days)
+    receipt = load_json(RECEIPT) or None
+    receipt_problems, receipt_state = evaluate_receipt(
+        receipt, state, today=today, stall_days=stall_days, count_stalled=bool(problems),
     )
+    problems.extend(receipt_problems)
+    nxt["receipt"] = receipt_state
     return observed, problems, nxt
 
 
@@ -169,8 +252,11 @@ def main() -> int:
     observed, problems, nxt = check(stall_days=args.stall_days)
 
     if args.update:
-        STATE.parent.mkdir(parents=True, exist_ok=True)
-        STATE.write_text(json.dumps(nxt, indent=2) + "\n", encoding="utf-8")
+        previous = load_json(STATE)
+        moved = previous.get("sources") != nxt.get("sources") or previous.get("receipt") != nxt.get("receipt")
+        if moved:
+            STATE.parent.mkdir(parents=True, exist_ok=True)
+            STATE.write_text(json.dumps(nxt, indent=2) + "\n", encoding="utf-8")
 
     if args.json:
         print(json.dumps({"observed": observed, "problems": problems}, indent=2))

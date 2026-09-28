@@ -228,5 +228,35 @@ class ScanCoverageCheckTests(unittest.TestCase):
         self.assertIn("no SEC activist scan", problems[0])
 
 
+class FinalizeBudgetTests(unittest.TestCase):
+    def test_a_short_slice_resumes_at_the_names_it_did_not_reach(self) -> None:
+        seen: list[str] = []
+        clock = {"t": 0.0}
+
+        def collect(ticker: str) -> list[dict]:
+            clock["t"] += 60.0
+            seen.append(ticker)
+            return []
+
+        state: dict = {}
+        with mock.patch.object(scan, "collect_local_reports", side_effect=collect), \
+                mock.patch.object(scan, "collect_short_markdown_reports", return_value=[]), \
+                mock.patch.object(scan, "write_portfolio_scan_md"), \
+                mock.patch.object(scan, "write_review_queue"), \
+                redirect_stdout(io.StringIO()):
+            scan.run_finalize_phase(
+                ["C", "A", "B"], state, [], scan_date="2026-09-28", dry_run=True,
+                budget=scan.Budget(2.0, clock=lambda: clock["t"]),
+            )
+            self.assertEqual(seen, ["A", "B"])
+            self.assertEqual(set(state["finalize"]["last_attempted"]), {"A", "B"})
+            clock["t"] = 0.0
+            scan.run_finalize_phase(
+                ["C", "A", "B"], state, [], scan_date="2026-09-28", dry_run=True,
+                budget=scan.Budget(1.0, clock=lambda: clock["t"]),
+            )
+        self.assertEqual(seen[2], "C")
+
+
 if __name__ == "__main__":
     raise SystemExit(unittest.main())

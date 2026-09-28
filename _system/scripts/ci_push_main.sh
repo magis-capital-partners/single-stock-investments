@@ -25,6 +25,26 @@ is_regenerable_artifact() {
     _system/reference/market-data/returns/*.csv) return 0 ;;
     _system/portfolio/research_events.jsonl) return 0 ;;
     _system/reference/market-data/external/sync_report.json) return 0 ;;
+    # The falsifier lane and the committee lane both rewrite these. They share
+    # a queue with each other, but the data-pipeline jobs do not, so main moves
+    # while a push is rebasing. The controller can rebuild them; aborting the
+    # push on the first conflict is how the 2026-09-25 and 2026-09-27 outcome
+    # runs lost a finished pass.
+    _system/data/epistemic_work_queue.json) return 0 ;;
+    _system/data/falsifier_authoring_queue.json) return 0 ;;
+    _system/research/epistemic_loop_status.json) return 0 ;;
+    _system/data/runs/epistemic_loop/*) return 0 ;;
+    *) return 1 ;;
+  esac
+}
+
+# Append-only ledgers. A rebase conflict here is two lanes adding lines, not
+# a file a builder should delete and recreate.
+is_union_jsonl() {
+  case "$1" in
+    _system/research/committee_forecasts.jsonl) return 0 ;;
+    _system/research/committee_forecast_outcomes.jsonl) return 0 ;;
+    _system/research/committee_outcome_attempts.jsonl) return 0 ;;
     *) return 1 ;;
   esac
 }
@@ -33,6 +53,11 @@ is_regenerable_artifact() {
 # Marvin-owned ticker research when refresh jobs race deep-dive merges.
 is_prefer_upstream_on_rebase() {
   case "$1" in
+    # These ledgers live under research/ but two lanes append to them. Taking
+    # main's copy would drop the committee run's new lines. Union them instead.
+    _system/research/committee_forecasts.jsonl) return 1 ;;
+    _system/research/committee_forecast_outcomes.jsonl) return 1 ;;
+    _system/research/committee_outcome_attempts.jsonl) return 1 ;;
     */research/*|*/third-party-analyses/*) return 0 ;;
     _system/memory/daily/*|_system/research/milly_log.md) return 0 ;;
     # Triage queues are rebuilt by whichever lane runs next, and two lanes on the
@@ -58,7 +83,7 @@ is_resolvable_rebase_conflict() {
   while IFS= read -r file; do
     [ -n "$file" ] || continue
     any=1
-    if ! is_regenerable_artifact "$file" && ! is_prefer_upstream_on_rebase "$file"; then
+    if ! is_regenerable_artifact "$file" && ! is_prefer_upstream_on_rebase "$file" && ! is_union_jsonl "$file"; then
       echo "Non-resolvable rebase conflict in: $file"
       return 1
     fi
@@ -78,6 +103,7 @@ builders_for() {
     _system/reference/market-data/returns/*.csv) echo returns ;;
     _system/portfolio/research_events.jsonl) echo research_events ;;
     _system/reference/market-data/external/sync_report.json) echo external_sync ;;
+    _system/data/epistemic_work_queue.json|_system/data/falsifier_authoring_queue.json|_system/research/epistemic_loop_status.json|_system/data/runs/epistemic_loop/*) echo epistemic ;;
   esac
 }
 
@@ -98,6 +124,11 @@ run_builder() {
     activist) { [ ! -f _system/scripts/clean_activist_indexes.py ] || "$PYTHON" _system/scripts/clean_activist_indexes.py; } &&
       "$PYTHON" _system/scripts/build_activist_feed.py &&
       git add dashboard/data/activist_feed.json ;;
+    epistemic) "$PYTHON" _system/scripts/epistemic_loop_controller.py &&
+      git add -- _system/data/epistemic_work_queue.json \
+        _system/data/falsifier_authoring_queue.json \
+        _system/research/epistemic_loop_status.json \
+        _system/data/runs/epistemic_loop ;;
     dashboard) "$PYTHON" _system/scripts/build_dashboard_data.py &&
       git add dashboard/data/ ;;
   esac
@@ -114,7 +145,7 @@ regenerate_conflicted_artifacts() {
     case "$needed" in *" $key "*) ;; *) needed="$needed$key " ;; esac
   done <<< "$conflicted"
 
-  for key in returns indexes portfolio research_events external_sync insights activist dashboard; do
+  for key in returns indexes portfolio research_events external_sync insights activist epistemic dashboard; do
     case "$needed" in
       *" $key "*)
         echo "Regenerating '$key' artifacts to resolve rebase conflicts..."
@@ -135,6 +166,36 @@ regenerate_conflicted_artifacts() {
     is_regenerable_artifact "$file" || continue
     if [ -f "$file" ]; then git add -f "$file"; else git rm -f --cached "$file" 2>/dev/null || true; fi
   done <<< "$conflicted"
+}
+
+union_jsonl_conflicts() {
+  local file
+  while IFS= read -r file; do
+    [ -n "$file" ] || continue
+    is_union_jsonl "$file" || continue
+    echo "Unioning jsonl rebase conflict: $file"
+    "$PYTHON" - "$file" <<'PY'
+import subprocess, sys
+path = sys.argv[1]
+
+def stage(n: int) -> list[str]:
+    result = subprocess.run(["git", "show", f":{n}:{path}"], capture_output=True, text=True)
+    if result.returncode != 0:
+        return []
+    return [line for line in result.stdout.splitlines() if line.strip()]
+
+seen: set[str] = set()
+lines: list[str] = []
+for line in stage(2) + stage(3):
+    if line not in seen:
+        seen.add(line)
+        lines.append(line)
+text = ("\n".join(lines) + "\n") if lines else ""
+with open(path, "w", encoding="utf-8", newline="\n") as handle:
+    handle.write(text)
+PY
+    git add -- "$file"
+  done <<< "$(conflicted_files)"
 }
 
 resolve_prefer_upstream_conflicts() {
@@ -174,6 +235,7 @@ try_resolve_rebase_conflicts() {
   rebase_in_progress || return 1
   is_resolvable_rebase_conflict || return 1
   resolve_prefer_upstream_conflicts
+  union_jsonl_conflicts
   if ! regenerate_conflicted_artifacts; then
     echo "::error::Artifact regeneration failed; rebase remains open."
     return 1

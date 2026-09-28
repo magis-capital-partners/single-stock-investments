@@ -32,6 +32,9 @@ on:
       - _system/scripts/build_research_scope.py
       - _system/scripts/test_research_watchdog.py
       - _system/scripts/test_build_research_scope.py
+      - _system/scripts/check_media_analysis_freshness.py
+      - _system/scripts/test_check_media_analysis_freshness.py
+      - _system/data/media_analysis_ratchet.json
       - _system/graph/graph_sources.json
   # No workflow_dispatch: test_llm_workflow_governance.py bans a manual run
   # surface outside a four-file allowlist. repository_dispatch gives the same
@@ -90,6 +93,7 @@ jobs:
             _system/portfolio
             _system/reviews
             _system/data
+            dashboard/data/insights/manifest.json
             .gitignore
             .github/workflows/research-watchdog.yml
           sparse-checkout-cone-mode: false
@@ -141,6 +145,11 @@ jobs:
                 f"in_scope={scope.get('in_scope')} findings={d['total_findings']}")
           PY
           python _system/scripts/build_research_scope.py --latest-run /nonexistent
+
+      - name: Media analysis has not stalled
+        env:
+          PYTHONIOENCODING: utf-8
+        run: python _system/scripts/check_media_analysis_freshness.py
 
       - name: Report what this run did and did not check
         if: always()
