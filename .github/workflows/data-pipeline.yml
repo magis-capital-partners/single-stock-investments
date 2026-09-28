@@ -320,13 +320,25 @@ jobs:
         with:
           message: "chore: activist scan sync $(date -u +%Y-%m-%d) (sites, wires, discovery)"
       - id: phase_finalize
-        timeout-minutes: 49
+        timeout-minutes: 35
         name: "Activist scan: triage, feed and reconcile"
         continue-on-error: true
-        run: |
-          timeout --kill-after=60s 30m python _system/scripts/scan_activist_sources.py --phase finalize --reconcile --fetch-sec
-          timeout --kill-after=60s 10m python _system/scripts/short_scan_batch.py
-          timeout --kill-after=60s 5m python _system/scripts/activist_registry_audit.py
+        # 25 minutes inside the phase, saved between tickers. The 30-minute
+        # timeout is only the backstop if the process stops checkpointing.
+        # A finished slice exits 0; a feed that stops moving is still red via
+        # check_activist_freshness.py. Short scan and the registry audit are
+        # their own steps so a finalize slice cannot skip them.
+        run: timeout --kill-after=60s 30m python _system/scripts/scan_activist_sources.py --phase finalize --reconcile --fetch-sec --budget-min 25
+      - id: phase_short
+        timeout-minutes: 12
+        name: "Activist short scan"
+        continue-on-error: true
+        run: timeout --kill-after=60s 10m python _system/scripts/short_scan_batch.py
+      - id: phase_audit
+        timeout-minutes: 8
+        name: "Activist registry audit"
+        continue-on-error: true
+        run: timeout --kill-after=60s 5m python _system/scripts/activist_registry_audit.py
       - name: Japan large-shareholding reports (EDINET)
         timeout-minutes: 12
         # Exits 0 and prints "not configured" until EDINET_API_KEY exists, so
@@ -338,8 +350,9 @@ jobs:
       - name: Activist coverage guards
         timeout-minutes: 5
         run: python -m unittest _system/scripts/test_activist_coverage.py _system/scripts/test_activist_taxonomy.py
-      - name: Rebuild activist dashboard slice
-        timeout-minutes: 20
+      - id: phase_rebuild
+        name: Rebuild activist dashboard slice
+        timeout-minutes: 35
         uses: ./.github/actions/rebuild-data
         env:
           OAUTH_CLIENT_ID: ${{ vars.OAUTH_CLIENT_ID }}
@@ -368,10 +381,13 @@ jobs:
             steps.phase_sites.outcome == 'failure' ||
             steps.phase_wires.outcome == 'failure' ||
             steps.phase_discovery.outcome == 'failure' ||
-            steps.phase_finalize.outcome == 'failure'
+            steps.phase_finalize.outcome == 'failure' ||
+            steps.phase_short.outcome == 'failure' ||
+            steps.phase_audit.outcome == 'failure' ||
+            steps.phase_rebuild.outcome == 'failure'
           )
         run: |
-          echo "::error::Activist phase failed or hit its timeout (sec=${{ steps.phase_sec.outcome }} sites=${{ steps.phase_sites.outcome }} wires=${{ steps.phase_wires.outcome }} discovery=${{ steps.phase_discovery.outcome }} finalize=${{ steps.phase_finalize.outcome }}); progress up to that point was committed."
+          echo "::error::Activist phase failed or hit its timeout (sec=${{ steps.phase_sec.outcome }} sites=${{ steps.phase_sites.outcome }} wires=${{ steps.phase_wires.outcome }} discovery=${{ steps.phase_discovery.outcome }} finalize=${{ steps.phase_finalize.outcome }} short=${{ steps.phase_short.outcome }} audit=${{ steps.phase_audit.outcome }} rebuild=${{ steps.phase_rebuild.outcome }}); progress up to that point was committed."
           exit 1
 
   downloads:
@@ -647,12 +663,12 @@ jobs:
     if: needs.decide.outputs.news == 'true'
     runs-on: ubuntu-latest
     # Budget, innermost first: each Google request is capped at 20s, the two
-    # sources run together, and the ingester stops starting requests at 35 min
+    # sources run together, and the ingester stops starting requests at 45 min
     # and writes the feed (coverage recorded, prior items kept). The step's
-    # `timeout 40m` is only the backstop for a hang the caps miss. Stacked,
-    # Polygon (~15 min) plus Google (~24 min at 8 workers) sat on that
-    # backstop, so a slightly slow day was killed with nothing written.
-    timeout-minutes: 50
+    # `timeout 55m` is only the backstop for a hang the caps miss. On
+    # 2026-09-28 a full 843-holding pass finished on the old 35-minute stop,
+    # five minutes under the kill, so a slower Google hour would have been cut.
+    timeout-minutes: 65
     concurrency:
       # Per-job queue - see the concurrency note at the top of this file.
       group: data-commit-main-${{ github.job }}
@@ -664,7 +680,7 @@ jobs:
       PORTFOLIO_NEWS_MAX_PAGES: "15"
       PORTFOLIO_NEWS_GOOGLE_MAX_PER_QUERY: "50"
       PORTFOLIO_NEWS_GOOGLE_WORKERS: "16"
-      PORTFOLIO_NEWS_DEADLINE_SEC: "2100"
+      PORTFOLIO_NEWS_DEADLINE_SEC: "2700"
     steps:
       - uses: actions/checkout@v4
         with:
@@ -688,7 +704,7 @@ jobs:
         name: Ingest portfolio news
         continue-on-error: true
         working-directory: _system/scripts
-        run: timeout --kill-after=60s 40m python ingest_portfolio_news.py
+        run: timeout --kill-after=60s 55m python ingest_portfolio_news.py
       - name: Commit news artifacts
         run: |
           git add dashboard/data/portfolio_news.json _system/data/news_seen.json _system/reviews/pending/news_*.md

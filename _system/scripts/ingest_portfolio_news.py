@@ -80,7 +80,7 @@ GOOGLE_RETRY_STATUS = {429, 500, 502, 503, 504}
 # Whole-run budget. When it runs out, no new request is started and the feed
 # is written with what was fetched, previous items kept for every holding
 # that was not refreshed, and the gap recorded under "coverage".
-DEADLINE_SEC = float(os.getenv("PORTFOLIO_NEWS_DEADLINE_SEC", str(35 * 60)))
+DEADLINE_SEC = float(os.getenv("PORTFOLIO_NEWS_DEADLINE_SEC", str(45 * 60)))
 # Below this share of holdings refreshed, the run writes its partial feed and
 # then exits 1: a run that mostly failed must not be green.
 MIN_GOOGLE_COVERAGE = float(os.getenv("PORTFOLIO_NEWS_MIN_COVERAGE", "0.5"))
@@ -1203,6 +1203,12 @@ def coverage_exit_status(coverage: dict) -> int:
             f"not_attempted={google.get('not_attempted')}); the partial feed was written"
         )
         return 1
+    if refreshed < total:
+        print(
+            f"::warning title=portfolio news::{refreshed}/{total} holdings refreshed "
+            f"(failed={google.get('failed')}, not_attempted={google.get('not_attempted')}); "
+            "the run is green and the rest keep their prior items"
+        )
     return 0
 
 

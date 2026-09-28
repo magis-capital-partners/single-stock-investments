@@ -129,6 +129,27 @@ function Get-Remaining {
     catch { return -1 }
 }
 
+function Write-AnalysisReceipt {
+    param([bool] $Ready)
+    # The research watchdog reads this file. A probe that never writes it is
+    # indistinguishable from a lane that is not running, which is the outage
+    # that sat in a local log from 2026-09-14 with every GitHub job still green.
+    $path = Join-Path $repo '_system\data\lane_receipts\media-analysis.json'
+    $dir = Split-Path $path
+    if (-not (Test-Path $dir)) {
+        New-Item -ItemType Directory -Path $dir -Force | Out-Null
+    }
+    $stamp = (Get-Date).ToUniversalTime().ToString('yyyy-MM-ddTHH:mm:ssZ')
+    $payload = [ordered]@{
+        schema_version = '1.0'
+        lane           = 'media-analysis'
+        model          = $Model
+        model_ready    = [bool]$Ready
+        probed_at      = $stamp
+    } | ConvertTo-Json
+    Set-Content -Path $path -Value $payload -Encoding utf8
+}
+
 function Test-ModelReady {
     $probe = Join-Path $repo '_system\scripts\llm_ready.py'
     if (-not (Test-Path $probe)) {
@@ -203,12 +224,16 @@ try {
 
         if (-not (Test-ModelReady)) {
             if (-not (Start-ModelServer)) {
+                Write-AnalysisReceipt -Ready $false
                 Write-Log "model still not answering; retrying in $backoff s"
                 Start-Sleep -Seconds $backoff
                 $backoff = [Math]::Min($backoff * 2, $MaxBackoff)
                 continue
             }
+            Write-AnalysisReceipt -Ready $true
             Write-Log "model ready ($Model)"
+        } else {
+            Write-AnalysisReceipt -Ready $true
         }
 
         # Ask each batch what is left. Each is the only thing that knows what

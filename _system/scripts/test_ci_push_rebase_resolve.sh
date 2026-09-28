@@ -389,6 +389,108 @@ test_main_writer_workflows_share_lock() {
   done
 }
 
+test_epistemic_outputs_are_regenerable() {
+  is_regenerable_artifact "_system/data/epistemic_work_queue.json" || {
+    echo "FAIL: epistemic work queue should be regenerable"
+    exit 1
+  }
+  is_regenerable_artifact "_system/data/runs/epistemic_loop/run_2026-09-27_abc.json" || {
+    echo "FAIL: epistemic run receipt should be regenerable"
+    exit 1
+  }
+  is_union_jsonl "_system/research/committee_forecasts.jsonl" || {
+    echo "FAIL: committee forecast log should union on rebase"
+    exit 1
+  }
+  if is_union_jsonl "_system/data/epistemic_work_queue.json"; then
+    echo "FAIL: work queue is rebuilt, not line-unioned"
+    exit 1
+  fi
+}
+
+test_epistemic_rebase_keeps_both_log_lines() {
+  # A throwaway repo, so the real controller never runs and the monorepo is
+  # not checked out from under the rest of this script.
+  local back tmp status
+  back=$PWD
+  tmp=$(mktemp -d)
+  status=0
+  (
+    cd "$tmp"
+    git init -q -b main
+    git config user.email "ci-push-test@example.com"
+    git config user.name "ci-push-test"
+    mkdir -p _system/data/runs/epistemic_loop _system/research
+    printf '%s\n' '{"v":1}' > _system/data/epistemic_work_queue.json
+    printf '%s\n' '{"id":"shared"}' > _system/research/committee_forecasts.jsonl
+    git add -A
+    git commit -q -m base
+    git checkout -q -b local
+    mkdir -p _system/data/runs/epistemic_loop _system/research
+    printf '%s\n' '{"v":2}' > _system/data/epistemic_work_queue.json
+    printf '%s\n' '{"id":"shared"}' '{"id":"local"}' > _system/research/committee_forecasts.jsonl
+    printf '%s\n' '{"side":"local"}' > _system/data/runs/epistemic_loop/run_same.json
+    git add -A
+    git commit -q -m local
+    git checkout -q main
+    mkdir -p _system/data/runs/epistemic_loop _system/research
+    printf '%s\n' '{"v":3}' > _system/data/epistemic_work_queue.json
+    printf '%s\n' '{"id":"shared"}' '{"id":"main"}' > _system/research/committee_forecasts.jsonl
+    printf '%s\n' '{"side":"main"}' > _system/data/runs/epistemic_loop/run_same.json
+    git add -A
+    git commit -q -m mainside
+    git checkout -q local
+    run_builder() {
+      case "$1" in
+        epistemic)
+          printf '%s\n' '{"rebuilt":true}' > _system/data/epistemic_work_queue.json
+          mkdir -p _system/data/runs/epistemic_loop
+          printf '%s\n' '{"rebuilt":true}' > _system/data/runs/epistemic_loop/run_rebuilt.json
+          git add -f -- _system/data/epistemic_work_queue.json _system/data/runs/epistemic_loop/run_rebuilt.json
+          ;;
+      esac
+    }
+    if git rebase main; then
+      echo "FAIL: expected a rebase conflict"
+      exit 1
+    fi
+    while rebase_in_progress && try_resolve_rebase_conflicts; do
+      :
+    done
+    if rebase_in_progress; then
+      echo "FAIL: epistemic rebase conflict was not resolved"
+      conflicted_files || true
+      exit 1
+    fi
+    grep -q '"rebuilt":true' _system/data/epistemic_work_queue.json || {
+      echo "FAIL: work queue was not rebuilt"
+      exit 1
+    }
+    grep -q '"id":"local"' _system/research/committee_forecasts.jsonl || {
+      echo "FAIL: local forecast line was dropped"
+      exit 1
+    }
+    grep -q '"id":"main"' _system/research/committee_forecasts.jsonl || {
+      echo "FAIL: main forecast line was dropped"
+      exit 1
+    }
+    if [ "$(grep -c '"id":"shared"' _system/research/committee_forecasts.jsonl)" -ne 1 ]; then
+      echo "FAIL: shared forecast line should appear once"
+      exit 1
+    fi
+    if grep -q '^<<<<<<< ' _system/research/committee_forecasts.jsonl _system/data/epistemic_work_queue.json; then
+      echo "FAIL: conflict markers remain"
+      exit 1
+    fi
+  ) || status=$?
+  cd "$back"
+  if [ "$status" -ne 0 ]; then
+    exit "$status"
+  fi
+}
+
+run_test "epistemic outputs are regenerable and forecast logs union" test_epistemic_outputs_are_regenerable
+run_test "epistemic rebase keeps both forecast lines" test_epistemic_rebase_keeps_both_log_lines
 run_test "returns CSV classified as regenerable" test_returns_csv_is_regenerable
 run_test "ticker research prefers upstream on rebase" test_ticker_research_prefers_upstream
 run_test "sync self refresh disabled no-op" test_sync_self_refresh_disabled
