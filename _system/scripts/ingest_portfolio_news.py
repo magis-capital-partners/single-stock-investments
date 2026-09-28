@@ -15,11 +15,12 @@ from __future__ import annotations
 
 import argparse
 import json
-import logging
 import os
+import logging
 import re
 import threading
 import time
+import weakref
 import urllib.parse
 import xml.etree.ElementTree as ET
 from collections import deque
@@ -30,6 +31,7 @@ from email.utils import parsedate_to_datetime
 from pathlib import Path
 
 import requests
+import concurrent.futures.thread as cf_thread
 
 from portfolio_news_common import (
     FEED_MIN_CONFIDENCE,
@@ -81,6 +83,39 @@ DEADLINE_SEC = float(os.getenv("PORTFOLIO_NEWS_DEADLINE_SEC", str(35 * 60)))
 MIN_GOOGLE_COVERAGE = float(os.getenv("PORTFOLIO_NEWS_MIN_COVERAGE", "0.5"))
 
 _REQUEST_TIMESTAMPS: deque[float] = deque()
+
+
+class _DaemonPool(ThreadPoolExecutor):
+    """Workers are daemons so a socket that ignores its timeout cannot pin the process.
+
+    The partial feed is written on the main thread. A non-daemon worker still
+    blocked in ``recv`` would keep the interpreter alive until the outer
+    ``timeout`` kills it, which is the failure this pool exists to avoid.
+    """
+
+    def _adjust_thread_count(self) -> None:
+        if self._idle_semaphore.acquire(timeout=0):
+            return
+
+        def weakref_cb(_, q=self._work_queue):
+            q.put(None)
+
+        if len(self._threads) < self._max_workers:
+            thread_name = "%s_%d" % (self._thread_name_prefix or self, len(self._threads))
+            thread = threading.Thread(
+                name=thread_name,
+                target=cf_thread._worker,
+                args=(
+                    weakref.ref(self, weakref_cb),
+                    self._work_queue,
+                    self._initializer,
+                    self._initargs,
+                ),
+            )
+            thread.daemon = True
+            thread.start()
+            self._threads.add(thread)
+            cf_thread._threads_queues[thread] = self._work_queue
 
 
 class Deadline:
@@ -316,6 +351,33 @@ def _google_query(cfg: HoldingNewsConfig) -> str:
     return f"({names}) OR ({tokens})"
 
 
+def _read_bounded(resp: requests.Response, budget_sec: float) -> bytes | None:
+    """Read a response body, or ``None`` if it is still arriving after ``budget_sec``.
+
+    ``timeout=`` on ``Session.get`` is an idle gap between bytes, not a cap on
+    the request. A trickle of bytes never trips it, and one such call holds a
+    worker until the outer ``timeout`` kills the process before the partial
+    feed is written.
+    """
+    started = time.monotonic()
+    chunks: list[bytes] = []
+    reader = getattr(resp, "iter_content", None)
+    try:
+        if reader is None:
+            body = getattr(resp, "content", b"") or b""
+            return body if isinstance(body, bytes) else bytes(body)
+        for chunk in reader(chunk_size=65536):
+            if time.monotonic() - started > budget_sec:
+                return None
+            if chunk:
+                chunks.append(chunk)
+    finally:
+        close = getattr(resp, "close", None)
+        if close is not None:
+            close()
+    return b"".join(chunks)
+
+
 def _fetch_google_news_rss(
     session: requests.Session, query: str, locale: dict[str, str]
 ) -> list[dict] | None:
@@ -334,20 +396,25 @@ def _fetch_google_news_rss(
     resp = None
     for attempt in range(2):
         try:
-            resp = session.get(url, timeout=HTTP_TIMEOUT_SEC)
+            resp = session.get(url, timeout=(10, 15), stream=True)
         except Exception as exc:  # noqa: BLE001
             LOGGER.warning("google RSS failed: %s", exc)
             resp = None
         if resp is not None and resp.status_code not in GOOGLE_RETRY_STATUS:
             break
+        if resp is not None:
+            close = getattr(resp, "close", None)
+            if close is not None:
+                close()
         if attempt == 0:
             time.sleep(2.0)
     if resp is None or resp.status_code != 200:
         return None
-    if not resp.content:
-        return []
+    content = _read_bounded(resp, HTTP_TIMEOUT_SEC)
+    if not content:
+        return [] if content == b"" else None
     try:
-        root = ET.fromstring(resp.content)
+        root = ET.fromstring(content)
     except ET.ParseError:
         return None
 
@@ -416,22 +483,39 @@ def _fetch_google_rows_bounded(
         return _fetch_google_news_rss(worker_session, _google_query(cfg), cfg.google_locale)
 
     queue = iter(selected)
-    with ThreadPoolExecutor(max_workers=workers) as pool:
-        pending: dict = {}
+    # Daemon workers so a call that ignores its timeout cannot keep the
+    # process alive after this function has given up and the feed is written.
+    pool = _DaemonPool(max_workers=workers, thread_name_prefix="google-rss")
+    pending: dict = {}
+    abandon_at: float | None = None
 
-        def submit_next() -> None:
-            for ticker in queue:
-                if deadline is not None and deadline.expired():
-                    not_attempted.append(ticker)
-                    not_attempted.extend(queue)
-                    return
-                pending[pool.submit(fetch, ticker)] = ticker
+    def submit_next() -> None:
+        for ticker in queue:
+            if deadline is not None and deadline.expired():
+                not_attempted.append(ticker)
+                not_attempted.extend(list(queue))
                 return
+            future = pool.submit(fetch, ticker)
+            pending[future] = ticker
+            return
 
+    try:
         for _ in range(workers * 2):
             submit_next()
         while pending:
-            done, _ = wait(list(pending), return_when=FIRST_COMPLETED)
+            if deadline is not None and deadline.expired() and abandon_at is None:
+                abandon_at = time.monotonic() + HTTP_TIMEOUT_SEC
+            done, _ = wait(list(pending), timeout=1, return_when=FIRST_COMPLETED)
+            if not done:
+                if abandon_at is not None and time.monotonic() >= abandon_at:
+                    for future, ticker in list(pending.items()):
+                        future.cancel()
+                        pending.pop(future, None)
+                        results[ticker] = None
+                        LOGGER.warning("google RSS %s abandoned after the deadline", ticker)
+                    not_attempted.extend(list(queue))
+                    break
+                continue
             for future in done:
                 ticker = pending.pop(future)
                 try:
@@ -440,6 +524,8 @@ def _fetch_google_rows_bounded(
                     LOGGER.warning("google RSS %s failed: %s", ticker, exc)
                     results[ticker] = None
                 submit_next()
+    finally:
+        pool.shutdown(wait=False, cancel_futures=True)
     return results, not_attempted
 
 
@@ -1060,4 +1146,7 @@ def coverage_exit_status(coverage: dict) -> int:
 
 
 if __name__ == "__main__":
-    raise SystemExit(main())
+    # os._exit skips the thread-pool atexit join. A Google call that is still
+    # blocked after we have written the feed must not hold the process until
+    # the workflow's outer timeout kills it.
+    os._exit(main())

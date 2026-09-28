@@ -90,6 +90,44 @@ class GooglePhaseConcurrencyTests(unittest.TestCase):
         self.assertLess(google["refreshed"], 20)
         self.assertEqual(google["refreshed"] + google["failed"] + google["not_attempted"], 20)
 
+    def test_a_hung_request_is_abandoned_once_the_deadline_passes(self) -> None:
+        def fake_fetch(_session, _query, _locale):
+            time.sleep(3)
+            return []
+
+        deadline = ingest.Deadline(0.05)
+        holdings = configs(4)
+        coverage: dict = {}
+        started = time.monotonic()
+        with mock.patch.object(ingest, "HTTP_TIMEOUT_SEC", 0.05), \
+                mock.patch.object(ingest, "_fetch_google_news_rss", side_effect=fake_fetch):
+            ingest.phase_google_news(
+                None, holdings, tickers=sorted(holdings), workers=1,
+                deadline=deadline, coverage=coverage,
+            )
+        self.assertLess(time.monotonic() - started, 5)
+        google = coverage["google"]
+        self.assertEqual(google["refreshed"] + google["failed"] + google["not_attempted"], 4)
+        self.assertGreater(google["failed"] + google["not_attempted"], 0)
+
+    def test_a_trickling_body_is_a_failed_fetch(self) -> None:
+        class _Trickle:
+            status_code = 200
+
+            def iter_content(self, chunk_size=65536):
+                while True:
+                    time.sleep(0.05)
+                    yield b"x"
+
+            def close(self) -> None:
+                return None
+
+        session = mock.Mock()
+        session.get.return_value = _Trickle()
+        with mock.patch.object(ingest, "HTTP_TIMEOUT_SEC", 0.1), \
+                mock.patch.object(ingest.time, "sleep"):
+            self.assertIsNone(ingest._fetch_google_news_rss(session, "q", {}))
+
     def test_a_failed_fetch_is_not_counted_as_refreshed(self) -> None:
         def fake_fetch(_session, query, _locale):
             return None if "T01" in query else []

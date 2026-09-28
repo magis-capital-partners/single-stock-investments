@@ -467,5 +467,33 @@ class ValuationAutomationTests(unittest.TestCase):
         self.assertTrue(explicit_contract["model_checks"]["positive_base_or_explicit_zero_value"])
 
 
+class EvidencePlanBlockerTests(unittest.TestCase):
+    def test_attempted_contract_blockers_survive_a_readiness_rewrite(self):
+        previous = {
+            "tasks": [{
+                "id": "contract_blocker:abc",
+                "status": "retry_scheduled",
+                "attempts": 2,
+                "last_error": "no new primary evidence",
+            }]
+        }
+
+        def fake_read(path):
+            if str(path).endswith("evidence_task_queue.json"):
+                return previous
+            return {}
+
+        with unittest.mock.patch.object(automation, "read_json", side_effect=fake_read):
+            plan = automation.evidence_plan(
+                "ZZZ",
+                {"primary_method": "not_a_real_method"},
+                {"facts": []},
+                "2026-09-28",
+            )
+        kept = {row["id"]: row for row in plan["tasks"]}
+        self.assertEqual(kept["contract_blocker:abc"]["attempts"], 2)
+        self.assertEqual(kept["contract_blocker:abc"]["status"], "retry_scheduled")
+
+
 if __name__ == "__main__":
     unittest.main()
