@@ -123,7 +123,19 @@ export function loadScripts(scripts, { routes = () => ({}), clock = new FakeCloc
     setInterval: clock.setInterval, clearInterval: clock.clear,
     __clockNow: () => clock.now,
   });
-  vm.runInContext("Date.now = () => __clockNow();", context);
+  // Date.now alone is not enough. `new Date()` constructs from the real clock,
+  // so a fixture frozen on 2026-09-25 renders as three days stale once the
+  // wall clock passes it, and the risk-page deploy test goes red every Monday.
+  vm.runInContext(`
+    const __RealDate = Date;
+    class __ClockDate extends __RealDate {
+      constructor(...args) {
+        super(...(args.length ? args : [__clockNow()]));
+      }
+      static now() { return __clockNow(); }
+    }
+    Date = __ClockDate;
+  `, context);
   for (const script of scripts) {
     vm.runInContext(readFileSync(join(DASHBOARD, script), "utf8"), context, { filename: script });
   }
