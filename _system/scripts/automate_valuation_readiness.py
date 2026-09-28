@@ -795,6 +795,16 @@ def evidence_plan(
             else []
         ),
     })
+    # The readiness compiler only knows method-input tasks. A later recovery
+    # rebuild turns contract blockers into tasks and records attempts on them.
+    # Dropping those tasks here resets attempts to zero on the next rebuild,
+    # which is how a collected blocker becomes "never attempted" and fails the
+    # V3 ratchet.
+    known_ids = {row.get("id") for row in tasks}
+    for prior_task in previous.get("tasks") or []:
+        task_id = str(prior_task.get("id") or "")
+        if task_id.startswith("contract_blocker:") and task_id not in known_ids:
+            tasks.append(dict(prior_task))
     return {"schema_version": "2.0", "ticker": ticker, "updated_at": now(), "method_id": method,
             "ready_count": sum(t["status"] == "evidence_ready" for t in tasks), "task_count": len(tasks), "tasks": tasks}
 
