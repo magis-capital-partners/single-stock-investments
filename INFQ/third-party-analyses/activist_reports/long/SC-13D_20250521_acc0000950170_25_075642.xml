@@ -1,0 +1,505 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns:p="http://www.sec.gov/edgar/schedule13D" xmlns:p1="http://www.sec.gov/edgar/common"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><link rel="stylesheet" type="text/css" href="/css/SDR_print.css"><style type="text/css">
+					.fakeTextBox {
+					border-top: 2px solid #999;
+					border-right: 1px solid #ccc;
+					border-bottom: 1px solid #ccc;
+					border-left: 2px solid #999;
+					padding: 2px;
+					_width: 800px;
+					height: auto;
+					min-width: 200px;
+					min-height: 50px;
+					word-wrap: break-word;
+					font-size: 0.9em;
+					color: blue;
+					}
+					table.tableClass { border: solid black;
+					border-top-width: 1;
+					border-right-width: 1;
+					border-bottom-width: 1;
+					border-left-width: 1;
+					table-layout:fixed;
+					}
+					table.innerTableClass { border: solid black;
+					border-top-width: 0;
+					border-right-width: 0;
+					border-bottom-width: 0;
+					border-left-width: 0;
+					table-layout:fixed;
+					}
+					th.tableClassLeft { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					padding: 2px;
+					}
+					th.tableClassRight { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 0;
+					padding: 2px;
+					}
+					th.tableClass { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					padding: 2px;
+					}
+					td.tableClassLeft { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					font-size: 0.9em;
+					color: blue;
+					word-wrap: break-word;
+					}
+					td.tableClassRight { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 0;
+					font-size: 0.9em;
+					color: blue;
+					word-wrap: break-word;
+					}
+					td.tableClass { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					font-size: 0.9em;
+					font-weight:bold;
+					color: black;
+					word-wrap: break-word;
+					}
+					td.tableClassNoBorder { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 0px;
+					font-size: 0.9em;
+					font-weight:bold;
+					color: black;
+					word-wrap: break-word;
+					}
+
+					td.tableClassNoBorderBlue { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 0px;
+					font-size: 0.9em;
+					font-weight:bold;
+					color: blue;
+					word-wrap: break-word;
+					}
+
+					td.tableClassInnerNoBorderBlue { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 0px;
+					font-size: 1.4em;
+					font-weight:bold;
+					color: blue;
+					word-wrap: break-word;
+					}
+
+					td.tableClassNoBorderAlignLeft { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 0px;
+					font-size: 0.9em;
+					font-weight:bold;
+					text-align: left;
+					color: black;
+					word-wrap: break-word;
+					}
+
+					td.signature {
+					padding: 4px 8px;
+					}
+
+					td.tableClassInner { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					font-size: 1em;
+					font-weight:bold;
+					color: black;
+					word-wrap: break-word;
+					}
+
+					td.tableClassValign { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					font-size: 0.9em;
+					font-weight:bold;
+					color: black;
+					vertical-align: middle;
+					text-align: center;
+					word-wrap: break-word;
+					}
+
+					td.tableClassValignNoBorder { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 0px;
+					font-size: 0.9em;
+					font-weight:bold;
+					color: black;
+					vertical-align: middle;
+					text-align: center;
+					word-wrap: break-word;
+					}
+
+					td.tableClassValignInner { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					font-size: 1em;
+					font-weight:bold;
+					color: black;
+					vertical-align: middle;
+					text-align: center;
+					word-wrap: break-word;
+					}
+
+					td.innerTableClassRightValign { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 0;
+					font-size: 1em;
+					font-weight:bold;
+					color: black;
+					vertical-align: middle;
+					text-align: center;
+					word-wrap: break-word;
+					}
+
+					td.innerTableClassRightValignBottomLess { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 0px;
+					border-left-width: 0;
+					font-size: 1em;
+					font-weight:bold;
+					color: black;
+					vertical-align: middle;
+					text-align: center;
+					word-wrap: break-word;
+					}
+
+					td.tableClassInnerLeft { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					font-size: 1em;
+					font-weight:bold;
+					color: black;
+					word-wrap: break-word;
+					}
+
+					td.tableClassInnerLeftBottomLess { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 1px;
+					font-size: 1em;
+					font-weight:bold;
+					color: black;
+					word-wrap: break-word;
+					}
+
+					td.tableClassNoBorderAlignCenter { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 0px;
+					font-size: 0.9em;
+					font-weight:bold;
+					color: black;
+					text-align: center;
+					word-wrap: break-word;
+					}
+
+					tr.tableClass { border: solid black;
+					border-top-width: 1px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					}
+					tr.tableClassWithBg { border: solid black;
+					border-top-width: 0;
+					border-right-width: 1;
+					border-bottom-width: 1;
+					border-left-width: 0;
+					background-color: #e0e0ff
+					}
+
+					tr.tableClassWithBgBlack { border: solid black;
+					border-top-width: 0;
+					border-right-width: 1;
+					border-bottom-width: 1;
+					border-left-width: 0;
+					background-color: #D3D3D3
+					}
+
+					hr.header {
+					position: relative;
+					top: 20px;
+					border: none;
+					height: 6px;
+					background: black;
+					margin-bottom: 10px;
+					}
+
+					hr.separatorThin {
+					position: relative;
+					top: 2px;
+					border: none;
+					height: 2px;
+					background: black;
+					margin-bottom: 2px;
+					}
+
+					hr.headerThin {
+					position: relative;
+					top: 10px;
+					border: none;
+					height: 2px;
+					background: black;
+					margin-bottom: 10px;
+					}
+
+					hr.separator {
+					position: relative;
+					top: 20px;
+					border: none;
+					height: 4px;
+					background: black;
+					margin-bottom: 5px;
+					}
+
+					div.text {
+					background-color: #ffffff;
+					color: blue;
+					font-size: 1em;
+					font-weight:normal;
+					text-align:justify;
+					}
+
+
+					div.information {
+					background-color: #ffffff;
+					color: black;
+					font-size: 1em;
+					font-weight:normal;
+					text-align:justify;
+					}
+
+					#scheader {
+					font-size: 0.9em;
+					border: 0px solid #404040;
+					border-spacing: 2px;
+					}
+
+					div.largetext {
+					background-color: #ffffff;
+					color: blue;
+					font-size: 1em;
+					font-weight:normal;
+					text-align:justify;
+					white-space: pre-wrap;
+					word-break: normal;
+					}
+
+				</style></head><body lang="en-US" text="#000000" bgcolor="#ffffff"><hr class="header"><br><hr class="headerThin"><div class="contentwrapper"><table role="presentation" id="scheader"><tr><td class="tableClassNoBorderAlignCenter" style="font-size:2em;">
+						SECURITIES AND EXCHANGE COMMISSION
+						<br>
+						Washington, D.C. 20549
+					</td></tr><tr><td class="tableClassNoBorderAlignCenter"><br><br><div style="font-size:1.5em;">
+									SCHEDULE 13D
+								</div><br><div style="font-size:1.2em;">
+							Under the Securities Exchange Act of 1934
+						</div><br></td></tr><tr><td class="center"><div class="information" style="text-align:center; font-weight:bold; color:blue;">Churchill Capital Corp X</div><div class="information" style="text-align:center; font-weight:bold;"><hr class="separatorThin">(Name of Issuer)</div><br><br></td></tr><tr><td class="center"><div class="information" style="text-align:center; font-weight:bold; color:blue;">Class A Ordinary Shares, $0.0001 par value</div><div class="information" style="text-align:center; font-weight:bold;"><hr class="separatorThin">(Title of Class of Securities)</div><br><br></td></tr><tr><td class="center"><div class="information" style="text-align:center; font-weight:bold; color:blue;">G2130T108</div><div class="information" style="text-align:center; font-weight:bold;"><hr class="separatorThin">(CUSIP Number)</div><br><br></td></tr><tr><td class="center"><div class="information" style="text-align:center; font-weight:bold; color:blue;">Jay Taragin<br>640 Fifth Avenue,
+								14th Floor<br>New York,
+								NY,
+								10019<br>(212) 380-7500</div><div class="information" style="text-align:center; font-weight:bold;"><hr class="separatorThin">(Name, Address and Telephone Number of Person Authorized to
+									Receive Notices and Communications)</div></td></tr><tr><td class="center"><div class="information" style="text-align:center; font-weight:bold; color:blue;">05/15/2025</div><div class="information" style="text-align:center; font-weight:bold;"><hr class="separatorThin">(Date of Event Which Requires Filing of This Statement)</div></td></tr></table><br><br><div class="information" style="text-align:justify">
+				If the filing person has previously filed a statement on Schedule 13G to report the acquisition that is the subject of this Schedule 13D, and is filing this schedule because of §§ 240.13d-1(e), 240.13d-1(f) or 240.13d-1(g), check the following box.
+				<img src="/Images/box-unchecked.jpg" alt="Checkbox not checked"></div><br><div class="information" style="text-align:justify">
+				The information required on the remainder of this cover page shall not be deemed to be “filed” for the purpose of Section 18 of the
+				Securities Exchange Act of 1934 (“Act”) or otherwise subject to the liabilities of that section of the Act but shall be subject to all other
+				provisions of the Act (however, see the Notes).
+			</div></div><hr class="headerThin"><hr class="header"><br><br>
+  <div class="content"><div class="form1"></div></div>
+  <div class="content"><div class="form1"><table><tr><td class="center"><br><br><p><div align="center" style="font-size:1.2em;">
+									SCHEDULE 13D
+								</div></p></td></tr></table><table role="presentation" class="tableClass" id="cusipNumber"><tr class="tableClass"><td width="25%" style="font-weight:bold;">CUSIP No.</td><td width="75%"><div style="font-size:.9em; color:#000000">G2130T108</div></td></tr></table><br><br><table role="presentation" class="tableClass" id="reportingPersonDetails"><tr class="tableClass"><td width="8%" class="tableClassValign">1</td><td width="92%" class="tableClass">
+					Name of reporting person
+					<br><br><div class="text">Churchill Sponsor X LLC</div></td></tr><tr><td width="8%" class="tableClassValign">2</td><td width="92%" class="tableClass">Check the appropriate box if a member of a Group (See Instructions)
+					<br><br><div class="text"><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked">  (a)
+						<br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked">  (b)
+					</div></td></tr><tr class="tableClassWithBgBlack"><td width="8%" class="tableClassValign">3</td><td width="92%" class="tableClass">SEC use only</td></tr><tr><td width="8%" class="tableClassValign">4</td><td width="92%" class="tableClass">
+					Source of funds (See Instructions)
+					<br><br><div class="text">WC</div></td></tr><tr><td width="8%" class="tableClassValign">5</td><td width="92%" class="tableClass">
+					Check if disclosure of legal proceedings is required pursuant to Items 2(d) or 2(e)
+					<br><br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked"></td></tr><tr><td width="8%" class="tableClassValign">6</td><td width="92%" class="tableClass">Citizenship or place of organization
+					<br><br><div class="text">
+				DELAWARE
+			</div></td></tr><tr><td width="8%" class="tableClassValign">Number of Shares Beneficially Owned by Each Reporting Person With:</td><td width="92%" class="tableClass"><table class="innerTableClass"><tr><td width="8%" class="innerTableClassRightValign">7</td><td width="92%" class="tableClassInnerLeft">Sole Voting Power
+								<br><br><div class="text">10,650,000.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">8</td><td width="92%" class="tableClassInnerLeft">Shared Voting Power
+								<br><br><div class="text">0.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">9</td><td width="92%" class="tableClassInnerLeft">Sole Dispositive Power
+								<br><br><div class="text">10,650,000.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValignBottomLess">10</td><td width="92%" class="tableClassInnerLeftBottomLess">Shared Dispositive Power
+								<br><br><div class="text">0.00</div></td></tr></table></td></tr><tr><td width="8%" class="tableClassValign">11</td><td width="92%" class="tableClass">Aggregate amount beneficially owned by each reporting person
+					<br><br><div class="text">10,650,000.00</div></td></tr><tr><td width="8%" class="tableClassValign">12</td><td width="92%" class="tableClass">Check if the aggregate amount in Row (11) excludes certain shares (See Instructions)
+					<br><br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked"></td></tr><tr><td width="8%" class="tableClassValign">13</td><td width="92%" class="tableClass">Percent of class represented by amount in Row (11)
+					<br><br><div class="text">20.4 % </div></td></tr><tr><td width="8%" class="tableClassValign">14</td><td width="92%" class="tableClass">Type of Reporting Person (See Instructions)
+					<br><br><div class="text">OO</div></td></tr></table><br><div style="display: flex;"><div style="font-size: 0.9em; font-weight: bold; margin-right: 5px;">
+					Comment for Type of Reporting Person:
+				</div><div class="largetext" style="text-align:justify">
+(1) Includes 300,000 of the Issuer's Class A ordinary shares, $0.0001 par value ("Class A Ordinary Shares") and 10,350,000 of the Issuer's Class B ordinary shares, $0.0001 par value ("Class B Ordinary Shares" and, together with the Class A Ordinary Shares, the "Ordinary Shares"), which are automatically convertible into Class A Ordinary Shares at the time of the Issuer's initial business combination on a one-for-one basis, or at any time prior to the Issuer's initial business combination, at the option of the holder, subject to adjustment as more fully described under the heading "Description of Securities--Founder Shares" in the Issuer's registration statement on Form S-1 (File No. 333-286799). The 300,000 Class A Ordinary Shares are included in units (each unit consisting of one Class A Ordinary Share and one-quarter of one warrant , each whole warrant exercisable into one Class A Ordinary Share 30 days following the consummation of the Issuer's initial business combination), acquired pursuant to a Private Placement Units Purchase Agreement by and between Churchill Sponsor X LLC  (the "Sponsor") and the Issuer. Michael Klein, the Chief Executive Officer and Director of the Issuer, is the controlling stockholder of M. Klein Associates, Inc., which is the managing member of the Sponsor, and accordingly Mr. Klein may be deemed to have beneficial ownership of securities reported herein. Mr. Klein disclaims any ownership of securities reported herein other than to the extent of any pecuniary interest he may have therein, directly or indirectly.</div></div><table><tr><td class="center"><br><br><p><div align="center" style="font-size:1.2em;">
+									SCHEDULE 13D
+								</div></p></td></tr></table><table role="presentation" class="tableClass" id="cusipNumber"><tr class="tableClass"><td width="25%" style="font-weight:bold;">CUSIP No.</td><td width="75%"><div style="font-size:.9em; color:#000000">G2130T108</div></td></tr></table><br><br><table role="presentation" class="tableClass" id="reportingPersonDetails"><tr class="tableClass"><td width="8%" class="tableClassValign">1</td><td width="92%" class="tableClass">
+					Name of reporting person
+					<br><br><div class="text">Michael Klein</div></td></tr><tr><td width="8%" class="tableClassValign">2</td><td width="92%" class="tableClass">Check the appropriate box if a member of a Group (See Instructions)
+					<br><br><div class="text"><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked">  (a)
+						<br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked">  (b)
+					</div></td></tr><tr class="tableClassWithBgBlack"><td width="8%" class="tableClassValign">3</td><td width="92%" class="tableClass">SEC use only</td></tr><tr><td width="8%" class="tableClassValign">4</td><td width="92%" class="tableClass">
+					Source of funds (See Instructions)
+					<br><br><div class="text">OO</div></td></tr><tr><td width="8%" class="tableClassValign">5</td><td width="92%" class="tableClass">
+					Check if disclosure of legal proceedings is required pursuant to Items 2(d) or 2(e)
+					<br><br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked"></td></tr><tr><td width="8%" class="tableClassValign">6</td><td width="92%" class="tableClass">Citizenship or place of organization
+					<br><br><div class="text">
+				UNITED STATES
+			</div></td></tr><tr><td width="8%" class="tableClassValign">Number of Shares Beneficially Owned by Each Reporting Person With:</td><td width="92%" class="tableClass"><table class="innerTableClass"><tr><td width="8%" class="innerTableClassRightValign">7</td><td width="92%" class="tableClassInnerLeft">Sole Voting Power
+								<br><br><div class="text">0.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">8</td><td width="92%" class="tableClassInnerLeft">Shared Voting Power
+								<br><br><div class="text">10,650,000.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">9</td><td width="92%" class="tableClassInnerLeft">Sole Dispositive Power
+								<br><br><div class="text">0.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValignBottomLess">10</td><td width="92%" class="tableClassInnerLeftBottomLess">Shared Dispositive Power
+								<br><br><div class="text">10,650,000.00</div></td></tr></table></td></tr><tr><td width="8%" class="tableClassValign">11</td><td width="92%" class="tableClass">Aggregate amount beneficially owned by each reporting person
+					<br><br><div class="text">10,650,000.00</div></td></tr><tr><td width="8%" class="tableClassValign">12</td><td width="92%" class="tableClass">Check if the aggregate amount in Row (11) excludes certain shares (See Instructions)
+					<br><br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked"></td></tr><tr><td width="8%" class="tableClassValign">13</td><td width="92%" class="tableClass">Percent of class represented by amount in Row (11)
+					<br><br><div class="text">20.4 % </div></td></tr><tr><td width="8%" class="tableClassValign">14</td><td width="92%" class="tableClass">Type of Reporting Person (See Instructions)
+					<br><br><div class="text">IN</div></td></tr></table><br><div style="display: flex;"><div style="font-size: 0.9em; font-weight: bold; margin-right: 5px;">
+					Comment for Type of Reporting Person:
+				</div><div class="largetext" style="text-align:justify">
+(1) Includes 300,000 of the Issuer's Class A ordinary shares, $0.0001 par value ("Class A Ordinary Shares") and 10,350,000 of the Issuer's Class B ordinary shares, $0.0001 par value ("Class B Ordinary Shares" and, together with the Class A Ordinary Shares, the "Ordinary Shares"), which are automatically convertible into Class A Ordinary Shares at the time of the Issuer's initial business combination on a one-for-one basis, or at any time prior to the Issuer's initial business combination, at the option of the holder, subject to adjustment as more fully described under the heading "Description of Securities--Founder Shares" in the Issuer's registration statement on Form S-1 (File No. 333-286799). The 300,000 Class A Ordinary Shares are included in units (each unit consisting of one Class A Ordinary Share and one-quarter of one warrant , each whole warrant exercisable into one Class A Ordinary Share 30 days following the consummation of the Issuer's initial business combination), acquired pursuant to a Private Placement Units Purchase Agreement by and between Churchill Sponsor X LLC  (the "Sponsor") and the Issuer. Michael Klein, the Chief Executive Officer and Director of the Issuer, is the controlling stockholder of M. Klein Associates, Inc., which is the managing member of the Sponsor, and accordingly Mr. Klein may be deemed to have beneficial ownership of securities reported herein. Mr. Klein disclaims any ownership of securities reported herein other than to the extent of any pecuniary interest he may have therein, directly or indirectly.</div></div><table><tr><td class="center"><br><br><p><div align="center" style="font-size:1.2em;">
+									SCHEDULE 13D
+								</div></p></td></tr></table><table role="presentation" class="tableClass" id="cusipNumber"><tr class="tableClass"><td width="25%" style="font-weight:bold;">CUSIP No.</td><td width="75%"><div style="font-size:.9em; color:#000000">G2130T108</div></td></tr></table><br><br><table role="presentation" class="tableClass" id="reportingPersonDetails"><tr class="tableClass"><td width="8%" class="tableClassValign">1</td><td width="92%" class="tableClass">
+					Name of reporting person
+					<br><br><div class="text">M. Klein Associates, Inc.</div></td></tr><tr><td width="8%" class="tableClassValign">2</td><td width="92%" class="tableClass">Check the appropriate box if a member of a Group (See Instructions)
+					<br><br><div class="text"><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked">  (a)
+						<br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked">  (b)
+					</div></td></tr><tr class="tableClassWithBgBlack"><td width="8%" class="tableClassValign">3</td><td width="92%" class="tableClass">SEC use only</td></tr><tr><td width="8%" class="tableClassValign">4</td><td width="92%" class="tableClass">
+					Source of funds (See Instructions)
+					<br><br><div class="text">OO</div></td></tr><tr><td width="8%" class="tableClassValign">5</td><td width="92%" class="tableClass">
+					Check if disclosure of legal proceedings is required pursuant to Items 2(d) or 2(e)
+					<br><br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked"></td></tr><tr><td width="8%" class="tableClassValign">6</td><td width="92%" class="tableClass">Citizenship or place of organization
+					<br><br><div class="text">
+				UNITED STATES
+			</div></td></tr><tr><td width="8%" class="tableClassValign">Number of Shares Beneficially Owned by Each Reporting Person With:</td><td width="92%" class="tableClass"><table class="innerTableClass"><tr><td width="8%" class="innerTableClassRightValign">7</td><td width="92%" class="tableClassInnerLeft">Sole Voting Power
+								<br><br><div class="text">0.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">8</td><td width="92%" class="tableClassInnerLeft">Shared Voting Power
+								<br><br><div class="text">10,650,000.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">9</td><td width="92%" class="tableClassInnerLeft">Sole Dispositive Power
+								<br><br><div class="text">0.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValignBottomLess">10</td><td width="92%" class="tableClassInnerLeftBottomLess">Shared Dispositive Power
+								<br><br><div class="text">10,650,000.00</div></td></tr></table></td></tr><tr><td width="8%" class="tableClassValign">11</td><td width="92%" class="tableClass">Aggregate amount beneficially owned by each reporting person
+					<br><br><div class="text">10,650,000.00</div></td></tr><tr><td width="8%" class="tableClassValign">12</td><td width="92%" class="tableClass">Check if the aggregate amount in Row (11) excludes certain shares (See Instructions)
+					<br><br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked"></td></tr><tr><td width="8%" class="tableClassValign">13</td><td width="92%" class="tableClass">Percent of class represented by amount in Row (11)
+					<br><br><div class="text">20.4 % </div></td></tr><tr><td width="8%" class="tableClassValign">14</td><td width="92%" class="tableClass">Type of Reporting Person (See Instructions)
+					<br><br><div class="text">OO</div></td></tr></table><br><div style="display: flex;"><div style="font-size: 0.9em; font-weight: bold; margin-right: 5px;">
+					Comment for Type of Reporting Person:
+				</div><div class="largetext" style="text-align:justify">
+(1) Includes 300,000 of the Issuer's Class A ordinary shares, $0.0001 par value ("Class A Ordinary Shares") and 10,350,000 of the Issuer's Class B ordinary shares, $0.0001 par value ("Class B Ordinary Shares" and, together with the Class A Ordinary Shares, the "Ordinary Shares"), which are automatically convertible into Class A Ordinary Shares at the time of the Issuer's initial business combination on a one-for-one basis, or at any time prior to the Issuer's initial business combination, at the option of the holder, subject to adjustment as more fully described under the heading "Description of Securities--Founder Shares" in the Issuer's registration statement on Form S-1 (File No. 333-286799). The 300,000 Class A Ordinary Shares are included in units (each unit consisting of one Class A Ordinary Share and one-quarter of one warrant , each whole warrant exercisable into one Class A Ordinary Share 30 days following the consummation of the Issuer's initial business combination), acquired pursuant to a Private Placement Units Purchase Agreement by and between Churchill Sponsor X LLC  (the "Sponsor") and the Issuer. Michael Klein, the Chief Executive Officer and Director of the Issuer, is the controlling stockholder of M. Klein Associates, Inc., which is the managing member of the Sponsor, and accordingly Mr. Klein may be deemed to have beneficial ownership of securities reported herein. Mr. Klein disclaims any ownership of securities reported herein other than to the extent of any pecuniary interest he may have therein, directly or indirectly.</div></div></div><div class="form1"><table><tr><td class="center"><br><br><p><div align="center" style="font-size:1.2em;">
+									SCHEDULE 13D
+								</div></p></td></tr></table><table role="presentation" id="item1to7"><tr><td width="8%" class="tableClassValignNoBorder">Item 1.</td><td width="92%" class="tableClassNoBorder">Security and Issuer</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignCenter">(a)</td><td width="92%" class="tableClassNoBorder">Title of Class of Securities:
+							<br><br><div class="text">Class A Ordinary Shares, $0.0001 par value</div></td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignCenter">(b)</td><td width="92%" class="tableClassNoBorder">Name of Issuer:
+							<br><br><div class="text">Churchill Capital Corp X</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(c)</td><td width="92%" class="tableClassNoBorder">Address of Issuer's Principal Executive Offices:
+							<br><br><div class="text">640 Fifth Avenue, 14th Floor, New York, 
+				NEW YORK
+			, 10019.</div></td></tr><tr><td width="8%" class="tableClassValignNoBorder">Item 2.</td><td width="92%" class="tableClassNoBorder">Identity and Background</td></tr><tr></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignCenter">(a)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">(a) This statement is filed by: (i) the Sponsor, which is the holder of record of approximately 20.4% of the issued and outstanding Ordinary Shares (52,230,000) based on the number of Class A Ordinary Shares (46,650,000) and Class B Ordinary Shares (10,350,000) outstanding as of May 15, 2025, as reported by the Issuer in its Current Report on Form 8-K, filed by the Issuer with the Securities and Exchange Commission (the "SEC") on May 21, 2025; (ii) Michael Klein, the Chairman and Chief Executive Officer of the Issuer and the controlling person of M. Klein Associates, Inc.; and (iii) M. Klein Associates, Inc., the managing member of the Sponsor. All disclosures herein with respect to any Reporting Person are made only by such Reporting Person. Any disclosures herein with respect to persons other than the Reporting Persons are made on information and belief after making inquiry to the appropriate party.</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(b)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">The address of the principal business and principal office of each of the Sponsor, Michael Klein and M. Klein Associates, Inc. is 640 Fifth Avenue, 14th Floor, New York, NY 10019.</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(c)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">The Sponsor's principal business is to act as the Issuer's sponsor. Mr. Klein serves as the Chairman and Chief Executive Officer of the Issuer and the controlling person of M. Klein Associates, Inc. M. Klein Associates, Inc. serves as the managing member of the Sponsor.</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(d)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">None of the Reporting Persons has, during the last five years, been convicted in a criminal proceeding (excluding traffic violations or similar misdemeanors).</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(e)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">None of the Reporting Persons has, during the last five years, been a party to civil proceeding of a judicial administrative body of competent jurisdiction and, as a result of such proceeding, was, or is subject to, a judgment, decree or final order enjoining future violations of, or prohibiting or mandating activities subject to, federal or state securities laws or finding any violation with respect to such laws.</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(f)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">The Sponsor is a Delaware limited liability company. M. Klein Associates, Inc. is a New York corporation.  Mr. Klein is a citizen of the United States.</div></td></tr><tr><td width="8%" class="tableClassValignNoBorder">Item 3.</td><td width="92%" class="tableClassNoBorder">Source and Amount of Funds or Other Consideration</td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter"> </td><td width="92%" class="tableClassNoBorder"><div class="largetext">The aggregate purchase price for the Ordinary Shares currently beneficially owned by the Reporting Persons was $3,025,000. The source of these funds was the working capital of the Sponsor.</div></td></tr><tr><td width="8%" class="tableClassValignNoBorder">Item 4.</td><td width="92%" class="tableClassNoBorder">Purpose of Transaction</td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter"> </td><td width="92%" class="tableClassNoBorder"><div class="largetext">In connection with the organization of the Issuer, on February 15, 2024, 7,187,500 Class B Ordinary Shares (the "Founder Shares") were purchased by the Sponsor for the amount of $25,000, pursuant to a Securities Subscription Agreement, dated as of February 15, 2024, by and between the Sponsor and the Issuer (the "Founder Share Purchase Agreement"), as more fully described in Item 6 of this Schedule 13D which information is incorporated herein by reference. In April 2025 and May 2025, the Issuer effected share capitalizations, resulting in the Sponsor holding an aggregate of 10,350,000 founder shares. On May 15, 2025, simultaneously with the consummation of the Issuer's Initial Public Offering (the "IPO"), the Sponsor purchased 300,000 units ("Placement Units") of the Issuer at $10.00 per Placement Unit, pursuant to a Private Placement Units Purchase Agreement, dated as of May 13, 2025, by and between the Issuer and the Sponsor (the "Placement Units Purchase Agreement"), as more fully described in Item 6 of this Schedule 13D, which information is incorporated herein by reference. Each Placement Unit consists of one Class A Ordinary Share and one-quarter of a warrant, with each whole warrant exercisable into one Class A ordinary share at an exercise price of $11.50, subject to adjustment, commencing 30 days following the consummation of the Issuer's initial business combination (as described more fully in the Issuer's Final Prospectus dated May 13, 2025). The Ordinary Shares owned by the Reporting Persons have been acquired for investment purposes. The Reporting Persons may make further acquisitions of the Ordinary Shares from time to time and, subject to certain restrictions, may dispose of any or all of the Ordinary Shares held by the Reporting Persons at any time depending on an ongoing evaluation of the investment in such securities, prevailing market conditions, other investment opportunities and other factors. However, certain of such shares are subject to certain lock-up restrictions as further described in Item 6 below. Except for the foregoing, the Reporting Persons have no plans or proposals which relate to, or could result in, any of the matters referred to in paragraphs (a) and (c) through (j) of Item 4 of Schedule 13D. With respect to paragraph (b) of Item 4, the Issuer is a blank check company formed for the purpose of effecting a merger, amalgamation, share exchange, asset acquisition, share purchase, reorganization or similar business combination with one or more businesses. Under various agreements between the Issuer and the Reporting Persons as further described in Item 6 below, the Reporting Persons have agreed (A) to vote their shares in favor of any proposed business combination and (B) not to redeem any shares in connection with a shareholder vote (or tender offer) to approve (or in connection with) a proposed initial business combination. The Reporting Persons may, at any time and from time to time, review or reconsider their position, change their purpose or formulate plans or proposals with respect to the Issuer.</div></td></tr><tr><td width="8%" class="tableClassValignNoBorder">Item 5.</td><td width="92%" class="tableClassNoBorder">Interest in Securities of the Issuer</td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(a)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">The aggregate number and percentage of Ordinary Shares beneficially owned by the Reporting Persons (on the basis of a total of 52,230,000 Ordinary Shares, including 46,650,000 Class A ordinary shares  and 10,350,000 Class B Ordinary Shares outstanding as of May 15, 2025, as reported by the Issuer in its Current Report on Form 8-K, filed by the Issuer with the SEC on May 21, 2025) are as follows:
+Sponsor: Amount beneficially owned: 10,650,000 and Percentage: 20.4%;
+
+Michael Klein: Amount beneficially owned: 10,650,000 and Percentage: 20.4%.; and
+
+M. Klein Associates, Inc.: Amount beneficially owned: 10,650,000 and Percentage: 20.4%</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(b)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">The aggregate number and percentage of Ordinary Shares beneficially owned by the Reporting Persons (on the basis of a total of 52,230,000 Ordinary Shares, including 46,650,000 Class A ordinary shares 10,350,000 and Class B Ordinary Shares outstanding as of May 15, 2025, as reported by the Issuer in its Current Report on Form 8-K,filed by the Issuer with the SEC on May 21, 2025) are as follows:
+
+(x) Sponsor: Number of shares to which the Reporting Person has:
+
+i.	Sole power to vote or to direct the vote: 10,650,000
+
+ii.	Shared power to vote or to direct the vote: 0
+
+iii.	 Sole power to dispose or to direct the disposition of: 10,650,000
+
+iv.	 Shared power to dispose or to direct the disposition of: 0
+
+
+
+(y) Michael Klein: Number of shares to which the Reporting Person has:
+
+i.	Sole power to vote or to direct the vote: 0
+
+ii.	Shared power to vote or to direct the vote: 10,650,000
+
+iii.	 Sole power to dispose or to direct the disposition of: 0
+
+iv.	 Shared power to dispose or to direct the disposition of: 10,650,000
+
+(z) M. Klein Associates, Inc.: Number of shares to which the Reporting Person has:
+
+i.	Sole power to vote or to direct the vote: 0
+
+ii.	Shared power to vote or to direct the vote: 10,650,000
+
+iii.	Sole power to dispose or to direct the disposition of: 0
+
+iv.	 Shared power to dispose or to direct the disposition of: 10,650,000
+
+Mr. Klein is the controlling person of M. Klein Associates, Inc., the managing member of the Sponsor, and holds voting and investment discretion with respect to the Ordinary Shares held of record by the Sponsor. As such, Mr. Klein may be deemed to have beneficial ownership of the securities held of record by the Sponsor. Mr. Klein disclaims any beneficial ownership of the securities held of record by the Sponsor other than to the extent of any pecuniary interest he may have therein, directly or indirectly.</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(c)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">None of the Reporting Persons has effected any transactions of Ordinary Shares during the 60 days preceding the date of this report, except as described in Item 4 and Item 6 of this Schedule 13D, which information is incorporated herein by reference.</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(d)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">Not applicable.</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(e)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">Not applicable.</div></td></tr><tr><td width="8%" class="tableClassValignNoBorder">Item 6.</td><td width="92%" class="tableClassNoBorder">Contracts, Arrangements, Understandings or Relationships With Respect to Securities of the Issuer</td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter"> </td><td width="92%" class="tableClassNoBorder"><div class="largetext">Founder Share Purchase Agreement between the Issuer and Sponsor
+
+In connection with the organization of the Issuer, on February 15, 2024, 7,187,500 Class B Ordinary Shares (the "Founder Shares") were purchased by the Sponsor for the amount of $25,000, pursuant to a Securities Subscription Agreement, dated as of February 15, 2024, by and between the Sponsor and the Issuer (the "Founder Share Purchase Agreement").
+
+The description of the Founder Share Purchase Agreement is qualified in its entirety by reference to the full text of such agreement, a copy of which was filed as Exhibit 10.5 to the Registration Statement on Form S-1 initially filed by the Issuer with the SEC on April 28, 2025 (and is incorporated by reference herein as Exhibit 10.1). In March 2025 and April 2025, the Issuer effected share capitalizations resulting in the Sponsor holding an aggregate of 10,350,000 founder shares.
+
+ Placement Units Purchase Agreement between the Issuer and Sponsor
+
+On May 15, 2025, simultaneously with the consummation of the IPO, the Sponsor purchased 300,000 Placement Units pursuant to the Placement Units Purchase Agreement. The Placement Units and the securities underlying such Placement Units are subject to a lock up provision in the Placement Units Purchase Agreement, which provides that such securities shall not be transferable, saleable or assignable until 30 days after the consummation of the Issuer's initial business combination, subject to certain limited exceptions as described in the Insider Letter (as defined below).
+
+The description of the Placement Units Purchase Agreement is qualified in its entirety by reference to the full text of such agreement, a copy of which was filed by the Issuer as Exhibit 10.3 to the Current Report on Form 8-K filed by the Issuer with the SEC on May 16, 2025 (and is incorporated by reference herein as Exhibit 10.2).
+
+Insider Letter
+
+On May 15, 2025, in connection with the IPO, the Issuer, the Sponsor and Mr. Klein and certain other parties thereto entered into a letter agreement (the "Insider Letter"). Pursuant to the Insider Letter, the Sponsor and Mr. Klein agreed (A) to vote their Founder Shares, any Ordinary Shares underlying the Placement Units and any public shares in favor of any proposed business combination, except that it or he shall not vote any Class A Ordinary Shares that it or he purchased after the Issuer publicly announces its intention to engage in such proposed business combination for or against such proposed business combination, (B) not to propose an amendment to the Issuer's Amended and Restated Memorandum and Articles of Association (i) that would modify the substance or timing of the Issuer's obligation to redeem 100% of the public shares if the Issuer does not consummate a business combination within 24 months from the completion of the IPO  (or 27 months from the closing of the IPO if the Issuer has executed a letter of intent, agreement in principle or definitive agreement for an initial business combination within 24 months from the closing of the IPO; no redemption rights shall be offered to the Issuer's public shareholders in connection with any such extension from 24 months to 27 months if the Issuer has executed a letter of intent, agreement in principle or definitive agreement for an initial business combination within 24 months from the closing of the IPO), or (ii) with respect to any other provision relating to the rights of holders of Class A Ordinary Shares or pre-initial business combination activity, unless the Issuer provides the holders of public shares with the opportunity to redeem such shares upon approval of any such amendment at a per-share price, payable in cash, equal to the aggregate amount then on deposit in the Issuer's trust account set up in connection with the IPO (the "Trust Account") including interest earned on the funds held in the Trust Account and net of amounts withdrawn to fund the Issuer's working capital requirements, subject to an annual limit of $1,000,000, and to pay the Issuer's taxes, divided by the number of then outstanding public shares, (C) not to redeem any Ordinary Shares in connection with a shareholder vote to approve the Issuer's proposed initial business combination or a vote to amend the provisions of the Issuer's Amended and Restated Memorandum and Articles of Association relating to shareholders' rights or pre-business combination activity and (D) that the Founder Shares and any Ordinary Shares underlying the Placement Units shall not participate in any liquidating distribution upon winding up if a business combination is not consummated. The Sponsor also agreed that, in the event of the liquidation of the Trust Account of the Issuer, it will indemnify and hold harmless the Issuer against any and all loss, liability, claims, damage and expense whatsoever which the Issuer may become subject to as a result of any claim by any vendor or other person (other than the Company's independent public accountants) who is owed money by the Issuer for services rendered or products sold to or contracted for the Issuer, or by any target business with which the Issuer has entered into a letter of intent, confidentiality or other similar agreement or business combination agreement, but only to the extent necessary to ensure that such loss, liability, claim, damage or expense does not reduce the amount of funds in the Trust Account below (i) $10.00 per public share or (ii) such lesser amount per public share held in the Trust Account as of the date of the liquidation of the Trust Account, due to reductions in value of the trust assets, in each case net of permitted withdrawals and taxes payable; provided that such indemnity shall not apply if such vendor or prospective target business executes an agreement waiving any claims against the Trust Account.
+
+The description of the Insider Letter is qualified in its entirety by reference to the full text of such agreement, a copy of which was filed by the Issuer as Exhibit 10.4 to the Form 8-K filed by the Issuer with the SEC on May 16, 2025 (and is incorporated by reference herein as Exhibit 10.3).
+
+Registration Rights Agreement
+
+On May 15, 2025, in connection with the IPO, the Issuer, the Sponsor and other security holders entered into a registration rights agreement with the Issuer, pursuant to which the Sponsor was granted certain demand and "piggyback" registration rights, which will be subject to customary conditions and limitations.
+
+The summary of such registration rights agreement contained herein is qualified in its entirety by reference to the full text of such agreement, a copy of which was filed by the Issuer as Exhibit 10.2 to the Form 8-K filed by the Issuer with the SEC on May 16, 2025 (and is incorporated by reference herein as Exhibit 10.4).</div></td></tr><tr><td width="8%" class="tableClassValignNoBorder">Item 7.</td><td width="92%" class="tableClassNoBorder">Material to be Filed as Exhibits.</td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter"> </td><td width="92%" class="tableClassNoBorder"><div class="largetext">Exhibit 10.1 - Securities Subscription Agreement, dated as of February 15, 2024, by and between the Issuer and the Sponsor (incorporated by reference to Exhibit 10.5 to the Registration Statement on Form S-1 initially filed by the Issuer with the SEC on April 28, 2025).
+
+Exhibit 10.2 - Private Placement Units Purchase Agreement, dated as of May 13, 2025, by and between the Issuer and the Sponsor (incorporated by reference to Exhibit 10.3 to the Current Report on Form 8-K filed by the Issuer with the SEC on May 16, 2025).
+
+Exhibit - 10.3 Letter Agreement, dated as of May 13, 2025, by and among the Issuer, the Sponsor and the Issuer's officers and directors (incorporated by reference to Exhibit 10.4 to the Current Report on Form 8-K filed by the Issuer with the SEC on May 16, 2025).
+
+Exhibit - 10.4 Registration Rights Agreement, dated as of May 13, 2025, by and among the Issuer, the Sponsor and other security holders (incorporated by reference to Exhibit 10.2 to the Current Report on Form 8-K filed by the Issuer with the SEC on May 16, 2025).
+
+Exhibit - 99.1 Joint Filing Agreement, May 22, 2025, by and among the Reporting Persons.</div></td></tr></table><br></div><div class="form1"><table role="presentation" id="signatureInfo"><tr><td width="8%" class="tableClassValignNoBorder">    SIGNATURE</td><td width="92%" class="tableClassNoBorder"> </td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter"> </td><td width="92%" class="tableClassNoBorder"><div class="information" style="text-align:justify">
+						After reasonable inquiry and to the best of my knowledge and belief, I certify that the information set forth in this statement is true, complete and correct.
+						<br><br></div></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="100%" class="tableClassInnerNoBorderBlue"><div class="text">Churchill Sponsor X LLC</div></td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Signature:</td><td width="92%" class="tableClassNoBorderBlue signature">By: /s/ Jay Taragin</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Name/Title:</td><td width="92%" class="tableClassNoBorderBlue signature">By: M. Klein Associates, Inc., its managing member</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Date:</td><td width="92%" class="tableClassNoBorderBlue signature">05/21/2025</td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Signature:</td><td width="92%" class="tableClassNoBorderBlue signature">By: /s/ Jay Taragin</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Name/Title:</td><td width="92%" class="tableClassNoBorderBlue signature">Jay Taragin, Authorized Signatory</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Date:</td><td width="92%" class="tableClassNoBorderBlue signature">05/21/2025</td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="100%" class="tableClassInnerNoBorderBlue"><div class="text">Michael Klein</div></td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Signature:</td><td width="92%" class="tableClassNoBorderBlue signature">/s/ Michael Klein</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Name/Title:</td><td width="92%" class="tableClassNoBorderBlue signature">Michael Klein</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Date:</td><td width="92%" class="tableClassNoBorderBlue signature">05/21/2025</td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="100%" class="tableClassInnerNoBorderBlue"><div class="text">M. Klein Associates, Inc.</div></td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Signature:</td><td width="92%" class="tableClassNoBorderBlue signature">/s/ Jay Taragin</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Name/Title:</td><td width="92%" class="tableClassNoBorderBlue signature">Jay Taragin, Authorized Signatory</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Date:</td><td width="92%" class="tableClassNoBorderBlue signature">05/21/2025</td></tr></table></td></tr></table></div></div>
+
+<script type="text/javascript"  src="/KSRe0AD3p8BYYbpDUqIn/EQS3hbNfLJf4tLS3/XgdUa3RMAg/ZlE8/IkgkRic"></script></body></html>

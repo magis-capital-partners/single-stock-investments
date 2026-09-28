@@ -1,0 +1,418 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns:p="http://www.sec.gov/edgar/schedule13D" xmlns:p1="http://www.sec.gov/edgar/common"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><link rel="stylesheet" type="text/css" href="/css/SDR_print.css"><style type="text/css">
+					.fakeTextBox {
+					border-top: 2px solid #999;
+					border-right: 1px solid #ccc;
+					border-bottom: 1px solid #ccc;
+					border-left: 2px solid #999;
+					padding: 2px;
+					_width: 800px;
+					height: auto;
+					min-width: 200px;
+					min-height: 50px;
+					word-wrap: break-word;
+					font-size: 0.9em;
+					color: blue;
+					}
+					table.tableClass { border: solid black;
+					border-top-width: 1;
+					border-right-width: 1;
+					border-bottom-width: 1;
+					border-left-width: 1;
+					table-layout:fixed;
+					}
+					table.innerTableClass { border: solid black;
+					border-top-width: 0;
+					border-right-width: 0;
+					border-bottom-width: 0;
+					border-left-width: 0;
+					table-layout:fixed;
+					}
+					th.tableClassLeft { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					padding: 2px;
+					}
+					th.tableClassRight { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 0;
+					padding: 2px;
+					}
+					th.tableClass { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					padding: 2px;
+					}
+					td.tableClassLeft { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					font-size: 0.9em;
+					color: blue;
+					word-wrap: break-word;
+					}
+					td.tableClassRight { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 0;
+					font-size: 0.9em;
+					color: blue;
+					word-wrap: break-word;
+					}
+					td.tableClass { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					font-size: 0.9em;
+					font-weight:bold;
+					color: black;
+					word-wrap: break-word;
+					}
+					td.tableClassNoBorder { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 0px;
+					font-size: 0.9em;
+					font-weight:bold;
+					color: black;
+					word-wrap: break-word;
+					}
+
+					td.tableClassNoBorderBlue { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 0px;
+					font-size: 0.9em;
+					font-weight:bold;
+					color: blue;
+					word-wrap: break-word;
+					}
+
+					td.tableClassInnerNoBorderBlue { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 0px;
+					font-size: 1.4em;
+					font-weight:bold;
+					color: blue;
+					word-wrap: break-word;
+					}
+
+					td.tableClassNoBorderAlignLeft { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 0px;
+					font-size: 0.9em;
+					font-weight:bold;
+					text-align: left;
+					color: black;
+					word-wrap: break-word;
+					}
+
+					td.signature {
+					padding: 4px 8px;
+					}
+
+					td.tableClassInner { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					font-size: 1em;
+					font-weight:bold;
+					color: black;
+					word-wrap: break-word;
+					}
+
+					td.tableClassValign { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					font-size: 0.9em;
+					font-weight:bold;
+					color: black;
+					vertical-align: middle;
+					text-align: center;
+					word-wrap: break-word;
+					}
+
+					td.tableClassValignNoBorder { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 0px;
+					font-size: 0.9em;
+					font-weight:bold;
+					color: black;
+					vertical-align: middle;
+					text-align: center;
+					word-wrap: break-word;
+					}
+
+					td.tableClassValignInner { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					font-size: 1em;
+					font-weight:bold;
+					color: black;
+					vertical-align: middle;
+					text-align: center;
+					word-wrap: break-word;
+					}
+
+					td.innerTableClassRightValign { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 0;
+					font-size: 1em;
+					font-weight:bold;
+					color: black;
+					vertical-align: middle;
+					text-align: center;
+					word-wrap: break-word;
+					}
+
+					td.innerTableClassRightValignBottomLess { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 0px;
+					border-left-width: 0;
+					font-size: 1em;
+					font-weight:bold;
+					color: black;
+					vertical-align: middle;
+					text-align: center;
+					word-wrap: break-word;
+					}
+
+					td.tableClassInnerLeft { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					font-size: 1em;
+					font-weight:bold;
+					color: black;
+					word-wrap: break-word;
+					}
+
+					td.tableClassInnerLeftBottomLess { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 1px;
+					font-size: 1em;
+					font-weight:bold;
+					color: black;
+					word-wrap: break-word;
+					}
+
+					td.tableClassNoBorderAlignCenter { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 0px;
+					font-size: 0.9em;
+					font-weight:bold;
+					color: black;
+					text-align: center;
+					word-wrap: break-word;
+					}
+
+					tr.tableClass { border: solid black;
+					border-top-width: 1px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					}
+					tr.tableClassWithBg { border: solid black;
+					border-top-width: 0;
+					border-right-width: 1;
+					border-bottom-width: 1;
+					border-left-width: 0;
+					background-color: #e0e0ff
+					}
+
+					tr.tableClassWithBgBlack { border: solid black;
+					border-top-width: 0;
+					border-right-width: 1;
+					border-bottom-width: 1;
+					border-left-width: 0;
+					background-color: #D3D3D3
+					}
+
+					hr.header {
+					position: relative;
+					top: 20px;
+					border: none;
+					height: 6px;
+					background: black;
+					margin-bottom: 10px;
+					}
+
+					hr.separatorThin {
+					position: relative;
+					top: 2px;
+					border: none;
+					height: 2px;
+					background: black;
+					margin-bottom: 2px;
+					}
+
+					hr.headerThin {
+					position: relative;
+					top: 10px;
+					border: none;
+					height: 2px;
+					background: black;
+					margin-bottom: 10px;
+					}
+
+					hr.separator {
+					position: relative;
+					top: 20px;
+					border: none;
+					height: 4px;
+					background: black;
+					margin-bottom: 5px;
+					}
+
+					div.text {
+					background-color: #ffffff;
+					color: blue;
+					font-size: 1em;
+					font-weight:normal;
+					text-align:justify;
+					}
+
+
+					div.information {
+					background-color: #ffffff;
+					color: black;
+					font-size: 1em;
+					font-weight:normal;
+					text-align:justify;
+					}
+
+					#scheader {
+					font-size: 0.9em;
+					border: 0px solid #404040;
+					border-spacing: 2px;
+					}
+
+					div.largetext {
+					background-color: #ffffff;
+					color: blue;
+					font-size: 1em;
+					font-weight:normal;
+					text-align:justify;
+					white-space: pre-wrap;
+					word-break: normal;
+					}
+
+				</style></head><body lang="en-US" text="#000000" bgcolor="#ffffff"><hr class="header"><br><hr class="headerThin"><div class="contentwrapper"><table role="presentation" id="scheader"><tr><td class="tableClassNoBorderAlignCenter" style="font-size:2em;">
+						SECURITIES AND EXCHANGE COMMISSION
+						<br>
+						Washington, D.C. 20549
+					</td></tr><tr><td class="tableClassNoBorderAlignCenter"><br><br><div style="font-size:1.5em;">
+									SCHEDULE 13D
+								</div><br><div style="font-size:1.2em;">
+							Under the Securities Exchange Act of 1934
+						</div><br><div class="information" style="text-align:center; font-weight:bold;">
+									(Amendment No. <span style="color:blue;">10</span>)
+								</div><br><br></td></tr><tr><td class="center"><div class="information" style="text-align:center; font-weight:bold; color:blue;">Liberty Broadband Corporation</div><div class="information" style="text-align:center; font-weight:bold;"><hr class="separatorThin">(Name of Issuer)</div><br><br></td></tr><tr><td class="center"><div class="information" style="text-align:center; font-weight:bold; color:blue;">Series B Common Stock, par value $0.01 per share</div><div class="information" style="text-align:center; font-weight:bold;"><hr class="separatorThin">(Title of Class of Securities)</div><br><br></td></tr><tr><td class="center"><div class="information" style="text-align:center; font-weight:bold; color:blue;">530307206</div><div class="information" style="text-align:center; font-weight:bold;"><hr class="separatorThin">(CUSIP Number)</div><br><br></td></tr><tr><td class="center"><div class="information" style="text-align:center; font-weight:bold; color:blue;">John C. Malone<br>c/o Liberty Media Corporation,
+								12300 Liberty Blvd.<br>Englewood,
+								CO,
+								80112<br>(720) 875-5400</div><div class="information" style="text-align:center; font-weight:bold;"><hr class="separatorThin">(Name, Address and Telephone Number of Person Authorized to
+									Receive Notices and Communications)</div></td></tr><tr><td class="center"><div class="information" style="text-align:center; font-weight:bold; color:blue;">07/14/2025</div><div class="information" style="text-align:center; font-weight:bold;"><hr class="separatorThin">(Date of Event Which Requires Filing of This Statement)</div></td></tr></table><br><br><div class="information" style="text-align:justify">
+				If the filing person has previously filed a statement on Schedule 13G to report the acquisition that is the subject of this Schedule 13D, and is filing this schedule because of §§ 240.13d-1(e), 240.13d-1(f) or 240.13d-1(g), check the following box.
+				<img src="/Images/box-unchecked.jpg" alt="Checkbox not checked"></div><br><div class="information" style="text-align:justify">
+				The information required on the remainder of this cover page shall not be deemed to be “filed” for the purpose of Section 18 of the
+				Securities Exchange Act of 1934 (“Act”) or otherwise subject to the liabilities of that section of the Act but shall be subject to all other
+				provisions of the Act (however, see the Notes).
+			</div></div><hr class="headerThin"><hr class="header"><br><br>
+  <div class="content"><div class="form1"></div></div>
+  <div class="content"><div class="form1"><table><tr><td class="center"><br><br><p><div align="center" style="font-size:1.2em;">
+									SCHEDULE 13D
+								</div></p></td></tr></table><table role="presentation" class="tableClass" id="cusipNumber"><tr class="tableClass"><td width="25%" style="font-weight:bold;">CUSIP No.</td><td width="75%"><div style="font-size:.9em; color:#000000">530307206</div></td></tr></table><br><br><table role="presentation" class="tableClass" id="reportingPersonDetails"><tr class="tableClass"><td width="8%" class="tableClassValign">1</td><td width="92%" class="tableClass">
+					Name of reporting person
+					<br><br><div class="text">John C. Malone</div></td></tr><tr><td width="8%" class="tableClassValign">2</td><td width="92%" class="tableClass">Check the appropriate box if a member of a Group (See Instructions)
+					<br><br><div class="text"><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked">  (a)
+						<br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked">  (b)
+					</div></td></tr><tr class="tableClassWithBgBlack"><td width="8%" class="tableClassValign">3</td><td width="92%" class="tableClass">SEC use only</td></tr><tr><td width="8%" class="tableClassValign">4</td><td width="92%" class="tableClass">
+					Source of funds (See Instructions)
+					<br><br><div class="text">OO</div></td></tr><tr><td width="8%" class="tableClassValign">5</td><td width="92%" class="tableClass">
+					Check if disclosure of legal proceedings is required pursuant to Items 2(d) or 2(e)
+					<br><br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked"></td></tr><tr><td width="8%" class="tableClassValign">6</td><td width="92%" class="tableClass">Citizenship or place of organization
+					<br><br><div class="text">
+				UNITED STATES
+			</div></td></tr><tr><td width="8%" class="tableClassValign">Number of Shares Beneficially Owned by Each Reporting Person With:</td><td width="92%" class="tableClass"><table class="innerTableClass"><tr><td width="8%" class="innerTableClassRightValign">7</td><td width="92%" class="tableClassInnerLeft">Sole Voting Power
+								<br><br><div class="text">238,474.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">8</td><td width="92%" class="tableClassInnerLeft">Shared Voting Power
+								<br><br><div class="text">27,171.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">9</td><td width="92%" class="tableClassInnerLeft">Sole Dispositive Power
+								<br><br><div class="text">238,474.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValignBottomLess">10</td><td width="92%" class="tableClassInnerLeftBottomLess">Shared Dispositive Power
+								<br><br><div class="text">27,171.00</div></td></tr></table></td></tr><tr><td width="8%" class="tableClassValign">11</td><td width="92%" class="tableClass">Aggregate amount beneficially owned by each reporting person
+					<br><br><div class="text">265,645.00</div></td></tr><tr><td width="8%" class="tableClassValign">12</td><td width="92%" class="tableClass">Check if the aggregate amount in Row (11) excludes certain shares (See Instructions)
+					<br><br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked"></td></tr><tr><td width="8%" class="tableClassValign">13</td><td width="92%" class="tableClass">Percent of class represented by amount in Row (11)
+					<br><br><div class="text">68.6 % </div></td></tr><tr><td width="8%" class="tableClassValign">14</td><td width="92%" class="tableClass">Type of Reporting Person (See Instructions)
+					<br><br><div class="text">IN</div></td></tr></table><br><div style="display: flex;"><div style="font-size: 0.9em; font-weight: bold; margin-right: 5px;">
+					Comment for Type of Reporting Person:
+				</div><div class="largetext" style="text-align:justify">Note to Rows 7, 9 and 11:
+
+(1)  Includes 57,641 shares of Liberty Broadband Corporation's, a Delaware corporation (the "Issuer"), Series B common stock, $0.01 par value per share ("Series B Common Stock"), held in a revocable trust (the "LM Revocable Trust") with respect to which John C. Malone ("Mr. Malone") and Mr. Malone's wife, Mrs. Leslie Malone ("Mrs. Malone"), are trustees. Mrs. Malone has the right to revoke such trust at any time. Mr. Malone disclaims beneficial ownership of the shares held by the LM Revocable Trust.
+
+(2)  Includes 122,649 shares of Series B Common Stock held by a trust (the "CRT") with respect to which Mr. Malone is the sole trustee and, with his wife, retains a unitrust interest in the CRT.
+
+Note to Rows 8, 10 and 11:
+
+Includes 27,171 shares of Series B Common Stock held by two trusts (the "Trusts") which are managed by an independent trustee (and, in the case of one such Trust, also co-managed by one of Mr. Malone's adult children) and the beneficiaries of which are Mr. Malone's adult children. Mr. Malone has no pecuniary interest in the Trusts, but he retains the right to substitute assets held by the Trusts. Mr. Malone disclaims beneficial ownership of the shares held by the Trusts.
+
+Note to Rows 7, 8, 9, 10 and 11:
+
+The Exchange Agreement, the Exchange Side Letter and the Voting Agreement (each as defined and described in Item 6) contain certain provisions relating to the voting of the Series A common stock, $0.01 par value per share ("Series A Common Stock") of the Issuer and Series B Common Stock and transfer of the Series B Common Stock beneficially owned by Mr. Malone.  See Item 6.
+
+Note to Row 13:
+
+Calculated based on the 386,988 shares of Series B Common Stock outstanding as of July 14, 2025, calculated in accordance with Rule 13d-3 of the Securities Exchange Act of 1934 and based (i) on the 2,004,028 shares of Series B Common Stock outstanding as of June 30, 2025, as reported in the Prospectus filed by GCI Liberty, Inc. under its Registration Statement on Form S-1, filed with the Securities and Exchange Commission on July 2, 2025 (the "Prospectus"), and adjusted for (ii) the 1,617,040 shares of Series B Common Stock delivered to the Issuer in the JCM Exchange (as defined in Item 6).  Furthermore, 18,254,690 shares of Series A Common Stock were outstanding as of June 30, 2025, as reported in the Prospectus, and 7,183,812 shares of the Issuer's Series A Cumulative Redeemable Preferred Stock, par value $0.01 per share (the "Preferred Stock"), were outstanding as of April 30, 2025, as reported in the Issuer's Quarterly Report on Form 10-Q for the fiscal quarter ended March 31, 2025, filed with the Securities and Exchange Commission on May 7, 2025. Each share of Series B Common Stock is convertible, at the option of the holder, into one share of Series A Common Stock. Shares of Series A Common Stock and Preferred Stock are not convertible at the option of the holder. The holders of Series A Common Stock, Series B Common Stock and Preferred Stock generally vote as a single class with respect to all matters voted on by the stockholders of the Issuer. Each share of Series A Common Stock is entitled to one vote, each share of Series B Common Stock is entitled to ten votes, and each share of Preferred Stock is entitled to 1/3 of a vote, in each case, on matters presented to stockholders of the Issuer for their approval. Accordingly, after giving effect to the 1,241,171 shares of Series A Common Stock owned by Mr. Malone, Mr. Malone may be deemed to beneficially own voting equity securities representing approximately 15.9% of the voting power with respect to the general election of directors of the Issuer, based on the outstanding shares noted above. See Item 5.</div></div></div><div class="form1"><table><tr><td class="center"><br><br><p><div align="center" style="font-size:1.2em;">
+									SCHEDULE 13D
+								</div></p></td></tr></table><table role="presentation" id="item1to7"><tr><td width="8%" class="tableClassValignNoBorder">Item 1.</td><td width="92%" class="tableClassNoBorder">Security and Issuer</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignCenter">(a)</td><td width="92%" class="tableClassNoBorder">Title of Class of Securities:
+							<br><br><div class="text">Series B Common Stock, par value $0.01 per share</div></td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignCenter">(b)</td><td width="92%" class="tableClassNoBorder">Name of Issuer:
+							<br><br><div class="text">Liberty Broadband Corporation</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(c)</td><td width="92%" class="tableClassNoBorder">Address of Issuer's Principal Executive Offices:
+							<br><br><div class="text">12300 Liberty Blvd., Englewood, 
+				COLORADO
+			, 80112.</div></td></tr><tr><td colspan="3"><div style="display: flex;"><div style="font-size: 0.9em; font-weight: bold; margin-right: 5px;">
+									Item 1 Comment:
+								</div><div class="largetext" style="text-align:justify">This statement on Schedule 13D relates to the Series B common stock, par value $0.01 per share (the "Series B common stock"), of Liberty Broadband Corporation, a Delaware corporation (the "Issuer" or "Liberty Broadband"). The statement on Schedule 13D originally filed with the Securities and Exchange Commission (the "SEC") by the Reporting Person, Mr. John C. Malone ("Mr. Malone" or the "Reporting Person"), on January 29, 2015, as amended by Amendment No. 1 to the Schedule 13D filed with the SEC on December 17, 2018, Amendment No. 2 to the Schedule 13D filed with the SEC on June 29, 2020, Amendment No. 3 to the Schedule 13D filed with the SEC on August 7, 2020, Amendment No. 4 to the Schedule 13D filed with the SEC on November 30, 2020, Amendment No. 5 to the Schedule 13D filed with the SEC on June 15, 2022, Amendment No. 6 to the Schedule 13D filed with the SEC on July 19, 2022, Amendment No. 7 to the Schedule 13D filed with the SEC on January 25, 2023, Amendment No. 8 to the Schedule 13D filed with the SEC on September 23, 2024 and Amendment No. 9 to the Schedule 13D filed with the SEC on November 14, 2024 (collectively, the "Schedule 13D"), is hereby amended and supplemented to include the information set forth herein.
+
+This amended statement on Schedule 13D/A (this "Amendment") constitutes Amendment No. 10 to the Schedule 13D (the Schedule 13D, as amended by the Amendment, collectively, the "Statement"). Capitalized terms not defined herein have the meanings given to such terms in the Schedule 13D. Except as set forth herein, the Schedule 13D is unmodified.</div></div></td></tr><tr><td width="8%" class="tableClassValignNoBorder">Item 4.</td><td width="92%" class="tableClassNoBorder">Purpose of Transaction</td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter"> </td><td width="92%" class="tableClassNoBorder"><div class="largetext">The information contained in Item 4 of the Schedule 13D is hereby amended to delete last three paragraphs thereof and supplemented to include the following information:
+
+Mr. Malone holds and has acquired the shares of Common Stock described herein for investment purposes.
+
+Other than as set forth in this Statement, Mr. Malone does not have any present plans or proposals which relate to or would result in: (i) any acquisition by any person of additional securities of the Issuer, or any disposition of securities of the Issuer; (ii) any extraordinary corporate transaction, such as a merger, reorganization or liquidation, involving the Issuer or any of its subsidiaries; (iii) any sale or transfer of a material amount of assets of the Issuer or any of its subsidiaries; (iv) any change in the board or management of the Issuer, including any plans or proposals to change the number or term of directors or to fill any vacancies on the board; (v) any material change in the present capitalization or dividend policy of the Issuer; (vi) any other material change in the Issuer's business or corporate structure; (vii) any change in the Issuer's charter or bylaws or other actions which may impede the acquisition of control of the Issuer by any person; (viii) any delisting from a national securities exchange or any loss of authorization for quotation in an inter-dealer quotation system of a registered national securities association of a class of securities of the Issuer; (ix) any termination of registration pursuant to Section 12(g)(4) of the Securities Exchange Act of 1934, as amended (the "Exchange Act"), of a class of equity securities of the Issuer; or (x) any action similar to any of those enumerated above.
+
+Mr. Malone is Chairman of the Board of Directors of the Issuer (the "Board"). As a result, Mr. Malone regularly has discussions with members of Issuer management, board members of the Issuer, and stockholders of the Issuer, which discussions from time to time relate to management, governance and board composition, the Issuer's operations and financial condition or strategic transactions.
+
+Notwithstanding the foregoing, Mr. Malone may determine to change his intentions with respect to the Issuer at any time in the future and may, for example, elect (i) to acquire additional shares of LBC Capital Stock or (ii) to dispose of all or a portion of his holdings of shares of Common Stock, as the case may be, in each case subject to the terms of the Voting Agreement, the Exchange Agreement or the Exchange Side Letter, as applicable. In reaching any determination as to his future course of action, Mr. Malone will take into consideration various factors, such as the Issuer's business and prospects, other developments concerning the Issuer, other business opportunities available to Mr. Malone, tax and estate planning considerations, liquidity needs and general economic and stock market conditions, including, but not limited to, the market price of the LBC Capital Stock.</div></td></tr><tr><td width="8%" class="tableClassValignNoBorder">Item 5.</td><td width="92%" class="tableClassNoBorder">Interest in Securities of the Issuer</td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(a)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">Mr. Malone beneficially owns 265,645 shares of Series B Common Stock (including (i) 57,641 shares held in a revocable trust with respect to which Mr. Malone and his wife are trustees (the "LM Revocable Trust"), as to which shares Mr. Malone disclaims beneficial ownership, (ii) 122,649 shares held by a trust (the "CRT") with respect to which Mr. Malone is the sole trustee and, with his wife, retains a unitrust interest in the CRT, and (iii) 27,171 shares held by two trusts (the "Trusts") which are managed by an independent trustee (and, in the case of one such Trust, also co-managed by one of Mr. Malone's adult children) and the beneficiaries of which are Mr. Malone's adult children, as to which shares Mr. Malone has no pecuniary interest and disclaims beneficial ownership), which represent approximately 68.64% of the outstanding shares of Series B Common Stock.
+
+The foregoing percentage was calculated based on the 386,988 shares of Series B Common Stock outstanding as of July 14, 2025, calculated in accordance with Rule 13d-3 of the Exchange Act and based (i) on the 2,004,028 shares of Series B Common Stock outstanding as of June 30, 2025, as reported in the Prospectus filed by GCI Liberty, Inc. under its Registration Statement on Form S-1, filed with the SEC on July 2, 2025 (the "Prospectus"), and adjusted for (ii) the 1,617,040 shares of Series B Common Stock delivered to the Issuer in the JCM Exchange (as defined in Item 6).  Furthermore, 18,254,690 shares of Series A Common Stock were outstanding as of June 30, 2025, as reported in the Prospectus, and 7,183,812 shares of the Issuer's Series A Cumulative Redeemable Preferred Stock, par value $0.01 per share (the "Preferred Stock"), were outstanding as of April 30, 2025, as reported in the Issuer's Quarterly Report on Form 10-Q for the fiscal quarter ended March 31, 2025, filed with the SEC on May 7, 2025. Each share of Series A Common Stock is entitled to one vote, each share of Series B Common Stock is entitled to ten votes, and each share of Preferred Stock is entitled to one-third of a vote, in each case, on all matters presented to stockholders of the Issuer for their approval. Accordingly, after giving effect to the 1,241,171 shares of Series A Common Stock owned by the Reporting Person, the Reporting Person may be deemed to beneficially own voting equity securities representing 15.9% of the voting power with respect to the general election of directors of the Issuer.</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(b)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">Mr. Malone, and, to his knowledge, the LM Revocable Trust and the CRT each have the sole power to vote and to dispose of, or to direct the voting or disposition of, their respective shares of Common Stock.  To Mr. Malone's knowledge, the Trusts have the sole power to vote and to dispose of, or to direct the voting or disposition of, the shares of Series B Common Stock held by the Trusts, except that Mr. Malone is permitted under the terms of the Trusts to substitute assets in the Trusts and thereby may acquire any shares held in the Trusts at any time.  The foregoing is subject to the terms of the Exchange Agreement, the Exchange Side Letter and the Voting Agreement.  See Item 6.</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(c)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">Other than as described in this Amendment, none of Mr. Malone nor, to his knowledge, the LM Revocable Trust, the CRT or the Trusts, have effected any transactions with respect to the Series B Common Stock during the 60 days preceding the date hereof.</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(d)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">Not applicable.</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(e)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">Not applicable.</div></td></tr><tr><td width="8%" class="tableClassValignNoBorder">Item 6.</td><td width="92%" class="tableClassNoBorder">Contracts, Arrangements, Understandings or Relationships With Respect to Securities of the Issuer</td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter"> </td><td width="92%" class="tableClassNoBorder"><div class="largetext">The information contained in Item 6 of the Schedule 13D is hereby supplemented to include the following information:
+
+On July 14, 2025, pursuant to the terms of that certain Exchange Side Letter, dated as of November 12, 2024, by and among the Issuer, Mr. Malone and certain affiliated trusts (collectively, the "Malone exchange group"), 1,617,040 shares of Series B common stock were exchanged by the Malone exchange group for 1,617,040 shares of the Issuer's Series C common stock, par value $0.01 per share (the "JCM Exchange").</div></td></tr></table><br></div><div class="form1"><table role="presentation" id="signatureInfo"><tr><td width="8%" class="tableClassValignNoBorder">    SIGNATURE</td><td width="92%" class="tableClassNoBorder"> </td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter"> </td><td width="92%" class="tableClassNoBorder"><div class="information" style="text-align:justify">
+						After reasonable inquiry and to the best of my knowledge and belief, I certify that the information set forth in this statement is true, complete and correct.
+						<br><br></div></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="100%" class="tableClassInnerNoBorderBlue"><div class="text">John C. Malone</div></td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Signature:</td><td width="92%" class="tableClassNoBorderBlue signature">/s/ John C. Malone</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Name/Title:</td><td width="92%" class="tableClassNoBorderBlue signature">John C. Malone</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Date:</td><td width="92%" class="tableClassNoBorderBlue signature">07/16/2025</td></tr></table></td></tr></table></div></div>
+<script type="text/javascript"  src="/KSRe0AD3p8BYYbpDUqIn/EQS3hbNfLJf4tLS3/XgdUa3RMAg/ZlE8/IkgkRic"></script></body></html>

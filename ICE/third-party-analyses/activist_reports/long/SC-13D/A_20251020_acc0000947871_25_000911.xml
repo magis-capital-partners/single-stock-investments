@@ -1,0 +1,506 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns:p="http://www.sec.gov/edgar/schedule13D" xmlns:p1="http://www.sec.gov/edgar/common"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><link rel="stylesheet" type="text/css" href="/css/SDR_print.css"><style type="text/css">
+					.fakeTextBox {
+					border-top: 2px solid #999;
+					border-right: 1px solid #ccc;
+					border-bottom: 1px solid #ccc;
+					border-left: 2px solid #999;
+					padding: 2px;
+					_width: 800px;
+					height: auto;
+					min-width: 200px;
+					min-height: 50px;
+					word-wrap: break-word;
+					font-size: 0.9em;
+					color: blue;
+					}
+					table.tableClass { border: solid black;
+					border-top-width: 1;
+					border-right-width: 1;
+					border-bottom-width: 1;
+					border-left-width: 1;
+					table-layout:fixed;
+					}
+					table.innerTableClass { border: solid black;
+					border-top-width: 0;
+					border-right-width: 0;
+					border-bottom-width: 0;
+					border-left-width: 0;
+					table-layout:fixed;
+					}
+					th.tableClassLeft { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					padding: 2px;
+					}
+					th.tableClassRight { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 0;
+					padding: 2px;
+					}
+					th.tableClass { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					padding: 2px;
+					}
+					td.tableClassLeft { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					font-size: 0.9em;
+					color: blue;
+					word-wrap: break-word;
+					}
+					td.tableClassRight { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 0;
+					font-size: 0.9em;
+					color: blue;
+					word-wrap: break-word;
+					}
+					td.tableClass { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					font-size: 0.9em;
+					font-weight:bold;
+					color: black;
+					word-wrap: break-word;
+					}
+					td.tableClassNoBorder { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 0px;
+					font-size: 0.9em;
+					font-weight:bold;
+					color: black;
+					word-wrap: break-word;
+					}
+
+					td.tableClassNoBorderBlue { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 0px;
+					font-size: 0.9em;
+					font-weight:bold;
+					color: blue;
+					word-wrap: break-word;
+					}
+
+					td.tableClassInnerNoBorderBlue { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 0px;
+					font-size: 1.4em;
+					font-weight:bold;
+					color: blue;
+					word-wrap: break-word;
+					}
+
+					td.tableClassNoBorderAlignLeft { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 0px;
+					font-size: 0.9em;
+					font-weight:bold;
+					text-align: left;
+					color: black;
+					word-wrap: break-word;
+					}
+
+					td.signature {
+					padding: 4px 8px;
+					}
+
+					td.tableClassInner { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					font-size: 1em;
+					font-weight:bold;
+					color: black;
+					word-wrap: break-word;
+					}
+
+					td.tableClassValign { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					font-size: 0.9em;
+					font-weight:bold;
+					color: black;
+					vertical-align: middle;
+					text-align: center;
+					word-wrap: break-word;
+					}
+
+					td.tableClassValignNoBorder { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 0px;
+					font-size: 0.9em;
+					font-weight:bold;
+					color: black;
+					vertical-align: middle;
+					text-align: center;
+					word-wrap: break-word;
+					}
+
+					td.tableClassValignInner { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					font-size: 1em;
+					font-weight:bold;
+					color: black;
+					vertical-align: middle;
+					text-align: center;
+					word-wrap: break-word;
+					}
+
+					td.innerTableClassRightValign { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 0;
+					font-size: 1em;
+					font-weight:bold;
+					color: black;
+					vertical-align: middle;
+					text-align: center;
+					word-wrap: break-word;
+					}
+
+					td.innerTableClassRightValignBottomLess { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 0px;
+					border-left-width: 0;
+					font-size: 1em;
+					font-weight:bold;
+					color: black;
+					vertical-align: middle;
+					text-align: center;
+					word-wrap: break-word;
+					}
+
+					td.tableClassInnerLeft { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					font-size: 1em;
+					font-weight:bold;
+					color: black;
+					word-wrap: break-word;
+					}
+
+					td.tableClassInnerLeftBottomLess { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 1px;
+					font-size: 1em;
+					font-weight:bold;
+					color: black;
+					word-wrap: break-word;
+					}
+
+					td.tableClassNoBorderAlignCenter { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 0px;
+					font-size: 0.9em;
+					font-weight:bold;
+					color: black;
+					text-align: center;
+					word-wrap: break-word;
+					}
+
+					tr.tableClass { border: solid black;
+					border-top-width: 1px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					}
+					tr.tableClassWithBg { border: solid black;
+					border-top-width: 0;
+					border-right-width: 1;
+					border-bottom-width: 1;
+					border-left-width: 0;
+					background-color: #e0e0ff
+					}
+
+					tr.tableClassWithBgBlack { border: solid black;
+					border-top-width: 0;
+					border-right-width: 1;
+					border-bottom-width: 1;
+					border-left-width: 0;
+					background-color: #D3D3D3
+					}
+
+					hr.header {
+					position: relative;
+					top: 20px;
+					border: none;
+					height: 6px;
+					background: black;
+					margin-bottom: 10px;
+					}
+
+					hr.separatorThin {
+					position: relative;
+					top: 2px;
+					border: none;
+					height: 2px;
+					background: black;
+					margin-bottom: 2px;
+					}
+
+					hr.headerThin {
+					position: relative;
+					top: 10px;
+					border: none;
+					height: 2px;
+					background: black;
+					margin-bottom: 10px;
+					}
+
+					hr.separator {
+					position: relative;
+					top: 20px;
+					border: none;
+					height: 4px;
+					background: black;
+					margin-bottom: 5px;
+					}
+
+					div.text {
+					background-color: #ffffff;
+					color: blue;
+					font-size: 1em;
+					font-weight:normal;
+					text-align:justify;
+					}
+
+
+					div.information {
+					background-color: #ffffff;
+					color: black;
+					font-size: 1em;
+					font-weight:normal;
+					text-align:justify;
+					}
+
+					#scheader {
+					font-size: 0.9em;
+					border: 0px solid #404040;
+					border-spacing: 2px;
+					}
+
+					div.largetext {
+					background-color: #ffffff;
+					color: blue;
+					font-size: 1em;
+					font-weight:normal;
+					text-align:justify;
+					white-space: pre-wrap;
+					word-break: normal;
+					}
+
+				</style></head><body lang="en-US" text="#000000" bgcolor="#ffffff"><hr class="header"><br><hr class="headerThin"><div class="contentwrapper"><table role="presentation" id="scheader"><tr><td class="tableClassNoBorderAlignCenter" style="font-size:2em;">
+						SECURITIES AND EXCHANGE COMMISSION
+						<br>
+						Washington, D.C. 20549
+					</td></tr><tr><td class="tableClassNoBorderAlignCenter"><br><br><div style="font-size:1.5em;">
+									SCHEDULE 13D
+								</div><br><div style="font-size:1.2em;">
+							Under the Securities Exchange Act of 1934
+						</div><br><div class="information" style="text-align:center; font-weight:bold;">
+									(Amendment No. <span style="color:blue;">9</span>)
+								</div><br><br></td></tr><tr><td class="center"><div class="information" style="text-align:center; font-weight:bold; color:blue;">Bakkt Holdings, Inc.</div><div class="information" style="text-align:center; font-weight:bold;"><hr class="separatorThin">(Name of Issuer)</div><br><br></td></tr><tr><td class="center"><div class="information" style="text-align:center; font-weight:bold; color:blue;">Class A Common Stock</div><div class="information" style="text-align:center; font-weight:bold;"><hr class="separatorThin">(Title of Class of Securities)</div><br><br></td></tr><tr><td class="center"><div class="information" style="text-align:center; font-weight:bold; color:blue;">05759B107</div><div class="information" style="text-align:center; font-weight:bold;"><hr class="separatorThin">(CUSIP Number)</div><br><br></td></tr><tr><td class="center"><div class="information" style="text-align:center; font-weight:bold; color:blue;">Andrew J. Surdykowski<br>Intercontinental Exchange, Inc.,
+								5660 New Northside Drive<br>Atlanta,
+								GA,
+								30328<br>770-857-4700</div><br><br><div class="information" style="text-align:center; font-weight:bold; color:blue;">Rory O'Halloran &amp; Cody Wright<br>Allen Overy Shearman Sterling US LLP,,
+								599 Lexington Avenue<br>New York,
+								NY,
+								10022<br>212-848-4000</div><div class="information" style="text-align:center; font-weight:bold;"><hr class="separatorThin">(Name, Address and Telephone Number of Person Authorized to
+									Receive Notices and Communications)</div></td></tr><tr><td class="center"><div class="information" style="text-align:center; font-weight:bold; color:blue;">10/16/2025</div><div class="information" style="text-align:center; font-weight:bold;"><hr class="separatorThin">(Date of Event Which Requires Filing of This Statement)</div></td></tr></table><br><br><div class="information" style="text-align:justify">
+				If the filing person has previously filed a statement on Schedule 13G to report the acquisition that is the subject of this Schedule 13D, and is filing this schedule because of §§ 240.13d-1(e), 240.13d-1(f) or 240.13d-1(g), check the following box.
+				<img src="/Images/box-unchecked.jpg" alt="Checkbox not checked"></div><br><div class="information" style="text-align:justify">
+				The information required on the remainder of this cover page shall not be deemed to be “filed” for the purpose of Section 18 of the
+				Securities Exchange Act of 1934 (“Act”) or otherwise subject to the liabilities of that section of the Act but shall be subject to all other
+				provisions of the Act (however, see the Notes).
+			</div></div><hr class="headerThin"><hr class="header"><br><br>
+  <div class="content"><div class="form1"></div></div>
+  <div class="content"><div class="form1"><table><tr><td class="center"><br><br><p><div align="center" style="font-size:1.2em;">
+									SCHEDULE 13D
+								</div></p></td></tr></table><table role="presentation" class="tableClass" id="cusipNumber"><tr class="tableClass"><td width="25%" style="font-weight:bold;">CUSIP No.</td><td width="75%"><div style="font-size:.9em; color:#000000">05759B107</div></td></tr></table><br><br><table role="presentation" class="tableClass" id="reportingPersonDetails"><tr class="tableClass"><td width="8%" class="tableClassValign">1</td><td width="92%" class="tableClass">
+					Name of reporting person
+					<br><br><div class="text">INTERCONTINENTAL EXCHANGE, INC.</div></td></tr><tr><td width="8%" class="tableClassValign">2</td><td width="92%" class="tableClass">Check the appropriate box if a member of a Group (See Instructions)
+					<br><br><div class="text"><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked">  (a)
+						<br><img src="/Images/box-checked.jpg" alt="Checkbox checked">  (b)
+					</div></td></tr><tr class="tableClassWithBgBlack"><td width="8%" class="tableClassValign">3</td><td width="92%" class="tableClass">SEC use only</td></tr><tr><td width="8%" class="tableClassValign">4</td><td width="92%" class="tableClass">
+					Source of funds (See Instructions)
+					<br><br><div class="text">WC, OO</div></td></tr><tr><td width="8%" class="tableClassValign">5</td><td width="92%" class="tableClass">
+					Check if disclosure of legal proceedings is required pursuant to Items 2(d) or 2(e)
+					<br><br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked"></td></tr><tr><td width="8%" class="tableClassValign">6</td><td width="92%" class="tableClass">Citizenship or place of organization
+					<br><br><div class="text">
+				DELAWARE
+			</div></td></tr><tr><td width="8%" class="tableClassValign">Number of Shares Beneficially Owned by Each Reporting Person With:</td><td width="92%" class="tableClass"><table class="innerTableClass"><tr><td width="8%" class="innerTableClassRightValign">7</td><td width="92%" class="tableClassInnerLeft">Sole Voting Power
+								<br><br><div class="text">0.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">8</td><td width="92%" class="tableClassInnerLeft">Shared Voting Power
+								<br><br><div class="text">7,914,472.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">9</td><td width="92%" class="tableClassInnerLeft">Sole Dispositive Power
+								<br><br><div class="text">0.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValignBottomLess">10</td><td width="92%" class="tableClassInnerLeftBottomLess">Shared Dispositive Power
+								<br><br><div class="text">7,914,472.00</div></td></tr></table></td></tr><tr><td width="8%" class="tableClassValign">11</td><td width="92%" class="tableClass">Aggregate amount beneficially owned by each reporting person
+					<br><br><div class="text">7,914,472.00</div></td></tr><tr><td width="8%" class="tableClassValign">12</td><td width="92%" class="tableClass">Check if the aggregate amount in Row (11) excludes certain shares (See Instructions)
+					<br><br><img src="/Images/box-checked.jpg" alt="Checkbox checked"></td></tr><tr><td width="8%" class="tableClassValign">13</td><td width="92%" class="tableClass">Percent of class represented by amount in Row (11)
+					<br><br><div class="text">33.6 % </div></td></tr><tr><td width="8%" class="tableClassValign">14</td><td width="92%" class="tableClass">Type of Reporting Person (See Instructions)
+					<br><br><div class="text">CO</div></td></tr></table><br><div style="display: flex;"><div style="font-size: 0.9em; font-weight: bold; margin-right: 5px;">
+					Comment for Type of Reporting Person:
+				</div><div class="largetext" style="text-align:justify">The amount listed in Rows 8, 10 and 11 includes (i) 1,111,294 shares of Class A common stock, par value $0.0001 per share ("Class A Common Stock"), of Bakkt Holdings, Inc. (the "Issuer") and (ii) 6,803,178 shares of Class V common stock, par value $0.0001 per share ("Class V Common Stock", and together with the Class A Common Stock, the "Common Stock"), of the Issuer beneficially owned by the Reporting Person as of the date hereof. This amount includes 461,360 shares of Class A Common Stock (the "Warrant Shares") underlying the Acquired Warrants (as defined in Item 6 of the Amended Schedule 13D) that became exercisable on September 4, 2024, as described further in Item 6 of the Amended Schedule 13D. The Reporting Persons will not have the power to vote the Warrant Shares unless, and to the extent, Intercontinental Exchange Holdings, Inc. ("ICEH"), a wholly owned subsidiary of Intercontinental Exchange, Inc. ("ICE"), exercises its right to acquire Warrant Shares in accordance with the terms of the Acquired Warrants.
+
+The percentage calculated in Row 13 is based on a total of 23,111,213 shares of Common Stock, consisting of 15,934,137 shares of Class A Common Stock and 7,177,076 shares of Class V Common Stock outstanding as of September 3, 2025, as reported in the Issuer's Definitive Proxy Statement filed with the Securities and Exchange Commission (the "SEC") on September 9, 2025. As of the date hereof, the Reporting Person beneficially owns 6.8% of the outstanding shares of Class A Common Stock (including the Warrant Shares but excluding any shares of Class V Common Stock).</div></div><table><tr><td class="center"><br><br><p><div align="center" style="font-size:1.2em;">
+									SCHEDULE 13D
+								</div></p></td></tr></table><table role="presentation" class="tableClass" id="cusipNumber"><tr class="tableClass"><td width="25%" style="font-weight:bold;">CUSIP No.</td><td width="75%"><div style="font-size:.9em; color:#000000">05759B107</div></td></tr></table><br><br><table role="presentation" class="tableClass" id="reportingPersonDetails"><tr class="tableClass"><td width="8%" class="tableClassValign">1</td><td width="92%" class="tableClass">
+					Name of reporting person
+					<br><br><div class="text">Intercontinental Exchange Holdings, Inc.</div></td></tr><tr><td width="8%" class="tableClassValign">2</td><td width="92%" class="tableClass">Check the appropriate box if a member of a Group (See Instructions)
+					<br><br><div class="text"><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked">  (a)
+						<br><img src="/Images/box-checked.jpg" alt="Checkbox checked">  (b)
+					</div></td></tr><tr class="tableClassWithBgBlack"><td width="8%" class="tableClassValign">3</td><td width="92%" class="tableClass">SEC use only</td></tr><tr><td width="8%" class="tableClassValign">4</td><td width="92%" class="tableClass">
+					Source of funds (See Instructions)
+					<br><br><div class="text">WC, OO</div></td></tr><tr><td width="8%" class="tableClassValign">5</td><td width="92%" class="tableClass">
+					Check if disclosure of legal proceedings is required pursuant to Items 2(d) or 2(e)
+					<br><br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked"></td></tr><tr><td width="8%" class="tableClassValign">6</td><td width="92%" class="tableClass">Citizenship or place of organization
+					<br><br><div class="text">
+				DELAWARE
+			</div></td></tr><tr><td width="8%" class="tableClassValign">Number of Shares Beneficially Owned by Each Reporting Person With:</td><td width="92%" class="tableClass"><table class="innerTableClass"><tr><td width="8%" class="innerTableClassRightValign">7</td><td width="92%" class="tableClassInnerLeft">Sole Voting Power
+								<br><br><div class="text">0.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">8</td><td width="92%" class="tableClassInnerLeft">Shared Voting Power
+								<br><br><div class="text">7,914,472.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">9</td><td width="92%" class="tableClassInnerLeft">Sole Dispositive Power
+								<br><br><div class="text">0.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValignBottomLess">10</td><td width="92%" class="tableClassInnerLeftBottomLess">Shared Dispositive Power
+								<br><br><div class="text">7,914,472.00</div></td></tr></table></td></tr><tr><td width="8%" class="tableClassValign">11</td><td width="92%" class="tableClass">Aggregate amount beneficially owned by each reporting person
+					<br><br><div class="text">7,914,472.00</div></td></tr><tr><td width="8%" class="tableClassValign">12</td><td width="92%" class="tableClass">Check if the aggregate amount in Row (11) excludes certain shares (See Instructions)
+					<br><br><img src="/Images/box-checked.jpg" alt="Checkbox checked"></td></tr><tr><td width="8%" class="tableClassValign">13</td><td width="92%" class="tableClass">Percent of class represented by amount in Row (11)
+					<br><br><div class="text">33.6 % </div></td></tr><tr><td width="8%" class="tableClassValign">14</td><td width="92%" class="tableClass">Type of Reporting Person (See Instructions)
+					<br><br><div class="text">CO</div></td></tr></table><br><div style="display: flex;"><div style="font-size: 0.9em; font-weight: bold; margin-right: 5px;">
+					Comment for Type of Reporting Person:
+				</div><div class="largetext" style="text-align:justify">The amount listed in Rows 8, 10 and 11 includes (i) 1,111,294 shares of Class A Common Stock and (ii) 6,803,178 shares of Class V Common Stock beneficially owned by the Reporting Person as of the date hereof. This amount includes the Warrant Shares underlying the Acquired Warrants that became exercisable on September 4, 2024, as described further in Item 6 of the Amended Schedule 13D.
+
+The percentage calculated in Row 13 is based on a total of 23,111,213 shares of Common Stock, consisting of 15,934,137 shares of Class A Common Stock and 7,177,076 shares of Class V Common Stock outstanding as of September 3, 2025, as reported in the Issuer's Definitive Proxy Statement filed with the SEC on September 9, 2025. As of the date hereof, the Reporting Person beneficially owns 6.8% of the outstanding shares of Class A Common Stock (including the Warrant Shares but excluding any shares of Class V Common Stock).</div></div></div><div class="form1"><table><tr><td class="center"><br><br><p><div align="center" style="font-size:1.2em;">
+									SCHEDULE 13D
+								</div></p></td></tr></table><table role="presentation" id="item1to7"><tr><td width="8%" class="tableClassValignNoBorder">Item 1.</td><td width="92%" class="tableClassNoBorder">Security and Issuer</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignCenter">(a)</td><td width="92%" class="tableClassNoBorder">Title of Class of Securities:
+							<br><br><div class="text">Class A Common Stock</div></td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignCenter">(b)</td><td width="92%" class="tableClassNoBorder">Name of Issuer:
+							<br><br><div class="text">Bakkt Holdings, Inc.</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(c)</td><td width="92%" class="tableClassNoBorder">Address of Issuer's Principal Executive Offices:
+							<br><br><div class="text">10000 Avalon Boulevard, Suite 1000, Alpharetta, 
+				GEORGIA
+			, 30009.</div></td></tr><tr><td colspan="3"><div style="display: flex;"><div style="font-size: 0.9em; font-weight: bold; margin-right: 5px;">
+									Item 1 Comment:
+								</div><div class="largetext" style="text-align:justify">This Amendment No. 9 (this "Amendment") is being jointly filed on behalf of: (a) Intercontinental Exchange, Inc., a Delaware corporation ("ICE"), and (b) Intercontinental Exchange Holdings, Inc., a Delaware corporation ("ICEH", and together with ICE, the "Reporting Persons" and each a "Reporting Person"), and amends the Statement on Schedule 13D filed by the Reporting Persons on October 21, 2021 ("Initial Schedule 13D"), as previously amended by (i) Amendment No. 1 to the Initial Schedule 13D filed by the Reporting Persons on May 5, 2022 ("Amendment No. 1"), (ii) Amendment No. 2 to the Initial Schedule 13D filed by the Reporting Persons on April 28, 2023 ("Amendment No. 2"), (iii) Amendment No. 3 to the Initial Schedule 13D filed by the Reporting Persons on March 4, 2024 ("Amendment No. 3"), (iv) Amendment No. 4 to the Initial Schedule 13D filed by the Reporting Persons on April 29, 2024 ("Amendment No. 4"), (v) Amendment No. 5 to the Initial Schedule 13D filed by the Reporting Persons on July 9, 2024 ("Amendment No. 5"), (vi) Amendment No. 6 to the Initial Schedule 13D filed by the Reporting Persons on July 1 and 2, 2025 ("Amendment No. 6"), (vii) Amendment No. 7 to the Initial Schedule 13D filed by the Reporting Persons on July 17, 2025 ("Amendment No. 7") and (viii) Amendment No. 8 to the Initial Schedule 13D filed by the Reporting Persons on July 30, 2025 ("Amendment No. 8", and the Initial Schedule 13D as so amended, the "Amended Schedule 13D"), which relates to the shares of Class A common stock, par value $0.0001 per share ("Class A Common Stock"), of Bakkt Holdings, Inc., a Delaware corporation (the "Issuer"). Information given in response to each item of this Amendment shall be deemed incorporated by reference in all other items, as applicable.
+
+Each common unit of Bakkt Opco Holdings, LLC, a Delaware limited liability company ("Bakkt Opco") (a "Bakkt Opco Common Unit", and together with one share of Class V Common Stock, par value $0.0001 per share (the "Class V Common Stock"), of the Issuer, a "Paired Interest") is exchangeable (along with the cancelation of a corresponding number of paired shares of Class V Common Stock) for one share of Class A Common Stock pursuant to the A&amp;R Exchange Agreement (as defined in Item 6 of the Amended Schedule 13D, subject to adjustment as set forth in the A&amp;R Exchange Agreement). The Class A Common Stock and the Class V Common Stock are collectively referred to herein as the "Common Stock". Capitalized terms used and not otherwise defined in this Amendment have the same meanings ascribed to them in the Amended Schedule 13D.</div></div></td></tr><tr><td width="8%" class="tableClassValignNoBorder">Item 4.</td><td width="92%" class="tableClassNoBorder">Purpose of Transaction</td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter"> </td><td width="92%" class="tableClassNoBorder"><div class="largetext">Item 4 of the Amended Schedule 13D is hereby supplemented and amended to add the information contained in Item 6 of this Amendment, which is incorporated herein by reference.</div></td></tr><tr><td width="8%" class="tableClassValignNoBorder">Item 5.</td><td width="92%" class="tableClassNoBorder">Interest in Securities of the Issuer</td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(a)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">The percentage of beneficial ownership in this Amendment is based on: (i) with respect to the total amount of securities issued and outstanding, an aggregate of 15,934,137 shares of Class A Common Stock and 7,177,076 shares of Class V Common Stock outstanding as of September 3, 2025, as reported in the Issuer's Definitive Proxy Statement filed with the Securities and Exchange Commission (the "SEC") on September 9, 2025, as adjusted pursuant to Rule 13d-3(d)(1)(i) under the Exchange Act to include the 461,360 shares of Class A Common Stock (the "Warrant Shares") underlying the Acquired Warrants (as defined in Item 6 of the Amended Schedule 13D), and (ii) with respect to the securities beneficially owned by the Reporting Persons, 649,934 shares of Class A Common Stock, the 461,360 Warrant Shares and 6,803,178 shares of Class A Common Stock underlying the Paired Interests (consisting of 6,803,178 Bakkt Opco Common Units and 6,803,178 shares of Class V Common Stock) beneficially owned by the Reporting Persons as of the date hereof.
+
+The aggregate number and percentage of shares of Class A Common Stock and Class V Common Stock beneficially owned by the Reporting Persons, the number of shares as to which there is sole power to vote or to direct the vote, shared power to vote or to direct the vote, sole power to dispose or to direct the disposition, or shared power to dispose or to direct the disposition, are set forth on rows 7 through 11 and row 13 of the cover pages of this Amendment and are incorporated herein by reference.
+
+Pursuant to the terms of the A&amp;R Exchange Agreement (as defined in Item 6 of Amendment No. 1), Bakkt Opco Common Units, when coupled with an equivalent number of shares of Class V Common Stock, may be exchanged at the discretion of the holder for shares of Class A Common Stock on a one-for-one basis (subject to adjustment as set forth in the A&amp;R Exchange Agreement), or, at the option of the Issuer, cash, subject to the following exceptions: (i) no holder of Bakkt Opco Common Units may exchange less than 1,000 Bakkt Opco Common Units in any single exchange unless exchanging all of their Bakkt Opco Common Units; and (ii) such exchange can only occur (a) upon a Permitted Exchange Event (as defined in the A&amp;R Exchange Agreement) or (b) on (1) the last trading day of the second week of the first month of each quarter, (2) the last trading day of the first month of each quarter, (3) the third full trading day occurring after the Issuer publicly announces its results for a quarter and (4) the last trading day of the second month of each quarter.
+
+The Warrant Shares will not have voting power unless, and to the extent, ICEH exercises its right to acquire Warrant Shares in accordance with the terms of the Acquired Warrants and such shares become issued and outstanding.
+
+To the best knowledge of the Reporting Persons, the following persons beneficially own or may be deemed to beneficially own the shares of Class A Common Stock, Class V Common Stock and Bakkt Opco Common Units set forth below:
+
+o Hon. Sharon Y. Bowen, Director, ICE, beneficially owns 20,118 shares of Class A Common Stock, 926 shares of Class V Common Stock and 926 Bakkt Opco Common Units.
+
+o Thomas E. Noonan, Director, ICE, beneficially owns 529 shares of Class V Common Stock and 529 Bakkt Opco Common Units.
+
+o Jeffrey C. Sprecher, Director (Chairman) and Chief Executive Officer, ICE, may be deemed to beneficially own 146,366 shares of Class V Common Stock and 146,366 Bakkt Opco Common Units, which shares and units are beneficially owned by his spouse through her holdings of vested incentive units in Bakkt Management. Mr. Sprecher disclaims beneficial ownership of the shares and units held indirectly by his spouse.
+
+The Reporting Persons specifically disclaim beneficial ownership over such shares and units held by the persons listed above. Except for the shares of Class A Common Stock beneficially owned by Ms. Bowen, the beneficial ownership information set forth above is with respect to shares of Class V Common Stock and Bakkt Opco Common Units indirectly acquired by Ms. Bowen, Mr. Noonan, and Mr. Sprecher's spouse in connection with the Closing in respect of incentive units held by such individuals under the Bakkt equity incentive plan in effect prior to the Closing and held directly by Bakkt Management LLC ("Bakkt Management").</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(b)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">Item 5(a) of this Statement is incorporated herein by reference.
+
+Pursuant to the terms of the Up-C Collapse Waiver (as defined in Item 6 of this Amendment), ICEH has agreed not to transfer the Acquired Warrants until the earlier of (a) the consummation by the Issuer of the Up-C Collapse (as defined in Item 6 of this Amendment) and (b) November 14, 2025.</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(c)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">This Amendment is being filed to report the entry by ICEH into the TRA Amendment, the Contribution Agreement and the Up-C Collapse Waiver (each as defined in Item 6 of this Amendment), and to update the aggregate percentage of the Common Stock owned by the Reporting Persons due to dilution caused by the Issuer's issuance of additional shares of its Class A Common Stock since the date of the filing of Amendment No. 8, and not in connection with any acquisition or disposition of any shares of Common Stock by the Reporting Persons. The Reporting Persons have not effected any transactions in Class A Common Stock or Class V Common Stock during the past 60 days.</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(d)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">To the best knowledge of the Reporting Persons, no one other than the Reporting Persons has the right to receive or the power to direct the receipt of dividends from, or the proceeds from the sale of, the securities reported herein.</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(e)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">Not applicable.</div></td></tr><tr><td width="8%" class="tableClassValignNoBorder">Item 6.</td><td width="92%" class="tableClassNoBorder">Contracts, Arrangements, Understandings or Relationships With Respect to Securities of the Issuer</td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter"> </td><td width="92%" class="tableClassNoBorder"><div class="largetext">Item 6 of the Amended Schedule 13D is hereby further supplemented and amended to add the following information:
+
+Up-C Collapse and Related Agreements
+
+On October 16, 2025, the Issuer announced plans for a reorganization of certain of its entities that would result in the elimination of its umbrella partnership-C-corporation structure and the Issuer becoming a wholly owned subsidiary of a new holding company ("NewCo") that will replace the Issuer as the public company trading on the New York Stock Exchange (the "Up-C Collapse"). In connection with the Up-C Collapse, (i) holders of shares of Class A Common Stock, including ICEH, will cease to hold such shares and will receive an equivalent number of shares of Class A common stock of NewCo ("NewCo Class A Common Stock") that have the same voting and economic rights as the Class A Common Stock, (ii) holders of shares of Class V Common Stock, including ICEH, will cease to hold such shares and will receive an equivalent number of shares of Class V common stock of NewCo ("NewCo Class V Common Stock") that have the same voting and economic rights as the Class V Common Stock, and (iii) holders of Bakkt Opco Common Units, each coupled with one share of NewCo Class V Common Stock, will cease to hold such Bakkt Opco Common Units and shares of NewCo Class V Common Stock and will receive an equivalent number of shares of NewCo Class A Common Stock. Upon consummation of the Up-C Collapse, NewCo will have only one class of outstanding common stock, the NewCo Class A Common Stock.
+
+On October 16, 2025, in connection with the Up-C Collapse, the Issuer, ICEH and Akshay Naheta, the Issuer's Chief Executive Officer ("Mr. Naheta"), entered into an amendment to the Tax Receivable Agreement (the "TRA Amendment") and a Contribution Agreement (the "Contribution Agreement"), and the Issuer and ICEH also entered into a waiver, acknowledgment and consent in respect of the Acquired Warrants (the "Up-C Collapse Waiver").
+
+Pursuant to the TRA Amendment and the Contribution Agreement, ICEH and Mr. Naheta agreed that they would, at the closing of the Up-C Collapse, (i) contribute their rights under the Tax Receivable Agreement to NewCo in exchange for a cash payment from NewCo equal to the respective amount to which ICEH and Mr. Naheta would otherwise be entitled under the Tax Receivable Agreement (as amended) and (ii) contribute such cash to NewCo in exchange for shares of NewCo Class A Common Stock, and further agreed that the respective obligations of ICEH and Mr. Naheta, on the one hand, and NewCo, on the other hand, to transfer the foregoing cash amounts will be net-settled and offset against one another. The number of shares of NewCo Class A Common Stock to be issued pursuant to the contribution in the foregoing clause (ii) will be issued based on a purchase price of $39.34, representing the "Minimum Price" as defined in NYSE Rule 312.04(h). Assuming a Class A Common Stock trading price of $38.00 for calculating the payment that would otherwise be owed to ICEH under the Tax Receivable Agreement (as amended) in accordance with the foregoing clause (i), the Issuer has estimated that approximately 655,500 shares of NewCo Class A Common Stock would be issued to ICEH at that Minimum Price. In addition, the TRA Amendment sets the discount rate to be used in calculating payments owed under the Tax Receivable Agreement to all TRA Parties (as defined in the Tax Receivable Agreement), including ICEH and Mr. Naheta, at 18%, calculated as of the date of consummation of the Up-C Collapse, except that for ICEH and Mr. Naheta only, the value of such payments is capped at the value of such payments calculated as of the date of the TRA Amendment.
+
+Pursuant to the Up-C Collapse Waiver, ICEH agreed to waive its right to treat the Up-C Collapse as a Fundamental Change (as defined in the Acquired Warrants) and to exchange the Acquired Warrants for equivalent warrants to purchase shares of NewCo Class A Common Stock upon consummation of the Up-C Collapse. In the Up-C Collapse Waiver, ICEH also agreed not to transfer the Acquired Warrants until the earlier of the consummation of the Up-C Collapse and November 14, 2025. The Up-C Collapse Waiver will terminate if the Up-C Collapse is not consummated on or before November 14, 2025.
+
+The foregoing descriptions of the TRA Amendment, the Contribution Agreement and the Up-C Collapse Waiver are qualified in their entirety by reference to the full text of the TRA Amendment, the Contribution Agreement and the Up-C Collapse Waiver, which are filed as Exhibits 99.24, 99.25 and 99.26, respectively, to the Amended Schedule 13D and incorporated herein by reference.</div></td></tr><tr><td width="8%" class="tableClassValignNoBorder">Item 7.</td><td width="92%" class="tableClassNoBorder">Material to be Filed as Exhibits.</td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter"> </td><td width="92%" class="tableClassNoBorder"><div class="largetext">Exhibit 99.1* Joint Filing Agreement, dated as of October 21, 2021, by and among the Reporting Persons (incorporated by reference to Exhibit 99.1 to the Schedule 13D filed by the Reporting Persons with the SEC on October 21, 2021). https://www.sec.gov/Archives/edgar/data/1571949/000119312521304172/d367825dex991.htm
+
+Exhibit 99.2 Agreement and Plan of Merger (incorporated by reference to Exhibit 2.1 to the Issuer's Current Report on Form 8-K filed on January 11, 2021). https://www.sec.gov/Archives/edgar/data/1820302/000119312521005832/d913171dex21.htm
+
+Exhibit 99.3 Amendment to Agreement and Plan of Merger (incorporated by reference to Exhibit 2.1 to the Issuer's Current Report on Form 8-K filed on March 31, 2021). https://www.sec.gov/Archives/edgar/data/1820302/000119312521101249/d107545dex21.htm
+
+Exhibit 99.4 Amendment to Agreement and Plan of Merger (incorporated by reference to Exhibit 2.1 to the Issuer's Current Report on Form 8-K filed on September 30, 2021). https://www.sec.gov/Archives/edgar/data/1820302/000119312521286927/d204551dex21.htm
+
+Exhibit 99.5 Certificate of Incorporation of the Issuer (incorporated by reference to Exhibit 3.1 to the Issuer's Current Report on Form 8-K filed on October 21, 2021). https://www.sec.gov/Archives/edgar/data/1820302/000119312521303985/d219325dex31.htm
+
+Exhibit 99.6 Exchange Agreement (incorporated by reference to Exhibit 10.4 to the Issuer's Current Report on Form 8-K filed on October 21, 2021). https://www.sec.gov/Archives/edgar/data/1820302/000119312521303985/d219325dex104.htm
+
+Exhibit 99.7 Amended and Restated Limited Liability Company Agreement (incorporated by reference to Exhibit 4.3 to the Issuer's Current Report on Form 8-K filed on October 21, 2021). https://www.sec.gov/Archives/edgar/data/1820302/000119312521303985/d219325dex43.htm
+
+Exhibit 99.8 Voting Agreement (incorporated by reference to Exhibit 10.3 to the Issuer's Current Report on Form 8-K filed on October 21, 2021). https://www.sec.gov/Archives/edgar/data/1820302/000119312521303985/d219325dex103.htm
+
+Exhibit 99.9 Stockholders Agreement (incorporated by reference to Exhibit 10.2 to the Issuer's Current Report on Form 8-K filed on October 21, 2021). https://www.sec.gov/Archives/edgar/data/1820302/000119312521303985/d219325dex102.htm
+
+Exhibit 99.10 Registration Rights Agreement (incorporated by reference to Exhibit 10.1 to the Issuer's Current Report on Form 8-K filed on October 21, 2021). https://www.sec.gov/Archives/edgar/data/1820302/000119312521303985/d219325dex101.htm
+
+Exhibit 99.11 Tax Receivable Agreement (incorporated by reference to Exhibit 10.5 to the Issuer's Current Report on Form 8-K filed on October 21, 2021). https://www.sec.gov/Archives/edgar/data/1820302/000119312521303985/d219325dex105.htm
+
+Exhibit 99.12* Amended and Restated Subscription Agreement (incorporated by reference to Exhibit 99.12 to the Schedule 13D filed by the Reporting Persons with the SEC on October 21, 2021). https://www.sec.gov/Archives/edgar/data/1571949/000119312521304172/d367825dex9912.htm
+
+Exhibit 99.13 Cooperation Agreement (incorporated by reference to Exhibit 10.6 to the Issuer's Current Report on Form 8-K filed on October 21, 2021). https://www.sec.gov/Archives/edgar/data/1820302/000119312521303985/d219325dex106.htm
+
+Exhibit 99.14 Amended and Restated Exchange Agreement (incorporated by reference to Exhibit 10.1 to the Issuer's Current Report on Form 8-K filed on May 4, 2022). https://www.sec.gov/Archives/edgar/data/1820302/000182030222000015/a101amendedandrestatedexch.htm
+
+
+Exhibit 99.15* Securities Purchase Agreement (incorporated by reference to Exhibit 99.15 to the Schedule 13D/A filed by the Reporting Persons with the SEC on March 4, 2024). https://www.sec.gov/Archives/edgar/data/1571949/000094787124000253/ss3098627_ex9915.htm
+
+Exhibit 99.16* Voting Support Agreement (incorporated by reference to Exhibit 99.16 to the Schedule 13D/A filed by the Reporting Persons with the SEC on March 4, 2024). https://www.sec.gov/Archives/edgar/data/1571949/000094787124000253/ss3098627_ex9916.htm
+
+Exhibit 99.17* Class 1 Warrant issued by the Issuer on March 4, 2024 (incorporated by reference to Exhibit 99.17 to the Schedule 13D/A filed by the Reporting Persons with the SEC on March 4, 2024). https://www.sec.gov/Archives/edgar/data/1571949/000094787124000253/ss3098627_ex9917.htm
+
+Exhibit 99.18* Class 2 Warrant issued by the Issuer on March 4, 2024 (incorporated by reference to Exhibit 99.18 to the Schedule 13D/A filed by the Reporting Persons with the SEC on March 4, 2024). https://www.sec.gov/Archives/edgar/data/1571949/000094787124000253/ss3098627_ex9918.htm
+
+Exhibit 99.19* Class 1 Warrant issued by the Issuer on April 25, 2024 (incorporated by reference to Exhibit 99.19 to the Schedule 13D/A filed by the Reporting Persons with the SEC on April 29, 2024). https://www.sec.gov/Archives/edgar/data/1820302/000094787124000420/ss3319225_ex9919.htm
+
+Exhibit 99.20* Class 2 Warrant issued by the Issuer on April 25, 2024 (incorporated by reference to Exhibit 99.20 to the Schedule 13D/A filed by the Reporting Persons with the SEC on April 29, 2024). https://www.sec.gov/Archives/edgar/data/1820302/000094787124000420/ss3319225_ex9920.htm
+
+Exhibit 99.21 First Amendment to the Third Amended and Restated Limited Liability Company Agreement (incorporated by reference to Exhibit 4.1 to the Issuer's Current Report on Form 8-K filed on April 29, 2024). https://www.sec.gov/Archives/edgar/data/1820302/000182030224000080/ex41firstamendmentto3rdame.htm
+
+Exhibit 99.22* Share Increase Voting Support Agreement (incorporated by reference to Exhibit 99.22 to the Schedule 13D/A filed by the Reporting Persons with the SEC on July 17, 2025).
+https://www.sec.gov/Archives/edgar/data/1571949/000094787125000670/ss5091566_ex9922.htm
+
+Exhibit 99.23* Lock-Up Agreement (incorporated by reference to Exhibit 99.23 to the Schedule 13D/A filed by the Reporting Persons with the SEC on July 30, 2025). https://www.sec.gov/Archives/edgar/data/1571949/000094787125000710/ss5145903_ex9923.htm
+
+Exhibit 99.24 TRA Amendment
+
+Exhibit 99.25 Contribution Agreement
+
+Exhibit 99.26 Up-C Collapse Waiver
+
+* Previously filed</div></td></tr></table><br></div><div class="form1"><table role="presentation" id="signatureInfo"><tr><td width="8%" class="tableClassValignNoBorder">    SIGNATURE</td><td width="92%" class="tableClassNoBorder"> </td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter"> </td><td width="92%" class="tableClassNoBorder"><div class="information" style="text-align:justify">
+						After reasonable inquiry and to the best of my knowledge and belief, I certify that the information set forth in this statement is true, complete and correct.
+						<br><br></div></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="100%" class="tableClassInnerNoBorderBlue"><div class="text">INTERCONTINENTAL EXCHANGE, INC.</div></td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Signature:</td><td width="92%" class="tableClassNoBorderBlue signature">/s/ Andrew J. Surdykowski</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Name/Title:</td><td width="92%" class="tableClassNoBorderBlue signature">Andrew J. Surdykowski, General Counsel</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Date:</td><td width="92%" class="tableClassNoBorderBlue signature">10/20/2025</td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="100%" class="tableClassInnerNoBorderBlue"><div class="text">Intercontinental Exchange Holdings, Inc.</div></td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Signature:</td><td width="92%" class="tableClassNoBorderBlue signature">/s/ Andrew J. Surdykowski</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Name/Title:</td><td width="92%" class="tableClassNoBorderBlue signature">Andrew J. Surdykowski, General Counsel</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Date:</td><td width="92%" class="tableClassNoBorderBlue signature">10/20/2025</td></tr></table></td></tr></table></div></div>
+
+<script type="text/javascript"  src="/KSRe0AD3p8BYYbpDUqIn/EQS3hbNfLJf4tLS3/XgdUa3RMAg/ZlE8/IkgkRic"></script></body></html>

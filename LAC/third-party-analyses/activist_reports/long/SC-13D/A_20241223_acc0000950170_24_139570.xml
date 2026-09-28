@@ -1,0 +1,488 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns:p="http://www.sec.gov/edgar/schedule13D" xmlns:p1="http://www.sec.gov/edgar/common"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><link rel="stylesheet" type="text/css" href="/css/SDR_print.css"><style type="text/css">
+					.fakeTextBox {
+					border-top: 2px solid #999;
+					border-right: 1px solid #ccc;
+					border-bottom: 1px solid #ccc;
+					border-left: 2px solid #999;
+					padding: 2px;
+					_width: 800px;
+					height: auto;
+					min-width: 200px;
+					min-height: 50px;
+					word-wrap: break-word;
+					font-size: 0.9em;
+					color: blue;
+					}
+					table.tableClass { border: solid black;
+					border-top-width: 1;
+					border-right-width: 1;
+					border-bottom-width: 1;
+					border-left-width: 1;
+					table-layout:fixed;
+					}
+					table.innerTableClass { border: solid black;
+					border-top-width: 0;
+					border-right-width: 0;
+					border-bottom-width: 0;
+					border-left-width: 0;
+					table-layout:fixed;
+					}
+					th.tableClassLeft { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					padding: 2px;
+					}
+					th.tableClassRight { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 0;
+					padding: 2px;
+					}
+					th.tableClass { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					padding: 2px;
+					}
+					td.tableClassLeft { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					font-size: 0.9em;
+					color: blue;
+					word-wrap: break-word;
+					}
+					td.tableClassRight { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 0;
+					font-size: 0.9em;
+					color: blue;
+					word-wrap: break-word;
+					}
+					td.tableClass { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					font-size: 0.9em;
+					font-weight:bold;
+					color: black;
+					word-wrap: break-word;
+					}
+					td.tableClassNoBorder { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 0px;
+					font-size: 0.9em;
+					font-weight:bold;
+					color: black;
+					word-wrap: break-word;
+					}
+
+					td.tableClassNoBorderBlue { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 0px;
+					font-size: 0.9em;
+					font-weight:bold;
+					color: blue;
+					word-wrap: break-word;
+					}
+
+					td.tableClassInnerNoBorderBlue { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 0px;
+					font-size: 1.4em;
+					font-weight:bold;
+					color: blue;
+					word-wrap: break-word;
+					}
+
+					td.tableClassNoBorderAlignLeft { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 0px;
+					font-size: 0.9em;
+					font-weight:bold;
+					text-align: left;
+					color: black;
+					word-wrap: break-word;
+					}
+
+					td.signature {
+					padding: 4px 8px;
+					}
+
+					td.tableClassInner { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					font-size: 1em;
+					font-weight:bold;
+					color: black;
+					word-wrap: break-word;
+					}
+
+					td.tableClassValign { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					font-size: 0.9em;
+					font-weight:bold;
+					color: black;
+					vertical-align: middle;
+					text-align: center;
+					word-wrap: break-word;
+					}
+
+					td.tableClassValignNoBorder { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 0px;
+					font-size: 0.9em;
+					font-weight:bold;
+					color: black;
+					vertical-align: middle;
+					text-align: center;
+					word-wrap: break-word;
+					}
+
+					td.tableClassValignInner { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					font-size: 1em;
+					font-weight:bold;
+					color: black;
+					vertical-align: middle;
+					text-align: center;
+					word-wrap: break-word;
+					}
+
+					td.innerTableClassRightValign { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 0;
+					font-size: 1em;
+					font-weight:bold;
+					color: black;
+					vertical-align: middle;
+					text-align: center;
+					word-wrap: break-word;
+					}
+
+					td.innerTableClassRightValignBottomLess { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 0px;
+					border-left-width: 0;
+					font-size: 1em;
+					font-weight:bold;
+					color: black;
+					vertical-align: middle;
+					text-align: center;
+					word-wrap: break-word;
+					}
+
+					td.tableClassInnerLeft { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					font-size: 1em;
+					font-weight:bold;
+					color: black;
+					word-wrap: break-word;
+					}
+
+					td.tableClassInnerLeftBottomLess { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 1px;
+					font-size: 1em;
+					font-weight:bold;
+					color: black;
+					word-wrap: break-word;
+					}
+
+					td.tableClassNoBorderAlignCenter { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 0px;
+					font-size: 0.9em;
+					font-weight:bold;
+					color: black;
+					text-align: center;
+					word-wrap: break-word;
+					}
+
+					tr.tableClass { border: solid black;
+					border-top-width: 1px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					}
+					tr.tableClassWithBg { border: solid black;
+					border-top-width: 0;
+					border-right-width: 1;
+					border-bottom-width: 1;
+					border-left-width: 0;
+					background-color: #e0e0ff
+					}
+
+					tr.tableClassWithBgBlack { border: solid black;
+					border-top-width: 0;
+					border-right-width: 1;
+					border-bottom-width: 1;
+					border-left-width: 0;
+					background-color: #D3D3D3
+					}
+
+					hr.header {
+					position: relative;
+					top: 20px;
+					border: none;
+					height: 6px;
+					background: black;
+					margin-bottom: 10px;
+					}
+
+					hr.separatorThin {
+					position: relative;
+					top: 2px;
+					border: none;
+					height: 2px;
+					background: black;
+					margin-bottom: 2px;
+					}
+
+					hr.headerThin {
+					position: relative;
+					top: 10px;
+					border: none;
+					height: 2px;
+					background: black;
+					margin-bottom: 10px;
+					}
+
+					hr.separator {
+					position: relative;
+					top: 20px;
+					border: none;
+					height: 4px;
+					background: black;
+					margin-bottom: 5px;
+					}
+
+					div.text {
+					background-color: #ffffff;
+					color: blue;
+					font-size: 1em;
+					font-weight:normal;
+					text-align:justify;
+					}
+
+
+					div.information {
+					background-color: #ffffff;
+					color: black;
+					font-size: 1em;
+					font-weight:normal;
+					text-align:justify;
+					}
+
+					#scheader {
+					font-size: 0.9em;
+					border: 0px solid #404040;
+					border-spacing: 2px;
+					}
+
+					div.largetext {
+					background-color: #ffffff;
+					color: blue;
+					font-size: 1em;
+					font-weight:normal;
+					text-align:justify;
+					white-space: pre-wrap;
+					word-break: normal;
+					}
+
+				</style></head><body lang="en-US" text="#000000" bgcolor="#ffffff"><hr class="header"><br><hr class="headerThin"><div class="contentwrapper"><table role="presentation" id="scheader"><tr><td class="tableClassNoBorderAlignCenter" style="font-size:2em;">
+						SECURITIES AND EXCHANGE COMMISSION
+						<br>
+						Washington, D.C. 20549
+					</td></tr><tr><td class="tableClassNoBorderAlignCenter"><br><br><div style="font-size:1.5em;">
+									SCHEDULE 13D
+								</div><br><div style="font-size:1.2em;">
+							Under the Securities Exchange Act of 1934
+						</div><br><div class="information" style="text-align:center; font-weight:bold;">
+									(Amendment No. <span style="color:blue;">3</span>)
+								</div><br><br></td></tr><tr><td class="center"><div class="information" style="text-align:center; font-weight:bold; color:blue;">Lithium Americas Corp.</div><div class="information" style="text-align:center; font-weight:bold;"><hr class="separatorThin">(Name of Issuer)</div><br><br></td></tr><tr><td class="center"><div class="information" style="text-align:center; font-weight:bold; color:blue;">Common Shares, without par value</div><div class="information" style="text-align:center; font-weight:bold;"><hr class="separatorThin">(Title of Class of Securities)</div><br><br></td></tr><tr><td class="center"><div class="information" style="text-align:center; font-weight:bold; color:blue;">53681J103</div><div class="information" style="text-align:center; font-weight:bold;"><hr class="separatorThin">(CUSIP Number)</div><br><br></td></tr><tr><td class="center"><div class="information" style="text-align:center; font-weight:bold; color:blue;">John S. Kim<br>300 Renaissance Center,
+								<br>Detroit,
+								MI,
+								48265<br>313-667-2303</div><div class="information" style="text-align:center; font-weight:bold;"><hr class="separatorThin">(Name, Address and Telephone Number of Person Authorized to
+									Receive Notices and Communications)</div></td></tr><tr><td class="center"><div class="information" style="text-align:center; font-weight:bold; color:blue;">12/20/2024</div><div class="information" style="text-align:center; font-weight:bold;"><hr class="separatorThin">(Date of Event Which Requires Filing of This Statement)</div></td></tr></table><br><br><div class="information" style="text-align:justify">
+				If the filing person has previously filed a statement on Schedule 13G to report the acquisition that is the subject of this Schedule 13D, and is filing this schedule because of §§ 240.13d-1(e), 240.13d-1(f) or 240.13d-1(g), check the following box.
+				<img src="/Images/box-unchecked.jpg" alt="Checkbox not checked"></div><br><div class="information" style="text-align:justify">
+				The information required on the remainder of this cover page shall not be deemed to be “filed” for the purpose of Section 18 of the
+				Securities Exchange Act of 1934 (“Act”) or otherwise subject to the liabilities of that section of the Act but shall be subject to all other
+				provisions of the Act (however, see the Notes).
+			</div></div><hr class="headerThin"><hr class="header"><br><br>
+<div class="content"><div class="form1"></div></div>
+<div class="content"><div class="form1"><table><tr><td class="center"><br><br><p><div align="center" style="font-size:1.2em;">
+									SCHEDULE 13D
+								</div></p></td></tr></table><table role="presentation" class="tableClass" id="cusipNumber"><tr class="tableClass"><td width="25%" style="font-weight:bold;">CUSIP No.</td><td width="75%"><div style="font-size:.9em; color:#000000">53681J103</div></td></tr></table><br><br><table role="presentation" class="tableClass" id="reportingPersonDetails"><tr class="tableClass"><td width="8%" class="tableClassValign">1</td><td width="92%" class="tableClass">
+					Name of reporting person
+					<br><br><div class="text">GENERAL MOTORS HOLDINGS LLC</div></td></tr><tr><td width="8%" class="tableClassValign">2</td><td width="92%" class="tableClass">Check the appropriate box if a member of a Group (See Instructions)
+					<br><br><div class="text"><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked">  (a)
+						<br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked">  (b)
+					</div></td></tr><tr class="tableClassWithBgBlack"><td width="8%" class="tableClassValign">3</td><td width="92%" class="tableClass">SEC use only</td></tr><tr><td width="8%" class="tableClassValign">4</td><td width="92%" class="tableClass">
+					Source of funds (See Instructions)
+					<br><br><div class="text">OO</div></td></tr><tr><td width="8%" class="tableClassValign">5</td><td width="92%" class="tableClass">
+					Check if disclosure of legal proceedings is required pursuant to Items 2(d) or 2(e)
+					<br><br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked"></td></tr><tr><td width="8%" class="tableClassValign">6</td><td width="92%" class="tableClass">Citizenship or place of organization
+					<br><br><div class="text">
+				DELAWARE
+			</div></td></tr><tr><td width="8%" class="tableClassValign">Number of Shares Beneficially Owned by Each Reporting Person With:</td><td width="92%" class="tableClass"><table class="innerTableClass"><tr><td width="8%" class="innerTableClassRightValign">7</td><td width="92%" class="tableClassInnerLeft">Sole Voting Power
+								<br><br><div class="text">0.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">8</td><td width="92%" class="tableClassInnerLeft">Shared Voting Power
+								<br><br><div class="text">15,002,243.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">9</td><td width="92%" class="tableClassInnerLeft">Sole Dispositive Power
+								<br><br><div class="text">0.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValignBottomLess">10</td><td width="92%" class="tableClassInnerLeftBottomLess">Shared Dispositive Power
+								<br><br><div class="text">15,002,243.00</div></td></tr></table></td></tr><tr><td width="8%" class="tableClassValign">11</td><td width="92%" class="tableClass">Aggregate amount beneficially owned by each reporting person
+					<br><br><div class="text">15,002,243.00</div></td></tr><tr><td width="8%" class="tableClassValign">12</td><td width="92%" class="tableClass">Check if the aggregate amount in Row (11) excludes certain shares (See Instructions)
+					<br><br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked"></td></tr><tr><td width="8%" class="tableClassValign">13</td><td width="92%" class="tableClass">Percent of class represented by amount in Row (11)
+					<br><br><div class="text">6.87 % </div></td></tr><tr><td width="8%" class="tableClassValign">14</td><td width="92%" class="tableClass">Type of Reporting Person (See Instructions)
+					<br><br><div class="text">OO</div></td></tr></table><br><div style="display: flex;"><div style="font-size: 0.9em; font-weight: bold; margin-right: 5px;">
+					Comment for Type of Reporting Person:
+				</div><div class="largetext" style="text-align:justify">(1)	General Motors Holdings LLC (GM Holdings) is the record holder of 15,002,243 common shares, without par value (Common Shares), of Lithium Americas Corp. (the Issuer), issued pursuant to the Separation. GM Holdings is a wholly owned subsidiary of General Motors Company (GM). GM may be deemed to share beneficial ownership over the Common Shares directly or beneficially owned by GM Holdings.
+(2)	The percentage set forth in Row 13 is based on a total of 218,322,245 Common Shares outstanding as of October 1, 2024, as disclosed in the Investment Agreement (as defined in Item 3 below) filed with the Issuer's Form 6-K on October 17, 2024.</div></div><table><tr><td class="center"><br><br><p><div align="center" style="font-size:1.2em;">
+									SCHEDULE 13D
+								</div></p></td></tr></table><table role="presentation" class="tableClass" id="cusipNumber"><tr class="tableClass"><td width="25%" style="font-weight:bold;">CUSIP No.</td><td width="75%"><div style="font-size:.9em; color:#000000">53681J103</div></td></tr></table><br><br><table role="presentation" class="tableClass" id="reportingPersonDetails"><tr class="tableClass"><td width="8%" class="tableClassValign">1</td><td width="92%" class="tableClass">
+					Name of reporting person
+					<br><br><div class="text">GENERAL MOTORS COMPANY</div></td></tr><tr><td width="8%" class="tableClassValign">2</td><td width="92%" class="tableClass">Check the appropriate box if a member of a Group (See Instructions)
+					<br><br><div class="text"><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked">  (a)
+						<br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked">  (b)
+					</div></td></tr><tr class="tableClassWithBgBlack"><td width="8%" class="tableClassValign">3</td><td width="92%" class="tableClass">SEC use only</td></tr><tr><td width="8%" class="tableClassValign">4</td><td width="92%" class="tableClass">
+					Source of funds (See Instructions)
+					<br><br><div class="text">OO</div></td></tr><tr><td width="8%" class="tableClassValign">5</td><td width="92%" class="tableClass">
+					Check if disclosure of legal proceedings is required pursuant to Items 2(d) or 2(e)
+					<br><br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked"></td></tr><tr><td width="8%" class="tableClassValign">6</td><td width="92%" class="tableClass">Citizenship or place of organization
+					<br><br><div class="text">
+				DELAWARE
+			</div></td></tr><tr><td width="8%" class="tableClassValign">Number of Shares Beneficially Owned by Each Reporting Person With:</td><td width="92%" class="tableClass"><table class="innerTableClass"><tr><td width="8%" class="innerTableClassRightValign">7</td><td width="92%" class="tableClassInnerLeft">Sole Voting Power
+								<br><br><div class="text">0.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">8</td><td width="92%" class="tableClassInnerLeft">Shared Voting Power
+								<br><br><div class="text">15,002,243.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">9</td><td width="92%" class="tableClassInnerLeft">Sole Dispositive Power
+								<br><br><div class="text">0.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValignBottomLess">10</td><td width="92%" class="tableClassInnerLeftBottomLess">Shared Dispositive Power
+								<br><br><div class="text">15,002,243.00</div></td></tr></table></td></tr><tr><td width="8%" class="tableClassValign">11</td><td width="92%" class="tableClass">Aggregate amount beneficially owned by each reporting person
+					<br><br><div class="text">15,002,243.00</div></td></tr><tr><td width="8%" class="tableClassValign">12</td><td width="92%" class="tableClass">Check if the aggregate amount in Row (11) excludes certain shares (See Instructions)
+					<br><br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked"></td></tr><tr><td width="8%" class="tableClassValign">13</td><td width="92%" class="tableClass">Percent of class represented by amount in Row (11)
+					<br><br><div class="text">6.87 % </div></td></tr><tr><td width="8%" class="tableClassValign">14</td><td width="92%" class="tableClass">Type of Reporting Person (See Instructions)
+					<br><br><div class="text">CO</div></td></tr></table><br><div style="display: flex;"><div style="font-size: 0.9em; font-weight: bold; margin-right: 5px;">
+					Comment for Type of Reporting Person:
+				</div><div class="largetext" style="text-align:justify">(1)	GM Holdings is the record holder of 15,002,243 Common Shares issued pursuant to the Separation. GM Holdings is a wholly owned subsidiary of GM. GM may be deemed to share beneficial ownership over the Common Shares directly or beneficially owned by GM Holdings.
+(2)	   The percentage set forth in Row 13 is based on a total of 218,322,245 Common Shares outstanding as of October 1, 2024, as disclosed in the Investment Agreement (as defined in Item 3 below) filed with the Issuer's Form 6-K on October 17, 2024.</div></div></div><div class="form1"><table><tr><td class="center"><br><br><p><div align="center" style="font-size:1.2em;">
+									SCHEDULE 13D
+								</div></p></td></tr></table><table role="presentation" id="item1to7"><tr><td width="8%" class="tableClassValignNoBorder">Item 1.</td><td width="92%" class="tableClassNoBorder">Security and Issuer</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignCenter">(a)</td><td width="92%" class="tableClassNoBorder">Title of Class of Securities:
+							<br><br><div class="text">Common Shares, without par value</div></td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignCenter">(b)</td><td width="92%" class="tableClassNoBorder">Name of Issuer:
+							<br><br><div class="text">Lithium Americas Corp.</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(c)</td><td width="92%" class="tableClassNoBorder">Address of Issuer's Principal Executive Offices:
+							<br><br><div class="text">3260 - 666 BURRARD STREET, VANCOUVER, British Columbia, 
+				CANADA (FEDERAL LEVEL)
+			, V6C 2X8.</div></td></tr><tr><td colspan="3"><div style="display: flex;"><div style="font-size: 0.9em; font-weight: bold; margin-right: 5px;">
+									Item 1 Comment:
+								</div><div class="largetext" style="text-align:justify">This Amendment No. 3 (this "Amendment No. 3") to Schedule 13D relates to the common shares, without par value ("Common Shares"), of Lithium Americas Corp., a corporation organized and existing under the laws of the Province of British Columbia (the "Issuer"), and amends the initial statement on Schedule 13D, filed on October 12, 2023, as amended by Amendment No.1 filed on September 3, 2024, and Amendment No. 2 filed on October 17, 2024 (the "Prior Statement," and, as amended by this Amendment No. 3, the "Schedule 13D"), by General Motors Holdings LLC, a Delaware limited liability company ("GM Holdings"), and General Motors Company, a Delaware corporation ("GM" and, collectively with GM Holdings, the "Reporting Persons").
+
+Except as specifically provided herein, this Amendment No. 3 does not modify any of the information previously reported in the Prior Statement. Capitalized terms used but not defined in this Amendment No. 3 shall have the same meanings herein as are ascribed to such terms in the Prior Statement. </div></div></td></tr><tr><td width="8%" class="tableClassValignNoBorder">Item 3.</td><td width="92%" class="tableClassNoBorder">Source and Amount of Funds or Other Consideration</td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter"> </td><td width="92%" class="tableClassNoBorder"><div class="largetext">Item 3 of the Schedule 13D is hereby amended and supplemented to add the following information:
+
+On December 20, 2024, the transactions contemplated by the Investment Agreement were completed (the "JV Closing"). In connection with the establishment of the joint venture, GM Holdings, LAC US Corp., a corporation organized and existing under the laws of the State of Nevada and an indirect wholly-owned subsidiary of the Issuer ("LAC US"), and Lithium Nevada Ventures LLC, a limited liability company organized and existing under the laws of the State of Delaware and an indirect wholly-owned subsidiary of the Issuer ("LNV"), entered into the agreements described in Item 6, which is incorporated by reference herein. </div></td></tr><tr><td width="8%" class="tableClassValignNoBorder">Item 6.</td><td width="92%" class="tableClassNoBorder">Contracts, Arrangements, Understandings or Relationships With Respect to Securities of the Issuer</td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter"> </td><td width="92%" class="tableClassNoBorder"><div class="largetext">Item 6 of the Schedule 13D is hereby amended and supplemented to add the following information:
+
+Joint Venture Agreement
+
+Consistent with the terms of the Investment Agreement, on December 20, 2024, GM Holdings and LAC US entered into the Amended and Restated Limited Liability Company Agreement of Lithium Nevada Ventures LLC (the "Joint Venture Agreement"), concurrently with the consummation of GM Holdings' subscription and purchase from LNV of a number of units of LNV representing 38% of the issued and outstanding limited liability company interests in LNV (the "Purchased Membership Interest") pursuant to the Investment Agreement. As total consideration for the issuance of the Purchased Membership Interests to GM Holdings, GM Holdings made an initial capital contribution to LNV of $330,000,000 in cash on such date, and has agreed to (i) make an additional capital contribution to LNV of $100,000,000 upon the determination of a final investment decision with respect to the Thacker Pass Project, and (ii) provide letters of credit in an aggregate amount of up to $195,000,000, in each case, subject to the terms and conditions set forth in the Joint Venture Agreement.
+
+The foregoing description of the Joint Venture Agreement is qualified in its entirety by reference to such agreement, a copy of which is filed as Exhibit 10.9 and is incorporated by reference herein.
+
+Management Services Agreement
+
+In connection with the establishment of the joint venture, on December 20, 2024, LAC Management LLC, a Nevada limited liability company (the "Manager"), LNV, Lithium Nevada LLC, a limited liability company organized and existing under the laws of the State of Nevada (as successor in interest to Lithium Nevada Corp., a corporation organized and existing under the laws of the State of Nevada, pursuant to the Restructuring (as such term is defined in the Investment Agreement), "LNC"), and the Issuer entered into a Management Services Agreement. Pursuant to such agreement, the Manager will provide LNC, LNV, and its other wholly-owned subsidiaries with services including executive level services, administrative and other general services. The term of the Management Services Agreement commenced on December 20, 2024 and will terminate, unless terminated earlier pursuant to certain terms in the agreement or extended by mutual agreement of the parties, on the earlier of regulatory approval of final reclamation and closure of the Thacker Pass Project and the date on which the Manager ceases to directly or indirectly own any equity interests in LNV. LNC will pay Manager a fee of $435,134 per month for the services provided by the Manager, with annual adjustments with the specified approval of LNC.
+
+The foregoing description of the Management Services Agreement is qualified in its entirety by reference to such agreement, a copy of which is filed as Exhibit 10.10 and is incorporated by reference herein.
+
+First Amendment to Phase 1 Offtake Agreement and Direct Agreement
+
+On October 28, 2024 (such date, the "DOE Loan Closing Date"), the Issuer, indirectly through its subsidiaries, entered into certain agreements in connection with the issuance of a loan from the U.S. Department of Energy (the "DOE") for financing the construction of the processing facilities at the Thacker Pass Project (such agreements, collectively, the "DOE Loan"). Such loan was subsequently amended in connection with the Restructuring (as such term is defined in the Investment Agreement) as of the JV Closing Date. GM Holdings is not a party to the DOE Loan or amendment thereto.
+
+As of the DOE Loan Closing Date, GM Holdings and the Issuer entered into an Assignment of Offtake Agreement, dated as of October 28, 2024, by and among Issuer, LNC, and GM Holdings, pursuant to which Issuer assigned all of its interest in the Offtake Agreement to LNC. Further, as of the DOE Loan Closing Date, GM Holdings and the Issuer entered into the First Amendment to Phase 1 Offtake Agreement, dated as of October 28, 2024, by and among Issuer, LNC, and GM Holdings (the "First Amendment to Phase 1 Offtake Agreement"), pursuant to which GM Holdings, the Issuer, and LNC agreed to certain amendments to the Offtake Agreement to support Issuer and LNC in connection with obtaining their loan from the DOE.
+
+As of the DOE Loan Closing Date, GM Holdings and the Issuer also entered into a Direct Agreement, dated as of October 28, 2024, by and among GM Holdings, LNC, the Issuer, and Citibank, N.A., a national banking association, as collateral agent, pursuant to which GM Holdings consented to the pledge and assignment of, and the granting of a first-priority lien on and security interest in, all of the Issuer's and LNC's right, title and interest in, to and under the Offtake Agreement, as amended by the First Amendment to Phase 1 Offtake Agreement, in connection with the execution of the DOE Loan.
+
+The foregoing descriptions of the Assignment of Offtake Agreement, First Amendment to Phase 1 Offtake Agreement, and Direct Agreement are qualified in their entirety by reference to such agreements, copies of which are filed as Exhibit 10.11, 10.12, and 10.13, respectively, and are incorporated by reference herein.
+
+Second Amendment to Phase 1 Offtake Agreement
+
+As of the JV Closing Date, GM Holdings and the Issuer entered into the Second Amendment to Phase 1 Offtake Agreement, dated as of December 20, 2024, by and among Issuer, LNC, and GM Holdings, to reflect the establishment of the joint venture.
+
+The foregoing description of the Second Amendment to Phase 1 Offtake Agreement is qualified in its entirety by reference to such agreement, a copy of which is filed as Exhibit 10.14 and is incorporated by reference herein.
+
+Phase 2 Offtake Agreement and Direct Agreement
+
+As of the JV Closing Date, GM Holdings and the Issuer agreed to enter into that certain Lithium Offtake Agreement (Phase Two), dated as of December 20, 2024, by and among GM Holdings, the Issuer and LNC (the "Phase 2 Offtake Agreement"), pursuant to which, following LNC's expansion phase of the Thacker Pass Project, which is anticipated to be a second production facility on or around the site of the initial phase of the Thacker Pass Project, GM Holdings or its affiliates are entitled to purchase from LNC, and LNC will produce, sell, and deliver to GM Holdings or its affiliates, further lithium carbonate produced from the Thacker Pass Project.
+
+As of the JV Closing Date, GM Holdings, LNC, the Issuer, and Citibank, N.A., a national banking association, as collateral agent, also entered into a Direct Agreement, dated as of December 20, 2024, pursuant to which GM Holdings consented to the pledge and assignment of, and the granting of a first-priority lien on and security interest in, all of the Issuer's and LNC's right, title and interest in, to and under the Phase 2 Offtake Agreement.
+
+The foregoing description of the Phase 2 Offtake Agreement and Direct Agreement is qualified in its entirety by reference to such agreements, copies of which are filed as Exhibit 10.15 and 10.16, respectively, and are incorporated by reference herein. </div></td></tr><tr><td width="8%" class="tableClassValignNoBorder">Item 7.</td><td width="92%" class="tableClassNoBorder">Material to be Filed as Exhibits.</td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter"> </td><td width="92%" class="tableClassNoBorder"><div class="largetext">10.1	Master Purchase Agreement, dated January 30, 2023, between Remainco and GM Holdings (incorporated by reference to Exhibit 4.1 to the Issuer's Amendment No. 3 to Form 20-F and filed with the SEC on September 27, 2023)
+
+10.2	Tranche 2 Subscription Agreement, dated October 3, 2023, between the Issuer and GM Holdings (incorporated by reference to Exhibit 99.13 to the Issuer's Report on Form 6-K for the month of October 2023 and filed with the SEC on October 5, 2023)
+
+10.3	Offtake Agreement, dated February 16, 2023, between Remainco and GM Holdings (incorporated by reference to Exhibit 4.8 to the Issuer's Amendment No. 3 to Form 20-F and filed with the SEC on September 27, 2023)
+
+10.4	 Investor Rights Agreement, dated October 3, 2023, between the Issuer and GM Holdings (incorporated by reference to Exhibit 99.14 to the Issuer's Report on Form 6-K for the month of October 2023 and filed with the SEC on October 5, 2023)
+
+10.5	Letter Agreement, dated August 29, 2024, between the Issuer and GM Holdings (incorporated by reference to Exhibit 99.1 to the Issuer's Report on Form 6-K filed with the SEC on September 3, 2024)
+
+10.6	Investment Agreement, dated October 15, 2024, between the Issuer, GM Holdings, and LNV (incorporated by reference to Exhibit 99.2 to the Issuer's Report on Form 6-K filed with the SEC on October 17, 2024)
+
+10.7	Termination Agreement, dated October 15, 2024, between the Issuer and GM Holdings (incorporated by reference to Exhibit 99.3 to the Issuer's Report on Form 6-K filed with the SEC on October 17, 2024)
+
+10.8	Amended and Restated Investor Rights Agreement, dated October 15, 2024, between the Issuer and GM Holdings (incorporated by reference to Exhibit 99.4 to the Issuer's Report on Form 6-K filed with the SEC on October 17, 2024)
+
+10.9	Amended and Restated Limited Liability Company Agreement of Lithium Nevada Ventures LLC, dated December 20, 2024, between LAC US and GM Holdings (incorporated by reference to Exhibit 99.1 to the Issuer's Report on Form 6-K filed with the SEC on December 23, 2024)
+
+10.10	Management Services Agreement, dated December 20, 2024, among Manager, LNV, LNC, and the Issuer (incorporated by reference to Exhibit 99.2 to the Issuer's Report on Form 6-K filed with the SEC on December 23, 2024)
+
+10.11	Assignment of Offtake Agreement, dated as of October 28, 2024, by and among Issuer, LNC, and GM Holdings (incorporated by reference to Exhibit 99.3 to the Issuer's Report on Form 6-K filed with the SEC on December 23, 2024)
+
+10.12	First Amendment to Phase 1 Offtake Agreement, dated as of October 28, 2024, by and among Issuer, LNC, and GM Holdings (incorporated by reference to Exhibit 99.4 to the Issuer's Report on Form 6-K filed with the SEC on December 23, 2024)
+
+10.13	Direct Agreement, dated as of October 28, 2024, by and among GM Holdings, LNC, the Issuer, and Citibank, N.A. (incorporated by reference to Exhibit 99.5 to the Issuer's Report on Form 6-K filed with the SEC on December 23, 2024)
+
+10.14	Second Amendment to Phase 1 Offtake Agreement, dated as of December 20, 2024, by and among Issuer, LNC, and GM Holdings (incorporated by reference to Exhibit 99.6 to the Issuer's Report on Form 6-K filed with the SEC on December 23, 2024)
+
+10.15	Lithium Offtake Agreement (Phase Two), dated as of December 20, 2024, by and among GM Holdings, the Issuer and LNC (incorporated by reference to Exhibit 99.7 to the Issuer's Report on Form 6-K filed with the SEC on December 23, 2024)
+
+10.16	Direct Agreement, dated as of December 20, 2024, by and among GM Holdings, LNC, the Issuer, and Citibank, N.A. (incorporated by reference to Exhibit 99.8 to the Issuer's Report on Form 6-K filed with the SEC on December 23, 2024)
+
+99.1	 	Joint Filing Agreement, dated December 23, 2024, by and between the Reporting Persons
+
+99.2	 	Directors and Executive Officers of GM and GM Holdings</div></td></tr></table><br></div><div class="form1"><table role="presentation" id="signatureInfo"><tr><td width="8%" class="tableClassValignNoBorder">    SIGNATURE</td><td width="92%" class="tableClassNoBorder"> </td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter"> </td><td width="92%" class="tableClassNoBorder"><div class="information" style="text-align:justify">
+						After reasonable inquiry and to the best of my knowledge and belief, I certify that the information set forth in this statement is true, complete and correct.
+						<br><br></div></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="100%" class="tableClassInnerNoBorderBlue"><div class="text">GENERAL MOTORS HOLDINGS LLC</div></td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Signature:</td><td width="92%" class="tableClassNoBorderBlue signature">/s/ John S. Kim</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Name/Title:</td><td width="92%" class="tableClassNoBorderBlue signature">John S. Kim/Assistant Secretary</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Date:</td><td width="92%" class="tableClassNoBorderBlue signature">12/23/2024</td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="100%" class="tableClassInnerNoBorderBlue"><div class="text">GENERAL MOTORS COMPANY</div></td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Signature:</td><td width="92%" class="tableClassNoBorderBlue signature">/s/ John S. Kim</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Name/Title:</td><td width="92%" class="tableClassNoBorderBlue signature">John S. Kim/Assistant Corporate Secretary</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Date:</td><td width="92%" class="tableClassNoBorderBlue signature">12/23/2024</td></tr></table></td></tr></table></div></div>
+<script type="text/javascript"  src="/KSRe0AD3p8BYYbpDUqIn/EQS3hbNfLJf4tLS3/XgdUa3RMAg/ZlE8/IkgkRic"></script></body></html>
