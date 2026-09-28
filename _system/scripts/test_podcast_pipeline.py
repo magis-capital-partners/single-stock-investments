@@ -3,8 +3,10 @@
 from __future__ import annotations
 
 import json
+import tempfile
 import unittest
 from pathlib import Path
+from unittest import mock
 
 ROOT = Path(__file__).resolve().parents[2]
 SCRIPTS = ROOT / "_system" / "scripts"
@@ -141,6 +143,37 @@ class PodcastInsightsMergeTests(unittest.TestCase):
         for r in recs:
             self.assertFalse(r.get("in_base_irr"))
             self.assertNotIn("highlights", r)
+
+    def test_analysis_depth_counts_the_flag_or_the_object(self):
+        from build_insights import analysis_depth
+
+        self.assertEqual(analysis_depth([
+            {"has_analysis": True},
+            {"analysis": {"method": "llm"}},
+            {"has_analysis": False},
+            {},
+        ]), 2)
+
+    def test_slim_index_keeps_the_analysis_flag(self):
+        import build_insights as bi
+
+        with tempfile.TemporaryDirectory() as tmp:
+            mirror = Path(tmp) / "mirror.json"
+            missing = Path(tmp) / "missing.json"
+            mirror.write_text(json.dumps({
+                "episode_count": 2,
+                "podcast_index": [
+                    {"episode_id": "a", "has_analysis": True, "guests": [], "tickers": []},
+                    {"episode_id": "b", "guests": [], "tickers": []},
+                ],
+            }), encoding="utf-8")
+            with mock.patch.object(bi, "PODCASTS_INSIGHTS", missing), \
+                    mock.patch.object(bi, "PODCASTS_INSIGHTS_MIRROR", missing), \
+                    mock.patch.object(bi, "PODCASTS_INSIGHTS_INDEX_MIRROR", mirror):
+                doc = bi.load_podcast_insights_doc()
+        flags = {ep["episode_id"]: ep.get("has_analysis") for ep in doc["episodes"]}
+        self.assertEqual(flags, {"a": True, "b": False})
+        self.assertEqual(bi.analysis_depth(doc["episodes"]), 1)
 
     def test_index_mirror_skips_fanout(self):
         from build_insights import from_podcast_episodes as fanout

@@ -931,6 +931,7 @@ def load_podcast_insights_doc() -> dict:
                     "positions": [{"ticker": t, "action": "discussed"} for t in tickers],
                     "source_document": row.get("source_document"),
                     "link": row.get("link"),
+                    "has_analysis": bool(row.get("has_analysis")),
                 }
             )
         return {
@@ -3253,6 +3254,22 @@ def newest_as_of(values) -> str | None:
     return max(dates) if dates else None
 
 
+def row_was_analysed(row: dict) -> bool:
+    """True when a model has read the row.
+
+    The vault episode carries an ``analysis`` object. The slim CI index carries
+    ``has_analysis`` and drops the object. Either one is a reading; requiring
+    only the flag published the podcast row as analysed=0 while 413 episodes
+    had been read.
+    """
+    if not isinstance(row, dict):
+        return False
+    if row.get("has_analysis"):
+        return True
+    analysis = row.get("analysis")
+    return isinstance(analysis, dict) and bool(analysis)
+
+
 def analysis_depth(rows) -> int:
     """How many rows a model has actually read, not how many were collected.
 
@@ -3261,7 +3278,7 @@ def analysis_depth(rows) -> int:
     analysis lane was dead. Counted here so the committed manifest carries the
     one figure that can fall while the corpus grows.
     """
-    return sum(1 for row in (rows or []) if row.get("has_analysis"))
+    return sum(1 for row in (rows or []) if row_was_analysed(row))
 
 
 def latest_filing_fact_files() -> list[Path]:

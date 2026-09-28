@@ -5,7 +5,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 from portfolio_registry import ROOT, load_registry
@@ -15,6 +15,9 @@ DONE_STATUSES = {"evidence_ready", "closed", "complete", "resolved"}
 TERMINAL_STATUSES = {"unavailable", "manual_only"}
 DEFAULT_MAX_ATTEMPTS = 5
 DEFAULT_TERMINAL_ERROR = "Automated collection exhausted retry budget without satisfying acceptance test."
+DISCOVERED_BLOCKER_ERROR = (
+    "Valuation contract rebuild already recorded this blocker; collection has not cleared it."
+)
 
 
 def read(path: Path) -> dict:
@@ -40,11 +43,43 @@ def _stable_blocker_id(text: str) -> str:
     return f"contract_blocker:{digest}"
 
 
+def note_discovered_contract_blocker(task: dict, *, now: str | None = None) -> dict:
+    """Count the contract rebuild that found a blocker as its first attempt.
+
+    The queue is a projection of blockers the contract build already recorded.
+    Projecting them as pending_collection with attempts 0 marks the ticker
+    never-attempted, which is how V3 rose by the blocker set with no new
+    uncollected evidence task. An honest failed attempt leaves that count.
+    A later collector run still retries it; this only stops the projection
+    from pretending the finding was never looked at.
+    """
+    task_id = str(task.get("id") or "")
+    if not task_id.startswith("contract_blocker:"):
+        return task
+    if int(task.get("attempts") or 0) > 0 or task.get("last_attempt_at"):
+        return task
+    status = str(task.get("status") or "").lower()
+    if status in DONE_STATUSES or status in TERMINAL_STATUSES:
+        return task
+    stamp = now or datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+    due = (
+        datetime.strptime(stamp, "%Y-%m-%dT%H:%M:%SZ").replace(tzinfo=timezone.utc)
+        + timedelta(hours=1)
+    ).strftime("%Y-%m-%dT%H:%M:%SZ")
+    task["attempts"] = 1
+    task["status"] = "retry_scheduled"
+    task["last_attempt_at"] = stamp
+    task["next_attempt_at"] = due
+    if not str(task.get("last_error") or "").strip():
+        task["last_error"] = DISCOVERED_BLOCKER_ERROR
+    return task
+
+
 def _task_from_gap(gap: dict, previous: dict | None = None) -> dict:
     previous = previous or {}
     text = " ".join(str(gap.get(key) or "") for key in ("question", "evidence_required", "acceptance_test"))
     task_id = str(gap.get("id") or _stable_blocker_id(text))
-    return {
+    task = {
         "id": task_id,
         "priority": gap.get("priority") or "critical",
         "field_id": gap.get("field_id"),
@@ -62,6 +97,40 @@ def _task_from_gap(gap: dict, previous: dict | None = None) -> dict:
         "last_error": previous.get("last_error"),
         "evidence_refs": previous.get("evidence_refs") or [],
     }
+    return note_discovered_contract_blocker(task)
+
+
+def migrate_discovered_blockers(root: Path = ROOT) -> int:
+    """Apply note_discovered_contract_blocker to queues already on disk."""
+    stamp = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+    changed = 0
+    for folder in root.iterdir():
+        if not folder.is_dir() or folder.name.startswith((".", "_")):
+            continue
+        path = folder / "research" / "evidence_task_queue.json"
+        if not path.exists():
+            continue
+        packet = read(path)
+        tasks = packet.get("tasks") or []
+        dirty = False
+        for task in tasks:
+            if not isinstance(task, dict):
+                continue
+            before = (
+                task.get("attempts"), task.get("status"),
+                task.get("last_attempt_at"), task.get("last_error"),
+            )
+            note_discovered_contract_blocker(task, now=stamp)
+            after = (
+                task.get("attempts"), task.get("status"),
+                task.get("last_attempt_at"), task.get("last_error"),
+            )
+            dirty = dirty or before != after
+        if not dirty:
+            continue
+        path.write_text(json.dumps(packet, indent=2) + "\n", encoding="utf-8")
+        changed += 1
+    return changed
 
 
 def _ensure_terminal_error(task: dict) -> dict:
@@ -282,7 +351,16 @@ def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--scope", choices=("all-blocked", "ls-algo", "all"), default="all-blocked")
     parser.add_argument("--dry-run", action="store_true")
+    parser.add_argument(
+        "--note-discovered-blockers",
+        action="store_true",
+        help="Record the contract rebuild as the first attempt on blockers projected with attempts 0.",
+    )
     args = parser.parse_args()
+    if args.note_discovered_blockers:
+        changed = migrate_discovered_blockers()
+        print(f"noted discovered contract blockers in {changed} queues")
+        return 0
     build(args.scope, write=not args.dry_run)
     return 0
 

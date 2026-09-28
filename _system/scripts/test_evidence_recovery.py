@@ -49,6 +49,33 @@ class EvidenceRecoveryTests(unittest.TestCase):
             "Automated collection exhausted retry budget without satisfying acceptance test.",
         )
 
+    def test_a_new_contract_blocker_counts_as_already_attempted(self):
+        from build_evidence_recovery_queue import _task_from_gap
+
+        task = _task_from_gap({"id": "contract_blocker:abc", "question": "price missing"})
+        self.assertEqual(task["attempts"], 1)
+        self.assertEqual(task["status"], "retry_scheduled")
+        self.assertIn("contract rebuild", task["last_error"])
+
+    def test_a_recorded_blocker_attempt_is_kept(self):
+        from build_evidence_recovery_queue import _task_from_gap
+
+        task = _task_from_gap(
+            {"id": "contract_blocker:abc", "question": "price missing"},
+            {"attempts": 2, "status": "retry_scheduled", "last_attempt_at": "2026-09-01T00:00:00Z",
+             "last_error": "still blocked"},
+        )
+        self.assertEqual(task["attempts"], 2)
+        self.assertEqual(task["last_attempt_at"], "2026-09-01T00:00:00Z")
+        self.assertEqual(task["last_error"], "still blocked")
+
+    def test_a_method_input_still_starts_unattempted(self):
+        from build_evidence_recovery_queue import _task_from_gap
+
+        task = _task_from_gap({"id": "method_input:shares", "question": "shares outstanding"})
+        self.assertEqual(task["attempts"], 0)
+        self.assertEqual(task["status"], "pending_collection")
+
 
 if __name__ == "__main__":
     unittest.main()
