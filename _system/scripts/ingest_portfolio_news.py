@@ -68,11 +68,14 @@ POLYGON_REQS_PER_MIN = int(os.getenv("PORTFOLIO_NEWS_POLYGON_REQS_PER_MIN", "5")
 ENABLE_POLYGON = os.getenv("PORTFOLIO_NEWS_ENABLE_POLYGON", "1") not in {"0", "false", "False", ""}
 ENABLE_GOOGLE = os.getenv("PORTFOLIO_NEWS_ENABLE_GOOGLE", "1") not in {"0", "false", "False", ""}
 GOOGLE_MAX_PER_QUERY = int(os.getenv("PORTFOLIO_NEWS_GOOGLE_MAX_PER_QUERY", "50"))
-# The Google phase was one request per holding, serially: ~1.9 s x 843 tickers
-# = 26 minutes, on top of an 11-16 minute Polygon phase, inside a 45-minute
-# job. 58 of 65 runs from 2026-09-08 to 09-24 hit the job timeout, which
-# GitHub reports as "cancelled", and a cancelled run writes nothing at all.
-GOOGLE_WORKERS = max(1, int(os.getenv("PORTFOLIO_NEWS_GOOGLE_WORKERS", "8")))
+# 843 holdings. At the ~14s GitHub sees per Google request, 8 workers need
+# about 24 minutes. Stacked on a 15-minute Polygon phase that is 39 minutes,
+# and the step is killed at 40. 16 workers bring Google under 15 minutes, and
+# the two phases run together so the kill line is not the sum.
+GOOGLE_WORKERS = max(1, int(os.getenv("PORTFOLIO_NEWS_GOOGLE_WORKERS", "16")))
+# One Google attempt, including a body that trickles. A timeout is an idle
+# gap; without this cap a slow drip holds a worker until the step is killed.
+GOOGLE_ATTEMPT_BUDGET_SEC = float(os.getenv("PORTFOLIO_NEWS_GOOGLE_ATTEMPT_SEC", "20"))
 GOOGLE_RETRY_STATUS = {429, 500, 502, 503, 504}
 # Whole-run budget. When it runs out, no new request is started and the feed
 # is written with what was fetched, previous items kept for every holding
@@ -393,24 +396,27 @@ def _fetch_google_news_rss(
         "ceid": locale.get("ceid", "US:en"),
     }
     url = "https://news.google.com/rss/search?" + urllib.parse.urlencode(params)
+    budget = GOOGLE_ATTEMPT_BUDGET_SEC
     resp = None
     for attempt in range(2):
         try:
-            resp = session.get(url, timeout=(10, 15), stream=True)
+            resp = session.get(url, timeout=(5, budget), stream=True)
         except Exception as exc:  # noqa: BLE001
+            # A timeout already spent the attempt budget. Retrying it is how
+            # one stalled holding consumes two workers' worth of the run.
             LOGGER.warning("google RSS failed: %s", exc)
-            resp = None
-        if resp is not None and resp.status_code not in GOOGLE_RETRY_STATUS:
+            return None
+        if resp.status_code not in GOOGLE_RETRY_STATUS:
             break
-        if resp is not None:
-            close = getattr(resp, "close", None)
-            if close is not None:
-                close()
+        close = getattr(resp, "close", None)
+        if close is not None:
+            close()
+        resp = None
         if attempt == 0:
-            time.sleep(2.0)
+            time.sleep(1.0)
     if resp is None or resp.status_code != 200:
         return None
-    content = _read_bounded(resp, HTTP_TIMEOUT_SEC)
+    content = _read_bounded(resp, budget)
     if not content:
         return [] if content == b"" else None
     try:
@@ -504,7 +510,7 @@ def _fetch_google_rows_bounded(
             submit_next()
         while pending:
             if deadline is not None and deadline.expired() and abandon_at is None:
-                abandon_at = time.monotonic() + HTTP_TIMEOUT_SEC
+                abandon_at = time.monotonic() + GOOGLE_ATTEMPT_BUDGET_SEC
             done, _ = wait(list(pending), timeout=1, return_when=FIRST_COMPLETED)
             if not done:
                 if abandon_at is not None and time.monotonic() >= abandon_at:
@@ -1017,6 +1023,64 @@ def sanitize_existing_news(
     return len(items), reassigned, dropped
 
 
+def collect_news_phases(
+    configs: dict[str, HoldingNewsConfig],
+    *,
+    tickers: list[str] | None,
+    deadline: Deadline,
+    coverage: dict,
+) -> tuple[list[NewsItem], list[NewsItem]]:
+    """Fetch Polygon and Google at the same time.
+
+    Stacked, Polygon is about 15 minutes and Google about 24. Their sum sits
+    on the 40-minute kill, so a slightly slow Google day dies before the feed
+    is written. Side by side, the run is as long as the slower phase.
+    """
+    boxes: dict[str, list[NewsItem]] = {"polygon": [], "google": []}
+
+    def run_polygon() -> None:
+        try:
+            boxes["polygon"] = phase_polygon_news(
+                build_session(), configs, deadline=deadline, coverage=coverage
+            )
+        except Exception:
+            LOGGER.exception("polygon phase failed")
+            coverage.setdefault("polygon", {}).update({"status": "failed", "stop": "failed"})
+
+    def run_google() -> None:
+        try:
+            boxes["google"] = phase_google_news(
+                build_session(),
+                configs,
+                tickers=tickers,
+                deadline=deadline,
+                coverage=coverage,
+            )
+        except Exception:
+            LOGGER.exception("google phase failed")
+            coverage.setdefault("google", {})
+
+    threads = [
+        threading.Thread(target=run_polygon, name="polygon-news", daemon=True),
+        threading.Thread(target=run_google, name="google-news", daemon=True),
+    ]
+    for thread in threads:
+        thread.start()
+    grace = GOOGLE_ATTEMPT_BUDGET_SEC + 15
+    if deadline.seconds is None:
+        for thread in threads:
+            thread.join()
+    else:
+        remaining = max(1.0, deadline.seconds - deadline.elapsed() + grace)
+        for thread in threads:
+            thread.join(remaining)
+            if thread.is_alive():
+                LOGGER.warning(
+                    "%s still running after the deadline; writing the feed", thread.name
+                )
+    return boxes["polygon"], boxes["google"]
+
+
 def main() -> int:
     logging.basicConfig(level=logging.INFO, format="%(levelname)s %(message)s")
     parser = argparse.ArgumentParser(description="Ingest portfolio news")
@@ -1061,20 +1125,17 @@ def main() -> int:
     deadline = Deadline(DEADLINE_SEC if DEADLINE_SEC > 0 else None)
     coverage: dict = {}
     previous = _load_previous_feed()
-    session = build_session()
     items: list[NewsItem] = []
-    items.extend(phase_polygon_news(session, configs, deadline=deadline, coverage=coverage))
-    items.extend(
-        phase_google_news(
-            session,
-            configs,
-            tickers=subset or sorted(configs.keys()),
-            deadline=deadline,
-            coverage=coverage,
-        )
+    polygon_items, google_items = collect_news_phases(
+        configs,
+        tickers=subset or sorted(configs.keys()),
+        deadline=deadline,
+        coverage=coverage,
     )
+    items.extend(polygon_items)
+    items.extend(google_items)
     if (not subset or "INV" in subset) and not deadline.expired():
-        items.extend(phase_two_phase_theme_news(session))
+        items.extend(phase_two_phase_theme_news(build_session()))
 
     google = coverage.get("google") or {}
     polygon = coverage.get("polygon") or {}

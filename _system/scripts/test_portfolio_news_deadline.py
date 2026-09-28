@@ -99,7 +99,7 @@ class GooglePhaseConcurrencyTests(unittest.TestCase):
         holdings = configs(4)
         coverage: dict = {}
         started = time.monotonic()
-        with mock.patch.object(ingest, "HTTP_TIMEOUT_SEC", 0.05), \
+        with mock.patch.object(ingest, "GOOGLE_ATTEMPT_BUDGET_SEC", 0.05), \
                 mock.patch.object(ingest, "_fetch_google_news_rss", side_effect=fake_fetch):
             ingest.phase_google_news(
                 None, holdings, tickers=sorted(holdings), workers=1,
@@ -124,7 +124,7 @@ class GooglePhaseConcurrencyTests(unittest.TestCase):
 
         session = mock.Mock()
         session.get.return_value = _Trickle()
-        with mock.patch.object(ingest, "HTTP_TIMEOUT_SEC", 0.1), \
+        with mock.patch.object(ingest, "GOOGLE_ATTEMPT_BUDGET_SEC", 0.1), \
                 mock.patch.object(ingest.time, "sleep"):
             self.assertIsNone(ingest._fetch_google_news_rss(session, "q", {}))
 
@@ -139,6 +139,34 @@ class GooglePhaseConcurrencyTests(unittest.TestCase):
         self.assertEqual(coverage["google"]["failed"], 1)
         self.assertEqual(coverage["google"]["failed_tickers"], ["T01"])
         self.assertNotIn("T01", coverage["google"]["refreshed_tickers"])
+
+    def test_google_starts_while_polygon_is_still_running(self) -> None:
+        order: list[str] = []
+        lock = threading.Lock()
+
+        def polygon(_session, _configs, deadline=None, coverage=None):
+            with lock:
+                order.append("polygon-start")
+            time.sleep(0.3)
+            with lock:
+                order.append("polygon-end")
+            return []
+
+        def google(_session, _configs, tickers=None, workers=None, deadline=None, coverage=None):
+            with lock:
+                order.append("google-start")
+            time.sleep(0.05)
+            with lock:
+                order.append("google-end")
+            return []
+
+        holdings = configs(1)
+        with mock.patch.object(ingest, "phase_polygon_news", side_effect=polygon), \
+                mock.patch.object(ingest, "phase_google_news", side_effect=google):
+            ingest.collect_news_phases(
+                holdings, tickers=["T00"], deadline=ingest.Deadline(30), coverage={}
+            )
+        self.assertLess(order.index("google-start"), order.index("polygon-end"))
 
 
 class _Response:
