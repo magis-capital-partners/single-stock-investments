@@ -1,10 +1,15 @@
 # Event triage — human review queue
 
 **Date:** 2026-09-28
-**Rows:** 4058
+**Rows:** 2548
 
 | Date | Ticker | Source | Tier | Materiality | Rules | Title |
 |------|--------|--------|------|-------------|-------|-------|
+| 2026-09-28 | COF | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | Capital One's stock outlook improves as Discover integration |
+| 2026-09-28 | CCI | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | Crown Castle (CCI) Could Be 28% Undervalued On CFO Transitio |
+| 2026-09-28 | MSFT | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | Microsoft Stock Outlook: Azure Growth and New Copilot Featur |
+| 2026-09-28 | O | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | The Unstoppable Monthly Dividend Stock to Buy and Hold Forev |
+| 2026-09-28 | SBUX | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | Starbucks to Close Select North America Coffeehouses, Cuts S |
 | 2026-09-28 | ACHR | kpi_trend | context | 66 | rule_conflict, activist_cross_link, routine_governance_watch | Leadership / governance on watch |
 | 2026-09-28 | AMR | kpi_trend | context | 66 | rule_conflict, activist_cross_link, routine_governance_watch | Leadership / governance on watch |
 | 2026-09-28 | APLD | kpi_trend | context | 66 | rule_conflict, activist_cross_link, routine_governance_watch | Leadership / governance on watch |
@@ -43,6 +48,12 @@
 | 2026-09-28 | MSCI | kpi_trend | context | 66 | rule_conflict, activist_cross_link, routine_governance_watch | Leadership / governance on watch |
 | 2026-09-28 | SMCI | kpi_trend | context | 66 | rule_conflict, activist_cross_link, routine_governance_watch | Leadership / governance on watch |
 | 2026-09-28 | FRMI | kpi_trend | context | 66 | rule_conflict, activist_cross_link, routine_governance_watch | Leadership / governance on watch |
+| 2026-09-28 | ROAD | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | Construction Partners (ROAD) Expands in Florida. Can a Stron |
+| 2026-09-27 | CSCO | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | Cisco (CSCO) Stock Surges 46% in 2026: AI Infrastructure Gro |
+| 2026-09-27 | FDX | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | FedEx (FDX) Q4 Fiscal 2026 Earnings on June 23rd - What to E |
+| 2026-09-27 | MSFT | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | Microsoft (MSFT) Q4 FY2026 Earnings Preview: $87.7B Revenue, |
+| 2026-09-27 | AMR | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | 53,128 Shares in Alpha Metallurgical Resources, Inc. $AMR Ac |
+| 2026-09-27 | GOOGL | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | A $1,000 Investment Split Between Alphabet and Nvidia Will B |
 | 2026-09-27 | BUR | vic_research | context | 33 | rule_conflict, activist_cross_link, neutral_low_impact | 07-BURFORD-CAPITAL-BUR-4694552095_151e |
 | 2026-09-27 | BUR | vic_research | context | 33 | rule_conflict, activist_cross_link, neutral_low_impact | VIC PDF intake - BUR - BUR VIC PDF |
 | 2026-09-27 | TRC | vic_research | context | 33 | rule_conflict, activist_cross_link, neutral_low_impact | VIC PDF intake - TRC - TRC VIC PDF |
@@ -194,14 +205,3 @@
 | 2026-09-27 | HLT | third_party | context | 25 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | HoldCo Asset Management — SC 13D/A |
 | 2026-09-27 | EXP | third_party | context | 25 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | Sachem Head Capital — SC 13D/A |
 | 2026-09-27 | EXP | third_party | context | 25 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | Sachem Head Capital — DEFA14A |
-| 2026-09-27 | PLUG | third_party | context | 25 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | Dec 19, 2019 |
-| 2026-09-27 | GE | third_party | context | 25 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | Trian Partners — SC 13D/A |
-| 2026-09-27 | GE | third_party | context | 25 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | General Electric Company — SC 13D/A |
-| 2026-09-27 | GE | third_party | context | 25 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | Inc — SC 13D/A |
-| 2026-09-27 | CNC | third_party | context | 25 | rule_conflict, activist_cross_link, neutral_low_impact | Centene Corporation — DFAN14A (proxy solicitation) |
-| 2026-09-27 | CNC | third_party | context | 25 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | Politan Capital Management — DEFA14A |
-| 2026-09-27 | NVTS | third_party | context | 25 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | Capricorn-Libra Investment Group, L.P. — SC 13D |
-| 2026-09-27 | HAS | third_party | context | 25 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | DEFC14A 1 d235661ddefc14a.htm DEFC14A DEFC14A... — DEFC14A ( |
-| 2026-09-27 | HAS | third_party | context | 25 | rule_conflict, activist_cross_link, neutral_low_impact | DEFC14A (proxy solicitation) · HAS · 2022-04-26 |
-| 2026-09-27 | DIS | third_party | context | 25 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | Trian Partners — DEFC14A (proxy solicitation) |
-| 2026-09-27 | BG | third_party | context | 25 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | CPP Investment Board Private Holdings (5), Inc — SC 13D |
