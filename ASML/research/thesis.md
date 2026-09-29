@@ -17,7 +17,7 @@
 | **Payoff lens** | pending |
 | **MOI bucket** | pending |
 
-**Deep dive:** `ASML/research/deep_dive_2026-08-18.md` (auto-sync)
+**Deep dive:** `ASML/research/deep_dive_2026-09-29.md` (auto-sync)
 
 ## One-line thesis
 
