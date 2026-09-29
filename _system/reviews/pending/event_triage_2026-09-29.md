@@ -1,10 +1,11 @@
 # Event triage — human review queue
 
 **Date:** 2026-09-29
-**Rows:** 4141
+**Rows:** 2616
 
 | Date | Ticker | Source | Tier | Materiality | Rules | Title |
 |------|--------|--------|------|-------------|-------|-------|
+| 2026-09-29 | AMZN | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | Amazon vs. Alibaba: Which Consumer Stock Is a Better Buy in  |
 | 2026-09-29 | ACHR | kpi_trend | context | 66 | rule_conflict, activist_cross_link, routine_governance_watch | Leadership / governance on watch |
 | 2026-09-29 | AMR | kpi_trend | context | 66 | rule_conflict, activist_cross_link, routine_governance_watch | Leadership / governance on watch |
 | 2026-09-29 | ARES | kpi_trend | context | 66 | rule_conflict, activist_cross_link, routine_governance_watch | Leadership / governance on watch |
@@ -42,8 +43,8 @@
 | 2026-09-29 | MSCI | kpi_trend | context | 66 | rule_conflict, activist_cross_link, routine_governance_watch | Leadership / governance on watch |
 | 2026-09-29 | SMCI | kpi_trend | context | 66 | rule_conflict, activist_cross_link, routine_governance_watch | Leadership / governance on watch |
 | 2026-09-29 | FRMI | kpi_trend | context | 66 | rule_conflict, activist_cross_link, routine_governance_watch | Leadership / governance on watch |
+| 2026-09-29 | HAS | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | Hasbro Cyberattack: Vishing Blamed, 6 Months Later [2026] -  |
 | 2026-09-28 | CTAS | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | Cintas (CTAS) Beats Estimates and Raises Fiscal 2027 Guidanc |
-| 2026-09-28 | CRM | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | Is Salesforce (NYSE:CRM) Turning Agentic AI Into Real Recurr |
 | 2026-09-28 | COF | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | Capital One's stock outlook improves as Discover integration |
 | 2026-09-28 | CCI | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | Crown Castle (CCI) Could Be 28% Undervalued On CFO Transitio |
 | 2026-09-28 | MSFT | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | Microsoft Stock Outlook: Azure Growth and New Copilot Featur |
@@ -51,6 +52,7 @@
 | 2026-09-28 | SBUX | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | Starbucks to Close Select North America Coffeehouses, Cuts S |
 | 2026-09-28 | SOFI | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | SOFI Stock Under Pressure As Insider Files Form 144 - timoth |
 | 2026-09-28 | SOFI | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | SOFI Stock Dips As Form 144 Insider Sale Looms - timothysyke |
+| 2026-09-28 | ROAD | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | Construction Partners (ROAD) Expands in Florida. Can a Stron |
 | 2026-09-27 | AMR | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | 53,128 Shares in Alpha Metallurgical Resources, Inc. $AMR Ac |
 | 2026-09-27 | GOOGL | news | context | 38 | rule_conflict, activist_cross_link, neutral_low_impact | A $1,000 Investment Split Between Alphabet and Nvidia Will B |
 | 2026-09-27 | BUR | vic_research | context | 33 | rule_conflict, activist_cross_link, neutral_low_impact | 07-BURFORD-CAPITAL-BUR-4694552095_151e |
@@ -203,5 +205,3 @@
 | 2026-09-27 | SBUX | third_party | context | 25 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | Strategic (+7) — DFAN14A (proxy solicitation) |
 | 2026-09-27 | HLT | third_party | context | 25 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | HoldCo Asset Management — SC 13D/A |
 | 2026-09-27 | EXP | third_party | context | 25 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | Sachem Head Capital — SC 13D/A |
-| 2026-09-27 | EXP | third_party | context | 25 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | Sachem Head Capital — DEFA14A |
-| 2026-09-27 | PLUG | third_party | context | 25 | rule_conflict, activist_cross_link, entity_mismatch, neutral_low_impact | Dec 19, 2019 |
