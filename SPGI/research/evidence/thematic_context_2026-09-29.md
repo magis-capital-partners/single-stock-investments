@@ -1,0 +1,29 @@
+# SPGI - Thematic context (2026-09-29)
+
+> Context only. Tailwinds inform stance and overlay sizing; they do not auto-inflate Lawrence base IRR. Promotion to base case requires [HUMAN REVIEW].
+
+| Indicator | Latest | As of | YoY | Direction | In base IRR? |
+|-----------|--------|-------|-----|-----------|--------------|
+| High-yield OAS credit spread (%) | 0.75 | 2026-09-29 | +175.8% | up | no (context) |
+| US Treasury 10Y yield (%) | 5.26800012588501 | 2026-09-29 | +27.2% | up | no (context) |
+| US Treasury 2Y yield (%) | 5.074999809265137 | 2026-09-29 | +35.7% | up | no (context) |
+| Trade-weighted USD index (broad) | 101.45500183105469 | 2026-09-29 | +3.6% | up | no (context) |
+| VIX index level | 16.280000686645508 | 2026-09-29 | +1.0% | flat | no (context) |
+| HYG vs TLT 1-month return spread (%) | 2.69 | 2026-09-29 | +207.6% | up | no (context) |
+| SPY 20-day realized vol (annualized %) | 10.77 | 2026-09-29 | +45.9% | up | no (context) |
+| AGI expert-horizon years ahead (public quotes) | 5.0 | 2026-06-01 | +0.0% | flat | no (context) |
+| Robotaxi expert-horizon years ahead (public quotes) | 2.0 | 2026-06-01 | +0.0% | flat | no (context) |
+| VIX index level | 16.280000686645508 | 2026-09-29 | +1.0% | flat | no (context) |
+| SPY 20-day realized vol (annualized %) | 10.77 | 2026-09-29 | +45.9% | up | no (context) |
+| Nikkei 225 20-day realized vol (annualized %) | 18.56 | 2026-09-28 | +33.8% | up | no (context) |
+| Hang Seng 20-day realized vol (annualized %) | 12.64 | 2026-09-28 | -23.8% | down | no (context) |
+| ASX 200 20-day realized vol (annualized %) | 8.68 | 2026-09-28 | -18.4% | down | no (context) |
+| FTSE 100 20-day realized vol (annualized %) | 9.85 | 2026-09-29 | +41.3% | up | no (context) |
+| Euro Stoxx 50 20-day realized vol (annualized %) | 11.52 | 2026-09-29 | +0.4% | flat | no (context) |
+| VRP health score (etf-dashboard derived 0-100) | 87.77 (stale) | 2026-07-28 | n/a | flat | no (context) |
+| Vol term-structure slope (VIX3M - VIX) | 1.94 | 2026-09-29 | -26.5% | down | no (context) |
+| VIX index level | 16.170000076293945 | 2026-09-29 | +0.3% | flat | no (context) |
+| SPY 20-day realized vol (annualized %) | 10.77 | 2026-09-29 | +45.9% | up | no (context) |
+| US Treasury 10Y yield (%) | 5.272000312805176 | 2026-09-29 | +27.3% | up | no (context) |
+
+Source panels: `_system/reference/market-data/themes/manifest.json`.
