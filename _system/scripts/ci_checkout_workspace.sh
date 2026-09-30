@@ -42,6 +42,13 @@ fetch_ref() {
 }
 
 checkout_ref() {
+  if [[ "$REF" =~ ^[0-9a-fA-F]{40}$ ]]; then
+    # A commit id is not a branch name. repository_dispatch always runs the
+    # workflow file on the default branch and passes the PR head this way;
+    # checkout -B would try to create a branch named after the commit.
+    git checkout --detach FETCH_HEAD
+    return 0
+  fi
   git checkout -B "$REF" "origin/$REF" 2>/dev/null || git checkout FETCH_HEAD
 }
 
