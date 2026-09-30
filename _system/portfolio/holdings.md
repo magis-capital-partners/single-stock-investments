@@ -174,14 +174,14 @@ Synced from `_system/portfolio/registry.json`. Last sync: 2026-09-30.
 | CMG | CMG/ | Chipotle Mexican Grill | US | 2026-09-27 | 2026-09-30 | unknown | watch |
 | CMI | CMI/ | Cummins | US | 2026-09-27 | 2026-09-30 | unknown | watch |
 | CMS | CMS/ | CMS Energy | US | 2026-09-27 | 2026-09-30 | unknown | watch |
-| CMSG | CMSG/ | Consensus Mining & Seigniorage Corp | US | 2026-07-09 | 2026-09-30 | optionality | watch |
-| CNC | CNC/ | Centene Corporation | US | 2026-07-29 | 2026-09-30 | unknown | watch |
-| CNP | CNP/ | CenterPoint Energy | US | 2026-07-09 | 2026-09-30 | unknown | watch |
-| COF | COF/ | Capital One | US | 2026-07-09 | 2026-09-30 | unknown | watch |
-| COHR | COHR/ | Coherent Corp. | US | 2026-07-29 | 2026-09-30 | unknown | watch |
-| COIN | COIN/ | Coinbase | US | 2026-07-29 | 2026-09-30 | unknown | watch |
-| COLD | COLD/ | Americold Realty Trust, Inc. | US | 2026-07-29 | 2026-09-30 | unknown | watch |
-| COO | COO/ | Cooper Companies (The) | US | 2026-07-29 | 2026-09-30 | unknown | watch |
+| CMSG | CMSG/ | Consensus Mining & Seigniorage Corp | US | 2026-09-30 | 2026-09-30 | optionality | watch |
+| CNC | CNC/ | Centene Corporation | US | 2026-09-30 | 2026-09-30 | unknown | watch |
+| CNP | CNP/ | CenterPoint Energy | US | 2026-09-30 | 2026-09-30 | unknown | watch |
+| COF | COF/ | Capital One | US | 2026-09-30 | 2026-09-30 | unknown | watch |
+| COHR | COHR/ | Coherent Corp. | US | 2026-09-30 | 2026-09-30 | unknown | watch |
+| COIN | COIN/ | Coinbase | US | 2026-09-30 | 2026-09-30 | unknown | watch |
+| COLD | COLD/ | Americold Realty Trust, Inc. | US | 2026-09-30 | 2026-09-30 | unknown | watch |
+| COO | COO/ | Cooper Companies (The) | US | 2026-09-30 | 2026-09-30 | unknown | watch |
 | COP | COP/ | ConocoPhillips | US | 2026-07-29 | 2026-09-30 | unknown | watch |
 | COPX | COPX/ | COPX | US | 2026-07-29 | 2026-09-30 | unknown | watch |
 | COR | COR/ | Cencora | US | 2026-07-09 | 2026-09-30 | unknown | watch |
