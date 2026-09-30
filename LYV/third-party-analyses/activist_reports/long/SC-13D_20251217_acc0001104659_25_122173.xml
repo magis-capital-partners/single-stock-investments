@@ -1,0 +1,455 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns:p="http://www.sec.gov/edgar/schedule13D" xmlns:p1="http://www.sec.gov/edgar/common"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><link rel="stylesheet" type="text/css" href="/css/SDR_print.css"><style type="text/css">
+					.fakeTextBox {
+					border-top: 2px solid #999;
+					border-right: 1px solid #ccc;
+					border-bottom: 1px solid #ccc;
+					border-left: 2px solid #999;
+					padding: 2px;
+					_width: 800px;
+					height: auto;
+					min-width: 200px;
+					min-height: 50px;
+					word-wrap: break-word;
+					font-size: 0.9em;
+					color: blue;
+					}
+					table.tableClass { border: solid black;
+					border-top-width: 1;
+					border-right-width: 1;
+					border-bottom-width: 1;
+					border-left-width: 1;
+					table-layout:fixed;
+					}
+					table.innerTableClass { border: solid black;
+					border-top-width: 0;
+					border-right-width: 0;
+					border-bottom-width: 0;
+					border-left-width: 0;
+					table-layout:fixed;
+					}
+					th.tableClassLeft { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					padding: 2px;
+					}
+					th.tableClassRight { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 0;
+					padding: 2px;
+					}
+					th.tableClass { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					padding: 2px;
+					}
+					td.tableClassLeft { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					font-size: 0.9em;
+					color: blue;
+					word-wrap: break-word;
+					}
+					td.tableClassRight { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 0;
+					font-size: 0.9em;
+					color: blue;
+					word-wrap: break-word;
+					}
+					td.tableClass { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					font-size: 0.9em;
+					font-weight:bold;
+					color: black;
+					word-wrap: break-word;
+					}
+					td.tableClassNoBorder { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 0px;
+					font-size: 0.9em;
+					font-weight:bold;
+					color: black;
+					word-wrap: break-word;
+					}
+
+					td.tableClassNoBorderBlue { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 0px;
+					font-size: 0.9em;
+					font-weight:bold;
+					color: blue;
+					word-wrap: break-word;
+					}
+
+					td.tableClassInnerNoBorderBlue { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 0px;
+					font-size: 1.4em;
+					font-weight:bold;
+					color: blue;
+					word-wrap: break-word;
+					}
+
+					td.tableClassNoBorderAlignLeft { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 0px;
+					font-size: 0.9em;
+					font-weight:bold;
+					text-align: left;
+					color: black;
+					word-wrap: break-word;
+					}
+
+					td.signature {
+					padding: 4px 8px;
+					}
+
+					td.tableClassInner { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					font-size: 1em;
+					font-weight:bold;
+					color: black;
+					word-wrap: break-word;
+					}
+
+					td.tableClassValign { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					font-size: 0.9em;
+					font-weight:bold;
+					color: black;
+					vertical-align: middle;
+					text-align: center;
+					word-wrap: break-word;
+					}
+
+					td.tableClassValignNoBorder { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 0px;
+					font-size: 0.9em;
+					font-weight:bold;
+					color: black;
+					vertical-align: middle;
+					text-align: center;
+					word-wrap: break-word;
+					}
+
+					td.tableClassValignInner { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					font-size: 1em;
+					font-weight:bold;
+					color: black;
+					vertical-align: middle;
+					text-align: center;
+					word-wrap: break-word;
+					}
+
+					td.innerTableClassRightValign { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 0;
+					font-size: 1em;
+					font-weight:bold;
+					color: black;
+					vertical-align: middle;
+					text-align: center;
+					word-wrap: break-word;
+					}
+
+					td.innerTableClassRightValignBottomLess { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 0px;
+					border-left-width: 0;
+					font-size: 1em;
+					font-weight:bold;
+					color: black;
+					vertical-align: middle;
+					text-align: center;
+					word-wrap: break-word;
+					}
+
+					td.tableClassInnerLeft { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					font-size: 1em;
+					font-weight:bold;
+					color: black;
+					word-wrap: break-word;
+					}
+
+					td.tableClassInnerLeftBottomLess { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 1px;
+					font-size: 1em;
+					font-weight:bold;
+					color: black;
+					word-wrap: break-word;
+					}
+
+					td.tableClassNoBorderAlignCenter { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 0px;
+					font-size: 0.9em;
+					font-weight:bold;
+					color: black;
+					text-align: center;
+					word-wrap: break-word;
+					}
+
+					tr.tableClass { border: solid black;
+					border-top-width: 1px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					}
+					tr.tableClassWithBg { border: solid black;
+					border-top-width: 0;
+					border-right-width: 1;
+					border-bottom-width: 1;
+					border-left-width: 0;
+					background-color: #e0e0ff
+					}
+
+					tr.tableClassWithBgBlack { border: solid black;
+					border-top-width: 0;
+					border-right-width: 1;
+					border-bottom-width: 1;
+					border-left-width: 0;
+					background-color: #D3D3D3
+					}
+
+					hr.header {
+					position: relative;
+					top: 20px;
+					border: none;
+					height: 6px;
+					background: black;
+					margin-bottom: 10px;
+					}
+
+					hr.separatorThin {
+					position: relative;
+					top: 2px;
+					border: none;
+					height: 2px;
+					background: black;
+					margin-bottom: 2px;
+					}
+
+					hr.headerThin {
+					position: relative;
+					top: 10px;
+					border: none;
+					height: 2px;
+					background: black;
+					margin-bottom: 10px;
+					}
+
+					hr.separator {
+					position: relative;
+					top: 20px;
+					border: none;
+					height: 4px;
+					background: black;
+					margin-bottom: 5px;
+					}
+
+					div.text {
+					background-color: #ffffff;
+					color: blue;
+					font-size: 1em;
+					font-weight:normal;
+					text-align:justify;
+					}
+
+
+					div.information {
+					background-color: #ffffff;
+					color: black;
+					font-size: 1em;
+					font-weight:normal;
+					text-align:justify;
+					}
+
+					#scheader {
+					font-size: 0.9em;
+					border: 0px solid #404040;
+					border-spacing: 2px;
+					}
+
+					div.largetext {
+					background-color: #ffffff;
+					color: blue;
+					font-size: 1em;
+					font-weight:normal;
+					text-align:justify;
+					white-space: pre-wrap;
+					word-break: normal;
+					}
+
+				</style></head><body lang="en-US" text="#000000" bgcolor="#ffffff"><hr class="header"><br><hr class="headerThin"><div class="contentwrapper"><table role="presentation" id="scheader"><tr><td class="tableClassNoBorderAlignCenter" style="font-size:2em;">
+						SECURITIES AND EXCHANGE COMMISSION
+						<br>
+						Washington, D.C. 20549
+					</td></tr><tr><td class="tableClassNoBorderAlignCenter"><br><br><div style="font-size:1.5em;">
+									SCHEDULE 13D
+								</div><br><div style="font-size:1.2em;">
+							Under the Securities Exchange Act of 1934
+						</div><br></td></tr><tr><td class="center"><div class="information" style="text-align:center; font-weight:bold; color:blue;">Live Nation Entertainment, Inc.</div><div class="information" style="text-align:center; font-weight:bold;"><hr class="separatorThin">(Name of Issuer)</div><br><br></td></tr><tr><td class="center"><div class="information" style="text-align:center; font-weight:bold; color:blue;">Common Stock, par value $0.01 per share</div><div class="information" style="text-align:center; font-weight:bold;"><hr class="separatorThin">(Title of Class of Securities)</div><br><br></td></tr><tr><td class="center"><div class="information" style="text-align:center; font-weight:bold; color:blue;">538034109</div><div class="information" style="text-align:center; font-weight:bold;"><hr class="separatorThin">(CUSIP Number)</div><br><br></td></tr><tr><td class="center"><div class="information" style="text-align:center; font-weight:bold; color:blue;">Renee L. Wilm, CLO and CAO<br>Liberty Live Holdings, Inc.,
+								12300 Liberty Boulevard<br>Englewood,
+								CO,
+								80112<br>(720) 875-5200</div><div class="information" style="text-align:center; font-weight:bold;"><hr class="separatorThin">(Name, Address and Telephone Number of Person Authorized to
+									Receive Notices and Communications)</div></td></tr><tr><td class="center"><div class="information" style="text-align:center; font-weight:bold; color:blue;">12/15/2025</div><div class="information" style="text-align:center; font-weight:bold;"><hr class="separatorThin">(Date of Event Which Requires Filing of This Statement)</div></td></tr></table><br><br><div class="information" style="text-align:justify">
+				If the filing person has previously filed a statement on Schedule 13G to report the acquisition that is the subject of this Schedule 13D, and is filing this schedule because of §§ 240.13d-1(e), 240.13d-1(f) or 240.13d-1(g), check the following box.
+				<img src="/Images/box-unchecked.jpg" alt="Checkbox not checked"></div><br><div class="information" style="text-align:justify">
+				The information required on the remainder of this cover page shall not be deemed to be “filed” for the purpose of Section 18 of the
+				Securities Exchange Act of 1934 (“Act”) or otherwise subject to the liabilities of that section of the Act but shall be subject to all other
+				provisions of the Act (however, see the Notes).
+			</div></div><hr class="headerThin"><hr class="header"><br><br>
+  <div class="content"><div class="form1"></div></div>
+  <div class="content"><div class="form1"><table><tr><td class="center"><br><br><p><div align="center" style="font-size:1.2em;">
+									SCHEDULE 13D
+								</div></p></td></tr></table><table role="presentation" class="tableClass" id="cusipNumber"><tr class="tableClass"><td width="25%" style="font-weight:bold;">CUSIP No.</td><td width="75%"><div style="font-size:.9em; color:#000000">538034109</div></td></tr></table><br><br><table role="presentation" class="tableClass" id="reportingPersonDetails"><tr class="tableClass"><td width="8%" class="tableClassValign">1</td><td width="92%" class="tableClass">
+					Name of reporting person
+					<br><br><div class="text">Liberty Live Holdings, Inc.</div></td></tr><tr><td width="8%" class="tableClassValign">2</td><td width="92%" class="tableClass">Check the appropriate box if a member of a Group (See Instructions)
+					<br><br><div class="text"><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked">  (a)
+						<br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked">  (b)
+					</div></td></tr><tr class="tableClassWithBgBlack"><td width="8%" class="tableClassValign">3</td><td width="92%" class="tableClass">SEC use only</td></tr><tr><td width="8%" class="tableClassValign">4</td><td width="92%" class="tableClass">
+					Source of funds (See Instructions)
+					<br><br><div class="text">OO</div></td></tr><tr><td width="8%" class="tableClassValign">5</td><td width="92%" class="tableClass">
+					Check if disclosure of legal proceedings is required pursuant to Items 2(d) or 2(e)
+					<br><br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked"></td></tr><tr><td width="8%" class="tableClassValign">6</td><td width="92%" class="tableClass">Citizenship or place of organization
+					<br><br><div class="text">
+				NEVADA
+			</div></td></tr><tr><td width="8%" class="tableClassValign">Number of Shares Beneficially Owned by Each Reporting Person With:</td><td width="92%" class="tableClass"><table class="innerTableClass"><tr><td width="8%" class="innerTableClassRightValign">7</td><td width="92%" class="tableClassInnerLeft">Sole Voting Power
+								<br><br><div class="text">69,645,033.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">8</td><td width="92%" class="tableClassInnerLeft">Shared Voting Power
+								<br><br><div class="text">0.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">9</td><td width="92%" class="tableClassInnerLeft">Sole Dispositive Power
+								<br><br><div class="text">69,645,033.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValignBottomLess">10</td><td width="92%" class="tableClassInnerLeftBottomLess">Shared Dispositive Power
+								<br><br><div class="text">0.00</div></td></tr></table></td></tr><tr><td width="8%" class="tableClassValign">11</td><td width="92%" class="tableClass">Aggregate amount beneficially owned by each reporting person
+					<br><br><div class="text">69,645,033.00</div></td></tr><tr><td width="8%" class="tableClassValign">12</td><td width="92%" class="tableClass">Check if the aggregate amount in Row (11) excludes certain shares (See Instructions)
+					<br><br><img src="/Images/box-checked.jpg" alt="Checkbox checked"></td></tr><tr><td width="8%" class="tableClassValign">13</td><td width="92%" class="tableClass">Percent of class represented by amount in Row (11)
+					<br><br><div class="text">29.7 % </div></td></tr><tr><td width="8%" class="tableClassValign">14</td><td width="92%" class="tableClass">Type of Reporting Person (See Instructions)
+					<br><br><div class="text">CO</div></td></tr></table><br><div style="display: flex;"><div style="font-size: 0.9em; font-weight: bold; margin-right: 5px;">
+					Comment for Type of Reporting Person:
+				</div><div class="largetext" style="text-align:justify">Note to Rows 7, 9 and 11:  8,970,379 shares of the common stock, par value $0.01 per share (the "Common Stock"), of Live Nation Entertainment, Inc., a Delaware corporation (the "Issuer"), are held through LMC LYV, LLC and 10,488,960 shares of Common Stock of the Issuer are held through LN Holdings 1, LLC, each of which are wholly owned subsidiaries of the Reporting Person.
+
+Note to Row 12: Excludes shares beneficially owned by the executive officers and directors of the Reporting Person.
+
+Note to Row 13: Calculated based on the 234,741,245 shares of Common Stock outstanding as of October 28, 2025, as reported by the Issuer in its Quarterly Report on Form 10-Q for the quarter ended September 30, 2025, filed with the Securities and Exchange Commission on November 4, 2025.</div></div></div><div class="form1"><table><tr><td class="center"><br><br><p><div align="center" style="font-size:1.2em;">
+									SCHEDULE 13D
+								</div></p></td></tr></table><table role="presentation" id="item1to7"><tr><td width="8%" class="tableClassValignNoBorder">Item 1.</td><td width="92%" class="tableClassNoBorder">Security and Issuer</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignCenter">(a)</td><td width="92%" class="tableClassNoBorder">Title of Class of Securities:
+							<br><br><div class="text">Common Stock, par value $0.01 per share</div></td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignCenter">(b)</td><td width="92%" class="tableClassNoBorder">Name of Issuer:
+							<br><br><div class="text">Live Nation Entertainment, Inc.</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(c)</td><td width="92%" class="tableClassNoBorder">Address of Issuer's Principal Executive Offices:
+							<br><br><div class="text">9348 Civic Center Drive, Beverly Hills, 
+				CALIFORNIA
+			, 90210.</div></td></tr><tr><td colspan="3"><div style="display: flex;"><div style="font-size: 0.9em; font-weight: bold; margin-right: 5px;">
+									Item 1 Comment:
+								</div><div class="largetext" style="text-align:justify">This statement on Schedule 13D relates to the shares of common stock, par value $0.01 per share (the "Common Stock"), of Live Nation Entertainment, Inc., a Delaware corporation (the "Issuer" or "Live Nation").</div></div></td></tr><tr><td width="8%" class="tableClassValignNoBorder">Item 2.</td><td width="92%" class="tableClassNoBorder">Identity and Background</td></tr><tr></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignCenter">(a)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">The Reporting Person is Liberty Live Holdings, Inc. (the "Reporting Person" or "Liberty Live"), a Nevada corporation, whose principal office address is 12300 Liberty Boulevard, Englewood, Colorado 80112.
+
+The name and present principal occupation of each director and executive officer of the Reporting Person is set forth below (the "Schedule 1 Persons"). The business address for each person listed below is c/o Liberty Live Holdings, Inc., 12300 Liberty Boulevard, Englewood, Colorado 80112. All executive officers and directors listed are United States citizens.
+
+                   Name and Business Address                 Principal Occupation and Principal Business
+                                (if applicable)                                                   (if applicable)
+
+Robert R. Bennett                                   Chairman of the Board of Directors
+Derek Chang                                           Director
+Carl E. Vogel                                           Director
+David J.A. Flowers                                  Director
+Bill Kurtz                                                  Director
+Chad R. Hollingsworth                            President and Chief Executive Officer
+Brian J. Wendling                                    Principal Financial Officer and Chief Accounting Officer
+Renee L. Wilm                                         Chief Legal Officer and Chief Administrative Officer</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(b)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">The information set forth in Item 2(a) is hereby incorporated by reference.</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(c)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">The information set forth in Item 2(a) is hereby incorporated by reference.</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(d)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">Neither Liberty Live, nor, to the best knowledge of Liberty Live, any of its executive officers and directors named in Item 2(a) hereof, has, during the last five years, been convicted of a criminal proceeding (excluding traffic violations or similar misdemeanors) or been a party to a civil proceeding of a judicial or administrative body of competent jurisdiction resulting in a judgment, decree or final order enjoining future violations of, or prohibiting or mandating activities subject to, federal or state securities laws or finding any violation with respect to such laws.</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(e)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">The information set forth in Item 2(d) is hereby incorporated by reference.</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(f)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">The information set forth in Item 2(a) is hereby incorporated by reference.</div></td></tr><tr><td width="8%" class="tableClassValignNoBorder">Item 3.</td><td width="92%" class="tableClassNoBorder">Source and Amount of Funds or Other Consideration</td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter"> </td><td width="92%" class="tableClassNoBorder"><div class="largetext">On December 15, 2025, Liberty Media Corporation ( "Liberty Media") completed its previously announced split-off (the "Split-Off") of the Reporting Person, its former wholly owned subsidiary.
+
+The Split-Off was accomplished by a redemption by Liberty Media of each outstanding share of each series of its Liberty Live common stock, par value $0.01 per share, in exchange for one share of the corresponding series of Liberty Live Group common stock, par value $0.01 per share, of the Reporting Person. As a result of the Split-Off, the Reporting Person is an independent, publicly traded company and its businesses, assets and liabilities consist of those businesses, assets and liabilities previously attributed to Liberty Media's Liberty Live Group as of immediately prior to the Split-Off, including the shares of Common Stock reported herein.
+
+For further information on the Split-Off, see the Registration Statement on Form S-4 filed by the Reporting Person with the Securities and Exchange Commission ("SEC"), file no. 333-288960.</div></td></tr><tr><td width="8%" class="tableClassValignNoBorder">Item 4.</td><td width="92%" class="tableClassNoBorder">Purpose of Transaction</td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter"> </td><td width="92%" class="tableClassNoBorder"><div class="largetext">The Reporting Person acquired its shares of Common Stock in connection with the Split-Off.
+
+Other than as set forth in herein, the Reporting Person does not have any present plans or proposals which relate to or would result in: (i) any acquisition by any person of additional securities of the Issuer, or any disposition of securities of the Issuer; (ii) any extraordinary corporate transaction, such as a merger, reorganization or liquidation, involving the Issuer or any of its subsidiaries; (iii) any sale or transfer of a material amount of assets of the Issuer or any of its subsidiaries; (iv) any change in the board or management of the Issuer, including any plans or proposals to change the number or term of directors or to fill any vacancies on the board; (v) any material change in the present capitalization or dividend policy of the Issuer; (vi) any other material change in the Issuer's business or corporate structure; (vii) any change in the Issuer's charter or bylaws or other actions which may impede the acquisition of control of the Issuer by any person; (viii) any delisting from a national securities exchange or any loss of authorization for quotation in an inter-dealer quotation system of a registered national securities association of a class of securities of the Issuer; (ix) any termination of registration pursuant to Section 12(g)(4) of the Securities Exchange Act of 1934, as amended (the "Exchange Act"), of a class of equity securities of the Issuer; or (x) any action similar to any of those enumerated above.
+
+Notwithstanding the foregoing, the Reporting Person may determine to change its intentions with respect to the Issuer at any time in the future and may, for example, elect (i) to acquire additional securities of the Issuer in open market or privately negotiated transactions or (ii) to dispose of all or a portion of the Reporting Person's holdings of securities of the Issuer. In reaching any determination as to the Reporting Person's future course of action, the Reporting Person will take into consideration various factors, such as the Issuer's business and prospects, other developments concerning the Issuer, other business opportunities available to the Reporting Person, tax considerations, liquidity needs and general economic and stock market conditions, including, but not limited to, the market prices of the securities.</div></td></tr><tr><td width="8%" class="tableClassValignNoBorder">Item 5.</td><td width="92%" class="tableClassNoBorder">Interest in Securities of the Issuer</td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(a)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">The Reporting Person is the beneficial owner of 69,645,033 shares of Common Stock, constituting 29.7% of the outstanding shares of Common Stock, calculated based on the 234,741,245 shares of Common Stock outstanding as of October 28, 2025, as reported by the Issuer in its Quarterly Report on Form 10-Q for the quarter ended September 30, 2025, filed with the SEC on November 4, 2025. Mr. Chad Hollingsworth beneficially owns 12,381 shares of Common Stock as of the date hereof.</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(b)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">The Reporting Person has the sole power to vote or to direct the voting of 69,645,033 shares of Common Stock, and has the sole power to dispose or to direct the disposition of such number of shares.  To the Reporting Person's knowledge, Mr. Hollingsworth has sole voting and dispositive power over the shares of Common Stock beneficially owned by him.</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(c)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">Other than as described herein, no transactions in the Common Stock were effected by the Reporting Person or, to the best of its knowledge, any Schedule 1 persons, in the past 60 days.</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(d)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">Not applicable</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(e)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">Not applicable</div></td></tr><tr><td width="8%" class="tableClassValignNoBorder">Item 6.</td><td width="92%" class="tableClassNoBorder">Contracts, Arrangements, Understandings or Relationships With Respect to Securities of the Issuer</td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter"> </td><td width="92%" class="tableClassNoBorder"><div class="largetext">In connection with the Split-Off, the Reporting Person entered into that certain New Holder Assignment and Assumption Agreement, dated as of December 15, 2025, with Liberty Media and Live Nation (the "New Holder Assignment and Assumption Agreement"), which provides for Liberty Media's assignment and transfer of, and the assumption by the Reporting Person of, Liberty Media's rights, benefits, liabilities and obligations under that certain Stockholder Agreement, dated as of February 10, 2009, by and among Live Nation, Liberty Media and certain other parties thereto (as assigned, the "Stockholder Agreement"). Further, in connection with the New Holder Assignment and Assumption Agreement, the Reporting Person also entered into that certain Assignment and Assumption Agreement, dated as of December 15, 2025, with Liberty Media and Live Nation (the "Assignment and Assumption Agreement"), which provides for Liberty Media's assignment and transfer of, and the assumption by the Reporting Person of, Liberty Media's rights, benefits, liabilities and obligations under that certain Registration Rights Agreement, dated as of January 25, 2010, by and among Live Nation, Liberty Media and Liberty USA Holdings, LLC (as assigned, the "Registration Rights Agreement").
+
+The following is a summary of the material terms of the Stockholder Agreement and the Registration Rights Agreement.  The following descriptions do not purport to cover all of the provisions of the Stockholder Agreement or the Registration Rights Agreement and are qualified in their entirety by reference to the full text of the agreements, which have been filed as Exhibits 7(a) and 7(b) hereto, respectively, and are incorporated herein by reference. In addition, the foregoing description of the New Holder Assignment and Assumption Agreement is qualified in its entirety by the full text of such agreement, which is attached hereto as Exhibit 7(c) and incorporated herein by reference.
+
+Stockholder Agreement
+
+Representation of Liberty Live on the Live Nation Board of Directors.  The Stockholder Agreement provides that, until such time as Liberty Live no longer beneficially owns shares of Common Stock representing at least 50% of the number of shares of Common Stock beneficially owned by Liberty Interactive Corporation (formerly known as Liberty Media Corporation) immediately after the completion of the merger of Ticketmaster Entertainment, Inc. with and into the Issuer on January 25, 2010 (or, if sooner, the date Liberty Live's beneficial ownership of Common Stock falls below 5% of the total voting power of Live Nation's equity securities), Liberty Live has the right to nominate up to two directors to serve on the board of directors of Live Nation.  Pursuant to the Stockholder Agreement, Live Nation (i) will cause each person that Liberty Live nominates to be included in the slate of nominees recommended by the board of directors of Live Nation to the stockholders of Live Nation for election as directors at each annual meeting of stockholders at which such director's term expires, and (ii) will use commercially reasonable efforts to cause the election of each such Liberty Live designee, including soliciting proxies in favor of the election of such designees.  Liberty Live has the right to designate a replacement director to the board of directors of Live Nation in order to fill any vacancy of a director previously designated by Liberty Live.
+
+One of Liberty Live's nominees serving on the board of directors of Live Nation must qualify as "independent" under applicable stock exchange rules.  In addition, pursuant to the Stockholder Agreement, Liberty Live may require that one of its designees be appointed to serve on the Audit Committee of the Live Nation board of directors and one of its designees be appointed to serve on the Compensation Committee of the Live Nation board of directors, so long as, in each case, such designee meets the independence requirements of the applicable stock exchange to be appointed to such committee (Liberty Live has revocably waived these rights). In addition, pursuant to the Stockholder Agreement, the Nominating and/or Governance Committee of the Live Nation board of directors may include only "qualified directors," who are directors other than any who (i) were nominated by Liberty Live, (ii) are officers or employees of Live Nation or (iii) were not nominated by the Nominating and/or Governance Committee of the Live Nation board of directors in their initial election to the Live Nation board of directors and for whose election Liberty Live voted shares.
+
+Share Acquisition Restrictions and Governance Matters.  Pursuant to the Stockholder Agreement, Liberty Live has agreed to not acquire (except acquisitions made pursuant to rights offerings or similar offerings generally available to holders of equity securities of Live Nation) beneficial ownership of any equity securities of Live Nation unless after giving effect to such acquisition, Liberty Live's voting power of Live Nation would not exceed the Applicable Percentage.  The "Applicable Percentage" initially is 35% and will be reduced for specified transfers of equity securities of Live Nation by Liberty Live.  In the event that Liberty Live's beneficial ownership exceeds the Applicable Percentage, Liberty Live is not permitted under the Stockholder Agreement to vote any of the equity securities of Live Nation beneficially owned by Liberty Live in excess of the Applicable Percentage on any matter submitted to a vote of Live Nation stockholders.
+
+Pursuant to the Stockholder Agreement, Live Nation has approved Liberty Live and its affiliates as an "interested stockholder" under Section 203 of the Delaware General Corporation Law, thereby exempting such persons' acquisition of Live Nation equity securities from the restrictions on "business combinations" set forth in Section 203 of the Delaware General Corporation Law.  In addition, Liberty Live and its affiliates are permitted to acquire voting equity securities of Live Nation up to the Applicable Percentage without triggering any distribution of rights under any stockholder rights plan of Live Nation.  Pursuant to the Stockholder Agreement, Live Nation has agreed not to take certain actions that would materially adversely affect Liberty Live's ability to acquire Live Nation equity securities up to the Applicable Percentage.
+
+Live Nation Registration Rights Agreement
+
+Pursuant to the Registration Rights Agreement, Liberty Live is entitled to three demand registration rights (and unlimited piggyback registration rights) in respect of the shares of Common Stock beneficially owned by Liberty Live as of the date of this Statement and other shares of Common Stock acquired by Liberty Live consistent with the terms of the Stockholder Agreement (collectively, the "Registrable Shares").  Liberty Live will be permitted to exercise its registration rights in connection with, among other things, certain hedging transactions that it may enter into in respect of the Registrable Shares.  Live Nation will be obligated to indemnify Liberty Live, and Liberty Live will be obligated to indemnify the Issuer, against certain liabilities in connection with misstatements or omissions in any registration statement.
+
+Forward Contracts
+
+In contemplation of the Split-Off, the Reporting Person entered into the 2025 Forward Contracts described immediately below.
+
+On May 28, 2025, LN Holdings 1, LLC ("LNSPV"), a wholly owned subsidiary of the Reporting Person upon the completion of the Split-Off, entered into certain agreements (the "2025 Forward Contracts") establishing the terms and conditions of variable forward transactions (sometimes referred to as collar transactions) with each of Banco Santander, S.A., Citibank, N.A., Morgan Stanley Bank, N.A., and Mizuho Markets Americas LLC (collectively, the "Dealers"). The 2025 Forward Contracts, in the aggregate, obligate LNSPV to deliver to the Dealers (or any of their respective assignees thereof in accordance with each of the 2025 Forward Contracts) up to an aggregate of 10,488,960 shares of Common Stock (the "Number of Shares"), based on the share prices for the Common Stock over a specified period ending in the first quarter of 2027 (the "Valuation Period"). Alternatively, LNSPV may choose to deliver an amount of cash based on a measure of the average share price over the Valuation Period.
+
+The Initial Share Price, Forward Floor Price and Forward Cap Price (each as defined in the 2025 Forward Contracts) for each of the 2025 Forward Contracts were set at $137.4500, $109.9600 and $179.3723, respectively. Accordingly, if LNSPV elects to receive prepayment amounts and elects share settlement, LNSPV will be obligated to deliver fewer than the Number of Shares if (and to the extent that) on one or more trading days during the Valuation Period the average per share price is more than $109.9600. As noted above, alternatively LNSPV may choose to deliver a cash amount in lieu of delivering such shares.
+
+LNSPV pledged a number of shares of Common Stock equal to the Number of Shares (the "Pledge Shares") to secure its obligations under the 2025 Forward Contracts; however, LNSPV will retain voting rights in the Pledge Shares during the term of the pledge, absent a default under the 2025 Forward Contracts.
+
+The foregoing summary of the 2025 Forward Contracts does not purport to be complete and is subject to, and qualified in its entirety by, the full text of the Form of Master Forward Confirmation, which is attached hereto as Exhibit 7(d) and is incorporated herein by reference.
+
+2016 Margin Loan
+
+On November 8, 2016, LMC LYV, LLC, a bankruptcy remote wholly owned subsidiary of Liberty Media that became a bankruptcy remote wholly owned subsidiary of Liberty Live upon the completion of the Split-Off ("MarginCo"), entered into a Margin Loan Agreement (as amended, amended and restated or otherwise modified, the "Margin Loan Agreement") with a group of lenders. The Margin Loan Agreement provides for a revolving credit facility in an aggregate principal amount of $400 million (the "Margin Loan Facility"). MarginCo's obligations under the Margin Loan Facility are secured by 9,000,000 shares of Common Stock owned by MarginCo. No borrowings were outstanding under the Margin Loan Facility as of the date hereof.
+
+On September 12, 2025, MarginCo entered into an Amendment No. 10 to the Margin Loan Agreement to, among other things, (i) extend the scheduled maturity date to September 8, 2028, (ii) reduce the per annum interest rate spread from 2.00% to 1.875% and (iii) permit the contribution of MarginCo to Liberty Live in connection with the Split-Off.</div></td></tr><tr><td width="8%" class="tableClassValignNoBorder">Item 7.</td><td width="92%" class="tableClassNoBorder">Material to be Filed as Exhibits.</td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter"> </td><td width="92%" class="tableClassNoBorder"><div class="largetext">7(a) Stockholder Agreement, dated as of February 10, 2009, by and among Live Nation, Inc., Liberty Media Corporation, Liberty USA Holdings, LLC, and Ticketmaster Entertainment, Inc. (incorporated by reference to Exhibit 10.2 to the Live Nation Entertainment, Inc. Current Report on Form 8-K (SEC File No. 001-32601), filed with the SEC on February 13, 2009).
+
+7(b) Registration Rights Agreement, dated as of January 25, 2010, by and among Liberty Media Corporation, Liberty USA Holdings, LLC, and Live Nation, Inc. (incorporated by reference to Exhibit 10.1 to the Live Nation Entertainment, Inc. Current Report on Form 8-K (SEC File No. 001-32601), filed with the SEC on January 29, 2010).
+
+7(c) New Holder Assignment and Assumption Agreement, dated as of December 15, 2025, by and between Liberty Media Corporation, Liberty Live Holdings, Inc. and Live Nation Entertainment, Inc. (incorporated by reference to Exhibit 10.5 to the Reporting Person's Current Report on Form 8-K (SEC File No. 001-43015), filed with the SEC on December 15, 2025).
+
+7(d) Form of Master Forward Confirmation (incorporated by reference to Exhibit 10.8 to the Reporting Person's Registration Statement on Form S-4 (SEC File No. 333-288960), filed with the SEC on July 25, 2025).
+
+7(e) Assistant Secretary's Certificate.</div></td></tr></table><br></div><div class="form1"><table role="presentation" id="signatureInfo"><tr><td width="8%" class="tableClassValignNoBorder">    SIGNATURE</td><td width="92%" class="tableClassNoBorder"> </td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter"> </td><td width="92%" class="tableClassNoBorder"><div class="information" style="text-align:justify">
+						After reasonable inquiry and to the best of my knowledge and belief, I certify that the information set forth in this statement is true, complete and correct.
+						<br><br></div></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="100%" class="tableClassInnerNoBorderBlue"><div class="text">Liberty Live Holdings, Inc.</div></td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Signature:</td><td width="92%" class="tableClassNoBorderBlue signature">By: /s/ Brittany A. Uthoff</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Name/Title:</td><td width="92%" class="tableClassNoBorderBlue signature">Brittany A. Uthoff / Vice President and Assistant Secretary</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Date:</td><td width="92%" class="tableClassNoBorderBlue signature">12/17/2025</td></tr></table></td></tr></table></div></div>
+
+<script type="text/javascript"  src="/NB7sno/xvGjX/Q_ZCq/rw/t5u30XhwmSVLpf/bC4gdQ8CAg/VAcuGi40/RH4"></script></body></html>

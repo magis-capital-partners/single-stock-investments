@@ -1,0 +1,455 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns:p="http://www.sec.gov/edgar/schedule13D" xmlns:p1="http://www.sec.gov/edgar/common"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><link rel="stylesheet" type="text/css" href="/css/SDR_print.css"><style type="text/css">
+					.fakeTextBox {
+					border-top: 2px solid #999;
+					border-right: 1px solid #ccc;
+					border-bottom: 1px solid #ccc;
+					border-left: 2px solid #999;
+					padding: 2px;
+					_width: 800px;
+					height: auto;
+					min-width: 200px;
+					min-height: 50px;
+					word-wrap: break-word;
+					font-size: 0.9em;
+					color: blue;
+					}
+					table.tableClass { border: solid black;
+					border-top-width: 1;
+					border-right-width: 1;
+					border-bottom-width: 1;
+					border-left-width: 1;
+					table-layout:fixed;
+					}
+					table.innerTableClass { border: solid black;
+					border-top-width: 0;
+					border-right-width: 0;
+					border-bottom-width: 0;
+					border-left-width: 0;
+					table-layout:fixed;
+					}
+					th.tableClassLeft { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					padding: 2px;
+					}
+					th.tableClassRight { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 0;
+					padding: 2px;
+					}
+					th.tableClass { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					padding: 2px;
+					}
+					td.tableClassLeft { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					font-size: 0.9em;
+					color: blue;
+					word-wrap: break-word;
+					}
+					td.tableClassRight { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 0;
+					font-size: 0.9em;
+					color: blue;
+					word-wrap: break-word;
+					}
+					td.tableClass { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					font-size: 0.9em;
+					font-weight:bold;
+					color: black;
+					word-wrap: break-word;
+					}
+					td.tableClassNoBorder { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 0px;
+					font-size: 0.9em;
+					font-weight:bold;
+					color: black;
+					word-wrap: break-word;
+					}
+
+					td.tableClassNoBorderBlue { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 0px;
+					font-size: 0.9em;
+					font-weight:bold;
+					color: blue;
+					word-wrap: break-word;
+					}
+
+					td.tableClassInnerNoBorderBlue { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 0px;
+					font-size: 1.4em;
+					font-weight:bold;
+					color: blue;
+					word-wrap: break-word;
+					}
+
+					td.tableClassNoBorderAlignLeft { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 0px;
+					font-size: 0.9em;
+					font-weight:bold;
+					text-align: left;
+					color: black;
+					word-wrap: break-word;
+					}
+
+					td.signature {
+					padding: 4px 8px;
+					}
+
+					td.tableClassInner { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					font-size: 1em;
+					font-weight:bold;
+					color: black;
+					word-wrap: break-word;
+					}
+
+					td.tableClassValign { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					font-size: 0.9em;
+					font-weight:bold;
+					color: black;
+					vertical-align: middle;
+					text-align: center;
+					word-wrap: break-word;
+					}
+
+					td.tableClassValignNoBorder { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 0px;
+					font-size: 0.9em;
+					font-weight:bold;
+					color: black;
+					vertical-align: middle;
+					text-align: center;
+					word-wrap: break-word;
+					}
+
+					td.tableClassValignInner { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					font-size: 1em;
+					font-weight:bold;
+					color: black;
+					vertical-align: middle;
+					text-align: center;
+					word-wrap: break-word;
+					}
+
+					td.innerTableClassRightValign { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 0;
+					font-size: 1em;
+					font-weight:bold;
+					color: black;
+					vertical-align: middle;
+					text-align: center;
+					word-wrap: break-word;
+					}
+
+					td.innerTableClassRightValignBottomLess { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 1px;
+					border-bottom-width: 0px;
+					border-left-width: 0;
+					font-size: 1em;
+					font-weight:bold;
+					color: black;
+					vertical-align: middle;
+					text-align: center;
+					word-wrap: break-word;
+					}
+
+					td.tableClassInnerLeft { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					font-size: 1em;
+					font-weight:bold;
+					color: black;
+					word-wrap: break-word;
+					}
+
+					td.tableClassInnerLeftBottomLess { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 1px;
+					font-size: 1em;
+					font-weight:bold;
+					color: black;
+					word-wrap: break-word;
+					}
+
+					td.tableClassNoBorderAlignCenter { border: solid black;
+					border-top-width: 0px;
+					border-right-width: 0px;
+					border-bottom-width: 0px;
+					border-left-width: 0px;
+					font-size: 0.9em;
+					font-weight:bold;
+					color: black;
+					text-align: center;
+					word-wrap: break-word;
+					}
+
+					tr.tableClass { border: solid black;
+					border-top-width: 1px;
+					border-right-width: 1px;
+					border-bottom-width: 1px;
+					border-left-width: 1px;
+					}
+					tr.tableClassWithBg { border: solid black;
+					border-top-width: 0;
+					border-right-width: 1;
+					border-bottom-width: 1;
+					border-left-width: 0;
+					background-color: #e0e0ff
+					}
+
+					tr.tableClassWithBgBlack { border: solid black;
+					border-top-width: 0;
+					border-right-width: 1;
+					border-bottom-width: 1;
+					border-left-width: 0;
+					background-color: #D3D3D3
+					}
+
+					hr.header {
+					position: relative;
+					top: 20px;
+					border: none;
+					height: 6px;
+					background: black;
+					margin-bottom: 10px;
+					}
+
+					hr.separatorThin {
+					position: relative;
+					top: 2px;
+					border: none;
+					height: 2px;
+					background: black;
+					margin-bottom: 2px;
+					}
+
+					hr.headerThin {
+					position: relative;
+					top: 10px;
+					border: none;
+					height: 2px;
+					background: black;
+					margin-bottom: 10px;
+					}
+
+					hr.separator {
+					position: relative;
+					top: 20px;
+					border: none;
+					height: 4px;
+					background: black;
+					margin-bottom: 5px;
+					}
+
+					div.text {
+					background-color: #ffffff;
+					color: blue;
+					font-size: 1em;
+					font-weight:normal;
+					text-align:justify;
+					}
+
+
+					div.information {
+					background-color: #ffffff;
+					color: black;
+					font-size: 1em;
+					font-weight:normal;
+					text-align:justify;
+					}
+
+					#scheader {
+					font-size: 0.9em;
+					border: 0px solid #404040;
+					border-spacing: 2px;
+					}
+
+					div.largetext {
+					background-color: #ffffff;
+					color: blue;
+					font-size: 1em;
+					font-weight:normal;
+					text-align:justify;
+					white-space: pre-wrap;
+					word-break: normal;
+					}
+
+				</style></head><body lang="en-US" text="#000000" bgcolor="#ffffff"><hr class="header"><br><hr class="headerThin"><div class="contentwrapper"><table role="presentation" id="scheader"><tr><td class="tableClassNoBorderAlignCenter" style="font-size:2em;">
+						SECURITIES AND EXCHANGE COMMISSION
+						<br>
+						Washington, D.C. 20549
+					</td></tr><tr><td class="tableClassNoBorderAlignCenter"><br><br><div style="font-size:1.5em;">
+									SCHEDULE 13D
+								</div><br><div style="font-size:1.2em;">
+							Under the Securities Exchange Act of 1934
+						</div><br><div class="information" style="text-align:center; font-weight:bold;">
+									(Amendment No. <span style="color:blue;">23</span>)
+								</div><br><br></td></tr><tr><td class="center"><div class="information" style="text-align:center; font-weight:bold; color:blue;">MORGAN STANLEY</div><div class="information" style="text-align:center; font-weight:bold;"><hr class="separatorThin">(Name of Issuer)</div><br><br></td></tr><tr><td class="center"><div class="information" style="text-align:center; font-weight:bold; color:blue;">Common Stock, par value $0.01 per Share</div><div class="information" style="text-align:center; font-weight:bold;"><hr class="separatorThin">(Title of Class of Securities)</div><br><br></td></tr><table border="1"><tr><td><div class="information" style="text-align:center; font-weight:bold; color:blue;">617446448</div><div class="information" style="text-align:center; font-weight:bold;"><hr class="separatorThin">(CUSIP Number)</div></td></tr><br><br></table><tr><td class="center"><div class="information" style="text-align:center; font-weight:bold; color:blue;">Satoshi Honda<br>Mitsubishi UFJ Financial Group, Inc.,
+								4-5, Marunouchi 1-chome<br>Chiyoda-ku, Tokyo,
+								M0,
+								100-8330<br>81-3-3240-8111</div><div class="information" style="text-align:center; font-weight:bold;"><hr class="separatorThin">(Name, Address and Telephone Number of Person Authorized to
+									Receive Notices and Communications)</div></td></tr><tr><td class="center"><div class="information" style="text-align:center; font-weight:bold; color:blue;">07/15/2026</div><div class="information" style="text-align:center; font-weight:bold;"><hr class="separatorThin">(Date of Event Which Requires Filing of This Statement)</div></td></tr></table><br><br><div class="information" style="text-align:justify">
+				If the filing person has previously filed a statement on Schedule 13G to report the acquisition that is the subject of this Schedule 13D, and is filing this schedule because of §§ 240.13d-1(e), 240.13d-1(f) or 240.13d-1(g), check the following box.
+				<img src="/Images/box-unchecked.jpg" alt="Checkbox not checked"></div><br><div class="information" style="text-align:justify">
+				The information required on the remainder of this cover page shall not be deemed to be “filed” for the purpose of Section 18 of the
+				Securities Exchange Act of 1934 (“Act”) or otherwise subject to the liabilities of that section of the Act but shall be subject to all other
+				provisions of the Act (however, see the Notes).
+			</div></div><hr class="headerThin"><hr class="header"><br><br>
+  <div style="display:none">
+			schemaVersion:
+			</div>
+<div class="content"><div class="form1"></div></div>
+  <div class="content"><div class="form1"><table><tr><td class="center"><br><br><p><div align="center" style="font-size:1.2em;">
+									SCHEDULE 13D
+								</div></p></td></tr></table><table role="presentation" class="tableClass" id="cusipNumber"><tr class="tableClass"><td width="7%" style="font-weight:bold;">CUSIP Number(s):</td><td width="75%"><div style="font-size:.9em; color:#000000">617446448</div></td></tr></table><br><br><table role="presentation" class="tableClass" id="reportingPersonDetails"><tr class="tableClass"><td width="8%" class="tableClassValign">1</td><td width="92%" class="tableClass">
+					Name of reporting person
+					<br><br><div class="text">MITSUBISHI UFJ FINANCIAL GROUP, INC.</div></td></tr><tr><td width="8%" class="tableClassValign">2</td><td width="92%" class="tableClass">Check the appropriate box if a member of a Group (See Instructions)
+				<br><br><div class="text"><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked">  (a)
+					<br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked">  (b)	
+				</div></td></tr><tr class="tableClassWithBgBlack"><td width="8%" class="tableClassValign">3</td><td width="92%" class="tableClass">SEC use only</td></tr><tr><td width="8%" class="tableClassValign">4</td><td width="92%" class="tableClass">
+					Source of funds (See Instructions)
+					<br><br><div class="text"></div></td></tr><tr><td width="8%" class="tableClassValign">5</td><td width="92%" class="tableClass">
+					Check if disclosure of legal proceedings is required pursuant to Items 2(d) or 2(e)
+					<br><br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked"></td></tr><tr><td width="8%" class="tableClassValign">6</td><td width="92%" class="tableClass">Citizenship or place of organization
+				<br><br><div class="text">
+				JAPAN
+			</div></td></tr><tr><td width="8%" class="tableClassValign">Number of Shares Beneficially Owned by Each Reporting Person With:</td><td width="92%" class="tableClass"><table class="innerTableClass"><tr><td width="8%" class="innerTableClassRightValign">7</td><td width="92%" class="tableClassInnerLeft">Sole Voting Power
+							<br><br><div class="text">24.12</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">8</td><td width="92%" class="tableClassInnerLeft">Shared Voting Power
+							<br><br><div class="text">0.00</div></td></tr><tr><td width="8%" class="innerTableClassRightValign">9</td><td width="92%" class="tableClassInnerLeft">Sole Dispositive Power
+							<br><br><div class="text">24.12</div></td></tr><tr><td width="8%" class="innerTableClassRightValignBottomLess">10</td><td width="92%" class="tableClassInnerLeftBottomLess">Shared Dispositive Power
+							<br><br><div class="text">0.00</div></td></tr></table></td></tr><tr><td width="8%" class="tableClassValign">11</td><td width="92%" class="tableClass">Aggregate amount beneficially owned by each reporting person
+				<br><br><div class="text">380,511,118.00</div></td></tr><tr><td width="8%" class="tableClassValign">12</td><td width="92%" class="tableClass">Check if the aggregate amount in Row (11) excludes certain shares (See Instructions)
+				<br><br><img src="/Images/box-unchecked.jpg" alt="Checkbox not checked"></td></tr><tr><td width="8%" class="tableClassValign">13</td><td width="92%" class="tableClass">Percent of class represented by amount in Row (11)
+				<br><br><div class="text">24.12 % </div></td></tr><tr><td width="8%" class="tableClassValign">14</td><td width="92%" class="tableClass">Type of Reporting Person (See Instructions)
+				<br><br><div class="text">CO</div></td></tr></table><br><div style="display: flex;"><div style="font-size: 0.9em; font-weight: bold; margin-right: 5px;">
+					Comment for Type of Reporting Person:
+				</div><div class="largetext" style="text-align:justify">Rows (7), (9), (11) and (13): Includes 3,425,951 shares of common stock of Morgan Stanley that certain affiliates of the reporting person held solely in a fiduciary capacity as the trustee of trust accounts or as the manager of investment funds, other investment vehicles and managed accounts as of July 7, 2026. Such shares represent approximately 0.22% of the 24.12% reported in row 13 above. The reporting person disclaims beneficial ownership of such shares, and the inclusion of such shares in this statement shall not be construed as an admission that the reporting person is, for purposes of Sections 13(d) or 13(g) of the Act, the beneficial owner of such shares.</div></div></div><div class="form1"><table><tr><td class="center"><br><br><p><div align="center" style="font-size:1.2em;">
+									SCHEDULE 13D
+								</div></p></td></tr></table><table role="presentation" id="item1to7"><tr><td width="8%" class="tableClassValignNoBorder">Item 1.</td><td width="92%" class="tableClassNoBorder">Security and Issuer</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignCenter">(a)</td><td width="92%" class="tableClassNoBorder">Title of Class of Securities:
+							<br><br><div class="text">Common Stock, par value $0.01 per Share</div></td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignCenter">(b)</td><td width="92%" class="tableClassNoBorder">Name of Issuer:
+							<br><br><div class="text">MORGAN STANLEY</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(c)</td><td width="92%" class="tableClassNoBorder">Address of Issuer's Principal Executive Offices:
+							<br><br><div class="text">1585 Broadway, New York, 
+				NEW YORK
+			, 10036.</div></td></tr><tr><td colspan="3"><div style="display: flex;"><div style="font-size: 0.9em; font-weight: bold; margin-right: 5px;">
+									Item 1 Comment:
+								</div><div class="largetext" style="text-align:justify">This statement (this "Amendment") amends the Statement of Beneficial Ownership on Schedule 13D, filed on October 23, 2008, as amended by the first amendment thereto, filed on October 30, 2008, the second amendment thereto, filed on May 22, 2009, the third amendment thereto, filed on June 11, 2009, the fourth amendment thereto, filed on April 1, 2010, the fifth amendment thereto, filed on May 3, 2010, the sixth amendment thereto, filed on November 9, 2010, the seventh amendment thereto, filed on April 25, 2011, the eighth amendment thereto, filed on July 1, 2011, the ninth amendment thereto, filed on October 4, 2013, the tenth amendment thereto, filed on April 7, 2016, the eleventh amendment thereto, filed on November 28, 2017, the twelfth amendment thereto, filed on March 5, 2018, the thirteenth amendment filed on April 18, 2018, the fourteenth amendment filed on October 4, 2018, the fifteenth amendment filed on September 20, 2019, the sixteenth amendment filed on October 28, 2020, the seventeenth amendment filed on December 11, 2020, the eighteenth amendment filed on April 13, 2021, the nineteenth amendment filed on August 8, 2022, the twentieth amendment filed on October 16, 2023, the twenty-first amendment filed on November 4, 2025, and the twenty-second amendmendment filed on April 13, 2026 (the "Schedule 13D"), by Mitsubishi UFJ Financial Group, Inc. ("MUFG"), a joint stock company incorporated in Japan, with respect to shares of common stock (the "Common Stock") of Morgan Stanley, a Delaware corporation (the "Company"). Capitalized terms used and not defined in this Amendment shall have the meanings set forth in the Schedule 13D. Except as specifically provided herein, this Amendment does not modify any of the information previously reported in the Schedule 13D.</div></div></td></tr><tr><td width="8%" class="tableClassValignNoBorder">Item 2.</td><td width="92%" class="tableClassNoBorder">Identity and Background</td></tr><tr></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(c)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">Item 2(c) is amended and restated as follows:
+
+MUFG is a bank holding company and joint stock company (kabushiki kaisha), and is one of the world's leading financial groups. MUFG's services include commercial banking, trust banking, securities, credit cards, consumer finance, asset management and leasing. The name, business address, present principal occupation or employment, name and principal business and address of any corporation or other organization in which such employment is conducted of each of the directors and executive officers of MUFG are set forth on Annex A hereto.</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(d)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">Item 2(d) is restated as follows:
+
+During the last five years, neither MUFG nor any of its directors nor executive officers has been convicted in a criminal proceeding (excluding traffic violations or similar misdemeanors).</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(e)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">Item 2(e) is restated as follows:
+
+During the last five years, neither MUFG nor any of its directors nor executive officers was a party to a civil proceeding of a judicial or administrative body of competent jurisdiction and as a result of such proceeding was or is subject to a judgment, decree or final order enjoining future violations of, or prohibiting or mandating activities subject to, federal or state securities laws or finding any violation with respect to such laws.</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(f)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">Item 2(f) is amended and restated as follows:
+
+MUFG is incorporated in Japan under the Commercial Code of Japan. The citizenships of each of the directors and executive officers of MUFG are set forth on Annex A hereto.</div></td></tr><tr><td width="8%" class="tableClassValignNoBorder">Item 3.</td><td width="92%" class="tableClassNoBorder">Source and Amount of Funds or Other Consideration</td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter"> </td><td width="92%" class="tableClassNoBorder"><div class="largetext">The last paragraph of Item 3 of the Schedule 13D is amended and restated as follows:
+
+In addition to the 377,085,167 shares of Common Stock held by MUFG directly, as of July 7, 2026, certain affiliates of MUFG held in the aggregate 3,425,951 shares of Common Stock (the "Managed Shares") solely in a fiduciary capacity as the trustee of trust accounts or as the manager of investment funds, other investment vehicles and managed accounts. MUFG disclaims beneficial ownership of the Managed Shares, and the inclusion of the Managed Shares in this Amendment shall not be construed as an admission that MUFG is, for purposes of Sections 13(d) or 13(g) of the Act, the beneficial owner of such shares.</div></td></tr><tr><td width="8%" class="tableClassValignNoBorder">Item 4.</td><td width="92%" class="tableClassNoBorder">Purpose of Transaction</td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter"> </td><td width="92%" class="tableClassNoBorder"><div class="largetext">On April 18, 2018, MUFG entered into a sales plan (the "Plan") with the Company and Morgan Stanley &amp; Co. LLC ("MS &amp; Co.") to sell shares of Common Stock to the Company, through its agent MS &amp; Co., as part of the Company's share repurchase program. The Plan was filed as Exhibit 20 to the thirteenth amendment to the Schedule 13D.
+
+On December 10, 2020, the Company provided written notice to MUFG pursuant to Paragraph F.2(i) of the Plan to suspend the Plan effective immediately.
+
+On July 15, 2026, MUFG provided written notice to the Company that Sales (as defined in the Plan) shall resume with July 30, 2026 as the first Sale Day.</div></td></tr><tr><td width="8%" class="tableClassValignNoBorder">Item 5.</td><td width="92%" class="tableClassNoBorder">Interest in Securities of the Issuer</td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(a)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">Item 5(a) is amended and restated as follows:
+
+Rows (7) through (11) and (13) of the cover pages to this Amendment are hereby incorporated by reference. For purposes of calculating the percentages set forth on the cover pages of this Amendment, the number of shares outstanding is assumed to be 1,577,284,817 (which is the number of shares of Common Stock outstanding as of April 30, 2026, as reported by the Company in their Form 10-Q for the quarterly period ended March 31, 2026 filed on May 5, 2026).
+
+As of July 7, 2026, MUFG beneficially owns 377,085,167 shares of Common Stock.
+
+In addition, MUFG may be deemed to be the beneficial owner of the Managed Shares. MUFG disclaims beneficial ownership of the Managed Shares, and the inclusion of the Managed Shares in this Amendment shall not be construed as an admission that MUFG is, for purposes of Sections 13(d) or 13(g) of the Act, the beneficial owner of such shares.
+
+The shares of Common Stock beneficially owned by MUFG (if MUFG is deemed to have beneficial ownership over the Managed Shares) represent approximately 24.12% of the outstanding shares of Common Stock.</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(b)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">Item 5(b) is restated as follows:
+
+Subject to the right of clients to withdraw their assets, including the Managed Shares managed by MUFG's affiliates, MUFG has the sole power to vote or direct the vote and to dispose or to direct the disposition of shares of Common Stock beneficially owned by it as indicated in rows (7) through (11) and (13) of the cover pages to this Amendment.</div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(c)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">Item 5(c) is resated as follows:
+
+Neither MUFG nor, to its knowledge, any of its directors or executive officers has engaged in any transactions in shares of Common Stock in the past 60 days except transactions in a fiduciary capacity as described under Item 3. </div></td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter">(d)</td><td width="92%" class="tableClassNoBorder"><div class="largetext">Item 5(d) is restated as follows:
+
+No other person is known by MUFG to have the right to receive or the power to direct the receipt of dividends from, or the proceeds from the sale of, any shares of the Company's securities beneficially owned by MUFG, except that, if MUFG is deemed to have beneficial ownership of the Managed Shares, dividends and the proceeds from the sale of Managed Shares will be the property of the customers for whom such Managed Shares are managed.</div></td></tr><tr><td width="8%" class="tableClassValignNoBorder">Item 7.</td><td width="92%" class="tableClassNoBorder">Material to be Filed as Exhibits.</td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter"> </td><td width="92%" class="tableClassNoBorder"><div class="largetext">Item 7 is amended and restated as follows:
+
+Exhibit          Description
+
+99.1.         Securities Purchase Agreement, dated September 29, 2008, First Amendment to the Securities Purchase Agreement, dated as of October 3, 2008 between Mitsubishi UFJ Financial Group, Inc. and Morgan Stanley, Second Amendment to the Securities Purchase Agreement, dated as of October 8, 2008 between Mitsubishi UFJ Financial Group, Inc. and Morgan Stanley, and Third Amendment to the Securities Purchase Agreement, dated as of October 13, 2008 between Mitsubishi UFJ Financial Group, Inc. and Morgan Stanley (incorporated by reference to Exhibit 10.1 of the Company's Form 8-K, filed on October 17, 2008).*
+99.2.          Amended Certificate of Designations of Preferences and Rights of the Series B Preferred Stock (incorporated by reference to Exhibit 3.1 of the Company's Form 8-K, filed on October 17, 2008).*
+99.3.          Certificate of Designations of Preferences and Rights of the Series C Preferred Stock (incorporated by reference to Exhibit 3.2 of the Company's Form 8-K, filed on October 17, 2008).*
+99.4.          English translation of Loan Agreement (and Rider thereto), dated October 14, 2008 between Mitsubishi UFJ Financial Group, Inc. and The Bank of Tokyo-Mitsubishi UFJ, Ltd.*
+99.5.          Investor Agreement, dated as of October 13, 2008, by and between Mitsubishi UFJ Financial Group, Inc. and Morgan Stanley (incorporated by reference to Exhibit 10.2 of the Company's Form 8-K, filed on October 17, 2008).*
+99.6.          Registration Rights Agreement, dated as of October 13, 2008, by and between Mitsubishi UFJ Financial Group, Inc. and Morgan Stanley (incorporated by reference to Exhibit 10.3 of the Company's Form 8-K, filed on October 17, 2008).*
+99.7.          First Amendment to Investor Agreement, dated as of October 27, 2008, by and between Mitsubishi UFJ Financial Group, Inc. and Morgan Stanley.*
+99.8.          Letter Agreement, dated as of May 8, 2009, by and between Mitsubishi UFJ Financial Group, Inc. and Morgan Stanley.*
+99.9.          Series C Preferred Stock Repurchase Agreement, dated as of May 8, 2009, by and between Mitsubishi UFJ Financial Group, Inc. and Morgan Stanley.*
+99.10.         Letter Agreement, dated as of May 13, 2008, by and among Mitsubishi UFJ Financial Group, Inc., Morgan Stanley and Morgan Stanley &amp; Co. Incorporated.*
+99.11.         Letter Agreement, dated as of June 2, 2009, by and between Mitsubishi UFJ Financial Group, Inc. and Morgan Stanley.*
+99.12.        Amendment to Letter Agreement, dated as of June 2, 2009, by and between Mitsubishi UFJ Financial Group, Inc. and Morgan Stanley.*
+99.13.        English translation of Loan Agreement, dated June 11, 2009, by and between Mitsubishi UFJ Financial Group, Inc. and The Bank of Tokyo-Mitsubishi UFJ, Ltd.*
+99.14.        Integration and Investment Agreement, dated as of March 30, 2010, by and between Mitsubishi UFJ Financial Group, Inc. and Morgan Stanley.*
+99.15.        Transaction Agreement, dated April 21, 2011, between Morgan Stanley and Mitsubishi UFJ Financial Group, Inc. (incorporated by reference to Exhibit 10.1 of the Company's Form 8-K, filed on April 22, 2011).*
+99.16.        Amended and Restated Investor Agreement, dated June 30, 2011, between Morgan Stanley and Mitsubishi UFJ Financial Group, Inc. (incorporated by reference to Exhibit 10.1 of the Company's Form 8-K, filed on June 30, 2011).*
+99.17.        Additional Commitments made by Mitsubishi UFJ Financial Group, Inc. to the Board of Governors of the Federal Reserve System, dated April 21, 2011.*
+99.18.        Third Amendment to Investor Agreement, dated October 3, 2013, between Morgan Stanley and Mitsubishi UFJ Financial Group, Inc.*
+99.19.        Fourth Amendment to Investor Agreement, dated April 6, 2016, between Morgan Stanley and Mitsubishi UFJ Financial Group, Inc.*
+99.20.        Sales Plan, dated April 18, 2018, between Mitsubishi UFJ Financial Group, Inc., Morgan Stanley and Morgan Stanley &amp; Co. LLC.*
+99.21.        Fifth Amendment to Investor Agreement dated October 4, 2018, between Morgan Stanley and Mitsubishi UFJ Financial Group, Inc.*
+99.22.        List of transactions disclosed in Item 5(c) of Amendment No. 15.*
+99.23.        List of transactions disclosed in Item 6 of Amendment No. 15.*
+99.24.        List of transactions disclosed in Item 6 of Amendment No. 15.*
+99.25.        List of transactions disclosed in Item 6 of Amendment No. 15.*
+99.26.        List of transactions disclosed in Item 5(c) of Amendment No. 16.*
+99.27.        List of transactions disclosed in Item 5(c) of Amendment No. 16.*
+99.28.        Sixth Amendment to Investor Agreement dated April 13, 2021, between Morgan Stanley and Mitsubishi UFJ Financial Group, Inc.*
+99.29.        Seventh Amendment to Investor Agreement dated October 13, 2023, between Morgan Stanley and Mitsubishi UFJ Financial Group, Inc.*
+99.30.        Eighth Amendment to Investor Agreement dated April 13, 2026, between Morgan Stanley and Mitsubishi UFJ Financial Group, Inc.*
+
+*Previously filed</div></td></tr></table><br></div><div class="form1"><table role="presentation" id="signatureInfo"><tr><td width="8%" class="tableClassValignNoBorder">    SIGNATURE</td><td width="92%" class="tableClassNoBorder"> </td></tr><tr><td width="8%" class="tableClassNoBorderAlignCenter"> </td><td width="92%" class="tableClassNoBorder"><div class="information" style="text-align:justify">
+						After reasonable inquiry and to the best of my knowledge and belief, I certify that the information set forth in this statement is true, complete and correct.
+						<br><br></div></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="100%" class="tableClassInnerNoBorderBlue"><div class="text">MITSUBISHI UFJ FINANCIAL GROUP, INC.</div></td></tr></table></td></tr></table><table><tr class="tableClass"><td width="50%" class="tableClassNoBorder"> </td><td width="50%" class="tableClassNoBorder"><table><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Signature:</td><td width="92%" class="tableClassNoBorderBlue signature">/s/ Satoshi Honda</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Name/Title:</td><td width="92%" class="tableClassNoBorderBlue signature">Satoshi Honda, Managing Director</td></tr><tr class="tableClass"><td width="8%" class="tableClassNoBorderAlignLeft signature">Date:</td><td width="92%" class="tableClassNoBorderBlue signature">07/15/2026</td></tr></table></td></tr></table></div></div>
+
+<script type="text/javascript"  src="/NB7sno/xvGjX/Q_ZCq/rw/t5u30XhwmSVLpf/bC4gdQ8CAg/VAcuGi40/RH4"></script></body></html>
