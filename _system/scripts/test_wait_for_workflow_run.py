@@ -108,5 +108,32 @@ class WaitLoopTests(unittest.TestCase):
         self.assertEqual(rc, 1)
 
 
+class DispatchTitleTests(unittest.TestCase):
+    def test_a_run_stored_on_main_is_found_when_its_title_names_the_sha(self):
+        sha = "a" * 40
+        titled = {
+            "name": "Research quality",
+            "display_title": f"research-quality-pr 1074 {sha}",
+            "status": "completed",
+            "conclusion": "success",
+            "head_sha": "b" * 40,
+        }
+
+        def fake(args, *, token):
+            path = args[0]
+            if "head_sha=" in path:
+                return {"workflow_runs": []}
+            return {"workflow_runs": [titled, {"name": "Python tests", "display_title": titled["display_title"]}]}
+
+        with patch.object(wait, "_gh_json", fake):
+            runs = wait.list_workflow_runs("o/r", "Research quality", sha, "t")
+        self.assertEqual(runs, [titled])
+
+    def test_a_title_for_a_different_commit_does_not_match(self):
+        run = {"display_title": "research-quality-pr 1074 " + ("b" * 40)}
+        self.assertFalse(wait.run_titles_sha(run, "a" * 40))
+        self.assertFalse(wait.run_titles_sha({"display_title": "fixed " + ("a" * 40)}, "a" * 40))
+
+
 if __name__ == "__main__":
     unittest.main()

@@ -65,6 +65,7 @@ def test_a_resolver_push_retriggers_research_quality():
     assert note["if"] == "steps.resolve.outputs.pushed == 'true'"
     assert "steps.resolve.outputs.pushed_sha" in note["env"]["PUSHED_SHA"]
     assert "event_type=research-quality-pr" in note["run"]
+    assert 'client_payload[pr]=${PR}' in note["run"]
     assert 'client_payload[sha]=${PUSHED_SHA}' in note["run"]
     assert "automerge_comment.py" in note["run"] and "${PUSHED_SHA}" in note["run"]
     assert "Push any commit to this branch, or close and reopen the PR" in note["run"]
@@ -133,6 +134,15 @@ def test_pr_state_is_rechecked_before_every_side_effect():
     squash = step(jobs["merge"], "Squash merge")["run"]
     assert squash.index("--json state") < squash.index("--method PUT")
     assert "merge=false" in step(jobs["merge"], "Skip unless the PR is still open")["run"]
+
+
+def test_a_dispatch_completion_finds_the_pr_from_the_run_title():
+    """repository_dispatch records head_sha as main. The run title carries
+    the PR number; the job log is only the fallback."""
+    resolve = step(load()["jobs"]["resolve-pr"], "Resolve PR number")
+    assert resolve["env"]["RUN_TITLE"] == "${{ github.event.workflow_run.display_title }}"
+    assert "research-quality-pr" in resolve["run"]
+    assert "AUTOMERGE_PR" in resolve["run"]
 
 
 def test_workflow_run_ignores_push_and_schedule_on_main():

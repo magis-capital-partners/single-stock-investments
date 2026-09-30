@@ -20,12 +20,14 @@ WORKFLOW = ROOT / ".github" / "workflows" / "research-quality.yml"
 
 HARNESS = r"""
 const fs = require('fs');
-const [scriptPath, eventName, filesJson] = process.argv.slice(2);
+const [scriptPath, eventName, filesJson, payloadJson] = process.argv.slice(2);
 const files = JSON.parse(filesJson);
 const outputs = {};
 const summary = { addHeading() { return this; }, addTable() { return this; }, async write() {} };
 const core = { setOutput: (key, value) => { outputs[key] = value; }, summary };
-const payload = eventName === 'pull_request' ? { pull_request: { number: 1 } } : {};
+const payload = payloadJson
+  ? JSON.parse(payloadJson)
+  : (eventName === 'pull_request' ? { pull_request: { number: 1 } } : {});
 const context = { eventName, payload, repo: { owner: 'o', repo: 'r' } };
 const github = {
   paginate: async () => files.map(filename => ({ filename })),
@@ -47,17 +49,18 @@ def triggers() -> dict:
     return data.get("on", data.get(True))  # PyYAML reads the bare `on:` key as True
 
 
-def classify(tmp_path: Path, event: str, files: list[str]) -> dict:
+def classify(tmp_path: Path, event: str, files: list[str], payload: dict | None = None) -> dict:
     node = shutil.which("node")
     if not node:
         pytest.skip("node is not installed")
-    script = load()["jobs"]["changes"]["steps"][0]["with"]["script"]
+    steps = load()["jobs"]["changes"]["steps"]
+    script = next(step["with"]["script"] for step in steps if step.get("with", {}).get("script"))
     (tmp_path / "classify.js").write_text(script, encoding="utf-8")
     (tmp_path / "harness.js").write_text(HARNESS, encoding="utf-8")
-    proc = subprocess.run(
-        [node, str(tmp_path / "harness.js"), str(tmp_path / "classify.js"), event, json.dumps(files)],
-        capture_output=True, text=True, check=False,
-    )
+    cmd = [node, str(tmp_path / "harness.js"), str(tmp_path / "classify.js"), event, json.dumps(files)]
+    if payload is not None:
+        cmd.append(json.dumps(payload))
+    proc = subprocess.run(cmd, capture_output=True, text=True, check=False)
     assert proc.returncode == 0, proc.stderr
     return json.loads(proc.stdout)
 
@@ -113,9 +116,33 @@ def test_a_pr_touching_only_a_deep_dive_skips_graph_invariants(tmp_path):
     assert outputs["research_lint"] == "true"
 
 
+def test_dispatch_is_not_a_manual_run_button():
+    """workflow_dispatch adds a Run button. Governance forbids that outside
+    an allowlist, and it is how run 36651667022 failed on main."""
+    on = triggers()
+    assert "workflow_dispatch" not in on
+    assert on["repository_dispatch"]["types"] == ["research-quality-pr"]
+    text = WORKFLOW.read_text(encoding="utf-8")
+    assert "format('research-quality-pr {0} {1}'" in text
+
+
+def test_a_dispatch_classifies_the_named_pr(tmp_path):
+    sha = "a" * 40
+    outputs = classify(
+        tmp_path,
+        "repository_dispatch",
+        ["ABC/research/deep_dive_2026-09-01.md"],
+        {"client_payload": {"pr": "1074", "sha": sha}},
+    )
+    assert outputs["research_lint"] == "true"
+    assert outputs["graph_invariants"] == "false"
+
+
 def test_every_job_tests_the_exact_commit():
     data = load()
-    assert data["env"]["CHECKOUT_SHA"] == "${{ github.event.pull_request.head.sha || github.sha }}"
+    assert data["env"]["CHECKOUT_SHA"] == (
+        "${{ github.event.pull_request.head.sha || github.event.client_payload.sha || github.sha }}"
+    )
     for name, job in data["jobs"].items():
         for step in job.get("steps", []):
             run = str(step.get("run", ""))

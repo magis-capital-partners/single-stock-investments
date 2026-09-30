@@ -1,4 +1,8 @@
 name: Research quality
+# repository_dispatch runs on main, so the Actions run is not stored under the
+# PR commit. The title is how automerge and the check verifier find it:
+# "research-quality-pr <number> <sha>". Other events keep the workflow name.
+run-name: ${{ github.event.client_payload.sha && format('research-quality-pr {0} {1}', github.event.client_payload.pr, github.event.client_payload.sha) || github.workflow }}
 
 on:
   # push: the SSI pipeline, fact-ledger currency and graph-invariants jobs
@@ -216,15 +220,20 @@ jobs:
     steps:
       - name: Record dispatch target
         if: github.event_name == 'repository_dispatch'
+        env:
+          DISPATCH_PR: ${{ github.event.client_payload.pr }}
+          DISPATCH_SHA: ${{ github.event.client_payload.sha }}
         run: |
           set -euo pipefail
-          PR="${{ github.event.client_payload.pr }}"
-          SHA="${{ github.event.client_payload.sha }}"
-          if [ -z "$PR" ] || [ -z "$SHA" ]; then
-            echo "::error::research-quality-pr requires client_payload pr and sha"
+          if ! printf '%s' "$DISPATCH_PR" | grep -Eq '^[0-9]+$'; then
+            echo "::error::research-quality-pr client_payload.pr must be a pull request number"
             exit 1
           fi
-          echo "AUTOMERGE_PR=${PR} AUTOMERGE_SHA=${SHA}"
+          if ! printf '%s' "$DISPATCH_SHA" | grep -Eq '^[0-9a-fA-F]{40}$'; then
+            echo "::error::research-quality-pr client_payload.sha must be a full commit id"
+            exit 1
+          fi
+          echo "AUTOMERGE_PR=${DISPATCH_PR} AUTOMERGE_SHA=${DISPATCH_SHA}"
       - id: classify
         uses: actions/github-script@v7
         with:

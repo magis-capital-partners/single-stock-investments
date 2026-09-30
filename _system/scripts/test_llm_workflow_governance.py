@@ -179,13 +179,14 @@ class WorkflowGovernanceTests(unittest.TestCase):
     def test_research_quality_checks_out_the_exact_commit(self):
         workflow = (ROOT / ".github" / "workflows" / "research-quality.yml").read_text(encoding="utf-8")
         # Every checkout tests the exact commit the run is for: the PR head SHA
-        # on pull_request, github.sha on push and schedule. A ref moves under a
-        # queued run (a push run for d43005e86d tested 26422889c646) and a
-        # branch can be deleted under it. Assert the property, not a count:
-        # jobs get added.
+        # on pull_request, the dispatch payload sha on repository_dispatch
+        # (that event's github.sha is main), github.sha on push and schedule.
+        # A ref moves under a queued run (a push run for d43005e86d tested
+        # 26422889c646) and a branch can be deleted under it. Assert the
+        # property, not a count: jobs get added.
         self.assertRegex(
             workflow,
-            r"(?m)^  CHECKOUT_SHA: \$\{\{ github\.event\.pull_request\.head\.sha \|\| github\.sha \}\}$",
+            r"(?m)^  CHECKOUT_SHA: \$\{\{ github\.event\.pull_request\.head\.sha \|\| github\.event\.client_payload\.sha \|\| github\.sha \}\}$",
         )
         checkouts = re.findall(r"ci_checkout_workspace\.sh \w+(.*)$", workflow, re.MULTILINE)
         self.assertTrue(checkouts)

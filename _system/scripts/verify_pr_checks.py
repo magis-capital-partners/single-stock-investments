@@ -157,9 +157,38 @@ def _gh_lines(path: str, jq: str) -> list[dict[str, Any]]:
     return [json.loads(line) for line in proc.stdout.splitlines() if line.strip()]
 
 
+def run_titles_sha(run: dict[str, Any], sha: str) -> bool:
+    """repository_dispatch stores the Actions run on the default branch.
+
+    research-quality.yml names that run "research-quality-pr <number> <sha>".
+    The sha in the title is the commit the jobs checked out.
+    """
+    parts = str(run.get("display_title") or "").split()
+    return len(parts) >= 3 and parts[0] == "research-quality-pr" and parts[-1] == sha
+
+
+def merge_titled_runs(
+    on_sha: list[dict[str, Any]],
+    recent: list[dict[str, Any]],
+    sha: str,
+) -> list[dict[str, Any]]:
+    seen = {run.get("id") for run in on_sha}
+    merged = list(on_sha)
+    for run in recent:
+        if run.get("id") in seen or not run_titles_sha(run, sha):
+            continue
+        merged.append(run)
+        seen.add(run.get("id"))
+    return merged
+
+
 def fetch(repo: str, sha: str) -> tuple[list, list, list]:
     check_runs = _gh_lines(f"repos/{repo}/commits/{sha}/check-runs?per_page=100", ".check_runs[]")
     workflow_runs = _gh_lines(f"repos/{repo}/actions/runs?head_sha={sha}&per_page=100", ".workflow_runs[]")
+    # The conflict-resolver re-trigger is a repository_dispatch. GitHub records
+    # that run under main, not under the PR commit, so head_sha= misses it.
+    recent = _gh_lines(f"repos/{repo}/actions/runs?per_page=50", ".workflow_runs[]")
+    workflow_runs = merge_titled_runs(workflow_runs, recent, sha)
     statuses = _gh_lines(f"repos/{repo}/commits/{sha}/status?per_page=100", ".statuses[]")
     return check_runs, workflow_runs, statuses
 

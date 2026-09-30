@@ -77,22 +77,28 @@ jobs:
           RUN_SHA: ${{ github.event.workflow_run.head_sha }}
           RUN_EVENT: ${{ github.event.workflow_run.event }}
           RUN_ID: ${{ github.event.workflow_run.id }}
+          RUN_TITLE: ${{ github.event.workflow_run.display_title }}
           REPO: ${{ github.repository }}
         run: |
           set -euo pipefail
           if [ "$EVENT_NAME" = "pull_request" ]; then
             PR="$PR_NUMBER"
           elif [ "$RUN_EVENT" = "repository_dispatch" ]; then
-            # The dispatch runs on main, so head_sha is not the PR. The
-            # changes job records AUTOMERGE_PR in its log.
-            JOB=$(gh api "repos/${REPO}/actions/runs/${RUN_ID}/jobs" --jq '.jobs[] | select(.name=="changes") | .id' | head -1)
-            TEXT=""
-            if [ -n "$JOB" ]; then
-              TEXT=$(gh api "repos/${REPO}/actions/jobs/${JOB}/logs" || true)
-            fi
-            PR=$(printf '%s\n' "$TEXT" | sed -n 's/.*AUTOMERGE_PR=\([0-9][0-9]*\).*/\1/p' | head -1)
+            # The dispatch runs on main, so head_sha is not the PR commit.
+            # research-quality.yml names that run
+            # "research-quality-pr <number> <sha>". The job log is the
+            # fallback when the title is missing.
+            PR=$(printf '%s\n' "$RUN_TITLE" | sed -n 's/^research-quality-pr \([0-9][0-9]*\) [0-9a-fA-F]\{40\}$/\1/p' | head -1)
             if [ -z "$PR" ]; then
-              echo "No AUTOMERGE_PR in Research quality run ${RUN_ID}; skipping."
+              JOB=$(gh api "repos/${REPO}/actions/runs/${RUN_ID}/jobs" --jq '.jobs[] | select(.name=="changes") | .id' | head -1)
+              TEXT=""
+              if [ -n "$JOB" ]; then
+                TEXT=$(gh api "repos/${REPO}/actions/jobs/${JOB}/logs" || true)
+              fi
+              PR=$(printf '%s\n' "$TEXT" | sed -n 's/.*AUTOMERGE_PR=\([0-9][0-9]*\).*/\1/p' | head -1)
+            fi
+            if [ -z "$PR" ]; then
+              echo "No PR number on Research quality run ${RUN_ID}; skipping."
               echo "eligible=false" >> "$GITHUB_OUTPUT"
               echo "number=" >> "$GITHUB_OUTPUT"
               echo "head_ref=" >> "$GITHUB_OUTPUT"
@@ -495,7 +501,7 @@ jobs:
           done
           if [ "$DISPATCHED" = "true" ]; then
             HEADLINE="Automerge re-triggered CI"
-            MESSAGE="conflicts with main were resolved at ${PUSHED_SHA}. Research quality was started on this branch. Automerge runs again when that finishes green."
+            MESSAGE="conflicts with main were resolved at ${PUSHED_SHA}. Research quality was started for this commit. Automerge runs again when that finishes green."
           else
             HEADLINE="Automerge needs CI re-triggered"
             MESSAGE="conflicts with main were resolved at ${PUSHED_SHA}. That commit was pushed with GITHUB_TOKEN, which starts no pull_request workflow, and re-triggering Research quality failed. Push any commit to this branch, or close and reopen the PR."

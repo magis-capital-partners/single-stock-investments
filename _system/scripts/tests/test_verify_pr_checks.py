@@ -206,6 +206,17 @@ def test_cli_reads_github_and_exits_nonzero_for_the_1021_head(monkeypatch, capsy
     assert "NOT GREEN" in capsys.readouterr().out
 
 
+def test_a_dispatch_run_recorded_on_main_counts_as_the_pr_commit():
+    sha = "c" * 40
+    dispatched = run(QUALITY, 1, number=9)
+    dispatched["id"] = 55
+    dispatched["display_title"] = f"research-quality-pr 12 {sha}"
+    merged = vpc.merge_titled_runs([], [dispatched], sha)
+    assert merged == [dispatched]
+    assert verdict([], merged) == ([], [])
+    assert vpc.merge_titled_runs([], [dispatched], "d" * 40) == []
+
+
 def test_cli_reports_api_errors_as_usage_errors(monkeypatch):
     def failing_run(cmd, capture_output, text, check):
         return subprocess.CompletedProcess(cmd, 1, stdout="", stderr="HTTP 502")
