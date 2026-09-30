@@ -1,0 +1,10 @@
+# NKE — Third-party source inventory
+
+**Date:** 2026-09-30
+**Sources:** 1 total (0 approved, 0 pending, 1 context)
+
+| ID | Title | Path | Status | Use |
+|----|-------|------|--------|-----|
+| activist_long | PX14A6G · NKE · 2024-08-12 | `NKE/third-party-analyses/activist_reports/long/PX14A6G_20240812_acc0001214659_24_014213.htm` | context | activist/long — sec_edgar |
+
+Cross-check required: `NKE/research/cross_check_third_party_2026-09-30.md`

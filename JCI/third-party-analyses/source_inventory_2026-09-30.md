@@ -1,0 +1,10 @@
+# JCI — Third-party source inventory
+
+**Date:** 2026-09-30
+**Sources:** 1 total (0 approved, 0 pending, 1 context)
+
+| ID | Title | Path | Status | Use |
+|----|-------|------|--------|-----|
+| activist_long | PX14A6G · JCI · 2020-02-11 | `JCI/third-party-analyses/activist_reports/long/PX14A6G_20200211_acc0001477932_20_000543.htm` | context | activist/long — sec_edgar |
+
+Cross-check required: `JCI/research/cross_check_third_party_2026-09-30.md`
