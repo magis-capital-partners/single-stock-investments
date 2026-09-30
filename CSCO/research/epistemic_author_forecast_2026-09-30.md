@@ -33,6 +33,6 @@ Prospective v3 falsifier draft: `CSCO/research/falsifier_drafts/03df290ce01c5b06
 ## Epistemic work receipt
 
 - **Disposition:** success  
-- **Published input SHA:** recorded in `research_agent_manifest.json`  
+- **Published input SHA:** recorded in the research agent manifest  
 - **Draft ref:** `CSCO/research/falsifier_drafts/03df290ce01c5b0678e15d5f.json`  
 - **Spec:** `csco-operating-owner-earnings-fy2026-v2` revision **3**
