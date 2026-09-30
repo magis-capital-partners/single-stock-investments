@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0",
-  "as_of": "2026-08-18",
+  "as_of": "2026-07-25",
   "policy_id": "valuation_universe_tiers_v1",
   "policy_ref": "_system/portfolio/valuation_universe_policy.json",
   "tier_manifest_ref": "_system/data/valuation_universe_tiers.json",
@@ -26,91 +26,19 @@
     "action_required_count": 40,
     "owner_approved_count": 0,
     "committee_ready_count": 0,
-    "research_blocked_count": 4,
+    "research_blocked_count": 3,
     "model_deepening_required_count": 0,
     "freshness_refresh_required_count": 0,
     "readiness_state_counts": {
-      "committee_in_progress": 36,
-      "research_blocked": 4
+      "committee_in_progress": 37,
+      "research_blocked": 3
     },
     "priority_bucket_counts": {
-      "committee_completion": 36,
-      "proof_completion": 4
+      "committee_completion": 37,
+      "proof_completion": 3
     }
   },
   "items": [
-    {
-      "ticker": "AMZN",
-      "tier": 1,
-      "tier_label": "Active capital decision",
-      "tier_reason_codes": [
-        "active_committee",
-        "active_committee_manifest"
-      ],
-      "proof_status": "evidence_blocked",
-      "model_level": "evidence_blocked",
-      "evidence_status": "clear",
-      "open_gap_count": 0,
-      "critical_gap_count": 0,
-      "falsifier_count": 4,
-      "freshness": {
-        "model_as_of": {
-          "date": "2026-08-31",
-          "age_days": -13,
-          "maximum_age_days": 365,
-          "status": "current"
-        },
-        "latest_fact_as_of": {
-          "date": "2026-07-25",
-          "age_days": 24,
-          "maximum_age_days": 548,
-          "status": "current"
-        },
-        "price_as_of": {
-          "date": "2026-08-31",
-          "age_days": -13,
-          "maximum_age_days": 7,
-          "status": "current"
-        }
-      },
-      "committee": {
-        "status": "independent_review_open",
-        "stage": "round_one_open",
-        "owner_status": "pending",
-        "completed": 6,
-        "required": 13,
-        "remaining": 7,
-        "invalid_output_count": 1,
-        "current_phase": "isolated_round_one",
-        "next_outputs": [
-          "pre_mortem.json",
-          "round_1/marathon_capital_cycle.json"
-        ]
-      },
-      "readiness_state": "research_blocked",
-      "priority": {
-        "rank": 30,
-        "bucket": "proof_completion"
-      },
-      "blockers": [
-        {
-          "code": "proof_not_decision_grade",
-          "severity": "high",
-          "value": "evidence_blocked"
-        },
-        {
-          "code": "stock_specific_model_required",
-          "severity": "high",
-          "value": "evidence_blocked"
-        }
-      ],
-      "next_action": "Complete the source-linked contract proof and resolve every failed model check before committee work.",
-      "source_refs": {
-        "tier_assignment": "_system/data/valuation_universe_tiers.json",
-        "contract": "AMZN/research/valuation_contract.json",
-        "workbench": "AMZN/research/valuation_workbench.json"
-      }
-    },
     {
       "ticker": "AAOI",
       "tier": 1,
@@ -128,19 +56,19 @@
       "freshness": {
         "model_as_of": {
           "date": "2026-07-28",
-          "age_days": 21,
+          "age_days": -3,
           "maximum_age_days": 365,
           "status": "current"
         },
         "latest_fact_as_of": {
           "date": "2026-07-17",
-          "age_days": 32,
+          "age_days": 8,
           "maximum_age_days": 548,
           "status": "current"
         },
         "price_as_of": {
           "date": "2026-08-31",
-          "age_days": -13,
+          "age_days": -37,
           "maximum_age_days": 7,
           "status": "current"
         }
@@ -202,19 +130,19 @@
       "freshness": {
         "model_as_of": {
           "date": "2026-07-28",
-          "age_days": 21,
+          "age_days": -3,
           "maximum_age_days": 365,
           "status": "current"
         },
         "latest_fact_as_of": {
           "date": "2026-07-25",
-          "age_days": 24,
+          "age_days": 0,
           "maximum_age_days": 548,
           "status": "current"
         },
         "price_as_of": {
           "date": "2026-08-31",
-          "age_days": -13,
+          "age_days": -37,
           "maximum_age_days": 7,
           "status": "current"
         }
@@ -278,19 +206,19 @@
       "freshness": {
         "model_as_of": {
           "date": "2026-09-17",
-          "age_days": -30,
+          "age_days": -54,
           "maximum_age_days": 365,
           "status": "current"
         },
         "latest_fact_as_of": {
           "date": "2026-03-31",
-          "age_days": 140,
+          "age_days": 116,
           "maximum_age_days": 548,
           "status": "current"
         },
         "price_as_of": {
           "date": "2026-09-17",
-          "age_days": -30,
+          "age_days": -54,
           "maximum_age_days": 7,
           "status": "current"
         }
@@ -336,6 +264,67 @@
       }
     },
     {
+      "ticker": "AMZN",
+      "tier": 1,
+      "tier_label": "Active capital decision",
+      "tier_reason_codes": [
+        "active_committee",
+        "active_committee_manifest"
+      ],
+      "proof_status": "decision_grade",
+      "model_level": "stock_specific",
+      "evidence_status": "clear",
+      "open_gap_count": 0,
+      "critical_gap_count": 0,
+      "falsifier_count": 4,
+      "freshness": {
+        "model_as_of": {
+          "date": "2026-08-31",
+          "age_days": -37,
+          "maximum_age_days": 365,
+          "status": "current"
+        },
+        "latest_fact_as_of": {
+          "date": "2026-07-25",
+          "age_days": 0,
+          "maximum_age_days": 548,
+          "status": "current"
+        },
+        "price_as_of": {
+          "date": "2026-09-30",
+          "age_days": -67,
+          "maximum_age_days": 7,
+          "status": "current"
+        }
+      },
+      "committee": {
+        "status": "independent_review_open",
+        "stage": "round_one_open",
+        "owner_status": "pending",
+        "completed": 6,
+        "required": 13,
+        "remaining": 7,
+        "invalid_output_count": 1,
+        "current_phase": "isolated_round_one",
+        "next_outputs": [
+          "pre_mortem.json",
+          "round_1/marathon_capital_cycle.json"
+        ]
+      },
+      "readiness_state": "committee_in_progress",
+      "priority": {
+        "rank": 70,
+        "bucket": "committee_completion"
+      },
+      "blockers": [],
+      "next_action": "Replace stale or unbound outputs (pre_mortem.json) against the frozen packet; keep each rater isolated from peer votes.",
+      "source_refs": {
+        "tier_assignment": "_system/data/valuation_universe_tiers.json",
+        "contract": "AMZN/research/valuation_contract.json",
+        "workbench": "AMZN/research/valuation_workbench.json"
+      }
+    },
+    {
       "ticker": "8697.T",
       "tier": 1,
       "tier_label": "Active capital decision",
@@ -352,19 +341,19 @@
       "freshness": {
         "model_as_of": {
           "date": "2026-08-04",
-          "age_days": 14,
+          "age_days": -10,
           "maximum_age_days": 365,
           "status": "current"
         },
         "latest_fact_as_of": {
           "date": "2026-03-31",
-          "age_days": 140,
+          "age_days": 116,
           "maximum_age_days": 548,
           "status": "current"
         },
         "price_as_of": {
           "date": "2026-09-01",
-          "age_days": -14,
+          "age_days": -38,
           "maximum_age_days": 7,
           "status": "current"
         }
@@ -413,19 +402,19 @@
       "freshness": {
         "model_as_of": {
           "date": "2026-07-22",
-          "age_days": 27,
+          "age_days": 3,
           "maximum_age_days": 365,
           "status": "current"
         },
         "latest_fact_as_of": {
           "date": "2025-11-28",
-          "age_days": 263,
+          "age_days": 239,
           "maximum_age_days": 548,
           "status": "current"
         },
         "price_as_of": {
           "date": "2026-08-31",
-          "age_days": -13,
+          "age_days": -37,
           "maximum_age_days": 7,
           "status": "current"
         }
@@ -476,19 +465,19 @@
       "freshness": {
         "model_as_of": {
           "date": "2026-07-24",
-          "age_days": 25,
+          "age_days": 1,
           "maximum_age_days": 365,
           "status": "current"
         },
         "latest_fact_as_of": {
           "date": "2026-03-31",
-          "age_days": 140,
+          "age_days": 116,
           "maximum_age_days": 548,
           "status": "current"
         },
         "price_as_of": {
           "date": "2026-08-31",
-          "age_days": -13,
+          "age_days": -37,
           "maximum_age_days": 7,
           "status": "current"
         }
@@ -538,20 +527,20 @@
       "falsifier_count": 4,
       "freshness": {
         "model_as_of": {
-          "date": "2026-08-04",
-          "age_days": 14,
+          "date": "2026-07-21",
+          "age_days": 4,
           "maximum_age_days": 365,
           "status": "current"
         },
         "latest_fact_as_of": {
           "date": "2026-03-31",
-          "age_days": 140,
+          "age_days": 116,
           "maximum_age_days": 548,
           "status": "current"
         },
         "price_as_of": {
           "date": "2026-08-31",
-          "age_days": -13,
+          "age_days": -37,
           "maximum_age_days": 7,
           "status": "current"
         }
@@ -602,19 +591,19 @@
       "freshness": {
         "model_as_of": {
           "date": "2026-07-24",
-          "age_days": 25,
+          "age_days": 1,
           "maximum_age_days": 365,
           "status": "current"
         },
         "latest_fact_as_of": {
           "date": "2025-12-27",
-          "age_days": 234,
+          "age_days": 210,
           "maximum_age_days": 548,
           "status": "current"
         },
         "price_as_of": {
           "date": "2026-08-31",
-          "age_days": -13,
+          "age_days": -37,
           "maximum_age_days": 7,
           "status": "current"
         }
@@ -666,19 +655,19 @@
       "freshness": {
         "model_as_of": {
           "date": "2026-08-04",
-          "age_days": 14,
+          "age_days": -10,
           "maximum_age_days": 365,
           "status": "current"
         },
         "latest_fact_as_of": {
           "date": "2026-05-20",
-          "age_days": 90,
+          "age_days": 66,
           "maximum_age_days": 548,
           "status": "current"
         },
         "price_as_of": {
           "date": "2026-08-31",
-          "age_days": -13,
+          "age_days": -37,
           "maximum_age_days": 7,
           "status": "current"
         }
@@ -729,19 +718,19 @@
       "freshness": {
         "model_as_of": {
           "date": "2026-07-21",
-          "age_days": 28,
+          "age_days": 4,
           "maximum_age_days": 365,
           "status": "current"
         },
         "latest_fact_as_of": {
           "date": "2025-12-31",
-          "age_days": 230,
+          "age_days": 206,
           "maximum_age_days": 548,
           "status": "current"
         },
         "price_as_of": {
           "date": "2026-08-31",
-          "age_days": -13,
+          "age_days": -37,
           "maximum_age_days": 7,
           "status": "current"
         }
@@ -792,19 +781,19 @@
       "freshness": {
         "model_as_of": {
           "date": "2026-07-23",
-          "age_days": 26,
+          "age_days": 2,
           "maximum_age_days": 365,
           "status": "current"
         },
         "latest_fact_as_of": {
           "date": "2026-05-14",
-          "age_days": 96,
+          "age_days": 72,
           "maximum_age_days": 548,
           "status": "current"
         },
         "price_as_of": {
           "date": "2026-08-31",
-          "age_days": -13,
+          "age_days": -37,
           "maximum_age_days": 7,
           "status": "current"
         }
@@ -855,19 +844,19 @@
       "freshness": {
         "model_as_of": {
           "date": "2026-07-21",
-          "age_days": 28,
+          "age_days": 4,
           "maximum_age_days": 365,
           "status": "current"
         },
         "latest_fact_as_of": {
           "date": "2026-05-31",
-          "age_days": 79,
+          "age_days": 55,
           "maximum_age_days": 548,
           "status": "current"
         },
         "price_as_of": {
           "date": "2026-08-31",
-          "age_days": -13,
+          "age_days": -37,
           "maximum_age_days": 7,
           "status": "current"
         }
@@ -918,19 +907,19 @@
       "freshness": {
         "model_as_of": {
           "date": "2026-08-13",
-          "age_days": 5,
+          "age_days": -19,
           "maximum_age_days": 365,
           "status": "current"
         },
         "latest_fact_as_of": {
           "date": "2025-12-31",
-          "age_days": 230,
+          "age_days": 206,
           "maximum_age_days": 548,
           "status": "current"
         },
         "price_as_of": {
           "date": "2026-08-31",
-          "age_days": -13,
+          "age_days": -37,
           "maximum_age_days": 7,
           "status": "current"
         }
@@ -981,19 +970,19 @@
       "freshness": {
         "model_as_of": {
           "date": "2026-07-29",
-          "age_days": 20,
+          "age_days": -4,
           "maximum_age_days": 365,
           "status": "current"
         },
         "latest_fact_as_of": {
           "date": "2026-07-24",
-          "age_days": 25,
+          "age_days": 1,
           "maximum_age_days": 548,
           "status": "current"
         },
         "price_as_of": {
           "date": "2026-08-31",
-          "age_days": -13,
+          "age_days": -37,
           "maximum_age_days": 7,
           "status": "current"
         }
@@ -1045,19 +1034,19 @@
       "freshness": {
         "model_as_of": {
           "date": "2026-07-20",
-          "age_days": 29,
+          "age_days": 5,
           "maximum_age_days": 365,
           "status": "current"
         },
         "latest_fact_as_of": {
           "date": "2026-05-27",
-          "age_days": 83,
+          "age_days": 59,
           "maximum_age_days": 548,
           "status": "current"
         },
         "price_as_of": {
           "date": "2026-08-31",
-          "age_days": -13,
+          "age_days": -37,
           "maximum_age_days": 7,
           "status": "current"
         }
@@ -1108,19 +1097,19 @@
       "freshness": {
         "model_as_of": {
           "date": "2026-07-23",
-          "age_days": 26,
+          "age_days": 2,
           "maximum_age_days": 365,
           "status": "current"
         },
         "latest_fact_as_of": {
           "date": "2025-06-30",
-          "age_days": 414,
+          "age_days": 390,
           "maximum_age_days": 548,
           "status": "current"
         },
         "price_as_of": {
           "date": "2026-08-31",
-          "age_days": -13,
+          "age_days": -37,
           "maximum_age_days": 7,
           "status": "current"
         }
@@ -1173,19 +1162,19 @@
       "freshness": {
         "model_as_of": {
           "date": "2026-07-21",
-          "age_days": 28,
+          "age_days": 4,
           "maximum_age_days": 365,
           "status": "current"
         },
         "latest_fact_as_of": {
           "date": "2026-03-31",
-          "age_days": 140,
+          "age_days": 116,
           "maximum_age_days": 548,
           "status": "current"
         },
         "price_as_of": {
           "date": "2026-08-31",
-          "age_days": -13,
+          "age_days": -37,
           "maximum_age_days": 7,
           "status": "current"
         }
@@ -1238,19 +1227,19 @@
       "freshness": {
         "model_as_of": {
           "date": "2026-07-20",
-          "age_days": 29,
+          "age_days": 5,
           "maximum_age_days": 365,
           "status": "current"
         },
         "latest_fact_as_of": {
           "date": "2026-04-16",
-          "age_days": 124,
+          "age_days": 100,
           "maximum_age_days": 548,
           "status": "current"
         },
         "price_as_of": {
           "date": "2026-08-31",
-          "age_days": -13,
+          "age_days": -37,
           "maximum_age_days": 7,
           "status": "current"
         }
@@ -1301,19 +1290,19 @@
       "freshness": {
         "model_as_of": {
           "date": "2026-07-30",
-          "age_days": 19,
+          "age_days": -5,
           "maximum_age_days": 365,
           "status": "current"
         },
         "latest_fact_as_of": {
           "date": "2026-04-24",
-          "age_days": 116,
+          "age_days": 92,
           "maximum_age_days": 548,
           "status": "current"
         },
         "price_as_of": {
           "date": "2026-08-31",
-          "age_days": -13,
+          "age_days": -37,
           "maximum_age_days": 7,
           "status": "current"
         }
@@ -1364,19 +1353,19 @@
       "freshness": {
         "model_as_of": {
           "date": "2026-07-29",
-          "age_days": 20,
+          "age_days": -4,
           "maximum_age_days": 365,
           "status": "current"
         },
         "latest_fact_as_of": {
           "date": "2026-03-31",
-          "age_days": 140,
+          "age_days": 116,
           "maximum_age_days": 548,
           "status": "current"
         },
         "price_as_of": {
           "date": "2026-08-31",
-          "age_days": -13,
+          "age_days": -37,
           "maximum_age_days": 7,
           "status": "current"
         }
@@ -1427,19 +1416,19 @@
       "freshness": {
         "model_as_of": {
           "date": "2026-07-29",
-          "age_days": 20,
+          "age_days": -4,
           "maximum_age_days": 365,
           "status": "current"
         },
         "latest_fact_as_of": {
           "date": "2026-05-01",
-          "age_days": 109,
+          "age_days": 85,
           "maximum_age_days": 548,
           "status": "current"
         },
         "price_as_of": {
           "date": "2026-08-31",
-          "age_days": -13,
+          "age_days": -37,
           "maximum_age_days": 7,
           "status": "current"
         }
@@ -1490,19 +1479,19 @@
       "freshness": {
         "model_as_of": {
           "date": "2026-07-30",
-          "age_days": 19,
+          "age_days": -5,
           "maximum_age_days": 365,
           "status": "current"
         },
         "latest_fact_as_of": {
           "date": "2026-03-31",
-          "age_days": 140,
+          "age_days": 116,
           "maximum_age_days": 548,
           "status": "current"
         },
         "price_as_of": {
           "date": "2026-08-31",
-          "age_days": -13,
+          "age_days": -37,
           "maximum_age_days": 7,
           "status": "current"
         }
@@ -1553,19 +1542,19 @@
       "freshness": {
         "model_as_of": {
           "date": "2026-07-30",
-          "age_days": 19,
+          "age_days": -5,
           "maximum_age_days": 365,
           "status": "current"
         },
         "latest_fact_as_of": {
           "date": "2026-03-31",
-          "age_days": 140,
+          "age_days": 116,
           "maximum_age_days": 548,
           "status": "current"
         },
         "price_as_of": {
           "date": "2026-08-31",
-          "age_days": -13,
+          "age_days": -37,
           "maximum_age_days": 7,
           "status": "current"
         }
@@ -1618,19 +1607,19 @@
       "freshness": {
         "model_as_of": {
           "date": "2026-07-21",
-          "age_days": 28,
+          "age_days": 4,
           "maximum_age_days": 365,
           "status": "current"
         },
         "latest_fact_as_of": {
           "date": "2026-02-28",
-          "age_days": 171,
+          "age_days": 147,
           "maximum_age_days": 548,
           "status": "current"
         },
         "price_as_of": {
           "date": "2026-08-31",
-          "age_days": -13,
+          "age_days": -37,
           "maximum_age_days": 7,
           "status": "current"
         }
@@ -1681,19 +1670,19 @@
       "freshness": {
         "model_as_of": {
           "date": "2026-07-24",
-          "age_days": 25,
+          "age_days": 1,
           "maximum_age_days": 365,
           "status": "current"
         },
         "latest_fact_as_of": {
           "date": "2025-12-31",
-          "age_days": 230,
+          "age_days": 206,
           "maximum_age_days": 548,
           "status": "current"
         },
         "price_as_of": {
           "date": "2026-08-31",
-          "age_days": -13,
+          "age_days": -37,
           "maximum_age_days": 7,
           "status": "current"
         }
@@ -1744,19 +1733,19 @@
       "freshness": {
         "model_as_of": {
           "date": "2026-07-21",
-          "age_days": 28,
+          "age_days": 4,
           "maximum_age_days": 365,
           "status": "current"
         },
         "latest_fact_as_of": {
           "date": "2026-03-31",
-          "age_days": 140,
+          "age_days": 116,
           "maximum_age_days": 548,
           "status": "current"
         },
         "price_as_of": {
           "date": "2026-08-31",
-          "age_days": -13,
+          "age_days": -37,
           "maximum_age_days": 7,
           "status": "current"
         }
@@ -1809,19 +1798,19 @@
       "freshness": {
         "model_as_of": {
           "date": "2026-07-20",
-          "age_days": 29,
+          "age_days": 5,
           "maximum_age_days": 365,
           "status": "current"
         },
         "latest_fact_as_of": {
           "date": "2026-07-27",
-          "age_days": 22,
+          "age_days": -2,
           "maximum_age_days": 548,
           "status": "current"
         },
         "price_as_of": {
           "date": "2026-08-31",
-          "age_days": -13,
+          "age_days": -37,
           "maximum_age_days": 7,
           "status": "current"
         }
@@ -1872,19 +1861,19 @@
       "freshness": {
         "model_as_of": {
           "date": "2026-07-23",
-          "age_days": 26,
+          "age_days": 2,
           "maximum_age_days": 365,
           "status": "current"
         },
         "latest_fact_as_of": {
           "date": "2026-03-31",
-          "age_days": 140,
+          "age_days": 116,
           "maximum_age_days": 548,
           "status": "current"
         },
         "price_as_of": {
           "date": "2026-08-31",
-          "age_days": -13,
+          "age_days": -37,
           "maximum_age_days": 7,
           "status": "current"
         }
@@ -1936,19 +1925,19 @@
       "freshness": {
         "model_as_of": {
           "date": "2026-09-01",
-          "age_days": -14,
+          "age_days": -38,
           "maximum_age_days": 365,
           "status": "current"
         },
         "latest_fact_as_of": {
           "date": "2025-12-31",
-          "age_days": 230,
+          "age_days": 206,
           "maximum_age_days": 548,
           "status": "current"
         },
         "price_as_of": {
           "date": "2026-08-28",
-          "age_days": -10,
+          "age_days": -34,
           "maximum_age_days": 7,
           "status": "current"
         }
@@ -1999,19 +1988,19 @@
       "freshness": {
         "model_as_of": {
           "date": "2026-07-21",
-          "age_days": 28,
+          "age_days": 4,
           "maximum_age_days": 365,
           "status": "current"
         },
         "latest_fact_as_of": {
           "date": "2026-04-30",
-          "age_days": 110,
+          "age_days": 86,
           "maximum_age_days": 548,
           "status": "current"
         },
         "price_as_of": {
           "date": "2026-08-31",
-          "age_days": -13,
+          "age_days": -37,
           "maximum_age_days": 7,
           "status": "current"
         }
@@ -2062,19 +2051,19 @@
       "freshness": {
         "model_as_of": {
           "date": "2026-07-21",
-          "age_days": 28,
+          "age_days": 4,
           "maximum_age_days": 365,
           "status": "current"
         },
         "latest_fact_as_of": {
           "date": "2025-12-31",
-          "age_days": 230,
+          "age_days": 206,
           "maximum_age_days": 548,
           "status": "current"
         },
         "price_as_of": {
           "date": "2026-08-31",
-          "age_days": -13,
+          "age_days": -37,
           "maximum_age_days": 7,
           "status": "current"
         }
@@ -2125,19 +2114,19 @@
       "freshness": {
         "model_as_of": {
           "date": "2026-07-21",
-          "age_days": 28,
+          "age_days": 4,
           "maximum_age_days": 365,
           "status": "current"
         },
         "latest_fact_as_of": {
           "date": "2025-12-31",
-          "age_days": 230,
+          "age_days": 206,
           "maximum_age_days": 548,
           "status": "current"
         },
         "price_as_of": {
           "date": "2026-08-31",
-          "age_days": -13,
+          "age_days": -37,
           "maximum_age_days": 7,
           "status": "current"
         }
@@ -2190,19 +2179,19 @@
       "freshness": {
         "model_as_of": {
           "date": "2026-07-21",
-          "age_days": 28,
+          "age_days": 4,
           "maximum_age_days": 365,
           "status": "current"
         },
         "latest_fact_as_of": {
           "date": "2026-03-29",
-          "age_days": 142,
+          "age_days": 118,
           "maximum_age_days": 548,
           "status": "current"
         },
         "price_as_of": {
           "date": "2026-08-31",
-          "age_days": -13,
+          "age_days": -37,
           "maximum_age_days": 7,
           "status": "current"
         }
@@ -2255,19 +2244,19 @@
       "freshness": {
         "model_as_of": {
           "date": "2026-07-20",
-          "age_days": 29,
+          "age_days": 5,
           "maximum_age_days": 365,
           "status": "current"
         },
         "latest_fact_as_of": {
           "date": "2026-04-24",
-          "age_days": 116,
+          "age_days": 92,
           "maximum_age_days": 548,
           "status": "current"
         },
         "price_as_of": {
           "date": "2026-08-31",
-          "age_days": -13,
+          "age_days": -37,
           "maximum_age_days": 7,
           "status": "current"
         }
@@ -2320,19 +2309,19 @@
       "freshness": {
         "model_as_of": {
           "date": "2026-08-31",
-          "age_days": -13,
+          "age_days": -37,
           "maximum_age_days": 365,
           "status": "current"
         },
         "latest_fact_as_of": {
           "date": "2026-06-30",
-          "age_days": 49,
+          "age_days": 25,
           "maximum_age_days": 548,
           "status": "current"
         },
         "price_as_of": {
           "date": "2026-08-31",
-          "age_days": -13,
+          "age_days": -37,
           "maximum_age_days": 7,
           "status": "current"
         }
@@ -2382,20 +2371,20 @@
       "falsifier_count": 14,
       "freshness": {
         "model_as_of": {
-          "date": "2026-07-24",
-          "age_days": 25,
+          "date": "2026-07-15",
+          "age_days": 10,
           "maximum_age_days": 365,
           "status": "current"
         },
         "latest_fact_as_of": {
           "date": "2026-03-31",
-          "age_days": 140,
+          "age_days": 116,
           "maximum_age_days": 548,
           "status": "current"
         },
         "price_as_of": {
           "date": "2026-08-31",
-          "age_days": -13,
+          "age_days": -37,
           "maximum_age_days": 7,
           "status": "current"
         }
@@ -2447,19 +2436,19 @@
       "freshness": {
         "model_as_of": {
           "date": "2026-09-01",
-          "age_days": -14,
+          "age_days": -38,
           "maximum_age_days": 365,
           "status": "current"
         },
         "latest_fact_as_of": {
           "date": "2026-03-31",
-          "age_days": 140,
+          "age_days": 116,
           "maximum_age_days": 548,
           "status": "current"
         },
         "price_as_of": {
           "date": "2026-08-31",
-          "age_days": -13,
+          "age_days": -37,
           "maximum_age_days": 7,
           "status": "current"
         }
@@ -2511,19 +2500,19 @@
       "freshness": {
         "model_as_of": {
           "date": "2026-07-24",
-          "age_days": 25,
+          "age_days": 1,
           "maximum_age_days": 365,
           "status": "current"
         },
         "latest_fact_as_of": {
           "date": "2026-03-31",
-          "age_days": 140,
+          "age_days": 116,
           "maximum_age_days": 548,
           "status": "current"
         },
         "price_as_of": {
           "date": "2026-08-31",
-          "age_days": -13,
+          "age_days": -37,
           "maximum_age_days": 7,
           "status": "current"
         }
@@ -2574,19 +2563,19 @@
       "freshness": {
         "model_as_of": {
           "date": "2026-08-11",
-          "age_days": 7,
+          "age_days": -17,
           "maximum_age_days": 365,
           "status": "current"
         },
         "latest_fact_as_of": {
           "date": "2026-06-09",
-          "age_days": 70,
+          "age_days": 46,
           "maximum_age_days": 548,
           "status": "current"
         },
         "price_as_of": {
           "date": "2026-08-31",
-          "age_days": -13,
+          "age_days": -37,
           "maximum_age_days": 7,
           "status": "current"
         }
