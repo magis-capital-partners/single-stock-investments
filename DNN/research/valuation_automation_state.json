@@ -4,32 +4,32 @@
   "stages": {
     "identity": {
       "status": "complete",
-      "at": "2026-07-29T20:34:16.078868Z"
+      "at": "2026-09-30T17:13:29.557088Z"
     },
     "collection": {
       "status": "complete",
-      "at": "2026-07-29T20:34:22.846351Z",
+      "at": "2026-09-30T17:13:31.127289Z",
       "results": [
         {
           "returncode": 0,
-          "stdout": "Saved DNN\\research\\evidence\\sec_companyfacts.json",
+          "stdout": "Saved DNN/research/evidence/sec_companyfacts.json",
           "stderr": ""
         },
         {
           "returncode": 0,
-          "stdout": "2026-07-29T16:34:21.249371 Starting download for DNN\n2026-07-29T16:34:21.855608 SKIP exists -> C:\\Users\\drewg\\Projects\\dashboards\\single-stock-investments\\DNN\\investor-documents\\sec-edgar\\40-F_20260330_rpt20251231_acc0001104659_26_036912.htm\n2026-07-29T16:34:21.977192 SKIP exists -> C:\\Users\\drewg\\Projects\\dashboards\\single-stock-investments\\DNN\\investor-documents\\sec-edgar\\40-F_20250328_rpt20241231_acc0001104659_25_029414.htm\n2026-07-29T16:34:22.098996 SKIP exists -> C:\\Users\\drewg\\Projects\\dashboards\\single-stock-investments\\DNN\\investor-documents\\sec-edgar\\40-F_20240328_rpt20231231_acc0001104659_24_040470.htm\n2026-07-29T16:34:22.100009 SEC filings downloaded: 3\n2026-07-29T16:34:22.101007 IR PDF URLs found: 0\n2026-07-29T16:34:22.103007 Done DNN. SEC=3 IR=0/0\n",
+          "stdout": "2026-09-30T17:13:29.899459 Starting download for DNN\n2026-09-30T17:13:30.350840 OK 400,450 bytes -> /home/runner/work/single-stock-investments/single-stock-investments/DNN/investor-documents/sec-edgar/40-F_20260330_rpt20251231_acc0001104659_26_036912.htm\n2026-09-30T17:13:30.699651 OK 387,562 bytes -> /home/runner/work/single-stock-investments/single-stock-investments/DNN/investor-documents/sec-edgar/40-F_20250328_rpt20241231_acc0001104659_25_029414.htm\n2026-09-30T17:13:31.021360 OK 107,705 bytes -> /home/runner/work/single-stock-investments/single-stock-investments/DNN/investor-documents/sec-edgar/40-F_20240328_rpt20231231_acc0001104659_24_040470.htm\n2026-09-30T17:13:31.021807 SEC filings downloaded: 3\n2026-09-30T17:13:31.021896 IR PDF URLs found: 0\n2026-09-30T17:13:31.022265 Done DNN. SEC=3 IR=0/0\n",
           "stderr": ""
         },
         {
           "returncode": 0,
-          "stdout": "OK DNN: docs=9 full=0 partial=3\nDone. 1 tickers, 9 documents inventoried.\n",
+          "stdout": "OK DNN: docs=3 full=2 partial=1\nDone. 1 tickers, 3 documents inventoried.\n",
           "stderr": ""
         }
       ]
     },
     "model_compile": {
       "status": "evidence_blocked",
-      "at": "2026-07-29T20:34:22.864354Z",
+      "at": "2026-09-30T17:13:31.136129Z",
       "method_id": "owner_earnings_reinvestment_dcf",
       "input_errors": [
         "normalized_owner_earnings_m: missing locked fact",
@@ -39,15 +39,41 @@
     },
     "decision_contract": {
       "status": "complete",
-      "at": "2026-07-29T20:34:23.479090Z",
+      "at": "2026-09-30T17:13:31.810924Z",
       "result": {
         "returncode": 0,
-        "stdout": "universe: scope=all tickers=1\n[1/6] routes: 1 processed, 0 errors\n[2/6] contracts: 1 ready, 0 model scaffolds, 0 missing, 0 errors\n[3/6] workbenches: 1 built, 0 skipped, 0 errors\n[4/6] pricing: 0 priced, 0 errors\n[5/6] committees: 0 initialized, 0 blocked, 0 evidence tasks\n[6/6] dashboard: skipped\nsummary: _system/reviews/pending/power_zone_security_run_2026-07-29_dnn.json\n",
+        "stdout": "[1/8] universe tiers: T1=40 T2=12 T3=791\nuniverse: scope=all tickers=1\n[2/8] routes: 1 processed, 0 errors\n[3/8] contracts: 1 ready, 0 model scaffolds, 0 missing, 0 errors\n[4/8] workbenches: 1 built, 0 skipped, 0 errors\n[5/8] pricing: 0 priced, 0 errors\n[6/8] committees: 0 initialized, 0 blocked, 0 evidence tasks, 1 outside Tier 1\n[7/8] Tier 1 readiness: 40 names, 4 research blocked, 0 need model depth, 0 committee ready\n[8/8] dashboard: skipped\nsummary: _system/data/runs/power_zone_security_run_2026-09-30_dnn.json\n",
         "stderr": ""
       }
+    },
+    "ssi_report": {
+      "status": "complete",
+      "at": "2026-09-30T17:13:32.084181Z",
+      "results": [
+        {
+          "returncode": 0,
+          "stdout": "[ok] DNN/research/evidence/ssi_evidence_pack_2026-09-30.json\n",
+          "stderr": ""
+        },
+        {
+          "returncode": 0,
+          "stdout": "[ok] DNN/research/evidence/ssi_claims_2026-09-30.json\n",
+          "stderr": ""
+        },
+        {
+          "returncode": 0,
+          "stdout": "[ok] DNN/research/evidence/ssi_verified_claims_2026-09-30.json\n[ok] DNN/research/evidence/ssi_time_zero_2026-09-30.json\n",
+          "stderr": ""
+        },
+        {
+          "returncode": 0,
+          "stdout": "[ok] DNN/research/ssi_report_2026-09-30.md (gate: see ssi_report_gate_2026-09-30.json)\n",
+          "stderr": ""
+        }
+      ]
     }
   },
-  "updated_at": "2026-07-29T20:34:23.479090Z",
+  "updated_at": "2026-09-30T17:13:31.810904Z",
   "full_rerun": true,
   "status": "evidence_blocked"
 }
