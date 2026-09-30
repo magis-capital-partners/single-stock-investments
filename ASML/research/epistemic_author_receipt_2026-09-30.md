@@ -7,9 +7,9 @@
 | component_id | operating_business_and_net_assets |
 | draft | `ASML/research/falsifier_drafts/290e1242482eb2878775b1a4.json` |
 | status | awaiting_review |
-| input_sha | `3cf10f377948f50bb4f6a30b0328980e65572db8` |
-| evidence_hash | `a2c333af2de3bc7ce1a28d919a5f7bf3c72d008acdca299cd5a12eba99d399f1` | <!-- pragma: allowlist secret -->
-| contract_hash | `d434edd8a9cef1c4169933554387a22a0e323c1ac0f65d88f3f0e75d50eb7931` |
+| input_sha | `c6908335918d438cb0363adf1a1b42c37b80142c` |
+| evidence_hash | `bb5e81ad70a16cf4338a4d77fc07807b24d547a064916b7b0f24327aa426a357` | <!-- pragma: allowlist secret -->
+| contract_hash | `25c42a2a6f1c2b79df9929496be24e0894758b4ae12f9a307661dbdaff0e5e2c` |
 | component_fingerprint | `4080c692e2d41ed5e8c8bb19cc5abb21e04b5d945b4f3f58c4832093f0829480` |
 
 ## Rejection remediation (prior draft `2750cd7278c04903d8dacb51`)
