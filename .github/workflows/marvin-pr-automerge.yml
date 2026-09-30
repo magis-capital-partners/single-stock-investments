@@ -17,9 +17,9 @@ name: Auto - Agent PR Merge
 #    has never been through CI (PRs #1017 and #1021 were squashed seconds after
 #    that push, with zero check runs on the merged head). The push is made with
 #    GITHUB_TOKEN, which starts no pull_request workflow (#1073 sat at that
-#    new head with zero checks). workflow_dispatch is the one event that token
-#    may start, so the job dispatches Research quality on the branch and
-#    automerge retries when that run completes.
+#    new head with zero checks). repository_dispatch is an event that token
+#    may start, and it adds no Actions button, so the job dispatches Research
+#    quality for that PR and automerge retries when that run completes.
 # 4. Squash merges are serialized across all agent PRs (agent-automerge-main).
 # 5. PR state is re-read before every side effect. A pull_request run and a
 #    workflow_run run fire for the same head; the second one finds the PR
@@ -42,20 +42,22 @@ permissions:
   contents: write
   pull-requests: write
   checks: read
-  # write: the conflict resolver dispatches Research quality. GITHUB_TOKEN may
-  # start workflow_dispatch; it may not start a pull_request run.
-  actions: write
+  # read: after a repository_dispatch re-trigger, resolve-pr reads that run's
+  # job log for the PR number. contents: write is what lets this token send
+  # the dispatch. It may not start a pull_request run.
+  actions: read
 
 jobs:
   resolve-pr:
     # Research quality also runs on push and on a schedule against main. Only a
-    # pull_request run, or a workflow_dispatch aimed at a PR branch, can make
-    # a PR mergeable.
+    # pull_request run, or a repository_dispatch aimed at one PR, can make a
+    # PR mergeable. A repository_dispatch run's head SHA is main, so the PR
+    # number is read from that run's log, not from the commit.
     if: >
       github.event_name == 'pull_request' ||
       (github.event.workflow_run.conclusion == 'success' &&
        (github.event.workflow_run.event == 'pull_request' ||
-        github.event.workflow_run.event == 'workflow_dispatch'))
+        github.event.workflow_run.event == 'repository_dispatch'))
     runs-on: ubuntu-latest
     timeout-minutes: 5
     outputs:
@@ -73,11 +75,31 @@ jobs:
           EVENT_NAME: ${{ github.event_name }}
           PR_NUMBER: ${{ github.event.pull_request.number }}
           RUN_SHA: ${{ github.event.workflow_run.head_sha }}
+          RUN_EVENT: ${{ github.event.workflow_run.event }}
+          RUN_ID: ${{ github.event.workflow_run.id }}
           REPO: ${{ github.repository }}
         run: |
           set -euo pipefail
           if [ "$EVENT_NAME" = "pull_request" ]; then
             PR="$PR_NUMBER"
+          elif [ "$RUN_EVENT" = "repository_dispatch" ]; then
+            # The dispatch runs on main, so head_sha is not the PR. The
+            # changes job records AUTOMERGE_PR in its log.
+            JOB=$(gh api "repos/${REPO}/actions/runs/${RUN_ID}/jobs" --jq '.jobs[] | select(.name=="changes") | .id' | head -1)
+            TEXT=""
+            if [ -n "$JOB" ]; then
+              TEXT=$(gh api "repos/${REPO}/actions/jobs/${JOB}/logs" || true)
+            fi
+            PR=$(printf '%s\n' "$TEXT" | sed -n 's/.*AUTOMERGE_PR=\([0-9][0-9]*\).*/\1/p' | head -1)
+            if [ -z "$PR" ]; then
+              echo "No AUTOMERGE_PR in Research quality run ${RUN_ID}; skipping."
+              echo "eligible=false" >> "$GITHUB_OUTPUT"
+              echo "number=" >> "$GITHUB_OUTPUT"
+              echo "head_ref=" >> "$GITHUB_OUTPUT"
+              echo "head_sha=" >> "$GITHUB_OUTPUT"
+              echo "is_draft=false" >> "$GITHUB_OUTPUT"
+              exit 0
+            fi
           else
             PR=$(gh api "repos/${REPO}/commits/${RUN_SHA}/pulls" \
               -H "Accept: application/vnd.github.groot-preview+json" \
@@ -452,9 +474,8 @@ jobs:
 
       - name: Re-trigger Research quality on the resolved head
         # A push made with GITHUB_TOKEN starts no pull_request workflow
-        # (#989, #1017, #1021, #1073). workflow_dispatch is the exception, and
-        # this workflow retries when that run completes. The resolver has
-        # already merged main, so the branch tip contains this trigger.
+        # (#989, #1017, #1021, #1073). repository_dispatch is an event that
+        # token may start, and this workflow retries when that run completes.
         if: steps.resolve.outputs.pushed == 'true'
         env:
           PUSHED_SHA: ${{ steps.resolve.outputs.pushed_sha }}
@@ -463,7 +484,10 @@ jobs:
           set -euo pipefail
           DISPATCHED=false
           for _ in 1 2 3 4 5 6; do
-            if gh workflow run research-quality.yml --ref "$HEAD_REF" -f "pr=$PR"; then
+            if gh api --method POST "repos/${REPO}/dispatches" \
+                 -f event_type=research-quality-pr \
+                 -f "client_payload[pr]=${PR}" \
+                 -f "client_payload[sha]=${PUSHED_SHA}"; then
               DISPATCHED=true
               break
             fi

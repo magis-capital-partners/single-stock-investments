@@ -88,16 +88,14 @@ on:
   # times a day.
   schedule:
     - cron: "37 1,7,13,19 * * *"
-  # Automerge's conflict resolver pushes with GITHUB_TOKEN, which starts no
-  # pull_request workflow. It dispatches this workflow on the PR branch
-  # instead (input `pr` is the open PR to classify). github.sha is that
-  # branch tip because the dispatch ref is the branch, not main.
-  workflow_dispatch:
-    inputs:
-      pr:
-        description: Open pull request number whose files this run should classify
-        required: true
-        type: string
+  # No workflow_dispatch: test_llm_workflow_governance.py bans a manual
+  # run surface outside the allowlist. repository_dispatch is the
+  # on-demand trigger, and it adds no button to the Actions page.
+  # Automerge sends pr and sha in client_payload. This event always runs the
+  # workflow file on main; CHECKOUT_SHA is the payload sha, not github.sha.
+  #   gh api --method POST repos/:owner/:repo/dispatches -f event_type=research-quality-pr -f client_payload[pr]=N -f client_payload[sha]=SHA
+  repository_dispatch:
+    types: [research-quality-pr]
   pull_request:
     branches: [main]
     paths:
@@ -190,7 +188,7 @@ concurrency:
   # group so frequent automated commits to main don't cancel each other's run.
   # The event name keeps a scheduled run from cancelling a push run on the
   # same sha, and the other way round.
-  group: research-quality-${{ github.event.pull_request.number || inputs.pr || format('{0}-{1}', github.event_name, github.sha) }}
+  group: research-quality-${{ github.event.pull_request.number || github.event.client_payload.pr || format('{0}-{1}', github.event_name, github.sha) }}
   cancel-in-progress: true
 
 env:
@@ -198,10 +196,10 @@ env:
   # or the pushed / scheduled main commit. A branch name moves (a push run for
   # d43005e86d tested 26422889c646, run 35927546486) and can vanish (automerge
   # deletes the head branch on merge).
-  CHECKOUT_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
-  # workflow_dispatch has no pull_request payload and no base_ref. The
-  # dispatcher passes the PR number; the base is main.
-  PR_NUMBER: ${{ github.event.pull_request.number || inputs.pr }}
+  CHECKOUT_SHA: ${{ github.event.pull_request.head.sha || github.event.client_payload.sha || github.sha }}
+  # repository_dispatch has no pull_request payload. The dispatcher passes
+  # the PR number; the base is main.
+  PR_NUMBER: ${{ github.event.pull_request.number || github.event.client_payload.pr }}
   PR_BASE_REF: ${{ github.base_ref || github.event.repository.default_branch }}
 
 jobs:
@@ -216,6 +214,17 @@ jobs:
       fact_currency: ${{ steps.classify.outputs.fact_currency }}
       graph_invariants: ${{ steps.classify.outputs.graph_invariants }}
     steps:
+      - name: Record dispatch target
+        if: github.event_name == 'repository_dispatch'
+        run: |
+          set -euo pipefail
+          PR="${{ github.event.client_payload.pr }}"
+          SHA="${{ github.event.client_payload.sha }}"
+          if [ -z "$PR" ] || [ -z "$SHA" ]; then
+            echo "::error::research-quality-pr requires client_payload pr and sha"
+            exit 1
+          fi
+          echo "AUTOMERGE_PR=${PR} AUTOMERGE_SHA=${SHA}"
       - id: classify
         uses: actions/github-script@v7
         with:
@@ -224,7 +233,7 @@ jobs:
             const isPush = context.eventName === 'push' || context.eventName === 'schedule';
             const prNumber = context.payload.pull_request
               ? context.payload.pull_request.number
-              : (context.payload.inputs && context.payload.inputs.pr);
+              : (context.payload.client_payload && context.payload.client_payload.pr);
             let names = [];
             if (!isPush) {
               if (!prNumber) {
@@ -349,7 +358,7 @@ jobs:
     needs: changes
     # PR-only: needs github.base_ref and the PR head ref, neither of
     # which exists on a push event.
-    if: (github.event_name == 'pull_request' || github.event_name == 'workflow_dispatch') && needs.changes.outputs.prompt_sync == 'true'
+    if: (github.event_name == 'pull_request' || github.event_name == 'repository_dispatch') && needs.changes.outputs.prompt_sync == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
@@ -381,7 +390,7 @@ jobs:
     needs: changes
     # PR-only: needs github.base_ref and the PR head ref, neither of
     # which exists on a push event.
-    if: (github.event_name == 'pull_request' || github.event_name == 'workflow_dispatch') && needs.changes.outputs.research_lint == 'true'
+    if: (github.event_name == 'pull_request' || github.event_name == 'repository_dispatch') && needs.changes.outputs.research_lint == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
@@ -576,7 +585,7 @@ jobs:
         # depth-1 checkout above every lane would read NO-COMMIT and fail P3
         # for a reason that has nothing to do with the lanes.
         run: |
-          if [ "${{ github.event_name }}" = "pull_request" ] || [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+          if [ "${{ github.event_name }}" = "pull_request" ] || [ "${{ github.event_name }}" = "repository_dispatch" ]; then
             git fetch --filter=blob:none --deepen=400 origin "$CHECKOUT_SHA"
             # P3 spurious-fire fix: a PR whose branch point is >48h old is
             # missing the nightly lane commits that landed on main since, so
@@ -686,7 +695,7 @@ jobs:
     needs: changes
     # PR-only: needs github.base_ref and the PR head ref, neither of
     # which exists on a push event.
-    if: (github.event_name == 'pull_request' || github.event_name == 'workflow_dispatch') && needs.changes.outputs.dashboard_integrity == 'true'
+    if: (github.event_name == 'pull_request' || github.event_name == 'repository_dispatch') && needs.changes.outputs.dashboard_integrity == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
