@@ -42,18 +42,41 @@ def _gh_json(args: list[str], *, token: str) -> Any:
     return json.loads(proc.stdout) if proc.stdout.strip() else {}
 
 
+def _matches_workflow(run: dict[str, Any], workflow: str) -> bool:
+    wanted = workflow.lower().strip()
+    return (
+        (run.get("name") or "").lower() == wanted
+        or (run.get("path") or "").lower().endswith(wanted)
+        or (run.get("path") or "").lower() == wanted
+    )
+
+
+def run_titles_sha(run: dict[str, Any], sha: str) -> bool:
+    """A repository_dispatch run is stored on the default branch.
+
+    research-quality.yml sets run-name to "research-quality-pr <number> <sha>"
+    so the run can still be found from the commit it actually tested.
+    """
+    parts = str(run.get("display_title") or "").split()
+    return len(parts) >= 3 and parts[0] == "research-quality-pr" and parts[-1] == sha
+
+
 def list_workflow_runs(repo: str, workflow: str, sha: str, token: str) -> list[dict[str, Any]]:
     # workflow can be file name or workflow name; prefer name filter client-side.
     path = f"repos/{repo}/actions/runs?per_page=30&head_sha={sha}"
     data = _gh_json([path], token=token)
-    runs = data.get("workflow_runs") or []
-    wanted = workflow.lower().strip()
+    runs = [
+        run
+        for run in (data.get("workflow_runs") or [])
+        if _matches_workflow(run, workflow)
+    ]
+    if runs:
+        return runs
+    recent = _gh_json([f"repos/{repo}/actions/runs?per_page=50"], token=token)
     return [
         run
-        for run in runs
-        if (run.get("name") or "").lower() == wanted
-        or (run.get("path") or "").lower().endswith(wanted)
-        or (run.get("path") or "").lower() == wanted
+        for run in (recent.get("workflow_runs") or [])
+        if _matches_workflow(run, workflow) and run_titles_sha(run, sha)
     ]
 
 
