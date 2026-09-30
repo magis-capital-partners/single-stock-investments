@@ -1,22 +1,22 @@
 # FICO — Investment Thesis
 
-**Last updated:** 2026-07-10
+**Last updated:** 2026-09-29
 
 ## Classification
 
 | Field | Value |
 |-------|-------|
-| **Archetype** (Stahl) | unknown |
-| **Moat** (Munger) | unproven |
-| **Dhando** (Pabrai) | pending |
+| **Archetype** (Stahl) | compounder |
+| **Moat** (Munger) | narrowing on mortgage scores |
+| **Dhando** (Pabrai) | none |
 | **Stance** | watch |
-| **Cycle** | - |
+| **Cycle** | late in a price-increase cycle |
 | **MOI bucket** (legacy) | pending |
-| **Payoff lens** | pending |
+| **Payoff lens** | operating |
 
 ## One-line thesis
 
-Fair Isaac — thesis pending Marvin deep dive.
+Fair Isaac still collects a high-margin toll on credit scores, but the September 29, 2026 mortgage pricing change attacks the unit-price growth that the last quarter reported. Full note: `research/deep_dive_2026-09-29.md`.
 
 ## Key questions
 
