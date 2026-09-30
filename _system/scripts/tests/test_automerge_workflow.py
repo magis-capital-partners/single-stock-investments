@@ -57,14 +57,16 @@ def test_a_resolver_push_is_never_merged_in_the_same_run():
 
 def test_a_resolver_push_retriggers_research_quality():
     """A GITHUB_TOKEN push starts no pull_request workflow (#989, #1017,
-    #1021, #1073). Dispatch Research quality, which this token may start,
-    and say so on the PR. If the dispatch fails, the note still tells a
-    person how to re-trigger by hand."""
+    #1021, #1073). Dispatch Research quality via repository_dispatch, which
+    this token may start and which adds no Actions button. If the dispatch
+    fails, the note still tells a person how to re-trigger by hand."""
     merge = load()["jobs"]["merge"]
     note = step(merge, "Re-trigger Research quality")
     assert note["if"] == "steps.resolve.outputs.pushed == 'true'"
     assert "steps.resolve.outputs.pushed_sha" in note["env"]["PUSHED_SHA"]
-    assert 'gh workflow run research-quality.yml --ref "$HEAD_REF" -f "pr=$PR"' in note["run"]
+    assert "event_type=research-quality-pr" in note["run"]
+    assert 'client_payload[pr]=${PR}' in note["run"]
+    assert 'client_payload[sha]=${PUSHED_SHA}' in note["run"]
     assert "automerge_comment.py" in note["run"] and "${PUSHED_SHA}" in note["run"]
     assert "Push any commit to this branch, or close and reopen the PR" in note["run"]
     assert "--method PUT" not in note["run"]
@@ -134,12 +136,21 @@ def test_pr_state_is_rechecked_before_every_side_effect():
     assert "merge=false" in step(jobs["merge"], "Skip unless the PR is still open")["run"]
 
 
+def test_a_dispatch_completion_finds_the_pr_from_the_run_title():
+    """repository_dispatch records head_sha as main. The run title carries
+    the PR number; the job log is only the fallback."""
+    resolve = step(load()["jobs"]["resolve-pr"], "Resolve PR number")
+    assert resolve["env"]["RUN_TITLE"] == "${{ github.event.workflow_run.display_title }}"
+    assert "research-quality-pr" in resolve["run"]
+    assert "AUTOMERGE_PR" in resolve["run"]
+
+
 def test_workflow_run_ignores_push_and_schedule_on_main():
     """Research quality also runs on push and on a schedule against main.
-    A workflow_dispatch is the conflict-resolver's re-trigger and must count."""
+    A repository_dispatch is the conflict-resolver's re-trigger and must count."""
     condition = load()["jobs"]["resolve-pr"]["if"]
     assert "github.event.workflow_run.event == 'pull_request'" in condition
-    assert "github.event.workflow_run.event == 'workflow_dispatch'" in condition
+    assert "github.event.workflow_run.event == 'repository_dispatch'" in condition
     assert "github.event.workflow_run.conclusion == 'success'" in condition
     assert "schedule" not in condition
     assert "'push'" not in condition
