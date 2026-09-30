@@ -16,8 +16,10 @@ name: Auto - Agent PR Merge
 # 3. A conflict-resolver push is never merged in the same run: the new head
 #    has never been through CI (PRs #1017 and #1021 were squashed seconds after
 #    that push, with zero check runs on the merged head). The push is made with
-#    GITHUB_TOKEN, which starts no CI run, so the job says so on the PR and in
-#    a warning: someone has to push a commit or close/reopen the PR.
+#    GITHUB_TOKEN, which starts no pull_request workflow (#1073 sat at that
+#    new head with zero checks). workflow_dispatch is the one event that token
+#    may start, so the job dispatches Research quality on the branch and
+#    automerge retries when that run completes.
 # 4. Squash merges are serialized across all agent PRs (agent-automerge-main).
 # 5. PR state is re-read before every side effect. A pull_request run and a
 #    workflow_run run fire for the same head; the second one finds the PR
@@ -40,16 +42,20 @@ permissions:
   contents: write
   pull-requests: write
   checks: read
-  actions: read
+  # write: the conflict resolver dispatches Research quality. GITHUB_TOKEN may
+  # start workflow_dispatch; it may not start a pull_request run.
+  actions: write
 
 jobs:
   resolve-pr:
     # Research quality also runs on push and on a schedule against main. Only a
-    # pull_request run can make a PR mergeable.
+    # pull_request run, or a workflow_dispatch aimed at a PR branch, can make
+    # a PR mergeable.
     if: >
       github.event_name == 'pull_request' ||
       (github.event.workflow_run.conclusion == 'success' &&
-       github.event.workflow_run.event == 'pull_request')
+       (github.event.workflow_run.event == 'pull_request' ||
+        github.event.workflow_run.event == 'workflow_dispatch'))
     runs-on: ubuntu-latest
     timeout-minutes: 5
     outputs:
@@ -129,8 +135,11 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 55
     concurrency:
+      # Do not cancel. A pull_request run and the workflow_run retry share this
+      # group; cancelling the first left PR #1022 green on Research quality
+      # with a cancelled gate and no successor.
       group: agent-automerge-gate-${{ needs.resolve-pr.outputs.number }}
-      cancel-in-progress: true
+      cancel-in-progress: false
     outputs:
       number: ${{ needs.resolve-pr.outputs.number }}
       head_ref: ${{ needs.resolve-pr.outputs.head_ref }}
@@ -277,7 +286,7 @@ jobs:
     timeout-minutes: 55
     concurrency:
       group: agent-automerge-gate-${{ needs.resolve-pr.outputs.number }}
-      cancel-in-progress: true
+      cancel-in-progress: false
     outputs:
       # Empty unless every check passed on this exact SHA.
       head_sha: ${{ steps.checks.outputs.sha }}
@@ -441,20 +450,35 @@ jobs:
             echo "proceed=false" >> "$GITHUB_OUTPUT"
           fi
 
-      - name: Say on the PR that the resolved head needs CI re-triggered
-        # A push made with GITHUB_TOKEN starts no CI run (GitHub documents it,
-        # and #989, #1017 and #1021 show it), so nothing will test or merge the
-        # resolved head until a person pushes or reopens. Say so where it shows.
+      - name: Re-trigger Research quality on the resolved head
+        # A push made with GITHUB_TOKEN starts no pull_request workflow
+        # (#989, #1017, #1021, #1073). workflow_dispatch is the exception, and
+        # this workflow retries when that run completes. The resolver has
+        # already merged main, so the branch tip contains this trigger.
         if: steps.resolve.outputs.pushed == 'true'
         env:
           PUSHED_SHA: ${{ steps.resolve.outputs.pushed_sha }}
           RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
         run: |
           set -euo pipefail
-          MESSAGE="conflicts with main were resolved at ${PUSHED_SHA}. That commit was pushed with GITHUB_TOKEN, which starts no CI run, so nothing will test or merge it on its own. Re-trigger CI: push any commit to this branch, or close and reopen the PR."
-          echo "::warning title=Automerge needs CI re-triggered on PR #${PR}::${MESSAGE}"
+          DISPATCHED=false
+          for _ in 1 2 3 4 5 6; do
+            if gh workflow run research-quality.yml --ref "$HEAD_REF" -f "pr=$PR"; then
+              DISPATCHED=true
+              break
+            fi
+            sleep 5
+          done
+          if [ "$DISPATCHED" = "true" ]; then
+            HEADLINE="Automerge re-triggered CI"
+            MESSAGE="conflicts with main were resolved at ${PUSHED_SHA}. Research quality was started on this branch. Automerge runs again when that finishes green."
+          else
+            HEADLINE="Automerge needs CI re-triggered"
+            MESSAGE="conflicts with main were resolved at ${PUSHED_SHA}. That commit was pushed with GITHUB_TOKEN, which starts no pull_request workflow, and re-triggering Research quality failed. Push any commit to this branch, or close and reopen the PR."
+          fi
+          echo "::warning title=${HEADLINE} on PR #${PR}::${MESSAGE}"
           python _system/scripts/automerge_comment.py --repo "$REPO" --pr "$PR" \
-            --headline "Automerge needs CI re-triggered" --message "$MESSAGE" --run-url "$RUN_URL"
+            --headline "$HEADLINE" --message "$MESSAGE" --run-url "$RUN_URL"
 
       - name: Verify every check on the gated SHA is green
         id: verify
