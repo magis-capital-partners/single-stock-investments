@@ -55,17 +55,28 @@ def test_a_resolver_push_is_never_merged_in_the_same_run():
         assert "resolve_marvin_pr_conflicts.py" not in step(merge, later)["run"], later
 
 
-def test_a_resolver_push_is_announced_because_it_starts_no_ci():
-    """A GITHUB_TOKEN push starts no CI run (#989, #1017, #1021): without a
-    note, the resolved PR stalls with no checks and nothing says why."""
+def test_a_resolver_push_retriggers_research_quality():
+    """A GITHUB_TOKEN push starts no pull_request workflow (#989, #1017,
+    #1021, #1073). Dispatch Research quality, which this token may start,
+    and say so on the PR. If the dispatch fails, the note still tells a
+    person how to re-trigger by hand."""
     merge = load()["jobs"]["merge"]
-    note = step(merge, "needs CI re-triggered")
+    note = step(merge, "Re-trigger Research quality")
     assert note["if"] == "steps.resolve.outputs.pushed == 'true'"
     assert "steps.resolve.outputs.pushed_sha" in note["env"]["PUSHED_SHA"]
-    assert "::warning title=Automerge needs CI re-triggered" in note["run"]
+    assert 'gh workflow run research-quality.yml --ref "$HEAD_REF" -f "pr=$PR"' in note["run"]
     assert "automerge_comment.py" in note["run"] and "${PUSHED_SHA}" in note["run"]
-    assert "push any commit to this branch, or close and reopen the PR" in note["run"]
+    assert "Push any commit to this branch, or close and reopen the PR" in note["run"]
     assert "--method PUT" not in note["run"]
+
+
+def test_gate_concurrency_does_not_cancel_the_twin_run():
+    """PR #1022: Research quality was green, and the workflow_run retry
+    cancelled the in-progress gate. Nothing queued behind it, so the PR stayed
+    open."""
+    jobs = load()["jobs"]
+    for name in ("gate", "code-gate"):
+        assert jobs[name]["concurrency"]["cancel-in-progress"] is False, name
 
 
 def test_checks_still_pending_leave_a_note_instead_of_failing():
@@ -123,11 +134,15 @@ def test_pr_state_is_rechecked_before_every_side_effect():
     assert "merge=false" in step(jobs["merge"], "Skip unless the PR is still open")["run"]
 
 
-def test_workflow_run_only_reacts_to_pull_request_runs():
-    """Research quality now also runs on push and on a schedule against main."""
+def test_workflow_run_ignores_push_and_schedule_on_main():
+    """Research quality also runs on push and on a schedule against main.
+    A workflow_dispatch is the conflict-resolver's re-trigger and must count."""
     condition = load()["jobs"]["resolve-pr"]["if"]
     assert "github.event.workflow_run.event == 'pull_request'" in condition
+    assert "github.event.workflow_run.event == 'workflow_dispatch'" in condition
     assert "github.event.workflow_run.conclusion == 'success'" in condition
+    assert "schedule" not in condition
+    assert "'push'" not in condition
 
 
 def test_validators_and_resolver_run_from_the_base_branch():
