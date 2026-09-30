@@ -1,10 +1,11 @@
 # ACHR — Third-party source inventory
 
 **Date:** 2026-09-30
-**Sources:** 26 total (0 approved, 0 pending, 26 context)
+**Sources:** 27 total (0 approved, 0 pending, 27 context)
 
 | ID | Title | Path | Status | Use |
 |----|-------|------|--------|-----|
+| vic | 01_Archer_4955058434_000e | `ACHR/third-party-analyses/vic/01_Archer_4955058434_000e.pdf` | context | Value Investors Club (licensed corpus; variant view, not base IRR) |
 | activist_long | Hight Drive Growth LLC — SC 13D/A | `ACHR/third-party-analyses/activist_reports/long/SC-13D/A_20220520_acc0001104659_22_062994.htm` | context | activist/long — sec_edgar |
 | activist_long | Capri Growth LLC — SC 13D/A | `ACHR/third-party-analyses/activist_reports/long/SC-13D/A_20220628_acc0001104659_22_075304.htm` | context | activist/long — sec_edgar |
 | activist_long | SC 13D/A · ACHR · 2022-10-27 | `ACHR/third-party-analyses/activist_reports/long/SC-13D/A_20221027_acc0001104659_22_111997.htm` | context | activist/long — sec_edgar |
