@@ -4,7 +4,8 @@ name: Repository Health Supervisor
 # retry can heal (backoff, at most three dispatches per lane per UTC day), opens
 # one `lane-failure` issue per persistent failure fingerprint, and alerts Slack
 # on a new failure issue, a stale or recovered lane, D1 usage past 60%/80% of
-# the free daily limits, a gap in its own runs, plus one daily digest.
+# the free daily limits, a gap in its own runs, a falsifier item first held
+# for review, plus one Sunday digest. A green day sends nothing.
 # See _system/scripts/supervise_repository_health.py.
 #
 # Every two hours at :41. The quarter-hours are where GitHub drops and delays

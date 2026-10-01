@@ -19,11 +19,13 @@ What changed on 2026-09-24 (healer v2), and why:
   never read, never closed). Issues are now per fingerprint, labelled
   ``lane-failure``, assigned to a human, commented only on state changes and
   closed automatically when the lane recovers. #847 is no longer written.
-* Nothing paged anyone. Slack now gets a message when a failure issue opens,
+* Nothing paged anyone. Slack gets a message when a failure issue opens,
   a lane goes stale, a lane recovers, D1 usage crosses 60% or 80% of the
-  free daily limits, or the supervisor itself has been silent for more than
-  eight hours -- plus one daily digest. Every alert is deduplicated through
-  this script's committed state file, so a condition is announced once.
+  free daily limits, the supervisor itself has been silent for more than
+  eight hours, or a falsifier work item first enters semantic review.
+  The standing picture is one Sunday digest, not a daily all-clear.
+  Every alert is deduplicated through this script's committed state file,
+  so a condition is announced once.
 
 Without ``--act`` the script only plans: no GitHub writes, no dispatches, no
 Slack, no Cloudflare call. Output is ASCII (Windows cp1252 console trap).
@@ -63,6 +65,9 @@ RECOVERY_ALERT_DAYS = 7
 ISSUE_LABEL = "lane-failure"
 ISSUE_ASSIGNEE = "GoldmanDrew"
 DIGEST_HOUR_UTC = 13
+DIGEST_WEEKDAY = 6                 # Sunday (datetime.weekday)
+HELD_RECENT_DAYS = 7               # a new review item stays on the Sunday list for a week
+HELD_STUCK_DAYS = 14               # then it returns to the Sunday list once it has sat this long
 D1_LIMITS = {"rows_read": 5_000_000, "rows_written": 100_000}   # Cloudflare free plan, per day
 D1_THRESHOLDS = (60, 80)
 
@@ -627,8 +632,49 @@ def _fresh_state(prior: dict) -> dict:
         "d1": dict(carry("d1", {})),
         "runs": list(carry("runs", [])),
         "unjudged_since": dict(carry("unjudged_since", {})),
+        "held_seen": dict(carry("held_seen", {})),
+        "held_baselined": bool(carry("held_baselined", False)),
         "first_v2_run": not v2,
     }
+
+
+def held_reason(item: dict) -> str:
+    blockers = item.get("promotion_blockers") or []
+    if blockers:
+        return "; ".join(str(b) for b in blockers)
+    return str(item.get("reason") or "no reason recorded")
+
+
+def held_age_days(first_seen: str | None, now: datetime) -> float:
+    stamp = lr.parse_iso(first_seen)
+    if stamp is None:
+        return 0.0
+    return (hours_between(now, stamp) or 0.0) / 24.0
+
+
+def digest_held_groups(review: list[dict], seen: dict, now: datetime) -> list[tuple]:
+    """Sunday lines: items first seen this week, or stuck for two weeks.
+    Grouped by ticker and reason so two identical FOXA rows are one line."""
+    groups: dict[tuple, int] = {}
+    for item in review:
+        age = held_age_days(seen.get(item.get("work_id")), now)
+        if not (age < HELD_RECENT_DAYS or age >= HELD_STUCK_DAYS):
+            continue
+        key = (str(item.get("ticker") or "?"), held_reason(item)[:100])
+        groups[key] = groups.get(key, 0) + 1
+    return sorted(groups.items())
+
+
+def week_alert_kinds(alerts: dict, now: datetime) -> list[str]:
+    kinds = set()
+    for key, meta in alerts.items():
+        if not isinstance(meta, dict):
+            continue
+        sent = lr.parse_iso(meta.get("sent_at"))
+        if sent is None or (hours_between(now, sent) or 0) > 24 * 7:
+            continue
+        kinds.add(str(key).split(":", 1)[0])
+    return sorted(kinds)
 
 
 # --------------------------------------------------------------------------- #
@@ -1191,21 +1237,36 @@ class Supervisor:
             elif name in P3_LANE_HEALERS:
                 held[name] = why
 
-        # Work parked for semantic review: a held-back draft keeps its lane
-        # green, so it is announced once here and listed in every digest.
+        # Work parked for semantic review keeps its lane green. The queue that
+        # already exists when this behavior ships is recorded once and not
+        # paged; a work item that appears after that is announced once.
         review = held_back_work(self.root)
         self.held_for_review = review
-        current = {f"held:{item['work_id']}" for item in review if item["draft"]}
+        seen = self.state["held_seen"]
+        baselined = bool(self.state.get("held_baselined"))
+        current_ids = set()
         for item in review:
-            key = f"held:{item['work_id']}"
-            if item["draft"] and key not in self.state["alerts"]:
-                blockers = "; ".join(item["promotion_blockers"])[:200]
-                self.alert(key, f"[HELD DRAFT] {item['ticker']} {item.get('spec_id') or ''}"
-                                f" parked in needs_semantic_review by the promoter: {blockers}",
-                           value=item.get("ticker"))
+            work_id = item["work_id"]
+            current_ids.add(work_id)
+            if work_id in seen:
+                continue
+            if not baselined:
+                # The queue already on disk is not news. Treat it as stuck so
+                # the Sunday digest keeps it, without a one-time page.
+                seen[work_id] = iso(self.now - timedelta(days=HELD_STUCK_DAYS))
+                continue
+            seen[work_id] = iso(self.now)
+            why = held_reason(item)[:200]
+            self.alert(f"held:{work_id}",
+                       f"[HELD] {item.get('ticker') or '?'} {item.get('task_type') or ''}: {why}",
+                       value=item.get("ticker"))
+        if not baselined:
+            self.state["held_baselined"] = True
+        for work_id in [k for k in seen if k not in current_ids]:
+            seen.pop(work_id, None)
         for key in [k for k in self.state["alerts"] if k.startswith("held:")]:
-            if key not in current:
-                self.state["alerts"].pop(key, None)      # released; nothing to announce
+            if key[len("held:"):] not in current_ids:
+                self.state["alerts"].pop(key, None)
 
         d1_status = self.check_d1()
         digest = self.maybe_digest(lanes, violated, d1_status, gap)
@@ -1254,35 +1315,48 @@ class Supervisor:
 
     # -- digest ------------------------------------------------------------- #
     def maybe_digest(self, lanes, violated, d1_status, gap) -> str | None:
-        if self.now.hour < DIGEST_HOUR_UTC or self.state["digest"].get("last_sent_date") == self.today:
+        """One Sunday digest, after 13:00 UTC. A green week with an empty
+        review queue sends nothing."""
+        if (self.now.weekday() != DIGEST_WEEKDAY or self.now.hour < DIGEST_HOUR_UTC
+                or self.state["digest"].get("last_sent_date") == self.today):
             return None
         stale = [(n, r) for n, r in lanes.items() if r["stale"]]
         unjudged = [n for n, r in lanes.items() if not r["judged"] and not r["stale"]]
+        open_issues = [issue for issue in self.state["issues"].values()
+                       if issue.get("state") == "open"]
+        review = getattr(self, "held_for_review", [])
+        groups = digest_held_groups(review, self.state["held_seen"], self.now)
+        week = week_alert_kinds(self.state["alerts"], self.now)
+        d1_hot = False
+        if d1_status.get("status") == "ok":
+            d1_hot = any((d1_status.get(f"{metric}_pct") or 0) >= D1_THRESHOLDS[0]
+                         for metric in D1_LIMITS)
+        gap_hot = gap is not None and gap > SUPERVISOR_GAP_HOURS
+        if not (stale or open_issues or violated or groups or week or self.alerts
+                or d1_hot or gap_hot):
+            return None
+        fresh = len(lanes) - len(stale) - len(unjudged)
         lines = [f"*Repository health digest {self.today}*",
-                 f"Lanes: {len(lanes)} declared, {len(lanes) - len(stale) - len(unjudged)} fresh,"
-                 f" {len(stale)} stale, {len(unjudged)} not yet judged"
+                 f"Lanes: {len(lanes)} declared, {fresh} fresh, {len(stale)} stale,"
+                 f" {len(unjudged)} not yet judged"
                  + (f" ({', '.join(sorted(unjudged))})" if unjudged else "") + "."]
         for name, row in sorted(stale, key=lambda item: -(item[1]["age_hours"] or 1e9)):
             latest = row["latest_outcome"] or "no run on record"
             lines.append(f"  - `{name}`: {_fmt_age(row['age_hours'])} since a work-done success"
                          f" (window {row['window']:.0f}h), latest {latest}")
-        open_issues = [issue for issue in self.state["issues"].values()
-                       if issue.get("state") == "open"]
         lines.append(f"Open lane-failure issues: {len(open_issues)}")
         for issue in open_issues[:10]:
             lanes_text = ", ".join(f"`{n}`" for n in sorted(issue["lanes"]))
             lines.append(f"  - #{issue.get('number')} {lanes_text}: {issue['raw'][:100]}")
-        todays = {n: int(l.get("count") or 0) for n, l in self.state["dispatch_log"].items()
-                  if l.get("date") == self.today and int(l.get("count") or 0)}
-        lines.append("Healer dispatches today: " + (", ".join(f"{n} x{c}" for n, c in
-                                                             sorted(todays.items())) or "none"))
-        review = getattr(self, "held_for_review", [])
-        drafts = [item for item in review if item["draft"]]
-        lines.append(f"Held for semantic review: {len(review)} work item(s),"
-                     f" {len(drafts)} draft(s) the promoter could not promote")
-        for item in (drafts + [i for i in review if not i["draft"]])[:8]:
-            why = "; ".join(item["promotion_blockers"]) or item.get("reason") or "no reason recorded"
-            lines.append(f"  - {item['ticker']} {item.get('task_type') or ''}: {why[:100]}")
+        if groups:
+            lines.append(f"Held for semantic review: {len(review)} work item(s),"
+                         f" {len(groups)} to look at")
+            for (ticker, why), count in groups[:12]:
+                suffix = f" x{count}" if count > 1 else ""
+                lines.append(f"  - {ticker}{suffix}: {why}")
+        elif review:
+            lines.append(f"Held for semantic review: {len(review)} work item(s),"
+                         " none new this week or stuck for two weeks")
         lines.append(f"Registered feeds (P6): {len(violated)} stale"
                      + (": " + ", ".join(sorted(violated)) if violated else ""))
         if d1_status.get("status") == "ok":
@@ -1290,10 +1364,10 @@ class Supervisor:
                          f" written {d1_status.get('rows_written_pct')}% of 100k")
         else:
             lines.append(f"D1 today: {d1_status.get('status')}")
-        recent = [r for r in self.state["runs"]
-                  if (hours_between(self.now, lr.parse_iso(r)) or 0) <= 24]
-        lines.append(f"Supervisor: {len(recent)} runs in the last 24h"
-                     + (f"; gap before this run {gap:.1f}h" if gap is not None else ""))
+        if week:
+            lines.append("State changes this week: " + ", ".join(week))
+        if gap_hot:
+            lines.append(f"Supervisor gap before this run: {gap:.1f}h")
         return "\n".join(lines)
 
     # -- delivery ------------------------------------------------------------- #
@@ -1381,6 +1455,8 @@ class Supervisor:
             "d1": self.state["d1"],
             "runs": self.state["runs"],
             "unjudged_since": self.state["unjudged_since"],
+            "held_seen": self.state["held_seen"],
+            "held_baselined": bool(self.state.get("held_baselined")),
         }
         path = self.root / STATE_REL
         path.parent.mkdir(parents=True, exist_ok=True)

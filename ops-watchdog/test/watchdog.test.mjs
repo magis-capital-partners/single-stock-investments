@@ -84,14 +84,19 @@ test("a supervisor gap alerts once per tier, then says it recovered", async () =
   assert.equal(back.slack.length, 1);
 });
 
-test("D1 thresholds alert once per day, highest threshold only", async () => {
+test("D1 thresholds alert once per day, and only while the supervisor is silent", async () => {
   const kv = new FakeKV();
-  const w60 = world({ d1: { rowsRead: 3_100_000, rowsWritten: 10 } });
+  const quiet = world({ d1: { rowsRead: 3_100_000, rowsWritten: 10 } });
+  await runChecks(ENV, NOW, { fetch: quiet.fetch, store: kvStore(new FakeKV()) });
+  assert.equal(quiet.slack.length, 0, "a fresh supervisor already owns the D1 alert");
+
+  const staleAt = "2026-09-24T10:00:00Z";
+  const w60 = world({ checkedAt: staleAt, d1: { rowsRead: 3_100_000, rowsWritten: 10 } });
   await runChecks(ENV, NOW, { fetch: w60.fetch, store: kvStore(kv) });
   assert.match(w60.slack[0], /\[D1 60%\] D1 rows read today: 3,100,000 of the free 5,000,000\/day/);
   await runChecks(ENV, NOW, { fetch: w60.fetch, store: kvStore(kv) });
   assert.equal(w60.slack.length, 1);
-  const w85 = world({ d1: { rowsRead: 10, rowsWritten: 85_000 } });
+  const w85 = world({ checkedAt: staleAt, d1: { rowsRead: 10, rowsWritten: 85_000 } });
   await runChecks(ENV, NOW, { fetch: w85.fetch, store: kvStore(kv) });
   assert.match(w85.slack[0], /\[D1 80%\] D1 rows written/);
   assert.doesNotMatch(w85.slack[0], /\[D1 60%\]/);

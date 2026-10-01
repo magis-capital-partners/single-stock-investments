@@ -608,20 +608,32 @@ class AlertTests(SupervisorFixture):
         self.run_plan(T0 + timedelta(hours=12))
         self.assertFalse(any("[GAP]" in m for m in self.slack.messages))
 
-    def test_one_digest_per_day_after_1300_utc(self):
+    def test_one_sunday_digest_and_silence_on_a_green_week(self):
         self.configure([lane("ls-algo", job="intake", workflow="ls-algo-universe.yml")])
         self.receipt("ls-algo", None, job="intake", workflow="ls-algo-universe.yml")
-        day = datetime(2026, 9, 25, tzinfo=timezone.utc)
-        self.run_plan(day.replace(hour=11))
-        self.assertFalse(any("digest" in m for m in self.slack.messages))
-        self.run_plan(day.replace(hour=13, minute=41))
-        self.run_plan(day.replace(hour=15, minute=41))
+        friday = datetime(2026, 9, 25, tzinfo=timezone.utc)
+        self.run_plan(friday.replace(hour=13, minute=41))
+        self.assertFalse(any("Repository health digest" in m for m in self.slack.messages))
+        sunday = datetime(2026, 9, 27, tzinfo=timezone.utc)
+        self.run_plan(sunday.replace(hour=11))
+        self.run_plan(sunday.replace(hour=13, minute=41))
+        self.run_plan(sunday.replace(hour=15, minute=41))
         digests = [m for m in self.slack.messages if "Repository health digest" in m]
         self.assertEqual(len(digests), 1)
         self.assertIn("`ls-algo`", digests[0])
-        self.run_plan(day.replace(day=26, hour=13, minute=41))
+        self.assertNotIn("gap before this run", digests[0])
+        self.run_plan(datetime(2026, 10, 4, 13, 41, tzinfo=timezone.utc))
         digests = [m for m in self.slack.messages if "Repository health digest" in m]
         self.assertEqual(len(digests), 2)
+
+        green = SupervisorFixture()
+        green.setUp()
+        try:
+            green.configure([])
+            green.run_plan(sunday.replace(hour=13, minute=41))
+            self.assertFalse(any("Repository health digest" in m for m in green.slack.messages))
+        finally:
+            green.tearDown()
 
 
 class HeldWorkTests(SupervisorFixture):
@@ -630,30 +642,69 @@ class HeldWorkTests(SupervisorFixture):
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_text(json.dumps({"items": items}), encoding="utf-8")
 
-    def test_a_held_back_draft_is_announced_once_and_listed_in_the_digest(self):
-        # The promoter now parks a draft it cannot promote in
-        # needs_semantic_review instead of failing the lane, so the lane stays
-        # green and nothing else would ever mention the draft.
+    def test_existing_held_work_is_baselined_and_a_new_item_is_announced_once(self):
+        # The queue already sitting in needs_semantic_review is recorded, not
+        # paged. A work item that appears later is announced once. Sunday
+        # groups duplicates; a green weekday does not reprint the queue.
         self.configure([])
         self.queue([
             {"work_id": "w1", "ticker": "CRM", "task_type": "author_falsifier",
              "state": "needs_semantic_review",
              "promotion_blockers": ["metric_definition_id missing from the registry"]},
-            {"work_id": "w2", "ticker": "SPGI", "task_type": "resolve_falsifier",
+            {"work_id": "w2", "ticker": "FOXA", "task_type": "resolve_falsifier",
+             "state": "needs_semantic_review", "reason": "ttm_period_inputs_missing"},
+            {"work_id": "w2b", "ticker": "FOXA", "task_type": "resolve_falsifier",
              "state": "needs_semantic_review", "reason": "ttm_period_inputs_missing"},
             {"work_id": "w3", "ticker": "ASML", "state": "queued"}])
         result = self.run_plan(MORNING)
         joined = "\n".join(self.slack.messages)
-        self.assertIn("[HELD DRAFT] CRM", joined)
-        self.assertIn("metric_definition_id missing", joined)
-        self.assertNotIn("SPGI", joined, "only promoter drafts page; the rest go to the digest")
-        self.assertEqual(result["held_for_review"], {"items": 2, "drafts": 1})
+        self.assertNotIn("[HELD]", joined)
+        self.assertEqual(result["held_for_review"], {"items": 3, "drafts": 1})
+        self.queue([
+            {"work_id": "w1", "ticker": "CRM", "task_type": "author_falsifier",
+             "state": "needs_semantic_review",
+             "promotion_blockers": ["metric_definition_id missing from the registry"]},
+            {"work_id": "w2", "ticker": "FOXA", "task_type": "resolve_falsifier",
+             "state": "needs_semantic_review", "reason": "ttm_period_inputs_missing"},
+            {"work_id": "w2b", "ticker": "FOXA", "task_type": "resolve_falsifier",
+             "state": "needs_semantic_review", "reason": "ttm_period_inputs_missing"},
+            {"work_id": "w4", "ticker": "DG", "task_type": "resolve_falsifier",
+             "state": "needs_semantic_review", "reason": "ttm_period_inputs_missing"}])
         self.slack.messages.clear()
-        self.run_plan(MORNING.replace(hour=14))
+        self.run_plan(MORNING + timedelta(hours=2))
         joined = "\n".join(self.slack.messages)
-        self.assertNotIn("[HELD DRAFT]", joined)
-        self.assertIn("Held for semantic review: 2 work item(s), 1 draft(s)", joined)
-        self.assertIn("SPGI", joined)
+        self.assertIn("[HELD] DG", joined)
+        self.assertIn("ttm_period_inputs_missing", joined)
+        self.assertNotIn("CRM", joined)
+        self.assertNotIn("FOXA", joined)
+        self.slack.messages.clear()
+        self.run_plan(MORNING + timedelta(hours=4))
+        self.assertFalse(any("[HELD]" in m for m in self.slack.messages))
+        sunday = datetime(2026, 9, 27, 13, 41, tzinfo=timezone.utc)
+        self.run_plan(sunday)
+        digests = [m for m in self.slack.messages if "Repository health digest" in m]
+        self.assertEqual(len(digests), 1)
+        self.assertIn("FOXA x2: ttm_period_inputs_missing", digests[0])
+        self.assertIn("DG", digests[0])
+        self.assertIn("CRM", digests[0])
+
+    def test_sunday_list_skips_items_that_are_neither_new_nor_stuck(self):
+        now = datetime(2026, 10, 4, 13, 41, tzinfo=timezone.utc)
+        review = [
+            {"work_id": "a", "ticker": "FOXA", "reason": "ttm_period_inputs_missing",
+             "promotion_blockers": []},
+            {"work_id": "b", "ticker": "FOXA", "reason": "ttm_period_inputs_missing",
+             "promotion_blockers": []},
+            {"work_id": "c", "ticker": "DG", "reason": "ttm_period_inputs_missing",
+             "promotion_blockers": []},
+        ]
+        seen = {
+            "a": "2026-09-01T00:00:00Z",
+            "b": "2026-09-01T00:00:00Z",
+            "c": "2026-09-24T00:00:00Z",
+        }
+        groups = supervisor.digest_held_groups(review, seen, now)
+        self.assertEqual(groups, [(("FOXA", "ttm_period_inputs_missing"), 2)])
 
 
 class ExtractionTests(unittest.TestCase):

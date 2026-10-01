@@ -209,6 +209,7 @@ export async function runChecks(env, now, deps) {
   const state = await readHeadField(fetchImpl, rawUrl(env, setting(env, "SUPERVISOR_STATE_PATH")),
     "checked_at");
   report.supervisor = state;
+  let supervisorFresh = false;
   if (!state.ok) {
     await once(`supervisor-unreadable:${day}`,
       `[ops-watchdog] Cannot read the supervisor state from GitHub (${state.error}).`);
@@ -216,6 +217,7 @@ export async function runChecks(env, now, deps) {
     const age = hoursSince(now, state.at);
     report.supervisor.age_hours = Math.round(age * 10) / 10;
     const tier = tierFor(age, maxGap);
+    supervisorFresh = !tier;
     if (tier) {
       await once(`supervisor-gap:${state.value}:${tier}`,
         `[ops-watchdog] [GAP] The repository-health supervisor has not run for ${age.toFixed(1)}h`
@@ -228,10 +230,12 @@ export async function runChecks(env, now, deps) {
     }
   }
 
-  // (b) D1 free-plan usage today
+  // (b) D1 free-plan usage. The supervisor sends the 60%/80% alert and the
+  // Sunday digest while it is running. This worker repeats D1 only when that
+  // supervisor is silent, so a blind GitHub still gets the page.
   const usage = await fetchD1Usage(fetchImpl, env, day);
   report.d1 = usage;
-  if (usage.ok) {
+  if (usage.ok && !supervisorFresh) {
     for (const [metric, limit] of Object.entries(D1_LIMITS)) {
       const pct = (100 * usage[metric]) / limit;
       const crossed = D1_THRESHOLDS.filter((t) => pct >= t);
@@ -245,9 +249,9 @@ export async function runChecks(env, now, deps) {
         + ` serving ${metric === "rows_read" ? "reads" : "writes"} until 00:00 UTC.`);
       for (const t of crossed) marks.push([`d1:${day}:${metric}:${t}`, "1"]);
     }
-  } else {
-    // Unauthorized or unconfigured: degrade quietly; the supervisor's digest
-    // reports the same status once a day.
+  } else if (!usage.ok) {
+    // Unauthorized or unconfigured: degrade quietly. The Sunday digest is the
+    // only routine D1 line, and only when something else is worth saying.
     console.log(`ops-watchdog: D1 usage unavailable: ${usage.error}`);
   }
 
