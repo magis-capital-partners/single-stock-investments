@@ -26,6 +26,10 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 SCRIPTS = Path(__file__).resolve().parent
+if str(SCRIPTS) not in sys.path:
+    sys.path.insert(0, str(SCRIPTS))
+from stooq_csv import DAILY_HEADER, StooqNotCsvError, check_stooq_csv  # noqa: E402
+
 CONFIG = SCRIPTS / "theme_panel_config.json"
 THEMES_DIR = ROOT / "_system" / "reference" / "market-data" / "themes"
 FILING_PANELS_DIR = THEMES_DIR / "filing_panels"
@@ -153,6 +157,10 @@ def fetch_stooq_daily(symbol: str) -> tuple[list[tuple[str, float]], str | None]
     raw = _http_get(STOOQ_DAILY_URL.format(symbol=symbol.lower()))
     if raw is None:
         return [], "network"
+    try:
+        raw = check_stooq_csv(raw, DAILY_HEADER)
+    except StooqNotCsvError as exc:
+        return [], str(exc)
     rows: list[tuple[str, float]] = []
     for line in raw.splitlines()[1:]:
         parts = line.split(",")

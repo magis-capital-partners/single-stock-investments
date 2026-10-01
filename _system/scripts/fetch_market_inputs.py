@@ -14,6 +14,7 @@ SCRIPTS = Path(__file__).resolve().parent
 if str(SCRIPTS) not in sys.path:
     sys.path.insert(0, str(SCRIPTS))
 from marvin_pipeline_common import ticker_needs_commodity_inputs  # noqa: E402
+from stooq_csv import QUOTE_HEADER, check_stooq_csv  # noqa: E402
 
 COMMODITY_DIR = ROOT / "_system" / "reference" / "market-data" / "commodities"
 UA = "MarvinResearch/1.0 (market-inputs)"
@@ -147,7 +148,7 @@ def fetch_stooq(symbol: str) -> tuple[float | None, str | None, str | None]:
     url = STOOQ_URL.format(symbol=symbol.lower())
     req = urllib.request.Request(url, headers={"User-Agent": UA})
     try:
-        raw = urllib.request.urlopen(req, timeout=25).read().decode("utf-8", errors="ignore")
+        raw = check_stooq_csv(urllib.request.urlopen(req, timeout=25).read(), QUOTE_HEADER)
     except Exception as exc:
         return None, None, str(exc)
     lines = [ln.strip() for ln in raw.strip().splitlines() if ln.strip()]

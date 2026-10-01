@@ -71,6 +71,28 @@ jobs:
           python -m pip install --disable-pip-version-check --quiet "ruff==0.16.0"
           python _system/scripts/check_undefined_names.py _system/scripts _system/trading
 
+  market-data-csvs:
+    # The unit-test checkout leaves out the reference corpus, so the CSVs
+    # themselves are checked here: Stooq's HTML bot check sat in
+    # benchmarks/spy_us.csv for three months behind an HTTP 200.
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          fetch-depth: 1
+          filter: blob:none
+          sparse-checkout: |
+            /_system/scripts/check_market_data_csvs.py
+            /_system/reference/market-data/**/*.csv
+          sparse-checkout-cone-mode: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: No HTML saved as CSV under market-data
+        run: python _system/scripts/check_market_data_csvs.py
+
   unit-tests:
     runs-on: ubuntu-latest
     timeout-minutes: 20

@@ -28,6 +28,7 @@ if str(SCRIPTS) not in sys.path:
 from darwin.prices import stooq_symbol  # noqa: E402
 from fetch_equity_prices import yahoo_symbol_for  # noqa: E402
 from portfolio_registry import load_registry  # noqa: E402
+from stooq_csv import DAILY_HEADER, check_stooq_csv  # noqa: E402
 
 OUTPUT = ROOT / "dashboard" / "data" / "technical_signals.json"
 SUMMARY_OUTPUT = ROOT / "dashboard" / "data" / "technical_summary.json"
@@ -107,7 +108,7 @@ def fetch_stooq_history(symbol: str) -> tuple[list[dict], str]:
             }
         )
     )
-    raw = _request(url).decode("utf-8", errors="replace")
+    raw = check_stooq_csv(_request(url), DAILY_HEADER)
     rows = []
     for row in csv.DictReader(io.StringIO(raw)):
         close = _finite(row.get("Close"))
