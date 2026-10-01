@@ -2,8 +2,10 @@ from __future__ import annotations
 
 import json
 from datetime import datetime, timezone
-from urllib.parse import parse_qs, urlparse
 from unittest.mock import patch
+from urllib.parse import parse_qs, urlparse
+
+import pytest
 
 import fetch_equity_prices as prices
 
@@ -84,3 +86,46 @@ def test_market_mark_does_not_rewrite_model_as_of(tmp_path) -> None:
     assert updated["as_of"] == "2026-06-30"
     assert updated["inputs"]["price"] == 12.5
     assert updated["inputs"]["price_as_of"] == "2026-08-31"
+
+
+@pytest.mark.parametrize(
+    ("ticker", "market", "exchange", "expected"),
+    [
+        # Recognised exchange suffixes survive; stripping them swaps in a US
+        # listing (DNP.WA -> DNP was the NYSE DNP Select Income Fund).
+        ("DNP.WA", "EU", "WSE", "DNP.WA"),
+        ("GPW.WA", "EU", "WSE", "GPW.WA"),
+        ("ENX.PA", "EU", "Euronext Paris", "ENX.PA"),
+        ("DB1.DE", "EU", "XETRA", "DB1.DE"),
+        ("UMG.AS", "EU", "Euronext Amsterdam", "UMG.AS"),
+        ("BRKN.SW", "EU", "SIX", "BRKN.SW"),
+        ("0388.HK", "EU", "HKEX", "0388.HK"),
+        ("S68.SI", "EU", "SGX", "S68.SI"),
+        ("NZX.NZ", "AU", "NZX", "NZX.NZ"),
+        ("BOLSAA.MX", "EU", "BMV", "BOLSAA.MX"),
+        ("NOVO-B.CO", "EU", "CSE", "NOVO-B.CO"),
+        ("ABC.MI", "EU", "", "ABC.MI"),
+        ("ABC.HE", "EU", "", "ABC.HE"),
+        ("ABC.OL", "EU", "", "ABC.OL"),
+        ("ABC.MC", "EU", "", "ABC.MC"),
+        ("ABC.BR", "EU", "", "ABC.BR"),
+        ("ABC.VI", "EU", "", "ABC.VI"),
+        ("ABC.PR", "EU", "", "ABC.PR"),
+        # US share classes use a hyphen.
+        ("BRK.B", "US", "", "BRK-B"),
+        ("BF.B", "US", "", "BF-B"),
+        ("HEI.A", "US", "NYSE", "HEI-A"),
+        # Single-letter suffixes only count on their own market: a London
+        # ticker is not a share class.
+        ("FTC.L", "UK", "LSE", "FTC.L"),
+        ("RMV.L", "UK", "LSE", "RMV.L"),
+        ("LSEG", "UK", "LSE", "LSEG.L"),
+        ("9984.T", "JP", "TSE", "9984.T"),
+        # Share class inside a suffixed listing.
+        ("URB.A.TO", "CA", "TSX", "URB-A.TO"),
+        ("CSU", "CA", "TSX", "CSU.TO"),
+        ("SUM", "CA", "TSXV", "SUM.V"),
+    ],
+)
+def test_yahoo_symbol_for(ticker: str, market: str, exchange: str, expected: str) -> None:
+    assert prices.yahoo_symbol_for(ticker, market, exchange) == expected
