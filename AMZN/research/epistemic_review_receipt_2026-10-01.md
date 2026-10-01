@@ -59,3 +59,4 @@
 
 - Stance and sizing remain in `human_decision.json` only
 - Scheduled promoter appends approved draft to `falsifier_specs.json`; agents do not edit authoritative list in place
+- Post-refresh promotion check (`promote_falsifier_drafts.py`) **blocked** with `component fingerprint changed after authoring` — review stands on the frozen draft fingerprint **f4706fca…**; reconcile contract drift or re-author before append
